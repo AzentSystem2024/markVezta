@@ -1,0 +1,310 @@
+<div
+  class="timesheet-form"
+  style="
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    row-gap: 0px;
+    width: 100%;
+    margin-top: -20px;
+  "
+>
+  <!-- Column 1: Month + Employee Fields -->
+  <!-- Column 2: Leave Period -->
+  <div style="width: 100%; margin-bottom: 10px;">
+    <dx-text-box
+      label="Month"
+      [labelMode]="'floating'"
+      [value]="timesheetFormData.TS_MONTH"
+      [readOnly]="true"
+      width="200px"
+    >
+    </dx-text-box>
+  </div>
+  <div
+    class="timesheet-extra-container"
+    style="
+      flex: 1 1 48%;
+      border: 1px solid #858080;
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      row-gap: 8px;
+      min-width: 300px;
+      box-sizing: border-box;
+    "
+  >
+    <p style="margin: 0 0 0"><strong>Employee</strong></p>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap">
+      <!-- Month Field -->
+      
+      <!-- Employee Field -->
+      <div style="flex: 1 1 45%; min-width: 200px">
+        <dx-select-box
+          label="Employee Name"
+          [labelMode]="'floating'"
+          [dataSource]="employee"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="timesheetFormData.EMP_NAME"
+          placeholder="Select Employee"
+          width="100%"
+          [readOnly]="true"
+        >
+        </dx-select-box>
+      </div>
+    </div>
+  </div>
+  <div
+    class="timesheet-extra-container"
+    style="
+      flex: 1 1 48%;
+      border: 1px solid #858080;
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 300px;
+      box-sizing: border-box;
+    "
+  >
+    <p style="margin: 0 0 0"><strong>Leave Period</strong></p>
+
+    <!-- Single row for all 3 fields -->
+    <div style="display: flex; gap: 20px; flex-wrap: wrap">
+      <!-- From Date -->
+      <dx-text-box
+        [(value)]="timesheetFormData.LEAVE_FROM"
+        label="From"
+        [labelMode]="'floating'"
+        type="date"
+        placeholder="Select From Date"
+        style="flex: 1 1 30%"
+      ></dx-text-box>
+
+      <!-- Total Days Worked -->
+
+      <!-- Upto Date -->
+      <dx-text-box
+        [(value)]="timesheetFormData.LEAVE_TO"
+        label="To"
+        [labelMode]="'floating'"
+        type="date"
+        placeholder="Select Upto Date"
+        style="flex: 1 1 30%"
+      ></dx-text-box>
+      <dx-number-box
+        [(value)]="timesheetFormData.DAYS"
+        label="Total Days Worked"
+        [labelMode]="'floating'"
+        [min]="0"
+        placeholder="Enter Total Days"
+        style="flex: 1 1 30%"
+      ></dx-number-box>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 8px; width: 100%; margin-top: 10px">
+    <!-- Left Container -->
+    <div
+      class="timesheet-extra-container"
+      style="
+        flex: 1 1 35%;
+        border: 1px solid #858080;
+        padding: 16px;
+        border-radius: 8px;
+        box-sizing: border-box;
+      "
+    >
+      <p style="margin: 0 0 10px"><strong>Timesheet Details</strong></p>
+      <div class="grid-container">
+        <dx-data-grid
+          #dataGrid
+          noDataText=" "
+          [width]="'100%'"
+          [height]="'20vh'"
+          [loadPanel]="{
+            enabled: true,
+            text: 'Loading...',
+            showIndicator: true,
+            showPane: true
+          }"
+          class="grid theme-dependent"
+          [dataSource]="timesheetDetails"
+          [showBorders]="true"
+          [columnAutoWidth]="true"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true }"
+          [allowColumnReordering]="true"
+          [allowColumnResizing]="true"
+          [columnResizingMode]="'nextColumn'"
+          [scrolling]="{ mode: 'standard' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+          focusStateEnabled="false"
+
+          [autoNavigateToFocusedRow]="false"
+
+          [editing]="{ mode: 'cell', allowUpdating: true }"
+          (onRowUpdated)="onTimesheetDetailsUpdated($event)"
+        >
+          <dxi-column dataField="STORE" caption="Store">
+            <dxo-lookup
+              [dataSource]="stores"
+              displayExpr="STORE_NAME"
+              valueExpr="ID"
+              [allowClearing]="false"
+              [value]="timesheetDetails.STORE" 
+            ></dxo-lookup>
+          </dxi-column>
+
+          <dxi-column dataField="DAYS" caption="Worked Days"></dxi-column>
+          <dxi-column dataField="NORMAL_OT" caption="OT Hours" [editorOptions]="{ max: 12 }"></dxi-column>
+          <dxi-column dataField="HOLIDAY_OT" caption="Holiday OT" [editorOptions]="{ max: 12 }"></dxi-column>
+        </dx-data-grid>
+      </div>
+    </div>
+
+    <!-- Right: Additional Container -->
+    <div
+      class="timesheet-extra-container"
+      style="
+        flex: 1 1 35%;
+        border: 1px solid #858080;
+        padding: 16px;
+        border-radius: 8px;
+        box-sizing: border-box;
+      "
+    >
+      <p style="margin: 0 0 10px"><strong>Additions and Deductions</strong></p>
+      <div class="grid-container">
+        <dx-data-grid
+          #dataGrid
+          noDataText=" "
+          [width]="'100%'"
+          [height]="'20vh'"
+          [loadPanel]="{
+            enabled: true,
+            text: 'Loading...',
+            showIndicator: true,
+            showPane: true
+          }"
+          class="grid theme-dependent"
+          [dataSource]="salaryDataSource"
+          [showBorders]="true"
+          [columnAutoWidth]="true"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true }"
+          [allowColumnReordering]="true"
+          [allowColumnResizing]="true"
+          [columnResizingMode]="'nextColumn'"
+          [scrolling]="{ mode: 'standard' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+          focusStateEnabled="false"
+          [autoNavigateToFocusedRow]="false"
+          [editing]="{ mode: 'cell', allowUpdating: true }"
+          (onRowUpdated)="onSalaryHeadUpdated($event)"
+        >
+          <dxi-column dataField="SALARY_HEAD_ID" caption="Salary Head">
+            <dxo-lookup
+              [dataSource]="salaryHead"
+              valueExpr="ID"
+              displayExpr="DESCRIPTION"
+              [allowClearing]="false"
+            >
+            </dxo-lookup>
+          </dxi-column>
+
+          <dxi-column dataField="AMOUNT" caption="Amount"></dxi-column>
+        </dx-data-grid>
+      </div>
+
+      <!-- Add more fields here if needed -->
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 20px; width: 100%; margin-top: 10px">
+
+    <div
+      class="timesheet-extra-container"
+      style="
+        flex: 1 1 35%;
+        border: 1px solid #858080;
+        padding: 16px;
+        border-radius: 8px;
+        box-sizing: border-box;
+      "
+    >
+      <p style="margin: 0 0 10px"><strong>Summary</strong></p>
+
+  
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          flex-wrap: wrap;
+        "
+      >
+        <div style="flex: 1 1 22%">
+          <dx-text-box
+            placeholder="Total Days Worked"
+            [(value)]="timesheetFormData.WORKED_DAYS"
+            label="Total Days Worked"
+            [labelMode]="'floating'"
+            [readOnly]="true"
+          ></dx-text-box>
+        </div>
+        <div style="flex: 1 1 22%">
+          <dx-text-box
+            placeholder="Normal OT"
+            [(value)]="timesheetFormData.NORMAL_OT"
+            label="Normal OT"
+            [labelMode]="'floating'"
+            [readOnly]="true"
+          ></dx-text-box>
+        </div>
+        <div style="flex: 1 1 22%">
+          <dx-text-box
+            placeholder="Holiday OT"
+            [(value)]="timesheetFormData.HOLIDAY_OT"
+            label="Holiday OT"
+            [labelMode]="'floating'"
+            [readOnly]="true"
+          ></dx-text-box>
+        </div>
+        <div style="flex: 1 1 22%">
+          <dx-text-box
+            placeholder="Deduction of Days"
+            [(value)]="timesheetFormData.DAYS_DEDUCTED"
+            label="Deduction of Days"
+            [labelMode]="'floating'"
+          ></dx-text-box>
+        </div>
+        <div style="flex: 1 1 22%">
+            <dx-text-box
+              placeholder="Remarks"
+              [(value)]="timesheetFormData.REMARKS"
+              label="Remarks"
+              [labelMode]="'floating'"
+            ></dx-text-box>
+          </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  
+</div>
+
+<!-- Buttons Section -->
+<div class="fixed-footer">
+  <dx-button text="Cancel" (onClick)="handleClose()" class="ml-2"></dx-button>
+  <dx-button text="Verify" type="default" (onClick)="updateTimesheet()"></dx-button>
+</div>

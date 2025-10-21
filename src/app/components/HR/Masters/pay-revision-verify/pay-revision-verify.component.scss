@@ -1,0 +1,29 @@
+
+::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar {
+    min-height: 91px;
+    align-items: center;
+  }
+  
+  ::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar .dx-toolbar-items-container {
+    height: 100%;
+  }
+  ::ng-deep .stacked-toolbar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* space between the two date pickers */
+    margin-bottom: 50px;
+  }
+  
+  .form-popup-buttons-container {
+    display: flex;
+    justify-content: flex-end; /* Moves buttons to the right */
+    padding: 10px; /* Optional: Adds some spacing */
+}
+
+.popup-footer {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}
+.custom-text-box {
+    width: 300px !important; /* Adjust the width as needed */
+  }

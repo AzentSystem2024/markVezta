@@ -1,0 +1,168 @@
+<dx-validation-group #journalVoucherGroup>
+  <div
+    class="invoice-wrapper"
+    style="
+      height: 70vh;
+      display: flex;
+      flex-direction: column;
+
+      box-sizing: border-box;
+    "
+  >
+    <div class="view-wrapper">
+      <div class="grid">
+        <dx-data-grid
+          #itemsGridRef
+          [dataSource]="openingBalance"
+          [showBorders]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="false"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [allowColumnReordering]="true"
+          [showColumnHeaders]="true"
+          [columnAutoWidth]="true"
+          [allowColumnResizing]="true"
+          [height]="'70vh'"
+          [columnResizingMode]="'nextColumn'"
+          [headerFilter]="{ visible: true }"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: !isReadOnly,
+            allowDeleting: !isReadOnly,
+            allowAdding: !isReadOnly,
+            newRowPosition: 'first',
+            useIcons: true
+          }"
+          (onEditorPreparing)="onEditorPreparing($event)"
+          (onContentReady)="onGridContentReady($event)"
+          (onRowRemoved)="onRowRemoved($event)"
+          (onRowValidating)="onRowValidating($event)"
+        >
+          <dxo-paging [pageSize]="10"></dxo-paging>
+          <dxo-pager
+            [visible]="true"
+            [allowedPageSizes]="allowedPageSizes"
+            [displayMode]="displayMode"
+            [showPageSizeSelector]="showPageSizeSelector"
+            [showInfo]="true"
+            [showNavigationButtons]="true"
+          ></dxo-pager>
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-scrolling mode="standard"></dxo-scrolling>
+          <!-- <dxo-filter-row
+            [visible]="isFilterRowVisible"
+            [applyFilter]="auto"
+          ></dxo-filter-row>
+          <dxo-header-filter [visible]="isFilterOpened">
+            <dxo-search [enabled]="true"></dxo-search>
+          </dxo-header-filter>
+          <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+          <dxo-filter-builder [allowHierarchicalFields]="true">
+          </dxo-filter-builder> -->
+          <dxo-toolbar>
+            <dxi-item location="before">
+              <div class="grid-header">Opening Balance</div>
+            </dxi-item>
+
+            <dxi-item
+              location="after"
+              locateInMenu="auto"
+              widget="dxButton"
+              [options]="refreshButtonOptions"
+            ></dxi-item>
+          </dxo-toolbar>
+
+          <dxi-column
+            dataField="ledgerCode"
+            caption="Ledger Code"
+            [width]="130"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_CODE',
+              displayExpr: 'HEAD_CODE',
+              searchEnabled: true
+            }"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="ledgerName"
+            caption="Ledger Name"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_NAME',
+              displayExpr: 'HEAD_NAME',
+              searchEnabled: true
+            }"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="debitAmount"
+            caption="Debit Amount"
+            dataType="number"
+            [width]="150"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+            <!-- <dxo-validation-rules>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateDebitOrCredit"
+                message="Either Debit or Credit must be entered"
+              ></dxi-validation-rule>
+            </dxo-validation-rules> -->
+          </dxi-column>
+
+          <dxi-column
+            dataField="creditAmount"
+            caption="Credit Amount"
+            dataType="number"
+            [width]="150"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+            <dxo-validation-rules>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateDebitOrCredit"
+                message="Either Debit or Credit must be entered"
+              ></dxi-validation-rule>
+            </dxo-validation-rules>
+          </dxi-column>
+        </dx-data-grid>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="approve-checkbox-container"
+    style="margin-top: 10px; text-align: right"
+  >
+    <dx-check-box
+      text="Approve"
+      [(value)]="isApproved"
+      [width]="'auto'"
+    ></dx-check-box>
+  </div>
+</dx-validation-group>
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      (onClick)="cancel()"
+      stylingMode="outlined"
+      type="normal"
+    ></dx-button>
+    <dx-button
+      #saveBtnRef
+      id="saveBtn"
+      [text]="isApproved ? 'Commit' : 'Save'"
+      (onClick)="saveOpeningBalance()"
+      stylingMode="contained"
+      type="default"
+    ></dx-button>
+  </div>
+</div>

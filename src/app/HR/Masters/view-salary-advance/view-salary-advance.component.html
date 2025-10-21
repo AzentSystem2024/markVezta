@@ -1,0 +1,212 @@
+<dx-form id="form" [formData]="selected_Data">
+  <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+
+    <!-- Document No -->
+    <dxi-item>
+      <dx-text-box
+        label="Document No"
+        [readOnly]="true"
+        [(value)]="selected_Data.ADV_NO"
+        [labelMode]="'floating'">
+      </dx-text-box>
+    </dxi-item>
+
+    <!-- Date -->
+    <dxi-item>
+      <dx-date-box
+        label="Date"
+        [(value)]="selected_Data.DATE"
+        displayFormat="dd/MM/yyyy"
+        [pickerType]="'calendar'"
+        [readOnly]="isEditReadOnly"
+        [labelMode]="'floating'">
+      </dx-date-box>
+    </dxi-item>
+
+  </dxi-item>
+
+    <!-- Employee -->
+    <dxi-item>
+      <dx-text-box
+        [(value)]="selected_Data.EMP_NAME"
+        [readOnly]="isEditReadOnly"
+        label="Employee"
+        [labelMode]="'floating'">
+      </dx-text-box>
+    </dxi-item>
+
+ 
+  <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+   <!-- Advance Type -->
+    <dxi-item>
+      <dx-text-box
+        [(value)]="selected_Data.ADV_TYPE_NAME"
+        [readOnly]="isEditReadOnly"
+        label="Advance Type"
+        [labelMode]="'floating'">
+      </dx-text-box>
+    </dxi-item>
+    <!-- Amount -->
+    <dxi-item>
+      <dx-number-box
+        label="Amount"
+        [(value)]="selected_Data.ADVANCE_AMOUNT"
+        [readOnly]="isEditReadOnly"
+        [showSpinButtons]="true"
+        [labelMode]="'floating'">
+      </dx-number-box>
+    </dxi-item>
+
+
+
+  </dxi-item>
+
+  
+    <dxi-item style="text-align: left">
+      <label >
+        Recovery details:
+      </label>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+              <dxi-item>
+        <dx-number-box
+         [inputAttr]="{ style: 'text-align: right;' }"
+       
+          label="Net amount to be recovered"
+          [labelMode]="'floating'"
+          formControlName="Net_Amount_recoverd"
+           [format]="'currency'"
+             [format]="'#,##0.##'"
+          valueChangeEvent="input"
+        ></dx-number-box>
+      </dxi-item>
+
+    <!-- Amt. Recovered through Salary -->
+    <dxi-item>
+      <dx-number-box
+        label="Amt. Recovered through Salary"
+        [(value)]="selected_Data.RECOVERED_AMOUNT"
+        [readOnly]="true"
+        [showSpinButtons]="true"
+        [labelMode]="'floating'">
+      </dx-number-box>
+    </dxi-item>
+
+    <!-- No of installments -->
+    <dxi-item>
+      <dx-number-box
+        label="No of installments"
+        [(value)]="selected_Data.REC_INSTALL_COUNT"
+        [readOnly]="isEditReadOnly"
+        [showSpinButtons]="true"
+        [labelMode]="'floating'">
+      </dx-number-box>
+    </dxi-item>
+
+</dxi-item>
+        <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+    <!-- Installment Amount -->
+    <dxi-item>
+      <dx-number-box
+        label="Installment Amount"
+        [(value)]="selected_Data.REC_INSTALL_AMOUNT"
+        [readOnly]="true"
+        [showSpinButtons]="true"
+        [labelMode]="'floating'">
+      </dx-number-box>
+    </dxi-item>
+    
+      <!-- <dxi-item itemType="group" [colCount]="2" [colSpan]="2"> -->
+
+    <!-- Recovery Starts from -->
+    <dxi-item>
+      <dx-date-box
+        label="Recovery Starts from"
+        [(value)]="selected_Data.REC_START_MONTH"
+        displayFormat="dd/MM/yyyy"
+        [pickerType]="'calendar'"
+        [readOnly]="isEditReadOnly"
+        [labelMode]="'floating'">
+      </dx-date-box>
+    </dxi-item>
+</dxi-item>
+    <!-- Remarks -->
+    <dxi-item>
+      <dx-text-box
+        label="Remarks"
+        [(value)]="selected_Data.REMARKS"
+        [readOnly]="isEditReadOnly"
+        [labelMode]="'floating'">
+      </dx-text-box>
+    </dxi-item>
+
+    <!-- Voucher No -->
+    <dxi-item>
+      <dx-text-box
+        label="Voucher No"
+        [(value)]="selected_Data.VOUCHER_NO"
+        [readOnly]="true"
+        [labelMode]="'floating'">
+      </dx-text-box>
+    </dxi-item>
+
+    <!-- Voucher Date -->
+    <dxi-item>
+      <dx-date-box
+        label="Voucher Date"
+        [(value)]="selected_Data.VOUCHER_DATE"
+        displayFormat="dd/MM/yyyy"
+        [pickerType]="'calendar'"
+        [readOnly]="true"
+        [labelMode]="'floating'">
+      </dx-date-box>
+    </dxi-item>
+
+    <!-- Payment Ac -->
+    <dxi-item>
+      <dx-select-box
+        [(value)]="selected_Data.PAY_HEAD_ID"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [items]="payment_Detilas"
+        [searchEnabled]="true"
+        [readOnly]="isEditReadOnly"
+        placeholder="Select.."
+        label="Payment Ac"
+        [labelMode]="'floating'">
+      </dx-select-box>
+    </dxi-item>
+
+    <!-- Cheque No -->
+    <dxi-item>
+      <dx-text-box
+        label="Cheque No"
+        [(value)]="selected_Data.CHEQUE_NO"
+        [readOnly]="isEditReadOnly"
+        [labelMode]="'floating'">
+      </dx-text-box>
+    </dxi-item>
+
+    <!-- Cheque Due Date -->
+    <dxi-item>
+      <dx-date-box
+        label="Cheque Due Date"
+        [(value)]="selected_Data.DATE"
+        displayFormat="dd/MM/yyyy"
+        [pickerType]="'calendar'"
+        [readOnly]="isEditReadOnly"
+        [labelMode]="'floating'">
+      </dx-date-box>
+    </dxi-item>
+
+    <!-- Approve -->
+    <dxi-item>
+      <dx-check-box
+        text="Approve"
+        [(value)]="approveValue"
+        [readOnly]="isEditReadOnly">
+      </dx-check-box>
+    </dxi-item>
+
+  <!-- </dxi-item> -->
+</dx-form>

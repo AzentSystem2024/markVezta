@@ -1,0 +1,264 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'75vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="filteredInventoryList"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onEditingStart)="onEditInventory($event)"
+      (onRowRemoving)="onDeleteInventory($event)"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Physical Inventory</div>
+        </dxi-item>
+        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [visible]="canAdd"
+          [options]="addButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+      <div *dxTemplate="let data of 'dateFilterTemplate'">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="180"
+        >
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
+        </dx-select-box>
+      </div>
+      <dxi-column
+        dataField="PHYSICAL_NO"
+        caption="Inventory No."
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="PHYSICAL_DATE"
+        caption="Date"
+        dataType="date"
+        [width]="'auto'"
+        [allowEditing]="false"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+      <dxi-column
+        dataField="STORE_NAME"
+        caption="Store."
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="REASON_DESCRIPTION"
+        caption="Reason"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="NARRATION"
+        caption="Narration"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        caption="Status"
+        dataField="TRANS_STATUS"
+        [cellTemplate]="statusCellRender"
+        [allowHeaderFiltering]="true"
+        [headerFilter]="{
+          dataSource: getStatusFilterData,
+          encodeHtml: false
+        }"
+      >
+      </dxi-column>
+    </dx-data-grid>
+  </div>
+</div>
+
+<dx-popup
+  [(visible)]="isPrePopupVisible"
+  [width]="'40vw'"
+  [height]="'auto'"
+  title="Select Data"
+  [showCloseButton]="true"
+>
+  <div style="padding: 20px">
+    <dx-form [formData]="prePopupData" [colCount]="1">
+      <dxi-item>
+        <dx-tag-box
+          [dataSource]="department"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="prePopupData.DEPT_ID"
+          [width]="'100%'"
+          [showSelectionControls]="true"
+          label="Department"
+          labelMode="floating"
+          [searchEnabled]="true"
+          [multiline]="false"
+          [title]="getTagBoxTooltip()"
+        ></dx-tag-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-tag-box
+          [dataSource]="brand"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="prePopupData.BRAND_ID"
+          [width]="'100%'"
+          [showSelectionControls]="true"
+          label="Brand"
+          labelMode="floating"
+          [multiline]="false"
+          [searchEnabled]="true"
+          [title]="getTagBoxTooltipForBrand()"
+        ></dx-tag-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-tag-box
+          [dataSource]="supplier"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="prePopupData.SUPP_ID"
+          [width]="'100%'"
+          label="Supplier"
+          labelMode="floating"
+          [searchEnabled]="true"
+          [multiline]="false"
+          [showSelectionControls]="true"
+          [title]="getTagBoxTooltipForSupplier()"
+        ></dx-tag-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-tag-box
+          [dataSource]="category"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="prePopupData.CAT_ID"
+          [width]="'100%'"
+          label="Category"
+          labelMode="floating"
+          [searchEnabled]="true"
+          [multiline]="false"
+          [showSelectionControls]="true"
+          [title]="getTagBoxTooltipForCategory()"
+        ></dx-tag-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-check-box
+          [(value)]="prePopupData.ALL_ITEMS"
+          text="All Items"
+        ></dx-check-box>
+      </dxi-item>
+    </dx-form>
+
+    <div style="text-align: right; margin-top: 20px">
+      <dx-button
+        text="Cancel"
+        type="normal"
+        (onClick)="closePrePopup()"
+        style="margin-right: 10px"
+      ></dx-button>
+      <dx-button
+        text="Apply"
+        type="default"
+        (onClick)="applyPrePopup()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isAddInventory"
+  [width]="'75vw'"
+  [height]="'100vh'"
+  title="Physical Inventory"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isAddInventory">
+    <app-physical-inventory-form
+      [filterData]="prePopupData"
+      (popupClosed)="handleClose()"
+    ></app-physical-inventory-form>
+  </ng-container>
+</dx-popup>
+<dx-popup
+  [(visible)]="isEditInventory"
+  [width]="'75vw'"
+  [height]="'100vh'"
+  title="Physical Inventory"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditInventory">
+    <app-physical-inventory-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedInventory"
+      [isReadOnlyMode]="isReadOnlyInventory"
+      (popupClosed)="handleClose()"
+    ></app-physical-inventory-form>
+  </ng-container>
+</dx-popup>

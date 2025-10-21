@@ -1,0 +1,154 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="tenders"
+    (onRowRemoving)="onRowRemoving($event)"
+    [showBorders]="true"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    (onExporting)="onExporting($event)"
+    (onRowUpdating)="onRowUpdating($event)"
+  >
+  <dxo-filter-row
+  [visible]="showFilterRow"
+></dxo-filter-row>
+
+<dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+<dxo-export
+    [enabled]="true"
+    [formats]="['xlsx', 'pdf']"
+  >
+  </dxo-export>
+
+  <dxo-paging [pageSize]="10"></dxo-paging>
+  <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-popup title="Edit Tenders" [showTitle]="true" [width]="600" [height]="640">
+        
+      </dxo-popup>
+      <dxo-form [colCount]="1">
+        <dxi-item itemType="group" [colCount]="2">
+            <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="CODE" width="100"></dxi-item>
+          </dxi-item>
+          <dxi-item dataField="IS_INACTIVE" [colCount]="1" editorType="dxCheckBox" cssClass="checkbox-right" [editorOptions]="{ text: 'Inactive' }">
+            <dxo-label [visible]="false"></dxo-label>
+          </dxi-item>
+        </dxi-item>
+        <dxi-item [colCount]="1" dataField="DESCRIPTION" ></dxi-item>
+
+        <dxi-item [colCount]="1" dataField="ARABIC_DESCRIPTION" [editorOptions]=" {rtlEnabled: true}"></dxi-item>
+        <dxi-item itemType="group" [colCount]="2">
+        <dxi-item [colCount]="1" dataField="TENDERTYPE_DESCRIPTION"></dxi-item>
+        <dxi-item [colCount]="1" dataField="DISPLAY_ORDER"></dxi-item>
+        </dxi-item>
+        <dxi-item [colCount]="1" dataField="CURRENCY_DESCRIPTION"></dxi-item>
+        <dxi-item dataField="ALLOW_OPENING" editorType="dxCheckBox" [editorOptions]="{ text: 'Allow Opening' }">
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
+        <dxi-item dataField="ALLOW_DECLARATION" editorType="dxCheckBox" [editorOptions]="{ text: 'Allow Declaration' }">
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
+        <dxi-item dataField="ADDITIONAL_INFO_REQUIRED" editorType="dxCheckBox" [editorOptions]="{ text: 'Additional information required' }">
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
+      
+          
+      </dxo-form>
+  </dxo-editing>
+  <dxo-search-panel
+        [visible]="true"
+        placeholder="Data Search"
+     ></dxo-search-panel>
+  <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header">Tenders</div>
+      </dxi-item>
+  
+  <dxi-item location="after" locateInMenu="auto">
+      <dx-button
+        text="Add"
+        icon="plus"
+        type="default"
+        stylingMode="contained"
+        (onClick)="addTenders()"
+        
+      ></dx-button>
+    </dxi-item>
+    <dxi-item
+          location="after"
+          locateInMenu="auto"
+          showText="inMenu"
+          widget="dxButton"
+          [options]="{
+            text: 'Refresh',
+            icon: 'refresh',
+            stylingMode: 'text'
+          }"
+        ></dxi-item>
+        <dxi-item location="after" locateInMenu="auto">
+          <div class="separator"></div>
+        </dxi-item>
+        <dxi-item name="exportButton"></dxi-item>
+        <dxi-item location="after" locateInMenu="auto">
+          <div class="separator"></div>
+        </dxi-item>
+        <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+  
+  </dxo-toolbar>
+  <dxi-column dataField="CODE" caption="Code"></dxi-column>
+  <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+  <dxi-column dataField="TENDERTYPE_DESCRIPTION" caption="Tender Type">
+    <dxo-lookup
+    [dataSource]="TenderTypeDropdownData"
+    displayExpr="DESCRIPTION"
+    valueExpr="ID"
+    ></dxo-lookup>
+  </dxi-column>
+  <dxi-column dataField="CURRENCY_DESCRIPTION" caption="Currency">
+    <dxo-lookup
+    [dataSource]="currencyList"
+    displayExpr="DESCRIPTION"
+    valueExpr="ID"
+    ></dxo-lookup>
+  </dxi-column>
+  <dxi-column dataField="ARABIC_DESCRIPTION" caption="Arabic Description"></dxi-column>
+  <dxi-column dataField="DISPLAY_ORDER" caption="Display Order" alignment="left"></dxi-column>
+  <dxi-column
+    dataField="IS_INACTIVE"
+    dataType="boolean"
+    [visible]="false"
+  ></dxi-column>
+  <dxi-column
+    dataField="IS_INACTIVE"
+    dataType="boolean"
+    [visible]="false"
+  ></dxi-column>
+  <dxi-column
+    dataField="ALLOW_OPENING"
+    dataType="boolean"
+    [visible]="false"
+  ></dxi-column>
+  <dxi-column
+    dataField="ALLOW_DECLARATION"
+    dataType="boolean"
+    [visible]="false"
+  ></dxi-column>
+  <dxi-column
+    dataField="ADDITIONAL_INFO_REQUIRED"
+    dataType="boolean"
+    [visible]="false"
+  ></dxi-column>
+  
+
+
+
+  </dx-data-grid>
+  <form-popup
+      [(visible)]="isAddTendersPopupOpened"
+      (save)="onClickSaveTenders()"
+      titleText="New Tenders"
+    >
+      <app-tenders-form></app-tenders-form>
+    </form-popup>
+  </div>

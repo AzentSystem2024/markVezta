@@ -1,0 +1,188 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'75vh'"
+        [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="FixedAssets"
+           [showColumnLines]="true"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+       (onEditingStart)="onEditFixedAssets($event)"
+         (onRowRemoving)="delete_FixedAssets_Data($event)"
+    >
+      <dxo-editing
+        mode="popup"
+         [allowUpdating]="true"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+       
+      ></dxo-filter-row>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">Fixed Assets</div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+<dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+                      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+
+   <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+       *ngIf="canAdd"
+    ></dxi-item>
+
+        <!-- <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            icon="plus"
+            hint="Add"
+            type="default"
+            stylingMode="contained"
+  (onClick)="addPacking()"
+          ></dx-button>
+        </dxi-item> -->
+      </dxo-toolbar>
+    <dxi-column dataField="CODE" caption="Code"></dxi-column>  
+    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+
+<dxi-column dataField="ASSET_TYPE" caption="Assets Type"></dxi-column>
+<!-- <dxi-column dataField="PackingName" caption="Location"></dxi-column> -->
+<dxi-column dataField="PURCH_DATE" caption="Purchase Date"></dxi-column>
+<dxi-column dataField="ASSET_VALUE"  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"  caption="Purchase Value"></dxi-column>
+<!-- <dxi-column dataField="ID" caption="ID"></dxi-column> -->
+<dxi-column dataField="USEFUL_LIFE" caption="Useful Life(year)" alignment="left"></dxi-column>
+    <dxi-column dataField="NET_DEPRECIATION"  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" caption="Total Depreciation"></dxi-column>
+    <dxi-column dataField="CURRENT_VALUE"   [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"caption="Net Assets Value"></dxi-column>
+<!-- <dxi-column dataField="PairQty" caption="Pair Qty"></dxi-column> -->
+<dxi-column dataField="IS_INACTIVE" caption="Status" alignment="center"  cellTemplate="statusCellTemplate"></dxi-column>
+<!-- <dxi-column dataField="Unit" caption="Unit"></dxi-column> -->
+
+   <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value ? 'Inactive ' : 'Active '"
+        style="margin-left: 10px; cursor: default"
+      ></i>       
+    </div>
+<dxi-column
+  type="buttons"
+  [buttons]="gridButtons">
+</dxi-column>
+
+    </dx-data-grid>
+  </div>
+</div>
+
+<!-- <dx-popup
+  [(visible)]="isAddInvoice"
+  [width]="'90vw'"
+  [height]="'85vh'"
+  title="New Invoice"
+  (onHiding)="handleClose()"
+>
+  <app-add-invoice (popupClosed)="handleClose()"></app-add-invoice>
+</dx-popup> -->
+
+<dx-popup
+  [(visible)]="AddFixedAssetsPopupVisible"
+  [width]="'50vw'"
+  [height]="'70vh'"
+  title="New Fixed Assets"
+  (onHiding)="handleClose()"
+>
+  <!-- <app-fixed-asstes-add
+    (popupClosed)="handleClose()"
+  ></app-fixed-asstes-add> -->
+
+  <ng-container *ngIf="AddFixedAssetsPopupVisible">
+    <app-fixed-asstes-add (popupClosed)="handleClose()"></app-fixed-asstes-add>
+  </ng-container>
+
+</dx-popup>
+
+
+<dx-popup
+  [(visible)]="EditFixedAssetsPopupVisible"
+  [width]="'50vw'"
+  [height]="'75vh'"
+  title="Update Fixed Assets"
+  (onHiding)="handleClose()"
+>
+  <app-fixed-asstes-edit
+  
+      [SelectFixedAssetData]="Selected_fixedAssets_data"
+    (popupClosed)="handleClose()"
+  ></app-fixed-asstes-edit>
+</dx-popup>
+<!-- <dx-popup
+
+
+ *ngIf="editArticlePopupOpened"
+    
+
+[articleData]="selectedArticle"======================Update data==========
+  [(visible)]="editArticlePopupOpened"
+  [width]="'70vw'"
+  [height]="'95vh'"
+  title="Update Article"
+  (onHiding)="handleClose()"
+>
+  <app-article-edit
+    *ngIf="editArticlePopupOpened"
+      [articleData]="selectedArticle"
+    (popupClosed)="handleClose()"
+  ></app-article-edit>
+</dx-popup> -->

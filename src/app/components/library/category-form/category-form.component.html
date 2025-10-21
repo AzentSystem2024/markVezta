@@ -1,0 +1,48 @@
+<dx-form class="plain-styled-form">
+  <dxi-item itemType="group">
+    <dxo-col-count-by-screen
+      [xs]="1"
+      [sm]="1"
+      [md]="1"
+      [lg]="1"
+    ></dxo-col-count-by-screen>
+
+    <!-- Code -->
+    <dxi-item>
+      <dx-text-box
+        [(value)]="newCategory.CODE"
+        label="Code"
+        labelMode="floating"><dx-validator>
+  <dxi-validation-rule type="required" message="Code is required"></dxi-validation-rule>
+</dx-validator>
+      </dx-text-box>
+    </dxi-item>
+
+    <!-- Category Name -->
+    <dxi-item>
+      <dx-text-box
+        [(value)]="newCategory.CAT_NAME"
+        label="Category Name"
+        labelMode="floating"><dx-validator>
+  <dxi-validation-rule type="required" message="Category name is required"></dxi-validation-rule>
+</dx-validator>
+      </dx-text-box>
+    </dxi-item>
+
+    <!-- Department -->
+    <dxi-item>
+      <dx-select-box
+        [items]="DepartmentDropdownData"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        placeholder="Select Department"
+        [(value)]="newCategory.DEPT_ID"
+        label="Department"
+        labelMode="floating"><dx-validator>
+  <dxi-validation-rule type="required" message="Department is required"></dxi-validation-rule>
+</dx-validator>
+      </dx-select-box>
+    </dxi-item>
+
+  </dxi-item>
+</dx-form>

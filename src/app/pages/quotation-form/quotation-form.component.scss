@@ -1,0 +1,247 @@
+@use "../../../variables.scss" as *;
+@use "sass:math";
+.quotation-page {
+  :host {
+    --side-panel-toolbar-height: 80px;
+
+    width: 100%;
+    display: contents;
+    overflow: auto;
+  }
+
+  .view-wrapper {
+    .grid {
+      .name-template {
+        .position {
+          font-size: 12px;
+          color: var(--texteditor-label-color);
+        }
+      }
+
+      ::ng-deep & {
+        .dx-datagrid-header-panel {
+          padding: 0 var(--content-padding);
+        }
+
+        .dx-toolbar {
+          margin-bottom: 0;
+          padding: var(--toolbar-margin-bottom) 0;
+        }
+
+        .dx-datagrid-content .dx-row {
+          cursor: pointer;
+        }
+      }
+
+      .grid-header {
+        @include header();
+      }
+    }
+
+    user-panel {
+      display: inherit;
+    }
+  }
+
+  /* Main wrapper */
+  .invoice-wrapper {
+    height: auto; /* let it shrink to fit content */
+    max-height: 90vh; /* optional: prevent overflowing outside screen */
+    overflow-y: visible; /* no internal scrollbar */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  /* Toolbar fixes */
+  ::ng-deep .quotation-grid-wrapper .dx-datagrid .dx-toolbar {
+    min-height: 120px; /* raise baseline */
+    height: 120px;
+    align-items: center;
+    z-index: 2;
+    position: relative;
+  }
+
+  ::ng-deep
+    .quotation-grid-wrapper
+    .dx-datagrid
+    .dx-toolbar
+    .dx-toolbar-items-container {
+    height: 100%;
+    padding: 0 10px !important;
+  }
+
+  /* Header fix */
+  ::ng-deep .quotation-grid-wrapper .dx-datagrid-headers {
+    margin-top: 0;
+  }
+
+  ::ng-deep .stacked-toolbar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 30px;
+  }
+
+  /* Buttons container */
+  .form-popup-buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 4px 10px 0 10px;
+    margin-top: -10px;
+  }
+
+  .popup-footer {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Data grid borders */
+  ::ng-deep .dx-data-grid .dx-row > td,
+  ::ng-deep .dx-data-grid .dx-header-row > td {
+    border-right: 1px solid #ccc !important;
+    border-bottom: 1px solid #ccc !important;
+  }
+
+  ::ng-deep .dx-data-grid .dx-header-row > td {
+    background-color: #f9f9f9;
+  }
+
+  ::ng-deep .dx-data-grid .dx-row > td:empty::after {
+    content: "\00a0";
+    display: block;
+  }
+
+  /* Select alignment */
+  ::ng-deep .align-select .dx-texteditor {
+    height: 28px !important;
+    line-height: 28px !important;
+  }
+
+  ::ng-deep .align-select .dx-texteditor-input {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    font-size: 13px;
+  }
+  .net-amount-wrapper {
+    display: flex; /* place input and checkbox in a row */
+    align-items: center; /* vertically center them */
+    gap: 10px; /* spacing between Net Amount and checkbox */
+  }
+  .form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 10px;
+    gap: 5px;
+    flex-wrap: wrap; /* ensures responsive layout */
+  }
+
+  .footer-left {
+    flex: 1;
+  }
+
+  .narration-box {
+    width: 50%;
+  }
+
+  .footer-right {
+    display: flex;
+    flex-direction: column; /* checkbox above buttons */
+    align-items: flex-start;
+    gap: 2px; /* spacing between checkbox and buttons */
+  }
+
+  .footer-actions {
+    position: fixed; /* fix to screen */
+    bottom: 20px; /* distance from bottom */
+    right: 20px; /* distance from right */
+    display: flex;
+    gap: 10px;
+    z-index: 1000; /* ensure it stays on top */
+  }
+
+  .approve-checkbox {
+    margin-bottom: 5px;
+  }
+
+  ::ng-deep .blue-outline-btn.dx-button {
+    border: 1px solid #007bff !important; /* blue border */
+    // color: #007bff !important;           /* blue text */
+  }
+
+  ::ng-deep .blue-outline-btn.dx-button .dx-icon {
+    color: #007bff !important; /* blue icon */
+  }
+  .roundoff-checkbox .dx-checkbox-container {
+    flex-direction: row-reverse; /* puts text before the checkbox */
+  }
+
+  .section-heading {
+    font-size: 16px;
+    font-weight: normal; /* removes bold */
+    margin-bottom: 8px;
+  }
+  /* Remove the border/box around tab headers */
+  /* Remove border around the whole tabpanel */
+  .tab-header-space {
+    margin-top: 12px; /* space between tab headers and content */
+  }
+
+  .common-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  /* Clean tab look (like your screenshot) */
+  ::ng-deep .dx-tabs {
+    border: none !important;
+    background: transparent !important;
+  }
+
+  ::ng-deep .dx-tab {
+    border: none !important;
+    background: transparent !important;
+  }
+
+  ::ng-deep .dx-tab-selected {
+    font-weight: bold;
+  }
+  ::ng-deep .custom-tab-panel .dx-tabs .dx-tab {
+    margin-right: 20px; /* adjust space between headers */
+  }
+  .dx-datagrid .dx-data-row {
+    height: 40px !important; /* Adjust as needed */
+  }
+
+  .dx-datagrid .dx-editor-cell {
+    height: 100% !important;
+  }
+
+  .small-btn {
+    font-size: 12px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    margin-top: 10px !important; /* moves the button downward */
+  }
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .quotation-grid-wrapper,
+  .quotation-grid-wrapper * {
+    visibility: visible;
+  }
+
+  .quotation-grid-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

@@ -1,0 +1,262 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [showBorders]="true"
+    height="84vh"
+    [dataSource]="grnDataSource"
+    [showColumnLines]="true"
+    (onRowRemoved)="deleteGrnData($event)"
+    (onEditingStart)="onEditingRow($event)"
+  >
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="standard"></dxo-scrolling>
+    <dxo-sorting mode="multiple"></dxo-sorting>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-column-chooser [enabled]="true" [height]="400"></dxo-column-chooser>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    <!-- <dxo-pager
+            [visible]="true"
+            [allowedPageSizes]="allowedPageSizes"
+            [displayMode]="displayMode"
+            [showPageSizeSelector]="showPageSizeSelector"
+            [showInfo]="showInfo"
+            [showNavigationButtons]="showNavButtons"
+          ></dxo-pager> -->
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    </dxo-editing>
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header">Goods Receipt Note</div>
+      </dxi-item>
+
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
+
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <div class="separator"></div>
+      </dxi-item>
+      <dxi-item name="exportButton"></dxi-item>
+      <!-- <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item> -->
+    </dxo-toolbar>
+
+    <dxi-column
+      dataField="GRN_NO"
+      width="100"
+      caption="GRN NO"
+      alignment="left"
+    ></dxi-column>
+    <dxi-column
+      dataField="GRN_DATE"
+      displayFormat="dd-MM-yyyy"
+      caption="GRN DATE"
+      dataType="date"
+      [allowEditing]="false"
+      format="dd-MM-yyyy"
+    ></dxi-column>
+    <dxi-column
+      dataField="PO_NO"
+      width="100"
+      caption="PO NO"
+      alignment="left"
+    ></dxi-column>
+    <dxi-column caption="SUPPLIER NAME" dataField="SUPPPLIER_NAME"></dxi-column>
+    <dxi-column
+      caption="NET AMOUNT"
+      dataField="NET_AMOUNT"
+      dataType="number"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+    <dxi-column
+      caption="STATUS"
+      dataField="STATUS"
+      [cellTemplate]="statusCellRender"
+    ></dxi-column>
+
+    <dxi-column type="buttons" width="100" [buttons]="allButtonsEditDelete">
+    </dxi-column>
+    <dxi-column type="buttons" width="100" [buttons]="customButtons">
+    </dxi-column>
+  </dx-data-grid>
+</div>
+
+<form-popup
+  [(visible)]="isGRNPopupVisible"
+  [width]="width"
+  [height]="height"
+  titleText="New Goods Receipt Note"
+  (save)="onClickSaveNewData()"
+  (closePopup)="ClearFormData()"
+>
+  <app-grn-new-form></app-grn-new-form>
+</form-popup>
+
+<!-- <dx-popup
+    [(visible)]="isEditPopupOpened"
+    title="Edit Goods Receipt Note"
+    [height]="'100vh'"
+    [width]="width"
+    (save)="updateGrnData()"
+  
+  >
+  <app-grn-edit-form
+  [formdata]="selectedRowData"
+  ></app-grn-edit-form>
+  <dxi-toolbar-item toolbar="bottom" location="after">
+    <div
+        class="form-popup-buttons-container" 
+        [class.flex-buttons]="width <= 360"
+      >
+      <dx-button
+      text="Print"
+      stylingMode="outlined"
+      type="normal"
+      icon="print"
+      (onClick)="PrintGrn()"
+    ></dx-button>
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+       (onClick)="closeEdit()"
+      ></dx-button>
+      <dx-button
+        text="Save"
+        stylingMode="contained"
+        type="default"
+        (onClick)="updateGrnData()"
+      ></dx-button>
+    </div>
+    </dxi-toolbar-item>
+
+</dx-popup> -->
+
+<form-popup
+  [(visible)]="isVerifyPopupOpened"
+  titleText="Edit Goods Receipt Note"
+  [height]="'100vh'"
+  [width]="width"
+  (save)="verifyGrnData()"
+>
+  <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
+</form-popup>
+
+<form-popup
+  [(visible)]="isApprovePopupOpened"
+  titleText="Approve Goods Receipt Note"
+  [height]="'100vh'"
+  [width]="width"
+  (save)="approveGrnData()"
+>
+  <app-grn-approve-form [formdata]="selectedRowData"></app-grn-approve-form>
+</form-popup>
+
+<dx-popup
+  [(visible)]="isViewPopupOpened"
+  title="View Goods Receipt Note"
+  [height]="'95vh'"
+  [width]="width"
+>
+  <app-grn-view-form [formdata]="selectedRowData"></app-grn-view-form>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="showTemplatePopup"
+  title="Choose Template"
+  [height]="'30vh'"
+  [width]="'30vw'"
+  [showCloseButton]="true"
+>
+  <div class="popup-content">
+    <dx-select-box
+      [(value)]="selectedTemplate"
+      [dataSource]="templateList"
+      displayExpr="TEMPLATE_NAME"
+      valueExpr="TEMPLATE_NAME"
+      placeholder="Select a template"
+      [searchEnabled]="true"
+    ></dx-select-box>
+    <dxi-toolbar-item toolbar="bottom" location="after">
+      <div
+        class="form-popup-buttons-container"
+        [class.flex-buttons]="width <= 360"
+      >
+        <dx-button
+          style="margin-top: 30px"
+          text="Print"
+          type="default"
+          stylingMode="contained"
+          [width]="'100px'"
+          (onClick)="applyTemplate()"
+        ></dx-button>
+      </div>
+    </dxi-toolbar-item>
+  </div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="showReportDesigner"
+  title="Print Goods Receipt Note"
+  [height]="'100vh'"
+  [width]="width"
+  [showCloseButton]="true"
+  *ngIf="flag"
+>
+  <div>
+    <dx-report-viewer [reportUrl]="reportName" height="800px">
+      <dxrv-request-options
+        [invokeAction]="getDesignerModelAction"
+        [host]="host"
+      ></dxrv-request-options>
+      <dxrv-callbacks
+        (ParametersInitialized)="OnParametersInitialized($event)"
+      ></dxrv-callbacks>
+    </dx-report-viewer>
+  </div>
+</dx-popup>

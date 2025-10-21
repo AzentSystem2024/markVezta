@@ -1,0 +1,169 @@
+<div class="view-wrapper list-page">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div>
+    <dx-data-grid
+      #dataGrid
+      noDataText=" "
+      [width]="'100%'"
+      [height]="'540px'"
+      class="grid theme-dependent"
+      [dataSource]="stockData"
+      [columns]="columns"
+      (onCellPrepared)="onCellPrepared($event)"
+      [filterRow]="{ visible: true, applyFilter: 'auto' }"
+      [showColumnHeaders]="true"
+      [headerFilter]="{ visible: true }"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [allowColumnReordering]="true"
+      [wordWrapEnabled]="false"
+
+      rowAlternationInterval="2"
+      [editing]="{
+            mode: 'cell',
+            allowUpdating: true,
+        }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+      }"
+      (onContentReady)="onContentReady($event)"
+
+      keyExpr="BARCODE"
+      [scrolling]="{ mode: 'standard' }"
+      (onRowClick)="onRowClick($event)"
+      (onExporting)="onExporting($event)"
+      (onSelectionChanged)="onSelectionChanged($event)"
+      [selection]="{
+        mode: 'multiple',
+        showCheckBoxesMode: 'always'
+      }"
+      [(selectedRowKeys)]="selectedRowKeys"
+    >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser>
+
+      <!-- <dxi-item name="exportButton" ></dxi-item> -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling
+        mode="standard"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-filter-row
+        [visible]="isFilterOpened"
+        [applyFilter]="applyFilter"
+      ></dxo-filter-row>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="true"
+        [formats]="['xlsx', 'pdf']"
+      >
+      </dxo-export>
+      <dxo-header-filter [visible]="true"></dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+
+      <dxo-editing mode="popup"> </dxo-editing>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header custom-header">Stock View</div>
+        </dxi-item>
+
+        <!-- <dxi-item
+          location="after"
+          locateInMenu="auto"
+          showText="inMenu"
+          widget="dxButton"
+          [options]="{
+            text: 'Refresh',
+            icon: 'refresh',
+            onClick: refresh,
+            stylingMode: 'text',
+            hint: 'Refresh'
+          }"
+        ></dxi-item> -->
+        
+
+        <dxi-item
+          widget="dxButton"
+          [options]="{
+            text: '',
+            icon: 'filter',
+            onClick: filterClick,
+
+            hint: 'Search Column',
+            disabled: isFilterInProgress
+          }"
+        ></dxi-item>
+
+        <dxi-item
+          widget="dxButton"
+          [options]="{
+    text: '',
+    icon: 'formula',
+    onClick: SummaryClick,
+    hint: 'Hide/Show Summary',
+  }"
+        ></dxi-item>
+
+        <dxi-item
+    class="columnfinderclass"
+    widget="dxDropDownButton"
+    [options]="{
+      dataSource: ColumnNames,
+      onItemClick: findColumnLocation, 
+      placeholder: 'Search Column',
+      noDataText: 'Load data and try again',
+      disabled: isLoading || !ColumnNames.length, 
+      hint: 'Column location finder',
+      icon: 'columnproperties',
+      dropDownOptions: {
+        width: 'auto',
+        height: '60vh'
+      }
+    }"
+  ></dxi-item>
+
+        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
+
+        <dxi-item name="exportButton"></dxi-item>
+      </dxo-toolbar>
+
+      <!-- <dxo-summary>
+        <dxi-total-item column="TOTAL" summaryType="sum"> </dxi-total-item>
+      </dxo-summary> -->
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+    </dx-data-grid>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+.form-container {
+    display: flex;
+    gap: 10px; /* spacing between columns */
+    margin-bottom: 10px;
+  }
+  
+  .form-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .form-popup-buttons-container {
+    display: flex;
+    justify-content: flex-end; /* Moves buttons to the right */
+    padding: 10px; /* Optional: Adds some spacing */
+}
+
+.popup-footer {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}

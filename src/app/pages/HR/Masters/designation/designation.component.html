@@ -1,0 +1,148 @@
+<div class="view-wrapper list-page">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div><!-- DevExtreme Loading Indicator -->
+  </div>
+    <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="Designation"
+    [showBorders]="true"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [allowColumnReordering]="true"
+    [height]="'80vh'"
+    noDataText=" "
+    [allowColumnResizing]="true"
+    (onRowRemoved)="delete_Department($event)"
+    [pager]="{ 
+        showInfo: true, 
+        infoText: 'Page {0} of {1}', 
+        showNavigationButtons: true 
+      }"
+     (onEditingStart)="onEditingStart($event)"
+    >
+
+    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+    <dxo-filter-row [visible]="showFilterRow" [applyFilter]="currentFilter"></dxo-filter-row>
+
+    <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+   
+      
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+    [visible]="true"
+    [showPageSizeSelector]="true"
+    [allowedPageSizes]="[10,20,30,40]"
+    ></dxo-pager>
+
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+        <dxo-popup title="Update Designation" [showTitle]="true" [width]="600" [height]="300"></dxo-popup>
+      </dxo-editing>
+
+      <dxo-search-panel
+    [visible]="true"
+    placeholder="Data Search"
+  ></dxo-search-panel>
+
+  <dxo-toolbar>
+    <dxi-item location="before">
+        <div class="grid-header">Designation</div>
+      </dxi-item>
+  
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text=""
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addDesignation()"></dx-button>
+      </dxi-item>
+
+      <dxi-item
+    location="after"
+    locateInMenu="never"
+    showText="inMenu"
+    widget="dxButton"
+    [options]="{
+      text: 'Refresh',
+      icon: 'refresh',
+      stylingMode: 'text',
+      onClick: refresh
+    }"
+  ></dxi-item>
+  
+ 
+  <dxi-item name="searchPanel" locateInMenu="never"></dxi-item> 
+  </dxo-toolbar>
+
+
+    <!-- This field ID optional .Used for displaying data temp -->
+    <dxi-column dataField="SlNo" [width]="80" caption="Sl.No" [allowFiltering]="false" [allowEditing]="false" alignment="left"  [allowHeaderFiltering]="false"></dxi-column>
+  <dxi-column dataField="CODE" caption="Code">
+    <!-- <dxi-validation-rule type="required" message="Code is required">
+      <dxi-validation-rule type="required" message="Code is required">
+      </dxi-validation-rule>
+    </dxi-validation-rule> -->
+  </dxi-column>
+  <dxi-column dataField="DESG_NAME" caption="Designation">
+    <!-- <dxi-validation-rule type="required" message="Designations required">
+      <dxi-validation-rule type="required" message="Designation required">
+      </dxi-validation-rule>
+    </dxi-validation-rule> -->
+  </dxi-column>
+  <dxi-column dataField="IS_INACTIVE" caption="Status" [calculateCellValue]="formatStatus" [cellTemplate]="statusCellTemplate" ></dxi-column>
+    </dx-data-grid>
+</div>
+
+    <form-popup
+    [(visible)]="AddDesignationPopup"
+    titleText="New Designation"
+    (save)="Add_Designation()">
+    <dx-form class="plain-styled-form" [formGroup]="formsource">
+        <dxi-item>
+         <dx-text-box
+         label="Code"
+         formControlName="CODE">
+        </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Designation"
+            formControlName="DESG_NAME">
+        </dx-text-box>
+        </dxi-item>
+
+    </dx-form>
+</form-popup>
+
+
+<!-- edit popup -->
+<form-popup
+    [(visible)]="UpdateDesignationPopup"
+    titleText="Update Designation"
+    (save)="Edit_Designation()">
+    <dx-form class="plain-styled-form">
+        <dxi-item>
+         <dx-text-box
+         label="Code"
+         [(value)]="editingRowData.CODE">
+        </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Designation"
+            [(value)]="editingRowData.DESG_NAME">
+        </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-check-box
+            text="Inactive"
+            [(value)]="editingRowData.IS_INACTIVE"></dx-check-box>
+          </dxi-item>
+    </dx-form>
+</form-popup>
+   

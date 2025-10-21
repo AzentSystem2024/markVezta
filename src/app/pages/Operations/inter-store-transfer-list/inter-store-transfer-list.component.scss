@@ -1,0 +1,206 @@
+@use "../../../../variables.scss" as *;
+@use "sass:math";
+
+
+:host {
+    --side-panel-toolbar-height: 76px;
+  
+    width: 100%;
+    display: contents;
+  }
+  
+  .view-wrappers {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+  
+    .grid {
+      .name-template {
+        .position {
+          font-size: 12px;
+          color: var(--texteditor-label-color);
+        }
+      }
+  
+      ::ng-deep & {
+        .dx-datagrid-header-panel {
+          padding: 0 var(--content-padding);
+        }
+  
+        .dx-toolbar {
+          margin-bottom: 0;
+          padding: var(--toolbar-margin-bottom) 0;
+        }
+  
+        .dx-datagrid-content .dx-row {
+          cursor: pointer;
+        
+        }
+      }
+  
+      .grid-header {
+        @include header();
+      }
+    }
+  
+    user-panel {
+      display: inherit;
+    }
+  }
+  
+  .edit-cell {
+    position: relative;
+      
+    contact-status {
+      position: absolute;
+      margin-top: 10px;
+      margin-left: 11px;
+    }
+  }
+
+  .grid .dx-toolbar {
+    margin-bottom: 0 !important;
+    padding: var(--toolbar-margin-bottom) 0 !important;
+  }
+  
+
+.save-button {
+  position: absolute;
+  bottom: 35px;
+  right: 25px;
+}
+.importItem {
+  width: 600px;
+}
+.center-Button-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  margin: 0px;
+}
+
+.btnDemo {
+  padding: 0px;
+  margin: 0px;
+  background-color: #1b1e20;
+  color: white;
+  border: none;
+  width: 150px;
+  // height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btnDemo i {
+  font-size: 15px;
+}
+
+.button-container {
+  padding: 0px;
+  height: 0.3vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.toggleButton {
+  border-radius: 4px;
+  background-color: #0fa6e1d3;
+}
+
+.SearchParams-container {
+  transition: transform 0.5s ease, opacity 0.5s ease, max-height 0.5s ease;
+  transform: translateY(0);
+  opacity: 1;
+  max-height: 500px; /* Set this to the maximum height of your content */
+}
+
+.hide-content {
+  transform: translateY(-20px);
+  opacity: 0;
+  max-height: 0; /* Transition from max-height to 0 */
+  padding: 0;
+  margin: 0;
+  overflow: hidden; /* Prevents content overflow */
+}
+
+/* Adjust the size of the icon inside the button */
+.button-container .toggleButton .dx-icon {
+  font-size: 50px; /* Adjust the icon size */
+  width: 50px; /* Adjust width to match the font-size */
+  // height: 20px;     /* Adjust height to match the font-size */
+}
+.dx-data-grid {
+  width: 100%; /* Make sure the grid takes full width of the container */
+  overflow-x: auto; /* Allow horizontal scrolling if needed */
+}
+
+.dx-datagrid-summary {
+  white-space: normal; /* Ensure summary text wraps within its container */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+/* Style to highlight the entire column */
+/* Style for the highlighted column */
+/* Style for highlighted column */
+.highlight-column {
+  background-color: lightgrey !important; /* Light grey highlight color */
+  border: 1px solid #ccc; /* Optional border for the highlighted column */
+  transition: background-color 0.3s ease-in-out; /* Smooth transition */
+}
+
+/* Optional: Add additional styling for the header if you want it to look different */
+.dx-header-row .dx-column-header.highlight-column {
+  background-color:rgb(172, 164, 164) !important; /* Light grey color for the header */
+  color: #000; /* Text color for the header */
+}
+::ng-deep .highlight-column {
+  background-color:rgb(172, 164, 164) !important; 
+}
+.highlight-column {
+  background-color:rgb(172, 164, 164) !important; /* Change this to your desired color */
+  border: 1px solid rgb(172, 164, 164) !important; /* Optional: Add a subtle border */
+  transition: background-color 0.3s ease-in-out; /* Optional: Smooth transition for highlighting */
+}
+
+.custom-header {
+  font-size: 22px; /* Increase font size as needed */
+  // font-weight: bold; /* Optional: make it bold */
+}
+
+
+
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  // background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3; /* Light grey */
+  border-top: 4px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

@@ -1,0 +1,77 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="uomList"
+    (onRowRemoving)="onRowRemoving($event)"
+    (onRowUpdating)="onRowUpdating($event)"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [showBorders]="true"
+  >
+    <dxo-paging [pageSize]="10"> </dxo-paging>
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-popup
+        title="Edit UOM"
+        [showTitle]="true"
+        [width]="500"
+        [height]="200"
+      >
+      </dxo-popup>
+      <dxo-form class="plain-styled-form" [colCount]="1">
+        <dxi-item itemType="group" [colCount]="1">
+            
+            <dxi-item itemType="group" [colCount]="1">
+              <dxi-item dataField="UOM"></dxi-item>
+            </dxi-item>
+            
+          </dxi-item>
+         </dxo-form>
+    </dxo-editing>
+
+    <dxo-search-panel
+      [visible]="true"
+      placeholder="Data Search"
+    ></dxo-search-panel>
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header" stylingMode="filled">Unit of Measurement</div>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addUom()"
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          text: 'Refresh',
+          icon: 'refresh',
+          stylingMode: 'text'
+        }"
+      ></dxi-item>
+      <dxi-item location="after" locateInMenu="auto">
+        <div class="separator"></div>
+      </dxi-item>
+      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    </dxo-toolbar>
+
+    <dxi-column dataField="UOM" caption="Uom" stylingMode="filled"> </dxi-column>
+  </dx-data-grid>
+  <form-popup
+  [(visible)]="isAddUomPopupOpened"
+  [width]="550"
+  [height]="200"
+  (save)="onClickSaveUom()"
+  titleText="New UOM"
+>
+  <app-uom-add-form></app-uom-add-form>
+</form-popup>
+</div>

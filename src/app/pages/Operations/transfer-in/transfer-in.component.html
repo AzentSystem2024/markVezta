@@ -1,0 +1,145 @@
+<div class="view-wrapper list-page">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [showBorders]="true" 
+      height="84vh"
+      [dataSource]="transferInLogDataGrid"
+      (onEditingStart)="onEditingRow($event)"
+    >
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-sorting mode="multiple"></dxo-sorting>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <dxo-filter-row [visible]="true"></dxo-filter-row>
+    <dxo-column-chooser [enabled]="true" [height]="400"></dxo-column-chooser>
+    <dxo-search-panel [visible]="true" placeholder=" Search"></dxo-search-panel>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    <!-- <dxo-pager
+            [visible]="true"
+            [allowedPageSizes]="allowedPageSizes"
+            [displayMode]="displayMode"
+            [showPageSizeSelector]="showPageSizeSelector"
+            [showInfo]="showInfo"
+            [showNavigationButtons]="showNavButtons"
+          ></dxo-pager> -->
+  <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+  </dxo-editing>      
+    <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Transfer In</div>
+        </dxi-item>
+    
+    <dxi-item location="after" locateInMenu="auto">     
+        <dx-button
+          icon="plus"
+          type="default"
+          hint="Add New Transfer In"
+          stylingMode="contained"
+          (onClick)="openTranserInNewForm()"
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              icon: 'refresh',
+              stylingMode: 'text'
+            }"
+          ></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="exportButton"></dxi-item>
+          <!-- <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item> -->
+          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    
+    </dxo-toolbar>
+    
+    <dxi-column dataField="TRIN_NO" width="150" caption="TRANSFER IN NO"  ></dxi-column>
+    <dxi-column dataField="TRIN_DATE" width="auto" caption="TRANSFER IN DATE" [calculateCellValue]="formatTrInDate"></dxi-column>
+    <dxi-column dataField="STORE_NAME" width="auto" caption="ORIGIN"></dxi-column>
+    <dxi-column dataField="NARRATION" width="auto" caption="REMARKS"></dxi-column>
+    <dxi-column caption="STATUS"  dataField="STATUS"></dxi-column>
+
+    <dxi-column type="buttons" width="100" [buttons]="allButtonsEditDelete">
+    </dxi-column>
+    <dxi-column type="buttons" width="100" [buttons]="customButtons">
+    </dxi-column>
+   
+    </dx-data-grid> 
+</div>
+
+<form-popup
+      [(visible)]="isTransferInNewFormVisible"
+      [width]="width"
+      [height]="height"
+      titleText="New Transfer In Form"
+      (save)="saveTransferInData()"
+    >
+    <app-transfer-in-new-form></app-transfer-in-new-form>
+</form-popup>
+
+<form-popup
+      [(visible)]="isTransferInEditPopUpVisible"
+      [width]="width"
+      [height]="height"
+      titleText="Edit Transfer In Form"
+      (save)="updateTransferInData()"
+    >
+    <app-transfer-in-edit-form 
+    [formdata]="selectedRowData"></app-transfer-in-edit-form>
+</form-popup>
+
+<form-popup
+      [(visible)]="isTransferInVerifyPopUpVisible"
+      [width]="width"
+      [height]="height"
+      titleText="Verify Transfer In Form"
+      (save)="verifyTransferInData()"
+    >
+    <app-transfer-in-verify-form
+    [formdata]="selectedRowData"></app-transfer-in-verify-form>
+</form-popup>
+
+<form-popup
+      [(visible)]="isTransferInApprovePopUpVisible"
+      [width]="width"
+      [height]="height"
+      titleText="Approve Transfer In Form"
+      (save)="approveTransferInData()"
+    >
+    <app-transfer-in-approve-form
+    [formdata]="selectedRowData"></app-transfer-in-approve-form>
+</form-popup>
+
+<dx-popup
+      [(visible)]="isTransferInViewPopUpVisible"
+      [width]="width"
+      [height]="height"
+      title="View Transfer In Form"
+    >
+    <app-transfer-in-view-form
+    [formdata]="selectedRowData"></app-transfer-in-view-form>
+</dx-popup>
+
+
+
+
+
+
+

@@ -1,0 +1,181 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid #dataGrid
+      [width]="'100%'"
+      [height]="'100%'"
+      class="grid theme-dependent"
+      [dataSource]="itemsList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-scrolling
+        mode="standard"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+     
+      <dxo-editing mode="popup" [alloAdding]="true"> </dxo-editing>
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Store Items</div>
+        </dxi-item>
+        <dxi-item location="before"> </dxi-item>
+        <dxi-item location="before"> </dxi-item>
+        <dxi-item location="before" locateInMenu="auto">
+          <dx-select-box
+            [items]="store "
+            valueExpr="ID"
+            [(value)]="selectedStoreId"
+            displayExpr="STORE_NAME"
+            (onValueChanged)="onDropdownValueChanged($event)"
+            placeholder="Select Store"
+          >
+          </dx-select-box>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            text="Add"
+            icon="plus"
+            type="default"
+            stylingMode="contained"
+            (onClick)="openAddFormPopup()"
+          ></dx-button>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            icon="refresh"
+            stylingMode="text"
+            (onClick)="refreshItems()"
+          ></dx-button>
+        </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+        <dxi-item location="after" locateInMenu="auto">
+          <div class="separator"></div>
+        </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto">
+          <div class="separator"></div>
+        </dxi-item>
+        <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+      </dxo-toolbar>
+      <dxo-search-panel [visible]="true" placeholder="Search">
+      </dxo-search-panel>
+
+      <!-- Define columns with fixed widths -->
+      <dxi-column
+        dataField="ITEM_CODE"
+        caption="Item Code"
+        [width]="160"
+      ></dxi-column>
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
+        [visible]="true"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Description"
+        [width]="280"
+      ></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department" [width]="150">
+      </dxi-column>
+      <dxi-column dataField="DESCRIPTION" caption="Category" [width]="150">
+      </dxi-column>
+      <dxi-column dataField="ID" caption="Brand" [width]="150">
+      </dxi-column>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Price"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="ITEM_SALE_PRICE"
+        caption="Sale Price"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="PROFIT_MARGIN"
+        caption="Profit Margin"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="QTY_STOCK"
+        caption="Available Quantity"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="QTY_COMMITTED"
+        caption="Committed Quantity"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="RESTOCK_LEVEL"
+        caption="Restock Level"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="REORDER_POINT"
+        caption="Reorder Point"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="COUNTRY_NAME"
+        caption="Country"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="BIN_LOCATION"
+        caption="Location"
+        [width]="150"
+      ></dxi-column>
+      <!-- Add a column for the icon button -->
+      <dxi-column type="buttons" [width]="110" caption=" ">
+        <dxi-button
+          name="detailsButton"
+          text="Details"
+          icon="info"
+          [onClick]="onDetailsButtonClick"
+        >
+        </dxi-button>
+      </dxi-column>
+    </dx-data-grid>
+    <dx-popup
+      [(visible)]="isPopupVisible"
+      [width]="'80vw'"
+      [height]="'95vh'"
+      title="Item Details"
+    >
+      <app-store-items
+        [storeData]="selectedData"
+        (formClosed)="handleFormClosed()"
+      ></app-store-items>
+    </dx-popup>
+
+    <dx-popup
+      [(visible)]="addFormPopupVisible"
+      [width]="'80vw'"
+      [height]="'95vh'"
+      title="Items"
+      (onHiding)="onPopupHiding()"
+    >
+      <app-store-items-add-form
+      [itemsList]="itemsList"
+      [filteredStores]="filteredStores"
+      [filteredStoreId]="filteredStoreId"
+      [defaultStore]="isDefaultStore"
+        (formClosed)="handleFormClosed()"
+      ></app-store-items-add-form>
+    </dx-popup>
+  </div>
+</div>

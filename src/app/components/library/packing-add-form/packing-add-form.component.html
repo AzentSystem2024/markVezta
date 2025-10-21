@@ -1,0 +1,36 @@
+<dx-form class="plain-styled-form" >
+    <dxi-item itemType="group">
+      <dxo-col-count-by-screen
+        [xs]="1"
+        [sm]="1"
+        [md]="1"
+        [lg]="1"
+      ></dxo-col-count-by-screen>
+      <dxi-item>
+        <div *dxTemplate>
+          <form-textbox
+            label="Packing"
+            [(value)]="newPacking.DESCRIPTION"
+            [isEditing]="true"
+            validationRules="required"
+          >
+     
+          </form-textbox>
+        </div>
+      </dxi-item>
+  
+      <dxi-item>
+        <div *dxTemplate>
+          <form-textbox
+            label="No. of Units"
+            [(value)]="newPacking.NO_OF_UNITS"
+            [isEditing]="true"
+            validationRules="required"
+          >
+          </form-textbox>
+        </div>
+      </dxi-item>
+
+    </dxi-item>
+  </dx-form>
+  

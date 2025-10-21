@@ -1,0 +1,61 @@
+@use "../../../../variables.scss" as *;
+
+:host {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+}
+.image-section {
+  margin-left: 40px;
+  margin-top: 30px;
+}
+.auth-card {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+
+  .image-section,
+  .dx-card {
+    flex: 1;
+  }
+
+  .image-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+
+    img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+    }
+  }
+
+  ::ng-deep .dx-button-text {
+    text-transform: none;
+  }
+  .dx-card {
+    margin: auto auto;
+    background: linear-gradient(
+      to bottom right,
+      #377dff,
+      #0047ab
+    ); /* Blue gradient */
+    width: 800px;
+    color: white; /* Optional: Improve contrast for text */
+  }
+
+  .auth-image {
+    max-width: 100%;
+    height: auto;
+    width: 400px; /* or use max-width: 400px for responsiveness */
+  }
+
+  // .dx-card {
+  //   margin: auto auto;
+  //    background-image: url(../../../../assets/images/rignside_img.jpg);
+  //   width: 800px;
+
+  // }
+}

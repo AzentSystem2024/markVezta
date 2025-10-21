@@ -1,0 +1,289 @@
+<dx-validation-group class="form-grid" #formValidationGroup>
+  <div class="form-container">
+    <!-- Row 1 -->
+    <div class="form-row">
+      <dx-text-box
+        label="Doc No."
+        labelMode="floating"
+        [readOnly]="true"
+        [(value)]="PrePaymentFormData.VOUCHER_NO"
+      ></dx-text-box>
+      <dx-date-box
+        label="Date"
+        labelMode="floating"
+        displayFormat="dd/MM/yyyy"
+        [readOnly]="isReadOnly"
+        [(value)]="PrePaymentFormData.TRANS_DATE"
+      ></dx-date-box>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="form-row">
+      <dx-select-box
+        label="Supplier"
+        [valueExpr]="'ID'"
+        [readOnly]="isReadOnly"
+        [(value)]="PrePaymentFormData.SUPP_ID"
+        [displayExpr]="'DESCRIPTION'"
+        [searchEnabled]="true"
+        [items]="Supplier"
+        labelMode="floating"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="form-row">
+      <dx-text-box
+        label="Supplier Invoice No"
+        [readOnly]="isReadOnly"
+        labelMode="floating"
+        [(value)]="PrePaymentFormData.REF_NO"
+      ></dx-text-box>
+      <dx-number-box
+        label="Amount"
+        labelMode="floating"
+        [readOnly]="isReadOnly"
+        [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-number-box>
+    </div>
+
+    <!-- Row 4 -->
+    <div class="period-row">
+      <dx-number-box
+        [label]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT %' : ' GST %'"
+        labelMode="floating"
+        width="220px"
+        [readOnly]="isReadOnly"
+        [(value)]="PrePaymentFormData.TAX_PERCENT"
+        (onValueChanged)="updateGSTAmount()"
+      ></dx-number-box>
+      <dx-number-box
+         [label]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Amount' : ' GST Amount'"
+        labelMode="floating"
+        width="220px"
+        [(value)]="PrePaymentFormData.TAX_AMOUNT"
+        [readOnly]="isReadOnly"
+      ></dx-number-box>
+      <dx-number-box
+        label="Net Amount"
+        labelMode="floating"
+        width="230px"
+        [(value)]="PrePaymentFormData.NET_AMOUNT"
+        [readOnly]="isReadOnly"
+      ></dx-number-box>
+    </div>
+
+    <!-- Row 5 -->
+    <div class="form-row">
+      <dx-select-box
+        label="Expense Ledger"
+        [searchEnabled]="true"
+        [valueExpr]="'ID'"
+        [displayExpr]="'DESCRIPTION'"
+        [items]="ExpenseLedger"
+        [readOnly]="isReadOnly"
+        [(value)]="PrePaymentFormData.EXP_HEAD_ID"
+        labelMode="floating"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+      <dx-select-box
+        label="Location"
+        labelMode="floating"
+        [readOnly]="isReadOnly"
+      ></dx-select-box>
+    </div>
+
+    <!-- Row 6 -->
+    <div class="form-row">
+      <dx-text-box
+        label="Narration"
+        labelMode="floating"
+        [readOnly]="isReadOnly"
+        [(value)]="PrePaymentFormData.NARRATION"
+      ></dx-text-box>
+    </div>
+
+    <!-- Row 7 -->
+    <div class="form-row">
+      <dx-select-box
+        label="Prepayment Ledger"
+        [searchEnabled]="true"
+        [readOnly]="isReadOnly"
+        [valueExpr]="'ID'"
+        [displayExpr]="'DESCRIPTION'"
+        [items]="PrePaymentLedger"
+        [(value)]="PrePaymentFormData.PREPAY_HEAD_ID"
+        labelMode="floating"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+    </div>
+
+    <!-- Row 8 -->
+    <div class="period-row">
+      <dx-date-box
+        label="Period From"
+        displayFormat="dd/MM/yyyy"
+        [readOnly]="isReadOnly"
+        labelMode="floating"
+        width="150px"
+        [(value)]="PrePaymentFormData.DATE_FROM"
+        (onValueChanged)="updatePeriodTo()"
+      ></dx-date-box>
+      <dx-number-box
+        label="No.Month"
+        labelMode="floating"
+        width="160px"
+        [(value)]="PrePaymentFormData.NO_OF_MONTHS"
+        [readOnly]="isReadOnly"
+        (onValueChanged)="updatePeriodTo()"
+      ></dx-number-box>
+      <dx-number-box
+        label="No.Days"
+        labelMode="floating"
+        width="160px"
+        [(value)]="PrePaymentFormData.NO_OF_DAYS"
+        [readOnly]="isReadOnly"
+        (onValueChanged)="updatePeriodTo()"
+      ></dx-number-box>
+      <dx-date-box
+        label="Period To"
+        displayFormat="dd/MM/yyyy"
+        labelMode="floating"
+        [readOnly]="isReadOnly"
+        width="150px"
+        [(value)]="PrePaymentFormData.DATE_TO"
+        [readOnly]="true"
+      ></dx-date-box>
+      <dx-button
+        icon="bi bi-calendar fs-5"
+        hint="generateSchedule"
+        stylingMode="text"
+        class="calendar-btn"
+        (onClick)="showGrid = true"
+        (onClick)="onCalendarClick()"
+      ></dx-button>
+    </div>
+
+    <!-- Data Grid -->
+    <div *ngIf="showGrid">
+      <dx-data-grid
+        [showBorders]="true"
+        height="200"
+        class="mt-3"
+        [readOnly]="isReadOnly"
+        [dataSource]="ExpenseAmountDetails"
+        (onSelectionChanged)="onSelectionChanged($event)"
+        (onEditorPreparing)="onEditorPreparing($event)"
+        (onCellValueChanged)="onCellValueChanged($event)"
+        width="100%"
+        [editing]="{
+          mode: 'cell',
+          allowUpdating: true
+        }"
+      >
+        <dxo-header-filter [visible]="true"></dxo-header-filter>
+        <dxo-sorting mode="multiple"></dxo-sorting>
+
+        <dxi-column
+          [width]="'200'"
+          dataField="DUE_DATE"
+          [readOnly]="isReadOnly"
+          caption="Date"
+       dataType="date"
+  format="dd/MM/yyyy"
+          [allowEditing]="false"
+          [readOnly]="true"
+        >
+          <dxo-header-filter [allowSelectAll]="false">
+            <dxo-search [enabled]="true"></dxo-search>
+          </dxo-header-filter>
+        </dxi-column>
+
+        <dxi-column
+          dataField="DUE_AMOUNT"
+          caption="Expense Amount"
+          [readOnly]="isReadOnly"
+          [editorOptions]="{ showSpinButtons: true }"
+          [allowEditing]="!isReadOnly"
+        >
+          <dxo-header-filter [allowSelectAll]="false">
+            <dxo-search [enabled]="true"></dxo-search>
+          </dxo-header-filter>
+        </dxi-column>
+
+        <dxi-column
+          dataField="HEAD_PERCENT"
+          caption="Status"
+          alignment="right"
+          [allowEditing]="false"
+          [readOnly]="true"
+        >
+          <dxo-header-filter [allowSelectAll]="false">
+            <dxo-search [enabled]="true"></dxo-search>
+          </dxo-header-filter>
+        </dxi-column>
+      </dx-data-grid>
+    </div>
+
+    <div class="total-expense">
+      <dx-check-box
+        [readOnly]="isReadOnly"
+        text="Approve"
+        [(value)]="PrePaymentFormData.TRANS_STATUS"
+      >
+      </dx-check-box>
+
+      <dx-number-box
+        label="Total Expense"
+        width="200px"
+        [readOnly]="isReadOnly"
+        labelMode="floating"
+        [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
+      ></dx-number-box>
+    </div>
+
+    <!-- Footer -->
+    <div class="fixed-footer" *ngIf="!isReadOnly">
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        class="action-btn"
+        (onClick)="cancel()"
+      ></dx-button>
+      <dx-button
+        text="Save"
+        stylingMode="contained"
+        type="default"
+        class="action-btn"
+        (onClick)="savePrePayment()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-validation-group>

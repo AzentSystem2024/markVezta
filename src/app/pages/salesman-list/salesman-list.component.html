@@ -1,0 +1,256 @@
+<div class="view-wrapper list-page">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="salesman"
+      (onRowRemoving)="onRowRemoving($event)"
+      [showBorders]="true"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      (onExporting)="onExporting($event)"
+      (onRowUpdating)="onRowUpdating($event)"
+    >
+    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+    <dxo-filter-row
+    [visible]="showFilterRow"
+  ></dxo-filter-row>
+
+  <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+<dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-popup
+        title="Edit Salesman"
+        [showTitle]="true"
+        [width]="950"
+        [height]="690"
+      >
+      </dxo-popup>
+      <dxo-form [colCount]="2">
+        <dxi-item itemType="group" [colCount]="1">
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item dataField="EMP_CODE"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="EMP_NAME"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="DOB"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="DOJ"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item
+              dataField="IS_MALE"
+              editorType="dxRadioGroup"
+              [editorOptions]="{
+                items: [
+                  { text: 'Male', value: 'true' },
+                  { text: 'Female', value: 'false' }
+                ],
+                layout: 'horizontal'
+              }"
+            ></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="STORE_ID"></dxi-item>
+          </dxi-item>
+        </dxi-item>
+        <dxi-item itemType="group" [colCount]="1">
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="ADDRESS1"> </dxi-item>
+            <dxi-item dataField="ADDRESS2">
+              <dxo-label [visible]="false"></dxo-label
+            ></dxi-item>
+            <dxi-item dataField="ADDRESS3">
+              <dxo-label [visible]="false"></dxo-label
+            ></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="CITY"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="MOBILE"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="EMAIL"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="IQAMA_NO"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="3">
+            <dxi-item dataField="INCENTIVE_PERCENT"></dxi-item>
+          </dxi-item>
+        </dxi-item>
+      </dxo-form>
+    </dxo-editing>
+    <dxo-search-panel
+      [visible]="true"
+      placeholder="Data Search"
+    ></dxo-search-panel>
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header">Salesman</div>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addSalesman()"
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              icon: 'refresh',
+              stylingMode: 'text'
+            }"
+          ></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="exportButton"></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    
+    </dxo-toolbar>
+
+    <dxi-column dataField="EMP_CODE" caption="Code">
+      <dxi-validation-rule type="required" message="Code is required">
+        <dxi-validation-rule type="required" message="Code is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="EMP_NAME" caption="Salesman Name">
+      <dxi-validation-rule type="required" message="Salesman name is required">
+        <dxi-validation-rule
+          type="required"
+          message="Salesman name is required"
+        >
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="DOB" caption="Date Of Birth" dataType="date">
+      <dxi-validation-rule type="required" message="DOB is required">
+        <dxi-validation-rule type="required" message="DOB is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+      <!-- <dxi-validation-rule
+      type="range"
+      [max]="maxDate"
+      message="You must be at least 21 years old"
+    >
+    </dxi-validation-rule> -->
+    </dxi-column>
+    <dxi-column dataField="DOJ" caption="Joining Date" dataType="date">
+      <dxi-validation-rule type="required" message="Joining date is required">
+        <dxi-validation-rule type="required" message="Joining date is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column
+      dataField="IS_MALE"
+      caption="Gender"
+      [visible]="false"
+      dataType="boolean"
+    >
+      <dxi-validation-rule type="required" message="Gender is required">
+        <dxi-validation-rule type="required" message="Gender is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="ADDRESS1" caption="Address">
+      <dxi-validation-rule type="required" message="Address is required">
+        <dxi-validation-rule type="required" message="Address is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column
+      dataField="ADDRESS2"
+      caption="Address"
+      [visible]="false"
+    ></dxi-column>
+    <dxi-column
+      dataField="ADDRESS3"
+      caption="Address"
+      [visible]="false"
+    ></dxi-column>
+    <dxi-column dataField="IQAMA_NO" caption="Emirates Id" [visible]="false">
+      <dxi-validation-rule type="required" message="Emirates Id is required">
+        <dxi-validation-rule type="required" message="Emirates Id is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column
+      dataField="INCENTIVE_PERCENT"
+      caption="Commission%"
+      [visible]="false"
+    >
+      <dxi-validation-rule
+        type="required"
+        message="Incentive percent is required"
+      >
+        <dxi-validation-rule
+          type="required"
+          message="Incentive percent is required"
+        >
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="CITY" caption="City">
+      <dxi-validation-rule type="required" message="City is required">
+        <dxi-validation-rule type="required" message="City is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="MOBILE" caption="Mobile">
+      <dxi-validation-rule type="required" message="Mobile number is required">
+        <dxi-validation-rule
+          type="required"
+          message="Mobile number is required"
+        >
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="EMAIL" caption="Email">
+      <dxi-validation-rule type="required" message="Email is required"></dxi-validation-rule>
+      <dxi-validation-rule 
+        type="pattern" 
+        pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+        message="Invalid email format"
+      ></dxi-validation-rule>
+    </dxi-column>
+    
+    <dxi-column dataField="STORE_ID" caption="Working Location">
+      <dxo-lookup [dataSource]="store" displayExpr="DESCRIPTION" valueExpr="ID">
+      </dxo-lookup>
+      <dxi-validation-rule type="required" message="Store ID is required">
+        <dxi-validation-rule type="required" message="Store ID is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+  </dx-data-grid>
+  <form-popup
+    [(visible)]="isAddSalesmanPopupOpened"
+    [width]="950"
+    [height]="620"
+    (save)="onClickSaveSalesman()"
+    titleText="New Salesman"
+  >
+    <app-salesman-form></app-salesman-form>
+  </form-popup>
+</div>

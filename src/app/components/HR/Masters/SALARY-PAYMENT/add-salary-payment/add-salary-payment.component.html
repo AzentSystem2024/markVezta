@@ -1,0 +1,345 @@
+<dx-validation-group #journalVoucherGroup>
+  <div
+    class="invoice-wrapper"
+    style="
+      height: 86vh;
+      display: flex;
+      flex-direction: column;
+
+      box-sizing: border-box;
+    "
+  >
+    <div class="salary-grid-wrapper" style="padding: 0 10px">
+      <div class="grid-container">
+        <dx-data-grid
+          #itemsGridRef
+          [dataSource]="salaryPendingList"
+          [showBorders]="true"
+          [showRowLines]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="false"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true, allowSearch: true }"
+          [allowColumnReordering]="true"
+          [showColumnHeaders]="true"
+          [columnAutoWidth]="true"
+          [allowColumnResizing]="true"
+          [height]="'52vh'"
+          [columnResizingMode]="'nextColumn'"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+          [keyboardNavigation]="{ editOnKeyPress: true }"
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: true,
+            allowDeleting: true,
+            allowAdding: true,
+            useIcons: true
+          }"
+          keyExpr="ID"
+          [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+          (onEditorPreparing)="onEditorPreparing($event)"
+          (onRowRemoved)="onRowRemoved($event)"
+          (onSelectionChanged)="onSelectionChanged($event)"
+        >
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-filter-builder [allowHierarchicalFields]="true">
+          </dxo-filter-builder>
+          <dxo-toolbar>
+            <div
+              class="stacked-toolbar-group"
+              style="display: flex; flex-direction: column; gap: 2px"
+            ></div>
+            <dxi-item location="before" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 0px"
+              >
+                <div style="display: flex; gap: 5px">
+                  <dx-text-box
+                    label="Voucher No"
+                    labelMode="floating"
+                    [(value)]="paymentNo"
+                    [width]="200"
+                    [readOnly]="true"
+                  ></dx-text-box>
+                </div>
+              </div>
+            </dxi-item>
+
+            <dxi-item location="after" locateInMenu="auto">
+              <div class="stacked-toolbar-group"></div>
+            </dxi-item>
+            <dxi-item location="after" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: row; gap: 10px"
+              >
+                <!-- ============================================================================= -->
+                <div
+                  style="
+                    display: flex;
+                    align-items: baseline;
+                    gap: 2px;
+                    margin-top: 6px;
+                  "
+                >
+                  <dxi-item location="after">
+                    <div
+                      class="month-selector"
+                      style="display: flex; align-items: center; gap: 8px"
+                    >
+                      <dx-button
+                        icon="chevronleft"
+                        (onClick)="goToPreviousMonth()"
+                      ></dx-button>
+                      <span class="month-label" (click)="toggleCalendar()">
+                        {{ selectedMonth | date : "MMMM yyyy" }}
+                      </span>
+                      <dx-button
+                        icon="chevronright"
+                        (onClick)="goToNextMonth()"
+                      ></dx-button>
+                    </div>
+                    <div *ngIf="calendarVisible" class="calendar-popup">
+                      <div class="calendar-header">
+                        <dx-button
+                          class="year-button"
+                          [options]="previousYearButtonOptions"
+                        ></dx-button>
+
+                        <span
+                          class="year-clickable"
+                          (click)="toggleYearSelector()"
+                        >
+                          {{ selectedYear }}
+                        </span>
+
+                        <dx-button
+                          class="year-button"
+                          [options]="nextYearButtonOptions"
+                        ></dx-button>
+                      </div>
+
+                      <div
+                        class="year-selector-popup"
+                        *ngIf="yearSelectorVisible"
+                        (click)="$event.stopPropagation()"
+                      >
+                        <div class="year-grid">
+                          <div
+                            class="year-option"
+                            *ngFor="let year of years"
+                            (click)="selectYear(year, $event)"
+                          >
+                            {{ year }}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="calendar-body">
+                        <div
+                          *ngFor="let monthName of monthNames; let idx = index"
+                          class="month-cell"
+                          [class.selected]="
+                            idx === selectedMonth.getMonth() &&
+                            selectedYear === selectedMonth.getFullYear()
+                          "
+                          (click)="selectMonthByIndex(idx)"
+                        >
+                          {{ monthName }}
+                        </div>
+                      </div>
+                    </div>
+                  </dxi-item>
+                </div>
+
+                <!-- ============================================================================= -->
+                <!--  -->
+
+                <div style="display: flex; gap: 5px">
+                  <dx-date-box
+                    label="Date"
+                    labelMode="floating"
+                    [(value)]="salaryPaymentData.TRANS_DATE"
+                    [width]="200"
+                    displayFormat="dd-MM-yyyy"
+                    [readOnly]="true"
+                  ></dx-date-box>
+                </div>
+              </div>
+            </dxi-item>
+          </dxo-toolbar>
+
+          <dxi-column
+            dataField="EMP_CODE"
+            caption="Employee Code"
+            [allowEditing]="!isReadOnlyMode"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="EMP_NAME"
+            caption="Employee Name"
+            [allowEditing]="!isReadOnlyMode"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="NET_AMOUNT"
+            caption="Salary Amount"
+            [allowEditing]="!isReadOnlyMode"
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          ></dxi-column>
+
+          <dxi-column type="buttons">
+            <dxi-button name="edit"></dxi-button>
+            <dxi-button name="delete"></dxi-button>
+          </dxi-column>
+
+          <dxo-summary>
+            <dxi-total-item
+              column="AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+
+        <!-- Fill Amount Button below grid -->
+        <div
+          style="display: flex; justify-content: flex-end; margin-top: 5px"
+        ></div>
+        <!-- Two-column box: Bank Details (left) and Receipt Details (right) -->
+        <div
+          class="bordered-grid"
+          style="
+            margin-top: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+          "
+        >
+          <!-- Row: Two columns side by side -->
+          <div style="display: flex; justify-content: space-between; gap: 5px">
+            <!-- Left: Receipt Details -->
+            <div style="flex: 1">
+              <div class="section-label">Payment Details</div>
+
+              <dx-radio-group
+                [items]="['Cash', 'Bank']"
+                layout="horizontal"
+                label="Mode"
+                labelMode="floating"
+                [width]="'100%'"
+                [value]="receiptMode"
+                (onValueChanged)="onReceiptModeChange($event)"
+                [readOnly]="isReadOnlyMode"
+              ></dx-radio-group>
+
+              <dx-select-box
+                id="payHeadIdField"
+                [dataSource]="filteredLedgerList"
+                displayExpr="HEAD_NAME"
+                valueExpr="HEAD_ID"
+                [(value)]="salaryPaymentData.PAY_HEAD_ID"
+                label="Ledger"
+                labelMode="floating"
+                [searchEnabled]="true"
+                [width]="'100%'"
+                style="margin-top: 2px"
+                [readOnly]="isReadOnlyMode"
+              ></dx-select-box>
+            </div>
+
+            <!-- Right: Bank Remittance Details -->
+            <div style="flex: 1">
+              <!-- Dimmed or highlighted section label -->
+              <div
+                class="section-label"
+                [ngStyle]="{
+                  color: receiptMode === 'Bank' ? 'inherit' : '#888'
+                }"
+              >
+                Bank Remittance Details
+              </div>
+
+              <!-- Cheque No & Due Date -->
+              <div style="display: flex; gap: 10px">
+                <dx-text-box
+                  label="Cheque No"
+                  labelMode="floating"
+                  [(value)]="salaryPaymentData.CHEQUE_NO"
+                  [width]="'100%'"
+                  [disabled]="receiptMode !== 'Bank'"
+                  style="flex: 1"
+                  [readOnly]="isReadOnlyMode"
+                ></dx-text-box>
+
+                <dx-date-box
+                  label="Due Date"
+                  labelMode="floating"
+                  [(value)]="salaryPaymentData.CHEQUE_DATE"
+                  type="date"
+                  displayFormat="dd-MM-yyyy"
+                  [width]="'100%'"
+                  [disabled]="receiptMode !== 'Bank'"
+                  style="flex: 1"
+                  [readOnly]="isReadOnlyMode"
+                ></dx-date-box>
+              </div>
+
+              <!-- Bank Name -->
+              <dx-text-box
+                label="Bank Name"
+                labelMode="floating"
+                [(value)]="salaryPaymentData.BANK_NAME"
+                [width]="'100%'"
+                style="margin-top: 5px"
+                [disabled]="receiptMode !== 'Bank'"
+                [readOnly]="isReadOnlyMode"
+              ></dx-text-box>
+            </div>
+          </div>
+
+          <!-- Row: Narration spanning both columns -->
+          <div>
+            <dx-text-box
+              label="Narration"
+              labelMode="floating"
+              [(value)]="salaryPaymentData.NARRATION"
+              [width]="'100%'"
+              style="margin-top: 2px"
+              [readOnly]="isReadOnlyMode"
+            ></dx-text-box>
+          </div>
+        </div>
+        <dx-check-box
+          *ngIf="isEditing && !isReadOnlyMode"
+          [(value)]="isApproved"
+          text="Approve"
+          style="margin-top: 10px"
+        ></dx-check-box>
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+
+<div class="form-popup-buttons-container" *ngIf="!isReadOnlyMode">
+  <div class="popup-footer">
+    <dx-button text="Cancel" stylingMode="outlined" type="normal" (onClick)="cancel()"></dx-button>
+    <dx-button
+      #saveButtonRef
+      [text]="isEditing ? (isApproved ? 'Commit' : 'Update') : 'Save'"
+      stylingMode="contained"
+      type="default"
+      (onClick)="isEditing ? onUpdateSalaryPayment() : onSaveSalaryPayment()"
+    >
+    </dx-button>
+  </div>
+</div>

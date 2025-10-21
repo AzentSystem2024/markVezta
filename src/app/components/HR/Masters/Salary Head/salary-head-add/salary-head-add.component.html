@@ -1,0 +1,225 @@
+<div class="content-wrapper">
+   <dx-validation-group #SalaryHeadValidation>
+    <div style="display:flex">
+
+        <div>
+           <dx-text-box
+    [(value)]="SalaryHeadData.HEAD_NAME"
+    [placeholder]="'Head Name'"
+    label="Head Name"
+    tabindex="3"
+    [labelMode]="'floating'"
+    [width]="400"
+    (onValueChanged)="onHeadNameChanged($event)"
+  >
+    <dx-validator>
+                      <dxi-validation-rule
+                        type="required"
+                        message="This field is required"
+                      ></dxi-validation-rule>
+                    </dx-validator>
+  </dx-text-box>
+  <dx-text-box
+    [(value)]="SalaryHeadData.PAYSLIP_TITLE"
+    [placeholder]="'Payslip Title'"
+    label="Payslip Title"
+    [width]="400"
+    [labelMode]="'floating'"
+      style=" margin-top:  10px;"
+  >
+  </dx-text-box>
+ 
+  
+  </div>
+  <div>
+     <dx-number-box
+    [(value)]="SalaryHeadData.HEAD_ORDER"
+    label="Order in Pay slip"
+    [width]="400"
+    [labelMode]="'floating'"
+    style="margin-left: 10px; "
+  >
+  </dx-number-box>
+
+  <dx-select-box
+  [(value)]="SalaryHeadData.AC_HEAD_ID"
+         [items]="Ac_head_values"
+                    [valueExpr]="'ID'"
+                    [displayExpr]="'DESCRIPTION'"
+                    [placeholder]="'Ac.Ledger'"
+                    label="Ac.Ledger"
+                    [labelMode]="'floating'"
+                    [searchEnabled]="true"
+                    (onValueChanged)="onChangeAc_head($event)"
+                       style="margin-left: 10px; margin-top:  10px;"
+                 
+  ></dx-select-box>
+</div>
+    </div>
+
+  <div style="display: flex">
+    <label style="margin-top: 10px; margin-right: 10px;"> Head Type </label>
+    <dx-radio-group
+      [items]="priorities"
+      [(value)]="selectedPriority"
+      displayExpr="name"
+      layout="horizontal"
+       (onValueChanged)="onPriorityChanged($event)"
+    >
+       <dx-validator>
+                      <dxi-validation-rule
+                        type="required"
+                        message="This field is required"
+                      ></dxi-validation-rule>
+                    </dx-validator>
+    </dx-radio-group>
+      <dx-check-box [(value)]="SalaryHeadData.IS_INACTIVE" text="Inactive" style="margin-left:27px"></dx-check-box>
+  </div>
+<div>   <dx-check-box     [disabled]="(isEnabled)" [(value)]="SalaryHeadData.INSTALLMENT_RECOVERY" text="Recovery will be in installments (will not allow more than one active advance at a time) "></dx-check-box>
+</div>
+  <div class="salary-head-card" style="display: flex; gap: 20px;margin-top: 9px;">
+<div >
+  
+   <label><strong>Nature of Salary head</strong></label>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+      <!-- <dx-radio-group
+        [(value)]="selectedType"
+        [items]="salaryHeadTypes"
+        displayExpr="label"
+        valueExpr="value"
+        layout="vertical"
+      (onValueChanged)="onTypeChange()"
+      ></dx-radio-group> -->
+
+<dx-radio-group
+  [(value)]="selectedType"
+  [items]="salaryHeadTypes"
+  displayExpr="label"
+  valueExpr="value"
+  layout="vertical"
+  (onValueChanged)="onTypeChange()"
+    [disabled]="(!isEnabled)"
+     
+></dx-radio-group>
+<!-- 
+     (onValueChanged)="onselectedNatureTypeChanged($event)"
+      <dx-number-box
+  class="text-amount"
+  placeholder="Amount"
+  label="Amount"
+  [labelMode]="'floating'"
+  [(value)]="SalaryHeadData.FIXED_AMOUNT"
+  [width]="150"
+  [showSpinButtons]="true"
+  [format]="{
+    type: 'fixedPoint',
+    precision: 2
+  }"
+  [stylingMode]="'outlined'"
+  inputAttr="{ style: 'text-align: right' }"
+></dx-number-box> -->
+
+      <dx-number-box
+        class="text-amount"
+        placeholder="Amount"
+        label="Amount"
+        [inputAttr]="{ style: 'text-align: right' }"
+        [labelMode]="'floating'"
+        [(value)]="SalaryHeadData.FIXED_AMOUNT"
+        [width]="150"
+          [format]="{
+    type: 'fixedPoint',
+    precision: 2
+  }"
+   
+     [disabled]="(!isEnabled || selecteNatureTypeTwo)"
+      ></dx-number-box>
+
+      <dx-check-box   [disabled]="(!isEnabled || ApplicableWorkingDay)" [(value)]="SalaryHeadData.AFFECT_LEAVE" [ngStyle]="{ color:(!isEnabled||ApplicableWorkingDay)  ? '#aaa' : 'inherit' }" text="Applicable to working days only"></dx-check-box>
+ 
+    </div>
+    <div style="display: flex;flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+      <dx-radio-group
+        [(value)]="selectedType"
+        [items]="salaryHeadTypes2"
+        displayExpr="label"
+        valueExpr="value"
+        (onValueChanged)="onTypeChange()"
+        layout="vertical"
+      [disabled]="!isEnabled"
+      ></dx-radio-group>
+
+    <dx-number-box  [disabled]="(!isEnabled||head_percent)" [width]="50" [(value)]="SalaryHeadData.HEAD_PERCENT" [height]="30"></dx-number-box>
+    <!-- <span    style="margin-top: 10px; " [ngStyle]="{ color: head_percent ? '#aaa' : 'inherit' }">% of selected Heads</span> -->
+     <span style="margin-top: 10px;" [ngStyle]="{ color:(!isEnabled||head_percent)  ? '#aaa' : 'inherit' }">% of selected Heads</span>
+      <dx-check-box   [ngStyle]="{ color: (!isEnabled|| head_percent)  ? '#aaa' : 'inherit' }" [disabled]="(!isEnabled ||ApplicableWithBasicRange)" [(value)]="SalaryHeadData.RANGE_EXISTS" text="Applicable within the basic  range from"></dx-check-box>
+        <dx-number-box   [disabled]="(!isEnabled||head_From)"  [width]="50" [height]="30" [(value)]="SalaryHeadData.RANGE_FROM" ></dx-number-box>
+      <span style="margin-top: 10px;" [ngStyle]="{ color:(!isEnabled||head_percent)  ? '#aaa' : 'inherit' }">to</span>
+        <dx-number-box   [disabled]="(!isEnabled||head_To)" [width]="100" [height]="30" [(value)]="SalaryHeadData.RANGE_TO" ></dx-number-box>
+    </div>
+    <dx-radio-group
+      [(value)]="selectedType"
+      [items]="salaryHeadTypes3"
+      displayExpr="label"
+      valueExpr="value"
+      layout="vertical"
+      (onValueChanged)="onTypeChange()"
+        [disabled]="!isEnabled"
+    ></dx-radio-group>
+
+  </div>
+  <div>
+    <dx-data-grid
+     *ngIf="selectedNatureId === 2"
+      [showBorders]="true"
+      [selection]="{ mode: 'multiple' }"
+      height="200"
+      [(selectedRowKeys)]="selectedRows"
+      [dataSource]="selectedHeads"
+       (onSelectionChanged)="onSelectionChanged($event)"
+      width="
+      400"
+      [editing]="{
+        mode: 'cell',
+        allowUpdating: true
+      }"
+  [showBorders]="true"
+  [selection]="{ mode: 'multiple' }"
+  height="200"
+  [(selectedRowKeys)]="selectedRows"
+  [dataSource]="selectedHeads"
+   (onSelectionChanged)="onSelectionChanged($event)"
+
+  [editing]="{
+    mode: 'cell',
+    allowUpdating: true
+  }"
+  
+>
+ 
+  <dxi-column
+    [width]="'auto'"
+    dataField="DESCRIPTION"
+    caption="Head Name"
+    alignment="Left"
+  >
+  
+  </dxi-column>
+</dx-data-grid>
+  </div>
+  </div>
+</dx-validation-group>
+  <div  style=" display:flex;margin-top: 20px; justify-content: flex-end;gap: 10px;">
+    <dx-button
+      text="Cancel"
+      type="normal"
+      class="ml-2"
+      (onClick)="cancel()"
+    ></dx-button>
+    <dx-button
+      text="Save"
+      type="default"
+      (onClick)="saveSalaryHeadData()"
+    ></dx-button>
+  </div>
+</div>

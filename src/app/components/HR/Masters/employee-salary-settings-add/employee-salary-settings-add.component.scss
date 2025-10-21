@@ -1,0 +1,42 @@
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+}
+
+.fixed-footer dx-button + dx-button {
+  margin-left: 10px;
+}
+
+.staff-id-name-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.field-group {
+  display: flex;
+  gap: 8px;
+}
+
+.short-box {
+  width: 100px;
+}
+
+.long-box {
+  flex: 1; /* takes remaining space */
+}
+.dx-state-readonly {
+  pointer-events: none;
+  opacity: 0.6;
+}

@@ -1,0 +1,128 @@
+// @use "../../../../../variables.scss" as *;
+@use "../../../../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 80px;
+
+  width: 100%;
+  display: contents;
+  overflow: auto;
+}
+
+.view-wrapper {
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
+      }
+    }
+
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
+
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
+  }
+
+  user-panel {
+    display: inherit;
+  }
+}
+
+.invoice-wrapper {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar {
+  min-height: 80px;
+  align-items: center;
+  z-index: 2; /* Ensure toolbar stays on top */
+  position: relative;
+  // background-color: white; /* Prevent overlap visual issues */
+}
+
+::ng-deep
+  .salary-grid-wrapper
+  .dx-datagrid
+  .dx-toolbar
+  .dx-toolbar-items-container {
+  height: 100%;
+  padding: 0 20px;
+}
+
+::ng-deep .salary-grid-wrapper .dx-datagrid-headers {
+  margin-top: 0; /* Fix: Push grid headers below toolbar */
+}
+
+::ng-deep .stacked-toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* space between the two date pickers */
+  margin-bottom: 50px;
+}
+::ng-deep
+  .salary-grid-wrapper
+  .dx-datagrid
+  .dx-toolbar
+  .dx-toolbar-items-container {
+  padding: 0px !important;
+}
+
+.form-popup-buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 10px 0 10px;
+  margin-top: -30px; /* ⬅ increased from -6px to -10px */
+}
+
+.popup-footer {
+  display: flex;
+  gap: 10px;
+}
+::ng-deep .dx-data-grid .dx-row > td,
+::ng-deep .dx-data-grid .dx-header-row > td {
+  border-right: 1px solid #ccc !important;
+  border-bottom: 1px solid #ccc !important;
+}
+
+::ng-deep .dx-data-grid .dx-header-row > td {
+  background-color: #f9f9f9;
+}
+::ng-deep .dx-data-grid .dx-row > td:empty::after {
+  content: "\00a0"; /* non-breaking space */
+  display: block;
+}
+.bordered-grid {
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  overflow: hidden;
+}
+::ng-deep .blue-outline-btn.dx-button {
+  border: 1px solid #007bff !important; /* blue border */
+  // color: #007bff !important;           /* blue text */
+}
+
+::ng-deep .blue-outline-btn.dx-button .dx-icon {
+  color: #007bff !important; /* blue icon */
+}
+.disabled-button {
+  opacity: 0.5;
+  pointer-events: auto; /* Allow clicking */
+  cursor: not-allowed;
+}

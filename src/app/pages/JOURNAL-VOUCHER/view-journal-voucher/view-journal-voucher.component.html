@@ -1,0 +1,262 @@
+<dx-validation-group #journalVoucherGroup>
+  <div
+    class="invoice-wrapper"
+    style="
+      height: 70vh;
+      display: flex;
+      flex-direction: column;
+
+      box-sizing: border-box;
+    "
+  >
+    <div class="salary-grid-wrapper" style="padding: 0 10px">
+      <div class="grid-container">
+        <dx-data-grid
+          *ngIf="ledgerList?.length"
+          #itemsGridRef
+          [dataSource]="journalVoucherFormData?.DETAILS"
+          [showBorders]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="false"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true }"
+          [allowColumnReordering]="true"
+          [showColumnHeaders]="true"
+          [columnAutoWidth]="true"
+          [allowColumnResizing]="true"
+          [height]="'55vh'"
+          [columnResizingMode]="'nextColumn'"
+          [headerFilter]="{ visible: true }"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+        >
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-filter-builder [allowHierarchicalFields]="true">
+          </dxo-filter-builder>
+          <dxo-toolbar>
+            <div
+              class="stacked-toolbar-group"
+              style="display: flex; flex-direction: column; gap: 2px"
+            ></div>
+            <dxi-item location="before" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 5px"
+              >
+                <div style="display: flex; gap: 5px">
+                  <div *ngIf="journalVoucherFormData">
+                    <dx-text-box
+                      label="JV No."
+                      [(value)]="journalVoucherFormData.JOURNAL_NO"
+                      labelMode="floating"
+                      [width]="200"
+                      [readOnly]="true"
+                    ></dx-text-box>
+                  </div>
+                  <div *ngIf="journalVoucherFormData">
+                    <dx-text-box
+                      #refBoxRef
+                      label="Reference No."
+                      labelMode="floating"
+                      [(value)]="journalVoucherFormData.REF_NO"
+                      [width]="200"
+                      [readOnly]="true"
+                    ></dx-text-box>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 5px">
+                  <div *ngIf="journalVoucherFormData">
+                    <dx-text-box
+                      #partyNameRef
+                      label="Beneficiary Name"
+                      labelMode="floating"
+                      [(value)]="journalVoucherFormData.PARTY_NAME"
+                      [width]="405"
+                      [readOnly]="true"
+                    ></dx-text-box>
+                  </div>
+                </div>
+              </div>
+            </dxi-item>
+
+            <dxi-item location="after" locateInMenu="auto">
+              <div class="stacked-toolbar-group"></div>
+            </dxi-item>
+            <dxi-item location="after" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 5px"
+              >
+                <!-- Row 1: Date only -->
+                <div style="display: flex; gap: 5px; justify-content: flex-end">
+                      <dx-select-box
+                    [width]="200"
+                    [height]="32"
+                    label="Department"
+                    labelMode="floating"
+                     [items]="Company_list"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [(value)]="journalVoucherFormData.DEPT_ID"
+                  >
+
+                  </dx-select-box>
+                  <div *ngIf="journalVoucherFormData">
+                    
+                    <dx-date-box
+                      label="Date"
+                      labelMode="floating"
+                      [(value)]="journalVoucherFormData.TRANS_DATE"
+                      [displayFormat]="'dd-MM-yyyy'"
+                      type="date"
+                      [width]="200"
+                      [readOnly]="true"
+                    ></dx-date-box>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 5px">
+                  <div *ngIf="journalVoucherFormData">
+                    <dx-text-box
+                      #narrationRefBox
+                      label="Narration"
+                      labelMode="floating"
+                      [(value)]="journalVoucherFormData.NARRATION"
+                      [width]="405"
+                      [showClearButton]="true"
+                      [readOnly]="true"
+                    ></dx-text-box>
+                  </div>
+                </div>
+              </div>
+            </dxi-item>
+          </dxo-toolbar>
+          <dxi-column
+            dataField="billNo"
+            caption="Bill No."
+            [allowEditing]="true"
+            [readOnly]="isReadOnly"
+          ></dxi-column>
+          <!-- <dxi-column
+            dataField="HEAD_CODE"
+            caption="Ledger Code"
+            [width]="130"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="HEAD_NAME"
+            caption="Ledger Name"
+            [allowEditing]="false"
+          ></dxi-column> -->
+          <dxi-column
+            dataField="ledgerCode"
+            caption="Ledger Code"
+            [width]="130"
+            [lookup]="{
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_CODE',
+              displayExpr: 'HEAD_CODE',
+              searchEnabled: true
+            }"
+          ></dxi-column>
+          <dxi-column
+            dataField="ledgerName"
+            caption="Ledger Name"
+            [lookup]="{
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_NAME',
+              displayExpr: 'HEAD_NAME',
+              searchEnabled: true
+            }"
+          ></dxi-column>
+          <dxi-column
+            dataField="particulars"
+            caption="Particulars"
+            [width]="150"
+            [allowEditing]="false"
+          >
+          </dxi-column>
+          <dxi-column
+            dataField="debitAmount"
+            caption="Debit Amount"
+            dataType="number"
+            [allowEditing]="false"
+            [width]="150"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+          </dxi-column>
+          <dxi-column
+            dataField="creditAmount"
+            caption="Credit Amount"
+            dataType="number"
+            [width]="150"
+            [allowEditing]="false"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+          </dxi-column>
+          <dxi-column type="buttons">
+            <dxi-button name="edit"></dxi-button>
+            <dxi-button name="delete"></dxi-button>
+          </dxi-column>
+          <dxo-summary>
+            <dxi-total-item
+              column="debitAmount"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            ></dxi-total-item>
+
+            <dxi-total-item
+              column="creditAmount"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            ></dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+        <div style="margin-top: 15px; padding: 0 0 0 5px">
+          <!-- <div *ngIf="journalVoucherFormData">
+            <dx-text-box
+              label="Narration"
+              labelMode="floating"
+              [(value)]="journalVoucherFormData.NARRATION"
+              [width]="400"
+              [readOnly]="true"
+              [allowEditing]="false"
+              [showClearButton]="true"
+            ></dx-text-box>
+          </div> -->
+        </div>
+        <div *ngIf="journalVoucherFormData" style="margin-top: 10px">
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              padding-right: 0px;
+            "
+          >
+            <dx-check-box
+              [(value)]="journalVoucherFormData.IS_APPROVED"
+              text="Approve"
+              [readOnly]="true"
+            ></dx-check-box>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      (onClick)="cancel()"
+      stylingMode="outlined"
+      type="normal"
+    ></dx-button>
+  </div>
+</div>

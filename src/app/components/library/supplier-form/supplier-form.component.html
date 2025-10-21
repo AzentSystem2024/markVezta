@@ -1,0 +1,477 @@
+<dx-form class="plain-styled-form" [colCount]="3">
+  <dxi-item itemType="group">
+    <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Code"
+            labelMode="floating"
+            [(value)]="newSupplier.SUPP_CODE"
+          >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Code is required">
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Address"
+            labelMode="floating"
+            [(value)]="newSupplier.ADDRESS1"
+           
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Address is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label=" "
+            labelMode="floating"
+            [(value)]="newSupplier.ADDRESS2"
+          
+          ></dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label=" "
+            labelMode="floating"
+            [(value)]="newSupplier.ADDRESS3"
+            
+          ></dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate style="display: flex">
+          <dx-text-box
+            label=" "
+            labelMode="floating"
+            [(value)]="DEFAULT_COUNTRY_CODE"
+            class="country-code-input"
+            
+          ></dx-text-box>
+          <dx-text-box
+            label="Mobile"
+            labelMode="floating"
+            class="phone-style"
+            [(value)]="newSupplier.MOBILE_NO"
+           
+            (keypress)="keyPressNumbers($event)"
+            [style]="{ 'width': '300px' }"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Mobile number is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+      <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Fax"
+            [(value)]="newSupplier.FAX_NO"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Fax No. is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Email"
+            [(value)]="newSupplier.EMAIL"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Email is required">
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="pattern"
+                pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                message="Invalid email format"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+      <!-- <dxi-item>
+        <div *dxTemplate style="display: flex">
+          <dx-text-box
+            label=" "
+            [(value)]="countryCode"
+            class="country-code-input"
+            stylingMode="filled"
+          ></dx-text-box>
+          <dx-text-box
+            label="Phone"
+            class="phone-style"
+            [(value)]="newSupplier.PHONE"
+            stylingMode="filled"
+            (keypress)="keyPressNumbers($event)"
+          ></dx-text-box>
+        </div>
+      </dxi-item> -->
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *dxTemplate>
+          <div class="checkbox">Accepted Currency</div>
+          <dx-check-box
+            [value]="isCurrencyAccepted"
+            (onValueChanged)="toggleCurrencyDropdown($event.value)"
+            [elementAttr]="{ 'aria-label': 'Checked' }"
+          ></dx-check-box>
+          Default
+        </div>
+      </dxi-item>
+
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-select-box
+            label=" "
+            [items]="CurrencyDropdownData"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="newSupplier.CURRENCY_ID"
+            [disabled]="isCurrencyAccepted"
+            placeholder="Select Currency"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Select Currency">
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-select-box
+            label="VAT Rule"
+            [items]="VATRuleDropdownData"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="newSupplier.VAT_RULE_ID"
+            placeholder="Select VAT Rule"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Select VAT rule">
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+         <div *dxTemplate>
+           <dx-check-box
+            [(value)]="newSupplier.IS_COMPANY_BRANCH"
+            text="Company Branch"
+            stylingMode="outlined"
+            hint="Company Branch"
+             labelMode="floating"
+          ></dx-check-box>
+         </div>
+      </dxi-item>
+    </dxi-item>
+    
+  </dxi-item>
+
+  <dxi-item itemType="group">
+    <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Supplier Name"
+            [(value)]="newSupplier.SUPP_NAME"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Supplier name is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Contact Name"
+            [(value)]="newSupplier.CONTACT_NAME"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Contact name is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="City"
+            [(value)]="newSupplier.CITY"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="City is required">
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Zip Code"
+            [(value)]="newSupplier.ZIP"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Zip Code is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-select-box
+            label="Country"
+            [items]="CountryDropdownData"
+            displayExpr="COUNTRY_NAME"
+            valueExpr="ID"
+            [(value)]="newSupplier.COUNTRY_ID"
+            placeholder="Select Country"
+            (onValueChanged)="onCountrySelectionChanged($event)"
+            [searchEnabled]="true"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Select country">
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-select-box
+            label="{{ stateLabel }}"
+            [items]="StateDropdownData"
+            displayExpr="DESCRIPTION"
+             valueExpr="ID"
+             [items]="State"
+            [(value)]="newSupplier.STATE_ID"
+            placeholder="Select State {{ stateLabel }}"
+            [searchEnabled]="true"
+            labelMode="floating"
+            (onValueChanged)="onStateValue($event)"
+          >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Select state">
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate style="display: flex">
+          <dx-text-box
+            label=" "
+             [(value)]="DEFAULT_COUNTRY_CODE"
+            class="country-code-input"
+            labelMode="floating"
+          ></dx-text-box>
+          <dx-text-box
+            label="Phone"
+            class="phone-style"
+            [(value)]="newSupplier.PHONE"
+            labelMode="floating"
+            (keypress)="keyPressNumbers($event)"
+            [style]="{ 'width': '300px' }"
+          ></dx-text-box>
+        </div>
+      </dxi-item>
+      <!-- <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Fax"
+            [(value)]="newSupplier.FAX_NO"
+            stylingMode="filled"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Fax No. is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Email"
+            [(value)]="newSupplier.EMAIL"
+            stylingMode="filled"
+          >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Email is required">
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="pattern"
+                pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                message="Invalid email format"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item> -->
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-select-box
+            label="Payment Terms"
+            [items]="PaymentTermsDropdownData"
+            [items]="PaymentTerms"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="newSupplier.PAY_TERM_ID"
+            placeholder="Select Payment Terms"
+            labelMode="floating"
+            (onValueChanged)="onPayTermSelectionChanged($event)"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Select payment terms"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="VAT Registration Number"
+            [(value)]="newSupplier.VAT_REGNO"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="VAT registration number is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item [colSpan]="2">
+      <div *dxTemplate>
+        <dx-text-area
+          label="Additional Info."
+          [(value)]="newSupplier.NOTES"
+          labelMode="floating"
+        ></dx-text-area>
+      </div>
+    </dxi-item>
+  </dxi-item>
+
+   <dxi-item itemType="group" [colCount]="2">
+  <!-- LANDED COST -->
+  <dxi-item itemType="group" [colCount]="1">
+    <!-- <label class="landed-cost-label">Landed Cost</label> -->
+
+    <!-- DataGrid for Cost Factors -->
+    <dx-data-grid
+     #landedCostGrid  
+    [dataSource]="landedcost" 
+    [height]="'200'"
+      [width]="'100%'"  
+    [showColumnLines]="false"
+    [showRowLines]="true"
+    [selection]="{
+      mode: 'multiple',
+      showCheckBoxesMode: 'always'
+    }"
+    (onSelectionChanged)="onSelectionChanged($event)"
+  >
+    <dxo-paging [enabled]="false"></dxo-paging>
+    <dxo-pager [showPageSizeSelector]="false" [showInfo]="false"></dxo-pager>
+  
+    <!-- Only include the DESCRIPTION column -->
+    <dxi-column dataField="DESCRIPTION" caption="Landed Cost" ></dxi-column>
+  </dx-data-grid>
+  
+  </dxi-item>
+
+    
+</dxi-item>
+
+</dx-form>

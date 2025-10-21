@@ -1,0 +1,229 @@
+<dx-form class="plain-styled-form" [colCount]="2">
+  <dxi-item itemType="group">
+    <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Code"
+            [(value)]="newReasons.CODE"
+            width="100"
+            labelMode="floating"
+          >
+          <dx-validator>
+            <dxi-validation-rule
+                type="required"
+                message="Code is required">
+            </dxi-validation-rule>
+        </dx-validator>
+        </dx-text-box>
+        </div>
+        </dxi-item>
+      
+      </dxi-item>
+
+      <dxi-item itemType="group" [colCount]="1">
+          <dxi-item>
+            <div *dxTemplate>
+              <dx-text-box
+                label="Description"
+                [(value)]="newReasons.DESCRIPTION"
+                labelMode="floating"
+              >
+              <dx-validator>
+                <dxi-validation-rule
+                    type="required"
+                    message="Description is required">
+                </dxi-validation-rule>
+            </dx-validator>
+            </dx-text-box>
+            </div>
+            </dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+              <dxi-item>
+                <div *dxTemplate>
+                  <label></label>
+                  <dx-text-box
+                    [(value)]="newReasons.ARABIC_DESCRIPTION"
+                    labelMode="floating"
+                    [rtlEnabled]="true"
+                    label="Arabic Name"
+                  >
+                  <dx-validator>
+                    <dxi-validation-rule
+                        type="required"
+                        message="Arabic description is required">
+                    </dxi-validation-rule>
+                </dx-validator>
+                </dx-text-box>
+                </div>
+                </dxi-item>
+              </dxi-item>
+      
+        
+        <dxi-item itemType="group" [colCount]="2">
+            <dxi-item>
+              <div *dxTemplate>
+              <dx-date-box
+              type="date"
+              label="Start Date"
+              [value]="now"
+              (onValueChanged)="onValueChangedSDate($event)"
+              [inputAttr]="{ 'aria-label': 'Date' }"
+              labelMode="floating"
+            ></dx-date-box>
+            </div>
+            </dxi-item>
+            <dxi-item>
+                <div *dxTemplate>
+                <dx-date-box
+                type="date"
+                label="End Date"
+                [value]="now"
+                (onValueChanged)="onValueChangedEDate($event)"
+                [inputAttr]="{ 'aria-label': 'Date' }"
+                labelMode="floating"
+              ></dx-date-box>
+              </div>
+              </dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item>
+              <div *dxTemplate >
+                <dx-select-box
+                  label="Reason Type"
+                  [items]="ReasonTypeDropdownData"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                   [searchEnabled]="true"
+                  [(value)]="newReasons.REASON_TYPE"
+                  placeholder="Select Reason ype"
+                  labelMode="floating"
+                  (onValueChanged)="onValueChangedReason($event)"
+
+                >
+                <!-- <dx-validator>
+                  <dxi-validation-rule
+                      type="required"
+                      message="Reason type is required">
+                  </dxi-validation-rule>
+              </dx-validator> -->
+              </dx-select-box>
+              </div>
+            </dxi-item>
+            
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="4" *ngIf="customer">
+            <dxi-item colSpan="3" >
+              <div *dxTemplate >
+                <dx-select-box 
+                  label="Discount Type"
+                  [items]="DiscountTypeDropdownData"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [(value)]="newReasons.DISCOUNT_TYPE"
+                  placeholder="Select Discount type"
+                  labelMode="floating"
+                   [searchEnabled]="true"
+                >
+                <!-- <dx-validator>
+                  <dxi-validation-rule
+                      type="required"
+                      message="Discount type is required">
+                  </dxi-validation-rule>
+              </dx-validator> -->
+              </dx-select-box>
+              </div>
+            </dxi-item>
+            <dxi-item>
+              <div *dxTemplate>
+                <dx-number-box
+                  label="Value"
+                  [(value)]="newReasons.DISCOUNT_PERCENT"
+                  labelMode="floating"
+                >
+                <!-- <dx-validator>
+                  <dxi-validation-rule
+                      type="required"
+                      message="Discount percent is required">
+                  </dxi-validation-rule>
+              </dx-validator> -->
+              </dx-number-box>
+              </div>
+              </dxi-item>
+            
+          </dxi-item>
+          
+       <dxi-item itemType="group" [colCount]="1" *ngIf="Inv_man_Adj">
+            <dxi-item colSpan="3" >
+              <div *dxTemplate >
+                <dx-select-box 
+                  label="Ac.Ledger"
+                  [items]="ac_ledger_Data"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [(value)]="newReasons.AC_HEAD_ID"
+                  placeholder="Select Discount type"
+                  labelMode="floating"
+                 [searchEnabled]="true"
+                  
+                >
+                <!-- <dx-validator>
+                  <dxi-validation-rule
+                      type="required"
+                      message="Discount type is required">
+                  </dxi-validation-rule>
+              </dx-validator> -->
+              </dx-select-box>
+              </div>
+            </dxi-item>
+   
+          </dxi-item>
+          
+          </dxi-item>
+          <dxi-item itemType="group">
+          <dxi-item itemType="group" [colCount]="1">
+            <label>Applicable Stores</label>
+          <dxi-item>
+            <dx-data-grid
+            class="grid theme-dependent"
+            [dataSource]="stores"
+            [columnAutoWidth]="true"
+            height="300"
+            keyExpr="ID"
+            [(selectedRowKeys)]="selectedRows"
+            (onSelectionChanged)="onSelectionChanged($event)" 
+            [showBorders]="true"
+            >
+            <dxo-scrolling mode="standard"></dxo-scrolling>
+            <dxo-selection mode="multiple"> </dxo-selection>
+            <dxi-column dataField="CODE"  caption="Code">
+              <!-- <dx-validator>
+                <dxi-validation-rule
+                    type="required"
+                    message="Code is required">
+                </dxi-validation-rule>
+            </dx-validator> -->
+            </dxi-column>
+            <dxi-column dataField="STORE_NAME" caption="Store Name" [width]="650">
+              <!-- <dx-validator>
+                <dxi-validation-rule
+                    type="required"
+                    message="Store name is required">
+                </dxi-validation-rule>
+            </dx-validator> -->
+            </dxi-column>
+            <dxi-column
+            [visible]="false" 
+            valueExpr="ID"
+            dataField="ID"
+            
+          ></dxi-column>
+            </dx-data-grid>
+            </dxi-item>
+          </dxi-item>
+          </dxi-item>
+       
+  </dx-form>
+
+  

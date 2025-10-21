@@ -1,0 +1,130 @@
+
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="vatclass"
+      (onRowRemoving)="onRowRemoving($event)"
+   
+      [showBorders]="true"
+      [allowColumnReordering]="true"
+       [width]="'100%'"
+      [height]="'75vh'"
+      [allowColumnResizing]="true"
+      (onExporting)="onExporting($event)"
+         (onEditingStart)="OnEditingStartVatReturn($event)"
+    >
+ 
+    <dxo-filter-row
+  [visible]="isFilterRowVisible"
+></dxo-filter-row>
+
+  <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+<dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+
+   <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+        <dxo-popup title="Edit Vat Class" [showTitle]="true" [width]="450" [height]="353">
+        
+        </dxo-popup>
+        <dxo-form [colCount]="1"></dxo-form>
+
+    </dxo-editing>
+   
+    <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">VAT Class</div>
+        </dxi-item>
+    
+     <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+ <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+
+      <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              icon: 'refresh',
+               onClick: refresh,
+              stylingMode: 'text'
+            }"
+          ></dxi-item>
+         
+          <dxi-item name="exportButton"></dxi-item>
+         
+        
+    
+    </dxo-toolbar>
+    <dxi-column dataField="CODE" caption="Code">
+        <dxi-validation-rule type="required" message="Code is required">
+          <dxi-validation-rule type="pattern" message="Code is required">
+          </dxi-validation-rule>
+        </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="VAT_NAME" caption="VAT Name">
+        <dxi-validation-rule type="required" message="VAT name is required">
+          <dxi-validation-rule type="pattern" message="VAT name is required">
+          </dxi-validation-rule>
+        </dxi-validation-rule>
+    
+    </dxi-column>
+    <dxi-column dataField="VAT_PERC" caption="VAT Percentage" alignment="left">
+   
+        <dxi-validation-rule type="required" message="VAT percent is required">
+          <dxi-validation-rule type="pattern" message="VAT percent is required">
+          </dxi-validation-rule>
+        </dxi-validation-rule>
+   
+    </dxi-column>
+    </dx-data-grid>
+    <form-popup
+        [(visible)]="isAddVatclassPopupOpened"
+        (save)="onClickSaveVatclass()"
+        titleText="New Vat Class"
+      >
+      <app-vat-class-form></app-vat-class-form>
+        
+      </form-popup>
+           <dx-popup
+        [(visible)]="isEditVatclassPopupOpened"
+        title="Edit VAT Class"
+        height="40vh"
+      width="40vw"
+      >
+    <app-vat-class-edit
+  [selectedData]="selected_data"
+  (formClosed)="handleClose()">
+</app-vat-class-edit>
+
+      </dx-popup>
+  

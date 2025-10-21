@@ -1,0 +1,197 @@
+<div class="view-wrapper list-page">
+    <!-- <div *ngIf="isLoading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+    </div> -->
+  
+    <div>
+      <dx-data-grid
+        #dataGrid
+        noDataText=" "
+        [width]="'100%'"
+        [height]="'540px'"
+        class="grid theme-dependent"
+        [dataSource]="transferList"
+        (onCellPrepared)="onCellPrepared($event)"
+        [filterRow]="{ visible: true, applyFilter: 'auto' }"
+        [showColumnHeaders]="true"
+        [headerFilter]="{ visible: true }"
+        [showBorders]="true"
+        [columnAutoWidth]="false"
+        [allowColumnReordering]="true"
+        [wordWrapEnabled]="false"
+        rowAlternationInterval="2"
+        [editing]="{
+              mode: 'cell',
+              allowUpdating: false,
+          }"
+        [columnFixing]="{
+          enabled: true,
+          texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+        }"
+        (onContentReady)="onContentReady($event)"
+        [scrolling]="{ mode: 'standard' }"
+        (onRowClick)="onRowClick($event)"
+        (onExporting)="onExporting($event)"
+      >
+      <!-- (onSelectionChanged)="onSelectionChanged($event)"
+        [selection]="{
+          mode: 'multiple',
+          showCheckBoxesMode: 'always'
+        }"
+        [(selectedRowKeys)]="selectedRowKeys" -->
+
+        <dxo-column-chooser
+          [height]="500"
+          hideOnOutsideClick="true"
+          [enabled]="true"
+          mode="select"
+        >
+        </dxo-column-chooser>
+  
+        <!-- <dxi-item name="exportButton" ></dxi-item> -->
+        <dxo-paging [pageSize]="10"></dxo-paging>
+        <dxo-pager
+          [visible]="true"
+          [allowedPageSizes]="allowedPageSizes"
+          [displayMode]="displayMode"
+          [showPageSizeSelector]="showPageSizeSelector"
+          [showInfo]="true"
+          [showNavigationButtons]="true"
+        ></dxo-pager>
+        <dxo-load-panel [showPane]="false"></dxo-load-panel>
+        <dxo-scrolling
+          mode="standard"
+          columnRenderingMode="virtual"
+        ></dxo-scrolling>
+        <dxo-search-panel
+          [visible]="true"
+          [highlightCaseSensitive]="false"
+        ></dxo-search-panel>
+        <dxo-filter-row
+          [visible]="isFilterOpened"
+          [applyFilter]="applyFilter"
+        ></dxo-filter-row>
+        <dxo-export
+          [enabled]="true"
+          [allowExportSelectedData]="true"
+          [formats]="['xlsx', 'pdf']"
+        >
+        </dxo-export>
+        <dxo-header-filter [visible]="true">
+            <dxo-search [enabled]="true"></dxo-search>
+        </dxo-header-filter>
+        <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+        <dxo-filter-builder [allowHierarchicalFields]="true">
+        </dxo-filter-builder>
+        <dxo-search-panel
+          [visible]="true"
+          [highlightCaseSensitive]="false"
+        ></dxo-search-panel>
+  
+        <dxo-editing mode="popup"> </dxo-editing>
+        <dxo-toolbar>
+          <dxi-item location="before">
+            <div class="grid-header custom-header">Inter Store Transfer List</div>
+          </dxi-item>
+  
+          <!-- <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              icon: 'refresh',
+              onClick: refresh,
+              stylingMode: 'text',
+              hint: 'Refresh'
+            }"
+          ></dxi-item> -->
+          <dxi-item
+          location="after"
+          locateInMenu="auto"
+          >
+            <div class="dx-field-label"></div>
+            <div class="dx-field-value">
+              <dx-date-range-box 
+              labelMode="floating"
+              [multiView]="false"
+              startDateLabel="From Date"
+              endDateLabel="To Date"
+              (onValueChanged)="onDateRangeChange($event)"></dx-date-range-box>
+            </div>
+        </dxi-item>
+          
+  
+          <dxi-item
+            widget="dxButton"
+            [options]="{
+              text: '',
+              icon: 'filter',
+              onClick: filterClick,
+  
+              hint: 'Search Column',
+              disabled: isFilterInProgress
+            }"
+          ></dxi-item>
+  
+          <dxi-item
+            widget="dxButton"
+            [options]="{
+      text: '',
+      icon: 'formula',
+      onClick: SummaryClick,
+      hint: 'Hide/Show Summary',
+    }"
+          ></dxi-item>
+  
+          <!-- <dxi-item
+      class="columnfinderclass"
+      widget="dxDropDownButton"
+      [options]="{
+        dataSource: ColumnNames,
+        onItemClick: findColumnLocation, 
+        placeholder: 'Search Column',
+        noDataText: 'Load data and try again',
+        disabled: isLoading || !ColumnNames.length, 
+        hint: 'Column location finder',
+        icon: 'columnproperties',
+        dropDownOptions: {
+          width: 'auto',
+          height: '60vh'
+        }
+      }"
+    ></dxi-item> -->
+  
+          <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
+  
+          <dxi-item name="exportButton"></dxi-item>
+        </dxo-toolbar>
+  
+        <!-- <dxo-summary>
+          <dxi-total-item column="TOTAL" summaryType="sum"> </dxi-total-item>
+        </dxo-summary> -->
+  
+        <dxo-grouping
+          [autoExpandAll]="false"
+          [contextMenuEnabled]="true"
+          [expandMode]="'rowClick'"
+        ></dxo-grouping>
+        <dxi-column dataField="TroutDate" width="auto" caption="Date"></dxi-column>
+        <dxi-column dataField="TrOutNo" width="auto" caption="Transfer No"></dxi-column>
+        <dxi-column dataField="Origin" width="auto" caption="Issued Store"></dxi-column>
+        <dxi-column dataField="Destination" width="auto" caption="Destination Store"></dxi-column>
+        <dxi-column dataField="Barcode" width="auto" caption="Barcode"></dxi-column>
+        <dxi-column dataField="ItemCode" width="auto" caption="Item Code"></dxi-column>
+        <dxi-column dataField="ItemDescription" width="auto" caption="Item Description"></dxi-column>
+        <dxi-column dataField="UOM" width="auto" caption="UOM"></dxi-column>
+        <dxi-column dataField="Status" width="auto" caption="Status"></dxi-column>
+        <dxi-column dataField="QtyIssued" width="auto" caption="Qty Issued" alignment="center"></dxi-column>
+        <dxi-column dataField="QtyReceived" width="auto" caption="Qty Received" alignment="center"></dxi-column>
+        <dxi-column dataField="QtyPending" width="auto" caption="Qty to Receive" alignment="center"></dxi-column>
+        <dxi-column dataField="TrInNo" width="auto" caption="Transfer-in No"></dxi-column>
+        <dxi-column dataField="TrInDate" width="auto" caption="Transfer-in Date"></dxi-column>
+      </dx-data-grid>
+    </div>
+  </div>
+  

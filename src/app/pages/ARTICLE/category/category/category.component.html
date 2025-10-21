@@ -1,0 +1,536 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'80vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="CategoryList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onEditingStart)="onEditingStart($event)"
+      (onRowRemoving)="delete_Category_Data($event)"
+      [showColumnLines]="true"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+       [allowDeleting]="canDelete"
+        [useIcons]="true"
+        editIcon="edit"
+      ></dxo-editing>
+
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+
+      ></dxo-filter-row>
+          
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <!-- <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel> -->
+      <dxo-toolbar>
+        <dxi-item location="before">
+                 <div class="grid-header"style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">Category</div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+  
+              <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+        <dxi-item
+      location="after"
+       *ngIf="canAdd"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+     
+     
+      </dxo-toolbar>
+      <dxi-column dataField="SNO" caption="S.No" alignment="left"></dxi-column>
+
+      <dxi-column dataField="CODE" caption="Code" alignment="left"></dxi-column>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Category"
+        alignment="left"
+      ></dxi-column>
+                <dxi-column
+      dataField="IS_INACTIVE"
+      caption="Status"
+      alignment="right"
+      cellTemplate="statusCellTemplate"
+      width="100"
+      fixedPosition="right"
+    >
+    </dxi-column>
+
+    <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value ? 'Inactive ' : 'Active '"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+            
+    </div>
+    </dx-data-grid>
+  </div>
+</div>
+
+<!-- ===================================AddPopup======================================= -->
+<dx-popup
+  [(visible)]="isAddPopup"
+  [width]="'75%'"
+  [height]="'85vh'"
+  title="Category"
+  (onHiding)="handleClose()"
+  ><dx-validation-group #formValidationGroup>
+    <form [formGroup]="formsource">
+      <!-- Left Column: Input Fields -->
+
+      <!-- Container for Two Grids -->
+      <div style="display: flex; gap: 20px; margin-top: 10px">
+        <!-- Left Grid -->
+        <div style="flex: 1; width: 400px">
+          <!-- Row 1 -->
+          <div
+            style="
+              gap: 10px;
+              border: 1px solid;
+              padding: 10px;
+              border-radius: 5px;
+            "
+          >
+            <div style="display: flex; gap: 20px">
+              <dx-text-box
+                type="text"
+                formControlName="code"
+                label="Code"
+                labelMode="floating"
+                style="flex: 1"
+                width="250px"
+                ><dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="This field is required"
+                  ></dxi-validation-rule> </dx-validator
+              ></dx-text-box>
+
+              <dx-text-box
+                type="text"
+                formControlName="category"
+                label="Category"
+                labelMode="floating"
+                style="flex: 1"
+                width="250px"
+                ><dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="This field is required"
+                  ></dxi-validation-rule> </dx-validator
+              ></dx-text-box>
+            </div>
+            <dx-tag-box
+              formControlName="size"
+              [items]="sizeOptions"
+              label="Size"
+              labelMode="floating"
+              [showSelectionControls]="true"
+              [applyValueMode]="'useButtons'"
+              [multiline]="false"
+              [searchEnabled]="true"
+              (onValueChanged)="sortSelectedSizes($event)"
+              style="flex: 1"
+              width="100%"
+              ><dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="This field is required"
+                ></dxi-validation-rule> </dx-validator
+            ></dx-tag-box>
+          </div>
+          <!-- Row 2: Size and Pack Name -->
+          <div class="manage-packing">
+            <dx-data-grid
+              [dataSource]="packingData"
+              [showBorders]="true"
+              [editing]="{ mode: 'cell', allowUpdating: true }"
+              [height]="'30vh'"
+              [width]="'100%'"              
+            (onRowClick)="onSelectPackAdd($event)"
+              (onRowDblClick)="onEditPackUpdate($event)"
+            >
+              <dxi-column
+                dataField="PACK_NAME"
+                caption="Packing"
+                [allowEditing]="false"
+              ></dxi-column>
+              <dxi-column
+                dataField="PAIR_QTY"
+                caption="Pair"
+                dataType="number"
+              ></dxi-column>
+            </dx-data-grid>
+          </div>
+        </div>
+
+        <!-- Right Grid -->
+        <div
+          style="
+            flex: 1;
+            padding: 10px;
+            border: 1px solid;
+            border-radius: 5px;
+            width: 400px;
+          "
+        >
+ 
+          <div style="display: flex; gap: 10px">
+            <dx-text-box
+              label="Pack Name"
+              [(value)]="packData.PACK_NAME"
+              labelMode="floating"
+              style="flex: 1"
+              width="200px"
+            ></dx-text-box>
+            <dx-check-box
+              text="Export packing"
+              [(value)]="packData.ISEXPORT"
+              style="margin-top: 6px"
+            ></dx-check-box>
+
+            <dx-check-box
+              text="Any Combination"
+              [(value)]="packData.ISANYCOMBINATION"
+              style="margin-top: 6px"
+            ></dx-check-box>
+          </div>
+          
+          <dx-data-grid
+            [dataSource]="packData.SIZEDETAILS"
+            [showBorders]="true"
+            style="display: flex; margin-top: 20px"
+            [editing]="{ mode: 'cell', allowUpdating: true }"
+           (onRowUpdated)="calculateTotal()"
+            [height]="'30vh'"
+            [width]="'100%'"
+          >
+            <dxo-scrolling mode="standard"></dxo-scrolling>
+            <dxi-column
+              dataField="size"
+              caption="Size"
+              [allowEditing]="false"
+            ></dxi-column>
+            <dxi-column
+              dataField="pairQty"
+              caption="Pair Quantity"
+              dataType="number"
+            ></dxi-column>
+      
+          </dx-data-grid>
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+              gap: 10px;
+            "
+          >
+            <dx-number-box
+              [(value)]="totalPairQty"
+              [readOnly]="true"
+              label="Total Pair Quantity"
+              labelMode="floating"
+              [showSpinButtons]="false"
+              [format]="'###.##'"
+              [inputAttr]="{ style: 'text-align: right;' }"
+              style="max-width: 200px"
+            ></dx-number-box>
+
+            <dx-button
+              text="Add"
+              height="30px"
+              (onClick)="Add_packages()"
+              width="60px"
+              style="margin-top: 8px"
+            ></dx-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popup Footer -->
+      <div class="button-row" style="display: flex; justify-content: flex-end">
+        <dx-button
+          stylingMode="contained"
+          text="Cancel"
+          (click)="handleClose()"
+        ></dx-button>
+        <dx-button
+          text="Save"
+          type="default"
+          stylingMode="contained"
+          (onClick)="AddData()"
+        ></dx-button>
+      </div>
+    </form>
+  </dx-validation-group>
+</dx-popup>
+
+<!-- ==========================Edit popup=============================== -->
+
+<dx-popup
+  [(visible)]="isEditPopup"
+  [width]="'85vw'"
+  [height]="'90vh'"
+  title="Category"
+  (onHiding)="handleClose()"
+>
+  <dx-validation-group #formValidationGroup>
+    <form>
+      <!-- Left Column: Input Fields -->
+
+      <!-- Container for Two Grids -->
+      <div style="display: flex; gap: 20px; margin-top: 10px">
+        <!-- Left Grid -->
+        <div style="flex: 1; width: 400px">
+          <!-- Row 1 -->
+          <div
+            style="
+              gap: 10px;
+              border: 1px solid;
+              padding: 10px;
+              border-radius: 5px;
+            "
+          >
+      <div style="display: flex;gap: 20px;">
+              <dx-text-box
+                type="text"
+                [(value)]="code_value"
+                label="Code"
+                labelMode="floating"
+                style="flex: 1"
+                ><dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="This field is required"
+                  ></dxi-validation-rule> </dx-validator
+              ></dx-text-box>
+  
+              <dx-text-box
+                type="text"
+                [(value)]="name_value"
+                label="Category"
+                labelMode="floating"
+                style="flex: 1"
+                ><dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="This field is required"
+                  ></dxi-validation-rule> </dx-validator
+              ></dx-text-box>
+                <!-- Inactive checkbox -->
+      <div  style="display: flex;margin-top: 9px; gap: 8px;">
+        <label for="checboxadd" class="me-2">Inactive</label>
+        <dx-check-box
+          [(value)]="status_value"
+          [elementAttr]="{ 'aria-label': 'Unchecked' }"
+          id="checboxadd"
+        ></dx-check-box>
+      </div>
+            
+      </div>
+        <dx-tag-box
+              [(value)]="size_value"
+              [items]="sizeOptions"
+              label="Size"
+              labelMode="floating"
+              [showSelectionControls]="true"
+              [applyValueMode]="'useButtons'"
+              [multiline]="false"
+              [searchEnabled]="true"
+              (onValueChanged)="updateGridSizes($event)"
+              (onValueChanged)="sortSelectedSizesupdte($event)"
+              style="flex: 1"
+              width="100%"
+              ><dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="This field is required"
+                ></dxi-validation-rule> </dx-validator
+            ></dx-tag-box>
+          </div>
+          <!-- Row 2: Size and Pack Name -->
+          <div class="manage-packing">
+            <dx-data-grid
+              [dataSource]="packing_values"
+              [showBorders]="true"
+              [height]="'300px'"
+              [width]="'100%'"
+             (onRowDblClick)="onEditPackUpdateedit($event)"
+              [editing]="{ mode: 'cell', allowUpdating: true }"
+              (onRowClick)="onSelectPack($event)"
+            > 
+              <dxo-scrolling mode="standard"></dxo-scrolling>
+              <dxi-column
+                dataField="NAME"
+                caption="Packing"
+                [allowEditing]="false"
+              ></dxi-column>
+              <dxi-column
+                dataField="PAIR_QTY"
+                caption="Pair"
+                readOnly="true"
+                dataType="number"
+              ></dxi-column>
+            </dx-data-grid>
+          </div>
+        </div>
+
+        <!-- Right Grid -->
+        <div
+          style="flex: 1; padding: 10px; border: 1px solid; border-radius: 5px"
+        >
+          
+          <div style="display: flex; gap: 10px">
+       
+            <dx-text-box
+              label="Pack Name"
+              [(value)]="packNameValue"
+              labelMode="floating"
+              style="flex: 1"
+              width="150px"
+            ></dx-text-box>
+           
+            <dx-check-box
+              text="Export packing"
+              [(value)]="isExport_value"
+            >
+            </dx-check-box>
+
+            <dx-check-box
+              text="Any Combination"
+              [(value)]="anyCombination_value"
+              style="margin-top: 9px"
+            >
+            </dx-check-box>
+          </div>
+         
+
+          <dx-data-grid
+            [dataSource]="packData_values"
+            [showBorders]="true"
+            style="display: flex; margin-top: 20px"
+            [editing]="{ mode: 'cell', allowUpdating: true }"
+            [height]="'300px'"
+            [width]="'100%'" 
+           (onRowUpdated)="calculateTotalUpdate()"
+          >
+            <dxo-scrolling mode="standard"></dxo-scrolling>
+            <dxi-column
+              dataField="size"
+              caption="Size"
+              [allowEditing]="false"
+               sortOrder="asc"
+              [sortIndex]="0"
+            ></dxi-column>
+            <dxi-column
+              dataField="pairQty"
+              caption="Pair Quantity"
+              dataType="number"
+            ></dxi-column>
+          </dx-data-grid>
+
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+              gap: 10px;
+            "
+          >
+            <dx-number-box
+              [value]="Pair_quantity_value"
+              [readOnly]="true"
+              label="Total Pair Quantity"
+              labelMode="floating"
+              [showSpinButtons]="false"
+              style="max-width: 200px"
+            ></dx-number-box>
+            <dx-button
+              text="Add"
+              height="30px"
+              width="60px"
+              (onClick)="Add_packagesUpdate()"
+              style="margin-top: 10px"
+            ></dx-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popup Footer -->
+      <div
+        class="button-row"
+        style="display: flex; justify-content: flex-end; gap: 10px"
+      >
+        <dx-button
+          stylingMode="contained"
+          text="Cancel"
+          (click)="handleClose()"
+        ></dx-button>
+        <dx-button
+          text="Update"
+          type="default"
+          stylingMode="contained"
+          (onClick)="UpdateData()"
+        ></dx-button>
+      </div>
+    </form>
+  </dx-validation-group>
+</dx-popup>

@@ -1,0 +1,102 @@
+<div class="view-wrapper list-page">
+    <dx-data-grid
+      class="grid theme-dependent"
+      height="600"
+      [dataSource]="dataSource"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [showBorders]="true"
+      (onEditingStart)="onEditingRow($event)"
+      (onRowRemoving)="onRowRemoving($event)"
+      height="84vh"
+    >
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-sorting mode="multiple"></dxo-sorting>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <dxo-filter-row [visible]="true"></dxo-filter-row>
+    <dxo-column-chooser [enabled]="true" [height]="400"></dxo-column-chooser>
+    <dxo-search-panel [visible]="true" placeholder=" Search"></dxo-search-panel>
+    <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    <dxo-pager
+            [visible]="true"
+            [allowedPageSizes]="allowedPageSizes"
+            [displayMode]="displayMode"
+            [showPageSizeSelector]="showPageSizeSelector"
+            [showInfo]="showInfo"
+            [showNavigationButtons]="showNavButtons"
+          ></dxo-pager>
+  <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+  </dxo-editing>
+    <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">User Level</div>
+        </dxi-item>
+    
+    <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          icon="plus"
+          type="default"
+          hint="Add new Data"
+          stylingMode="contained"
+          (onClick)="addUserLevel()"
+          
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              icon: 'refresh',
+              stylingMode: 'text'
+            }"
+          ></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="exportButton"></dxi-item>
+          <!-- <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item> -->
+          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    
+    </dxo-toolbar>
+    <dxi-column dataField="LEVEL_NAME" caption="User Level"></dxi-column>
+    <dxi-column dataField="IS_INACTIVE" caption="Status" [calculateCellValue]="calculateStatus"></dxi-column>
+    
+    </dx-data-grid>
+
+    <form-popup
+      [(visible)]="isAddUserLevelPopupOpened"
+      [width]="width"
+      [height]="height"
+      titleText="New User Level"
+      (save)="onClickSaveUserLevel()"
+      (closePopup)="onClosePopup()"
+    >
+      <app-user-levels-form></app-user-levels-form>
+    </form-popup>
+
+    <form-popup
+    [(visible)]="isEditUserLevelPopupOpened"
+    titleText="Edit User Level"
+    [height]="'100vh'"
+    [width]="popupwidth"
+    (save)="onClickUpdateUserLevel()"
+  >
+    <app-user-levels-edit-form
+    [formdata]="selectedRowData"
+    ></app-user-levels-edit-form>
+  </form-popup>
+    
+    </div>
+    
+   

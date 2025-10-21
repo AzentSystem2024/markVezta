@@ -1,0 +1,162 @@
+<div class="pdc-form" style="max-width: 900px; margin: 0 auto; padding: 20px;">
+  <!-- Row 1: Doc No, Date, Priority -->
+  <div class="d-flex" style="gap: 1rem; margin-bottom: 1rem; align-items: flex-start;">
+    <dx-text-box
+     label="Doc No."
+     labelMode="floating"
+     [readOnly]="true"
+     [(value)]="PDCFormData.ENTRY_NO"
+     >
+    </dx-text-box>
+
+      <dx-date-box
+    label="Date"
+    labelMode="floating"
+    [readOnly]="isReadOnly"
+    displayFormat="dd-MM-yyyy"
+    [(value)]="PDCFormData.ENTRY_DATE"
+    ></dx-date-box>
+
+   <dx-radio-group
+  [items]="priorities"
+  [readOnly]="isReadOnly"
+  [(value)]="selectedType"
+  layout="horizontal"
+  [stylingMode]="'outlined'"
+  displayExpr="name"
+   [(value)]="PDCFormData.IS_PAYMENT"
+  (onValueChanged)="onPriorityChanged($event)"
+>
+</dx-radio-group>
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <label style="margin-bottom: 6px; display: block;">Beneficiary Type</label>
+    <dx-radio-group
+      [items]="BeneficiaryType"
+      [(value)]="selectedBeneficiaryTypeID"
+     valueExpr="id"
+      displayExpr="name"
+      [readOnly]="isReadOnly"
+      layout="horizontal"
+        [itemDisabled]="isBeneficiaryTypeDisabled"
+       (onValueChanged)="onBeneficiaryTypeChanged($event)"
+    >
+    </dx-radio-group>
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <dx-select-box
+     *ngIf="selectedBeneficiaryType?.id === 1"
+    label="Supplier"
+    labelMode="floating"
+    [valueExpr]="'ID'"
+    [displayExpr]="'DESCRIPTION'"
+    [items]="Supplier"
+    [readOnly]="isReadOnly"
+    [(value)]="PDCFormData.SUPP_ID"
+    (onValueChanged)="onSupplierChanged($event)"
+    >  
+    </dx-select-box>
+   
+    <dx-select-box
+    *ngIf="selectedBeneficiaryType?.id === 2"
+    label="Customer"
+    labelMode="floating"
+    [readOnly]="isReadOnly"
+    [valueExpr]="'ID'"
+    [displayExpr]="'DESCRIPTION'"
+    [items]="Customer"
+    [(value)]="PDCFormData.CUST_ID"
+    (onValueChanged)="onCustomerChanged($event)"
+    >  
+    </dx-select-box>
+
+    <dx-text-box
+    *ngIf="selectedBeneficiaryType?.id === 3"
+    label="Beneficiary Name"
+    labelMode="floating"
+    [valueExpr]="'ID'"
+    [displayExpr]="'DESCRIPTION'"
+    [items]="Supplier"
+    [readOnly]="isReadOnly"
+    [(value)]="PDCFormData.BENEFICIARY_NAME"
+    >  
+    </dx-text-box>
+  </div>
+
+   <div class="d-flex" style="gap: 1rem; margin-bottom: 1rem;">
+    <dx-text-box
+    label="Cheque No"
+    labelMode="floating"
+    [width]="'16vw'"
+    [readOnly]="isReadOnly"
+    [(value)]="PDCFormData.CHEQUE_NO">
+  </dx-text-box>
+
+  <dx-date-box
+  label="Date"
+  labelMode="floating"
+  [width]="'16vw'"
+  displayFormat="dd-MM-yyyy"
+  [readOnly]="isReadOnly"
+  [(value)]="PDCFormData.CHEQUE_DATE">
+  </dx-date-box>
+
+  <dx-number-box
+  label="Amount"
+  [width]="'16vw'"
+  labelMode="floating"
+  [readOnly]="isReadOnly"
+  [(value)]="PDCFormData.AMOUNT">
+  </dx-number-box>
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <dx-select-box
+    label="Bank Ac."
+    labelMode="floating"
+    [readOnly]="isReadOnly"
+    [valueExpr]="'ID'"
+    [displayExpr]="'DESCRIPTION'"
+    [items]="Bank"
+    [(value)]="PDCFormData.BANK_HEAD_ID"
+    >
+  </dx-select-box>
+  </div>
+
+  <div  style="margin-bottom: 1.5rem;">
+    <dx-text-box
+    label="Remarks"
+    labelMode="floating"
+    [readOnly]="isReadOnly"
+    [(value)]="PDCFormData.REMARKS">
+  </dx-text-box>
+  </div>
+
+    <div  style="margin-bottom: 1.5rem;">
+    <dx-check-box
+    text="Approve"
+    [readOnly]="isReadOnly"
+    [(value)]="PDCFormData.ENTRY_STATUS"
+    >
+  </dx-check-box>
+  </div>
+
+ <div  style="display: flex; justify-content: flex-end; gap: 10px;">
+    <dx-button
+    
+      text="Cancel"
+      type="normal"
+      class="ml-2"
+      
+      (onClick)="cancel()"
+    ></dx-button>
+    <dx-button
+      text="Update"
+      type="default"
+      (onClick)="savePDC()"
+    ></dx-button>
+  </div>
+  </div>
+

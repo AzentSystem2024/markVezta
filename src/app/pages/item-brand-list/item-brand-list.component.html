@@ -1,0 +1,106 @@
+<div class="view-wrapper list-page">
+  
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="brand"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      (onRowRemoving)="onRowRemoving($event)"
+      (onRowUpdating)="onRowUpdating($event)"
+      [showBorders]="true"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      (onExporting)="onExporting($event)"
+    >
+    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+    <dxo-filter-row
+    [visible]="showFilterRow"
+  ></dxo-filter-row>
+
+  <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+<dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-popup title="Edit Item Brand" [showTitle]="true" [width]="500" [height]="300"></dxo-popup>
+      <dxo-form [colCount]="1">
+
+      </dxo-form>
+    </dxo-editing>
+    <dxo-search-panel
+      [visible]="true"
+      placeholder="Data Search"
+    ></dxo-search-panel>
+    
+    <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Brand</div>
+        </dxi-item>
+    
+    <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addBrand()"
+          
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              onClick: refresh,
+              icon: 'refresh',
+              stylingMode: 'text'
+            }"
+          ></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="exportButton"></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    
+    </dxo-toolbar>
+    <dxi-column dataField="CODE" caption="Code">
+      <dxi-validation-rule type="required" message="Code is required">
+        <dxi-validation-rule
+        type="pattern"
+        
+        message="Code is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="BRAND_NAME" caption="Brand Name">
+      <dxi-validation-rule type="required" message="Code is required">
+        <dxi-validation-rule
+        type="pattern"
+        
+        message="Brand name is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    </dx-data-grid>
+    <form-popup
+    [(visible)]="isAddBrandPopupOpened"
+    (save)="onClickSaveBrand()"
+    titleText="New Brand"
+      >
+      <app-itm-brand-form></app-itm-brand-form>
+
+        
+      </form-popup>
+    </div>

@@ -1,0 +1,114 @@
+.radio-select-container {
+    display: flex;
+    align-items: flex-start; /* Aligns the select box to the top of the radio buttons */
+    // flex-direction: column;
+    // height: 100%;
+  }
+  
+  .radio-select-container > div {
+    margin-right: 20px; /* Adds space between the radio buttons and the select box */
+  }
+
+  .form-content {
+    flex: 1; /* Take up remaining space, pushing buttons to the bottom */
+  }
+  
+  .selected-values-box {
+    margin-top: 20px;
+    min-width: 400px; /* Increase the width of the box */
+    min-height: 400px; /* Increase the height of the box */
+    border: 1px solid #ccc; /* Add a border to the box */
+    padding: 15px; /* Add more padding inside the box */
+    background-color: #f9f9f9; /* Set a background color */
+    overflow-y: auto; /* Enable scrolling if content overflows */
+  }
+  
+  .selected-values-box .dx-check-box {
+    margin-bottom: 10px; /* Add space between each checkbox */
+  }
+  
+  .selected-values-box .dx-check-box:last-child {
+    margin-bottom: 0; /* Remove bottom margin for the last checkbox */
+  }
+
+  .buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 20px; /* Space between form content and buttons */
+    padding-bottom: 10px; /* Space at the bottom of the container */
+    margin-right: 50px;
+    position: relative;
+    bottom: 60px; 
+    width: 15%;
+    margin-left: auto;
+  }
+
+  .selected-rows-container {
+    position: relative;
+    left: 24x;
+    bottom: 5px;;
+    
+  }
+  
+  .popup-content {
+    // display: flex;
+    // width: 800; /* or specify a larger fixed width like 1500px if you want */
+    // justify-content: space-between; /* Ensures space between the grids */
+    // // max-width: 1500px; /* or any other width */
+    // margin: 0 auto;
+  }
+  
+  
+  
+  .buttons-container2 {
+    display: flex;           /* Use flexbox for alignment */
+    justify-content: flex-end; /* Align buttons to the end (right) */
+    align-items: flex-start;  /* Align buttons to the top */
+    gap: 10px;               /* Space between buttons */
+    // margin-left: auto;       /* Push the buttons to the right */
+    margin-right: 10px; 
+
+  }
+  .custom-select-box .dx-selectbox {
+    width: 1000; /* Set the desired width */
+  }
+  .data-grids-container {
+    display: flex;
+    justify-content: space-between; /* Distribute space between grids */
+    gap: 5px; /* Space between grids */
+  }
+  
+  .item-list-container, .stores-list-container {
+    flex: 1; /* Adjust flex as needed */
+    // border: 1px solid #ccc; /* Optional: Border for visual separation */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+  }
+
+
+
+  
+  .grid-wrapper {
+    padding-top: 20px; /* Adjust this value as needed */
+    width: 1000;
+  }
+ 
+  .grid.theme-dependent {
+    flex: 3;
+  }
+  .stores-list-container {
+    flex: 1;
+    margin-top: 50px;
+    // border: 1px solid #ccc; /* Border on all sides */
+    border-radius: 5px ; /* Rounded corners (optional) */
+    padding: 10px;
+    // height: 545px; /* Set the desired height */
+    // width: 350px;
+    overflow-y: auto; /* Add a scrollbar if content overflows */
+    // margin-top: 55px; /* Adjust this value to move the container down */
+    // overflow: auto;
+   
+  }
+  
+  

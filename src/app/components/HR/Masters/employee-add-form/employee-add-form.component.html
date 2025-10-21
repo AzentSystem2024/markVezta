@@ -1,0 +1,664 @@
+<div class="content-wrapper">
+  <dx-validation-group #employeeFormGroup>
+    <dx-tab-panel
+      [(selectedIndex)]="selectedTabIndex"
+      [animationEnabled]="true"
+    >
+      <!-- GENERAL TAB -->
+      <dxi-item>
+        <!-- Two Column Container -->
+        <div class="container">
+          <!-- Left Column: dx-card with Form -->
+          <div class="left-column">
+            <div class="dx-card custom-card">
+              <!-- <dx-form
+            [formData]="employeeFormData"
+            [colCount]="2"
+            
+            [colCountByScreen]="{ xs: 1, sm: 1, md: 2, lg: 2 }"
+          > -->
+
+              <span class="card-label">-- Personal Details --</span>
+
+              <div class="two-column-layout">
+                <div>
+                  <dx-text-box
+                    [(value)]="employeeFormData.EMP_CODE"
+                    [placeholder]="'Employee Code'"
+                    label="Employee No."
+                    [labelMode]="'floating'"
+                  >
+                    <dx-validator>
+                      <dxi-validation-rule
+                        type="required"
+                        message="This field is required"
+                      ></dxi-validation-rule>
+                    </dx-validator>
+                  </dx-text-box>
+                </div>
+                <div>
+                  <dx-text-box
+                    [(value)]="employeeFormData.EMP_NAME"
+                    [placeholder]="'Enter Name'"
+                    label="Employee Name"
+                    [labelMode]="'floating'"
+                  >
+                    <dx-validator>
+                      <dxi-validation-rule
+                        type="required"
+                        message="This field is required"
+                      ></dxi-validation-rule>
+                    </dx-validator>
+                  </dx-text-box>
+                </div>
+              </div>
+              <div class="two-column-layout">
+                <!-- <div class="dob-gender-row"> -->
+                <div class="dob-field">
+                  <dx-date-box
+                    [(value)]="employeeFormData.DOB"
+                    [placeholder]="'Date of Birth'"
+                    label="Date of Birth"
+                    labelMode="floating"
+                    [max]="eighteenYearsAgo"
+                    [showClearButton]="true"
+                    [useMaskBehavior]="true"
+                    displayFormat="dd-MM-yyyy"
+                  >
+                  </dx-date-box>
+                </div>
+                <!-- <div class="gender-field">
+                <dx-radio-group
+                  [(value)]="employeeFormData.IS_MALE"
+                  [items]="['Male', 'Female']"
+                  layout="horizontal"
+                >
+                </dx-radio-group>
+              </div> -->
+                <!-- </div> -->
+                <div>
+                  <dx-radio-group
+                    [(value)]="employeeFormData.IS_MALE"
+                    [items]="[
+                      { text: 'Male', value: true },
+                      { text: 'Female', value: false }
+                    ]"
+                    [valueExpr]="'value'"
+                    [displayExpr]="'text'"
+                    layout="horizontal"
+                  >
+                  </dx-radio-group>
+
+                  <!-- <dx-text-box
+                [(value)]="employeeFormData.MOBILE"
+                [placeholder]="'Enter Mobile No.'"
+                label="Mobile"
+                [labelMode]="'floating'"
+              >
+              </dx-text-box> -->
+                </div>
+              </div>
+
+              <div class="two-column-layout">
+                <div>
+                  <dx-select-box
+                    [(value)]="employeeFormData.DESG_ID"
+                    [items]="designations"
+                    [valueExpr]="'ID'"
+                    [displayExpr]="'DESCRIPTION'"
+                    [placeholder]="'Select Designation'"
+                    label="Designation"
+                    [labelMode]="'floating'"
+                    [searchEnabled]="true"
+                    (onValueChanged)="onDesignationChange($event)"
+                  >
+                  </dx-select-box>
+                </div>
+                <div>
+                  <dx-select-box
+                    [(value)]="employeeFormData.DEPT_ID"
+                    [items]="departments"
+                    [valueExpr]="'ID'"
+                    [displayExpr]="'DESCRIPTION'"
+                    [placeholder]="'Select Department'"
+                    label="Department"
+                    [labelMode]="'floating'"
+                    [searchEnabled]="true"
+                    (onValueChanged)="onDepartmentChange($event)"
+                  >
+                  </dx-select-box>
+                </div>
+              </div>
+              <div class="two-column-layout">
+                <div>
+                  <dx-date-box
+                    [(value)]="employeeFormData.DOJ"
+                    [placeholder]="'Date of Join'"
+                    label="Date of Join"
+                    labelMode="floating"
+                  >
+                  </dx-date-box>
+                </div>
+                <div>
+
+
+                  <dx-select-box
+                    label="Nationality"
+                    displayExpr="COUNTRY_NAME"
+                    valueExpr="ID"
+                    [dataSource]="countries"
+                    [inputAttr]="{ 'aria-label': 'Country' }"
+                    labelMode="floating"
+                    [searchEnabled]="true"
+                    [(value)]="employeeFormData.COUNTRY_ID"
+                    placeholder="Select Country"
+                  >
+                    <!-- Selected field display -->
+                    <div *dxTemplate="let data of 'field'">
+                      <div class="custom-item">
+                        <img
+                          alt="{{ data.COUNTRY_NAME }}"
+                          [src]="data.FLAG_URL"
+                          width="20"
+                          height="20"
+                          style="margin-right: 8px"
+                        />
+                        <span>{{ data.COUNTRY_NAME }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Dropdown items -->
+                    <div *dxTemplate="let data of 'item'">
+                      <div class="custom-item">
+                        <img
+                          alt="{{ data.COUNTRY_NAME }}"
+                          [src]="data.FLAG_URL"
+                          width="20"
+                          height="20"
+                          style="margin-right: 8px"
+                        />
+                        {{ data.COUNTRY_NAME }}
+                      </div>
+                    </div>
+                  </dx-select-box>
+                  <!-- <dx-select-box
+                    label="Nationality"
+                    displayExpr="COUNTRY_NAME"
+                    valueExpr="ID"
+                    [dataSource]="countries"
+                    [inputAttr]="{ 'aria-label': 'Country' }"
+                    labelMode="floating"
+                    [searchEnabled]="true"
+                    [(value)]="employeeFormData.COUNTRY_ID"
+                    placeholder="Select Country"
+                  >
+                   
+                    <div *dxTemplate="let data of 'field'">
+                      <div class="custom-item">
+                        <img
+                          alt="{{ data.COUNTRY_NAME }}"
+                          [src]="data.FLAG_URL"
+                          width="20"
+                          height="20"
+                          style="margin-right: 8px"
+                        />
+                        <span>{{ data.COUNTRY_NAME }}</span>
+                      </div>
+                    </div>
+
+                  
+                    <div *dxTemplate="let data of 'item'">
+                      <div class="custom-item">
+                        <img
+                          alt="{{ data.COUNTRY_NAME }}"
+                          [src]="data.FLAG_URL"
+                          width="20"
+                          height="20"
+                          style="margin-right: 8px"
+                        />
+                        {{ data.COUNTRY_NAME }}
+                      </div>
+                    </div>
+                  </dx-select-box> -->
+                </div>
+              </div>
+<div class="three-column-layout">
+  <div>
+    <dx-text-box
+      [(value)]="employeeFormData.PF_AC_NO"
+      [placeholder]="'Enter PF Account No'"
+      label="PF A/C No"
+      [labelMode]="'floating'"
+    >
+    </dx-text-box>
+  </div>
+  <div>
+    <dx-text-box
+      [(value)]="employeeFormData.ESI_NO"
+      [placeholder]="'Enter ESI No'"
+      label="ESI No"
+      [labelMode]="'floating'"
+    >
+    </dx-text-box>
+  </div>
+  <div>
+    <dx-number-box
+      [(value)]="employeeFormData.ESI_PERCENT"
+      [placeholder]="'Enter ESI %'"
+      label="ESI Percent"
+      [labelMode]="'floating'"
+      [min]="0"
+      [max]="100"
+      format="#0.## '%'"
+    >
+    </dx-number-box>
+  </div>
+</div>
+
+              <!-- </dx-form> -->
+            </div>
+          </div>
+
+          <!-- Right Column: Image Upload Section -->
+
+          <div class="right-column">
+            <!-- Image Upload Container -->
+            <div class="image-upload-container" (click)="triggerFileUpload()">
+              <div class="image-preview" *ngIf="imageUrl">
+                <img [src]="imageUrl" alt="Uploaded Image" />
+                <button class="clear-btn" (click)="clearImage($event)">
+                  ✖
+                </button>
+              </div>
+
+              <div class="upload-placeholder" *ngIf="!imageUrl">
+                Upload Image
+              </div>
+            </div>
+
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              style="display: none"
+              (change)="onImageUpload($event)"
+            />
+          </div>
+        </div>
+<div class="custom-card-address">
+
+
+  <!-- Row 1: Address fields -->
+  <div>
+    <dx-text-box
+      [(value)]="employeeFormData.ADDRESS1"
+      [placeholder]="'Enter Address'"
+      label="Address 1"
+      [labelMode]="'floating'"
+    ></dx-text-box>
+  </div>
+
+  <div>
+    <dx-text-box
+      [(value)]="employeeFormData.ADDRESS2"
+      [placeholder]="'Enter Address'"
+      label="Address 2"
+      [labelMode]="'floating'"
+    ></dx-text-box>
+  </div>
+
+  <div>
+    <dx-text-box
+      [(value)]="employeeFormData.ADDRESS3"
+      [placeholder]="'Enter Address'"
+      label="Address 3"
+      [labelMode]="'floating'"
+    ></dx-text-box>
+  </div>
+
+  <!-- Row 2: City, State, Mobile, Email (combine into 3 columns) -->
+  <div>
+    <dx-text-box
+      [(value)]="employeeFormData.CITY"
+      [placeholder]="'Enter City'"
+      label="City"
+      [labelMode]="'floating'"
+    ></dx-text-box>
+  </div>
+
+  <div>
+    <dx-select-box
+      [(value)]="employeeFormData.STATE_ID"
+      [items]="states"
+      [valueExpr]="'ID'"
+      [displayExpr]="'DESCRIPTION'"
+      [placeholder]="'Select State'"
+      label="State"
+      [labelMode]="'floating'"
+      [searchEnabled]="true"
+      (onValueChanged)="onStateChange($event)"
+    ></dx-select-box>
+  </div>
+
+  <div>
+    <dx-text-box
+      [(value)]="employeeFormData.MOBILE"
+      [placeholder]="'Enter Mobile'"
+      label="Mobile"
+      [labelMode]="'floating'"
+      (input)="validateMobile($event)"
+    ></dx-text-box>
+    <div *ngIf="mobileError" class="error-message">{{ mobileError }}</div>
+  </div>
+
+  <div>
+    <dx-text-box
+      [(value)]="employeeFormData.EMAIL"
+      [placeholder]="'Enter Email'"
+      label="Email"
+      [labelMode]="'floating'"
+      (input)="validateEmail($event)"
+    ></dx-text-box>
+    <div *ngIf="emailError" class="error-message">{{ emailError }}</div>
+  </div>
+</div>
+
+        <div class="dx-card custom-card-passport">
+          <span class="card-label">-- Visa Details --</span>
+          <div class="four-column-layout">
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.PP_NO"
+                [placeholder]="'Passport No.'"
+                label="Passport No."
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-date-box
+                [(value)]="employeeFormData.PP_EXPIRY"
+                [placeholder]="'Passport Expiry'"
+                label="Passport Expiry"
+                labelMode="floating"
+              >
+              </dx-date-box>
+            </div>
+
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.VISA_NO"
+                [placeholder]="'Visa No.'"
+                label="Visa No."
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-date-box
+                [(value)]="employeeFormData.VISA_EXPIRY"
+                [placeholder]="'Visa Expiry'"
+                label="Visa Expiry"
+                labelMode="floating"
+              >
+              </dx-date-box>
+            </div>
+          </div>
+          <div class="four-column-layout">
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.WORK_PERMIT_NO"
+                [placeholder]="'Work Permit ID'"
+                label="Work Permit ID"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-date-box
+                [(value)]="employeeFormData.WORK_PERMIT_EXPIRY"
+                [placeholder]="'Work Permit Expiry'"
+                label="Work Permit Expiry"
+                labelMode="floating"
+              >
+              </dx-date-box>
+            </div>
+
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.LICENSE_NO"
+                [placeholder]="'Driving License'"
+                label="Driving License"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-date-box
+                [(value)]="employeeFormData.LICENSE_EXPIRY"
+                [placeholder]="'Driving License Expiry'"
+                label="Driving License Expiry"
+                labelMode="floating"
+              >
+              </dx-date-box>
+            </div>
+          </div>
+
+          <div class="four-column-layout">
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.DAMAN_NO"
+                [placeholder]="'Daman Card No'"
+                label="Daman Card No"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.DAMAN_CATEGORY"
+                [placeholder]="'Category'"
+                label="Category"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.MOL_NUMBER"
+                [placeholder]="'MOL Number'"
+                label="MOL Number"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="left-column">
+            <div class="custom-card-passport-2">
+              <span class="card-label">-- Bank Details --</span>
+              <div class="four-column-layout">
+                <dx-select-box
+                  [(value)]="employeeFormData.PAYMENT_TYPE"
+                  [items]="paymentType"
+                  valueExpr="ID"
+                  displayExpr="DESCRIPTION"
+                  [searchEnabled]="true"
+                  [placeholder]="'Select Payment'"
+                  label="Type of Payment"
+                  [labelMode]="'floating'"
+                >
+                </dx-select-box>
+
+                <!-- Filler to push next fields to second row -->
+                <div style="grid-column: span 3"></div>
+
+                <!-- Second Row Fields -->
+
+                <dx-text-box
+                  [(value)]="employeeFormData.BANK_CODE"
+                  placeholder="Bank Code"
+                  labelMode="floating"
+                  label="Bank Code"
+                >
+                </dx-text-box>
+
+                <dx-text-box
+                  [(value)]="employeeFormData.BANK_NAME"
+                  placeholder="Bank Name"
+                  labelMode="floating"
+                  label="Bank Name"
+                >
+                </dx-text-box>
+
+                <dx-text-box
+                  [(value)]="employeeFormData.BANK_AC_NO"
+                  placeholder="Bank Account No."
+                  labelMode="floating"
+                  label="Bank Account No"
+                >
+                </dx-text-box>
+
+                <dx-text-box
+                  [(value)]="employeeFormData.IBAN_NO"
+                  placeholder="IBAN No"
+                  labelMode="floating"
+                  label="IBAN No"
+                >
+                </dx-text-box>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="left-column">
+            <div class="custom-card">
+              <div class="two-column-layout">
+                <div>
+                  <dx-check-box
+                    [(value)]="employeeFormData.IS_SALESMAN"
+                    text="Salesman"
+                  ></dx-check-box>
+                </div>
+                <div>
+                  <dx-check-box
+                    [(value)]="employeeFormData.IS_INACTIVE"
+                    text="Inactive"
+                  ></dx-check-box>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </dxi-item>
+
+   
+
+    
+
+      <!-- <dxi-item title="Attachments">
+    <div class="attachments-container">
+
+      <dx-data-grid
+        [dataSource]="attachments"
+        [showBorders]="true"
+        [columnAutoWidth]="true">
+      <dxo-toolbar>
+        <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            icon="plus"
+            type="default"
+            stylingMode="contained"
+            (onClick)="openAttachmentPopup()"
+            
+          ></dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+        
+        
+        <dxi-column dataField="fileName" caption="File Name"></dxi-column>
+        <dxi-column dataField="remarks" caption="Remarks">
+          <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="true"></dxo-editing>
+
+        </dxi-column>
+     
+      </dx-data-grid>
+    </div>
+  </dxi-item> -->
+    </dx-tab-panel>
+  </dx-validation-group>
+  <div class="fixed-footer">
+    <dx-button
+      text="Cancel"
+      type="normal"
+      class="ml-2"
+      (onClick)="cancel()"
+    ></dx-button>
+    <dx-button
+      text="Save"
+      type="default"
+      (onClick)="saveEmployee()"
+    ></dx-button>
+  </div>
+</div>
+<dx-popup
+  [(visible)]="showPopup"
+  [width]="500"
+  [height]="'auto'"
+  title="Add Attachment"
+  [showCloseButton]="true"
+  [dragEnabled]="false"
+  [showTitle]="true"
+>
+  <div class="popup-content-wrapper">
+    <!-- File Upload Section -->
+    <div class="form-group">
+      <label class="form-label">Upload File</label>
+      <div class="upload-btn-wrapper">
+        <label for="file-upload">
+          <dx-button icon="upload" text="Choose File"></dx-button>
+        </label>
+        <input
+          id="file-upload"
+          type="file"
+          (change)="onFileSelected($event)"
+          accept="image/*,application/pdf"
+          class="hidden-input"
+        />
+        <span *ngIf="uploadedFileName" class="file-name">{{
+          uploadedFileName
+        }}</span>
+      </div>
+    </div>
+
+    <!-- Remarks Input -->
+    <div class="form-group">
+      <dx-text-box
+        [(value)]="fileDetails.remarks"
+        label="Remarks"
+        labelMode="floating"
+      ></dx-text-box>
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="fixed-footer">
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        class="action-btn"
+        (onClick)="showPopup = false"
+      ></dx-button>
+      <dx-button
+        text="Save"
+        stylingMode="contained"
+        type="default"
+        class="action-btn"
+        (onClick)="saveFileDetails()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>

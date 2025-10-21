@@ -1,0 +1,225 @@
+<div class="grid-container">
+  <dx-data-grid
+    #dataGrid
+    [dataSource]="AgedPayableReport"
+    width="100%"
+    height="83vh"
+    [showBorders]="true"
+    [showRowLines]="true"
+    [allowColumnResizing]="false"
+    [showColumnLines]="true"
+    [columnAutoWidth]="true"
+    [groupPanel]="{ visible: true }"
+    [grouping]="{ autoExpandAll: false }"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [remoteOperations]="false"
+     [summary]="summaryColumnsData"
+   
+    [allowColumnReordering]="true"
+    [filterRow]="{ visible: false }"
+   
+    
+    id="dataGrid"
+    [headerFilter]="{ visible: false }"
+    [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+    [columnFixing]="{
+      enabled: true,
+      texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+    }"
+    (onExporting)="onExporting($event)"
+    [loadPanel]="{ enabled: false, text: 'Loading...',  }"
+   
+   
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="true"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+         Aged Payables
+        </div>
+      </dxi-item>
+
+      <!-- <dxi-item>
+        <dx-date-box
+          [width]="200"
+          label="Date From"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+      </dxi-item> -->
+      <dxi-item>
+        <dx-date-box
+          [width]="200"
+          label="As on Date"
+          labelMode="floating"
+          [value]="defaultDate"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+      </dxi-item>
+      <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
+
+      <dxi-item>
+        <dx-select-box
+      label="Supplier"
+      labelMode="floating"
+      stylingMode="outlined"
+      [valueExpr]="'ID'"
+      [displayExpr]="'DESCRIPTION'"
+      [items]="Supplier"
+      [searchEnabled]="true"
+      [(value)]=" selectedSupplierId"
+      (onValueChanged)="onSupplierChanged($event)"
+    ></dx-select-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-button
+          text="Apply"
+          type="default"
+          icon="todo"
+          stylingMode="contained"
+          [width]="100"
+          class="mt-2"
+          (onClick)="get_DataSource()"
+        >
+        </dx-button>
+      </dxi-item>
+
+      <dxi-item name="exportButton"></dxi-item>
+    </dxo-toolbar>
+
+    <dxo-grouping
+      [autoExpandAll]="false"
+      [contextMenuEnabled]="true"
+      [expandMode]="'rowClick'"
+    ></dxo-grouping>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+
+  
+    <dxi-column
+      dataField="SUPP_NAME"
+      caption="Supplier Name"
+      dataType="string"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="PURCH_ID"
+      caption="Invoice No"
+      dataType="number"
+      alignment="left"
+    ></dxi-column>
+
+     <dxi-column
+      dataField="PURCH_DATE"
+      caption="Invoice Date"
+      dataType="date"
+    ></dxi-column>
+
+    <dxi-column dataField="AGE_0_30" caption="Age 0-30"  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" dataType="number"></dxi-column>
+
+    <dxi-column
+      dataField="AGE_31_60"
+      caption="Age 31-60"
+      [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" dataType="number"
+      
+    ></dxi-column>
+
+     <dxi-column
+      dataField="AGE_61_90"
+      caption="Age 61-90"
+      [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" dataType="number"
+      
+    ></dxi-column>
+
+     <dxi-column
+      dataField="AGE_91_120"
+      caption="Age 91-120"
+      [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" dataType="number"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="AGE_121_150"
+      caption="Age 121-150"
+      [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" dataType="number"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="AGE_151_180"
+      caption="Age 151-180"
+      [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" dataType="number"
+    ></dxi-column>
+
+ <dxi-column
+      dataField="AGE_ABOVE_180"
+      caption="Age above 180"
+      [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" dataType="number"
+    ></dxi-column>
+
+     <dxi-column
+      dataField="BALANCE"
+      caption="Balance"
+      [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" dataType="number"
+    ></dxi-column>
+
+    <dxi-column
+      *ngIf="AgedPayableReport.length > 0"
+      type="buttons"
+      [width]="100"
+    >
+      <dxi-button
+        hint="View"
+        icon="eyeopen"
+        text="View"
+        [onClick]="onViewClick.bind(this)"
+      ></dxi-button>
+    </dxi-column>
+  </dx-data-grid>
+  
+</div>
+
+<!-- drill down   -->
+
+<dx-popup
+  [(visible)]="isEditInvoice"
+  [width]="'90vw'"
+  [height]="'85vh'"
+  title="Purchase Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditInvoice">
+    <app-edit-purchase-invoice
+      [invoiceFormData]="selectedInvoice"
+      [readOnly]="isEditInvoiceReadOnly"
+      (popupClosed)="handleClose()"
+    ></app-edit-purchase-invoice>
+  </ng-container>
+</dx-popup>

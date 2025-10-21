@@ -1,0 +1,28 @@
+.grntextbox{
+    height: 40px;
+  }
+  .grndatebox{
+    height: 40px;
+  }
+  .grndropdown{
+    height: 40px;
+  }
+  .total-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+  }
+  .total-field {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+  }
+  
+  .total-field:last-child {
+    margin-right: 0; /* Remove margin-right from the last item */
+  }
+  
+  .total-field label {
+    margin-right: 10px;
+  }
+  

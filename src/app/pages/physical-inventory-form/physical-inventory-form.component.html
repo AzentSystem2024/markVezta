@@ -1,0 +1,318 @@
+<div id="quotationForm">
+  <dx-validation-group #inventoryGroup>
+    <div class="quotation-page">
+      <dx-tab-panel class="custom-tab-panel" [selectedIndex]="0">
+        <!-- 🔹 TAB 1: Header -->
+        <dxi-item title="Header">
+          <div class="tab-content" style="margin-top: 10px">
+            <div class="quotation-grid-wrapper">
+              <div class="grid-container">
+                <dx-data-grid
+                  #itemsGridRef
+                  [dataSource]="inventoryFormData.Details"
+                  [showBorders]="true"
+                  [showColumnLines]="true"
+                  [columnAutoWidth]="true"
+                  [rowAlternationEnabled]="true"
+                  [allowColumnReordering]="true"
+                  [allowColumnResizing]="true"
+                  [height]="'65vh'"
+                  [columnResizingMode]="'nextColumn'"
+                  [scrolling]="{ mode: 'virtual' }"
+                  rowAlternationInterval="2"
+                  [selection]="{ mode: 'single' }"
+                  [editing]="{
+                    mode: 'cell',
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: !isReadOnlyMode
+                  }"
+                  (onEditorPreparing)="onEditorPreparing($event)"
+                  (onRowRemoving)="onRowRemoving($event)"
+                >
+                  <dxo-paging [pageSize]="10"></dxo-paging>
+                  <dxo-pager
+                    [visible]="true"
+                    [allowedPageSizes]="allowedPageSizes"
+                    [displayMode]="displayMode"
+                    [showPageSizeSelector]="showPageSizeSelector"
+                    [showInfo]="true"
+                    [showNavigationButtons]="true"
+                  ></dxo-pager>
+                  <dxo-scrolling
+                    mode="standard"
+                    columnRenderingMode="virtual"
+                  ></dxo-scrolling>
+
+                  <dxo-header-filter
+                    [visible]="true"
+                    [search]="{ enabled: true }"
+                  ></dxo-header-filter>
+                  <dxo-paging [pageSize]="10"></dxo-paging>
+
+                  <!-- Toolbar -->
+                  <dxo-toolbar>
+                    <!-- Toolbar Before -->
+                    <dxi-item location="before" locateInMenu="auto">
+                      <div class="stacked-toolbar-group">
+                        <!-- Date + Reference Fields -->
+                        <div
+                          style="display: flex; gap: 5px; align-items: flex-end"
+                        >
+                          <dx-date-box
+                            [(value)]="inventoryFormData.PHYSICAL_DATE"
+                            label="Date"
+                            labelMode="floating"
+                            [width]="200"
+                            displayFormat="dd-MM-yyyy"
+                            [readOnly]="true"
+                          ></dx-date-box>
+                        </div>
+                      </div>
+                    </dxi-item>
+
+                    <!-- Toolbar After -->
+                    <dxi-item location="after" locateInMenu="auto">
+                      <div class="stacked-toolbar-group">
+                        <div style="display: flex; gap: 5px">
+                          <dx-text-box
+                            [(value)]="inventoryFormData.PHYSICAL_NO"
+                            label="Physical No"
+                            labelMode="floating"
+                            [width]="200"
+                            [readOnly]="true"
+                          ></dx-text-box>
+                          <dx-text-box
+                            [(value)]="inventoryFormData.REFERENCE_NO"
+                            label="Reference No"
+                            labelMode="floating"
+                            [width]="200"
+                            [readOnly]="isReadOnlyMode"
+                          ></dx-text-box>
+                        </div>
+                        <div
+                          style="display: flex; align-items: center; gap: 5px"
+                        ></div>
+                      </div>
+                    </dxi-item>
+                  </dxo-toolbar>
+
+                  <!-- Columns -->
+                  <dxi-column
+                    dataField="ITEM_ID"
+                    [visible]="false"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="ITEM_CODE"
+                    caption="Bar Code"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="DESCRIPTION"
+                    caption="Description"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="MATRIX_CODE"
+                    caption="Matrix Code"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="STOCK_QTY"
+                    caption="Qty Available"
+                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="QTY_COUNTED"
+                    caption="Qty Counted"
+                    [allowEditing]="true"
+                    alignment="right"
+                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="ADJUSTED_QTY"
+                    caption="Variance"
+                    [allowEditing]="true"
+                    [calculateCellValue]="calculateVariance"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="COUNT_TIME"
+                    caption="Count Time"
+                    [allowEditing]="false"
+                  ></dxi-column>
+                  <dxi-column type="buttons">
+                    <dxo-button
+                      name="delete"
+                      [visible]="!isReadOnlyMode"
+                    ></dxo-button>
+                  </dxi-column>
+                </dx-data-grid>
+
+                <!-- Bottom Buttons -->
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    margin-top: 5px;
+                  "
+                >
+                  <!-- Left: Import & Narration -->
+                  <div style="display: flex; flex-direction: column; gap: 2px">
+                    <div style="display: flex; gap: 5px; align-items: center">
+                      <dx-button
+                        *ngIf="!isReadOnlyMode"
+                        icon="import"
+                        type="default"
+                        hint="Import Excel"
+                        stylingMode="outlined"
+                        [disabled]="isReadOnlyMode"
+                        (onClick)="onImportExcel()"
+                      ></dx-button>
+
+                      <input
+                        type="file"
+                        #fileInput
+                        style="display: none"
+                        (change)="onFileSelected($event)"
+                        accept=".xlsx, .xls"
+                      />
+
+                      <dx-button
+                        *ngIf="!isReadOnlyMode"
+                        icon="download"
+                        type="default"
+                        hint="Download Template"
+                        stylingMode="outlined"
+                        [disabled]="isReadOnlyMode"
+                        (onClick)="onDownloadExcel()"
+                      ></dx-button>
+                    </div>
+
+                    <dx-text-box
+                      [(value)]="inventoryFormData.NARRATION"
+                      label="Narration"
+                      labelMode="floating"
+                      [width]="405"
+                      placeholder="Enter narration here..."
+                      [readOnly]="isReadOnlyMode"
+                    ></dx-text-box>
+                  </div>
+
+                  <!-- Right: Approve + Save -->
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      align-items: flex-end;
+                      gap: 10px;
+                      margin-top: 15px;
+                      margin-right: 5px;
+                    "
+                  >
+                    <dx-check-box
+                      [(value)]="isApproved"
+                      text="Approve"
+                      [readOnly]="isReadOnlyMode"
+                      [disabled]="!isEditing"
+                    ></dx-check-box>
+
+                    <div style="display: flex; gap: 10px">
+                      <dx-button
+                        text="Cancel"
+                        (onClick)="onCancel()"
+                        stylingMode="outlined"
+                        type="normal"
+                      ></dx-button>
+
+                      <dx-button
+                        *ngIf="!isReadOnlyMode"
+                        [text]="
+                          isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'
+                        "
+                        type="default"
+                        stylingMode="contained"
+                        [disabled]="isReadOnlyMode"
+                        (onClick)="saveInventory()"
+                      ></dx-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </dxi-item>
+
+        <!-- 🔹 TAB 2: History -->
+        <dxi-item title="History">
+          <div class="tab-content" style="margin-top: 10px">
+            <div class="quotation-grid-wrapper">
+              <div class="grid-container">
+                <dx-data-grid
+                  #itemsGridRef
+                  [dataSource]="history"
+                  [showBorders]="true"
+                  [showColumnLines]="true"
+                  [columnAutoWidth]="true"
+                  [rowAlternationEnabled]="true"
+                  [allowColumnReordering]="true"
+                  [allowColumnResizing]="true"
+                  [height]="'75vh'"
+                  [columnResizingMode]="'nextColumn'"
+                  [scrolling]="{ mode: 'virtual' }"
+                  rowAlternationInterval="2"
+                  [selection]="{ mode: 'single' }"
+                  [editing]="{
+                    mode: 'cell',
+
+                    allowDeleting: !isReadOnlyMode
+                  }"
+                >
+                  <dxo-paging [pageSize]="10"></dxo-paging>
+                  <dxo-pager
+                    [visible]="true"
+                    [allowedPageSizes]="allowedPageSizes"
+                    [displayMode]="displayMode"
+                    [showPageSizeSelector]="showPageSizeSelector"
+                    [showInfo]="true"
+                    [showNavigationButtons]="true"
+                  ></dxo-pager>
+                  <dxo-load-panel [showPane]="false"></dxo-load-panel>
+                  <dxo-scrolling mode="virtual"></dxo-scrolling>
+                  <dxo-filter-row
+                    [visible]="isFilterRowVisible"
+                    [applyFilter]="auto"
+                  ></dxo-filter-row>
+                  <dxo-header-filter [visible]="isFilterOpened">
+                    <dxo-search [enabled]="true"></dxo-search>
+                  </dxo-header-filter>
+                  <dxo-filter-panel
+                    [visible]="isFilterOpened"
+                  ></dxo-filter-panel>
+                  <dxo-filter-builder [allowHierarchicalFields]="true">
+                  </dxo-filter-builder>
+                  <dxi-column
+                    dataField="Action"
+                    caption="Action"
+                    [visible]="true"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="Time"
+                    caption="Time"
+                    [visible]="true"
+                    [customizeText]="formatDateTime"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="Description"
+                    caption="Description"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="UserName"
+                    caption="User Name"
+                  ></dxi-column>
+                </dx-data-grid>
+              </div>
+            </div>
+          </div>
+        </dxi-item>
+      </dx-tab-panel>
+    </div>
+  </dx-validation-group>
+</div>

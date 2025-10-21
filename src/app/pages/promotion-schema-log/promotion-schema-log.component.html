@@ -1,0 +1,488 @@
+<div class="view-wrapper list-page">
+  <div>
+    <dx-data-grid
+      [width]="'100%'"
+      [height]="'530px'"
+      class="grid theme-dependent"
+      [dataSource]="logList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      (onSelectionChanged)="onSelectionChanged($event)"
+      (onEditingStart)="openEditingStart($event)"
+      (onRowRemoving)="onRowRemoving($event)"
+      (onCellPrepared)="onCellPrepared($event)"
+      [selection]="{ mode: 'single' }"
+    >
+      <dxo-scrolling
+        mode="standard"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+        [allowDeleting]="true"
+      ></dxo-editing>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Promotion Schema</div>
+        </dxi-item>
+        <dxi-item location="after">
+          <dx-button
+            text="Add"
+            icon="plus"
+            type="default"
+            stylingMode="contained"
+            (click)="onAddClick()"
+          ></dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Schema"
+        [width]="'auto'"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="SCHEMA_TYPE"
+        caption="Schema Type"
+        [width]="'auto'"
+        [allowEditing]="false"
+      ></dxi-column>
+    </dx-data-grid>
+  </div>
+</div>
+
+<dx-popup
+  [(visible)]="isPopupVisible"
+  title="New Promotion Schema"
+  [width]="popupWidth"
+  [height]="popupHeight"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div class="popup-content">
+    <div class="form-row">
+      <div class="input-container">
+        <div class="spacing" style="display: flex; align-items: center">
+          <label style="width: 120px; margin-right: 8px">Promotion Name</label>
+          <dx-text-box
+            [(value)]="promotionData.DESCRIPTION"
+            placeholder="Promotion Name"
+            style="width: 480px"
+          >
+        </dx-text-box>
+        </div>
+
+        <div class="spacing" style="display: flex; align-items: center;">
+          <label style="width: 120px; margin-right: 8px">Type</label>
+          <div style="display: flex; align-items: center; width: 480px">
+            <dx-select-box
+              [(value)]="promotionData.SCHEMA_TYPE_ID"
+              [items]="promotionSchema"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              placeholder="Choose Type"
+              style="flex: 1"
+              (onValueChanged)="onPromotionSchemaChange($event)"
+            ></dx-select-box>
+            <div
+              style="margin-left: 8px; cursor: pointer"
+              (click)="openDetailsPopup()"
+              title="More Details"
+            >
+              <i
+                class="dx-icon dx-icon-info"
+                style="font-size: 20px; color: #007bff"
+              ></i>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedPromotionSchema !== 3">
+          <div
+            class="spacing"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 10px;
+              margin-left: 80px;
+            "
+          >
+            <label style="width: 70px; text-align: right; margin-left: 14px;">Buy</label>
+            <dx-number-box
+              #numberBox
+              [min]="0"
+              [showSpinButtons]="true"
+              [inputAttr]="{ 'aria-label': 'Sales' }"
+
+              [(value)]="promotionData.QTY_BUY"
+              [disabled]="buyAndGetDisabled"
+              style="width: 150px;"
+              placeholder="Buy"
+          ></dx-number-box>
+            
+            <!-- Get Field -->
+            <label
+              [style.width]="'50px'"
+              [style.text-align]="'right'"
+              [style.color]="
+                isQtyGetDisabled || buyAndGetDisabled ? '#b0b0b0' : 'inherit'
+              "
+            >
+              Get
+            </label>
+                <dx-number-box
+                #numberBox
+                [min]="0"
+                [showSpinButtons]="true"
+                [inputAttr]="{ 'aria-label': 'Sales' }"
+                (onKeyDown)="keyDown($event)"
+                [(value)]="promotionData.QTY_GET"
+                [disabled]="isQtyGetDisabled || buyAndGetDisabled"
+                style="width: 150px;"
+                placeholder="Get"
+              ></dx-number-box>
+
+            <label style="width: 70px; text-align: right">Discount%</label>
+        
+
+            <dx-number-box
+              #numberBox
+              [min]="0"
+              [max]="100"
+              [showSpinButtons]="true"
+              [inputAttr]="{ 'aria-label': 'Sales', 'placeholder': 'Discount'}"
+              [(value)]="DISC_PERCENT"
+              (valueChange)="onPercentageChange($event)"
+              [disabled]="buyAndGetDisabled"
+              style="width: 150px;"
+          ></dx-number-box> 
+          </div>
+
+          <div style="margin-top: 10px">
+            <label>
+              <dx-radio-group
+                [(value)]="selectedSchemaCondition"
+                (onValueChanged)="handleSchemaConditionChange($event)"
+                [items]="[
+                  {
+                    text: 'Schema is applicable on the multiple of promotion quantity',
+                    value: 'multiple'
+                  },
+                  {
+                    text: 'Schema is applicable when the quantity is more than promotion quantity',
+                    value: 'more'
+                  }
+                ]"
+                [disabled]="areRadioButtonsDisabled"
+              ></dx-radio-group>
+            </label>
+          </div>
+        </div>
+
+        <!-- Table for Mix and Match -->
+        <div *ngIf="selectedPromotionSchema === 3">
+          <dx-data-grid
+            #dataGrid
+            [dataSource]="tableData"
+            [showBorders]="true"
+            [editing]="{
+              mode: 'batch',
+              allowAdding: true
+            }"
+            noDataText=" "
+            (onRowInserted)="onRowInserted($event)"
+            [sorting]="{ mode: 'none' }"
+          >
+            <dxi-column
+              dataField="qtyToBuy"
+              caption="Qty to Buy"
+              width="130"
+              [allowEditing]="true"
+            >
+            </dxi-column>
+            <dxi-column
+              dataField="discount"
+              caption="Discount %"
+              width="130"
+              [allowEditing]="true"
+            >
+            </dxi-column>
+            <dxi-column
+              dataField="description"
+              caption="Description"
+              width="320"
+              [allowEditing]="true"
+            >
+            </dxi-column>
+          </dx-data-grid>
+          <div
+            class="spacing"
+            style="display: flex; align-items: center; margin-top: 10px"
+          >
+            <dx-check-box
+              text="Calculate Discount on Regular Price"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <!-- <div style="display: flex; justify-content: flex-end; padding: 20px"> -->
+        <div style="padding: 20px; text-align: right">
+          <div style="margin-right: auto">
+            <dx-button
+              text="Save"
+              stylingMode="contained"
+              type="default"
+              (onClick)="savePromotionShema()"
+              style="width: 150px"
+            ></dx-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div></div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="detailsPopup"
+  title="Promotion Details"
+  [width]="400"
+  [height]="300"
+  [position]="{ my: 'right top', at: 'right top', of: '.info-icon-container' }"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <p>
+      <strong>Buy X Get % off</strong> - Here promotion is applicable for when
+      customers buy X quantity of an item. It has 2 sub options 1) Schema is
+      applicable on the multiple of promotion quantity: - in this case,if
+      promotion is applicable when user purchases 2 quantity. Next promotion
+      will trigger only when user purchases multiple of 2 (4, 6, 8 etc.) 2)
+      Schema is applicable when quantity is more than promotion quantity: in
+      this case promotion is applicable for all items if total quantity is equal
+      to or more than quantity to buy.
+    </p>
+    <p>
+      <strong>Buy X Get Y for Z% off'</strong> - When customer buy X+Y quantity,
+      he will get Z% for Y no. of items. For example, buy 2 Get 1 Free. Here
+      when a customer purchases 2 items, he will get 3 items free.
+    </p>
+    <p>
+      <strong>Mix and Match</strong> - In this case when a customer buys X no.
+      of items, he will get an offer for another item. For example, buy 2 pieces
+      of bread, get 1 Jam free.
+    </p>
+    <p>
+      <strong>Buy X Get Y of A for Z% off</strong> - In this case, users can
+      enter different promotions for the same set of items. For example, buy 2
+      get 10% off, buy 3 get 20% off etc.
+    </p>
+  </div>
+</dx-popup>
+
+<!-- edit -->
+<dx-popup
+  [(visible)]="isEditPopupVisible"
+  title="Edit Promotion Schema"
+  [width]="popupWidth"
+  [height]="popupHeight"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+  (onHiding)="resetPopup()"
+>
+  <div class="popup-content">
+    <div class="form-row">
+      <div class="input-container">
+        <div class="spacing" style="display: flex; align-items: center">
+          <label style="width: 120px; margin-right: 8px">Promotion Name</label>
+          <dx-text-box
+            [(value)]="promotionData.DESCRIPTION"
+            placeholder="Description"
+            style="width: 480px"
+          ></dx-text-box>
+        </div>
+
+        <div class="spacing" style="display: flex; align-items: center">
+          <label style="width: 120px; margin-right: 8px">Type</label>
+          <div style="display: flex; align-items: center; width: 480px">
+            <dx-select-box
+              [(value)]="promotionData.SCHEMA_TYPE_ID"
+              [items]="promotionSchema"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              placeholder="Choose Type"
+              style="flex: 1"
+              (onValueChanged)="onPromotionSchemaChange($event)"
+            ></dx-select-box>
+            <div
+              style="margin-left: 8px; cursor: pointer"
+              (click)="openDetailsPopup()"
+              title="More Details"
+            >
+              <i
+                class="dx-icon dx-icon-info"
+                style="font-size: 20px; color: #007bff"
+              ></i>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="selectedPromotionSchema !== 3">
+          <div
+            class="spacing"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 10px;
+              margin-left: 93px;
+            "
+          >
+            <!-- Buy Field -->
+            <label style="width: 70px; text-align: right; margin-left: 5px;">Buy</label>
+            <dx-number-box
+              #numberBox
+              [min]="0"
+              [showSpinButtons]="true"
+              [inputAttr]="{ 'aria-label': 'Sales' }"
+
+              [(value)]="promotionData.QTY_BUY"
+              [disabled]="buyAndGetDisabled"
+              style="width: 150px;"
+          ></dx-number-box>
+
+            <!-- Get Field -->
+            <label
+              [style.width]="'50px'"
+              [style.text-align]="'right'"
+              [style.color]="
+                isQtyGetDisabled || buyAndGetDisabled ? '#b0b0b0' : 'inherit'
+              "
+            >
+              Get
+            </label>
+                <dx-number-box
+                #numberBox
+                [min]="0"
+                [showSpinButtons]="true"
+                [inputAttr]="{ 'aria-label': 'Sales' }"
+                (onKeyDown)="keyDown($event)"
+                [(value)]="promotionData.QTY_GET"
+                [disabled]="isQtyGetDisabled || buyAndGetDisabled"
+                style="width: 150px;"
+              ></dx-number-box>
+
+            <!-- Discount Field -->
+            <label style="width: 70px; text-align: right">Discount</label>
+            <dx-number-box
+              #numberBox
+              [min]="0"
+              [max]="100"
+              [showSpinButtons]="true"
+              [inputAttr]="{ 'aria-label': 'Sales' }"
+              [(value)]="DISC_PERCENT"
+              [disabled]="buyAndGetDisabled"
+              style="width: 150px;"
+          ></dx-number-box>
+          </div>
+
+          <div style="margin-top: 10px">
+            <label style="width: 100px; margin-right: 8px"></label>
+            <dx-radio-group
+              [(value)]="selectedSchemaType"
+              [items]="[
+                {
+                  value: 'multiple',
+                  label:
+                    'Schema is applicable on the multiple of promotion quantity'
+                },
+                {
+                  value: 'regular',
+                  label:
+                    'Schema is applicable when the quantity is more than promotion quantity'
+                }
+              ]"
+              displayExpr="label"
+              valueExpr="value"
+              layout="vertical"
+              (onValueChanged)="onSchemaTypeChange($event)"
+              [disabled]="areRadioButtonsDisabled"
+            ></dx-radio-group>
+          </div>
+        </div>
+
+        <!-- Table for Mix and Match -->
+        <div *ngIf="selectedPromotionSchema === 3">
+          <dx-data-grid
+            [dataSource]="promotionData?.promotionschema_entry"
+            [showBorders]="true"
+            noDataText=""
+          >
+            <dxo-editing
+              mode="batch"
+              [allowEditing]="true"
+              [allowAdding]="true"
+              [allowDeleting]="true"
+            ></dxo-editing>
+            <dxi-column
+              dataField="QTY_BUY"
+              caption="Qty to Buy"
+              width="130"
+              [allowEditing]="true"
+            >
+            </dxi-column>
+            <dxi-column
+              dataField="DISC_PERCENT"
+              caption="Discount %"
+              width="130"
+              [allowEditing]="true"
+            >
+            </dxi-column>
+            <dxi-column
+              dataField="DESCRIPTION"
+              caption="Description"
+              width="320"
+              [allowEditing]="true"
+            >
+            </dxi-column>
+          </dx-data-grid>
+          <div
+            class="spacing"
+            style="display: flex; align-items: center; margin-top: 10px"
+          >
+            <dx-check-box
+              text="Calculate Discount on Regular Price"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div style="padding: 20px; text-align: right">
+          <div style="margin-right: auto">
+            <dx-button
+              text="Save"
+              stylingMode="contained"
+              type="default"
+              (onClick)="updatePromotionSchema()"
+              style="width: 150px"
+            ></dx-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div></div>
+</dx-popup>

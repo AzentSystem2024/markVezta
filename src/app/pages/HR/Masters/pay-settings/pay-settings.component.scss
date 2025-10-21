@@ -1,0 +1,38 @@
+@use "../../../../../variables.scss" as *;
+
+
+.form-container  {
+ height: 550px;
+  width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;  
+}
+
+/* Reduce space between fields */
+// .form-container ::ng-deep .dx-form .dx-field-item {
+//   margin-bottom: 1px !important;
+// }
+
+.center-selectbox {
+  display: flex;
+  justify-content: center;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* Moves content to the right */
+  gap: 10px; /* Optional: adds space between buttons */
+  margin-right: 30px;
+}
+
+
+
+
+
+.custom-form .dx-form-group-with-caption,
+.custom-form .dx-form-group {
+  margin-bottom: 8px; /* Default is often 20px+ */
+}

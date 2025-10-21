@@ -1,0 +1,112 @@
+@use "../../../../../variables.scss" as *;
+@use "sass:math";
+
+
+
+:host {
+    --side-panel-toolbar-height: 76px;
+  
+    width: 100%;
+    display: contents;
+    overflow: auto; 
+  }
+
+.view-wrapper {
+    // position: absolute;
+    // top: 0;
+    // bottom: 0;
+    // left: 0;
+    // right: 0;
+    // flex-direction: row;
+  
+    .grid {
+      .name-template {
+        .position {
+          font-size: 12px;
+          color: var(--texteditor-label-color);
+        }
+      }
+  
+      ::ng-deep & {
+        .dx-datagrid-header-panel {
+          padding: 0 var(--content-padding);
+        }
+  
+        .dx-toolbar {
+          margin-bottom: 0;
+          padding: var(--toolbar-margin-bottom) 0;
+        }
+  
+        .dx-datagrid-content .dx-row {
+          cursor: pointer;
+        }
+      }
+  
+      .grid-header {
+        @include header();
+      }
+    }
+  
+    user-panel {
+      display: inherit;
+    }
+  }
+
+  .edit-cell {
+    position: relative;
+  
+    contact-status {
+      position: absolute;
+      margin-top: 10px;
+      margin-left: 11px;
+    }
+  }
+
+
+  .flag-open {
+    color: white; /* or rgb(245, 240, 240) */
+    text-shadow: 0 0 1px black, 0 0 2px black;
+  }
+  
+  
+  .flag-verified {
+    color: orange;
+  }
+  
+  .flag-approved {
+    color: green;
+  }
+
+  .flag-travelled{
+    color: blue;
+  }
+
+  .flag-rejoined{
+    color: yellow;
+  }
+
+  .flag-left-service{
+    color: red;
+  }
+
+
+  ::ng-deep .dx-datagrid-filter-row {
+    height: 45px !important;
+    overflow: hidden !important;
+  }
+  
+  ::ng-deep .dx-datagrid-filter-row td {
+    padding: 2px 6px !important;
+    height: 28px !important;
+  }
+  
+  ::ng-deep .dx-datagrid-filter-row .dx-texteditor-input {
+    font-size: 12px !important;
+    height: 22px !important;
+    padding: 2px 4px !important;
+  }
+  
+  ::ng-deep .dx-datagrid-filter-row .dx-editor-cell .dx-widget {
+    min-height: 24px !important;
+  }
+  

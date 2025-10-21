@@ -1,0 +1,171 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText=" "
+      [showColumnLines]="true"
+      [width]="'100%'"
+      [height]="'80vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="salaryHeadList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true }"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: true }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      (onEditingStart)="OnEditSalary_Head($event)"
+      (onRowRemoving)="OnDeleteSalaryHead($event)"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+      }"
+    >
+      <!-- <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser> -->
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <!-- <dxi-item name="exportButton" ></dxi-item> -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="true"
+        [formats]="['xlsx', 'pdf']"
+      >
+      </dxo-export>
+      <dxo-header-filter
+        [visible]="true"
+        [search]="{ enabled: true }"
+      ></dxo-header-filter>
+      <!-- <dxo-filter-panel [visible]="true"></dxo-filter-panel> -->
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header" style="font-size: 20px;">Salary Head</div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto">
+      
+          <!-- <dx-button
+            icon="plus"
+            type="default"
+            stylingMode="contained"
+            (onClick)="addEmployee()"
+          ></dx-button> -->
+        </dxi-item>
+                          <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+    <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+               <dxi-item
+               *ngIf="canAdd"
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+      </dxo-toolbar>
+
+      <!-- <dxi-column dataField="serialNo" caption="SL.No" [aligement]="left"></dxi-column> -->
+       <dxi-column dataField="serialNo" caption="SL. No" [alignment]="'left'" [width]="80"></dxi-column>
+      <dxi-column dataField="HEAD_NAME" caption="Salary Head"></dxi-column>
+      <dxi-column dataField="PAYSLIP_TITLE" caption="Title"></dxi-column>
+      <dxi-column dataField="HEAD_TYPE" caption="Type"></dxi-column>
+      <dxi-column
+        dataField="IS_INACTIVE"
+        caption="Status"
+          cellTemplate="statusCellTemplate"
+      ></dxi-column>
+        <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value ? true : false"
+        style="margin-left: 10px; cursor: default"
+      ></i>       
+    </div>
+    </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="addSalaryHeadPopupOpened"
+     [width]="'90vw'"
+  [height]="'70vh'"
+      title="Add Salary Head"
+       (onHiding)="handleEditClose()"
+    >
+      <app-salary-head-add
+        [isOpen]="addSalaryHeadPopupOpened"
+         (formClosed)="handleEditClose()"
+      ></app-salary-head-add>
+    </dx-popup>
+  </div>
+</div>
+<dx-popup
+  [(visible)]="EditSalaryHeadPopupOpened"
+  [width]="'90vw'"
+  [height]="'70vh'"
+ title="Edit Salary Head"
+  (onHiding)="handleEditClose()"
+>
+  <app-salary-head-edit
+    [selectedSalaryHeadData]="Selected_salaryHead_Data"
+    (formClosed)="handleEditClose()"
+  ></app-salary-head-edit>
+</dx-popup>

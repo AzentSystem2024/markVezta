@@ -1,0 +1,251 @@
+<dx-form class="plain-styled-form">
+  <dxi-item itemType="group" [colCount]="2">
+    <!-- <dxo-col-count-by-screen
+      [xs]="1"
+      [sm]="1"
+      [md]="1"
+      [lg]="1"
+    ></dxo-col-count-by-screen> -->
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Code"
+          labelMode="floating"
+          [(value)]="newStores.CODE"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Code is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Store Name"
+          labelMode="floating"
+          [(value)]="newStores.STORE_NAME"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
+      </div>
+    </dxi-item>
+  </dxi-item>
+  <dxi-item itemType="group">
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Address1"
+          labelMode="floating"
+          label="Address"
+          labelMode="floating"
+          [(value)]="newStores.ADDRESS1"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Address2"
+          labelMode="floating"
+          [(value)]="newStores.ADDRESS2"
+        ></dx-text-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Address3"
+          labelMode="floating"
+          [(value)]="newStores.ADDRESS3"
+        ></dx-text-box>
+      </div>
+    </dxi-item>
+  </dxi-item>
+  <dxi-item itemType="group" [colCount]="4">
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Zip Code"
+          labelMode="floating"
+          [(value)]="newStores.ZIP_CODE"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="ZIP code is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
+      </div>
+    </dxi-item>
+  </dxi-item>
+  <dxi-item itemType="group" [colCount]="3">
+    <dxi-item>
+      <dx-select-box
+        [dataSource]="countries"
+        displayExpr="COUNTRY_NAME"
+        valueExpr="ID"
+        [(value)]="newStores.COUNTRY_ID"
+        (onValueChanged)="onCountrySelected($event)"
+        [searchEnabled]="true"
+      >
+        <div *dxTemplate="let data of 'item'">
+          <img
+            [src]="data.FLAG_URL"
+            width="20"
+            height="15"
+            style="margin-right: 8px"
+          />
+          <span>{{ data.COUNTRY_NAME }}</span>
+        </div>
+      </dx-select-box>
+
+      <!-- </div> -->
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-select-box
+          label="Emirate"
+          labelMode="floating"
+          [items]="StateDropdownData"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="newStores.STATE_ID"
+          placeholder="Select Emirate"
+          [searchEnabled]="true"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-select-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="City"
+          labelMode="floating"
+          [(value)]="newStores.CITY"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+    </dxi-item>
+  </dxi-item>
+  <dxi-item itemType="group" [colCount]="2">
+    <dxi-item>
+      <div *dxTemplate style="display: flex">
+        <dx-text-box
+          label=" "
+          labelMode="floating"
+          [(value)]="countryCode"
+          class="country-code-input"
+        ></dx-text-box>
+        <dx-text-box
+          label="Phone"
+          labelMode="floating"
+          [width]="250"
+          class="phone-style"
+          [(value)]="newStores.PHONE"
+          (keypress)="keyPressNumbers($event)"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            >
+              <dxi-validation-rule type="numeric"> </dxi-validation-rule>
+            </dxi-validation-rule>
+            <dxi-validation-rule
+              type="pattern"
+              [pattern]="'^[1-9][0-9]{9}$'"
+              message="Enter a valid 10-digit phone number"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Email"
+          labelMode="floating"
+          [(value)]="newStores.EMAIL"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+    </dxi-item>
+  </dxi-item>
+
+  <dxi-item itemType="group" [colCount]="2">
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-select-box
+          label="Group"
+          labelMode="floating"
+          [items]="GroupDropdownData"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="newStores.GROUP_ID"
+          placeholder="Select Group"
+          [searchEnabled]="true"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-select-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="VAT Registration Number"
+          labelMode="floating"
+          [(value)]="newStores.VAT_REGNO"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+    </dxi-item>
+  </dxi-item>
+</dx-form>

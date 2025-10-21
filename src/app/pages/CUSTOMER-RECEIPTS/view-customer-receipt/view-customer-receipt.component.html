@@ -1,0 +1,300 @@
+<dx-validation-group #journalVoucherGroup>
+  <div
+    class="invoice-wrapper"
+    style="
+      height: 75vh;
+      display: flex;
+      flex-direction: column;
+
+      box-sizing: border-box;
+    "
+  >
+    <div class="salary-grid-wrapper" style="padding: 0 10px">
+      <div class="grid-container">
+        <dx-data-grid
+          #itemsGridRef
+          [dataSource]="pendingInvoiceList"
+          [showBorders]="true"
+          [showRowLines]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="false"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true, allowSearch: true }"
+          [allowColumnReordering]="true"
+          [showColumnHeaders]="true"
+          [columnAutoWidth]="true"
+          [allowColumnResizing]="true"
+          [height]="'40vh'"
+          [columnResizingMode]="'nextColumn'"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="{
+            mode: 'none'
+          }"
+          [selectedRowKeys]="selectedRowsKeys"
+          (onContentReady)="onGridContentReady($event)"
+          (onSelectionChanged)="onSelectionChanged($event)"
+          keyExpr="BILL_ID"
+        >
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-filter-builder [allowHierarchicalFields]="true">
+          </dxo-filter-builder>
+          <dxo-toolbar>
+            <div
+              class="stacked-toolbar-group"
+              style="display: flex; flex-direction: column; gap: 2px"
+            ></div>
+            <dxi-item location="before" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 0px"
+              >
+                <div style="display: flex; gap: 5px">
+                  <dx-text-box
+                    label="Receipt No"
+                    labelMode="floating"
+                    [(value)]="receiptNo"
+                    [width]="200"
+                    [readOnly]="true"
+                  ></dx-text-box>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 2px">
+                  <dx-select-box
+                    [(value)]="selectedDistributorId"
+                    [dataSource]="distributorList"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="320"
+                    [searchEnabled]="true"
+                    [showClearButton]="true"
+                    label="Customer"
+                    labelMode="floating"
+                    [readOnly]="true"
+                  ></dx-select-box>
+                </div>
+              </div>
+            </dxi-item>
+
+            <dxi-item location="after" locateInMenu="auto">
+              <div class="stacked-toolbar-group"></div>
+            </dxi-item>
+            <dxi-item location="after" locateInMenu="auto">
+              <div style="position: relative; top: 35px">
+                <!-- push it down -->
+                <div *ngIf="receiprtFormData">
+                  <dx-date-box
+                    label="Date"
+                    labelMode="floating"
+                    [(value)]="receiprtFormData.REC_DATE"
+                    displayFormat="dd-MM-yyyy"
+                    type="date"
+                    [width]="200"
+                    [readOnly]="true"
+                  ></dx-date-box>
+                </div>
+              </div>
+            </dxi-item>
+          </dxo-toolbar>
+          <dxi-column
+            dataField="SL_NO"
+            caption="Sl No"
+            [allowEditing]="false"
+            [calculateCellValue]="getSlNo"
+          ></dxi-column>
+          <dxi-column
+            dataField="INVOICE_NO"
+            caption="Inv No"
+            [width]="100"
+            [allowEditing]="false"
+          >
+          </dxi-column>
+
+          <dxi-column
+            dataField="INVOICE_DATE"
+            caption="Date"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="REF_NO"
+            caption="Ref No"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="NET_AMOUNT"
+            caption="Inv Amount"
+            [allowEditing]="false"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+            [width]="120"
+          ></dxi-column>
+          <dxi-column
+            dataField="SETTLED_TILL_DATE"
+            caption="Settled Till Date"
+            [allowEditing]="false"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          ></dxi-column>
+          <dxi-column
+            dataField="PENDING_AMOUNT"
+            caption="Balance"
+            [allowEditing]="false"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          ></dxi-column>
+          <dxi-column
+            dataField="AMOUNT"
+            caption="Received Amount"
+            [allowEditing]="false"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          ></dxi-column>
+
+          <dxo-summary>
+            <dxi-total-item
+              column="PENDING_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+
+            <dxi-total-item
+              column="Received Amount"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+              [readOnly]="true"
+            >
+            </dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+
+        <!-- Fill Amount Button below grid -->
+
+        <!-- Two-column box: Bank Details (left) and Receipt Details (right) -->
+        <div
+          class="bordered-grid"
+          style="
+            margin-top: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid #888; /* ✅ Add visible border */
+            border-radius: 4px; /* Optional: for rounded corners */
+          "
+        >
+          <!-- Row: Two columns side by side -->
+          <div style="display: flex; justify-content: space-between; gap: 5px">
+            <!-- Left: Receipt Details -->
+            <div style="flex: 1">
+              <div class="section-label">Receipt Details</div>
+
+              <dx-radio-group
+                [items]="['Cash', 'Bank', 'Adjustments']"
+                [(value)]="receiptMode"
+                layout="horizontal"
+                label="Mode"
+                labelMode="floating"
+                [width]="'100%'"
+                [readOnly]="true"
+              ></dx-radio-group>
+              <div *ngIf="receiprtFormData">
+                <dx-select-box
+                  [(value)]="receiprtFormData.PAY_HEAD_ID"
+                  [dataSource]="ledgerList"
+                  displayExpr="HEAD_NAME"
+                  valueExpr="HEAD_ID"
+                  label="Ledger"
+                  labelMode="floating"
+                  [width]="'100%'"
+                  style="margin-top: 2px"
+                  [readOnly]="true"
+                ></dx-select-box>
+              </div>
+            </div>
+
+            <!-- Right: Bank Remittance Details -->
+            <div style="flex: 1">
+              <!-- Dimmed or highlighted section label -->
+              <div
+                class="section-label"
+                [ngStyle]="{
+                  color: receiptMode === 'Bank' ? 'inherit' : '#888'
+                }"
+              >
+                Bank Remittance Details
+              </div>
+
+              <!-- Cheque No & Due Date -->
+              <div style="display: flex; gap: 10px">
+                <div *ngIf="receiprtFormData">
+                  <dx-text-box
+                    label="Reference No"
+                    labelMode="floating"
+                    [(value)]="receiprtFormData.CHEQUE_NO"
+                    [width]="'100%'"
+                    [disabled]="receiptMode !== 'Bank'"
+                    [readOnly]="true"
+                    style="flex: 1"
+                  ></dx-text-box>
+                </div>
+                <div *ngIf="receiprtFormData">
+                  <dx-date-box
+                    label="Due Date"
+                    labelMode="floating"
+                    [(value)]="receiprtFormData.CHEQUE_DATE"
+                    [width]="'100%'"
+                    [disabled]="receiptMode !== 'Bank'"
+                    [readOnly]="true"
+                    style="flex: 1"
+                  ></dx-date-box>
+                </div>
+              </div>
+
+              <!-- Bank Name -->
+              <div *ngIf="receiprtFormData">
+                <dx-text-box
+                  label="Bank Name"
+                  labelMode="floating"
+                  [(value)]="receiprtFormData.BANK_NAME"
+                  [width]="'100%'"
+                  [disabled]="receiptMode !== 'Bank'"
+                  [readOnly]="true"
+                  style="margin-top: 5px"
+                ></dx-text-box>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row: Narration spanning both columns -->
+          <div>
+            <div *ngIf="receiprtFormData">
+              <dx-text-box
+                label="Narration"
+                labelMode="floating"
+                [(value)]="receiprtFormData.NARRATION"
+                [width]="'100%'"
+                [readOnly]="true"
+                style="margin-top: 2px"
+              ></dx-text-box>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+
+<div
+  class="form-popup-buttons-container"
+  style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px"
+>
+  <!-- <dx-button
+    text="Cancel"
+    (onClick)="cancel()"
+    stylingMode="outlined"
+    type="normal"
+  ></dx-button> -->
+</div>

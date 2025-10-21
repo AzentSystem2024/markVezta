@@ -1,0 +1,243 @@
+<div class="card-container" style="padding: 5px; margin-bottom: 10px; background-color: var(--base-bg); border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <!-- First Row -->
+    <div class="row" style="display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 10px;">
+        <div class="left-section" style="display: flex; gap: 20px; flex: 1;">
+            <dx-text-box
+              label="Transfer No"
+              labelMode="floating"
+              [readOnly]="true"
+              [elementAttr]="{ class: 'grntextbox' }"
+              [(value)]="newTransferOutData.TRANSFER_NO"
+              >
+            </dx-text-box>
+            <!--[displayFormat]="dateFormat" -->
+            <dx-date-box
+              label="Date"
+              labelMode="floating"
+              [value]="today"
+              [readOnly]="true"
+              
+              [elementAttr]="{ class: 'grndatebox' }"
+              > 
+            </dx-date-box>
+          </div>
+      
+          <div class="right-section" style="flex: 1;margin-left: 10px;">
+            <dx-select-box
+              label="Transfer To"
+              labelMode="floating"
+              [dataSource]="storesList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              [(value)]="newTransferOutData.DEST_STORE_ID"
+              placeholder="Select Store"
+              [searchEnabled]="true"
+              [elementAttr]="{ class: 'grndropdown' }"
+              [readOnly]="true"
+             >
+            </dx-select-box>
+          </div>
+    </div>   
+</div>
+
+<div>
+    <dx-data-grid
+            [showBorders]="true"
+            class="data-grid"
+            [dataSource]="savedItemsDataGrid"
+            [selection]="{ mode: 'single' }"
+            [hoverStateEnabled]="true"
+            [paging]="{ enabled: true, pageSize: 10 }"
+            [width]="'auto'"
+            [height]="350"
+            class="custom-data-grid"
+            [columnAutoWidth]="true"
+            (onCellPrepared)="highlightEditableColumns($event)"
+            (onRowUpdated)="updateCell($event)"
+            (onContentReady)="onContentReady($event)"
+          >
+          <dxo-scrolling
+        mode="virtual"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+
+          <dxo-editing mode="cell" [allowUpdating]="true" 
+    ></dxo-editing>
+         
+          <dxi-column caption="SL NO" dataField="SL_NO" [width]="87" [allowEditing]="false" alignment="center"></dxi-column> 
+          <dxi-column dataField="BAR_CODE" caption="BAR CODE" [width]="'auto'" [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="ITEM_NAME" caption="DESCRIPTION" [width]="cwidth" [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="UOM" caption="UOM" [width]="'auto'" [allowEditing]="false"></dxi-column>
+          <dxi-column *ngIf="canViewCost" dataField="COST" caption="UNIT COST" [width]="'auto'" [allowEditing]="false" alignment="right" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+          <dxi-column dataField="QTY_STOCK" caption="QTY AVAILABLE" [width]="'auto'" [allowEditing]="false" alignment="center"></dxi-column>
+          <dxi-column dataField="QUANTITY" caption="QTY ISSUED" [width]="'auto'" [allowEditing]="false" alignment="center"></dxi-column>
+          <dxi-column dataField="AMOUNT" [visible]="false" [width]="'auto'" [allowEditing]="true" alignment="center"></dxi-column>
+          </dx-data-grid>      
+  </div>
+
+ <div style="display: flex;">
+ <!-- <div style="flex: 1;">
+  <div class="button-class">
+    <dx-button
+    hint="Quick Scan"
+    (onClick)="openQuickScan()"
+    >
+    <i class="fa-solid fa-barcode"></i>
+  </dx-button>
+    <div class="right-button">
+      <dx-button
+    icon="plus"
+    type="default"
+    hint="Add Items"
+    stylingMode="contained"
+    (onClick)="openItems()"
+    ></dx-button>
+    </div>
+  </div>
+
+  
+</div> -->
+ <div style="flex: 1;">
+  <div class="total-container">
+
+    <div class="total-field">
+      <label>Net Cost</label>
+      <dx-text-box
+        placeholder="0"
+        [width]="150"
+        [readOnly]="true"
+        [(value)]="newTransferOutData.NET_AMOUNT"
+        [rtlEnabled]="true"
+      ></dx-text-box>
+    </div>
+  
+    <div class="total-field">
+      <label>Net Qty Issued</label>
+
+      <dx-text-box
+        placeholder="0"
+        [width]="90"
+        [readOnly]="true"
+        [(value)]="newTransferOutData.NET_QUANTITY"
+        [rtlEnabled]="true"
+      ></dx-text-box>
+    </div>
+  </div>
+</div>
+</div>
+
+<div style="flex: 1;margin-top: 10px;">
+  <dx-text-area
+    label="NARRATION"
+    labelMode="floating"
+    placeholder="Enter NARRATION"
+    [(value)]="newTransferOutData.NARRATION"
+    [height]="80"
+    [width]="400"
+    [maxLength]="500"
+    [readOnly]="true"
+  >
+  </dx-text-area>
+</div>
+
+
+<dx-popup
+  [(visible)]="isItemsPopVisible"
+  [width]="width"
+  [height]="height"
+  title="Add Items"
+>
+  <div class="popup-content">
+    <dx-data-grid
+      [showBorders]="true"
+      class="custom-data-grid"
+      [selection]="{ mode: 'single' }"
+      [hoverStateEnabled]="true"
+      [dataSource]="storeItemsDataGrid"
+      [paging]="{ enabled: true, pageSize: 10 }"
+      [columnAutoWidth]="true"
+      [selection]="{ mode : 'multiple',showCheckBoxesMode:'always'}"
+      (onSelectionChanged)="onItemsSelectionChanged($event)"
+    >
+      <dxo-scrolling mode="virtual" columnRenderingMode="virtual"></dxo-scrolling>
+      <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
+
+      <dxi-column caption="ITEM CODE" dataField="ITEM_CODE" [allowEditing]="false" alignment="left"></dxi-column> 
+      <dxi-column dataField="BAR_CODE" caption="BAR CODE" [allowEditing]="false"></dxi-column>
+      <dxi-column dataField="ITEM_NAME" caption="DESCRIPTION" [allowEditing]="false"></dxi-column>
+      <dxi-column dataField="QTY_STOCK" caption="STOCK" [allowEditing]="false" alignment="center"></dxi-column>
+      <dxi-column dataField="ITEM_SALE_PRICE" caption="PRICE" [allowEditing]="false" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+      <dxo-filter-row [visible]="true"></dxo-filter-row>
+      <dxo-sorting mode="multiple"></dxo-sorting>
+      <dxo-header-filter [visible]="true"></dxo-header-filter>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <!-- <dxo-search-panel [visible]="true" placeholder=" Search"></dxo-search-panel> -->
+    </dx-data-grid>
+</div>
+  <div style="display: flex;justify-content: flex-end;margin-top: 20px;" >
+   
+    <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        style="margin-right: 10px;"      
+      ></dx-button>
+      <dx-button
+        text="Save"
+        stylingMode="contained"
+        type="default"
+        (onClick)="SaveItems()"
+      ></dx-button>
+    </div>
+  
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isScanPopVisible"
+  [width]="400"
+  [height]="250"
+  title="Quick Scan"
+  (onHiding)="clearQuickScan()"
+>
+
+<dx-text-box
+label="Barcode"
+labelMode="floating"
+[(value)]="QuickScanBarcode"
+>
+</dx-text-box>
+<div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 10px;">
+  <dx-check-box
+    text="Add Quantity"
+    [(value)]="isQuantityVisible"
+  ></dx-check-box>
+
+  <dx-text-box
+    *ngIf="isQuantityVisible"
+    label="Quantity"
+    [(value)]="QuickScanQty"
+    labelMode="floating"
+  ></dx-text-box>
+</div>
+
+<div style="display: flex;justify-content: flex-end;margin-top: 20px;" >
+   
+  <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      type="normal"
+      style="margin-right: 10px;"  
+      (onClick)="clearQuickScan()"    
+    ></dx-button>
+
+    <dx-button
+      text="Add"
+      stylingMode="contained"
+      type="default"
+      (onClick)="addScannedItem()"
+    ></dx-button>
+  </div>
+
+</dx-popup>

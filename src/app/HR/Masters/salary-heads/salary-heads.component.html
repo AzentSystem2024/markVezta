@@ -1,0 +1,375 @@
+<div class="view-wrapper list-page">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="salarySource"
+    [remoteOperations]="false"
+    [allowColumnReordering]="true"
+    [rowAlternationEnabled]="true"
+    [width]="'100%'"
+    [height]="'80vh'"
+    (onEditingStart)="onEditingStart($event)"
+    (onRowRemoving)="deleteData($event)"
+    noDataText=" "
+    [scrolling]="{ mode: 'standard' }"
+    rowAlternationInterval="2"
+    [editing]="{ allowUpdating: true, allowDeleting: true }"
+    (onCellPrepared)="onCellPrepared($event)"
+  >
+    <!-- (onCellPrepared)="onCellPrepared($event)" -->
+    <dxo-paging [pageSize]="10"></dxo-paging>
+
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+
+    <dxo-scrolling mode="standard"></dxo-scrolling>
+
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-form [colCount]="1"> </dxo-form>
+    </dxo-editing>
+    <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
+    <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+    <dxo-pager [visible]="true"></dxo-pager>
+
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header">Salary Heads</div>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="Salary_head_popup()"
+        ></dx-button>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          icon="refresh"
+          stylingMode="text"
+          (onClick)="refreshData()"
+        ></dx-button>
+      </dxi-item>
+      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    </dxo-toolbar>
+
+    <dxi-column
+      dataField="slNo"
+      caption="Sl.No"
+      alignment="left"
+      dataField="SlNo"
+      [allowEditing]="true"
+      [allowFiltering]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column dataField="CODE" caption="  Code" [width]="100"></dxi-column>
+    <dxi-column
+      dataField="HEAD_NAME"
+      [width]="150"
+      caption="Description"
+    ></dxi-column>
+    <dxi-column
+      dataField="PRINT_DESCRIPTION"
+      caption="Print Description"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="IS_INACTIVE"
+      caption="Status"
+      alignment="left"
+      [calculateCellValue]="formatStatus"
+    ></dxi-column>
+  </dx-data-grid>
+</div>
+
+<!-- ===================== Add Salary Head====================================== -->
+<form-popup
+  [(visible)]="isAddPopup"
+  titleText="Salary Heads"
+  [width]="660"
+  [height]="450"
+  (save)="Add_Salary_Head()"
+  (cancel)="close()"
+>
+  <dx-form class="plain-styled-form" [formGroup]="formsource">
+        <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+          
+      <dxi-item cssClass="code-box">
+        <dx-text-box
+          label="Code"
+          width="150px"
+          valueChangeEvent="input"
+          formControlName="code"
+          [labelMode]="'floating'"
+        ></dx-text-box>
+      </dxi-item>
+      <!-- Radio Group -->
+      <dxi-item cssClass="radio-group">
+        <dx-radio-group
+          [items]="salaryOptions"
+          layout="horizontal"
+          [(value)]="Sal_Value"
+          formControlName="IS_FIXED"
+          [labelMode]="'floating'"
+        ></dx-radio-group>
+      </dxi-item>
+
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item itemType="simple">
+        <dx-text-box
+          formControlName="description"
+          label="Description"
+          valueChangeEvent="input"
+          [labelMode]="'floating'"
+          (onValueChanged)="OnDescInput($event)"
+
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item itemType="simple">
+        <dx-text-box
+          formControlName="print_Description"
+          label="Print Description"
+          [labelMode]="'floating'"
+          valueChangeEvent="input"
+        ></dx-text-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [(value)]="AC_HEAD_ID"
+        [items]="AC_HEAD_VALUE"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [labelMode]="'floating'"
+        (onValueChanged)="onSalary_ExpChange($event)"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        formControlName="AC_HEAD_ID"
+        label="Salary Expense Ledger"
+      ></dx-select-box>
+    </dxi-item>
+
+    <!-- </dxi-item> -->
+
+    <!-- <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Radio Group -->
+      <dxi-item cssClass="radio-group">
+        <dx-radio-group
+          [items]="salaryOptions"
+          layout="horizontal"
+          [(value)]="Sal_Value"
+          formControlName="IS_FIXED"
+          [labelMode]="'floating'"
+        ></dx-radio-group>
+      </dxi-item>
+
+      <dxi-item cssClass="code-box">
+        <dx-text-box
+          label="Code"
+          width="150px"
+          valueChangeEvent="input"
+          formControlName="code"
+          [labelMode]="'floating'"
+        ></dx-text-box>
+        <dx-validator>
+          <dxi-validation-rule
+            type="stringLength"
+            max="3"
+            message="Max 3 digits allowed"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dxi-item>
+    <!-- </dxi-item> --> -->
+    <!-- Code Field -->
+
+    <!-- Order in PaySlip -->
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item cssClass="radio-group">
+        <dx-radio-group
+          [items]="select_Head_type"
+          layout="horizontal"
+          [labelMode]="'floating'"
+          [(value)]="Head_type_Value"
+          formControlName="HEAD_TYPE"
+        ></dx-radio-group>
+      </dxi-item>
+      <dxi-item>
+        <dx-number-box
+          label="Order In PaySlip"
+          width="150px"
+          formControlName="HEAD_ORDER"
+          [inputAttr]="{ style: 'text-align: left;' }"
+          placeholder="0"
+          [labelMode]="'floating'"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <!-- Checkboxes -->
+    <dxi-item
+      itemType="group"
+      [colCount]="2"
+      [colSpan]="2"
+      style="margin-top: 20px"
+    >
+      <dxi-item style="margin-top: 20px">
+       <label >
+        Applicable only for working days:
+          <dx-check-box
+            [value]="workinDays"
+            formControlName="IS_WORKING_DAY"
+            [elementAttr]="{ 'aria-label': 'Unchecked' }"
+            id="checkboxadd"
+            [labelMode]="'floating'"
+          ></dx-check-box>
+        </label>
+      </dxi-item>
+      <dxi-item style="margin-top: 20px">
+        <label>
+          Inactive
+          <dx-check-box
+            [value]="inActive"
+            [labelMode]="'floating'"
+            formControlName="IS_INACTIVE"
+            [elementAttr]="{ 'aria-label': 'Unchecked' }"
+            id="checkboxadd"
+            [editorOptions]="{ enableTwoStateBehavior: true }"
+          ></dx-check-box>
+        </label>
+      </dxi-item>
+    </dxi-item>
+  </dx-form>
+</form-popup>
+<!-- ===================== Update Salary Head====================================== -->
+<form-popup
+  [(visible)]="isEditPopup"
+  (save)="Update_Salary_Head()"
+  titleText="Salary Heads"
+  [width]="660"
+  [height]="450"
+>
+  <dx-form class="plain-styled-form">
+    <dxi-item
+      itemType="group"
+      [colCount]="2"
+      [colSpan]="2"
+      style="margin-top: 20px"
+    >
+      <dxi-item>
+        <dx-text-box
+          label="Description"
+          [labelMode]="'floating'"
+          [disabled]="isSystem"
+          [(value)]="description_value"
+        >
+        </dx-text-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-text-box label="Print Description"   [labelMode]="'floating'" [(value)]="print_description">
+        </dx-text-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-select-box
+        [(value)]="selected_salary_EXP"
+        [items]="AC_HEAD_VALUE"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        style="flex: 1"
+        [disabled]="isSystem"
+        [labelMode]="'floating'"
+        [searchEnabled]="true"
+        label="Salary Expense Ledger"
+        (onValueChanged)="onSalary_ExpChange($event)"
+      ></dx-select-box>
+    </dxi-item>
+
+    <!-- </dxi-item> -->
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item cssClass="radio-group">
+        <dx-radio-group
+          [items]="salaryOptions"
+          layout="horizontal"
+          [(value)]="Sal_Value"
+          (onValueChanged)="onValueChangedSalary($event)"
+          [disabled]="isSystem"
+          [labelMode]="'floating'"
+        ></dx-radio-group>
+      </dxi-item>
+      <dxi-item cssClass="code-box">
+        <dx-text-box
+          label="Code"
+          [disabled]="isSystem"
+          width="150px"
+          [labelMode]="'floating'"
+          [(value)]="code_value"
+        ></dx-text-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item cssClass="radio-group">
+        <dx-radio-group
+          [items]="select_Head_type"
+          [disabled]="isSystem"
+          layout="horizontal"
+          [(value)]="Head_type_Value"
+          [labelMode]="'floating'"
+        ></dx-radio-group>
+      </dxi-item>
+      <dxi-item>
+        <dx-number-box
+          label="Order In PaySlip"
+          width="150px"
+          [inputAttr]="{ style: 'text-align: left;' }"
+          [(value)]="head_order_value"
+          [labelMode]="'floating'"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item
+      itemType="group"
+      [colCount]="2"
+      [colSpan]="2"
+      style="margin-top: 20px"
+    >
+      <dxi-item style="margin-top: 20px">
+        <label>
+          Applicable only for working days
+          <dx-check-box
+            [(value)]="is_working_Day_value"
+            [disabled]="isSystem"
+            [elementAttr]="{ 'aria-label': 'Checked' }"
+            [labelMode]="'floating'"
+          ></dx-check-box>
+        </label>
+      </dxi-item>
+      <dxi-item style="margin-top: 20px">
+        <label>
+          Inactive
+          <dx-check-box
+            [(value)]="is_inactive_value"
+            [elementAttr]="{ 'aria-label': 'Checked' }"
+            [labelMode]="'floating'"
+          ></dx-check-box>
+        </label>
+      </dxi-item>
+    </dxi-item>
+  </dx-form>
+</form-popup>

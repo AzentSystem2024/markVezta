@@ -1,0 +1,73 @@
+@use "../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+  overflow: auto; 
+}
+
+.view-wrapper {
+  
+    .grid {
+      .name-template {
+        .position {
+          font-size: 12px;
+          color: var(--texteditor-label-color);
+        }
+      }
+  
+      ::ng-deep & {
+        .dx-datagrid-header-panel {
+          padding: 0 var(--content-padding);
+        }
+  
+        .dx-toolbar {
+          margin-bottom: 0;
+          padding: var(--toolbar-margin-bottom) 0;
+        }
+  
+        .dx-datagrid-content .dx-row {
+          cursor: pointer;
+        }
+      }
+  
+      .grid-header {
+        @include header();
+      }
+    }
+  
+    user-panel {
+      display: inherit;
+    }
+  }
+  
+.dx-datagrid-header-panel
+  .dx-toolbar-text-auto-hide
+  .dx-button.dx-button-has-icon {
+    border-radius: 4px;
+    background-color: #00a0e028;
+}
+
+.dx-datagrid-headers.dx-datagrid-nowrap.dx-bordered-top-view {
+  border-radius: 8px 8px 0 0;
+  background-color: #00a0e020;
+  font-size: 1.25rem;
+  font-weight: bolder;
+}
+.dx-datagrid .dx-row > td {
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 20px;
+}
+.dx-datagrid-nowrap .dx-header-row > td > .dx-datagrid-text-content {
+  white-space: nowrap;
+  font-size: 14px;
+}
+.view-wrapper .grid .grid-header {
+  font-size: 19px;
+  font-weight: 400;
+  padding-right: 25px;
+}

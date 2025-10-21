@@ -1,0 +1,261 @@
+@use "../../../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+  overflow: auto;
+}
+
+.view-wrapper {
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
+      }
+    }
+
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
+
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
+  }
+
+  user-panel {
+    display: inherit;
+  }
+}
+
+.month-selector {
+  padding-left: 100px;
+}
+.calendar-popup {
+  position: absolute;
+  background: var(--base-bg);
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 1000;
+  width: 284px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.calendar-body {
+  display: grid;
+  grid-template-columns: repeat(3, 2fr);
+  gap: 8px;
+}
+
+.month-cell {
+  padding: 8px;
+  background-color: var(--base-bg);
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+
+.month-cell:hover {
+  background-color: #d0d0ff;
+}
+
+.month-cell.selected {
+  background-color: #4f46e5;
+  color: white;
+}
+.year-clickable {
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+  margin-left: 0;
+  width: auto;
+}
+@media (max-width: 768px) {
+  .year-grid {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    ); /* Reduces to 2 columns on smaller screens */
+  }
+}
+.year-selector-popup {
+  margin-top: -10px;
+  margin-left: -10px;
+  max-height: 186px;
+  overflow-y: auto;
+  background-color: var(--base-bg);
+  // border: 1px solid #272626;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 220px;
+  width: 100%;
+  position: absolute;
+  z-index: 1000;
+  // top: 50%;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
+}
+
+// .year-option {
+//   padding: 8px 16px;
+//   cursor: pointer;
+//   transition: background-color 0.2s ease;
+//   font-size: 14px;
+//   color: #333;
+// }
+
+.year-option {
+  padding: 8px 16px;
+  text-align: center;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.year-option:hover {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+.flag-open {
+  color: white; /* or rgb(245, 240, 240) */
+  text-shadow: 0 0 1px black, 0 0 2px black;
+}
+
+.flag-verified {
+  color: orange;
+}
+
+.flag-approved {
+  color: green;
+}
+
+.year-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--base-bg);
+  font-size: 20px;
+  color: #726c6c;
+  font-weight: bold;
+  font-family: "Arial", sans-serif;
+  font-style: normal;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.year-button:hover {
+  background-color: #e0e0e0;
+}
+
+.year-button:focus {
+  outline: 2px solid #999;
+  outline-offset: 2px;
+}
+
+::ng-deep .blue-outline-btn.dx-button {
+  border: 1px solid #007bff !important; /* blue border */
+  // color: #007bff !important;           /* blue text */
+}
+
+::ng-deep .blue-outline-btn.dx-button .dx-icon {
+  color: #007bff !important; /* blue icon */
+}
+
+.approved {
+  color: green !important;
+  font-weight: bold;
+}
+
+.pending {
+  color: orange !important;
+  font-weight: bold;
+}
+
+
+// .year-button {
+//   width: 32px;
+//   height: 32px;
+//   border-radius: 50%;
+//   border: none;
+//   background-color: var(--base-bg);
+//   font-size: 20px;          /* Bigger size for clarity */
+//   color: #726c6c;              /* Arrow color */
+//   font-weight: bold;        /* Makes the arrow thicker */
+//   font-family: 'Arial';     /* You can pick a font where arrows look better */
+//   font-style: normal;       /* Usually arrows don't need italic/oblique */
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+// }
+
+// .year-button:hover {
+//   background-color: #bcbcbc;
+// }
+
+
+.status-flag {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: auto;
+}
+
+.flag-approved {
+  background-color: green;
+}
+
+.flag-pending {
+  background-color: orange;
+}

@@ -1,0 +1,808 @@
+<div class="view-wrapper list-page">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+<dx-data-grid
+    #dataGrid
+    class="grid theme-dependent"
+    [dataSource]="staffEosSource"
+    [remoteOperations]="false"
+    [allowColumnReordering]="true"
+    [rowAlternationEnabled]="true"
+    [width]="'100%'"
+    [height]="'80vh'"
+    noDataText=" "
+    (onEditingStart)="onEditingStart($event)"
+    [scrolling]="{ mode: 'standard' }"
+    rowAlternationInterval="2"
+    (onRowRemoved)="deleteData($event)"
+    [editing]="{ allowUpdating: true, allowDeleting: true }"
+    
+  >
+  <dxo-paging [pageSize]="10"></dxo-paging>
+
+  <dxo-pager
+    [visible]="true"
+   [displayMode]="displayMode"
+    [showPageSizeSelector]="showPageSizeSelector"
+    [showInfo]="true"
+    [showNavigationButtons]="true"
+  ></dxo-pager>
+
+  <dxo-scrolling mode="standard"></dxo-scrolling>
+
+ 
+
+  <dxo-header-filter [visible]="true"></dxo-header-filter>
+
+  <dxo-toolbar>
+    <dxi-item location="before">
+      <div class="grid-header">Staff End of Reason</div>
+    </dxi-item>
+  
+    <dxi-item>
+      <dx-select-box
+        [(value)]="selectedRange"
+        [dataSource]="dateRanges"
+        displayExpr="label"
+        valueExpr="value"
+        (onValueChanged)="onDateRangeChange($event)"
+        placeholder="Date Range"
+        class="mb-3"
+      ></dx-select-box>
+    </dxi-item>
+  
+    <dxi-item location="after" locateInMenu="never">
+      <dx-button icon="plus" type="default" (onClick)="add_popup()"></dx-button>
+    </dxi-item>
+  
+    <dxi-item location="after" locateInMenu="never">
+      <dx-button icon="refresh" (onClick)="refreshGrid()"></dx-button>
+    </dxi-item>
+  
+    <dxi-item location="after" locateInMenu="never">
+      <dx-button 
+                icon="search" 
+                (onClick)="toggle()"
+             >
+            </dx-button>
+    </dxi-item>
+  
+   
+  </dxo-toolbar>
+  
+  <!-- <dxo-filter-row [visible]="isFilterVisible"></dxo-filter-row> -->
+    <dxo-filter-row [visible]="true" *ngIf="isFilterVisible"></dxo-filter-row>
+  <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-form [colCount]="1"> </dxo-form>
+  </dxo-editing>
+  <dxi-column
+  dataField="DOC_NO"
+  caption="Doc.No"
+  alignment="left"
+  [allowEditing]="true"
+  [allowFiltering]="false"
+  [width]="100"
+></dxi-column>
+<dxi-column dataField="DATE" caption="Date" [width]="100"></dxi-column>
+<dxi-column
+  dataField="EMP_NO"
+  caption="Employee No"
+  alignment="left"
+  [width]="150"
+></dxi-column>
+<dxi-column
+  dataField="EMP_NAME"
+  caption="Employee Name"
+  [width]="150"
+  
+></dxi-column>
+<dxi-column
+  dataField="REASON"
+  caption="Reason "
+  [width]="150"
+></dxi-column>
+<dxi-column
+  dataField="REMARKS"
+  caption="Remarks "
+  [width]="150"
+></dxi-column>
+
+<dxi-column dataField="STATUS" caption="Status" alignment="right"   fixedPosition="right" cellTemplate="statusCellTemplate"
+      width="100"
+   
+      fixedPosition="right">
+      </dxi-column>
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value"
+          style="margin-left: 10px; cursor: default;"
+        ></i>
+      </div>
+<dxi-column type="buttons" [buttons]="allActionButtons"  fixed="true" fixedPosition="right" width="150"></dxi-column>
+
+</dx-data-grid>
+</div>
+<!-- ============================================Add form============================== -->
+
+<dx-validation-group #miscFormGroup> 
+
+  <form-popup 
+  (onHiding)="closeButton()"
+  [(visible)]="isAddPopUp"
+  titleText="  Staff End of Service"
+  [width]=600
+  [height]=550
+  [dragEnabled]="true"
+  (save)="Add_EOS()"
+  (cancel)="close()"
+>
+  <dx-form id="form" [formGroup]="formSource">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box 
+          label="Document No" 
+          [readOnly]="true" 
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-date-box
+          label="EOS Date"
+          placeholder="dd/mm/yyyy"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          [displayFormat]="'dd/MM/yyyy'"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          formControlName="Date"
+          labelMode="floating"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [items]="EMPLOYEE_ID"
+        [(value)]="employee_ID" 
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Employee"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        formControlName="employee_ID"
+        (onValueChanged)="onEmployee_Change($event)"
+        labelMode="floating"
+        #myTextBox
+      >   
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+          label="Join Date"
+          [readOnly]="true"
+          [(value)]="join_date_value"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-text-box
+          label="Days Worked"
+          [readOnly]="true"
+          [(value)]="all_workingdays"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [items]="reson_data"
+        [(value)]="reason_ID" 
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Reason"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        formControlName="reason_ID"
+        (onValueChanged)="onReason_Change($event)"
+        labelMode="floating"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-area
+        label="Remarks"
+        valueChangeEvent="input"
+        formControlName="Remarks"
+        labelMode="floating"
+      ></dx-text-area>
+    </dxi-item>
+  </dx-form>
+</form-popup>
+
+<!-- ============================================Edit form============================== -->
+
+<dx-popup 
+  (onHiding)="closeButton()"
+  [(visible)]="editpopup"
+  title="Staff End of Service"
+  [width]=600
+  [height]=550
+  [dragEnabled]="true"
+  (cancel)="closeButton()"
+>
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box 
+          label="Document No" 
+          [(value)]="doc_no_value" 
+          [readOnly]="true" 
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-date-box
+          label="EOS Date"
+          placeholder="dd/mm/yyyy"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          [displayFormat]="'dd/MM/yyyy'"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [(value)]="selected_data.EOS_DATE"
+          labelMode="floating"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [items]="EMPLOYEE_ID"
+        [(value)]="employee_value"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Employee"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        (onValueChanged)="onEmployee_Change($event)"
+        labelMode="floating"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+          label="Join Date"
+          [readOnly]="true"
+          [(value)]="join_date_value"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-text-box
+          label="Days Worked"
+          [readOnly]="true"
+          [(value)]="all_workingdays"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [items]="reson_data"
+        [(value)]="reason_id_value"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Reason"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        (onValueChanged)="onReason_Change($event)"
+        labelMode="floating"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-area
+        label="Remarks"
+        valueChangeEvent="input"
+        [(value)]="remarks_value"
+        labelMode="floating"
+      ></dx-text-area>
+    </dxi-item>
+
+    <dxi-item
+      class="fixed-footer"
+      itemType="group"
+      [colCount]="2"
+      [colSpan]="2"
+    >
+      <div class="fixed-footer">
+        <dx-button
+          text="Cancel"
+          (onClick)="close()"
+          style="color: white; border: rgb(97, 97, 97)"
+        ></dx-button>
+        <dx-button
+          class="saveBtn"
+          text="Update"
+          stylingMode="contained"
+          (onClick)="Edit_EOS()"
+        ></dx-button>
+      </div>
+    </dxi-item>
+  </dx-form>
+</dx-popup>
+
+<!-- ============================================verify form============================== -->
+
+<dx-popup 
+(onHiding)="closeButton()"
+  [(visible)]="verifypopup"
+  title="staff End of Service"
+  [width]=600
+  [height]=550
+  [dragEnabled]="true"
+  (cancel)="close()"
+>
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box 
+          label="Document No" 
+          [(value)]="selected_data.DOC_NO" 
+          [readOnly]="true" 
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-date-box
+          label="EOS Date"
+          placeholder="dd/mm/yyyy"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          [displayFormat]="'dd/MM/yyyy'"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [(value)]="selected_data.EOS_DATE"
+          labelMode="floating"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [items]="EMPLOYEE_ID"
+        [(value)]="selected_data.EMP_ID"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Employee"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        labelMode="floating"
+        (onValueChanged)="onEmployee_Change($event)"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+          label="Join Date"
+          [readOnly]="true"
+          [(value)]="join_date_value"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Days Worked"
+          [(value)]="days_worked_value"
+          [readOnly]="true"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          labelMode="floating"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [items]="reson_data"
+        [(value)]="selected_data.REASON_ID"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Reason"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        labelMode="floating"
+      ></dx-select-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-area
+        label="Remarks"
+        valueChangeEvent="input"
+        [(value)]="selected_data.REMARKS"
+        labelMode="floating"
+      ></dx-text-area>
+    </dxi-item>
+
+    <dxi-item
+      class="fixed-footer"
+      itemType="group"
+      [colCount]="2"
+      [colSpan]="2"
+    >
+      <div class="fixed-footer">
+        <dx-button
+          text="Cancel"
+          (onClick)="close()"
+          style="color: white; border: rgb(97, 97, 97)"
+        ></dx-button>
+        <dx-button
+          class="saveBtn"
+          text="Verify"
+          stylingMode="contained"
+          (onClick)="Verify_EOS()"
+        ></dx-button>
+      </div>
+    </dxi-item>
+  </dx-form>
+</dx-popup>
+
+
+<!-- ============================================ Approve form============================== -->
+ 
+<dx-popup 
+  [(visible)]="Approvepopup"
+  (onHiding)="closeButton()"
+  title="staff End of Service"
+  [width]=600
+  [height]=550
+  [dragEnabled]="true"
+  (save)="Approve_EOS()"
+  (cancel)="close()"
+>
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box 
+          label="Document No" 
+          [(value)]="selected_data.DOC_NO" 
+          [readOnly]="true"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-date-box
+          label="EOS Date"
+          placeholder="dd/mm/yyyy"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          [displayFormat]="'dd/MM/yyyy'"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [(value)]="selected_data.EOS_DATE"
+          labelMode="floating"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [items]="EMPLOYEE_ID"
+        [(value)]="selected_data.EMP_ID"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Employee"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        labelMode="floating"
+        (onValueChanged)="onEmployee_Change($event)"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+          label="Join Date"
+          [readOnly]="true"
+          [(value)]="join_date_value"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-text-box
+          label="Days Worked"
+          [readOnly]="true"
+          [(value)]="all_workingdays"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [items]="reson_data"
+        [(value)]="selected_data.REASON_ID"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Reason"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        labelMode="floating"
+      >
+      </dx-select-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-area
+        label="Remarks"
+        valueChangeEvent="input"
+        [(value)]="selected_data.REMARKS"
+        labelMode="floating"
+      ></dx-text-area>
+    </dxi-item>
+
+    <dxi-item
+      class="fixed-footer"
+      itemType="group"
+      [colCount]="2"
+      [colSpan]="2"
+    >
+      <div class="fixed-footer">
+        <dx-button
+          text="Cancel"
+          (onClick)="close()"
+          style="color: white; border: rgb(97, 97, 97)"
+        ></dx-button>
+        <dx-button
+          class="saveBtn"
+          text="Approve"
+          stylingMode="contained"
+          (onClick)="Approve_EOS()"
+        ></dx-button>
+      </div>
+    </dxi-item>
+  </dx-form>
+</dx-popup>
+
+<!-- ========================view form========================== -->
+<dx-popup
+  (onHiding)="closeButton()"
+  [(visible)]="isviewpopup"
+  title="Staff End of Service"
+  [width]=600
+  [height]=550
+>
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box
+          label="Document No"
+          [(value)]="selected_data.DOC_NO"
+          [readOnly]="true"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-date-box
+          label="EOS Date"
+          placeholder="dd/mm/yyyy"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          [displayFormat]="'dd/MM/yyyy'"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [(value)]="selected_data.EOS_DATE"
+          [readOnly]="true"
+          labelMode="floating"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-text-box
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Employee"
+        [readOnly]="true"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        [(value)]="selected_data.EMP_NAME"
+        labelMode="floating"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-text-box>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+        label="Join Date"
+        [readOnly]="true"
+        [(value)]="join_date_value"
+        labelMode="floating"
+      ></dx-text-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-number-box
+          [inputAttr]="{ style: 'text-align: right;' }"
+          label="Days Worked"
+          [(value)]="all_workingdays"
+          [readOnly]="true"
+          labelMode="floating"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-text-box
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Reason"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        [readOnly]="true"
+        [(value)]="selected_data.REASON_ID"
+        labelMode="floating"
+      >
+      </dx-text-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-area
+        label="Remarks"
+        [readOnly]="true"
+        valueChangeEvent="input"
+        [(value)]="selected_data.REMARKS"
+        labelMode="floating"
+      >
+      </dx-text-area>
+    </dxi-item>
+
+    <dxi-item style="text-align: center">
+      <label style="display: block; text-align: left; text-decoration: underline; text-underline-offset: 4px;"> Payment Details:</label>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+          label="Voucher No"
+          [(value)]="payment_Detilas.VOUCHER_NO"
+          [readOnly]="true"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          label="Voucher Date"
+          [(value)]="payment_Detilas.TRANS_DATE"
+          [readOnly]="true"
+          labelMode="floating"
+          displayFormat="dd/MM/yyyy"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+          label="Amount paid"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          [(value)]="payment_Detilas.AMOUNT_PAID"
+          [readOnly]="true"
+          placeholder="0"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-text-box
+          label="Payment Reference"
+          [(value)]="payment_Detilas.PAYMENT_REFERENCE"
+          [readOnly]="true"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
+    </dxi-item>
+  </dx-form>
+</dx-popup>
+
+
+
+<!-- =================header filter======================== -->
+<dx-popup
+[(visible)]="isCustomDatePopupVisible"
+[width]="'400px'"
+title="Select Custom Date Range"
+[showCloseButton]="true"
+[dragEnabled]="false"
+[closeOnOutsideClick]="true"
+[height]="'250px'"
+>
+<div class="p-3">
+  <dx-date-box
+    [(value)]="fromDate"
+    type="date"
+    displayFormat="yyyy-MM-dd"
+    label="From Date">
+  </dx-date-box>
+
+  <dx-date-box
+    [(value)]="toDate"
+    type="date"
+    displayFormat="yyyy-MM-dd"
+    label="To Date">
+  </dx-date-box>
+
+  <button class="custom-apply-btn" (click)="applyCustomDate()">Apply</button>
+</div>
+</dx-popup>
+
+

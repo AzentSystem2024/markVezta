@@ -1,0 +1,16 @@
+::ng-deep .salary-grid-wrapper {
+  padding: 0 !important; /* Remove wrapper padding if needed */
+}
+
+::ng-deep .grid-container {
+  margin-top: -8px; /* Negative margin to pull grid up */
+}
+
+::ng-deep .dx-toolbar {
+  margin-bottom: 0 !important;
+  padding-bottom: 5px !important; /* Reduce toolbar bottom padding */
+}
+
+::ng-deep .dx-datagrid {
+  margin-top: 0 !important;
+}

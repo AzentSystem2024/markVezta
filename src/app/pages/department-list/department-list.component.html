@@ -1,0 +1,126 @@
+
+
+<dx-data-grid
+  class="grid theme-dependent"
+  [dataSource]="department"
+  [rowAlternationEnabled]="true"
+  rowAlternationInterval="2"
+  [showBorders]="true"
+     [showColumnLines]="true"
+  (onRowRemoving)="onRowRemoving($event)"
+  [allowColumnReordering]="true"
+  [allowColumnResizing]="true"
+  (onExporting)="onExporting($event)"
+  [width]="'100%'"
+      [height]="'75vh'"
+  (onEditingStart)="OnEditingStart($event)"
+>
+
+ <dxo-filter-row
+  [visible]="isFilterRowVisible"
+></dxo-filter-row>
+
+
+  <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+<dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+
+  <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-popup title="Edit Department" [showTitle]="true" [width]="600" [height]="300"></dxo-popup>
+    </dxo-editing>
+    
+
+<dxo-toolbar>
+    <dxi-item location="before">
+      <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;"> Item Department</div>
+    </dxi-item>
+
+ <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+ <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+
+
+  <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          text: 'Refresh',
+          icon: 'refresh',
+          onClick: refresh,
+          stylingMode: 'text'
+        }"
+      ></dxi-item>
+      
+      <dxi-item name="exportButton"></dxi-item>
+      
+</dxo-toolbar>
+
+<dxi-column dataField="CODE" caption="Code">
+  <dxi-validation-rule type="required" message="Code is required">
+    <dxi-validation-rule type="required" message="Code is required">
+    </dxi-validation-rule>
+  </dxi-validation-rule>
+</dxi-column>
+<dxi-column dataField="DEPT_NAME" caption="Department Name">
+  <dxi-validation-rule type="required" message="Department is required">
+    <dxi-validation-rule type="required" message="Department is required">
+    </dxi-validation-rule>
+  </dxi-validation-rule>
+</dxi-column>
+
+
+
+  </dx-data-grid>
+<form-popup
+    [height]="250"
+    [(visible)]="isAddDepartmentPopupOpened"
+    (save)="onClickSaveDepartment()"
+    titleText="New Department"
+  >
+  <app-department-form></app-department-form>
+    
+  </form-popup>
+
+  <dx-popup
+    [height]="250"
+    [(visible)]="isEditDepartmentPopupOpened"
+    [width]="500"
+    titleText="Edit Department"
+     (formClosed)="handleClose()"
+  >
+  <app-department-edit  (formClosed)="handleClose()" [selectedDepartment]="selectedDepartment_data"></app-department-edit>
+    
+  </dx-popup>
+
+

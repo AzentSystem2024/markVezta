@@ -1,0 +1,42 @@
+// .form-grid {
+//   display: grid;
+//   grid-template-columns: 1fr 1fr 1fr; /* 2 columns for fields, 1 for image/grid */
+//   gap: 8px 12px;
+//   margin-bottom: 16px;
+//   align-items: start;
+// }
+
+// .form-field {
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+// }
+
+
+.popup-footer {
+  display: flex;
+  gap: 10px;
+}
+
+.with-buttons {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.with-buttons .dx-textbox {
+  flex-grow: 1;
+}
+
+// .button-group {
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+//   padding-top: 4px;
+// }
+.popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px; /* space between buttons */
+  margin-top: 20px;
+}

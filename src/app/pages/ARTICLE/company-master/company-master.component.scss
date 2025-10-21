@@ -1,0 +1,27 @@
+@use "../../../../variables.scss" as *;
+@use "sass:math";
+
+.form-popup-buttons-container {
+    display: flex;
+    justify-content: flex-end; /* Moves buttons to the right */
+    padding: 10px;
+    margin-top: 25px; /* Optional: Adds some spacing */
+}
+
+.popup-footer {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}
+
+.tab-content.tab-basic {
+    min-height: 380px;
+    background-color: var(--base-bg);
+}
+
+.flag-red {
+    color: red;
+  }
+  
+  .flag-green {
+    color: green;
+  }

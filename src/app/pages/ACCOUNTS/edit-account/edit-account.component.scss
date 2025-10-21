@@ -1,0 +1,147 @@
+.two-column-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.form-group {
+  width: 100%;
+}
+.subgroup-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subgroup-container dx-select-box {
+  flex: 1;
+}
+
+.horizontal-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.select-box-wrapper {
+  flex: 1;
+}
+
+.add-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px; /* Optional: for slightly rounded corners */
+  padding: 0;
+  min-width: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -4px;
+}
+
+.add-btn .dx-button-content {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-btn .dx-icon {
+  font-size: 12px !important;
+  width: 12px !important;
+  height: 12px !important;
+  line-height: 1 !important;
+}
+
+.headcode-ledger-container {
+  display: flex;
+  gap: 3px;
+}
+
+.headcode-box {
+  width: 120px; /* Fixed width for Code */
+  flex-shrink: 0;
+}
+
+.ledger-box {
+  flex: 1; /* Ledger takes remaining space */
+}
+
+// .add-btn .dx-icon {
+//   font-size: 10px !important;
+//   width: 10px !important;
+//   height: 10px !important;
+//   line-height: 1 !important;
+// }
+
+// .add-btn .dx-icon.dx-icon-plus {
+//   font-size: 10px !important;
+//   width: 10px !important;
+//   height: 10px !important;
+// }
+
+
+// .add-btn {
+//   border-radius: 50%;       /* makes the button round */
+//   width: 25px;              /* set fixed width */
+//   height: 25px;             /* set fixed height */
+//   padding: 0;              /* remove extra padding */
+//   min-width: unset;        /* override DevExtreme's min-width */
+//     display: flex;            /* make button a flex container */
+//   align-items: center;      /* vertical center */
+//   justify-content: center;  /* horizontal center */
+//   margin-top: -4px;
+// }
+
+
+// .add-btn .dx-button-content {
+//   justify-content: center;
+//   align-items: center;
+//   display: flex;
+//   padding: 0;
+// }
+// .add-btn .dx-icon {
+//   font-size: 12px;
+// }
+
+
+.full-width-form-group {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+  
+  .form-popup-buttons-container {
+    display: flex;
+    justify-content: flex-end; /* Moves buttons to the right */
+    padding: 10px; /* Optional: Adds some spacing */
+}
+
+.popup-footer {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}
+
+.checkbox-container {
+  margin-top: 16px;
+}
+.form-field {
+  display: block;
+  margin-bottom: 8px; /* Adjust space as needed */
+}
+.single-column-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* spacing between fields */
+}
+
+// .form-group {
+//   display: flex;
+//   flex-direction: column;
+//   margin-bottom: 1px;
+// }
+
+// .add-btn {
+//   margin-top: 8px;
+//   align-self: flex-start;
+// }

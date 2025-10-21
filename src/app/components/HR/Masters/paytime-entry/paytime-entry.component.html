@@ -1,0 +1,264 @@
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText=" "
+      [width]="'100%'"
+      [height]="'80vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="PayEntryList"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+     (onEditorPreparing)="onEditorPreparing($event)"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+      [(selectedRowKeys)]="selectedRows" 
+     (onSelectionChanged)="onSelectionChanged($event)"
+     [editing]="{
+    mode: 'cell',
+    allowUpdating: true
+  }"
+      
+    >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser>
+      <!-- <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+        [allowDeleting]="true"
+      ></dxo-editing> -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
+      <!-- <dxo-header-filter
+        [visible]="true"
+        [search]="{ enabled: true }"
+      ></dxo-header-filter>
+      -->
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-toolbar>
+
+        <!-- Buttons -->
+        <dxi-item location="before">
+          <div
+            class="month-selector"
+            style="display: flex; align-items: center; gap: 8px; margin-left: 4px;"
+          >
+            <dx-button
+              icon="chevronleft"
+              (onClick)="goToPreviousMonth()"
+            ></dx-button>
+            <span class="month-label" (click)="toggleCalendar()">
+              {{ selectedMonth | date : "MMMM yyyy" }}
+            </span>
+            <dx-button
+              icon="chevronright"
+              (onClick)="goToNextMonth()"
+            ></dx-button>
+          </div>
+          <div *ngIf="calendarVisible" class="calendar-popup">
+            <div class="calendar-header">
+              <button class="year-button" (click)="previousYear()">&lt;</button>
+
+              <span class="year-clickable" (click)="toggleYearSelector()">{{
+                selectedYear
+              }}</span>
+
+              <button class="year-button" (click)="nextYear()">&gt;</button>
+            </div>
+
+            <div
+              class="year-selector-popup"
+              *ngIf="yearSelectorVisible"
+              (click)="$event.stopPropagation()"
+            >
+              <!-- <div class="year-popup-header">
+                <button class="close-btn" (click)="yearSelectorVisible = false; $event.stopPropagation()">
+                  ✕
+                </button>
+              </div> -->
+              <div class="year-grid">
+                <div
+                  class="year-option"
+                  *ngFor="let year of years"
+                  (click)="selectYear(year, $event)"
+                >
+                  {{ year }}
+                </div>
+              </div>
+            </div>
+
+            <div class="calendar-body">
+              <div
+                *ngFor="let monthName of monthNames; let idx = index"
+                class="month-cell"
+                [class.selected]="
+                  idx === selectedMonth.getMonth() &&
+                  selectedYear === selectedMonth.getFullYear()
+                "
+                (click)="selectMonthByIndex(idx)"
+              >
+                {{ monthName }}
+              </div>
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> 
+        </dxi-item>
+        <!-- <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            icon="plus"
+            hint="add"
+            type="default"
+            stylingMode="contained"
+            (onClick)="addTimesheet()"
+          ></dx-button>
+        </dxi-item> -->
+
+        <dxi-item location="before" locateInMenu="auto">
+            <dx-select-box
+            valueExpr="ID"
+           displayExpr="DESCRIPTION"
+            label="Select SalaryHead"
+            labelMode="floating"
+             [searchEnabled]="true"
+           [items]="SalaryHead"
+            [(value)]="selectedSalaryHeadType"
+            [width]="220"
+            [searchEnabled]="true"
+            [acceptCustomValue]="true"
+             (onValueChanged)="onSalaryHeadChanged($event)"
+          ></dx-select-box>
+        </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto">
+            <dx-button
+        text="Amount"
+        type="default"   
+        stylingMode="contained"
+        [width]="80"
+        class="mt-2"
+        (onClick)="FillAmount()"
+      >
+      </dx-button>
+        </dxi-item>
+
+         <!-- <dxi-item location="after" locateInMenu="auto">
+            <dx-number-box
+        label="Fill Amount"
+        labelMode="floating"
+        type="default"
+         [value]="filledAmount"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+   
+      >
+      </dx-number-box>
+        </dxi-item> -->
+ 
+
+    <dxi-item>
+      <dx-button
+        text="Save"
+        type="default"
+       
+        stylingMode="contained"
+        [width]="100"
+        class="mt-2"
+        (onClick)="Save()"
+      >
+      </dx-button>
+    </dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column dataField="EMP_CODE" caption="Employee No." [allowEditing]="false"></dxi-column>
+      <dxi-column dataField="EMP_NAME" caption="Employee Name" [allowEditing]="false"></dxi-column>
+      <dxi-column dataField="DAYS" caption="Worked Days" [allowEditing]="true"></dxi-column>
+       <dxi-column dataField="AMOUNT" caption="Amount" [allowEditing]="true"  [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+        
+      <!-- <dxi-column
+        type="buttons"
+        [buttons]="allActionButtons"
+        width="100"
+        fixed="true"
+        fixedPosition="right"
+      ></dxi-column> -->
+
+    
+    </dx-data-grid>
+  </div>
+
+<!-- Fill Amount Popup -->
+ <dx-popup
+  [(visible)]="newPopupAmount"
+  [width]="320"
+  height="300"
+  title="Fill Amount"
+  [showCloseButton]="true"
+  [shading]="true"
+  [hideOnOutsideClick]="false"
+  (onHiding)="onAddPopupClose()"
+>
+   <dx-form [formGroup]="amountForm" class="mt-3">
+    <dxi-item>
+      <dx-number-box
+        label="Amount to Fill"
+        formControlName="amount"
+        
+        [min]="0"
+        [showSpinButtons]="true"
+        labelMode="floating"
+      ></dx-number-box>
+    </dxi-item>
+
+    <dxi-item>
+    <dx-radio-group
+      [items]="amountModes"
+      formControlName="mode"
+      layout="horizontal"
+     
+    ></dx-radio-group>
+  </dxi-item>
+
+  </dx-form> 
+
+  <div class="form-popup-buttons-container mt-3" style="text-align: right">
+    <dx-button
+      text="Save"
+      type="default"
+      stylingMode="contained"
+      (onClick)="AmountData()"
+    ></dx-button>
+  </div> 
+</dx-popup> 
+

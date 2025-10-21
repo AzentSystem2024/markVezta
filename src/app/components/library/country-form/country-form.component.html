@@ -1,0 +1,35 @@
+<dx-form class="plain-styled-form" >
+    <dxi-item itemType="group">
+      <dxo-col-count-by-screen
+        [xs]="1"
+        [sm]="1"
+        [md]="1"
+        [lg]="1"
+      ></dxo-col-count-by-screen>
+      <dxi-item>
+      <dx-text-box
+      
+        label="CODE"
+        [(value)]="newCountry.CODE"
+      
+        labelMode="floating"
+      >
+      </dx-text-box>
+  
+    </dxi-item>
+  
+      <dxi-item>
+
+          <dx-text-box
+           labelMode="floating"
+            label="COUNTRY NAME"
+            [(value)]="newCountry.COUNTRY_NAME"
+          
+         ></dx-text-box>
+          
+        
+      </dxi-item>
+
+    </dxi-item>
+  </dx-form>
+  

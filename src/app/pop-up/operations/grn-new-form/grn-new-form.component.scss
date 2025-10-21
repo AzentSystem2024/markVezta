@@ -1,0 +1,99 @@
+.total-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+  }
+
+  .add-button {
+    margin-right: 20px;
+  }
+  
+  .total-field {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+  }
+  
+  .total-field:last-child {
+    margin-right: 0; /* Remove margin-right from the last item */
+  }
+  
+  .total-field label {
+    margin-right: 10px;
+  }
+  
+  .vat-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+  .vat-field {
+    display: flex;
+    align-items: center;
+  }
+  
+  .vat-field label {
+    margin-right: 10px;
+  }
+  // .grntextbox{
+  //   height: 40px;
+  // }
+  // .grndatebox{
+  //   height: 40px;
+  // }
+  // .grndropdown{
+  //   height: 40px;
+  // }
+  
+  /* Highlight the headers of editable columns */
+.dx-header-cell.editable-header {
+  background-color: #f0ad4e !important; /* Change this to your desired highlight color */
+  color: #fff !important; /* Change the text color if needed */
+}
+
+/* Optional: Change the font weight or style */
+.dx-header-cell.editable-header {
+  font-weight: bold;
+}
+
+:host ::ng-deep .dx-datagrid-headers table td div.dx-datagrid-text-content {
+  white-space: normal;
+}
+
+.custom-data-grid .dx-datagrid-rowsview {
+  padding: 0; /* Remove padding around the entire grid */
+}
+
+/* Reduce the padding inside cells */
+.custom-data-grid .dx-row, .custom-data-grid .dx-cell {
+  padding: 2px 5px; /* Adjust padding to your preference */
+}
+
+/* Adjust header padding */
+.custom-data-grid .dx-header-row, .custom-data-grid .dx-header-cell {
+  padding: 5px 10px; /* Adjust header padding */
+}
+
+/* Adjust the group panel cells padding */
+.custom-data-grid .dx-datagrid-group-cell {
+  padding: 5px; /* Adjust padding for group cells */
+}
+
+/* You can also adjust the individual column's padding by targeting them specifically */
+.custom-data-grid .dx-column-header {
+  padding: 5px; /* Adjust column header padding */
+}
+
+
+.form-popup-buttons-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--popup-toolbar-item-spacing);
+
+  &.flex-buttons {
+    &::ng-deep .dx-button {
+      flex: 1;
+    }
+  }
+} 

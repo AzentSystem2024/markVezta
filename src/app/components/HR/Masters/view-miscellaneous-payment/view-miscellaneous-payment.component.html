@@ -1,0 +1,179 @@
+<!-- <div id="print-section"> -->
+<div class="form-container">
+    <div class="form-column">
+      <dx-text-box
+        label="Document No."
+        [labelMode]="'floating'"
+        [(value)]="miscFormData.DOC_NO"
+        [readOnly]="true"
+      ></dx-text-box>
+    </div>
+  
+    <div class="form-column">
+      <dx-date-box
+        label="Date"
+        [labelMode]="'floating'"
+        [(value)]="miscFormData.DOC_DATE"
+        [readOnly]="true"
+        displayFormat="dd/MM/yyyy"
+      ></dx-date-box>
+    </div>
+  </div>
+  <div class="form-container">
+    <div class="form-column">
+      <dx-select-box
+        label="Employee Name"
+        [labelMode]="'floating'"
+        [dataSource]="employee"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [(value)]="miscFormData.EMP_ID"
+        placeholder="Select Employee"
+        [readOnly]="true"
+        width="100%"
+      >
+      </dx-select-box>
+    </div>
+    
+  </div>
+  <div class="form-container">
+      
+      <div class="form-column">
+        <dx-select-box
+          label="Salary Head"
+          [labelMode]="'floating'"
+          [dataSource]="salaryHead"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="miscFormData.SAL_HEAD_ID"
+          placeholder="Select Salary Head"
+          [readOnly]="true"
+          
+        >
+        </dx-select-box>
+      </div>
+  
+      <div class="form-column">
+          <!-- <label>Date</label> -->
+          <dx-number-box
+          label="Amount"
+          [labelMode]="'floating'"
+          [(value)]="miscFormData.AMOUNT"
+          [format]="'#,##0.##'"
+          [readOnly]="true"
+        ></dx-number-box>
+        </div>
+    </div>
+  <div class="form-container">
+      <div class="form-column">
+          <dx-text-box
+          label="Description"
+          [labelMode]="'floating'"
+          [(value)]="miscFormData.DESCRIPTION"
+          [readOnly]="true"
+        ></dx-text-box>
+      </div>
+  </div>
+  
+  
+  <div class="form-container">
+      <div class="form-column">
+          <dx-text-box
+          label="Narration"
+          [labelMode]="'floating'"
+          [(value)]="miscFormData.NARRATION"
+          [readOnly]="true"
+        ></dx-text-box>
+      </div>
+  </div>
+
+
+
+  <div class="box-container" *ngIf="miscFormData.PAY_TRANS_ID > 0">
+    <div class="section-title">Payment Details</div>
+    <div class="form-container">
+      <div class="form-column">
+       
+        <!-- <div class="payment-mode-container">
+          <label class="dx-field-label">Payment Mode</label>
+          <dx-radio-group
+            [items]="['Cash', 'Bank']"
+            [(value)]="miscFormData.PAYMENT_MODE"
+            layout="horizontal"
+            [readOnly]="true"
+          >
+          </dx-radio-group>
+        </div> -->
+        
+ 
+    </div>
+    </div>
+    <div class="form-container">
+      <div class="form-column">
+       
+          <dx-text-box
+          label="Voucher No."
+          [(value)]="paymentDetails.VOUCHER_NO"
+          [labelMode]="'floating'"
+          [readOnly]="true"
+        ></dx-text-box>
+   
+      </div>
+  
+      <div class="form-column">
+        <dx-date-box
+          label="Date"
+          [(value)]="paymentDetails.TRANS_DATE"
+          displayFormat="dd/MM/yyyy"
+          [labelMode]="'floating'"
+          [readOnly]="true"
+        ></dx-date-box>
+      </div>
+    </div>
+
+
+    <div class="form-container">
+      <div class="form-column">
+       
+        <dx-text-box
+        label="Payment Reference"
+        [(value)]="paymentDetails.PAYMENT_REFERENCE"
+        [labelMode]="'floating'"
+        [readOnly]="true"
+      ></dx-text-box>
+ 
+    </div>
+    
+    </div>
+
+
+    <!-- <div class="box-container"> -->
+      <!-- <div class="form-container">
+        <div class="form-column"> -->
+       
+          <!-- <dx-text-box
+          label="Amount Paid"
+          [(value)]="paymentDetails.AMOUNT_PAID"
+          [labelMode]="'floating'"
+          [readOnly]="true"
+        ></dx-text-box> -->
+   
+      <!-- </div>
+      
+      </div> -->
+
+    <!-- </div> -->
+  </div>
+  <!-- </div> -->
+  <!-- <button class="no-print" (click)="printForm()">Print</button>
+
+
+<div id="print-section" style="display: none;">
+  <h2>Miscellaneous Form Details</h2>
+  <p><strong>Employee Name:</strong> {{ miscellaneousData.EMP_NAME }}</p>
+  <p><strong>Document No:</strong> {{ miscellaneousData.DOC_NO }}</p>
+  <p><strong>Date:</strong> {{ miscellaneousData.DOC_DATE | date }}</p>
+  <p><strong>Head:</strong> {{ miscellaneousData.HEAD_NAME }}</p>
+  <p><strong>Amount:</strong> {{ miscellaneousData.AMOUNT }}</p>
+  <p><strong>Status:</strong> {{ miscellaneousData.STATUS }}</p>
+</div> -->

@@ -1,0 +1,221 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText=" "
+      [width]="'100%'"
+      [height]="'80vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="prepaymentList"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+  
+      [allowColumnReordering]="true"
+    
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onEditingStart)="onEditPrePayment($event)"
+      (onRowRemoving)="onDeletePrepayment($event)"
+    >
+    
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+        [allowDeleting]="isEditReadOnly"
+      ></dxo-editing>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
+      <dxo-header-filter
+        [visible]="true"
+        [search]="{ enabled: true }"
+      ></dxo-header-filter>
+     
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header"style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">Prepayment Posting</div>
+        </dxi-item>
+
+        <!-- Buttons -->
+        <dxi-item location="after">
+          <div
+            class="month-selector"
+            style="display: flex; align-items: center; gap: 8px"
+          >
+            <dx-button
+              icon="chevronleft"
+              (onClick)="goToPreviousMonth()"
+            ></dx-button>
+            <span class="month-label" (click)="toggleCalendar()">
+              {{ selectedMonth | date : "MMMM yyyy" }}
+            </span>
+            <dx-button
+              icon="chevronright"
+              (onClick)="goToNextMonth()"
+            ></dx-button>
+          </div>
+          <div *ngIf="calendarVisible" class="calendar-popup">
+            <div class="calendar-header">
+              <button class="year-button" (click)="previousYear()">&lt;</button>
+
+              <span class="year-clickable" (click)="toggleYearSelector()">{{
+                selectedYear
+              }}</span>
+
+              <button class="year-button" (click)="nextYear()">&gt;</button>
+            </div>
+
+            <div
+              class="year-selector-popup"
+              *ngIf="yearSelectorVisible"
+              (click)="$event.stopPropagation()"
+            >
+        
+              <div class="year-grid">
+                <div
+                  class="year-option"
+                  *ngFor="let year of years"
+                  (click)="selectYear(year, $event)"
+                >
+                  {{ year }}
+                </div>
+              </div>
+            </div>
+
+            <!-- <div class="calendar-body">
+                   *ngFor="let monthName of timesheetList let idx = index"
+              <div
+             
+                class="month-cell"
+                [class.selected]="
+                  idx === selectedMonth.getMonth() &&
+                  selectedYear === selectedMonth.getFullYear()
+                "
+                (click)="selectMonthByIndex(idx)"
+              >
+                {{ monthName }}
+              </div>
+            </div> -->
+          </div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> 
+        </dxi-item>
+          <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+         <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+     
+      </dxo-toolbar>
+            <dxi-column dataField="SNO" caption="S.No" [width]="100" alignment="left"></dxi-column>
+
+      <dxi-column dataField="DOC_NO" caption="Doc.No" [width]="100"></dxi-column>
+
+  <!-- Invoice No -->
+  <dxi-column dataField="INVOICE_NO" caption="Invoice No"  [width]="100"></dxi-column>
+
+  <!-- Date -->
+  <dxi-column dataField="TRANS_DATE" caption="Date" [width]="150" dataType="date" [format]="'dd/MM/yyyy'"></dxi-column>
+
+  <!-- Supplier -->
+  <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+
+  <!-- Amount -->
+  <dxi-column dataField="NET_AMOUNT" caption="Amount" [width]="150" dataType="number"
+              [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+
+  <!-- Remarks -->
+  <dxi-column dataField="NARRATION"  [width]="250" caption="Remarks"></dxi-column>
+
+
+<!-- <dxi-column dataField="STATUS" caption="Status"></dxi-column> -->
+        <dxi-column
+          dataField="TRANS_STATUS"
+          caption="Status"
+          cellTemplate="statusCellTemplate"
+          width="100  "
+          alignment="center"
+        >
+        </dxi-column>
+        <div *dxTemplate="let cellData of 'statusCellTemplate'">
+          <i
+            class="fas fa-flag"
+            [ngClass]="getStatusFlagClass(cellData.value)"
+            [attr.title]="cellData.value"
+            style="margin-left: 10px; cursor: default"
+          ></i>
+      </div>
+      <!-- <dxi-column
+        type="buttons"
+        [buttons]="allActionButtons"
+        width="100"
+        fixed="true"
+        fixedPosition="right"
+      ></dxi-column> -->
+
+    
+    </dx-data-grid>
+  </div>
+</div>
+<dx-popup
+  [(visible)]="isAddPopupPrepaymentPosting"
+  [width]="'95vw'"
+  [height]="'75vh'"
+  title="New Prepayment Posting"
+  (onHiding)="handleClose()"
+>
+<app-prepayment-posting-add
+ (popupClosed)="handleClose()"
+>
+
+</app-prepayment-posting-add>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditPopupPrepaymentPosting"
+  [width]="'95vw'"
+  [height]="'75vh'"
+  title="Edit Prepayment Posting"
+  (onHiding)="handleClose()"
+>
+<app-prepayment-posting-edit
+   *ngIf="isEditPopupPrepaymentPosting"
+    [selecteprepaymentData]="selecte_prepayment_Data"
+    (popupClosed)="handleClose()"
+    >
+
+</app-prepayment-posting-edit>
+ 
+</dx-popup>

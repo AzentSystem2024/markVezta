@@ -1,0 +1,364 @@
+@use "../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+}
+
+.view-wrapper {
+  flex-wrap: wrap;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  flex-direction: row;
+  height: 100%;
+
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
+      }
+    }
+
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
+
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
+  }
+
+  user-panel {
+    display: inherit;
+  }
+}
+
+.edit-cell {
+  position: relative;
+
+  contact-status {
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 11px;
+  }
+}
+.price-header{
+  font-weight: bolder;
+}
+.custom-group {
+  width: 100px; /* Set the desired width */
+}
+
+.spacing-item {
+  margin-bottom: 20px; /* Adjust the value as needed */
+}
+
+
+
+::ng-deep #dropzone-external {
+  width: 270px;
+  height: 280px;
+  background-color: rgb(183 183 183 / 10%);
+  border-width: 2px;
+  border-style: dashed;
+  padding: 10px;
+  border-color: var(--dx-color-border);
+}
+
+::ng-deep #dropzone-external > * {
+  pointer-events: none;
+}
+
+::ng-deep #dropzone-external.dropzone-active {
+  border-style: solid;
+  border-color: var(--dx-color-primary);
+}
+
+::ng-deep .widget-container > span {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+::ng-deep #dropzone-image {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+::ng-deep #dropzone-text > span {
+  font-weight: 100;
+  opacity: 0.5;
+}
+
+::ng-deep #upload-progress {
+  display: flex;
+  margin-top: 10px;
+}
+
+::ng-deep .flex-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.dx-fileuploader-button {
+  display: none;
+}
+.custom-group {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.price-header, .new-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.dxi-item-group {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+::ng-deep .edit-form-containers {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+}
+
+::ng-deep .pricing-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  flex: 1;
+  min-width: 350px;
+  margin-right: 20px;
+}
+
+::ng-deep .inventory-history-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+::ng-deep .inventory-container,
+::ng-deep .history-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  min-width: 360px;
+  gap: 60px;
+}
+
+::ng-deep .inventory-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 5px;
+}
+
+::ng-deep .inventory-row dx-text-box {
+  margin-right: 15px;
+  width: 150px; 
+  gap: 5px;
+}
+
+::ng-deep .inventory-row label {
+  margin-right: 10px;
+  width: auto;
+  // margin-bottom: 5px;
+}
+
+::ng-deep .inventory-container {
+  margin-bottom: 20px; /* Space below the inventory container */
+  justify-content: space-between;
+}
+.dx-text-box {
+  width: 100%; /* Full width within its container */
+}
+::ng-deep .inventory-row dxi-item {
+  margin-bottom: 5px; /* Reduce this value to decrease the space between rows */
+}
+::ng-deep .dxi-item {
+  margin: 0; /* Remove any default margin */
+  padding: 0; /* Remove any default padding */
+}
+::ng-deep .inventory-container .dxi-item,
+::ng-deep .history-container .dxi-item {
+  margin-bottom: 5px; /* Adjust this value as needed */
+}
+::ng-deep .inventory-row dxi-item {
+  margin-bottom: 5px; /* Reduce spacing between items */
+}
+.form-item label {
+  width: 150px;
+  // font-weight: bold;
+}
+.inventory-item label, .history-item label {
+  width: 200px; /* Adjust width as needed */
+  margin-right: 10px; /* Adjust spacing between label and input */
+}
+
+.flex-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px; /* Adjust spacing between rows as needed */
+}
+
+.inventory-item label, .history-item label {
+  width: 200px; /* Fixed width for all labels */
+  margin-right: 10px; /* Space between label and text box */
+}
+
+.inventory-container,
+.history-container {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 20px; /* Space between inventory and history containers */
+}
+.inventory-row, .history-row {
+  display: flex;
+  flex-direction: column; /* Stack rows vertically */
+}
+.inventory-row .dxi-item, .history-row .dxi-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px; /* Reduce space between rows */
+}
+/* Inventory and History Item styles */
+::ng-deep .inventory-item, .history-item {
+  margin-bottom: 5px; /* Adjust this to reduce space between rows */
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: row; /* Ensure horizontal alignment */
+  gap: 20px; /* Adjust spacing between containers as needed */
+  border: 1px solid #ccc;
+}
+
+.special-container,
+.options-container {
+  flex: 1; /* Allow both containers to grow equally */
+  border: 1px solid #ccc;
+}
+
+/* Optional: Ensure containers do not collapse */
+.special-container, .options-container {
+  min-width: 0;
+}
+
+.grid-container {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; /* Allow horizontal scrolling */
+  overflow-y: hidden;
+   /* Prevent wrapping inside the grid */
+   flex: 1; /* Ensures the container takes up all available space */
+   display: flex;
+   flex-direction: column;
+}
+
+.view-wrapper.list-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+.grid.theme-dependent {
+  flex: 1; /* Makes the dx-data-grid take up all available height within the container */
+}
+
+.grid {
+  width: 100%;
+  // min-width: 1400px; /* Set this to a value greater than the sum of all column widths */
+  white-space: nowrap;
+}
+// ::ng-deep #grid {
+//   max-height: 440px;
+// }
+
+@media (min-width: 768px) {
+ 
+}
+
+// html, body {
+//   height: 100%;
+//   margin: 0;
+// }
+
+.dx-data-grid {
+  flex: 1;
+  width: 100% !important; /* Ensures the grid spans full width */
+  height: 100%
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.app-root {
+  height: 100%;
+}
+
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  // background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure it is above other content */
+}
+
+.spinner {
+  border: 4px solid #f3f3f3; /* Light grey */
+  border-top: 4px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+  .button-container{
+    margin-top: 30px;
+    margin-left: 40%;
+
+  }

@@ -1,0 +1,287 @@
+
+<dx-validation-group class="form-grid" #formValidationGroup>
+    <div style="display: flex;">
+    
+      <dx-text-box
+        label="Asset Code"
+        [(value)]="FixedAssetsData.CODE"
+        labelMode="floating"
+        style="width: 300px;"
+     
+
+      
+        ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-text-box>
+      <dx-check-box style="margin-left: 150px;" text="Inactive" [(value)]="FixedAssetsData.IS_INACTIVE">
+
+      </dx-check-box>
+    
+  
+    </div>
+    <div class="form-field" style="margin-top: 10px;">
+          
+      <dx-text-box
+        label="Description"
+        [(value)]="FixedAssetsData.DESCRIPTION"
+        labelMode="floating"
+       
+      
+        ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-text-box>
+</div>
+   <div class="form-field" style="display: flex; align-items: center; gap: 5px;">
+      
+      <dx-select-box
+        label="Asset Type"
+        labelMode="floating"
+        [(value)]="FixedAssetsData.ASSET_TYPE"
+        valueExpr="DESCRIPTION"
+        displayExpr="DESCRIPTION"
+       [items]="asseted_Data"
+        [searchEnabled]="true"
+      style="flex: 1;"
+      >
+             <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+       
+      </dx-select-box>
+<dx-button text=""
+icon="plus"
+   style="margin-top: 9px;"
+type="default"
+(onClick)="open_popup_new_assettype()">
+
+</dx-button>
+    </div>
+    <div class="form-field">
+      
+      <dx-select-box
+        label="Fixed Asset Ledger"
+        labelMode="floating"
+        valueExpr="ID"
+        [(value)]="FixedAssetsData.ASSET_LEDGER_ID"
+        displayExpr="DESCRIPTION"
+        [searchEnabled]="true"
+        [items]="asset_ledgerData"
+     
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+    
+    </div>
+     <div style="display: flex;">
+    
+        <dx-number-box label="Useful Life (Year)" style="width: 450px;" [(value)]="FixedAssetsData.USEFUL_LIFE"
+        labelMode="floating"(onValueChanged)="calculateDepreciation($event)"></dx-number-box>
+      <!-- <dx-text-box
+        label="Useful Life (Year)"
+        [(value)]="FixedAssetsData.ART_NO"
+        labelMode="floating"
+    
+        ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-text-box> -->
+      <dx-text-box label="Depreciation %(Yearly)"
+  labelMode="floating"
+  style="margin-left: 40px; width: 450px;"
+  [(value)]="FixedAssetsData.DEPR_PERCENT"
+  [readOnly]="true">
+
+      </dx-text-box>
+    
+  
+    </div>
+    <div class="form-field">
+      
+      <dx-select-box
+label="Accumulated Depreciation Ledger"
+        labelMode="floating"
+        [(value)]="FixedAssetsData.DEPR_LEDGER_ID"
+        valueExpr="ID"
+        displayExpr="DESCRIPTION"
+           [items]="asset_ledgerData"
+        [searchEnabled]="true"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
+
+    </div>
+  
+<div style="display: flex; gap: 20px;">
+  <!-- Left Column -->
+  <div style="display: flex; flex-direction: column; gap: 20px; width: 450px;">
+    <dx-number-box
+      label="Asset Value"
+      [(value)]="FixedAssetsData.ASSET_VALUE"
+    
+      labelMode="floating"
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-number-box>
+
+    <dx-date-box
+     label="Purchase Date" 
+      [(value)]="FixedAssetsData.PURCH_DATE"
+      type="date"
+      displayFormat="dd/MM/yyyy"
+      labelMode="floating"
+      (onValueChanged)="puchaseDataFormat($event)"
+    ></dx-date-box>
+
+    <!-- <dx-number-box
+      label="Net Depreciation"
+      [(value)]="FixedAssetsData.netDepreciation"
+      labelMode="floating"
+      [readOnly]="true"
+    ></dx-number-box> -->
+  </div>
+
+  <!-- Right Column -->
+  <div style="display: flex; flex-direction: column; gap: 20px; width: 450px;">
+    <dx-number-box
+      label="Residual Value"
+      [(value)]="FixedAssetsData.RESIDUAL_VALUE"
+      labelMode="floating"
+     
+    ></dx-number-box>
+
+    <!-- <dx-text-box
+      label="Last Depreciation"
+      [(value)]="FixedAssetsData.lastDepreciation"
+      labelMode="floating"
+       [readOnly]="true"
+    ></dx-text-box> -->
+
+    <!-- <dx-number-box
+      label="Current Asset Value"
+      [(value)]="FixedAssetsData.currentAssetValue"
+      format="#,##0.00"
+      labelMode="floating"
+      [readOnly]="true"
+    ></dx-number-box> -->
+  </div>
+</div>
+
+
+    <!-- <div class="form-field">
+    <dx-select-box
+    visible=""
+      label="Supplier"
+      labelMode="floating"
+      placeholder="Supplier"
+      [dataSource]="materialUnits"
+      valueExpr="ID"
+      displayExpr="DESCRIPTION"
+    >
+    </dx-select-box>
+  </div> -->
+    <!-- <div class="form-field">
+    <dx-text-box
+      label="Alias"
+      labelMode="floating"
+      placeholder="Alias"
+    ></dx-text-box>
+  </div>
+ -->
+
+
+  
+ </dx-validation-group>
+
+
+
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      (onClick)="closePopup()"
+      type="normal"
+    ></dx-button>
+    <dx-button
+      text="Save"
+      stylingMode="contained"
+      type="default"
+      (onClick)="AddData()"
+    ></dx-button>
+  </div>
+</div>
+<!-- ============================new fixed asset type poppup===================== -->
+ <dx-popup
+  [(visible)]="new_asset_type_popup"
+  [width]="350"
+  height="220"
+  title="Add New Fixed Asset Type"
+  [shading]="false"
+  (onHiding)="Add_new_AssetType_close()"
+  [showCloseButton]="true"
+  [shading]="true"
+  [hideOnOutsideClick]="false"
+>
+<dx-validation-group #newformValidationGroup>
+       
+  <dxi-item>
+    <dx-text-box
+      type="text"
+      class="form-control mt-1"
+      label="Name"
+      [(value)]="New_Asset_type"
+      labelMode="floating"
+    >
+  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="Fixed Asset Type is required"
+                    ></dxi-validation-rule> </dx-validator
+                ></dx-text-box>
+  </dxi-item>
+
+</dx-validation-group>
+
+  <div class="form-popup-buttons-container">
+    <div class="popup-footer">
+      <dx-button
+        class="btn me-1 border border-1 equal-button"
+         (click)="Add_new_AssetType_close()"
+      >
+        Cancel
+      </dx-button>
+      <dx-button
+        class="equal-button"
+        text="Save"
+        type="default"
+        stylingMode="contained"
+     
+        (onClick)="Add_new_AssetType()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>

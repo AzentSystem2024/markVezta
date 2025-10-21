@@ -1,0 +1,123 @@
+<div class="login-wrapper">
+  <form class="login-form" (submit)="onSubmit($event)">
+    <div class="logo">
+      <h1 class="brand-title">VEZTA FINANCE</h1>
+      <p class="subtitle">Log In to your account</p>
+    </div>
+
+    <!-- Username -->
+    <dx-text-box
+      [(value)]="formData.LOGIN_NAME"
+      [disabled]="loading"
+      placeholder="Username"
+      stylingMode="outlined"
+      mode="text"
+      (onValueChanged)="onUsernameChange($event)"
+    >
+      <div *dxTemplate="let data of 'before'">
+        <i class="dx-icon dx-icon-user"></i>
+      </div>
+    </dx-text-box>
+    <dx-validator
+      [validationRules]="[
+        { type: 'required', message: 'Username is required' }
+      ]"
+    >
+    </dx-validator>
+
+    <!-- Password -->
+    <!-- Password -->
+    <dx-text-box
+      [(value)]="formData.PASSWORD"
+      [disabled]="loading"
+      placeholder="Password"
+      stylingMode="outlined"
+      [mode]="showPassword ? 'text' : 'password'"
+      style="margin-top: 16px"
+    >
+      <!-- Lock icon before input -->
+      <div *dxTemplate="let data of 'before'">
+        <i class="dx-icon dx-icon-lock"></i>
+      </div>
+
+      <!-- Eye icon after input -->
+      <div
+        *dxTemplate="let data of 'after'"
+        (click)="showPassword = !showPassword"
+        style="cursor: pointer"
+      >
+        <i
+          class="dx-icon"
+          [ngClass]="showPassword ? 'dx-icon-eyeclose' : 'dx-icon-eyeopen'"
+        ></i>
+      </div>
+    </dx-text-box>
+    <dx-validator
+      [validationRules]="[
+        { type: 'required', message: 'Password is required' }
+      ]"
+    >
+    </dx-validator>
+
+    <!-- Company -->
+    <dx-select-box
+      [(value)]="formData.COMPANY_ID"
+      [dataSource]="CompanyList"
+      displayExpr="COMPANY_NAME"
+      valueExpr="COMPANY_ID"
+      placeholder="Select Company"
+      stylingMode="outlined"
+      style="margin-top: 16px"
+    >
+      <dx-validator
+        [validationRules]="[
+          { type: 'required', message: 'Company Name is required' }
+        ]"
+      ></dx-validator>
+    </dx-select-box>
+
+    <!-- Financial Year -->
+    <dx-select-box
+      [(value)]="formData.FINANCIAL_YEAR_ID"
+      [dataSource]="finacialYearList"
+      displayExpr="DESCRIPTION"
+      valueExpr="ID"
+      placeholder="Select Financial Year"
+      stylingMode="outlined"
+      style="margin-top: 16px"
+    >
+    </dx-select-box>
+    <dx-validator
+      [validationRules]="[
+        { type: 'required', message: 'Financial Year is required' }
+      ]"
+    >
+    </dx-validator>
+
+    <!-- Submit Button -->
+    <dx-button
+      type="default"
+      width="100%"
+      cssClass="btn-sign-in"
+      [useSubmitBehavior]="true"
+      style="margin-top: 30px"
+    >
+      <ng-container *ngIf="loading; else notLoading">
+        <dx-load-indicator
+          width="24px"
+          height="24px"
+          [visible]="true"
+        ></dx-load-indicator>
+      </ng-container>
+      <ng-template #notLoading>LOG IN</ng-template>
+    </dx-button>
+
+    <div class="forgot-password-link" style="margin-top: 10px">
+      <a [routerLink]="resetLink">Forgot password?</a>
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage" style="margin-top: 10px">
+      * {{ errorMessage }}
+    </div>
+  </form>
+</div>

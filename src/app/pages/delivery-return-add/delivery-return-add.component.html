@@ -1,0 +1,103 @@
+
+<div class="form-container">
+  <!-- Row 1 -->
+  <div class="form-row d-flex justify-content-between">
+    <dx-text-box label="Return No." labelMode="floating" width="300"  [readOnly]="true" [(value)]="DeliveryReturnFormData.DR_NO"></dx-text-box>
+    <dx-date-box label="Date"  labelMode="floating" displayFormat="dd/MM/yyyy" width="300" [(value)]="DeliveryReturnFormData.DR_DATE"></dx-date-box>
+  </div>
+
+  <div class="d-flex justify-content-between">
+    <dx-select-box label="Customer"
+     [dataSource]="customer"
+     valueExpr="ID"
+    displayExpr="DESCRIPTION" 
+    labelMode="floating"
+    width="300"
+    [(value)]="DeliveryReturnFormData.CUST_ID"
+     (onValueChanged)="onCustomerChange($event)"
+    >
+    </dx-select-box>
+    <dx-text-box label="Reference No." width="300" labelMode="floating" [(value)]="DeliveryReturnFormData.REF_NO"></dx-text-box>
+  </div>
+
+  <div class="d-flex justify-content-between">
+    <dx-select-box label="Salesman"
+     [dataSource]="salesman"
+     displayExpr="DESCRIPTION"
+   valueExpr="ID" 
+   labelMode="floating"
+   width="300"
+   [(value)]="DeliveryReturnFormData.SALESMAN_ID">
+  </dx-select-box>
+   <dx-button
+      text="Pending DN"
+      icon="plus"
+      type="default"
+      stylingMode="contained"
+      class="add-item-button mt-4"
+      (onClick)="togglePendingDN()"
+    ></dx-button>
+  </div>
+
+  <dx-data-grid
+class="grid theme-dependent"
+[showBorders]="true"
+style="margin-top: 24px;"
+[dataSource]="DNDatasource"
+[rowAlternationEnabled]="true"
+[showColumnLines]="true"
+rowAlternationInterval="2"
+[allowColumnReordering]="true"
+[allowColumnResizing]="true"
+ (onCellValueChanged)="onCellValueChanged($event)"
+noDataText=" "
+height="300px"
+(onEditorPreparing)="onEditorPreparing($event)"
+>
+
+<dxo-editing
+    mode="cell"       
+    [allowUpdating]="true">
+  </dxo-editing>
+
+    <dxo-summary>
+            <dxi-total-item
+              column="QUANTITY"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+          </dxo-summary>
+  <!-- This field ID optional .Used for displaying data temp -->
+  <dxi-column dataField="MATRIX_CODE" [visible]="ENABLE_Matrix_Code" caption="Matrix Code" [allowEditing]="false"></dxi-column>
+
+  <dxi-column dataField="ITEM_CODE" caption="Item Code" [allowEditing]="false"></dxi-column>
+
+  <dxi-column dataField="DESCRIPTION" caption="Description" [allowEditing]="false"></dxi-column>
+  <dxi-column dataField="COLOR" caption="Color" [allowEditing]="false"></dxi-column>
+  <dxi-column dataField="SIZE" caption="Size" [allowEditing]="false"></dxi-column>
+  <dxi-column dataField="STYLE" caption="Style" [allowEditing]="false"></dxi-column>
+  <dxi-column dataField="UOM" caption="UOM" [allowEditing]="false"></dxi-column>
+  <dxi-column dataField="DELIVERED_QUANTITY" caption="Qty in DN" [allowEditing]="false"></dxi-column>
+  <dxi-column dataField="QTY_AVAILABLE" caption="Qty Available" [allowEditing]="false"></dxi-column>
+  <dxi-column dataField="QUANTITY" caption="Qty Returned"  [allowEditing]="true"></dxi-column>
+  
+</dx-data-grid>
+  </div>
+
+  <div class="d-flex justify-content-end mt-3 mb-3 gap-2">
+     <dx-button
+      text="Cancel"
+          (onClick)="cancel()"
+          stylingMode="outlined"
+          type="normal"
+    ></dx-button>
+  <dx-button
+      text="Save"
+      type="default"
+       stylingMode="contained"
+       (onClick)="saveDeliveryreturn()"
+    ></dx-button>
+  </div>

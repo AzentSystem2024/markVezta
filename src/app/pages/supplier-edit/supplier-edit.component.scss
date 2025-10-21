@@ -1,0 +1,62 @@
+.country-code-input{
+  width: 70px;
+}
+.phone-style{
+  margin-left: 10px;
+  width: 100%;
+}
+.checkbox{
+  margin-bottom: 10px;
+}
+.landed-cost-label {
+  margin-bottom: 10px;  /* Adjust the value as needed */
+}
+/* Add border to all cells */
+dx-data-grid .dx-datagrid-rowsview .dx-row > .dx-data-cell {
+border: 1px solid #ccc;  /* Light grey border color, adjust as needed */
+}
+
+/* Add specific border to 'label' column (first column) */
+dx-data-grid .dx-datagrid-rowsview .dx-row > .dx-data-cell:nth-child(1) {
+border-right: 1px solid #ccc;  /* Border between columns */
+}
+
+/* Add specific border to 'value' column (second column) */
+dx-data-grid .dx-datagrid-rowsview .dx-row > .dx-data-cell:nth-child(2) {
+border-right: 1px solid #ccc;  /* Border between columns */
+}
+
+
+.form-popup-buttons-container {
+    position: absolute;
+    bottom: 20px; /* Distance from the bottom of the container */
+    right: 20px;  /* Distance from the right of the container */
+    display: flex;
+    gap: 10px; /* Space between buttons */
+  }
+
+  .form-popup-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--popup-toolbar-item-spacing);
+  
+    &.flex-buttons {
+      &::ng-deep .dx-button {
+        flex: 1;
+      }
+    }
+  }
+
+  .form-popup-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--popup-toolbar-item-spacing);
+  
+    &.flex-buttons {
+      &::ng-deep .dx-button {
+        flex: 1;
+      }
+    }
+  }

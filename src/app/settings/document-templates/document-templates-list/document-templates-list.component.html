@@ -1,0 +1,219 @@
+<div class="view-wrapper list-page">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [showBorders]="true" 
+      height="84vh"
+      [dataSource]="filteredDataSource"
+      [editing]="{ mode: 'cell', allowUpdating: true }"
+      (onRowUpdating)="onCellValueChanged($event)"
+    >
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-sorting mode="multiple"></dxo-sorting>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <dxo-filter-row [visible]="true"></dxo-filter-row>
+    <dxo-column-chooser [enabled]="true" [height]="400"></dxo-column-chooser>
+    <dxo-search-panel [visible]="true" placeholder=" Search"></dxo-search-panel>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    <dxo-pager
+            [visible]="true"
+            [allowedPageSizes]="allowedPageSizes"
+            [displayMode]="displayMode"
+            [showPageSizeSelector]="showPageSizeSelector"
+            [showInfo]="showInfo"
+            [showNavigationButtons]="showNavButtons"
+          ></dxo-pager>
+  <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+  </dxo-editing>
+    <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Document Template</div>
+        </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto">
+          <dx-select-box
+          [(value)]="selectedDocument"
+          [dataSource]="DocumentList"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          placeholder="Select a Document"
+          [searchEnabled]="true" 
+          stylingMode="filled"
+          [width]="300"
+          (onValueChanged)="onDocumentSelected($event)"
+          ></dx-select-box>
+        </dxi-item>
+    
+    <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          icon="plus"
+          type="default"
+          hint="Add new Template"
+          stylingMode="contained"  
+          (onClick)="openPopUp()"
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              icon: 'refresh',
+              stylingMode: 'text'
+            }"
+          ></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="exportButton"></dxi-item>
+          <!-- <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item> -->
+          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    
+    </dxo-toolbar>
+    
+    <dxi-column dataField="DOC_TYPE"  caption="Document" [allowEditing]="false"></dxi-column>
+    <dxi-column dataField="TEMPLATE_NAME"  caption="Template Name" [allowEditing]="false"></dxi-column>
+    <!-- <dxi-column dataField="Created By" width="auto" caption="Created By"></dxi-column>
+    <dxi-column dataField="Created On" width="auto" caption="Created On"></dxi-column> -->
+    <dxi-column dataField="USER_NAME" caption="Last Modified User" [allowEditing]="false"></dxi-column>
+    
+    <!-- <dxi-column dataField="Status" width="auto" caption="Status" ></dxi-column>   -->
+    <dxi-column caption=" "  dataField="IS_DEFAULT" [allowEditing]="true">
+      <!-- <ng-template dxTemplate="cell" let-data>
+          <dx-check-box 
+              [(value)]="data.data.IS_DEFAULT"
+              [readOnly]="true"
+              [text]="'Default'">
+          </dx-check-box>
+      </ng-template> -->
+  </dxi-column>
+  <dxi-column type="buttons" width="100" [buttons]="allButtonsEditDelete">
+  </dxi-column>
+    </dx-data-grid> 
+
+</div>
+<dx-popup
+  [(visible)]="showReportDesigner"
+  title="New Document Template"
+  [height]="'100vh'"
+  [width]="'100vw'"
+  [showCloseButton]="true"
+  *ngIf="flag"
+>
+<div>
+  <dx-report-designer [reportUrl]="reportName" height="700px" [developmentMode]="true">
+      <dxrd-request-options [getDesignerModelAction]="getDesignerModelAction"
+       [host]="host"></dxrd-request-options> 
+       <dxrd-callbacks (CustomizeMenuActions)="CustomizeMenuActions($event)" (BeforeRender)="onDesignerContentReady($event)"
+       (CustomizeElements)="CustomizeElements($event)" (ReportSaved)="ReportSaving($event)"
+        (CustomizeSaveDialog)="CustomizeSaveDialog($event)"></dxrd-callbacks>
+       <dxrd-designer-model-settings [allowMDI]="true">
+        <dxrd-datasource-settings [allowAddDataSource]="false" [allowRemoveDataSource]="false"></dxrd-datasource-settings>
+        <dxrd-preview-settings>
+            <dxrv-export-settings [useSameTab]="false" [useAsynchronousExport]="false" ></dxrv-export-settings>
+            <dxrv-progressbar-settings position="TopRight"></dxrv-progressbar-settings>
+            <dxrv-search-settings [useAsyncSearch]="false"></dxrv-search-settings>
+        </dxrd-preview-settings>
+        </dxrd-designer-model-settings>
+
+  </dx-report-designer>
+
+  <!-- <script type="text/html" id="custom-toolbarItem-template">
+    <div class="custom-toolbar-item" data-bind="visible: visible">
+      <div class="custom-toolbar-item-editor" data-bind="dxSelectBox: { items: $data.items, value: $data.currentValue, onItemClick: function(s,e){alert(s.itemData);} }"></div>
+    </div>
+  </script> -->
+  <!-- <dx-report-viewer [reportUrl]="reportName" height="800px">
+    <dxrv-request-options [invokeAction]="getViewModelAction" [host]="host"></dxrv-request-options>
+    </dx-report-viewer>  -->
+</div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="showDocumentDropdown"
+  title="Choose Document"
+  [height]="'30vh'" 
+  [width]="'30vw'"
+  [showCloseButton]="true"
+  
+>
+<div class="popup-content">
+  <dx-select-box
+    [(value)]="selectedDocument"
+    [dataSource]="documentOptions"
+    placeholder="Select a template"
+    [searchEnabled]="true"
+  ></dx-select-box>
+  <dxi-toolbar-item toolbar="bottom" location="center">
+    <div
+      class="form-popup-buttons-container"
+    >
+  <dx-button style="margin-top: 30px;"
+    text="Ok"
+    type="default"
+    stylingMode="contained"
+    [width]="'100px'"
+    (onClick)="applyDocument()"
+  ></dx-button>
+    </div>
+    </dxi-toolbar-item>
+</div>
+
+</dx-popup>
+
+<dx-popup 
+    [(visible)]="isDefaultPopupVisible" 
+    [width]="400" 
+    [height]="200" 
+    [showTitle]="true" 
+    title="Confirm Default Template">
+    
+        <p>Do you want to make this as default template?</p>
+        <dxi-toolbar-item toolbar="bottom">
+          <div class="form-popup-buttons-container">
+        <dx-button text="No" type="normal" stylingMode="outlined" (onClick)="CancelDefault()"></dx-button>
+        <dx-button text="Yes" type="default" stylingMode="contained" (onClick)="SaveDefault()"></dx-button>
+    </div>
+  </dxi-toolbar-item>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="editPopupTemplate"
+  title="Edit Document Template"
+  [height]="'100vh'"
+  [width]="'100vw'"
+  [showCloseButton]="true"
+  *ngIf="editflag"
+  (onHiding)="handlePopupClose()"
+>
+<dx-report-designer [reportUrl]="editreportName" height="700px" [developmentMode]="true">
+  <dxrd-request-options [getDesignerModelAction]="getEditDesignerModelAction"
+   [host]="host"></dxrd-request-options> 
+   <dxrd-callbacks (CustomizeMenuActions)="CustomizeMenuActions($event)" (BeforeRender)="onDesignerContentReady($event)"
+   (CustomizeElements)="CustomizeElements($event)" (ReportSaved)="ReportSaving($event)"
+    (CustomizeSaveDialog)="CustomizeSaveDialog($event)"></dxrd-callbacks>
+   <dxrd-designer-model-settings [allowMDI]="true">
+    <dxrd-datasource-settings [allowAddDataSource]="false" [allowRemoveDataSource]="false"></dxrd-datasource-settings>
+    <dxrd-preview-settings>
+        <dxrv-export-settings [useSameTab]="false" [useAsynchronousExport]="false" ></dxrv-export-settings>
+        <dxrv-progressbar-settings position="TopRight"></dxrv-progressbar-settings>
+        <dxrv-search-settings [useAsyncSearch]="false"></dxrv-search-settings>
+    </dxrd-preview-settings>
+    </dxrd-designer-model-settings>
+
+</dx-report-designer>
+</dx-popup>

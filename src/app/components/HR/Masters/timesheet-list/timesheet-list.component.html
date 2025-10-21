@@ -1,0 +1,273 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText=" "
+      [width]="'100%'"
+      [height]="'80vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="timesheetList"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true }"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: true, applyFilter: 'auto' }"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: true }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onEditingStart)="onEditOrViewTimesheet($event)"
+      (onRowRemoving)="onDeleteTimesheet($event)"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+       [selectedRows]="selectedRows" 
+
+        (onSelectionChanged)="onSelectionChanged($event)"
+      
+    >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser>
+      <!-- <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+        [allowDeleting]="true"
+      ></dxo-editing> -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
+      <dxo-header-filter
+        [visible]="true"
+        [search]="{ enabled: true }"
+      ></dxo-header-filter>
+     
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Time Sheet</div>
+        </dxi-item>
+
+        <!-- Buttons -->
+        <dxi-item location="after">
+          <div
+            class="month-selector"
+            style="display: flex; align-items: center; gap: 8px"
+          >
+            <dx-button
+              icon="chevronleft"
+              (onClick)="goToPreviousMonth()"
+            ></dx-button>
+            <span class="month-label" (click)="toggleCalendar()">
+              {{ selectedMonth | date : "MMMM yyyy" }}
+            </span>
+            <dx-button
+              icon="chevronright"
+              (onClick)="goToNextMonth()"
+            ></dx-button>
+          </div>
+          <div *ngIf="calendarVisible" class="calendar-popup">
+            <div class="calendar-header">
+              <button class="year-button" (click)="previousYear()">&lt;</button>
+
+              <span class="year-clickable" (click)="toggleYearSelector()">{{
+                selectedYear
+              }}</span>
+
+              <button class="year-button" (click)="nextYear()">&gt;</button>
+            </div>
+
+            <div
+              class="year-selector-popup"
+              *ngIf="yearSelectorVisible"
+              (click)="$event.stopPropagation()"
+            >
+              <!-- <div class="year-popup-header">
+                <button class="close-btn" (click)="yearSelectorVisible = false; $event.stopPropagation()">
+                  ✕
+                </button>
+              </div> -->
+              <div class="year-grid">
+                <div
+                  class="year-option"
+                  *ngFor="let year of years"
+                  (click)="selectYear(year, $event)"
+                >
+                  {{ year }}
+                </div>
+              </div>
+            </div>
+
+            <div class="calendar-body">
+              <!-- <div
+                *ngFor="let monthName of monthNames; let idx = index"
+                class="month-cell"
+                [class.selected]="
+                  idx === selectedMonth.getMonth() &&
+                  selectedYear === selectedMonth.getFullYear()
+                "
+                (click)="selectMonthByIndex(idx)"
+              >
+                {{ monthName }}
+              </div> -->
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> 
+        </dxi-item>
+        <!-- <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            icon="plus"
+            hint="add"
+            type="default"
+            stylingMode="contained"
+            (onClick)="addTimesheet()"
+          ></dx-button>
+        </dxi-item> -->
+        
+        <dxi-item>
+      <dx-button
+        text="Approve"
+        type="default"
+       
+        stylingMode="contained"
+        [width]="100"
+        class="mt-2"
+        (onClick)="ApproveBulkRows()"
+      >
+      </dx-button>
+    </dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column dataField="EMP_NO" caption="Employee No."></dxi-column>
+      <dxi-column dataField="EMP_NAME" caption="Employee Name"></dxi-column>
+      <dxi-column dataField="WORKED_DAYS" caption="Worked Days"></dxi-column>
+      <dxi-column dataField="OT_HOURS" caption="OT Hours"></dxi-column>
+       <dxi-column dataField="LESS_HOURS" caption="Less Hours"></dxi-column>
+      <!-- <dxi-column dataField="STATUS" caption="Status"></dxi-column> -->
+        <dxi-column
+          dataField="STATUS"
+          caption="Status"
+          cellTemplate="statusCellTemplate"
+          width="100  "
+          alignment="right"
+        >
+        </dxi-column>
+        <div *dxTemplate="let cellData of 'statusCellTemplate'">
+          <i
+            class="fas fa-flag"
+            [ngClass]="getStatusFlagClass(cellData.value)"
+            [attr.title]="cellData.value"
+            style="margin-left: 10px; cursor: default"
+          ></i>
+      </div>
+      <!-- <dxi-column
+        type="buttons"
+        [buttons]="allActionButtons"
+        width="100"
+        fixed="true"
+        fixedPosition="right"
+      ></dxi-column> -->
+
+    
+    </dx-data-grid>
+  </div>
+</div>
+<dx-popup
+  [(visible)]="addTimesheetPopupOpened"
+  [width]="'95vw'"
+  [height]="'95vh'"
+  title="New Timesheet"
+  (onHiding)="handleClose()"
+>
+  <app-timesheet-add
+    *ngIf="addTimesheetPopupOpened"
+    [selectedMonth]="selectedMonthForAdd"
+    [existingTimesheets]="timesheetList"
+    (popupClosed)="handleClose()"
+  ></app-timesheet-add>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="editTimesheetPopupOpened"
+  [width]="'95vw'"
+  [height]="'95vh'"
+  title="Edit Timesheet"
+  (onHiding)="handleClose()"
+>
+  <app-timesheet-edit
+    *ngIf="editTimesheetPopupOpened"
+    [timesheet]="selectedTimesheet"
+    [existingTimesheets]="timesheetList"
+    (popupClosed)="handleClose()"
+  ></app-timesheet-edit>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="verifyTimesheetPopupOpened"
+  [width]="'95vw'"
+  [height]="'95vh'"
+  title="Verify Timesheet"
+  (onHiding)="handleClose()"
+>
+  <app-timesheet-verify
+    *ngIf="verifyTimesheetPopupOpened"
+    [timesheet]="selectedTimesheet"
+    [existingTimesheets]="timesheetList"
+    (popupClosed)="handleClose()"
+  ></app-timesheet-verify>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="approveTimesheetPopupOpened"
+  [width]="'95vw'"
+  [height]="'95vh'"
+  title="Approve Timesheet"
+  (onHiding)="handleClose()"
+>
+  <app-timesheet-approve
+    *ngIf="approveTimesheetPopupOpened"
+    [timesheet]="selectedTimesheet"
+    (popupClosed)="handleClose()"
+  ></app-timesheet-approve>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="viewTimesheetPopupOpened"
+  [width]="'95vw'"
+  [height]="'95vh'"
+  title="View Timesheet"
+  (onHiding)="handleClose()"
+>
+  <app-timesheet-view
+    *ngIf="viewTimesheetPopupOpened"
+    [timesheet]="selectedTimesheet"
+    (popupClosed)="handleClose()"
+  ></app-timesheet-view>
+</dx-popup>

@@ -1,0 +1,139 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'75vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="StockMovementDatasource"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      [groupPanel]="{ visible: true }"
+      [grouping]="{ autoExpandAll: false }"
+      [summary]="summaryColumnsData" 
+      (onExporting)="onExporting($event)"
+    >
+      
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+       
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+      <dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <!-- <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row> -->
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header"style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">Stock Movement</div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto">
+           <dx-select-box
+        [width]="200"
+        label="Item"
+        labelMode="floating"
+         [items]="ItemList"
+    displayExpr="DESCRIPTION"
+    valueExpr="ID"
+    [(value)]="selected_item_Id"
+    (onValueChanged)="onItemIdChange($event)"
+    [searchEnabled]="true"
+        >
+        </dx-select-box>
+ </dxi-item>
+
+ <dxi-item location="after" locateInMenu="auto">
+     <dx-date-box
+          [width]="200"
+          label="Date From"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+  </dxi-item>
+
+  <dxi-item location="after" locateInMenu="auto">
+     <dx-date-box
+          [width]="200"
+          label="Date To"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onToDateChange($event)"
+        ></dx-date-box>
+  </dxi-item>
+
+  
+   <dxi-item>
+          <dx-button
+            text="Apply"
+            icon="todo"
+            stylingMode="contained"
+            type="default"
+            [width]="100"
+            (onClick)="getStockMovement()"
+          ></dx-button>
+        </dxi-item>
+
+      
+    
+      <dxi-item name="exportButton"></dxi-item>
+      </dxo-toolbar>
+   
+       <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+
+<dxi-column dataField="ITEM_CODE" caption="Code" ></dxi-column>
+<dxi-column dataField="ITEM_NAME" caption="Description"></dxi-column>
+<dxi-column dataField="OPENING_QTY" dataType="number" format="#,##0.00" alignment="right" caption="Opening Qty"></dxi-column>
+<dxi-column dataField="GRN_QTY" dataType="number" format="#,##0.00" alignment="right" caption="GRN Qty"></dxi-column>
+<dxi-column dataField="PURCHASE_RETURN_QTY" dataType="number" format="#,##0.00" alignment="right" caption="Purch.Return"></dxi-column>
+<dxi-column dataField="TRANSFEROUT_QTY" dataType="number" format="#,##0.00" alignment="right" caption="Transf.Out"></dxi-column>
+<dxi-column dataField="TRANSFERIN_QTY" dataType="number" format="#,##0.00" alignment="right" caption="Transf.In"></dxi-column>
+<dxi-column dataField="DELIVERY_QTY" dataType="number" format="#,##0.00" alignment="right" caption="Delivery Out"></dxi-column>
+<dxi-column dataField="DELIVERY_RETURN_QTY" dataType="number" format="#,##0.00" alignment="right" caption="Delivery Return"></dxi-column>
+<dxi-column dataField="SALE_QTY" dataType="number" format="#,##0.00" alignment="right" caption="Sale Qty"></dxi-column>
+<dxi-column dataField="SALE_RETURN_QTY" dataType="number" format="#,##0.00" alignment="right" caption="Sales Return"></dxi-column>
+<dxi-column dataField="ADJUSTED" dataType="number" format="#,##0.00" alignment="right" caption="Adjusted"></dxi-column>
+<dxi-column dataField="BALANCE_STOCK" dataType="number" format="#,##0.00" alignment="right" caption="Balance Stock"></dxi-column>
+<dxi-column dataField="SIZE" caption="Size"></dxi-column>
+<dxi-column dataField="COLOR" caption="Color"></dxi-column>
+<dxi-column dataField="STYLE" caption="Style"></dxi-column>
+
+    </dx-data-grid>
+  </div>
+</div>

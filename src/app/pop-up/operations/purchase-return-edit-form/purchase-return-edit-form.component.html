@@ -1,0 +1,182 @@
+<div class="card-container" style="padding: 5px; margin-bottom: 10px; background-color: var(--base-bg); border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <!-- First Row -->
+    <div class="row" style="display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 10px;">
+        <div class="left-section" style="display: flex; gap: 20px; flex: 1;">
+            <dx-text-box
+              label="Return No."
+              labelMode="floating"
+              [readOnly]="true"
+              [elementAttr]="{ class: 'grntextbox' }"
+              [(value)]="newReturnData.RET_NO"
+              >
+            </dx-text-box>
+      
+            <dx-date-box
+              label="Date"
+              labelMode="floating"
+              [readOnly]="true"
+              [value]="today"
+              [displayFormat]="'MM/dd/yyyy'"
+              [elementAttr]="{ class: 'grndatebox' }"
+              >
+            </dx-date-box>
+          </div>
+      
+          <div class="right-section" style="flex: 1;margin-left: 10px;">
+            <!-- <dx-select-box
+              label="Store"
+              labelMode="floating"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              placeholder="Select Store"
+              [searchEnabled]="true"
+              [elementAttr]="{ class: 'grndropdown' }"
+              >
+            </dx-select-box> -->
+          </div>
+    </div>
+  
+    <!-- Second Row -->
+    <div class="row" style="display: flex; gap: 20px; margin-top: 10px;">
+      <div style="flex: 1;">
+        <dx-select-box
+          label="Supplier"
+          labelMode="floating"
+          [(value)]="newReturnData.SUPP_ID"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          placeholder="Select Supplier"
+          [searchEnabled]="true"
+          [elementAttr]="{ class: 'grndropdown' }"
+          [dataSource]="supplierList"
+          (onValueChanged)="onSupplierValueChanged($event)"
+          [readOnly]="true"
+          >
+        </dx-select-box>
+      </div>
+  
+      <div style="flex: 1;">
+        <dx-text-box
+              label="GRN"
+              labelMode="floating"
+              [readOnly]="true"
+              [(value)]="newReturnData.GRN_NO"
+              [elementAttr]="{ class: 'grntextbox' }"
+              >
+            </dx-text-box>
+      </div>
+    </div>
+  </div>
+
+
+  <div>
+    <dx-data-grid
+            [showBorders]="true"
+            class="data-grid"
+            (onCellPrepared)="highlightEditableColumns($event)"
+            [selection]="{ mode: 'single' }"
+            [hoverStateEnabled]="true"
+            [paging]="{ enabled: true, pageSize: 10 }"
+            [width]="'auto'"
+            [height]="350"
+            class="custom-data-grid"
+            [columnAutoWidth]="true"
+            [dataSource]="grnDetails"
+            (onRowUpdated)="updateCell($event)"
+            (onContentReady)="onContentReady($event)"
+          >
+          <dxo-scrolling
+        mode="virtual"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+
+          <dxo-editing mode="cell" [allowUpdating]="true" 
+    ></dxo-editing>
+         
+          <dxi-column caption="SL NO" dataField="SL_NO" [width]="87" [allowEditing]="false" alignment="center"></dxi-column> 
+          <dxi-column dataField="BAR_CODE" caption="BAR CODE" [width]="'auto'" [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="ITEM_NAME" caption="DESCRIPTION" [width]="'auto'" [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="UOM" [width]="87" caption="UOM" [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="GRN_QTY" [width]="cwidth" caption="GRN QTY" [allowEditing]="false" alignment="center"></dxi-column>
+          <dxi-column dataField="RETURN_QTY" [width]="cwidth" caption="QTY AFTER PREV. RETURN" [allowEditing]="false" alignment="center"></dxi-column>
+          <dxi-column dataField="QTY_STOCK" [width]="cwidth" caption="QTY AVAILABLE" [allowEditing]="false" alignment="center"></dxi-column>
+          <dxi-column dataField="QUANTITY" [width]="cwidth" caption="QTY RETURN" [allowEditing]="true" alignment="center" [editorOptions]="{ showSpinButtons: true, min: 0, format: '#0', mode: 'number' }"></dxi-column>
+          <dxi-column dataField="RATE" [width]="cwidth" [caption]="'PRICE ' + localCurrencySymbol" [allowEditing]="false" alignment="right" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+          <dxi-column *ngIf="SupplierCurrencySymbol && SupplierCurrencySymbol !== localCurrencySymbol"
+              dataField="SUPP_PRICE" [width]="cwidth"
+              [caption]="'PRICE ' + SupplierCurrencySymbol" [allowEditing]="false" alignment="right">
+          </dxi-column>
+          <dxi-column dataField="DISC_PERCENT" [width]="cwidth" caption="DISC %" [allowEditing]="false" alignment="center"></dxi-column>
+          <dxi-column dataField="AMOUNT" [width]="cwidth" [caption]="'AMOUNT ' + localCurrencySymbol" [allowEditing]="false" alignment="center" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+          <dxi-column *ngIf="SupplierCurrencySymbol && SupplierCurrencySymbol !== localCurrencySymbol"
+              dataField="SUPP_AMOUNT" [width]="cwidth"
+              [caption]="'AMOUNT ' + SupplierCurrencySymbol" [allowEditing]="false" alignment="right" [format]="{ type: 'fixedPoint', precision: 2 }">
+          </dxi-column>
+          <dxi-column *ngIf="SupplierCurrencySymbol == localCurrencySymbol"
+           dataField="VAT_PERC" [width]="cwidth" caption="VAT %" [allowEditing]="false" alignment="center"></dxi-column>
+          <dxi-column *ngIf="SupplierCurrencySymbol == localCurrencySymbol"
+          dataField="VAT_AMOUNT" [width]="cwidth" caption="VAT AMOUNT" [allowEditing]="false" alignment="right"></dxi-column>
+          <dxi-column dataField="TOTAL_AMOUNT" [width]="cwidth" [caption]="'TOTAL AMOUNT ' + localCurrencySymbol" [allowEditing]="false" alignment="right" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+          <dxi-column *ngIf="SupplierCurrencySymbol && SupplierCurrencySymbol !== localCurrencySymbol"
+              dataField="SUPP_TOTAL_AMOUNT" [width]="cwidth"
+              [caption]="'TOTAL AMOUNT ' + SupplierCurrencySymbol" [allowEditing]="false" alignment="right" [format]="{ type: 'fixedPoint', precision: 2 }">
+          </dxi-column>
+
+          <dxo-summary>
+            <dxi-total-item 
+                column="BAR_CODE" 
+                displayFormat="Total"
+               ></dxi-total-item>
+
+            <dxi-total-item 
+            column="QUANTITY" 
+            summaryType="sum"
+            displayFormat="{0}"
+            >
+          </dxi-total-item>
+      
+            <dxi-total-item 
+              column="VAT_AMOUNT" 
+              summaryType="sum" 
+              displayFormat="{0}"
+              valueFormat="##0.00"
+              >
+              <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+            </dxi-total-item>
+      
+            <dxi-total-item 
+              column="TOTAL_AMOUNT" 
+              summaryType="sum" 
+              displayFormat="{0}"
+              valueFormat="##0.00"
+             >
+             <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+            </dxi-total-item>
+
+            <dxi-total-item 
+              column="SUPP_TOTAL_AMOUNT" 
+              summaryType="sum" 
+              displayFormat="{0}"
+              valueFormat="##0.00"
+             >
+             <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+            </dxi-total-item>
+            
+          </dxo-summary>
+          
+          </dx-data-grid>
+          
+  </div>
+
+  <div style="flex: 1;">
+    <dx-text-area
+      label="NARRATION"
+      labelMode="floating"
+      placeholder="Enter NARRATION"
+      [(value)]="newReturnData.NARRATION"
+      [height]="80"
+      [width]="400"
+      [maxLength]="500"
+    >
+    </dx-text-area>
+  </div>

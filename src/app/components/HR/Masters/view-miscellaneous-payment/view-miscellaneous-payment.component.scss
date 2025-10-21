@@ -1,0 +1,46 @@
+.form-container {
+    display: flex;
+    gap: 10px; /* spacing between columns */
+    margin-bottom: 10px;
+  }
+  
+  .form-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .form-popup-buttons-container {
+    display: flex;
+    justify-content: flex-end; /* Moves buttons to the right */
+    padding: 10px; /* Optional: Adds some spacing */
+}
+
+.popup-footer {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}
+
+.box-container {
+  border: 1px solid #968f8f;
+  padding: 16px;
+  margin-top: 16px;
+  border-radius: 8px;
+  // background-color: #f9f9f9;
+}
+.payment-mode-container {
+  display: flex;
+  align-items: center;
+}
+
+.payment-mode-container .dx-field-label {
+  margin-right: 6px; /* Reduce this to tighten spacing */
+  white-space: nowrap;
+  font-weight: 500; /* Optional for visual consistency */
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 12px;
+  display: block;
+}

@@ -1,0 +1,244 @@
+<div class="view-wrapper list-page">
+  <div *ngIf="isLoading" class="loading-overlaaay">
+    <div class="spinner"></div>
+  </div>
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="AdvaceSource"
+    [remoteOperations]="false"
+    [width]="'100%'"
+    [height]="'80vh'"
+    [allowColumnReordering]="true"
+    [rowAlternationEnabled]="true"
+    noDataText=" "
+   
+    (onEditingStart)="onEditingStart($event)"
+    [scrolling]="{ mode: 'standard' }"
+    [filterRow]="{ visible: true, applyFilter: 'auto' }"
+  >
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-form [colCount]="1"> </dxo-form>
+    </dxo-editing>
+    <dxo-filter-row [visible]="true"></dxo-filter-row>
+    <dxo-scrolling mode="standard"></dxo-scrolling>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    
+    <dxo-paging [pageSize]="10"></dxo-paging>
+
+    <dxo-pager
+    [visible]="true"
+    [allowedPageSizes]="allowedPageSizes"
+    [displayMode]="displayMode"
+    [showPageSizeSelector]="showPageSizeSelector"
+    [showInfo]="true"
+    [showNavigationButtons]="true"
+  ></dxo-pager>
+
+  <dxo-column-chooser
+  [height]="500"
+  hideOnOutsideClick="true"
+  [enabled]="true"
+  mode="select"
+>
+</dxo-column-chooser>
+
+  
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header">Advance Types</div>
+      </dxi-item>
+
+      <dxi-item location="after">
+        <dx-button
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="Advance_types_add_pop()"
+        ></dx-button>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          icon="refresh"
+          stylingMode="text"
+          (onClick)="refreshData()"
+        ></dx-button>
+      </dxi-item>
+      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    </dxo-toolbar>
+
+  
+  <dxi-column
+  dataField="slNo"
+  caption="Sl.No"
+  alignment="left"
+  dataField="SlNo"
+  [allowEditing]="true"
+  [allowFiltering]="false"
+  [width]="100"
+></dxi-column>
+<!-- <dxi-column dataField="CODE" caption=" Code"></dxi-column> -->
+<dxi-column dataField="CODE" caption="Code" [width]="100"></dxi-column>
+
+
+<dxi-column dataField="HEAD_NAME" caption="Description" [width]="150"></dxi-column>
+<dxi-column
+  dataField="PRINT_DESCRIPTION"
+  caption="Print Description"
+></dxi-column>
+
+<dxi-column
+dataField="IS_INACTIVE"
+caption="Status"
+alignment="left"
+[calculateCellValue]="formatStatus"
+
+></dxi-column>
+
+</dx-data-grid>
+
+</div>
+<!-- /=============== Add advance Types========================= -->
+
+<dx-popup  (onHiding)="closeButton()" [(visible)]="isAddPopup" title="New Advance Types" [width]="550" height="420px" >
+  <dx-form id="form"  [formGroup]="formsource" >
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item itemType="simple">
+        <dx-text-box formControlName="description" label="Description"></dx-text-box>
+      </dxi-item>
+
+      <dxi-item itemType="simple">
+        <dx-text-box  formControlName="print_Description"  label="Print Description"></dx-text-box>
+      </dxi-item>
+
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [(value)]="AC_HEAD_ID" 
+        [items]="AC_HEAD_VALUE"
+        [searchEnabled]="true"
+        placeholder="Select.."
+        formControlName="AC_HEAD_ID"
+        label=" Account Ledger"
+        
+      ></dx-select-box>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+    
+ <dxi-item>
+      <dx-text-box
+      label="Code"
+      width="150px"
+      valueChangeEvent="input"
+      formControlName="code" 
+    ></dx-text-box>
+ </dxi-item>
+ <dxi-item style="margin-top: 30px">
+  <label >
+   Inactive
+    <dx-check-box
+      formControlName="IS_INACTIVE"
+      [elementAttr]="{ 'aria-label': 'Unchecked' }"
+      id="checkboxadd"
+      style="margin-left: 10px;"
+    ></dx-check-box>
+  </label>
+</dxi-item>
+
+
+    </dxi-item>
+
+  
+    <!-- test -->
+
+    <dxi-item
+      class="fixed-footer"
+      itemType="group"
+      [colCount]="2"
+      [colSpan]="2"
+    >
+      <div class="fixed-footer">
+        <dx-button text="Cancel" (onClick)="close()" style="color: white;     border: rgb(97, 97, 97);
+"></dx-button>
+        <dx-button
+          class="saveBtn"
+          text="Save"
+          stylingMode="contained"
+          (onClick)="Add_Advance_Types()"
+        ></dx-button>
+      </div>
+    </dxi-item>
+  </dx-form>
+</dx-popup>
+
+<!-- ========================Edit Advance Types==============================
+  -->
+<dx-popup class="form-group"   [(visible)]="isEditPopup" title="Edit Advance Types" [width]="360">
+  <dx-form id="form">
+
+
+    
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item itemType="simple">
+        <dx-text-box   dataField="DESCRIPTION"   [(value)]="description_value"  label="Description"></dx-text-box>
+      </dxi-item>
+      <dxi-item itemType="simple">
+        <dx-text-box   dataField="PRINT_DESCRIPTION"   [(value)]="print_description"  label="Print Description"></dx-text-box>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item class="select-box">
+      <dx-select-box
+      [(value)]="selected_Account_Lr" 
+      [items]="AC_HEAD_VALUE"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [searchEnabled]="true"
+        placeholder="Select.."
+       
+        label="Account Ledger"
+      ></dx-select-box>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">  <dxi-item itemType="simple">
+      <dx-text-box
+        dataField="CODE"
+        label="Code"
+        [(value)]="code_value"
+      ></dx-text-box>
+    </dxi-item>
+    <dxi-item style="margin-top: 30px">
+      <label>
+        Inactive
+        <dx-check-box
+          [(value)]="is_inactive_value"
+          [elementAttr]="{ 'aria-label': 'Checked' }"
+          style="margin-left: 10px;"
+        ></dx-check-box>
+      </label>
+    </dxi-item>
+   </dxi-item>
+  
+  
+
+    <dxi-item
+      class="fixed-footer"
+      itemType="group"
+      [colCount]="2"
+      [colSpan]="2"
+    >
+      <div class="fixed-footer">
+        <dx-button text="Cancel" (onClick)="close()" style="color: white;     border: rgb(97, 97, 97);
+"></dx-button>
+        <dx-button
+          class="saveBtn"
+          text="Update"
+          stylingMode="contained"
+          
+        ></dx-button>
+      </div>
+    </dxi-item>
+  </dx-form>
+</dx-popup>

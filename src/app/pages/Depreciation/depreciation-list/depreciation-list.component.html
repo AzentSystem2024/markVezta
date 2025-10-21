@@ -1,0 +1,246 @@
+
+
+
+
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'75vh'"
+        [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="Depreciation_List"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+       [showRowLines]="true"
+      [showColumnLines]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+       (onEditingStart)="onEditDepreciation($event)"
+         (onRowRemoving)="delete_Depreciation_Data($event)"
+    >
+      <dxo-editing
+        mode="popup"
+         [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+     
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header"style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">Depreciation</div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+ <dxi-item location="after" locateInMenu="auto">
+
+
+    <dx-select-box
+      [dataSource]="dateRanges"
+      [displayExpr]="'label'"
+      valueExpr="value"
+      [(value)]="selectedDateRange"
+      (onValueChanged)="onDateRangeChanged($event)"
+      [searchEnabled]="true"
+      [width]="250"
+      placeholder="Select Date Range"
+    >
+     <div *dxTemplate="let item of 'item'">
+          {{ item.value === 'custom' ? 'Custom' : item.label }}
+        </div>
+    </dx-select-box>
+  </dxi-item>
+  <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+                      <!-- <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item> -->
+   <dxi-item
+   *ngIf="canAdd"
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+
+        <!-- <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            icon="plus"
+            hint="Add"
+            type="default"
+            stylingMode="contained"
+  (onClick)="addPacking()"
+          ></dx-button>
+        </dxi-item> -->
+      </dxo-toolbar>
+    <dxi-column dataField="DOC_NO"  [width]="150" caption="Doc.No"></dxi-column>  
+    <dxi-column dataField="DEPR_DATE"  [width]="150" caption="Depreciation Date"  dataType="date"   [format]="'dd/MM/yy'"></dxi-column>
+
+<dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
+<!-- <dxi-column dataField="PackingName" caption="Location"></dxi-column> -->
+<dxi-column dataField="AMOUNT" caption="Net Amount"  [width]="150"  [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+<!--  -->
+<dxi-column dataField="TRANS_STATUS" caption="Status"  [width]="100"   alignment="center" cellTemplate="statusCellTemplate"></dxi-column>
+
+<!-- <dxi-column dataField="Unit" caption="Unit"></dxi-column> -->
+
+   <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+     [attr.title]="cellData.value == '1' ? 'Open' : 'Approve'"
+
+        style=" margin-left: 10px; cursor: default"
+      ></i>       
+    </div> 
+
+<dxi-column
+  type="buttons"
+  [buttons]="gridButtons">
+</dxi-column>
+    </dx-data-grid>
+  </div>
+</div>
+
+<!-- <dx-popup
+  [(visible)]="isAddInvoice"
+  [width]="'90vw'"
+  [height]="'85vh'"
+  title="New Invoice"
+  (onHiding)="handleClose()"
+>
+  <app-add-invoice (popupClosed)="handleClose()"></app-add-invoice>
+</dx-popup> -->
+
+<dx-popup
+  [(visible)]="AddDepreciationPopupVisible"
+  [width]="'100vw'"
+  [height]="'95vh'"
+  title="New Depreciation"
+  (onHiding)="handleClose()"
+>
+  <!-- <app-fixed-asstes-add
+    (popupClosed)="handleClose()"
+  ></app-fixed-asstes-add> -->
+
+  
+    <app-depreciation-add (popupClosed)="handleClose()"></app-depreciation-add>
+
+
+</dx-popup>
+
+
+<dx-popup
+  [(visible)]="EditDepreciationPopupVisible"
+  [width]="'100vw'"
+  [height]="'95vh'"
+  title="Update Depreciation"
+  (onHiding)="handleClose()"
+>
+  <app-depreciation-edit
+  
+      [SelectDepreciationData]="Selected_Depreciation_data"
+    (popupClosed)="handleClose()"
+  ></app-depreciation-edit>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="showCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="250"
+  [dragEnabled]="false"
+>
+  <div>
+    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
+  <dx-date-box
+    [(value)]="customStartDate"
+    type="date"
+    width="250"
+    displayFormat="dd/MM/yyyy"
+    placeholder="From Date"
+    label="From Date"
+    labelMode="floating">
+  </dx-date-box>
+
+  <dx-date-box
+    [(value)]="customEndDate"
+    type="date"
+    width="250"
+    displayFormat="dd/MM/yyyy"
+    placeholder="To Date"
+    label="To Date"
+    labelMode="floating">
+  </dx-date-box>
+</div>
+
+    <!-- <div class="date-range-container">
+      <dx-date-box
+        [(value)]="customStartDate"
+        type="date"
+        width="300"
+     
+        displayFormat="dd/MM/yyyy"
+        placeholder="From Date"
+      >
+      </dx-date-box>
+
+      <dx-date-box
+        [(value)]="customEndDate"
+        type="date"
+        placeholder="To Date"
+        width="300"
+         displayFormat="dd/MM/yyyy"
+      >
+      </dx-date-box>
+    </div> -->
+
+    <div class="button-container" >
+      <dx-button
+        text="Apply"
+        type="default"
+        (onClick)="applyCustomDateFilter()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>

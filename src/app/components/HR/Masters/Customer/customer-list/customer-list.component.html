@@ -1,0 +1,475 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="customer"
+    [showColumnLines]="true"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [showBorders]="true"
+    [allowColumnReordering]="true"
+    [height]="'75vh'"
+    [allowColumnResizing]="true"
+    (onExporting)="onExporting($event)"
+    (onEditingStart)="OnEditCustomer($event)"
+    (onRowRemoving)="onRowRemoving($event)"
+    [showColumnLines]="true"
+  >
+    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <!-- <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter> -->
+    <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-popup
+        title="Edit Customer"
+        [showTitle]="true"
+        [width]="950"
+        [height]="750"
+      >
+      </dxo-popup>
+      <dxo-form [colCount]="2">
+        <dxi-item itemType="group" [colCount]="1">
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item dataField="CUST_CODE"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item dataField="FIRST_NAME"></dxi-item>
+            <dxi-item dataField="LAST_NAME"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="DOB"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="NATIONALITY"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="CONTACT_NAME"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="ADDRESS1"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="ADDRESS2"
+              ><dxo-label [visible]="false"></dxo-label
+            ></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="ADDRESS3"
+              ><dxo-label [visible]="false"></dxo-label
+            ></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="CITY"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="COUNTRY_NAME"></dxi-item>
+          </dxi-item>
+        </dxi-item>
+        <dxi-item itemType="group" [colCount]="1">
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item dataField="ZIP"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item dataField="MOBILE_NO"></dxi-item>
+            <dxi-item dataField="PHONE"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item dataField="FAX_NO"></dxi-item>
+            <dxi-item dataField="EMAIL"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item dataField="CREDIT_LIMIT"></dxi-item>
+            <dxi-item dataField="CURRENT_CREDIT"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="PAY_TERM_ID"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="NOTES" editorType="dxTextBox"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item dataField="PRICE_CLASS_ID"></dxi-item>
+            <dxi-item dataField="DISCOUNT_PERCENT"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="VAT_RULE_ID"></dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="VAT_REGNO"></dxi-item>
+          </dxi-item>
+        </dxi-item>
+      </dxo-form>
+    </dxo-editing>
+    <!-- <dxo-search-panel
+      [visible]="true"
+      placeholder="Data Search"
+    ></dxo-search-panel> -->
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Customer
+        </div>
+      </dxi-item>
+
+      <!-- <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addCustomer()"
+          
+        ></dx-button>
+      </dxi-item> -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              icon: 'refresh',
+              stylingMode: 'text'
+            }"
+          ></dxi-item> -->
+      <dxi-item location="after" locateInMenu="auto">
+        <div class="separator"></div>
+      </dxi-item>
+      <dxi-item name="exportButton"></dxi-item>
+      <dxi-item location="after" locateInMenu="auto">
+        <div class="separator"></div>
+      </dxi-item>
+      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    </dxo-toolbar>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="showInfo"
+      [showNavigationButtons]="showNavButtons"
+    >
+    </dxo-pager>
+    <dxo-paging [pageSize]="100"></dxo-paging>
+    <dxi-column
+      dataField="SNO"
+      caption="S.No"
+      alignment="left"
+      width="70"
+    ></dxi-column>
+    <dxi-column dataField="CUST_CODE" caption="Code">
+      <dxi-validation-rule type="required" message="Code is required">
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="CUST_NAME" caption="Name">
+      <dxi-validation-rule type="required" message="Customer name is required">
+        <dxi-validation-rule type="pattern" message="Customer name is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <!-- <dxi-column dataField="ADDRESS1" caption="Address">
+      <dxi-validation-rule type="required" message="Address is required">
+        <dxi-validation-rule type="pattern" message="Address is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="ADDRESS2" > </dxi-column>
+    <dxi-column dataField="ADDRESS3" ></dxi-column> -->
+    <dxi-column dataField="CITY" caption="City">
+      <dxi-validation-rule type="required" message="City is required">
+        <dxi-validation-rule type="pattern" message="City is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="ZIP" caption="Zip" [visible]="false">
+      <dxi-validation-rule type="required" message="ZIP is required">
+        <dxi-validation-rule type="pattern" message="ZIP is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="MOBILE_NO" caption="Mobile" [visible]="false">
+      <dxi-validation-rule type="required" message="Mobile number is required">
+        <dxi-validation-rule
+          type="pattern"
+          pattern="number"
+          message="Mobile number is required"
+        >
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="PHONE" caption="Phone" [visible]="false">
+      <dxi-validation-rule type="required" message="Phone number is required">
+        <dxi-validation-rule
+          type="pattern"
+          pattern="number"
+          message="Mobile number is required"
+        >
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="FAX_NO" caption="Fax" [visible]="false">
+      <dxi-validation-rule type="required" message="Fax is required">
+        <dxi-validation-rule
+          type="pattern"
+          pattern="number"
+          message="Fax is required"
+        >
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="EMAIL" caption="Email" [visible]="false">
+      <dxi-validation-rule
+        type="required"
+        message="Email is required"
+      ></dxi-validation-rule>
+      <dxi-validation-rule
+        type="pattern"
+        pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+        message="Invalid email format"
+      ></dxi-validation-rule>
+    </dxi-column>
+    <dxi-column
+      dataField="CREDIT_LIMIT"
+      caption="Credit Limit"
+      [visible]="false"
+    >
+      <dxi-validation-rule type="required" message="Credit limit is required">
+        <dxi-validation-rule type="pattern" message="Credit limit is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column
+      dataField="CURRENT_CREDIT"
+      caption="Current Credit"
+      [visible]="false"
+    >
+      <dxi-validation-rule type="required" message="Current credit is required">
+        <dxi-validation-rule
+          type="pattern"
+          message="Current credit is required"
+        >
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="STATE_NAME" caption="State">
+      <dxi-validation-rule type="required" message="State is required">
+        <dxi-validation-rule type="pattern" message="State is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="COUNTRY_NAME" caption="Country">
+      <!-- <dxo-lookup
+      [dataSource]="country"
+      displayExpr="COUNTRY_NAME"
+      valueExpr="ID"
+    >
+    <dxi-validation-rule type="required" message="Country is required">
+      <dxi-validation-rule type="pattern" message="Country is required">
+      </dxi-validation-rule>
+    </dxi-validation-rule>
+  </dxo-lookup> -->
+    </dxi-column>
+    <dxi-column dataField="PHONE" caption="Phone">
+      <dxi-validation-rule type="required" message="Phone number is required">
+        <dxi-validation-rule type="pattern" message="Phone number is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="EMAIL" caption="Email">
+      <dxi-validation-rule
+        type="required"
+        message="Email is required"
+      ></dxi-validation-rule>
+      <dxi-validation-rule
+        type="pattern"
+        pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+        message="Invalid email format"
+      ></dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="FIRST_NAME" caption="First Name" [visible]="false">
+      <dxi-validation-rule type="required" message="First name is required">
+        <dxi-validation-rule type="pattern" message="First name is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="LAST_NAME" caption="Last Name" [visible]="false">
+      <dxi-validation-rule type="required" message="Last name is required">
+        <dxi-validation-rule type="pattern" message="Last name is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column
+      dataField="NOTES"
+      caption="Additional Info"
+      [visible]="false"
+    ></dxi-column>
+    <dxi-column
+      dataField="DOB"
+      caption="Date of Birth"
+      dataType="date"
+      [visible]="false"
+    >
+      <dxi-validation-rule type="required" message="DOB is required">
+        <dxi-validation-rule type="pattern" message="DOB is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="NATIONALITY" caption="Nationality" [visible]="false">
+      <dxo-lookup
+        [dataSource]="country"
+        displayExpr="COUNTRY_NAME"
+        valueExpr="ID"
+      >
+        <dxi-validation-rule type="required" message="Nationality is required">
+        </dxi-validation-rule>
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column
+      dataField="CONTACT_NAME"
+      caption="Contact Name"
+      [visible]="false"
+    >
+      <dxi-validation-rule type="required" message="Contact name is required">
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column
+      dataField="PAY_TERM_ID"
+      caption="Payment Terms"
+      [visible]="false"
+    >
+      <dxo-lookup
+        [dataSource]="PaymentTermsDropdownData"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+      >
+        <dxi-validation-rule
+          type="required"
+          message="Payment terms is required"
+        >
+        </dxi-validation-rule
+      ></dxo-lookup>
+    </dxi-column>
+    <dxi-column
+      dataField="DISCOUNT_PERCENT"
+      caption="Discount %"
+      [visible]="false"
+    >
+      <dxi-validation-rule
+        type="required"
+        message="Discount percent is required"
+      >
+        <dxi-validation-rule
+          type="pattern"
+          pattern="number"
+          message="Discount percent is required"
+        >
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column
+      dataField="PRICE_CLASS_ID"
+      caption="Default Price Level"
+      [visible]="false"
+    >
+      <dxo-lookup
+        [dataSource]="PriceClassDropdownData"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+      >
+        <dxi-validation-rule type="required" message="Price class is required">
+          <dxi-validation-rule type="pattern" message="Price class is required">
+          </dxi-validation-rule>
+        </dxi-validation-rule>
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column dataField="VAT_RULE_ID" caption="VAT Rule" [visible]="false">
+      <dxo-lookup
+        [dataSource]="VatRuleDropdownData"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+      >
+        <dxi-validation-rule type="required" message="VAT rule is required">
+          <dxi-validation-rule type="pattern" message="VAT rule is required">
+          </dxi-validation-rule> </dxi-validation-rule
+      ></dxo-lookup>
+    </dxi-column>
+    <dxi-column
+      dataField="VAT_REGNO"
+      caption="VAT Registration Number"
+      [visible]="false"
+    >
+      <dxi-validation-rule
+        type="required"
+        message="VAT Registration number is required"
+      >
+        <dxi-validation-rule
+          type="pattern"
+          message="VAT Registration number is required"
+        >
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+  </dx-data-grid>
+  <form-popup
+    [(visible)]="isAddCustomerPopupOpened"
+    [width]="950"
+    [height]="650"
+    titleText="New Customer"
+    (cancel)="onCancelCustomer()"
+    (save)="onClickSaveCustomer()"
+  >
+    <app-customer-form></app-customer-form>
+  </form-popup>
+  <form-popup
+    [(visible)]="isEditCustomerPopupOpened"
+    [width]="950"
+    [height]="650"
+    titleText="Edit Customer"
+    (save)="onClickUpdateCustomer()"
+  >
+    <!-- <app-customer-form></app-customer-form> -->
+
+    <app-customer-edit-form
+      [selectedCustomerData]="Selected_Customer_Data"
+      (customerUpdated)="onCustomerUpdated($event)"
+    ></app-customer-edit-form>
+  </form-popup>
+</div>

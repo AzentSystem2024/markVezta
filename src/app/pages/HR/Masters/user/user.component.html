@@ -1,0 +1,145 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    noDataText=""
+    height="600"
+    [dataSource]="datasource"
+    [showBorders]="true"
+    [allowColumnResizing]="true"
+    [allowColumnReordering]="true"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    (onEditingStart)="onEditingRow($event)"
+    (onRowRemoving)="onRowRemoving($event)"
+    height="84vh"
+    [showColumnLines]="true"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-editing
+      mode="popup"
+       [allowUpdating]="canEdit"
+       [allowDeleting]="canDelete"
+    >
+    </dxo-editing>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="showInfo"
+      [showNavigationButtons]="showNavButtons"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="standard"></dxo-scrolling>
+    <dxo-sorting mode="multiple"></dxo-sorting>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+    <dxo-column-chooser [enabled]="true" [height]="400"></dxo-column-chooser>
+    <dxo-search-panel [visible]="true" placeholder=" Search"></dxo-search-panel>
+    <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="false"
+      [formats]="['xlsx']"
+    >
+    </dxo-export>
+
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header" style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          ">User</div>
+      </dxi-item>
+      <dxi-item
+      location="after"
+      locateInMenu="auto"
+      showText="inMenu"
+      widget="dxButton"
+      [options]="{
+        icon: isFilterRowVisible ? 'filter' : 'filter',
+        hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+        onClick: toggleFilterRow,
+        stylingMode: 'text',
+        elementAttr: { class: 'commonButtons' }
+      }"
+    ></dxi-item>
+     <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          text: 'Refresh',
+          icon: 'refresh',
+          onClick: refresh,
+          stylingMode: 'text',
+          hint: 'refresh'
+        }"
+      ></dxi-item>
+
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="custom-export-button"
+      ></dxi-item>
+      <dxi-item
+      location="after"
+      widget="dxButton"
+       *ngIf="canAdd"
+      [options]="addButtonOptions"
+    ></dxi-item>
+
+
+    </dxo-toolbar>
+
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+<dxi-column dataField="SlNo" caption="S.No"  [width]="100" alignment="left"></dxi-column>
+    <dxi-column dataField="USER_NAME" caption="UserName"></dxi-column>
+    <dxi-column dataField="LOGIN_NAME" caption="LoginName"></dxi-column>
+    <dxi-column dataField="USER_ROLE" caption="Role"></dxi-column>
+     <dxi-column dataField="MOBILE" caption="Mobile No."></dxi-column>
+    <dxi-column dataField="EMAIL" caption="Email"></dxi-column>
+   <dxi-column
+      dataField="IS_INACTIVE"
+      caption="Status"
+      cellTemplate="statusCellTemplate"
+    ></dxi-column>
+    <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+    </div>
+  </dx-data-grid>
+  <form-popup
+    class="formPopupClass"
+    [(visible)]="isAddFormPopupOpened"
+    titleText="New User"
+    [height]="'95vh'"
+    [width]="popupwidth"
+    (save)="onClickSaveNewData()"
+    (clear)="onClearData()"
+  >
+    <app-user-new-form></app-user-new-form>
+  </form-popup>
+  <dx-popup
+    [(visible)]="isEditPopupOpened"
+    title="Edit User"
+    [height]="'95vh'"
+    [width]="popupwidth"
+     (onHiding)="CloseEditForm()"
+  >
+    <app-user-edit-form
+      [selectedRowData]="selectedRowData"
+      (closeForm)="CloseEditForm()"
+    ></app-user-edit-form>
+  </dx-popup>
+</div>
+

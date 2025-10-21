@@ -1,0 +1,225 @@
+.details-container {
+  display: flex;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.supplier-details,
+.shipping-details {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  margin-left: 0; /* Default for the first item */
+}
+
+.shipping-details {
+  margin-left: 10px; /* For the second column */
+}
+
+.section-title {
+  font-size: 16px;
+  margin-bottom: 10px;
+  display: block;
+}
+.po-title {
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.termsncondition-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  margin-left: 0; /* Default for the first item */
+}
+
+.total-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.add-button {
+  margin-right: 20px;
+}
+
+.total-field {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.total-field:last-child {
+  margin-right: 0; /* Remove margin-right from the last item */
+}
+
+.total-field label {
+  margin-right: 10px;
+}
+
+.vat-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.vat-field {
+  display: flex;
+  align-items: center;
+}
+
+.vat-field label {
+  margin-right: 10px;
+}
+
+.form-popup-buttons-container {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--popup-toolbar-item-spacing);
+
+  &.flex-buttons {
+    &::ng-deep .dx-button {
+      flex: 1;
+    }
+  }
+}
+
+/* Container for the file upload input */
+.file-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Hide the default file input */
+.file-input {
+  display: none;
+}
+
+/* Custom file upload button styling */
+.custom-file-upload {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.custom-file-upload:hover {
+  background-color: #0056b3;
+}
+
+/* Optional: Style for the upload icon */
+.upload-icon::before {
+  content: "\u2191"; /* Up arrow as icon (change to your preferred icon) */
+  margin-left: 8px;
+  font-size: 18px;
+}
+
+/* Style for the list of uploaded files */
+.file-list {
+  margin-top: 10px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.remove-button {
+  margin-left: 8px;
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+/* Highlight the headers of editable columns */
+.dx-header-cell.editable-header {
+  background-color: #f0ad4e !important; /* Change this to your desired highlight color */
+  color: #fff !important; /* Change the text color if needed */
+}
+
+/* Optional: Change the font weight or style */
+.dx-header-cell.editable-header {
+  font-weight: bold;
+}
+
+:host ::ng-deep .dx-datagrid-headers table td div.dx-datagrid-text-content {
+  white-space: normal;
+}
+
+.custom-data-grid .dx-datagrid-rowsview {
+  padding: 0; /* Remove padding around the entire grid */
+}
+
+/* Reduce the padding inside cells */
+.custom-data-grid .dx-row,
+.custom-data-grid .dx-cell {
+  padding: 2px 5px; /* Adjust padding to your preference */
+}
+
+/* Adjust header padding */
+.custom-data-grid .dx-header-row,
+.custom-data-grid .dx-header-cell {
+  padding: 5px 10px; /* Adjust header padding */
+}
+
+/* Adjust the group panel cells padding */
+.custom-data-grid .dx-datagrid-group-cell {
+  padding: 5px; /* Adjust padding for group cells */
+}
+
+/* You can also adjust the individual column's padding by targeting them specifically */
+.custom-data-grid .dx-column-header {
+  padding: 5px; /* Adjust column header padding */
+}
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Add space between sections */
+  padding: 20px;
+}
+
+.file-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.file-upload-label {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-name-display {
+  font-size: 14px;
+  color: #555;
+}
+
+.remarks-container {
+  margin-top: 5px; /* Add space between file upload and remarks */
+}
+
+.dx-popup-content {
+  overflow-x: hidden; /* hide horizontal overflow */
+}

@@ -1,0 +1,46 @@
+<dx-form class="plain-styled-form" >
+    <dxi-item itemType="group">
+      <dxo-col-count-by-screen
+        [xs]="1"
+        [sm]="1"
+        [md]="1"
+        [lg]="1"
+      ></dxo-col-count-by-screen>
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="CODE"
+            [(value)]="newVatclass.CODE"
+           labelMode="floating"
+            (keypress)="keyPressCode($event)"
+          >
+          </dx-text-box>
+        </div>
+      </dxi-item>
+  
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="VAT NAME"
+            [(value)]="newVatclass.VAT_NAME"
+           labelMode="floating"
+            (keypress)="keyPressVatname($event)"
+          >
+          </dx-text-box>
+        </div>
+      </dxi-item>
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="VAT PERC"
+            [(value)]="newVatclass.VAT_PERC"
+           labelMode="floating"
+           
+          >
+          </dx-text-box>
+        </div>
+      </dxi-item>
+
+    </dxi-item>
+  </dx-form>
+  

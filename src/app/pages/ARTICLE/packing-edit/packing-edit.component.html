@@ -1,0 +1,370 @@
+<dx-validation-group class="form-grid" #formValidationGroup>
+  <div class="form-field">
+    <dx-validation-group #ArtnoValidationGroup>
+      <dx-text-box
+        label="Art No."
+        [(value)]="PackingData.ART_NO"
+        labelMode="floating"
+        placeholder="Art No."
+          [disabled]="isArticleFieldsDisabled"
+      ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-text-box>
+    </dx-validation-group>
+  </div>
+  <div class="form-field">
+    <dx-validation-group #ColorValidationGroup>
+      <dx-select-box
+        label="Color"
+        labelMode="floating"
+        placeholder="Color"
+        [(value)]="PackingData.COLOR"
+        [dataSource]="colorList"
+        valueExpr="DESCRIPTION"
+        displayExpr="DESCRIPTION"
+        [searchEnabled]="true"
+            [disabled]="isArticleFieldsDisabled"
+      ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      >
+      </dx-select-box>
+    </dx-validation-group>
+  </div>
+  <div class="form-field">
+      <dx-validation-group #CategoryValidationGroup>
+    <dx-select-box
+      label="Category"
+      labelMode="floating"
+      placeholder="Category"
+      [dataSource]="categoryList"
+      valueExpr="ID"
+      [(value)]="PackingData.CATEGORY_ID"
+      displayExpr="DESCRIPTION"
+      [searchEnabled]="true"
+          [disabled]="isArticleFieldsDisabled"
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      >
+    </dx-select-box>
+    </dx-validation-group>
+  </div>
+
+  <div class="form-field">
+    <dx-validation-group #UnitValidationGroup>
+    <dx-select-box
+      label="Production Unit"
+      labelMode="floating"
+      placeholder="Unit"
+      [(value)]="PackingData.UNIT_ID"
+      [dataSource]="produCtionUnits"
+      valueExpr="ID"
+      displayExpr="DESCRIPTION"
+      [disabled]="isArticleFieldsDisabled"
+      [searchEnabled]="true"
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      >
+    </dx-select-box>
+    </dx-validation-group>
+  </div>
+    <div class="form-field">
+    <dx-text-box
+      label="Packing Name."
+      [(value)]="PackingData.DESCRIPTION"
+      labelMode="floating"
+      placeholder="Art No."
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-text-box>
+  </div>
+
+  <div class="form-field">
+    <dx-select-box
+      label="Type"
+      labelMode="floating"
+      placeholder="Type"
+      [(value)]="PackingData.ARTICLE_TYPE"
+      [dataSource]="typeList"
+      valueExpr="ID"
+      displayExpr="DESCRIPTION"
+      [searchEnabled]="true"
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      >
+    </dx-select-box>
+  </div>
+  <div class="form-field">
+    <dx-select-box
+      label="Brand"
+      labelMode="floating"
+      placeholder="Brand"
+      [dataSource]="brandList"
+      [(value)]="PackingData.BRAND_ID"
+      valueExpr="ID"
+      displayExpr="DESCRIPTION"
+      [searchEnabled]="true"
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      >
+    </dx-select-box>
+  </div>
+
+  <div class="form-field">
+    <dx-text-box
+      label="Packing Order No."
+      [(value)]="PackingData.ORDER_NO"
+      labelMode="floating"
+      placeholder="Packing Order No."
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-text-box>
+  </div>
+  <div class="form-field">
+    <dx-text-box
+      label="Serial No."
+      labelMode="floating"
+      [(value)]="PackingData.ART_SERIAL"
+      placeholder="Next Serial No."
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-text-box>
+  </div>
+
+  <div class="form-field">
+    <dx-text-box
+      label="Part No."
+      [(value)]="PackingData.PART_NO"
+      labelMode="floating"
+      placeholder="Part No."
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-text-box>
+  </div>
+  <div class="form-field">
+    <dx-text-box
+      label="Alias No."
+      [(value)]="PackingData.ALIAS_NO"
+      labelMode="floating"
+      placeholder="Alias No."
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-text-box>
+  </div>
+  <!-- <div class="form-field">
+    <dx-number-box
+      label="Total Pair Qty"
+      labelMode="floating"
+       [(value)]="PackingData.PAIR_QTY"
+      placeholder="Total Pair Qty"
+    ></dx-number-box>
+  </div> -->
+  <div class="form-field">
+    <dx-number-box
+      label="Price"
+      [(value)]="PackingData.PRICE"
+      [format]="'#,##0.##'"
+      labelMode="floating"
+      placeholder="Price"
+      [min]="0"
+      [showSpinButtons]="true"
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-number-box>
+  </div>
+
+
+  <!-- <div class="form-field">
+    <dx-text-box
+      label="Alias"
+      labelMode="floating"
+      placeholder="Alias"
+    ></dx-text-box>
+  </div> -->
+
+  <!-- <div class="form-field mt-2">
+    
+  </div>  -->
+
+  <div class="checkbox-container">
+    <div style="display:flex">   
+       <dx-check-box
+      text="Purchasable Item"
+      [(value)]="PackingData.IS_PURCHASABLE"
+      (onValueChanged)="onPurchasableChanged($event)"
+    ></dx-check-box>
+    <div class="form-field" *ngIf="PackingData.IS_PURCHASABLE"  class="supplier-box">
+    <dx-select-box
+      label="Supplier"
+         [searchEnabled]="true"
+      labelMode="floating"
+      placeholder="Supplier"
+      [dataSource]="materialUnits"
+      valueExpr="ID"
+      displayExpr="DESCRIPTION"
+      [(value)]="PackingData.SUPP_ID"
+    ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      >
+    </dx-select-box>
+  </div>
+  </div>
+    <div style="display:flex">    <dx-check-box
+      text="Inactive"
+      [(value)]="PackingData.IS_INACTIVE"
+    ></dx-check-box>
+
+    <dx-check-box
+      text="Any Combination"
+      [(value)]="PackingData.IS_ANY_COMB"
+    ></dx-check-box>
+    <!-- <dx-check-box text="Purchasable Item"      [(value)]="PackingData.IS_PURCHASABLE"></dx-check-box> -->
+
+    <dx-check-box
+      text="Export"
+      [(value)]="PackingData.IS_EXPORT"
+    ></dx-check-box>
+    </div>
+  </div>
+
+  <div class="image-grid-wrapper">
+    <div class="combination">
+      <dx-button
+        text="Clear"
+        hind="clear form"
+        stylingMode="outlined"
+        (onClick)="clearForm()"
+        type="default"
+      ></dx-button>
+      <dx-button
+        text="Load Article"
+        stylingMode="contained"
+        (onClick)="loadArticle()"
+        type="default"
+      ></dx-button>
+    </div>  
+     <dx-data-grid
+      [dataSource]="articleSizeData"
+      [showBorders]="true"
+      [editing]="{ mode: 'cell', allowUpdating: true }"
+      [height]="'30vh'"
+      [width]="'100%'"
+      (onRowUpdated)="onQuantityChanged()"
+      (onEditorPreparing)="onEditorPreparing($event)"
+    >
+      <dxi-column
+        sortOrder="asc"
+        sortIndex="0"
+        [allowEditing]="false"
+        dataField="Size"
+        caption="Size"
+        sortOrder="asc"
+           alignment="center"
+      ></dxi-column>
+      <dxi-column
+        dataField="Qty"
+        sortOrder="asc"
+        sortIndex="0"
+        caption="Quantity"
+        dataType="number"
+           alignment="center"
+      ></dxi-column>
+    </dx-data-grid>
+
+    <!-- [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }" -->
+
+    <!-- <dx-data-grid
+  [dataSource]="articleSizeData"
+  [showBorders]="true"
+  [columnAutoWidth]="true"
+  [rowAlternationEnabled]="true"
+  [height]="'33vh'"
+  [width]="'100%'"
+  [editing]="{ mode: 'cell', allowUpdating: true }"
+  [selectedRowKeys]="selectedSizeRows"
+  (onRowUpdated)="onQuantityChanged()"
+  class="article-size-grid"
+> <dxi-column 
+   
+    [allowEditing]="true" 
+    [width]="40"
+    [height]="20"
+    dataType="boolean"
+  ></dxi-column>
+  <dxi-column dataField="Size" caption="Size" sortOrder="asc"></dxi-column>
+  <dxi-column dataField="Qty" caption="Quantity" dataType="number"></dxi-column>
+
+  <Checkbox column with editing support -
+ 
+</dx-data-grid>
+ -->
+ 
+
+    <!-- CURRENT POSITION (move this) -->
+    <div class="form-field"style="align-items: end;">
+      <dx-text-box
+       class="center-numberbox"
+        labelMode="floating"
+        label="Quantity"
+        style="width: 160px; "
+        [(value)]="totalQuantity"
+      ></dx-text-box>
+    </div>
+
+    <!-- MOVE THIS BELOW IMAGE-GRID-WRAPPER     (onRowUpdated)="onQuantityChanged()" -->
+  </div>
+</dx-validation-group>
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      (onClick)="closePopup()"
+      type="normal"
+    ></dx-button>
+    <dx-button
+      text="Update"
+      stylingMode="contained"
+      type="default"
+      (onClick)="UpdateData()"
+    ></dx-button>
+  </div>
+</div>

@@ -1,0 +1,310 @@
+<dx-validation-group #journalVoucherGroup>
+  <div
+    class="invoice-wrapper"
+    style="
+      height: 70vh;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    "
+  >
+    <div class="salary-grid-wrapper" style="padding: 0 10px">
+      <div class="grid-container">
+        <dx-data-grid
+          *ngIf="ledgerList?.length"
+          #itemsGridRef
+          [dataSource]="journalVoucherFormData?.DETAILS"
+          [showBorders]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="false"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true }"
+          [allowColumnReordering]="true"
+          [showColumnHeaders]="true"
+          [columnAutoWidth]="true"
+          [allowColumnResizing]="true"
+          [height]="'55vh'"
+          [columnResizingMode]="'nextColumn'"
+          [headerFilter]="{ visible: true }"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: true,
+            allowDeleting: true,
+            allowAdding: true,
+            useIcons: true
+          }"
+          (onEditorPreparing)="onEditorPreparing($event)"
+          (onRowValidating)="onRowValidating($event)"
+          (onRowUpdating)="onRowUpdating($event)"
+          (onRowRemoved)="onRowRemoved($event)"
+          (onRowInserted)="onRowInserted($event)"
+          (onKeyDown)="onGridKeyDown($event)"
+        >
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-filter-builder [allowHierarchicalFields]="true">
+          </dxo-filter-builder>
+          <dxo-toolbar>
+            <div
+              class="stacked-toolbar-group"
+              style="display: flex; flex-direction: column; gap: 2px"
+            ></div>
+            <dxi-item location="before" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 5px"
+              >
+                <div style="display: flex; gap: 5px">
+                  <div *ngIf="journalVoucherFormData">
+                    <dx-text-box
+                      label="JV No."
+                      [(value)]="journalVoucherFormData.JOURNAL_NO"
+                      labelMode="floating"
+                      [width]="200"
+                      [readOnly]="true"
+                    ></dx-text-box>
+                  </div>
+                  <div *ngIf="journalVoucherFormData">
+                    <dx-text-box
+                      #refBoxRef
+                      label="Reference No."
+                      labelMode="floating"
+                      [(value)]="journalVoucherFormData.REF_NO"
+                      [width]="200"
+                      (onKeyDown)="onRefNoEnter($event)"
+                    ></dx-text-box>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 5px">
+                  <div *ngIf="journalVoucherFormData">
+                    <dx-text-box
+                      #partyNameRef
+                      label="Beneficiary Name"
+                      labelMode="floating"
+                      [(value)]="journalVoucherFormData.PARTY_NAME"
+                      [width]="405"
+                      (onKeyDown)="onPartyNameEnter($event)"
+                    ></dx-text-box>
+                  </div>
+                </div>
+              </div>
+            </dxi-item>
+
+            <dxi-item location="after" locateInMenu="auto">
+              <div class="stacked-toolbar-group"></div>
+            </dxi-item>
+            <dxi-item location="after" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 5px"
+              >
+                <!-- Row 1: Date only -->
+                <div style="display: flex; gap: 5px; justify-content: flex-end">
+                           <dx-select-box
+                    [width]="200"
+                    [height]="32"
+                    label="Department"
+                    labelMode="floating"
+                     [items]="Company_list"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [(value)]="journalVoucherFormData.DEPT_ID"
+                  >
+
+                  </dx-select-box>
+                  <div *ngIf="journalVoucherFormData">
+               
+                    <dx-date-box
+                      label="Date"
+                      labelMode="floating"
+                      [(value)]="journalVoucherFormData.TRANS_DATE"
+                      [displayFormat]="'dd-MM-yyyy'"
+                      type="date"
+                      [width]="200"
+                      [readOnly]="true"
+                    ></dx-date-box>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 5px">
+                  <div *ngIf="journalVoucherFormData">
+                    <dx-text-box
+                      #narrationRefBox
+                      label="Narration"
+                      labelMode="floating"
+                      [(value)]="journalVoucherFormData.NARRATION"
+                      [width]="405"
+                      (onKeyDown)="onNarrationEnter($event)"
+                    ></dx-text-box>
+                  </div>
+                </div>
+                <!-- Row 2: Beneficiary Name below Date -->
+                <!-- <div style="display: flex; gap: 5px">
+                  <dx-text-box
+                    #partyNameRef
+                    label="Beneficiary Name"
+                    labelMode="floating"
+                    [(value)]="journalVoucherFormData.PARTY_NAME"
+                    [width]="300"
+                    (onKeyDown)="onPartyNameEnter($event)"
+                  ></dx-text-box>
+                </div> -->
+              </div>
+            </dxi-item>
+          </dxo-toolbar>
+          <dxi-column
+            dataField="billNo"
+            caption="Bill No."
+            [allowEditing]="true"
+          ></dxi-column>
+          <dxi-column
+            dataField="ledgerCode"
+            caption="Ledger Code"
+            [width]="130"
+            [lookup]="{
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_CODE',
+              displayExpr: 'HEAD_CODE',
+              searchEnabled: true
+            }"
+          ></dxi-column>
+          <dxi-column
+            dataField="ledgerName"
+            caption="Ledger Name"
+            [lookup]="{
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_NAME',
+              displayExpr: 'HEAD_NAME',
+              searchEnabled: true
+            }"
+          ></dxi-column>
+          <dxi-column
+            dataField="particulars"
+            caption="Particulars"
+            [width]="150"
+            [editorOptions]="{ maxLength: 250 }"
+          >
+            <dxi-validation-rule
+              type="stringLength"
+              [max]="250"
+              message="Max 250 characters allowed"
+            ></dxi-validation-rule>
+          </dxi-column>
+          <dxi-column
+            dataField="debitAmount"
+            caption="Debit Amount"
+            dataType="number"
+            [width]="150"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+            <dxo-validation-rules>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateDebitOrCredit"
+                message="Either Debit or Credit must be entered"
+              ></dxi-validation-rule>
+            </dxo-validation-rules>
+          </dxi-column>
+          <dxi-column
+            dataField="creditAmount"
+            caption="Credit Amount"
+            dataType="number"
+            [width]="150"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+            <dxo-validation-rules>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateDebitOrCredit"
+                message="Either Debit or Credit must be entered"
+              ></dxi-validation-rule>
+            </dxo-validation-rules>
+          </dxi-column>
+          <dxi-column type="buttons">
+            <dxi-button name="edit"></dxi-button>
+            <dxi-button name="delete"></dxi-button>
+          </dxi-column>
+          <dxo-summary>
+            <dxi-total-item
+              column="debitAmount"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            ></dxi-total-item>
+
+            <dxi-total-item
+              column="creditAmount"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            ></dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+        <!-- ✅ Row with Narration and Approve aligned in same row -->
+        <div
+          *ngIf="journalVoucherFormData"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 15px;
+            padding: 0 5px;
+          "
+        >
+          <!-- Narration Text Box (left side) -->
+          <!-- <dx-text-box
+            label="Narration"
+            labelMode="floating"
+            [(value)]="journalVoucherFormData.NARRATION"
+            [width]="400"
+            [showClearButton]="true"
+          ></dx-text-box> -->
+
+          <!-- Approve Checkbox (right side) -->
+          <div *ngIf="journalVoucherFormData" style="margin-top: 10px">
+            <dx-check-box
+              [(value)]="journalVoucherFormData.IS_APPROVED"
+              text="Approve"
+              (onValueChanged)="onApprovedChanged($event)"
+            >
+            </dx-check-box>
+          </div>
+        </div>
+
+        <!-- <div *ngIf="journalVoucherFormData" style="margin-top: 10px">
+  <dx-check-box
+    [(value)]="journalVoucherFormData.IS_APPROVED"
+    text="Approve"
+
+    (onValueChanged)="onApprovedChanged($event)"
+  ></dx-check-box>
+</div> -->
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      (onClick)="cancel()"
+      stylingMode="outlined"
+      type="normal"
+    ></dx-button>
+    <dx-button
+      [text]="
+        journalVoucherFormData?.IS_APPROVED ? 'Update & Commit' : 'Update'
+      "
+      [visible]="canEdit"
+      (onClick)="update()"
+      stylingMode="contained"
+      type="default"
+    >
+    </dx-button>
+  </div>
+</div>

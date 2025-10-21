@@ -1,0 +1,190 @@
+@use "../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+  overflow: auto; 
+}
+
+
+.item-list-container {
+  width: 100%;
+  flex: 1;
+  transition: width 0.3s ease; /* Smooth transition */
+  margin: 0; /* Remove margin to avoid extra space */
+  padding: 0; 
+  overflow-x: auto;
+}
+
+.item-list-collapsed {
+  width: 40%; /* Adjust this percentage to reduce the width when new grid is shown */
+}
+
+.item-list-expanded {
+  width: 100%; /* Full width when new grid is not visible */
+  opacity: 1; /* Ensure visibility */
+  transition: width 0.3s ease, opacity 0.3s ease;
+}
+
+.new-grid-container {
+  width: 100%; /* Full width on small screens */
+  margin-top: 20px; /* Adjust the margin to prevent overlap */
+  // width: 30%; /* Adjust this to the desired width for the new grid */
+  display: flex;
+  justify-content: flex-end;
+  margin: 0; /* Remove margin to avoid extra space */
+  padding: 0; /* Remove padding to avoid unwanted spaces */
+  margin-top: 65px;
+  overflow-x: auto; /* Ensure horizontal scrolling is enabled */
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+  flex-grow: 0;
+  flex-shrink: 1; 
+}
+
+/* Target all column headers for both dynamically generated and static columns */
+.dx-datagrid .dx-header-row {
+  height: 60px; /* Set the same height for all column headers */
+}
+
+/* Ensure vertical alignment of the text within the headers */
+.dx-datagrid .dx-header-row .dx-datagrid-text-content {
+  line-height: 60px; /* Adjust to match the header height */
+}
+
+
+
+.view-wrapper {
+  display: flex;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  flex-direction: row;
+  height: 100%;
+
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
+      }
+    }
+
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
+
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
+  }
+
+  user-panel {
+    display: inherit;
+  }
+}
+
+html, body {
+  height: 100%; /* Ensure the html and body are 100% tall */
+  margin: 0; /* Remove default margin */
+}
+
+.grid-container {
+  height: calc(100vh - 100px); /* Adjust this value based on your layout (e.g., header/footer height) */
+}
+
+.grid {
+  height: 100%; /* Make sure the grid takes full height of the container */
+}
+
+::ng-deep .dx-checkbox-checked.dx-state-readonly .dx-checkbox-icon {
+  color: rgba(17, 17, 17, 0.507);
+  // border: 1px solid rgb(71, 158, 245);
+  // background-color: rgb(71, 158, 245);
+  background-color: rgb(71, 158, 245) !important;
+  border-color: rgb(71, 158, 245) !important;
+  color: white !important; /* Ensures the tick is white */
+}
+::ng-deep .dx-checkbox-unchecked.dx-state-readonly .dx-checkbox-icon{
+  // color: rgba(17, 17, 17, 0.507);
+  background-color: rgb(71, 158, 245) !important;
+    border-color: rgb(71, 158, 245) !important;
+  color: white !important; /* Ensures the tick is white */
+}
+
+::ng-deep .dx-checkbox-checked .dx-checkbox-icon {
+
+  background-color: rgb(71, 158, 245) !important;
+  border-color: rgb(71, 158, 245) !important;
+  color: white !important; /* Ensures the tick is white */
+}
+
+::ng-deep .dx-checkbox.dx-state-readonly .dx-checkbox-icon {
+  border-color: #e5e8f0;
+  border: 1px solid rgb(71, 158, 245);
+}
+::ng-deep .dx-checkbox-icon {
+  font-size: 15px !important; /* Adjust the size of the checkbox */
+  width: 15px;
+  height: 15px;
+}
+
+::ng-deep .dx-checkbox-icon::before, .dx-checkbox-icon::after {
+  content: none; /* Removes the box inside */
+}
+
+::ng-deep .dx-checkbox-indeterminate .dx-checkbox-icon {
+  // border: none;
+  // background-color: rgb(255, 255, 255);
+  // border: 1px solid #5486ff;
+  font-size: 35px;
+}
+
+.bottom-toolbar-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px; /* Adjust this value for spacing between the buttons */
+  margin-right: 10px; /* Adjust this value for spacing from the pagination */
+  width: 100%;
+}
+
+.cancel-button {
+  position: relative;
+  z-index: 10; /* Adjust as necessary */
+}
+
+
+widget * {
+  box-sizing: unset;
+}
+
+/* Remove only the inner square, but keep the checkmark */
+::ng-deep .dx-checkbox-icon::before {
+  background: none !important;  /* Removes the background (inner square) */
+  border: none !important;      /* Removes the border of the inner box */
+}
+
+/* Ensure the checkmark (when checked) is displayed correctly */
+::ng-deep .dx-checkbox-checked .dx-checkbox-icon::after {
+  // content: '\2713'; /* Unicode for a tick mark */
+  font-size: 12px; /* Adjust as per your desired tick size */
+  // color: #000;     /* Color for the checkmark */
+  position: absolute;
+  top: 2px;
+  left: 3px;
+}

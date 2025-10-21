@@ -1,0 +1,242 @@
+ 
+ <dx-validation-group class="form-grid" #formValidationGroup>
+
+<div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
+  
+  <!-- Left side - Document No -->
+  <div>
+    <dx-text-box 
+      label="Document No"
+      labelMode="floating"
+      [readOnly]="true"
+      [(value)]="DepreciationPayload.DOC_NO"
+      style="width: 200px;">
+    </dx-text-box>
+  </div>
+
+  <!-- Right side - Date + Button -->
+  <div style="display: flex; align-items: flex-end; gap: 10px;">
+    <dx-date-box
+      label="Date of Depreciation"
+      placeholder="dd/mm/yyyy"
+      [showClearButton]="true"
+      [useMaskBehavior]="true"
+      [displayFormat]="'dd/MM/yyyy'"
+      type="date"
+      [inputAttr]="{ 'aria-label': 'Date' }"
+      [(value)]="DepreciationPayload.DEPR_DATE"
+      [labelMode]="'floating'"
+      style="width: 250px;"
+      (onValueChanged)="onDateValueChanged($event)"
+      [readOnly]="readOnly">
+    </dx-date-box>
+
+    <dx-button
+      text="Process"
+      stylingMode="contained"
+      type="default"
+      (onClick)="Process_function()"
+      [visible]="isEdit"
+      style="width: 150px;">
+    </dx-button>
+  </div>
+
+</div>
+
+
+<dx-data-grid
+  [showBorders]="true"
+  [selection]="{ mode: 'multiple' }"
+  height="300"
+   [showRowLines]="true"
+      [showColumnLines]="true"
+  class="mt-3"
+  [(selectedRowKeys)]="selectedRowsInGrid"
+   [keyExpr]="'ID'"  
+  [dataSource]="Active_fixed_asset_list"
+  (onSelectionChanged)="onSelectionChanged($event)"
+  (onEditorPreparing)="onEditorPreparing($event)"
+   (onCellValueChanged)="onCellValueChanged($event)"
+     [readOnly]="readOnly"
+  width="100%"
+  [editing]="{
+    mode: 'cell',
+    allowUpdating: false
+  }"
+  
+>
+  <dxo-header-filter [visible]="true"></dxo-header-filter>
+  <dxo-sorting mode="multiple"></dxo-sorting>
+
+  <dxi-column [width]="'100'" dataField="CODE" caption="Code "  [allowEditing]="false" [readOnly]="true">
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+  <dxi-column
+ [width]="'250'"
+    dataField="DESCRIPTION"
+    caption="Description"
+    [editorOptions]="{ showSpinButtons: true }"
+    [allowEditing]="true"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+
+  <dxi-column
+    [width]="'auto'"
+    dataField="PURCH_DATE"
+    caption="Purchase Date"
+    alignment="right"
+    [allowEditing]="true"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+    <dxi-column
+    
+    dataField="ASSET_VALUE"
+    caption="Purchase Value"
+    alignment="right"
+    [width]="'130'"
+     [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+    [allowEditing]="true"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+    <dxi-column
+    [width]="'auto'"
+    dataField="RESIDUAL_VALUE"
+    caption="Residual Value"
+    alignment="right"
+    [allowEditing]="true"
+     [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+    <dxi-column
+    [width]="'auto'"
+    dataField="LAST_DEPR_DATE"
+    caption="Last Depr. Date"
+    alignment="right"
+    [allowEditing]="true"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+    <dxi-column
+    [width]="'auto'"
+    dataField="CURRENT_VALUE"
+    caption="Current Value"
+    alignment="right"
+     [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+    [allowEditing]="true"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+    <dxi-column
+
+    dataField="DEPR_PERCENT"
+    caption="Depreciation %"
+    alignment="right"
+    [width]="'150'"
+    [allowEditing]="true"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+    <dxi-column
+    [width]="'auto'"
+    dataField="Days"
+    caption="Days"
+    [width]="'100'"
+    alignment="right"
+    [allowEditing]="false"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+    <dxi-column
+   
+    dataField="Depreciation_amount"
+    caption="Depreciation Amount"
+    alignment="right"
+     [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+    [width]="180"
+    [allowEditing]="false"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+</dx-data-grid>
+        <div style="display: flex; align-items: center; gap: 30px; margin-left: 50px; margin-top: 20px;">
+  <!-- <dx-check-box 
+    text="Select All"
+    >
+  </dx-check-box> -->
+<div class="dx-field-label" style="margin-left:-10px">
+  Records: {{ recordsCount }}
+</div>
+<!-- <dx-number-box 
+  [(value)]="recordsCount"
+
+  labelMode="floating"
+  [readOnly]="true"
+  label="Records">
+</dx-number-box> -->
+
+
+  <dx-number-box  
+    labelMode="floating"
+  [inputAttr]="{ style: 'text-align: right;' }"
+  style="margin-left:700px"
+   [readOnly]="readOnly"
+   [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+  [(value)]="grandTotal"
+    label="Grand Total">
+  </dx-number-box>
+</div>
+
+         <dx-text-box label="Narration"   [readOnly]="readOnly"  labelMode="floating" [(value)]="DepreciationPayload.NARRATION"></dx-text-box>
+         <dxi-item>    
+         <dx-check-box
+           [(value)]="approveValue"
+              text="Approve"
+                [readOnly]="readOnly"
+              (onValueChanged)="onApprovedChanged($event)"
+              style="margin:10px"
+            
+            >
+            </dx-check-box></dxi-item>
+ </dx-validation-group>
+
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      (onClick)="closePopup()"
+      type="normal"
+    ></dx-button>
+    <dx-button
+       [text]="approveValue ? 'Update & Commit' : 'Update'"
+      stylingMode="contained"
+      type="default"
+      (onClick)="UpdateData()"
+      [visible]="isEdit"
+    ></dx-button>
+  </div>
+</div>

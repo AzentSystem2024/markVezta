@@ -1,0 +1,14 @@
+// .button-container {
+//   display: flex;
+//   justify-content: flex-end; /* pushes buttons to the right */
+//   gap: 10px; /* spacing between buttons */
+// }
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* align right */
+  gap: 10px; /* spacing between buttons */
+}
+
+.btn {
+  margin-top: 12px; /* keep your mt-3 spacing */
+}

@@ -1,0 +1,200 @@
+<div class="view-wrapper list-page">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div><!-- DevExtreme Loading Indicator -->
+  </div>
+
+
+<div class="form-container">
+  <dx-form class="tight-form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <label>Pay Settings
+        <dx-number-box
+        label="Daily Working Hours"
+        [labelMode]="'floating'"
+        width="300px"
+        [(value)]="PaySettings.DAILY_HOURS"
+       >
+      </dx-number-box>
+    </label>
+      </dxi-item>
+      <dxi-item>
+        <label>Ledger Mapping
+        <dx-select-box
+        placeholder="Select.."
+        [(value)]="PaySettings.SAL_EXPENSE_HEAD_ID"
+        [labelMode]="'floating'"
+        [items]="Ledger"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        label="Salary Expense"
+        width="100%">
+        </dx-select-box>
+      </label>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-number-box
+        label="Max OT Hours"
+        [(value)]="PaySettings. MAX_OT_MTS"
+        [labelMode]="'floating'"
+        width="300px">
+      </dx-number-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-select-box
+        displayExpr="LeaveSalary"
+        placeholder="Select.."
+        [(value)]="PaySettings.LS_EXPENSE_HEAD_ID"
+        label="Leave Salary"
+        [labelMode]="'floating'"
+        [items]="Ledger"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        width="100%">
+        </dx-select-box>  
+      </dxi-item>
+    </dxi-item>
+
+
+      <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+        <dxi-item>
+          <dx-number-box
+          label="Normal OT Rate"
+          [(value)]="PaySettings.NORMAL_OT_RATE"
+          width="300px"
+          [labelMode]="'floating'">
+        </dx-number-box>
+        </dxi-item>
+        <dxi-item>
+          <dx-select-box
+          displayExpr="EOS"
+          placeholder="Select.."
+          [(value)]="PaySettings.EOS_EXPENSE_HEAD_ID"
+          [labelMode]="'floating'"
+          [items]="Ledger"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+          width="100%"
+          label="EOS">
+          </dx-select-box>
+          </dxi-item>
+          </dxi-item>
+
+
+      <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+        <dxi-item>
+          <dx-number-box
+          label="Holiday OT Rate"
+          [(value)]="PaySettings.HOLIDAY_OT_RATE"
+          [labelMode]="'floating'"
+          width="300px">
+        </dx-number-box>
+        </dxi-item>
+        <dxi-item>
+          <dx-select-box
+          displayExpr="SalaryPayable"
+          placeholder="Select.."
+          [(value)]="PaySettings.SAL_PAYABLE_HEAD_ID"
+          [labelMode]="'floating'"
+          [items]="Ledger"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+          label="Salary Payable"
+          width="100%">
+          </dx-select-box>
+        </dxi-item>
+        </dxi-item>
+
+        <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+          <dxi-item>
+            <dx-number-box
+            label="Leave Salary Days"
+            [(value)]="PaySettings.LEAVE_SAL_DAYS"
+            [labelMode]="'floating'"
+            width="300px">
+          </dx-number-box>
+          </dxi-item>
+          <dxi-item>
+            <dx-select-box
+            displayExpr="LeaveSalaryPayable"
+            placeholder="Select.."
+            [(value)]="PaySettings. LS_PAYABLE_HEAD_ID"
+            label="Leave Salary Payable"
+            [labelMode]="'floating'"
+            [items]="Ledger"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+            width="100%">
+            </dx-select-box>
+          </dxi-item>
+          </dxi-item>
+
+        <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+          <dxi-item>
+            <dx-text-box
+            label="Labour ID"
+            [(value)]="PaySettings. UQ_LABOUR_ID"
+            [labelMode]="'floating'"
+            width="300px">
+          </dx-text-box>
+          </dxi-item> 
+          <dxi-item>
+            <dx-select-box
+            displayExpr="EOS Payable"
+            [labelMode]="'floating'"
+            placeholder="Select.."
+            [(value)]="PaySettings.EOS_PAYABLE_HEAD_ID"
+            [items]="Ledger"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+            width="100%"
+            label="EOS Payable">
+            </dx-select-box>
+          </dxi-item>
+          </dxi-item>
+
+
+        <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+        <dxi-item>
+          <dx-text-box
+          label="Bank Ac.No"
+          [(value)]="PaySettings.BANK_AC_NO"
+          [labelMode]="'floating'"
+          width="300px">
+        </dx-text-box>
+        </dxi-item>
+        </dxi-item>
+    
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+       <dxi-item>
+        <dx-text-box
+        label="Bank Code"
+       [(value)]="PaySettings.BANK_CODE"
+        [labelMode]="'floating'"
+        width="300px">
+      </dx-text-box>
+      </dxi-item>
+        </dxi-item>
+    
+      
+      <dxi-item class="button-container">
+        <dx-button
+      text="Cancel"
+      type="default"
+      stylingMode="contained">
+      </dx-button>
+
+        <dx-button
+        text="Edit"
+        type="default"
+        (onClick)="editData()"
+        stylingMode="contained">
+        </dx-button>
+    </dxi-item>
+ 
+  </dx-form>
+</div>

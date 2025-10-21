@@ -1,0 +1,87 @@
+<div class="view-wrapper list-page">
+  <div>
+    <dx-data-grid
+      [width]="'100%'"
+      [height]="'530px'"
+      class="grid theme-dependent"
+      [dataSource]="logList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      (onSelectionChanged)="onSelectionChanged($event)"
+      (onEditingStart)="openEditingStart($event)"
+      (onRowRemoving)="onRowRemoving($event)"
+      (onCellPrepared)="onCellPrepared($event)"
+      [keyExpr]="'ID'"
+      [selection]="{ mode: 'single' }"
+    >
+      <dxo-scrolling
+        mode="standard"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+        [allowDeleting]="true"
+      ></dxo-editing>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Store Properties Log</div>
+        </dxi-item>
+        <dxi-item location="after">
+          <dx-button
+            text="Add"
+            icon="plus"
+            type="default"
+            stylingMode="contained"
+            (click)="onAddClick()"
+          ></dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column
+        dataField="ID"
+        caption="ID"
+        [width]="'auto'"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="WS_NO"
+        caption="Work Sheet No."
+        [width]="'auto'"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="WS_DATE"
+        caption="Date"
+        [width]="'auto'"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="Narration"
+        caption="Remarks"
+        [width]="'auto'"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="Status"
+        caption="Status"
+        [width]="'auto'"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column type="buttons" width="150" [buttons]="allButtons">
+      </dxi-column>
+    </dx-data-grid>
+  </div>
+  <!-- <div class="selected-rows-container">
+    Total records: {{ totalRecords }}
+  </div> -->
+</div>

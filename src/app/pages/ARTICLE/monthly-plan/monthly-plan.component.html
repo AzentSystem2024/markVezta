@@ -1,0 +1,472 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'80vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="MonthlyPlanDataSource"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onEditingStart)="onEditingStart($event)"
+      (onRowRemoving)="delete_Monthly_Data($event)"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+        [allowDeleting]="true"
+        [useIcons]="true"
+        editIcon="edit"
+      ></dxo-editing>
+
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Monthly Plan Order</div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+        <dxi-item>
+          <!-- <dx-select-box
+        [(value)]="selectedRange"
+        [dataSource]="dateRanges"
+        displayExpr="label"
+        valueExpr="value"
+        label="Date Range"
+        labelMode="floating"
+        [width]="220"
+        [searchEnabled]="true"
+        [acceptCustomValue]="true"
+        (onValueChanged)="onDateRangeChanged($event)"
+  (onOpened)="attachItemClickHandler($event)"
+      ></dx-select-box> -->
+   
+                            <div *dxTemplate="let data of 'dateFilterTemplate'">
+<dx-select-box
+  [dataSource]="dateRanges"
+  [displayExpr]="displayExpr"
+  valueExpr="value"
+  [(value)]="selectedDateRange"
+  (onValueChanged)="onDateRangeChanged($event)"
+  (onOpened)="attachItemClickHandler($event)"
+  width="250">
+
+  <!-- This controls the dropdown list rendering -->
+  <div *dxTemplate="let item of 'item'">
+    {{ item.value === 'custom' ? 'Custom' : item.label }}
+  </div>
+
+</dx-select-box>
+
+  </div>
+
+    </dxi-item>
+<dxi-item  location="after">  
+    <dx-button
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="openPopup()"
+        ></dx-button></dxi-item>>
+        <!-- <dxi-item
+          location="after"
+          locateInMenu="auto"
+          showText="inMenu"
+          widget="dxButton"
+          [options]="{
+            icon: 'plus',
+            hint: 'Add popup',
+            onClick: openPopup,
+            stylingMode: 'text',
+            text: 'New',
+            elementAttr: { class: 'commonButtons' }
+          }"
+        ></dxi-item> -->
+        <!-- <dxi-item
+          location="after"
+          locateInMenu="auto"
+          showText="inMenu"
+          widget="dxButton"
+          [options]="{
+            hint: 'Add popup',
+            onClick: openPopup,
+            stylingMode: 'text',
+            text: 'New',
+            elementAttr: { class: 'commonButtons' }
+          }"
+        >
+        </dxi-item> -->
+      </dxo-toolbar>
+   
+
+<dxi-column dataField="Number" caption="Number" alignment="left"></dxi-column>
+<dxi-column dataField="Month" caption="Month" alignment="left"></dxi-column>
+<dxi-column dataField="Remarks" caption="Remarks" alignment="left"></dxi-column>
+<dxi-column dataField="Status" caption="Status" alignment="center"></dxi-column>
+
+    <!-- <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value ? 'Inactive ' : 'Active '"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+            
+    </div> -->
+    </dx-data-grid>
+  </div>
+</div>
+<!-- ===============================Add form==================== -->
+<dx-popup
+  [(visible)]="isAddPopup"
+  [width]="'75%'"
+  [height]="'90vh'"
+  title="Monthly Plan"
+  (onHiding)="handleClose()"
+  >
+  <form>
+    <!-- <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px;">
+    
+<dx-text-box   type="text"
+                formControlName="code"
+                label="Code"
+                labelMode="floating"
+                style="flex: 1"
+                width="250px"></dx-text-box>
+ <dx-select-box
+        [(value)]="selectedRange"
+        [dataSource]="dateRanges"
+        displayExpr="label"
+        valueExpr="value"
+        label="Date Range"
+        labelMode="floating"
+        [width]="220"
+        [searchEnabled]="true"
+        [acceptCustomValue]="true"
+        (onValueChanged)="onDateRangeChange($event)"
+      ></dx-select-box>
+    </div> -->
+<div style="display: flex; flex-direction: column; gap: 12px;">
+  
+  <!-- Row 1: Doc No. (left) and Month (right) -->
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center;">
+   
+      <dx-text-box formControlName="docNo"   label="Doc No" labelMode="floating"  width="150px"></dx-text-box>
+    </div>
+    <div style="display: flex; align-items: center; ">
+  
+      <dx-select-box formControlName="month"  label="Month" labelMode="floating"      [width]="220"></dx-select-box>
+        
+    </div>
+  </div>
+
+  <!-- Row 2: Remarks full width -->
+  <div style="display: flex; align-items: center;">
+   
+    <dx-text-box formControlName="remarks"label="Remarks" labelMode="floating" width='500px'></dx-text-box>
+      <dx-check-box
+      style="margin-left: 178px;"
+    [(value)]="includeUnplannedPacking"
+    text="Include Unplanned Packing"
+  ></dx-check-box>
+  </div>
+
+<!-- Row 3 & 4: 3 Boxes on left, Checkbox on right -->
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+  <!-- Left side: 4 text boxes with gap -->
+  <div style="display: flex; gap: 10px;">
+    <dx-text-box width="200px"></dx-text-box>
+    <dx-text-box width="200px"></dx-text-box>
+    <dx-text-box width="200px"></dx-text-box>
+    <dx-text-box width="200px"></dx-text-box>
+  </div>
+
+  <!-- (Optional right-side content here, like a checkbox) -->
+</div>
+
+
+  <!-- Right side: checkbox -->
+</div>
+
+       <dx-data-grid
+       style="margin-top: 20px;"
+              [dataSource]="PackingList"
+              [showBorders]="true"
+              [editing]="{ mode: 'cell', allowUpdating: true }"
+              [height]="'30vh'"
+              [width]="'100%'"              
+          
+            >
+              <dxi-column
+                dataField="CATEGORY"
+                caption="Category"
+                [allowEditing]="false"
+              ></dxi-column>
+              <dxi-column
+                dataField="COLOR"
+                caption="color"
+                dataType="number"
+                  [allowEditing]="false"
+              ></dxi-column>
+                <dxi-column
+                dataField="ART_NO"
+                caption="Art No"
+                [allowEditing]="false"
+              ></dxi-column>
+              <dxi-column
+                dataField="SIZE"
+                caption="Size"
+                dataType="number"
+                [allowEditing]="false"
+              ></dxi-column>
+              <dxi-column
+                dataField="PLAN_TOTAL"
+                caption="Plan Total"
+                dataType="number"
+              ></dxi-column>
+            </dx-data-grid>
+           <div style="display: flex; justify-content: flex-end; padding: 10px;">
+  <dx-number-box
+    [(value)]="PackingDataQty"
+    width="150px"
+    placeholder="Total Pair Qty"
+    [showSpinButtons]="true"
+    [readOnly]="true"
+  >
+    <dx-validator>
+      <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+    </dx-validator>
+  </dx-number-box>
+</div>
+
+              <!-- Popup Footer -->
+      <div
+        class="button-row"
+        style="display: flex; justify-content: flex-end; gap: 10px"
+      >
+        <dx-button
+          stylingMode="contained"
+          text="Cancel"
+          (click)="handleClose()"
+        ></dx-button>
+        <dx-button
+          text="Save"
+          type="default"
+          stylingMode="contained"
+          (onClick)="AddData()"
+        ></dx-button>
+      </div>
+
+  </form>
+  </dx-popup>
+<!-- ===============================Edit form==================== -->
+<dx-popup
+  [(visible)]="isEditPopup"
+  [width]="'75%'"
+  [height]="'85vh'"
+  title="Monthly Plan"
+  (onHiding)="handleClose()"
+  >
+  <form>
+    <!-- <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px;">
+    
+<dx-text-box   type="text"
+                formControlName="code"
+                label="Code"
+                labelMode="floating"
+                style="flex: 1"
+                width="250px"></dx-text-box>
+ <dx-select-box
+        [(value)]="selectedRange"
+        [dataSource]="dateRanges"
+        displayExpr="label"
+        valueExpr="value"
+        label="Date Range"
+        labelMode="floating"
+        [width]="220"
+        [searchEnabled]="true"
+        [acceptCustomValue]="true"
+        (onValueChanged)="onDateRangeChange($event)"
+      ></dx-select-box>
+    </div> -->
+<div style="display: flex; flex-direction: column; gap: 12px;">
+  
+  <!-- Row 1: Doc No. (left) and Month (right) -->
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center;">
+   
+      <dx-text-box formControlName="docNo"   label="Doc No" labelMode="floating"  width="150px"></dx-text-box>
+    </div>
+    <div style="display: flex; align-items: center; ">
+  
+      <dx-select-box formControlName="month"  label="Month" labelMode="floating"     [width]="220"></dx-select-box>
+        
+    </div>
+  </div>
+
+  <!-- Row 2: Remarks full width -->
+  <div style="display: flex; align-items: center;">
+   
+    <dx-text-box formControlName="remarks"label="Remarks" labelMode="floating" width='500px'></dx-text-box>
+      <dx-check-box
+      style="margin-left: 178px;"
+    [(value)]="includeUnplannedPacking"
+    text="Include Unplanned Packing"
+  ></dx-check-box>
+  </div>
+
+<!-- Row 3 & 4: 3 Boxes on left, Checkbox on right -->
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+  <!-- Left side: 4 text boxes with gap -->
+  <div style="display: flex; gap: 10px;">
+    <dx-text-box width="200px"></dx-text-box>
+    <dx-text-box width="200px"></dx-text-box>
+    <dx-text-box width="200px"></dx-text-box>
+    <dx-text-box width="200px"></dx-text-box>
+  </div>
+
+  <!-- (Optional right-side content here, like a checkbox) -->
+</div>
+
+
+  <!-- Right side: checkbox -->
+</div>
+
+       <dx-data-grid
+       style="margin-top: 20px;"
+              [dataSource]="PackingList"
+              [showBorders]="true"
+              [editing]="{ mode: 'cell', allowUpdating: true }"
+              [height]="'30vh'"
+              [width]="'100%'"              
+          
+            >
+              <dxi-column
+                dataField="CATEGORY"
+                caption="Category"
+                [allowEditing]="false"
+              ></dxi-column>
+              <dxi-column
+                dataField="COLOR"
+                caption="color"
+                dataType="number"
+                  [allowEditing]="false"
+              ></dxi-column>
+                <dxi-column
+                dataField="ART_NO"
+                caption="Art No"
+                [allowEditing]="false"
+              ></dxi-column>
+              <dxi-column
+                dataField="SIZE"
+                caption="Size"
+                dataType="number"
+                [allowEditing]="false"
+              ></dxi-column>
+              <dxi-column
+                dataField="PLAN_TOTAL"
+                caption="Plan Total"
+                dataType="number"
+              ></dxi-column>
+            </dx-data-grid>
+           <div style="display: flex; justify-content: flex-end; padding: 10px;">
+  <dx-number-box
+    [(value)]="PackingDataQty"
+    width="150px"
+    placeholder="Total Pair Qty"
+    [showSpinButtons]="true"
+    [readOnly]="true"
+  >
+    <dx-validator>
+      <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+    </dx-validator>
+  </dx-number-box>
+</div>
+
+              <!-- Popup Footer -->
+      <div
+        class="button-row"
+        style="display: flex; justify-content: flex-end; gap: 10px"
+      >
+        <dx-button
+          stylingMode="contained"
+          text="Cancel"
+          (click)="handleClose()"
+        ></dx-button>
+        <dx-button
+          text="Update"
+          type="default"
+          stylingMode="contained"
+          (onClick)="UpdateData()"
+        ></dx-button>
+      </div>
+
+  </form>
+  </dx-popup>
+
+  <!-- =====================date fillter=============== -->
+<dx-popup
+  [(visible)]="showCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="170"
+  [dragEnabled]="false"
+>
+<div>
+  <div class="date-range-container">
+    <dx-date-box
+      [(value)]="customStartDate"
+      type="date"
+      width="300"
+      placeholder="From Date">
+    </dx-date-box>
+
+    <dx-date-box
+      [(value)]="customEndDate"
+      type="date"
+      placeholder="To Date"
+      width="300"
+      >
+    </dx-date-box>
+  </div>
+
+  <div class="button-container">
+    <dx-button text="Apply" type="default" (onClick)="applyCustomDateFilter()"></dx-button>
+  </div>
+</div>
+
+</dx-popup>

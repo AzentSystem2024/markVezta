@@ -1,0 +1,222 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText=" "
+      [width]="'100%'"
+      [height]="'80vh'"
+      [showColumnLines]="true"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="employeeList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true }"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: true }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      (onEditingStart)="onEditEmployee($event)"
+      (onRowRemoving)="onDeleteEmployee($event)"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+      }"
+    >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser>
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <!-- <dxi-item name="exportButton" ></dxi-item> -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
+          <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="true"
+        [formats]="['xlsx', 'pdf']"
+      >
+      </dxo-export>
+      <dxo-header-filter
+        [visible]="true"
+        [search]="{ enabled: true }"
+      ></dxo-header-filter>
+      <!-- <dxo-filter-panel [visible]="true"></dxo-filter-panel> -->
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Employee</div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto">
+      
+          <!-- <dx-button
+            icon="plus"
+            type="default"
+            stylingMode="contained"
+            (onClick)="addEmployee()"
+          ></dx-button> -->
+        </dxi-item>
+                  <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+    <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+  
+               <dxi-item
+               *ngIf="canAdd"
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column dataField="EMP_CODE" caption="Employee Code"></dxi-column>
+      <dxi-column dataField="EMP_NAME" caption="Employee Name"></dxi-column>
+      <dxi-column dataField="CITY" caption="City"></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
+      <dxi-column dataField="DESG_NAME" caption="Designation"></dxi-column>
+      <dxi-column dataField="COUNTRY_NAME" caption="Country"></dxi-column>
+      <dxi-column dataField="STATE_NAME" caption="State"></dxi-column>
+      <!-- <dxi-column
+        dataField="INCENTIVE_PERCENT"
+        caption="Incentive Percent"
+      ></dxi-column> -->
+      <!-- <dxi-column
+        dataField="IQAMA_NO"
+        caption="Iqama No."
+        alignment="right"
+      ></dxi-column> -->
+      <!-- <dxi-column dataField="IQAMA_EXPIRY" caption="IQAMA Expiry"></dxi-column> -->
+
+      <dxi-column
+        dataField="DAMAN_CATEGORY"
+        caption="Daman Category"
+      ></dxi-column>
+      <dxi-column dataField="DAMAN_NO" caption="Daman No"></dxi-column>
+      <dxi-column dataField="IBAN_NO" caption="IBAN No"></dxi-column>
+      <dxi-column
+        dataField="LAST_REJOIN_DATE"
+        caption="Last Rejoin Date"
+         dataType="date"
+        [format]="{ type: 'custom', formatter: formatDates }"
+      ></dxi-column>
+      <dxi-column dataField="LEAVE_CREDIT" caption="Leave Credits"></dxi-column>
+      <dxi-column
+        dataField="LESS_SERVICE_DAYS"
+        caption="Less Service Days"
+      ></dxi-column>
+      <dxi-column dataField="LICENSE_NO" caption="License No."></dxi-column>
+      <dxi-column
+        dataField="LICENSE_EXPIRY"
+        caption="License Expiry"
+        dataType="date" [format]="{ type: 'custom', formatter: formatDates }"
+      ></dxi-column>
+      <dxi-column dataField="PP_NO" caption="PP No."></dxi-column>
+      <dxi-column dataField="PP_EXPIRY"  dataType="date" [format]="{ type: 'custom', formatter: formatDates }" caption="PP Expiry"></dxi-column>
+
+      <!-- <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column> -->
+      <dxi-column dataField="VISA_NO" caption="Visa No."></dxi-column>
+      <dxi-column dataField="VISA_NO" caption="Visa No."></dxi-column>
+      <dxi-column dataField="WORK_PERMIT_NO" caption="Work Permit"></dxi-column>
+      <dxi-column
+        dataField="WORK_PERMIT_EXPIRY"
+        caption="Work Permit Expiry"
+        dataType="date"
+        [format]="{ type: 'custom', formatter: formatDates }"
+      ></dxi-column>
+      <dxi-column
+        dataField="IS_INACTIVE"
+        caption="Status"
+          cellTemplate="statusCellTemplate"
+      ></dxi-column>
+        <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value ? 'Inactive ' : 'Active '"
+        style="margin-left: 10px; cursor: default"
+      ></i>       
+    </div>
+    </dx-data-grid>
+
+    <dx-popup
+      *ngIf="addEmployeePopupOpened"
+      [(visible)]="addEmployeePopupOpened"
+      [width]="'90vw'"
+      [height]="'100vh'"
+      title="Add Employee"
+    >
+      <app-employee-add-form
+        [isOpen]="addEmployeePopupOpened"
+        (formClosed)="onFormClosed($event)"
+      ></app-employee-add-form>
+    </dx-popup>
+  </div>
+</div>
+<dx-popup
+  [(visible)]="editEmployeePopupOpened"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Edit Employee"
+  (onHiding)="handleEditClose()"
+>
+  <app-employee-edit-form
+    [employeeData]="selectedEmployee"
+    (formClosed)="handleEditClose()"
+  ></app-employee-edit-form>
+</dx-popup>

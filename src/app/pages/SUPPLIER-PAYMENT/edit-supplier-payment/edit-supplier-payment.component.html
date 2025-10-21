@@ -1,0 +1,504 @@
+<dx-validation-group #journalVoucherGroup>
+  <div
+    class="invoice-wrapper"
+    style="
+      height: 75vh;
+      display: flex;
+      flex-direction: column;
+
+      box-sizing: border-box;
+    "
+  >
+    <div class="salary-grid-wrapper" style="padding: 0 10px">
+      <div class="grid-container">
+        <dx-data-grid
+          #itemsGridRef
+          [dataSource]="mainGridData"
+          [showBorders]="true"
+          [showRowLines]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="false"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true, allowSearch: true }"
+          [allowColumnReordering]="true"
+          [showColumnHeaders]="true"
+          [columnAutoWidth]="true"
+          [allowColumnResizing]="true"
+          [height]="'40vh'"
+          [columnResizingMode]="'nextColumn'"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="
+            isReadOnlyMode
+              ? { mode: 'none' }
+              : { mode: 'multiple', showCheckBoxesMode: 'always' }
+          "
+          [keyExpr]="'BILL_ID'"
+          (onContentReady)="onGridContentReady($event)"
+          (onSelectionChanged)="onSelectionChanged($event)"
+        >
+          <dxo-editing
+            mode="cell"
+            [allowUpdating]="true"
+            [allowAdding]="false"
+            [allowDeleting]="false"
+          ></dxo-editing>
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-filter-builder [allowHierarchicalFields]="true">
+          </dxo-filter-builder>
+          <dxo-toolbar>
+            <div
+              class="stacked-toolbar-group"
+              style="display: flex; flex-direction: column; gap: 2px"
+            ></div>
+            <dxi-item location="before" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 0px"
+              >
+                <div style="display: flex; gap: 5px">
+                  <dx-text-box
+                    [(value)]="receiptNo"
+                    label="Receipt No"
+                    labelMode="floating"
+                    [width]="200"
+                    [readOnly]="true"
+                  ></dx-text-box>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 2px">
+                  <dx-select-box
+                    #distributorRef
+                    [(value)]="selectedSupplierId"
+                    [dataSource]="supplierList"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="320"
+                    [searchEnabled]="true"
+                    [showClearButton]="true"
+                    label="Supplier"
+                    labelMode="floating"
+                    (onValueChanged)="onSupplierChanged($event)"
+                    [readOnly]="true"
+                  ></dx-select-box>
+                </div>
+              </div>
+            </dxi-item>
+            <dxi-item location="after" locateInMenu="auto">
+              <div class="stacked-toolbar-group"></div>
+            </dxi-item>
+            <dxi-item location="after" locateInMenu="auto">
+              <div style="position: relative; top: 35px">
+                <!-- push it down -->
+                <dx-text-box
+                  [(value)]="paymentDate"
+                  label="Date"
+                  labelMode="floating"
+                  displayFormat="dd-MM-yyyy"
+                  type="date"
+                  [width]="200"
+                  [readOnly]="true"
+                ></dx-text-box>
+              </div>
+            </dxi-item>
+          </dxo-toolbar>
+
+          <dxi-column
+            dataField="DOC_NO"
+            caption="Doc No"
+            [allowEditing]="true"
+            [readOnly]="isReadOnlyMode"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="PURCH_DATE"
+            caption="Date"
+            [allowEditing]="true"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SUPP_INV_NO"
+            caption="Supplier Invoice No"
+            [allowEditing]="true"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="NET_AMOUNT"
+            caption="Inv Amount"
+            [allowEditing]="true"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+            [width]="120"
+          ></dxi-column>
+          <dxi-column
+            dataField="PENDING_AMOUNT"
+            caption="Balance"
+            [allowEditing]="true"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+          </dxi-column>
+          <dxi-column
+            dataField="AMOUNT"
+            caption="Received Amount"
+            [allowEditing]="true"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateReceivedAmount"
+              message="Received Amount must equal Balance"
+            ></dxi-validation-rule>
+          </dxi-column>
+
+          <dxo-summary>
+            <dxi-total-item
+              column="PENDING_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+
+            <dxi-total-item
+              column="Received Amount"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+        <div style="display: flex; justify-content: flex-end; margin-top: 5px">
+          <dx-button
+            *ngIf="!isReadOnlyMode"
+            text="Fill Amount"
+            hint="Fill Amount"
+            icon="plus"
+            type="normal"
+            stylingMode="outlined"
+            class="blue-outline-btn"
+            [disabled]="selectedRowsCount === 0"
+            (onClick)="onFillAmountClick()"
+          ></dx-button>
+        </div>
+        <div
+          class="bordered-grid"
+          style="
+            margin-top: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+          "
+        >
+          <div style="display: flex; justify-content: space-between; gap: 5px">
+            <!-- Left: Payment Details -->
+            <div style="flex: 1">
+              <div class="section-label">Payment Details</div>
+
+              <dx-radio-group
+                [(value)]="selectedPaymentMode"
+                [items]="['Cash', 'Bank', 'Adjustments', 'PDC']"
+                layout="horizontal"
+                label="Mode"
+                labelMode="floating"
+                [width]="'100%'"
+                (onValueChanged)="onReceiptModeChange($event)"
+                [readOnly]="isReadOnlyMode"
+              ></dx-radio-group>
+
+              <div class="dropdown-row">
+                <dx-select-box
+                  [(value)]="ledger"
+                  [dataSource]="filteredLedgerList"
+                  displayExpr="HEAD_NAME"
+                  valueExpr="HEAD_ID"
+                  label="Ledger"
+                  labelMode="floating"
+                  [searchEnabled]="true"
+                  [width]="'100%'"
+                  style="margin-top: 2px"
+                  [readOnly]="isReadOnlyMode"
+                  (onValueChanged)="onLedgerChanged($event)"
+                ></dx-select-box>
+              </div>
+            </div>
+
+            <!-- Right: Bank Remittance -->
+            <div style="flex: 1">
+              <div
+                class="section-label"
+                [ngStyle]="{
+                  color: receiptMode === 'Bank' ? 'inherit' : '#888'
+                }"
+              >
+                Bank Remittance Details
+              </div>
+
+              <div style="display: flex; gap: 10px">
+                <dx-button
+                  icon="search"
+                  stylingMode="outlined"
+                  type="default"
+                  (onClick)="onSearchCheque()"
+                  style="width: 40px; align-self: flex-end"
+                  [disabled]="
+                    !(receiptMode === 'PDC' && !!paymentFormData?.PAY_HEAD_ID)
+                  "
+                ></dx-button>
+
+                <dx-text-box
+                  [(value)]="chequeNo"
+                  label="Reference No"
+                  labelMode="floating"
+                  [width]="'100%'"
+                  [disabled]="
+                    !(receiptMode === 'Bank' || receiptMode === 'PDC')
+                  "
+                  style="flex: 1"
+                  [readOnly]="isReadOnlyMode"
+                ></dx-text-box>
+
+                <dx-date-box
+                  [(value)]="chequeDate"
+                  label="Due Date"
+                  labelMode="floating"
+                  type="date"
+                  displayFormat="dd-MM-yyyy"
+                  [width]="'100%'"
+                  [disabled]="
+                    !(receiptMode === 'Bank' || receiptMode === 'PDC')
+                  "
+                  style="flex: 1"
+                  [readOnly]="isReadOnlyMode"
+                ></dx-date-box>
+              </div>
+
+              <dx-text-box
+                [(value)]="bank"
+                label="Bank Name"
+                labelMode="floating"
+                [width]="'100%'"
+                style="margin-top: 5px"
+                [disabled]="!(receiptMode === 'Bank' || receiptMode === 'PDC')"
+                [readOnly]="isReadOnlyMode"
+              ></dx-text-box>
+            </div>
+          </div>
+
+          <!-- Narration & Amount Row -->
+          <div
+            *ngIf="receiptMode === 'PDC'"
+            style="display: flex; gap: 5px; margin-top: 2px"
+          >
+            <!-- Narration aligned with Ledger -->
+            <div style="flex: 1">
+              <dx-text-box
+                [(value)]="narration"
+                label="Narration"
+                labelMode="floating"
+                [width]="'100%'"
+                [readOnly]="isReadOnlyMode"
+              ></dx-text-box>
+            </div>
+
+            <!-- Amount aligned with Bank side -->
+            <div style="flex: 1">
+              <dx-number-box
+                [(value)]="totalPending"
+                label="Amount"
+                labelMode="floating"
+                [width]="'100%'"
+                [disabled]="!(receiptMode === 'PDC')"
+                [readOnly]="isReadOnlyMode"
+              ></dx-number-box>
+            </div>
+          </div>
+
+          <!-- Narration (non-PDC modes, full width) -->
+          <div *ngIf="receiptMode !== 'PDC'">
+            <dx-text-box
+              [(value)]="narration"
+              label="Narration"
+              labelMode="floating"
+              [width]="'100%'"
+              style="margin-top: 2px"
+              [readOnly]="isReadOnlyMode"
+            ></dx-text-box>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+
+<div
+  style="
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    margin-top: 20px;
+    padding-right: 10px;
+  "
+>
+  <!-- Checkbox right above buttons -->
+  <dx-check-box
+    *ngIf="!isReadOnlyMode"
+    [(value)]="isApproved"
+    text="Approve"
+    [width]="120"
+  ></dx-check-box>
+
+  <!-- Buttons row -->
+  <div style="display: flex; gap: 10px">
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      type="normal"
+      (onClick)="cancel()"
+    ></dx-button>
+
+    <dx-button
+      *ngIf="!isReadOnlyMode"
+      #saveButtonRef
+      [text]="isApproved ? 'Update & Commit' : 'Update'"
+      stylingMode="contained"
+      type="default"
+      (onClick)="saveReceipt()"
+    ></dx-button>
+  </div>
+</div>
+<!-- Only show this section if not in read-only mode -->
+<!-- <ng-container *ngIf="!isReadOnlyMode">
+  <dx-check-box
+    [(value)]="isApproved"
+    text="Approve"
+    stylingMode="outlined"
+    [readOnly]="isReadOnlyMode"
+  ></dx-check-box>
+
+  <div class="form-popup-buttons-container">
+    <div class="popup-footer">
+      <dx-button text="Cancel" stylingMode="outlined" type="normal"></dx-button>
+      <dx-button
+        #saveButtonRef
+        [text]="isApproved ? 'Update and Commit' : 'Update'"
+        stylingMode="contained"
+        type="default"
+        (onClick)="saveReceipt()"
+      ></dx-button>
+    </div>
+  </div>
+</ng-container> -->
+
+<dx-popup
+  [(visible)]="showFillAmountPopup"
+  [width]="400"
+  [height]="300"
+  title="Fill Amount"
+  [showTitle]="true"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+  (onHidden)="resetFillAmountForm()"
+>
+  <div
+    style="
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+      overflow: auto;
+    "
+  >
+    <!-- Display Total Pending Amount (read-only) -->
+    <dx-text-box
+      [value]="totalPending | number : '1.2-2'"
+      label="Total Pending Amount"
+      labelMode="floating"
+      [readOnly]="true"
+    ></dx-text-box>
+
+    <!-- Editable Amount Field -->
+    <dx-number-box
+      [(value)]="fillAmountData.field1"
+      label="Received Amount"
+      labelMode="floating"
+      [showClearButton]="true"
+      [format]="'#,##0.00'"
+      [min]="0"
+      [max]="totalPending"
+      (onValueChanged)="validateAmount($event)"
+    ></dx-number-box>
+
+    <div style="min-height: 16px; font-size: 12px; color: red"></div>
+    <!-- Action Buttons -->
+    <div
+      style="
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      "
+    >
+      <dx-button text="Cancel" stylingMode="outlined" type="normal"></dx-button>
+      <dx-button
+        text="Submit"
+        stylingMode="contained"
+        type="default"
+        (onClick)="submitAmountPopup()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="pdcPopupVisible"
+  [width]="700"
+  [height]="400"
+  [showTitle]="true"
+  title="Select PDC"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-data-grid
+      [dataSource]="pdcList"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [height]="'45vh'"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{
+        mode: 'single',
+        showCheckBoxesMode: 'always'
+      }"
+      (onRowDblClick)="onPdcSelected($event)"
+    >
+      <dxi-column dataField="CHEQUE_NO" caption="Cheque No"></dxi-column>
+      <dxi-column
+        dataField="DUE_DATE"
+        caption="Cheque Date"
+        dataType="date"
+      ></dxi-column>
+      <dxi-column dataField="BANK_NAME" caption="Bank Name"></dxi-column>
+      <dxi-column
+        dataField="AMOUNT"
+        caption="Amount"
+        dataType="number"
+      ></dxi-column>
+    </dx-data-grid>
+  </div>
+</dx-popup>

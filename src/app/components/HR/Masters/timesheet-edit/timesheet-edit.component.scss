@@ -1,0 +1,42 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Prevent any additional scrolling */
+  }
+  .timesheet-form {
+      padding: 20px;
+      // max-height: calc(100vh - 60px);
+      overflow-y: hidden; 
+      gap: 8px;
+      .button-group {
+        margin-top: 20px;
+    
+        dx-button {
+          margin-right: 10px;
+        }
+      }
+    }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 1px;
+    }
+    
+  
+  .popup-footer {
+      display: flex;
+      gap: 10px; /* Space between buttons */
+  }
+  
+  .fixed-footer {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--base-bg); /* or your background */
+    padding: 8px 16px; 
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    z-index: 1000;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }

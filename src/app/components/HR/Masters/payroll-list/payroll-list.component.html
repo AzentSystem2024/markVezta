@@ -1,0 +1,294 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'80vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="payrollList"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: false }"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{
+        mode: 'multiple',
+        showCheckBoxesMode: 'always'
+      }"
+      focusStateEnabled="false"
+      (onEditingStart)="onEditOrViewPayroll($event)"
+      (onRowRemoving)="onDeletePayroll($event)"
+      (onSelectionChanged)="onSelectionChanged($event)"
+      (onToolbarPreparing)="onToolbarPreparing($event)"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="true"
+        [formats]="['xlsx', 'pdf']"
+      >
+      </dxo-export>
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Payroll</div>
+        </dxi-item>
+
+        <dxi-item location="after">
+          <div
+            class="month-selector"
+            style="display: flex; align-items: center; gap: 8px"
+          >
+            <dx-button
+              icon="chevronleft"
+              (onClick)="goToPreviousMonth()"
+            ></dx-button>
+            <span class="month-label" (click)="toggleCalendar()">
+              {{ selectedMonth | date : "MMMM yyyy" }}
+            </span>
+            <dx-button
+              icon="chevronright"
+              (onClick)="goToNextMonth()"
+            ></dx-button>
+          </div>
+          <div *ngIf="calendarVisible" class="calendar-popup">
+            <div class="calendar-header">
+               <dx-button
+    class="year-button"
+    [options]="previousYearButtonOptions"
+  ></dx-button>
+
+  <span class="year-clickable" (click)="toggleYearSelector()">
+    {{ selectedYear }}
+  </span>
+
+  <dx-button
+    class="year-button"
+    [options]="nextYearButtonOptions"
+  ></dx-button>
+            </div>
+
+            <div
+              class="year-selector-popup"
+              *ngIf="yearSelectorVisible"
+              (click)="$event.stopPropagation()"
+            >
+              <div class="year-grid">
+                <div
+                  class="year-option"
+                  *ngFor="let year of years"
+                  (click)="selectYear(year, $event)"
+                >
+                  {{ year }}
+                </div>
+              </div>
+            </div>
+
+            <div class="calendar-body">
+              <div
+                *ngFor="let monthName of monthNames; let idx = index"
+                class="month-cell"
+                [class.selected]="
+                  idx === selectedMonth.getMonth() &&
+                  selectedYear === selectedMonth.getFullYear()
+                "
+                (click)="selectMonthByIndex(idx)"
+              >
+                {{ monthName }}
+              </div>
+            </div>
+          </div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+        *ngIf="canAdd"
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="approveButtonOptions"
+        ></dxi-item>
+
+        <!-- <dxi-item location="after">
+          <dx-button
+            icon="check"
+            text="Approve"
+            stylingMode="outlined"
+            class="blue-outline-btn"
+            (onClick)="approveSelectedPayroll()"
+          ></dx-button>
+        </dxi-item> -->
+      </dxo-toolbar>
+      <dxi-column
+        dataField="SALARY_BILL_NO"
+        caption="Salary Bill No."
+        alignment="left"
+      ></dxi-column>
+      <dxi-column
+        dataField="SAL_MONTH"
+        caption="Date"
+        dataType="date"
+        [format]="{ type: 'custom', formatter: formatDate }"
+      ></dxi-column>
+      <dxi-column dataField="EMPLOYEE_NO" caption="Employee No."></dxi-column>
+      <dxi-column
+        dataField="EMPLOYEE_NAME"
+        caption="Employee Name"
+      ></dxi-column>
+      <dxi-column
+        dataField="WORKED_DAYS"
+        caption="Total Days"
+        alignment="right"
+      ></dxi-column>
+      <dxi-column
+        dataField="NET_AMOUNT"
+        caption="Net Salary"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+
+      <dxi-column
+        caption="Status"
+        dataField="STATUS"
+        [width]="80"
+        [cellTemplate]="statusCellRender"
+        [allowHeaderFiltering]="true"
+        [headerFilter]="{
+          dataSource: getStatusFilterData,
+          encodeHtml: false
+        }"
+      >
+      </dxi-column>
+    </dx-data-grid>
+  </div>
+</div>
+
+<dx-popup
+  [(visible)]="addPayrollPopupOpened"
+  [width]="'60vw'"
+  [height]="'80vh'"
+  title="New Payroll - Select Timesheet - {{ selectedMonthForAdd }}"
+  (onHiding)="handleClose()"
+>
+  <app-payroll-add
+    *ngIf="addPayrollPopupOpened"
+    [selectedMonth]="selectedMonthForAdd"
+    (popupClosed)="handleClose()"
+  ></app-payroll-add>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="editPayrollPopupOpened"
+  [width]="'70vw'"
+  [height]="'85vh'"
+  title="Payroll"
+  (onHiding)="handleClose()"
+>
+  <app-payroll-edit
+    *ngIf="editPayrollPopupOpened"
+    [selectedMonth]="selectedMonthForAdd"
+    [payroll]="selectedPayroll"
+    (popupClosed)="handleClose()"
+  ></app-payroll-edit>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="verifyPayrollPopupOpened"
+  [width]="'75vw'"
+  [height]="'90vh'"
+  title="Payroll"
+  (onHiding)="handleClose()"
+>
+  <app-payroll-verify
+    *ngIf="verifyPayrollPopupOpened"
+    [selectedMonth]="selectedMonthForAdd"
+    [payroll]="selectedPayroll"
+    (popupClosed)="handleClose()"
+  ></app-payroll-verify>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="approvePayrollPopupOpened"
+  [width]="'75vw'"
+  [height]="'90vh'"
+  title="Payroll"
+  (onHiding)="handleClose()"
+>
+  <app-payroll-approve
+    *ngIf="approvePayrollPopupOpened"
+    [selectedMonth]="selectedMonthForAdd"
+    [payroll]="selectedPayroll"
+    (popupClosed)="handleClose()"
+  ></app-payroll-approve>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="viewPayrollPopupOpened"
+  [width]="'75vw'"
+  [height]="'90vh'"
+  title="Payroll"
+  (onHiding)="handleClose()"
+>
+  <app-payroll-view
+    *ngIf="viewPayrollPopupOpened"
+    [selectedMonth]="selectedMonthForAdd"
+    [payroll]="selectedPayroll"
+    (popupClosed)="handleClose()"
+  ></app-payroll-view>
+</dx-popup>

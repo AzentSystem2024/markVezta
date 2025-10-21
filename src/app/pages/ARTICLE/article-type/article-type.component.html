@@ -1,0 +1,141 @@
+
+<div class="view-wrapper list-page">
+<dx-data-grid
+class="grid theme-dependent"
+[dataSource]="Datasource"
+[showBorders]="true"
+[rowAlternationEnabled]="true"
+rowAlternationInterval="2"
+[allowColumnReordering]="true"
+[allowColumnResizing]="true"
+[showColumnLines]="true"
+(onRowRemoved)="delete_Data($event)"
+[height]="'80vh'"
+noDataText=" "
+(onEditingStart)="onEditingStart($event)"
+
+>
+
+ <dxo-filter-row
+  [visible]="isFilterRowVisible"
+></dxo-filter-row>
+
+
+  <dxo-header-filter [visible]="true">
+    <dxo-search [enabled]="true"></dxo-search>
+  </dxo-header-filter>
+
+ 
+     <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+    
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+       [allowDeleting]="canDelete"
+      [allowAdding]="true">
+    <dxo-popup title="Update Department" [showTitle]="true" [width]="600" [height]="300"></dxo-popup>
+    </dxo-editing>
+
+
+  <dxo-toolbar>
+    <dxi-item location="before" locateInMenu="never">
+      <div class="grid-header" style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          ">Article Type</div>
+    </dxi-item>
+
+    <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+ <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+
+     <dxi-item
+      location="after"
+      *ngIf="canAdd"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+  </dxo-toolbar>
+
+  <!-- This field ID optional .Used for displaying data temp -->
+  <dxi-column dataField="SlNo" [width]="80" caption="Sl.No" [allowFiltering]="false" [allowEditing]="false" alignment="left"  [allowHeaderFiltering]="false"></dxi-column>
+
+  <dxi-column dataField="DESCRIPTION" caption="Article Type"></dxi-column>
+
+  
+</dx-data-grid>
+</div>
+
+<form-popup
+    [(visible)]="AddArticleTypePopup"
+   (save)="addData()"
+    titleText="New Article Type">
+
+     <dx-validation-group #formValidationGroup>
+    <dx-form class="plain-styled-form" [formGroup]="formsource">
+        <dxi-item>
+         <dx-text-box
+         label="Description"
+         formControlName="Description">
+         <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Description is required"
+                  ></dxi-validation-rule> </dx-validator>
+        </dx-text-box>
+        </dxi-item>
+
+    </dx-form>
+    </dx-validation-group>
+</form-popup>
+
+<form-popup
+    [(visible)]="UpdateArticleTypePopup"
+    titleText="Update Article Type"
+    (save)="editData()">
+    <dx-validation-group #formValidationGroup>
+    <dx-form class="plain-styled-form">
+        <dxi-item>
+         <dx-text-box
+         label="Description"
+         [(value)]="editingRowData.DESCRIPTION">
+         <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Description is required"
+                  ></dxi-validation-rule> </dx-validator>
+        </dx-text-box>
+        </dxi-item>
+       
+    </dx-form>
+    </dx-validation-group>
+  </form-popup>

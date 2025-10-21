@@ -1,0 +1,144 @@
+<div class="salary-grid-wrapper">
+    <div class="grid-container">
+      <dx-data-grid
+        [dataSource]="revisionGridData"
+        [showBorders]="true"
+        [columnAutoWidth]="false"
+        [wordWrapEnabled]="false"
+        [rowAlternationEnabled]="true"
+        [headerFilter]="{ visible: true }"
+        [allowColumnReordering]="true"
+        [showColumnHeaders]="true"
+        [columnAutoWidth]="true"
+        [allowColumnResizing]="true"
+        [height]="'50vh'"
+        [columnResizingMode]="'nextColumn'"
+        [headerFilter]="{ visible: true }"
+        [scrolling]="{ mode: 'virtual' }"
+        rowAlternationInterval="2"
+        [selection]="{ mode: 'single' }"
+        [editing]="{ mode: 'cell', allowUpdating: true }"
+        (onEditorPreparing)="onEditorPreparing($event)"
+      >
+        <dxo-column-chooser
+          [height]="500"
+          hideOnOutsideClick="true"
+          [enabled]="true"
+          mode="select"
+        >
+        </dxo-column-chooser>
+        <dxo-load-panel [showPane]="false"></dxo-load-panel>
+        <dxo-scrolling mode="standard"></dxo-scrolling>
+        <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
+        <dxo-filter-builder [allowHierarchicalFields]="true">
+        </dxo-filter-builder>
+        <dxo-toolbar>
+          <dxi-item location="before" locateInMenu="auto">
+            <div class="stacked-toolbar-group">
+              <dx-text-box
+                class="custom-select-box"
+                [placeholder]="'Enter Employee Name'"
+                label="Employee Name"
+                [labelMode]="'floating'"
+                [width]="300"
+                [(value)]="revisionFormData.EMP_NAME"
+                [readOnly]="true"
+              >
+              </dx-text-box>
+  
+              <dx-text-box
+                class="custom-select-box"
+                [placeholder]="'Employee Code'"
+                label="Employee Code"
+                [labelMode]="'floating'"
+                [width]="300"
+                [(value)]="revisionFormData.EMP_ID"
+                [readOnly]="true"
+              >
+              </dx-text-box>
+            </div>
+          </dxi-item>
+          <dxi-item location="before" locateInMenu="auto">
+            <div class="stacked-toolbar-group">
+              <dx-date-box
+                displayFormat="dd-MM-yyyy"
+                [(value)]="revisionFormData.REV_DATE"
+                [showClearButton]="true"
+                label="Revision Date"
+                [labelMode]="'floating'"
+                [width]="180"
+                [acceptCustomValue]="false"
+                [showClearButton]="false"
+              ></dx-date-box>
+  
+              <dx-date-box
+                displayFormat="dd-MM-yyyy"
+                [(value)]="revisionFormData.EFFECT_DATE"
+                [showClearButton]="true"
+                label="Effective From"
+                [labelMode]="'floating'"
+                [width]="180"
+                [acceptCustomValue]="false"
+                [showClearButton]="false"
+              ></dx-date-box>
+            </div>
+          </dxi-item>
+  
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="stacked-toolbar-group">
+              <dx-text-box
+                [placeholder]="'Previous Revision On'"
+                [(value)]="employeeSalaryDetails.PREV_REVISION_DATE"
+                label="Previous Revision On"
+                [labelMode]="'floating'"
+                [width]="180"
+                [readOnly]="true"
+                [showClearButton]="false"
+              ></dx-text-box>
+  
+              <dx-number-box
+              [(value)]="increasedByPercent"
+              [placeholder]="'Increased By (%)'"
+              [label]="'Increased By (%)'"
+              [labelMode]="'floating'"
+              [width]="180"
+              (onValueChanged)="onIncreaseChange($event)"
+            ></dx-number-box>
+            </div>
+          </dxi-item>
+        </dxo-toolbar>
+        <dxi-column dataField="code" caption="Code" [allowEditing]="false"></dxi-column>
+        <dxi-column dataField="description" caption="Description" [allowEditing]="false"></dxi-column>
+        <dxi-column dataField="presentAmount" caption="Present Amount" [allowEditing]="false" format="#,##0.00"></dxi-column>
+        <dxi-column dataField="newAmount" caption="New Amount" dataType="number" format="#,##0.##"></dxi-column>
+      </dx-data-grid>
+  
+      <div class="remarks-container">
+        <dx-text-area
+          [placeholder]="'Enter remarks here'"
+          [(value)]="revisionFormData.REMARKS"
+          label="Remarks"
+          [labelMode]="'floating'"
+          [width]="840"
+          rows="4"
+        ></dx-text-area>
+      </div>
+    </div>
+    <div class="form-popup-buttons-container">
+      <div class="popup-footer">
+        <dx-button
+          text="Cancel"
+          stylingMode="outlined"
+          type="normal"
+          (onClick)="handleEditClose()"
+        ></dx-button>
+        <dx-button
+          text="Save"
+          stylingMode="contained"
+          (onClick)="onVerify()"
+          type="default"
+        ></dx-button>
+      </div>
+    </div>
+  </div>
+  

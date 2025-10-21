@@ -1,0 +1,220 @@
+ 
+ <div class="grid-container">
+    <dx-data-grid
+      [dataSource]="CustomerListDataSource"
+      width="100%"
+      noDataText=""
+      height="75vh"
+      width="100%"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+        [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+      }"
+
+      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+       [summary]="summaryColumnsData"
+       (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading...',  }"
+    >
+    
+      <dxo-paging [pageSize]="10"></dxo-paging>
+       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <!-- <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="font-weight: 600; font-size: 20px; margin-left: 12px"
+          >
+            Trial Balance
+          </div>
+        </dxi-item>
+      </dxo-toolbar> -->
+     
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">
+         Customer Statement
+          </div>
+        </dxi-item>
+         <dxi-item>
+           <dx-select-box
+        [width]="200"
+        label="Customer"
+        labelMode="floating"
+         [items]="customer_list"
+    displayExpr="DESCRIPTION"
+    valueExpr="ID"
+    [(value)]="select_customer_id"
+    [searchEnabled]="true"
+    (onValueChanged)="onCompanyChange($event)"
+        >
+
+        </dx-select-box>
+
+        </dxi-item> 
+           <dxi-item>
+           <dx-date-box
+        [width]="200"
+        label="Date From"
+        labelMode="floating"
+  [displayFormat]="'dd-MM-yyyy'"
+    [value]="financialYeaDate"
+
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+      
+
+        </dxi-item>
+           <dxi-item>
+           <dx-date-box
+        [width]="200"
+        label="Date To"
+        labelMode="floating"
+        [displayFormat]="'dd-MM-yyyy'"
+           [value]="defaultDate"
+        (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+
+        </dxi-item>
+        <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
+        
+    <dxi-item>
+      <dx-button
+        text="Apply"
+        type="default"
+        icon="todo"
+        stylingMode="contained"
+        [width]="100"
+        class="mt-2"
+        (onClick)="GET_CUSTOMER_LIST()"
+      >
+      </dx-button>
+    </dxi-item>
+
+    <!-- <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item> -->
+ <dxi-item name="exportButton"></dxi-item>
+    
+      </dxo-toolbar>
+     
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+       <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+   
+
+<!-- <dxi-column dataField="DEPARTMENT_NAME" caption="Department Name" dataType="string"></dxi-column> -->
+ <!-- Customer ID -->
+  <!-- <dxi-column dataField="CUSTOMER_ID" caption="Customer ID" dataType="number"></dxi-column> -->
+
+  <!-- Customer Name -->
+  <dxi-column dataField="CUSTOMER_NAME" caption="Customer Name" dataType="string"></dxi-column>
+  
+  <!-- Age -->
+  <!-- <dxi-column dataField="TRANS_TYPE" caption="Trans type" dataType="number"></dxi-column> -->
+
+
+  <!-- Invoice Date -->
+  <dxi-column dataField="INVOICE_DATE" caption="Invoice Date" dataType="date" format="dd/MM/yyyy"></dxi-column>
+
+  <!-- Invoice No -->
+  <dxi-column dataField="INVOICE_NO" caption="Invoice No" dataType="string"></dxi-column>
+
+  <!-- Reference No -->
+  <dxi-column dataField="REFERENCE_NO" caption="Reference No" dataType="string"></dxi-column>
+
+  <!-- Narration -->
+  <dxi-column dataField="NARRATION" caption="Narration" dataType="string"></dxi-column>
+
+  <!-- Net Amount -->
+  <dxi-column dataField="NET_AMOUNT" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" caption="Net Amount" dataType="number" format="currency"></dxi-column>
+
+  <!-- Received Amount -->
+  <dxi-column dataField="RECEIVED_AMOUNT" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" caption="Received Amount" dataType="number" format="currency"></dxi-column>
+
+  <!-- Return Amount -->
+  <dxi-column dataField="RETURN_AMOUNT" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" caption="Return Amount" dataType="number" format="currency"></dxi-column>
+
+  <!-- Adjusted Amount -->
+  <dxi-column dataField="ADJUSTED_AMOUNT" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" caption="Adjusted Amount" dataType="number" format="currency"></dxi-column>
+
+  <!-- Balance -->
+  <dxi-column dataField="BALANCE" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" caption="Balance" dataType="number" format="currency"></dxi-column>
+
+  <!-- Example: Group by Customer Name -->
+  <!-- <dxi-column dataField="CUSTOMER_NAME" caption="Customer" dataType="string" ></dxi-column> -->
+
+<!-- Group summary for MAIN_GROUP_NAME -->
+
+     <dxi-column  *ngIf="CustomerListDataSource.length > 0" type="buttons" [width]="100">
+  <dxi-button
+    hint="View"
+    icon="eyeopen"  
+    text="View"
+[onClick]="onViewClick.bind(this)"
+  ></dxi-button>
+</dxi-column> 
+
+    </dx-data-grid>
+  </div>
+
+
+
+  <!-- =============================drildown========================= -->
+
+  
+<dx-popup
+  [(visible)]="isViewInvoice"
+  [width]="'90vw'"
+  [height]="'85vh'"
+  title="View Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewInvoice">
+    <app-view-invoice
+      [invoiceFormData]="selectedInvoice"
+      (popupClosed)="handleClose()"
+    ></app-view-invoice>
+  </ng-container>
+</dx-popup>

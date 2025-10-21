@@ -1,0 +1,117 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText=" "
+      [width]="'100%'"
+      [height]="'65vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="timesheetList"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: filterRowVisible, applyFilter: 'auto' }"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+
+      focusStateEnabled="false"
+    >
+      <!-- <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+        [allowDeleting]="true"
+      ></dxo-editing> -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="true"
+        [formats]="['xlsx', 'pdf']"
+      >
+      </dxo-export>
+      <dxo-toolbar>
+        <!-- <dxi-item location="before">
+          <div class="grid-header">Timesheet</div>
+        </dxi-item> -->
+
+        <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            
+            hint="Generate Payroll"
+            text="Generate Payroll"
+            type="default"
+            stylingMode="contained"
+            (onClick)="generatePayroll()"
+          ></dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column dataField="EMP_NO" caption="Employee No." width="120"></dxi-column>
+      <dxi-column
+        dataField="EMP_NAME"
+        caption="Employee Name"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="WORKED_DAYS"
+        caption="Worked Days"
+        alignment="right"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="LESS_HOURS"
+        caption="Less Hours"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="OT_HOURS"
+        caption="OT Hours"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="STATUS"
+        caption="Status"
+        cellTemplate="statusCellTemplate"
+        width="80"
+        alignment="right"
+      >
+      </dxi-column>
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value"
+          style="margin-left: 10px; cursor: default"
+        ></i>
+      </div>
+      
+    </dx-data-grid>
+  </div>
+</div>

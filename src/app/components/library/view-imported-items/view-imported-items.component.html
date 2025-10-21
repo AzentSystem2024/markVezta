@@ -1,0 +1,52 @@
+<div class="view-wrapper list-page">
+    <dx-data-grid
+    class="grid theme-dependent static-header-grid"
+      [dataSource]="datasource"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      [width]="'100%'"
+      [columnAutoWidth]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [elementAttr]="{ class: 'datagrid-class' }"
+    >
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    
+    <dxo-toolbar>
+      <dxi-item location="before">
+          <dx-text-box
+              label="Batch No"
+              labelMode="floating"
+              [(value)]="batchNo"
+              [readOnly]="true"
+              [width]="100"
+          ></dx-text-box>
+      </dxi-item>
+      <dxi-item location="before">
+          <dx-text-box
+              label="Stores Imported"
+              labelMode="floating"
+              [(value)]="storesImported"
+              [readOnly]="true"
+              [width]="400"
+          ></dx-text-box>
+      </dxi-item>
+      <dxi-item location="after">
+          <dx-text-box
+              label="Date"
+              labelMode="floating"
+              [(value)]="date"
+              [readOnly]="true"
+          ></dx-text-box>
+      </dxi-item>
+      <dxi-item location="after">
+          <dx-text-box
+              [(value)]="user"
+              label="User"
+              labelMode="floating"
+              [readOnly]="true"
+          ></dx-text-box>
+      </dxi-item>
+  </dxo-toolbar>
+    </dx-data-grid>
+</div>

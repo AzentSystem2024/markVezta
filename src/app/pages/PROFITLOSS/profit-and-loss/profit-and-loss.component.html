@@ -1,0 +1,167 @@
+<div class="grid-container">
+  <dx-data-grid
+    #dataGrid
+    [dataSource]="ProfitLossReport"
+    width="100%"
+    height="83vh"
+    [showBorders]="true"
+    [showRowLines]="true"
+    [allowColumnResizing]="false"
+    [showColumnLines]="true"
+    [columnAutoWidth]="true"
+    [groupPanel]="{ visible: true }"
+    [grouping]="{ autoExpandAll: true }"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [remoteOperations]="false"
+     (onCellPrepared)="onCellPrepared($event)"
+    (onRowPrepared)="onRowPrepared($event)"
+    [allowColumnReordering]="true"
+    [filterRow]="{ visible: false }"
+   
+    
+    id="dataGrid"
+    [headerFilter]="{ visible: false }"
+    [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+    [columnFixing]="{
+      enabled: true,
+      texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+    }"
+    (onExporting)="onExporting($event)"
+    [loadPanel]="{ enabled: false, text: 'Loading...',  }"
+   
+   
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="true"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Profit & Loss
+        </div>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-date-box
+          [width]="200"
+          label="Date From"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          [width]="200"
+          label="Date To"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+      </dxi-item>
+      <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
+
+      <dxi-item>
+        <dx-button
+          text="Apply"
+          type="default"
+          icon="todo"
+          stylingMode="contained"
+          [width]="100"
+          class="mt-2"
+          (onClick)="get_DataSource()"
+        >
+        </dx-button>
+      </dxi-item>
+
+      <dxi-item name="exportButton"></dxi-item>
+    </dxo-toolbar>
+
+    <dxo-grouping
+      [autoExpandAll]="true"
+      [contextMenuEnabled]="true"
+      [expandMode]="'rowClick'"
+    ></dxo-grouping>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+
+  
+    <dxi-column
+      dataField="TYPE_NAME"
+      caption="Category"
+      dataType="string"
+      [groupIndex]="0"
+    ></dxi-column>
+    <dxi-column
+      dataField="MAIN_GROUP_NAME"
+      caption="Group"
+      alignment="left"
+      dataType="number"
+      [groupIndex]="1"
+    ></dxi-column>
+    <dxi-column dataField="HEAD_NAME" caption="Particulars"></dxi-column>
+    <dxi-column
+      dataField="AMOUNT"
+      caption="Amount"
+      dataType="number"
+      format="#,##0.00"
+    ></dxi-column>
+
+    <!-- Group summary for MAIN_GROUP_NAME -->
+ <dxo-summary >
+    <dxi-group-item
+      column="AMOUNT"
+      summaryType="sum"
+      [alignByColumn]="true"
+      displayFormat="Total: {0}"
+      valueFormat="#,##0.00"
+      >
+    </dxi-group-item>
+
+     <dxi-total-item
+      column="AMOUNT"
+      summaryType="sum"
+      displayFormat="">
+    </dxi-total-item>
+  
+  </dxo-summary>
+
+    <dxi-column
+      *ngIf="ProfitLossReport.length > 0"
+      type="buttons"
+      [width]="100"
+    >
+      <dxi-button
+        hint="View"
+        icon="eyeopen"
+        text="View"
+        [onClick]="onViewClick.bind(this)"
+      ></dxi-button>
+    </dxi-column>
+  </dx-data-grid>
+  
+</div>

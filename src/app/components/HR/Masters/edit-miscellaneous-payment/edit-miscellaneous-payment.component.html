@@ -1,0 +1,322 @@
+<dx-validation-group #journalVoucherGroup>
+  <div
+    class="invoice-wrapper"
+    style="
+      height: 86vh;
+      display: flex;
+      flex-direction: column;
+
+      box-sizing: border-box;
+    "
+  >
+    <div class="salary-grid-wrapper" style="padding: 0 10px">
+      <div class="grid-container">
+        <dx-data-grid
+          #itemsGridRef
+          [dataSource]="pendingInvoicelist"
+          [showBorders]="true"
+          [showRowLines]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="false"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true, allowSearch: true }"
+          [allowColumnReordering]="true"
+          [showColumnHeaders]="true"
+          [columnAutoWidth]="true"
+          [allowColumnResizing]="true"
+          [height]="'45vh'"
+          [columnResizingMode]="'nextColumn'"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+          [keyboardNavigation]="{ editOnKeyPress: true }"
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: true,
+            allowDeleting: true,
+            allowAdding: true,
+            useIcons: true
+          }"
+          (onEditorPreparing)="onEditorPreparing($event)"
+          (onRowRemoved)="onRowRemoved($event)"
+        >
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-filter-builder [allowHierarchicalFields]="true">
+          </dxo-filter-builder>
+          <dxo-toolbar>
+            <div
+              class="stacked-toolbar-group"
+              style="display: flex; flex-direction: column; gap: 2px"
+            ></div>
+            <dxi-item location="before" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 0px"
+              >
+                <div style="display: flex; gap: 5px">
+                  <dx-text-box
+                    [(value)]="pendingNo"
+                    label="Payment No"
+                    labelMode="floating"
+                    [width]="200"
+                  ></dx-text-box>
+
+
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 2px">
+                  <dx-text-box
+                  #beneficiaryNameRef
+                    [(value)]="miscFormData.PARTY_NAME"
+                    label="Beneficiary Name"
+                    labelMode="floating"
+                    [width]="335"
+                    (onEnterKey)="focusTaxRegn()"
+                  ></dx-text-box>
+                </div>
+              </div>
+            </dxi-item>
+
+            <dxi-item location="after" locateInMenu="auto">
+              <div class="stacked-toolbar-group"></div>
+            </dxi-item>
+            <dxi-item location="after" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 0px"
+              >
+                <div style="display: flex; gap: 5px">
+                  <dx-date-box
+                    [(value)]="miscFormData.TRANS_DATE"
+                    label="Date"
+                    labelMode="floating"
+                    [width]="200"
+                    displayFormat="dd-MM-yyyy"
+                  ></dx-date-box>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 2px">
+                  <dx-text-box
+                  #taxRegnRef
+                    [(value)]="miscFormData.VAT_REGN"
+                    [label]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Regtn No' : ' GST Regtn No'" 
+                    labelMode="floating"
+                    [width]="200"
+                    (onEnterKey)="focusGridFirstCell()"
+                  ></dx-text-box>
+                </div>
+                <!--  -->
+              </div>
+            </dxi-item>
+          </dxo-toolbar>
+          <dxi-column
+            dataField="LEDGER_CODE"
+            caption="Ledger Code"
+            [width]="130"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_CODE',
+              displayExpr: 'HEAD_CODE',
+              searchEnabled: true
+            }"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="LEDGER_NAME"
+            caption="Ledger Name"
+            [width]="200"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_NAME',
+              displayExpr: 'HEAD_NAME',
+              searchEnabled: true
+            }"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="REMARKS"
+            caption="Description"
+            [allowEditing]="true"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="AMOUNT"
+            caption="Amount"
+            [allowEditing]="true"
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="VAT_PERCENT"
+              [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Regtn No' : ' GST Regtn No'" 
+            [allowEditing]="true"
+            [width]="120"
+          ></dxi-column>
+          <dxi-column
+            dataField="VAT_AMOUNT"
+        
+                [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Amount' : ' GST Amount'" 
+            [allowEditing]="true"
+            [calculateCellValue]="calculateTaxAmount"
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          ></dxi-column>
+
+          <dxi-column type="buttons">
+            <dxi-button name="edit"></dxi-button>
+            <dxi-button name="delete"></dxi-button>
+          </dxi-column>
+
+          <dxo-summary>
+            <dxi-total-item
+              column="AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+
+            <dxi-total-item
+              column="VAT_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+
+        <!-- Fill Amount Button below grid -->
+        <div
+          style="display: flex; justify-content: flex-end; margin-top: 5px"
+        ></div>
+        <!-- Two-column box: Bank Details (left) and Receipt Details (right) -->
+        <div
+          class="bordered-grid"
+          style="
+            margin-top: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+          "
+        >
+          <!-- Row: Two columns side by side -->
+          <div style="display: flex; justify-content: space-between; gap: 5px">
+            <!-- Left: Receipt Details -->
+            <div style="flex: 1">
+              <div class="section-label">Payment Details</div>
+
+              <dx-radio-group
+                [(value)]="receiptMode"
+                [items]="['Cash', 'Bank', 'Adjustments']"
+                layout="horizontal"
+                label="Mode"
+                labelMode="floating"
+                [width]="'100%'"
+                (onValueChanged)="onReceiptModeChange($event)"
+                [readOnly]="isReadOnlyMode"
+              ></dx-radio-group>
+
+              <dx-select-box
+              id="payHeadIdField"
+                [(value)]="miscFormData.HEAD_ID"
+                [dataSource]="filteredLedgerList"
+                displayExpr="HEAD_NAME"
+                valueExpr="HEAD_ID"
+                label="Ledger"
+                labelMode="floating"
+                [searchEnabled]="true"
+                [width]="'100%'"
+                style="margin-top: 2px"
+                [readOnly]="isReadOnlyMode"
+              ></dx-select-box>
+            </div>
+
+            <!-- Right: Bank Remittance Details -->
+            <div style="flex: 1">
+              <!-- Dimmed or highlighted section label -->
+              <div
+                class="section-label"
+                [ngStyle]="{
+                  color: receiptMode === 'Bank' ? 'inherit' : '#888'
+                }"
+              >
+                Bank Remittance Details
+              </div>
+
+              <!-- Cheque No & Due Date -->
+              <div style="display: flex; gap: 10px">
+                <dx-text-box
+                  [(value)]="miscFormData.CHEQUE_NO"
+                  label="Cheque No"
+                  labelMode="floating"
+                  [width]="'100%'"
+                  [disabled]="receiptMode !== 'Bank'"
+                  [readOnly]="isReadOnlyMode"
+                  style="flex: 1"
+                ></dx-text-box>
+
+                <dx-date-box
+                  [(value)]="miscFormData.CHEQUE_DATE"
+                  label="Due Date"
+                  labelMode="floating"
+                  type="date"
+                  displayFormat="dd-MM-yyyy"
+                  [width]="'100%'"
+                  [disabled]="receiptMode !== 'Bank'"
+                  [readOnly]="isReadOnlyMode"
+                  style="flex: 1"
+                ></dx-date-box>
+              </div>
+
+              <!-- Bank Name -->
+              <dx-text-box
+                [(value)]="miscFormData.BANK_NAME"
+                label="Bank Name"
+                labelMode="floating"
+                [width]="'100%'"
+                style="margin-top: 5px"
+                [disabled]="receiptMode !== 'Bank'"
+                [readOnly]="isReadOnlyMode"
+              ></dx-text-box>
+            </div>
+          </div>
+
+          <!-- Row: Narration spanning both columns -->
+          <div>
+            <dx-text-box
+              [(value)]="miscFormData.NARRATION"
+              label="Narration"
+              labelMode="floating"
+              [width]="'100%'"
+              style="margin-top: 2px"
+              [readOnly]="isReadOnlyMode"
+            ></dx-text-box>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+<div *ngIf="!isReadOnlyMode">
+  <div style="margin: -5px; display: flex; align-items: right; gap: 5px">
+    <dx-check-box [(value)]="isApproved" text="Approve"></dx-check-box>
+  </div>
+</div>
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button text="Cancel" stylingMode="outlined" type="normal" (onClick)="cancel()"></dx-button>
+    <dx-button
+      #saveButtonRef
+      [text]="isApproved ? 'Update & Commit' : 'Update'"
+      stylingMode="contained"
+      type="default"
+      (onClick)="onSave()"
+    ></dx-button>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<dx-form class="plain-styled-form" >
+    <dxi-item itemType="group">
+      <dxo-col-count-by-screen
+        [xs]="1"
+        [sm]="1"
+        [md]="1"
+        [lg]="1"
+      ></dxo-col-count-by-screen>
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="CODE"
+            [(value)]="formVatclassData.CODE"
+           labelMode="floating"
+            (keypress)="keyPressCode($event)"
+          >
+          </dx-text-box>
+        </div>
+      </dxi-item>
+  
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="VAT NAME"
+            [(value)]="formVatclassData.VAT_NAME"
+           labelMode="floating"
+            (keypress)="keyPressVatname($event)"
+          >
+          </dx-text-box>
+        </div>
+      </dxi-item>
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="VAT PERC"
+            [(value)]="formVatclassData.VAT_PERC"
+           labelMode="floating"
+           
+          >
+          </dx-text-box>
+        </div>
+      </dxi-item>
+
+    </dxi-item>
+  </dx-form>
+  
+
+     <div style="margin-top: 20px;
+    margin-left: 60%;
+        display: flex
+;
+    gap: 20px;
+">
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      (onClick)="closePopup()"
+      type="normal"
+    ></dx-button>
+    <dx-button
+      text="Save"
+      stylingMode="contained"
+      type="default"
+      (onClick)="UpdateData()"
+    ></dx-button>
+  </div>

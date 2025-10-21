@@ -1,0 +1,101 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    noDataText=""
+    height="100%"
+    [dataSource]="dataSource"
+    [showBorders]="true"
+    [allowColumnReordering]="true"
+    (onExporting)="onExporting($event)"
+    (onRowRemoving)="onRowRemoving($event)"
+    (onRowUpdating)="onRowUpdating($event)"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-editing mode="row" [allowUpdating]="true" [allowDeleting]="true">
+    </dxo-editing>
+
+    <dxo-pager [visible]="true" [showPageSizeSelector]="true"></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-sorting mode="multiple"></dxo-sorting>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <dxo-column-chooser [enabled]="true"></dxo-column-chooser>
+    <dxo-search-panel
+      [visible]="true"
+      placeholder="Contact Search"
+    ></dxo-search-panel>
+    <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header">Denials</div>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add Denials"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addContact()"
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          text: 'Refresh',
+          icon: 'refresh',
+          onClick: refresh,
+          stylingMode: 'text'
+        }"
+      ></dxi-item>
+      <dxi-item location="after" locateInMenu="auto">
+        <div class="separator"></div>
+      </dxi-item>
+      <dxi-item name="exportButton"></dxi-item>
+      <dxi-item location="after" locateInMenu="auto">
+        <div class="separator"></div>
+      </dxi-item>
+      <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
+      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    </dxo-toolbar>
+
+    <dxo-selection mode="multiple"></dxo-selection>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+
+    <dxi-column dataField="CODE"></dxi-column>
+    <dxi-column dataField="DESCRIPTION"></dxi-column>
+    <dxi-column dataField="TYPE_ID" caption="TYPE">
+      <dxo-lookup
+        [dataSource]="Denial_Type_DropDownData"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+      >
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column dataField="CATEGORY_ID" caption="CATEGORY">
+      <dxo-lookup
+        [dataSource]="Denial_category_DropDownData"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+      >
+      </dxo-lookup>
+    </dxi-column>
+  </dx-data-grid>
+
+  <form-popup
+    [(visible)]="isAddContactPopupOpened"
+    (save)="onClickSaveNewContact()"
+    titleText="New Denial"
+  >
+    <contact-new-form></contact-new-form>
+  </form-popup>
+</div>

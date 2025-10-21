@@ -1,0 +1,331 @@
+<!-- Grid Section -->
+<dx-tab-panel
+  class="innert-tab custom-article-tabs"
+  [(selectedIndex)]="selectedTabIndex"
+  [animationEnabled]="true"
+  [deferRendering]="false"
+>
+  <dxi-item title="Details">
+    <div style="margin-top: 8px">
+      <div class="form-grid">
+        <!-- 2-column form fields -->
+        <div class="form-field">
+          <dx-text-box
+            label="Art No."
+            [(value)]="articleData.ART_NO"
+            labelMode="floating"
+            placeholder="Art No."
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-select-box
+            label="Color"
+            [(value)]="articleData.COLOR"
+            labelMode="floating"
+            placeholder="Color"
+            [dataSource]="colorList"
+            valueExpr="DESCRIPTION"
+            displayExpr="DESCRIPTION"
+            [searchEnabled]="true"
+            (onValueChanged)="onColorChanged($event)"
+          >
+          </dx-select-box>
+        </div>
+
+        <div class="form-field">
+          <dx-select-box
+            label="Category"
+            labelMode="floating"
+            placeholder="Category"
+            [dataSource]="categoryList"
+            valueExpr="ID"
+            displayExpr="DESCRIPTION"
+            [searchEnabled]="true"
+            [(value)]="articleData.CATEGORY_ID"
+            (onValueChanged)="getCategory()"
+          >
+          </dx-select-box>
+        </div>
+        <div class="form-field">
+          <dx-select-box
+            label="Type"
+            labelMode="floating"
+            placeholder="Type"
+            [(value)]="articleData.ARTICLE_TYPE"
+            [dataSource]="typeList"
+            valueExpr="ID"
+            displayExpr="DESCRIPTION"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </div>
+
+        <div class="form-field">
+          <dx-select-box
+            label="Brand"
+            labelMode="floating"
+            placeholder="Brand"
+            [(value)]="articleData.BRAND_ID"
+            [dataSource]="brandList"
+            valueExpr="ID"
+            displayExpr="DESCRIPTION"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Packing Qty"
+            [(value)]="articleData.PACK_QTY"
+            labelMode="floating"
+            placeholder="Packing Qty"
+          ></dx-text-box>
+        </div>
+
+        <div class="form-field">
+          <dx-number-box
+            label="Price"
+            [(value)]="articleData.PRICE"
+            [format]="'#,##0.##'"
+            labelMode="floating"
+            placeholder="Price"
+            [min]="0"
+            [showSpinButtons]="true"
+          ></dx-number-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Next Serial No."
+            [(value)]="articleData.NEXT_SERIAL"
+            labelMode="floating"
+            placeholder="Next Serial No."
+          ></dx-text-box>
+        </div>
+
+        <div class="form-field">
+          <dx-text-box
+            label="Part No."
+            [(value)]="articleData.PART_NO"
+            labelMode="floating"
+            placeholder="Part No."
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-select-box
+            label="Unit"
+            labelMode="floating"
+            placeholder="Unit"
+            [(value)]="articleData.UNIT_ID"
+            [dataSource]="produCtionUnits"
+            valueExpr="ID"
+            displayExpr="DESCRIPTION"
+            [searchEnabled]="true"
+            (onValueChanged)="onUnitChanged($event)"
+          >
+          </dx-select-box>
+          <!--  -->
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Alias"
+            [(value)]="articleData.ALIAS_NO"
+            labelMode="floating"
+            placeholder="Alias"
+          ></dx-text-box>
+        </div>
+
+        <div class="form-field">
+          <dx-select-box
+            label="Supplier"
+            labelMode="floating"
+            placeholder="Supplier"
+            [dataSource]="materialUnits"
+            valueExpr="ID"
+            displayExpr="DESCRIPTION"
+            [searchEnabled]="true"
+            [(value)]="articleData.SUPPLIER_ID"
+            (onValueChanged)="onSupplierChanged($event)"
+          >
+          </dx-select-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Last Order No."
+            labelMode="floating"
+            placeholder="Last Order No."
+            [(value)]="lastOrderNo"
+            [readOnly]="true"
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Description"
+            [(value)]="articleData.DESCRIPTION"
+            labelMode="floating"
+            placeholder="Description"
+            [value]="defaultDescription"
+          ></dx-text-box>
+        </div>
+        <div class="form-field component-with-buttons">
+          <div class="component-input-group">
+            <dx-text-box
+              label="Component"
+              [(value)]="articleData.ComponentArticleName"
+              labelMode="floating"
+              placeholder="Component"
+              [readOnly]="true"
+              [disabled]="articleData.IS_COMPONENT"
+            >
+            </dx-text-box>
+
+            <!-- <div class="button-group-inline">
+              <dx-button
+                text="Attach"
+                stylingMode="outlined"
+                type="default"
+                (onClick)="openAttachPopup()"
+              >
+              </dx-button>
+              <dx-button
+                text="Clear"
+                stylingMode="outlined"
+                (onClick)="clearComponentArticleId()"
+                type="normal"
+              >
+              </dx-button>
+            </div> -->
+          </div>
+        </div>
+        <div class="checkbox-container">
+          <dx-check-box text="Create packing on saving"></dx-check-box>
+          <!-- <dx-check-box text="Used as component for another article"></dx-check-box> -->
+        </div>
+        <div class="checkbox-container">
+          <!-- <dx-check-box text="Create packing automatically"></dx-check-box> -->
+          <dx-check-box
+            text="Used as component for another article"
+            [(value)]="articleData.IS_COMPONENT"
+            [disabled]="!!articleData.COMPONENT_ARTICLE_ID"
+          ></dx-check-box>
+        </div>
+        <!-- <div class="arrival-info">
+  Show as new arrival for <strong>30</strong> days.
+</div> -->
+        <div class="form-field"></div>
+
+        <!-- Image + Grid (Right Side) -->
+        <div class="image-grid-wrapper">
+          <div class="form-field image-field">
+            <label class="image-upload-box">
+              <input type="file" (change)="onImageSelected($event)" hidden />
+              <ng-container *ngIf="!imagePreview"> </ng-container>
+              <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview" />
+            </label>
+          </div>
+
+          <!-- Size Grid -->
+          <dx-data-grid
+            [dataSource]="articleSizeData"
+            keyExpr="SizeValue"
+            [showBorders]="true"
+            [columnAutoWidth]="true"
+            [rowAlternationEnabled]="true"
+            [width]="'100%'"
+            [height]="'35vh'"
+            class="article-size-grid"
+            [selection]="{ mode: 'multiple' }"
+            [selectedRowKeys]="sizeGridSelectedKeys"
+            (onSelectionChanged)="onSizeSelectionChanged($event)"
+          >
+            <dxi-column
+              dataField="SizeValue"
+              caption="Size"
+              sortOrder="asc"
+            ></dxi-column>
+            <dxi-column dataField="OrderNo" caption="Order No."></dxi-column>
+          </dx-data-grid>
+        </div>
+      </div>
+    </div>
+  </dxi-item>
+  <!-- Footer Buttons -->
+
+  <dxi-item title="Attach Component">
+    <div style="margin-top: 16px">
+      <div
+        class="popup-content"
+        style="height: 100%; display: flex; flex-direction: column"
+      >
+        <!-- Data Grid -->
+        <div style="flex: 1; overflow: hidden">
+          <dx-data-grid
+            [dataSource]="attachGridData"
+            [showBorders]="true"
+            [columnAutoWidth]="true"
+            [rowAlternationEnabled]="true"
+            [height]="'100%'"
+            keyExpr="ID"
+            [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
+            [selectedRowKeys]="selectedAttachRowKeys"
+            (onSelectionChanged)="onAttachRowSelected($event)"
+          >
+            <dxo-paging [enabled]="true" [pageSize]="10"></dxo-paging>
+            <dxo-pager
+              [visible]="true"
+              [allowedPageSizes]="allowedPageSizes"
+              [displayMode]="displayMode"
+              [showPageSizeSelector]="showPageSizeSelector"
+              [showInfo]="true"
+              [showNavigationButtons]="true"
+            ></dxo-pager>
+            <dxo-load-panel [showPane]="false"></dxo-load-panel>
+            <dxo-scrolling mode="standard"></dxo-scrolling>
+            <dxo-filter-row
+              [visible]="isFilterRowVisible"
+              [applyFilter]="'auto'"
+            ></dxo-filter-row>
+            <dxi-column dataField="ART_NO" caption="Art No."></dxi-column>
+            <dxi-column dataField="COLOR" caption="Color"></dxi-column>
+            <dxi-column
+              dataField="CATEGORY_NAME"
+              caption="Category"
+            ></dxi-column>
+            <dxi-column
+              dataField="ARTICLE_TYPE_NAME"
+              caption="Type"
+            ></dxi-column>
+          </dx-data-grid>
+        </div>
+
+        <!-- Button aligned to bottom right -->
+        <div
+          style="display: flex; justify-content: flex-end; padding: 10px 0 0 0"
+        >
+          <dx-button
+            text="Add"
+            type="default"
+            [disabled]="!selectedAttachRow"
+            (onClick)="attachComponent()"
+          ></dx-button>
+        </div>
+      </div>
+    </div>
+  </dxi-item>
+</dx-tab-panel>
+
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      (onClick)="closePopup()"
+      stylingMode="outlined"
+      type="normal"
+    ></dx-button>
+    <dx-button
+      text="Update"
+      (onClick)="updateArticle()"
+      stylingMode="contained"
+      type="default"
+    ></dx-button>
+  </div>
+</div>

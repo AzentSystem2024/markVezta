@@ -1,0 +1,494 @@
+<div id="quotationForm">
+  <dx-validation-group #creditNoteGroup>
+    <div class="quotation-page">
+      <dx-tab-panel class="custom-tab-panel" [selectedIndex]="0">
+        <!-- First Tab: Quotation Details -->
+        <dxi-item title="Quotation Details">
+          <div class="tab-content" style="margin-top: 10px">
+            <div class="quotation-grid-wrapper">
+              <div class="grid-container">
+                <dx-data-grid
+                  #itemsGridRef
+                  [dataSource]="quotationFormData.Details"
+                  [showBorders]="true"
+                  [showColumnLines]="true"
+                  [columnAutoWidth]="true"
+                  [rowAlternationEnabled]="true"
+                  [allowColumnReordering]="true"
+                  [allowColumnResizing]="true"
+                  [height]="'50vh'"
+                  [columnResizingMode]="'nextColumn'"
+                  [scrolling]="{ mode: 'virtual' }"
+                  rowAlternationInterval="2"
+                  [selection]="{ mode: 'single' }"
+                  [editing]="{
+                    mode: 'cell',
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: !isReadOnlyMode
+                  }"
+                  (onEditorPreparing)="onEditorPreparing($event)"
+                  (onContentReady)="onGridReady($event)"
+                >
+                  <dxo-load-panel [showPane]="false"></dxo-load-panel>
+                  <dxo-toolbar>
+                    <!-- Toolbar Before -->
+                    <dxi-item location="before" locateInMenu="auto">
+                      <div class="stacked-toolbar-group">
+                        <div style="display: flex; gap: 5px">
+                          <dx-date-box
+                            label="Date"
+                            labelMode="floating"
+                            [(value)]="quotationFormData.QTN_DATE"
+                            [width]="200"
+                            displayFormat="dd-MM-yyyy"
+                            [readOnly]="true"
+                          ></dx-date-box>
+                          <dx-text-box
+                            label="Quotation No"
+                            labelMode="floating"
+                            [(value)]="quotationFormData.QTN_NO"
+                            [width]="200"
+                            [readOnly]="isReadOnlyMode"
+                          ></dx-text-box>
+                        </div>
+
+                        <div style="margin-top: -4px; display: flex; gap: 10px">
+                          <dx-select-box
+                            [dataSource]="customer"
+                            displayExpr="DESCRIPTION"
+                            [(value)]="quotationFormData.CUST_ID"
+                            valueExpr="ID"
+                            [width]="405"
+                            [searchEnabled]="true"
+                            label="Customer"
+                            labelMode="floating"
+                            [readOnly]="isReadOnlyMode"
+                            (onValueChanged)="customerChanged($event)"
+                          ></dx-select-box>
+                        </div>
+                        <div style="margin-top: -6px; display: flex; gap: 10px">
+                          <dx-text-box
+                            label="Contact Name"
+                            labelMode="floating"
+                            [(value)]="quotationFormData.CONTACT_NAME"
+                            [width]="405"
+                            [readOnly]="isReadOnlyMode"
+                          ></dx-text-box>
+                        </div>
+                      </div>
+                    </dxi-item>
+
+                    <!-- Toolbar After -->
+                    <dxi-item location="after" locateInMenu="auto">
+                      <div class="stacked-toolbar-group">
+                        <div
+                          style="display: flex; align-items: center; gap: 5px"
+                        >
+                          <!-- Reference No -->
+                          <dx-text-box
+                            label="Reference No"
+                            labelMode="floating"
+                            [(value)]="quotationFormData.REF_NO"
+                            [width]="200"
+                            [readOnly]="isReadOnlyMode"
+                          ></dx-text-box>
+
+                          <!-- Plus Button -->
+                          <dx-button
+                            icon="plus"
+                            stylingMode="outlined"
+                            type="default"
+                            hint="Add Row"
+                            (onClick)="addNewRow()"
+                            [disabled]="isReadOnlyMode"
+                            [elementAttr]="{ class: 'small-btn' }"
+                          ></dx-button>
+                        </div>
+                        <div style="margin-top: -4px; text-align: left">
+                          <dx-select-box
+                            [(value)]="quotationFormData.SALESMAN_ID"
+                            [dataSource]="salesman"
+                            displayExpr="DESCRIPTION"
+                            valueExpr="ID"
+                            [width]="405"
+                            [searchEnabled]="true"
+                            label="Salesman"
+                            labelMode="floating"
+                            [readOnly]="isReadOnlyMode"
+                          ></dx-select-box>
+                        </div>
+                        <div style="margin-top: -6px; text-align: left">
+                          <dx-text-box
+                            label="Subject"
+                            labelMode="floating"
+                            [(value)]="quotationFormData.SUBJECT"
+                            [width]="405"
+                            [readOnly]="isReadOnlyMode"
+                          ></dx-text-box>
+                        </div>
+                      </div>
+                    </dxi-item>
+                  </dxo-toolbar>
+
+                  <!-- Grid Columns -->
+                  <dxi-column
+                    caption="Sl No"
+                    [allowEditing]="false"
+                    width="70"
+                    [calculateCellValue]="calculateSerialNumber"
+                  >
+                  </dxi-column>
+
+                  <dxi-column
+                    dataField="ITEM_ID"
+                    [visible]="false"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="ITEM_CODE"
+                    caption="Item Code"
+                    [lookup]="{
+                      dataSource: items,
+                      valueExpr: 'ITEM_ID',
+                      displayExpr: 'ITEM_CODE'
+                    }"
+                    [width]="250"
+                  >
+                  </dxi-column>
+
+                  <dxi-column
+                    dataField="DESCRIPTION"
+                    caption="Description"
+                    [allowEditing]="true"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="MATRIX_CODE"
+                    caption="Matrix Code"
+                    [allowEditing]="false"
+                    [visible]="matrixCode"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="REMARKS"
+                    caption="Remarks"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="UOM"
+                    caption="UOM"
+                    [allowEditing]="false"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="TAX_PERCENT"
+                    [caption]="
+                      selected_vat_id == sessionData.VAT_ID &&
+                      sessionData.VAT_ID == 2
+                        ? ' VAT %'
+                        : ' GST %'
+                    "
+                    dataType="number"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="STOCK_QTY"
+                    caption="Quantity"
+                    [allowEditing]="false"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="PRICE"
+                    caption="Price"
+                    [allowEditing]="true"
+                    dataType="number"
+                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="GROSS_AMOUNT"
+                    caption="Gross Amount"
+                    [allowEditing]="false"
+                    [calculateCellValue]="calculateGrossAmount"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="DISC_PERCENT"
+                    caption="Discount%"
+                    [allowEditing]="true"
+                    dataType="number"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="AMOUNT"
+                    caption="Amount"
+                    [allowEditing]="true"
+                    [calculateCellValue]="calculateAmount"
+                    dataType="number"
+                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="TAX_AMOUNT"
+                    [caption]="
+                      selected_vat_id == sessionData.VAT_ID &&
+                      sessionData.VAT_ID == 2
+                        ? ' VAT Amount'
+                        : ' GST Amount'
+                    "
+                    [allowEditing]="true"
+                    [calculateCellValue]="calculateVatAmount"
+                    dataType="number"
+                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="TOTAL_AMOUNT"
+                    caption="Total"
+                    [allowEditing]="false"
+                    [calculateCellValue]="calculateTotal"
+                    dataType="number"
+                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                  ></dxi-column>
+
+                  <dxo-summary>
+                    <dxi-total-item
+                      column="GROSS_AMOUNT"
+                      summaryType="sum"
+                      displayFormat="Gross: {0}"
+                      [valueFormat]="'#.00'"
+                    ></dxi-total-item>
+                    <dxi-total-item
+                      column="STOCK_QTY"
+                      summaryType="sum"
+                      displayFormat="Total Qty: {0}"
+                      [valueFormat]="'#.00'"
+                    ></dxi-total-item>
+                    <dxi-total-item
+                      column="AMOUNT"
+                      summaryType="sum"
+                      displayFormat="Total Amount: {0}"
+                      [valueFormat]="'#.00'"
+                    ></dxi-total-item>
+                    <dxi-total-item
+                      column="TAX_AMOUNT"
+                      summaryType="sum"
+                      [displayFormat]="taxSummaryLabel"
+                      [valueFormat]="'#.00'"
+                    ></dxi-total-item>
+                    <dxi-total-item
+                      column="TOTAL_AMOUNT"
+                      summaryType="sum"
+                      displayFormat="Grand Total: {0}"
+                      [valueFormat]="'#.00'"
+                    ></dxi-total-item>
+                  </dxo-summary>
+
+                  <dxi-column type="buttons" [width]="50">
+                    <dxi-button icon="info" hint="Info" [onClick]="onInfoClick">
+                    </dxi-button>
+                  </dxi-column>
+
+                  <dxi-column type="buttons" [width]="50">
+                    <dxi-button name="delete"></dxi-button>
+                  </dxi-column>
+                </dx-data-grid>
+
+                <!-- Footer Terms & Conditions, Net Amount, Remarks, Round Off -->
+                <div class="form-footer">
+                  <div class="footer-left">
+                    <p class="section-heading">Terms and Conditions</p>
+                    <dx-select-box
+                      [(value)]="quotationFormData.PAY_TERM_ID"
+                      [dataSource]="paymentTerms"
+                      displayExpr="DESCRIPTION"
+                      valueExpr="ID"
+                      [width]="385"
+                      [searchEnabled]="true"
+                      label="Payment"
+                      labelMode="floating"
+                      [readOnly]="isReadOnlyMode"
+                    ></dx-select-box>
+                    <dx-select-box
+                      [(value)]="quotationFormData.DELIVERY_TERM_ID"
+                      [dataSource]="deliveryTerms"
+                      displayExpr="DESCRIPTION"
+                      valueExpr="ID"
+                      [width]="385"
+                      [searchEnabled]="true"
+                      label="Delivery"
+                      labelMode="floating"
+                      [readOnly]="isReadOnlyMode"
+                    ></dx-select-box>
+                    <dx-text-box
+                      #narrationRef
+                      [(value)]="quotationFormData.VALID_DAYS"
+                      label="Validity"
+                      labelMode="floating"
+                      [width]="385"
+                      class="narration-box"
+                      [readOnly]="isReadOnlyMode"
+                    ></dx-text-box>
+                  </div>
+
+                  <div class="footer-right">
+                    <div class="net-amount-wrapper">
+                      <dx-check-box
+                        text="Round Off"
+                        class="roundoff-checkbox"
+                        textPosition="before"
+                        [(value)]="isRoundOff"
+                        (onValueChanged)="onRoundOffChange($event)"
+                        [readOnly]="isReadOnlyMode"
+                      ></dx-check-box>
+                      <dx-text-box
+                        [(value)]="quotationFormData.NET_AMOUNT"
+                        label="Net Amount"
+                        labelMode="floating"
+                        [readOnly]="true"
+                        [width]="290"
+                      ></dx-text-box>
+                    </div>
+                    <div class="net-amount-wrapper">
+                      <dx-text-box
+                        [(value)]="quotationFormData.NARRATION"
+                        label="Remarks"
+                        labelMode="floating"
+                        [width]="405"
+                      ></dx-text-box>
+                    </div>
+                    <dx-check-box
+                      *ngIf="isEditing && !isReadOnlyMode"
+                      [(value)]="isApproved"
+                      text="Approve"
+                      class="approve-checkbox"
+                    ></dx-check-box>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </dxi-item>
+
+        <!-- Second Tab: Other List -->
+        <dxi-item title="Terms & Conditions">
+          <div class="tab-content" style="margin-top: 20px">
+            <dx-data-grid
+              [dataSource]="combinedTerms"
+              [showBorders]="true"
+              [showColumnLines]="true"
+              [columnAutoWidth]="true"
+              [rowAlternationEnabled]="true"
+              [allowColumnReordering]="true"
+              [allowColumnResizing]="true"
+              [height]="'70vh'"
+              [columnResizingMode]="'nextColumn'"
+              [scrolling]="{ mode: 'virtual' }"
+              rowAlternationInterval="2"
+              [selection]="{ mode: 'single' }"
+              [rowDragging]="rowDraggingOptions"
+            >
+              <dxo-editing
+                mode="cell"
+                [allowUpdating]="true"
+                [allowAdding]="true"
+                [allowDeleting]="true"
+              ></dxo-editing>
+
+              <dxo-paging [pageSize]="10"></dxo-paging>
+              <dxo-pager
+                [visible]="true"
+                [allowedPageSizes]="allowedPageSizes"
+                [displayMode]="displayMode"
+                [showPageSizeSelector]="showPageSizeSelector"
+                [showInfo]="true"
+                [showNavigationButtons]="true"
+              ></dxo-pager>
+              <dxo-load-panel [showPane]="false"></dxo-load-panel>
+              <dxo-scrolling mode="standard"></dxo-scrolling>
+              <dxo-filter-row
+                [visible]="isFilterRowVisible"
+                [applyFilter]="auto"
+              ></dxo-filter-row>
+              <dxo-header-filter [visible]="isFilterOpened">
+                <dxo-search [enabled]="true"></dxo-search>
+              </dxo-header-filter>
+              <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+              <dxo-filter-builder [allowHierarchicalFields]="true">
+              </dxo-filter-builder>
+              <dxo-toolbar>
+                <dxi-item
+                  location="after"
+                  locateInMenu="auto"
+                  widget="dxButton"
+                  [visible]="canAdd"
+                  [options]="addButtonOptions"
+                  [disabled]="isReadOnlyMode"
+                ></dxi-item>
+              </dxo-toolbar>
+              <dxi-column
+                caption="SL No"
+                [width]="70"
+                [allowEditing]="false"
+                cellTemplate="slNoTemplate"
+              ></dxi-column>
+              <dxi-column dataField="TERMS" caption="Terms"></dxi-column>
+              <div *dxTemplate="let data of 'slNoTemplate'">
+                {{ data.rowIndex + 1 }}
+              </div>
+            </dx-data-grid>
+          </div>
+        </dxi-item>
+      </dx-tab-panel>
+
+      <!-- Common Save / Cancel Buttons -->
+      <!-- Common Save / Cancel Buttons -->
+      <div
+        class="common-footer"
+        style="
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+          margin-top: 20px;
+        "
+      >
+        <dx-button
+          text="Cancel"
+          (onClick)="cancel()"
+          stylingMode="outlined"
+          type="normal"
+        ></dx-button>
+        <dx-button
+          *ngIf="!isReadOnlyMode"
+          [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
+          (onClick)="saveQuotation()"
+          stylingMode="contained"
+          type="default"
+        ></dx-button>
+        <dx-button
+          *ngIf="isReadOnlyMode"
+          text="Print"
+          (onClick)="printQuotation()"
+          stylingMode="contained"
+          type="default"
+        ></dx-button>
+      </div>
+    </div>
+  </dx-validation-group>
+</div>
+<dx-popup
+  [(visible)]="popupVisible"
+  [showTitle]="true"
+  title="Quotation History"
+  [width]="600"
+  [height]="400"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div *ngIf="quotationHistory?.length > 0">
+    <dx-data-grid
+      [dataSource]="quotationHistory"
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+    >
+      <dxi-column dataField="SL_NO" caption="Sl No"></dxi-column>
+      <dxi-column dataField="ITEM_CODE" caption="Quotation No"></dxi-column>
+      <dxi-column dataField="DESCRIPTION" caption="Date"></dxi-column>
+      <dxi-column dataField="Quantity" caption="Customer Name"></dxi-column>
+      <dxi-column dataField="Price" caption="Ref no"></dxi-column>
+      <dxi-column dataField="Total" caption="Quantity"></dxi-column>
+      <dxi-column dataField="Total" caption="UOM"></dxi-column>
+      <dxi-column dataField="Total" caption="Unit Price"></dxi-column>
+    </dx-data-grid>
+  </div>
+  <div *ngIf="!quotationHistory?.length">No history found.</div>
+</dx-popup>

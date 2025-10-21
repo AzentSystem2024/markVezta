@@ -1,0 +1,302 @@
+<dx-validation-group #creditNoteGroup>
+  <div class="invoice-wrapper">
+    <div class="salary-grid-wrapper">
+      <div class="grid-container">
+        <dx-data-grid
+          #itemsGridRef
+          [dataSource]="invoiceFormData.SALE_DETAILS"
+          [showBorders]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="true"
+          [rowAlternationEnabled]="true"
+          [allowColumnReordering]="true"
+          [allowColumnResizing]="true"
+          [height]="'55vh'"
+          [columnResizingMode]="'nextColumn'"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+          [editing]="{
+            mode: 'cell',
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: !isReadOnlyMode
+          }"
+        >
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-toolbar>
+            <dxi-item location="before" locateInMenu="auto">
+              <div class="stacked-toolbar-group">
+                <div style="display: flex; gap: 5px">
+                  <dx-date-box
+                    label="Date"
+                    labelMode="floating"
+                    [(value)]="invoiceFormData.TRANS_DATE"
+                    [width]="200"
+                    displayFormat="dd-MM-yyyy"
+                    [readOnly]="true"
+                  ></dx-date-box>
+                  <dx-text-box
+                    label="Transfer No"
+                    labelMode="floating"
+                    [(value)]="voucherNo"
+                    [width]="200"
+                    [readOnly]="true"
+                  ></dx-text-box>
+                </div>
+
+                <div style="margin-top: -4px; display: flex; gap: 20px">
+                  <dx-select-box
+                    [dataSource]="customer"
+                    [(value)]="invoiceFormData.CUST_ID"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="405"
+                    [searchEnabled]="true"
+                    label="Customer"
+                    labelMode="floating"
+                    [readOnly]="isReadOnlyMode"
+                    (onValueChanged)="customerChanged($event)"
+                  ></dx-select-box>
+                </div>
+              </div>
+            </dxi-item>
+
+            <dxi-item location="after" locateInMenu="auto">
+              <div class="stacked-toolbar-group">
+                <dx-text-box
+                  label="Ref No"
+                  labelMode="floating"
+                  [(value)]="invoiceFormData.REF_NO"
+                  [width]="200"
+                  [readOnly]="true"
+                  [readOnly]="isReadOnlyMode"
+                ></dx-text-box>
+                <div style="margin-top: 2px; text-align: left">
+                  <dx-button
+                    text="Add Items"
+                    icon="event"
+                    type="default"
+                    [width]="200"
+                    stylingMode="outlined"
+                    class="blue-outline-btn"
+                    (onClick)="onAddItems()"
+                    [disabled]="!selectedCustomerId || isReadOnlyMode"
+                  >
+                  </dx-button>
+                </div>
+              </div>
+            </dxi-item>
+          </dxo-toolbar>
+          <!-- <dxi-column dataField="SL_NO" caption="Sl No"></dxi-column> -->
+          <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
+
+          <dxi-column
+            dataField="DESCRIPTION"
+            caption="Description"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="QUANTITY"
+            caption="Quantity"
+            [allowEditing]="false"
+            [width]="100"
+          ></dxi-column>
+          <dxi-column
+            dataField="PRICE"
+            caption="Price"
+            [allowEditing]="!isReadOnlyMode"
+          ></dxi-column>
+          <dxi-column
+            dataField="AMOUNT"
+            caption="Amount"
+            dataType="number"
+            format="#,##0.00"
+            [width]="120"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateAmount"
+          ></dxi-column>
+          <dxi-column
+            dataField="GST"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT %'
+                : ' GST %'
+            "
+            dataType="number"
+            format="#,##0.00"
+            [width]="80"
+            [allowEditing]="true"
+          ></dxi-column>
+          <dxi-column
+            dataField="TAX_AMOUNT"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT Amount'
+                : ' GST Amount'
+            "
+            dataType="number"
+            format="#,##0.00"
+            [width]="100"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateTaxAmount"
+          ></dxi-column>
+          <dxi-column
+            dataField="TOTAL_AMOUNT"
+            caption="Total"
+            dataType="number"
+            format="#,##0.00"
+            [width]="120"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateTotalAmount"
+          ></dxi-column>
+          <dxo-summary>
+            <dxi-total-item
+              column="AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Net Amount: {0}"
+              alignment="right"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="TAX_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Tax Amount: {0}"
+              alignment="right"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="TOTAL_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Amount: {0}"
+              alignment="right"
+            ></dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+        <div class="form-footer">
+          <!-- Narration stays in left -->
+          <div class="footer-left">
+            <dx-text-box
+              #narrationRef
+              label="Narration"
+              labelMode="floating"
+              [(value)]="invoiceFormData.NARRATION"
+              class="narration-box"
+              [readOnly]="isReadOnlyMode"
+            ></dx-text-box>
+          </div>
+
+          <!-- Buttons + Approve checkbox grouped together -->
+          <div class="footer-right">
+            <!-- <dx-text-box
+              label="Net Amount"
+              labelMode="floating"
+              [readOnly]="true"
+            ></dx-text-box> -->
+            <dx-check-box
+              *ngIf="isEditing && !isReadOnlyMode"
+              [(value)]="isApproved"
+              text="Approve"
+              class="approve-checkbox"
+            ></dx-check-box>
+
+            <div class="footer-actions">
+              <dx-button
+                text="Cancel"
+                (onClick)="cancel()"
+                stylingMode="outlined"
+                type="normal"
+              ></dx-button>
+              <dx-button
+                *ngIf="!isReadOnlyMode"
+                [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
+                (onClick)="saveInvoice()"
+                stylingMode="contained"
+                type="default"
+              ></dx-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+<dx-popup
+  [(visible)]="isPopupVisible"
+  [width]="800"
+  [height]="500"
+  [showTitle]="true"
+  title="Items"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+  (onHiding)="onPopupHiding()"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-data-grid
+      #popupGridRef
+      [dataSource]="pendingDeliveries"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [height]="'60vh'"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+
+      <dxo-toolbar>
+        <div
+          class="stacked-toolbar-group"
+          style="display: flex; flex-direction: column; gap: 2px"
+        ></div>
+        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
+
+        <dxi-item location="after">
+          <div class="toolbar-button-wrapper">
+            <dx-button
+              text="Select Items"
+              icon="check"
+              type="default"
+              stylingMode="contained"
+              (onClick)="onSelectItems()"
+              class="blue-outline-btn"
+            ></dx-button>
+          </div>
+        </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+      </dxo-toolbar>
+      <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
+
+      <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+      <dxi-column dataField="DELIVERY_DATE" caption="Date"></dxi-column>
+      <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
+    </dx-data-grid>
+  </div>
+</dx-popup>

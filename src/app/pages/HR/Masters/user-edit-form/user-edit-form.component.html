@@ -1,0 +1,312 @@
+<div class="tabs-demo view-wrapper">
+  <div class="widget-container">
+    <!-- User Details Section with Hide/Show Button -->
+    <div style="display: flex; align-items: center; margin-bottom: 10px">
+      <label style="font-weight: bold; font-size: 16px; margin-right: 10px"
+        >User Details:</label
+      >
+      <dx-button
+        icon="{{ showUserDetails ? 'chevronup' : 'chevrondown' }}"
+        type="default"
+        (onClick)="toggleUserDetails()"
+        [elementAttr]="{
+          style: 'background-color: transparent; border: none; color: #000;'
+        }"
+        stylingMode="text"
+      ></dx-button>
+    </div>
+
+    <div *ngIf="showUserDetails">
+      <!-- User Details Form in Two Columns -->
+      <div
+        class="user-details"
+        style="display: flex; flex-wrap: wrap; gap: 20px"
+      >
+        <div class="form-column" style="flex: 2">
+          <dx-text-box
+            [(value)]="newUserData.USER_NAME"
+            label="User Name"
+            hint="User Name"
+             labelMode="floating"
+            (input)="onUserNameInput($event)"
+          >`        
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="User Name is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+
+          <div style="position: relative; display: flex">
+           <dx-text-box
+                  [(value)]="newUserData.PASSWORD"
+                   labelMode="floating"
+                  label="Password"
+                  class="form-control"
+                  label="Password"
+                  hint="Password"
+                  [inputAttr]="{ autocomplete: 'new-password' }"
+                  [mode]="passwordMode"
+                  [buttons]="[
+                    {
+                      name: 'togglePassword',
+                      location: 'after',
+                      options: {
+                        icon:
+                          passwordMode === 'password'
+                            ? 'fas fa-eye'
+                            : 'fas fa-eye-slash',
+                        stylingMode: 'text',
+                        onClick: togglePasswordVisibility
+                      }
+                    }
+                  ]"
+                >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="Password is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-text-box>
+             
+          </div>
+
+ <div style="display: flex">
+            <dx-select-box
+              label="Mobile"
+              [searchEnabled]="true"
+              [acceptCustomValue]="false"
+              [(value)]="countryCode"
+              [items]="countryCodes"
+              [displayExpr]="countryCodeDisplay"
+              valueExpr="data.dial_code"
+              [width]="200"
+              placeholder="+1"
+               labelMode="floating"
+              [dropDownOptions]="{ width: '370px' }"
+              hint="Country Code"
+              (onValueChanged)="updateMobileNumber()"
+              (onOpened)="onDropdownOpened()"
+              (onClosed)="onDropdownClosed()"
+            >
+              <!-- Custom template for the dropdown list items -->
+              <div *dxTemplate="let item of 'item'">
+                <span>{{ item.data.flag }} </span>
+                <span>{{ item.data.dial_code }} </span>
+                <span>{{ item.data.name }}</span>
+              </div>
+
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Country code is required"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+
+            <dx-text-box
+              label="No."
+              [(value)]="newUserData.MOBILE"
+               labelMode="floating"
+              [width]="'100%'"
+              style="margin-left: 10px"
+              hint="Mobile No"
+              [valueChangeEvent]="'input'"
+              (input)="onMobileInputChange($event)"
+              [maxLength]="17"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Mobile No is required"
+                ></dxi-validation-rule>
+                <dxi-validation-rule
+                  type="custom"
+                  message="Mobile no. must be at least 10 digits long"
+                  [validationCallback]="MobileNumberValidate"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
+
+           <dx-text-box
+            label="Whatsapp No"
+             labelMode="floating"
+            [(value)]="newUserData.WHATSAPP_NO"
+            (input)="validateWhatsapp($event)"
+            hint="Whatsapp No"
+            (onFocusIn)="autoBindWhatsapp()"
+            [maxLength]="17"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Whatsapp no. is required"
+              ></dxi-validation-rule>
+              <dxi-validation-rule
+                type="custom"
+                message="Mobile no. must be at least 10 digits long"
+                [validationCallback]="WhatsappValidate"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+
+         
+        </div>
+
+        <div class="form-column" style="flex: 2">
+          <dx-text-box
+            label="Login Name"
+             labelMode="floating"
+            [(value)]="newUserData.LOGIN_NAME"
+            hint="Login Name"
+            (input)="onLoginNameInput($event)"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Login Name is required"
+              ></dxi-validation-rule>
+              <dxi-validation-rule
+                type="custom"
+                message="Login Name already exists"
+                [validationCallback]="checkLoginNameExists"
+              ></dxi-validation-rule>
+              <dxi-validation-rule
+                type="stringLength"
+                min="5"
+                message="Login Name must be at least 5 characters long"
+              ></dxi-validation-rule>
+              <dxi-validation-rule
+                type="stringLength"
+                max="20"
+                message="Login Name cannot exceed 20 characters"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+
+          <dx-select-box
+            label="User Role"
+             labelMode="floating"
+            [(value)]="newUserData.USER_ROLE"
+            [items]="userRole"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            placeholder="Select User Role"
+            hint="User Role"
+          >
+        
+          </dx-select-box>
+
+          <dx-text-box
+            label="Email"
+            [(value)]="newUserData.EMAIL"
+            hint="Email"
+             labelMode="floating"
+            (input)="onEmailInput($event)"
+          >
+     
+          </dx-text-box>
+
+           <div
+          style="
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            margin-top: 10px;
+          "
+        >
+          <dx-check-box
+            [(value)]="newUserData.IS_INACTIVE"
+            text="Inactive"
+            stylingMode="outlined"
+            hint="Inactive"
+          ></dx-check-box>
+  
+        </div>
+
+        </div>
+         
+        </div>
+      </div>
+    </div>
+
+        <dx-data-grid
+          [dataSource]="CompanyList_data"
+          [showBorders]="true"
+          [selection]="{ mode: 'multiple' }"
+          height="300"
+          keyExpr="ID"
+          class="mt-3"
+        [(selectedRowKeys)]="selectedRows"
+  (onSelectionChanged)="onSelectionChanged($event)"
+          width="100%"
+        >
+          <dxo-header-filter [visible]="true"></dxo-header-filter>
+          <dxo-sorting mode="multiple"></dxo-sorting>
+
+          <dxi-column
+            [width]="'200'"
+            dataField="COMPANY_CODE"
+            caption="Company Code "
+          >
+            <dxo-header-filter [allowSelectAll]="false">
+              <dxo-search [enabled]="true"></dxo-search>
+            </dxo-header-filter>
+          </dxi-column>
+          <dxi-column
+            [width]="'auto'"
+            dataField="COMPANY_NAME"
+            caption="Company Name"
+          >
+            <dxo-header-filter [allowSelectAll]="false">
+              <dxo-search [enabled]="true"></dxo-search>
+            </dxo-header-filter>
+          </dxi-column>
+
+
+        </dx-data-grid>
+        <!-- Display selected row count -->
+      <div>
+          <!-- <div style="margin-top: 10px">
+            Selected Rows: {{ selectedRowCount }}
+          </div> -->
+          <!-- <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+            <dx-button
+            type="default"
+            text="Update"
+            (onClick)="Update_data()"
+            
+            >
+            </dx-button>
+            <dx-button
+            type="default"
+            text="Cancel"
+      (click)="Closepop()"
+      [elementAttr]="{ class: 'transparent-cancel-button' }"
+    >
+    </dx-button>
+          </div>
+  -->
+ 
+ 
+  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+  <dx-button
+    type="default"
+    text="Cancel"
+    (onClick)="Closepop()"
+    [elementAttr]="{ class: 'transparent-cancel-button' }">
+  </dx-button>
+
+  <dx-button
+    type="default"
+    text="Save"
+    (onClick)="Update_data()"
+    [elementAttr]="{ class: 'blue-save-button' }">
+  </dx-button>
+</div>
+
+        
+      </div>

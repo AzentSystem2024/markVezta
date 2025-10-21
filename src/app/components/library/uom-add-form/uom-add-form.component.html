@@ -1,0 +1,24 @@
+
+<div class="form-container">
+<dx-form class="plain-styled-form" [colCount]="1">
+    <dxi-item itemType="group" [colCount]="2">
+        <dxi-item>
+            <div *dxTemplate>
+              <dx-text-box
+                label="UOM"
+                [(value)]="newUOM.UOM"
+                width="500"
+                stylingMode="filled"
+              >
+              <dx-validator>
+                <dxi-validation-rule
+                    type="required"
+                    message="UOM is required">
+                </dxi-validation-rule>
+            </dx-validator>
+            </dx-text-box>
+            </div>
+            </dxi-item>
+    </dxi-item>
+</dx-form>
+</div>

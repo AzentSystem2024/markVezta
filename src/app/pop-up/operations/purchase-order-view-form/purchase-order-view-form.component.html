@@ -1,0 +1,647 @@
+<div
+  class="pono-date"
+  style="display: flex; margin-top: 10px; margin-bottom: 10px"
+>
+  <dx-text-box
+    label="PO NO."
+    labelMode="floating"
+    placeholder="Enter PO No"
+    [(value)]="newPoData.PO_NO"
+    [width]="200"
+    [readOnly]="true"
+  >
+  </dx-text-box>
+  <div class="po-date" style="margin-left: 20px">
+    <dx-text-box
+      label="Date"
+      labelMode="floating"
+      placeholder="Select Date"
+      [width]="200"
+      [readOnly]="true"
+      [(value)]="newPoData.PO_DATE"
+      displayFormat="yyyy-MM-dd"
+    >
+    </dx-text-box>
+  </div>
+  <div class="po-date" style="margin-left: 20px">
+    <dx-text-box
+      label="Reference No"
+      labelMode="floating"
+      [width]="200"
+      [(value)]="newPoData.REF_NO"
+    >
+    </dx-text-box>
+  </div>
+  <div class="po-date" style="margin-left: 20px">
+    <dx-text-box
+      label="Supplier"
+      labelMode="floating"
+      [width]="300"
+      placeholder="Select Supplier"
+      [(value)]="newPoData.SUPP_NAME"
+      [readOnly]="true"
+    >
+    </dx-text-box>
+  </div>
+  <div class="po-date" style="margin-left: 20px">
+    <dx-text-box
+      label="Store"
+      labelMode="floating"
+      [width]="300"
+      placeholder="Select Store"
+      [(value)]="newPoData.STORE"
+      [readOnly]="true"
+    >
+    </dx-text-box>
+  </div>
+</div>
+<dx-tabs
+  [(selectedIndex)]="selectedTabIndex"
+  [dataSource]="tabs"
+  (onItemClick)="onTabClick($event)"
+  [elementAttr]="{ class: 'custom-tabs' }"
+  [orientation]="orientations"
+  [stylingMode]="stylingMode"
+>
+</dx-tabs>
+
+<!-- Content based on selected tab -->
+<div *ngIf="selectedTabIndex === 0">
+  <div class="header-tab-content">
+    <!-- Supplier and Shipping Details -->
+    <div class="details-container">
+      <!-- Supplier Details -->
+      <div class="supplier-details">
+        <span class="section-title">Supplier Details</span>
+
+        <dx-text-box
+          label="Currency"
+          labelMode="floating"
+          placeholder="Currency"
+          [(value)]="SupplierCurrency"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+
+        <dx-text-box
+          label="Exchange Rate"
+          labelMode="floating"
+          placeholder="Exchange Rate"
+          [(value)]="newPoData.EXCHANGE_RATE"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+
+        <dx-text-box
+          label="VAT Rule"
+          labelMode="floating"
+          placeholder="VAT Rule"
+          [(value)]="vatRule"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+
+        <dx-text-box
+          label="Address"
+          labelMode="floating"
+          placeholder="Supplier Address"
+          [(value)]="newPoData.SUPP_ADDRESS"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+
+        <dx-text-box
+          label="Contact Person"
+          labelMode="floating"
+          placeholder="Contact Person"
+          [(value)]="newPoData.SUPP_CONTACT"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+
+        <dx-text-box
+          label="Email"
+          labelMode="floating"
+          placeholder="Email"
+          [(value)]="supplierMail"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+
+        <dx-text-box
+          label="Contact No"
+          labelMode="floating"
+          placeholder="Contact No"
+          [(value)]="newPoData.SUPP_MOBILE"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+      </div>
+
+      <!-- Shipping Details -->
+      <div class="shipping-details">
+        <span class="section-title">Shipping Details</span>
+        <dx-text-box
+          label="Shipping Address"
+          labelMode="floating"
+          placeholder="Shipping Address"
+          [(value)]="newPoData.SHIP_TO"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+
+        <dx-text-box
+          label="Purpose"
+          labelMode="floating"
+          placeholder="Purpose"
+          [(value)]="newPoData.PURPOSE"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+
+        <dx-text-box
+          label="Contact Name"
+          labelMode="floating"
+          placeholder="Contact Name"
+          [(value)]="newPoData.CONTACT_NAME"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+
+        <dx-text-box
+          label="Mobile"
+          labelMode="floating"
+          placeholder="Mobile"
+          [(value)]="newPoData.CONTACT_MOBILE"
+          [readOnly]="true"
+        >
+        </dx-text-box>
+      </div>
+    </div>
+    <div class="termsncondition-container">
+      <span class="section-title">Terms&Condition</span>
+      <div style="display: flex; margin-bottom: 10px">
+        <div class="Shipment-details" style="flex: 1">
+          <dx-text-box
+            label="Shipment Method"
+            labelMode="floating"
+            placeholder="Select Shipment Method"
+            [(value)]="newPoData.DELIVERY_TERM"
+            [readOnly]="true"
+          >
+          </dx-text-box>
+          <dx-text-box
+            label="Payment"
+            labelMode="floating"
+            placeholder="Select Payment"
+            [(value)]="newPoData.PAY_TERM"
+            [readOnly]="true"
+          >
+          </dx-text-box>
+        </div>
+        <div class="Delivery-details" style="flex: 1; margin-left: 30px">
+          <dx-text-box
+            label="Delivery Date"
+            labelMode="floating"
+            placeholder="Select Delivery Date"
+            [readOnly]="true"
+            [(value)]="newPoData.DELIVERY_DATE"
+          >
+          </dx-text-box>
+          <dx-text-box
+            label="Reference"
+            labelMode="floating"
+            placeholder="Reference"
+            [(value)]="newPoData.DELIVERY_DESC"
+            [readOnly]="true"
+          >
+          </dx-text-box>
+        </div>
+      </div>
+    </div>
+    <dx-text-box
+      label="Notes"
+      labelMode="floating"
+      placeholder="Notes"
+      [(value)]="newPoData.NOTES"
+      [readOnly]="true"
+    >
+    </dx-text-box>
+    <dx-text-box
+      label="Narration"
+      labelMode="floating"
+      placeholder="Narration"
+      [(value)]="newPoData.NARRATION"
+      [readOnly]="true"
+    >
+    </dx-text-box>
+    <div>
+      <dx-text-box
+        label="Issued by"
+        labelMode="floating"
+        placeholder="Issued by"
+        [width]="465"
+        [(value)]="newPoData.ISSUED_EMP_ID"
+      >
+      </dx-text-box>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="selectedTabIndex === 1">
+  <div
+    style="display: flex; justify-content: space-between; margin-bottom: 10px"
+  >
+    <span class="section-title">Items</span>
+  </div>
+  <dx-data-grid
+    [columnAutoWidth]="true"
+    [showBorders]="true"
+    class="data-grid"
+    [dataSource]="savedItems"
+    [width]="'85vw'"
+    [height]="'50vh'"
+    (onRowUpdated)="updateAmount($event)"
+    [rowAlternationEnabled]="true"
+    [showColumnLines]="true"
+    [showRowLines]="true"
+    [columnAutoWidth]="true"
+    [columnResizingMode]="'widget'"
+    (onRowClick)="onRowClick($event)"
+    (onCellPrepared)="highlightEditableColumns($event)"
+    class="custom-data-grid"
+  >
+    <dxi-column
+      caption="Item Id"
+      dataField="ITEM_ID"
+      width="auto"
+      [visible]="false"
+    ></dxi-column>
+    <dxi-column
+      caption="Sl no"
+      dataField="slNo"
+      alignment="center"
+      width="67"
+      [allowEditing]="false"
+    ></dxi-column>
+    <dxi-column
+      caption="Item Code"
+      dataField="ITEM_CODE"
+      width="auto"
+      [allowEditing]="false"
+    ></dxi-column>
+    <dxi-column
+      caption="Description"
+      dataField="DESCRIPTION"
+      width="200"
+      [allowEditing]="false"
+    ></dxi-column>
+    <dxi-column
+      caption="UOM"
+      dataField="UOM"
+      width="76"
+      [allowEditing]="false"
+    ></dxi-column>
+    <dxi-column
+      caption="Packing"
+      dataField="PACKING_NAME"
+      width="auto"
+      [allowEditing]="false"
+    ></dxi-column>
+    <!-- Conditionally add local currency column -->
+    <dxi-column
+      *ngIf="showLocalCurrencyColumn"
+      caption="Price ({{ SupplierCurrencySymbol }})"
+      dataField="SUPP_PRICE"
+      width="100"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+      [editorOptions]="{ format: '#0' }"
+    >
+    </dxi-column>
+    <!-- <dxi-column caption="Price ({{ localCurrencyCode }})" dataField="PURCH_PRICE" width="100" [allowEditing]="false" [format]="{ type: 'fixedPoint', precision: 2 }" [editorOptions]="{format: '#0'}"></dxi-column> -->
+    <dxi-column
+      caption="Qty"
+      dataField="qtyOrdered"
+      alignment="center"
+      width="76"
+      [allowEditing]="false"
+      [editorOptions]="{
+        showSpinButtons: true,
+        min: 0,
+        format: '#0',
+        mode: 'number'
+      }"
+    ></dxi-column>
+    <dxi-column
+      caption="Amount"
+      [visible]="false"
+      dataField="Amount"
+      width="auto"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+    <dxi-column
+      caption="Disc%"
+      dataField="discountPercentage"
+      alignment="center"
+      width="auto"
+      [allowEditing]="false"
+      [editorOptions]="{ format: '#0', mode: 'number' }"
+    ></dxi-column>
+    <dxi-column
+      caption="Disc Amount"
+      [visible]="false"
+      dataField="discountAmount"
+      width="auto"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+    <!-- <dxi-column
+      *ngIf="showLocalCurrencyColumn"
+      caption="Taxable"
+      dataField="taxable_Supplier"
+      width="100"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    >
+    </dxi-column> -->
+    <dxi-column
+      caption="Taxable"
+      dataField="taxable"
+      width="100"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+    <!-- <dxi-column
+      caption="Tax (%)"
+      dataField="VAT_PERC"
+      alignment="center"
+      width="70"
+      [allowEditing]="false"
+      [editorOptions]="{ format: '#0', mode: 'number' }"
+    ></dxi-column>
+    <dxi-column
+      caption="Tax Amount"
+      dataField="vatAmount"
+      width="100"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column> -->
+    <!-- <dxi-column
+      *ngIf="showLocalCurrencyColumn"
+      caption="Total"
+      dataField="total_Supplier"
+      width="auto"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column> -->
+    <dxi-column
+      caption="Total"
+      dataField="total"
+      width="auto"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+
+    <dxo-summary>
+      <dxi-total-item column="ITEM_CODE" displayFormat="Total"></dxi-total-item>
+
+      <dxi-total-item column="qtyOrdered" summaryType="sum" displayFormat="{0}">
+      </dxi-total-item>
+
+      <dxi-total-item
+        column="taxable_Supplier"
+        summaryType="sum"
+        displayFormat="{0}"
+      >
+        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+      </dxi-total-item>
+
+      <dxi-total-item column="taxable" summaryType="sum" displayFormat="{0}">
+        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+      </dxi-total-item>
+
+      <dxi-total-item column="vatAmount" summaryType="sum" displayFormat="{0}">
+        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+      </dxi-total-item>
+
+      <dxi-total-item
+        column="total_Supplier"
+        summaryType="sum"
+        displayFormat="{0}"
+      >
+        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+      </dxi-total-item>
+
+      <dxi-total-item column="total" summaryType="sum" displayFormat="{0}">
+        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+      </dxi-total-item>
+    </dxo-summary>
+
+    <dxo-master-detail
+      [enabled]="true"
+      template="masterDetail"
+    ></dxo-master-detail>
+
+    <div *dxTemplate="let detailData of 'masterDetail'">
+      <div *ngIf="detailData?.data">
+        <span class="po-title"
+          >Last 5 Purchase Orders for {{ detailData.data.ITEM_CODE }}</span
+        >
+        <dx-data-grid
+          [columnAutoWidth]="true"
+          [showBorders]="true"
+          [dataSource]="purchaseOrders"
+          [width]="750"
+        >
+          <dxi-column dataField="PO_NO" caption="PO No"></dxi-column>
+          <dxi-column
+            dataField="PO_DATE"
+            caption="Date"
+            dataType="date"
+            [allowEditing]="false"
+            format="dd-MM-yyyy"
+          ></dxi-column>
+          <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
+          <dxi-column dataField="PRICE" caption="Price"></dxi-column>
+          <!-- <dxi-column dataField="CURRENCY_NAME" caption="Currency"></dxi-column> -->
+        </dx-data-grid>
+      </div>
+    </div>
+  </dx-data-grid>
+  <!-- Bottom Section for Total Quantity and Total (Excluding VAT) -->
+
+  <!-- Add Item Popup -->
+
+  <!-- <div class="total-container">
+  
+      <div class="total-field">
+        <label>Total Quantity:</label>
+        <dx-text-box
+          placeholder="0"
+          [width]="90"
+          [readOnly]="true"
+          [(value)]="totalQuantity"
+          [rtlEnabled]="true"
+        ></dx-text-box>
+      </div>
+    
+      <div class="total-field">
+        <label>Total (Excluding Tax):</label>
+        <dx-text-box
+          *ngIf="showLocalCurrencyColumn"
+          placeholder="0.00"
+          [width]="150"
+          [readOnly]="true"
+          [(value)]="newPoData.SUPP_GROSS_AMOUNT"
+          [rtlEnabled]="true"
+        ></dx-text-box>&nbsp;
+        <dx-text-box
+          placeholder="0.00"
+          [width]="150"
+          [readOnly]="true"
+          [(value)]="newPoData.GROSS_AMOUNT"
+          [rtlEnabled]="true"
+        ></dx-text-box>
+      </div>
+    </div>
+    <div class="vat-container">
+      <div class="vat-field">
+        <label>Tax Amount:</label>
+        <dx-text-box
+          placeholder="0.00"
+          [width]="150"
+          [readOnly]="true"
+          [(value)]="newPoData.TAX_AMOUNT"
+          [rtlEnabled]="true"
+        ></dx-text-box>
+      </div>
+    </div>
+    <div class="vat-container">
+      <div class="vat-field">
+      <label>Total (Including Tax):</label>
+      <dx-text-box
+        *ngIf="showLocalCurrencyColumn"
+        placeholder="0.00"
+        [width]="150"
+        [readOnly]="true"
+        [(value)]="newPoData.SUPP_NET_AMOUNT"
+        [rtlEnabled]="true"
+      ></dx-text-box>&nbsp;
+      <dx-text-box
+        placeholder="0.00"
+        [width]="150"
+        [readOnly]="true"
+        [(value)]="newPoData.NET_AMOUNT"
+        [rtlEnabled]="true"
+      ></dx-text-box>
+      </div>
+    </div> -->
+</div>
+
+<div *ngIf="selectedTabIndex === 2">
+  <!-- Add button to open the popup for file details input -->
+
+  <!-- DataGrid to display uploaded files -->
+  <dx-data-grid
+    [dataSource]="uploadedFiles"
+    [showBorders]="true"
+    class="file-data-grid"
+  >
+    <dxo-editing
+      mode="cell"
+      [allowUpdating]="true"
+      [allowDeleting]="true"
+    ></dxo-editing>
+
+    <dxi-column
+      dataField="FILE_NAME"
+      caption="File Name"
+      [allowEditing]="false"
+      [cellTemplate]="'fileNameTemplate'"
+    ></dxi-column>
+    <!-- <div *dxTemplate="let cell of 'fileNameTemplate'">
+        <a [href]="cell.data.fileUrl" target="_blank" rel="noopener noreferrer">{{ cell.data.fileName }}</a>cellTemplate="fileNameTemplate"
+      </div> -->
+    <dxi-column
+      dataField="REMARKS"
+      caption="Remarks"
+      [allowEditing]="false"
+    ></dxi-column>
+
+    <!-- File Name Cell Template -->
+    <div *dxTemplate="let data of 'fileNameTemplate'">
+      <a
+        href="javascript:void(0);"
+        (click)="openFile(data.data.FILE_DATA, data.data.FILE_NAME)"
+      >
+        {{ data.data.FILE_NAME }}
+      </a>
+    </div>
+  </dx-data-grid>
+
+  <!-- Popup for adding file details -->
+</div>
+
+<!-- <div *ngIf="selectedTabIndex === 3" class="file-upload-container">
+  <dx-data-grid
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [dataSource]="poHistoryList"
+    height="60vh"
+  >
+    <dxi-column
+      dataField="slNo"
+      caption="Sl no"
+      alignment="center"
+    ></dxi-column>
+    <dxi-column
+      dataField="Time"
+      [calculateCellValue]="formatDateTime"
+      caption="Date & Time"
+    ></dxi-column>
+    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+    <dxi-column dataField="USER_NAME" caption="By User"></dxi-column>
+  </dx-data-grid>
+</div> -->
+<div *ngIf="selectedTabIndex === 3">
+  <dx-data-grid
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [dataSource]="poHistoryList"
+    height="55vh"
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
+    [columnResizingMode]="'nextColumn'"
+  >
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxi-column
+      dataField="slNo"
+      caption="Sl No"
+      alignment="center"
+    ></dxi-column>
+    <dxi-column
+      dataField="TIME"
+      [calculateCellValue]="formatDateTime"
+      caption="Date & Time"
+    ></dxi-column>
+    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+    <dxi-column dataField="USER_NAME" caption="User"></dxi-column>
+  </dx-data-grid>
+</div>

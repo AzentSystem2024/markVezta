@@ -1,0 +1,151 @@
+
+<div class="content-wrapper">
+  <div>
+    <dx-select-box
+      [placeholder]="'Employee Code'"
+      label="Employee"
+      [items]="EmployeeDropdown"
+      valueExpr="ID"
+      displayExpr="DESCRIPTION"
+       [(value)]="selectedEmployeeId"
+      [searchEnabled]="true"
+      [showClearButton]="true"
+      [labelMode]="'floating'"
+      (onValueChanged)="onEmployeeChanged($event)"
+    >
+      <!-- <dx-validator>
+        <dxi-validation-rule
+          type="required"
+          message="This field is required"
+        ></dxi-validation-rule>
+      </dx-validator> -->
+    </dx-select-box>
+  </div>
+
+  <div style="display: flex; gap: 20px">
+    <div style="flex: 1">
+      <dx-number-box
+        label="Basic Salary"
+        [(value)]="employeeFormData.BASIC_SALARY"
+        [labelMode]="'floating'"
+      >
+      </dx-number-box>
+    </div>
+
+    <div style="flex: 1">
+       <!-- <dx-validation-group class="form-grid" #formValidationGroup> -->
+      <dx-date-box
+        label="Previous Revision"
+        [readOnly]="true"
+       [(value)]="PreviousRevision"
+       displayFormat="MMMM/yyyy"
+        [labelMode]="'floating'"
+      >
+       <!-- <dx-validator>
+      <dxi-validation-rule
+        type="custom"
+        [validationCallback]="validatePreviousRevision"
+        message="Previous Revision must be earlier than Effect From"
+      ></dxi-validation-rule>
+    </dx-validator> -->
+      </dx-date-box>
+      <!-- </dx-validation-group> -->
+    </div>
+  </div>
+
+  <div>
+  <!-- <dx-validation-group class="form-grid" #formValidationGroup> -->
+  <dx-date-box
+    label="Effect From"
+    width="300px"
+     displayFormat="MMMM/yyyy"
+   [showClearButton]="true"
+    [(value)]="employeeFormData.EFFECT_FROM"
+    [labelMode]="'floating'"  
+     pickerType="calendar"
+   [calendarOptions]="{
+          maxZoomLevel: 'year',
+          minZoomLevel: 'century',
+        }"
+  (onValueChanged)="onEffectFromChanged($event)"
+  >
+   <dx-validator #effectFromValidator>
+    <dxi-validation-rule
+      type="custom"
+      [validationCallback]="validateEffectFrom"
+      message="Effect From must be after Previous Revision"
+    ></dxi-validation-rule>
+  </dx-validator>
+  </dx-date-box>
+ <!-- </dx-validation-group> -->
+  </div>
+</div>
+ 
+
+<dx-data-grid
+  [showBorders]="true"
+  [selection]="{ mode: 'multiple' }"
+  height="300"
+  class="mt-3"
+  [(selectedRowKeys)]="selectedRows"
+   [keyExpr]="'HEAD_ID'"  
+  [dataSource]="SalaryDetails"
+  (onSelectionChanged)="onSelectionChanged($event)"
+  (onEditorPreparing)="onEditorPreparing($event)"
+   (onCellValueChanged)="onCellValueChanged($event)"
+  width="100%"
+  [editing]="{
+    mode: 'cell',
+    allowUpdating: true
+  }"
+  
+>
+  <dxo-header-filter [visible]="true"></dxo-header-filter>
+  <dxo-sorting mode="multiple"></dxo-sorting>
+
+  <dxi-column [width]="'200'" dataField="HEAD_NAME" caption="Salary Head "  [allowEditing]="false" [readOnly]="true">
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+  <dxi-column
+    [width]="'auto'"
+    dataField="HEAD_AMOUNT"
+    caption="Amount"
+    [editorOptions]="{ showSpinButtons: true }"
+    [allowEditing]="true"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+
+  <dxi-column
+    [width]="'auto'"
+    dataField="HEAD_PERCENT"
+    caption="Percentage"
+    alignment="right"
+    [allowEditing]="true"
+  >
+    <dxo-header-filter [allowSelectAll]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+  </dxi-column>
+</dx-data-grid>
+
+<div class="fixed-footer">
+  <dx-button
+    text="Cancel"
+    stylingMode="outlined"
+    type="normal"
+    class="action-btn"
+    (onClick)="cancel()"
+  ></dx-button>
+  <dx-button
+    text="Save"
+    stylingMode="contained"
+    type="default"
+    class="action-btn"
+    (onClick)="saveEmployee()"
+  ></dx-button>
+</div>

@@ -1,0 +1,176 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText=" "
+      [width]="'100%'"
+      [height]="'80vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="employeeList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true }"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: true, applyFilter: 'auto' }"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: true }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      (onEditingStart)="onEditOrViewPayRevision($event)"
+      (onRowRemoving)="onDeleteSalaryRevision($event)"
+      focusStateEnabled="false"
+    >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser>
+      <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true"></dxo-editing>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="true"
+        [formats]="['xlsx', 'pdf']"
+      >
+      </dxo-export>
+      <dxo-header-filter
+        [visible]="true"
+        [search]="{ enabled: true }"
+      ></dxo-header-filter>
+      <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Pay Revision</div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+        <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            icon="plus"
+            type="default"
+            stylingMode="contained"
+            (onClick)="addSalaryRevision()"
+          ></dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column dataField="EMP_NO" caption="Employee No."></dxi-column>
+      <dxi-column dataField="EMP_NAME" caption="Employee Name"></dxi-column>
+      <dxi-column dataField="DATE" caption="Date"  [calculateCellValue]="formatDateColumn"></dxi-column>
+      <dxi-column dataField="EFFECT_FROM" caption="Effect From" [calculateCellValue]="formatEffectFromColumn"></dxi-column>
+      <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
+      <!-- <dxi-column dataField="STATUS" caption="Status"></dxi-column> -->
+      <dxi-column dataField="STATUS" caption="Status" cellTemplate="statusCellTemplate"
+      width="100"
+      fixed="true"
+      fixedPosition="right">
+      </dxi-column>
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value"
+          style="margin-left: 10px; cursor: default;"
+        ></i>
+      </div>
+      <dxi-column type="buttons" [buttons]="allActionButtons" width="100"></dxi-column>
+    </dx-data-grid>
+  
+  </div>
+</div>
+<dx-popup
+  [(visible)]="addPayRevisionPopupOpened"
+  [width]="'65vw'"
+  [height]="'85vh'"
+  title="New Salary Revision"
+  (onHiding)="handleEditClose()"
+>
+  <app-pay-revision-add
+  *ngIf="addPayRevisionPopupOpened"
+
+    (popupClosed)="handleEditClose()"
+  ></app-pay-revision-add>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="editPayRevisionPopupOpened"
+  [width]="'65vw'"
+  [height]="'85vh'"
+  title="Update Salary"
+  (onHiding)="handleEditClose()"
+>
+  <app-pay-revision-edit
+  *ngIf="editPayRevisionPopupOpened"
+    [revisionData]="selectedRevisionData"
+    (popupClosed)="handleEditClose()"
+  ></app-pay-revision-edit>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="verifyPayRevisionPopupOpened"
+  [width]="'65vw'"
+  [height]="'85vh'"
+  title="Verify Salary"
+  (onHiding)="handleEditClose()"
+>
+  <app-pay-revision-verify
+    [revisionData]="selectedRevisionData"
+    (popupClosed)="handleEditClose()"
+  ></app-pay-revision-verify>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="approvePayRevisionPopupOpened"
+  [width]="'65vw'"
+  [height]="'85vh'"
+  title="Approve Salary"
+  (onHiding)="handleEditClose()"
+>
+  <app-pay-revision-approve
+    [revisionData]="selectedRevisionData"
+    (popupClosed)="handleEditClose()"
+  ></app-pay-revision-approve>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="viewPayRevisionPopupOpened"
+  [width]="'65vw'"
+  [height]="'85vh'"
+  title="View Salary Revision"
+  (onHiding)="handleEditClose()"
+>
+  <app-pay-revision-view
+    [revisionData]="selectedRevisionData"
+    (popupClosed)="handleEditClose()"
+  ></app-pay-revision-view>
+</dx-popup>

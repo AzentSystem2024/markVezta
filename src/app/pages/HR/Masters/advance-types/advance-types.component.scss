@@ -1,0 +1,71 @@
+
+// @use "../.../../../../../variables.scss" as *;
+// @use "sass:math";
+// .view-wrapper {
+//   flex-wrap: wrap;
+//   position: absolute;
+//   top: 0;
+//   bottom: 0;
+//   left: 0;
+//   right: 0;
+//   flex-direction: row;
+//   height: 100%;
+
+//   .grid {
+//     .name-template {
+//       .position {
+//         font-size: 12px;
+//         color: var(--texteditor-label-color);
+//       }
+//     }
+
+//     ::ng-deep & {
+//       .dx-datagrid-header-panel {
+//         padding: 0 var(--content-padding);
+//       }
+
+//       .dx-toolbar {
+//         margin-bottom: 0;
+//         padding: var(--toolbar-margin-bottom) 0;
+//       }
+
+//       .dx-datagrid-content .dx-row {
+//         cursor: pointer;
+//       }
+//     }
+
+//     .grid-header {
+//       @include header();
+//     }
+//   }
+
+//   user-panel {
+//     display: inherit;
+//   }
+// }
+
+// .form-group {
+//   display: flex;
+//   align-items: center;  /* Aligns items vertically */
+//   gap: 0px;  /* Adjust spacing between elements */
+// }
+
+// .fixed-footer {
+//     position: fixed;
+//     bottom: 0;
+//     left: 0;
+//     right: 0;
+//     padding: 12px 20px;
+//     display: flex;
+//     justify-content: end;
+//     z-index: 1000;
+
+//   }
+  
+//   .saveBtn{
+//     background-color:rgb(71, 158, 245);
+//     color: black;
+//   }
+//   .fixed-footer dx-button + dx-button {
+//     margin-left: 10px;
+//   }

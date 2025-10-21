@@ -1,0 +1,119 @@
+
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="country"
+      [keyExpr]="country.CODE" 
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      (onRowRemoving)="onRowRemoving($event)"
+      (onRowUpdating)="onRowUpdating($event)"
+      [showBorders]="true"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+        [showColumnLines]="true"
+        [width]="'100%'"
+      [height]="'75vh'"
+      (onExporting)="onExporting($event)"
+    >
+   
+    <dxo-filter-row
+    [visible]="showFilterRow"
+  ></dxo-filter-row>
+
+  <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+<dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    
+
+    <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-popup title="Edit Country" [showTitle]="true" [width]="450" [height]="300">
+        
+      </dxo-popup>
+      <dxo-form [colCount]="1">
+        <dxi-item itemType="group" [colCount]="1" >
+          <dxi-item dataField="CODE"></dxi-item>
+          <dxi-item dataField="COUNTRY_NAME">
+          </dxi-item>
+      </dxi-item>
+      </dxo-form>
+    </dxo-editing>
+   
+    <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header"style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          " >Country</div>
+        </dxi-item>
+    
+    <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addCountry()"
+          
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              onClick: refresh,
+              icon: 'refresh',
+              stylingMode: 'text'
+            }"
+          ></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="exportButton"></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    
+    </dxo-toolbar>
+    <dxi-column dataField="CODE" caption="Code">
+      <dxi-validation-rule type="required" message="Code is required">
+        <dxi-validation-rule type="required" message="Code is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="COUNTRY_NAME" caption="Country Name">
+      <dxi-validation-rule type="required" message="Country name is required">
+        <dxi-validation-rule type="required" message="Country name is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+
+
+    </dx-data-grid>
+    <form-popup
+        [(visible)]="isAddCountryPopupOpened"
+        (save)="onClickSaveCountry()"
+        titleText="New Country"
+      >
+      <app-country-form></app-country-form>
+        
+      </form-popup>

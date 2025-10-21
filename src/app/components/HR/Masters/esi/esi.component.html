@@ -1,0 +1,85 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'5vh'"
+      class="grid theme-dependent"
+      [dataSource]="gridData"
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+    >
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">ESI Register</div>
+        </dxi-item>
+
+        <dxi-item>
+          <dx-select-box
+            [dataSource]="months"
+            displayExpr="name"
+            valueExpr="value"
+            [(value)]="selectedMonth"
+            (onValueChanged)="onMonthChange($event)"
+            [width]="200"
+            label="Select Month"
+            labelMode="floating"
+          ></dx-select-box>
+        </dxi-item>
+
+        <!-- <dxi-item>
+          <dx-tag-box
+            #tagBox
+            [dataSource]="employeeList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="selectedEmployee"
+            [width]="250"
+            [showSelectionControls]="true"
+            [multiline]="!allSelected"
+            applyValueMode="useButtons"
+            label="Select Employee"
+            labelMode="floating"
+            (onSelectionChanged)="handleSelection($event, tagBox)"
+          ></dx-tag-box>
+        </dxi-item> -->
+
+
+        <dxi-item>
+          <dx-button
+            text="Apply"
+            icon="todo"
+            stylingMode="contained"
+            type="default"
+            [width]="100"
+            (onClick)="getESIRegister()"
+          ></dx-button>
+        </dxi-item>
+
+        <!-- PDF inside the toolbar -->
+      </dxo-toolbar>
+      <ng-template #pdfTemplate let-data>
+        <div style="padding: 10px">
+          <iframe
+            *ngIf="pdfSrc"
+            [src]="pdfSrc"
+            width="100%"
+            height="600"
+            style="border: 1px solid #ccc; border-radius: 4px"
+          ></iframe>
+        </div>
+      </ng-template>
+    </dx-data-grid>
+  </div>
+
+  <div class="pdf-container" style="margin-top: 30px">
+    <iframe
+      *ngIf="pdfSrc"
+      [src]="pdfSrc"
+      width="100%"
+      height="600"
+      style="border: 1px solid #ccc; border-radius: 4px"
+    ></iframe>
+  </div>
+</div>

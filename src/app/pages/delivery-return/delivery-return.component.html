@@ -1,0 +1,139 @@
+<div class="view-wrapper list-page">
+<dx-data-grid
+class="grid theme-dependent"
+[dataSource]="DeliveryReturnDatasource"
+[showBorders]="true"
+[rowAlternationEnabled]="true"
+[showColumnLines]="true"
+rowAlternationInterval="2"
+[allowColumnReordering]="true"
+[allowColumnResizing]="true"
+(onRowRemoved)="delete_Data($event)"
+[height]="'80vh'"
+noDataText=" "
+(onCellPrepared)="onCellPrepared($event)"
+(onEditingStart)="onEditingStart($event)"
+
+>
+
+
+ <dxo-filter-row
+  [visible]="isFilterRowVisible"
+></dxo-filter-row>
+
+
+  <dxo-header-filter [visible]="true">
+    <dxo-search [enabled]="true"></dxo-search>
+  </dxo-header-filter>
+
+ 
+    <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+    
+    <dxo-editing
+      mode="popup"
+
+       [allowUpdating]="true"
+       [allowDeleting]="true"
+      [allowAdding]="true">
+    <dxo-popup title="Update Department" [showTitle]="true" [width]="600" [height]="300"></dxo-popup>
+    </dxo-editing>
+
+
+  <dxo-toolbar>
+    <dxi-item location="before" locateInMenu="never">
+      <div class="grid-header" style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          ">Delivery Return</div>
+    </dxi-item>
+
+        
+<dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+ <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+  
+ <dxi-item
+      location="after"
+      
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+
+  </dxo-toolbar>
+
+  <!-- This field ID optional .Used for displaying data temp -->
+  <dxi-column dataField="CUSTOMER_NAME" caption="Customer Name"></dxi-column>
+
+  <dxi-column dataField="STORE_NAME" caption="Store Name"></dxi-column>
+
+  <!-- <dxi-column dataField="DR_DATE" caption="Date"  format="dd/MM/yyyy"></dxi-column> -->
+    <dxi-column dataField="STATUS" caption="Status" cellTemplate="statusCellTemplate" alignment="center" width="200"></dxi-column>
+   <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+     [attr.title]="cellData.value == 'OPEN' ? 'Open' : 'Approve'" 
+
+        style=" margin-left: 10px; cursor: default"
+      ></i>       
+    </div>
+    
+  
+</dx-data-grid>
+</div>
+
+ <dx-popup
+      [(visible)]="addDeliveryReturnPopupOpened"
+      [width]="'80vw'"
+      [height]="'85vh'"
+      title="Add Delivery Return"
+      (onHiding)="handleClose()"
+    >
+      <app-delivery-return-add
+        [isOpen]="addDeliveryReturnPopupOpened"
+        
+        (formClosed)="handleClose()"
+      ></app-delivery-return-add>
+    </dx-popup>
+
+     <dx-popup
+      [(visible)]="editDeliveryReturnPopupOpened"
+      [width]="'80vw'"
+      [height]="'85vh'"
+      title="Edit Delivery Return"
+      (onHiding)="handleClose()"
+    >
+      <app-delivery-return-edit
+        [isOpen]="editDeliveryReturnPopupOpened"
+          [SelectDeliveryReturnData]="DeliveryReturnData"
+        (formClosed)="handleClose()"
+      ></app-delivery-return-edit>
+    </dx-popup>

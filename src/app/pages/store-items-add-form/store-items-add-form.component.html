@@ -1,0 +1,175 @@
+<div class="popup-content">
+  <div class="data-grids-container">
+    <dx-data-grid
+      [width]="'50vw'"
+      [height]="'76vh'"
+      class="item-list-container"
+      [dataSource]="filteredItemsList"
+      [showBorders]="true"
+      noDataText=" "
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [(selectedRowKeys)]="selectedRowKeys"
+      [selection]="{
+        mode: 'multiple',
+        showCheckBoxesMode: 'always'
+      }"
+      (onSelectionChanged)="onItemSelectionChanged($event)"
+      
+    >
+    <dxo-scrolling mode="virtual"> </dxo-scrolling>
+  <dxo-paging [pageSize]="10"> </dxo-paging>
+  <dxo-pager
+    [visible]="true"
+    [allowedPageSizes]="allowedPageSizes"
+    [displayMode]="displayMode"
+    [showPageSizeSelector]="showPageSizeSelector"
+    [showInfo]="showInfo"
+    [showNavigationButtons]="showNavButtons"
+  >
+  </dxo-pager>
+      <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-editing mode="popup" [alloAdding]="true"> </dxo-editing>
+
+      <dxo-toolbar>
+        <dxi-item location="after" locateInMenu="auto">
+        </dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column
+        dataField="ITEM_CODE"
+        caption="Item Code"
+        [width]="160"
+      ></dxi-column>
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
+        [visible]="true"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Description"
+        [width]="280"
+      ></dxi-column>
+
+      <dxi-column dataField="DEPT_NAME" caption="Department" [width]="150">
+      </dxi-column>
+      <dxi-column dataField="CAT_NAME" caption="Category" [width]="150">
+
+      </dxi-column>
+      <dxi-column dataField="BRAND_NAME" caption="Brand" [width]="150">
+      </dxi-column>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Price"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_PRICE"
+        caption="Sale Price"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_PRICE1"
+        caption="Sale Price1"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_PRICE2"
+        caption="Sale Price2"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_PRICE3"
+        caption="Sale Price3"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_PRICE4"
+        caption="Sale Price4"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_PRICE5"
+        caption="Sale Price5"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="PROFIT_MARGIN"
+        caption="Profit Margin"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="QTY_STOCK"
+        caption="Available Quantity"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="QTY_COMMITTED"
+        caption="Committed Quantity"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="RESTOCK_LEVEL"
+        caption="Restock Level"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="REORDER_POINT"
+        caption="Reorder Point"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="COUNTRY_NAME"
+        caption="Country"
+        [width]="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="BIN_LOCATION"
+        caption="Location"
+        [width]="150"
+      ></dxi-column>
+    </dx-data-grid>
+
+    <dx-data-grid
+      class="stores-list-container"
+      [dataSource]="store"
+      noDataText=" "
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [height]="'64vh'"
+      [width]="'20vw'"
+      [keyExpr]="'ID'"
+      [selectedRowKeys]="selectedStoreId"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+    (onSelectionChanged)="onStoreSelectionChanged($event)"
+    >
+      <dxi-column dataField="ID" caption="Store" [width]="200">
+        <dxo-lookup
+          [dataSource]="store"
+          displayExpr="STORE_NAME"
+          valueExpr="ID"
+        ></dxo-lookup>
+      </dxi-column>
+    </dx-data-grid>
+  </div>
+  <div class="selected-rows-container">
+    Selected Rows: {{ selectedRowCount }} out of {{ filteredRowCount }}
+  </div>
+</div>
+<div class="buttons-container">
+  <dx-button text="Close" type="normal" (onClick)="closeForm()"> </dx-button>
+  <dx-button text="Save" type="default" (onClick)="saveItemsToStore()"> </dx-button>
+</div>
+
+

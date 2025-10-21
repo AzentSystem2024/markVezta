@@ -1,0 +1,487 @@
+@use "../../../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+  overflow: auto; 
+}
+.view-wrapper {
+  
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
+      }
+    }
+
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
+
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
+  }
+
+  user-panel {
+    display: inherit;
+  }
+}
+
+
+.image-upload-container {
+    border: 2px dashed #ccc;
+    // width: 200px;
+    width: 100%;
+   height: 217px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    // margin-top: -10px;
+  }
+  
+  
+  .image-preview img {
+    width: 100%;
+    height: 100%;
+    // object-fit: cover;
+    object-fit: contain;
+    object-position: center;
+    margin-top: -10px;
+  }
+  
+  .upload-placeholder {
+    font-size: 16px;
+    color: #777;
+    margin-top: -10px;
+  }
+  
+  .hidden-file-uploader {
+    display: none;
+  }
+  .clear-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  
+  .clear-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  .two-column-layout {
+    display: flex;
+    gap: 10px; /* Adjust space between columns */
+  }
+  .two-column-layout > div {
+    flex: 1; /* Equal width for both columns */
+    // margin-bottom: 10px;
+  }
+  
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Spacing between Address and City/State */
+    height: 90%;
+  }
+  
+  .row {
+    display: flex;
+    gap: 15px; /* Space between City and State */
+    justify-content: space-between;
+  }
+  
+  .row {
+    display: flex;
+    gap: 10px; /* Add spacing between fields */
+    width: 100%;
+  }
+  
+  .row > div {
+    flex: 1; /* Ensures equal width for both select and text fields */
+    min-width: 150px; /* Adjust as needed */
+  }
+  
+  dx-select-box, dx-text-box {
+    width: 100% !important; /* Force full width inside flex container */
+    display: block;
+  }
+  
+  
+  .full-width {
+    width: 100%;
+  }
+  
+
+  
+  
+.container {
+    display: flex;
+    gap: 5px; /* Space between columns */
+    height: 90%;
+  
+ 
+  }
+  .left-column {
+    flex: 4; /* Takes 2/3 of the space */
+  }
+
+  .right-column {
+    flex: 1; /* Takes 1/3 of the space */
+    display: flex;
+    flex-direction: column;
+    // justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+  }
+
+  
+  .custom-card {
+    border: 1px solid #838181;  
+    border-radius: 8px;
+  
+    padding: 20px;
+    // margin: 10px;
+    width: 100%;
+    
+    margin-top: 8px; 
+  }
+
+  // box-shadow: 0px 2px 20px rgba(7, 7, 7, 0.1);
+  .custom-card-passport{
+    border: 1px solid #838181;  
+    border-radius: 8px;
+    padding: 20px;
+    // margin: 20px;
+    margin-top: 8px;
+    width: 98%;
+    overflow-y: auto; 
+    margin-left: 10px;
+  }
+
+  .custom-card-passport-2{
+    border: 1px solid #838181;  
+    border-radius: 8px;
+  margin-top: 8px;
+    padding: 20px;
+    // margin: 20px;
+    width: 100%;
+    overflow-y: auto; 
+    margin-left: 0px;
+  }
+
+
+  // .custom-card-address {
+  //   border: 1px solid #838181;  
+  //   border-radius: 8px;
+  //   box-shadow: 0px 2px 20px rgba(7, 7, 7, 0.1);
+  //   padding: 20px;
+  //   margin: 10px;
+  //   width: 50%;
+  //   margin-left :250px;
+  //   margin-top: 50px; 
+  //   height: 100%;
+  // }
+  
+  .dx-form .dx-field-item {
+    margin-bottom: 0px !important;
+    padding-bottom: 0px !important;
+    margin-top: 1px; 
+  }
+  
+  .dx-field-item-content {
+    min-height: 10px !important; /* Adjust as needed */
+    padding: 2px 0px !important; /* Reduce vertical padding */
+  }
+  
+  .four-column-layout {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Creates 4 equal columns */
+    gap: 10px; /* Adds space between fields */
+    width: 100%; /* Ensures it takes full width */
+  }
+  
+  .four-column-layout dx-select-box,
+  .four-column-layout dx-text-box {
+    width: 100% !important; /* Forces full width inside grid */
+  }
+  .error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+  
+  .salary-container {
+    padding: 10px;
+    display: flex;
+  }
+  
+  .salary-footer {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .salary-footer label {
+    font-weight: bold;
+  }
+  .salary-container {
+    display: flex;
+    justify-content: space-between; /* Ensures space between grid and footer */
+    align-items: flex-start; /* Aligns items at the top */
+  }
+  
+  .salary-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding-left: 20px; /* Adds space between grid and footer */
+  }
+  
+  .salary-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Adds spacing between elements */
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .dateClass{
+    margin-bottom: 10px;
+  }
+  
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Add space between sections */
+  padding: 20px;
+}
+
+.file-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.file-upload-label {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-name-display {
+  font-size: 14px;
+  color: #555;
+}
+
+.remarks-container {
+  margin-top: 5px; /* Add space between file upload and remarks */
+}
+
+// .fixed-footer {
+//   position: fixed;
+//   bottom: 0;
+//   left: 0;
+//   right: 0;
+//   padding: 12px 20px;
+//   display: flex;
+//   justify-content: flex-end;
+//   z-index: 1000;
+//   // background-color: #494848; /* Add background to avoid transparency */
+//   // border-top: 1px solid #616060; /* Optional: adds a nice top border */
+//   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05); /* Optional: soft shadow */
+// }
+
+.button-container {
+  position: fixed;
+  bottom: 20px; /* distance from bottom */
+  right: 20px;  /* distance from right */
+  display: flex;
+  gap: 10px;    /* space between buttons */
+  z-index: 1000; /* ensures it's on top */
+}
+
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+}
+
+.fixed-footer dx-button + dx-button {
+  margin-left: 10px;
+}
+
+
+.content-wrapper {
+  padding-bottom: 60px; /* match or slightly exceed footer height */
+}
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// .custom-card-address {
+//   border: 1px solid #838181;
+//   border-radius: 8px;
+//   padding: 20px;
+//   // background-color: #2c2c2c; /* Dark card background */
+//   width: 100%;
+//   margin-top: 50px;
+//   max-width: 600px;
+// }
+
+.custom-card-address {
+  border: 1px solid #838181;
+  border-radius: 8px;
+  padding: 8px;
+  width: 98%;
+  // margin-top: 50px;
+  // max-width: 800px; /* Increased for better 3-column layout */
+  display: grid;
+  margin-left: 10px;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  margin-top: 8px;
+  grid-gap: 8px; /* spacing between items */
+}
+
+
+.form-popup-buttons-container{
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+  bottom: 0;
+}
+
+
+
+
+
+.popup-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.upload-btn-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.file-name {
+  font-size: 13px;
+  color: #2e7d32;
+  font-style: italic;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.action-btn {
+  min-width: 90px;
+}
+
+.dob-gender-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.dob-field {
+  flex: 2;
+}
+
+.gender-field {
+  flex: 1.5;
+  display: flex;
+  align-items: center;
+}
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+  background-color: var(--base-bg); /* fallback for light theme */
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* For dark theme */
+.dark-theme .fixed-footer {
+  background-color: #1e1e1e;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+.three-column-layout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px; /* spacing between fields */
+}

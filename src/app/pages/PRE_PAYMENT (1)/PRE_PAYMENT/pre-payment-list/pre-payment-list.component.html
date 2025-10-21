@@ -1,0 +1,155 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'75vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="PrePaymentListDataSource"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      [groupPanel]="{ visible: true }"
+      [grouping]="{ autoExpandAll: false }"
+      (onEditingStart)="onEditingStart($event)"
+      (onRowRemoving)="DeletePrePayment($event)"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+
+      
+      <dxo-paging [pageSize]="20"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+
+       <dxo-filter-row
+  [visible]="isFilterRowVisible"
+></dxo-filter-row>
+
+<dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          
+          <h6>PrePayment Invoice</h6>
+          </dxi-item>
+         
+         
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+
+        <dxi-item
+        *ngIf="canAdd"
+          location="after"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
+
+     <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+ <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <!-- </div> -->
+      </dxo-toolbar>
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <!-- <dxi-column dataField="TRANS_ID" caption="Trans ID"></dxi-column> -->
+       <dxi-column dataField="VOUCHER_NO" caption="Invoice No."  alignment="left"></dxi-column>
+      <dxi-column dataField="TRANS_DATE" caption="Date"></dxi-column>
+      <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+       <dxi-column dataField="REF_NO" caption="Supplier Invoice No."></dxi-column>
+      <dxi-column
+        dataField="EXPENSE_AMOUNT"
+        caption="Amount"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+       <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
+
+        <dxi-column dataField="TRANS_STATUS" [cellTemplate]="statusCellRender" caption="Status"></dxi-column>
+
+      <dxi-column
+  type="buttons"
+  [buttons]="gridButtons">
+</dxi-column>
+    </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="addPrepaymentPopupOpened"
+      [width]="'50vw'"
+      [height]="'90vh'"
+      title="Add PrePayment Invoice"
+      (onHiding)="handleClose()"
+    >
+      <app-pre-payment-add
+        [isOpen]="addPrepaymentPopupOpened"
+        
+        (formClosed)="handleClose()"
+      ></app-pre-payment-add>
+    </dx-popup>
+  </div>
+</div>
+
+<dx-popup
+  [(visible)]="editPrePaymentPopupOpened"
+  [width]="'50vw'"
+  [height]="'85vh'"
+  title="PrePayment Invoice"
+   (onHiding)="handleClose()"
+>
+  <app-pre-payment-edit
+    [selectedPrePayment]="selectedPrePayment"
+    [isOpen]="editPrePaymentPopupOpened"
+    [isReadOnly]="isEditReadOnly"
+    (formClosed)="handleClose()"
+  ></app-pre-payment-edit>
+</dx-popup>
+
+
+

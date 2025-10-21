@@ -1,0 +1,147 @@
+<div class="dx-theme-fluent dx-theme-fluent">
+    <div class="view-wrapper topDiv d-flex mb-2 mt-0">
+      <div class="headDiv d-flex align-items-center m-0 p-0">
+        <div class="inputBox ms-3">
+          <dx-text-box
+            label="Enter User Level"
+            labelMode="floating"
+            validationMessagePosition="right"
+            [(value)]="newUserLevel.LEVEL_NAME"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="user level is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </div>
+      <div class="checkboxBox mb-1">
+        <dx-check-box
+          text="Inactive"
+          [(value)]="newUserLevel.IS_INACTIVE"
+        ></dx-check-box>
+      </div>
+    </div>
+  
+    <div class="tabs-demo view-wrapper">
+      <div class="widget-container">
+        <div>
+          <dx-tabs
+            #withiconAndtext
+            [width]="width"
+            [selectedIndex]="selectedTab"
+            [scrollByContent]="scrollByContent"
+            [showNavButtons]="showNavButtons"
+            [dataSource]="MainMenu"
+            [orientation]="orientations"
+            [stylingMode]="stylingMode"
+            [iconPosition]="iconPosition"
+            (onItemClick)="onTabClick($event)"
+            
+          >
+          </dx-tabs>
+          <dx-data-grid
+            *ngIf="selectedTabData"
+            class="grid theme-dependent"
+            noDataText=""
+            [height]="'58vh'"
+            [dataSource]="selectedTabData"
+            [rowAlternationEnabled]="true"
+            [hoverStateEnabled]="true"
+            rowAlternationInterval="2"
+            (onSelectionChanged)="onSelectionChanged($event)"
+            [selectedRowKeys]="selectedRows[selectedTab]"
+          >
+            <dxo-selection mode="multiple"></dxo-selection>
+            <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
+            <dxo-pager
+            [visible]="true"
+            [allowedPageSizes]="allowedPageSizes"
+            [displayMode]="displayMode"
+            [showPageSizeSelector]="showPageSizeSelector"
+            [showInfo]="showInfo"
+            [showNavigationButtons]="showNavButtons"
+          ></dxo-pager>
+            <dxi-column dataField="MODULE_NAME" caption="Menu List" [allowEditing]="false" [width]="360"></dxi-column>
+            <!-- Add Right Column -->
+            <dxi-column dataField="CanAdd" caption="Add" [width]="80" 
+            dataType="boolean"
+            [allowEditing]="true" 
+            [allowSorting]="false"
+            [editorOptions]="{
+                iconSize: '15px',
+                enableTwoStateBehavior: true,
+              }"
+              >
+          </dxi-column>
+          <dxi-column dataField="canView" caption="View" [width]="80"
+            dataType="boolean"
+            [allowEditing]="true"
+            [allowSorting]="false" 
+            [editorOptions]="{
+                iconSize: '15px',
+                enableTwoStateBehavior: true,
+              }">
+              <dxo-selection mode="multiple"></dxo-selection>
+          </dxi-column>
+          <dxi-column dataField="canModify" caption="Modify" [width]="80"
+            dataType="boolean"
+            [allowEditing]="true" 
+            [allowSorting]="false"
+            [editorOptions]="{
+                iconSize: '15px',
+                enableTwoStateBehavior: true,
+              }">
+          </dxi-column>
+          <dxi-column dataField="canDelete" caption="Delete" [width]="80"
+            dataType="boolean"
+            [allowEditing]="true" 
+            [allowSorting]="false"
+            [editorOptions]="{
+                iconSize: '15px',
+                enableTwoStateBehavior: true,
+              }">
+          </dxi-column>
+          <dxi-column dataField="canVerify" caption="Verify" [width]="80"
+            dataType="boolean"
+            [allowEditing]="true" 
+            [allowSorting]="false"
+            [editorOptions]="{
+                iconSize: '15px',
+                enableTwoStateBehavior: true,
+              }">
+          </dxi-column>
+          <dxi-column dataField="canApprove" caption="Approve" [width]="90"
+            dataType="boolean"
+            [allowEditing]="true" 
+            [allowSorting]="false"
+            [editorOptions]="{
+                iconSize: '15px',
+                enableTwoStateBehavior: true,
+              }">
+          </dxi-column>
+          <dxi-column dataField="canPrint" caption="Print" [width]="80"
+            dataType="boolean"
+            [allowEditing]="true" 
+            [allowSorting]="false"
+            [editorOptions]="{
+                iconSize: '15px',
+                enableTwoStateBehavior: true,
+              }">
+          </dxi-column>
+          <dxi-column dataField="canExport" caption="Export" [width]="80"
+            dataType="boolean"
+            [allowEditing]="true" 
+            [allowSorting]="false"
+            [editorOptions]="{
+                iconSize: '15px',
+                enableTwoStateBehavior: true,
+              }">
+          </dxi-column>
+          </dx-data-grid>
+        </div>
+      </div>
+    </div>
+  </div>

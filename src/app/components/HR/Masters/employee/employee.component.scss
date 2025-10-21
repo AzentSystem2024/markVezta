@@ -1,0 +1,181 @@
+@use "../../../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+  overflow: auto; 
+}
+
+.view-wrapper {
+  
+    .grid {
+      .name-template {
+        .position {
+          font-size: 12px;
+          color: var(--texteditor-label-color);
+        }
+      }
+  
+      ::ng-deep & {
+        .dx-datagrid-header-panel {
+          padding: 0 var(--content-padding);
+        }
+  
+        .dx-toolbar {
+          margin-bottom: 0;
+          padding: var(--toolbar-margin-bottom) 0;
+        }
+  
+        .dx-datagrid-content .dx-row {
+          cursor: pointer;
+        }
+      }
+  
+      .grid-header {
+        @include header();
+      }
+    }
+  
+    user-panel {
+      display: inherit;
+    }
+  }
+  
+  .popup-content {
+    padding: 20px;
+  }
+  
+  .popup-content > div {
+    margin-bottom: 15px;
+  }
+
+
+.form-row {
+  margin: 20px 0; /* Space around the form row */
+}
+
+.input-container {
+  display: flex; /* Use flexbox to align items */
+  align-items: center; /* Center vertically */
+}
+.toggle-container {
+  display: flex; /* Flexbox for alignment */
+  align-items: center; /* Center items vertically */
+  position: relative; /* Position relative for the slider */
+  width: 60px; /* Width of the toggle switch */
+  height: 30px; /* Height of the toggle switch */
+  border-radius: 20px; /* Rounded corners */
+  background-color: #ccc; /* Background color */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-left: 10px; /* Space between input and toggle */
+}
+
+.toggle-slider {
+  position: absolute; /* Position absolute for sliding effect */
+  display: flex;
+  top: 2px; /* Align to the top of the toggle container */
+  left: 0; /* Start at the left */
+  width: 28px; /* Width of the slider */
+  height: 28px; /* Full height */
+  border-radius: 20px; /* Rounded corners */
+  background-color: #007bff; /* Slider color */
+  transition: transform 0.3s ease; /* Smooth transition for sliding */
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+.toggle-option {
+  font-size: 30px; /* Adjust font size */
+  line-height: 30px; /* Center text vertically */
+  flex: 1; /* Make each option take equal space */
+  text-align: center; /* Center text horizontally */
+  cursor: pointer;
+}
+
+.decrease-option {
+  text-align: left; /* Align "-" to the left */
+  padding-left: 5px; /* Space from the left */
+}
+
+.increase-option {
+  text-align: right; /* Align "+" to the right */
+  padding-right: 5px; /* Space from the right */
+}
+
+.increase {
+  transform: translateX(30px); /* Adjust to move the slider */
+}
+
+.decrease {
+  transform: translateX(0); /* Initial position */
+}
+
+.toggle-option.active {
+  color: #0a0a0a; /* Change color for active state */
+  font-weight: bold; /* Optional: make active option bold */
+}
+
+
+.dx-datagrid-header-panel
+.dx-toolbar-text-auto-hide
+.dx-button.dx-button-has-icon {
+  border-radius: 4px !important;
+  background-color: #00a0e028 !important;
+}
+
+.dx-datagrid-headers.dx-datagrid-nowrap.dx-bordered-top-view {
+border-radius: 10px 10px 0 0 !important;
+background-color: #4699b920 !important;
+font-size: 1.25rem !important;
+font-weight: bolder !important;
+font-weight: bolder !important;
+// border-bottom: 1px solid #000 !important; 
+}
+.dx-datagrid-headers .dx-datagrid-header-row .dx-datagrid-action {
+  border-left: 1px solid #000 !important; /* Define a border between columns */
+}
+
+.dx-datagrid .dx-row .dx-cell {
+  border-right: 1px solid #000 !important; /* Ensure column borders are visible */
+}
+
+.dx-datagrid-headers.dx-header-multi-row .dx-datagrid-content .dx-datagrid-table .dx-row.dx-header-row > td {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  vertical-align: bottom;
+  border-right: 1px solid #9db2cf;
+  border-left: 1px solid #9db2cf;
+  border-bottom: 1px solid #9db2cf;
+}
+
+.dx-datagrid .dx-row > td {
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 20px;
+}
+.dx-datagrid-nowrap .dx-header-row > td > .dx-datagrid-text-content {
+  white-space: nowrap;
+  font-size: 13px;
+}
+.view-wrapper .grid .grid-header {
+  font-size: 19px;
+  font-weight: 400;
+  padding-right: 25px;
+}
+
+
+  
+  
+  
+.flag-red {
+    color: red;
+  }
+  
+  .flag-green {
+    color:green;
+  }

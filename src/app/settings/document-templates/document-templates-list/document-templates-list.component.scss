@@ -1,0 +1,120 @@
+@use "../../../../variables.scss" as *;
+@use "sass:math";
+
+.grid-header {
+    @include header();
+  }
+
+  .form-popup-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--popup-toolbar-item-spacing);
+  
+    &.flex-buttons {
+      &::ng-deep .dx-button {
+        flex: 1;
+      }
+    }
+  }
+
+  .print-container {
+    padding: 16px;
+    background-color: #fff;
+  }
+  
+  .template-item {
+    border: 1px dashed #ccc;
+    margin: 8px 0;
+    padding: 12px;
+    background-color: #f9f9f9;
+    cursor: grab;
+  }
+  
+  .main-header, .footer {
+    font-size: 12px;
+  
+  }
+  
+  .main-header {
+    margin-bottom: 16px;
+    margin-top:0px;
+  }
+
+  .header-container {
+    margin-bottom: 15px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .header-container .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-container .row-middle {
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .header-container .row .left {
+    flex: 1;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .header-container .row .middle {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .header-container .row .right {
+    flex: 1;
+    text-align: right;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .draggable-item {
+    padding: 10px;
+    margin: 5px 0;
+    cursor: grab;
+  }
+  
+  .draggable-item:active {
+    cursor: grabbing;
+  }
+
+  ::ng-deep .dx-toolbar-center {
+    width: 100%;
+  }
+
+  .form-popup-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--popup-toolbar-item-spacing);
+  
+    &.flex-buttons {
+      &::ng-deep .dx-button {
+        flex: 1;
+      }
+    }
+  }
+  .dropdownClass{
+    width: 400px;
+    height: 40px;
+  }
+
+  .dx-editor-cell.dx-editor-inline-block:not(.dx-command-select)::before {
+    padding-top: 0px;
+    padding-bottom:0px;
+}
+
+ 

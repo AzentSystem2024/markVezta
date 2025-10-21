@@ -1,0 +1,80 @@
+
+.form-group {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+}
+
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: end;
+  z-index: 1000;
+}
+
+.saveBtn {
+  background-color: rgb(71, 158, 245);
+  color: black;
+}
+
+.fixed-footer dx-button + dx-button {
+  margin-left: 10px;
+}
+
+/* Set popup height */
+.custom-date-popup .dx-popup-content {
+  height: 250px;
+}
+
+/* Style the Apply button */
+.custom-apply-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.custom-apply-btn:hover {
+  background-color: #0056b3;
+}
+
+.flag-open {
+  color: white;
+  text-shadow: 0 0 1px black, 0 0 2px black;
+}
+
+.flag-verified {
+  color: orange;
+}
+
+.flag-approved {
+  color: green;
+}
+
+/* Adjust filter row height */
+::ng-deep .dx-datagrid-filter-row {
+  height: 45px !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .dx-datagrid-filter-row td {
+  padding: 2px 6px !important;
+  height: 28px !important;
+}
+
+::ng-deep .dx-datagrid-filter-row .dx-texteditor-input {
+  font-size: 12px !important;
+  height: 22px !important;
+  padding: 2px 4px !important;
+}
+
+::ng-deep .dx-datagrid-filter-row .dx-editor-cell .dx-widget {
+  min-height: 24px !important;
+}

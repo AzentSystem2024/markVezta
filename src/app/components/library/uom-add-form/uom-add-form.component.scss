@@ -1,0 +1,18 @@
+.form-container {
+    width: 100%; /* Ensure the container takes up the full width of its parent */
+    height: 100%; /* Ensure the container takes up the full height of its parent */
+    overflow-y: hidden; /* Hide vertical overflow */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  }
+  
+  .plain-styled-form {
+    width: 100%; /* Ensure the form takes up the full width of its container */
+    height: 100%; /* Ensure the form takes up the full height of its container */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  }
+  
+  .plain-styled-form .dx-text-box {
+    max-width: 100%; /* Ensure the text box does not exceed the container's width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  }
+  

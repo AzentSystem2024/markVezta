@@ -1,0 +1,159 @@
+<dx-form class="plain-styled-form" [colCount]="1">
+    
+      <dxi-item itemType="group" [colCount]="2">
+        <dxi-item>
+          <div *dxTemplate>
+            <dx-text-box
+              label="Code"
+              [(value)]="newTender.CODE"
+              width="100"
+              stylingMode="filled"
+            >
+            <dx-validator>
+              <dxi-validation-rule
+                  type="required"
+                  message="Code is required">
+              </dxi-validation-rule>
+          </dx-validator>
+          </dx-text-box>
+          </div>
+          </dxi-item>
+          <dxi-item Align="Right">
+            <dx-check-box 
+                    [value]="isInactive"
+                    [elementAttr]="{ 'aria-label': 'checked' }"
+                    text="Inactive"
+                  ></dx-check-box>
+            </dxi-item>
+        </dxi-item>
+
+        <dxi-item itemType="group" [colCount]="1">
+            <dxi-item>
+              <div *dxTemplate>
+                <dx-text-box
+                  label="Description"
+                  [(value)]="newTender.DESCRIPTION"
+                  stylingMode="filled"
+                >
+                <dx-validator>
+                  <dxi-validation-rule
+                      type="required"
+                      message="Description is required">
+                  </dxi-validation-rule>
+              </dx-validator>
+              </dx-text-box>
+              </div>
+              </dxi-item>
+            </dxi-item>
+            <dxi-item itemType="group" [colCount]="1">
+                <dxi-item>
+                  <div *dxTemplate>
+                    <label>Arabic Name</label>
+                    <dx-text-box
+                      [(value)]="newTender.ARABIC_DESCRIPTION"
+                      stylingMode="filled"
+                      [rtlEnabled]="true"
+                    >
+                    <dx-validator>
+                      <dxi-validation-rule
+                          type="required"
+                          message="Arabic name is required">
+                      </dxi-validation-rule>
+                  </dx-validator>
+                  </dx-text-box>
+                  </div>
+                  </dxi-item>
+                </dxi-item>
+        
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item>
+              <div *dxTemplate>
+                <dx-select-box
+                  label="Tender Type"
+                  [items]="TenderTypeDropdownData"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [(value)]="newTender.TENDER_TYPE"
+                  placeholder="Select Tender type"
+                  stylingMode="filled"
+                >
+                <dx-validator>
+                  <dxi-validation-rule
+                      type="required"
+                      message="Tender type is required">
+                  </dxi-validation-rule>
+              </dx-validator>
+              </dx-select-box>
+              </div>
+            </dxi-item>
+            <dxi-item>
+                  <div *dxTemplate  Align="Right">
+                    <dx-text-box
+                      label="Display Order"
+                      [(value)]="newTender.DISPLAY_ORDER"
+                      width="95"
+                      stylingMode="filled"
+                     
+                    >
+                    <dx-validator>
+                      <dxi-validation-rule
+                          type="required"
+                          message="Display order is required">
+                      </dxi-validation-rule>
+                  </dx-validator>
+                  </dx-text-box>
+                  </div>
+                  </dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item>
+              <div *dxTemplate>
+                <dx-select-box
+                  label="Currency"
+                  [items]="VATRuleDropdownData"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [(value)]="newTender.CURRENCY_ID"
+                  placeholder="Select Currency"
+                  stylingMode="filled"
+                >
+                <dx-validator>
+                  <dxi-validation-rule
+                      type="required"
+                      message="Currency is required">
+                  </dxi-validation-rule>
+              </dx-validator>
+              </dx-select-box>
+              </div>
+            </dxi-item>
+            </dxi-item>
+            <dxi-item itemType="group" [colCount]="1">
+                
+                  <dx-check-box
+                    [value]="allowOpening"
+                    (onValueChanged)="onValueChangedOpening($event.value)"
+                    text="Allow Opening "
+                  ></dx-check-box> 
+
+            </dxi-item>
+            <dxi-item itemType="group" [colCount]="1">
+                  <dx-check-box
+                    [value]="allowDeclaration"
+                    (onValueChanged)="onValueChangedDeclaration($event.value)"
+                    [elementAttr]="{ 'aria-label': allowDeclaration? 'Checked' : 'Unchecked' }"
+                    text="Allow Declaration"
+                  ></dx-check-box>  
+
+            </dxi-item>
+            <dxi-item itemType="group" [colCount]="1">
+                  <dx-check-box
+                    [(value)]="additionalInformationRequired"
+                    (onValueChanged)="onValueChangedInformation($event.value)"
+                    [elementAttr]="{ 'aria-label': additionalInformationRequired ? 'Checked' : 'Unchecked' }"
+                    text="Additional information required"
+                  ></dx-check-box> 
+            </dxi-item>    
+          
+    </dx-form>
+
+    

@@ -1,0 +1,110 @@
+<div class="view-wrapper list-page">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="category"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      (onRowRemoving)="onRowRemoving($event)"
+      (onRowUpdating)="onRowUpdating($event)"
+      [showBorders]="true"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      (onExporting)="onExporting($event)"
+
+    >
+    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+    <dxo-filter-row
+    [visible]="showFilterRow"
+  ></dxo-filter-row>
+
+  <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+<dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+ 
+      <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+        <dxo-popup title="Edit Category" [showTitle]="true" [width]="600" [height]="300">
+        
+        </dxo-popup>
+      </dxo-editing>
+      <dxo-search-panel
+      [visible]="true"
+      placeholder="Data Search"
+    ></dxo-search-panel>
+   
+    <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Category</div>
+        </dxi-item>
+    
+    <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addCategory()"
+          
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              icon: 'refresh',
+              onClick: refresh,
+              stylingMode: 'text'
+            }"
+          ></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="exportButton"></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    
+    </dxo-toolbar>
+    <dxi-column dataField="CODE" caption="Code">
+      <dxi-validation-rule type="required" message="Code is required">
+        <dxi-validation-rule type="required" message="Code is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="CAT_NAME" caption="Category">
+      <dxi-validation-rule type="required" message="Category is required">
+        <dxi-validation-rule type="required" message="Category is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <!-- <dxi-column dataField="LOYALTY_POINT" caption="LOYALTY POINT"></dxi-column> -->
+    <!-- <dxi-column dataField="COST_HEAD_ID" caption="COST HEAD"></dxi-column> -->
+    <dxi-column dataField="DEPT_ID" caption="Department">
+      <dxo-lookup
+        [dataSource]="DepartmentDropdownData"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+      >
+      </dxo-lookup>
+      <dxi-validation-rule type="required" message="Department is required">
+        <dxi-validation-rule type="required" message="Department is required">
+        </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    </dx-data-grid>
+    <form-popup
+        [(visible)]="isAddCategoryPopupOpened"
+        (save)="onClickSaveCategory()"
+        titleText="New Category"
+      >
+        <app-category-form></app-category-form>
+      </form-popup>
+    </div>

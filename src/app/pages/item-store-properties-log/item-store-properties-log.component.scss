@@ -1,0 +1,33 @@
+@use "../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+}
+
+.edit-cell {
+    position: relative;
+  
+    contact-status {
+      position: absolute;
+      margin-top: 10px;
+      margin-left: 11px;
+    }
+  }
+
+.grid-header{
+    font-size: 22px;
+    font-weight: 400;
+    padding-right: 25px
+}
+
+.selected-rows-container {
+  position: relative;
+  left: 24x;
+  bottom: 5px;;
+  margin-top: 10px;
+  margin-left: 10px; 
+}

@@ -1,0 +1,167 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'75vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true
+      }"
+      class="grid theme-dependent"
+      [dataSource]="packingList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'standard' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onEditingStart)="onEditPacking($event)"
+      (onRowRemoving)="delete_Packing_Data($event)"
+      (onToolbarPreparing)="onToolbarPreparing($event)"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Packing</div>
+        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="addButtonOptions"
+          *ngIf="canAdd"
+        ></dxi-item>
+
+        <!-- <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            icon="plus"
+            hint="Add"
+            type="default"
+            stylingMode="contained"
+  (onClick)="addPacking()"
+          ></dx-button>
+        </dxi-item> -->
+      </dxo-toolbar>
+      
+            <dxi-column dataField="SNO" caption="S.No." alignment="left"></dxi-column>
+
+      <dxi-column dataField="ArtNo" caption="Art No."></dxi-column>
+      <dxi-column dataField="Color" caption="Color"></dxi-column>
+
+      <dxi-column dataField="Category" caption="Category"></dxi-column>
+      <dxi-column dataField="PackingName" caption="Packing Name"></dxi-column>
+      <dxi-column dataField="Type" caption="Type"></dxi-column>
+      <dxi-column dataField="Brand" caption="Brand"></dxi-column>
+      <!-- <dxi-column dataField="ID" caption="ID"></dxi-column> -->
+      <dxi-column dataField="UnitId"      alignment="Left" caption="Unit"></dxi-column>
+      <dxi-column dataField="AliasNo" caption="Alias No."></dxi-column>
+      <dxi-column dataField="PartNo" caption="Part No."></dxi-column>
+      <dxi-column dataField="PairQty" caption="Pair Qty"></dxi-column>
+      <dxi-column
+        dataField="Status"
+        caption="Status"
+        alignment="center"
+        cellTemplate="statusCellTemplate"
+      ></dxi-column>
+      <!-- <dxi-column dataField="Unit" caption="Unit"></dxi-column> -->
+
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value == 'Active' ? 'Active ' : 'Inactive '"
+          style="cursor: default ;align-items: center;"
+        ></i>
+              
+      </div>
+
+    </dx-data-grid>
+  </div>
+</div>
+
+<dx-popup
+  [(visible)]="addPackingPopupVisible"
+  [width]="'70vw'"
+  [height]="'77vh'"
+  title="New Packing"
+  (onHiding)="handleClose()"
+>
+  <app-packing-add (popupClosed)="handleClose()"></app-packing-add>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="editPackPopupOpened"
+  [width]="'70vw'"
+  [height]="'77vh'"
+  title="Update Packing"
+  (onHiding)="handleClose()"
+>
+  <app-packing-edit
+    *ngIf="editPackPopupOpened"
+    [PackingData]="selectedPacking"
+    (popupClosed)="handleClose()"
+  ></app-packing-edit>
+</dx-popup>
+<!-- <dx-popup
+
+
+ *ngIf="editArticlePopupOpened"
+    
+
+[articleData]="selectedArticle"======================Update data==========
+  [(visible)]="editArticlePopupOpened"
+  [width]="'70vw'"
+  [height]="'95vh'"
+  title="Update Article"
+  (onHiding)="handleClose()"
+>
+  <app-article-edit
+    *ngIf="editArticlePopupOpened"
+      [articleData]="selectedArticle"
+    (popupClosed)="handleClose()"
+  ></app-article-edit>
+</dx-popup> -->

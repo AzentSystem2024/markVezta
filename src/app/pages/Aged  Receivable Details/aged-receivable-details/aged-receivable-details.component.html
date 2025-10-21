@@ -1,0 +1,247 @@
+<div class="salary-grid-wrapper" style="padding: 10px">
+  
+ 
+  <div class="grid-container">
+    <dx-data-grid
+      [dataSource]="CustomerListDataSource"
+      width="100%"
+      noDataText=""
+      height="70vh"
+      width="100%"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+        [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+      }"
+
+[summary]="summaryColumnsData"
+    [summary.calculateCustomSummary]="summaryColumnsData.calculateCustomSummary"
+    (onExporting)="onExporting($event)"
+    >
+       <!-- (onEditingStart)="onEditLedger($event)" -->
+         <!-- <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+      ></dxo-editing> -->
+     <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"  style="padding-right: 15px;"> </dxo-export>
+<!-- <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager> -->
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"  style="padding-right: 15px;"> </dxo-export>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px;">
+         Aged Receivables Details
+          </div>
+        </dxi-item>
+
+           <!-- <dxi-item>
+           <dx-select-box
+    [width]="200"
+    label="Company Id"
+    labelMode="floating"
+    [items]="company_list"
+    displayExpr="COMPANY_NAME"
+    valueExpr="COMPANY_ID"
+    [(value)]="selectedCompanyId"
+    [searchEnabled]="true"
+    (onValueChanged)="onCompanyChange($event)">
+        >
+
+        </dx-select-box>
+
+        </dxi-item> -->
+           <dxi-item>
+             <dx-select-box
+        [width]="200"
+        label="Customer"
+        labelMode="floating"
+         [items]="customer_list"
+    displayExpr="DESCRIPTION"
+    valueExpr="ID"
+    [(value)]="select_customer_id"
+    [searchEnabled]="true"
+    (onValueChanged)="onCompanyChange($event)"
+        >
+
+        </dx-select-box>
+
+        </dxi-item>
+           <dxi-item>
+            <dx-date-box
+  [width]="150"
+  label="From Date"
+  labelMode="floating"
+  [(value)]="selected_from_date"
+  [displayFormat]="'dd-MM-yyyy'"
+  (onValueChanged)="onFromDateChange($event)">
+</dx-date-box>
+
+           <!-- <dx-date-box
+        [width]="150"
+        label="From Date"
+        labelMode="floating"
+            [(value)]="selected_from_date"
+              displayFormat="yyyy-MM-dd"
+        >
+
+        </dx-date-box> -->
+
+        </dxi-item>
+           <dxi-item>
+           <dx-date-box
+        [width]="150"
+        label="To Date"
+        labelMode="floating"
+          [(value)]="selected_To_date"
+            displayFormat="dd-MM-yyyy"
+              (onValueChanged)="onToDateChange($event)"
+        >
+
+        </dx-date-box>
+
+        </dxi-item>
+        <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
+        <!-- <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item> -->
+
+  <dxi-item>
+    <!-- <dx-button
+    text="Apply"
+    icon="todo"
+    stylingMode="contained"
+    type="default"
+    [width]="100"
+    class="mt-2"
+    (onClick)="load_Ledgre_data()"
+    >
+
+    </dx-button> -->
+  </dxi-item>
+       <dxi-item name="exportButton"></dxi-item>
+      </dxo-toolbar>
+      
+
+      <dxo-sorting mode="none"></dxo-sorting>
+      <dxo-filter-row visible="true"></dxo-filter-row>
+      <dxo-header-filter visible="true"></dxo-header-filter>
+      <dxo-paging page-size="10"></dxo-paging>
+      <dxo-pager
+        show-page-size-selector="true"
+        show-info="true"
+        show-navigator="true"
+      ></dxo-pager>
+        <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+     <!-- <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row> -->
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+
+<!-- <dxi-column dataField="TRANS_ID" caption="Transaction ID" [width]="120"></dxi-column> -->
+<dxi-column dataField="TRANS_DATE" caption="Date" dataType="date" format="dd-MM-yyyy" [width]="130"></dxi-column>
+<dxi-column dataField="TRANS_TYPE" caption="Transaction Type" [width]="150"></dxi-column>
+<dxi-column dataField="DOC_NO" caption="Doc No" [width]="100"></dxi-column>
+<dxi-column dataField="DOC_NAME" caption="Document Name" [width]="250"></dxi-column>
+<dxi-column dataField="NARRATION" caption="Narration" [width]="350"></dxi-column>
+<dxi-column dataField="DR_AMOUNT" caption="Debit Amount"  [width]="150" dataType="number" format="#,##0.00" alignment="right"></dxi-column>
+<dxi-column dataField="CR_AMOUNT" caption="Credit Amount"  [width]="200" dataType="number" format="#,##0.00" alignment="right" ></dxi-column>
+
+<dxi-column  *ngIf="CustomerListDataSource.length > 0" type="buttons" [width]="100">
+  <dxi-button
+    hint="View"
+    icon="eyeopen"  
+    text="View"
+[onClick]="onViewClick.bind(this)"
+  ></dxi-button>
+</dxi-column>
+
+    </dx-data-grid>
+  </div>
+</div>
+
+
+<!-- =========================view of credit note============================== -->
+
+<dx-popup
+  [(visible)]="isViewCreditNote"
+  [width]="'90vw'"
+  [height]="'90vh'"
+  title="Credit Note"
+  (onHiding)="handleClose()"
+>
+  <app-view-credit-note
+    [creditFormData]="selectedCreditNote"
+    (popupClosed)="handleClose()"
+  ></app-view-credit-note>
+</dx-popup>
+
+<!-- =====================invoice view screen=========================== -->
+
+<dx-popup
+  [(visible)]="isViewInvoice"
+  [width]="'90vw'"
+  [height]="'85vh'"
+  title="View Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewInvoice">
+    <app-view-invoice
+      [invoiceFormData]="selectedInvoice"
+      (popupClosed)="handleClose()"
+    ></app-view-invoice>
+  </ng-container>
+</dx-popup>
+
+
+<!-- //======================= coustom receipt=================== -->
+
+<dx-popup
+  [(visible)]="isViewReceipt"
+  [width]="'75vw'"
+  [height]="'100vh'"
+  title="View Receipt"
+  (onHiding)="handleClose()"
+>
+
+    <app-view-customer-receipt
+      [receiprtFormData]="selectedReceipt"
+      (popupClosed)="handleClose()"
+    ></app-view-customer-receipt>
+
+</dx-popup>

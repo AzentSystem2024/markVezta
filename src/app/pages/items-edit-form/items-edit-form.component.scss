@@ -1,0 +1,570 @@
+.price-header {
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+.file-uploader-container {
+    display: flex;
+    align-items: center;
+  }
+
+
+  
+  /* Ensures the form scales properly */
+  .plain-styled-form {
+    width: 100%; /* Makes the form stretch to the container */
+    max-width: 100%; /* Prevents overflowing the container */
+  }
+
+  /* Handle smaller screens using media queries */
+@media (max-width: 768px) {
+  .plain-styled-form {
+    width: 100%;
+  }
+
+  .spacing-item {
+    padding: 15px; /* Adjust padding for smaller screens */
+  }
+}
+  
+.field-spacing {
+  margin-bottom: 16px; /* Adjust as needed */
+}
+
+  
+  .clear-button-container {
+    margin-left: 1px; /* Adjust as needed */
+    // pointer-events: none;
+  }
+  .clear-button-container {
+    background-color: transparent; /* Make background transparent */
+    border: none; /* Remove border */
+    padding: 0; /* Remove padding */
+    color: rgb(10, 10, 10); /* Change color if desired */
+    font-size: 1em; /* Adjust size as needed */
+    cursor: pointer; /* Change cursor to pointer */
+  }
+  
+  .country-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .flag-icon {
+    width: 20px; /* Adjust according to your flag image size */
+    height: 15px; /* Adjust according to your flag image size */
+    margin-right: 8px;
+  }
+  
+  .spacing-item {
+    margin-bottom: 20px; /* Adjust the value as needed */
+  }
+  
+  .spacing-custom-items {
+    margin-bottom: 30px; /* Adjust the value as needed */
+  }
+  
+  .spacing-custom {
+    margin-bottom: 10px; /* Adjust the value as needed */
+  }
+
+
+  ::ng-deep #dropzone-external {
+    width: 270px;
+    height: 280px;
+    background-color: rgb(183 183 183 / 10%);
+    border-width: 2px;
+    border-style: dashed;
+    padding: 10px;
+    border-color: var(--dx-color-border);
+  }
+  
+  ::ng-deep #dropzone-external > * {
+    pointer-events: none;
+  }
+  
+  ::ng-deep #dropzone-external.dropzone-active {
+    border-style: solid;
+    border-color: var(--dx-color-primary);
+  }
+  
+  ::ng-deep .widget-container > span {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+  
+  ::ng-deep #dropzone-image {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  ::ng-deep #dropzone-text > span {
+    font-weight: 100;
+    opacity: 0.5;
+  }
+  
+  ::ng-deep #upload-progress {
+    display: flex;
+    margin-top: 10px;
+  }
+  
+  ::ng-deep .flex-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .dx-fileuploader-button {
+    display: none;
+  }
+  
+
+
+  .image-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 250px; /* Adjust this height based on your image and button sizes */
+  }
+  
+  .image-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .button-container {
+    height: 40px; /* Adjust this height based on the button height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+
+  /* Modal styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+.modal-content {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+}
+
+.modal-content, .caption {
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@keyframes zoom {
+  from {transform:scale(0)} 
+  to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+.form-container {
+  width: 90%; /* Or any percentage less than 100% */
+  margin: 0 auto; /* Center the form */
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-frame {
+  border-width: 0.5px;
+  border-style: solid;
+  border-color: black;
+  padding: 20px;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box; 
+  // background-color: #f0f0f0; /* Optional background color */
+  // max-width: 600px;
+  // width: 50%;
+}
+
+.form-item label {
+  width: 150px;
+  // font-weight: bold;
+}
+
+.container-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-container {
+  border: none; 
+  padding: 10px;
+  width: calc(50% - 20px); /* Adjust width to leave space for borders and padding */
+  max-height: 530px;
+  border: 1px solid #ccc;
+  max-width: 100%; 
+}
+
+.right-containers {
+  // border: none; 
+  display: flex;
+  flex-direction: column;
+  width: calc(52% - 22px); /* Adjust width to leave space for borders and padding */
+  // box-shadow: 0 0 0 0.5px black;
+}
+
+.inventory-container, .history-container {
+  border: none; 
+  padding: 10px;
+  margin-bottom: 30px; /* Adjust margin between Inventory and History containers */
+  box-sizing: border-box; /* Include padding and border in the width calculation */
+  border: 1px solid #ccc;
+
+}
+
+.price-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.inventory-item, .history-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.inventory-item label, .history-item label {
+  width: 200px; /* Adjust width as needed */
+  margin-right: 10px; /* Adjust spacing between label and input */
+}
+
+.dx-text-box {
+  width: 100%; /* Full width within its container */
+}
+
+/* Force the grid to always show the horizontal scrollbar */
+.always-show-scrollbar .dx-datagrid-rowsview {
+  overflow-x: scroll !important;
+  overflow-y: hidden; /* Adjust if you don't want a vertical scrollbar */
+}
+
+.dx-datagrid-rowsview {
+  overflow-x: auto !important;
+}
+.dx-scrollable-scrollbar.dx-scrollbar-horizontal {
+  height: 16px; /* Adjust based on your design */
+  background-color: #f1f1f1; /* Optional: Background color for visibility */
+}
+
+/* Ensure the horizontal scrollbar is visible and correctly styled */
+.always-show-scrollbar .dx-scrollbar-horizontal {
+  height: 16px; /* Adjust based on your design */
+  opacity: 1 !important;
+  visibility: visible !important;
+  background-color: #ccc; /* Adjust if needed to make scrollbar more visible */
+}
+
+/* Force the scrollbar content to always be visible */
+.always-show-scrollbar .dx-scrollbar-horizontal .dx-scrollable-scroll-content {
+  opacity: 1 !important;
+  visibility: visible !important;
+  height: 100%;
+  background-color: #ccc; /* Adjust if needed to make scrollbar more visible */
+}
+
+/* Optional: Style the scrollbar thumb to make it more visible */
+.always-show-scrollbar .dx-scrollbar-horizontal .dx-scrollable-scroll {
+  background-color: #888; /* Adjust the color for visibility */
+  border-radius: 8px; /* Optional: rounded scrollbar thumb */
+}
+
+.inventory-container {
+  width: 100%; /* Adjust as needed */
+  max-width: 800px; /* Set a maximum width if necessary */
+  margin: 0 auto; /* Center the container if needed */
+  padding: 10px; /* Add some padding for better spacing */
+  margin-bottom: 20px
+}
+
+.history-container {
+  border: none;
+  padding: 10px;
+  box-sizing: border-box; /* Include padding and border in the width calculation */
+  border: 1px solid #ccc;
+}
+
+.container {
+  overflow-y:hidden;
+  display: grid;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  margin: 0 auto;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+}
+
+.item {
+  flex: 1 1 auto;  /* Each item will grow and shrink as needed */
+  margin: 10px;
+}
+
+.special-container {
+  flex: 1;
+  margin-right: 20px;
+  border: 1px solid #ccc;
+  // border:white;
+  padding: 10px;
+  max-height: 530px;
+}
+
+.options-container {
+  flex: 1;
+  border: 1px solid #ccc;
+  
+  padding: 10px;
+  max-height: 530px;
+}
+
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30vh; /* Match the dropdown height */
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #000; /* Color of the spinner */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.button-container1 {
+  margin-top: 20px; /* Adjust the value to increase/decrease the space */
+  text-align: right; /* Optional: Aligns buttons to the right */
+}
+
+.spacing-itemUOM {
+  margin-top: 100px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between label and checkbox */
+}
+
+.checkbox-label {
+  font-size: 14px;
+  color: #333; /* Adjust label color */
+}
+
+
+
+
+
+#drop-area {
+  border: 2px dashed #ccc; /* Dashed border for the drop area */
+  border-radius: 10px; /* Rounded corners */
+  width: 150px; /* Full width */
+  max-height: 200px ;
+  max-width: 200px; /* Maximum width */
+  height: 150px; /* Fixed height for the drop area */
+  margin: 20px auto; /* Centered with margin */
+  padding: 20px; /* Padding inside the area */
+  text-align: center; /* Centered text */
+  transition: border-color 0.3s; /* Smooth transition for border color */
+  position: relative; /* Positioning for absolute children */
+  overflow: hidden; /* Hide overflow to make image cover */
+}
+
+
+#drop-area.highlight {
+  border-color: purple; /* Highlight color when dragging over */
+}
+
+button {
+  margin-top: 10px; /* Space above the button */
+  padding: 8px 16px; /* Padding inside the button */
+  font-size: 13px; /* Font size for button text */
+  cursor: pointer; /* Pointer cursor for hover effect */
+  background-color: #007bff; /* Button background color */
+  color: white; /* Button text color */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded button corners */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+  position: relative; /* Ensure button is above the image */
+  z-index: 2; /* Higher z-index to ensure the button is clickable */
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker color on hover */
+}
+
+#gallery {
+  position: absolute; /* Absolute positioning to cover drop area */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  display: flex; /* Flexbox for centering */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  z-index: 1; /* Lower z-index to ensure it's behind the button */
+}
+
+#gallery img {
+  width: 100%; /* Make image cover the full width */
+  height: 135px; /* Make image cover the full height */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
+  transition: transform 0.3s; /* Smooth transition for transform */
+}
+
+#gallery img:hover {
+  transform: scale(1.05); /* Slight zoom effect on hover */
+}
+.close-icon {
+    position: absolute; /* Absolute positioning for close icon */
+    bottom: 10px; /* Distance from top */
+    right: 50%; /* Distance from right */
+    color: red;
+    font-weight: bolder;
+    cursor: pointer; 
+//   font-size: 20px; /* Size of the close icon */
+//   color: red; /* Color of the close icon */
+//   background-color: white; /* Background color for visibility */
+//   border-radius: 50%; /* Round shape for close icon background */
+//   padding: 5px; /* Padding around the icon */
+//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
+}
+
+.custom-field {
+  margin-bottom: 0px !important; /* Removes vertical gap */
+  padding-bottom: 0px !important;
+}
+.dx-field-item-content {
+  padding: 2px 0 !important; /* Reduce top & bottom padding */
+}
+
+.dx-texteditor-input {
+  height: 24px !important; /* Reduce input field height */
+}
+  
+
+
+
+/* Make the whole tab strip dark */
+::ng-deep .dx-tab {
+  background-color: #1e1e1e;   /* dark background */
+  color: #ccc;                 /* light gray text */
+  font-weight: 500;
+  padding: 10px 20px;
+  border: none;
+}
+
+/* Change hover state */
+::ng-deep .dx-tab:hover {
+  color: #fff;                 /* white on hover */
+}
+
+/* Selected (active) tab */
+::ng-deep .dx-tab.dx-tab-selected {
+  color: #2979ff;              /* blue text */
+  border-bottom: 2px solid #2979ff; /* blue underline */
+}
+
+/* Remove default borders */
+::ng-deep .dx-tabs {
+  border-bottom: 1px solid #333;  /* subtle line under tabs */
+  background-color: #1e1e1e;      /* dark bar */
+}
+::ng-deep .dx-tabpanel .dx-tabpanel-tabs .dx-tabs {
+    height: 100%;
+    background-color: var(--tab-bg-color);
+    border: none; 
+}
+ ::ng-deep  .dx-tab.dx-tab-selected {
+    color: #2979ff;
+ border-bottom: 0px ; 
+    background: transparent;
+    // margin-right: 10px;
+}
+
+ ::ng-deep  .dx-tab .dx-tab-text {
+  background-color: transparent !important;
+  font-size: large;
+}
+
+::ng-deep .dx-tabpanel .dx-tabpanel-tab {
+    flex-basis: unset;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background: transparent;
+    margin-left: 20px;
+}
+// .plus-btn {
+//   width: 28px;
+//   height: 28px;
+//   border: none;
+//   border-radius: 50%;
+
+//   color: white;
+//   font-size: 18px;
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+// }
+
+
+.form-popup-buttons-container {
+  display: flex;
+  justify-content: flex-end; /* push buttons to right */
+  gap: 10px;                 /* space between buttons */
+  margin-top: 20px;          /* add some top spacing */
+}

@@ -1,0 +1,230 @@
+<div class="single-column-form">
+  <div class="form-group">
+  <div class="popup-content">
+    <dx-select-box
+[(value)]="accountHeadData.MainGroupId"
+  [dataSource]="mainGroupList"
+  displayExpr="GROUP_NAME"
+  valueExpr="GROUP_ID"
+  placeholder="Main Group"
+  stylingMode="outlined"
+  [searchEnabled]="true"
+  (onValueChanged)="onMainGroupChange($event)"
+  class="form-field">
+</dx-select-box>
+  </div>
+
+<div class="form-group">
+  <div class="subgroup-container">
+        <dx-select-box
+[(value)]="accountHeadData.SubGroupId"
+  [dataSource]="subGroupList"
+  displayExpr="GROUP_NAME"
+  valueExpr="GROUP_ID"
+  placeholder="Sub Group"
+  stylingMode="outlined"
+  (onValueChanged)="onSubGroupChange($event)"
+  [searchEnabled]="true"
+  class="form-field">
+</dx-select-box>
+    <dx-button
+      icon="plus"
+      type="default"
+      stylingMode="contained"
+      class="add-btn"
+      (onClick)="onAddSubField()"
+    ></dx-button>
+  </div>
+</div>
+
+
+  <div class="form-group">
+    <div class="subgroup-container">
+     
+      <dx-select-box
+[(value)]="selectedCategory"
+  [dataSource]="categoryList"
+  displayExpr="GROUP_NAME"
+  valueExpr="GROUP_ID"
+  placeholder="Category"
+  stylingMode="outlined"
+  [searchEnabled]="true"
+  (onValueChanged)="onCategoryChange($event)"
+  class="form-field">
+</dx-select-box>
+  
+    <dx-button
+      icon="plus"
+      type="default"
+      stylingMode="contained"
+      class="add-btn"
+      (onClick)="onAddCategory()"
+    ></dx-button>
+    </div>
+  </div>
+
+
+  <div class="form-group">
+  <div class="headcode-ledger-container">
+    <!-- HEAD_CODE (ReadOnly) -->
+    <dx-text-box
+      [value]="accountHeadData.HEAD_CODE"
+      label="Code"
+      labelMode="floating"
+      placeholder="Code"
+      [readOnly]="true"
+      stylingMode="outlined"
+      class="headcode-box"
+    ></dx-text-box>
+
+    <!-- HEAD_NAME (Editable Ledger) -->
+    <dx-text-box
+      [(value)]="accountHeadData.HEAD_NAME"
+      label="Ledger"
+      labelMode="floating"
+      placeholder="Ledger"
+      stylingMode="outlined"
+      class="ledger-box"
+    ></dx-text-box>
+  </div>
+</div>
+
+
+  <!-- <div class="form-group">
+    <dx-text-box
+[(value)]="accountHeadData.HEAD_NAME"
+      label="Ledger"
+      labelMode="floating"
+      placeholder="Ledger"
+    ></dx-text-box>
+  </div> -->
+
+  <!-- <div class="form-group">
+    <dx-text-box
+
+      label="Arabic Description"
+      labelMode="floating"
+      placeholder="Arabic Description"
+    ></dx-text-box>
+  </div> -->
+</div>
+
+
+<div class="checkbox-container">
+  <dx-check-box text="Active" [(value)]="accountHeadData.IS_ACTIVE"> </dx-check-box>
+</div>
+
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      type="normal"
+      (onClick)="closePopup()"
+    ></dx-button>
+    <dx-button text="Update" (onClick)="updateAccountHead()" stylingMode="contained" type="default"></dx-button>
+  </div>
+</div>
+
+<dx-popup
+  [(visible)]="subGroupPopup"
+  [showTitle]="true"
+  title="New Sub Group"
+  [width]="400"
+  [height]="230"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div class="popup-content">
+    <dx-text-box
+[value]="selectedMainGroupName"
+      placeholder="Main Group"
+      stylingMode="outlined"
+      class="form-field"
+      [readOnly]="true"
+    ></dx-text-box>
+
+    <dx-text-box
+[(value)]="accountGroupData.GROUP_NAME"
+      placeholder="Sub Group"
+      stylingMode="outlined"
+      class="form-field"
+    ></dx-text-box>
+  </div>
+
+<div class="form-popup-buttons-container">
+      <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      (onClick)="subGroupPopup = false"
+      stylingMode="outlined"
+    ></dx-button>
+    <dx-button text="Edit" (onClick)="editAccountGroup()" type="default" stylingMode="contained"></dx-button>
+      </div>
+
+  </div>
+</dx-popup>
+
+
+<!-- CATEGORY POPUP -->
+<dx-popup
+  [(visible)]="categoryPopup"
+  [showTitle]="true"
+  title="New Category"
+  [width]="400"
+  [height]="230"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+<div class="two-column-form">
+  <div class="form-group">
+    <dx-text-box
+[value]="selectedMainGroupName"
+      label="Main Group"
+      labelMode="floating"
+      [readOnly]="true"
+      placeholder="Enter Main Group"
+    >
+    </dx-text-box>
+  </div>
+
+  <div class="form-group horizontal-group">
+    <div class="select-box-wrapper">
+<dx-text-box
+[value]="selectedSubGroupName"
+  label="Sub Group"
+  labelMode="floating"
+  placeholder="Sub Group"
+  [readOnly]="true">
+</dx-text-box>
+
+    </div>
+
+
+  </div>
+</div>
+
+<div class="full-width-form-group">
+<dx-text-box
+[(value)]="accountGroupData.GROUP_NAME"
+  label="Category"
+  labelMode="floating"
+  placeholder="Category"
+  stylingMode="outlined"
+  class="form-field"
+>
+</dx-text-box>
+
+</div>
+<div class="form-popup-buttons-container">
+      <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      (onClick)="categoryPopup = false"
+      stylingMode="outlined"
+    ></dx-button>
+    <dx-button text="Edit" (onClick)="editAccountGroup()" type="default" stylingMode="contained"></dx-button>
+      </div>
+
+  </div>
+</dx-popup>

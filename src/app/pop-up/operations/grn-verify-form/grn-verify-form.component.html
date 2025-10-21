@@ -1,0 +1,449 @@
+<div
+  class="card-container"
+  style="
+    padding: 5px;
+    margin-bottom: 10px;
+    background-color: var(--base-bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  "
+>
+  <!-- First Row -->
+  <div
+    class="row"
+    style="
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    "
+  >
+    <div class="left-section" style="display: flex; gap: 20px; flex: 1">
+      <dx-text-box
+        label="GRN NO."
+        [(value)]="newGrnData.GRN_NO"
+        labelMode="floating"
+        placeholder="Enter PO No"
+        [readOnly]="true"
+        [elementAttr]="{ class: 'grntextbox' }"
+      >
+      </dx-text-box>
+
+      <dx-date-box
+        label="Date"
+        labelMode="floating"
+        placeholder="Select Date"
+        [readOnly]="true"
+        [value]="today"
+        [readOnly]="true"
+        displayFormat="dd-MM-yyyy"
+        [elementAttr]="{ class: 'grndatebox' }"
+      >
+      </dx-date-box>
+    </div>
+
+    <div class="right-section" style="flex: 1; margin-left: 10px">
+      <dx-select-box
+        label="Store"
+        labelMode="floating"
+        [dataSource]="storeList"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [(value)]="newGrnData.STORE_ID"
+        placeholder="Select Store"
+        [searchEnabled]="true"
+        [readOnly]="true"
+        [elementAttr]="{ class: 'grndropdown' }"
+        (onValueChanged)="onStoreValueChanged($event)"
+      >
+      </dx-select-box>
+    </div>
+  </div>
+
+  <!-- Second Row -->
+  <div class="row" style="display: flex; gap: 20px; margin-top: 10px">
+    <div style="flex: 1">
+      <dx-select-box
+        label="Supplier"
+        labelMode="floating"
+        [dataSource]="supplierList"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [(value)]="newGrnData.SUPP_ID"
+        placeholder="Select Supplier"
+        [searchEnabled]="true"
+        [readOnly]="true"
+        [elementAttr]="{ class: 'grndropdown' }"
+        width="390"
+      >
+      </dx-select-box>
+    </div>
+
+    <div style="flex: 1">
+      <!-- <dx-drop-down-box
+        labelMode="floating"
+        labelLocation="left"
+        label="Select Purchase Order"
+        [(opened)]="isGridBoxOpened"
+        displayExpr="PO_NO"
+        [(value)]="selectedPONo"
+        [showClearButton]="true"
+        [readOnly]="true"
+        [dataSource]="filteredPOList"
+        [elementAttr]="{ class: 'grndropdown' }"
+        [inputAttr]="{ 'aria-label': 'Owner' }"
+        [showClearButton]="true"
+        >
+        <div *dxTemplate="let data of 'content'">
+          <dx-data-grid
+            [columns]="[
+              { dataField: 'PO_NO', caption: 'PO NO' },
+              { dataField: 'PO_DATE', caption: 'PO DATE', dataType: 'date', format: 'MM/dd/yyyy' },
+              { dataField: 'SUPP_NAME', caption: 'SUPPLIER' },
+              { dataField: 'ID', caption: 'ID', visible: false }
+            ]"
+            [selection]="{ mode: 'single' }"
+            [hoverStateEnabled]="true"
+            [paging]="{ enabled: true, pageSize: 10 }"
+            [headerFilter]="{ visible: true }"
+            [scrolling]="{ mode: 'virtual' }"
+            [height]="250"
+            [dataSource]="filteredPOList"
+            [(selectedRowKeys)]="selectedPONo"
+            >
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+          </dx-data-grid>
+        </div>
+      </dx-drop-down-box> -->
+      <dx-text-box
+        label="Purchase Order"
+        [(value)]="selectedPONo"
+        labelMode="floating"
+        [readOnly]="true"
+        [elementAttr]="{ class: 'grntextbox' }"
+      >
+      </dx-text-box>
+    </div>
+  </div>
+</div>
+
+<div>
+  <dx-data-grid
+    [showBorders]="true"
+    class="data-grid"
+    [dataSource]="poDetails"
+    [selection]="{ mode: 'single' }"
+    [hoverStateEnabled]="true"
+    [paging]="{ enabled: true, pageSize: 10 }"
+    [scrolling]="{ mode: 'virtual' }"
+    [height]="250"
+    (onRowUpdated)="updateCell($event)"
+    (onCellPrepared)="highlightEditableColumns($event)"
+    class="custom-data-grid"
+    [columnAutoWidth]="true"
+    (onContentReady)="onGrnContentReady($event)"
+    
+  >
+    <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
+
+    <dxi-column
+      caption="SL NO"
+      dataField="SL_NO"
+      [width]="87"
+      [allowEditing]="false"
+      alignment="center"
+    ></dxi-column>
+    <dxi-column
+      dataField="ITEM_CODE"
+      caption="ITEM CODE"
+      [width]="'auto'"
+      [allowEditing]="false"
+    ></dxi-column>
+    <dxi-column
+      dataField="DESCRIPTION"
+      caption="DESCRIPTION"
+      [width]="'auto'"
+      [allowEditing]="false"
+    ></dxi-column>
+    <dxi-column
+      *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2"
+      dataField="SUPP_PRICE"
+      caption="PRICE {{ currencySymbol }}"
+      [width]="'auto'"
+      [allowEditing]="false"
+      alignment="right"
+    ></dxi-column>
+    <dxi-column
+      *ngIf="
+        !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
+      "
+      dataField="PRICE"
+      caption="PRICE {{ localCurrencySymbol }}"
+      [width]="'auto'"
+      [allowEditing]="false"
+      alignment="right"
+    ></dxi-column>
+    <dxi-column
+      dataField="PO_QUANTITY"
+      caption="QTY IN PO"
+      [width]="87"
+      [allowEditing]="false"
+      alignment="center"
+    ></dxi-column>
+    <dxi-column
+      dataField="UOM"
+      [width]="87"
+      caption="PURCH UOM"
+      [allowEditing]="false"
+    ></dxi-column>
+    <dxi-column
+      dataField="GRN_QUANTITY"
+      [width]="cwidth"
+      caption="RECEIVED TO DATE"
+      [allowEditing]="false"
+      alignment="center"
+    ></dxi-column>
+    <dxi-column
+      dataField="QTY_TO_RECEIVE"
+      [width]="cwidth"
+      caption="QTY TO RECEIVE"
+      [allowEditing]="false"
+      alignment="center"
+    ></dxi-column>
+    <dxi-column
+      dataField="RECEIVED_QTY"
+      [width]="cwidth"
+      caption="QTY RECEIVED"
+      [allowEditing]="true"
+      alignment="center"
+      [editorOptions]="{
+        showSpinButtons: true,
+        min: 0,
+        format: '#0',
+        mode: 'number'
+      }"
+    ></dxi-column>
+    <dxi-column
+      dataField="QTY_BASE_UNIT"
+      [width]="cwidth"
+      caption="QTY IN STOCK UNIT"
+      [allowEditing]="false"
+    ></dxi-column>
+    <dxi-column
+      *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2"
+      dataField="SUPP_AMOUNT"
+      [width]="cwidth"
+      caption="AMOUNT {{ currencySymbol }}"
+      [allowEditing]="false"
+      alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+    <dxi-column
+      *ngIf="
+        !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
+      "
+      dataField="AMOUNT"
+      [width]="cwidth"
+      caption="AMOUNT {{ localCurrencySymbol }}"
+      [allowEditing]="false"
+      alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+
+    <!-- <dxi-column *ngFor="let col of dynamicColumns" [dataField]="col.dataField" [caption]="col.caption" [allowEditing]="col.allowEditing" [width]="col.width" [alignment]="col.alignment" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column> -->
+
+    <dxi-column
+      dataField="PRICE"
+      caption="UNIT COST"
+      [allowEditing]="false"
+      alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+
+  </dx-data-grid>
+</div>
+<div style="display: flex">
+  <div style="flex: 1; margin-top: 10px">
+    <div
+      class="card-container"
+      style="
+        padding: 5px;
+        margin-bottom: 10px;
+        background-color: var(--base-bg);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      "
+    >
+      <div style="display: flex">
+        <label style="font-weight: 600; margin-bottom: 20px; flex: 13"
+          >Costs</label
+        >
+        <dx-button
+          style="flex: 1"
+          icon="plus"
+          type="default"
+          hint="Add New Cost"
+          (onClick)="openCostPopup()"
+          stylingMode="contained"
+        ></dx-button>
+      </div>
+      <dx-data-grid
+        [showBorders]="true"
+        class="data-grid"
+        [dataSource]="costingMethodDataGrid"
+        [selection]="{ mode: 'single' }"
+        [hoverStateEnabled]="true"
+        [paging]="{ enabled: true, pageSize: 10 }"
+        [scrolling]="{ mode: 'virtual' }"
+        [height]="150"
+        (onRowUpdated)="onCostingGridValueChanged($event)"
+        (onContentReady)="onCostContentReady($event)"
+        [showColumnLines]="true"
+      >
+        <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
+
+        <dxi-column
+          dataField="DESCRIPTION"
+          caption="Description"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="CURRENCY"
+          caption="Currency"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="RATE"
+          caption="Rate"
+          [allowEditing]="true"
+          [editorOptions]="{
+            showSpinButtons: true,
+            min: 0,
+            format: '#0',
+            mode: 'number'
+          }"
+        ></dxi-column>
+        <dxi-column
+          dataField="TOTAL"
+          caption="Total"
+          [allowEditing]="false"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+        ></dxi-column>
+      </dx-data-grid>
+    </div>
+  </div>
+  <div style="flex: 1; margin-left: 20px">
+    <dx-text-area
+      label="NARRATION"
+      labelMode="floating"
+      placeholder="Enter NARRATION"
+      [(value)]="newGrnData.NARRATION"
+      [height]="30"
+      [width]="400"
+      [maxLength]="500"
+    >
+    </dx-text-area>
+  </div>
+  <div style="flex: 1">
+    <div class="total-container">
+      <div class="total-field">
+        <label>Total Quantity:</label>
+        <dx-text-box
+          placeholder="0"
+          [width]="90"
+          [readOnly]="true"
+          [(value)]="totalQuantity"
+          [rtlEnabled]="true"
+        ></dx-text-box>
+      </div>
+
+      <div class="total-field"  *ngIf="!(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)">
+        <label>Net Amount</label>
+
+        <dx-text-box
+          placeholder="0.00"
+          [width]="150"
+          [readOnly]="true"
+          [value]="formattedLocalNetAmount"
+          [rtlEnabled]="true"
+        ></dx-text-box>
+      </div>
+    </div>
+
+    <div class="vat-container">
+      <div class="vat-field" *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2">
+        <label>Net Amount</label>
+
+        <dx-text-box
+          placeholder="0.00"
+          [width]="150"
+          [readOnly]="true"
+          [rtlEnabled]="true"
+          [value]="formattedNetAmount"
+        ></dx-text-box>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dx-popup
+  id="CostPopup"
+  [(visible)]="isCostPopUpOpened"
+  title="Add Cost"
+  [height]="300"
+  [width]="400"
+  (onHiding)="onCloseCostPOpup()"
+>
+  <dx-select-box
+    label="Landed Cost"
+    labelMode="floating"
+    displayExpr="DESCRIPTION"
+    valueExpr="ID"
+    [(value)]="costData.ID"
+    [dataSource]="landedCostDropDown"
+    placeholder="Select Cost"
+    [searchEnabled]="true"
+    [elementAttr]="{ class: 'grndropdown' }"
+    (onValueChanged)="onCostDropdownValueChanged($event)"
+  >
+  </dx-select-box>
+
+  <dx-text-box
+    label="Currency"
+    labelMode="floating"
+    [(value)]="costData.CURRENCY"
+    [readOnly]="true"
+    [elementAttr]="{ class: 'grntextbox' }"
+  >
+  </dx-text-box>
+
+  <dx-text-box
+    label="Rate"
+    labelMode="floating"
+    [(value)]="costData.RATE"
+    [elementAttr]="{ class: 'grntextbox' }"
+  >
+  </dx-text-box>
+
+  <dxi-toolbar-item toolbar="bottom" location="center">
+    <div
+      class="form-popup-buttons-container"
+      [class.flex-buttons]="width <= 360"
+    >
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        (onClick)="onCloseCostPOpup()"
+      ></dx-button>
+      <dx-button
+        text="Save"
+        stylingMode="contained"
+        (onClick)="saveCost('CostPopup')"
+        type="default"
+      ></dx-button>
+    </div>
+  </dxi-toolbar-item>
+
+  <dx-popup></dx-popup
+></dx-popup>

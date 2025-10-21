@@ -1,0 +1,149 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="landedcost"
+    (onRowRemoving)="onRowRemoving($event)"
+    [showBorders]="true"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    (onExporting)="onExporting($event)"
+    (onRowUpdating)="onRowUpdating($event)"
+  >
+    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+    <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
+
+    <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-popup
+        title="Edit Landed Cost"
+        [showTitle]="true"
+        [width]="500"
+        [height]="450"
+      ></dxo-popup>
+      <dxo-form [colCount]="1">
+        <dxi-item itemType="group" [colCount]="2">
+          <dxi-item dataField="CODE"></dxi-item>
+          <dxi-item
+            dataField="IS_INACTIVE"
+            [colCount]="1"
+            editorType="dxCheckBox"
+            cssClass="checkbox-right"
+            [editorOptions]="{ text: 'Inactive' }"
+          >
+            <dxo-label [visible]="false"></dxo-label>
+          </dxi-item>
+        </dxi-item>
+        <dxi-item itemType="group" [colCount]="1">
+          <dxi-item dataField="DESCRIPTION"></dxi-item>
+        </dxi-item>
+        <dxi-item itemType="group" [colCount]="1">
+          <dxi-item
+            dataField="IS_LOCAL_CURRENCY"
+            [colSpan]="1"
+            editorType="dxRadioGroup"
+            [editorOptions]="{
+              items: currencyOptions,
+              value: isLocalCurrency,
+              layout: 'horizontal'
+            }"
+          >
+            <dxo-label [visible]="false"></dxo-label>
+          </dxi-item>
+        </dxi-item>
+        <dxi-item itemType="group" [colCount]="2">
+          <dxi-item
+            dataField="IS_FIXED_AMOUNT"
+            [colSpan]="1"
+            editorType="dxRadioGroup"
+            [editorOptions]="{
+              items: amountOptions,
+              value: isFixedAmount,
+              layout: 'horizontal'
+            }"
+          ></dxi-item>
+          <dxi-item dataField="VALUE" [colSpan]="1"></dxi-item>
+        </dxi-item>
+      </dxo-form>
+    </dxo-editing>
+    <dxo-search-panel
+      [visible]="true"
+      placeholder="Data Search"
+    ></dxo-search-panel>
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header">Landed Cost</div>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addLandedcost()"
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          text: 'Refresh',
+          icon: 'refresh',
+          stylingMode: 'text'
+        }"
+      ></dxi-item>
+      <dxi-item location="after" locateInMenu="auto">
+        <div class="separator"></div>
+      </dxi-item>
+      <dxi-item name="exportButton"></dxi-item>
+      <dxi-item location="after" locateInMenu="auto">
+        <div class="separator"></div>
+      </dxi-item>
+      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    </dxo-toolbar>
+
+    <dxi-column dataField="CODE" caption="Code" [visible]="false"> </dxi-column>
+
+    <dxi-column dataField="DESCRIPTION" caption="Description">
+      <dxi-validation-rule type="required" message="Description is required">
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column
+      dataField="IS_LOCAL_CURRENCY"
+      caption="Currency"
+      dataType="string"
+      [calculateCellValue]="calculateCurrency"
+    >
+    </dxi-column>
+    <dxi-column
+      dataField="IS_FIXED_AMOUNT"
+      caption="Amount"
+      dataType="string"
+      [calculateCellValue]="calculateAmount"
+    >
+      <dxi-validation-rule type="required" message="Amount is required">
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="VALUE" caption="Value" alignment="left"></dxi-column>
+    <dxi-column
+      dataField="IS_INACTIVE"
+      caption="Status"
+      dataType="string"
+      [calculateCellValue]="calculateStatus"
+    >
+    </dxi-column>
+  </dx-data-grid>
+  <form-popup
+    [(visible)]="isAddLandedcostPopupOpened"
+    [width]="500"
+    (save)="onClickSaveLandedcost()"
+    titleText="New Landed Cost"
+  >
+    <app-landed-cost-form></app-landed-cost-form>
+  </form-popup>
+</div>

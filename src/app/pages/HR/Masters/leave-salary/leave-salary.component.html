@@ -1,0 +1,143 @@
+<div class="view-wrapper list-page">
+    <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="LeaveType"
+    [showBorders]="true"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    [height]="'80vh'"
+    noDataText=" "
+    (onRowRemoved)="delete_LeaveType($event)"
+    [pager]="{ 
+        showInfo: true, 
+        infoText: 'Page {0} of {1}', 
+        showNavigationButtons: true 
+      }"
+     (onEditingStart)="onEditingStart($event)"
+    >
+
+    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+    <dxo-filter-row [visible]="showFilterRow" [applyFilter]="currentFilter"></dxo-filter-row>
+
+    <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+      <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+    [visible]="true"
+    [showPageSizeSelector]="true"
+    [allowedPageSizes]="[10,20,30,40]"
+    ></dxo-pager>
+
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+        <dxo-popup title="Update LeaveType" [showTitle]="true" [width]="600" [height]="300"></dxo-popup>
+      </dxo-editing>
+
+      <dxo-search-panel
+    [visible]="true"
+    placeholder="Data Search"
+  ></dxo-search-panel>
+
+  <dxo-toolbar>
+    <dxi-item location="before">
+        <div class="grid-header">Leave Type</div>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text=""
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+            (onClick)="addLeaveSalary()"
+          ></dx-button>
+      </dxi-item>
+
+      <dxi-item
+    location="after"
+    locateInMenu="auto"
+    showText="inMenu"
+    widget="dxButton"
+    [options]="{
+      text: 'Refresh',
+      icon: 'refresh',
+      stylingMode: 'text',
+      onClick: refresh
+    }"
+  ></dxi-item>
+  <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item> 
+  </dxo-toolbar>
+
+  <dxi-column dataField="SlNo" [width]="80" caption="Sl.No" [allowEditing]="false" [allowFiltering]="false"  alignment="left"  [allowHeaderFiltering]="false"></dxi-column>
+  <dxi-column dataField="CODE" caption="Code"></dxi-column>
+  <dxi-column dataField="DESCRIPTION" caption="Leave Type"></dxi-column>
+  <dxi-column dataField="LEAVE_SALARY_PAYABLE" caption="Leave Salary Payable" [calculateCellValue]="formatStatusPayable"></dxi-column>
+  <dxi-column dataField="STATUS" caption="Status"></dxi-column>
+    </dx-data-grid>
+</div>
+
+
+<form-popup
+    [(visible)]="AddLSPopup"
+    titleText="New Leave Salary"
+    (save)="Add_LeaveType()">
+    <dx-form class="plain-styled-form" [formGroup]="formsource">
+        <dxi-item>
+         <dx-text-box
+         label="Code"
+         formControlName="CODE" >
+        </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Leave Type"
+            formControlName="DESCRIPTION"
+            ></dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-check-box
+            text="LeaveSalary Payable"
+            formControlName="LEAVE_SALARY_PAYABLE"
+            ></dx-check-box>
+        </dxi-item>
+    </dx-form>
+</form-popup>
+
+<form-popup
+[(visible)]="UpdateLSPopup"
+titleText="Update Leave Type"
+(save)="Edit_LeaveType()"
+>
+<dx-form class="plain-styled-form">
+    <dxi-item>
+     <dx-text-box
+     label="Code"
+     [(value)]="selectedData.CODE" >
+    </dx-text-box>
+    </dxi-item>
+
+    <dxi-item>
+        <dx-text-box
+        label="Leave Type"
+        [(value)]="selectedData.DESCRIPTION"></dx-text-box>
+    </dxi-item>
+
+    <dxi-item type="group" [colCount]="2" [colSpan]="2">
+      
+        <dx-check-box
+        text="LeaveSalary Payable"
+        [(value)]="selectedData.LEAVE_SALARY_PAYABLE"></dx-check-box>
+    
+
+      <dx-check-box
+      text="Inactive"
+      [(value)]="selectedData.IS_INACTIVE"></dx-check-box>
+    </dxi-item>
+</dx-form>
+</form-popup>
+    

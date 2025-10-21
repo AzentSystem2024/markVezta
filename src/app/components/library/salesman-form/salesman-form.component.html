@@ -1,0 +1,289 @@
+
+<dx-form class="plain-styled-form" [colCount]="2">
+  
+    
+  <dxi-item itemType="group" >
+     
+      <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Code"
+            [(value)]="newSalesman.EMP_CODE"
+            stylingMode="filled"
+          >
+          <dx-validator>
+            <dxi-validation-rule
+                type="required"
+                message="Code is required">
+            </dxi-validation-rule>
+        </dx-validator>
+        </dx-text-box>
+        </div>
+        </dxi-item>
+      </dxi-item>
+    
+      <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Salesman Name"
+            [(value)]="newSalesman.EMP_NAME"
+            stylingMode="filled"
+          >
+          <dx-validator>
+            <dxi-validation-rule
+                type="required"
+                message="Code is required">
+            </dxi-validation-rule>
+        </dx-validator>
+        </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+      <div *dxTemplate>
+      <dx-date-box
+      type="date"
+      label="Date Of Birth"
+      [value]="dob"
+      [inputAttr]="{ 'aria-label': 'Date' }"
+      stylingMode="filled"
+      validationRules="required"
+    >
+    <dx-validator>
+      <dxi-validation-rule
+          type="required"
+          message="DOB is required">
+      </dxi-validation-rule>
+  </dx-validator>
+  </dx-date-box>
+    </div>
+    </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+    <dxi-item>
+      <div *dxTemplate>
+      <dx-date-box
+      type="date"
+      label="Joining Date"
+      [value]="doj"
+      [inputAttr]="{ 'aria-label': 'Date' }"
+      stylingMode="filled"
+      validationRules="required"
+    >
+    <dx-validator>
+      <dxi-validation-rule
+          type="required"
+          message="Joining is required">
+      </dxi-validation-rule>
+  </dx-validator>
+  </dx-date-box>
+    </div>
+    </dxi-item>
+  </dxi-item>
+  <dxi-item itemType="group" [colCount]="1">
+    <dxi-item> 
+      <div *dxTemplate> 
+        <label>Gender</label>
+        <dx-radio-group
+          [items]="genderOptions"
+          layout="horizontal"
+          [(value)]="gender"
+          (onValueChanged)="onValueChangedGender($event)"
+        ></dx-radio-group>
+      </div>
+    </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-select-box
+          label="Working Location"
+          [items]="StoreDropdownData"
+          stylingMode="filled"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="newSalesman.STORE_ID"
+          placeholder="Select Location"
+          validationRules="required"
+          >
+          <dx-validator>
+            <dxi-validation-rule
+                type="required"
+                message="Description is required">
+            </dxi-validation-rule>
+        </dx-validator>
+          </dx-select-box
+        >
+      </div>
+    </dxi-item>
+  </dxi-item>
+    
+      
+    
+  </dxi-item>
+  
+ 
+  <dxi-item itemType="group">
+    <dxi-item itemType="group" [colCount]="1">
+  
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Address"
+            [(value)]="newSalesman.ADDRESS1"
+            stylingMode="filled"
+            validationRules="required"
+          >
+          <dx-validator>
+            <dxi-validation-rule
+                type="required"
+                message="Address is required">
+            </dxi-validation-rule>
+        </dx-validator>
+        </dx-text-box>
+        </div>
+      </dxi-item>
+  
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            [(value)]="newSalesman.ADDRESS2"   
+            stylingMode="filled"   
+          ></dx-text-box>
+        </div>
+      </dxi-item>
+  
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            [(value)]="newSalesman.ADDRESS3"   
+            stylingMode="filled"    
+          ></dx-text-box>
+        </div>
+      </dxi-item>
+      </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="City"
+            [(value)]="newSalesman.CITY"
+            stylingMode="filled"
+            validationRules="required"
+          >
+          <dx-validator>
+            <dxi-validation-rule
+                type="required"
+                message="City is required">
+            </dxi-validation-rule>
+        </dx-validator>
+        </dx-text-box>
+        </div>
+      </dxi-item>
+      
+        </dxi-item>
+        <dxi-item itemType="group" [colCount]="1">
+        <dxi-item>
+              <dx-text-box
+                label="Mobile"
+                class="phone-style"
+                [(value)]="newSalesman.MOBILE"
+                stylingMode="filled"
+                (keypress)="keyPressNumbers($event)"
+                validationRules="required"
+              >
+              <dx-validator>
+                <dxi-validation-rule
+                    type="required"
+                    message="Mobile number is required">
+                </dxi-validation-rule>
+            </dx-validator>
+            </dx-text-box>
+            
+        </dxi-item>
+        
+      
+      
+      </dxi-item>
+      <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Email"
+            [(value)]="newSalesman.EMAIL"
+            stylingMode="filled"
+            validationRules="required"
+          >
+          <dx-validator>
+            <dxi-validation-rule
+                type="required"
+                message="Email is required">
+            </dxi-validation-rule>
+            <dxi-validation-rule 
+        type="pattern" 
+        pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+        message="Invalid email format"
+      ></dxi-validation-rule>
+        </dx-validator>
+        </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Emirates Id"
+            [(value)]="newSalesman.IQAMA_NO"
+            stylingMode="filled"
+            validationRules="required"
+          >
+          <dx-validator>
+            <dxi-validation-rule
+                type="required"
+                message="Emirates ID is required">
+            </dxi-validation-rule>
+        </dx-validator>
+        </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <label>Commission%</label>
+        <div style="display:flex ;padding-top: 5px;">
+          
+          <dx-text-box
+            width="80"
+            [(value)]="newSalesman.INCENTIVE_PERCENT"
+            stylingMode="filled"
+            placeholder="0 %"
+            validationRules="required"
+          >
+          <dx-validator>
+            <dxi-validation-rule
+                type="required"
+                message="Incentive percent is required">
+            </dxi-validation-rule>
+        </dx-validator>
+        </dx-text-box><span style="padding-left: 10px;">of invoice value</span>
+        </div>
+        </dxi-item>
+      </dxi-item>
+    </dxi-item>
+    
+   
+     
+    
+  
+  
+    
+  </dx-form>
+  
+  
+  
+  

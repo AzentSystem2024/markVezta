@@ -1,0 +1,175 @@
+
+@use "../.../../../../../variables.scss" as *;
+@use "sass:math";
+
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+  overflow: auto; 
+}
+
+.view-wrapper {
+  
+    .grid {
+      .name-template {
+        .position {
+          font-size: 12px;
+          color: var(--texteditor-label-color);
+        }
+      }
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        // background: rgba(255, 255, 255, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000; /* Ensure it is above other content */
+      }
+      
+  
+      ::ng-deep & {
+        .dx-datagrid-header-panel {
+          padding: 0 var(--content-padding);
+        }
+  
+        .dx-toolbar {
+          margin-bottom: 0;
+          padding: var(--toolbar-margin-bottom) 0;
+        }
+  
+        .dx-datagrid-content .dx-row {
+          cursor: pointer;
+        }
+      }
+  
+      .grid-header {
+        @include header();
+      }
+    }
+  
+    user-panel {
+      display: inherit;
+    }
+    
+  }
+.popup-content {
+    padding: 20px;
+  }
+  
+  .popup-content > div {
+    margin-bottom: 15px;
+  }
+
+  .month-selector {
+    padding-left: 100px;
+  }
+  .calendar-popup {
+    position: absolute;
+    background: var(--base-bg);
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    width:284px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    border-radius: 8px;
+  }
+  
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  
+  
+  .calendar-body {
+    display: grid;
+    grid-template-columns: repeat(3, 2fr);
+    gap: 8px;
+  }
+  
+  .month-cell {
+    padding: 8px;
+    background-color: var(--base-bg);
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.3s;
+  }
+  
+  .month-cell:hover {
+    background-color: #d0d0ff;
+  }
+  
+  .month-cell.selected {
+    background-color: #4f46e5;
+    color: white;
+  }
+
+  .form-group {
+    display: flex;
+    align-items: center;  /* Aligns items vertically */
+    gap: 0px;  /* Adjust spacing between elements */
+ }
+ 
+ .fixed-footer {
+     position: fixed;
+     bottom: 0;
+     left: 0;
+     right: 0;
+     padding: 12px 20px;
+     display: flex;
+     justify-content: end;
+     z-index: 1000;
+ 
+   }
+   
+   .saveBtn{
+     background-color:rgb(71, 158, 245);
+     color: black;
+   }
+    .fixed-footer dx-button + dx-button {
+      margin-left: 10px;
+   }
+
+
+   .flag-open {
+    color: white; /* or rgb(245, 240, 240) */
+    text-shadow: 0 0 1px black, 0 0 2px black;
+  }
+  
+  
+  .flag-verified {
+    color: orange;
+  }
+  
+  .flag-approved {
+    color:rgb(255, 8, 8);}
+    
+   /* Set popup height */
+.custom-date-popup .dx-popup-content {
+  height: 250px; /* or any height you want */
+}
+
+/* Style the Apply button */
+.custom-apply-btn {
+  background-color: #007bff; /* Bootstrap primary blue */
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.custom-apply-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}

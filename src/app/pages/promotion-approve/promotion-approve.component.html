@@ -1,0 +1,971 @@
+<div class="view-wrappers list-page">
+  <div>
+    <dx-data-grid
+      #dataGrid
+      [width]="'100%'"
+      [height]="originalGridHeight"
+      class="grid theme-dependent"
+      [dataSource]="worksheetpromotionSchema"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [editing]="{
+          mode: 'cell',
+          allowUpdating: true,
+        }"
+      [keyExpr]="'ID'"
+      [selectedRowKeys]="selectedRowKeys"
+      (onContentReady)="onGridReady($event)"
+      [(selectedRowKeys)]="selectedRowKeys"
+      (onSelectionChanged)="onSelectionChanged($event)"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-scrolling
+        mode="standard"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-header-filter
+        [visible]="true"
+        [allowSearch]="true"
+      ></dxo-header-filter>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-editing mode="popup" [allowAdding]="true" [allowUpdating]="true">
+      </dxo-editing>
+
+      <dxo-toolbar  #toolbar1>
+        <!-- Heading -->
+
+        <!-- Row 1 -->
+        <dxi-item location="before">
+          <div style="display: flex; flex-direction: column; gap: 5px">
+            <dxi-item location="before">
+              <div class="grid-header">{{ heading }}</div>
+            </dxi-item>
+          </div>
+          <div
+            style="
+              display: flex;
+              align-items: flex-start;
+              gap: 20px;
+              flex-wrap: wrap;
+              margin-top: 20px;
+            "
+          >
+            <!-- From Date and To Date -->
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <dx-date-box
+                [(value)]="fromDate"
+                [type]="'date'"
+                [displayFormat]="'yyyy-MM-dd'"
+                [placeholder]="'Select from date'"
+                [min]="minDate"
+                style="width: 120px"
+                (onValueChanged)="checkDateSelection($event)"
+              >
+              </dx-date-box>
+
+              <dx-date-box
+                [(value)]="toDate"
+                [type]="'date'"
+                [displayFormat]="'yyyy-MM-dd'"
+                [placeholder]="'Select to date'"
+                [min]="minDate"
+                style="width: 120px"
+                (onValueChanged)="checkDateSelection($event)"
+              >
+              </dx-date-box>
+            </div>
+
+            <!-- Checkbox -->
+            <dx-check-box
+              id="happyHoursCheckbox"
+              [(value)]="isHappyHoursEnabled"
+              hint="Enable Happy Hours"
+              (valueChange)="onHappyHoursChanged($event)"
+            ></dx-check-box>
+
+            <!-- From Time and To Time -->
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <dx-date-box
+                [(value)]="timeFrom"
+                [type]="'time'"
+                [displayFormat]="'HH:mm'"
+                [pickerType]="'rollers'"
+                placeholder="From Time"
+                [width]="80"
+                [disabled]="!isHappyHoursEnabled"
+              >
+              </dx-date-box>
+
+              <dx-date-box
+                [(value)]="timeTo"
+                [type]="'time'"
+                [displayFormat]="'HH:mm'"
+                [pickerType]="'rollers'"
+                placeholder="To Time"
+                [width]="80"
+                [disabled]="!isHappyHoursEnabled"
+              >
+              </dx-date-box>
+            </div>
+
+            <!-- Days of the Week and Select Store -->
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <dx-tag-box
+                [items]="daysOfWeek"
+                [(value)]="selectedDays"
+                displayExpr="text"
+                valueExpr="value"
+                placeholder="Select Days"
+                [showSelectionControls]="true"
+                [multiline]="false"
+                [width]="600"
+                [searchEnabled]="true"
+                (onValueChanged)="handleDaySelection($event)"
+              >
+              </dx-tag-box>
+
+              <dx-tag-box
+                [items]="store"
+                valueExpr="ID"
+                [(value)]="selectedStoreId"
+                displayExpr="STORE_NAME"
+                [showSelectionControls]="true"
+                [multiline]="false"
+                [searchEnabled]="true"
+                (onValueChanged)="onDropdownValueChanged($event)"
+                [width]="600"
+              >
+              </dx-tag-box>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: flex-start; flex-wrap: wrap">
+            <!-- Narration TextBox with margin to the right -->
+            <div style="margin-top: 5px; margin-right: 20px">
+              <dx-text-box
+                [(value)]="narration"
+                placeholder="Enter Remarks"
+                [width]="255"
+              ></dx-text-box>
+            </div>
+
+            <!-- Two textboxes (wsDate and wsNo) with gap between them -->
+            <div style="display: flex; gap: 20px; margin-top: 5px">
+              <dx-text-box
+                [(value)]="wsDate"
+                hint="Worksheet Date"
+                [readOnly]="true"
+                [width]="200"
+                placeholder="Worksheet Date"
+            
+              >
+              </dx-text-box>
+
+              <dx-text-box
+                [(value)]="wsNo"
+                hint="Worksheet No."
+                [readOnly]="true"
+                [width]="200"
+                placeholder="Worksheet No"
+              >
+              </dx-text-box>
+            </div>
+          </div>
+        </dxi-item>
+
+        <!-- Row 2 -->
+        <dxi-item location="before" locateInMenu="auto">
+          <dx-button
+            icon="formula"
+            hint="Set Promotion"
+            stylingMode="contained"
+            type="normal"
+            [width]="40"
+            (onClick)="setPromotion(dataGrid.selectedRowKeys)"
+          ></dx-button>
+        </dxi-item>
+        <dxi-item location="before" locateInMenu="auto">
+          <dx-button
+            icon="remove"
+            hint="Cancel"
+            type="normal"
+            [width]="40"
+            (onClick)="Cancel()"
+          ></dx-button>
+        </dxi-item>
+        <dxi-item location="before" locateInMenu="auto">
+          <dx-button
+            icon="save"
+            hint="Update"
+            stylingMode="contained"
+            type="normal"
+            [width]="40"
+            (onClick)="savePromotion()"
+          ></dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+
+      <!-- <dxo-toolbar>
+       
+          <dxi-item location="before">
+            <div class="grid-header">{{ heading }}</div>
+          </dxi-item>
+        
+    
+          <dxi-item location="before">
+            <div style="display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+    
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <dx-date-box
+                  [(value)]="fromDate"
+                  [type]="'date'"
+                  [displayFormat]="'yyyy-MM-dd'"
+                  [placeholder]="'Select from date'"
+                  [min]="minDate"
+                  style="width: 120px"
+                  (onValueChanged)="checkDateSelection($event)"
+               
+                >
+                </dx-date-box>
+        
+                <dx-date-box
+                  [(value)]="toDate"
+                  [type]="'date'"
+                  [displayFormat]="'yyyy-MM-dd'"
+                  [placeholder]="'Select to date'"
+                  [min]="minDate"
+                  style="width: 120px"
+                  (onValueChanged)="checkDateSelection($event)"
+            
+                >
+                </dx-date-box>
+              </div>
+        
+      
+              <dx-check-box
+                id="happyHoursCheckbox"
+                [value]="isHappyHoursEnabled"
+                hint="Enable Happy Hours"
+          
+              >
+              </dx-check-box>
+        
+    
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <dx-date-box
+                  [(value)]="timeFrom"
+                  [type]="'time'"
+                  [displayFormat]="'HH:mm'"
+                  [pickerType]="'rollers'"
+                  placeholder="From Time"
+                  [width]="80"
+              
+                >
+                </dx-date-box>
+        
+                <dx-date-box
+                  [(value)]="timeTo"
+                  [type]="'time'"
+                  [displayFormat]="'HH:mm'"
+                  [pickerType]="'rollers'"
+                  placeholder="To Time"
+                  [width]="80"
+           
+                >
+                </dx-date-box>
+              </div>
+        
+    >
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <dx-text-box
+                  [(value)]="wsDate"
+                  hint="Worksheet Date"
+                  [readOnly]="true"
+                  [width]="120"
+                  placeholder="Worksheet Date"
+                >
+                </dx-text-box>
+        
+                <dx-text-box
+                  [(value)]="wsNo"
+                  hint="Worksheet No."
+                  [readOnly]="true"
+                  [width]="120"
+                  placeholder="Worksheet No"
+                >
+                </dx-text-box>
+              </div>
+  
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <dx-tag-box
+                [items]="daysOfWeek"
+                [(value)]="selectedDays"
+                displayExpr="text"
+                valueExpr="value"
+                placeholder="Select Days"
+                [showSelectionControls]="true"
+                [multiline]="false"
+                [width]="250"
+                [searchEnabled]="true"
+                (onValueChanged)="onSelectionChanged($event)"
+          
+              >
+              </dx-tag-box>
+        
+   
+              <dx-tag-box
+                [items]="store"
+                valueExpr="ID"
+                [(value)]="selectedStoreId"
+                displayExpr="STORE_NAME"
+                [showSelectionControls]="true"
+                [multiline]="false"
+                [searchEnabled]="true"
+                [width]="250"
+                (onValueChanged)="onDropdownValueChanged($event)"
+         
+              >
+              </dx-tag-box>
+  
+              </div>
+            </div>
+          </dxi-item>
+        
+    
+        
+          <dxi-item location="before" locateInMenu="auto">
+            <dx-button
+            icon="formula"
+              hint="Set Promotion"
+              stylingMode="contained"
+              type="normal"
+              [width]="40"
+              (onClick)="setPromotion(dataGrid.selectedRowKeys)"
+            >
+            </dx-button>
+          </dxi-item>
+          <dxi-item location="before" locateInMenu="auto">
+            <dx-button
+            icon="remove"
+              hint="Cancel"
+    
+              type="normal"
+              [width]="40"
+              (onClick)="Cancel()"
+            >
+            </dx-button>
+          </dxi-item>
+          <dxi-item location="before" locateInMenu="auto">
+            <dx-button
+              icon="save"
+              hint="Update"
+              stylingMode="contained"
+              type="normal"
+              [width]="40"
+              (onClick)="savePromotion()"
+            >
+            </dx-button>
+          </dxi-item>
+        </dxo-toolbar> -->
+
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="ITEM_DESCRIPTION"
+        caption="Description"
+        [width]="200"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        alignment="left"
+        dataField="CAT_NAME"
+        caption="Category"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        alignment="right"
+        dataField="DEPT_NAME"
+        caption="Department"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+
+      <dxi-column
+        alignment="right"
+        dataField="COST"
+        caption="Cost"
+        [width]="100"
+        [allowEditing]="false"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        alignment="right"
+        dataField="PRICE"
+        caption="Price"
+        [width]="100"
+        [allowEditing]="false"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        alignment="right"
+        dataField="PROMOTION_PRICE"
+        caption="Promotion Price"
+        [width]="100"
+        [allowEditing]="false"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+        [visible]="selectedOption !== 'schemaLevelPromotion'"
+      ></dxi-column>
+      <dxi-column
+        alignment="left"
+        dataField="PROMOTION_NAME"
+        caption="Schema"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        alignment="left"
+        dataField="PROMOTION_SCHEMA_ID"
+        caption="Schema ID"
+        [width]="150"
+        [visible]="false"
+        [allowEditing]="false"
+      ></dxi-column>
+    </dx-data-grid>
+    </div>
+  </div>
+
+    <!-- <div
+      *ngIf="filteredItemStoresList?.length > 0"
+      class="filtered-grid-container"
+    > -->
+    
+    <dx-data-grid
+      #filteredGrid
+      [width]="'100%'"
+      [height]="'250px'"
+      class="grid theme-dependent"
+      [dataSource]="filteredItems"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      keyExpr="ID"
+      [editing]="{
+          mode: 'cell',
+          allowUpdating: true,
+        }"
+      [selectedRowKeys]="selectedRowForNewList"
+      (onSelectionChanged)="onSelectionChangedforNewItem($event)"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-scrolling
+        mode="standard"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+
+      <dxo-header-filter
+        [visible]="true"
+        [allowSearch]="true"
+      ></dxo-header-filter>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Items To Get</div>
+        </dxi-item>
+        <dxi-item location="after">
+          <dx-button
+            icon="add"
+            hint="Add"
+            type="normal"
+            stylingMode="contained"
+            width="40"
+            (click)="onAddClick()"
+          ></dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="ITEM_DESCRIPTION"
+        caption="Description"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="DEPT_NAME"
+        caption="Department"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="CAT_NAME"
+        caption="Category"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="COST"
+        caption="Cost"
+        [width]="100"
+        [allowEditing]="false"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="PRICE"
+        caption="Price"
+        [width]="100"
+        [allowEditing]="false"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <!-- <dxi-column
+        dataField="PROMOTION_PRICE"
+        caption="Promotion Price"
+        [width]="150"
+        [allowEditing]="false"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column> -->
+      <dxi-column
+        dataField="PROMOTION_NAME"
+        caption="Schema"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="PROMOTION_SCHEMA_ID"
+        caption="Schema ID"
+        [width]="150"
+        [visible]="false"
+        [allowEditing]="false"
+      ></dxi-column>
+      <!--  -->
+      <!-- Columns similar to the original grid go here -->
+    </dx-data-grid>
+    <!-- </div> -->
+
+
+  <dx-popup
+    [(visible)]="isVisible"
+    [width]="'850'"
+    [height]="'500px'"
+    title="Set Promotion"
+    [showCloseButton]="true"
+  >
+    <div *dxTemplate="let data of 'content'" class="popup-content">
+      <div class="form-container">
+        <div class="flex-container">
+          <!-- Left Side Fields -->
+          <div class="left-column">
+            <dx-radio-group
+              [(value)]="selectedOption"
+              [items]="[{ text: 'Price Level', value: 'onSaleStatus' }]"
+              displayExpr="text"
+              valueExpr="value"
+              layout="horizontal"
+              (onValueChanged)="onOptionChange($event)"
+            ></dx-radio-group>
+            <div *ngIf="selectedOption === 'onSaleStatus'">
+              <div class="dropdown-field">
+                <label
+                  for="promotionName"
+                  class="dropdown-label"
+                  [style.color]="
+                    selectedOption !== 'onSaleStatus' ? 'gray' : 'inherit'
+                  "
+                  [style.opacity]="
+                    selectedOption !== 'onSaleStatus' ? '0.6' : '1'
+                  "
+                  [style.pointerEvents]="
+                    selectedOption !== 'onSaleStatus' ? 'none' : 'auto'
+                  "
+                  >Promotion</label
+                >
+                <dx-text-box
+                  [(value)]="promotionName"
+                  placeholder="Promotion Name"
+                  id="promotionName"
+                  [width]="500"
+                  [disabled]="selectedOption !== 'onSaleStatus'"
+                ></dx-text-box>
+              </div>
+
+              <div class="flex-row">
+                <div class="row">
+                  <div class="dropdown-field">
+                    <label
+                      for="firstDropdown"
+                      class="dropdown-label"
+                      [style.color]="
+                        selectedOption !== 'onSaleStatus' ? 'gray' : 'inherit'
+                      "
+                      [style.opacity]="
+                        selectedOption !== 'onSaleStatus' ? '0.6' : '1'
+                      "
+                      [style.pointerEvents]="
+                        selectedOption !== 'onSaleStatus' ? 'none' : 'auto'
+                      "
+                      >Set Sale Price To</label
+                    >
+                    <dx-select-box
+                      [(value)]="firstDropdownValue"
+                      [items]="firstDropdownOptions"
+                      displayExpr="label"
+                      valueExpr="value"
+                      placeholder="Choose an option"
+                      class="move-right"
+                      id="firstDropdown"
+                      [width]="200"
+                      (onValueChanged)="applySelectedValue()"
+                      [disabled]="selectedOption !== 'onSaleStatus'"
+                    ></dx-select-box>
+                  </div>
+                  <div class="inline-fields">
+                    <div class="dropdown-field">
+                      <dx-select-box *ngIf="firstDropdownValue !== 'defaultPrice'"
+                        [(value)]="operationValue"
+                        [items]="operationOptions"
+                        displayExpr="label"
+                        valueExpr="value"
+                        class="full-width operation-dropdown"
+                        [width]="50"
+                        id="operationDropdown"
+                        (onValueChanged)="onValueInputChange()"
+                        [disabled]="
+                          firstDropdownValue === 'defaultPrice' ||
+                          selectedOption !== 'onSaleStatus'
+                        "
+                      ></dx-select-box>
+                    </div>
+
+                    <div class="default-value-field" *ngIf="firstDropdownValue == 'defaultPrice'">
+                      <dx-text-box
+                        [(value)]="defaultTextValue"
+                        placeholder="Enter default value"
+                        id="defaultTextField"
+                        [width]="210"
+                        [disabled]="firstDropdownValue !== 'defaultPrice'"
+                        (onValueChanged)="validateNumber($event)"
+                      ></dx-text-box>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="dropdown-field">
+                <label *ngIf="firstDropdownValue !== 'defaultPrice'"
+                  for="promotionName"
+                  class="dropdown-label"
+                  [style.color]="
+                    firstDropdownValue === 'defaultPrice' ||
+                    selectedOption !== 'onSaleStatus'
+                      ? 'gray'
+                      : 'inherit'
+                  "
+                  [style.opacity]="
+                    firstDropdownValue === 'defaultPrice' ||
+                    selectedOption !== 'onSaleStatus'
+                      ? '0.6'
+                      : '1'
+                  "
+                  [style.pointerEvents]="
+                    firstDropdownValue === 'defaultPrice' ||
+                    selectedOption !== 'onSaleStatus'
+                      ? 'none'
+                      : 'auto'
+                  "
+                  >Value</label
+                >
+                <dx-text-box *ngIf="firstDropdownValue !== 'defaultPrice'"
+                  [(value)]="operationInputValue"
+                  placeholder="Enter value to apply operation"
+                  id="promotionName"
+                  class="full-width"
+                  [width]="200"
+                  (onValueChanged)="onValueInputChange()"
+                  [disabled]="
+                    firstDropdownValue === 'defaultPrice' ||
+                    selectedOption !== 'onSaleStatus'
+                  "
+                ></dx-text-box>
+              </div>
+
+              <div class="dropdown-field">
+                <label *ngIf="firstDropdownValue !== 'defaultPrice'"
+                  for="roundingValue"
+                  class="dropdown-label"
+                  [style.color]="
+                    firstDropdownValue === 'defaultPrice' ||
+                    selectedOption !== 'onSaleStatus'
+                      ? 'gray'
+                      : 'inherit'
+                  "
+                  [style.opacity]="
+                    firstDropdownValue === 'defaultPrice' ||
+                    selectedOption !== 'onSaleStatus'
+                      ? '0.6'
+                      : '1'
+                  "
+                  [style.pointerEvents]="
+                    firstDropdownValue === 'defaultPrice' ||
+                    selectedOption !== 'onSaleStatus'
+                      ? 'none'
+                      : 'auto'
+                  "
+                >
+                  Round The Value
+                </label>
+                <dx-select-box *ngIf="firstDropdownValue !== 'defaultPrice'"
+                  [(value)]="roundingValue"
+                  [items]="roundingOptions"
+                  displayExpr="text"
+                  valueExpr="value"
+                  placeholder="Choose rounding option"
+                  class="full-width"
+                  [width]="200"
+                  id="roundingValue"
+                  (onValueChanged)="onRoundingValueChanged()"
+                  [disabled]="
+                    firstDropdownValue === 'defaultPrice' ||
+                    selectedOption !== 'onSaleStatus'
+                  "
+                ></dx-select-box>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-column">
+            <div class="schema-level-promotion">
+              <dx-radio-group
+                [(value)]="selectedOption"
+                [items]="[
+                  {
+                    text: 'Schema Level Promotion',
+                    value: 'schemaLevelPromotion'
+                  }
+                ]"
+                displayExpr="text"
+                valueExpr="value"
+                layout="horizontal"
+                (onValueChanged)="onOptionChange($event)"
+              ></dx-radio-group>
+            </div>
+
+            <div
+              class="dropdown-field"
+              *ngIf="selectedOption === 'schemaLevelPromotion'"
+            >
+              <label
+                for="schemaSelect"
+                class="dropdown-label"
+                [style.color]="
+                  selectedOption !== 'schemaLevelPromotion' ? 'gray' : 'inherit'
+                "
+                [style.opacity]="
+                  selectedOption !== 'schemaLevelPromotion' ? '0.6' : '1'
+                "
+                [style.pointerEvents]="
+                  selectedOption !== 'schemaLevelPromotion' ? 'none' : 'auto'
+                "
+                >Choose any schema</label
+              >
+              <dx-select-box
+                [(value)]="selectedSchemaId"
+                [items]="promotionSchema"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                placeholder="Choose Type"
+                id="schemaSelect"
+                class="full-width"
+                [width]="200"
+                (onValueChanged)="onSchemaChanged($event)"
+                [disabled]="selectedOption !== 'schemaLevelPromotion'"
+              ></dx-select-box>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div class="action-buttons">
+        <dx-button
+          text="Apply"
+          stylingMode="contained"
+          type="default"
+          (onClick)="applyPromotion()"
+        ></dx-button>
+        <!-- <dx-button
+        text="Cancel"
+        (onClick)="closePopup()"
+        stylingMode="text"
+      ></dx-button> -->
+      </div>
+    </div>
+  </dx-popup>
+
+  <!-- Popup For Selecting Items To Get -->
+  <dx-popup
+    [(visible)]="popupForItemsToGet"
+    [width]="'850'"
+    [height]="'500px'"
+    title="Select Items"
+    [showCloseButton]="true"
+  >
+    <dx-data-grid
+      #filteredGrid
+      [width]="'100%'"
+      [height]="'350'"
+      class="grid theme-dependent"
+      [dataSource]="filteredItemStoresListRemaining"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [selectedRowKeys]="selectedRowNew"
+      keyExpr="ID"
+      [editing]="{
+      mode: 'cell',
+      allowUpdating: true,
+    }"
+      [selection]="{
+        mode: 'multiple',
+        showCheckBoxesMode: 'always'
+      }"
+      (onSelectionChanged)="onSelectionChangedforNewItem($event)"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-scrolling
+        mode="standard"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+
+      <dxo-header-filter
+        [visible]="true"
+        [allowSearch]="true"
+      ></dxo-header-filter>
+      <dxo-toolbar class="second-toolbar">
+        <dxi-item location="before">
+          <div class="grid-header">Items To Get</div>
+        </dxi-item>
+        <dxi-item location="after">
+          <dx-button
+            icon="add"
+            hint="Add Items"
+            stylingMode="contained"
+            type="normal"
+            [width]="40"
+            (onClick)="AddSelectedItems()"
+            [disabled]="!isRowsSelected"
+          >
+          </dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Description"
+        [width]="200"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="DEPT_NAME"
+        caption="Department"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="CAT_NAME"
+        caption="Category"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="COST"
+        caption="Cost"
+        [width]="100"
+        [allowEditing]="false"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_PRICE"
+        caption="Price"
+        [width]="100"
+        [allowEditing]="false"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <!-- <dxi-column
+      dataField="PROMOTION_PRICE"
+      caption="Promotion Price"
+      [width]="200"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column> -->
+      <dxi-column
+        dataField="PROMOTION_NAME"
+        caption="Schema"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="PROMOTION_SCHEMA_ID"
+        caption="Schema ID"
+        [width]="150"
+        [visible]="false"
+        [allowEditing]="false"
+      ></dxi-column>
+    </dx-data-grid>
+  </dx-popup>
+

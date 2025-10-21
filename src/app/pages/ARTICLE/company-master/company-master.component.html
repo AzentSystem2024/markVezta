@@ -1,0 +1,526 @@
+
+<div class="view-wrapper list-page">
+<dx-data-grid
+class="grid theme-dependent"
+[dataSource]="Datasource"
+[showBorders]="true"
+[rowAlternationEnabled]="true"
+rowAlternationInterval="2"
+[allowColumnReordering]="true"
+[allowColumnResizing]="true"
+[showColumnLines]="true"
+(onRowRemoved)="delete_Data($event)"
+[height]="'80vh'"
+noDataText=" "
+(onEditingStart)="onEditingStart($event)"
+
+>
+
+ <dxo-export
+        [enabled]="true"
+        [formats]="['xlsx', 'pdf']"
+      >
+      </dxo-export>
+
+ <dxo-filter-row
+  [visible]="isFilterRowVisible"
+></dxo-filter-row>
+
+  <dxo-header-filter [visible]="true">
+    <dxo-search [enabled]="true"></dxo-search>
+  </dxo-header-filter>
+
+ 
+     <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+    
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+       [allowDeleting]="canDelete"
+      [allowAdding]="true">
+    <!-- <dxo-popup title="Update Department" [showTitle]="true" [width]="600" [height]="300"></dxo-popup> -->
+    </dxo-editing>
+
+
+  <dxo-toolbar>
+    <dxi-item location="before" locateInMenu="never">
+      <div class="grid-header" style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          ">Company</div>
+    </dxi-item>
+
+    <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+ <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+  
+ <dxi-item
+      location="after"
+      *ngIf="canAdd"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+ 
+  </dxo-toolbar>
+
+  <!-- This field ID optional .Used for displaying data temp -->
+  <dxi-column dataField="SlNo" [width]="80" caption="Sl.No" [allowFiltering]="false" [allowEditing]="false" alignment="left"  [allowHeaderFiltering]="false"></dxi-column>
+  <dxi-column dataField="COMPANY_CODE" caption="Code"></dxi-column>
+
+  <dxi-column dataField="COMPANY_NAME" caption="Company Name"></dxi-column>
+  
+  <dxi-column dataField="COMPANY_TYPE_NAME"  caption="Company Type"></dxi-column>
+   
+   <dxi-column
+      dataField="IS_INACTIVE"
+      caption="Status"
+      cellTemplate="statusCellTemplate"
+    ></dxi-column>
+    <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+    </div>
+
+  
+</dx-data-grid>
+</div>
+
+  <dx-popup
+  [(visible)]="addPopup"
+  [width]="630"
+  height="580"
+  title="New Company"
+  [shading]="false"
+  [showCloseButton]="true"
+  (onHiding)="onAddPopupClose()"
+  [shading]="true"
+  [hideOnOutsideClick]="false"
+>
+  <!-- INPUT FIELD -->
+
+    <dxi-item title="Basic" >
+      <div class="tab-content tab-basic">
+<dx-validation-group #formValidationGroup>
+          <dx-form [formGroup]="formsource" width="580" class="mt-3" >
+         <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+        <dxi-item>
+         <dx-select-box
+         #dealerTypeBoxRef
+         label="Company Type"
+                  labelMode="floating"
+                  alignment="center"
+                  formControlName="CompanyType"
+                  valueExpr="ID"
+                  displayExpr="DESCRIPTION"
+                   [searchEnabled]="true"
+                  [items]="CompanyTypeDropdown"
+                  [(value)]="selectedCompanyType"
+                  (onValueChanged)="onCompanyTypeChanged($event)"
+                  >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="CompanyType is required"
+                  ></dxi-validation-rule> </dx-validator
+              ></dx-select-box>
+        </dxi-item>
+      
+        <dxi-item>
+            <dx-text-box
+             #dealerCodeBoxRef
+                type="text"
+                formControlName="Code"
+                class="form-control mt-1"
+                label="Company Code"
+                labelMode="floating"
+                
+              >
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="CompanyCode is required"
+                  ></dxi-validation-rule> </dx-validator>
+                </dx-text-box>
+        </dxi-item>
+</dxi-item>
+
+ <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+<dxi-item>
+            <dx-text-box
+             #dealerNameBoxRef
+                type="text"
+                formControlName="CompanyName"
+                class="form-control mt-1"
+                label="Company Name"
+                labelMode="floating"
+                
+              >
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="CompanyName is required"
+                  ></dxi-validation-rule> </dx-validator
+              ></dx-text-box>
+</dxi-item>   
+ <dxi-item>
+            <dx-text-box
+             #whatsAppBoxRef
+                type="text"
+                formControlName="ContactName"
+                class="form-control mt-1"
+                label="ContactName"
+                labelMode="floating"
+                
+              ></dx-text-box>
+        </dxi-item>
+</dxi-item>
+    
+            <dxi-item>
+            <dx-text-box
+             #contactNameBoxRef
+                type="text"
+                formControlName="FirstAddress"
+                class="form-control mt-1"
+                label="Address"
+                labelMode="floating"
+                
+              ></dx-text-box>
+        </dxi-item>
+
+         <dxi-item>
+            <dx-text-box
+             #addressBoxRef
+                type="text"
+                formControlName="SecondAddress"
+                class="form-control mt-1"
+                label="Address"
+                labelMode="floating"
+              ></dx-text-box>
+         </dxi-item>
+    
+        <dxi-item>
+            <dx-text-box
+             #mobileBoxRef
+                type="text"
+                formControlName="ThirdAddress"
+                class="form-control mt-1"
+                label="Address"
+                labelMode="floating"
+              ></dx-text-box>
+        </dxi-item>
+
+
+<dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+        <dxi-item>
+         <dx-text-box
+          #telephoneBoxRef
+                type="text"
+                formControlName="Telephone"
+                class="form-control mt-1"
+                label="Phone"
+                labelMode="floating"
+              ></dx-text-box>
+        </dxi-item>
+   
+       <dxi-item>
+         <dx-text-box
+          #telephoneBoxRef
+                type="text"
+                formControlName="Mobile"
+                class="form-control mt-1"
+                label="Mobile"
+                labelMode="floating"
+              ></dx-text-box>
+        </dxi-item>
+</dxi-item>
+
+        <dxi-item itemType="group" [colCount]="2" [colSpan]="2">  
+                 <dxi-item>
+            <dx-text-box
+             #whatsAppBoxRef
+                type="text"
+                formControlName="WhatsApp"
+                class="form-control mt-1"
+                label="Whatsapp No"
+                labelMode="floating"
+                
+              ></dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+             #faxBoxRef
+                type="text"
+                formControlName="Email"
+                class="form-control mt-1"
+                label="Email"
+                labelMode="floating"
+                
+              ></dx-text-box>
+        </dxi-item>
+       </dxi-item> 
+          </dx-form>
+          </dx-validation-group>
+      </div>
+    </dxi-item>
+  <!-- BUTTONS -->
+  <div class="form-popup-buttons-container">
+      <div class="popup-footer">
+    <dx-button
+      class="btn me-1  border border-1 equal-button"
+      (click)="closePop()"
+    >
+      Cancel
+    </dx-button>
+    <dx-button
+      class="equal-button"
+      text="Save"
+      type="default"
+      stylingMode="contained"
+      (onClick)="addData()"
+    ></dx-button>
+  </div>
+</div>
+</dx-popup>
+
+  <dx-popup
+  [(visible)]="editPopup"
+  [width]="630"
+  height="550"
+  title="Update Company"
+  [shading]="false"
+  [showCloseButton]="true"
+  (onHiding)="onAddPopupClose()"  
+  [shading]="true"
+  [hideOnOutsideClick]="false"
+>
+  <!-- INPUT FIELD -->
+
+    <dxi-item title="Basic" >
+      <div class="tab-content tab-basic">
+<dx-validation-group #formValidationGroup>
+          <dx-form [formGroup]="formsource" width="580" class="mt-3" >
+         <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+        <dxi-item>
+         <dx-select-box
+         #dealerTypeBoxRef
+         label="Company Type"
+                  labelMode="floating"
+                  alignment="center"
+                  valueExpr="ID"
+                  formControlName="CompanyTypeName"
+                  displayExpr="DESCRIPTION"
+                   [searchEnabled]="true"
+                   [items]="CompanyTypeDropdown"
+                  [(value)]="selectedCompanyType"
+                  (onValueChanged)="onCompanyTypeChanged($event)"
+                  >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="CompanyType is required"
+                  ></dxi-validation-rule> </dx-validator
+              ></dx-select-box>
+        </dxi-item>
+      
+        <dxi-item>
+            <dx-text-box
+             #dealerCodeBoxRef
+                type="text"
+                class="form-control mt-1"
+                label="Company Code"
+                labelMode="floating"
+                [(value)]="editingRowData.COMPANY_CODE"
+              >
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="CompanyCode is required"
+                  ></dxi-validation-rule> </dx-validator
+              ></dx-text-box>
+        </dxi-item>
+</dxi-item>
+
+<dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+<dxi-item>
+            <dx-text-box
+             #dealerNameBoxRef
+                type="text"
+                class="form-control mt-1"
+                label="Company Name"
+                labelMode="floating"
+                [(value)]="editingRowData.COMPANY_NAME"
+              >
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="CompanyName is required"
+                  ></dxi-validation-rule> </dx-validator
+              ></dx-text-box>
+        </dxi-item> 
+
+         <dxi-item>
+            <dx-text-box
+             #contactNameBoxRef
+                type="text"
+                [(value)]="editingRowData.CONTACT_NAME"
+                class="form-control mt-1"
+                label="ContactName"
+                labelMode="floating"
+                
+              ></dx-text-box>
+        </dxi-item>
+   
+</dxi-item>
+       
+            <dxi-item>
+            <dx-text-box
+             #contactNameBoxRef
+                type="text"
+                [(value)]="editingRowData.ADDRESS1"
+                class="form-control mt-1"
+                label="Address"
+                labelMode="floating"
+                
+              ></dx-text-box>
+        </dxi-item>
+
+         <dxi-item>
+            <dx-text-box
+             #addressBoxRef
+                type="text"
+                [(value)]="editingRowData.ADDRESS2"
+                class="form-control mt-1"
+                label="Address"
+                labelMode="floating"
+              ></dx-text-box>
+         </dxi-item>
+    
+        <dxi-item>
+            <dx-text-box
+             #mobileBoxRef
+                type="text"
+                [(value)]="editingRowData.ADDRESS3"
+                class="form-control mt-1"
+                label="Address"
+                labelMode="floating"
+              ></dx-text-box>
+        </dxi-item>
+
+<dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+        <dxi-item>
+         <dx-text-box
+          #telephoneBoxRef
+                type="text"
+                [(value)]="editingRowData.PHONE"
+                class="form-control mt-1"
+                label="Phone"
+                labelMode="floating"
+              ></dx-text-box>
+        </dxi-item>
+   
+       <dxi-item>
+         <dx-text-box
+          #telephoneBoxRef
+                type="text"
+                [(value)]="editingRowData.MOBILE"
+                class="form-control mt-1"
+                label="Mobile"
+                labelMode="floating"
+              ></dx-text-box>
+        </dxi-item>
+</dxi-item>
+
+        <dxi-item itemType="group" [colCount]="2" [colSpan]="2">  
+                 <dxi-item>
+            <dx-text-box
+             #whatsAppBoxRef
+                type="text"
+                [(value)]="editingRowData.WHATSAPP"
+                class="form-control mt-1"
+                label="Whatsapp No"
+                labelMode="floating"
+                
+              ></dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+             #faxBoxRef
+                type="text"
+                [(value)]="editingRowData.EMAIL"
+                class="form-control mt-1"
+                label="Email"
+                labelMode="floating"
+                
+              ></dx-text-box>
+        </dxi-item>
+       </dxi-item> 
+       
+       <dxi-item class="checkbox-row">
+                <dx-check-box
+                  [(value)]="editingRowData.IS_INACTIVE"
+                  class="mt-4"
+                  [elementAttr]="{ 'aria-label': 'Unchecked' }"
+                  id="checkboxadd"
+                ></dx-check-box>
+                <label for="checboxadd" style="margin-left: 5px;">Inactive</label>
+              </dxi-item>
+          </dx-form>
+          </dx-validation-group>
+      </div>
+    </dxi-item>
+
+  
+
+  <!-- BUTTONS -->
+  <div class="form-popup-buttons-container">
+      <div class="popup-footer">
+    <dx-button
+      class="btn me-1  border border-1 equal-button"
+      (click)="closePop()"
+    >
+      Cancel
+    </dx-button>
+    <dx-button
+      class="equal-button"
+      text="Save"
+      type="default"
+      stylingMode="contained"
+      (onClick)="editData()"
+    ></dx-button>
+  </div>
+</div>
+</dx-popup>

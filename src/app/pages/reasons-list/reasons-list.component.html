@@ -1,0 +1,209 @@
+
+    <dx-data-grid
+      [dataSource]="reasons"
+      (onRowRemoving)="onRowRemoving($event)"
+      [showBorders]="true"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+        [showColumnLines]="true"
+        [width]="'100%'"
+      [height]="'75vh'"
+      (onExporting)="onExporting($event)"
+    (onEditingStart)="OnEditingStartReason($event)"
+      height="90%"
+      width="100%"
+    >
+    
+    
+    <dxo-filter-row
+    [visible]="showFilterRow"
+  ></dxo-filter-row>
+
+  <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+<dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+  <dxo-editing
+      mode="popup"
+      [allowUpdating]="true"
+      [allowDeleting]="true"
+      [allowAdding]="true"
+    >
+    </dxo-editing>
+     <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+    <!-- <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+  
+    </dxo-editing> -->
+   
+    <dxo-toolbar>
+
+        <dxi-item location="before">
+          <div class="grid-header" style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          ">Reasons</div>
+        </dxi-item>
+    
+    <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addReasons()"
+        ></dx-button>
+      </dxi-item>
+      <dxi-item
+            location="after"
+            locateInMenu="auto"
+            showText="inMenu"
+            widget="dxButton"
+            [options]="{
+              text: 'Refresh',
+              icon: 'refresh',
+              stylingMode: 'text'
+            }"
+          ></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="exportButton"></dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="separator"></div>
+          </dxi-item>
+          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+    
+    </dxo-toolbar>
+    <dxi-column dataField="CODE" caption="Code">
+      <dxi-validation-rule type="required" message="Code is required">
+        <dxi-validation-rule
+        type="pattern"
+        
+        message="Code is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="DESCRIPTION" caption="Description">
+      <dxi-validation-rule type="required" message="Description is required">
+        <dxi-validation-rule
+        type="pattern"
+        message="Description is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="ARABIC_DESCRIPTION" caption="Arabic Description">
+      <dxi-validation-rule type="required" message="Arabic description is required">
+        <dxi-validation-rule
+        type="pattern"
+        
+        message="Description is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="REASON_TYPE" caption="Reason Type">
+      <dxo-lookup
+        [dataSource]="reasontype"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+      >
+      </dxo-lookup>
+      <dxi-validation-rule type="required" message="Reason Type is required">
+        <dxi-validation-rule
+        type="pattern"
+        
+        message="Reason Type is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="DISCOUNT_TYPE" caption="Discount Type">
+      <dxo-lookup
+        [dataSource]="discounttype"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+      >
+      </dxo-lookup>
+      <dxi-validation-rule type="required" message="Discount type is required">
+        <dxi-validation-rule
+        type="pattern"
+        message="Discount type is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="DISCOUNT_PERCENT" caption="Discount Percent">
+      <dxi-validation-rule type="required" message="Discount percent is required">
+        <dxi-validation-rule
+        type="pattern"
+        
+        message="Description is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+
+    <dxi-column dataField="START_DATE" caption="Start Date" dataType="date" [format]="'dd/MM/yyyy'">
+      <dxi-validation-rule type="required" message="Start date is required">
+        <dxi-validation-rule
+        type="pattern"
+        
+        message="Start date is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="END_DATE" caption="End Date" dataType="date" [format]="'dd/MM/yyyy'">
+      <dxi-validation-rule type="required" message="End date is required">
+        <dxi-validation-rule
+        type="pattern"
+        
+        message="End date is required"
+      >
+      </dxi-validation-rule>
+      </dxi-validation-rule>
+    </dxi-column>
+
+    </dx-data-grid>
+    <form-popup
+        [(visible)]="isAddReasonsPopupOpened"
+        [width]=800
+        [height]=550
+        (save)="onClickSaveReasons()"
+        titleText="New Reasons"
+      >
+      <app-reasons-form></app-reasons-form>
+        
+      </form-popup>
+
+       <dx-popup
+        [(visible)]="isEditReasonsPopupOpened"
+        width='800px'
+        height='550px'
+        titleText="New Reasons"
+      >
+      <app-reason-edit
+      (formClosed)="handleClose()"
+      [selectedData]='selected_Data'
+    
+      ></app-reason-edit>
+        
+      </dx-popup>
+
+    

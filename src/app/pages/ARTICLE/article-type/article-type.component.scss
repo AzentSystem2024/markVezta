@@ -1,0 +1,21 @@
+@use "../../../../variables.scss" as *;
+@use "sass:math";
+
+.equal-button {
+  width: 80px;     /* adjust as needed */
+  height: 30px;     /* adjust to match desired size */
+  padding: 3px 10px; /* adjust padding as needed */
+  font-size: 14px;
+  text-align: center;
+  margin-top: 1;
+}
+
+.checkbox-row {
+  display: flex;
+  gap: 10px; /* 👈 spacing between checkboxes */
+  align-items: center;
+}
+
+.fields{
+  margin-top: 0px;
+}

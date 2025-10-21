@@ -1,0 +1,347 @@
+<dx-validation-group #creditNoteGroup>
+  <div class="invoice-wrapper">
+    <div class="salesorder-grid-wrapper">
+      <div class="grid-container">
+        <dx-data-grid
+          #itemsGridRef
+          [dataSource]="deliveryFormData.DETAILS"
+          [showBorders]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="true"
+          [rowAlternationEnabled]="true"
+          [allowColumnReordering]="true"
+          [allowColumnResizing]="true"
+          [height]="'55vh'"
+          [columnResizingMode]="'nextColumn'"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+          [editing]="{
+            mode: 'cell',
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: !isReadOnlyMode
+          }"
+          (onInitNewRow)="onInitNewRow($event)"
+          (onRowUpdated)="onRowUpdated($event)"
+          (onCellValueChanged)="onCellValueChanged($event)"
+          (onEditorPreparing)="onEditorPreparing($event)"
+        >
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-toolbar>
+            <dxi-item location="before" locateInMenu="auto">
+              <div class="stacked-toolbar-group">
+                <div style="display: flex; gap: 5px">
+                  <dx-date-box
+                    [(value)]="deliveryFormData.DN_DATE"
+                    label="Date"
+                    labelMode="floating"
+                    [width]="200"
+                    displayFormat="dd-MM-yyyy"
+                    [readOnly]="true"
+                  ></dx-date-box>
+                  <dx-text-box
+                    [(value)]="deliveryFormData.REF_NO"
+                    label="Reference No"
+                    labelMode="floating"
+                    [width]="200"
+                    [readOnly]="isReadOnlyMode"
+                  ></dx-text-box>
+                </div>
+
+                <div style="margin-top: -4px; display: flex; gap: 10px">
+                  <dx-select-box
+                    [(value)]="deliveryFormData.SALESMAN_ID"
+                    [dataSource]="salesman"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="'100%'"
+                    [searchEnabled]="true"
+                    label="Salesman"
+                    labelMode="floating"
+                    [readOnly]="isReadOnlyMode"
+                  ></dx-select-box>
+                </div>
+                <div style="margin-top: -6px; display: flex; gap: 10px">
+                  <dx-select-box
+                    [(value)]="deliveryFormData.CUST_ID"
+                    [dataSource]="customer"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="405"
+                    [searchEnabled]="true"
+                    label="Customer"
+                    labelMode="floating"
+                    [readOnly]="isReadOnlyMode"
+                    (onValueChanged)="customerChanged($event)"
+                  ></dx-select-box>
+                  <!-- -->
+                </div>
+              </div>
+            </dxi-item>
+
+            <dxi-item location="after" locateInMenu="auto">
+              <div class="stacked-toolbar-group">
+                <div style="display: flex; align-items: center; gap: 5px">
+                  <!-- Reference No -->
+                  <dx-text-box
+                    [(value)]="deliveryFormData.CONTACT_NAME"
+                    label="Contact Name"
+                    labelMode="floating"
+                    [width]="'100%'"
+                    [readOnly]="isReadOnlyMode"
+                  ></dx-text-box>
+
+                  <!-- Plus Button -->
+                  <dx-button
+                    icon="plus"
+                    stylingMode="outlined"
+                    type="default"
+                    hint="Quotation List"
+                    (onClick)="addSalesOrder()"
+                    [elementAttr]="{ class: 'small-btn' }"
+                    [disabled]="isReadOnlyMode || !deliveryFormData.CUST_ID"
+                  ></dx-button>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 5px;
+                    margin-top: -4px;
+                    align-items: flex-start;
+                  "
+                >
+                  <div style="flex: 1">
+                    <dx-text-box
+                      [(value)]="deliveryFormData.CONTACT_FAX"
+                      label="Fax"
+                      labelMode="floating"
+                      [width]="'100%'"
+                      [readOnly]="isReadOnlyMode"
+                    >
+                    </dx-text-box>
+                  </div>
+                </div>
+
+                <div
+                  style="
+                    margin-top: -6px;
+                    display: flex;
+                    gap: 5px;
+                    align-items: flex-start;
+                  "
+                >
+                  <div style="flex: 1">
+                    <dx-text-box
+                      [(value)]="deliveryFormData.CONTACT_PHONE"
+                      label="Phone"
+                      labelMode="floating"
+                      [width]="'100%'"
+                      [readOnly]="isReadOnlyMode"
+                    >
+                    </dx-text-box>
+                  </div>
+
+                  <div style="flex: 1">
+                    <dx-text-box
+                      [(value)]="deliveryFormData.CONTACT_MOBILE"
+                      label="Mobile"
+                      labelMode="floating"
+                      [width]="'100%'"
+                      [readOnly]="isReadOnlyMode"
+                    >
+                    </dx-text-box>
+                  </div>
+                </div>
+              </div>
+            </dxi-item>
+          </dxo-toolbar>
+
+          <dxi-column caption="Sl No" [allowEditing]="false"> </dxi-column>
+          <dxi-column
+            dataField="SO_DETAIL_ID"
+            caption="SODETAILID"
+            [visible]="false"
+          >
+          </dxi-column>
+          <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
+          <dxi-column dataField="ITEM_CODE" caption="Item Code" [width]="250">
+          </dxi-column>
+          <dxi-column
+            dataField="DESCRIPTION"
+            caption="Description"
+            [allowEditing]="true"
+          ></dxi-column>
+          <!-- <dxi-column
+            dataField="MATRIX_CODE"
+            caption="Matrix Code"
+            [allowEditing]="false"
+            [visible]="matrixCode"
+          ></dxi-column> -->
+          <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
+          <dxi-column
+            dataField="UOM"
+            caption="UOM"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="QUANTITY"
+            caption="Quantity"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="DELIVERED_QUANTITY"
+            caption="Delivered Quantity"
+            [allowEditing]="true"
+            [validationRules]="[
+              { type: 'required', message: 'Quantity is required' },
+              {
+                type: 'custom',
+                validationCallback: validateQtyIssued,
+                message: 'Delivery Qty cannot be greater than Qty Available'
+              }
+            ]"
+          >
+          </dxi-column>
+          <dxo-summary>
+            <dxi-total-item
+              column="DELIVERED_QUANTITY"
+              summaryType="sum"
+              displayFormat="Total Qty: {0}"
+              [valueFormat]="'#.00'"
+            ></dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+
+        <div class="form-footer">
+          <!-- Narration stays in left -->
+          <div class="footer-left">
+            <dx-text-box
+              #narrationRef
+              [(value)]="deliveryFormData.NARRATION"
+              label="Narration"
+              labelMode="floating"
+              class="narration-box"
+              [readOnly]="isReadOnlyMode"
+            ></dx-text-box>
+          </div>
+
+          <!-- Buttons + Approve checkbox grouped together -->
+          <div class="footer-right">
+            <!-- <dx-text-box
+              label="Net Amount"
+              labelMode="floating"
+              [readOnly]="true"
+            ></dx-text-box> -->
+
+            <dx-check-box
+              *ngIf="isEditing && !isReadOnlyMode"
+              [(value)]="isApproved"
+              text="Approve"
+              class="approve-checkbox"
+            ></dx-check-box>
+
+            <div class="footer-actions">
+              <dx-button
+                text="Cancel"
+                (onClick)="cancel()"
+                stylingMode="outlined"
+                type="normal"
+              ></dx-button>
+              <dx-button
+                *ngIf="!isReadOnlyMode"
+                [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
+                (onClick)="saveDeliveryNote()"
+                stylingMode="contained"
+                type="default"
+              ></dx-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+
+<dx-popup
+  [(visible)]="salesOrderPopupOpened"
+  [width]="'70vw'"
+  [height]="'75vh'"
+  [showTitle]="true"
+  title="Add Sales Order"
+  (onHiding)="salesOrderPopupOpened = false"
+>
+  <dx-data-grid
+    #quotationGrid
+    [dataSource]="salesOrderList"
+    [height]="'50vh'"
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
+    [columnResizingMode]="'nextColumn'"
+    [filterRow]="{ visible: false }"
+    [headerFilter]="{ visible: false }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+    focusStateEnabled="false"
+  >
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    ></dxo-editing>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxo-toolbar>
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [visible]="canAdd"
+        [options]="addButtonOptions"
+      ></dxi-item>
+    </dxo-toolbar>
+    <dxi-column
+      dataField="ITEM_CODE"
+      caption="Item Code"
+      visible="false"
+    ></dxi-column>
+    <dxi-column dataField="ITEM_NAME" caption="Item"></dxi-column>
+    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+    <dxi-column dataField="UOM" caption="UOM"></dxi-column>
+    <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
+    <dxi-column dataField="REMARKS" caption="Remark"></dxi-column>
+    <dxi-column
+      dataField="totalAmount"
+      caption="Amount"
+      dataType="number"
+    ></dxi-column>
+    <dxi-column dataField="status" caption="Status"></dxi-column>
+  </dx-data-grid>
+</dx-popup>

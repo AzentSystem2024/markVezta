@@ -1,0 +1,1418 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+
+    class="grid theme-dependent"
+    [dataSource]="EmployeeLeaveDatasource"
+    [showBorders]="true"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [allowColumnReordering]="true"
+    (onRowRemoved)="Delete_Data($event)"
+    [height]="'80vh'"
+    [allowColumnResizing]="true"
+    noDataText=" "
+    [pager]="{ 
+        showInfo: true, 
+        infoText: 'Page {0} of {1}', 
+        showNavigationButtons: true 
+      }"
+     (onEditingStart)="onEditingStart($event)"
+    >
+
+    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+    <dxo-filter-row [visible]="showFilterRow" [applyFilter]="currentFilter"></dxo-filter-row>
+
+    <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+      [visible]="true"
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[10,20,30,40]"
+      ></dxo-pager>
+
+      <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+        <dxo-popup title="Update EOS" [showTitle]="true" [width]="600" [height]="300"></dxo-popup>
+      </dxo-editing>
+
+      <dxo-search-panel
+    [visible]="true"
+    placeholder="Data Search"
+  ></dxo-search-panel>
+
+  <dxo-toolbar>
+    <dxi-item location="before">
+        <div class="grid-header">Employee Leave</div>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text=""
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+            (onClick)="Add_EmployeeLeave()"
+          ></dx-button>
+      </dxi-item>
+
+      <dxi-item
+    location="after"
+    locateInMenu="auto"
+    showText="inMenu"
+    widget="dxButton"
+    [options]="{
+      text: 'Refresh',
+      icon: 'refresh',
+      stylingMode: 'text',
+      onClick: refresh
+    }"
+  ></dxi-item>
+
+ 
+  <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item> 
+  </dxo-toolbar>
+
+  <!-- <dxi-column dataField="SlNo" [width]="80" caption="Sl.No" [allowEditing]="false" [allowFiltering]="false"  alignment="left"  [allowHeaderFiltering]="false"></dxi-column> -->
+  <dxi-column dataField="DOC_NO" caption="Doc No"></dxi-column>
+  <dxi-column dataField="DATE" caption="Date"></dxi-column>
+  <dxi-column dataField="EMP_NO" caption="Employee No"></dxi-column>
+    <dxi-column dataField="EMP_NAME" caption="Employee Name"></dxi-column>
+    <dxi-column dataField="LEAVE_TYPE" caption="Leave Type"></dxi-column>
+    <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
+    <dxi-column dataField="STATUS" caption="Status" cellTemplate="statusCellTemplate"
+    width="100"
+    fixedPosition="right">
+    </dxi-column>
+    <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value"
+        style="margin-left: 10px; cursor: default;"
+      ></i>
+    </div>
+    <dxi-column type="buttons" [buttons]="allActionButtons" fixed="true" fixedPosition="right" width="150" ></dxi-column>
+</dx-data-grid>
+</div>
+</div>
+
+<!-- ADD POPUP -->
+
+<form-popup
+  AddVacationPopup = false;
+  [(visible)]="AddVacationPopup"
+  titleText=" Employee Vacation"
+  (cancel)="closePopup()"
+  (save)="Add_Data()"
+  
+>
+  <dx-form id="form" [formGroup]="formsource">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box label="Document No" [readOnly]="true" [labelMode]="'floating'" formControlName="Doc_no"></dx-text-box>
+      </dxi-item>
+
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          formControlName="Date"
+          [labelMode]="'floating'"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+   
+      <dxi-item class="select-box">
+        <dx-select-box
+          [inputAttr]="{ 'aria-label': 'Simple Product' }"
+          label="Employee"
+          [searchEnabled]="true"
+          placeholder="Select.."
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="Employee_no"
+          [items]="Employee"
+          formControlName="Employee_no"
+          [labelMode]="'floating'"
+          (onValueChanged)="onEmployee_Change($event)"
+        ></dx-select-box>
+      </dxi-item>
+    
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item class="select-box">
+        <dx-select-box
+          [inputAttr]="{ 'aria-label': 'Simple Product' }"
+          label="Leave Type"
+          [searchEnabled]="true"
+          displayExpr="DESCRIPTION"   
+          valueExpr="ID"  
+          [items]="LeaveType"
+          [(value)]="Leave_type"
+          placeholder="Select.."
+          formControlName="Leave_type"
+          [labelMode]="'floating'"
+        ></dx-select-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Available"
+          [labelMode]="'floating'"
+          formControlName="Leave_credit"
+          valueChangeEvent="input"
+          [readOnly]="true"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+        [labelMode]="'floating'"
+          label="Departure Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          type="date"
+          [min]="minSelectableDate"
+  [disabledDates]="isDateDisabledvalue"
+          [inputAttr]="{ 'aria-label': 'Dept_date' }"
+          formControlName="Dept_date"
+        ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-date-box>
+      </dxi-item>
+      
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Required"
+          formControlName="Leave_days"
+          valueChangeEvent="keyup input change"
+          valueChangeEvonValueChangedent="input"
+          [labelMode]="'floating'"
+        ><dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule> </dx-validator
+      ></dx-number-box>
+      </dxi-item>
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+        label="Expected Rejoin Date"
+        placeholder="MM/DD/YYYY"
+        [showClearButton]="true"
+        [useMaskBehavior]="true"
+        displayFormat="dd/MM/yyyy"
+        type="date"
+        [readOnly]="true"
+        [inputAttr]="{ 'aria-label': 'Date' }"
+        formControlName="Expected_rejoin_date"
+        [labelMode]="'floating'"
+      >
+        <dx-validator>
+          <dxi-validation-rule type="custom" [validationCallback]="validateExpectedRejoin" message="Rejoin date overlaps with departure period."></dxi-validation-rule>
+        </dx-validator>
+      </dx-date-box>
+      
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item
+      ><dx-text-box
+        label="Remarks"
+        valueChangeEvent="input"
+        formControlName="Remarks"
+        [labelMode]="'floating'"
+      ></dx-text-box
+    ></dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+      text="Leave Salary Payable"
+      formControlName="Leave_salary_payable"></dx-check-box>
+    </dxi-item>
+  </dx-form>
+</form-popup>
+
+              
+ <!-- EDIT POPUP -->
+<form-popup
+  UpdateVacationPopup = false;
+  [(visible)]="UpdateVacationPopup"
+  titleText="Employee Vacation"
+  [width]="550"
+  height="530px"
+  (save)="Edit_Data()"
+>
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box label="Document No" [readOnly]="true" [labelMode]="'floating'" [(value)]="selectedData.DOC_NO"></dx-text-box>
+      </dxi-item>
+
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          type="date"
+          [(value)]="selectedData.DOC_DATE"
+          [inputAttr]="{  'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+   
+      <dxi-item class="select-box">
+        <dx-select-box
+          [inputAttr]="{ 'aria-label': 'Simple Product' }"
+          label="Employee"
+          [searchEnabled]="true"
+          [(value)]="selectedData.EMP_ID"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Employee"
+          placeholder="Select.."
+          [labelMode]="'floating'"
+        ></dx-select-box>
+      </dxi-item>
+    
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item class="select-box">
+        <dx-select-box
+        [inputAttr]="{ 'aria-label': 'Simple Product' }"
+        label="Leave Type"
+        [searchEnabled]="true"
+        displayExpr="DESCRIPTION"   
+        valueExpr="ID"  
+        [(value)]="selectedData.LEAVE_TYPE_ID"
+        [items]="LeaveType"
+        placeholder="Select.."
+        [labelMode]="'floating'"
+      ></dx-select-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Available"
+          [labelMode]="'floating'"
+          [(value)]="selectedData.LEAVE_CREDIT"
+          [readOnly]="true"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+        [labelMode]="'floating'"
+          label="Departure Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.DEPT_DATE"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Required"
+          [(value)]="selectedData.VAC_DAYS"
+          [labelMode]="'floating'"
+          valueChangeEvent="keyup input change"
+          valueChangeEvonValueChangedent="input"
+
+        ></dx-number-box>
+      </dxi-item>
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Expected Rejoin Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.EXPECT_RETURN"
+          type="date"
+          [readOnly]="true"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item
+      ><dx-text-box
+        label="Remarks"
+        valueChangeEvent="input"
+        [(value)]="selectedData.REMARKS"
+        [labelMode]="'floating'"
+      ></dx-text-box
+    ></dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+      text="Leave Salary Payable"
+      [(value)]="selectedData.LS_PAYABLE"></dx-check-box>
+    </dxi-item>
+  </dx-form>
+</form-popup>
+
+
+             <!-- VERIFY POPUP -->
+<form-popup
+  UpdateVacationPopup = false;
+  [(visible)]="VerifyPopup"
+  titleText="Employee Vacation"
+  [width]="550"
+  height="530px"
+  (save)="Verify_Data()"
+>
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box label="Document No" [readOnly]="true"  [labelMode]="'floating'" [(value)]="selectedData.DOC_NO"></dx-text-box>
+      </dxi-item>
+
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          type="date"
+          [(value)]="selectedData.DOC_DATE"
+          [inputAttr]="{  'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+   
+      <dxi-item class="select-box">
+        <dx-select-box
+          [inputAttr]="{ 'aria-label': 'Simple Product' }"
+          label="Employee"
+          [searchEnabled]="true"
+          [(value)]="selectedData.EMP_ID"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Employee"
+          placeholder="Select.."
+          [labelMode]="'floating'"
+        ></dx-select-box>
+      </dxi-item>
+    
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item class="select-box">
+        <dx-select-box
+        [inputAttr]="{ 'aria-label': 'Simple Product' }"
+        label="Leave Type"
+        [searchEnabled]="true"
+        displayExpr="DESCRIPTION"   
+        valueExpr="ID"  
+        [(value)]="selectedData.LEAVE_TYPE_ID"
+        [items]="LeaveType"
+        placeholder="Select.."
+        [labelMode]="'floating'"
+      ></dx-select-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Available"
+          [labelMode]="'floating'"
+          [(value)]="selectedData.LEAVE_CREDIT"
+          [readOnly]="true"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+        [labelMode]="'floating'"
+          label="Departure Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.DEPT_DATE"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Required"
+          [(value)]="selectedData.VAC_DAYS"
+          [labelMode]="'floating'"
+          valueChangeEvent="keyup input change"
+          (onValueChanged)="calculateExpectedRejoinDate()"
+        ></dx-number-box>
+      </dxi-item>
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Expected Rejoin Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.EXPECT_RETURN"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+          [readOnly]="true"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item
+      ><dx-text-box
+        label="Remarks"
+        valueChangeEvent="input"
+        [(value)]="selectedData.REMARKS"
+        [labelMode]="'floating'"
+      ></dx-text-box
+    ></dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+      text="Leave Salary Payable"
+      [(value)]="selectedData.LS_PAYABLE"></dx-check-box>
+    </dxi-item>
+  </dx-form>
+</form-popup>
+
+
+             <!-- APPROVE POPUP -->
+<form-popup
+  UpdateVacationPopup = false;
+  [(visible)]="ApprovePopup"
+  titleText="Employee Vacation"
+  [width]="550"
+  height="530px"
+  (save)="Approve_Data()"
+>
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box label="Document No" [readOnly]="true" [labelMode]="'floating'" [(value)]="selectedData.DOC_NO"></dx-text-box>
+      </dxi-item>
+
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          type="date"
+          [(value)]="selectedData.DOC_DATE"
+          [inputAttr]="{  'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+   
+      <dxi-item class="select-box">
+        <dx-select-box
+          [inputAttr]="{ 'aria-label': 'Simple Product' }"
+          label="Employee"
+          [searchEnabled]="true"
+          [(value)]="selectedData.EMP_ID"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Employee"
+          placeholder="Select.."
+          [labelMode]="'floating'"
+        ></dx-select-box>
+      </dxi-item>
+    
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item class="select-box">
+        <dx-select-box
+        [inputAttr]="{ 'aria-label': 'Simple Product' }"
+        label="Leave Type"
+        [searchEnabled]="true"
+        displayExpr="DESCRIPTION"   
+        valueExpr="ID"  
+        [(value)]="selectedData.LEAVE_TYPE_ID"
+        [items]="LeaveType"
+        placeholder="Select.."
+        [labelMode]="'floating'"
+      ></dx-select-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Available"
+          [labelMode]="'floating'"
+          [(value)]="selectedData.LEAVE_CREDIT"
+          [readOnly]="true"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+        [labelMode]="'floating'"
+          label="Departure Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.DEPT_DATE"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Required"
+          [(value)]="selectedData.VAC_DAYS"
+          [labelMode]="'floating'"
+          valueChangeEvent="keyup input change"
+          (onValueChanged)="calculateExpectedRejoinDate()"
+        ></dx-number-box>
+      </dxi-item>
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Expected Rejoin Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.EXPECT_RETURN"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+          [readOnly]="true"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item
+      ><dx-text-box
+        label="Remarks"
+        valueChangeEvent="input"
+        [(value)]="selectedData.REMARKS"
+        [labelMode]="'floating'"
+      ></dx-text-box
+    ></dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+      text="Leave Salary Payable"
+      [(value)]="selectedData.LS_PAYABLE"></dx-check-box>
+    </dxi-item>
+  </dx-form>
+</form-popup>
+
+
+<!-- TRAVEL POPUP -->
+<form-popup
+  [(visible)]="TravelPopup"
+  titleText="Employee Vacation"
+  [width]="650"
+  height="700px"
+  (save)="Travel_Data()"
+  >
+
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box 
+          label="Document No"  
+          [readOnly]="true"
+          [labelMode]="'floating'" 
+          [(value)]="selectedData.DOC_NO">
+        </dx-text-box>
+      </dxi-item>
+
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [readOnly]="true"
+          type="date"
+          [(value)]="selectedData.DOC_DATE"
+          [inputAttr]="{  'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [inputAttr]="{ 'aria-label': 'Simple Product' }"
+        label="Employee"
+        [searchEnabled]="true"
+        [(value)]="selectedData.EMP_ID"
+        [readOnly]="true"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [items]="Employee"
+        placeholder="Select.."
+        [labelMode]="'floating'"
+      >
+      </dx-select-box>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item class="select-box">
+        <dx-select-box
+          [inputAttr]="{ 'aria-label': 'Simple Product' }"
+          label="Leave Type"
+          [searchEnabled]="true"
+          displayExpr="DESCRIPTION"
+          [readOnly]="true"
+          valueExpr="ID"
+          [(value)]="selectedData.LEAVE_TYPE_ID"
+          [items]="LeaveType"
+          placeholder="Select.."
+          [labelMode]="'floating'"
+        >
+        </dx-select-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Available"
+          [readOnly]="true"
+          [labelMode]="'floating'"
+          [(value)]="selectedData.LEAVE_CREDIT"
+          [readOnly]="true"
+        >
+        </dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-date-box
+          label="Departure Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [readOnly]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.DEPT_DATE"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Required"
+          [(value)]="selectedData.VAC_DAYS"
+          [labelMode]="'floating'"
+          [readOnly]="true"
+        >
+        </dx-number-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          label="Expected Rejoin Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          [readOnly]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.EXPECT_RETURN"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-box
+        label="Remarks"
+        valueChangeEvent="input"
+        [(value)]="selectedData.REMARKS"
+        [readOnly]="true"
+        [labelMode]="'floating'"
+      >
+      </dx-text-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+        text="Leave Salary Payable"
+        [(value)]="selectedData.LS_PAYABLE"
+        [readOnly]="true">
+      </dx-check-box>
+    </dxi-item>
+
+
+    <dxi-item> Employee Vacation Status</dxi-item> 
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+     <!-- Travelled Checkbox (always visible) -->
+<dxi-item>
+  <dx-check-box
+    text="Travelled"
+    [(value)]="Is_ticket"
+  ></dx-check-box>
+</dxi-item>
+
+<!-- Travelled Date (only visible when checkbox is checked) -->
+<dxi-item >
+  <dx-date-box
+          label="Travelled Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.DEPT_DATE"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+</dxi-item>
+
+    </dxi-item>
+    
+ <!-- RADIO BUTTON ROLES -->
+      
+ <dxi-item>
+  <dx-radio-group
+    [items]="StatusType"
+    class="mt-2"
+    alignment="center"
+    [readOnly]="true"
+    [(value)]="selectedStatusType"
+  >
+  </dx-radio-group
+></dxi-item>
+    <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+
+      <dxi-item>
+        <dx-date-box
+        label="Rejoin Date"
+        placeholder="MM/DD/YYYY"
+        [showClearButton]="true"
+        [useMaskBehavior]="true"
+        displayFormat="dd/MM/yyyy"
+        type="date"
+        [inputAttr]="{ 'aria-label': 'Date' }"
+        [labelMode]="'floating'"
+        [(value)]="selectedData.REJOIN_DATE"
+        [visible]="selectedStatusType === 'Rejoined'"
+        [readOnly]="true"
+      ></dx-date-box>
+      </dxi-item> 
+  
+  
+      <dxi-item>
+        <dx-number-box
+          label="Total Leave Days Taken"
+          [labelMode]="'floating'"
+          [(value)]="selectedData.ACTUAL_DAYS"
+          [visible]="selectedStatusType === 'Rejoined'"
+          [readOnly]="true"
+        ></dx-number-box>
+      </dxi-item>
+  
+      
+      <dxi-item>
+        <dx-number-box
+            label="Days Deducted from Service"
+            [labelMode]="'floating'"
+            [(value)]="selectedData.DEDUCT_DAYS"
+            [visible]="selectedStatusType === 'Rejoined'"
+            [readOnly]="true"
+          ></dx-number-box>
+      </dxi-item>
+  </dxi-item>
+  
+  <dxi-item itemType="group" [colCount]="1" [colSpan]="1">
+    <dxi-item class="select-box">
+      <dx-select-box
+        [inputAttr]="{ 'aria-label': 'Simple Product' }"
+        label="Reason"
+        [searchEnabled]="true"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [(value)]="selectedData.LEFT_REASON"
+        [dataSource]="Left_service"
+        placeholder="Select.."
+        [labelMode]="'floating'"
+        [readOnly]="true"
+        [visible]="selectedStatusType === 'Left Service'"
+      ></dx-select-box>
+    </dxi-item>
+    </dxi-item>
+
+  </dx-form>
+
+</form-popup>
+
+
+<!-- REJOIN/LEFTSERVICE POPUP -->
+<form-popup
+  [(visible)]="RejoinPopup"
+  titleText="Employee Vacation"
+  [width]="650"
+  height="700px"
+  (save)="Rejoin_Data()"
+  >
+
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2" >
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box 
+          label="Document No"  
+          [readOnly]="true"
+          [labelMode]="'floating'" 
+          [(value)]="selectedData.DOC_NO">
+        </dx-text-box>
+      </dxi-item>
+
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [readOnly]="true"
+          type="date"
+          [(value)]="selectedData.DATE"
+          [inputAttr]="{  'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item class="select-box">
+      <dx-select-box
+        [inputAttr]="{ 'aria-label': 'Simple Product' }"
+        label="Employee"
+        [searchEnabled]="true"
+        [(value)]="selectedData.EMP_ID"
+        [readOnly]="true"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [items]="Employee"
+        placeholder="Select.."
+        [labelMode]="'floating'"
+      >
+      </dx-select-box>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item class="select-box">
+        <dx-select-box
+          [inputAttr]="{ 'aria-label': 'Simple Product' }"
+          label="Leave Type"
+          [searchEnabled]="true"
+          displayExpr="DESCRIPTION"
+          [readOnly]="true"
+          valueExpr="ID"
+          [(value)]="selectedData.LEAVE_TYPE_ID"
+          [items]="LeaveType"
+          placeholder="Select.."
+          [labelMode]="'floating'"
+        >
+        </dx-select-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Available"
+          [readOnly]="true"
+          [labelMode]="'floating'"
+          [(value)]="selectedData.LEAVE_CREDIT"
+          [readOnly]="true"
+        >
+        </dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-date-box
+          label="Departure Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [readOnly]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.DEPT_DATE"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Required"
+          [(value)]="selectedData.VAC_DAYS"
+          [labelMode]="'floating'"
+          [readOnly]="true"
+        >
+        </dx-number-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          label="Expected Rejoin Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          [readOnly]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.EXPECT_RETURN"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-box
+        label="Remarks"
+        valueChangeEvent="input"
+        [(value)]="selectedData.REMARKS"
+        [readOnly]="true"
+        [labelMode]="'floating'"
+      >
+      </dx-text-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+        text="Leave Salary Payable"
+        [(value)]="selectedData.LS_PAYABLE"
+        [readOnly]="true">
+      </dx-check-box>
+    </dxi-item>
+
+
+    <dxi-item> Employee Vacation Status</dxi-item> 
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+     <!-- Travelled Checkbox (always visible) -->
+<dxi-item>
+  <dx-check-box
+    [readOnly]="true"
+    text="Travelled"
+    [(value)]="Is_ticket"
+  ></dx-check-box>
+</dxi-item>
+
+<!-- Travelled Date (only visible when checkbox is checked) -->
+<dxi-item>
+  <dx-date-box
+    label="Travelled Date"
+    placeholder="MM/DD/YYYY"
+    [showClearButton]="true"
+    [useMaskBehavior]="true"
+    displayFormat="dd/MM/yyyy"
+    [readOnly]="true"
+    type="date"
+    [(value)]="selectedData.TRAVELLED_DATE"
+    [readOnly]="true"
+    [inputAttr]="{ 'aria-label': 'Travelled Date' }"
+    [labelMode]="'floating'"
+  ></dx-date-box>
+</dxi-item>
+
+    </dxi-item>
+    
+
+
+    <!-- RADIO BUTTON ROLES -->
+      
+    <dxi-item>
+      <dx-radio-group
+        [items]="StatusType"
+        class="mt-2"
+        alignment="center"
+        [(value)]="selectedStatusType"
+        (onValueChanged)="onStatusChange($event.value)"
+      >
+      </dx-radio-group
+    ></dxi-item>
+
+    <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+
+    <dxi-item>
+      <dx-date-box
+      label="Rejoin Date"
+      placeholder="MM/DD/YYYY"
+      [showClearButton]="true"
+      [useMaskBehavior]="true"
+      displayFormat="dd/MM/yyyy"
+      type="date"
+      [inputAttr]="{ 'aria-label': 'Date' }"
+      [labelMode]="'floating'"
+      [(value)]="selectedData.REJOIN_DATE"
+      [visible]="selectedStatusType === 'Rejoined'"
+    ></dx-date-box>
+    </dxi-item> 
+
+
+    <dxi-item>
+      <dx-number-box
+        label="Total Leave Days Taken"
+        [labelMode]="'floating'"
+        [(value)]="selectedData.ACTUAL_DAYS"
+        [visible]="selectedStatusType === 'Rejoined'"
+      ></dx-number-box>
+    </dxi-item>
+
+    
+    <dxi-item>
+      <dx-number-box
+          label="Days Deducted from Service"
+          [labelMode]="'floating'"
+          [(value)]="selectedData.DEDUCT_DAYS"
+          [visible]="selectedStatusType === 'Rejoined'"
+        ></dx-number-box>
+    </dxi-item>
+</dxi-item>
+
+<dxi-item itemType="group" [colCount]="1" [colSpan]="1">
+  <dxi-item class="select-box">
+    <dx-select-box
+      [inputAttr]="{ 'aria-label': 'Simple Product' }"
+      label="Reason"
+      [searchEnabled]="true"
+      displayExpr="DESCRIPTION"
+      valueExpr="ID"
+      [(value)]="selectedData.LEFT_REASON"
+      [dataSource]="Left_service"
+      placeholder="Select.."
+      [labelMode]="'floating'"
+      [visible]="selectedStatusType === 'Left Service'"
+    ></dx-select-box>
+  </dxi-item>
+     </dxi-item>
+    
+  </dx-form>
+
+</form-popup>
+
+
+<!-- VIEW POPUP -->
+ <form-popup
+  [(visible)]="ViewPopup"
+  titleText="Employee Vacation"
+  [width]="650"
+  height="790px"
+  (save)="View_Data()"> 
+
+  <dx-form id="form" [readOnly]="true">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2"> 
+      <!-- Document No -->
+      <dxi-item>
+        <dx-text-box 
+          label="Document No"  
+          [readOnly]="true"
+          [labelMode]="'floating'" 
+          [(value)]="selectedData.DOC_NO">
+        </dx-text-box>
+      </dxi-item>
+
+      <!-- Date Picker -->
+      <dxi-item>
+        <dx-date-box
+          label="Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [readOnly]="true"
+          type="date"
+          [(value)]="selectedData.DOC_DATE"
+          [inputAttr]="{  'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+     <dxi-item class="select-box">
+      <dx-select-box
+        [inputAttr]="{ 'aria-label': 'Simple Product' }"
+        label="Employee"
+        [searchEnabled]="true"
+        [(value)]="selectedData.EMP_ID"
+        [readOnly]="true"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [items]="Employee"
+        placeholder="Select.."
+        [labelMode]="'floating'"
+      >
+      </dx-select-box>
+    </dxi-item> 
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item class="select-box">
+        <dx-select-box
+          [inputAttr]="{ 'aria-label': 'Simple Product' }"
+          label="Leave Type"
+          [searchEnabled]="true"
+          displayExpr="DESCRIPTION"
+          [readOnly]="true"
+          valueExpr="ID"
+          [(value)]="selectedData.LEAVE_TYPE_ID"
+          [items]="LeaveType"
+          placeholder="Select.."
+          [labelMode]="'floating'"
+        >
+        </dx-select-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Available"
+          [readOnly]="true"
+          [labelMode]="'floating'"
+          [(value)]="selectedData.LEAVE_CREDIT"
+          [readOnly]="true"
+        >
+        </dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-date-box
+          label="Departure Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [readOnly]="true"
+          [useMaskBehavior]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.DEPT_DATE"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-number-box
+          label="Leave Days Required"
+          [(value)]="selectedData.VAC_DAYS"
+          [labelMode]="'floating'"
+          
+          [readOnly]="true"
+        >
+        </dx-number-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          label="Expected Rejoin Date"
+          placeholder="MM/DD/YYYY"
+          [showClearButton]="true"
+          [useMaskBehavior]="true"
+          [readOnly]="true"
+          displayFormat="dd/MM/yyyy"
+          [(value)]="selectedData.EXPECT_RETURN"
+          type="date"
+          [inputAttr]="{ 'aria-label': 'Date' }"
+          [labelMode]="'floating'"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-box
+        label="Remarks"
+        valueChangeEvent="input"
+        [(value)]="selectedData.REMARKS"
+        [readOnly]="true"
+        [labelMode]="'floating'"
+      >
+      </dx-text-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+        text="Leave Salary Payable"
+        [(value)]="selectedData.LS_PAYABLE"
+        [readOnly]="true">
+      </dx-check-box>
+    </dxi-item>
+
+
+    <dxi-item> Employee Leave Status</dxi-item>  
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2"> 
+     <!-- Travelled Checkbox (always visible) -->
+ <dxi-item>
+  <dx-check-box
+    text="Travelled"
+    [(value)]="Is_ticket"
+    [readOnly]="true"
+  ></dx-check-box>
+</dxi-item> 
+
+<!-- Travelled Date (only visible when checkbox is checked) -->
+<dxi-item>
+   <dx-date-box
+    label="Travelled Date"
+    placeholder="MM/DD/YYYY"
+    [showClearButton]="true"
+    [useMaskBehavior]="true"
+    displayFormat="dd/MM/yyyy"
+    type="date"
+    [(value)]="selectedData.TRAVELLED_DATE"
+    [readOnly]="true"
+    [inputAttr]="{ 'aria-label': 'Travelled Date' }"
+    [labelMode]="'floating'"
+  ></dx-date-box>
+</dxi-item> 
+
+    </dxi-item>
+    
+
+   <!-- RADIO BUTTON ROLES -->
+      
+   <dxi-item>
+    <dx-radio-group
+      [items]="StatusType"
+      class="mt-2"
+      alignment="center"
+      [(value)]="selectedStatusType"
+    >
+    </dx-radio-group
+  ></dxi-item>
+
+  <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+
+  <dxi-item  *ngIf="selectedStatusType === 'Rejoined'">
+    <dx-date-box
+    label="Rejoin Date"
+    placeholder="MM/DD/YYYY"
+    [showClearButton]="true"
+    [useMaskBehavior]="true"
+    displayFormat="dd/MM/yyyy"
+    type="date"
+    [inputAttr]="{ 'aria-label': 'Date' }"
+    [labelMode]="'floating'"
+    [(value)]="selectedData.REJOIN_DATE"
+  ></dx-date-box>
+  </dxi-item> 
+
+
+  <dxi-item  *ngIf="selectedStatusType === 'Rejoined'">
+    <dx-number-box
+      label="Total Leave Days Taken"
+      [labelMode]="'floating'"
+      [(value)]="selectedData.ACTUAL_DAYS"
+    ></dx-number-box>
+  </dxi-item>
+
+  
+  <dxi-item *ngIf="selectedStatusType === 'Rejoined'">
+    <dx-number-box
+        label="Days Deducted from Service"
+        [labelMode]="'floating'"
+        [(value)]="selectedData.DEDUCT_DAYS"
+        
+      ></dx-number-box>
+  </dxi-item>
+</dxi-item>
+
+<dxi-item itemType="group" [colCount]="1" [colSpan]="1">
+<dxi-item class="select-box" *ngIf="selectedStatusType === 'Left Service'">
+  <dx-select-box
+    [inputAttr]="{ 'aria-label': 'Simple Product' }"
+    label="Reason"
+    [searchEnabled]="true"
+    displayExpr="DESCRIPTION"
+    valueExpr="ID"
+    [(value)]="selectedData.LEFT_REASON"
+    [dataSource]="Left_service"
+    placeholder="Select.."
+    [labelMode]="'floating'"
+  ></dx-select-box>
+</dxi-item>
+</dxi-item>
+
+  </dx-form>
+
+</form-popup>

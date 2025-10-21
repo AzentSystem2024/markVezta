@@ -1,0 +1,150 @@
+<div class="view-wrapper list-page">
+<dx-data-grid
+class="grid theme-dependent"
+[dataSource]="Department"
+[showBorders]="true"
+[rowAlternationEnabled]="true"
+rowAlternationInterval="2"
+[allowColumnReordering]="true"
+[allowColumnResizing]="true"
+(onRowRemoved)="delete_Department($event)"
+[height]="'80vh'"
+noDataText=" "
+[pager]="{ 
+  showInfo: true, 
+  infoText: 'Page {0} of {1}', 
+  showNavigationButtons: true 
+}"
+(onEditingStart)="onEditingStart($event)"
+
+>
+<dxo-filter-panel [visible]="true"></dxo-filter-panel>
+
+<dxo-filter-row [visible]="showFilterRow" [applyFilter]="currentFilter"></dxo-filter-row>
+
+
+  <dxo-header-filter [visible]="true">
+    <dxo-search [enabled]="true"></dxo-search>
+  </dxo-header-filter>
+
+ 
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+    [visible]="true"
+    [showPageSizeSelector]="true"
+    [allowedPageSizes]="[10,20,30,40]"
+    ></dxo-pager>
+    
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="true"
+      [allowDeleting]="true"
+      [allowAdding]="true">
+    <dxo-popup title="Update Department" [showTitle]="true" [width]="600" [height]="300"></dxo-popup>
+    </dxo-editing>
+
+
+  <dxo-toolbar>
+    <dxi-item location="before" locateInMenu="never">
+      <div class="grid-header">Department</div>
+    </dxi-item>
+
+   
+
+     <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+
+
+    <dxi-item
+    location="after"
+    locateInMenu="never"
+    showText="inMenu"
+    widget="dxButton"
+    [options]="{
+      text: 'Refresh',
+      icon: 'refresh',
+      stylingMode: 'text',
+      onClick: refresh
+    }"
+  ></dxi-item>
+
+ 
+  
+  <dxi-item name="searchPanel" locateInMenu="never"></dxi-item> 
+  </dxo-toolbar>
+
+  <!-- This field ID optional .Used for displaying data temp -->
+  <dxi-column dataField="SlNo" [width]="80" caption="Sl.No" [allowFiltering]="false" [allowEditing]="false" alignment="left"  [allowHeaderFiltering]="false"></dxi-column>
+  <dxi-column dataField="CODE" caption="Code">
+    <dxi-validation-rule type="required" message="Code is required">
+      <dxi-validation-rule type="required" message="Code is required"></dxi-validation-rule>
+    </dxi-validation-rule>
+  </dxi-column>
+
+  <dxi-column dataField="DEPT_NAME" caption="Department">
+    <dxi-validation-rule type="required" message="Department is required">
+      <dxi-validation-rule type="required" message="Department is required">
+      </dxi-validation-rule>
+    </dxi-validation-rule>
+  </dxi-column>
+  <dxi-column dataField="IS_ACTIVE" caption="Status" [calculateCellValue]="formatStatus" [cellTemplate]="statusCellTemplate"></dxi-column>
+  
+</dx-data-grid>
+</div>
+
+<form-popup
+    [(visible)]="AddDepartmentPopup"
+   (save)="Add_Department()"
+    (onHidden)="onPopupCancel()"
+    titleText="New Department">
+
+    <dx-form class="plain-styled-form" [formGroup]="formsource" >
+        <dxi-item>
+         <dx-text-box
+         label="Code"
+         formControlName="CODE">
+        </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Department"
+            formControlName="DEPT_NAME" >
+          </dx-text-box>
+        </dxi-item>
+
+    </dx-form>
+</form-popup>
+
+
+<form-popup
+    [(visible)]="UpdateDepartmentPopup"
+    titleText="Update Department"
+    (save)="Edit_Department()">
+    <dx-form class="plain-styled-form">
+        <dxi-item>
+         <dx-text-box
+         label="Code"
+         [(value)]="editingRowData.CODE">
+        </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Department" 
+            [(value)]="editingRowData.DEPT_NAME">
+          </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+          <dx-check-box
+          text="Active"
+          [(value)]="editingRowData.IS_ACTIVE"></dx-check-box>
+        </dxi-item>
+       
+    </dx-form>
+  </form-popup>
+  

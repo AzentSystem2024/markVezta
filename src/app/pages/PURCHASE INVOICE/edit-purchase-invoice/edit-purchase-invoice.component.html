@@ -1,0 +1,395 @@
+<dx-validation-group #journalVoucherGroup>
+  <div
+    class="invoice-wrapper"
+    style="
+      height: 70vh;
+      display: flex;
+      flex-direction: column;
+
+      box-sizing: border-box;
+    "
+  >
+    <div
+      class="stacked-toolbar-group"
+      style="
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 6px;
+        margin-left: 20px;
+        margin-right: 20px;
+      "
+    >
+      <!-- Row 1: Supplier Invoice Date + Invoice No on left, Transaction Date on right -->
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 10px;
+        "
+      >
+        <div style="display: flex; gap: 10px">
+          <dx-date-box
+            label="Supplier Invoice Date"
+            type="date"
+            [(value)]="purchaseInvoiceFormData.SUPP_INV_DATE"
+            labelMode="floating"
+            [width]="200"
+            [readOnly]="readOnly"
+            [displayFormat]="'dd-MM-yyyy'"
+          >
+          </dx-date-box>
+
+          <dx-text-box
+            label="Supplier Invoice No."
+            labelMode="floating"
+            [(value)]="purchaseInvoiceFormData.SUPP_INV_NO"
+            [width]="200"
+            [readOnly]="readOnly"
+          >
+          </dx-text-box>
+        </div>
+
+        <dx-date-box
+          label="Transaction Date"
+          type="date"
+          [(value)]="purchaseInvoiceFormData.PURCH_DATE"
+          labelMode="floating"
+          [width]="200"
+          [displayFormat]="'dd-MM-yyyy'"
+          [readOnly]="true"
+        >
+        </dx-date-box>
+      </div>
+
+      <!-- Row 2: Supplier + Narration on left, Fill Pending GRN button on right -->
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 10px;
+        "
+      >
+        <div style="display: flex; gap: 10px">
+          <dx-select-box
+            [dataSource]="supplierList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="purchaseInvoiceFormData.SUPP_ID"
+            [width]="405"
+            label="Supplier"
+            labelMode="floating"
+            (onValueChanged)="onSupplierChanged($event)"
+            [readOnly]="readOnly"
+          >
+          </dx-select-box>
+
+          <dx-text-box
+            label="Narration"
+            labelMode="floating"
+            [(value)]="purchaseInvoiceFormData.NARRATION"
+            [width]="400"
+            [readOnly]="readOnly"
+          >
+          </dx-text-box>
+        </div>
+
+        <div style="display: flex; gap: 2px; justify-content: flex-end">
+          <dx-button
+            text="Fill Pending GRN"
+            icon="event"
+            [width]="200"
+            stylingMode="outlined"
+            class="blue-outline-btn"
+            (onClick)="openPendingGrnPopup()"
+            [readOnly]="readOnly"
+          ></dx-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="salary-grid-wrapper" style="padding: 0 20px">
+      <div class="grid-container">
+        <dx-data-grid
+          #itemsGridRef
+          [dataSource]="mainGridData"
+          [showBorders]="true"
+          [showRowLines]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="false"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true, allowSearch: true }"
+          [allowColumnReordering]="true"
+          [showColumnHeaders]="true"
+          [columnAutoWidth]="true"
+          [allowColumnResizing]="true"
+          [height]="'45vh'"
+          [width]="'auto'"
+          [columnResizingMode]="'nextColumn'"
+          [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }"
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: !readOnly,
+            allowDeleting: !readOnly,
+            allowAdding: false,
+            useIcons: true
+          }"
+          (onEditorPreparing)="onEditorPreparing($event)"
+        >
+          <dxo-load-panel [showPane]="false"></dxo-load-panel>
+          <dxo-filter-builder [allowHierarchicalFields]="true">
+          </dxo-filter-builder>
+          <dxi-column
+            dataField="GRN_NO"
+            caption="Transfer No"
+            [width]="120"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="GRN_DATE"
+            caption="Date"
+            dataType="date"
+            format="dd-MM-yyyy"
+            [width]="120"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="ITEM_NAME"
+            caption="Item Name"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="RATE"
+            caption="Price"
+            dataType="number"
+            format="#,##0.00"
+            [width]="120"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="PENDING_QTY"
+            caption="Pending Qty"
+            dataType="number"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="QUANTITY"
+            caption="Qty"
+            dataType="number"
+            [allowEditing]="!readOnly"
+          >
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateQuantity"
+              message="Quantity cannot be greater than Pending Qty"
+            ></dxi-validation-rule>
+          </dxi-column>
+
+          <dxi-column
+            dataField="AMOUNT"
+            caption="Amount"
+            dataType="number"
+            format="#,##0.00"
+            [width]="140"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateAmount"
+          ></dxi-column>
+          <dxi-column
+            dataField="VAT_PERC"
+            [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT %' : ' GST %'"
+            dataType="number"
+            format="#,##0.00"
+            [width]="80"
+            [allowEditing]="!readOnly"
+          ></dxi-column>
+          <dxi-column
+            dataField="TAX_AMOUNT"
+           [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Amount' : ' GST Amount'"
+            dataType="number"
+            format="#,##0.00"
+            [width]="140"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateGstAmount"
+          ></dxi-column>
+          <dxi-column
+            dataField="TOTAL_AMOUNT"
+            caption="Total Amount"
+            dataType="number"
+            format="#,##0.00"
+            [width]="140"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateTotal"
+          ></dxi-column>
+          <dxo-summary>
+            <dxi-total-item
+              column="QUANTITY"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+              alignment="right"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="TOTAL_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+              alignment="right"
+            ></dxi-total-item>
+
+            <dxi-total-item
+              column="TAX_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+              alignment="right"
+            ></dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+        <div
+          style="
+            margin: 16px 0 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+          "
+        >
+          <dx-check-box
+            *ngIf="!readOnly"
+            text="Approve"
+            [(value)]="isApproved"
+            [readOnly]="readOnly"
+          ></dx-check-box>
+        </div>
+
+        <div class="form-popup-buttons-container" *ngIf="!readOnly">
+          <div class="popup-footer">
+            <dx-button
+              text="Cancel"
+               (onClick)="cancel()"
+              stylingMode="outlined"
+              type="normal"
+            ></dx-button>
+            <dx-button
+              #saveButtonRef
+              text="Save"
+              stylingMode="contained"
+              type="default"
+              [width]="120"
+              (onClick)="savePurchaseInvoice()"
+            ></dx-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+
+<dx-popup
+  [(visible)]="isTrOutPopupVisible"
+  [width]="800"
+  [height]="500"
+  [showTitle]="true"
+  title="Pending GRN"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-data-grid
+      #popupGridRef
+      [dataSource]="pendingGRNs"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [height]="'60vh'"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+
+      <dxo-toolbar>
+        <div
+          class="stacked-toolbar-group"
+          style="display: flex; flex-direction: column; gap: 2px"
+        ></div>
+        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
+
+        <dxi-item location="after">
+          <div class="toolbar-button-wrapper">
+            <dx-button
+              text="Select GRN"
+              icon="check"
+              type="default"
+              stylingMode="contained"
+              class="blue-outline-btn"
+              (onClick)="onTransferSelectClick()"
+            ></dx-button>
+          </div>
+        </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+      </dxo-toolbar>
+      <dxi-column
+        dataField="GRN_NO"
+        caption="GRN No"
+        [allowEditing]="!readOnly"
+      ></dxi-column>
+      <dxi-column
+        dataField="GRN_DATE"
+        caption="GRN Date"
+        dataType="date"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+      <dxi-column
+        dataField="ITEM_NAME"
+        caption="Item Name"
+        dataType="date"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+      <!-- <dxi-column
+        dataField="INVOICE_QTY"
+        caption="Invoice Qty"
+        dataType="number"
+      ></dxi-column> -->
+      <dxi-column
+        dataField="PENDING_QTY"
+        caption="Pending Qty"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column
+        dataField="RATE"
+        caption="Price"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+    </dx-data-grid>
+  </div>
+</dx-popup>

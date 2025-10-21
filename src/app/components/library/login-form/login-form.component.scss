@@ -1,0 +1,146 @@
+@use "../../../../variables.scss" as *;
+
+.login-form {
+  ::ng-deep .form-text {
+    color: var(--base-text-color-alpha);
+  }
+}
+
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  // background: url("../../../../assets/images/rignside_img.jpg"); /* background like screenshot */
+  background: linear-gradient(to bottom right, #007bff, #00c8ff);
+  background-image: url("../../../../assets/images/rignside_img.jpg");
+  background-blend-mode: overlay;
+  background-size: cover;
+  background-position: center;
+}
+
+.login-form .logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-form .brand-title {
+  font-size: 28px; /* Bigger text like screenshot */
+  font-weight: 700; /* Bold */
+  text-align: center; /* Center align */
+  margin-bottom: 5px; /* Tight gap between title & subtitle */
+  color: #000; /* Solid black */
+  letter-spacing: 0.5px; /* Slight spacing for a clean look */
+}
+
+.login-form .subtitle {
+  font-size: 15px;
+  color: #4a5568; /* Slightly muted blue-gray */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.dx-textbox,
+.dx-selectbox {
+  width: 100%;
+}
+.btn-sign-in {
+  background: #007bff !important;
+  color: #fff !important;
+  border-radius: 25px !important;
+}
+.forgot-password-link {
+  text-align: right;
+  font-size: 13px;
+}
+.login-form {
+  // background: var(--base-bg);
+  background: white;
+  border-radius: 10px;
+  padding: 40px 30px;
+  max-width: 320px;
+  width: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+  // Center horizontally & vertically
+  position: absolute;
+  top: 50%;
+  left: 75%; // pushes it to the right side
+  transform: translate(-50%, -50%);
+
+  text-align: center;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.dx-icon {
+  font-size: 16px;
+  color: #0a0b0c; /* Gray like in your screenshot */
+}
+
+.dx-textbox .dx-texteditor-container {
+  padding-left: 35px !important;
+}
+
+.dx-textbox {
+  margin-bottom: 15px;
+}
+
+/* Make the button background & shape */
+.dx-button.btn-sign-in {
+  background-color: #377dff !important; /* Blue color */
+  border-radius: 25px !important; /* Rounded pill shape */
+  height: 45px; /* Adjust height */
+  border: none !important; /* Remove border */
+}
+
+/* Ensure the button content also matches the rounded shape */
+.dx-button.btn-sign-in .dx-button-content {
+  border-radius: 25px !important;
+  justify-content: center;
+  color: white !important;
+}
+
+/* Adjust the text style */
+.btn-sign-in .dx-button-text {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.forgot-link {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.forgot-link a {
+  font-size: 12px;
+  color: #377dff;
+  text-decoration: none;
+}
+
+.error-message {
+  color: red;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.forgot-password-link {
+  text-align: right;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.forgot-password-link a {
+  color: #377dff;
+  text-decoration: none;
+}
+.error-message {
+  color: red;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+// .dx-texteditor-container .dx-icon {
+//   font-size: 18px;
+//   // color: #888;
+// }

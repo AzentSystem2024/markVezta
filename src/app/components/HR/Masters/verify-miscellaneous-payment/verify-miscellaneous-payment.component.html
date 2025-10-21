@@ -1,0 +1,105 @@
+<div class="form-container">
+    <div class="form-column">
+      <dx-text-box
+        label="Document No."
+        [labelMode]="'floating'"
+        [(value)]="miscFormData.DOC_NO"
+        [readOnly]="true"
+      ></dx-text-box>
+    </div>
+  
+    <div class="form-column">
+      <dx-date-box
+        label="Date"
+        [labelMode]="'floating'"
+        [(value)]="miscFormData.DOC_DATE"
+        displayFormat="dd/MM/yyyy"
+      ></dx-date-box>
+    </div>
+  </div>
+  <div class="form-container">
+    <div class="form-column">
+      <dx-select-box
+        label="Employee Name"
+        [labelMode]="'floating'"
+        [dataSource]="employee"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [(value)]="miscFormData.EMP_ID"
+        placeholder="Select Employee"
+        (onValueChanged)="onEmployeeSelected($event)"
+        [searchEnabled]="true"
+      [dropDownOptions]="{ height: 200 }"
+      [readOnly]="true"
+      >
+      </dx-select-box>
+    </div>
+    
+  </div>
+  <div class="form-container">
+      
+      <div class="form-column">
+        <dx-select-box
+          label="Salary Head"
+          [labelMode]="'floating'"
+          [dataSource]="salaryHead"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="miscFormData.SAL_HEAD_ID"
+          placeholder="Select Salary Head"
+          (onValueChanged)="onSalaryHeadSelected($event)"
+          [searchEnabled]="true"
+      [dropDownOptions]="{ height: 180 }"
+        >
+        </dx-select-box>
+      </div>
+  
+      <div class="form-column">
+          <!-- <label>Date</label> -->
+          <dx-number-box
+          label="Amount"
+          [labelMode]="'floating'"
+          [(value)]="miscFormData.AMOUNT"
+          [format]="'#,##0.##'"
+        ></dx-number-box>
+        </div>
+    </div>
+  <div class="form-container">
+      <div class="form-column">
+          <dx-text-box
+          label="Description"
+          [labelMode]="'floating'"
+          [(value)]="miscFormData.DESCRIPTION"
+        ></dx-text-box>
+      </div>
+  </div>
+  
+  
+  <div class="form-container">
+      <div class="form-column">
+          <dx-text-box
+          label="Narration"
+          [labelMode]="'floating'"
+          [(value)]="miscFormData.NARRATION"
+        ></dx-text-box>
+      </div>
+  </div>
+  
+  <div class="form-popup-buttons-container">
+      <div class="popup-footer">
+        <dx-button
+          text="Cancel"
+          stylingMode="outlined"
+          type="normal"
+          (onClick)="handleClose()"
+        ></dx-button>
+        <dx-button
+          text="Verify"
+          stylingMode="contained"
+          (onClick)="onSave()"
+          type="default"
+        ></dx-button>
+      </div>
+    </div>
+
+

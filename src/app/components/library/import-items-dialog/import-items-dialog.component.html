@@ -1,0 +1,59 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="datasource"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    [width]="'100%'"
+    [columnAutoWidth]="true"
+    [columns]="columns"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    (onCellPrepared)="onCellPrepared($event)">
+  
+  <dxo-scrolling mode="virtual"></dxo-scrolling>
+  <dxo-toolbar>
+
+      <dxi-item location="before">
+          <dx-tag-box
+          [items]="stores"
+          [showSelectionControls]="true"
+          displayExpr="DESCRIPTION"
+          applyValueMode="useButtons"
+          placeholder="Select Store"
+          valueExpr="ID"
+          stylingMode="filled"
+          [searchEnabled]="true"
+          [elementAttr]="{ class: 'dropdownClass' }"
+          (onValueChanged)="onStoreSelectionChanged($event)"
+        >
+        </dx-tag-box>
+          
+        </dxi-item>
+      
+      <dxi-item location="after">
+        <dx-select-box
+          placeholder="Select Template"
+          displayExpr="TEMPLATE_NAME"
+          [items]="itemTemplateData"
+          valueExpr="ID"
+          stylingMode="filled"
+          [searchEnabled]="true"
+          (onValueChanged)="onTemplateValueChanged($event)"
+          [elementAttr]="{ class: 'dropdownClass' }"
+          
+        ></dx-select-box>
+
+      </dxi-item>
+      <dxi-item location="after"></dxi-item>
+      <dxi-item location="after" widget="dxButton" [options]="importButtonOptions"></dxi-item>
+      <dxi-item location="after" >
+        <dx-button [visible]="isDatasourceLoaded" [text]="saveButtonOptions.text" [elementAttr]="saveButtonOptions.elementAttr" (onClick)="saveButtonOptions.onClick()"></dx-button>
+      </dxi-item>
+  </dxo-toolbar>
+
+  </dx-data-grid>
+
+  <input type="file" id="fileInput" style="display: none;" (change)="onFileChange($event)" />
+  
+  </div>

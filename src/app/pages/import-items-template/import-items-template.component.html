@@ -1,0 +1,74 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="itemTemplate"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    (onEditingStart)="onEditingRow($event)"
+    (onRowRemoving)="onRowRemoving($event)"
+    (onRowUpdating)="onRowUpdating($event)"
+    [width]="'100%'"
+    [columnAutoWidth]="true"
+  >
+  <dxo-scrolling mode="virtual"></dxo-scrolling>
+
+  <dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    <dxo-search-panel
+      [visible]="true"
+      placeholder="Data Search"
+    ></dxo-search-panel>
+
+<dxo-paging [pageSize]="10"></dxo-paging>
+
+  <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+  </dxo-editing>
+  <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header">Import Items Template</div>
+      </dxi-item>
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="openForm()"
+          
+        ></dx-button>
+      </dxi-item>
+      
+
+
+  </dxo-toolbar>
+
+  <dxi-column dataField="TEMPLATE_NAME" caption="Template Name"></dxi-column>
+  <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
+  
+  
+
+
+  </dx-data-grid>
+  <form-popup
+    [(visible)]="isPopupOpened"
+    (save)="onClickSave()"
+    titleText="New Item Template"
+    [height]="700"
+    [width]="700"
+  >
+  <app-import-item-template-form></app-import-item-template-form>
+    
+  </form-popup>
+  <dx-popup
+  [(visible)]="isEditPopupOpened"
+  title="Edit Import Item Template"
+  [height]="700"
+  [width]="700"
+  >
+  <app-import-item-template-edit-form [formdata]="selectedRowData" (closeForm)="CloseEditForm()"></app-import-item-template-edit-form>
+</dx-popup>
+
+  </div>

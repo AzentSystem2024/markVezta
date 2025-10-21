@@ -1,0 +1,394 @@
+@use "../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+  overflow: auto; 
+}
+
+.view-wrappers {
+  
+    .grid {
+      .name-template {
+        .position {
+          font-size: 12px;
+          color: var(--texteditor-label-color);
+        }
+      }
+  
+      ::ng-deep & {
+        .dx-datagrid-header-panel {
+          padding: 0 var(--content-padding);
+        }
+        .dx-toolbar  {
+          height: 170px; /* Adjust the height as per your requirements */
+          overflow: visible;
+          margin-bottom: 0;
+          padding: var(--toolbar-margin-bottom) 0;
+        }
+
+        ::ng-deep .grid .dx-toolbar:nth-of-type(2) {
+          height: 50px !important;
+          overflow: visible;
+          margin-bottom: 0;
+          padding: var(--toolbar-margin-bottom) 0;
+        }
+        
+        
+
+  
+        .dx-datagrid-content .dx-row {
+          cursor: pointer;
+        }
+            /* Adding ::ng-deep for header row background */
+    ::ng-deep .dx-datagrid-headers .dx-header-row {
+      background-color: #00a0e028 !important; /* Replace with your desired color */
+    }
+      }
+  
+      .grid-header {
+        @include header();
+      }
+    }
+  
+    user-panel {
+      display: inherit;
+    }
+
+
+  
+  }
+
+
+
+  
+  
+
+
+  
+
+/* Applies to the entire header row */
+.dx-datagrid-headers .dx-header-row {
+  background-color: #f0f0f0; /* Replace with your desired color */
+}
+
+
+
+.date-period {
+    display: flex; /* Align items horizontally */
+    gap: 10px; /* Add space between the date pickers */
+    align-items: center; /* Vertically align the items */
+  }
+  
+  .date-picker-container {
+    display: flex;
+    flex-direction: column; /* Stack label and date box vertically */
+    align-items: flex-start; /* Align the label and date box to the left */
+  }
+  
+  .date-picker-container label {
+    margin-bottom: 5px; /* Add space between the label and date picker */
+  }
+  .popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    // justify-content: center;
+    padding: 20px;
+  }
+  .left-align {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    margin-bottom: 15px; /* Optional: to add spacing between sections */
+  }
+  .on-sale-container-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px; /* Optional: spacing between sections */
+  }
+  
+  .half-width {
+    flex: 1;
+    margin-right: 10px; /* Optional: space between radio and text box */
+  }
+  
+  .half-width:last-child {
+    margin-right: 0;
+  }
+  
+  
+
+  
+  
+  .operation-container {
+    margin-bottom: 15px; /* Space between the label and select box */
+  }
+  
+  .operation-container label {
+    margin-bottom: 5px; /* Space between label and select box */
+    font-weight: bold;
+  }
+  
+  .action-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px; /* Space between the buttons */
+  }
+  
+  dx-button {
+    width: 150px; /* Optional: Set consistent width for buttons */
+  }
+/* Buttons Section at the Bottom Right */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;  /* Space between the buttons */
+  position: absolute;
+  bottom: 20px; /* Distance from the bottom */
+  right: 20px; /* Distance from the right */
+}
+
+dx-button {
+  width: 150px; /* Optional: Set consistent width for buttons */
+}  
+.three-field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Optional: space between the fields */
+  margin-bottom: 15px; /* Optional: space below the row */
+}
+
+.third-width {
+  flex: 1;
+}
+
+.third-width-label {
+  flex: 0.2; /* Adjust as needed to control label width */
+  margin-right: 5px;
+  display: flex;
+  align-items: center;
+}
+.promotion-field label {
+  display: block;
+  margin-bottom: 4px; /* Adjust as needed for spacing */
+}
+
+.on-sale-container-row {
+  display: flex;
+  gap: 20px; /* Space between radio button and text box */
+}
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px; /* Optional padding for overall spacing */
+  flex-direction: column; /* Arrange items vertically */
+  align-items: flex-start; /* Align items to the left */
+  gap: 16px; /* Space between the fields */
+  width: 100%;
+}
+
+.left-right-container {
+  display: flex;
+  gap: 30px; /* Space between left and right columns */
+  width: 100%;
+}
+
+// .left-column, .right-column {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 16px; /* Space between fields in each column */
+//   flex: 1; /* Both columns take equal space */
+// }
+
+.dropdown-field {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  width: 100%; /* Ensures the dropdown fields expand to take full width */
+}
+
+// .row {
+//   display: flex;
+//   align-items: center; /* Align items vertically centered if desired */
+//   gap: 10px; /* Adjust this value to control the horizontal space between items */
+// }
+
+.dropdown-label {
+  width: 80px; /* Set fixed width for labels */
+  // margin-right: 10px; /* Space between label and input field */
+  // font-weight: bold; /* Optional for better readability */
+}
+// .move-right {
+//   margin-left: 18px; /* Push the element as far right as possible */
+// }
+.move-left {
+  margin-left: 5px;   /* Pushes it to the right within its flex container */
+  margin-right: 50px;     /* Optional: ensure there's no margin on the right */
+  width: 80px; /* Adjust this value to move the second field closer */
+}
+.fixed-value-dropdown {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 5px; /* Adjust space here */
+}
+// .operation-dropdown {
+//   display: inline-flex;
+//   align-items: center;
+//   margin-right: 5px; /* Reduce the gap here */
+// }
+
+.dx-select-box, .full-width {
+  // width: 100%; /* Ensures the dropdown takes the full available width */
+  min-width: 80px; /* Optional: ensures the select box does not get too narrow */
+}
+
+.dropdown-width {
+  width: 100px !important; /* Ensures the dropdown width is fixed */
+  min-width: 150px; /* Optional: prevent the select box from shrinking too much */
+}
+
+.label {
+  width: 100px;
+  margin-right: 10px;
+}
+
+.promotion-field, .operation-field {
+  display: flex;
+  align-items: center;
+}
+// .input {
+//   width: 100%; /* Make both fields take up 100% of their container's width */
+//   min-width: 200px; /* Optional: Set a minimum width for both inputs */
+// }
+::ng-deep .dx-tag-box .dx-tag-box-value {
+  display: flex; /* Arrange tags horizontally */
+  flex-wrap: nowrap; /* Prevent wrapping of tags */
+  overflow-x: auto; /* Allow horizontal scrolling if needed */
+  // gap: 5px; /* Optional: space between tags */
+}
+
+::ng-deep .dx-tag-box .dx-tag-box-item {
+  white-space: nowrap; /* Prevent each tag from wrapping */
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap; /* Wraps elements on smaller screens */
+}
+
+.left-column {
+  flex: 1 1 60%; /* Takes up 60% of the available space */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Space between each field */
+}
+
+.right-column {
+  flex: 1 1 40%; /* Takes up 40% of the available space */
+  margin-top: 16px; /* Add top margin to align with left column content */
+  display: flex;
+  flex-direction: column;
+  // gap: 16px;
+}
+
+// .dropdown-field {
+//   width: 100%;
+// }
+
+.flex-row {
+  display: flex;
+  gap: 0px; /* Adds space between fields */
+  align-items: flex-start; /* Aligns fields vertically at the top */
+}
+
+.dropdown-field {
+  flex: 1 1 auto; /* Ensures each field takes only the necessary space */
+  // min-width: 200px; /* Ensures fields have a minimum width */
+  // flex-direction: column;
+
+}
+
+
+
+
+.row, .flex-row, .inline-fields {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.move-right[_ngcontent-ng-c457929866] {
+  margin-left: 1px;
+}
+.move-right[_ngcontent-ng-c2563189635] {
+  margin-left: 0px;
+}
+
+
+.operation-dropdown {
+  margin-right: 2px; /* Reduce space to the right of operation dropdown */
+}
+
+.default-value-field {
+  margin-left: 10px; /* Reduce space to the left of default text field */
+}
+.dropdown-field, .default-value-field {
+  flex: 0 0 auto; /* Prevent fields from growing or shrinking unexpectedly */
+  width: auto; /* Let the fields adjust their widths based on content */
+}
+.inline-fields {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start; /* Ensure all fields are aligned to the left */
+  gap: 5px; /* Minimal spacing between fields */
+  margin-left: 0; /* Align container to the left */
+  padding-left: 0;
+}
+
+.operation-dropdown, .default-value-field {
+  margin-left: 0; /* Remove left margin */
+}
+
+.container {
+  padding-left: 0; /* Remove padding from the container */
+  margin-left: 0; /* Move the container to the left */
+}
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it appears above the popup content */
+}
+
+.loading-spinner {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

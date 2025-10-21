@@ -1,0 +1,474 @@
+
+  <!-- <div class="grid-container"> -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="itemsList"
+    [width]="'100%'"
+      [height]="'75vh'"
+    [showBorders]="true"
+    noDataText=" "
+    (onRowRemoving)="onRowRemoving($event)"
+    (onEditingStart)="openEditingStart($event)"
+   
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [showColumnLines]="true"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-search-panel [visible]="true" [highlightCaseSensitive]="false"></dxo-search-panel>
+    <dxo-scrolling mode="standard" [columnRenderingMode]="'virtual'"></dxo-scrolling>
+    <!-- <dxo-scrolling columnRenderingMode="virtual"></dxo-scrolling> -->
+
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="true"
+      [allowDeleting]="true"
+      [allowAdding]="true"
+    >
+    </dxo-editing>
+
+     <dxo-filter-row
+  [visible]="isFilterRowVisible"
+></dxo-filter-row>
+
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">Items</div>
+      </dxi-item>
+       <dxi-item location="after" locateInMenu="auto">
+
+
+    <dx-select-box
+      [dataSource]="dateRanges"
+      [displayExpr]="'label'"
+      valueExpr="value"
+      [(value)]="selectedDateRange"
+      (onValueChanged)="onDateRangeChanged($event)"
+      [searchEnabled]="true"
+      [width]="250"
+      placeholder="Select Date Range"
+    >
+     <div *dxTemplate="let item of 'item'">
+          {{ item.value === 'custom' ? 'Custom' : item.label }}
+        </div>
+    </dx-select-box>
+  </dxi-item>
+
+       <dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+      <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+
+
+      <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+        
+          icon="refresh"
+          stylingMode="text"
+          (onClick)="onRefreshButtonClick()"
+        ></dx-button>
+      </dxi-item>
+     
+      <dxi-item name="exportButton"></dxi-item>
+    
+    </dxo-toolbar>
+
+    <!-- Define columns with fixed widths -->
+         <dxi-column dataField="MATRIX_CODE" caption="Matrix Code" [width]="150"></dxi-column>
+    <dxi-column dataField="ITEM_CODE" caption="Code" [width]="150"></dxi-column>
+        <!-- <dxi-column dataField="MATRIX_CODE" [visible]="ENABLE_Matrix_Code" caption="Matrix Code" [width]="150"></dxi-column> -->
+    <dxi-column
+      dataField="BARCODE"
+      caption="Barcode"
+      [visible]="true"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column dataField="DESCRIPTION" caption="Description" [width]="150"></dxi-column>
+    <dxi-column
+      dataField="ARABIC_DESCRIPTION"
+      caption="Arabic Description"
+      [visible]="true"
+      [width]="150"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="SALE_PRICE"
+      caption="Price"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="PROFIT_MARGIN"
+      caption="Profit Margin"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="PURCH_PRICE"
+      caption="Last Purchase Price"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="SALE_PRICE1"
+      caption="Price Level 1"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="SALE_PRICE2"
+      caption="Price Level 2"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="SALE_PRICE3"
+      caption="Price Level 3"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="SALE_PRICE4"
+      caption="Price Level 4"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="SALE_PRICE5"
+      caption="Price Level 5"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="REORDER_NO"
+      caption="Reorder No."
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="SUPP_ID"
+      caption="Supplier Name"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="IS_PRIMARY"
+      caption="Primary"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column dataField="COST" caption="Cost" [visible]="true"  [format]="{ type: 'fixedPoint', precision: 2 }" [width]="70"></dxi-column>
+    <dxi-column
+      dataField="QTY_STOCK"
+      caption="On Hand Quantity"
+      [visible]="false"
+      [width]="60"
+    ></dxi-column>
+    <dxi-column
+      dataField="QTY_COMMITTED"
+      caption="Committed Quantity"
+      [visible]="false"
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="QTY_COMMITTED_"
+      caption="Available Quantity"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="CREATED_DATE"
+      caption="Date Created"
+      [visible]="false"
+      dataType="date"
+      [format]="'dd/MM/yyyy'"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="LAST_PO_DATE"
+      caption="Last Ordered"
+      [visible]="false"
+      dataType="date"
+      [format]="'dd/MM/yyyy'"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="LAST_GRN_DATE"
+      caption="Last Received"
+      [visible]="false"
+      dataType="date"
+      [format]="'dd/MM/yyyy'"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="LAST_SALE_DATE"
+      caption="Last Sold"
+      [visible]="false"
+      dataType="date"
+      [format]="'dd/MM/yyyy'"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="RESTOCK_LEVEL"
+      caption="Restock Level"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="REORDER_POINT"
+      caption="Reorder Level"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="BIN_LOCATION"
+      caption="Bin Location"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="SHELF_LIFE"
+      caption="Shelf Life"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="NOTES"
+      caption="Notes"
+
+      
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="IS_INACTIVE"
+      dataType="boolean"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="IS_PRICE_REQUIRED"
+      dataType="boolean"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="IS_NOT_DISCOUNTABLE"
+      dataType="boolean"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="IS_NOT_PURCH_ITEM"
+      dataType="boolean"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="IS_NOT_SALE_ITEM"
+      dataType="boolean"
+      [visible]="false"
+    ></dxi-column>
+    <dxi-column
+      dataField="IS_CONSIGNMENT"
+      dataType="boolean"
+      [visible]="false"
+    ></dxi-column>
+    <dxi-column
+      dataField="IS_NOT_SALE_RETURN"
+      dataType="boolean"
+      [visible]="false"
+    ></dxi-column>
+    <dxi-column dataField="ALIAS" caption="Code" [visible]="false" [width]="150"></dxi-column>
+
+    <dxi-column
+      dataField="LONG_DESCRIPTION"
+      caption="Notes"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="image"
+      caption="Image"
+      [visible]="false"
+    ></dxi-column>
+    <dxi-column dataField="UOM" caption="Unit of Measure" [visible]="false" [width]="150">
+      <dxo-lookup [dataSource]="vat" displayExpr="UOM" valueExpr="ID">
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column dataField="VAT_CLASS_ID" caption="VAT" [visible]="false" [width]="150">
+      <dxo-lookup [dataSource]="vat" displayExpr="VAT_NAME" valueExpr="ID">
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column dataField="ITEM_PROPERTY1" caption="Custom 1" [visible]="false" [width]="150"> 
+      <dxo-lookup
+        [dataSource]="itemprop1"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+      >
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column
+      dataField="ITEM_PROPERTY2"
+      caption="Custom 2"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column
+      dataField="ITEM_PROPERTY3"
+      caption="Custom 3"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <dxi-column dataField="TYPE_ID" caption="Type" [width]="150">
+      <dxo-lookup
+        [dataSource]="itemtype"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [visible]="true"
+      >
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column dataField="DEPT_NAME" caption="Department" [width]="150">
+    </dxi-column>
+    <dxi-column dataField="CAT_ID" caption="Category" [width]="150">
+      <dxo-lookup
+        [dataSource]="catagory"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [visible]="true"
+      >
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column dataField="SUBCAT_ID" caption="Subcategory" [width]="150">
+      <dxo-lookup
+        [dataSource]="subcatagory"
+        displayExpr="SUBCAT_NAME"
+        valueExpr="ID"
+        [visible]="true"
+      >
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column dataField="BRAND_ID" caption="Brand" [visible]="true" [width]="150">
+      <dxo-lookup [dataSource]="brand" displayExpr="DESCRIPTION" valueExpr="ID" [visible]="true">
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column
+      dataField="PARENT_ITEM_ID"
+      caption="Parent Item"
+      [visible]="false"
+      [width]="150"
+    >
+      <dxo-lookup
+        [dataSource]="parentitem"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [width]="150"
+      >
+      </dxo-lookup>
+    </dxi-column>
+    <dxi-column
+      dataField="CHILD_QTY"
+      caption="Child Quantity"
+      [visible]="false"
+      [width]="150"
+    ></dxi-column>
+    <!-- <dxi-column type="buttons" width="150" [buttons]="['edit', 'delete']"></dxi-column> -->
+  </dx-data-grid>
+  
+  <form-popup *ngIf="isAddItemsPopupOpened"
+    [(visible)]="isAddItemsPopupOpened"
+    [width]="1200"
+    [height]="'95vh'"
+    titleText="New Items"
+    (save)="onClickSaveItems()"
+    (closeAndRefresh)="refreshItems()"
+  >
+    <app-items-form></app-items-form>
+  </form-popup>
+
+  <dx-popup *ngIf="isEditItemsPopupOpened"
+    [(visible)]="isEditItemsPopupOpened"
+     [width]="1200"
+    [height]="'95vh'"
+    title="Edit Item"
+
+  >
+    <app-items-edit-form
+      [itemData]="selectedItemData"
+      (formClosed)="handleFormClosed()"
+ 
+    ></app-items-edit-form>
+  </dx-popup>
+
+
+<dx-popup
+  [(visible)]="showCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="250"
+  [dragEnabled]="false"
+>
+  <div>
+    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
+  <dx-date-box
+    [(value)]="customStartDate"
+    type="date"
+    width="250"
+    displayFormat="dd/MM/yyyy"
+    placeholder="From Date"
+    label="From Date"
+    labelMode="floating">
+  </dx-date-box>
+
+  <dx-date-box
+    [(value)]="customEndDate"
+    type="date"
+    width="250"
+    displayFormat="dd/MM/yyyy"
+    placeholder="To Date"
+    label="To Date"
+    labelMode="floating">
+  </dx-date-box>
+</div>
+
+    <div class="button-container" >
+      <dx-button
+        text="Apply"
+        type="default"
+        (onClick)="applyCustomDateFilter()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>

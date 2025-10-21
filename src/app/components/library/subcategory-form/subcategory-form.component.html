@@ -1,0 +1,59 @@
+<dx-form class="plain-styled-form">
+  <dxi-item itemType="group">
+    <dxo-col-count-by-screen
+      [xs]="1"
+      [sm]="1"
+      [md]="1"
+      [lg]="1"
+    ></dxo-col-count-by-screen>
+
+    <!-- Code -->
+    <dxi-item  [colSpan]="1">
+      <dx-text-box
+      style="margin-bottom: 20px;"
+        [(value)]="newSubCategory.CODE"
+        placeholder="Enter Code"
+      ><dx-validator>
+  <dxi-validation-rule type="required" message="Code is required"></dxi-validation-rule>
+</dx-validator></dx-text-box>
+    </dxi-item>
+
+    <!-- Sub Category Name -->
+    <dxi-item  [colSpan]="1">
+      <dx-text-box
+        style="margin-bottom: 20px;"
+        [(value)]="newSubCategory.SUBCAT_NAME"
+        placeholder="Enter Sub Category Name"
+      ><dx-validator>
+  <dxi-validation-rule type="required" message="Subcategory is required"></dxi-validation-rule>
+</dx-validator></dx-text-box>
+    </dxi-item>
+
+        <!-- Category -->
+    <dxi-item  [colSpan]="1">
+      <dx-select-box
+        style="margin-bottom: 20px;"
+        [items]="categories"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+            [searchEnabled]="true"
+        placeholder="Select Category"
+        [(value)]="newSubCategory.CAT_ID"
+      ><dx-validator>
+  <dxi-validation-rule type="required" message=" category is required"></dxi-validation-rule>
+</dx-validator></dx-select-box>
+    </dxi-item>
+    <!-- Department -->
+    <dxi-item  [colSpan]="1">
+      <dx-select-box
+        style="margin-bottom: 20px;"
+        [items]="departmetDropdownData"
+        displayExpr="DESCRIPTION"
+            [searchEnabled]="true"
+        valueExpr="ID"
+        placeholder="Select Department"
+        [(value)]="newSubCategory.DEPT_ID"
+      ></dx-select-box>
+    </dxi-item>
+  </dxi-item>
+</dx-form>

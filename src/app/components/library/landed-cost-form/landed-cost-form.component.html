@@ -1,0 +1,85 @@
+<dx-form class="plain-styled-form" [colCount]="1">
+    
+    <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *dxTemplate>
+          <!-- <dx-text-box
+            label="Code"
+           
+            width="100"
+            stylingMode="filled"
+          ></dx-text-box> -->
+          <dx-text-box
+          label="Code"
+          [(value)]="newLandedCost.CODE"
+          width="100"
+          stylingMode="filled"
+        >
+
+    
+      </dx-text-box>
+        </div>
+        </dxi-item>
+        <dxi-item Align="Right">
+          <dx-check-box 
+                  [(value)]="newLandedCost.IS_INACTIVE"
+                  (onValueChanged)="onValueChangedInactive($event.value)"
+                  text="Inactive"
+                  
+                ></dx-check-box>
+          </dxi-item>
+      </dxi-item>
+
+      <dxi-item itemType="group" [colCount]="1">
+          <dxi-item>
+            <div *dxTemplate>
+              <dx-text-box
+                label="Description"
+                [(value)]="newLandedCost.DESCRIPTION"
+                stylingMode="filled"
+              ></dx-text-box>
+            </div>
+            </dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item> 
+              <div *dxTemplate> 
+                <label>Currency</label>
+               
+                <dx-radio-group
+                    [items]="currencyOptions"
+                    [(value)]="newLandedCost.isLocalCurency"
+                    (onValueChanged)="onValueChangedCurrency($event.value)"
+                    layout="horizontal"
+                   
+                  ></dx-radio-group>
+              </div>
+            </dxi-item>
+          
+            </dxi-item>
+            <dxi-item itemType="group" [colCount]="3">
+              <dxi-item [colSpan]="2"> 
+                <div *dxTemplate> 
+                  <label>Amount</label>
+                  <dx-radio-group
+                    [items]="amountOptions"
+                    [(value)]="newLandedCost.isFixedAmount"
+                    (onValueChanged)="onValueChangedAmount($event)"
+                    layout="horizontal"
+                  ></dx-radio-group>
+                </div>
+              </dxi-item>
+
+              <dxi-item>
+                <div *dxTemplate>
+                  <dx-text-box
+                    label="Value"
+                    [(value)]="newLandedCost.VALUE"
+                    stylingMode="filled"
+                  ></dx-text-box>
+                </div>
+                </dxi-item>
+              </dxi-item>
+</dx-form>
+          
+          
