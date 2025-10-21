@@ -4511,7 +4511,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   deleteMiscellaneousData(id: number) {
-    return this.http.post<any>(`${this.apiUrl}/MiscPayment/delete/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}MiscPayment/delete/` + id, {});
   }
 
   getPaymentDetails(data: Object): Observable<any> {

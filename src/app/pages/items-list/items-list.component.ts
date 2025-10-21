@@ -133,6 +133,7 @@ export class ItemsListComponent implements OnInit,AfterViewInit  {
   isEditItemsPopupOpened = false;
   edit : any;
   isLoading: boolean = true;
+
     isFilterRowVisible: boolean = false;
   sessionData : any;
   ITEM_PROPERTY1 : any;
@@ -199,7 +200,7 @@ customLabel = 'Custom';
     this.showItems();
     this.loadDropdownData();
     this.getStores();
-    
+    this.sesstion_Details();
   }
   
     sesstion_Details(){
@@ -220,6 +221,7 @@ customLabel = 'Custom';
 
     this.ITEM_PROPERTY5=this.sessionData.GeneralSettings.ITEM_PROPERTY5
     console.log(this.ITEM_PROPERTY5,'============ITEM_PROPERTY5==============')
+
     this.ENABLE_Matrix_Code=this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE
     console.log(this.ENABLE_Matrix_Code)
 
@@ -244,15 +246,14 @@ else if(this.selectedDateRange === 'all'){
   //  this.showItems();
 
   const payload={
-  DATE_FROM: "2020-01-01",
+  DATE_FROM: "2000-01-01",
   DATE_TO: this.formatDate(new Date())
   }
   this.dataservice.getItemsData(payload).subscribe((res:any)=>{
     console.log(res)
     this.itemsList=res.data
 
-  })
-  
+  });
 
 } else if (this.selectedDateRange === 'last7') {
     this.startDate = new Date(today);

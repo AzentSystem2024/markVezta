@@ -167,6 +167,14 @@ this.isEditPopupPrepaymentPosting=false
 
   }
   onDeletePrepayment(event:any){
+    console.log(event)
+    event.cancel=true
+
+     if (event.data.TRANS_STATUS === "Approved") {
+          event.cancel = true;
+          notify('Prepayment posting cannot be deleted.', 'error', 2000);
+          return;
+        }
     const id=event.data.TRANS_ID
     this.dataservice.Delete_Prepayment_Posting(id).subscribe((res:any)=>{
       console.log(res)

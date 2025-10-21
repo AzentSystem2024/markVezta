@@ -452,10 +452,10 @@ export class JournalVoucherListComponent {
   onDeleteJournalVoucher(event: any) {
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
-      notify('This journal voucher cannot be edited.', 'error', 2000);
+      notify('This journal voucher cannot be deleted.', 'error', 2000);
       return;
     }
-    const JVId = event.data.ID;
+    const JVId = event.data.TRANS_ID;
     event.cancel = true;
 
     // Call your delete API

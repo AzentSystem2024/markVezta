@@ -421,7 +421,13 @@ export class ListMiscellaneousPaymentsComponent {
   }
 
   onDeleteMiscPayment(e: any) {
-    const miscId = e.data.ID;
+     if (e.data.TRANS_STATUS === 5) {
+          e.cancel = true;
+          notify('Misc Payment cannot be deleted.', 'error', 2000);
+          return;
+        }
+
+    const miscId = e.data.TRANS_ID;
     // console.log("delete")
     // Optionally prevent the default delete behavior
     e.cancel = true;
