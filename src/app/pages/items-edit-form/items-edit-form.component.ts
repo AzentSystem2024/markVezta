@@ -69,10 +69,10 @@ export class ItemsEditFormComponent implements OnInit {
   @Input() width = 480;
   selectedParentItemId: any;
   selectedParentItemDescription: any;
-  ENABLE_Matrix_Code: boolean=false
+  ENABLE_Matrix_Code: boolean = false;
   edit_Suplier: any;
   Edit_Store: any;
-  
+
   get buttonContainerHtml() {
     return `
       <div class="button-container1">
@@ -179,18 +179,18 @@ export class ItemsEditFormComponent implements OnInit {
   COSTING_METHOD: any = '';
   countryFlag: any[] = [];
   countries: any[];
-  selectedPriority:any=1
+  selectedPriority: any = 1;
   public costingMethodOptions: any[] = [];
   packing: any[] = [];
 
   item_alias: any[] = [
     {
       ALIAS: '',
-       ALIAS_TYPE_ID:this.selectedPriority
+      ALIAS_TYPE_ID: this.selectedPriority,
     },
   ];
-  
-  ITEM_ALIAS: any[] = [{ ALIAS: '' , ALIAS_TYPE_ID:this.selectedPriority}];
+
+  ITEM_ALIAS: any[] = [{ ALIAS: '', ALIAS_TYPE_ID: this.selectedPriority }];
   item_stores: any[] = [];
   item_suppliers: any[] = [];
   combinedStores: any[] = [];
@@ -222,7 +222,7 @@ export class ItemsEditFormComponent implements OnInit {
     ITEM_PROPERTY1: '',
     ITEM_PROPERTY2: '',
     ITEM_PROPERTY3: '',
-    MATRIX_CODE:'',
+    MATRIX_CODE: '',
     ITEM_PROPERTY4: '',
     ITEM_PROPERTY5: '',
     VAT_CLASS_ID: '',
@@ -260,9 +260,9 @@ export class ItemsEditFormComponent implements OnInit {
     IS_NOT_SALE_RETURN: false,
     COSTING_METHOD: '',
     POS_DESCRIPTION: '',
-    IS_DIFFERENT_UOM_PURCH:false,
-    UOM_PURCH:'',
-    UOM_MULTPLE:'',
+    IS_DIFFERENT_UOM_PURCH: false,
+    UOM_PURCH: '',
+    UOM_MULTPLE: '',
     ITEM_STORES: [
       {
         STORE_ID: '',
@@ -272,23 +272,23 @@ export class ItemsEditFormComponent implements OnInit {
         SALE_PRICE3: '',
         SALE_PRICE4: '',
         SALE_PRICE5: '',
-        STORE_CODE:'',
-        STORE_NAME:'',
-        COST:'',
-        IS_INACTIVE:false ,
+        STORE_CODE: '',
+        STORE_NAME: '',
+        COST: '',
+        IS_INACTIVE: false,
         IS_NOT_SALE_ITEM: false,
-        IS_NOT_SALE_RETURN:false,
+        IS_NOT_SALE_RETURN: false,
         IS_PRICE_REQUIRED: false,
         IS_NOT_DISCOUNTABLE: false,
-        LAST_MODIFIED_DATE:'',
-        QTY_AVAILABLE:'',
+        LAST_MODIFIED_DATE: '',
+        QTY_AVAILABLE: '',
         IS_SELECTED: false,
       },
     ],
     ITEM_ALIAS: [
       {
         ALIAS: '',
-        ALIAS_TYPE_ID:this.selectedPriority
+        ALIAS_TYPE_ID: this.selectedPriority,
       },
     ],
     ITEM_SUPPLIERS: [
@@ -302,12 +302,12 @@ export class ItemsEditFormComponent implements OnInit {
       },
     ],
     ITEM_COMPONENTS: [
-    {
-      COMPONENT_ITEM_ID:"",
-      QUANTITY:"",
-      UOM: ""
-    }
-  ]
+      {
+        COMPONENT_ITEM_ID: '',
+        QUANTITY: '',
+        UOM: '',
+      },
+    ],
   };
 
   newItems = this.formItemsData;
@@ -318,36 +318,33 @@ export class ItemsEditFormComponent implements OnInit {
     ITEM_CODE: '',
     DESCRIPTION: '',
     UOM: '',
-    QUANTITY: null
+    QUANTITY: null,
   };
   selectedStores: any;
   selectedRows: any;
   itemStores: any;
   isPopupVisible: boolean;
   showComponentTab: boolean;
-  itemComponents: any[] = []; 
+  itemComponents: any[] = [];
   filteredDropdownOptions = [];
   filteredUOM: any;
   filteredUOMs: any;
-  sessionData : any;
-  ITEM_PROPERTY1 : any;
-  ITEM_PROPERTY2 : any;
-  ITEM_PROPERTY3 : any;
-  ITEM_PROPERTY4 : any;
-  ITEM_PROPERTY5 : any;
+  sessionData: any;
+  ITEM_PROPERTY1: any;
+  ITEM_PROPERTY2: any;
+  ITEM_PROPERTY3: any;
+  ITEM_PROPERTY4: any;
+  ITEM_PROPERTY5: any;
   isParentItemDropdownOpen: boolean;
-
 
   constructor(
     private dataservice: DataService,
     authservice: AuthService,
     private countryFlagService: CountryServiceService,
-        private cdr: ChangeDetectorRef,
-        private router: Router
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {
-
-
-      this.selectedPriority=1
+    this.selectedPriority = 1;
     this.onDropZoneEnter = this.onDropZoneEnter.bind(this);
     this.onDropZoneLeave = this.onDropZoneLeave.bind(this);
     this.onUploaded = this.onUploaded.bind(this);
@@ -389,20 +386,20 @@ export class ItemsEditFormComponent implements OnInit {
       this.itemprop3 = data;
       // console.log(this.itemprop3,"itemprop3")
     });
-         dataservice.getItemProperty4Data().subscribe((data) => {
+    dataservice.getItemProperty4Data().subscribe((data) => {
       this.itemprop4 = data;
     });
-     dataservice.getItemProperty5Data().subscribe((data) => {
+    dataservice.getItemProperty5Data().subscribe((data) => {
       this.itemprop5 = data;
     });
-    
+
     // dataservice.getDepartmentData().subscribe((data) => {
     //   this.department = data;
     //   console.log(this.department,"DEP IN EDIT")
     // });
     dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
       this.department = data;
-      console.log(this.department,"DEPARTMENTTTTTTTTTTTT")
+      console.log(this.department, 'DEPARTMENTTTTTTTTTTTT');
     });
     dataservice.getSubCategoryData().subscribe((data) => {
       this.subcatagory = data;
@@ -419,11 +416,9 @@ export class ItemsEditFormComponent implements OnInit {
     dataservice.getDropdownData('ITEMCATEGORY').subscribe((data) => {
       this.catagory = data;
     });
-    const payload={
+    const payload = {};
 
-    }
-   
-    dataservice.getItemsData(payload).subscribe((data) => {
+    dataservice.getItemsData().subscribe((data) => {
       this.items = data;
     });
     dataservice.getDropdownData('COSTINGMETHOD').subscribe((data) => {
@@ -436,15 +431,14 @@ export class ItemsEditFormComponent implements OnInit {
     });
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
-    }); 
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-
     if (changes['itemData'] && this.itemData) {
-      console.log( JSON.parse(JSON.stringify(this.itemData)), 'IN NGONCHANGES');
+      console.log(JSON.parse(JSON.stringify(this.itemData)), 'IN NGONCHANGES');
       console.log(this.itemData.PARENT_ITEM_ID, 'IMAGE_NAME in ngOnChanges');
-      this.formItemsData=this.itemData
+      this.formItemsData = this.itemData;
       if (this.itemData.IMAGE_NAME) {
         this.imageSource = this.itemData.IMAGE_NAME; // Set the Base64 string to the imageSource
         this.textVisible = false; // Hide "Upload Image" text
@@ -455,35 +449,36 @@ export class ItemsEditFormComponent implements OnInit {
         this.imageUploaded = false; // Mark as no image uploaded
       }
       this.showComponentTab = this.itemData.TYPE_ID === 8; // Show the Component tab if TYPE_ID is 8
-      this.showSupplierTab = this.itemData.TYPE_ID !== 8; 
-      console.log(this.itemData.UOM,"ITEMCOMPONENTSSSS")
+      this.showSupplierTab = this.itemData.TYPE_ID !== 8;
+      console.log(this.itemData.UOM, 'ITEMCOMPONENTSSSS');
       const data = this.uom;
-      console.log(this.uom,"DATAAAAAAAAAAAA")
-      this.filteredUOM = this.uom
-      console.log(this.filteredUOM,"FILTEREDUOM")
-      this.selectedData = this.itemData.UOM_PURCH 
-      console.log(this.selectedData,"UOMPURCH")
-      if (this.itemData.item_components && this.itemData.item_components.length > 0) {
+      console.log(this.uom, 'DATAAAAAAAAAAAA');
+      this.filteredUOM = this.uom;
+      console.log(this.filteredUOM, 'FILTEREDUOM');
+      this.selectedData = this.itemData.UOM_PURCH;
+      console.log(this.selectedData, 'UOMPURCH');
+      if (
+        this.itemData.item_components &&
+        this.itemData.item_components.length > 0
+      ) {
         this.gridData = this.itemData.item_components.map((component: any) => ({
           ITEM_CODE: component.ITEM_CODE, // Map the item code if needed
           DESCRIPTION: component.DESCRIPTION, // Map description if available
           UOM: component.UOM,
           QUANTITY: component.QUANTITY,
-         
         }));
-        console.log(this.gridData,"GRIDDATAAAAA")
+        console.log(this.gridData, 'GRIDDATAAAAA');
       } else {
         this.gridData = []; // Reset if no components
       }
-      console.log(this.gridData,"GRIDDATA")
+      console.log(this.gridData, 'GRIDDATA');
     }
-    console.log(this.itemData.item_stores,"Stores")
+    console.log(this.itemData.item_stores, 'Stores');
     if (changes['itemData'] && this.itemData) {
       this.formData = { ...this.itemData }; // Bind itemData to formData
 
-
-      this.edit_Suplier=this.itemData.item_suppliers
-      console.log(this.edit_Suplier,'][][][[][[][][][')
+      this.edit_Suplier = this.itemData.item_suppliers;
+      console.log(this.edit_Suplier, '][][][[][[][][][');
       if (this.itemData && this.itemData.item_stores) {
         this.selectedStoreIds = this.itemData.item_stores.map(
           (store) => store.ID
@@ -491,73 +486,72 @@ export class ItemsEditFormComponent implements OnInit {
       } else {
       }
 
-  this.Edit_Store= JSON.parse(JSON.stringify(this.itemData)).item_stores
+      this.Edit_Store = JSON.parse(JSON.stringify(this.itemData)).item_stores;
 
-  console.log(this.Edit_Store,'[]][[]][][][][][][=======][[][][]][][][[]')
-
-
+      console.log(this.Edit_Store, '[]][[]][][][][][][=======][[][][]][][][[]');
     }
     this.loadStores();
-    this.sesstion_Details()
-    
+    this.sesstion_Details();
   }
   onPriceChange(event: any) {
     const newPrice = event.value;
     this.itemData.SALE_PRICE = newPrice;
-    console.log(this.itemData.SALE_PRICE,'=================event data==========================')
-    this.Edit_Store.forEach(s => s.SALE_PRICE = newPrice);
-
-}
+    console.log(
+      this.itemData.SALE_PRICE,
+      '=================event data=========================='
+    );
+    this.Edit_Store.forEach((s) => (s.SALE_PRICE = newPrice));
+  }
 
   onCostChange(event: any) {
     const newPrice = event.value;
-    console.log(event,'=================event data==========================')
+    console.log(event, '=================event data==========================');
     console.log('New Price:', newPrice);
-  this.itemData.COST_PRICE = newPrice;
-  this.Edit_Store.forEach(s => s.COST_PRICE = newPrice);
-}
+    this.itemData.COST_PRICE = newPrice;
+    this.Edit_Store.forEach((s) => (s.COST_PRICE = newPrice));
+  }
   onProfitmarginChange(event: any) {
     const newPrice = event.value;
-    console.log(event,'=================event data==========================')
+    console.log(event, '=================event data==========================');
     console.log('New Price:', newPrice);
-  // this.itemData.SALE_PRICE = newPrice;
-  // this.Edit_Store.forEach(s => s.SALE_PRICE = newPrice);
-}
+    // this.itemData.SALE_PRICE = newPrice;
+    // this.Edit_Store.forEach(s => s.SALE_PRICE = newPrice);
+  }
   onSalesPrice1Change(event: any) {
     const newPrice = event.value;
-    console.log(event,'=================event data==========================')
+    console.log(event, '=================event data==========================');
     console.log('New Price:', newPrice);
-  this.itemData.SALE_PRICE = newPrice;
-  this.Edit_Store.forEach(s => s.SALE_PRICE1 = newPrice);
-}
+    this.itemData.SALE_PRICE = newPrice;
+    this.Edit_Store.forEach((s) => (s.SALE_PRICE1 = newPrice));
+  }
   onSalesPrice2Change(event: any) {
     const newPrice = event.value;
-    console.log(event,'=================event data==========================')
+    console.log(event, '=================event data==========================');
     console.log('New Price:', newPrice);
-  this.itemData.SALE_PRICE = newPrice;
-  this.Edit_Store.forEach(s => s.SALE_PRICE2 = newPrice);
-}
+    this.itemData.SALE_PRICE = newPrice;
+    this.Edit_Store.forEach((s) => (s.SALE_PRICE2 = newPrice));
+  }
   onSalesPrice3Change(event: any) {
     const newPrice = event.value;
-    console.log(event,'=================event data==========================')
+    console.log(event, '=================event data==========================');
     console.log('New Price:', newPrice);
-  this.itemData.SALE_PRICE = newPrice;
-  this.Edit_Store.forEach(s => s.SALE_PRICE3 = newPrice);
-}
+    this.itemData.SALE_PRICE = newPrice;
+    this.Edit_Store.forEach((s) => (s.SALE_PRICE3 = newPrice));
+  }
   onSalesPrice4Change(event: any) {
     const newPrice = event.value;
-    console.log(event,'=================event data==========================')
+    console.log(event, '=================event data==========================');
     console.log('New Price:', newPrice);
-  this.itemData.SALE_PRICE = newPrice;
-  this.Edit_Store.forEach(s => s.SALE_PRICE4 = newPrice);
-}
+    this.itemData.SALE_PRICE = newPrice;
+    this.Edit_Store.forEach((s) => (s.SALE_PRICE4 = newPrice));
+  }
   onSalesPrice5Change(event: any) {
     const newPrice = event.value;
-    console.log(event,'=================event data==========================')
+    console.log(event, '=================event data==========================');
     console.log('New Price:', newPrice);
-  this.itemData.SALE_PRICE = newPrice;
-  this.Edit_Store.forEach(s => s.SALE_PRICE5 = newPrice);
-}
+    this.itemData.SALE_PRICE = newPrice;
+    this.Edit_Store.forEach((s) => (s.SALE_PRICE5 = newPrice));
+  }
   ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
     const state = navigation?.extras.state as { data: any };
@@ -569,82 +563,100 @@ export class ItemsEditFormComponent implements OnInit {
     this.refreshItems();
     this.showItems();
     this.filteredUom();
-    this
+    this;
   }
-      sesstion_Details(){
-     this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(this.sessionData,'=================session data==========')
+  sesstion_Details() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
 
-    this.ITEM_PROPERTY1=this.sessionData.GeneralSettings.ITEM_PROPERTY1
-    console.log(this.ITEM_PROPERTY1,'============ITEM_PROPERTY1==============')
+    this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
+    console.log(
+      this.ITEM_PROPERTY1,
+      '============ITEM_PROPERTY1=============='
+    );
 
-    this.ITEM_PROPERTY2=this.sessionData.GeneralSettings.ITEM_PROPERTY2
-    console.log(this.ITEM_PROPERTY2,'============ITEM_PROPERTY2==============')
+    this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
+    console.log(
+      this.ITEM_PROPERTY2,
+      '============ITEM_PROPERTY2=============='
+    );
 
-    this.ITEM_PROPERTY3=this.sessionData.GeneralSettings.ITEM_PROPERTY3
-    console.log(this.ITEM_PROPERTY3,'============ITEM_PROPERTY3==============')
+    this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
+    console.log(
+      this.ITEM_PROPERTY3,
+      '============ITEM_PROPERTY3=============='
+    );
 
-    this.ITEM_PROPERTY4=this.sessionData.GeneralSettings.ITEM_PROPERTY4
-    console.log(this.ITEM_PROPERTY4,'============ITEM_PROPERTY4==============')
+    this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
+    console.log(
+      this.ITEM_PROPERTY4,
+      '============ITEM_PROPERTY4=============='
+    );
 
-    this.ITEM_PROPERTY5=this.sessionData.GeneralSettings.ITEM_PROPERTY5
-    console.log(this.ITEM_PROPERTY5,'============ITEM_PROPERTY5==============')
+    this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
+    console.log(
+      this.ITEM_PROPERTY5,
+      '============ITEM_PROPERTY5=============='
+    );
 
-    this.ENABLE_Matrix_Code=this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE
-    console.log(this.ENABLE_Matrix_Code)
-}
-onRowUpdated(e:any){
-  console.log(e)
-}
-
+    this.ENABLE_Matrix_Code =
+      this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
+    console.log(this.ENABLE_Matrix_Code);
+  }
+  onRowUpdated(e: any) {
+    console.log(e);
+  }
 
   onParentItemChanged(event: any) {
-    console.log(event,"PARENT")
-    const selectedParentItem = event.selectedRowsData[0];  // Access the first selected item
-    console.log(selectedParentItem,"SELECTEDITEM")
-    if(selectedParentItem){
+    console.log(event, 'PARENT');
+    const selectedParentItem = event.selectedRowsData[0]; // Access the first selected item
+    console.log(selectedParentItem, 'SELECTEDITEM');
+    if (selectedParentItem) {
       // this.selectedParentItemId = selectedParentItem.ID;
-      this.itemData.PARENT_ITEM_ID = selectedParentItem.ID
-      console.log(this.itemData.PARENT_ITEM_ID,"===========----------")
+      this.itemData.PARENT_ITEM_ID = selectedParentItem.ID;
+      console.log(this.itemData.PARENT_ITEM_ID, '===========----------');
       this.selectedParentItemDescription = selectedParentItem.DESCRIPTION;
-      console.log(this.selectedParentItemDescription,"SELECTEDDESCRIPTION")
+      console.log(this.selectedParentItemDescription, 'SELECTEDDESCRIPTION');
       this.isParentItemSelected = this.itemData.PARENT_ITEM_ID;
     }
   }
-  
-  getUOM(){
+
+  getUOM() {
     this.dataservice.getDropdownData('UOM').subscribe((data) => {
       this.uom = data;
-      console.log(this.uom,"UOMMMMMMMMMMMMMM")
-      this.filteredUOMs = this.uom.filter(option => option.ID !== this.itemData.UNIT_ID)
-      console.log(this.filteredUOMs,"UOMMMMMMMMMMMMMMFILTERED")
+      console.log(this.uom, 'UOMMMMMMMMMMMMMM');
+      this.filteredUOMs = this.uom.filter(
+        (option) => option.ID !== this.itemData.UNIT_ID
+      );
+      console.log(this.filteredUOMs, 'UOMMMMMMMMMMMMMMFILTERED');
       this.filterDropdownOptions();
     });
   }
 
-  filteredUom(){
-    this.filteredUOM = this.uom.filter(option => option.ID !== this.itemData.UNIT_ID)
-    console.log(this.filteredUOM,"FILTEREDUOM")
+  filteredUom() {
+    this.filteredUOM = this.uom.filter(
+      (option) => option.ID !== this.itemData.UNIT_ID
+    );
+    console.log(this.filteredUOM, 'FILTEREDUOM');
   }
-
 
   filterDropdownOptions() {
-    this.filteredDropdownOptions = this.uom.filter(option => option.ID !== this.selectedUom);
-    console.log(this.filteredDropdownOptions,"FILTERED")
+    this.filteredDropdownOptions = this.uom.filter(
+      (option) => option.ID !== this.selectedUom
+    );
+    console.log(this.filteredDropdownOptions, 'FILTERED');
   }
 
-  onUOMChange(event:any) {
-    this.selectedUom = this.newItems.UNIT_ID
+  onUOMChange(event: any) {
+    this.selectedUom = this.newItems.UNIT_ID;
     this.formItemsData.UOM_PURCH = this.selectedUom;
-    this.filterDropdownOptions();  // Filter the options when the selection changes
+    this.filterDropdownOptions(); // Filter the options when the selection changes
   }
-
 
   onTypeIdChange(event: any): void {
     this.showComponentTab = event.value === 8; // Check if TYPE_ID is 8
   }
 
-  
   loadStores() {
     this.dataservice.getDropdownData('STORE').subscribe((data) => {
       this.store = data;
@@ -656,19 +668,18 @@ onRowUpdated(e:any){
   loadItemStores() {
     // Extract STORE_IDs where IS_SELECTED is true
     this.selectedRowKeys = this.itemData.item_stores
-      .filter(store => store.IS_SELECTED) // Filter based on IS_SELECTED
-      .map(store => store.STORE_ID); // Map to STORE_ID
-  
+      .filter((store) => store.IS_SELECTED) // Filter based on IS_SELECTED
+      .map((store) => store.STORE_ID); // Map to STORE_ID
+
     // Set initial data in the grid
     this.itemStores = this.itemData.item_stores;
   }
-  
+
   onSelectionChanged(event: any) {
     this.selectedStoreIds = event.selectedRowKeys;
     console.log('Selected Store IDs:', this.selectedStoreIds);
     this.updatePriceLevel(event.selectedRowsData);
   }
-
 
   updatePriceLevel(selectedRows: any[]) {
     if (selectedRows.length > 0) {
@@ -698,7 +709,7 @@ onRowUpdated(e:any){
         store.SALE_PRICE5 = '';
         store.IS_INACTIVE = '';
         store.IS_NOT_SALE_ITEM = false;
-        store.IS_NOT_SALE_RETURN =false;
+        store.IS_NOT_SALE_RETURN = false;
         store.IS_PRICE_REQUIRED = false;
         store.IS_NOT_DISCOUNTABLE = false;
         store.CREATED_DATE = '';
@@ -708,55 +719,50 @@ onRowUpdated(e:any){
     // console.log('Updated ITEM_STORES:', this.itemData.ITEM_STORES);
   }
 
-
   saveData() {
-    console.log("SAVEDATACALLED")
+    console.log('SAVEDATACALLED');
 
-    console.log(this.Edit_Store,'EDITTTTTTTTTTTTTTTTTTTTTTTTTTTTTT')
-   
-const select_supplier = this.itemData.item_suppliers;
-console.log(select_supplier)
+    console.log(this.Edit_Store, 'EDITTTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
 
-const convertedData: any[] = [];
+    const select_supplier = this.itemData.item_suppliers;
+    console.log(select_supplier);
 
-select_supplier.forEach(item => {
-    convertedData.push({
-      ID:  0,
-    SUPP_ID: item.SUPP_ID?.toString() || "",
-        REORDER_NO: item.REORDER_NO || "",
+    const convertedData: any[] = [];
+
+    select_supplier.forEach((item) => {
+      convertedData.push({
+        ID: 0,
+        SUPP_ID: item.SUPP_ID?.toString() || '',
+        REORDER_NO: item.REORDER_NO || '',
         COST: item.COST || 0,
         IS_PRIMARY: item.IS_PRIMARY || false,
-        IS_CONSIGNMENT: item.IS_CONSIGNMENT || true
+        IS_CONSIGNMENT: item.IS_CONSIGNMENT || true,
+      });
     });
-});
-console.log(convertedData,'====[[=====[[===[[==')
+    console.log(convertedData, '====[[=====[[===[[==');
 
-const itemAliasDAta=this.itemData.item_alias
-const convertedAliasData: any[] = [];
+    const itemAliasDAta = this.itemData.item_alias;
+    const convertedAliasData: any[] = [];
 
-
-itemAliasDAta.forEach(item => {
-    convertedAliasData.push({
- ID: item.ID ||0,
-  ALIAS: item.ALIAS,
-  IS_DEFAULT: item.IS_DEFAULT,
-  ALIAS_TYPE_ID: item.ALIAS_TYPE_ID ||1
-
+    itemAliasDAta.forEach((item) => {
+      convertedAliasData.push({
+        ID: item.ID || 0,
+        ALIAS: item.ALIAS,
+        IS_DEFAULT: item.IS_DEFAULT,
+        ALIAS_TYPE_ID: item.ALIAS_TYPE_ID || 1,
+      });
     });
-});
 
-console.log(convertedAliasData)
+    console.log(convertedAliasData);
     const items = this.itemData; // Adjust if needed based on your form structure
     console.log(items, 'in update function!');
     const payload = {
       ...this.itemData,
       item_stores: this.Edit_Store || this.itemData.item_stores,
-      item_suppliers:convertedData,
-      item_alias:convertedAliasData,
-
-     
+      item_suppliers: convertedData,
+      item_alias: convertedAliasData,
     };
-  console.log(payload,"PAYLOAD")
+    console.log(payload, 'PAYLOAD');
     // Call the service to update the items
     this.dataservice.updateItems(payload.ID, payload).subscribe(
       (response) => {
@@ -855,11 +861,9 @@ console.log(convertedAliasData)
   }
 
   refreshItems() {
-    const payload={
-
-    }
+    const payload = {};
     // Implement this method to refresh the items from the server
-    this.dataservice.getItemsData(payload).subscribe(
+    this.dataservice.getItemsData().subscribe(
       (data) => {
         this.items = data; // Assuming 'items' is the data source for your grid
         console.log(this.items, 'after refresh');
@@ -893,31 +897,28 @@ console.log(convertedAliasData)
     }
   }
 
-
   showItems() {
     this.isLoading = true;
-    this.cdr.detectChanges(); 
-        const payload={
-
-    }
-    this.dataservice.getItemsData(payload).subscribe(
+    this.cdr.detectChanges();
+    const payload = {};
+    this.dataservice.getItemsData().subscribe(
       (response: any) => {
         // Sort items by 'createdAt' in descending order
         this.itemsList = response.data.reverse();
-        this.newItemList = this.itemsList.map(item => {
+        this.newItemList = this.itemsList.map((item) => {
           return {
             ID: item.ID,
             ITEM_CODE: item.ITEM_CODE,
             DESCRIPTION: item.DESCRIPTION,
-            UOM : item.UOM
+            UOM: item.UOM,
           };
         });
-      this.isLoading = false;
+        this.isLoading = false;
         console.log(this.newItemList, 'New Item List');
-  
+
         // console.log(this.itemsList, "ITEMSLIST");
         this.isLoading = false;
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
       },
       (error) => {
         console.error('Error fetching items:', error);
@@ -927,19 +928,21 @@ console.log(convertedAliasData)
   }
 
   onItemSelected(event: any): void {
-    console.log("ITEM SELECTED======", event);
-  
+    console.log('ITEM SELECTED======', event);
+
     // Get the selected item from the event's selectedRowsData
-    const selectedItem = event.selectedRowsData[0];  // Access the first selected item
-    console.log(selectedItem,"SELECTEDITEM")
+    const selectedItem = event.selectedRowsData[0]; // Access the first selected item
+    console.log(selectedItem, 'SELECTEDITEM');
 
     if (selectedItem) {
-      this.selectedItemId = selectedItem.ID;  // Bind the selected ID
-      console.log(this.selectedItemId,"SELECTEDITEMIDDDDDDDDDD")
-      this.selectedItemCode = selectedItem.ITEM_CODE;  // Optionally capture the ITEM_CODE
+      this.selectedItemId = selectedItem.ID; // Bind the selected ID
+      console.log(this.selectedItemId, 'SELECTEDITEMIDDDDDDDDDD');
+      this.selectedItemCode = selectedItem.ITEM_CODE; // Optionally capture the ITEM_CODE
       // Optionally, bind them to your form data or use them in your application
-      const selectedItemDetails = this.newItemList.find(item => item.ID === this.selectedItemId);
-      this.newItemList.forEach(item => {
+      const selectedItemDetails = this.newItemList.find(
+        (item) => item.ID === this.selectedItemId
+      );
+      this.newItemList.forEach((item) => {
         item.displayValue = `${item.ITEM_CODE} - ${item.DESCRIPTION}`;
       });
       this.formData.ITEM_CODE = selectedItemDetails.ITEM_CODE;
@@ -949,46 +952,53 @@ console.log(convertedAliasData)
   }
 
   saveItem(): void {
-    console.log(this.selectedItemId,"IN SAVEEEEEEEEEE")
+    console.log(this.selectedItemId, 'IN SAVEEEEEEEEEE');
     console.log('Form data:', this.formData);
-    if (!this.formData.ITEM_CODE || !this.formData.UOM || !this.formData.QUANTITY) {
+    if (
+      !this.formData.ITEM_CODE ||
+      !this.formData.UOM ||
+      !this.formData.QUANTITY
+    ) {
       console.error('Please fill all fields');
       return;
     }
 
     // Get the description for the selected item
-    const selectedItem = this.newItemList.find(item => item.ID === this.selectedItemId);
-    console.log(selectedItem,"SELECTEDITEMMMMMMMMM")
+    const selectedItem = this.newItemList.find(
+      (item) => item.ID === this.selectedItemId
+    );
+    console.log(selectedItem, 'SELECTEDITEMMMMMMMMM');
     const newComponent = {
       COMPONENT_ITEM_ID: this.selectedItemId,
       ITEM_CODE: this.formData.ITEM_CODE,
       DESCRIPTION: this.formData.DESCRIPTION,
       UOM: this.formData.UOM,
-      QUANTITY: Number(this.formData.QUANTITY)
+      QUANTITY: Number(this.formData.QUANTITY),
     };
 
     // Add the component data to the components array
     this.gridData.push(newComponent);
     console.log('Grid Data:', this.gridData);
 
-    
-
     if (this.itemData && Array.isArray(this.itemData.item_components)) {
-      this.itemData.item_components = [...this.itemData.item_components, newComponent]; // Merging arrays
+      this.itemData.item_components = [
+        ...this.itemData.item_components,
+        newComponent,
+      ]; // Merging arrays
       console.log('Item Data after merge:', this.itemData);
     }
 
-    console.log(this.itemData,"FORMITEMSDATA")
+    console.log(this.itemData, 'FORMITEMSDATA');
     // Close the popup after saving
     this.isPopupVisible = false;
 
     // Reset the form data
     this.formData = {
-      COMPONENT_ITEM_ID:'',
+      COMPONENT_ITEM_ID: '',
       ITEM_CODE: null,
       DESCRIPTION: '',
       UOM: '',
-      QUANTITY: null
+      QUANTITY: null,
     };
   }
 
@@ -998,26 +1008,23 @@ console.log(convertedAliasData)
   }
 
   addComponent() {
-    console.log("popup opened")
+    console.log('popup opened');
     this.isPopupVisible = true;
-    this.cdr.detectChanges()
-    console.log(this.isPopupVisible,"POPUP")
+    this.cdr.detectChanges();
+    console.log(this.isPopupVisible, 'POPUP');
   }
 
-
-  cancelPopup(){
+  cancelPopup() {
     this.isPopupVisible = false;
     this.formData = {
-      COMPONENT_ITEM_ID:'',
-      ITEM_CODE: "",
+      COMPONENT_ITEM_ID: '',
+      ITEM_CODE: '',
       DESCRIPTION: '',
       UOM: '',
-      QUANTITY: ''
+      QUANTITY: '',
     };
     this.selectedItemId = null;
   }
-  
-
 }
 
 @NgModule({
@@ -1055,7 +1062,7 @@ console.log(convertedAliasData)
     DxToolbarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxNumberBoxModule
+    DxNumberBoxModule,
   ],
   providers: [],
   exports: [ItemsEditFormComponent],

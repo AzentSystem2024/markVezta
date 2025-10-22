@@ -319,38 +319,112 @@ export class DeliveryNoteFormComponent {
 
   selectSalesOrder() {
     const selectedRows = this.quotationGrid.instance.getSelectedRowsData();
-    console.log(selectedRows);
 
     if (selectedRows.length === 0) {
-      alert('Please select at least one quotation.');
+      alert('Please select at least one sales order.');
       return;
     }
 
-    selectedRows.forEach((row) => {
-      // Push quotation ID into QTN_ID array (avoid duplicates)
-      if (selectedRows.length > 0) {
-        this.deliveryFormData.SO_DETAIL_ID = selectedRows[0].SO_DETAIL_ID; // single ID
-      }
+    // Map each selected row into the DETAILS format
+    this.deliveryFormData.DETAILS = selectedRows.map((row: any) => ({
+      ID: row.ID,
+      ITEM_ID: row.ITEM_ID || null,
+      ITEM_CODE: row.ITEM_CODE || '',
+      DESCRIPTION: row.DESCRIPTION || '',
+      MATRIX_CODE: row.MATRIX_CODE || '',
+      REMARKS: row.REMARKS || '',
+      UOM: row.UOM || '',
+      QUANTITY: row.QUANTITY || 0,
+      SO_DETAIL_ID: row.SO_DETAIL_ID || 0,
+    }));
 
-      // Push details into sales order
-      this.deliveryFormData.DETAILS.push({
-        ID: row.ID,
-        ITEM_ID: row.ITEM_ID || null,
-        ITEM_CODE: row.ITEM_CODE || '',
-        DESCRIPTION: row.ITEM_NAME || '',
-        MATRIX_CODE: row.MATRIX_CODE || '',
-        REMARKS: row.REMARKS || '',
-        UOM: row.UOM || '',
-        QUANTITY: row.QUANTITY || 0,
-        SO_DETAIL_ID: row.SO_DETAIL_ID || 0,
-      });
-    });
+    // Optionally store all SO_DETAIL_IDs as an array
+    this.deliveryFormData.SO_DETAIL_IDs = selectedRows.map(
+      (r: any) => r.SO_DETAIL_ID
+    );
 
-    this.itemsGridRef.instance.refresh(); // Refresh main grid
-    this.salesOrderPopupOpened = false; // Close popup
+    // Refresh main grid after update
+    this.itemsGridRef.instance.refresh();
 
-    console.log('Selected SO_DETAIL_ID:', this.deliveryFormData.SO_DETAIL_ID);
+    // Close popup
+    this.salesOrderPopupOpened = false;
+
+    console.log('Selected SO_DETAIL_IDs:', this.deliveryFormData.SO_DETAIL_IDs);
+    console.log('Updated DETAILS:', this.deliveryFormData.DETAILS);
   }
+
+  // selectSalesOrder() {
+  //   const selectedRows = this.quotationGrid.instance.getSelectedRowsData();
+
+  //   if (selectedRows.length === 0) {
+  //     alert('Please select at least one quotation.');
+  //     return;
+  //   }
+
+  //   const selectedRow = selectedRows[0]; // Single selection mode anyway
+
+  //   // Replace the existing DETAILS array with the new row
+  //   this.deliveryFormData.DETAILS = [
+  //     {
+  //       ID: selectedRow.ID,
+  //       ITEM_ID: selectedRow.ITEM_ID || null,
+  //       ITEM_CODE: selectedRow.ITEM_CODE || '',
+  //       DESCRIPTION: selectedRow.DESCRIPTION || '',
+  //       MATRIX_CODE: selectedRow.MATRIX_CODE || '',
+  //       REMARKS: selectedRow.REMARKS || '',
+  //       UOM: selectedRow.UOM || '',
+  //       QUANTITY: selectedRow.QUANTITY || 0,
+  //       SO_DETAIL_ID: selectedRow.SO_DETAIL_ID || 0,
+  //     },
+  //   ];
+
+  //   // Store SO_DETAIL_ID separately
+  //   this.deliveryFormData.SO_DETAIL_ID = selectedRow.SO_DETAIL_ID;
+
+  //   // Refresh main grid after update
+  //   this.itemsGridRef.instance.refresh();
+
+  //   // Close popup
+  //   this.salesOrderPopupOpened = false;
+
+  //   console.log('Selected SO_DETAIL_ID:', this.deliveryFormData.SO_DETAIL_ID);
+  //   console.log('Updated DETAILS:', this.deliveryFormData.DETAILS);
+  // }
+
+  // selectSalesOrder() {
+  //   const selectedRows = this.quotationGrid.instance.getSelectedRowsData();
+  //   console.log(selectedRows);
+
+  //   if (selectedRows.length === 0) {
+  //     alert('Please select at least one quotation.');
+  //     return;
+  //   }
+
+  //   selectedRows.forEach((row) => {
+  //     // Push quotation ID into QTN_ID array (avoid duplicates)
+  //     if (selectedRows.length > 0) {
+  //       this.deliveryFormData.SO_DETAIL_ID = selectedRows[0].SO_DETAIL_ID; // single ID
+  //     }
+
+  //     // Push details into sales order
+  //     this.deliveryFormData.DETAILS.push({
+  //       ID: row.ID,
+  //       ITEM_ID: row.ITEM_ID || null,
+  //       ITEM_CODE: row.ITEM_CODE || '',
+  //       DESCRIPTION: row.ITEM_NAME || '',
+  //       MATRIX_CODE: row.MATRIX_CODE || '',
+  //       REMARKS: row.REMARKS || '',
+  //       UOM: row.UOM || '',
+  //       QUANTITY: row.QUANTITY || 0,
+  //       SO_DETAIL_ID: row.SO_DETAIL_ID || 0,
+  //     });
+  //   });
+
+  //   this.itemsGridRef.instance.refresh(); // Refresh main grid
+  //   this.salesOrderPopupOpened = false; // Close popup
+
+  //   console.log('Selected SO_DETAIL_ID:', this.deliveryFormData.SO_DETAIL_ID);
+  // }
 
   getItemsList() {
     const payload = {
@@ -371,9 +445,46 @@ export class DeliveryNoteFormComponent {
   }
 
   onEditorPreparing(e: any) {
-    if (e.parentType === 'dataRow') {
-      e.editorOptions.height = 30; // fixed editor height
-      e.editorOptions.elementAttr = { style: 'height: 30px;' };
+    if (e.dataField === 'DELIVERED_QUANTITY') {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
     }
   }
 
@@ -463,7 +574,14 @@ export class DeliveryNoteFormComponent {
     });
 
     if (!isValid) return;
-
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${year}-${month}-${day}`;
+    };
     // Prepare Payload
     const payload = {
       ...this.deliveryFormData,
@@ -471,6 +589,7 @@ export class DeliveryNoteFormComponent {
       STORE_ID: this.storeFromSession,
       FIN_ID: this.finID,
       USER_ID: this.userID,
+      DN_DATE: formatDate(this.deliveryFormData.DN_DATE),
       DETAILS: (this.deliveryFormData.DETAILS || []).map((item: any) => ({
         ITEM_ID: item.ITEM_ID,
         ITEM_CODE: item.ITEM_CODE,

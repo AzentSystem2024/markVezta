@@ -326,7 +326,7 @@ export class ItemStorePricesComponent {
 
   listAllItems() {
     const payload = {};
-    this.dataservice.getItemsData(payload).subscribe(
+    this.dataservice.getItemsData().subscribe(
       (items: any) => {
         this.allItems = items.data;
         this.allItemsList = this.allItems;

@@ -13,7 +13,17 @@ import {
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.component';
-import { DxCheckBoxModule, DxDataGridComponent, DxDropDownBoxModule, DxFileUploaderComponent, DxFormComponent, DxNumberBoxModule, DxPopupModule, DxTabPanelModule, DxTabsModule } from 'devextreme-angular';
+import {
+  DxCheckBoxModule,
+  DxDataGridComponent,
+  DxDropDownBoxModule,
+  DxFileUploaderComponent,
+  DxFormComponent,
+  DxNumberBoxModule,
+  DxPopupModule,
+  DxTabPanelModule,
+  DxTabsModule,
+} from 'devextreme-angular';
 import { DxoItemModule } from 'devextreme-angular/ui/nested';
 import { DxoFormItemModule } from 'devextreme-angular/ui/nested';
 import { DxoLookupModule } from 'devextreme-angular/ui/nested';
@@ -43,20 +53,19 @@ import { Console } from 'console';
   templateUrl: './items-form.component.html',
   styleUrls: ['./items-form.component.scss'],
 })
-export class ItemsFormComponent implements  OnInit {
-
-
-  @ViewChild(DxDataGridComponent, { static: false }) dataGrid: DxDataGridComponent;
+export class ItemsFormComponent implements OnInit {
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid: DxDataGridComponent;
   @ViewChild(DxFormComponent, { static: false }) form: DxFormComponent;
   @ViewChild('fileUploader', { static: false }) fileUploader!: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
-//  priorities: string[] = ['Standard code', 'Tally code',];
-//  priorities = [
-//     { id: 1, name: 'Standard code' },
-//     { id: 2, name: 'Tally code' }
-//   ];
-   selectedPriority: number = 1;
-  isLoading: boolean = false; 
+  //  priorities: string[] = ['Standard code', 'Tally code',];
+  //  priorities = [
+  //     { id: 1, name: 'Standard code' },
+  //     { id: 2, name: 'Tally code' }
+  //   ];
+  selectedPriority: number = 1;
+  isLoading: boolean = false;
   toolbarItems = [
     {
       widget: 'dxButton',
@@ -80,7 +89,7 @@ export class ItemsFormComponent implements  OnInit {
       },
     },
   ];
-  
+
   components: any[] = [];
   selectedItemId: any = null;
   gridColumns: any[] = [];
@@ -93,18 +102,17 @@ export class ItemsFormComponent implements  OnInit {
   imageUploaded: boolean = false;
   selectedFile: File = null;
   imageBase64: any = '';
-  isPopupVisible: boolean = false; 
+  isPopupVisible: boolean = false;
 
   formData = {
     COMPONENT_ITEM_ID: '',
     ITEM_CODE: '',
     DESCRIPTION: '',
     UOM: '',
-    QUANTITY: null
+    QUANTITY: null,
   };
 
-  ITEM_ALIAS: any[] = [{ ALIAS: '', ALIAS_TYPE_ID:this.selectedPriority
- }];
+  ITEM_ALIAS: any[] = [{ ALIAS: '', ALIAS_TYPE_ID: this.selectedPriority }];
   url: any;
   items: any[] = [];
   store: any[] = [];
@@ -152,8 +160,8 @@ export class ItemsFormComponent implements  OnInit {
   COSTING_METHOD: any = '';
   countryFlag: any[] = [];
   countries: any[];
-  public costingMethodOptions: any[] =[]
-  packing: any[] =[]
+  public costingMethodOptions: any[] = [];
+  packing: any[] = [];
   country1: any;
   imageFile: any;
   base64Image: string | ArrayBuffer | null = null;
@@ -173,7 +181,7 @@ export class ItemsFormComponent implements  OnInit {
   gridData: any[] = [];
   selectedParentItemId: any;
   selectedParentItemDescription: any;
-  VatClass:any;
+  VatClass: any;
 
   ITEM_SUPPLIERS = [
     {
@@ -181,20 +189,19 @@ export class ItemsFormComponent implements  OnInit {
       REORDER_NO: '',
       COST: 0,
       IS_PRIMARY: false,
-      IS_CONSIGNMENT: false
-    }
+      IS_CONSIGNMENT: false,
+    },
   ];
 
-  sessionData : any;
-  ITEM_PROPERTY1 : any;
-  ITEM_PROPERTY2 : any;
-  ITEM_PROPERTY3 : any;
-  ITEM_PROPERTY4 : any;
-  ITEM_PROPERTY5 : any;
-  ENABLE_Matrix_Code:boolean
+  sessionData: any;
+  ITEM_PROPERTY1: any;
+  ITEM_PROPERTY2: any;
+  ITEM_PROPERTY3: any;
+  ITEM_PROPERTY4: any;
+  ITEM_PROPERTY5: any;
+  ENABLE_Matrix_Code: boolean;
   isParentItemDropdownOpen: boolean;
   selectedStoresMap: any;
-
 
   constructor(
     private dataservice: DataService,
@@ -203,7 +210,7 @@ export class ItemsFormComponent implements  OnInit {
     private cdr: ChangeDetectorRef,
     private countryFlagService: CountryServiceService
   ) {
-    this.selectedPriority=1
+    this.selectedPriority = 1;
     // this.onDropZoneEnter = this.onDropZoneEnter.bind(this);
     // this.onDropZoneLeave = this.onDropZoneLeave.bind(this);
     this.onUploaded = this.onUploaded.bind(this);
@@ -216,35 +223,34 @@ export class ItemsFormComponent implements  OnInit {
     this.itemlabel4 = authservice.getsettingsData().ITEM_PROPERTY4;
     this.itemlabel5 = authservice.getsettingsData().ITEM_PROPERTY5;
 
-     dataservice.Dropdown_ItemTax('VAT_CLASS').subscribe((data) => {
-      console.log(data)
+    dataservice.Dropdown_ItemTax('VAT_CLASS').subscribe((data) => {
+      console.log(data);
       this.VatClass = data;
-      console.log(this.VatClass,"VAT_CLASS=======")
+      console.log(this.VatClass, 'VAT_CLASS=======');
     });
-
 
     dataservice.getDropdownData('PARENTITEM').subscribe((data) => {
       this.parentitem = data;
-      console.log(this.parentitem,"PARENTITEM")
+      console.log(this.parentitem, 'PARENTITEM');
     });
     dataservice.getDropdownData('ITEMTYPE').subscribe((data) => {
       this.itemtype = data;
-      console.log(this.itemtype,"ITEMTYPE")
+      console.log(this.itemtype, 'ITEMTYPE');
     });
     dataservice.getDropdownData('COUNTRY').subscribe((data) => {
       this.country = data;
-      console.log(this.country,"COUNTRY=======")
+      console.log(this.country, 'COUNTRY=======');
     });
     dataservice.getDropdownData('STORE').subscribe((data) => {
       this.store = data;
     });
     dataservice.getDropdownData('brand').subscribe((data) => {
       this.brand = data;
-      console.log(this.brand,"=====================brand--------------------")
+      console.log(this.brand, '=====================brand--------------------');
     });
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
-      console.log(this.countries,"COUNTRY;;;;;;;;;;")
+      console.log(this.countries, 'COUNTRY;;;;;;;;;;');
     });
     dataservice.getItemProperty1Data().subscribe((data) => {
       this.itemprop1 = data;
@@ -255,13 +261,13 @@ export class ItemsFormComponent implements  OnInit {
     dataservice.getItemProperty3Data().subscribe((data) => {
       this.itemprop3 = data;
     });
-     dataservice.getItemProperty4Data().subscribe((data) => {
+    dataservice.getItemProperty4Data().subscribe((data) => {
       this.itemprop4 = data;
     });
-     dataservice.getItemProperty5Data().subscribe((data) => {
+    dataservice.getItemProperty5Data().subscribe((data) => {
       this.itemprop5 = data;
     });
-    
+
     dataservice.getDepartmentData().subscribe((data) => {
       this.department = data;
     });
@@ -282,13 +288,11 @@ export class ItemsFormComponent implements  OnInit {
     });
     dataservice.getDropdownData('UOM').subscribe((data) => {
       this.uom = data;
-      console.log(this.uom,"UOMMMMMMMM")
-      this.filterDropdownOptions(); 
+      console.log(this.uom, 'UOMMMMMMMM');
+      this.filterDropdownOptions();
     });
-    const payload={
-
-    }
-    dataservice.getItemsData(payload).subscribe((data) => {
+    const payload = {};
+    dataservice.getItemsData().subscribe((data) => {
       this.items = data;
     });
     dataservice.getDropdownData('COSTINGMETHOD').subscribe((data) => {
@@ -299,181 +303,195 @@ export class ItemsFormComponent implements  OnInit {
       // console.log(this.packing,"packing")
     });
   }
-  ALias_list:any
+  ALias_list: any;
 
-  formItemsData : any = {
-    
-      ITEM_CODE: '',
-      BARCODE: '',
-      DESCRIPTION: "",
-      ARABIC_DESCRIPTION: "",
-      TYPE_ID: 0,
-      DEPT_ID: 0,
-      RESTOCK_LEVEL: 0,
-      IS_CONSIGNMENT: false,
-      CAT_ID: 0,
-      SUBCAT_ID: 0,
-      IS_INACTIVE: false,
-      BRAND_ID: 0,
-      LONG_DESCRIPTION: "",
-      SALE_PRICE: 0,
-      COST: 0,
-      PROFIT_MARGIN: 0,
-      MATRIX_CODE:'',
-      QTY_STOCK: 0,
-      QTY_COMMITTED: 0,
-      CREATED_DATE:new Date(),
-      LAST_PO_DATE: new Date(),
-      LAST_GRN_DATE: new Date(),
-      LAST_SALE_DATE: new Date(),
-      PARENT_ITEM_ID: 0,
-      CHILD_QTY: 0,
-      ORIGIN_COUNTRY: 0,
-      SHELF_LIFE: 0,
-      NOTES: "",
-      IS_DIFFERENT_UOM_PURCH: false,
-      UOM_PURCH: '',
-      UOM_MULTPLE:0,
-      IS_PRICE_REQUIRED: false,
-      IS_NOT_DISCOUNTABLE: false,
-      IS_NOT_PURCH_ITEM: false,
-      IS_NOT_SALE_ITEM: false,
-      IS_NOT_SALE_RETURN: false,
-      IS_BLOCKED: false,
-      IMAGE_NAME: "",
-      ITEM_SL: 0,
-      SALE_PRICE1:0,
-      SALE_PRICE2: 0,
-      SALE_PRICE3: 0,
-      SALE_PRICE4: 0,
-      SALE_PRICE5: 0,
-      PURCH_PRICE: 0,
-      BIN_LOCATION: "",
-      PURCH_CURRENCY: 0,
-      VAT_CLASS_ID: 0,
-      VAT_NAME: "",
-      ITEM_PROPERTY1: 0,
-      ITEM_PROPERTY2: 0,
-      ITEM_PROPERTY3: 0,
-      ITEM_PROPERTY4: 0,
-      ITEM_PROPERTY5: 0,
-      COSTING_METHOD: 0,
-      REORDER_POINT: 0,
-      UNIT_ID:0,
-      PACKING_ID:0,
-      POS_DESCRIPTION:"",
-      ITEM_STORES: [
-        {
-          STORE_ID: '',
-          SALE_PRICE: 0,
-          SALE_PRICE1: 0,
-          SALE_PRICE2: 0,
-          SALE_PRICE3: 0,
-          SALE_PRICE4: 0,
-          SALE_PRICE5: 0,
-          STORE_CODE: "",
-          STORE_NAME:'',
-          COST:0,
-          IS_INACTIVE: false,
-          IS_NOT_SALE_ITEM: false,
-          IS_NOT_SALE_RETURN:false,
-          IS_PRICE_REQUIRED: false,
-          IS_NOT_DISCOUNTABLE: false,
-          LAST_MODIFIED_DATE: new Date(),
-          QTY_AVAILABLE:'',
-          IS_SELECTED: false,
-        }
-      ],
-      ITEM_ALIAS: [
-        {
-          ALIAS: "",
-          ALIAS_TYPE_ID:this.selectedPriority
-        }
-      ],
-      ITEM_SUPPLIERS: [
-        {
-          SUPP_ID: '',
-          REORDER_NO: "",
-          COST: 0,
-          IS_PRIMARY: false,
-          IS_CONSIGNMENT: false
-        }
-      ],
-      ITEM_COMPONENTS: [
-        {
-          COMPONENT_ITEM_ID: 0,
-          QUANTITY: 0,
-          UOM: ''
-        }
-      ]
+  formItemsData: any = {
+    ITEM_CODE: '',
+    BARCODE: '',
+    DESCRIPTION: '',
+    ARABIC_DESCRIPTION: '',
+    TYPE_ID: 0,
+    DEPT_ID: 0,
+    RESTOCK_LEVEL: 0,
+    IS_CONSIGNMENT: false,
+    CAT_ID: 0,
+    SUBCAT_ID: 0,
+    IS_INACTIVE: false,
+    BRAND_ID: 0,
+    LONG_DESCRIPTION: '',
+    SALE_PRICE: 0,
+    COST: 0,
+    PROFIT_MARGIN: 0,
+    MATRIX_CODE: '',
+    QTY_STOCK: 0,
+    QTY_COMMITTED: 0,
+    CREATED_DATE: new Date(),
+    LAST_PO_DATE: new Date(),
+    LAST_GRN_DATE: new Date(),
+    LAST_SALE_DATE: new Date(),
+    PARENT_ITEM_ID: 0,
+    CHILD_QTY: 0,
+    ORIGIN_COUNTRY: 0,
+    SHELF_LIFE: 0,
+    NOTES: '',
+    IS_DIFFERENT_UOM_PURCH: false,
+    UOM_PURCH: '',
+    UOM_MULTPLE: 0,
+    IS_PRICE_REQUIRED: false,
+    IS_NOT_DISCOUNTABLE: false,
+    IS_NOT_PURCH_ITEM: false,
+    IS_NOT_SALE_ITEM: false,
+    IS_NOT_SALE_RETURN: false,
+    IS_BLOCKED: false,
+    IMAGE_NAME: '',
+    ITEM_SL: 0,
+    SALE_PRICE1: 0,
+    SALE_PRICE2: 0,
+    SALE_PRICE3: 0,
+    SALE_PRICE4: 0,
+    SALE_PRICE5: 0,
+    PURCH_PRICE: 0,
+    BIN_LOCATION: '',
+    PURCH_CURRENCY: 0,
+    VAT_CLASS_ID: 0,
+    VAT_NAME: '',
+    ITEM_PROPERTY1: 0,
+    ITEM_PROPERTY2: 0,
+    ITEM_PROPERTY3: 0,
+    ITEM_PROPERTY4: 0,
+    ITEM_PROPERTY5: 0,
+    COSTING_METHOD: 0,
+    REORDER_POINT: 0,
+    UNIT_ID: 0,
+    PACKING_ID: 0,
+    POS_DESCRIPTION: '',
+    ITEM_STORES: [
+      {
+        STORE_ID: '',
+        SALE_PRICE: 0,
+        SALE_PRICE1: 0,
+        SALE_PRICE2: 0,
+        SALE_PRICE3: 0,
+        SALE_PRICE4: 0,
+        SALE_PRICE5: 0,
+        STORE_CODE: '',
+        STORE_NAME: '',
+        COST: 0,
+        IS_INACTIVE: false,
+        IS_NOT_SALE_ITEM: false,
+        IS_NOT_SALE_RETURN: false,
+        IS_PRICE_REQUIRED: false,
+        IS_NOT_DISCOUNTABLE: false,
+        LAST_MODIFIED_DATE: new Date(),
+        QTY_AVAILABLE: '',
+        IS_SELECTED: false,
+      },
+    ],
+    ITEM_ALIAS: [
+      {
+        ALIAS: '',
+        ALIAS_TYPE_ID: this.selectedPriority,
+      },
+    ],
+    ITEM_SUPPLIERS: [
+      {
+        SUPP_ID: '',
+        REORDER_NO: '',
+        COST: 0,
+        IS_PRIMARY: false,
+        IS_CONSIGNMENT: false,
+      },
+    ],
+    ITEM_COMPONENTS: [
+      {
+        COMPONENT_ITEM_ID: 0,
+        QUANTITY: 0,
+        UOM: '',
+      },
+    ],
+  };
 
-  }
-
-  newItems=this.formItemsData;
-  getNewItems = () => ({ ...this.newItems,
-    ITEM_STORES:this.selectedStoresMap ||this.formItemsData.ITEM_STORES
-   } );
+  newItems = this.formItemsData;
+  getNewItems = () => ({
+    ...this.newItems,
+    ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
+  });
 
   ngOnInit() {
-    this.showItems()
-   this.sesstion_Details()
+    this.showItems();
+    this.sesstion_Details();
     // this.loadImageFromLocalStorage();
   }
 
-    sesstion_Details(){
-     this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(this.sessionData,'=================session data==========')
+  sesstion_Details() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
 
-    this.ITEM_PROPERTY1=this.sessionData.GeneralSettings.ITEM_PROPERTY1
-    console.log(this.ITEM_PROPERTY1,'============ITEM_PROPERTY1==============')
+    this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
+    console.log(
+      this.ITEM_PROPERTY1,
+      '============ITEM_PROPERTY1=============='
+    );
 
-    this.ITEM_PROPERTY2=this.sessionData.GeneralSettings.ITEM_PROPERTY2
-    console.log(this.ITEM_PROPERTY2,'============ITEM_PROPERTY2==============')
+    this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
+    console.log(
+      this.ITEM_PROPERTY2,
+      '============ITEM_PROPERTY2=============='
+    );
 
-    this.ITEM_PROPERTY3=this.sessionData.GeneralSettings.ITEM_PROPERTY3
-    console.log(this.ITEM_PROPERTY3,'============ITEM_PROPERTY3==============')
+    this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
+    console.log(
+      this.ITEM_PROPERTY3,
+      '============ITEM_PROPERTY3=============='
+    );
 
-    this.ITEM_PROPERTY4=this.sessionData.GeneralSettings.ITEM_PROPERTY4
-    console.log(this.ITEM_PROPERTY4,'============ITEM_PROPERTY4==============')
+    this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
+    console.log(
+      this.ITEM_PROPERTY4,
+      '============ITEM_PROPERTY4=============='
+    );
 
-    this.ITEM_PROPERTY5=this.sessionData.GeneralSettings.ITEM_PROPERTY5
-    console.log(this.ITEM_PROPERTY5,'============ITEM_PROPERTY5==============')
-    this.ENABLE_Matrix_Code=this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE
-    console.log(this.ENABLE_Matrix_Code)
+    this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
+    console.log(
+      this.ITEM_PROPERTY5,
+      '============ITEM_PROPERTY5=============='
+    );
+    this.ENABLE_Matrix_Code =
+      this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
+    console.log(this.ENABLE_Matrix_Code);
+  }
 
-
-}
-  
- onInitNewRowAlias(e: any) {
-  e.data.ALIAS_TYPE_ID = this.selectedPriority;
-}
-
+  onInitNewRowAlias(e: any) {
+    e.data.ALIAS_TYPE_ID = this.selectedPriority;
+  }
 
   filterDropdownOptions() {
-    this.filteredDropdownOptions = this.uom.filter(option => option.ID !== this.selectedUom);
-    console.log(this.filteredDropdownOptions,"FILTERED")
+    this.filteredDropdownOptions = this.uom.filter(
+      (option) => option.ID !== this.selectedUom
+    );
+    console.log(this.filteredDropdownOptions, 'FILTERED');
   }
-onSelectPackAdd(event:any){}
+  onSelectPackAdd(event: any) {}
 
-  onUOMChange(event:any) {
-    this.selectedUom = this.newItems.UNIT_ID
+  onUOMChange(event: any) {
+    this.selectedUom = this.newItems.UNIT_ID;
     this.formItemsData.UOM_PURCH = this.selectedUom;
-    console.log('===============UOM_PURCH==========',this.formItemsData.UOM_PURCH)
-    this.filterDropdownOptions();  // Filter the options when the selection changes
+    console.log(
+      '===============UOM_PURCH==========',
+      this.formItemsData.UOM_PURCH
+    );
+    this.filterDropdownOptions(); // Filter the options when the selection changes
   }
-onPriorityChange(event:any){
-  console.log(event)
+  onPriorityChange(event: any) {
+    console.log(event);
+  }
 
-}
-  
-
-// onParentItemChanged(e: any) {
-//   if (e.selectedRowKeys.length > 0) {
-//     this.newItems.PARENT_ITEM_ID = e.selectedRowKeys[0];
-//     this.isParentItemDropdownOpen = false;  // ✅ close dropdown
-//   }
-// }
-
+  // onParentItemChanged(e: any) {
+  //   if (e.selectedRowKeys.length > 0) {
+  //     this.newItems.PARENT_ITEM_ID = e.selectedRowKeys[0];
+  //     this.isParentItemDropdownOpen = false;  // ✅ close dropdown
+  //   }
+  // }
 
   onUploaded(e: any) {
     const file = e.file;
@@ -482,7 +500,7 @@ onPriorityChange(event:any){
       this.isDropZoneActive = false;
       this.imageSource = fileReader.result as string;
       this.imageBase64 = fileReader.result as string; // Store the image as Base64
-      console.log(this.imageBase64,"IMAGE")
+      console.log(this.imageBase64, 'IMAGE');
       this.imageUploaded = true;
 
       // Save the image to IndexedDB
@@ -513,13 +531,12 @@ onPriorityChange(event:any){
       fileReader.onload = async () => {
         this.imageSource = fileReader.result as string;
         this.imageBase64 = this.imageSource;
-        console.log(this.imageBase64,"IMAGEEEEEEE")
-        this.newItems.IMAGE_NAME = this.imageBase64
-        console.log(this.newItems.IMAGE_NAME,"IMAGENAMEEEEEEEEEEE")
+        console.log(this.imageBase64, 'IMAGEEEEEEE');
+        this.newItems.IMAGE_NAME = this.imageBase64;
+        console.log(this.newItems.IMAGE_NAME, 'IMAGENAMEEEEEEEEEEE');
         this.textVisible = false;
         this.isDropZoneActive = false;
         this.imageUploaded = true;
-      
 
         // Save the image to IndexedDB
         await this.imageService.saveImage(file.name, this.imageBase64);
@@ -528,27 +545,25 @@ onPriorityChange(event:any){
     }
   }
 
-   
+  openModal(event: Event) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage') as HTMLImageElement;
+    const captionText = document.getElementById('caption') as HTMLDivElement;
 
-    openModal(event: Event) {
-      const modal = document.getElementById('imageModal');
-      const modalImg = document.getElementById('modalImage') as HTMLImageElement;
-      const captionText = document.getElementById('caption') as HTMLDivElement;
-  
-      if (modal && modalImg && captionText) {
-        modal.style.display = 'block';
-        modalImg.src = this.imageSource;
-        captionText.innerHTML = 'Image Caption';
-        event.stopPropagation(); // Prevent event bubbling
-      }
+    if (modal && modalImg && captionText) {
+      modal.style.display = 'block';
+      modalImg.src = this.imageSource;
+      captionText.innerHTML = 'Image Caption';
+      event.stopPropagation(); // Prevent event bubbling
     }
+  }
 
-    closeModal() {
-      const modal = document.getElementById('imageModal');
-      if (modal) {
-        modal.style.display = 'none';
-      }
+  closeModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+      modal.style.display = 'none';
     }
+  }
 
   onFileChanged(e) {
     let reader = new FileReader();
@@ -576,14 +591,14 @@ onPriorityChange(event:any){
     }
   }
 
-    // Save the image in localStorage (if needed)
-    saveImageToLocalStorage() {
-      if (this.imageBase64) {
-        console.log('Saving image to localStorage:', this.imageBase64); // Log the Base64 string
-        localStorage.setItem('uploadedImage', this.imageBase64);
-      }
+  // Save the image in localStorage (if needed)
+  saveImageToLocalStorage() {
+    if (this.imageBase64) {
+      console.log('Saving image to localStorage:', this.imageBase64); // Log the Base64 string
+      localStorage.setItem('uploadedImage', this.imageBase64);
     }
-    
+  }
+
   loadImageFromLocalStorage() {
     const savedImage = localStorage.getItem('uploadedImage');
     if (savedImage) {
@@ -615,112 +630,114 @@ onPriorityChange(event:any){
   }
 
   updatePriceLevel(selectedRows: any[]) {
-    if (selectedRows.length>0) {
-      console.log(selectedRows,'=============selected row===========================')
-      selectedRows.forEach(row => {
-      row.SALE_PRICE=this.formItemsData.SALE_PRICE;
-      row.SALE_PRICE1 = this.formItemsData.SALE_PRICE1;
-      row.SALE_PRICE2 =this.formItemsData.SALE_PRICE2;
-      row.SALE_PRICE3 =this.formItemsData.SALE_PRICE3;
-      row.SALE_PRICE4 =this.formItemsData.SALE_PRICE4;
-      row.SALE_PRICE5 =this.formItemsData.SALE_PRICE5;
-      row.IS_INACTIVE =this.formItemsData.IS_INACTIVE;
-      row.IS_NOT_SALE_ITEM =this.formItemsData.IS_NOT_SALE_ITEM;
-      row.IS_NOT_SALE_RETURN =this.formItemsData.IS_NOT_SALE_RETURN;
-      row.IS_PRICE_REQUIRED =this.formItemsData.IS_PRICE_REQUIRED;
-      row.IS_NOT_DISCOUNTABLE =this.formItemsData.IS_NOT_SALE_RETURN;
-      row.COST = this.formItemsData.COST
+    if (selectedRows.length > 0) {
+      console.log(
+        selectedRows,
+        '=============selected row==========================='
+      );
+      selectedRows.forEach((row) => {
+        row.SALE_PRICE = this.formItemsData.SALE_PRICE;
+        row.SALE_PRICE1 = this.formItemsData.SALE_PRICE1;
+        row.SALE_PRICE2 = this.formItemsData.SALE_PRICE2;
+        row.SALE_PRICE3 = this.formItemsData.SALE_PRICE3;
+        row.SALE_PRICE4 = this.formItemsData.SALE_PRICE4;
+        row.SALE_PRICE5 = this.formItemsData.SALE_PRICE5;
+        row.IS_INACTIVE = this.formItemsData.IS_INACTIVE;
+        row.IS_NOT_SALE_ITEM = this.formItemsData.IS_NOT_SALE_ITEM;
+        row.IS_NOT_SALE_RETURN = this.formItemsData.IS_NOT_SALE_RETURN;
+        row.IS_PRICE_REQUIRED = this.formItemsData.IS_PRICE_REQUIRED;
+        row.IS_NOT_DISCOUNTABLE = this.formItemsData.IS_NOT_SALE_RETURN;
+        row.COST = this.formItemsData.COST;
 
-
-      console.log('pricelevel',selectedRows); 
-      this.formItemsData.ITEM_STORES.forEach((store, index) => {
-        this.formItemsData.ITEM_STORES[index].STORE_ID = row.ID;
-        this.formItemsData.ITEM_STORES[index].SALE_PRICE = row.SALE_PRICE;
-        this.formItemsData.ITEM_STORES[index].SALE_PRICE1 = row.SALE_PRICE1;
-        this.formItemsData.ITEM_STORES[index].SALE_PRICE2 = row.SALE_PRICE2;
-        this.formItemsData.ITEM_STORES[index].SALE_PRICE3 = row.SALE_PRICE3;
-        this.formItemsData.ITEM_STORES[index].SALE_PRICE4 = row.SALE_PRICE4;
-        this.formItemsData.ITEM_STORES[index].SALE_PRICE5 = row.SALE_PRICE5;
-        this.formItemsData.ITEM_STORES[index].IS_INACTIVE = row.IS_INACTIVE;
-        this.formItemsData.ITEM_STORES[index].IS_NOT_SALE_ITEM = row.IS_NOT_SALE_ITEM;
-        this.formItemsData.ITEM_STORES[index].IS_NOT_SALE_RETURN = row.IS_NOT_SALE_RETURN;
-        this.formItemsData.ITEM_STORES[index].IS_PRICE_REQUIRED = row.IS_PRICE_REQUIRED;
-        this.formItemsData.ITEM_STORES[index].IS_NOT_DISCOUNTABLE = row.IS_NOT_DISCOUNTABLE;
-        this.formItemsData.ITEM_STORES[index].COST = row.COST;
+        console.log('pricelevel', selectedRows);
+        this.formItemsData.ITEM_STORES.forEach((store, index) => {
+          this.formItemsData.ITEM_STORES[index].STORE_ID = row.ID;
+          this.formItemsData.ITEM_STORES[index].SALE_PRICE = row.SALE_PRICE;
+          this.formItemsData.ITEM_STORES[index].SALE_PRICE1 = row.SALE_PRICE1;
+          this.formItemsData.ITEM_STORES[index].SALE_PRICE2 = row.SALE_PRICE2;
+          this.formItemsData.ITEM_STORES[index].SALE_PRICE3 = row.SALE_PRICE3;
+          this.formItemsData.ITEM_STORES[index].SALE_PRICE4 = row.SALE_PRICE4;
+          this.formItemsData.ITEM_STORES[index].SALE_PRICE5 = row.SALE_PRICE5;
+          this.formItemsData.ITEM_STORES[index].IS_INACTIVE = row.IS_INACTIVE;
+          this.formItemsData.ITEM_STORES[index].IS_NOT_SALE_ITEM =
+            row.IS_NOT_SALE_ITEM;
+          this.formItemsData.ITEM_STORES[index].IS_NOT_SALE_RETURN =
+            row.IS_NOT_SALE_RETURN;
+          this.formItemsData.ITEM_STORES[index].IS_PRICE_REQUIRED =
+            row.IS_PRICE_REQUIRED;
+          this.formItemsData.ITEM_STORES[index].IS_NOT_DISCOUNTABLE =
+            row.IS_NOT_DISCOUNTABLE;
+          this.formItemsData.ITEM_STORES[index].COST = row.COST;
+        });
       });
-    });
-    console.log('Updated ITEM_STORES:', this.formItemsData.ITEM_STORES);
-
-
-    } 
-    else {
-
-      this.store.forEach(row => {
-       row.SALE_PRICE='';
-       row.SALE_PRICE1 = '';
-       row.SALE_PRICE2 = '';
-       row.SALE_PRICE3 = '';
-       row.SALE_PRICE4 = '';
-       row.SALE_PRICE5 = '';
-       row.COST = '';
-       row.IS_INACTIVE ='';
-       row.IS_NOT_SALE_ITEM ='';
-       row.IS_NOT_SALE_RETURN ='';
-       row.IS_PRICE_REQUIRED =''
-       row.IS_NOT_DISCOUNTABLE ='';
-    });
-  
-  }
+      console.log('Updated ITEM_STORES:', this.formItemsData.ITEM_STORES);
+    } else {
+      this.store.forEach((row) => {
+        row.SALE_PRICE = '';
+        row.SALE_PRICE1 = '';
+        row.SALE_PRICE2 = '';
+        row.SALE_PRICE3 = '';
+        row.SALE_PRICE4 = '';
+        row.SALE_PRICE5 = '';
+        row.COST = '';
+        row.IS_INACTIVE = '';
+        row.IS_NOT_SALE_ITEM = '';
+        row.IS_NOT_SALE_RETURN = '';
+        row.IS_PRICE_REQUIRED = '';
+        row.IS_NOT_DISCOUNTABLE = '';
+      });
+    }
   }
   onRowUpdated(e: any) {
-  console.log("Row updated:", e.data);  // The row where checkbox was changed
-  // console.log("Changed column:", e.column.dataField, "New value:", e.value);
-const storeId = e.data.ID;
-console.log(storeId,'[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]][[][][][]')
-const createDummyItemStore = (storeData: any) => {
-  return {
-    STORE_ID: storeData.ID || 0,
-    SALE_PRICE: storeData.SALE_PRICE || 0,
-    SALE_PRICE1: storeData.SALE_PRICE1 || 0,
-    SALE_PRICE2: storeData.SALE_PRICE2 || 0,
-    SALE_PRICE3: storeData.SALE_PRICE3 || 0,
-    SALE_PRICE4: storeData.SALE_PRICE4 || 0,
-    SALE_PRICE5: storeData.SALE_PRICE5 || 0,
-    STORE_CODE: storeData.STORE_CODE || "",
-    STORE_NAME: storeData.DESCRIPTION || storeData.STORE_NAME || "",
-    COST: storeData.COST || 0,
-    IS_INACTIVE: storeData.IS_INACTIVE || false,
-    IS_NOT_SALE_ITEM: storeData.IS_NOT_SALE_ITEM || false,
-    IS_NOT_SALE_RETURN: storeData.IS_NOT_SALE_RETURN || false,
-    IS_PRICE_REQUIRED: storeData.IS_PRICE_REQUIRED || false,
-    IS_NOT_DISCOUNTABLE: storeData.IS_NOT_DISCOUNTABLE || false,
-    LAST_MODIFIED_DATE: new Date().toISOString(),
-    QTY_AVAILABLE: storeData.QTY_AVAILABLE || "",
-    IS_SELECTED: true
-  };
-};
+    console.log('Row updated:', e.data); // The row where checkbox was changed
+    // console.log("Changed column:", e.column.dataField, "New value:", e.value);
+    const storeId = e.data.ID;
+    console.log(
+      storeId,
+      '[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]][[][][][]'
+    );
+    const createDummyItemStore = (storeData: any) => {
+      return {
+        STORE_ID: storeData.ID || 0,
+        SALE_PRICE: storeData.SALE_PRICE || 0,
+        SALE_PRICE1: storeData.SALE_PRICE1 || 0,
+        SALE_PRICE2: storeData.SALE_PRICE2 || 0,
+        SALE_PRICE3: storeData.SALE_PRICE3 || 0,
+        SALE_PRICE4: storeData.SALE_PRICE4 || 0,
+        SALE_PRICE5: storeData.SALE_PRICE5 || 0,
+        STORE_CODE: storeData.STORE_CODE || '',
+        STORE_NAME: storeData.DESCRIPTION || storeData.STORE_NAME || '',
+        COST: storeData.COST || 0,
+        IS_INACTIVE: storeData.IS_INACTIVE || false,
+        IS_NOT_SALE_ITEM: storeData.IS_NOT_SALE_ITEM || false,
+        IS_NOT_SALE_RETURN: storeData.IS_NOT_SALE_RETURN || false,
+        IS_PRICE_REQUIRED: storeData.IS_PRICE_REQUIRED || false,
+        IS_NOT_DISCOUNTABLE: storeData.IS_NOT_DISCOUNTABLE || false,
+        LAST_MODIFIED_DATE: new Date().toISOString(),
+        QTY_AVAILABLE: storeData.QTY_AVAILABLE || '',
+        IS_SELECTED: true,
+      };
+    };
 
-// ✅ Initialize array if not yet created
-if (!this.selectedStoresMap) {
-  this.selectedStoresMap = [];
-}
+    // ✅ Initialize array if not yet created
+    if (!this.selectedStoresMap) {
+      this.selectedStoresMap = [];
+    }
 
-const existingIndex = this.selectedStoresMap.findIndex(
-  (item: any) => item.STORE_ID === e.data.ID
-);
+    const existingIndex = this.selectedStoresMap.findIndex(
+      (item: any) => item.STORE_ID === e.data.ID
+    );
 
-if (existingIndex > -1) {
-  // Replace existing with mapped dummy object
-  this.selectedStoresMap[existingIndex] = createDummyItemStore(e.data);
-} else {
-  // Add new mapped dummy object
-  this.selectedStoresMap.push(createDummyItemStore(e.data));
-}
+    if (existingIndex > -1) {
+      // Replace existing with mapped dummy object
+      this.selectedStoresMap[existingIndex] = createDummyItemStore(e.data);
+    } else {
+      // Add new mapped dummy object
+      this.selectedStoresMap.push(createDummyItemStore(e.data));
+    }
 
-console.log("Updated Array:", this.selectedStoresMap);
-
+    console.log('Updated Array:', this.selectedStoresMap);
   }
-
 
   clearFiles() {
     this.url = '';
@@ -747,12 +764,17 @@ console.log("Updated Array:", this.selectedStoresMap);
             this.CURRENCY
           );
 
-          console.log(event,'===================event=========================')
-          console.log(    event.component.cellValue(
-            event.row.rowIndex,
-            'CURRENCY',
-            this.CURRENCY
-          ))
+          console.log(
+            event,
+            '===================event========================='
+          );
+          console.log(
+            event.component.cellValue(
+              event.row.rowIndex,
+              'CURRENCY',
+              this.CURRENCY
+            )
+          );
         } else {
           // Reset currency value if no supplier is selected
           this.currencydata = null;
@@ -762,20 +784,22 @@ console.log("Updated Array:", this.selectedStoresMap);
     }
   }
   onRowClick(e: any) {
-    console.log("Full row data:", e.data);
+    console.log('Full row data:', e.data);
 
     // Example: access each column
-    console.log("SUPP_ID:", e.data.SUPP_ID);
-    console.log("CURRENCY:", e.data.CURRENCY);
-    console.log("REORDER_NO:", e.data.REORDER_NO);
-    console.log("COST:", e.data.COST);
-    console.log("IS_PRIMARY:", e.data.IS_PRIMARY);
-    console.log("IS_CONSIGNMENT:", e.data.IS_CONSIGNMENT);
+    console.log('SUPP_ID:', e.data.SUPP_ID);
+    console.log('CURRENCY:', e.data.CURRENCY);
+    console.log('REORDER_NO:', e.data.REORDER_NO);
+    console.log('COST:', e.data.COST);
+    console.log('IS_PRIMARY:', e.data.IS_PRIMARY);
+    console.log('IS_CONSIGNMENT:', e.data.IS_CONSIGNMENT);
   }
 
-
   onRowInserted(event: any) {
-    console.log(event,'===========================test===========================')
+    console.log(
+      event,
+      '===========================test==========================='
+    );
     // const newRecordIsPrimary = event.data.IS_PRIMARY === true;
 
     // // If the inserted record is primary, set other records' IS_PRIMARY to false
@@ -798,7 +822,7 @@ console.log("Updated Array:", this.selectedStoresMap);
       SUPP_ID: event.data.SUPP_ID.toString(),
       REORDER_NO: event.data.REORDER_NO.toString(),
       COST: event.data.COST,
-      IS_PRIMARY: event.data.IS_PRIMARY||false,
+      IS_PRIMARY: event.data.IS_PRIMARY || false,
       IS_CONSIGNMENT: event.data.IS_CONSIGNMENT || false,
     });
 
@@ -814,10 +838,10 @@ console.log("Updated Array:", this.selectedStoresMap);
   //     (alias) => alias.ALIAS.trim() !== ''
   //   );
 
-    // Push the new object into ITEM_ALIAS array with ALIAS value
-    // this.formItemsData.ITEM_ALIAS.push({ ALIAS: event.data.ALIAS, ALIAS_TYPE_ID: this.selectedPriority   });
+  // Push the new object into ITEM_ALIAS array with ALIAS value
+  // this.formItemsData.ITEM_ALIAS.push({ ALIAS: event.data.ALIAS, ALIAS_TYPE_ID: this.selectedPriority   });
 
-    // console.log('inserted Alias data', this.formItemsData.ITEM_ALIAS);
+  // console.log('inserted Alias data', this.formItemsData.ITEM_ALIAS);
   // }
   onClickSaveSupplier() {
     // console.log('currency');
@@ -836,45 +860,42 @@ console.log("Updated Array:", this.selectedStoresMap);
   }
 
   onParentItemChanged(event: any) {
-    console.log(event,"PARENT")
-    const selectedParentItem = event.selectedRowsData[0];  // Access the first selected item
-    console.log(selectedParentItem,"SELECTEDITEM")
-    if(selectedParentItem){
+    console.log(event, 'PARENT');
+    const selectedParentItem = event.selectedRowsData[0]; // Access the first selected item
+    console.log(selectedParentItem, 'SELECTEDITEM');
+    if (selectedParentItem) {
       // this.selectedParentItemId = selectedParentItem.ID;
-      this.newItems.PARENT_ITEM_ID = selectedParentItem.ID
-      console.log(this.selectedParentItemId,"===========----------")
+      this.newItems.PARENT_ITEM_ID = selectedParentItem.ID;
+      console.log(this.selectedParentItemId, '===========----------');
       this.selectedParentItemDescription = selectedParentItem.DESCRIPTION;
-      console.log(this.selectedParentItemDescription,"SELECTEDDESCRIPTION")
+      console.log(this.selectedParentItemDescription, 'SELECTEDDESCRIPTION');
       this.isParentItemSelected = !!this.newItems.PARENT_ITEM_ID;
     }
     this.isParentItemDropdownOpen = false;
   }
-  
-
 
   showItems() {
     this.isLoading = true;
-    this.cdr.detectChanges(); 
-    const payload={
-    }
-    this.dataservice.getItemsData(payload).subscribe(
+    this.cdr.detectChanges();
+    const payload = {};
+    this.dataservice.getItemsData().subscribe(
       (response: any) => {
         // Sort items by 'createdAt' in descending order
         this.itemsList = response.data.reverse();
-        this.newItemList = this.itemsList.map(item => {
+        this.newItemList = this.itemsList.map((item) => {
           return {
             ID: item.ID,
             ITEM_CODE: item.ITEM_CODE,
             DESCRIPTION: item.DESCRIPTION,
-            UOM : item.UOM
+            UOM: item.UOM,
           };
         });
-      this.isLoading = false;
+        this.isLoading = false;
         // console.log(this.newItemList, 'New Item List');
-  
+
         // console.log(this.itemsList, "ITEMSLIST");
         this.isLoading = false;
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
       },
       (error) => {
         console.error('Error fetching items:', error);
@@ -886,51 +907,58 @@ console.log("Updated Array:", this.selectedStoresMap);
   // onItemSelected(event: any): void {
   //   console.log("Item selected:", event);
   // }
-  
 
   onItemSelected(event: any): void {
-    console.log("ITEM SELECTED======", event);
-  
+    console.log('ITEM SELECTED======', event);
+
     // Get the selected item from the event's selectedRowsData
-    const selectedItem = event.selectedRowsData[0];  // Access the first selected item
-    console.log(selectedItem,"SELECTEDITEM")
+    const selectedItem = event.selectedRowsData[0]; // Access the first selected item
+    console.log(selectedItem, 'SELECTEDITEM');
 
     if (selectedItem) {
-      this.selectedUom = selectedItem.UNIT_ID
-      console.log(this.selectedUom,"SELECTEDUOM")
-      this.selectedItemId = selectedItem.ID;  // Bind the selected ID
-      console.log(this.selectedItemId,"================")
-      this.selectedItemCode = selectedItem.ITEM_CODE;  // Optionally capture the ITEM_CODE
+      this.selectedUom = selectedItem.UNIT_ID;
+      console.log(this.selectedUom, 'SELECTEDUOM');
+      this.selectedItemId = selectedItem.ID; // Bind the selected ID
+      console.log(this.selectedItemId, '================');
+      this.selectedItemCode = selectedItem.ITEM_CODE; // Optionally capture the ITEM_CODE
       // Optionally, bind them to your form data or use them in your application
-      const selectedItemDetails = this.newItemList.find(item => item.ID === this.selectedItemId);
-      this.newItemList.forEach(item => {
+      const selectedItemDetails = this.newItemList.find(
+        (item) => item.ID === this.selectedItemId
+      );
+      this.newItemList.forEach((item) => {
         item.displayValue = `${item.ITEM_CODE} - ${item.DESCRIPTION}`;
       });
       this.formData.ITEM_CODE = selectedItemDetails.ITEM_CODE;
       this.formData.DESCRIPTION = selectedItemDetails.DESCRIPTION;
-      this.formData.UOM = selectedItemDetails.UOM
-      console.log(this.formData.UOM,"SELECTEDITEMDETAILSSSS")
+      this.formData.UOM = selectedItemDetails.UOM;
+      console.log(this.formData.UOM, 'SELECTEDITEMDETAILSSSS');
     }
   }
 
   saveItem(): void {
-    console.log(this.selectedItemId,"IN SAVEEEEEEEEEE")
+    console.log(this.selectedItemId, 'IN SAVEEEEEEEEEE');
     console.log('Form data:', this.formData);
-    if (!this.formData.ITEM_CODE || !this.formData.UOM || !this.formData.QUANTITY) {
+    if (
+      !this.formData.ITEM_CODE ||
+      !this.formData.UOM ||
+      !this.formData.QUANTITY
+    ) {
       console.error('Please fill all fields');
       return;
     }
 
     // Get the description for the selected item
-    const selectedItem = this.newItemList.find(item => item.ID === this.selectedItemId);
+    const selectedItem = this.newItemList.find(
+      (item) => item.ID === this.selectedItemId
+    );
     // const selectedUom = this.newItemList.find(item => === this.)
-    console.log(selectedItem,"SELECTEDITEMMMMMMMMM")
+    console.log(selectedItem, 'SELECTEDITEMMMMMMMMM');
     const newComponent = {
       COMPONENT_ITEM_ID: this.selectedItemId,
       ITEM_CODE: this.formData.ITEM_CODE,
       DESCRIPTION: this.formData.DESCRIPTION,
       UOM: this.formData.UOM,
-      QTY_AVAILABLE: this.formData.QUANTITY
+      QTY_AVAILABLE: this.formData.QUANTITY,
     };
 
     // Add the component data to the components array
@@ -938,50 +966,46 @@ console.log("Updated Array:", this.selectedStoresMap);
     console.log('Grid Data:', this.gridData);
 
     this.newItems = {
-      ...this.formItemsData,  // Copy existing form data
-      ITEM_COMPONENTS: this.gridData.map(item => ({
-        COMPONENT_ITEM_ID: item.COMPONENT_ITEM_ID,  // Map ITEM_CODE to COMPONENT_ITEM_ID
-        QUANTITY: item.QTY_AVAILABLE,      // Map QTY_AVAILABLE to QUANTITY
-        UOM: item.UOM                      // Map UOM to UOM
-      }))
+      ...this.formItemsData, // Copy existing form data
+      ITEM_COMPONENTS: this.gridData.map((item) => ({
+        COMPONENT_ITEM_ID: item.COMPONENT_ITEM_ID, // Map ITEM_CODE to COMPONENT_ITEM_ID
+        QUANTITY: item.QTY_AVAILABLE, // Map QTY_AVAILABLE to QUANTITY
+        UOM: item.UOM, // Map UOM to UOM
+      })),
     };
-    console.log(this.newItems,"FORMITEMSDATA")
+    console.log(this.newItems, 'FORMITEMSDATA');
     // Close the popup after saving
     this.isPopupVisible = false;
 
     // Reset the form data
     this.formData = {
-      COMPONENT_ITEM_ID:'',
-      ITEM_CODE: "",
+      COMPONENT_ITEM_ID: '',
+      ITEM_CODE: '',
       DESCRIPTION: '',
       UOM: '',
-      QUANTITY: ''
+      QUANTITY: '',
     };
     this.selectedItemId = null;
   }
-
-  
 
   addComponent() {
-    console.log("popup opened")
+    console.log('popup opened');
     this.isPopupVisible = true;
-    this.cdr.detectChanges()
-    console.log(this.isPopupVisible,"POPUP")
+    this.cdr.detectChanges();
+    console.log(this.isPopupVisible, 'POPUP');
   }
 
-
-  cancelPopup(){
+  cancelPopup() {
     this.isPopupVisible = false;
     this.formData = {
-      COMPONENT_ITEM_ID:'',
-      ITEM_CODE: "",
+      COMPONENT_ITEM_ID: '',
+      ITEM_CODE: '',
       DESCRIPTION: '',
       UOM: '',
-      QUANTITY: ''
+      QUANTITY: '',
     };
     this.selectedItemId = null;
   }
-  
 }
 
 @NgModule({
@@ -1007,7 +1031,7 @@ console.log("Updated Array:", this.selectedStoresMap);
     DxPopupModule,
     DxDropDownBoxModule,
     DxTabPanelModule,
-    DxTabsModule
+    DxTabsModule,
   ],
   providers: [],
   declarations: [ItemsFormComponent],

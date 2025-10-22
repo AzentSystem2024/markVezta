@@ -33,15 +33,15 @@ import { StoreItemsAddFormModule } from '../store-items-add-form/store-items-add
 export class StoreItemsListComponent {
   @ViewChild(StoreItemsComponent) StoreItemsComponent: StoreItemsComponent;
   // @ViewChild(DxDataGridComponent, { static: true })
-  @ViewChild(DxDataGridComponent,{ static: true }) dataGrid: DxDataGridComponent;
-  
-  
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+
   @Output()
   editingStart = new EventEmitter<any>();
 
   isListVisible: boolean = false;
   isPopupVisible: boolean = false;
-  addFormPopupVisible: boolean = false
+  addFormPopupVisible: boolean = false;
   items: any;
   itemsList: any;
   store: any[] = [];
@@ -81,7 +81,7 @@ export class StoreItemsListComponent {
     });
     dataservice.getDropdownData('BRAND').subscribe((data) => {
       this.brand = data;
-      console.log(this.brand,"BRAND")
+      console.log(this.brand, 'BRAND');
     });
     dataservice.getDropdownData('SUPPLIER').subscribe((data) => {
       this.supplier = data;
@@ -89,12 +89,12 @@ export class StoreItemsListComponent {
   }
 
   ngOnInit() {
-    this.loadStores()
-    console.log(this.selectedStoreId,"NAME")
+    this.loadStores();
+    console.log(this.selectedStoreId, 'NAME');
     this.getStoresById(this.selectedStoreId);
     // if (this.selectedData && this.selectedData.ID) {
-      this.getSelectedItemsData(this.selectedData);
-      
+    this.getSelectedItemsData(this.selectedData);
+
     // }
     this.getDepartment();
   }
@@ -114,14 +114,12 @@ export class StoreItemsListComponent {
   }
 
   listAllItems() {
-    const payload={
-
-    }
-    this.dataservice.getItemsData(payload).subscribe(
+    const payload = {};
+    this.dataservice.getItemsData().subscribe(
       (items: any) => {
         this.allItems = items.data;
         this.allItemsList = this.allItems;
-  
+
         console.log(this.itemsList, 'ITEMLIST');
         this.totalRowCount = this.allItems.length;
       },
@@ -133,7 +131,7 @@ export class StoreItemsListComponent {
 
   refreshItems() {
     if (this.selectedData && this.selectedData.ID) {
-      this.getSelectedItemsData(this.selectedData)
+      this.getSelectedItemsData(this.selectedData);
     }
   }
 
@@ -143,7 +141,7 @@ export class StoreItemsListComponent {
   }
 
   openAddFormPopup() {
-    console.log("hi")
+    console.log('hi');
     this.addFormPopupVisible = true;
     this.cdr.detectChanges();
   }
@@ -158,61 +156,58 @@ export class StoreItemsListComponent {
     this.cdr.detectChanges();
   }
 
+  onDropdownValueChanged(event: any) {
+    const storeId = event.value; // Get the selected store ID
+    console.log(storeId, 'SELECTED STORE ID');
 
-onDropdownValueChanged(event: any) {
-  const storeId = event.value; // Get the selected store ID
-  console.log(storeId, "SELECTED STORE ID");
+    // Call the function to filter the stores by the same ID
+    this.getStoresById(storeId);
+  }
 
-  // Call the function to filter the stores by the same ID
-  this.getStoresById(storeId);
-}
+  // Step 2: Function to filter stores by the same storeId
+  getStoresById(storeId: any) {
+    this.dataservice.getStoresData().subscribe((response) => {
+      console.log(response, '=====================');
+      this.filteredStores = response.filter(
+        (store: any) => store.ID === storeId
+      ); // Filter stores by ID
+      console.log(this.filteredStores, 'FILTERED STORES WITH SAME ID');
+      if (this.filteredStores && this.filteredStores.length > 0) {
+        this.filteredStores.forEach((store: any) => {
+          console.log('Filtered Store ID:', store.ID);
+        });
+        this.filteredStoreId = this.filteredStores[0].ID;
+        this.listItemsByStoreId(storeId);
+      } else {
+        console.log('No stores found with this ID');
+      }
+    });
+  }
 
-// Step 2: Function to filter stores by the same storeId
-getStoresById(storeId: any) {
-  this.dataservice.getStoresData().subscribe((response) => {
-    console.log(response,"=====================")
-    this.filteredStores = response.filter((store: any) => store.ID === storeId); // Filter stores by ID
-    console.log(this.filteredStores, "FILTERED STORES WITH SAME ID");
-    if (this.filteredStores && this.filteredStores.length > 0) {
+  loadStores() {
+    this.dataservice.getStoresData().subscribe((response) => {
+      this.store = response;
+      console.log(this.store, '=========');
+      // Filter out the default store (ID = 1) from the dropdown list
+      this.filteredStoreList = this.store.filter((store) => store.ID !== 1);
 
-      this.filteredStores.forEach((store: any) => {
-        console.log('Filtered Store ID:', store.ID);
-      });
-      this.filteredStoreId = this.filteredStores[0].ID;
-      this.listItemsByStoreId(storeId);
-    } else {
-      console.log("No stores found with this ID");
-    }
-  });
-}
-
-loadStores() {
-  this.dataservice.getStoresData().subscribe((response) => {
-    this.store = response;
-    console.log(this.store,"=========")
-    // Filter out the default store (ID = 1) from the dropdown list
-    this.filteredStoreList = this.store.filter(store => store.ID !== 1);
-    
-    console.log(this.filteredStoreList, 'FILTERED STORE LIST');
-  });
-}
-
+      console.log(this.filteredStoreList, 'FILTERED STORE LIST');
+    });
+  }
 
   listItemsByStoreId(storeId: number) {
-    if(storeId == 1){
-      const payload={
-
-      }
-      this.dataservice.getItemsData(payload).subscribe((response:any) => {
-        this.items = response
-        this.itemsList = response.data
-      })
-    }else{
+    if (storeId == 1) {
+      const payload = {};
+      this.dataservice.getItemsData().subscribe((response: any) => {
+        this.items = response;
+        this.itemsList = response.data;
+      });
+    } else {
       this.dataservice.getItemsByStoreId(storeId).subscribe(
         (response: any) => {
           this.items = response;
-          this.itemsList = response.data; 
-          console.log(this.itemsList,"ITEMLIST")
+          this.itemsList = response.data;
+          console.log(this.itemsList, 'ITEMLIST');
           this.dataGrid.instance.refresh();
           // this.filterItems();
         },
@@ -221,7 +216,6 @@ loadStores() {
         }
       );
     }
-
   }
 
   onDetailsButtonClick = (e: any) => {
@@ -245,10 +239,10 @@ loadStores() {
     }
   }
 
-  handleFormClosed(){
+  handleFormClosed() {
     this.addFormPopupVisible = false;
     this.dataGrid.instance.refresh();
-    this.refreshDataGrid()
+    this.refreshDataGrid();
   }
   refreshDataGrid() {
     if (this.selectedStoreId) {
@@ -263,11 +257,10 @@ loadStores() {
 
   // Add this method to handle added items from the AddFormComponent
   onItemAdded(item: any) {
-    this.itemsList.push(item);  // Push the new item into the storeList array
+    this.itemsList.push(item); // Push the new item into the storeList array
   }
 
-  addItems(){}
-  
+  addItems() {}
 }
 @NgModule({
   imports: [

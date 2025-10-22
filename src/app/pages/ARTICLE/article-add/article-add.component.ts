@@ -91,7 +91,7 @@ export class ArticleAddComponent {
 
   articleData: any = {
     ART_NO: '',
-    DESCRIPTION: 'PU Footwear',
+    DESCRIPTION: '',
     COLOR: '',
     PRICE: '',
     PACK_QTY: '',
@@ -159,7 +159,7 @@ export class ArticleAddComponent {
       DATE_TO: new Date(), // keep to date as today
     };
 
-    this.dataService.getArticleList(payload).subscribe((response: any) => {
+    this.dataService.getArticleList().subscribe((response: any) => {
       console.log(response, 'ARTICLELIST');
       if (response?.Data && Array.isArray(response.Data)) {
         // Store full list (reversed) in articleList

@@ -247,7 +247,7 @@ export class ArticleListComponent {
       DATE_TO: formatDate(endDate),
     };
 
-    this.dataService.getArticleList(payload).subscribe((response: any) => {
+    this.dataService.getArticleList().subscribe((response: any) => {
       this.articleList = response.Data.map((item: any) => {
         let dateValue: Date;
 

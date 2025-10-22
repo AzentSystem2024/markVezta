@@ -38,6 +38,7 @@
             useIcons: true
           }"
           (onContentReady)="onContentReady($event)"
+          (onEditorPreparing)="onEditorPreparing($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
@@ -188,7 +189,6 @@
                 : ' GST %'
             "
             dataType="number"
-            format="#,##0.00"
             [width]="80"
             [allowEditing]="true"
           ></dxi-column>

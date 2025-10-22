@@ -39,6 +39,7 @@
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onSummaryCalculated)="onSummaryCalculated($event)"
+          (onRowInserted)="onRowInserted($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
@@ -181,7 +182,11 @@
 
           <dxi-column
             dataField="gstAmount"
-             [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Amount' : ' GST Amount'"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT Amount'
+                : ' GST Amount'
+            "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >

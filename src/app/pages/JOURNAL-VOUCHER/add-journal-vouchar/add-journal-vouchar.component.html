@@ -43,7 +43,6 @@
           (onRowRemoved)="onRowRemoved($event)"
           (onKeyDown)="onGridKeyDown($event)"
         >
-
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
@@ -97,7 +96,7 @@
               >
                 <!-- Row 1: Date only -->
                 <div style="display: flex; gap: 5px; justify-content: flex-end">
-                   <dx-select-box
+                  <dx-select-box
                     [width]="200"
                     [height]="32"
                     label="Department"
@@ -107,7 +106,6 @@
                     valueExpr="ID"
                     [(value)]="journalVoucherFormData.DEPT_ID"
                   >
-
                   </dx-select-box>
                   <dx-date-box
                     label="Date"
@@ -118,7 +116,6 @@
                     [width]="200"
                     [readOnly]="true"
                   ></dx-date-box>
-                 
                 </div>
                 <div style="display: flex; gap: 5px">
                   <dx-text-box
@@ -136,10 +133,17 @@
           </dxo-toolbar>
           <dxi-column
             dataField="billNo"
-            [(value)]="journalVoucherFormData.BILL_NO"
             caption="Bill No."
             [allowEditing]="true"
           ></dxi-column>
+
+          <!-- <dxi-column
+            dataField="billNo"
+            caption="Bill No."
+            [allowEditing]="false"
+          >
+          </dxi-column> -->
+
           <dxi-column
             dataField="ledgerCode"
             caption="Ledger Code"

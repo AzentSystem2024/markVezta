@@ -141,8 +141,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
 
-  getArticleList(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}article/List`, data);
+  getArticleList(): Observable<any> {
+    return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
   insertArticle(items: any) {
@@ -493,6 +493,19 @@ export class DataService {
   }
 
   //........................................SALES-ORDER............................................//
+  getSalesGridColumnList(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/list-items`, {});
+  }
+  getCatList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/catlist`, data);
+  }
+  getCatColorList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/catcolor`, data);
+  }
+
+  getCatSizeList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/catsize`, data);
+  }
   getSalesOrderMainList(): Observable<any> {
     return this.http.post(`${this.apiUrl}SalesOrder/list`, {});
   }
@@ -2628,9 +2641,9 @@ export class DataService {
   }
 
   //items
-  getItemsData(DateRange: any): any {
-    const payload = DateRange;
-    return this.http.post(`${this.apiUrl}items/list`, payload);
+  getItemsData(): any {
+    // const payload = DateRange;
+    return this.http.post(`${this.apiUrl}items/list`, {});
   }
 
   public postItems(items: any) {

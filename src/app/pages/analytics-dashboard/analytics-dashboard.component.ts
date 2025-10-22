@@ -1,6 +1,4 @@
-import {
-  Component, OnInit, NgModule,
-} from '@angular/core';
+import { Component, OnInit, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { map, share } from 'rxjs/operators';
 import { Observable, forkJoin } from 'rxjs';
@@ -26,11 +24,19 @@ import { ConversionTickerModule } from 'src/app/components/utils/conversion-tick
 import { LeadsTickerModule } from 'src/app/components/utils/leads-ticker/leads-ticker.component';
 import { analyticsPanelItems, Dates } from 'src/app/types/resource';
 import {
-  Sales, SalesByState, SalesByStateAndCity, SalesOrOpportunitiesByCategory,
+  Sales,
+  SalesByState,
+  SalesByStateAndCity,
+  SalesOrOpportunitiesByCategory,
 } from 'src/app/types/analytics';
 import { ApplyPipeModule } from 'src/app/pipes/apply.pipe';
 
-type DashboardData = SalesOrOpportunitiesByCategory | Sales | SalesByState | SalesByStateAndCity | null;
+type DashboardData =
+  | SalesOrOpportunitiesByCategory
+  | Sales
+  | SalesByState
+  | SalesByStateAndCity
+  | null;
 type DataLoader = (startDate: string, endDate: string) => Observable<Object>;
 
 @Component({
@@ -64,10 +70,13 @@ export class AnalyticsDashboardComponent implements OnInit {
       ['opportunities', this.service.getOpportunitiesByCategory],
       ['sales', this.service.getSales],
       ['salesByCategory', this.service.getSalesByCategory],
-      ['salesByState', (startDate: string, endDate: string) => this.service.getSalesByStateAndCity(startDate, endDate).pipe(
-        map((data) => this.service.getSalesByState(data))
-      )
-      ]
+      [
+        'salesByState',
+        (startDate: string, endDate: string) =>
+          this.service
+            .getSalesByStateAndCity(startDate, endDate)
+            .pipe(map((data) => this.service.getSalesByState(data))),
+      ],
     ].map(([dataName, loader]: [string, DataLoader]) => {
       const loaderObservable = loader(startDate, endDate).pipe(share());
 
@@ -116,4 +125,4 @@ export class AnalyticsDashboardComponent implements OnInit {
   exports: [],
   declarations: [AnalyticsDashboardComponent],
 })
-export class AnalyticsDashboardModule { }
+export class AnalyticsDashboardModule {}
