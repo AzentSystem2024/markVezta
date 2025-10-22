@@ -139,6 +139,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   isEditItemsPopupOpened = false;
   edit: any;
   isLoading: boolean = true;
+
   isFilterRowVisible: boolean = false;
   sessionData: any;
   ITEM_PROPERTY1: any;
@@ -224,11 +225,15 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       '============ITEM_PROPERTY3=============='
     );
 
-    this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
+    this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
     console.log(
-      this.ITEM_PROPERTY4,
-      '============ITEM_PROPERTY4=============='
+      this.ITEM_PROPERTY5,
+      '============ITEM_PROPERTY5=============='
     );
+
+    this.ENABLE_Matrix_Code =
+      this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
+    console.log(this.ENABLE_Matrix_Code);
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
     console.log(
@@ -256,7 +261,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       //  this.showItems();
 
       const payload = {
-        DATE_FROM: '2020-01-01',
+        DATE_FROM: '2000-01-01',
         DATE_TO: this.formatDate(new Date()),
       };
       this.dataservice.getItemsData().subscribe((res: any) => {

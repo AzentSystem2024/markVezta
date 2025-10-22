@@ -68,6 +68,7 @@ export class SalaryHeadAddComponent {
   head_From: boolean = false;
   head_To: boolean = false;
   SalaryHeadData = {
+    COMPANY_ID: 1,
     HEAD_NAME: '',
     PAYSLIP_TITLE: '',
     HEAD_ACTIVE: true,
@@ -139,6 +140,10 @@ export class SalaryHeadAddComponent {
 
   ngOnInit() {
     this.selectedPriority = this.priorities.find((p) => p.id === 1);
+    this.dataservice.Dropdown_ac_head(name).subscribe((res: any) => {
+      console.log('ac head dropdown', res);
+      this.Ac_head_values = res;
+    });
   }
 
   //================disbled================
@@ -456,6 +461,7 @@ export class SalaryHeadAddComponent {
 
   resetForm() {
     this.SalaryHeadData = {
+      COMPANY_ID: 1,
       HEAD_NAME: '',
       PAYSLIP_TITLE: '',
       HEAD_ACTIVE: true,

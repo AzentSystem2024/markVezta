@@ -90,7 +90,7 @@ export class AddDebitComponent {
     STORE_ID: 1,
     TRANS_DATE: new Date(),
     TRANS_STATUS: 1,
-    SUPP_ID: 1,
+    SUPP_ID: 0,
     NARRATION: '',
     INVOICE_ID: 0,
     INVOICE_NO: '',
@@ -148,6 +148,7 @@ export class AddDebitComponent {
     this.getCompanyListDropdown();
     this.getSupplierDropdown();
     this.sessionData_tax();
+    this.getPendingInvoices();
   }
 
   ngAfterViewInit(): void {
@@ -197,7 +198,7 @@ export class AddDebitComponent {
     this.selectedSupplierId = event.value;
 
     if (this.selectedSupplierId) {
-      this.debitFormData.SUPPLIER_ID = this.selectedSupplierId;
+      this.debitFormData.SUPP_ID = this.selectedSupplierId;
       console.log(
         this.selectedSupplierId,
         'SELECTEDSUPPLIERIDDDDDDDDDDDDDDDDDD'

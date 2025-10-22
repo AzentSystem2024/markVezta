@@ -67,6 +67,7 @@ head_To:boolean = false
 SalaryHeadData=
 {
   ID: 0,
+  COMPANY_ID :1 ,
   HEAD_NAME: "",
   PAYSLIP_TITLE: "",
   HEAD_ACTIVE: true,
@@ -362,8 +363,8 @@ onSelectionChanged(event: any) {
 // }
 
 UpdateSalaryHeadData() {
- this.dataservice.get_salary_head_list().subscribe((list: any) => {
-    this.salaryHeadList = list.Data;
+//  this.dataservice.get_salary_head_list().subscribe((list: any) => {
+//     this.salaryHeadList = list.Data;
 
     console.log(this.selectedPriority, "selectedPriority");
     console.log(this.selectedType, 'selectedType');
@@ -395,6 +396,7 @@ UpdateSalaryHeadData() {
 
     const payload = {
       ...this.SalaryHeadData,
+
       HEAD_TYPE: this.selectedPriority,
       HEAD_NATURE: selectedTypeId,
     };
@@ -410,7 +412,7 @@ UpdateSalaryHeadData() {
       );
     });
   }
-  });
+  // });
 
 }
 

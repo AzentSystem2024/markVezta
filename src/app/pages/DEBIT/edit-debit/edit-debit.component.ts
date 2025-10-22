@@ -220,7 +220,7 @@ export class EditDebitComponent {
     this.selectedSupplierId = event.value;
 
     if (this.selectedSupplierId) {
-      this.debitFormData.SUPPLIER_ID = this.selectedSupplierId;
+      this.debitFormData.SUPP_ID = this.selectedSupplierId;
       console.log(
         this.selectedSupplierId,
         'SELECTEDSUPPLIERIDDDDDDDDDDDDDDDDDD'
