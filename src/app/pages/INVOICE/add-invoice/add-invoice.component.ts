@@ -294,15 +294,47 @@ export class AddInvoiceComponent {
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
 
-    this.mainInvoiceGridList = [...selectedRows]; // use new variable here
+    if (!selectedRows || selectedRows.length === 0) {
+      return;
+    }
 
+    // Initialize mainInvoiceGridList if null
+    if (!this.mainInvoiceGridList) {
+      this.mainInvoiceGridList = [];
+    }
+
+    // Get existing IDs to avoid duplicates
+    const existingTransferIds = this.mainInvoiceGridList.map(
+      (item: any) => item.TRANSFER_SUMMARY_ID
+    );
+
+    // Only add new unique rows
+    const newRows = selectedRows.filter(
+      (row: any) => !existingTransferIds.includes(row.TRANSFER_SUMMARY_ID)
+    );
+
+    // ✅ Mutate the existing array (DON'T reassign!)
+    this.mainInvoiceGridList.push(...newRows);
+
+    // ✅ Close popup
     this.isTrOutPopupVisible = false;
-    setTimeout(() => {
-      if (this.itemsGridRef?.instance) {
-        this.itemsGridRef.instance.editCell(0, 'PRICE');
-      }
-    }, 100);
+
+    // Optional: Trigger manual change detection if needed
+    this.cdr.detectChanges();
   }
+
+  // onTransferSelectClick() {
+  //   const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+
+  //   this.mainInvoiceGridList = [...selectedRows]; // use new variable here
+
+  //   this.isTrOutPopupVisible = false;
+  //   setTimeout(() => {
+  //     if (this.itemsGridRef?.instance) {
+  //       this.itemsGridRef.instance.editCell(0, 'PRICE');
+  //     }
+  //   }, 100);
+  // }
 
   onPopupHiding() {
     if (this.popupGridRef?.instance) {
@@ -312,7 +344,7 @@ export class AddInvoiceComponent {
   }
 
   onEditorPreparing(e: any) {
-    if (e.dataField === 'PRICE') {
+    if (e.dataField === 'PRICE' || e.dataField === 'GST') {
       e.editorOptions = e.editorOptions || {};
 
       // Let the editor inherit row height naturally (no fixed height)

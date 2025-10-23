@@ -157,6 +157,14 @@ export class SalesOrderFormComponent {
   selectedCustomerId: any;
   isPhoneValid = true;
   countryCode = '';
+  articleDescriptionList: any;
+  isDescriptionLoading: boolean;
+  catList: any;
+  selectedCategory: any;
+  selectedDescription: any;
+  catColorList: any;
+  selectedColor: any;
+  catSizeList: any;
 
   constructor(
     private dataService: DataService,
@@ -166,6 +174,13 @@ export class SalesOrderFormComponent {
   ) {}
 
   ngOnInit() {
+    this.getListOfArticleInColumn();
+    if (
+      !this.salesOrderFormData.Details ||
+      this.salesOrderFormData.Details.length === 0
+    ) {
+      this.salesOrderFormData.Details = [];
+    }
     this.sessionData_tax();
     this.getSalesOrderNo();
     this.getSalesmanDropdown();
@@ -402,14 +417,156 @@ export class SalesOrderFormComponent {
   }
 
   onGridReady(e: any) {
-    const total = this.dataGrid.instance.getTotalSummaryValue('TOTAL_AMOUNT');
-    const grossAmount =
-      this.dataGrid.instance.getTotalSummaryValue('GROSS_AMOUNT');
-    this.salesOrderFormData.NET_AMOUNT = total;
-    this.salesOrderFormData.GROSS_AMOUNT = grossAmount;
+    // Ensure grid is rendered only once before inserting empty row
+    if (this.salesOrderFormData.Details.length === 0) {
+      this.addEmptyRow();
+    }
   }
 
+  addEmptyRow() {
+    const emptyRow = {
+      ITEM_ID: null,
+      ITEM_CODE: '',
+      DESCRIPTION: '',
+      MATRIX_CODE: '',
+      REMARKS: '',
+      UOM: '',
+      QUANTITY: 0,
+      GROSS_AMOUNT: 0,
+      STOCK_QTY: 0,
+      AMOUNT: 0,
+      TAX_AMOUNT: 0,
+      TOTAL_AMOUNT: 0,
+    };
+
+    this.salesOrderFormData.Details.push(emptyRow);
+
+    // Refresh grid to show the new row
+    if (this.itemsGridRef && this.itemsGridRef.instance) {
+      this.itemsGridRef.instance.refresh();
+    }
+  }
+
+  //Get first column's dropdown list
+  getListOfArticleInColumn() {
+    this.dataService.getSalesGridColumnList().subscribe((response: any) => {
+      this.articleDescriptionList = response.Data;
+    });
+  }
+
+  onArticleSelected(e: any) {
+    const selected = e.selectedRowsData[0];
+    if (selected) {
+      // fill the currently editing cell with selected article
+      // depends on your grid reference
+      // Example: this.salesOrderFormData.Details[rowIndex].DESCRIPTION = selected.DESCRIPTION;
+    }
+  }
+
+  onDescriptionDropdownOpened(e: any) {
+    this.isDescriptionLoading = true;
+
+    // Simulate a short data preparation/loading delay
+    setTimeout(() => {
+      this.isDescriptionLoading = false;
+    }, 1000); // or remove timeout if data is already ready
+  }
+  // In your component class
+  // In your component class
+  setDescriptionValue = (newData: any, value: any, currentRowData: any) => {
+    // Persist selected value in the row
+    newData.DESCRIPTION = value;
+
+    // Call API to fetch dependent Category list
+    const payload = { DESCRIPTION: value };
+    this.isDescriptionLoading = true;
+
+    this.dataService.getCatList(payload).subscribe({
+      next: (response: any) => {
+        this.catList = response.Data || [];
+        this.isDescriptionLoading = false;
+      },
+      error: () => {
+        this.isDescriptionLoading = false;
+      },
+    });
+  };
+
+  onDescriptionValueChanged(e: any) {
+    this.selectedDescription = e.value;
+    console.log(this.selectedDescription, 'selecteddescription');
+
+    const payload = {
+      DESCRIPTION: this.selectedDescription,
+    };
+    this.isDescriptionLoading = true;
+
+    this.dataService.getCatList(payload).subscribe({
+      next: (response: any) => {
+        this.catList = response.Data || [];
+        this.isDescriptionLoading = false;
+      },
+      error: () => {
+        this.isDescriptionLoading = false;
+      },
+    });
+  }
+
+  onCategoryValueChanged(e: any) {
+    this.selectedCategory = e.value;
+    console.log(this.selectedCategory, 'selecteddescription');
+
+    const payload = {
+      DESCRIPTION: this.selectedDescription,
+      CATEGORY: this.selectedCategory,
+    };
+    this.isDescriptionLoading = true;
+
+    this.dataService.getCatColorList(payload).subscribe({
+      next: (response: any) => {
+        this.catColorList = response.Data || [];
+        this.isDescriptionLoading = false;
+      },
+      error: () => {
+        this.isDescriptionLoading = false;
+      },
+    });
+  }
+
+  onColorValueChanged(e: any) {
+    this.selectedColor = e.value;
+    console.log(this.selectedColor, 'selecteddescription');
+
+    const payload = {
+      DESCRIPTION: this.selectedDescription,
+      CATEGORY: this.selectedCategory,
+      COLOR: this.selectedCategory,
+    };
+    this.isDescriptionLoading = true;
+
+    this.dataService.getCatSizeList(payload).subscribe({
+      next: (response: any) => {
+        this.catSizeList = response.Data || [];
+        this.isDescriptionLoading = false;
+      },
+      error: () => {
+        this.isDescriptionLoading = false;
+      },
+    });
+  }
+
+  onSizeValueChanged(e: any) {}
+
   onEditorPreparing(e: any) {
+    // if (e.dataField === 'DESCRIPTION' && e.parentType === 'dataRow') {
+    //   // Attach a value change handler without breaking grid binding
+    //   e.editorOptions.onValueChanged = (args: any) => {
+    //     const payload = { DESCRIPTION: args.value };
+    //     this.dataService.getCatList(payload).subscribe((res: any) => {
+    //       this.catList = res.Data || [];
+    //     });
+    //   };
+    // }
     if (e.parentType === 'dataRow') {
       e.editorOptions.height = 30; // fixed editor height
       e.editorOptions.elementAttr = { style: 'height: 30px;' };

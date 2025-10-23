@@ -170,7 +170,7 @@ export class ArticleEditComponent {
       DATE_FROM: new Date(),
       DATE_TO: new Date(),
     };
-    this.dataService.getArticleList(payload).subscribe((response: any) => {
+    this.dataService.getArticleList().subscribe((response: any) => {
       console.log(response, 'ARTICLELIST');
       if (response?.Data && Array.isArray(response.Data)) {
         // Store full list (reversed) in articleList

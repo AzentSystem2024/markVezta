@@ -94,32 +94,34 @@ export class AddJournalVoucharComponent {
     TRANS_TYPE: 4,
     NARRATION: '',
     USER_ID: 1,
-    DEPT_ID:'',
-    DETAILS: [
-      {
-        billNo: '',
-        ledgerCode: '',
-        ledgerName: '',
-        particulars: '',
-        debitAmount: '',
-        creditAmount: '',
-      },
-    ],
+    DEPT_ID: '',
+    DETAILS: [],
+
+    // DETAILS: [
+    //   {
+    //     billNo: '',
+    //     ledgerCode: '',
+    //     ledgerName: '',
+    //     particulars: '',
+    //     debitAmount: '',
+    //     creditAmount: '',
+    //   },
+    // ],
   };
   private focusSet = false;
   isNewRowTriggeredByEnter = false;
   netAmountDisplay: number;
   currentUser: any;
-  Company_list: any=[];
+  Company_list: any = [];
   constructor(private dataService: DataService) {
-     this.Deparment_Drop_down()
+    this.Deparment_Drop_down();
   }
 
   ngOnInit(): void {
     this.getJournalVoucherNo();
     this.resetJournalVoucherForm();
     this.getLedgerCodeDropdown();
-    this.Deparment_Drop_down()
+    this.Deparment_Drop_down();
 
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
@@ -141,13 +143,15 @@ export class AddJournalVoucharComponent {
     }
   }
 
+  Deparment_Drop_down() {
+    this.dataService.Department_Dropdown().subscribe((res: any) => {
+      console.log(
+        res,
+        '========================department data========================='
+      );
 
-  Deparment_Drop_down(){
-    this.dataService.Department_Dropdown().subscribe((res:any)=>{
-      console.log(res,'========================department data=========================')
-
-      this.Company_list=res
-    })
+      this.Company_list = res;
+    });
   }
   ngAfterViewInit(): void {
     console.log('refBoxRef:', this.refBoxRef);
@@ -172,19 +176,6 @@ export class AddJournalVoucharComponent {
       }
     }, 100);
   }
-
-  // ngAfterViewInit(): void {
-  //   // Wait for the grid and everything else to stabilize
-  //   setTimeout(() => {
-  //     requestAnimationFrame(() => {
-  //       requestAnimationFrame(() => {
-  //         if (this.refBoxRef?.instance) {
-  //           this.refBoxRef.instance.focus();
-  //         }
-  //       });
-  //     });
-  //   }, 500); // Delay long enough for grid rendering to complete
-  // }
 
   onRefNoEnter(e: any) {
     if (e.event.key === 'Enter') {
@@ -256,209 +247,78 @@ export class AddJournalVoucharComponent {
     return ledger ? ledger.HEAD_NAME : '';
   }
 
-  // onEditorPreparing(e: any) {
-  //   if (e.parentType !== 'dataRow') return;
-  //   const rowIndex = e.row?.rowIndex;
-  //   console.log(rowIndex);
-
-  //   // ➤ SL_NO: Move to ledgerCode on Enter
-  //   if (e.dataField === 'billNo') {
-  //     e.editorOptions.onKeyDown = (event: any) => {
-  //       if (event.event.key === 'Enter') {
-  //         const grid = this.itemsGridRef?.instance;
-  //         const visibleRows = grid.getVisibleRows();
-
-  //         const rowIndex = visibleRows.findIndex(
-  //           (r) => r?.data === e.row?.data
-  //         );
-  //         console.log(
-  //           'SL_NO → Enter → move to ledgerCode, rowIndex:',
-  //           rowIndex
-  //         );
-
-  //         setTimeout(() => {
-  //           grid.focus(grid.getCellElement(rowIndex, 'ledgerCode'));
-  //         }, 50);
-  //       }
-  //     };
-  //   }
-
-  //   // ➤ ledgerCode: open dropdown on Enter, move to ledgerName on second Enter
-  //   if (e.dataField === 'ledgerCode') {
-  //     let enterPressedOnce = false;
-
-  //     e.editorOptions.onKeyDown = (event: any) => {
-  //       if (event.event.key === 'Enter') {
-  //         event.event.preventDefault();
-
-  //         if (!enterPressedOnce) {
-  //           enterPressedOnce = true;
-  //           setTimeout(() => {
-  //             if (event.component?.open) {
-  //               event.component.open(); // open dropdown
-  //             }
-  //           }, 50);
-  //         } else {
-  //           enterPressedOnce = false;
-  //           setTimeout(() => {
-  //             this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-  //           }, 50);
-  //         }
-  //       }
-  //     };
-
-  //     e.editorOptions.onValueChanged = (args: any) => {
-  //       const selectedLedger = this.ledgerList.find(
-  //         (item: any) => item.HEAD_CODE === args.value
-  //       );
-  //       e.setValue(args.value);
-  //       if (selectedLedger) {
-  //         e.component.cellValue(
-  //           rowIndex,
-  //           'ledgerName',
-  //           selectedLedger.HEAD_NAME
-  //         );
-  //         setTimeout(() => {
-  //           this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-  //         }, 50);
-  //       }
-  //     };
-  //   }
-
-  //   // ➤ ledgerName: move to particulars on Enter
-  //   if (e.dataField === 'ledgerName') {
-  //     e.editorOptions.onKeyDown = (event: any) => {
-  //       if (event.event.key === 'Enter') {
-  //         event.event.preventDefault();
-  //         // setTimeout(() => {
-  //         //   this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-  //         // }, 50);
-  //       }
-  //     };
-
-  //     e.editorOptions.onValueChanged = (args: any) => {
-  //       const selectedLedger = this.ledgerList.find(
-  //         (item: any) => item.HEAD_NAME === args.value
-  //       );
-  //       e.setValue(args.value);
-  //       if (selectedLedger) {
-  //         e.component.cellValue(
-  //           rowIndex,
-  //           'ledgerCode',
-  //           selectedLedger.HEAD_CODE
-  //         );
-  //       }
-  //     };
-  //   }
-
-  //   if (e.dataField === 'particulars') {
-  //     e.editorOptions.onKeyDown = (event: any) => {
-  //       if (event.event.key === 'Enter') {
-  //         const grid = e.component;
-  //         const rowIndex = e.row.rowIndex;
-  //         // Move focus to the "ledgerCode" column in the same row
-  //         setTimeout(() => {
-  //           grid.focus(grid.getCellElement(rowIndex, 'debitAmount'));
-  //         });
-  //       }
-  //     };
-  //   }
-  //   if (e.dataField === 'debitAmount') {
-  //     e.editorOptions.onKeyDown = (event: any) => {
-  //       if (event.event.key === 'Enter') {
-  //         const grid = e.component;
-  //         const rowIndex = e.row.rowIndex;
-  //         // Move focus to the "ledgerCode" column in the same row
-  //         setTimeout(() => {
-  //           grid.focus(grid.getCellElement(rowIndex, 'creditAmount'));
-  //         });
-  //       }
-  //     };
-  //   }
-  //   if (e.dataField === 'creditAmount') {
-  //     e.editorOptions.onKeyDown = (event: any) => {
-  //       if (event.event.key === 'Enter') {
-  //         event.event.preventDefault();
-
-  //         const grid = this.itemsGridRef?.instance;
-  //         const rowIndex = e.row.rowIndex;
-
-  //         // ✅ Force the editor to lose focus and commit its value
-  //         const editorElement = event.event.target as HTMLElement;
-  //         editorElement.blur();
-
-  //         // ✅ Delay to let grid register the committed value
-  //         setTimeout(() => {
-  //           grid?.saveEditData(); // Now the value is committed
-  //           const rows = grid.getVisibleRows().map((r) => r.data);
-
-  //           // ✅ Add new row manually
-  //           const newRow = {
-  //             billNo: '',
-  //             ledgerCode: '',
-  //             ledgerName: '',
-  //             particulars: '',
-  //             debitAmount: '',
-  //             creditAmount: '',
-  //           };
-
-  //           this.journalVoucherFormData.DETAILS.push(newRow);
-
-  //           setTimeout(() => {
-  //             grid.option('dataSource', [
-  //               ...this.journalVoucherFormData.DETAILS,
-  //             ]);
-
-  //             setTimeout(() => {
-  //               const visibleRows = grid.getVisibleRows();
-  //               const newRowIndex = visibleRows.findIndex(
-  //                 (r) => r.data === newRow
-  //               );
-  //               if (newRowIndex >= 0) {
-  //                 grid.editCell(newRowIndex, 'billNo');
-  //               }
-  //             }, 50);
-  //           }, 50);
-  //         }, 50); // Let blur + commit happen
-  //       }
-
-  //       if (event.event.key === 'Tab') {
-  //         event.event.preventDefault();
-
-  //         const grid = this.itemsGridRef?.instance;
-  //         const editorElement = event.event.target as HTMLElement;
-
-  //         // ✅ Force blur to trigger value commit
-  //         editorElement.blur();
-
-  //         // ✅ Wait for value commit, then save the row and move to narration
-  //         setTimeout(() => {
-  //           grid?.saveEditData(); // Save current row edits
-  //           const rows = grid.getVisibleRows().map((r) => r.data);
-
-  //           // setTimeout(() => {
-  //           //   this.narrationRef?.instance?.focus();
-  //           // }, 50);
-  //         }, 50);
-  //       }
-  //     };
-  //   }
-  // }
-
   onInitNewRow(e: any) {
-    // Check if any new row (unsaved row without primary key) already exists
+    // Prevent multiple unsaved rows
     const hasNewRow = this.journalVoucherFormData.DETAILS.some(
       (row) => !row.ID
     );
-    // 👆 replace `ID` with your unique field name from DB
-
     if (hasNewRow) {
-      e.cancel = true; // cancel adding another row
+      e.cancel = true;
       alert('You can only add one new row at a time. Please save it first.');
+      return;
     }
+    const currentDetails = this.journalVoucherFormData.DETAILS || [];
+    const nextBillNo = currentDetails.length + 1;
+
+    e.data = {
+      billNo: nextBillNo.toString().padStart(3, '0'), // 001, 002, ...
+      ledgerCode: '',
+      ledgerName: '',
+      particulars: '',
+      debitAmount: null,
+      creditAmount: null,
+    };
   }
 
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'billNo' ||
+      e.dataField === 'ledgerCode' ||
+      e.dataField === 'ledgerName' ||
+      e.dataField === 'particulars' ||
+      e.dataField === 'debitAmount' ||
+      e.dataField === 'creditAmount'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
     console.log(rowIndex);
@@ -767,19 +627,6 @@ export class AddJournalVoucharComponent {
     // }
   }
 
-  // onRowInserted(e: any) {
-  //   if (this.isNewRowTriggeredByEnter) {
-  //     const grid = this.itemsGridRef?.instance;
-
-  //     setTimeout(() => {
-  //       const rowIndex = grid.getRowIndexByKey(e.key);
-  //       if (rowIndex >= 0) {
-  //         grid.editCell(rowIndex, 'billNo');
-  //       }
-  //       this.isNewRowTriggeredByEnter = false;
-  //     }, 50);
-  //   }
-  // }
   onGridKeyDown(e: any) {
     // Check if Tab key is pressed and no Shift (so not Shift+Tab)
     if (e.event.key === 'Tab' && !e.event.shiftKey) {

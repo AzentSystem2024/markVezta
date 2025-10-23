@@ -286,12 +286,106 @@ export class EditInvoiceComponent {
     this.logGridSummaries();
   }
 
+  onEditorPreparing(e: any) {
+    if (e.dataField === 'PRICE' || e.dataField === 'GST') {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
+  }
+
   updateInvoice() {
     if (!this.invoiceFormData || !this.invoiceFormData.TRANS_ID) {
       console.warn('Missing invoice data or TRANS_ID.');
       return;
     }
+    if (!this.invoiceFormData.DISTRIBUTOR_ID) {
+      notify('Please select Customer', 'error', 3000);
 
+      return;
+    }
+    console.log(this.mainInvoiceGridList, 'MAINGRID');
+    // 2. Validation checks
+    if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
+      notify('No items in the grid to save.', 'error', 3000);
+      return;
+    }
+
+    // 1. Get updated summary values from the grid
+    if (this.itemsGridRef?.instance) {
+      this.totalAmount =
+        this.itemsGridRef.instance.getTotalSummaryValue('AMOUNT') || 0;
+      this.taxAmount =
+        this.itemsGridRef.instance.getTotalSummaryValue('TAX_AMOUNT') || 0;
+      this.grandTotal =
+        this.itemsGridRef.instance.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
+    } else {
+      notify('Grid instance not available for summary.', 'error', 3000);
+    }
+    console.log(this.mainInvoiceGridList.length, 'MAINGRIDDDDDDDDDDDDDDDDD');
+    // 2. Validation checks
+    if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
+      notify(
+        {
+          message: 'No items selected to save.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        3000
+      );
+      return;
+    }
+
+    const hasInvalidPrice = this.mainInvoiceGridList.some(
+      (row: any) => !row.PRICE || row.PRICE === 0
+    );
+    if (hasInvalidPrice) {
+      notify(
+        {
+          message: 'Some rows have missing or zero price value.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        3000
+      );
+      return;
+    }
     if (this.invoiceFormData.IS_APPROVED) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
@@ -315,7 +409,7 @@ export class EditInvoiceComponent {
             TAX_AMOUNT: this.taxAmount,
             NET_AMOUNT: this.grandTotal,
             SALE_DETAILS: this.mainInvoiceGridList.map((row: any) => ({
-              TRANSFER_SUMMARY_ID: row.ID || '',
+              TRANSFER_SUMMARY_ID: row.TRANSFER_SUMMARY_ID || '',
               QUANTITY: row.TOTAL_PAIR_QTY || 0,
               PRICE: row.PRICE || 0,
               GST: row.GST || 0,

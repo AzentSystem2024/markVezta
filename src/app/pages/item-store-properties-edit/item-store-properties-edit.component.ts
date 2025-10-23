@@ -141,12 +141,15 @@ export class ItemStorePropertiesEditComponent {
         this.itemStoresList = this.worksheetData.worksheet_item_property;
         this.selectedStoreId =
           this.worksheetData.worksheet_item_store?.[0]?.STORE_ID;
-          console.log('All worksheet items:', this.worksheetData.worksheet_item_property);
+        console.log(
+          'All worksheet items:',
+          this.worksheetData.worksheet_item_property
+        );
         this.selectedItems = this.worksheetData.worksheet_item_property.filter(
           (item) => item.Selected === true
         );
         this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
         console.log('Selected Items:', this.selectedItems);
         console.log('Selected Row Keys:', this.selectedRowKeys);
       } else {
@@ -177,10 +180,8 @@ export class ItemStorePropertiesEditComponent {
   };
 
   listItems() {
-    const payload={
-
-    }
-    this.dataservice.getItemsData(payload).subscribe(
+    const payload = {};
+    this.dataservice.getItemsData().subscribe(
       (items: any) => {
         this.items = items;
         this.itemStoresList = items.data;
@@ -358,7 +359,7 @@ export class ItemStorePropertiesEditComponent {
   saveChanges() {
     if (this.editedItems.length > 0) {
       const payload = this.editedItems;
-      console.log(payload,"PAYLOAD IN EDIT")
+      console.log(payload, 'PAYLOAD IN EDIT');
       this.dataservice.updateworksheetItemProperty(payload).subscribe(
         (response: any) => {
           this.savedWorksheet = response;
@@ -393,64 +394,66 @@ export class ItemStorePropertiesEditComponent {
   }
 
   updateEditedItems(property: string, newValue: boolean, rowData: any) {
-    console.log(rowData,"{{{{{")
+    console.log(rowData, '{{{{{');
     let editedItem = this.editedItems.find(
-        (item) => item.STORE_ID === String(this.selectedStoreId) // Ensure STORE_ID is a string
+      (item) => item.STORE_ID === String(this.selectedStoreId) // Ensure STORE_ID is a string
     );
     // If no existing edited item found, create a new one
     if (!editedItem) {
-        editedItem = {
-            ID: 1,
-            COMPANY_ID: 1,
-            USER_ID: 1,
-            STORE_ID: String(this.selectedStoreId),
-            worksheet_item_property: [], // Initialize as an empty array
-        };
-        this.editedItems.push(editedItem);
+      editedItem = {
+        ID: 1,
+        COMPANY_ID: 1,
+        USER_ID: 1,
+        STORE_ID: String(this.selectedStoreId),
+        worksheet_item_property: [], // Initialize as an empty array
+      };
+      this.editedItems.push(editedItem);
     }
 
     this.selectedRowKeys.forEach((selectedId: number) => {
-        let worksheetItem = editedItem.worksheet_item_property.find(
-            (prop) => prop.ITEM_ID === selectedId
-        );
+      let worksheetItem = editedItem.worksheet_item_property.find(
+        (prop) => prop.ITEM_ID === selectedId
+      );
 
-        if (!worksheetItem) {
-            // Create a new worksheet item with all properties initialized to null
-            worksheetItem = {
-                ITEM_ID: selectedId, // Store only the numeric ID
-                IS_PRICE_REQUIRED: null,
-                IS_NOT_DISCOUNTABLE: null,
-                IS_NOT_SALE_ITEM: null,
-                IS_NOT_SALE_RETURN: null,
-                IS_INACTIVE: null,
+      if (!worksheetItem) {
+        // Create a new worksheet item with all properties initialized to null
+        worksheetItem = {
+          ITEM_ID: selectedId, // Store only the numeric ID
+          IS_PRICE_REQUIRED: null,
+          IS_NOT_DISCOUNTABLE: null,
+          IS_NOT_SALE_ITEM: null,
+          IS_NOT_SALE_RETURN: null,
+          IS_INACTIVE: null,
 
-                // Initialize _NEW properties based on the current change
-                IS_PRICE_REQUIRED_NEW: property === 'IS_PRICE_REQUIRED_NEW' ? newValue : null,
-                IS_NOT_DISCOUNTABLE_NEW: property === 'IS_NOT_DISCOUNTABLE_NEW' ? newValue : null,
-                IS_NOT_SALE_ITEM_NEW: property === 'IS_NOT_SALE_ITEM_NEW' ? newValue : null,
-                IS_NOT_SALE_RETURN_NEW: property === 'IS_NOT_SALE_RETURN_NEW' ? newValue : null,
-                IS_INACTIVE_NEW: property === 'IS_INACTIVE_NEW' ? newValue : null,
-            };
+          // Initialize _NEW properties based on the current change
+          IS_PRICE_REQUIRED_NEW:
+            property === 'IS_PRICE_REQUIRED_NEW' ? newValue : null,
+          IS_NOT_DISCOUNTABLE_NEW:
+            property === 'IS_NOT_DISCOUNTABLE_NEW' ? newValue : null,
+          IS_NOT_SALE_ITEM_NEW:
+            property === 'IS_NOT_SALE_ITEM_NEW' ? newValue : null,
+          IS_NOT_SALE_RETURN_NEW:
+            property === 'IS_NOT_SALE_RETURN_NEW' ? newValue : null,
+          IS_INACTIVE_NEW: property === 'IS_INACTIVE_NEW' ? newValue : null,
+        };
 
-            editedItem.worksheet_item_property.push(worksheetItem);
-        } else {
-            // Update the new value for the specific property only if it is the changed property
-            if (property === 'IS_PRICE_REQUIRED') {
-                worksheetItem.IS_PRICE_REQUIRED_NEW = newValue;
-            } else if (property === 'IS_NOT_DISCOUNTABLE') {
-                worksheetItem.IS_NOT_DISCOUNTABLE_NEW = newValue;
-            } else if (property === 'IS_NOT_SALE_ITEM') {
-                worksheetItem.IS_NOT_SALE_ITEM_NEW = newValue;
-            } else if (property === 'IS_NOT_SALE_RETURN') {
-                worksheetItem.IS_NOT_SALE_RETURN_NEW = newValue;
-            } else if (property === 'IS_INACTIVE') {
-                worksheetItem.IS_INACTIVE_NEW = newValue; // Update for IS_INACTIVE
-            }
+        editedItem.worksheet_item_property.push(worksheetItem);
+      } else {
+        // Update the new value for the specific property only if it is the changed property
+        if (property === 'IS_PRICE_REQUIRED') {
+          worksheetItem.IS_PRICE_REQUIRED_NEW = newValue;
+        } else if (property === 'IS_NOT_DISCOUNTABLE') {
+          worksheetItem.IS_NOT_DISCOUNTABLE_NEW = newValue;
+        } else if (property === 'IS_NOT_SALE_ITEM') {
+          worksheetItem.IS_NOT_SALE_ITEM_NEW = newValue;
+        } else if (property === 'IS_NOT_SALE_RETURN') {
+          worksheetItem.IS_NOT_SALE_RETURN_NEW = newValue;
+        } else if (property === 'IS_INACTIVE') {
+          worksheetItem.IS_INACTIVE_NEW = newValue; // Update for IS_INACTIVE
         }
+      }
     });
-}
-
-
+  }
 
   onSaveButtonClick() {
     this.saveChanges();
@@ -563,7 +566,7 @@ export class ItemStorePropertiesEditComponent {
   }
 
   onPropertiesChange(event: any) {
-    console.log('Selected Properties======:', event.value); 
+    console.log('Selected Properties======:', event.value);
     this.selectedProperties = event.value;
     this.columns.forEach((column) => {
       column.visible = this.selectedProperties.includes(column.caption); // Match caption with selected properties
@@ -595,10 +598,8 @@ export class ItemStorePropertiesEditComponent {
 
   listItemsByStoreId(storeId: number) {
     if (storeId == 1) {
-         const payload={
-
-      }
-      this.dataservice.getItemsData(payload).subscribe((response: any) => {
+      const payload = {};
+      this.dataservice.getItemsData().subscribe((response: any) => {
         this.items = response;
         this.itemStoresList = response.data;
         this.dataGrid.instance.refresh();

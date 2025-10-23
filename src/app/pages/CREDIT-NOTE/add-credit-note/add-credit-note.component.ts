@@ -139,7 +139,7 @@ export class AddCreditNoteComponent {
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
-    this.sessionData_tax()
+    this.sessionData_tax();
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -166,14 +166,13 @@ export class AddCreditNoteComponent {
     this.getDocNo();
     this.getPendingInvoices();
   }
-  
-      sessionData_tax(){
-        // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'" 
-        this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(this.sessionData,'=================session data==========')
-this.selected_vat_id=this.sessionData.VAT_ID
-  }
 
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+  }
 
   addNewManualRow(): void {
     const newRow = {
@@ -369,6 +368,54 @@ this.selected_vat_id=this.sessionData.VAT_ID
   }
 
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'SL_NO' ||
+      e.dataField === 'ledgerCode' ||
+      e.dataField === 'ledgerName' ||
+      e.dataField === 'particulars' ||
+      e.dataField === 'Amount' ||
+      e.dataField === 'gstAmount'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
     console.log(rowIndex);
@@ -775,7 +822,7 @@ this.selected_vat_id=this.sessionData.VAT_ID
   }
 
   cancel() {
-    this.popupClosed.emit()
+    this.popupClosed.emit();
   }
 }
 

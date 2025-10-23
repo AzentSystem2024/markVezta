@@ -89,7 +89,7 @@
                     label="Contact Name"
                     labelMode="floating"
                     [width]="'100%'"
-                    [readOnly]="isReadOnlyMode"
+                    [readOnly]="true"
                   ></dx-text-box>
 
                   <!-- Plus Button -->
@@ -117,7 +117,7 @@
                       label="Fax"
                       labelMode="floating"
                       [width]="'100%'"
-                      [readOnly]="isReadOnlyMode"
+                      [readOnly]="true"
                     >
                     </dx-text-box>
                   </div>
@@ -137,7 +137,7 @@
                       label="Phone"
                       labelMode="floating"
                       [width]="'100%'"
-                      [readOnly]="isReadOnlyMode"
+                      [readOnly]="true"
                     >
                     </dx-text-box>
                   </div>
@@ -148,7 +148,7 @@
                       label="Mobile"
                       labelMode="floating"
                       [width]="'100%'"
-                      [readOnly]="isReadOnlyMode"
+                      [readOnly]="true"
                     >
                     </dx-text-box>
                   </div>
@@ -157,7 +157,7 @@
             </dxi-item>
           </dxo-toolbar>
 
-          <dxi-column caption="Sl No" [allowEditing]="false"> </dxi-column>
+          <!-- <dxi-column caption="Sl No" [allowEditing]="false"> </dxi-column> -->
           <dxi-column
             dataField="SO_DETAIL_ID"
             caption="SODETAILID"
@@ -165,12 +165,17 @@
           >
           </dxi-column>
           <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
-          <dxi-column dataField="ITEM_CODE" caption="Item Code" [width]="250">
+          <dxi-column
+            dataField="ITEM_CODE"
+            caption="Item Code"
+            [width]="250"
+            [allowEditing]="false"
+          >
           </dxi-column>
           <dxi-column
             dataField="DESCRIPTION"
             caption="Description"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
           <!-- <dxi-column
             dataField="MATRIX_CODE"
@@ -178,7 +183,11 @@
             [allowEditing]="false"
             [visible]="matrixCode"
           ></dxi-column> -->
-          <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
+          <dxi-column
+            dataField="REMARKS"
+            caption="Remarks"
+            [allowEditing]="false"
+          ></dxi-column>
           <dxi-column
             dataField="UOM"
             caption="UOM"
@@ -193,6 +202,7 @@
             dataField="DELIVERED_QUANTITY"
             caption="Delivered Quantity"
             [allowEditing]="true"
+            alignment="right"
             [validationRules]="[
               { type: 'required', message: 'Quantity is required' },
               {
@@ -290,14 +300,10 @@
     [headerFilter]="{ visible: false }"
     [scrolling]="{ mode: 'virtual' }"
     rowAlternationInterval="2"
-    [selection]="{ mode: 'single' }"
+    [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
     focusStateEnabled="false"
   >
-    <dxo-editing
-      mode="popup"
-      [allowUpdating]="canEdit"
-      [allowDeleting]="canDelete"
-    ></dxo-editing>
+    <dxo-editing mode="popup"></dxo-editing>
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
       [visible]="true"
@@ -337,11 +343,11 @@
     <dxi-column dataField="UOM" caption="UOM"></dxi-column>
     <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
     <dxi-column dataField="REMARKS" caption="Remark"></dxi-column>
-    <dxi-column
+    <!-- <dxi-column
       dataField="totalAmount"
       caption="Amount"
       dataType="number"
     ></dxi-column>
-    <dxi-column dataField="status" caption="Status"></dxi-column>
+    <dxi-column dataField="status" caption="Status"></dxi-column> -->
   </dx-data-grid>
 </dx-popup>

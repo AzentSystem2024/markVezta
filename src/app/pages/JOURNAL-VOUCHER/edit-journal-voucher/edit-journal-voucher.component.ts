@@ -84,21 +84,20 @@ export class EditJournalVoucherComponent {
   ledgerNameEditorOptions: any = {};
   isReadOnly = false;
   isNewRowTriggeredByEnter: any;
-  
+
   canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  Company_list: any=[];
+  Company_list: any = [];
 
-  constructor(private dataService: DataService,private router:Router) {
-    this.Deparment_Drop_down()
+  constructor(private dataService: DataService, private router: Router) {
+    this.Deparment_Drop_down();
   }
 
   ngOnInit() {
-    
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
@@ -124,7 +123,6 @@ export class EditJournalVoucherComponent {
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getLedgerCodeDropdown();
-
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -179,12 +177,15 @@ export class EditJournalVoucherComponent {
     }
   }
 
-    Deparment_Drop_down(){
-    this.dataService.Department_Dropdown().subscribe((res:any)=>{
-      console.log(res,'========================department data=========================')
+  Deparment_Drop_down() {
+    this.dataService.Department_Dropdown().subscribe((res: any) => {
+      console.log(
+        res,
+        '========================department data========================='
+      );
 
-      this.Company_list=res
-    })
+      this.Company_list = res;
+    });
   }
   ngAfterViewInit(): void {
     // Wait for the grid and everything else to stabilize
@@ -261,6 +262,54 @@ export class EditJournalVoucherComponent {
   }
 
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'billNo' ||
+      e.dataField === 'ledgerCode' ||
+      e.dataField === 'ledgerName' ||
+      e.dataField === 'particulars' ||
+      e.dataField === 'debitAmount' ||
+      e.dataField === 'creditAmount'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
     console.log(rowIndex);
@@ -702,7 +751,6 @@ export class EditJournalVoucherComponent {
             DETAILS: transformedDetails,
           };
 
-
           this.dataService.commitJournalVoucher(payload).subscribe(
             (response: any) => {
               if (response.flag === 1) {
@@ -726,7 +774,7 @@ export class EditJournalVoucherComponent {
         }
       });
 
-      return; 
+      return;
     }
 
     // ✅ Step 4: normal UPDATE flow

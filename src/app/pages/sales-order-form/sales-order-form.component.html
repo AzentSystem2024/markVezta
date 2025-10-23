@@ -92,7 +92,7 @@
                   ></dx-select-box>
 
                   <!-- Plus Button -->
-                  <dx-button
+                  <!-- <dx-button
                     icon="plus"
                     stylingMode="outlined"
                     type="default"
@@ -100,7 +100,7 @@
                     (onClick)="addQuotation()"
                     [disabled]="isReadOnlyMode || !salesOrderFormData.CUST_ID"
                     [elementAttr]="{ class: 'small-btn' }"
-                  ></dx-button>
+                  ></dx-button> -->
                 </div>
                 <div
                   style="
@@ -179,84 +179,141 @@
           >
           </dxi-column>
           <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
-          <dxi-column dataField="ITEM_CODE" caption="Item Code" [width]="250">
-          </dxi-column>
+          <dxi-column dataField="ITEM_CODE" caption="Art No"> </dxi-column>
           <dxi-column
             dataField="DESCRIPTION"
             caption="Description"
-            [allowEditing]="true"
+            [width]="130"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: articleDescriptionList,
+              valueExpr: 'DESCRIPTION',
+              displayExpr: 'DESCRIPTION',
+              searchEnabled: true,
+              paginate: true,
+              pageSize: 50
+            }"
+            [editorOptions]="{
+              dropDownOptions: { height: 300 },
+              dataSource: {
+                store: {
+                  type: 'array',
+                  data: articleDescriptionList
+                },
+                paginate: true,
+                pageSize: 50
+              },
+              showScrollbar: 'always',
+              virtualScrollingEnabled: true,
+              onValueChanged: onDescriptionValueChanged.bind(this)
+            }"
           ></dxi-column>
+
+          <!-- Add this anywhere in your template (usually near your grid) -->
+          <dx-load-indicator
+            *ngIf="isDescriptionLoading"
+            id="loading-indicator"
+            height="40"
+            width="40"
+          ></dx-load-indicator>
+
           <dxi-column
             dataField="MATRIX_CODE"
-            caption="Matrix Code"
+            caption="Category"
             [allowEditing]="false"
             [visible]="matrixCode"
           ></dxi-column>
-          <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
+          <dxi-column
+            dataField="CATEGORY"
+            caption="Category"
+            [width]="130"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: catList,
+              valueExpr: 'DESCRIPTION',
+              displayExpr: 'DESCRIPTION',
+              searchEnabled: true,
+              paginate: true,
+              pageSize: 50
+            }"
+            [editorOptions]="{
+              dropDownOptions: { height: 300 },
+              dataSource: {
+                store: {
+                  type: 'array',
+                  data: catList
+                },
+                paginate: true,
+                pageSize: 50
+              },
+              showScrollbar: 'always',
+              virtualScrollingEnabled: true,
+              onValueChanged: onCategoryValueChanged.bind(this)
+            }"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="COLOR"
+            caption="Category Color"
+            [width]="130"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: catColorList,
+              valueExpr: 'DESCRIPTION',
+              displayExpr: 'DESCRIPTION',
+              searchEnabled: true,
+              paginate: true,
+              pageSize: 50
+            }"
+            [editorOptions]="{
+              dropDownOptions: { height: 300 },
+              dataSource: {
+                store: {
+                  type: 'array',
+                  data: catColorList
+                },
+                paginate: true,
+                pageSize: 50
+              },
+              showScrollbar: 'always',
+              virtualScrollingEnabled: true,
+              onValueChanged: onColorValueChanged.bind(this)
+            }"
+          ></dxi-column>
+          <dxi-column
+            dataField="SIZE"
+            caption="Size"
+            [width]="130"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: catSizeList,
+              valueExpr: 'DESCRIPTION',
+              displayExpr: 'DESCRIPTION',
+              searchEnabled: true,
+              paginate: true,
+              pageSize: 50
+            }"
+            [editorOptions]="{
+              dropDownOptions: { height: 300 },
+              dataSource: {
+                store: {
+                  type: 'array',
+                  data: catSizeList
+                },
+                paginate: true,
+                pageSize: 50
+              },
+              showScrollbar: 'always',
+              virtualScrollingEnabled: true,
+              onValueChanged: onSizeValueChanged.bind(this)
+            }"
+          ></dxi-column>
           <dxi-column
             dataField="UOM"
-            caption="UOM"
-            [allowEditing]="false"
-          ></dxi-column>
-          <dxi-column
-            dataField="TAX_PERCENT"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? ' VAT %'
-                : ' GST %'
-            "
-            dataType="number"
-          ></dxi-column>
-          <dxi-column
-            dataField="QUANTITY"
             caption="Quantity"
             [allowEditing]="false"
           ></dxi-column>
-          <dxi-column
-            dataField="PRICE"
-            caption="Price"
-            [allowEditing]="true"
-            dataType="number"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dxi-column>
-          <dxi-column
-            dataField="GROSS_AMOUNT"
-            caption="Gross Amount"
-            [allowEditing]="false"
-            [calculateCellValue]="calculateGrossAmount"
-          ></dxi-column>
-          <dxi-column
-            dataField="DISC_PERCENT"
-            caption="Discount%"
-            [allowEditing]="true"
-            dataType="number"
-          ></dxi-column>
-          <dxi-column
-            dataField="AMOUNT"
-            caption="Amount"
-            [allowEditing]="true"
-            [calculateCellValue]="calculateAmount"
-            dataType="number"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dxi-column>
-          <dxi-column
-            dataField="TAX_AMOUNT"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? ' VAT Amount'
-                : ' GST Amount'
-            "
-            [allowEditing]="true"
-            [calculateCellValue]="calculateVatAmount"
-          ></dxi-column>
-          <dxi-column
-            dataField="TOTAL_AMOUNT"
-            caption="Total"
-            [allowEditing]="false"
-            [calculateCellValue]="calculateTotal"
-            dataType="number"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dxi-column>
+
           <dxo-summary>
             <dxi-total-item
               column="GROSS_AMOUNT"

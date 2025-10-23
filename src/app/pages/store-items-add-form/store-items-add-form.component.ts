@@ -43,7 +43,6 @@ import { ItemsFormModule } from 'src/app/components/library/items-form/items-for
 import { DataService } from 'src/app/services';
 import { forkJoin } from 'rxjs';
 
-
 @Component({
   selector: 'app-store-items-add-form',
   templateUrl: './store-items-add-form.component.html',
@@ -53,7 +52,7 @@ export class StoreItemsAddFormComponent {
   @Input() storeId: number;
   @Input() filteredStores: any;
   @Input() defaultStore: boolean = false;
-  @Input() itemsList : any
+  @Input() itemsList: any;
   @Output() itemAdded = new EventEmitter<void>();
   @Output() storeDataUpdated = new EventEmitter<{
     storeIds: number[];
@@ -99,7 +98,7 @@ export class StoreItemsAddFormComponent {
   showHeaderFilter = true;
   selectedRowCount: number = 0;
   totalRowCount: number = 0;
-  filteredRowCount : number = 0;
+  filteredRowCount: number = 0;
   gridData: any;
   selectedRowKeys: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -113,42 +112,45 @@ export class StoreItemsAddFormComponent {
   selectedStoreId: any;
   filteredStoreIds: any;
 
-  constructor(private dataservice: DataService,private cdr : ChangeDetectorRef) {}
+  constructor(
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.listItems();
     this.getStore();
-    this.selectedStores = [this.storeId]; 
-
+    this.selectedStores = [this.storeId];
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.selectedStores=this.storeId
+    this.selectedStores = this.storeId;
     this.listItems();
     // this.listItemsByStore(this.storeId)
     if (this.selectedStores == 1) {
       this.listItemsByStore(this.storeId);
-  } else {
+    } else {
       // If storeId is 1, display all items
       this.filteredItemsList = this.allItems;
-  }
+    }
     if (changes.filteredStores && changes.filteredStores.currentValue) {
       this.filteredStoreIds = this.filteredStores.map((store) => store.ID);
       if (this.storeId === 1) {
         this.filteredItemsList = this.allItems;
       }
-    
+
       const hasDefaultStore = this.filteredStores.some(
         (store) => store.IS_DEFAULT_STORE
       );
-      console.log(hasDefaultStore,"HASDEFAULTSTORE")
+      console.log(hasDefaultStore, 'HASDEFAULTSTORE');
       if (hasDefaultStore) {
-        this.filteredItemsList = this.allItemsList
-        this.getStore(); 
-      }
-      else {
+        this.filteredItemsList = this.allItemsList;
+        this.getStore();
+      } else {
         this.store = this.filteredStores;
-        this.selectedStoreId = this.filteredStores.map((store: any) => store.ID);
+        this.selectedStoreId = this.filteredStores.map(
+          (store: any) => store.ID
+        );
         this.cdr.detectChanges();
       }
     }
@@ -164,12 +166,11 @@ export class StoreItemsAddFormComponent {
     this.dataservice.getStoresData().subscribe((response) => {
       // Filter the stores to exclude the store with ID 1
       this.store = response.filter((store: any) => store.ID !== 1);
-      
+
       // Log the filtered stores list
       console.log(this.store, 'STORESLIST (excluding store with ID 1)');
     });
   }
-  
 
   onRefreshButtonClick() {
     this.refreshItems();
@@ -187,13 +188,11 @@ export class StoreItemsAddFormComponent {
   }
 
   listItems() {
-    const payload={
-
-    }
-    this.dataservice.getItemsData(payload).subscribe(
+    const payload = {};
+    this.dataservice.getItemsData().subscribe(
       (items: any) => {
-        if(this.filteredStores.IS_DEFAULT_STORE == true){
-          this.filteredItemsList=this.allItems
+        if (this.filteredStores.IS_DEFAULT_STORE == true) {
+          this.filteredItemsList = this.allItems;
         }
         this.allItems = items.data;
         this.allItemsList = this.allItems;
@@ -209,42 +208,48 @@ export class StoreItemsAddFormComponent {
   filterItems() {
     if (this.itemsList && this.allItems) {
       // Log the filteredStores array
-      console.log(this.filteredStores, "FILTEREDSTORESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-  
+      console.log(
+        this.filteredStores,
+        'FILTEREDSTORESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'
+      );
+
       // Check if any store has IS_DEFAULT_STORE set to true
-      const isDefaultStore = this.filteredStores.some(store => store.IS_DEFAULT_STORE);
-  
+      const isDefaultStore = this.filteredStores.some(
+        (store) => store.IS_DEFAULT_STORE
+      );
+
       if (isDefaultStore) {
         // If there's a store with IS_DEFAULT_STORE true, set filteredItemsList to allItems
         this.filteredItemsList = this.allItems;
-        console.log("IS_DEFAULT_STORE is true for at least one store. Showing all items.");
+        console.log(
+          'IS_DEFAULT_STORE is true for at least one store. Showing all items.'
+        );
       } else {
         // Filter items based on itemsList if no store with IS_DEFAULT_STORE true
-        this.filteredItemsList = this.allItems.filter(item => 
-          !this.itemsList.some(excludeItem => excludeItem.ID === item.ID)
+        this.filteredItemsList = this.allItems.filter(
+          (item) =>
+            !this.itemsList.some((excludeItem) => excludeItem.ID === item.ID)
         );
-        console.log("Filtering items based on itemsList.");
+        console.log('Filtering items based on itemsList.');
       }
-  
+
       this.filteredRowCount = this.filteredItemsList.length;
     }
   }
 
   listItemsByStore(storeId: number) {
-    console.log(`Fetching items for store ID: ${storeId}`); 
+    console.log(`Fetching items for store ID: ${storeId}`);
     this.dataservice.getItemsByStoreId(storeId).subscribe(
       (response: any) => {
         console.log('Response received:', response);
         this.itemsByStore = response.data;
-        console.log(this.itemsByStore, 'ITEMS BY STORE'); 
+        console.log(this.itemsByStore, 'ITEMS BY STORE');
       },
       (error) => {
         console.error('Error fetching items by store ID:', error);
       }
     );
   }
-  
-  
 
   onItemSelectionChanged(e: any) {
     this.selectedRowCount = e.selectedRowKeys.length;
@@ -256,21 +261,19 @@ export class StoreItemsAddFormComponent {
   }
 
   onStoreSelectionChanged(e: any) {
-
     this.selectedStores = e.selectedRowsData;
     this.selectedStoreIds = this.selectedStores.map((store: any) => store.ID);
     if (this.selectedStoreIds.length > 0) {
-      this.selectedStoreId = this.selectedStoreIds[0]; 
+      this.selectedStoreId = this.selectedStoreIds[0];
     }
   }
 
-  saveItemsToStore(){
-    if(this.store.ID==1){
-     this.confirmMove()
-    }
-    else{
-      console.log(this.selectedStoreId,"IN SAVE FUNCTION")
-      console.log(this.filteredStores,"S STORES")
+  saveItemsToStore() {
+    if (this.store.ID == 1) {
+      this.confirmMove();
+    } else {
+      console.log(this.selectedStoreId, 'IN SAVE FUNCTION');
+      console.log(this.filteredStores, 'S STORES');
       if (this.selectedItems.length > 0 && this.filteredStores.length > 0) {
         this.filteredStores.forEach((store) => {
           this.selectedItems.forEach((item) => {
@@ -290,7 +293,7 @@ export class StoreItemsAddFormComponent {
               STORE_IS_PRICE_REQUIRED: store.IS_PRICE_REQUIRED,
               STORE_IS_NOT_DISCOUNTABLE: store.IS_NOT_DISCOUNTABLE,
             };
-  
+
             this.dataservice.pushItemToStore(payload).subscribe(
               (response) => {
                 try {
@@ -301,12 +304,11 @@ export class StoreItemsAddFormComponent {
                     },
                     'success'
                   );
-                 
                 } catch {}
                 console.log('Data inserted successfully', response);
                 this.closeForm();
-                this.filteredItemsList
-                this.refreshDataGrid()
+                this.filteredItemsList;
+                this.refreshDataGrid();
                 this.dataGrid.instance.refresh();
               },
               (error) => {
@@ -321,7 +323,7 @@ export class StoreItemsAddFormComponent {
   }
 
   confirmMove(): void {
-    console.log(this.selectedStoreId,"NIBIN")
+    console.log(this.selectedStoreId, 'NIBIN');
     if (this.selectedItems.length > 0 && this.selectedStores.length > 0) {
       this.selectedStores.forEach((store) => {
         this.selectedItems.forEach((item) => {
@@ -353,7 +355,7 @@ export class StoreItemsAddFormComponent {
                   'success'
                 );
                 this.dataGrid.instance.refresh();
-                this.refreshDataGrid()
+                this.refreshDataGrid();
                 this.onRefreshButtonClick();
               } catch {}
               console.log('Data inserted successfully', response);
@@ -372,7 +374,7 @@ export class StoreItemsAddFormComponent {
   }
 
   refreshDataGrid() {
-    this.listItemsByStore(this.storeId)
+    this.listItemsByStore(this.storeId);
   }
   openPopup(): void {
     this.isPopupVisible = true;
@@ -393,7 +395,6 @@ export class StoreItemsAddFormComponent {
 
     console.log('Close button clicked');
   }
-
 }
 @NgModule({
   imports: [
