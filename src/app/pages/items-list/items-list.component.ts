@@ -229,65 +229,65 @@ customLabel = 'Custom';
 }
 
 
-     onDateRangeChanged(e: any) {
-        const today = new Date();
-    this.selectedDateRange = e.value;
-console.log('selected data=======',this.selectedDateRange)
-if(this.selectedDateRange==='today'){
-   const today = this.formatDate( new Date());
-  // today.setHours(0, 0, 0, 0);
+//      onDateRangeChanged(e: any) {
+//         const today = new Date();
+//     this.selectedDateRange = e.value;
+// console.log('selected data=======',this.selectedDateRange)
+// if(this.selectedDateRange==='today'){
+//    const today = this.formatDate( new Date());
+//   // today.setHours(0, 0, 0, 0);
 
-   this.startDate=new Date(today)
-   this.EndDate=new Date(today)
-   console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-} 
-else if(this.selectedDateRange === 'all'){
-  //  this.showItems();
+//    this.startDate=new Date(today)
+//    this.EndDate=new Date(today)
+//    console.log(this.startDate,'=======start date=====')
+// console.log(this.EndDate,'=======End date=====')
+// } 
+// else if(this.selectedDateRange === 'all'){
+//   //  this.showItems();
 
-  const payload={
-  DATE_FROM: "2000-01-01",
-  DATE_TO: this.formatDate(new Date())
-  }
-  this.dataservice.getItemsData(payload).subscribe((res:any)=>{
-    console.log(res)
-    this.itemsList=res.data
+//   const payload={
+//   DATE_FROM: "2000-01-01",
+//   DATE_TO: this.formatDate(new Date())
+//   }
+//   this.dataservice.getItemsData(payload).subscribe((res:any)=>{
+//     console.log(res)
+//     this.itemsList=res.data
 
-  });
+//   });
 
-} else if (this.selectedDateRange === 'last7') {
-    this.startDate = new Date(today);
-    this.startDate.setDate(today.getDate() - 6);
-    this.EndDate = new Date(today);
-console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-  } else if (this.selectedDateRange === 'last15') {
-    this.startDate = new Date(today);
-    this.startDate.setDate(today.getDate() - 14);
-    this.EndDate = new Date(today);
-console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-  } else if (this.selectedDateRange === 'last30') {
-    this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    this.EndDate = new Date(today);
-console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-  } else if (this.selectedDateRange === 'lastMonth') {
-    const lastMonth = today.getMonth() - 1;
-    this.startDate = new Date(today.getFullYear(), lastMonth, 1);
-    this.EndDate = new Date(today.getFullYear(), today.getMonth(), 0);
-console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-  } else {
-this.showCustomDatePopup=true
-
-
-}
+// } else if (this.selectedDateRange === 'last7') {
+//     this.startDate = new Date(today);
+//     this.startDate.setDate(today.getDate() - 6);
+//     this.EndDate = new Date(today);
+// console.log(this.startDate,'=======start date=====')
+// console.log(this.EndDate,'=======End date=====')
+//   } else if (this.selectedDateRange === 'last15') {
+//     this.startDate = new Date(today);
+//     this.startDate.setDate(today.getDate() - 14);
+//     this.EndDate = new Date(today);
+// console.log(this.startDate,'=======start date=====')
+// console.log(this.EndDate,'=======End date=====')
+//   } else if (this.selectedDateRange === 'last30') {
+//     this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+//     this.EndDate = new Date(today);
+// console.log(this.startDate,'=======start date=====')
+// console.log(this.EndDate,'=======End date=====')
+//   } else if (this.selectedDateRange === 'lastMonth') {
+//     const lastMonth = today.getMonth() - 1;
+//     this.startDate = new Date(today.getFullYear(), lastMonth, 1);
+//     this.EndDate = new Date(today.getFullYear(), today.getMonth(), 0);
+// console.log(this.startDate,'=======start date=====')
+// console.log(this.EndDate,'=======End date=====')
+//   } else {
+// this.showCustomDatePopup=true
 
 
+// }
 
-       this.showItems();
-  }
+
+
+//        this.showItems();
+//   }
 
   
   ngAfterViewInit(): void {

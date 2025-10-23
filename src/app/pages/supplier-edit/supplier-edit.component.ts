@@ -148,14 +148,14 @@ export class SupplierEditComponent {
         this.DEFAULT_COUNTRY_CODE=this.sessionData.DEFAULT_COUNTRY_CODE
   }
 
-  showCountry(){
-    this.dataservice.getCountryData().subscribe(
-     (response)=>{
-           this.CountryDropdownData=response;
-           console.log('count',this.CountryDropdownData);
-     }
-    )
- }
+//   showCountry(){
+//     this.dataservice.getCountryData().subscribe(
+//      (response)=>{
+//            this.CountryDropdownData=response;
+//            console.log('count',this.CountryDropdownData);
+//      }
+//     )
+//  }
     sesstion_Details(){
     const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
     console.log(sessionData,'=================session data==========')
@@ -170,23 +170,27 @@ export class SupplierEditComponent {
     this.isCurrencyAccepted = checked;
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['supplierData'] && changes['supplierData'].currentValue) {
-      console.log('SupplierData:', this.supplierData);
-      const savedCostIDs = (this.supplierData.Supplier_cost || []).map(
-        (cost: any) => cost.COST_ID
-      );
-      console.log('Saved Cost IDs:', savedCostIDs);
-      const selectedCosts = (this.landedcost || []).filter((cost: any) =>
-        savedCostIDs.includes(cost.ID)
-      );
-      this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
+    ngOnChanges(changes: SimpleChanges): void {
+      if (changes['supplierData'] && changes['supplierData'].currentValue) {
+        console.log('SupplierData:', this.supplierData);
 
-      console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
-        this.get_State_Dropdown_List()
+         this.get_Country_Dropdown_List()
+          this.get_State_Dropdown_List()
+
+        const savedCostIDs = (this.supplierData.Supplier_cost || []).map(
+          (cost: any) => cost.COST_ID
+        );
+        console.log('Saved Cost IDs:', savedCostIDs);
+        const selectedCosts = (this.landedcost || []).filter((cost: any) =>
+          savedCostIDs.includes(cost.ID)
+        );
+        this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
+
+        console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
+       
+      }
+    
     }
-  
-  }
 
   ngOnInit() {
     console.log('EDIT COMPONENT111');
@@ -199,11 +203,11 @@ export class SupplierEditComponent {
     this.listSupplier();
     this.getVATRuleDropDown();
     this.get_State_Dropdown_List();
-    this.listCountry();
+    // this.listCountry();
     this.listState();
     this.getPaymentTerms();
     this.getCurrency_Dropdown();
-    this.showCountry();
+    // this.showCountry();
     this.get_Country_Dropdown_List();
   }
 
@@ -221,17 +225,17 @@ export class SupplierEditComponent {
     });
   }
 
-  listCountry() {
-    this.dataservice.getCountryData().subscribe((response) => {
-      this.CountryDropdownData = response;
-    });
-  }
+  // listCountry() {
+  //   this.dataservice.getCountryData().subscribe((response) => {
+  //     this.CountryDropdownData = response;
+  //   });
+  // }
 
     get_Country_Dropdown_List() {
     this.dataservice.get_Country_Dropdown_Api().subscribe((response: any) => {
       // console.log(response, 'response++++++++++');
       this.CountryDropdownData = response;
-      console.log(this.Country,'Country dropdown')
+      console.log(this.CountryDropdownData,'Country dropdown')
     });
   }
 
@@ -289,6 +293,7 @@ export class SupplierEditComponent {
 
   onCountrySelectionChanged(event: any) {
      this.CountryId = event.value
+
     const selectedCountry = this.CountryDropdownData.find(
       (country) => country.ID === event.value
     );

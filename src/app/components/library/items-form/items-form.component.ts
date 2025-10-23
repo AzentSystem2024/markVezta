@@ -392,7 +392,7 @@ export class ItemsFormComponent implements  OnInit {
       ],
       ITEM_SUPPLIERS: [
         {
-          SUPP_ID: '',
+          SUPP_ID: 0,
           REORDER_NO: "",
           COST: 0,
           IS_PRIMARY: false,
