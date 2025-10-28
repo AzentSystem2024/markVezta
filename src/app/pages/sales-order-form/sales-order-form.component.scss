@@ -56,8 +56,8 @@
 
 /* Toolbar fixes */
 ::ng-deep .salesorder-grid-wrapper .dx-datagrid .dx-toolbar {
-  min-height: 120px; /* raise baseline */
-  height: 120px;
+  min-height: 80px; /* raise baseline */
+  height: 80px;
   align-items: center;
   z-index: 2;
   position: relative;
@@ -209,4 +209,44 @@
   height: 28px !important;
   min-width: 28px !important;
   margin-top: 10px !important; /* moves the button downward */
+}
+.cutsize-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.cutsize-header,
+.cutsize-row {
+  display: contents;
+}
+
+.left-cell {
+  text-align: left;
+  padding: 4px 6px;
+}
+
+.right-cell {
+  text-align: left;
+  padding: 4px 6px;
+}
+.cutsize-popup-footer {
+  display: flex;
+  justify-content: flex-end; /* aligns to right */
+  margin-top: 10px; /* optional spacing from grid */
+  padding: 0 10px 10px 0; /* optional padding */
+}
+.summary-error {
+  text-align: right;
+  color: red;
+  font-weight: 500;
+  margin-top: 4px;
+  margin-right: 12px;
+  font-size: 13px;
+}
+
+.dx-dropdowneditor-overlay .dx-list {
+  max-height: 250px !important;
+  min-height: 150px !important;
+  overflow-y: auto;
 }

@@ -4,7 +4,9 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.component';
 import {
   DxCheckBoxModule,
+  DxDataGridModule,
   DxNumberBoxModule,
+  DxPopupModule,
   DxRadioGroupModule,
   DxValidationGroupModule,
   DxValidatorModule,
@@ -35,6 +37,8 @@ export class CustomerFormComponent {
   selected_Company_id: any = null; // or ''
   // dob=new Date();
   dob: string | number | Date = new Date();
+  isSubDealerPopupVisible: boolean = false;
+  dealerList: any;
 
   formCustomerData = {
     COMPANY_ID: this.selected_Company_id,
@@ -63,7 +67,10 @@ export class CustomerFormComponent {
     DISCOUNT_PERCENT: '',
     CUST_VAT_RULE_ID: '',
     VAT_REGNO: '',
-    CUSTOMER_TYPE: 0,
+    CUST_TYPE: 0,
+    DELIVERY_ADDRESS: [],
+    DEALER_TYPE: 0,
+    DEALER_ID: 0,
   };
   // selected_Company_id: any;
   selected_fin_id: any;
@@ -74,6 +81,15 @@ export class CustomerFormComponent {
     { text: 'Unit of Company', value: 1 },
     { text: 'Outside Customer', value: 2 },
   ];
+
+  dealerTypeOptions = [
+    { text: 'Dealer', value: 1 },
+    { text: 'Sub-Dealer', value: 2 },
+  ];
+  isDealerVisible: boolean;
+  deliveryAddress1: any;
+  deliveryAddress2: any;
+  deliveryAddress3: any;
 
   constructor(private service: DataService, authservice: AuthService) {
     this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
@@ -86,7 +102,36 @@ export class CustomerFormComponent {
   }
   newCustomer = this.formCustomerData;
 
-  getNewCustomerData = () => ({ ...this.newCustomer });
+  // getNewCustomerData = () => ({ ...this.newCustomer });
+  getNewCustomerData = () => {
+    // Create delivery address array from entered textboxes
+    const deliveryAddressArray = [];
+
+    if (this.deliveryAddress1?.trim()) {
+      deliveryAddressArray.push({ DELIVERY_ADDRESS: this.deliveryAddress1 });
+    }
+    if (this.deliveryAddress2?.trim()) {
+      deliveryAddressArray.push({ DELIVERY_ADDRESS: this.deliveryAddress2 });
+    }
+    if (this.deliveryAddress3?.trim()) {
+      deliveryAddressArray.push({ DELIVERY_ADDRESS: this.deliveryAddress3 });
+    }
+
+    // Return the full customer data with the delivery address array included
+    return {
+      ...this.newCustomer,
+      DELIVERY_ADDRESS: deliveryAddressArray,
+    };
+  };
+
+  addDeliveryAddress(address: string) {
+    if (address && address.trim() !== '') {
+      this.formCustomerData.DELIVERY_ADDRESS.push({
+        DELIVERY_ADDRESS: address,
+      });
+    }
+  }
+
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -114,6 +159,33 @@ export class CustomerFormComponent {
     this.service.getCountryDataAPi().subscribe((response) => {
       this.CountryDropdownData = response;
       console.log(this.CountryDropdownData);
+    });
+  }
+
+  onDealerTypeChange(e: any) {
+    console.log(e.value, 'Dealer Type Changed');
+
+    if (e.value === 2) {
+      // 2 = Sub Dealer
+      this.isDealerVisible = true; // show dropdown
+      this.getDealerDropDown(); // fetch dealers dynamically
+    } else {
+      this.isDealerVisible = false; // hide dropdown
+      this.formCustomerData.DEALER_ID = null; // reset selection
+    }
+  }
+
+  onDealerSelected(e: any) {
+    const selectedDealer = e.selectedRowsData[0];
+    if (selectedDealer) {
+      this.formCustomerData.DEALER_ID = selectedDealer.ID;
+      this.isSubDealerPopupVisible = false;
+    }
+  }
+
+  getDealerDropDown() {
+    this.service.getDropdownData('DEALER').subscribe((response: any) => {
+      this.dealerList = response;
     });
   }
   getPriceLevelDropDown() {
@@ -162,6 +234,7 @@ export class CustomerFormComponent {
   }
   onStateSelectionChanged(event: any) {}
   ngOnInit(): void {
+    this.getDealerDropDown();
     this.getPaymentTerms();
     this.showCountry();
     this.getVATRuleDropDown();
@@ -205,6 +278,8 @@ export class CustomerFormComponent {
     DxValidationGroupModule,
     DxNumberBoxModule,
     DxRadioGroupModule,
+    DxPopupModule,
+    DxDataGridModule,
   ],
   declarations: [CustomerFormComponent],
   exports: [CustomerFormComponent],

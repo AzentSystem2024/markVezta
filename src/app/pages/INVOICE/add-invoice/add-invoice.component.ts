@@ -139,6 +139,10 @@ export class AddInvoiceComponent {
   }
 
   ngOnInit() {
+    this.invoiceFormData = {
+      ...this.invoiceFormData,
+      TRANS_DATE: new Date(this.invoiceFormData.TRANS_DATE || new Date()),
+    };
     if (!this.invoiceFormData.SALE_DATE) {
       this.invoiceFormData.SALE_DATE = new Date();
     }
@@ -545,6 +549,9 @@ export class AddInvoiceComponent {
       GST_AMOUNT: 0,
       NET_AMOUNT: 0,
       SALE_DETAILS: [],
+      TRANS_DATE: new Date(), // ✅ add this line
+      ADD_TIME: new Date(), // optional
+      SALE_DATE: new Date(),
     };
 
     // Reset invoice number (optional: if API provides a new number)

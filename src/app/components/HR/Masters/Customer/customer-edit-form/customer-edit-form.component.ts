@@ -45,12 +45,17 @@ export class CustomerEditFormComponent {
   countryCode: any;
   isCurrencyAccepted: boolean = true;
   selecte_countyId: any;
-
+  selected_fin_id: any;
+  sessionData: any;
+  selected_vat_id: any;
+  selected_Company_id: any = null; // or ''
+  dob: string | number | Date = new Date();
   formCustomerData = {
+    COMPANY_ID: this.selected_Company_id,
     CUST_CODE: '',
     FIRST_NAME: '',
     LAST_NAME: '',
-    DOB: null,
+    DOB: this.dob,
     NATIONALITY: '',
     CONTACT_NAME: '',
     ADDRESS1: '',
@@ -72,16 +77,30 @@ export class CustomerEditFormComponent {
     DISCOUNT_PERCENT: '',
     CUST_VAT_RULE_ID: '',
     VAT_REGNO: '',
-    CUSTOMER_TYPE: null,
+    CUST_TYPE: 0,
+    DELIVERY_ADDRESS: [],
+    DEALER_TYPE: 0,
+    DEALER_ID: 0,
   };
-  sessionData: any;
+
   DEFAULT_COUNTRY_CODE: any;
-  selected_vat_id: any;
+
   //  newCustomer = this.formCustomerData;
   customerTypeOptions = [
     { text: 'Unit of Company', value: 1 },
     { text: 'Outside Customer', value: 2 },
   ];
+
+  dealerTypeOptions = [
+    { text: 'Dealer', value: 1 },
+    { text: 'Sub-Dealer', value: 2 },
+  ];
+  isDealerVisible: boolean;
+  deliveryAddress1: any;
+  deliveryAddress2: any;
+  deliveryAddress3: any;
+  isSubDealerPopupVisible: boolean;
+  dealerList: any;
 
   constructor(private service: DataService, authservice: AuthService) {
     this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
@@ -102,7 +121,66 @@ export class CustomerEditFormComponent {
 
       this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
       this.ChangedCustomerData = this.formCustomerData;
+      if (this.formCustomerData.DELIVERY_ADDRESS?.length) {
+        this.deliveryAddress1 =
+          this.formCustomerData.DELIVERY_ADDRESS[0]?.DELIVERY_ADDRESS || '';
+        this.deliveryAddress2 =
+          this.formCustomerData.DELIVERY_ADDRESS[1]?.DELIVERY_ADDRESS || '';
+        this.deliveryAddress3 =
+          this.formCustomerData.DELIVERY_ADDRESS[2]?.DELIVERY_ADDRESS || '';
+      } else {
+        // In case no addresses exist yet
+        this.deliveryAddress1 = '';
+        this.deliveryAddress2 = '';
+        this.deliveryAddress3 = '';
+      }
+      // ✅ Show dealer dropdown automatically if Dealer Type = 2
+      if (this.formCustomerData.CUST_TYPE === 2) {
+        if (this.formCustomerData.DEALER_TYPE === 2) {
+          this.isDealerVisible = true;
+          this.getDealerDropDown(); // fetch dealer list for dropdown
+        } else {
+          this.isDealerVisible = false;
+        }
+      } else {
+        this.isDealerVisible = false;
+      }
     }
+  }
+
+  addDeliveryAddress(address: string) {
+    if (address && address.trim() !== '') {
+      this.formCustomerData.DELIVERY_ADDRESS.push({
+        DELIVERY_ADDRESS: address,
+      });
+    }
+  }
+
+  onDealerTypeChange(e: any) {
+    console.log(e.value, 'Dealer Type Changed');
+
+    if (e.value === 2) {
+      // 2 = Sub Dealer
+      this.isDealerVisible = true; // show dropdown
+      this.getDealerDropDown(); // fetch dealers dynamically
+    } else {
+      this.isDealerVisible = false; // hide dropdown
+      this.formCustomerData.DEALER_ID = null; // reset selection
+    }
+  }
+
+  onDealerSelected(e: any) {
+    const selectedDealer = e.selectedRowsData[0];
+    if (selectedDealer) {
+      this.formCustomerData.DEALER_ID = selectedDealer.ID;
+      this.isSubDealerPopupVisible = false;
+    }
+  }
+
+  getDealerDropDown() {
+    this.service.getDropdownData('DEALER').subscribe((response: any) => {
+      this.dealerList = response;
+    });
   }
   // getNewCustomerData = () => ({ ...this.newCustomer });
   sessionData_tax() {

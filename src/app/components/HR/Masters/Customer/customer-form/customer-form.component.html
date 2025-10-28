@@ -215,6 +215,51 @@
         </div>
       </dxi-item>
     </dxi-item>
+
+    <dxi-item [colSpan]="2">
+      <div *dxTemplate>
+        <dx-radio-group
+          [(value)]="formCustomerData.CUST_TYPE"
+          [items]="customerTypeOptions"
+          layout="horizontal"
+          displayExpr="text"
+          valueExpr="value"
+          label="Customer Type"
+          labelMode="floating"
+        ></dx-radio-group>
+      </div>
+    </dxi-item>
+
+    <dxi-item *ngIf="formCustomerData.CUST_TYPE === 2" [colSpan]="2">
+      <div *dxTemplate>
+        <dx-radio-group
+          [(value)]="formCustomerData.DEALER_TYPE"
+          [items]="dealerTypeOptions"
+          layout="horizontal"
+          displayExpr="text"
+          valueExpr="value"
+          label="Customer Category"
+          labelMode="floating"
+          (onValueChanged)="onDealerTypeChange($event)"
+        ></dx-radio-group>
+      </div>
+    </dxi-item>
+
+    <dxi-item *ngIf="isDealerVisible" [colSpan]="2">
+      <div *dxTemplate>
+        <dx-select-box
+          label="Parent Dealer"
+          [items]="dealerList"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="formCustomerData.DEALER_ID"
+          placeholder="Select Parent Dealer"
+          labelMode="floating"
+          (onValueChanged)="onDealerSelected($event)"
+        >
+        </dx-select-box>
+      </div>
+    </dxi-item>
   </dxi-item>
 
   <dxi-item itemType="group">
@@ -499,54 +544,80 @@
         </div>
       </dxi-item>
     </dxi-item>
-  </dxi-item>
-  <dxi-item [colSpan]="2">
-    <div *dxTemplate>
-      <dx-radio-group
-        [(value)]="formCustomerData.CUSTOMER_TYPE"
-        [items]="customerTypeOptions"
-        layout="horizontal"
-        displayExpr="text"
-        valueExpr="value"
-        label="Customer Type"
-        labelMode="floating"
-      ></dx-radio-group>
-    </div>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Delivery Address"
+          labelMode="floating"
+          [(value)]="deliveryAddress1"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Delivery Address is required"
+            >
+            </dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Delivery Address"
+          labelMode="floating"
+          [(value)]="deliveryAddress2"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Delivery Address is required"
+            >
+            </dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="Delivery Address"
+          labelMode="floating"
+          [(value)]="deliveryAddress3"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Delivery Address is required"
+            >
+            </dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
+      </div>
+    </dxi-item>
   </dxi-item>
 
-  <!-- <dxi-item> -->
-  <!-- <dx-button
-      text="Update"
-      stylingMode="contained"
-      type="default"
-      (onClick)="UpdateData()"
-    ></dx-button>
-  </dxi-item> -->
-
-  <!-- <dxi-item [colSpan]="2">
-          <div *dxTemplate>
-            <dx-text-area
-              label="Additional Info."
-              [(value)]="newSupplier.NOTES"
-             labelMode="floating"
-    
-            ></dx-text-area>
-          </div>
-        </dxi-item> -->
-  <!-- <div class="form-popup-buttons-container">
-    <div class="popup-footer">
-      <dx-button
-        text="Cancel"
-        stylingMode="outlined"
-        (onClick)="closePopup()"
-        type="normal"
-      ></dx-button>
-      <dx-button
-        text="Update"
-        stylingMode="contained"
-        type="default"
-        (onClick)="UpdateData()"
-      ></dx-button>
-    </div>
-  </div> -->
+  <!-- Conditional Dealer/Sub-Dealer Radio -->
 </dx-form>
+<dx-popup
+  [(visible)]="isSubDealerPopupVisible"
+  [showTitle]="true"
+  title="Select Main Dealer"
+  [height]="'70vh'"
+  [width]="'50vh'"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <dx-data-grid
+    [dataSource]="dealerList"
+    [showBorders]="true"
+    [height]="350"
+    (onSelectionChanged)="onDealerSelected($event)"
+    [selection]="{ mode: 'single' }"
+  >
+    <dxi-column dataField="DEALER" caption="Dealer"></dxi-column>
+  </dx-data-grid>
+</dx-popup>
