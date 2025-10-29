@@ -86,31 +86,27 @@ export class SalesOrderFormComponent {
   salesman: any;
   quotationList: any;
   salesOrderFormData: any = {
-    ID: 0,
-    COMPANY_ID: 0,
-    FIN_ID: 0,
-    STORE_ID: 0,
-    SO_NO: '',
+    COMPANY_ID: 1,
+    FIN_ID: 1,
+    STORE_ID: 1,
     SO_DATE: new Date(),
     CUST_ID: 0,
-    SALESMAN_ID: 0,
-    CONTACT_NAME: '',
-    CONTACT_PHONE: '',
-    CONTACT_EMAIL: '',
-    QTN_ID: 0,
-    REF_NO: '',
-    PAY_TERM_ID: 0,
-    DELIVERY_TERM_ID: 0,
-    GROSS_AMOUNT: 0,
-    CHARGE_DESCRIPTION: '',
-    CHARGE_AMOUNT: 0,
-    NET_AMOUNT: 0,
-    TRANS_ID: 0,
-    USER_ID: 0,
-    NARRATION: '',
-    Details: [],
-    DEALER_ID: 0,
-    ADDRESS: '',
+    USER_ID: 67,
+    REMARKS: '',
+    DELIVERY_ADDRESS: 0,
+    WAREHOUSE: 2,
+    TOTAL_QTY: 0,
+    Details: [
+      {
+        PACKING: 0,
+        BRAND_ID: 0,
+        ARTICLE_TYPE: 0,
+        CATEGORY: 0,
+        ART_NO: 0,
+        COLOR: 0,
+        QUANTITY: 0,
+      },
+    ],
   };
   isRoundOff: boolean = false;
   deliveryTerms: any;
@@ -170,7 +166,9 @@ export class SalesOrderFormComponent {
   selectedColor: any;
   catSizeList: any;
   isCutsizePopupVisible: boolean;
-  cutsizeValues: { size: number; value: any }[] = [];
+  // cutsizeValues: { size: number; value: any }[] = [];
+  cutsizeValues: any[] = [];
+
   cutsizeInputs: {};
   totalErrorMessage: string;
   itemsList: any;
@@ -183,6 +181,12 @@ export class SalesOrderFormComponent {
   colorList: any;
   packingList: any;
   selectedPacking: any;
+  showTotals = false;
+  showSaveButton = false;
+  totalRequiredQty = 25;
+  totalQty = 0;
+  isTotalQtyValid: boolean;
+  validationMessage: string;
 
   constructor(
     private dataService: DataService,
@@ -192,6 +196,7 @@ export class SalesOrderFormComponent {
   ) {}
 
   ngOnInit() {
+    this.updateTotalQty();
     this.getListOfItemsInColumn();
     if (
       !this.salesOrderFormData.Details ||
@@ -202,10 +207,7 @@ export class SalesOrderFormComponent {
     this.getDealerDropdown();
     this.sessionData_tax();
     this.getSalesOrderNo();
-    this.getSalesmanDropdown();
-    this.getCustomerDropdown();
-    this.getPymentTermsDropdown();
-    this.getDeliveryTermsDropdown();
+
     this.getTransferNo(); // always fetch fresh number when popup opens
 
     this.isEditDataAvailable();
@@ -257,93 +259,93 @@ export class SalesOrderFormComponent {
     console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
-  onPhoneInput(event: any) {
-    if (this.phoneTextBox) {
-      this.phoneTextBox.instance.option('value', event.target.value);
-      this.phoneTextBox.instance.validate();
-    }
-  }
+  // onPhoneInput(event: any) {
+  //   if (this.phoneTextBox) {
+  //     this.phoneTextBox.instance.option('value', event.target.value);
+  //     this.phoneTextBox.instance.validate();
+  //   }
+  // }
 
-  phoneValidation(options: any): boolean {
-    let phone = options.value;
+  // phoneValidation(options: any): boolean {
+  //   let phone = options.value;
 
-    if (!phone) {
-      options.rule.message = 'Phone number is required';
-      return false;
-    }
+  //   if (!phone) {
+  //     options.rule.message = 'Phone number is required';
+  //     return false;
+  //   }
 
-    if (!this.countryCode) {
-      options.rule.message = 'Country code not set';
-      return false;
-    }
+  //   if (!this.countryCode) {
+  //     options.rule.message = 'Country code not set';
+  //     return false;
+  //   }
 
-    // Add '+' if missing
-    if (!phone.startsWith('+')) {
-      phone = '+' + phone;
-    }
+  //   // Add '+' if missing
+  //   if (!phone.startsWith('+')) {
+  //     phone = '+' + phone;
+  //   }
 
-    if (!phone.startsWith(this.countryCode)) {
-      options.rule.message = `Phone number must start with country code ${this.countryCode}`;
-      return false;
-    }
+  //   if (!phone.startsWith(this.countryCode)) {
+  //     options.rule.message = `Phone number must start with country code ${this.countryCode}`;
+  //     return false;
+  //   }
 
-    const restNumber = phone.slice(this.countryCode.length).replace(/\D/g, '');
+  //   const restNumber = phone.slice(this.countryCode.length).replace(/\D/g, '');
 
-    let regex;
+  //   let regex;
 
-    if (this.countryCode === '+971') {
-      regex = /^[5]\d{8}$/;
-      if (!regex.test(restNumber)) {
-        options.rule.message = "UAE phone must be 9 digits starting with '5'";
-        return false;
-      }
-    } else if (this.countryCode === '+91') {
-      regex = /^[6-9]\d{9}$/;
-      if (!regex.test(restNumber)) {
-        options.rule.message =
-          'India phone must be 10 digits starting with 6–9';
-        return false;
-      }
-    } else {
-      regex = /^\d{6,15}$/;
-      if (!regex.test(restNumber)) {
-        options.rule.message = 'Invalid phone number format';
-        return false;
-      }
-    }
+  //   if (this.countryCode === '+971') {
+  //     regex = /^[5]\d{8}$/;
+  //     if (!regex.test(restNumber)) {
+  //       options.rule.message = "UAE phone must be 9 digits starting with '5'";
+  //       return false;
+  //     }
+  //   } else if (this.countryCode === '+91') {
+  //     regex = /^[6-9]\d{9}$/;
+  //     if (!regex.test(restNumber)) {
+  //       options.rule.message =
+  //         'India phone must be 10 digits starting with 6–9';
+  //       return false;
+  //     }
+  //   } else {
+  //     regex = /^\d{6,15}$/;
+  //     if (!regex.test(restNumber)) {
+  //       options.rule.message = 'Invalid phone number format';
+  //       return false;
+  //     }
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
-  isEmailValid(email: string): boolean {
-    if (!email) return false;
+  // isEmailValid(email: string): boolean {
+  //   if (!email) return false;
 
-    const requiredRule = this.emailValidationRules.find(
-      (rule) => rule.type === 'required'
-    );
-    const patternRule = this.emailValidationRules.find(
-      (rule) => rule.type === 'pattern'
-    ) as PatternRule;
+  //   const requiredRule = this.emailValidationRules.find(
+  //     (rule) => rule.type === 'required'
+  //   );
+  //   const patternRule = this.emailValidationRules.find(
+  //     (rule) => rule.type === 'pattern'
+  //   ) as PatternRule;
 
-    if (requiredRule && email.trim() === '') {
-      return false;
-    }
+  //   if (requiredRule && email.trim() === '') {
+  //     return false;
+  //   }
 
-    if (patternRule) {
-      if (patternRule.pattern instanceof RegExp) {
-        if (!patternRule.pattern.test(email)) {
-          return false;
-        }
-      } else if (typeof patternRule.pattern === 'string') {
-        const regex = new RegExp(patternRule.pattern);
-        if (!regex.test(email)) {
-          return false;
-        }
-      }
-    }
+  //   if (patternRule) {
+  //     if (patternRule.pattern instanceof RegExp) {
+  //       if (!patternRule.pattern.test(email)) {
+  //         return false;
+  //       }
+  //     } else if (typeof patternRule.pattern === 'string') {
+  //       const regex = new RegExp(patternRule.pattern);
+  //       if (!regex.test(email)) {
+  //         return false;
+  //       }
+  //     }
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
@@ -408,61 +410,11 @@ export class SalesOrderFormComponent {
   }
 
   getTransferNo() {}
-  getSalesmanDropdown() {
-    this.dataService.getDropdownData('SALESMAN').subscribe((response: any) => {
-      this.salesman = response;
-    });
-  }
-
-  getCustomerDropdown() {
-    this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
-      this.customer = response;
-    });
-  }
-
-  getPymentTermsDropdown() {
-    this.dataService
-      .getDropdownData('PAYMENTTERMS')
-      .subscribe((response: any) => {
-        this.paymentTerms = response;
-      });
-  }
-  getDeliveryTermsDropdown() {
-    this.dataService
-      .getDropdownData('PAYMENTTERMS')
-      .subscribe((response: any) => {
-        this.deliveryTerms = response;
-      });
-  }
 
   onGridReady(e: any) {
     // Ensure grid is rendered only once before inserting empty row
     if (this.salesOrderFormData.Details.length === 0) {
-      this.addEmptyRow();
-    }
-  }
-
-  addEmptyRow() {
-    const emptyRow = {
-      ITEM_ID: null,
-      ITEM_CODE: '',
-      DESCRIPTION: '',
-      MATRIX_CODE: '',
-      REMARKS: '',
-      UOM: '',
-      QUANTITY: 0,
-      GROSS_AMOUNT: 0,
-      STOCK_QTY: 0,
-      AMOUNT: 0,
-      TAX_AMOUNT: 0,
-      TOTAL_AMOUNT: 0,
-    };
-
-    this.salesOrderFormData.Details.push(emptyRow);
-
-    // Refresh grid to show the new row
-    if (this.itemsGridRef && this.itemsGridRef.instance) {
-      this.itemsGridRef.instance.refresh();
+      // this.addEmptyRow();
     }
   }
 
@@ -501,9 +453,9 @@ export class SalesOrderFormComponent {
   onTypeValueChanged(e: any) {
     this.selectedType = e.value;
     console.log(e, 'selecteddescriptionnnnnnnnnnn');
-    this.selectedCategory = null;
-    this.selectedArtNo = null;
-    this.selectedColor = null;
+    // this.selectedCategory = null;
+    // this.selectedArtNo = null;
+    // this.selectedColor = null;
 
     const payload = {
       BRAND_ID: String(this.selectedDescription),
@@ -526,7 +478,7 @@ export class SalesOrderFormComponent {
     this.selectedCategory = e.value;
     console.log(this.selectedCategory, 'selectedCategoryyyyyyyyyyyyyyy');
     // this.selectedArtNo = null;
-    this.selectedColor = null;
+    // this.selectedColor = null;
 
     const payload = {
       ARTICLE_TYPE: String(this.selectedType),
@@ -549,13 +501,13 @@ export class SalesOrderFormComponent {
   onArtNoValueChanged(e: any) {
     this.selectedArtNo = e.value;
     console.log(this.selectedArtNo, 'selecteddescription');
-    this.selectedColor = null;
+    // this.selectedColor = null;
 
     const payload = {
       ARTICLE_TYPE: String(this.selectedType),
       CATEGORY_ID: String(this.selectedCategory),
       BRAND_ID: String(this.selectedDescription),
-      ART_NO: String(this.selectedArtNo),
+      ARTNO_ID: String(this.selectedArtNo),
     };
     this.isDescriptionLoading = true;
 
@@ -578,7 +530,7 @@ export class SalesOrderFormComponent {
       ARTICLE_TYPE: String(this.selectedType),
       CATEGORY_ID: String(this.selectedCategory),
       BRAND_ID: String(this.selectedDescription),
-      ART_NO: String(this.selectedArtNo),
+      ARTNO_ID: String(this.selectedArtNo),
       COLOR: String(this.selectedColor),
     };
     this.isDescriptionLoading = true;
@@ -621,7 +573,7 @@ export class SalesOrderFormComponent {
       ARTICLE_TYPE: String(this.selectedType),
       CATEGORY_ID: String(this.selectedCategory),
       BRAND_ID: String(this.selectedDescription),
-      ART_NO: String(this.selectedArtNo),
+      ARTNO_ID: String(this.selectedArtNo),
       COLOR: String(this.selectedColor),
     };
     this.isDescriptionLoading = true;
@@ -665,6 +617,9 @@ export class SalesOrderFormComponent {
         e.editorOptions.showSpinButtons = false;
       }
     }
+
+    const rowKey = e.row?.key;
+    const grid = e.component;
 
     // Only process data rows
     if (e.parentType !== 'dataRow') return;
@@ -710,8 +665,10 @@ export class SalesOrderFormComponent {
     // ITEM dropdown
     if (e.dataField === 'ITEM') {
       e.editorOptions.dropDownOptions = { height: 300 };
+      e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
+        grid.cellValue(rowKey, 'ITEM', args.value);
         this.onItemValueChanged(args);
       };
     }
@@ -720,8 +677,10 @@ export class SalesOrderFormComponent {
     if (e.dataField === 'TYPE') {
       e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.dataSource = e.row.data.typeList || this.typeList || [];
+      e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
+        grid.cellValue(rowKey, 'TYPE', args.value);
         this.onTypeValueChanged(args);
       };
     }
@@ -730,8 +689,10 @@ export class SalesOrderFormComponent {
     if (e.dataField === 'CATEGORY') {
       e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.dataSource = e.row.data.catList || this.catList || [];
+      e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
+        grid.cellValue(rowKey, 'CATEGORY', args.value);
         this.onCategoryValueChanged(args);
       };
     }
@@ -740,8 +701,12 @@ export class SalesOrderFormComponent {
     if (e.dataField === 'ARTNO') {
       e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.dataSource = e.row.data.artNoList || this.artNoList || [];
+      e.editorOptions.valueExpr = 'ARTICLE_ID'; // 👈 added
+      e.editorOptions.displayExpr = 'DESCRIPTION'; // 👈 added
+      e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
+        grid.cellValue(rowKey, 'ARTNO', args.value);
         this.onArtNoValueChanged(args);
       };
     }
@@ -749,8 +714,10 @@ export class SalesOrderFormComponent {
     // COLOR dropdown
     if (e.dataField === 'COLOR') {
       e.editorOptions.dropDownOptions = { height: 300 };
+      e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
+        grid.cellValue(rowKey, 'COLOR', args.value);
         this.onColorValueChanged(args);
       };
     }
@@ -758,12 +725,38 @@ export class SalesOrderFormComponent {
     // PACKING dropdown
     if (e.dataField === 'PACKING') {
       e.editorOptions.dropDownOptions = { height: 300 };
+      e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
+        grid.cellValue(rowKey, 'PACKING', args.value);
         this.onPackingValueChanged(args);
       };
     }
   }
+  itemCellTemplate = (container: any, options: any) => {
+    // Show the value from the data row
+    container.textContent = options.data.ITEM || '';
+  };
+  typeCellTemplate = (container: any, options: any) => {
+    // Show the value from the data row
+    container.textContent = options.data.TYPE || '';
+  };
+  categoryCellTemplate = (container: any, options: any) => {
+    // Show the value from the data row
+    container.textContent = options.data.CATEGORY || '';
+  };
+  artNoCellTemplate = (container: any, options: any) => {
+    // Show the value from the data row
+    container.textContent = options.data.ARTNO || '';
+  };
+  colorCellTemplate = (container: any, options: any) => {
+    // Show the value from the data row
+    container.textContent = options.data.COLOR || '';
+  };
+  packingCellTemplate = (container: any, options: any) => {
+    // Show the value from the data row
+    container.textContent = options.data.PACKING || '';
+  };
 
   prepareCutsizeValues(packingText: string) {
     // Try to extract range like "10X15"
@@ -820,24 +813,94 @@ export class SalesOrderFormComponent {
     this.cdr.detectChanges(); // ✅ force UI update if using OnPush
   }
 
-  checkTotal(e: any) {
-    this.cutsizeGrid.instance.saveEditData();
+  onCustSizeEditorPreparing(e: any) {
+    if (e.dataField === 'quantity') {
+      e.editorOptions = e.editorOptions || {};
 
-    const total = this.cutsizeValues.reduce(
-      (sum, item) => sum + Number(item.value || 0),
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+    }
+    if (e.dataField === 'quantity' && e.parentType === 'dataRow') {
+      e.editorOptions.onValueChanged = (args: any) => {
+        e.setValue(args.value);
+
+        const grid = e.component;
+        const allData = grid.getVisibleRows().map((row: any) => row.data);
+
+        const total = allData.reduce(
+          (sum: number, row: any) => sum + (Number(row.quantity) || 0),
+          0
+        );
+
+        this.totalQty = total;
+
+        // ✅ Validation logic
+        if (this.totalQty < this.totalRequiredQty) {
+          this.isTotalQtyValid = false;
+          this.validationMessage =
+            '⚠️ Total Qty is less than Total Required Qty.';
+        } else if (this.totalQty > this.totalRequiredQty) {
+          this.isTotalQtyValid = false;
+          this.validationMessage =
+            '⚠️ Total Qty is greater than Total Required Qty.';
+        } else {
+          this.isTotalQtyValid = true;
+          this.validationMessage = '';
+        }
+
+        // ✅ Force UI refresh so the validation message updates immediately
+        this.cdr.detectChanges();
+
+        console.log('Total Quantity:', this.totalQty);
+      };
+    }
+  }
+
+  onCellValueChanged(e: any) {
+    if (e.column.dataField === 'quantity') {
+      // Update the actual array value manually
+      const rowIndex = e.row.rowIndex;
+      this.cutsizeValues[rowIndex].quantity = e.value;
+
+      // Now recalculate total
+      this.updateTotalQty();
+    }
+  }
+
+  updateTotalQty() {
+    this.totalQty = this.cutsizeValues.reduce(
+      (sum, item) => sum + (Number(item.quantity) || 0),
       0
     );
 
-    if (total > 30) {
-      this.totalErrorMessage = '❌ Total must not exceed 30.';
-      e.data[e.column.dataField] = e.oldValue;
-      e.component.refresh(true);
-    } else if (total < 30) {
-      this.totalErrorMessage = `⚠️ Current total is ${total}. Must be exactly 30.`;
-    } else {
-      this.totalErrorMessage = ''; // ✅ valid
-    }
+    console.log('Total Quantity:', this.totalQty);
   }
+
+  validateTotalQty = (): boolean => {
+    return this.totalQty === this.totalRequiredQty;
+  };
 
   saveCutsizeDetails() {
     const total = this.cutsizeValues.reduce(
@@ -853,15 +916,6 @@ export class SalesOrderFormComponent {
     console.log('✅ Saved Cutsize Values:', this.cutsizeValues);
     this.isCutsizePopupVisible = false;
   }
-
-  validateTotal = (e: any) => {
-    const totalWithoutCurrent = this.cutsizeValues
-      .filter((item) => item !== e.data)
-      .reduce((sum, item) => sum + Number(item.value || 0), 0);
-
-    const newTotal = totalWithoutCurrent + Number(e.value || 0);
-    return newTotal <= 30; // ✅ valid only if total ≤ 30
-  };
 
   addNewRow() {
     this.dataGrid.instance.addRow();
@@ -1062,28 +1116,21 @@ export class SalesOrderFormComponent {
     );
   }
 
+  calculateTotalQuantity(): number {
+    return this.salesOrderFormData.Details.reduce(
+      (sum: number, item: any) => sum + (Number(item.QTY) || 0),
+      0
+    );
+  }
+
   cancel() {
     this.popupClosed.emit();
   }
 
   saveSalesOrder() {
-    const phoneValid = this.phoneValidation({
-      value: this.salesOrderFormData.CONTACT_PHONE,
-      rule: {},
-    });
-    if (!phoneValid) {
-      notify('Invalid phone number.', 'warning', 3000);
-      return;
-    }
-
-    const emailValid = this.isEmailValid(this.salesOrderFormData.CONTACT_EMAIL);
-    if (!emailValid) {
-      notify('Invalid email address.', 'warning', 3000);
-      return;
-    }
-    // 2. Business validations
+    // Validate
     if (!this.salesOrderFormData.CUST_ID) {
-      notify('Please select a customer.', 'warning', 3000);
+      notify('Please select a Dealer before saving.', 'warning', 2000);
       return;
     }
 
@@ -1091,123 +1138,81 @@ export class SalesOrderFormComponent {
       !this.salesOrderFormData.Details ||
       this.salesOrderFormData.Details.length === 0
     ) {
+      notify('Please add at least one item to the order.', 'warning', 2000);
+      return;
+    }
+
+    // Filter out empty or partially empty rows
+    const validDetails = this.salesOrderFormData.Details.filter((d: any) => {
+      // Keep only rows that have at least one meaningful field filled
+      const hasValues =
+        d.ITEM ||
+        d.TYPE ||
+        d.CATEGORY ||
+        d.ARTNO ||
+        d.COLOR ||
+        (d.QTY && Number(d.QTY) > 0);
+
+      return hasValues;
+    });
+
+    if (validDetails.length === 0) {
       notify(
-        'Please add at least one item to the sales order.',
+        'Please add at least one valid item before saving.',
         'warning',
-        3000
+        2000
       );
       return;
     }
 
-    // 3. Prepare payload
+    // Calculate total qty safely
+    const totalQty = validDetails.reduce(
+      (sum: number, d: any) => sum + (Number(d.QTY) || 0),
+      0
+    );
+
+    // Build payload
     const payload = {
-      ...this.salesOrderFormData,
-      QTN_ID: this.salesOrderFormData.QTN_ID,
-      SO_DATE: this.salesOrderFormData.SO_DATE
-        ? new Date(this.salesOrderFormData.SO_DATE).toISOString().split('T')[0] // overwrite with YYYY-MM-DD
-        : null,
-      COMPANY_ID: this.companyID,
-      FIN_ID: this.finID,
-      STORE_ID: this.storeFromSession,
-      USER_ID: this.userID,
+      COMPANY_ID: this.salesOrderFormData.COMPANY_ID,
+      FIN_ID: this.salesOrderFormData.FIN_ID,
+      STORE_ID: this.salesOrderFormData.STORE_ID,
+      SO_DATE: this.salesOrderFormData.SO_DATE,
+      CUST_ID: this.salesOrderFormData.CUST_ID,
+      USER_ID: this.salesOrderFormData.USER_ID,
+      REMARKS: this.salesOrderFormData.REMARKS,
+      DELIVERY_ADDRESS: this.salesOrderFormData.DELIVERY_ADDRESS,
+      WAREHOUSE: this.salesOrderFormData.WAREHOUSE,
+      TOTAL_QTY: totalQty,
+      Details: validDetails.map((d: any) => ({
+        PACKING: d.PACKING || 0,
+        BRAND_ID: d.ITEM || 0,
+        ARTICLE_TYPE: d.TYPE || 0,
+        CATEGORY: d.CATEGORY || 0,
+        ART_NO: d.ARTNO || 0,
+        COLOR: d.COLOR || 0,
+        QUANTITY: d.QTY || 0,
+      })),
     };
 
-    console.log('Sales Order Payload:', payload);
+    console.log('Final payload before saving:', payload);
 
-    // 4. Choose API based on mode
-    let apiCall;
-    if (this.isApproved) {
-      confirm(
-        'Are you sure you want to approve this Sales Order?',
-        'Confirm Approval'
-      ).then((dialogResult) => {
-        if (dialogResult) {
-          apiCall = this.dataService.approveSalesOrder(payload);
-          apiCall.subscribe({
-            next: (res: any) => {
-              if (res && res.Flag === '1') {
-                notify(
-                  res.Message || 'Sales Order approved successfully.',
-                  'success',
-                  3000
-                );
-                this.popupClosed.emit();
-                this.getSalesOrderNo();
-              } else {
-                notify(
-                  res?.Message || 'Failed to approve Sales Order.',
-                  'error',
-                  3000
-                );
-              }
-            },
-            error: (err) => {
-              console.error('Approve error:', err);
-              notify(
-                'Error approving Sales Order. Please try again.',
-                'error',
-                3000
-              );
-            },
-          });
-        }
-      });
-    } else if (this.isEditing) {
-      apiCall = this.dataService.updateSalesOrder(payload);
-    } else {
-      apiCall = this.dataService.saveSalesOrder(payload);
-    }
-
-    // 5. Call backend
-    apiCall.subscribe({
-      next: (res: any) => {
-        if (res && res.Flag === '1') {
-          notify(
-            res.Message || 'Sales Order processed successfully.',
-            'success',
-            3000
-          );
+    // Save
+    this.dataService.saveSalesOrder(payload).subscribe({
+      next: (response: any) => {
+        if (response.Flag === '1') {
+          notify('Sales Order saved successfully!', 'success', 2000);
           this.popupClosed.emit();
-          this.getSalesOrderNo();
-          // reset if new save
-          if (!this.isEditing && !this.isApproved) {
-            this.salesOrderFormData = {
-              ID: 0,
-              COMPANY_ID: this.companyID,
-              FIN_ID: this.finID,
-              STORE_ID: this.storeFromSession,
-              SO_NO: '',
-              SO_DATE: this.salesOrderFormData.SO_DATE
-                ? new Date(this.salesOrderFormData.SO_DATE)
-                    .toISOString()
-                    .split('T')[0] // <-- only "2025-09-27"
-                : null,
-              CUST_ID: 0,
-              SALESMAN_ID: 0,
-              CONTACT_NAME: '',
-              CONTACT_PHONE: '',
-              CONTACT_EMAIL: '',
-              QTN_ID: 0,
-              REF_NO: '',
-              PAY_TERM_ID: 1,
-              DELIVERY_TERM_ID: 1,
-              GROSS_AMOUNT: 0,
-              CHARGE_DESCRIPTION: '',
-              CHARGE_AMOUNT: 0,
-              NET_AMOUNT: 0,
-              TRANS_ID: 0,
-              USER_ID: this.userID,
-              NARRATION: '',
-              Details: [],
-            };
-          }
         } else {
-          notify(res?.Message || 'Failed to save Sales Order.', 'error', 3000);
+          notify(
+            response.Message || 'Failed to save Sales Order.',
+            'error',
+            2000
+          );
         }
       },
       error: (err) => {
-        console.error('Save error:', err);
-        notify('Error saving Sales Order. Please try again.', 'error', 3000);
+        console.error('Save failed:', err);
+        notify('Error saving Sales Order. Please try again.', 'error', 2000);
       },
     });
   }

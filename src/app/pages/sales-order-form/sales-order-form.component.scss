@@ -230,12 +230,31 @@
   text-align: left;
   padding: 4px 6px;
 }
+.cutsize-popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* adds vertical spacing between all blocks */
+  padding-bottom: 10px;
+}
+
 .cutsize-popup-footer {
   display: flex;
-  justify-content: flex-end; /* aligns to right */
-  margin-top: 10px; /* optional spacing from grid */
-  padding: 0 10px 10px 0; /* optional padding */
+  justify-content: space-between;
+  padding: 0 10px;
 }
+
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 10px 10px;
+}
+
 .summary-error {
   text-align: right;
   color: red;
