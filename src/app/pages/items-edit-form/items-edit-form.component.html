@@ -271,7 +271,7 @@
               <dxi-item *ngIf="itemData.IS_DIFFERENT_UOM_PURCH">
                 <dx-select-box
                   label="Option"
-                  [(value)]="itemData.UOM_PURCH"
+                  [(value)]="selectedData"
                   [items]="filteredUOMs"
                   displayExpr="DESCRIPTION"
                   valueExpr="DESCRIPTION"

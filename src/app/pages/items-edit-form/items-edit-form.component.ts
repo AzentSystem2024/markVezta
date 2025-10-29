@@ -300,7 +300,7 @@ export class ItemsEditFormComponent implements OnInit {
         IS_CONSIGNMENT: false,
         CURRENCY: '',
       },
-    ],
+    ], 
     ITEM_COMPONENTS: [
       {
         COMPONENT_ITEM_ID: '',
@@ -761,6 +761,7 @@ export class ItemsEditFormComponent implements OnInit {
       item_stores: this.Edit_Store || this.itemData.item_stores,
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
+      UOM_PURCH: this.selectedData
     };
     console.log(payload, 'PAYLOAD');
     // Call the service to update the items

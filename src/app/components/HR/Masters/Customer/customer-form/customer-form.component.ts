@@ -26,6 +26,11 @@ import { AuthService, DataService } from 'src/app/services';
 export class CustomerFormComponent {
   CountryDropdownData: any;
   VATRuleDropdownData: any[] = [];
+  Warehouse: any[] = [];
+  selectedWarehouseId: any[] = [];
+   WarehouseId: any;
+   DeliveryAddressId:any
+   DeliveryAddress:any[]=[];
   PaymentTermsDropdownData: any;
   PriceLevelDropdownData: any[] = [];
   StateDropdownData: any[] = [];
@@ -64,6 +69,8 @@ export class CustomerFormComponent {
     CUST_VAT_RULE_ID: '',
     VAT_REGNO: '',
     CUSTOMER_TYPE: 0,
+    WAREHOUSE_ID:'',
+    DELIVERY_ADDRESS_ID:''
   };
   // selected_Company_id: any;
   selected_fin_id: any;
@@ -135,6 +142,27 @@ export class CustomerFormComponent {
     });
   }
 
+   get_Warehouse_Dropdown_List() {
+    this.service.get_Warehouse_Dropdown_Api().subscribe((response: any) => {
+      this.Warehouse = response;
+    });
+  }
+    onWarehouseValue(event: any) {
+    this.selectedWarehouseId = event.value;
+    this.WarehouseId = event.value;
+    this.get_Warehouse_Dropdown_List();
+  }
+
+    get_DeliveryAddress_Dropdown_List() {
+    this.service.get_DeliveryAddress_Dropdown_Api().subscribe((response: any) => {
+      this.DeliveryAddress = response;
+    });
+  }
+    onDeliveryAddressValue(event: any) {
+    
+    this.DeliveryAddressId = event.value;
+    this.get_DeliveryAddress_Dropdown_List();
+  }
   getStateDropDown() {
     const id = this.selecte_countyId;
     const payload = {
@@ -167,6 +195,8 @@ export class CustomerFormComponent {
     this.getVATRuleDropDown();
     this.getStateDropDown();
     this.getPriceLevelDropDown();
+    this.get_Warehouse_Dropdown_List();
+    this.get_DeliveryAddress_Dropdown_List();
     this.sesstion_Details();
     console.log('selected company id', this.selected_Company_id);
   }

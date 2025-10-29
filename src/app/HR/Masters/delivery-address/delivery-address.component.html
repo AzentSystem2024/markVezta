@@ -1,0 +1,310 @@
+<div class="view-wrapper list-page">
+<dx-data-grid
+class="grid theme-dependent"
+[dataSource]="Datasource"
+[showBorders]="true"
+[rowAlternationEnabled]="true"
+[showColumnLines]="true"
+rowAlternationInterval="2"
+[allowColumnReordering]="true"
+[allowColumnResizing]="true"
+(onRowRemoved)="delete_Data($event)"
+[height]="'80vh'"
+noDataText=" "
+
+(onEditingStart)="onEditingStart($event)"
+
+>
+
+
+ <dxo-filter-row
+  [visible]="isFilterRowVisible"
+></dxo-filter-row>
+
+
+  <dxo-header-filter [visible]="true">
+    <dxo-search [enabled]="true"></dxo-search>
+  </dxo-header-filter>
+
+ 
+    <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+    
+    <dxo-editing
+      mode="popup"
+
+       [allowUpdating]="canEdit"
+       [allowDeleting]="canDelete"
+      [allowAdding]="true">
+    <dxo-popup title="Update Department" [showTitle]="true" [width]="600" [height]="300"></dxo-popup>
+    </dxo-editing>
+
+
+  <dxo-toolbar>
+    <dxi-item location="before" locateInMenu="never">
+      <div class="grid-header" style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          ">Delivery Address</div>
+    </dxi-item>
+
+        
+<dxi-item
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'filter' : 'filter',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
+
+ <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+  
+ <dxi-item
+      location="after"
+        locateInMenu="auto"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+
+  </dxo-toolbar>
+
+  <!-- This field ID optional .Used for displaying data temp -->
+  <dxi-column dataField="SlNo" [width]="80" caption="Sl.No" [allowFiltering]="false" [allowEditing]="false" alignment="left"  [allowHeaderFiltering]="false"></dxi-column>
+  <dxi-column dataField="ADDRESS1" caption="Address1"></dxi-column>
+
+  <!-- <dxi-column dataField="ADDRESS2" caption="Address2"></dxi-column> -->
+
+  <!-- <dxi-column dataField="COLOR_ENGLISH" caption="Address3"></dxi-column> -->
+  <dxi-column dataField="LOCATION" caption="Location"></dxi-column>
+  <dxi-column dataField="MOBILE" caption="Mobile"></dxi-column>
+  <dxi-column dataField="PHONE" caption="Phone"></dxi-column>
+   <dxi-column
+      dataField="IS_INACTIVE"
+      caption="Status"
+      cellTemplate="statusCellTemplate"
+    ></dxi-column>
+    <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+    </div>
+
+  
+</dx-data-grid>
+</div>
+
+
+<form-popup
+    [(visible)]="AddDeliveryAddressPopup"
+   (save)="addData()"
+    titleText="New Delivery Address">
+
+    <dx-validation-group #formValidationGroup>
+    <dx-form class="plain-styled-form" [formGroup]="formsource" >
+        <dxi-item>
+         <dx-text-box
+         label="Address1"
+         formControlName="Address1"
+         labelMode="floating">
+         <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Address1 is required"
+                  ></dxi-validation-rule> </dx-validator>
+        </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Address2"
+            formControlName="Address2"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Address2 is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Address3"
+            formControlName="Address3"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Address3 is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Location"
+            formControlName="Location"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Location is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Mobile"
+            formControlName="Mobile"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Mobile is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Phone"
+            formControlName="Phone"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Phone is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+    </dx-form>
+    </dx-validation-group>
+</form-popup>
+
+<form-popup
+    [(visible)]="UpdateDeliveryAddressPopup"
+    titleText="Update Delivery Address"
+    (save)="editData()">
+
+    <dx-validation-group #formValidationGroup>
+    <dx-form class="plain-styled-form">
+        <dxi-item>
+         <dx-text-box
+         label="Address1"
+         [(value)]="editingRowData.ADDRESS1"
+         labelMode="floating">
+         <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Address1 is required"
+                  ></dxi-validation-rule> </dx-validator>
+        </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Address2" 
+            [(value)]="editingRowData.ADDRESS2"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Address2 is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+        <dxi-item>
+            <dx-text-box
+            label="Address3" 
+            [(value)]="editingRowData.ADDRESS3"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Address3 is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+         <dxi-item>
+            <dx-text-box
+            label="Location" 
+            [(value)]="editingRowData.LOCATION"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Location is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+         <dxi-item>
+            <dx-text-box
+            label="Mobile"
+            [(value)]="editingRowData.MOBILE"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Mobile is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+         <dxi-item>
+            <dx-text-box
+            label="Phone" 
+            [(value)]="editingRowData.PHONE"
+            labelMode="floating">
+            <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Phone is required"
+                  ></dxi-validation-rule> </dx-validator>
+          </dx-text-box>
+        </dxi-item>
+
+          <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+              <dxi-item class="checkbox-row">
+                <dx-check-box
+                  [(value)]="editingRowData.IS_INACTIVE"
+                  class="mt-2"
+                  [elementAttr]="{ 'aria-label': 'Unchecked' }"
+                  id="checkboxadd"
+                ></dx-check-box>
+                <label for="checboxadd" class="me-3">Inactive</label>
+              </dxi-item>
+              </dxi-item>
+       
+    </dx-form>
+    </dx-validation-group>
+  </form-popup>
+

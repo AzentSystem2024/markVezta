@@ -45,8 +45,15 @@ export class CustomerEditFormComponent {
   countryCode: any;
   isCurrencyAccepted: boolean = true;
   selecte_countyId: any;
+  Warehouse: any[] = [];
+  selectedWarehouseId: any[] = [];
+   WarehouseId: any;
+   DeliveryAddressId:any
+   DeliveryAddress:any[]=[];
 
   formCustomerData = {
+    WAREHOUSE_ID:'',
+    DELIVERY_ADDRESS_ID:'',
     CUST_CODE: '',
     FIRST_NAME: '',
     LAST_NAME: '',
@@ -137,6 +144,27 @@ export class CustomerEditFormComponent {
     });
   }
 
+     get_Warehouse_Dropdown_List() {
+    this.service.get_Warehouse_Dropdown_Api().subscribe((response: any) => {
+      this.Warehouse = response;
+    });
+  }
+    onWarehouseValue(event: any) {
+    this.selectedWarehouseId = event.value;
+    this.WarehouseId = event.value;
+    this.get_Warehouse_Dropdown_List();
+  }
+
+  get_DeliveryAddress_Dropdown_List() {
+    this.service.get_DeliveryAddress_Dropdown_Api().subscribe((response: any) => {
+      this.DeliveryAddress = response;
+    });
+  }
+    onDeliveryAddressValue(event: any) {
+    
+    this.DeliveryAddressId = event.value;
+    this.get_DeliveryAddress_Dropdown_List();
+  }
   getStateDropDown() {
     const id = this.selecte_countyId;
     const payload = {
@@ -172,6 +200,8 @@ export class CustomerEditFormComponent {
     this.getVATRuleDropDown();
     this.getStateDropDown();
     this.getPriceLevelDropDown();
+    this.get_Warehouse_Dropdown_List();
+    this.get_DeliveryAddress_Dropdown_List();
   }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;

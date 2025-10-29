@@ -198,6 +198,7 @@ import { InvoiceDeliveryComponent } from './pages/invoice-delivery/invoice-deliv
 import { PhysicalInventoryComponent } from './pages/physical-inventory/physical-inventory.component';
 import { DeliveryReturnComponent } from './pages/delivery-return/delivery-return.component';
 import { ArticleProductionViewModule } from './components/HR/Masters/article-production-view/article-production-view.component';
+import { DeliveryAddressComponent } from './HR/Masters/delivery-address/delivery-address.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -828,7 +829,11 @@ const routes: Routes = [
         component: DeliveryReturnComponent,
         canActivate: [AuthGuardService],
       },
-
+      {
+        path: 'delivery-address',
+        component: DeliveryAddressComponent,
+        canActivate: [AuthGuardService],
+      },
 
       {
         path: '**',

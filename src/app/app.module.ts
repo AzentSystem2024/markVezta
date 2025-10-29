@@ -879,6 +879,7 @@ import {
   DeliveryReturnEditComponent,
   DeliveryReturnEditModule,
 } from './pages/delivery-return-edit/delivery-return-edit.component';
+import { DeliveryAddressComponent, DeliveryAddressModule } from './HR/Masters/delivery-address/delivery-address.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -886,7 +887,7 @@ import {
 // import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1212,6 +1213,7 @@ import {
     DeliveryReturnModule,
     DeliveryReturnAddModule,
     DeliveryReturnEditModule,
+    DeliveryAddressModule,
   ],
   providers: [
     AuthService,
