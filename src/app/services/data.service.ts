@@ -493,16 +493,26 @@ export class DataService {
   }
 
   //........................................SALES-ORDER............................................//
-  getSalesGridColumnList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Salesorder/list-items`, {});
+  getItemsColumnList(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/getitem`, {});
+  }
+  getTypeList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/gettype`, data);
   }
   getCatList(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}Salesorder/catlist`, data);
+    return this.http.post(`${this.apiUrl}Salesorder/getcategory`, data);
   }
   getCatColorList(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}Salesorder/catcolor`, data);
+    return this.http.post(`${this.apiUrl}Salesorder/getcolor`, data);
   }
 
+  getArtNoList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/getartno`, data);
+  }
+
+  getPackings(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/getPacking`, data);
+  }
   getCatSizeList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Salesorder/catsize`, data);
   }
@@ -512,6 +522,10 @@ export class DataService {
 
   getQuotationListForSalesOrder(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}SalesOrder/listQuotation`, data);
+  }
+
+  getDealerDropdown(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Customer/dropdownlist`, data);
   }
 
   saveSalesOrder(items: any) {
