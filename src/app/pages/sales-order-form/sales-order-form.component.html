@@ -50,7 +50,7 @@
 
                 <div style="margin-top: -6px; display: flex; gap: 10px">
                   <dx-select-box
-                    [(value)]="salesOrderFormData.DEALER_ID"
+                    [(value)]="salesOrderFormData.CUST_ID"
                     [dataSource]="dealerList"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
@@ -71,10 +71,10 @@
                 <div style="display: flex; align-items: center; gap: 5px">
                   <!-- Reference No -->
                   <dx-select-box
-                    [(value)]="salesOrderFormData.SALESMAN_ID"
+                    [(value)]="salesOrderFormData.DELIVERY_ADDRESS"
                     [dataSource]="deliveryAddress"
                     displayExpr="DELIVERYADDRESS"
-                    valueExpr="ID"
+                    valueExpr="Id"
                     [width]="'100%'"
                     [searchEnabled]="true"
                     label="Delivery Address"
@@ -215,7 +215,7 @@
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: artNoList,
-              valueExpr: 'DESCRIPTION',
+              valueExpr: 'ARTICLE_ID',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
@@ -234,6 +234,7 @@
               showScrollbar: 'always',
               virtualScrollingEnabled: true
             }"
+            [cellTemplate]="artNoCellTemplate"
           ></dxi-column>
           <dxi-column
             dataField="COLOR"
@@ -242,7 +243,7 @@
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: colorList,
-              valueExpr: 'DESCRIPTION',
+              valueExpr: 'ARTICLE_ID',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
@@ -261,6 +262,7 @@
               showScrollbar: 'always',
               virtualScrollingEnabled: true
             }"
+            [cellTemplate]="colorCellTemplate"
           ></dxi-column>
 
           <dxi-column
@@ -289,6 +291,7 @@
               showScrollbar: 'always',
               virtualScrollingEnabled: true
             }"
+            [cellTemplate]="packingCellTemplate"
           ></dxi-column>
 
           <dxi-column
@@ -320,7 +323,7 @@
             <div class="net-amount-wrapper"></div>
             <div class="net-amount-wrapper">
               <dx-text-box
-                [(value)]="salesOrderFormData.NARRATION"
+                [(value)]="salesOrderFormData.REMARKS"
                 label="Remarks"
                 labelMode="floating"
                 [width]="405"
@@ -365,7 +368,9 @@
 <!-- CUTSIZE POPUP -->
 <dx-popup
   [(visible)]="isCutsizePopupVisible"
-  [width]="'35%'"
+  [width]="'30%'"
+  [height]="'60vh'"
+  [maxHeight]="800"
   title="Cutsize Details"
 >
   <dx-data-grid
@@ -377,31 +382,32 @@
     [rowAlternationEnabled]="true"
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
-    [height]="'55vh'"
+    [height]="'auto'"
     [columnResizingMode]="'nextColumn'"
     [scrolling]="{ mode: 'virtual' }"
     rowAlternationInterval="2"
     [selection]="{ mode: 'single' }"
-    (onCellValueChanged)="checkTotal($event)"
+    (onCellValueChanged)="onCellValueChanged($event)"
     [editing]="{
       mode: 'cell',
-      allowAdding: true,
       allowUpdating: true,
       allowDeleting: false
     }"
+    (onEditorPreparing)="onCustSizeEditorPreparing($event)"
   >
     <dxi-column
       dataField="size"
       caption="Size"
       [allowEditing]="false"
     ></dxi-column>
-    <dxi-column dataField="value" caption="Value" [allowEditing]="true">
-      <dxi-validation-rule
-        type="custom"
-        [validationCallback]="validateTotal"
-        message="Total must not exceed 30."
-      ></dxi-validation-rule>
+    <dxi-column
+      dataField="quantity"
+      caption="Quantity"
+      [allowEditing]="true"
+      alignment="right"
+    >
     </dxi-column>
+
     <dxo-summary>
       <dxi-total-item
         column="value"
@@ -412,10 +418,40 @@
       ></dxi-total-item>
     </dxo-summary>
   </dx-data-grid>
+
   <div *ngIf="totalErrorMessage" class="summary-error">
     {{ totalErrorMessage }}
   </div>
+
+  <!-- Footer section -->
   <div class="cutsize-popup-footer">
+    <div class="footer-row">
+      <dx-number-box
+        label="Total Required Qty"
+        labelMode="floating"
+        [value]="totalRequiredQty"
+        [readOnly]="true"
+        width="160"
+      ></dx-number-box>
+
+      <dx-number-box
+        label="Total Qty"
+        labelMode="floating"
+        [(value)]="totalQty"
+        [readOnly]="true"
+        width="160"
+        [isValid]="isTotalQtyValid"
+        [validationError]="{ message: validationMessage }"
+      >
+        <!-- <dxi-validation-rule
+          type="custom"
+          [validationCallback]="validateTotalQty"
+          message="❌ Total Qty must match Total Required Qty."
+        ></dxi-validation-rule> -->
+      </dx-number-box>
+    </div>
+  </div>
+  <div class="footer-actions">
     <dx-button
       text="Save"
       type="default"

@@ -103,7 +103,7 @@
       ></dxi-column>
       <dxi-column
         dataField="SO_DATE"
-        caption="Order Date"
+        caption="Date"
         [allowEditing]="false"
         dataType="date"
         width="120"
@@ -112,24 +112,23 @@
       </dxi-column>
 
       <dxi-column
-        dataField="STORE_NAME"
-        caption="Store"
-        [allowEditing]="false"
-      ></dxi-column>
-      <dxi-column
         dataField="CUSTOMER_NAME"
         caption="Customer"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
-        dataField="NET_AMOUNT"
-        caption="Net amount"
+        dataField="DELIVERY_ADDRESS"
+        caption="Delivery Address"
         [allowEditing]="false"
-        format="#,##0.00"
-        width="120"
       ></dxi-column>
       <dxi-column
-        dataField="NARRATION"
+        dataField="TOTAL_QTY"
+        caption="Quantity"
+        [allowEditing]="false"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="REMARKS"
         caption="Narration"
         [allowEditing]="false"
       ></dxi-column>
@@ -143,6 +142,8 @@
           dataSource: getStatusFilterData,
           encodeHtml: false
         }"
+        [fixed]="true"
+        fixedPosition="right"
       >
       </dxi-column>
     </dx-data-grid>

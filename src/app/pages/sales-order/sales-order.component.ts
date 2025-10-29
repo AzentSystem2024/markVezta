@@ -151,7 +151,9 @@ export class SalesOrderComponent {
 
   getsalesOrderList() {
     this.dataService.getSalesOrderMainList().subscribe((response: any) => {
-      this.salesOrderList = response.Data.map((item: any) => {
+      this.salesOrderList = response.Data.sort(
+        (a: any, b: any) => b.ID - a.ID
+      ).map((item: any) => {
         let dateValue: Date;
 
         // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
@@ -167,7 +169,7 @@ export class SalesOrderComponent {
           SO_DATE: dateValue,
         };
       });
-
+      // .sort((a: any, b: any) => b.SO_DATE.getTime() - a.SO_DATE.getTime());
       this.applyDateFilter();
     });
   }
