@@ -5699,4 +5699,57 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(`${this.apiUrl}Delivery_Return/approve`, payload);
   }
+
+  //==============DELIVERY ADDRESS================
+    get_DeliveryAddress_Api() {
+    const getEndpoint = this.apiUrl + 'CustomerAddress/list';
+    return this.http.post(getEndpoint, {});
+  }
+
+  Insert_DeliveryAddress_Api(payload) {
+    const getEndpoint = this.apiUrl + 'CustomerAddress/save';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  Select_DeliveryAddress_Api(ID: any) {
+    const getEndpoint = this.apiUrl + `CustomerAddress/select/${ID}`;
+    return this.http.post(getEndpoint, {});
+  }
+
+  Update_DeliveryAddress_Api(
+    Id: any,
+    address1: any,
+    address2: any,
+    address3: any,
+    location: any,
+    mobile: any,
+    phone: any,
+    isinactive:any
+  ) {
+    const getEndpoint = this.apiUrl + 'CustomerAddress/Update';
+    const reqBody = {
+      ID: Id,
+      ADDRESS1: address1,
+      ADDRESS2: address2,
+      ADDRESS3: address3,
+      LOCATION: location,
+      MOBILE: mobile,
+      PHONE: phone,
+      IS_INACTIVE: isinactive
+    };
+    return this.http.post(getEndpoint, reqBody);
+  }
+
+  Delete_DeliveryAddress_Api(ID: any) {
+    const getEndpoint = this.apiUrl + `CustomerAddress/delete/${ID}`;
+    return this.http.post(getEndpoint, {});
+  }
+
+  //=========DELIVERY ADDRESS DROPDOWN=============
+   get_DeliveryAddress_Dropdown_Api() {
+    const reqbody = {
+      NAME: 'DELIVERY_ADDRESS',
+    };
+    return this.http.post(`${this.apiUrl}dropdown`, reqbody);
+  }
 }

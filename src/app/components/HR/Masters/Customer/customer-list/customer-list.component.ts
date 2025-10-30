@@ -80,6 +80,8 @@ export class CustomerListComponent {
   dob = new Date();
 
   formCustomerData = {
+    WAREHOUSE_ID:'',
+    DELIVERY_ADDRESS_ID:'',
     COMPANY_ID: 0,
     CUST_CODE: '',
     FIRST_NAME: '',
@@ -161,6 +163,8 @@ export class CustomerListComponent {
     this.sesstion_Details();
 
     this.formCustomerData = {
+      WAREHOUSE_ID:'',
+      DELIVERY_ADDRESS_ID:'',
       COMPANY_ID: 0,
       CUST_CODE: '',
       FIRST_NAME: '',
@@ -238,6 +242,8 @@ export class CustomerListComponent {
   }
   onClickSaveCustomer() {
     const {
+      WAREHOUSE_ID,
+      DELIVERY_ADDRESS_ID,
       COMPANY_ID,
       CUST_CODE,
       FIRST_NAME,
