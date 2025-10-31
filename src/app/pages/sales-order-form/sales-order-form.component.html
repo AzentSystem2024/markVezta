@@ -85,20 +85,28 @@
                 <div
                   style="
                     display: flex;
+                    align-items: flex-start;
                     gap: 5px;
                     margin-top: -4px;
-                    align-items: flex-start;
                   "
                 >
-                  <div style="flex: 1">
-                    <dx-text-box
-                      [(value)]="salesOrderFormData.ADDRESS"
-                      label="Address"
-                      labelMode="floating"
-                      [width]="405"
-                      [readOnly]="true"
-                    ></dx-text-box>
-                  </div>
+                  <dx-text-box
+                    [(value)]="salesOrderFormData.ADDRESS"
+                    label="Address"
+                    labelMode="floating"
+                    [width]="405"
+                    [readOnly]="true"
+                  ></dx-text-box>
+
+                  <!-- Plus icon button -->
+                  <dx-button
+                    icon="plus"
+                    stylingMode="outlined"
+                    type="default"
+                    hint="New Row"
+                    [elementAttr]="{ class: 'small-btn' }"
+                    (onClick)="onAddRow()"
+                  ></dx-button>
                 </div>
               </div>
             </dxi-item>
@@ -326,7 +334,7 @@
               <dx-select-box
                 [(value)]="salesOrderFormData.WAREHOUSE"
                 [dataSource]="warehouse"
-                displayExpr="DESCRIPTION"
+                displayExpr="WAREHOUSE_NAME"
                 valueExpr="ID"
                 [width]="405"
                 [searchEnabled]="true"
@@ -386,6 +394,7 @@
   [height]="'60vh'"
   [maxHeight]="800"
   title="Cutsize Details"
+  (onHiding)="onCutsizePopupHiding($event)"
 >
   <dx-data-grid
     #cutsizeGrid

@@ -528,6 +528,12 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Customer/dropdownlist`, data);
   }
 
+  getPairQty(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/getpair`, data);
+  }
+  getWarehouse(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/getwarehouse`, data);
+  }
   saveSalesOrder(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}SalesOrder/save`, data);
@@ -5701,7 +5707,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //==============DELIVERY ADDRESS================
-    get_DeliveryAddress_Api() {
+  get_DeliveryAddress_Api() {
     const getEndpoint = this.apiUrl + 'CustomerAddress/list';
     return this.http.post(getEndpoint, {});
   }
@@ -5724,7 +5730,7 @@ The result can be exported to HTML or Markdown.`;
     location: any,
     mobile: any,
     phone: any,
-    isinactive:any
+    isinactive: any
   ) {
     const getEndpoint = this.apiUrl + 'CustomerAddress/Update';
     const reqBody = {
@@ -5735,7 +5741,7 @@ The result can be exported to HTML or Markdown.`;
       LOCATION: location,
       MOBILE: mobile,
       PHONE: phone,
-      IS_INACTIVE: isinactive
+      IS_INACTIVE: isinactive,
     };
     return this.http.post(getEndpoint, reqBody);
   }
@@ -5746,7 +5752,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=========DELIVERY ADDRESS DROPDOWN=============
-   get_DeliveryAddress_Dropdown_Api() {
+  get_DeliveryAddress_Dropdown_Api() {
     const reqbody = {
       NAME: 'DELIVERY_ADDRESS',
     };

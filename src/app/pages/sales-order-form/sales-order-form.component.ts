@@ -106,6 +106,7 @@ export class SalesOrderFormComponent {
       },
     ],
   };
+  artNoCache: { [categoryId: string]: any[] } = {};
   private suppressCutsizePopup = false;
   quotationList: any;
   sessionData: any;
@@ -152,7 +153,7 @@ export class SalesOrderFormComponent {
   selectedPacking: any;
   showTotals = false;
   showSaveButton = false;
-  totalRequiredQty = 25;
+  totalRequiredQty: any;
   totalQty = 0;
   isTotalQtyValid: boolean;
   validationMessage: string;
@@ -160,6 +161,7 @@ export class SalesOrderFormComponent {
   cutsizePairs: string[] = [];
   contentValue: string;
   cutsizeRowIndex: any;
+  cutsizeRowKey: any;
 
   constructor(
     private dataService: DataService,
@@ -179,7 +181,7 @@ export class SalesOrderFormComponent {
     }
     this.getDealerDropdown();
     this.getSalesOrderNo();
-    this.getWarehouseDropdown();
+    // this.getWarehouseDropdown();
     // always fetch fresh number when popup opens
 
     this.isEditDataAvailable();
@@ -244,6 +246,7 @@ export class SalesOrderFormComponent {
         ...this.salesOrderFormData,
         ...response,
         SO_DATE: response.SO_DATE ? new Date(response.SO_DATE) : new Date(),
+        SO_NO: response.SO_NO,
         Details: mappedDetails,
       };
 
@@ -404,11 +407,18 @@ export class SalesOrderFormComponent {
     });
   }
 
-  onCategoryValueChanged(e: any) {
+  onCategoryValueChanged(e: any, event?: any) {
+    const grid = event?.component;
+    const rowKey = event?.row?.key;
     this.selectedCategory = e.value;
     console.log(this.selectedCategory, 'selectedCategoryyyyyyyyyyyyyyy');
-    // this.selectedArtNo = null;
-    // this.selectedColor = null;
+    if (grid && rowKey != null) {
+      grid.cellValue(rowKey, 'ARTNO', null);
+      grid.cellValue(rowKey, 'COLOR', null);
+      grid.cellValue(rowKey, 'PACKING', null);
+      grid.cellValue(rowKey, 'PAIR_QTY', null);
+      grid.refresh(true);
+    }
 
     const payload = {
       ARTICLE_TYPE: String(this.selectedType),
@@ -421,6 +431,9 @@ export class SalesOrderFormComponent {
       next: (response: any) => {
         this.artNoList = response.Data || [];
         this.isDescriptionLoading = false;
+        if (grid && rowKey != null) {
+          grid.repaint(); // ensures new lookup values are rendered
+        }
       },
       error: () => {
         this.isDescriptionLoading = false;
@@ -428,11 +441,23 @@ export class SalesOrderFormComponent {
     });
   }
 
-  onArtNoValueChanged(e: any) {
+  onArtNoValueChanged(e: any, event?: any) {
+    const grid = event?.component;
+    const rowKey = event?.row?.key;
     this.selectedArtNo = e.value;
     console.log(this.selectedArtNo, 'selecteddescription');
     // this.selectedColor = null;
+    if (grid && rowKey != null) {
+      // Clear dependent cells (COLOR, PACKING, PAIR_QTY)
+      grid.cellValue(rowKey, 'COLOR', null);
+      grid.cellValue(rowKey, 'PACKING', null);
+      grid.cellValue(rowKey, 'PAIR_QTY', null);
 
+      // Force the row update to refresh editors
+      grid.refresh(true);
+    }
+
+    this.colorList = [];
     const payload = {
       ARTICLE_TYPE: String(this.selectedType),
       CATEGORY_ID: String(this.selectedCategory),
@@ -452,10 +477,17 @@ export class SalesOrderFormComponent {
     });
   }
 
-  onColorValueChanged(e: any) {
+  onColorValueChanged(e: any, event?: any) {
+    const grid = event?.component; // Reference to dx-data-grid
+    const rowKey = event?.row?.key;
     this.selectedColor = e.value;
     console.log(this.selectedColor, 'selecteddescription');
+    if (grid && rowKey != null) {
+      grid.cellValue(rowKey, 'PACKING', null); // clear packing cell
+      grid.cellValue(rowKey, 'PAIR_QTY', null); // optional: clear dependent quantity
+    }
 
+    this.packingList = [];
     const payload = {
       ARTICLE_TYPE: String(this.selectedType),
       CATEGORY_ID: String(this.selectedCategory),
@@ -476,9 +508,11 @@ export class SalesOrderFormComponent {
     });
   }
 
-  onPackingValueChanged(e: any) {
+  onPackingValueChanged(e: any, event: any) {
     this.selectedPacking = e.value;
-
+    const packingID = {
+      PACKING_ID: this.selectedPacking,
+    };
     // Get the selected PACKING description text
     const selectedPackingText = this.packingList.find(
       (p) => p.ARTICLE_ID === e.value
@@ -486,7 +520,15 @@ export class SalesOrderFormComponent {
 
     console.log('Selected Packing:', selectedPackingText);
 
-    // ✅ Check if selected packing contains "CUTSIZE"
+    this.dataService.getPairQty(packingID).subscribe((response: any) => {
+      this.totalRequiredQty = response.Data[0].PAIR_QTY;
+      console.log(' Total Required Qty:', this.totalRequiredQty);
+    });
+    const rowIndex = event.row?.rowIndex;
+    const rowKey = event.row?.key;
+
+    this.cutsizeRowIndex = rowIndex;
+    this.cutsizeRowKey = rowKey;
     if (
       selectedPackingText &&
       selectedPackingText.toUpperCase().includes('CUTSIZE')
@@ -496,37 +538,69 @@ export class SalesOrderFormComponent {
 
       // Show popup
       this.showCutsizePopup();
+    } else {
+      this.isCutsizePopupVisible = false;
     }
 
-    // Your existing logic for API call, etc.
-    const payload = {
-      ARTICLE_TYPE: String(this.selectedType),
-      CATEGORY_ID: String(this.selectedCategory),
-      BRAND_ID: String(this.selectedDescription),
-      ARTNO_ID: String(this.selectedArtNo),
-      COLOR: String(this.selectedColor),
-    };
-    this.isDescriptionLoading = true;
+    // this.isDescriptionLoading = true;
 
     // Example API call if needed
     // this.dataService.getSomething(payload).subscribe(...);
   }
 
   onEditorPreparing(e: any) {
+    const autoHeightFields = [
+      'ITEM',
+      'TYPE',
+      'CATEGORY',
+      'COLOR',
+      'ARTNO',
+      'PACKING',
+    ];
+
+    if (autoHeightFields.includes(e.dataField) && e.parentType === 'dataRow') {
+      e.editorOptions.dropDownOptions = {
+        onContentReady: (args: any) => {
+          const popupContent =
+            args.component?.contentElement?.() || args.component?.content();
+          if (!popupContent) return;
+
+          const listElement = popupContent.querySelector('.dx-list');
+          if (!listElement) return;
+
+          // Calculate list height
+          const totalHeight = listElement.scrollHeight;
+          const maxHeight = 180; // ✅ your preferred max height
+
+          // Apply dynamic height but limit it
+          const finalHeight = Math.min(totalHeight, maxHeight);
+
+          // Apply styles
+          popupContent.style.height = `${finalHeight}px`;
+          popupContent.style.overflowY =
+            totalHeight > maxHeight ? 'auto' : 'visible';
+        },
+      };
+    }
     if (e.dataField === 'CONTENT' && e.parentType === 'dataRow') {
-      e.editorOptions.readOnly = true; // prevent direct edit
+      e.editorOptions.readOnly = true; // prevent typing
 
       e.editorOptions.onFocusIn = () => {
-        if (this.suppressCutsizePopup) {
-          // 👇 Skip opening if popup just closed
-          this.suppressCutsizePopup = false;
+        // Open only if packing contains "CUTSIZE"
+        const selectedPackingText = e.row.data?.PACKING_NAME || ''; // adjust key if needed
+        if (
+          !selectedPackingText ||
+          !selectedPackingText.toUpperCase().includes('CUTSIZE')
+        ) {
+          //  Skip popup if not cutsize
           return;
         }
 
+        //  Otherwise open
         this.cutsizeRowIndex = e.row.rowIndex;
         this.isCutsizePopupVisible = true;
         console.log(
-          '🟢 Cutsize popup opened for row index:',
+          'Cutsize popup opened for row index:',
           this.cutsizeRowIndex
         );
       };
@@ -536,7 +610,10 @@ export class SalesOrderFormComponent {
       e.dataField === 'TYPE' ||
       e.dataField === 'CATEGORY' ||
       e.dataField === 'ARTNO' ||
-      e.dataField === 'COLOR'
+      e.dataField === 'COLOR' ||
+      e.dataField === 'PACKING' ||
+      e.dataField === 'CONTENT' ||
+      e.dataField === 'QTY'
     ) {
       e.editorOptions = e.editorOptions || {};
 
@@ -572,8 +649,8 @@ export class SalesOrderFormComponent {
     if (e.parentType !== 'dataRow') return;
 
     // Default editor height
-    e.editorOptions.height = 30;
-    e.editorOptions.elementAttr = { style: 'height: 30px;' };
+    // e.editorOptions.height = 30;
+    // e.editorOptions.elementAttr = { style: 'height: 30px;' };
 
     // QTY column logic - auto add new empty row
     if (e.dataField === 'QTY') {
@@ -592,10 +669,10 @@ export class SalesOrderFormComponent {
               const dataSource = grid.getDataSource();
               const store = dataSource.store();
 
-              // ✅ Add new empty row without clearing data
+              //Add new empty row without clearing data
               store.push([{ type: 'insert', data: {} }]);
 
-              // ✅ Just refresh grid, don't reload
+              //Just refresh grid, don't reload
               grid.refresh().then(() => {
                 const rows = grid.getVisibleRows();
                 if (rows.length > 0) {
@@ -611,7 +688,7 @@ export class SalesOrderFormComponent {
 
     // ITEM dropdown
     if (e.dataField === 'ITEM') {
-      e.editorOptions.dropDownOptions = { height: 300 };
+      // e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
@@ -622,7 +699,7 @@ export class SalesOrderFormComponent {
 
     // TYPE dropdown
     if (e.dataField === 'TYPE') {
-      e.editorOptions.dropDownOptions = { height: 300 };
+      // e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.dataSource = e.row.data.typeList || this.typeList || [];
       e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
@@ -634,7 +711,7 @@ export class SalesOrderFormComponent {
 
     // CATEGORY dropdown
     if (e.dataField === 'CATEGORY') {
-      e.editorOptions.dropDownOptions = { height: 300 };
+      // e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.dataSource = e.row.data.catList || this.catList || [];
       e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
@@ -646,7 +723,7 @@ export class SalesOrderFormComponent {
 
     // ARTNO dropdown
     if (e.dataField === 'ARTNO') {
-      e.editorOptions.dropDownOptions = { height: 300 };
+      // e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.dataSource = e.row.data.artNoList || this.artNoList || [];
       e.editorOptions.valueExpr = 'ARTICLE_ID'; // 👈 added
       e.editorOptions.displayExpr = 'DESCRIPTION'; // 👈 added
@@ -660,7 +737,7 @@ export class SalesOrderFormComponent {
 
     // COLOR dropdown
     if (e.dataField === 'COLOR') {
-      e.editorOptions.dropDownOptions = { height: 300 };
+      // e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
@@ -671,18 +748,18 @@ export class SalesOrderFormComponent {
 
     // PACKING dropdown
     if (e.dataField === 'PACKING') {
-      e.editorOptions.dropDownOptions = { height: 300 };
+      // e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
         grid.cellValue(rowKey, 'PACKING', args.value);
-        this.onPackingValueChanged(args);
+        this.onPackingValueChanged(args, e);
       };
     }
 
     // SIZE dropdown — capture row index for Cutsize logic
     if (e.dataField === 'SIZE') {
-      e.editorOptions.dropDownOptions = { height: 300 };
+      // e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         // 🔹 Store the row index globally for later update
@@ -710,6 +787,7 @@ export class SalesOrderFormComponent {
     // Show the value from the data row
     container.textContent = options.data.CATEGORY || '';
   };
+
   artNoCellTemplate = (container: any, options: any) => {
     // Show the value from the data row
     container.textContent = options.data.ARTNO || '';
@@ -764,6 +842,15 @@ export class SalesOrderFormComponent {
       }
 
       this.showCutsizePopup();
+    }
+  }
+
+  onCutsizePopupHiding(e: any) {
+    console.log(this.selectedPacking, 'SELECTEDPACKINGGGGGGGGGGGGGGGG');
+    if (this.totalQty === 0) {
+      this.totalErrorMessage = 'Total Qty cannot be 0.';
+    } else {
+      this.totalErrorMessage = ''; // Clear any previous error
     }
   }
 
@@ -826,7 +913,7 @@ export class SalesOrderFormComponent {
       }
     }
 
-    // ✅ Validation logic refinement — other logic untouched
+    // Validation logic refinement — other logic untouched
     if (e.dataField === 'quantity' && e.parentType === 'dataRow') {
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
@@ -841,22 +928,22 @@ export class SalesOrderFormComponent {
 
         this.totalQty = total;
 
-        // ✅ Updated validation logic
+        //  Updated validation logic
         if (this.totalQty !== this.totalRequiredQty) {
           this.isTotalQtyValid = false;
           if (this.totalQty < this.totalRequiredQty) {
             this.validationMessage =
-              '⚠️ Total Qty is less than Total Required Qty.';
+              ' Total Qty is less than Total Required Qty.';
           } else {
             this.validationMessage =
-              '⚠️ Total Qty is greater than Total Required Qty.';
+              ' Total Qty is greater than Total Required Qty.';
           }
         } else {
           this.isTotalQtyValid = true;
           this.validationMessage = '';
         }
 
-        // ✅ Force UI refresh so the validation message updates immediately
+        //  Force UI refresh so the validation message updates immediately
         this.cdr.detectChanges();
 
         console.log('Total Quantity:', this.totalQty);
@@ -885,44 +972,98 @@ export class SalesOrderFormComponent {
   }
 
   saveCutsizeDetails() {
-    // ✅ 1. Validate quantities
+    // Validate total quantity
     if (this.totalQty !== this.totalRequiredQty) {
       this.totalErrorMessage = '⚠️ Total Qty must match Total Required Qty.';
       console.warn(this.totalErrorMessage);
       return;
     }
 
-    // ✅ 2. Build the pair string like "6*10, 7*5, 8*5, 9*5"
+    // Filter and build new content string cleanly
     const pairs = this.cutsizeValues
-      .filter((r: any) => r.size && r.quantity != null)
+      .filter((r: any) => r.size && r.quantity != null && r.quantity !== '')
       .map((r: any) => `${r.size}*${r.quantity}`);
 
-    const contentValue = pairs.join(', ');
-    console.log('✅ Content to insert:', contentValue);
+    const newContent = pairs.join(', ');
+    console.log('🧾 New cutsize content:', newContent);
 
-    // ✅ 3. Update CONTENT column of the current grid row
+    // 3️⃣ Update the grid row cleanly
     if (this.cutsizeRowIndex !== null && this.cutsizeRowIndex >= 0) {
-      this.itemsGridRef.instance.cellValue(
-        this.cutsizeRowIndex,
-        'CONTENT',
-        contentValue
-      );
+      const grid = this.itemsGridRef.instance;
+      const visibleRows = grid.getVisibleRows();
+      const rowData = visibleRows[this.cutsizeRowIndex]?.data;
 
-      // Optional: also update quantity or any other related field
-      // this.itemsGridRef.instance.cellValue(this.cutsizeRowIndex, 'QUANTITY', this.totalQty);
+      if (rowData) {
+        //  Step 1: Reset previous content completely
+        rowData.CONTENT = '';
 
-      // this.itemsGridRef.instance.refresh();
-      console.log(
-        `🟢 CONTENT updated in row ${this.cutsizeRowIndex}:`,
-        contentValue
-      );
+        // 🆕 Step 2: Apply only new clean string
+        rowData.CONTENT = newContent;
+
+        //  Step 3: Push the updated object back to the grid store
+        const rowKey = grid.keyOf(rowData); // ✅ get the correct row key
+        grid
+          .getDataSource()
+          .store()
+          .push([{ type: 'update', key: rowKey, data: rowData }]);
+
+        //  Step 4: Refresh visible grid to reflect changes
+        grid.refresh();
+
+        console.log(
+          `CONTENT updated at row ${this.cutsizeRowIndex}:`,
+          rowData.CONTENT
+        );
+      } else {
+        console.warn('Row data not found for Cutsize update.');
+      }
     } else {
-      console.warn('⚠️ No valid row index stored for Cutsize update.');
+      console.warn('No valid Cutsize row index found.');
     }
 
-    // ✅ 4. Close popup
+    // Close popup
     this.isCutsizePopupVisible = false;
   }
+
+  // saveCutsizeDetails() {
+  //   // ✅ 1. Validate quantities
+  //   if (this.totalQty !== this.totalRequiredQty) {
+  //     this.totalErrorMessage = '⚠️ Total Qty must match Total Required Qty.';
+  //     console.warn(this.totalErrorMessage);
+  //     return;
+  //   }
+
+  //   // ✅ 2. Build the pair string like "6*10, 7*5, 8*5, 9*5"
+  //   const pairs = this.cutsizeValues
+  //     .filter((r: any) => r.size && r.quantity != null)
+  //     .map((r: any) => `${r.size}*${r.quantity}`);
+
+  //   const contentValue = pairs.join(', ');
+  //   console.log('✅ Content to insert:', contentValue);
+
+  //   // ✅ 3. Update CONTENT column of the current grid row
+  //   if (this.cutsizeRowIndex !== null && this.cutsizeRowIndex >= 0) {
+  //     this.itemsGridRef.instance.cellValue(
+  //       this.cutsizeRowIndex,
+  //       'CONTENT',
+  //       contentValue
+  //     );
+
+  //     // Optional: also update quantity or any other related field
+  //     // this.itemsGridRef.instance.cellValue(this.cutsizeRowIndex, 'QUANTITY', this.totalQty);
+
+  //     // this.itemsGridRef.instance.refresh();
+  //     console.log(
+  //       `🟢 CONTENT updated in row ${this.cutsizeRowIndex}:`,
+  //       contentValue
+  //     );
+  //   } else {
+  //     console.warn('⚠️ No valid row index stored for Cutsize update.');
+  //   }
+
+  //   // ✅ 4. Close popup
+  //   this.isCutsizePopupVisible = false;
+  // }
 
   addNewRow() {
     this.dataGrid.instance.addRow();
@@ -936,11 +1077,11 @@ export class SalesOrderFormComponent {
     });
   }
 
-  getWarehouseDropdown() {
-    this.dataService.getDropdownData('WAREHOUSE').subscribe((response: any) => {
-      this.warehouse = response;
-    });
-  }
+  // getWarehouseDropdown() {
+  //   this.dataService.getDropdownData('WAREHOUSE').subscribe((response: any) => {
+  //     this.warehouse = response;
+  //   });
+  // }
 
   getDealerDropdown() {
     this.dataService.getDropdownData('DEALER').subscribe((response: any) => {
@@ -954,17 +1095,44 @@ export class SalesOrderFormComponent {
 
     if (selectedDealerId) {
       this.getDeliveryAddressDropdown(selectedDealerId);
+      this.getWarehouseList(selectedDealerId);
     }
   }
-
+  getWarehouseList(dealerId: number) {
+    const payload = {
+      CUST_ID: dealerId,
+    };
+    this.dataService.getWarehouse(payload).subscribe((response: any) => {
+      this.warehouse = response.Data;
+      if (this.warehouse.length > 0) {
+        this.salesOrderFormData.WAREHOUSE = this.warehouse[0].ID;
+      } else {
+        // Clear if no data found
+        this.salesOrderFormData.WAREHOUSE = null;
+      }
+    });
+  }
   getDeliveryAddressDropdown(dealerId: number) {
     const payload = {
       CUST_ID: dealerId,
     };
+
     this.dataService.getDealerDropdown(payload).subscribe((response: any) => {
-      this.deliveryAddress = response;
-      if (!this.deliveryAddress.length) {
-        this.salesOrderFormData.DELIVERY_ADDRESS_ID = null;
+      this.deliveryAddress = response || [];
+
+      if (this.deliveryAddress.length > 0) {
+        // Automatically bind first delivery address
+        const firstAddress = this.deliveryAddress[0];
+        this.salesOrderFormData.DELIVERY_ADDRESS = firstAddress.Id;
+
+        // Optional: If you want to auto-fill address text as well
+        this.salesOrderFormData.ADDRESS = firstAddress.DELIVERYADDRESS;
+
+        // Optionally trigger any change logic if needed
+        this.onDeliveryAddressChanged({ value: firstAddress.Id });
+      } else {
+        // No addresses found — clear the field
+        this.salesOrderFormData.DELIVERY_ADDRESS = null;
         this.salesOrderFormData.ADDRESS = '';
       }
     });
@@ -981,6 +1149,24 @@ export class SalesOrderFormComponent {
     } else {
       this.salesOrderFormData.ADDRESS = '';
     }
+  }
+  onAddRow() {
+    const newRow = {
+      PACKING_ID: 0,
+      BRAND_ID: 0,
+      ARTICLE_TYPE: 0,
+      CATEGORY_ID: 0,
+      ART_NO: 0,
+      COLOR_ID: 0,
+      CONTENT: '',
+      QUANTITY: 0,
+    };
+
+    // Push the new row to the end of the array
+    this.salesOrderFormData.Details.push(newRow);
+
+    // Refresh grid display (replace `#dataGrid` with your ViewChild name)
+    this.dataGrid.instance.refresh();
   }
 
   calculateSerialNumber = (rowData: any) => {
