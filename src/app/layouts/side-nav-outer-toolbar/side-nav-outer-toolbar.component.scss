@@ -58,14 +58,15 @@
 .tabItems {
   width: 200px;
   height: 30px;
-  border-radius: 30px; /* Radius for the top-left corner */
+  border-radius: 8px; /* Radius for the top-left corner */
   padding-left: 5px;
   margin: 0px;
   padding: 0px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: var(--background-color);
+  // background-color: var(--background-color);
+  // background-color: #B0D4F3;
 }
 .tabItems:hover {
   cursor: pointer;

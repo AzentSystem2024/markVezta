@@ -10,12 +10,12 @@
   .menu-container {
     background-color: var(--side-panel-background);
     min-height: 100%;
-    width: 250px;
+    width: 300px;
     display: flex;
     flex: 1;
     padding-top: var(--toolbar-vertical-padding);
     padding-bottom: var(--footer-height);
-
+    
     ::ng-deep .dx-treeview {
       // ## Long text positioning
       white-space: nowrap;
@@ -51,19 +51,26 @@
 
       // ##
 
-      // ## Item levels customization
-      .dx-treeview-node {
-        &[aria-level="1"] {
-          font-weight: bold;
-          border-bottom: 1px solid var(--border-color);
-        }
+  
+.dx-treeview-node {
+  &[aria-level="1"] .dx-treeview-item-content {
+    font-weight: bold;
+    text-align: left;
+    position: relative;
+    
+  }
+ 
 
-        &[aria-level="2"] .dx-treeview-item-content {
-          font-weight: normal;
-          padding: 0 0 0 var(--side-panel-min-width);
-        }
-      }
+  &[aria-level="2"] .dx-treeview-item-content {
+    font-weight: normal;
+   
+    padding-left: calc(var(--side-panel-min-width) + 20px);
+    /* adjust 20px until the submenu sits under the main menu's center */
+  }
+}
 
+
+      
       // ##
     }
 
@@ -86,4 +93,21 @@
   .dx-treeview-node-container {
   left: auto !important;
   right: 0 !important;
+}
+
+
+::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-hover {
+   background-color:var(--sub-menu-bg-color)!important;
+    color: var(--sub-menu-color) !important; /* dark blue text */
+  border-radius: 15px;
+  height: 46px;
+  // margin-left: 50px; 
+}
+
+::ng-deep .dx-treeview .dx-treeview-node[aria-level="1"] > .dx-treeview-item.dx-state-hover {
+   background-color:var(--bg-side-panel)!important;
+    
+  border-radius: 8px;
+  height: 46px;
+
 }

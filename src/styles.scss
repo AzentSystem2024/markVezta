@@ -266,6 +266,7 @@ body {
   app-footer {
     // background-color: var(--base-bg);
     background-color: var(--bg-side-panel);
+     border-radius: 8px;
   }
   // .layout-body .menu-container.theme-dependent :hover{
   //   background-color: var(--bg-side-panel);
@@ -635,17 +636,23 @@ body {
 .dx-tabpanel .dx-tabpanel-tabs .dx-tabs {
   height: 100%;
   background-color: var(--tab-bg-color);
-  border: 1px solid var(--border-color);
+  margin-top: 3px;
+  border-radius: 5px;
+  margin-left: 8px;
+  margin-right: 20px;
+  // border: 1px solid var(--border-color);
 }
 
 .custom-tab .dx-tabs-styling-mode-secondary .dx-tab {
-  border-radius: 30px;
+  border-radius: 8px;
+  background-color: var(--tab-unselected-bg-color);
   border: 1px solid var(--border-color);
 }
 
 .custom-tab .dx-tab.dx-tab-selected {
   background-color: var(--tab-selected-bg-color);
   color: var(--text-color);
+  border-radius: 8px;
 }
 .custom-tab .dx-tab.dx-tab-selected .dx-icon {
   color: black;
@@ -704,3 +711,54 @@ body {
 .inner-tab .dx-tabpanel-tabs-position-top .dx-tabs {
   border-bottom: none;
 }
+
+
+.dx-treeview-node[aria-expanded="true"] > .dx-item .dx-item-content {
+  height: auto;
+  color:var(--main-menu-expanded-color)!important;
+  border-radius: 6px;
+  padding: 4px 8px;
+  
+}
+.dx-icon-edit:before {
+  content: "\f023" !important;
+  color:#0073D8 !important;
+}
+.dx-icon-trash:before {
+  content: "\f03e";
+  color: #d62a1e!important;
+}
+.dx-treeview-node[aria-expanded="true"] > .dx-item .dx-item-content {
+  height: auto;
+  color:#0073D8;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+.dx-treeview-node[aria-level="2"][aria-expanded="true"]
+  > .dx-item
+  .dx-item-content {
+  font-weight: 500 !important;
+  height: auto !important;
+ 
+}
+
+.dx-treeview-node[aria-level="1"][aria-expanded="true"]
+  > .dx-item
+  .dx-item-content {
+  font-weight: 600 !important;
+  height: auto !important;
+  padding: 0;
+}
+
+.dx-treeview-search {
+  margin-bottom: 5px;
+  margin-top: 13px;
+  margin-right: 10px;
+  margin-left: 10px;
+  border-radius: 32px !important;
+  background-color: white!important;
+  
+}
+
+
+

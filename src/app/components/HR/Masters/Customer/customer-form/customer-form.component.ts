@@ -3,14 +3,18 @@ import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.component';
 import {
+  DxButtonModule,
   DxCheckBoxModule,
   DxDataGridModule,
   DxNumberBoxModule,
   DxPopupModule,
   DxRadioGroupModule,
+  DxTabPanelModule,
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
+import { confirm } from 'devextreme/ui/dialog';
+
 
 import {
   DxSelectBoxModule,
@@ -44,6 +48,15 @@ export class CustomerFormComponent {
   dob: string | number | Date = new Date();
   isSubDealerPopupVisible: boolean = false;
   dealerList: any;
+  selectedTabIndex = 0;
+  Address1Value :any;
+  MobileValue:any;
+  locationValue:any;
+  phoneValue:any;
+  editingIndex: number | null = null;
+
+
+
 
   formCustomerData = {
     COMPANY_ID: this.selected_Company_id,
@@ -74,11 +87,13 @@ export class CustomerFormComponent {
     VAT_REGNO: '',
     CUSTOMER_TYPE: 0,
     WAREHOUSE_ID:'',
-    DELIVERY_ADDRESS_ID:'',
     CUST_TYPE: 0,
-    DELIVERY_ADDRESS: [],
+  
     DEALER_TYPE: 0,
     DEALER_ID: 0,
+    DeliveryAddresses: [
+  ]
+
   };
   // selected_Company_id: any;
   selected_fin_id: any;
@@ -132,20 +147,20 @@ export class CustomerFormComponent {
     };
   };
 
-  addDeliveryAddress(address: string) {
-    if (address && address.trim() !== '') {
-      this.formCustomerData.DELIVERY_ADDRESS.push({
-        DELIVERY_ADDRESS: address,
-      });
-    }
-  }
+  // addDeliveryAddress(address: string) {
+  //   if (address && address.trim() !== '') {
+  //     this.formCustomerData.DELIVERY_ADDRESS.push({
+  //       DELIVERY_ADDRESS: address,
+  //     });
+  //   }
+  // }
 
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
-    this.DEFAULT_COUNTRY_CODE = this.sessionData.DEFAULT_COUNTRY_CODE;
+    this.DEFAULT_COUNTRY_CODE = this.sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
   }
 
   sesstion_Details() {
@@ -293,7 +308,103 @@ export class CustomerFormComponent {
   resetPartialForm() {
     this.newCustomer.ADDRESS2 = '';
     this.newCustomer.ADDRESS3 = '';
+    this.Address1Value = '';
+  this.MobileValue = '';
+  this.locationValue = '';
+  this.phoneValue = '';
+   this.savedAddresses = [];
+    }
+
+
+  savedAddresses: any[] = [];
+  saveDeliveryAddress() {
+  // Validate that at least one field is filled
+  if (this.Address1Value || this.MobileValue || this.locationValue || this.phoneValue) {
+    const newAddress = {
+      ADDRESS1: this.Address1Value,
+      MOBILE: this.MobileValue,
+      LOCATION: this.locationValue,
+      PHONE: this.phoneValue
+    };
+
+     if (this.editingIndex !== null && this.editingIndex >= 0) {
+      // ✅ Update existing card (do not push)
+      this.savedAddresses[this.editingIndex] = { ...newAddress };
+      this.editingIndex = null; // Exit edit mode
+    } else {
+      // ✅ Add as a new card
+    //  Push into savedAddresses array
+    this.savedAddresses.push(newAddress);
+    }
+    console.log(this.savedAddresses, 'Saved Addresses:');
+
+    //  Optionally link with formCustomerData for payload
+    this.formCustomerData.DeliveryAddresses = [...this.savedAddresses];
+    console.log(this.formCustomerData, 'Updated formCustomerData payload');
+
+    //  Clear the input fields
+    this.Address1Value = '';
+    this.MobileValue = '';
+    this.locationValue = '';
+    this.phoneValue = '';
   }
+}
+
+// saveDeliveryAddress() {
+//   if (
+//     this.newCustomer.DeliveryAddresses[0].ADDRESS1 ||
+//     this.newCustomer.DeliveryAddresses[0].ADDRESS2 ||
+//     this.newCustomer.DeliveryAddresses[0].LOCATION ||
+//     this.newCustomer.DeliveryAddresses[0].PHONE
+//   ) {
+//     const newAddress = {
+//       ADDRESS1: this.newCustomer.DeliveryAddresses[0].ADDRESS1,
+//       MOBILE: this.newCustomer.DeliveryAddresses[0].MOBILE,
+//       LOCATION: this.newCustomer.DeliveryAddresses[0].LOCATION,
+//       PHONE: this.newCustomer.DeliveryAddresses[0].PHONE
+//     };
+
+//     this.savedAddresses.push(newAddress);
+//   console.log(this.savedAddresses, 'Saved Addresses:');
+  
+//     // Optional: clear form after saving
+//     this.newCustomer.DeliveryAddresses[0].ADDRESS1 = '';
+//     this.newCustomer.DeliveryAddresses[0].MOBILE = '';
+//     this.newCustomer.DeliveryAddresses[0].LOCATION = '';
+//     this.newCustomer.DeliveryAddresses[0].PHONE = '';
+//   }
+// }
+
+
+
+removeAddress(index: number) {
+  const result = confirm(
+    "Are you sure you want to delete this address?",
+    "Confirm Deletion"
+  );
+
+  result.then((dialogResult) => {
+    if (dialogResult) {
+      this.savedAddresses.splice(index, 1);
+    }
+  });
+}
+
+
+editAddress(i: number) {
+  const addr = this.savedAddresses[i];
+
+  // Fill form fields
+  this.Address1Value = addr.ADDRESS1;
+  this.MobileValue = addr.MOBILE;
+  this.locationValue = addr.LOCATION;
+  this.phoneValue = addr.PHONE;
+
+  // ✅ Remember which card is being edited
+  this.editingIndex = i;
+}
+
+
 }
 @NgModule({
   imports: [
@@ -311,6 +422,8 @@ export class CustomerFormComponent {
     DxRadioGroupModule,
     DxPopupModule,
     DxDataGridModule,
+    DxTabPanelModule,
+    DxButtonModule,
   ],
   declarations: [CustomerFormComponent],
   exports: [CustomerFormComponent],

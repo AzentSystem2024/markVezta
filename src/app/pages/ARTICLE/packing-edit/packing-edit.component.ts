@@ -84,6 +84,8 @@ export class PackingEditComponent {
   selectedSizeRows: any[] = []
   combinationString: string
  combination_value: any[]=[]
+PackingEntriesData:any;
+ 
   constructor(private dataService: DataService) {
     this.getDropdownLists();
     this.dataService.get_packages_list_api().subscribe((res: any) => {
@@ -142,6 +144,7 @@ export class PackingEditComponent {
         ...this.PackingData,
         ...changes['PackingData'].currentValue,
       };
+      console.log(this.PackingData, 'UPDATED PACKING DATA');
       if (
         this.PackingData.ART_NO &&
         this.PackingData.COLOR &&
@@ -149,8 +152,8 @@ export class PackingEditComponent {
         this.PackingData.UNIT_ID
       ) {
         this.articleSizeData = this.PackingData.COMBINATION.split(',').map((item) => {
-  const [size, qty] = item.split('x').map(Number);
-  return { Size: size, Qty: qty };
+  const [size, qty,ARTICLE_ID] = item.split('x').map(Number);
+  return { Size: size, Qty: qty, ArticleID:ARTICLE_ID};
 });
       }
          this.totalQuantity = this.articleSizeData.reduce(
@@ -162,6 +165,7 @@ export class PackingEditComponent {
     );
     }
     console.log(this.PackingData, 'MAINGROUPID');
+    this.PackingEntriesData= this.PackingData.PackingEntries
   }
 
   UpdateData() {
@@ -179,8 +183,15 @@ console.log(combinationToUse, 'COMBINATION TO USE');
       ...this.PackingData,
       COMBINATION:combinationToUse,
       PAIR_QTY: this.totalQuantity,
-
+     PackingEntries: this.articleSizeData
+    // .filter(item => Number(item.QUANTITY) > 0) // only include rows with quantity
+    .map(item => ({
+      ARTICLE_ID: Number(item.ArticleID), // or whichever field holds article id
+      SIZE: String(item.Size),
+      QUANTITY: Number(item.Qty)
+    }))
     }
+    console.log(this.articleSizeData,'========article size data=========');
     const unitName = this.produCtionUnits.find(
       (u) => u.ID === payload.UNIT_ID
     )?.DESCRIPTION;
@@ -417,43 +428,69 @@ clearForm() {
 
   close() {}
   
-onEditorPreparing(e: any) {
-console.log(e, "EDITOR PREPARING EVENT");
-  const rowData = e.row?.data;  
-console.log(rowData, "ROW DATA IN EDITOR PREPARING");
+// onEditorPreparing(e: any) {
+// console.log(e, "EDITOR PREPARING EVENT");
+//   const rowData = e.row?.data;  
+  
+// console.log(rowData, "ROW DATA IN EDITOR PREPARING");
     
-const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
-console.log(sizeQtyString, "SIZE QUANTITY STRING");
+// const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
+// console.log(sizeQtyString, "SIZE QUANTITY STRING");
 
-this.combination_value.push(sizeQtyString); // Add the size and quantity to the combination_value array   
-if (!this.combination_value.includes(sizeQtyString)) {
-  this.combination_value.push(sizeQtyString);
+// this.combination_value.push(sizeQtyString); // Add the size and quantity to the combination_value array   
+// if (!this.combination_value.includes(sizeQtyString)) {
+//   this.combination_value.push(sizeQtyString);
+// }
+// console.log(this.combination_value, "COMBINATION VALUE ARRAY");
+
+// const validData = this.combination_value.filter(item => !item.includes('undefined'));
+
+// console.log(validData, "VALID DATA AFTER FILTERING");
+
+// const combvalue= this.PackingData.COMBINATION
+// console.log(combvalue, "COMBINATION VALUE FROM PACKING DATA");
+// const combinationString = validData.join(', '); 
+// // Join the array into a string
+// console.log(this.combinationString, "COMBINATION STRING");
+
+// console.log(' changed Data', this.articleSizeData);
+
+// //=======take combination of all sizes and quantities==========
+// const firstcombinationString = this.articleSizeData
+//   .filter(item => item.Qty !== undefined && item.Qty !== null && item.Qty > 0)
+//   .map(item => `${item.Size}x${item.Qty}`)
+//   .join(', ');
+
+// this.combinationString = firstcombinationString;
+
+// console.log("Combination String:", this.combinationString);
+
+// }
+
+onEditorPreparing(e: any) {
+  console.log(e, "EDITOR PREPARING EVENT");
+  if (e.dataField === 'Qty' && e.row?.data) {
+    const rowData = e.row.data;
+    const articleId = rowData.ArticleId || e.row.key?.ArticleId;
+
+    if (!articleId) {
+      console.warn("ArticleId undefined during editor preparing", rowData);
+      return;
+    }
+
+    const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
+    console.log(sizeQtyString, "SIZE QUANTITY STRING");
+
+    if (!this.combination_value.includes(sizeQtyString)) {
+      this.combination_value.push(sizeQtyString);
+    }
+
+    const validData = this.combination_value.filter(item => !item.includes('undefined'));
+    this.combinationString = validData.join(', ');
+    console.log("Combination String:", this.combinationString);
+  }
 }
-console.log(this.combination_value, "COMBINATION VALUE ARRAY");
 
-const validData = this.combination_value.filter(item => !item.includes('undefined'));
-
-console.log(validData, "VALID DATA AFTER FILTERING");
-
-const combvalue= this.PackingData.COMBINATION
-console.log(combvalue, "COMBINATION VALUE FROM PACKING DATA");
-const combinationString = validData.join(', '); 
-// Join the array into a string
-console.log(this.combinationString, "COMBINATION STRING");
-
-console.log(' changed Data', this.articleSizeData);
-
-//=======take combination of all sizes and quantities==========
-const firstcombinationString = this.articleSizeData
-  .filter(item => item.Qty !== undefined && item.Qty !== null && item.Qty > 0)
-  .map(item => `${item.Size}x${item.Qty}`)
-  .join(', ');
-
-this.combinationString = firstcombinationString;
-
-console.log("Combination String:", this.combinationString);
-
-}
 }
 
 @NgModule({

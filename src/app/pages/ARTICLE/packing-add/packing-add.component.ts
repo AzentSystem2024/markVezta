@@ -63,7 +63,14 @@ PackingData: any = {
   IS_EXPORT: false,
  IS_ANY_COMB: false,
  SUPP_ID: 0,
- COMPANY_ID:0
+ COMPANY_ID:0,
+ PackingEntries: [
+    {
+      ARTICLE_ID: 0,
+      QUANTITY: 0,
+      SIZE: ''
+    }
+  ]
  
 };
   Alias_no: number;
@@ -305,8 +312,16 @@ const payload = {
    ART_SERIAL: this.art_Serial_no,
    COMBINATION: this.combinationString,
    PAIR_QTY: this.totalQuantity,
-   COMPANY_ID:this.selected_Company_id
+   COMPANY_ID:this.selected_Company_id,
+   PackingEntries: this.articleSizeData
+    // .filter(item => Number(item.QUANTITY) > 0) // only include rows with quantity
+    .map(item => ({
+      ARTICLE_ID: Number(item.ArticleID), // or whichever field holds article id
+      SIZE: String(item.Size),
+      QUANTITY: Number(item.QUANTITY)
+    }))
 };
+console.log(this.articleSizeData,'========article size data=========');
 console.log(payload,'-----payload for packing list-----');
 
 const unitName = this.produCtionUnits.find(u => u.ID === payload.UNIT_ID)?.DESCRIPTION;
