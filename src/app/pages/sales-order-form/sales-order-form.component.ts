@@ -162,6 +162,7 @@ export class SalesOrderFormComponent {
   contentValue: string;
   cutsizeRowIndex: any;
   cutsizeRowKey: any;
+  selectedPackingID: any;
 
   constructor(
     private dataService: DataService,
@@ -180,7 +181,9 @@ export class SalesOrderFormComponent {
       this.salesOrderFormData.Details = [];
     }
     this.getDealerDropdown();
-    this.getSalesOrderNo();
+    if (!this.isEditing) {
+      this.getSalesOrderNo();
+    }
     // this.getWarehouseDropdown();
     // always fetch fresh number when popup opens
 
@@ -221,13 +224,13 @@ export class SalesOrderFormComponent {
   isEditDataAvailable() {
     if (this.isEditing && this.EditingResponseData) {
       console.log(
-        '🟡 Editing mode enabled. Populating data:',
+        'Editing mode enabled. Populating data:',
         this.EditingResponseData
       );
 
       const response = this.EditingResponseData;
 
-      // ✅ Map backend fields → grid fields
+      // Map backend fields → grid fields
       const mappedDetails = Array.isArray(response.Details)
         ? response.Details.map((item: any) => ({
             ITEM: item.BRAND_ID || 0,
@@ -255,7 +258,7 @@ export class SalesOrderFormComponent {
       //  Bind details to the grid
       setTimeout(() => {
         if (this.itemsGridRef && this.itemsGridRef.instance) {
-          this.itemsGridRef.instance.option('dataSource', [...mappedDetails]);
+          this.salesOrderFormData.Details = mappedDetails;
           this.itemsGridRef.instance.refresh();
         }
       }, 300);
@@ -269,7 +272,7 @@ export class SalesOrderFormComponent {
         const artNoId = firstRow.ARTNO;
         const colorId = firstRow.COLOR;
 
-        console.log('🔄 Populating dropdowns for edit mode:', firstRow);
+        console.log(' Populating dropdowns for edit mode:', firstRow);
 
         // Load TYPE list
         this.dataService
@@ -386,9 +389,6 @@ export class SalesOrderFormComponent {
   onTypeValueChanged(e: any) {
     this.selectedType = e.value;
     console.log(e, 'selecteddescriptionnnnnnnnnnn');
-    // this.selectedCategory = null;
-    // this.selectedArtNo = null;
-    // this.selectedColor = null;
 
     const payload = {
       BRAND_ID: String(this.selectedDescription),
@@ -410,9 +410,13 @@ export class SalesOrderFormComponent {
   onCategoryValueChanged(e: any, event?: any) {
     const grid = event?.component;
     const rowKey = event?.row?.key;
+    const rowData = event?.row?.data; // 🔹 get current row object
+
     this.selectedCategory = e.value;
     console.log(this.selectedCategory, 'selectedCategoryyyyyyyyyyyyyyy');
+
     if (grid && rowKey != null) {
+      // Clear dependent cells
       grid.cellValue(rowKey, 'ARTNO', null);
       grid.cellValue(rowKey, 'COLOR', null);
       grid.cellValue(rowKey, 'PACKING', null);
@@ -425,14 +429,21 @@ export class SalesOrderFormComponent {
       CATEGORY_ID: String(this.selectedCategory),
       BRAND_ID: String(this.selectedDescription),
     };
+
     this.isDescriptionLoading = true;
 
     this.dataService.getArtNoList(payload).subscribe({
       next: (response: any) => {
-        this.artNoList = response.Data || [];
+        const artNoList = response.Data || [];
         this.isDescriptionLoading = false;
+
+        // 🔹 Assign at both row level & component level
+        if (rowData) rowData.artNoList = artNoList;
+        this.artNoList = artNoList;
+
+        // 🔹 Force refresh so new lookup values appear
         if (grid && rowKey != null) {
-          grid.repaint(); // ensures new lookup values are rendered
+          grid.repaint();
         }
       },
       error: () => {
@@ -510,8 +521,16 @@ export class SalesOrderFormComponent {
 
   onPackingValueChanged(e: any, event: any) {
     this.selectedPacking = e.value;
+    console.log(e, 'PACKINGVALUECHANGEDDDDDDDDDDDDDDDDD');
     const packingID = {
       PACKING_ID: this.selectedPacking,
+    };
+
+    this.selectedPackingID = this.packingList.find(
+      (p) => p.DESCRIPTION === e.value
+    )?.ARTICLE_ID;
+    const selectedPackingId = {
+      PACKING_ID: this.selectedPackingID,
     };
     // Get the selected PACKING description text
     const selectedPackingText = this.packingList.find(
@@ -520,10 +539,12 @@ export class SalesOrderFormComponent {
 
     console.log('Selected Packing:', selectedPackingText);
 
-    this.dataService.getPairQty(packingID).subscribe((response: any) => {
-      this.totalRequiredQty = response.Data[0].PAIR_QTY;
-      console.log(' Total Required Qty:', this.totalRequiredQty);
-    });
+    this.dataService
+      .getPairQty(selectedPackingId)
+      .subscribe((response: any) => {
+        this.totalRequiredQty = response.Data[0].PAIR_QTY;
+        console.log(' Total Required Qty:', this.totalRequiredQty);
+      });
     const rowIndex = event.row?.rowIndex;
     const rowKey = event.row?.key;
 
@@ -725,8 +746,7 @@ export class SalesOrderFormComponent {
     if (e.dataField === 'ARTNO') {
       // e.editorOptions.dropDownOptions = { height: 300 };
       e.editorOptions.dataSource = e.row.data.artNoList || this.artNoList || [];
-      e.editorOptions.valueExpr = 'ARTICLE_ID'; // 👈 added
-      e.editorOptions.displayExpr = 'DESCRIPTION'; // 👈 added
+
       e.editorOptions.value = e.row.data[e.dataField];
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
@@ -974,7 +994,7 @@ export class SalesOrderFormComponent {
   saveCutsizeDetails() {
     // Validate total quantity
     if (this.totalQty !== this.totalRequiredQty) {
-      this.totalErrorMessage = '⚠️ Total Qty must match Total Required Qty.';
+      this.totalErrorMessage = ' Total Qty must match Total Required Qty.';
       console.warn(this.totalErrorMessage);
       return;
     }
@@ -985,9 +1005,9 @@ export class SalesOrderFormComponent {
       .map((r: any) => `${r.size}*${r.quantity}`);
 
     const newContent = pairs.join(', ');
-    console.log('🧾 New cutsize content:', newContent);
+    console.log(' New cutsize content:', newContent);
 
-    // 3️⃣ Update the grid row cleanly
+    // Update the grid row cleanly
     if (this.cutsizeRowIndex !== null && this.cutsizeRowIndex >= 0) {
       const grid = this.itemsGridRef.instance;
       const visibleRows = grid.getVisibleRows();
@@ -997,11 +1017,11 @@ export class SalesOrderFormComponent {
         //  Step 1: Reset previous content completely
         rowData.CONTENT = '';
 
-        // 🆕 Step 2: Apply only new clean string
+        // Step 2: Apply only new clean string
         rowData.CONTENT = newContent;
 
         //  Step 3: Push the updated object back to the grid store
-        const rowKey = grid.keyOf(rowData); // ✅ get the correct row key
+        const rowKey = grid.keyOf(rowData); //  get the correct row key
         grid
           .getDataSource()
           .store()
@@ -1024,46 +1044,6 @@ export class SalesOrderFormComponent {
     // Close popup
     this.isCutsizePopupVisible = false;
   }
-
-  // saveCutsizeDetails() {
-  //   // ✅ 1. Validate quantities
-  //   if (this.totalQty !== this.totalRequiredQty) {
-  //     this.totalErrorMessage = '⚠️ Total Qty must match Total Required Qty.';
-  //     console.warn(this.totalErrorMessage);
-  //     return;
-  //   }
-
-  //   // ✅ 2. Build the pair string like "6*10, 7*5, 8*5, 9*5"
-  //   const pairs = this.cutsizeValues
-  //     .filter((r: any) => r.size && r.quantity != null)
-  //     .map((r: any) => `${r.size}*${r.quantity}`);
-
-  //   const contentValue = pairs.join(', ');
-  //   console.log('✅ Content to insert:', contentValue);
-
-  //   // ✅ 3. Update CONTENT column of the current grid row
-  //   if (this.cutsizeRowIndex !== null && this.cutsizeRowIndex >= 0) {
-  //     this.itemsGridRef.instance.cellValue(
-  //       this.cutsizeRowIndex,
-  //       'CONTENT',
-  //       contentValue
-  //     );
-
-  //     // Optional: also update quantity or any other related field
-  //     // this.itemsGridRef.instance.cellValue(this.cutsizeRowIndex, 'QUANTITY', this.totalQty);
-
-  //     // this.itemsGridRef.instance.refresh();
-  //     console.log(
-  //       `🟢 CONTENT updated in row ${this.cutsizeRowIndex}:`,
-  //       contentValue
-  //     );
-  //   } else {
-  //     console.warn('⚠️ No valid row index stored for Cutsize update.');
-  //   }
-
-  //   // ✅ 4. Close popup
-  //   this.isCutsizePopupVisible = false;
-  // }
 
   addNewRow() {
     this.dataGrid.instance.addRow();
@@ -1264,12 +1244,12 @@ export class SalesOrderFormComponent {
       WAREHOUSE: this.salesOrderFormData.WAREHOUSE,
       TOTAL_QTY: totalQty,
       Details: validDetails.map((d: any) => ({
-        PACKING_ID: d.PACKING || 0,
-        BRAND_ID: d.ITEM || 0,
-        ARTICLE_TYPE: d.TYPE || 0,
-        CATEGORY_ID: d.CATEGORY || 0,
-        ART_NO: d.ARTNO || 0,
-        COLOR_ID: d.COLOR || 0,
+        PACKING_ID: d.PACKING || '',
+        BRAND_ID: d.ITEM || '',
+        ARTICLE_TYPE: d.TYPE || '',
+        CATEGORY_ID: d.CATEGORY || '',
+        ART_NO: d.ARTNO || '',
+        COLOR_ID: d.COLOR || '',
         QUANTITY: d.QTY || 0,
         CONTENT: d.CONTENT || '',
       })),
@@ -1280,14 +1260,14 @@ export class SalesOrderFormComponent {
       payload.ID = this.salesOrderFormData.ID;
     }
 
-    console.log('🟢 Final payload before saving/updating:', payload);
+    console.log('Final payload before saving/updating:', payload);
 
     // --- Determine which API to call ---
     let apiCall;
     let message = '';
 
     if (this.isApproved) {
-      // ✅ Confirm approval before calling API
+      // Confirm approval before calling API
       const result = confirm(
         'Are you sure you want to approve this Sales Order?',
         'Confirm Approval'
@@ -1330,7 +1310,7 @@ export class SalesOrderFormComponent {
         }
       },
       error: (err) => {
-        console.error('❌ API failed:', err);
+        console.error(' API failed:', err);
         notify('Error performing operation. Please try again.', 'error', 2000);
       },
     });

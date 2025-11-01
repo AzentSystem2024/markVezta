@@ -11,7 +11,7 @@
           [rowAlternationEnabled]="true"
           [allowColumnReordering]="true"
           [allowColumnResizing]="true"
-          [height]="'55vh'"
+          [height]="'65vh'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
@@ -192,7 +192,7 @@
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: catList,
-              valueExpr: 'ARTICLE_ID',
+              valueExpr: 'DESCRIPTION',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
@@ -212,6 +212,7 @@
               virtualScrollingEnabled: true,
             }"
             [allowEditing]="!isReadOnlyMode"
+            [cellTemplate]="categoryCellTemplate"
           ></dxi-column>
 
           <dxi-column
@@ -221,7 +222,7 @@
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: artNoList,
-              valueExpr: 'ARTICLE_ID',
+              valueExpr: 'DESCRIPTION',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
@@ -250,7 +251,7 @@
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: colorList,
-              valueExpr: 'ARTICLE_ID',
+              valueExpr: 'DESCRIPTION',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
@@ -280,7 +281,7 @@
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: packingList,
-              valueExpr: 'ARTICLE_ID',
+              valueExpr: 'DESCRIPTION',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
@@ -328,63 +329,64 @@
           </dxi-column>
         </dx-data-grid>
         <div class="form-footer">
-          <div class="footer-right">
-            <div class="net-amount-wrapper"></div>
-            <div class="net-amount-wrapper">
+          <!-- 🔹 Row 1: Warehouse (left) + Approve (right) -->
+          <div class="footer-row">
+            <div class="footer-left">
               <dx-select-box
                 [(value)]="salesOrderFormData.WAREHOUSE"
                 [dataSource]="warehouse"
                 displayExpr="WAREHOUSE_NAME"
                 valueExpr="ID"
-                [width]="405"
+                [width]="400"
                 [searchEnabled]="true"
-                label="Wrehouse"
+                label="Warehouse"
                 labelMode="floating"
                 [readOnly]="isReadOnlyMode"
               ></dx-select-box>
             </div>
-            <div class="net-amount-wrapper">
+
+            <div class="footer-right">
+              <dx-check-box
+                *ngIf="isEditing && !isReadOnlyMode"
+                [(value)]="isApproved"
+                text="Approve"
+                class="approve-checkbox"
+              ></dx-check-box>
+            </div>
+          </div>
+
+          <!-- 🔹 Row 2: Remarks (left) + Buttons (right) -->
+          <div class="footer-row">
+            <div class="footer-left">
               <dx-text-box
                 [(value)]="salesOrderFormData.REMARKS"
                 label="Remarks"
                 labelMode="floating"
-                [width]="405"
+                [width]="400"
+                class="narration-box"
               ></dx-text-box>
             </div>
-            <dx-check-box
-              *ngIf="isEditing && !isReadOnlyMode"
-              [(value)]="isApproved"
-              text="Approve"
-              class="approve-checkbox"
-            ></dx-check-box>
+
+            <div class="footer-right footer-actions">
+              <dx-button
+                text="Cancel"
+                (onClick)="cancel()"
+                stylingMode="outlined"
+                type="normal"
+              ></dx-button>
+
+              <dx-button
+                *ngIf="!isReadOnlyMode"
+                [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
+                (onClick)="saveSalesOrder()"
+                stylingMode="contained"
+                type="default"
+              ></dx-button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div
-    class="common-footer"
-    style="
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    "
-  >
-    <dx-button
-      text="Cancel"
-      (onClick)="cancel()"
-      stylingMode="outlined"
-      type="normal"
-    ></dx-button>
-    <dx-button
-      *ngIf="!isReadOnlyMode"
-      [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
-      (onClick)="saveSalesOrder()"
-      stylingMode="contained"
-      type="default"
-    ></dx-button>
   </div>
 </dx-validation-group>
 <!-- CUTSIZE POPUP -->
