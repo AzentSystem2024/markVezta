@@ -23,7 +23,6 @@
             allowDeleting: !isReadOnlyMode
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
-          (onContentReady)="onGridReady($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-toolbar>
@@ -80,30 +79,34 @@
                     label="Delivery Address"
                     labelMode="floating"
                     [readOnly]="isReadOnlyMode"
+                    (onValueChanged)="onDeliveryAddressChanged($event)"
                   ></dx-select-box>
                 </div>
                 <div
                   style="
                     display: flex;
+                    align-items: flex-start;
                     gap: 5px;
                     margin-top: -4px;
-                    align-items: flex-start;
                   "
                 >
-                  <div style="flex: 1">
-                    <dx-text-box
-                      [(value)]="salesOrderFormData.ADDRESS"
-                      [dataSource]="customer"
-                      displayExpr="DESCRIPTION"
-                      valueExpr="ID"
-                      [width]="405"
-                      [searchEnabled]="true"
-                      label="Address"
-                      labelMode="floating"
-                      [readOnly]="isReadOnlyMode"
-                      (onValueChanged)="customerChanged($event)"
-                    ></dx-text-box>
-                  </div>
+                  <dx-text-box
+                    [(value)]="salesOrderFormData.ADDRESS"
+                    label="Address"
+                    labelMode="floating"
+                    [width]="405"
+                    [readOnly]="true"
+                  ></dx-text-box>
+
+                  <!-- Plus icon button -->
+                  <dx-button
+                    icon="plus"
+                    stylingMode="outlined"
+                    type="default"
+                    hint="New Row"
+                    [elementAttr]="{ class: 'small-btn' }"
+                    (onClick)="onAddRow()"
+                  ></dx-button>
                 </div>
               </div>
             </dxi-item>
@@ -140,6 +143,7 @@
               virtualScrollingEnabled: true,
            
             }"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
           <dxi-column
             dataField="TYPE"
@@ -165,6 +169,7 @@
               showScrollbar: 'always',
               virtualScrollingEnabled: true
             }"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
 
           <dx-load-indicator
@@ -174,12 +179,12 @@
             width="40"
           ></dx-load-indicator>
 
-          <dxi-column
+          <!-- <dxi-column
             dataField="MATRIX_CODE"
             caption="Category"
             [allowEditing]="false"
             [visible]="matrixCode"
-          ></dxi-column>
+          ></dxi-column> -->
           <dxi-column
             dataField="CATEGORY"
             caption="Category"
@@ -206,6 +211,7 @@
               showScrollbar: 'always',
               virtualScrollingEnabled: true,
             }"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
 
           <dxi-column
@@ -234,6 +240,7 @@
               showScrollbar: 'always',
               virtualScrollingEnabled: true
             }"
+            [allowEditing]="!isReadOnlyMode"
             [cellTemplate]="artNoCellTemplate"
           ></dxi-column>
           <dxi-column
@@ -262,6 +269,7 @@
               showScrollbar: 'always',
               virtualScrollingEnabled: true
             }"
+            [allowEditing]="!isReadOnlyMode"
             [cellTemplate]="colorCellTemplate"
           ></dxi-column>
 
@@ -291,18 +299,19 @@
               showScrollbar: 'always',
               virtualScrollingEnabled: true
             }"
+            [allowEditing]="!isReadOnlyMode"
             [cellTemplate]="packingCellTemplate"
           ></dxi-column>
 
           <dxi-column
             dataField="CONTENT"
             caption="Content"
-            [allowEditing]="false"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
           <dxi-column
             dataField="QTY"
             caption="Quantity"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
 
           <dxo-summary>
@@ -321,6 +330,19 @@
         <div class="form-footer">
           <div class="footer-right">
             <div class="net-amount-wrapper"></div>
+            <div class="net-amount-wrapper">
+              <dx-select-box
+                [(value)]="salesOrderFormData.WAREHOUSE"
+                [dataSource]="warehouse"
+                displayExpr="WAREHOUSE_NAME"
+                valueExpr="ID"
+                [width]="405"
+                [searchEnabled]="true"
+                label="Wrehouse"
+                labelMode="floating"
+                [readOnly]="isReadOnlyMode"
+              ></dx-select-box>
+            </div>
             <div class="net-amount-wrapper">
               <dx-text-box
                 [(value)]="salesOrderFormData.REMARKS"
@@ -372,6 +394,7 @@
   [height]="'60vh'"
   [maxHeight]="800"
   title="Cutsize Details"
+  (onHiding)="onCutsizePopupHiding($event)"
 >
   <dx-data-grid
     #cutsizeGrid
@@ -404,7 +427,13 @@
       dataField="quantity"
       caption="Quantity"
       [allowEditing]="true"
+      [editorType]="'dxNumberBox'"
       alignment="right"
+      [allowEditing]="true"
+      [editorOptions]="{
+        min: 0,
+        showSpinButtons: true,
+      }"
     >
     </dxi-column>
 
@@ -440,14 +469,14 @@
         [(value)]="totalQty"
         [readOnly]="true"
         width="160"
-        [isValid]="isTotalQtyValid"
-        [validationError]="{ message: validationMessage }"
       >
-        <!-- <dxi-validation-rule
-          type="custom"
-          [validationCallback]="validateTotalQty"
-          message="❌ Total Qty must match Total Required Qty."
-        ></dxi-validation-rule> -->
+        <dx-validator>
+          <dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateTotalQty"
+            [message]="validationMessage"
+          ></dxi-validation-rule>
+        </dx-validator>
       </dx-number-box>
     </div>
   </div>
@@ -515,15 +544,7 @@
     </dxo-header-filter>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
-    <dxo-toolbar>
-      <dxi-item
-        location="after"
-        locateInMenu="auto"
-        widget="dxButton"
-        [visible]="canAdd"
-        [options]="addButtonOptions"
-      ></dxi-item>
-    </dxo-toolbar>
+    <dxo-toolbar> </dxo-toolbar>
     <dxi-column
       dataField="ITEM_CODE"
       caption="Item Code"
