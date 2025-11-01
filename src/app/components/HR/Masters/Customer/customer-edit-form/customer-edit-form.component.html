@@ -1,3 +1,12 @@
+<dx-tab-panel
+  class="innert-tab custom-article-tabs"
+  [(selectedIndex)]="selectedTabIndex"
+  [animationEnabled]="true"
+  [deferRendering]="false"
+  style="border: none"
+>
+
+<dxi-item title="Details">
 <dx-form class="plain-styled-form" [colCount]="2">
   <dxi-item itemType="group">
     <dxi-item itemType="group" [colCount]="2">
@@ -211,7 +220,7 @@
           </dx-text-box>
         </div>
       </dxi-item>
-     <dxi-item>
+     <!-- <dxi-item>
         <div *dxTemplate>
           <dx-select-box
             label="Delivery Address"
@@ -227,7 +236,7 @@
               </dxi-validation-rule> </dx-validator
           ></dx-select-box>
         </div>
-      </dxi-item>
+      </dxi-item> -->
     </dxi-item>
 
     <dxi-item [colSpan]="2">
@@ -578,7 +587,7 @@
       </dxi-item>
     </dxi-item>
 
-    <dxi-item>
+    <!-- <dxi-item>
       <div *dxTemplate>
         <dx-text-box
           label="Delivery Address"
@@ -630,7 +639,7 @@
           </dx-validator>
         </dx-text-box>
       </div>
-    </dxi-item>
+    </dxi-item> -->
   </dxi-item>
 
   <!-- <dxi-item> -->
@@ -669,3 +678,98 @@
     </div>
   </div>
 </dx-form>
+</dxi-item>
+
+<dxi-item title="Delivery Address">
+  <div class="address-container">
+  <dx-form
+    [colCount]="2"
+    labelLocation="left"
+    stylingMode="outlined"
+    class="address-form"
+    
+  >
+    <dxi-item>
+      <dx-text-box
+        label="Address"
+        labelMode="floating"
+        [(value)]="Address1Value"
+        stylingMode="outlined"
+        
+      >
+    </dx-text-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-box
+        label="Mobile"
+        labelMode="floating"
+        [(value)]="MobileValue"
+        stylingMode="outlined"
+      ></dx-text-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-box
+        label="Location"
+        labelMode="floating"
+        [(value)]="locationValue"
+        stylingMode="outlined"
+      ></dx-text-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-box
+        label="Telephone"
+        labelMode="floating"
+        [(value)]="phoneValue"
+        stylingMode="outlined"
+      ></dx-text-box>
+    </dxi-item>
+  </dx-form>
+  <dxi-item>
+
+    <div class="save-btn">
+    <dx-button
+      text="Save"
+      type="default"
+      location="after"
+      (onClick)="saveDeliveryAddress()"
+    ></dx-button>
+    </div>
+
+    
+    <div class="saved-addresses" *ngIf="savedAddresses.length > 0">
+  <div class="address-card-container">
+    <div class="address-card" *ngFor="let addr of savedAddresses; let i = index">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+       <div> <h6>{{ addr.ADDRESS1 || ('Address ' + (i + 1)) }}</h6></div>
+      <div class="card-actions">
+          <dx-button
+            icon="edit"
+            stylingMode="text"
+            hint="Edit"
+            (onClick)="editAddress(i)"
+          ></dx-button>
+
+          <dx-button
+            icon="trash"
+            stylingMode="text"
+            hint="Delete"
+            (onClick)="removeAddress(i)"
+          ></dx-button>
+        </div>
+  </div>
+      <p><strong>Address:</strong> {{ addr.ADDRESS1 }}</p>
+      <p><strong>Mobile:</strong> {{ addr.MOBILE }}</p>
+      <p><strong>Location:</strong> {{ addr.LOCATION }}</p>
+      <p><strong>Telephone:</strong> {{ addr.PHONE }}</p>
+    </div>
+  </div>
+</div>
+
+  </dxi-item>
+</div>
+
+</dxi-item>
+</dx-tab-panel>

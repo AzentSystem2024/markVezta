@@ -169,7 +169,7 @@ export class CustomerListComponent {
       CUST_CODE: '',
       FIRST_NAME: '',
       LAST_NAME: '',
-      DOB: null,
+      DOB: new Date(),
       NATIONALITY: '',
       CONTACT_NAME: '',
       ADDRESS1: '',
@@ -243,7 +243,6 @@ export class CustomerListComponent {
   onClickSaveCustomer() {
     const {
       WAREHOUSE_ID,
-      DELIVERY_ADDRESS_ID,
       COMPANY_ID,
       CUST_CODE,
       FIRST_NAME,
@@ -271,6 +270,8 @@ export class CustomerListComponent {
       CUST_VAT_RULE_ID,
       VAT_REGNO,
       CUST_TYPE,
+  
+      
     } = this.customerComponent.getNewCustomerData();
 
     // this.dataservice.postCustomerData(COMPANY_ID,CUST_CODE, FIRST_NAME,LAST_NAME,DOB,NATIONALITY,CONTACT_NAME,ADDRESS1,ADDRESS2,ADDRESS3,ZIP,STATE_ID,CITY,COUNTRY_ID,PHONE,MOBILE_NO,

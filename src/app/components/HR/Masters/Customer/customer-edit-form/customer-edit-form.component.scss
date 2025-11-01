@@ -1,0 +1,72 @@
+
+
+
+
+
+
+
+.address-form {
+  .dx-texteditor {
+    width: 350px;
+  }
+
+  .dx-button.dx-button-mode-contained {
+    background-color: #0078d7;
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+  }
+
+  .dx-icon.dx-icon-plus {
+    font-size: 14px;
+  }
+}
+
+.saved-title {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0d47a1;
+}
+
+.address-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+   margin-top: 28px;
+   
+}
+
+.address-card {
+  background-color: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.address-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.18);
+}
+
+.address-card h6 {
+  color: #1565c0;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.address-card p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #333;
+}
+.save-btn {
+  display: flex;
+  justify-content: flex-end; /* Aligns button to right */
+  margin-top: 20px;          /* Adds space above */
+  margin-bottom: 20px;       /* Adds space below (before cards) */
+}

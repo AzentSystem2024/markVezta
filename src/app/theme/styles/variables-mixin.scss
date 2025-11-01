@@ -40,10 +40,19 @@ $theme-mode: null !default;
   --calendar-width: 292px;
   // --bg-side-panel:#00a2ed;
   --bg-side-panel: #ffffff;
+--tab-bg-color: #FFFFFF;
+--tab-selected-bg-color:#B0D4F3;
+--tab-unselected-bg-color:#E6F1FB;
+--main-menu-expanded-color:#0073D8;
+--sub-menu-color :#FE4A49;
+--sub-menu-bg-color:#F1F8FF;
+
+
 
   @if $theme-mode == dark {
     --card-background: var(--base-bg-darken-5);
     --bg-side-panel:rgb(41, 41, 41);
+    --tab-bg-color: #131111;
   }
 
   --border-color: #{$base-border-color};
