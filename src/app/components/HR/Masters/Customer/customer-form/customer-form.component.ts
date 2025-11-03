@@ -83,7 +83,7 @@ export class CustomerFormComponent {
     NOTES: '',
     PRICE_CLASS_ID: '',
     DISCOUNT_PERCENT: '',
-    CUST_VAT_RULE_ID: '',
+    CUST_VAT_RULE_ID: 0,
     VAT_REGNO: '',
     CUSTOMER_TYPE: 0,
     WAREHOUSE_ID:'',
@@ -105,9 +105,10 @@ export class CustomerFormComponent {
     { text: 'Outside Customer', value: 2 },
   ];
 
-  dealerTypeOptions = [
+   dealerTypeOptions= [
     { text: 'Dealer', value: 1 },
     { text: 'Sub-Dealer', value: 2 },
+    { text: 'CompanyBranch', value: 3 },
   ];
   isDealerVisible: boolean;
   deliveryAddress1: any;
@@ -160,7 +161,7 @@ export class CustomerFormComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
-    this.DEFAULT_COUNTRY_CODE = this.sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+   
   }
 
   sesstion_Details() {
@@ -176,6 +177,8 @@ export class CustomerFormComponent {
       this.selected_fin_id,
       '===========selected fin id==================='
     );
+     this.DEFAULT_COUNTRY_CODE = sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
   }
 
   showCountry() {
@@ -313,6 +316,12 @@ export class CustomerFormComponent {
   this.locationValue = '';
   this.phoneValue = '';
    this.savedAddresses = [];
+   if (this.formCustomerData) {
+    this.formCustomerData.DEALER_ID = 0;
+    this.formCustomerData.CUST_TYPE = 0;
+  
+    this.formCustomerData.DEALER_TYPE = 0;
+  }
     }
 
 

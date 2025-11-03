@@ -2,9 +2,9 @@
   <form class="login-form" (submit)="onSubmit($event)">
     <div class="logo">
       <!-- <h1 class="brand-title">MMARK</h1> -->
-       <img src="../../../../assets/images/MmarkIcon.png" alt="MMARK Logo" class="brand-logo" height="100px"/>
+       <img src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png" alt="MMARK Logo" class="brand-logo" height="50px"/>
 
-      <p class="subtitle">Log In to your account</p>
+      <p class="subtitle">LOG IN TO YOUR ACCOUNT</p>
     </div>
 
     <!-- Username -->
@@ -15,6 +15,13 @@
       stylingMode="outlined"
       mode="text"
       (onValueChanged)="onUsernameChange($event)"
+      [buttons]="[
+    {
+      name: 'user',
+      location: 'before',
+      options: { icon: 'user' }
+    }
+  ]"
     >
       <div *dxTemplate="let data of 'before'">
         <i class="dx-icon dx-icon-user"></i>
@@ -34,8 +41,25 @@
       [disabled]="loading"
       placeholder="Password"
       stylingMode="outlined"
-      [mode]="showPassword ? 'text' : 'password'"
+
       style="margin-top: 16px"
+        [buttons]="[
+    {
+      name: 'user',
+      location: 'before',
+      options: { icon: 'lock' }
+    },
+    {
+      name: 'togglePassword',
+      location: 'after',
+      options: {
+        icon: showPassword ? 'eyeopen' : 'eyeclose',
+        stylingMode: 'text',
+        elementAttr: { class: 'password-toggle-icon' },
+        onClick: togglePasswordVisibility.bind(this)
+      }
+    }
+  ]"
     >
       <!-- Lock icon before input -->
       <div *dxTemplate="let data of 'before'">
@@ -96,6 +120,9 @@
     >
     </dx-validator>
 
+     <div class="reset-link">
+    <a [routerLink]="resetLink"style="text-decoration: none;  font-size: 18px;">Forgot password?</a>
+  </div>
     <!-- Submit Button -->
     <dx-button
       type="default"
