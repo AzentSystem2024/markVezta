@@ -7,13 +7,13 @@
           [dataSource]="salesOrderFormData.Details"
           [showBorders]="true"
           [showColumnLines]="true"
-          [columnAutoWidth]="true"
+          [columnAutoWidth]="false"
           [rowAlternationEnabled]="true"
           [allowColumnReordering]="true"
           [allowColumnResizing]="true"
           [height]="'65vh'"
           [columnResizingMode]="'nextColumn'"
-          [scrolling]="{ mode: 'virtual' }"
+          [scrolling]="{ mode: 'standard' }"
           rowAlternationInterval="2"
           [selection]="{ mode: 'single' }"
           [editing]="{
@@ -43,7 +43,7 @@
                     label="Sales Order No"
                     labelMode="floating"
                     [width]="200"
-                    [readOnly]="isReadOnlyMode"
+                    [readOnly]="true"
                   ></dx-text-box>
                 </div>
 
@@ -61,14 +61,8 @@
                     (onValueChanged)="onDealerChanged($event)"
                   ></dx-select-box>
                 </div>
-              </div>
-            </dxi-item>
 
-            <!-- Toolbar After -->
-            <dxi-item location="after" locateInMenu="auto">
-              <div class="stacked-toolbar-group">
-                <div style="display: flex; align-items: center; gap: 5px">
-                  <!-- Reference No -->
+                <div style="margin-top: -5px; display: flex; gap: 1px">
                   <dx-select-box
                     [(value)]="salesOrderFormData.DELIVERY_ADDRESS"
                     [dataSource]="deliveryAddress"
@@ -82,12 +76,42 @@
                     (onValueChanged)="onDeliveryAddressChanged($event)"
                   ></dx-select-box>
                 </div>
+              </div>
+            </dxi-item>
+
+            <!-- Toolbar After -->
+            <dxi-item location="after" locateInMenu="auto">
+              <div class="stacked-toolbar-group">
+                <!-- 🔹 Empty first row on right side -->
+                <div style="height: 40px"></div>
+
+                <!-- Address row -->
                 <div
                   style="
                     display: flex;
                     align-items: flex-start;
                     gap: 5px;
                     margin-top: -4px;
+                  "
+                >
+                  <dx-select-box
+                    [(value)]="salesOrderFormData.SUBDEALER_ID"
+                    [dataSource]="subDealerList"
+                    displayExpr="SUBDEALER"
+                    valueExpr="ID"
+                    [width]="'100%'"
+                    [searchEnabled]="true"
+                    label="Sub Dealer"
+                    labelMode="floating"
+                    [readOnly]="isReadOnlyMode"
+                  ></dx-select-box>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 5px;
+                    margin-top: -6px;
                   "
                 >
                   <dx-text-box
@@ -97,8 +121,6 @@
                     [width]="405"
                     [readOnly]="true"
                   ></dx-text-box>
-
-                  <!-- Plus icon button -->
                   <dx-button
                     icon="plus"
                     stylingMode="outlined"
@@ -111,6 +133,7 @@
               </div>
             </dxi-item>
           </dxo-toolbar>
+
           <dxi-column
             caption="Sl No"
             [allowEditing]="false"
@@ -120,7 +143,7 @@
           <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
           <dxi-column
             dataField="ITEM"
-            caption="Item"
+            caption="Brand"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: itemsList,
@@ -320,7 +343,6 @@
               column="QTY"
               summaryType="sum"
               displayFormat="Total: {0}"
-              [valueFormat]="'#.00'"
             ></dxi-total-item>
           </dxo-summary>
 
@@ -393,7 +415,8 @@
 <dx-popup
   [(visible)]="isCutsizePopupVisible"
   [width]="'30%'"
-  [height]="'60vh'"
+  [height]="'auto'"
+  [minHeight]="100"
   [maxHeight]="800"
   title="Cutsize Details"
   (onHiding)="onCutsizePopupHiding($event)"
@@ -484,6 +507,7 @@
   </div>
   <div class="footer-actions">
     <dx-button
+      class="mt-2"
       text="Save"
       type="default"
       (onClick)="saveCutsizeDetails()"
