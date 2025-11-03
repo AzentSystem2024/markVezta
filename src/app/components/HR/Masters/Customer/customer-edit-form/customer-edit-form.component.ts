@@ -111,6 +111,7 @@ selectedTabIndex = 0;
   dealerTypeOptions = [
     { text: 'Dealer', value: 1 },
     { text: 'Sub-Dealer', value: 2 },
+    { text: 'CompanyBranch', value: 3 }
   ];
   isDealerVisible: boolean;
   deliveryAddress1: any;
@@ -229,8 +230,26 @@ selectedTabIndex = 0;
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
-    this.DEFAULT_COUNTRY_CODE = this.sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+   
   }
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    console.log(
+      this.selected_fin_id,
+      '===========selected fin id==================='
+    );
+     this.DEFAULT_COUNTRY_CODE = sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
+  }
+
   showCountry() {
     this.service.getCountryDataAPi().subscribe((response) => {
       this.CountryDropdownData = response;
@@ -314,6 +333,7 @@ selectedTabIndex = 0;
     this.getPriceLevelDropDown();
     this.get_Warehouse_Dropdown_List();
     this.get_DeliveryAddress_Dropdown_List();
+    this.sesstion_Details();
   }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;

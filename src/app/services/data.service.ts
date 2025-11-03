@@ -1224,7 +1224,7 @@ export class DataService {
   }
   public getCountryDataAPi() {
     const reqBody = {
-      NAME: 'COUNTRY',
+      NAME: 'COUNTRY_NAME',
     };
     return this.http.post(`${this.apiUrl}dropdown`, reqBody);
   }

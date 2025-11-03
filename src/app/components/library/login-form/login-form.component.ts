@@ -52,6 +52,16 @@ export class LoginFormComponent implements OnInit {
   navigation: any;
 
   validUsernames: string[] = [];
+    isPasswordVisible: boolean = false;
+
+// togglePasswordVisibility() {
+//   this.showPassword = !this.showPassword;
+// }
+
+  togglePasswordVisibility = () => {
+    this.isPasswordVisible = !this.isPasswordVisible;
+    this.cdr.detectChanges();
+  };
 
   loading = false;
   finacialYearList: any = [];

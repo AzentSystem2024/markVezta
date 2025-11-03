@@ -39,7 +39,17 @@
   text-align: center;
   margin-bottom: 20px;
 }
-
+.brand-logo{
+  margin-bottom: 25px;
+}
+// .username-input{
+//   font-family: "Poppins";
+//   font-weight: 400px;
+//   font-style: "Regular";
+//   font-size: 16px;
+//   line-height: 16px;
+//   letter-spacing: -3%;
+// }
 .dx-textbox,
 .dx-selectbox {
   width: 100%;
@@ -58,18 +68,23 @@
   background: white;
   border-radius: 10px;
   padding: 40px 30px;
-  max-width: 320px;
+  max-width: 340px;
   width: 100%;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-
+  
   // Center horizontally & vertically
   position: absolute;
   top: 50%;
   left: 75%; // pushes it to the right side
   transform: translate(-50%, -50%);
-
+  font-weight: 500px;
+  font-style: Medium;
+  font-size: 20px;
+  line-height: 16px;
+  letter-spacing: -3%;
   text-align: center;
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Poppins";
+  color: #343434;
 }
 
 .dx-icon {
@@ -81,9 +96,9 @@
   padding-left: 35px !important;
 }
 
-.dx-textbox {
-  margin-bottom: 15px;
-}
+// .dx-textbox {
+//   margin-bottom: 15px;
+// }
 
 /* Make the button background & shape */
 .dx-button.btn-sign-in {
@@ -144,3 +159,15 @@
 //   font-size: 18px;
 //   // color: #888;
 // }
+.reset-link {
+  text-align: end;
+  /* font-size: 12px; */
+  font-style: normal;
+  // margin: 6px 0 50px 0;
+  font-size: 14px;
+
+  a {
+    cursor: pointer;
+    color:#3B82F6;
+  }
+}
