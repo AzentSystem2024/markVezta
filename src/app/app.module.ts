@@ -880,6 +880,8 @@ import {
   DeliveryReturnEditModule,
 } from './pages/delivery-return-edit/delivery-return-edit.component';
 import { DeliveryAddressComponent, DeliveryAddressModule } from './HR/Masters/delivery-address/delivery-address.component';
+import { ChangePasswordComponent, ChangePasswordModule } from './components/library/PROFILEPAGE/change-password/change-password.component';
+import { SecurityPolicyComponent, SecurityPolicyModule } from './pages/SYSTEMPAGES/security-policy/security-policy.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1214,6 +1216,9 @@ import { DeliveryAddressComponent, DeliveryAddressModule } from './HR/Masters/de
     DeliveryReturnAddModule,
     DeliveryReturnEditModule,
     DeliveryAddressModule,
+    ChangePasswordModule,
+    SecurityPolicyModule,
+    
   ],
   providers: [
     AuthService,
