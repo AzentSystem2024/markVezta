@@ -5766,4 +5766,22 @@ The result can be exported to HTML or Markdown.`;
     };
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
+
+    //===================================Security Policy===================================
+  // get_securityPolicy_List() {
+  //   const getEndpoint = `${this.apiUrl}UserSecurity/usersecuritylist`;
+  //   return this.http.post(getEndpoint, {});
+  // }
+
+  //===============GET PASSOWRD POLITY IN CHANGE PASSWORD=================
+    getUserSecurityPolicityData() {
+    return this.http.post(`${this.apiUrl}Usersecurity/usersecuritylist`, {});
+  }
+
+  //================SAVE NEW PASSWORD==========================
+    reset_Password(PasswordData: any) {
+    // Ensure the function returns an Observable<any>
+    const getEndpoint = `${this.apiUrl}UserSecurity/password`;
+    return this.http.post(getEndpoint, PasswordData);
+  }
 }

@@ -9,6 +9,7 @@ import { DxToolbarModule } from 'devextreme-angular/ui/toolbar';
 import { UserPanelModule } from '../user-panel/user-panel.component';
 import { AuthService, IUser } from 'src/app/services';
 import { ThemeSwitcherModule } from 'src/app/components/library/theme-switcher/theme-switcher.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -29,6 +30,13 @@ export class AppHeaderComponent implements OnInit {
   user: IUser | null = { email: 'rererer' };
 
   userMenuItems = [
+     {
+      text: 'Change Password',
+      icon: 'key',
+      onClick: () => {
+        this.changePassword();
+      },
+    },
   {
     text: 'Logout',
     icon: 'runner',
@@ -38,10 +46,14 @@ export class AppHeaderComponent implements OnInit {
     },
   }];
 
-  constructor(private authService: AuthService,private changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private authService: AuthService,private changeDetectorRef: ChangeDetectorRef,private router: Router) { }
 
   ngOnInit() {
     this.authService.getUser().then((e) => this.user = e.data);
+  }
+
+    changePassword() {
+    this.router.navigateByUrl('/change-password');
   }
 
   toggleMenu = () => {

@@ -199,6 +199,8 @@ import { PhysicalInventoryComponent } from './pages/physical-inventory/physical-
 import { DeliveryReturnComponent } from './pages/delivery-return/delivery-return.component';
 import { ArticleProductionViewModule } from './components/HR/Masters/article-production-view/article-production-view.component';
 import { DeliveryAddressComponent } from './HR/Masters/delivery-address/delivery-address.component';
+import { ChangePasswordComponent } from './components/library/PROFILEPAGE/change-password/change-password.component';
+import { SecurityPolicyComponent } from './pages/SYSTEMPAGES/security-policy/security-policy.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -208,12 +210,6 @@ const routes: Routes = [
     redirectTo: '/auth/login',
     pathMatch: 'full',
   },
-
-  //       {
-  //  path: 'customer-list',
-  //  component: CustomerListComponent,
-  //  canActivate: [AuthGuardService],
-  //   },
 
   {
     path: 'auth',
@@ -235,12 +231,12 @@ const routes: Routes = [
         component: CreateAccountFormComponent,
         canActivate: [AuthGuardService],
       },
+     
       {
         path: 'change-password/:recoveryCode',
         component: ChangePasswordFormComponent,
         canActivate: [AuthGuardService],
       },
-
       {
         path: '**',
         redirectTo: 'login',
@@ -299,11 +295,11 @@ const routes: Routes = [
         component: ArticleBrandComponent,
         canActivate: [AuthGuardService],
       },
-      // {
-      //   path: 'article-production-view',
-      //   component: ArticleProductionViewComponent,
-      //   canActivate: [AuthGuardService],
-      // },
+       {
+        path: 'change-password',
+        component: ChangePasswordComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: 'customer-list',
         component: CustomerListComponent,
@@ -832,6 +828,11 @@ const routes: Routes = [
       {
         path: 'delivery-address',
         component: DeliveryAddressComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'security-policy',
+        component: SecurityPolicyComponent,
         canActivate: [AuthGuardService],
       },
 
