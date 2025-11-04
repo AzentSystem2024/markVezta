@@ -534,6 +534,9 @@ export class DataService {
   getWarehouse(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Salesorder/getwarehouse`, data);
   }
+  getSubdealer(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}SalesOrder/getsubdealer`, data);
+  }
   saveSalesOrder(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}SalesOrder/save`, data);
