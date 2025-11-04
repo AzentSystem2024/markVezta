@@ -167,6 +167,8 @@ export class SalesOrderFormComponent {
   selectedPackingID: any;
   subDealerList: any;
   combination: any;
+  dealerID: any;
+  selectedSubdealerId: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -391,9 +393,21 @@ export class SalesOrderFormComponent {
         this.typeList = response.Data || [];
         this.isDescriptionLoading = false;
         // Move focus to the next cell ("TYPE") after loading completes
-        setTimeout(() => {
-          grid.editCell(rowIndex, 'TYPE');
-        }, 100);
+        // setTimeout(() => {
+        //   grid.editCell(rowIndex, 'TYPE');
+        // }, 100);
+        if (e.dataField === 'ITEM') {
+          e.editorOptions.onKeyDown = (event: any) => {
+            if (event.event.key === 'Enter') {
+              const grid = e.component;
+              const rowIndex = e.row.rowIndex;
+              // Move focus to the "ledgerCode" column in the same row
+              setTimeout(() => {
+                grid.focus(grid.getCellElement(rowIndex, 'TYPE'));
+              });
+            }
+          };
+        }
       },
       error: () => {
         this.isDescriptionLoading = false;
@@ -429,6 +443,9 @@ export class SalesOrderFormComponent {
       next: (response: any) => {
         this.catList = response.Data || [];
         this.isDescriptionLoading = false;
+        setTimeout(() => {
+          grid.editCell(rowIndex, 'CATEGORY');
+        }, 100);
       },
       error: () => {
         this.isDescriptionLoading = false;
@@ -467,7 +484,9 @@ export class SalesOrderFormComponent {
       next: (response: any) => {
         const artNoList = response.Data || [];
         this.isDescriptionLoading = false;
-
+        setTimeout(() => {
+          grid.editCell(rowIndex, 'ARTNO');
+        }, 100);
         // 🔹 Assign at both row level & component level
         if (rowData) rowData.artNoList = artNoList;
         this.artNoList = artNoList;
@@ -513,6 +532,9 @@ export class SalesOrderFormComponent {
       next: (response: any) => {
         this.colorList = response.Data || [];
         this.isDescriptionLoading = false;
+        setTimeout(() => {
+          grid.editCell(rowIndex, 'COLOR');
+        }, 100);
       },
       error: () => {
         this.isDescriptionLoading = false;
@@ -550,6 +572,9 @@ export class SalesOrderFormComponent {
       next: (response: any) => {
         this.packingList = response.Data || [];
         this.isDescriptionLoading = false;
+        setTimeout(() => {
+          grid.editCell(rowIndex, 'PACKING');
+        }, 100);
       },
       error: () => {
         this.isDescriptionLoading = false;
@@ -1072,10 +1097,11 @@ export class SalesOrderFormComponent {
 
   onDealerChanged(e: any) {
     const selectedDealerId = e.value; // this gives the selected dealer's ID
+    this.dealerID = selectedDealerId;
     console.log('Selected Dealer ID:', selectedDealerId);
 
     if (selectedDealerId) {
-      this.getDeliveryAddressDropdown(selectedDealerId);
+      // this.getDeliveryAddressDropdown(selectedDealerId);
       this.getSubDealer(selectedDealerId);
       this.getWarehouseList(selectedDealerId);
     }
@@ -1087,8 +1113,16 @@ export class SalesOrderFormComponent {
     };
     this.dataService.getSubdealer(payload).subscribe((response: any) => {
       this.subDealerList = response;
+      if (this.subDealerList.length == 0) {
+        this.getDeliveryAddressDropdown(dealerId);
+      }
       console.log(response, 'SUBDEALERRRRRRRRRRRRRRRRR');
     });
+  }
+
+  onSuDealerValueChanged(event: any) {
+    this.selectedSubdealerId = event.value;
+    this.getDeliveryAddressDropdown(this.selectedSubdealerId);
   }
   getWarehouseList(dealerId: number) {
     const payload = {

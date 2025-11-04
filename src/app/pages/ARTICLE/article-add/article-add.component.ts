@@ -51,6 +51,8 @@ import { confirm } from 'devextreme/ui/dialog';
   styleUrls: ['./article-add.component.scss'],
 })
 export class ArticleAddComponent {
+  @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
+
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
@@ -88,7 +90,7 @@ export class ArticleAddComponent {
   defaultDescription: string = 'PU Footware';
   selectedSizeRows: any[] = [];
   lastOrderNo: any;
-
+  // items: any;
   articleData: any = {
     ART_NO: '',
     DESCRIPTION: '',
@@ -108,6 +110,7 @@ export class ArticleAddComponent {
     IS_COMPONENT: false,
     SUPPLIER_ID: 0,
     CREATED_DATE: new Date(),
+    STANDARD_PACKING: '',
   };
 
   articleList: any;
@@ -117,6 +120,10 @@ export class ArticleAddComponent {
   selectedSizeRowData: any;
   selectedComponentDescription: any;
   selectedTabIndex = 0;
+  items: any[] = []; // grid data → BoM components
+  itemsList: any[] = []; // dropdown source → item master list
+  data: any;
+  selectedItemId: any;
 
   constructor(private dataService: DataService) {}
 
@@ -129,6 +136,10 @@ export class ArticleAddComponent {
       this.getLastOrderNo();
     }
     this.getDropdownLists();
+    this.getItems();
+    this.items = [
+      { ITEM: null, COLOR: '', CATEGORY_NAME: '', ARTICLE_TYPE_NAME: '' },
+    ];
   }
 
   onImageSelected(event: Event) {
@@ -150,6 +161,92 @@ export class ArticleAddComponent {
       );
     } else {
       console.log('Unchecked');
+    }
+  }
+
+  getItems() {
+    this.dataService.getDropdownData('ITEMS').subscribe((response: any) => {
+      this.itemsList = response;
+    });
+  }
+
+  onEditorPreparing(e: any) {
+    const grid = e.component;
+    const row = e.row?.data;
+    const rowIndex = e.row?.rowIndex;
+    const field = e.dataField;
+    if (e.dataField === 'ITEM' && e.editorName === 'dxSelectBox') {
+      e.editorOptions.onValueChanged = (args: any) => {
+        const selectedDescription = args.value;
+        console.log('Selected Item Description:', selectedDescription);
+
+        const grid = e.component;
+        const rowIndex = e.row.rowIndex;
+
+        // keep the selected value in grid
+        grid.cellValue(rowIndex, 'ITEM', selectedDescription);
+        const matchedItem = this.itemsList.find(
+          (p: any) => p.DESCRIPTION === selectedDescription
+        );
+        console.log('Selected Description:', selectedDescription);
+        console.log('Matched Item:', matchedItem.ID);
+        // get its ID (ITEM_ID)
+        this.selectedItemId = matchedItem ? matchedItem.ID : null;
+        console.log(this.selectedItemId, 'ITEMSIDDDDDDDDDDDDDDDDDDDDDDDDDDD');
+        // Prepare payload and call API
+        const payload = { ITEM_CODE: String(selectedDescription) };
+
+        this.dataService.getItemsForArticle(payload).subscribe({
+          next: (response: any) => {
+            console.log('API Response:', response);
+
+            if (response?.flag === 1 && response?.Data) {
+              const data = response.Data;
+
+              // Update the same row with API data
+              grid.cellValue(rowIndex, 'DESCRIPTION', data.DESCRIPTION);
+              grid.cellValue(rowIndex, 'UOM', data.UOM);
+            }
+          },
+          error: (err) => console.error('API Error:', err),
+        });
+      };
+    }
+    /** ---------------------- Auto-height Dropdowns ---------------------- */
+    const dropdownFields = ['ITEM', 'DESCRIPTION', 'UOM', 'QUANTITY'];
+    if (dropdownFields.includes(field)) {
+      e.editorOptions.dropDownOptions = {
+        onContentReady: (args: any) => {
+          const content =
+            args.component?.contentElement?.() || args.component?.content();
+          const list = content?.querySelector('.dx-list');
+          if (!list) return;
+          const h = Math.min(list.scrollHeight, 180);
+          content.style.height = `${h}px`;
+          content.style.overflowY =
+            list.scrollHeight > 180 ? 'auto' : 'visible';
+        },
+      };
+    }
+    // Handle QUANTITY input
+    if (field === 'QUANTITY') {
+      e.editorOptions.onValueChanged = (args: any) => {
+        e.setCellValue(e.row.data, args.value);
+
+        if (args.value > 0) {
+          setTimeout(() => {
+            const rows = grid.getVisibleRows();
+            const hasEmpty = rows.some((r: any) => !r.data.ITEM);
+            if (!hasEmpty) {
+              const store = grid.getDataSource().store();
+              store.push([{ type: 'insert', data: {} }]);
+              grid.refresh().then(() => {
+                grid.editCell(rows.length, 'ITEM');
+              });
+            }
+          }, 100);
+        }
+      };
     }
   }
 
@@ -368,15 +465,15 @@ export class ArticleAddComponent {
       });
       return;
     }
-    if (!this.imagePreview) {
-      notify({
-        message: 'Please upload an image.',
-        type: 'warning',
-        displayTime: 3000,
-        position: { at: 'top right', my: 'top right' },
-      });
-      return;
-    }
+    // if (!this.imagePreview) {
+    //   notify({
+    //     message: 'Please upload an image.',
+    //     type: 'warning',
+    //     displayTime: 3000,
+    //     position: { at: 'top right', my: 'top right' },
+    //   });
+    //   return;
+    // }
     // Validate size selection
     if (!this.selectedSizeRowData || this.selectedSizeRowData.length === 0) {
       notify({
@@ -449,6 +546,18 @@ export class ArticleAddComponent {
           const dd = String(d.getDate()).padStart(2, '0');
           return `${yyyy}-${mm}-${dd}`;
         };
+        // ✅ Get BOM grid data
+        const bomGridData =
+          this.itemsGridRef?.instance
+            .getVisibleRows()
+            .map((row: any) => row.data)
+            .filter((row: any) => row.ITEM && row.QUANTITY > 0)
+            .map((row: any) => ({
+              ITEM_CODE: row.ITEM,
+              QUANTITY: row.QUANTITY,
+            })) || [];
+
+        console.log('BOM Data:', bomGridData);
         const payload = {
           ...this.articleData,
           CREATED_DATE: formatDate(this.articleData.CREATED_DATE),
@@ -462,6 +571,7 @@ export class ArticleAddComponent {
             SizeValue: row.SIZE,
             OrderNo: String(row.ORDER_NO),
           })),
+          BOM: bomGridData,
         };
 
         console.log('Saving article with payload:', payload);

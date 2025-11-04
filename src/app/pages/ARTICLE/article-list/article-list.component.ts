@@ -188,84 +188,48 @@ export class ArticleListComponent {
   // }
 
   getArticles() {
-    let startDate: Date;
-    let endDate: Date = new Date(); // default = today
-
-    switch (this.selectedDateRange) {
-      case 'today':
-        startDate = new Date();
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(23, 59, 59, 999);
-        break;
-
-      case 'last7':
-        startDate = new Date();
-        startDate.setDate(endDate.getDate() - 6);
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(23, 59, 59, 999);
-        break;
-
-      case 'last15':
-        startDate = new Date();
-        startDate.setDate(endDate.getDate() - 14);
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(23, 59, 59, 999);
-        break;
-
-      case 'last30':
-        startDate = new Date();
-        startDate.setDate(endDate.getDate() - 29);
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(23, 59, 59, 999);
-        break;
-
-      case 'custom':
-        if (this.customStartDate && this.customEndDate) {
-          startDate = new Date(this.customStartDate);
-          endDate = new Date(this.customEndDate);
-        } else {
-          startDate = new Date();
-          endDate = new Date();
-        }
-        break;
-
-      default: // 'all'
-        startDate = new Date(2000, 0, 1); // very old date
-        endDate = new Date();
-    }
-
-    // Helper function to format date as dd-MM-yyyy
-    const formatDate = (date: Date) => {
-      const dd = String(date.getDate()).padStart(2, '0');
-      const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-      const yyyy = date.getFullYear();
-      return `${yyyy}-${mm}-${dd}`;
-    };
-
-    const payload = {
-      DATE_FROM: formatDate(startDate),
-      DATE_TO: formatDate(endDate),
-    };
-
     this.dataService.getArticleList().subscribe((response: any) => {
-      this.articleList = response.Data.map((item: any) => {
-        let dateValue: Date;
+      if (response?.flag === 1 && Array.isArray(response.Data)) {
+        this.articleList = response.Data.map((item: any) => {
+          let parsedDate: Date;
 
-        if (!isNaN(Date.parse(item.CREATED_DATE))) {
-          dateValue = new Date(item.CREATED_DATE);
-        } else {
-          dateValue = this.parseDateString(item.CREATED_DATE);
-        }
+          // ✅ Handle various date formats safely
+          if (item.CREATED_DATE) {
+            // Try normal parsing first
+            parsedDate = new Date(item.CREATED_DATE);
 
-        return {
-          ...item,
-          CREATED_DATE: dateValue,
-        };
-      }).sort(
-        (a: any, b: any) => b.CREATED_DATE.getTime() - a.CREATED_DATE.getTime()
-      );
+            // If invalid (e.g., DD-MM-YYYY), fix it
+            if (
+              isNaN(parsedDate.getTime()) &&
+              item.CREATED_DATE.includes('-')
+            ) {
+              const parts = item.CREATED_DATE.split('-');
+              if (parts.length === 3) {
+                // assume format dd-MM-yyyy
+                const [day, month, year] = parts.map((p) => parseInt(p, 10));
+                parsedDate = new Date(year, month - 1, day);
+              }
+            }
+          } else {
+            parsedDate = new Date(0); // fallback
+          }
 
-      this.applyDateFilter(); // still useful for front-end filtering
+          return {
+            ...item,
+            CREATED_DATE: parsedDate,
+          };
+        })
+          // ✅ Sort descending by date
+          .sort(
+            (a: any, b: any) =>
+              b.CREATED_DATE.getTime() - a.CREATED_DATE.getTime()
+          );
+
+        console.log('✅ Sorted Article List:', this.articleList);
+      } else {
+        this.articleList = [];
+        console.warn('No article data found or invalid response format.');
+      }
     });
   }
 
@@ -332,105 +296,12 @@ export class ArticleListComponent {
     },
   ];
 
-  onDateRangeChanged(e: any) {
-    this.selectedDateRange = e.value;
-
-    if (e.value === 'custom') {
-      this.customStartDate = null;
-      this.customEndDate = null;
-      this.showCustomDatePopup = true;
-    } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
-    }
-    this.getArticles();
-  }
   //     sessionData_tax(){
   //         // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
   //         this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
   //     console.log(this.sessionData,'=================session data==========')
   // this.selected_vat_id=this.sessionData.VAT_ID
   //   }
-
-  applyDateFilter() {
-    if (!this.selectedDateRange || !this.articleList) {
-      this.filteredInvoiceList = this.articleList;
-      return;
-    }
-    if (this.selectedDateRange === 'all') {
-      this.filteredInvoiceList = this.articleList; // show full list
-      return;
-    }
-    const today = new Date();
-    let startDate: Date;
-    const endDate = new Date(); // today
-
-    switch (this.selectedDateRange) {
-      case 'today':
-        startDate = new Date();
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      case 'last7':
-        startDate = new Date();
-        startDate.setDate(today.getDate() - 6);
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      case 'last15':
-        startDate = new Date();
-        startDate.setDate(today.getDate() - 14);
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      case 'last30':
-        startDate = new Date();
-        startDate.setDate(today.getDate() - 29);
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      default:
-        this.filteredInvoiceList = this.articleList;
-        return;
-    }
-
-    this.filteredInvoiceList = this.articleList.filter((item: any) => {
-      if (!item.CREATED_DATE) {
-        console.warn('Missing CREATED_DATE in item:', item);
-        return false;
-      }
-
-      const invoiceDate = item.CREATED_DATE;
-      return invoiceDate >= startDate && invoiceDate <= endDate;
-    });
-  }
-
-  applyCustomDateFilter() {
-    if (!(this.customStartDate && this.customEndDate)) return;
-
-    const start = new Date(this.customStartDate);
-    start.setHours(0, 0, 0, 0);
-
-    const end = new Date(this.customEndDate);
-    end.setHours(23, 59, 59, 999);
-
-    this.filteredInvoiceList = this.articleList.filter((item: any) => {
-      const invoiceDate = item.CREATED_DATE;
-      return invoiceDate >= start && invoiceDate <= end;
-    });
-
-    const fromLabel = this.formatAsDDMMYYYY(start);
-    const toLabel = this.formatAsDDMMYYYY(end);
-
-    this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom'
-        ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
-    );
-
-    this.showCustomDatePopup = false;
-    this.getArticles();
-  }
 
   private parseDateString(dateStr: string): Date {
     if (!dateStr || typeof dateStr !== 'string') {
@@ -456,12 +327,6 @@ export class ArticleListComponent {
     return item.label;
   };
 
-  openCustomDatePopup() {
-    this.customStartDate = null;
-    this.customEndDate = null;
-    this.showCustomDatePopup = true;
-  }
-
   private formatAsDDMMYYYY(d: Date): string {
     const day = d.getDate().toString().padStart(2, '0');
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
@@ -480,29 +345,6 @@ export class ArticleListComponent {
       ? this.formatAsDDMMYYYY(new Date(this.customEndDate))
       : '';
   }
-
-  attachItemClickHandler(e: any) {
-    setTimeout(() => {
-      const popup = e.component._popup;
-      const innerList =
-        popup && popup.$content().find('.dx-list').dxList('instance');
-      if (innerList) {
-        innerList.off('itemClick'); // unsubscribe first (to avoid duplicates)
-        innerList.on('itemClick', (clickEvent: any) => {
-          const clickedValue = clickEvent.itemData.value;
-          if (clickedValue === 'custom') {
-            this.openCustomDatePopup();
-            e.component.close();
-          }
-        });
-      }
-    }, 0);
-  }
-  // refreshGrid() {
-  //   if (this.dataGrid?.instance) {
-  //     this.dataGrid.instance.refresh(); // Or reload data from API if needed
-  //   }
-  // }
 
   onEditArticle(event: any) {
     console.log(event, 'EVENT');
