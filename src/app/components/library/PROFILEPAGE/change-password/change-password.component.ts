@@ -185,31 +185,31 @@ export class ChangePasswordComponent {
 
     saveNewPassword() {
       console.log('Save New Password called');
-    this.isSaving = true;
+    // this.isSaving = true;
 
-    // Validate the entire validation group
-    const validationResult = this.validationGroup.instance.validate();
+    // // Validate the entire validation group
+    // const validationResult = this.validationGroup.instance.validate();
 
-    // Check if the form is valid before proceeding
-    if (!validationResult.isValid) {
-      this.isSaving = false;
-      return; // Stop execution if form is not valid; error messages will be shown next to the fields
-    }
+    // // Check if the form is valid before proceeding
+    // if (!validationResult.isValid) {
+    //   this.isSaving = false;
+    //   return; // Stop execution if form is not valid; error messages will be shown next to the fields
+    // }
 
     // Check if the new password meets the security policy
-    if (!this.checkPasswordStrength()) {
-      this.isSaving = false;
-      // Show error message if the password does not meet the security policy
-      notify(
-        {
-          message: 'New password does not meet the security requirements.',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'error'
-      );
-      return; // Stop execution if the password does not meet the policy
-    }
+    // if (!this.checkPasswordStrength()) {
+    //   this.isSaving = false;
+    //   // Show error message if the password does not meet the security policy
+    //   notify(
+    //     {
+    //       message: 'New password does not meet the security requirements.',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 500,
+    //     },
+    //     'error'
+    //   );
+    //   return; // Stop execution if the password does not meet the policy
+    // }
 
     const PasswordData = {
       UserID: this.UserID,
@@ -220,51 +220,52 @@ export class ChangePasswordComponent {
     console.log(PasswordData, 'password form data');
 
     this.dataService.reset_Password(PasswordData).subscribe((res) => {
-      // try {
-      //   if (res.message === 'Success') {
-      //     notify(
-      //       {
-      //         message: 'Password Updated successfully',
-      //         position: { at: 'top right', my: 'top right' },
-      //         displayTime: 500,
-      //       },
-      //       'success'
-      //     );
-      //     // Navigate to login page after notification
-      //     setTimeout(() => {
-      //       this.authService.logOut();
-      //       this.authService.logOut().subscribe((response: any) => {
-      //         if (response) {
-      //           localStorage.removeItem('sidemenuItems');
-      //           localStorage.clear();
-      //           sessionStorage.clear();
-      //           this.reuseStrategy.clearStoredData();
-      //           this.route.navigate(['/auth/login']);
-      //         }
-      //       });
-      //     }); // Wait for notification to display before navigating
-      //   } else {
-      //     this.isSaving = false;
-      //     notify(
-      //       {
-      //         message: res.message,
-      //         position: { at: 'top right', my: 'top right' },
-      //         displayTime: 500,
-      //       },
-      //       'error'
-      //     );
-      //   }
-      // } catch (error) {
-      //   this.isSaving = false;
-      //   notify(
-      //     {
-      //       message: 'Password update operation failed',
-      //       position: { at: 'top right', my: 'top right' },
-      //       displayTime: 500,
-      //     },
-      //     'error'
-      //   );
-      // }
+      console.log(res, 'password reset response');
+      try {
+        if (res) {
+          notify(
+            {
+              message: 'Password Updated successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success'
+          );
+          // Navigate to login page after notification
+          // setTimeout(() => {
+          //   this.authService.logOut();
+          //   this.authService.logOut().subscribe((response: any) => {
+          //     if (response) {
+          //       localStorage.removeItem('sidemenuItems');
+          //       localStorage.clear();
+          //       sessionStorage.clear();
+          //       this.reuseStrategy.clearStoredData();
+          //       this.route.navigate(['/auth/login']);
+          //     }
+          //   });
+          // }); // Wait for notification to display before navigating
+        } else {
+          this.isSaving = false;
+          notify(
+            {
+              message: res,
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'error'
+          );
+        }
+      } catch (error) {
+        this.isSaving = false;
+        notify(
+          {
+            message: 'Password update operation failed',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          },
+          'error'
+        );
+      }
     });
   }
 }
