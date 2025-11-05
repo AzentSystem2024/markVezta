@@ -81,11 +81,13 @@ export class EditAccountComponent implements OnChanges {
   selectedSubGroup: number | null = null;
   category: any;
   selectedCategory: any;
+  ledgerList: any;
 
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
     this.getGroupingList();
+    this.getAccountHeadList();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -180,7 +182,57 @@ export class EditAccountComponent implements OnChanges {
     this.selectedCategory = event.value; // keep both in sync
   }
 
+  getAccountHeadList() {
+    this.dataService.getAccountHeadList().subscribe((response: any) => {
+      this.ledgerList = response.Data;
+      console.log(
+        this.ledgerList,
+        '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}'
+      );
+    });
+  }
+
   updateAccountHead() {
+    if (
+      !this.accountHeadData.HEAD_NAME ||
+      !this.accountHeadData.HEAD_NAME.trim()
+    ) {
+      notify(
+        {
+          message: 'Please enter Account Head Name',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error'
+      );
+      return;
+    }
+
+    // Find duplicate excluding current record
+    const newName = this.accountHeadData?.HEAD_NAME?.trim()?.toLowerCase();
+    if (!newName) return;
+
+    const currentHeadId = String(this.accountHeadData?.HEAD_ID ?? '');
+
+    // check duplication excluding current record
+    const duplicate = (this.ledgerList ?? []).some((item: any) => {
+      const sameName = item?.HEAD_NAME?.trim()?.toLowerCase() === newName;
+      const sameRecord = String(item?.HEAD_ID ?? '') === currentHeadId;
+      return sameName && !sameRecord;
+    });
+
+    console.log(duplicate, 'DUPLICATEEEEEEEEEE');
+
+    if (duplicate) {
+      notify(
+        {
+          message: 'Account Head already exists',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'warning'
+      );
+      return;
+    }
+
     const payload = {
       HEAD_ID: this.accountHeadData.HEAD_ID,
       GROUP_ID: this.selectedCategory, // From the selected category field
@@ -263,7 +315,6 @@ export class EditAccountComponent implements OnChanges {
       this.dataService.getGroupingList().subscribe((res: any) => {
         if (res?.flag === 1 && Array.isArray(res.Data)) {
           this.groupingList = res.Data;
-
 
           if (isSubGroup) {
             this.subGroupList = this.groupingList.filter(

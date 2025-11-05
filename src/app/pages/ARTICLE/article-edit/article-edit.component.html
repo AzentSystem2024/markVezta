@@ -313,11 +313,23 @@
   </dxi-item>
 
   <dxi-item title="BoM Component">
-    <div style="margin-top: 16px">
+    <div>
       <div
         class="popup-content"
         style="height: 100%; display: flex; flex-direction: column"
       >
+        <div style="display: flex; justify-content: flex-end; margin: 10px 0">
+          <dx-button
+            text="Add"
+            (onClick)="addNewRow()"
+            [width]="120"
+            stylingMode="contained"
+            type="default"
+            icon="plus"
+            hint="New Row"
+            style="padding: 8px 8px"
+          ></dx-button>
+        </div>
         <div style="flex: 1; overflow: hidden">
           <dx-data-grid
             #itemsGridRef
@@ -327,12 +339,14 @@
             [rowAlternationEnabled]="true"
             [height]="'54vh'"
             [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
+            (onInitialized)="onGridInitialized($event)"
+            (onInitNewRow)="onInitNewRow($event)"
             (onEditorPreparing)="onEditorPreparing($event)"
           >
             <dxo-editing
               mode="cell"
               [allowUpdating]="true"
-              [allowAdding]="true"
+              [allowAdding]="false"
               [allowDeleting]="true"
             >
             </dxo-editing>

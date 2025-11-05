@@ -717,6 +717,9 @@ export class ArticleAddComponent {
     this.selectedSizeRows = [];
     this.selectedComponentArtNo = '';
     this.selectedAttachRow = null;
+    // if (this.itemsGridRef?.instance) {
+    //   this.itemsGridRef.instance.option('dataSource', []);
+    // }
   }
 
   handleClose() {

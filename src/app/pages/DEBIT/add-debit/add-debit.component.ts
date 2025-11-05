@@ -218,15 +218,11 @@ export class AddDebitComponent {
   selectInvoice(e: any) {
     console.log('Invoice selected:', e);
     const selected = e.data;
-    this.debitFormData.INVOICE_NO = String(selected.INVOICE_NO);
+    // this.debitFormData.INVOICE_NO = String(selected.INVOICE_NO);
+    this.debitFormData.INVOICE_NO = selected.INVOICE_NO;
     this.debitFormData.DUE_AMOUNT = selected.NET_AMOUNT;
     this.debitFormData.INVOICE_ID = selected.BILL_ID;
-    console.log(
-      this.debitFormData.INVOICE_NO,
-      this.debitFormData.DUE_AMOUNT,
-      this.debitFormData.INVOICE_ID,
-      '=============+++++++++++++++++++++++++++++++++++++'
-    );
+
     this.invoicePopupVisible = false;
   }
 
@@ -598,6 +594,14 @@ export class AddDebitComponent {
     return amt + gst;
   };
 
+  formatDate(date: any): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`; // ✅ yyyy-MM-dd format
+  }
+
   saveDebitNote(): void {
     this.itemsGridRef?.instance?.saveEditData();
 
@@ -628,6 +632,10 @@ export class AddDebitComponent {
         };
       });
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
+    this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
+    this.debitFormData.TRANS_DATE = this.formatDate(
+      this.debitFormData.TRANS_DATE
+    );
     this.dataService
       .insertDebitNote(this.debitFormData)
       .subscribe((response: any) => {
