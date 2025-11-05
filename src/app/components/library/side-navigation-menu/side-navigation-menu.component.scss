@@ -10,7 +10,7 @@
   .menu-container {
     background-color: var(--side-panel-background);
     min-height: 100%;
-    width: 300px;
+    width: 250px;
     display: flex;
     flex: 1;
     padding-top: var(--toolbar-vertical-padding);
@@ -103,6 +103,14 @@
   height: 46px;
   // margin-left: 50px; 
 }
+::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected {
+  background-color: var(--sub-menu-bg-color) !important;
+  color: var(--sub-menu-color) !important; /* dark blue text */
+  border-radius: 15px;
+  height: 46px;
+  /* margin-left: 50px; */ /* optional */
+}
+
 
 ::ng-deep .dx-treeview .dx-treeview-node[aria-level="1"] > .dx-treeview-item.dx-state-hover {
    background-color:var(--bg-side-panel)!important;

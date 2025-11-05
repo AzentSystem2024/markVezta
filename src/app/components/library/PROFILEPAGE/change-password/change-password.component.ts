@@ -45,7 +45,9 @@ export class ChangePasswordComponent {
      this.sesstion_Details();
   }
     onOldPasswordValueChanged(event: any): void {
+      console.log(event,'old password event');
     this.oldPassword = event.value;
+    console.log(this.oldPassword, 'old password value');
   }
 
 
@@ -95,12 +97,12 @@ export class ChangePasswordComponent {
 
    checkPasswordStrength(): boolean {
     // Skip password validation if not required
-    // if (
-    //   !this.securityPolicyData ||
-    //   !this.securityPolicyData.PasswordValidationRequired
-    // ) {
-    //   return true;
-    // }
+    if (
+      !this.securityPolicyData ||
+      !this.securityPolicyData.PasswordValidationRequired
+    ) {
+      return true;
+    }
 
     return (
       this.checkNumbers() &&

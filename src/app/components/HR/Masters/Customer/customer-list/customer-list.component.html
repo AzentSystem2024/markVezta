@@ -133,18 +133,22 @@
           
         ></dx-button>
       </dxi-item> -->
-      <dxi-item
+
+        <dxi-item
         location="after"
+        locateInMenu="auto"
         widget="dxButton"
-        [options]="addButtonOptions"
+        [options]="refreshButtonOptions"
       ></dxi-item>
+
+    
       <dxi-item
         location="after"
         locateInMenu="auto"
         showText="inMenu"
         widget="dxButton"
         [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
+          icon: isFilterRowVisible ? 'search' : 'search',
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
           stylingMode: 'text',
@@ -152,12 +156,7 @@
         }"
       ></dxi-item>
 
-      <dxi-item
-        location="after"
-        locateInMenu="auto"
-        widget="dxButton"
-        [options]="refreshButtonOptions"
-      ></dxi-item>
+    
 
       <!-- <dxi-item
             location="after"
@@ -174,6 +173,12 @@
         <div class="separator"></div>
       </dxi-item>
       <dxi-item name="exportButton"></dxi-item>
+
+        <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
       <dxi-item location="after" locateInMenu="auto">
         <div class="separator"></div>
       </dxi-item>

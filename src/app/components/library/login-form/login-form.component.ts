@@ -42,8 +42,6 @@ export class LoginFormComponent implements OnInit {
 
   btnStylingMode: DxButtonTypes.ButtonStyle;
 
-  passwordMode = 'password';
-
   menus: { [key: string]: any } | undefined;
   settings: { [key: string]: any } | undefined;
 
@@ -54,14 +52,16 @@ export class LoginFormComponent implements OnInit {
   validUsernames: string[] = [];
     isPasswordVisible: boolean = false;
 
-// togglePasswordVisibility() {
-//   this.showPassword = !this.showPassword;
-// }
-
-  togglePasswordVisibility = () => {
-    this.isPasswordVisible = !this.isPasswordVisible;
-    this.cdr.detectChanges();
+passwordMode: 'password' | 'text' = 'password';
+    togglePasswordVisibility = () => {
+    this.passwordMode = this.passwordMode === 'password' ? 'text' : 'password';
+     this.cdr.detectChanges(); // Ensure the UI reflects the change immediately
   };
+
+  // togglePasswordVisibility = () => {
+  //   this.isPasswordVisible = !this.isPasswordVisible;
+  //   this.cdr.detectChanges();
+  // };
 
   loading = false;
   finacialYearList: any = [];
