@@ -89,22 +89,7 @@
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
-      <div *dxTemplate="let data of 'dateFilterTemplate'">
-        <dx-select-box
-          [dataSource]="dateRanges"
-          [displayExpr]="displayExpr"
-          valueExpr="value"
-          [(value)]="selectedDateRange"
-          (onValueChanged)="onDateRangeChanged($event)"
-          (onOpened)="attachItemClickHandler($event)"
-          width="250"
-        >
-          <!-- This controls the dropdown list rendering -->
-          <div *dxTemplate="let item of 'item'">
-            {{ item.value === "custom" ? "Custom" : item.label }}
-          </div>
-        </dx-select-box>
-      </div>
+
       <dxi-column dataField="ART_NO" caption="Art No."></dxi-column>
       <dxi-column dataField="CATEGORY_NAME" caption="Category"></dxi-column>
       <dxi-column dataField="COLOR" caption="Color"></dxi-column>
@@ -183,14 +168,6 @@
         width="300"
       >
       </dx-date-box>
-    </div>
-
-    <div class="button-container">
-      <dx-button
-        text="Apply"
-        type="default"
-        (onClick)="applyCustomDateFilter()"
-      ></dx-button>
     </div>
   </div>
 </dx-popup>

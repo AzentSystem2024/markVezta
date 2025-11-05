@@ -178,19 +178,15 @@
               [readOnly]="true"
               [disabled]="articleData.IS_COMPONENT"
             ></dx-text-box>
-
-            <!-- <div class="button-group-inline">
-        <dx-button
-          text="Attach"
-          stylingMode="outlined"
-          type="default"
-          (onClick)="openAttachPopup()"
-        >
-        </dx-button>
-        <dx-button text="Clear" (onClick)="clearComponentArticleId()" stylingMode="outlined" type="normal">
-        </dx-button>
-      </div> -->
           </div>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="STANDARD_PACKING"
+            labelMode="floating"
+            placeholder="STANDARD_PACKING"
+            [(value)]="articleData.STANDARD_PACKING"
+          ></dx-text-box>
         </div>
         <div class="checkbox-container">
           <dx-check-box text="Create packing on saving"></dx-check-box>
@@ -311,6 +307,86 @@
       </div>
     </div>
     <!-- End of Tab 2 content -->
+  </dxi-item>
+
+  <dxi-item title="BoM Component">
+    <div style="margin-top: 16px">
+      <div
+        class="popup-content"
+        style="height: 100%; display: flex; flex-direction: column"
+      >
+        <div style="flex: 1; overflow: hidden">
+          <dx-data-grid
+            #itemsGridRef
+            [dataSource]="items"
+            [showBorders]="true"
+            [columnAutoWidth]="true"
+            [rowAlternationEnabled]="true"
+            [height]="'54vh'"
+            [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
+            (onEditorPreparing)="onEditorPreparing($event)"
+          >
+            <dxo-editing
+              mode="cell"
+              [allowUpdating]="true"
+              [allowAdding]="true"
+              [allowDeleting]="true"
+            >
+            </dxo-editing>
+
+            <dxo-paging [enabled]="true" [pageSize]="10"></dxo-paging>
+            <dxo-pager
+              [visible]="true"
+              [allowedPageSizes]="allowedPageSizes"
+              [displayMode]="displayMode"
+              [showPageSizeSelector]="showPageSizeSelector"
+              [showInfo]="true"
+              [showNavigationButtons]="true"
+            ></dxo-pager>
+            <dxo-load-panel [showPane]="false"></dxo-load-panel>
+            <dxo-scrolling mode="standard"></dxo-scrolling>
+            <dxo-filter-row
+              [visible]="isFilterRowVisible"
+              [applyFilter]="'auto'"
+            ></dxo-filter-row>
+
+            <dxi-column
+              dataField="ITEM"
+              caption="Item"
+              [editorType]="'dxSelectBox'"
+              [lookup]="{
+                dataSource: itemsList,
+                valueExpr: 'DESCRIPTION',
+                displayExpr: 'DESCRIPTION',
+                searchEnabled: true,
+                paginate: true,
+                pageSize: 50
+              }"
+              [editorOptions]="{
+              dataSource: {
+                store: {
+                  type: 'array',
+                  data: itemsList
+                },
+                paginate: true,
+                pageSize: 50
+              },
+              showScrollbar: 'always',
+              virtualScrollingEnabled: true,
+           
+            }"
+            ></dxi-column>
+
+            <dxi-column
+              dataField="DESCRIPTION"
+              caption="Description"
+            ></dxi-column>
+            <dxi-column dataField="UOM" caption="UOM"></dxi-column>
+            <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
+          </dx-data-grid>
+        </div>
+      </div>
+    </div>
   </dxi-item>
 </dx-tab-panel>
 

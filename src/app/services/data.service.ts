@@ -140,7 +140,12 @@ export class DataService {
     const reqBodyData = { name: type };
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
-
+  // --------------------------------------ARTICLE------------------------------------------------------------//
+  getItemsForArticle(items: any) {
+    const data = items;
+    // console.log(data,"insert service")
+    return this.http.post(`${this.apiUrl}article/getitem`, data);
+  }
   getArticleList(): Observable<any> {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
