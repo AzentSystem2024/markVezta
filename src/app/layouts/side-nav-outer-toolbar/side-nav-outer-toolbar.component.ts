@@ -14,10 +14,17 @@ import { CommonModule } from '@angular/common';
 
 import { Router, RouterModule, NavigationEnd, Event } from '@angular/router';
 import { ScreenService, AppInfoService, DataService } from '../../services';
-import { SideNavigationMenuModule, AppHeaderModule, AppFooterModule } from '../../components';
+import {
+  SideNavigationMenuModule,
+  AppHeaderModule,
+  AppFooterModule,
+} from '../../components';
 
 import { Subscription } from 'rxjs';
-import { DxSortableModule, DxSortableTypes } from 'devextreme-angular/ui/sortable';
+import {
+  DxSortableModule,
+  DxSortableTypes,
+} from 'devextreme-angular/ui/sortable';
 import { DxTabPanelModule } from 'devextreme-angular';
 
 @Component({
@@ -26,7 +33,8 @@ import { DxTabPanelModule } from 'devextreme-angular';
   styleUrls: ['./side-nav-outer-toolbar.component.scss'],
 })
 export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
-  @ViewChild(DxScrollViewComponent, { static: true }) scrollView!: DxScrollViewComponent;
+  @ViewChild(DxScrollViewComponent, { static: true })
+  scrollView!: DxScrollViewComponent;
 
   @Input()
   title!: string;
@@ -52,9 +60,14 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
   tabs: any[] = [];
   selectedIndex = 0;
 
-  constructor(private screen: ScreenService, private router: Router, public appInfo: AppInfoService,private cdr: ChangeDetectorRef,
+  constructor(
+    private screen: ScreenService,
+    private router: Router,
+    public appInfo: AppInfoService,
+    private cdr: ChangeDetectorRef,
     // private inactiveservice: InactivityService,
-    private dataService: DataService) {
+    private dataService: DataService
+  ) {
     this.routerSubscription = this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationEnd) {
         this.selectedRoute = event.urlAfterRedirects.split('?')[0];
@@ -71,10 +84,12 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     });
     this.selectedIndex = this.tabs.findIndex((tab) => tab.path === path);
     this.router.navigate([path]);
-    
+
     this.menuOpened = this.screen.sizes['screen-large'];
 
-    this.screenSubscription = this.screen.changed.subscribe(() => this.updateDrawer());
+    this.screenSubscription = this.screen.changed.subscribe(() =>
+      this.updateDrawer()
+    );
 
     this.updateDrawer();
   }
@@ -124,25 +139,26 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
   // }
 
   navigationChanged(event: DxTreeViewTypes.ItemClickEvent) {
+    console.log('SIDENAVMENUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU');
     console.log('Menu clicked:', event);
-  
+
     const path = (event.itemData as any).path;
     const title = (event.itemData as any).text;
-  
+
     const pointerEvent = event.event;
-  
+
     if (path) {
       const tabExists = this.tabs.some((tab) => tab.path === path);
       console.log('Tab exists?', tabExists);
-  
+
       if (!tabExists) {
         this.tabs.push({ title, path });
         console.log('Tab added:', { title, path });
       }
-  
+
       this.selectedIndex = this.tabs.findIndex((tab) => tab.path === path);
       console.log('Selected index:', this.selectedIndex);
-  
+
       this.router.navigate([path]);
       if (this.menuOpened) {
         pointerEvent?.preventDefault();
@@ -151,60 +167,52 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
         this.menuOpened = false;
         pointerEvent?.stopPropagation();
       }
-  
+
       this.cdr.detectChanges();
     } else {
       pointerEvent?.preventDefault();
     }
 
-      if (this.showMenuAfterClick) {
-    this.temporaryMenuOpened = true;
+    if (this.showMenuAfterClick) {
+      this.temporaryMenuOpened = true;
+    }
+
+    const previousState = this.menuOpened;
+    this.menuOpened = !this.menuOpened;
+
+    if (previousState !== this.menuOpened) {
+      this.cdr.detectChanges();
+    }
   }
 
-  const previousState = this.menuOpened;
-  this.menuOpened = !this.menuOpened;
-
-  if (previousState !== this.menuOpened) {
-    this.cdr.detectChanges();
-  }
-  }
-  
-
-
-
-
-
-onTabChanged(index: number) {
-  this.selectedIndex = index;
-  const selectedTab = this.tabs[index];
-  if (selectedTab) {
-    this.router.navigate([selectedTab.path]);
-  }
-}
-
-
-navigationClick() {
-  if (this.showMenuAfterClick) {
-    this.temporaryMenuOpened = true;
+  onTabChanged(index: number) {
+    this.selectedIndex = index;
+    const selectedTab = this.tabs[index];
+    if (selectedTab) {
+      this.router.navigate([selectedTab.path]);
+    }
   }
 
-  const previousState = this.menuOpened;
-  this.menuOpened = !this.menuOpened;
+  navigationClick() {
+    if (this.showMenuAfterClick) {
+      this.temporaryMenuOpened = true;
+    }
 
-  if (previousState !== this.menuOpened) {
-    this.cdr.detectChanges();
+    const previousState = this.menuOpened;
+    this.menuOpened = !this.menuOpened;
+
+    if (previousState !== this.menuOpened) {
+      this.cdr.detectChanges();
+    }
   }
-}
 
-
-
-// navigationClick() {
-//   // this.menuOpened = !this.menuOpened;
-//   if (this.showMenuAfterClick) {
-//     this.temporaryMenuOpened = true;
-//     this.menuOpened = true;
-//   }
-// }
+  // navigationClick() {
+  //   // this.menuOpened = !this.menuOpened;
+  //   if (this.showMenuAfterClick) {
+  //     this.temporaryMenuOpened = true;
+  //     this.menuOpened = true;
+  //   }
+  // }
 
   TabItemClick(tab: any) {
     const path = tab.path;
@@ -230,7 +238,7 @@ navigationClick() {
     const index = this.tabs.indexOf(tab);
     if (index > -1) {
       this.tabs.splice(index, 1);
-     
+
       if (this.selectedIndex >= this.tabs.length) {
         this.selectedIndex = this.tabs.length - 1;
       }
@@ -242,7 +250,6 @@ navigationClick() {
     } else {
     }
   }
-  
 }
 
 @NgModule({
@@ -254,9 +261,9 @@ navigationClick() {
     CommonModule,
     AppFooterModule,
     DxTabPanelModule,
-    DxSortableModule
+    DxSortableModule,
   ],
   exports: [SideNavOuterToolbarComponent],
   declarations: [SideNavOuterToolbarComponent],
 })
-export class SideNavOuterToolbarModule { }
+export class SideNavOuterToolbarModule {}

@@ -126,7 +126,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'45vh'"
+          [height]="'40vh'"
           [width]="'auto'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
@@ -201,7 +201,11 @@
           ></dxi-column>
           <dxi-column
             dataField="VAT_PERC"
-            [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT %' : ' GST %'"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT %'
+                : ' GST %'
+            "
             dataType="number"
             format="#,##0.00"
             [width]="80"
@@ -209,7 +213,11 @@
           ></dxi-column>
           <dxi-column
             dataField="TAX_AMOUNT"
-           [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Amount' : ' GST Amount'"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT Amount'
+                : ' GST Amount'
+            "
             dataType="number"
             format="#,##0.00"
             [width]="140"
@@ -271,7 +279,7 @@
           <div class="popup-footer">
             <dx-button
               text="Cancel"
-               (onClick)="cancel()"
+              (onClick)="cancel()"
               stylingMode="outlined"
               type="normal"
             ></dx-button>

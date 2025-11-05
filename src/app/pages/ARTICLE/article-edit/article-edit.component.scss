@@ -1,7 +1,20 @@
+:host ::ng-deep .dx-popup-wrapper .dx-overlay-content {
+  max-height: 90vh !important; /* allows the popup to expand higher */
+  height: auto !important; /* prevent fixed height */
+  overflow-y: hidden !important; /* remove scroll overflow */
+}
+
+:host ::ng-deep .dx-popup-content-scrollable,
+:host ::ng-deep .dx-popup-content,
+:host ::ng-deep .dx-overlay-content {
+  overflow-y: hidden !important;
+  overscroll-behavior: contain !important;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 0.5fr; /* 2 columns for fields, 1 for image/grid */
-  gap: 8px 12px;
+  gap: 6px 8px;
   margin-bottom: 16px;
   align-items: start;
 }
@@ -18,31 +31,41 @@
   grid-row: 1 / span 10; /* Adjust to fit height */
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .image-field {
-height: 150px;
+  height: 100px;
 }
 
 .image-upload-box {
   width: 100%;
-height: 200px;
+  height: 150px;
   border: 1px dashed #ccc;
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  background-color: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // background-color: #f8f8f8;
 }
 
-.image-upload-box img,
-.placeholder-box {
+.image-upload-box img {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Center the "Upload Image" text */
+.placeholder-box {
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+  position: relative; /* allow normal flow */
 }
 
 /* Override DevExtreme spacing */
@@ -68,8 +91,8 @@ height: 200px;
 .checkbox-container {
   grid-column: span 2;
   display: flex;
-  gap: 24px;
-  margin-top: 16px;
+  gap: 16px;
+  margin-top: 12px;
   align-items: center;
 }
 
@@ -102,7 +125,7 @@ height: 200px;
 }
 
 .popup-content {
-  padding: 16px;
+  //   padding: 16px;
 }
 ::ng-deep .dx-datagrid-rowsview .dx-row > td {
   border-right: 1px solid #ccc !important;
@@ -149,19 +172,32 @@ height: 200px;
   gap: 6px;
 }
 
-
 ::ng-deep .dx-tabpanel .dx-tabpanel-tabs .dx-tabs {
-    height: 100%;
-    border: none;
+  height: 100%;
+  border: none;
 }
 
 ::ng-deep .innert-tab .dx-tab.dx-tab-selected {
-    // background-color: none;
-    border: none;
-      color: #2979ff;
+  // background-color: none;
+  border: none;
+  color: #2979ff;
 }
 ::ng-deep .innert-tab .dx-tabs-styling-mode-secondary .dx-tab {
-    /* border: 1px solid var(--border-color); */
-    border: none;
-    padding: 8px 16px;
+  /* border: 1px solid var(--border-color); */
+  border: none;
+  padding: 8px 16px;
+}
+
+.fixed-footer-buttons {
+  position: absolute; /* or fixed if you want it to stay on screen while scrolling */
+  bottom: 40px; /* distance from bottom */
+  right: 20px; /* distance from right */
+  display: flex;
+  gap: 10px; /* space between buttons */
+  z-index: 1000; /* ensure it is on top */
+}
+
+/* Optional: reduce padding at the bottom of tab-panel to make space */
+.innert-tab.custom-article-tabs {
+  padding-bottom: 80px; /* must be >= height of buttons + margin */
 }

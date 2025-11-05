@@ -103,20 +103,18 @@
               >
                 <!-- Row 1: Date only -->
                 <div style="display: flex; gap: 5px; justify-content: flex-end">
-                           <dx-select-box
+                  <dx-select-box
                     [width]="200"
                     [height]="32"
                     label="Department"
                     labelMode="floating"
-                     [items]="Company_list"
+                    [items]="Company_list"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     [(value)]="journalVoucherFormData.DEPT_ID"
                   >
-
                   </dx-select-box>
                   <div *ngIf="journalVoucherFormData">
-               
                     <dx-date-box
                       label="Date"
                       labelMode="floating"
@@ -135,28 +133,27 @@
                       label="Narration"
                       labelMode="floating"
                       [(value)]="journalVoucherFormData.NARRATION"
-                      [width]="405"
+                      [width]="370"
                       (onKeyDown)="onNarrationEnter($event)"
                     ></dx-text-box>
                   </div>
+                  <dx-button
+                    icon="plus"
+                    stylingMode="outlined"
+                    type="default"
+                    hint="New Row"
+                    [elementAttr]="{ class: 'small-btn' }"
+                    style="margin-top: 8px"
+                    (onClick)="onAddRow()"
+                  ></dx-button>
                 </div>
-                <!-- Row 2: Beneficiary Name below Date -->
-                <!-- <div style="display: flex; gap: 5px">
-                  <dx-text-box
-                    #partyNameRef
-                    label="Beneficiary Name"
-                    labelMode="floating"
-                    [(value)]="journalVoucherFormData.PARTY_NAME"
-                    [width]="300"
-                    (onKeyDown)="onPartyNameEnter($event)"
-                  ></dx-text-box>
-                </div> -->
               </div>
             </dxi-item>
           </dxo-toolbar>
           <dxi-column
             dataField="billNo"
             caption="Bill No."
+            [width]="'auto'"
             [allowEditing]="true"
           ></dxi-column>
           <dxi-column
@@ -244,7 +241,7 @@
             ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
-        <!-- ✅ Row with Narration and Approve aligned in same row -->
+        <!-- Row with Narration and Approve aligned in same row -->
         <div
           *ngIf="journalVoucherFormData"
           style="

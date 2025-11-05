@@ -39,7 +39,10 @@ import {
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import { AddAccountModule } from '../add-account/add-account.component';
-import { EditAccountModule,EditAccountComponent } from '../edit-account/edit-account.component';
+import {
+  EditAccountModule,
+  EditAccountComponent,
+} from '../edit-account/edit-account.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 
@@ -62,7 +65,7 @@ export class AccountsListComponent {
   addAccountPopupOpened: boolean = false;
   editAccountPopupOpened: boolean = false;
   accountsGroupList: any;
-      canAdd = false;
+  canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
@@ -78,7 +81,7 @@ export class AccountsListComponent {
   };
   auto: string = 'auto';
   selectedAccountHead: any;
-    addButtonOptions = {
+  addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
     // icon: 'add',
@@ -93,18 +96,20 @@ export class AccountsListComponent {
     elementAttr: { class: 'add-button' },
   };
 
-      refreshButtonOptions = {
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     onClick: () => this.refreshGrid(),
     text: '',
   };
-  constructor(private dataService: DataService,
-    private ngZone: NgZone,private router: Router
+  constructor(
+    private dataService: DataService,
+    private ngZone: NgZone,
+    private router: Router
   ) {}
 
   ngOnInit() {
-     const currentUrl = this.router.url;
+    const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}'
@@ -130,18 +135,17 @@ export class AccountsListComponent {
     this.getAccountsGroupList();
   }
 
-
   getFilterButtonOptions() {
-  return {
-    icon: 'search',
-    hint: this.isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-    onClick: () => this.toggleFilterRow(),
-    stylingMode: 'text',
-    elementAttr: { class: 'commonButtons' }
-  };
-}
+    return {
+      icon: 'filter',
+      hint: this.isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+      onClick: () => this.toggleFilterRow(),
+      stylingMode: 'text',
+      elementAttr: { class: 'commonButtons' },
+    };
+  }
 
-    refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
@@ -178,25 +182,31 @@ export class AccountsListComponent {
     }
   }
 
+  toggleFilterRow = () => {
+    this.ngZone.run(() => {
+      this.isFilterRowVisible = !this.isFilterRowVisible;
 
-toggleFilterRow = () => {
-  this.ngZone.run(() => {
-    this.isFilterRowVisible = !this.isFilterRowVisible;
+      // Update hint/icon without reconstructing the object
+      this.filterButtonOptions.hint = this.isFilterRowVisible
+        ? 'Hide Filter Row'
+        : 'Show Filter Row';
+      this.filterButtonOptions.icon = this.isFilterRowVisible
+        ? 'filter'
+        : 'filter';
+    });
+  };
 
-    // Update hint/icon without reconstructing the object
-    this.filterButtonOptions.hint = this.isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row';
-    this.filterButtonOptions.icon = this.isFilterRowVisible ? 'filter' : 'filter';
-  });
-};
   getAccountsGroupList() {
     this.dataService.getAccountGroupHeadList().subscribe((response: any) => {
       if (response?.Data && Array.isArray(response.Data)) {
-        this.accountsGroupList = response.Data.map(
-          (item: any, index: number) => ({
-            ...item,
-            sno: index + 1,
-          })
-        );
+        // Sort by ID descending (latest first)
+        const sortedData = response.Data.sort((a: any, b: any) => b.ID - a.ID);
+
+        this.accountsGroupList = sortedData.map((item: any, index: number) => ({
+          ...item,
+          sno: index + 1,
+        }));
+
         console.log(this.accountsGroupList, 'accountsGroupList with Serial No');
       } else {
         this.accountsGroupList = [];
@@ -205,24 +215,41 @@ toggleFilterRow = () => {
     });
   }
 
+  // getAccountsGroupList() {
+  //   this.dataService.getAccountGroupHeadList().subscribe((response: any) => {
+  //     if (response?.Data && Array.isArray(response.Data)) {
+  //       this.accountsGroupList = response.Data.map(
+  //         (item: any, index: number) => ({
+  //           ...item,
+  //           sno: index + 1,
+  //         })
+  //       );
+  //       console.log(this.accountsGroupList, 'accountsGroupList with Serial No');
+  //     } else {
+  //       this.accountsGroupList = [];
+  //       console.warn('No data found in response');
+  //     }
+  //   });
+  // }
+
   onEditAccount(event: any) {
-    console.log(event,"EVENT")
+    console.log(event, 'EVENT');
     event.cancel = true;
     const accHeadId = event.data.ID;
-    console.log(accHeadId,"ACCOUNTHEADID")
+    console.log(accHeadId, 'ACCOUNTHEADID');
     this.dataService.selectAccountHead(accHeadId).subscribe((response: any) => {
       this.selectedAccountHead = response.Data;
       this.editAccountPopupOpened = true;
-      console.log(response,"RESPONSE")
-    })
+      console.log(response, 'RESPONSE');
+    });
   }
 
   addAccount() {
     this.addAccountPopupOpened = true;
   }
 
-  onDeleteAccountHead(e: any){
-      const accHeadId = e.data.ID;
+  onDeleteAccountHead(e: any) {
+    const accHeadId = e.data.ID;
     // console.log("delete")
     // Optionally prevent the default delete behavior
     e.cancel = true;
@@ -296,7 +323,7 @@ toggleFilterRow = () => {
     DxNumberBoxModule,
     DxoSummaryModule,
     AddAccountModule,
-    EditAccountModule
+    EditAccountModule,
   ],
   providers: [],
   declarations: [AccountsListComponent],

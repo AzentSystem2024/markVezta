@@ -45,17 +45,27 @@
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   // background-color: #f8f8f8;
 }
 
-.image-upload-box img,
-.placeholder-box {
+.image-upload-box img {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Center the "Upload Image" text */
+.placeholder-box {
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+  position: relative; /* allow normal flow */
 }
 
 /* Override DevExtreme spacing */
@@ -115,7 +125,7 @@
 }
 
 .popup-content {
-  padding: 16px;
+  //   padding: 16px;
 }
 ::ng-deep .dx-datagrid-rowsview .dx-row > td {
   border-right: 1px solid #ccc !important;

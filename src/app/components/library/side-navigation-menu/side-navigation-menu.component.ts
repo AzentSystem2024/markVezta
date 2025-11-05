@@ -42,112 +42,6 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
     return this._items;
   }
 
-  // staticMenu: any[] = [
-  //   {
-  //     text: 'Home',
-  //     icon: 'home',
-  //     path: '/analytics-dashboard',
-  //   },
-  //   {
-  //     text: 'Masters',
-  //     icon: 'user',
-  //     items: [
-  //       { text: 'User Level', path: '/user-role' },
-  //       { text: 'User', path: '/user' },
-  //       // { text: 'Dealer', path: '/dealer' },
-  //       { text: 'Company', path: '/company' },
-  //       { text: 'Customer', path: '/customer-list' },
-  //       { text: 'Supplier', path: '/supplier' },
-  //     ],
-  //   },
-  //   {
-  //     text: 'Operations',
-  //     icon: 'group',
-  //     items: [
-  //       { text: 'Invoice', path: '/invoice' },
-  //       { text: 'Article Stock View', path: '/article-stock-view' },
-  //       { text: 'Article Production View', path: '/article-production-view' },
-  //       { text: 'Transfer Out View', path: '/transfer-out-view' },
-  //       { text: 'Customer Receipts', path: '/customer-receipt' },
-  //       { text: 'Box Production View', path: '/Box-production-view' },
-  //       { text: 'Supplier Payments', path: '/supplier-payment' },
-  //       { text: 'Purchase Invoice', path: '/purchase-invoice' },
-  //       { text: 'Purchase Order', path: '/purchase-order' },
-  //       { text: 'GRN', path: '/grn' },
-  //     ],
-  //   },
-  //   {
-  //     text: 'Accounts',
-  //     icon: 'money',
-  //     items: [
-  //       { text: 'Chart Of Accounts', path: '/accounts' },
-  //       { text: 'Opening Balance', path: '/opening-balance' },
-  //       { text: 'Miscellaneous Receipts', path: '/misc-receipt' },
-  //       { text: 'Miscellaneous Payment', path: '/miscellaneous-payment' },
-  //       { text: 'Journal Voucher', path: '/journal-voucher' },
-  //       { text: 'Debit Note', path: '/debit' },
-  //       { text: 'Credit Note', path: '/credit-note' },
-  //       { text: 'Prepayment', path: '/pre-payment' },
-  //       { text: 'PDC', path: '/pdc' },
-  //       { text: 'Fixed Asset', path: '/fixed-assets' },
-  //       { text: 'Depreciation', path: '/depreciation' },
-  //       // { text: 'Journal Book', path: '/journal-book' },
-  //       // { text: 'Ledger Statement', path: '/ledger-statement' },
-  //       // { text: 'Customer Detail', path: '/customer-statement-details' },
-  //       // { text: 'Supplier Detail', path: '/supplier-statement-details' },
-  //       // { text: 'Aged Receivables', path: '/age-receivables' },
-  //       // { text: 'Aged Payables', path: '/age-payables' },
-  //       // { text: 'Profit Loss', path: '/profit-loss' },
-  //       // { text: 'Balance Sheet', path: '/balance-sheet' },
-  //       // { text: 'Cash Book', path: '/cash-book' },
-  //       // { text: 'Input Tax Worksheet', path: '/input-vat' },
-  //       // { text: 'Output Tax Worksheet', path: '/output-vat' },
-  //       // { text: 'VAT Return', path: '/vat-return' },
-  //       // { text: 'Aged Payable Details', path: '/aged-payable-details' },
-  //       // { text: 'Aged Receivable Details', path: '/aged-receivable-details' },
-  //       // { text: 'Trial Balance', path: '/trial-balance-report' },
-  //       {
-  //         text: 'Reports',
-  //         icon: 'chart',
-  //         items: [
-  //           { text: 'Journal Book', path: '/journal-book' },
-  //           { text: 'Ledger Statement', path: '/ledger-statement' },
-  //           {
-  //             text: 'Customer Statement Detail',
-  //             path: '/customer-statement-details',
-  //           },
-  //           {
-  //             text: 'Supplier Statement Detail',
-  //             path: '/supplier-statement-details',
-  //           },
-  //           { text: 'Input VAT Worksheet', path: '/input-vat' },
-  //           { text: 'Output VAT Worksheet', path: '/output-vat' },
-  //           { text: 'Aged Receivable', path: '/age-receivables' },
-  //           { text: 'Aged Payable', path: '/age-payables' },
-  //           { text: 'Trial Balance', path: '/trial-balance-report' },
-  //           { text: 'Profit & Loss', path: '/profit-loss' },
-  //           { text: 'Balance Sheet', path: '/balance-sheet' },
-  //         ],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     text: 'HR & Payroll',
-  //     icon: 'user',
-  //     items: [
-  //       { text: 'Employee', path: '/employee' },
-  //       { text: 'Salary Head', path: '/salary-head' },
-  //       { text: 'Employee Salary Settings', path: '/employee-salary-settings' },
-  //       { text: 'Timesheet', path: '/timesheet' },
-  //       { text: 'Payroll', path: '/payroll' },
-  //       { text: 'Salary Advance', path: '/salary-advance' },
-  //       { text: 'Paytime Entry', path: '/Paytime-entry' },
-  //       { text: 'Salary Payment', path: '/salary-payment' },
-  //     ],
-  //   },
-  //   //
-  // ];
-
   constructor(
     private authService: AuthService,
     private elementRef: ElementRef,
@@ -201,10 +95,6 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
 
   getIconForMainMenu(menu: string): string {
     switch (menu.toLowerCase()) {
-      case 'Home':
-        return 'preferences';
-      case 'Masters':
-        return 'user';
       case 'Accounts':
         return 'money';
       case 'HR':

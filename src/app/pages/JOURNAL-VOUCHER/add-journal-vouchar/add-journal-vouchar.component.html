@@ -60,6 +60,7 @@
                   <dx-text-box
                     label="JV No."
                     labelMode="floating"
+                    [(value)]="journalVoucherFormData.VOUCHER_NO"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
@@ -134,15 +135,9 @@
           <dxi-column
             dataField="billNo"
             caption="Bill No."
+            [width]="'auto'"
             [allowEditing]="true"
           ></dxi-column>
-
-          <!-- <dxi-column
-            dataField="billNo"
-            caption="Bill No."
-            [allowEditing]="false"
-          >
-          </dxi-column> -->
 
           <dxi-column
             dataField="ledgerCode"

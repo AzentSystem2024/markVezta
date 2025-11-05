@@ -47,6 +47,7 @@ import notify from 'devextreme/ui/notify';
 import dxSelectBox from 'devextreme/ui/select_box';
 import DevExpress from 'devextreme';
 import { Console } from 'console';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-journal-vouchar',
@@ -113,7 +114,7 @@ export class AddJournalVoucharComponent {
   netAmountDisplay: number;
   currentUser: any;
   Company_list: any = [];
-  constructor(private dataService: DataService) {
+  constructor(private dataService: DataService, private router: Router) {
     this.Deparment_Drop_down();
   }
 
@@ -122,14 +123,29 @@ export class AddJournalVoucharComponent {
     this.resetJournalVoucherForm();
     this.getLedgerCodeDropdown();
     this.Deparment_Drop_down();
-
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+    this.journalVoucherFormData.COMPANY_ID =
+      menuResponse?.Companies[0].COMPANY_ID;
+    this.journalVoucherFormData.STORE_ID =
+      menuResponse?.Configuration[0].STORE_ID;
+    console.log('Company ID:', menuResponse?.Configuration[0].STORE_ID);
+    console.log('Parsed ObjectData:', menuResponse);
     const userDataString = localStorage.getItem('userData');
+    console.log(userDataString, 'USERDATASTRINGGGGGGGGG');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      const selectedCompany = userData?.SELECTED_COMPANY;
-
+      const selectedCompany = userData?.Companies[0].COMPANY_ID;
+      console.log(userData, 'SELECTEDCOMPANY');
       if (selectedCompany?.COMPANY_ID) {
         this.journalVoucherFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
+        console.log(
+          this.journalVoucherFormData.COMPANY_ID,
+          'COMPANYIDDDDDDDDD'
+        );
       }
 
       if (userData.USER_ID) {
@@ -546,85 +562,6 @@ export class AddJournalVoucharComponent {
         e.setValue(args.value);
       };
     }
-
-    // if (e.dataField === 'creditAmount') {
-    //   e.editorOptions.onKeyDown = (event: any) => {
-    //     if (event.event.key === 'Enter') {
-    //       event.event.preventDefault();
-
-    //       const grid = this.itemsGridRef?.instance;
-    //       const rowIndex = e.row.rowIndex;
-
-    //       // ✅ Force the editor to lose focus and commit its value
-    //       const editorElement = event.event.target as HTMLElement;
-    //       editorElement.blur();
-
-    //       // ✅ Delay to let grid register the committed value
-    //       setTimeout(() => {
-    //         grid?.saveEditData(); // Now the value is committed
-    //         const rows = grid.getVisibleRows().map((r) => r.data);
-
-    //         // ✅ Add new row manually
-    //         const newRow = {
-    //           billNo: '',
-    //           ledgerCode: '',
-    //           ledgerName: '',
-    //           particulars: '',
-    //           debitAmount: '',
-    //           creditAmount: '',
-    //         };
-
-    //         this.journalVoucherFormData.DETAILS.push(newRow);
-
-    //         setTimeout(() => {
-    //           grid.option('dataSource', [
-    //             ...this.journalVoucherFormData.DETAILS,
-    //           ]);
-
-    //           setTimeout(() => {
-    //             const visibleRows = grid.getVisibleRows();
-    //             const newRowIndex = visibleRows.findIndex(
-    //               (r) => r.data === newRow
-    //             );
-    //             if (newRowIndex >= 0) {
-    //               grid.editCell(newRowIndex, 'billNo');
-    //             }
-    //           }, 50);
-    //         }, 50);
-    //       }, 50); // Let blur + commit happen
-    //     }
-
-    //     if (event.event.key === 'Tab') {
-    //       event.event.preventDefault();
-
-    //       const grid = this.itemsGridRef?.instance;
-    //       const editorElement = event.event.target as HTMLElement;
-
-    //       // ✅ Force blur to trigger value commit
-    //       editorElement.blur();
-
-    //       // ✅ Wait for value commit, then save the row and move to narration
-    //       setTimeout(() => {
-    //         grid?.saveEditData(); // Save current row edits
-    //         const rows = grid.getVisibleRows().map((r) => r.data);
-
-    //         // setTimeout(() => {
-    //         //   this.narrationRef?.instance?.focus();
-    //         // }, 50);
-    //       }, 50);
-    //     }
-    //   };
-    //   e.editorOptions.onValueChanged = (args: any) => {
-    //     if (
-    //       args.value !== null &&
-    //       args.value !== undefined &&
-    //       args.value !== ''
-    //     ) {
-    //       e.component.cellValue(rowIndex, 'debitAmount', 0.0);
-    //     }
-    //     e.setValue(args.value);
-    //   };
-    // }
   }
 
   onGridKeyDown(e: any) {
@@ -862,7 +799,7 @@ export class AddJournalVoucharComponent {
     this.journalVoucherFormData = {
       TRANS_ID: 0,
       TRANS_DATE: new Date(),
-      VOUCHER_NO: keepJournalNo ? journalNoToKeep : '',
+      // VOUCHER_NO: keepJournalNo ? journalNoToKeep : '',
       PARTY_NAME: '',
       REF_NO: '',
       TRANS_TYPE: 4,

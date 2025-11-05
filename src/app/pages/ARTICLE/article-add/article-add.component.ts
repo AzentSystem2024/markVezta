@@ -178,40 +178,40 @@ export class ArticleAddComponent {
     if (e.dataField === 'ITEM' && e.editorName === 'dxSelectBox') {
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedDescription = args.value;
-        console.log('Selected Item Description:', selectedDescription);
-
         const grid = e.component;
         const rowIndex = e.row.rowIndex;
 
-        // keep the selected value in grid
+        // Keep the selected value in the grid
         grid.cellValue(rowIndex, 'ITEM', selectedDescription);
+
+        // Find the matched item ID
         const matchedItem = this.itemsList.find(
           (p: any) => p.DESCRIPTION === selectedDescription
         );
-        console.log('Selected Description:', selectedDescription);
-        console.log('Matched Item:', matchedItem.ID);
-        // get its ID (ITEM_ID)
         this.selectedItemId = matchedItem ? matchedItem.ID : null;
-        console.log(this.selectedItemId, 'ITEMSIDDDDDDDDDDDDDDDDDDDDDDDDDDD');
-        // Prepare payload and call API
-        const payload = { ITEM_CODE: String(selectedDescription) };
 
+        // Call API to get DESCRIPTION/UOM
+        const payload = { ITEM_CODE: String(selectedDescription) };
         this.dataService.getItemsForArticle(payload).subscribe({
           next: (response: any) => {
-            console.log('API Response:', response);
-
             if (response?.flag === 1 && response?.Data) {
               const data = response.Data;
 
-              // Update the same row with API data
+              // Fill DESCRIPTION and UOM
               grid.cellValue(rowIndex, 'DESCRIPTION', data.DESCRIPTION);
               grid.cellValue(rowIndex, 'UOM', data.UOM);
+
+              // Move focus automatically to QUANTITY
+              setTimeout(() => {
+                grid.editCell(rowIndex, 'QUANTITY');
+              }, 50); // slight delay for grid rendering
             }
           },
           error: (err) => console.error('API Error:', err),
         });
       };
     }
+
     /** ---------------------- Auto-height Dropdowns ---------------------- */
     const dropdownFields = ['ITEM', 'DESCRIPTION', 'UOM', 'QUANTITY'];
     if (dropdownFields.includes(field)) {
@@ -231,23 +231,109 @@ export class ArticleAddComponent {
     // Handle QUANTITY input
     if (field === 'QUANTITY') {
       e.editorOptions.onValueChanged = (args: any) => {
-        e.setCellValue(e.row.data, args.value);
+        const grid = e.component;
+        const rowIndex = e.row?.rowIndex;
+        const rowData = e.row?.data;
 
-        if (args.value > 0) {
-          setTimeout(() => {
-            const rows = grid.getVisibleRows();
-            const hasEmpty = rows.some((r: any) => !r.data.ITEM);
-            if (!hasEmpty) {
-              const store = grid.getDataSource().store();
-              store.push([{ type: 'insert', data: {} }]);
-              grid.refresh().then(() => {
-                grid.editCell(rows.length, 'ITEM');
-              });
+        // Update current QUANTITY
+        e.setCellValue(rowData, args.value);
+
+        // Only proceed if ITEM and QUANTITY are filled
+        if (rowData?.ITEM && args.value > 0) {
+          const rows = grid.getVisibleRows();
+          const hasIncompleteRow = rows.some(
+            (r: any) => !r.data.ITEM || !r.data.QUANTITY
+          );
+
+          if (!hasIncompleteRow) {
+            // Add a new row at the bottom
+            this.items.push({
+              ITEM: null,
+              DESCRIPTION: '',
+              UOM: '',
+              QUANTITY: null,
+            });
+
+            // Use setTimeout to wait for grid to render the new row
+            setTimeout(() => {
+              const updatedRows = grid.getVisibleRows();
+              const newRowIndex = updatedRows.length - 1; // last row
+
+              // Make sure row exists
+              if (newRowIndex >= 0) {
+                // Start editing ITEM cell of new row
+                grid.editCell(newRowIndex, 'ITEM').then(() => {
+                  grid.focus(
+                    grid.getCellElement(newRowIndex, grid.columnOption('ITEM'))
+                  );
+                });
+              }
+            }, 100); // 100ms is usually enough
+          } else {
+            // If next row exists, just move focus to its ITEM
+            const nextRowIndex = rowIndex + 1;
+            if (nextRowIndex < rows.length) {
+              setTimeout(() => {
+                grid.editCell(nextRowIndex, 'ITEM');
+              }, 50);
             }
-          }, 100);
+          }
         }
       };
     }
+  }
+
+  onGridInitialized(e: any) {
+    const grid = e.component;
+    const store = grid.getDataSource().store();
+
+    // Remove empty row at start if present
+    setTimeout(() => {
+      const rows = grid.getVisibleRows();
+      if (rows.length === 1 && !rows[0].data.ITEM && !rows[0].data.QUANTITY) {
+        store.remove(rows[0].key);
+        grid.refresh();
+      }
+    });
+  }
+
+  onInitNewRow(e: any) {
+    const grid = e.component;
+    const rows = grid.getVisibleRows();
+
+    // Get the last row
+    const lastRow = rows[rows.length - 1];
+
+    // Check if last row exists and required fields are empty
+    if (lastRow && (!lastRow.data.ITEM || !lastRow.data.QUANTITY)) {
+      e.cancel = true; // Prevent adding new row
+    }
+  }
+
+  addNewRow() {
+    const grid = this.itemsGridRef.instance; // reference to your dx-data-grid
+    const rows = grid.getVisibleRows();
+
+    // Check if any existing row is incomplete
+    const hasIncompleteRow = rows.some(
+      (r: any) => !r.data.ITEM || !r.data.QUANTITY
+    );
+
+    if (hasIncompleteRow) {
+      // Optionally, show a message
+      return; // Stop adding new row
+    }
+
+    // Add new row at the bottom
+    this.items.push({ ITEM: null, DESCRIPTION: '', UOM: '', QUANTITY: null });
+
+    setTimeout(() => {
+      const updatedRows = grid.getVisibleRows();
+      const newRowIndex = updatedRows.length - 1;
+      if (newRowIndex >= 0) {
+        grid.editCell(newRowIndex, 'ITEM'); // Focus ITEM of new row
+      }
+    }, 100);
   }
 
   getArticles() {
@@ -631,6 +717,9 @@ export class ArticleAddComponent {
     this.selectedSizeRows = [];
     this.selectedComponentArtNo = '';
     this.selectedAttachRow = null;
+    // if (this.itemsGridRef?.instance) {
+    //   this.itemsGridRef.instance.option('dataSource', []);
+    // }
   }
 
   handleClose() {
