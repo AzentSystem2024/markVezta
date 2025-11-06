@@ -129,7 +129,7 @@ export class AddDebitComponent {
 
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
-        this.companyList = [selectedCompany]; // ✅ Show only selected company
+        this.companyList = [selectedCompany]; //  Show only selected company
       }
 
       if (userData.USER_ID) {
@@ -149,6 +149,16 @@ export class AddDebitComponent {
     this.getSupplierDropdown();
     this.sessionData_tax();
     this.getPendingInvoices();
+    this.debitFormData.NOTE_DETAIL = [
+      {
+        SL_NO: 1,
+        ledgerCode: '',
+        ledgerName: '',
+        particulars: '',
+        Amount: '',
+        gstAmount: '',
+      },
+    ];
   }
 
   ngAfterViewInit(): void {
@@ -208,12 +218,6 @@ export class AddDebitComponent {
       // this.pendingInvoicelist = [];
     }
   }
-
-  //   onSupplierChanged(event: any) {
-  //   console.log(event, 'eventttttttttttttttttttttttttttttttttt');
-  //   const selectedSupplierId = event.value;
-
-  // }
 
   selectInvoice(e: any) {
     console.log('Invoice selected:', e);
@@ -482,9 +486,9 @@ export class AddDebitComponent {
             }
             this.netAmountDisplay = netTotal;
             console.log('Net Amount Updated:', this.netAmountDisplay);
-            // ✅ Add new row manually
+            // Add new row manually
             const newRow = {
-              SL_NO: '',
+              SL_NO: this.debitFormData.NOTE_DETAIL.length + 1,
               HEAD_ID: '',
               AMOUNT: '',
               GST_AMOUNT: '',
@@ -563,8 +567,9 @@ export class AddDebitComponent {
   }
 
   getDocNo() {
-    this.dataService.getDocNo().subscribe((response: any) => {
+    this.dataService.getDocNoForDebit().subscribe((response: any) => {
       this.docNo = response.DOC_NO;
+      this.debitFormData.DOC_NO = response.DOC_NO;
       console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
@@ -599,7 +604,7 @@ export class AddDebitComponent {
     const year = d.getFullYear();
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const day = d.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`; // ✅ yyyy-MM-dd format
+    return `${year}-${month}-${day}`; //yyyy-MM-dd format
   }
 
   saveDebitNote(): void {
@@ -681,6 +686,19 @@ export class AddDebitComponent {
   cancel() {
     this.popupClosed.emit();
     this.resetDebitNoteForm();
+  }
+
+  onAddNewRow() {
+    const nextSlNo = this.debitFormData.NOTE_DETAIL.length + 1;
+    this.debitFormData.NOTE_DETAIL.push({
+      SL_NO: nextSlNo,
+      ledgerCode: '',
+      ledgerName: '',
+      particulars: '',
+      Amount: '',
+      gstAmount: '',
+      HEAD_ID: null,
+    });
   }
 }
 

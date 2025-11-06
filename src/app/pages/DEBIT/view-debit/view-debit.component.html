@@ -164,7 +164,11 @@
 
           <dxi-column
             dataField="gstAmount"
-           [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Amount' : ' GST Amount'"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT Amount'
+                : ' GST Amount'
+            "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [width]="150"
@@ -248,7 +252,16 @@
     </div>
   </div>
 </dx-validation-group>
-
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      (onClick)="cancel()"
+      stylingMode="outlined"
+      type="normal"
+    ></dx-button>
+  </div>
+</div>
 <!-- <div class="form-popup-buttons-container">
   <div class="popup-footer">
     <dx-button

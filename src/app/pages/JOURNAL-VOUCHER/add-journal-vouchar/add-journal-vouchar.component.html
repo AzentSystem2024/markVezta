@@ -106,6 +106,7 @@
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     [(value)]="journalVoucherFormData.DEPT_ID"
+                    (onValueChanged)="onDeptChanged($event)"
                   >
                   </dx-select-box>
                   <dx-date-box
@@ -124,10 +125,20 @@
                     label="Narration"
                     labelMode="floating"
                     [(value)]="journalVoucherFormData.NARRATION"
-                    [width]="405"
+                    [width]="365"
                     [showClearButton]="true"
                     (onKeyDown)="onNarrationEnter($event)"
                   ></dx-text-box>
+                  <dx-button
+                    icon="plus"
+                    type="default"
+                    stylingMode="outlined"
+                    hint="Add Row"
+                    [width]="32"
+                    [height]="30"
+                    style="margin-top: 6px"
+                    (onClick)="addNewManualRow()"
+                  ></dx-button>
                 </div>
               </div>
             </dxi-item>
@@ -136,7 +147,7 @@
             dataField="billNo"
             caption="Bill No."
             [width]="'auto'"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column

@@ -21,7 +21,6 @@
           [headerFilter]="{ visible: true }"
           [allowColumnReordering]="true"
           [showColumnHeaders]="true"
-          [columnAutoWidth]="true"
           [allowColumnResizing]="true"
           [height]="'55vh'"
           [columnResizingMode]="'nextColumn'"
@@ -133,6 +132,7 @@
           <dxi-column
             dataField="SL_NO"
             caption="Sl No"
+            width="80"
             [allowEditing]="true"
           ></dxi-column>
 
@@ -151,7 +151,6 @@
           <dxi-column
             dataField="ledgerName"
             caption="Ledger Name"
-            [width]="200"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: ledgerList,
@@ -164,7 +163,6 @@
           <dxi-column
             dataField="particulars"
             caption="Particulars"
-            [width]="150"
             [editorOptions]="{ maxLength: 250 }"
           >
             <dxi-validation-rule
@@ -179,15 +177,17 @@
             caption="Amount"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [width]="150"
           ></dxi-column>
 
           <dxi-column
             dataField="gstAmount"
-             [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'" 
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? ' VAT Amount'
+                : ' GST Amount'
+            "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [width]="150"
           ></dxi-column>
 
           <dxi-column type="buttons">
@@ -274,7 +274,7 @@
       type="normal"
     ></dx-button>
     <dx-button
-      [text]="creditFormData.IS_APPROVED ? 'Update & Commit' : 'Update'"
+      [text]="creditFormData.IS_APPROVED ? 'Commit' : 'Update'"
       (onClick)="updateCreditNote()"
       stylingMode="contained"
       type="default"

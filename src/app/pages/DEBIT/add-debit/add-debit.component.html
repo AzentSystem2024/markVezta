@@ -72,7 +72,7 @@
                 <div style="display: flex; gap: 5px">
                   <dx-text-box
                     label="Doc No"
-                    [(value)]="docNo"
+                    [(value)]="debitFormData.DOC_NO"
                     labelMode="floating"
                     [width]="200"
                     [readOnly]="true"
@@ -125,6 +125,13 @@
                     [inputAttr]="{ style: 'text-align: right;' }"
                     (onKeyDown)="onDueAmountKeyDown($event)"
                   ></dx-number-box>
+                  <dx-button
+                    icon="plus"
+                    stylingMode="outlined"
+                    type="default"
+                    (onClick)="onAddNewRow()"
+                    style="margin-top: 10px"
+                  ></dx-button>
                 </div>
               </div>
             </dxi-item>
@@ -132,7 +139,7 @@
           <dxi-column
             dataField="SL_NO"
             caption="Sl No"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="ledgerCode"

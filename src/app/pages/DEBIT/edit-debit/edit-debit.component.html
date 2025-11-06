@@ -118,11 +118,18 @@
                     labelMode="floating"
                     [(value)]="debitFormData[0].DUE_AMOUNT"
                     [format]="{ type: 'fixedPoint', precision: 2 }"
-                    [width]="200"
+                    [width]="150"
                     [showSpinButtons]="true"
                     [inputAttr]="{ style: 'text-align: right;' }"
                     (onKeyDown)="onDueAmountKeyDown($event)"
                   ></dx-number-box>
+                  <dx-button
+                    icon="plus"
+                    stylingMode="outlined"
+                    type="default"
+                    (onClick)="onAddNewRow()"
+                    style="margin-top: 10px"
+                  ></dx-button>
                 </div>
               </div>
             </dxi-item>
@@ -130,7 +137,7 @@
           <dxi-column
             dataField="SL_NO"
             caption="Sl No"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="ledgerCode"
@@ -248,14 +255,6 @@
               gap: 5px;
             "
           >
-            <!-- <dx-text-box
-              [value]="netAmountDisplay"
-              label="Net Amount"
-              labelMode="floating"
-              [width]="200"
-              [readOnly]="true"
-              [inputAttr]="{ style: 'text-align: right;' }"
-            ></dx-text-box> -->
             <dx-text-box
               [value]="netAmountDisplay"
               label="Net Amount"
@@ -277,13 +276,7 @@
     </div>
   </div>
 </dx-validation-group>
-<!-- <div style="display: flex; justify-content: flex-end; margin-top: 15px">
-          <dx-check-box
-            text="Approved"
-            [width]="200"
-          >
-          </dx-check-box>
-        </div> -->
+
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
     <dx-button
@@ -294,7 +287,7 @@
     ></dx-button>
     <dx-button
       #saveButtonRef
-      [text]="debitFormData.IS_APPROVED ? 'Update & Commit' : 'Update'"
+      [text]="debitFormData.IS_APPROVED ? 'Commit' : 'Update'"
       (onClick)="updateDebitNote()"
       stylingMode="contained"
       type="default"

@@ -94,15 +94,13 @@ export class ViewDebitComponent {
   sessionData: any;
   selected_vat_id: any;
 
-
   constructor(private dataService: DataService) {}
 
-  sessionData_tax(){
-        this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(this.sessionData,'=================session data==========')
-this.selected_vat_id=this.sessionData.VAT_ID
+  sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
   }
-
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
@@ -126,8 +124,8 @@ this.selected_vat_id=this.sessionData.VAT_ID
     // this.getCompanyListDropdown();
     this.getLedgerCodeDropdown();
     this.getDocNo();
-    this.getSupplierDropdown(); 
-    this.sessionData_tax()
+    this.getSupplierDropdown();
+    this.sessionData_tax();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -458,7 +456,6 @@ this.selected_vat_id=this.sessionData.VAT_ID
 
   cancel() {
     this.popupClosed.emit();
-       
   }
 
   onApprovedChanged(e: any) {

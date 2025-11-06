@@ -157,6 +157,16 @@ export class AddJournalVoucharComponent {
         this.journalVoucherFormData.FIN_ID = firstFinYear.FIN_ID;
       }
     }
+    this.journalVoucherFormData.DETAILS = [
+      {
+        billNo: 1,
+        ledgerCode: '',
+        ledgerName: '',
+        particulars: '',
+        debitAmount: '',
+        creditAmount: '',
+      },
+    ];
   }
 
   Deparment_Drop_down() {
@@ -169,6 +179,13 @@ export class AddJournalVoucharComponent {
       this.Company_list = res;
     });
   }
+
+  onDeptChanged(e: any) {
+    console.log('Selected Dept:', e.value);
+    console.log('Form value:', this.journalVoucherFormData.DEPT_ID);
+    this.journalVoucherFormData.DEPT_ID = e.value;
+  }
+
   ngAfterViewInit(): void {
     console.log('refBoxRef:', this.refBoxRef);
     console.log('refBoxRef.instance:', this.refBoxRef?.instance);
@@ -205,7 +222,7 @@ export class AddJournalVoucharComponent {
     if (e.event.key === 'Enter') {
       // Wait for DOM to stabilize
       setTimeout(() => {
-        this.itemsGridRef?.instance?.editCell(0, 'billNo');
+        this.itemsGridRef?.instance?.editCell(0, 'ledgerCode');
       }, 100);
     }
   }
@@ -226,8 +243,9 @@ export class AddJournalVoucharComponent {
   }
 
   onAddRow(): void {
+    const nextBillNo = this.journalVoucherFormData.DETAILS.length + 1;
     this.journalVoucherFormData.DETAILS.push({
-      billNo: '',
+      billNo: nextBillNo,
       ledgerCode: '',
       ledgerName: '',
       particulars: '',
@@ -288,7 +306,6 @@ export class AddJournalVoucharComponent {
 
   onEditorPreparing(e: any) {
     if (
-      e.dataField === 'billNo' ||
       e.dataField === 'ledgerCode' ||
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
@@ -483,7 +500,7 @@ export class AddJournalVoucharComponent {
 
             // ✅ Add new row manually
             const newRow = {
-              billNo: '',
+              billNo: this.journalVoucherFormData.DETAILS.length + 1,
               ledgerCode: '',
               ledgerName: '',
               particulars: '',
@@ -523,7 +540,7 @@ export class AddJournalVoucharComponent {
                   (r) => r.data === newRow
                 );
                 if (newRowIndex >= 0) {
-                  grid.editCell(newRowIndex, 'billNo');
+                  grid.editCell(newRowIndex, 'ledgerCode');
                 }
               }, 50);
             }, 50);
@@ -578,6 +595,40 @@ export class AddJournalVoucharComponent {
         }
       }, 50);
     }
+  }
+
+  addNewManualRow() {
+    if (!this.journalVoucherFormData.DETAILS) {
+      this.journalVoucherFormData.DETAILS = [];
+    }
+
+    const nextSlNo =
+      this.journalVoucherFormData.DETAILS.length > 0
+        ? Math.max(
+            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo)
+          ) + 1
+        : 1;
+
+    const newRow = {
+      billNo: nextSlNo,
+      ledgerCode: '',
+      ledgerName: '',
+      particulars: '',
+      debitAmount: '',
+      creditAmount: '',
+    };
+
+    // Force change detection
+    this.journalVoucherFormData.DETAILS = [
+      ...this.journalVoucherFormData.DETAILS,
+      newRow,
+    ];
+
+    setTimeout(() => {
+      const grid = this.itemsGridRef?.instance;
+      const newRowIndex = this.journalVoucherFormData.DETAILS.length - 1;
+      grid?.editCell(newRowIndex, 'ledgerCode');
+    }, 100);
   }
 
   onRowValidating(e: any) {
@@ -680,7 +731,8 @@ export class AddJournalVoucharComponent {
 
   saveJournalVoucher() {
     // 🔹 Step 0: Load from session/local storage
-    const userDataString = localStorage.getItem('userData'); // or sessionStorage
+    // 🔹 Step 0: Load from session/local storage
+    const userDataString = localStorage.getItem('userData');
     let companyId = '';
     let finId = '';
 
@@ -689,26 +741,36 @@ export class AddJournalVoucharComponent {
       companyId = userData?.SELECTED_COMPANY?.COMPANY_ID ?? '';
       finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? '';
     }
-    // 1. Filter out completely empty rows
+
+    // 🔹 Step 1: Filter out completely empty rows (ignore billNo-only rows)
     const cleanedDetails = this.journalVoucherFormData.DETAILS.filter(
       (item) => {
-        return Object.values({
-          billNo: item.billNo,
-          ledgerCode: item.ledgerCode,
-          ledgerName: item.ledgerName,
-          particulars: item.particulars,
-          debitAmount: item.debitAmount,
-          creditAmount: item.creditAmount,
-        }).some(
-          (value) => value !== null && value !== '' && value !== undefined
-        );
+        const hasAnyValue =
+          (item.ledgerCode && item.ledgerCode.trim() !== '') ||
+          (item.ledgerName && item.ledgerName.trim() !== '') ||
+          (item.particulars && item.particulars.trim() !== '') ||
+          (item.debitAmount && item.debitAmount != 0) ||
+          (item.creditAmount && item.creditAmount != 0);
+
+        return hasAnyValue; // Only include if there’s real content
       }
     );
+    cleanedDetails.forEach((item, index) => {
+      item.billNo = (index + 1).toString(); // ensure billNo is string
+    });
+
+    // 🔹 Step 2: Ensure at least one valid row exists
     if (!cleanedDetails || cleanedDetails.length === 0) {
-      notify('Please enter at least one entry.', 'error', 3000);
+      notify('Please enter at least one valid entry.', 'error', 3000);
       return;
     }
 
+    // 🔹 Step 3: Re-number bill numbers (continuous)
+    cleanedDetails.forEach((item, index) => {
+      item.billNo = index + 1;
+    });
+
+    // 🔹 Step 4: Calculate totals
     const totalDebit = cleanedDetails.reduce(
       (sum, item) => sum + (parseFloat(item.debitAmount) || 0),
       0
@@ -722,36 +784,33 @@ export class AddJournalVoucharComponent {
       notify('Total Debit and Credit amounts must be equal.', 'error', 3000);
       return;
     }
+
+    // 🔹 Step 5: Validate ledger codes only for rows with amount
     const hasLedgerCodeMissing = cleanedDetails.some(
-      (item) => !item.ledgerCode
-    );
-    if (hasLedgerCodeMissing) {
-      notify('One or more rows are missing a ledger code.', 'error', 3000);
-      return;
-    }
-    const hasNoAmount = cleanedDetails.every(
       (item) =>
-        (!item.debitAmount || item.debitAmount == 0) &&
-        (!item.creditAmount || item.creditAmount == 0)
+        (!item.ledgerCode || item.ledgerCode.trim() === '') &&
+        ((item.debitAmount && item.debitAmount != 0) ||
+          (item.creditAmount && item.creditAmount != 0))
     );
-    if (hasNoAmount) {
+
+    if (hasLedgerCodeMissing) {
       notify(
-        'At least one debit or credit amount must be entered.',
+        'One or more rows with debit/credit amount are missing a ledger code.',
         'error',
         3000
       );
       return;
     }
 
-    // 2. Map ledgerCode (HeadCode) to HeadID for payload
+    // 🔹 Step 6: Map ledgerCode (HeadCode) → HeadID for payload
     const transformedDetails = cleanedDetails.map((item) => {
       const matchedLedger = this.ledgerList.find(
         (l) => l.HEAD_CODE === item.ledgerCode
       );
 
       return {
-        BILL_NO: item.billNo,
-        LEDGER_CODE: matchedLedger?.HEAD_ID?.toString() || '', // <- send HeadID instead of HeadCode
+        BILL_NO: item.billNo.toString(),
+        LEDGER_CODE: matchedLedger?.HEAD_ID?.toString() || '',
         LEDGER_NAME: item.ledgerName,
         PARTICULARS: item.particulars,
         DEBIT_AMOUNT: item.debitAmount ? parseFloat(item.debitAmount) : 0.0,
@@ -759,7 +818,7 @@ export class AddJournalVoucharComponent {
       };
     });
 
-    // 3. Prepare final payload
+    // 🔹 Step 7: Prepare final payload
     const finalPayload = {
       ...this.journalVoucherFormData,
       COMPANY_ID: companyId,
@@ -799,7 +858,7 @@ export class AddJournalVoucharComponent {
     this.journalVoucherFormData = {
       TRANS_ID: 0,
       TRANS_DATE: new Date(),
-      // VOUCHER_NO: keepJournalNo ? journalNoToKeep : '',
+      VOUCHER_NO: keepJournalNo ? journalNoToKeep : '',
       PARTY_NAME: '',
       REF_NO: '',
       TRANS_TYPE: 4,
@@ -807,7 +866,7 @@ export class AddJournalVoucharComponent {
       USER_ID: 1,
       DETAILS: [
         {
-          billNo: '',
+          billNo: 1,
           ledgerCode: '',
           ledgerName: '',
           particulars: '',
