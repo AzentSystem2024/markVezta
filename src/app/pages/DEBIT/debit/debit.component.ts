@@ -158,12 +158,15 @@ export class DebitComponent {
       this.debitList = response.Data.map((item: any) => {
         let dateValue: Date;
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.TRANS_DATE))) {
-          dateValue = new Date(item.TRANS_DATE);
+        // Always parse TRANS_DATE as dd-MM-yyyy manually
+        if (
+          typeof item.TRANS_DATE === 'string' &&
+          item.TRANS_DATE.includes('-')
+        ) {
+          const [day, month, year] = item.TRANS_DATE.split('-').map(Number);
+          dateValue = new Date(year, month - 1, day);
         } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.TRANS_DATE);
+          dateValue = new Date(item.TRANS_DATE);
         }
 
         return {

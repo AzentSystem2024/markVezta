@@ -147,7 +147,7 @@ export class AddCreditNoteComponent {
 
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
-        this.companyList = [selectedCompany]; // ✅ Show only selected company
+        this.companyList = [selectedCompany]; // Show only selected company
       }
 
       if (userData.USER_ID) {
@@ -165,6 +165,17 @@ export class AddCreditNoteComponent {
     this.getCompanyListDropdown();
     this.getDocNo();
     this.getPendingInvoices();
+    this.creditFormData.NOTE_DETAIL = [
+      {
+        SL_NO: 1,
+        HEAD_ID: '',
+        ledgerCode: '',
+        ledgerName: '',
+        particulars: '',
+        Amount: '',
+        gstAmount: '',
+      },
+    ];
   }
 
   sessionData_tax() {
@@ -174,32 +185,37 @@ export class AddCreditNoteComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
-  addNewManualRow(): void {
+  addNewManualRow() {
+    if (!this.creditFormData.NOTE_DETAIL) {
+      this.creditFormData.NOTE_DETAIL = [];
+    }
+
+    const nextSlNo =
+      this.creditFormData.NOTE_DETAIL.length > 0
+        ? Math.max(...this.creditFormData.NOTE_DETAIL.map((r) => r.SL_NO)) + 1
+        : 1;
+
     const newRow = {
-      SL_NO: '',
-      HEAD_ID: '',
+      SL_NO: nextSlNo,
       ledgerCode: '',
       ledgerName: '',
       particulars: '',
       Amount: '',
       gstAmount: '',
+      HEAD_ID: null,
     };
 
-    this.creditFormData.NOTE_DETAIL.push(newRow);
+    // Force change detection
+    this.creditFormData.NOTE_DETAIL = [
+      ...this.creditFormData.NOTE_DETAIL,
+      newRow,
+    ];
 
-    // Refresh grid and edit new row
     setTimeout(() => {
-      this.itemsGridRef?.instance.option('dataSource', [
-        ...this.creditFormData.NOTE_DETAIL,
-      ]);
-      const newRowIndex = this.itemsGridRef?.instance
-        .getVisibleRows()
-        .findIndex((r) => r.data === newRow);
-
-      if (newRowIndex >= 0) {
-        this.itemsGridRef?.instance.editCell(newRowIndex, 'SL_NO');
-      }
-    }, 50);
+      const grid = this.itemsGridRef?.instance;
+      const newRowIndex = this.creditFormData.NOTE_DETAIL.length - 1;
+      grid?.editCell(newRowIndex, 'ledgerCode');
+    }, 100);
   }
 
   // ngAfterViewInit(): void {
@@ -228,7 +244,7 @@ export class AddCreditNoteComponent {
             this.itemsGridRef.instance.addRow();
 
             setTimeout(() => {
-              this.itemsGridRef?.instance?.editCell(0, 'SL_NO');
+              this.itemsGridRef?.instance?.editCell(0, 'ledgerCode');
             }, 100);
           } else {
             // ✅ No new row needed — focus invoiceBox and grid cell
@@ -237,7 +253,7 @@ export class AddCreditNoteComponent {
             }
 
             setTimeout(() => {
-              this.itemsGridRef?.instance?.editCell(0, 'SL_NO');
+              this.itemsGridRef?.instance?.editCell(0, 'ledgerCode');
             }, 100);
           }
         });
@@ -369,7 +385,6 @@ export class AddCreditNoteComponent {
 
   onEditorPreparing(e: any) {
     if (
-      e.dataField === 'SL_NO' ||
       e.dataField === 'ledgerCode' ||
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
@@ -421,26 +436,28 @@ export class AddCreditNoteComponent {
     console.log(rowIndex);
 
     // ➤ SL_NO: Move to ledgerCode on Enter
-    if (e.dataField === 'SL_NO') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.itemsGridRef?.instance;
-          const visibleRows = grid.getVisibleRows();
+    // if (e.dataField === 'SL_NO') {
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     e.editorOptions = e.editorOptions || {};
+    //     e.editorOptions.readOnly = true;
+    //     if (event.event.key === 'Enter') {
+    //       const grid = this.itemsGridRef?.instance;
+    //       const visibleRows = grid.getVisibleRows();
 
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
-          );
-          console.log(
-            'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex
-          );
+    //       const rowIndex = visibleRows.findIndex(
+    //         (r) => r?.data === e.row?.data
+    //       );
+    //       console.log(
+    //         'SL_NO → Enter → move to ledgerCode, rowIndex:',
+    //         rowIndex
+    //       );
 
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'ledgerCode'));
-          }, 50);
-        }
-      };
-    }
+    //       setTimeout(() => {
+    //         grid.focus(grid.getCellElement(rowIndex, 'ledgerCode'));
+    //       }, 50);
+    //     }
+    //   };
+    // }
 
     // ➤ ledgerCode: open dropdown on Enter, move to ledgerName on second Enter
     if (e.dataField === 'ledgerCode') {
@@ -560,7 +577,8 @@ export class AddCreditNoteComponent {
             console.log('Net Amount Updated:', this.netAmountDisplay);
             // ✅ Add new row manually
             const newRow = {
-              SL_NO: '',
+              SL_NO: this.creditFormData.NOTE_DETAIL.length + 1,
+
               HEAD_ID: '',
               AMOUNT: '',
               GST_AMOUNT: '',
@@ -578,7 +596,7 @@ export class AddCreditNoteComponent {
                   (r) => r.data === newRow
                 );
                 if (newRowIndex >= 0) {
-                  grid.editCell(newRowIndex, 'SL_NO');
+                  grid.editCell(newRowIndex, 'ledgerCode');
                 }
               }, 50);
             }, 50);

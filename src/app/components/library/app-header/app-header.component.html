@@ -19,9 +19,13 @@
       [text]="title"
     >
     </dxi-item> -->
-    <dxi-item  location="before"
-      cssClass="header-title">
-      <img src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png" alt="Logo" class="logo-image" height="40px"/>
+    <dxi-item location="before" cssClass="header-title">
+      <img
+        src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png"
+        alt="Logo"
+        class="logo-image"
+        height="40px"
+      />
     </dxi-item>
 
     <dxi-item location="after" locateInMenu="never">
@@ -29,7 +33,7 @@
         <theme-switcher></theme-switcher>
       </ng-container>
     </dxi-item>
-<!-- 
+    <!-- 
     <dxi-item location="after">
       <div *dxTemplate>
         <div class="messages">
@@ -38,11 +42,9 @@
         </div>
       </div>
     </dxi-item> -->
- 
-    
+
     <dxi-item location="after" locateInMenu="auto" menuItemTemplate="menuItem">
       <div *dxTemplate="let data of 'item'">
-        
         <user-panel
           [user]="user"
           [menuItems]="userMenuItems"
@@ -57,6 +59,5 @@
         menuMode="list"
       ></user-panel>
     </div>
-    
   </dx-toolbar>
 </header>

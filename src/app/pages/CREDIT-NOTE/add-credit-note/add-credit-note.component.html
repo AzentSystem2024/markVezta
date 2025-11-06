@@ -22,7 +22,6 @@
           [headerFilter]="{ visible: true }"
           [allowColumnReordering]="true"
           [showColumnHeaders]="true"
-          [columnAutoWidth]="true"
           [allowColumnResizing]="true"
           [height]="'55vh'"
           [columnResizingMode]="'nextColumn'"
@@ -110,7 +109,7 @@
                   [(value)]="creditFormData.TRANS_DATE"
                   label="Date"
                   labelMode="floating"
-                  [width]="200"
+                  [width]="242"
                   displayFormat="dd-MM-yyyy"
                 ></dx-text-box>
 
@@ -130,7 +129,7 @@
                     [readOnly]="true"
                   ></dx-number-box>
 
-                  <!-- <dx-button
+                  <dx-button
                     icon="plus"
                     type="default"
                     stylingMode="outlined"
@@ -139,7 +138,7 @@
                     [height]="30"
                     style="margin-top: 4px"
                     (onClick)="addNewManualRow()"
-                  ></dx-button> -->
+                  ></dx-button>
                 </div>
               </div>
             </dxi-item>
@@ -147,12 +146,12 @@
           <dxi-column
             dataField="SL_NO"
             caption="Sl No"
-            [allowEditing]="true"
+            width="80"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="ledgerCode"
             caption="Ledger Code"
-            [width]="130"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: ledgerList,
@@ -165,7 +164,6 @@
           <dxi-column
             dataField="ledgerName"
             caption="Ledger Name"
-            [width]="200"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: ledgerList,
@@ -178,7 +176,6 @@
           <dxi-column
             dataField="particulars"
             caption="Particulars"
-            [width]="150"
             [editorOptions]="{ maxLength: 250 }"
           >
             <dxi-validation-rule
@@ -192,7 +189,6 @@
             caption="Amount"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [width]="150"
           >
           </dxi-column>
 
@@ -205,11 +201,9 @@
             "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [width]="150"
           >
           </dxi-column>
           <dxi-column type="buttons">
-            <dxi-button name="edit" width="80"></dxi-button>
             <dxi-button name="delete" width="80"></dxi-button>
           </dxi-column>
 

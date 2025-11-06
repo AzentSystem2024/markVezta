@@ -91,20 +91,18 @@
               >
                 <!-- Row 1: Date only -->
                 <div style="display: flex; gap: 5px; justify-content: flex-end">
-                      <dx-select-box
+                  <dx-select-box
                     [width]="200"
                     [height]="32"
                     label="Department"
                     labelMode="floating"
-                     [items]="Company_list"
+                    [items]="Company_list"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     [(value)]="journalVoucherFormData.DEPT_ID"
                   >
-
                   </dx-select-box>
                   <div *ngIf="journalVoucherFormData">
-                    
                     <dx-date-box
                       label="Date"
                       labelMode="floating"
@@ -138,17 +136,7 @@
             [allowEditing]="true"
             [readOnly]="isReadOnly"
           ></dxi-column>
-          <!-- <dxi-column
-            dataField="HEAD_CODE"
-            caption="Ledger Code"
-            [width]="130"
-            [allowEditing]="false"
-          ></dxi-column>
-          <dxi-column
-            dataField="HEAD_NAME"
-            caption="Ledger Name"
-            [allowEditing]="false"
-          ></dxi-column> -->
+
           <dxi-column
             dataField="ledgerCode"
             caption="Ledger Code"
@@ -195,10 +183,10 @@
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
           </dxi-column>
-          <dxi-column type="buttons">
-            <dxi-button name="edit"></dxi-button>
-            <dxi-button name="delete"></dxi-button>
-          </dxi-column>
+          <!-- <dxi-column type="buttons">
+              <dxi-button name="edit"></dxi-button>
+              <dxi-button name="delete"></dxi-button>
+            </dxi-column> -->
           <dxo-summary>
             <dxi-total-item
               column="debitAmount"
@@ -232,11 +220,7 @@
         </div>
         <div *ngIf="journalVoucherFormData" style="margin-top: 10px">
           <div
-            style="
-              display: flex;
-              justify-content: flex-end;
-              padding-right: 0px;
-            "
+            style="display: flex; justify-content: flex-end; padding-right: 0px"
           >
             <dx-check-box
               [(value)]="journalVoucherFormData.IS_APPROVED"

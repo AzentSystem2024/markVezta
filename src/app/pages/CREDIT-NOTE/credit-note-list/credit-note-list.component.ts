@@ -157,11 +157,14 @@ export class CreditNoteListComponent {
         let dateValue: Date;
 
         // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.TRANS_DATE))) {
-          dateValue = new Date(item.TRANS_DATE);
+        if (
+          typeof item.TRANS_DATE === 'string' &&
+          item.TRANS_DATE.includes('-')
+        ) {
+          const [day, month, year] = item.TRANS_DATE.split('-').map(Number);
+          dateValue = new Date(year, month - 1, day);
         } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.TRANS_DATE);
+          dateValue = new Date(item.TRANS_DATE);
         }
 
         return {
@@ -468,6 +471,7 @@ export class CreditNoteListComponent {
   handleClose() {
     this.isAddCreditNote = false;
     this.isEditCreditNote = false;
+    this.isViewCreditNote = false;
     this.selectedDateRange = 'today';
     this.getCreditNotes();
   }

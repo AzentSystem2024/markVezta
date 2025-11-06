@@ -92,10 +92,9 @@ export class EditJournalVoucherComponent {
   canApprove = false;
   canPrint = false;
   Company_list: any = [];
+  selectedDeptId: any;
 
-  constructor(private dataService: DataService, private router: Router) {
-    this.Deparment_Drop_down();
-  }
+  constructor(private dataService: DataService, private router: Router) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -123,6 +122,7 @@ export class EditJournalVoucherComponent {
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getLedgerCodeDropdown();
+    this.Deparment_Drop_down();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -131,6 +131,8 @@ export class EditJournalVoucherComponent {
       changes['journalVoucherFormData'].currentValue
     ) {
       const incomingData = changes['journalVoucherFormData'].currentValue;
+      console.log(incomingData, 'INCOMINGDATAAAAAAAAAAAAAAA');
+      this.journalVoucherFormData.DEPT_ID = incomingData.DEPT_ID || null;
       const transformedDetails = (incomingData.DETAILS || []).map(
         (item: any) => {
           const matchedLedger = this.ledgerList.find(
@@ -185,7 +187,22 @@ export class EditJournalVoucherComponent {
       );
 
       this.Company_list = res;
+      if (this.journalVoucherFormData?.DEPT_ID) {
+        setTimeout(() => {
+          this.journalVoucherFormData.DEPT_ID =
+            this.journalVoucherFormData.DEPT_ID;
+          console.log(
+            'Department set after data load:',
+            this.journalVoucherFormData.DEPT_ID
+          );
+        }, 100);
+      }
     });
+  }
+  onDeptChanged(e: any) {
+    console.log('Selected Dept:', e.value);
+    console.log('Form value:', this.journalVoucherFormData.DEPT_ID);
+    this.journalVoucherFormData.DEPT_ID = e.value;
   }
   ngAfterViewInit(): void {
     // Wait for the grid and everything else to stabilize
@@ -263,7 +280,7 @@ export class EditJournalVoucherComponent {
 
   onEditorPreparing(e: any) {
     if (
-      e.dataField === 'billNo' ||
+      // e.dataField === 'billNo' ||
       e.dataField === 'ledgerCode' ||
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
@@ -458,7 +475,7 @@ export class EditJournalVoucherComponent {
 
             // ✅ Add new row manually
             const newRow = {
-              billNo: '',
+              billNo: this.journalVoucherFormData.DETAILS.length + 1,
               ledgerCode: '',
               ledgerName: '',
               particulars: '',
@@ -498,7 +515,7 @@ export class EditJournalVoucherComponent {
                   (r) => r.data === newRow
                 );
                 if (newRowIndex >= 0) {
-                  grid.editCell(newRowIndex, 'billNo');
+                  grid.editCell(newRowIndex, 'ledgerCode');
                 }
               }, 50);
             }, 50);
@@ -577,21 +594,31 @@ export class EditJournalVoucherComponent {
   }
 
   onAddRow(): void {
-    this.journalVoucherFormData.DETAILS.push({
-      billNo: '',
+    const nextSlNo =
+      this.journalVoucherFormData.DETAILS.length > 0
+        ? Math.max(
+            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo)
+          ) + 1
+        : 1;
+    const newRow = {
+      billNo: nextSlNo,
       ledgerCode: '',
       ledgerName: '',
       particulars: '',
-      debitAmount: null,
-      creditAmount: null,
-    });
+      debitAmount: '',
+      creditAmount: '',
+    };
+
+    // Force change detection
+    this.journalVoucherFormData.DETAILS = [
+      ...this.journalVoucherFormData.DETAILS,
+      newRow,
+    ];
 
     setTimeout(() => {
       const grid = this.itemsGridRef?.instance;
-      grid.refresh();
-
-      const rowIndex = this.journalVoucherFormData.DETAILS.length - 1;
-      grid.editCell(rowIndex, 'billNo'); // Focus the first field of the new row
+      const newRowIndex = this.journalVoucherFormData.DETAILS.length - 1;
+      grid?.editCell(newRowIndex, 'ledgerCode');
     }, 100);
   }
 
@@ -681,21 +708,23 @@ export class EditJournalVoucherComponent {
     // ✅ Step 1: build transformedDetails once, at the top
     const transformedDetails = (this.journalVoucherFormData.DETAILS || [])
       .filter((item: any) => {
-        const hasValue =
-          item.billNo ||
+        const hasOtherValues =
           item.ledgerCode ||
           item.ledgerName ||
           item.particulars ||
           (item.debitAmount && item.debitAmount !== 0) ||
           (item.creditAmount && item.creditAmount !== 0);
-        return hasValue;
+
+        // include row only if it has other values besides just billNo
+        return hasOtherValues;
       })
+
       .map((item: any) => {
         const matchedLedger = this.ledgerList.find(
           (l) => l.HEAD_CODE === item.ledgerCode
         );
         return {
-          BILL_NO: item.billNo,
+          BILL_NO: String(item.billNo),
           LEDGER_CODE: matchedLedger?.HEAD_ID?.toString() || '',
           LEDGER_NAME: item.ledgerName,
           PARTICULARS: item.particulars,
@@ -742,6 +771,7 @@ export class EditJournalVoucherComponent {
             TRANS_DATE: this.formatDateToDDMMYYYY(
               this.journalVoucherFormData.TRANS_DATE
             ),
+            DEPT_ID: this.journalVoucherFormData.DEPT_ID,
             TRANS_TYPE: this.journalVoucherFormData.TRANS_TYPE_ID || 4,
             NARRATION: this.journalVoucherFormData.NARRATION,
             USER_ID: this.journalVoucherFormData.USER_ID,
@@ -811,137 +841,6 @@ export class EditJournalVoucherComponent {
       }
     );
   }
-
-  // update() {
-  //   if (this.journalVoucherFormData.IS_APPROVED) {
-  //     console.log('approved???????????????????????????????????');
-  //     confirm(
-  //       'It will approve and commit. Are you sure you want to commit?',
-  //       'Confirm Commit'
-  //     ).then((result) => {
-  //       if (result) {
-  //         const payload = {
-  //           TRANS_ID: this.journalVoucherFormData.TRANS_ID,
-  //           IS_APPROVED: true,
-  //           VOUCHER_NO: this.journalVoucherFormData.VOUCHER_NO,
-  //           REF_NO: this.journalVoucherFormData.REF_NO,
-  //           PARTY_NAME: this.journalVoucherFormData.PARTY_NAME,
-  //           TRANS_DATE: this.formatDateToDDMMYYYY(
-  //             this.journalVoucherFormData.TRANS_DATE
-  //           ),
-  //           TRANS_TYPE: this.journalVoucherFormData.TRANS_TYPE_ID || 4,
-  //           NARRATION: this.journalVoucherFormData.NARRATION,
-  //           USER_ID: this.journalVoucherFormData.USER_ID,
-  //           COMPANY_ID: this.journalVoucherFormData.COMPANY_ID,
-  //           FIN_ID: this.journalVoucherFormData.FIN_ID,
-  //           TRANS_STATUS: 1,
-  //           DETAILS: transformedDetails,
-  //         };
-  //         console.log(payload, 'PAYLOADDDDDDDDDDDDDDDDDDDD');
-  //         this.dataService.commitJournalVoucher(payload).subscribe(
-  //           (response: any) => {
-  //             if (response.flag === 1) {
-  //               notify(
-  //                 'Journal voucher approved successfully!',
-  //                 'success',
-  //                 3000
-  //               );
-  //               this.popupClosed.emit(); // Close popup
-  //             } else {
-  //               notify(`Approval failed: ${response.Message}`, 'error', 4000);
-  //             }
-  //           },
-  //           (error) => {
-  //             console.error('Approval error:', error);
-  //             alert('Something went wrong while approving');
-  //           }
-  //         );
-  //       } else {
-  //         // ❌ User cancelled commit
-  //         notify('Approval cancelled.', 'info', 2000);
-  //       }
-  //     });
-
-  //     return; // 🚫 Prevent running normal update block
-  //   }
-
-  //   const transformedDetails = (this.journalVoucherFormData.DETAILS || [])
-  //     // ✅ Step 1: filter out empty rows
-  //     .filter((item: any) => {
-  //       const hasValue =
-  //         item.billNo ||
-  //         item.ledgerCode ||
-  //         item.ledgerName ||
-  //         item.particulars ||
-  //         (item.debitAmount && item.debitAmount !== 0) ||
-  //         (item.creditAmount && item.creditAmount !== 0);
-  //       return hasValue;
-  //     })
-  //     // ✅ Step 2: transform
-  //     .map((item: any) => {
-  //       const matchedLedger = this.ledgerList.find(
-  //         (l) => l.HEAD_CODE === item.ledgerCode
-  //       );
-  //       return {
-  //         BILL_NO: item.billNo,
-  //         LEDGER_CODE: matchedLedger?.HEAD_ID?.toString() || '',
-  //         LEDGER_NAME: item.ledgerName,
-  //         PARTICULARS: item.particulars,
-  //         DEBIT_AMOUNT: item.debitAmount ? Number(item.debitAmount) : 0,
-  //         CREDIT_AMOUNT: item.creditAmount ? Number(item.creditAmount) : 0,
-  //       };
-  //     });
-  //   const debitTotal = transformedDetails.reduce(
-  //     (sum, item) => sum + (item.DEBIT_AMOUNT || 0),
-  //     0
-  //   );
-  //   const creditTotal = transformedDetails.reduce(
-  //     (sum, item) => sum + (item.CREDIT_AMOUNT || 0),
-  //     0
-  //   );
-
-  //   if (debitTotal !== creditTotal) {
-  //     notify(
-  //       'Debit and Credit totals must be equal before updating!',
-  //       'error',
-  //       3000
-  //     );
-  //     return;
-  //   }
-
-  //   const payload = {
-  //     TRANS_ID: this.journalVoucherFormData.TRANS_ID,
-  //     VOUCHER_NO: this.journalVoucherFormData.VOUCHER_NO,
-  //     REF_NO: this.journalVoucherFormData.REF_NO,
-  //     PARTY_NAME: this.journalVoucherFormData.PARTY_NAME,
-  //     TRANS_DATE: this.formatDateToDDMMYYYY(
-  //       this.journalVoucherFormData.TRANS_DATE
-  //     ),
-  //     TRANS_TYPE: this.journalVoucherFormData.TRANS_TYPE_ID || 4,
-  //     NARRATION: this.journalVoucherFormData.NARRATION,
-  //     USER_ID: this.journalVoucherFormData.USER_ID,
-  //     COMPANY_ID: this.journalVoucherFormData.COMPANY_ID,
-  //     FIN_ID: this.journalVoucherFormData.FIN_ID,
-  //     TRANS_STATUS: 1,
-  //     DETAILS: transformedDetails,
-  //     IS_APPROVED: false,
-  //   };
-
-  //   this.dataService.updateJournalVoucher(payload).subscribe(
-  //     (response: any) => {
-  //       if (response.flag === 1) {
-  //         notify('Journal voucher updated successfully!', 'success', 3000);
-  //         this.popupClosed.emit(); // Close popup
-  //       } else {
-  //         notify(`Update failed: ${response.Message}`, 'error', 4000);
-  //       }
-  //     },
-  //     (error) => {
-  //       console.error('Update error:', error);
-  //       alert('Something went wrong while updating');
-  //     }
-  //   );
-  // }
 
   cancel() {
     this.popupClosed.emit();

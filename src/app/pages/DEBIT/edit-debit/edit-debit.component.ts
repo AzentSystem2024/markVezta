@@ -151,18 +151,31 @@ export class EditDebitComponent {
       this.formattedTransDate = this.formatAsDDMMYYYY(this.transDate);
       console.log(this.formattedTransDate, 'FORMATTED TRANSDATE');
       this.getLedgerCodeDropdown().then(() => {
-        this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
-          const match = this.ledgerList.find(
-            (l: any) => l.HEAD_ID === item.HEAD_ID
-          );
-          return {
-            ...item,
-            ledgerCode: match?.HEAD_CODE || '',
-            ledgerName: match?.HEAD_NAME || '',
-            particulars: item.REMARKS || '',
-            Amount: item.AMOUNT || '',
-            gstAmount: item.GST_AMOUNT || '',
-          };
+        this.noteDetails = (data.NOTE_DETAIL || []).map(
+          (item: any, index: number) => {
+            const match = this.ledgerList.find(
+              (l: any) => l.HEAD_ID === item.HEAD_ID
+            );
+            return {
+              SL_NO: index + 1,
+              ...item,
+              ledgerCode: match?.HEAD_CODE || '',
+              ledgerName: match?.HEAD_NAME || '',
+              particulars: item.REMARKS || '',
+              Amount: item.AMOUNT || '',
+              gstAmount: item.GST_AMOUNT || '',
+            };
+          }
+        );
+        const nextSlNo = this.noteDetails.length + 1;
+        this.noteDetails.push({
+          SL_NO: nextSlNo,
+          ledgerCode: '',
+          ledgerName: '',
+          particulars: '',
+          Amount: '',
+          gstAmount: '',
+          HEAD_ID: null,
         });
       });
       // this.selectedCompanyId = this.debitFormData[0].SUPP_ID;
@@ -171,6 +184,18 @@ export class EditDebitComponent {
         'SELECTEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
       );
     }
+  }
+  onAddNewRow() {
+    const nextSlNo = this.noteDetails.length + 1;
+    this.noteDetails.push({
+      SL_NO: nextSlNo,
+      ledgerCode: '',
+      ledgerName: '',
+      particulars: '',
+      Amount: '',
+      gstAmount: '',
+      HEAD_ID: null,
+    });
   }
 
   ngAfterViewInit(): void {
@@ -607,6 +632,7 @@ export class EditDebitComponent {
   getDocNo() {
     this.dataService.getDocNo().subscribe((response: any) => {
       this.docNo = response.DOC_NO;
+
       console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }

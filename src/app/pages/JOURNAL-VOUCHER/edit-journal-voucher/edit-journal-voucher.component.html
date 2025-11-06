@@ -112,6 +112,7 @@
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     [(value)]="journalVoucherFormData.DEPT_ID"
+                    (onValueChanged)="onDeptChanged($event)"
                   >
                   </dx-select-box>
                   <div *ngIf="journalVoucherFormData">

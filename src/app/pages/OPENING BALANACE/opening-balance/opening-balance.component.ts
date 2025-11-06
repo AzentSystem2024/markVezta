@@ -389,6 +389,53 @@ export class OpeningBalanceComponent {
   }
 
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'ledgerCode' ||
+      e.dataField === 'ledgerName' ||
+      e.dataField === 'debitAmount' ||
+      e.dataField === 'creditAmount' ||
+      e.dataField === 'headId'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
     console.log(rowIndex);
@@ -556,6 +603,29 @@ export class OpeningBalanceComponent {
     );
     if (hasBothAmounts) {
       alert('Each row must have either Debit or Credit amount, not both.');
+      return;
+    }
+    // ✅ Step 3: Ensure total debit = total credit
+    const totalDebit = validRows.reduce(
+      (sum: number, item: any) => sum + (item.debitAmount || 0),
+      0
+    );
+    const totalCredit = validRows.reduce(
+      (sum: number, item: any) => sum + (item.creditAmount || 0),
+      0
+    );
+
+    if (totalDebit !== totalCredit) {
+      notify(
+        `Total Debit (${totalDebit.toFixed(
+          2
+        )}) and Total Credit (${totalCredit.toFixed(
+          2
+        )}) must be equal before saving.`,
+        'warning',
+        3000
+      );
+
       return;
     }
     const payload = {

@@ -20,7 +20,6 @@
         [headerFilter]="{ visible: true }"
         [allowColumnReordering]="true"
         [showColumnHeaders]="true"
-        [columnAutoWidth]="true"
         [allowColumnResizing]="true"
         [height]="'55vh'"
         [columnResizingMode]="'nextColumn'"
@@ -99,6 +98,7 @@
           dataField="SL_NO"
           caption="Sl No"
           [allowEditing]="true"
+          width="80"
           [readOnly]="true"
         ></dxi-column>
 
@@ -108,27 +108,26 @@
           [editorType]="'dxSelectBox'"
           [lookup]="{
             dataSource: ledgerList,
-            valueExpr: 'HeadCode',
-            displayExpr: 'HeadCode',
+            valueExpr: 'HEAD_CODE',
+            displayExpr: 'HEAD_CODE',
             searchEnabled: true
           }"
         ></dxi-column>
+
         <dxi-column
           dataField="ledgerName"
           caption="Ledger Name"
-          [width]="200"
           [editorType]="'dxSelectBox'"
           [lookup]="{
             dataSource: ledgerList,
-            valueExpr: 'HeadName',
-            displayExpr: 'HeadName',
+            valueExpr: 'HEAD_NAME',
+            displayExpr: 'HEAD_NAME',
             searchEnabled: true
           }"
         ></dxi-column>
         <dxi-column
           dataField="particulars"
           caption="Particulars"
-          [width]="150"
           [editorOptions]="{ maxLength: 250 }"
         >
         </dxi-column>
@@ -138,15 +137,17 @@
           caption="Amount"
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
-          [width]="150"
         ></dxi-column>
 
         <dxi-column
           dataField="gstAmount"
-         [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'" 
+          [caption]="
+            selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+              ? ' VAT Amount'
+              : ' GST Amount'
+          "
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
-          [width]="150"
         ></dxi-column>
 
         <dxo-summary>
@@ -205,7 +206,7 @@
           ></dx-text-box>
 
           <dx-check-box
-            text="Approve"
+            text="Approved"
             [value]="creditFormData?.[0]?.TRANS_STATUS === 5"
             [readOnly]="true"
           ></dx-check-box>
