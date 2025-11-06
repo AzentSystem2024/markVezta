@@ -38,7 +38,21 @@
         </div>
       </div>
     </dxi-item> -->
- 
+ <dxi-item location="after" locateInMenu="auto">
+        <div class="separator"></div>
+      </dxi-item>
+      
+    <dxi-item
+  location="after"
+  locateInMenu="auto"
+  [options]="{
+    text: UserName,
+    stylingMode: 'text',
+    elementAttr: { class: 'userNameLabel' }
+  }"
+  widget="dxButton"
+></dxi-item>
+
     
     <dxi-item location="after" locateInMenu="auto" menuItemTemplate="menuItem">
       <div *dxTemplate="let data of 'item'">

@@ -26,8 +26,9 @@ export class AppHeaderComponent implements OnInit {
 
   @Input()
   title!: string;
-
+  customerInfo: any;
   user: IUser | null = { email: 'rererer' };
+UserName:any;
 
   userMenuItems = [
      {
@@ -50,6 +51,14 @@ export class AppHeaderComponent implements OnInit {
 
   ngOnInit() {
     this.authService.getUser().then((e) => this.user = e.data);
+    this.sesstion_Details();
+  }
+
+      sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.UserName = sessionData.USER_NAME;
+    console.log(this.UserName, 'Username');
   }
 
     changePassword() {

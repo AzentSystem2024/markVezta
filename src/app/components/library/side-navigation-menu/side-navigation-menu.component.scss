@@ -88,8 +88,7 @@
 /* Right-align only Reports submenu */
 
 /* Accounts > Reports is the 10th child in your staticMenu */
-::ng-deep
-  .dx-treeview-node[aria-level="2"]:nth-of-type(10)
+::ng-deep .dx-treeview-node[aria-level="2"]:nth-of-type(10)
   .dx-treeview-node-container {
   left: auto !important;
   right: 0 !important;
@@ -104,15 +103,14 @@
   // margin-left: 50px; 
 }
 ::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected {
-  background-color: var(--sub-menu-bg-color) !important;
-  color: var(--sub-menu-color) !important; /* dark blue text */
-  border-radius: 15px;
-  height: 46px;
-  /* margin-left: 50px; */ /* optional */
+    background-color: var(--sub-menu-bg-color) !important;
+    color: var(--sub-menu-color) !important;
+    border-radius: 15px;
+    height: 46px;
 }
 
 
-::ng-deep .dx-treeview .dx-treeview-node[aria-level="1"] > .dx-treeview-item.dx-state-hover {
+::ng-deep .dx-treeview .dx-treeview-node[aria-level="1"] > .dx-treeview-item.dx-state-hover  {
    background-color:var(--bg-side-panel)!important;
     
   border-radius: 8px;
