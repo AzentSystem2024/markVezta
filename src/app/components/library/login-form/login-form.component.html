@@ -2,7 +2,12 @@
   <form class="login-form" (submit)="onSubmit($event)">
     <div class="logo">
       <!-- <h1 class="brand-title">MMARK</h1> -->
-       <img src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png" alt="MMARK Logo" class="brand-logo" height="50px"/>
+      <img
+        src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png"
+        alt="MMARK Logo"
+        class="brand-logo"
+        height="50px"
+      />
 
       <p class="subtitle">LOG IN TO YOUR ACCOUNT</p>
     </div>
@@ -16,12 +21,12 @@
       mode="text"
       (onValueChanged)="onUsernameChange($event)"
       [buttons]="[
-    {
-      name: 'user',
-      location: 'before',
-      options: { icon: 'user' }
-    }
-  ]"
+        {
+          name: 'user',
+          location: 'before',
+          options: { icon: 'user', stylingMode: 'text' }
+        }
+      ]"
     >
       <div *dxTemplate="let data of 'before'">
         <i class="dx-icon dx-icon-user"></i>
@@ -41,25 +46,26 @@
       [disabled]="loading"
       placeholder="Password"
       stylingMode="outlined"
-
+      [inputAttr]="{ autocomplete: 'new-password' }"
+      [mode]="passwordMode"
       style="margin-top: 16px"
-        [buttons]="[
-    {
-      name: 'user',
-      location: 'before',
-      options: { icon: 'lock' }
-    },
-    {
-      name: 'togglePassword',
-      location: 'after',
-      options: {
-        icon: showPassword ? 'eyeopen' : 'eyeclose',
-        stylingMode: 'text',
-        elementAttr: { class: 'password-toggle-icon' },
-        onClick: togglePasswordVisibility.bind(this)
-      }
-    }
-  ]"
+      [buttons]="[
+        {
+          name: 'user',
+          location: 'before',
+          options: { icon: 'lock', stylingMode: 'text' }
+        },
+        {
+          name: 'togglePassword',
+          location: 'after',
+          options: {
+            icon:
+              passwordMode === 'password' ? 'fas fa-eye-slash' : 'fas fa-eye',
+            stylingMode: 'text',
+            onClick: togglePasswordVisibility
+          }
+        }
+      ]"
     >
       <!-- Lock icon before input -->
       <div *dxTemplate="let data of 'before'">
@@ -67,7 +73,7 @@
       </div>
 
       <!-- Eye icon after input -->
-      <div
+      <!-- <div
         *dxTemplate="let data of 'after'"
         (click)="showPassword = !showPassword"
         style="cursor: pointer"
@@ -76,7 +82,7 @@
           class="dx-icon"
           [ngClass]="showPassword ? 'dx-icon-eyeclose' : 'dx-icon-eyeopen'"
         ></i>
-      </div>
+      </div> -->
     </dx-text-box>
     <dx-validator
       [validationRules]="[
@@ -120,9 +126,13 @@
     >
     </dx-validator>
 
-     <div class="reset-link">
-    <a [routerLink]="resetLink"style="text-decoration: none;  font-size: 18px;">Forgot password?</a>
-  </div>
+    <div class="reset-link">
+      <a
+        [routerLink]="resetLink"
+        style="text-decoration: none; font-size: 14px; margin: top 3px"
+        >Forgot password?</a
+      >
+    </div>
     <!-- Submit Button -->
     <dx-button
       type="default"

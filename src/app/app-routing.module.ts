@@ -835,7 +835,11 @@ const routes: Routes = [
         component: SecurityPolicyComponent,
         canActivate: [AuthGuardService],
       },
-
+      {
+        path: 'reset-password-form',
+        component: AppResetPasswordComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: '**',
         redirectTo: 'analytics-dashboard',

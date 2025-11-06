@@ -73,7 +73,7 @@ export class AccountsListComponent {
   canPrint = false;
 
   filterButtonOptions: any = {
-    icon: 'filter',
+    icon: 'search',
     hint: 'Show Filter Row',
     onClick: () => this.toggleFilterRow(),
     stylingMode: 'text',
@@ -174,7 +174,7 @@ export class AccountsListComponent {
         name: 'toggleFilterButton', // custom name to avoid duplicates
         location: 'after',
         options: {
-          icon: 'filter',
+          icon: 'search',
           hint: 'Search Column',
           onClick: () => this.toggleFilters(),
         },

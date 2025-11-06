@@ -79,6 +79,7 @@ export class SecurityPolicyComponent {
 
   isLoading: boolean = false;
   menuPrevilage: any;
+  UserID: any;
 
   constructor(
     // private systemService: SystemServicesService,
@@ -92,12 +93,20 @@ export class SecurityPolicyComponent {
    ngOnInit(): void {
     this.userId = sessionStorage.getItem('UserID');
     this.get_Present_Security_Policy();
+    this.sesstion_Details();
 
     this.route.url.subscribe((segments) => {
       const fullUrl = segments.map((s) => s.path).join('/');
       console.log(fullUrl);
       // this.menuPrevilage = this.dataservice.getMenuPrevilages(fullUrl);
     });
+  }
+
+    sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.UserID = sessionData.USER_ID;
+    console.log(this.UserID, 'UserID');
   }
 
    //========== only allow select one check box under the MFA ========
@@ -175,109 +184,110 @@ export class SecurityPolicyComponent {
   }
 
     get_Present_Security_Policy() {
-    // this.isLoading = true;
-    // this.dataService
-    //   .get_securityPolicy_List()
-    //   .subscribe((response: any) => {
-    //     if (response) {
-    //       this.presentSecurityData = response.data[0];
-    //       this.tooltipData = response.Tooltip;
-    //       this.validationRequired =
-    //         this.presentSecurityData.PasswordValidationRequired;
-    //       this.minPasswordLength = this.presentSecurityData.MinimumLength;
-    //       this.isNumberChecked = this.presentSecurityData.Numbers;
-    //       this.isUppercaseChecked =
-    //         this.presentSecurityData.UppercaseCharacters;
-    //       this.isLowercaseChecked =
-    //         this.presentSecurityData.LowercaseCharacters;
-    //       this.isSpecialCharactersChecked =
-    //         this.presentSecurityData.SpecialCharacters;
-    //       this.sessionTimeOut = this.presentSecurityData.SessionTimeoutMinutes;
-    //       this.LoginAttempts = this.presentSecurityData.AccountLockAttempt;
-    //       this.resetDuration = this.presentSecurityData.AccountLockDuration;
-    //       this.failedLoginDuration =
-    //         this.presentSecurityData.AccountLockFailedLogin;
-    //       this.changePasswordOnLogin =
-    //         this.presentSecurityData.UserMustChangePasswordOnLogin;
-    //       this.passwordExpiryDaysCount = this.presentSecurityData.PasswordAge;
-    //       this.passwordRepeatCycle =
-    //         this.presentSecurityData.PasswordRepeatCycle;
-    //       this.unautherizedMessage =
-    //         this.presentSecurityData.UnauthorizedBannerMessage;
-    //       this.disableUserOn =
-    //         this.presentSecurityData.DisableUserOnInactiveDays;
-    //       this.MFAvalidationRequired = this.presentSecurityData.EnableMFA;
-    //       this.isGoogleAuthenticator = this.presentSecurityData.MFAGoogle;
-    //       this.isMicrosoftAuthenticator = this.presentSecurityData.MFAMicrosoft;
-    //       this.isCustomAuthenticator = this.presentSecurityData.MFACustom;
+    this.isLoading = true;
+    this.dataService
+      .get_securityPolicy_List()
+      .subscribe((response: any) => {
+        if (response) {
+          this.presentSecurityData = response.data[0];
+          console.log(this.presentSecurityData);
+          this.tooltipData = response.Tooltip;
+          this.validationRequired =
+            this.presentSecurityData.PasswordValidationRequired;
+          this.minPasswordLength = this.presentSecurityData.MinimumLength;
+          this.isNumberChecked = this.presentSecurityData.Numbers;
+          this.isUppercaseChecked =
+            this.presentSecurityData.UppercaseCharacters;
+          this.isLowercaseChecked =
+            this.presentSecurityData.LowercaseCharacters;
+          this.isSpecialCharactersChecked =
+            this.presentSecurityData.SpecialCharacters;
+          this.sessionTimeOut = this.presentSecurityData.SessionTimeoutMinutes;
+          this.LoginAttempts = this.presentSecurityData.AccountLockAttempt;
+          this.resetDuration = this.presentSecurityData.AccountLockDuration;
+          this.failedLoginDuration =
+            this.presentSecurityData.AccountLockFailedLogin;
+          this.changePasswordOnLogin =
+            this.presentSecurityData.UserMustChangePasswordOnLogin;
+          this.passwordExpiryDaysCount = this.presentSecurityData.PasswordAge;
+          this.passwordRepeatCycle =
+            this.presentSecurityData.PasswordRepeatCycle;
+          this.unautherizedMessage =
+            this.presentSecurityData.UnauthorizedBannerMessage;
+          this.disableUserOn =
+            this.presentSecurityData.DisableUserOnInactiveDays;
+          this.MFAvalidationRequired = this.presentSecurityData.EnableMFA;
+          this.isGoogleAuthenticator = this.presentSecurityData.MFAGoogle;
+          this.isMicrosoftAuthenticator = this.presentSecurityData.MFAMicrosoft;
+          this.isCustomAuthenticator = this.presentSecurityData.MFACustom;
 
-    //       this.customSMS = this.presentSecurityData.MFASMS;
-    //       this.customEmail = this.presentSecurityData.MFAEmail;
-    //       this.customWhatsapp = this.presentSecurityData.MFAWhatsapp;
-    //       this.customSingleToken = this.presentSecurityData.MFASingleToken;
-    //       this.appliesToLogin = this.presentSecurityData.MFAOnLogin;
-    //       this.appliesToPasswordChange =
-    //         this.presentSecurityData.MFAOnPasswordChange;
+          this.customSMS = this.presentSecurityData.MFASMS;
+          this.customEmail = this.presentSecurityData.MFAEmail;
+          this.customWhatsapp = this.presentSecurityData.MFAWhatsapp;
+          this.customSingleToken = this.presentSecurityData.MFASingleToken;
+          this.appliesToLogin = this.presentSecurityData.MFAOnLogin;
+          this.appliesToPasswordChange =
+            this.presentSecurityData.MFAOnPasswordChange;
 
-    //       this.isLoading = false;
-    //     }
-    //   });
+          this.isLoading = false;
+        }
+      });
   }
 
     onClickSave() {
-    // const formData = {
-    //   AccountLockAttempt: this.LoginAttempts,
-    //   AccountLockDuration: this.resetDuration,
-    //   AccountLockFailedLogin: this.failedLoginDuration,
-    //   DisableUserOnInactiveDays: this.disableUserOn,
-    //   EnableMFA: this.MFAvalidationRequired,
-    //   LowercaseCharacters: this.isLowercaseChecked,
-    //   MFACustom: this.isCustomAuthenticator,
-    //   MFAEmail: this.customEmail,
-    //   MFAGoogle: this.isGoogleAuthenticator,
-    //   MFAMicrosoft: this.isMicrosoftAuthenticator,
-    //   MFAOnLogin: this.appliesToLogin,
-    //   MFAOnPasswordChange: this.appliesToPasswordChange,
-    //   MFASMS: this.customSMS,
-    //   MFASingleToken: this.customSingleToken,
-    //   MFAWhatsapp: this.customWhatsapp,
-    //   MinimumLength: this.minPasswordLength,
-    //   Numbers: this.isNumberChecked,
-    //   PasswordAge: this.passwordExpiryDaysCount,
-    //   PasswordRepeatCycle: this.passwordRepeatCycle,
-    //   PasswordValidationRequired: this.validationRequired,
-    //   SessionTimeoutMinutes: this.sessionTimeOut,
-    //   SpecialCharacters: this.isSpecialCharactersChecked,
-    //   UnauthorizedBannerMessage: this.unautherizedMessage,
-    //   UppercaseCharacters: this.isUppercaseChecked,
-    //   UserID: this.userId,
-    //   UserMustChangePasswordOnLogin: this.changePasswordOnLogin,
-    // };
+    const formData = {
+      AccountLockAttempt: this.LoginAttempts,
+      AccountLockDuration: this.resetDuration,
+      AccountLockFailedLogin: this.failedLoginDuration,
+      DisableUserOnInactiveDays: this.disableUserOn,
+      EnableMFA: this.MFAvalidationRequired,
+      LowercaseCharacters: this.isLowercaseChecked,
+      MFACustom: this.isCustomAuthenticator,
+      MFAEmail: this.customEmail,
+      MFAGoogle: this.isGoogleAuthenticator,
+      MFAMicrosoft: this.isMicrosoftAuthenticator,
+      MFAOnLogin: this.appliesToLogin,
+      MFAOnPasswordChange: this.appliesToPasswordChange,
+      MFASMS: this.customSMS,
+      MFASingleToken: this.customSingleToken,
+      MFAWhatsapp: this.customWhatsapp,
+      MinimumLength: this.minPasswordLength,
+      Numbers: this.isNumberChecked,
+      PasswordAge: this.passwordExpiryDaysCount,
+      PasswordRepeatCycle: this.passwordRepeatCycle,
+      PasswordValidationRequired: this.validationRequired,
+      SessionTimeoutMinutes: this.sessionTimeOut,
+      SpecialCharacters: this.isSpecialCharactersChecked,
+      UnauthorizedBannerMessage: this.unautherizedMessage,
+      UppercaseCharacters: this.isUppercaseChecked,
+      UserID: this.UserID,
+      UserMustChangePasswordOnLogin: this.changePasswordOnLogin,
+    };
 
-    // this.isLoading = true;
-    // this.systemService
-    //   .save_security_Policy_Data(formData)
-    //   .subscribe((response: any) => {
-    //     if (response) {
-    //       notify(
-    //         {
-    //           message: `Security Policy saved Successfully`,
-    //           position: { at: 'top right', my: 'top right' },
-    //         },
-    //         'success'
-    //       );
-    //       this.get_Present_Security_Policy();
-    //     } else {
-    //       notify(
-    //         {
-    //           message: `Your Data Not Saved`,
-    //           position: { at: 'top right', my: 'top right' },
-    //         },
-    //         'error'
-    //       );
-    //       this.isLoading = false;
-    //     }
-    //   });
+    this.isLoading = true;
+    this.dataService
+      .save_security_Policy_Data(formData)
+      .subscribe((response: any) => {
+        if (response) {
+          notify(
+            {
+              message: `Security Policy saved Successfully`,
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success'
+          );
+          this.get_Present_Security_Policy();
+        } else {
+          notify(
+            {
+              message: `Your Data Not Saved`,
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error'
+          );
+          this.isLoading = false;
+        }
+      });
   }
 }
 @NgModule({

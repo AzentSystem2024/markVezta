@@ -882,6 +882,7 @@ import {
 import { DeliveryAddressComponent, DeliveryAddressModule } from './HR/Masters/delivery-address/delivery-address.component';
 import { ChangePasswordComponent, ChangePasswordModule } from './components/library/PROFILEPAGE/change-password/change-password.component';
 import { SecurityPolicyComponent, SecurityPolicyModule } from './pages/SYSTEMPAGES/security-policy/security-policy.component';
+import { ResetPasswordComponent, ResetPasswordModule } from './pages/reset-password/reset-password.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -898,6 +899,7 @@ import { SecurityPolicyComponent, SecurityPolicyModule } from './pages/SYSTEMPAG
     SingleCardModule,
     AppFooterModule,
     ResetPasswordFormModule,
+    ResetPasswordModule,
     CreateAccountFormModule,
     ChangePasswordFormModule,
     LoginFormModule,

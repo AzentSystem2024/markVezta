@@ -53,20 +53,8 @@
             margin-right: 3px;
           ">User</div>
       </dxi-item>
-      <dxi-item
-      location="after"
-      locateInMenu="auto"
-      showText="inMenu"
-      widget="dxButton"
-      [options]="{
-        icon: isFilterRowVisible ? 'filter' : 'filter',
-        hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-        onClick: toggleFilterRow,
-        stylingMode: 'text',
-        elementAttr: { class: 'commonButtons' }
-      }"
-    ></dxi-item>
-     <dxi-item
+
+       <dxi-item
         location="after"
         locateInMenu="auto"
         showText="inMenu"
@@ -79,6 +67,21 @@
           hint: 'refresh'
         }"
       ></dxi-item>
+      
+      <dxi-item
+      location="after"
+      locateInMenu="auto"
+      showText="inMenu"
+      widget="dxButton"
+      [options]="{
+        icon: isFilterRowVisible ? 'search' : 'search',
+        hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+        onClick: toggleFilterRow,
+        stylingMode: 'text',
+        elementAttr: { class: 'commonButtons' }
+      }"
+    ></dxi-item>
+    
 
       <dxi-item
         name="exportButton"

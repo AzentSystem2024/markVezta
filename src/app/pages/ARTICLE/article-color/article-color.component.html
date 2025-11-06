@@ -58,6 +58,13 @@ noDataText=" "
           ">Article Color</div>
     </dxi-item>
 
+     <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+  
         
 <dxi-item
         location="after"
@@ -65,7 +72,7 @@ noDataText=" "
         showText="inMenu"
         widget="dxButton"
         [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
+          icon: isFilterRowVisible ? 'search' : 'search',
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
           stylingMode: 'text',
@@ -73,13 +80,7 @@ noDataText=" "
         }"
       ></dxi-item>
 
- <dxi-item
-          location="after"
-          locateInMenu="auto"
-          widget="dxButton"
-          [options]="refreshButtonOptions"
-        ></dxi-item>
-  
+
  <dxi-item
       location="after"
       *ngIf="canAdd"

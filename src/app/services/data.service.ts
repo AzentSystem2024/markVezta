@@ -5784,4 +5784,17 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = `${this.apiUrl}UserSecurity/password`;
     return this.http.post(getEndpoint, PasswordData);
   }
+
+  //===================GET SECURITY POLICY LIST======================
+    get_securityPolicy_List() {
+    const getEndpoint = `${this.apiUrl}SecuritySettings/list`;
+    return this.http.post(getEndpoint, {});
+  }
+
+   //========================Insert OR Update security policy list==========================
+  save_security_Policy_Data(data: any) {
+    const getEndpoint = `${this.apiUrl}SecuritySettings/save`;
+    const reqBody = data;
+    return this.http.post(getEndpoint, reqBody);
+  }
 }

@@ -206,7 +206,7 @@ export class CustomerReceiptsComponent {
         name: 'toggleFilterButton', // custom name to avoid duplicates
         location: 'after',
         options: {
-          icon: 'filter',
+          icon: 'search',
           hint: 'Search Column',
           onClick: () => this.toggleFilters(),
         },

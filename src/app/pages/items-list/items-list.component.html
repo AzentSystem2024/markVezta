@@ -69,13 +69,22 @@
     </dx-select-box> -->
   </dxi-item>
 
+   <dxi-item location="after" locateInMenu="auto">
+        <dx-button
+        
+          icon="refresh"
+          stylingMode="text"
+          (onClick)="onRefreshButtonClick()"
+        ></dx-button>
+      </dxi-item>
+
        <dxi-item
         location="after"
         locateInMenu="auto"
         showText="inMenu"
         widget="dxButton"
         [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
+          icon: isFilterRowVisible ? 'search' : 'search',
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
           stylingMode: 'text',
@@ -90,14 +99,7 @@
     ></dxi-item>
 
 
-      <dxi-item location="after" locateInMenu="auto">
-        <dx-button
-        
-          icon="refresh"
-          stylingMode="text"
-          (onClick)="onRefreshButtonClick()"
-        ></dx-button>
-      </dxi-item>
+     
      
       <dxi-item name="exportButton"></dxi-item>
     

@@ -1,4 +1,5 @@
 import { Component, NgModule } from '@angular/core';
+import { DxButtonModule } from 'devextreme-angular';
 
 
 import { CardAuthModule, ResetPasswordFormModule } from 'src/app/components';
@@ -10,18 +11,13 @@ import { CardAuthModule, ResetPasswordFormModule } from 'src/app/components';
 })
 export class AppResetPasswordComponent {
 
-  defaultLink = '/sign-in-form';
-
-  buttonLink = '/reset-password-form';
-
-  constructor() { }
-
 }
 
 @NgModule({
   imports: [
     CardAuthModule,
     ResetPasswordFormModule,
+    DxButtonModule
   ],
   providers: [],
   exports: [AppResetPasswordComponent],

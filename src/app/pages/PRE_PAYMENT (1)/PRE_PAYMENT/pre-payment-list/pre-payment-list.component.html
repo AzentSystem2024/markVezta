@@ -64,21 +64,21 @@
          
          
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-
-        <dxi-item
-        *ngIf="canAdd"
+<dxi-item
           location="after"
+          locateInMenu="auto"
           widget="dxButton"
-          [options]="addButtonOptions"
-        ></dxi-item>
+          [options]="refreshButtonOptions"
+        ></dxi-item>
 
+       
      <dxi-item
         location="after"
         locateInMenu="auto"
         showText="inMenu"
         widget="dxButton"
         [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
+          icon: isFilterRowVisible ? 'search' : 'search',
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
           stylingMode: 'text',
@@ -86,12 +86,14 @@
         }"
       ></dxi-item>
 
- <dxi-item
+       <dxi-item
+        *ngIf="canAdd"
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
-          [options]="refreshButtonOptions"
-        ></dxi-item>
+          [options]="addButtonOptions"
+        ></dxi-item>
+
+ 
         <!-- </div> -->
       </dxo-toolbar>
 
