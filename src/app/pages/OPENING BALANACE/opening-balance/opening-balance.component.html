@@ -74,6 +74,20 @@
               widget="dxButton"
               [options]="refreshButtonOptions"
             ></dxi-item>
+            <dxi-item
+              location="after"
+              locateInMenu="auto"
+              widget="dxButton"
+              [options]="{
+                icon: 'plus',
+                type: 'default',
+                stylingMode: 'contained',
+                hint: 'Add Row',
+                width: 32,
+                height: 25,
+                onClick: addNewManualRow.bind(this)
+              }"
+            ></dxi-item>
           </dxo-toolbar>
 
           <dxi-column
@@ -81,6 +95,7 @@
             caption="Ledger Code"
             [width]="130"
             [editorType]="'dxSelectBox'"
+            [allowEditing]="!isReadOnly"
             [lookup]="{
               dataSource: ledgerList,
               valueExpr: 'HEAD_CODE',
@@ -93,6 +108,7 @@
             dataField="ledgerName"
             caption="Ledger Name"
             [editorType]="'dxSelectBox'"
+            [allowEditing]="!isReadOnly"
             [lookup]="{
               dataSource: ledgerList,
               valueExpr: 'HEAD_NAME',
@@ -107,6 +123,7 @@
             dataType="number"
             [width]="150"
             [format]="{ type: 'fixedPoint', precision: 2 }"
+            [allowEditing]="!isReadOnly"
           >
           </dxi-column>
 
@@ -116,6 +133,7 @@
             dataType="number"
             [width]="150"
             [format]="{ type: 'fixedPoint', precision: 2 }"
+            [allowEditing]="!isReadOnly"
           >
             <dxo-validation-rules>
               <dxi-validation-rule
@@ -135,9 +153,10 @@
     style="margin-top: 10px; text-align: right"
   >
     <dx-check-box
-      text="Approve"
+      [text]="isReadOnly ? 'Approved' : 'Approve'"
       [(value)]="isApproved"
       [width]="'auto'"
+      [disabled]="isReadOnly"
     ></dx-check-box>
   </div>
 </dx-validation-group>
@@ -156,6 +175,7 @@
       (onClick)="saveOpeningBalance()"
       stylingMode="contained"
       type="default"
+      [disabled]="isReadOnly"
     ></dx-button>
   </div>
 </div>

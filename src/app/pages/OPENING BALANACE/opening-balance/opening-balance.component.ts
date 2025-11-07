@@ -47,6 +47,7 @@ import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-vou
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-opening-balance',
@@ -86,6 +87,7 @@ export class OpeningBalanceComponent {
   isApproved: boolean = false;
   isReadOnly: boolean = false;
   transId: any;
+  isReadOnlyBalance: boolean;
 
   constructor(private dataService: DataService, private router: Router) {}
 
@@ -584,9 +586,28 @@ export class OpeningBalanceComponent {
     return isValid || (!debitAmount && !creditAmount); // allow empty too, or make it stricter if needed
   }
 
+  addNewManualRow() {
+    console.log('newrowadded');
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
+
+    const newRow = {
+      ledgerCode: '',
+      ledgerName: '',
+      debitAmount: 0,
+      creditAmount: 0,
+      headId: null,
+      // add any required default fields
+    };
+
+    this.openingBalance = [newRow, ...this.openingBalance];
+    grid.refresh();
+  }
+
   cancel() {}
 
   saveOpeningBalance() {
+    console.log('SAVE CALLED');
     const userDataString = localStorage.getItem('userData');
     if (!userDataString) return;
 
@@ -605,17 +626,19 @@ export class OpeningBalanceComponent {
       alert('Each row must have either Debit or Credit amount, not both.');
       return;
     }
-    // ✅ Step 3: Ensure total debit = total credit
+
+    //  Step 3: Ensure total debit = total credit
     const totalDebit = validRows.reduce(
-      (sum: number, item: any) => sum + (item.debitAmount || 0),
+      (sum: number, item: any) => sum + parseFloat(item.debitAmount || 0),
       0
     );
     const totalCredit = validRows.reduce(
-      (sum: number, item: any) => sum + (item.creditAmount || 0),
+      (sum: number, item: any) => sum + parseFloat(item.creditAmount || 0),
       0
     );
 
-    if (totalDebit !== totalCredit) {
+    const epsilon = 0.01; // tolerance for rounding
+    if (Math.abs(totalDebit - totalCredit) > epsilon) {
       notify(
         `Total Debit (${totalDebit.toFixed(
           2
@@ -625,9 +648,9 @@ export class OpeningBalanceComponent {
         'warning',
         3000
       );
-
       return;
     }
+
     const payload = {
       COMPANY_ID: selectedCompany?.COMPANY_ID,
       FIN_ID: userData?.FINANCIAL_YEARS?.[0]?.FIN_ID,
@@ -677,19 +700,36 @@ export class OpeningBalanceComponent {
       alert('TRANS_ID not found. Cannot commit.');
       return;
     }
+    const confirmResult = confirm(
+      'Are you sure you want to approve this Opening Balance?',
+      'Confirm Approval'
+    );
     const commitPayload = {
       ...payload,
-      TRANS_ID: this.transId, // ✅ add TRANS_ID only here
+      TRANS_ID: this.transId,
     };
-    console.log(commitPayload, 'COMMITPAYLOADDDDDDDDDDD');
-    this.dataService.approveOpeningBalance(commitPayload).subscribe({
-      next: (commitRes) => {
-        notify('Opening balance committed successfully', 'success', 3000);
-        this.itemsGridRef.instance.refresh();
-      },
-      error: (commitErr) => {
-        console.error('Failed to commit opening balance', commitErr);
-      },
+
+    confirmResult.then((dialogResult: boolean) => {
+      if (dialogResult) {
+        // User clicked "Yes"
+        console.log(commitPayload, 'COMMITPAYLOADDDDDDDDDDD');
+        this.dataService.approveOpeningBalance(commitPayload).subscribe({
+          next: (commitRes) => {
+            notify('Opening balance committed successfully', 'success', 3000);
+            this.itemsGridRef.instance.refresh();
+            if (commitRes?.Data?.TRANS_STATUS === 5) {
+              this.isReadOnly = true;
+              console.log('Form is now read-only');
+            }
+          },
+          error: (commitErr) => {
+            console.error('Failed to commit opening balance', commitErr);
+          },
+        });
+      } else {
+        // User clicked "No"
+        notify('Approval cancelled', 'info', 2000);
+      }
     });
   }
 }
