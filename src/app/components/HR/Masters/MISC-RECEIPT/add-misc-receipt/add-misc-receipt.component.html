@@ -58,7 +58,7 @@
                   <dx-text-box
                     label="Payment No"
                     labelMode="floating"
-                    [(value)]="voucherNo"
+                    [(value)]="miscFormData.VOUCHER_NO"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
@@ -95,17 +95,36 @@
                     [readOnly]="true"
                   ></dx-date-box>
                 </div>
-                <div style="display: flex; align-items: baseline; gap: 2px">
-                  <dx-select-box
-                    label="Department"
-                    labelMode="floating"
-                    [width]="333"
-                    [items]="Company_list"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    [(value)]="miscFormData.DEPT_ID"
-                  ></dx-select-box>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    margin-top: 6px;
+                  "
+                >
+                  <div style="margin-top: -6px">
+                    <dx-select-box
+                      label="Department"
+                      labelMode="floating"
+                      [width]="333"
+                      [items]="Company_list"
+                      displayExpr="DESCRIPTION"
+                      valueExpr="ID"
+                      [(value)]="miscFormData.DEPT_ID"
+                      [readOnly]="isReadOnlyMode"
+                    ></dx-select-box>
+                  </div>
+
+                  <dx-button
+                    icon="plus"
+                    stylingMode="outlined"
+                    type="default"
+                    (onClick)="onAddNewRow()"
+                    style="height: 32px; width: 32px; padding: 0"
+                  ></dx-button>
                 </div>
+
                 <!--  -->
               </div>
             </dxi-item>

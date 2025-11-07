@@ -45,6 +45,7 @@ import {
 } from '../edit-account/edit-account.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-accounts-list',
@@ -197,24 +198,64 @@ export class AccountsListComponent {
   };
 
   getAccountsGroupList() {
-    this.dataService.getAccountGroupHeadList().subscribe((response: any) => {
-      if (response?.Data && Array.isArray(response.Data)) {
-        // Sort by ID descending (latest first)
-        const sortedData = response.Data.sort((a: any, b: any) => b.ID - a.ID);
+    this.accountsGroupList = new DataSource({
+      load: () =>
+        new Promise((resolve, reject) => {
+          this.dataService.getAccountGroupHeadList().subscribe({
+            next: (response: any) => {
+              if (response?.Data && Array.isArray(response.Data)) {
+                // Sort data by ID (descending)
+                const sortedData = response.Data.sort(
+                  (a: any, b: any) => b.ID - a.ID
+                );
 
-        this.accountsGroupList = sortedData.map((item: any, index: number) => ({
-          ...item,
-          sno: index + 1,
-        }));
+                // Add serial number
+                const formattedData = sortedData.map(
+                  (item: any, index: number) => ({
+                    ...item,
+                    sno: index + 1,
+                  })
+                );
 
-        console.log(this.accountsGroupList, 'accountsGroupList with Serial No');
-      } else {
-        this.accountsGroupList = [];
-        console.warn('No data found in response');
-      }
+                resolve(formattedData); // ✅ return the formatted data
+              } else {
+                resolve([]); // ✅ no data found
+              }
+            },
+            error: (err) => {
+              console.error('Error loading Account Group list:', err);
+              reject('Failed to load data');
+            },
+          });
+        }),
     });
   }
+  statusCellRender(cellElement: any, cellInfo: any) {
+    const status = cellInfo.data.IS_INACTIVE;
 
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color = status === 'ACTIVE' ? '#5cac6fff' : '#d87f7fff';
+    // icon.title = status === 5 ? 'Approved' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+
+    cellElement.appendChild(icon);
+  }
+
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+  ];
   // getAccountsGroupList() {
   //   this.dataService.getAccountGroupHeadList().subscribe((response: any) => {
   //     if (response?.Data && Array.isArray(response.Data)) {

@@ -126,6 +126,8 @@ export class AddInvoiceComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedCustomerType: any;
+  selectedCustomerId: any;
+  selectedCustomer: any;
 
   constructor(
     private dataService: DataService,
@@ -206,6 +208,13 @@ export class AddInvoiceComponent {
     const selectedCustomer = this.distributorList.find(
       (cust: any) => cust.ID === e.value
     );
+    if (this.selectedCustomerId) {
+      this.selectedCustomer = this.distributorList.find(
+        (s: any) => s.ID === this.selectedCustomerId
+      );
+      this.invoiceFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
+      console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+    }
     this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
     if (this.selectedCustomerType) {
       console.log(
@@ -502,6 +511,7 @@ export class AddInvoiceComponent {
     this.invoiceFormData.GROSS_AMOUNT = this.totalAmount;
     this.invoiceFormData.GST_AMOUNT = this.taxAmount;
     this.invoiceFormData.NET_AMOUNT = this.grandTotal;
+    this.invoiceFormData.PARTY_NAME = this.invoiceFormData.PARTY_NAME;
     console.log(
       this.invoiceFormData,
       'PAYLOADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'

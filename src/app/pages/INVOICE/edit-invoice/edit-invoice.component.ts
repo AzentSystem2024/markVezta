@@ -108,7 +108,7 @@ export class EditInvoiceComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['invoiceFormData'] && this.invoiceFormData?.length > 0) {
       const firstInvoice = this.invoiceFormData[0];
-
+      this.invoiceFormData.PARTY_NAME = firstInvoice.PARTY_NAME;
       if (
         firstInvoice.SALE_DATE &&
         typeof firstInvoice.SALE_DATE === 'string'
@@ -408,6 +408,7 @@ export class EditInvoiceComponent {
             GROSS_AMOUNT: this.totalAmount,
             TAX_AMOUNT: this.taxAmount,
             NET_AMOUNT: this.grandTotal,
+            PARTY_NAME: this.invoiceFormData.PARTY_NAME,
             SALE_DETAILS: this.mainInvoiceGridList.map((row: any) => ({
               TRANSFER_SUMMARY_ID: row.TRANSFER_SUMMARY_ID || '',
               QUANTITY: row.TOTAL_PAIR_QTY || 0,
@@ -458,6 +459,7 @@ export class EditInvoiceComponent {
         GROSS_AMOUNT: this.totalAmount,
         TAX_AMOUNT: this.taxAmount,
         NET_AMOUNT: this.grandTotal,
+        PARTY_NAME: this.invoiceFormData.PARTY_NAME,
         SALE_DETAILS: this.mainInvoiceGridList.map((row: any) => ({
           TRANSFER_SUMMARY_ID: row.TRANSFER_SUMMARY_ID || '',
           QUANTITY: row.TOTAL_PAIR_QTY || 0,

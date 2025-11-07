@@ -102,6 +102,7 @@ export class EditDebitComponent {
   invoiceNo: string;
   sessionData: any;
   selected_vat_id: any;
+  selectedSupplier: any;
 
   constructor(private dataService: DataService) {}
 
@@ -136,6 +137,8 @@ export class EditDebitComponent {
     if (changes['debitFormData'] && this.debitFormData?.length) {
       const data = this.debitFormData[0];
       this.debitFormData = [...this.debitFormData];
+      this.debitFormData.PARTY_NAME = data.PARTY_NAME;
+      console.log(this.debitFormData.PARTY_NAME, 'PARTYNAMEINEDIT');
       this.invoiceNo = data.INVOICE_NO;
       this.getPendingInvoices(data);
       console.log(
@@ -243,7 +246,13 @@ export class EditDebitComponent {
   onSupplierChanged(event: any) {
     console.log(event, 'eventttttttttttttttttttttttttttttttttt');
     this.selectedSupplierId = event.value;
+    if (this.selectedSupplierId) {
+      this.selectedSupplier = this.supplierList.find(
+        (s: any) => s.ID === this.selectedSupplierId
+      );
 
+      console.log(this.selectedSupplier.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+    }
     if (this.selectedSupplierId) {
       this.debitFormData.SUPP_ID = this.selectedSupplierId;
       console.log(
@@ -693,6 +702,7 @@ export class EditDebitComponent {
             INVOICE_NO: this.debitFormData[0].INVOICE_NO || '',
             SUPP_ID: this.debitFormData[0].SUPP_ID || 0,
             DISTRIBUTOR_ID: this.debitFormData[0].DISTRIBUTOR_ID || 0,
+            PARTY_NAME: this.debitFormData.PARTY_NAME,
             NOTE_DETAIL: this.noteDetails
               .filter(
                 (item) =>
@@ -754,6 +764,7 @@ export class EditDebitComponent {
         INVOICE_NO: this.debitFormData[0].INVOICE_NO || '',
         SUPP_ID: this.debitFormData[0].SUPP_ID || 0,
         DISTRIBUTOR_ID: this.debitFormData[0].DISTRIBUTOR_ID || 0,
+        PARTY_NAME: this.debitFormData.PARTY_NAME,
         IS_APPROVED: false,
         NOTE_DETAIL: this.noteDetails
           .filter(

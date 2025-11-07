@@ -821,6 +821,7 @@ export class EditJournalVoucherComponent {
       USER_ID: this.journalVoucherFormData.USER_ID,
       COMPANY_ID: this.journalVoucherFormData.COMPANY_ID,
       FIN_ID: this.journalVoucherFormData.FIN_ID,
+      DEPT_ID: this.journalVoucherFormData.DEPT_ID,
       TRANS_STATUS: 1,
       DETAILS: transformedDetails,
       IS_APPROVED: false,

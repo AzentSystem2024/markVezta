@@ -135,6 +135,7 @@ export class AddCreditNoteComponent {
   selectedCustomerId: any;
   sessionData: any;
   selected_vat_id: any;
+  selectedCustomer: any;
 
   constructor(private dataService: DataService) {}
 
@@ -295,6 +296,13 @@ export class AddCreditNoteComponent {
   onDistributorSelected(event: any): void {
     const grid = this.itemsGridRef?.instance;
     this.selectedCustomerId = event.value;
+    if (this.selectedCustomerId) {
+      this.selectedCustomer = this.distributorList.find(
+        (s: any) => s.ID === this.selectedCustomerId
+      );
+      this.creditFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
+      console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+    }
     this.creditFormData.DISTRIBUTOR_ID = this.selectedCustomerId;
     if (grid) {
       const editRowIndex = grid
