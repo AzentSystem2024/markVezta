@@ -168,18 +168,23 @@ export class ListMiscellaneousPaymentsComponent {
         let dateValue: Date;
 
         // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.TRANS_DATE))) {
-          dateValue = new Date(item.TRANS_DATE);
+        if (
+          typeof item.TRANS_DATE === 'string' &&
+          item.TRANS_DATE.includes('-')
+        ) {
+          const [day, month, year] = item.TRANS_DATE.split('-').map(Number);
+          dateValue = new Date(year, month - 1, day);
         } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.TRANS_DATE);
+          dateValue = new Date(item.TRANS_DATE);
         }
 
         return {
           ...item,
           TRANS_DATE: dateValue,
         };
-      });
+      })
+        // ✅ Sort by VOUCHER_NO descending (latest first)
+        .sort((a: any, b: any) => Number(b.VOUCHER_NO) - Number(a.VOUCHER_NO));
 
       this.applyDateFilter();
     });
@@ -421,11 +426,11 @@ export class ListMiscellaneousPaymentsComponent {
   }
 
   onDeleteMiscPayment(e: any) {
-     if (e.data.TRANS_STATUS === 5) {
-          e.cancel = true;
-          notify('Misc Payment cannot be deleted.', 'error', 2000);
-          return;
-        }
+    if (e.data.TRANS_STATUS === 5) {
+      e.cancel = true;
+      notify('Misc Payment cannot be deleted.', 'error', 2000);
+      return;
+    }
 
     const miscId = e.data.TRANS_ID;
     // console.log("delete")
