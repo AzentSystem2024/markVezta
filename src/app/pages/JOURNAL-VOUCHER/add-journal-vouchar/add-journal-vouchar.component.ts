@@ -602,6 +602,24 @@ export class AddJournalVoucharComponent {
       this.journalVoucherFormData.DETAILS = [];
     }
 
+    // Check for an empty row: only rows with no ledgerCode and ledgerName are empty
+    const hasEmptyRow = this.journalVoucherFormData.DETAILS.some(
+      (r) => !r.ledgerCode && !r.ledgerName
+    );
+
+    if (hasEmptyRow) {
+      // Focus on the first empty row instead of adding a new one
+      const grid = this.itemsGridRef?.instance;
+      const emptyRowIndex = this.journalVoucherFormData.DETAILS.findIndex(
+        (r) => !r.ledgerCode && !r.ledgerName
+      );
+      setTimeout(() => {
+        grid?.editCell(emptyRowIndex, 'ledgerCode');
+      }, 100);
+      return;
+    }
+
+    // Calculate next Sl No
     const nextSlNo =
       this.journalVoucherFormData.DETAILS.length > 0
         ? Math.max(
@@ -618,7 +636,7 @@ export class AddJournalVoucharComponent {
       creditAmount: '',
     };
 
-    // Force change detection
+    // Add new row
     this.journalVoucherFormData.DETAILS = [
       ...this.journalVoucherFormData.DETAILS,
       newRow,
