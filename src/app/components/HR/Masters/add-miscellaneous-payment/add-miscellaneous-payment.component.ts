@@ -88,7 +88,7 @@ export class AddMiscellaneousPaymentComponent {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
-  Department:any;
+  Department: any;
   miscFormData: any = {
     TRANS_TYPE: 3,
     COMPANY_ID: '',
@@ -102,7 +102,7 @@ export class AddMiscellaneousPaymentComponent {
     CREATE_USER_ID: '',
     PAY_TYPE_ID: '',
     PAY_HEAD_ID: '',
-    DEPT_ID:0,
+    DEPT_ID: 0,
     MISC_DETAIL: [
       {
         SL_NO: '',
@@ -149,11 +149,14 @@ export class AddMiscellaneousPaymentComponent {
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
-    this.getPendingNo();
     if (this.EditingResponseData) {
       console.log('EditingResponseData on init:', this.EditingResponseData);
     }
-    this.isEditDataAvailable();
+    if (this.isEditing) {
+      this.isEditDataAvailable(); // load edit data
+    } else {
+      this.getPendingNo(); // only fetch new number in add mode
+    }
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -188,6 +191,7 @@ export class AddMiscellaneousPaymentComponent {
   getPendingNo() {
     this.dataService.getPendingNo().subscribe((response: any) => {
       this.pendingNo = response.PAYMENT_NO;
+      this.miscFormData.PAYMENT_NO = response.PAYMENT_NO;
     });
   }
 
@@ -215,6 +219,7 @@ export class AddMiscellaneousPaymentComponent {
     // Map form fields
     this.miscFormData.PARTY_NAME = data.PARTY_NAME || '';
     this.miscFormData.VOUCHER_NO = data.VOUCHER_NO || '';
+    console.log(this.miscFormData.VOUCHER_NO, 'VOUCHERNOOOOOOO');
     // this.miscFormData.TRANS_DATE = data.TRANS_DATE
     //   ? new Date(data.TRANS_DATE)
     //   : new Date();
@@ -231,7 +236,7 @@ export class AddMiscellaneousPaymentComponent {
     this.miscFormData.FIN_ID = data.FIN_ID || '';
     this.miscFormData.VAT_REGN = data.VAT_REGN || '';
 
-     this.miscFormData.DEPT_ID = data.DEPT_ID ? Number(data.DEPT_ID) : null;
+    this.miscFormData.DEPT_ID = data.DEPT_ID ? Number(data.DEPT_ID) : null;
     // Populate pendingInvoicelist from DetailList
     if (Array.isArray(data.DetailList) && data.DetailList.length > 0) {
       this.pendingInvoicelist = data.DetailList.map((item: any) => ({
@@ -275,6 +280,54 @@ export class AddMiscellaneousPaymentComponent {
   }
 
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'ledgerCode' ||
+      e.dataField === 'ledgerName' ||
+      e.dataField === 'DESCRIPTION' ||
+      e.dataField === 'AMOUNT' ||
+      e.dataField === 'TAX' ||
+      e.dataField === 'TAX_AMOUNT'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
     console.log(rowIndex);
@@ -432,21 +485,39 @@ export class AddMiscellaneousPaymentComponent {
 
             // ✅ Move to next row or add row
             if (rowIndex === grid.getVisibleRows().length - 1) {
-              // Add new row only after preserving data
-              const newRow = {
-                HEAD_ID: '',
-                DESCRIPTION: '',
-                AMOUNT: '',
-                TAX: '',
-                TAX_AMOUNT: '',
-              };
-              this.miscFormData.MISC_DETAIL.push(newRow);
+              // ✅ Check if an empty row already exists
+              const hasEmptyRow = this.pendingInvoicelist.some(
+                (r: any) =>
+                  !r.ledgerCode &&
+                  !r.ledgerName &&
+                  !r.DESCRIPTION &&
+                  (!r.AMOUNT || r.AMOUNT === 0) &&
+                  (!r.TAX || r.TAX === 0) &&
+                  (!r.TAX_AMOUNT || r.TAX_AMOUNT === 0)
+              );
 
-              grid.option('dataSource', [...this.miscFormData.MISC_DETAIL]);
-              setTimeout(() => {
-                const newRowIndex = grid.getVisibleRows().length - 1;
-                grid.editCell(newRowIndex, 'ledgerCode');
-              }, 50);
+              if (!hasEmptyRow) {
+                // ✅ Add new empty row
+                const newRow = {
+                  ledgerCode: '',
+                  ledgerName: '',
+                  DESCRIPTION: '',
+                  AMOUNT: '',
+                  TAX: '',
+                  TAX_AMOUNT: '',
+                };
+
+                this.pendingInvoicelist.push(newRow);
+
+                // ✅ Refresh the grid
+                grid.option('dataSource', [...this.pendingInvoicelist]);
+
+                // ✅ Focus first cell of new row
+                setTimeout(() => {
+                  const newRowIndex = grid.getVisibleRows().length - 1;
+                  grid.editCell(newRowIndex, 'ledgerCode');
+                }, 50);
+              }
             } else {
               setTimeout(() => {
                 grid.editCell(rowIndex + 1, 'ledgerCode');
@@ -458,30 +529,103 @@ export class AddMiscellaneousPaymentComponent {
     }
   }
 
+  addNewManualRow() {
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
+
+    // Ensure array exists
+    if (!Array.isArray(this.pendingInvoicelist)) {
+      this.pendingInvoicelist = [];
+    }
+
+    // Create a new empty row
+    const newRow = {
+      ledgerCode: '',
+      ledgerName: '',
+      DESCRIPTION: '',
+      AMOUNT: null,
+      TAX: null,
+      TAX_AMOUNT: null,
+    };
+
+    // ✅ Replace array reference (triggers Angular + DevExtreme change detection)
+    this.pendingInvoicelist = [...this.pendingInvoicelist, newRow];
+
+    // ✅ Just refresh grid (no rebind)
+    grid.refresh();
+
+    // ✅ Focus new row
+    setTimeout(() => {
+      const lastRowIndex = this.pendingInvoicelist.length - 1;
+      grid.editCell(lastRowIndex, 'ledgerCode');
+    }, 100);
+  }
+
   onRowRemoved(e: any) {
     setTimeout(() => {
       const grid = e.component;
 
-      // Add empty row data to the end
+      // Ensure pendingInvoicelist exists
+      if (!this.pendingInvoicelist || this.pendingInvoicelist.length === 0) {
+        // Create a new blank row
+        const newRow = {
+          ledgerCode: '',
+          ledgerName: '',
+          DESCRIPTION: '',
+          AMOUNT: '',
+          TAX: '',
+          TAX_AMOUNT: '',
+        };
+
+        // Reset the data source with one new row
+        this.pendingInvoicelist = [newRow];
+        grid.option('dataSource', [...this.pendingInvoicelist]);
+
+        // Focus the first cell of the new row
+        setTimeout(() => {
+          grid.focus(
+            grid.getCellElement(0, grid.columnOption('HEAD_ID', 'index'))
+          );
+          grid.editCell(0, 'HEAD_ID'); // Or whichever field should be focused first
+        }, 50);
+      }
+    }, 50); // small delay ensures deletion completes
+  }
+
+  // TS: Add this method in your component
+  onGridClick(e: any) {
+    // Check if there is already a blank row
+    const hasEmptyRow = this.pendingInvoicelist.some(
+      (row: any) =>
+        !row.HEAD_ID &&
+        !row.DESCRIPTION &&
+        (!row.AMOUNT || row.AMOUNT === 0) &&
+        (!row.TAX || row.TAX === 0)
+    );
+
+    if (!hasEmptyRow) {
       const newRow = {
-        HEAD_ID: '',
+        ledgerCode: '',
+        ledgerName: '',
         DESCRIPTION: '',
         AMOUNT: '',
         TAX: '',
         TAX_AMOUNT: '',
       };
-      this.miscFormData.MISC_DETAIL.push(newRow);
 
-      // Refresh grid
-      grid.option('dataSource', [...this.miscFormData.MISC_DETAIL]);
+      this.pendingInvoicelist.push(newRow);
 
-      // Focus the first cell of the new row
-      setTimeout(() => {
-        const visibleRows = grid.getVisibleRows();
-        const newRowIndex = visibleRows.length - 1;
-        grid.editCell(newRowIndex, 'ledgerCode');
-      }, 50);
-    }, 0);
+      const grid = this.itemsGridRef?.instance;
+      if (grid) {
+        grid.option('dataSource', [...this.pendingInvoicelist]);
+
+        // Optional: focus first cell of new row
+        setTimeout(() => {
+          const rowIndex = this.pendingInvoicelist.length - 1;
+          grid.editCell(rowIndex, 'HEAD_ID');
+        }, 50);
+      }
+    }
   }
 
   getLedgerCodeDropdown() {
@@ -501,10 +645,17 @@ export class AddMiscellaneousPaymentComponent {
     });
   }
 
+  // calculateTaxAmount(rowData: any): number {
+  //   const amount = Number(rowData.AMOUNT) || 0;
+  //   const tax = Number(rowData.TAX) || 0;
+  //   return +(amount * tax).toFixed(2); // returns tax amount rounded to 2 decimal places
+  // }
+
   calculateTaxAmount(rowData: any): number {
     const amount = Number(rowData.AMOUNT) || 0;
-    const tax = Number(rowData.TAX) || 0;
-    return +(amount * tax).toFixed(2); // returns tax amount rounded to 2 decimal places
+    const taxPercent = Number(rowData.TAX) || 0;
+    const taxAmount = (amount * taxPercent) / 100;
+    return +taxAmount.toFixed(2); // round to 2 decimals
   }
 
   onReceiptModeChange(e: any) {
@@ -525,6 +676,15 @@ export class AddMiscellaneousPaymentComponent {
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
     }
+  }
+
+  formatDateOnly(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   onSave() {
@@ -549,8 +709,6 @@ export class AddMiscellaneousPaymentComponent {
 
     this.miscFormData.PAY_TYPE_ID = payTypeMapping[this.receiptMode] || null;
 
-
-
     // 2. Commit any pending cell edits in grid
     this.itemsGridRef.instance.closeEditCell();
 
@@ -573,24 +731,27 @@ export class AddMiscellaneousPaymentComponent {
       (row) => row.ledgerCode || row.amount != null || row.taxPercent != null
     );
 
-     // ✅ Department validation (only when Approve is checked)
-  if (this.isApproved && !this.miscFormData.DEPT_ID) {
-    notify(
-      {
-        message: 'Please select department.',
-        position: 'top center',
-      },
-      'error'
-    );
-    return;
-  }
+    // ✅ Department validation (only when Approve is checked)
+    if (this.isApproved && !this.miscFormData.DEPT_ID) {
+      notify(
+        {
+          message: 'Please select department.',
+          position: 'top center',
+        },
+        'error'
+      );
+      return;
+    }
     // 4. Prepare final payload
+    const { VAT_REGN, ...miscDataWithoutVat } = this.miscFormData;
     const payload = {
-      ...this.miscFormData,
+      ...miscDataWithoutVat,
+      TRANS_DATE: this.formatDateOnly(this.miscFormData.TRANS_DATE),
       MISC_DETAIL: cleanedList.map((item: any, index: number) => {
         const amount = Number(item.AMOUNT) || 0;
         const tax = Number(item.TAX) || 0;
-        const taxAmount = +(amount * tax).toFixed(2);
+        // const taxAmount = +(amount * tax).toFixed(2);
+        const taxAmount = +((amount * tax) / 100).toFixed(2);
 
         // Find the HEAD_ID from ledgerList using ledgerCode
         const matchedLedger = this.ledgerList.find(
@@ -599,7 +760,7 @@ export class AddMiscellaneousPaymentComponent {
 
         return {
           SL_NO: index + 1,
-          HEAD_ID: matchedLedger?.HEAD_ID || '', // ✅ Use actual HEAD_ID
+          HEAD_ID: matchedLedger?.HEAD_ID || '', //  Use actual HEAD_ID
           REMARKS: item.DESCRIPTION || '',
           AMOUNT: amount,
           VAT_AMOUNT: taxAmount,
@@ -620,6 +781,7 @@ export class AddMiscellaneousPaymentComponent {
             },
             'success'
           );
+          this.getPendingNo();
           this.popupClosed.emit(); // Or reset form if needed
         } else {
           notify(
@@ -708,19 +870,7 @@ export class AddMiscellaneousPaymentComponent {
         };
       }),
     };
-    // 4. Prepare final payload
-    // const payload = {
-    //   ...cleanedFormData,
-    //   MISC_DETAIL: cleanedList.map((item: any, index: number) => ({
-    //     SL_NO: index + 1,
-    //     HEAD_ID: item.HEAD_ID || '', // Use HEAD_ID, not ledgerCode
-    //     REMARKS: item.REMARKS || '',
-    //     AMOUNT: item.AMOUNT || 0,
-    //     VAT_AMOUNT: this.calculateTaxAmount(item),
-    //     VAT_REGN: this.miscFormData.VAT_REGN,
-    //     VAT_PERCENT: item.VAT_PERCENT || 0,
-    //   })),
-    // };
+
     console.log(payload, 'PAYLOADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD');
     // 5. Submit via API - Conditional: Approve or Update
     const submitObservable = this.isApproved
@@ -763,7 +913,7 @@ export class AddMiscellaneousPaymentComponent {
     });
   }
 
-    get_Department_dropdown(){
+  get_Department_dropdown() {
     this.dataService.Department_Dropdown().subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Department = res;
@@ -774,8 +924,8 @@ export class AddMiscellaneousPaymentComponent {
     this.popupClosed.emit();
   }
 
-  cancel(){
-     this.popupClosed.emit();
+  cancel() {
+    this.popupClosed.emit();
   }
 }
 

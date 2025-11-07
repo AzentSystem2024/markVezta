@@ -40,6 +40,7 @@
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onRowRemoved)="onRowRemoved($event)"
+          (onCellClick)="onCellClick($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
@@ -116,13 +117,13 @@
                     ></dx-select-box>
                   </div>
 
-                  <dx-button
+                  <!-- <dx-button
                     icon="plus"
                     stylingMode="outlined"
                     type="default"
                     (onClick)="onAddNewRow()"
                     style="height: 32px; width: 32px; padding: 0"
-                  ></dx-button>
+                  ></dx-button> -->
                 </div>
 
                 <!--  -->

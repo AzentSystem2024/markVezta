@@ -232,6 +232,42 @@ export class AddMiscReceiptComponent {
     }
   }
 
+  onCellClick(e: any) {
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
+
+    const dataSource = this.pendingInvoicelist || [];
+    const lastRow = dataSource[dataSource.length - 1];
+
+    // Check if last row is empty (all fields empty)
+    const isEmptyRow =
+      lastRow &&
+      !lastRow.ledgerCode &&
+      !lastRow.ledgerName &&
+      !lastRow.REMARKS &&
+      (lastRow.AMOUNT === null || lastRow.AMOUNT === '');
+
+    if (!isEmptyRow) {
+      // Add new row
+      const newRow = {
+        ledgerCode: '',
+        ledgerName: '',
+        REMARKS: '',
+        AMOUNT: null,
+      };
+      this.pendingInvoicelist.push(newRow);
+
+      // Refresh grid datasource
+      grid.option('dataSource', [...this.pendingInvoicelist]);
+
+      // Focus the new row ledgerCode
+      const newRowIndex = this.pendingInvoicelist.length - 1;
+      setTimeout(() => {
+        grid.editCell(newRowIndex, 'ledgerCode');
+      }, 50);
+    }
+  }
+
   onEditorPreparing(e: any) {
     if (
       e.dataField === 'ledgerCode' ||
@@ -432,24 +468,29 @@ export class AddMiscReceiptComponent {
     setTimeout(() => {
       const grid = e.component;
 
-      // Add empty row data to the end
-      const newRow = {
-        HEAD_ID: '',
-        REMARKS: '',
-        AMOUNT: '',
-      };
-      this.pendingInvoicelist.push(newRow);
+      // Ensure pendingInvoicelist exists
+      if (!this.pendingInvoicelist || this.pendingInvoicelist.length === 0) {
+        // Create a new blank row
+        const newRow = {
+          ledgerCode: '',
+          ledgerName: '',
+          REMARKS: '',
+          AMOUNT: '',
+        };
 
-      // Refresh grid
-      grid.option('dataSource', [...this.pendingInvoicelist]);
+        // Reset the data source with one new row
+        this.pendingInvoicelist = [newRow];
+        grid.option('dataSource', [...this.pendingInvoicelist]);
 
-      // Focus the first cell of the new row
-      setTimeout(() => {
-        const visibleRows = grid.getVisibleRows();
-        const newRowIndex = visibleRows.length - 1;
-        grid.editCell(newRowIndex, 'ledgerCode');
-      }, 50);
-    }, 0);
+        // Focus the first cell of the new row
+        setTimeout(() => {
+          grid.focus(
+            grid.getCellElement(0, grid.columnOption('HEAD_ID', 'index'))
+          );
+          grid.editCell(0, 'HEAD_ID'); // Or whichever field should be focused first
+        }, 50);
+      }
+    }, 50); // small delay ensures deletion completes
   }
 
   getLedgerCodeDropdown() {

@@ -89,7 +89,7 @@ export class EditMiscellaneousPaymentComponent {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
-  Department:any;
+  Department: any;
   pendingInvoicelist: any;
   miscFormData: any;
   userId: any;
@@ -111,7 +111,7 @@ export class EditMiscellaneousPaymentComponent {
 
   ngOnInit() {
     this.getPendingNo();
-    this.sessionData_tax()
+    this.sessionData_tax();
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -235,12 +235,12 @@ export class EditMiscellaneousPaymentComponent {
         return '';
     }
   }
-    
-      sessionData_tax(){
-        // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'" 
-        this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-        console.log(this.sessionData,'=================session data==========')
-        this.selected_vat_id=this.sessionData.VAT_ID
+
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
   }
   ngAfterViewInit() {
     setTimeout(() => {
@@ -564,7 +564,6 @@ export class EditMiscellaneousPaymentComponent {
 
     this.miscFormData.PAY_TYPE_ID = payTypeMapping[this.receiptMode] || null;
 
-
     // 2. Commit any pending cell edits in grid
     this.itemsGridRef.instance.closeEditCell();
 
@@ -652,7 +651,7 @@ export class EditMiscellaneousPaymentComponent {
     this.popupClosed.emit();
   }
 
-  cancel(){
+  cancel() {
     this.popupClosed.emit();
   }
 }
