@@ -50,10 +50,10 @@ isEditReadOnly: boolean = false;
 
 
          dateRanges = [
-     {
-      label: 'All',
-      value: 'all',
-    },  
+    //  {
+    //   label: 'All',
+    //   value: 'all',
+    // },  
     {
       label: 'Today',
       value: 'today',
@@ -68,10 +68,10 @@ isEditReadOnly: boolean = false;
   ];
 
   entryDateRanges = [
-      {
-      label: 'All',
-      value: 'all',
-    },  
+    //   {
+    //   label: 'All',
+    //   value: 'all',
+    // },  
   { label: 'Today', value: 'today' },
   { label: 'Last 7 Days', value: 'last7' },
   { label: 'Last 15 Days', value: 'last15' },

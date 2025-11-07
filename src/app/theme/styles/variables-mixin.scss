@@ -54,6 +54,9 @@ $theme-mode: null !default;
     --card-background: var(--base-bg-darken-5);
     --bg-side-panel:rgb(41, 41, 41);
     --tab-bg-color: #131111;
+    --tab-selected-bg-color:#131111;
+    --tab-unselected-bg-color:rgb(41, 41, 41);
+    --grid-bg-color: #131111;
   }
 
   --border-color: #{$base-border-color};

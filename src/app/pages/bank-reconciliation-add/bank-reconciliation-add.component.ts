@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  ViewChild,
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -54,6 +55,7 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./bank-reconciliation-add.component.scss']
 })
 export class BankReconciliationAddComponent {
+  @ViewChild('dataGrid', { static: false }) dataGrid: any;
     BankReconciliationdatasource: any[]=[];
  closingBalance:any;
 
@@ -66,6 +68,7 @@ export class BankReconciliationAddComponent {
   savedUserData: any;
   selected_from_date: any;
   selected_To_date: any;
+  
   selected_Head_Id: any;
   selected_fin_id: any;
   selectedJournalVoucher: any;
@@ -109,6 +112,7 @@ BankRecData :any={
 }
   selectedBankName: any;
   selectedBankId: any;
+ 
 
    constructor(
     private dataService: DataService,
@@ -121,6 +125,11 @@ BankRecData :any={
   this.remainingDebit = this.totalDebit;
   this.remainingCredit = this.totalCredit;
   }
+
+  ngOnInit() {
+  // If you want to format or adjust it, you can do that here
+  this.selected_To_date = new Date();
+}
 
   onToDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
@@ -220,7 +229,7 @@ BankRecData :any={
   Getdata(){
     const payload ={
       HEAD_ID : this.selectedBankId,
-      DATE_TO : this.formatted_To_date
+      DATE_TO : this.selected_To_date
     }
    this.dataService.BankReconciliation_List(payload).subscribe((res: any) => {
     console.log(res)
@@ -259,7 +268,7 @@ BankRecData :any={
       console.log(payload)
       this.dataService.Insert_BankReconciliation(payload).subscribe((res:any)=>{
         console.log(res)
-         if (res.Message === 'Success') {
+         if (res.message === 'Bank reconciliation saved successfully.') {
           notify(
             {
               message: 'Inserted successfully',
@@ -268,9 +277,53 @@ BankRecData :any={
             },
             'success'
           );
+          this.resetPage();
         }
       })
     }
+
+    resetPage() {
+  // Clear selected rows
+  this.selectedRows = [];
+
+  // Reset calculated values (if you use them)
+  this.totalDebit = 0;
+  this.totalCredit = 0;
+  this.remainingDebit = 0;
+  this.remainingCredit = 0;
+  this.runningbalance = 0;
+  this.closingBalance = 0;
+
+  // Reset date to current date
+  this.selected_To_date = new Date();
+
+  this.selectedBankId = ''
+  this.BankReconciliationdatasource = []
+
+  // ✅ Reset BankRecData object
+  this.BankRecData = {
+    TRANS_ID: '',
+    VOUCHER_NO: '',
+    TRANS_DATE: '',
+    CHEQUE_NO: '',
+    CHEQUE_DATE: '',
+    PARTY_NAME: '',
+    DR_AMOUNT: 0,
+    CR_AMOUNT: 0,
+    RUNNING_BALANCE: 0,
+  };
+
+  if (this.dataGrid && this.dataGrid.instance) {
+    this.dataGrid.instance.clearSelection();
+    // If you've just updated the datasource variable, refresh will re-render rows
+    this.dataGrid.instance.refresh();
+    
+  }
+
+  // If you have a form or filters, reset them here
+  // this.myForm.reset(); (if using Reactive Forms)
+}
+
 
       formatDates(cellData: any): string {
     const date = new Date(cellData);

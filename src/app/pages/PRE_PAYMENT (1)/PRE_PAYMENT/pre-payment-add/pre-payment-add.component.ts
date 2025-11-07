@@ -290,12 +290,41 @@ private formatDateDDMMYYYY(date: any): string | null {
   return `${day}/${month}/${year}`;
 }
 
+// private formatToISO(date: any): string | null {
+//   if (!date) return null;
+
+//   // If it's already a Date object
+//   if (date instanceof Date && !isNaN(date.getTime())) {
+//     return date.toISOString();
+//   }
+
+//   // If it's already in dd/MM/yyyy format
+//   if (typeof date === 'string' && date.includes('/')) {
+//     const parts = date.split('/');
+//     if (parts.length === 3) {
+//       const day = parseInt(parts[0], 10);
+//       const month = parseInt(parts[1], 10) - 1; // JS months are 0-based
+//       const year = parseInt(parts[2], 10);
+//       const d = new Date(year, month, day);
+//       return isNaN(d.getTime()) ? null : d.toISOString();
+//     }
+//   }
+
+//   // Fallback
+//   const d = new Date(date);
+//   return isNaN(d.getTime()) ? null : d.toISOString();
+// }
+
 private formatToISO(date: any): string | null {
   if (!date) return null;
 
   // If it's already a Date object
   if (date instanceof Date && !isNaN(date.getTime())) {
-    return date.toISOString();
+    // Convert to ISO date without timezone offset
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}T00:00:00.000Z`;
   }
 
   // If it's already in dd/MM/yyyy format
@@ -303,9 +332,11 @@ private formatToISO(date: any): string | null {
     const parts = date.split('/');
     if (parts.length === 3) {
       const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1; // JS months are 0-based
+      const month = parseInt(parts[1], 10) - 1;
       const year = parseInt(parts[2], 10);
-      const d = new Date(year, month, day);
+
+      // Create UTC date directly to avoid timezone offset
+      const d = new Date(Date.UTC(year, month, day));
       return isNaN(d.getTime()) ? null : d.toISOString();
     }
   }
@@ -314,6 +345,7 @@ private formatToISO(date: any): string | null {
   const d = new Date(date);
   return isNaN(d.getTime()) ? null : d.toISOString();
 }
+
 
         sessionData_tax(){
         this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
