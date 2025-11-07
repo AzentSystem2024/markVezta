@@ -81,7 +81,7 @@ export class DepreciationEditComponent {
     // example
     // this.Date = new Date(); // convert string → Date
 
-    this.Date = this.DepreciationPayload.DEPR_DATE;
+    // this.Date = this.DepreciationPayload.DEPR_DATE;
   }
 
   ngOnChanges(changes: SimpleChanges) {

@@ -147,6 +147,7 @@ export class EditCreditNoteComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['creditFormData'] && this.creditFormData?.length) {
       const data = this.creditFormData[0];
+      this.creditFormData.PARTY_NAME = data.PARTY_NAME;
       console.log(this.creditFormData[0].INVOICE_NO, 'INEDITTTTTTTTTTT');
       if (this.creditFormData?.length) {
         const data = this.creditFormData[0];
@@ -725,6 +726,7 @@ export class EditCreditNoteComponent {
             INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
             UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
             DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
+            PARTY_NAME: this.creditFormData.PARTY_NAME,
             NOTE_DETAIL: this.noteDetails
               .filter(
                 (item) =>
@@ -786,6 +788,7 @@ export class EditCreditNoteComponent {
         INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
         UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
         DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
+        PARTY_NAME: this.creditFormData.PARTY_NAME,
         IS_APPROVED: false,
         NOTE_DETAIL: this.noteDetails
           .filter(

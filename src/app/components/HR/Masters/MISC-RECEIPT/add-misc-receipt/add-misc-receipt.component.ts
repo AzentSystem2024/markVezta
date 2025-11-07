@@ -104,7 +104,7 @@ export class AddMiscReceiptComponent {
     CHEQUE_DATE: '',
     BANK_NAME: '',
     NARRATION: '',
-    DEPT_ID:'',
+    DEPT_ID: '',
   };
   ledgerList: any;
   receiptMode: string = 'Cash';
@@ -121,16 +121,20 @@ export class AddMiscReceiptComponent {
   ];
   isApproved: boolean = false;
   voucherNo: any;
-  Company_list: any=[];
+  Company_list: any = [];
 
   constructor(private dataService: DataService) {
-    this.Deparment_Drop_down()
+    this.Deparment_Drop_down();
   }
 
   ngOnInit() {
-    this.getVoucherNo()
+    // this.getVoucherNo();
     console.log('EditingResponseData on init:', this.EditingResponseData);
-    this.isEditDataAvailable();
+    if (this.isEditing) {
+      this.isEditDataAvailable(); // load edit data
+    } else {
+      this.getVoucherNo(); // only fetch new number in add mode
+    }
     this.getLedgerCodeDropdown();
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
@@ -160,23 +164,24 @@ export class AddMiscReceiptComponent {
     }, 500); // allow grid/toolbar to fully render
   }
 
-  getVoucherNo(){
+  getVoucherNo() {
     this.dataService.getVoucherNoForMiscReceipt().subscribe((response: any) => {
-      this.voucherNo = response.VOUCHER_NO
-    })
+      this.miscFormData.VOUCHER_NO = response.VOUCHER_NO;
+    });
   }
 
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const data = this.EditingResponseData;
-  const payTypeReverseMapping: any = {
-    1: 'Cash',
-    2: 'Bank',
-    3: 'PDC',
-    4: 'Adjustments'
-  };
-  this.receiptMode = payTypeReverseMapping[data.PAY_TYPE_ID] || 'Cash';
+    console.log(data, 'dataforedit');
+    const payTypeReverseMapping: any = {
+      1: 'Cash',
+      2: 'Bank',
+      3: 'PDC',
+      4: 'Adjustments',
+    };
+    this.receiptMode = payTypeReverseMapping[data.PAY_TYPE_ID] || 'Cash';
     // Map form fields
     this.miscFormData.PARTY_NAME = data.PARTY_NAME || '';
     this.miscFormData.VOUCHER_NO = data.VOUCHER_NO || '';
@@ -208,6 +213,8 @@ export class AddMiscReceiptComponent {
     this.miscFormData.DEPT_ID = data.DEPT_ID ? Number(data.DEPT_ID) : null;
   }
 
+  onAddNewRow() {}
+
   focusTaxRegn() {
     this.taxRegnRef.instance.focus();
   }
@@ -225,7 +232,89 @@ export class AddMiscReceiptComponent {
     }
   }
 
+  onCellClick(e: any) {
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
+
+    const dataSource = this.pendingInvoicelist || [];
+    const lastRow = dataSource[dataSource.length - 1];
+
+    // Check if last row is empty (all fields empty)
+    const isEmptyRow =
+      lastRow &&
+      !lastRow.ledgerCode &&
+      !lastRow.ledgerName &&
+      !lastRow.REMARKS &&
+      (lastRow.AMOUNT === null || lastRow.AMOUNT === '');
+
+    if (!isEmptyRow) {
+      // Add new row
+      const newRow = {
+        ledgerCode: '',
+        ledgerName: '',
+        REMARKS: '',
+        AMOUNT: null,
+      };
+      this.pendingInvoicelist.push(newRow);
+
+      // Refresh grid datasource
+      grid.option('dataSource', [...this.pendingInvoicelist]);
+
+      // Focus the new row ledgerCode
+      const newRowIndex = this.pendingInvoicelist.length - 1;
+      setTimeout(() => {
+        grid.editCell(newRowIndex, 'ledgerCode');
+      }, 50);
+    }
+  }
+
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'ledgerCode' ||
+      e.dataField === 'ledgerName' ||
+      e.dataField === 'REMARKS' ||
+      e.dataField === 'AMOUNT'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
     console.log(rowIndex);
@@ -379,24 +468,29 @@ export class AddMiscReceiptComponent {
     setTimeout(() => {
       const grid = e.component;
 
-      // Add empty row data to the end
-      const newRow = {
-        HEAD_ID: '',
-        REMARKS: '',
-        AMOUNT: '',
-      };
-      this.pendingInvoicelist.push(newRow);
+      // Ensure pendingInvoicelist exists
+      if (!this.pendingInvoicelist || this.pendingInvoicelist.length === 0) {
+        // Create a new blank row
+        const newRow = {
+          ledgerCode: '',
+          ledgerName: '',
+          REMARKS: '',
+          AMOUNT: '',
+        };
 
-      // Refresh grid
-      grid.option('dataSource', [...this.pendingInvoicelist]);
+        // Reset the data source with one new row
+        this.pendingInvoicelist = [newRow];
+        grid.option('dataSource', [...this.pendingInvoicelist]);
 
-      // Focus the first cell of the new row
-      setTimeout(() => {
-        const visibleRows = grid.getVisibleRows();
-        const newRowIndex = visibleRows.length - 1;
-        grid.editCell(newRowIndex, 'ledgerCode');
-      }, 50);
-    }, 0);
+        // Focus the first cell of the new row
+        setTimeout(() => {
+          grid.focus(
+            grid.getCellElement(0, grid.columnOption('HEAD_ID', 'index'))
+          );
+          grid.editCell(0, 'HEAD_ID'); // Or whichever field should be focused first
+        }, 50);
+      }
+    }, 50); // small delay ensures deletion completes
   }
 
   getLedgerCodeDropdown() {
@@ -411,12 +505,15 @@ export class AddMiscReceiptComponent {
       },
     });
   }
-    Deparment_Drop_down(){
-    this.dataService.Department_Dropdown().subscribe((res:any)=>{
-      console.log(res,'========================department data=========================')
+  Deparment_Drop_down() {
+    this.dataService.Department_Dropdown().subscribe((res: any) => {
+      console.log(
+        res,
+        '========================department data========================='
+      );
 
-      this.Company_list=res
-    })
+      this.Company_list = res;
+    });
   }
   onReceiptModeChange(e: any) {
     this.receiptMode = e.value;
@@ -507,7 +604,8 @@ export class AddMiscReceiptComponent {
       CREATE_USER_ID: this.userId,
       PAY_TYPE_ID: payTypeMapping[this.receiptMode] || null,
       PAY_HEAD_ID: this.miscFormData.PAY_HEAD_ID,
-      DEPT_ID : Number(this.miscFormData.DEPT_ID),
+      DEPT_ID: Number(this.miscFormData.DEPT_ID),
+
       DETAILS: details,
     };
 
@@ -516,6 +614,7 @@ export class AddMiscReceiptComponent {
     this.dataService.insertMiscReceipt(payload).subscribe((res: any) => {
       if (res.flag === 1) {
         notify('Miscellaneous Receipt saved successfully', 'success', 2000);
+        this.getVoucherNo();
         this.popupClosed.emit();
       } else {
         notify('Failed to save Misc Receipt', 'error', 2000);
@@ -582,36 +681,35 @@ export class AddMiscReceiptComponent {
       CREATE_USER_ID: this.userId,
       PAY_TYPE_ID: payTypeMapping[this.receiptMode] || null,
       PAY_HEAD_ID: this.miscFormData.PAY_HEAD_ID,
-      DEPT_ID : Number(this.miscFormData.DEPT_ID),
+      DEPT_ID: Number(this.miscFormData.DEPT_ID),
       DETAILS: details,
     };
 
     console.log('Save Payload:', payload);
 
-  const apiCall = this.isApproved
-    ? this.dataService.approveMiscReceipt(payload)
-    : this.dataService.updateMiscReceipt(payload);
+    const apiCall = this.isApproved
+      ? this.dataService.approveMiscReceipt(payload)
+      : this.dataService.updateMiscReceipt(payload);
 
-  const successMsg = this.isApproved
-    ? 'Miscellaneous Receipt approved successfully'
-    : 'Miscellaneous Receipt updated successfully';
+    const successMsg = this.isApproved
+      ? 'Miscellaneous Receipt approved successfully'
+      : 'Miscellaneous Receipt updated successfully';
 
-  const errorMsg = this.isApproved
-    ? 'Failed to approve Misc Receipt'
-    : 'Failed to update Misc Receipt';
+    const errorMsg = this.isApproved
+      ? 'Failed to approve Misc Receipt'
+      : 'Failed to update Misc Receipt';
 
-  apiCall.subscribe((res: any) => {
-    if (res.flag === 1) {
-      notify(successMsg, 'success', 2000);
-      this.popupClosed.emit();
-    } else {
-      notify(errorMsg, 'error', 2000);
-    }
-  });
+    apiCall.subscribe((res: any) => {
+      if (res.flag === 1) {
+        notify(successMsg, 'success', 2000);
+        this.popupClosed.emit();
+      } else {
+        notify(errorMsg, 'error', 2000);
+      }
+    });
   }
-  Cancel(){
-        this.popupClosed.emit()
-
+  Cancel() {
+    this.popupClosed.emit();
   }
 }
 

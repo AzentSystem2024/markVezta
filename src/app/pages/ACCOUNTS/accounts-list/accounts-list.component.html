@@ -90,7 +90,20 @@
       <dxi-column dataField="Category" caption="Category"></dxi-column>
       <dxi-column dataField="HeadCode" caption="Code"></dxi-column>
       <dxi-column dataField="HeadName" caption="Head Name"></dxi-column>
-      <!-- <dxi-column dataField="ledger" caption="Ledger"></dxi-column> -->
+      <dxi-column
+        caption="Status"
+        dataField="IS_INACTIVE"
+        [width]="80"
+        [cellTemplate]="statusCellRender"
+        [allowHeaderFiltering]="true"
+        [headerFilter]="{
+          dataSource: getStatusFilterData,
+          encodeHtml: false
+        }"
+        [fixed]="true"
+        fixedPosition="right"
+      >
+      </dxi-column>
     </dx-data-grid>
   </div>
 </div>

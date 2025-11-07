@@ -73,7 +73,7 @@ constructor( private dataService:DataService){
    // example
     // this.Date = new Date(); // convert string → Date
    
-   this.Date = this.DepreciationPayload.DEPR_DATE
+   this.Date = new Date(this.DepreciationPayload.DEPR_DATE)
    this.sesstion_Details()
   }
 
@@ -350,6 +350,7 @@ console.log(this.depreciationDate,'============this.processd_Date==========')
     this.get_Depreciation_list();
     this.grandTotal = 0;
     this.selectedRowsInGrid = [];
+    this.DepreciationPayload.DEPR_DATE=new Date
   } else {
     notify(
       {
@@ -373,6 +374,8 @@ console.log(this.depreciationDate,'============this.processd_Date==========')
     this.popupClosed.emit()
     this.selectedRowsInGrid = []; 
     this.grandTotal=0
+    
+  this.DepreciationPayload.DEPR_DATE=new Date
   }
 
   sesstion_Details(){

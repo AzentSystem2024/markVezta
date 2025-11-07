@@ -243,6 +243,7 @@ export class EditAccountComponent implements OnChanges {
       ARABIC_NAME: this.accountHeadData.ARABIC_NAME,
       GROUP_ORDER: this.accountHeadData.GROUP_ORDER || 0,
       GROUP_LEVEL: this.accountHeadData.GROUP_LEVEL || 0,
+      IS_INACTIVE: !!this.accountHeadData.IS_INACTIVE,
     };
     this.dataService.updateAccountHead(payload).subscribe((response: any) => {
       if (response?.flag === 1) {

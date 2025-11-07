@@ -113,6 +113,7 @@ export class AddDebitComponent {
   invoicePopupVisible: boolean;
   pendingInvoices: any;
   pendingInvoicelist: any;
+  selectedSupplier: any;
   constructor(private dataService: DataService) {}
 
   sessionData_tax() {
@@ -204,9 +205,14 @@ export class AddDebitComponent {
   }
 
   onSupplierChanged(event: any) {
-    console.log(event, 'eventttttttttttttttttttttttttttttttttt');
     this.selectedSupplierId = event.value;
-
+    if (this.selectedSupplierId) {
+      this.selectedSupplier = this.supplierList.find(
+        (s: any) => s.ID === this.selectedSupplierId
+      );
+      this.debitFormData.PARTY_NAME = this.selectedSupplier.DESCRIPTION;
+      console.log(this.selectedSupplier.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+    }
     if (this.selectedSupplierId) {
       this.debitFormData.SUPP_ID = this.selectedSupplierId;
       console.log(
@@ -641,6 +647,7 @@ export class AddDebitComponent {
     this.debitFormData.TRANS_DATE = this.formatDate(
       this.debitFormData.TRANS_DATE
     );
+
     this.dataService
       .insertDebitNote(this.debitFormData)
       .subscribe((response: any) => {
