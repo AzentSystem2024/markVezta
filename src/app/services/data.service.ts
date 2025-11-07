@@ -5797,4 +5797,14 @@ The result can be exported to HTML or Markdown.`;
     const reqBody = data;
     return this.http.post(getEndpoint, reqBody);
   }
+
+   BankReconciliation_List(payload) {
+    const getEndpoint = `${this.apiUrl}BankReconciliation/bankrecon`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+   Insert_BankReconciliation(payload) {
+    const getEndpoint = `${this.apiUrl}AC_Report/bankrecon`;
+    return this.http.post(getEndpoint, payload);
+  }
 }

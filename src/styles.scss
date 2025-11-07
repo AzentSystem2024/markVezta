@@ -714,13 +714,13 @@ body {
 }
 
 
-.dx-treeview-node[aria-expanded="true"] > .dx-item .dx-item-content {
-  height: auto;
-  color:var(--main-menu-expanded-color)!important;
-  border-radius: 6px;
-  padding: 4px 8px;
+// .dx-treeview-node[aria-expanded="true"] > .dx-item .dx-item-content {
+//   height: auto;
+//   color:var(--main-menu-expanded-color)!important;
+//   border-radius: 6px;
+//   padding: 4px 8px;
   
-}
+// }
 .dx-icon-edit:before {
   content: "\f023" !important;
   color:#0073D8 !important;
@@ -735,13 +735,13 @@ body {
   border-radius: 6px;
   padding: 4px 8px;
 }
-.dx-treeview-node[aria-level="2"][aria-expanded="true"]
-  > .dx-item
-  .dx-item-content {
-  font-weight: 500 !important;
-  height: auto !important;
+// .dx-treeview-node[aria-level="2"][aria-expanded="true"]
+//   > .dx-item
+//   .dx-item-content {
+//   font-weight: 500 !important;
+//   height: auto !important;
   
-}
+// }
 
 .dx-treeview-node[aria-level="1"][aria-expanded="true"]
   > .dx-item
@@ -762,4 +762,9 @@ body {
 }
 
 
-
+// ::ng-deep.dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected {
+//     background-color: var(--sub-menu-bg-color) !important;
+//     color: var(--sub-menu-color) !important;
+//     border-radius: 15px;
+//     height: 46px;
+// }
