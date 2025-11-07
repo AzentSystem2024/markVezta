@@ -46,7 +46,7 @@
 
 <dx-data-grid
   [showBorders]="true"
-  [selection]="{ mode: 'multiple' }"
+   [selection]="{ mode: isEdit ? 'multiple' : 'none' }"
   height="300"
    [showRowLines]="true"
       [showColumnLines]="true"
