@@ -42,6 +42,17 @@
         </div>
       </div>
     </dxi-item> -->
+    <dxi-item
+  location="after"
+  locateInMenu="auto"
+  widget="dxButton"
+  [options]="{
+    text: UserName,
+    stylingMode: 'text',
+    elementAttr: { class: 'userNameLabel' }
+  }"
+></dxi-item>
+
     <dxi-item location="after" locateInMenu="auto" menuItemTemplate="menuItem">
       <div *dxTemplate="let data of 'item'">
         <user-panel

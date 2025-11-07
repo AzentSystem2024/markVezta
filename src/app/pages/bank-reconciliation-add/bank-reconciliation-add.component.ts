@@ -46,6 +46,7 @@ import { DataService } from 'src/app/services';
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
 import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 import { ViewSalaryAdvanceModule } from 'src/app/HR/Masters/view-salary-advance/view-salary-advance.component';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-bank-reconciliation-add',
@@ -164,48 +165,6 @@ BankRecData :any={
 
 }
     summaryColumnsData = {
-    // totalItems: [
-    //   // 1. Total Debitṅ
-    //   {
-    //     name: 'totalDr',
-    //     column: 'DR_AMOUNT',
-    //     summaryType: 'sum',
-    //     displayFormat: ' {0}',
-    //     valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-    //     showInColumn: 'DR_AMOUNT',
-    //     alignment: 'right',
-    //   },
-    //   // 2. Total Credit
-    //   {
-    //     name: 'totalCr',
-    //     column: 'CR_AMOUNT',
-    //     summaryType: 'sum',
-    //     displayFormat: ' {0}',
-    //     valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-    //     showInColumn: 'CR_AMOUNT',
-    //     alignment: 'right',
-    //   },
-    //   // 3. Closing Balance (shows in Debit or Credit column based on value)
-    //   {
-    //     name: 'closingBalanceDr',
-    //     summaryType: 'custom',
-    //     displayFormat: ' {0}',
-    //     valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-    //     showInColumn: 'DR_AMOUNT',
-    //     alignment: 'right',
-    //   },
-    //   {
-    //     name: 'closingBalanceCr',
-    //     summaryType: 'custom',
-    //     displayFormat: '{0}',
-    //     valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-    //     showInColumn: 'CR_AMOUNT',
-    //     alignment: 'right',
-    //   },
-
-      
-    // ],
-    
 
     calculateCustomSummary: (options: any) => {
   if (options.summaryProcess === 'finalize') {
@@ -233,14 +192,6 @@ BankRecData :any={
     this.closingBalance = this.runningbalance-(this.remainingDebit + this.remainingCredit);
     console.log(this.closingBalance)
 
-    // Closing Balance
-    // if (options.name === 'closingBalanceCr') {
-    //   options.totalValue = closingBalance > 0 ? closingBalance : 0;
-    // }
-
-    // if (options.name === 'closingBalanceDr') {
-    //   options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : 0;
-    // }
   }
 },
 
@@ -285,11 +236,39 @@ BankRecData :any={
   }
 
     Savedata(){
-      const payload ={
 
+       // ✅ Check if any rows are selected
+  if (!this.selectedRows || this.selectedRows.length === 0) {
+    notify(
+      {
+        message: 'Please select at least one row',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 1000,
+      },
+      'error'
+    );
+    return;
+  }
+
+      const payload ={
+          RECON_DATE : new Date(),
+          ReconciliationList: this.selectedRows.map((row: any) => ({
+           TRANS_ID: row.TRANS_ID
+    }))
       }
+      console.log(payload)
       this.dataService.Insert_BankReconciliation(payload).subscribe((res:any)=>{
         console.log(res)
+         if (res.Message === 'Success') {
+          notify(
+            {
+              message: 'Inserted successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success'
+          );
+        }
       })
     }
 
