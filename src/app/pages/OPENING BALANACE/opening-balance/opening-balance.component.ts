@@ -88,6 +88,7 @@ export class OpeningBalanceComponent {
   isReadOnly: boolean = false;
   transId: any;
   isReadOnlyBalance: boolean;
+  addButtonOptions: any;
 
   constructor(private dataService: DataService, private router: Router) {}
 
@@ -187,6 +188,15 @@ export class OpeningBalanceComponent {
 
   ngOnInit() {
     this.openingBalance = [];
+    this.addButtonOptions = {
+      icon: 'plus',
+      type: 'default',
+      stylingMode: 'contained',
+      hint: 'Add Row',
+      width: 32,
+      height: 25,
+      onClick: () => this.addNewManualRow(), // ✅ Arrow function preserves `this`
+    };
 
     const userDataString = localStorage.getItem('userData');
     console.log(userDataString, 'USERDATASTRINGGGGGGGGGGG');
@@ -587,7 +597,10 @@ export class OpeningBalanceComponent {
   }
 
   addNewManualRow() {
-    console.log('newrowadded');
+    if (this.isReadOnly) {
+      notify('Committed opening balance cannot be edited.', 'warning', 3000);
+      return;
+    }
     const grid = this.itemsGridRef?.instance;
     if (!grid) return;
 
@@ -597,11 +610,15 @@ export class OpeningBalanceComponent {
       debitAmount: 0,
       creditAmount: 0,
       headId: null,
-      // add any required default fields
     };
 
-    this.openingBalance = [newRow, ...this.openingBalance];
+    this.openingBalance = [...this.openingBalance, newRow];
+
     grid.refresh();
+    setTimeout(() => {
+      const newRowIndex = this.openingBalance.length - 1;
+      grid.editCell(newRowIndex, 'ledgerCode');
+    }, 100);
   }
 
   cancel() {}

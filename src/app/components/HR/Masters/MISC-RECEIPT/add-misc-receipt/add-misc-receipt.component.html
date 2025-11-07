@@ -60,7 +60,6 @@
                     labelMode="floating"
                     [(value)]="voucherNo"
                     [width]="200"
-                    [(value)]="miscFormData.VOUCHER_NO"
                     [readOnly]="true"
                   ></dx-text-box>
                 </div>
@@ -86,31 +85,26 @@
                 class="stacked-toolbar-group"
                 style="display: flex; flex-direction: column; gap: 0px"
               >
-                <div style="display: flex; gap: 5px;margin-left: auto;">
+                <div style="display: flex; gap: 5px; margin-left: auto">
                   <dx-date-box
                     label="Date"
                     labelMode="floating"
                     [width]="200"
                     [(value)]="miscFormData.TRANS_DATE"
                     displayFormat="dd-MM-yyyy"
-                  
                     [readOnly]="true"
                   ></dx-date-box>
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-select-box
-              
                     label="Department"
                     labelMode="floating"
                     [width]="333"
-                     [items]="Company_list"
+                    [items]="Company_list"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     [(value)]="miscFormData.DEPT_ID"
-                    
-
                   ></dx-select-box>
-
                 </div>
                 <!--  -->
               </div>
@@ -298,7 +292,12 @@
 
 <div class="form-popup-buttons-container" *ngIf="!isReadOnlyMode">
   <div class="popup-footer">
-    <dx-button text="Cancel" stylingMode="outlined" (onClick)="Cancel()" type="normal"></dx-button>
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      (onClick)="Cancel()"
+      type="normal"
+    ></dx-button>
     <dx-button
       #saveButtonRef
       [text]="isEditing ? (isApproved ? 'Commit' : 'Update') : 'Save'"

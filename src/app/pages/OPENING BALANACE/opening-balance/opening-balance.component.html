@@ -78,15 +78,7 @@
               location="after"
               locateInMenu="auto"
               widget="dxButton"
-              [options]="{
-                icon: 'plus',
-                type: 'default',
-                stylingMode: 'contained',
-                hint: 'Add Row',
-                width: 32,
-                height: 25,
-                onClick: addNewManualRow.bind(this)
-              }"
+              [options]="addButtonOptions"
             ></dxi-item>
           </dxo-toolbar>
 
