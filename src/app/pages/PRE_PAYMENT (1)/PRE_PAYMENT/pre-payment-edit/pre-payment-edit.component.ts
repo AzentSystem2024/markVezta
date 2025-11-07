@@ -375,19 +375,8 @@ console.log(data,"dataaaaaaaaaaaaaaaaaaaaaaaaaa")
     console.log('Validation failed');
     return;
   }
-
-          //  ✅ Validation before save
-          // if (Number(this.PrePaymentFormData.EXPENSE_AMOUNT) !== Number(this.totalExpense)) {
-          //   notify({
-          //     message: 'Amount and Total Expense must be the same.',
-          //     type: 'error',
-          //     position: { at: 'top right', my: 'top right' },
-          //     displayTime: 1500,
-          //   });
-          //   return; // stop save
-          // }
      
-            const result = this.ExpenseAmountDetails.map(item => ({
+            const result = (this.ExpenseAmountDetails || []).map(item => ({
   DUE_DATE:this.convertToISO(item.DUE_DATE),
   DUE_AMOUNT: item.DUE_AMOUNT
 }));

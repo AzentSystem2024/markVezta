@@ -185,8 +185,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/update`, data);
   }
 
-  deleteArticle(id: number) {
-    return this.http.post<any>(`${this.apiUrl}article/delete/` + id, {});
+  deleteArticle(payload) {
+    return this.http.post<any>(`${this.apiUrl}article/delete`, payload);
   }
 
   //JOURNAL VOUCHER
@@ -5804,7 +5804,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
    Insert_BankReconciliation(payload) {
-    const getEndpoint = `${this.apiUrl}BankReconciliation/save`;
+    const getEndpoint = `${this.apiUrl}`;
     return this.http.post(getEndpoint, payload);
   }
 }

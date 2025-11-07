@@ -175,7 +175,7 @@ console.log(this.sharedValue,'selected');
             menu.canDelete = match.CanDelete ?? false;
             menu.canPrint = match.CanPrint ?? false;
 
-            menu.Selected = true;
+            menu.Selected = match.Selected ?? false;;
 
             this.selectedRows[tabIndex].push(menu.MenuId);
           } else {
