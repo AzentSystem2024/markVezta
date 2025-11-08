@@ -616,22 +616,58 @@ export class AddDebitComponent {
   saveDebitNote(): void {
     this.itemsGridRef?.instance?.saveEditData();
 
-    const gridData = this.itemsGridRef?.instance
-      ?.getVisibleRows()
-      .map((r) => r.data);
+    const gridData =
+      this.itemsGridRef?.instance?.getVisibleRows().map((r) => r.data) || [];
 
-    this.debitFormData.NOTE_DETAIL = gridData
-      .filter(
-        (row: any) =>
-          row.ledgerCode ||
-          row.ledgerName ||
-          row.Amount ||
-          row.gstAmount ||
-          row.particulars
-      )
-      .map((row: any, index: number) => {
+    // ✅ Filter valid rows
+    const validRows = gridData.filter(
+      (row: any) =>
+        row.ledgerCode ||
+        row.ledgerName ||
+        row.Amount ||
+        row.gstAmount ||
+        row.particulars
+    );
+
+    // ✅ 1. Form-level validations
+    if (!this.debitFormData.SUPP_ID) {
+      notify('Please select a Supplier before saving.', 'error', 2000);
+      return;
+    }
+
+    if (!this.debitFormData.INVOICE_NO) {
+      notify('Please select an Invoice before saving.', 'error', 2000);
+      return;
+    }
+
+    if (validRows.length === 0) {
+      notify('Please enter at least one ledger entry.', 'error', 2000);
+      return;
+    }
+
+    // ✅ 2. Row-level validation for Amount
+    const invalidAmountRow = validRows.find(
+      (row: any) =>
+        (row.ledgerCode || row.ledgerName) &&
+        (!row.Amount || Number(row.Amount) === 0)
+    );
+
+    if (invalidAmountRow) {
+      notify(
+        'Please enter a valid Amount for all ledger rows having Ledger Code or Ledger Name.',
+        'error',
+        3000
+      );
+      return;
+    }
+
+    // ✅ 3. Build NOTE_DETAIL for backend
+    this.debitFormData.NOTE_DETAIL = validRows.map(
+      (row: any, index: number) => {
         const ledger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === row.ledgerCode
+          (item: any) =>
+            item.HEAD_CODE === row.ledgerCode ||
+            item.HEAD_NAME === row.ledgerName
         );
 
         return {
@@ -641,30 +677,88 @@ export class AddDebitComponent {
           GST_AMOUNT: Number(row.gstAmount) || 0,
           REMARKS: row.particulars || '',
         };
-      });
+      }
+    );
+
+    // ✅ 4. Other fields
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
     this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
     this.debitFormData.TRANS_DATE = this.formatDate(
       this.debitFormData.TRANS_DATE
     );
 
-    this.dataService
-      .insertDebitNote(this.debitFormData)
-      .subscribe((response: any) => {
-        console.log(response, 'SAVED SUCCESSFULLY');
-
+    // ✅ 5. Save
+    this.dataService.insertDebitNote(this.debitFormData).subscribe(
+      (response: any) => {
         notify(
           {
-            message: 'Credit Note Saved Successfully',
+            message: 'Debit Note Saved Successfully',
             position: { at: 'top right', my: 'top right' },
           },
           'success'
         );
-
         this.popupClosed.emit();
         this.resetDebitNoteForm();
-      });
+      },
+      (error) => {
+        notify('Failed to save Debit Note. Please try again.', 'error', 2000);
+        console.error('Save error:', error);
+      }
+    );
   }
+
+  // saveDebitNote(): void {
+  //   this.itemsGridRef?.instance?.saveEditData();
+
+  //   const gridData = this.itemsGridRef?.instance
+  //     ?.getVisibleRows()
+  //     .map((r) => r.data);
+
+  //   this.debitFormData.NOTE_DETAIL = gridData
+  //     .filter(
+  //       (row: any) =>
+  //         row.ledgerCode ||
+  //         row.ledgerName ||
+  //         row.Amount ||
+  //         row.gstAmount ||
+  //         row.particulars
+  //     )
+  //     .map((row: any, index: number) => {
+  //       const ledger = this.ledgerList.find(
+  //         (item: any) => item.HEAD_CODE === row.ledgerCode
+  //       );
+
+  //       return {
+  //         SL_NO: row.SL_NO || index + 1,
+  //         HEAD_ID: ledger?.HEAD_ID || null,
+  //         AMOUNT: Number(row.Amount) || 0,
+  //         GST_AMOUNT: Number(row.gstAmount) || 0,
+  //         REMARKS: row.particulars || '',
+  //       };
+  //     });
+  //   this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
+  //   this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
+  //   this.debitFormData.TRANS_DATE = this.formatDate(
+  //     this.debitFormData.TRANS_DATE
+  //   );
+
+  //   this.dataService
+  //     .insertDebitNote(this.debitFormData)
+  //     .subscribe((response: any) => {
+  //       console.log(response, 'SAVED SUCCESSFULLY');
+
+  //       notify(
+  //         {
+  //           message: 'Credit Note Saved Successfully',
+  //           position: { at: 'top right', my: 'top right' },
+  //         },
+  //         'success'
+  //       );
+
+  //       this.popupClosed.emit();
+  //       this.resetDebitNoteForm();
+  //     });
+  // }
 
   resetDebitNoteForm() {
     this.debitFormData = {
@@ -678,9 +772,9 @@ export class AddDebitComponent {
       INVOICE_ID: 0,
       INVOICE_NO: '',
       UNIT_ID: '',
+      DUE_AMOUNT: '',
       NOTE_DETAIL: [
         {
-          SL_NO: '',
           HEAD_ID: '',
           AMOUNT: '',
           GST_AMOUNT: '',
