@@ -257,7 +257,7 @@
             "
           >
             <dx-text-box
-              [value]="netAmountDisplay"
+              [value]="netAmountDisplay | number : '1.2-2'"
               label="Net Amount"
               labelMode="floating"
               [width]="200"
