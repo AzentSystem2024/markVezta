@@ -154,6 +154,7 @@
         width="150px"
         [(value)]="PrePaymentFormData.DATE_FROM"
         (onValueChanged)="updatePeriodTo()"
+        (valueChange)="onFieldChange()"
       ></dx-date-box>
       <dx-number-box
         label="No.Month"
@@ -162,6 +163,7 @@
         [(value)]="PrePaymentFormData.NO_OF_MONTHS"
         [readOnly]="isReadOnly"
         (onValueChanged)="updatePeriodTo()"
+        (valueChange)="onFieldChange()"
       ></dx-number-box>
       <dx-number-box
         label="No.Days"
@@ -170,6 +172,7 @@
         [(value)]="PrePaymentFormData.NO_OF_DAYS"
         [readOnly]="isReadOnly"
         (onValueChanged)="updatePeriodTo()"
+        (valueChange)="onFieldChange()"
       ></dx-number-box>
       <dx-date-box
         label="Period To"

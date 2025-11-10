@@ -31,6 +31,7 @@ export class PrePaymentAddComponent {
       PrePaymentLedger: any;
            sessionData: any;
   selected_vat_id: any;
+  selectedstoreId:any;
 
       periodTo: string | number | Date | null = null;
       periodFrom: string | number | Date | null = null;
@@ -367,7 +368,11 @@ sesstion_Details(){
 
     this.selected_user_id=sessionData.USER_ID
     console.log(this.selected_user_id,'===========selected user id===================')
-    
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
   }
 
   savePrePayment(){
@@ -413,7 +418,7 @@ console.log(result)
     NO_OF_DAYS: Number(this.PrePaymentFormData.NO_OF_DAYS) || null,
     EXPENSE_AMOUNT: Number(this.PrePaymentFormData.EXPENSE_AMOUNT) || null,
     NO_OF_MONTHS: Number(this.PrePaymentFormData.NO_OF_MONTHS) || null,
-   
+      STORE_ID : this.selectedstoreId,
      // ✅ Map from the grid data source, not the form object
     PREPAY_DETAIL:result
   };

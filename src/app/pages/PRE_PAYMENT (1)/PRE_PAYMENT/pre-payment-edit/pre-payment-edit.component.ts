@@ -32,7 +32,11 @@ export class PrePaymentEditComponent {
            PrePaymentLedger: any;
              sessionData: any;
   selected_vat_id: any;
+  selectedstoreId:any;
      
+  fieldChanged = false;
+scheduleGenerated = false;
+
            periodTo: string | number | Date | null = null;
            periodFrom: string | number | Date | null = null;
      
@@ -101,21 +105,39 @@ export class PrePaymentEditComponent {
     console.log(this.sessionData,'=================session data==========')
 this.selected_vat_id=this.sessionData.VAT_ID
   }
-     
-// convertToISO(date: Date | string): string | null {
-//   if (!date) return null;
-//   const d = date instanceof Date ? date : new Date(date);
-//   return isNaN(d.getTime()) ? null : d.toISOString();
+
+//    convertToISO(dateStr: string): string {
+//   // dateStr is in "DD/MM/YYYY"
+//   const [day, month, year] = dateStr.split("/").map(Number);
+
+//   // Create JS Date (note: month is 0-based)
+//   const date = new Date(year, month - 1, day +1);
+
+//   return date.toISOString();  // Converts to ISO string
 // }
+convertToISO(dateStr: any): string {
+  if (!dateStr) return ''; // ⛔ Return empty if missing
 
-   convertToISO(dateStr: string): string {
-  // dateStr is in "DD/MM/YYYY"
-  const [day, month, year] = dateStr.split("/").map(Number);
+  // ✅ If it's already a Date object
+  if (dateStr instanceof Date) {
+    return dateStr.toISOString();
+  }
 
-  // Create JS Date (note: month is 0-based)
-  const date = new Date(year, month - 1, day +1);
+  // ✅ If it's a string like "DD/MM/YYYY"
+  if (typeof dateStr === 'string' && dateStr.includes('/')) {
+    const [day, month, year] = dateStr.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.toISOString();
+  }
 
-  return date.toISOString();  // Converts to ISO string
+  // ✅ If it’s already in ISO or unexpected format, try to parse
+  const parsed = new Date(dateStr);
+  if (!isNaN(parsed.getTime())) {
+    return parsed.toISOString();
+  }
+
+  console.warn('⚠️ Unrecognized date format:', dateStr);
+  return '';
 }
 
      updatePeriodTo() {
@@ -197,7 +219,15 @@ this.selected_vat_id=this.sessionData.VAT_ID
      
        this.ExpenseAmountDetails = schedule;
        this.showGrid = true;
+        this.scheduleGenerated = true;
+  this.fieldChanged = false; 
      }
+
+     onFieldChange() {
+  this.fieldChanged = true;
+  this.scheduleGenerated = false; // reset since user changed a key field
+}
+
      
      
      onCellValueChanged(e: any) {
@@ -343,7 +373,11 @@ this.selected_vat_id=this.sessionData.VAT_ID
      
          this.selected_user_id=sessionData.USER_ID
          console.log(this.selected_user_id,'===========selected user id===================')
-         
+           this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
        }
 
        ngOnChanges(changes: SimpleChanges): void{
@@ -370,17 +404,31 @@ console.log(data,"dataaaaaaaaaaaaaaaaaaaaaaaaaa")
 
        savePrePayment(){
 
-             const validationResult = this.formValidationGroup?.instance?.validate();
-  if (!validationResult?.isValid) {
-    console.log('Validation failed');
-    return;
-  }
+//              const validationResult = this.formValidationGroup?.instance?.validate();
+//   if (!validationResult?.isValid) {
+//     console.log('Validation failed');
+//     return;
+//   }
+
+if (this.fieldChanged && !this.scheduleGenerated) {
+    notify({
+      message: 'Please click "Generate Schedule" before saving since Date/Months/Days were modified.',
+      type: 'warning',
+      position: { at: 'top right', my: 'top right' },
+      displayTime: 2000,
+    });
+    return;
+  }
+
+
      
             const result = (this.ExpenseAmountDetails || []).map(item => ({
   DUE_DATE:this.convertToISO(item.DUE_DATE),
   DUE_AMOUNT: item.DUE_AMOUNT
 }));
 console.log(result)
+
+ 
 
           const payload = {
          TRANS_ID: this.PrePaymentFormData.TRANS_ID || 0,
@@ -403,7 +451,7 @@ console.log(result)
          EXPENSE_AMOUNT: Number(this.PrePaymentFormData.EXPENSE_AMOUNT) || null,
          NO_OF_MONTHS: Number(this.PrePaymentFormData.NO_OF_MONTHS) || null,
          TRANS_STATUS: this.PrePaymentFormData.TRANS_STATUS ? 5 : 1,
-        
+        STORE_ID :this.selectedstoreId,
           // ✅ Map from the grid data source, not the form object
          PREPAY_DETAIL: result
        };

@@ -89,9 +89,17 @@ export class OpeningBalanceComponent {
   transId: any;
   isReadOnlyBalance: boolean;
   addButtonOptions: any;
+  selectedstoreId:any;
 
   constructor(private dataService: DataService, private router: Router) {}
-
+  sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
+  }
   // ngOnInit() {
   //   this.openingBalance = [];
 
@@ -187,6 +195,7 @@ export class OpeningBalanceComponent {
   // }
 
   ngOnInit() {
+    this.sessionDetails();
     this.openingBalance = [];
     this.addButtonOptions = {
       icon: 'plus',
@@ -671,6 +680,7 @@ export class OpeningBalanceComponent {
     const payload = {
       COMPANY_ID: selectedCompany?.COMPANY_ID,
       FIN_ID: userData?.FINANCIAL_YEARS?.[0]?.FIN_ID,
+      STORE_ID : userData?.Configuration?.[0].STORE_ID,
       Details: this.openingBalance
         .map((item: any) => {
           const ledger = this.ledgerList.find(

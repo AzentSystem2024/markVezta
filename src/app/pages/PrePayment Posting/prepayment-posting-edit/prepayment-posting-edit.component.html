@@ -72,7 +72,7 @@
        <!-- <dxi-column dataField="INVOICE_NO" caption="Invoice No"></dxi-column> -->
 
   <!-- Due Date -->
-  <dxi-column dataField="DUE_DATE" caption="Due Date" dataType="date" [format]="'dd/MM/yyyy'"></dxi-column>
+  <dxi-column dataField="DUE_DATE" caption="Due Date" dataType="date" [format]="'dd/MM/yyyy'" [allowEditing]="false"></dxi-column>
 
   <!-- Store Code -->
   <!-- <dxi-column dataField="STORE_CODE" caption="Store Code"></dxi-column> -->
@@ -84,15 +84,15 @@
   <!-- <dxi-column dataField="CR_LEDGER" caption="Cr. Ledger"></dxi-column> -->
 
   <!-- Amount -->
-  <dxi-column dataField="DUE_AMOUNT" caption="Amount" dataType="number"  [allowEditing]="true"
+  <dxi-column dataField="DUE_AMOUNT" caption="Amount" dataType="number"  [allowEditing]="false"
               [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
 
                 <!-- DR Amount -->
-  <dxi-column dataField="DR_AMOUNT" caption="Debit" dataType="number"  [allowEditing]="true"
+  <dxi-column dataField="DR_AMOUNT" caption="Debit" dataType="number"  [allowEditing]="false"
               [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
 
                 <!-- CR Amount -->
-  <dxi-column dataField="CR_AMOUNT" caption="Credit" dataType="number"  [allowEditing]="true"
+  <dxi-column dataField="CR_AMOUNT" caption="Credit" dataType="number"  [allowEditing]="false"
               [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
 
   <!-- Narration -->

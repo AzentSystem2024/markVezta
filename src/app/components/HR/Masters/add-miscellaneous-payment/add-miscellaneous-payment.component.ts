@@ -145,10 +145,21 @@ export class AddMiscellaneousPaymentComponent {
   pendingNo: any;
   sessionData: any;
   selected_vat_id: any;
+  selectedstoreId: any;
 
   constructor(private dataService: DataService) {}
 
+    sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
+  }
+
   ngOnInit() {
+    this.sessionDetails();
     if (this.EditingResponseData) {
       console.log('EditingResponseData on init:', this.EditingResponseData);
     }
@@ -747,6 +758,7 @@ export class AddMiscellaneousPaymentComponent {
     const payload = {
       ...miscDataWithoutVat,
       TRANS_DATE: this.formatDateOnly(this.miscFormData.TRANS_DATE),
+      STORE_ID: this.selectedstoreId,
       MISC_DETAIL: cleanedList.map((item: any, index: number) => {
         const amount = Number(item.AMOUNT) || 0;
         const tax = Number(item.TAX) || 0;
@@ -849,6 +861,7 @@ export class AddMiscellaneousPaymentComponent {
     const { DetailList, ...cleanedFormData } = this.miscFormData;
     const payload = {
       ...this.miscFormData,
+      STORE_ID :  this.selectedstoreId,
       MISC_DETAIL: cleanedList.map((item: any, index: number) => {
         const amount = Number(item.AMOUNT) || 0;
         const tax = Number(item.TAX) || 0;

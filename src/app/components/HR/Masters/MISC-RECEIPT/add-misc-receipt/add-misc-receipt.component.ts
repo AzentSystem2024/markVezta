@@ -122,12 +122,23 @@ export class AddMiscReceiptComponent {
   isApproved: boolean = false;
   voucherNo: any;
   Company_list: any = [];
+ selectedstoreId: any;
 
   constructor(private dataService: DataService) {
     this.Deparment_Drop_down();
   }
 
+
+  sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
+  }
   ngOnInit() {
+    this.sessionDetails();
     // this.getVoucherNo();
     console.log('EditingResponseData on init:', this.EditingResponseData);
     if (this.isEditing) {
@@ -156,6 +167,7 @@ export class AddMiscReceiptComponent {
         this.miscFormData.FIN_ID = firstFinYear.FIN_ID;
       }
     }
+
   }
 
   ngAfterViewInit() {
@@ -547,6 +559,22 @@ export class AddMiscReceiptComponent {
   }
 
   onSaveMiscReceipt() {
+
+    if (
+    !this.miscFormData?.PAY_HEAD_ID ||
+    !this.miscFormData?.PARTY_NAME ||
+    !this.miscFormData?.TRANS_DATE ||
+    !this.receiptMode
+  ) {
+    notify('Please fill all required fields before saving.', 'warning', 2500);
+    return;
+  }
+
+  if (!this.pendingInvoicelist || this.pendingInvoicelist.length === 0) {
+    notify('Please add at least one invoice detail.', 'warning', 2500);
+    return;
+  }
+  
     const PAY_HEAD_ID = this.miscFormData?.PAY_HEAD_ID; // get from your form
     const payTypeMapping: any = {
       Cash: 1,
@@ -605,7 +633,7 @@ export class AddMiscReceiptComponent {
       PAY_TYPE_ID: payTypeMapping[this.receiptMode] || null,
       PAY_HEAD_ID: this.miscFormData.PAY_HEAD_ID,
       DEPT_ID: Number(this.miscFormData.DEPT_ID),
-
+      STORE_ID: this.selectedstoreId,
       DETAILS: details,
     };
 
@@ -682,6 +710,7 @@ export class AddMiscReceiptComponent {
       PAY_TYPE_ID: payTypeMapping[this.receiptMode] || null,
       PAY_HEAD_ID: this.miscFormData.PAY_HEAD_ID,
       DEPT_ID: Number(this.miscFormData.DEPT_ID),
+      STORE_ID: this.selectedstoreId,
       DETAILS: details,
     };
 

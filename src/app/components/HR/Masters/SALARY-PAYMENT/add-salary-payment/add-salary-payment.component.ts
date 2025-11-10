@@ -96,6 +96,7 @@ export class AddSalaryPaymentComponent {
   salaryPaymentData: any = {
     COMPANY_ID: '',
     FIN_ID: '',
+    STORE_ID :0,
     TRANS_DATE: new Date(),
     PAY_TYPE_ID: '',
     PAY_HEAD_ID: '',
@@ -118,6 +119,7 @@ export class AddSalaryPaymentComponent {
   companyId: any;
   finId: any;
   selectedRows: any;
+  selectedstoreId:any;
 
   constructor(private dataService: DataService) {}
 
@@ -125,6 +127,16 @@ export class AddSalaryPaymentComponent {
     this.getLedgerCodeDropdown();
     this.getVoucherNo();
     this.loadUserData();
+    this.sessionDetails();
+  }
+
+    sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -433,6 +445,7 @@ this.salaryPaymentData.TRANS_DATE = new Date();
     this.salaryPaymentData.COMPANY_ID = this.companyId;
     this.salaryPaymentData.CREATE_USER_ID = this.userId;
     this.salaryPaymentData.FIN_ID = this.finId;
+    this.salaryPaymentData.STORE_ID = this.selectedstoreId;
 
     // Update salary pay details with selected IDs
     // this.salaryPaymentData.SALARY_PAY_DETAIL = this.selectedIds.map((id) => ({
@@ -501,6 +514,7 @@ onUpdateSalaryPayment() {
   this.salaryPaymentData.COMPANY_ID = this.companyId;
   this.salaryPaymentData.CREATE_USER_ID = this.userId;
   this.salaryPaymentData.FIN_ID = this.finId;
+  this.salaryPaymentData.STORE_ID = this.selectedstoreId;
 
   // Update salary pay details with selected rows
   this.salaryPaymentData.SALARY_PAY_DETAIL = this.selectedRows.map((row) => ({

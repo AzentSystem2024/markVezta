@@ -97,7 +97,7 @@ export class AddCreditNoteComponent {
   creditFormData: any = {
     TRANS_TYPE: 37,
     COMPANY_ID: 1,
-    STORE_ID: 1,
+    STORE_ID: 0,
     TRANS_DATE: new Date(),
     TRANS_STATUS: 1,
     PARTY_ID: 1,
@@ -136,10 +136,11 @@ export class AddCreditNoteComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedCustomer: any;
-
+selectedstoreId:any;
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
+    this.sessionDetails();
     this.sessionData_tax();
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
@@ -184,6 +185,16 @@ export class AddCreditNoteComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+    
+  }
+
+    sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
   }
 
   addNewManualRow() {
@@ -791,6 +802,7 @@ export class AddCreditNoteComponent {
         userData?.FINANCIAL_YEARS?.[0]?.FIN_ID || null;
       this.creditFormData.UNIT_ID =
         this.selectedCompanyId || userData?.Companies?.[0]?.COMPANY_ID || null;
+        this.creditFormData.STORE_ID = this.selectedstoreId || userData?.Configuration?.[0]?.STORE_ID || null;
     }
     this.dataService
       .insertCreditNote(this.creditFormData)
@@ -827,7 +839,7 @@ export class AddCreditNoteComponent {
     this.creditFormData = {
       TRANS_TYPE: 37,
       COMPANY_ID: 1,
-      STORE_ID: 1,
+      STORE_ID: 0,
       TRANS_DATE: new Date(),
       TRANS_STATUS: 1,
       PARTY_ID: 1,
