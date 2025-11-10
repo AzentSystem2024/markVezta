@@ -122,22 +122,7 @@
       <dxi-column dataField="VOUCHER_NO" caption="Voucher No"></dxi-column>
 
       <dxi-column dataField="PARTY_NAME" caption="Party Name"></dxi-column>
-      <dxi-column
-        dataField="AMOUNT"
-        caption="Amount"
-        dataType="number"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
-      <dxi-column
-        dataField="VAT_AMOUNT"
-        [caption]="
-          selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-            ? ' VAT Amount'
-            : ' GST Amount'
-        "
-        dataType="number"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
+
       <dxi-column dataField="BANK_NAME" caption="Bank"></dxi-column>
       <dxi-column
         dataField="TRANS_DATE"

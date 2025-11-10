@@ -118,7 +118,6 @@
           <dxi-column
             dataField="ledgerCode"
             caption="Ledger Code"
-            [width]="200"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: ledgerList,
@@ -131,7 +130,6 @@
           <dxi-column
             dataField="ledgerName"
             caption="Ledger Name"
-            [width]="250"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: ledgerList,
@@ -144,7 +142,6 @@
           <dxi-column
             dataField="particulars"
             caption="Particulars"
-            [width]="250"
             [editorOptions]="{ maxLength: 250 }"
           >
             <dxi-validation-rule
@@ -158,7 +155,6 @@
             caption="Amount"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [width]="150"
           >
           </dxi-column>
 
@@ -171,14 +167,8 @@
             "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [width]="150"
             [allowEditing]="true"
           >
-          </dxi-column>
-
-          <dxi-column type="buttons">
-            <dxi-button name="edit"></dxi-button>
-            <dxi-button name="delete"></dxi-button>
           </dxi-column>
 
           <dxo-summary>
@@ -232,7 +222,7 @@
             "
           >
             <dx-text-box
-              [value]="debitFormData[0].NET_AMOUNT"
+              [value]="debitFormData[0].NET_AMOUNT | number : '1.2-2'"
               label="Net Amount"
               labelMode="floating"
               [width]="200"

@@ -171,7 +171,7 @@ export class CreditNoteListComponent {
           ...item,
           TRANS_DATE: dateValue,
         };
-      });
+      }).sort((a: any, b: any) => Number(b.DOC_NO) - Number(a.DOC_NO));
 
       this.applyDateFilter();
     });

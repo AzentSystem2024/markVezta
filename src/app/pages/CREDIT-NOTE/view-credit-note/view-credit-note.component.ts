@@ -339,7 +339,7 @@ export class ViewCreditNoteComponent {
 
   getLedgerCodeDropdown(): Promise<void> {
     return new Promise((resolve) => {
-      this.dataService.getAccountHeadList().subscribe((response: any) => {
+      this.dataService.getActiveLedger().subscribe((response: any) => {
         this.ledgerList = response.Data;
         console.log('Ledger List Loaded:', this.ledgerList);
         resolve();

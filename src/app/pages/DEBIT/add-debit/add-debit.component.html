@@ -23,7 +23,6 @@
           [headerFilter]="{ visible: true, allowSearch: true }"
           [allowColumnReordering]="true"
           [showColumnHeaders]="true"
-          [columnAutoWidth]="true"
           [allowColumnResizing]="true"
           [height]="'60vh'"
           [columnResizingMode]="'nextColumn'"
@@ -34,7 +33,7 @@
             mode: 'cell',
             allowUpdating: true,
             allowDeleting: true,
-            allowAdding: true,
+            allowAdding: false,
             useIcons: true
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
@@ -129,6 +128,7 @@
                   <dx-button
                     icon="plus"
                     stylingMode="outlined"
+                    hint="Add New Row"
                     type="default"
                     (onClick)="onAddNewRow()"
                     style="margin-top: 10px"
@@ -140,12 +140,12 @@
           <dxi-column
             dataField="SL_NO"
             caption="Sl No"
+            width="100"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="ledgerCode"
             caption="Ledger Code"
-            [width]="130"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: ledgerList,
@@ -158,7 +158,7 @@
           <dxi-column
             dataField="ledgerName"
             caption="Ledger Name"
-            [width]="200"
+            [width]="'auto'"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: ledgerList,
@@ -171,7 +171,6 @@
           <dxi-column
             dataField="particulars"
             caption="Particulars"
-            [width]="150"
             [editorOptions]="{ maxLength: 250 }"
           >
             <dxi-validation-rule
@@ -187,7 +186,17 @@
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
           </dxi-column>
-
+          <dxi-column
+            dataField="GST_PERC"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? ' VAT %'
+                : ' GST %'
+            "
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+          </dxi-column>
           <dxi-column
             dataField="gstAmount"
             [caption]="
@@ -197,7 +206,13 @@
             "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
+            [calculateCellValue]="calculateTaxAmount"
           >
+            <!-- <dxi-validation-rule 
+              type="custom" 
+              [validationCallback]="validateGstAmount"
+              message="GST Amount cannot be greater than Amount">
+            </dxi-validation-rule> -->
           </dxi-column>
 
           <dxi-column type="buttons">
@@ -229,7 +244,7 @@
         <div
           style="
             margin-top: 1px;
-            padding: 0 10px;
+            padding: 0 10px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -256,14 +271,23 @@
             "
           >
             <dx-text-box
-              [value]="netAmountDisplay"
+              [value]="netAmountString"
+              label="Net Amount"
+              labelMode="floating"
+              [width]="200"
+              [readOnly]="true"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
+              [inputAttr]="{ style: 'text-align: right;' }"
+            ></dx-text-box>
+            <!-- <dx-text-box
+              [value]="netAmountDisplay | number : '1.2-2'"
               label="Net Amount"
               labelMode="floating"
               [width]="200"
               [readOnly]="true"
               [calculateCellValue]="calculateAmount"
               [inputAttr]="{ style: 'text-align: right;' }"
-            ></dx-text-box>
+            ></dx-text-box> -->
           </div>
         </div>
       </div>

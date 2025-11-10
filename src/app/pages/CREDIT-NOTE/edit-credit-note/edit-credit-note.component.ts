@@ -225,11 +225,29 @@ export class EditCreditNoteComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
+  private hasEmptyRow(): boolean {
+    return (this.noteDetails || []).some(
+      (r: any) =>
+        !r.ledgerCode &&
+        !r.ledgerName &&
+        !r.particulars &&
+        (!r.Amount || r.Amount === 0) &&
+        (!r.GST_PERC || r.GST_PERC === 0)
+    );
+  }
+
   addNewManualRow() {
     if (!this.noteDetails) {
       this.noteDetails = [];
     }
-
+    if (this.hasEmptyRow()) {
+      notify(
+        'Please fill the existing empty row before adding a new one.',
+        'warning',
+        2000
+      );
+      return;
+    }
     const nextSlNo =
       this.noteDetails.length > 0
         ? Math.max(...this.noteDetails.map((r) => r.SL_NO)) + 1
@@ -353,7 +371,7 @@ export class EditCreditNoteComponent {
 
   getLedgerCodeDropdown(): Promise<void> {
     return new Promise((resolve) => {
-      this.dataService.getAccountHeadList().subscribe((response: any) => {
+      this.dataService.getActiveLedger().subscribe((response: any) => {
         this.ledgerList = response.Data;
         console.log('Ledger List Loaded:', this.ledgerList);
         resolve();
@@ -367,6 +385,7 @@ export class EditCreditNoteComponent {
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
       e.dataField === 'Amount' ||
+      e.dataField === 'GST_PERC' ||
       e.dataField === 'gstAmount'
     ) {
       e.editorOptions = e.editorOptions || {};
@@ -522,7 +541,7 @@ export class EditCreditNoteComponent {
           const rowIndex = e.row.rowIndex;
           // Move focus to the "ledgerCode" column in the same row
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'gstAmount'));
+            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
           });
         }
       };
@@ -533,7 +552,7 @@ export class EditCreditNoteComponent {
         }, 0);
       };
     }
-    if (e.dataField === 'gstAmount') {
+    if (e.dataField === 'GST_PERC') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
@@ -550,29 +569,40 @@ export class EditCreditNoteComponent {
             grid?.saveEditData(); // Now the value is committed
 
             // ✅ Add new row manually
-            const newRow = {
-              SL_NO: this.noteDetails.length + 1,
-              HEAD_ID: '',
-              AMOUNT: '',
-              GST_AMOUNT: '',
-              REMARKS: '',
-            };
+            if (!this.hasEmptyRow()) {
+              const grid = this.itemsGridRef?.instance;
+              const newRow = {
+                SL_NO: this.noteDetails.length + 1,
+                ledgerCode: '',
+                ledgerName: '',
+                particulars: '',
+                Amount: '',
+                GST_PERC: '',
+                gstAmount: '',
+                HEAD_ID: null,
+              };
 
-            this.noteDetails.push(newRow);
+              this.noteDetails.push(newRow);
 
-            setTimeout(() => {
+              // ✅ Force rebind and refresh the grid
               grid.option('dataSource', [...this.noteDetails]);
+              grid.refresh();
 
+              // ✅ Wait a bit longer to ensure row is rendered before focusing
               setTimeout(() => {
                 const visibleRows = grid.getVisibleRows();
                 const newRowIndex = visibleRows.findIndex(
                   (r) => r.data === newRow
                 );
+
                 if (newRowIndex >= 0) {
-                  grid.editCell(newRowIndex, 'ledgerCode');
+                  // Small extra delay for rendering safety
+                  setTimeout(() => {
+                    grid.editCell(newRowIndex, 'ledgerCode');
+                  }, 50);
                 }
-              }, 50);
-            }, 50);
+              }, 100);
+            }
           }, 50); // Let blur + commit happen
         }
       };
@@ -586,17 +616,25 @@ export class EditCreditNoteComponent {
   }
 
   updateNetAmount() {}
-
+  calculateTaxAmount = (rowData: any) => {
+    const amount = Number(rowData.Amount) || 0;
+    const gstPerc = Number(rowData.GST_PERC) || 0;
+    return +((amount * gstPerc) / 100).toFixed(2);
+  };
   get calculatedNetAmount(): string {
+    const details = this.noteDetails || [];
     let totalAmount = 0;
-    let totalGstAmount = 0;
+    let totalGST = 0;
 
-    for (const row of this.noteDetails) {
-      totalAmount += parseFloat(row.Amount) || 0;
-      totalGstAmount += parseFloat(row.gstAmount) || 0;
-    }
+    details.forEach((item: any) => {
+      const amount = Number(item.Amount) || 0;
+      const gstPerc = Number(item.GST_PERC) || 0;
 
-    return (totalAmount + totalGstAmount).toFixed(2); // returns a string
+      totalAmount += amount;
+      totalGST += (amount * gstPerc) / 100; // ✅ Recalculate GST dynamically
+    });
+
+    return (totalAmount + totalGST).toFixed(2);
   }
 
   onCompanySelected(event: any): void {
@@ -714,8 +752,68 @@ export class EditCreditNoteComponent {
   }
 
   updateCreditNote() {
+    // 1) Ensure in-progress edits are committed
+    this.itemsGridRef?.instance?.saveEditData();
+
+    // small util to compute GST
+    const calculateTaxAmount = (item: any): number => {
+      const amount = Number(item.Amount) || 0;
+      const gstPerc = Number(item.GST_PERC) || 0;
+      return +((amount * gstPerc) / 100).toFixed(2);
+    };
+    const details = this.noteDetails || [];
+    let totalAmount = 0;
+    let totalGST = 0;
+
+    details.forEach((item: any) => {
+      const amount = Number(item.Amount) || 0;
+      const gstPerc = Number(item.GST_PERC) || 0;
+      totalAmount += amount;
+      totalGST += (amount * gstPerc) / 100;
+    });
+
+    const netAmount = totalAmount + totalGST;
+    const dueAmount = Number(this.creditFormData[0]?.DUE_AMOUNT) || 0;
+    console.log(netAmount, dueAmount, 'NETAMOUNT,DUEAMOUNT');
+    // ✅ Validation check
+    if (netAmount > dueAmount) {
+      notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
+      return;
+    }
+    // Build NOTE_DETAIL consistently (use same shape for both branches)
+    const buildNoteDetail = () =>
+      (this.noteDetails || [])
+        .filter(
+          (item) =>
+            // include rows that have any meaningful data
+            item.ledgerCode ||
+            item.ledgerName ||
+            item.Amount ||
+            item.GST_PERC ||
+            item.particulars
+        )
+        .map((item: any, index: number) => {
+          const match = this.ledgerList.find(
+            (l) =>
+              l.HEAD_CODE === item.ledgerCode || l.HEAD_NAME === item.ledgerName
+          );
+
+          const amount = Number(item.Amount) || 0;
+          const gstPerc = Number(item.GST_PERC) || 0;
+          const gstAmount = calculateTaxAmount(item);
+
+          return {
+            SL_NO: item.SL_NO || index + 1,
+            HEAD_ID: match?.HEAD_ID || item.HEAD_ID || null,
+            AMOUNT: amount,
+            GST_PERC: gstPerc, // <-- INCLUDE GST_PERC
+            GST_AMOUNT: gstAmount, // <-- computed
+            REMARKS: item.particulars || '',
+          };
+        });
+
+    // APPROVE / COMMIT path
     if (this.creditFormData.IS_APPROVED) {
-      console.log('approved???????????????????????????????????');
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit'
@@ -738,36 +836,14 @@ export class EditCreditNoteComponent {
             UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
             DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
             PARTY_NAME: this.creditFormData.PARTY_NAME,
-            NOTE_DETAIL: this.noteDetails
-              .filter(
-                (item) =>
-                  item.ledgerCode ||
-                  item.ledgerName ||
-                  item.Amount ||
-                  item.gstAmount ||
-                  item.particulars
-              )
-              .map((item: any, index: number) => {
-                const match = this.ledgerList.find(
-                  (l) =>
-                    l.HEAD_CODE === item.ledgerCode ||
-                    l.HEAD_NAME === item.ledgerName
-                );
-                return {
-                  SL_NO: item.SL_NO || index + 1,
-                  HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
-                  AMOUNT: Number(item.Amount) || 0,
-                  GST_AMOUNT: Number(item.gstAmount) || 0,
-                  REMARKS: item.particulars || '',
-                };
-              }),
+            NOTE_DETAIL: buildNoteDetail(),
           };
 
           this.dataService.commitCreditNote(payload).subscribe(
             (response: any) => {
               if (response.flag === 1) {
                 notify('Credit Note approved successfully!', 'success', 3000);
-                this.popupClosed.emit(); // Close popup
+                this.popupClosed.emit();
               } else {
                 notify(`Approval failed: ${response.Message}`, 'error', 4000);
               }
@@ -778,71 +854,182 @@ export class EditCreditNoteComponent {
             }
           );
         } else {
-          // ❌ User cancelled commit
           notify('Approval cancelled.', 'info', 2000);
         }
       });
 
-      return; // 🚫 Prevent running normal update block
-    } else {
-      const payload = {
-        TRANS_ID: this.creditFormData[0].TRANS_ID,
-        TRANS_TYPE: 37,
-        COMPANY_ID: this.selectedCompanyId,
-        FIN_ID: this.finId,
-        STORE_ID: 1,
-        TRANS_DATE: this.transDate,
-        TRANS_STATUS: 1,
-        NARRATION:
-          this.creditFormData[0].NARRATION || 'Update Details of Credit Note',
-        INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
-        INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
-        UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
-        DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
-        PARTY_NAME: this.creditFormData.PARTY_NAME,
-        IS_APPROVED: false,
-        NOTE_DETAIL: this.noteDetails
-          .filter(
-            (item) =>
-              item.ledgerCode ||
-              item.ledgerName ||
-              item.Amount ||
-              item.gstAmount ||
-              item.particulars
-          )
-          .map((item: any, index: number) => {
-            const match = this.ledgerList.find(
-              (l) =>
-                l.HEAD_CODE === item.ledgerCode ||
-                l.HEAD_NAME === item.ledgerName
-            );
-            return {
-              SL_NO: item.SL_NO || index + 1,
-              HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
-              AMOUNT: Number(item.Amount) || 0,
-              GST_AMOUNT: Number(item.gstAmount) || 0,
-              REMARKS: item.particulars || '',
-            };
-          }),
-      };
-
-      console.log('Update Payload:', payload);
-
-      this.dataService.updateCreditNote(payload).subscribe((response) => {
-        if (response) {
-          notify(
-            {
-              message: 'Credit Note Updated Successfully',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success'
-          );
-          this.popupClosed.emit();
-          // this.resetCreditNoteForm();
-        }
-      });
+      return;
     }
+
+    // NORMAL UPDATE path
+    const payload = {
+      TRANS_ID: this.creditFormData[0].TRANS_ID,
+      TRANS_TYPE: 37,
+      COMPANY_ID: this.selectedCompanyId,
+      FIN_ID: this.finId,
+      STORE_ID: 1,
+      TRANS_DATE: this.transDate,
+      TRANS_STATUS: 1,
+      NARRATION:
+        this.creditFormData[0].NARRATION || 'Update Details of Credit Note',
+      INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
+      INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
+      UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
+      DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
+      PARTY_NAME: this.creditFormData.PARTY_NAME,
+      IS_APPROVED: false,
+      NOTE_DETAIL: buildNoteDetail(), // <- includes GST_PERC and GST_AMOUNT
+    };
+
+    console.log('Update Payload:', payload);
+
+    this.dataService.updateCreditNote(payload).subscribe((response) => {
+      if (response) {
+        notify(
+          {
+            message: 'Credit Note Updated Successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+        this.popupClosed.emit();
+      }
+    });
   }
+
+  // updateCreditNote() {
+  //   if (this.creditFormData.IS_APPROVED) {
+  //     console.log('approved???????????????????????????????????');
+  //     confirm(
+  //       'It will approve and commit. Are you sure you want to commit?',
+  //       'Confirm Commit'
+  //     ).then((result) => {
+  //       if (result) {
+  //         const payload = {
+  //           TRANS_ID: this.creditFormData[0].TRANS_ID,
+  //           IS_APPROVED: true,
+  //           TRANS_TYPE: 37,
+  //           COMPANY_ID: this.selectedCompanyId,
+  //           FIN_ID: this.finId,
+  //           STORE_ID: 1,
+  //           TRANS_DATE: this.transDate,
+  //           TRANS_STATUS: 1,
+  //           NARRATION:
+  //             this.creditFormData[0].NARRATION ||
+  //             'Update Details of Credit Note',
+  //           INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
+  //           INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
+  //           UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
+  //           DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
+  //           PARTY_NAME: this.creditFormData.PARTY_NAME,
+  //           NOTE_DETAIL: this.noteDetails
+  //             .filter(
+  //               (item) =>
+  //                 item.ledgerCode ||
+  //                 item.ledgerName ||
+  //                 item.Amount ||
+  //                 item.GST_PERC ||
+  //                 item.gstAmount ||
+  //                 item.particulars
+  //             )
+  //             .map((item: any, index: number) => {
+  //               const match = this.ledgerList.find(
+  //                 (l) =>
+  //                   l.HEAD_CODE === item.ledgerCode ||
+  //                   l.HEAD_NAME === item.ledgerName
+  //               );
+  //               const gstAmount = this.calculateTaxAmount(item);
+  //               return {
+  //                 SL_NO: item.SL_NO || index + 1,
+  //                 HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
+  //                 AMOUNT: Number(item.Amount) || 0,
+  //                 GST_PERC: Number(item.GST_PERC) || 0,
+  //                 GST_AMOUNT: gstAmount,
+  //                 REMARKS: item.particulars || '',
+  //               };
+  //             }),
+  //         };
+
+  //         this.dataService.commitCreditNote(payload).subscribe(
+  //           (response: any) => {
+  //             if (response.flag === 1) {
+  //               notify('Credit Note approved successfully!', 'success', 3000);
+  //               this.popupClosed.emit(); // Close popup
+  //             } else {
+  //               notify(`Approval failed: ${response.Message}`, 'error', 4000);
+  //             }
+  //           },
+  //           (error) => {
+  //             console.error('Approval error:', error);
+  //             alert('Something went wrong while approving');
+  //           }
+  //         );
+  //       } else {
+  //         // ❌ User cancelled commit
+  //         notify('Approval cancelled.', 'info', 2000);
+  //       }
+  //     });
+
+  //     return; // 🚫 Prevent running normal update block
+  //   } else {
+  //     const payload = {
+  //       TRANS_ID: this.creditFormData[0].TRANS_ID,
+  //       TRANS_TYPE: 37,
+  //       COMPANY_ID: this.selectedCompanyId,
+  //       FIN_ID: this.finId,
+  //       STORE_ID: 1,
+  //       TRANS_DATE: this.transDate,
+  //       TRANS_STATUS: 1,
+  //       NARRATION:
+  //         this.creditFormData[0].NARRATION || 'Update Details of Credit Note',
+  //       INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
+  //       INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
+  //       UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
+  //       DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
+  //       PARTY_NAME: this.creditFormData.PARTY_NAME,
+  //       IS_APPROVED: false,
+  //       NOTE_DETAIL: this.noteDetails
+  //         .filter(
+  //           (item) =>
+  //             item.ledgerCode ||
+  //             item.ledgerName ||
+  //             item.Amount ||
+  //             item.gstAmount ||
+  //             item.particulars
+  //         )
+  //         .map((item: any, index: number) => {
+  //           const match = this.ledgerList.find(
+  //             (l) =>
+  //               l.HEAD_CODE === item.ledgerCode ||
+  //               l.HEAD_NAME === item.ledgerName
+  //           );
+  //           return {
+  //             SL_NO: item.SL_NO || index + 1,
+  //             HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
+  //             AMOUNT: Number(item.Amount) || 0,
+  //             GST_AMOUNT: Number(item.gstAmount) || 0,
+  //             REMARKS: item.particulars || '',
+  //           };
+  //         }),
+  //     };
+
+  //     console.log('Update Payload:', payload);
+
+  //     this.dataService.updateCreditNote(payload).subscribe((response) => {
+  //       if (response) {
+  //         notify(
+  //           {
+  //             message: 'Credit Note Updated Successfully',
+  //             position: { at: 'top right', my: 'top right' },
+  //           },
+  //           'success'
+  //         );
+  //         this.popupClosed.emit();
+  //         // this.resetCreditNoteForm();
+  //       }
+  //     });
+  //   }
+  // }
 
   resetCreditNoteForm() {
     this.creditFormData = {

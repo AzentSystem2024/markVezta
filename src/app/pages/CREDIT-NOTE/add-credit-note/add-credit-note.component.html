@@ -191,7 +191,17 @@
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
           </dxi-column>
-
+          <dxi-column
+            dataField="GST_PERC"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? ' VAT %'
+                : ' GST %'
+            "
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+          </dxi-column>
           <dxi-column
             dataField="gstAmount"
             [caption]="
@@ -201,6 +211,7 @@
             "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
+            [calculateCellValue]="calculateTaxAmount"
           >
           </dxi-column>
           <dxi-column type="buttons">
@@ -263,6 +274,7 @@
               labelMode="floating"
               [width]="200"
               [readOnly]="true"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
               [inputAttr]="{ style: 'text-align: right;' }"
             ></dx-text-box>
           </div>

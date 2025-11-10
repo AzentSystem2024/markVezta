@@ -92,7 +92,9 @@ export class DataService {
   getAccountGroupHeadList(): Observable<any> {
     return this.http.post(`${this.apiUrl}listGroupHead/list`, {});
   }
-
+  getActiveLedger(): Observable<any> {
+    return this.http.post(`${this.apiUrl}accountHead/getlist`, {});
+  }
   getAccountHeadList(): Observable<any> {
     return this.http.post(`${this.apiUrl}AccountHead/list`, {});
   }
@@ -5786,24 +5788,24 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //===================GET SECURITY POLICY LIST======================
-    get_securityPolicy_List() {
+  get_securityPolicy_List() {
     const getEndpoint = `${this.apiUrl}SecuritySettings/list`;
     return this.http.post(getEndpoint, {});
   }
 
-   //========================Insert OR Update security policy list==========================
+  //========================Insert OR Update security policy list==========================
   save_security_Policy_Data(data: any) {
     const getEndpoint = `${this.apiUrl}SecuritySettings/save`;
     const reqBody = data;
     return this.http.post(getEndpoint, reqBody);
   }
 
-   BankReconciliation_List(payload) {
+  BankReconciliation_List(payload) {
     const getEndpoint = `${this.apiUrl}BankReconciliation/bankrecon`;
     return this.http.post(getEndpoint, payload);
   }
 
-   Insert_BankReconciliation(payload) {
+  Insert_BankReconciliation(payload) {
     const getEndpoint = `${this.apiUrl}`;
     return this.http.post(getEndpoint, payload);
   }

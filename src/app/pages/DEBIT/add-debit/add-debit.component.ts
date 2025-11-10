@@ -115,6 +115,7 @@ export class AddDebitComponent {
   pendingInvoicelist: any;
   selectedSupplier: any;
   selectedstoreId:any;
+  net: string;
   constructor(private dataService: DataService) {}
 
       sessionDetails(){
@@ -168,6 +169,7 @@ export class AddDebitComponent {
         ledgerName: '',
         particulars: '',
         Amount: '',
+        GST_PERC: '',
         gstAmount: '',
       },
     ];
@@ -241,7 +243,7 @@ export class AddDebitComponent {
     const selected = e.data;
     // this.debitFormData.INVOICE_NO = String(selected.INVOICE_NO);
     this.debitFormData.INVOICE_NO = selected.INVOICE_NO;
-    this.debitFormData.DUE_AMOUNT = selected.NET_AMOUNT;
+    this.debitFormData.DUE_AMOUNT = selected.PENDING_AMOUNT;
     this.debitFormData.INVOICE_ID = selected.BILL_ID;
 
     this.invoicePopupVisible = false;
@@ -306,11 +308,17 @@ export class AddDebitComponent {
   }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe((response: any) => {
+    this.dataService.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
       console.log('Ledger List Loaded:', this.ledgerList);
     });
   }
+
+  calculateTaxAmount = (rowData: any) => {
+    const amount = Number(rowData.Amount) || 0;
+    const gstPerc = Number(rowData.GST_PERC) || 0;
+    return +((amount * gstPerc) / 100).toFixed(2);
+  };
 
   onEditorPreparing(e: any) {
     if (
@@ -319,6 +327,7 @@ export class AddDebitComponent {
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
       e.dataField === 'Amount' ||
+      e.dataField === 'GST_PERC' ||
       e.dataField === 'gstAmount'
     ) {
       e.editorOptions = e.editorOptions || {};
@@ -474,18 +483,45 @@ export class AddDebitComponent {
           const rowIndex = e.row.rowIndex;
           // Move focus to the "ledgerCode" column in the same row
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'gstAmount'));
+            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
           });
         }
       };
     }
-    if (e.dataField === 'gstAmount') {
+
+    if (e.dataField === 'GST_PERC') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
 
           const grid = this.itemsGridRef?.instance;
-          const rowIndex = e.row.rowIndex;
+          const rowData = e.row?.data;
+
+          // ✅ Validate ledgerCode and Amount before proceeding
+          if (!rowData.ledgerCode) {
+            notify(
+              'Please select a Ledger Code before proceeding.',
+              'warning',
+              2000
+            );
+            return;
+          }
+          if (rowData.Amount == null || rowData.Amount <= 0) {
+            notify(
+              'Please enter a valid Amount before proceeding.',
+              'warning',
+              2000
+            );
+            return;
+          }
+
+          // ✅ Ensure gstAmount is not greater than Amount
+          if (rowData.Amount != null && event.value > rowData.Amount) {
+            notify('GST Amount cannot be greater than Amount.', 'error', 2000);
+            event.value = rowData.Amount;
+            e.setCellValue(rowData, event.value);
+            return;
+          }
 
           // ✅ Force the editor to lose focus and commit its value
           const editorElement = event.event.target as HTMLElement;
@@ -493,7 +529,9 @@ export class AddDebitComponent {
 
           // ✅ Delay to let grid register the committed value
           setTimeout(() => {
-            grid?.saveEditData(); // Now the value is committed
+            grid?.saveEditData();
+
+            // ✅ Recalculate net total
             const rows = grid.getVisibleRows().map((r) => r.data);
             let netTotal = 0;
             for (const row of rows) {
@@ -502,46 +540,60 @@ export class AddDebitComponent {
               netTotal += amount + gst;
             }
             this.netAmountDisplay = netTotal;
-            console.log('Net Amount Updated:', this.netAmountDisplay);
-            // Add new row manually
-            const newRow = {
-              SL_NO: this.debitFormData.NOTE_DETAIL.length + 1,
-              HEAD_ID: '',
-              AMOUNT: '',
-              GST_AMOUNT: '',
-              REMARKS: '',
-            };
 
-            this.debitFormData.NOTE_DETAIL.push(newRow);
+            // ✅ Add new row only if current row is fully filled
+            if (
+              rowData.ledgerCode &&
+              rowData.Amount != null &&
+              !this.hasEmptyRow()
+            ) {
+              // ✅ Check if last row is empty, prevent multiple empty rows
+              const lastRow =
+                this.debitFormData.NOTE_DETAIL[
+                  this.debitFormData.NOTE_DETAIL.length - 1
+                ];
+              if (!lastRow || (lastRow.ledgerCode && lastRow.Amount != null)) {
+                const newRow = {
+                  SL_NO: this.debitFormData.NOTE_DETAIL.length + 1,
+                  HEAD_ID: '',
+                  AMOUNT: '',
+                  GST_PERC: '',
+                  GST_AMOUNT: '',
+                  REMARKS: '',
+                };
+                this.debitFormData.NOTE_DETAIL.push(newRow);
 
-            setTimeout(() => {
-              grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
+                setTimeout(() => {
+                  grid.option('dataSource', [
+                    ...this.debitFormData.NOTE_DETAIL,
+                  ]);
 
-              setTimeout(() => {
-                const visibleRows = grid.getVisibleRows();
-                const newRowIndex = visibleRows.findIndex(
-                  (r) => r.data === newRow
-                );
-                if (newRowIndex >= 0) {
-                  grid.editCell(newRowIndex, 'SL_NO');
-                }
-              }, 50);
-            }, 50);
-          }, 50); // Let blur + commit happen
+                  setTimeout(() => {
+                    const visibleRows = grid.getVisibleRows();
+                    const newRowIndex = visibleRows.findIndex(
+                      (r) => r.data === newRow
+                    );
+                    if (newRowIndex >= 0) {
+                      grid.editCell(newRowIndex, 'ledgerCode');
+                    }
+                  }, 50);
+                }, 50);
+              }
+            }
+          }, 50);
         }
 
         if (event.event.key === 'Tab') {
           event.event.preventDefault();
-
           const grid = this.itemsGridRef?.instance;
           const editorElement = event.event.target as HTMLElement;
 
-          // ✅ Force blur to trigger value commit
           editorElement.blur();
 
-          // ✅ Wait for value commit, then save the row and move to narration
           setTimeout(() => {
-            grid?.saveEditData(); // Save current row edits
+            grid?.saveEditData();
+
+            // ✅ Recalculate net total
             const rows = grid.getVisibleRows().map((r) => r.data);
             let netTotal = 0;
             for (const row of rows) {
@@ -550,7 +602,7 @@ export class AddDebitComponent {
               netTotal += amount + gst;
             }
             this.netAmountDisplay = netTotal;
-            console.log('Net Amount Updated:', this.netAmountDisplay);
+
             setTimeout(() => {
               this.narrationRef?.instance?.focus();
             }, 50);
@@ -571,6 +623,14 @@ export class AddDebitComponent {
         item.SL_NO = index + 1;
       });
     }
+  }
+
+  validateGstAmount(e: any) {
+    console.log(e, 'sasas');
+    const row = e.data;
+    // If Amount is null or undefined, allow editing
+    if (row.Amount == null) return true;
+    return row.gstAmount <= row.Amount;
   }
 
   onNarrationKeyDown(e: any): void {
@@ -616,6 +676,23 @@ export class AddDebitComponent {
     return amt + gst;
   };
 
+  get netAmountString(): string {
+    const details = this.debitFormData?.NOTE_DETAIL || [];
+    let totalAmount = 0;
+    let totalGST = 0;
+
+    details.forEach((item: any) => {
+      const amount = Number(item.Amount) || 0;
+      const gstPerc = Number(item.GST_PERC) || 0;
+
+      totalAmount += amount;
+      totalGST += (amount * gstPerc) / 100; // Recalculate GST live
+    });
+    this.net = (totalAmount + totalGST).toFixed(2);
+    console.log('Net Amount (from getter):', this.net);
+    return (totalAmount + totalGST).toFixed(2);
+  }
+
   formatDate(date: any): string {
     const d = new Date(date);
     const year = d.getFullYear();
@@ -627,55 +704,113 @@ export class AddDebitComponent {
   saveDebitNote(): void {
     this.itemsGridRef?.instance?.saveEditData();
 
-    const gridData = this.itemsGridRef?.instance
-      ?.getVisibleRows()
-      .map((r) => r.data);
+    const gridData =
+      this.itemsGridRef?.instance?.getVisibleRows().map((r) => r.data) || [];
+    const details = this.debitFormData.NOTE_DETAIL || [];
+    let totalAmount = 0;
+    let totalGST = 0;
 
-    this.debitFormData.NOTE_DETAIL = gridData
-      .filter(
-        (row: any) =>
-          row.ledgerCode ||
-          row.ledgerName ||
-          row.Amount ||
-          row.gstAmount ||
-          row.particulars
-      )
-      .map((row: any, index: number) => {
+    details.forEach((item: any) => {
+      const amount = Number(item.Amount) || 0;
+      const gstPerc = Number(item.GST_PERC) || 0;
+      totalAmount += amount;
+      totalGST += (amount * gstPerc) / 100;
+    });
+
+    const netAmount = totalAmount + totalGST;
+    const dueAmount = Number(this.debitFormData?.DUE_AMOUNT) || 0;
+
+    // ✅ Validation check
+    if (netAmount > dueAmount) {
+      notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
+      return;
+    }
+    // ✅ Filter valid rows
+    const validRows = gridData.filter(
+      (row: any) =>
+        row.ledgerCode ||
+        row.ledgerName ||
+        row.Amount ||
+        row.GST_PERC ||
+        row.gstAmount ||
+        row.particulars
+    );
+
+    // ✅ 1. Form-level validations
+    if (!this.debitFormData.SUPP_ID) {
+      notify('Please select a Supplier before saving.', 'error', 2000);
+      return;
+    }
+
+    if (!this.debitFormData.INVOICE_NO) {
+      notify('Please select an Invoice before saving.', 'error', 2000);
+      return;
+    }
+
+    if (validRows.length === 0) {
+      notify('Please enter at least one ledger entry.', 'error', 2000);
+      return;
+    }
+
+    // ✅ 2. Row-level validation for Amount
+    const invalidAmountRow = validRows.find(
+      (row: any) =>
+        (row.ledgerCode || row.ledgerName) &&
+        (!row.Amount || Number(row.Amount) === 0)
+    );
+
+    if (invalidAmountRow) {
+      notify('Please enter a valid Amount', 'error', 3000);
+      return;
+    }
+
+    // ✅ 3. Build NOTE_DETAIL for backend
+    this.debitFormData.NOTE_DETAIL = validRows.map(
+      (row: any, index: number) => {
         const ledger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === row.ledgerCode
+          (item: any) =>
+            item.HEAD_CODE === row.ledgerCode ||
+            item.HEAD_NAME === row.ledgerName
         );
-
+        const gstAmount = this.calculateTaxAmount(row);
         return {
           SL_NO: row.SL_NO || index + 1,
           HEAD_ID: ledger?.HEAD_ID || null,
           AMOUNT: Number(row.Amount) || 0,
-          GST_AMOUNT: Number(row.gstAmount) || 0,
+          GST_PERC: Number(row.GST_PERC) || 0,
+          GST_AMOUNT: gstAmount,
           REMARKS: row.particulars || '',
         };
-      });
+      }
+    );
+
+    // ✅ 4. Other fields
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
     this.debitFormData.STORE_ID = this.selectedstoreId
     this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
     this.debitFormData.TRANS_DATE = this.formatDate(
       this.debitFormData.TRANS_DATE
     );
+    console.log(this.debitFormData.NET_AMOUNT, 'NETAMOUNT');
 
-    this.dataService
-      .insertDebitNote(this.debitFormData)
-      .subscribe((response: any) => {
-        console.log(response, 'SAVED SUCCESSFULLY');
-
+    // ✅ 5. Save
+    this.dataService.insertDebitNote(this.debitFormData).subscribe(
+      (response: any) => {
         notify(
           {
-            message: 'Credit Note Saved Successfully',
+            message: 'Debit Note Saved Successfully',
             position: { at: 'top right', my: 'top right' },
           },
           'success'
         );
-
         this.popupClosed.emit();
         this.resetDebitNoteForm();
-      });
+      },
+      (error) => {
+        notify('Failed to save Debit Note. Please try again.', 'error', 2000);
+        console.error('Save error:', error);
+      }
+    );
   }
 
   resetDebitNoteForm() {
@@ -690,9 +825,10 @@ export class AddDebitComponent {
       INVOICE_ID: 0,
       INVOICE_NO: '',
       UNIT_ID: '',
+      DUE_AMOUNT: '',
       NOTE_DETAIL: [
         {
-          SL_NO: '',
+          SL_NO: 1,
           HEAD_ID: '',
           AMOUNT: '',
           GST_AMOUNT: '',
@@ -707,17 +843,62 @@ export class AddDebitComponent {
     this.resetDebitNoteForm();
   }
 
+  // onAddNewRow() {
+  //   const nextSlNo = this.debitFormData.NOTE_DETAIL.length + 1;
+  //   this.debitFormData.NOTE_DETAIL.push({
+  //     SL_NO: nextSlNo,
+  //     ledgerCode: '',
+  //     ledgerName: '',
+  //     particulars: '',
+  //     Amount: '',
+  //     gstAmount: '',
+  //     HEAD_ID: null,
+  //   });
+  // }
+  private hasEmptyRow(): boolean {
+    return (this.debitFormData?.NOTE_DETAIL || []).some(
+      (r: any) =>
+        (!r.ledgerCode || r.ledgerCode === '') &&
+        (!r.ledgerName || r.ledgerName === '') &&
+        (!r.Amount || r.Amount === 0)
+    );
+  }
+
   onAddNewRow() {
+    const grid = this.itemsGridRef.instance;
+    const rows = grid.getVisibleRows();
+    if (this.hasEmptyRow()) {
+      notify('Please fill the existing empty row first.', 'warning', 2000);
+      return;
+    }
+    // Prevent adding if any existing row is incomplete
+    // const hasIncompleteRow = rows.some(
+    //   (r: any) => !r.data.ledgerName || !r.data.Amount
+    // );
+    // if (hasIncompleteRow) {
+    //   return;
+    // }
+
+    // Add a new empty row with auto SL_NO
     const nextSlNo = this.debitFormData.NOTE_DETAIL.length + 1;
-    this.debitFormData.NOTE_DETAIL.push({
+    const newRow = {
       SL_NO: nextSlNo,
-      ledgerCode: '',
+      ledgerCode: null,
       ledgerName: '',
       particulars: '',
-      Amount: '',
-      gstAmount: '',
-      HEAD_ID: null,
-    });
+      Amount: null,
+      gstAmount: null,
+    };
+
+    this.debitFormData.NOTE_DETAIL.push(newRow);
+
+    // // Refresh grid and focus the ledgerCode cell
+
+    setTimeout(() => {
+      const grid = this.itemsGridRef?.instance;
+      const newRowIndex = this.debitFormData.NOTE_DETAIL.length - 1;
+      grid?.editCell(newRowIndex, 'ledgerCode');
+    }, 100);
   }
 }
 
