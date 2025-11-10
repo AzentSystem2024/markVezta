@@ -270,7 +270,7 @@ export class AddJournalVoucharComponent {
   }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe((response: any) => {
+    this.dataService.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
       console.log(response, 'ledgercodelist');
     });

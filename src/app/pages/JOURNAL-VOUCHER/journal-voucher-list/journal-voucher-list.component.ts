@@ -183,7 +183,7 @@ export class JournalVoucherListComponent {
           ...item,
           TRANS_DATE: dateValue,
         };
-      });
+      }).sort((a: any, b: any) => Number(b.JOURNAL_NO) - Number(a.JOURNAL_NO));
 
       this.applyDateFilter();
     });

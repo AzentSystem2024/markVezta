@@ -188,6 +188,7 @@ export class OpeningBalanceComponent {
 
   ngOnInit() {
     this.openingBalance = [];
+    this.openingBalance.SL_NO = 1;
     this.addButtonOptions = {
       icon: 'plus',
       type: 'default',
@@ -353,7 +354,7 @@ export class OpeningBalanceComponent {
   }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe((response: any) => {
+    this.dataService.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
       console.log(response, 'ledgercodelist');
     });
@@ -547,7 +548,22 @@ export class OpeningBalanceComponent {
 
           setTimeout(() => {
             grid?.saveEditData();
+            const hasEmptyRow = this.openingBalance.some(
+              (r: any) =>
+                (!r.ledgerCode || r.ledgerCode === '') &&
+                (!r.ledgerName || r.ledgerName === '') &&
+                (!r.debitAmount || r.debitAmount === 0) &&
+                (!r.creditAmount || r.creditAmount === 0)
+            );
 
+            if (hasEmptyRow) {
+              notify(
+                'Finish the current empty row before adding a new one.',
+                'info',
+                2000
+              );
+              return;
+            }
             // Create new row
             const newRow = {
               ledgerCode: '',
@@ -596,6 +612,12 @@ export class OpeningBalanceComponent {
     return isValid || (!debitAmount && !creditAmount); // allow empty too, or make it stricter if needed
   }
 
+  updateSerialNumbers() {
+    this.openingBalance.forEach((item: any, index: number) => {
+      item.SL_NO = index + 1;
+    });
+  }
+
   addNewManualRow() {
     if (this.isReadOnly) {
       notify('Committed opening balance cannot be edited.', 'warning', 3000);
@@ -603,8 +625,25 @@ export class OpeningBalanceComponent {
     }
     const grid = this.itemsGridRef?.instance;
     if (!grid) return;
+    const hasEmptyRow = this.openingBalance.some(
+      (r: any) =>
+        (!r.ledgerCode || r.ledgerCode === '') &&
+        (!r.ledgerName || r.ledgerName === '') &&
+        (!r.debitAmount || r.debitAmount === 0) &&
+        (!r.creditAmount || r.creditAmount === 0)
+    );
 
+    if (hasEmptyRow) {
+      notify(
+        'Finish the current empty row before adding a new one.',
+        'warning',
+        2000
+      );
+      return;
+    }
+    const nextSlNo = this.openingBalance.length + 1;
     const newRow = {
+      SL_NO: this.openingBalance.length + 1,
       ledgerCode: '',
       ledgerName: '',
       debitAmount: 0,

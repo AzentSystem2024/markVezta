@@ -629,7 +629,7 @@ export class AddMiscellaneousPaymentComponent {
   }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe({
+    this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
         console.log('API Response:', response); // <== LOG FULL RESPONSE
         this.ledgerList = response?.Data || []; // Fallback to empty array

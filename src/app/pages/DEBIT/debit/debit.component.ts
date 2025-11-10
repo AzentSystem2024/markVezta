@@ -42,7 +42,10 @@ import { CreditNoteListComponent } from '../../CREDIT-NOTE/credit-note-list/cred
 import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
 import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
 import { DataService } from 'src/app/services';
-import { AddDebitModule } from '../add-debit/add-debit.component';
+import {
+  AddDebitComponent,
+  AddDebitModule,
+} from '../add-debit/add-debit.component';
 import { EditDebitModule } from '../edit-debit/edit-debit.component';
 import { ViewDebitModule } from '../view-debit/view-debit.component';
 import notify from 'devextreme/ui/notify';
@@ -54,6 +57,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./debit.component.scss'],
 })
 export class DebitComponent {
+  @ViewChild(AddDebitComponent) addDebitComponent!: AddDebitComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -173,7 +177,7 @@ export class DebitComponent {
           ...item,
           TRANS_DATE: dateValue,
         };
-      });
+      }).sort((a: any, b: any) => Number(b.DOC_NO) - Number(a.DOC_NO));
 
       this.applyDateFilter();
     });
@@ -461,6 +465,9 @@ export class DebitComponent {
     this.isAddDebitNote = false;
     this.isEditDebitNote = false;
     this.isViewDebitNote = false;
+    if (this.addDebitComponent) {
+      this.addDebitComponent.resetDebitNoteForm();
+    }
     this.getDebitNoteList();
   }
 }

@@ -152,18 +152,21 @@ export class ListMiscReceiptComponent {
         let dateValue: Date;
 
         // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.TRANS_DATE))) {
-          dateValue = new Date(item.TRANS_DATE);
+        if (
+          typeof item.TRANS_DATE === 'string' &&
+          item.TRANS_DATE.includes('-')
+        ) {
+          const [day, month, year] = item.TRANS_DATE.split('-').map(Number);
+          dateValue = new Date(year, month - 1, day);
         } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.TRANS_DATE);
+          dateValue = new Date(item.TRANS_DATE);
         }
 
         return {
           ...item,
           TRANS_DATE: dateValue,
         };
-      });
+      }).sort((a: any, b: any) => Number(b.VOUCHER_NO) - Number(a.VOUCHER_NO));
 
       this.applyDateFilter();
     });
@@ -418,7 +421,7 @@ export class ListMiscReceiptComponent {
     // console.log("delete")
     // Optionally prevent the default delete behavior
     e.cancel = true;
-     if (e.data.TRANS_STATUS === 5) {
+    if (e.data.TRANS_STATUS === 5) {
       e.cancel = true;
       notify('This Misc receipt cannot be deleted.', 'error', 2000);
       return;

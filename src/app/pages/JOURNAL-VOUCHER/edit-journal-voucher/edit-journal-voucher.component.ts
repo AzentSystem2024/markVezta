@@ -251,7 +251,7 @@ export class EditJournalVoucherComponent {
   }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe((response: any) => {
+    this.dataService.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
 
       // Only transform if form data already loaded

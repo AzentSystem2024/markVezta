@@ -237,7 +237,7 @@ export class AccountsListComponent {
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
     icon.style.color = status === 'ACTIVE' ? '#5cac6fff' : '#d87f7fff';
-    // icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.title = status === 'ACTIVE' ? 'Active' : 'Inactive';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';

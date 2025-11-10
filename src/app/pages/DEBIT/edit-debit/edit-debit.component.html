@@ -17,13 +17,12 @@
           [showBorders]="true"
           [showRowLines]="true"
           [showColumnLines]="true"
-          [columnAutoWidth]="false"
           [wordWrapEnabled]="false"
           [rowAlternationEnabled]="true"
           [headerFilter]="{ visible: true }"
           [allowColumnReordering]="true"
           [showColumnHeaders]="true"
-          [columnAutoWidth]="true"
+          [columnAutoWidth]="false"
           [allowColumnResizing]="true"
           [height]="'55vh'"
           [columnResizingMode]="'nextColumn'"
@@ -138,12 +137,12 @@
           <dxi-column
             dataField="SL_NO"
             caption="Sl No"
+            width="100"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="ledgerCode"
             caption="Ledger Code"
-            [width]="130"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: ledgerList,
@@ -156,7 +155,7 @@
           <dxi-column
             dataField="ledgerName"
             caption="Ledger Name"
-            [width]="200"
+            [width]="'auto'"
             [editorType]="'dxSelectBox'"
             [lookup]="{
               dataSource: ledgerList,
@@ -169,7 +168,6 @@
           <dxi-column
             dataField="particulars"
             caption="Particulars"
-            [width]="150"
             [editorOptions]="{ maxLength: 250 }"
           >
             <dxi-validation-rule
@@ -183,10 +181,19 @@
             caption="Amount"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [width]="150"
           >
           </dxi-column>
-
+          <dxi-column
+            dataField="GST_PERC"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? ' VAT %'
+                : ' GST %'
+            "
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          >
+          </dxi-column>
           <dxi-column
             dataField="gstAmount"
             [caption]="
@@ -196,7 +203,7 @@
             "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [width]="150"
+            [calculateCellValue]="calculateTaxAmount"
             [allowEditing]="true"
           >
           </dxi-column>
@@ -230,7 +237,7 @@
         <div
           style="
             margin-top: 15px;
-            padding: 0 10px;
+            padding: 0 10px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;

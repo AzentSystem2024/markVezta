@@ -47,6 +47,7 @@ import { ViewMiscellaneousPaymentModule } from '../../view-miscellaneous-payment
 import { ListMiscReceiptComponent } from '../list-misc-receipt/list-misc-receipt.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-add-misc-receipt',
@@ -232,10 +233,23 @@ export class AddMiscReceiptComponent {
     }
   }
 
+  private hasEmptyRow(): boolean {
+    if (!this.pendingInvoicelist || this.pendingInvoicelist.length === 0)
+      return false;
+
+    return this.pendingInvoicelist.some(
+      (row) =>
+        (!row.ledgerCode || row.ledgerCode === '') &&
+        (!row.ledgerName || row.ledgerName === '') &&
+        (!row.REMARKS || row.REMARKS === '') &&
+        (row.AMOUNT === null || row.AMOUNT === '' || row.AMOUNT === 0)
+    );
+  }
+
   onCellClick(e: any) {
     const grid = this.itemsGridRef?.instance;
     if (!grid) return;
-
+    if (this.hasEmptyRow()) return;
     const dataSource = this.pendingInvoicelist || [];
     const lastRow = dataSource[dataSource.length - 1];
 
@@ -438,9 +452,10 @@ export class AddMiscReceiptComponent {
           const editorElement = event.event.target as HTMLElement;
           editorElement.blur();
 
-          // Wait for saveEditData to complete before proceeding
           grid.saveEditData().then(() => {
-            // Now safe to add new row
+            // ✅ Add check here before creating new row
+            if (this.hasEmptyRow()) return;
+
             const newRow = {
               ledgerCode: '',
               ledgerName: '',
@@ -449,17 +464,47 @@ export class AddMiscReceiptComponent {
             };
 
             this.pendingInvoicelist.push(newRow);
-
-            // Refresh grid datasource
             grid.option('dataSource', [...this.pendingInvoicelist]);
 
-            // Focus new row ledgerCode cell
             const newRowIndex = this.pendingInvoicelist.length - 1;
             setTimeout(() => {
               grid.editCell(newRowIndex, 'ledgerCode');
             }, 100);
           });
         }
+
+        // if (event.event.key === 'Enter') {
+        //   event.event.preventDefault();
+
+        //   const grid = this.itemsGridRef?.instance;
+        //   const rowIndex = e.row.rowIndex;
+
+        //   // Blur editor to trigger commit
+        //   const editorElement = event.event.target as HTMLElement;
+        //   editorElement.blur();
+
+        //   // Wait for saveEditData to complete before proceeding
+        //   grid.saveEditData().then(() => {
+        //     // Now safe to add new row
+        //     const newRow = {
+        //       ledgerCode: '',
+        //       ledgerName: '',
+        //       REMARKS: '',
+        //       AMOUNT: null,
+        //     };
+
+        //     this.pendingInvoicelist.push(newRow);
+
+        //     // Refresh grid datasource
+        //     grid.option('dataSource', [...this.pendingInvoicelist]);
+
+        //     // Focus new row ledgerCode cell
+        //     const newRowIndex = this.pendingInvoicelist.length - 1;
+        //     setTimeout(() => {
+        //       grid.editCell(newRowIndex, 'ledgerCode');
+        //     }, 100);
+        //   });
+        // }
       };
     }
   }
@@ -494,7 +539,7 @@ export class AddMiscReceiptComponent {
   }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe({
+    this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
         console.log('API Response:', response); // <== LOG FULL RESPONSE
         this.ledgerList = response?.Data || []; // Fallback to empty array
@@ -547,6 +592,28 @@ export class AddMiscReceiptComponent {
   }
 
   onSaveMiscReceipt() {
+    if (!this.miscFormData.PARTY_NAME) {
+      notify('Please enter Beneficairy name before saving.', 'warning', 2000);
+      return;
+    }
+
+    // 🔍 Validation for missing ledger info with amount
+    const invalidRows = this.pendingInvoicelist.filter(
+      (row) => Number(row.AMOUNT) > 0 && (!row.ledgerCode || !row.ledgerName)
+    );
+
+    if (invalidRows.length > 0) {
+      notify(
+        'Please select Ledger Code and Ledger Name for all rows with amount entered',
+        'warning',
+        2500
+      );
+      return;
+    }
+    if (!this.miscFormData?.PAY_HEAD_ID) {
+      notify('Please select ledger before saving.', 'warning', 2000);
+      return;
+    }
     const PAY_HEAD_ID = this.miscFormData?.PAY_HEAD_ID; // get from your form
     const payTypeMapping: any = {
       Cash: 1,
@@ -556,6 +623,28 @@ export class AddMiscReceiptComponent {
     };
 
     this.miscFormData.PAY_TYPE_ID = payTypeMapping[this.receiptMode] || null;
+    if (this.receiptMode === 'Bank') {
+      if (
+        !this.miscFormData.CHEQUE_NO ||
+        this.miscFormData.CHEQUE_NO.trim() === ''
+      ) {
+        notify('Please enter Cheque Number', 'warning', 2000);
+        return;
+      }
+
+      if (!this.miscFormData.CHEQUE_DATE) {
+        notify('Please select Cheque Date', 'warning', 2000);
+        return;
+      }
+
+      if (
+        !this.miscFormData.BANK_NAME ||
+        this.miscFormData.BANK_NAME.trim() === ''
+      ) {
+        notify('Please enter Bank Name', 'warning', 2000);
+        return;
+      }
+    }
     // 2. Commit any pending cell edits in grid
     this.itemsGridRef.instance.closeEditCell();
     const details: any[] = [];
@@ -623,6 +712,28 @@ export class AddMiscReceiptComponent {
   }
 
   onUpdateMiscReceipt() {
+    if (!this.miscFormData.PARTY_NAME) {
+      notify('Please enter Beneficairy name before saving.', 'warning', 2000);
+      return;
+    }
+
+    // 🔍 Validation for missing ledger info with amount
+    const invalidRows = this.pendingInvoicelist.filter(
+      (row) => Number(row.AMOUNT) > 0 && (!row.ledgerCode || !row.ledgerName)
+    );
+
+    if (invalidRows.length > 0) {
+      notify(
+        'Please select Ledger Code and Ledger Name for all rows with amount entered',
+        'warning',
+        2500
+      );
+      return;
+    }
+    if (!this.miscFormData?.PAY_HEAD_ID) {
+      notify('Please select ledger before saving.', 'warning', 2000);
+      return;
+    }
     const PAY_HEAD_ID = this.miscFormData?.PAY_HEAD_ID; // get from your form
     const payTypeMapping: any = {
       Cash: 1,
@@ -632,6 +743,28 @@ export class AddMiscReceiptComponent {
     };
 
     this.miscFormData.PAY_TYPE_ID = payTypeMapping[this.receiptMode] || null;
+    if (this.receiptMode === 'Bank') {
+      if (
+        !this.miscFormData.CHEQUE_NO ||
+        this.miscFormData.CHEQUE_NO.trim() === ''
+      ) {
+        notify('Please enter Cheque Number', 'warning', 2000);
+        return;
+      }
+
+      if (!this.miscFormData.CHEQUE_DATE) {
+        notify('Please select Cheque Date', 'warning', 2000);
+        return;
+      }
+
+      if (
+        !this.miscFormData.BANK_NAME ||
+        this.miscFormData.BANK_NAME.trim() === ''
+      ) {
+        notify('Please enter Bank Name', 'warning', 2000);
+        return;
+      }
+    }
     // 2. Commit any pending cell edits in grid
     this.itemsGridRef.instance.closeEditCell();
     const details: any[] = [];
@@ -698,15 +831,42 @@ export class AddMiscReceiptComponent {
     const errorMsg = this.isApproved
       ? 'Failed to approve Misc Receipt'
       : 'Failed to update Misc Receipt';
-
-    apiCall.subscribe((res: any) => {
-      if (res.flag === 1) {
-        notify(successMsg, 'success', 2000);
-        this.popupClosed.emit();
-      } else {
-        notify(errorMsg, 'error', 2000);
-      }
-    });
+    if (this.isApproved) {
+      const result = confirm(
+        'Are you sure you want to approve this Miscellaneous Receipt?',
+        'Confirm Approval'
+      );
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.dataService.approveMiscReceipt(payload).subscribe((res: any) => {
+            if (res.flag === 1) {
+              notify(successMsg, 'success', 2000);
+              this.popupClosed.emit();
+            } else {
+              notify(errorMsg, 'error', 2000);
+            }
+          });
+        }
+      });
+    } else {
+      // ✅ Update directly
+      this.dataService.updateMiscReceipt(payload).subscribe((res: any) => {
+        if (res.flag === 1) {
+          notify(successMsg, 'success', 2000);
+          this.popupClosed.emit();
+        } else {
+          notify(errorMsg, 'error', 2000);
+        }
+      });
+    }
+    // apiCall.subscribe((res: any) => {
+    //   if (res.flag === 1) {
+    //     notify(successMsg, 'success', 2000);
+    //     this.popupClosed.emit();
+    //   } else {
+    //     notify(errorMsg, 'error', 2000);
+    //   }
+    // });
   }
   Cancel() {
     this.popupClosed.emit();

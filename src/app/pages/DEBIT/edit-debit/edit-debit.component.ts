@@ -189,16 +189,37 @@ export class EditDebitComponent {
     }
   }
   onAddNewRow() {
+    const grid = this.itemsGridRef.instance;
+    const rows = grid.getVisibleRows();
+
+    // Prevent adding if any existing row is incomplete
+    const hasIncompleteRow = rows.some(
+      (r: any) => !r.data.ledgerName || !r.data.Amount
+    );
+    if (hasIncompleteRow) {
+      return;
+    }
+
+    // Add a new empty row with auto SL_NO
     const nextSlNo = this.noteDetails.length + 1;
-    this.noteDetails.push({
+    const newRow = {
       SL_NO: nextSlNo,
-      ledgerCode: '',
+      ledgerCode: null,
       ledgerName: '',
       particulars: '',
-      Amount: '',
-      gstAmount: '',
-      HEAD_ID: null,
-    });
+      Amount: null,
+      gstAmount: null,
+    };
+
+    this.noteDetails.push(newRow);
+
+    // // Refresh grid and focus the ledgerCode cell
+
+    setTimeout(() => {
+      const grid = this.itemsGridRef?.instance;
+      const newRowIndex = this.noteDetails.length - 1;
+      grid?.editCell(newRowIndex, 'ledgerCode');
+    }, 100);
   }
 
   ngAfterViewInit(): void {
@@ -275,7 +296,7 @@ export class EditDebitComponent {
     console.log('Invoice selected:', e);
     const selected = e.data;
     this.debitFormData.INVOICE_NO = String(selected.INVOICE_NO);
-    this.debitFormData.DUE_AMOUNT = selected.NET_AMOUNT;
+    this.debitFormData.DUE_AMOUNT = selected.PENDING_AMOUNT;
     this.debitFormData.INVOICE_ID = selected.BILL_ID;
     console.log(
       this.debitFormData.INVOICE_NO,
@@ -390,7 +411,7 @@ export class EditDebitComponent {
 
   getLedgerCodeDropdown(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.dataService.getAccountHeadList().subscribe({
+      this.dataService.getActiveLedger().subscribe({
         next: (response: any) => {
           this.ledgerList = response.Data;
           console.log('Ledger List Loaded:', this.ledgerList);
@@ -569,19 +590,48 @@ export class EditDebitComponent {
       };
     }
     if (e.dataField === 'gstAmount') {
-      e.editorOptions.onValueChanged = (valueChangeEvent: any) => {
-        e.setValue(valueChangeEvent.value); // 🔹 Commit editor value immediately
-      };
-
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
 
           const grid = this.itemsGridRef?.instance;
-          const rowIndex = e.row.rowIndex;
+          const rowData = e.row?.data;
 
-          grid.saveEditData().then(() => {
-            // 🔹 Recalculate totals after commit
+          // ✅ Validate ledgerCode and Amount before proceeding
+          if (!rowData.ledgerCode) {
+            notify(
+              'Please select a Ledger Code before proceeding.',
+              'warning',
+              2000
+            );
+            return;
+          }
+          if (rowData.Amount == null || rowData.Amount <= 0) {
+            notify(
+              'Please enter a valid Amount before proceeding.',
+              'warning',
+              2000
+            );
+            return;
+          }
+
+          // ✅ Ensure gstAmount is not greater than Amount
+          if (rowData.Amount != null && event.value > rowData.Amount) {
+            notify('GST Amount cannot be greater than Amount.', 'error', 2000);
+            event.value = rowData.Amount;
+            e.setCellValue(rowData, event.value);
+            return;
+          }
+
+          // ✅ Force the editor to lose focus and commit its value
+          const editorElement = event.event.target as HTMLElement;
+          editorElement.blur();
+
+          // ✅ Delay to let grid register the committed value
+          setTimeout(() => {
+            grid?.saveEditData();
+
+            // ✅ Recalculate net total
             const rows = grid.getVisibleRows().map((r) => r.data);
             let netTotal = 0;
             for (const row of rows) {
@@ -591,38 +641,66 @@ export class EditDebitComponent {
             }
             this.netAmountDisplay = netTotal;
 
-            // 🔹 Create a fresh new row
-            const newRow: any = {
-              SL_NO: this.noteDetails.length + 1,
-              HEAD_ID: '',
-              ledgerCode: '',
-              ledgerName: '',
-              particulars: '',
-              Amount: '',
-              gstAmount: '',
-            };
+            // ✅ Add new row only if current row is fully filled
+            if (
+              rowData.ledgerCode &&
+              rowData.Amount != null &&
+              rowData.gstAmount != null
+            ) {
+              // ✅ Check if last row is empty, prevent multiple empty rows
+              const lastRow = this.noteDetails[this.noteDetails.length - 1];
+              if (!lastRow || (lastRow.ledgerCode && lastRow.Amount != null)) {
+                const newRow = {
+                  SL_NO: this.noteDetails.length + 1,
+                  HEAD_ID: '',
+                  AMOUNT: '',
+                  GST_AMOUNT: '',
+                  REMARKS: '',
+                };
+                this.noteDetails.push(newRow);
 
-            // 🔹 Insert into noteDetails
-            this.noteDetails = [
-              ...this.noteDetails.slice(0, rowIndex + 1),
-              newRow,
-              ...this.noteDetails.slice(rowIndex + 1),
-            ];
+                setTimeout(() => {
+                  grid.option('dataSource', [...this.noteDetails]);
 
-            // 🔹 Rebind grid
-            grid.option('dataSource', this.noteDetails);
-
-            // 🔹 Focus new row
-            setTimeout(() => {
-              const visibleRows = grid.getVisibleRows();
-              const newRowIndex = visibleRows.findIndex(
-                (r) => r.data === newRow
-              );
-              if (newRowIndex >= 0) {
-                grid.editCell(newRowIndex, 'SL_NO');
+                  setTimeout(() => {
+                    const visibleRows = grid.getVisibleRows();
+                    const newRowIndex = visibleRows.findIndex(
+                      (r) => r.data === newRow
+                    );
+                    if (newRowIndex >= 0) {
+                      grid.editCell(newRowIndex, 'ledgerCode');
+                    }
+                  }, 50);
+                }, 50);
               }
+            }
+          }, 50);
+        }
+
+        if (event.event.key === 'Tab') {
+          event.event.preventDefault();
+          const grid = this.itemsGridRef?.instance;
+          const editorElement = event.event.target as HTMLElement;
+
+          editorElement.blur();
+
+          setTimeout(() => {
+            grid?.saveEditData();
+
+            // ✅ Recalculate net total
+            const rows = grid.getVisibleRows().map((r) => r.data);
+            let netTotal = 0;
+            for (const row of rows) {
+              const amount = parseFloat(row.Amount) || 0;
+              const gst = parseFloat(row.gstAmount) || 0;
+              netTotal += amount + gst;
+            }
+            this.netAmountDisplay = netTotal;
+
+            setTimeout(() => {
+              this.narrationRef?.instance?.focus();
             }, 50);
-          });
+          }, 50);
         }
       };
     }
@@ -678,7 +756,32 @@ export class EditDebitComponent {
     this.debitFormData.IS_APPROVED = e.value;
   }
 
+  calculateTaxAmount = (rowData: any) => {
+    const amount = Number(rowData.Amount) || 0;
+    const gstPerc = Number(rowData.GST_PERC) || 0;
+    return +((amount * gstPerc) / 100).toFixed(2);
+  };
+
   updateDebitNote() {
+    const details = this.noteDetails || [];
+    let totalAmount = 0;
+    let totalGST = 0;
+
+    details.forEach((item: any) => {
+      const amount = Number(item.Amount) || 0;
+      const gstPerc = Number(item.GST_PERC) || 0;
+      totalAmount += amount;
+      totalGST += (amount * gstPerc) / 100;
+    });
+
+    const netAmount = totalAmount + totalGST;
+    const dueAmount = Number(this.debitFormData?.DUE_AMOUNT) || 0;
+
+    // ✅ Validation check
+    if (netAmount > dueAmount) {
+      notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
+      return;
+    }
     if (this.debitFormData.IS_APPROVED) {
       console.log('approved???????????????????????????????????');
       confirm(
@@ -709,6 +812,7 @@ export class EditDebitComponent {
                   item.ledgerCode ||
                   item.ledgerName ||
                   item.Amount ||
+                  item.GST_PERC ||
                   item.gstAmount ||
                   item.particulars
               )
@@ -718,11 +822,13 @@ export class EditDebitComponent {
                     l.HEAD_CODE === item.ledgerCode ||
                     l.HEAD_NAME === item.ledgerName
                 );
+                const gstAmount = this.calculateTaxAmount(item);
                 return {
                   SL_NO: item.SL_NO || index + 1,
                   HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
                   AMOUNT: Number(item.Amount) || 0,
-                  GST_AMOUNT: Number(item.gstAmount) || 0,
+                  GST_PERC: Number(item.GST_PERC) || 0,
+                  GST_AMOUNT: gstAmount,
                   REMARKS: item.particulars || '',
                 };
               }),
@@ -781,11 +887,13 @@ export class EditDebitComponent {
                 l.HEAD_CODE === item.ledgerCode ||
                 l.HEAD_NAME === item.ledgerName
             );
+            const gstAmount = this.calculateTaxAmount(item);
             return {
               SL_NO: item.SL_NO || index + 1,
               HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
               AMOUNT: Number(item.Amount) || 0,
-              GST_AMOUNT: Number(item.gstAmount) || 0,
+              GST_PERC: Number(item.GST_PERC) || 0,
+              GST_AMOUNT: gstAmount,
               REMARKS: item.particulars || '',
             };
           }),
