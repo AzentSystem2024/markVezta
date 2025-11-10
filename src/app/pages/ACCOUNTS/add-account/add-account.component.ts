@@ -77,7 +77,7 @@ export class AddAccountComponent {
     IS_DIRECT: true,
     IS_SYS_HEAD: true,
     ARABIC_NAME: '',
-    IS_ACTIVE: true,
+    IS_ACTIVE: false,
     SERIAL_NO: 0,
   };
 
