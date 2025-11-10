@@ -50,12 +50,12 @@ export class LoginFormComponent implements OnInit {
   navigation: any;
 
   validUsernames: string[] = [];
-    isPasswordVisible: boolean = false;
+  isPasswordVisible: boolean = false;
 
-passwordMode: 'password' | 'text' = 'password';
-    togglePasswordVisibility = () => {
+  passwordMode: 'password' | 'text' = 'password';
+  togglePasswordVisibility = () => {
     this.passwordMode = this.passwordMode === 'password' ? 'text' : 'password';
-     this.cdr.detectChanges(); // Ensure the UI reflects the change immediately
+    this.cdr.detectChanges(); // Ensure the UI reflects the change immediately
   };
 
   // togglePasswordVisibility = () => {
@@ -148,7 +148,9 @@ passwordMode: 'password' | 'text' = 'password';
 
         // Optionally store or use the company list
         this.CompanyList = res.Companies || [];
-
+        if (this.CompanyList.length > 0) {
+          this.formData.COMPANY_ID = this.CompanyList[0].COMPANY_ID;
+        }
         // Optionally store login info
         localStorage.setItem('userData', JSON.stringify(res));
       });
