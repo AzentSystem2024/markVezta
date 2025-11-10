@@ -217,6 +217,21 @@ resetForm() {
 
 
   savePDC() {
+     // ✅ Basic field validation before building payload
+  if (
+    !this.PDCFormData.BANK_HEAD_ID ||
+    !this.PDCFormData.CHEQUE_NO ||
+    !this.PDCFormData.ENTRY_DATE ||
+    !this.PDCFormData.CHEQUE_DATE ||
+    !this.PDCFormData.AMOUNT ||
+    !this.PDCFormData.REMARKS ||
+    !this.selectedBeneficiaryTypeID ||
+    !this.selectedBeneficiaryCommonName
+  ) {
+    notify('Please fill all the fields before saving.', 'error', 3000);
+    return; //  Stop function if fields are missing
+  }
+
   const payload = {
     ID: this.PDCFormData.ID ? +this.PDCFormData.ID : 0,
     COMPANY_ID: this.selected_Company_id || 0,

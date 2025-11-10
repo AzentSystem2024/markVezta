@@ -103,6 +103,7 @@ export class EditDebitComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedSupplier: any;
+  selectedstoreId:any;
 
   constructor(private dataService: DataService) {}
 
@@ -112,7 +113,18 @@ export class EditDebitComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
+   sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
+  }
+
+
   ngOnInit() {
+    this.sessionDetails();
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -861,7 +873,7 @@ export class EditDebitComponent {
         TRANS_TYPE: 36,
         COMPANY_ID: this.selectedCompanyId,
         FIN_ID: this.finId,
-        STORE_ID: 1,
+        STORE_ID: this.selectedstoreId,
         TRANS_DATE: this.transDate,
         TRANS_STATUS: 1,
         NARRATION:

@@ -97,10 +97,12 @@ export class EditCustomerReceiptComponent {
   pdcPopupVisible: boolean;
   selectedLedger: any;
   pdcList: any;
+  selectedstoreId:any;
 
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
+     this.sessionDetails();
     const userDataString = localStorage.getItem('userData');
 
     if (userDataString) {
@@ -120,8 +122,17 @@ export class EditCustomerReceiptComponent {
     this.getLedgerCodeDropdown();
     // this.getCompanyListDropdown();
     this.getReceiptNo();
+   
   }
 
+      sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
+  }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['receiprtFormData'] && this.receiprtFormData) {
       console.log('INVOICEFORMDATA:', this.receiprtFormData);
@@ -662,7 +673,7 @@ export class EditCustomerReceiptComponent {
       REC_NO: '',
       REC_DATE: new Date(),
       COMPANY_ID: 1,
-      STORE_ID: 1,
+      STORE_ID: 0,
       FIN_ID: 1,
       TRANS_STATUS: 1,
       REF_NO: '',
@@ -791,6 +802,7 @@ export class EditCustomerReceiptComponent {
       ...this.receiprtFormData,
       DISTRIBUTOR_ID: this.selectedDistributorId, // or whatever your selected supplier ID is
       REC_DETAIL: validDetails,
+      
     };
 
     console.log('Sending payload:', payload); // For debugging

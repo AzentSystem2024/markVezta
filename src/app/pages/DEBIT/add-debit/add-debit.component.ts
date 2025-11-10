@@ -87,7 +87,7 @@ export class AddDebitComponent {
   debitFormData: any = {
     TRANS_TYPE: 36,
     COMPANY_ID: 1,
-    STORE_ID: 1,
+    STORE_ID: 0,
     TRANS_DATE: new Date(),
     TRANS_STATUS: 1,
     SUPP_ID: 0,
@@ -114,8 +114,18 @@ export class AddDebitComponent {
   pendingInvoices: any;
   pendingInvoicelist: any;
   selectedSupplier: any;
+  selectedstoreId:any;
   net: string;
   constructor(private dataService: DataService) {}
+
+      sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
+  }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -124,6 +134,7 @@ export class AddDebitComponent {
   }
 
   ngOnInit() {
+    this.sessionDetails();
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -775,6 +786,7 @@ export class AddDebitComponent {
 
     // ✅ 4. Other fields
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
+    this.debitFormData.STORE_ID = this.selectedstoreId
     this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
     this.debitFormData.TRANS_DATE = this.formatDate(
       this.debitFormData.TRANS_DATE
@@ -805,7 +817,7 @@ export class AddDebitComponent {
     this.debitFormData = {
       TRANS_TYPE: 36,
       COMPANY_ID: 1,
-      STORE_ID: 1,
+      STORE_ID: 0,
       TRANS_DATE: new Date(),
       TRANS_STATUS: 1,
       SUPP_ID: '',

@@ -116,6 +116,7 @@ export class EditCreditNoteComponent {
   selectedInvoice: string;
   sessionData: any;
   selected_vat_id: any;
+  selectedstoreId:any;
 
   constructor(
     private dataService: DataService,
@@ -142,6 +143,16 @@ export class EditCreditNoteComponent {
     this.getLedgerCodeDropdown();
     // this.getPendingInvoices();
     this.sessionData_tax();
+    this.sessionDetails();
+  }
+
+   sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -814,7 +825,7 @@ export class EditCreditNoteComponent {
             TRANS_TYPE: 37,
             COMPANY_ID: this.selectedCompanyId,
             FIN_ID: this.finId,
-            STORE_ID: 1,
+            STORE_ID: this.selectedstoreId,
             TRANS_DATE: this.transDate,
             TRANS_STATUS: 1,
             NARRATION:

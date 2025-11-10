@@ -38,6 +38,7 @@ PrepaymentList:any
   PREPAY_DETAIL: any;
   selected_Company_id: any;
   selected_fin_id: any;
+selectedstoreId: any;
 
   Prepoting_Add_Data:any={
   COMPANY_ID: null,
@@ -98,6 +99,7 @@ this.get_prepayment_pending_list()
 }
    
 ngOnInit(){
+  this.sesstion_Details();
    const today = new Date();
 const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0); 
 this.selectedMonthYear = lastDay;
@@ -141,8 +143,14 @@ this.PrepaymentList=  res.Data
       '===========selected fin id==================='
     );
   this.session_user_id= sessionData.USER_ID
-
+   
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
   }
+
   onSelectionChanged(event:any){
     console.log(event,'==============seleted========event====')
     const selected_Rows_data=event.selectedRowsData
@@ -174,7 +182,8 @@ this.PrepaymentList=  res.Data
       COMPANY_ID: this.selected_Company_id,
   FIN_ID: this.selected_fin_id,
   CREATE_USER_ID: this.session_user_id,
-  PREPAY_DETAIL: this.PREPAY_DETAIL
+  PREPAY_DETAIL: this.PREPAY_DETAIL,
+  STORE_ID :this.selectedstoreId
 
     }
     console.log(payload)

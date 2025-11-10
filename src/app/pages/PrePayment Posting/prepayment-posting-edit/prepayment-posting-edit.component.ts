@@ -61,6 +61,7 @@ PrepaymentList:any
   approveValue: boolean=false
   isEditReadOnly:boolean=false
   selected_Rows_data: any;
+  selectedstoreId: any;
 transDate: Date | string | number | null = null;
 
 constructor(private dataservice:DataService){
@@ -114,6 +115,7 @@ this.selectedMonthYear=formattedDate
 // this.get_prepayment_pending_list()
 }
 ngOnInit(){
+    this.sesstion_Details()
    const today = new Date();
 const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0); 
 this.selectedMonthYear = lastDay;
@@ -157,6 +159,11 @@ const payload={
       '===========selected fin id==================='
     );
   this.session_user_id= sessionData.USER_ID
+  this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
 
   }
   
@@ -200,7 +207,7 @@ const payload={
     TRANS_ID: this.selecteprepaymentData[0].TRANS_ID,
     COMPANY_ID: this.selected_Company_id,
     FIN_ID: this.selected_fin_id,
-
+    STORE_ID : this.selectedstoreId,
     CREATE_USER_ID: this.session_user_id,
       PREPAY_DETAIL:this.PREPAY_DETAIL_data
   };

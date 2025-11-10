@@ -80,12 +80,21 @@ selectedRows: any[] = [];
     },
     elementAttr: { class: 'add-button' }
   };
-    refreshButtonOptions = {
+    refreshButtonOptions = { 
     icon: 'refresh',
     hint: 'Refresh',
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
+    gridButtons = [
+  'edit', 
+  {
+    name: 'delete',
+    visible: (e: any) => e.row?.data?.TRANS_STATUS?.trim() === 'Open'
+  }
+]; 
+ 
   selecte_prepayment_Data: any;
 isEditReadOnly:boolean=false
   constructor (private ngZone:NgZone,private dataservice:DataService, private cdr:ChangeDetectorRef){

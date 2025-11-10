@@ -103,6 +103,7 @@ export class EditMiscReceiptComponent {
 
     constructor(private dataService: DataService) {}
 
+    
       ngOnInit() {
     this.getLedgerCodeDropdown();
     const userDataString = localStorage.getItem('userData');

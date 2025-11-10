@@ -86,7 +86,7 @@ export class AddCutomerReceiptComponent {
     REC_NO: '',
     REC_DATE: new Date(),
     COMPANY_ID: 1,
-    STORE_ID: 1,
+    STORE_ID: 0,
     FIN_ID: 1,
     TRANS_STATUS: 1,
     REF_NO: '',
@@ -115,10 +115,12 @@ export class AddCutomerReceiptComponent {
   selectedCustomerId: any;
   pdcList: any;
   pdcPopupVisible: boolean;
+  selectedstoreId:any
 
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
+    this.sessionDetails();
     const userDataString = localStorage.getItem('userData');
 
     if (userDataString) {
@@ -133,6 +135,15 @@ export class AddCutomerReceiptComponent {
     this.getLedgerCodeDropdown();
     this.getCompanyListDropdown(); // only fetches distributor list
     this.getPdcofSelectedSupplier();
+  }
+
+    sessionDetails(){
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    console.log(
+      this.selectedstoreId,
+      '===========selected store id==================='
+    );
   }
 
   getSlNo = (rowData: any, index?: number): number => {
@@ -558,6 +569,7 @@ export class AddCutomerReceiptComponent {
       DISTRIBUTOR_ID: this.selectedDistributorId, // or whatever your selected supplier ID is
       REC_DETAIL: validDetails,
       BANK_NAME: this.receiprtFormData.BANK_NAME,
+      STORE_ID : this.selectedstoreId
     };
 
     console.log('Sending payload:', payload); // For debugging
@@ -583,7 +595,7 @@ export class AddCutomerReceiptComponent {
       REC_NO: '',
       REC_DATE: new Date(),
       COMPANY_ID: 1,
-      STORE_ID: 1,
+      STORE_ID: 0,
       FIN_ID: 1,
       TRANS_STATUS: 1,
       REF_NO: '',
