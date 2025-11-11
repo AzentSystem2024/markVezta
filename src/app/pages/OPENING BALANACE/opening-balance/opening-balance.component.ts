@@ -89,17 +89,9 @@ export class OpeningBalanceComponent {
   transId: any;
   isReadOnlyBalance: boolean;
   addButtonOptions: any;
-  selectedstoreId:any;
 
   constructor(private dataService: DataService, private router: Router) {}
-  sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id==================='
-    );
-  }
+
   // ngOnInit() {
   //   this.openingBalance = [];
 
@@ -195,9 +187,7 @@ export class OpeningBalanceComponent {
   // }
 
   ngOnInit() {
-    this.sessionDetails();
     this.openingBalance = [];
-    this.openingBalance.SL_NO = 1;
     this.addButtonOptions = {
       icon: 'plus',
       type: 'default',
@@ -248,7 +238,7 @@ export class OpeningBalanceComponent {
 
             if (transformedData.length === 0) {
               // ✅ No data or null case
-              this.openingBalance = [];
+              // this.openingBalance = [];
               this.itemsGridRef?.instance.option(
                 'dataSource',
                 this.openingBalance
@@ -256,7 +246,7 @@ export class OpeningBalanceComponent {
 
               setTimeout(() => {
                 if (!this.isReadOnly) {
-                  this.itemsGridRef?.instance.addRow(); // 👈 always add blank row if editable
+                  // this.itemsGridRef?.instance.addRow(); // 👈 always add blank row if editable
                 }
               }, 200);
             } else {
@@ -351,9 +341,27 @@ export class OpeningBalanceComponent {
   }
   focusFirstEditableCell(): void {
     const grid = this.itemsGridRef?.instance;
-    if (grid && this.openingBalance.length > 0) {
-      grid.editCell(0, 'ledgerCode');
+    if (!grid) return;
+
+    // Ensure there is at least one row
+    if (this.openingBalance.length === 0) {
+      // Add an empty row if none exists
+      this.addNewManualRow();
+      return;
     }
+
+    // Assign SL_NO automatically
+    this.openingBalance.forEach((item, index) => {
+      item.SL_NO = index + 1;
+    });
+
+    // Refresh the grid **without destroying editors**
+    grid.refresh();
+
+    // Focus first editable cell after the grid finishes rendering
+    setTimeout(() => {
+      grid.editCell(0, 'ledgerCode');
+    }, 50); // slight delay ensures DOM is ready
   }
 
   ngAfterViewInit(): void {
@@ -405,9 +413,9 @@ export class OpeningBalanceComponent {
     }
 
     // ✅ If grid becomes empty, add a new row automatically
-    if (this.openingBalance.length === 0 && !this.isReadOnly) {
-      setTimeout(() => this.itemsGridRef.instance.addRow(), 100);
-    }
+    // if (this.openingBalance.length === 0 && !this.isReadOnly) {
+    //   setTimeout(() => this.itemsGridRef.instance.addRow(), 100);
+    // }
   }
 
   onEditorPreparing(e: any) {
@@ -535,28 +543,40 @@ export class OpeningBalanceComponent {
         if (event.event.key === 'Enter') {
           const grid = e.component;
           const rowIndex = e.row.rowIndex;
-          // Move focus to the "ledgerCode" column in the same row
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'creditAmount'));
           });
         }
       };
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        const rowIndex = e.row.rowIndex;
+        const value = parseFloat(args.value) || 0;
+
+        // Set debitAmount
+        e.component.cellValue(rowIndex, 'debitAmount', value);
+
+        // If debit > 0, set creditAmount to 0
+        if (value > 0) {
+          e.component.cellValue(rowIndex, 'creditAmount', 0);
+          this.openingBalance[rowIndex].creditAmount = 0; // update array
+        }
+      };
     }
     if (e.dataField === 'creditAmount') {
       e.editorOptions.onKeyDown = (event: any) => {
-        const grid = this.itemsGridRef?.instance;
-
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
-
+          const grid = this.itemsGridRef?.instance;
           const rowIndex = e.row.rowIndex;
 
-          // Commit the current cell value
           const editorElement = event.event.target as HTMLElement;
           editorElement.blur();
 
           setTimeout(() => {
             grid?.saveEditData();
+
+            // Check for empty row
             const hasEmptyRow = this.openingBalance.some(
               (r: any) =>
                 (!r.ledgerCode || r.ledgerCode === '') &&
@@ -573,36 +593,44 @@ export class OpeningBalanceComponent {
               );
               return;
             }
-            // Create new row
+
+            // Insert new row
             const newRow = {
               ledgerCode: '',
               ledgerName: '',
-              debitAmount: '',
-              creditAmount: '',
+              debitAmount: 0,
+              creditAmount: 0,
+              SL_NO: 0, // placeholder
             };
-
-            // Insert the new row just after current row
             this.openingBalance.splice(rowIndex + 1, 0, newRow);
+
+            // Recalculate SlNo for all rows
+            this.openingBalance.forEach((r: any, i: number) => {
+              r.SL_NO = i + 1; // or your numbering logic
+            });
 
             // Refresh grid dataSource
             grid.option('dataSource', [...this.openingBalance]);
 
+            // Focus the ledgerCode of the new row
             setTimeout(() => {
-              const newRowIndex = rowIndex + 1;
-              grid.editCell(newRowIndex, 'ledgerCode');
+              grid.editCell(rowIndex + 1, 'ledgerCode');
             }, 50);
           }, 50);
         }
+      };
 
-        if (event.event.key === 'Tab') {
-          event.event.preventDefault();
-          const editorElement = event.event.target as HTMLElement;
-          editorElement.blur();
+      e.editorOptions.onValueChanged = (args: any) => {
+        const rowIndex = e.row.rowIndex;
+        const value = parseFloat(args.value) || 0;
 
-          setTimeout(() => {
-            grid?.saveEditData();
-            // Optional: focus next element
-          }, 50);
+        // Set creditAmount
+        e.component.cellValue(rowIndex, 'creditAmount', value);
+
+        // If credit > 0, set debitAmount to 0
+        if (value > 0) {
+          e.component.cellValue(rowIndex, 'debitAmount', 0);
+          this.openingBalance[rowIndex].debitAmount = 0; // update array
         }
       };
     }
@@ -719,7 +747,6 @@ export class OpeningBalanceComponent {
     const payload = {
       COMPANY_ID: selectedCompany?.COMPANY_ID,
       FIN_ID: userData?.FINANCIAL_YEARS?.[0]?.FIN_ID,
-      STORE_ID : userData?.Configuration?.[0].STORE_ID,
       Details: this.openingBalance
         .map((item: any) => {
           const ledger = this.ledgerList.find(

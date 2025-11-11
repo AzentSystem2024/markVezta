@@ -56,7 +56,6 @@
   width: 100%;
 }
 
-
 .invoice-wrapper {
   height: 70vh;
   overflow-y: auto;
@@ -70,7 +69,11 @@
   // background-color: white; /* Prevent overlap visual issues */
 }
 
-::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar .dx-toolbar-items-container {
+::ng-deep
+  .salary-grid-wrapper
+  .dx-datagrid
+  .dx-toolbar
+  .dx-toolbar-items-container {
   height: 100%;
   padding: 0 20px;
 }
@@ -85,7 +88,11 @@
   gap: 8px; /* space between the two date pickers */
   margin-bottom: 50px;
 }
-::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar .dx-toolbar-items-container {
+::ng-deep
+  .salary-grid-wrapper
+  .dx-datagrid
+  .dx-toolbar
+  .dx-toolbar-items-container {
   padding: 0px !important;
 }
 
@@ -110,6 +117,6 @@
   background-color: #f9f9f9;
 }
 ::ng-deep .dx-data-grid .dx-row > td:empty::after {
-  content: '\00a0'; /* non-breaking space */
+  content: "\00a0"; /* non-breaking space */
   display: block;
 }
