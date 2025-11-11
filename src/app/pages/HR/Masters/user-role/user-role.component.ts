@@ -159,7 +159,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
 
  show_new_Form() {
     this.isAddFormVisible = true;
-   
+    
   }
 
     isDeleteIconVisible({ row }: { row: any }): boolean {

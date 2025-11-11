@@ -120,17 +120,17 @@ selectedTabIndex = 0;
   isSubDealerPopupVisible: boolean;
   dealerList: any;
 
-  countryCodeMap: { [key: string]: string } = {
-  India: '+91',
-  'United States': '+1',
-  'United Kingdom': '+44',
-  Canada: '+1',
-  Australia: '+61',
-  Germany: '+49',
-  France: '+33',
-  Singapore: '+65',
-  // add as many as needed
-};
+//   countryCodeMap: { [key: string]: string } = {
+//   India: '+91',
+//   'United States': '+1',
+//   'United Kingdom': '+44',
+//   Canada: '+1',
+//   Australia: '+61',
+//   Germany: '+49',
+//   France: '+33',
+//   Singapore: '+65',
+//   // add as many as needed
+// };
 
 
   constructor(private service: DataService, authservice: AuthService) {
@@ -139,6 +139,11 @@ selectedTabIndex = 0;
     this.showCountry();
     this.sessionData_tax();
     this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
+
+     service.getCountryWithFlags().subscribe((data) => {
+      this.CountryDropdownData = data;
+      console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -331,21 +336,21 @@ selectedTabIndex = 0;
     console.log(this.selecte_countyId, '======county id============');
     this.getStateDropDown();
     const selectedCountry = this.CountryDropdownData.find(
-      (country) => country.ID === event.value
-    );
-    if (selectedCountry) {
-      this.countryCode = selectedCountry.CODE;
-    }
+    (country: any) => country.ID === this.selecte_countyId
+  );
 
-     if (selectedCountry) {
-    const countryName = selectedCountry.DESCRIPTION; // assuming API returns "DESCRIPTION" as the country name
-    this.DEFAULT_COUNTRY_CODE = this.countryCodeMap[countryName] || '';
+  // 4️⃣ If found, set code & name
+  if (selectedCountry) {
+    this.countryCode = selectedCountry.CODE;                // e.g., '+971'
+    this.DEFAULT_COUNTRY_CODE = this.countryCode;           // bind to textbox
+    console.log('Selected Country:', selectedCountry.DESCRIPTION);
+    console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
   } else {
+    // 5️⃣ Fallback if no country found
+    this.countryCode = '';
     this.DEFAULT_COUNTRY_CODE = '';
+    console.warn('⚠️ No matching country found for ID:', this.selecte_countyId);
   }
-
-  console.log('Selected Country:', selectedCountry?.DESCRIPTION);
-  console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
   }
 
   ngOnInit(): void {

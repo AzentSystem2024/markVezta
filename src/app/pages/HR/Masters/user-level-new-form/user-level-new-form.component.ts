@@ -60,7 +60,12 @@ MenuDatasource:any;
      }
 
   ngOnInit(): void {
-    this.selectedTab = 0;
+  setTimeout(() => {
+      this.selectedTab = 0;
+      this.selectedTabData = this.MenuDatasource[0]?.Menus || [];
+      this.cdr.detectChanges(); // Force refresh for DevExtreme
+    }, 100); 
+    
     this.UserLevelValue = '';
     
    this.get_All_MenuList();
@@ -71,6 +76,8 @@ MenuDatasource:any;
 
 ngOnChanges(changes: SimpleChanges): void {
   if (changes['sharedValue'] && this.sharedValue) {
+
+    
 console.log(this.sharedValue,'selected');
 
     this.selectedTab = 0;
@@ -97,6 +104,7 @@ console.log(this.sharedValue,'selected');
 
     // ✅ Set the initial tab data
     this.selectedTabData = this.MenuDatasource[this.selectedTab]?.Menus || [];
+    this.cdr.detectChanges(); 
     
   }
 }
@@ -107,9 +115,13 @@ console.log(this.sharedValue,'selected');
   get_All_MenuList() {
     this.dataservice. get_usermenu_Api().subscribe((response: any) => {
       this.MenuDatasource = response.Data;
+      setTimeout(() => {
+      this.selectedTab = 0;
+      this.selectedTabData = this.MenuDatasource[0]?.Menus || [];
+      console.log(this.selectedTabData)
+      this.cdr.detectChanges(); // Force refresh for DevExtreme
+    }, 100); // 100ms delay is enough
     });
-
-    
   }
 
    //===============Fetch All User Level List===================
@@ -129,6 +141,7 @@ console.log(this.sharedValue,'selected');
     this.selectedTab = event.itemIndex;
     console.log(this.selectedTab)
     this.selectedTabData = this.MenuDatasource[this.selectedTab].Menus;
+     this.cdr.detectChanges(); 
   }
 
   
@@ -140,6 +153,7 @@ console.log(this.sharedValue,'selected');
     }
     this.selectedRows[this.selectedTab] = event.selectedRowKeys;
     this.combineSelectedRows();
+
   }
   
   //============== copy data from already exis user ==========

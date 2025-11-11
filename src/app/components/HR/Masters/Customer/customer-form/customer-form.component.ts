@@ -115,17 +115,18 @@ export class CustomerFormComponent {
   deliveryAddress2: any;
   deliveryAddress3: any;
 
-  countryCodeMap: { [key: string]: string } = {
-  India: '+91',
-  'United States': '+1',
-  'United Kingdom': '+44',
-  Canada: '+1',
-  Australia: '+61',
-  Germany: '+49',
-  France: '+33',
-  Singapore: '+65',
-  // add as many as needed
-};
+//   countryCodeMap: { [key: string]: string } = {
+//   India: '+91',
+//   'United States': '+1',
+//   'United Kingdom': '+44',
+//   Canada: '+1',
+//   Australia: '+61',
+//   Germany: '+49',
+//   France: '+33',
+//   Singapore: '+65',
+  
+//   // add as many as needed
+// };
 
 
   constructor(private service: DataService, authservice: AuthService) {
@@ -136,6 +137,10 @@ export class CustomerFormComponent {
     );
     this.sesstion_Details();
     this.sessionData_tax();
+      service.getCountryWithFlags().subscribe((data) => {
+      this.CountryDropdownData = data;
+      console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
+    });
   }
   newCustomer = this.formCustomerData;
 
@@ -194,12 +199,14 @@ export class CustomerFormComponent {
      console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
   }
 
-  showCountry() {
-    this.service.getCountryDataAPi().subscribe((response) => {
-      this.CountryDropdownData = response;
-      console.log(this.CountryDropdownData);
-    });
-  }
+  // showCountry() {
+  //   this.service.getCountryDataAPi().subscribe((response) => {
+  //     this.CountryDropdownData = response;
+  //     console.log(this.CountryDropdownData);
+  //   });
+  // }
+
+  
 
   onDealerTypeChange(e: any) {
     console.log(e.value, 'Dealer Type Changed');
@@ -285,29 +292,28 @@ export class CustomerFormComponent {
     console.log(this.selecte_countyId, '======county id============');
     this.getStateDropDown();
     const selectedCountry = this.CountryDropdownData.find(
-      (country) => country.ID === event.value
-    );
+    (country: any) => country.ID === this.selecte_countyId
+  );
 
-    if (selectedCountry) {
-      this.countryCode = selectedCountry.CODE;
-    }
-
-    if (selectedCountry) {
-    const countryName = selectedCountry.DESCRIPTION; // assuming API returns "DESCRIPTION" as the country name
-    this.DEFAULT_COUNTRY_CODE = this.countryCodeMap[countryName] || '';
+  // 4️⃣ If found, set code & name
+  if (selectedCountry) {
+    this.countryCode = selectedCountry.CODE;                // e.g., '+971'
+    this.DEFAULT_COUNTRY_CODE = this.countryCode;           // bind to textbox
+    console.log('Selected Country:', selectedCountry.DESCRIPTION);
+    console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
   } else {
+    // 5️⃣ Fallback if no country found
+    this.countryCode = '';
     this.DEFAULT_COUNTRY_CODE = '';
+    console.warn('⚠️ No matching country found for ID:', this.selecte_countyId);
   }
-
-  console.log('Selected Country:', selectedCountry?.DESCRIPTION);
-  console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
   }
   
   onStateSelectionChanged(event: any) {}
   ngOnInit(): void {
     this.getDealerDropDown();
     this.getPaymentTerms();
-    this.showCountry();
+    // this.showCountry();
     this.getVATRuleDropDown();
     this.getStateDropDown();
     this.getPriceLevelDropDown();
