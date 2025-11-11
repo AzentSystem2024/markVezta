@@ -306,8 +306,8 @@ export class AddInvoiceComponent {
 
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
-
     if (!selectedRows || selectedRows.length === 0) {
+      notify('Please select at least one row.', 'warning', 2000);
       return;
     }
 
@@ -334,20 +334,16 @@ export class AddInvoiceComponent {
 
     // Optional: Trigger manual change detection if needed
     this.cdr.detectChanges();
+    // setTimeout(() => {
+    //   if (this.itemsGridRef?.instance && this.mainInvoiceGridList.length > 0) {
+    //     this.itemsGridRef.instance.focus(
+    //       this.itemsGridRef.instance.getCellElement(0, 'PRICE')
+    //     );
+    //     // OR start editing directly:
+    //     // this.mainGridRef.instance.editCell(0, 'PRICE');
+    //   }
+    // }, 200);
   }
-
-  // onTransferSelectClick() {
-  //   const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
-
-  //   this.mainInvoiceGridList = [...selectedRows]; // use new variable here
-
-  //   this.isTrOutPopupVisible = false;
-  //   setTimeout(() => {
-  //     if (this.itemsGridRef?.instance) {
-  //       this.itemsGridRef.instance.editCell(0, 'PRICE');
-  //     }
-  //   }, 100);
-  // }
 
   onPopupHiding() {
     if (this.popupGridRef?.instance) {

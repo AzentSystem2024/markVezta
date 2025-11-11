@@ -14,7 +14,6 @@
     (onEditingStart)="onEditingStart($event)"
     height="84vh"
     [showColumnLines]="true"
-    
   >
     <dxo-paging [pageSize]="100"></dxo-paging>
     <dxo-editing
@@ -80,14 +79,14 @@
           elementAttr: { class: 'commonButtons' }
         }"
       ></dxi-item>
-      
+
       <dxi-item
         name="exportButton"
         location="after"
         cssClass="custom-export-button"
       ></dxi-item>
       <dxi-item
-      *ngIf="canAdd"
+        *ngIf="canAdd"
         location="after"
         widget="dxButton"
         [options]="addButtonOptions"
@@ -97,7 +96,12 @@
     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
- <dxi-column caption="S.No" dataField ="SlNo" [width]="100" alignment="left"></dxi-column>
+    <dxi-column
+      caption="S.No"
+      dataField="SlNo"
+      [width]="100"
+      alignment="left"
+    ></dxi-column>
     <dxi-column dataField="UserRoles" caption="User Role"></dxi-column>
     <dxi-column
       dataField="LastModifiedTime"
@@ -109,14 +113,14 @@
     class="formPopupClass m-2"
     [(visible)]="isAddFormVisible"
     titleText="New User Role"
-    [height]="'90vh'"
+    [height]="'100vh'"
     [width]="popup_width"
     (save)="onClickSaveNewData()"
     (onHiding)="onPopupClose()"
   >
     <app-user-level-new-form
-        #userLevelNewForm
-  [sharedValue]="isAddFormVisible"
+      #userLevelNewForm
+      [sharedValue]="isAddFormVisible"
     ></app-user-level-new-form>
   </form-popup>
 
@@ -124,13 +128,12 @@
     class="formPopupClass m-2"
     [(visible)]="iseditFormVisible"
     titleText="Edit User Role"
-    [height]="'90vh'"
+    [height]="'100vh'"
     [width]="popup_width"
     (save)="onRowUpdating()"
     (onHiding)="onEditPopupClose()"
   >
     <app-user-level-edit-form
-      
       [editValue]="clickedRowData"
     ></app-user-level-edit-form>
   </form-popup>
