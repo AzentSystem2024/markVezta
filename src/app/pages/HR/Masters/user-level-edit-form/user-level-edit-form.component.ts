@@ -200,6 +200,7 @@ onPermissionCheckboxChanged(e: any): void {
   }
 
   onSelectionChanged(event: any): void {
+    console.log(event,'event')
     if (this.UserLevelValue == '') {
       this.isErrorVisible = true;
     } else {

@@ -60,8 +60,8 @@ export class CompanyMasterComponent {
       //  ID :[null, Validators.required],
       CompanyType: ['', Validators.required],
       CompanyTypeName: ['', Validators.required],
-      Code: ['', Validators.required],
-      CompanyName: ['', Validators.required],
+      Code: [null, Validators.required],
+      CompanyName: [null, Validators.required],
       FirstAddress: ['', Validators.required],
       SecondAddress: ['', Validators.required],
       ThirdAddress: ['', Validators.required],
@@ -147,15 +147,21 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
 
   onAddPopupClose() {
     this.selectedCompanyType = null;
+    
   }
+
+  
   addCompany() {
     this.addPopup = true;
+    
 
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
 
       this.formsource.reset({
         Inactive: '',
+        Code:'',
+        CompanyName:''
       });
 
 
@@ -215,7 +221,12 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
   addData() {
 
     
-    const validationResult = this.formValidationGroup?.instance?.validate();
+    const validationResult = this.formValidationGroup.instance.validate();
+  if (!validationResult.isValid) {
+    console.log('Validation failed');
+    return;
+  }
+    // const validationResult = this.formValidationGroup?.instance?.validate();
     const Company_code =
       this.formsource.get('Code')?.value?.toString().trim() || '';
     const Company_name =

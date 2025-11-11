@@ -152,10 +152,11 @@ PackingEntriesData:any;
         this.PackingData.UNIT_ID
       ) {
         this.articleSizeData = this.PackingData.COMBINATION.split(',').map((item) => {
-  const [size, qty,ARTICLE_ID] = item.split('x').map(Number);
-  return { Size: size, Qty: qty, ArticleID:ARTICLE_ID};
+  const [size, qty,Article_ID] = item.split('x').map(Number);
+  return { Size: size, Qty: qty, ArticleID: Article_ID};
 });
       }
+      console.log(this.articleSizeData)
          this.totalQuantity = this.articleSizeData.reduce(
       (sum: number, item: any) => {
         const qty = parseInt(item.Qty, 10);
@@ -382,6 +383,7 @@ const comb_Data = this.articleSizeData.map(item => `${item.Size}x${item.Qty}`).j
     this.dataService.get_combinbation_list_api(payload).subscribe((response: any) => {
       console.log(response, "COMBINATION LIST RESPONSE");
       this.articleSizeData = response
+      console.log(this.articleSizeData)
       this.PackingData.COMBINATION=''
     })
   }
