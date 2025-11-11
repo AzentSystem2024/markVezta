@@ -115,6 +115,19 @@ export class CustomerFormComponent {
   deliveryAddress2: any;
   deliveryAddress3: any;
 
+  countryCodeMap: { [key: string]: string } = {
+  India: '+91',
+  'United States': '+1',
+  'United Kingdom': '+44',
+  Canada: '+1',
+  Australia: '+61',
+  Germany: '+49',
+  France: '+33',
+  Singapore: '+65',
+  // add as many as needed
+};
+
+
   constructor(private service: DataService, authservice: AuthService) {
     this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
     console.log(
@@ -278,7 +291,18 @@ export class CustomerFormComponent {
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE;
     }
+
+    if (selectedCountry) {
+    const countryName = selectedCountry.DESCRIPTION; // assuming API returns "DESCRIPTION" as the country name
+    this.DEFAULT_COUNTRY_CODE = this.countryCodeMap[countryName] || '';
+  } else {
+    this.DEFAULT_COUNTRY_CODE = '';
   }
+
+  console.log('Selected Country:', selectedCountry?.DESCRIPTION);
+  console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
+  }
+  
   onStateSelectionChanged(event: any) {}
   ngOnInit(): void {
     this.getDealerDropDown();

@@ -109,14 +109,15 @@
     <dxi-column dataField="EMAIL" caption="Email"></dxi-column>
    <dxi-column
       dataField="IS_INACTIVE"
-      caption="Status"
+      caption="Active/Inactive"
       cellTemplate="statusCellTemplate"
+      width="150px"
     ></dxi-column>
     <div *dxTemplate="let cellData of 'statusCellTemplate'">
       <i
         class="fas fa-flag"
         [ngClass]="getStatusFlagClass(cellData.value)"
-        [attr.title]="cellData.value"
+        [attr.title]="cellData.value ? 'Inactive' : 'Active'"
         style="margin-left: 10px; cursor: default"
       ></i>
     </div>

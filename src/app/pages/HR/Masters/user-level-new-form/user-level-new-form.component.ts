@@ -97,6 +97,7 @@ console.log(this.sharedValue,'selected');
 
     // ✅ Set the initial tab data
     this.selectedTabData = this.MenuDatasource[this.selectedTab]?.Menus || [];
+    
   }
 }
 
@@ -124,17 +125,20 @@ console.log(this.sharedValue,'selected');
   }
 
   onTabClick(event: any): void {
+    console.log(event,'event')
     this.selectedTab = event.itemIndex;
+    console.log(this.selectedTab)
     this.selectedTabData = this.MenuDatasource[this.selectedTab].Menus;
   }
 
   
 
-   onSelectionChanged(event: any): void {
+   onSelectionChanged(event: any): void { 
+    console.log(event,'event')
     if (this.UserLevelValue == '') {
       this.isErrorVisible = true;
     }
-    this.selectedRows[this.selectedTab] = event.selectedRowsData;
+    this.selectedRows[this.selectedTab] = event.selectedRowKeys;
     this.combineSelectedRows();
   }
   

@@ -170,9 +170,7 @@ convertToISO(dateStr: any): string {
      
      private daysBetween(start: Date, end: Date): number {
        const msPerDay = 1000 * 60 * 60 * 24;
-       return Math.floor((end.getTime() - start.getTime()) / msPerDay) + 1;
-
-       
+       return Math.floor((end.getTime() - start.getTime()) / msPerDay) + 1;   
      }
      
      onCalendarClick() {
