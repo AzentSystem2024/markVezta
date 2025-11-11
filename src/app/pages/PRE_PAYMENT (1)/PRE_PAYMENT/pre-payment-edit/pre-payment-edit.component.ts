@@ -86,6 +86,12 @@ scheduleGenerated = false;
        this.get_PrePaymentLedger_dropdown();
        this.sessionData_tax();
       }
+
+       ngOnInit() {
+    // initialize flags on load
+    this.fieldChanged = false;
+    this.scheduleGenerated = false;
+  }
      
      updateGSTAmount() {
        if (this.PrePaymentFormData.EXPENSE_AMOUNT && this.PrePaymentFormData.TAX_PERCENT >= 0) {
@@ -141,6 +147,7 @@ convertToISO(dateStr: any): string {
 }
 
      updatePeriodTo() {
+      
        if (this.PrePaymentFormData.DATE_FROM) {
          let newDate = new Date(this.PrePaymentFormData.DATE_FROM);
      
@@ -156,11 +163,16 @@ convertToISO(dateStr: any): string {
        } else {
          this.PrePaymentFormData.DATE_TO = null; // Clear if Period From is empty
        }
+
+        this.fieldChanged = true;
+  this.scheduleGenerated = false;
      }
      
      private daysBetween(start: Date, end: Date): number {
        const msPerDay = 1000 * 60 * 60 * 24;
        return Math.floor((end.getTime() - start.getTime()) / msPerDay) + 1;
+
+       
      }
      
      onCalendarClick() {
