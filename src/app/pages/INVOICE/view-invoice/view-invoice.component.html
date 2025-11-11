@@ -51,8 +51,15 @@
                     [(value)]="invoiceFormData.SALE_NO"
                     label="Invoice No."
                     labelMode="floating"
-                    [width]="200"
+                    [width]="148"
                     [readOnly]="true"
+                  ></dx-text-box>
+                  <dx-text-box
+                    #invoiceBoxRef
+                    label="Reference No."
+                    labelMode="floating"
+                    [(value)]="invoiceFormData.REF_NO"
+                    [width]="148"
                   ></dx-text-box>
                 </div>
                 <div
@@ -133,25 +140,21 @@
           <dxi-column
             dataField="TRANSFER_NO"
             caption="Transfer No"
-            [width]="120"
           ></dxi-column>
           <dxi-column
             dataField="TRANSFER_DATE"
             caption="Date"
             dataType="date"
             format="dd-MM-yyyy"
-            [width]="120"
           ></dxi-column>
           <dxi-column
             dataField="ARTICLE"
             caption="Item Description"
-            [width]="150"
           ></dxi-column>
           <dxi-column
             dataField="TOTAL_PAIR_QTY"
             caption="Total Pair Qty"
             dataType="number"
-            [width]="120"
           ></dxi-column>
           <dxi-column
             dataField="PRICE"
@@ -166,7 +169,6 @@
             caption="Amount"
             dataType="number"
             format="#,##0.00"
-            [width]="120"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
@@ -174,7 +176,6 @@
             caption="TAX%"
             dataType="number"
             format="#,##0.00"
-            [width]="80"
             [allowEditing]="true"
           ></dxi-column>
           <dxi-column
@@ -182,7 +183,6 @@
             caption="Tax Amount"
             dataType="number"
             format="#,##0.00"
-            [width]="100"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
@@ -190,7 +190,6 @@
             caption="Total"
             dataType="number"
             format="#,##0.00"
-            [width]="120"
             [allowEditing]="false"
           ></dxi-column>
           <dxo-summary>

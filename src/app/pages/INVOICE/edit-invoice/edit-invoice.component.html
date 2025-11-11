@@ -140,14 +140,12 @@
                 ? 'Item Code'
                 : 'Transfer No'
             "
-            [width]="120"
           ></dxi-column>
           <dxi-column
             dataField="TRANSFER_DATE"
             caption="Date"
             dataType="date"
             format="dd-MM-yyyy"
-            [width]="120"
           ></dxi-column>
           <dxi-column
             dataField="ARTICLE"
@@ -156,20 +154,17 @@
                 ? 'Item Description'
                 : 'Article'
             "
-            [width]="150"
           ></dxi-column>
           <dxi-column
             dataField="TOTAL_PAIR_QTY"
             caption="Total Pair Qty"
             dataType="number"
-            [width]="120"
           ></dxi-column>
           <dxi-column
             dataField="PRICE"
             caption="Price"
             dataType="number"
             format="#,##0.00"
-            [width]="100"
             [allowEditing]="true"
           ></dxi-column>
           <dxi-column
@@ -177,7 +172,6 @@
             caption="Amount"
             dataType="number"
             format="#,##0.00"
-            [width]="120"
             [allowEditing]="false"
             [calculateCellValue]="calculateAmount"
           ></dxi-column>
@@ -189,7 +183,6 @@
                 : ' GST %'
             "
             dataType="number"
-            [width]="80"
             [allowEditing]="true"
           ></dxi-column>
           <dxi-column
@@ -201,7 +194,6 @@
             "
             dataType="number"
             format="#,##0.00"
-            [width]="100"
             [allowEditing]="false"
             [calculateCellValue]="calculateGstAmount"
           ></dxi-column>
@@ -210,7 +202,6 @@
             caption="Total"
             dataType="number"
             format="#,##0.00"
-            [width]="120"
             [allowEditing]="false"
             [calculateCellValue]="calculateTotal"
           ></dxi-column>

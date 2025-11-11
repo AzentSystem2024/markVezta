@@ -172,64 +172,44 @@ export class ArticleListComponent {
     this.getArticles();
   }
 
-  // getArticles() {
-  //   this.articleList = new DataSource({
-  //     load: () =>
-  //       new Promise((resolve, reject) => {
-  //         this.dataService.getArticleList().subscribe({
-  //           next: (res: any) => {
-  //             const articles = res?.Data ?? [];
-  //             resolve(articles.reverse()); // Capital 'D' here
-  //           },
-  //           error: (error) => reject(error.message),
-  //         });
-  //       }),
-  //   });
-  // }
-
   getArticles() {
-    this.dataService.getArticleList().subscribe((response: any) => {
-      if (response?.flag === 1 && Array.isArray(response.Data)) {
-        this.articleList = response.Data.map((item: any) => {
-          let parsedDate: Date;
+    this.articleList = new DataSource({
+      load: () =>
+        new Promise((resolve, reject) => {
+          this.dataService.getArticleList().subscribe({
+            next: (response: any) => {
+              if (response?.flag === 1 && Array.isArray(response.Data)) {
+                //  Sort articles by ID (latest first)
+                const sortedData = response.Data.sort(
+                  (a: any, b: any) => b.ID - a.ID
+                );
 
-          // ✅ Handle various date formats safely
-          if (item.CREATED_DATE) {
-            // Try normal parsing first
-            parsedDate = new Date(item.CREATED_DATE);
+                // Add serial number (sno)
+                const formattedData = sortedData.map(
+                  (item: any, index: number) => ({
+                    ...item,
+                    sno: index + 1,
+                  })
+                );
 
-            // If invalid (e.g., DD-MM-YYYY), fix it
-            if (
-              isNaN(parsedDate.getTime()) &&
-              item.CREATED_DATE.includes('-')
-            ) {
-              const parts = item.CREATED_DATE.split('-');
-              if (parts.length === 3) {
-                // assume format dd-MM-yyyy
-                const [day, month, year] = parts.map((p) => parseInt(p, 10));
-                parsedDate = new Date(year, month - 1, day);
+                resolve(formattedData); // Return formatted data
+                console.log(
+                  ' Sorted Article List (latest first):',
+                  formattedData
+                );
+              } else {
+                resolve([]); // Handle empty or invalid response
+                console.warn(
+                  'No article data found or invalid response format.'
+                );
               }
-            }
-          } else {
-            parsedDate = new Date(0); // fallback
-          }
-
-          return {
-            ...item,
-            CREATED_DATE: parsedDate,
-          };
-        })
-          // ✅ Sort descending by date
-          .sort(
-            (a: any, b: any) =>
-              b.CREATED_DATE.getTime() - a.CREATED_DATE.getTime()
-          );
-
-        console.log('✅ Sorted Article List:', this.articleList);
-      } else {
-        this.articleList = [];
-        console.warn('No article data found or invalid response format.');
-      }
+            },
+            error: (err) => {
+              console.error('Error loading article list:', err);
+              reject('Failed to load data');
+            },
+          });
+        }),
     });
   }
 
@@ -375,13 +355,13 @@ export class ArticleListComponent {
 
   onDeleteArticle(event: any) {
     console.log(event.data);
-   const articleArtNo = event.data.ART_NO;
-    const payload ={
-      ART_NO : articleArtNo
-    }
-    
+    const articleArtNo = event.data.ART_NO;
+    const payload = {
+      ART_NO: articleArtNo,
+    };
+
     event.cancel = true;
-   console.log(articleArtNo)
+    console.log(articleArtNo);
     // Call your delete API
     this.dataService.deleteArticle(payload).subscribe(
       (response: any) => {

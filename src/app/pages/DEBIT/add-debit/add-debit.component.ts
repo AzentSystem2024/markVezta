@@ -114,13 +114,13 @@ export class AddDebitComponent {
   pendingInvoices: any;
   pendingInvoicelist: any;
   selectedSupplier: any;
-  selectedstoreId:any;
+  selectedstoreId: any;
   net: string;
   constructor(private dataService: DataService) {}
 
-      sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
       '===========selected store id==================='
@@ -719,9 +719,10 @@ export class AddDebitComponent {
 
     const netAmount = totalAmount + totalGST;
     const dueAmount = Number(this.debitFormData?.DUE_AMOUNT) || 0;
+    console.log(netAmount, dueAmount, 'netadmount,dueamount');
 
-    // ✅ Validation check
-    if (netAmount > dueAmount) {
+    if (Number(netAmount) > dueAmount) {
+      console.log(netAmount, dueAmount, 'NOTIFYNETAMOUNT');
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
       return;
     }
@@ -786,7 +787,7 @@ export class AddDebitComponent {
 
     // ✅ 4. Other fields
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
-    this.debitFormData.STORE_ID = this.selectedstoreId
+    this.debitFormData.STORE_ID = this.selectedstoreId;
     this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
     this.debitFormData.TRANS_DATE = this.formatDate(
       this.debitFormData.TRANS_DATE

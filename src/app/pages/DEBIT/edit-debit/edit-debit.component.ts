@@ -103,7 +103,8 @@ export class EditDebitComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedSupplier: any;
-  selectedstoreId:any;
+  selectedstoreId: any;
+  net: string;
 
   constructor(private dataService: DataService) {}
 
@@ -113,15 +114,14 @@ export class EditDebitComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
-   sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
       '===========selected store id==================='
     );
   }
-
 
   ngOnInit() {
     this.sessionDetails();
@@ -441,6 +441,7 @@ export class EditDebitComponent {
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
       e.dataField === 'Amount' ||
+      e.dataField === 'GST_PERC' ||
       e.dataField === 'gstAmount'
     ) {
       e.editorOptions = e.editorOptions || {};
@@ -596,12 +597,12 @@ export class EditDebitComponent {
           const rowIndex = e.row.rowIndex;
           // Move focus to the "ledgerCode" column in the same row
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'gstAmount'));
+            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
           });
         }
       };
     }
-    if (e.dataField === 'gstAmount') {
+    if (e.dataField === 'GST_PERC') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
@@ -774,6 +775,23 @@ export class EditDebitComponent {
     return +((amount * gstPerc) / 100).toFixed(2);
   };
 
+  get netAmountString(): string {
+    const details = this.noteDetails || [];
+    let totalAmount = 0;
+    let totalGST = 0;
+
+    details.forEach((item: any) => {
+      const amount = Number(item.Amount) || 0;
+      const gstPerc = Number(item.GST_PERC) || 0;
+
+      totalAmount += amount;
+      totalGST += (amount * gstPerc) / 100; // Recalculate GST live
+    });
+    this.net = (totalAmount + totalGST).toFixed(2);
+    console.log('Net Amount (from getter):', this.net);
+    return (totalAmount + totalGST).toFixed(2);
+  }
+
   updateDebitNote() {
     const details = this.noteDetails || [];
     let totalAmount = 0;
@@ -787,10 +805,12 @@ export class EditDebitComponent {
     });
 
     const netAmount = totalAmount + totalGST;
-    const dueAmount = Number(this.debitFormData?.DUE_AMOUNT) || 0;
+    const dueAmount = Number(this.debitFormData[0]?.DUE_AMOUNT) || 0;
+    console.log(this.net, dueAmount, 'NOTIFY');
 
     // ✅ Validation check
-    if (netAmount > dueAmount) {
+    if (Number(this.net) > dueAmount) {
+      console.log(netAmount, dueAmount, 'NOTIFYNETAMOUNT');
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
       return;
     }

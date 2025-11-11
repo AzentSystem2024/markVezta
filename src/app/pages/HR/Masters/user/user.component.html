@@ -17,8 +17,8 @@
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-editing
       mode="popup"
-       [allowUpdating]="canEdit"
-       [allowDeleting]="canDelete"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
     >
     </dxo-editing>
     <dxo-pager
@@ -45,16 +45,21 @@
 
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header" style="
+        <div
+          class="grid-header"
+          style="
             font-weight: 600;
             font-size: 20px;
             margin-left: 12px;
             padding: -3px;
             margin-right: 3px;
-          ">User</div>
+          "
+        >
+          User
+        </div>
       </dxi-item>
 
-       <dxi-item
+      <dxi-item
         location="after"
         locateInMenu="auto"
         showText="inMenu"
@@ -67,21 +72,20 @@
           hint: 'refresh'
         }"
       ></dxi-item>
-      
+
       <dxi-item
-      location="after"
-      locateInMenu="auto"
-      showText="inMenu"
-      widget="dxButton"
-      [options]="{
-        icon: isFilterRowVisible ? 'search' : 'search',
-        hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-        onClick: toggleFilterRow,
-        stylingMode: 'text',
-        elementAttr: { class: 'commonButtons' }
-      }"
-    ></dxi-item>
-    
+        location="after"
+        locateInMenu="auto"
+        showText="inMenu"
+        widget="dxButton"
+        [options]="{
+          icon: isFilterRowVisible ? 'search' : 'search',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'text',
+          elementAttr: { class: 'commonButtons' }
+        }"
+      ></dxi-item>
 
       <dxi-item
         name="exportButton"
@@ -89,25 +93,28 @@
         cssClass="custom-export-button"
       ></dxi-item>
       <dxi-item
-      location="after"
-      widget="dxButton"
-       *ngIf="canAdd"
-      [options]="addButtonOptions"
-    ></dxi-item>
-
-
+        location="after"
+        widget="dxButton"
+        *ngIf="canAdd"
+        [options]="addButtonOptions"
+      ></dxi-item>
     </dxo-toolbar>
 
     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
-<dxi-column dataField="SlNo" caption="S.No"  [width]="100" alignment="left"></dxi-column>
+    <dxi-column
+      dataField="SlNo"
+      caption="S.No"
+      [width]="100"
+      alignment="left"
+    ></dxi-column>
     <dxi-column dataField="USER_NAME" caption="UserName"></dxi-column>
     <dxi-column dataField="LOGIN_NAME" caption="LoginName"></dxi-column>
     <dxi-column dataField="USER_ROLE" caption="Role"></dxi-column>
-     <dxi-column dataField="MOBILE" caption="Mobile No."></dxi-column>
+    <dxi-column dataField="MOBILE" caption="Mobile No."></dxi-column>
     <dxi-column dataField="EMAIL" caption="Email"></dxi-column>
-   <dxi-column
+    <dxi-column
       dataField="IS_INACTIVE"
       caption="Active/Inactive"
       cellTemplate="statusCellTemplate"
@@ -136,9 +143,9 @@
   <dx-popup
     [(visible)]="isEditPopupOpened"
     title="Edit User"
-    [height]="'95vh'"
+    [height]="'100vh'"
     [width]="popupwidth"
-     (onHiding)="CloseEditForm()"
+    (onHiding)="CloseEditForm()"
   >
     <app-user-edit-form
       [selectedRowData]="selectedRowData"
@@ -146,4 +153,3 @@
     ></app-user-edit-form>
   </dx-popup>
 </div>
-
