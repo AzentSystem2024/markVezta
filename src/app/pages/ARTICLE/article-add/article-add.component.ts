@@ -124,6 +124,7 @@ export class ArticleAddComponent {
   itemsList: any[] = []; // dropdown source → item master list
   data: any;
   selectedItemId: any;
+  createPacking: boolean = false;
 
   constructor(private dataService: DataService) {}
 
@@ -153,16 +154,32 @@ export class ArticleAddComponent {
       reader.readAsDataURL(file);
     }
   }
+  onCreatePackingChanged(e: any) {
+    this.articleData.CREATE_PACKING = e.value;
 
-  onIsComponentChanged(e: any) {
+    // When "Create packing" is checked, set IS_COMPONENT to false
     if (e.value) {
-      console.log(
-        'Checked: this article will be used as a component for another article'
-      );
-    } else {
-      console.log('Unchecked');
+      this.articleData.IS_COMPONENT = false;
     }
   }
+
+  onIsComponentChanged(e: any) {
+    this.articleData.IS_COMPONENT = e.value;
+
+    // If user marks it as component, remove create packing
+    if (e.value) {
+      this.articleData.CREATE_PACKING = false;
+    }
+  }
+  // onIsComponentChanged(e: any) {
+  //   if (e.value) {
+  //     console.log(
+  //       'Checked: this article will be used as a component for another article'
+  //     );
+  //   } else {
+  //     console.log('Unchecked');
+  //   }
+  // }
 
   getItems() {
     this.dataService.getDropdownData('ITEMS').subscribe((response: any) => {
@@ -171,6 +188,52 @@ export class ArticleAddComponent {
   }
 
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'ITEM' ||
+      e.dataField === 'DESCRIPTION' ||
+      e.dataField === 'UOM' ||
+      e.dataField === 'QUANTITY'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      // if (e.editorName === 'dxNumberBox') {
+      //   e.editorOptions.showSpinButtons = false;
+      // }
+      // e.editorOptions.onKeyDown = (event: any) => {
+      //   if (event.event.key === 'Enter') {
+      //     const grid = this.itemsGridRef?.instance;
+      //     const visibleRows = grid.getVisibleRows();
+
+      //     const rowIndex = visibleRows.findIndex(
+      //       (r) => r?.data === e.row?.data
+      //     );
+      //     setTimeout(() => {
+      //       grid.focus(grid.getCellElement(rowIndex, 'GST'));
+      //     }, 50);
+      //   }
+      // };
+    }
     const grid = e.component;
     const row = e.row?.data;
     const rowIndex = e.row?.rowIndex;
@@ -652,6 +715,7 @@ export class ArticleAddComponent {
           BRAND_ID: this.selectedBrandId,
           UNIT_ID: this.selectedProductionUnitId,
           SUPPLIER_ID: this.selectedMaterialUnitId,
+          DESCRIPTION: this.articleData.DESCRIPTION,
           IMAGE_NAME: this.imagePreview ? this.imagePreview.toString() : null,
           Sizes: this.selectedSizeRowData.map((row) => ({
             SizeValue: row.SIZE,

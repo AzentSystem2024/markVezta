@@ -197,7 +197,11 @@
           </div>
         </div>
         <div class="checkbox-container">
-          <dx-check-box text="Create packing on saving"></dx-check-box>
+          <dx-check-box
+            text="Create packing on saving"
+            [(value)]="articleData.CREATE_PACKING"
+            (onValueChanged)="onCreatePackingChanged($event)"
+          ></dx-check-box>
           <!-- <dx-check-box text="Used as component for another article"></dx-check-box> -->
         </div>
         <div class="checkbox-container">
@@ -205,7 +209,7 @@
           <dx-check-box
             text="Used as component for another article"
             [(value)]="articleData.IS_COMPONENT"
-            [disabled]="!!articleData.COMPONENT_ARTICLE_ID"
+            (onValueChanged)="onIsComponentChanged($event)"
           ></dx-check-box>
         </div>
         <!-- <div class="arrival-info">
@@ -250,7 +254,7 @@
   </dxi-item>
   <!-- Footer Buttons -->
 
-  <dxi-item title="Attach Component">
+  <dxi-item title="Attach Component" [visible]="!articleData.IS_COMPONENT">
     <div style="margin-top: 16px">
       <div
         class="popup-content"

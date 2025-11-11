@@ -199,7 +199,71 @@ export class ArticleEditComponent {
     });
   }
 
+  onCreatePackingChanged(e: any) {
+    this.articleData.CREATE_PACKING = e.value;
+
+    // When "Create packing" is checked, set IS_COMPONENT to false
+    if (e.value) {
+      this.articleData.IS_COMPONENT = false;
+    }
+  }
+
+  onIsComponentChanged(e: any) {
+    this.articleData.IS_COMPONENT = e.value;
+
+    // If user marks it as component, remove create packing
+    if (e.value) {
+      this.articleData.CREATE_PACKING = false;
+    }
+  }
+
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'ITEM' ||
+      e.dataField === 'DESCRIPTION' ||
+      e.dataField === 'UOM' ||
+      e.dataField === 'QUANTITY'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     const grid = e.component;
     const row = e.row?.data;
     const rowIndex = e.row?.rowIndex;

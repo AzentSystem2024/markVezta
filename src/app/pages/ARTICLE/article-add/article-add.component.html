@@ -165,7 +165,6 @@
             [(value)]="articleData.DESCRIPTION"
             labelMode="floating"
             placeholder="Description"
-            [value]="defaultDescription"
           ></dx-text-box>
         </div>
         <div class="form-field component-with-buttons">
@@ -182,20 +181,23 @@
         </div>
         <div class="form-field">
           <dx-text-box
-            label="STANDARD_PACKING"
+            label="Standard Packing"
             labelMode="floating"
-            placeholder="STANDARD_PACKING"
+            placeholder="Standard Packing"
             [(value)]="articleData.STANDARD_PACKING"
           ></dx-text-box>
         </div>
         <div class="checkbox-container">
-          <dx-check-box text="Create packing on saving"></dx-check-box>
+          <dx-check-box
+            text="Create packing on saving"
+            [(value)]="articleData.CREATE_PACKING"
+            (onValueChanged)="onCreatePackingChanged($event)"
+          ></dx-check-box>
         </div>
         <div class="checkbox-container">
           <dx-check-box
             text="Used as component for another article"
             [(value)]="articleData.IS_COMPONENT"
-            [disabled]="!!articleData.COMPONENT_ARTICLE_ID"
             (onValueChanged)="onIsComponentChanged($event)"
           ></dx-check-box>
         </div>
@@ -246,7 +248,7 @@
   </dxi-item>
   <!-- Footer Buttons -->
 
-  <dxi-item title="Attach Component">
+  <dxi-item title="Attach Component" [visible]="!articleData.IS_COMPONENT">
     <div style="margin-top: 16px">
       <!-- Tab 2: Show dx-popup content statically in tab -->
       <div
