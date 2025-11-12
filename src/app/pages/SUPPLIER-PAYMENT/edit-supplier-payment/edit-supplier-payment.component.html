@@ -59,7 +59,7 @@
               >
                 <div style="display: flex; gap: 5px">
                   <dx-text-box
-                    [(value)]="receiptNo"
+                    [(value)]="voucherNo"
                     label="Receipt No"
                     labelMode="floating"
                     [width]="200"
@@ -306,7 +306,7 @@
             <!-- Amount aligned with Bank side -->
             <div style="flex: 1">
               <dx-number-box
-                [(value)]="totalPending"
+                [(value)]="paymentFormData.PDC_AMOUNT"
                 label="Amount"
                 labelMode="floating"
                 [width]="'100%'"

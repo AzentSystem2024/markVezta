@@ -63,7 +63,7 @@
                   <dx-text-box
                     label="Receipt No"
                     labelMode="floating"
-                    [(value)]="receiptNo"
+                    [(value)]="receiprtFormData.VOUCHER_NO"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
@@ -114,7 +114,6 @@
           <dxi-column
             dataField="INVOICE_NO"
             caption="Inv No"
-            [width]="100"
             [allowEditing]="true"
           >
           </dxi-column>
@@ -135,7 +134,6 @@
             dataField="NET_AMOUNT"
             caption="Inv Amount"
             [allowEditing]="true"
-            [width]="120"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
           <dxi-column

@@ -105,6 +105,7 @@ export class AddInvoiceComponent {
     GST_AMOUNT: '',
     NET_AMOUNT: '',
     REF_NO: '',
+    PARTY_NAME: '',
     SALE_DETAILS: [
       {
         TRANSFER_SUMMARY_ID: '',
@@ -128,6 +129,7 @@ export class AddInvoiceComponent {
   selectedCustomerType: any;
   selectedCustomerId: any;
   selectedCustomer: any;
+  selectedCustomerName: void;
 
   constructor(
     private dataService: DataService,
@@ -208,6 +210,9 @@ export class AddInvoiceComponent {
     const selectedCustomer = this.distributorList.find(
       (cust: any) => cust.ID === e.value
     );
+    this.selectedCustomerName = selectedCustomer.CUST_NAME;
+    this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
+    console.log(selectedCustomer.CUST_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
     if (this.selectedCustomerId) {
       this.selectedCustomer = this.distributorList.find(
         (s: any) => s.ID === this.selectedCustomerId

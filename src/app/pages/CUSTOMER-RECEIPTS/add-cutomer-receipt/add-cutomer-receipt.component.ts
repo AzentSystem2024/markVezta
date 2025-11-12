@@ -100,6 +100,7 @@ export class AddCutomerReceiptComponent {
     CHEQUE_NO: '',
     CHEQUE_DATE: '',
     BANK_NAME: '',
+    PARTY_NAME: '',
     REC_DETAIL: [
       {
         BILL_ID: '',
@@ -116,6 +117,8 @@ export class AddCutomerReceiptComponent {
   pdcList: any;
   pdcPopupVisible: boolean;
   selectedstoreId: any;
+  partyName: any;
+  selectedCustomer: any;
 
   constructor(private dataService: DataService) {}
 
@@ -221,6 +224,14 @@ export class AddCutomerReceiptComponent {
   onCustomerChanged(event: any): void {
     console.log(event, "==============='''");
     const selectedId = event.value;
+    this.partyName = event.value;
+    if (selectedId) {
+      this.selectedCustomer = this.distributorList.find(
+        (s: any) => s.ID === selectedId
+      );
+      this.receiprtFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
+      console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+    }
     console.log(selectedId, "==============='''");
     if (selectedId) {
       this.getInvoiceList();
@@ -570,6 +581,7 @@ export class AddCutomerReceiptComponent {
       REC_DETAIL: validDetails,
       BANK_NAME: this.receiprtFormData.BANK_NAME,
       STORE_ID: this.selectedstoreId,
+      PARTY_NAME: this.receiprtFormData.PARTY_NAME,
     };
 
     console.log('Sending payload:', payload); // For debugging

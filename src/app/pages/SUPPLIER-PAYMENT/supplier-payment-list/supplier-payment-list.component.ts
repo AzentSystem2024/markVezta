@@ -119,21 +119,18 @@ export class SupplierPaymentListComponent {
     this.dataService.getSupplierPaymentList().subscribe((response: any) => {
       this.supplierPaymentList = response.Data.map((item: any) => {
         let dateValue: Date;
-
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.PAY_DATE))) {
-          dateValue = new Date(item.PAY_DATE);
+        if (typeof item.PAY_DATE === 'string' && item.PAY_DATE.includes('-')) {
+          const [day, month, year] = item.PAY_DATE.split('-').map(Number);
+          dateValue = new Date(year, month - 1, day);
         } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.PAY_DATE);
+          dateValue = new Date(item.PAY_DATE);
         }
 
         return {
           ...item,
           PAY_DATE: dateValue,
         };
-      });
-
+      }).sort((a: any, b: any) => Number(b.VOUCHER_NO) - Number(a.VOUCHER_NO));
       this.applyDateFilter();
     });
   }
@@ -220,17 +217,23 @@ export class SupplierPaymentListComponent {
   }
 
   applyDateFilter() {
+    console.log('Applying filter for:', this.selectedDateRange);
+    console.log('Sample PAY_DATE:', this.supplierPaymentList?.[0]?.PAY_DATE);
+
     if (!this.selectedDateRange || !this.supplierPaymentList) {
       this.filteredSupplierPaymentList = this.supplierPaymentList;
       return;
     }
+
     if (this.selectedDateRange === 'all') {
-      this.filteredSupplierPaymentList = this.supplierPaymentList; // show full list
+      this.filteredSupplierPaymentList = this.supplierPaymentList;
       return;
     }
+
     const today = new Date();
     let startDate: Date;
-    const endDate = new Date(); // today
+    const endDate = new Date();
+    endDate.setHours(23, 59, 59, 999);
 
     switch (this.selectedDateRange) {
       case 'today':
@@ -238,17 +241,17 @@ export class SupplierPaymentListComponent {
         startDate.setHours(0, 0, 0, 0);
         break;
       case 'last7':
-        startDate = new Date();
+        startDate = new Date(today);
         startDate.setDate(today.getDate() - 6);
         startDate.setHours(0, 0, 0, 0);
         break;
       case 'last15':
-        startDate = new Date();
+        startDate = new Date(today);
         startDate.setDate(today.getDate() - 14);
         startDate.setHours(0, 0, 0, 0);
         break;
       case 'last30':
-        startDate = new Date();
+        startDate = new Date(today);
         startDate.setDate(today.getDate() - 29);
         startDate.setHours(0, 0, 0, 0);
         break;
@@ -259,9 +262,14 @@ export class SupplierPaymentListComponent {
 
     this.filteredSupplierPaymentList = this.supplierPaymentList.filter(
       (item: any) => {
-        const journalDate = item.PAY_DATE;
-        return journalDate >= startDate && journalDate <= endDate;
+        const payDate = new Date(item.PAY_DATE);
+        return payDate >= startDate && payDate <= endDate;
       }
+    );
+
+    console.log(
+      'Filtered list count:',
+      this.filteredSupplierPaymentList.length
     );
   }
 

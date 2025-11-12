@@ -93,6 +93,7 @@ export class EditInvoiceComponent {
   selectedDistributorId: any;
   sessionData: any;
   selected_vat_id: any;
+  selectedSupplierName: any;
 
   constructor(
     private dataService: DataService,
@@ -135,7 +136,16 @@ export class EditInvoiceComponent {
     if (e && e.value) {
       this.selectedDistributorId = e.value; // ✅ this is the selected ID
       console.log('Selected Distributor ID:', this.selectedDistributorId);
-
+      if (this.selectedDistributorId) {
+        this.selectedSupplierName = this.distributorList.find(
+          (s: any) => s.ID === this.selectedDistributorId
+        );
+        this.invoiceFormData.PARTY_NAME = this.selectedSupplierName.DESCRIPTION;
+        console.log(
+          this.selectedSupplierName.DESCRIPTION,
+          'PARTYNAMEEEEEEEEEEEEEE'
+        );
+      }
       this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
       this.invoiceFormData.UNIT_ID = 0;
     }

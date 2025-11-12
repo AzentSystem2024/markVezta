@@ -87,7 +87,8 @@ export class AddSupplierPaymentComponent {
     ADD_TIME: '',
     SUPPLIER_ID: '',
     NET_AMOUNT: '',
-    PDC_ID: '',
+    PDC_ID: 0,
+    PARTY_NAME: '',
     SUPP_DETAIL: [
       {
         BILL_ID: '',
@@ -129,15 +130,30 @@ export class AddSupplierPaymentComponent {
     if (!e || !e.data) return true;
 
     const value = Number(e.value);
+    const pending = Number(e.data.PENDING_AMOUNT);
 
-    // allow 0 or empty
+    // Allow 0 or empty values
     if (!e.value || value === 0) {
       return true;
     }
 
-    // validate only when > 0
-    return value === Number(e.data.PENDING_AMOUNT);
+    // ✅ Allow received amount ≤ pending amount
+    return value <= pending;
   };
+
+  // validateReceivedAmount = (e: any) => {
+  //   if (!e || !e.data) return true;
+
+  //   const value = Number(e.value);
+
+  //   // allow 0 or empty
+  //   if (!e.value || value === 0) {
+  //     return true;
+  //   }
+
+  //   // validate only when > 0
+  //   return value === Number(e.data.PENDING_AMOUNT);
+  // };
 
   getPendingInvoiceList(supplierId: number) {
     const payload = {
@@ -171,6 +187,50 @@ export class AddSupplierPaymentComponent {
         'distributorList=============================='
       );
     });
+  }
+
+  onEditorPreparing(e: any) {
+    if (e.dataField === 'RECEIVED_AMOUNT') {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
   }
 
   onGridContentReady(e: any) {
@@ -292,6 +352,7 @@ export class AddSupplierPaymentComponent {
   }
 
   onPdcSelected(e: any) {
+    console.log('ONPDCCHANGED');
     const selectedCheque = e.data;
     console.log('Selected Cheque:', selectedCheque);
 
@@ -517,6 +578,7 @@ export class AddSupplierPaymentComponent {
 
         this.popupClosed.emit();
         this.resetForm();
+        this.getReceiptNo();
       },
       error: (err) => {
         notify('Error saving receipt', 'error', 3000);

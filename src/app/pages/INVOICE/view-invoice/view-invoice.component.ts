@@ -86,6 +86,7 @@ export class ViewInvoiceComponent {
   grandTotal: any;
   selectedCompanyId: any;
   selectedDistributorId: any;
+  selectedSupplierName: any;
 
   constructor(
     private dataService: DataService,
@@ -147,19 +148,28 @@ export class ViewInvoiceComponent {
       this.getDistributorListAfterInput();
     }
   }
-onDistributorChanged(e: any) {
-  if (e && e.value) {
-    this.selectedDistributorId = e.value;  // ✅ this is the selected ID
-    console.log("Selected Distributor ID:", this.selectedDistributorId);
-
-    this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
-    this.invoiceFormData.UNIT_ID = 0;
+  onDistributorChanged(e: any) {
+    if (e && e.value) {
+      this.selectedDistributorId = e.value; // ✅ this is the selected ID
+      console.log('Selected Distributor ID:', this.selectedDistributorId);
+      if (this.selectedDistributorId) {
+        this.selectedSupplierName = this.distributorList.find(
+          (s: any) => s.ID === this.selectedDistributorId
+        );
+        this.invoiceFormData.PARTY_NAME = this.selectedSupplierName.DESCRIPTION;
+        console.log(
+          this.selectedSupplierName.DESCRIPTION,
+          'PARTYNAMEEEEEEEEEEEEEE'
+        );
+      }
+      this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
+      this.invoiceFormData.UNIT_ID = 0;
+    }
   }
-}
   getInvoiceListForGrid() {
     const payload = {
-      CUST_ID : this.selectedDistributorId
-    }
+      CUST_ID: this.selectedDistributorId,
+    };
     this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
       this.staticTransfers = response.Data; // Save the original full list
       console.log(this.staticTransfers, 'STATISCTRANSFERS');
@@ -168,24 +178,23 @@ onDistributorChanged(e: any) {
   }
 
   getDistributorListAfterInput() {
-  this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
-    this.distributorList = response;
-    console.log(this.distributorList, 'DISTRIBUTORLISTTTT');
+    this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
+      this.distributorList = response;
+      console.log(this.distributorList, 'DISTRIBUTORLISTTTT');
 
-    // ✅ Ensure ID is correctly matched
-    const matched = response.find(
-      (d) => d.ID === this.invoiceFormData?.DISTRIBUTOR_ID
-    );
-
-    if (!matched) {
-      console.warn(
-        'No matching distributor for ID:',
-        this.invoiceFormData?.DISTRIBUTOR_ID
+      // ✅ Ensure ID is correctly matched
+      const matched = response.find(
+        (d) => d.ID === this.invoiceFormData?.DISTRIBUTOR_ID
       );
-    }
-  });
-}
 
+      if (!matched) {
+        console.warn(
+          'No matching distributor for ID:',
+          this.invoiceFormData?.DISTRIBUTOR_ID
+        );
+      }
+    });
+  }
 
   getCompanyListDropdown() {
     this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {

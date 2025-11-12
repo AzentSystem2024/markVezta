@@ -107,7 +107,13 @@
         caption="Supplier"
         alignment="right"
       ></dxi-column>
-      <dxi-column dataField="SALE_DATE" caption="Sale Date"></dxi-column>
+      <dxi-column
+        dataField="SALE_DATE"
+        caption="Date"
+        dataType="date"
+        [allowEditing]="false"
+        format="dd-MM-yyyy"
+      ></dxi-column>
       <dxi-column
         dataField="GROSS_AMOUNT"
         caption="Gross Amount"

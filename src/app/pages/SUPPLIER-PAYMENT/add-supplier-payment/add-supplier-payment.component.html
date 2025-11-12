@@ -35,6 +35,7 @@
           }"
           (onContentReady)="onGridContentReady($event)"
           (onSelectionChanged)="onSelectionChanged($event)"
+          (onEditorPreparing)="onEditorPreparing($event)"
         >
           <dxo-editing
             mode="cell"
@@ -57,7 +58,7 @@
               >
                 <div style="display: flex; gap: 5px">
                   <dx-text-box
-                    [(value)]="receiptNo"
+                    [(value)]="paymentFormData.RECEIPT_NO"
                     label="Payment No"
                     labelMode="floating"
                     [width]="200"
@@ -145,7 +146,9 @@
           <dxi-column
             dataField="RECEIVED_AMOUNT"
             caption="Received Amount"
+            dataType="number"
             [allowEditing]="true"
+            alignment="right"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
             <dxi-validation-rule

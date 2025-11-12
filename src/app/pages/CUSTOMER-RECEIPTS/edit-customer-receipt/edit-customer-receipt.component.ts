@@ -98,6 +98,7 @@ export class EditCustomerReceiptComponent {
   selectedLedger: any;
   pdcList: any;
   selectedstoreId: any;
+  selectedCustomer: any;
 
   constructor(private dataService: DataService) {}
 
@@ -141,6 +142,10 @@ export class EditCustomerReceiptComponent {
         firstReceipt.REC_DATE = new Date(year, month - 1, day); // month is 0-based
       }
       this.receiprtFormData = firstReceipt; // assign for form binding
+      console.log(
+        this.receiprtFormData.VOUCHER_NO,
+        'VOUCHERNOOOOOOOOOOOOOOOOOOOOOOOO'
+      );
       this.selectedDistributorId = Number(firstReceipt.DISTRIBUTOR_ID);
       this.getCompanyListDropdown(firstReceipt.ID);
       console.log(
@@ -547,6 +552,13 @@ export class EditCustomerReceiptComponent {
     console.log('===================');
     const selectedId = event.value;
     console.log(selectedId, 'SELECTEDID');
+    if (selectedId) {
+      this.selectedCustomer = this.distributorList.find(
+        (s: any) => s.ID === selectedId
+      );
+      this.receiprtFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
+      console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+    }
     if (selectedId) {
       this.getInvoiceList();
     }

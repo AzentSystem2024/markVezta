@@ -162,18 +162,21 @@ export class InvoiceListComponent {
         let dateValue: Date;
 
         // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.SALE_DATE))) {
-          dateValue = new Date(item.SALE_DATE);
+        if (
+          typeof item.SALE_DATE === 'string' &&
+          item.SALE_DATE.includes('-')
+        ) {
+          const [day, month, year] = item.SALE_DATE.split('-').map(Number);
+          dateValue = new Date(year, month - 1, day);
         } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.SALE_DATE);
+          dateValue = new Date(item.SALE_DATE);
         }
 
         return {
           ...item,
-          TRANS_DATE: dateValue,
+          SALE_DATE: dateValue,
         };
-      });
+      }).sort((a: any, b: any) => Number(b.SALE_NO) - Number(a.SALE_NO));
 
       this.applyDateFilter();
     });
@@ -300,7 +303,7 @@ export class InvoiceListComponent {
     }
 
     this.filteredInvoiceList = this.invoiceList.filter((item: any) => {
-      const invoiceDate = item.TRANS_DATE;
+      const invoiceDate = item.SALE_DATE;
       return invoiceDate >= startDate && invoiceDate <= endDate;
     });
   }
@@ -315,7 +318,7 @@ export class InvoiceListComponent {
     end.setHours(23, 59, 59, 999);
 
     this.filteredInvoiceList = this.invoiceList.filter((item: any) => {
-      const invoiceDate = item.TRANS_DATE;
+      const invoiceDate = item.SALE_DATE;
       return invoiceDate >= start && invoiceDate <= end;
     });
 
