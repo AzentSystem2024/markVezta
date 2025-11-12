@@ -456,7 +456,7 @@
   <form-popup
     [(visible)]="isAddCustomerPopupOpened"
     [width]="900"
-    [height]="690"
+    [height]="'100vh'"
     titleText="New Customer"
     (cancel)="onCancelCustomer()"
     (save)="onClickSaveCustomer()"
@@ -466,7 +466,7 @@
   <form-popup
     [(visible)]="isEditCustomerPopupOpened"
     [width]="950"
-    [height]="650"
+    [height]="'100vh'"
     titleText="Edit Customer"
     (save)="onClickUpdateCustomer()"
   >
