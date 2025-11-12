@@ -883,8 +883,9 @@ import { DeliveryAddressComponent, DeliveryAddressModule } from './HR/Masters/de
 import { ChangePasswordComponent, ChangePasswordModule } from './components/library/PROFILEPAGE/change-password/change-password.component';
 import { SecurityPolicyComponent, SecurityPolicyModule } from './pages/SYSTEMPAGES/security-policy/security-policy.component';
 import { ResetPasswordComponent, ResetPasswordModule } from './pages/reset-password/reset-password.component';
-import { BankReconciliationComponent } from './pages/bank-reconciliation/bank-reconciliation.component';
 import { BankReconciliationAddComponent, BankReconciliationAddModule } from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
+import { InvoicePdfComponent } from './pages/INVOICE/invoice-pdf/invoice-pdf.component';
+import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoice-pdf-view.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1222,7 +1223,8 @@ import { BankReconciliationAddComponent, BankReconciliationAddModule } from './p
     DeliveryAddressModule,
     ChangePasswordModule,
     SecurityPolicyModule,
-    BankReconciliationAddModule
+    BankReconciliationAddModule,
+    
     
   ],
   providers: [

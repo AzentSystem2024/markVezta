@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -49,6 +49,11 @@ import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-vou
 import { EditInvoiceComponent } from '../edit-invoice/edit-invoice.component';
 import notify from 'devextreme/ui/notify';
 import { DataService } from 'src/app/services';
+import { Router } from '@angular/router';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import autoTable from 'jspdf-autotable';
+
 
 @Component({
   selector: 'app-view-invoice',
@@ -86,10 +91,20 @@ export class ViewInvoiceComponent {
   grandTotal: any;
   selectedCompanyId: any;
   selectedDistributorId: any;
+isViewInvoice: boolean;
+
+ pdfSrc: SafeResourceUrl | null = null;
+selectedInvoice: any;
+  selected_Company_name: any;
+    formatted_To_date: string;
+     formatted_from_date: string;
+     isPdfPopupVisible: boolean = false;
 
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+     private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -206,8 +221,195 @@ onDistributorChanged(e: any) {
   cancelPopup() {
     this.popupClosed.emit();
   }
+
+
+   viewPdf(): void {
+    this.isPdfPopupVisible = true;
+   const invoiceId = this.invoiceFormData.TRANS_ID;
+   console.log(invoiceId,'=================invoiceId===================')
+    this.dataService.selectInvoice(invoiceId).subscribe((response: any) => {
+      console.log(response,'=================invoice response===================')
+      if (response) {
+        this.pdfSrc = this.get_pdf(response.Data); // Update iframe source
+      }
+    });
 }
 
+formatAmount(value: any): string {
+  if (value === null || value === undefined || value === '') return '';
+  const num = Number(value);
+  if (isNaN(num)) return value; 
+  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// get_pdf(data: any): SafeResourceUrl {
+//   console.log(this.selected_Company_name,'=========================company name=============')
+//   console.log(data,'=======data=======================')
+
+
+//   const doc = new jsPDF();
+//   const pageWidth = doc.internal.pageSize.width;
+//   const marginLeft = 10;
+//   let y = 20;
+
+//   // Title
+//   doc.setFontSize(18);
+//   doc.setFont('helvetica', 'bold');
+//   doc.text('SALES INVOICE', pageWidth / 2, y, { align: 'center' });
+//   y += 10;
+
+//   // Taxable Person Details Section
+//   doc.setFontSize(12);
+//   doc.setFont('helvetica', 'bold');
+//   doc.setFillColor(200, 220, 255);
+//   doc.rect(marginLeft, y, pageWidth - 20, 8, 'F');
+//   doc.setTextColor(0, 0, 0);
+//   doc.text('Taxable Person details', marginLeft + 2, y + 6);
+//   y += 14;
+
+//   doc.setFont('helvetica', 'normal');
+//   // const taxableDetails = [
+//   //   ['TRN', companyInfo.TRN || ''],
+//   //   ['Taxable Person Name (English)',companyInfo.COMPANY_NAME  ||this.selected_Company_name ],
+//   //   ['Taxable Person Name (Arabic)', companyInfo.ARABIC_NAME || ''],
+//   //   ['Taxable Person Address', companyInfo.ADDRESS || ''],
+//   //   ['Tax Agency Name', data.tax_agency || ''],
+//   //   ['TAN', data.tan || ''],
+//   //   ['Tax Agent Name', data.agent_name || ''],
+//   //   ['TAAN', data.taan || '']
+//   // ];
+
+//   // taxableDetails.forEach(([label, value]) => {
+//   //   doc.text(label, marginLeft, y);
+//   //   doc.text(':', marginLeft + 70, y);
+//   //   doc.text(value, marginLeft + 75, y);
+//   //   y += 8;
+//   // });
+
+//   // VAT Return Period
+//   y += 6;
+//   doc.setFont('helvetica', 'bold');
+//   doc.text('VAT Return Period', marginLeft, y);
+//   y += 10;
+//   doc.setFont('helvetica', 'normal');
+//   const fromDate=this.formatted_from_date
+
+
+// // Convert to Date object
+// const dateObj = new Date(fromDate);
+
+
+
+//   const pdfBlob = doc.output('blob');
+//   const pdfUrl = URL.createObjectURL(pdfBlob);
+//   return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+// }
+
+get_pdf(data: any): SafeResourceUrl {
+  console.log(this.selected_Company_name, '=========================company name=============');
+  console.log(data, '=======data=======================');
+
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.width;
+  const marginLeft = 15;
+  let y = 20;
+
+  // ===== HEADER =====
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('SALES INVOICE', pageWidth / 2, y, { align: 'center' });
+  y += 10;
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Company: ${this.selected_Company_name || 'N/A'}`, marginLeft, y);
+  y += 6;
+  doc.text(`Invoice No: ${data[0].DISTRIBUTOR_ID || ''}`, marginLeft, y);
+  y += 6;
+  doc.text(`Reference No: ${data[0].REF_NO || ''}`, marginLeft, y);
+  y += 6;
+  doc.text(`Customer: ${data[0].CUST_NAME || ''}`, marginLeft, y);
+  y += 6;
+  doc.text(`Transaction Date: ${data[0].SALE_DATE || ''}`, marginLeft, y);
+  y += 10;
+
+  // ===== TABLE HEADER =====
+  const tableColumn = [
+    'Transfer No',
+    'Date',
+    'Item Description',
+    'Total Pair Qty',
+    'Price',
+    'Amount',
+    'TAX%',
+    'Tax Amount',
+    'Total'
+  ];
+
+  const tableRows: any[] = [];
+
+  // Fill the table rows dynamically
+  // Loop through Sale Details from the first invoice record
+if (data && Array.isArray(data) && data.length > 0 && data[0].SALE_DETAILS) {
+  data[0].SALE_DETAILS.forEach((item: any) => {
+    const row = [
+      item.TRANSFER_NO || '',
+      item.TRANSFER_DATE || '',
+      item.ARTICLE || '',
+      item.TOTAL_PAIR_QTY?.toString() || '',
+      item.PRICE?.toFixed(2) || '',
+      item.AMOUNT?.toFixed(2) || '',
+      item.GST?.toFixed(2) || '',
+      item.TAX_AMOUNT?.toFixed(2) || '',
+      Number(item.TOTAL_AMOUNT || 0).toFixed(2)
+    ];
+    tableRows.push(row);
+  });
+}
+
+
+  // ===== DRAW TABLE =====
+  (doc as any).autoTable({
+    head: [tableColumn],
+    body: tableRows,
+    startY: y,
+    theme: 'grid',
+    headStyles: { fillColor: [200, 220, 255], textColor: [0, 0, 0], halign: 'center' },
+    styles: { fontSize: 10, cellPadding: 2 },
+    columnStyles: {
+      0: { cellWidth: 20 }, // Transfer No
+      1: { cellWidth: 25 }, // Date
+      2: { cellWidth: 40 }, // Description
+      3: { cellWidth: 25 }, // Qty
+      4: { cellWidth: 20 }, // Price
+      5: { cellWidth: 25 }, // Amount
+      6: { cellWidth: 15 }, // TAX%
+      7: { cellWidth: 25 }, // Tax Amount
+      8: { cellWidth: 25,halign: 'right' }, // Total
+    },
+  });
+
+  const finalY = (doc as any).lastAutoTable.finalY + 10;
+
+  // ===== TOTALS =====
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Subtotal: ₹${data[0].GROSS_AMOUNT?.toFixed(2) || '0.00'}`, pageWidth - 80, finalY);
+  doc.text(`Tax Amount: ₹${data[0].TAX_AMOUNT?.toFixed(2) || '0.00'}`, pageWidth - 80, finalY + 6);
+  doc.text(`Grand Total: ₹${data[0].NET_AMOUNT?.toFixed(2) || '0.00'}`, pageWidth - 80, finalY + 12);
+
+  // ===== FOOTER =====
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'italic');
+  doc.text('Thank you for your business!', pageWidth / 2, finalY + 25, { align: 'center' });
+
+  // ===== RETURN AS URL =====
+  const pdfBlob = doc.output('blob');
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+}
+
+
+}
 @NgModule({
   imports: [
     BrowserModule,

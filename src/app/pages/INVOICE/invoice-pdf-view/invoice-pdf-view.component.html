@@ -1,0 +1,66 @@
+<dx-popup
+  [(visible)]="isViewInvoice"
+  [width]="1000"
+  [height]="700"
+  title="View Invoice"
+>
+  <div id="invoiceContent">
+    <div class="invoice-header">
+      <h2>View Invoice</h2>
+      <div class="invoice-info">
+        <div><strong>Invoice No:</strong> {{ selectedInvoice.INVOICE_NO }}</div>
+        <div><strong>Reference No:</strong> {{ selectedInvoice.REFERENCE_NO }}</div>
+        <div><strong>Customer:</strong> {{ selectedInvoice.CUSTOMER_NAME }}</div>
+        <div><strong>Transaction Date:</strong> {{ selectedInvoice.TRANSACTION_DATE }}</div>
+      </div>
+    </div>
+
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>Transfer No</th>
+          <th>Date</th>
+          <th>Item Description</th>
+          <th>Total Pair Qty</th>
+          <th>Price</th>
+          <th>Amount</th>
+          <th>Tax%</th>
+          <th>Tax Amount</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of selectedInvoice.ITEMS">
+          <td>{{ item.TRANSFER_NO }}</td>
+          <td>{{ item.DATE }}</td>
+          <td>{{ item.ITEM_DESCRIPTION }}</td>
+          <td>{{ item.TOTAL_PAIR_QTY }}</td>
+          <td>{{ item.PRICE | number:'1.2-2' }}</td>
+          <td>{{ item.AMOUNT | number:'1.2-2' }}</td>
+          <td>{{ item.TAX_PERCENT | number:'1.2-2' }}</td>
+          <td>{{ item.TAX_AMOUNT | number:'1.2-2' }}</td>
+          <td>{{ item.TOTAL | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="invoice-total">
+      <div><strong>Amount:</strong> {{ selectedInvoice.TOTAL_AMOUNT | number:'1.2-2' }}</div>
+      <div><strong>Tax:</strong> {{ selectedInvoice.TOTAL_TAX | number:'1.2-2' }}</div>
+      <div><strong>Grand Total:</strong> {{ selectedInvoice.GRAND_TOTAL | number:'1.2-2' }}</div>
+    </div>
+  </div>
+
+  <div class="pdf-button-container">
+    <dx-button
+      icon="fas fa-file-pdf"
+      text="PDF"
+      type="normal"
+      stylingMode="outlined"
+      [width]="100"
+      (onClick)="viewPdf()"
+      hint="View PDF"
+    ></dx-button>
+  </div>
+</dx-popup>
+

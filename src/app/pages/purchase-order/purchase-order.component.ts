@@ -328,7 +328,7 @@ export class PurchaseOrderComponent {
     {
       name: 'edit',
       visible: (e) =>
-        e.row.data.STATUS === 'Approved' || e.row.data.STATUS === 'Open',
+        e.row.data.STATUS !== 'Approved' || e.row.data.STATUS !== 'Open',
     },
     {
       name: 'delete',
@@ -336,6 +336,8 @@ export class PurchaseOrderComponent {
         e.row.data.STATUS !== 'Approved' && e.row.data.STATUS !== 'Verified',
     },
   ];
+
+
 
   initializePrintTemplateData() {
     this.printTemplateData = [
@@ -712,6 +714,10 @@ export class PurchaseOrderComponent {
     intParam.value = invisibleIntParamValue;
     console.log(intParam, 'intparam');
   }
+
+ viewPdf(log: any) {
+}
+
 }
 
 @NgModule({

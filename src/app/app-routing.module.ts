@@ -202,6 +202,7 @@ import { DeliveryAddressComponent } from './HR/Masters/delivery-address/delivery
 import { ChangePasswordComponent } from './components/library/PROFILEPAGE/change-password/change-password.component';
 import { SecurityPolicyComponent } from './pages/SYSTEMPAGES/security-policy/security-policy.component';
 import { BankReconciliationAddComponent } from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
+import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoice-pdf-view.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -236,6 +237,11 @@ const routes: Routes = [
       {
         path: 'change-password/:recoveryCode',
         component: ChangePasswordFormComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'invoice-pdf/:invoiceId',
+        component: InvoicePdfViewComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -844,6 +850,12 @@ const routes: Routes = [
       {
         path: 'bank-reconciliation',
         component: BankReconciliationAddComponent,
+        canActivate: [AuthGuardService],
+      },
+      
+      {
+        path: 'invoice-pdf',
+        component: InvoicePdfViewComponent,
         canActivate: [AuthGuardService],
       },
       {
