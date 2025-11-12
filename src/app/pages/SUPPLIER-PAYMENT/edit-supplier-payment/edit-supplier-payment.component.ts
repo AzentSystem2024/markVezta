@@ -109,6 +109,7 @@ export class EditSupplierPaymentComponent {
   pdcPopupVisible: boolean;
   selectedLedger: any;
   payHeadTouched: boolean;
+  voucherNo: any;
 
   constructor(
     private dataService: DataService,
@@ -124,6 +125,9 @@ export class EditSupplierPaymentComponent {
     if (changes['paymentData']) {
       console.log('Changed paymentData:', this.paymentData);
       this.paymentFormData = this.paymentData[0];
+      console.log(this.paymentFormData, 'PAYMENTFORMDATA');
+      this.voucherNo = this.paymentData[0].SUPPLIER_NO;
+      console.log(this.voucherNo, 'VOUCHERNOOOOOOOOOOOOOO');
       setTimeout(() => {
         this.itemsGridRef?.instance.refresh();
       }, 0);
@@ -137,10 +141,7 @@ export class EditSupplierPaymentComponent {
       );
       this.paymentDate = this.paymentFormData.PAY_DATE;
       console.log(this.paymentDate, 'PAYMENTDATEEEEEEEEE');
-      console.log(
-        this.paymentFormData.PAY_HEAD_ID,
-        'PAYHEADIDDDDDDDDDDDDDDDDDDD'
-      );
+      console.log(this.paymentFormData.PDC_AMOUNT, 'PDCAMOUNTTTTTTTTTTTTTTTTT');
       this.narration = this.paymentData.NARRATION;
       this.ledger = this.paymentFormData.PAY_HEAD_ID;
       this.narration = this.paymentFormData.NARRATION;
@@ -159,8 +160,8 @@ export class EditSupplierPaymentComponent {
         this.selectedSupplierId,
         'SUPPLIERIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
       );
-      // 👇 Map PAY_TYPE_ID to mode string
-      // 👇 Map PAY_TYPE_ID to mode string
+      // Map PAY_TYPE_ID to mode string
+      console.log(this.paymentFormData.PAY_TYPE_ID, 'PAYTYPEIDDDDDD');
       switch (this.paymentFormData.PAY_TYPE_ID) {
         case 1:
           this.selectedPaymentMode = 'Cash';
@@ -298,7 +299,7 @@ export class EditSupplierPaymentComponent {
   }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe({
+    this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
         console.log('API Response:', response);
         this.ledgerList = response?.Data || [];
@@ -385,7 +386,7 @@ export class EditSupplierPaymentComponent {
 
   onPdcSelected(e: any) {
     const selectedCheque = e.data;
-    console.log('Selected Cheque:', selectedCheque);
+    console.log('Selected Cheque:', selectedCheque.ID);
 
     // Example: assign selected cheque to form
     this.chequeNo = selectedCheque.CHEQUE_NO;
@@ -402,7 +403,7 @@ export class EditSupplierPaymentComponent {
     }
     this.bank = selectedCheque.BANK_NAME;
     this.paymentFormData.AMOUNT = selectedCheque.AMOUNT;
-
+    this.paymentFormData.PDC_ID = selectedCheque.ID;
     this.pdcPopupVisible = false;
   }
 
@@ -589,9 +590,13 @@ export class EditSupplierPaymentComponent {
       SUPPLIER_ID: this.selectedSupplierId,
       NET_AMOUNT: this.calculateNetAmount(validSuppDetails),
       SUPP_DETAIL: validSuppDetails,
+      PDC_ID: this.paymentFormData.PDC_ID || null,
     };
+    if (this.receiptMode === 'PDC' && this.paymentFormData.PDC_ID) {
+      payload.PDC_ID = this.paymentFormData.PDC_ID;
+    }
     if (this.receiptMode === 'PDC') {
-      const pdcAmount = Number(this.paymentFormData.AMOUNT || 0); // or PDC_AMOUNT field if you have
+      const pdcAmount = Number(this.paymentFormData.PDC_AMOUNT || 0); // or PDC_AMOUNT field if you have
       if (netAmount !== pdcAmount) {
         notify(
           `PDC amount (${pdcAmount}) must equal the total received amount (${netAmount})`,

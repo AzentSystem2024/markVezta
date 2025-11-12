@@ -53,6 +53,7 @@ import { EditCustomerReceiptModule } from '../edit-customer-receipt/edit-custome
 import { ViewCustomerReceiptModule } from '../view-customer-receipt/view-customer-receipt.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-customer-receipts',
@@ -153,25 +154,79 @@ export class CustomerReceiptsComponent {
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getCustomerReceipts();
   }
+  // getCustomerReceipts() {
+  //   this.customerReciptList = new DataSource({
+  //     load: () =>
+  //       new Promise((resolve, reject) => {
+  //         this.dataService.getCustomerReciptList().subscribe({
+  //           next: (response: any) => {
+  //             if (response?.Data && Array.isArray(response.Data)) {
+  //               // Sort data by VOUCHER_NO (descending)
+  //               const sortedData = response.Data.sort(
+  //                 (a: any, b: any) => b.VOUCHER_NO - a.VOUCHER_NO
+  //               );
+
+  //               // Format and add serial number
+  //               const formattedData = sortedData.map(
+  //                 (item: any, index: number) => {
+  //                   let dateValue: Date;
+
+  //                   if (
+  //                     typeof item.REC_DATE === 'string' &&
+  //                     item.REC_DATE.includes('-')
+  //                   ) {
+  //                     const [day, month, year] =
+  //                       item.REC_DATE.split('-').map(Number);
+  //                     dateValue = new Date(year, month - 1, day);
+  //                   } else {
+  //                     dateValue = new Date(item.REC_DATE);
+  //                   }
+
+  //                   return {
+  //                     ...item,
+  //                     sno: index + 1,
+  //                     REC_DATE: dateValue,
+  //                   };
+  //                 }
+  //               );
+
+  //               // ✅ Apply date filter *after* data is formatted
+  //               resolve(formattedData);
+
+  //               // Ensure filter runs only after the data is loaded
+  //               setTimeout(() => {
+  //                 this.applyDateFilter();
+  //               }, 0);
+  //             } else {
+  //               resolve([]);
+  //             }
+  //           },
+  //           error: (err) => {
+  //             console.error('Error loading Customer Receipt list:', err);
+  //             reject('Failed to load data');
+  //           },
+  //         });
+  //       }),
+  //   });
+  // }
 
   getCustomerReceipts() {
     this.dataService.getCustomerReciptList().subscribe((response: any) => {
       this.customerReciptList = response.Data.map((item: any) => {
         let dateValue: Date;
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.REC_DATE))) {
-          dateValue = new Date(item.REC_DATE);
+        if (typeof item.REC_DATE === 'string' && item.REC_DATE.includes('-')) {
+          const [day, month, year] = item.REC_DATE.split('-').map(Number);
+          dateValue = new Date(year, month - 1, day);
         } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.REC_DATE);
+          dateValue = new Date(item.REC_DATE);
         }
 
         return {
           ...item,
           REC_DATE: dateValue,
         };
-      });
+      }).sort((a: any, b: any) => Number(b.VOUCHER_NO) - Number(a.VOUCHER_NO));
 
       this.applyDateFilter();
     });

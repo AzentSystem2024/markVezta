@@ -97,12 +97,13 @@ export class EditCustomerReceiptComponent {
   pdcPopupVisible: boolean;
   selectedLedger: any;
   pdcList: any;
-  selectedstoreId:any;
+  selectedstoreId: any;
+  selectedCustomer: any;
 
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
-     this.sessionDetails();
+    this.sessionDetails();
     const userDataString = localStorage.getItem('userData');
 
     if (userDataString) {
@@ -122,12 +123,11 @@ export class EditCustomerReceiptComponent {
     this.getLedgerCodeDropdown();
     // this.getCompanyListDropdown();
     this.getReceiptNo();
-   
   }
 
-      sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
       '===========selected store id==================='
@@ -142,6 +142,10 @@ export class EditCustomerReceiptComponent {
         firstReceipt.REC_DATE = new Date(year, month - 1, day); // month is 0-based
       }
       this.receiprtFormData = firstReceipt; // assign for form binding
+      console.log(
+        this.receiprtFormData.VOUCHER_NO,
+        'VOUCHERNOOOOOOOOOOOOOOOOOOOOOOOO'
+      );
       this.selectedDistributorId = Number(firstReceipt.DISTRIBUTOR_ID);
       this.getCompanyListDropdown(firstReceipt.ID);
       console.log(
@@ -292,7 +296,7 @@ export class EditCustomerReceiptComponent {
   // }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe({
+    this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
         console.log('API Response:', response);
         this.ledgerList = response?.Data || [];
@@ -549,6 +553,13 @@ export class EditCustomerReceiptComponent {
     const selectedId = event.value;
     console.log(selectedId, 'SELECTEDID');
     if (selectedId) {
+      this.selectedCustomer = this.distributorList.find(
+        (s: any) => s.ID === selectedId
+      );
+      this.receiprtFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
+      console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+    }
+    if (selectedId) {
       this.getInvoiceList();
     }
   }
@@ -802,7 +813,6 @@ export class EditCustomerReceiptComponent {
       ...this.receiprtFormData,
       DISTRIBUTOR_ID: this.selectedDistributorId, // or whatever your selected supplier ID is
       REC_DETAIL: validDetails,
-      
     };
 
     console.log('Sending payload:', payload); // For debugging
