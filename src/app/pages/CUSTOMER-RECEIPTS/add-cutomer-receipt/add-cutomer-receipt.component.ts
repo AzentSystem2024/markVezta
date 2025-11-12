@@ -115,7 +115,7 @@ export class AddCutomerReceiptComponent {
   selectedCustomerId: any;
   pdcList: any;
   pdcPopupVisible: boolean;
-  selectedstoreId:any
+  selectedstoreId: any;
 
   constructor(private dataService: DataService) {}
 
@@ -137,9 +137,9 @@ export class AddCutomerReceiptComponent {
     this.getPdcofSelectedSupplier();
   }
 
-    sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
       '===========selected store id==================='
@@ -239,7 +239,7 @@ export class AddCutomerReceiptComponent {
   }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe({
+    this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
         console.log('API Response:', response); // <== LOG FULL RESPONSE
         this.ledgerList = response?.Data || []; // Fallback to empty array
@@ -569,7 +569,7 @@ export class AddCutomerReceiptComponent {
       DISTRIBUTOR_ID: this.selectedDistributorId, // or whatever your selected supplier ID is
       REC_DETAIL: validDetails,
       BANK_NAME: this.receiprtFormData.BANK_NAME,
-      STORE_ID : this.selectedstoreId
+      STORE_ID: this.selectedstoreId,
     };
 
     console.log('Sending payload:', payload); // For debugging

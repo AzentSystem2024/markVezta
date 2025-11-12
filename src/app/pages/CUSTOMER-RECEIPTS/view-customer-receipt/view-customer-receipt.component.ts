@@ -281,7 +281,7 @@ export class ViewCustomerReceiptComponent {
   // }
 
   getLedgerCodeDropdown() {
-    this.dataService.getAccountHeadList().subscribe({
+    this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
         console.log('API Response:', response);
         this.ledgerList = response?.Data || [];
