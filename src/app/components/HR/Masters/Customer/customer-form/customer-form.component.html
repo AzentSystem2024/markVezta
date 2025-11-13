@@ -204,6 +204,12 @@
                 message="Mobile number is required"
               >
               </dxi-validation-rule>
+              <dxi-validation-rule
+      type="stringLength"
+      [min]="10"
+      [max]="10"
+      message="Mobile number must be exactly 10 digits"
+    ></dxi-validation-rule>
             </dx-validator>
           </dx-text-box>
         </div>
@@ -240,6 +246,12 @@
                 message="Phone number is required"
               >
               </dxi-validation-rule>
+               <dxi-validation-rule
+      type="stringLength"
+      [min]="10"
+      [max]="10"
+      message="Mobile number must be exactly 10 digits"
+    ></dxi-validation-rule>
             </dx-validator>
           </dx-text-box>
         </div>
@@ -702,6 +714,14 @@
          [(value)]="MobileValue"
         stylingMode="outlined"
       ></dx-text-box>
+       <dx-validator>
+        <dxi-validation-rule
+      type="stringLength"
+      [min]="10"
+      [max]="10"
+      message="Mobile number must be exactly 10 digits"
+    ></dxi-validation-rule>
+       </dx-validator>
     </dxi-item>
 
     <dxi-item>
@@ -719,7 +739,16 @@
         labelMode="floating"
         [(value)]="phoneValue"
         stylingMode="outlined"
-      ></dx-text-box>
+      >
+     <dx-validator>
+        <dxi-validation-rule
+      type="stringLength"
+      [min]="10"
+      [max]="10"
+      message="Mobile number must be exactly 10 digits"
+    ></dxi-validation-rule>
+       </dx-validator>
+      </dx-text-box>
     </dxi-item>
   </dx-form>
   <dxi-item>

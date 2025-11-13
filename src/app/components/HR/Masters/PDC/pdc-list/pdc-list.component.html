@@ -30,6 +30,7 @@
       focusStateEnabled="false"
       [groupPanel]="{ visible: true }"
       [grouping]="{ autoExpandAll: false }"
+       (onExporting)="onExporting($event)"
       (onEditingStart)="onEditPDC($event)"
       (onRowRemoving)="DeletePDC($event)"
     >
@@ -38,6 +39,13 @@
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
+
+       <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="false"
+      [formats]="['xlsx']"
+    >
+    </dxo-export>
 
       <dxo-paging [pageSize]="20"></dxo-paging>
       <dxo-pager
@@ -124,6 +132,12 @@
         </dx-select-box>
         </dxi-item>
 
+         <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="custom-export-button"
+      ></dxi-item>
+
         <dxi-item
           location="after"
           *ngIf="canAdd"
@@ -166,8 +180,8 @@
 
     <dx-popup
       [(visible)]="addPDCPopupOpened"
-      [width]="'50vw'"
-      [height]="'70vh'"
+      [width]="'60vw'"
+      [height]="'80vh'"
       title="Add PDC"
       (onHiding)="handleClose()"
     >

@@ -108,6 +108,12 @@ isEditReadOnly: boolean = false;
     elementAttr: { class: 'add-button' }
   };
 
+   //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'PDC';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
+
  onStatusChanged() {
   // this.applyChequeFilters();  // Call your centralized filtering logic
 this.applyAllFilters();

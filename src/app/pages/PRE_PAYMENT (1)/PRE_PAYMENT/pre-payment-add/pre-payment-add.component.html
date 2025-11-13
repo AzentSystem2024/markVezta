@@ -65,7 +65,7 @@
             : ' GST %'
         "
         labelMode="floating"
-        width="220px"
+       
         [(value)]="PrePaymentFormData.TAX_PERCENT"
         (onValueChanged)="updateGSTAmount()"
       ></dx-number-box>
@@ -76,13 +76,13 @@
             : ' GST Amount'
         "
         labelMode="floating"
-        width="220px"
+       
         [(value)]="PrePaymentFormData.TAX_AMOUNT"
       ></dx-number-box>
       <dx-number-box
         label="Net Amount"
         labelMode="floating"
-        width="150"
+       
         [(value)]="PrePaymentFormData.NET_AMOUNT"
       ></dx-number-box>
     </div>
@@ -150,14 +150,14 @@
       <dx-number-box
         label="No.Month"
         labelMode="floating"
-        width="160px"
+       
         [(value)]="PrePaymentFormData.NO_OF_MONTHS"
         (onValueChanged)="updatePeriodTo()"
       ></dx-number-box>
       <dx-number-box
         label="No.Days"
         labelMode="floating"
-        width="160px"
+        
         [(value)]="PrePaymentFormData.NO_OF_DAYS"
         (onValueChanged)="updatePeriodTo()"
       ></dx-number-box>
@@ -165,7 +165,7 @@
         label="Period To"
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
-        width="150px"
+       
         [(value)]="PrePaymentFormData.DATE_TO"
         [readOnly]="true"
       ></dx-date-box>

@@ -31,6 +31,7 @@
       (onContentReady)="onGridContentReady($event)"
       (onRowRemoved)="onRowRemoved($event)"
       (onRowValidating)="onRowValidating($event)"
+      (onExporting)="onExporting($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -41,6 +42,12 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
+      <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="false"
+      [formats]="['xlsx']"
+    >
+    </dxo-export>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <!-- <dxo-filter-row
@@ -64,6 +71,13 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+          <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="custom-export-button"
+      ></dxi-item>
+      
         <dxi-item
           location="after"
           locateInMenu="auto"

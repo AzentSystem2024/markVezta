@@ -109,6 +109,12 @@ export class DebitComponent {
   sessionData: any;
   selected_vat_id: any;
 
+   //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'Debit_Note';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',

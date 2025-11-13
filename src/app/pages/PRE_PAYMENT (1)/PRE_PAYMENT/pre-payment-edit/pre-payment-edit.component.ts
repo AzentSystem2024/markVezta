@@ -423,15 +423,15 @@ console.log(data,"dataaaaaaaaaaaaaaaaaaaaaaaaaa")
 //     return;
 //   }
 
-if (this.fieldChanged && !this.scheduleGenerated) {
-    notify({
-      message: 'Please click "Generate Schedule" before saving since Date/Months/Days were modified.',
-      type: 'warning',
-      position: { at: 'top right', my: 'top right' },
-      displayTime: 2000,
-    });
-    return;
-  }
+// if (this.fieldChanged && !this.scheduleGenerated) {
+//     notify({
+//       message: 'Please click "Generate Schedule" before saving since Date/Months/Days were modified.',
+//       type: 'warning',
+//       position: { at: 'top right', my: 'top right' },
+//       displayTime: 2000,
+//     });
+//     return;
+//   }
 
 
      

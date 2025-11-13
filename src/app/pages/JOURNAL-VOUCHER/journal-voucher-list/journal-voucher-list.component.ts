@@ -101,6 +101,12 @@ export class JournalVoucherListComponent {
     elementAttr: { class: 'add-button' },
   };
 
+   //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'Journal_Voucher';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
