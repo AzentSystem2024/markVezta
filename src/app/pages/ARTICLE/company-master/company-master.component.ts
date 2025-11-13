@@ -20,8 +20,8 @@ import {
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
-import notify from 'devextreme/ui/notify';
-import { FormPopupModule } from 'src/app/components';
+import notify from 'devextreme/ui/notify'; 
+import { FormPopupModule } from 'src/app/components'; 
 import { DataService } from 'src/app/services';
 
 @Component({
@@ -220,7 +220,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
 
   addData() {
 
-    
+     this.addPopup = false;
     const validationResult = this.formValidationGroup.instance.validate();
   if (!validationResult.isValid) {
     console.log('Validation failed');
