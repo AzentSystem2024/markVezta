@@ -189,7 +189,13 @@
    
   "
 >
-   
+   <dx-text-box
+        [width]="200"
+        label="Closing Balance"
+        labelMode="floating"
+        [(value)]="closingBalance"
+        [readOnly]="true"
+      ></dx-text-box>
 
   <dx-number-box
     label="Total Debit"
@@ -211,13 +217,7 @@
   </div>
   
 
- <dx-text-box
-        [width]="200"
-        label="Closing Balance"
-        labelMode="floating"
-        [(value)]="closingBalance"
-        [readOnly]="true"
-      ></dx-text-box>
+ 
 
       
 </div>

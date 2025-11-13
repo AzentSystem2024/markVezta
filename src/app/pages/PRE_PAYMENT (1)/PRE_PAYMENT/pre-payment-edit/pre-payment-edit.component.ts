@@ -185,8 +185,11 @@ convertToISO(dateStr: any): string {
        if (!this.PrePaymentFormData.DATE_FROM || !this.PrePaymentFormData.DATE_TO || !this.PrePaymentFormData.EXPENSE_AMOUNT ) return;
      
        const startDate = new Date(this.PrePaymentFormData.DATE_FROM!);
-       const endDateFinal = new Date(this.PrePaymentFormData.DATE_TO!);
+       let endDateFinal = new Date(this.PrePaymentFormData.DATE_TO!);
      
+       if (endDateFinal.getDate() === 1) {
+    endDateFinal = new Date(endDateFinal.getFullYear(), endDateFinal.getMonth(), 0);
+  }
        const totalDays = this.daysBetween(startDate, endDateFinal);
        const perDayAmount = this.PrePaymentFormData.EXPENSE_AMOUNT  / totalDays;
      

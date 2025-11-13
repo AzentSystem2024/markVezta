@@ -134,9 +134,13 @@ generateSchedule() {
   if (!this.PrePaymentFormData.DATE_FROM || !this.PrePaymentFormData.DATE_TO || !this.PrePaymentFormData.EXPENSE_AMOUNT ) return;
 
   const startDate = new Date(this.PrePaymentFormData.DATE_FROM!);
-  const endDateFinal = new Date(this.PrePaymentFormData.DATE_TO!);
+  let endDateFinal = new Date(this.PrePaymentFormData.DATE_TO!);
   console.log(startDate,'start date=========')
   console.log(endDateFinal,'end date=========')
+
+   if (endDateFinal.getDate() === 1) {
+    endDateFinal = new Date(endDateFinal.getFullYear(), endDateFinal.getMonth(), 0);
+  }
 
   const totalDays = this.daysBetween(startDate, endDateFinal);
   console.log(totalDays,'total days=========')
