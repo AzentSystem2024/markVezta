@@ -135,8 +135,11 @@ generateSchedule() {
 
   const startDate = new Date(this.PrePaymentFormData.DATE_FROM!);
   const endDateFinal = new Date(this.PrePaymentFormData.DATE_TO!);
+  console.log(startDate,'start date=========')
+  console.log(endDateFinal,'end date=========')
 
   const totalDays = this.daysBetween(startDate, endDateFinal);
+  console.log(totalDays,'total days=========')
   const perDayAmount = this.PrePaymentFormData.EXPENSE_AMOUNT  / totalDays;
 
   let schedule: any[] = [];
