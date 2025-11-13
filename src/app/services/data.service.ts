@@ -5806,7 +5806,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   Insert_BankReconciliation(payload) {
-    const getEndpoint = `${this.apiUrl}`;
+    const getEndpoint = `${this.apiUrl}BankReconciliation/save`;
     return this.http.post(getEndpoint, payload);
   }
 }
