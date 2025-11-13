@@ -82,7 +82,7 @@ export class EditPurchaseInvoiceComponent {
   @Input() readOnly: boolean = false;
   purchaseNo: any;
   selectedSupplierId: any;
-   sessionData: any;
+  sessionData: any;
   selected_vat_id: any;
 
   constructor(private dataService: DataService) {}
@@ -94,10 +94,10 @@ export class EditPurchaseInvoiceComponent {
     this.sessionData_tax();
   }
 
-      sessionData_tax(){
-        this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(this.sessionData,'=================session data==========')
-this.selected_vat_id=this.sessionData.VAT_ID
+  sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -112,10 +112,10 @@ this.selected_vat_id=this.sessionData.VAT_ID
       this.purchaseInvoiceFormData.SUPP_ID = Number(
         this.invoiceFormData.SUPP_ID
       );
-this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
-if (this.selectedSupplierId) {
-      this.getPendingGRNList();
-    }
+      this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
+      if (this.selectedSupplierId) {
+        this.getPendingGRNList();
+      }
       console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
     }
   }
@@ -132,8 +132,8 @@ if (this.selectedSupplierId) {
 
   getPendingGRNList() {
     const payload = {
-      SUPP_ID: this.selectedSupplierId
-    }
+      SUPP_ID: this.selectedSupplierId,
+    };
     this.dataService.getPendingGRN(payload).subscribe((response: any) => {
       this.pendingGRNs = response.Data;
       console.log(this.pendingGRNs, 'PENDINGGRNSSSSSSSSSSSSSSSSSSSSSSSSS');
@@ -163,6 +163,47 @@ if (this.selectedSupplierId) {
   };
 
   onEditorPreparing(e: any) {
+    if (e.dataField === 'QUANTITY' || e.dataField === 'VAT_PERC') {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+          `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+            height: 100%;
+            padding: 0 4px;
+            box-sizing: border-box;
+          `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     if (e.parentType === 'dataRow') {
       if (e.dataField === 'QUANTITY' || e.dataField === 'VAT_PERC') {
         e.editorOptions.readOnly = false;
@@ -389,8 +430,8 @@ if (this.selectedSupplierId) {
     });
   }
 
-    cancel(){
-     this.popupClosed?.emit();
+  cancel() {
+    this.popupClosed?.emit();
   }
 }
 
