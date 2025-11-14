@@ -95,6 +95,7 @@ export class GrnComponent implements OnInit {
   grnVerifyForm: GrnVerifyFormComponent;
   @ViewChild(GrnApproveFormComponent, { static: false })
   grnApproveForm: GrnApproveFormComponent;
+  selectedGrnId: any;
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = (cellInfo.data.STATUS || '').trim();
@@ -331,6 +332,7 @@ export class GrnComponent implements OnInit {
     event.cancel = true;
     this.grnId = event.data.ID;
     const Id = event.data.ID;
+    this.selectedGrnId = Id;
     console.log(Id, 'id');
     this.isVerifyPopupOpened = true;
     this.service.selectGrnData(Id).subscribe((res) => {

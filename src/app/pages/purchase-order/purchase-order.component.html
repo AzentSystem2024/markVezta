@@ -360,6 +360,7 @@
   >
     <app-purchase-order-view-form
       [formdata]="selectedRowData"
+      [poId]="selectedPoId"
       (closeForm)="CloseEditForm()"
       (netViewSupplierAmountChange)="netViewSupplierAmount = $event"
       (netViewAmountChange)="netViewAmount = $event"

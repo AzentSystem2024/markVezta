@@ -382,9 +382,8 @@
           <div *dxTemplate>
             <dx-select-box
               label="Country"
-              [items]="CountryDropdownData"
-              
-              displayExpr="DESCRIPTION"
+              [items]="CountryDropdownData" 
+              displayExpr="COUNTRY_NAME"
               valueExpr="ID"
               [(value)]="supplierData.COUNTRY_ID"
               placeholder="Select Country"

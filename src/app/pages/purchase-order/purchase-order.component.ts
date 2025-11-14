@@ -167,6 +167,7 @@ export class PurchaseOrderComponent {
   canView: any;
   canApprove: any;
   isFilterOpened: boolean;
+  selectedPoId: any;
 
   constructor(
     private service: DataService,
@@ -395,6 +396,7 @@ export class PurchaseOrderComponent {
     event.cancel = true;
     this.poId = event.data.ID;
     const Id = event.data.ID;
+     this.selectedPoId = Id;   
     const status = event.data.STATUS;
     console.log(Id, 'id');
     // this.isEditPopupOpened = true;

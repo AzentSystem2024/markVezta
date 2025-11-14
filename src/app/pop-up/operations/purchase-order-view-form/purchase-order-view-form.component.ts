@@ -8,7 +8,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -30,6 +30,8 @@ import {
 import { FormTextboxModule } from 'src/app/components';
 import { PurchaseOrderVerifyFormComponent } from '../purchase-order-verify-form/purchase-order-verify-form.component';
 import { DataService } from 'src/app/services';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-purchase-order-view-form',
@@ -45,7 +47,8 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   @Input() formdata: any;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-  constructor(private service: DataService) {
+  @Input() poId!: number;
+  constructor(private service: DataService, private sanitizer: DomSanitizer) {
     const settingsData = sessionStorage.getItem('settings');
     this.settingsData = settingsData ? JSON.parse(settingsData) : null;
     // Access CURRENCY_ID
@@ -105,6 +108,10 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   selectedRowKeys: any[] = []; // Keys of items to be preselected
   supplierMail: any;
   fileData: string = '';
+
+  pdfSrc: SafeResourceUrl | null = null;
+    isPdfPopupVisible: boolean = false;
+
   fileDetails: any = {
     DOC_ID: '',
     DOC_TYPE: 1,
@@ -715,6 +722,272 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     }
     return '';
   }
+
+   viewPdf(): void {
+  console.log(this.poId, "ID received in viewPdf()");
+
+  this.isPdfPopupVisible = true;
+
+  this.service.selectPoData(this.poId).subscribe(res => {
+    console.log(res, "Selected response");
+
+    if (res) {
+      this.pdfSrc = this.get_pdf(res);
+    }
+  });
+}
+
+
+
+get_pdf(data: any): SafeResourceUrl {
+
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.width;
+
+  const label = (text: string) => doc.setFont("helvetica", "bold").setFontSize(9).text(text, 15, y);
+  const value = (text: string) => doc.setFont("helvetica", "normal").setFontSize(9).text(text, 60, y);
+
+  // START POSITION
+  let y = 15;
+
+  // -------------------- TITLE --------------------
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Purchase Order", pageWidth / 2, y, { align: 'center' });
+
+  y += 10;
+
+  // ====================================================
+  //  PO HEADER (Top Row)
+  // ====================================================
+  autoTable(doc, {
+    startY: y,
+    theme: "grid",
+    headStyles: { fillColor: [240, 240, 240] },
+    styles: { fontSize: 9, cellPadding: 2 },
+    margin: { left: 15, right: 15 },
+    body: [
+      ["PO No", data.PO_NO || ""],
+      ["Date", data.PO_DATE || ""],
+      ["Reference No", data.REF_NO || ""],
+      ["Supplier", data.Supplier || ""],
+      ["Store", data.Store || ""],
+    ]
+  });
+
+  y = (doc as any).lastAutoTable.finalY + 8;
+
+  // ====================================================
+  //  SUPPLIER DETAILS
+  // ====================================================
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text("Supplier Details", 15, y);
+
+  y += 5;
+
+  autoTable(doc, {
+    startY: y,
+    theme: "grid",
+    headStyles: { fillColor: [245, 245, 245] },
+    styles: { fontSize: 9, cellPadding: 2 },
+    margin: { left: 15, right: 15 },
+    body: [
+      ["Currency", data.Currency || ""],
+      ["Exchange Rate", data.EXCHANGE_RATE   || ""],
+      ["VAT Rule", data.VATRule || ""],
+      ["Address", data.SUPP_ADDRESS || ""],
+      ["Contact Person", data.ContactPerson || ""],
+      ["Email", data.Email || ""],
+      ["Contact No", data.ContactNo || ""],
+    ]
+  });
+
+  y = (doc as any).lastAutoTable.finalY + 10;
+
+  // ====================================================
+  //  SHIPPING DETAILS
+  // ====================================================
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("Shipping Details", 15, y);
+
+  y += 5;
+
+  autoTable(doc, {
+    startY: y,
+    theme: "grid",
+    headStyles: { fillColor: [245, 245, 245] },
+    styles: { fontSize: 9, cellPadding: 2 },
+    margin: { left: 15, right: 15 },
+    body: [
+      ["Shipping Address", data.SHIP_TO || ""],
+      ["Purpose", data.PURPOSE || ""],
+      ["Contact Name", data.CONTACT_NAME || ""],
+      ["Mobile", data.CONTACT_MOBILE || ""],
+    ]
+  });
+
+  y = (doc as any).lastAutoTable.finalY + 10;
+
+  // ====================================================
+  //  TERMS & CONDITIONS
+  // ====================================================
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("Terms & Conditions", 15, y);
+
+  y += 5;
+
+  autoTable(doc, {
+    startY: y,
+    theme: "grid",
+    headStyles: { fillColor: [245, 245, 245] },
+    styles: { fontSize: 9, cellPadding: 2 },
+    margin: { left: 15, right: 15 },
+    body: [
+      ["Shipment Method", data.DELIVERY_TERM || ""],
+      ["Payment", data.PAY_TERM || ""],
+      ["Delivery Date", data.DELIVERY_DATE || ""],
+      ["Reference", data.DELIVERY_DESC || ""],
+      ["Notes", data.NOTES || ""],
+      ["Narration", data.NARRATION || ""],
+      ["Issued By", data.ISSUED_EMP_ID || ""]
+    ]
+  });
+
+
+  // ====================================================
+//  DETAIL TAB – ITEMS TABLE
+// ====================================================
+y = (doc as any).lastAutoTable.finalY + 10;
+
+// Table Title
+doc.setFontSize(11);
+doc.setFont("helvetica", "bold");
+doc.text("Items", 15, y);
+
+y += 5;
+
+// Prepare table data
+const itemRows = data.PoDetails?.map((item: any, index: number) => [
+  index + 1,
+  item.ITEM_CODE || "",
+  item.ITEM_DESC || "",
+  item.UOM || "",
+  item.PACKING || "",
+  (item.PRICE || 0).toLocaleString(),
+  item.QUANTITY || 0,
+  item.DISC_PERCENT || 0,
+  (item.Taxable || 0).toLocaleString(),
+  (item.TOTAL_AMOUNT || 0).toLocaleString()
+]) || [];
+
+// ITEMS TABLE
+autoTable(doc, {
+  startY: y,
+  theme: "striped",
+  headStyles: { fillColor: [220, 230, 255] },   // light blue header
+  styles: { fontSize: 9, cellPadding: 2 },
+  margin: { left: 15, right: 15 },
+  head: [[
+    "Sl No", "Item Code", "Description", "UOM", "Packing",
+    "Price (AED)", "Qty", "Disc%", "Taxable", "Total"
+  ]],
+  body: itemRows
+});
+
+y = (doc as any).lastAutoTable.finalY + 5;
+
+// =======================
+// TABLE FOOTER TOTALS
+// =======================
+
+const totalQty = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.Qty || 0), 0) || 0;
+const totalTaxable = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.GROSS_AMOUNT || 0), 0) || 0;
+const grandTotal = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.Total || 0), 0) || 0;
+
+autoTable(doc, {
+  startY: y,
+  theme: "plain",
+  styles: { fontSize: 10, fontStyle: "bold" },
+  margin: { left: 15, right: 15 },
+  body: [
+    ["Total Qty", totalQty],
+    ["Total Taxable", totalTaxable.toLocaleString()],
+    ["Grand Total", grandTotal.toLocaleString()]
+  ]
+});
+
+
+// ====================================================
+//  ATTACHMENTS TAB
+// ====================================================
+y = (doc as any).lastAutoTable.finalY + 15;
+
+// Section Title
+doc.setFontSize(11);
+doc.setFont("helvetica", "bold");
+doc.text("Attachments", 15, y);
+
+y += 8;
+
+// Convert attachments to table rows
+const attachmentRows = data.Attachments?.map((att: any) => [
+  att.FileName || "",
+  att.Remarks || ""
+]) || [];
+
+// ATTACHMENTS TABLE
+autoTable(doc, {
+  startY: y,
+  theme: "striped",
+  headStyles: { fillColor: [220, 230, 255] },
+  styles: { fontSize: 10, cellPadding: 3 },
+  margin: { left: 15, right: 15 },
+  head: [["File Name", "Remarks"]],
+  body: attachmentRows,
+});
+
+
+// ====================================================
+//  HISTORY TAB
+// ====================================================
+y = (doc as any).lastAutoTable.finalY + 15;
+
+// Section Title
+doc.setFontSize(11);
+doc.setFont("helvetica", "bold");
+doc.text("History", 15, y);
+
+y += 8;
+
+// Convert attachments to table rows
+const historyRows = data.History?.map((att: any) => [
+  att.SlNo || "",
+  att.DateTime || "",
+  att.Description || "",
+  att.User || ""
+]) || [];
+
+// ATTACHMENTS TABLE
+autoTable(doc, {
+  startY: y,
+  theme: "striped",
+  headStyles: { fillColor: [220, 230, 255] },
+  styles: { fontSize: 10, cellPadding: 3 },
+  margin: { left: 15, right: 15 },
+  head: [["SlNo", "DateTime", "Description", "User"]],
+  body: historyRows,
+});
+
+  // -------------------- EXPORT --------------------
+  const pdfBlob = doc.output('blob');
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+}
+
+
 }
 @NgModule({
   imports: [

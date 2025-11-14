@@ -116,10 +116,7 @@ export class SupplierEditComponent {
     dataservice.getDropdownData('VATRULE').subscribe((data) => {
       this.vatrule = data;
     });
-    dataservice.getCountryWithFlags().subscribe((data) => {
-      this.CountryDropdownData = data;
-      console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
-    });
+    
     this.stateLabel = authservice.getsettingsData().STATE_LABEL;
     this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
      this.get_Country_Dropdown_List();
@@ -167,6 +164,7 @@ export class SupplierEditComponent {
     this.listCountry();
     this.listState();
     this.getPaymentTerms();
+  
   }
 
   loadDropdownData(): void {

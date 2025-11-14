@@ -5,7 +5,7 @@ import {
   NgModule,
   SimpleChanges,
 } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -25,6 +25,7 @@ import {
   DxDropDownBoxModule,
 } from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
+import jsPDF from 'jspdf';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 
@@ -35,6 +36,7 @@ import { DataService } from 'src/app/services';
 })
 export class GrnViewFormComponent {
   @Input() formdata: any;
+   @Input() grnId!: number;
 
   financialYeaDate: string;
   selected_vat_id: any;
@@ -66,6 +68,9 @@ export class GrnViewFormComponent {
   landedCostDropDown: any;
   landedCostList: any;
   width: any;
+  pdfSrc: SafeResourceUrl | null = null;
+      isPdfPopupVisible: boolean = false;
+      
   costData: any = {
     ID: '',
     DESCRIPTION: '',
@@ -156,7 +161,7 @@ export class GrnViewFormComponent {
   newGrnData = this.grnData;
   getNewGrnData = () => ({ ...this.newGrnData });
 
-  constructor(private service: DataService, private ref: ChangeDetectorRef) {
+  constructor(private service: DataService, private ref: ChangeDetectorRef,private sanitizer: DomSanitizer) {
     this.today = new Date();
     const settingsData = sessionStorage.getItem('settings');
     const data = settingsData ? JSON.parse(settingsData) : null;
@@ -827,6 +832,36 @@ export class GrnViewFormComponent {
     this.costData = [];
     this.isCostPopUpOpened = false;
   }
+
+   viewPdf(): void {
+  console.log(this.grnId, "ID received in viewPdf()");
+
+  this.isPdfPopupVisible = true;
+
+  this.service.selectGrnData(this.grnId).subscribe(res => {
+    console.log(res, "Selected response");
+
+    if (res) {
+      this.pdfSrc = this.get_pdf(res);
+    }
+  });
+}
+
+get_pdf(data: any): SafeResourceUrl {
+ const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.width;
+
+   const label = (text: string) => doc.setFont("helvetica", "bold").setFontSize(9).text(text, 15, y);
+  const value = (text: string) => doc.setFont("helvetica", "normal").setFontSize(9).text(text, 60, y);
+
+  // START POSITION
+  let y = 15;
+
+  // -------------------- EXPORT --------------------
+  const pdfBlob = doc.output('blob');
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+}
 }
 
 @NgModule({

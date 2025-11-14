@@ -85,6 +85,8 @@ export class PackingEditComponent {
   combinationString: string
  combination_value: any[]=[]
 PackingEntriesData:any;
+
+
  
   constructor(private dataService: DataService) {
     this.getDropdownLists();
@@ -152,8 +154,15 @@ PackingEntriesData:any;
         this.PackingData.UNIT_ID
       ) {
         this.articleSizeData = this.PackingData.COMBINATION.split(',').map((item) => {
-  const [size, qty,Article_ID] = item.split('x').map(Number);
-  return { Size: size, Qty: qty, ArticleID: Article_ID};
+  const [size, qty] = item.split('x').map(Number);
+  const articleEntry = this.PackingData.PackingEntries.find(
+      (entry) => entry.SIZE == size
+    );
+ return {
+      Size: size,
+      Qty: qty,
+      ArticleID: articleEntry ? articleEntry.ARTICLE_ID : null,
+    };
 });
       }
       console.log(this.articleSizeData)
@@ -167,6 +176,7 @@ PackingEntriesData:any;
     }
     console.log(this.PackingData, 'MAINGROUPID');
     this.PackingEntriesData= this.PackingData.PackingEntries
+    console.log(this.PackingEntriesData,'========packing entries data=========');
   }
 
   UpdateData() {
