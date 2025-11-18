@@ -26,6 +26,7 @@ import {
 } from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 
@@ -36,7 +37,7 @@ import { DataService } from 'src/app/services';
 })
 export class GrnViewFormComponent {
   @Input() formdata: any;
-   @Input() grnId!: number;
+   @Input() grnId: any; 
 
   financialYeaDate: string;
   selected_vat_id: any;
@@ -574,6 +575,9 @@ export class GrnViewFormComponent {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    if (changes['grnId'] && changes['grnId'].currentValue) {
+    console.log("Received GRN ID:", this.grnId);
+  }
     if (changes.formdata && changes.formdata.currentValue) {
       console.log(this.formdata, 'formdata');
 
@@ -838,7 +842,7 @@ export class GrnViewFormComponent {
 
   this.isPdfPopupVisible = true;
 
-  this.service.selectGrnData(this.grnId).subscribe(res => {
+ this.service.selectGrnData(this.grnId).subscribe((res) => {
     console.log(res, "Selected response");
 
     if (res) {
@@ -850,12 +854,101 @@ export class GrnViewFormComponent {
 get_pdf(data: any): SafeResourceUrl {
  const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.width;
+  const marginLeft = 15;
 
    const label = (text: string) => doc.setFont("helvetica", "bold").setFontSize(9).text(text, 15, y);
   const value = (text: string) => doc.setFont("helvetica", "normal").setFontSize(9).text(text, 60, y);
 
+  
   // START POSITION
   let y = 15;
+  // ---------------- HEADER BOX ----------------
+ doc.setFont("helvetica", "bold").setFontSize(14);
+doc.text("GOODS RECEIPT NOTE", pageWidth / 2, y, { align: "center" });
+
+y += 12; // spacing after title
+
+
+
+   // ----------- FIRST ROW (GRN, DATE, STORE) -------------
+ // X positions
+const leftLabelX = 15;
+const leftValueX = 50;
+const rightLabelX = 120;
+const rightValueX = 160;
+
+// GRN NO + DATE  (same row)
+doc.setFont("helvetica", "bold").setFontSize(9).text("GRN NO:", leftLabelX, y);
+doc.setFont("helvetica", "normal").text(String(data.ID || ""), leftValueX, y);
+
+doc.setFont("helvetica", "bold").text("Date:", rightLabelX, y);
+doc.setFont("helvetica", "normal").text(String(data.GRN_DATE || ""), rightValueX, y);
+
+y += 7;
+
+// SUPPLIER + STORE (same row)
+doc.setFont("helvetica", "bold").text("Supplier:", leftLabelX, y);
+doc.setFont("helvetica", "normal").text(String(data.SUPPPLIER_NAME || ""), leftValueX, y);
+
+doc.setFont("helvetica", "bold").text("Store:", rightLabelX, y);
+doc.setFont("helvetica", "normal").text(String(data.STORE_NAME || ""), rightValueX, y);
+
+y += 7;
+
+// PURCHASE ORDER (single left item)
+doc.setFont("helvetica", "bold").text("Purchase Order:", leftLabelX, y);
+doc.setFont("helvetica", "normal").text(String(data.PO_NO || ""), leftValueX, y);
+
+y += 10;
+
+  // --------------------- TABLE -------------------------
+  const tableData = data.GRNDetails?.map((it: any, index: number) => [
+    index + 1,
+    it.ITEM_CODE || "",
+    it.ITEM_NAME || "",
+    it.PRICE?.toLocaleString() || "",
+    it.PO_QUANTITY || "",
+    it.UOM || "",
+    it.QUANTITY || "",
+    it.RECEIVED_QTY || "",
+    it.AMOUNT?.toLocaleString() || "",
+    it.SUPP_PRICE?.toLocaleString() || ""
+  ]) || [];
+
+  autoTable(doc, {
+    startY: y,
+    head: [[
+      "SL NO", "ITEM CODE", "DESCRIPTION", "PRICE", "QTY IN PO", "PURCH UOM",
+      "RECEIVED TO DATE", "QTY RECEIVED", "AMOUNT", "UNIT COST"
+    ]],
+    body: tableData,
+    styles: { fontSize: 9, halign: "center" },
+    headStyles: {
+      fillColor: [195, 225, 255],  // Light blue like your UI
+      textColor: 20,
+      fontSize: 9,
+      halign: "center"
+    },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+  });
+  y = (doc as any).lastAutoTable.finalY + 10;
+
+
+  // ---------------------- NARRATION -------------------------
+  doc.setFont("helvetica", "bold").text("Narration:", marginLeft, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(data.NARRATION || "", marginLeft + 30, y, { maxWidth: 150 });
+
+  y += 10;
+
+  // ---------------------- TOTALS ----------------------------
+  const totalQty = data.GRNDetails?.reduce((sum: any, it: any) => sum + (it.QUANTITY || 0), 0) || 0;
+
+  doc.setFont("helvetica", "bold").text("Total Quantity:", marginLeft, y);
+  doc.setFont("helvetica", "normal").text(String(totalQty), marginLeft + 40, y);
+
+  doc.setFont("helvetica", "bold").text("Net Amount:", 140, y);
+  doc.setFont("helvetica", "normal").text(String(data.NET_AMOUNT || 0), 170, y);
 
   // -------------------- EXPORT --------------------
   const pdfBlob = doc.output('blob');

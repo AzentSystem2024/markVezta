@@ -332,12 +332,13 @@ export class GrnComponent implements OnInit {
     event.cancel = true;
     this.grnId = event.data.ID;
     const Id = event.data.ID;
-    this.selectedGrnId = Id;
+    
     console.log(Id, 'id');
     this.isVerifyPopupOpened = true;
     this.service.selectGrnData(Id).subscribe((res) => {
       this.selectedRowData = res;
       this.cdr.detectChanges();
+      this.selectedGrnId = Id;
       console.log(this.selectedRowData, 'select row data');
     });
   }
@@ -370,6 +371,7 @@ export class GrnComponent implements OnInit {
     console.log(e);
     e.cancel = true;
     const id = e.row.data.ID;
+     this.selectedGrnId = id;
     this.isViewPopupOpened = true;
     this.change.detectChanges();
     this.service.selectGrnData(id).subscribe((res) => {

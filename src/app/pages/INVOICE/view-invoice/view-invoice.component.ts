@@ -331,8 +331,8 @@ get_pdf(data: any): SafeResourceUrl {
 
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Company: ${this.selected_Company_name || 'N/A'}`, marginLeft, y);
-  y += 6;
+  // doc.text(`Company: ${this.selected_Company_name || 'N/A'}`, marginLeft, y);
+  // y += 6;
   doc.text(`Invoice No: ${data[0].DISTRIBUTOR_ID || ''}`, marginLeft, y);
   y += 6;
   doc.text(`Reference No: ${data[0].REF_NO || ''}`, marginLeft, y);

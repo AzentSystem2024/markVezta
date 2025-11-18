@@ -770,8 +770,8 @@ get_pdf(data: any): SafeResourceUrl {
       ["PO No", data.PO_NO || ""],
       ["Date", data.PO_DATE || ""],
       ["Reference No", data.REF_NO || ""],
-      ["Supplier", data.Supplier || ""],
-      ["Store", data.Store || ""],
+      ["Supplier", data.SUPP_NAME || ""],
+      ["Store", data.STORE || ""],
     ]
   });
 
@@ -793,13 +793,13 @@ get_pdf(data: any): SafeResourceUrl {
     styles: { fontSize: 9, cellPadding: 2 },
     margin: { left: 15, right: 15 },
     body: [
-      ["Currency", data.Currency || ""],
+      ["Currency", data.CURRENCY_NAME || ""],
       ["Exchange Rate", data.EXCHANGE_RATE   || ""],
-      ["VAT Rule", data.VATRule || ""],
+      ["VAT Rule", data.VAT_RULE_NAME || ""],
       ["Address", data.SUPP_ADDRESS || ""],
-      ["Contact Person", data.ContactPerson || ""],
-      ["Email", data.Email || ""],
-      ["Contact No", data.ContactNo || ""],
+      ["Contact Person", data.SUPP_CONTACT || ""],
+      ["Email", data.SUPPLIER_EMAIL || ""],
+      ["Contact No", data.SUPP_MOBILE || ""],
     ]
   });
 
@@ -879,7 +879,6 @@ const itemRows = data.PoDetails?.map((item: any, index: number) => [
   (item.PRICE || 0).toLocaleString(),
   item.QUANTITY || 0,
   item.DISC_PERCENT || 0,
-  (item.Taxable || 0).toLocaleString(),
   (item.TOTAL_AMOUNT || 0).toLocaleString()
 ]) || [];
 
@@ -887,12 +886,12 @@ const itemRows = data.PoDetails?.map((item: any, index: number) => [
 autoTable(doc, {
   startY: y,
   theme: "striped",
-  headStyles: { fillColor: [220, 230, 255] },   // light blue header
+  headStyles: { fillColor: [195, 225, 255],textColor: 20 },   // light blue header
   styles: { fontSize: 9, cellPadding: 2 },
   margin: { left: 15, right: 15 },
   head: [[
     "Sl No", "Item Code", "Description", "UOM", "Packing",
-    "Price (AED)", "Qty", "Disc%", "Taxable", "Total"
+    "Price", "Qty", "Disc%", "Total"
   ]],
   body: itemRows
 });
@@ -903,9 +902,10 @@ y = (doc as any).lastAutoTable.finalY + 5;
 // TABLE FOOTER TOTALS
 // =======================
 
-const totalQty = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.Qty || 0), 0) || 0;
-const totalTaxable = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.GROSS_AMOUNT || 0), 0) || 0;
-const grandTotal = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.Total || 0), 0) || 0;
+// const totalQty = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.Qty || 0), 0) || 0;
+// const totalTaxable = data.GROSS_AMOUNT || 0;
+ const grandTotal = data.NET_AMOUNT || 0;
+
 
 autoTable(doc, {
   startY: y,
@@ -913,8 +913,8 @@ autoTable(doc, {
   styles: { fontSize: 10, fontStyle: "bold" },
   margin: { left: 15, right: 15 },
   body: [
-    ["Total Qty", totalQty],
-    ["Total Taxable", totalTaxable.toLocaleString()],
+    // ["Total Qty", totalQty],
+    // ["Total Taxable", totalTaxable.toLocaleString()],
     ["Grand Total", grandTotal.toLocaleString()]
   ]
 });
@@ -923,63 +923,63 @@ autoTable(doc, {
 // ====================================================
 //  ATTACHMENTS TAB
 // ====================================================
-y = (doc as any).lastAutoTable.finalY + 15;
+// y = (doc as any).lastAutoTable.finalY + 15;
 
-// Section Title
-doc.setFontSize(11);
-doc.setFont("helvetica", "bold");
-doc.text("Attachments", 15, y);
+// // Section Title
+// doc.setFontSize(11);
+// doc.setFont("helvetica", "bold");
+// doc.text("Attachments", 15, y);
 
-y += 8;
+// y += 8;
 
-// Convert attachments to table rows
-const attachmentRows = data.Attachments?.map((att: any) => [
-  att.FileName || "",
-  att.Remarks || ""
-]) || [];
+// // Convert attachments to table rows
+// const attachmentRows = data.Attachments?.map((att: any) => [
+//   att.FileName || "",
+//   att.Remarks || ""
+// ]) || [];
 
-// ATTACHMENTS TABLE
-autoTable(doc, {
-  startY: y,
-  theme: "striped",
-  headStyles: { fillColor: [220, 230, 255] },
-  styles: { fontSize: 10, cellPadding: 3 },
-  margin: { left: 15, right: 15 },
-  head: [["File Name", "Remarks"]],
-  body: attachmentRows,
-});
+// // ATTACHMENTS TABLE
+// autoTable(doc, {
+//   startY: y,
+//   theme: "striped",
+//   headStyles: { fillColor: [220, 230, 255] },
+//   styles: { fontSize: 10, cellPadding: 3 },
+//   margin: { left: 15, right: 15 },
+//   head: [["File Name", "Remarks"]],
+//   body: attachmentRows,
+// });
 
 
 // ====================================================
 //  HISTORY TAB
 // ====================================================
-y = (doc as any).lastAutoTable.finalY + 15;
+// y = (doc as any).lastAutoTable.finalY + 15;
 
-// Section Title
-doc.setFontSize(11);
-doc.setFont("helvetica", "bold");
-doc.text("History", 15, y);
+// // Section Title
+// doc.setFontSize(11);
+// doc.setFont("helvetica", "bold");
+// doc.text("History", 15, y);
 
-y += 8;
+// y += 8;
 
-// Convert attachments to table rows
-const historyRows = data.History?.map((att: any) => [
-  att.SlNo || "",
-  att.DateTime || "",
-  att.Description || "",
-  att.User || ""
-]) || [];
+// // Convert attachments to table rows
+// const historyRows = data.History?.map((att: any) => [
+//   att.SlNo || "",
+//   att.DateTime || "",
+//   att.Description || "",
+//   att.User || ""
+// ]) || [];
 
-// ATTACHMENTS TABLE
-autoTable(doc, {
-  startY: y,
-  theme: "striped",
-  headStyles: { fillColor: [220, 230, 255] },
-  styles: { fontSize: 10, cellPadding: 3 },
-  margin: { left: 15, right: 15 },
-  head: [["SlNo", "DateTime", "Description", "User"]],
-  body: historyRows,
-});
+// // ATTACHMENTS TABLE
+// autoTable(doc, {
+//   startY: y,
+//   theme: "striped",
+//   headStyles: { fillColor: [220, 230, 255] },
+//   styles: { fontSize: 10, cellPadding: 3 },
+//   margin: { left: 15, right: 15 },
+//   head: [["SlNo", "DateTime", "Description", "User"]],
+//   body: historyRows,
+// });
 
   // -------------------- EXPORT --------------------
   const pdfBlob = doc.output('blob');
