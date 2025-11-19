@@ -58,6 +58,7 @@ export class SupplierEditComponent {
   isCurrencyAccepted: boolean = true;
   selectedLandedCosts: { COST_ID: number }[] = [];
   selectedSupp : {SUPP_ID:number}[] = [];
+  selecte_countyId:any;
   formSupplierData = {
     ID: '',
     HQID: 1,
@@ -70,7 +71,7 @@ export class SupplierEditComponent {
     ZIP: '',
     STATE_ID: '', // Use number or string depending on your data type
     CITY: '',
-    COUNTRY_ID: '', // Check if number or string is expected
+    COUNTRY_ID: null, // Check if number or string is expected
     PHONE: '',
     EMAIL: '',
     IS_INACTIVE: 0,
@@ -121,7 +122,7 @@ export class SupplierEditComponent {
       this.vatrule = data;
     });
     this.stateLabel = authservice.getsettingsData().STATE_LABEL;
-    // this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
+    this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
     this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
     console.log(
       this.countryCode,
@@ -132,7 +133,10 @@ export class SupplierEditComponent {
     this.get_PaymentTerms_Dropdown_List();
      this.sesstion_Details()
     this.sessionData_tax()
-
+    dataservice.getCountryWithFlags().subscribe((data) => {
+      this.CountryDropdownData = data;
+      console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
+    });
   
   }
 
@@ -163,7 +167,8 @@ export class SupplierEditComponent {
     console.log(this.selected_Company_id,'============selected_Company_id==============')
     this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
     console.log(this.selected_fin_id,'===========selected fin id===================')
-    
+     this.DEFAULT_COUNTRY_CODE = sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
   }
 
   toggleCurrencyDropdown(checked: boolean) {
@@ -174,7 +179,7 @@ export class SupplierEditComponent {
       if (changes['supplierData'] && changes['supplierData'].currentValue) {
         console.log('SupplierData:', this.supplierData);
 
-         this.get_Country_Dropdown_List()
+        //  this.get_Country_Dropdown_List()
           this.get_State_Dropdown_List()
 
         const savedCostIDs = (this.supplierData.Supplier_cost || []).map(
@@ -208,7 +213,7 @@ export class SupplierEditComponent {
     this.getPaymentTerms();
     this.getCurrency_Dropdown();
     // this.showCountry();
-    this.get_Country_Dropdown_List();
+    // this.get_Country_Dropdown_List();
   }
 
   loadDropdownData(): void {
@@ -231,13 +236,13 @@ export class SupplierEditComponent {
   //   });
   // }
 
-    get_Country_Dropdown_List() {
-    this.dataservice.get_Country_Dropdown_Api().subscribe((response: any) => {
-      // console.log(response, 'response++++++++++');
-      this.CountryDropdownData = response;
-      console.log(this.CountryDropdownData,'Country dropdown')
-    });
-  }
+  //   get_Country_Dropdown_List() {
+  //   this.dataservice.get_Country_Dropdown_Api().subscribe((response: any) => {
+  //     // console.log(response, 'response++++++++++');
+  //     this.CountryDropdownData = response;
+  //     console.log(this.CountryDropdownData,'Country dropdown')
+  //   });
+  // }
 
   listState() {
     this.dataservice.getStateData().subscribe((data: any) => {
@@ -292,17 +297,33 @@ export class SupplierEditComponent {
   }
 
   onCountrySelectionChanged(event: any) {
-     this.CountryId = event.value
-
-    const selectedCountry = this.CountryDropdownData.find(
-      (country) => country.ID === event.value
-    );
-    console.log('selected country', selectedCountry);
-    if (selectedCountry) {
-      this.countryCode = selectedCountry.CODE;
-    }
+     this.selecte_countyId = event.value
+console.log(this.selecte_countyId,'selected country id++++++++++')
+    // const selectedCountry = this.CountryDropdownData.find(
+    // //   (country) => country.ID === event.value
+    // // );
+    // console.log('selected country', selectedCountry);
+    // if (selectedCountry) {
+    //   this.countryCode = selectedCountry.CODE;
+    // }
     // this.get_Country_Dropdown_List();
      this.get_State_Dropdown_List();
+      const selectedCountry = this.CountryDropdownData.find(
+    (country: any) => country.ID === this.selecte_countyId
+  );
+
+  // 4️⃣ If found, set code & name
+  if (selectedCountry) {
+    this.countryCode = selectedCountry.CODE;                // e.g., '+971'
+    this.DEFAULT_COUNTRY_CODE = this.countryCode;           // bind to textbox
+    console.log('Selected Country:', selectedCountry.DESCRIPTION);
+    console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
+  } else {
+    // 5️⃣ Fallback if no country found
+    this.countryCode = '';
+    this.DEFAULT_COUNTRY_CODE = '';
+    console.warn('⚠️ No matching country found for ID:', this.selecte_countyId);
+  }
 
   }
 

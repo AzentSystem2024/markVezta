@@ -103,6 +103,10 @@ export class AccountsListComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+    onExporting(event: any) {
+    const fileName = 'ChartOfAccounts';
+    this.dataService.exportDataGrid(event, fileName);
+  }
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,

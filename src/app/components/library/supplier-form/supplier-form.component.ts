@@ -44,6 +44,7 @@ export class SupplierFormComponent implements OnInit {
   isCurrencyAccepted: boolean = true;
   selectedLandedCosts: { COST_ID: number }[] = [];
   selectedSupp : {SUPP_ID:number}[]=[];
+  selecte_countyId: any;
   formSupplierData = {
      COMPANY_ID: 0,
     HQID:1,
@@ -91,10 +92,9 @@ export class SupplierFormComponent implements OnInit {
     this.get_PaymentTerms_Dropdown_List();
     this.sesstion_Details()
     this.sessionData_tax()
-
-     service.getCountryWithFlags().subscribe((data) => {
+    service.getCountryWithFlags().subscribe((data) => {
       this.CountryDropdownData = data;
-      console.log(this.CountryDropdownData,"COUNTRY;;;;;;;;;;")
+      console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
     });
   }
   newSupplier=this.formSupplierData;
@@ -168,14 +168,14 @@ const CountryId = this.formSupplierData?.COUNTRY_ID;
       });
   }
 
-  showCountry(){
-    this.service.getCountryData().subscribe(
-     (response)=>{
-           this.CountryDropdownData=response;
-           console.log('count',this.CountryDropdownData);
-     }
-    )
- }
+//   showCountry(){
+//     this.service.getCountryData().subscribe(
+//      (response)=>{
+//            this.CountryDropdownData=response;
+//            console.log('count',this.CountryDropdownData);
+//      }
+//     )
+//  }
  getVATRuleDropDown() {
   const dropdownvat = 'VATRULE';
   this.service
@@ -220,15 +220,32 @@ getStateDropDown() {
     });
 }
  onCountrySelectionChanged(event: any) {
-  this.CountryId = event.value
+   this.selecte_countyId = event.value;
   console.log(this.CountryId,'country selection change ')
-  const selectedCountry = this.CountryDropdownData.find(country => country.ID === event.value);
-  console.log('selected country',selectedCountry);
-  if (selectedCountry) {
-    this.countryCode = selectedCountry.CODE;
-  }
+  // const selectedCountry = this.CountryDropdownData.find(country => country.ID === event.value);
+  // console.log('selected country',selectedCountry);
+  // if (selectedCountry) {
+  //   this.countryCode = selectedCountry.CODE;
+  // }
   // this.get_Country_Dropdown_List();
   this.get_State_Dropdown_List();
+
+  const selectedCountry = this.CountryDropdownData.find(
+    (country: any) => country.ID === this.selecte_countyId
+  );
+
+  // 4️⃣ If found, set code & name
+  if (selectedCountry) {
+    this.countryCode = selectedCountry.CODE;                // e.g., '+971'
+    this.DEFAULT_COUNTRY_CODE = this.countryCode;           // bind to textbox
+    console.log('Selected Country:', selectedCountry.DESCRIPTION);
+    console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
+  } else {
+    // 5️⃣ Fallback if no country found
+    this.countryCode = '';
+    this.DEFAULT_COUNTRY_CODE = '';
+    console.warn('⚠️ No matching country found for ID:', this.selecte_countyId);
+  }
 }
 
 onPayTermSelectionChanged(event:any){
@@ -247,7 +264,7 @@ onPayTermSelectionChanged(event:any){
  ngOnInit(): void {
   this.loadDropdownData();
    this.getPaymentTerms();
-   this.showCountry();
+  //  this.showCountry();
    this.getVATRuleDropDown();
    this.getStateDropDown();
    this.getCurrency();
@@ -284,6 +301,8 @@ sessionData_tax(){
     this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
     console.log(this.selected_Company_id,'============selected_Company_id==============')
 
+    this.DEFAULT_COUNTRY_CODE = sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
 
     // this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
 

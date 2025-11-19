@@ -32,12 +32,19 @@
       (onEditingStart)="onEditJournalVoucher($event)"
       (onRowRemoving)="onDeleteJournalVoucher($event)"
       (onToolbarPreparing)="onToolbarPreparing($event)"
+      (onExporting)="onExporting($event)"
     >
       <dxo-editing
         mode="popup"
         [allowUpdating]="true"
         [allowDeleting]="canDelete"
       ></dxo-editing>
+      <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="false"
+      [formats]="['xlsx']"
+    >
+    </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -74,6 +81,12 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
 
+         <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="custom-export-button"
+      ></dxi-item>
+      
         <dxi-item
           location="after"
           locateInMenu="auto"

@@ -70,6 +70,13 @@ export class ListMiscellaneousPaymentsComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+
+   //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'Micellaneous_Payments';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',

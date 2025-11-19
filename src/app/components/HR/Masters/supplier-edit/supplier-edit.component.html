@@ -73,8 +73,9 @@
               label=" "
               [(value)]="countryCode"
               class="country-code-input"
-              labelMode="floating"
+              [(value)]="DEFAULT_COUNTRY_CODE"
             ></dx-text-box>
+
             <dx-text-box
               label="Mobile"
               class="phone-style"
@@ -425,7 +426,7 @@
         </div>
       </dxi-item>
     </dxi-item>
-    <!-- <dxi-item itemType="group" [colCount]="1"> -->
+    <!-- <dxi-item itemType="group" []="1"> -->
     <dxi-item>
       <div *ngIf="supplierData">
         <div *dxTemplate style="display: flex">
@@ -434,6 +435,7 @@
             [(value)]="countryCode"
             class="country-code-input"
             labelMode="floating"
+            [(value)]="DEFAULT_COUNTRY_CODE"
           ></dx-text-box>
           <dx-text-box
             label="Phone"

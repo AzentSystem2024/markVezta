@@ -90,6 +90,12 @@ export class OpeningBalanceComponent {
   isReadOnlyBalance: boolean;
   addButtonOptions: any;
 
+   //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'Opening_Balance_Data';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+
   constructor(private dataService: DataService, private router: Router) {}
 
   // ngOnInit() {

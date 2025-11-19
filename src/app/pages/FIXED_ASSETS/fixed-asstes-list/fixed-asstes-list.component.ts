@@ -69,6 +69,12 @@ canAdd = false;
   }
 ];
 
+ //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'fixed_assets';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+
 refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',

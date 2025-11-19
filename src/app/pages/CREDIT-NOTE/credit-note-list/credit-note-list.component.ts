@@ -83,6 +83,12 @@ export class CreditNoteListComponent {
     },
     elementAttr: { class: 'add-button' },
   };
+
+   //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'Credit_Note';
+    this.dataService.exportDataGrid(event, fileName);
+  }
   isAddCreditNote: boolean = false;
   creditNotes: any;
   selectedCreditNote: any;

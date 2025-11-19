@@ -28,8 +28,9 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
-      (onEditingStart)="onEditFixedAssets($event)"
-      (onRowRemoving)="delete_FixedAssets_Data($event)"
+       (onExporting)="onExporting($event)"
+       (onEditingStart)="onEditFixedAssets($event)"
+         (onRowRemoving)="delete_FixedAssets_Data($event)"
     >
       <dxo-editing
         mode="popup"
@@ -47,7 +48,18 @@
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
-      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+       
+      ></dxo-filter-row>
+
+      <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="false"
+      [formats]="['xlsx']"
+    >
+    </dxo-export>
+      
       <dxo-toolbar>
         <dxi-item location="before">
           <div
@@ -84,12 +96,18 @@
           }"
         ></dxi-item>
 
-        <dxi-item
-          location="after"
-          widget="dxButton"
-          [options]="addButtonOptions"
-          *ngIf="canAdd"
-        ></dxi-item>
+       <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="custom-export-button"
+      ></dxi-item>
+
+   <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="addButtonOptions"
+       *ngIf="canAdd"
+    ></dxi-item>
 
         <!-- <dxi-item location="after" locateInMenu="auto">
           <dx-button

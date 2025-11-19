@@ -55,6 +55,13 @@ export class PrePaymentListComponent {
     elementAttr: { class: 'add-button' }
   };
 
+  //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'PrePaymentInvoice';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
+
+
      //=================================refresh=============================
    refreshButtonOptions = {
     icon: 'refresh',

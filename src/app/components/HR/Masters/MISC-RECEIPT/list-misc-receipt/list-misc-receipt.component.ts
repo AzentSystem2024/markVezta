@@ -71,6 +71,12 @@ export class ListMiscReceiptComponent {
   canApprove = false;
   canPrint = false;
 
+   //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'Micellaneous_Receipt';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',

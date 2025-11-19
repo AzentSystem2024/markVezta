@@ -28,6 +28,7 @@
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
       [groupPanel]="{ visible: true }"
+       (onExporting)="onExporting($event)"
       [grouping]="{ autoExpandAll: false }"
       (onEditingStart)="onEditingStart($event)"
       (onRowRemoving)="DeletePrePayment($event)"
@@ -37,6 +38,13 @@
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
+
+      <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="false"
+      [formats]="['xlsx']"
+    >
+    </dxo-export>
 
       <dxo-paging [pageSize]="20"></dxo-paging>
       <dxo-pager
@@ -79,6 +87,12 @@
             elementAttr: { class: 'commonButtons' }
           }"
         ></dxi-item>
+
+          <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="custom-export-button"
+      ></dxi-item>
 
         <dxi-item
           *ngIf="canAdd"
