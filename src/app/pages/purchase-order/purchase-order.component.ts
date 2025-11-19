@@ -221,7 +221,7 @@ export class PurchaseOrderComponent {
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
-      this.getPurchaseOrderList()
+      this.getPurchaseOrderList();
     }
   }
 
@@ -336,8 +336,6 @@ export class PurchaseOrderComponent {
         e.row.data.STATUS !== 'Approved' && e.row.data.STATUS !== 'Verified',
     },
   ];
-
-
 
   initializePrintTemplateData() {
     this.printTemplateData = [
@@ -494,6 +492,55 @@ export class PurchaseOrderComponent {
       return false;
     }
     // return true;
+    if (data.IS_APPROVED === true) {
+      const result = confirm(
+        'Are you sure you want to approve and commit this invoice?',
+        'Confirm Approval'
+      );
+
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.savePoToServer(data); // Only save if user confirms
+        }
+      });
+    } else {
+      // Not approved → Save directly
+      this.savePoToServer(data);
+    }
+    // this.service.savePoData(data).subscribe((res) => {
+    //   console.log('saved data');
+    //   if (res) {
+    //     notify(
+    //       {
+    //         message: 'Data Saved Successfully',
+    //         position: { at: 'top center', my: 'top center' },
+    //       },
+    //       'success'
+    //     );
+    //     this.refreshPo = true;
+    //     setTimeout(() => (this.refreshPo = false), 0);
+    //     this.dataGrid.instance.refresh();
+    //     this.isAddPopupOpened = false;
+    //     if (this.PurchaseOrderNewFormComponent?.resetForm) {
+    //       console.log(
+    //         'FORMRESETTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT'
+    //       );
+    //       this.PurchaseOrderNewFormComponent?.resetForm();
+    //     }
+    //     this.getPurchaseOrderList();
+    //   } else {
+    //     notify(
+    //       {
+    //         message: 'Your Data Not Saved',
+    //         position: { at: 'top right', my: 'top right' },
+    //       },
+    //       'error'
+    //     );
+    //   }
+    // });
+  }
+
+  savePoToServer(data: any) {
     this.service.savePoData(data).subscribe((res) => {
       console.log('saved data');
       if (res) {
@@ -504,16 +551,17 @@ export class PurchaseOrderComponent {
           },
           'success'
         );
+
         this.refreshPo = true;
         setTimeout(() => (this.refreshPo = false), 0);
+
         this.dataGrid.instance.refresh();
         this.isAddPopupOpened = false;
+
         if (this.PurchaseOrderNewFormComponent?.resetForm) {
-          console.log(
-            'FORMRESETTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT'
-          );
-          this.PurchaseOrderNewFormComponent?.resetForm();
+          this.PurchaseOrderNewFormComponent.resetForm();
         }
+
         this.getPurchaseOrderList();
       } else {
         notify(
@@ -715,9 +763,7 @@ export class PurchaseOrderComponent {
     console.log(intParam, 'intparam');
   }
 
- viewPdf(log: any) {
-}
-
+  viewPdf(log: any) {}
 }
 
 @NgModule({

@@ -47,6 +47,7 @@ import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-vou
 import { PurchaseInvoiceListComponent } from '../purchase-invoice-list/purchase-invoice-list.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-add-purchase-invoice',
@@ -106,6 +107,7 @@ export class AddPurchaseInvoiceComponent {
     RETURN_AMOUNT: 0,
     ADJ_AMOUNT: 0,
     PAID_AMOUNT: 0,
+    IS_APPROVED: false,
     PurchDetails: [
       {
         COMPANY_ID: '',
@@ -138,7 +140,7 @@ export class AddPurchaseInvoiceComponent {
     ],
   };
   selectedSupplierId: any;
-
+  isApproved: boolean = false;
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
@@ -419,26 +421,41 @@ export class AddPurchaseInvoiceComponent {
       this.purchaseInvoiceFormData.PURCH_DATE;
 
     console.log('Final Payload:', this.purchaseInvoiceFormData);
+    const callInsertAPI = () => {
+      this.dataService
+        .insertPurchaseInvoice(this.purchaseInvoiceFormData)
+        .subscribe({
+          next: (res) => {
+            notify(
+              {
+                message: 'Invoice saved successfully',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+              3000
+            );
+            this.resetInvoiceForm();
+            this.popupClosed?.emit();
+          },
+          error: (err) => {
+            console.error('Save failed', err);
+          },
+        });
+    };
+    if (this.purchaseInvoiceFormData.IS_APPROVED === true) {
+      const dialog = confirm(
+        'Are you sure you want to approve and commit this invoice?',
+        'Confirmation'
+      );
 
-    this.dataService
-      .insertPurchaseInvoice(this.purchaseInvoiceFormData)
-      .subscribe({
-        next: (res) => {
-          notify(
-            {
-              message: 'Invoice saved successfully',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-            3000
-          );
-          this.resetInvoiceForm(); // If you have a reset function
-          this.popupClosed?.emit();
-        },
-        error: (err) => {
-          console.error('Save failed', err);
-        },
+      dialog.then((confirmed: boolean) => {
+        if (confirmed) {
+          callInsertAPI(); // Only save if user clicked YES
+        }
       });
+    } else {
+      callInsertAPI(); // Save directly
+    }
   }
 
   resetInvoiceForm() {

@@ -48,6 +48,7 @@ import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-vou
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-add-invoice',
@@ -106,6 +107,7 @@ export class AddInvoiceComponent {
     NET_AMOUNT: '',
     REF_NO: '',
     PARTY_NAME: '',
+    IS_APPROVED: false,
     SALE_DETAILS: [
       {
         TRANSFER_SUMMARY_ID: '',
@@ -513,40 +515,54 @@ export class AddInvoiceComponent {
     this.invoiceFormData.GST_AMOUNT = this.taxAmount;
     this.invoiceFormData.NET_AMOUNT = this.grandTotal;
     this.invoiceFormData.PARTY_NAME = this.invoiceFormData.PARTY_NAME;
-    console.log(
-      this.invoiceFormData,
-      'PAYLOADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
-    );
+
     this.invoiceFormData.TRANS_TYPE = 25;
     this.invoiceFormData.SALE_DATE = new Date();
     this.invoiceFormData.ADD_TIME = new Date();
+    const callInsertAPI = () => {
+      this.dataService.insertInvoice(this.invoiceFormData).subscribe(
+        (response) => {
+          console.log('Invoice saved successfully:', response);
+          notify(
+            {
+              message: 'Invoice saved successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+            3000
+          );
+          this.resetInvoiceForm();
+          this.popupClosed?.emit();
+        },
+        (error) => {
+          console.error('Error saving invoice:', error);
+          notify(
+            {
+              message: 'Failed to save invoice',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+            3000
+          );
+        }
+      );
+    };
     // 5. Call the API to save invoice
-    this.dataService.insertInvoice(this.invoiceFormData).subscribe(
-      (response) => {
-        console.log('Invoice saved successfully:', response);
-        notify(
-          {
-            message: 'Invoice saved successfully',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-          3000
-        );
-        this.resetInvoiceForm(); // If you have a reset function
-        this.popupClosed?.emit(); // If you are using EventEmitter to close the popup
-      },
-      (error) => {
-        console.error('Error saving invoice:', error);
-        notify(
-          {
-            message: 'Failed to save invoice',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-          3000
-        );
-      }
-    );
+    if (this.invoiceFormData.IS_APPROVED === true) {
+      const result = confirm(
+        'Are you sure you want to approve and commit this invoice?',
+        'Confirmation'
+      );
+
+      result.then((confirmed) => {
+        if (confirmed) {
+          callInsertAPI();
+        }
+      });
+    } else {
+      // NOT approved → Direct save
+      callInsertAPI();
+    }
   }
 
   resetInvoiceForm() {

@@ -203,6 +203,7 @@ import { ChangePasswordComponent } from './components/library/PROFILEPAGE/change
 import { SecurityPolicyComponent } from './pages/SYSTEMPAGES/security-policy/security-policy.component';
 import { BankReconciliationAddComponent } from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
 import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoice-pdf-view.component';
+import { PurchaseReturnDebitComponent } from './pages/purchase-return-debit/purchase-return-debit.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -233,7 +234,7 @@ const routes: Routes = [
         component: CreateAccountFormComponent,
         canActivate: [AuthGuardService],
       },
-     
+
       {
         path: 'change-password/:recoveryCode',
         component: ChangePasswordFormComponent,
@@ -302,7 +303,7 @@ const routes: Routes = [
         component: ArticleBrandComponent,
         canActivate: [AuthGuardService],
       },
-       {
+      {
         path: 'change-password',
         component: ChangePasswordComponent,
         canActivate: [AuthGuardService],
@@ -753,7 +754,7 @@ const routes: Routes = [
         component: ESIComponent,
         canActivate: [AuthGuardService],
       },
-      { 
+      {
         path: 'attendance-sheet',
         component: AttendanceSheetComponent,
         canActivate: [AuthGuardService],
@@ -764,7 +765,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'item-stock-value', 
+        path: 'item-stock-value',
         component: ItemStockValueComponent,
       },
       {
@@ -852,11 +853,16 @@ const routes: Routes = [
         component: BankReconciliationAddComponent,
         canActivate: [AuthGuardService],
       },
-      
+
       {
         path: 'invoice-pdf',
         component: InvoicePdfViewComponent,
         canActivate: [AuthGuardService],
+      },
+      {
+        path: 'purchase-return-debit',
+        component: PurchaseReturnDebitComponent,
+        // canActivate: [AuthGuardService],
       },
       {
         path: '**',

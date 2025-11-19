@@ -153,6 +153,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     SUPP_NET_AMOUNT: '',
     EXCHANGE_PRICE: '',
     ISSUED_EMP_ID: '0',
+    IS_APPROVED: false,
     PoDetails: [],
   };
   newPoData = this.poData;
@@ -786,8 +787,6 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     // this.resetForm();        // optional: clear form data
     this.showAddItemPopup = false; // 🔥 close popup
   }
-
-
 
   // Parent component
   resetForm() {

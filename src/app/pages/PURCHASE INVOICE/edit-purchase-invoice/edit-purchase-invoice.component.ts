@@ -49,6 +49,8 @@ import { AddPurchaseInvoiceComponent } from '../add-purchase-invoice/add-purchas
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-edit-purchase-invoice',
@@ -84,6 +86,7 @@ export class EditPurchaseInvoiceComponent {
   selectedSupplierId: any;
   sessionData: any;
   selected_vat_id: any;
+  selectedInvoice: any;
 
   constructor(private dataService: DataService) {}
 
@@ -158,7 +161,7 @@ export class EditPurchaseInvoiceComponent {
 
   validateQuantity = (e: any) => {
     const quantity = e.value;
-    const pendingQty = e.data?.PENDING_QTY ?? 0;
+    const pendingQty = e.data?.PO_QUANTITY ?? 0;
     return quantity <= pendingQty;
   };
 
@@ -266,7 +269,7 @@ export class EditPurchaseInvoiceComponent {
             GRN_NO: row.GRN_NO,
             GRN_DATE: row.GRN_DATE, // if needed
             ITEM_NAME: row.ITEM_NAME,
-            PENDING_QTY: row.PENDING_QTY,
+            PO_QUANTITY: row.PO_QUANTITY,
             QUANTITY: 0,
             RATE: row.RATE,
             VAT_PERC: 0,
@@ -428,6 +431,102 @@ export class EditPurchaseInvoiceComponent {
         console.error('Operation failed', err);
       },
     });
+  }
+
+  openPDF() {
+    // Call your PDF API or open a URL
+    console.log('Open PDF clicked');
+    const invId = this.purchaseInvoiceFormData.TRANS_ID;
+    // Example:
+    this.dataService.selectPurchaseInvoice(invId).subscribe((res: any) => {
+      this.selectedInvoice = res.Data;
+      this.generatePDF(this.selectedInvoice);
+    });
+  }
+
+  generatePDF(data: any) {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // --- TITLE ---
+    doc.setFontSize(16);
+    const title = 'Purchase Invoice';
+    const textWidth = doc.getTextWidth(title);
+    doc.text(title, (pageWidth - textWidth) / 2, 15);
+
+    // --- HEADER ---
+    doc.setFontSize(11);
+    let headerY = 25;
+    const labelX = 14,
+      colonX = 50,
+      valueX = 55;
+
+    const printHeaderRow = (label: string, value: any) => {
+      doc.text(label, labelX, headerY);
+      doc.text(':', colonX, headerY);
+      doc.text(String(value ?? '-'), valueX, headerY);
+      headerY += 7;
+    };
+
+    printHeaderRow('Invoice No', data.PURCH_NO);
+    printHeaderRow('Invoice Date', data.PURCH_DATE.split('T')[0]);
+    printHeaderRow('Supplier', data.SUPPPLIER_NAME);
+    printHeaderRow('Narration', data.NARRATION);
+
+    // --- TABLE ROWS ---
+    const rows = data.PurchDetails.map((item: any) => [
+      item.GRN_DET_ID,
+      item.GRN_DATE ? item.GRN_DATE.split('T')[0] : '',
+      item.ITEM_NAME,
+      item.PO_QUANTITY,
+      item.RATE.toFixed(2),
+      item.AMOUNT.toFixed(2),
+      item.VAT_PERC.toFixed(2),
+      (item.VAT_AMOUNT ?? 0).toFixed(2),
+      item.TOTAL_AMOUNT.toFixed(2),
+    ]);
+
+    autoTable(doc, {
+      startY: 55,
+      head: [
+        [
+          'GRN No',
+          'GRN Date',
+          'Item Description',
+          'Pending Qty',
+          'Rate',
+          'Amount',
+          'VAT%',
+          'VAT Amount',
+          'Total Amount',
+        ],
+      ],
+      body: rows,
+      theme: 'grid',
+    });
+
+    // --- FOOTER TOTALS ---
+    let finalY = (doc as any).lastAutoTable.finalY + 15;
+
+    const labelEndX = pageWidth - 40;
+    const amountEndX = pageWidth - 20;
+
+    const printFooter = (label: string, value: number, y: number) => {
+      doc.text(label, labelEndX, y, { align: 'right' });
+      doc.text(value.toFixed(2), amountEndX, y, { align: 'right' });
+    };
+
+    printFooter('Gross Amount', data.GROSS_AMOUNT, finalY);
+    printFooter('VAT Amount', data.VAT_AMOUNT, finalY + 7);
+    printFooter('Net Amount', data.NET_AMOUNT, finalY + 14);
+
+    // --- THANK YOU ---
+    doc.text('Thank you for your business!', pageWidth / 2, finalY + 30, {
+      align: 'center',
+    });
+
+    // --- OPEN PDF ---
+    doc.output('dataurlnewwindow');
   }
 
   cancel() {

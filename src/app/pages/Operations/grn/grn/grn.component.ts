@@ -143,7 +143,7 @@ export class GrnComponent implements OnInit {
   ];
 
   refreshButtonOptions = {
-    icon: 'refresh', 
+    icon: 'refresh',
     hint: 'Refresh',
     onClick: () => this.refreshGrid(),
     text: '',
@@ -161,7 +161,7 @@ export class GrnComponent implements OnInit {
     {
       name: 'edit',
       visible: (e) => e.row.data.STATUS !== 'Approved',
-    }, 
+    },
     {
       name: 'delete',
       visible: (e) => e.row.data.STATUS !== 'Approved',
@@ -268,7 +268,7 @@ export class GrnComponent implements OnInit {
     console.log(data, 'grn verified data===============================');
     this.service.verifyGrnData(data).subscribe((res) => {
       console.log('data verified', res);
-      if ((res.Message === 'Success')) {
+      if (res.Message === 'Success') {
         notify(
           {
             message: 'Data Verified Successfully',

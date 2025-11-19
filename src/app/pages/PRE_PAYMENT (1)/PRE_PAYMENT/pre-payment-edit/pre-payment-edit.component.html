@@ -64,7 +64,11 @@
     <!-- Row 4 -->
     <div class="period-row">
       <dx-number-box
-        [label]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT %' : ' GST %'"
+        [label]="
+          selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+            ? 'VAT %'
+            : ' GST %'
+        "
         labelMode="floating"
         width="220px"
         [readOnly]="isReadOnly"
@@ -72,7 +76,11 @@
         (onValueChanged)="updateGSTAmount()"
       ></dx-number-box>
       <dx-number-box
-         [label]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Amount' : ' GST Amount'"
+        [label]="
+          selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+            ? 'VAT Amount'
+            : ' GST Amount'
+        "
         labelMode="floating"
         width="220px"
         [(value)]="PrePaymentFormData.TAX_AMOUNT"
@@ -81,7 +89,7 @@
       <dx-number-box
         label="Net Amount"
         labelMode="floating"
-        width="220px"
+        width="180px"
         [(value)]="PrePaymentFormData.NET_AMOUNT"
         [readOnly]="isReadOnly"
       ></dx-number-box>
@@ -159,7 +167,7 @@
       <dx-number-box
         label="No.Month"
         labelMode="floating"
-        width="160px"
+        width="100px"
         [(value)]="PrePaymentFormData.NO_OF_MONTHS"
         [readOnly]="isReadOnly"
         (onValueChanged)="updatePeriodTo()"
@@ -168,7 +176,7 @@
       <dx-number-box
         label="No.Days"
         labelMode="floating"
-        width="160px"
+        width="100px"
         [(value)]="PrePaymentFormData.NO_OF_DAYS"
         [readOnly]="isReadOnly"
         (onValueChanged)="updatePeriodTo()"
@@ -218,8 +226,8 @@
           dataField="DUE_DATE"
           [readOnly]="isReadOnly"
           caption="Date"
-       dataType="date"
-  format="dd/MM/yyyy"
+          dataType="date"
+          format="dd/MM/yyyy"
           [allowEditing]="false"
           [readOnly]="true"
         >

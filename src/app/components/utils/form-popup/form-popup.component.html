@@ -14,10 +14,11 @@
       [class.flex-buttons]="width <= 360"
     >
       <div style="display: flex; align-items: center" *ngIf="showNetAmount">
-        <div
+        <!-- <div
           style="display: flex; align-items: center"
           *ngIf="showNetAmount && isEditMode"
-        >
+        > -->
+        <div style="display: flex; align-items: center" *ngIf="showNetAmount">
           <label style="margin-right: 8px">Approve</label>
           <dx-check-box
             [value]="isApproved"
@@ -25,15 +26,6 @@
           >
           </dx-check-box>
         </div>
-
-        <!-- <label style="margin-right: 8px;margin-left: 8px;">Net Amount</label>
-      <dx-text-box *ngIf="showSupplierNetAmount"
-        [width]="150"
-        [readOnly]="true"
-        [(value)]="netSupplierAmount"
-        placeholder="0.00"
-        [rtlEnabled]="true"
-      ></dx-text-box>&nbsp; -->
       </div>
       <dx-button
         text="Cancel"

@@ -346,6 +346,39 @@ export class DataService {
   getPendingInvoiceList(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}AC_CreditNote/invoicelist`, payload);
   }
+
+  //--------------------------PURCHASE-RETURN-DEBIT-------------------------------------//
+  getPurchaseReturnMainList(): Observable<any> {
+    return this.http.post(`${this.apiUrl}PurchaseReturn/list`, {});
+  }
+  getPendingInvoicesForReturn(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}PurchaseReturn/pendinglist`, data);
+  }
+
+  insertPurchaseReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PurchaseReturn/insert`, data);
+  }
+  selectPurchaseReturn(id: number) {
+    return this.http.post<any>(`${this.apiUrl}PurchaseReturn/select/` + id, {});
+  }
+
+  updatePurchaseReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PurchaseReturn/update`, data);
+  }
+
+  getPurchaseReturnNo(): Observable<any> {
+    return this.http.post(`${this.apiUrl}PurchaseReturn/Docno`, {});
+  }
+
+  approvePurchaseReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PurchaseReturn/approve`, data);
+  }
+  deletePurchaseReturn(id: number) {
+    return this.http.post<any>(`${this.apiUrl}PurchaseReturn/delete/` + id, {});
+  }
   //--------------------------INVOICE-DELIVERY-------------------------------------//
 
   getInvoiceMainListDelivery(): Observable<any> {
@@ -5306,7 +5339,7 @@ The result can be exported to HTML or Markdown.`;
   // selectArticle(id: number, payload: any) {
 
   //   return this.http.post<any>(`${this.apiUrl}article/select/${id}`, {}, { params });
-  // }
+  // }debit
 
   Add_packages_listapi(item: any) {
     const payload = item;
