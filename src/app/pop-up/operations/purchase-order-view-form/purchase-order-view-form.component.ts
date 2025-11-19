@@ -31,7 +31,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { PurchaseOrderVerifyFormComponent } from '../purchase-order-verify-form/purchase-order-verify-form.component';
 import { DataService } from 'src/app/services';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import autoTable ,  { ThemeType, UserOptions } from 'jspdf-autotable';
 
 @Component({
   selector: 'app-purchase-order-view-form',
@@ -739,250 +739,513 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
 
 
+// get_pdf(data: any): SafeResourceUrl {
+
+//   const doc = new jsPDF('p', 'mm', 'a4');
+//   const pageWidth = doc.internal.pageSize.width;
+
+//   const label = (text: string) => doc.setFont("helvetica", "bold").setFontSize(9).text(text, 15, y);
+//   const value = (text: string) => doc.setFont("helvetica", "normal").setFontSize(9).text(text, 60, y);
+
+//   // START POSITION
+//   let y = 15;
+
+//   // -------------------- TITLE --------------------
+//   doc.setFontSize(14);
+//   doc.setFont("helvetica", "bold");
+//   doc.text("Purchase Order", pageWidth / 2, y, { align: 'center' });
+
+//   y += 10;
+
+//   // ====================================================
+//   //  PO HEADER (Top Row)
+//   // ====================================================
+//   autoTable(doc, {
+//     startY: y,
+//     theme: "grid",
+//     headStyles: { fillColor: [240, 240, 240] },
+//     styles: { fontSize: 9, cellPadding: 2 },
+//     margin: { left: 15, right: 15 },
+//     body: [
+//       ["PO No", data.PO_NO || ""],
+//       ["Date", data.PO_DATE || ""],
+//       ["Reference No", data.REF_NO || ""],
+//       ["Supplier", data.SUPP_NAME || ""],
+//       ["Store", data.STORE || ""],
+//     ]
+//   });
+
+//   y = (doc as any).lastAutoTable.finalY + 8;
+
+//   // ====================================================
+//   //  SUPPLIER DETAILS
+//   // ====================================================
+//   doc.setFont("helvetica", "bold");
+//   doc.setFontSize(11);
+//   doc.text("Supplier Details", 15, y);
+
+//   y += 5;
+
+//   autoTable(doc, {
+//     startY: y,
+//     theme: "grid",
+//     headStyles: { fillColor: [245, 245, 245] },
+//     styles: { fontSize: 9, cellPadding: 2 },
+//     margin: { left: 15, right: 15 },
+//     body: [
+//       ["Currency", data.CURRENCY_NAME || ""],
+//       ["Exchange Rate", data.EXCHANGE_RATE   || ""],
+//       ["VAT Rule", data.VAT_RULE_NAME || ""],
+//       ["Address", data.SUPP_ADDRESS || ""],
+//       ["Contact Person", data.SUPP_CONTACT || ""],
+//       ["Email", data.SUPPLIER_EMAIL || ""],
+//       ["Contact No", data.SUPP_MOBILE || ""],
+//     ]
+//   });
+
+//   y = (doc as any).lastAutoTable.finalY + 10;
+
+//   // ====================================================
+//   //  SHIPPING DETAILS
+//   // ====================================================
+//   doc.setFontSize(11);
+//   doc.setFont("helvetica", "bold");
+//   doc.text("Shipping Details", 15, y);
+
+//   y += 5;
+
+//   autoTable(doc, {
+//     startY: y,
+//     theme: "grid",
+//     headStyles: { fillColor: [245, 245, 245] },
+//     styles: { fontSize: 9, cellPadding: 2 },
+//     margin: { left: 15, right: 15 },
+//     body: [
+//       ["Shipping Address", data.SHIP_TO || ""],
+//       ["Purpose", data.PURPOSE || ""],
+//       ["Contact Name", data.CONTACT_NAME || ""],
+//       ["Mobile", data.CONTACT_MOBILE || ""],
+//     ]
+//   });
+
+//   y = (doc as any).lastAutoTable.finalY + 10;
+
+//   // ====================================================
+//   //  TERMS & CONDITIONS
+//   // ====================================================
+//   doc.setFontSize(11);
+//   doc.setFont("helvetica", "bold");
+//   doc.text("Terms & Conditions", 15, y);
+
+//   y += 5;
+
+//   autoTable(doc, {
+//     startY: y,
+//     theme: "grid",
+//     headStyles: { fillColor: [245, 245, 245] },
+//     styles: { fontSize: 9, cellPadding: 2 },
+//     margin: { left: 15, right: 15 },
+//     body: [
+//       ["Shipment Method", data.DELIVERY_TERM || ""],
+//       ["Payment", data.PAY_TERM || ""],
+//       ["Delivery Date", data.DELIVERY_DATE || ""],
+//       ["Reference", data.DELIVERY_DESC || ""],
+//       ["Notes", data.NOTES || ""],
+//       ["Narration", data.NARRATION || ""],
+//       ["Issued By", data.ISSUED_EMP_ID || ""]
+//     ]
+//   });
+
+
+//   // ====================================================
+// //  DETAIL TAB – ITEMS TABLE
+// // ====================================================
+// y = (doc as any).lastAutoTable.finalY + 10;
+
+// // Table Title
+// doc.setFontSize(11);
+// doc.setFont("helvetica", "bold");
+// doc.text("Items", 15, y);
+
+// y += 5;
+
+// // Prepare table data
+// const itemRows = data.PoDetails?.map((item: any, index: number) => [
+//   index + 1,
+//   item.ITEM_CODE || "",
+//   item.ITEM_DESC || "",
+//   item.UOM || "",
+//   item.PACKING || "",
+//   (item.PRICE || 0).toLocaleString(),
+//   item.QUANTITY || 0,
+//   item.DISC_PERCENT || 0,
+//   (item.TOTAL_AMOUNT || 0).toLocaleString()
+// ]) || [];
+
+// // ITEMS TABLE
+// autoTable(doc, {
+//   startY: y,
+//   theme: "striped",
+//   headStyles: { fillColor: [195, 225, 255],textColor: 20 },   // light blue header
+//   styles: { fontSize: 9, cellPadding: 2 },
+//   margin: { left: 15, right: 15 },
+//   head: [[
+//     "Sl No", "Item Code", "Description", "UOM", "Packing",
+//     "Price", "Qty", "Disc%", "Total"
+//   ]],
+//   body: itemRows
+// });
+
+// y = (doc as any).lastAutoTable.finalY + 5;
+
+// // =======================
+// // TABLE FOOTER TOTALS
+// // =======================
+
+// // const totalQty = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.Qty || 0), 0) || 0;
+// // const totalTaxable = data.GROSS_AMOUNT || 0;
+//  const grandTotal = data.NET_AMOUNT || 0;
+
+
+// autoTable(doc, {
+//   startY: y,
+//   theme: "plain",
+//   styles: { fontSize: 10, fontStyle: "bold" },
+//   margin: { left: 15, right: 15 },
+//   body: [
+//     // ["Total Qty", totalQty],
+//     // ["Total Taxable", totalTaxable.toLocaleString()],
+//     ["Grand Total", grandTotal.toLocaleString()]
+//   ]
+// });
+
+
+// // ====================================================
+// //  ATTACHMENTS TAB
+// // ====================================================
+// // y = (doc as any).lastAutoTable.finalY + 15;
+
+// // // Section Title
+// // doc.setFontSize(11);
+// // doc.setFont("helvetica", "bold");
+// // doc.text("Attachments", 15, y);
+
+// // y += 8;
+
+// // // Convert attachments to table rows
+// // const attachmentRows = data.Attachments?.map((att: any) => [
+// //   att.FileName || "",
+// //   att.Remarks || ""
+// // ]) || [];
+
+// // // ATTACHMENTS TABLE
+// // autoTable(doc, {
+// //   startY: y,
+// //   theme: "striped",
+// //   headStyles: { fillColor: [220, 230, 255] },
+// //   styles: { fontSize: 10, cellPadding: 3 },
+// //   margin: { left: 15, right: 15 },
+// //   head: [["File Name", "Remarks"]],
+// //   body: attachmentRows,
+// // });
+
+
+// // ====================================================
+// //  HISTORY TAB
+// // ====================================================
+// // y = (doc as any).lastAutoTable.finalY + 15;
+
+// // // Section Title
+// // doc.setFontSize(11);
+// // doc.setFont("helvetica", "bold");
+// // doc.text("History", 15, y);
+
+// // y += 8;
+
+// // // Convert attachments to table rows
+// // const historyRows = data.History?.map((att: any) => [
+// //   att.SlNo || "",
+// //   att.DateTime || "",
+// //   att.Description || "",
+// //   att.User || ""
+// // ]) || [];
+
+// // // ATTACHMENTS TABLE
+// // autoTable(doc, {
+// //   startY: y,
+// //   theme: "striped",
+// //   headStyles: { fillColor: [220, 230, 255] },
+// //   styles: { fontSize: 10, cellPadding: 3 },
+// //   margin: { left: 15, right: 15 },
+// //   head: [["SlNo", "DateTime", "Description", "User"]],
+// //   body: historyRows,
+// // });
+
+//   // -------------------- EXPORT --------------------
+//   const pdfBlob = doc.output('blob');
+//   const pdfUrl = URL.createObjectURL(pdfBlob);
+//   return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+// }
 get_pdf(data: any): SafeResourceUrl {
 
-  const doc = new jsPDF('p', 'mm', 'a4');
+  const doc = new jsPDF("p", "mm", "a4");
   const pageWidth = doc.internal.pageSize.width;
+  let y = 20; // start after header
 
-  const label = (text: string) => doc.setFont("helvetica", "bold").setFontSize(9).text(text, 15, y);
-  const value = (text: string) => doc.setFont("helvetica", "normal").setFontSize(9).text(text, 60, y);
+  // -----------------------
+  //  GLOBAL STYLE HELPERS
+  // -----------------------
 
-  // START POSITION
-  let y = 15;
+  function sectionHeader(title: string) {
+    doc.setFillColor(230, 230, 230); // light grey
+    doc.rect(15, y, pageWidth - 30, 7, "F");
+    doc.setFont("helvetica", "bold").setFontSize(11);
+    doc.text(title, 20, y + 5);
+    y += 12; // spacing after title bar
+  }
 
-  // -------------------- TITLE --------------------
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("Purchase Order", pageWidth / 2, y, { align: 'center' });
+  function boxed(autoTableYStart: number) {
+    const boxEnd = (doc as any).lastAutoTable.finalY;
+    doc.setDrawColor(180); // light grey border
+    doc.rect(15, autoTableYStart - 5, pageWidth - 30, boxEnd - autoTableYStart + 10);
+    y = boxEnd + 12;
+  }
 
-  y += 10;
+  const tableStyle = {
+    theme: "grid",
+    headStyles: {
+      fillColor: [245, 245, 245],
+      textColor: 20,
+      fontSize: 9,
+      halign: "center"
+    },
+    styles: { fontSize: 9, cellPadding: 2, valign: "middle" },
+    columnStyles: {
+      0: { cellWidth: 45, fontStyle: "bold" },
+      1: { cellWidth: pageWidth - 75 }
+    },
+    margin: { left: 15, right: 15 }
+  };
 
-  // ====================================================
-  //  PO HEADER (Top Row)
-  // ====================================================
+  // -----------------------
+  //   HEADER BAR / TITLE
+  // -----------------------
+  doc.setFillColor(15, 60, 120);
+  doc.rect(0, 0, pageWidth, 18, "F");
+  doc.setFontSize(15).setFont("helvetica", "bold").setTextColor(255, 255, 255);
+  doc.text("PURCHASE ORDER", pageWidth / 2, 12, { align: "center" });
+  doc.setTextColor(0, 0, 0);
+
+  // =============================
+  // 1. PO HEADER DETAILS
+  // =============================
+  sectionHeader("PO Details");
+  let boxStartY = y;
+
+  autoTable(doc, {
+  startY: y,
+  theme: "grid" as ThemeType,
+  headStyles: {
+    fillColor: [245, 245, 245],
+    textColor: 20,
+    fontSize: 9,
+    halign: "center"
+  },
+  styles: {
+    fontSize: 9,
+    cellPadding: 2,
+    valign: "middle"
+  },
+  columnStyles: {
+    0: { cellWidth: 45, fontStyle: "bold" },
+    1: { cellWidth: pageWidth - 75 }
+  },
+  margin: { left: 15, right: 15 },
+  body: [
+    ["PO No", data.PO_NO || ""],
+    ["Date", data.PO_DATE || ""],
+    ["Reference No", data.REF_NO || ""],
+    ["Supplier", data.SUPP_NAME || ""],
+    ["Store", data.STORE || ""]
+  ]
+} as UserOptions);
+
+
+  boxed(boxStartY);
+
+  // =============================
+  // 2. SUPPLIER DETAILS
+  // =============================
+  sectionHeader("Supplier Details");
+  boxStartY = y;
+
+autoTable(doc, {
+  startY: y,
+  theme: "grid" as ThemeType,
+  headStyles: {
+    fillColor: [245, 245, 245],
+    textColor: 20,
+    fontSize: 9,
+    halign: "center"
+  },
+  styles: {
+    fontSize: 9,
+    cellPadding: 2,
+    valign: "middle"
+  },
+  columnStyles: {
+    0: { cellWidth: 45, fontStyle: "bold" },
+    1: { cellWidth: pageWidth - 75 }
+  },
+  margin: { left: 15, right: 15 },
+  body: [
+    ["Currency", data.CURRENCY_NAME || ""],
+    ["Exchange Rate", data.EXCHANGE_RATE || ""],
+    ["VAT Rule", data.VAT_RULE_NAME || ""],
+    ["Address", data.SUPP_ADDRESS || ""],
+    ["Contact Person", data.SUPP_CONTACT || ""],
+    ["Email", data.SUPPLIER_EMAIL || ""],
+    ["Contact No", data.SUPP_MOBILE || ""]
+  ]
+} as UserOptions);
+
+
+  boxed(boxStartY);
+
+  // =============================
+  // 3. SHIPPING DETAILS
+  // =============================
+  sectionHeader("Shipping Details");
+  boxStartY = y;
+
+autoTable(doc, {
+  startY: y,
+  theme: "grid" as ThemeType,
+  headStyles: {
+    fillColor: [245, 245, 245],
+    textColor: 20,
+    fontSize: 9,
+    halign: "center"
+  },
+  styles: {
+    fontSize: 9,
+    cellPadding: 2,
+    valign: "middle"
+  },
+  columnStyles: {
+    0: { cellWidth: 45, fontStyle: "bold" },
+    1: { cellWidth: pageWidth - 75 }
+  },
+  margin: { left: 15, right: 15 },
+  body: [
+    ["Shipping Address", data.SHIP_TO || ""],
+    ["Purpose", data.PURPOSE || ""],
+    ["Contact Name", data.CONTACT_NAME || ""],
+    ["Mobile", data.CONTACT_MOBILE || ""]
+  ]
+} as UserOptions);
+
+
+  boxed(boxStartY);
+
+  // =============================
+  // 4. TERMS & CONDITIONS
+  // =============================
+  sectionHeader("Terms & Conditions");
+  boxStartY = y;
+
+ autoTable(doc, {
+  startY: y,
+  theme: "grid" as ThemeType,
+  headStyles: {
+    fillColor: [245, 245, 245],
+    textColor: 20,
+    fontSize: 9,
+    halign: "center"
+  },
+  styles: {
+    fontSize: 9,
+    cellPadding: 2,
+    valign: "middle"
+  },
+  columnStyles: {
+    0: { cellWidth: 45, fontStyle: "bold" },
+    1: { cellWidth: pageWidth - 75 }
+  },
+  margin: { left: 15, right: 15 },
+  body: [
+    ["Shipment Method", data.DELIVERY_TERM || ""],
+    ["Payment", data.PAY_TERM || ""],
+    ["Delivery Date", data.DELIVERY_DATE || ""],
+    ["Reference", data.DELIVERY_DESC || ""],
+    ["Notes", data.NOTES || ""],
+    ["Narration", data.NARRATION || ""],
+    ["Issued By", data.ISSUED_EMP_ID || ""]
+  ]
+} as UserOptions);
+
+
+  boxed(boxStartY);
+
+  // =============================
+  // 5. ITEMS TABLE
+  // =============================
+  sectionHeader("Items");
+
+  const itemRows =
+    data.PoDetails?.map((item: any, index: number) => [
+      index + 1,
+      item.ITEM_CODE || "",
+      item.ITEM_DESC || "",
+      item.UOM || "",
+      item.PACKING || "",
+      (item.PRICE || 0).toLocaleString(),
+      item.QUANTITY || 0,
+      item.DISC_PERCENT || 0,
+      (item.TOTAL_AMOUNT || 0).toLocaleString()
+    ]) || [];
+
   autoTable(doc, {
     startY: y,
-    theme: "grid",
-    headStyles: { fillColor: [240, 240, 240] },
+   theme: "grid" as const,
+    headStyles: { fillColor: [200, 220, 255], halign: "center", fontSize: 9 },
     styles: { fontSize: 9, cellPadding: 2 },
     margin: { left: 15, right: 15 },
-    body: [
-      ["PO No", data.PO_NO || ""],
-      ["Date", data.PO_DATE || ""],
-      ["Reference No", data.REF_NO || ""],
-      ["Supplier", data.SUPP_NAME || ""],
-      ["Store", data.STORE || ""],
-    ]
+    head: [
+      [
+        "Sl No",
+        "Item Code",
+        "Description",
+        "UOM",
+        "Packing",
+        "Price",
+        "Qty",
+        "Disc%",
+        "Total"
+      ]
+    ],
+    body: itemRows
   });
 
   y = (doc as any).lastAutoTable.finalY + 8;
 
-  // ====================================================
-  //  SUPPLIER DETAILS
-  // ====================================================
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.text("Supplier Details", 15, y);
-
-  y += 5;
+  // =============================
+  // 6. TOTAL SUMMARY
+  // =============================
+  const grandTotal = data.NET_AMOUNT || 0;
 
   autoTable(doc, {
     startY: y,
-    theme: "grid",
-    headStyles: { fillColor: [245, 245, 245] },
-    styles: { fontSize: 9, cellPadding: 2 },
+    theme: "plain",
+    styles: { fontSize: 11, fontStyle: "bold" },
     margin: { left: 15, right: 15 },
-    body: [
-      ["Currency", data.CURRENCY_NAME || ""],
-      ["Exchange Rate", data.EXCHANGE_RATE   || ""],
-      ["VAT Rule", data.VAT_RULE_NAME || ""],
-      ["Address", data.SUPP_ADDRESS || ""],
-      ["Contact Person", data.SUPP_CONTACT || ""],
-      ["Email", data.SUPPLIER_EMAIL || ""],
-      ["Contact No", data.SUPP_MOBILE || ""],
-    ]
+    body: [["Grand Total", grandTotal.toLocaleString()]]
   });
 
-  y = (doc as any).lastAutoTable.finalY + 10;
-
-  // ====================================================
-  //  SHIPPING DETAILS
-  // ====================================================
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.text("Shipping Details", 15, y);
-
-  y += 5;
-
-  autoTable(doc, {
-    startY: y,
-    theme: "grid",
-    headStyles: { fillColor: [245, 245, 245] },
-    styles: { fontSize: 9, cellPadding: 2 },
-    margin: { left: 15, right: 15 },
-    body: [
-      ["Shipping Address", data.SHIP_TO || ""],
-      ["Purpose", data.PURPOSE || ""],
-      ["Contact Name", data.CONTACT_NAME || ""],
-      ["Mobile", data.CONTACT_MOBILE || ""],
-    ]
-  });
-
-  y = (doc as any).lastAutoTable.finalY + 10;
-
-  // ====================================================
-  //  TERMS & CONDITIONS
-  // ====================================================
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.text("Terms & Conditions", 15, y);
-
-  y += 5;
-
-  autoTable(doc, {
-    startY: y,
-    theme: "grid",
-    headStyles: { fillColor: [245, 245, 245] },
-    styles: { fontSize: 9, cellPadding: 2 },
-    margin: { left: 15, right: 15 },
-    body: [
-      ["Shipment Method", data.DELIVERY_TERM || ""],
-      ["Payment", data.PAY_TERM || ""],
-      ["Delivery Date", data.DELIVERY_DATE || ""],
-      ["Reference", data.DELIVERY_DESC || ""],
-      ["Notes", data.NOTES || ""],
-      ["Narration", data.NARRATION || ""],
-      ["Issued By", data.ISSUED_EMP_ID || ""]
-    ]
-  });
-
-
-  // ====================================================
-//  DETAIL TAB – ITEMS TABLE
-// ====================================================
-y = (doc as any).lastAutoTable.finalY + 10;
-
-// Table Title
-doc.setFontSize(11);
-doc.setFont("helvetica", "bold");
-doc.text("Items", 15, y);
-
-y += 5;
-
-// Prepare table data
-const itemRows = data.PoDetails?.map((item: any, index: number) => [
-  index + 1,
-  item.ITEM_CODE || "",
-  item.ITEM_DESC || "",
-  item.UOM || "",
-  item.PACKING || "",
-  (item.PRICE || 0).toLocaleString(),
-  item.QUANTITY || 0,
-  item.DISC_PERCENT || 0,
-  (item.TOTAL_AMOUNT || 0).toLocaleString()
-]) || [];
-
-// ITEMS TABLE
-autoTable(doc, {
-  startY: y,
-  theme: "striped",
-  headStyles: { fillColor: [195, 225, 255],textColor: 20 },   // light blue header
-  styles: { fontSize: 9, cellPadding: 2 },
-  margin: { left: 15, right: 15 },
-  head: [[
-    "Sl No", "Item Code", "Description", "UOM", "Packing",
-    "Price", "Qty", "Disc%", "Total"
-  ]],
-  body: itemRows
-});
-
-y = (doc as any).lastAutoTable.finalY + 5;
-
-// =======================
-// TABLE FOOTER TOTALS
-// =======================
-
-// const totalQty = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.Qty || 0), 0) || 0;
-// const totalTaxable = data.GROSS_AMOUNT || 0;
- const grandTotal = data.NET_AMOUNT || 0;
-
-
-autoTable(doc, {
-  startY: y,
-  theme: "plain",
-  styles: { fontSize: 10, fontStyle: "bold" },
-  margin: { left: 15, right: 15 },
-  body: [
-    // ["Total Qty", totalQty],
-    // ["Total Taxable", totalTaxable.toLocaleString()],
-    ["Grand Total", grandTotal.toLocaleString()]
-  ]
-});
-
-
-// ====================================================
-//  ATTACHMENTS TAB
-// ====================================================
-// y = (doc as any).lastAutoTable.finalY + 15;
-
-// // Section Title
-// doc.setFontSize(11);
-// doc.setFont("helvetica", "bold");
-// doc.text("Attachments", 15, y);
-
-// y += 8;
-
-// // Convert attachments to table rows
-// const attachmentRows = data.Attachments?.map((att: any) => [
-//   att.FileName || "",
-//   att.Remarks || ""
-// ]) || [];
-
-// // ATTACHMENTS TABLE
-// autoTable(doc, {
-//   startY: y,
-//   theme: "striped",
-//   headStyles: { fillColor: [220, 230, 255] },
-//   styles: { fontSize: 10, cellPadding: 3 },
-//   margin: { left: 15, right: 15 },
-//   head: [["File Name", "Remarks"]],
-//   body: attachmentRows,
-// });
-
-
-// ====================================================
-//  HISTORY TAB
-// ====================================================
-// y = (doc as any).lastAutoTable.finalY + 15;
-
-// // Section Title
-// doc.setFontSize(11);
-// doc.setFont("helvetica", "bold");
-// doc.text("History", 15, y);
-
-// y += 8;
-
-// // Convert attachments to table rows
-// const historyRows = data.History?.map((att: any) => [
-//   att.SlNo || "",
-//   att.DateTime || "",
-//   att.Description || "",
-//   att.User || ""
-// ]) || [];
-
-// // ATTACHMENTS TABLE
-// autoTable(doc, {
-//   startY: y,
-//   theme: "striped",
-//   headStyles: { fillColor: [220, 230, 255] },
-//   styles: { fontSize: 10, cellPadding: 3 },
-//   margin: { left: 15, right: 15 },
-//   head: [["SlNo", "DateTime", "Description", "User"]],
-//   body: historyRows,
-// });
-
-  // -------------------- EXPORT --------------------
-  const pdfBlob = doc.output('blob');
+  // ------------------------------
+  // EXPORT PDF
+  // ------------------------------
+  const pdfBlob = doc.output("blob");
   const pdfUrl = URL.createObjectURL(pdfBlob);
   return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
 }
