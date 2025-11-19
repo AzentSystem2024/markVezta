@@ -648,245 +648,77 @@ export class PurchaseReturnDebitFormComponent {
     });
   }
 
-  // generatePDF(data: any) {
-  //   const doc = new jsPDF();
-
-  //   // --- HEADER ---
-  //   // --- HEADER ---
-  //   // --- HEADER ---
-  //   doc.setFontSize(16);
-
-  //   const title = 'Purchase Return Invoice';
-  //   const pageWidth = doc.internal.pageSize.getWidth();
-  //   const textWidth = doc.getTextWidth(title);
-
-  //   doc.text(title, (pageWidth - textWidth) / 2, 15);
-
-  //   // ===================================================================
-  //   //                 HEADER WITH SPLIT LEFT + RIGHT SECTIONS
-  //   // ===================================================================
-
-  //   doc.setFontSize(11);
-
-  //   // LEFT SIDE → Supplier
-  //   let leftLabelX = 14;
-  //   let leftColonX = 45;
-  //   let leftValueX = 50;
-  //   let leftY = 25;
-
-  //   // RIGHT SIDE → Return No / Date / Narration
-  //   let rightLabelX = pageWidth - 90;
-  //   let rightColonX = pageWidth - 60;
-  //   let rightValueX = pageWidth - 55;
-  //   let rightY = 25;
-
-  //   // LEFT SIDE PRINTER (Only Supplier)
-  //   const printLeftRow = (label: string, value: string) => {
-  //     doc.setFont('helvetica', 'normal');
-  //     doc.text(label, leftLabelX, leftY);
-  //     doc.text(':', leftColonX, leftY);
-  //     doc.text(value, leftValueX, leftY);
-  //     leftY += 7;
-  //   };
-
-  //   // RIGHT SIDE PRINTER (Return No / Date / Narration)
-  //   const printRightRow = (label: string, value: string) => {
-  //     doc.setFont('helvetica', 'normal');
-  //     doc.text(label, rightLabelX, rightY);
-  //     doc.text(':', rightColonX, rightY);
-  //     doc.text(value, rightValueX, rightY);
-  //     rightY += 7;
-  //   };
-
-  //   // --- PRINT HEADER FIELDS ---
-  //   printLeftRow('Supplier', data.SUPPLIER_NAME);
-
-  //   printRightRow('Return No', data.RET_NO);
-  //   printRightRow('Return Date', data.RET_DATE.split('T')[0]);
-  //   printRightRow('Narration', data.NARRATION || '-');
-
-  //   // --- TABLE ROWS (using your actual API fields) ---
-  //   const rows = data.PurchDetail.map((item) => [
-  //     item.DOC_NO, // Transfer No
-  //     item.PURCH_DATE?.split('T')[0] || '', // Date
-  //     item.ITEM_NAME, // Item Description
-  //     item.PENDING_QTY, // Pending Qty
-  //     item.RATE.toFixed(2), // Price
-  //     item.AMOUNT.toFixed(2), // Amount
-  //     item.VAT_PERC.toFixed(2), // TAX%
-  //     item.VAT_AMOUNT.toFixed(2), // Tax Amount
-  //     item.TOTAL_AMOUNT.toFixed(2), // Total Amount
-  //   ]);
-
-  //   // --- TABLE ---
-  //   autoTable(doc, {
-  //     startY: 55,
-  //     head: [
-  //       [
-  //         'Transfer No',
-  //         'Date',
-  //         'Item Description',
-  //         'Pending Qty',
-  //         'Price',
-  //         'Amount',
-  //         'TAX%',
-  //         'Tax Amount',
-  //         'Total Amount',
-  //       ],
-  //     ],
-  //     body: rows,
-  //     theme: 'grid',
-  //     headStyles: {
-  //       fillColor: [207, 231, 255], // SAME BLUE COLOR AS SAMPLE
-  //       textColor: 0,
-  //       fontStyle: 'bold',
-  //       halign: 'center',
-  //       fontSize: 10,
-  //     },
-  //     bodyStyles: {
-  //       halign: 'center',
-  //       fontSize: 9,
-  //     },
-  //     columnStyles: {
-  //       2: { halign: 'left' }, // Item Description → left aligned
-  //     },
-  //     styles: {
-  //       lineWidth: 0.1, // ✨ key change — makes table look clean
-  //       lineColor: [180, 180, 180],
-  //       textColor: 0,
-  //     },
-  //   });
-
-  //   // --- FOOTER TOTALS ---
-  //   // --- FOOTER TOTALS ---
-  //   let finalY = (doc as any).lastAutoTable.finalY + 15;
-
-  //   doc.setFontSize(11);
-
-  //   // -------------------------------
-  //   // 1. Define alignment columns
-  //   // -------------------------------
-  //   const labelEndX = pageWidth - 40; // Where labels (ends) align
-  //   const amountEndX = pageWidth - 20; // Right edge for values
-
-  //   // -------------------------------
-  //   // 2. Helper to print aligned rows
-  //   // -------------------------------
-  //   const printFooterRow = (label: string, value: string, y: number) => {
-  //     // LABEL (right aligned at labelEndX)
-  //     doc.setFont('helvetica', 'normal');
-  //     doc.text(label, labelEndX, y, { align: 'right' });
-
-  //     // VALUE (right aligned at amountEndX)
-  //     doc.setFont('helvetica', 'bold');
-  //     doc.text(value, amountEndX, y, { align: 'right' });
-  //   };
-
-  //   // -------------------------------
-  //   // 3. Print Rows
-  //   // -------------------------------
-  //   printFooterRow('Gross Amount', data.GROSS_AMOUNT.toFixed(2), finalY);
-  //   printFooterRow('VAT Amount', data.VAT_AMOUNT.toFixed(2), finalY + 7);
-  //   printFooterRow('Net Amount', data.NET_AMOUNT.toFixed(2), finalY + 14);
-
-  //   // -------------------------------
-  //   // 4. Thank You Text
-  //   // -------------------------------
-  //   let thanksY = finalY + 30;
-  //   doc.setFontSize(12);
-  //   doc.setFont('helvetica', 'italic');
-  //   doc.text('Thank you for your business!', pageWidth / 2, thanksY, {
-  //     align: 'center',
-  //   });
-
-  //   // --- OPEN PDF ---
-  //   doc.output('dataurlnewwindow');
-  // }
-
   generatePDF(data: any) {
     const doc = new jsPDF();
+
+    // --- HEADER ---
+    doc.setFontSize(16);
+
+    const title = 'Purchase Return Invoice';
     const pageWidth = doc.internal.pageSize.getWidth();
+    const textWidth = doc.getTextWidth(title);
 
-    // =========================================================
-    //   COMPANY NAME (LEFT) + DATE / INVOICE # / CUSTOMER ID (RIGHT SAME ROW)
-    // =========================================================
+    doc.text(title, (pageWidth - textWidth) / 2, 15);
 
-    // LEFT: Company Name
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text(data.COMPANY_NAME || 'Company Name', 14, 18);
+    // ===================================================================
+    //                 HEADER WITH SPLIT LEFT + RIGHT SECTIONS
+    // ===================================================================
 
-    // RIGHT: Info Block
-    doc.setFontSize(10);
-    let infoY = 18; // SAME ROW AS COMPANY NAME
-    const rightLabelX = pageWidth - 70;
-    const rightValueX = pageWidth - 20;
+    doc.setFontSize(11);
 
-    const printInfo = (label: string, value: string) => {
-      doc.setFont('helvetica', 'bold');
-      doc.text(label, rightLabelX, infoY);
+    // LEFT SIDE → Supplier
+    let leftLabelX = 14;
+    let leftColonX = 45;
+    let leftValueX = 50;
+    let leftY = 25;
 
+    // RIGHT SIDE → Return No / Date / Narration
+    let rightLabelX = pageWidth - 90;
+    let rightColonX = pageWidth - 60;
+    let rightValueX = pageWidth - 55;
+    let rightY = 25;
+
+    // LEFT SIDE PRINTER (Only Supplier)
+    const printLeftRow = (label: string, value: string) => {
       doc.setFont('helvetica', 'normal');
-      doc.text(': ' + value, rightValueX, infoY, { align: 'right' });
-
-      infoY += 6;
+      doc.text(label, leftLabelX, leftY);
+      doc.text(':', leftColonX, leftY);
+      doc.text(value, leftValueX, leftY);
+      leftY += 7;
     };
 
-    printInfo('DATE', data.RET_DATE.split('T')[0]);
-    printInfo('INVOICE #', data.RET_NO);
-    printInfo('CUSTOMER ID', data.SUPPLIER_ID || '-');
+    // RIGHT SIDE PRINTER (Return No / Date / Narration)
+    const printRightRow = (label: string, value: string) => {
+      doc.setFont('helvetica', 'normal');
+      doc.text(label, rightLabelX, rightY);
+      doc.text(':', rightColonX, rightY);
+      doc.text(value, rightValueX, rightY);
+      rightY += 7;
+    };
 
-    // =========================================================
-    //                      INVOICE TITLE (BELOW INFO BLOCK)
-    // =========================================================
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('INVOICE', pageWidth - 60, infoY + 10);
+    // --- PRINT HEADER FIELDS ---
+    printLeftRow('Supplier', data.SUPPLIER_NAME);
 
-    // =========================================================
-    //                  BILL TO & SHIP TO BOXES (LIGHT BLUE)
-    // =========================================================
-    let blockY = infoY + 25; // move below "INVOICE"
+    printRightRow('Return No', data.RET_NO);
+    printRightRow('Return Date', data.RET_DATE.split('T')[0]);
+    printRightRow('Narration', data.NARRATION || '-');
 
-    doc.setFillColor(210, 230, 255);
-
-    // BILL TO
-    doc.rect(14, blockY, 80, 7, 'F');
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('BILL TO:', 18, blockY + 5);
-
-    doc.setFont('helvetica', 'normal');
-    doc.text(data.SUPPLIER_NAME || '-', 18, blockY + 15);
-
-    // SHIP TO
-    doc.setFillColor(210, 230, 255);
-    doc.rect(110, blockY, 80, 7, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.text('SHIP TO:', 114, blockY + 5);
-
-    doc.setFont('helvetica', 'normal');
-    doc.text(data.COMPANY_NAME || '-', 114, blockY + 15);
-
-    // =========================================================
-    //                        ITEM TABLE
-    // =========================================================
-
+    // --- TABLE ROWS (using your actual API fields) ---
     const rows = data.PurchDetail.map((item) => [
-      item.DOC_NO,
-      item.PURCH_DATE?.split('T')[0] || '',
-      item.ITEM_NAME,
-      item.PENDING_QTY,
-      item.RATE.toFixed(2),
-      item.AMOUNT.toFixed(2),
-      item.VAT_PERC.toFixed(2),
-      item.VAT_AMOUNT.toFixed(2),
-      item.TOTAL_AMOUNT.toFixed(2),
+      item.DOC_NO, // Transfer No
+      item.PURCH_DATE?.split('T')[0] || '', // Date
+      item.ITEM_NAME, // Item Description
+      item.PENDING_QTY, // Pending Qty
+      item.RATE.toFixed(2), // Price
+      item.AMOUNT.toFixed(2), // Amount
+      item.VAT_PERC.toFixed(2), // TAX%
+      item.VAT_AMOUNT.toFixed(2), // Tax Amount
+      item.TOTAL_AMOUNT.toFixed(2), // Total Amount
     ]);
 
+    // --- TABLE ---
     autoTable(doc, {
-      startY: blockY + 30,
+      startY: 55,
       head: [
         [
           'Transfer No',
@@ -903,69 +735,222 @@ export class PurchaseReturnDebitFormComponent {
       body: rows,
       theme: 'grid',
       headStyles: {
-        fillColor: [210, 230, 255],
+        fillColor: [207, 231, 255], // SAME BLUE COLOR AS SAMPLE
         textColor: 0,
         fontStyle: 'bold',
         halign: 'center',
+        fontSize: 10,
       },
       bodyStyles: {
         halign: 'center',
-        textColor: 0,
         fontSize: 9,
       },
       columnStyles: {
-        2: { halign: 'left' },
+        2: { halign: 'left' }, // Item Description → left aligned
       },
       styles: {
-        lineWidth: 0.1,
+        lineWidth: 0.1, // ✨ key change — makes table look clean
+        lineColor: [180, 180, 180],
+        textColor: 0,
       },
     });
 
-    // =========================================================
-    //                   TOTALS SECTION
-    // =========================================================
-    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    // --- FOOTER TOTALS ---
+    // --- FOOTER TOTALS ---
+    let finalY = (doc as any).lastAutoTable.finalY + 15;
 
-    doc.setFontSize(10);
+    doc.setFontSize(11);
 
-    doc.rect(pageWidth - 70, finalY, 55, 35);
+    // -------------------------------
+    // 1. Define alignment columns
+    // -------------------------------
+    const labelEndX = pageWidth - 40; // Where labels (ends) align
+    const amountEndX = pageWidth - 20; // Right edge for values
 
-    const printTotal = (label: string, value: string, y: number) => {
-      doc.text(label, pageWidth - 66, y);
-      doc.text(value, pageWidth - 18, y, { align: 'right' });
+    // -------------------------------
+    // 2. Helper to print aligned rows
+    // -------------------------------
+    const printFooterRow = (label: string, value: string, y: number) => {
+      // LABEL (right aligned at labelEndX)
+      doc.setFont('helvetica', 'normal');
+      doc.text(label, labelEndX, y, { align: 'right' });
+
+      // VALUE (right aligned at amountEndX)
+      doc.setFont('helvetica', 'bold');
+      doc.text(value, amountEndX, y, { align: 'right' });
     };
 
-    printTotal('SUBTOTAL', data.GROSS_AMOUNT.toFixed(2), finalY + 7);
-    printTotal('TAX', data.VAT_AMOUNT.toFixed(2), finalY + 14);
-    printTotal('TOTAL', data.NET_AMOUNT.toFixed(2), finalY + 28);
+    // -------------------------------
+    // 3. Print Rows
+    // -------------------------------
+    printFooterRow('Gross Amount', data.GROSS_AMOUNT.toFixed(2), finalY);
+    printFooterRow('VAT Amount', data.VAT_AMOUNT.toFixed(2), finalY + 7);
+    printFooterRow('Net Amount', data.NET_AMOUNT.toFixed(2), finalY + 14);
 
-    // =========================================================
-    //                        NOTES BOX
-    // =========================================================
-    doc.rect(14, finalY, 120, 35);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text('Other Comments or Special Instructions', 18, finalY + 6);
-
-    doc.setFont('helvetica', 'normal');
-    doc.text('1. Total payment due in 30 days', 18, finalY + 15);
-    doc.text(
-      '2. Please include the invoice number on your check',
-      18,
-      finalY + 22
-    );
-
-    // =========================================================
-    //                       FOOTER MESSAGE
-    // =========================================================
+    // -------------------------------
+    // 4. Thank You Text
+    // -------------------------------
+    let thanksY = finalY + 30;
     doc.setFontSize(12);
     doc.setFont('helvetica', 'italic');
-    doc.text('Thank You For Your Business!', pageWidth / 2, finalY + 55, {
+    doc.text('Thank you for your business!', pageWidth / 2, thanksY, {
       align: 'center',
     });
 
+    // --- OPEN PDF ---
     doc.output('dataurlnewwindow');
   }
+
+  // generatePDF(data: any) {
+  //   const doc = new jsPDF('p', 'mm', 'a4');
+  //   const pageWidth = doc.internal.pageSize.getWidth();
+
+  //   // =========================================================
+  //   // CENTERED INVOICE TITLE
+  //   // =========================================================
+  //   doc.setFontSize(20);
+  //   doc.setFont('helvetica', 'bold');
+  //   doc.text('INVOICE', pageWidth / 2, 18, { align: 'center' });
+
+  //   // =========================================================
+  //   // HEADER TWO-COLUMN LAYOUT
+  //   // =========================================================
+
+  //   const leftX = 14;
+  //   const rightX = pageWidth / 2 + 5;
+  //   let leftY = 32;
+  //   let rightY = 32;
+  //   const rowGap = 12;
+
+  //   const printLeft = (label: string, value: string) => {
+  //     doc.setFont('helvetica', 'bold');
+  //     doc.setFontSize(10);
+  //     doc.text(label, leftX, leftY);
+
+  //     doc.setFont('helvetica', 'normal');
+  //     doc.text(value, leftX, leftY + 5);
+
+  //     leftY += rowGap;
+  //   };
+
+  //   const printRight = (label: string, value: string) => {
+  //     doc.setFont('helvetica', 'bold');
+  //     doc.setFontSize(10);
+  //     doc.text(label, rightX, rightY);
+
+  //     doc.setFont('helvetica', 'normal');
+  //     doc.text(value, rightX, rightY + 5);
+
+  //     rightY += rowGap;
+  //   };
+
+  //   // LEFT SECTION
+  //   printLeft('INVOICE DATE', data.RET_DATE.split('T')[0]);
+  //   printLeft('INVOICE NO.', data.RET_NO);
+  //   printLeft(
+  //     'CUSTOMER ID',
+  //     data.SUPPLIER_ID ? data.SUPPLIER_ID.toString() : '-'
+  //   );
+
+  //   // RIGHT SECTION
+  //   printRight('PLACE OF SUPPLY', '--');
+  //   printRight('ORDER TYPE', 'Purchase Return');
+  //   printRight('NARRATION', data.NARRATION || '--');
+
+  //   // =========================================================
+  //   // BILL TO / BILL FROM CLEAN ROW
+  //   // =========================================================
+  //   const yBill = Math.max(leftY, rightY) + 5;
+
+  //   doc.setFont('helvetica', 'bold');
+  //   doc.text('BILL TO', leftX, yBill);
+  //   doc.text('BILL FROM', rightX, yBill);
+
+  //   doc.setFont('helvetica', 'normal');
+  //   doc.text(data.SUPPLIER_NAME || '-', leftX, yBill + 6);
+  //   doc.text(data.COMPANY_NAME || '-', rightX, yBill + 6);
+
+  //   const tableStartY = yBill + 15;
+
+  //   // =========================================================
+  //   // ITEM TABLE
+  //   // =========================================================
+  //   const rows = data.PurchDetail.map((item, idx) => [
+  //     (idx + 1).toString(),
+  //     item.ITEM_NAME,
+  //     item.PENDING_QTY.toString(),
+  //     item.RATE.toFixed(2),
+  //     item.DISC_PERCENT + '%',
+  //     item.VAT_PERC.toFixed(2),
+  //     item.AMOUNT.toFixed(2),
+  //   ]);
+
+  //   autoTable(doc, {
+  //     startY: tableStartY,
+  //     head: [
+  //       ['#', 'Item Name', 'Qty', 'Price/Unit', 'Discount', 'GST%', 'Amount'],
+  //     ],
+  //     body: rows,
+  //     theme: 'grid',
+  //     headStyles: {
+  //       fillColor: [210, 230, 255],
+  //       textColor: 0,
+  //       fontStyle: 'bold',
+  //       halign: 'center',
+  //     },
+  //     styles: {
+  //       fontSize: 9,
+  //       cellPadding: 3,
+  //       lineWidth: 0.1,
+  //     },
+  //     columnStyles: {
+  //       0: { halign: 'center', cellWidth: 10 },
+  //       1: { halign: 'left', cellWidth: 65 },
+  //       2: { halign: 'center', cellWidth: 15 },
+  //       3: { halign: 'right', cellWidth: 25 },
+  //       4: { halign: 'right', cellWidth: 20 },
+  //       5: { halign: 'center', cellWidth: 15 },
+  //       6: { halign: 'right', cellWidth: 25 },
+  //     },
+  //   });
+
+  //   const finalY = (doc as any).lastAutoTable.finalY + 10;
+
+  //   // =========================================================
+  //   // TOTALS SECTION (RIGHT SIDE)
+  //   // =========================================================
+  //   const totalsX = pageWidth - 60;
+  //   let tY = finalY;
+
+  //   const printTotal = (label: string, value: string) => {
+  //     doc.setFont('helvetica', 'bold');
+  //     doc.text(label, totalsX - 20, tY);
+  //     doc.setFont('helvetica', 'normal');
+  //     doc.text(value, totalsX + 25, tY, { align: 'right' });
+  //     tY += 7;
+  //   };
+
+  //   printTotal('SUBTOTAL', data.GROSS_AMOUNT.toFixed(2));
+  //   printTotal('GST', data.VAT_AMOUNT.toFixed(2));
+
+  //   doc.setFont('helvetica', 'bold');
+  //   doc.setFontSize(12);
+  //   doc.text('TOTAL', totalsX - 20, tY + 3);
+  //   doc.text(data.NET_AMOUNT.toFixed(2), totalsX + 25, tY + 3, {
+  //     align: 'right',
+  //   });
+
+  //   // =========================================================
+  //   // FOOTER
+  //   // =========================================================
+  //   doc.setFontSize(9);
+  //   doc.setFont('helvetica', 'italic');
+  //   doc.text('Generated by BOYZONE System', pageWidth / 2, tY + 25, {
+  //     align: 'center',
+  //   });
+
+  //   doc.output('dataurlnewwindow');
+  // }
 
   cancel() {
     this.popupClosed.emit();

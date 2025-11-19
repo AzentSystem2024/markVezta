@@ -219,21 +219,42 @@
               <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview" />
             </label>
           </div> -->
-          <div class="form-field image-field">
-            <!-- Upload Box (visible only when no image) -->
-            <label class="image-upload-box" *ngIf="!imagePreview">
+          <div
+            class="form-field image-field"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+          >
+            <!-- Upload Box (no image uploaded) -->
+            <label
+              class="image-upload-box"
+              *ngIf="!imagePreview"
+              [class.drag-active]="isDragOver"
+            >
               <input type="file" (change)="onImageSelected($event)" hidden />
-              <div class="placeholder-box">Upload Image</div>
+              <div class="placeholder-box">
+                Drag & Drop Image Here<br />
+                or<br />
+                <strong>Click to Upload</strong>
+              </div>
             </label>
 
-            <!-- Image Preview Box (visible only when image is uploaded) -->
+            <!-- Image Preview -->
             <div class="image-preview-box" *ngIf="imagePreview">
-              <!-- Delete Cross -->
               <span class="delete-btn" (click)="deleteImage()">✕</span>
-
-              <!-- Clickable Image for Zoom -->
               <img [src]="imagePreview" alt="Preview" (click)="openZoom()" />
             </div>
+          </div>
+
+          <!-- Zoom Popup -->
+          <div class="zoom-overlay" *ngIf="zoomActive" (click)="closeZoom()">
+            <span
+              class="close-btn"
+              (click)="closeZoom(); $event.stopPropagation()"
+            >
+              ✕
+            </span>
+            <img class="zoom-image" [src]="imagePreview" alt="Zoomed Image" />
           </div>
 
           <!-- Zoom Popup -->

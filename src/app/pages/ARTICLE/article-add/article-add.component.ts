@@ -128,6 +128,7 @@ export class ArticleAddComponent {
   createPacking: boolean = false;
   zoomActive = false;
   selectedUnitsTooltip = '';
+  isDragOver: boolean = false;
 
   constructor(private dataService: DataService) {}
 
@@ -166,6 +167,35 @@ export class ArticleAddComponent {
   }
   closeZoom() {
     this.zoomActive = false;
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.isDragOver = false;
+
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      // Call your existing method
+      this.onImageSelected({ target: { files: [file] } } as any);
+    }
+  }
+
+  handleFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result;
+    };
+    reader.readAsDataURL(file);
   }
   onCreatePackingChanged(e: any) {
     this.articleData.CREATE_PACKING = e.value;
