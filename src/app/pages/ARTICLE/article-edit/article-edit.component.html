@@ -111,8 +111,8 @@
           ></dx-text-box>
         </div>
         <div class="form-field">
-          <dx-select-box
-            label="Unit"
+          <!-- <dx-select-box
+            label="Production Unit"
             labelMode="floating"
             placeholder="Unit"
             [(value)]="articleData.UNIT_ID"
@@ -122,7 +122,21 @@
             [searchEnabled]="true"
             (onValueChanged)="onUnitChanged($event)"
           >
-          </dx-select-box>
+          </dx-select-box> -->
+          <dx-tag-box
+            label="Production Unit"
+            labelMode="floating"
+            placeholder="Select Units"
+            [dataSource]="produCtionUnits"
+            valueExpr="ID"
+            displayExpr="DESCRIPTION"
+            [searchEnabled]="true"
+            [showSelectionControls]="true"
+            [selectAllMode]="'allPages'"
+            [(value)]="articleData.UNIT_ID"
+            (onValueChanged)="onUnitChanged($event)"
+          >
+          </dx-tag-box>
           <!--  -->
         </div>
         <div class="form-field">
@@ -254,7 +268,7 @@
   </dxi-item>
   <!-- Footer Buttons -->
 
-  <dxi-item title="Attach Component" [visible]="!articleData.IS_COMPONENT">
+  <dxi-item title="Component" [visible]="!articleData.IS_COMPONENT">
     <div style="margin-top: 16px">
       <div
         class="popup-content"
@@ -316,7 +330,7 @@
     </div>
   </dxi-item>
 
-  <dxi-item title="BoM Component">
+  <dxi-item title="BoM">
     <div>
       <div
         class="popup-content"

@@ -29,6 +29,7 @@ import {
   DxNumberBoxModule,
   DxBoxModule,
   DxDataGridComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -125,6 +126,8 @@ export class ArticleAddComponent {
   data: any;
   selectedItemId: any;
   createPacking: boolean = false;
+  zoomActive = false;
+  selectedUnitsTooltip = '';
 
   constructor(private dataService: DataService) {}
 
@@ -153,6 +156,16 @@ export class ArticleAddComponent {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  openZoom() {
+    this.zoomActive = true;
+  }
+  deleteImage() {
+    this.imagePreview = null;
+  }
+  closeZoom() {
+    this.zoomActive = false;
   }
   onCreatePackingChanged(e: any) {
     this.articleData.CREATE_PACKING = e.value;
@@ -217,22 +230,22 @@ export class ArticleAddComponent {
       };
 
       // Remove spin buttons to prevent layout changes
-      // if (e.editorName === 'dxNumberBox') {
-      //   e.editorOptions.showSpinButtons = false;
-      // }
-      // e.editorOptions.onKeyDown = (event: any) => {
-      //   if (event.event.key === 'Enter') {
-      //     const grid = this.itemsGridRef?.instance;
-      //     const visibleRows = grid.getVisibleRows();
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
 
-      //     const rowIndex = visibleRows.findIndex(
-      //       (r) => r?.data === e.row?.data
-      //     );
-      //     setTimeout(() => {
-      //       grid.focus(grid.getCellElement(rowIndex, 'GST'));
-      //     }, 50);
-      //   }
-      // };
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
     }
     const grid = e.component;
     const row = e.row?.data;
@@ -509,23 +522,22 @@ export class ArticleAddComponent {
   getLastOrderNo() {
     if (!this.selectedProductionUnitId) return;
     console.log(this.selectedProductionUnitId, 'SELECTEDPRODUCTIONUNITID');
-    this.dataService
-      .getLastOrderNo(this.selectedProductionUnitId)
-      .subscribe((response: any) => {
-        const last = Number(response?.LastOrderNo ?? 0);
-        this.lastOrderNo = last;
-        let nextOrderNo = last + 1;
+    const ids = this.selectedProductionUnitId.join(',');
+    this.dataService.getLastOrderNo(ids).subscribe((response: any) => {
+      const last = Number(response?.LastOrderNo ?? 0);
+      this.lastOrderNo = last;
+      let nextOrderNo = last + 1;
 
-        if (Array.isArray(this.articleSizeData)) {
-          // Sort by SIZE ascending
-          this.articleSizeData = this.articleSizeData
-            .sort((a, b) => a.SIZE - b.SIZE)
-            .map((item: any) => ({
-              ...item,
-              ORDER_NO: nextOrderNo++,
-            }));
-        }
-      });
+      if (Array.isArray(this.articleSizeData)) {
+        // Sort by SIZE ascending
+        this.articleSizeData = this.articleSizeData
+          .sort((a, b) => a.SIZE - b.SIZE)
+          .map((item: any) => ({
+            ...item,
+            ORDER_NO: nextOrderNo++,
+          }));
+      }
+    });
   }
 
   openAttachPopup() {
@@ -830,6 +842,7 @@ export class ArticleAddComponent {
     DxBoxModule,
     DxoPageSizeModule,
     DxTabPanelModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [ArticleAddComponent],

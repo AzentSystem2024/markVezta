@@ -29,36 +29,38 @@
           gap: 10px;
         "
       >
-        <div style="display: flex; gap: 10px">
+        <div style="display: flex; gap: 10px; margin-top: 5px">
           <dx-date-box
-            label="Supplier Invoice Date"
+            label="Return Date"
             type="date"
-            [(value)]="purchaseInvoiceFormData.SUPP_INV_DATE"
+            [(value)]="purchaseReturnFormData.RET_DATE"
             labelMode="floating"
             [width]="200"
             [displayFormat]="'dd-MM-yyyy'"
+            [readOnly]="true"
           >
           </dx-date-box>
 
           <dx-text-box
             label="Supplier Invoice No."
             labelMode="floating"
-            [(value)]="purchaseInvoiceFormData.SUPP_INV_NO"
+            [(value)]="purchaseReturnFormData.RET_NO"
             [width]="200"
+            [readOnly]="true"
           >
           </dx-text-box>
         </div>
-
-        <dx-date-box
-          label="Transaction Date"
-          type="date"
-          [(value)]="purchaseInvoiceFormData.PURCH_DATE"
-          labelMode="floating"
+        <dx-button
+          *ngIf="!isReadOnlyMode"
+          text="Fill Pending Invoice"
+          icon="event"
+          (onClick)="openPendingGrnPopup()"
           [width]="200"
-          [displayFormat]="'dd-MM-yyyy'"
-          [readOnly]="true"
-        >
-        </dx-date-box>
+          stylingMode="outlined"
+          class="blue-outline-btn"
+          [disabled]="isReadOnlyMode"
+          style="margin-top: 15px"
+        ></dx-button>
       </div>
 
       <!-- Row 2: Supplier + Narration on left, Fill Pending GRN button on right -->
@@ -75,33 +77,24 @@
             [dataSource]="supplierList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
-            [(value)]="purchaseInvoiceFormData.SUPP_ID"
-            [width]="405"
+            [(value)]="purchaseReturnFormData.SUPP_ID"
+            [width]="410"
             label="Supplier"
             labelMode="floating"
             (onValueChanged)="onSupplierChanged($event)"
+            [readOnly]="isReadOnlyMode"
           >
           </dx-select-box>
-
-          <dx-text-box
-            label="Narration"
-            labelMode="floating"
-            [(value)]="purchaseInvoiceFormData.NARRATION"
-            [width]="400"
-          >
-          </dx-text-box>
         </div>
 
         <div style="display: flex; gap: 2px; justify-content: flex-end">
-          <dx-button
-            text="Fill Pending GRN"
-            icon="event"
-            [width]="200"
-            stylingMode="outlined"
-            class="blue-outline-btn"
-            (onClick)="openPendingGrnPopup()"
-            [disabled]="!purchaseInvoiceFormData.SUPP_ID"
-          ></dx-button>
+          <dx-text-box
+            label="Narration"
+            [(value)]="purchaseReturnFormData.NARRATION"
+            labelMode="floating"
+            [width]="400"
+            [readOnly]="isReadOnlyMode"
+          ></dx-text-box>
         </div>
       </div>
     </div>
@@ -131,7 +124,7 @@
           [editing]="{
             mode: 'cell',
             allowUpdating: true,
-            allowDeleting: true,
+            allowDeleting: !isReadOnlyMode,
             allowAdding: false,
             useIcons: true
           }"
@@ -141,31 +134,47 @@
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
           <dxi-column
+            dataField="DETAIL_ID"
+            caption="Detail ID"
+            [allowEditing]="!isReadOnlyMode"
+            [visible]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="GRN_DET_ID"
+            caption="GRN Detail Id"
+            [allowEditing]="!isReadOnlyMode"
+            [visible]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="ITEM_ID"
+            caption="Item ID"
+            [allowEditing]="!isReadOnlyMode"
+            [visible]="false"
+          ></dxi-column>
+
+          <dxi-column
             dataField="TRANSFER_NO"
             caption="Transfer No"
-            [width]="120"
-            [allowEditing]="false"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
           <dxi-column
             dataField="TRANSFER_DATE"
             caption="Date"
             dataType="date"
             format="dd-MM-yyyy"
-            [width]="120"
-            [allowEditing]="false"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
           <dxi-column
             dataField="ITEM_NAME"
             caption="Item Name"
-            [allowEditing]="false"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
           <dxi-column
             dataField="RATE"
             caption="Price"
             dataType="number"
             format="#,##0.00"
-            [width]="120"
-            [allowEditing]="false"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
           <dxi-column
             dataField="PENDING_QTY"
@@ -177,7 +186,7 @@
             dataField="QUANTITY"
             caption="Qty"
             dataType="number"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
           >
             <dxi-validation-rule
               type="custom"
@@ -191,47 +200,33 @@
             caption="Amount"
             dataType="number"
             format="#,##0.00"
-            [width]="140"
-            [allowEditing]="false"
+            [allowEditing]="!isReadOnlyMode"
             [calculateCellValue]="calculateAmount"
           ></dxi-column>
           <dxi-column
             dataField="VAT_PERC"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? 'VAT %'
-                : ' GST %'
-            "
             dataType="number"
             format="#,##0.00"
-            [width]="80"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
-            dataField="TAX_AMOUNT"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? 'VAT Amount'
-                : ' GST Amount'
-            "
+            dataField="VAT_AMOUNT"
             dataType="number"
             format="#,##0.00"
-            [width]="140"
             [allowEditing]="false"
-            [calculateCellValue]="calculateGstAmount"
+            [calculateCellValue]="calculateVATAmount"
           ></dxi-column>
           <dxi-column
             dataField="TOTAL_AMOUNT"
             caption="Total Amount"
             dataType="number"
             format="#,##0.00"
-            [width]="140"
             [allowEditing]="false"
-            [calculateCellValue]="calculateTotal"
+            [calculateCellValue]="calculateTotalAmount"
           ></dxi-column>
           <dxo-summary>
             <dxi-total-item
-              column="QUANTITY"
+              column="AMOUNT"
               summaryType="sum"
               valueFormat="#,##0.00"
               displayFormat="{0}"
@@ -244,44 +239,46 @@
               displayFormat="{0}"
               alignment="right"
             ></dxi-total-item>
-
-            <dxi-total-item
-              column="TAX_AMOUNT"
-              summaryType="sum"
-              valueFormat="#,##0.00"
-              displayFormat="{0}"
-              alignment="right"
-            ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
-        <div
-          style="
-            margin: 16px 0 8px 0;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-          "
-        >
-          <dx-check-box
-            text="Approve"
-            [(value)]="purchaseInvoiceFormData.IS_APPROVED"
-          ></dx-check-box>
-        </div>
+
         <div class="form-popup-buttons-container">
+          <div class="approve-container">
+            <dx-check-box
+              [value]="
+                isReadOnlyMode ? true : purchaseReturnFormData.IS_APPROVED
+              "
+              (valueChange)="
+                !isReadOnlyMode
+                  ? (purchaseReturnFormData.IS_APPROVED = $event)
+                  : null
+              "
+              [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+              [readOnly]="isReadOnlyMode"
+              stylingMode="outlined"
+            >
+            </dx-check-box>
+          </div>
           <div class="popup-footer">
             <dx-button
               text="Cancel"
-              (onClick)="cancel()"
               stylingMode="outlined"
               type="normal"
+              (onClick)="cancel()"
             ></dx-button>
             <dx-button
               #saveButtonRef
-              [text]="purchaseInvoiceFormData.IS_APPROVED ? 'Commit' : 'Save'"
+              [text]="
+                isReadOnlyMode
+                  ? 'PDF'
+                  : purchaseReturnFormData.IS_APPROVED
+                  ? 'Commit'
+                  : 'Save'
+              "
+              (onClick)="isReadOnlyMode ? openPDF() : savePurchaseReturn()"
               stylingMode="contained"
               type="default"
-              (onClick)="savePurchaseInvoice()"
+              [width]="120"
             ></dx-button>
           </div>
         </div>
@@ -302,7 +299,7 @@
   <div *dxTemplate="let data of 'content'">
     <dx-data-grid
       #popupGridRef
-      [dataSource]="pendingGRNs"
+      [dataSource]="pendingList"
       [showBorders]="true"
       [showRowLines]="true"
       [showColumnLines]="true"
@@ -358,10 +355,10 @@
 
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
       </dxo-toolbar>
-      <dxi-column dataField="GRN_NO" caption="GRN No"></dxi-column>
+      <dxi-column dataField="DOC_NO" caption="Doc No"></dxi-column>
       <dxi-column
-        dataField="GRN_DATE"
-        caption="GRN Date"
+        dataField="PURCH_DATE"
+        caption="Date"
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
@@ -371,19 +368,34 @@
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <!-- <dxi-column
-        dataField="INVOICE_QTY"
-        caption="Invoice Qty"
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
         dataType="number"
-      ></dxi-column> -->
+      ></dxi-column>
       <dxi-column
         dataField="PENDING_QTY"
-        caption="Pending Qty"
+        caption="Quantity"
         dataType="number"
       ></dxi-column>
       <dxi-column
         dataField="RATE"
         caption="Price"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="AMOUNT"
+        caption="Amount"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="VAT_PERC"
+        caption="Tax%"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="TAX_AMOUNT"
+        caption="Tax Amount"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
     </dx-data-grid>

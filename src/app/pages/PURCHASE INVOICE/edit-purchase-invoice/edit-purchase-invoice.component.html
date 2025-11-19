@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 70vh;
+      height: 85vh;
       display: flex;
       flex-direction: column;
 
@@ -126,7 +126,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'40vh'"
+          [height]="'55vh'"
           [width]="'auto'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
@@ -172,7 +172,7 @@
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
-            dataField="PENDING_QTY"
+            dataField="PO_QUANTITY"
             caption="Pending Qty"
             dataType="number"
             [allowEditing]="false"
@@ -275,7 +275,7 @@
           ></dx-check-box>
         </div>
 
-        <div class="form-popup-buttons-container" *ngIf="!readOnly">
+        <div class="form-popup-buttons-container">
           <div class="popup-footer">
             <dx-button
               text="Cancel"
@@ -285,11 +285,10 @@
             ></dx-button>
             <dx-button
               #saveButtonRef
-              text="Save"
+              [text]="readOnly ? 'PDF' : 'Save'"
               stylingMode="contained"
               type="default"
-              [width]="120"
-              (onClick)="savePurchaseInvoice()"
+              (onClick)="readOnly ? openPDF() : savePurchaseInvoice()"
             ></dx-button>
           </div>
         </div>
@@ -389,7 +388,7 @@
         dataType="number"
       ></dxi-column> -->
       <dxi-column
-        dataField="PENDING_QTY"
+        dataField="PO_QUANTITY"
         caption="Pending Qty"
         dataType="number"
       ></dxi-column>

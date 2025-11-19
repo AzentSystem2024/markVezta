@@ -85,10 +85,14 @@
 }
 
 .form-popup-buttons-container {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
   display: flex;
   justify-content: flex-end;
-  padding: 10px 0 0 0; // no side padding since parent already has it
-  margin-right: 12px;
+  padding: 10px 20px; // no side padding since parent already has it
+  // border-top: 1px solid #ddd;
+  z-index: 10;
 }
 
 .popup-footer {

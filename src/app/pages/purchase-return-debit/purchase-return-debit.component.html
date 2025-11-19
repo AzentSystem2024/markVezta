@@ -12,7 +12,7 @@
         showPane: true
       }"
       class="grid theme-dependent"
-      [dataSource]="filteredPurchaseInvoices"
+      [dataSource]="filteredJournalVoucherList"
       [showBorders]="true"
       [showRowLines]="true"
       [showColumnLines]="true"
@@ -26,17 +26,18 @@
       [columnResizingMode]="'nextColumn'"
       [filterRow]="{ visible: false }"
       [headerFilter]="{ visible: false }"
-      [scrolling]="{ mode: 'standard' }"
+      [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
+      (onEditingStart)="onEditPurchaseReturn($event)"
+      (onRowRemoving)="onDeletePurchaseReturn($event)"
       (onToolbarPreparing)="onToolbarPreparing($event)"
-      (onEditingStart)="onEditInvoice($event)"
-      (onRowRemoving)="onDeleteInvoice($event)"
+      (onCellPrepared)="onCellPrepared($event)"
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
+        [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
@@ -49,7 +50,7 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
       <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
@@ -67,9 +68,10 @@
       ></dxo-filter-row>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Purchase Invoice</div>
+          <div class="grid-header">Purchase Return(Debit Note)</div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <!-- <dxi-item widget="dxButton" [options]="filterButtonOptions"></dxi-item> -->
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -85,6 +87,7 @@
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
+
       <div *dxTemplate="let data of 'dateFilterTemplate'">
         <dx-select-box
           [dataSource]="dateRanges"
@@ -101,24 +104,42 @@
           </div>
         </dx-select-box>
       </div>
-      <dxi-column dataField="PURCH_NO" caption="Purchase No"></dxi-column>
-      <!-- <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column> -->
+      <dxi-column dataField="RET_NO" caption="Return No"></dxi-column>
       <dxi-column
-        dataField="SUPPPLIER_NAME"
-        caption="Supplier Name"
-      ></dxi-column>
-      <dxi-column dataField="NET_AMOUNT" caption="NET Amount"></dxi-column>
-      <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
-      <dxi-column
-        dataField="PURCH_DATE"
-        caption="Date"
+        dataField="RET_DATE"
+        caption="Return Date"
         dataType="date"
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
+      <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+      <dxi-column
+        dataField="GROSS_AMOUNT"
+        caption="Gross Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="VAT_AMOUNT"
+        [caption]="
+          selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+            ? 'VAT Amount'
+            : ' GST Amount'
+        "
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="NET_AMOUNT"
+        caption="NET Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <!-- <dxi-column dataField="NARRATION" caption="Narration"></dxi-column> -->
+
       <dxi-column
         caption="Status"
-        dataField="STATUS"
+        dataField="TRANS_STATUS"
         [width]="80"
         [cellTemplate]="statusCellRender"
         [allowHeaderFiltering]="true"
@@ -126,6 +147,8 @@
           dataSource: getStatusFilterData,
           encodeHtml: false
         }"
+        [fixed]="true"
+        fixedPosition="right"
       >
       </dxi-column>
     </dx-data-grid>
@@ -133,32 +156,31 @@
 </div>
 
 <dx-popup
-  [(visible)]="isAddInvoice"
+  [(visible)]="isAddPurchaseReturn"
   [width]="'100vw'"
   [height]="'100vh'"
-  title="New Invoice"
+  title="Purchase Return(Debit Note)"
   (onHiding)="handleClose()"
 >
-  <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-add-purchase-invoice
+  <app-purchase-return-debit-form
     (popupClosed)="handleClose()"
-  ></app-add-purchase-invoice>
-  <!-- </ng-container> -->
+  ></app-purchase-return-debit-form>
 </dx-popup>
 
 <dx-popup
-  [(visible)]="isEditInvoice"
+  [(visible)]="isEditPurchaseReturn"
   [width]="'100vw'"
   [height]="'100vh'"
-  title="Purchase Invoice"
+  title="Purchase Return(Debit Note)"
   (onHiding)="handleClose()"
 >
-  <ng-container *ngIf="isEditInvoice">
-    <app-edit-purchase-invoice
-      [invoiceFormData]="selectedInvoice"
-      [readOnly]="isEditInvoiceReadOnly"
+  <ng-container *ngIf="isEditPurchaseReturn">
+    <app-purchase-return-debit-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedPurchaseReturn"
+      [isReadOnlyMode]="isReadOnlyPurchaseReturn"
       (popupClosed)="handleClose()"
-    ></app-edit-purchase-invoice>
+    ></app-purchase-return-debit-form>
   </ng-container>
 </dx-popup>
 

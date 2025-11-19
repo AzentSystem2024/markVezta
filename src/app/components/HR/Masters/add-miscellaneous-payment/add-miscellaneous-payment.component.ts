@@ -149,9 +149,9 @@ export class AddMiscellaneousPaymentComponent {
 
   constructor(private dataService: DataService) {}
 
-    sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
       '===========selected store id==================='
@@ -450,19 +450,19 @@ export class AddMiscellaneousPaymentComponent {
         }
       };
     }
+    // if (e.dataField === 'AMOUNT') {
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     if (event.event.key === 'Enter') {
+    //       const grid = e.component;
+    //       const rowIndex = e.row.rowIndex;
+    //       // Move focus to the "ledgerCode" column in the same row
+    //       setTimeout(() => {
+    //         grid.focus(grid.getCellElement(rowIndex, 'TAX'));
+    //       });
+    //     }
+    //   };
+    // }
     if (e.dataField === 'AMOUNT') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = e.component;
-          const rowIndex = e.row.rowIndex;
-          // Move focus to the "ledgerCode" column in the same row
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'TAX'));
-          });
-        }
-      };
-    }
-    if (e.dataField === 'TAX') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
@@ -861,7 +861,7 @@ export class AddMiscellaneousPaymentComponent {
     const { DetailList, ...cleanedFormData } = this.miscFormData;
     const payload = {
       ...this.miscFormData,
-      STORE_ID :  this.selectedstoreId,
+      STORE_ID: this.selectedstoreId,
       MISC_DETAIL: cleanedList.map((item: any, index: number) => {
         const amount = Number(item.AMOUNT) || 0;
         const tax = Number(item.TAX) || 0;

@@ -31,6 +31,7 @@ import {
   DxNumberBoxModule,
   DxBoxModule,
   DxDataGridComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -706,6 +707,7 @@ export class ArticleEditComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     DxBoxModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [ArticleEditComponent],

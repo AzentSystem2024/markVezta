@@ -1,5 +1,4 @@
-// @use "../../../../../variables.scss" as *;
-@use "../../../../variables.scss" as *;
+@use "../../../variables.scss" as *;
 @use "sass:math";
 
 :host {
@@ -84,29 +83,10 @@
   padding: 0px !important;
 }
 
-// .form-popup-buttons-container {
-//   display: flex;
-//   justify-content: flex-end;
-//   padding: 10px 0 0 0; // no side padding since parent already has it
-//   margin-right: 12px;
-// }
-
-.form-popup-buttons-container {
-  position: sticky;
-  bottom: 0;
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px 20px; // no side padding since parent already has it
-  // border-top: 1px solid #ddd;
-  z-index: 10;
-}
-
 .popup-footer {
   display: flex;
   gap: 10px;
 }
-
 ::ng-deep .dx-data-grid .dx-row > td,
 ::ng-deep .dx-data-grid .dx-header-row > td {
   border-right: 1px solid #ccc !important;
@@ -121,6 +101,35 @@
   display: block;
 }
 
+// .form-popup-buttons-container {
+//   display: flex;
+//   justify-content: flex-end;
+
+//   //   padding: 4px 10px 0 10px;
+//   //   margin-top: -10px; /* ⬅ increased from -6px to -10px */
+// }
+// .form-popup-buttons-container {
+//   display: flex;
+//   justify-content: flex-end;
+//   padding: 10px 0 0 0; // no side padding since parent already has it
+//   margin-right: 12px;
+//   margin-top: 20px;
+// }
+
+.form-popup-buttons-container {
+  display: flex;
+  flex-direction: column; /* stack vertically */
+  align-items: flex-end; /* right-aligned */
+  padding: 10px 0 0 0;
+  margin-right: 12px;
+  margin-top: 20px;
+  gap: 10px; /* spacing between checkbox & buttons */
+}
+
+.popup-footer {
+  display: flex;
+  gap: 15px;
+}
 ::ng-deep .blue-outline-btn.dx-button {
   border: 1px solid #007bff !important; /* blue border */
   // color: #007bff !important;           /* blue text */
@@ -128,10 +137,4 @@
 
 ::ng-deep .blue-outline-btn.dx-button .dx-icon {
   color: #007bff !important; /* blue icon */
-}
-
-::ng-deep .toolbar-button-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  padding-right: 10px;
 }

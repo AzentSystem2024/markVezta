@@ -830,7 +830,6 @@ import {
 import { DeliveryNoteFormComponent } from './pages/delivery-note-form/delivery-note-form.component';
 // import { StockMovementReportComponent, StockMovementReportModule } from './pages/HR/Masters/stock-movement-report/stock-movement-report.component';
 
-
 import {
   QuotationComponent,
   QuotationModule,
@@ -879,13 +878,36 @@ import {
   DeliveryReturnEditComponent,
   DeliveryReturnEditModule,
 } from './pages/delivery-return-edit/delivery-return-edit.component';
-import { DeliveryAddressComponent, DeliveryAddressModule } from './HR/Masters/delivery-address/delivery-address.component';
-import { ChangePasswordComponent, ChangePasswordModule } from './components/library/PROFILEPAGE/change-password/change-password.component';
-import { SecurityPolicyComponent, SecurityPolicyModule } from './pages/SYSTEMPAGES/security-policy/security-policy.component';
-import { ResetPasswordComponent, ResetPasswordModule } from './pages/reset-password/reset-password.component';
-import { BankReconciliationAddComponent, BankReconciliationAddModule } from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
+import {
+  DeliveryAddressComponent,
+  DeliveryAddressModule,
+} from './HR/Masters/delivery-address/delivery-address.component';
+import {
+  ChangePasswordComponent,
+  ChangePasswordModule,
+} from './components/library/PROFILEPAGE/change-password/change-password.component';
+import {
+  SecurityPolicyComponent,
+  SecurityPolicyModule,
+} from './pages/SYSTEMPAGES/security-policy/security-policy.component';
+import {
+  ResetPasswordComponent,
+  ResetPasswordModule,
+} from './pages/reset-password/reset-password.component';
+import {
+  BankReconciliationAddComponent,
+  BankReconciliationAddModule,
+} from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
 import { InvoicePdfComponent } from './pages/INVOICE/invoice-pdf/invoice-pdf.component';
 import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoice-pdf-view.component';
+import {
+  PurchaseReturnDebitComponent,
+  PurchaseReturnDebitModule,
+} from './pages/purchase-return-debit/purchase-return-debit.component';
+import {
+  PurchaseReturnDebitFormComponent,
+  PurchaseReturnDebitFormModule,
+} from './pages/purchase-return-debit-form/purchase-return-debit-form.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -893,7 +915,7 @@ import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoic
 // import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1224,8 +1246,8 @@ import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoic
     ChangePasswordModule,
     SecurityPolicyModule,
     BankReconciliationAddModule,
-    
-    
+    PurchaseReturnDebitModule,
+    PurchaseReturnDebitFormModule,
   ],
   providers: [
     AuthService,

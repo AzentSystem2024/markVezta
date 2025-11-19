@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -37,30 +38,30 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
-import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import { OpeningBalanceComponent } from '../../OPENING BALANACE/opening-balance/opening-balance.component';
-import { DataService } from 'src/app/services';
-import {
-  AddPurchaseInvoiceComponent,
-  AddPurchaseInvoiceModule,
-} from '../add-purchase-invoice/add-purchase-invoice.component';
-import { EditPurchaseInvoiceModule } from '../edit-purchase-invoice/edit-purchase-invoice.component';
-import notify from 'devextreme/ui/notify';
+import { ArticleAddModule } from '../ARTICLE/article-add/article-add.component';
+import { ArticleEditModule } from '../ARTICLE/article-edit/article-edit.component';
+import { AddJournalVoucharModule } from '../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
+import { EditJournalVoucherModule } from '../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
+import { ViewJournalVoucherModule } from '../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
+import { AddPurchaseInvoiceModule } from '../PURCHASE INVOICE/add-purchase-invoice/add-purchase-invoice.component';
+import { EditPurchaseInvoiceModule } from '../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
+import { PurchaseInvoiceListComponent } from '../PURCHASE INVOICE/purchase-invoice-list/purchase-invoice-list.component';
 import { Router } from '@angular/router';
+import { DataService } from 'src/app/services';
+import notify from 'devextreme/ui/notify';
+import {
+  PurchaseReturnDebitFormComponent,
+  PurchaseReturnDebitFormModule,
+} from '../purchase-return-debit-form/purchase-return-debit-form.component';
 
 @Component({
-  selector: 'app-purchase-invoice-list',
-  templateUrl: './purchase-invoice-list.component.html',
-  styleUrls: ['./purchase-invoice-list.component.scss'],
+  selector: 'app-purchase-return-debit',
+  templateUrl: './purchase-return-debit.component.html',
+  styleUrls: ['./purchase-return-debit.component.scss'],
 })
-export class PurchaseInvoiceListComponent {
-  purchaseInvoiceList: any;
-  @ViewChild(AddPurchaseInvoiceComponent)
-  addInvoiceComp!: AddPurchaseInvoiceComponent;
+export class PurchaseReturnDebitComponent {
+  @ViewChild(PurchaseReturnDebitFormComponent)
+  PurchaseReturnDebitFormComponent!: PurchaseReturnDebitFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -72,7 +73,7 @@ export class PurchaseInvoiceListComponent {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
-  filteredPurchaseInvoices: any;
+  purchaseReturnList: any;
   canAdd = false;
   canEdit = false;
   canView = false;
@@ -80,12 +81,6 @@ export class PurchaseInvoiceListComponent {
   canApprove = false;
   canPrint = false;
 
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
@@ -93,10 +88,18 @@ export class PurchaseInvoiceListComponent {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    onClick: () => this.addPurchaseInvoice(),
+    onClick: () => {
+      this.ngZone.run(() => {
+        this.addPurchaseReturn();
+      });
+    },
     elementAttr: { class: 'add-button' },
   };
-
+  isAddDebitNote: boolean = false;
+  isEditDebitNote: boolean = false;
+  isViewCreditNote: boolean = false;
+  selectedDebitNote: any;
+  isViewDebitNote: boolean;
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -109,16 +112,34 @@ export class PurchaseInvoiceListComponent {
   customStartDate: any = null;
   customEndDate: any = null;
   showCustomDatePopup = false;
-  isAddInvoice: boolean = false;
-  isViewInvoice: boolean = false;
-  isEditInvoice: boolean = false;
-  selectedInvoice: any;
-  isEditInvoiceReadOnly: boolean = false;
+  filteredJournalVoucherList: any;
+  isEmptyDatagrid: boolean = false;
+  sessionData: any;
+  selected_vat_id: any;
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+  isAddPurchaseReturn: boolean;
+  isEditPurchaseReturn: boolean;
+  isViewPurchaseReturn: boolean;
+  selectedPurchaseReturn: any;
+  isReadOnlyPurchaseReturn: boolean;
+
+  sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+  }
 
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit() {
@@ -128,12 +149,12 @@ export class PurchaseInvoiceListComponent {
       sessionStorage.getItem('savedUserData') || '{}'
     );
     console.log('Parsed ObjectData:', menuResponse);
-
+    this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/purchase-invoice');
+      .find((menu) => menu.Path === '/debit');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -146,27 +167,28 @@ export class PurchaseInvoiceListComponent {
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
-    this.getPurchaseInvoiceList();
+    this.getpurchaseReturnList();
+    this.sessionData_tax();
   }
 
-  getPurchaseInvoiceList() {
-    this.dataService.getPurchaseInvoiceList().subscribe((response: any) => {
-      this.purchaseInvoiceList = response.PurchHeaders.map((item: any) => {
+  getpurchaseReturnList() {
+    this.dataService.getPurchaseReturnMainList().subscribe((response: any) => {
+      this.purchaseReturnList = response.Data.map((item: any) => {
         let dateValue: Date;
 
         // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.PURCH_DATE))) {
-          dateValue = new Date(item.PURCH_DATE);
+        if (!isNaN(Date.parse(item.RET_DATE))) {
+          dateValue = new Date(item.RET_DATE);
         } else {
           // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.PURCH_DATE);
+          dateValue = this.parseDateString(item.RET_DATE);
         }
 
         return {
           ...item,
-          PURCH_DATE: dateValue,
+          RET_DATE: dateValue,
         };
-      }).sort((a: any, b: any) => Number(b.PURCH_NO) - Number(a.PURCH_NO));
+      }).sort((a: any, b: any) => Number(b.RET_NO) - Number(a.RET_NO));
 
       this.applyDateFilter();
     });
@@ -179,12 +201,13 @@ export class PurchaseInvoiceListComponent {
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.STATUS;
+    const status = cellInfo.data.TRANS_STATUS;
+
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 'Approved' ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 'Approved' ? 'Approved' : 'Open';
+    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+    icon.title = status === 5 ? 'Approved' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -203,6 +226,22 @@ export class PurchaseInvoiceListComponent {
       value: 'Open',
     },
   ];
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+
+    if (e.value === 'custom') {
+      this.customStartDate = null;
+      this.customEndDate = null;
+      this.showCustomDatePopup = true;
+    } else {
+      // Reset the custom label
+      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
+      if (customOpt) {
+        customOpt.label = 'Custom';
+      }
+      this.applyDateFilter();
+    }
+  }
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
@@ -235,32 +274,17 @@ export class PurchaseInvoiceListComponent {
     }
   }
 
-  onDateRangeChanged(e: any) {
-    this.selectedDateRange = e.value;
-
-    if (e.value === 'custom') {
-      this.customStartDate = null;
-      this.customEndDate = null;
-      this.showCustomDatePopup = true;
-    } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
-    }
-  }
-
   applyDateFilter() {
-    if (!this.selectedDateRange || !this.purchaseInvoiceList) {
-      this.filteredPurchaseInvoices = this.purchaseInvoiceList;
+    if (!this.selectedDateRange || !this.purchaseReturnList) {
+      this.filteredJournalVoucherList = this.purchaseReturnList;
       return;
     }
+
     if (this.selectedDateRange === 'all') {
-      this.filteredPurchaseInvoices = this.purchaseInvoiceList; // show full list
+      this.filteredJournalVoucherList = this.purchaseReturnList; // show full list
       return;
     }
+
     const today = new Date();
     let startDate: Date;
     const endDate = new Date(); // today
@@ -286,19 +310,15 @@ export class PurchaseInvoiceListComponent {
         startDate.setHours(0, 0, 0, 0);
         break;
       default:
-        this.filteredPurchaseInvoices = this.purchaseInvoiceList;
+        this.filteredJournalVoucherList = this.purchaseReturnList;
         return;
     }
 
-    this.filteredPurchaseInvoices = this.purchaseInvoiceList.filter(
+    this.filteredJournalVoucherList = this.purchaseReturnList.filter(
       (item: any) => {
-        if (!item.PURCH_DATE) {
-          console.warn('Missing PURCH_DATE in item:', item);
-          return false;
-        }
-
-        const invoiceDate = item.PURCH_DATE;
-        return invoiceDate >= startDate && invoiceDate <= endDate;
+        // const journalDate = this.parseDateString(item.RET_DATE);
+        const journalDate = item.RET_DATE;
+        return journalDate >= startDate && journalDate <= endDate;
       }
     );
   }
@@ -312,10 +332,11 @@ export class PurchaseInvoiceListComponent {
     const end = new Date(this.customEndDate);
     end.setHours(23, 59, 59, 999);
 
-    this.filteredPurchaseInvoices = this.purchaseInvoiceList.filter(
+    this.filteredJournalVoucherList = this.purchaseReturnList.filter(
       (item: any) => {
-        const invoiceDate = item.PURCH_DATE;
-        return invoiceDate >= start && invoiceDate <= end;
+        // const journalDate = this.parseDateString(item.RET_DATE);
+        const journalDate = item.RET_DATE;
+        return journalDate >= start && journalDate <= end;
       }
     );
 
@@ -332,11 +353,6 @@ export class PurchaseInvoiceListComponent {
   }
 
   private parseDateString(dateStr: string): Date {
-    if (!dateStr || typeof dateStr !== 'string') {
-      console.warn('Invalid date string:', dateStr);
-      return new Date('Invalid'); // or new Date(0) if you want a fallback
-    }
-
     const [day, month, year] = dateStr
       .split('-')
       .map((part) => parseInt(part, 10));
@@ -398,57 +414,41 @@ export class PurchaseInvoiceListComponent {
     }, 0);
   }
 
-  // onEditInvoice(event: any) {
-  //   event.cancel = true;
-  //   const invoiceId = event.data.ID;
-  //   const transStatus = event.data.STATUS;
-
-  //   this.dataService
-  //     .selectPurchaseInvoice(invoiceId)
-  //     .subscribe((response: any) => {
-  //       this.selectedInvoice = response.Data;
-
-  //       this.isEditInvoice = true;
-  //       this.isEditInvoiceReadOnly = transStatus === 'Approved'; // 👈 read-only if Approved
-  //     });
-  // }
-
-  onEditInvoice(event: any) {
+  onEditPurchaseReturn(event: any) {
     event.cancel = true;
-    const invoiceId = event.data.TRANS_ID;
-    const transStatus = event.data.STATUS;
-
+    const returnId = event.data.ID;
+    const status = event.data.TRANS_STATUS;
     this.dataService
-      .selectPurchaseInvoice(invoiceId)
+      .selectPurchaseReturn(returnId)
       .subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
-
-        this.isEditInvoice = true;
-        this.isEditInvoiceReadOnly = transStatus === 'Approved'; // 👈 read-only if Approved
+        this.selectedPurchaseReturn = response;
+        console.log(this.selectedPurchaseReturn, 'SELECTEDTROUT');
+        this.isEditPurchaseReturn = true;
+        this.isReadOnlyPurchaseReturn = status === 5;
       });
   }
-
-  onDeleteInvoice(event: any) {
-    console.log(event, 'EVENTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
-    if (event.data.STATUS === 'Approved') {
+  onDeletePurchaseReturn(event: any) {
+    const returnId = event.data.ID;
+    const status = event.data.TRANS_STATUS;
+    if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
-      notify('Invoice cannot be deleted.', 'error', 2000);
+      notify('This cannot be deleted.', 'error', 2000);
       return;
     }
-    const invoiceId = event.data.ID;
     event.cancel = true;
+    console.log(returnId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
     // Call your delete API
-    this.dataService.deletePurchaseInvoice(invoiceId).subscribe(
+    this.dataService.deletePurchaseReturn(returnId).subscribe(
       (response: any) => {
         if (response) {
           notify(
             {
-              message: 'Invoice Deleted Successfully',
+              message: 'Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
             'success'
           );
-          this.getPurchaseInvoiceList();
+          this.getpurchaseReturnList();
           // this.dataGrid.instance.refresh();
         } else {
           notify(
@@ -467,19 +467,30 @@ export class PurchaseInvoiceListComponent {
     );
   }
 
-  handleClose() {
-    this.isAddInvoice = false;
-    this.isEditInvoice = false;
-    this.getPurchaseInvoiceList();
-    this.addInvoiceComp.resetInvoiceForm();
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.TRANS_STATUS === 5) {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
+  }
+  addPurchaseReturn() {
+    this.isAddPurchaseReturn = true;
   }
 
-  addPurchaseInvoice() {
-    this.isAddInvoice = true;
-    this.cdr.detectChanges();
+  handleClose() {
+    this.isAddPurchaseReturn = false;
+    this.isEditPurchaseReturn = false;
+    this.isViewPurchaseReturn = false;
+    if (this.PurchaseReturnDebitFormComponent) {
+      this.PurchaseReturnDebitFormComponent.resetPurchaseReturnForm();
+    }
+    this.getpurchaseReturnList();
   }
 }
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -511,17 +522,11 @@ export class PurchaseInvoiceListComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
-    ArticleAddModule,
-    ArticleEditModule,
-    AddJournalVoucharModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
-    AddPurchaseInvoiceModule,
-    EditPurchaseInvoiceModule,
+    PurchaseReturnDebitFormModule,
   ],
   providers: [],
-  declarations: [PurchaseInvoiceListComponent],
-  exports: [PurchaseInvoiceListComponent],
+  declarations: [PurchaseReturnDebitComponent],
+  exports: [PurchaseReturnDebitComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseInvoiceListModule {}
+export class PurchaseReturnDebitModule {}

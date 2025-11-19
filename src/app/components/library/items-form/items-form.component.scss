@@ -4,148 +4,141 @@
   margin-bottom: 5px;
 }
 .file-uploader-container {
-    display: flex;
-    align-items: center;
-  }
+  display: flex;
+  align-items: center;
+}
 
+/* Ensures the form scales properly */
+.plain-styled-form {
+  width: 100%; /* Makes the form stretch to the container */
+  max-width: 100%; /* Prevents overflowing the container */
+}
 
-  
-  /* Ensures the form scales properly */
-  .plain-styled-form {
-    width: 100%; /* Makes the form stretch to the container */
-    max-width: 100%; /* Prevents overflowing the container */
-  }
-
-  /* Handle smaller screens using media queries */
+/* Handle smaller screens using media queries */
 @media (max-width: 768px) {
   .plain-styled-form {
     width: 100%;
   }
 
   .spacing-item {
-    padding: 15px; /* Adjust padding for smaller screens */
+    padding: 5px; /* Adjust padding for smaller screens */
   }
 }
-  
+
 .field-spacing {
   margin-bottom: 16px; /* Adjust as needed */
 }
 
-  
-  .clear-button-container {
-    margin-left: 1px; /* Adjust as needed */
-    // pointer-events: none;
-  }
-  .clear-button-container {
-    background-color: transparent; /* Make background transparent */
-    border: none; /* Remove border */
-    padding: 0; /* Remove padding */
-    color: rgb(10, 10, 10); /* Change color if desired */
-    font-size: 1em; /* Adjust size as needed */
-    cursor: pointer; /* Change cursor to pointer */
-  }
-  
-  .country-item {
-    display: flex;
-    align-items: center;
-  }
-  
-  .flag-icon {
-    width: 20px; /* Adjust according to your flag image size */
-    height: 15px; /* Adjust according to your flag image size */
-    margin-right: 8px;
-  }
-  
-  .spacing-item {
-    margin-bottom: 20px; /* Adjust the value as needed */
-  }
-  
-  .spacing-custom-items {
-    margin-bottom: 30px; /* Adjust the value as needed */
-  }
-  
-  .spacing-custom {
-    margin-bottom: 10px; /* Adjust the value as needed */
-  }
+.clear-button-container {
+  margin-left: 1px; /* Adjust as needed */
+  // pointer-events: none;
+}
+.clear-button-container {
+  background-color: transparent; /* Make background transparent */
+  border: none; /* Remove border */
+  padding: 0; /* Remove padding */
+  color: rgb(10, 10, 10); /* Change color if desired */
+  font-size: 1em; /* Adjust size as needed */
+  cursor: pointer; /* Change cursor to pointer */
+}
 
+.country-item {
+  display: flex;
+  align-items: center;
+}
 
-  ::ng-deep #dropzone-external {
-    width: 270px;
-    height: 280px;
-    background-color: rgb(183 183 183 / 10%);
-    border-width: 2px;
-    border-style: dashed;
-    padding: 10px;
-    border-color: var(--dx-color-border);
-  }
-  
-  ::ng-deep #dropzone-external > * {
-    pointer-events: none;
-  }
-  
-  ::ng-deep #dropzone-external.dropzone-active {
-    border-style: solid;
-    border-color: var(--dx-color-primary);
-  }
-  
-  ::ng-deep .widget-container > span {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 16px;
-  }
-  
-  ::ng-deep #dropzone-image {
-    max-width: 100%;
-    max-height: 100%;
-  }
-  
-  ::ng-deep #dropzone-text > span {
-    font-weight: 100;
-    opacity: 0.5;
-  }
-  
-  ::ng-deep #upload-progress {
-    display: flex;
-    margin-top: 10px;
-  }
-  
-  ::ng-deep .flex-box {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  .dx-fileuploader-button {
-    display: none;
-  }
-  
+.flag-icon {
+  width: 20px; /* Adjust according to your flag image size */
+  height: 15px; /* Adjust according to your flag image size */
+  margin-right: 8px;
+}
 
+.spacing-item {
+  margin-bottom: 10px; /* Adjust the value as needed */
+}
 
-  .image-button-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 250px; /* Adjust this height based on your image and button sizes */
-  }
-  
-  .image-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-  }
-  
-  .button-container {
-    height: 40px; /* Adjust this height based on the button height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
+.spacing-custom-items {
+  margin-bottom: 30px; /* Adjust the value as needed */
+}
 
-  /* Modal styles */
+.spacing-custom {
+  margin-bottom: 10px; /* Adjust the value as needed */
+}
+
+::ng-deep #dropzone-external {
+  width: 270px;
+  height: 280px;
+  background-color: rgb(183 183 183 / 10%);
+  border-width: 2px;
+  border-style: dashed;
+  padding: 10px;
+  border-color: var(--dx-color-border);
+}
+
+::ng-deep #dropzone-external > * {
+  pointer-events: none;
+}
+
+::ng-deep #dropzone-external.dropzone-active {
+  border-style: solid;
+  border-color: var(--dx-color-primary);
+}
+
+::ng-deep .widget-container > span {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+::ng-deep #dropzone-image {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+::ng-deep #dropzone-text > span {
+  font-weight: 100;
+  opacity: 0.5;
+}
+
+::ng-deep #upload-progress {
+  display: flex;
+  margin-top: 10px;
+}
+
+::ng-deep .flex-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.dx-fileuploader-button {
+  display: none;
+}
+
+.image-button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 250px; /* Adjust this height based on your image and button sizes */
+}
+
+.image-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.button-container {
+  height: 40px; /* Adjust this height based on the button height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal styles */
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
@@ -156,8 +149,8 @@
   width: 100%; /* Full width */
   height: 100%; /* Full height */
   overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.9); /* Black w/ opacity */
 }
 
 .modal-content {
@@ -167,14 +160,19 @@
   max-width: 700px;
 }
 
-.modal-content, .caption {
+.modal-content,
+.caption {
   animation-name: zoom;
   animation-duration: 0.6s;
 }
 
 @keyframes zoom {
-  from {transform:scale(0)} 
-  to {transform:scale(1)}
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 
 /* The Close Button */
@@ -195,14 +193,12 @@
   cursor: pointer;
 }
 
-
 .form-container {
   width: 90%; /* Or any percentage less than 100% */
   margin: 0 auto; /* Center the form */
   overflow-x: auto;
   display: flex;
   flex-direction: column;
-  
 }
 
 .form-item {
@@ -218,7 +214,7 @@
   padding: 20px;
   max-width: 100%;
   width: 100%;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   // background-color: #f0f0f0; /* Optional background color */
   // max-width: 600px;
   // width: 50%;
@@ -235,29 +231,33 @@
 }
 
 .left-container {
-  border: none; 
+  border: none;
   padding: 10px;
-  width: calc(50% - 20px); /* Adjust width to leave space for borders and padding */
+  width: calc(
+    50% - 20px
+  ); /* Adjust width to leave space for borders and padding */
   max-height: 530px;
   border: 1px solid #ccc;
-  max-width: 100%; 
+  max-width: 100%;
 }
 
 .right-containers {
-  // border: none; 
+  // border: none;
   display: flex;
   flex-direction: column;
-  width: calc(52% - 22px); /* Adjust width to leave space for borders and padding */
+  width: calc(
+    52% - 22px
+  ); /* Adjust width to leave space for borders and padding */
   // box-shadow: 0 0 0 0.5px black;
 }
 
-.inventory-container, .history-container {
-  border: none; 
+.inventory-container,
+.history-container {
+  border: none;
   padding: 10px;
   margin-bottom: 30px; /* Adjust margin between Inventory and History containers */
   box-sizing: border-box; /* Include padding and border in the width calculation */
   border: 1px solid #ccc;
-
 }
 
 .price-header {
@@ -265,13 +265,15 @@
   margin-bottom: 10px;
 }
 
-.inventory-item, .history-item {
+.inventory-item,
+.history-item {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.inventory-item label, .history-item label {
+.inventory-item label,
+.history-item label {
   width: 200px; /* Adjust width as needed */
   margin-right: 10px; /* Adjust spacing between label and input */
 }
@@ -321,7 +323,7 @@
   max-width: 800px; /* Set a maximum width if necessary */
   margin: 0 auto; /* Center the container if needed */
   padding: 10px; /* Add some padding for better spacing */
-  margin-bottom: 20px
+  margin-bottom: 20px;
 }
 
 .history-container {
@@ -332,17 +334,17 @@
 }
 
 .container {
-  overflow-y:hidden;
+  overflow-y: hidden;
   display: grid;
   justify-content: space-between;
   width: 100%;
   padding: 20px;
   margin: 0 auto;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 .item {
-  flex: 1 1 auto;  /* Each item will grow and shrink as needed */
+  flex: 1 1 auto; /* Each item will grow and shrink as needed */
   margin: 10px;
 }
 
@@ -358,7 +360,7 @@
 .options-container {
   flex: 1;
   border: 1px solid #ccc;
-  
+
   padding: 10px;
   max-height: 530px;
 }
@@ -404,15 +406,11 @@
   color: #333; /* Adjust label color */
 }
 
-
-
-
-
 #drop-area {
   border: 2px dashed #ccc; /* Dashed border for the drop area */
   border-radius: 10px; /* Rounded corners */
   width: 150px; /* Full width */
-  max-height: 200px ;
+  max-height: 200px;
   max-width: 200px; /* Maximum width */
   height: 150px; /* Fixed height for the drop area */
   margin: 20px auto; /* Centered with margin */
@@ -422,7 +420,6 @@
   position: relative; /* Positioning for absolute children */
   overflow: hidden; /* Hide overflow to make image cover */
 }
-
 
 #drop-area.highlight {
   border-color: purple; /* Highlight color when dragging over */
@@ -469,18 +466,18 @@ button:hover {
   transform: scale(1.05); /* Slight zoom effect on hover */
 }
 .close-icon {
-    position: absolute; /* Absolute positioning for close icon */
-    bottom: 10px; /* Distance from top */
-    right: 50%; /* Distance from right */
-    color: red;
-    font-weight: bolder;
-    cursor: pointer; 
-//   font-size: 20px; /* Size of the close icon */
-//   color: red; /* Color of the close icon */
-//   background-color: white; /* Background color for visibility */
-//   border-radius: 50%; /* Round shape for close icon background */
-//   padding: 5px; /* Padding around the icon */
-//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
+  position: absolute; /* Absolute positioning for close icon */
+  bottom: 10px; /* Distance from top */
+  right: 50%; /* Distance from right */
+  color: red;
+  font-weight: bolder;
+  cursor: pointer;
+  //   font-size: 20px; /* Size of the close icon */
+  //   color: red; /* Color of the close icon */
+  //   background-color: white; /* Background color for visibility */
+  //   border-radius: 50%; /* Round shape for close icon background */
+  //   padding: 5px; /* Padding around the icon */
+  //   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
 }
 
 .custom-field {
@@ -494,14 +491,11 @@ button:hover {
 .dx-texteditor-input {
   height: 24px !important; /* Reduce input field height */
 }
-  
-
-
 
 /* Make the whole tab strip dark */
 ::ng-deep .dx-tab {
-  background-color: #1e1e1e;   /* dark background */
-  color: #ccc;                 /* light gray text */
+  background-color: #1e1e1e; /* dark background */
+  color: #ccc; /* light gray text */
   font-weight: 500;
   padding: 10px 20px;
   border: none;
@@ -509,43 +503,43 @@ button:hover {
 
 /* Change hover state */
 ::ng-deep .dx-tab:hover {
-  color: #fff;                 /* white on hover */
+  color: #fff; /* white on hover */
 }
 
 /* Selected (active) tab */
 ::ng-deep .dx-tab.dx-tab-selected {
-  color: #2979ff;              /* blue text */
+  color: #2979ff; /* blue text */
   border-bottom: 2px solid #2979ff; /* blue underline */
 }
 
 /* Remove default borders */
 ::ng-deep .dx-tabs {
-  border-bottom: 1px solid #333;  /* subtle line under tabs */
-  background-color: #1e1e1e;      /* dark bar */
+  border-bottom: 1px solid #333; /* subtle line under tabs */
+  background-color: #1e1e1e; /* dark bar */
 }
 ::ng-deep .dx-tabpanel .dx-tabpanel-tabs .dx-tabs {
-    height: 100%;
-    background-color: var(--tab-bg-color);
-    border: none; 
+  height: 100%;
+  background-color: var(--tab-bg-color);
+  border: none;
 }
- ::ng-deep  .dx-tab.dx-tab-selected {
-    color: #2979ff;
- border-bottom: 0px ; 
-    background: transparent;
-    // margin-right: 10px;
+::ng-deep .dx-tab.dx-tab-selected {
+  color: #2979ff;
+  border-bottom: 0px;
+  background: transparent;
+  // margin-right: 10px;
 }
 
- ::ng-deep  .dx-tab .dx-tab-text {
+::ng-deep .dx-tab .dx-tab-text {
   background-color: transparent !important;
   font-size: large;
 }
 
 ::ng-deep .dx-tabpanel .dx-tabpanel-tab {
-    flex-basis: unset;
-    flex-grow: 0;
-    flex-shrink: 0;
-    background: transparent;
-    margin-left: 20px;
+  flex-basis: unset;
+  flex-grow: 0;
+  flex-shrink: 0;
+  background: transparent;
+  margin-left: 20px;
 }
 // .plus-btn {
 //   width: 28px;
@@ -560,4 +554,3 @@ button:hover {
 //   align-items: center;
 //   justify-content: center;
 // }
-
