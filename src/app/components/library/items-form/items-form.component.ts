@@ -368,6 +368,8 @@ export class ItemsFormComponent implements OnInit {
       UNIT_ID:0,
       PACKING_ID:0,
       POS_DESCRIPTION:"",
+      HSN_CODE :'',
+      GST_PERC:0,
       ITEM_STORES: [
         {
           STORE_ID: '',
@@ -991,6 +993,7 @@ export class ItemsFormComponent implements OnInit {
       DESCRIPTION: '',
       UOM: '',
       QUANTITY: '',
+      
     };
     this.selectedItemId = null;
   }

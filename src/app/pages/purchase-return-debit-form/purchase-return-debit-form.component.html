@@ -206,16 +206,32 @@
           <dxi-column
             dataField="VAT_PERC"
             dataType="number"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? ' VAT %'
+                : ' GST %'
+            "
             format="#,##0.00"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="VAT_AMOUNT"
             dataType="number"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? ' VAT Amount'
+                : ' GST Amount'
+            "
             format="#,##0.00"
             [allowEditing]="false"
             [calculateCellValue]="calculateVATAmount"
           ></dxi-column>
+          <dxi-column
+            dataField="HSN_CODE"
+            caption="HSN Code"
+            dataType="string"
+          ></dxi-column>
+
           <dxi-column
             dataField="TOTAL_AMOUNT"
             caption="Total Amount"

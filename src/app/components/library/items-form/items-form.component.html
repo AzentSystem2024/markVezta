@@ -240,7 +240,12 @@
             </dxi-item>
             <dxi-item class="spacing-item">
               <div *dxTemplate>
-                <dx-number-box label="GST %" labelMode="floating">
+                <dx-number-box
+                  label="GST %"
+                  labelMode="floating"
+                  [(value)]="newItems.GST_PERC"
+                  valueChangeEvent="keyup"
+                >
                   <dx-validator>
                     <dxi-validation-rule
                       type="required"
@@ -255,7 +260,12 @@
           <dxi-item itemType="group" [colCount]="2" class="spacing-item">
             <dxi-item>
               <div *dxTemplate>
-                <dx-text-box label="HSN Code" labelMode="floating">
+                <dx-text-box
+                  label="HSN Code"
+                  labelMode="floating"
+                  [(value)]="newItems.HSN_CODE"
+                  valueChangeEvent="keyup"
+                >
                   <dx-validator>
                     <dxi-validation-rule
                       type="required"

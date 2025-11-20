@@ -53,6 +53,9 @@ import { Router } from '@angular/router';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
+// import logo from 'src/assets/images/logo.png';
+
+
 
 
 @Component({
@@ -251,242 +254,143 @@ formatAmount(value: any): string {
   return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-
-
-
-// get_pdf(data: any): SafeResourceUrl {
-//   console.log(this.selected_Company_name, '=========================company name=============');
-//   console.log(data, '=======data=======================');
-
-//   const doc = new jsPDF('p', 'mm', 'a4');
-//   const pageWidth = doc.internal.pageSize.width;
-//   const marginLeft = 15;
-//   let y = 20;
-
-//   // ===== HEADER =====  
-//   doc.setFontSize(18);
-//   doc.setFont('helvetica', 'bold');
-//   doc.text('SALES INVOICE', pageWidth / 2, y, { align: 'center' });
-//   y += 10;
-
-//   doc.setFontSize(11);
-//   doc.setFont('helvetica', 'normal');
-
-//   doc.text(`Invoice No: ${data[0].DISTRIBUTOR_ID || ''}`, marginLeft, y);
-//   y += 6;
-//   doc.text(`Reference No: ${data[0].REF_NO || ''}`, marginLeft, y);
-//   y += 6;
-//   doc.text(`Customer: ${data[0].CUST_NAME || ''}`, marginLeft, y);
-//   y += 6;
-//   doc.text(`Transaction Date: ${data[0].SALE_DATE || ''}`, marginLeft, y); 
-//   y += 10;
-
-//   // ===== TABLE HEADER =====
-//   const tableColumn = [
-//     'Transfer No',
-//     'Date',
-//     'Item Description',
-//     'Total Pair Qty',
-//     'Price',
-//     'Amount',
-//     'TAX%',
-//     'Tax Amount',
-//     'Total'
-//   ];
-
-//   const tableRows: any[] = [];
-
-//   // Fill the table rows dynamically
-//   // Loop through Sale Details from the first invoice record
-// if (data && Array.isArray(data) && data.length > 0 && data[0].SALE_DETAILS) {
-//   data[0].SALE_DETAILS.forEach((item: any) => {
-//     const row = [
-//       item.TRANSFER_NO || '',
-//       item.TRANSFER_DATE || '',
-//       item.ARTICLE || '',
-//       item.TOTAL_PAIR_QTY?.toString() || '',
-//       item.PRICE?.toFixed(2) || '',
-//       item.AMOUNT?.toFixed(2) || '',
-//       item.GST?.toFixed(2) || '',
-//       item.TAX_AMOUNT?.toFixed(2) || '',
-//       Number(item.TOTAL_AMOUNT || 0).toFixed(2)
-//     ];
-//     tableRows.push(row);
-//   });
-// }
-
-
-//   // ===== DRAW TABLE =====
-//   (doc as any).autoTable({
-//     head: [tableColumn],
-//     body: tableRows,
-//     startY: y,
-//     theme: 'grid',
-//     headStyles: { fillColor: [200, 220, 255], textColor: [0, 0, 0], halign: 'center' },
-//     styles: { fontSize: 10, cellPadding: 2 },
-//     columnStyles: {
-//       0: { cellWidth: 20 }, // Transfer No
-//       1: { cellWidth: 25 }, // Date
-//       2: { cellWidth: 40 }, // Description
-//       3: { cellWidth: 25 }, // Qty
-//       4: { cellWidth: 20 }, // Price
-//       5: { cellWidth: 25 }, // Amount
-//       6: { cellWidth: 15 }, // TAX%
-//       7: { cellWidth: 25 }, // Tax Amount
-//       8: { cellWidth: 25,halign: 'right' }, // Total
-//     },
-//   });
-
-//   const finalY = (doc as any).lastAutoTable.finalY + 10;
-
-//   // ===== TOTALS =====
-//   doc.setFont('helvetica', 'bold');
-//   doc.text(`Subtotal: ₹${data[0].GROSS_AMOUNT?.toFixed(2) || '0.00'}`, pageWidth - 80, finalY);
-//   doc.text(`Tax Amount: ₹${data[0].TAX_AMOUNT?.toFixed(2) || '0.00'}`, pageWidth - 80, finalY + 6);
-//   doc.text(`Grand Total: ₹${data[0].NET_AMOUNT?.toFixed(2) || '0.00'}`, pageWidth - 80, finalY + 12);
-
-//   // ===== FOOTER =====
-//   doc.setFontSize(10);
-//   doc.setFont('helvetica', 'italic');
-//   doc.text('Thank you for your business!', pageWidth / 2, finalY + 25, { align: 'center' });
-
-//   // ===== RETURN AS URL =====
-//   const pdfBlob = doc.output('blob');
-//   const pdfUrl = URL.createObjectURL(pdfBlob);
-//   return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
-// }
-
-
-
 get_pdf(data: any): SafeResourceUrl {
-  const doc = new jsPDF('p', 'mm', 'a4');
+  const doc = new jsPDF('p', 'mm', 'a4'); 
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;
   const marginLeft = 15;
   let y = 18;
 
+
+  //  =====================================
+  // ADD LOGO TOP-RIGHT
+  // =====================================
+  const imgWidth = 28;     // adjust size of logo
+  const imgHeight = 18;
+  const imgX = pageWidth - imgWidth - 10;   // 10mm from right border
+  const imgY = 5;                           
+
+  // doc.addImage(logo, 'PNG', imgX, imgY, imgWidth, imgHeight);
+
+  // =====================================
   // 1) TITLE ABOVE BORDER
-  // ===========================
+  // =====================================
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.text("SALES INVOICE", pageWidth / 2, y, { align: "center" });
 
-  // Move down a little
   y += 5;
 
-  
-  
-
-  // 2) FULL PAGE BORDER LIKE SAMPLE
-  // ===========================
+  // =====================================
+  // 2) FULL PAGE BORDER
+  // =====================================
   doc.setDrawColor(0);
   doc.setLineWidth(0.4);
-  doc.rect(5, 20, pageWidth - 10, pageHeight - 25);   // Border starts *below title*
+  doc.rect(5, 20, pageWidth - 10, pageHeight - 25);
 
-  y = 25; // inside the border now
+  y = 25; // inside border
 
-const boxY = y;
-const boxH = 18;
-const midX = pageWidth / 2;
+  const boxY = y;
+  const boxH = 30;
+  const midX = pageWidth / 2;
 
-// ===============================
-// VERTICAL LINE TOUCHING TOP BORDER
-// ===============================
-doc.setDrawColor(0);
-doc.line(midX, 20, midX, boxY + boxH);   // FROM PAGE BORDER TO END OF HEADER
-doc.setFont("helvetica", "normal");
-doc.setFontSize(8.5);            // slightly smaller (thinner)
-doc.setTextColor(60, 60, 60);    // soft gray (not full black)
+  // =====================================
+  // CENTER VERTICAL LINE (TOP → END OF HEADER)
+  // =====================================
+  doc.line(midX, 20, midX, boxY + boxH);
 
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(60, 60, 60);
 
-// LEFT SIDE
-doc.text(`Invoice No: ${data[0].DISTRIBUTOR_ID || ''}`, 6 + 3, boxY + 6);
-doc.text(`Customer: ${data[0].CUST_NAME || ''}`, 6 + 3, boxY + 10);
-doc.text(`StateName: ${data[0].DISTRIBUTOR_ID || ''}`, 6 + 3, boxY + 14);
-doc.text(`Email: ${data[0].CUST_NAME || ''}`, 6 + 3, boxY + 18);
+  // LEFT SIDE
+  doc.text(`${data[0].COMPANY_NAME || ''}`, 6 + 3, boxY + 6);
+   doc.text(`${data[0].COMPANY_CODE || ''}`, 6 + 3, boxY + 10);
+  doc.text(`Customer: ${data[0].CUST_NAME || ''}`, 6 + 3, boxY + 14);
+  doc.text(`Address1: ${data[0].ADDRESS1 || ''}`, 6 + 3, boxY + 18);
+  doc.text(`Address2: ${data[0].ADDRESS2 || ''}`, 6 + 3, boxY + 22);
+  doc.text(`Address3: ${data[0].ADDRESS3 || ''}`, 6 + 3, boxY + 26);
+   doc.text(`Email: ${data[0].EMAIL || ''}`, 6 + 3, boxY + 30);
 
-// RIGHT SIDE
-doc.text(`Date: ${data[0].SALE_DATE || ''}`, midX + 3, boxY + 6);
-doc.text(`Reference No: ${data[0].REF_NO || ''}`, midX + 3, boxY + 13);
+  // RIGHT SIDE
+  doc.text(`Invoice No: ${data[0].DISTRIBUTOR_ID || ''}`, midX + 3, boxY + 6);
+  doc.text(`Date: ${data[0].SALE_DATE || ''}`, midX + 3, boxY + 10);
+  doc.text(`Reference No: ${data[0].REF_NO || ''}`, midX + 3, boxY + 14);
 
-// Horizontal line under header
-doc.line(6, boxY + boxH + 2, pageWidth - 6, boxY + boxH + 2);
-
-y += boxH + 8;
-
-
-// ===============================
-// SECOND BOX UNDER FIRST BOX
-// ===============================
-
-const secondBoxX = 6;
-const secondBoxW = pageWidth - 12;   // full width inside border
-const secondBoxH = 32;               // increased height to fit all lines
-const secondBoxY = y;
-
-// No left & no top border
-
-// ⭐ Right border (connect to top page border)
-doc.line(secondBoxX + secondBoxW, 20, secondBoxX + secondBoxW, secondBoxY + secondBoxH);
-
-// ⭐ Bottom border (full width)
-doc.line(secondBoxX, secondBoxY + secondBoxH, midX, secondBoxY + secondBoxH);
-// Extend center vertical line from top to below second box
-doc.line(midX, 20, midX, secondBoxY + secondBoxH + 20);
+ // Horizontal line under header (LEFT SIDE ONLY)
+doc.line(6, boxY + boxH + 2, midX, boxY + boxH + 2);
 
 
-// Text inside second box
-doc.setFont("helvetica", "bold");
-doc.setFontSize(9);
-doc.text("Consignee (Ship to)", secondBoxX + 3, secondBoxY + 6);
+  y += boxH + 8;
 
-doc.setFont("helvetica", "normal");
-doc.text("KWALITY FOOTWEAR AGENCIES", secondBoxX + 3, secondBoxY + 10);
-doc.text("35/1025/3 & 4, K M A TOWER LATIN", secondBoxX + 3, secondBoxY + 14);
-doc.text("CHURCH ROAD, PALLIKKULAM, THRISSUR", secondBoxX + 3, secondBoxY + 18);
-doc.text("PIN - 680001", secondBoxX + 3, secondBoxY + 22);
-doc.text("GSTIN/UIN : 32ACXPA8968Q1ZJ", secondBoxX + 3, secondBoxY + 26);
-doc.text("State Name : Kerala, Code : 3", secondBoxX + 3, secondBoxY + 30);
-
-// Move Y downward
-y += secondBoxH + 8;
+  // =====================================
+  // SECOND BOX
+  // =====================================
+  const secondBoxX = 6;
+  const secondBoxW = pageWidth - 12;
+  const secondBoxH = 32;
+  const secondBoxY = y;
 
 
+  // Bottom border
+  doc.line(secondBoxX, secondBoxY + secondBoxH, midX, secondBoxY + secondBoxH);
 
-// ===============================
-// SECOND BOX UNDER FIRST BOX
-// ===============================
+  // Extend center line through this box
+  doc.line(midX, 20, midX, secondBoxY + secondBoxH);
 
-const thirdBoxX = 6;
-const thirdBoxW = pageWidth - 12;   // full width inside border
-const thirdBoxH = 32;
-const thirdBoxY = y;
+  // Text inside
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.text("Buyer (Bill to)", secondBoxX + 3, secondBoxY + 6);
 
-// ⭐ NO TOP BORDER
-// ⭐ NO LEFT BORDER
-// ⭐ NO CENTER VERTICAL LINE (because full width)
+  doc.setFont("helvetica", "normal");
+  doc.text(data[0].CUST_ADDRESS1 || "", secondBoxX + 3, secondBoxY + 10);
+  doc.text(data[0].CUST_ADDRESS2 || "", secondBoxX + 3, secondBoxY + 14);
+  doc.text(data[0].CUST_ADDRESS3 || "", secondBoxX + 3, secondBoxY + 18);
+  doc.text("PIN - 680001", secondBoxX + 3, secondBoxY + 22);
+  doc.text("GSTIN/UIN : 32ACXPA8968Q1ZJ", secondBoxX + 3, secondBoxY + 26);
+  doc.text(data[0].CUST_STATE, secondBoxX + 3, secondBoxY + 30);
 
-// Bottom border (full width)
-doc.line(thirdBoxX, thirdBoxY + thirdBoxH, thirdBoxX + thirdBoxW, thirdBoxY + thirdBoxH);
+  y += secondBoxH + 8;
 
-// Text inside second box
-doc.setFont("helvetica", "bold");
-doc.setFontSize(9);
-doc.text("Consignee (Ship to)", thirdBoxX + 3, thirdBoxY + 6);
+  // =====================================
+  // THIRD BOX
+  // =====================================
+  const thirdBoxX = 6;
+  const thirdBoxW = pageWidth - 12;
+  const thirdBoxH = 32;
+  const thirdBoxY = y;
 
-doc.setFont("helvetica", "normal");
-doc.text("KWALITY FOOTWEAR AGENCIES", thirdBoxX + 3, thirdBoxY + 10);
-doc.text("35/1025/3 & 4, K M A TOWER LATIN", thirdBoxX + 3, thirdBoxY + 14);
-doc.text("CHURCH ROAD, PALLIKKULAM, THRISSUR", thirdBoxX + 3, thirdBoxY + 18);
-doc.text("PIN - 680001", thirdBoxX + 3, thirdBoxY + 22);
-doc.text("GSTIN/UIN : 32ACXPA8968Q1ZJ", thirdBoxX + 3, thirdBoxY + 26);
-doc.text("State Name : Kerala, Code : 3", thirdBoxX + 3, thirdBoxY + 30);
+  // Bottom border
+  doc.line(thirdBoxX, thirdBoxY + thirdBoxH, thirdBoxX + thirdBoxW, thirdBoxY + thirdBoxH);
 
-// Move Y downward
-y += thirdBoxH + 8;
+  // Text inside
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.text("Consignee (Ship to)", thirdBoxX + 3, thirdBoxY + 6);
 
+  doc.setFont("helvetica", "normal");
+  doc.text(data[0].CUST_ADDRESS1 || "", thirdBoxX + 3, thirdBoxY + 10);
+  doc.text(data[0].CUST_ADDRESS2 || "", thirdBoxX + 3, thirdBoxY + 14);
+  doc.text(data[0].CUST_ADDRESS3 || "", thirdBoxX + 3, thirdBoxY + 18);
+  doc.text("PIN - 680001", thirdBoxX + 3, thirdBoxY + 22);
+  doc.text("GSTIN/UIN : 32ACXPA8968Q1ZJ", thirdBoxX + 3, thirdBoxY + 26);
+  doc.text(data[0].CUST_STATE, thirdBoxX + 3, thirdBoxY + 30);
 
-  // ===== TABLE HEADER =====
+  y += thirdBoxH + 8;
+
+  // =====================================
+  // ★ CONNECT CENTER VERTICAL LINE TO HORIZONTAL LINE ABOVE TABLE
+  // =====================================
+  const horizontalLineY = thirdBoxY + thirdBoxH;
+
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.4);
+  doc.line(midX, 20, midX, horizontalLineY);  // <-- PERFECT STOP HERE
+
+  // =====================================
+  // TABLE HEADER + ROWS
+  // =====================================
   const tableColumn = [
     'Transfer No',
     'Date',
@@ -501,53 +405,45 @@ y += thirdBoxH + 8;
 
   const tableRows: any[] = [];
 
-  if (data && Array.isArray(data) && data.length > 0 && data[0].SALE_DETAILS) {
+  if (data && Array.isArray(data) && data[0].SALE_DETAILS) {
     data[0].SALE_DETAILS.forEach((item: any) => {
-      const row = [
+      tableRows.push([
         item.TRANSFER_NO || '',
         item.TRANSFER_DATE || '',
         item.ARTICLE || '',
-        item.TOTAL_PAIR_QTY?.toString() || '',
+        item.TOTAL_PAIR_QTY || '',
         item.PRICE?.toFixed(2) || '',
         item.AMOUNT?.toFixed(2) || '',
         item.GST?.toFixed(2) || '',
         item.TAX_AMOUNT?.toFixed(2) || '',
         Number(item.TOTAL_AMOUNT || 0).toFixed(2)
-      ];
-      tableRows.push(row);
+      ]);
     });
   }
 
-
   const totalsRow = [
-  "",                       // Transfer No
-  "",                       // Date
-  "",                       // Description
-  "",                       // Qty
-  "",                       // Price
-  (data[0].GROSS_AMOUNT || 0).toFixed(2),      // Amount column
-  "",                       // TAX%
-  (data[0].TAX_AMOUNT || 0).toFixed(2),        // Tax Amount column
-  (data[0].NET_AMOUNT || 0).toFixed(2)         // Total column
-];
+    "", "", "", "", "",
+    (data[0].GROSS_AMOUNT || 0).toFixed(2),
+    "",
+    (data[0].TAX_AMOUNT || 0).toFixed(2),
+    (data[0].NET_AMOUNT || 0).toFixed(2)
+  ];
 
-
-  // ===== DRAW TABLE WITH GRID (BORDER) =====
   (doc as any).autoTable({
     head: [tableColumn],
     body: tableRows,
-     foot: [totalsRow],
+    foot: [totalsRow],
     margin: { left: 10, right: 55 },
     startY: y,
     theme: 'grid',
     headStyles: { fillColor: [200, 220, 255], textColor: [0, 0, 0], halign: 'center' },
     styles: { fontSize: 10, cellPadding: 2 },
-    footStyles: {        // 🔥 STYLING FOR TOTALS ROW INSIDE TABLE
-    fillColor: [240, 240, 240],
-    textColor: [0, 0, 0],
-    halign: "right",
-    fontStyle: "bold"
-  },
+    footStyles: {
+      fillColor: [240, 240, 240],
+      textColor: [0, 0, 0],
+      halign: "right",
+      fontStyle: "bold"
+    },
     columnStyles: {
       0: { cellWidth: 15 },
       1: { cellWidth: 25 },
@@ -561,89 +457,77 @@ y += thirdBoxH + 8;
     }
   });
 
+  const footerY = (doc as any).lastAutoTable.finalY + 10;
 
+  // =====================================
+  // AMOUNT IN WORDS
+  // =====================================
+  const netAmount = data[0].NET_AMOUNT || 0;
 
-let footerY = (doc as any).lastAutoTable.finalY + 10;
+  const rupees = Math.floor(netAmount);
+  const paise = Math.round((netAmount - rupees) * 100);
 
+  const rupeesInWords = numberToWordsIndianNumber(rupees);
+  const paiseInWords = paise > 0 ? numberToWordsIndianNumber(paise) : "";
 
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text("Amount Chargeable (in words)", 6, footerY);
 
-// =======================
-// AMOUNT IN WORDS
-// =======================
-const netAmount = data[0].NET_AMOUNT || 0;
+  let amountWords = `INR ${rupeesInWords} Rupees`;
+  if (paise > 0) amountWords += ` and ${paiseInWords} Paise`;
+  amountWords += " Only";
 
-// Split rupees and paise
-const rupees = Math.floor(netAmount);
-const paise = Math.round((netAmount - rupees) * 100);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text(amountWords, 6, footerY + 6);
 
-// Convert each part
-const rupeesInWords = numberToWordsIndianNumber(rupees);
-const paiseInWords = paise > 0 ? numberToWordsIndianNumber(paise) : "";
+  // =====================================
+// TAX AMOUNT IN WORDS
+// =====================================
+const taxAmount = data[0].TAX_AMOUNT || 0;
 
+const taxRupees = Math.floor(taxAmount);
+const taxPaise = Math.round((taxAmount - taxRupees) * 100);
+
+const taxRupeesInWords = numberToWordsIndianNumber(taxRupees);
+const taxPaiseInWords = taxPaise > 0 ? numberToWordsIndianNumber(taxPaise) : "";
 
 doc.setFont("helvetica", "bold");
 doc.setFontSize(10);
-doc.text("Amount Chargeable (in words)", 6, footerY);
+doc.text("Tax Amount (in words)", 6, footerY + 15);
 
-// Prepare final wording
-let amountWords = `INR ${rupeesInWords} Rupees`;
+let taxAmountWords = `INR ${taxRupeesInWords} Rupees`;
+if (taxPaise > 0) taxAmountWords += ` and ${taxPaiseInWords} Paise`;
+taxAmountWords += " Only";
 
-if (paise > 0) {
-  amountWords += ` and ${paiseInWords} Paise`;
-}
-
-amountWords += " Only";
-
-// Print in bold
 doc.setFont("helvetica", "bold");
 doc.setFontSize(11);
-doc.text(amountWords, 6, footerY + 6);
+doc.text(taxAmountWords, 6, footerY + 21);
 
 
+  // =====================================
+  // SIGNATURE BLOCK
+  // =====================================
+  const signBoxWidth = 100;
+  const signBoxX = pageWidth - signBoxWidth - 6;
 
+  doc.rect(signBoxX, footerY + 25, signBoxWidth, 30);
 
-// =======================
-// PAN NUMBER
-// =======================
-// doc.setFont("helvetica", "normal");
-// doc.setFontSize(10);
-// doc.text(`Company's PAN  :  ${data[0].PAN_NO || "AAAAA0000A"}`, 6, footerY + 15);
+  doc.setFont("helvetica", "bold");
+  doc.text(`for ${data[0].CUST_NAME || ''}`, signBoxX + 3, footerY + 32);
 
+  doc.setFont("helvetica", "normal");
+  doc.text("Authorised Signatory", signBoxX + 3, footerY + 50);
 
-// =======================
-// RIGHT SIDE NOTES
-// =======================
-// doc.setFont("helvetica", "italic");
-// doc.setFontSize(10);
-// doc.text("E. & O. E", pageWidth - 40, footerY + 5);
-
-// doc.setFont("helvetica", "normal");
-// doc.text(`User : ${data[0].USER_ID || ''}`, pageWidth - 40, footerY + 12);
-
-
-// =======================
-// SIGNATURE BLOCK
-// =======================
-// Signature box width
-const signBoxWidth = 100;
-const signBoxX = pageWidth - signBoxWidth - 6;  // aligns right box border with page border
-
-// Box
-doc.rect(signBoxX, footerY + 25, signBoxWidth, 30);
-
-
-// TEXT inside the enlarged box
-doc.setFont("helvetica", "bold");
-doc.text(`for ${data[0].CUST_NAME || ''}`, signBoxX + 3, footerY + 32);
-
-doc.setFont("helvetica", "normal");
-doc.text("Authorised Signatory", signBoxX + 3, footerY + 50);
-
-  // ===== RETURN =====
+  // =====================================
+  // RETURN PDF
+  // =====================================
   const pdfBlob = doc.output('blob');
   const pdfUrl = URL.createObjectURL(pdfBlob);
   return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
 }
+
 
 }
 
