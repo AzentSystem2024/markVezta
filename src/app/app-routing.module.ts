@@ -204,6 +204,8 @@ import { SecurityPolicyComponent } from './pages/SYSTEMPAGES/security-policy/sec
 import { BankReconciliationAddComponent } from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
 import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoice-pdf-view.component';
 import { PurchaseReturnDebitComponent } from './pages/purchase-return-debit/purchase-return-debit.component';
+import { MiscPaymentGstListComponent } from './components/HR/Masters/misc-payment-gst-list/misc-payment-gst-list.component';
+import { PrepaymentGstListComponent } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -213,6 +215,16 @@ const routes: Routes = [
     redirectTo: '/auth/login',
     pathMatch: 'full',
   },
+  {
+        path: 'misc-payment',
+        component: MiscPaymentGstListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'prepayment',
+        component: PrepaymentGstListComponent,
+        canActivate: [AuthGuardService],
+      },
 
   {
     path: 'auth',
@@ -451,6 +463,7 @@ const routes: Routes = [
         component: ListMiscellaneousPaymentsComponent,
         canActivate: [AuthGuardService],
       },
+      
       {
         path: 'misc-receipt',
         component: ListMiscReceiptComponent,
