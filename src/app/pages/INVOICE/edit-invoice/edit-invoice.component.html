@@ -198,6 +198,12 @@
             [calculateCellValue]="calculateGstAmount"
           ></dxi-column>
           <dxi-column
+            dataField="HSN_CODE"
+            caption="HSN Code"
+            dataType="string"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
             dataField="TOTAL_AMOUNT"
             caption="Total"
             dataType="number"

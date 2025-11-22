@@ -36,12 +36,10 @@
             allowUpdating: true,
             allowDeleting: true,
             allowAdding: true,
-            newRowPosition: 'last',
             useIcons: true
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onRowRemoved)="onRowRemoved($event)"
-          (onCellClick)="onGridClick($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
@@ -58,35 +56,21 @@
               >
                 <div style="display: flex; gap: 5px">
                   <dx-text-box
+                    [(value)]="pendingNo"
                     label="Payment No"
                     labelMode="floating"
-                    [(value)]="miscFormData.VOUCHER_NO"
                     [width]="200"
-                    [readOnly]="true"
                   ></dx-text-box>
 
-                  <!-- <dx-select-box
-                    *ngIf="isEditing"
-                    id="payHeadIdField"
-                    [(value)]="miscFormData.DEPT_ID"
-                    [dataSource]="Department"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    label="Department"
-                    labelMode="floating"
-                    [searchEnabled]="true"
-                    [width]="230"
-                    [readOnly]="isReadOnlyMode || !isApproved"
-                  ></dx-select-box> -->
+
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-text-box
-                    #beneficiaryNameRef
+                  #beneficiaryNameRef
                     [(value)]="miscFormData.PARTY_NAME"
                     label="Beneficiary Name"
                     labelMode="floating"
                     [width]="335"
-                    [readOnly]="isReadOnlyMode"
                     (onEnterKey)="focusTaxRegn()"
                   ></dx-text-box>
                 </div>
@@ -108,41 +92,24 @@
                     labelMode="floating"
                     [width]="200"
                     displayFormat="dd-MM-yyyy"
-                    [readOnly]="true"
                   ></dx-date-box>
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-text-box
-                    #taxRegnRef
+                  #taxRegnRef
                     [(value)]="miscFormData.VAT_REGN"
-                    [label]="
-                      selected_vat_id == sessionData.VAT_ID &&
-                      sessionData.VAT_ID == 2
-                        ? ' VAT Regtn No'
-                        : ' GST Regtn No'
-                    "
+                    [label]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Regtn No' : ' GST Regtn No'" 
                     labelMode="floating"
                     [width]="200"
-                    [readOnly]="isReadOnlyMode"
                     (onEnterKey)="focusGridFirstCell()"
                   ></dx-text-box>
-                  <!-- <dx-button
-                    icon="plus"
-                    type="default"
-                    stylingMode="outlined"
-                    hint="Add Row"
-                    [width]="32"
-                    [height]="30"
-                    style="margin-top: 4px"
-                    (onClick)="addNewManualRow()"
-                  ></dx-button> -->
                 </div>
                 <!--  -->
               </div>
             </dxi-item>
           </dxo-toolbar>
           <dxi-column
-            dataField="ledgerCode"
+            dataField="LEDGER_CODE"
             caption="Ledger Code"
             [width]="130"
             [editorType]="'dxSelectBox'"
@@ -152,11 +119,10 @@
               displayExpr: 'HEAD_CODE',
               searchEnabled: true
             }"
-            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
 
           <dxi-column
-            dataField="ledgerName"
+            dataField="LEDGER_NAME"
             caption="Ledger Name"
             [width]="200"
             [editorType]="'dxSelectBox'"
@@ -166,46 +132,37 @@
               displayExpr: 'HEAD_NAME',
               searchEnabled: true
             }"
-            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
 
           <dxi-column
-            dataField="DESCRIPTION"
+            dataField="REMARKS"
             caption="Description"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="true"
           ></dxi-column>
 
           <dxi-column
             dataField="AMOUNT"
             caption="Amount"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="true"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
 
-          <dxi-column
-            dataField="TAX"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? ' VAT %'
-                : 'GST %'
-            "
-            [allowEditing]="!isReadOnlyMode"
-            alignment="right"
+          <!-- <dxi-column
+            dataField="VAT_PERCENT"
+              [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Regtn No' : ' GST Regtn No'" 
+            [allowEditing]="true"
             [width]="120"
           ></dxi-column>
           <dxi-column
-            dataField="TAX_AMOUNT"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? ' VAT Amount '
-                : 'GST Amount '
-            "
+            dataField="VAT_AMOUNT"
+        
+                [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Amount' : ' GST Amount'" 
             [allowEditing]="true"
             [calculateCellValue]="calculateTaxAmount"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dxi-column>
+          ></dxi-column> -->
 
           <dxi-column type="buttons">
             <dxi-button name="edit"></dxi-button>
@@ -223,7 +180,7 @@
             </dxi-total-item>
 
             <dxi-total-item
-              column="TAX_AMOUNT"
+              column="VAT_AMOUNT"
               summaryType="sum"
               valueFormat="#,##0.00"
               displayFormat="Total: {0}"
@@ -255,18 +212,19 @@
               <div class="section-label">Payment Details</div>
 
               <dx-radio-group
+                [(value)]="receiptMode"
                 [items]="['Cash', 'Bank', 'Adjustments']"
                 layout="horizontal"
                 label="Mode"
                 labelMode="floating"
                 [width]="'100%'"
-                [value]="receiptMode"
-                [readOnly]="isReadOnlyMode"
                 (onValueChanged)="onReceiptModeChange($event)"
+                [readOnly]="isReadOnlyMode"
               ></dx-radio-group>
 
               <dx-select-box
-                [(value)]="miscFormData.PAY_HEAD_ID"
+              id="payHeadIdField"
+                [(value)]="miscFormData.HEAD_ID"
                 [dataSource]="filteredLedgerList"
                 displayExpr="HEAD_NAME"
                 valueExpr="HEAD_ID"
@@ -299,8 +257,8 @@
                   labelMode="floating"
                   [width]="'100%'"
                   [disabled]="receiptMode !== 'Bank'"
-                  style="flex: 1"
                   [readOnly]="isReadOnlyMode"
+                  style="flex: 1"
                 ></dx-text-box>
 
                 <dx-date-box
@@ -311,8 +269,8 @@
                   displayFormat="dd-MM-yyyy"
                   [width]="'100%'"
                   [disabled]="receiptMode !== 'Bank'"
-                  style="flex: 1"
                   [readOnly]="isReadOnlyMode"
+                  style="flex: 1"
                 ></dx-date-box>
               </div>
 
@@ -341,45 +299,25 @@
             ></dx-text-box>
           </div>
         </div>
-        <dx-check-box
-          *ngIf="!isEditing && !isReadOnlyMode"
-          [(value)]="miscFormData.IS_APPROVED"
-          text="Approve"
-          style="margin-top: 10px"
-        ></dx-check-box>
-        <dx-check-box
-          *ngIf="isEditing && !isReadOnlyMode"
-          [(value)]="isApproved"
-          text="Approve"
-          style="margin-top: 10px"
-        ></dx-check-box>
       </div>
     </div>
   </div>
 </dx-validation-group>
-
+<div *ngIf="!isReadOnlyMode">
+  <div style="margin: -5px; display: flex; align-items: right; gap: 5px">
+    <dx-check-box [(value)]="isApproved" text="Approve"></dx-check-box>
+  </div>
+</div>
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
-    <dx-button
-      text="Cancel"
-      stylingMode="outlined"
-      type="normal"
-      (onClick)="cancel()"
-    ></dx-button>
+    <dx-button text="Cancel" stylingMode="outlined" type="normal" (onClick)="cancel()"></dx-button>
     <dx-button
       #saveButtonRef
-      [text]="
-        miscFormData?.IS_APPROVED
-          ? 'Commit'
-          : isEditing
-          ? isApproved
-            ? 'Commit'
-            : 'Update'
-          : 'Save'
-      "
+      [text]="isApproved ? 'Update & Commit' : 'Update'"
       stylingMode="contained"
       type="default"
-      (onClick)="isEditing ? onUpdateMiscReceipt() : onSave()"
+      (onClick)="onSave()"
     ></dx-button>
   </div>
 </div>
+

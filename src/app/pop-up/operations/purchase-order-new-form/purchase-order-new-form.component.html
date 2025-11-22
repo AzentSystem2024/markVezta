@@ -466,6 +466,11 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column> -->
     <dxi-column
+          dataField="HSN_CODE"
+          caption="HSN Code"
+          dataType="string"
+        ></dxi-column>
+    <dxi-column
       caption="Tax (%)"
       dataField="VAT_PERC"
       alignment="center"
@@ -481,6 +486,7 @@
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
+     
     <dxi-column
       *ngIf="showLocalCurrencyColumn"
       caption="Total ({{ SupplierCurrencySymbol }})"

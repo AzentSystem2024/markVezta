@@ -65,6 +65,7 @@ export class ItemsFormComponent implements OnInit {
   //     { id: 2, name: 'Tally code' }
   //   ];
   selectedPriority: number = 1;
+   selected_vat_id: any;
   isLoading: boolean = false;
   toolbarItems = [
     {
@@ -367,6 +368,8 @@ export class ItemsFormComponent implements OnInit {
       UNIT_ID:0,
       PACKING_ID:0,
       POS_DESCRIPTION:"",
+      HSN_CODE :'',
+      GST_PERC:0,
       ITEM_STORES: [
         {
           STORE_ID: '',
@@ -462,6 +465,9 @@ export class ItemsFormComponent implements OnInit {
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     console.log(this.ENABLE_Matrix_Code);
+
+     this.selected_vat_id = this.sessionData.VAT_ID;
+     console.log(this.selected_vat_id, 'SELECTED_VAT_ID=========');
   }
 
   onInitNewRowAlias(e: any) {
@@ -987,6 +993,7 @@ export class ItemsFormComponent implements OnInit {
       DESCRIPTION: '',
       UOM: '',
       QUANTITY: '',
+      
     };
     this.selectedItemId = null;
   }

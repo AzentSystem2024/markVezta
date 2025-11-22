@@ -183,7 +183,7 @@
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
 
-          <dxi-column
+          <!-- <dxi-column
             dataField="TAX"
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
@@ -205,7 +205,7 @@
             [calculateCellValue]="calculateTaxAmount"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dxi-column>
+          ></dxi-column> -->
 
           <dxi-column type="buttons">
             <dxi-button name="edit"></dxi-button>
@@ -342,12 +342,6 @@
           </div>
         </div>
         <dx-check-box
-          *ngIf="!isEditing && !isReadOnlyMode"
-          [(value)]="miscFormData.IS_APPROVED"
-          text="Approve"
-          style="margin-top: 10px"
-        ></dx-check-box>
-        <dx-check-box
           *ngIf="isEditing && !isReadOnlyMode"
           [(value)]="isApproved"
           text="Approve"
@@ -368,18 +362,11 @@
     ></dx-button>
     <dx-button
       #saveButtonRef
-      [text]="
-        miscFormData?.IS_APPROVED
-          ? 'Commit'
-          : isEditing
-          ? isApproved
-            ? 'Commit'
-            : 'Update'
-          : 'Save'
-      "
+      [text]="isEditing ? (isApproved ? 'Commit' : 'Update') : 'Save'"
       stylingMode="contained"
       type="default"
       (onClick)="isEditing ? onUpdateMiscReceipt() : onSave()"
     ></dx-button>
   </div>
 </div>
+

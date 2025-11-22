@@ -49,7 +49,7 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-select-box
-                  class="spacing-item"
+                  class="field-spacing"
                   label="Item Type"
                   displayExpr="DESCRIPTION"
                   [searchEnabled]="true"
@@ -88,7 +88,7 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-text-box
-                  class="spacing-item"
+                  class="field-spacing"
                   label="Description"
                   [(value)]="newItems.DESCRIPTION"
                   labelMode="floating"
@@ -108,7 +108,7 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-text-box
-                  class="spacing-item"
+                  class="field-spacing"
                   label="POS Description"
                   labelMode="floating"
                   [(value)]="newItems.POS_DESCRIPTION"
@@ -240,6 +240,42 @@
             </dxi-item>
             <dxi-item class="spacing-item">
               <div *dxTemplate>
+                <dx-number-box
+                  label="GST %"
+                  labelMode="floating"
+                  [(value)]="newItems.GST_PERC"
+                  valueChangeEvent="keyup"
+                >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="This field is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-number-box>
+              </div>
+            </dxi-item>
+          </dxi-item>
+
+          <dxi-item itemType="group" [colCount]="2" class="spacing-item">
+            <dxi-item>
+              <div *dxTemplate>
+                <dx-text-box
+                  label="HSN Code"
+                  labelMode="floating"
+                  [(value)]="newItems.HSN_CODE"
+                  valueChangeEvent="keyup"
+                >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="This field is required"
+                    ></dxi-validation-rule> </dx-validator
+                ></dx-text-box>
+              </div>
+            </dxi-item>
+            <dxi-item class="spacing-item">
+              <div *dxTemplate>
                 <dx-select-box
                   label="Unit of Measure"
                   labelMode="floating"
@@ -261,6 +297,7 @@
               </div>
             </dxi-item>
           </dxi-item>
+
           <dxi-item itemType="group" [colCount]="3" class="spacing-item">
             <!-- <dxi-item itemType="group" [colCount]="2"> -->
             <dxi-item class="spacing-item">
