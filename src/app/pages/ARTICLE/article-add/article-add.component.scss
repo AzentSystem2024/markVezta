@@ -36,7 +36,7 @@
 
 .image-field {
   position: relative;
-  height: 100px;
+  height: 150px;
 }
 
 .image-upload-box {
@@ -274,7 +274,7 @@
 
 .fixed-footer-buttons {
   position: absolute; /* or fixed if you want it to stay on screen while scrolling */
-  bottom: 40px; /* distance from bottom */
+  bottom: 10px; /* distance from bottom */
   right: 20px; /* distance from right */
   display: flex;
   gap: 10px; /* space between buttons */
@@ -307,4 +307,14 @@
   max-width: 300px;
   white-space: normal;
   font-size: 13px;
+}
+.tooltip-wrapper {
+  display: inline-block;
+  pointer-events: auto !important; /* Enables hover */
+  position: relative;
+  z-index: 1; /* Ensure wrapper stays above the form background */
+}
+
+.tooltip-wrapper * {
+  pointer-events: auto !important; /* Allow hover to reach wrapper */
 }

@@ -99,6 +99,10 @@ export class ArticleEditComponent {
   items: any[] = []; // grid data → BoM components
   itemsList: any[] = []; // dropdown source → item master list
   data: any;
+  zoomActive = false;
+  isDragOver: boolean = false;
+  selectedItemId: any;
+  selectedUnitsTooltip: string = '';
 
   constructor(private dataService: DataService) {}
 
@@ -121,7 +125,16 @@ export class ArticleEditComponent {
           ...this.articleData,
           ...incomingData,
         };
+        if (
+          this.articleData.UNIT_ID &&
+          typeof this.articleData.UNIT_ID === 'string'
+        ) {
+          this.articleData.UNIT_ID = this.articleData.UNIT_ID.split(',').map(
+            (x: string) => Number(x.trim())
+          );
+        }
 
+        this.selectedProductionUnitId = this.articleData.UNIT_ID;
         // Set basic fields
         this.lastOrderNo = this.articleData.LAST_ORDER_NO || '';
         this.imagePreview = this.articleData.IMAGE_NAME;
@@ -279,7 +292,14 @@ export class ArticleEditComponent {
 
         // keep the selected value in grid
         grid.cellValue(rowIndex, 'ITEM', selectedDescription);
-
+        const matchedItem = this.itemsList.find(
+          (p: any) => p.DESCRIPTION === selectedDescription
+        );
+        this.selectedItemId = matchedItem ? matchedItem.ID : null;
+        let itemCode = null;
+        if (selectedDescription) {
+          itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
+        }
         // Prepare payload and call API
         const payload = { ITEM_CODE: String(selectedDescription) };
 
@@ -361,16 +381,67 @@ export class ArticleEditComponent {
     this.articleData.COMPONENT_ARTICLE_ID = '';
   }
 
+  // onImageSelected(event: Event) {
+  //   const file = (event.target as HTMLInputElement).files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       this.imagePreview = reader.result;
+  //       this.articleData.IMAGE_NAME = this.imagePreview;
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // }
+
   onImageSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
-        this.articleData.IMAGE_NAME = this.imagePreview;
+        // console.log('Base64 Image String:', this.imagePreview);
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  openZoom() {
+    this.zoomActive = true;
+  }
+  deleteImage() {
+    this.imagePreview = null;
+  }
+  closeZoom() {
+    this.zoomActive = false;
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.isDragOver = false;
+
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      // Call your existing method
+      this.onImageSelected({ target: { files: [file] } } as any);
+    }
+  }
+
+  handleFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result;
+    };
+    reader.readAsDataURL(file);
   }
 
   getCategory() {
@@ -417,17 +488,20 @@ export class ArticleEditComponent {
   getLastOrderNo() {
     if (!this.selectedProductionUnitId) return;
 
-    this.dataService
-      .getLastOrderNo(this.selectedProductionUnitId)
-      .subscribe((response: any) => {
-        console.log(response, 'LASTORDERNO');
-        this.lastOrderNo = response?.LastOrderNo ?? '';
-      });
+    this.dataService.getLastOrderNoForArticle().subscribe((response: any) => {
+      console.log(response, 'LASTORDERNO');
+      this.lastOrderNo = response?.LastOrderNo ?? '';
+    });
   }
 
   onUnitChanged(e: any) {
     this.articleData.UNIT_ID = e.value;
     this.selectedProductionUnitId = e.value;
+    // Build tooltip from selected unit descriptions
+    this.selectedUnitsTooltip = this.produCtionUnits
+      ?.filter((u: any) => e.value.includes(u.ID))
+      .map((u: any) => u.DESCRIPTION)
+      .join(', ');
     this.getLastOrderNo();
   }
 
@@ -544,7 +618,7 @@ export class ArticleEditComponent {
         .map((row: any) => row.data)
         .filter((row: any) => row.ITEM && row.QUANTITY > 0)
         .map((row: any) => ({
-          ITEM_CODE: row.ITEM,
+          ITEM_CODE: String(this.selectedItemId),
           QUANTITY: row.QUANTITY,
         })) || [];
 
@@ -561,7 +635,10 @@ export class ArticleEditComponent {
       PACK_QTY: this.articleData.PACK_QTY || 0,
       PART_NO: this.articleData.PART_NO || '',
       ALIAS_NO: this.articleData.ALIAS_NO || '',
-      UNIT_ID: this.articleData.UNIT_ID || 0,
+      // UNIT_ID: this.articleData.UNIT_ID || 0,
+      UNIT_ID: Array.isArray(this.selectedProductionUnitId)
+        ? this.selectedProductionUnitId.join(',')
+        : this.selectedProductionUnitId,
       ARTICLE_TYPE: this.articleData.ARTICLE_TYPE || 0,
       ARTICLE_TYPE_NAME: this.articleData.ARTICLE_TYPE_NAME || '',
       CATEGORY_ID: this.articleData.CATEGORY_ID || 0,

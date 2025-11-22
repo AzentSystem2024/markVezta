@@ -290,7 +290,20 @@
     </div>
   </div>
 </dx-validation-group>
-
+<div
+  style="
+    margin: 16px 0 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  "
+>
+  <dx-check-box
+    text="Approve"
+    [(value)]="creditFormData.IS_APPROVED"
+  ></dx-check-box>
+</div>
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
     <dx-button
@@ -303,7 +316,7 @@
       #saveButtonRef
       id="saveBtn"
       text="Save"
-      (onClick)="saveJournalVoucher()"
+      (onClick)="saveCreditNote()"
       stylingMode="contained"
       type="default"
     ></dx-button>

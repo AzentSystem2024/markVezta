@@ -57,7 +57,7 @@
     </div>
 
     <!-- Row 4 -->
-    <div class="period-row">
+    <!-- <div class="period-row">
       <dx-number-box
         [label]="
           selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
@@ -65,7 +65,6 @@
             : ' GST %'
         "
         labelMode="floating"
-       
         [(value)]="PrePaymentFormData.TAX_PERCENT"
         (onValueChanged)="updateGSTAmount()"
       ></dx-number-box>
@@ -76,16 +75,14 @@
             : ' GST Amount'
         "
         labelMode="floating"
-       
         [(value)]="PrePaymentFormData.TAX_AMOUNT"
       ></dx-number-box>
       <dx-number-box
         label="Net Amount"
         labelMode="floating"
-       
         [(value)]="PrePaymentFormData.NET_AMOUNT"
       ></dx-number-box>
-    </div>
+    </div> -->
 
     <!-- Row 5 -->
     <div class="form-row">
@@ -143,21 +140,21 @@
         label="Period From"
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
-        width="150px"
+        width="150"
         [(value)]="PrePaymentFormData.DATE_FROM"
         (onValueChanged)="updatePeriodTo()"
       ></dx-date-box>
       <dx-number-box
         label="No.Month"
         labelMode="floating"
-       
+        width="120"
         [(value)]="PrePaymentFormData.NO_OF_MONTHS"
         (onValueChanged)="updatePeriodTo()"
       ></dx-number-box>
       <dx-number-box
         label="No.Days"
         labelMode="floating"
-        
+        width="120"
         [(value)]="PrePaymentFormData.NO_OF_DAYS"
         (onValueChanged)="updatePeriodTo()"
       ></dx-number-box>
@@ -165,7 +162,7 @@
         label="Period To"
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
-       
+        width="150"
         [(value)]="PrePaymentFormData.DATE_TO"
         [readOnly]="true"
       ></dx-date-box>
@@ -244,7 +241,20 @@
         [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
       ></dx-number-box>
     </div>
-
+    <div
+      style="
+        margin: 4px 0 8px 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+      "
+    >
+      <dx-check-box
+        text="Approve"
+        [(value)]="PrePaymentFormData.IS_APPROVED"
+      ></dx-check-box>
+    </div>
     <!-- Footer -->
     <div class="fixed-footer">
       <dx-button

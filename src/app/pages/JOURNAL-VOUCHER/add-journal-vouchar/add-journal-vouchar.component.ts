@@ -48,6 +48,7 @@ import dxSelectBox from 'devextreme/ui/select_box';
 import DevExpress from 'devextreme';
 import { Console } from 'console';
 import { Router } from '@angular/router';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-add-journal-vouchar',
@@ -96,6 +97,7 @@ export class AddJournalVoucharComponent {
     NARRATION: '',
     USER_ID: 1,
     DEPT_ID: '',
+    IS_APPROVED: false,
     DETAILS: [],
 
     // DETAILS: [
@@ -114,6 +116,9 @@ export class AddJournalVoucharComponent {
   netAmountDisplay: number;
   currentUser: any;
   Company_list: any = [];
+  selectedCompany: any;
+  selectedCompanyId: any;
+  selectedFinId: any;
   constructor(private dataService: DataService, private router: Router) {
     this.Deparment_Drop_down();
   }
@@ -134,14 +139,18 @@ export class AddJournalVoucharComponent {
       menuResponse?.Configuration[0].STORE_ID;
     console.log('Company ID:', menuResponse?.Configuration[0].STORE_ID);
     console.log('Parsed ObjectData:', menuResponse);
+    this.selectedCompanyId = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || null;
+    console.log('Selected Company ID:', this.selectedCompanyId);
+    this.selectedFinId = menuResponse?.FINANCIAL_YEARS?.FIN_ID || null;
     const userDataString = localStorage.getItem('userData');
     console.log(userDataString, 'USERDATASTRINGGGGGGGGG');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      const selectedCompany = userData?.Companies[0].COMPANY_ID;
-      console.log(userData, 'SELECTEDCOMPANY');
-      if (selectedCompany?.COMPANY_ID) {
-        this.journalVoucherFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
+      this.selectedCompany = userData?.SELECTED_COMPANY.COMPANY_ID;
+      console.log(this.selectedCompany, 'SELECTEDCOMPANY');
+      if (this.selectedCompany?.COMPANY_ID) {
+        this.journalVoucherFormData.COMPANY_ID =
+          this.selectedCompany.COMPANY_ID;
         console.log(
           this.journalVoucherFormData.COMPANY_ID,
           'COMPANYIDDDDDDDDD'
@@ -747,18 +756,54 @@ export class AddJournalVoucharComponent {
     });
   }
 
+  callInsertJournalVoucherAPI(finalPayload: any) {
+    this.dataService.insertJournalVoucher(finalPayload).subscribe(
+      (response: any) => {
+        console.log(response, 'SAVED SUCCESSFULLY');
+
+        notify(
+          {
+            message: 'Journal Voucher Saved Successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+
+        // ⭐ DO NOT REMOVE — Needed for auto-setting voucher number
+        if (response?.VoucherNo) {
+          this.journalVoucherFormData.VOUCHER_NO = response.VoucherNo;
+        }
+
+        // Reset form but keep newly assigned voucher number
+        this.resetJournalVoucherForm(true);
+
+        // Close popup
+        this.popupClosed.emit();
+      },
+      (error) => {
+        notify(
+          'Failed to save Journal Voucher. Please try again.',
+          'error',
+          2000
+        );
+        console.error('Save error:', error);
+      }
+    );
+  }
+
   saveJournalVoucher() {
     // 🔹 Step 0: Load from session/local storage
     // 🔹 Step 0: Load from session/local storage
     const userDataString = localStorage.getItem('userData');
     let companyId = '';
     let finId = '';
+    companyId = this.selectedCompanyId;
+    finId = this.selectedFinId;
+    // if (userDataString) {
+    //   const userData = JSON.parse(userDataString);
 
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
-      companyId = userData?.SELECTED_COMPANY?.COMPANY_ID ?? '';
-      finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? '';
-    }
+    //   finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? '';
+    // }
 
     // 🔹 Step 1: Filter out completely empty rows (ignore billNo-only rows)
     const cleanedDetails = this.journalVoucherFormData.DETAILS.filter(
@@ -844,31 +889,23 @@ export class AddJournalVoucharComponent {
       DETAILS: transformedDetails,
     };
 
-    // 4. Save request
-    this.dataService
-      .insertJournalVoucher(finalPayload)
-      .subscribe((response: any) => {
-        console.log(response, 'SAVED SUCCESSFULLY');
+    if (this.journalVoucherFormData.IS_APPROVED) {
+      const result = confirm(
+        'A new Journal Voucher will be created and approved. Do you want to continue?',
+        'Confirm Approval'
+      );
 
-        notify(
-          {
-            message: 'Journal Voucher Saved Successfully',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success'
-        );
-
-        // 5. Extract Journal No from message string
-        if (response?.VoucherNo) {
-          this.journalVoucherFormData.VOUCHER_NO = response.VoucherNo;
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.callInsertJournalVoucherAPI(finalPayload);
         }
-
-        // 7. Reset form but keep the new Journal No
-        this.resetJournalVoucherForm(true);
-
-        // 8. Close the popup
-        this.popupClosed.emit();
       });
+
+      return;
+    }
+
+    // Normal flow (Not Approved)
+    this.callInsertJournalVoucherAPI(finalPayload);
   }
 
   resetJournalVoucherForm(keepJournalNo: boolean = false) {

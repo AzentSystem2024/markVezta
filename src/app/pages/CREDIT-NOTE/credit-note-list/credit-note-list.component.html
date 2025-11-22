@@ -41,11 +41,11 @@
         [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -79,10 +79,10 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
         <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="custom-export-button"
-      ></dxi-item>
+          name="exportButton"
+          location="after"
+          cssClass="custom-export-button"
+        ></dxi-item>
         <dxi-item
           *ngIf="canAdd"
           location="after"
@@ -161,7 +161,7 @@
 <dx-popup
   [(visible)]="isAddCreditNote"
   [width]="'90vw'"
-  [height]="'90vh'"
+  [height]="'100vh'"
   title="Credit Note"
   (onHiding)="handleClose()"
 >
@@ -173,7 +173,7 @@
 <dx-popup
   [(visible)]="isEditCreditNote"
   [width]="'90vw'"
-  [height]="'90vh'"
+  [height]="'100vh'"
   title="Update Credit Note"
   (onHiding)="handleClose()"
 >
@@ -188,7 +188,7 @@
 <dx-popup
   [(visible)]="isViewCreditNote"
   [width]="'90vw'"
-  [height]="'90vh'"
+  [height]="'100vh'"
   title="Credit Note"
   (onHiding)="handleClose()"
 >

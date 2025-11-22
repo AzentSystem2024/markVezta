@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Input,
   NgModule,
+  NgZone,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -46,6 +47,7 @@ import {
 import notify from 'devextreme/ui/notify';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
 import { DataService } from 'src/app/services';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-add-miscellaneous-payment',
@@ -103,6 +105,7 @@ export class AddMiscellaneousPaymentComponent {
     PAY_TYPE_ID: '',
     PAY_HEAD_ID: '',
     DEPT_ID: 0,
+    IS_APPROVED: false,
     MISC_DETAIL: [
       {
         SL_NO: '',
@@ -147,7 +150,7 @@ export class AddMiscellaneousPaymentComponent {
   selected_vat_id: any;
   selectedstoreId: any;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -450,18 +453,6 @@ export class AddMiscellaneousPaymentComponent {
         }
       };
     }
-    // if (e.dataField === 'AMOUNT') {
-    //   e.editorOptions.onKeyDown = (event: any) => {
-    //     if (event.event.key === 'Enter') {
-    //       const grid = e.component;
-    //       const rowIndex = e.row.rowIndex;
-    //       // Move focus to the "ledgerCode" column in the same row
-    //       setTimeout(() => {
-    //         grid.focus(grid.getCellElement(rowIndex, 'TAX'));
-    //       });
-    //     }
-    //   };
-    // }
     if (e.dataField === 'AMOUNT') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
@@ -698,6 +689,34 @@ export class AddMiscellaneousPaymentComponent {
     return `${year}-${month}-${day}`;
   }
 
+  callInsertAPI(finalPayload: any) {
+    this.dataService.insertMiscPayment(finalPayload).subscribe(
+      (response: any) => {
+        console.log(response, 'SAVED SUCCESSFULLY');
+
+        notify(
+          {
+            message: 'Payment Saved Successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+
+        // DO NOT REMOVE — Needed for auto-setting voucher number
+        if (response?.VoucherNo) {
+          this.miscFormData.VOUCHER_NO = response.VoucherNo;
+        }
+
+        // Close popup
+        this.popupClosed.emit();
+      },
+      (error) => {
+        notify('Failed to save Credit Note. Please try again.', 'error', 2000);
+        console.error('Save error:', error);
+      }
+    );
+  }
+
   onSave() {
     // 1. Validate form fields
     const result = this.miscFormGroup?.instance?.validate();
@@ -783,39 +802,67 @@ export class AddMiscellaneousPaymentComponent {
     };
 
     // // 5. Submit via API
-    this.dataService.insertMiscPayment(payload).subscribe({
-      next: (response: any) => {
-        if (response?.flag == 1) {
-          notify(
-            {
-              message: 'Miscellaneous Payment Added Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success'
-          );
-          this.getPendingNo();
-          this.popupClosed.emit(); // Or reset form if needed
-        } else {
-          notify(
-            {
-              message: response?.Message || 'Failed to save data.',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'error'
-          );
+
+    if (this.miscFormData.IS_APPROVED) {
+      const result = confirm(
+        'A new Payment will be created and approved. Do you want to continue?',
+        'Confirm Approval'
+      );
+
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.ngZone.run(() => {
+            this.callInsertAPI(payload);
+          });
         }
-      },
-      error: (err) => {
-        console.error('Save Error:', err);
-        notify(
-          {
-            message: 'Something went wrong while saving.',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'error'
-        );
-      },
-    });
+      });
+
+      return;
+    }
+
+    // no approval → save directly
+    this.callInsertAPI(payload);
+    // this.dataService.insertMiscPayment(payload).subscribe({
+    //   next: (response: any) => {
+    //     if (response?.flag == 1) {
+    //       notify(
+    //         {
+    //           message: 'Miscellaneous Payment Added Successfully',
+    //           position: { at: 'top center', my: 'top center' },
+    //         },
+    //         'success'
+    //       );
+    //       this.getPendingNo();
+    //       this.popupClosed.emit(); // Or reset form if needed
+    //     } else {
+    //       notify(
+    //         {
+    //           message: response?.Message || 'Failed to save data.',
+    //           position: { at: 'top center', my: 'top center' },
+    //         },
+    //         'error'
+    //       );
+    //     }
+    //   },
+    //   error: (err) => {
+    //     console.error('Save Error:', err);
+    //     notify(
+    //       {
+    //         message: 'Something went wrong while saving.',
+    //         position: { at: 'top center', my: 'top center' },
+    //       },
+    //       'error'
+    //     );
+    //   },
+    // });
+  }
+
+  formatDate(date: any): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    return `${year}-${month}-${day}`; // yyyy-MM-dd
   }
 
   onUpdateMiscReceipt() {
@@ -859,6 +906,9 @@ export class AddMiscellaneousPaymentComponent {
     }
 
     const { DetailList, ...cleanedFormData } = this.miscFormData;
+    this.miscFormData.TRANS_DATE = this.formatDate(
+      this.miscFormData.TRANS_DATE
+    );
     const payload = {
       ...this.miscFormData,
       STORE_ID: this.selectedstoreId,
@@ -886,27 +936,69 @@ export class AddMiscellaneousPaymentComponent {
 
     console.log(payload, 'PAYLOADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD');
     // 5. Submit via API - Conditional: Approve or Update
-    const submitObservable = this.isApproved
-      ? this.dataService.approveMiscPayment(payload) // <- Call approve API
-      : this.dataService.updateMiscPayment(payload); // <- Default update API
+    // 5. Submit via API - Conditional: Approve or Update
+    if (this.isApproved) {
+      confirm(
+        'Are you sure you want to approve this Miscellaneous Payment?',
+        'Confirm Approval'
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          // YES -> Call approve API
+          this.dataService.approveMiscPayment(payload).subscribe({
+            next: (response: any) => {
+              if (response?.flag == 1) {
+                notify(
+                  {
+                    message: 'Miscellaneous Payment Approved Successfully',
+                    position: { at: 'top center', my: 'top center' },
+                  },
+                  'success'
+                );
+                this.popupClosed.emit();
+              } else {
+                notify(
+                  {
+                    message: response?.Message || 'Failed to approve.',
+                    position: { at: 'top center', my: 'top center' },
+                  },
+                  'error'
+                );
+              }
+            },
+            error: (err) => {
+              console.error('Approve Error:', err);
+              notify(
+                {
+                  message: 'Something went wrong while approving.',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'error'
+              );
+            },
+          });
+        }
+        // If NO -> do nothing
+      });
 
-    submitObservable.subscribe({
+      return; // Stop here
+    }
+
+    // NOT APPROVED → normal update API
+    this.dataService.updateMiscPayment(payload).subscribe({
       next: (response: any) => {
         if (response?.flag == 1) {
           notify(
             {
-              message: this.isApproved
-                ? 'Miscellaneous Payment Approved Successfully'
-                : 'Miscellaneous Payment Updated Successfully',
+              message: 'Miscellaneous Payment Updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
             'success'
           );
-          this.popupClosed.emit(); // Or reset form if needed
+          this.popupClosed.emit();
         } else {
           notify(
             {
-              message: response?.Message || 'Failed to save data.',
+              message: response?.Message || 'Failed to update.',
               position: { at: 'top center', my: 'top center' },
             },
             'error'
@@ -914,10 +1006,10 @@ export class AddMiscellaneousPaymentComponent {
         }
       },
       error: (err) => {
-        console.error('Save Error:', err);
+        console.error('Update Error:', err);
         notify(
           {
-            message: 'Something went wrong while saving.',
+            message: 'Something went wrong while updating.',
             position: { at: 'top center', my: 'top center' },
           },
           'error'

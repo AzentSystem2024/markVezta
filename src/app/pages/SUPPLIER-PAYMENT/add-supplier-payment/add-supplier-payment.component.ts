@@ -3,6 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
   NgModule,
+  NgZone,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -46,6 +47,7 @@ import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-vou
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-add-supplier-payment',
@@ -89,6 +91,7 @@ export class AddSupplierPaymentComponent {
     NET_AMOUNT: '',
     PDC_ID: 0,
     PARTY_NAME: '',
+    IS_APPROVED: false,
     SUPP_DETAIL: [
       {
         BILL_ID: '',
@@ -117,7 +120,7 @@ export class AddSupplierPaymentComponent {
   selectedLedger: any;
   pdcPopupVisible: boolean = false;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   ngOnInit() {
     this.getLedgerCodeDropdown();
@@ -572,19 +575,60 @@ export class AddSupplierPaymentComponent {
     }
 
     // ✅ Call backend API
-    this.dataService.insertSupplierPayment(this.paymentFormData).subscribe({
-      next: () => {
-        notify('Receipt saved successfully', 'success', 3000);
+    if (this.paymentFormData.IS_APPROVED) {
+      const result = confirm(
+        'A new Supplier Payment will be created and approved. Do you want to continue?',
+        'Confirm Approval'
+      );
 
-        this.popupClosed.emit();
+      result.then((dialogResult: any) => {
+        if (dialogResult) {
+          this.ngZone.run(() => {
+            this.callAPI(this.paymentFormData);
+          });
+        }
+      });
+
+      return;
+    }
+
+    // Normal flow (Not Approved)
+    this.callAPI(this.paymentFormData);
+  }
+
+  callAPI(finalPayload: any) {
+    this.dataService.insertSupplierPayment(finalPayload).subscribe(
+      (response: any) => {
+        console.log(response, 'SAVED SUCCESSFULLY');
+
+        notify(
+          {
+            message: 'Supplier Payment Saved Successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+
+        // DO NOT REMOVE — Needed for auto-setting voucher number
+        if (response?.VoucherNo) {
+          this.paymentFormData.VOUCHER_NO = response.VoucherNo;
+        }
+
+        // Reset form but keep newly assigned voucher number
         this.resetForm();
-        this.getReceiptNo();
+
+        // Close popup
+        this.popupClosed.emit();
       },
-      error: (err) => {
-        notify('Error saving receipt', 'error', 3000);
-        console.error('Save error:', err);
-      },
-    });
+      (error) => {
+        notify(
+          'Failed to save Supplier Payment. Please try again.',
+          'error',
+          2000
+        );
+        console.error('Save error:', error);
+      }
+    );
   }
 
   resetForm() {
