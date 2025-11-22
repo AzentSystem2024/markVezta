@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 86vh;
+      height: 85vh;
       display: flex;
       flex-direction: column;
 
@@ -356,109 +356,42 @@
               ></dx-number-box>
             </div>
           </div>
-
-          <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-          <!-- Row: Two columns side by side -->
-          <!-- <div style="display: flex; justify-content: space-between; gap: 5px">
-       
-            <div style="flex: 1">
-              <div class="section-label">Receipt Details</div>
-
-              <dx-radio-group
-                [items]="['Cash', 'Bank', 'Adjustments', 'PDC']"
-                [(value)]="receiptMode"
-                layout="horizontal"
-                label="Mode"
-                labelMode="floating"
-                [width]="'100%'"
-                (onValueChanged)="onReceiptModeChange($event)"
-              ></dx-radio-group>
-
-              <dx-select-box
-                [dataSource]="filteredLedgerList"
-                [(value)]="receiprtFormData.PAY_HEAD_ID"
-                displayExpr="HEAD_NAME"
-                valueExpr="HEAD_ID"
-                label="Ledger"
-                labelMode="floating"
-                [searchEnabled]="true"
-                [width]="'100%'"
-                style="margin-top: 2px"
-              ></dx-select-box>
-            </div>
-
-            <div style="flex: 1">
-  
-              <div
-                class="section-label"
-                [ngStyle]="{
-                  color: receiptMode === 'Bank' ? 'inherit' : '#888'
-                }"
-              >
-                Bank Remittance Details
-              </div>
-
-            
-              <div style="display: flex; gap: 10px">
-                <dx-text-box
-                  label="Reference No"
-                  labelMode="floating"
-                  [(value)]="receiprtFormData.CHEQUE_NO"
-                  [width]="'100%'"
-                  [disabled]="receiptMode !== 'Bank'"
-                  style="flex: 1"
-                ></dx-text-box>
-
-                <dx-date-box
-                  label="Due Date"
-                  labelMode="floating"
-                  [(value)]="receiprtFormData.CHEQUE_DATE"
-                  type="date"
-                  displayFormat="dd-MM-yyyy"
-                  [width]="'100%'"
-                  [disabled]="receiptMode !== 'Bank'"
-                  style="flex: 1"
-                ></dx-date-box>
-              </div>
-
-       
-              <dx-text-box
-                label="Bank Name"
-                labelMode="floating"
-                [(value)]="receiprtFormData.BANK_NAME"
-                [width]="'100%'"
-                [disabled]="receiptMode !== 'Bank'"
-                style="margin-top: 5px"
-              ></dx-text-box>
-            </div>
-          </div>
-
-          <div>
-            <dx-text-box
-              label="Narration"
-              labelMode="floating"
-              [(value)]="receiprtFormData.NARRATION"
-              [width]="'100%'"
-              style="margin-top: 2px"
-            ></dx-text-box>
-          </div> -->
         </div>
       </div>
     </div>
   </div>
 </dx-validation-group>
 
-<div class="form-popup-buttons-container">
-  <div class="popup-footer">
+<div
+  style="
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    margin-top: -5px;
+    top: -8px; /* move the block upward */
+    padding-right: 10px;
+  "
+>
+  <!-- Checkbox right above buttons -->
+  <dx-check-box
+    [(value)]="receiprtFormData.IS_APPROVED"
+    text="Approve"
+    [width]="120"
+  ></dx-check-box>
+
+  <!-- Buttons row -->
+  <div style="display: flex; gap: 1px">
     <dx-button
       text="Cancel"
       stylingMode="outlined"
       type="normal"
       (onClick)="cancel()"
     ></dx-button>
+
     <dx-button
       #saveButtonRef
-      text="Save"
+      [text]="receiprtFormData.IS_APPROVED ? 'Commit' : 'Save'"
       stylingMode="contained"
       type="default"
       (onClick)="saveReceipt()"

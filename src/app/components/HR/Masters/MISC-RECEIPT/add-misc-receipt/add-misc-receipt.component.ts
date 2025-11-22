@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Input,
   NgModule,
+  NgZone,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -106,6 +107,7 @@ export class AddMiscReceiptComponent {
     BANK_NAME: '',
     NARRATION: '',
     DEPT_ID: '',
+    IS_APPROVED: false,
   };
   ledgerList: any;
   receiptMode: string = 'Cash';
@@ -123,16 +125,15 @@ export class AddMiscReceiptComponent {
   isApproved: boolean = false;
   voucherNo: any;
   Company_list: any = [];
- selectedstoreId: any;
+  selectedstoreId: any;
 
-  constructor(private dataService: DataService) {
+  constructor(private dataService: DataService, private ngZone: NgZone) {
     this.Deparment_Drop_down();
   }
 
-
-  sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
       '===========selected store id==================='
@@ -168,7 +169,6 @@ export class AddMiscReceiptComponent {
         this.miscFormData.FIN_ID = firstFinYear.FIN_ID;
       }
     }
-
   }
 
   ngAfterViewInit() {
@@ -603,23 +603,49 @@ export class AddMiscReceiptComponent {
     return `${yyyy}-${mm}-${dd}`;
   }
 
+  callInsertAPI(finalPayload: any) {
+    this.dataService.insertMiscReceipt(finalPayload).subscribe(
+      (response: any) => {
+        console.log(response, 'SAVED SUCCESSFULLY');
+
+        notify(
+          {
+            message: 'Miscellaneous Receipt Saved Successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+        this.popupClosed.emit();
+        // DO NOT REMOVE — Needed for auto-setting voucher number
+        if (response?.VoucherNo) {
+          this.miscFormData.VOUCHER_NO = response.VoucherNo;
+        }
+
+        // Close popup
+      },
+      (error) => {
+        notify('Failed to save Credit Note. Please try again.', 'error', 2000);
+        console.error('Save error:', error);
+      }
+    );
+  }
+
   onSaveMiscReceipt() {
-
     if (
-    !this.miscFormData?.PAY_HEAD_ID ||
-    !this.miscFormData?.PARTY_NAME ||
-    !this.miscFormData?.TRANS_DATE ||
-    !this.receiptMode
-  ) {
-    notify('Please fill all required fields before saving.', 'warning', 2500);
-    return;
-  }
+      !this.miscFormData?.PAY_HEAD_ID ||
+      !this.miscFormData?.PARTY_NAME ||
+      !this.miscFormData?.TRANS_DATE ||
+      !this.receiptMode
+    ) {
+      notify('Please fill all required fields before saving.', 'warning', 2500);
+      return;
+    }
 
-  if (!this.pendingInvoicelist || this.pendingInvoicelist.length === 0) {
-    notify('Please add at least one invoice detail.', 'warning', 2500);
-    return;
-  }
-  
+    if (!this.pendingInvoicelist || this.pendingInvoicelist.length === 0) {
+      notify('Please add at least one invoice detail.', 'warning', 2500);
+      return;
+    }
+
     if (!this.miscFormData.PARTY_NAME) {
       notify('Please enter Beneficairy name before saving.', 'warning', 2000);
       return;
@@ -723,20 +749,41 @@ export class AddMiscReceiptComponent {
       PAY_HEAD_ID: this.miscFormData.PAY_HEAD_ID,
       DEPT_ID: Number(this.miscFormData.DEPT_ID),
       STORE_ID: this.selectedstoreId,
+      IS_APPROVED: this.miscFormData.IS_APPROVED,
       DETAILS: details,
     };
 
     console.log('Save Payload:', payload);
 
-    this.dataService.insertMiscReceipt(payload).subscribe((res: any) => {
-      if (res.flag === 1) {
-        notify('Miscellaneous Receipt saved successfully', 'success', 2000);
-        this.getVoucherNo();
-        this.popupClosed.emit();
-      } else {
-        notify('Failed to save Misc Receipt', 'error', 2000);
-      }
-    });
+    if (this.miscFormData.IS_APPROVED) {
+      const result = confirm(
+        'A new Payment will be created and approved. Do you want to continue?',
+        'Confirm Approval'
+      );
+
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.ngZone.run(() => {
+            this.callInsertAPI(payload);
+          });
+        }
+      });
+
+      return;
+    }
+
+    // no approval → save directly
+    this.callInsertAPI(payload);
+
+    // this.dataService.insertMiscReceipt(payload).subscribe((res: any) => {
+    //   if (res.flag === 1) {
+    //     notify('Miscellaneous Receipt saved successfully', 'success', 2000);
+    //     this.getVoucherNo();
+    //     this.popupClosed.emit();
+    //   } else {
+    //     notify('Failed to save Misc Receipt', 'error', 2000);
+    //   }
+    // });
   }
 
   onUpdateMiscReceipt() {

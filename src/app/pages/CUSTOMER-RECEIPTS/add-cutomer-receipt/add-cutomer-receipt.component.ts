@@ -3,6 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
   NgModule,
+  NgZone,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -46,6 +47,7 @@ import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-vou
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-add-cutomer-receipt',
@@ -101,6 +103,7 @@ export class AddCutomerReceiptComponent {
     CHEQUE_DATE: '',
     BANK_NAME: '',
     PARTY_NAME: '',
+    IS_APPROVED: false,
     REC_DETAIL: [
       {
         BILL_ID: '',
@@ -120,7 +123,7 @@ export class AddCutomerReceiptComponent {
   partyName: any;
   selectedCustomer: any;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   ngOnInit() {
     this.sessionDetails();
@@ -224,6 +227,9 @@ export class AddCutomerReceiptComponent {
   onCustomerChanged(event: any): void {
     console.log(event, "==============='''");
     const selectedId = event.value;
+    this.selectedDistributorId = event.value;
+    this.receiprtFormData.DISTRIBUTOR_ID = selectedId;
+
     this.partyName = event.value;
     if (selectedId) {
       this.selectedCustomer = this.distributorList.find(
@@ -515,6 +521,37 @@ export class AddCutomerReceiptComponent {
     });
   }
 
+  callAPI(finalPayload: any) {
+    this.dataService.insertCustomerReceipt(finalPayload).subscribe(
+      (response: any) => {
+        console.log(response, 'SAVED SUCCESSFULLY');
+
+        notify(
+          {
+            message: 'Receipt Saved Successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+
+        // DO NOT REMOVE — Needed for auto-setting voucher number
+        if (response?.VoucherNo) {
+          this.receiprtFormData.VOUCHER_NO = response.VoucherNo;
+        }
+
+        // Reset form but keep newly assigned voucher number
+        this.resetForm();
+
+        // Close popup
+        this.popupClosed.emit();
+      },
+      (error) => {
+        notify('Failed to save Credit Note. Please try again.', 'error', 2000);
+        console.error('Save error:', error);
+      }
+    );
+  }
+
   saveReceipt() {
     if (!this.selectedDistributorId || this.selectedDistributorId == '') {
       notify('Please select a customer', 'warning', 3000);
@@ -526,7 +563,7 @@ export class AddCutomerReceiptComponent {
     const validDetails = selectedRows
       .filter((row: any) => Number(row.RECEIVED_AMOUNT) > 0)
       .map((row: any) => ({
-        BILL_ID: row.BILL_ID,
+        BILL_ID: Number(row.BILL_ID), // ensure number
         AMOUNT: Number(row.RECEIVED_AMOUNT),
       }));
 
@@ -586,17 +623,26 @@ export class AddCutomerReceiptComponent {
 
     console.log('Sending payload:', payload); // For debugging
 
-    this.dataService.insertCustomerReceipt(payload).subscribe({
-      next: () => {
-        notify('Receipt saved successfully', 'success', 3000);
-        this.resetForm();
-        this.popupClosed.emit();
-      },
-      error: (err) => {
-        notify('Error saving receipt', 'error', 3000);
-        console.error('Save error:', err);
-      },
-    });
+    // --- Save data ---
+    if (this.receiprtFormData.IS_APPROVED) {
+      const result = confirm(
+        'A new Credit Note will be created and approved. Do you want to continue?',
+        'Confirm Approval'
+      );
+
+      result.then((dialogResult: any) => {
+        if (dialogResult) {
+          this.ngZone.run(() => {
+            this.callAPI(payload);
+          });
+        }
+      });
+
+      return;
+    }
+
+    // Normal flow (Not Approved)
+    this.callAPI(payload);
   }
 
   resetForm() {

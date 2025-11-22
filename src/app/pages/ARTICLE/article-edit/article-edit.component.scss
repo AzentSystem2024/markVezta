@@ -35,12 +35,13 @@
 }
 
 .image-field {
-  height: 100px;
+  position: relative;
+  height: 150px;
 }
 
 .image-upload-box {
   width: 100%;
-  height: 150px;
+  height: 100%;
   border: 1px dashed #ccc;
   position: relative;
   overflow: hidden;
@@ -52,14 +53,97 @@
 }
 
 .image-upload-box img {
-  position: absolute;
+  // position: absolute;
+  position: static;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  // object-fit: cover;
+  transition: 0.2s ease-in-out;
 }
 
+/* Search Icon on Hover */
+.image-upload-box::after {
+  // content: "\1F50D"; /* unicode search icon */
+  font-size: 28px;
+  color: white;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 6px 10px;
+  border-radius: 50%;
+  position: absolute;
+  top: 45%;
+  left: 45%;
+  opacity: 0;
+  transition: 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+.image-upload-box:hover::after {
+  opacity: 1;
+}
+
+/* ------ Zoom Modal ------ */
+.image-preview-box {
+  position: relative;
+  width: 100%;
+  cursor: zoom-in;
+}
+
+.image-preview-box img {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+/* Delete Cross */
+.delete-btn {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 18px;
+  padding: 3px 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.delete-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Zoom Overlay */
+.zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.zoom-image {
+  max-width: 85%;
+  max-height: 85%;
+  border-radius: 8px;
+}
+
+/* Close button on zoom */
+.close-btn {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  font-size: 30px;
+  color: white;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 5px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+}
 /* Center the "Upload Image" text */
 .placeholder-box {
   color: #888;
@@ -100,7 +184,6 @@
   display: flex;
   justify-content: flex-end;
   padding: 10px;
-  margin-top: -50px;
 }
 
 .popup-footer {
@@ -191,7 +274,7 @@
 
 .fixed-footer-buttons {
   position: absolute; /* or fixed if you want it to stay on screen while scrolling */
-  bottom: 40px; /* distance from bottom */
+  bottom: 10px; /* distance from bottom */
   right: 20px; /* distance from right */
   display: flex;
   gap: 10px; /* space between buttons */
@@ -201,4 +284,27 @@
 /* Optional: reduce padding at the bottom of tab-panel to make space */
 .innert-tab.custom-article-tabs {
   padding-bottom: 80px; /* must be >= height of buttons + margin */
+}
+.preview-wrapper {
+  width: 200px; /* FIXED width */
+  height: 150px; /* FIXED height */
+  border: 1px solid #ddd;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+.preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* IMPORTANT */
+  cursor: zoom-in;
+}
+.tooltip-content {
+  max-width: 300px;
+  white-space: normal;
+  font-size: 13px;
 }

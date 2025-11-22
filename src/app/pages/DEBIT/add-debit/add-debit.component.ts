@@ -49,6 +49,7 @@ import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouch
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-add-debit',
@@ -95,6 +96,7 @@ export class AddDebitComponent {
     INVOICE_ID: 0,
     INVOICE_NO: '',
     UNIT_ID: '',
+    IS_APPROVED: false,
     NOTE_DETAIL: [
       {
         SL_NO: '',
@@ -701,6 +703,27 @@ export class AddDebitComponent {
     return `${year}-${month}-${day}`; //yyyy-MM-dd format
   }
 
+  callInsertAPI() {
+    this.dataService.insertDebitNote(this.debitFormData).subscribe(
+      (response: any) => {
+        notify(
+          {
+            message: 'Debit Note Saved Successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+
+        this.popupClosed.emit();
+        this.resetDebitNoteForm();
+      },
+      (error) => {
+        notify('Failed to save Debit Note. Please try again.', 'error', 2000);
+        console.error('Save error:', error);
+      }
+    );
+  }
+
   saveDebitNote(): void {
     this.itemsGridRef?.instance?.saveEditData();
 
@@ -794,24 +817,24 @@ export class AddDebitComponent {
     );
     console.log(this.debitFormData.NET_AMOUNT, 'NETAMOUNT');
 
-    // ✅ 5. Save
-    this.dataService.insertDebitNote(this.debitFormData).subscribe(
-      (response: any) => {
-        notify(
-          {
-            message: 'Debit Note Saved Successfully',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success'
-        );
-        this.popupClosed.emit();
-        this.resetDebitNoteForm();
-      },
-      (error) => {
-        notify('Failed to save Debit Note. Please try again.', 'error', 2000);
-        console.error('Save error:', error);
-      }
-    );
+    // ⭐ NEW LOGIC HERE ⭐
+    if (this.debitFormData.IS_APPROVED) {
+      const result = confirm(
+        'A new Debit Note will be created and approved. Do you want to continue?',
+        'Confirm Approval'
+      );
+
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.callInsertAPI();
+        }
+      });
+
+      return;
+    }
+
+    // no approval → save directly
+    this.callInsertAPI();
   }
 
   resetDebitNoteForm() {

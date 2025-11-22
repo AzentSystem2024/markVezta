@@ -148,6 +148,10 @@ export class DataService {
     // console.log(data,"insert service")
     return this.http.post(`${this.apiUrl}article/getitem`, data);
   }
+
+  listItemsForArticle(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Article/listitem`, {});
+  }
   getArticleList(): Observable<any> {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
@@ -181,6 +185,9 @@ export class DataService {
     );
   }
 
+  getLastOrderNoForArticle() {
+    return this.http.post<any>(`${this.apiUrl}article/LastOrderNo`, {});
+  }
   updateArticle(items: any) {
     const data = items;
     // console.log(data,"insert service")

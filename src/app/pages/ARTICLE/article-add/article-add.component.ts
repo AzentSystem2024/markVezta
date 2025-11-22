@@ -127,7 +127,7 @@ export class ArticleAddComponent {
   selectedItemId: any;
   createPacking: boolean = false;
   zoomActive = false;
-  selectedUnitsTooltip = '';
+  selectedUnitsTooltip: string = '';
   isDragOver: boolean = false;
 
   constructor(private dataService: DataService) {}
@@ -224,9 +224,15 @@ export class ArticleAddComponent {
   //   }
   // }
 
+  // getItems() {
+  //   this.dataService.getDropdownData('ITEMS').subscribe((response: any) => {
+  //     this.itemsList = response;
+  //   });
+  // }
+
   getItems() {
-    this.dataService.getDropdownData('ITEMS').subscribe((response: any) => {
-      this.itemsList = response;
+    this.dataService.listItemsForArticle().subscribe((response: any) => {
+      this.itemsList = response.DataList;
     });
   }
 
@@ -295,9 +301,12 @@ export class ArticleAddComponent {
           (p: any) => p.DESCRIPTION === selectedDescription
         );
         this.selectedItemId = matchedItem ? matchedItem.ID : null;
-
+        let itemCode = null;
+        if (selectedDescription) {
+          itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
+        }
         // Call API to get DESCRIPTION/UOM
-        const payload = { ITEM_CODE: String(selectedDescription) };
+        const payload = { ITEM_CODE: String(itemCode) };
         this.dataService.getItemsForArticle(payload).subscribe({
           next: (response: any) => {
             if (response?.flag === 1 && response?.Data) {
@@ -540,12 +549,17 @@ export class ArticleAddComponent {
       }));
     }
   }
-  onProductionUnitChanged() {
+  onProductionUnitChanged(e: any) {
     this.selectedSizeRowData = []; // clear selected sizes
     this.articleSizeData = this.articleSizeData.map((item: any) => ({
       ...item,
       ORDER_NO: null,
     }));
+    // Build tooltip string for ADD form
+    this.selectedUnitsTooltip = this.produCtionUnits
+      ?.filter((u: any) => e.value.includes(u.ID))
+      .map((u: any) => u.DESCRIPTION)
+      .join(', ');
     this.getLastOrderNo();
   }
 
@@ -553,7 +567,7 @@ export class ArticleAddComponent {
     if (!this.selectedProductionUnitId) return;
     console.log(this.selectedProductionUnitId, 'SELECTEDPRODUCTIONUNITID');
     const ids = this.selectedProductionUnitId.join(',');
-    this.dataService.getLastOrderNo(ids).subscribe((response: any) => {
+    this.dataService.getLastOrderNoForArticle().subscribe((response: any) => {
       const last = Number(response?.LastOrderNo ?? 0);
       this.lastOrderNo = last;
       let nextOrderNo = last + 1;
@@ -656,16 +670,7 @@ export class ArticleAddComponent {
       });
       return;
     }
-    // if (!this.imagePreview) {
-    //   notify({
-    //     message: 'Please upload an image.',
-    //     type: 'warning',
-    //     displayTime: 3000,
-    //     position: { at: 'top right', my: 'top right' },
-    //   });
-    //   return;
-    // }
-    // Validate size selection
+
     if (!this.selectedSizeRowData || this.selectedSizeRowData.length === 0) {
       notify({
         message: 'Please select at least one size.',
@@ -744,7 +749,8 @@ export class ArticleAddComponent {
             .map((row: any) => row.data)
             .filter((row: any) => row.ITEM && row.QUANTITY > 0)
             .map((row: any) => ({
-              ITEM_CODE: row.ITEM,
+              // ITEM_CODE: row.ITEM,
+              ITEM_CODE: String(this.selectedItemId),
               QUANTITY: row.QUANTITY,
             })) || [];
 
@@ -755,7 +761,10 @@ export class ArticleAddComponent {
           CATEGORY_ID: this.selectedCategoryId,
           ARTICLE_TYPE: this.selectedTypeId,
           BRAND_ID: this.selectedBrandId,
-          UNIT_ID: this.selectedProductionUnitId,
+          // UNIT_ID: this.selectedProductionUnitId,
+          UNIT_ID: Array.isArray(this.selectedProductionUnitId)
+            ? this.selectedProductionUnitId.join(',')
+            : this.selectedProductionUnitId,
           SUPPLIER_ID: this.selectedMaterialUnitId,
           DESCRIPTION: this.articleData.DESCRIPTION,
           IMAGE_NAME: this.imagePreview ? this.imagePreview.toString() : null,

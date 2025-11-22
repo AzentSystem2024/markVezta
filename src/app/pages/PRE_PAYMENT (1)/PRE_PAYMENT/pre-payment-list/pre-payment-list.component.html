@@ -28,7 +28,7 @@
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
       [groupPanel]="{ visible: true }"
-       (onExporting)="onExporting($event)"
+      (onExporting)="onExporting($event)"
       [grouping]="{ autoExpandAll: false }"
       (onEditingStart)="onEditingStart($event)"
       (onRowRemoving)="DeletePrePayment($event)"
@@ -40,11 +40,11 @@
       ></dxo-editing>
 
       <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
 
       <dxo-paging [pageSize]="20"></dxo-paging>
       <dxo-pager
@@ -88,11 +88,11 @@
           }"
         ></dxi-item>
 
-          <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="custom-export-button"
-      ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="custom-export-button"
+        ></dxi-item>
 
         <dxi-item
           *ngIf="canAdd"
@@ -140,7 +140,7 @@
     <dx-popup
       [(visible)]="addPrepaymentPopupOpened"
       [width]="'50vw'"
-      [height]="'100vh'"
+      [height]="'95vh'"
       title="Add PrePayment Invoice"
       (onHiding)="handleClose()"
     >
@@ -155,7 +155,7 @@
 <dx-popup
   [(visible)]="editPrePaymentPopupOpened"
   [width]="'50vw'"
-  [height]="'85vh'"
+  [height]="'100vh'"
   title="PrePayment Invoice"
   (onHiding)="handleClose()"
 >

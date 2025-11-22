@@ -651,74 +651,141 @@ export class PurchaseReturnDebitFormComponent {
   generatePDF(data: any) {
     const doc = new jsPDF();
 
-    // --- HEADER ---
-    doc.setFontSize(16);
-
-    const title = 'Purchase Return Invoice';
     const pageWidth = doc.internal.pageSize.getWidth();
-    const textWidth = doc.getTextWidth(title);
+    const margin = 14;
 
-    doc.text(title, (pageWidth - textWidth) / 2, 15);
+    // ------------------ TITLE ------------------
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Purchase Return Invoice', pageWidth / 2, 15, { align: 'center' });
 
-    // ===================================================================
-    //                 HEADER WITH SPLIT LEFT + RIGHT SECTIONS
-    // ===================================================================
+    const headerFont = 11;
+    const detailFont = 9;
 
-    doc.setFontSize(11);
+    const leftX = margin;
+    const rightX = pageWidth - margin - 85;
+    let startY = 25;
 
-    // LEFT SIDE → Supplier
-    let leftLabelX = 14;
-    let leftColonX = 45;
-    let leftValueX = 50;
-    let leftY = 25;
+    const boxWidth = 85;
 
-    // RIGHT SIDE → Return No / Date / Narration
-    let rightLabelX = pageWidth - 90;
-    let rightColonX = pageWidth - 60;
-    let rightValueX = pageWidth - 55;
-    let rightY = 25;
+    // Blue header color (match table header)
+    const headerColor = { r: 207, g: 231, b: 255 };
 
-    // LEFT SIDE PRINTER (Only Supplier)
-    const printLeftRow = (label: string, value: string) => {
-      doc.setFont('helvetica', 'normal');
-      doc.text(label, leftLabelX, leftY);
-      doc.text(':', leftColonX, leftY);
-      doc.text(value, leftValueX, leftY);
-      leftY += 7;
-    };
+    // ------------------------------------------------
+    //               SHIP TO (LEFT BOX)
+    // ------------------------------------------------
+    let shipY = startY;
 
-    // RIGHT SIDE PRINTER (Return No / Date / Narration)
-    const printRightRow = (label: string, value: string) => {
-      doc.setFont('helvetica', 'normal');
-      doc.text(label, rightLabelX, rightY);
-      doc.text(':', rightColonX, rightY);
-      doc.text(value, rightValueX, rightY);
-      rightY += 7;
-    };
+    doc.setFillColor(headerColor.r, headerColor.g, headerColor.b);
+    doc.rect(leftX, shipY, boxWidth, 8, 'F');
 
-    // --- PRINT HEADER FIELDS ---
-    printLeftRow('Supplier', data.SUPPLIER_NAME);
+    doc.setFontSize(headerFont);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Ship To', leftX + 3, shipY + 6);
 
-    printRightRow('Return No', data.RET_NO);
-    printRightRow('Return Date', data.RET_DATE.split('T')[0]);
-    printRightRow('Narration', data.NARRATION || '-');
+    shipY += 11;
+    doc.setFontSize(detailFont);
+    doc.setFont('helvetica', 'normal');
 
-    // --- TABLE ROWS (using your actual API fields) ---
+    if (data.SUPPLIER_NAME)
+      doc.text(data.SUPPLIER_NAME, leftX + 3, shipY), (shipY += 5);
+    if (data.SUPP_ADDRESS1)
+      doc.text(data.SUPP_ADDRESS1, leftX + 3, shipY), (shipY += 5);
+    if (data.SUPP_ADDRESS2)
+      doc.text(data.SUPP_ADDRESS2, leftX + 3, shipY), (shipY += 5);
+    if (data.SUPP_ADDRESS3)
+      doc.text(data.SUPP_ADDRESS3, leftX + 3, shipY), (shipY += 5);
+
+    let cs = '';
+    if (data.SUPP_CITY) cs += data.SUPP_CITY;
+    if (data.SUPP_STATE_NAME) cs += (cs ? ' - ' : '') + data.SUPP_STATE_NAME;
+    if (data.SUPP_ZIP) cs += (cs ? ' - ' : '') + data.SUPP_ZIP;
+    if (cs) doc.text(cs, leftX + 3, shipY), (shipY += 5);
+
+    if (data.SUPP_PHONE)
+      doc.text('Phone: ' + data.SUPP_PHONE, leftX + 3, shipY), (shipY += 5);
+    if (data.SUPP_EMAIL)
+      doc.text('Email: ' + data.SUPP_EMAIL, leftX + 3, shipY), (shipY += 5);
+
+    const shipBottomY = shipY;
+
+    // ------------------------------------------------
+    //            RETURN DETAILS (RIGHT BOX)
+    // ------------------------------------------------
+    let retY = startY;
+
+    doc.setFillColor(headerColor.r, headerColor.g, headerColor.b);
+    doc.rect(rightX, retY, boxWidth, 8, 'F');
+
+    doc.setFontSize(headerFont);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Return Details', rightX + 3, retY + 6);
+
+    retY += 11;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(detailFont);
+
+    doc.text('Return No :', rightX + 3, retY);
+    doc.text(String(data.RET_NO), rightX + 42, retY);
+    retY += 5;
+
+    doc.text('Date :', rightX + 3, retY);
+    doc.text(data.RET_DATE?.split('T')[0] || '', rightX + 42, retY);
+    retY += 5;
+
+    doc.text('Narration :', rightX + 3, retY);
+    doc.text(data.NARRATION || '-', rightX + 42, retY);
+    retY += 5;
+
+    const retBottomY = retY;
+
+    // ------------------------------------------------
+    //                 FROM (FULL WIDTH BOX)
+    // ------------------------------------------------
+    let nextY = Math.max(shipBottomY, retBottomY) + 10;
+
+    doc.setFillColor(headerColor.r, headerColor.g, headerColor.b);
+    doc.rect(margin, nextY, pageWidth - margin * 2, 8, 'F');
+
+    doc.setFontSize(headerFont);
+    doc.setFont('helvetica', 'bold');
+    doc.text('From', margin + 3, nextY + 6);
+
+    nextY += 11;
+
+    doc.setFontSize(detailFont);
+    doc.setFont('helvetica', 'normal');
+
+    if (data.COMPANY_NAME)
+      doc.text(data.COMPANY_NAME, margin + 3, nextY), (nextY += 5);
+    if (data.ADDRESS1) doc.text(data.ADDRESS1, margin + 3, nextY), (nextY += 5);
+    if (data.ADDRESS2) doc.text(data.ADDRESS2, margin + 3, nextY), (nextY += 5);
+    if (data.ADDRESS3) doc.text(data.ADDRESS3, margin + 3, nextY), (nextY += 5);
+
+    if (data.PHONE)
+      doc.text('Phone: ' + data.PHONE, margin + 3, nextY), (nextY += 5);
+    if (data.EMAIL)
+      doc.text('Email: ' + data.EMAIL, margin + 3, nextY), (nextY += 5);
+
+    // ------------------------------------------------
+    //                 TABLE START
+    // ------------------------------------------------
+    const tableStartY = nextY + 8;
+
     const rows = data.PurchDetail.map((item) => [
-      item.DOC_NO, // Transfer No
-      item.PURCH_DATE?.split('T')[0] || '', // Date
-      item.ITEM_NAME, // Item Description
-      item.PENDING_QTY, // Pending Qty
-      item.RATE.toFixed(2), // Price
-      item.AMOUNT.toFixed(2), // Amount
-      item.VAT_PERC.toFixed(2), // TAX%
-      item.VAT_AMOUNT.toFixed(2), // Tax Amount
-      item.TOTAL_AMOUNT.toFixed(2), // Total Amount
+      item.DOC_NO,
+      item.PURCH_DATE?.split('T')[0] || '',
+      item.ITEM_NAME,
+      item.PENDING_QTY,
+      item.RATE.toFixed(2),
+      item.AMOUNT.toFixed(2),
+      item.VAT_PERC.toFixed(2),
+      item.VAT_AMOUNT.toFixed(2),
+      item.TOTAL_AMOUNT.toFixed(2),
     ]);
 
-    // --- TABLE ---
     autoTable(doc, {
-      startY: 55,
+      startY: tableStartY,
       head: [
         [
           'Transfer No',
@@ -733,71 +800,48 @@ export class PurchaseReturnDebitFormComponent {
         ],
       ],
       body: rows,
-      theme: 'grid',
+      styles: { fontSize: 9 },
       headStyles: {
-        fillColor: [207, 231, 255], // SAME BLUE COLOR AS SAMPLE
-        textColor: 0,
+        fillColor: [207, 231, 255], // SAME BLUE
         fontStyle: 'bold',
         halign: 'center',
-        fontSize: 10,
       },
-      bodyStyles: {
-        halign: 'center',
-        fontSize: 9,
-      },
-      columnStyles: {
-        2: { halign: 'left' }, // Item Description → left aligned
-      },
-      styles: {
-        lineWidth: 0.1, // ✨ key change — makes table look clean
-        lineColor: [180, 180, 180],
-        textColor: 0,
-      },
+      columnStyles: { 2: { halign: 'left' } },
     });
 
-    // --- FOOTER TOTALS ---
-    // --- FOOTER TOTALS ---
-    let finalY = (doc as any).lastAutoTable.finalY + 15;
+    // ------------------------------------------------
+    //                   FOOTER TOTALS
+    // ------------------------------------------------
+    const finalY = (doc as any).lastAutoTable.finalY + 15;
 
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    const labelX = pageWidth - 60;
+    const valueX = pageWidth - 20;
+
+    doc.text('Gross Amount', labelX, finalY, { align: 'right' });
+    doc.text(data.GROSS_AMOUNT.toFixed(2), valueX, finalY, { align: 'right' });
+
+    doc.text('VAT Amount', labelX, finalY + 6, { align: 'right' });
+    doc.text(data.VAT_AMOUNT.toFixed(2), valueX, finalY + 6, {
+      align: 'right',
+    });
+
+    doc.text('Net Amount', labelX, finalY + 12, { align: 'right' });
+    doc.text(data.NET_AMOUNT.toFixed(2), valueX, finalY + 12, {
+      align: 'right',
+    });
+
+    // ------------------------------------------------
+    //                   THANK YOU
+    // ------------------------------------------------
     doc.setFontSize(11);
-
-    // -------------------------------
-    // 1. Define alignment columns
-    // -------------------------------
-    const labelEndX = pageWidth - 40; // Where labels (ends) align
-    const amountEndX = pageWidth - 20; // Right edge for values
-
-    // -------------------------------
-    // 2. Helper to print aligned rows
-    // -------------------------------
-    const printFooterRow = (label: string, value: string, y: number) => {
-      // LABEL (right aligned at labelEndX)
-      doc.setFont('helvetica', 'normal');
-      doc.text(label, labelEndX, y, { align: 'right' });
-
-      // VALUE (right aligned at amountEndX)
-      doc.setFont('helvetica', 'bold');
-      doc.text(value, amountEndX, y, { align: 'right' });
-    };
-
-    // -------------------------------
-    // 3. Print Rows
-    // -------------------------------
-    printFooterRow('Gross Amount', data.GROSS_AMOUNT.toFixed(2), finalY);
-    printFooterRow('VAT Amount', data.VAT_AMOUNT.toFixed(2), finalY + 7);
-    printFooterRow('Net Amount', data.NET_AMOUNT.toFixed(2), finalY + 14);
-
-    // -------------------------------
-    // 4. Thank You Text
-    // -------------------------------
-    let thanksY = finalY + 30;
-    doc.setFontSize(12);
     doc.setFont('helvetica', 'italic');
-    doc.text('Thank you for your business!', pageWidth / 2, thanksY, {
+    doc.text('Thank you for your business!', pageWidth / 2, finalY + 30, {
       align: 'center',
     });
 
-    // --- OPEN PDF ---
     doc.output('dataurlnewwindow');
   }
 

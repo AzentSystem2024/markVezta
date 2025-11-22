@@ -4,6 +4,7 @@ import {
   ElementRef,
   EventEmitter,
   NgModule,
+  NgZone,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -54,6 +55,7 @@ import { DataService } from 'src/app/services';
 import DevExpress from 'devextreme';
 import notify from 'devextreme/ui/notify';
 import dxSelectBox from 'devextreme/ui/select_box';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-add-credit-note',
@@ -106,6 +108,7 @@ export class AddCreditNoteComponent {
     INVOICE_ID: '',
     INVOICE_NO: '',
     UNIT_ID: '',
+    IS_APPROVED: false,
     NOTE_DETAIL: [
       {
         SL_NO: '',
@@ -137,8 +140,8 @@ export class AddCreditNoteComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedCustomer: any;
-selectedstoreId:any;
-  constructor(private dataService: DataService) {}
+  selectedstoreId: any;
+  constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   ngOnInit() {
     this.sessionDetails();
@@ -147,7 +150,7 @@ selectedstoreId:any;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
-
+      console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         this.companyList = [selectedCompany]; // Show only selected company
@@ -186,12 +189,11 @@ selectedstoreId:any;
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
-    
   }
 
-    sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
       '===========selected store id==================='
@@ -735,7 +737,38 @@ selectedstoreId:any;
     }
   }
 
-  saveJournalVoucher(): void {
+  callAPI(finalPayload: any) {
+    this.dataService.insertCreditNote(finalPayload).subscribe(
+      (response: any) => {
+        console.log(response, 'SAVED SUCCESSFULLY');
+
+        notify(
+          {
+            message: 'Credit Note Saved Successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+
+        // DO NOT REMOVE — Needed for auto-setting voucher number
+        if (response?.VoucherNo) {
+          this.creditFormData.VOUCHER_NO = response.VoucherNo;
+        }
+
+        // Reset form but keep newly assigned voucher number
+        this.resetCreditNoteForm();
+
+        // Close popup
+        this.popupClosed.emit();
+      },
+      (error) => {
+        notify('Failed to save Credit Note. Please try again.', 'error', 2000);
+        console.error('Save error:', error);
+      }
+    );
+  }
+
+  saveCreditNote(): void {
     this.itemsGridRef?.instance?.saveEditData();
 
     const gridData = this.itemsGridRef?.instance
@@ -755,7 +788,7 @@ selectedstoreId:any;
     const netAmount = totalAmount + totalGST;
     const dueAmount = Number(this.creditFormData?.DUE_AMOUNT) || 0;
 
-    // ✅ Validation check
+    // Validation check
     if (netAmount > dueAmount) {
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
       return;
@@ -839,35 +872,30 @@ selectedstoreId:any;
         userData?.FINANCIAL_YEARS?.[0]?.FIN_ID || null;
       this.creditFormData.UNIT_ID =
         this.selectedCompanyId || userData?.Companies?.[0]?.COMPANY_ID || null;
-        this.creditFormData.STORE_ID = this.selectedstoreId || userData?.Configuration?.[0]?.STORE_ID || null;
+      this.creditFormData.STORE_ID =
+        this.selectedstoreId || userData?.Configuration?.[0]?.STORE_ID || null;
     }
 
     // --- Save data ---
-    this.dataService.insertCreditNote(this.creditFormData).subscribe(
-      (response: any) => {
-        console.log(response, 'SAVED SUCCESSFULLY');
+    if (this.creditFormData.IS_APPROVED) {
+      const result = confirm(
+        'A new Credit Note will be created and approved. Do you want to continue?',
+        'Confirm Approval'
+      );
 
-        notify(
-          {
-            message: 'Credit Note Saved Successfully',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success'
-        );
+      result.then((dialogResult: any) => {
+        if (dialogResult) {
+          this.ngZone.run(() => {
+            this.callAPI(this.creditFormData);
+          });
+        }
+      });
 
-        this.popupClosed.emit();
-        this.resetCreditNoteForm();
-      },
-      (error: any) => {
-        notify(
-          {
-            message: 'Error saving Credit Note.',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error'
-        );
-      }
-    );
+      return;
+    }
+
+    // Normal flow (Not Approved)
+    this.callAPI(this.creditFormData);
   }
   get netAmountString(): string {
     const details = this.creditFormData?.NOTE_DETAIL || [];

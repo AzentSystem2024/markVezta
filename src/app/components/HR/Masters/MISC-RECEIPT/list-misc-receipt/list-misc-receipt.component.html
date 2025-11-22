@@ -30,7 +30,7 @@
       focusStateEnabled="false"
       (onEditingStart)="onEditOrViewMiscPayment($event)"
       (onRowRemoving)="onDeleteMiscPayment($event)"
-       (onExporting)="onExporting($event)"
+      (onExporting)="onExporting($event)"
       (onToolbarPreparing)="onToolbarPreparing($event)"
     >
       <dxo-column-chooser
@@ -67,12 +67,12 @@
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
       <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
-      
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
+
       <dxo-header-filter
         [visible]="true"
         [search]="{ enabled: true }"
@@ -92,11 +92,11 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
 
-          <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="custom-export-button"
-      ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="custom-export-button"
+        ></dxi-item>
 
         <dxi-item
           *ngIf="canAdd"
@@ -137,7 +137,7 @@
         caption="Date"
         dataType="date"
         [allowEditing]="false"
-        Format="dd-MM-yyyy"
+        format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
       <dxi-column

@@ -125,7 +125,8 @@
             [showSelectionControls]="true"
             [selectAllMode]="'allPages'"
             [(value)]="selectedProductionUnitId"
-            (onValueChanged)="onProductionUnitChanged()"
+            (onValueChanged)="onProductionUnitChanged($event)"
+            [hint]="selectedUnitsTooltip"
           >
           </dx-tag-box>
 
@@ -209,16 +210,6 @@
 
         <!-- Image + Grid (Right Side) -->
         <div class="image-grid-wrapper">
-          <!-- Image Upload -->
-          <!-- <div class="form-field image-field">
-            <label class="image-upload-box">
-              <input type="file" (change)="onImageSelected($event)" hidden />
-              <ng-container *ngIf="!imagePreview">
-                <div class="placeholder-box">Upload Image</div>
-              </ng-container>
-              <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview" />
-            </label>
-          </div> -->
           <div
             class="form-field image-field"
             (dragover)="onDragOver($event)"
@@ -258,14 +249,6 @@
           </div>
 
           <!-- Zoom Popup -->
-          <div class="zoom-overlay" *ngIf="zoomActive" (click)="closeZoom()">
-            <span
-              class="close-btn"
-              (click)="closeZoom(); $event.stopPropagation()"
-              >✕</span
-            >
-            <img class="zoom-image" [src]="imagePreview" alt="Zoomed Image" />
-          </div>
 
           <!-- Size Grid -->
           <dx-data-grid
@@ -275,7 +258,7 @@
             [showBorders]="true"
             [rowAlternationEnabled]="true"
             [width]="'100%'"
-            [height]="'35vh'"
+            [height]="'27vh'"
             class="article-size-grid"
             [selection]="{ mode: 'multiple' }"
             [selectedRowKeys]="selectedSizeRows"

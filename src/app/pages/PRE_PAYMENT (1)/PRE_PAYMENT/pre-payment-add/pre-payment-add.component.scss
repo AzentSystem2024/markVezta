@@ -1,14 +1,14 @@
 .form-container {
   display: flex;
   flex-direction: column;
-   gap: 0.5rem; 
+  gap: 0.5rem;
   padding: 1rem;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-   gap: 0.5rem; 
+  gap: 0.5rem;
   align-items: flex-start;
 }
 
@@ -26,16 +26,14 @@
   display: flex;
   justify-content: flex-end; /* push buttons to right */
   gap: 0.5rem; /* space between buttons */
-  padding: 1rem; /* optional: breathing room */
+  padding: 0.4rem 1rem; /* optional: breathing room */
 }
 
 .total-expense {
   display: flex;
-  justify-content: flex-end; /* moves number box to the right */
+  justify-content: flex-start; /* moves number box to the right */
   padding-right: 1rem; /* optional: small spacing from form edge */
 }
-
-
 
 .section-title {
   font-weight: 600;
@@ -43,7 +41,6 @@
   font-size: 1rem;
   color: #333;
 }
-
 
 .calendar-btn {
   margin-top: 10px; /* adjust as needed */
