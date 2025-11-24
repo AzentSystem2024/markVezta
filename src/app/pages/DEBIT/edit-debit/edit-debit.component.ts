@@ -105,8 +105,22 @@ export class EditDebitComponent {
   selectedSupplier: any;
   selectedstoreId: any;
   net: string;
+  HSNCODE: any;
+  hsnLoaded: boolean;
+  GST: any;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) {
+    const userDataString = localStorage.getItem('userData');
+    console.log(userDataString, 'USERDATASTRING');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log(this.HSNCODE, 'HSNCODE===================');
+      this.hsnLoaded = true; // ADD THIS
+    }
+  }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -179,19 +193,26 @@ export class EditDebitComponent {
               particulars: item.REMARKS || '',
               Amount: item.AMOUNT || '',
               gstAmount: item.GST_AMOUNT || '',
+              HSN_CODE: this.HSNCODE, // force-create
+             
+              
             };
           }
         );
-        const nextSlNo = this.noteDetails.length + 1;
-        this.noteDetails.push({
-          SL_NO: nextSlNo,
-          ledgerCode: '',
-          ledgerName: '',
-          particulars: '',
-          Amount: '',
-          gstAmount: '',
-          HEAD_ID: null,
-        });
+       // Add empty row ONLY when there are no rows (new entry)
+if (this.noteDetails.length === 0) {
+  this.noteDetails.push({
+    SL_NO: 1,
+    ledgerCode: '',
+    ledgerName: '',
+    particulars: '',
+    Amount: '',
+    gstAmount: '',
+    HSN_CODE: '',
+    HEAD_ID: null,
+  });
+}
+
       });
       // this.selectedCompanyId = this.debitFormData[0].SUPP_ID;
       console.log(
@@ -221,6 +242,7 @@ export class EditDebitComponent {
       particulars: '',
       Amount: null,
       gstAmount: null,
+      HSN_CODE: '',
     };
 
     this.noteDetails.push(newRow);
@@ -534,22 +556,34 @@ export class EditDebitComponent {
         }
       };
 
-      e.editorOptions.onValueChanged = (args: any) => {
-        const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
-        );
-        e.setValue(args.value);
-        if (selectedLedger) {
-          e.component.cellValue(
-            rowIndex,
-            'ledgerName',
-            selectedLedger.HEAD_NAME
-          );
-          setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-          }, 50);
-        }
-      };
+     e.editorOptions.onValueChanged = (args: any) => {
+  const selectedLedger = this.ledgerList.find(
+    (item: any) => item.HEAD_CODE === args.value
+  );
+
+  e.setValue(args.value);
+
+  if (selectedLedger) {
+    // 1️⃣ Set ledger name
+    e.component.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
+
+    // 2️⃣ Get HSN & GST from session
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
+    const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+
+    // 3️⃣ Set HSN_CODE
+    e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+
+    // 4️⃣ Set GST_PERC
+    e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+
+    // 5️⃣ Move to next field
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+    }, 50);
+  }
+};
     }
 
     // ➤ ledgerName: move to particulars on Enter

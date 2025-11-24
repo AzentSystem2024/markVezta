@@ -456,6 +456,7 @@ export class PurchaseOrderComponent {
     // debugger;
     const data = this.poNewForm.getNewPoData();
     console.log(data);
+     data.IS_APPROVED = this.isApproved
     if (!data.STORE_ID) {
       notify(
         {
@@ -507,21 +508,21 @@ export class PurchaseOrderComponent {
       return false;
     }
     // return true;
-    if (data.IS_APPROVED === true) {
-      const result = confirm(
-        'Are you sure you want to approve and commit this invoice?',
-        'Confirm Approval'
-      );
+    // if (data.IS_APPROVED === true) {
+    //   const result = confirm(
+    //     'Are you sure you want to approve and commit this invoice?',
+    //     'Confirm Approval'
+    //   );
 
-      result.then((dialogResult) => {
-        if (dialogResult) {
-          this.savePoToServer(data); // Only save if user confirms
-        }
-      });
-    } else {
-      // Not approved → Save directly
-      this.savePoToServer(data);
-    }
+    //   result.then((dialogResult) => {
+    //     if (dialogResult) {
+    //       this.savePoToServer(data); // Only save if user confirms
+    //     }
+    //   });
+    // } else {
+    //   // Not approved → Save directly
+    //   this.savePoToServer(data);
+    // }
     // this.service.savePoData(data).subscribe((res) => {
     //   console.log('saved data');
     //   if (res) {
@@ -553,12 +554,22 @@ export class PurchaseOrderComponent {
     //     );
     //   }
     // });
-  }
+  // }
 
-  savePoToServer(data: any) {
+  // savePoToServer(data: any) {
     this.service.savePoData(data).subscribe((res) => {
-      console.log('saved data');
-      if (res) {
+      console.log(res,'saved data');
+     
+      if (res.message === 'Success' && res.flag === 1) {
+        if (data.IS_APPROVED === true) {
+        notify(
+          {
+            message: 'Data Saved & Approved Successfully',
+            position: { at: 'top center', my: 'top center' },
+          },
+          'success'
+        );
+      } else {
         notify(
           {
             message: 'Data Saved Successfully',
@@ -566,6 +577,7 @@ export class PurchaseOrderComponent {
           },
           'success'
         );
+      }
 
         this.refreshPo = true;
         setTimeout(() => (this.refreshPo = false), 0);

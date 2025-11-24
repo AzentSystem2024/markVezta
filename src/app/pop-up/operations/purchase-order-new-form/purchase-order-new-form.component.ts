@@ -79,7 +79,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
   width = '97vw';
   height = '420px';
-  tabs = [{ text: 'Header' }, { text: 'Detail' }, { text: 'History' }];
+  tabs = [{ text: 'Header' }, { text: 'Detail' }];
 
   readonly allowedPageSizes: any = [10, 50, 100];
   displayMode: any = 'full';
