@@ -118,6 +118,8 @@ export class AddDebitComponent {
   selectedSupplier: any;
   selectedstoreId: any;
   net: string;
+  HSN_CODE: any;
+  GST_PERC: any;
   constructor(private dataService: DataService) {}
 
   sessionDetails() {
@@ -127,7 +129,14 @@ export class AddDebitComponent {
       this.selectedstoreId,
       '===========selected store id==================='
     );
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    console.log(
+      this.HSN_CODE, '===========selected HSN CODE===================');
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST_PERC, '===========selected GST PERC===================');
   }
+
+
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -323,6 +332,8 @@ export class AddDebitComponent {
   };
 
   onEditorPreparing(e: any) {
+   
+    console.log(e, 'editor preparing event');
     if (
       e.dataField === 'SL_NO' ||
       e.dataField === 'ledgerCode' ||
@@ -330,6 +341,7 @@ export class AddDebitComponent {
       e.dataField === 'particulars' ||
       e.dataField === 'Amount' ||
       e.dataField === 'GST_PERC' ||
+      e.dataField === 'HSN_CODE' ||
       e.dataField === 'gstAmount'
     ) {
       e.editorOptions = e.editorOptions || {};
@@ -422,22 +434,35 @@ export class AddDebitComponent {
         }
       };
 
-      e.editorOptions.onValueChanged = (args: any) => {
-        const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
-        );
-        e.setValue(args.value);
-        if (selectedLedger) {
-          e.component.cellValue(
-            rowIndex,
-            'ledgerName',
-            selectedLedger.HEAD_NAME
-          );
-          setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-          }, 50);
-        }
-      };
+e.editorOptions.onValueChanged = (args: any) => {
+  const selectedLedger = this.ledgerList.find(
+    (item: any) => item.HEAD_CODE === args.value
+  );
+
+  e.setValue(args.value);
+
+  if (selectedLedger) {
+    // 1️⃣ Set ledger name
+    e.component.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
+
+    // 2️⃣ Get HSN & GST from session
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
+    const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+
+    // 3️⃣ Set HSN_CODE
+    e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+
+    // 4️⃣ Set GST_PERC
+    e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+
+    // 5️⃣ Move to next field
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+    }, 50);
+  }
+};
+      
     }
 
     // ➤ ledgerName: move to particulars on Enter
@@ -561,6 +586,7 @@ export class AddDebitComponent {
                   AMOUNT: '',
                   GST_PERC: '',
                   GST_AMOUNT: '',
+                HSN_CODE: '',
                   REMARKS: '',
                 };
                 this.debitFormData.NOTE_DETAIL.push(newRow);
@@ -612,6 +638,8 @@ export class AddDebitComponent {
         }
       };
     }
+
+    // e.row.data.HSN_CODE = this.HSN_CODE;
   }
 
   onRowInserted(e: any) {
@@ -691,7 +719,7 @@ export class AddDebitComponent {
       totalGST += (amount * gstPerc) / 100; // Recalculate GST live
     });
     this.net = (totalAmount + totalGST).toFixed(2);
-    console.log('Net Amount (from getter):', this.net);
+    // console.log('Net Amount (from getter):', this.net);
     return (totalAmount + totalGST).toFixed(2);
   }
 

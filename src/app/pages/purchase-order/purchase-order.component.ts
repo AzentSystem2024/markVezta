@@ -168,6 +168,8 @@ export class PurchaseOrderComponent {
   canApprove: any;
   isFilterOpened: boolean;
   selectedPoId: any;
+  GST_PERC: any;
+  HSN_CODE: any;
 
   constructor(
     private service: DataService,
@@ -181,7 +183,17 @@ export class PurchaseOrderComponent {
     // console.log(docType, 'doctype');
   }
 
+        sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    console.log(
+      this.HSN_CODE, '===========selected HSN CODE===================');
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST_PERC, '===========selected GST PERC===================');
+  }
+
   ngOnInit(): void {
+    this.sessionDetails();
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
@@ -397,6 +409,7 @@ export class PurchaseOrderComponent {
      this.selectedPoId = Id;   
     const status = event.data.STATUS;
     console.log(Id, 'id');
+    this.sessionDetails();
     // this.isEditPopupOpened = true;
     this.service.selectPoData(Id).subscribe((res) => {
       this.selectedRowData = res;

@@ -61,6 +61,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
   isSupplierValid: boolean = true;
   isSupplierTouched: boolean = false;
+  GST_PERC: any;
+  HSN_CODE: any;
 
   constructor(private service: DataService, private router: Router) {
     const settingsData = sessionStorage.getItem('settings');
@@ -273,6 +275,11 @@ export class PurchaseOrderNewFormComponent implements OnInit {
         slNo: this.savedItems.length + index + 1, // Serial number starting from existing items
         SUPP_PRICE: parseFloat(supplierPrice), // Update SUPP_PRICE based on currency check
         PURCH_PRICE: parseFloat(purchPrice), // Ensure consistent numeric value
+
+        // Bind session data
+    HSN_CODE: this.HSN_CODE,
+    GST_PERC: this.GST_PERC,
+    
         supplierAmount,
         taxable,
         vatAmount,
@@ -299,9 +306,19 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.showAddItemPopup = false; // Close the "Add Item" popup
   }
 
+
+    sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    console.log(
+      this.HSN_CODE, '===========selected HSN CODE===================');
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST_PERC, '===========selected GST PERC===================');
+  }
+
   ngOnInit() {
     this.getPoNumber();
-
+    this.sessionDetails();
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     this.menuResponse = JSON.parse(
@@ -428,7 +445,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       // Only calculate if qtyOrdered is greater than 0
       if (qtyOrdered > 0) {
         // Calculate Amount based on qtyOrdered and Cost (PURCH_PRICE)
-        item.Amount = Number((qtyOrdered * updatedRow.PURCH_PRICE).toFixed(2));
+        item.Amount = Number((qtyOrdered * updatedRow.SUPP_PRICE).toFixed(2));
         item.SUPP_AMOUNT = Number(
           (qtyOrdered * updatedRow.SUPP_PRICE).toFixed(2)
         );
@@ -503,7 +520,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       const detailItem = {
         ITEM_ID: item.ITEM_ID,
         QUANTITY: qtyOrdered,
-        PRICE: item.PURCH_PRICE,
+        PRICE: item.SUPP_PRICE,
         AMOUNT: item.Amount,
         DISC_PERCENT: updatedRow.discountPercentage,
         TAX_PERCENT: updatedRow.VAT_PERC,

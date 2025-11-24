@@ -63,6 +63,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   canView: any;
   canApprove: any;
   storeLabel: string;
+  GST_PERC: any;
+  HSN_CODE: any;
 
   constructor(private service: DataService, private router: Router) {
     const userRights = sessionStorage.getItem('menuUserRightsResponse');
@@ -256,10 +258,20 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     // Handle upload error
     console.error('File upload error:', event.error);
   }
-  onSelectionChanged(event: any) {
-    this.selectedRowKeys = event.selectedRowKeys;
-    this.selectedItems = event.selectedRowsData;
-  }
+  // onSelectionChanged(event: any) {
+  //   this.selectedRowKeys = event.selectedRowKeys;
+  //   this.selectedItems = event.selectedRowsData;
+  //   this.sessionDetails();
+  // }
+
+  onSelectionChanged(e) {
+  this.selectedItems = e.selectedRowsData.map(item => ({
+    ...item,
+    HSN_CODE: this.HSN_CODE,      // <-- Inject from session
+    GST_PERC: this.GST_PERC       // <-- Inject from session
+  }));
+}
+
 
   saveSelectedData() {
     // Map over selectedItems to create new items with updated values
@@ -289,6 +301,11 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         slNo: this.savedItems.length + index + 1, // Serial number starting from existing items
         SUPP_PRICE: supplierPrice, // Update SUPP_PRICE based on currency check
         PURCH_PRICE: parseFloat(purchPrice), // Ensure consistent numeric value
+
+        // Bind session data
+    HSN_CODE: this.HSN_CODE,
+    GST_PERC: this.GST_PERC,
+
         supplierAmount,
         taxable,
         vatAmount,
@@ -315,7 +332,17 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     this.showAddItemPopup = false; // Close the "Add Item" popup
   }
 
+      sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    console.log(
+      this.HSN_CODE, '===========selected HSN CODE===================');
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST_PERC, '===========selected GST PERC===================');
+  }
+
   ngOnInit() {
+    this.sessionDetails();
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     this.menuResponse = JSON.parse(
