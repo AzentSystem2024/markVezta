@@ -94,11 +94,25 @@ export class EditInvoiceComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedSupplierName: any;
+  HSNCODE: any;
+  GST: any;
+  hsnLoaded: boolean;
 
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    const userDataString = localStorage.getItem('userData');
+    console.log(userDataString, 'USERDATASTRING');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log(this.HSNCODE, 'HSNCODE===================');
+      this.hsnLoaded = true; // ADD THIS
+    }
+  }
 
   ngOnInit() {
     this.populateCompanyFromSession(); // ✅ Add this
@@ -110,6 +124,8 @@ export class EditInvoiceComponent {
     if (changes['invoiceFormData'] && this.invoiceFormData?.length > 0) {
       const firstInvoice = this.invoiceFormData[0];
       this.invoiceFormData.PARTY_NAME = firstInvoice.PARTY_NAME;
+      console.table(this.mainInvoiceGridList);
+
       if (
         firstInvoice.SALE_DATE &&
         typeof firstInvoice.SALE_DATE === 'string'
@@ -119,8 +135,25 @@ export class EditInvoiceComponent {
         date.setHours(12, 0, 0);
         firstInvoice.SALE_DATE = date;
       }
+      console.log(this.HSNCODE, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
 
       this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
+      // Force-create missing fields so DevExtreme can bind them
+      this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => ({
+        HSN_CODE: this.HSNCODE, // force-create
+        GST: row.GST || this.GST, // already showing
+        ...row, // merge original row at the end
+      }));
+      console.log(this.mainInvoiceGridList, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
+      // ✔ Assign HSN Code & GST for each existing row when editing
+      this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
+        return {
+          ...row,
+          HSN_CODE: this.HSNCODE, // From session
+          // From session
+        };
+      });
+
       this.invoiceFormData = firstInvoice;
       console.log(this.mainInvoiceGridList, 'MAINGRIDINVOICELIST');
       this.customerType = firstInvoice.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
@@ -264,7 +297,11 @@ export class EditInvoiceComponent {
     const newRows = selectedRows.filter(
       (row: any) => !existingTransferIds.includes(row.TRANSFER_SUMMARY_ID)
     );
-
+    newRows.forEach((row: any) => {
+      row.HSN_CODE = this.HSNCODE;
+      row.GST = this.GST;
+      // or whatever your login session variable is
+    });
     // ✅ Mutate the existing array (DON'T reassign!)
     this.mainInvoiceGridList.push(...newRows);
 
@@ -504,8 +541,6 @@ export class EditInvoiceComponent {
   }
 
   resetInvoiceForm() {}
-
-  
 }
 
 @NgModule({

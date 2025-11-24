@@ -170,6 +170,12 @@
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
           <dxi-column
+            dataField="HSN_CODE"
+            caption="HSN Code"
+            dataType="number"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
             dataField="RATE"
             caption="Price"
             dataType="number"
@@ -225,11 +231,6 @@
             format="#,##0.00"
             [allowEditing]="false"
             [calculateCellValue]="calculateVATAmount"
-          ></dxi-column>
-          <dxi-column
-            dataField="HSN_CODE"
-            caption="HSN Code"
-            dataType="string"
           ></dxi-column>
 
           <dxi-column

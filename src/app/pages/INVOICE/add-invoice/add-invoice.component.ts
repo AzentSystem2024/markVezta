@@ -132,6 +132,8 @@ export class AddInvoiceComponent {
   selectedCustomerId: any;
   selectedCustomer: any;
   selectedCustomerName: void;
+  HSNCODE: any;
+  GST: any;
 
   constructor(
     private dataService: DataService,
@@ -156,7 +158,9 @@ export class AddInvoiceComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
-
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log(userData.GeneralSettings.HSN_CODE, 'HSNCODE');
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         this.companyList = [selectedCompany]; // ✅ Show only selected company
@@ -332,11 +336,15 @@ export class AddInvoiceComponent {
     const newRows = selectedRows.filter(
       (row: any) => !existingTransferIds.includes(row.TRANSFER_SUMMARY_ID)
     );
-
-    // ✅ Mutate the existing array (DON'T reassign!)
+    newRows.forEach((row: any) => {
+      row.HSN_CODE = this.HSNCODE;
+      row.GST = this.GST;
+      // or whatever your login session variable is
+    });
+    //  Mutate the existing array (DON'T reassign!)
     this.mainInvoiceGridList.push(...newRows);
 
-    // ✅ Close popup
+    // Close popup
     this.isTrOutPopupVisible = false;
 
     // Optional: Trigger manual change detection if needed

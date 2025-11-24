@@ -164,6 +164,11 @@
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
+            dataField="HSN_CODE"
+            caption="HSN Code"
+            dataType="string"
+          ></dxi-column>
+          <dxi-column
             dataField="RATE"
             caption="Price"
             dataType="number"
@@ -207,7 +212,6 @@
                 : ' GST %'
             "
             dataType="number"
-            format="#,##0.00"
             [width]="80"
             [allowEditing]="!readOnly"
           ></dxi-column>
