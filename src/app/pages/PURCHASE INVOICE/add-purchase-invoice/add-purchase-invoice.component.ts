@@ -141,9 +141,36 @@ export class AddPurchaseInvoiceComponent {
   };
   selectedSupplierId: any;
   isApproved: boolean = false;
+  HSNCODE: any;
+  GST: any;
+  selectedCompanyId: any;
+  companyList: any[];
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
+    const userDataString = localStorage.getItem('userData');
+    // if (userDataString) {
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData?.SELECTED_COMPANY;
+    this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+    this.GST = userData.GeneralSettings.GST_PERC;
+    console.log(this.HSNCODE, this.GST, 'HSNCODEANDGST');
+    //   console.log(userData.GeneralSettings.HSN_CODE, 'HSNCODE');
+    //   if (selectedCompany?.COMPANY_ID) {
+    //     this.selectedCompanyId = selectedCompany.COMPANY_ID;
+    //     this.companyList = [selectedCompany]; //  Show only selected company
+    //     this.purchaseInvoiceFormData = selectedCompany.COMPANY_ID;
+    //   }
+
+    //   if (userData.USER_ID) {
+    //     this.purchaseInvoiceFormData.USER_ID = userData.USER_ID;
+    //   }
+
+    //   const firstFinYear = userData.FINANCIAL_YEARS?.[0];
+    //   if (firstFinYear?.FIN_ID) {
+    //     this.purchaseInvoiceFormData.FIN_ID = firstFinYear.FIN_ID;
+    //   }
+    // }
     this.getSupplierDropdown();
     this.getPendingGRNList();
     this.sessionData_tax();
@@ -304,10 +331,12 @@ export class AddPurchaseInvoiceComponent {
             PENDING_QTY: row.PENDING_QTY,
             QUANTITY: 0,
             RATE: row.RATE,
-            VAT_PERC: 0,
+            // VAT_PERC: 0,
             TAX_AMOUNT: 0,
             AMOUNT: 0,
             TOTAL_AMOUNT: 0,
+            HSN_CODE: this.HSNCODE,
+            VAT_PERC: this.GST,
           });
         }
       });

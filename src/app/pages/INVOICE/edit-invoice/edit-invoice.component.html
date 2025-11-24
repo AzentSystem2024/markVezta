@@ -156,6 +156,12 @@
             "
           ></dxi-column>
           <dxi-column
+            dataField="HSN_CODE"
+            caption="HSN Code"
+            dataType="string"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
             dataField="TOTAL_PAIR_QTY"
             caption="Total Pair Qty"
             dataType="number"
@@ -197,12 +203,7 @@
             [allowEditing]="false"
             [calculateCellValue]="calculateGstAmount"
           ></dxi-column>
-          <dxi-column
-            dataField="HSN_CODE"
-            caption="HSN Code"
-            dataType="string"
-            [allowEditing]="false"
-          ></dxi-column>
+
           <dxi-column
             dataField="TOTAL_AMOUNT"
             caption="Total"

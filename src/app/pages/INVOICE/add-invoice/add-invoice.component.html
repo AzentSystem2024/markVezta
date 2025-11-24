@@ -157,6 +157,12 @@
             [width]="150"
           ></dxi-column>
           <dxi-column
+            dataField="HSN_CODE"
+            caption="HSN Code"
+            dataType="string"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
             dataField="TOTAL_PAIR_QTY"
             caption="Total Pair Qty"
             dataType="number"
@@ -169,6 +175,7 @@
             format="#,##0.00"
             [allowEditing]="true"
           ></dxi-column>
+
           <dxi-column
             dataField="AMOUNT"
             caption="Amount"
@@ -185,7 +192,7 @@
                 : ' GST %'
             "
             dataType="number"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="TAX_AMOUNT"
@@ -200,12 +207,6 @@
             [calculateCellValue]="calculateGstAmount"
           ></dxi-column>
 
-          <dxi-column
-            dataField="HSN_CODE"
-            caption="HSN Code"
-            dataType="string"
-            [allowEditing]="false"
-          ></dxi-column>
           <dxi-column
             dataField="TOTAL_AMOUNT"
             caption="Total"

@@ -131,6 +131,8 @@ export class PurchaseReturnDebitFormComponent {
   pendingList: any;
   companyList: any[];
   pendingQtyValidation = 0;
+  HSNCODE: any;
+  GST: any;
 
   constructor(
     private dataService: DataService,
@@ -144,7 +146,9 @@ export class PurchaseReturnDebitFormComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
-
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log(this.HSNCODE, this.GST, 'HSNCODEANDGST');
       if (selectedCompany?.COMPANY_ID) {
         this.purchaseReturnFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
         this.companyList = [selectedCompany]; //  Show only selected company
@@ -220,13 +224,15 @@ export class PurchaseReturnDebitFormComponent {
       RATE: item.RATE,
       QUANTITY: item.QUANTITY,
       AMOUNT: item.AMOUNT,
-      VAT_PERC: item.VAT_PERC,
+      // VAT_PERC: item.VAT_PERC,
       VAT_AMOUNT: item.VAT_AMOUNT,
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
       UOM: item.UOM,
       UOM_PURCH: item.UOM_PURCH,
       UOM_MULTIPLE: item.UOM_MULTIPLE,
       BARCODE: item.BAR_CODE,
+      HSN_CODE: this.HSNCODE,
+      VAT_PERC: this.GST,
     }));
 
     // Refresh grid
@@ -313,13 +319,15 @@ export class PurchaseReturnDebitFormComponent {
             RATE: row.RATE,
             QUANTITY: 0,
             AMOUNT: row.AMOUNT,
-            VAT_PERC: row.VAT_PERC,
+            // VAT_PERC: row.VAT_PERC,
             VAT_AMOUNT: row.TAX_AMOUNT,
             TOTAL_AMOUNT: 0,
             UOM: row.UOM,
             UOM_PURCH: row.UOM_PURCH,
             UOM_MULTIPLE: row.UOM_MULTIPLE,
             BARCODE: row.BARCODE,
+            HSN_CODE: this.HSNCODE,
+            VAT_PERC: this.GST,
           });
         }
       });

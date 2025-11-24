@@ -87,8 +87,18 @@ export class EditPurchaseInvoiceComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedInvoice: any;
+  HSNCODE: any;
+  GST: any;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) {
+    const userDataString = localStorage.getItem('userData');
+    // if (userDataString) {
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData?.SELECTED_COMPANY;
+    this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+    this.GST = userData.GeneralSettings.GST_PERC;
+    console.log(this.HSNCODE, this.GST, 'HSNCODEANDGST');
+  }
 
   ngOnInit() {
     this.getSupplierDropdown();
@@ -108,10 +118,11 @@ export class EditPurchaseInvoiceComponent {
       console.log('Changed invoiceFormData:', this.invoiceFormData);
       this.purchaseInvoiceFormData = this.invoiceFormData;
       this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
-      console.log(
-        this.purchaseInvoiceFormData.PurchDetails,
-        'PURCHASEEEEEEEEEEEEEEEEEEEEEEEE'
-      );
+      this.mainGridData = this.mainGridData.map((row: any) => ({
+        HSN_CODE: this.HSNCODE, // force-create
+        VAT_PERC: row.GST || this.GST, // already showing
+        ...row, // merge original row at the end
+      }));
       this.purchaseInvoiceFormData.SUPP_ID = Number(
         this.invoiceFormData.SUPP_ID
       );
@@ -272,10 +283,12 @@ export class EditPurchaseInvoiceComponent {
             PO_QUANTITY: row.PO_QUANTITY,
             QUANTITY: 0,
             RATE: row.RATE,
-            VAT_PERC: 0,
+            // VAT_PERC: 0,
             TAX_AMOUNT: 0,
             AMOUNT: 0,
             TOTAL_AMOUNT: 0,
+            HSN_CODE: this.HSNCODE,
+            VAT_PERC: this.GST,
           });
         }
       });
@@ -433,6 +446,27 @@ export class EditPurchaseInvoiceComponent {
     });
   }
 
+  formatDateDDMMMyyyy(dateStr: string) {
+    const date = new Date(dateStr);
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return `${date.getDate().toString().padStart(2, '0')}-${
+      months[date.getMonth()]
+    }-${date.getFullYear().toString().slice(-2)}`;
+  }
+
   openPDF() {
     // Call your PDF API or open a URL
     console.log('Open PDF clicked');
@@ -445,88 +479,258 @@ export class EditPurchaseInvoiceComponent {
   }
 
   generatePDF(data: any) {
-    const doc = new jsPDF();
+    const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    // --- TITLE ---
-    doc.setFontSize(16);
-    const title = 'Purchase Invoice';
-    const textWidth = doc.getTextWidth(title);
-    doc.text(title, (pageWidth - textWidth) / 2, 15);
+    // ============================================================
+    // 1) TOP HEADER (LOGO + RIGHT DETAILS)
+    // ============================================================
+    const headerY = 12;
 
-    // --- HEADER ---
+    // LOGO BOX (SMALL)
+    const logoX = 18;
+    const logoY = headerY;
+    const logoW = 55;
+    const logoH = 22;
+
+    doc.setFillColor(225, 225, 225);
+    doc.rect(logoX, logoY, logoW, logoH, 'F');
+
     doc.setFontSize(11);
-    let headerY = 25;
-    const labelX = 14,
-      colonX = 50,
-      valueX = 55;
-
-    const printHeaderRow = (label: string, value: any) => {
-      doc.text(label, labelX, headerY);
-      doc.text(':', colonX, headerY);
-      doc.text(String(value ?? '-'), valueX, headerY);
-      headerY += 7;
-    };
-
-    printHeaderRow('Invoice No', data.PURCH_NO);
-    printHeaderRow('Invoice Date', data.PURCH_DATE.split('T')[0]);
-    printHeaderRow('Supplier', data.SUPPPLIER_NAME);
-    printHeaderRow('Narration', data.NARRATION);
-
-    // --- TABLE ROWS ---
-    const rows = data.PurchDetails.map((item: any) => [
-      item.GRN_DET_ID,
-      item.GRN_DATE ? item.GRN_DATE.split('T')[0] : '',
-      item.ITEM_NAME,
-      item.PO_QUANTITY,
-      item.RATE.toFixed(2),
-      item.AMOUNT.toFixed(2),
-      item.VAT_PERC.toFixed(2),
-      (item.VAT_AMOUNT ?? 0).toFixed(2),
-      item.TOTAL_AMOUNT.toFixed(2),
-    ]);
-
-    autoTable(doc, {
-      startY: 55,
-      head: [
-        [
-          'GRN No',
-          'GRN Date',
-          'Item Description',
-          'Pending Qty',
-          'Rate',
-          'Amount',
-          'VAT%',
-          'VAT Amount',
-          'Total Amount',
-        ],
-      ],
-      body: rows,
-      theme: 'grid',
-    });
-
-    // --- FOOTER TOTALS ---
-    let finalY = (doc as any).lastAutoTable.finalY + 15;
-
-    const labelEndX = pageWidth - 40;
-    const amountEndX = pageWidth - 20;
-
-    const printFooter = (label: string, value: number, y: number) => {
-      doc.text(label, labelEndX, y, { align: 'right' });
-      doc.text(value.toFixed(2), amountEndX, y, { align: 'right' });
-    };
-
-    printFooter('Gross Amount', data.GROSS_AMOUNT, finalY);
-    printFooter('VAT Amount', data.VAT_AMOUNT, finalY + 7);
-    printFooter('Net Amount', data.NET_AMOUNT, finalY + 14);
-
-    // --- THANK YOU ---
-    doc.text('Thank you for your business!', pageWidth / 2, finalY + 30, {
+    doc.text('logo', logoX + logoW / 2, logoY + logoH / 2 + 3, {
       align: 'center',
     });
 
-    // --- OPEN PDF ---
+    // RIGHT-TOP DETAILS
+    const rightX = pageWidth - 15;
+    let ty = headerY + 4;
+
+    const purchDate = (data.PURCH_DATE || '').split('T')[0];
+
+    const headerLines = [
+      `Debit Note No : ${data.PURCH_NO}`,
+      `e-Way Bill No :`,
+      `Original Invoice No. & Date:`,
+      `Dated : ${this.formatDateDDMMMyyyy(purchDate)}`,
+    ];
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    headerLines.forEach((txt) => {
+      doc.text(txt, rightX, ty, { align: 'right' });
+      ty += 6;
+    });
+
+    // LINE BELOW HEADER
+    const lineY = logoY + logoH + 3;
+    doc.setDrawColor(180);
+    doc.line(15, lineY, pageWidth - 15, lineY);
+
+    // ============================================================
+    // 2) COMPANY BLOCK (LEFT BLUE BOX — DYNAMIC HEIGHT)
+    // ============================================================
+    const compBoxX = 15;
+    const compBoxY = lineY + 3; // reduced spacing
+    const compBoxW = 95;
+
+    const companyLines = [
+      data.COMPANY_NAME,
+      data.ADDRESS1,
+      data.ADDRESS2,
+      data.ADDRESS3,
+      `GSTIN/UIN : ${data.COMPANY_CODE}`,
+      `State Name : ${data.SUPP_STATE_NAME}, Code : 32`,
+      `Email : ${data.EMAIL}`,
+    ];
+
+    const lineHeight = 5;
+    const topPadding = 8;
+    const compBoxH = topPadding + companyLines.length * lineHeight + 4;
+
+    // Draw Box
+    doc.setFillColor(210, 230, 255);
+    doc.rect(compBoxX, compBoxY, compBoxW, compBoxH, 'F');
+
+    // Print text inside box
+    let cy = compBoxY + 8;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(data.COMPANY_NAME || '', compBoxX + 5, cy);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    companyLines.slice(1).forEach((line) => {
+      cy += lineHeight;
+      if (line.startsWith('Email')) doc.setTextColor(0, 0, 255);
+      doc.text(line || '', compBoxX + 5, cy);
+      doc.setTextColor(0, 0, 0);
+    });
+
+    // ============================================================
+    // 3) CONSIGNEE (SHIP TO)
+    // ============================================================
+    let shipX = compBoxX + compBoxW + 15;
+    let shipY = compBoxY + 8;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Consignee (Ship to)', shipX, shipY);
+
+    shipY += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    const shipLines = [
+      data.SUPP_NAME,
+      data.SUPP_ADDRESS1,
+      data.SUPP_ADDRESS2,
+      `${data.SUPP_CITY} - ${data.SUPP_ZIP}`,
+      `GSTIN/UIN : ${data.SUPP_CODE}`,
+      `State Name : ${data.SUPP_STATE_NAME}, Code : 32`,
+    ];
+
+    shipLines.forEach((l) => {
+      doc.text(l || '', shipX, shipY);
+      shipY += 5;
+    });
+
+    // ============================================================
+    // 4) BUYER (BILL TO)
+    // ============================================================
+    let buyerX = shipX;
+    let buyerY = compBoxY + compBoxH + 5;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Buyer (Bill to)', buyerX, buyerY);
+
+    buyerY += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    const buyerLines = [...shipLines];
+
+    buyerLines.forEach((l) => {
+      doc.text(l || '', buyerX, buyerY);
+      buyerY += 5;
+    });
+
+    // LINE BELOW BUYER BLOCK
+    const tableLineY = buyerY + 2;
+    doc.setDrawColor(180);
+    doc.line(15, tableLineY, pageWidth - 15, tableLineY);
+
+    // ============================================================
+    // 5) TABLE — EXACT SAME WIDTH AS THE LINE (180mm)
+    // ============================================================
+    const tableStartY = tableLineY + 4;
+
+    const rows = data.PurchDetails.map((item: any, index: number) => [
+      index + 1, // Sl No
+      item.ITEM_NAME, // Description
+      item.GRN_QUANTITY, // Quantity
+      item.RATE.toFixed(2), // Rate
+      'pairs', // Per
+      item.VAT_PERC.toFixed(2) + ' %', // GST%
+      item.TOTAL_AMOUNT.toFixed(2), // Total Amount
+    ]);
+
+    autoTable(doc, {
+      startY: tableStartY,
+      theme: 'grid',
+
+      headStyles: {
+        fillColor: [240, 240, 240],
+        textColor: 0,
+        fontSize: 9,
+        halign: 'center',
+      },
+      bodyStyles: { fontSize: 9 },
+      footStyles: {
+        fillColor: [255, 255, 255], // same as table
+        textColor: 0,
+        fontSize: 10,
+        halign: 'right',
+      },
+
+      columnStyles: {
+        0: { cellWidth: 12, halign: 'center' },
+        1: { cellWidth: 70 },
+        2: { cellWidth: 20, halign: 'center' },
+        3: { cellWidth: 18, halign: 'right' },
+        4: { cellWidth: 15, halign: 'center' },
+        5: { cellWidth: 20, halign: 'center' },
+        6: { cellWidth: 25, halign: 'right' },
+      },
+
+      head: [
+        [
+          'Sl No',
+          'Description of goods',
+          'Quantity',
+          'Rate',
+          'Per',
+          'GST%',
+          'Total Amount',
+        ],
+      ],
+
+      body: rows,
+
+      // ⭐ PERFECTLY ALIGNED TOTAL ROW
+      foot: [
+        [
+          {
+            content: 'Total',
+            colSpan: 6,
+            styles: { halign: 'right', fontStyle: 'bold' },
+          },
+          {
+            content: data.NET_AMOUNT.toFixed(2),
+            styles: { fontStyle: 'bold' },
+          },
+        ],
+      ],
+    });
+
+    // ============================================================
+    // 6) FOOTER TEXT BLOCK (LEFT SIDE BELOW TABLE)
+    // ============================================================
+
+    // Y-position immediately after table
+    const footerY = (doc as any).lastAutoTable.finalY + 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    // E. & O.E
+    doc.text('E. & O.E', 15, footerY);
+
+    // User
+    doc.text(`User: ${data.USER_NAME || ''}`, 15, footerY + 5);
+
+    // Company PAN
+    doc.text("Company's PAN", 15, footerY + 10);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`: ${data.PAN_NO || ''}`, 45, footerY + 10);
+
+    // restore normal
+    doc.setFont('helvetica', 'normal');
+
+    // THANK YOU
+    // doc.text('Thank you for your business!', pageWidth / 2, finalY + 25, {
+    //   align: 'center',
+    // });
+
     doc.output('dataurlnewwindow');
+  }
+
+  // Convert amount to words (simple version)
+  numberToWords(amount: number): string {
+    return 'INR ' + amount.toFixed(0) + ' Only';
   }
 
   cancel() {
