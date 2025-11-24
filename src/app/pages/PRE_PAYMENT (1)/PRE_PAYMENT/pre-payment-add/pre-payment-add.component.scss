@@ -14,13 +14,13 @@
 
 .period-row {
   display: flex;
-  gap: 0.5rem; /* spacing between fields */
-  align-items: flex-start;
+  gap: 15px;
 }
 
-.period-row > * {
-  flex-shrink: 0; /* prevent resizing below the width attribute */
+.period-row dx-number-box {
+  width: 33%;   /* all same fixed width */
 }
+
 
 .fixed-footer {
   display: flex;

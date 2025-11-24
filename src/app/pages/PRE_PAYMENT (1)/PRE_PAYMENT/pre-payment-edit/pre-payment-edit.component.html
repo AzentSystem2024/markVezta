@@ -70,7 +70,6 @@
             : ' GST %'
         "
         labelMode="floating"
-        width="220px"
         [readOnly]="isReadOnly"
         [(value)]="PrePaymentFormData.TAX_PERCENT"
         (onValueChanged)="updateGSTAmount()"
@@ -82,14 +81,12 @@
             : ' GST Amount'
         "
         labelMode="floating"
-        width="220px"
         [(value)]="PrePaymentFormData.TAX_AMOUNT"
         [readOnly]="isReadOnly"
       ></dx-number-box>
       <dx-number-box
         label="Net Amount"
         labelMode="floating"
-        width="180px"
         [(value)]="PrePaymentFormData.NET_AMOUNT"
         [readOnly]="isReadOnly"
       ></dx-number-box>
@@ -159,7 +156,6 @@
         displayFormat="dd/MM/yyyy"
         [readOnly]="isReadOnly"
         labelMode="floating"
-        width="150px"
         [(value)]="PrePaymentFormData.DATE_FROM"
         (onValueChanged)="updatePeriodTo()"
         (valueChange)="onFieldChange()"
@@ -167,7 +163,6 @@
       <dx-number-box
         label="No.Month"
         labelMode="floating"
-        width="100px"
         [(value)]="PrePaymentFormData.NO_OF_MONTHS"
         [readOnly]="isReadOnly"
         (onValueChanged)="updatePeriodTo()"
@@ -176,7 +171,6 @@
       <dx-number-box
         label="No.Days"
         labelMode="floating"
-        width="100px"
         [(value)]="PrePaymentFormData.NO_OF_DAYS"
         [readOnly]="isReadOnly"
         (onValueChanged)="updatePeriodTo()"
@@ -187,7 +181,6 @@
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
         [readOnly]="isReadOnly"
-        width="150px"
         [(value)]="PrePaymentFormData.DATE_TO"
         [readOnly]="true"
       ></dx-date-box>
