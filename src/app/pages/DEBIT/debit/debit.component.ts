@@ -108,6 +108,8 @@ export class DebitComponent {
   isEmptyDatagrid: boolean = false;
   sessionData: any;
   selected_vat_id: any;
+  selectedDN: any;
+  DNid: any;
 
    //========================Export data ==========================
   onExporting(event: any) {
@@ -408,6 +410,8 @@ export class DebitComponent {
   onEditDebitNote(event: any) {
     event.cancel = true; // Prevent default popup editing
     const debitId = event.data.TRANS_ID;
+    this.DNid = event.data.TRANS_ID;
+    this.selectedDN = debitId;
     const transStatus = event.data.TRANS_STATUS;
     console.log(event, 'transstatus');
 

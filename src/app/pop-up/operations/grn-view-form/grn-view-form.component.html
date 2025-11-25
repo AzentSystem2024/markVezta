@@ -204,7 +204,7 @@
     <dxi-column
       dataField="QTY_TO_RECEIVE"
       [width]="cwidth"
-      caption="QTY TO RECEIVE" 
+      caption="QTY TO RECEIVE"
       [allowEditing]="false"
       alignment="center"
     ></dxi-column>
@@ -251,7 +251,6 @@
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
-
   </dx-data-grid>
 </div>
 <div style="display: flex">
@@ -335,7 +334,12 @@
         ></dx-text-box>
       </div>
 
-      <div class="total-field"  *ngIf="!(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)">
+      <div
+        class="total-field"
+        *ngIf="
+          !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
+        "
+      >
         <label>Net Amount</label>
 
         <dx-text-box
@@ -349,7 +353,12 @@
     </div>
 
     <div class="vat-container">
-      <div class="vat-field" *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2">
+      <div
+        class="vat-field"
+        *ngIf="
+          selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2
+        "
+      >
         <label>Net Amount</label>
 
         <dx-text-box
@@ -364,21 +373,22 @@
   </div>
 </div>
 
-
-<div class="form-popup-buttons-container"> 
-  <div class="popup-footer"> 
-    <dx-button icon="fas fa-file-pdf"
-     text="PDF"
-      type="normal" 
-     stylingMode="outlined" 
-     [width]="100"
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      icon="fas fa-file-pdf"
+      text="PDF"
+      type="normal"
+      stylingMode="outlined"
+      [width]="100"
       (onClick)="viewPdf()"
-       hint="View PDF">
+      hint="View PDF"
+    >
     </dx-button>
-   </div> 
   </div>
+</div>
 
-  <dx-popup
+<dx-popup
   [(visible)]="isPdfPopupVisible"
   [width]="900"
   [height]="700"

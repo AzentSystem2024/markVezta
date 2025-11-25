@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxButtonModule,
   DxCheckBoxModule,
@@ -28,6 +28,7 @@ import {
   DxValidatorModule,
 } from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
+import jsPDF from 'jspdf';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 
@@ -43,6 +44,7 @@ export class PrePaymentEditComponent {
   @Output() formClosed = new EventEmitter<void>();
   @Input() selectedPrePayment: any;
   @Input() isReadOnly: boolean = false;
+  @Input() PrepaymentId: any;
 
   selectedRows: any[] = [];
   ExpenseAmountDetails: any[] = [];
@@ -66,11 +68,14 @@ export class PrePaymentEditComponent {
   periodTo: string | number | Date | null = null;
   periodFrom: string | number | Date | null = null;
 
+  pdfSrc: SafeResourceUrl | null = null;
+          isPdfPopupVisible: boolean = false;
+
   PrePaymentFormData: any = {
     COMPANY_ID: '',
     FIN_ID: '',
 
-    TRANS_TYPE: 38,
+    TRANS_TYPE: 38, 
     TRANS_DATE: '',
     REF_NO: '',
     NARRATION: '',
@@ -103,7 +108,7 @@ export class PrePaymentEditComponent {
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
 
-  constructor(private dataservice: DataService, private ngZone: NgZone) {
+  constructor(private dataservice: DataService, private ngZone: NgZone,private sanitizer: DomSanitizer) {
     this.get_Supplier_dropdown();
     this.get_ExpenseLedger_dropdown();
     this.sesstion_Details();
@@ -536,6 +541,31 @@ export class PrePaymentEditComponent {
       });
     }
   }
+
+  viewPdf(): void {
+    this.isPdfPopupVisible = true;
+         this.dataservice.Select_PrePayment(this.PrepaymentId).subscribe((res: any) => {
+           if(res){
+          this.pdfSrc = this.get_pdf(res);
+        }
+         })
+  }
+
+   get_pdf(data: any): SafeResourceUrl {
+     
+       const doc = new jsPDF("p", "mm", "a4");
+       const pageWidth = doc.internal.pageSize.width;
+       const margin = 12;
+       let y = 12;
+
+       // ===========================
+  //  RETURN PDF
+  // ===========================
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+   }
+  
 }
 
 @NgModule({

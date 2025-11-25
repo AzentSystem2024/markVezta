@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -45,6 +45,7 @@ import { AddSupplierPaymentComponent } from '../add-supplier-payment/add-supplie
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-edit-supplier-payment',
@@ -59,6 +60,7 @@ export class EditSupplierPaymentComponent {
   @Input() paymentData: any;
   @Input() readOnlyMode: boolean = false;
   @Input() isReadOnlyMode: boolean = false;
+  @Input() supplierPaymentId: any;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -74,6 +76,11 @@ export class EditSupplierPaymentComponent {
   totalPendingAmount: any;
   amountError: string = '';
   showFillAmountPopup: boolean = false;
+
+  pdfSrc: SafeResourceUrl | null = null;
+        isPdfPopupVisible: boolean = false;
+        
+        
   fillAmountData = {
     field1: 0,
     field2: 0,
@@ -113,7 +120,8 @@ export class EditSupplierPaymentComponent {
 
   constructor(
     private dataService: DataService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -663,6 +671,34 @@ export class EditSupplierPaymentComponent {
   // }
 
   cancel() {}
+
+   viewPdf(): void {
+    console.log(this.supplierPaymentId, 'SUPPLIERPAYMENTIDDDDDDDDDDDDDDDDD');
+    this.isPdfPopupVisible = true;
+    
+    this.dataService
+      .selectSupplierPayment(this.supplierPaymentId)
+      .subscribe((response: any) => {
+        if(response){
+          this.pdfSrc = this.get_pdf(response);
+        }
+      });
+   }
+
+   get_pdf(data: any): SafeResourceUrl {
+   
+     const doc = new jsPDF("p", "mm", "a4");
+     const pageWidth = doc.internal.pageSize.width;
+     const margin = 12;
+     let y = 12;
+
+     // ===========================
+  //  RETURN PDF
+  // ===========================
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+   }
 }
 
 @NgModule({
