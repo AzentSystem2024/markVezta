@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DxButtonModule, DxCheckBoxModule, DxDataGridModule, DxDateBoxModule, DxDropDownBoxModule, DxFileUploaderModule, DxFormModule, DxNumberBoxModule, DxPopupModule, DxProgressBarModule, DxRadioGroupModule, DxSelectBoxModule, DxTabPanelModule, DxTabsModule, DxTagBoxModule, DxTextAreaModule, DxTextBoxModule, DxToolbarModule, DxValidatorModule } from 'devextreme-angular';
 import { DxiGroupModule, DxiItemModule, DxoFormItemModule, DxoItemModule, DxoLookupModule, DxoSummaryModule } from 'devextreme-angular/ui/nested';
+import notify from 'devextreme/ui/notify';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DataService } from 'src/app/services';
@@ -98,6 +99,11 @@ const payload = {
   };
     this.dataService.getESIRegister(payload).subscribe((response: any) => {
     if (!response?.ESIDetails || response.ESIDetails.length === 0) {
+       notify(
+            { message: 'No ESI details found for selected month', position: { at: 'top right', my: 'top right' } },
+            'error',
+            3000
+          );
       return; // nothing to show
     }
 
