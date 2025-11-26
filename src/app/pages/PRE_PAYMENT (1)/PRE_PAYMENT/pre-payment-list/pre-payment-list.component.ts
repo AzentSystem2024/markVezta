@@ -36,6 +36,8 @@ export class PrePaymentListComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  selectprepayment: any;
+  PrepaymentId: any;
 
 
     constructor(private dataservice: DataService,private ngZone: NgZone,private cdr: ChangeDetectorRef,private router: Router) {
@@ -184,7 +186,8 @@ export class PrePaymentListComponent {
   selectPrePayment(event: any) {
   console.log(event);
   const id = event.data.TRANS_ID;
-
+   this.PrepaymentId = event.data.TRANS_ID;
+   this.selectprepayment = id
   this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
     console.log(res);
 

@@ -30,7 +30,7 @@
       focusStateEnabled="false"
       (onEditingStart)="onEditOrViewMiscPayment($event)"
       (onRowRemoving)="onDeleteMiscPayment($event)"
-       (onExporting)="onExporting($event)"
+      (onExporting)="onExporting($event)"
       (onToolbarPreparing)="onToolbarPreparing($event)"
     >
       <dxo-column-chooser
@@ -54,12 +54,12 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-       <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <dxo-filter-row
@@ -72,7 +72,7 @@
 
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
-     
+
       <dxo-header-filter
         [visible]="true"
         [search]="{ enabled: true }"
@@ -92,11 +92,11 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
 
-         <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="custom-export-button"
-      ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="custom-export-button"
+        ></dxi-item>
 
         <dxi-item
           *ngIf="canAdd"
@@ -182,6 +182,7 @@
     [EditingResponseData]="selectedmiscellaneousData"
     [isReadOnlyMode]="isReadOnlyPayment"
     (popupClosed)="handleClose()"
+    [MiscPaymentId]="selectedMiscPayment"
   ></app-add-miscellaneous-payment>
 </dx-popup>
 

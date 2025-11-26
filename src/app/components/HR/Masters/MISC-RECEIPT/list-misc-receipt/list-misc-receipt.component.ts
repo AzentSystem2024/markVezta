@@ -70,6 +70,8 @@ export class ListMiscReceiptComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  selectedMiscReceipt: any;
+  MiscReceiptId: any;
 
    //========================Export data ==========================
   onExporting(event: any) {
@@ -407,7 +409,8 @@ export class ListMiscReceiptComponent {
   onEditOrViewMiscPayment(e: any) {
     e.cancel = true;
     const miscId = e.data.TRANS_ID;
-
+    this.MiscReceiptId = e.data.TRANS_ID;
+    this.selectedMiscReceipt = miscId;
     const status = e.data.TRANS_STATUS;
     this.dataService.selectMiscReceipt(miscId).subscribe({
       next: (response: any) => {

@@ -153,6 +153,7 @@
               displayExpr: 'HEAD_CODE',
               searchEnabled: true
             }"
+            (onEditorPreparing)="onEditorPreparing($event)"
           ></dxi-column>
 
           <dxi-column
@@ -195,6 +196,7 @@
             "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
+            [allowEditing]="false"
           >
           </dxi-column>
           <dxi-column

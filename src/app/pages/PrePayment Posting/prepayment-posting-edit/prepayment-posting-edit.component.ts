@@ -28,6 +28,8 @@ import {
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import jsPDF from 'jspdf';
 @Component({
   selector: 'app-prepayment-posting-edit',
   templateUrl: './prepayment-posting-edit.component.html',
@@ -36,13 +38,14 @@ import { confirm } from 'devextreme/ui/dialog';
 export class PrepaymentPostingEditComponent {  
   @Input() selecteprepaymentData: any = {};
   @Output() popupClosed = new EventEmitter<void>();
-  
+  @Input() prepaymentpostingId : any
  selectedMonthYear: string | number | Date 
 PrepaymentList:any
   PREPAY_DETAIL: any;
   selected_Company_id: any;
   selected_fin_id: any;
-
+pdfSrc: SafeResourceUrl | null = null;
+              isPdfPopupVisible: boolean = false;
   Prepoting_Add_Data:any={
   COMPANY_ID: null,
   FIN_ID: null,
@@ -64,7 +67,7 @@ PrepaymentList:any
   selectedstoreId: any;
 transDate: Date | string | number | null = null;
 
-constructor(private dataservice:DataService){
+constructor(private dataservice:DataService,private sanitizer: DomSanitizer){
 
 this.get_prepayment_pending_list()
 this.sesstion_Details()
@@ -256,6 +259,31 @@ const payload={
 closePopup(){
   this.popupClosed.emit();
 }
+
+
+ viewPdf(): void {
+                 this.isPdfPopupVisible = true;
+                   this.dataservice.select_Prepayment_Posting(this.prepaymentpostingId).subscribe((response:any)=>{
+                  if(response){
+                  this.pdfSrc = this.get_pdf(response);
+                }
+                 })
+      }
+    
+        get_pdf(data: any): SafeResourceUrl {
+         
+           const doc = new jsPDF("p", "mm", "a4");
+           const pageWidth = doc.internal.pageSize.width;
+           const margin = 12;
+           let y = 12;
+      
+           // ===========================
+        //  RETURN PDF
+        // ===========================
+        const blob = doc.output("blob");
+        const url = URL.createObjectURL(blob);
+        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+         }
 }
 
 @NgModule({

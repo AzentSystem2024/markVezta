@@ -70,6 +70,8 @@ export class ListMiscellaneousPaymentsComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  selectedMiscPayment: any;
+  MiscPaymentId: any;
 
    //========================Export data ==========================
   onExporting(event: any) {
@@ -419,6 +421,8 @@ export class ListMiscellaneousPaymentsComponent {
     const miscId = e.data.TRANS_ID;
 
     const status = e.data.TRANS_STATUS;
+    this.MiscPaymentId = e.data.TRANS_ID;
+    this.selectedMiscPayment = miscId
     this.dataService.selectMiscPayment(miscId).subscribe({
       next: (response: any) => {
         this.selectedmiscellaneousData = response;

@@ -23,6 +23,7 @@ import {
   DxSortableModule,
   DxSelectBoxModule,
   DxDataGridComponent,
+  DxCheckBoxModule,
 } from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
@@ -96,6 +97,7 @@ export class GrnComponent implements OnInit {
   @ViewChild(GrnApproveFormComponent, { static: false })
   grnApproveForm: GrnApproveFormComponent;
   selectedGrnId: any;
+  isApproved: boolean = false;
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = (cellInfo.data.STATUS || '').trim();
@@ -206,12 +208,26 @@ export class GrnComponent implements OnInit {
   }
 
   onClickSaveNewData() {
-    const data = this.grnNewForm.getNewGrnData();
-    console.log(data, 'grn new data');
+  const data = this.grnNewForm.getNewGrnData();
+  console.log(data, 'grn new data');
+  data.IS_APPROVED = this.isApproved;
 
-    this.service.saveGrnData(data).subscribe((res) => {
-      console.log('data saved', res);
-      if ((res.Message = 'Success')) {
+  this.service.saveGrnData(data).subscribe((res) => {
+    console.log('data saved', res);
+
+    // Check proper save success
+    if (res.Message === 'Success' && res.Flag === 1) {
+
+      // Check approval from payload
+      if (data.IS_APPROVED === true) {
+        notify(
+          {
+            message: 'Data Saved & Approved Successfully',
+            position: { at: 'top center', my: 'top center' },
+          },
+          'success'
+        );
+      } else {
         notify(
           {
             message: 'Data Saved Successfully',
@@ -219,22 +235,26 @@ export class GrnComponent implements OnInit {
           },
           'success'
         );
-        this.ClearFormData();
-        this.GrnNewFormComponent?.clearDemoArray(); // custom grid array clear
-        this.isGRNPopupVisible = false;
-
-        this.getGrnLogData();
-      } else {
-        notify(
-          {
-            message: 'Your Data Not Saved',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error'
-        );
       }
-    });
-  }
+
+      // After success actions
+      this.ClearFormData();
+      this.GrnNewFormComponent?.clearDemoArray(); 
+      this.isGRNPopupVisible = false;
+      this.getGrnLogData();
+
+    } else {
+      notify(
+        {
+          message: 'Your Data Not Saved',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error'
+      );
+    }
+  });
+}
+
 
   updateGrnData() {
     const data = this.grnEditForm.getNewGrnData();
@@ -495,6 +515,7 @@ export class GrnComponent implements OnInit {
     GrnEditFormModule,
     GrnVerifyFormModule,
     GrnApproveFormModule,
+    DxCheckBoxModule,
     GrnViewFormModule,
   ],
   providers: [],

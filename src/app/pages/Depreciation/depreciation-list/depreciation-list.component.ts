@@ -122,6 +122,8 @@ refreshButtonOptions = {
     elementAttr: { class: 'add-button' }
   };
   allDepreciationLid: any;
+  DepreciationId: any;
+  selectedDepreciation: any;
 
 
   addDepreciation(){
@@ -203,6 +205,8 @@ onEditDepreciation(event:any){
   this.EditDepreciationPopupVisible=true
       this.DepreciationAddComponent.Active_fixedasset_List()
 const id=event.data.TRANS_ID
+ this.DepreciationId = event.data.ID
+ this.selectedDepreciation =id
 console.log(event.data)
   this.dataService.select_Depreciation_Asset(id).subscribe((res:any)=>{
     console.log(res)

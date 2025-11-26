@@ -168,6 +168,8 @@ export class PurchaseOrderComponent {
   canApprove: any;
   isFilterOpened: boolean;
   selectedPoId: any;
+  GST_PERC: any;
+  HSN_CODE: any;
 
   constructor(
     private service: DataService,
@@ -181,7 +183,17 @@ export class PurchaseOrderComponent {
     // console.log(docType, 'doctype');
   }
 
+        sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    console.log(
+      this.HSN_CODE, '===========selected HSN CODE===================');
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST_PERC, '===========selected GST PERC===================');
+  }
+
   ngOnInit(): void {
+    this.sessionDetails();
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
@@ -397,6 +409,7 @@ export class PurchaseOrderComponent {
      this.selectedPoId = Id;   
     const status = event.data.STATUS;
     console.log(Id, 'id');
+    this.sessionDetails();
     // this.isEditPopupOpened = true;
     this.service.selectPoData(Id).subscribe((res) => {
       this.selectedRowData = res;
@@ -443,6 +456,7 @@ export class PurchaseOrderComponent {
     // debugger;
     const data = this.poNewForm.getNewPoData();
     console.log(data);
+     data.IS_APPROVED = this.isApproved
     if (!data.STORE_ID) {
       notify(
         {
@@ -494,21 +508,21 @@ export class PurchaseOrderComponent {
       return false;
     }
     // return true;
-    if (data.IS_APPROVED === true) {
-      const result = confirm(
-        'Are you sure you want to approve and commit this invoice?',
-        'Confirm Approval'
-      );
+    // if (data.IS_APPROVED === true) {
+    //   const result = confirm(
+    //     'Are you sure you want to approve and commit this invoice?',
+    //     'Confirm Approval'
+    //   );
 
-      result.then((dialogResult) => {
-        if (dialogResult) {
-          this.savePoToServer(data); // Only save if user confirms
-        }
-      });
-    } else {
-      // Not approved → Save directly
-      this.savePoToServer(data);
-    }
+    //   result.then((dialogResult) => {
+    //     if (dialogResult) {
+    //       this.savePoToServer(data); // Only save if user confirms
+    //     }
+    //   });
+    // } else {
+    //   // Not approved → Save directly
+    //   this.savePoToServer(data);
+    // }
     // this.service.savePoData(data).subscribe((res) => {
     //   console.log('saved data');
     //   if (res) {
@@ -540,12 +554,22 @@ export class PurchaseOrderComponent {
     //     );
     //   }
     // });
-  }
+  // }
 
-  savePoToServer(data: any) {
+  // savePoToServer(data: any) {
     this.service.savePoData(data).subscribe((res) => {
-      console.log('saved data');
-      if (res) {
+      console.log(res,'saved data');
+     
+      if (res.message === 'Success' && res.flag === 1) {
+        if (data.IS_APPROVED === true) {
+        notify(
+          {
+            message: 'Data Saved & Approved Successfully',
+            position: { at: 'top center', my: 'top center' },
+          },
+          'success'
+        );
+      } else {
         notify(
           {
             message: 'Data Saved Successfully',
@@ -553,6 +577,7 @@ export class PurchaseOrderComponent {
           },
           'success'
         );
+      }
 
         this.refreshPo = true;
         setTimeout(() => (this.refreshPo = false), 0);

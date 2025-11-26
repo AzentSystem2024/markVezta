@@ -852,103 +852,139 @@ export class GrnViewFormComponent {
 }
 
 get_pdf(data: any): SafeResourceUrl {
- const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.width;
-  const marginLeft = 15;
+ const doc = new jsPDF("p", "mm", "a4");
+   const pageWidth = doc.internal.pageSize.width;
+   const margin = 12;
+   let y = 12;
+ 
+   // ===========================
+   //  HEADER - COMPANY DETAILS
+   // ===========================
+   doc.setFont("helvetica", "bold").setFontSize(12);
+   doc.text(data.COMPANY_NAME || "RADIANT MOULDS & COMPOUNDS", margin, y);
+ 
+   doc.setFont("helvetica", "normal").setFontSize(10);
+   y += 6;
+   doc.text(data.ADDRESS1 || "43/981, Rahiman Bazar", margin, y);
+   y += 5;
+   doc.text(data.ADDRESS2 || "Cheruvannur", margin, y);
+   y += 5;
+   doc.text(data.ADDRESS3 || "Calicut - 673655, Kerala, India", margin, y);
+   y += 5;
+ 
+   doc.text("Mob :", margin, y);
+   doc.text(data.CONTACT_MOBILE || "0495-2421733", margin + 18, y);
+   y += 5;
+   doc.text("Email :", margin, y);
+   doc.text(data.EMAIL || "enquiry@mmarkgroup.com", margin +18, y);
+ 
+   // Horizontal Line
+   y += 8;
+   doc.setLineWidth(0.5);
+   doc.line(margin, y, pageWidth - margin, y);
 
-   const label = (text: string) => doc.setFont("helvetica", "bold").setFontSize(9).text(text, 15, y);
-  const value = (text: string) => doc.setFont("helvetica", "normal").setFontSize(9).text(text, 60, y);
-
-  
-  // START POSITION
-  let y = 15;
-  // ---------------- HEADER BOX ----------------
- doc.setFont("helvetica", "bold").setFontSize(14);
-doc.text("GOODS RECEIPT NOTE", pageWidth / 2, y, { align: "center" });
-
-y += 12; // spacing after title
-
-
-
-   // ----------- FIRST ROW (GRN, DATE, STORE) -------------
- // X positions
-const leftLabelX = 15;
-const leftValueX = 50;
-const rightLabelX = 120;
-const rightValueX = 160;
-
-// GRN NO + DATE  (same row)
-doc.setFont("helvetica", "bold").setFontSize(9).text("GRN NO:", leftLabelX, y);
-doc.setFont("helvetica", "normal").text(String(data.ID || ""), leftValueX, y);
-
-doc.setFont("helvetica", "bold").text("Date:", rightLabelX, y);
-doc.setFont("helvetica", "normal").text(String(data.GRN_DATE || ""), rightValueX, y);
-
-y += 7;
-
-// SUPPLIER + STORE (same row)
-doc.setFont("helvetica", "bold").text("Supplier:", leftLabelX, y);
-doc.setFont("helvetica", "normal").text(String(data.SUPPPLIER_NAME || ""), leftValueX, y);
-
-doc.setFont("helvetica", "bold").text("Store:", rightLabelX, y);
-doc.setFont("helvetica", "normal").text(String(data.STORE_NAME || ""), rightValueX, y);
-
-y += 7;
-
-// PURCHASE ORDER (single left item)
-doc.setFont("helvetica", "bold").text("Purchase Order:", leftLabelX, y);
-doc.setFont("helvetica", "normal").text(String(data.PO_NO || ""), leftValueX, y);
-
-y += 10;
-
-  // --------------------- TABLE -------------------------
-  const tableData = data.GRNDetails?.map((it: any, index: number) => [
-    index + 1,
-    it.ITEM_CODE || "",
-    it.ITEM_NAME || "",
-    it.PRICE?.toLocaleString() || "",
-    it.PO_QUANTITY || "",
-    it.UOM || "",
-    it.QUANTITY || "",
-    it.RECEIVED_QTY || "",
-    it.AMOUNT?.toLocaleString() || "",
-    it.SUPP_PRICE?.toLocaleString() || ""
-  ]) || [];
-
-  autoTable(doc, {
-    startY: y,
-    head: [[
-      "SL NO", "ITEM CODE", "DESCRIPTION", "PRICE", "QTY IN PO", "PURCH UOM",
-      "RECEIVED TO DATE", "QTY RECEIVED", "AMOUNT", "UNIT COST"
-    ]],
-    body: tableData,
-    styles: { fontSize: 9, halign: "center" },
-    headStyles: {
-      fillColor: [195, 225, 255],  // Light blue like your UI
-      textColor: 20,
-      fontSize: 9,
-      halign: "center"
-    },
-    alternateRowStyles: { fillColor: [245, 245, 245] },
-  });
-  y = (doc as any).lastAutoTable.finalY + 10;
-
-
-  // ---------------------- NARRATION -------------------------
-  doc.setFont("helvetica", "bold").text("Narration:", marginLeft, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(data.NARRATION || "", marginLeft + 30, y, { maxWidth: 150 });
-
+   // ===========================
+  //  TITLE - LOCAL PURCHASE ORDER
+  // ===========================
   y += 10;
+  doc.setFont("helvetica", "bold").setFontSize(14);
+  doc.text("GOOD RECEIPT NOTE", pageWidth / 2, y, { align: "center" });
 
-  // ---------------------- TOTALS ----------------------------
-  const totalQty = data.GRNDetails?.reduce((sum: any, it: any) => sum + (it.QUANTITY || 0), 0) || 0;
+ // ===========================
+  //  TWO COLUMN MAIN DETAILS
+  // ===========================
+  y += 12;
+  doc.setFontSize(10);
 
-  doc.setFont("helvetica", "bold").text("Total Quantity:", marginLeft, y);
-  doc.setFont("helvetica", "normal").text(String(totalQty), marginLeft + 40, y);
+  const leftX = margin;
+  const rightX = pageWidth / 2 + 5;
 
-  doc.setFont("helvetica", "bold").text("Net Amount:", 140, y);
-  doc.setFont("helvetica", "normal").text(String(data.NET_AMOUNT || 0), 170, y);
+  doc.text("Supplier :", leftX, y);
+  doc.text(data.SUPPPLIER_NAME || "", leftX + 25, y);
+
+  doc.text("LPO NO. :", rightX, y);
+  doc.text(data.PO_NO || "", rightX + 30, y);
+
+  y += 8;
+  doc.text("Tel :", leftX, y);
+  doc.text(data.SUPP_NAME || "", leftX + 25, y);
+
+  doc.text("Date :", rightX, y);
+  doc.text(data.GRN_DATE || "", rightX + 30, y);
+
+  y += 8;
+  doc.text("Fax :", leftX, y);
+  doc.text(data.SUPP_ADDRESS || "", leftX + 25, y);
+
+  // ===========================
+    // ITEMS TABLE
+    // ===========================
+    y += 15;
+  
+    const itemRows =
+      data.GRNDetails?.map((item: any, i: number) => [
+        i + 1,
+        item.ITEM_CODE || "",
+        item.ITEM_NAME || "",
+        item.SUPP_PRICE || "",
+        item.PO_QUANTITY || "",
+        item.UOM || "",
+        item.GRN_QUANTITY || "",
+        item.RECEIVED_QTY || "",
+        item.SUPP_AMOUNT || 0,
+        item.SUPP_PRICE || 0,
+      ]) || [];
+  
+    autoTable(doc, {
+      startY: y,
+      theme: "grid",
+      headStyles: { fillColor: [230, 230, 230],textColor: 0, fontSize: 9, halign: "center" },
+      styles: { fontSize: 9, valign: "middle", cellPadding: 2 },
+      margin: { left: margin, right: margin },
+      head: [
+        [
+          "Sl#",
+          "Item Code",
+          "Description",
+          "Price",
+          "Qty in PO",
+          "Purch UOM",
+          "Recieved to Date",
+          "Qty Received",
+          "Amount",
+          "Unit Cost"
+        ]
+      ],
+      body: itemRows
+    });
+  
+    y = (doc as any).lastAutoTable.finalY + 10;
+  
+    // ===========================
+    //  TOTAL SECTION (Bottom Right)
+    // ===========================
+    doc.setFont("helvetica", "bold").setFontSize(11);
+  
+    const amtX = pageWidth - margin - 50;
+    doc.text("Total Amount :", amtX, y);
+    doc.text(String(data.NET_AMOUNT || 0), amtX + 35, y);
+  
+    // ===========================
+  //  FOOTER (E & OE + SIGNATORY)
+  // ===========================
+  
+  y += 20; // spacing after total
+  
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  
+  // Left side – E & OE
+  doc.text("E & OE", margin, y);
+  
+  // Right side – Authorised Signatory
+  doc.text("Authorised Signatory", pageWidth - margin - 40, y);
+  
+
+   
 
   // -------------------- EXPORT --------------------
   const pdfBlob = doc.output('blob');

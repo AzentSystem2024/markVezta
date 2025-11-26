@@ -234,6 +234,15 @@
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
     <dx-button
+      icon="fas fa-file-pdf"
+      text="PDF"
+      type="normal"
+      stylingMode="outlined"
+      [width]="100"
+      (onClick)="viewPdf()"
+      hint="View PDF"
+    ></dx-button>
+    <dx-button
       text="Cancel"
       (onClick)="cancel()"
       stylingMode="outlined"
@@ -241,3 +250,23 @@
     ></dx-button>
   </div>
 </div>
+
+<dx-popup
+  [(visible)]="isPdfPopupVisible"
+  [width]="900"
+  [height]="700"
+  [showTitle]="true"
+  title="CreditNote PDF Preview"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div class="pdf-container" style="margin-top: 10px">
+    <iframe
+      *ngIf="pdfSrc"
+      [src]="pdfSrc"
+      width="100%"
+      height="600"
+      style="border: 1px solid #ccc; border-radius: 4px"
+    ></iframe>
+  </div>
+</dx-popup>

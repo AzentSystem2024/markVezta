@@ -1,78 +1,76 @@
 <dx-date-box
   [(value)]="transDate"
- [width]="150"
-  [displayFormat]="'MMMM yyyy'"   
+  [width]="150"
+  [displayFormat]="'MMMM yyyy'"
   [openOnFieldClick]="true"
   label="Month"
-   [readOnly]="isEditReadOnly"
+  [readOnly]="isEditReadOnly"
   labelMode="floating"
   [calendarOptions]="{ maxZoomLevel: 'year', minZoomLevel: 'year' }"
   [pickerType]="'calendar'"
-
   (onValueChanged)="DateChange($event)"
-
-  style="margin-bottom: 20px;"
-  >
+  style="margin-bottom: 20px"
+>
 </dx-date-box>
 
- <dx-data-grid
-      #dataGrid
-      noDataText=" "
-      [width]="'100%'"
-      [height]="'50vh'"
-      [loadPanel]="{
-        enabled: true,
-        text: 'Loading...',
-        showIndicator: true,
-        showPane: true
-      }"
-      class="grid theme-dependent"
-  
-      [showBorders]="true"
-      [showColumnLines]="true"
-      [columnAutoWidth]="false"
-      [wordWrapEnabled]="false"
-      [rowAlternationEnabled]="true"
-      [dataSource]="PREPAY_DETAIL_data "
-      [allowColumnReordering]="true"
-      [showColumnHeaders]="true"
-      [columnAutoWidth]="true"
-      [allowColumnResizing]="true"
-      [columnResizingMode]="'nextColumn'"
-      [scrolling]="{ mode: 'standard' }"
-      rowAlternationInterval="2"
- 
-      focusStateEnabled="false"
-    [keyExpr]="'ID'"  
-    (onSelectionChanged)="onSelectionChanged($event)"
-
-    [selectedRowKeys]="selectedRowKeys"
-  style="margin-top:10px"  
-   [editing]="{
+<dx-data-grid
+  #dataGrid
+  noDataText=" "
+  [width]="'100%'"
+  [height]="'50vh'"
+  [loadPanel]="{
+    enabled: true,
+    text: 'Loading...',
+    showIndicator: true,
+    showPane: true
+  }"
+  class="grid theme-dependent"
+  [showBorders]="true"
+  [showColumnLines]="true"
+  [columnAutoWidth]="false"
+  [wordWrapEnabled]="false"
+  [rowAlternationEnabled]="true"
+  [dataSource]="PREPAY_DETAIL_data"
+  [allowColumnReordering]="true"
+  [showColumnHeaders]="true"
+  [columnAutoWidth]="true"
+  [allowColumnResizing]="true"
+  [columnResizingMode]="'nextColumn'"
+  [scrolling]="{ mode: 'standard' }"
+  rowAlternationInterval="2"
+  focusStateEnabled="false"
+  [keyExpr]="'ID'"
+  (onSelectionChanged)="onSelectionChanged($event)"
+  [selectedRowKeys]="selectedRowKeys"
+  style="margin-top: 10px"
+  [editing]="{
     mode: 'cell',
     allowUpdating: true
-  }" 
-    >
-    
-      <dxo-paging [pageSize]="10"></dxo-paging>
+  }"
+>
+  <dxo-paging [pageSize]="10"></dxo-paging>
 
-      <!-- <dxo-load-panel [showPane]="false"></dxo-load-panel> -->
-      <dxo-scrolling mode="standard"></dxo-scrolling>
-      <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
-      <dxo-header-filter
-        [visible]="true"
-        [search]="{ enabled: true }"
-      ></dxo-header-filter>
-     
-      <dxo-filter-builder [allowHierarchicalFields]="true">
-      </dxo-filter-builder>
-  
+  <!-- <dxo-load-panel [showPane]="false"></dxo-load-panel> -->
+  <dxo-scrolling mode="standard"></dxo-scrolling>
+  <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
+  <dxo-header-filter
+    [visible]="true"
+    [search]="{ enabled: true }"
+  ></dxo-header-filter>
 
-      <!-- <dxi-column dataField="LESS_HOURS" caption="S.No"></dxi-column> -->
-       <!-- <dxi-column dataField="INVOICE_NO" caption="Invoice No"></dxi-column> -->
+  <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+
+  <!-- <dxi-column dataField="LESS_HOURS" caption="S.No"></dxi-column> -->
+  <!-- <dxi-column dataField="INVOICE_NO" caption="Invoice No"></dxi-column> -->
 
   <!-- Due Date -->
-  <dxi-column dataField="DUE_DATE" caption="Due Date" dataType="date" [format]="'dd/MM/yyyy'" [allowEditing]="false"></dxi-column>
+  <dxi-column
+    dataField="DUE_DATE"
+    caption="Due Date"
+    dataType="date"
+    [format]="'dd/MM/yyyy'"
+    [allowEditing]="false"
+  ></dxi-column>
 
   <!-- Store Code -->
   <!-- <dxi-column dataField="STORE_CODE" caption="Store Code"></dxi-column> -->
@@ -84,35 +82,57 @@
   <!-- <dxi-column dataField="CR_LEDGER" caption="Cr. Ledger"></dxi-column> -->
 
   <!-- Amount -->
-  <dxi-column dataField="DUE_AMOUNT" caption="Amount" dataType="number"  [allowEditing]="false"
-              [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+  <dxi-column
+    dataField="DUE_AMOUNT"
+    caption="Amount"
+    dataType="number"
+    [allowEditing]="false"
+    [format]="{ type: 'fixedPoint', precision: 2 }"
+  ></dxi-column>
 
-                <!-- DR Amount -->
-  <dxi-column dataField="DR_AMOUNT" caption="Debit" dataType="number"  [allowEditing]="false"
-              [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+  <!-- DR Amount -->
+  <dxi-column
+    dataField="DR_AMOUNT"
+    caption="Debit"
+    dataType="number"
+    [allowEditing]="false"
+    [format]="{ type: 'fixedPoint', precision: 2 }"
+  ></dxi-column>
 
-                <!-- CR Amount -->
-  <dxi-column dataField="CR_AMOUNT" caption="Credit" dataType="number"  [allowEditing]="false"
-              [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+  <!-- CR Amount -->
+  <dxi-column
+    dataField="CR_AMOUNT"
+    caption="Credit"
+    dataType="number"
+    [allowEditing]="false"
+    [format]="{ type: 'fixedPoint', precision: 2 }"
+  ></dxi-column>
 
   <!-- Narration -->
   <!-- <dxi-column dataField="NARRATION" [width]="250" caption="Narration"></dxi-column> -->
-
-
-    
 </dx-data-grid>
 
-  <dx-check-box
-           [(value)]="approveValue"
-              text="Approve"
-                     [readOnly]="isEditReadOnly"
-              (onValueChanged)="onApprovedChanged($event)"
-              style="margin:10px"
-            >
-            </dx-check-box>
-    
+<dx-check-box
+  [(value)]="approveValue"
+  text="Approve"
+  [readOnly]="isEditReadOnly"
+  (onValueChanged)="onApprovedChanged($event)"
+  style="margin: 10px"
+>
+</dx-check-box>
+
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
+    <dx-button
+      icon="fas fa-file-pdf"
+      text="PDF"
+      type="normal"
+      stylingMode="outlined"
+      [width]="100"
+      (onClick)="viewPdf()"
+      hint="View PDF"
+    >
+    </dx-button>
     <dx-button
       text="Cancel"
       stylingMode="outlined"
@@ -120,11 +140,31 @@
       type="normal"
     ></dx-button>
     <dx-button
-    [visible]="!isEditReadOnly"
-    [text]="approveValue ? 'Update & Commit' : 'Update'"
+      [visible]="!isEditReadOnly"
+      [text]="approveValue ? 'Update & Commit' : 'Update'"
       stylingMode="contained"
       type="default"
       (onClick)="Update_Prepayment()"
     ></dx-button>
   </div>
 </div>
+
+<dx-popup
+  [(visible)]="isPdfPopupVisible"
+  [width]="900"
+  [height]="700"
+  [showTitle]="true"
+  title="PrepaymentPosting PDF Preview"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div class="pdf-container" style="margin-top: 10px">
+    <iframe
+      *ngIf="pdfSrc"
+      [src]="pdfSrc"
+      width="100%"
+      height="600"
+      style="border: 1px solid #ccc; border-radius: 4px"
+    ></iframe>
+  </div>
+</dx-popup>

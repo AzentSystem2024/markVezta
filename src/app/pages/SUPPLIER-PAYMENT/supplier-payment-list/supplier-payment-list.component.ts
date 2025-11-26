@@ -108,6 +108,8 @@ export class SupplierPaymentListComponent {
   isViewReceipt: boolean;
   isEditReceipt: boolean;
   isReadOnlyReceipt: boolean = false;
+  selectedSupplierPayment: any;
+  supplierPaymentId: any;
 
   constructor(private dataService: DataService, private ngZone: NgZone) {}
 
@@ -368,7 +370,9 @@ export class SupplierPaymentListComponent {
 
     const receiptId = event.data.TRANS_ID;
     const transStatus = event.data.TRANS_STATUS;
-
+     
+    this.supplierPaymentId = event.data.TRANS_ID;
+      this.selectedSupplierPayment = receiptId;
     this.dataService
       .selectSupplierPayment(receiptId)
       .subscribe((response: any) => {

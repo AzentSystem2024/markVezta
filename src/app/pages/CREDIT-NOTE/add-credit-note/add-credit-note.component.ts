@@ -141,6 +141,8 @@ export class AddCreditNoteComponent {
   selected_vat_id: any;
   selectedCustomer: any;
   selectedstoreId: any;
+  HSN_CODE: any;
+  GST_PERC: any;
   constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   ngOnInit() {
@@ -198,6 +200,11 @@ export class AddCreditNoteComponent {
       this.selectedstoreId,
       '===========selected store id==================='
     );
+     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    console.log(
+      this.HSN_CODE, '===========selected HSN CODE===================');
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST_PERC, '===========selected GST PERC===================');
   }
 
   private hasEmptyRow(): boolean {
@@ -506,22 +513,34 @@ export class AddCreditNoteComponent {
         }
       };
 
-      e.editorOptions.onValueChanged = (args: any) => {
-        const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
-        );
-        e.setValue(args.value);
-        if (selectedLedger) {
-          e.component.cellValue(
-            rowIndex,
-            'ledgerName',
-            selectedLedger.HEAD_NAME
-          );
-          setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-          }, 50);
-        }
-      };
+     e.editorOptions.onValueChanged = (args: any) => {
+  const selectedLedger = this.ledgerList.find(
+    (item: any) => item.HEAD_CODE === args.value
+  );
+
+  e.setValue(args.value);
+
+  if (selectedLedger) {
+    // 1️⃣ Set ledger name
+    e.component.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
+
+    // 2️⃣ Get HSN & GST from session
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
+    const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+
+    // 3️⃣ Set HSN_CODE
+    e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+
+    // 4️⃣ Set GST_PERC
+    e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+
+    // 5️⃣ Move to next field
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+    }, 50);
+  }
+};
     }
 
     // ➤ ledgerName: move to particulars on Enter

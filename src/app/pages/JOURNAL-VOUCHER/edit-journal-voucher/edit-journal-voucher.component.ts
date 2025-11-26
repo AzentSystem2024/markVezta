@@ -9,7 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -94,7 +94,11 @@ export class EditJournalVoucherComponent {
   Company_list: any = [];
   selectedDeptId: any;
 
-  constructor(private dataService: DataService, private router: Router) {}
+  pdfSrc: SafeResourceUrl | null = null;
+            isPdfPopupVisible: boolean = false;
+  
+
+  constructor(private dataService: DataService, private router: Router,private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -869,6 +873,8 @@ export class EditJournalVoucherComponent {
   cancel() {
     this.popupClosed.emit();
   }
+
+  
 }
 
 @NgModule({

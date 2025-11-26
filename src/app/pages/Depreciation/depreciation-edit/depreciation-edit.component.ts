@@ -38,6 +38,8 @@ import {
 } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 import { confirm } from 'devextreme/ui/dialog';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import jsPDF from 'jspdf';
 @Component({
   selector: 'app-depreciation-edit',
   templateUrl: './depreciation-edit.component.html',
@@ -46,6 +48,7 @@ import { confirm } from 'devextreme/ui/dialog';
 export class DepreciationEditComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() SelectDepreciationData: any = {};
+  @Input() DepreciationId: any;
   depreciationDate: any;
   approveValue: boolean = false;
   DepreciationPayload: any = {
@@ -73,7 +76,10 @@ export class DepreciationEditComponent {
   isProcessClicked: boolean = false;
   Depreciation_List: any;
 
-  constructor(private dataService: DataService) {
+  pdfSrc: SafeResourceUrl | null = null;
+                isPdfPopupVisible: boolean = false;
+
+  constructor(private dataService: DataService,private sanitizer: DomSanitizer) {
     this.Active_fixedasset_List();
   }
   ngOnInit() {
@@ -511,6 +517,31 @@ export class DepreciationEditComponent {
     this.selectedRowsInGrid = [];
     this.grandTotal = 0;
   }
+
+  viewPdf(): void {
+                   this.isPdfPopupVisible = true;
+                    this.dataService.select_Depreciation_Asset(this.DepreciationId).subscribe((response:any)=>{
+                    if(response){
+                    this.pdfSrc = this.get_pdf(response);
+                  }
+                   })
+        }
+      
+          get_pdf(data: any): SafeResourceUrl {
+           
+             const doc = new jsPDF("p", "mm", "a4");
+             const pageWidth = doc.internal.pageSize.width;
+             const margin = 12;
+             let y = 12;
+        
+             // ===========================
+          //  RETURN PDF
+          // ===========================
+          const blob = doc.output("blob");
+          const url = URL.createObjectURL(blob);
+          return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+           }
+  
 }
 
 @NgModule({
@@ -528,6 +559,7 @@ export class DepreciationEditComponent {
     ReactiveFormsModule,
     DxDateBoxModule,
     DxValidationGroupModule,
+    CommonModule
   ],
   providers: [],
   exports: [DepreciationEditComponent],

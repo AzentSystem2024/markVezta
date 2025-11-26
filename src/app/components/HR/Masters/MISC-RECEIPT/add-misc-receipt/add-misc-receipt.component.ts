@@ -9,7 +9,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -49,6 +49,7 @@ import { ListMiscReceiptComponent } from '../list-misc-receipt/list-misc-receipt
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-add-misc-receipt',
@@ -82,6 +83,7 @@ export class AddMiscReceiptComponent {
   taxRegnRef!: DxTextBoxComponent;
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   dataGrid: DxDataGridComponent;
+  @Input() MiscReceiptId: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -127,7 +129,10 @@ export class AddMiscReceiptComponent {
   Company_list: any = [];
   selectedstoreId: any;
 
-  constructor(private dataService: DataService, private ngZone: NgZone) {
+  pdfSrc: SafeResourceUrl | null = null;
+            isPdfPopupVisible: boolean = false;
+
+  constructor(private dataService: DataService, private ngZone: NgZone,private sanitizer: DomSanitizer) {
     this.Deparment_Drop_down();
   }
 
@@ -947,6 +952,30 @@ export class AddMiscReceiptComponent {
   Cancel() {
     this.popupClosed.emit();
   }
+
+    viewPdf(): void {
+               this.isPdfPopupVisible = true;
+              this.dataService.selectMiscReceipt(this.MiscReceiptId).subscribe((response: any) => {
+                if(response){
+                this.pdfSrc = this.get_pdf(response);
+              }
+               })
+    }
+  
+      get_pdf(data: any): SafeResourceUrl {
+       
+         const doc = new jsPDF("p", "mm", "a4");
+         const pageWidth = doc.internal.pageSize.width;
+         const margin = 12;
+         let y = 12;
+    
+         // ===========================
+      //  RETURN PDF
+      // ===========================
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+       }
 }
 
 @NgModule({

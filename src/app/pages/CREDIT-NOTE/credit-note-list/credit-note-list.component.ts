@@ -83,6 +83,8 @@ export class CreditNoteListComponent {
     },
     elementAttr: { class: 'add-button' },
   };
+  selectedCredit: any;
+  CreditNoteid: any;
 
    //========================Export data ==========================
   onExporting(event: any) {
@@ -414,6 +416,8 @@ export class CreditNoteListComponent {
   onEditCreditNote(event: any) {
     event.cancel = true; // Prevent default popup editing
     const creditId = event.data.TRANS_ID;
+     this.CreditNoteid = event.data.TRANS_ID;
+    this.selectedCredit = creditId;
     const transStatus = event.data.TRANS_STATUS;
     console.log(event, 'transstatus');
 

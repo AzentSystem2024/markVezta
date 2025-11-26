@@ -117,11 +117,25 @@ export class EditCreditNoteComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedstoreId:any;
+  HSNCODE: any;
+  hsnLoaded: boolean;
+  GST: any;
 
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    const userDataString = localStorage.getItem('userData');
+    console.log(userDataString, 'USERDATASTRING');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log(this.HSNCODE, 'HSNCODE===================');
+      this.hsnLoaded = true; // ADD THIS
+    }
+  }
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
@@ -183,6 +197,7 @@ export class EditCreditNoteComponent {
             particulars: item.REMARKS || '',
             Amount: item.AMOUNT || '',
             gstAmount: item.GST_AMOUNT || '',
+            HSN_CODE: this.HSNCODE,
           };
         });
       });
@@ -479,21 +494,33 @@ export class EditCreditNoteComponent {
       };
 
       e.editorOptions.onValueChanged = (args: any) => {
-        const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
-        );
-        e.setValue(args.value);
-        if (selectedLedger) {
-          e.component.cellValue(
-            rowIndex,
-            'ledgerName',
-            selectedLedger.HEAD_NAME
-          );
-          setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-          }, 50);
-        }
-      };
+  const selectedLedger = this.ledgerList.find(
+    (item: any) => item.HEAD_CODE === args.value
+  );
+
+  e.setValue(args.value);
+
+  if (selectedLedger) {
+    // 1️⃣ Set ledger name
+    e.component.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
+
+    // 2️⃣ Get HSN & GST from session
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
+    const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+
+    // 3️⃣ Set HSN_CODE
+    e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+
+    // 4️⃣ Set GST_PERC
+    e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+
+    // 5️⃣ Move to next field
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+    }, 50);
+  }
+};
     }
 
     // ➤ ledgerName: move to particulars on Enter

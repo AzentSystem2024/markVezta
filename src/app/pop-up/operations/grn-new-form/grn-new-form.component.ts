@@ -98,7 +98,7 @@ export class GrnNewFormComponent implements OnInit {
     STATUS: '',
     CURRENCY_ID: 0,
     CURRENCY_SYMBOL: '',
-
+    IS_APPROVED: false,
     GRNDetails: [
       {
         ID: 0,
@@ -146,7 +146,7 @@ export class GrnNewFormComponent implements OnInit {
         STORE_ID: 0,
         GRN_ID: 0,
         COST_ID: 0,
-        PERCENT: '',
+        PERCENT: 0,
         AMOUNT_FC: 0,
         AMOUNT: 0,
         VALUE: 0,
@@ -316,7 +316,7 @@ export class GrnNewFormComponent implements OnInit {
         return {
           STORE_ID: STORE_ID,
           COST_ID: landedCost.ID, // Assuming COST_ID is available in landedCost data
-          PERCENT,
+          PERCENT:landedCost.VALUE,
           AMOUNT_FC: AMOUNT_FC.toFixed(2), // Format AMOUNT_FC as needed
           AMOUNT: AMOUNT.toFixed(2), // Format AMOUNT as needed
         };

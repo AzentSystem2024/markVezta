@@ -154,7 +154,9 @@ export class ViewMiscellaneousPaymentComponent {
     
     
     
-     
+  viewPdf():void {
+    
+  }   
     
 
 }

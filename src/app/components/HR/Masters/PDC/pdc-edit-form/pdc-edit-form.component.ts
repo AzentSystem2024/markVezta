@@ -1,11 +1,12 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, NgModule, Output, SimpleChanges } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DxButtonModule, DxCheckBoxModule, DxDataGridModule, DxDateBoxModule, DxFormModule, DxNumberBoxModule, DxPopupModule, DxRadioGroupModule, DxSelectBoxModule, DxTextAreaModule, DxTextBoxModule, DxValidatorModule } from 'devextreme-angular';
 import { DxoFormItemModule, DxoItemModule } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-pdc-edit-form',
@@ -16,7 +17,11 @@ export class PdcEditFormComponent {
       @Output() formClosed = new EventEmitter<void>();
      @Input() selectedPDC: any;
 @Input() isReadOnly: boolean = false;
+@Input() PDCid: any;
    
+isPdfPopupVisible: boolean = false;
+ pdfSrc: SafeResourceUrl | null = null;
+ 
      Supplier:any;
      selectedBeneficiaryTypeID: any
      selected_Company_id:any;
@@ -92,7 +97,7 @@ export class PdcEditFormComponent {
 }
      isBeneficiaryTypeDisabled = (data: any) => data.disabled;
    
-     constructor(private dataservice: DataService) {
+     constructor(private dataservice: DataService, private sanitizer: DomSanitizer) {
        this.get_Supplier_dropdown();
        this.get_Bank_dropdown();
        this.get_Customer_dropdown();
@@ -297,6 +302,30 @@ parseDate(dateStr: string): Date {
   return new Date(+parts[2], +parts[1] - 1, +parts[0]);
 }
 
+viewPdf (): void {
+    this.isPdfPopupVisible = true;
+
+     this.dataservice.Select_PDC(this.PDCid).subscribe((res:any)=>{
+      if(res){
+          this.pdfSrc = this.get_pdf(res);
+        }
+     })
+}
+
+get_pdf(data: any): SafeResourceUrl {
+   
+     const doc = new jsPDF("p", "mm", "a4");
+     const pageWidth = doc.internal.pageSize.width;
+     const margin = 12;
+     let y = 12;
+
+     // ===========================
+  //  RETURN PDF
+  // ===========================
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+   }
    
 }
 

@@ -13,12 +13,12 @@
       class="form-popup-buttons-container"
       [class.flex-buttons]="width <= 360"
     >
-      <div style="display: flex; align-items: center" *ngIf="showNetAmount">
+      <div style="display: flex; align-items: center">
         <!-- <div
           style="display: flex; align-items: center"
           *ngIf="showNetAmount && isEditMode"
         > -->
-        <div style="display: flex; align-items: center" *ngIf="showNetAmount">
+        <div style="display: flex; align-items: center">
           <label style="margin-right: 8px">Approve</label>
           <dx-check-box
             [value]="isApproved"

@@ -737,517 +737,223 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   });
 }
 
-
-
-// get_pdf(data: any): SafeResourceUrl {
-
-//   const doc = new jsPDF('p', 'mm', 'a4');
-//   const pageWidth = doc.internal.pageSize.width;
-
-//   const label = (text: string) => doc.setFont("helvetica", "bold").setFontSize(9).text(text, 15, y);
-//   const value = (text: string) => doc.setFont("helvetica", "normal").setFontSize(9).text(text, 60, y);
-
-//   // START POSITION
-//   let y = 15;
-
-//   // -------------------- TITLE --------------------
-//   doc.setFontSize(14);
-//   doc.setFont("helvetica", "bold");
-//   doc.text("Purchase Order", pageWidth / 2, y, { align: 'center' });
-
-//   y += 10;
-
-//   // ====================================================
-//   //  PO HEADER (Top Row)
-//   // ====================================================
-//   autoTable(doc, {
-//     startY: y,
-//     theme: "grid",
-//     headStyles: { fillColor: [240, 240, 240] },
-//     styles: { fontSize: 9, cellPadding: 2 },
-//     margin: { left: 15, right: 15 },
-//     body: [
-//       ["PO No", data.PO_NO || ""],
-//       ["Date", data.PO_DATE || ""],
-//       ["Reference No", data.REF_NO || ""],
-//       ["Supplier", data.SUPP_NAME || ""],
-//       ["Store", data.STORE || ""],
-//     ]
-//   });
-
-//   y = (doc as any).lastAutoTable.finalY + 8;
-
-//   // ====================================================
-//   //  SUPPLIER DETAILS
-//   // ====================================================
-//   doc.setFont("helvetica", "bold");
-//   doc.setFontSize(11);
-//   doc.text("Supplier Details", 15, y);
-
-//   y += 5;
-
-//   autoTable(doc, {
-//     startY: y,
-//     theme: "grid",
-//     headStyles: { fillColor: [245, 245, 245] },
-//     styles: { fontSize: 9, cellPadding: 2 },
-//     margin: { left: 15, right: 15 },
-//     body: [
-//       ["Currency", data.CURRENCY_NAME || ""],
-//       ["Exchange Rate", data.EXCHANGE_RATE   || ""],
-//       ["VAT Rule", data.VAT_RULE_NAME || ""],
-//       ["Address", data.SUPP_ADDRESS || ""],
-//       ["Contact Person", data.SUPP_CONTACT || ""],
-//       ["Email", data.SUPPLIER_EMAIL || ""],
-//       ["Contact No", data.SUPP_MOBILE || ""],
-//     ]
-//   });
-
-//   y = (doc as any).lastAutoTable.finalY + 10;
-
-//   // ====================================================
-//   //  SHIPPING DETAILS
-//   // ====================================================
-//   doc.setFontSize(11);
-//   doc.setFont("helvetica", "bold");
-//   doc.text("Shipping Details", 15, y);
-
-//   y += 5;
-
-//   autoTable(doc, {
-//     startY: y,
-//     theme: "grid",
-//     headStyles: { fillColor: [245, 245, 245] },
-//     styles: { fontSize: 9, cellPadding: 2 },
-//     margin: { left: 15, right: 15 },
-//     body: [
-//       ["Shipping Address", data.SHIP_TO || ""],
-//       ["Purpose", data.PURPOSE || ""],
-//       ["Contact Name", data.CONTACT_NAME || ""],
-//       ["Mobile", data.CONTACT_MOBILE || ""],
-//     ]
-//   });
-
-//   y = (doc as any).lastAutoTable.finalY + 10;
-
-//   // ====================================================
-//   //  TERMS & CONDITIONS
-//   // ====================================================
-//   doc.setFontSize(11);
-//   doc.setFont("helvetica", "bold");
-//   doc.text("Terms & Conditions", 15, y);
-
-//   y += 5;
-
-//   autoTable(doc, {
-//     startY: y,
-//     theme: "grid",
-//     headStyles: { fillColor: [245, 245, 245] },
-//     styles: { fontSize: 9, cellPadding: 2 },
-//     margin: { left: 15, right: 15 },
-//     body: [
-//       ["Shipment Method", data.DELIVERY_TERM || ""],
-//       ["Payment", data.PAY_TERM || ""],
-//       ["Delivery Date", data.DELIVERY_DATE || ""],
-//       ["Reference", data.DELIVERY_DESC || ""],
-//       ["Notes", data.NOTES || ""],
-//       ["Narration", data.NARRATION || ""],
-//       ["Issued By", data.ISSUED_EMP_ID || ""]
-//     ]
-//   });
-
-
-//   // ====================================================
-// //  DETAIL TAB – ITEMS TABLE
-// // ====================================================
-// y = (doc as any).lastAutoTable.finalY + 10;
-
-// // Table Title
-// doc.setFontSize(11);
-// doc.setFont("helvetica", "bold");
-// doc.text("Items", 15, y);
-
-// y += 5;
-
-// // Prepare table data
-// const itemRows = data.PoDetails?.map((item: any, index: number) => [
-//   index + 1,
-//   item.ITEM_CODE || "",
-//   item.ITEM_DESC || "",
-//   item.UOM || "",
-//   item.PACKING || "",
-//   (item.PRICE || 0).toLocaleString(),
-//   item.QUANTITY || 0,
-//   item.DISC_PERCENT || 0,
-//   (item.TOTAL_AMOUNT || 0).toLocaleString()
-// ]) || [];
-
-// // ITEMS TABLE
-// autoTable(doc, {
-//   startY: y,
-//   theme: "striped",
-//   headStyles: { fillColor: [195, 225, 255],textColor: 20 },   // light blue header
-//   styles: { fontSize: 9, cellPadding: 2 },
-//   margin: { left: 15, right: 15 },
-//   head: [[
-//     "Sl No", "Item Code", "Description", "UOM", "Packing",
-//     "Price", "Qty", "Disc%", "Total"
-//   ]],
-//   body: itemRows
-// });
-
-// y = (doc as any).lastAutoTable.finalY + 5;
-
-// // =======================
-// // TABLE FOOTER TOTALS
-// // =======================
-
-// // const totalQty = data.PoDetails?.reduce((sum: any, it: any) => sum + (it.Qty || 0), 0) || 0;
-// // const totalTaxable = data.GROSS_AMOUNT || 0;
-//  const grandTotal = data.NET_AMOUNT || 0;
-
-
-// autoTable(doc, {
-//   startY: y,
-//   theme: "plain",
-//   styles: { fontSize: 10, fontStyle: "bold" },
-//   margin: { left: 15, right: 15 },
-//   body: [
-//     // ["Total Qty", totalQty],
-//     // ["Total Taxable", totalTaxable.toLocaleString()],
-//     ["Grand Total", grandTotal.toLocaleString()]
-//   ]
-// });
-
-
-// // ====================================================
-// //  ATTACHMENTS TAB
-// // ====================================================
-// // y = (doc as any).lastAutoTable.finalY + 15;
-
-// // // Section Title
-// // doc.setFontSize(11);
-// // doc.setFont("helvetica", "bold");
-// // doc.text("Attachments", 15, y);
-
-// // y += 8;
-
-// // // Convert attachments to table rows
-// // const attachmentRows = data.Attachments?.map((att: any) => [
-// //   att.FileName || "",
-// //   att.Remarks || ""
-// // ]) || [];
-
-// // // ATTACHMENTS TABLE
-// // autoTable(doc, {
-// //   startY: y,
-// //   theme: "striped",
-// //   headStyles: { fillColor: [220, 230, 255] },
-// //   styles: { fontSize: 10, cellPadding: 3 },
-// //   margin: { left: 15, right: 15 },
-// //   head: [["File Name", "Remarks"]],
-// //   body: attachmentRows,
-// // });
-
-
-// // ====================================================
-// //  HISTORY TAB
-// // ====================================================
-// // y = (doc as any).lastAutoTable.finalY + 15;
-
-// // // Section Title
-// // doc.setFontSize(11);
-// // doc.setFont("helvetica", "bold");
-// // doc.text("History", 15, y);
-
-// // y += 8;
-
-// // // Convert attachments to table rows
-// // const historyRows = data.History?.map((att: any) => [
-// //   att.SlNo || "",
-// //   att.DateTime || "",
-// //   att.Description || "",
-// //   att.User || ""
-// // ]) || [];
-
-// // // ATTACHMENTS TABLE
-// // autoTable(doc, {
-// //   startY: y,
-// //   theme: "striped",
-// //   headStyles: { fillColor: [220, 230, 255] },
-// //   styles: { fontSize: 10, cellPadding: 3 },
-// //   margin: { left: 15, right: 15 },
-// //   head: [["SlNo", "DateTime", "Description", "User"]],
-// //   body: historyRows,
-// // });
-
-//   // -------------------- EXPORT --------------------
-//   const pdfBlob = doc.output('blob');
-//   const pdfUrl = URL.createObjectURL(pdfBlob);
-//   return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
-// }
 get_pdf(data: any): SafeResourceUrl {
 
   const doc = new jsPDF("p", "mm", "a4");
   const pageWidth = doc.internal.pageSize.width;
-  let y = 20; // start after header
+  const margin = 12;
+  let y = 12;
 
-  // -----------------------
-  //  GLOBAL STYLE HELPERS
-  // -----------------------
+  // ===========================
+  //  HEADER - COMPANY DETAILS
+  // ===========================
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.text(data.COMPANY_NAME || "RADIANT MOULDS & COMPOUNDS", margin, y);
 
-  function sectionHeader(title: string) {
-    doc.setFillColor(230, 230, 230); // light grey
-    doc.rect(15, y, pageWidth - 30, 7, "F");
-    doc.setFont("helvetica", "bold").setFontSize(11);
-    doc.text(title, 20, y + 5);
-    y += 12; // spacing after title bar
-  }
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  y += 6;
+  doc.text(data.ADDRESS1 || "43/981, Rahiman Bazar", margin, y);
+  y += 5;
+  doc.text(data.ADDRESS2 || "Cheruvannur", margin, y);
+  y += 5;
+  doc.text(data.ADDRESS3 || "Calicut - 673655, Kerala, India", margin, y);
+  y += 5;
 
-  function boxed(autoTableYStart: number) {
-    const boxEnd = (doc as any).lastAutoTable.finalY;
-    doc.setDrawColor(180); // light grey border
-    doc.rect(15, autoTableYStart - 5, pageWidth - 30, boxEnd - autoTableYStart + 10);
-    y = boxEnd + 12;
-  }
+  doc.text("Mob :", margin, y);
+  doc.text(data.CONTACT_MOBILE || "0495-2421733", margin + 18, y);
+  y += 5;
+  doc.text("Email :", margin, y);
+  doc.text(data.EMAIL || "enquiry@mmarkgroup.com", margin +18, y);
 
-  const tableStyle = {
-    theme: "grid",
-    headStyles: {
-      fillColor: [245, 245, 245],
-      textColor: 20,
-      fontSize: 9,
-      halign: "center"
-    },
-    styles: { fontSize: 9, cellPadding: 2, valign: "middle" },
-    columnStyles: {
-      0: { cellWidth: 45, fontStyle: "bold" },
-      1: { cellWidth: pageWidth - 75 }
-    },
-    margin: { left: 15, right: 15 }
-  };
+  // Horizontal Line
+  y += 8;
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, pageWidth - margin, y);
 
-  // -----------------------
-  //   HEADER BAR / TITLE
-  // -----------------------
-  doc.setFillColor(15, 60, 120);
-  doc.rect(0, 0, pageWidth, 18, "F");
-  doc.setFontSize(15).setFont("helvetica", "bold").setTextColor(255, 255, 255);
-  doc.text("PURCHASE ORDER", pageWidth / 2, 12, { align: "center" });
-  doc.setTextColor(0, 0, 0);
+  // ===========================
+  //  TITLE - LOCAL PURCHASE ORDER
+  // ===========================
+  y += 10;
+  doc.setFont("helvetica", "bold").setFontSize(14);
+  doc.text("LOCAL PURCHASE ORDER", pageWidth / 2, y, { align: "center" });
 
-  // =============================
-  // 1. PO HEADER DETAILS
-  // =============================
-  sectionHeader("PO Details");
-  let boxStartY = y;
+  // ===========================
+  //  TWO COLUMN MAIN DETAILS
+  // ===========================
+  y += 12;
+  doc.setFontSize(10);
 
-  autoTable(doc, {
-  startY: y,
-  theme: "grid" as ThemeType,
-  headStyles: {
-    fillColor: [245, 245, 245],
-    textColor: 20,
-    fontSize: 9,
-    halign: "center"
-  },
-  styles: {
-    fontSize: 9,
-    cellPadding: 2,
-    valign: "middle"
-  },
-  columnStyles: {
-    0: { cellWidth: 45, fontStyle: "bold" },
-    1: { cellWidth: pageWidth - 75 }
-  },
-  margin: { left: 15, right: 15 },
-  body: [
-    ["PO No", data.PO_NO || ""],
-    ["Date", data.PO_DATE || ""],
-    ["Reference No", data.REF_NO || ""],
-    ["Supplier", data.SUPP_NAME || ""],
-    ["Store", data.STORE || ""]
-  ]
-} as UserOptions);
+  const leftX = margin;
+  const rightX = pageWidth / 2 + 5;
 
+  doc.text("Date :", leftX, y);
+  doc.text(data.PO_DATE || "", leftX + 25, y);
 
-  boxed(boxStartY);
+  doc.text("LPO NO. :", rightX, y);
+  doc.text(data.PO_NO || "", rightX + 30, y);
 
-  // =============================
-  // 2. SUPPLIER DETAILS
-  // =============================
-  sectionHeader("Supplier Details");
-  boxStartY = y;
+  y += 8;
+  doc.text("Supplier :", leftX, y);
+  doc.text(data.SUPP_NAME || "", leftX + 25, y);
 
-autoTable(doc, {
-  startY: y,
-  theme: "grid" as ThemeType,
-  headStyles: {
-    fillColor: [245, 245, 245],
-    textColor: 20,
-    fontSize: 9,
-    halign: "center"
-  },
-  styles: {
-    fontSize: 9,
-    cellPadding: 2,
-    valign: "middle"
-  },
-  columnStyles: {
-    0: { cellWidth: 45, fontStyle: "bold" },
-    1: { cellWidth: pageWidth - 75 }
-  },
-  margin: { left: 15, right: 15 },
-  body: [
-    ["Currency", data.CURRENCY_NAME || ""],
-    ["Exchange Rate", data.EXCHANGE_RATE || ""],
-    ["VAT Rule", data.VAT_RULE_NAME || ""],
-    ["Address", data.SUPP_ADDRESS || ""],
-    ["Contact Person", data.SUPP_CONTACT || ""],
-    ["Email", data.SUPPLIER_EMAIL || ""],
-    ["Contact No", data.SUPP_MOBILE || ""]
-  ]
-} as UserOptions);
+  doc.text("Po Date :", rightX, y);
+  doc.text(data.PO_DATE || "", rightX + 30, y);
 
+  y += 8;
+  doc.text("Address :", leftX, y);
+  doc.text(data.SUPP_ADDRESS || "", leftX + 25, y);
 
-  boxed(boxStartY);
+  doc.text("Ship to :", rightX, y);
+  doc.text(data.SHIP_TO || "", rightX + 30, y);
 
-  // =============================
-  // 3. SHIPPING DETAILS
-  // =============================
-  sectionHeader("Shipping Details");
-  boxStartY = y;
+  y += 8;
+  doc.text("Contact Person :", leftX, y);
+  doc.text(data.SUPP_CONTACT || "", leftX + 32, y);
 
-autoTable(doc, {
-  startY: y,
-  theme: "grid" as ThemeType,
-  headStyles: {
-    fillColor: [245, 245, 245],
-    textColor: 20,
-    fontSize: 9,
-    halign: "center"
-  },
-  styles: {
-    fontSize: 9,
-    cellPadding: 2,
-    valign: "middle"
-  },
-  columnStyles: {
-    0: { cellWidth: 45, fontStyle: "bold" },
-    1: { cellWidth: pageWidth - 75 }
-  },
-  margin: { left: 15, right: 15 },
-  body: [
-    ["Shipping Address", data.SHIP_TO || ""],
-    ["Purpose", data.PURPOSE || ""],
-    ["Contact Name", data.CONTACT_NAME || ""],
-    ["Mobile", data.CONTACT_MOBILE || ""]
-  ]
-} as UserOptions);
+  doc.text("Purpose :", rightX, y);
+  doc.text(data.PURPOSE || "", rightX + 30, y);
 
+  y += 8;
+  doc.text("Contact No. :", leftX, y);
+  doc.text(data.SUPP_MOBILE || "", leftX + 30, y);
 
-  boxed(boxStartY);
+  doc.text("Location :", rightX, y);
+  doc.text(data.LOCATION || "", rightX + 30, y);
 
-  // =============================
-  // 4. TERMS & CONDITIONS
-  // =============================
-  sectionHeader("Terms & Conditions");
-  boxStartY = y;
+  y += 8;
+  doc.text("Contact Person :", rightX, y);
+  doc.text(data.CONTACT_NAME || "", rightX + 30, y);
 
- autoTable(doc, {
-  startY: y,
-  theme: "grid" as ThemeType,
-  headStyles: {
-    fillColor: [245, 245, 245],
-    textColor: 20,
-    fontSize: 9,
-    halign: "center"
-  },
-  styles: {
-    fontSize: 9,
-    cellPadding: 2,
-    valign: "middle"
-  },
-  columnStyles: {
-    0: { cellWidth: 45, fontStyle: "bold" },
-    1: { cellWidth: pageWidth - 75 }
-  },
-  margin: { left: 15, right: 15 },
-  body: [
-    ["Shipment Method", data.DELIVERY_TERM || ""],
-    ["Payment", data.PAY_TERM || ""],
-    ["Delivery Date", data.DELIVERY_DATE || ""],
-    ["Reference", data.DELIVERY_DESC || ""],
-    ["Notes", data.NOTES || ""],
-    ["Narration", data.NARRATION || ""],
-    ["Issued By", data.ISSUED_EMP_ID || ""]
-  ]
-} as UserOptions);
+  y += 8;
+  doc.text("Contact No :", rightX, y);
+  doc.text(data.CONTACT_MOBILE || "", rightX + 30, y);
 
+  // ========= TABLE HEADER (Ship Method Row) =========
+  y += 12;
+  doc.setLineWidth(0.3);
 
-  boxed(boxStartY);
+  const tableWidth = pageWidth - margin * 2;
+  const colWidth = tableWidth / 5;
+  let x = margin;
 
-  // =============================
-  // 5. ITEMS TABLE
-  // =============================
-  sectionHeader("Items");
+  const headers = [
+    "Ship Method",
+    "Payment Terms",
+    "Currency",
+    "Delivery Date",
+    "Remarks (If any)"
+  ];
+
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  headers.forEach((h, idx) => {
+    doc.rect(x, y, colWidth, 10);
+    doc.text(h, x + 2, y + 6);
+    x += colWidth;
+  });
+
+  // second row with values
+  y += 10;
+  x = margin;
+  const values = [
+    data.DELIVERY_TERM || "",
+    data.PAY_TERM || "",
+    data.CURRENCY_NAME || "",
+    this.formatDateToDDMMYYYY(data.DELIVERY_DATE || ""),
+    data.NOTES || ""
+  ];
+
+  doc.setFont("helvetica", "normal");
+  values.forEach(val => {
+    doc.rect(x, y, colWidth, 10);
+    doc.text(String(val), x + 2, y + 6);
+    x += colWidth;
+  });
+
+  // ===========================
+  // ITEMS TABLE
+  // ===========================
+  y += 15;
 
   const itemRows =
-    data.PoDetails?.map((item: any, index: number) => [
-      index + 1,
+    data.PoDetails?.map((item: any, i: number) => [
+      i + 1,
       item.ITEM_CODE || "",
       item.ITEM_DESC || "",
       item.UOM || "",
       item.PACKING || "",
-      (item.PRICE || 0).toLocaleString(),
-      item.QUANTITY || 0,
-      item.DISC_PERCENT || 0,
-      (item.TOTAL_AMOUNT || 0).toLocaleString()
+      item.PRICE || "",
+      item.QUANTITY || "",
+      item.DISC_PERCENT || "",
+      item.TOTAL_AMOUNT || 0,
     ]) || [];
 
   autoTable(doc, {
     startY: y,
-   theme: "grid" as const,
-    headStyles: { fillColor: [200, 220, 255], halign: "center", fontSize: 9 },
-    styles: { fontSize: 9, cellPadding: 2 },
-    margin: { left: 15, right: 15 },
+    theme: "grid",
+    headStyles: { fillColor: [230, 230, 230],textColor: 0, fontSize: 9, halign: "center" },
+    styles: { fontSize: 9, valign: "middle", cellPadding: 2 },
+    margin: { left: margin, right: margin },
     head: [
       [
-        "Sl No",
+        "Sl#",
         "Item Code",
         "Description",
         "UOM",
         "Packing",
         "Price",
-        "Qty",
-        "Disc%",
-        "Total"
+        "Quantity",
+        "Discount (%)",
+        "Total Amount",
       ]
     ],
     body: itemRows
   });
 
-  y = (doc as any).lastAutoTable.finalY + 8;
+  y = (doc as any).lastAutoTable.finalY + 10;
 
-  // =============================
-  // 6. TOTAL SUMMARY
-  // =============================
-  const grandTotal = data.NET_AMOUNT || 0;
+  // ===========================
+  //  TOTAL SECTION (Bottom Right)
+  // ===========================
+  doc.setFont("helvetica", "bold").setFontSize(11);
 
-  autoTable(doc, {
-    startY: y,
-    theme: "plain",
-    styles: { fontSize: 11, fontStyle: "bold" },
-    margin: { left: 15, right: 15 },
-    body: [["Grand Total", grandTotal.toLocaleString()]]
-  });
+  const amtX = pageWidth - margin - 50;
+  doc.text("Total Amount :", amtX, y);
+  doc.text(String(data.NET_AMOUNT || 0), amtX + 35, y);
 
-  // ------------------------------
-  // EXPORT PDF
-  // ------------------------------
-  const pdfBlob = doc.output("blob");
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+  // ===========================
+//  FOOTER (E & OE + SIGNATORY)
+// ===========================
+
+y += 20; // spacing after total
+
+doc.setFont("helvetica", "bold").setFontSize(10);
+
+// Left side – E & OE
+doc.text("E & OE", margin, y);
+
+// Right side – Authorised Signatory
+doc.text("Authorised Signatory", pageWidth - margin - 40, y);
+
+
+  // ===========================
+  //  RETURN PDF
+  // ===========================
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+}
+
+formatDateToDDMMYYYY(dateString: any): string {
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString; // if invalid, return as is
+
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const yyyy = date.getFullYear();
+
+  return `${dd}/${mm}/${yyyy}`;
 }
 
 

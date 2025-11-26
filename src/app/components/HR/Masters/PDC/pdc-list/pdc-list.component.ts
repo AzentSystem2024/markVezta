@@ -107,6 +107,8 @@ isEditReadOnly: boolean = false;
     },
     elementAttr: { class: 'add-button' }
   };
+  selectPDC: any;
+  PDCid: any;
 
    //========================Export data ==========================
   onExporting(event: any) {
@@ -509,6 +511,8 @@ gridButtons = [
   selected_PDC(event:any){
     console.log(event,' event of select')
   const id =event.data.ID
+  this.PDCid = event.data.ID
+  this.selectPDC = id
   console.log(id,'id')
   this.dataservice.Select_PDC(id).subscribe((res:any)=>{
     console.log('response from select packing api:', res);
