@@ -62,7 +62,7 @@
                     [readOnly]="isReadOnlyMode"
                   ></dx-select-box>
                 </div>
-                <div style="margin-top: -6px; display: flex; gap: 10px">
+                <!-- <div style="margin-top: -6px; display: flex; gap: 10px">
                   <dx-select-box
                     [(value)]="deliveryFormData.CUST_ID"
                     [dataSource]="customer"
@@ -75,22 +75,34 @@
                     [readOnly]="isReadOnlyMode"
                     (onValueChanged)="customerChanged($event)"
                   ></dx-select-box>
-                  <!-- -->
-                </div>
+                 
+                </div> -->
               </div>
             </dxi-item>
 
             <dxi-item location="after" locateInMenu="auto">
               <div class="stacked-toolbar-group">
                 <div style="display: flex; align-items: center; gap: 5px">
+                  <dx-select-box
+                    [(value)]="deliveryFormData.CUST_ID"
+                    [dataSource]="customer"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="405"
+                    [searchEnabled]="true"
+                    label="Customer"
+                    labelMode="floating"
+                    [readOnly]="isReadOnlyMode"
+                    (onValueChanged)="customerChanged($event)"
+                  ></dx-select-box>
                   <!-- Reference No -->
-                  <dx-text-box
+                  <!-- <dx-text-box
                     [(value)]="deliveryFormData.CONTACT_NAME"
                     label="Contact Name"
                     labelMode="floating"
                     [width]="'100%'"
                     [readOnly]="true"
-                  ></dx-text-box>
+                  ></dx-text-box> -->
 
                   <!-- Plus Button -->
                   <dx-button
@@ -103,6 +115,19 @@
                     [disabled]="isReadOnlyMode || !deliveryFormData.CUST_ID"
                   ></dx-button>
                 </div>
+                <div style="margin-top: 10px">
+                  <dx-radio-group
+                    [(value)]="deliveryFormData.TYPE"
+                    [items]="[
+                      { id: 'T_OUT', text: 'Transfer Out' },
+                      { id: 'D_NOTE', text: 'Delivery Note' }
+                    ]"
+                    valueExpr="id"
+                    displayExpr="text"
+                    layout="horizontal"
+                  >
+                  </dx-radio-group>
+                </div>
                 <div
                   style="
                     display: flex;
@@ -111,7 +136,7 @@
                     align-items: flex-start;
                   "
                 >
-                  <div style="flex: 1">
+                  <!-- <div style="flex: 1">
                     <dx-text-box
                       [(value)]="deliveryFormData.CONTACT_FAX"
                       label="Fax"
@@ -120,7 +145,7 @@
                       [readOnly]="true"
                     >
                     </dx-text-box>
-                  </div>
+                  </div> -->
                 </div>
 
                 <div
@@ -131,7 +156,7 @@
                     align-items: flex-start;
                   "
                 >
-                  <div style="flex: 1">
+                  <!-- <div style="flex: 1">
                     <dx-text-box
                       [(value)]="deliveryFormData.CONTACT_PHONE"
                       label="Phone"
@@ -140,9 +165,9 @@
                       [readOnly]="true"
                     >
                     </dx-text-box>
-                  </div>
+                  </div> -->
 
-                  <div style="flex: 1">
+                  <!-- <div style="flex: 1">
                     <dx-text-box
                       [(value)]="deliveryFormData.CONTACT_MOBILE"
                       label="Mobile"
@@ -151,7 +176,7 @@
                       [readOnly]="true"
                     >
                     </dx-text-box>
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </dxi-item>
@@ -164,17 +189,17 @@
             [visible]="false"
           >
           </dxi-column>
-          <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
+          <!-- <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column> -->
           <dxi-column
-            dataField="ITEM_CODE"
-            caption="Item Code"
+            dataField="BRAND"
+            caption="Brand"
             [width]="250"
             [allowEditing]="false"
           >
           </dxi-column>
           <dxi-column
-            dataField="DESCRIPTION"
-            caption="Description"
+            dataField="ART_NO"
+            caption="Art No"
             [allowEditing]="false"
           ></dxi-column>
           <!-- <dxi-column
@@ -334,13 +359,16 @@
       ></dxi-item>
     </dxo-toolbar>
     <dxi-column
-      dataField="ITEM_CODE"
+      dataField="SO_DETAIL_ID"
       caption="Item Code"
       visible="false"
     ></dxi-column>
-    <dxi-column dataField="ITEM_NAME" caption="Item"></dxi-column>
-    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-    <dxi-column dataField="UOM" caption="UOM"></dxi-column>
+    <dxi-column dataField="BRAND" caption="Brand"></dxi-column>
+    <dxi-column dataField="ART_NO" caption="Art No"></dxi-column>
+    <dxi-column dataField="PACKING" caption="Packing"></dxi-column>
+    <dxi-column dataField="ARTICLE_TYPE" caption="Article Type"></dxi-column>
+    <dxi-column dataField="COLOR" caption="Article Type"></dxi-column>
+    <dxi-column dataField="CATEGORY" caption="Category"></dxi-column>
     <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
     <dxi-column dataField="REMARKS" caption="Remark"></dxi-column>
     <!-- <dxi-column

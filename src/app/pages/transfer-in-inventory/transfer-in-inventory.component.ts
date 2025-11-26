@@ -163,22 +163,26 @@ export class TransferInInventoryComponent {
     this.dataService
       .getTransferInForInventoryMainList()
       .subscribe((response: any) => {
-        this.transferInList = response.data.map((item: any) => {
-          let dateValue: Date;
+        this.transferInList = response.data
+          .map((item: any) => {
+            let dateValue: Date;
 
-          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-          if (!isNaN(Date.parse(item.TRANSFER_DATE))) {
-            dateValue = new Date(item.TRANSFER_DATE);
-          } else {
-            // Case 2: If backend gives dd-MM-yyyy format
-            dateValue = this.parseDateString(item.TRANSFER_DATE);
-          }
+            // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
+            if (!isNaN(Date.parse(item.TRANSFER_DATE))) {
+              dateValue = new Date(item.TRANSFER_DATE);
+            } else {
+              // Case 2: If backend gives dd-MM-yyyy format
+              dateValue = this.parseDateString(item.TRANSFER_DATE);
+            }
 
-          return {
-            ...item,
-            TRANSFER_DATE: dateValue,
-          };
-        });
+            return {
+              ...item,
+              TRANSFER_DATE: dateValue,
+            };
+          })
+          .sort(
+            (a: any, b: any) => Number(b.TRANSFER_NO) - Number(a.TRANSFER_NO)
+          );
 
         this.applyDateFilter();
       });

@@ -173,7 +173,7 @@ export class TransferOutInventoryComponent {
             TRANSFER_DATE: dateValue,
             DESTINATION_STORE: item.STORE_NAME,
           };
-        });
+        }).sort((a: any, b: any) => Number(b.ISSUE_NO) - Number(a.ISSUE_NO));
 
         console.log('TransferOutList after mapping:', this.transferOutList);
         this.applyDateFilter();

@@ -149,6 +149,8 @@ export class AddMiscellaneousPaymentComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedstoreId: any;
+  HSNCODE: any;
+  GST: any;
 
   constructor(private dataService: DataService, private ngZone: NgZone) {}
 
@@ -166,20 +168,17 @@ export class AddMiscellaneousPaymentComponent {
     if (this.EditingResponseData) {
       console.log('EditingResponseData on init:', this.EditingResponseData);
     }
-    if (this.isEditing) {
-      this.isEditDataAvailable(); // load edit data
-    } else {
-      this.getPendingNo(); // only fetch new number in add mode
-    }
+
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.userId = userData?.USER_ID;
       this.companyId = userData?.SELECTED_COMPANY?.COMPANY_ID;
       this.finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
-
-      console.log('User ID:', this.userId);
-      console.log('Company ID:', this.companyId);
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log('HSNCODE:', this.HSNCODE);
+      console.log('GST:', this.GST);
       console.log('Financial ID:', this.finId);
 
       if (userData.USER_ID) {
@@ -190,6 +189,11 @@ export class AddMiscellaneousPaymentComponent {
       if (firstFinYear?.FIN_ID) {
         this.miscFormData.FIN_ID = firstFinYear.FIN_ID;
       }
+    }
+    if (this.isEditing) {
+      this.isEditDataAvailable(); // load edit data
+    } else {
+      this.getPendingNo(); // only fetch new number in add mode
     }
     this.getLedgerCodeDropdown();
     this.get_Department_dropdown();
@@ -260,6 +264,7 @@ export class AddMiscellaneousPaymentComponent {
         AMOUNT: item.AMOUNT ?? null,
         TAX: item.VAT_PERCENT ?? null,
         TAX_AMOUNT: item.VAT_AMOUNT ?? null,
+        HSN_CODE: this.HSNCODE,
       }));
     } else {
       // Keep one empty row
@@ -271,6 +276,7 @@ export class AddMiscellaneousPaymentComponent {
           AMOUNT: null,
           TAX: null,
           TAX_AMOUNT: null,
+          HSN_CODE: '',
         },
       ];
     }
@@ -402,14 +408,19 @@ export class AddMiscellaneousPaymentComponent {
           (item: any) => item.HEAD_CODE === args.value
         );
         e.setValue(args.value);
+
         if (selectedLedger) {
-          e.component.cellValue(
-            rowIndex,
-            'ledgerName',
-            selectedLedger.HEAD_NAME
-          );
+          const grid = this.itemsGridRef?.instance;
+
+          // Set ledgerName
+          grid.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
+
+          //  Auto-fill HSN + GST %
+          grid.cellValue(rowIndex, 'HSN_CODE', this.HSNCODE);
+          grid.cellValue(rowIndex, 'TAX', this.GST);
+
           setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'DESCRIPTION');
+            grid.editCell(rowIndex, 'DESCRIPTION');
           }, 50);
         }
       };
@@ -431,12 +442,19 @@ export class AddMiscellaneousPaymentComponent {
           (item: any) => item.HEAD_NAME === args.value
         );
         e.setValue(args.value);
+
         if (selectedLedger) {
-          e.component.cellValue(
-            rowIndex,
-            'ledgerCode',
-            selectedLedger.HEAD_CODE
-          );
+          const grid = this.itemsGridRef?.instance;
+
+          // Set ledgerCode
+          grid.cellValue(rowIndex, 'ledgerCode', selectedLedger.HEAD_CODE);
+
+          // Auto-fill HSN + GST %
+          grid.cellValue(rowIndex, 'HSN_CODE', this.HSNCODE);
+          grid.cellValue(rowIndex, 'TAX', this.GST);
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'DESCRIPTION');
+          }, 50);
         }
       };
     }

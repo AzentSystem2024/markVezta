@@ -182,12 +182,27 @@
               [readOnly]="true"
             ></dx-text-box>
 
-            <dx-check-box
+            <!-- <dx-check-box
               *ngIf="isEditing && !isReadOnlyMode"
               [(value)]="isApproved"
               text="Approve"
               class="approve-checkbox"
-            ></dx-check-box>
+            ></dx-check-box> -->
+
+            <div class="approve-container">
+              <dx-check-box
+                [value]="isReadOnlyMode ? true : transferInFormData.IS_APPROVED"
+                (valueChange)="
+                  !isReadOnlyMode
+                    ? (transferInFormData.IS_APPROVED = $event)
+                    : null
+                "
+                [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+                [readOnly]="isReadOnlyMode"
+                stylingMode="outlined"
+              >
+              </dx-check-box>
+            </div>
 
             <div class="footer-actions">
               <dx-button
@@ -197,12 +212,26 @@
                 type="normal"
               ></dx-button>
               <dx-button
+                #saveButtonRef
+                [text]="
+                  isReadOnlyMode
+                    ? 'PDF'
+                    : transferInFormData.IS_APPROVED
+                    ? 'Commit'
+                    : 'Save'
+                "
+                (onClick)="isReadOnlyMode ? openPDF() : saveTransferIn()"
+                stylingMode="contained"
+                type="default"
+                [width]="120"
+              ></dx-button>
+              <!-- <dx-button
                 *ngIf="!isReadOnlyMode"
                 [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
                 (onClick)="saveTransferIn()"
                 stylingMode="contained"
                 type="default"
-              ></dx-button>
+              ></dx-button> -->
             </div>
           </div>
         </div>

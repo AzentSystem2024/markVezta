@@ -103,6 +103,8 @@ export class EditMiscellaneousPaymentComponent {
   miscDataFromInput: any = null;
   sessionData: any;
   selected_vat_id: any;
+  HSNCODE: any;
+  GST: any;
 
   constructor(private dataService: DataService) {
     this.getLedgerCodeDropdown();
@@ -118,9 +120,10 @@ export class EditMiscellaneousPaymentComponent {
       this.userId = userData?.USER_ID;
       this.companyId = userData?.SELECTED_COMPANY?.COMPANY_ID;
       this.finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
-
-      console.log('User ID:', this.userId);
-      console.log('Company ID:', this.companyId);
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log('User ID:', this.HSNCODE);
+      console.log('Company ID:', this.GST);
       console.log('Financial ID:', this.finId);
 
       if (userData.USER_ID) {
@@ -166,9 +169,10 @@ export class EditMiscellaneousPaymentComponent {
           ...item,
           ledgerCode: item.LEDGER_CODE,
           ledgerName: ledger?.LEDGER_NAME || '',
+          HSN_CODE: this.HSNCODE,
         };
       });
-      console.log(this.ledgerList, 'INNGONCHANGES');
+      console.log(this.pendingInvoicelist, 'INNGONCHANGES');
       const matchedLedger = this.ledgerList.find(
         (ledger: any) => ledger.HEAD_CODE === this.miscFormData.LEDGER_CODE
       );
@@ -194,7 +198,7 @@ export class EditMiscellaneousPaymentComponent {
           ledgerName: ledger?.LEDGER_NAME || '',
         };
       });
-
+      console.log(this.pendingInvoicelist, 'PENDINGINVOICELIST');
       // Ensure empty row exists
       if (
         this.pendingInvoicelist.length === 0 ||

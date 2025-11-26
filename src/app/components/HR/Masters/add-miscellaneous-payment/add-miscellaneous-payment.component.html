@@ -34,7 +34,7 @@
           [editing]="{
             mode: 'cell',
             allowUpdating: true,
-            allowDeleting: true,
+            allowDeleting: !isReadOnlyMode,
             allowAdding: true,
             newRowPosition: 'last',
             useIcons: true
@@ -112,7 +112,7 @@
                   ></dx-date-box>
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
-                  <dx-text-box
+                  <!-- <dx-text-box
                     #taxRegnRef
                     [(value)]="miscFormData.VAT_REGN"
                     [label]="
@@ -125,7 +125,7 @@
                     [width]="200"
                     [readOnly]="isReadOnlyMode"
                     (onEnterKey)="focusGridFirstCell()"
-                  ></dx-text-box>
+                  ></dx-text-box> -->
                   <!-- <dx-button
                     icon="plus"
                     type="default"
@@ -174,7 +174,11 @@
             caption="Description"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
-
+          <!-- <dxi-column
+            dataField="HSN_CODE"
+            caption="HSN Code"
+            [allowEditing]="false"
+          ></dxi-column> -->
           <dxi-column
             dataField="AMOUNT"
             caption="Amount"
@@ -183,7 +187,7 @@
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
 
-          <dxi-column
+          <!-- <dxi-column
             dataField="TAX"
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
@@ -193,8 +197,8 @@
             [allowEditing]="!isReadOnlyMode"
             alignment="right"
             [width]="120"
-          ></dxi-column>
-          <dxi-column
+          ></dxi-column> -->
+          <!-- <dxi-column
             dataField="TAX_AMOUNT"
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
@@ -205,7 +209,7 @@
             [calculateCellValue]="calculateTaxAmount"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dxi-column>
+          ></dxi-column> -->
 
           <dxi-column type="buttons">
             <dxi-button name="edit"></dxi-button>

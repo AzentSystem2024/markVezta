@@ -763,6 +763,8 @@ export class ViewCustomerReceiptComponent {
     this.amountError = '';
   }
 
+  openPdf() {}
+
   cancel() {
     this.popupClosed.emit();
   }

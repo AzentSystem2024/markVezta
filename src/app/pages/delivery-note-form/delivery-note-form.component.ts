@@ -328,12 +328,13 @@ export class DeliveryNoteFormComponent {
     // Map each selected row into the DETAILS format
     this.deliveryFormData.DETAILS = selectedRows.map((row: any) => ({
       ID: row.ID,
-      ITEM_ID: row.ITEM_ID || null,
-      ITEM_CODE: row.ITEM_CODE || '',
-      DESCRIPTION: row.DESCRIPTION || '',
-      MATRIX_CODE: row.MATRIX_CODE || '',
+      BRAND: row.BRAND || '',
+      ART_NO: row.ART_NO || '',
+      PACKING: row.PACKING || '',
       REMARKS: row.REMARKS || '',
-      UOM: row.UOM || '',
+      ARTICLE_TYPE: row.ARTICLE_TYPE || '',
+      COLOR: row.COLOR || '',
+      CATEGORY: row.CATEGORY || '',
       QUANTITY: row.QUANTITY || 0,
       SO_DETAIL_ID: row.SO_DETAIL_ID || 0,
     }));
@@ -477,7 +478,7 @@ export class DeliveryNoteFormComponent {
     let isValid = true;
 
     this.deliveryFormData.DETAILS.forEach((item: any, index: number) => {
-      if (!item.ITEM_ID) {
+      if (!item.SO_DETAIL_ID) {
         notify(`Row ${index + 1}: Item is required.`, 'warning', 3000);
         isValid = false;
         return;
@@ -518,11 +519,14 @@ export class DeliveryNoteFormComponent {
       USER_ID: this.userID,
       DN_DATE: formatDate(this.deliveryFormData.DN_DATE),
       DETAILS: (this.deliveryFormData.DETAILS || []).map((item: any) => ({
-        ITEM_ID: item.ITEM_ID,
-        ITEM_CODE: item.ITEM_CODE,
-        DESCRIPTION: item.DESCRIPTION,
+        // ITEM_ID: item.ITEM_ID,
+        BRAND: item.BRAND,
+        ART_NO: item.ART_NO,
+        PACKING: item.PACKING,
+        ARTICLE_TYPE: item.ARTICLE_TYPE,
         REMARKS: item.REMARKS,
-        UOM: item.UOM,
+        COLOR: item.COLOR,
+        CATEGORY: item.CATEGORY,
         QUANTITY: item.QUANTITY || 0,
         DELIVERED_QUANTITY: item.DELIVERED_QUANTITY,
         SO_DETAIL_ID: item.SO_DETAIL_ID || 0,

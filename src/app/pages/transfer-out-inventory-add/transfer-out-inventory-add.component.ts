@@ -4,6 +4,7 @@ import {
   EventEmitter,
   Input,
   NgModule,
+  NgZone,
   Output,
   SimpleChanges,
   ViewChild,
@@ -51,6 +52,8 @@ import DataSource from 'devextreme/data/data_source';
 import { AddInvoiceComponent } from '../INVOICE/add-invoice/add-invoice.component';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-transfer-out-inventory-add',
@@ -104,15 +107,21 @@ export class TransferOutInventoryAddComponent {
     USER_ID: '',
     NARRATION: '',
     REASON_ID: '',
+    IS_APPROVED: false,
     DETAILS: [], // <-- start empty
   };
   userID: any;
   finID: any;
   companyID: any;
 
-  constructor(private dataService: DataService, private router: Router) {}
+  constructor(
+    private dataService: DataService,
+    private router: Router,
+    private ngZone: NgZone
+  ) {}
 
   ngOnInit() {
+    console.log(this.isReadOnlyMode, 'READONLYMODE');
     this.isEditDataAvailable();
 
     this.getTransferNo(); // always fetch fresh number when popup opens
@@ -154,15 +163,6 @@ export class TransferOutInventoryAddComponent {
     // this.items = [];
     // this.addEmptyRow();
   }
-  // ngOnChanges(changes: SimpleChanges) {
-  //   if (
-  //     changes['EditingResponseData'] &&
-  //     this.isEditing &&
-  //     this.EditingResponseData
-  //   ) {
-  //     console.log('✅ EditingResponseData received:', this.EditingResponseData);
-  //   }
-  // }
 
   onRowInserted(e: any) {
     // Assign SL_NO as the row count
@@ -188,7 +188,9 @@ export class TransferOutInventoryAddComponent {
       NARRATION: data.NARRATION || '',
       NET_AMOUNT: data.NET_AMOUNT,
     };
-
+    this.transferOutFormData.DETAILS.forEach((row: any, index: number) => {
+      row.SL_NO = index + 1;
+    });
     console.log('Bound transferOutFormData:', this.transferOutFormData);
   }
 
@@ -245,7 +247,7 @@ export class TransferOutInventoryAddComponent {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
 
     if (selectedRows && selectedRows.length > 0) {
-      // 🔥 remove any empty placeholder rows
+      // remove any empty placeholder rows
       this.transferOutFormData.DETAILS =
         this.transferOutFormData.DETAILS.filter(
           (item) => item.BARCODE !== '' && item.DESCRIPTION !== ''
@@ -276,6 +278,47 @@ export class TransferOutInventoryAddComponent {
   }
 
   onEditorPreparing(e: any) {
+    if (e.dataField === 'QUANTITY') {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     if (e.dataField === 'QUANTITY' && e.parentType === 'dataRow') {
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value); // commit to grid
@@ -296,7 +339,7 @@ export class TransferOutInventoryAddComponent {
   onEditorPrepared(e: any) {
     if (e.parentType === 'dataRow' && e.dataField === 'QUANTITY') {
       setTimeout(() => {
-        e.editorElement.querySelector('input')?.focus(); // 👈 focus actual input
+        e.editorElement.querySelector('input')?.focus(); //  focus actual input
       });
     }
   }
@@ -371,106 +414,6 @@ export class TransferOutInventoryAddComponent {
     return `${year}-${month}-${day}`; // ✅ preserves local date
   }
 
-  saveTransferOut() {
-    // 1. Validate required fields before saving
-    if (!this.transferOutFormData.DEST_STORE_ID) {
-      notify('Please select a store to transfer to', 'error');
-      return;
-    }
-    if (!this.transferOutFormData.REASON_ID) {
-      notify('Please select a reason', 'error');
-      return;
-    }
-    if (
-      !this.transferOutFormData.DETAILS ||
-      this.transferOutFormData.DETAILS.length === 0
-    ) {
-      notify('Please add at least one item', 'error');
-      return;
-    }
-
-    this.transferOutFormData.NET_AMOUNT =
-      this.transferOutFormData.DETAILS.reduce(
-        (sum: number, item: any) =>
-          sum + (Number(item.COST) || 0) * (Number(item.QUANTITY) || 0),
-        0
-      );
-
-    // 2. Format payload
-    const payload = {
-      ...this.transferOutFormData,
-      TRANSFER_DATE: this.formatDateLocal(
-        this.transferOutFormData.TRANSFER_DATE
-      ),
-      USER_ID: this.userID,
-      COMPANY_ID: this.companyID,
-      FIN_ID: this.finID,
-      STORE_ID: this.storeFromSession,
-    };
-
-    console.log('Final payload:', payload);
-
-    // 3. Decide whether to insert or update
-    if (this.isApproved) {
-      confirm(
-        'Are you sure you want to approve this transfer?',
-        'Confirm Approval'
-      ).then((dialogResult) => {
-        if (dialogResult) {
-          this.dataService.approveTransferOutForInventory(payload).subscribe({
-            next: (res: any) => {
-              if (res.flag === 1) {
-                notify('Transfer approved successfully!', 'success', 3000);
-                this.popupClosed.emit();
-              } else {
-                notify(
-                  'Error approving transfer: ' + res.message,
-                  'error',
-                  3000
-                );
-              }
-            },
-            error: (err) => {
-              console.error('Approve error:', err);
-              notify('Something went wrong while approving.', 'error', 3000);
-            },
-          });
-        }
-      });
-    } else if (this.isEditing) {
-      this.dataService.updateTransferOutForInventory(payload).subscribe({
-        next: (res: any) => {
-          if (res.flag === 1) {
-            notify('Transfer updated successfully!', 'success', 3000);
-            this.popupClosed.emit();
-          } else {
-            notify('Error updating transfer: ' + res.message, 'error', 3000);
-          }
-        },
-        error: (err) => {
-          console.error('Update error:', err);
-          notify('Something went wrong while updating.', 'error', 3000);
-        },
-      });
-    } else {
-      this.dataService.insertTransferOutForInventory(payload).subscribe({
-        next: (res: any) => {
-          if (res.flag === 1) {
-            notify('Transfer saved successfully!', 'success', 3000);
-            this.getTransferNo();
-            this.popupClosed.emit(); // close/reset
-          } else {
-            notify('Error saving transfer: ' + res.message, 'error', 3000);
-          }
-        },
-        error: (err) => {
-          console.error('Save error:', err);
-          notify('Something went wrong while saving.', 'error', 3000);
-        },
-      });
-    }
-  }
-
   // saveTransferOut() {
   //   // 1. Validate required fields before saving
   //   if (!this.transferOutFormData.DEST_STORE_ID) {
@@ -488,19 +431,20 @@ export class TransferOutInventoryAddComponent {
   //     notify('Please add at least one item', 'error');
   //     return;
   //   }
+
   //   this.transferOutFormData.NET_AMOUNT =
   //     this.transferOutFormData.DETAILS.reduce(
-  //       (sum: number, item: any) => sum + (Number(item.COST) || 0),
+  //       (sum: number, item: any) =>
+  //         sum + (Number(item.COST) || 0) * (Number(item.QUANTITY) || 0),
   //       0
   //     );
-  //   // 2. Format the payload (if needed)
+
+  //   // 2. Format payload
   //   const payload = {
   //     ...this.transferOutFormData,
-  //     TRANSFER_DATE: this.transferOutFormData.TRANSFER_DATE
-  //       ? new Date(this.transferOutFormData.TRANSFER_DATE)
-  //           .toISOString()
-  //           .split('T')[0]
-  //       : null,
+  //     TRANSFER_DATE: this.formatDateLocal(
+  //       this.transferOutFormData.TRANSFER_DATE
+  //     ),
   //     USER_ID: this.userID,
   //     COMPANY_ID: this.companyID,
   //     FIN_ID: this.finID,
@@ -509,23 +453,626 @@ export class TransferOutInventoryAddComponent {
 
   //   console.log('Final payload:', payload);
 
-  //   // 3. Call your API service
-  //   this.dataService.insertTransferOutForInventory(payload).subscribe({
-  //     next: (res: any) => {
-  //       if (res.flag === 1) {
-  //         notify('Transfer saved successfully!', 'success', 3000);
-  //         this.getTransferNo();
-  //         this.popupClosed.emit(); // close/reset form
-  //       } else {
-  //         notify('Error saving transfer: ' + res.message, 'error', 3000);
+  //   // 3. Decide whether to insert or update
+  //   if (this.isApproved) {
+  //     confirm(
+  //       'Are you sure you want to approve this transfer?',
+  //       'Confirm Approval'
+  //     ).then((dialogResult) => {
+  //       if (dialogResult) {
+  //         this.dataService.approveTransferOutForInventory(payload).subscribe({
+  //           next: (res: any) => {
+  //             if (res.flag === 1) {
+  //               notify('Transfer approved successfully!', 'success', 3000);
+  //               this.popupClosed.emit();
+  //             } else {
+  //               notify(
+  //                 'Error approving transfer: ' + res.message,
+  //                 'error',
+  //                 3000
+  //               );
+  //             }
+  //           },
+  //           error: (err) => {
+  //             console.error('Approve error:', err);
+  //             notify('Something went wrong while approving.', 'error', 3000);
+  //           },
+  //         });
   //       }
-  //     },
-  //     error: (err) => {
-  //       console.error('Save error:', err);
-  //       notify('Something went wrong while saving.', 'error', 3000);
-  //     },
-  //   });
+  //     });
+  //   } else if (this.isEditing) {
+  //     this.dataService.updateTransferOutForInventory(payload).subscribe({
+  //       next: (res: any) => {
+  //         if (res.flag === 1) {
+  //           notify('Transfer updated successfully!', 'success', 3000);
+  //           this.popupClosed.emit();
+  //         } else {
+  //           notify('Error updating transfer: ' + res.message, 'error', 3000);
+  //         }
+  //       },
+  //       error: (err) => {
+  //         console.error('Update error:', err);
+  //         notify('Something went wrong while updating.', 'error', 3000);
+  //       },
+  //     });
+  //   } else {
+  //     this.dataService.insertTransferOutForInventory(payload).subscribe({
+  //       next: (res: any) => {
+  //         if (res.flag === 1) {
+  //           notify('Transfer saved successfully!', 'success', 3000);
+  //           this.getTransferNo();
+  //           this.popupClosed.emit(); // close/reset
+  //         } else {
+  //           notify('Error saving transfer: ' + res.message, 'error', 3000);
+  //         }
+  //       },
+  //       error: (err) => {
+  //         console.error('Save error:', err);
+  //         notify('Something went wrong while saving.', 'error', 3000);
+  //       },
+  //     });
+  //   }
   // }
+
+  saveTransferOut() {
+    // 1. Validate required fields
+    if (!this.transferOutFormData.DEST_STORE_ID) {
+      notify('Please select a store to transfer to', 'error');
+      return;
+    }
+    if (!this.transferOutFormData.REASON_ID) {
+      notify('Please select a reason', 'error');
+      return;
+    }
+    if (
+      !this.transferOutFormData.DETAILS ||
+      this.transferOutFormData.DETAILS.length === 0
+    ) {
+      notify('Please add at least one item', 'error');
+      return;
+    }
+
+    // 2. Calculate totals
+    this.transferOutFormData.NET_AMOUNT =
+      this.transferOutFormData.DETAILS.reduce(
+        (sum: number, item: any) =>
+          sum + (Number(item.COST) || 0) * (Number(item.QUANTITY) || 0),
+        0
+      );
+
+    // 3. Create payload (unchanged)
+    const payload = {
+      ...this.transferOutFormData,
+      TRANSFER_DATE: this.formatDateLocal(
+        this.transferOutFormData.TRANSFER_DATE
+      ),
+      USER_ID: this.userID,
+      COMPANY_ID: this.companyID,
+      FIN_ID: this.finID,
+      STORE_ID: this.storeFromSession,
+    };
+
+    console.log('Final payload:', payload);
+
+    // ============================================================
+    // ------------------ UPDATED APPROVAL LOGIC -------------------
+    // ============================================================
+
+    // ---------- EDIT MODE ----------
+    if (this.isEditing) {
+      if (this.transferOutFormData.IS_APPROVED) {
+        // APPROVE API
+        confirm(
+          'Are you sure you want to approve this transfer?',
+          'Confirm Approval'
+        ).then((result) => {
+          if (result) {
+            this.dataService.approveTransferOutForInventory(payload).subscribe({
+              next: (res: any) => {
+                if (res.flag === 1) {
+                  notify('Transfer approved successfully!', 'success', 3000);
+                  this.ngZone.run(() => {
+                    this.popupClosed.emit();
+                  });
+                } else {
+                  notify(
+                    'Error approving transfer: ' + res.message,
+                    'error',
+                    3000
+                  );
+                }
+              },
+              error: (err) => {
+                console.error('Approve error:', err);
+                notify('Something went wrong while approving.', 'error', 3000);
+              },
+            });
+          }
+        });
+      } else {
+        // UPDATE API
+        this.dataService.updateTransferOutForInventory(payload).subscribe({
+          next: (res: any) => {
+            if (res.flag === 1) {
+              notify('Transfer updated successfully!', 'success', 3000);
+              this.popupClosed.emit();
+            } else {
+              notify('Error updating transfer: ' + res.message, 'error', 3000);
+            }
+          },
+          error: (err) => {
+            console.error('Update error:', err);
+            notify('Something went wrong while updating.', 'error', 3000);
+          },
+        });
+      }
+
+      return; // stop here
+    }
+
+    // ---------- ADD (INSERT) MODE ----------
+    if (!this.isEditing) {
+      if (this.transferOutFormData.IS_APPROVED) {
+        // CONFIRM → INSERT API
+        confirm(
+          'Do you want to approve & save this transfer?',
+          'Confirm Save'
+        ).then((result) => {
+          if (result) {
+            this.dataService.insertTransferOutForInventory(payload).subscribe({
+              next: (res: any) => {
+                if (res.flag === 1) {
+                  notify(
+                    'Transfer saved and approved successfully!',
+                    'success',
+                    3000
+                  );
+                  this.getTransferNo();
+                  this.ngZone.run(() => {
+                    this.popupClosed.emit();
+                  });
+                } else {
+                  notify(
+                    'Error saving transfer: ' + res.message,
+                    'error',
+                    3000
+                  );
+                }
+              },
+              error: (err) => {
+                console.error('Save error:', err);
+                notify('Something went wrong while saving.', 'error', 3000);
+              },
+            });
+          }
+        });
+      } else {
+        // DIRECT INSERT
+        this.dataService.insertTransferOutForInventory(payload).subscribe({
+          next: (res: any) => {
+            if (res.flag === 1) {
+              notify('Transfer saved successfully!', 'success', 3000);
+              this.getTransferNo();
+              this.popupClosed.emit();
+            } else {
+              notify('Error saving transfer: ' + res.message, 'error', 3000);
+            }
+          },
+          error: (err) => {
+            console.error('Save error:', err);
+            notify('Something went wrong while saving.', 'error', 3000);
+          },
+        });
+      }
+    }
+  }
+
+  formatDateDDMMMyyyy(dateStr: string) {
+    const date = new Date(dateStr);
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return `${date.getDate().toString().padStart(2, '0')}-${
+      months[date.getMonth()]
+    }-${date.getFullYear().toString().slice(-2)}`;
+  }
+
+  openPDF() {
+    console.log('Open PDF clicked');
+    const returnId = this.EditingResponseData.ID;
+    // Example:
+    this.dataService
+      .selectTransferOutForInventory(returnId)
+      .subscribe((res: any) => {
+        console.log(res, 'RESPONSE');
+        this.generatePDF(res);
+      });
+  }
+
+  generatePDF(data: any) {
+    console.log(data, 'DATA');
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // ============================================================
+    // 1) TOP HEADER (LOGO + RIGHT DETAILS)
+    // ============================================================
+    const headerY = 12;
+
+    const logoX = 18;
+    const logoY = headerY;
+    const logoW = 55;
+    const logoH = 22;
+
+    doc.setFillColor(225, 225, 225);
+    doc.rect(logoX, logoY, logoW, logoH, 'F');
+
+    doc.setFontSize(11);
+    doc.text('logo', logoX + logoW / 2, logoY + logoH / 2 + 3, {
+      align: 'center',
+    });
+
+    const purchDate = (data.TRANSFER_DATE || '').split('T')[0];
+    const headerBlockX = pageWidth - 65;
+    let ty = headerY + 4;
+
+    const headerLines = [
+      `Debit Note No : ${data.TRANSFER_NO}`,
+      `e-Way Bill No :`,
+      `Original Invoice No. & Date:`,
+      `Dated : ${this.formatDateDDMMMyyyy(purchDate)}`,
+    ];
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    headerLines.forEach((txt) => {
+      doc.text(txt, headerBlockX, ty);
+      ty += 6;
+    });
+
+    const lineY = logoY + logoH + 3;
+    doc.setDrawColor(180);
+    doc.line(15, lineY, pageWidth - 15, lineY);
+
+    // ============================================================
+    // 2) COMPANY BLOCK (LEFT BLUE BOX)
+    // ============================================================
+    const compBoxX = 15;
+    const compBoxY = lineY + 3;
+    const compBoxW = 95;
+
+    const companyLines = [
+      data.COMPANY_NAME,
+      data.ADDRESS1,
+      data.ADDRESS2,
+      data.ADDRESS3,
+      `GSTIN/UIN : ${data.COMPANY_CODE}`,
+      `State Name : ${data.STORE_STATE_NAME}, Code : 32`,
+      `Email : ${data.EMAIL}`,
+    ];
+
+    const lineHeight = 5;
+    const topPadding = 8;
+    const compBoxH = topPadding + companyLines.length * lineHeight + 4;
+
+    doc.setFillColor(210, 230, 255);
+    doc.rect(compBoxX, compBoxY, compBoxW, compBoxH, 'F');
+
+    let cy = compBoxY + 8;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(data.COMPANY_NAME || '', compBoxX + 5, cy);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    companyLines.slice(1).forEach((line) => {
+      cy += lineHeight;
+      if (line.startsWith('Email')) doc.setTextColor(0, 0, 255);
+      doc.text(line || '', compBoxX + 5, cy);
+      doc.setTextColor(0, 0, 0);
+    });
+
+    // ============================================================
+    // 2.1 EXTRA INFO BLOCK (LEFT-SIDE COLUMN ONLY)
+    // ============================================================
+    const infoX = compBoxX;
+    const infoBlockY = compBoxY + compBoxH + 5;
+
+    const infoW = compBoxW; // keeps it left-side only
+    const rowH = 8;
+    const totalRows = 9;
+    const infoH = totalRows * rowH;
+
+    doc.setDrawColor(0);
+    doc.rect(infoX, infoBlockY, infoW, infoH);
+
+    const splitX = infoX + infoW / 2;
+    doc.line(splitX, infoBlockY, splitX, infoBlockY + infoH);
+
+    for (let i = 1; i < totalRows; i++) {
+      doc.line(
+        infoX,
+        infoBlockY + rowH * i,
+        infoX + infoW,
+        infoBlockY + rowH * i
+      );
+    }
+
+    const leftLabels = [
+      'Invoice No.',
+      'Delivery Note',
+      'Reference No. & Date.',
+      "Buyer's Order No.",
+      'Dispatch Doc No.',
+      'Dispatched through',
+      '',
+      'Terms of Delivery',
+    ];
+
+    const rightLabels = [
+      'Dated',
+      'Mode/Terms of Payment',
+      'Other References',
+      'Dated',
+      'Delivery Note Date',
+      'Destination',
+      '',
+      '',
+    ];
+
+    let textY = infoBlockY + 6;
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+
+    leftLabels.forEach((line, i) => {
+      doc.text(line, infoX + 3, textY + i * rowH);
+    });
+
+    rightLabels.forEach((line, i) => {
+      doc.text(line, splitX + 3, textY + i * rowH);
+    });
+
+    doc.setFont('helvetica', 'bold');
+    doc.text(data.TRANSFER_NO?.toString() || '', infoX + 35, textY);
+    doc.text(this.formatDateDDMMMyyyy(purchDate), splitX + 20, textY);
+
+    // ============================================================
+    // 3) CONSIGNEE (SHIP TO) — RIGHT COLUMN
+    // ============================================================
+    let shipX = compBoxX + compBoxW + 15;
+    let shipY = compBoxY + 8; // <-- move upwards next to company block
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Consignee (Ship to)', shipX, shipY);
+
+    shipY += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    const shipLines = [
+      data.STORE_NAME,
+      data.STORE_ADDRESS1,
+      data.STORE_ADDRESS2,
+      `${data.STORE_CITY} - ${data.STORE_ZIP}`,
+      `GSTIN/UIN : ${data.STORE_CODE}`,
+      `State Name : ${data.STORE_STATE_NAME}, Code : 32`,
+    ];
+
+    shipLines.forEach((l) => {
+      doc.text(l || '', shipX, shipY);
+      shipY += 5;
+    });
+
+    // ============================================================
+    // 4) BUYER (BILL TO) — RIGHT COLUMN BELOW SHIP TO
+    // ============================================================
+    let buyerX = shipX;
+    let buyerY = shipY + shipLines.length * 5 + 12;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Buyer (Bill to)', buyerX, buyerY);
+
+    buyerY += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    const buyerLines = [...shipLines];
+
+    buyerLines.forEach((l) => {
+      doc.text(l || '', buyerX, buyerY);
+      buyerY += 5;
+    });
+
+    // ============================================================
+    // 5) TABLE
+    // ============================================================
+    const tableLineY = buyerY + 2;
+    doc.setDrawColor(180);
+    doc.line(15, tableLineY, pageWidth - 15, tableLineY);
+
+    const tableStartY = tableLineY + 4;
+
+    const rows = data.DETAILS.map((item: any, index: number) => [
+      index + 1,
+      item.BARCODE,
+      item.DESCRIPTION,
+      item.COST.toFixed(2),
+      item.QUANTITY,
+      item.QUANTITY_AVAILABLE,
+    ]);
+
+    autoTable(doc, {
+      startY: tableStartY,
+      theme: 'grid',
+      margin: { left: 15, right: 15 },
+      tableWidth: pageWidth - 30,
+      headStyles: {
+        fillColor: [240, 240, 240],
+        textColor: 0,
+        fontSize: 9,
+        halign: 'center',
+      },
+      bodyStyles: { fontSize: 9 },
+      columnStyles: {
+        0: { cellWidth: 12, halign: 'center' },
+        1: { cellWidth: 38, halign: 'center' },
+        2: { cellWidth: 70 },
+        3: { cellWidth: 20, halign: 'right' },
+        4: { cellWidth: 20, halign: 'center' },
+        5: { cellWidth: 20, halign: 'center' },
+      },
+      head: [
+        [
+          'Sl No',
+          'Barcode',
+          'Description of goods',
+          'Cost',
+          'Quantity',
+          'Quantity Available',
+        ],
+      ],
+      body: rows,
+      foot: [
+        [
+          {
+            content: 'Total',
+            colSpan: 5,
+            styles: { halign: 'right', fontStyle: 'bold' },
+          },
+          {
+            content: data.NET_AMOUNT.toFixed(2),
+            styles: { halign: 'right', fontStyle: 'bold' },
+          },
+        ],
+      ],
+    });
+
+    // ============================================================
+    // 6) FOOTER + SIGNATURE
+    // ============================================================
+    const footerY = (doc as any).lastAutoTable.finalY + 10;
+    const leftColX = 15;
+    const rightColX = pageWidth / 2 + 10;
+
+    doc.setFontSize(9);
+    doc.text('E. & O.E', leftColX, footerY);
+    doc.text(`User: ${data.USER_NAME || ''}`, leftColX, footerY + 5);
+
+    doc.text("Company's PAN", leftColX, footerY + 10);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`: ${data.PAN_NO || ''}`, leftColX + 40, footerY + 10);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text('Amount Chargeable (in words)', rightColX, footerY);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text(
+      `INR ${this.convertNumberToWords(data.NET_AMOUNT)} Only`,
+      rightColX,
+      footerY + 6
+    );
+
+    const boxY = footerY + 15;
+    const boxWidth = pageWidth - rightColX - 15;
+    const boxHeight = 25;
+
+    doc.setDrawColor(0);
+    doc.rect(rightColX, boxY, boxWidth, boxHeight);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    const companyText = `for ${data.COMPANY_NAME}`;
+    const wrappedCompanyName = doc.splitTextToSize(companyText, boxWidth - 10);
+
+    doc.text(wrappedCompanyName, rightColX + 5, boxY + 10);
+
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(10);
+    doc.text(
+      'Authorised Signatory',
+      rightColX + boxWidth - 45,
+      boxY + boxHeight - 6
+    );
+
+    doc.output('dataurlnewwindow');
+  }
+
+  convertNumberToWords(num: number): string {
+    if (num === 0) return 'Zero';
+
+    const a = [
+      '',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen',
+    ];
+
+    const b = [
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety',
+    ];
+
+    const inWords = (n: number, suffix: string): string => {
+      if (n === 0) return '';
+      if (n < 20) return a[n] + ' ' + suffix + ' ';
+      return b[Math.floor(n / 10)] + ' ' + a[n % 10] + ' ' + suffix + ' ';
+    };
+
+    let str = '';
+
+    str += inWords(Math.floor(num / 10000000), 'Crore');
+    str += inWords(Math.floor((num / 100000) % 100), 'Lakh');
+    str += inWords(Math.floor((num / 1000) % 100), 'Thousand');
+    str += inWords(Math.floor((num / 100) % 10), 'Hundred');
+
+    if (num > 100 && num % 100 > 0) str += 'and ';
+
+    str += inWords(num % 100, '');
+
+    return str.trim();
+  }
 
   cancel() {
     this.popupClosed.emit();

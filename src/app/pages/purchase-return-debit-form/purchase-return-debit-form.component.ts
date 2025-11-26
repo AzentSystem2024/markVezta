@@ -496,7 +496,7 @@ export class PurchaseReturnDebitFormComponent {
           AMOUNT: row.AMOUNT ?? 0,
           VAT_PERC: row.VAT_PERC ?? 0,
           VAT_AMOUNT: row.VAT_AMOUNT ?? 0,
-          TOTAL_AMOUNT: row.TOTAL_AMOUNT ?? 0,
+          TOTAL_AMOUNT: totalAmount,
           UOM: row.UOM ?? '',
           UOM_PURCH: row.UOM_PURCH ?? '',
           UOM_MULTIPLE: row.UOM_MULTIPLE ?? 0,
@@ -527,7 +527,7 @@ export class PurchaseReturnDebitFormComponent {
       // UPDATE API
       // If approved → call APPROVE API
       // If Approved → Ask confirmation before calling APPROVE API
-      if (this.isApproved) {
+      if (this.purchaseReturnFormData.IS_APPROVED === true) {
         const result = confirm(
           `Are you sure you want to approve this Purchase Return?`,
           'Confirm Approval'
@@ -610,8 +610,14 @@ export class PurchaseReturnDebitFormComponent {
                     'success'
                   );
                   this.resetPurchaseReturnForm();
-                  this.getDocNo();
-                  this.popupClosed.emit();
+
+                  // Fetch new Doc No and THEN close popup
+                  this.dataService
+                    .getPurchaseReturnNo()
+                    .subscribe((resp: any) => {
+                      this.purchaseReturnFormData.RET_NO = resp.PURCHASE_NO;
+                      this.popupClosed.emit();
+                    });
                 },
                 (error) => {
                   console.error('SAVE ERROR:', error);
@@ -646,6 +652,27 @@ export class PurchaseReturnDebitFormComponent {
     }
   }
 
+  formatDateDDMMMyyyy(dateStr: string) {
+    const date = new Date(dateStr);
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return `${date.getDate().toString().padStart(2, '0')}-${
+      months[date.getMonth()]
+    }-${date.getFullYear().toString().slice(-2)}`;
+  }
+
   openPDF() {
     // Call your PDF API or open a URL
     console.log('Open PDF clicked');
@@ -657,198 +684,251 @@ export class PurchaseReturnDebitFormComponent {
   }
 
   generatePDF(data: any) {
-    const doc = new jsPDF();
-
+    const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 14;
 
-    // ------------------ TITLE ------------------
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Purchase Return Invoice', pageWidth / 2, 15, { align: 'center' });
+    // ============================================================
+    // 1) TOP HEADER (LOGO + RIGHT DETAILS)
+    // ============================================================
+    const headerY = 12;
 
-    const headerFont = 11;
-    const detailFont = 9;
+    // LOGO BOX (SMALL)
+    const logoX = 18;
+    const logoY = headerY;
+    const logoW = 55;
+    const logoH = 22;
 
-    const leftX = margin;
-    const rightX = pageWidth - margin - 85;
-    let startY = 25;
+    doc.setFillColor(225, 225, 225);
+    doc.rect(logoX, logoY, logoW, logoH, 'F');
 
-    const boxWidth = 85;
+    doc.setFontSize(11);
+    doc.text('logo', logoX + logoW / 2, logoY + logoH / 2 + 3, {
+      align: 'center',
+    });
 
-    // Blue header color (match table header)
-    const headerColor = { r: 207, g: 231, b: 255 };
+    // RIGHT-TOP DETAILS
+    const rightX = pageWidth - 15;
+    let ty = headerY + 4;
 
-    // ------------------------------------------------
-    //               SHIP TO (LEFT BOX)
-    // ------------------------------------------------
-    let shipY = startY;
+    const purchDate = (data.RET_DATE || '').split('T')[0];
 
-    doc.setFillColor(headerColor.r, headerColor.g, headerColor.b);
-    doc.rect(leftX, shipY, boxWidth, 8, 'F');
+    const headerLines = [
+      `Debit Note No : ${data.RET_NO}`,
+      `e-Way Bill No :`,
+      `Original Invoice No. & Date:`,
+      `Dated : ${this.formatDateDDMMMyyyy(purchDate)}`,
+    ];
 
-    doc.setFontSize(headerFont);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Ship To', leftX + 3, shipY + 6);
-
-    shipY += 11;
-    doc.setFontSize(detailFont);
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
 
-    if (data.SUPPLIER_NAME)
-      doc.text(data.SUPPLIER_NAME, leftX + 3, shipY), (shipY += 5);
-    if (data.SUPP_ADDRESS1)
-      doc.text(data.SUPP_ADDRESS1, leftX + 3, shipY), (shipY += 5);
-    if (data.SUPP_ADDRESS2)
-      doc.text(data.SUPP_ADDRESS2, leftX + 3, shipY), (shipY += 5);
-    if (data.SUPP_ADDRESS3)
-      doc.text(data.SUPP_ADDRESS3, leftX + 3, shipY), (shipY += 5);
+    headerLines.forEach((txt) => {
+      doc.text(txt, rightX, ty, { align: 'right' });
+      ty += 6;
+    });
 
-    let cs = '';
-    if (data.SUPP_CITY) cs += data.SUPP_CITY;
-    if (data.SUPP_STATE_NAME) cs += (cs ? ' - ' : '') + data.SUPP_STATE_NAME;
-    if (data.SUPP_ZIP) cs += (cs ? ' - ' : '') + data.SUPP_ZIP;
-    if (cs) doc.text(cs, leftX + 3, shipY), (shipY += 5);
+    // LINE BELOW HEADER
+    const lineY = logoY + logoH + 3;
+    doc.setDrawColor(180);
+    doc.line(15, lineY, pageWidth - 15, lineY);
 
-    if (data.SUPP_PHONE)
-      doc.text('Phone: ' + data.SUPP_PHONE, leftX + 3, shipY), (shipY += 5);
-    if (data.SUPP_EMAIL)
-      doc.text('Email: ' + data.SUPP_EMAIL, leftX + 3, shipY), (shipY += 5);
+    // ============================================================
+    // 2) COMPANY BLOCK (LEFT BLUE BOX — DYNAMIC HEIGHT)
+    // ============================================================
+    const compBoxX = 15;
+    const compBoxY = lineY + 3; // reduced spacing
+    const compBoxW = 95;
 
-    const shipBottomY = shipY;
+    const companyLines = [
+      data.COMPANY_NAME,
+      data.ADDRESS1,
+      data.ADDRESS2,
+      data.ADDRESS3,
+      `GSTIN/UIN : ${data.COMPANY_CODE}`,
+      `State Name : ${data.SUPP_STATE_NAME}, Code : 32`,
+      `Email : ${data.EMAIL}`,
+    ];
 
-    // ------------------------------------------------
-    //            RETURN DETAILS (RIGHT BOX)
-    // ------------------------------------------------
-    let retY = startY;
+    const lineHeight = 5;
+    const topPadding = 8;
+    const compBoxH = topPadding + companyLines.length * lineHeight + 4;
 
-    doc.setFillColor(headerColor.r, headerColor.g, headerColor.b);
-    doc.rect(rightX, retY, boxWidth, 8, 'F');
+    // Draw Box
+    doc.setFillColor(210, 230, 255);
+    doc.rect(compBoxX, compBoxY, compBoxW, compBoxH, 'F');
 
-    doc.setFontSize(headerFont);
+    // Print text inside box
+    let cy = compBoxY + 8;
+
     doc.setFont('helvetica', 'bold');
-    doc.text('Return Details', rightX + 3, retY + 6);
+    doc.setFontSize(10);
+    doc.text(data.COMPANY_NAME || '', compBoxX + 5, cy);
 
-    retY += 11;
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(detailFont);
+    doc.setFontSize(9);
 
-    doc.text('Return No :', rightX + 3, retY);
-    doc.text(String(data.RET_NO), rightX + 42, retY);
-    retY += 5;
+    companyLines.slice(1).forEach((line) => {
+      cy += lineHeight;
+      if (line.startsWith('Email')) doc.setTextColor(0, 0, 255);
+      doc.text(line || '', compBoxX + 5, cy);
+      doc.setTextColor(0, 0, 0);
+    });
 
-    doc.text('Date :', rightX + 3, retY);
-    doc.text(data.RET_DATE?.split('T')[0] || '', rightX + 42, retY);
-    retY += 5;
+    // ============================================================
+    // 3) CONSIGNEE (SHIP TO)
+    // ============================================================
+    let shipX = compBoxX + compBoxW + 15;
+    let shipY = compBoxY + 8;
 
-    doc.text('Narration :', rightX + 3, retY);
-    doc.text(data.NARRATION || '-', rightX + 42, retY);
-    retY += 5;
-
-    const retBottomY = retY;
-
-    // ------------------------------------------------
-    //                 FROM (FULL WIDTH BOX)
-    // ------------------------------------------------
-    let nextY = Math.max(shipBottomY, retBottomY) + 10;
-
-    doc.setFillColor(headerColor.r, headerColor.g, headerColor.b);
-    doc.rect(margin, nextY, pageWidth - margin * 2, 8, 'F');
-
-    doc.setFontSize(headerFont);
     doc.setFont('helvetica', 'bold');
-    doc.text('From', margin + 3, nextY + 6);
+    doc.setFontSize(12);
+    doc.text('Consignee (Ship to)', shipX, shipY);
 
-    nextY += 11;
-
-    doc.setFontSize(detailFont);
+    shipY += 7;
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
 
-    if (data.COMPANY_NAME)
-      doc.text(data.COMPANY_NAME, margin + 3, nextY), (nextY += 5);
-    if (data.ADDRESS1) doc.text(data.ADDRESS1, margin + 3, nextY), (nextY += 5);
-    if (data.ADDRESS2) doc.text(data.ADDRESS2, margin + 3, nextY), (nextY += 5);
-    if (data.ADDRESS3) doc.text(data.ADDRESS3, margin + 3, nextY), (nextY += 5);
+    const shipLines = [
+      data.SUPP_NAME,
+      data.SUPP_ADDRESS1,
+      data.SUPP_ADDRESS2,
+      `${data.SUPP_CITY} - ${data.SUPP_ZIP}`,
+      `GSTIN/UIN : ${data.SUPP_CODE}`,
+      `State Name : ${data.SUPP_STATE_NAME}, Code : 32`,
+    ];
 
-    if (data.PHONE)
-      doc.text('Phone: ' + data.PHONE, margin + 3, nextY), (nextY += 5);
-    if (data.EMAIL)
-      doc.text('Email: ' + data.EMAIL, margin + 3, nextY), (nextY += 5);
+    shipLines.forEach((l) => {
+      doc.text(l || '', shipX, shipY);
+      shipY += 5;
+    });
 
-    // ------------------------------------------------
-    //                 TABLE START
-    // ------------------------------------------------
-    const tableStartY = nextY + 8;
+    // ============================================================
+    // 4) BUYER (BILL TO)
+    // ============================================================
+    let buyerX = shipX;
+    let buyerY = compBoxY + compBoxH + 5;
 
-    const rows = data.PurchDetail.map((item) => [
-      item.DOC_NO,
-      item.PURCH_DATE?.split('T')[0] || '',
-      item.ITEM_NAME,
-      item.PENDING_QTY,
-      item.RATE.toFixed(2),
-      item.AMOUNT.toFixed(2),
-      item.VAT_PERC.toFixed(2),
-      item.VAT_AMOUNT.toFixed(2),
-      item.TOTAL_AMOUNT.toFixed(2),
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Buyer (Bill to)', buyerX, buyerY);
+
+    buyerY += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    const buyerLines = [...shipLines];
+
+    buyerLines.forEach((l) => {
+      doc.text(l || '', buyerX, buyerY);
+      buyerY += 5;
+    });
+
+    // LINE BELOW BUYER BLOCK
+    const tableLineY = buyerY + 2;
+    doc.setDrawColor(180);
+    doc.line(15, tableLineY, pageWidth - 15, tableLineY);
+
+    // ============================================================
+    // 5) TABLE — EXACT SAME WIDTH AS THE LINE (180mm)
+    // ============================================================
+    const tableStartY = tableLineY + 4;
+
+    const rows = data.PurchDetail.map((item: any, index: number) => [
+      index + 1, // Sl No
+      item.ITEM_NAME, // Description
+      item.QUANTITY, // Quantity
+      item.RATE.toFixed(2), // Rate
+      'pairs', // Per
+      item.VAT_PERC.toFixed(2) + ' %', // GST%
+      item.TOTAL_AMOUNT.toFixed(2), // Total Amount
     ]);
 
     autoTable(doc, {
       startY: tableStartY,
+      theme: 'grid',
+
+      headStyles: {
+        fillColor: [240, 240, 240],
+        textColor: 0,
+        fontSize: 9,
+        halign: 'center',
+      },
+      bodyStyles: { fontSize: 9 },
+      footStyles: {
+        fillColor: [255, 255, 255], // same as table
+        textColor: 0,
+        fontSize: 10,
+        halign: 'right',
+      },
+
+      columnStyles: {
+        0: { cellWidth: 12, halign: 'center' },
+        1: { cellWidth: 70 },
+        2: { cellWidth: 20, halign: 'center' },
+        3: { cellWidth: 18, halign: 'right' },
+        4: { cellWidth: 15, halign: 'center' },
+        5: { cellWidth: 20, halign: 'center' },
+        6: { cellWidth: 25, halign: 'right' },
+      },
+
       head: [
         [
-          'Transfer No',
-          'Date',
-          'Item Description',
-          'Pending Qty',
-          'Price',
-          'Amount',
-          'TAX%',
-          'Tax Amount',
+          'Sl No',
+          'Description of goods',
+          'Quantity',
+          'Rate',
+          'Per',
+          'GST%',
           'Total Amount',
         ],
       ],
+
       body: rows,
-      styles: { fontSize: 9 },
-      headStyles: {
-        fillColor: [207, 231, 255], // SAME BLUE
-        fontStyle: 'bold',
-        halign: 'center',
-      },
-      columnStyles: { 2: { halign: 'left' } },
+
+      // ⭐ PERFECTLY ALIGNED TOTAL ROW
+      foot: [
+        [
+          {
+            content: 'Total',
+            colSpan: 6,
+            styles: { halign: 'right', fontStyle: 'bold' },
+          },
+          {
+            content: data.NET_AMOUNT.toFixed(2),
+            styles: { fontStyle: 'bold' },
+          },
+        ],
+      ],
     });
 
-    // ------------------------------------------------
-    //                   FOOTER TOTALS
-    // ------------------------------------------------
-    const finalY = (doc as any).lastAutoTable.finalY + 15;
+    // ============================================================
+    // 6) FOOTER TEXT BLOCK (LEFT SIDE BELOW TABLE)
+    // ============================================================
 
-    doc.setFontSize(10);
+    // Y-position immediately after table
+    const footerY = (doc as any).lastAutoTable.finalY + 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    // E. & O.E
+    doc.text('E. & O.E', 15, footerY);
+
+    // User
+    doc.text(`User: ${data.USER_NAME || ''}`, 15, footerY + 5);
+
+    // Company PAN
+    doc.text("Company's PAN", 15, footerY + 10);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`: ${data.PAN_NO || ''}`, 45, footerY + 10);
+
+    // restore normal
     doc.setFont('helvetica', 'normal');
 
-    const labelX = pageWidth - 60;
-    const valueX = pageWidth - 20;
-
-    doc.text('Gross Amount', labelX, finalY, { align: 'right' });
-    doc.text(data.GROSS_AMOUNT.toFixed(2), valueX, finalY, { align: 'right' });
-
-    doc.text('VAT Amount', labelX, finalY + 6, { align: 'right' });
-    doc.text(data.VAT_AMOUNT.toFixed(2), valueX, finalY + 6, {
-      align: 'right',
-    });
-
-    doc.text('Net Amount', labelX, finalY + 12, { align: 'right' });
-    doc.text(data.NET_AMOUNT.toFixed(2), valueX, finalY + 12, {
-      align: 'right',
-    });
-
-    // ------------------------------------------------
-    //                   THANK YOU
-    // ------------------------------------------------
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'italic');
-    doc.text('Thank you for your business!', pageWidth / 2, finalY + 30, {
-      align: 'center',
-    });
+    // THANK YOU
+    // doc.text('Thank you for your business!', pageWidth / 2, finalY + 25, {
+    //   align: 'center',
+    // });
 
     doc.output('dataurlnewwindow');
   }

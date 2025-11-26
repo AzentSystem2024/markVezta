@@ -147,7 +147,6 @@
             <dxi-total-item
               column="QUANTITY"
               summaryType="sum"
-              valueFormat="#,##0.00"
               displayFormat="Net Qty Issued: {0}"
               alignment="right"
             ></dxi-total-item>
@@ -177,17 +176,29 @@
           <!-- Buttons + Approve checkbox grouped together -->
           <div class="footer-right">
             <dx-text-box
+              class="right-align-textbox"
               [value]="transferOutFormData.NET_AMOUNT | number : '1.2-2'"
               label="Net Amount"
               labelMode="floating"
               [readOnly]="true"
+              [inputAttr]="{ style: 'text-align: right;' }"
             ></dx-text-box>
-            <dx-check-box
-              *ngIf="isEditing && !isReadOnlyMode"
-              [(value)]="isApproved"
-              text="Approve"
-              class="approve-checkbox"
-            ></dx-check-box>
+            <div class="approve-container">
+              <dx-check-box
+                [value]="
+                  isReadOnlyMode ? true : transferOutFormData.IS_APPROVED
+                "
+                (valueChange)="
+                  !isReadOnlyMode
+                    ? (transferOutFormData.IS_APPROVED = $event)
+                    : null
+                "
+                [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+                [readOnly]="isReadOnlyMode"
+                stylingMode="outlined"
+              >
+              </dx-check-box>
+            </div>
 
             <div class="footer-actions">
               <dx-button
@@ -197,11 +208,18 @@
                 type="normal"
               ></dx-button>
               <dx-button
-                *ngIf="!isReadOnlyMode"
-                [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
-                (onClick)="saveTransferOut()"
+                #saveButtonRef
+                [text]="
+                  isReadOnlyMode
+                    ? 'PDF'
+                    : transferOutFormData.IS_APPROVED
+                    ? 'Commit'
+                    : 'Save'
+                "
+                (onClick)="isReadOnlyMode ? openPDF() : saveTransferOut()"
                 stylingMode="contained"
                 type="default"
+                [width]="120"
               ></dx-button>
             </div>
           </div>

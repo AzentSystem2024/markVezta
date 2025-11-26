@@ -817,7 +817,7 @@ export class AddDebitComponent {
     );
     console.log(this.debitFormData.NET_AMOUNT, 'NETAMOUNT');
 
-    // ⭐ NEW LOGIC HERE ⭐
+    //  NEW LOGIC HERE
     if (this.debitFormData.IS_APPROVED) {
       const result = confirm(
         'A new Debit Note will be created and approved. Do you want to continue?',

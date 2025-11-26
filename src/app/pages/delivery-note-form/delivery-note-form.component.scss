@@ -56,8 +56,7 @@
 
 /* Toolbar fixes */
 ::ng-deep .salesorder-grid-wrapper .dx-datagrid .dx-toolbar {
-  min-height: 120px; /* raise baseline */
-  height: 120px;
+  min-height: 80px;
   align-items: center;
   z-index: 2;
   position: relative;
