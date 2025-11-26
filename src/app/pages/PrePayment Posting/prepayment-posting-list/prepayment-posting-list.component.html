@@ -223,7 +223,7 @@
 <dx-popup
   [(visible)]="isAddPopupPrepaymentPosting"
   [width]="'95vw'"
-  [height]="'75vh'"
+  [height]="'100vh'"
   title="New Prepayment Posting"
   (onHiding)="handleClose()"
 >
@@ -234,7 +234,7 @@
 <dx-popup
   [(visible)]="isEditPopupPrepaymentPosting"
   [width]="'95vw'"
-  [height]="'75vh'"
+  [height]="'100vh'"
   title="Edit Prepayment Posting"
   (onHiding)="handleClose()"
 >
@@ -242,6 +242,7 @@
     *ngIf="isEditPopupPrepaymentPosting"
     [selecteprepaymentData]="selecte_prepayment_Data"
     (popupClosed)="handleClose()"
+    [prepaymentpostingId]="selectedprepaymentposting"
   >
   </app-prepayment-posting-edit>
 </dx-popup>

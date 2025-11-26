@@ -5,7 +5,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -48,6 +48,7 @@ import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-opening-balance',
@@ -59,6 +60,10 @@ export class OpeningBalanceComponent {
   openingBalanceFormGroup: DxValidationGroupComponent;
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   dataGrid: DxDataGridComponent;
+
+  pdfSrc: SafeResourceUrl | null = null;
+            isPdfPopupVisible: boolean = false;
+            
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -96,7 +101,7 @@ export class OpeningBalanceComponent {
     this.dataService.exportDataGrid(event, fileName);
   }
 
-  constructor(private dataService: DataService, private router: Router) {}
+  constructor(private dataService: DataService, private router: Router,private sanitizer: DomSanitizer) {}
 
   // ngOnInit() {
   //   this.openingBalance = [];
@@ -831,6 +836,37 @@ export class OpeningBalanceComponent {
       }
     });
   }
+
+  viewPdf(): void {
+                 this.isPdfPopupVisible = true;
+                 const userDataString = localStorage.getItem('userData');
+                const userData = JSON.parse(userDataString);
+      const selectedCompany = userData?.SELECTED_COMPANY;
+      const companyId = selectedCompany?.COMPANY_ID;
+      const finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
+
+       const payload = { COMPANY_ID: companyId, FIN_ID: finId };
+                this.dataService.selectOpeningBalance(payload).subscribe((response: any) => {
+                  if(response){
+                  this.pdfSrc = this.get_pdf(response);
+                }
+                 })
+      }
+    
+        get_pdf(data: any): SafeResourceUrl {
+         
+           const doc = new jsPDF("p", "mm", "a4");
+           const pageWidth = doc.internal.pageSize.width;
+           const margin = 12;
+           let y = 12;
+      
+           // ===========================
+        //  RETURN PDF
+        // ===========================
+        const blob = doc.output("blob");
+        const url = URL.createObjectURL(blob);
+        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+         }
 }
 
 @NgModule({

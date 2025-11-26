@@ -9,7 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -45,6 +45,7 @@ import { EditJournalVoucherComponent } from '../edit-journal-voucher/edit-journa
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
 import { DataService } from 'src/app/services';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-view-journal-voucher',
@@ -66,6 +67,7 @@ export class ViewJournalVoucherComponent {
   };
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  @Input() JVid: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -79,7 +81,10 @@ export class ViewJournalVoucherComponent {
   isReadOnly = false;
   Company_list: any = [];
 
-  constructor(private dataService: DataService) {
+  pdfSrc: SafeResourceUrl | null = null;
+              isPdfPopupVisible: boolean = false;
+
+  constructor(private dataService: DataService,private sanitizer: DomSanitizer) {
     this.Deparment_Drop_down();
   }
 
@@ -221,6 +226,30 @@ export class ViewJournalVoucherComponent {
   cancel() {
     this.popupClosed.emit();
   }
+
+   viewPdf(): void {
+                 this.isPdfPopupVisible = true;
+                 this.dataService.selectJournalVoucher(this.JVid).subscribe((response: any) => {
+                  if(response){
+                  this.pdfSrc = this.get_pdf(response);
+                }
+                 })
+      }
+    
+        get_pdf(data: any): SafeResourceUrl {
+         
+           const doc = new jsPDF("p", "mm", "a4");
+           const pageWidth = doc.internal.pageSize.width;
+           const margin = 12;
+           let y = 12;
+      
+           // ===========================
+        //  RETURN PDF
+        // ===========================
+        const blob = doc.output("blob");
+        const url = URL.createObjectURL(blob);
+        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+         }
 }
 
 @NgModule({

@@ -100,6 +100,8 @@ export class JournalVoucherListComponent {
     },
     elementAttr: { class: 'add-button' },
   };
+  selectedJV: any;
+  JVid: any;
 
    //========================Export data ==========================
   onExporting(event: any) {
@@ -434,6 +436,8 @@ export class JournalVoucherListComponent {
     // Otherwise proceed with your normal logic
     event.cancel = true; // Prevent default popup editing
     const journalId = event.data.TRANS_ID;
+    this.JVid = event.data.TRANS_ID;
+    this.selectedJV = journalId;
     const transStatus = event.data.TRANS_STATUS;
     console.log(event, 'JOURNALID');
 

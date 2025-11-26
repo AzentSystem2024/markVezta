@@ -9,7 +9,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -48,6 +48,7 @@ import notify from 'devextreme/ui/notify';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
 import { DataService } from 'src/app/services';
 import { confirm } from 'devextreme/ui/dialog';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-add-miscellaneous-payment',
@@ -81,6 +82,7 @@ export class AddMiscellaneousPaymentComponent {
   taxRegnRef!: DxTextBoxComponent;
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   dataGrid: DxDataGridComponent;
+  @Input() MiscPaymentId: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -150,7 +152,10 @@ export class AddMiscellaneousPaymentComponent {
   selected_vat_id: any;
   selectedstoreId: any;
 
-  constructor(private dataService: DataService, private ngZone: NgZone) {}
+  pdfSrc: SafeResourceUrl | null = null;
+            isPdfPopupVisible: boolean = false;
+
+  constructor(private dataService: DataService, private ngZone: NgZone,private sanitizer: DomSanitizer) {}
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -1032,6 +1037,30 @@ export class AddMiscellaneousPaymentComponent {
   cancel() {
     this.popupClosed.emit();
   }
+
+   viewPdf(): void {
+               this.isPdfPopupVisible = true;
+               this.dataService.selectMiscPayment(this.MiscPaymentId).subscribe((response: any) => {
+                if(response){
+                this.pdfSrc = this.get_pdf(response);
+              }
+               })
+    }
+  
+      get_pdf(data: any): SafeResourceUrl {
+       
+         const doc = new jsPDF("p", "mm", "a4");
+         const pageWidth = doc.internal.pageSize.width;
+         const margin = 12;
+         let y = 12;
+    
+         // ===========================
+      //  RETURN PDF
+      // ===========================
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+       }
 }
 
 @NgModule({

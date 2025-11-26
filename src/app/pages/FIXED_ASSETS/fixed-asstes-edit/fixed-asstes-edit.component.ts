@@ -40,6 +40,8 @@ import {
 import { DataService } from 'src/app/services';
 import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import jsPDF from 'jspdf';
 @Component({
   selector: 'app-fixed-asstes-edit',
   templateUrl: './fixed-asstes-edit.component.html',
@@ -52,7 +54,7 @@ export class FixedAsstesEditComponent {
 @ViewChild('formValidationGroup', { static: false }) formValidationGroup: DxValidationGroupComponent;
 @ViewChild('newformValidationGroup', { static: false }) newformValidationGroup: DxValidationGroupComponent;
 AddFixedAssetsPopupVisible : boolean = false
-
+@Input() fixedAssetId: any;
 purchaseDate:any
 asseted_Data:any
    FixedAssetsData:any = {
@@ -88,9 +90,10 @@ canAdd = false;
 //     this.FixedAssetsData.DEP_PERCENT = null;
 //   }
 // }
+pdfSrc: SafeResourceUrl | null = null;
+              isPdfPopupVisible: boolean = false;
 
-
-constructor(private dataService:DataService,private router:Router){
+constructor(private dataService:DataService,private router:Router,private sanitizer: DomSanitizer){
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
@@ -333,6 +336,30 @@ open_popup_new_assettype(){
   this.new_asset_type_popup=true
 }
 
+ viewPdf(): void {
+                 this.isPdfPopupVisible = true;
+                  this.dataService.select_Fixed_Asset(this.fixedAssetId).subscribe((response:any)=>{
+                  if(response){
+                  this.pdfSrc = this.get_pdf(response);
+                }
+                 })
+      }
+    
+        get_pdf(data: any): SafeResourceUrl {
+         
+           const doc = new jsPDF("p", "mm", "a4");
+           const pageWidth = doc.internal.pageSize.width;
+           const margin = 12;
+           let y = 12;
+      
+           // ===========================
+        //  RETURN PDF
+        // ===========================
+        const blob = doc.output("blob");
+        const url = URL.createObjectURL(blob);
+        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+         }
+
 }
 
 
@@ -350,8 +377,8 @@ open_popup_new_assettype(){
     DxValidatorModule,
     ReactiveFormsModule,
     DxDateBoxModule,
-    DxValidationGroupModule
-    
+    DxValidationGroupModule,
+    CommonModule
   ],
   providers: [],
   exports: [FixedAsstesEditComponent],

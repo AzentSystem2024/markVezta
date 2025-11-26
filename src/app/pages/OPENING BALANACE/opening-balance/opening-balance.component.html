@@ -43,11 +43,11 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <!-- <dxo-filter-row
@@ -72,12 +72,12 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
 
-          <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="custom-export-button"
-      ></dxi-item>
-      
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="custom-export-button"
+        ></dxi-item>
+
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -147,6 +147,16 @@
   class="approve-checkbox-container"
   style="margin-top: 10px; text-align: right"
 >
+  <dx-button
+    icon="fas fa-file-pdf"
+    text="PDF"
+    type="normal"
+    stylingMode="outlined"
+    [width]="100"
+    (onClick)="viewPdf()"
+    hint="View PDF"
+  >
+  </dx-button>
   <dx-check-box
     [text]="isReadOnly ? 'Approved' : 'Approve'"
     [(value)]="isApproved"
@@ -174,3 +184,23 @@
     ></dx-button>
   </div>
 </div>
+
+<dx-popup
+  [(visible)]="isPdfPopupVisible"
+  [width]="900"
+  [height]="700"
+  [showTitle]="true"
+  title="Opening Balance PDF Preview"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div class="pdf-container" style="margin-top: 10px">
+    <iframe
+      *ngIf="pdfSrc"
+      [src]="pdfSrc"
+      width="100%"
+      height="600"
+      style="border: 1px solid #ccc; border-radius: 4px"
+    ></iframe>
+  </div>
+</dx-popup>

@@ -61,12 +61,10 @@
                     labelMode="floating"
                     [width]="200"
                   ></dx-text-box>
-
-
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-text-box
-                  #beneficiaryNameRef
+                    #beneficiaryNameRef
                     [(value)]="miscFormData.PARTY_NAME"
                     label="Beneficiary Name"
                     labelMode="floating"
@@ -96,9 +94,14 @@
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-text-box
-                  #taxRegnRef
+                    #taxRegnRef
                     [(value)]="miscFormData.VAT_REGN"
-                    [label]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Regtn No' : ' GST Regtn No'" 
+                    [label]="
+                      selected_vat_id == sessionData.VAT_ID &&
+                      sessionData.VAT_ID == 2
+                        ? 'VAT Regtn No'
+                        : ' GST Regtn No'
+                    "
                     labelMode="floating"
                     [width]="200"
                     (onEnterKey)="focusGridFirstCell()"
@@ -150,14 +153,21 @@
 
           <dxi-column
             dataField="VAT_PERCENT"
-              [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Regtn No' : ' GST Regtn No'" 
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT Regtn No'
+                : ' GST Regtn No'
+            "
             [allowEditing]="true"
             [width]="120"
           ></dxi-column>
           <dxi-column
             dataField="VAT_AMOUNT"
-        
-                [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? 'VAT Amount' : ' GST Amount'" 
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT Amount'
+                : ' GST Amount'
+            "
             [allowEditing]="true"
             [calculateCellValue]="calculateTaxAmount"
             dataType="number"
@@ -223,7 +233,7 @@
               ></dx-radio-group>
 
               <dx-select-box
-              id="payHeadIdField"
+                id="payHeadIdField"
                 [(value)]="miscFormData.HEAD_ID"
                 [dataSource]="filteredLedgerList"
                 displayExpr="HEAD_NAME"
@@ -310,7 +320,22 @@
 </div>
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
-    <dx-button text="Cancel" stylingMode="outlined" type="normal" (onClick)="cancel()"></dx-button>
+    <dx-button
+      icon="fas fa-file-pdf"
+      text="PDF"
+      type="normal"
+      stylingMode="outlined"
+      [width]="100"
+      (onClick)="viewPdf()"
+      hint="View PDF"
+    >
+    </dx-button>
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      type="normal"
+      (onClick)="cancel()"
+    ></dx-button>
     <dx-button
       #saveButtonRef
       [text]="isApproved ? 'Update & Commit' : 'Update'"
@@ -320,3 +345,23 @@
     ></dx-button>
   </div>
 </div>
+
+<dx-popup
+  [(visible)]="isPdfPopupVisible"
+  [width]="900"
+  [height]="700"
+  [showTitle]="true"
+  title="GRN PDF Preview"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <div class="pdf-container" style="margin-top: 10px">
+    <iframe
+      *ngIf="pdfSrc"
+      [src]="pdfSrc"
+      width="100%"
+      height="600"
+      style="border: 1px solid #ccc; border-radius: 4px"
+    ></iframe>
+  </div>
+</dx-popup>

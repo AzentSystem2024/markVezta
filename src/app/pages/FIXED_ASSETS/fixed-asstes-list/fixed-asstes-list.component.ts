@@ -68,6 +68,8 @@ canAdd = false;
    visible: (e: any) => !e.row?.data?.NET_DEPRECIATION
   }
 ];
+  selectedFA: any;
+  fixedAssetId: any;
 
  //========================Export data ==========================
   onExporting(event: any) {
@@ -149,7 +151,8 @@ onEditFixedAssets(event:any){
   this.EditFixedAssetsPopupVisible=true
 console.log(event)
   const id=event.data.ID
-
+  this.fixedAssetId = event.data.ID;
+  this.selectedFA = id;
   this.dataService.select_Fixed_Asset(id).subscribe((res:any)=>{
     console.log(res)
     this.Selected_fixedAssets_data=res.Data

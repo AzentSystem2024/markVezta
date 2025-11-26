@@ -97,6 +97,8 @@ selectedRows: any[] = [];
  
   selecte_prepayment_Data: any;
 isEditReadOnly:boolean=false
+  prepaymentpostingId: any;
+  selectedprepaymentposting: any;
   constructor (private ngZone:NgZone,private dataservice:DataService, private cdr:ChangeDetectorRef){
 this.get_prepayment_posting_list()
 
@@ -156,7 +158,8 @@ this.selected_Data(e)
 selected_Data(e:any){
 
   const id=e.data.TRANS_ID
-
+  this.prepaymentpostingId = e.data.TRANS_ID
+  this.selectedprepaymentposting = id
   this.dataservice.select_Prepayment_Posting(id).subscribe((Res:any)=>{
     console.log(Res)
    this.selecte_prepayment_Data= Res.Data

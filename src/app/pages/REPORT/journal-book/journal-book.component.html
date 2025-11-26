@@ -1,6 +1,4 @@
 <div class="salary-grid-wrapper" style="padding: 10px">
-  
- 
   <div class="grid-container">
     <dx-data-grid
       [dataSource]="Ledger_statement_datasource"
@@ -11,7 +9,7 @@
       [showColumnLines]="true"
       [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
-        [grouping]="{ autoExpandAll: false }"
+      [grouping]="{ autoExpandAll: false }"
       [filterRow]="{ visible: false }"
       [rowAlternationEnabled]="true"
       [rowAlternationEnabled]="true"
@@ -24,20 +22,18 @@
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' }
       }"
-
-[summary]="summaryColumnsData"
-  
-    (onExporting)="onExporting($event)"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
     >
       <!-- [summary.calculateCustomSummary]="summaryColumnsData.calculateCustomSummary" -->
-       <!-- (onEditingStart)="onEditLedger($event)" -->
-         <!-- <dxo-editing
+      <!-- (onEditingStart)="onEditLedger($event)" -->
+      <!-- <dxo-editing
         mode="popup"
         [allowUpdating]="true"
       ></dxo-editing> -->
-     <dxo-paging [pageSize]="10"></dxo-paging>
-     
-<dxo-pager
+      <dxo-paging [pageSize]="10"></dxo-paging>
+
+      <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
         [displayMode]="displayMode"
@@ -48,8 +44,17 @@
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">
-        Journal Book
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Journal Book
           </div>
         </dxi-item>
         <!-- <dxi-item>
@@ -68,7 +73,7 @@
         </dx-select-box>
 
         </dxi-item> -->
-           <!-- <dxi-item>
+        <!-- <dxi-item>
            <dx-select-box
     [width]="200"
     label="Company Id"
@@ -84,7 +89,7 @@
         </dx-select-box>
 
         </dxi-item> -->
-           <!-- <dxi-item>
+        <!-- <dxi-item>
            <dx-select-box
         [width]="200"
         label="Ledger"
@@ -99,17 +104,18 @@
         </dx-select-box>
 
         </dxi-item> -->
-           <dxi-item>
-            <dx-date-box
-  [width]="150"
-  label="From Date"
-  labelMode="floating"
- [value]="defaultDate"
-  [displayFormat]="'dd-MM-yyyy'"
-  (onValueChanged)="onFromDateChange($event)">
-</dx-date-box>
+        <dxi-item>
+          <dx-date-box
+            [width]="150"
+            label="From Date"
+            labelMode="floating"
+            [value]="defaultDate"
+            [displayFormat]="'dd-MM-yyyy'"
+            (onValueChanged)="onFromDateChange($event)"
+          >
+          </dx-date-box>
 
-           <!-- <dx-date-box
+          <!-- <dx-date-box
         [width]="150"
         label="From Date"
         labelMode="floating"
@@ -118,36 +124,32 @@
         >
 
         </dx-date-box> -->
-
         </dxi-item>
-           <dxi-item>
-           <dx-date-box
-        [width]="150"
-        label="To Date"
-        labelMode="floating"
-          [value]="defaultDate"
+        <dxi-item itemType="simple" verticalAlignment="center">
+          <dx-date-box
+            [width]="150"
+            label="To Date"
+            labelMode="floating"
+            [value]="defaultDate"
             displayFormat="dd-MM-yyyy"
-              (onValueChanged)="onToDateChange($event)"
-        >
-
-        </dx-date-box>
-
+            (onValueChanged)="onToDateChange($event)"
+          >
+          </dx-date-box>
         </dxi-item>
 
-  <dxi-item>
-    <dx-button
-    text="Apply"
-    icon="todo"
-    stylingMode="contained"
-    type="default"
-    [width]="100"
-    class="mt-2"
-    (onClick)="load_JournalBook_data()"
-    >
-
-    </dx-button>
-  </dxi-item>
-       <dxi-item name="exportButton"></dxi-item>
+        <dxi-item itemType="simple" verticalAlignment="center">
+          <dx-button
+            text="Apply"
+            icon="todo"
+            stylingMode="contained"
+            type="default"
+            [width]="100"
+            class="mt-2"
+            (onClick)="load_JournalBook_data()"
+          >
+          </dx-button>
+        </dxi-item>
+        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
       <dxo-sorting mode="none"></dxo-sorting>
       <dxo-filter-row visible="true"></dxo-filter-row>
@@ -158,10 +160,10 @@
         show-info="true"
         show-navigator="true"
       ></dxo-pager>
-        <dxo-header-filter [visible]="true">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
-     <!-- <dxo-filter-row
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <!-- <dxo-filter-row
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row> -->
@@ -170,39 +172,52 @@
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-        <!-- <dxi-column dataField="TransID" caption="Trans Type Id" dataType="date"></dxi-column> -->
-      <dxi-column dataField="Date" caption="Date" dataType="date"  [format]="{ type: 'custom', formatter: formatDates }"></dxi-column>
-<dxi-column dataField="DocumentType" caption="Document Type"></dxi-column>
-<dxi-column dataField="VoucherNo" caption="Voucher No"></dxi-column>
-<dxi-column dataField="Particulars" caption="Particulars"></dxi-column>
-<dxi-column dataField="Remarks" caption="Remarks"></dxi-column>
-<dxi-column dataField="DebitAmount" caption="Debit Amount"
-  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-  alignment="right">
-</dxi-column>
+      <!-- <dxi-column dataField="TransID" caption="Trans Type Id" dataType="date"></dxi-column> -->
+      <dxi-column
+        dataField="Date"
+        caption="Date"
+        dataType="date"
+        [format]="{ type: 'custom', formatter: formatDates }"
+      ></dxi-column>
+      <dxi-column dataField="DocumentType" caption="Document Type"></dxi-column>
+      <dxi-column dataField="VoucherNo" caption="Voucher No"></dxi-column>
+      <dxi-column dataField="Particulars" caption="Particulars"></dxi-column>
+      <dxi-column dataField="Remarks" caption="Remarks"></dxi-column>
+      <dxi-column
+        dataField="DebitAmount"
+        caption="Debit Amount"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        alignment="right"
+      >
+      </dxi-column>
 
-<dxi-column dataField="CreditAmount" caption="Credit Amount"
-  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-  alignment="right">
-</dxi-column>
+      <dxi-column
+        dataField="CreditAmount"
+        caption="Credit Amount"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        alignment="right"
+      >
+      </dxi-column>
 
-<!-- <dxi-column dataField="BALANCE" caption="Balance"
+      <!-- <dxi-column dataField="BALANCE" caption="Balance"
   [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
   alignment="right">
 </dxi-column> -->
-<dxi-column  *ngIf="Ledger_statement_datasource.length > 0" type="buttons" [width]="100">
-  <dxi-button
-    hint="View"
-    icon="eyeopen"  
-    text="View"
-[onClick]="onViewClick.bind(this)"
-  ></dxi-button>
-</dxi-column>
-
+      <dxi-column
+        *ngIf="Ledger_statement_datasource.length > 0"
+        type="buttons"
+        [width]="100"
+      >
+        <dxi-button
+          hint="View"
+          icon="eyeopen"
+          text="View"
+          [onClick]="onViewClick.bind(this)"
+        ></dxi-button>
+      </dxi-column>
     </dx-data-grid>
   </div>
 </div>
-
 
 <!-- <dx-popup
   [(visible)]="editLedgerPopup"
@@ -253,7 +268,7 @@
 <dx-popup
   [(visible)]="isViewJournalVoucher"
   [width]="'90vw'"
-  [deferRendering]="false" 
+  [deferRendering]="false"
   [height]="'90vh'"
   title="Journal Voucher"
   (onHiding)="handleClose()"
@@ -269,12 +284,12 @@
   [width]="'90vw'"
   [height]="'90vh'"
   title="Debit Note"
-  [deferRendering]="false" 
+  [deferRendering]="false"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isViewDebitNote">
     <app-view-debit
-    [debitFormData]="selectedDebitNote"
+      [debitFormData]="selectedDebitNote"
       (popupClosed)="handleClose()"
     ></app-view-debit>
   </ng-container>
@@ -285,7 +300,7 @@
   [width]="'90vw'"
   [height]="'90vh'"
   title="Credit Note"
-  [deferRendering]="false" 
+  [deferRendering]="false"
   (onHiding)="handleClose()"
 >
   <app-view-credit-note
@@ -298,7 +313,7 @@
   [(visible)]="isViewInvoice"
   [width]="'90vw'"
   [height]="'85vh'"
-  [deferRendering]="false" 
+  [deferRendering]="false"
   title="View Invoice"
   (onHiding)="handleClose()"
 >
@@ -314,23 +329,21 @@
   [(visible)]="isViewReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
-  [deferRendering]="false" 
+  [deferRendering]="false"
   title="View Receipt"
   (onHiding)="handleClose()"
 >
-
-    <app-view-customer-receipt
-      [receiprtFormData]="selectedReceipt"
-      (popupClosed)="handleClose()"
-    ></app-view-customer-receipt>
-
+  <app-view-customer-receipt
+    [receiprtFormData]="selectedReceipt"
+    (popupClosed)="handleClose()"
+  ></app-view-customer-receipt>
 </dx-popup>
 
 <dx-popup
   [(visible)]="isEditInvoice"
   [width]="'90vw'"
   [height]="'85vh'"
-   [deferRendering]="false" 
+  [deferRendering]="false"
   title="Purchase Invoice"
   (onHiding)="handleClose()"
 >
