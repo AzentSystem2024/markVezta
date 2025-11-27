@@ -337,6 +337,23 @@
 </dx-popup>
 
 
+     <!-- Misc Receipt -->
+<dx-popup
+  [(visible)]="editMiscPopup"
+  [width]="'75vw'"
+  [height]="'100vh'"
+  title="Miscellaneous Receipt"
+  (onHiding)="handleClose()"
+>
+  <app-add-misc-receipt
+    *ngIf="editMiscPopup"
+    [isEditing]="true"
+    [EditingResponseData]="selectedmiscellaneousData"
+    [isReadOnlyMode]="isReadOnlyPayment"
+    (popupClosed)="handleClose()"
+    
+  ></app-add-misc-receipt>
+</dx-popup>
 
 
 app-advance

@@ -347,9 +347,10 @@ loadingInvoice = false;
       this.dataService
         .selectMiscPayment(trans_id)
         .subscribe((response: any) => {
-          this.selectedmiscellaneousData = response;
-          this.cdr.detectChanges();
+          this.selectedmiscellaneousData = response.Data;
           this.editMiscPopupOpened = true;
+          this.cdr.detectChanges();
+          
         });
     } 
         else if (TRANS_TYPE_ID === 9) {

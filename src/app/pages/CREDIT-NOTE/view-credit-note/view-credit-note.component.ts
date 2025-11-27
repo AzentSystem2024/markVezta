@@ -116,6 +116,9 @@ export class ViewCreditNoteComponent {
   selectedInvoice: string;
   sessionData: any;
   selected_vat_id: any;
+  HSNCODE: any;
+  hsnLoaded: boolean;
+  GST: any;
 
    isPdfPopupVisible: boolean = false;
       pdfSrc: SafeResourceUrl | null = null;
@@ -124,7 +127,18 @@ export class ViewCreditNoteComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
-  ) {}
+  ) {
+    const userDataString = localStorage.getItem('userData');
+    console.log(userDataString, 'USERDATASTRING');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log(this.HSNCODE, 'HSNCODE===================');
+      this.hsnLoaded = true; // ADD THIS
+    }
+  }
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
@@ -175,6 +189,7 @@ export class ViewCreditNoteComponent {
             particulars: item.REMARKS || '',
             Amount: item.AMOUNT || '',
             gstAmount: item.GST_AMOUNT || '',
+            HSN_CODE: this.HSNCODE,
           };
         });
       });

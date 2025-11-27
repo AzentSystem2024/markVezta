@@ -106,7 +106,7 @@ export class CashBookComponent {
   editPrePaymentPopupOpened: boolean = false;
   isEditReceipt: boolean = false;
   isReadOnlyReceipt: boolean = true;
-  editMiscPopupOpened: boolean;
+  editMiscPopupOpened: boolean =false;
   editSalaryPopup: boolean = false;
   selectedSalaryData:any
 
@@ -266,8 +266,20 @@ export class CashBookComponent {
         .selectMiscPayment(trans_id)
         .subscribe((response: any) => {
           this.selectedmiscellaneousData = response;
-          this.cdr.detectChanges();
           this.editMiscPopupOpened = true;
+          this.cdr.detectChanges();
+          
+        });
+    } 
+    else if (TRANS_TYPE_ID === 2) {
+      console.log('=====navigate to 2 mis payament=====');
+      this.dataService
+        .selectMiscReceipt(trans_id)
+        .subscribe((response: any) => {
+          this.selectedmiscellaneousData = response;
+          this.editMiscPopup = true;
+          this.cdr.detectChanges();
+          
         });
     } 
     else if (TRANS_TYPE_ID === 9) {
