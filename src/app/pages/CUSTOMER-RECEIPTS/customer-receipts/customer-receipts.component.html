@@ -142,7 +142,7 @@
 
 <dx-popup
   [(visible)]="isAddCustomerReceipt"
-  [width]="'75vw'"
+  [width]="'100vw'"
   [height]="'100vh'"
   title="New Customer Receipt"
   (onHiding)="handleClose()"
@@ -169,7 +169,7 @@
 
 <dx-popup
   [(visible)]="isEditReceipt"
-  [width]="'75vw'"
+  [width]="'100vw'"
   [height]="'100vh'"
   title="Customer Receipt"
   (onHiding)="handleClose()"
@@ -210,6 +210,7 @@
         type="date"
         width="300"
         placeholder="From Date"
+        displayFormat="dd-MM-yyyy"
       >
       </dx-date-box>
 
@@ -218,6 +219,7 @@
         type="date"
         placeholder="To Date"
         width="300"
+        displayFormat="dd-MM-yyyy"
       >
       </dx-date-box>
     </div>

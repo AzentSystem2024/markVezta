@@ -26,6 +26,7 @@
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
           [height]="'40vh'"
+          
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
@@ -36,6 +37,7 @@
           (onContentReady)="onGridContentReady($event)"
           (onSelectionChanged)="onSelectionChanged($event)"
           keyExpr="BILL_ID"
+          [allowEditing]="false"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">

@@ -26,6 +26,10 @@ import { ViewCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/view-customer
 import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
 import { EditMiscReceiptModule } from 'src/app/components/HR/Masters/MISC-RECEIPT/edit-misc-receipt/edit-misc-receipt.component';
 import { AddMiscReceiptModule } from 'src/app/components/HR/Masters/MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
+import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-edit/pre-payment-edit.component';
+import { EditSupplierPaymentModule } from '../../SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
+import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
+import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
 
 @Component({
   selector: 'app-journal-book',
@@ -46,7 +50,8 @@ export class JournalBookComponent {
   selected_To_date: any;
   selected_Head_Id: any;
   selected_fin_id: any;
-  isViewJournalVoucher: boolean = false;
+  isEditReadOnly:boolean = true;
+isViewJournalVoucher :boolean = false;
   formatted_from_date: string;
   formatted_To_date: string;
   editLedgerPopup: boolean = false;
@@ -63,13 +68,22 @@ export class JournalBookComponent {
   selected_Company_id: any;
   isEditInvoice: boolean = false;
   isEditInvoiceReadOnly: boolean = true;
-  isReadOnlyPayment: boolean = true;
+  editPrePaymentPopupOpened :boolean = false;
+  isReadOnlyPayment:boolean = true;
+  isEditReceipt : boolean = false;
   loadingInvoice = false;
-  popupReady = false;
+
+  isReadOnlyPurchaseReturn:boolean = true;
+  isEditPurchaseReturn:boolean=false;
   // @Input() MiscReceiptId : any;
 
   defaultDate: Date = new Date();
   selectedmiscellaneousData: any;
+  selectedPrePayment: any;
+  selectedSupplierPayment: any;
+  selectedPurchaseReturn: any;
+  popupReady: boolean;
+  editMiscPopupOpened: boolean;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -262,182 +276,136 @@ export class JournalBookComponent {
           );
           this.isViewReceipt = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedReceipt,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-          );
-        });
-    } else if (TransType === 2) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-      this.dataService
-        .selectMiscReceipt(trans_id)
-        .subscribe((response: any) => {
-          console.log(response);
-          this.selectedmiscellaneousData = response.Data;
-          this.editMiscPopup = true;
-          this.cdr.detectChanges();
-          console.log(
-            this.selectedmiscellaneousData,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-          );
-        });
-    }
-    //else {
-    //   console.log(Unknown TRANS_TYPE_ID: ${TransType});
-    // }
-  }
-  //   totalItems: [
-  //     {
-  //       column: 'DR_AMOUNT',
-  //       summaryType: 'sum',
-  //       displayFormat: '{0}',
-  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //       showInColumn: 'DR_AMOUNT',
-  //       alignment: 'right',
-  //     },
-  //     {
-  //       column: 'CR_AMOUNT',
-  //       summaryType: 'sum',
-  //       displayFormat: '{0}',
-  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //       showInColumn: 'CR_AMOUNT',
-  //       alignment: 'left',
-  //     },
-  //     {
-  //       column: 'BALANCE',
-  //       summaryType: 'sum',
-  //       displayFormat: '{0}',
-  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //       showInColumn: 'BALANCE',
-  //       alignment: 'right',
-  //     },
-  //   ],
-  //   calculateCustomSummary: (options) => {
-  //     if (options.name === 'summaryRow') {
-  //       // Add custom logic here
-  //     }
-  //   },
-  // };
+        console.log(this.selectedReceipt, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+} 
 
-  summaryColumnsData = {
-    totalItems: [
-      // 1. Total Debitṅ
-      {
-        name: 'totalDr',
-        column: 'DebitAmount',
-        summaryType: 'sum',
-        displayFormat: 'Total {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DebitAmount',
-        alignment: 'right',
-      },
-      // 2. Total Credit
-      {
-        name: 'totalCr',
-        column: 'CreditAmount',
-        summaryType: 'sum',
-        displayFormat: 'Total {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CreditAmount',
-        alignment: 'right',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'DebitAmount',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'CreditAmount',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      // {
-      //   column: 'TOTAL_PAIR_QTY',
-      //   summaryType: 'sum',
-      //   displayFormat: '{0}',
-      //   valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      //   alignByColumn: true,
-      // },
-    ],
+// else if (TransType === 2) {
+ 
+//   console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+//      this.dataService
+//       .selectMiscReceipt(trans_id).subscribe((response: any) => {
+//         console.log(response)
+//           this.selectedmiscellaneousData = response.Data;
+//           this.editMiscPopup = true;
+//           this.cdr.detectChanges();
+//         console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+//       });
+// } 
+else if (TransType === 38) {
+ 
+  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+     this.dataService
+      .Select_PrePayment(trans_id).subscribe((response: any) => {
+        console.log(response)
+          this.selectedPrePayment = response.Data;
+          this.editPrePaymentPopupOpened = true;
+          this.cdr.detectChanges();
+        console.log(this.selectedPrePayment, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+} 
+else if (TransType === 21) {
+ 
+  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+     this.dataService
+      .selectSupplierPayment(trans_id).subscribe((response: any) => {
+        console.log(response)
+          this.selectedSupplierPayment = response.Data;
+          console.log(this.selectedSupplierPayment)
+          this.isEditReceipt = true;
+          this.cdr.detectChanges();
+        console.log(this.selectedPrePayment, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+} 
+
+else if (TransType === 20) {
+ 
+  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+     this.dataService
+      .selectPurchaseReturn(trans_id).subscribe((response: any) => {
+        console.log(response)
+          this.selectedPurchaseReturn = response.Data;
+          this.isEditPurchaseReturn = true;
+          
+          this.cdr.detectChanges();
+        console.log(this.selectedPurchaseReturn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+} 
+
+else if (TransType === 3) {
+ 
+  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+     this.dataService
+      .selectMiscPayment(trans_id).subscribe((response: any) => {
+        console.log(response)
+          this.selectedmiscellaneousData = response.Data;
+          console.log(this.selectedmiscellaneousData)
+          this.editMiscPopupOpened = true;
+          
+          this.cdr.detectChanges();
+        console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+} 
+//else {
+//   console.log(Unknown TRANS_TYPE_ID: ${TransType});
+// }
+  } 
+ 
+summaryColumnsData = {
+  totalItems: [
+    // 1. Total Debitṅ
+    {
+      name: 'totalDr',
+      column: 'DebitAmount',
+      summaryType: 'sum',
+      displayFormat: 'Total {0}',
+      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+      showInColumn: 'DebitAmount',
+      alignment: 'right',
+    },
+    // 2. Total Credit
+    {
+      name: 'totalCr',
+      column: 'CreditAmount',
+      summaryType: 'sum',
+      displayFormat: 'Total {0}',
+      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+      showInColumn: 'CreditAmount',
+      alignment: 'right',
+    },
+
+  ],
+   groupItems: [
+    {
+      column: 'DebitAmount',
+      summaryType: 'sum',
+      displayFormat: '{0}',
+      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+      alignByColumn: true,
+    },
+    {
+      column: 'CreditAmount',
+      summaryType: 'sum',
+      displayFormat: ' {0}',
+      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+      alignByColumn: true,
+    },
+    // {
+    //   column: 'TOTAL_PAIR_QTY',
+    //   summaryType: 'sum',
+    //   displayFormat: '{0}',
+    //   valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+    //   alignByColumn: true,
+    // },
+  ],
     calculateCustomSummary: (options) => {
       if (options.name === 'summaryRow') {
         // Custom logic if needed
       }
     },
 
-    // calculateCustomSummary: (options: any) => {
-    //   if (options.summaryProcess === 'finalize') {
-    //     const dataSource = options.component.getDataSource();
-    //     const items = dataSource.items();
 
-    //     if (items && items.length) {
-    //       // Calculate totals
-    //       const totalDr = items.reduce((sum, item) => sum + (Number(item.DR_AMOUNT) || 0), 0);
-    //       const totalCr = items.reduce((sum, item) => sum + (Number(item.CR_AMOUNT) || 0), 0);
-    //       const closingBalance = totalDr - totalCr;
-
-    //       // Closing Balance logic
-    //       if (options.name === 'closingBalanceDr') {
-    //         options.totalValue = closingBalance > 0 ? closingBalance : null;
-    //       }
-    //       if (options.name === 'closingBalanceCr') {
-    //         options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : null;
-    //       }
-
-    //       // Grand Total logic
-    //       if (options.name === 'grandTotalDr') {
-    //         options.totalValue = totalDr + (closingBalance > 0 ? closingBalance : 0);
-    //       }
-    //       if (options.name === 'grandTotalCr') {
-    //         options.totalValue = totalCr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-    //       }
-    //     }
-    //   }
-    // }
-
-    // calculateCustomSummary: (options: any) => {
-    //   if (options.summaryProcess === 'finalize') {
-    //     const items = this.ledgerSummaryData || [];
-    // console.log(items, 'items in custom summary calculation');
-
-    //     const totalDr = items.reduce((sum, item) => {
-    //   const val = parseFloat(String(item?.DR_AMOUNT || '0').replace(/,/g, '').trim());
-    //   return sum + (isNaN(val) ? 0 : val);
-    // }, 0);
-
-    // const totalCr = items.reduce((sum, item) => {
-    //   const val = parseFloat(String(item?.CR_AMOUNT || '0').replace(/,/g, '').trim());
-    //   return sum + (isNaN(val) ? 0 : val);
-    // }, 0);
-
-    // console.log('Total Debit:', totalDr, 'Total Credit:', totalCr);
-    //     const closingBalance = totalDr - totalCr;
-    // console.log('Closing Balance:', closingBalance);
-
-    //      if (options.name === 'closingBalanceCr') {
-    //       options.totalValue = closingBalance > 0 ? closingBalance : null;
-    //     }
-
-    //     if (options.name === 'closingBalanceDr') {
-    //       options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : null;
-    //     }
-
-    //      // Grand Total logic
-    //         if (options.name === 'grandTotalCr') {
-    //           options.totalValue = totalCr + (closingBalance > 0 ? closingBalance : 0);
-    //         }
-    //         if (options.name === 'grandTotalDr') {
-    //           options.totalValue = totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-    //         }
-    //   }
-    // }
-  };
+};
 
   handleClose() {
     this.editLedgerPopup = false;
@@ -458,42 +426,6 @@ export class JournalBookComponent {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
 
-    return `${day}-${month}-${year}`;
   }
 
-  onExporting(event: any) {
-    const fileName = 'Journal_Book';
-    this.dataService.exportDataGridReport(event, fileName);
-  }
 }
-
-@NgModule({
-  imports: [
-    DxDataGridModule,
-    DxButtonModule,
-    CommonModule,
-    DxTextBoxModule,
-    DxCheckBoxModule,
-    DxValidatorModule,
-    DxValidationGroupModule,
-    DxSelectBoxModule,
-    DxLoadPanelModule,
-    DxLoadIndicatorModule,
-    DxNumberBoxModule,
-    DxDateBoxModule,
-    DxSelectBoxModule,
-    DxButtonModule,
-    DxPopupModule,
-    ViewJournalVoucherModule,
-    ViewDebitModule,
-    ViewCreditNoteModule,
-    ViewInvoiceModule,
-    ViewCustomerReceiptModule,
-    EditPurchaseInvoiceModule,
-    AddMiscReceiptModule,
-  ],
-  providers: [],
-  exports: [],
-  declarations: [JournalBookComponent],
-})
-export class JournalBookModule {}

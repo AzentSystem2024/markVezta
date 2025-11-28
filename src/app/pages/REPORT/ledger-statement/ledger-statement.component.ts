@@ -56,6 +56,8 @@ import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-paym
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
 import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 import { ViewSalaryAdvanceModule } from 'src/app/HR/Masters/view-salary-advance/view-salary-advance.component';
+import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
+import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
 // import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 // import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 @Component({
@@ -108,6 +110,12 @@ selected_Data:any
 isEditPopUp:boolean=false
 loadingInvoice = false;
   popupReady = false;
+  editMiscPopup : boolean = false;
+  isEditInvoice :boolean = false;
+  isEditInvoiceReadOnly :boolean = true;
+  isEditPurchaseReturn:boolean=false;
+  selectedPurchaseReturn: any;
+  isReadOnlyPurchaseReturn:boolean=true;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -331,7 +339,34 @@ loadingInvoice = false;
         this.cdr.detectChanges();
         console.log(this.selectedInvoice, 'SELECTE SALES INVOICE');
       });
-    } else if (TRANS_TYPE_ID === 27) {
+    }
+     else if(TRANS_TYPE_ID == 19){
+      this.dataService
+        .selectPurchaseInvoice(trans_id)
+        .subscribe((response: any) => {
+          this.selectedInvoice = response.Data;
+ this.loadingInvoice = false;
+
+
+          this.isEditInvoice = true;
+          this.cdr.detectChanges();
+         
+        });
+      }
+      else if (TRANS_TYPE_ID === 20) {
+ 
+  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+     this.dataService
+      .selectPurchaseReturn(trans_id).subscribe((response: any) => {
+        console.log(response)
+          this.selectedPurchaseReturn = response.Data;
+          this.isEditPurchaseReturn = true;
+          
+          this.cdr.detectChanges();
+        console.log(this.selectedPurchaseReturn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+} 
+    else if (TRANS_TYPE_ID === 27) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectCustomerReceipt(trans_id)
@@ -409,6 +444,18 @@ loadingInvoice = false;
           );
         });
     }
+    else if (TRANS_TYPE_ID === 2) {
+ 
+  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+     this.dataService
+      .selectMiscReceipt(trans_id).subscribe((response: any) => {
+        console.log(response)
+          this.selectedmiscellaneousData = response.Data;
+          this.editMiscPopup = true;
+          this.cdr.detectChanges();
+        console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+}
         else if (TRANS_TYPE_ID === 28) {
       console.log('=====navigate =====');
       this.dataService
@@ -670,7 +717,9 @@ loadingInvoice = false;
     AddMiscellaneousPaymentModule,
     AddSalaryPaymentModule,
     ViewSalaryAdvanceModule,
-
+    AddMiscReceiptModule,
+    EditPurchaseInvoiceModule,
+    PurchaseReturnDebitFormModule
   ],
   providers: [],
   declarations: [LedgerStatementComponent],

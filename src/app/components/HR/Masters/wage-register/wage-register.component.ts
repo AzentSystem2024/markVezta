@@ -4,6 +4,7 @@ import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-
 import { DxButtonModule, DxCheckBoxModule, DxDataGridModule, DxDateBoxModule, DxDropDownBoxModule, DxFileUploaderModule, DxFormModule, DxNumberBoxModule, DxPopupModule, DxProgressBarModule, DxRadioGroupModule, DxSelectBoxModule, DxTabPanelModule, DxTabsModule, DxTagBoxModule, DxTextAreaModule, DxTextBoxModule, DxToolbarModule, DxValidatorModule } from 'devextreme-angular';
 import { DxiGroupModule, DxiItemModule, DxoFormItemModule, DxoItemModule, DxoLookupModule, DxoSummaryModule } from 'devextreme-angular/ui/nested';
 import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DataService } from 'src/app/services';

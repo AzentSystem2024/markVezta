@@ -132,7 +132,7 @@
       <dxi-column dataField="CITY" caption="City"></dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column dataField="DESG_NAME" caption="Designation"></dxi-column>
-      <dxi-column dataField="COUNTRY_NAME" caption="Country"></dxi-column>
+      <!-- <dxi-column dataField="COUNTRY_NAME" caption="Country"></dxi-column> -->
       <dxi-column dataField="STATE_NAME" caption="State"></dxi-column>
       <!-- <dxi-column
         dataField="INCENTIVE_PERCENT"
@@ -199,7 +199,7 @@
     <dx-popup
       *ngIf="addEmployeePopupOpened"
       [(visible)]="addEmployeePopupOpened"
-      [width]="'90vw'"
+      [width]="'100vw'"
       [height]="'100vh'"
       title="Add Employee"
     >
@@ -212,7 +212,7 @@
 </div>
 <dx-popup
   [(visible)]="editEmployeePopupOpened"
-  [width]="'95vw'"
+  [width]="'100vw'"
   [height]="'100vh'"
   title="Edit Employee"
   (onHiding)="handleEditClose()"
