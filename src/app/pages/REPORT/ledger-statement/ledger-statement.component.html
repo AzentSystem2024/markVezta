@@ -418,3 +418,59 @@
   >
 </app-view-salary-advance>
  </dx-popup>
+
+
+ <!-- ====================Misc Receipt=========================== -->
+
+ <dx-popup
+  [(visible)]="editMiscPopup"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="Miscellaneous Receipt"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="editMiscPopup">
+  <app-add-misc-receipt
+    *ngIf="editMiscPopup"
+    [EditingResponseData]="selectedmiscellaneousData"
+    [isReadOnlyMode]="isReadOnlyPayment"
+    (popupClosed)="handleClose()"
+  ></app-add-misc-receipt>
+  </ng-container>
+</dx-popup>
+
+<!-- ==========================Purchase Invoice =============================== -->
+ <dx-popup
+  [(visible)]="isEditInvoice"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  [deferRendering]="false"
+  title="Purchase Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditInvoice">
+    <app-edit-purchase-invoice
+      [invoiceFormData]="selectedInvoice"
+      [readOnly]="isEditInvoiceReadOnly"
+      (popupClosed)="handleClose()"
+    ></app-edit-purchase-invoice>
+  </ng-container>
+</dx-popup>
+
+<!-- =================================Pucrhase Return============================= -->
+  <dx-popup
+  [(visible)]="isEditPurchaseReturn"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="Purchase Return(Debit Note)"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditPurchaseReturn">
+    <app-purchase-return-debit-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedPurchaseReturn"
+      [isReadOnlyMode]="isReadOnlyPurchaseReturn"
+      (popupClosed)="handleClose()"
+    ></app-purchase-return-debit-form>
+  </ng-container>
+</dx-popup>

@@ -374,14 +374,15 @@
   "
 >
   <!-- Checkbox right above buttons -->
-  <dx-check-box
+  
+
+  <!-- Buttons row -->
+  <div style="display: flex; gap: 1px">
+    <dx-check-box
     [(value)]="receiprtFormData.IS_APPROVED"
     text="Approve"
     [width]="120"
   ></dx-check-box>
-
-  <!-- Buttons row -->
-  <div style="display: flex; gap: 1px">
     <dx-button
       text="Cancel"
       stylingMode="outlined"

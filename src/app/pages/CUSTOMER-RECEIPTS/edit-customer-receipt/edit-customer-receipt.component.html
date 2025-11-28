@@ -312,7 +312,7 @@
                 label="Bank Name"
                 labelMode="floating"
                 [width]="'100%'"
-                style="margin-top: 5px"
+                style="margin-top: 2px"
                 [disabled]="
                   !(
                     receiptMode === 'Bank' ||
@@ -376,15 +376,17 @@
   "
 >
   <!-- Checkbox right above buttons -->
-  <dx-check-box
+ 
+
+  <!-- Buttons row -->
+  <div style="display: flex; gap: 10px">
+     <dx-check-box
     *ngIf="!isReadOnlyMode"
     [(value)]="receiprtFormData.IS_APPROVED"
     text="Approve"
     [width]="120"
   ></dx-check-box>
-
-  <!-- Buttons row -->
-  <div style="display: flex; gap: 10px">
+  
     <dx-button
       text="Cancel"
       stylingMode="outlined"
