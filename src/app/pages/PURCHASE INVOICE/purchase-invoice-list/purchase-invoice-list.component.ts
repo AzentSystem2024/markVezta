@@ -398,20 +398,16 @@ export class PurchaseInvoiceListComponent {
     }, 0);
   }
 
-  // onEditInvoice(event: any) {
-  //   event.cancel = true;
-  //   const invoiceId = event.data.ID;
-  //   const transStatus = event.data.STATUS;
-
-  //   this.dataService
-  //     .selectPurchaseInvoice(invoiceId)
-  //     .subscribe((response: any) => {
-  //       this.selectedInvoice = response.Data;
-
-  //       this.isEditInvoice = true;
-  //       this.isEditInvoiceReadOnly = transStatus === 'Approved'; // 👈 read-only if Approved
-  //     });
-  // }
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.TRANS_STATUS === 5) {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
+  }
 
   onEditInvoice(event: any) {
     event.cancel = true;

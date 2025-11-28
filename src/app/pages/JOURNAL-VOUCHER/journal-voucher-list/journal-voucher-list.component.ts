@@ -103,7 +103,7 @@ export class JournalVoucherListComponent {
   selectedJV: any;
   JVid: any;
 
-   //========================Export data ==========================
+  //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'Journal_Voucher';
     this.dataService.exportDataGrid(event, fileName);
@@ -428,6 +428,17 @@ export class JournalVoucherListComponent {
 
   addJournalVoucher() {
     this.isAddJournalVoucher = true;
+  }
+
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.TRANS_STATUS === 5) {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
   }
 
   onEditJournalVoucher(event: any) {

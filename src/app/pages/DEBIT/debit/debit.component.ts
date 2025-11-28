@@ -111,7 +111,7 @@ export class DebitComponent {
   selectedDN: any;
   DNid: any;
 
-   //========================Export data ==========================
+  //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'Debit_Note';
     this.dataService.exportDataGrid(event, fileName);
@@ -405,6 +405,17 @@ export class DebitComponent {
         });
       }
     }, 0);
+  }
+
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.TRANS_STATUS === 5) {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
   }
 
   onEditDebitNote(event: any) {

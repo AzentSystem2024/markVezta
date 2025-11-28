@@ -36,6 +36,7 @@
       (onRowRemoving)="onDeletePayroll($event)"
       (onSelectionChanged)="onSelectionChanged($event)"
       (onToolbarPreparing)="onToolbarPreparing($event)"
+      (onCellPrepared)="onCellPrepared($event)"
     >
       <dxo-editing
         mode="popup"
@@ -99,19 +100,19 @@
           </div>
           <div *ngIf="calendarVisible" class="calendar-popup">
             <div class="calendar-header">
-               <dx-button
-    class="year-button"
-    [options]="previousYearButtonOptions"
-  ></dx-button>
+              <dx-button
+                class="year-button"
+                [options]="previousYearButtonOptions"
+              ></dx-button>
 
-  <span class="year-clickable" (click)="toggleYearSelector()">
-    {{ selectedYear }}
-  </span>
+              <span class="year-clickable" (click)="toggleYearSelector()">
+                {{ selectedYear }}
+              </span>
 
-  <dx-button
-    class="year-button"
-    [options]="nextYearButtonOptions"
-  ></dx-button>
+              <dx-button
+                class="year-button"
+                [options]="nextYearButtonOptions"
+              ></dx-button>
             </div>
 
             <div
@@ -153,7 +154,7 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
         <dxi-item
-        *ngIf="canAdd"
+          *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"

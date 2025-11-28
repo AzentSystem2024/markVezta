@@ -178,7 +178,7 @@ export class DeliveryNoteComponent {
           ...item,
           DN_DATE: dateValue,
         };
-      });
+      }).sort((a: any, b: any) => Number(b.DN_NO) - Number(a.DN_NO));
 
       this.applyDateFilter();
     });

@@ -64,7 +64,7 @@ export class PayrollListComponent {
   auto: string = 'auto';
   payrollList: any;
   CompanyID = 1;
-   canAdd = false;
+  canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
@@ -174,7 +174,11 @@ export class PayrollListComponent {
     },
   };
 
-  constructor(private dataService: DataService, private zone: NgZone,private router: Router) {}
+  constructor(
+    private dataService: DataService,
+    private zone: NgZone,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
@@ -197,8 +201,7 @@ export class PayrollListComponent {
     });
     this.selectedYear = this.selectedMonth.getFullYear();
 
-
-      const currentUrl = this.router.url;
+    const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}'
@@ -511,6 +514,17 @@ export class PayrollListComponent {
 
   addPayroll() {
     this.addPayrollPopupOpened = true;
+  }
+
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.STATUS === 'Approved') {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
   }
 
   onEditOrViewPayroll(e: any) {

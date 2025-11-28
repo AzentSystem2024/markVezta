@@ -206,6 +206,7 @@ import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoic
 import { PurchaseReturnDebitComponent } from './pages/purchase-return-debit/purchase-return-debit.component';
 import { MiscPaymentGstListComponent } from './components/HR/Masters/misc-payment-gst-list/misc-payment-gst-list.component';
 import { PrepaymentGstListComponent } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
+import { InvoiceTrOutComponent } from './pages/INVOICE/invoice-tr-out/invoice-tr-out.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -216,15 +217,15 @@ const routes: Routes = [
     pathMatch: 'full',
   },
   {
-        path: 'misc-payment',
-        component: MiscPaymentGstListComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'prepayment',
-        component: PrepaymentGstListComponent,
-        canActivate: [AuthGuardService],
-      },
+    path: 'misc-payment',
+    component: MiscPaymentGstListComponent,
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'prepayment',
+    component: PrepaymentGstListComponent,
+    canActivate: [AuthGuardService],
+  },
 
   {
     path: 'auth',
@@ -454,6 +455,11 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'invoice-tr-out',
+        component: InvoiceTrOutComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'customer-receipt',
         component: CustomerReceiptsComponent,
         canActivate: [AuthGuardService],
@@ -463,7 +469,7 @@ const routes: Routes = [
         component: ListMiscellaneousPaymentsComponent,
         canActivate: [AuthGuardService],
       },
-      
+
       {
         path: 'misc-receipt',
         component: ListMiscReceiptComponent,

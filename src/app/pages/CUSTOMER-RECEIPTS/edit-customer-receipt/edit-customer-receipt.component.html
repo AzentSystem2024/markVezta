@@ -70,6 +70,7 @@
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-select-box
+                    class="customer-select"
                     #distributorRef
                     [(value)]="selectedDistributorId"
                     [dataSource]="distributorList"
@@ -114,26 +115,26 @@
           <dxi-column
             dataField="INVOICE_NO"
             caption="Inv No"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
           >
           </dxi-column>
 
           <dxi-column
             dataField="INVOICE_DATE"
             caption="Date"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
 
           <dxi-column
             dataField="REF_NO"
             caption="Ref No"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
 
           <dxi-column
             dataField="NET_AMOUNT"
             caption="Inv Amount"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
           <dxi-column
@@ -145,13 +146,13 @@
           <dxi-column
             dataField="PENDING_AMOUNT"
             caption="Balance"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
           <dxi-column
             dataField="AMOUNT"
             caption="Received Amount"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
             <dxi-validation-rule
@@ -308,6 +309,7 @@
 
               <!-- Bank Name -->
               <dx-text-box
+                class="bank-name-bo x"
                 [(value)]="receiprtFormData.BANK_NAME"
                 label="Bank Name"
                 labelMode="floating"
