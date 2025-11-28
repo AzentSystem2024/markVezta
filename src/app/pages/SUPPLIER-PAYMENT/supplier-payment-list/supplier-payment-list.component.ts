@@ -364,15 +364,25 @@ export class SupplierPaymentListComponent {
       }
     }, 0);
   }
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.TRANS_STATUS === 5) {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
+  }
 
   onEditReceiptNote(event: any) {
     event.cancel = true; // Prevent default popup editing
 
     const receiptId = event.data.TRANS_ID;
     const transStatus = event.data.TRANS_STATUS;
-     
+
     this.supplierPaymentId = event.data.TRANS_ID;
-      this.selectedSupplierPayment = receiptId;
+    this.selectedSupplierPayment = receiptId;
     this.dataService
       .selectSupplierPayment(receiptId)
       .subscribe((response: any) => {

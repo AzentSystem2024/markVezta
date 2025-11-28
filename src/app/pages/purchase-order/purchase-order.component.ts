@@ -183,13 +183,18 @@ export class PurchaseOrderComponent {
     // console.log(docType, 'doctype');
   }
 
-        sessionDetails() {
+  sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
-      this.HSN_CODE, '===========selected HSN CODE===================');
+      this.HSN_CODE,
+      '===========selected HSN CODE==================='
+    );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST_PERC, '===========selected GST PERC===================');
+    console.log(
+      this.GST_PERC,
+      '===========selected GST PERC==================='
+    );
   }
 
   ngOnInit(): void {
@@ -401,12 +406,23 @@ export class PurchaseOrderComponent {
     });
   };
 
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.STATUS === 5) {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
+  }
+
   onEditingRow(event): void {
     console.log(event, 'event');
     event.cancel = true;
     this.poId = event.data.ID;
     const Id = event.data.ID;
-     this.selectedPoId = Id;   
+    this.selectedPoId = Id;
     const status = event.data.STATUS;
     console.log(Id, 'id');
     this.sessionDetails();
@@ -456,7 +472,7 @@ export class PurchaseOrderComponent {
     // debugger;
     const data = this.poNewForm.getNewPoData();
     console.log(data);
-     data.IS_APPROVED = this.isApproved
+    data.IS_APPROVED = this.isApproved;
     if (!data.STORE_ID) {
       notify(
         {
@@ -554,30 +570,30 @@ export class PurchaseOrderComponent {
     //     );
     //   }
     // });
-  // }
+    // }
 
-  // savePoToServer(data: any) {
+    // savePoToServer(data: any) {
     this.service.savePoData(data).subscribe((res) => {
-      console.log(res,'saved data');
-     
+      console.log(res, 'saved data');
+
       if (res.message === 'Success' && res.flag === 1) {
         if (data.IS_APPROVED === true) {
-        notify(
-          {
-            message: 'Data Saved & Approved Successfully',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'success'
-        );
-      } else {
-        notify(
-          {
-            message: 'Data Saved Successfully',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'success'
-        );
-      }
+          notify(
+            {
+              message: 'Data Saved & Approved Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success'
+          );
+        } else {
+          notify(
+            {
+              message: 'Data Saved Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success'
+          );
+        }
 
         this.refreshPo = true;
         setTimeout(() => (this.refreshPo = false), 0);

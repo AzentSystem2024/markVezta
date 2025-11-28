@@ -86,7 +86,7 @@ export class CreditNoteListComponent {
   selectedCredit: any;
   CreditNoteid: any;
 
-   //========================Export data ==========================
+  //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'Credit_Note';
     this.dataService.exportDataGrid(event, fileName);
@@ -413,10 +413,21 @@ export class CreditNoteListComponent {
     }, 0);
   }
 
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.TRANS_STATUS === 5) {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
+  }
+
   onEditCreditNote(event: any) {
     event.cancel = true; // Prevent default popup editing
     const creditId = event.data.TRANS_ID;
-     this.CreditNoteid = event.data.TRANS_ID;
+    this.CreditNoteid = event.data.TRANS_ID;
     this.selectedCredit = creditId;
     const transStatus = event.data.TRANS_STATUS;
     console.log(event, 'transstatus');

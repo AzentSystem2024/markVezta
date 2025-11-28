@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   Output,
   ViewChild,
@@ -42,29 +43,33 @@ import {
 import { FormTextboxModule } from 'src/app/components';
 import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
 import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
-import { AddCreditNoteComponent } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
 import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
+import { AddInvoiceComponent } from '../add-invoice/add-invoice.component';
+import { confirm } from 'devextreme/ui/dialog';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
-import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
-  selector: 'app-add-invoice',
-  templateUrl: './add-invoice.component.html',
-  styleUrls: ['./add-invoice.component.scss'],
+  selector: 'app-invoice-tr-out-add',
+  templateUrl: './invoice-tr-out-add.component.html',
+  styleUrls: ['./invoice-tr-out-add.component.scss'],
 })
-export class AddInvoiceComponent {
-  @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
-  //  @Output()  sesstion_Details = new EventEmitter<void>();
+export class InvoiceTrOutAddComponent {
+  @Input() isEditing: boolean = false;
+  @Input() EditingResponseData: any;
+  @Input() isReadOnlyMode: boolean = false;
+  @Output() popupClosed = new EventEmitter<void>();
+  @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
 
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
-  @ViewChild('refBoxRef', { static: false }) refBoxRef!: DxTextBoxComponent;
-  @Output() popupClosed = new EventEmitter<void>();
-  @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  @ViewChild('itemsGridRef', { static: false })
+  itemsGridRef!: DxDataGridComponent;
+  isApproved: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -74,6 +79,23 @@ export class AddInvoiceComponent {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
+  isPopupVisible: boolean = false;
+  items: any[] = [];
+  // itemsForInventory: any[] = [];
+  barcodeList: any;
+  canAdd: any;
+  canEdit: any;
+  canDelete: any;
+  canPrint: any;
+  canView: any;
+  canApprove: any;
+  matrix: any;
+  storeFromSession: any;
+  stores: any;
+  reasons: any;
+
+  @ViewChild('refBoxRef', { static: false }) refBoxRef!: DxTextBoxComponent;
+
   customerType: string = 'Unit';
   selectedTransfers: any[] = [];
   customerTypes = [
@@ -92,31 +114,29 @@ export class AddInvoiceComponent {
   mainInvoiceGridList: any;
 
   invoiceFormData: any = {
-    TRANS_TYPE: 25,
+    // TRANS_TYPE: 25,
     COMPANY_ID: 1,
     STORE_ID: 1,
     TRANS_DATE: new Date(),
-    TRANS_STATUS: 1,
-    ADD_TIME: new Date(),
-    SALE_DATE: new Date(),
-    UNIT_ID: 1,
-    DISTRIBUTOR_ID: 0,
+    CUST_ID: 0,
     FIN_ID: 1,
     GROSS_AMOUNT: '',
-    GST_AMOUNT: '',
+    TAX_AMOUNT: '',
     NET_AMOUNT: '',
     REF_NO: '',
     PARTY_NAME: '',
+    NARRATION: '',
+    CREATE_USER_ID: 0,
     IS_APPROVED: false,
     SALE_DETAILS: [
       {
+        QUANTITY: 0,
+        PRICE: 0,
+        TAXABLE_AMOUNT: 0,
+        TAX_PERC: 0,
+        TAX_AMOUNT: 0,
+        TOTAL_AMOUNT: 0,
         DN_DETAIL_ID: 0,
-        QUANTITY: '',
-        PRICE: '',
-        AMOUNT: '',
-        GST: '',
-        TAX_AMOUNT: '',
-        TOTAL_AMOUNT: '',
       },
     ],
   };
@@ -133,6 +153,7 @@ export class AddInvoiceComponent {
   selectedCustomer: any;
   selectedCustomerName: void;
   HSNCODE: any;
+  TAX_PERC: any;
   GST: any;
 
   constructor(
@@ -151,8 +172,8 @@ export class AddInvoiceComponent {
       ...this.invoiceFormData,
       TRANS_DATE: new Date(this.invoiceFormData.TRANS_DATE || new Date()),
     };
-    if (!this.invoiceFormData.SALE_DATE) {
-      this.invoiceFormData.SALE_DATE = new Date();
+    if (!this.invoiceFormData.TRANS_DATE) {
+      this.invoiceFormData.TRANS_DATE = new Date();
     }
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
@@ -180,6 +201,7 @@ export class AddInvoiceComponent {
     this.getCustomerOrUnitLst();
     this.getInvoiceNo();
     this.sessionData_tax();
+    this.isEditDataAvailable();
   }
 
   ngAfterViewInit() {
@@ -187,6 +209,69 @@ export class AddInvoiceComponent {
     setTimeout(() => {
       this.refBoxRef?.instance?.focus();
     }, 0);
+  }
+
+  parseDMY(dateStr: string): Date {
+    if (!dateStr) return new Date();
+
+    const [day, month, year] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  isEditDataAvailable() {
+    if (!this.isEditing || !this.EditingResponseData) {
+      return; // Not edit mode → nothing to load
+    }
+
+    const data = this.EditingResponseData.Data[0];
+    const transactionDate = this.parseDMY(data.TRANS_DATE);
+    // Populate header fields
+    this.invoiceFormData = {
+      ID: data.ID,
+      TRANS_ID: data.TRANS_ID,
+      COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+      STORE_ID: data.STORE_ID,
+      // RET_DATE: new Date(data.RET_DATE),
+      TRANS_DATE: transactionDate,
+      CUST_ID: data.CUST_ID,
+      GROSS_AMOUNT: data.GROSS_AMOUNT,
+      TAX_AMOUNT: data.VAT_AMOUNT,
+      NET_AMOUNT: data.NET_AMOUNT,
+      CREATED_USER_ID: this.invoiceFormData.CREATED_USER_ID,
+      NARRATION: data.NARRATION,
+      SALE_DETAILS: data.SALE_DETAILS || [],
+      PARTY_NAME: data.PARTY_NAME,
+      FIN_ID: this.invoiceFormData.FIN_ID,
+      REF_NO: data.REF_NO,
+    };
+
+    // Populate supplier selection
+    this.invoiceFormData.CUST_ID = data.CUST_ID;
+
+    // Populate grid rows from PurchDetail
+    this.mainInvoiceGridList = (data.SALE_DETAILS || []).map((item) => ({
+      DN_DETAIL_ID: item.DN_DETAIL_ID,
+      PRICE: item.PRICE,
+      QUANTITY: item.QUANTITY,
+      TAXABLE_AMOUNT: item.TAXABLE_AMOUNT,
+      TAX_AMOUNT: item.TAX_AMOUNT,
+      TOTAL_AMOUNT: item.TOTAL_AMOUNT,
+      HSN_CODE: this.HSNCODE,
+      TAX_PERC: this.GST,
+      TRANSFER_NO: item.ART_NO,
+      SALE_DATE: item.DN_DATE,
+      ARTICLE: item.ARTICLE,
+      TOTAL_PAIR_QTY: item.TOTAL_PAIR_QTY,
+    }));
+
+    // Refresh grid
+    setTimeout(() => {
+      if (this.itemsGridRef?.instance) {
+        this.itemsGridRef.instance.refresh();
+      }
+    }, 200);
+
+    console.log('EDIT MODE - Loaded Data:', this.mainInvoiceGridList);
   }
 
   formatDate(date: Date | string): string {
@@ -201,13 +286,6 @@ export class AddInvoiceComponent {
     this.dataService.getCustomerOrUnit().subscribe((response: any) => {
       this.distributorList = response;
       console.log(this.distributorList, 'DISTLISTPOPUP');
-    });
-  }
-
-  getCompanyListDropdown() {
-    this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'distributorList');
     });
   }
 
@@ -226,7 +304,7 @@ export class AddInvoiceComponent {
       this.invoiceFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
       console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
     }
-    this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
+    this.invoiceFormData.CUST_ID = selectedCustomer.ID;
     if (this.selectedCustomerType) {
       console.log(
         'Selected Customer Type:',
@@ -241,35 +319,26 @@ export class AddInvoiceComponent {
 
   onUnitChanged(e: any) {
     if (e.value) {
-      this.invoiceFormData.DISTRIBUTOR_ID = 0;
+      this.invoiceFormData.CUST_ID = 0;
     }
   }
 
-  // onDistributorChanged(e: any) {
-  //   if (e && e.value) {
-  //     this.selectedDistributorId = e.value; // ✅ this is the selected ID
-  //     console.log('Selected Distributor ID:', e);
-
-  //     this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
-  //     this.invoiceFormData.UNIT_ID = 0;
-  //   }
-  //   this.getInvoiceListForGrid();
-  // }
-
   getInvoiceListForGrid() {
-    console.log(this.invoiceFormData.DISTRIBUTOR_ID, 'INVOICELISTFORGRID');
+    console.log(this.invoiceFormData.CUST_ID, 'INVOICELISTFORGRID');
     const payload = {
-      CUST_ID: this.invoiceFormData.DISTRIBUTOR_ID,
+      CUST_ID: this.invoiceFormData.CUST_ID,
     };
-    this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
-      this.staticTransfers = response.Data; // Save the original full list
-      console.log(this.staticTransfers, 'STATISCTRANSFERS');
-      this.invoiceGridList = [...this.staticTransfers]; // Initial value
-    });
+    this.dataService
+      .getInvoiceGridListTrOut(payload)
+      .subscribe((response: any) => {
+        this.staticTransfers = response.Data; // Save the original full list
+        console.log(this.staticTransfers, 'STATISCTRANSFERS');
+        this.invoiceGridList = [...this.staticTransfers]; // Initial value
+      });
   }
 
   getInvoiceNo() {
-    this.dataService.getInvoiceNo().subscribe((response: any) => {
+    this.dataService.getInvoiceNoTrOut().subscribe((response: any) => {
       this.invoiceNo = response.INVOICE_NO;
       console.log(response.INVOICE_NO, 'INVOICENO');
     });
@@ -279,14 +348,9 @@ export class AddInvoiceComponent {
     return (parseFloat(row.PRICE) || 0) * (parseFloat(row.TOTAL_PAIR_QTY) || 0);
   };
 
-  // calculateGstAmount = (row: any) => {
-  //   const amt = this.calculateAmount(row);
-  //   return amt * (parseFloat(row.GST) || 0);
-  // };
-
   calculateGstAmount = (row: any) => {
     const amt = this.calculateAmount(row);
-    const gstPercent = parseFloat(row.GST) || 0;
+    const gstPercent = parseFloat(row.TAX_PERC) || 0;
     return amt * (gstPercent / 100);
   };
 
@@ -295,10 +359,6 @@ export class AddInvoiceComponent {
     const gst = this.calculateGstAmount(row);
     return amt + gst;
   };
-
-  // calculateTotal = (row: any) => {
-  //   return this.calculateAmount(row) + this.calculateGstAmount(row);
-  // };
 
   openTrOutSelector() {
     if (!this.staticTransfers || this.staticTransfers.length === 0) {
@@ -321,11 +381,7 @@ export class AddInvoiceComponent {
       notify('Please select at least one row.', 'warning', 2000);
       return;
     }
-    console.log(selectedRows, 'SELECTEDROWSSSSSSSSSSSSSSSS');
-    console.log(
-      'Selected DN_DETAIL_IDs:',
-      selectedRows.map((x: any) => x.DN_DETAIL_ID)
-    );
+
     // Initialize mainInvoiceGridList if null
     if (!this.mainInvoiceGridList) {
       this.mainInvoiceGridList = [];
@@ -342,7 +398,7 @@ export class AddInvoiceComponent {
     );
     newRows.forEach((row: any) => {
       row.HSN_CODE = this.HSNCODE;
-      row.GST = this.GST;
+      row.TAX_PERC = this.GST;
       // or whatever your login session variable is
     });
     //  Mutate the existing array (DON'T reassign!)
@@ -353,15 +409,6 @@ export class AddInvoiceComponent {
 
     // Optional: Trigger manual change detection if needed
     this.cdr.detectChanges();
-    // setTimeout(() => {
-    //   if (this.itemsGridRef?.instance && this.mainInvoiceGridList.length > 0) {
-    //     this.itemsGridRef.instance.focus(
-    //       this.itemsGridRef.instance.getCellElement(0, 'PRICE')
-    //     );
-    //     // OR start editing directly:
-    //     // this.mainGridRef.instance.editCell(0, 'PRICE');
-    //   }
-    // }, 200);
   }
 
   onPopupHiding() {
@@ -372,27 +419,27 @@ export class AddInvoiceComponent {
   }
 
   onEditorPreparing(e: any) {
-    if (e.dataField === 'PRICE' || e.dataField === 'GST') {
+    if (e.dataField === 'PRICE' || e.dataField === 'TAX_PERC') {
       e.editorOptions = e.editorOptions || {};
 
       // Let the editor inherit row height naturally (no fixed height)
       e.editorOptions.elementAttr = {
         style: `
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        align-items: center;
-      `,
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          align-items: center;
+        `,
       };
 
       // Make sure the input fits snugly inside
       e.editorOptions.inputAttr = {
         style: `
-        height: 100%;
-        padding: 0 4px;
-        box-sizing: border-box;
-      `,
+          height: 100%;
+          padding: 0 4px;
+          box-sizing: border-box;
+        `,
       };
 
       // Remove spin buttons to prevent layout changes
@@ -408,7 +455,7 @@ export class AddInvoiceComponent {
             (r) => r?.data === e.row?.data
           );
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+            grid.focus(grid.getCellElement(rowIndex, 'TAX_PERC'));
           }, 50);
         }
       };
@@ -421,8 +468,8 @@ export class AddInvoiceComponent {
       const currentField = column?.dataField;
 
       if (currentField === 'PRICE') {
-        // Move to GST column after PRICE
-        this.itemsGridRef.instance.editCell(rowIndex, 'GST');
+        // Move to TAX_PERC column after PRICE
+        this.itemsGridRef.instance.editCell(rowIndex, 'TAX_PERC');
       }
     }
   }
@@ -436,7 +483,8 @@ export class AddInvoiceComponent {
 
     if (this.summaryValues) {
       this.totalAmount =
-        this.itemsGridRef?.instance?.getTotalSummaryValue('AMOUNT') || 0;
+        this.itemsGridRef?.instance?.getTotalSummaryValue('TAXABLE_AMOUNT') ||
+        0;
       this.taxAmount =
         this.itemsGridRef?.instance?.getTotalSummaryValue('TAX_AMOUNT') || 0;
       this.grandTotal =
@@ -444,7 +492,7 @@ export class AddInvoiceComponent {
 
       console.log('GROSS AMOUNT Summary:', this.totalAmount);
       console.log('TAX_AMOUNT Summary:', this.taxAmount);
-      console.log('NET AMOUNT Summary:', this.grandTotal);
+      console.log('NET_AMOUNT Summary:', this.grandTotal);
     } else {
       console.warn('Summary values not ready yet.');
     }
@@ -455,142 +503,147 @@ export class AddInvoiceComponent {
 
   saveInvoice() {
     console.log('save clicked');
-    if (!this.invoiceFormData.DISTRIBUTOR_ID) {
-      notify('Please select Customer', 'error', 3000);
 
+    // ----------------------- VALIDATIONS -----------------------
+    if (!this.invoiceFormData.CUST_ID) {
+      notify('Please select Customer', 'error', 3000);
       return;
     }
-    console.log(this.mainInvoiceGridList, 'MAINGRID');
-    // 2. Validation checks
+
     if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
       notify('No items in the grid to save.', 'error', 3000);
-      return;
-    }
-
-    // 1. Get updated summary values from the grid
-    if (this.itemsGridRef?.instance) {
-      this.totalAmount =
-        this.itemsGridRef.instance.getTotalSummaryValue('AMOUNT') || 0;
-      this.taxAmount =
-        this.itemsGridRef.instance.getTotalSummaryValue('TAX_AMOUNT') || 0;
-      this.grandTotal =
-        this.itemsGridRef.instance.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
-    } else {
-      notify('Grid instance not available for summary.', 'error', 3000);
-    }
-    console.log(this.mainInvoiceGridList.length, 'MAINGRIDDDDDDDDDDDDDDDDD');
-    // 2. Validation checks
-    if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
-      notify(
-        {
-          message: 'No items selected to save.',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'error',
-        3000
-      );
       return;
     }
 
     const hasInvalidPrice = this.mainInvoiceGridList.some(
       (row: any) => !row.PRICE || row.PRICE === 0
     );
+
     if (hasInvalidPrice) {
-      notify(
-        {
-          message: 'Some rows have missing or zero price value.',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'error',
-        3000
-      );
+      notify('Some rows have missing or zero price value.', 'error', 3000);
       return;
     }
 
-    // 3. Prepare the SALE_DETAILS array
+    // ----------------------- SUMMARY VALUES -----------------------
+    if (this.itemsGridRef?.instance) {
+      this.totalAmount =
+        this.itemsGridRef.instance.getTotalSummaryValue('TAXABLE_AMOUNT') || 0;
+      this.taxAmount =
+        this.itemsGridRef.instance.getTotalSummaryValue('TAX_AMOUNT') || 0;
+      this.grandTotal =
+        this.itemsGridRef.instance.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
+    }
+
+    // ----------------------- PREPARE SALE DETAILS -----------------------
     this.invoiceFormData.SALE_DETAILS = this.mainInvoiceGridList.map(
       (row: any) => ({
-        DN_DETAIL_ID: row.DN_DETAIL_ID || '',
-        QUANTITY: row.TOTAL_PAIR_QTY || 0,
-        PRICE: row.PRICE || 0,
-        GST: row.GST || 0,
-        AMOUNT: this.calculateAmount(row),
+        DN_DETAIL_ID: row.DN_DETAIL_ID,
+        QUANTITY: row.TOTAL_PAIR_QTY,
+        PRICE: row.PRICE,
+        TAX_PERC: row.TAX_PERC,
+        TAXABLE_AMOUNT: this.calculateAmount(row),
         TAX_AMOUNT: this.calculateGstAmount(row),
         TOTAL_AMOUNT: this.calculateTotal(row),
-
-        // Optional: Do not include row-level total if not needed
       })
     );
 
-    // 4. Set root-level totals
+    // ----------------------- ROOT-LEVEL VALUES -----------------------
     this.invoiceFormData.GROSS_AMOUNT = this.totalAmount;
-    this.invoiceFormData.GST_AMOUNT = this.taxAmount;
+    this.invoiceFormData.TAX_AMOUNT = this.taxAmount;
     this.invoiceFormData.NET_AMOUNT = this.grandTotal;
-    this.invoiceFormData.PARTY_NAME = this.invoiceFormData.PARTY_NAME;
-
     this.invoiceFormData.TRANS_TYPE = 25;
-    this.invoiceFormData.SALE_DATE = new Date();
-    this.invoiceFormData.ADD_TIME = new Date();
+
+    console.log('Final Payload Before API:', this.invoiceFormData);
+
+    // ----------------------- API CALLS -----------------------
+
     const callInsertAPI = () => {
-      this.dataService.insertInvoice(this.invoiceFormData).subscribe(
-        (response) => {
-          console.log('Invoice saved successfully:', response);
-          notify(
-            {
-              message: 'Invoice saved successfully',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-            3000
-          );
+      this.dataService
+        .insertInvoiceTrOut(this.invoiceFormData)
+        .subscribe(() => {
+          notify('Invoice saved successfully', 'success', 3000);
           this.resetInvoiceForm();
-          this.popupClosed?.emit();
-        },
-        (error) => {
-          console.error('Error saving invoice:', error);
-          notify(
-            {
-              message: 'Failed to save invoice',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-            3000
-          );
-        }
-      );
+          this.popupClosed.emit();
+        });
     };
-    // 5. Call the API to save invoice
-    if (this.invoiceFormData.IS_APPROVED === true) {
+
+    const callUpdateAPI = () => {
+      this.dataService
+        .updateInvoiceTrOut(this.invoiceFormData)
+        .subscribe(() => {
+          notify('Invoice updated successfully', 'success', 3000);
+          this.popupClosed.emit();
+        });
+    };
+
+    const callApproveAPI = () => {
       const result = confirm(
-        'Are you sure you want to approve and commit this invoice?',
+        'Are you sure you want to APPROVE this invoice?',
         'Confirmation'
       );
 
       result.then((confirmed) => {
         if (confirmed) {
-          callInsertAPI();
+          this.dataService
+            .commitInvoiceTrOut(this.invoiceFormData)
+            .subscribe(() => {
+              notify('Invoice approved successfully', 'success', 3000);
+              this.popupClosed.emit();
+            });
         }
       });
+    };
+
+    // ----------------------- FINAL DECISION LOGIC -----------------------
+
+    if (this.isEditing) {
+      // --- CASE 1: EDIT MODE ---
+      if (this.invoiceFormData.IS_APPROVED) {
+        // APPROVE EXISTING INVOICE
+        callApproveAPI();
+      } else {
+        // UPDATE EXISTING INVOICE
+        callUpdateAPI();
+      }
     } else {
-      // NOT approved → Direct save
-      callInsertAPI();
+      // --- CASE 2: ADD MODE ---
+      if (this.invoiceFormData.IS_APPROVED) {
+        // Ask confirmation only for approved INSERT
+        const result = confirm(
+          'Are you sure you want to approve and commit this invoice?',
+          'Confirmation'
+        );
+
+        result.then((confirmed) => {
+          if (confirmed) {
+            callInsertAPI();
+          }
+        });
+      } else {
+        // NOT APPROVED → DIRECT INSERT
+        callInsertAPI();
+      }
     }
   }
 
+  openPDF() {}
+
   resetInvoiceForm() {
     this.invoiceFormData = {
-      COMPANY_ID: this.selectedCompanyId || null,
-      FIN_ID: this.invoiceFormData.FIN_ID || null,
-      USER_ID: this.invoiceFormData.USER_ID || null,
-      UNIT_ID: 0,
-      DISTRIBUTOR_ID: 0,
+      COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+      STORE_ID: this.invoiceFormData.STORE_ID,
+      REF_NO: '',
+      PARTY_NAME: '',
+      NARRATION: '',
+      CREATE_USER_ID: this.invoiceFormData.CREATE_USER_ID,
+      FIN_ID: this.invoiceFormData.FIN_ID,
+      CUST_ID: 0,
       GROSS_AMOUNT: 0,
-      GST_AMOUNT: 0,
+      TAX_AMOUNT: 0,
       NET_AMOUNT: 0,
       SALE_DETAILS: [],
-      TRANS_DATE: new Date(), // ✅ add this line
+      TRANS_DATE: new Date(), // add this line
       ADD_TIME: new Date(), // optional
-      SALE_DATE: new Date(),
     };
 
     // Reset invoice number (optional: if API provides a new number)
@@ -613,7 +666,6 @@ export class AddInvoiceComponent {
     this.popupClosed.emit();
   }
 }
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -652,8 +704,8 @@ export class AddInvoiceComponent {
     ViewJournalVoucherModule,
   ],
   providers: [],
-  declarations: [AddInvoiceComponent],
-  exports: [AddInvoiceComponent],
+  declarations: [InvoiceTrOutAddComponent],
+  exports: [InvoiceTrOutAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddInvoiceModule {}
+export class InvoiceTrOutAddModule {}

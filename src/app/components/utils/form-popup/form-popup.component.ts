@@ -65,6 +65,7 @@ export class FormPopupComponent {
   @Output() cancel = new EventEmitter();
 
   @Output() visibleChange = new EventEmitter<boolean>();
+  @Input() showApprove: boolean = true; // default: visible
 
   constructor(protected screen: ScreenService) {}
 

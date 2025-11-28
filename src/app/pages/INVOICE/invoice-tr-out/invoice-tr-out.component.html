@@ -12,8 +12,9 @@
         showPane: true
       }"
       class="grid theme-dependent"
-      [dataSource]="filteredJournalVoucherList"
+      [dataSource]="filteredInvoiceList"
       [showBorders]="true"
+      [showRowLines]="true"
       [showColumnLines]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
@@ -29,10 +30,9 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
-      (onEditingStart)="onEditJournalVoucher($event)"
-      (onRowRemoving)="onDeleteJournalVoucher($event)"
+      (onEditingStart)="onEditInvoice($event)"
+      (onRowRemoving)="onDeleteInvoice($event)"
       (onToolbarPreparing)="onToolbarPreparing($event)"
-      (onExporting)="onExporting($event)"
       (onCellPrepared)="onCellPrepared($event)"
     >
       <dxo-editing
@@ -40,12 +40,6 @@
         [allowUpdating]="true"
         [allowDeleting]="canDelete"
       ></dxo-editing>
-      <dxo-export
-        [enabled]="true"
-        [allowExportSelectedData]="false"
-        [formats]="['xlsx']"
-      >
-      </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -68,32 +62,22 @@
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
       <dxo-toolbar>
-        <!-- Title -->
         <dxi-item location="before">
-          <div class="grid-header">Journal Voucher</div>
+          <div class="grid-header">Invoice</div>
         </dxi-item>
-        <!-- Date Range Filter -->
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
-
         <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-
         <dxi-item
-          name="exportButton"
-          location="after"
-          cssClass="custom-export-button"
-        ></dxi-item>
-
-        <dxi-item
+          *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
-          *ngIf="canAdd"
         ></dxi-item>
       </dxo-toolbar>
 
@@ -113,22 +97,51 @@
           </div>
         </dx-select-box>
       </div>
-
-      <dxi-column dataField="JOURNAL_NO" caption="Journal No."></dxi-column>
-
-      <dxi-column dataField="REF_NO" caption="Reference No."></dxi-column>
-
-      <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
+      <!-- <dxi-column dataField="TRANS_TYPE" caption="Trans Type"></dxi-column> -->
       <dxi-column
-        dataField="TRANS_DATE"
+        dataField="INVOICE_NO"
+        caption="Sale No"
+        alignment="right"
+      ></dxi-column>
+      <dxi-column
+        dataField="CUST_NAME"
+        caption="Customer"
+        alignment="right"
+      ></dxi-column>
+      <dxi-column
+        dataField="INVOICE_DATE"
         caption="Date"
         dataType="date"
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column
+        dataField="GROSS_AMOUNT"
+        caption="Gross Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="GST_AMOUNT"
+        [caption]="
+          selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+            ? ' VAT Amount'
+            : ' GST Amount'
+        "
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="NET_AMOUNT"
+        caption="Net Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+
+      <dxi-column
         caption="Status"
         dataField="STATUS"
+        [width]="80"
         [cellTemplate]="statusCellRender"
         [allowHeaderFiltering]="true"
         [headerFilter]="{
@@ -142,43 +155,49 @@
 </div>
 
 <dx-popup
-  [(visible)]="isAddJournalVoucher"
-  [width]="'90vw'"
+  [(visible)]="isAddInvoice"
+  [width]="'100vw'"
   [height]="'100vh'"
-  title="Journal Voucher"
+  title="New Invoice - Transfer out"
   (onHiding)="handleClose()"
 >
-  <app-add-journal-vouchar
-    #journalChild
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-invoice-tr-out-add
     (popupClosed)="handleClose()"
-  ></app-add-journal-vouchar>
+  ></app-invoice-tr-out-add>
+  <!-- </ng-container> -->
 </dx-popup>
 
 <dx-popup
-  [(visible)]="isEditJournalVoucher"
-  [width]="'90vw'"
+  [(visible)]="isEditInvoice"
+  [width]="'100vw'"
   [height]="'100vh'"
-  title="Update Journal Voucher"
+  title="Update Invoice"
   (onHiding)="handleClose()"
 >
-  <app-edit-journal-voucher
-    [journalVoucherFormData]="selectedJournalVoucher"
-    (popupClosed)="handleClose()"
-  ></app-edit-journal-voucher>
+  <ng-container *ngIf="isEditInvoice">
+    <app-invoice-tr-out-add
+      [isEditing]="true"
+      [EditingResponseData]="selectedInvoice"
+      [isReadOnlyMode]="isReadOnlyInvoice"
+      (popupClosed)="handleClose()"
+    ></app-invoice-tr-out-add>
+  </ng-container>
 </dx-popup>
 
 <dx-popup
-  [(visible)]="isViewJournalVoucher"
-  [width]="'90vw'"
+  [(visible)]="isViewInvoice"
+  [width]="'100vw'"
   [height]="'100vh'"
-  title="Journal Voucher"
+  title="View Invoice"
   (onHiding)="handleClose()"
 >
-  <app-view-journal-voucher
-    [journalVoucherFormData]="selectedJournalVoucher"
-    (popupClosed)="handleClose()"
-    [JVid]="selectedJV"
-  ></app-view-journal-voucher>
+  <ng-container *ngIf="isViewInvoice">
+    <app-view-invoice
+      [invoiceFormData]="selectedInvoice"
+      (popupClosed)="handleClose()"
+    ></app-view-invoice>
+  </ng-container>
 </dx-popup>
 
 <dx-popup

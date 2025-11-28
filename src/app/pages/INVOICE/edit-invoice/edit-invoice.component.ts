@@ -267,11 +267,11 @@ export class EditInvoiceComponent {
     console.log('staticTransfers:', this.staticTransfers);
 
     const selectedTransferNos =
-      this.mainInvoiceGridList?.map((t) => t.TRANSFER_SUMMARY_ID) || [];
+      this.mainInvoiceGridList?.map((t) => t.DN_DETAIL_ID) || [];
 
     // Filter the full list before showing in popup
     this.invoiceGridList = this.staticTransfers.filter(
-      (item: any) => !selectedTransferNos.includes(item.TRANSFER_SUMMARY_ID)
+      (item: any) => !selectedTransferNos.includes(item.DN_DETAIL_ID)
     );
     this.isTrOutPopupVisible = true;
   }
@@ -290,12 +290,12 @@ export class EditInvoiceComponent {
 
     // Get existing IDs to avoid duplicates
     const existingTransferIds = this.mainInvoiceGridList.map(
-      (item: any) => item.TRANSFER_SUMMARY_ID
+      (item: any) => item.DN_DETAIL_ID
     );
 
     // Only add new unique rows
     const newRows = selectedRows.filter(
-      (row: any) => !existingTransferIds.includes(row.TRANSFER_SUMMARY_ID)
+      (row: any) => !existingTransferIds.includes(row.DN_DETAIL_ID)
     );
     newRows.forEach((row: any) => {
       row.HSN_CODE = this.HSNCODE;
@@ -457,7 +457,7 @@ export class EditInvoiceComponent {
             NET_AMOUNT: this.grandTotal,
             PARTY_NAME: this.invoiceFormData.PARTY_NAME,
             SALE_DETAILS: this.mainInvoiceGridList.map((row: any) => ({
-              TRANSFER_SUMMARY_ID: row.TRANSFER_SUMMARY_ID || '',
+              DN_DETAIL_ID: row.DN_DETAIL_ID || '',
               QUANTITY: row.TOTAL_PAIR_QTY || 0,
               PRICE: row.PRICE || 0,
               GST: row.GST || 0,
@@ -508,7 +508,7 @@ export class EditInvoiceComponent {
         NET_AMOUNT: this.grandTotal,
         PARTY_NAME: this.invoiceFormData.PARTY_NAME,
         SALE_DETAILS: this.mainInvoiceGridList.map((row: any) => ({
-          TRANSFER_SUMMARY_ID: row.TRANSFER_SUMMARY_ID || '',
+          DN_DETAIL_ID: row.DN_DETAIL_ID || '',
           QUANTITY: row.TOTAL_PAIR_QTY || 0,
           PRICE: row.PRICE || 0,
           GST: row.GST || 0,

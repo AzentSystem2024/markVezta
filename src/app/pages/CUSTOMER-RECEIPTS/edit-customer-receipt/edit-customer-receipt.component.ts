@@ -468,6 +468,21 @@ export class EditCustomerReceiptComponent {
   };
 
   onEditorPreparing(e: any) {
+    // Disable selection checkbox when in read-only mode
+    if (e.parentType === 'dataRow' && e.dataField === 'selected') {
+      if (this.isReadOnlyMode) {
+        e.editorOptions.readOnly = true;
+        e.editorOptions.disabled = true;
+      }
+    }
+
+    // Disable header checkbox (select all)
+    if (e.parentType === 'headerRow' && e.dataField === 'selected') {
+      if (this.isReadOnlyMode) {
+        e.editorOptions.readOnly = true;
+        e.editorOptions.disabled = true;
+      }
+    }
     if (e.parentType !== 'dataRow') return;
 
     if (e.dataField === 'AMOUNT') {

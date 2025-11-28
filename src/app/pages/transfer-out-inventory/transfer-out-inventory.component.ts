@@ -416,27 +416,37 @@ export class TransferOutInventoryComponent {
     this.isAddTransferOut = true;
   }
 
-  onCellPrepared(e: any) {
-    if (e.rowType === 'data' && e.column.command === 'delete') {
-      const status = e.data.STATUS;
+  // onCellPrepared(e: any) {
+  //   if (e.rowType === 'data' && e.column.command === 'delete') {
+  //     const status = e.data.STATUS;
 
-      if (status === 'APPROVED') {
+  //     if (status === 'APPROVED') {
+  //       const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+  //       if (deleteButton) {
+  //         // intercept the click
+  //         deleteButton.addEventListener('click', (event: Event) => {
+  //           event.preventDefault();
+  //           event.stopPropagation();
+  //           notify('Approved records cannot be deleted.', 'warning', 2000);
+  //         });
+
+  //         // style it as disabled if you like
+  //         deleteButton.classList.add('dx-state-disabled');
+  //       }
+  //     }
+  //   }
+  // }
+
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.STATUS === 'APPROVED') {
         const deleteButton = e.cellElement.querySelector('.dx-link-delete');
         if (deleteButton) {
-          // intercept the click
-          deleteButton.addEventListener('click', (event: Event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            notify('Approved records cannot be deleted.', 'warning', 2000);
-          });
-
-          // style it as disabled if you like
-          deleteButton.classList.add('dx-state-disabled');
+          deleteButton.style.display = 'none';
         }
       }
     }
   }
-
   onEditTransferOut(event: any) {
     event.cancel = true;
     const trOutId = event.data.ID;
@@ -445,7 +455,6 @@ export class TransferOutInventoryComponent {
       .selectTransferOutForInventory(trOutId)
       .subscribe((response: any) => {
         this.selectedTrOut = response;
-        console.log(this.selecteTrOut, 'SELECTEDTROUT');
         this.isEditTransferOut = true;
         this.isReadOnlyTrOut = status === 'APPROVED';
       });
@@ -460,7 +469,6 @@ export class TransferOutInventoryComponent {
       return;
     }
     event.cancel = true;
-    console.log(trOutId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
     // Call your delete API
     this.dataService.deleteTrOutForInventory(trOutId).subscribe(
       (response: any) => {

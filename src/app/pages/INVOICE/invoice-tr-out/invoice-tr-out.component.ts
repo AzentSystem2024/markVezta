@@ -41,26 +41,31 @@ import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credi
 import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
 import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
 import { AddDebitModule } from '../../DEBIT/add-debit/add-debit.component';
-import { DebitComponent } from '../../DEBIT/debit/debit.component';
 import { EditDebitModule } from '../../DEBIT/edit-debit/edit-debit.component';
 import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
-import { DataService } from 'src/app/services';
 import {
   AddInvoiceComponent,
   AddInvoiceModule,
 } from '../add-invoice/add-invoice.component';
 import { EditInvoiceModule } from '../edit-invoice/edit-invoice.component';
-import notify from 'devextreme/ui/notify';
+import { InvoiceListComponent } from '../invoice-list/invoice-list.component';
 import { ViewInvoiceModule } from '../view-invoice/view-invoice.component';
+import notify from 'devextreme/ui/notify';
+import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
+import {
+  InvoiceTrOutAddComponent,
+  InvoiceTrOutAddModule,
+} from '../invoice-tr-out-add/invoice-tr-out-add.component';
 
 @Component({
-  selector: 'app-invoice-list',
-  templateUrl: './invoice-list.component.html',
-  styleUrls: ['./invoice-list.component.scss'],
+  selector: 'app-invoice-tr-out',
+  templateUrl: './invoice-tr-out.component.html',
+  styleUrls: ['./invoice-tr-out.component.scss'],
 })
-export class InvoiceListComponent {
-  @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
+export class InvoiceTrOutComponent {
+  @ViewChild(InvoiceTrOutAddComponent)
+  InvoiceTrOutAddComponent!: InvoiceTrOutAddComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -119,6 +124,7 @@ export class InvoiceListComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  isReadOnlyInvoice: boolean;
 
   constructor(
     private dataService: DataService,
@@ -157,30 +163,60 @@ export class InvoiceListComponent {
   }
 
   getInvoiceList() {
-    this.dataService.getInvoiceMainList().subscribe((response: any) => {
+    this.dataService.getInvoiceMainListTrOut().subscribe((response: any) => {
       this.invoiceList = response.Data.map((item: any) => {
+        let saleDate = item.INVOICE_DATE;
         let dateValue: Date;
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (
-          typeof item.SALE_DATE === 'string' &&
-          item.SALE_DATE.includes('-')
-        ) {
-          const [day, month, year] = item.SALE_DATE.split('-').map(Number);
+        // Case 1: DD-MM-YYYY (matches exactly 2-2-4 digits)
+        if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
+          const [day, month, year] = saleDate.split('-').map(Number);
           dateValue = new Date(year, month - 1, day);
-        } else {
-          dateValue = new Date(item.SALE_DATE);
+        }
+        // Case 2: ISO format from backend
+        else if (typeof saleDate === 'string') {
+          dateValue = new Date(saleDate);
+        }
+        // Case 3: Already a date
+        else {
+          dateValue = new Date(saleDate);
         }
 
         return {
           ...item,
-          SALE_DATE: dateValue,
+          INVOICE_DATE: dateValue,
         };
-      }).sort((a: any, b: any) => Number(b.SALE_NO) - Number(a.SALE_NO));
+      }).sort((a: any, b: any) => Number(b.INVOICE_NO) - Number(a.INVOICE_NO));
 
       this.applyDateFilter();
     });
   }
+
+  // getInvoiceList() {
+  //   this.dataService.getInvoiceMainListTrOut().subscribe((response: any) => {
+  //     this.invoiceList = response.Data.map((item: any) => {
+  //       let dateValue: Date;
+
+  //       // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
+  //       if (
+  //         typeof item.INVOICE_DATE === 'string' &&
+  //         item.INVOICE_DATE.includes('-')
+  //       ) {
+  //         const [day, month, year] = item.INVOICE_DATE.split('-').map(Number);
+  //         dateValue = new Date(year, month - 1, day);
+  //       } else {
+  //         dateValue = new Date(item.INVOICE_DATE);
+  //       }
+
+  //       return {
+  //         ...item,
+  //         INVOICE_DATE: dateValue,
+  //       };
+  //     }).sort((a: any, b: any) => Number(b.INVOICE_NO) - Number(a.INVOICE_NO));
+
+  //     this.applyDateFilter();
+  //   });
+  // }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -303,7 +339,7 @@ export class InvoiceListComponent {
     }
 
     this.filteredInvoiceList = this.invoiceList.filter((item: any) => {
-      const invoiceDate = item.SALE_DATE;
+      const invoiceDate = item.INVOICE_DATE;
       return invoiceDate >= startDate && invoiceDate <= endDate;
     });
   }
@@ -318,7 +354,7 @@ export class InvoiceListComponent {
     end.setHours(23, 59, 59, 999);
 
     this.filteredInvoiceList = this.invoiceList.filter((item: any) => {
-      const invoiceDate = item.SALE_DATE;
+      const invoiceDate = item.INVOICE_DATE;
       return invoiceDate >= start && invoiceDate <= end;
     });
 
@@ -435,39 +471,36 @@ export class InvoiceListComponent {
   }
 
   onEditInvoice(event: any) {
-    event.cancel = true; // Prevent default popup editing
+    event.cancel = true;
     const invoiceId = event.data.TRANS_ID;
-    const transStatus = event.data.TRANS_STATUS;
-    console.log(transStatus, 'transstatus');
-
-    this.dataService.selectInvoice(invoiceId).subscribe((response: any) => {
-      this.selectedInvoice = response.Data;
-      if (transStatus === 5) {
-        // Open view popup
-        this.isViewInvoice = true;
-      } else {
-        // Open edit popup
+    const status = event.data.TRANS_STATUS;
+    this.dataService
+      .selectInvoiceTrOut(invoiceId)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response;
+        console.log(this.selectedInvoice, 'SELECTEDTROUT');
         this.isEditInvoice = true;
-      }
-      console.log(this.selectedInvoice, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-    });
+        this.isReadOnlyInvoice = status === 5;
+      });
   }
 
   onDeleteInvoice(event: any) {
+    const invoiceId = event.data.TRANS_ID;
+    const status = event.data.TRANS_STATUS;
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
-      notify('Invoice cannot be deleted.', 'error', 2000);
+      notify('This cannot be deleted.', 'error', 2000);
       return;
     }
-    const invoiceId = event.data.TRANS_ID;
     event.cancel = true;
+    console.log(invoiceId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
     // Call your delete API
-    this.dataService.deleteInvoice(invoiceId).subscribe(
+    this.dataService.deleteInvoiceTrOut(invoiceId).subscribe(
       (response: any) => {
         if (response) {
           notify(
             {
-              message: 'Invoice Deleted Successfully',
+              message: 'Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
             'success'
@@ -501,8 +534,8 @@ export class InvoiceListComponent {
     this.isEditInvoice = false;
     this.isViewInvoice = false;
     this.getInvoiceList();
-    if (this.addInvoiceComp) {
-      this.addInvoiceComp.resetInvoiceForm();
+    if (this.InvoiceTrOutAddComponent) {
+      this.InvoiceTrOutAddComponent.resetInvoiceForm();
     }
   }
 }
@@ -547,10 +580,11 @@ export class InvoiceListComponent {
     AddInvoiceModule,
     EditInvoiceModule,
     ViewInvoiceModule,
+    InvoiceTrOutAddModule,
   ],
   providers: [],
-  declarations: [InvoiceListComponent],
-  exports: [InvoiceListComponent],
+  declarations: [InvoiceTrOutComponent],
+  exports: [InvoiceTrOutComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceListModule {}
+export class InvoiceTrOutModule {}

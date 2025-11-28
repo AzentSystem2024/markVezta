@@ -62,30 +62,36 @@
                     [readOnly]="isReadOnlyMode"
                   ></dx-select-box>
                 </div>
-                <!-- <div style="margin-top: -6px; display: flex; gap: 10px">
-                  <dx-select-box
-                    [(value)]="deliveryFormData.CUST_ID"
-                    [dataSource]="customer"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    [width]="405"
-                    [searchEnabled]="true"
-                    label="Customer"
-                    labelMode="floating"
-                    [readOnly]="isReadOnlyMode"
-                    (onValueChanged)="customerChanged($event)"
-                  ></dx-select-box>
-                 
-                </div> -->
               </div>
             </dxi-item>
 
             <dxi-item location="after" locateInMenu="auto">
               <div class="stacked-toolbar-group">
                 <div style="display: flex; align-items: center; gap: 5px">
+                  <dx-radio-group
+                    [(value)]="deliveryFormData.TYPE"
+                    [items]="[
+                      { id: 1, text: 'Transfer Out' },
+                      { id: 2, text: 'Delivery Note' }
+                    ]"
+                    valueExpr="id"
+                    displayExpr="text"
+                    layout="horizontal"
+                    (onValueChanged)="typeChanged($event)"
+                  >
+                  </dx-radio-group>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    margin-top: -5px;
+                  "
+                >
                   <dx-select-box
                     [(value)]="deliveryFormData.CUST_ID"
-                    [dataSource]="customer"
+                    [dataSource]="customerList"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     [width]="405"
@@ -95,16 +101,8 @@
                     [readOnly]="isReadOnlyMode"
                     (onValueChanged)="customerChanged($event)"
                   ></dx-select-box>
-                  <!-- Reference No -->
-                  <!-- <dx-text-box
-                    [(value)]="deliveryFormData.CONTACT_NAME"
-                    label="Contact Name"
-                    labelMode="floating"
-                    [width]="'100%'"
-                    [readOnly]="true"
-                  ></dx-text-box> -->
 
-                  <!-- Plus Button -->
+                  <!-- Plus Button (now aligned to the right of Customer select) -->
                   <dx-button
                     icon="plus"
                     stylingMode="outlined"
@@ -115,19 +113,6 @@
                     [disabled]="isReadOnlyMode || !deliveryFormData.CUST_ID"
                   ></dx-button>
                 </div>
-                <div style="margin-top: 10px">
-                  <dx-radio-group
-                    [(value)]="deliveryFormData.TYPE"
-                    [items]="[
-                      { id: 'T_OUT', text: 'Transfer Out' },
-                      { id: 'D_NOTE', text: 'Delivery Note' }
-                    ]"
-                    valueExpr="id"
-                    displayExpr="text"
-                    layout="horizontal"
-                  >
-                  </dx-radio-group>
-                </div>
                 <div
                   style="
                     display: flex;
@@ -135,18 +120,7 @@
                     margin-top: -4px;
                     align-items: flex-start;
                   "
-                >
-                  <!-- <div style="flex: 1">
-                    <dx-text-box
-                      [(value)]="deliveryFormData.CONTACT_FAX"
-                      label="Fax"
-                      labelMode="floating"
-                      [width]="'100%'"
-                      [readOnly]="true"
-                    >
-                    </dx-text-box>
-                  </div> -->
-                </div>
+                ></div>
 
                 <div
                   style="
@@ -155,29 +129,7 @@
                     gap: 5px;
                     align-items: flex-start;
                   "
-                >
-                  <!-- <div style="flex: 1">
-                    <dx-text-box
-                      [(value)]="deliveryFormData.CONTACT_PHONE"
-                      label="Phone"
-                      labelMode="floating"
-                      [width]="'100%'"
-                      [readOnly]="true"
-                    >
-                    </dx-text-box>
-                  </div> -->
-
-                  <!-- <div style="flex: 1">
-                    <dx-text-box
-                      [(value)]="deliveryFormData.CONTACT_MOBILE"
-                      label="Mobile"
-                      labelMode="floating"
-                      [width]="'100%'"
-                      [readOnly]="true"
-                    >
-                    </dx-text-box>
-                  </div> -->
-                </div>
+                ></div>
               </div>
             </dxi-item>
           </dxo-toolbar>
@@ -213,11 +165,11 @@
             caption="Remarks"
             [allowEditing]="false"
           ></dxi-column>
-          <dxi-column
+          <!-- <dxi-column
             dataField="UOM"
             caption="UOM"
             [allowEditing]="false"
-          ></dxi-column>
+          ></dxi-column> -->
           <dxi-column
             dataField="QUANTITY"
             caption="Quantity"
@@ -243,14 +195,14 @@
               column="DELIVERED_QUANTITY"
               summaryType="sum"
               displayFormat="Total Qty: {0}"
-              [valueFormat]="'#.00'"
             ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
 
         <div class="form-footer">
-          <!-- Narration stays in left -->
+          <!-- LEFT SECTION -->
           <div class="footer-left">
+            <!-- Narration -->
             <dx-text-box
               #narrationRef
               [(value)]="deliveryFormData.NARRATION"
@@ -259,36 +211,90 @@
               class="narration-box"
               [readOnly]="isReadOnlyMode"
             ></dx-text-box>
+
+            <!-- Contact Name stays here (LEFT SIDE) -->
+            <dx-text-box
+              [(value)]="deliveryFormData.CONTACT_NAME"
+              label="Contact Name"
+              labelMode="floating"
+              [width]="410"
+              [readOnly]="true"
+              style="margin-top: 10px"
+            ></dx-text-box>
+            <div style="flex: 1">
+              <dx-text-box
+                [(value)]="deliveryFormData.CONTACT_FAX"
+                label="Fax"
+                labelMode="floating"
+                [width]="410"
+                [readOnly]="true"
+              ></dx-text-box>
+              <!--  -->
+            </div>
           </div>
 
-          <!-- Buttons + Approve checkbox grouped together -->
+          <!-- RIGHT SECTION -->
           <div class="footer-right">
-            <!-- <dx-text-box
-              label="Net Amount"
-              labelMode="floating"
-              [readOnly]="true"
-            ></dx-text-box> -->
+            <!-- Phone + Fax moved to RIGHT SIDE -->
+            <div
+              class="contact-right"
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                width: 250px;
+              "
+            >
+              <dx-text-box
+                [(value)]="deliveryFormData.CONTACT_PHONE"
+                label="Phone"
+                labelMode="floating"
+                [readOnly]="true"
+              ></dx-text-box>
 
+              <dx-text-box
+                [(value)]="deliveryFormData.CONTACT_MOBILE"
+                label="Mobile"
+                labelMode="floating"
+                [readOnly]="true"
+              >
+              </dx-text-box>
+            </div>
+
+            <!-- Approve Checkbox -->
             <dx-check-box
-              *ngIf="isEditing && !isReadOnlyMode"
-              [(value)]="isApproved"
-              text="Approve"
+              [value]="isReadOnlyMode ? true : deliveryFormData.IS_APPROVED"
+              (valueChange)="
+                !isReadOnlyMode ? (deliveryFormData.IS_APPROVED = $event) : null
+              "
+              [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+              [readOnly]="isReadOnlyMode"
               class="approve-checkbox"
+              style="margin-top: 15px"
             ></dx-check-box>
 
-            <div class="footer-actions">
+            <!-- Buttons -->
+            <div class="footer-actions" style="margin-top: 15px">
               <dx-button
                 text="Cancel"
                 (onClick)="cancel()"
                 stylingMode="outlined"
                 type="normal"
               ></dx-button>
+
               <dx-button
-                *ngIf="!isReadOnlyMode"
-                [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
-                (onClick)="saveDeliveryNote()"
+                #saveButtonRef
+                [text]="
+                  isReadOnlyMode
+                    ? 'PDF'
+                    : deliveryFormData.IS_APPROVED
+                    ? 'Commit'
+                    : 'Save'
+                "
+                (onClick)="isReadOnlyMode ? openPDF() : saveDeliveryNote()"
                 stylingMode="contained"
                 type="default"
+                [width]="120"
               ></dx-button>
             </div>
           </div>

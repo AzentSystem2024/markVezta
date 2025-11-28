@@ -73,7 +73,7 @@ export class ListMiscellaneousPaymentsComponent {
   selectedMiscPayment: any;
   MiscPaymentId: any;
 
-   //========================Export data ==========================
+  //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'Micellaneous_Payments';
     this.dataService.exportDataGrid(event, fileName);
@@ -416,13 +416,24 @@ export class ListMiscellaneousPaymentsComponent {
     }, 0);
   }
 
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.TRANS_STATUS === 5) {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
+  }
+
   onEditOrViewMiscPayment(e: any) {
     e.cancel = true;
     const miscId = e.data.TRANS_ID;
 
     const status = e.data.TRANS_STATUS;
     this.MiscPaymentId = e.data.TRANS_ID;
-    this.selectedMiscPayment = miscId
+    this.selectedMiscPayment = miscId;
     this.dataService.selectMiscPayment(miscId).subscribe({
       next: (response: any) => {
         this.selectedmiscellaneousData = response;

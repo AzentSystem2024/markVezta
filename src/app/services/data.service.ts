@@ -306,7 +306,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}ACTransactions/invoicelist`, payload);
   }
 
-  //INVOICE
+  //---------------------------------------INVOICE-------------------------------------------//
   getInvoiceGridList(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Invoice/list`, payload);
   }
@@ -353,7 +353,50 @@ export class DataService {
   getPendingInvoiceList(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}AC_CreditNote/invoicelist`, payload);
   }
+  //-------------------------------INVOICE-TRANSFER-OUT-------------------------------------//
+  //---------------------------------------INVOICE-------------------------------------------//
+  getInvoiceGridListTrOut(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Trout_Invoice/list`, payload);
+  }
 
+  getInvoiceMainListTrOut(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Trout_Invoice/getlist`, {});
+  }
+
+  getCustomerOrUnitTrOut(): Observable<any> {
+    return this.http.post(`${this.apiUrl}CustTypeDrop`, {});
+  }
+
+  insertInvoiceTrOut(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Trout_Invoice/insert`, data);
+  }
+
+  updateInvoiceTrOut(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Trout_Invoice/update`, data);
+  }
+
+  selectInvoiceTrOut(id: number) {
+    return this.http.post<any>(`${this.apiUrl}Trout_Invoice/select/` + id, {});
+  }
+
+  getInvoiceNoTrOut(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Trout_Invoice/invoiceno`, {});
+  }
+
+  commitInvoiceTrOut(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Trout_Invoice/approve`, data);
+  }
+
+  deleteInvoiceTrOut(id: number) {
+    return this.http.post<any>(`${this.apiUrl}Trout_Invoice/delete/` + id, {});
+  }
+
+  getPendingInvoiceListTrOut(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}AC_CreditNote/invoicelist`, payload);
+  }
   //--------------------------PURCHASE-RETURN-DEBIT-------------------------------------//
   getPurchaseReturnMainList(): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseReturn/list`, {});

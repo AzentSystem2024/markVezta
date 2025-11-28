@@ -46,6 +46,8 @@ import { DataService } from 'src/app/services';
 import { AddInvoiceComponent } from '../INVOICE/add-invoice/add-invoice.component';
 import { confirm } from 'devextreme/ui/dialog';
 import notify from 'devextreme/ui/notify';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-delivery-note-form',
@@ -102,6 +104,7 @@ export class DeliveryNoteFormComponent {
     TOTAL_QTY: 0,
     USER_ID: 0,
     NARRATION: '',
+    DN_TYPE: 0,
     DETAILS: [
       // {
       //   SO_DETAIL_ID: 0,
@@ -139,6 +142,9 @@ export class DeliveryNoteFormComponent {
   };
   selectedCustomerId: any;
   customerDetails: any;
+  insideCustomers: any;
+  outsideCustomers: any;
+  customerList: any;
 
   constructor(
     private dataService: DataService,
@@ -218,6 +224,7 @@ export class DeliveryNoteFormComponent {
       TOTAL_QTY: data.TOTAL_QTY || 0,
       USER_ID: data.USER_ID || this.userID,
       NARRATION: data.NARRATION || '',
+      DN_TYPE: data.DN_TYPE,
       DETAILS: data.DETAILS
         ? data.DETAILS.map((row: any) => ({
             ...row,
@@ -251,6 +258,40 @@ export class DeliveryNoteFormComponent {
     this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
       this.customer = response;
     });
+  }
+
+  typeChanged(e: any) {
+    const selectedType = e.value;
+
+    // ✔️ Set DN_TYPE based on selected radio
+    this.deliveryFormData.DN_TYPE = selectedType;
+
+    if (selectedType === 1) {
+      // Transfer Out → Inside Customers
+      this.getInsideCustomerList();
+    } else if (selectedType === 2) {
+      // Delivery Note → Outside Customers
+      this.getOutsideCustomerList();
+    }
+
+    // Reset customer after type change
+    this.deliveryFormData.CUST_ID = null;
+  }
+
+  getInsideCustomerList() {
+    this.dataService
+      .getDropdownData('INSIDE_CUSTOMER')
+      .subscribe((response: any) => {
+        this.customerList = response;
+      });
+  }
+
+  getOutsideCustomerList() {
+    this.dataService
+      .getDropdownData('OUTSIDE_CUSTOMER')
+      .subscribe((response: any) => {
+        this.customerList = response;
+      });
   }
 
   getStoreDropdown() {
@@ -337,12 +378,13 @@ export class DeliveryNoteFormComponent {
       CATEGORY: row.CATEGORY || '',
       QUANTITY: row.QUANTITY || 0,
       SO_DETAIL_ID: row.SO_DETAIL_ID || 0,
+      PACKING_ID: row.PACKING_ID || 0,
     }));
 
     // Optionally store all SO_DETAIL_IDs as an array
-    this.deliveryFormData.SO_DETAIL_IDs = selectedRows.map(
-      (r: any) => r.SO_DETAIL_ID
-    );
+    // this.deliveryFormData.SO_DETAIL_IDs = selectedRows.map(
+    //   (r: any) => r.SO_DETAIL_ID
+    // );
 
     // Refresh main grid after update
     this.itemsGridRef.instance.refresh();
@@ -530,6 +572,7 @@ export class DeliveryNoteFormComponent {
         QUANTITY: item.QUANTITY || 0,
         DELIVERED_QUANTITY: item.DELIVERED_QUANTITY,
         SO_DETAIL_ID: item.SO_DETAIL_ID || 0,
+        PACKING_ID: item.PACKING_ID || 0,
       })),
     };
 
@@ -538,67 +581,73 @@ export class DeliveryNoteFormComponent {
       payload.ID = this.deliveryFormData.ID;
     }
     // Decide API call based on mode
-    if (this.isEditing && this.isApproved) {
-      const result = confirm(
-        'Are you sure you want to approve this Delivery Note?',
-        'Confirm Approval'
-      );
+    // Decide API call logic
+    if (this.isEditing) {
+      // EDIT MODE
+      if (this.deliveryFormData.IS_APPROVED) {
+        // ✔️ APPROVE existing DN
+        const result = confirm(
+          'Are you sure you want to approve this Delivery Note?',
+          'Confirm Approval'
+        );
 
-      result.then((dialogResult: boolean) => {
-        if (dialogResult) {
-          // ✅ User clicked "Yes"
-          this.dataService.approveDeliveryNote(payload).subscribe({
-            next: (res: any) => {
-              notify(
-                { message: 'Delivery Note Approved!', type: 'success' },
-                'success',
-                2000
-              );
-              this.popupClosed.emit();
-            },
-            error: (err) => {
-              console.error('Approval failed:', err);
-              notify(
-                { message: 'Approval failed!', type: 'error' },
-                'error',
-                3000
-              );
-            },
-          });
-        }
-      });
-    } else if (this.isEditing) {
-      this.dataService.updateDeliveryNote(payload).subscribe({
-        next: (res: any) => {
-          notify(
-            { message: 'Delivery Note Updated!', type: 'success' },
-            'success',
-            2000
-          );
-          this.popupClosed.emit();
-        },
-        error: (err) => {
-          console.error('Update failed:', err);
-          notify({ message: 'Update failed!', type: 'error' }, 'error', 3000);
-        },
-      });
+        result.then((dialogResult: boolean) => {
+          if (dialogResult) {
+            this.dataService.approveDeliveryNote(payload).subscribe({
+              next: () => {
+                notify('Delivery Note Approved!', 'success', 2000);
+                this.popupClosed.emit();
+              },
+              error: () => notify('Approval failed!', 'error', 3000),
+            });
+          }
+        });
+      } else {
+        // ✔️ UPDATE existing DN
+        this.dataService.updateDeliveryNote(payload).subscribe({
+          next: () => {
+            notify('Delivery Note Updated!', 'success', 2000);
+            this.popupClosed.emit();
+          },
+          error: () => notify('Update failed!', 'error', 3000),
+        });
+      }
     } else {
-      this.dataService.saveDeliveryNote(payload).subscribe({
-        next: (res: any) => {
-          notify(
-            { message: 'Delivery Note Saved!', type: 'success' },
-            'success',
-            2000
-          );
-          this.popupClosed.emit();
-        },
-        error: (err) => {
-          console.error('Save failed:', err);
-          notify({ message: 'Save failed!', type: 'error' }, 'error', 3000);
-        },
-      });
+      // ADD MODE
+      if (this.deliveryFormData.IS_APPROVED) {
+        // ✔️ Confirm before saving as Approved
+        const result = confirm(
+          'Are you sure you want to save this Delivery Note as Approved?',
+          'Confirm Save'
+        );
+
+        result.then((dialogResult: boolean) => {
+          if (dialogResult) {
+            this.dataService.saveDeliveryNote(payload).subscribe({
+              next: () => {
+                notify('Delivery Note Saved & Approved!', 'success', 2000);
+                this.ngZone.run(() => {
+                  this.popupClosed.emit();
+                });
+              },
+              error: () => notify('Save failed!', 'error', 3000),
+            });
+          }
+        });
+      } else {
+        // ✔️ Save normally without approval
+        this.dataService.saveDeliveryNote(payload).subscribe({
+          next: () => {
+            notify('Delivery Note Saved!', 'success', 2000);
+            this.popupClosed.emit();
+          },
+          error: () => notify('Save failed!', 'error', 3000),
+        });
+      }
     }
   }
+
+  openPDF() {}
 }
 
 @NgModule({

@@ -908,12 +908,46 @@ import {
   PurchaseReturnDebitFormComponent,
   PurchaseReturnDebitFormModule,
 } from './pages/purchase-return-debit-form/purchase-return-debit-form.component';
-import { MiscPaymentGstListComponent, MiscPaymentGstListModule } from './components/HR/Masters/misc-payment-gst-list/misc-payment-gst-list.component';
-import { MiscPaymentGstAddComponent, MiscPaymentGstAddModule } from './components/HR/Masters/misc-payment-gst-add/misc-payment-gst-add.component';
-import { MiscPaymentGstEditComponent, MiscPaymentGstEditModule } from './components/HR/Masters/misc-payment-gst-edit/misc-payment-gst-edit.component';
-import { PrepaymentGstListComponent, PrePaymentGstListModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
-import { PrepaymentGstAddComponent, PrePaymentGstAddModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-add/prepayment-gst-add.component';
-import { PrepaymentGstEditComponent, PrePaymentGstEditModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-edit/prepayment-gst-edit.component';
+import {
+  MiscPaymentGstListComponent,
+  MiscPaymentGstListModule,
+} from './components/HR/Masters/misc-payment-gst-list/misc-payment-gst-list.component';
+import {
+  MiscPaymentGstAddComponent,
+  MiscPaymentGstAddModule,
+} from './components/HR/Masters/misc-payment-gst-add/misc-payment-gst-add.component';
+import {
+  MiscPaymentGstEditComponent,
+  MiscPaymentGstEditModule,
+} from './components/HR/Masters/misc-payment-gst-edit/misc-payment-gst-edit.component';
+import {
+  PrepaymentGstListComponent,
+  PrePaymentGstListModule,
+} from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
+import {
+  PrepaymentGstAddComponent,
+  PrePaymentGstAddModule,
+} from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-add/prepayment-gst-add.component';
+import {
+  PrepaymentGstEditComponent,
+  PrePaymentGstEditModule,
+} from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-edit/prepayment-gst-edit.component';
+import {
+  InvoiceTrOutComponent,
+  InvoiceTrOutModule,
+} from './pages/INVOICE/invoice-tr-out/invoice-tr-out.component';
+import {
+  InvoiceTrOutAddComponent,
+  InvoiceTrOutAddModule,
+} from './pages/INVOICE/invoice-tr-out-add/invoice-tr-out-add.component';
+import {
+  EditInvoiceTrOutComponent,
+  EditInvoiceTrOutModule,
+} from './pages/INVOICE/edit-invoice-tr-out/edit-invoice-tr-out.component';
+import {
+  ViewInvoiceTrOutComponent,
+  ViewInvoiceTrOutModule,
+} from './pages/INVOICE/view-invoice-tr-out/view-invoice-tr-out.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1260,6 +1294,10 @@ import { PrepaymentGstEditComponent, PrePaymentGstEditModule } from './pages/PRE
     BankReconciliationAddModule,
     PurchaseReturnDebitModule,
     PurchaseReturnDebitFormModule,
+    InvoiceTrOutModule,
+    InvoiceTrOutAddModule,
+    EditInvoiceTrOutModule,
+    ViewInvoiceTrOutModule,
   ],
   providers: [
     AuthService,
