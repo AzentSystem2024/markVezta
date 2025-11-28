@@ -70,6 +70,7 @@
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-select-box
+                    class="customer-select"
                     #distributorRef
                     [(value)]="selectedDistributorId"
                     [dataSource]="distributorList"
@@ -308,11 +309,12 @@
 
               <!-- Bank Name -->
               <dx-text-box
+                class="bank-name-bo x"
                 [(value)]="receiprtFormData.BANK_NAME"
                 label="Bank Name"
                 labelMode="floating"
                 [width]="'100%'"
-                style="margin-top: 5px"
+                style="margin-top: 12px"
                 [disabled]="
                   !(
                     receiptMode === 'Bank' ||

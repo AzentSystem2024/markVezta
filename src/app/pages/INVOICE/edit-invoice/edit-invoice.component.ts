@@ -312,7 +312,9 @@ export class EditInvoiceComponent {
     this.cdr.detectChanges();
   }
 
-  cancelPopup() {}
+  cancelPopup() {
+    this.popupClosed.emit();
+  }
 
   logGridSummaries() {
     this.summaryValues = this.itemsGridRef?.instance?.getTotalSummaryValue;
@@ -383,14 +385,34 @@ export class EditInvoiceComponent {
       return;
     }
     if (!this.invoiceFormData.DISTRIBUTOR_ID) {
-      notify('Please select Customer', 'error', 3000);
+      notify({
+        message: 'Please select customer',
+        type: 'error',
+        displayTime: 3000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
 
       return;
     }
     console.log(this.mainInvoiceGridList, 'MAINGRID');
     // 2. Validation checks
     if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
-      notify('No items in the grid to save.', 'error', 3000);
+      // notify('No items in the grid to save.', 'error', 3000);
+      notify({
+        message: 'No items in the grid to save.',
+        type: 'error',
+        displayTime: 3000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
+
       return;
     }
 
@@ -403,7 +425,14 @@ export class EditInvoiceComponent {
       this.grandTotal =
         this.itemsGridRef.instance.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
     } else {
-      notify('Grid instance not available for summary.', 'error', 3000);
+      notify(
+        {
+          message: 'Grid instance not available for summary.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'warning',
+        3000
+      );
     }
     console.log(this.mainInvoiceGridList.length, 'MAINGRIDDDDDDDDDDDDDDDDD');
     // 2. Validation checks
@@ -411,9 +440,9 @@ export class EditInvoiceComponent {
       notify(
         {
           message: 'No items selected to save.',
-          position: { at: 'top right', my: 'top right' },
+          position: { at: 'top center', my: 'top center' },
         },
-        'error',
+        'warning',
         3000
       );
       return;
@@ -426,9 +455,9 @@ export class EditInvoiceComponent {
       notify(
         {
           message: 'Some rows have missing or zero price value.',
-          position: { at: 'top right', my: 'top right' },
+          position: { at: 'top center', my: 'top center' },
         },
-        'error',
+        'warning',
         3000
       );
       return;
@@ -475,7 +504,7 @@ export class EditInvoiceComponent {
               notify(
                 {
                   message: 'Invoice committed successfully',
-                  position: { at: 'top right', my: 'top right' },
+                  position: { at: 'top center', my: 'top center' },
                 },
                 'success',
                 3000
@@ -526,7 +555,7 @@ export class EditInvoiceComponent {
           notify(
             {
               message: 'Invoice updated successfully',
-              position: { at: 'top right', my: 'top right' },
+              position: { at: 'top center', my: 'top center' },
             },
             'success',
             3000

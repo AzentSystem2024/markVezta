@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 85vh;
+      height: 75vh;
       display: flex;
       flex-direction: column;
 
@@ -25,7 +25,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'45vh'"
+          [height]="'40vh'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
@@ -67,6 +67,7 @@
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-select-box
+                    class="customer-select"
                     #distributorRef
                     [(value)]="selectedDistributorId"
                     [dataSource]="distributorList"
@@ -307,6 +308,7 @@
 
               <!-- Bank Name -->
               <dx-text-box
+                class="bank-name-box"
                 [(value)]="receiprtFormData.BANK_NAME"
                 label="Bank Name"
                 labelMode="floating"
@@ -368,8 +370,7 @@
     flex-direction: column;
     align-items: flex-end;
     gap: 5px;
-    margin-top: -5px;
-    top: -8px; /* move the block upward */
+    margin-top: 20px;
     padding-right: 10px;
   "
 >

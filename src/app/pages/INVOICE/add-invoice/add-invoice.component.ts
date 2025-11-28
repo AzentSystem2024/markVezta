@@ -302,7 +302,16 @@ export class AddInvoiceComponent {
 
   openTrOutSelector() {
     if (!this.staticTransfers || this.staticTransfers.length === 0) {
-      notify('No data found.', 'warning', 2000);
+      notify({
+        message: 'No data found.',
+        type: 'warning',
+        displayTime: 2000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
       return; // stop execution here
     }
     const selectedTransferNos =
@@ -318,7 +327,16 @@ export class AddInvoiceComponent {
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
     if (!selectedRows || selectedRows.length === 0) {
-      notify('Please select at least one row.', 'warning', 2000);
+      notify({
+        message: 'Please select at least one row',
+        type: 'warning',
+        displayTime: 2000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
       return;
     }
     console.log(selectedRows, 'SELECTEDROWSSSSSSSSSSSSSSSS');
@@ -456,14 +474,32 @@ export class AddInvoiceComponent {
   saveInvoice() {
     console.log('save clicked');
     if (!this.invoiceFormData.DISTRIBUTOR_ID) {
-      notify('Please select Customer', 'error', 3000);
+      notify({
+        message: 'Please select Customer',
+        type: 'warning',
+        displayTime: 3000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
 
       return;
     }
     console.log(this.mainInvoiceGridList, 'MAINGRID');
     // 2. Validation checks
     if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
-      notify('No items in the grid to save.', 'error', 3000);
+      notify({
+        message: 'No items in the grid to save',
+        type: 'warning',
+        displayTime: 3000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
       return;
     }
 
@@ -476,7 +512,16 @@ export class AddInvoiceComponent {
       this.grandTotal =
         this.itemsGridRef.instance.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
     } else {
-      notify('Grid instance not available for summary.', 'error', 3000);
+      notify({
+        message: 'Grid instance not available for summary.',
+        type: 'warning',
+        displayTime: 3000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
     }
     console.log(this.mainInvoiceGridList.length, 'MAINGRIDDDDDDDDDDDDDDDDD');
     // 2. Validation checks
@@ -484,9 +529,9 @@ export class AddInvoiceComponent {
       notify(
         {
           message: 'No items selected to save.',
-          position: { at: 'top right', my: 'top right' },
+          position: { at: 'top center', my: 'center top' },
         },
-        'error',
+        'warning',
         3000
       );
       return;
@@ -499,9 +544,9 @@ export class AddInvoiceComponent {
       notify(
         {
           message: 'Some rows have missing or zero price value.',
-          position: { at: 'top right', my: 'top right' },
+          position: { at: 'top center', my: 'top center' },
         },
-        'error',
+        'warning',
         3000
       );
       return;
@@ -538,7 +583,7 @@ export class AddInvoiceComponent {
           notify(
             {
               message: 'Invoice saved successfully',
-              position: { at: 'top right', my: 'top right' },
+              position: { at: 'top center', my: 'top center' },
             },
             'success',
             3000
@@ -551,7 +596,7 @@ export class AddInvoiceComponent {
           notify(
             {
               message: 'Failed to save invoice',
-              position: { at: 'top right', my: 'top right' },
+              position: { at: 'top center', my: 'top center' },
             },
             'error',
             3000
