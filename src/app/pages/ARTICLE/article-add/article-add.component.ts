@@ -742,7 +742,7 @@ export class ArticleAddComponent {
           const dd = String(d.getDate()).padStart(2, '0');
           return `${yyyy}-${mm}-${dd}`;
         };
-        // ✅ Get BOM grid data
+        //  Get BOM grid data
         const bomGridData =
           this.itemsGridRef?.instance
             .getVisibleRows()
@@ -762,9 +762,9 @@ export class ArticleAddComponent {
           ARTICLE_TYPE: this.selectedTypeId,
           BRAND_ID: this.selectedBrandId,
           // UNIT_ID: this.selectedProductionUnitId,
-          UNIT_ID: Array.isArray(this.selectedProductionUnitId)
-            ? this.selectedProductionUnitId.join(',')
-            : this.selectedProductionUnitId,
+          Units: Array.isArray(this.selectedProductionUnitId)
+            ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))
+            : [{ UNIT_ID: this.selectedProductionUnitId }],
           SUPPLIER_ID: this.selectedMaterialUnitId,
           DESCRIPTION: this.articleData.DESCRIPTION,
           IMAGE_NAME: this.imagePreview ? this.imagePreview.toString() : null,

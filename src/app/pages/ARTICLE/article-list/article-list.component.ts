@@ -344,13 +344,11 @@ export class ArticleListComponent {
     console.log(payload, 'PAYLOADDDDDDDDDDDDDDDDDDDDDD');
     console.log(payload, 'PAYLOAD');
 
-    this.dataService
-      .selectArticle(articleId, payload)
-      .subscribe((response: any) => {
-        this.selectedArticle = response.Data;
-        this.editArticlePopupOpened = true;
-        console.log(response, 'RESPONSE');
-      });
+    this.dataService.selectArticle(articleId).subscribe((response: any) => {
+      this.selectedArticle = response.Data;
+      this.editArticlePopupOpened = true;
+      console.log(response, 'RESPONSE');
+    });
   }
 
   onDeleteArticle(event: any) {
