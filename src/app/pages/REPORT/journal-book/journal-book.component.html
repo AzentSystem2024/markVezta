@@ -355,3 +355,21 @@
     ></app-edit-purchase-invoice>
   </ng-container>
 </dx-popup>
+
+
+<dx-popup
+  [(visible)]="editMiscPopup"
+  [width]="'75vw'"
+  [height]="'100vh'"
+  title="Miscellaneous Receipt"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="editMiscPopup">
+  <app-add-misc-receipt
+    *ngIf="editMiscPopup"
+    [EditingResponseData]="selectedmiscellaneousData"
+    [isReadOnlyMode]="isReadOnlyPayment"
+    (popupClosed)="handleClose()"
+  ></app-add-misc-receipt>
+  </ng-container>
+</dx-popup>

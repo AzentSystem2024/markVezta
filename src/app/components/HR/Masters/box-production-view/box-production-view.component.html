@@ -29,13 +29,11 @@
       focusStateEnabled="false"
       [groupPanel]="{ visible: true }"
       [grouping]="{ autoExpandAll: false }"
-      [summary]="summaryColumnsData" 
+      [summary]="summaryColumnsData"
     >
-      
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
-       
         [displayMode]="displayMode"
         [showPageSizeSelector]="showPageSizeSelector"
         [showInfo]="true"
@@ -47,78 +45,81 @@
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row> -->
-     <dxo-toolbar>
-  <dxi-item location="before">
-    <div class="custom-toolbar-stack">
-      <div class="grid-header">Box Production view</div>
-      <dx-select-box
-        [dataSource]="dateRanges"
-        [displayExpr]="'label'"
-        valueExpr="value"
-        [(value)]="selectedDateRange"
-        (onValueChanged)="onDateRangeChanged($event)"
-        [searchEnabled]="true"
-        [width]="250"
-        placeholder="Select Date Range"
-      >
-        <div *dxTemplate="let item of 'item'">
-          {{ item.value === 'custom' ? 'Custom' : item.label }}
-        </div>
-      </dx-select-box>
-    </div>
-  </dxi-item>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="custom-toolbar-stack">
+            <div class="grid-header">Box Production view</div>
+            <dx-select-box
+              [dataSource]="dateRanges"
+              [displayExpr]="'label'"
+              valueExpr="value"
+              [(value)]="selectedDateRange"
+              (onValueChanged)="onDateRangeChanged($event)"
+              [searchEnabled]="true"
+              [width]="250"
+              placeholder="Select Date Range"
+            >
+              <div *dxTemplate="let item of 'item'">
+                {{ item.value === "custom" ? "Custom" : item.label }}
+              </div>
+            </dx-select-box>
+          </div>
+        </dxi-item>
 
-  <dxi-item location="after">
-    <div class="toolbar-margin-top">
-    <dx-tag-box
-      [items]="CompanyDetails"
-      valueExpr="COMPANY_ID"
-      displayExpr="COMPANY_NAME"
-      label="Select Company"
-      labelMode="floating"
-      [(value)]="company_id"
-      [showSelectionControls]="true"
-      [multiline]="false"
-      [searchEnabled]="true"
-      [width]="230"
-    ></dx-tag-box>
-    </div>
-  </dxi-item>
+        <dxi-item location="after">
+          <div class="toolbar-margin-top">
+            <dx-tag-box
+              [items]="CompanyDetails"
+              valueExpr="COMPANY_ID"
+              displayExpr="COMPANY_NAME"
+              label="Select Company"
+              labelMode="floating"
+              [(value)]="company_id"
+              [showSelectionControls]="true"
+              [multiline]="false"
+              [searchEnabled]="true"
+              [width]="300"
+            ></dx-tag-box>
+          </div>
+        </dxi-item>
 
-  <dxi-item location="after">
-    <div class="toolbar-margin-top">
-    <dx-button
-      text="Apply"
-      type="default"
-      icon="todo"
-      stylingMode="contained"
-      [width]="100"
-      (onClick)="get_DataSource()"
-    ></dx-button>
-    </div>
-  </dxi-item>
-</dxo-toolbar>
+        <dxi-item location="after">
+          <div class="toolbar-margin-top">
+            <dx-button
+              text="Apply"
+              type="default"
+              icon="todo"
+              stylingMode="contained"
+              [width]="100"
+              (onClick)="get_DataSource()"
+            ></dx-button>
+          </div>
+        </dxi-item>
+      </dxo-toolbar>
 
-       <dxo-grouping
+      <dxo-grouping
         [autoExpandAll]="false"
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-<!-- <dxi-column dataField="ARTICLE_ID" caption="Id"></dxi-column> -->
-<dxi-column dataField="ART_NO" caption="Art No." ></dxi-column>
-<dxi-column dataField="COLOR" caption="Color"></dxi-column>
-<dxi-column dataField="CATEGORY" caption="Category"></dxi-column>
-<dxi-column dataField="SIZE" caption="Size" alignment="center"></dxi-column>
-<dxi-column dataField="PRODUCTION_UNIT" caption="Production Unit"></dxi-column>
-<dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
+      <!-- <dxi-column dataField="ARTICLE_ID" caption="Id"></dxi-column> -->
+      <dxi-column dataField="ART_NO" caption="Art No."></dxi-column>
+      <dxi-column dataField="COLOR" caption="Color"></dxi-column>
+      <dxi-column dataField="CATEGORY" caption="Category"></dxi-column>
+      <dxi-column
+        dataField="SIZE"
+        caption="Size"
+        alignment="center"
+      ></dxi-column>
+      <dxi-column
+        dataField="PRODUCTION_UNIT"
+        caption="Production Unit"
+      ></dxi-column>
+      <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
 
-<!-- <dxi-column dataField="QTY_MULTIBOX" caption="Qty Multibox"></dxi-column> -->
+      <!-- <dxi-column dataField="QTY_MULTIBOX" caption="Qty Multibox"></dxi-column> -->
 
-
-
-<!-- <dxi-column dataField="QTY_TOTAL" caption="Qty Total"></dxi-column> -->
-
-
+      <!-- <dxi-column dataField="QTY_TOTAL" caption="Qty Total"></dxi-column> -->
     </dx-data-grid>
   </div>
 </div>
@@ -187,13 +188,12 @@
     >
     </dx-date-box>
 
-   <dx-button
-  text="Apply"
-  type="default"
-  stylingMode="contained"
-  (onClick)="applyCustomDateFilter()"
-  class="mt-3"
-></dx-button>
-
+    <dx-button
+      text="Apply"
+      type="default"
+      stylingMode="contained"
+      (onClick)="applyCustomDateFilter()"
+      class="mt-3"
+    ></dx-button>
   </div>
 </dx-popup>

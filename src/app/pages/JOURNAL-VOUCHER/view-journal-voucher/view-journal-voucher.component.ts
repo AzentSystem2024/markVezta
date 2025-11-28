@@ -227,7 +227,7 @@ export class ViewJournalVoucherComponent {
     this.popupClosed.emit();
   }
 
-   viewPdf(): void {
+   viewPdf(): void {  
                  this.isPdfPopupVisible = true;
                  this.dataService.selectJournalVoucher(this.JVid).subscribe((response: any) => {
                   if(response){

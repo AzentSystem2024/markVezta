@@ -107,7 +107,25 @@ export class SalaryHeadAddComponent {
   selectedType: any;
   selectedRows: any[];
   salaryHeadList: any;
-  payload: { HEAD_NATURE: any; HEAD_TYPE: any; HEAD_NAME: string; PAYSLIP_TITLE: string; HEAD_ACTIVE: boolean; INSTALLMENT_RECOVERY: boolean; HEAD_PERCENT_INCLUDE_OT: boolean; IS_INACTIVE: boolean; AFFECT_LEAVE: boolean; AC_HEAD_ID: number; HEAD_ORDER: number; FIXED_AMOUNT: number; HEAD_PERCENT: number; PERCENT_HEAD_ID: any[]; RANGE_EXISTS: boolean; RANGE_FROM: number; RANGE_TO: number; };
+  payload: {
+    HEAD_NATURE: any;
+    HEAD_TYPE: any;
+    HEAD_NAME: string;
+    PAYSLIP_TITLE: string;
+    HEAD_ACTIVE: boolean;
+    INSTALLMENT_RECOVERY: boolean;
+    HEAD_PERCENT_INCLUDE_OT: boolean;
+    IS_INACTIVE: boolean;
+    AFFECT_LEAVE: boolean;
+    AC_HEAD_ID: number;
+    HEAD_ORDER: number;
+    FIXED_AMOUNT: number;
+    HEAD_PERCENT: number;
+    PERCENT_HEAD_ID: any[];
+    RANGE_EXISTS: boolean;
+    RANGE_FROM: number;
+    RANGE_TO: number;
+  };
 
   constructor(private dataservice: DataService) {
     this.get_headnameGrid();
@@ -127,15 +145,14 @@ export class SalaryHeadAddComponent {
       this.Ac_head_values = res;
     });
 
-      
-  // Reset other UI flags
-  this.selecteNatureTypeTwo = false; 
-  this.head_percent = false;
-  this.head_From = false;
-  this.head_To = false;
-  this.ApplicableWithBasicRange = false;
-  this.ApplicableWorkingDay = false;
-  this.selecteNatureTypeone = false;
+    // Reset other UI flags
+    this.selecteNatureTypeTwo = false;
+    this.head_percent = false;
+    this.head_From = false;
+    this.head_To = false;
+    this.ApplicableWithBasicRange = false;
+    this.ApplicableWorkingDay = false;
+    this.selecteNatureTypeone = false;
   }
 
   ngOnInit() {
@@ -226,19 +243,19 @@ export class SalaryHeadAddComponent {
     );
     this.isEnabled = this.HeadType_value === 1 || this.HeadType_value === 2;
 
-    if(  this.HeadType_value==3){
-       const defaultNumericValue = 3;
+    if (this.HeadType_value == 3) {
+      const defaultNumericValue = 3;
 
-    const defaultTypeMap: { [key: number]: string } = {
-      1: 'fixed',
-      2: 'percentage',
-      3: 'others',
-    };
-    // Set selectedType based on numeric default
-    this.selectedType = defaultTypeMap[defaultNumericValue];
+      const defaultTypeMap: { [key: number]: string } = {
+        1: 'fixed',
+        2: 'percentage',
+        3: 'others',
+      };
+      // Set selectedType based on numeric default
+      this.selectedType = defaultTypeMap[defaultNumericValue];
     }
   }
-  
+
   setDefaultValues() {
     const defaultNumericValue = 1;
 
@@ -247,11 +264,11 @@ export class SalaryHeadAddComponent {
       2: 'percentage',
       3: 'others',
     };
-    
+
     // Set selectedType based on numeric default
     this.selectedType = defaultTypeMap[defaultNumericValue];
-    console.log(this.selectedType,'========selected typeee=========')
-    if(this.selectedType=='fixed'){
+    console.log(this.selectedType, '========selected typeee=========');
+    if (this.selectedType == 'fixed') {
       this.selecteNatureTypeTwo = true;
       this.head_percent = true;
       this.head_From = true;
@@ -262,7 +279,6 @@ export class SalaryHeadAddComponent {
     this.SalaryHeadData.HEAD_TYPE = 1;
     this.HeadType_value = 1;
     this.isEnabled = true;
-    
   }
 
   // validateAcLedger(e: any) {
@@ -317,7 +333,6 @@ export class SalaryHeadAddComponent {
       this.selecteNatureTypeTwo = true;
     }
 
-    
     // if(this.selectedNatureId==1){
 
     // this.selecteNatureTypeTwo=true
@@ -403,59 +418,60 @@ export class SalaryHeadAddComponent {
         );
         return;
       }
-  const selectedNatureId = this.selectedNatureId
-      if (selectedNatureId === 2) {
+      const selectedNatureId = this.selectedNatureId;
+      if (this.selectedNatureId === 2 && 
+      (!this.SalaryHeadData.PERCENT_HEAD_ID || this.SalaryHeadData.PERCENT_HEAD_ID.length === 0)) {
         notify(
           {
-            message: 'Please select Atlear one Head Name',
+            message: 'Please select Atleast one Head Name',
             position: { at: 'top center', my: 'top center' },
           },
           'error'
         );
         return;
       }
-      
 
-      console.log(this.SalaryHeadData.HEAD_NATURE,'=====================')
-      if(this.SalaryHeadData.HEAD_NATURE===3){
-          this.payload = {
-        ...this.SalaryHeadData,
-        HEAD_NATURE: this.selectedNatureId,
-        FIXED_AMOUNT:0,
-        HEAD_TYPE: this.HeadType_value || 1,
-      };
+      console.log(this.SalaryHeadData.HEAD_NATURE, '=====================');
+      if (this.SalaryHeadData.HEAD_NATURE === 3) {
+        this.payload = {
+          ...this.SalaryHeadData,
+          HEAD_NATURE: this.selectedNatureId,
+          FIXED_AMOUNT: 0,
+          HEAD_TYPE: this.HeadType_value || 1,
+        };
+      } else {
+        this.payload = {
+          ...this.SalaryHeadData,
+
+          HEAD_NATURE: this.selectedNatureId,
+          HEAD_TYPE: this.HeadType_value || 1,
+        };
       }
-      else{
-       this.payload = {
-        ...this.SalaryHeadData,
-      
-        HEAD_NATURE: this.selectedNatureId,
-        HEAD_TYPE: this.HeadType_value || 1,
-      };
-    }
       console.log(this.payload, 'payload');
-      this.dataservice.Add_salary_Head_api(this.payload).subscribe((res: any) => {
-        console.log(res, '==========res====================');
-    
-             this.getSalaryHeadList();
-        notify(
-          {
-            message: 'Salary Head added successfully ',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'success'
-        );
+      this.dataservice
+        .Add_salary_Head_api(this.payload)
+        .subscribe((res: any) => {
+          console.log(res, '==========res====================');
 
-        this.formClosed.emit();
-        setTimeout(() => {
-          this.SalaryHeadValidation?.instance?.reset();
+          this.getSalaryHeadList();
+          notify(
+            {
+              message: 'Salary Head added successfully ',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success'
+          );
+
+          this.formClosed.emit();
+          setTimeout(() => {
+            this.SalaryHeadValidation?.instance?.reset();
+          });
+          this.selectedRows = [];
+          this.selectedNatureId = null;
+          // this.selectedPriority = this.priorities.find(p => p.id === 1)
+          this.selectedPriority;
+          this.resetForm();
         });
-        this.selectedRows = [];
-        this.selectedNatureId = null;
-        // this.selectedPriority = this.priorities.find(p => p.id === 1)
-        this.selectedPriority;
-        this.resetForm();
-      });
     }
   }
 

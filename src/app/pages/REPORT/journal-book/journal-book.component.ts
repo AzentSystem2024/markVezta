@@ -1,6 +1,6 @@
 // import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, NgModule } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { DxButtonModule, DxCheckBoxModule, DxDataGridModule, DxDateBoxModule, DxLoadIndicatorModule, DxLoadPanelModule, DxNumberBoxModule, DxPopupModule, DxSelectBoxModule, DxTextBoxModule, DxValidationGroupModule, DxValidatorModule } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
@@ -11,6 +11,8 @@ import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-cr
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { ViewCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
 import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
+import { EditMiscReceiptModule } from 'src/app/components/HR/Masters/MISC-RECEIPT/edit-misc-receipt/edit-misc-receipt.component';
+import { AddMiscReceiptModule } from 'src/app/components/HR/Masters/MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
 
 @Component({
   selector: 'app-journal-book',
@@ -42,6 +44,7 @@ isViewJournalVoucher :boolean = false;
   isViewCreditNote: boolean = false;
   isViewInvoice: boolean = false;
   isViewReceipt: boolean = false;
+  editMiscPopup:boolean = false;
   selectedJournalVoucher: any;
   selectedDebitNote: any;
   selectedCreditNote: any;
@@ -50,10 +53,13 @@ isViewJournalVoucher :boolean = false;
   selected_Company_id:any;
   isEditInvoice: boolean = false;
   isEditInvoiceReadOnly: boolean = true;
+  isReadOnlyPayment:boolean = true;
   loadingInvoice = false;
   popupReady = false;
+  // @Input() MiscReceiptId : any;
 
    defaultDate: Date = new Date();
+  selectedmiscellaneousData: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -176,11 +182,12 @@ console.log(e,'=======event==========');
     this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
-
+console.log(TransType , trans_id)
 if(TransType==4){
     this.dataService
       .selectJournalVoucher(trans_id)
       .subscribe((response: any) => {
+        console.log(response)
           this.selectedJournalVoucher = response.Data;
            this.loadingInvoice = false;
 
@@ -250,6 +257,19 @@ else if (TransType === 25) {
           this.isViewReceipt = true;
           this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+} 
+
+else if (TransType === 2) {
+ 
+  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+     this.dataService
+      .selectMiscReceipt(trans_id).subscribe((response: any) => {
+        console.log(response)
+          this.selectedmiscellaneousData = response.Data;
+          this.editMiscPopup = true;
+          this.cdr.detectChanges();
+        console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
       });
 } 
 //else {
@@ -424,6 +444,7 @@ summaryColumnsData = {
     this.isViewInvoice = false;
     this.isViewReceipt = false;
     this.isEditInvoice = false;
+    this.editMiscPopup = false;
   }
 
 formatDates(cellData: any): string {
@@ -469,6 +490,7 @@ formatDates(cellData: any): string {
   ViewInvoiceModule,
   ViewCustomerReceiptModule,
   EditPurchaseInvoiceModule,
+  AddMiscReceiptModule,
   ],
   providers: [],
   exports: [],

@@ -17,13 +17,7 @@ export class PaytimeEntryComponent {
   @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
 
     PayEntryList = [];
-// PayEntryList = [
-//   { EMP_NO: 'E001', EMP_NAME: 'John Doe', WORKING_DAYS: 22,AMOUNT:0 },
-//   { EMP_NO: 'E002', EMP_NAME: 'Jane Smith', WORKING_DAYS: 20 ,AMOUNT:0},
-//   { EMP_NO: 'E003', EMP_NAME: 'Ravi Kumar', WORKING_DAYS: 21 ,AMOUNT:0},
-//   { EMP_NO: 'E004', EMP_NAME: 'Anita Nair', WORKING_DAYS: 23,AMOUNT:0 },
-//   { EMP_NO: 'E005', EMP_NAME: 'Michael Lee', WORKING_DAYS: 19,AMOUNT:0 }
-// ];
+
 
     readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -359,8 +353,9 @@ console.log(payload,'payload for saving')
               displayTime: 500,
             },
             'success'
-          );        
-       
+          );     
+      
+      
 // ✅ Update the local data source manually
   // this.selectedRows.forEach(updatedRow => {
   //   const rowInGrid = this.PayEntryList.find(p => p.EMP_ID === updatedRow.EMP_ID);

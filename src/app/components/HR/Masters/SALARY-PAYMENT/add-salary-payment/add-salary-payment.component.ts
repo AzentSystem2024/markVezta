@@ -218,7 +218,7 @@ this.salaryPaymentData.TRANS_DATE = new Date();
     this.selectedRows = e.selectedRowsData;
     // Add mode → ID
     this.selectedIds = e.selectedRowsData.map((row: any) => row.ID);
-
+console.log(this.selectedRows)
     console.log('Selected IDs:', this.selectedIds);
   }
 
@@ -240,6 +240,7 @@ this.salaryPaymentData.TRANS_DATE = new Date();
       .getPendingSalaryPayments(payload)
       .subscribe((response: any) => {
         this.salaryPendingList = response.data;
+     
       });
   }
 

@@ -71,7 +71,8 @@ export class PdcAddFormComponent {
   REMARKS: '',
   IS_PAYMENT: '',
   ENTRY_STATUS: '',
-  AC_TRANS_ID: ''
+  AC_TRANS_ID: '',
+  
   }
   onBeneficiaryTypeChanged(e :any){
     this.selectedBeneficiaryType = e.value
@@ -250,7 +251,7 @@ resetForm() {
     AMOUNT: +this.PDCFormData.AMOUNT || 0,
     REMARKS: this.PDCFormData.REMARKS || '',
     IS_PAYMENT: this.PDCFormData.IS_PAYMENT?.name === 'Issued', // true if Issued
-    ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS || 1,
+     ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS ? 5 : 1,
     AC_TRANS_ID: this.PDCFormData.AC_TRANS_ID || 0
   };
 
