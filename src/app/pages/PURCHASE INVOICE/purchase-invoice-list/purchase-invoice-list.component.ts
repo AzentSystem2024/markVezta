@@ -400,7 +400,7 @@ export class PurchaseInvoiceListComponent {
 
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
-      if (e.data.TRANS_STATUS === 5) {
+      if (e.data.STATUS === 'Approved') {
         const deleteButton = e.cellElement.querySelector('.dx-link-delete');
         if (deleteButton) {
           deleteButton.style.display = 'none';
@@ -420,7 +420,7 @@ export class PurchaseInvoiceListComponent {
         this.selectedInvoice = response.Data;
 
         this.isEditInvoice = true;
-        this.isEditInvoiceReadOnly = transStatus === 'Approved'; // 👈 read-only if Approved
+        this.isEditInvoiceReadOnly = transStatus === 'Approved'; //read-only if Approved
       });
   }
 

@@ -67,6 +67,7 @@
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-select-box
+                    class="supplier-select"
                     #distributorRef
                     [(value)]="paymentFormData.SUPP_ID"
                     [dataSource]="supplierList"
@@ -103,7 +104,7 @@
           <dxi-column
             dataField="DOC_NO"
             caption="Doc No"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
           <!-- <dxi-column
             dataField="INVOICE_NO"
@@ -116,19 +117,19 @@
           <dxi-column
             dataField="PURCH_DATE"
             caption="Date"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
             dataField="SUPP_INV_NO"
             caption="Supplier Invoice No"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
             dataField="NET_AMOUNT"
             caption="Inv Amount"
-            [allowEditing]="true"
+            [allowEditing]="false"
             [width]="120"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
@@ -140,7 +141,7 @@
           <dxi-column
             dataField="PENDING_AMOUNT"
             caption="Balance"
-            [allowEditing]="true"
+            [allowEditing]="false"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
           <dxi-column

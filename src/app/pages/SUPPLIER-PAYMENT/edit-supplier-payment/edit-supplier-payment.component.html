@@ -354,6 +354,7 @@
   <!-- Buttons row -->
   <div style="display: flex; gap: 10px">
     <dx-button
+      *ngIf="isReadOnlyMode"
       icon="fas fa-file-pdf"
       text="PDF"
       type="normal"

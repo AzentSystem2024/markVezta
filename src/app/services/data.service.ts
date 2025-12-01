@@ -162,19 +162,19 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/Insert`, data);
   }
 
-  selectArticle(id: number, payload: any) {
-    const body = {
-      ID: id,
-      UnitID: payload.UNIT_ID,
-      ArtNo: payload.Art_no,
-      Color: payload.Color,
-      CategoryID: payload.CATEGORY_ID,
-      Price: payload.PRICE,
-    };
+  selectArticle(id: number) {
+    // const body = {
+    //   ID: id,
+    //   UnitID: payload.UNIT_ID,
+    //   ArtNo: payload.Art_no,
+    //   Color: payload.Color,
+    //   CategoryID: payload.CATEGORY_ID,
+    //   Price: payload.PRICE,
+    // };
 
     return this.http.post<any>(
-      `${this.apiUrl}article/select`, // removed /${id}
-      body
+      `${this.apiUrl}article/select/` + id,
+      {} // removed /${id}
     );
   }
 

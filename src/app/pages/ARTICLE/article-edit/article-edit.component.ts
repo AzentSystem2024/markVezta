@@ -125,12 +125,20 @@ export class ArticleEditComponent {
           ...this.articleData,
           ...incomingData,
         };
+        // CASE 1: When backend sends string: "1,2,3"
         if (
           this.articleData.UNIT_ID &&
           typeof this.articleData.UNIT_ID === 'string'
         ) {
           this.articleData.UNIT_ID = this.articleData.UNIT_ID.split(',').map(
             (x: string) => Number(x.trim())
+          );
+        }
+
+        // ✅ CASE 2: When backend sends array of objects
+        if (incomingData.Units && Array.isArray(incomingData.Units)) {
+          this.articleData.UNIT_ID = incomingData.Units.map(
+            (u: any) => u.UNIT_ID
           );
         }
 
@@ -636,9 +644,9 @@ export class ArticleEditComponent {
       PART_NO: this.articleData.PART_NO || '',
       ALIAS_NO: this.articleData.ALIAS_NO || '',
       // UNIT_ID: this.articleData.UNIT_ID || 0,
-      UNIT_ID: Array.isArray(this.selectedProductionUnitId)
-        ? this.selectedProductionUnitId.join(',')
-        : this.selectedProductionUnitId,
+      Units: Array.isArray(this.selectedProductionUnitId)
+        ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))
+        : [{ UNIT_ID: this.selectedProductionUnitId }],
       ARTICLE_TYPE: this.articleData.ARTICLE_TYPE || 0,
       ARTICLE_TYPE_NAME: this.articleData.ARTICLE_TYPE_NAME || '',
       CATEGORY_ID: this.articleData.CATEGORY_ID || 0,

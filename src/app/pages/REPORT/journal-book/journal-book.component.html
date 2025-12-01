@@ -356,7 +356,6 @@
   </ng-container>
 </dx-popup>
 
-
 <dx-popup
   [(visible)]="editMiscPopup"
   [width]="'100vw'"
@@ -365,17 +364,25 @@
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="editMiscPopup">
+    <app-add-misc-receipt
+      *ngIf="editMiscPopup"
+      [isEditing]="true"
+      [EditingResponseData]="selectedmiscellaneousData"
+      [isReadOnlyMode]="isReadOnlyPayment"
+      (popupClosed)="handleClose()"
+    ></app-add-misc-receipt>
+  </ng-container>
+  <!-- <ng-container *ngIf="editMiscPopup">
   <app-add-misc-receipt
     *ngIf="editMiscPopup"
     [EditingResponseData]="selectedmiscellaneousData"
     [isReadOnlyMode]="isReadOnlyPayment"
     (popupClosed)="handleClose()"
   ></app-add-misc-receipt>
-  </ng-container>
+  </ng-container> -->
 </dx-popup>
 
-
-             <!-- Prepayment -->
+<!-- Prepayment -->
 <dx-popup
   [(visible)]="editPrePaymentPopupOpened"
   [width]="'90vw'"
@@ -383,16 +390,16 @@
   title="PrePayment Invoice"
   (onHiding)="handleClose()"
 >
-<ng-container *ngIf="editPrePaymentPopupOpened">
-  <app-pre-payment-edit
-    [selectedPrePayment]="selectedPrePayment"
-    [isReadOnly]="isEditReadOnly"
-    (formClosed)="handleClose()"
-  ></app-pre-payment-edit>
+  <ng-container *ngIf="editPrePaymentPopupOpened">
+    <app-pre-payment-edit
+      [selectedPrePayment]="selectedPrePayment"
+      [isReadOnly]="isEditReadOnly"
+      (formClosed)="handleClose()"
+    ></app-pre-payment-edit>
   </ng-container>
 </dx-popup>
 
-  <!-- Supplier Payment -->
+<!-- Supplier Payment -->
 <dx-popup
   [(visible)]="isEditReceipt"
   [width]="'75vw'"
@@ -410,9 +417,8 @@
   <!-- </ng-container> -->
 </dx-popup>
 
-
 <!-- purchase return -->
- <dx-popup
+<dx-popup
   [(visible)]="isEditPurchaseReturn"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -443,6 +449,5 @@
     [EditingResponseData]="selectedmiscellaneousData"
     [isReadOnlyMode]="isReadOnlyPayment"
     (popupClosed)="handleClose()"
-   
   ></app-add-miscellaneous-payment>
 </dx-popup>
