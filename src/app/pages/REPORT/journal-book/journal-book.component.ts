@@ -2,20 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, NgModule } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import {
-  DxButtonModule,
-  DxCheckBoxModule,
-  DxDataGridModule,
-  DxDateBoxModule,
-  DxLoadIndicatorModule,
-  DxLoadPanelModule,
-  DxNumberBoxModule,
-  DxPopupModule,
-  DxSelectBoxModule,
-  DxTextBoxModule,
-  DxValidationGroupModule,
-  DxValidatorModule,
-} from 'devextreme-angular';
+import { DxButtonModule, DxCheckBoxModule, DxDataGridModule, DxDateBoxModule, DxLoadIndicatorModule, DxLoadPanelModule, DxNumberBoxModule, DxPopupModule, DxSelectBoxModule, DxTextBoxModule, DxValidationGroupModule, DxValidatorModule } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { Router, NavigationEnd } from '@angular/router';
@@ -34,17 +21,20 @@ import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add
 @Component({
   selector: 'app-journal-book',
   templateUrl: './journal-book.component.html',
-  styleUrls: ['./journal-book.component.scss'],
+  styleUrls: ['./journal-book.component.scss']
 })
 export class JournalBookComponent {
+
+
+
   Ledger_statement_datasource: any = [];
-  readonly allowedPageSizes: any = [5, 10, 'all'];
-  displayMode: any = 'full';
+ readonly allowedPageSizes: any = [ 5,10, 'all'];
+    displayMode: any = 'full';
   company_list: any[] = [];
   company_id: any;
   HEAD_ID_LIST: any[] = [];
   fin_id: any[] = [];
-  ledgerSummaryData: any = [];
+  ledgerSummaryData:any=[]
   savedUserData: any;
   selected_from_date: any;
   selected_To_date: any;
@@ -59,35 +49,37 @@ isViewJournalVoucher :boolean = false;
   isViewCreditNote: boolean = false;
   isViewInvoice: boolean = false;
   isViewReceipt: boolean = false;
-  editMiscPopup: boolean = false;
+  editMiscPopup:boolean = false;
   selectedJournalVoucher: any;
   selectedDebitNote: any;
   selectedCreditNote: any;
   selectedInvoice: any;
   selectedReceipt: any;
-  selected_Company_id: any;
+  selected_Company_id:any;
   isEditInvoice: boolean = false;
   isEditInvoiceReadOnly: boolean = true;
   editPrePaymentPopupOpened :boolean = false;
   isReadOnlyPayment:boolean = true;
   isEditReceipt : boolean = false;
+  isReadOnlyReceipt : boolean=true;
   loadingInvoice = false;
+  popupReady = false;
+
+  editMiscPopupOpened :boolean = false;
 
   isReadOnlyPurchaseReturn:boolean = true;
   isEditPurchaseReturn:boolean=false;
   // @Input() MiscReceiptId : any;
 
-  defaultDate: Date = new Date();
+   defaultDate: Date = new Date();
   selectedmiscellaneousData: any;
   selectedPrePayment: any;
   selectedSupplierPayment: any;
   selectedPurchaseReturn: any;
-  popupReady: boolean;
-  editMiscPopupOpened: boolean;
   constructor(
     private dataService: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+     private cdr: ChangeDetectorRef
   ) {
     this.get_sessionstorage_data();
     this.get_fin_id();
@@ -105,9 +97,10 @@ isViewJournalVoucher :boolean = false;
   ngOnInit() {
     // this.loadLedgerData();
 
-    this.ledgerSummaryData = this.Ledger_statement_datasource;
+    this.ledgerSummaryData=this.Ledger_statement_datasource
     this.onFromDateChange({ value: this.defaultDate });
     this.onToDateChange({ value: this.defaultDate });
+
   }
 
   getSessionData(key: string) {
@@ -115,23 +108,21 @@ isViewJournalVoucher :boolean = false;
     return data ? JSON.parse(data) : null;
   }
 
-  sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
+     sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
 
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id==================='
-    );
-  }
+
+    this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
+
+    console.log(this.selected_fin_id,'===========selected fin id===================')
+    
+  }
+
 
   get_sessionstorage_data() {
     this.savedUserData = this.getSessionData('savedUserData');
@@ -145,16 +136,15 @@ isViewJournalVoucher :boolean = false;
     if (this.fin_id.length) {
       this.selected_fin_id = this.fin_id[0].FIN_ID;
     }
-    console.log(this.selected_fin_id, '========financial year');
+  console.log(this.selected_fin_id, '========financial year');
+    
   }
 
   onCompanyChange(event: any) {
     this.company_id = event.value;
-    this.dataService
-      .HeadId_Dropdown_api(this.selected_fin_id)
-      .subscribe((res: any) => {
-        this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
-      });
+    this.dataService.HeadId_Dropdown_api(this.selected_fin_id).subscribe((res: any) => {
+      this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
+    });
   }
 
   onFromDateChange(event: any) {
@@ -183,115 +173,121 @@ isViewJournalVoucher :boolean = false;
       CompanyId: this.selected_Company_id,
       FinId: this.selected_fin_id,
       DateFrom: this.formatted_from_date ?? this.selected_from_date,
-      DateTo: this.formatted_To_date ?? this.selected_To_date,
+      DateTo: this.formatted_To_date ?? this.selected_To_date
     };
 
     console.log(payload, '==========manual payload===========');
 
     this.dataService.Journal_Booking_Api(payload).subscribe((res: any) => {
       this.Ledger_statement_datasource = res.data || [];
-      this.ledgerSummaryData = this.Ledger_statement_datasource;
+         this.ledgerSummaryData=this.Ledger_statement_datasource
     });
   }
 
-  onViewClick(e: any) {
-    console.log(e, '=======event==========');
 
-    const TransType = e.row.data.TransType;
-    const trans_id = e.row.data.TransID;
+
+
+   
+
+onViewClick(e: any){
+console.log(e,'=======event==========');
+ 
+ const TransType=e.row.data.TransType
+  const trans_id=e.row.data.TransID
 
     this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
-    console.log(TransType, trans_id);
-    if (TransType == 4) {
-      this.dataService
-        .selectJournalVoucher(trans_id)
-        .subscribe((response: any) => {
-          console.log(response, '======================');
+console.log(TransType , trans_id)
+if(TransType==4){
+    this.dataService
+      .selectJournalVoucher(trans_id)
+      .subscribe((response: any) => {
+        console.log(response)
           this.selectedJournalVoucher = response.Data;
-          this.loadingInvoice = false;
+           this.loadingInvoice = false;
 
-          this.isViewJournalVoucher = true;
-          this.cdr.detectChanges();
-          console.log(
-            this.selectedJournalVoucher,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-          );
-        });
-    } else if (TransType === 36) {
-      this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
-        this.selectedDebitNote = response.Data;
-        this.loadingInvoice = false;
 
-        this.isViewDebitNote = true;
-        this.cdr.detectChanges();
+           this.isViewJournalVoucher = true;
+           this.cdr.detectChanges();
         console.log(
-          this.selectedDebitNote,
+          this.selectedJournalVoucher,
           'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
         );
       });
-    } else if (TransType === 37) {
-      console.log('=====navigate to 37-CREDIT NOTE=====');
-      this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-        this.selectedCreditNote = response.Data;
-        this.loadingInvoice = false;
+}
+else if(TransType === 36){
 
-        this.isViewCreditNote = true;
-        this.cdr.detectChanges();
-        console.log(
-          this.selectedCreditNote,
-          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-        );
-      });
-    } else if (TransType === 25) {
-      console.log('=====navigate to 25-SALES INVOICE=====');
-      this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
-        this.loadingInvoice = false;
+    this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
+    this.selectedDebitNote = response.Data;
+     this.loadingInvoice = false;
+
+     this.isViewDebitNote = true;
+     this.cdr.detectChanges();
+    console.log(this.selectedDebitNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
+  });
+}
+  else if (TransType === 37) {
+ 
+  console.log('=====navigate to 37-CREDIT NOTE=====');
+    this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
+    this.selectedCreditNote = response.Data;
+     this.loadingInvoice = false;
+
+      this.isViewCreditNote = true;
+      this.cdr.detectChanges();
+    console.log(this.selectedCreditNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
+  });
+}
+else if (TransType === 25) {
+ 
+  console.log('=====navigate to 25-SALES INVOICE=====');
+   this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
+      this.selectedInvoice = response.Data;
+       this.loadingInvoice = false;
 
         this.isViewInvoice = true;
         this.cdr.detectChanges();
-        console.log(this.selectedInvoice, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-    } else if (TransType == 19) {
+      console.log(this.selectedInvoice, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+    });
+}
+     else if(TransType == 19){
       this.dataService
         .selectPurchaseInvoice(trans_id)
         .subscribe((response: any) => {
           this.selectedInvoice = response.Data;
-          this.loadingInvoice = false;
+ this.loadingInvoice = false;
+
 
           this.isEditInvoice = true;
           this.cdr.detectChanges();
+         
         });
-    } else if (TransType === 27) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-      this.dataService
-        .selectCustomerReceipt(trans_id)
-        .subscribe((response: any) => {
+      }
+ else if (TransType === 27) {
+ 
+  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+     this.dataService
+      .selectCustomerReceipt(trans_id).subscribe((response: any) => {
           this.selectedReceipt = response.Data;
-          console.log(
-            this.selectedReceipt,
-            'SELECTEDRECEIPTTTTTTTTTTTTTTTTTTTTTTTTT'
-          );
           this.isViewReceipt = true;
           this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
       });
 } 
 
-// else if (TransType === 2) {
+else if (TransType === 2) {
  
-//   console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-//      this.dataService
-//       .selectMiscReceipt(trans_id).subscribe((response: any) => {
-//         console.log(response)
-//           this.selectedmiscellaneousData = response.Data;
-//           this.editMiscPopup = true;
-//           this.cdr.detectChanges();
-//         console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-//       });
-// } 
+  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+     this.dataService
+      .selectMiscReceipt(trans_id).subscribe((response: any) => {
+        console.log(response)
+          this.selectedmiscellaneousData = response.Data;
+          this.editMiscPopup = true;
+          this.cdr.detectChanges();
+        console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+} 
 else if (TransType === 38) {
  
   console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
@@ -408,7 +404,7 @@ summaryColumnsData = {
 };
 
   handleClose() {
-    this.editLedgerPopup = false;
+     this.editLedgerPopup = false;
     this.isViewJournalVoucher = false;
     this.isViewDebitNote = false;
     this.isViewCreditNote = false;
@@ -418,14 +414,57 @@ summaryColumnsData = {
     this.editMiscPopup = false;
   }
 
-  formatDates(cellData: any): string {
-    const date = new Date(cellData);
-    if (isNaN(date.getTime())) return '';
+formatDates(cellData: any): string {
+  const date = new Date(cellData);
+  if (isNaN(date.getTime())) return '';
 
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
 
+  return `${day}-${month}-${year}`;
+}
+
+
+    onExporting(event: any) {
+    const fileName = 'Journal_Book';
+    this.dataService.exportDataGridReport(event, fileName);
   }
 
 }
+
+
+@NgModule({
+  imports: [
+    DxDataGridModule,
+    DxButtonModule,
+    CommonModule,
+    DxTextBoxModule,
+    DxCheckBoxModule,
+    DxValidatorModule,
+    DxValidationGroupModule,
+    DxSelectBoxModule,
+    DxLoadPanelModule,
+    DxLoadIndicatorModule,
+    DxNumberBoxModule,
+    DxDateBoxModule,
+    DxSelectBoxModule,
+    DxButtonModule,
+      DxPopupModule,
+      ViewJournalVoucherModule,
+      ViewDebitModule,
+      ViewCreditNoteModule,
+  ViewInvoiceModule,
+  ViewCustomerReceiptModule,
+  EditPurchaseInvoiceModule,
+  AddMiscReceiptModule,
+  PrePaymentEditModule,
+  EditSupplierPaymentModule,
+  PurchaseReturnDebitFormModule,
+  AddMiscellaneousPaymentModule,
+  ],
+  providers: [],
+  exports: [],
+  declarations: [JournalBookComponent],
+})
+export class JournalBookModule {}
