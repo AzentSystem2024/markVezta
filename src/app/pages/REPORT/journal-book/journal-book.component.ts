@@ -50,8 +50,8 @@ export class JournalBookComponent {
   selected_To_date: any;
   selected_Head_Id: any;
   selected_fin_id: any;
-  isEditReadOnly:boolean = true;
-isViewJournalVoucher :boolean = false;
+  isEditReadOnly: boolean = true;
+  isViewJournalVoucher: boolean = false;
   formatted_from_date: string;
   formatted_To_date: string;
   editLedgerPopup: boolean = false;
@@ -68,13 +68,17 @@ isViewJournalVoucher :boolean = false;
   selected_Company_id: any;
   isEditInvoice: boolean = false;
   isEditInvoiceReadOnly: boolean = true;
-  editPrePaymentPopupOpened :boolean = false;
-  isReadOnlyPayment:boolean = true;
-  isEditReceipt : boolean = false;
+  editPrePaymentPopupOpened: boolean = false;
+  isReadOnlyPayment: boolean = true;
+  isEditReceipt: boolean = false;
+  isReadOnlyReceipt: boolean = true;
   loadingInvoice = false;
+  popupReady = false;
 
-  isReadOnlyPurchaseReturn:boolean = true;
-  isEditPurchaseReturn:boolean=false;
+  editMiscPopupOpened: boolean = false;
+
+  isReadOnlyPurchaseReturn: boolean = true;
+  isEditPurchaseReturn: boolean = false;
   // @Input() MiscReceiptId : any;
 
   defaultDate: Date = new Date();
@@ -82,8 +86,6 @@ isViewJournalVoucher :boolean = false;
   selectedPrePayment: any;
   selectedSupplierPayment: any;
   selectedPurchaseReturn: any;
-  popupReady: boolean;
-  editMiscPopupOpened: boolean;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -208,7 +210,7 @@ isViewJournalVoucher :boolean = false;
       this.dataService
         .selectJournalVoucher(trans_id)
         .subscribe((response: any) => {
-          console.log(response, '======================');
+          console.log(response);
           this.selectedJournalVoucher = response.Data;
           this.loadingInvoice = false;
 
@@ -270,142 +272,145 @@ isViewJournalVoucher :boolean = false;
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
           this.selectedReceipt = response.Data;
-          console.log(
-            this.selectedReceipt,
-            'SELECTEDRECEIPTTTTTTTTTTTTTTTTTTTTTTTTT'
-          );
           this.isViewReceipt = true;
           this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-} 
-
-// else if (TransType === 2) {
- 
-//   console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-//      this.dataService
-//       .selectMiscReceipt(trans_id).subscribe((response: any) => {
-//         console.log(response)
-//           this.selectedmiscellaneousData = response.Data;
-//           this.editMiscPopup = true;
-//           this.cdr.detectChanges();
-//         console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-//       });
-// } 
-else if (TransType === 38) {
- 
-  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-     this.dataService
-      .Select_PrePayment(trans_id).subscribe((response: any) => {
-        console.log(response)
+          console.log(
+            this.selectedReceipt,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
+        });
+    } else if (TransType === 2) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectMiscReceipt(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
+          this.selectedmiscellaneousData = response.Data;
+          this.editMiscPopup = true;
+          this.cdr.detectChanges();
+          console.log(
+            this.selectedmiscellaneousData,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
+        });
+    } else if (TransType === 38) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .Select_PrePayment(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
           this.selectedPrePayment = response.Data;
           this.editPrePaymentPopupOpened = true;
           this.cdr.detectChanges();
-        console.log(this.selectedPrePayment, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-} 
-else if (TransType === 21) {
- 
-  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-     this.dataService
-      .selectSupplierPayment(trans_id).subscribe((response: any) => {
-        console.log(response)
+          console.log(
+            this.selectedPrePayment,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
+        });
+    } else if (TransType === 21) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectSupplierPayment(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
           this.selectedSupplierPayment = response.Data;
-          console.log(this.selectedSupplierPayment)
+          console.log(this.selectedSupplierPayment);
           this.isEditReceipt = true;
           this.cdr.detectChanges();
-        console.log(this.selectedPrePayment, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-} 
-
-else if (TransType === 20) {
- 
-  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-     this.dataService
-      .selectPurchaseReturn(trans_id).subscribe((response: any) => {
-        console.log(response)
+          console.log(
+            this.selectedPrePayment,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
+        });
+    } else if (TransType === 20) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectPurchaseReturn(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
           this.selectedPurchaseReturn = response.Data;
           this.isEditPurchaseReturn = true;
-          
-          this.cdr.detectChanges();
-        console.log(this.selectedPurchaseReturn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-} 
 
-else if (TransType === 3) {
- 
-  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-     this.dataService
-      .selectMiscPayment(trans_id).subscribe((response: any) => {
-        console.log(response)
+          this.cdr.detectChanges();
+          console.log(
+            this.selectedPurchaseReturn,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
+        });
+    } else if (TransType === 3) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectMiscPayment(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
           this.selectedmiscellaneousData = response.Data;
-          console.log(this.selectedmiscellaneousData)
+          console.log(this.selectedmiscellaneousData);
           this.editMiscPopupOpened = true;
-          
-          this.cdr.detectChanges();
-        console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-} 
-//else {
-//   console.log(Unknown TRANS_TYPE_ID: ${TransType});
-// }
-  } 
- 
-summaryColumnsData = {
-  totalItems: [
-    // 1. Total Debitṅ
-    {
-      name: 'totalDr',
-      column: 'DebitAmount',
-      summaryType: 'sum',
-      displayFormat: 'Total {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      showInColumn: 'DebitAmount',
-      alignment: 'right',
-    },
-    // 2. Total Credit
-    {
-      name: 'totalCr',
-      column: 'CreditAmount',
-      summaryType: 'sum',
-      displayFormat: 'Total {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      showInColumn: 'CreditAmount',
-      alignment: 'right',
-    },
 
-  ],
-   groupItems: [
-    {
-      column: 'DebitAmount',
-      summaryType: 'sum',
-      displayFormat: '{0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'CreditAmount',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    // {
-    //   column: 'TOTAL_PAIR_QTY',
-    //   summaryType: 'sum',
-    //   displayFormat: '{0}',
-    //   valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-    //   alignByColumn: true,
-    // },
-  ],
+          this.cdr.detectChanges();
+          console.log(
+            this.selectedmiscellaneousData,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
+        });
+    }
+    //else {
+    //   console.log(Unknown TRANS_TYPE_ID: ${TransType});
+    // }
+  }
+
+  summaryColumnsData = {
+    totalItems: [
+      // 1. Total Debitṅ
+      {
+        name: 'totalDr',
+        column: 'DebitAmount',
+        summaryType: 'sum',
+        displayFormat: 'Total {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'DebitAmount',
+        alignment: 'right',
+      },
+      // 2. Total Credit
+      {
+        name: 'totalCr',
+        column: 'CreditAmount',
+        summaryType: 'sum',
+        displayFormat: 'Total {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'CreditAmount',
+        alignment: 'right',
+      },
+    ],
+    groupItems: [
+      {
+        column: 'DebitAmount',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'CreditAmount',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      // {
+      //   column: 'TOTAL_PAIR_QTY',
+      //   summaryType: 'sum',
+      //   displayFormat: '{0}',
+      //   valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+      //   alignByColumn: true,
+      // },
+    ],
     calculateCustomSummary: (options) => {
       if (options.name === 'summaryRow') {
         // Custom logic if needed
       }
     },
-
-
-};
+  };
 
   handleClose() {
     this.editLedgerPopup = false;
@@ -426,6 +431,46 @@ summaryColumnsData = {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
 
+    return `${day}-${month}-${year}`;
   }
 
+  onExporting(event: any) {
+    const fileName = 'Journal_Book';
+    this.dataService.exportDataGridReport(event, fileName);
+  }
 }
+
+@NgModule({
+  imports: [
+    DxDataGridModule,
+    DxButtonModule,
+    CommonModule,
+    DxTextBoxModule,
+    DxCheckBoxModule,
+    DxValidatorModule,
+    DxValidationGroupModule,
+    DxSelectBoxModule,
+    DxLoadPanelModule,
+    DxLoadIndicatorModule,
+    DxNumberBoxModule,
+    DxDateBoxModule,
+    DxSelectBoxModule,
+    DxButtonModule,
+    DxPopupModule,
+    ViewJournalVoucherModule,
+    ViewDebitModule,
+    ViewCreditNoteModule,
+    ViewInvoiceModule,
+    ViewCustomerReceiptModule,
+    EditPurchaseInvoiceModule,
+    AddMiscReceiptModule,
+    PrePaymentEditModule,
+    EditSupplierPaymentModule,
+    PurchaseReturnDebitFormModule,
+    AddMiscellaneousPaymentModule,
+  ],
+  providers: [],
+  exports: [],
+  declarations: [JournalBookComponent],
+})
+export class JournalBookModule {}
