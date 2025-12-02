@@ -178,7 +178,7 @@ export class TransferOutInventoryAddComponent {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const data = this.EditingResponseData;
-
+    console.log(data)
     this.transferOutFormData = {
       TRANS_ID:data.TRANS_ID,
       // ID: data.ID,

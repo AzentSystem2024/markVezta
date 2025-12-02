@@ -258,7 +258,7 @@
 <dx-popup
   [(visible)]="isViewInvoice"
   [width]="'90vw'"
-  [height]="'85vh'"
+  [height]="'100vh'"
   title="View Invoice"
   (onHiding)="handleClose()"
   [deferRendering]="false"
@@ -349,21 +349,20 @@
 
 <!-- //=======================Pre payment=================== -->
 
-
-
 <dx-popup
   [(visible)]="editPrePaymentPopupOpened"
-  [width]="'50vw'"
-  [height]="'75vh'"
+  [width]="'90vw'"
+  [height]="'100vh'"
   title="PrePayment Invoice"
-   (onHiding)="handleClose()"
+  (onHiding)="handleClose()"
 >
-  <app-pre-payment-edit
-    [selectedPrePayment]="selectedPrePayment"
-    [isOpen]="editPrePaymentPopupOpened"
-    [isReadOnly]="isEditReadOnly"
-    (formClosed)="handleClose()"
-  ></app-pre-payment-edit>
+  <ng-container *ngIf="editPrePaymentPopupOpened">
+    <app-pre-payment-edit
+      [selectedPrePayment]="selectedPrePayment"
+      [isReadOnly]="isEditReadOnly"
+      (formClosed)="handleClose()"
+    ></app-pre-payment-edit>
+  </ng-container>
 </dx-popup>
 
 <!-- //=======================  Depreciation=================== -->
@@ -373,7 +372,7 @@
 <dx-popup
   [(visible)]="EditDepreciationPopupVisible"
   [width]="'100vw'"
-  [height]="'95vh'"
+  [height]="'100vh'"
   title="Update Depreciation"
   (onHiding)="handleClose()"
 >
@@ -422,7 +421,7 @@
 
  <!-- ====================Misc Receipt=========================== -->
 
- <dx-popup
+<dx-popup
   [(visible)]="editMiscPopup"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -430,13 +429,22 @@
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="editMiscPopup">
+    <app-add-misc-receipt
+      *ngIf="editMiscPopup"
+      [isEditing]="true"
+      [EditingResponseData]="selectedmiscellaneousData"
+      [isReadOnlyMode]="isReadOnlyPayment"
+      (popupClosed)="handleClose()"
+    ></app-add-misc-receipt>
+  </ng-container>
+  <!-- <ng-container *ngIf="editMiscPopup">
   <app-add-misc-receipt
     *ngIf="editMiscPopup"
     [EditingResponseData]="selectedmiscellaneousData"
     [isReadOnlyMode]="isReadOnlyPayment"
     (popupClosed)="handleClose()"
   ></app-add-misc-receipt>
-  </ng-container>
+  </ng-container> -->
 </dx-popup>
 
 <!-- ==========================Purchase Invoice =============================== -->
@@ -472,5 +480,43 @@
       [isReadOnlyMode]="isReadOnlyPurchaseReturn"
       (popupClosed)="handleClose()"
     ></app-purchase-return-debit-form>
+  </ng-container>
+</dx-popup>
+
+
+<!-- ===============================TransferOut================================== -->
+<dx-popup
+  [(visible)]="isEditTransferOut"
+  [width]="'75vw'"
+  [height]="'90vh'"
+  title="Transfer Out"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditTransferOut">
+    <app-transfer-out-inventory-add
+      [isEditing]="true"
+      [EditingResponseData]="selectedTrOut"
+      [isReadOnlyMode]="isReadOnlyTrOut"
+      (popupClosed)="handleClose()"
+    ></app-transfer-out-inventory-add>
+  </ng-container>
+</dx-popup>
+
+<!-- ======================================TransferIn============================= -->
+
+<dx-popup
+  [(visible)]="isEditTransferIn"
+  [width]="'70vw'"
+  [height]="'90vh'"
+  title="Transfer In"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditTransferIn">
+    <app-transfer-in-inventory-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedTrIn"
+      [isReadOnlyMode]="isReadOnlyTrIn"
+      (popupClosed)="handleClose()"
+    ></app-transfer-in-inventory-form>
   </ng-container>
 </dx-popup>

@@ -167,9 +167,10 @@ export class TransferInInventoryFormComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
     const data = this.EditingResponseData;
+    console.log(data)
     this.transferInFormData = {
       TRANS_ID:data.TRANS_ID,
-      ID: data.ID,
+      // ID: data.ID,
       REC_DATE: data.REC_DATE
         ? new Date(data.REC_DATE)
         : data.TRANSFER_DATE
