@@ -368,7 +368,7 @@ loadingInvoice = false;
      this.dataService
       .selectPurchaseReturn(trans_id).subscribe((response: any) => {
         console.log(response)
-          this.selectedPurchaseReturn = response.Data;
+          this.selectedPurchaseReturn = response;
           this.isEditPurchaseReturn = true;
           
           this.cdr.detectChanges();
@@ -472,7 +472,7 @@ loadingInvoice = false;
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
-          this.selectedReceipt = response.Data;
+          this.selectedReceipt = response.Data[0];
           this.isEditReceipt = true;
           this.cdr.detectChanges();
           console.log(
