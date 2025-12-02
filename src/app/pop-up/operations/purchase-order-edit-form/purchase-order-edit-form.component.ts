@@ -48,6 +48,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @Output() closeForm = new EventEmitter<void>();
+  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
 
   @Input() formdata: any;
   poHistoryList: any;
@@ -88,8 +89,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       ? this.settingsData.CURRENCY_CODE
       : null;
 
-
-      const userDataString = localStorage.getItem('userData');
+    const userDataString = localStorage.getItem('userData');
     console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -202,9 +202,9 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   highlightEditableColumns(event: any) {
     if (event.rowType === 'data' && event.column.allowEditing) {
       // Apply a custom style for editable cells
-      event.cellElement.style.backgroundColor = '#7ca8e2ff'; // Soft yellow background
+      event.cellElement.style.backgroundColor = '#FFFFFF'; // Soft yellow background
       event.cellElement.style.color = '#000000ff'; // Dark yellow text
-      event.cellElement.style.fontWeight = 'bold';
+      // event.cellElement.style.fontWeight = 'bold';
     }
   }
   // Validate if supplier is selected
@@ -280,13 +280,12 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   // }
 
   onSelectionChanged(e) {
-  this.selectedItems = e.selectedRowsData.map(item => ({
-    ...item,
-    HSN_CODE: this.HSN_CODE,      // <-- Inject from session
-    GST_PERC: this.GST_PERC       // <-- Inject from session
-  }));
-}
-
+    this.selectedItems = e.selectedRowsData.map((item) => ({
+      ...item,
+      HSN_CODE: this.HSN_CODE, // <-- Inject from session
+      GST_PERC: this.GST_PERC, // <-- Inject from session
+    }));
+  }
 
   saveSelectedData() {
     // Map over selectedItems to create new items with updated values
@@ -318,8 +317,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         PURCH_PRICE: parseFloat(purchPrice), // Ensure consistent numeric value
 
         // Bind session data
-    HSN_CODE: this.HSN_CODE,
-    GST_PERC: this.GST_PERC,
+        HSN_CODE: this.HSN_CODE,
+        GST_PERC: this.GST_PERC,
 
         supplierAmount,
         taxable,
@@ -347,13 +346,18 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     this.showAddItemPopup = false; // Close the "Add Item" popup
   }
 
-      sessionDetails() {
+  sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
-      this.HSN_CODE, '===========selected HSN CODE===================');
+      this.HSN_CODE,
+      '===========selected HSN CODE==================='
+    );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST_PERC, '===========selected GST PERC===================');
+    console.log(
+      this.GST_PERC,
+      '===========selected GST PERC==================='
+    );
   }
 
   ngOnInit() {
@@ -469,15 +473,16 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   }
 
   updateAmount(e: any) {
-    const updatedRow = e.data; // Get the updated row data
+    const updatedRow = { ...e.key, ...e.data }; // Get the updated row data
 
+    console.log(updatedRow, 'Final merged updated row');
     // Find the specific item in savedItems
     const item = this.savedItems.find((i) => i.slNo === updatedRow.slNo);
-    console.log(item, 'itemsssssssssssssssss');
 
     if (item) {
+      console.log(item, 'item');
       // Ensure qtyOrdered is valid before proceeding with calculations
-      const qtyOrdered = updatedRow.qtyOrdered || 0; // Default to 0 if undefined
+      const qtyOrdered = updatedRow.qtyOrdered ? updatedRow.qtyOrdered : 0;
 
       // Check if SUPP_PRICE is updated and calculate PURCH_PRICE
       if (
@@ -489,7 +494,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         // Only recalculate PURCH_PRICE if the currencies are different
         if (this.SupplierCurrencyCode !== this.localCurrencyCode) {
           item.PURCH_PRICE = parseFloat(
-            (item.SUPP_PRICE / this.currencyExchangeRate).toFixed(2)
+            (item.SUPP_PRICE / this.newPoData.EXCHANGE_PRICE).toFixed(2)
           );
         } else {
           // Use the manually updated PURCH_PRICE directly
@@ -500,56 +505,71 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       // Only calculate if qtyOrdered is greater than 0
       if (qtyOrdered > 0) {
         // Calculate Amount based on qtyOrdered and Cost (PURCH_PRICE)
-        item.Amount = parseFloat(
-          (qtyOrdered * updatedRow.PURCH_PRICE).toFixed(2)
-        );
-
-        item.supplierAmount = parseFloat(
+        item.Amount = Number((qtyOrdered * updatedRow.SUPP_PRICE).toFixed(2));
+        item.SUPP_AMOUNT = Number(
           (qtyOrdered * updatedRow.SUPP_PRICE).toFixed(2)
         );
-
-        // Calculate Discount Amount
-        item.discountAmount =
-          updatedRow.discountPercentage && updatedRow.discountPercentage > 0
-            ? parseFloat(
-                (item.Amount * (updatedRow.discountPercentage / 100)).toFixed(2)
-              )
-            : 0;
+        console.log(item.Amount, 'AMOUNTINEDIT');
+        // Calculate Discount Amount only if discountPercentage is valid
+        console.log(updatedRow.discountPercentage, 'DISCOUNTPARCENTAGE');
+        if (
+          updatedRow.discountPercentage &&
+          updatedRow.discountPercentage > 0
+        ) {
+          item.discountAmount = parseFloat(
+            (item.Amount * (updatedRow.discountPercentage / 100)).toFixed(2)
+          );
+          console.log(item.discountAmount, 'discountAmount');
+        } else {
+          item.discountAmount = 0; // Set to 0 if no valid discount percentage
+        }
 
         // Calculate Taxable Amount as Amount - Discount Amount
         item.taxable = parseFloat(
           (item.Amount - item.discountAmount).toFixed(2)
         );
+        console.log(item.taxable, 'taxable');
+        let discSupplierAmount = 0; // Initialize discount amount
 
-        let discSupplierAmount =
-          updatedRow.discountPercentage && updatedRow.discountPercentage > 0
-            ? parseFloat(
-                (
-                  qtyOrdered *
-                  item.SUPP_PRICE *
-                  (updatedRow.discountPercentage / 100)
-                ).toFixed(2)
-              )
-            : 0;
+        if (
+          updatedRow.discountPercentage &&
+          updatedRow.discountPercentage > 0
+        ) {
+          discSupplierAmount = parseFloat(
+            (
+              qtyOrdered *
+              item.SUPP_PRICE *
+              (updatedRow.discountPercentage / 100)
+            ).toFixed(2)
+          );
+        } else {
+          discSupplierAmount = 0; // Set to 0 if no valid discount percentage
+        }
 
-        // Calculate Taxable Supplier
+        // Calculate Taxable Supplier based on SUPP_PRICE in the supplier's currency
         item.taxable_Supplier = parseFloat(
           (qtyOrdered * item.SUPP_PRICE - discSupplierAmount).toFixed(2)
         );
 
         // Calculate VAT Amount if VAT percentage is provided
-        item.vatAmount =
-          updatedRow.VAT_PERC && updatedRow.VAT_PERC > 0
-            ? parseFloat(
-                (item.taxable * (updatedRow.VAT_PERC / 100)).toFixed(2)
-              )
-            : 0;
-
+        if (updatedRow.VAT_PERC && updatedRow.VAT_PERC > 0) {
+          item.vatAmount = parseFloat(
+            (item.taxable * (updatedRow.VAT_PERC / 100)).toFixed(2)
+          );
+        } else {
+          item.vatAmount = 0; // Set to 0 if no valid VAT percentage
+        }
+        console.log(item.taxable, item.vatAmount, 'TAXABLE,VATAMOUNT');
         // Calculate Total as Taxable Amount + VAT Amount
         item.total_Supplier = item.taxable_Supplier;
         item.total = parseFloat((item.taxable + item.vatAmount).toFixed(2));
+        console.log(item.total_Supplier, 'TOTALSUPPLIERRRRRRRRR');
+        console.log(item.total, 'total-------------');
+        // item.total_Supplier = parseFloat(
+        //   (item.taxable + item.vatAmount).toFixed(2)
+        // );
       } else {
-        // Reset related fields if qtyOrdered is invalid or zero
+        // Reset related fields if qtyOrdered is not valid or zero
         item.Amount = 0;
         item.discountAmount = 0;
         item.taxable = 0;
@@ -567,55 +587,167 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       const detailItem = {
         ITEM_ID: item.ITEM_ID,
         QUANTITY: qtyOrdered,
-        PRICE: item.PURCH_PRICE,
+        PRICE: item.SUPP_PRICE,
         AMOUNT: item.Amount,
         DISC_PERCENT: updatedRow.discountPercentage,
         TAX_PERCENT: updatedRow.VAT_PERC,
         TAX_AMOUNT: item.vatAmount,
+        // TOTAL_AMOUNT: item.total,
         TOTAL_AMOUNT: item.total,
         ITEM_DESC: item.DESCRIPTION,
         UOM: item.UOM,
-        SUPP_PRICE: item.SUPP_PRICE, // Assuming you want to leave these fields empty or set them later
-        SUPP_AMOUNT: item.supplierAmount,
+        SUPP_PRICE: item.SUPP_PRICE,
+        SUPP_AMOUNT: item.SUPP_AMOUNT,
       };
 
       // Check if the item already exists in PoDetails
-      const detailItemIndex = this.newPoData.PoDetails.findIndex(
+      const detailItemIndex = this.poData.PoDetails.findIndex(
         (detailItem: any) => detailItem.ITEM_ID === item.ITEM_ID
       );
-
+      console.log(detailItem, 'ITEMSVALUESINPO');
       if (detailItemIndex !== -1) {
         // If item already exists in PoDetails, update it
-        this.newPoData.PoDetails[detailItemIndex] = { ...detailItem };
+        this.poData.PoDetails[detailItemIndex] = { ...detailItem };
       } else {
         // If item does not exist, add it to PoDetails
-        this.newPoData.PoDetails.push({ ...detailItem });
+        this.poData.PoDetails.push({ ...detailItem });
       }
-      // Refresh the data grid
       this.needSummaryUpdate = true;
       this.dataGrid.instance.refresh();
     }
   }
 
-  // // Handle file selection
-  // onFilesSelected(event: Event) {
-  //   const input = event.target as HTMLInputElement;
-  //   if (input.files) {
-  //     const newFiles = Array.from(input.files);
-  //     this.uploadedFiles = [...this.uploadedFiles, ...newFiles];
+  // updateAmount(e: any) {
+  //   const updatedRow = e.data; // Get the updated row data
 
-  //     // Generate object URLs for each new file
-  //     const newFileUrls = newFiles.map(file => URL.createObjectURL(file));
-  //     this.fileUrls = [...this.fileUrls, ...newFileUrls];
+  //   // Find the specific item in savedItems
+  //   const item = this.savedItems.find((i) => i.slNo === updatedRow.slNo);
+  //   console.log(item, 'itemsssssssssssssssss');
+
+  //   if (item) {
+  //     // Ensure qtyOrdered is valid before proceeding with calculations
+  //     const qtyOrdered = updatedRow.qtyOrdered || 0; // Default to 0 if undefined
+
+  //     // Check if SUPP_PRICE is updated and calculate PURCH_PRICE
+  //     if (
+  //       updatedRow.SUPP_PRICE !== undefined &&
+  //       updatedRow.SUPP_PRICE !== null
+  //     ) {
+  //       item.SUPP_PRICE = updatedRow.SUPP_PRICE;
+
+  //       // Only recalculate PURCH_PRICE if the currencies are different
+  //       if (this.SupplierCurrencyCode !== this.localCurrencyCode) {
+  //         item.PURCH_PRICE = parseFloat(
+  //           (item.SUPP_PRICE / this.currencyExchangeRate).toFixed(2)
+  //         );
+  //       } else {
+  //         // Use the manually updated PURCH_PRICE directly
+  //         item.PURCH_PRICE = updatedRow.PURCH_PRICE || 0;
+  //       }
+  //     }
+
+  //     // Only calculate if qtyOrdered is greater than 0
+  //     if (qtyOrdered > 0) {
+  //       // Calculate Amount based on qtyOrdered and Cost (PURCH_PRICE)
+  //       item.Amount = parseFloat(
+  //         (qtyOrdered * updatedRow.PURCH_PRICE).toFixed(2)
+  //       );
+
+  //       item.supplierAmount = parseFloat(
+  //         (qtyOrdered * updatedRow.SUPP_PRICE).toFixed(2)
+  //       );
+
+  //       // Calculate Discount Amount
+  //       item.discountAmount =
+  //         updatedRow.discountPercentage && updatedRow.discountPercentage > 0
+  //           ? parseFloat(
+  //               (item.Amount * (updatedRow.discountPercentage / 100)).toFixed(2)
+  //             )
+  //           : 0;
+
+  //       // Calculate Taxable Amount as Amount - Discount Amount
+  //       item.taxable = parseFloat(
+  //         (item.Amount - item.discountAmount).toFixed(2)
+  //       );
+  //       console.log(item.taxable, 'TAXABLEEEEEEEEEEE');
+  //       console.log(item.vatAmount, 'VATAMOUNTTTTTTTTTT');
+  //       let discSupplierAmount =
+  //         updatedRow.discountPercentage && updatedRow.discountPercentage > 0
+  //           ? parseFloat(
+  //               (
+  //                 qtyOrdered *
+  //                 item.SUPP_PRICE *
+  //                 (updatedRow.discountPercentage / 100)
+  //               ).toFixed(2)
+  //             )
+  //           : 0;
+
+  //       // Calculate Taxable Supplier
+  //       item.taxable_Supplier = parseFloat(
+  //         (qtyOrdered * item.SUPP_PRICE - discSupplierAmount).toFixed(2)
+  //       );
+
+  //       // Calculate VAT Amount if VAT percentage is provided
+  //       item.vatAmount =
+  //         updatedRow.VAT_PERC && updatedRow.VAT_PERC > 0
+  //           ? parseFloat(
+  //               (item.taxable * (updatedRow.VAT_PERC / 100)).toFixed(2)
+  //             )
+  //           : 0;
+
+  //       // Calculate Total as Taxable Amount + VAT Amount
+  //       item.total_Supplier = item.taxable_Supplier;
+  //       // item.total = parseFloat((item.taxable + item.vatAmount).toFixed(2));
+  //       item.total_Supplier = parseFloat(
+  //         (item.taxable + item.vatAmount).toFixed(2)
+  //       );
+  //     } else {
+  //       // Reset related fields if qtyOrdered is invalid or zero
+  //       item.Amount = 0;
+  //       item.discountAmount = 0;
+  //       item.taxable = 0;
+  //       item.vatAmount = 0;
+  //       item.total = 0;
+  //     }
+
+  //     // Update the total quantities and amounts
+  //     this.calculateTotalQuantity();
+  //     this.calculateTotalExcludingTax();
+  //     this.calculateTotalVATAmount();
+  //     this.calculateTotalIncludingTax();
+
+  //     // Define the structure of the item for PoDetails
+  //     const detailItem = {
+  //       ITEM_ID: item.ITEM_ID,
+  //       QUANTITY: qtyOrdered,
+  //       PRICE: item.PURCH_PRICE,
+  //       AMOUNT: item.Amount,
+  //       DISC_PERCENT: updatedRow.discountPercentage,
+  //       TAX_PERCENT: updatedRow.VAT_PERC,
+  //       TAX_AMOUNT: item.vatAmount,
+  //       TOTAL_AMOUNT: item.total,
+  //       ITEM_DESC: item.DESCRIPTION,
+  //       UOM: item.UOM,
+  //       SUPP_PRICE: item.SUPP_PRICE, // Assuming you want to leave these fields empty or set them later
+  //       SUPP_AMOUNT: item.supplierAmount,
+  //     };
+
+  //     // Check if the item already exists in PoDetails
+  //     const detailItemIndex = this.newPoData.PoDetails.findIndex(
+  //       (detailItem: any) => detailItem.ITEM_ID === item.ITEM_ID
+  //     );
+
+  //     if (detailItemIndex !== -1) {
+  //       // If item already exists in PoDetails, update it
+  //       this.newPoData.PoDetails[detailItemIndex] = { ...detailItem };
+  //     } else {
+  //       // If item does not exist, add it to PoDetails
+  //       this.newPoData.PoDetails.push({ ...detailItem });
+  //     }
+  //     // Refresh the data grid
+  //     this.needSummaryUpdate = true;
+  //     this.dataGrid.instance.refresh();
   //   }
-  // }
-
-  // // Remove file from the list
-  // removeFile(index: number) {
-  //   // Revoke the URL to free memory
-  // URL.revokeObjectURL(this.fileUrls[index]);
-  // this.uploadedFiles.splice(index, 1);
-  // this.fileUrls.splice(index, 1);
   // }
 
   calculateSummary(options: any) {
@@ -705,6 +837,54 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
           PRICE: parseFloat(po.PRICE).toFixed(2),
         }));
     });
+  }
+
+  onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'SUPP_PRICE' ||
+      e.dataField === 'qtyOrdered' ||
+      e.dataField === 'discountPercentage'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
   }
 
   getPoHistoryList() {

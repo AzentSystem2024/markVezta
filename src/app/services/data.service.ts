@@ -2023,10 +2023,7 @@ export class DataService {
       STATE_NAME: stateName,
       COUNTRY_ID: countryId,
     };
-    return this.http.post<any>(
-      `${this.apiUrl}state/delete/` + id,
-      requestBody
-    );
+    return this.http.post<any>(`${this.apiUrl}state/delete/` + id, requestBody);
   }
   updateState(
     ID: any,

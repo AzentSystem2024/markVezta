@@ -133,7 +133,20 @@
           labelMode="floating"
           placeholder="Contact No"
           [(value)]="newPoData.SUPP_MOBILE"
+          valueChangeEvent="keyup"
         >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Contact number is required"
+            ></dxi-validation-rule>
+
+            <dxi-validation-rule
+              type="pattern"
+              pattern="^(\+91[- ]?|91[- ]?|0)?[6-9]\d{9}$"
+              message="Enter a valid mobile number"
+            ></dxi-validation-rule>
+          </dx-validator>
         </dx-text-box>
       </div>
 
@@ -169,7 +182,20 @@
           labelMode="floating"
           placeholder="Mobile"
           [(value)]="newPoData.CONTACT_MOBILE"
+          valueChangeEvent="keyup"
         >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Contact number is required"
+            ></dxi-validation-rule>
+
+            <dxi-validation-rule
+              type="pattern"
+              pattern="^(\+91[- ]?|91[- ]?|0)?[6-9]\d{9}$"
+              message="Enter a valid mobile number"
+            ></dxi-validation-rule>
+          </dx-validator>
         </dx-text-box>
       </div>
     </div>
@@ -263,6 +289,7 @@
     </div>
   </div>
   <dx-data-grid
+    #itemsGridRef
     [columnAutoWidth]="true"
     [showBorders]="true"
     class="data-grid"
@@ -279,6 +306,7 @@
     (onCellPrepared)="highlightEditableColumns($event)"
     class="custom-data-grid"
     (onContentReady)="onContentReady($event)"
+    (onEditorPreparing)="onEditorPreparing($event)"
   >
     <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
     <dxi-column
@@ -330,15 +358,7 @@
       [editorOptions]="{ format: '#0' }"
     >
     </dxi-column>
-    <!-- <dxi-column
-      caption="Price"
-      alignment="right"
-      dataField="PURCH_PRICE"
-      width="100"
-      [allowEditing]="SupplierCurrencyCode === localCurrencyCode"
-      [format]="{ type: 'fixedPoint', precision: 2 }"
-      [editorOptions]="{ format: '#0' }"
-    ></dxi-column> -->
+
     <dxi-column
       caption="Qty"
       dataField="qtyOrdered"
@@ -388,19 +408,12 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     >
     </dxi-column>
-    <!-- <dxi-column
-      caption="Taxable ({{ localCurrencyCode }})"
-      alignment="right"
-      dataField="taxable"
-      width="100"
-      [allowEditing]="false"
-      [format]="{ type: 'fixedPoint', precision: 2 }"
-    ></dxi-column> -->
-     <dxi-column
-          dataField="HSN_CODE"
-          caption="HSN Code"
-          dataType="string"
-        ></dxi-column>
+
+    <dxi-column
+      dataField="HSN_CODE"
+      caption="HSN Code"
+      dataType="string"
+    ></dxi-column>
     <dxi-column
       caption="Tax (%)"
       dataField="VAT_PERC"
@@ -420,20 +433,12 @@
     <dxi-column
       *ngIf="showLocalCurrencyColumn"
       caption="Total ({{ SupplierCurrencySymbol }})"
-      dataField="total_Supplier"
+      dataField="total"
       alignment="right"
       width="100"
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
-    <!-- <dxi-column
-      caption="Total ({{ localCurrencyCode }})"
-      alignment="right"
-      dataField="total"
-      width="100"
-      [allowEditing]="false"
-      [format]="{ type: 'fixedPoint', precision: 2 }"
-    ></dxi-column> -->
 
     <dxo-summary>
       <dxi-total-item column="ITEM_CODE" displayFormat="Total"></dxi-total-item>

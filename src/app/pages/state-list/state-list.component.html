@@ -4,18 +4,39 @@
     [dataSource]="state"
     (onRowRemoving)="onRowRemoving($event)"
     (onRowUpdating)="onRowUpdating($event)"
+    [width]="'100%'"
+    [height]="'85vh'"
     [showBorders]="true"
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
     (onExporting)="onExporting($event)"
+    (onToolbarPreparing)="onToolbarPreparing($event)"
   >
-    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
-    <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
 
-    <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
-    <dxo-scrolling rowRenderingMode="infinite"> </dxo-scrolling>
-    <dxo-paging [pageSize]="10"> </dxo-paging>
-    <dxo-pager [visible]="true"></dxo-pager>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
 
     <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
 
@@ -29,24 +50,15 @@
       </dxo-popup>
       <dxo-form [colCount]="1"> </dxo-form>
     </dxo-editing>
-    <dxo-search-panel
+    <!-- <dxo-search-panel
       [visible]="true"
       placeholder="Data Search"
-    ></dxo-search-panel>
+    ></dxo-search-panel> -->
     <dxo-toolbar>
       <dxi-item location="before">
         <div class="grid-header">State</div>
       </dxi-item>
-
-      <dxi-item location="after" locateInMenu="auto">
-        <dx-button
-          text="Add"
-          icon="plus"
-          type="default"
-          stylingMode="contained"
-          (onClick)="addState()"
-        ></dx-button>
-      </dxi-item>
+      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
       <dxi-item
         location="after"
         locateInMenu="auto"
@@ -58,14 +70,29 @@
           stylingMode: 'text'
         }"
       ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
+      <!-- <dxi-item location="after" locateInMenu="auto"> -->
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
+      <!-- <dx-button
+          text="Add"
+          icon="plus"
+          type="default"
+          stylingMode="contained"
+          (onClick)="addState()"
+        ></dx-button> -->
+      <!-- </dxi-item> -->
+
+      <!-- <dxi-item location="after" locateInMenu="auto">
         <div class="separator"></div>
-      </dxi-item>
+      </dxi-item> -->
       <dxi-item name="exportButton"></dxi-item>
       <dxi-item location="after" locateInMenu="auto">
         <div class="separator"></div>
       </dxi-item>
-      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
     </dxo-toolbar>
     <dxi-column dataField="STATE_CODE" caption="State Codes"></dxi-column>
     <dxi-column dataField="STATE_NAME" caption="State Name">

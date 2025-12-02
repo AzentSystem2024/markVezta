@@ -441,7 +441,7 @@ export class PurchaseOrderComponent {
 
   getPurchaseOrderList() {
     this.service.getPurchaseOrderList().subscribe((res) => {
-      this.dataSource = res.data;
+      this.dataSource = [...res.data].reverse();
     });
   }
 
@@ -471,7 +471,7 @@ export class PurchaseOrderComponent {
   onClickSaveNewData() {
     // debugger;
     const data = this.poNewForm.getNewPoData();
-    console.log(data);
+    console.log(data, 'DATA FOR SAVE');
     data.IS_APPROVED = this.isApproved;
     if (!data.STORE_ID) {
       notify(
@@ -621,6 +621,7 @@ export class PurchaseOrderComponent {
   UpdatePurchaseOrder() {
     console.log('UPDATEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
     const data = this.poEditForm.getNewPoData();
+    data.PoDetails = [...this.poEditForm.poData.PoDetails];
     console.log(data);
 
     if (this.isApproved) {

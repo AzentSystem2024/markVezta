@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild, NgZone } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import {
   DxDataGridComponent,
@@ -30,9 +30,39 @@ export class StateListComponent {
   isAddStatePopupOpened = false;
   showFilterRow = true;
   showHeaderFilter = true;
+  isFilterOpened = false;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
+  debitList: any;
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
+  addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
+    // icon: 'add',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.zone.run(() => {
+        this.addState();
+      });
+    },
+    elementAttr: { class: 'add-button' },
+  };
   constructor(
     private dataservice: DataService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private zone: NgZone
   ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'state-list');
@@ -47,6 +77,39 @@ export class StateListComponent {
       console.log(response);
     });
   }
+
+  onToolbarPreparing(e: any) {
+    const toolbarItems = e.toolbarOptions.items;
+
+    // Avoid adding the button more than once
+    const alreadyAdded = toolbarItems.some(
+      (item: any) => item.name === 'toggleFilterButton'
+    );
+    if (!alreadyAdded) {
+      toolbarItems.splice(toolbarItems.length - 1, 0, {
+        widget: 'dxButton',
+        name: 'toggleFilterButton', // custom name to avoid duplicates
+        location: 'after',
+        options: {
+          icon: 'search',
+          hint: 'Search Column',
+          onClick: () => this.toggleFilters(),
+        },
+      });
+    }
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
   onClickSaveState() {
     const { STATE_CODE, STATE_NAME, COUNTRY_ID } =
       this.stateComponent.getNewStateData();
