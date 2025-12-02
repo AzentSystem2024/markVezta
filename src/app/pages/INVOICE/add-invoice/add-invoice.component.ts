@@ -204,12 +204,12 @@ export class AddInvoiceComponent {
     });
   }
 
-  getCompanyListDropdown() {
-    this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'distributorList');
-    });
-  }
+  // getCompanyListDropdown() {
+  //   this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
+  //     this.distributorList = response;
+  //     console.log(this.distributorList, 'distributorList');
+  //   });
+  // }
 
   onDistributorChanged(e: any) {
     // Find the selected customer from the distributorList

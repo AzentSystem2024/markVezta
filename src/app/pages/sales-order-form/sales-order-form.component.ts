@@ -609,6 +609,9 @@ export class SalesOrderFormComponent {
         console.log(' Total Required Qty:', this.totalRequiredQty);
         const data = response.Data[0];
         this.combination = data.COMBINATION;
+        console.log(this.combination, 'COMBINATION');
+        const grid = event.component;
+        grid.cellValue(rowIndex, 'CONTENT', this.combination);
       });
 
     const rowIndex = event.row?.rowIndex;

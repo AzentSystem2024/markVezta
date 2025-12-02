@@ -884,6 +884,11 @@ const routes: Routes = [
         // canActivate: [AuthGuardService],
       },
       {
+        path: 'state',
+        component: StateListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: '**',
         redirectTo: 'analytics-dashboard',
         pathMatch: 'full',
