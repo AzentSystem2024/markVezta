@@ -440,14 +440,69 @@
   [(visible)]="editMiscPopupOpened"
   [width]="'75vw'"
   [height]="'100vh'"
-  title="Miscellaneous Payment data"
+  title="Miscellaneous Payment"
   (onHiding)="handleClose()"
 >
-  <app-add-miscellaneous-payment
+ <ng-container *ngIf="editMiscPopupOpened">
+   <app-add-miscellaneous-payment
     *ngIf="editMiscPopupOpened"
     [isEditing]="true"
     [EditingResponseData]="selectedmiscellaneousData"
     [isReadOnlyMode]="isReadOnlyPayment"
     (popupClosed)="handleClose()"
+    [MiscPaymentId]="selectedMiscPayment"
   ></app-add-miscellaneous-payment>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditPopupPrepaymentPosting"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Edit Prepayment Posting"
+  (onHiding)="handleClose()"
+>
+  <app-prepayment-posting-edit
+    *ngIf="isEditPopupPrepaymentPosting"
+    [selecteprepaymentData]="selecte_prepayment_Data"
+    (popupClosed)="handleClose()"
+    
+  >
+  </app-prepayment-posting-edit>
+</dx-popup>
+
+
+<dx-popup
+  [(visible)]="isEditTransferOut"
+  [width]="'75vw'"
+  [height]="'90vh'"
+  title="Transfer Out"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditTransferOut">
+    <app-transfer-out-inventory-add
+      [isEditing]="true"
+      [EditingResponseData]="selectedTrOut"
+      [isReadOnlyMode]="isReadOnlyTrOut"
+      (popupClosed)="handleClose()"
+    ></app-transfer-out-inventory-add>
+  </ng-container>
+</dx-popup>
+
+
+<dx-popup
+  [(visible)]="isEditTransferIn"
+  [width]="'70vw'"
+  [height]="'90vh'"
+  title="Transfer In"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditTransferIn">
+    <app-transfer-in-inventory-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedTrIn"
+      [isReadOnlyMode]="isReadOnlyTrIn"
+      (popupClosed)="handleClose()"
+    ></app-transfer-in-inventory-form>
+  </ng-container>
 </dx-popup>

@@ -426,7 +426,7 @@ export class TransferInInventoryComponent {
 
   onEditTransferIn(event: any) {
     event.cancel = true;
-    const trInId = event.data.TRANSFER_ID;
+    const trInId = event.data.TRANS_ID;
     const status = event.data.STATUS;
     this.dataService
       .selectTransferInForInventory(trInId)
