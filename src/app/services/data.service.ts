@@ -2008,25 +2008,35 @@ export class DataService {
   //  const reqBody=item
   //   return this.http.post(`${this.apiUrl}dropdown`, reqBody);
   // }
-  public postStateData(STATE_NAME: any, COUNTRY_ID: any): Observable<any> {
-    const data = { STATE_NAME, COUNTRY_ID };
+  public postStateData(
+    STATE_CODE: any,
+    STATE_NAME: any,
+    COUNTRY_ID: any
+  ): Observable<any> {
+    const data = { STATE_CODE, STATE_NAME, COUNTRY_ID };
 
-    return this.http.post(`${this.apiUrl}/state/save`, data);
+    return this.http.post(`${this.apiUrl}state/save`, data);
   }
-  removeState(id: any, stateName: any, countryId: any) {
+  removeState(id: any, stateCode: any, stateName: any, countryId: any) {
     const requestBody = {
+      STATE_CODE: stateCode,
       STATE_NAME: stateName,
       COUNTRY_ID: countryId,
     };
     return this.http.post<any>(
-      `${this.apiUrl}/state/delete/` + id,
+      `${this.apiUrl}state/delete/` + id,
       requestBody
     );
   }
-  updateState(ID: any, STATE_NAME: any, COUNTRY_ID: any): Observable<any> {
-    const data = { ID, STATE_NAME, COUNTRY_ID };
+  updateState(
+    ID: any,
+    STATE_CODE: any,
+    STATE_NAME: any,
+    COUNTRY_ID: any
+  ): Observable<any> {
+    const data = { ID, STATE_CODE, STATE_NAME, COUNTRY_ID };
 
-    return this.http.post(`${this.apiUrl}/state/save`, data);
+    return this.http.post(`${this.apiUrl}state/save`, data);
   }
 
   //item-property1

@@ -1,4 +1,4 @@
-import { Component,NgModule,OnInit } from '@angular/core';
+import { Component, NgModule, OnInit } from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
@@ -12,28 +12,25 @@ import { DataService } from 'src/app/services';
 @Component({
   selector: 'app-state-form',
   templateUrl: './state-form.component.html',
-  styleUrls: ['./state-form.component.scss']
+  styleUrls: ['./state-form.component.scss'],
 })
 export class StateFormComponent implements OnInit {
-  CountryDropdownData:any;
+  CountryDropdownData: any;
   formStateData = {
+    STATE_CODE: '',
     STATE_NAME: '',
-    COUNTRY_ID: ''
+    COUNTRY_ID: '',
   };
-  constructor(private service:DataService){}
-  newState=this.formStateData;
+  constructor(private service: DataService) {}
+  newState = this.formStateData;
 
   getNewStateData = () => ({ ...this.newState });
 
-
   getCountryDropDown() {
-
-    this.service
-      .getCountryData()
-      .subscribe((data: any) => {
-        this.CountryDropdownData = data;
-        console.log('dropdown',this.CountryDropdownData);
-      });
+    this.service.getCountryData().subscribe((data: any) => {
+      this.CountryDropdownData = data;
+      console.log('dropdown', this.CountryDropdownData);
+    });
   }
   ngOnInit(): void {
     this.getCountryDropDown();

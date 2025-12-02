@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule, NgZone, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  NgModule,
+  NgZone,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
@@ -20,8 +26,8 @@ import {
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
-import notify from 'devextreme/ui/notify'; 
-import { FormPopupModule } from 'src/app/components'; 
+import notify from 'devextreme/ui/notify';
+import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 
 @Component({
@@ -32,16 +38,16 @@ import { DataService } from 'src/app/services';
 export class CompanyMasterComponent {
   @ViewChild('formValidationGroup')
   formValidationGroup: DxValidationGroupComponent;
-    @ViewChild(DxDataGridComponent, { static: true })
-    dataGrid: DxDataGridComponent;
-    
-     readonly allowedPageSizes: any = [5, 10, 'all'];
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+
+  readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   Datasource: any[];
   formsource: any;
-   isFilterRowVisible: boolean = false;
- isFilterOpened = false;
+  isFilterRowVisible: boolean = false;
+  isFilterOpened = false;
   addPopup: boolean = false;
   editPopup: boolean = false;
   editingRowData: any = {};
@@ -54,8 +60,16 @@ export class CompanyMasterComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  stateList: any;
+  state: any;
 
-  constructor(private fb: FormBuilder, private dataservice: DataService,private router : Router,private ngZone: NgZone, private cdr: ChangeDetectorRef) {
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) {
     this.formsource = this.fb.group({
       //  ID :[null, Validators.required],
       CompanyType: ['', Validators.required],
@@ -71,105 +85,114 @@ export class CompanyMasterComponent {
       WhatsApp: ['', Validators.required],
       Email: ['', [Validators.required, Validators.email]],
       Inactive: [false],
+      STATE_ID: ['', Validators.required],
     });
     this.get_Company_List();
     this.get_Company_Dropdown_List();
   }
 
+  // getStatusFlagClass(IS_INACTIVE: boolean): string {
+  //   return IS_INACTIVE ? 'flag-red' : 'flag-green';
+  // }
+
   getStatusFlagClass(IS_INACTIVE: boolean): string {
     return IS_INACTIVE ? 'flag-red' : 'flag-green';
   }
 
-      addButtonOptions = {
+  getStatusText(IS_INACTIVE: boolean): string {
+    return IS_INACTIVE ? 'Inactive' : 'Active';
+  }
+
+  addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-  
+
     onClick: () => {
       // Run inside Angular's zone
       this.ngZone.run(() => this.addCompany());
     },
-    
-    elementAttr: { class: 'add-button' },    
-  };
 
+    elementAttr: { class: 'add-button' },
+  };
 
-   //=================================refresh=============================
-   refreshButtonOptions = {
+  //=================================refresh=============================
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     onClick: () => this.refreshGrid(),
     text: '',
   };
 
-      refreshGrid(){
-          if (this.dataGrid?.instance) {
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
-       // Or reload data from API if needed
-       this.get_Company_List()
-      
+      // Or reload data from API if needed
+      this.get_Company_List();
     }
-       
-    }
-  
-        toggleFilterRow = () => {
+  }
+
+  toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
 
-    ngOnInit(){
-const currentUrl = this.router.url;
-  console.log('Current URL:', currentUrl);
-   const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
-  console.log('Parsed ObjectData:', menuResponse);
+  getCompanyList() {
+    this.dataservice.getDropdownData('STATE').subscribe((response: any) => {
+      this.stateList = response;
+    });
+  }
 
-  const menuGroups = menuResponse.MenuGroups || [];
-  console.log('MenuGroups:', menuGroups);
-const packingRights = menuGroups
-  .flatMap(group => group.Menus)
-  .find(menu => menu.Path === '/company');
+  ngOnInit() {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+    console.log('Parsed ObjectData:', menuResponse);
 
-if (packingRights) {
-  this.canAdd = packingRights.CanAdd;
-  this.canEdit = packingRights.CanEdit;
-  this.canDelete = packingRights.CanDelete;
-    this.canPrint = packingRights.CanEdit;
-  this.canView = packingRights.canView;
-   this.canApprove = packingRights.canApprove;
-}
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/company');
 
-console.log('packingRights',packingRights);
-console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
-
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+    this.getCompanyList();
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
   onAddPopupClose() {
     this.selectedCompanyType = null;
-    
   }
 
-  
   addCompany() {
     this.addPopup = true;
-    
 
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
 
       this.formsource.reset({
         Inactive: '',
-        Code:'',
-        CompanyName:''
+        Code: '',
+        CompanyName: '',
       });
 
-
       // ✅ remove validators when opening
-    this.formsource.get('Code')?.clearValidators();
-    this.formsource.get('CompanyName')?.clearValidators();
-    this.formsource.get('CompanyType')?.clearValidators();
-    this.formsource.updateValueAndValidity();
+      this.formsource.get('Code')?.clearValidators();
+      this.formsource.get('CompanyName')?.clearValidators();
+      this.formsource.get('CompanyType')?.clearValidators();
+      this.formsource.updateValueAndValidity();
     });
   }
   closePop() {
@@ -195,6 +218,10 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     this.get_Company_Dropdown_List();
   }
 
+  onStateChanged(event: any) {
+    this.state = event.value;
+  }
+
   onEditingStart(event: any) {
     event.cancel = true;
     this.editingRowData = { ...event.data };
@@ -213,19 +240,18 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
         this.Datasource = res.Data.map((item: any, index: any) => ({
           ...item,
           SlNo: index + 1, // Assign serial number
-        }));
+        })).sort((a: any, b: any) => Number(b.ID) - Number(a.ID));
       }
     });
   }
 
   addData() {
-
-     this.addPopup = false;
+    this.addPopup = false;
     const validationResult = this.formValidationGroup.instance.validate();
-  if (!validationResult.isValid) {
-    console.log('Validation failed');
-    return;
-  }
+    if (!validationResult.isValid) {
+      console.log('Validation failed');
+      return;
+    }
     // const validationResult = this.formValidationGroup?.instance?.validate();
     const Company_code =
       this.formsource.get('Code')?.value?.toString().trim() || '';
@@ -247,6 +273,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     const WhatsApp_no =
       this.formsource.get('WhatsApp')?.value?.toString().trim() || '';
     const Company_type = this.formsource.get('CompanyType')?.value || 0;
+    const STATE_ID = this.formsource.get('STATE_ID')?.value || 0;
 
     // Log to debug
     console.log(
@@ -260,7 +287,8 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
       Mobile_no,
       Email,
       WhatsApp_no,
-      Company_type
+      Company_type,
+      STATE_ID
     );
 
     const payload = {
@@ -276,6 +304,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
       WHATSAPP: WhatsApp_no,
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: false,
+      STATE_ID: STATE_ID,
     };
 
     const isDuplicate = this.Datasource?.some((data: any) => {
@@ -326,6 +355,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
         this.selectedData = response;
         this.formsource.patchValue({
           CompanyTypeName: response.Data.COMPANY_TYPE || 0,
+          STATE_ID: response.Data.STATE_ID,
         });
       });
     } else {
@@ -347,6 +377,10 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     const Email = this.editingRowData.EMAIL;
     const WhatsApp_no = this.editingRowData.WHATSAPP;
     const Company_type = this.selectedCompanyType;
+    const STATE_ID = this.state;
+
+    console.log(STATE_ID, 'stateID');
+
     // const Company_type = this.editingRowData.COMPANY_TYPE;
     const Is_Inactive = this.editingRowData.IS_INACTIVE;
 
@@ -366,6 +400,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
       WHATSAPP: WhatsApp_no,
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: Is_Inactive,
+      STATE_ID: STATE_ID,
     };
 
     //   const isDuplicate = this.Datasource?.some((data: any) => {
