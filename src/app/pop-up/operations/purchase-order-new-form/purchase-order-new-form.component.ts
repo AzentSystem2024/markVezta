@@ -46,6 +46,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   @Output() netQuantityChange = new EventEmitter<number>();
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   poNo: number;
   poHistoryList: any;
   sessionData: any;
@@ -63,6 +64,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   isSupplierTouched: boolean = false;
   GST_PERC: any;
   HSN_CODE: any;
+  maskRules = {
+    X: /[0-9]/,
+  };
 
   constructor(private service: DataService, private router: Router) {
     const settingsData = sessionStorage.getItem('settings');
@@ -164,9 +168,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   highlightEditableColumns(event: any) {
     if (event.rowType === 'data' && event.column.allowEditing) {
       // Apply a custom style for editable cells
-      event.cellElement.style.backgroundColor = '#7ca8e2ff'; // Soft yellow background
+      event.cellElement.style.backgroundColor = '#FFFFFF'; // Soft yellow background
       event.cellElement.style.color = '#000000ff'; // Dark yellow text
-      event.cellElement.style.fontWeight = 'bold';
+      // event.cellElement.style.fontWeight = 'bold';
     }
   }
 
@@ -277,9 +281,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
         PURCH_PRICE: parseFloat(purchPrice), // Ensure consistent numeric value
 
         // Bind session data
-    HSN_CODE: this.HSN_CODE,
-    GST_PERC: this.GST_PERC,
-    
+        HSN_CODE: this.HSN_CODE,
+        GST_PERC: this.GST_PERC,
+
         supplierAmount,
         taxable,
         vatAmount,
@@ -306,14 +310,18 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.showAddItemPopup = false; // Close the "Add Item" popup
   }
 
-
-    sessionDetails() {
+  sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
-      this.HSN_CODE, '===========selected HSN CODE===================');
+      this.HSN_CODE,
+      '===========selected HSN CODE==================='
+    );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST_PERC, '===========selected GST PERC===================');
+    console.log(
+      this.GST_PERC,
+      '===========selected GST PERC==================='
+    );
   }
 
   ngOnInit() {
@@ -497,10 +505,13 @@ export class PurchaseOrderNewFormComponent implements OnInit {
         } else {
           item.vatAmount = 0; // Set to 0 if no valid VAT percentage
         }
-
+        console.log(item.taxable, item.vatAmount, 'TAXABLE,VATAMOUNT');
         // Calculate Total as Taxable Amount + VAT Amount
         item.total_Supplier = item.taxable_Supplier;
-        item.total = parseFloat((item.taxable + item.vatAmount).toFixed(2));
+        // item.total = parseFloat((item.taxable + item.vatAmount).toFixed(2));
+        item.total_Supplier = parseFloat(
+          (item.taxable + item.vatAmount).toFixed(2)
+        );
       } else {
         // Reset related fields if qtyOrdered is not valid or zero
         item.Amount = 0;
@@ -666,7 +677,56 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     });
   }
 
+  onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'SUPP_PRICE' ||
+      e.dataField === 'qtyOrdered' ||
+      e.dataField === 'discountPercentage'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
+  }
+
   getPoHistoryList() {
+    const payload = 1;
     this.service.getPurchaseOrderHistoryList().subscribe((res: any) => {
       if (res && Array.isArray(res)) {
         this.poHistoryList = res.map((item, index) => ({
