@@ -449,7 +449,7 @@ export class TransferOutInventoryComponent {
   }
   onEditTransferOut(event: any) {
     event.cancel = true;
-    const trOutId = event.data.ID;
+    const trOutId = event.data.TRANS_ID;
     const status = event.data.STATUS;
     this.dataService
       .selectTransferOutForInventory(trOutId)

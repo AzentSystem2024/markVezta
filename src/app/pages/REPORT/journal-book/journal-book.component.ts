@@ -17,6 +17,10 @@ import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-paym
 import { EditSupplierPaymentModule } from '../../SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
 import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
+import { PrepaymentPostingEditModule } from '../../PrePayment Posting/prepayment-posting-edit/prepayment-posting-edit.component';
+import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
+import { TransferInInventoryModule } from '../../transfer-in-inventory/transfer-in-inventory.component';
+import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
 
 @Component({
   selector: 'app-journal-book',
@@ -75,6 +79,15 @@ export class JournalBookComponent {
   selectedPrePayment: any;
   selectedSupplierPayment: any;
   selectedPurchaseReturn: any;
+selectedMiscPayment: any;
+  selecte_prepayment_Data: any;
+  isEditPopupPrepaymentPosting: boolean = false;
+  selectedTrOut: any;
+  isEditTransferOut:boolean = false;
+  isReadOnlyTrOut : boolean= true;
+  selectedTrIn: any;
+  isEditTransferIn: boolean = false;
+isReadOnlyTrIn: boolean = true;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -331,13 +344,58 @@ else if (TransType === 38) {
             'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
           );
         });
-    } else if (TransType === 3) {
+    } 
+    else if (TransType === 14) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectTransferOutForInventory(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
+          this.selectedTrOut = response;
+          console.log(this.selectedTrOut);
+          this.isEditTransferOut = true;
+
+          this.cdr.detectChanges();
+          console.log(
+            this.selectedTrOut,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
+        });
+    }
+    else if (TransType === 15) {
+  console.log('=====navigate to 25-SALES INVOICE=====');
+   this.dataService.selectTransferInForInventory(trans_id).subscribe((response: any) => {
+      this.selectedTrIn = response;
+       this.loadingInvoice = false;
+
+        this.isEditTransferIn = true;
+        this.cdr.detectChanges();
+      console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+    });
+}
+    else if (TransType === 39) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .select_Prepayment_Posting(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
+          this.selecte_prepayment_Data = response.Data;
+          this.isEditPopupPrepaymentPosting = true;
+
+          this.cdr.detectChanges();
+          console.log(
+            this.selecte_prepayment_Data,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
+        });
+    } 
+    else if (TransType === 3) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectMiscPayment(trans_id)
         .subscribe((response: any) => {
           console.log(response);
-          this.selectedmiscellaneousData = response.Data;
+          this.selectedmiscellaneousData = response;
           console.log(this.selectedmiscellaneousData);
           this.editMiscPopupOpened = true;
 
@@ -465,6 +523,9 @@ formatDates(cellData: any): string {
   EditSupplierPaymentModule,
   PurchaseReturnDebitFormModule,
   AddMiscellaneousPaymentModule,
+  PrepaymentPostingEditModule,
+  TransferOutInventoryAddModule,
+  TransferInInventoryFormModule
   ],
   providers: [],
   exports: [],

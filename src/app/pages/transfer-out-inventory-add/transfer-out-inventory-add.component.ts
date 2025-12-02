@@ -180,7 +180,8 @@ export class TransferOutInventoryAddComponent {
     const data = this.EditingResponseData;
 
     this.transferOutFormData = {
-      ID: data.ID,
+      TRANS_ID:data.TRANS_ID,
+      // ID: data.ID,
       TRANSFER_DATE: data.TRANSFER_DATE ? new Date(data.TRANSFER_DATE) : null,
       DEST_STORE_ID: data.DEST_STORE_ID,
       REASON_ID: data.REASON_ID,
@@ -690,7 +691,7 @@ export class TransferOutInventoryAddComponent {
 
   openPDF() {
     console.log('Open PDF clicked');
-    const returnId = this.EditingResponseData.ID;
+    const returnId = this.EditingResponseData.TRANS_ID;
     // Example:
     this.dataService
       .selectTransferOutForInventory(returnId)
