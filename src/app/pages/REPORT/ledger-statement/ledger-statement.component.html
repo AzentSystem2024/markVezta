@@ -275,35 +275,36 @@
 <!-- //======================= coustom receipt=================== -->
 
 <dx-popup
-  [(visible)]="isViewReceipt"
-  [width]="'75vw'"
+  [(visible)]="isEditCustomerReceipt"
+  [width]="'100vw'"
   [height]="'100vh'"
-  title="View Receipt"
+  title="Customer Receipt"
   (onHiding)="handleClose()"
 >
-
-    <app-view-customer-receipt
+  <ng-container *ngIf="isEditCustomerReceipt">
+    <app-edit-customer-receipt
       [receiprtFormData]="selectedReceipt"
+      [isReadOnlyMode]="isReadOnlyReceipt"
       (popupClosed)="handleClose()"
-    ></app-view-customer-receipt>
-
+    ></app-edit-customer-receipt>
+  </ng-container>
 </dx-popup>
 
 <!-- ==============================suplier statement================================ -->
- <dx-popup
+<dx-popup
   [(visible)]="isEditReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
   title="Supplier Payment"
   (onHiding)="handleClose()"
 >
-  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <ng-container *ngIf="isEditReceipt">
   <app-edit-supplier-payment
     [paymentData]="selectedReceipt"
     [isReadOnlyMode]="isReadOnlyReceipt"
     (popupClosed)="handleClose()"
   ></app-edit-supplier-payment>
-  <!-- </ng-container> -->
+  </ng-container>
 </dx-popup>
 
 

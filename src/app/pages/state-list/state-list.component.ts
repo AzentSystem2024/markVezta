@@ -71,6 +71,8 @@ export class StateListComponent {
     this.isAddStatePopupOpened = true;
   }
 
+  
+
   showState() {
     this.dataservice.getStateData().subscribe((response) => {
       this.state = response;

@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -60,6 +61,7 @@ import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-
 import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
 import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
+import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 // import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 // import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 @Component({
@@ -124,11 +126,13 @@ loadingInvoice = false;
   isEditTransferIn:boolean = false;
   isReadOnlyTrOut:boolean = true;
   isReadOnlyTrIn:boolean = true;
-
+  isEditCustomerReceipt:boolean = false; 
   constructor(
     private dataService: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+     private ngZone: NgZone
+
   ) {
     this.get_sessionstorage_data();
     this.get_fin_id();
@@ -409,7 +413,7 @@ loadingInvoice = false;
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
           this.selectedReceipt = response.Data;
-          this.isViewReceipt = true;
+          this.isEditCustomerReceipt = true;
           this.cdr.detectChanges();
           console.log(this.selectedReceipt, 'Custom receipts=====');
         });
@@ -472,9 +476,15 @@ loadingInvoice = false;
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
-          this.selectedReceipt = response.Data[0];
-          this.isEditReceipt = true;
-          this.cdr.detectChanges();
+          console.log(response)
+         this.ngZone.run(() => {
+            this.selectedReceipt = response.Data;
+            this.isEditReceipt = true; // <-- popup now opens immediately
+          });
+
+    //        setTimeout(() => {
+    //   this.cdr.detectChanges();
+    // }, 0);
           console.log(
             this.selectedReceipt,
             'Selected_Depreciation_data====='
@@ -501,10 +511,6 @@ loadingInvoice = false;
           this.selected_Data = response;
           this.isEditPopUp = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedReceipt,
-            'Selected_Depreciation_data====='
-          );
         });
     }
     else {
@@ -747,6 +753,7 @@ loadingInvoice = false;
     ViewCreditNoteModule,
     ViewInvoiceModule,
     ViewCustomerReceiptModule,
+    EditCustomerReceiptModule,
     EditSupplierPaymentModule,
     AddMiscReceiptModule,
     DepreciationEditModule,
