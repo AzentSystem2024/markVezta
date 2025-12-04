@@ -326,17 +326,20 @@
 </dx-popup>
 
 <dx-popup
-  [(visible)]="isViewReceipt"
+  [(visible)]="isEditCustomerReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
   [deferRendering]="false"
   title="View Receipt"
   (onHiding)="handleClose()"
 >
-  <app-view-customer-receipt
-    [receiprtFormData]="selectedReceipt"
-    (popupClosed)="handleClose()"
-  ></app-view-customer-receipt>
+  <ng-container *ngIf="isEditCustomerReceipt">
+    <app-edit-customer-receipt
+      [receiprtFormData]="selectedReceipt"
+      [isReadOnlyMode]="isReadOnlyReceipt"
+      (popupClosed)="handleClose()"
+    ></app-edit-customer-receipt>
+  </ng-container>
 </dx-popup>
 
 <dx-popup

@@ -21,6 +21,7 @@ import { PrepaymentPostingEditModule } from '../../PrePayment Posting/prepayment
 import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { TransferInInventoryModule } from '../../transfer-in-inventory/transfer-in-inventory.component';
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
+import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 
 @Component({
   selector: 'app-journal-book',
@@ -88,6 +89,7 @@ selectedMiscPayment: any;
   selectedTrIn: any;
   isEditTransferIn: boolean = false;
 isReadOnlyTrIn: boolean = true;
+isEditCustomerReceipt:boolean = false;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -282,7 +284,7 @@ else if (TransType === 25) {
      this.dataService
       .selectCustomerReceipt(trans_id).subscribe((response: any) => {
           this.selectedReceipt = response.Data;
-          this.isViewReceipt = true;
+          this.isEditCustomerReceipt = true;
           this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
       });
@@ -525,7 +527,8 @@ formatDates(cellData: any): string {
   AddMiscellaneousPaymentModule,
   PrepaymentPostingEditModule,
   TransferOutInventoryAddModule,
-  TransferInInventoryFormModule
+  TransferInInventoryFormModule,
+  EditCustomerReceiptModule,
   ],
   providers: [],
   exports: [],

@@ -290,7 +290,7 @@
   </ng-container>
 </dx-popup>
 
-<!-- ==============================suplier statement================================ -->
+<!-- ==============================suplier payment================================ -->
 <dx-popup
   [(visible)]="isEditReceipt"
   [width]="'75vw'"
@@ -298,13 +298,13 @@
   title="Supplier Payment"
   (onHiding)="handleClose()"
 >
-  <ng-container *ngIf="isEditReceipt">
+  <!-- <ng-container *ngIf="isEditReceipt"> -->
   <app-edit-supplier-payment
     [paymentData]="selectedReceipt"
     [isReadOnlyMode]="isReadOnlyReceipt"
     (popupClosed)="handleClose()"
   ></app-edit-supplier-payment>
-  </ng-container>
+  <!-- </ng-container> -->
 </dx-popup>
 
 

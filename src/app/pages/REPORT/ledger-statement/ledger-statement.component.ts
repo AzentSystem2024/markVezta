@@ -472,23 +472,21 @@ loadingInvoice = false;
         });
     }
     else if (TRANS_TYPE_ID === 21) {
-      console.log('=====navigate =====');
+      this.isEditReceipt = true;
+   
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
-          console.log(response)
-         this.ngZone.run(() => {
-            this.selectedReceipt = response.Data;
-            this.isEditReceipt = true; // <-- popup now opens immediately
-          });
+          
+      
+           this.selectedReceipt = Array.isArray(response) ? response[0] : response.Data[0];
+          console.log(this.selectedReceipt, "Selected data");
 
-    //        setTimeout(() => {
-    //   this.cdr.detectChanges();
-    // }, 0);
-          console.log(
-            this.selectedReceipt,
-            'Selected_Depreciation_data====='
-          );
+            this.cdr.detectChanges();
+         
+      
+ 
+         
         });
     }
     else if (TRANS_TYPE_ID === 2) {
@@ -609,55 +607,6 @@ loadingInvoice = false;
       },
     ],
 
-
-    // calculateCustomSummary: (options: any) => {
-    //   if (options.summaryProcess === 'finalize') {
-    //     const items = this.ledgerSummaryData || [];
-
-    //     console.log(items, 'items in custom summary calculation');
-
-    //     const totalDr = items.reduce((sum, item) => {
-    //       const val = parseFloat(
-    //         String(item?.DR_AMOUNT || '0')
-    //           .replace(/,/g, '')
-    //           .trim()
-    //       );
-    //       return sum + (isNaN(val) ? 0 : val);
-    //     }, 0);
-
-    //     const totalCr = items.reduce((sum, item) => {
-    //       const val = parseFloat(
-    //         String(item?.CR_AMOUNT || '0')
-    //           .replace(/,/g, '')
-    //           .trim()
-    //       );
-    //       return sum + (isNaN(val) ? 0 : val);
-    //     }, 0);
-
-    //     console.log('Total Debit:', totalDr, 'Total Credit:', totalCr);
-    //     const closingBalance = totalDr - totalCr;
-    //     console.log('Closing Balance:', closingBalance);
-
-    //     if (options.name === 'closingBalanceCr') {
-    //       options.totalValue = closingBalance > 0 ? closingBalance : null;
-    //     }
-
-    //     if (options.name === 'closingBalanceDr') {
-    //       options.totalValue =
-    //         closingBalance < 0 ? Math.abs(closingBalance) : null;
-    //     }
-
-    //     // Grand Total logic
-    //     if (options.name === 'grandTotalCr') {
-    //       options.totalValue =
-    //         totalCr + (closingBalance > 0 ? closingBalance : 0);
-    //     }
-    //     if (options.name === 'grandTotalDr') {
-    //       options.totalValue =
-    //         totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-    //     }
-    //   }
-    // },
 
     calculateCustomSummary: (options: any) => {
   if (options.summaryProcess === 'finalize') {
