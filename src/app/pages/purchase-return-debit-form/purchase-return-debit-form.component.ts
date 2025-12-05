@@ -168,7 +168,12 @@ export class PurchaseReturnDebitFormComponent {
     }
     console.log(this.EditingResponseData, 'EDITINGRESPONSEDATA');
     this.sessionData_tax();
-    this.isEditDataAvailable();
+    // this.isEditDataAvailable();
+    if (this.isEditing) {
+      this.isEditDataAvailable(); // load edit data
+    } else {
+      this.getDocNo(); // only fetch new number in add mode
+    }
     this.getSupplierDropdown();
   }
 

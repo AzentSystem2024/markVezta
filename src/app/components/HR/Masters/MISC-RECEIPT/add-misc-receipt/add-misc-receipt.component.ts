@@ -9,7 +9,11 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -130,9 +134,13 @@ export class AddMiscReceiptComponent {
   selectedstoreId: any;
 
   pdfSrc: SafeResourceUrl | null = null;
-            isPdfPopupVisible: boolean = false;
+  isPdfPopupVisible: boolean = false;
 
-  constructor(private dataService: DataService, private ngZone: NgZone,private sanitizer: DomSanitizer) {
+  constructor(
+    private dataService: DataService,
+    private ngZone: NgZone,
+    private sanitizer: DomSanitizer
+  ) {
     this.Deparment_Drop_down();
   }
 
@@ -620,11 +628,12 @@ export class AddMiscReceiptComponent {
           },
           'success'
         );
+        this.getVoucherNo();
         this.popupClosed.emit();
         // DO NOT REMOVE — Needed for auto-setting voucher number
-        if (response?.VoucherNo) {
-          this.miscFormData.VOUCHER_NO = response.VoucherNo;
-        }
+        // if (response?.VoucherNo) {
+        //   this.miscFormData.VOUCHER_NO = response.VoucherNo;
+        // }
 
         // Close popup
       },
@@ -953,29 +962,30 @@ export class AddMiscReceiptComponent {
     this.popupClosed.emit();
   }
 
-    viewPdf(): void {
-               this.isPdfPopupVisible = true;
-              this.dataService.selectMiscReceipt(this.MiscReceiptId).subscribe((response: any) => {
-                if(response){
-                this.pdfSrc = this.get_pdf(response);
-              }
-               })
-    }
-  
-      get_pdf(data: any): SafeResourceUrl {
-       
-         const doc = new jsPDF("p", "mm", "a4");
-         const pageWidth = doc.internal.pageSize.width;
-         const margin = 12;
-         let y = 12;
-    
-         // ===========================
-      //  RETURN PDF
-      // ===========================
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-       }
+  viewPdf(): void {
+    this.isPdfPopupVisible = true;
+    this.dataService
+      .selectMiscReceipt(this.MiscReceiptId)
+      .subscribe((response: any) => {
+        if (response) {
+          this.pdfSrc = this.get_pdf(response);
+        }
+      });
+  }
+
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
+
+    // ===========================
+    //  RETURN PDF
+    // ===========================
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 }
 
 @NgModule({

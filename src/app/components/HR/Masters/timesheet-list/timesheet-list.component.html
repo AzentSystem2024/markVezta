@@ -33,10 +33,8 @@
       (onEditingStart)="onEditOrViewTimesheet($event)"
       (onRowRemoving)="onDeleteTimesheet($event)"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
-       [selectedRows]="selectedRows" 
-
-        (onSelectionChanged)="onSelectionChanged($event)"
-      
+      [selectedRows]="selectedRows"
+      (onSelectionChanged)="onSelectionChanged($event)"
     >
       <dxo-column-chooser
         [height]="500"
@@ -60,15 +58,22 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <dxo-scrolling mode="standard"></dxo-scrolling>
-      <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
-      <dxo-header-filter
-        [visible]="true"
-        [search]="{ enabled: true }"
-      ></dxo-header-filter>
-     
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
+
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
       <dxo-toolbar>
         <dxi-item location="before">
           <div class="grid-header">Time Sheet</div>
@@ -139,8 +144,7 @@
             </div>
           </div>
         </dxi-item>
-        <dxi-item location="after" locateInMenu="auto"> 
-        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
         <!-- <dxi-item location="after" locateInMenu="auto">
           <dx-button
             icon="plus"
@@ -150,42 +154,41 @@
             (onClick)="addTimesheet()"
           ></dx-button>
         </dxi-item> -->
-        
+
         <dxi-item>
-      <dx-button
-        text="Approve"
-        type="default"
-       
-        stylingMode="contained"
-        [width]="100"
-        class="mt-2"
-        (onClick)="ApproveBulkRows()"
-      >
-      </dx-button>
-    </dxi-item>
+          <dx-button
+            text="Approve"
+            type="default"
+            stylingMode="contained"
+            [width]="100"
+            class="mt-2"
+            (onClick)="ApproveBulkRows()"
+          >
+          </dx-button>
+        </dxi-item>
       </dxo-toolbar>
 
       <dxi-column dataField="EMP_NO" caption="Employee No."></dxi-column>
       <dxi-column dataField="EMP_NAME" caption="Employee Name"></dxi-column>
       <dxi-column dataField="WORKED_DAYS" caption="Worked Days"></dxi-column>
       <dxi-column dataField="OT_HOURS" caption="OT Hours"></dxi-column>
-       <dxi-column dataField="LESS_HOURS" caption="Less Hours"></dxi-column>
+      <dxi-column dataField="LESS_HOURS" caption="Less Hours"></dxi-column>
       <!-- <dxi-column dataField="STATUS" caption="Status"></dxi-column> -->
-        <dxi-column
-          dataField="STATUS"
-          caption="Status"
-          cellTemplate="statusCellTemplate"
-          width="100  "
-          alignment="right"
-        >
-        </dxi-column>
-        <div *dxTemplate="let cellData of 'statusCellTemplate'">
-          <i
-            class="fas fa-flag"
-            [ngClass]="getStatusFlagClass(cellData.value)"
-            [attr.title]="cellData.value"
-            style="margin-left: 10px; cursor: default"
-          ></i>
+      <dxi-column
+        dataField="STATUS"
+        caption="Status"
+        cellTemplate="statusCellTemplate"
+        width="100  "
+        alignment="right"
+      >
+      </dxi-column>
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value"
+          style="margin-left: 10px; cursor: default"
+        ></i>
       </div>
       <!-- <dxi-column
         type="buttons"
@@ -194,8 +197,6 @@
         fixed="true"
         fixedPosition="right"
       ></dxi-column> -->
-
-    
     </dx-data-grid>
   </div>
 </div>

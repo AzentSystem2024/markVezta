@@ -185,11 +185,27 @@
             dataField="GST"
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? 'VAT%'
-                : ' GST %'
+                ? 'VAT %'
+                : ' IGST %'
             "
             dataType="number"
-            [allowEditing]="true"
+            [visible]="showGST"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="TAX_AMOUNT"

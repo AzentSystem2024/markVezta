@@ -224,7 +224,7 @@
               <div class="section-label">Payment Details</div>
 
               <dx-radio-group
-                [items]="['Cash', 'Bank', 'Adjustments', 'PDC']"
+                [items]="['Cash', 'Bank', 'PDC']"
                 [(value)]="receiptMode"
                 layout="horizontal"
                 label="Mode"
@@ -375,15 +375,14 @@
   "
 >
   <!-- Checkbox right above buttons -->
-  
 
   <!-- Buttons row -->
   <div style="display: flex; gap: 1px">
     <dx-check-box
-    [(value)]="receiprtFormData.IS_APPROVED"
-    text="Approve"
-    [width]="120"
-  ></dx-check-box>
+      [(value)]="receiprtFormData.IS_APPROVED"
+      text="Approve"
+      [width]="120"
+    ></dx-check-box>
     <dx-button
       text="Cancel"
       stylingMode="outlined"

@@ -10,7 +10,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -78,9 +82,8 @@ export class EditSupplierPaymentComponent {
   showFillAmountPopup: boolean = false;
 
   pdfSrc: SafeResourceUrl | null = null;
-        isPdfPopupVisible: boolean = false;
-        
-        
+  isPdfPopupVisible: boolean = false;
+
   fillAmountData = {
     field1: 0,
     field2: 0,
@@ -204,15 +207,16 @@ export class EditSupplierPaymentComponent {
   validateReceivedAmount = (e: any) => {
     if (!e || !e.data) return true;
 
-    const value = Number(e.value);
+    const value = Number(e.value); // entered amount
+    const pending = Number(e.data.PENDING_AMOUNT); // balance
 
-    // allow 0 or empty
+    // allow empty or 0
     if (!e.value || value === 0) {
       return true;
     }
 
-    // validate only when > 0
-    return value === Number(e.data.PENDING_AMOUNT);
+    // validate: amount must be <= pending
+    return value <= pending;
   };
 
   getPendingInvoiceList(supplierId: number) {
@@ -410,8 +414,9 @@ export class EditSupplierPaymentComponent {
       this.chequeDate = null;
     }
     this.bank = selectedCheque.BANK_NAME;
-    this.paymentFormData.AMOUNT = selectedCheque.AMOUNT;
+    this.paymentFormData.PDC_AMOUNT = selectedCheque.AMOUNT;
     this.paymentFormData.PDC_ID = selectedCheque.ID;
+    this.paymentFormData = { ...this.paymentFormData };
     this.pdcPopupVisible = false;
   }
 
@@ -549,6 +554,8 @@ export class EditSupplierPaymentComponent {
         return 2;
       case 'Adjustments':
         return 4;
+      case 'PDC': //  ADD THIS
+        return 3;
       default:
         return 0;
     }
@@ -556,6 +563,50 @@ export class EditSupplierPaymentComponent {
 
   calculateNetAmount(details: any[]): number {
     return details.reduce((sum, item) => sum + Number(item.AMOUNT || 0), 0);
+  }
+
+  onEditorPreparing(e: any) {
+    if (e.dataField === 'AMOUNT') {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
   }
 
   saveReceipt() {
@@ -672,33 +723,32 @@ export class EditSupplierPaymentComponent {
 
   cancel() {}
 
-   viewPdf(): void {
+  viewPdf(): void {
     console.log(this.supplierPaymentId, 'SUPPLIERPAYMENTIDDDDDDDDDDDDDDDDD');
     this.isPdfPopupVisible = true;
-    
+
     this.dataService
       .selectSupplierPayment(this.supplierPaymentId)
       .subscribe((response: any) => {
-        if(response){
+        if (response) {
           this.pdfSrc = this.get_pdf(response);
         }
       });
-   }
+  }
 
-   get_pdf(data: any): SafeResourceUrl {
-   
-     const doc = new jsPDF("p", "mm", "a4");
-     const pageWidth = doc.internal.pageSize.width;
-     const margin = 12;
-     let y = 12;
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
 
-     // ===========================
-  //  RETURN PDF
-  // ===========================
-  const blob = doc.output("blob");
-  const url = URL.createObjectURL(blob);
-  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-   }
+    // ===========================
+    //  RETURN PDF
+    // ===========================
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 }
 
 @NgModule({

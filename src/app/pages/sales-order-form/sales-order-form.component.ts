@@ -95,6 +95,7 @@ export class SalesOrderFormComponent {
     DELIVERY_ADDRESS: 0,
     WAREHOUSE: 2,
     TOTAL_QTY: 0,
+    IS_APPROVED: false,
     Details: [
       {
         PACKING_ID: 0,
@@ -1292,6 +1293,7 @@ export class SalesOrderFormComponent {
       REMARKS: this.salesOrderFormData.REMARKS,
       DELIVERY_ADDRESS: this.salesOrderFormData.DELIVERY_ADDRESS,
       WAREHOUSE: this.salesOrderFormData.WAREHOUSE,
+      IS_APPROVED: this.salesOrderFormData.IS_APPROVED,
       TOTAL_QTY: totalQty,
       Details: validDetails.map((d: any) => ({
         PACKING_ID: d.PACKING || '',
@@ -1316,7 +1318,7 @@ export class SalesOrderFormComponent {
     let apiCall;
     let message = '';
 
-    if (this.isApproved) {
+    if (this.isEditing && this.salesOrderFormData.IS_APPROVED) {
       // Confirm approval before calling API
       const result = confirm(
         'Are you sure you want to approve this Sales Order?',
@@ -1340,12 +1342,41 @@ export class SalesOrderFormComponent {
     if (this.salesOrderFormData.ID) {
       apiCall = this.dataService.updateSalesOrder(payload);
       message = 'Sales Order updated successfully!';
-    } else {
-      apiCall = this.dataService.saveSalesOrder(payload);
-      message = 'Sales Order saved successfully!';
+      return;
     }
+    if (this.salesOrderFormData.IS_APPROVED) {
+      // Show confirmation before insert
+      const result = confirm(
+        'Are you sure you want to save and approve this Sales Order?',
+        'Confirm Save & Approve'
+      );
 
-    this.callApi(apiCall, message);
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          //  Run API inside Angular zone
+          this.ngZone.run(() => {
+            this.callApi(
+              this.dataService.saveSalesOrder(payload),
+              'Sales Order saved & approved successfully!'
+            );
+          });
+        } else {
+          notify('Save cancelled.', 'info', 1500);
+        }
+      });
+    } else {
+      // Normal save (no confirmation)
+      this.callApi(
+        this.dataService.saveSalesOrder(payload),
+        'Sales Order saved successfully!'
+      );
+    }
+    // else {
+    //   apiCall = this.dataService.saveSalesOrder(payload);
+    //   message = 'Sales Order saved successfully!';
+    // }
+
+    // this.callApi(apiCall, message);
   }
 
   // --- Reusable helper for all API calls ---

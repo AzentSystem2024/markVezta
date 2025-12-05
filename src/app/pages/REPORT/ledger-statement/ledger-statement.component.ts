@@ -70,13 +70,12 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
   styleUrls: ['./ledger-statement.component.scss'],
 })
 export class LedgerStatementComponent {
-  
   Ledger_statement_datasource: any = [];
   isEditJournalVoucher: boolean = false;
   isViewJournalVoucher: boolean = false;
   isViewDebitNote: boolean = false;
   company_list: any[] = [];
-  selectedCompanyId:any
+  selectedCompanyId: any;
   company_id: any;
   HEAD_ID_LIST: any[] = [];
   fin_id: any[] = [];
@@ -98,45 +97,44 @@ export class LedgerStatementComponent {
   isViewReceipt: boolean = false;
   selectedReceipt: any;
   selected_Company_id: any;
-  isReadOnlyReceipt:boolean=true
-  isEditReceipt:boolean=false
-isReadOnlyPayment:boolean=true
-  selectedmiscellaneousData:any
+  isReadOnlyReceipt: boolean = true;
+  isEditReceipt: boolean = false;
+  isReadOnlyPayment: boolean = true;
+  selectedmiscellaneousData: any;
   editMiscPopupOpened: boolean = false;
-  Selected_Depreciation_data:any
-  EditDepreciationPopupVisible:boolean=false
-editPrePaymentPopupOpened:boolean=false
-selectedSalaryData:any
-editSalaryPopup:boolean=false
-selectedPrePayment:any
-isEditReadOnly:boolean=true
-selected_Data:any
-isEditPopUp:boolean=false
-loadingInvoice = false;
-  popupReady = false;
-  editMiscPopup : boolean = false;
-  isEditInvoice :boolean = false;
-  isEditInvoiceReadOnly :boolean = true;
-  isEditPurchaseReturn:boolean=false;
+  Selected_Depreciation_data: any;
+  EditDepreciationPopupVisible: boolean = false;
+  editPrePaymentPopupOpened: boolean = false;
+  selectedSalaryData: any;
+  editSalaryPopup: boolean = false;
+  selectedPrePayment: any;
+  isEditReadOnly: boolean = true;
+  selected_Data: any;
+  isEditPopUp: boolean = false;
+  loadingInvoice = false;
+  popupReady = false;
+  editMiscPopup: boolean = false;
+  isEditInvoice: boolean = false;
+  isEditInvoiceReadOnly: boolean = true;
+  isEditPurchaseReturn: boolean = false;
   selectedPurchaseReturn: any;
-  isReadOnlyPurchaseReturn:boolean=true;
+  isReadOnlyPurchaseReturn: boolean = true;
   selectedTrOut: any;
   selectedTrIn: any;
-  isEditTransferOut :boolean = false;
-  isEditTransferIn:boolean = false;
-  isReadOnlyTrOut:boolean = true;
-  isReadOnlyTrIn:boolean = true;
-  isEditCustomerReceipt:boolean = false; 
+  isEditTransferOut: boolean = false;
+  isEditTransferIn: boolean = false;
+  isReadOnlyTrOut: boolean = true;
+  isReadOnlyTrIn: boolean = true;
+  isEditCustomerReceipt: boolean = false;
   constructor(
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-     private ngZone: NgZone
-
+    private ngZone: NgZone
   ) {
     this.get_sessionstorage_data();
     this.get_fin_id();
-    this.sesstion_Details()
+    this.sesstion_Details();
 
     // Detect when component is revisited
     this.router.events
@@ -149,8 +147,6 @@ loadingInvoice = false;
   }
 
   ngOnInit() {
-
-
     this.loadLedgerData();
 
     this.ledgerSummaryData = this.Ledger_statement_datasource;
@@ -168,13 +164,12 @@ loadingInvoice = false;
   }
 
   async loadLedgerData() {
-
     // this.ledgerSummaryData=this.Ledger_statement_datasource
     const sessiondata = this.getSessionData('viewclickvalue');
     const headid = this.getSessionData('HEADID');
 
-    console.log(sessiondata)
-     
+    console.log(sessiondata);
+
     // if (!sessiondata) {
     //   console.log('No session data found!');
     //   return;
@@ -194,14 +189,14 @@ loadingInvoice = false;
     this.selected_Head_Id = payload.HEAD_ID;
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
- 
-   await this.dataService.get_ladger_statement_api(payload).subscribe((res: any) => {
-      this.Ledger_statement_datasource = res.data || [];
-      this.ledgerSummaryData = this.Ledger_statement_datasource;
-    });
+
+    await this.dataService
+      .get_ladger_statement_api(payload)
+      .subscribe((res: any) => {
+        this.Ledger_statement_datasource = res.data || [];
+        this.ledgerSummaryData = this.Ledger_statement_datasource;
+      });
   }
-
-
 
   get_sessionstorage_data() {
     this.savedUserData = this.getSessionData('savedUserData');
@@ -223,9 +218,8 @@ loadingInvoice = false;
     this.dataService
       .HeadId_Dropdown_api(this.selected_Company_id)
       .subscribe((res: any) => {
-        this.HEAD_ID_LIST = res
-        console.log('===============ledger=========',res);
-        
+        this.HEAD_ID_LIST = res;
+        console.log('===============ledger=========', res);
       });
   }
 
@@ -250,19 +244,23 @@ loadingInvoice = false;
     // Optional: Update sessionStorage if needed
   }
 
-  sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
 
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
 
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
-
-    console.log(this.selected_fin_id,'===========selected fin id===================')
-    
-  }
+    console.log(
+      this.selected_fin_id,
+      '===========selected fin id==================='
+    );
+  }
   load_Ledgre_data() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -301,7 +299,6 @@ loadingInvoice = false;
     this.isViewReceipt = false;
   }
 
-
   onViewClick(e: any) {
     console.log(e, '=======event==========');
 
@@ -336,7 +333,7 @@ loadingInvoice = false;
       console.log('=====navigate to 37-CREDIT NOTE=====');
       this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
         this.selectedCreditNote = response.Data;
-         this.isViewCreditNote=true
+        this.isViewCreditNote = true;
         this.cdr.detectChanges();
         console.log(this.selectedCreditNote, 'selected credit note');
       });
@@ -346,40 +343,38 @@ loadingInvoice = false;
         this.selectedInvoice = response.Data;
         this.loadingInvoice = false;
 
-          // this.isEditInvoice = true;
+        // this.isEditInvoice = true;
 
         this.isViewInvoice = true;
         this.cdr.detectChanges();
         console.log(this.selectedInvoice, 'SELECTE SALES INVOICE');
       });
-    }
-     else if(TRANS_TYPE_ID == 19){
+    } else if (TRANS_TYPE_ID == 19) {
       this.dataService
         .selectPurchaseInvoice(trans_id)
         .subscribe((response: any) => {
           this.selectedInvoice = response.Data;
- this.loadingInvoice = false;
-
+          this.loadingInvoice = false;
 
           this.isEditInvoice = true;
           this.cdr.detectChanges();
-         
         });
-      }
-      else if (TRANS_TYPE_ID === 20) {
- 
-  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-     this.dataService
-      .selectPurchaseReturn(trans_id).subscribe((response: any) => {
-        console.log(response)
+    } else if (TRANS_TYPE_ID === 20) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectPurchaseReturn(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
           this.selectedPurchaseReturn = response;
           this.isEditPurchaseReturn = true;
-          
+
           this.cdr.detectChanges();
-        console.log(this.selectedPurchaseReturn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-} 
- else if (TRANS_TYPE_ID === 14) {
+          console.log(
+            this.selectedPurchaseReturn,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
+        });
+    } else if (TRANS_TYPE_ID === 14) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectTransferOutForInventory(trans_id)
@@ -390,24 +385,21 @@ loadingInvoice = false;
           this.isEditTransferOut = true;
 
           this.cdr.detectChanges();
-          console.log(
-            this.selectedTrOut,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-          );
+          console.log(this.selectedTrOut, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
-    }
-    else if (TRANS_TYPE_ID === 15) {
-  console.log('=====navigate to 25-SALES INVOICE=====');
-   this.dataService.selectTransferInForInventory(trans_id).subscribe((response: any) => {
-      this.selectedTrIn = response;
-       this.loadingInvoice = false;
+    } else if (TRANS_TYPE_ID === 15) {
+      console.log('=====navigate to 25-SALES INVOICE=====');
+      this.dataService
+        .selectTransferInForInventory(trans_id)
+        .subscribe((response: any) => {
+          this.selectedTrIn = response;
+          this.loadingInvoice = false;
 
-        this.isEditTransferIn = true;
-        this.cdr.detectChanges();
-      console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-    });
-}
-    else if (TRANS_TYPE_ID === 27) {
+          this.isEditTransferIn = true;
+          this.cdr.detectChanges();
+          console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+        });
+    } else if (TRANS_TYPE_ID === 27) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectCustomerReceipt(trans_id)
@@ -417,8 +409,7 @@ loadingInvoice = false;
           this.cdr.detectChanges();
           console.log(this.selectedReceipt, 'Custom receipts=====');
         });
-    }       
-     else if (TRANS_TYPE_ID === 3) {
+    } else if (TRANS_TYPE_ID === 3) {
       console.log('=====navigate to 2 mis payament=====');
       this.dataService
         .selectMiscPayment(trans_id)
@@ -426,10 +417,8 @@ loadingInvoice = false;
           this.selectedmiscellaneousData = response;
           this.editMiscPopupOpened = true;
           this.cdr.detectChanges();
-          
         });
-    } 
-        else if (TRANS_TYPE_ID === 9) {
+    } else if (TRANS_TYPE_ID === 9) {
       console.log('=====navigate to 2 mis payament=====');
       this.dataService
         .select_Depreciation_Asset(trans_id)
@@ -455,78 +444,74 @@ loadingInvoice = false;
             'Selected_Depreciation_data====='
           );
         });
-    } 
-    else if (TRANS_TYPE_ID === 30) {
+    } else if (TRANS_TYPE_ID === 30) {
       console.log('=====navigate =====');
       this.dataService
         .selectSalaryPayment(trans_id)
         .subscribe((response: any) => {
           this.selectedSalaryData = response.Data;
           this.editSalaryPopup = true;
-            this.cdr.detectChanges();
+          this.cdr.detectChanges();
           console.log(
             this.selectedSalaryData,
             'Selected_Depreciation_data====='
           );
-
         });
-    }
-    else if (TRANS_TYPE_ID === 21) {
+    } else if (TRANS_TYPE_ID === 21) {
       this.isEditReceipt = true;
-   
+
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
-          
-      
-           this.selectedReceipt = Array.isArray(response) ? response[0] : response.Data[0];
-          console.log(this.selectedReceipt, "Selected data");
+          this.selectedReceipt = Array.isArray(response)
+            ? response[0]
+            : response.Data[0];
+          console.log(this.selectedReceipt, 'Selected data');
 
-            this.cdr.detectChanges();
-         
-      
- 
-         
+          this.cdr.detectChanges();
         });
-    }
-    else if (TRANS_TYPE_ID === 2) {
- 
-  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-     this.dataService
-      .selectMiscReceipt(trans_id).subscribe((response: any) => {
-        console.log(response)
+    } else if (TRANS_TYPE_ID === 2) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectMiscReceipt(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
           this.selectedmiscellaneousData = response.Data;
           this.editMiscPopup = true;
           this.cdr.detectChanges();
-        console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-}
-        else if (TRANS_TYPE_ID === 28) {
-      console.log('=====navigate =====');
-      this.dataService
-        .select_Advance(trans_id)
-        .subscribe((response: any) => {
-          this.selected_Data = response;
-          this.isEditPopUp = true;
-          this.cdr.detectChanges();
+          console.log(
+            this.selectedmiscellaneousData,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          );
         });
-    }
-    else {
+    } else if (TRANS_TYPE_ID === 28) {
+      console.log('=====navigate =====');
+      this.dataService.select_Advance(trans_id).subscribe((response: any) => {
+        this.selected_Data = response;
+        this.isEditPopUp = true;
+        this.cdr.detectChanges();
+      });
+    } else if (TRANS_TYPE_ID === 28) {
+      console.log('=====navigate =====');
+      this.dataService.select_Advance(trans_id).subscribe((response: any) => {
+        this.selected_Data = response;
+        this.isEditPopUp = true;
+        this.cdr.detectChanges();
+        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+      });
+    } else {
       console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
     }
-
-    
   }
-// POPUP shown → allow child to render
+  // POPUP shown → allow child to render
   onPopupShown() {
     this.popupReady = true;
     this.cdr.detectChanges();
-  }
+  }
   summaryColumnsData = {
     totalItems: [
       // 1. Total Debitṅ
-                       {
-
+      {
         column: 'PARTICULARS',
         summaryType: '',
         displayFormat: ' Total',
@@ -534,8 +519,7 @@ loadingInvoice = false;
         showInColumn: 'PARTICULARS',
         alignment: 'right',
       },
-                 {
-
+      {
         column: 'PARTICULARS',
         summaryType: '',
         displayFormat: ' Closing Balance',
@@ -543,8 +527,7 @@ loadingInvoice = false;
         showInColumn: 'PARTICULARS',
         alignment: 'right',
       },
-                 {
-
+      {
         column: 'PARTICULARS',
         summaryType: '',
         displayFormat: ' Grand Total',
@@ -607,60 +590,57 @@ loadingInvoice = false;
       },
     ],
 
-
     calculateCustomSummary: (options: any) => {
-  if (options.summaryProcess === 'finalize') {
-    const items = this.ledgerSummaryData || [];
+      if (options.summaryProcess === 'finalize') {
+        const items = this.ledgerSummaryData || [];
 
-    const totalDr = items.reduce((sum, item) => {
-      const val = parseFloat(
-        String(item?.DR_AMOUNT || '0')
-          .replace(/,/g, '')
-          .trim()
-      );
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
+        const totalDr = items.reduce((sum, item) => {
+          const val = parseFloat(
+            String(item?.DR_AMOUNT || '0')
+              .replace(/,/g, '')
+              .trim()
+          );
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
 
-    const totalCr = items.reduce((sum, item) => {
-      const val = parseFloat(
-        String(item?.CR_AMOUNT || '0')
-          .replace(/,/g, '')
-          .trim()
-      );
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
+        const totalCr = items.reduce((sum, item) => {
+          const val = parseFloat(
+            String(item?.CR_AMOUNT || '0')
+              .replace(/,/g, '')
+              .trim()
+          );
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
 
-    const closingBalance = totalDr - totalCr;
+        const closingBalance = totalDr - totalCr;
 
-    // Closing Balance
-    if (options.name === 'closingBalanceCr') {
-      options.totalValue = closingBalance > 0 ? closingBalance : 0;
-    }
+        // Closing Balance
+        if (options.name === 'closingBalanceCr') {
+          options.totalValue = closingBalance > 0 ? closingBalance : 0;
+        }
 
-    if (options.name === 'closingBalanceDr') {
-      options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : 0;
-    }
+        if (options.name === 'closingBalanceDr') {
+          options.totalValue =
+            closingBalance < 0 ? Math.abs(closingBalance) : 0;
+        }
 
-    // Grand Total
-    if (options.name === 'grandTotalCr') {
-      options.totalValue =
-        totalCr + (closingBalance > 0 ? closingBalance : 0);
-    }
-    if (options.name === 'grandTotalDr') {
-      options.totalValue =
-        totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-    }
-  }
-},
-
+        // Grand Total
+        if (options.name === 'grandTotalCr') {
+          options.totalValue =
+            totalCr + (closingBalance > 0 ? closingBalance : 0);
+        }
+        if (options.name === 'grandTotalDr') {
+          options.totalValue =
+            totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
+        }
+      }
+    },
   };
 
   onExporting(event: any) {
     const fileName = 'Ledger Statement Report';
     this.dataService.exportDataGridReport(event, fileName);
   }
-
-
 }
 
 @NgModule({

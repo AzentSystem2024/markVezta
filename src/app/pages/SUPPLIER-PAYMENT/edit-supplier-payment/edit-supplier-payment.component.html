@@ -37,6 +37,7 @@
           [keyExpr]="'BILL_ID'"
           (onContentReady)="onGridContentReady($event)"
           (onSelectionChanged)="onSelectionChanged($event)"
+          (onEditorPreparing)="onEditorPreparing($event)"
         >
           <dxo-editing
             mode="cell"
@@ -145,7 +146,7 @@
             <dxi-validation-rule
               type="custom"
               [validationCallback]="validateReceivedAmount"
-              message="Received Amount must equal Balance"
+              message="Received Amount must equal or less than Balance"
             ></dxi-validation-rule>
           </dxi-column>
 
@@ -199,7 +200,7 @@
 
               <dx-radio-group
                 [(value)]="selectedPaymentMode"
-                [items]="['Cash', 'Bank', 'Adjustments', 'PDC']"
+                [items]="['Cash', 'Bank', 'PDC']"
                 layout="horizontal"
                 label="Mode"
                 labelMode="floating"

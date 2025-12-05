@@ -304,6 +304,7 @@ export class ArticleEditComponent {
           (p: any) => p.DESCRIPTION === selectedDescription
         );
         this.selectedItemId = matchedItem ? matchedItem.ID : null;
+        console.log(this.selectedItemId, 'SELECTEDITEMID');
         let itemCode = null;
         if (selectedDescription) {
           itemCode = selectedDescription.split('-')[0]; // gets "078257588206"

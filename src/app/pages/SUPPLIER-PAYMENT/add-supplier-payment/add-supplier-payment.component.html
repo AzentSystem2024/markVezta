@@ -211,7 +211,7 @@
               <div class="section-label">Payment Details</div>
 
               <dx-radio-group
-                [items]="['Cash', 'Bank', 'Adjustments', 'PDC']"
+                [items]="['Cash', 'Bank', 'PDC']"
                 layout="horizontal"
                 label="Mode"
                 labelMode="floating"
@@ -363,7 +363,7 @@
     ></dx-button>
     <dx-button
       #saveButtonRef
-      text="Save"
+      [text]="paymentFormData.IS_APPROVED ? 'Commit' : 'Save'"
       stylingMode="contained"
       type="default"
       (onClick)="saveReceipt()"
