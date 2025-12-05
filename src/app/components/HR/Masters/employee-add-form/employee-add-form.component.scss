@@ -99,11 +99,13 @@
   }
   .two-column-layout {
     display: flex;
+    
     gap: 10px; /* Adjust space between columns */
   }
   .two-column-layout > div {
     flex: 1; /* Equal width for both columns */
     // margin-bottom: 10px;
+    
   }
   
   .form-container {
@@ -152,6 +154,7 @@
   }
   .left-column {
     flex: 4; /* Takes 2/3 of the space */
+    
   }
 
   .right-column {
@@ -172,7 +175,8 @@
     padding: 20px;
     // margin: 10px;
     width: 100%;
-    
+     overflow-y: auto; 
+    margin-left: -75px;
     margin-top: 8px; 
   }
 
@@ -194,23 +198,10 @@
   margin-top: 8px;
     padding: 20px;
     // margin: 20px;
-    width: 100%;
+    width: 10 0%;
     overflow-y: auto; 
-    margin-left: 0px;
+    margin-left: -75px;
   }
-
-
-  // .custom-card-address {
-  //   border: 1px solid #838181;  
-  //   border-radius: 8px;
-  //   box-shadow: 0px 2px 20px rgba(7, 7, 7, 0.1);
-  //   padding: 20px;
-  //   margin: 10px;
-  //   width: 50%;
-  //   margin-left :250px;
-  //   margin-top: 50px; 
-  //   height: 100%;
-  // }
   
   .dx-form .dx-field-item {
     margin-bottom: 0px !important;

@@ -192,7 +192,8 @@ export class PurchaseReturnDebitFormComponent {
     console.log(data, 'DATAINEDITFORM');
     // Populate header fields
     this.purchaseReturnFormData = {
-      ID: data.ID,
+      // ID: data.ID,
+      TRANS_ID :data.TRANS_ID,
       COMPANY_ID: this.purchaseReturnFormData.COMPANY_ID,
       STORE_ID: data.STORE_ID,
       // RET_DATE: new Date(data.RET_DATE),

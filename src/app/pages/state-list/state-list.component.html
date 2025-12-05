@@ -8,7 +8,11 @@
     [height]="'85vh'"
     [showBorders]="true"
     [allowColumnReordering]="true"
-    [allowColumnResizing]="true"
+    [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+    [rowAlternationEnabled]="true"
+    [showColumnLines]="true"
     (onExporting)="onExporting($event)"
     (onToolbarPreparing)="onToolbarPreparing($event)"
   >
@@ -30,7 +34,7 @@
     <dxo-header-filter [visible]="isFilterOpened">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
-    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <!-- <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel> -->
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
 
     <dxo-filter-row
@@ -70,6 +74,7 @@
           stylingMode: 'text'
         }"
       ></dxi-item>
+      
       <!-- <dxi-item location="after" locateInMenu="auto"> -->
       <dxi-item
         location="after"

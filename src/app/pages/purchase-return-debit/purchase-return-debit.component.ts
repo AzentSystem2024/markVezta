@@ -416,7 +416,7 @@ export class PurchaseReturnDebitComponent {
 
   onEditPurchaseReturn(event: any) {
     event.cancel = true;
-    const returnId = event.data.ID;
+    const returnId = event.data.TRANS_ID;
     const status = event.data.TRANS_STATUS;
     this.dataService
       .selectPurchaseReturn(returnId)

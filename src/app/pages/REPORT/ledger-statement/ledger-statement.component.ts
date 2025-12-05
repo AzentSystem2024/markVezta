@@ -61,6 +61,7 @@ import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-
 import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
 import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
+import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 // import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 // import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 @Component({
@@ -124,7 +125,7 @@ export class LedgerStatementComponent {
   isEditTransferIn: boolean = false;
   isReadOnlyTrOut: boolean = true;
   isReadOnlyTrIn: boolean = true;
-
+  isEditCustomerReceipt: boolean = false;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -364,7 +365,7 @@ export class LedgerStatementComponent {
         .selectPurchaseReturn(trans_id)
         .subscribe((response: any) => {
           console.log(response);
-          this.selectedPurchaseReturn = response.Data;
+          this.selectedPurchaseReturn = response;
           this.isEditPurchaseReturn = true;
 
           this.cdr.detectChanges();
@@ -404,7 +405,7 @@ export class LedgerStatementComponent {
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
           this.selectedReceipt = response.Data;
-          this.isViewReceipt = true;
+          this.isEditCustomerReceipt = true;
           this.cdr.detectChanges();
           console.log(this.selectedReceipt, 'Custom receipts=====');
         });
@@ -457,14 +458,17 @@ export class LedgerStatementComponent {
           );
         });
     } else if (TRANS_TYPE_ID === 21) {
-      console.log('=====navigate =====');
+      this.isEditReceipt = true;
+
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
-          this.selectedReceipt = response.Data;
-          this.isEditReceipt = true;
+          this.selectedReceipt = Array.isArray(response)
+            ? response[0]
+            : response.Data[0];
+          console.log(this.selectedReceipt, 'Selected data');
+
           this.cdr.detectChanges();
-          console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
         });
     } else if (TRANS_TYPE_ID === 2) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
@@ -480,6 +484,13 @@ export class LedgerStatementComponent {
             'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
           );
         });
+    } else if (TRANS_TYPE_ID === 28) {
+      console.log('=====navigate =====');
+      this.dataService.select_Advance(trans_id).subscribe((response: any) => {
+        this.selected_Data = response;
+        this.isEditPopUp = true;
+        this.cdr.detectChanges();
+      });
     } else if (TRANS_TYPE_ID === 28) {
       console.log('=====navigate =====');
       this.dataService.select_Advance(trans_id).subscribe((response: any) => {
@@ -579,55 +590,6 @@ export class LedgerStatementComponent {
       },
     ],
 
-    // calculateCustomSummary: (options: any) => {
-    //   if (options.summaryProcess === 'finalize') {
-    //     const items = this.ledgerSummaryData || [];
-
-    //     console.log(items, 'items in custom summary calculation');
-
-    //     const totalDr = items.reduce((sum, item) => {
-    //       const val = parseFloat(
-    //         String(item?.DR_AMOUNT || '0')
-    //           .replace(/,/g, '')
-    //           .trim()
-    //       );
-    //       return sum + (isNaN(val) ? 0 : val);
-    //     }, 0);
-
-    //     const totalCr = items.reduce((sum, item) => {
-    //       const val = parseFloat(
-    //         String(item?.CR_AMOUNT || '0')
-    //           .replace(/,/g, '')
-    //           .trim()
-    //       );
-    //       return sum + (isNaN(val) ? 0 : val);
-    //     }, 0);
-
-    //     console.log('Total Debit:', totalDr, 'Total Credit:', totalCr);
-    //     const closingBalance = totalDr - totalCr;
-    //     console.log('Closing Balance:', closingBalance);
-
-    //     if (options.name === 'closingBalanceCr') {
-    //       options.totalValue = closingBalance > 0 ? closingBalance : null;
-    //     }
-
-    //     if (options.name === 'closingBalanceDr') {
-    //       options.totalValue =
-    //         closingBalance < 0 ? Math.abs(closingBalance) : null;
-    //     }
-
-    //     // Grand Total logic
-    //     if (options.name === 'grandTotalCr') {
-    //       options.totalValue =
-    //         totalCr + (closingBalance > 0 ? closingBalance : 0);
-    //     }
-    //     if (options.name === 'grandTotalDr') {
-    //       options.totalValue =
-    //         totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-    //     }
-    //   }
-    // },
-
     calculateCustomSummary: (options: any) => {
       if (options.summaryProcess === 'finalize') {
         const items = this.ledgerSummaryData || [];
@@ -720,6 +682,7 @@ export class LedgerStatementComponent {
     ViewCreditNoteModule,
     ViewInvoiceModule,
     ViewCustomerReceiptModule,
+    EditCustomerReceiptModule,
     EditSupplierPaymentModule,
     AddMiscReceiptModule,
     DepreciationEditModule,

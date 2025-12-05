@@ -160,6 +160,8 @@ dx-text-box {
   padding: 20px;
   // margin: 10px;
   width: 100%;
+   overflow-y: auto; 
+    margin-left: -75px;
   margin-top: 8px;
 }
 
@@ -181,32 +183,10 @@ dx-text-box {
   padding: 20px;
   // margin: 20px;
   width: 100%;
-  overflow-y: auto;
-  margin-left: 0px;
+  overflow-y: auto; 
+    margin-left: -75px;
 }
 
-// .custom-card-passport{
-//   border: 1px solid #838181;
-//   border-radius: 8px;
-//   box-shadow: 0px 2px 10px rgba(7, 7, 7, 0.1);
-//   padding: 20px;
-//   margin: 10px;
-//   width: 98%;
-//   margin-top: 1px;
-//   overflow-y: auto;
-// }
-
-// .custom-card-address {
-//   border: 1px solid #838181;
-//   border-radius: 8px;
-//   box-shadow: 0px 2px 20px rgba(7, 7, 7, 0.1);
-//   padding: 20px;
-//   margin: 10px;
-//   width: 50%;
-//   margin-left :250px;
-//   margin-top: 50px;
-//   height: 100%;
-// }
 
 .dx-form .dx-field-item {
   margin-bottom: 0px !important;
@@ -625,40 +605,6 @@ dx-text-box {
   overflow-y: auto;
   margin-left: 16px;
 }
-
-.custom-card-passport-2 {
-  border: 1px solid #838181;
-  border-radius: 8px;
-  margin-top: 8px;
-  padding: 20px;
-  // margin: 20px;
-  width: 100%;
-  overflow-y: auto;
-  margin-left: 0px;
-}
-
-// .custom-card-passport{
-//   border: 1px solid #838181;
-//   border-radius: 8px;
-//   box-shadow: 0px 2px 10px rgba(7, 7, 7, 0.1);
-//   padding: 20px;
-//   margin: 10px;
-//   width: 98%;
-//   margin-top: 1px;
-//   overflow-y: auto;
-// }
-
-// .custom-card-address {
-//   border: 1px solid #838181;
-//   border-radius: 8px;
-//   box-shadow: 0px 2px 20px rgba(7, 7, 7, 0.1);
-//   padding: 20px;
-//   margin: 10px;
-//   width: 50%;
-//   margin-left :250px;
-//   margin-top: 50px;
-//   height: 100%;
-// }
 
 .dx-form .dx-field-item {
   margin-bottom: 0px !important;
