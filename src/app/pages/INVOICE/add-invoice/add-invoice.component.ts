@@ -108,6 +108,8 @@ export class AddInvoiceComponent {
     REF_NO: '',
     PARTY_NAME: '',
     IS_APPROVED: false,
+    VEHICLE_NO: '',
+    ROUND_OFF: false,
     SALE_DETAILS: [
       {
         DN_DETAIL_ID: 0,
@@ -134,6 +136,13 @@ export class AddInvoiceComponent {
   selectedCustomerName: void;
   HSNCODE: any;
   GST: any;
+  companyState: any;
+  isSameState: boolean = false;
+  selectedCompany: any;
+  showGST: boolean = false;
+  showCGST: boolean = false;
+  showSGST: boolean = false;
+  netAmount: any;
 
   constructor(
     private dataService: DataService,
@@ -157,13 +166,15 @@ export class AddInvoiceComponent {
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      const selectedCompany = userData?.SELECTED_COMPANY;
+      this.selectedCompany = userData?.SELECTED_COMPANY;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(userData.GeneralSettings.HSN_CODE, 'HSNCODE');
-      if (selectedCompany?.COMPANY_ID) {
-        this.selectedCompanyId = selectedCompany.COMPANY_ID;
-        this.companyList = [selectedCompany]; // ✅ Show only selected company
+      console.log(this.GST, 'HSNCODE');
+      if (this.selectedCompany?.COMPANY_ID) {
+        this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
+        this.companyState = this.selectedCompany.STATE_NAME;
+        console.log(this.companyState, 'COMPANYSTATE');
+        this.companyList = [this.selectedCompany]; //  Show only selected company
       }
 
       if (userData.USER_ID) {
@@ -198,34 +209,63 @@ export class AddInvoiceComponent {
   }
 
   getCustomerOrUnitLst() {
-    this.dataService.getCustomerOrUnit().subscribe((response: any) => {
+    this.dataService.getCustomerWithState().subscribe((response: any) => {
       this.distributorList = response;
       console.log(this.distributorList, 'DISTLISTPOPUP');
     });
   }
-
-  // getCompanyListDropdown() {
-  //   this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
-  //     this.distributorList = response;
-  //     console.log(this.distributorList, 'distributorList');
-  //   });
-  // }
 
   onDistributorChanged(e: any) {
     // Find the selected customer from the distributorList
     const selectedCustomer = this.distributorList.find(
       (cust: any) => cust.ID === e.value
     );
-    this.selectedCustomerName = selectedCustomer.CUST_NAME;
+    this.selectedCustomerName = selectedCustomer.DESCRIPTION;
     this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
-    console.log(selectedCustomer.CUST_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
-    if (this.selectedCustomerId) {
-      this.selectedCustomer = this.distributorList.find(
-        (s: any) => s.ID === this.selectedCustomerId
-      );
-      this.invoiceFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
-      console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+    console.log(selectedCustomer.STATE_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
+    const company = this.companyState?.trim().toLowerCase();
+    const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
+    const sessionGst = parseFloat(this.GST) || 0; // main GST%
+    if (company === customer) {
+      console.log('Both states SAME → CGST + SGST apply');
+
+      this.showCGST = true;
+      this.showSGST = true;
+      this.showGST = false;
+
+      //  Split GST into CGST + SGST
+      const half = sessionGst / 2;
+
+      // Update all grid rows
+      this.mainInvoiceGridList?.forEach((row: any) => {
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0; // GST becomes zero in same-state case
+      });
+    } else {
+      console.log('States DIFFERENT → GST applies');
+
+      this.showGST = true;
+      this.showCGST = false;
+      this.showSGST = false;
+
+      // ⭐ GST only
+      this.mainInvoiceGridList?.forEach((row: any) => {
+        row.GST = sessionGst;
+        row.CGST = 0;
+        row.SGST = 0;
+      });
     }
+
+    this.selectedCustomer = selectedCustomer;
+
+    // if (this.selectedCustomerId) {
+    //   this.selectedCustomer = this.distributorList.find(
+    //     (s: any) => s.ID === this.selectedCustomerId
+    //   );
+    //   this.invoiceFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
+    //   console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+    // }
     this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
     if (this.selectedCustomerType) {
       console.log(
@@ -281,13 +321,29 @@ export class AddInvoiceComponent {
 
   // calculateGstAmount = (row: any) => {
   //   const amt = this.calculateAmount(row);
-  //   return amt * (parseFloat(row.GST) || 0);
+  //   const gstPercent = parseFloat(row.GST) || 0;
+  //   return amt * (gstPercent / 100);
   // };
 
   calculateGstAmount = (row: any) => {
     const amt = this.calculateAmount(row);
-    const gstPercent = parseFloat(row.GST) || 0;
-    return amt * (gstPercent / 100);
+
+    const igst = parseFloat(row.GST) || 0; // GST column = GST
+    const cgst = parseFloat(row.CGST) || 0;
+    const sgst = parseFloat(row.SGST) || 0;
+
+    let totalGstPercent = 0;
+
+    // GST case
+    if (igst > 0) {
+      totalGstPercent = igst;
+    }
+    // CGST + SGST case
+    else {
+      totalGstPercent = cgst + sgst;
+    }
+
+    return amt * (totalGstPercent / 100);
   };
 
   calculateTotal = (row: any) => {
@@ -360,9 +416,27 @@ export class AddInvoiceComponent {
     );
     newRows.forEach((row: any) => {
       row.HSN_CODE = this.HSNCODE;
-      row.GST = this.GST;
-      // or whatever your login session variable is
+
+      const sessionGst = parseFloat(this.GST) || 0;
+      const company = this.companyState?.trim().toLowerCase();
+      const customer = this.invoiceFormData?.PARTY_NAME
+        ? this.selectedCustomer?.STATE_NAME?.trim().toLowerCase()
+        : null;
+
+      if (company === customer) {
+        // Same state → CGST + SGST
+        const half = sessionGst / 2;
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0; // GST = 0
+      } else {
+        // Different state → GST only
+        row.GST = sessionGst;
+        row.CGST = 0;
+        row.SGST = 0;
+      }
     });
+
     //  Mutate the existing array (DON'T reassign!)
     this.mainInvoiceGridList.push(...newRows);
 
@@ -459,7 +533,8 @@ export class AddInvoiceComponent {
         this.itemsGridRef?.instance?.getTotalSummaryValue('TAX_AMOUNT') || 0;
       this.grandTotal =
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
-
+      this.netAmount = Number(this.grandTotal).toFixed(2);
+      this.onRoundOffChange();
       console.log('GROSS AMOUNT Summary:', this.totalAmount);
       console.log('TAX_AMOUNT Summary:', this.taxAmount);
       console.log('NET AMOUNT Summary:', this.grandTotal);
@@ -553,29 +628,55 @@ export class AddInvoiceComponent {
     }
 
     // 3. Prepare the SALE_DETAILS array
+    // 3. Prepare the SALE_DETAILS array
     this.invoiceFormData.SALE_DETAILS = this.mainInvoiceGridList.map(
-      (row: any) => ({
-        DN_DETAIL_ID: row.DN_DETAIL_ID || '',
-        QUANTITY: row.TOTAL_PAIR_QTY || 0,
-        PRICE: row.PRICE || 0,
-        GST: row.GST || 0,
-        AMOUNT: this.calculateAmount(row),
-        TAX_AMOUNT: this.calculateGstAmount(row),
-        TOTAL_AMOUNT: this.calculateTotal(row),
+      (row: any) => {
+        const igst = parseFloat(row.GST) || 0; // GST
+        const cgst = parseFloat(row.CGST) || 0; // CGST
+        const sgst = parseFloat(row.SGST) || 0; // SGST
 
-        // Optional: Do not include row-level total if not needed
-      })
+        // Build final object to send
+        return {
+          DN_DETAIL_ID: row.DN_DETAIL_ID || '',
+          QUANTITY: row.TOTAL_PAIR_QTY || 0,
+          PRICE: row.PRICE || 0,
+
+          // *** Required Output ***
+          GST: igst > 0 ? igst : 0,
+          CGST: igst > 0 ? 0 : cgst,
+          SGST: igst > 0 ? 0 : sgst,
+
+          // base amounts
+          AMOUNT: this.calculateAmount(row),
+          TAX_AMOUNT: this.calculateGstAmount(row),
+          TOTAL_AMOUNT: this.calculateTotal(row),
+        };
+      }
     );
+
+    // this.invoiceFormData.SALE_DETAILS = this.mainInvoiceGridList.map(
+    //   (row: any) => ({
+    //     DN_DETAIL_ID: row.DN_DETAIL_ID || '',
+    //     QUANTITY: row.TOTAL_PAIR_QTY || 0,
+    //     PRICE: row.PRICE || 0,
+    //     GST: row.GST || 0,
+    //     AMOUNT: this.calculateAmount(row),
+    //     TAX_AMOUNT: this.calculateGstAmount(row),
+    //     TOTAL_AMOUNT: this.calculateTotal(row),
+
+    //     // Optional: Do not include row-level total if not needed
+    //   })
+    // );
 
     // 4. Set root-level totals
     this.invoiceFormData.GROSS_AMOUNT = this.totalAmount;
     this.invoiceFormData.GST_AMOUNT = this.taxAmount;
     this.invoiceFormData.NET_AMOUNT = this.grandTotal;
     this.invoiceFormData.PARTY_NAME = this.invoiceFormData.PARTY_NAME;
-
     this.invoiceFormData.TRANS_TYPE = 25;
     this.invoiceFormData.SALE_DATE = new Date();
     this.invoiceFormData.ADD_TIME = new Date();
+    this.invoiceFormData.VEHICLE_NO = this.invoiceFormData.VEHICLE_NO;
     const callInsertAPI = () => {
       this.dataService.insertInvoice(this.invoiceFormData).subscribe(
         (response) => {
@@ -656,6 +757,16 @@ export class AddInvoiceComponent {
   cancel() {
     this.resetInvoiceForm();
     this.popupClosed.emit();
+  }
+
+  onRoundOffChange() {
+    if (this.invoiceFormData.IS_ROUNDOFF) {
+      // Round Off Enabled
+      this.netAmount = Math.round(this.grandTotal).toFixed(2);
+    } else {
+      // Round Off Disabled → return to original value
+      this.netAmount = Number(this.grandTotal).toFixed(2);
+    }
   }
 }
 

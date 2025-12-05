@@ -62,8 +62,11 @@ export class TimesheetListComponent {
   showHeaderFilter: true;
   showFilterRow = true;
   isFilterOpened = false;
-   CompanyID= 1;
-   selectedRows: any[] = [];
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
+  CompanyID = 1;
+  selectedRows: any[] = [];
 
   GridSource: any;
   isLoading: boolean = false;
@@ -161,8 +164,8 @@ export class TimesheetListComponent {
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
-const today = new Date();
-  this.selectedMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); // Previous month
+    const today = new Date();
+    this.selectedMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); // Previous month
 
     this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString('en-US', {
       month: 'long',
@@ -175,23 +178,22 @@ const today = new Date();
     this.generateYears();
     this.fetchTimesheetList();
 
-  //   const payload ={
-  //      CompanyId: this.CompanyID,
-  //      Month: this.selectedMonth.toLocaleDateString('en-US', {
-  //   month: 'long',
-  //   year: 'numeric',
-  // }).replace(/\s/g, ''), // removes the space → "July2025"
-  //   }
-  //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-  //     console.log(response, 'Timesheet List Response');
-  //     this.timesheetList = response.data
-  //     // console.log(
-  //     //   this.timesheetList,
-  //     //   'Filtered Timesheet for',
-  //     //   selectedMonthStr
-  //     // );
-  //   });
-    
+    //   const payload ={
+    //      CompanyId: this.CompanyID,
+    //      Month: this.selectedMonth.toLocaleDateString('en-US', {
+    //   month: 'long',
+    //   year: 'numeric',
+    // }).replace(/\s/g, ''), // removes the space → "July2025"
+    //   }
+    //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
+    //     console.log(response, 'Timesheet List Response');
+    //     this.timesheetList = response.data
+    //     // console.log(
+    //     //   this.timesheetList,
+    //     //   'Filtered Timesheet for',
+    //     //   selectedMonthStr
+    //     // );
+    //   });
   }
 
   generateYears() {
@@ -213,7 +215,7 @@ const today = new Date();
     this.selectedMonth = new Date(this.selectedYear, monthIndex, 1, 12); // Set the date to the 1st of the selected month
     this.onMonthChange({ value: this.selectedMonth }); // Pass the selected month to onMonthChange
 
-      this.calendarVisible=false;
+    this.calendarVisible = false;
 
     // Hide calendar after selection (optional)
   }
@@ -257,7 +259,6 @@ const today = new Date();
     this.selectedYear = year;
     this.yearSelectorVisible = false;
   }
-  
 
   outsideClickListener = (event: any) => {
     const calendarElement = document.querySelector('.calendar-popup');
@@ -319,27 +320,27 @@ const today = new Date();
       year: 'numeric',
     }); // e.g. "Apr 2025"
     // console.log('Selected month string:', selectedMonthStr);/
-    
-
-    
   }
-
-  
 
   getStatusFlagClass(status: string): string {
     switch (status) {
-      case 'Open': return 'flag-open';   
-      case 'Pending': return 'flag-pending';    // White or gray
-      case 'Verified': return 'flag-verified'; // Orange
-      case 'Approved': return 'flag-approved'; // Green
-      default: return '';
+      case 'Open':
+        return 'flag-open';
+      case 'Pending':
+        return 'flag-pending'; // White or gray
+      case 'Verified':
+        return 'flag-verified'; // Orange
+      case 'Approved':
+        return 'flag-approved'; // Green
+      default:
+        return '';
     }
   }
-  
+
   getPayTimeEntries() {
-    this.dataService.getDropdownData('PAYTIME_ENTRY').subscribe((res: any) => {
-      
-    });
+    this.dataService
+      .getDropdownData('PAYTIME_ENTRY')
+      .subscribe((res: any) => {});
   }
 
   goToPreviousMonth() {
@@ -348,24 +349,24 @@ const today = new Date();
     this.selectedMonth = currentDate;
     this.getTimesheet();
 
-  //   const payload ={
-  //      CompanyId: this.CompanyID,
-  //      Month: this.selectedMonth.toLocaleDateString('en-US', {
-  //   month: 'long',
-  //   year: 'numeric',
-  // }).replace(/\s/g, ''), // removes the space → "July2025"
-  //   }
-  //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-  //     console.log(response, 'Timesheet List Response');
-  //     this.timesheetList = response.data
-  //     // console.log(
-  //     //   this.timesheetList,
-  //     //   'Filtered Timesheet for',
-  //     //   selectedMonthStr
-  //     // );
-  //   });
+    //   const payload ={
+    //      CompanyId: this.CompanyID,
+    //      Month: this.selectedMonth.toLocaleDateString('en-US', {
+    //   month: 'long',
+    //   year: 'numeric',
+    // }).replace(/\s/g, ''), // removes the space → "July2025"
+    //   }
+    //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
+    //     console.log(response, 'Timesheet List Response');
+    //     this.timesheetList = response.data
+    //     // console.log(
+    //     //   this.timesheetList,
+    //     //   'Filtered Timesheet for',
+    //     //   selectedMonthStr
+    //     // );
+    //   });
 
-  this.fetchTimesheetList();
+    this.fetchTimesheetList();
   }
 
   goToNextMonth() {
@@ -373,23 +374,23 @@ const today = new Date();
     currentDate.setMonth(currentDate.getMonth() + 1);
     this.selectedMonth = currentDate;
     this.getTimesheet();
-  //    const payload ={
-  //      CompanyId: this.CompanyID,
-  //      Month: this.selectedMonth.toLocaleDateString('en-US', {
-  //   month: 'long',
-  //   year: 'numeric',
-  // }).replace(/\s/g, ''), // removes the space → "July2025"
-  //   }
-  //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-  //     console.log(response, 'Timesheet List Response');
-  //     this.timesheetList = response.data
-  //     // console.log(
-  //     //   this.timesheetList,
-  //     //   'Filtered Timesheet for',
-  //     //   selectedMonthStr
-  //     // );
-  //   });
-  this.fetchTimesheetList();
+    //    const payload ={
+    //      CompanyId: this.CompanyID,
+    //      Month: this.selectedMonth.toLocaleDateString('en-US', {
+    //   month: 'long',
+    //   year: 'numeric',
+    // }).replace(/\s/g, ''), // removes the space → "July2025"
+    //   }
+    //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
+    //     console.log(response, 'Timesheet List Response');
+    //     this.timesheetList = response.data
+    //     // console.log(
+    //     //   this.timesheetList,
+    //     //   'Filtered Timesheet for',
+    //     //   selectedMonthStr
+    //     // );
+    //   });
+    this.fetchTimesheetList();
   }
 
   onVerifyClick(e: any): void {
@@ -454,11 +455,14 @@ const today = new Date();
     this.dataService.selectTimesheet(timesheetId).subscribe({
       next: (response: any) => {
         this.selectedTimesheet = response;
-const actionButton = this.allActionButtons.find(btn => btn.name === 'edit');
-      if (actionButton) {
-        actionButton.hint = this.selectedTimesheet.STATUS === 'Approved' ? 'View' : 'Edit';
-        actionButton.text = actionButton.hint; // optional: update button text as well
-      }
+        const actionButton = this.allActionButtons.find(
+          (btn) => btn.name === 'edit'
+        );
+        if (actionButton) {
+          actionButton.hint =
+            this.selectedTimesheet.STATUS === 'Approved' ? 'View' : 'Edit';
+          actionButton.text = actionButton.hint; // optional: update button text as well
+        }
         if (status === 'Approved') {
           this.viewTimesheetPopupOpened = true;
         } else {
@@ -516,10 +520,10 @@ const actionButton = this.allActionButtons.find(btn => btn.name === 'edit');
     this.getTimesheet();
   }
 
-    onSelectionChanged(e: any) {
-  this.selectedRows = e.selectedRowKeys;
-  console.log('User selected:', this.selectedRows);
-}
+  onSelectionChanged(e: any) {
+    this.selectedRows = e.selectedRowKeys;
+    console.log('User selected:', this.selectedRows);
+  }
 
   // ApproveBulkRows(){
   //   const payload = {
@@ -537,56 +541,53 @@ const actionButton = this.allActionButtons.find(btn => btn.name === 'edit');
   //     //   selectedMonthStr
   //     // );
   //   });
-   
+
   // }
 
   fetchTimesheetList() {
-  const payload = {
-    CompanyId: this.CompanyID,
-    Month: this.selectedMonth.toLocaleDateString('en-US', {
-      month: 'long',
-      year: 'numeric',
-    }).replace(/\s/g, ''),
-  };
+    const payload = {
+      CompanyId: this.CompanyID,
+      Month: this.selectedMonth
+        .toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        })
+        .replace(/\s/g, ''),
+    };
 
-  this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-    console.log(response, 'Timesheet List Response');
-    this.timesheetList = response.data;
-  });
-}
-
+    this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
+      console.log(response, 'Timesheet List Response');
+      this.timesheetList = response.data;
+    });
+  }
 
   ApproveBulkRows() {
-  // Extract only the numeric IDs from the selected rows
-  const selectedIDs = this.selectedRows.map(row => row.ID);
+    // Extract only the numeric IDs from the selected rows
+    const selectedIDs = this.selectedRows.map((row) => row.ID);
 
-  const payload = {
-    IDs: selectedIDs
-  };
+    const payload = {
+      IDs: selectedIDs,
+    };
 
-  console.log('Payload sent to API:', payload);
+    console.log('Payload sent to API:', payload);
 
-  this.dataService.Timesheet_Approval_Api(payload).subscribe(
-    (response: any) => {
-      console.log(response, 'Timesheet Approve List Response');
-      this.timesheetList = response;
-  console.log(this.timesheetList, 'Filtered Timesheet for');
-      this.selectedRows = []; // Clear selection after success
+    this.dataService
+      .Timesheet_Approval_Api(payload)
+      .subscribe((response: any) => {
+        console.log(response, 'Timesheet Approve List Response');
+        this.timesheetList = response;
+        console.log(this.timesheetList, 'Filtered Timesheet for');
+        this.selectedRows = []; // Clear selection after success
         notify(
-            {
-              message: `Approved Successfully`,
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success'
-          );
-           this.fetchTimesheetList();
-    },
-  );
-
-
-}
-
-
+          {
+            message: `Approved Successfully`,
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+        this.fetchTimesheetList();
+      });
+  }
 }
 
 @NgModule({

@@ -300,7 +300,14 @@ export class ArticleAddComponent {
         const matchedItem = this.itemsList.find(
           (p: any) => p.DESCRIPTION === selectedDescription
         );
-        this.selectedItemId = matchedItem ? matchedItem.ID : null;
+
+        // Save ID separately
+        grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
+
+        // const matchedItem = this.itemsList.find(
+        //   (p: any) => p.DESCRIPTION === selectedDescription
+        // );
+        // this.selectedItemId = matchedItem ? matchedItem.ID : null;
         let itemCode = null;
         if (selectedDescription) {
           itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
@@ -596,6 +603,7 @@ export class ArticleAddComponent {
 
   attachComponent() {
     if (this.selectedAttachRow) {
+      console.log(this.selectedAttachRow, 'SELECTEDATTACHROW');
       // Assign the selected article's ID to articleData.ComponentArticleID
       this.articleData.COMPONENT_ARTICLE_ID = this.selectedAttachRow.ID;
       this.selectedComponentDescription =

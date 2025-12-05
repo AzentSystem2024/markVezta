@@ -769,10 +769,10 @@ export class AddJournalVoucharComponent {
           'success'
         );
 
-        // ⭐ DO NOT REMOVE — Needed for auto-setting voucher number
-        if (response?.VoucherNo) {
-          this.journalVoucherFormData.VOUCHER_NO = response.VoucherNo;
-        }
+        // // ⭐ DO NOT REMOVE — Needed for auto-setting voucher number
+        // if (response?.VoucherNo) {
+        //   this.journalVoucherFormData.VOUCHER_NO = response.VoucherNo;
+        // }
 
         // Reset form but keep newly assigned voucher number
         this.resetJournalVoucherForm(true);
@@ -909,11 +909,10 @@ export class AddJournalVoucharComponent {
   }
 
   resetJournalVoucherForm(keepJournalNo: boolean = false) {
-    const journalNoToKeep = this.journalVoucherFormData.VOUCHER_NO;
     this.journalVoucherFormData = {
       TRANS_ID: 0,
       TRANS_DATE: new Date(),
-      VOUCHER_NO: keepJournalNo ? journalNoToKeep : '',
+
       PARTY_NAME: '',
       REF_NO: '',
       TRANS_TYPE: 4,

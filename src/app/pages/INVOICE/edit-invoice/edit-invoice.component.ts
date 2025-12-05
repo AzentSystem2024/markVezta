@@ -97,6 +97,12 @@ export class EditInvoiceComponent {
   HSNCODE: any;
   GST: any;
   hsnLoaded: boolean;
+  showGST: boolean;
+  showCGST: boolean;
+  showSGST: boolean;
+  selectedCustomer: any;
+  selectedCompany: any;
+  companyState: any;
 
   constructor(
     private dataService: DataService,
@@ -118,6 +124,29 @@ export class EditInvoiceComponent {
     this.populateCompanyFromSession(); // ✅ Add this
     this.getInvoiceListForGrid();
     this.sessionData_tax();
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      this.selectedCompany = userData?.SELECTED_COMPANY;
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log(this.GST, 'HSNCODE');
+      if (this.selectedCompany?.COMPANY_ID) {
+        this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
+        this.companyState = this.selectedCompany.STATE_NAME;
+        console.log(this.companyState, 'COMPANYSTATE');
+        this.companyList = [this.selectedCompany]; //  Show only selected company
+      }
+
+      if (userData.USER_ID) {
+        this.invoiceFormData.USER_ID = userData.USER_ID;
+      }
+
+      const firstFinYear = userData.FINANCIAL_YEARS?.[0];
+      if (firstFinYear?.FIN_ID) {
+        this.invoiceFormData.FIN_ID = firstFinYear.FIN_ID;
+      }
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -126,6 +155,7 @@ export class EditInvoiceComponent {
       this.invoiceFormData.PARTY_NAME = firstInvoice.PARTY_NAME;
       console.table(this.mainInvoiceGridList);
 
+      // Convert SALE_DATE (do NOT change)
       if (
         firstInvoice.SALE_DATE &&
         typeof firstInvoice.SALE_DATE === 'string'
@@ -135,36 +165,105 @@ export class EditInvoiceComponent {
         date.setHours(12, 0, 0);
         firstInvoice.SALE_DATE = date;
       }
+
       console.log(this.HSNCODE, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
 
-      this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
-      // Force-create missing fields so DevExtreme can bind them
-      this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => ({
-        HSN_CODE: this.HSNCODE, // force-create
-        GST: row.GST || this.GST, // already showing
-        ...row, // merge original row at the end
-      }));
+      // 💡 ORIGINAL LINE (replaced below)
+      // this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
+
+      // ---------- 🔥 ONLY THIS BLOCK IS MODIFIED ----------
+      // Load saved GST from the API for edit mode
+      this.mainInvoiceGridList = (firstInvoice.SALE_DETAILS || []).map(
+        (row: any) => {
+          const igst = parseFloat(row.IGST) || 0;
+          const cgst = parseFloat(row.CGST) || 0;
+          const sgst = parseFloat(row.SGST) || 0;
+
+          return {
+            ...row,
+
+            // GST binding for grid
+            GST: igst > 0 ? igst : 0, // IGST → GST column
+            CGST: igst > 0 ? 0 : cgst, // Same-state
+            SGST: igst > 0 ? 0 : sgst, // Same-state
+            HSN_CODE: this.HSNCODE, // keep your HSN logic
+          };
+        }
+      );
+      // -----------------------------------------------------
+
       console.log(this.mainInvoiceGridList, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
-      // ✔ Assign HSN Code & GST for each existing row when editing
+
+      // ⭐ Keep your original mapping block untouched
       this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
         return {
           ...row,
-          HSN_CODE: this.HSNCODE, // From session
-          // From session
+          HSN_CODE: this.HSNCODE,
         };
       });
 
       this.invoiceFormData = firstInvoice;
       console.log(this.mainInvoiceGridList, 'MAINGRIDINVOICELIST');
-      this.customerType = firstInvoice.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
 
+      this.customerType = firstInvoice.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
       if (this.customerType === 'Unit') {
-        this.populateCompanyFromSession(); // ✅ call here too
+        this.populateCompanyFromSession();
       }
 
-      this.getCompanyListDropdown();
+      // this.getCompanyListDropdown();
+      this.getCustomerOrUnitLst();
+      console.log(
+        firstInvoice.DISTRIBUTOR_ID,
+        'DISTRIBUTORIDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
+      );
     }
   }
+
+  // ngOnChanges(changes: SimpleChanges): void {
+  //   if (changes['invoiceFormData'] && this.invoiceFormData?.length > 0) {
+  //     const firstInvoice = this.invoiceFormData[0];
+  //     this.invoiceFormData.PARTY_NAME = firstInvoice.PARTY_NAME;
+  //     console.table(this.mainInvoiceGridList);
+
+  //     if (
+  //       firstInvoice.SALE_DATE &&
+  //       typeof firstInvoice.SALE_DATE === 'string'
+  //     ) {
+  //       const [day, month, year] = firstInvoice.SALE_DATE.split('-');
+  //       const date = new Date(+year, +month - 1, +day);
+  //       date.setHours(12, 0, 0);
+  //       firstInvoice.SALE_DATE = date;
+  //     }
+  //     console.log(this.HSNCODE, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
+
+  //     this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
+  //     // Force-create missing fields so DevExtreme can bind them
+  //     this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => ({
+  //       HSN_CODE: this.HSNCODE, // force-create
+  //       GST: row.GST || this.GST, // already showing
+  //       ...row, // merge original row at the end
+  //     }));
+  //     console.log(this.mainInvoiceGridList, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
+  //     // ✔ Assign HSN Code & GST for each existing row when editing
+  //     this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
+  //       return {
+  //         ...row,
+  //         HSN_CODE: this.HSNCODE, // From session
+  //         // From session
+  //       };
+  //     });
+
+  //     this.invoiceFormData = firstInvoice;
+  //     console.log(this.mainInvoiceGridList, 'MAINGRIDINVOICELIST');
+  //     this.customerType = firstInvoice.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
+
+  //     if (this.customerType === 'Unit') {
+  //       this.populateCompanyFromSession(); // ✅ call here too
+  //     }
+
+  //     this.getCompanyListDropdown();
+  //   }
+  // }
   onDistributorChanged(e: any) {
     if (e && e.value) {
       this.selectedDistributorId = e.value; // ✅ this is the selected ID
@@ -221,16 +320,53 @@ export class EditInvoiceComponent {
     }
   }
 
-  getCompanyListDropdown() {
-    if (this.customerType === 'Unit') {
-      // Don't overwrite the session company list
-      return;
-    }
+  // getCompanyListDropdown() {
+  //   if (this.customerType === 'Unit') {
+  //     // Don't overwrite the session company list
+  //     return;
+  //   }
 
-    this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
+  //   this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
+  //     this.distributorList = response;
+  //   });
+  // }
+
+  getCustomerOrUnitLst() {
+    this.dataService.getCustomerWithState().subscribe((response: any) => {
       this.distributorList = response;
+      console.log(this.distributorList, 'DISTLISTPOPUP');
+
+      if (this.invoiceFormData && this.invoiceFormData.DISTRIBUTOR_ID) {
+        this.selectedCustomer = this.distributorList.find(
+          (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID
+        );
+
+        console.log('EDIT MODE — Selected Customer:', this.selectedCustomer);
+
+        // ⭐ NOW CHECK STATES
+        if (this.selectedCustomer && this.companyState) {
+          const custState =
+            this.selectedCustomer.STATE_NAME.trim().toLowerCase();
+          const compState = this.companyState.trim().toLowerCase();
+
+          if (custState === compState) {
+            console.log('EDIT MODE — SAME STATE → CGST + SGST');
+
+            this.showCGST = true;
+            this.showSGST = true;
+            this.showGST = false;
+          } else {
+            console.log('EDIT MODE — DIFFERENT STATE → IGST');
+
+            this.showCGST = false;
+            this.showSGST = false;
+            this.showGST = true;
+          }
+        }
+      }
     });
   }
+
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
@@ -249,8 +385,25 @@ export class EditInvoiceComponent {
 
   calculateGstAmount = (row: any) => {
     const amt = this.calculateAmount(row);
-    const gstPercent = parseFloat(row.GST) || 0;
-    return amt * (gstPercent / 100);
+
+    // In your mapping:
+    // - GST = IGST (for different state)
+    // - CGST + SGST (for same state)
+    const igst = parseFloat(row.GST) || 0; // IGST stored in GST column
+    const cgst = parseFloat(row.CGST) || 0;
+    const sgst = parseFloat(row.SGST) || 0;
+
+    let totalGstPercent = 0;
+
+    if (igst > 0) {
+      // Different state → IGST only
+      totalGstPercent = igst;
+    } else {
+      // Same state → CGST + SGST
+      totalGstPercent = cgst + sgst;
+    }
+
+    return amt * (totalGstPercent / 100);
   };
 
   calculateTotal = (row: any) => {
@@ -489,7 +642,12 @@ export class EditInvoiceComponent {
               DN_DETAIL_ID: row.DN_DETAIL_ID || '',
               QUANTITY: row.TOTAL_PAIR_QTY || 0,
               PRICE: row.PRICE || 0,
-              GST: row.GST || 0,
+
+              // NEW — pass all GST parts properly
+              IGST: row.GST || 0, // If IGST → row.GST contains value
+              CGST: row.CGST || 0, // If same state → CGST filled
+              SGST: row.SGST || 0, // If same state → SGST filled
+
               AMOUNT: this.calculateAmount(row),
               TAX_AMOUNT: this.calculateGstAmount(row),
               TOTAL_AMOUNT: this.calculateTotal(row),
@@ -540,7 +698,11 @@ export class EditInvoiceComponent {
           DN_DETAIL_ID: row.DN_DETAIL_ID || '',
           QUANTITY: row.TOTAL_PAIR_QTY || 0,
           PRICE: row.PRICE || 0,
-          GST: row.GST || 0,
+
+          IGST: row.GST || 0,
+          CGST: row.CGST || 0,
+          SGST: row.SGST || 0,
+
           AMOUNT: this.calculateAmount(row),
           TAX_AMOUNT: this.calculateGstAmount(row),
           TOTAL_AMOUNT: this.calculateTotal(row),

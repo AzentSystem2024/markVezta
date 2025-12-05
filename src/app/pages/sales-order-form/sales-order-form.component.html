@@ -371,11 +371,23 @@
 
             <div class="footer-right">
               <dx-check-box
+                [value]="isReadOnlyMode ? true : salesOrderFormData.IS_APPROVED"
+                (valueChange)="
+                  !isReadOnlyMode
+                    ? (salesOrderFormData.IS_APPROVED = $event)
+                    : null
+                "
+                [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+                [readOnly]="isReadOnlyMode"
+                stylingMode="outlined"
+              >
+              </dx-check-box>
+              <!-- <dx-check-box
                 *ngIf="isEditing && !isReadOnlyMode"
                 [(value)]="isApproved"
                 text="Approve"
                 class="approve-checkbox"
-              ></dx-check-box>
+              ></dx-check-box> -->
             </div>
           </div>
 
@@ -401,7 +413,13 @@
 
               <dx-button
                 *ngIf="!isReadOnlyMode"
-                [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
+                [text]="
+                  isReadOnlyMode
+                    ? 'PDF'
+                    : salesOrderFormData.IS_APPROVED
+                    ? 'Commit'
+                    : 'Save'
+                "
                 (onClick)="saveSalesOrder()"
                 stylingMode="contained"
                 type="default"

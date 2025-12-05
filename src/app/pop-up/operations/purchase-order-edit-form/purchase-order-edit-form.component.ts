@@ -69,6 +69,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   HSNCODE: any;
   GST: any;
   hsnLoaded: boolean;
+  transID: any;
 
   constructor(private service: DataService, private router: Router) {
     const userRights = sessionStorage.getItem('menuUserRightsResponse');
@@ -888,7 +889,10 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   }
 
   getPoHistoryList() {
-    this.service.getPurchaseOrderHistoryList().subscribe((res: any) => {
+    const payload = {
+      TRANS_ID: this.transID,
+    };
+    this.service.getPurchaseOrderHistoryList(payload).subscribe((res: any) => {
       if (res && Array.isArray(res)) {
         this.poHistoryList = res.map((item, index) => ({
           ...item,
@@ -980,6 +984,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['formdata'] && this.formdata) {
+      this.transID = this.formdata.TRANS_ID;
+      console.log(this.transID, 'FORMDATAAAAAAAAAAAAA');
       this.fileDetails.DOC_ID = this.formdata.ID;
       console.log(this.fileDetails.DOC_ID, 'DOCIDDDDDDDDDDDDDDDD');
       this.newPoData = { ...this.formdata };

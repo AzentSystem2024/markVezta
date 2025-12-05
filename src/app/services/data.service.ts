@@ -323,6 +323,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}CustTypeDrop`, {});
   }
 
+  getCustomerWithState(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Customer/custdtl`, {});
+  }
+
   insertInvoice(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Invoice/insert`, data);
@@ -3456,8 +3460,8 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post<any>(`${this.apiUrl}PurchaseOrder/delete/` + id, {});
   }
 
-  public getPurchaseOrderHistoryList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}PurchaseOrder/getpohis`, {});
+  public getPurchaseOrderHistoryList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}PurchaseOrder/getpohis`, data);
   }
 
   public getAttachmentList(id: any, type: any): Observable<any> {

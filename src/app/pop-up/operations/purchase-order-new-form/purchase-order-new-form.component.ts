@@ -726,8 +726,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   getPoHistoryList() {
-    const payload = 1;
-    this.service.getPurchaseOrderHistoryList().subscribe((res: any) => {
+    const payload = {
+      TRANS_ID: 155,
+    };
+    this.service.getPurchaseOrderHistoryList(payload).subscribe((res: any) => {
       if (res && Array.isArray(res)) {
         this.poHistoryList = res.map((item, index) => ({
           ...item,

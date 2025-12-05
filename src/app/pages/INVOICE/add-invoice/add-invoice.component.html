@@ -25,7 +25,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'70vh'"
+          [height]="'65vh'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
@@ -84,7 +84,7 @@
                   <dx-select-box
                     [(value)]="invoiceFormData.DISTRIBUTOR_ID"
                     [dataSource]="distributorList"
-                    displayExpr="CUST_NAME"
+                    displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     [width]="300"
                     label="Customer"
@@ -189,11 +189,28 @@
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
                 ? 'VAT %'
-                : ' GST %'
+                : ' IGST %'
             "
             dataType="number"
+            [visible]="showGST"
             [allowEditing]="false"
           ></dxi-column>
+          <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
           <dxi-column
             dataField="TAX_AMOUNT"
             [caption]="
@@ -243,27 +260,51 @@
           </dxo-summary>
         </dx-data-grid>
         <div
-          style="
-            margin: 16px 0 8px 0;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-          "
+          style="display: flex; justify-content: flex-end; margin: 10px 20px"
         >
-          <dx-check-box
-            text="Approve"
-            [(value)]="invoiceFormData.IS_APPROVED"
-          ></dx-check-box>
+          <div style="display: flex; align-items: center; gap: 16px">
+            <!-- Round Off Checkbox -->
+            <dx-check-box
+              text="Round Off"
+              [(value)]="invoiceFormData.IS_ROUNDOFF"
+              (onValueChanged)="onRoundOffChange()"
+            ></dx-check-box>
+
+            <!-- Net Amount Field -->
+            <dx-text-box
+              label="Net Amount"
+              labelMode="floating"
+              [value]="netAmount"
+              [width]="150"
+              [readOnly]="true"
+            ></dx-text-box>
+          </div>
         </div>
-        <div class="form-popup-buttons-container">
-          <div class="popup-footer">
+        <div class="form-footer-wrapper">
+          <!-- LEFT SECTION -->
+          <div class="left-section">
+            <dx-text-box
+              label="Vehicle No"
+              labelMode="floating"
+              [(value)]="invoiceFormData.VEHICLE_NO"
+              [width]="200"
+            ></dx-text-box>
+          </div>
+
+          <!-- RIGHT SECTION -->
+          <div class="right-section">
+            <dx-check-box
+              text="Approve"
+              [(value)]="invoiceFormData.IS_APPROVED"
+            ></dx-check-box>
+
             <dx-button
               text="Cancel"
               (onClick)="cancel()"
               stylingMode="outlined"
               type="normal"
             ></dx-button>
+
             <dx-button
               #saveButtonRef
               [text]="invoiceFormData.IS_APPROVED ? 'Commit' : 'Save'"

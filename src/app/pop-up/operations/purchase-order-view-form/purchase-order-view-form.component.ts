@@ -8,7 +8,11 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -31,7 +35,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { PurchaseOrderVerifyFormComponent } from '../purchase-order-verify-form/purchase-order-verify-form.component';
 import { DataService } from 'src/app/services';
 import jsPDF from 'jspdf';
-import autoTable ,  { ThemeType, UserOptions } from 'jspdf-autotable';
+import autoTable, { ThemeType, UserOptions } from 'jspdf-autotable';
 
 @Component({
   selector: 'app-purchase-order-view-form',
@@ -48,6 +52,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @Input() poId!: number;
+  transID: any;
   constructor(private service: DataService, private sanitizer: DomSanitizer) {
     const settingsData = sessionStorage.getItem('settings');
     this.settingsData = settingsData ? JSON.parse(settingsData) : null;
@@ -110,7 +115,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   fileData: string = '';
 
   pdfSrc: SafeResourceUrl | null = null;
-    isPdfPopupVisible: boolean = false;
+  isPdfPopupVisible: boolean = false;
 
   fileDetails: any = {
     DOC_ID: '',
@@ -541,7 +546,10 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   }
 
   getPoHistoryList() {
-    this.service.getPurchaseOrderHistoryList().subscribe((res: any) => {
+    const payload = {
+      TRANS_ID: this.transID,
+    };
+    this.service.getPurchaseOrderHistoryList(payload).subscribe((res: any) => {
       if (res && Array.isArray(res)) {
         this.poHistoryList = res.map((item, index) => ({
           ...item,
@@ -588,7 +596,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.formdata && changes.formdata.currentValue) {
       // Format imported date
-
+      this.transID = this.formdata.TRANS_ID;
       this.fileDetails.DOC_ID = this.formdata.ID;
       this.newPoData = { ...this.formdata };
       this.newPoData.PoDetails = this.formdata.PoDetails;
@@ -723,240 +731,241 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     return '';
   }
 
-   viewPdf(): void {
-  console.log(this.poId, "ID received in viewPdf()");
+  viewPdf(): void {
+    console.log(this.poId, 'ID received in viewPdf()');
 
-  this.isPdfPopupVisible = true;
+    this.isPdfPopupVisible = true;
 
-  this.service.selectPoData(this.poId).subscribe(res => {
-    console.log(res, "Selected response");
+    this.service.selectPoData(this.poId).subscribe((res) => {
+      console.log(res, 'Selected response');
 
-    if (res) {
-      this.pdfSrc = this.get_pdf(res);
-    }
-  });
-}
+      if (res) {
+        this.pdfSrc = this.get_pdf(res);
+      }
+    });
+  }
 
-get_pdf(data: any): SafeResourceUrl {
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
 
-  const doc = new jsPDF("p", "mm", "a4");
-  const pageWidth = doc.internal.pageSize.width;
-  const margin = 12;
-  let y = 12;
+    // ===========================
+    //  HEADER - COMPANY DETAILS
+    // ===========================
+    doc.setFont('helvetica', 'bold').setFontSize(12);
+    doc.text(data.COMPANY_NAME || 'RADIANT MOULDS & COMPOUNDS', margin, y);
 
-  // ===========================
-  //  HEADER - COMPANY DETAILS
-  // ===========================
-  doc.setFont("helvetica", "bold").setFontSize(12);
-  doc.text(data.COMPANY_NAME || "RADIANT MOULDS & COMPOUNDS", margin, y);
+    doc.setFont('helvetica', 'normal').setFontSize(10);
+    y += 6;
+    doc.text(data.ADDRESS1 || '43/981, Rahiman Bazar', margin, y);
+    y += 5;
+    doc.text(data.ADDRESS2 || 'Cheruvannur', margin, y);
+    y += 5;
+    doc.text(data.ADDRESS3 || 'Calicut - 673655, Kerala, India', margin, y);
+    y += 5;
 
-  doc.setFont("helvetica", "normal").setFontSize(10);
-  y += 6;
-  doc.text(data.ADDRESS1 || "43/981, Rahiman Bazar", margin, y);
-  y += 5;
-  doc.text(data.ADDRESS2 || "Cheruvannur", margin, y);
-  y += 5;
-  doc.text(data.ADDRESS3 || "Calicut - 673655, Kerala, India", margin, y);
-  y += 5;
+    doc.text('Mob :', margin, y);
+    doc.text(data.CONTACT_MOBILE || '0495-2421733', margin + 18, y);
+    y += 5;
+    doc.text('Email :', margin, y);
+    doc.text(data.EMAIL || 'enquiry@mmarkgroup.com', margin + 18, y);
 
-  doc.text("Mob :", margin, y);
-  doc.text(data.CONTACT_MOBILE || "0495-2421733", margin + 18, y);
-  y += 5;
-  doc.text("Email :", margin, y);
-  doc.text(data.EMAIL || "enquiry@mmarkgroup.com", margin +18, y);
+    // Horizontal Line
+    y += 8;
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
 
-  // Horizontal Line
-  y += 8;
-  doc.setLineWidth(0.5);
-  doc.line(margin, y, pageWidth - margin, y);
+    // ===========================
+    //  TITLE - LOCAL PURCHASE ORDER
+    // ===========================
+    y += 10;
+    doc.setFont('helvetica', 'bold').setFontSize(14);
+    doc.text('LOCAL PURCHASE ORDER', pageWidth / 2, y, { align: 'center' });
 
-  // ===========================
-  //  TITLE - LOCAL PURCHASE ORDER
-  // ===========================
-  y += 10;
-  doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text("LOCAL PURCHASE ORDER", pageWidth / 2, y, { align: "center" });
+    // ===========================
+    //  TWO COLUMN MAIN DETAILS
+    // ===========================
+    y += 12;
+    doc.setFontSize(10);
 
-  // ===========================
-  //  TWO COLUMN MAIN DETAILS
-  // ===========================
-  y += 12;
-  doc.setFontSize(10);
+    const leftX = margin;
+    const rightX = pageWidth / 2 + 5;
 
-  const leftX = margin;
-  const rightX = pageWidth / 2 + 5;
+    doc.text('Date :', leftX, y);
+    doc.text(data.PO_DATE || '', leftX + 25, y);
 
-  doc.text("Date :", leftX, y);
-  doc.text(data.PO_DATE || "", leftX + 25, y);
+    doc.text('LPO NO. :', rightX, y);
+    doc.text(data.PO_NO || '', rightX + 30, y);
 
-  doc.text("LPO NO. :", rightX, y);
-  doc.text(data.PO_NO || "", rightX + 30, y);
+    y += 8;
+    doc.text('Supplier :', leftX, y);
+    doc.text(data.SUPP_NAME || '', leftX + 25, y);
 
-  y += 8;
-  doc.text("Supplier :", leftX, y);
-  doc.text(data.SUPP_NAME || "", leftX + 25, y);
+    doc.text('Po Date :', rightX, y);
+    doc.text(data.PO_DATE || '', rightX + 30, y);
 
-  doc.text("Po Date :", rightX, y);
-  doc.text(data.PO_DATE || "", rightX + 30, y);
+    y += 8;
+    doc.text('Address :', leftX, y);
+    doc.text(data.SUPP_ADDRESS || '', leftX + 25, y);
 
-  y += 8;
-  doc.text("Address :", leftX, y);
-  doc.text(data.SUPP_ADDRESS || "", leftX + 25, y);
+    doc.text('Ship to :', rightX, y);
+    doc.text(data.SHIP_TO || '', rightX + 30, y);
 
-  doc.text("Ship to :", rightX, y);
-  doc.text(data.SHIP_TO || "", rightX + 30, y);
+    y += 8;
+    doc.text('Contact Person :', leftX, y);
+    doc.text(data.SUPP_CONTACT || '', leftX + 32, y);
 
-  y += 8;
-  doc.text("Contact Person :", leftX, y);
-  doc.text(data.SUPP_CONTACT || "", leftX + 32, y);
+    doc.text('Purpose :', rightX, y);
+    doc.text(data.PURPOSE || '', rightX + 30, y);
 
-  doc.text("Purpose :", rightX, y);
-  doc.text(data.PURPOSE || "", rightX + 30, y);
+    y += 8;
+    doc.text('Contact No. :', leftX, y);
+    doc.text(data.SUPP_MOBILE || '', leftX + 30, y);
 
-  y += 8;
-  doc.text("Contact No. :", leftX, y);
-  doc.text(data.SUPP_MOBILE || "", leftX + 30, y);
+    doc.text('Location :', rightX, y);
+    doc.text(data.LOCATION || '', rightX + 30, y);
 
-  doc.text("Location :", rightX, y);
-  doc.text(data.LOCATION || "", rightX + 30, y);
+    y += 8;
+    doc.text('Contact Person :', rightX, y);
+    doc.text(data.CONTACT_NAME || '', rightX + 30, y);
 
-  y += 8;
-  doc.text("Contact Person :", rightX, y);
-  doc.text(data.CONTACT_NAME || "", rightX + 30, y);
+    y += 8;
+    doc.text('Contact No :', rightX, y);
+    doc.text(data.CONTACT_MOBILE || '', rightX + 30, y);
 
-  y += 8;
-  doc.text("Contact No :", rightX, y);
-  doc.text(data.CONTACT_MOBILE || "", rightX + 30, y);
+    // ========= TABLE HEADER (Ship Method Row) =========
+    y += 12;
+    doc.setLineWidth(0.3);
 
-  // ========= TABLE HEADER (Ship Method Row) =========
-  y += 12;
-  doc.setLineWidth(0.3);
+    const tableWidth = pageWidth - margin * 2;
+    const colWidth = tableWidth / 5;
+    let x = margin;
 
-  const tableWidth = pageWidth - margin * 2;
-  const colWidth = tableWidth / 5;
-  let x = margin;
+    const headers = [
+      'Ship Method',
+      'Payment Terms',
+      'Currency',
+      'Delivery Date',
+      'Remarks (If any)',
+    ];
 
-  const headers = [
-    "Ship Method",
-    "Payment Terms",
-    "Currency",
-    "Delivery Date",
-    "Remarks (If any)"
-  ];
+    doc.setFont('helvetica', 'bold').setFontSize(10);
+    headers.forEach((h, idx) => {
+      doc.rect(x, y, colWidth, 10);
+      doc.text(h, x + 2, y + 6);
+      x += colWidth;
+    });
 
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  headers.forEach((h, idx) => {
-    doc.rect(x, y, colWidth, 10);
-    doc.text(h, x + 2, y + 6);
-    x += colWidth;
-  });
+    // second row with values
+    y += 10;
+    x = margin;
+    const values = [
+      data.DELIVERY_TERM || '',
+      data.PAY_TERM || '',
+      data.CURRENCY_NAME || '',
+      this.formatDateToDDMMYYYY(data.DELIVERY_DATE || ''),
+      data.NOTES || '',
+    ];
 
-  // second row with values
-  y += 10;
-  x = margin;
-  const values = [
-    data.DELIVERY_TERM || "",
-    data.PAY_TERM || "",
-    data.CURRENCY_NAME || "",
-    this.formatDateToDDMMYYYY(data.DELIVERY_DATE || ""),
-    data.NOTES || ""
-  ];
+    doc.setFont('helvetica', 'normal');
+    values.forEach((val) => {
+      doc.rect(x, y, colWidth, 10);
+      doc.text(String(val), x + 2, y + 6);
+      x += colWidth;
+    });
 
-  doc.setFont("helvetica", "normal");
-  values.forEach(val => {
-    doc.rect(x, y, colWidth, 10);
-    doc.text(String(val), x + 2, y + 6);
-    x += colWidth;
-  });
+    // ===========================
+    // ITEMS TABLE
+    // ===========================
+    y += 15;
 
-  // ===========================
-  // ITEMS TABLE
-  // ===========================
-  y += 15;
+    const itemRows =
+      data.PoDetails?.map((item: any, i: number) => [
+        i + 1,
+        item.ITEM_CODE || '',
+        item.ITEM_DESC || '',
+        item.UOM || '',
+        item.PACKING || '',
+        item.PRICE || '',
+        item.QUANTITY || '',
+        item.DISC_PERCENT || '',
+        item.TOTAL_AMOUNT || 0,
+      ]) || [];
 
-  const itemRows =
-    data.PoDetails?.map((item: any, i: number) => [
-      i + 1,
-      item.ITEM_CODE || "",
-      item.ITEM_DESC || "",
-      item.UOM || "",
-      item.PACKING || "",
-      item.PRICE || "",
-      item.QUANTITY || "",
-      item.DISC_PERCENT || "",
-      item.TOTAL_AMOUNT || 0,
-    ]) || [];
+    autoTable(doc, {
+      startY: y,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [230, 230, 230],
+        textColor: 0,
+        fontSize: 9,
+        halign: 'center',
+      },
+      styles: { fontSize: 9, valign: 'middle', cellPadding: 2 },
+      margin: { left: margin, right: margin },
+      head: [
+        [
+          'Sl#',
+          'Item Code',
+          'Description',
+          'UOM',
+          'Packing',
+          'Price',
+          'Quantity',
+          'Discount (%)',
+          'Total Amount',
+        ],
+      ],
+      body: itemRows,
+    });
 
-  autoTable(doc, {
-    startY: y,
-    theme: "grid",
-    headStyles: { fillColor: [230, 230, 230],textColor: 0, fontSize: 9, halign: "center" },
-    styles: { fontSize: 9, valign: "middle", cellPadding: 2 },
-    margin: { left: margin, right: margin },
-    head: [
-      [
-        "Sl#",
-        "Item Code",
-        "Description",
-        "UOM",
-        "Packing",
-        "Price",
-        "Quantity",
-        "Discount (%)",
-        "Total Amount",
-      ]
-    ],
-    body: itemRows
-  });
+    y = (doc as any).lastAutoTable.finalY + 10;
 
-  y = (doc as any).lastAutoTable.finalY + 10;
+    // ===========================
+    //  TOTAL SECTION (Bottom Right)
+    // ===========================
+    doc.setFont('helvetica', 'bold').setFontSize(11);
 
-  // ===========================
-  //  TOTAL SECTION (Bottom Right)
-  // ===========================
-  doc.setFont("helvetica", "bold").setFontSize(11);
+    const amtX = pageWidth - margin - 50;
+    doc.text('Total Amount :', amtX, y);
+    doc.text(String(data.NET_AMOUNT || 0), amtX + 35, y);
 
-  const amtX = pageWidth - margin - 50;
-  doc.text("Total Amount :", amtX, y);
-  doc.text(String(data.NET_AMOUNT || 0), amtX + 35, y);
+    // ===========================
+    //  FOOTER (E & OE + SIGNATORY)
+    // ===========================
 
-  // ===========================
-//  FOOTER (E & OE + SIGNATORY)
-// ===========================
+    y += 20; // spacing after total
 
-y += 20; // spacing after total
+    doc.setFont('helvetica', 'bold').setFontSize(10);
 
-doc.setFont("helvetica", "bold").setFontSize(10);
+    // Left side – E & OE
+    doc.text('E & OE', margin, y);
 
-// Left side – E & OE
-doc.text("E & OE", margin, y);
+    // Right side – Authorised Signatory
+    doc.text('Authorised Signatory', pageWidth - margin - 40, y);
 
-// Right side – Authorised Signatory
-doc.text("Authorised Signatory", pageWidth - margin - 40, y);
+    // ===========================
+    //  RETURN PDF
+    // ===========================
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 
+  formatDateToDDMMYYYY(dateString: any): string {
+    if (!dateString) return '';
 
-  // ===========================
-  //  RETURN PDF
-  // ===========================
-  const blob = doc.output("blob");
-  const url = URL.createObjectURL(blob);
-  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-}
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString; // if invalid, return as is
 
-formatDateToDDMMYYYY(dateString: any): string {
-  if (!dateString) return "";
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
 
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return dateString; // if invalid, return as is
-
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const yyyy = date.getFullYear();
-
-  return `${dd}/${mm}/${yyyy}`;
-}
-
-
+    return `${dd}/${mm}/${yyyy}`;
+  }
 }
 @NgModule({
   imports: [

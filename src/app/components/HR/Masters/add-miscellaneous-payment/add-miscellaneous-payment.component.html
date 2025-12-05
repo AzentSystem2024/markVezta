@@ -60,7 +60,7 @@
                   <dx-text-box
                     label="Payment No"
                     labelMode="floating"
-                    [(value)]="miscFormData.VOUCHER_NO"
+                    [(value)]="miscFormData.PAYMENT_NO"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
@@ -365,6 +365,7 @@
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
     <dx-button
+      *ngIf="isReadOnlyMode"
       icon="fas fa-file-pdf"
       text="PDF"
       type="normal"

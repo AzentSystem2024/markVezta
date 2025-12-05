@@ -76,7 +76,6 @@
         </dxi-item>
 
         <dxi-item
-        
           location="after"
           widget="dxButton"
           [options]="addButtonOptions"
@@ -94,9 +93,8 @@
       <dxi-column
         dataField="EFFECT_FROM"
         caption="Effect From"
-       [format]="{ type: 'custom', formatter: formatMonthYear }"
+        [format]="{ type: 'custom', formatter: formatMonthYear }"
         dataType="date"
-        
       ></dxi-column>
       <dxi-column
         dataField="SALARY"
@@ -124,7 +122,7 @@
 <dx-popup
   [(visible)]="editEmployeePopupOpened"
   [width]="'44vw'"
-  [height]="'80vh'"
+  [height]="'90vh'"
   title="Edit employee salary settings"
 >
   <app-employee-salary-settings-edit
