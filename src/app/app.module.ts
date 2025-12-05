@@ -948,6 +948,7 @@ import {
   ViewInvoiceTrOutComponent,
   ViewInvoiceTrOutModule,
 } from './pages/INVOICE/view-invoice-tr-out/view-invoice-tr-out.component';
+import { StateEditComponent, StateEditModule } from './state-edit/state-edit.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -955,7 +956,7 @@ import {
 // import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1298,6 +1299,7 @@ import {
     InvoiceTrOutAddModule,
     EditInvoiceTrOutModule,
     ViewInvoiceTrOutModule,
+    StateEditModule
   ],
   providers: [
     AuthService,

@@ -86,6 +86,9 @@ export class CompanyMasterComponent {
       Email: ['', [Validators.required, Validators.email]],
       Inactive: [false],
       STATE_ID: ['', Validators.required],
+      PAN:['',Validators.required],
+      CIN:['',Validators.required],
+      GSTNo:['',Validators.required]
     });
     this.get_Company_List();
     this.get_Company_Dropdown_List();
@@ -274,7 +277,9 @@ export class CompanyMasterComponent {
       this.formsource.get('WhatsApp')?.value?.toString().trim() || '';
     const Company_type = this.formsource.get('CompanyType')?.value || 0;
     const STATE_ID = this.formsource.get('STATE_ID')?.value || 0;
-
+   const PAN = this.formsource.get('PAN')?.value || '';
+   const GSTNo = this.formsource.get('GSTNo')?.value || '';
+   const CIN = this.formsource.get('CIN')?.value || '';
     // Log to debug
     console.log(
       Company_code,
@@ -288,7 +293,10 @@ export class CompanyMasterComponent {
       Email,
       WhatsApp_no,
       Company_type,
-      STATE_ID
+      STATE_ID,
+      PAN,
+      CIN,
+      GSTNo
     );
 
     const payload = {
@@ -305,6 +313,9 @@ export class CompanyMasterComponent {
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: false,
       STATE_ID: STATE_ID,
+      GST_NO:GSTNo,
+      PAN_NO:PAN,
+      CIN:CIN
     };
 
     const isDuplicate = this.Datasource?.some((data: any) => {
@@ -378,6 +389,9 @@ export class CompanyMasterComponent {
     const WhatsApp_no = this.editingRowData.WHATSAPP;
     const Company_type = this.selectedCompanyType;
     const STATE_ID = this.state;
+    const PAN = this.editingRowData.PAN_NO
+    const GSTNo = this.editingRowData.GST_NO;
+    const CIN = this.editingRowData.CIN;
 
     console.log(STATE_ID, 'stateID');
 
@@ -401,6 +415,9 @@ export class CompanyMasterComponent {
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: Is_Inactive,
       STATE_ID: STATE_ID,
+      PAN_NO:PAN,
+      GST_NO:GSTNo,
+      CIN:CIN
     };
 
     //   const isDuplicate = this.Datasource?.some((data: any) => {

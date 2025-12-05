@@ -455,6 +455,7 @@
   </dx-data-grid>
   <form-popup
     [(visible)]="isAddCustomerPopupOpened"
+      [showApprove]="false"
     [width]="900"
     [height]="'100vh'"
     titleText="New Customer"
@@ -468,6 +469,7 @@
     [width]="950"
     [height]="'100vh'"
     titleText="Edit Customer"
+      [showApprove]="false"
     (save)="onClickUpdateCustomer()"
   >
     <!-- <app-customer-form></app-customer-form> -->

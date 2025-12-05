@@ -98,7 +98,8 @@ noDataText=" "
 <form-popup
     [(visible)]="AddArticleTypePopup"
    (save)="addData()"
-    titleText="New Article Type">
+    titleText="New Article Type"
+      [showApprove]="false">
 
      <dx-validation-group #formValidationGroup>
     <dx-form class="plain-styled-form" [formGroup]="formsource">
@@ -121,7 +122,8 @@ noDataText=" "
 <form-popup
     [(visible)]="UpdateArticleTypePopup"
     titleText="Update Article Type"
-    (save)="editData()">
+    (save)="editData()"
+      [showApprove]="false">
     <dx-validation-group #formValidationGroup>
     <dx-form class="plain-styled-form">
         <dxi-item>

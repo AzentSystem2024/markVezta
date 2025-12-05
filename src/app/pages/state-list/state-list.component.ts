@@ -1,5 +1,5 @@
-import { Component, OnInit, NgModule, ViewChild, NgZone } from '@angular/core';
-import { DxButtonModule } from 'devextreme-angular';
+import { Component, OnInit, NgModule, ViewChild, NgZone, Output, EventEmitter } from '@angular/core';
+import { DxButtonModule, DxPopupModule } from 'devextreme-angular';
 import {
   DxDataGridComponent,
   DxDataGridModule,
@@ -15,6 +15,7 @@ import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver-es';
 import { jsPDF } from 'jspdf';
 import { ExportService } from 'src/app/services/export.service';
+import { StateEditModule } from 'src/app/state-edit/state-edit.component';
 
 @Component({
   selector: 'app-state-list',
@@ -25,6 +26,8 @@ export class StateListComponent {
   @ViewChild(StateFormComponent) stateComponent: StateFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+   @Output() formClosed = new EventEmitter<void>();
+    
   state: any;
   CountryDropdownData: any;
   isAddStatePopupOpened = false;
@@ -36,6 +39,7 @@ export class StateListComponent {
   showPageSizeSelector = true;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
+  isEditPopupOpened :boolean = false;
   auto: string = 'auto';
   debitList: any;
   canAdd = false;
@@ -59,6 +63,7 @@ export class StateListComponent {
     },
     elementAttr: { class: 'add-button' },
   };
+  selectedState: any;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -71,7 +76,11 @@ export class StateListComponent {
     this.isAddStatePopupOpened = true;
   }
 
-  
+  CloseEditForm(){
+     this.isEditPopupOpened = false;
+     this.isAddStatePopupOpened = false;
+     this.showState();
+  }
 
   showState() {
     this.dataservice.getStateData().subscribe((response) => {
@@ -128,7 +137,9 @@ export class StateListComponent {
               },
               'success'
             );
-            this.dataGrid.instance.refresh();
+            // this.dataGrid.instance.refresh();
+              this.formClosed.emit();
+              this.isAddStatePopupOpened = false
             this.showState();
           } catch (error) {
             notify(
@@ -171,44 +182,44 @@ export class StateListComponent {
         }
       });
   }
-  onRowUpdating(event) {
-    const updataDate = event.newData;
-    const oldData = event.oldData;
-    const combinedData = { ...oldData, ...updataDate };
-    let id = combinedData.ID;
-    let stateCode = combinedData.STATE_CODE;
-    let statename = combinedData.STATE_NAME;
-    let country_id = combinedData.COUNTRY_ID;
+//  onRowUpdating (event) {
+//     const updataDate = event.newData;
+//     const oldData = event.oldData;
+//     const combinedData = { ...oldData, ...updataDate };
+//     let id = combinedData.ID;
+//     let stateCode = combinedData.STATE_CODE;
+//     let statename = combinedData.STATE_NAME;
+//     let country_id = combinedData.COUNTRY_ID;
 
-    this.dataservice
-      .updateState(id, stateCode, statename, country_id)
-      .subscribe((data: any) => {
-        if (data) {
-          notify(
-            {
-              message: 'State updated Successfully',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success'
-          );
-          this.dataGrid.instance.refresh();
-          this.showState();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not Saved',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error'
-          );
-        }
-      });
-    console.log('old data:', oldData);
-    console.log('new data:', updataDate);
-    console.log('modified data:', combinedData);
+//     this.dataservice
+//       .updateState(id, stateCode, statename, country_id)
+//       .subscribe((data: any) => {
+//         if (data) {
+//           notify(
+//             {
+//               message: 'State updated Successfully',
+//               position: { at: 'top right', my: 'top right' },
+//             },
+//             'success'
+//           );
+//           this.dataGrid.instance.refresh();
+//           this.showState();
+//         } else {
+//           notify(
+//             {
+//               message: 'Your Data Not Saved',
+//               position: { at: 'top right', my: 'top right' },
+//             },
+//             'error'
+//           );
+//         }
+//       });
+//     console.log('old data:', oldData);
+//     console.log('new data:', updataDate);
+//     console.log('modified data:', combinedData);
 
-    event.cancel = true; // Prevent the default update operation
-  }
+//     event.cancel = true; // Prevent the default update operation
+//   }
   ngOnInit(): void {
     this.showState();
     this.getCountryDropDown();
@@ -219,9 +230,26 @@ export class StateListComponent {
       console.log('dropdown', this.CountryDropdownData);
     });
   }
+
+  onEditingRow(event:any){
+   event.cancel = true;
+   this.isEditPopupOpened = true;
+   console.log(event)
+   this.selectedState = event.data
+   this.selectState(event)
+  }
+
+  selectState(event:any){
+      console.log(event);
+      const id = event.data.ID
+      this.dataservice.SelectState(id).subscribe((res: any) => {
+    console.log(res);
+    this.selectedState = res
+      })
+  }
 }
 @NgModule({
-  imports: [DxDataGridModule, DxButtonModule, FormPopupModule, StateFormModule],
+  imports: [DxDataGridModule, DxButtonModule, FormPopupModule, StateFormModule,DxPopupModule,StateEditModule,],
   providers: [],
   exports: [],
   declarations: [StateListComponent],

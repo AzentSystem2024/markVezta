@@ -2004,6 +2004,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}state/list`, {});
   }
 
+    UpdateState(item: any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}state/save`, payload);
+  }
   // getStateData_Api(item:any){
   //  const reqBody=item
   //   return this.http.post(`${this.apiUrl}dropdown`, reqBody);
@@ -2034,6 +2038,10 @@ export class DataService {
     const data = { ID, STATE_CODE, STATE_NAME, COUNTRY_ID };
 
     return this.http.post(`${this.apiUrl}state/save`, data);
+  }
+
+  SelectState(id: any) {
+    return this.http.post(`${this.apiUrl}State/select/${id}`, {});
   }
 
   //item-property1
