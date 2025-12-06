@@ -140,6 +140,7 @@
             useIcons: true
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
+          (onContentReady)="onContentReady($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
@@ -212,6 +213,7 @@
                 : ' GST %'
             "
             dataType="number"
+            [visible]="showGST"
             [width]="80"
             [allowEditing]="!readOnly"
           ></dxi-column>
@@ -232,6 +234,21 @@
             dataField="HSN_CODE"
             caption="HSN Code"
             dataType="string"
+          ></dxi-column>
+          <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="TOTAL_AMOUNT"
@@ -267,38 +284,63 @@
             ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
+
         <div
-          style="
-            margin: 16px 0 8px 0;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-          "
+          style="display: flex; justify-content: flex-end; margin: 10px 20px"
         >
-          <dx-check-box
-            *ngIf="!readOnly"
-            text="Approve"
-            [(value)]="isApproved"
-            [readOnly]="readOnly"
-          ></dx-check-box>
+          <div style="display: flex; align-items: center; gap: 16px">
+            <!-- Round Off Checkbox -->
+            <dx-check-box
+              text="Round Off"
+              [(value)]="purchaseInvoiceFormData.ROUND_OFF"
+              (onValueChanged)="onRoundOffChange()"
+            ></dx-check-box>
+
+            <!-- Net Amount Field -->
+            <dx-text-box
+              label="Net Amount"
+              labelMode="floating"
+              [value]="netAmount"
+              [width]="150"
+              [readOnly]="true"
+            ></dx-text-box>
+          </div>
         </div>
 
-        <div class="form-popup-buttons-container">
-          <div class="popup-footer">
-            <dx-button
-              text="Cancel"
-              (onClick)="cancel()"
-              stylingMode="outlined"
-              type="normal"
-            ></dx-button>
-            <dx-button
-              #saveButtonRef
-              [text]="readOnly ? 'PDF' : 'Save'"
-              stylingMode="contained"
-              type="default"
-              (onClick)="readOnly ? openPDF() : savePurchaseInvoice()"
-            ></dx-button>
+        <div class="form-footer-wrapper">
+          <!-- LEFT SECTION -->
+          <div class="left-section">
+            <dx-text-box
+              label="Vehicle No"
+              labelMode="floating"
+              [(value)]="purchaseInvoiceFormData.VEHICLE_NO"
+              [width]="200"
+            ></dx-text-box>
+          </div>
+
+          <div class="form-popup-buttons-container">
+            <div class="popup-footer">
+              <dx-check-box
+                *ngIf="!readOnly"
+                text="Approve"
+                [(value)]="isApproved"
+                [readOnly]="readOnly"
+              ></dx-check-box>
+
+              <dx-button
+                text="Cancel"
+                (onClick)="cancel()"
+                stylingMode="outlined"
+                type="normal"
+              ></dx-button>
+              <dx-button
+                #saveButtonRef
+                [text]="readOnly ? 'PDF' : 'Save'"
+                stylingMode="contained"
+                type="default"
+                (onClick)="readOnly ? openPDF() : savePurchaseInvoice()"
+              ></dx-button>
+            </div>
           </div>
         </div>
       </div>
