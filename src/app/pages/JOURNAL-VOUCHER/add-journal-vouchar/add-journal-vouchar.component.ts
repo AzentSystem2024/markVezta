@@ -887,10 +887,17 @@ export class AddJournalVoucharComponent {
         CREDIT_AMOUNT: item.creditAmount ? parseFloat(item.creditAmount) : 0.0,
       };
     });
-
+    const today = new Date();
+    const jvDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
     // 🔹 Step 7: Prepare final payload
     const finalPayload = {
       ...this.journalVoucherFormData,
+      TRANS_DATE: jvDate,
       COMPANY_ID: companyId,
       FIN_ID: finId,
       DETAILS: transformedDetails,

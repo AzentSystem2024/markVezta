@@ -734,129 +734,6 @@ export class AddDebitComponent {
       };
     }
 
-    // if (e.dataField === 'GST_PERC') {
-    //   e.editorOptions.onKeyDown = (event: any) => {
-    //     if (event.event.key === 'Enter') {
-    //       event.event.preventDefault();
-
-    //       const grid = this.itemsGridRef?.instance;
-    //       const rowData = e.row?.data;
-
-    //       // ✅ Validate ledgerCode and Amount before proceeding
-    //       if (!rowData.ledgerCode) {
-    //         notify(
-    //           'Please select a Ledger Code before proceeding.',
-    //           'warning',
-    //           2000
-    //         );
-    //         return;
-    //       }
-    //       if (rowData.Amount == null || rowData.Amount <= 0) {
-    //         notify(
-    //           'Please enter a valid Amount before proceeding.',
-    //           'warning',
-    //           2000
-    //         );
-    //         return;
-    //       }
-
-    //       // ✅ Ensure gstAmount is not greater than Amount
-    //       if (rowData.Amount != null && event.value > rowData.Amount) {
-    //         notify('GST Amount cannot be greater than Amount.', 'error', 2000);
-    //         event.value = rowData.Amount;
-    //         e.setCellValue(rowData, event.value);
-    //         return;
-    //       }
-
-    //       // ✅ Force the editor to lose focus and commit its value
-    //       const editorElement = event.event.target as HTMLElement;
-    //       editorElement.blur();
-
-    //       // ✅ Delay to let grid register the committed value
-    //       setTimeout(() => {
-    //         grid?.saveEditData();
-
-    //         // ✅ Recalculate net total
-    //         const rows = grid.getVisibleRows().map((r) => r.data);
-    //         let netTotal = 0;
-    //         for (const row of rows) {
-    //           const amount = parseFloat(row.Amount) || 0;
-    //           const gst = parseFloat(row.gstAmount) || 0;
-    //           netTotal += amount + gst;
-    //         }
-    //         this.netAmountDisplay = netTotal;
-
-    //         // ✅ Add new row only if current row is fully filled
-    //         if (
-    //           rowData.ledgerCode &&
-    //           rowData.Amount != null &&
-    //           !this.hasEmptyRow()
-    //         ) {
-    //           // ✅ Check if last row is empty, prevent multiple empty rows
-    //           const lastRow =
-    //             this.debitFormData.NOTE_DETAIL[
-    //               this.debitFormData.NOTE_DETAIL.length - 1
-    //             ];
-    //           if (!lastRow || (lastRow.ledgerCode && lastRow.Amount != null)) {
-    //             const newRow = {
-    //               SL_NO: this.debitFormData.NOTE_DETAIL.length + 1,
-    //               HEAD_ID: '',
-    //               AMOUNT: '',
-    //               GST_PERC: '',
-    //               GST_AMOUNT: '',
-    //               HSN_CODE: '',
-    //               REMARKS: '',
-    //             };
-    //             this.debitFormData.NOTE_DETAIL.push(newRow);
-
-    //             setTimeout(() => {
-    //               grid.option('dataSource', [
-    //                 ...this.debitFormData.NOTE_DETAIL,
-    //               ]);
-
-    //               setTimeout(() => {
-    //                 const visibleRows = grid.getVisibleRows();
-    //                 const newRowIndex = visibleRows.findIndex(
-    //                   (r) => r.data === newRow
-    //                 );
-    //                 if (newRowIndex >= 0) {
-    //                   grid.editCell(newRowIndex, 'ledgerCode');
-    //                 }
-    //               }, 50);
-    //             }, 50);
-    //           }
-    //         }
-    //       }, 50);
-    //     }
-
-    //     if (event.event.key === 'Tab') {
-    //       event.event.preventDefault();
-    //       const grid = this.itemsGridRef?.instance;
-    //       const editorElement = event.event.target as HTMLElement;
-
-    //       editorElement.blur();
-
-    //       setTimeout(() => {
-    //         grid?.saveEditData();
-
-    //         // ✅ Recalculate net total
-    //         const rows = grid.getVisibleRows().map((r) => r.data);
-    //         let netTotal = 0;
-    //         for (const row of rows) {
-    //           const amount = parseFloat(row.Amount) || 0;
-    //           const gst = parseFloat(row.gstAmount) || 0;
-    //           netTotal += amount + gst;
-    //         }
-    //         this.netAmountDisplay = netTotal;
-
-    //         setTimeout(() => {
-    //           this.narrationRef?.instance?.focus();
-    //         }, 50);
-    //       }, 50);
-    //     }
-    //   };
-    // }
-
     if (e.dataField === 'GST_PERC') {
       const originalOnValueChanged = e.editorOptions.onValueChanged;
 
@@ -1068,15 +945,27 @@ export class AddDebitComponent {
       return;
     }
     // ✅ Filter valid rows
-    const validRows = gridData.filter(
-      (row: any) =>
-        row.ledgerCode ||
-        row.ledgerName ||
-        row.Amount ||
-        row.GST_PERC ||
-        row.gstAmount ||
-        row.particulars,
-    );
+
+    const validRows = gridData.filter((row: any) => {
+      const hasLedger = !!(row.ledgerCode || row.ledgerName);
+      const hasAmount = Number(row.Amount) > 0;
+      const hasTax =
+        Number(row.GST_PERC) > 0 ||
+        Number(row.CGST) > 0 ||
+        Number(row.SGST) > 0;
+      const hasRemarks = !!row.particulars;
+
+      return hasLedger || hasAmount || hasTax || hasRemarks;
+    });
+    // const validRows = gridData.filter(
+    //   (row: any) =>
+    //     row.ledgerCode ||
+    //     row.ledgerName ||
+    //     row.Amount ||
+    //     row.GST_PERC ||
+    //     row.gstAmount ||
+    //     row.particulars,
+    // );
 
     // ✅ 1. Form-level validations
     if (!this.debitFormData.SUPP_ID) {

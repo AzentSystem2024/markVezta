@@ -353,7 +353,7 @@ export class InvoiceTrOutAddComponent {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.invoiceFormData.COMPANY_ID,
-      NAME: 'CUSTOMER',
+      // NAME: 'CUSTOMER',
     };
 
     this.dataService
@@ -761,8 +761,15 @@ export class InvoiceTrOutAddComponent {
         SGST: row.SGST,
       }),
     );
-
+    const today = new Date();
+    const invDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
     // ----------------------- ROOT-LEVEL VALUES -----------------------
+    this.invoiceFormData.TRANS_DATE = invDate;
     this.invoiceFormData.GROSS_AMOUNT = this.totalAmount;
     this.invoiceFormData.TAX_AMOUNT = this.taxAmount;
     this.invoiceFormData.NET_AMOUNT = this.grandTotal;

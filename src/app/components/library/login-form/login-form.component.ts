@@ -231,7 +231,7 @@ export class LoginFormComponent implements OnInit {
       this.getInternetIP(),
       this.getLocalIP(),
     ]);
-
+    const SYSTEM_DATETIME = new Date().toISOString();
     const payload = {
       LOGIN_NAME: this.formData.LOGIN_NAME,
       PASSWORD: this.formData.PASSWORD,
@@ -242,6 +242,7 @@ export class LoginFormComponent implements OnInit {
       DOMAIN_NAME,
       LOCAL_IP,
       INTERNET_IP,
+      SYSTEM_DATETIME,
     };
 
     this.dataservice.login_function_api(payload).subscribe({

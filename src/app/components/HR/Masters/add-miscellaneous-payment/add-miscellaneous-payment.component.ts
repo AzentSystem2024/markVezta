@@ -813,9 +813,17 @@ export class AddMiscellaneousPaymentComponent {
     }
     // 4. Prepare final payload
     const { VAT_REGN, ...miscDataWithoutVat } = this.miscFormData;
+    const today = new Date();
+    const paymentDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
     const payload = {
       ...miscDataWithoutVat,
-      TRANS_DATE: this.formatDateOnly(this.miscFormData.TRANS_DATE),
+      // TRANS_DATE: this.formatDateOnly(this.miscFormData.TRANS_DATE),
+      TRANS_DATE: paymentDate,
       STORE_ID: this.selectedstoreId,
       MISC_DETAIL: cleanedList.map((item: any, index: number) => {
         const amount = Number(item.AMOUNT) || 0;
