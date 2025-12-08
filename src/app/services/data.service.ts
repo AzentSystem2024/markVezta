@@ -5928,7 +5928,10 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = `${this.apiUrl}DocSettings/insert`;
     return this.http.post(getEndpoint, payload);
   }
-
+    Doc_Last_SNo(payload) {
+    const getEndpoint = `${this.apiUrl}DocSettings/nextvoucherno`;
+    return this.http.post(getEndpoint, payload);
+  }
 
 
  

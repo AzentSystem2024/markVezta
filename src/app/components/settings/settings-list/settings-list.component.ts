@@ -73,13 +73,14 @@ text: '',
     onClick: () => this.Savedata(),
     elementAttr: { class: 'add-button' }
   };
+  trans_id: any;
 constructor(private service:DataService,private cdr:ChangeDetectorRef){
 
  
 this.sessionData_tax()
 
 }
-
+//=================session data================
 sessionData_tax() {
      console.log('working')
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -90,15 +91,29 @@ sessionData_tax() {
  this.user_id=this.sessionData.USER_ID
 this.getlist()
 
+
+
   }
 
 
-  getlist(){
-    
-  const payload={
 
+  //================api for Serial number validation=================
+
+Doc_serial_no(){
+  const payload={
+    COMPANY_ID:this.selectedCompany,
+  TRANS_TYPE: this.trans_id
+
+  }
+  this.service.Doc_Last_SNo(payload).subscribe((res:any)=>{
+    console.log(res)
+  })
+}
+
+//========================list for doc settings========================
+  getlist(){
+  const payload={
   COMPANY_ID:this.selectedCompany,
-  FIN_ID:this.finId
   }
 
   this.service.List_setting(payload).subscribe((res:any)=>{
@@ -108,9 +123,8 @@ this.getlist()
   })
 
   }
-onExporting(e:any){
+  //=========================grid refresh with call list==========================
 
-}
     refreshGrid(){
           if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
@@ -119,18 +133,34 @@ onExporting(e:any){
       
     }
   }
-
-             toggleFilterRow = () => {
+// ====================================hide and shwo filter=====================
+    toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
 
+
+  // /===============
+
+onEditorPreparing(e: any) {
+  if (e.parentType === "dataRow" && e.dataField === "START") {
+
+    const row = e.row?.data;
+
+    if (row.LAST_NO == "0") {
+      e.editorOptions.readOnly = false;   // Editable
+    } else {
+      e.editorOptions.readOnly = true;    // Not editable
+    }
+  }
+}
+
+
+
+
+//=====================Save function======================================
 Savedata(){
-  
   console.log(this.DOcList)
-
-
-
   const docValues = this.DOcList.map(item => ({
   TRANS_TYPE: item.ID,
   GROUP_CODE: item.CODE,
