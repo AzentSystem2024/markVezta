@@ -5919,4 +5919,17 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = `${this.apiUrl}BankReconciliation/save`;
     return this.http.post(getEndpoint, payload);
   }
+
+    List_setting(payload) {
+    const getEndpoint = `${this.apiUrl}DocSettings/list`;
+    return this.http.post(getEndpoint, payload);
+  }
+    Add_setting(payload) {
+    const getEndpoint = `${this.apiUrl}DocSettings/insert`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+
+
+ 
 }

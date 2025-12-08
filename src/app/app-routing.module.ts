@@ -207,6 +207,7 @@ import { PurchaseReturnDebitComponent } from './pages/purchase-return-debit/purc
 import { MiscPaymentGstListComponent } from './components/HR/Masters/misc-payment-gst-list/misc-payment-gst-list.component';
 import { PrepaymentGstListComponent } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
 import { InvoiceTrOutComponent } from './pages/INVOICE/invoice-tr-out/invoice-tr-out.component';
+import { SettingsListComponent } from './components/settings/settings-list/settings-list.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -886,6 +887,11 @@ const routes: Routes = [
       {
         path: 'state',
         component: StateListComponent,
+        canActivate: [AuthGuardService],
+      },
+        {
+        path: 'settings',
+        component:SettingsListComponent ,
         canActivate: [AuthGuardService],
       },
       {
