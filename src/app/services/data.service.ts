@@ -327,6 +327,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Customer/custdtl`, {});
   }
 
+    getSupplierWithState(): Observable<any> {
+    return this.http.post(`${this.apiUrl}supplier/suppdtl`, {});
+  }
+
   insertInvoice(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Invoice/insert`, data);

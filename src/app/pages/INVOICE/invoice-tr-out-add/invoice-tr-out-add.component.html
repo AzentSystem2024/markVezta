@@ -86,7 +86,7 @@
                   <dx-select-box
                     [(value)]="invoiceFormData.CUST_ID"
                     [dataSource]="distributorList"
-                    displayExpr="CUST_NAME"
+                    displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     [width]="300"
                     label="Customer"
@@ -193,9 +193,10 @@
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
                 ? 'VAT %'
-                : ' GST %'
+                : ' IGST %'
             "
             dataType="number"
+            [visible]="showGST"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
@@ -209,6 +210,22 @@
             format="#,##0.00"
             [allowEditing]="false"
             [calculateCellValue]="calculateGstAmount"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
@@ -246,51 +263,74 @@
             ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
+
         <div
-          style="
-            margin: 16px 0 8px 0;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 5px;
-          "
+          style="display: flex; justify-content: flex-end; margin: 10px 20px"
         >
-          <!-- <div class="approve-container"> -->
-          <dx-check-box
-            [value]="isReadOnlyMode ? true : invoiceFormData.IS_APPROVED"
-            (valueChange)="
-              !isReadOnlyMode ? (invoiceFormData.IS_APPROVED = $event) : null
-            "
-            [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
-            [readOnly]="isReadOnlyMode"
-            stylingMode="outlined"
-          >
-          </dx-check-box>
-          <!-- </div> -->
+          <div style="display: flex; align-items: center; gap: 16px">
+            <!-- Round Off Checkbox -->
+            <dx-check-box
+              text="Round Off"
+              [(value)]="invoiceFormData.ROUND_OFF"
+              (onValueChanged)="onRoundOffChange()"
+            ></dx-check-box>
+
+            <!-- Net Amount Field -->
+            <dx-text-box
+              label="Net Amount"
+              labelMode="floating"
+              [value]="netAmount"
+              [width]="150"
+              [readOnly]="true"
+            ></dx-text-box>
+          </div>
         </div>
-        <div class="form-popup-buttons-container">
-          <div class="popup-footer">
-            <dx-button
-              text="Cancel"
-              (onClick)="cancel()"
-              stylingMode="outlined"
-              type="normal"
-            ></dx-button>
-            <dx-button
-              #saveButtonRef
-              [text]="
-                isReadOnlyMode
-                  ? 'PDF'
-                  : invoiceFormData.IS_APPROVED
-                  ? 'Commit'
-                  : 'Save'
-              "
-              (onClick)="isReadOnlyMode ? openPDF() : saveInvoice()"
-              stylingMode="contained"
-              type="default"
-              [width]="120"
-            ></dx-button>
-            <!-- <dx-button
+        <div class="form-footer-wrapper">
+          <!-- LEFT SECTION -->
+          <div class="left-section">
+            <dx-text-box
+              label="Vehicle No"
+              labelMode="floating"
+              [(value)]="invoiceFormData.VEHICLE_NO"
+              [width]="200"
+            ></dx-text-box>
+          </div>
+
+          <div class="form-popup-buttons-container">
+            <div class="popup-footer">
+              <dx-check-box
+                [value]="isReadOnlyMode ? true : invoiceFormData.IS_APPROVED"
+                (valueChange)="
+                  !isReadOnlyMode
+                    ? (invoiceFormData.IS_APPROVED = $event)
+                    : null
+                "
+                [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+                [readOnly]="isReadOnlyMode"
+                stylingMode="outlined"
+              >
+              </dx-check-box>
+              <dx-button
+                text="Cancel"
+                (onClick)="cancel()"
+                stylingMode="outlined"
+                type="normal"
+              ></dx-button>
+              <dx-button
+                #saveButtonRef
+                [text]="
+                  isReadOnlyMode
+                    ? 'PDF'
+                    : invoiceFormData.IS_APPROVED
+                    ? 'Commit'
+                    : 'Save'
+                "
+                (onClick)="isReadOnlyMode ? openPDF() : saveInvoice()"
+                stylingMode="contained"
+                type="default"
+                [width]="120"
+              ></dx-button>
+              <!-- <dx-button
               #saveButtonRef
               [text]="invoiceFormData.IS_APPROVED ? 'Commit' : 'Save'"
               (onClick)="saveInvoice()"
@@ -298,6 +338,7 @@
               type="default"
               [width]="120"
             ></dx-button> -->
+            </div>
           </div>
         </div>
       </div>

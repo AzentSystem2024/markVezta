@@ -94,6 +94,11 @@ export class InvoiceTrOutAddComponent {
   stores: any;
   reasons: any;
 
+  netAmount:string;
+  showSGST:boolean =false;
+  showCGST:boolean = false;
+  showGST:boolean = false;
+
   @ViewChild('refBoxRef', { static: false }) refBoxRef!: DxTextBoxComponent;
 
   customerType: string = 'Unit';
@@ -128,6 +133,8 @@ export class InvoiceTrOutAddComponent {
     NARRATION: '',
     CREATE_USER_ID: 0,
     IS_APPROVED: false,
+    VEHICLE_NO:'',
+    ROUND_OFF:false,
     SALE_DETAILS: [
       {
         QUANTITY: 0,
@@ -137,6 +144,8 @@ export class InvoiceTrOutAddComponent {
         TAX_AMOUNT: 0,
         TOTAL_AMOUNT: 0,
         DN_DETAIL_ID: 0,
+        CGST:0,
+        SGST:0
       },
     ],
   };
@@ -155,16 +164,27 @@ export class InvoiceTrOutAddComponent {
   HSNCODE: any;
   TAX_PERC: any;
   GST: any;
+  selectedCompany: any;
+  companyState: any;
 
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    this.sessionData_tax();
+  }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+
+    this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+ console.log(this.selectedCompany)
+ this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
+ console.log(this.companyState)
+ this.GST = this.sessionData.GeneralSettings.GST_PERC;
+ console.log(this.GST,'GST')
   }
 
   ngOnInit() {
@@ -282,13 +302,13 @@ export class InvoiceTrOutAddComponent {
     return `${day}-${month}-${year}`;
   }
 
+  
   getCustomerOrUnitLst() {
-    this.dataService.getCustomerOrUnit().subscribe((response: any) => {
+    this.dataService.getCustomerWithState().subscribe((response: any) => {
       this.distributorList = response;
       console.log(this.distributorList, 'DISTLISTPOPUP');
     });
   }
-
   onDistributorChanged(e: any) {
     // Find the selected customer from the distributorList
     const selectedCustomer = this.distributorList.find(
@@ -297,6 +317,47 @@ export class InvoiceTrOutAddComponent {
     this.selectedCustomerName = selectedCustomer.CUST_NAME;
     this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
     console.log(selectedCustomer.CUST_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
+
+     const company = this.companyState?.trim().toLowerCase();
+     console.log(company)
+     const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
+     console.log(customer)
+     const sessionGst = parseFloat(this.GST) || 0; // main GST%
+     console.log(sessionGst)
+
+      if (company === customer) {
+      console.log('Both states SAME → CGST + SGST apply');
+
+      this.showCGST = true;
+      this.showSGST = true;
+      this.showGST = false;
+
+      //  Split GST into CGST + SGST
+      const half = sessionGst / 2;
+
+      // Update all grid rows
+      this.mainInvoiceGridList?.forEach((row: any) => {
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0; // GST becomes zero in same-state case
+      });
+    } else {
+      console.log('States DIFFERENT → GST applies');
+
+      this.showGST = true;
+      this.showCGST = false;
+      this.showSGST = false;
+
+      // ⭐ GST only
+      this.mainInvoiceGridList?.forEach((row: any) => {
+        row.GST = sessionGst;
+        row.CGST = 0;
+        row.SGST = 0;
+      });
+    }
+    this.selectedCustomer = selectedCustomer
+
+
     if (this.selectedCustomerId) {
       this.selectedCustomer = this.distributorList.find(
         (s: any) => s.ID === this.selectedCustomerId
@@ -350,8 +411,23 @@ export class InvoiceTrOutAddComponent {
 
   calculateGstAmount = (row: any) => {
     const amt = this.calculateAmount(row);
-    const gstPercent = parseFloat(row.TAX_PERC) || 0;
-    return amt * (gstPercent / 100);
+
+    const igst = parseFloat(row.GST) || 0; // GST column = GST
+    const cgst = parseFloat(row.CGST) || 0;
+    const sgst = parseFloat(row.SGST) || 0;
+
+    let totalGstPercent = 0;
+
+    // GST case
+    if (igst > 0) {
+      totalGstPercent = igst;
+    }
+    // CGST + SGST case
+    else {
+      totalGstPercent = cgst + sgst;
+    }
+
+    return amt * (totalGstPercent / 100);
   };
 
   calculateTotal = (row: any) => {
@@ -399,6 +475,27 @@ export class InvoiceTrOutAddComponent {
     newRows.forEach((row: any) => {
       row.HSN_CODE = this.HSNCODE;
       row.TAX_PERC = this.GST;
+
+       const sessionGst = parseFloat(this.GST) || 0;
+      const company = this.companyState?.trim().toLowerCase();
+      const customer = this.invoiceFormData?.PARTY_NAME
+        ? this.selectedCustomer?.STATE_NAME?.trim().toLowerCase()
+        : null;
+
+        console.log(company)
+        console.log(customer)
+      if (company === customer) {
+        // Same state → CGST + SGST
+        const half = sessionGst / 2;
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0; // GST = 0
+      } else {
+        // Different state → GST only
+        row.GST = sessionGst;
+        row.CGST = 0;
+        row.SGST = 0;
+      }
       // or whatever your login session variable is
     });
     //  Mutate the existing array (DON'T reassign!)
@@ -544,6 +641,8 @@ export class InvoiceTrOutAddComponent {
         TAXABLE_AMOUNT: this.calculateAmount(row),
         TAX_AMOUNT: this.calculateGstAmount(row),
         TOTAL_AMOUNT: this.calculateTotal(row),
+        CGST:row.CGST,
+        SGST:row.SGST
       })
     );
 
@@ -665,6 +764,8 @@ export class InvoiceTrOutAddComponent {
     this.resetInvoiceForm();
     this.popupClosed.emit();
   }
+
+  onRoundOffChange(){}
 }
 @NgModule({
   imports: [
