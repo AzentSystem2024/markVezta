@@ -113,7 +113,8 @@ export class EditPurchaseInvoiceComponent {
   }
 
   ngOnInit() {
-    this.getSupplierDropdown();
+    // this.getSupplierDropdown();
+    this.getSupplierOrUnitLst();
     // this.getPendingGRNList();
     this.getPurchNo();
     this.sessionData_tax();
@@ -132,26 +133,115 @@ export class EditPurchaseInvoiceComponent {
  console.log(this.GST,'GST')
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['invoiceFormData']) {
-      console.log('Changed invoiceFormData:', this.invoiceFormData);
-      this.purchaseInvoiceFormData = this.invoiceFormData;
-      this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
+//   ngOnChanges(changes: SimpleChanges): void {
+//     if (changes['invoiceFormData']) {
+//       console.log('Changed invoiceFormData:', this.invoiceFormData);
+//       this.purchaseInvoiceFormData = this.invoiceFormData;
+//       this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
+//       console.log(this.mainGridData,'mainGridData')
+//       this.mainGridData = this.mainGridData.map((row: any) => ({
+//         HSN_CODE: this.HSNCODE, // force-create
+//         VAT_PERC: row.GST || this.GST, // already showing
+//         ...row, // merge original row at the end
+//       }));
+      
+     
+//       this.showCGST = true;
+//       this.showSGST = true;
+//       this.showGST = false;
+
+// //       this.mainGridData = this.mainGridData.map((row: any) => ({
+        
+// //   ...row,
+// //   HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
+// //   GST: row.GST ?? 0,
+// //   CGST: row.CGST ?? 0,
+// //   SGST: row.SGST ?? 0,
+// //   VAT_PERC: row.VAT_PERC ?? this.GST,
+// // }));
+
+//       this.purchaseInvoiceFormData.SUPP_ID = Number(
+//         this.invoiceFormData.SUPP_ID
+//       );
+//       this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
+//       if (this.selectedSupplierId) {
+//         this.getPendingGRNList();
+//       }
+//       console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
+//     }
+//   }
+
+
+ngOnChanges(changes: SimpleChanges): void {
+  if (changes['invoiceFormData']) {
+    console.log('Changed invoiceFormData:', this.invoiceFormData);
+
+    this.purchaseInvoiceFormData = this.invoiceFormData;
+
+    // Load grid data
+    this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
+
+    // Get company and supplier state names
+    const companyState = this.companyState?.trim().toLowerCase();
+    const supplierState = this.purchaseInvoiceFormData?.SUPP_STATE_NAME?.trim().toLowerCase();
+
+    console.log("Company:", companyState, "Supplier:", supplierState);
+
+    // GST Percentage from session
+    const gstPerc = parseFloat(this.GST) || 0;
+
+    // ---------------------------------------------------------
+    // CONDITION: SAME STATE → CGST + SGST, DIFFERENT → GST ONLY
+    // ---------------------------------------------------------
+    if (companyState === supplierState) {
+      console.log("Same state → Apply CGST + SGST");
+
+      this.showCGST = true;
+      this.showSGST = true;
+      this.showGST = false;
+
+      const half = gstPerc / 2;
+
       this.mainGridData = this.mainGridData.map((row: any) => ({
-        HSN_CODE: this.HSNCODE, // force-create
-        VAT_PERC: row.GST || this.GST, // already showing
-        ...row, // merge original row at the end
+        ...row,
+        HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
+        CGST: row.CGST ?? half,
+        SGST: row.SGST ?? half,
+        GST: 0,                 // GST disabled for same state
+        VAT_PERC: half + half,  // total GST
       }));
-      this.purchaseInvoiceFormData.SUPP_ID = Number(
-        this.invoiceFormData.SUPP_ID
-      );
-      this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
-      if (this.selectedSupplierId) {
-        this.getPendingGRNList();
-      }
-      console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
+    } 
+    else {
+      console.log("Different state → Apply GST only");
+
+      this.showCGST = false;
+      this.showSGST = false;
+      this.showGST = true;
+
+      this.mainGridData = this.mainGridData.map((row: any) => ({
+        ...row,
+        HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
+        GST: row.GST ?? gstPerc, // Full GST %
+        CGST: 0,
+        SGST: 0,
+        VAT_PERC: gstPerc,
+      }));
     }
+
+    // ---------------------------------------------------------
+    // Supplier ID assignment
+    // ---------------------------------------------------------
+    this.purchaseInvoiceFormData.SUPP_ID = Number(this.invoiceFormData.SUPP_ID);
+    this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
+
+    if (this.selectedSupplierId) {
+      this.getPendingGRNList();
+    }
+
+    console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
   }
+}
+
 
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
@@ -182,7 +272,7 @@ export class EditPurchaseInvoiceComponent {
 
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
-    const selectedSupplier = this.supplierList.find(
+    const selectedSupplier = this.distributorList.find(
       (supplier: any) => supplier.ID === this.selectedSupplierId
     );
 

@@ -74,7 +74,7 @@
       >
         <div style="display: flex; gap: 10px">
           <dx-select-box
-            [dataSource]="supplierList"
+            [dataSource]="distributorList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
             [(value)]="purchaseInvoiceFormData.SUPP_ID"
@@ -164,11 +164,7 @@
             caption="Item Name"
             [allowEditing]="false"
           ></dxi-column>
-          <dxi-column
-            dataField="HSN_CODE"
-            caption="HSN Code"
-            dataType="string"
-          ></dxi-column>
+
           <dxi-column
             dataField="RATE"
             caption="Price"
@@ -210,7 +206,7 @@
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
                 ? 'VAT %'
-                : ' GST %'
+                : ' IGST %'
             "
             dataType="number"
             [visible]="showGST"

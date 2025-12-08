@@ -244,6 +244,7 @@ export class InvoiceTrOutAddComponent {
     }
 
     const data = this.EditingResponseData.Data[0];
+    console.log(data)
     const transactionDate = this.parseDMY(data.TRANS_DATE);
     // Populate header fields
     this.invoiceFormData = {
@@ -263,10 +264,26 @@ export class InvoiceTrOutAddComponent {
       PARTY_NAME: data.PARTY_NAME,
       FIN_ID: this.invoiceFormData.FIN_ID,
       REF_NO: data.REF_NO,
+      VEHICLE_NO:data.VEHICLE_NO,
+      ROUND_OFF:data.ROUND_OFF
     };
 
     // Populate supplier selection
     this.invoiceFormData.CUST_ID = data.CUST_ID;
+   console.log(this.invoiceFormData.CUST_ID)
+    
+ // ----------- STATE COMPARISON -----------
+  const companyState = this.companyState?.trim().toLowerCase();
+
+  // 👇 Change this line based on what your API sends for customer state
+  const customerState = (data.CUST_STATE || data.STATE_NAME || '')
+    .trim()
+    .toLowerCase();
+
+  console.log('Company State:', companyState);
+  console.log('Customer State:', customerState);
+
+  const gstPerc = parseFloat(this.GST) || 0;
 
     // Populate grid rows from PurchDetail
     this.mainInvoiceGridList = (data.SALE_DETAILS || []).map((item) => ({
@@ -282,8 +299,44 @@ export class InvoiceTrOutAddComponent {
       SALE_DATE: item.DN_DATE,
       ARTICLE: item.ARTICLE,
       TOTAL_PAIR_QTY: item.TOTAL_PAIR_QTY,
+      CGST: item.CGST ?? 0,
+    SGST: item.SGST ?? 0,
+    GST: item.GST ?? 0,
     }));
 
+      if (companyState === customerState) {
+      console.log('Both states SAME → CGST + SGST apply');
+
+      this.showCGST = true;
+      this.showSGST = true;
+      this.showGST = false;
+
+      //  Split GST into CGST + SGST
+      const half = gstPerc / 2;
+
+      // Update all grid rows
+      this.mainInvoiceGridList?.forEach((row: any) => {
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0; // GST becomes zero in same-state case
+      });
+    } else {
+      console.log('States DIFFERENT → GST applies');
+
+      this.showGST = true;
+      this.showCGST = false;
+      this.showSGST = false;
+
+      // ⭐ GST only
+      this.mainInvoiceGridList?.forEach((row: any) => {
+        row.GST = gstPerc;
+        row.CGST = 0;
+        row.SGST = 0;
+      });
+    }
+   
+
+    
     // Refresh grid
     setTimeout(() => {
       if (this.itemsGridRef?.instance) {
@@ -304,7 +357,7 @@ export class InvoiceTrOutAddComponent {
 
   
   getCustomerOrUnitLst() {
-    this.dataService.getCustomerWithState().subscribe((response: any) => {
+    this.dataService.getCustomerStateTrout_Invoice().subscribe((response: any) => {
       this.distributorList = response;
       console.log(this.distributorList, 'DISTLISTPOPUP');
     });
@@ -314,9 +367,9 @@ export class InvoiceTrOutAddComponent {
     const selectedCustomer = this.distributorList.find(
       (cust: any) => cust.ID === e.value
     );
-    this.selectedCustomerName = selectedCustomer.CUST_NAME;
+    this.selectedCustomerName = selectedCustomer.DESCRIPTION;
     this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
-    console.log(selectedCustomer.CUST_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
+    console.log(selectedCustomer.DESCRIPTION, 'SELECTEDCUSTOMERRRRRRRRRR');
 
      const company = this.companyState?.trim().toLowerCase();
      console.log(company)
@@ -575,25 +628,26 @@ export class InvoiceTrOutAddComponent {
 
   cancelPopup() {}
 
-  logGridSummaries() {
+logGridSummaries() {
     this.summaryValues = this.itemsGridRef?.instance?.getTotalSummaryValue;
 
     if (this.summaryValues) {
       this.totalAmount =
-        this.itemsGridRef?.instance?.getTotalSummaryValue('TAXABLE_AMOUNT') ||
-        0;
+        this.itemsGridRef?.instance?.getTotalSummaryValue('AMOUNT') || 0;
       this.taxAmount =
         this.itemsGridRef?.instance?.getTotalSummaryValue('TAX_AMOUNT') || 0;
       this.grandTotal =
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
-
+      this.netAmount = Number(this.grandTotal).toFixed(2);
+      this.onRoundOffChange();
       console.log('GROSS AMOUNT Summary:', this.totalAmount);
       console.log('TAX_AMOUNT Summary:', this.taxAmount);
-      console.log('NET_AMOUNT Summary:', this.grandTotal);
+      console.log('NET AMOUNT Summary:', this.grandTotal);
     } else {
       console.warn('Summary values not ready yet.');
     }
   }
+
   onContentReady(e: any): void {
     this.logGridSummaries();
   }
@@ -765,7 +819,15 @@ export class InvoiceTrOutAddComponent {
     this.popupClosed.emit();
   }
 
-  onRoundOffChange(){}
+   onRoundOffChange() {
+    if (this.invoiceFormData.IS_ROUNDOFF) {
+      // Round Off Enabled
+      this.netAmount = Math.round(this.grandTotal).toFixed(2);
+    } else {
+      // Round Off Disabled → return to original value
+      this.netAmount = Number(this.grandTotal).toFixed(2);
+    }
+  }
 }
 @NgModule({
   imports: [
