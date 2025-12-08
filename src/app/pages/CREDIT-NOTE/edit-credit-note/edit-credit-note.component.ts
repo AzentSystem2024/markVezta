@@ -116,10 +116,21 @@ export class EditCreditNoteComponent {
   selectedInvoice: string;
   sessionData: any;
   selected_vat_id: any;
-  selectedstoreId:any;
+  selectedstoreId: any;
   HSNCODE: any;
   hsnLoaded: boolean;
   GST: any;
+  companyState: any;
+  isSameState: boolean = false;
+  selectedCompany: any;
+  showGST: boolean = false;
+  showCGST: boolean = false;
+  showSGST: boolean = false;
+  netAmount: any;
+  companyStateID: any;
+  netTotal: number;
+  customerStateID: any;
+  selectedCustomer: any;
 
   constructor(
     private dataService: DataService,
@@ -160,9 +171,9 @@ export class EditCreditNoteComponent {
     this.sessionDetails();
   }
 
-   sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
       '===========selected store id==================='
@@ -173,7 +184,9 @@ export class EditCreditNoteComponent {
     if (changes['creditFormData'] && this.creditFormData?.length) {
       const data = this.creditFormData[0];
       this.creditFormData.PARTY_NAME = data.PARTY_NAME;
-      console.log(this.creditFormData[0].INVOICE_NO, 'INEDITTTTTTTTTTT');
+      console.log(this.creditFormData, 'INEDITTTTTTTTTTT');
+      this.companyStateID = this.selectedCompany?.STATE_ID;
+
       if (this.creditFormData?.length) {
         const data = this.creditFormData[0];
         this.invoiceNo = String(data.INVOICE_NO);
@@ -182,7 +195,29 @@ export class EditCreditNoteComponent {
         this.selectedInvoice = String(data.INVOICE_NO);
         console.log('invoiceNo bound to:', this.invoiceNo);
       }
-
+      const distributorId = data.DISTRIBUTOR_ID;
+      const selectedCustomer = this.distributorList?.find(
+        (x: any) => x.ID === distributorId
+      );
+      if (selectedCustomer) {
+        this.customerStateID = selectedCustomer.STATE_ID;
+        this.selectedCustomer = selectedCustomer;
+        console.log('Customer State:', this.customerStateID);
+      } else {
+        console.warn('Customer state not found in distributorList');
+      }
+      this.isSameState = this.companyStateID === this.customerStateID;
+      console.log('Same State:', this.isSameState);
+      // ⭐ UPDATE COLUMN VISIBILITY
+      if (this.isSameState) {
+        this.showGST = false;
+        this.showCGST = true;
+        this.showSGST = true;
+      } else {
+        this.showGST = true;
+        this.showCGST = false;
+        this.showSGST = false;
+      }
       this.selectedInvoice = String(data.INVOICE_NO);
       this.transDate = new Date(data.TRANS_DATE);
       this.getLedgerCodeDropdown().then(() => {
@@ -190,6 +225,9 @@ export class EditCreditNoteComponent {
           const match = this.ledgerList.find(
             (l: any) => l.HEAD_ID === item.HEAD_ID
           );
+          const igst = parseFloat(item.GST) || 0;
+          const cgst = parseFloat(item.CGST) || 0;
+          const sgst = parseFloat(item.SGST) || 0;
           return {
             ...item,
             ledgerCode: match?.HEAD_CODE || '',
@@ -198,6 +236,9 @@ export class EditCreditNoteComponent {
             Amount: item.AMOUNT || '',
             gstAmount: item.GST_AMOUNT || '',
             HSN_CODE: this.HSNCODE,
+            GST: this.isSameState ? 0 : Number(item.GST) || 0,
+            CGST: this.isSameState ? Number(item.CGST) || 0 : 0,
+            SGST: this.isSameState ? Number(item.SGST) || 0 : 0,
           };
         });
       });
@@ -231,6 +272,13 @@ export class EditCreditNoteComponent {
 
         this.selectedDistributorId = match ? match.ID : null;
       }
+    });
+  }
+
+  getCustomerOrUnitLst() {
+    this.dataService.getCustomerWithState().subscribe((response: any) => {
+      this.distributorList = response;
+      console.log(this.distributorList, 'DISTLISTPOPUP');
     });
   }
   sessionData_tax() {
@@ -494,33 +542,39 @@ export class EditCreditNoteComponent {
       };
 
       e.editorOptions.onValueChanged = (args: any) => {
-  const selectedLedger = this.ledgerList.find(
-    (item: any) => item.HEAD_CODE === args.value
-  );
+        const selectedLedger = this.ledgerList.find(
+          (item: any) => item.HEAD_CODE === args.value
+        );
 
-  e.setValue(args.value);
+        e.setValue(args.value);
 
-  if (selectedLedger) {
-    // 1️⃣ Set ledger name
-    e.component.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
+        if (selectedLedger) {
+          // 1️⃣ Set ledger name
+          e.component.cellValue(
+            rowIndex,
+            'ledgerName',
+            selectedLedger.HEAD_NAME
+          );
 
-    // 2️⃣ Get HSN & GST from session
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
-    const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+          // 2️⃣ Get HSN & GST from session
+          const sessionData = JSON.parse(
+            sessionStorage.getItem('savedUserData')
+          );
+          const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
+          const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
 
-    // 3️⃣ Set HSN_CODE
-    e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+          // 3️⃣ Set HSN_CODE
+          e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
 
-    // 4️⃣ Set GST_PERC
-    e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+          // 4️⃣ Set GST_PERC
+          e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
 
-    // 5️⃣ Move to next field
-    setTimeout(() => {
-      this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-    }, 50);
-  }
-};
+          // 5️⃣ Move to next field
+          setTimeout(() => {
+            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+          }, 50);
+        }
+      };
     }
 
     // ➤ ledgerName: move to particulars on Enter

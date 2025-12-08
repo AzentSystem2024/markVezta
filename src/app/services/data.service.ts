@@ -327,6 +327,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Customer/custdtl`, {});
   }
 
+  getOutsideCustomerWithState(): Observable<any> {
+    return this.http.post(`${this.apiUrl}invoice/cust`, {});
+  }
+
   insertInvoice(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Invoice/insert`, data);
@@ -407,6 +411,10 @@ export class DataService {
   }
   getPendingInvoicesForReturn(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseReturn/pendinglist`, data);
+  }
+
+  getSupplierWithState(): Observable<any> {
+    return this.http.post(`${this.apiUrl}supplier/suppdtl`, {});
   }
 
   insertPurchaseReturn(items: any) {

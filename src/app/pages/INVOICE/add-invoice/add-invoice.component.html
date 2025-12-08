@@ -259,36 +259,52 @@
             ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
+        <!-- ✔ Row: Vehicle No (Left)  |  Round Off + Net Amount (Right) -->
         <div
-          style="display: flex; justify-content: flex-end; margin: 10px 20px"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 3px;
+          "
         >
-          <div style="display: flex; align-items: center; gap: 16px">
-            <!-- Round Off Checkbox -->
-            <dx-check-box
-              text="Round Off"
-              [(value)]="invoiceFormData.IS_ROUNDOFF"
-              (onValueChanged)="onRoundOffChange()"
-            ></dx-check-box>
-
-            <!-- Net Amount Field -->
-            <dx-text-box
-              label="Net Amount"
-              labelMode="floating"
-              [value]="netAmount"
-              [width]="150"
-              [readOnly]="true"
-            ></dx-text-box>
-          </div>
-        </div>
-        <div class="form-footer-wrapper">
-          <!-- LEFT SECTION -->
-          <div class="left-section">
+          <!-- LEFT SIDE → Vehicle No -->
+          <div>
             <dx-text-box
               label="Vehicle No"
               labelMode="floating"
               [(value)]="invoiceFormData.VEHICLE_NO"
               [width]="200"
             ></dx-text-box>
+          </div>
+
+          <!-- RIGHT SIDE → Round Off + Net Amount -->
+          <div style="display: flex; align-items: center; gap: 16px">
+            <dx-check-box
+              text="Round Off"
+              [(value)]="invoiceFormData.ROUND_OFF"
+              (onValueChanged)="onRoundOffChange()"
+            ></dx-check-box>
+
+            <dx-text-box
+              label="Net Amount"
+              labelMode="floating"
+              [value]="netAmount"
+              [width]="120"
+              [readOnly]="true"
+            ></dx-text-box>
+          </div>
+        </div>
+
+        <div class="form-footer-wrapper">
+          <!-- LEFT SECTION -->
+          <div class="left-section">
+            <!-- <dx-text-box
+              label="Vehicle No"
+              labelMode="floating"
+              [(value)]="invoiceFormData.VEHICLE_NO"
+              [width]="200"
+            ></dx-text-box> -->
           </div>
 
           <!-- RIGHT SECTION -->
@@ -311,7 +327,6 @@
               (onClick)="saveInvoice()"
               stylingMode="contained"
               type="default"
-              [width]="120"
             ></dx-button>
           </div>
         </div>

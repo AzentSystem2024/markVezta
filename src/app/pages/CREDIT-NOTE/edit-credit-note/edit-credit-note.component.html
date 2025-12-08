@@ -188,9 +188,25 @@
                 : ' GST %'
             "
             dataType="number"
+            [visible]="showGST"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
           </dxi-column>
+          <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
+            [allowEditing]="false"
+          ></dxi-column>
           <dxi-column
             dataField="gstAmount"
             [caption]="
