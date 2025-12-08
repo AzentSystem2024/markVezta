@@ -8,17 +8,19 @@
     [showBorders]="true"
       [showColumnLines]="true"
         [width]="'100%'"
+          (onEditorPreparing)="onEditorPreparing($event)"
       [height]="'75vh'"
   >
-   <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-pager
+   <!-- <dxo-paging [pageSize]="10"></dxo-paging> -->
+      <!-- <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
         [displayMode]="displayMode"
         [showPageSizeSelector]="showPageSizeSelector"
         [showInfo]="true"
         [showNavigationButtons]="true"
-      ></dxo-pager>
+      ></dxo-pager> -->
+<dxo-scrolling mode="virtual"></dxo-scrolling>
 
      <dxo-filter-row
   [visible]="isFilterRowVisible"
@@ -70,13 +72,23 @@
     <dxi-column dataField="DESCRIPTION" caption="Document Type"    [allowEditing]="false" >
      
     </dxi-column>
-    <dxi-column dataField="PREFIX" caption="Prefix"   [width]="'150'">
+    <dxi-column dataField="PREFIX" caption="Prefix"  [allowFiltering]="false"    [width]="'150'">
+      
    
     </dxi-column>
-        <dxi-column dataField="START" caption="Starting No."   [width]="'150'">
+    <dxi-column dataField="LAST_NO" caption="Last SNo."  [allowFiltering]="false" [height]="'20'"  [allowEditing]="false"  alignment="center"  [width]="'150'"></dxi-column>
+        <dxi-column dataField="START" caption="Starting No."   [allowFiltering]="false"  alignment="center"  [width]="'150'">
      
     </dxi-column>
-    <dxi-column dataField="WIDTH" caption="Width"   [width]="'100'">
+    <dxi-column dataField="WIDTH" caption="Width"  alignment="center"  [allowFiltering]="false"    [width]="'100'">
    
     </dxi-column>
+    <dxo-summary>
+  <dxi-total-item
+      summaryType="count"
+      column="DESCRIPTION"
+      displayFormat="Total Count: {0}">
+  </dxi-total-item>
+</dxo-summary>
+
   </dx-data-grid>
