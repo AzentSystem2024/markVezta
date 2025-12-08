@@ -122,7 +122,7 @@
 <dx-popup
   [(visible)]="addPopup"
   [width]="630"
-  height="580"
+  height="620"
   title="New Company"
   [shading]="false"
   [showCloseButton]="true"
@@ -206,7 +206,8 @@
               ></dx-text-box>
             </dxi-item>
           </dxi-item>
-          <dxi-item>
+          <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+            <dxi-item>
             <dx-select-box
               label="State"
               labelMode="floating"
@@ -223,6 +224,16 @@
                   message="CompanyType is required"
                 ></dxi-validation-rule> </dx-validator
             ></dx-select-box>
+            </dxi-item>
+
+            <dxi-item>
+              <dx-text-box
+              type="text"
+              labelMode="floating"
+              label="GST No."
+              formControlName="GSTNo">
+            </dx-text-box>
+            </dxi-item>
           </dxi-item>
           <dxi-item>
             <dx-text-box
@@ -300,6 +311,30 @@
                 formControlName="Email"
                 class="form-control mt-1"
                 label="Email"
+                labelMode="floating"
+              ></dx-text-box>
+            </dxi-item>
+          </dxi-item>
+
+            <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+            <dxi-item>
+              <dx-text-box
+                #whatsAppBoxRef
+                type="text"
+                formControlName="PAN"
+                class="form-control mt-1"
+                label="PAN No."
+                labelMode="floating"
+              ></dx-text-box>
+            </dxi-item>
+
+            <dxi-item>
+              <dx-text-box
+                #faxBoxRef
+                type="text"
+                formControlName="CIN"
+                class="form-control mt-1"
+                label="CIN"
                 labelMode="floating"
               ></dx-text-box>
             </dxi-item>
@@ -403,6 +438,20 @@
                   ></dxi-validation-rule> </dx-validator
               ></dx-text-box>
             </dxi-item>
+             <dxi-item>
+              <dx-text-box
+                #contactNameBoxRef
+                type="text"
+                [(value)]="editingRowData.CONTACT_NAME"
+                class="form-control mt-1"
+                label="ContactName"
+                labelMode="floating"
+              ></dx-text-box>
+            </dxi-item>
+            </dxi-item>
+
+             <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+            <dxi-item>
             <dx-select-box
               label="State"
               labelMode="floating"
@@ -420,18 +469,17 @@
                   message="CompanyType is required"
                 ></dxi-validation-rule> </dx-validator
             ></dx-select-box>
-            <dxi-item>
-              <dx-text-box
-                #contactNameBoxRef
-                type="text"
-                [(value)]="editingRowData.CONTACT_NAME"
-                class="form-control mt-1"
-                label="ContactName"
-                labelMode="floating"
-              ></dx-text-box>
-            </dxi-item>
           </dxi-item>
 
+            <dxi-item>
+              <dx-text-box
+              type="text"
+              labelMode="floating"
+              label="GST No."
+               [(value)]="editingRowData.GST_NO">
+            </dx-text-box>
+            </dxi-item>
+</dxi-item>
           <dxi-item>
             <dx-text-box
               #contactNameBoxRef
@@ -508,6 +556,32 @@
                 [(value)]="editingRowData.EMAIL"
                 class="form-control mt-1"
                 label="Email"
+                labelMode="floating"
+              ></dx-text-box>
+            </dxi-item>
+          </dxi-item>
+
+          
+
+           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+            <dxi-item>
+              <dx-text-box
+                #whatsAppBoxRef
+                type="text"
+                 [(value)]="editingRowData.PAN_NO"
+                class="form-control mt-1"
+                label="PAN No."
+                labelMode="floating"
+              ></dx-text-box>
+            </dxi-item>
+
+            <dxi-item>
+              <dx-text-box
+                #faxBoxRef
+                type="text"
+                 [(value)]="editingRowData.CIN"
+                class="form-control mt-1"
+                label="CIN"
                 labelMode="floating"
               ></dx-text-box>
             </dxi-item>

@@ -117,6 +117,7 @@
     [width]="popup_width"
     (save)="onClickSaveNewData()"
     (onHiding)="onPopupClose()"
+    [showApprove]="false"
   >
     <app-user-level-new-form
       #userLevelNewForm
@@ -132,6 +133,7 @@
     [width]="popup_width"
     (save)="onRowUpdating()"
     (onHiding)="onEditPopupClose()"
+    [showApprove]="false"
   >
     <app-user-level-edit-form
       [editValue]="clickedRowData"

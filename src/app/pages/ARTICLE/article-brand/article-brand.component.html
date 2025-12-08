@@ -114,6 +114,7 @@ noDataText=" "
 <form-popup
     [(visible)]="AddArticleBrandPopup"
    (save)="addData()"
+     [showApprove]="false"
     titleText="New Article Brand">
 
     <dx-validation-group #formValidationGroup>
@@ -148,6 +149,7 @@ noDataText=" "
 
 <form-popup
     [(visible)]="UpdateArticleBrandPopup"
+      [showApprove]="false"
     titleText="Update Article Color"
     (save)="editData()">
 

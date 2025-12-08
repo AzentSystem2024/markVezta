@@ -1,0 +1,39 @@
+ <div class="form-container">
+    <dx-text-box
+    label="StateCode"
+    labelMode="floating"
+      [(value)]="formStateData.STATE_CODE">
+</dx-text-box>
+     <dx-text-box
+    label="State Name"
+    labelMode="floating"
+      [(value)]="formStateData.STATE_NAME">
+</dx-text-box>
+     <dx-select-box
+    label="Country"
+    labelMode="floating"
+    [items]="CountryDropdownData"
+         [(value)]="formStateData.COUNTRY_ID"
+          displayExpr="COUNTRY_NAME"
+          valueExpr="ID"
+          placeholder="Select Country"
+          [searchEnabled]="true">
+</dx-select-box>
+ </div>
+
+  <div class="fixed-footer">
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        class="action-btn"
+        (onClick)="cancel()"
+      ></dx-button>
+      <dx-button
+        text="Save"
+        stylingMode="contained"
+        type="default"
+        class="action-btn"
+        (onClick)="onRowUpdating()"
+      ></dx-button>
+    </div>

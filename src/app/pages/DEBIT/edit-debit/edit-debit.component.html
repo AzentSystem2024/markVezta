@@ -57,7 +57,7 @@
                   <dx-select-box
                     #distributorRef
                     [(value)]="debitFormData[0].SUPP_ID"
-                    [dataSource]="supplierList"
+                    [dataSource]="distributorList"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     [width]="405"
@@ -188,7 +188,7 @@
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
                 ? ' VAT %'
-                : ' GST %'
+                : ' IGST %'
             "
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -210,9 +210,33 @@
           </dxi-column>
 
           <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
             dataField="HSN_CODE"
             caption="HSN Code"
             dataType="string"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="Total"
+            caption="Total"
+            dataType="number"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateTotal"
           ></dxi-column>
 
           <dxi-column type="buttons">
@@ -232,6 +256,15 @@
 
             <dxi-total-item
               column="gstAmount"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+
+            <dxi-total-item
+              column="Total"
               summaryType="sum"
               valueFormat="#,##0.00"
               displayFormat="Total: {0}"
@@ -260,6 +293,21 @@
             [width]="400"
             (onKeyDown)="onNarrationKeyDown($event)"
           ></dx-text-box>
+
+          <dx-text-box
+            label="Vehicle No"
+            labelMode="floating"
+            [(value)]="debitFormData[0].VEHICLE_NO"
+            [width]="200"
+          ></dx-text-box>
+
+          <!-- Middle: Round Off Checkbox -->
+          <dx-check-box
+            text="Round Off"
+            [(value)]="debitFormData[0].ROUND_OFF"
+            (onValueChanged)="onRoundOffChange()"
+            style="margin-top: 18px"
+          ></dx-check-box>
 
           <!-- Right: Net Amount + Approve checkbox -->
           <div

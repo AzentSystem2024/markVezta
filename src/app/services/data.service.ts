@@ -330,6 +330,13 @@ export class DataService {
   getOutsideCustomerWithState(): Observable<any> {
     return this.http.post(`${this.apiUrl}invoice/cust`, {});
   }
+  getCustomerStateTrout_Invoice(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Trout_Invoice/cust`, {});
+  }
+
+  //   getSupplierWithState(): Observable<any> {
+  //   return this.http.post(`${this.apiUrl}supplier/suppdtl`, {});
+  // }
 
   insertInvoice(items: any) {
     const data = items;
@@ -2016,6 +2023,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}state/list`, {});
   }
 
+  UpdateState(item: any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}state/save`, payload);
+  }
   // getStateData_Api(item:any){
   //  const reqBody=item
   //   return this.http.post(`${this.apiUrl}dropdown`, reqBody);
@@ -2046,6 +2057,10 @@ export class DataService {
     const data = { ID, STATE_CODE, STATE_NAME, COUNTRY_ID };
 
     return this.http.post(`${this.apiUrl}state/save`, data);
+  }
+
+  SelectState(id: any) {
+    return this.http.post(`${this.apiUrl}State/select/${id}`, {});
   }
 
   //item-property1
@@ -5909,6 +5924,19 @@ The result can be exported to HTML or Markdown.`;
 
   Insert_BankReconciliation(payload) {
     const getEndpoint = `${this.apiUrl}BankReconciliation/save`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+  List_setting(payload) {
+    const getEndpoint = `${this.apiUrl}DocSettings/list`;
+    return this.http.post(getEndpoint, payload);
+  }
+  Add_setting(payload) {
+    const getEndpoint = `${this.apiUrl}DocSettings/insert`;
+    return this.http.post(getEndpoint, payload);
+  }
+  Doc_Last_SNo(payload) {
+    const getEndpoint = `${this.apiUrl}DocSettings/nextvoucherno`;
     return this.http.post(getEndpoint, payload);
   }
 }

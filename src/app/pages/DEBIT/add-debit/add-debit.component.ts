@@ -85,6 +85,11 @@ export class AddDebitComponent {
   sessionData: any;
   selected_vat_id: any;
   dropdownJustOpened = false;
+
+  showCGST:boolean = false;
+  showGST:boolean = false;
+  showSGST:boolean = false;
+
   debitFormData: any = {
     TRANS_TYPE: 36,
     COMPANY_ID: 1,
@@ -97,6 +102,8 @@ export class AddDebitComponent {
     INVOICE_NO: '',
     UNIT_ID: '',
     IS_APPROVED: false,
+    VEHICLE_NO:'',
+    ROUND_OFF:false,
     NOTE_DETAIL: [
       {
         SL_NO: '',
@@ -104,6 +111,8 @@ export class AddDebitComponent {
         AMOUNT: '',
         GST_AMOUNT: '',
         REMARKS: '',
+        CGST:0,
+        SGST:0
       },
     ],
   };
@@ -120,7 +129,15 @@ export class AddDebitComponent {
   net: string;
   HSN_CODE: any;
   GST_PERC: any;
-  constructor(private dataService: DataService) {}
+netAmount: string;
+  selectedCompany: any;
+  companyState: any;
+  GST: any;
+  distributorList: any;
+  grandTotal: number;
+  constructor(private dataService: DataService) {
+    this.sessionData_tax();
+  }
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -142,6 +159,13 @@ export class AddDebitComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+
+     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+ console.log(this.selectedCompany)
+ this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
+ console.log(this.companyState)
+ this.GST = this.sessionData.GeneralSettings.GST_PERC;
+ console.log(this.GST,'GST')
   }
 
   ngOnInit() {
@@ -170,7 +194,8 @@ export class AddDebitComponent {
     this.getDocNo();
     this.getLedgerCodeDropdown();
     this.getCompanyListDropdown();
-    this.getSupplierDropdown();
+    // this.getSupplierDropdown();
+    this.getSupplierOrUnitLst();
     this.sessionData_tax();
     this.getPendingInvoices();
     this.debitFormData.NOTE_DETAIL = [
@@ -228,15 +253,69 @@ export class AddDebitComponent {
     });
   }
 
+
+      getSupplierOrUnitLst() {
+    this.dataService.getSupplierWithState().subscribe((response: any) => {
+      this.distributorList = response;
+      console.log(this.distributorList, 'DISTLISTPOPUP');
+    });
+  }
+
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
-    if (this.selectedSupplierId) {
-      this.selectedSupplier = this.supplierList.find(
-        (s: any) => s.ID === this.selectedSupplierId
-      );
+ console.log(this.selectedSupplierId)
+   
+     const selectedSupplier = this.distributorList.find(
+      (supplier: any) => supplier.ID === this.selectedSupplierId
+    );
+
+    
+console.log(selectedSupplier)
+     const company = this.companyState?.trim().toLowerCase();
+     console.log(company)
+     const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
+     console.log(supplier)
+     const sessionGst = parseFloat(this.GST) || 0; // main GST%
+     console.log(sessionGst)
+
+      if (company === supplier) {
+      console.log('Both states SAME → CGST + SGST apply');
+
+      this.showCGST = true;
+      this.showSGST = true;
+      this.showGST = false;
+
+      //  Split GST into CGST + SGST
+      const half = sessionGst / 2;
+
+      // Update all grid rows
+      this.debitFormData.NOTE_DETAIL?.forEach((row: any) => {
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0; // GST becomes zero in same-state case
+      });
+    } else {
+      console.log('States DIFFERENT → GST applies');
+
+      this.showGST = true;
+      this.showCGST = false;
+      this.showSGST = false;
+
+      // ⭐ GST only
+      this.debitFormData.NOTE_DETAIL?.forEach((row: any) => {
+        row.GST = sessionGst;
+        row.CGST = 0;
+        row.SGST = 0;
+      });
+    }
+    this.selectedSupplier = selectedSupplier
+    
+
+     if (this.selectedSupplierId) {
       this.debitFormData.PARTY_NAME = this.selectedSupplier.DESCRIPTION;
       console.log(this.selectedSupplier.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
-    }
+     }
+
     if (this.selectedSupplierId) {
       this.debitFormData.SUPP_ID = this.selectedSupplierId;
       console.log(
@@ -830,6 +909,8 @@ e.editorOptions.onValueChanged = (args: any) => {
           HEAD_ID: ledger?.HEAD_ID || null,
           AMOUNT: Number(row.Amount) || 0,
           GST_PERC: Number(row.GST_PERC) || 0,
+          CGST:Number(row.CGST) || 0,
+          SGST:Number(row.SGST) || 0,
           GST_AMOUNT: gstAmount,
           REMARKS: row.particulars || '',
         };
@@ -946,11 +1027,76 @@ e.editorOptions.onValueChanged = (args: any) => {
 
     // // Refresh grid and focus the ledgerCode cell
 
+
     setTimeout(() => {
       const grid = this.itemsGridRef?.instance;
       const newRowIndex = this.debitFormData.NOTE_DETAIL.length - 1;
       grid?.editCell(newRowIndex, 'ledgerCode');
     }, 100);
+
+     const selectedSupplier = this.distributorList.find(
+      (supplier: any) => supplier.ID === this.selectedSupplierId
+    );
+
+    
+console.log(selectedSupplier)
+     const company = this.companyState?.trim().toLowerCase();
+     console.log(company)
+     const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
+     console.log(supplier)
+     const sessionGst = parseFloat(this.GST) || 0; // main GST%
+     console.log(sessionGst)
+
+      if (company === supplier) {
+      console.log('Both states SAME → CGST + SGST apply');
+
+      this.showCGST = true;
+      this.showSGST = true;
+      this.showGST = false;
+
+      //  Split GST into CGST + SGST
+      const half = sessionGst / 2;
+
+      // Update all grid rows
+      this.debitFormData.NOTE_DETAIL?.forEach((row: any) => {
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0; // GST becomes zero in same-state case
+      });
+    } else {
+      console.log('States DIFFERENT → GST applies');
+
+      this.showGST = true;
+      this.showCGST = false;
+      this.showSGST = false;
+
+      // ⭐ GST only
+      this.debitFormData.NOTE_DETAIL?.forEach((row: any) => {
+        row.GST = sessionGst;
+        row.CGST = 0;
+        row.SGST = 0;
+      });
+    }
+    this.selectedSupplier = selectedSupplier
+    
+  }
+
+  calculateTotal = (row: any) => {
+    console.log(row)
+  const amount = Number(row.Amount) || 0;
+ const gst = this.calculateTaxAmount(row) || 0;
+  return amount + gst;
+};
+
+
+     onRoundOffChange() {
+    if (this.debitFormData.ROUND_OFF) {
+      // Round Off Enabled
+      this.netAmountDisplay = Math.round(this.grandTotal).toFixed(2);
+    } else {
+      // Round Off Disabled → return to original value
+      this.netAmountDisplay = Number(this.grandTotal).toFixed(2);
+    }
   }
 }
 

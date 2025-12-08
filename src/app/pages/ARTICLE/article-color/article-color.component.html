@@ -106,14 +106,16 @@ noDataText=" "
 <form-popup
     [(visible)]="AddArticleColorPopup"
    (save)="addData()"
-    titleText="New Article Color">
+    titleText="New Article Color"
+    [showApprove]="false">
 
     <dx-validation-group #formValidationGroup>
     <dx-form class="plain-styled-form" [formGroup]="formsource" >
         <dxi-item>
          <dx-text-box
          label="Code"
-         formControlName="Code">
+         formControlName="Code"
+         labelMode="floating">
          <dx-validator>
                   <dxi-validation-rule
                     type="required"
@@ -124,6 +126,7 @@ noDataText=" "
 
         <dxi-item>
             <dx-text-box
+            labelMode="floating"
             label="Color English"
             formControlName="ColorEnglish">
             <dx-validator>
@@ -136,6 +139,7 @@ noDataText=" "
 
         <dxi-item>
             <dx-text-box
+            labelMode="floating"
             label="Color Arabic"
             formControlName="ColorArabic">
             <dx-validator>
@@ -153,13 +157,15 @@ noDataText=" "
 <form-popup
     [(visible)]="UpdateArticleColorPopup"
     titleText="Update Article Color"
-    (save)="editData()">
+    (save)="editData()"
+      [showApprove]="false">
 
     <dx-validation-group #formValidationGroup>
     <dx-form class="plain-styled-form">
         <dxi-item>
          <dx-text-box
          label="Code"
+         labelMode="floating"
          [(value)]="editingRowData.CODE">
          <dx-validator>
                   <dxi-validation-rule
@@ -172,6 +178,7 @@ noDataText=" "
         <dxi-item>
             <dx-text-box
             label="Color English" 
+            labelMode="floating"
             [(value)]="editingRowData.COLOR_ENGLISH">
             <dx-validator>
                   <dxi-validation-rule
@@ -183,6 +190,7 @@ noDataText=" "
 
         <dxi-item>
             <dx-text-box
+            labelMode="floating"
             label="Color Arabic" 
             [(value)]="editingRowData.COLOR_ARABIC">
             <dx-validator>
