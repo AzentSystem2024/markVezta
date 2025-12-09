@@ -185,7 +185,7 @@ export class EditCreditNoteComponent {
     if (changes['creditFormData'] && this.creditFormData?.length) {
       const data = this.creditFormData[0];
       this.creditFormData.PARTY_NAME = data.PARTY_NAME;
-      console.log(this.creditFormData, 'INEDITTTTTTTTTTT');
+      console.log(this.creditFormData.ROUND_OFF, 'INEDITTTTTTTTTTT');
       this.companyStateID = this.selectedCompany?.STATE_ID;
 
       if (this.creditFormData?.length) {
@@ -1161,7 +1161,7 @@ onRoundOffChange() {
     };
 
     console.log('Update Payload:', payload);
-
+    console.log(this.transDate, 'TRANSDATEEEEEEEEEEEEE');
     this.dataService.updateCreditNote(payload).subscribe((response) => {
       if (response) {
         notify(
