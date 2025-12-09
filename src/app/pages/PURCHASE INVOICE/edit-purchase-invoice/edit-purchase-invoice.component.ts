@@ -52,6 +52,8 @@ import { confirm } from 'devextreme/ui/dialog';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+
+
 @Component({
   selector: 'app-edit-purchase-invoice',
   templateUrl: './edit-purchase-invoice.component.html',
@@ -100,6 +102,7 @@ export class EditPurchaseInvoiceComponent {
   totalAmount: any;
   netAmount: string;
   summaryValues: any;
+  logoBase64: string;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -117,6 +120,12 @@ export class EditPurchaseInvoiceComponent {
     this.getSupplierOrUnitLst();
     // this.getPendingGRNList();
     this.getPurchNo();
+const imagePath = 'assets/markLogo.jpg';
+this.convertToBase64(imagePath).then((base64) => {
+  this.logoBase64 = base64;
+  console.log("Logo Base64 Loaded");
+});
+
     this.sessionData_tax();
   }
 
@@ -750,6 +759,7 @@ ngOnChanges(changes: SimpleChanges): void {
     });
   }
 
+  
   generatePDF(data: any) {
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -762,16 +772,18 @@ ngOnChanges(changes: SimpleChanges): void {
     // LOGO BOX (SMALL)
     const logoX = 18;
     const logoY = headerY;
-    const logoW = 55;
-    const logoH = 22;
+    const logoW = 30;
+    const logoH = 30;
 
     doc.setFillColor(225, 225, 225);
     doc.rect(logoX, logoY, logoW, logoH, 'F');
-
     doc.setFontSize(11);
-    doc.text('logo', logoX + logoW / 2, logoY + logoH / 2 + 3, {
-      align: 'center',
-    });
+    // doc.addImage('../', 'PNG', logoX, logoY, logoW, logoH);
+      doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
+
+    // doc.text('logo', logoX + logoW / 2, logoY + logoH / 2 + 3, {
+    //   align: 'center',
+    // });
 
     // RIGHT-TOP DETAILS
     const rightX = pageWidth - 15;
@@ -780,10 +792,10 @@ ngOnChanges(changes: SimpleChanges): void {
     const purchDate = (data.PURCH_DATE || '').split('T')[0];
 
     const headerLines = [
-      `Debit Note No : ${data.PURCH_NO}`,
-      `e-Way Bill No :`,
-      `Original Invoice No. & Date:`,
-      `Dated : ${this.formatDateDDMMMyyyy(purchDate)}`,
+      `GST IN : ${data.PURCH_NO}`,
+      `CIN :`,
+      `PAN:`,
+      `e-Way Bill No. : ${this.formatDateDDMMMyyyy(purchDate)}`,
     ];
 
     doc.setFont('helvetica', 'normal');
@@ -840,6 +852,52 @@ ngOnChanges(changes: SimpleChanges): void {
       doc.text(line || '', compBoxX + 5, cy);
       doc.setTextColor(0, 0, 0);
     });
+// ============================================================
+// 3) DISPATCHED FROM (LEFT SIDE)
+// ============================================================
+
+let dispX = compBoxX;                   // same left alignment
+let dispY = compBoxY + compBoxH + 10;   // positioned below company box
+
+
+let startX = 15;
+let startY =  compBoxY + compBoxH + 50; 
+let gap = 7; // space between lines
+
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(11);
+doc.text('Dispatched from', dispX, dispY);
+
+
+
+doc.setFontSize(12);
+doc.setFont("helvetica", "bold");
+
+doc.text('Invoice Serial No', startX, startY);
+
+doc.setFont("helvetica", "normal");
+doc.text('Invoice Date:', startX, startY + gap);
+doc.text('Vehicle No:', startX, startY + gap * 2);
+doc.text('Mode of Transport:', startX, startY + gap * 3);
+// doc.text('Dispatched From:', startX, startY + gap * 4);
+dispY += 6;
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(10);
+
+const dispatchLines = [
+  data.DISPATCH_ADDRESS1,
+  data.DISPATCH_ADDRESS2,
+  data.DISPATCH_ADDRESS3,
+  `Pin: ${data.DISPATCH_PIN}`,
+];
+
+// Print lines
+dispatchLines.forEach(line => {
+  if (line) {
+    doc.text(line, dispX, dispY);
+    dispY += 5;
+  }
+});
 
     // ============================================================
     // 3) CONSIGNEE (SHIP TO)
@@ -891,14 +949,14 @@ ngOnChanges(changes: SimpleChanges): void {
     });
 
     // LINE BELOW BUYER BLOCK
-    const tableLineY = buyerY + 2;
+    const tableLineY = buyerY + 40;
     doc.setDrawColor(180);
     doc.line(15, tableLineY, pageWidth - 15, tableLineY);
 
     // ============================================================
     // 5) TABLE — EXACT SAME WIDTH AS THE LINE (180mm)
     // ============================================================
-    const tableStartY = tableLineY + 4;
+    const tableStartY = tableLineY + 5;
 
     const rows = data.PurchDetails.map((item: any, index: number) => [
       index + 1, // Sl No
@@ -992,6 +1050,17 @@ ngOnChanges(changes: SimpleChanges): void {
     // restore normal
     doc.setFont('helvetica', 'normal');
 
+    let amtY = footerY + 20;
+
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(10);
+doc.text("Amount Chargeable (in words)", 15, amtY);
+
+amtY += 6;
+doc.setFont('helvetica', 'bold');
+doc.text(`INR ${data.AMOUNT_IN_WORDS || ''}`, 15, amtY);
+
+
     // THANK YOU
     // doc.text('Thank you for your business!', pageWidth / 2, finalY + 25, {
     //   align: 'center',
@@ -1008,6 +1077,18 @@ ngOnChanges(changes: SimpleChanges): void {
   cancel() {
     this.popupClosed?.emit();
   }
+
+private async convertToBase64(path: string): Promise<string> {
+  const response = await fetch(path);
+  const blob = await response.blob();
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.readAsDataURL(blob);
+  });
+}
+
 }
 
 @NgModule({
