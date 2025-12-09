@@ -129,6 +129,7 @@ export class ArticleAddComponent {
   zoomActive = false;
   selectedUnitsTooltip: string = '';
   isDragOver: boolean = false;
+  selectedItemID: any;
 
   constructor(private dataService: DataService) {}
 
@@ -292,7 +293,7 @@ export class ArticleAddComponent {
         const selectedDescription = args.value;
         const grid = e.component;
         const rowIndex = e.row.rowIndex;
-
+        console.log(args, 'ARGSSSSSSSSSSSSSS');
         // Keep the selected value in the grid
         grid.cellValue(rowIndex, 'ITEM', selectedDescription);
 
@@ -300,14 +301,13 @@ export class ArticleAddComponent {
         const matchedItem = this.itemsList.find(
           (p: any) => p.DESCRIPTION === selectedDescription
         );
+        console.log(matchedItem.ID, 'MATCHEDITEMMMMMMMMMMMMMMMMMMM');
+        grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
 
+        console.log(this.selectedItemID, 'ID');
         // Save ID separately
         grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
 
-        // const matchedItem = this.itemsList.find(
-        //   (p: any) => p.DESCRIPTION === selectedDescription
-        // );
-        // this.selectedItemId = matchedItem ? matchedItem.ID : null;
         let itemCode = null;
         if (selectedDescription) {
           itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
@@ -322,6 +322,7 @@ export class ArticleAddComponent {
               // Fill DESCRIPTION and UOM
               grid.cellValue(rowIndex, 'DESCRIPTION', data.DESCRIPTION);
               grid.cellValue(rowIndex, 'UOM', data.UOM);
+              grid.cellValue(rowIndex, 'ITEM_ID', data.ID);
 
               // Move focus automatically to QUANTITY
               setTimeout(() => {
@@ -754,11 +755,10 @@ export class ArticleAddComponent {
         const bomGridData =
           this.itemsGridRef?.instance
             .getVisibleRows()
-            .map((row: any) => row.data)
-            .filter((row: any) => row.ITEM && row.QUANTITY > 0)
-            .map((row: any) => ({
-              // ITEM_CODE: row.ITEM,
-              ITEM_CODE: String(this.selectedItemId),
+            .map((r) => r.data)
+            .filter((row) => row.ITEM_ID && row.QUANTITY > 0)
+            .map((row) => ({
+              ITEM_CODE: String(row.ITEM_ID),
               QUANTITY: row.QUANTITY,
             })) || [];
 
