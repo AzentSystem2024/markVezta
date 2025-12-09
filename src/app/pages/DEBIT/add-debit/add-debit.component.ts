@@ -135,6 +135,8 @@ netAmount: string;
   GST: any;
   distributorList: any;
   grandTotal: number;
+  netTotal:number;
+  companyStateID: any;
   constructor(private dataService: DataService) {
     this.sessionData_tax();
   }
@@ -785,22 +787,42 @@ e.editorOptions.onValueChanged = (args: any) => {
     return amt + gst;
   };
 
-  get netAmountString(): string {
+    get netAmountString(): string {
     const details = this.debitFormData?.NOTE_DETAIL || [];
     let totalAmount = 0;
     let totalGST = 0;
 
+    const isSameState = this.companyStateID === this.selectedSupplier?.STATE_ID;
+
     details.forEach((item: any) => {
       const amount = Number(item.Amount) || 0;
-      const gstPerc = Number(item.GST_PERC) || 0;
-
       totalAmount += amount;
-      totalGST += (amount * gstPerc) / 100; // Recalculate GST live
+
+      if (isSameState) {
+        // ⭐ SAME STATE → CGST + SGST
+        const cgst = Number(item.CGST) || 0;
+        const sgst = Number(item.SGST) || 0;
+        const totalGstPerc = cgst + sgst;
+
+        totalGST += (amount * totalGstPerc) / 100;
+      } else {
+        // ⭐ DIFFERENT STATE → IGST
+        const gstPerc = Number(item.GST_PERC) || 0;
+        totalGST += (amount * gstPerc) / 100;
+      }
     });
-    this.net = (totalAmount + totalGST).toFixed(2);
-    // console.log('Net Amount (from getter):', this.net);
-    return (totalAmount + totalGST).toFixed(2);
+
+    // ⭐ Raw total (before round-off)
+    this.netTotal = totalAmount + totalGST;
+
+    // ⭐ Apply round-off only if checkbox enabled
+    if (this.debitFormData.ROUND_OFF) {
+      this.netTotal = Math.round(this.netTotal);
+    }
+    console.log(this.netTotal, 'NETTOTALLLLLLLL');
+    return this.netTotal.toFixed(2);
   }
+
 
   formatDate(date: any): string {
     const d = new Date(date);
@@ -1089,15 +1111,16 @@ console.log(selectedSupplier)
 };
 
 
-     onRoundOffChange() {
+   onRoundOffChange() {
     if (this.debitFormData.ROUND_OFF) {
       // Round Off Enabled
-      this.netAmountDisplay = Math.round(this.grandTotal).toFixed(2);
+      this.netAmount = Math.round(this.netTotal).toFixed(2);
     } else {
       // Round Off Disabled → return to original value
-      this.netAmountDisplay = Number(this.grandTotal).toFixed(2);
+      this.netAmount = Number(this.netTotal).toFixed(2);
     }
   }
+
 }
 
 @NgModule({

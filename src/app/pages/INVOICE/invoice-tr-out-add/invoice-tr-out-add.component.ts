@@ -820,7 +820,7 @@ logGridSummaries() {
   }
 
    onRoundOffChange() {
-    if (this.invoiceFormData.IS_ROUNDOFF) {
+    if (this.invoiceFormData.ROUND_OFF) {
       // Round Off Enabled
       this.netAmount = Math.round(this.grandTotal).toFixed(2);
     } else {

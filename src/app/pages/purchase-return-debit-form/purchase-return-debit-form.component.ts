@@ -211,90 +211,159 @@ export class PurchaseReturnDebitFormComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
-  isEditDataAvailable() {
-    if (!this.isEditing || !this.EditingResponseData) {
-      return; // Not edit mode → nothing to load
-    }
+//   isEditDataAvailable() {
+//     if (!this.isEditing || !this.EditingResponseData) {
+//       return; // Not edit mode → nothing to load
+//     }
 
-    const data = this.EditingResponseData;
-    console.log(data, 'DATAINEDITFORM');
-    // Populate header fields
-    this.purchaseReturnFormData = {
-      // ID: data.ID,
-      TRANS_ID: data.TRANS_ID,
-      COMPANY_ID: this.purchaseReturnFormData.COMPANY_ID,
-      STORE_ID: data.STORE_ID,
-      // RET_DATE: new Date(data.RET_DATE),
-      RET_DATE: data.RET_DATE,
-      SUPP_ID: data.SUPP_ID,
-      GRN_ID: data.GRN_ID,
-      GRN_NO: data.GRN_NO,
-      IS_CREDIT: data.IS_CREDIT,
-      GROSS_AMOUNT: data.GROSS_AMOUNT,
-      VAT_AMOUNT: data.VAT_AMOUNT,
-      NET_AMOUNT: data.NET_AMOUNT,
-      USER_ID: this.purchaseReturnFormData.USER_ID,
-      NARRATION: data.NARRATION,
-      CURRENCY_SYMBOL: data.CURRENCY_SYMBOL,
-      PurchDetail: data.PurchDetail || [],
-      SUPPPLIER_NAME: data.SUPPPLIER_NAME,
-      RETURN_AMOUNT: data.RETURN_AMOUNT,
-      FIN_ID: this.purchaseReturnFormData.FIN_ID,
-      RET_NO: data.RET_NO,
-      VEHICLE_NO: data.VEHICLE_NO,
-      ROUND_OFF: data.ROUND_OFF,
-    };
+//     const data = this.EditingResponseData;
+//     console.log(data, 'DATAINEDITFORM');
+//     // Populate header fields
+//     this.purchaseReturnFormData = {
+//       // ID: data.ID,
+//       TRANS_ID: data.TRANS_ID,
+//       COMPANY_ID: this.purchaseReturnFormData.COMPANY_ID,
+//       STORE_ID: data.STORE_ID,
+//       // RET_DATE: new Date(data.RET_DATE),
+//       RET_DATE: data.RET_DATE,
+//       SUPP_ID: data.SUPP_ID,
+//       GRN_ID: data.GRN_ID,
+//       GRN_NO: data.GRN_NO,
+//       IS_CREDIT: data.IS_CREDIT,
+//       GROSS_AMOUNT: data.GROSS_AMOUNT,
+//       VAT_AMOUNT: data.VAT_AMOUNT,
+//       NET_AMOUNT: data.NET_AMOUNT,
+//       USER_ID: this.purchaseReturnFormData.USER_ID,
+//       NARRATION: data.NARRATION,
+//       CURRENCY_SYMBOL: data.CURRENCY_SYMBOL,
+//       PurchDetail: data.PurchDetail || [],
+//       SUPPPLIER_NAME: data.SUPPPLIER_NAME,
+//       RETURN_AMOUNT: data.RETURN_AMOUNT,
+//       FIN_ID: this.purchaseReturnFormData.FIN_ID,
+//       RET_NO: data.RET_NO,
+//       VEHICLE_NO: data.VEHICLE_NO,
+//       ROUND_OFF: data.ROUND_OFF,
+//     };
 
-    // Populate supplier selection
-    this.selectedSupplierId = data.SUPP_ID;
-    console.log(this.supplierList, 'SELECTEDSUPPLIERIDDDDDDDDDDDDDDD');
-    // Step 1: Find supplier from list
-    // FIX FOR GST COLUMNS IN EDIT MODE
-    const supplier = this.supplierList?.find(
-      (s: any) => s.ID === this.selectedSupplierId
-    );
-    console.log(supplier, 'SUPPLIERRRRRRRRRRR');
-    if (supplier) {
-      this.selectedSupplierStateId = supplier.STATE_ID;
-      this.sameState = this.selectedSupplierStateId === this.companyStateId;
+//     console.log(this.purchaseReturnFormData)
+//     // Populate supplier selection
+//     this.selectedSupplierId = data.SUPP_ID;
+//     console.log(this.supplierList, 'SELECTEDSUPPLIERIDDDDDDDDDDDDDDD');
+//     // Step 1: Find supplier from list
+//     // FIX FOR GST COLUMNS IN EDIT MODE
+//     const supplier = this.supplierList?.find(
+//       (s: any) => s.ID === this.selectedSupplierId
+//     );
+//     console.log(supplier, 'SUPPLIERRRRRRRRRRR');
+//     if (supplier) {
+//       this.selectedSupplierStateId = supplier.STATE_ID;
+//       this.sameState = this.selectedSupplierStateId === this.companyStateId;
 
-      this.showCGST = this.sameState;
-      this.showSGST = this.sameState;
-      this.showGST = !this.sameState;
-    }
+//       this.showCGST = this.sameState;
+//       this.showSGST = this.sameState;
+//       this.showGST = !this.sameState;
+//     }
 
-    // Fill grid rows
-    this.mainGridData = (data.PurchDetail || []).map((item) => ({
-      DETAIL_ID: item.PURCH_DET_ID,
-      ITEM_ID: item.ITEM_ID,
-      GRN_DET_ID: item.GRN_DET_ID,
-      TRANSFER_NO: item.DOC_NO,
-      TRANSFER_DATE: item.PURCH_DATE,
-      ITEM_NAME: item.ITEM_NAME,
-      PENDING_QTY: item.PENDING_QTY,
-      RATE: item.RATE,
-      QUANTITY: item.QUANTITY,
-      AMOUNT: item.AMOUNT,
-      VAT_AMOUNT: item.VAT_AMOUNT,
-      TOTAL_AMOUNT: item.TOTAL_AMOUNT,
-      UOM: item.UOM,
-      UOM_PURCH: item.UOM_PURCH,
-      UOM_MULTIPLE: item.UOM_MULTIPLE,
-      BARCODE: item.BAR_CODE,
-      HSN_CODE: this.HSNCODE,
+//     // Fill grid rows
+//     this.mainGridData = (data.PurchDetail || []).map((item) => ({
+//       DETAIL_ID: item.PURCH_DET_ID,
+//       ITEM_ID: item.ITEM_ID,
+//       GRN_DET_ID: item.GRN_DET_ID,
+//       TRANSFER_NO: item.DOC_NO,
+//       TRANSFER_DATE: item.PURCH_DATE,
+//       ITEM_NAME: item.ITEM_NAME,
+//       PENDING_QTY: item.PENDING_QTY,
+//       RATE: item.RATE,
+//       QUANTITY: item.QUANTITY,
+//       AMOUNT: item.AMOUNT,
+//       VAT_AMOUNT: item.VAT_AMOUNT,
+//       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
+//       UOM: item.UOM,
+//       UOM_PURCH: item.UOM_PURCH,
+//       UOM_MULTIPLE: item.UOM_MULTIPLE,
+//       BARCODE: item.BAR_CODE,
+//       HSN_CODE: this.HSNCODE,
 
-      // GST values
-      CGST: item.CGST ?? 0,
-      SGST: item.SGST ?? 0,
-      GST: item.VAT_PERC ?? 0,
-    }));
+//       // GST values
+//       CGST: item.CGST ?? 0,
+//       SGST: item.SGST ?? 0,
+//       GST: item.VAT_PERC ?? 0,
+//     }));
 
-    // Force VAT recalculation after grid loads
-    setTimeout(() => {
-      this.mainGridData = [...this.mainGridData];
-      this.itemsGridRef?.instance?.refresh();
-    }, 200);
+//     console.log(this.mainGridData)
+//     // Force VAT recalculation after grid loads
+// setTimeout(() => {
+//   this.mainGridData = [...this.mainGridData];
+
+//   // Run AFTER view becomes stable
+//   this.cdr.detectChanges();
+
+//   setTimeout(() => {
+//     if (this.itemsGridRef?.instance) {
+//       this.itemsGridRef.instance.option("dataSource", this.mainGridData);
+//       this.itemsGridRef.instance.refresh();
+//     }
+//   });
+// }, 0);
+
+//   }
+
+isEditDataAvailable() {
+  if (!this.isEditing || !this.EditingResponseData) return;
+
+  const data = this.EditingResponseData;
+
+  // Form patch
+  this.purchaseReturnFormData = { ...this.purchaseReturnFormData, ...data };
+
+  // Supplier GST logic
+  const supplier = this.supplierList?.find((s: any) => s.ID === data.SUPP_ID);
+  if (supplier) {
+    this.sameState = supplier.STATE_ID === this.companyStateId;
+    this.showCGST = this.sameState;
+    this.showSGST = this.sameState;
+    this.showGST = !this.sameState;
   }
+
+  // IMPORTANT: Reset grid before binding
+  this.mainGridData = [];
+  this.cdr.detectChanges();
+
+  // Map grid rows
+  this.mainGridData = (data.PurchDetail || []).map(item => ({
+    DETAIL_ID: item.PURCH_DET_ID,
+    ITEM_ID: item.ITEM_ID,
+    GRN_DET_ID: item.GRN_DET_ID,
+    TRANSFER_NO: item.DOC_NO,
+    TRANSFER_DATE: item.PURCH_DATE,
+    ITEM_NAME: item.ITEM_NAME,
+    PENDING_QTY: item.PENDING_QTY,
+    RATE: item.RATE,
+    QUANTITY: item.QUANTITY,
+    AMOUNT: item.AMOUNT,
+    VAT_AMOUNT: item.VAT_AMOUNT,
+    TOTAL_AMOUNT: item.TOTAL_AMOUNT,
+    UOM: item.UOM,
+    UOM_PURCH: item.UOM_PURCH,
+    UOM_MULTIPLE: item.UOM_MULTIPLE,
+    BARCODE: item.BAR_CODE,
+    HSN_CODE: this.HSNCODE,
+    CGST: item.CGST ?? 0,
+    SGST: item.SGST ?? 0,
+    GST: item.VAT_PERC ?? 0,
+  }));
+
+  // Force grid refresh
+  setTimeout(() => {
+    if (this.itemsGridRef?.instance) {
+      this.itemsGridRef.instance.beginUpdate();
+      this.itemsGridRef.instance.option("dataSource", this.mainGridData);
+      this.itemsGridRef.instance.endUpdate();
+      this.itemsGridRef.instance.refresh();
+    }
+  }, 50);
+}
+
 
   getDocNo() {
     this.dataService.getPurchaseReturnNo().subscribe((response: any) => {
