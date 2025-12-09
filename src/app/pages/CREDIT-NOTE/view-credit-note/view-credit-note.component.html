@@ -146,6 +146,7 @@
               : ' GST %'
           "
           dataType="number"
+          [visible]="showGST"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
@@ -159,10 +160,35 @@
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         ></dxi-column>
+
+        <dxi-column
+          dataField="CGST"
+          caption="CGST"
+          dataType="number"
+          [visible]="showCGST"
+          [allowEditing]="false"
+        ></dxi-column>
+
+        <dxi-column
+          dataField="SGST"
+          caption="SGST"
+          dataType="number"
+          [visible]="showSGST"
+          [allowEditing]="false"
+        ></dxi-column>
+
         <dxi-column
           dataField="HSN_CODE"
           caption="HSN Code"
           dataType="string"
+        ></dxi-column>
+
+        <dxi-column
+          dataField="Total"
+          caption="Total"
+          dataType="number"
+          [allowEditing]="false"
+          [calculateCellValue]="calculateTotal"
         ></dxi-column>
 
         <dxo-summary>
@@ -180,6 +206,15 @@
             displayFormat="Total: {0}"
             alignment="right"
           ></dxi-total-item>
+
+          <dxi-total-item
+            column="Total"
+            summaryType="sum"
+            valueFormat="#,##0.00"
+            displayFormat="Total: {0}"
+            alignment="right"
+          >
+          </dxi-total-item>
         </dxo-summary>
       </dx-data-grid>
 
@@ -193,15 +228,30 @@
           width: 100%;
         "
       >
-        <!-- Left: Narration -->
-        <dx-text-box
-          label="Narration"
-          [value]="creditFormData?.[0]?.NARRATION"
-          labelMode="floating"
-          [width]="400"
-          [readOnly]="true"
-        ></dx-text-box>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <!-- Left: Narration -->
 
+          <dx-text-box
+            label="Vehicle Number"
+            labelMode="floating"
+            [value]="creditFormData?.[0]?.VEHICLE_NO"
+            [width]="200"
+          ></dx-text-box>
+
+          <dx-text-box
+            label="Narration"
+            [value]="creditFormData?.[0]?.NARRATION"
+            labelMode="floating"
+            [width]="400"
+            [readOnly]="true"
+          ></dx-text-box>
+        </div>
+        <!-- <dx-text-box
+          label="Vehicle No"
+          labelMode="floating"
+          [(value)]="creditFormData[0].VEHICLE_NO"
+          [width]="200"
+        ></dx-text-box> -->
         <!-- Right: Net Amount + Approve checkbox -->
         <div
           style="
@@ -211,16 +261,25 @@
             gap: 5px;
           "
         >
-          <dx-number-box
-            label="Net Amount"
-            [value]="creditFormData?.[0]?.NET_AMOUNT"
-            labelMode="floating"
-            [width]="200"
-            [readOnly]="true"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-            [inputAttr]="{ style: 'text-align: right;' }"
-          ></dx-number-box>
+          <div style="display: flex; align-items: center; gap: 15px">
+            <dx-check-box
+              text="Round Off"
+              [readOnly]="true"
+              [value]="creditFormData?.[0]?.ROUND_OFF"
+              (onValueChanged)="onRoundOffChange()"
+              style="margin-top: 18px"
+            ></dx-check-box>
 
+            <dx-number-box
+              label="Net Amount"
+              [value]="creditFormData?.[0]?.NET_AMOUNT"
+              labelMode="floating"
+              [width]="200"
+              [readOnly]="true"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
+              [inputAttr]="{ style: 'text-align: right;' }"
+            ></dx-number-box>
+          </div>
           <dx-check-box
             text="Approved"
             [value]="creditFormData?.[0]?.TRANS_STATUS === 5"

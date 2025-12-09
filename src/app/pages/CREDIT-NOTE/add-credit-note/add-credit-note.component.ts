@@ -109,6 +109,7 @@ export class AddCreditNoteComponent {
     INVOICE_NO: '',
     UNIT_ID: '',
     IS_APPROVED: false,
+    ROUND_OFF: false,
     NOTE_DETAIL: [
       {
         SL_NO: '',
@@ -143,6 +144,17 @@ export class AddCreditNoteComponent {
   selectedstoreId: any;
   HSN_CODE: any;
   GST_PERC: any;
+  companyState: any;
+  isSameState: boolean = false;
+  selectedCompany: any;
+  showGST: boolean = false;
+  showCGST: boolean = false;
+  showSGST: boolean = false;
+  netAmount: any;
+  companyStateID: any;
+  HSNCODE: any;
+  GST: any;
+  netTotal: number;
   constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   ngOnInit() {
@@ -153,8 +165,14 @@ export class AddCreditNoteComponent {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
       console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
+      this.companyState = selectedCompany.STATE_NAME;
+      this.companyStateID = selectedCompany.STATE_ID;
+      console.log(this.companyStateID, 'COMPANYSTATE');
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
+
         this.companyList = [selectedCompany]; // Show only selected company
       }
 
@@ -170,7 +188,8 @@ export class AddCreditNoteComponent {
     this.creditFormData.TRANS_DATE = this.formatAsDDMMYYYY(new Date());
     console.log('ADDCOMPONENT TRIGERRED');
     this.getLedgerCodeDropdown();
-    this.getCompanyListDropdown();
+    // this.getCompanyListDropdown();
+    this.getCustomerOrUnitLst();
     this.getDocNo();
     this.getPendingInvoices();
     this.creditFormData.NOTE_DETAIL = [
@@ -200,11 +219,16 @@ export class AddCreditNoteComponent {
       this.selectedstoreId,
       '===========selected store id==================='
     );
-     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
-      this.HSN_CODE, '===========selected HSN CODE===================');
+      this.HSN_CODE,
+      '===========selected HSN CODE==================='
+    );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST_PERC, '===========selected GST PERC===================');
+    console.log(
+      this.GST_PERC,
+      '===========selected GST PERC==================='
+    );
   }
 
   private hasEmptyRow(): boolean {
@@ -244,7 +268,7 @@ export class AddCreditNoteComponent {
       gstAmount: '',
       HEAD_ID: null,
     };
-
+    this.applyGstForRow(newRow);
     // Force change detection
     this.creditFormData.NOTE_DETAIL = [
       ...this.creditFormData.NOTE_DETAIL,
@@ -257,19 +281,6 @@ export class AddCreditNoteComponent {
       grid?.editCell(newRowIndex, 'ledgerCode');
     }, 100);
   }
-
-  // ngAfterViewInit(): void {
-  //   // Wait for the grid and everything else to stabilize
-  //   setTimeout(() => {
-  //     requestAnimationFrame(() => {
-  //       requestAnimationFrame(() => {
-  //         if (this.invoiceBoxRef?.instance) {
-  //           this.invoiceBoxRef.instance.focus();
-  //         }
-  //       });
-  //     });
-  //   }, 500); // Delay long enough for grid rendering to complete
-  // }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
@@ -316,6 +327,24 @@ export class AddCreditNoteComponent {
     }
   }
 
+  applyGstForRow(row: any) {
+    const sessionGst = parseFloat(this.GST) || 0;
+
+    // Same State → CGST + SGST
+    if (this.companyStateID === this.selectedCustomer?.STATE_ID) {
+      const half = sessionGst / 2;
+
+      row.CGST = half;
+      row.SGST = half;
+      row.GST = 0;
+    } else {
+      // Different State → IGST (GST only)
+      row.GST = sessionGst;
+      row.CGST = 0;
+      row.SGST = 0;
+    }
+  }
+
   onCompanySelected(event: any): void {
     const grid = this.itemsGridRef?.instance;
     const selectedId = event.value;
@@ -334,26 +363,104 @@ export class AddCreditNoteComponent {
 
   onDistributorSelected(event: any): void {
     const grid = this.itemsGridRef?.instance;
+
     this.selectedCustomerId = event.value;
+
     if (this.selectedCustomerId) {
       this.selectedCustomer = this.distributorList.find(
         (s: any) => s.ID === this.selectedCustomerId
       );
+
       this.creditFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
-      console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+
+      console.log(this.selectedCustomer.DESCRIPTION, 'PARTY NAME');
+      console.log(this.selectedCustomer.STATE_ID, 'SELECTED CUSTOMER STATE ID');
+
+      // SHOW OR HIDE GST COLUMNS
+      if (this.companyStateID === this.selectedCustomer.STATE_ID) {
+        // Same state → CGST + SGST
+        this.showCGST = true;
+        this.showSGST = true;
+        this.showGST = false;
+      } else {
+        // Different state → GST only
+        this.showGST = true;
+        this.showCGST = false;
+        this.showSGST = false;
+      }
+
+      // ⭐ APPLY GST LOGIC TO ALL EXISTING ROWS
+      this.creditFormData.NOTE_DETAIL?.forEach((row: any) => {
+        this.applyGstForRow(row);
+      });
     }
+
     this.creditFormData.DISTRIBUTOR_ID = this.selectedCustomerId;
+
+    // Save current row if user is editing
     if (grid) {
       const editRowIndex = grid
         .getVisibleRows()
         .findIndex((row: any) => row.isEditing);
+
       if (editRowIndex !== -1) {
-        grid.saveEditData(); // Save new row before changing distributor
+        grid.saveEditData();
       }
     }
 
     this.selectedDistributorId = event.value;
   }
+
+  // onDistributorSelected(event: any): void {
+  //   const grid = this.itemsGridRef?.instance;
+  //   this.selectedCustomerId = event.value;
+  //   if (this.selectedCustomerId) {
+  //     this.selectedCustomer = this.distributorList.find(
+  //       (s: any) => s.ID === this.selectedCustomerId
+  //     );
+  //     this.creditFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
+  //     console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
+  //     console.log(this.selectedCustomer.STATE_ID, 'SELECTED CUSTOMER STATE ID');
+  //     const sessionGst = parseFloat(this.GST) || 0;
+  //     if (this.companyStateID === this.selectedCustomer.STATE_ID) {
+  //       console.log('Both states SAME → CGST + SGST apply');
+
+  //       this.showCGST = true;
+  //       this.showSGST = true;
+  //       this.showGST = false;
+
+  //       //  Split GST into CGST + SGST
+  //       const half = sessionGst / 2;
+
+  //       // Update all grid rows
+  //       this.creditFormData.NOTE_DETAIL?.forEach((row: any) => {
+  //         this.applyGstForRow(row);
+  //       });
+  //     } else {
+  //       console.log('States DIFFERENT → GST applies');
+
+  //       this.showGST = true;
+  //       this.showCGST = false;
+  //       this.showSGST = false;
+
+  //       // ⭐ GST only
+  //       this.creditFormData.NOTE_DETAIL?.forEach((row: any) => {
+  //         this.applyGstForRow(row);
+  //       });
+  //     }
+  //   }
+  //   this.creditFormData.DISTRIBUTOR_ID = this.selectedCustomerId;
+  //   if (grid) {
+  //     const editRowIndex = grid
+  //       .getVisibleRows()
+  //       .findIndex((row: any) => row.isEditing);
+  //     if (editRowIndex !== -1) {
+  //       grid.saveEditData(); // Save new row before changing distributor
+  //     }
+  //   }
+
+  //   this.selectedDistributorId = event.value;
+  // }
 
   onInitNewRow(e: any): void {
     this.newRowIndex = e.component.getRowIndexByKey(e.key);
@@ -430,10 +537,29 @@ export class AddCreditNoteComponent {
     });
   }
 
-  calculateTaxAmount = (rowData: any) => {
-    const amount = Number(rowData.Amount) || 0;
-    const gstPerc = Number(rowData.GST_PERC) || 0;
+  calculateTaxAmount = (row: any) => {
+    const amount = Number(row.Amount) || 0;
+
+    // SAME STATE → CGST + SGST applies
+    if (this.companyStateID === this.selectedCustomer?.STATE_ID) {
+      const cgst = Number(row.CGST) || 0;
+      const sgst = Number(row.SGST) || 0;
+
+      // Total GST% = CGST% + SGST%
+      const totalGstPerc = cgst + sgst;
+
+      return +((amount * totalGstPerc) / 100).toFixed(2);
+    }
+
+    // DIFFERENT STATE → IGST applies
+    const gstPerc = Number(row.GST_PERC) || 0;
     return +((amount * gstPerc) / 100).toFixed(2);
+  };
+
+  calculateTotalAmount = (row: any) => {
+    const amount = Number(row.Amount) || 0;
+    const gstAmount = this.calculateTaxAmount(row); // IGST or CGST+SGST
+    return +(amount + gstAmount).toFixed(2);
   };
 
   onEditorPreparing(e: any) {
@@ -513,34 +639,40 @@ export class AddCreditNoteComponent {
         }
       };
 
-     e.editorOptions.onValueChanged = (args: any) => {
-  const selectedLedger = this.ledgerList.find(
-    (item: any) => item.HEAD_CODE === args.value
-  );
+      e.editorOptions.onValueChanged = (args: any) => {
+        const selectedLedger = this.ledgerList.find(
+          (item: any) => item.HEAD_CODE === args.value
+        );
 
-  e.setValue(args.value);
+        e.setValue(args.value);
 
-  if (selectedLedger) {
-    // 1️⃣ Set ledger name
-    e.component.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
+        if (selectedLedger) {
+          // 1️⃣ Set ledger name
+          e.component.cellValue(
+            rowIndex,
+            'ledgerName',
+            selectedLedger.HEAD_NAME
+          );
 
-    // 2️⃣ Get HSN & GST from session
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
-    const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+          // 2️⃣ Get HSN & GST from session
+          const sessionData = JSON.parse(
+            sessionStorage.getItem('savedUserData')
+          );
+          const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
+          const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
 
-    // 3️⃣ Set HSN_CODE
-    e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+          // 3️⃣ Set HSN_CODE
+          e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
 
-    // 4️⃣ Set GST_PERC
-    e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+          // 4️⃣ Set GST_PERC
+          e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
 
-    // 5️⃣ Move to next field
-    setTimeout(() => {
-      this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-    }, 50);
-  }
-};
+          // 5️⃣ Move to next field
+          setTimeout(() => {
+            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+          }, 50);
+        }
+      };
     }
 
     // ➤ ledgerName: move to particulars on Enter
@@ -593,7 +725,7 @@ export class AddCreditNoteComponent {
         }
       };
     }
-    if (e.dataField === 'GST_PERC') {
+    if (e.dataField === 'Amount') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
@@ -628,10 +760,13 @@ export class AddCreditNoteComponent {
                 particulars: '',
                 Amount: '',
                 GST_PERC: '',
+                GST: 0,
+                CGST: 0,
+                SGST: 0,
                 gstAmount: '',
                 HEAD_ID: null,
               };
-
+              this.applyGstForRow(newRow);
               this.creditFormData.NOTE_DETAIL.push(newRow);
 
               // ✅ Force rebind and refresh the grid
@@ -705,10 +840,17 @@ export class AddCreditNoteComponent {
     }
   }
 
-  getCompanyListDropdown() {
-    this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
+  // getCompanyListDropdown() {
+  //   this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
+  //     this.distributorList = response;
+  //     console.log(this.distributorList, 'distributorList');
+  //   });
+  // }
+
+  getCustomerOrUnitLst() {
+    this.dataService.getCustomerWithState().subscribe((response: any) => {
       this.distributorList = response;
-      console.log(this.distributorList, 'distributorList');
+      console.log(this.distributorList, 'DISTLISTPOPUP');
     });
   }
 
@@ -844,7 +986,7 @@ export class AddCreditNoteComponent {
           row.ledgerCode ||
           row.ledgerName ||
           row.Amount ||
-          row.GST_PERC ||
+          row.GGST_PERC ||
           row.particulars
       )
       .map((row: any, index: number) => {
@@ -852,15 +994,43 @@ export class AddCreditNoteComponent {
           (item: any) => item.HEAD_CODE === row.ledgerCode
         );
 
-        // ✅ Always calculate GST dynamically
-        const gstAmount = this.calculateTaxAmount(row);
+        const amount = Number(row.Amount) || 0;
+        const isSameState =
+          this.companyStateID === this.selectedCustomer?.STATE_ID;
+
+        let gstPerc = 0;
+        let gstAmount = 0;
+        let cgst = 0;
+        let sgst = 0;
+
+        if (isSameState) {
+          //  CGST + SGST mode
+          cgst = Number(row.CGST) || 0;
+          sgst = Number(row.SGST) || 0;
+
+          const totalGstPerc = cgst + sgst;
+          gstPerc = 0; // IGST not applicable
+          gstAmount = Number(((amount * totalGstPerc) / 100).toFixed(2));
+        } else {
+          //  IGST mode
+          gstPerc = Number(row.GST_PERC) || 0;
+          gstAmount = Number(((amount * gstPerc) / 100).toFixed(2)); // FIXED
+          cgst = 0;
+          sgst = 0;
+        }
 
         return {
           SL_NO: row.SL_NO || index + 1,
           HEAD_ID: ledger?.HEAD_ID || null,
-          AMOUNT: Number(row.Amount) || 0,
-          GST_PERC: Number(row.GST_PERC) || 0,
-          GST_AMOUNT: gstAmount,
+          AMOUNT: amount,
+
+          // Passing GST breakup
+          GST_PERC: gstPerc, // Only IGST or 0
+          CGST: cgst, // Only in same-state
+          SGST: sgst, // Only in same-state
+
+          GST_AMOUNT: gstAmount, // ALWAYS combined amount
+
           REMARKS: row.particulars || '',
         };
       });
@@ -893,6 +1063,8 @@ export class AddCreditNoteComponent {
         this.selectedCompanyId || userData?.Companies?.[0]?.COMPANY_ID || null;
       this.creditFormData.STORE_ID =
         this.selectedstoreId || userData?.Configuration?.[0]?.STORE_ID || null;
+      this.creditFormData.ROUND_OFF = this.creditFormData.ROUND_OFF;
+      this.creditFormData.VEHICLE_NO = this.creditFormData.VEHICLE_NO;
     }
 
     // --- Save data ---
@@ -921,15 +1093,45 @@ export class AddCreditNoteComponent {
     let totalAmount = 0;
     let totalGST = 0;
 
+    const isSameState = this.companyStateID === this.selectedCustomer?.STATE_ID;
+
     details.forEach((item: any) => {
       const amount = Number(item.Amount) || 0;
-      const gstPerc = Number(item.GST_PERC) || 0;
-
       totalAmount += amount;
-      totalGST += (amount * gstPerc) / 100; // Recalculate GST live
+
+      if (isSameState) {
+        // ⭐ SAME STATE → CGST + SGST
+        const cgst = Number(item.CGST) || 0;
+        const sgst = Number(item.SGST) || 0;
+        const totalGstPerc = cgst + sgst;
+
+        totalGST += (amount * totalGstPerc) / 100;
+      } else {
+        // ⭐ DIFFERENT STATE → IGST
+        const gstPerc = Number(item.GST_PERC) || 0;
+        totalGST += (amount * gstPerc) / 100;
+      }
     });
 
-    return (totalAmount + totalGST).toFixed(2);
+    // ⭐ Raw total (before round-off)
+    this.netTotal = totalAmount + totalGST;
+
+    // ⭐ Apply round-off only if checkbox enabled
+    if (this.creditFormData.ROUND_OFF) {
+      this.netTotal = Math.round(this.netTotal);
+    }
+    console.log(this.netTotal, 'NETTOTALLLLLLLL');
+    return this.netTotal.toFixed(2);
+  }
+
+  onRoundOffChange() {
+    if (this.creditFormData.ROUND_OFF) {
+      // Round Off Enabled
+      this.netAmount = Math.round(this.netTotal).toFixed(2);
+    } else {
+      // Round Off Disabled → return to original value
+      this.netAmount = Number(this.netTotal).toFixed(2);
+    }
   }
 
   // get netAmountString(): string {

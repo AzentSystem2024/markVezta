@@ -209,10 +209,12 @@ export class AddInvoiceComponent {
   }
 
   getCustomerOrUnitLst() {
-    this.dataService.getCustomerWithState().subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'DISTLISTPOPUP');
-    });
+    this.dataService
+      .getOutsideCustomerWithState()
+      .subscribe((response: any) => {
+        this.distributorList = response;
+        console.log(this.distributorList, 'DISTLISTPOPUP');
+      });
   }
 
   onDistributorChanged(e: any) {
@@ -760,7 +762,7 @@ export class AddInvoiceComponent {
   }
 
   onRoundOffChange() {
-    if (this.invoiceFormData.IS_ROUNDOFF) {
+    if (this.invoiceFormData.ROUND_OFF) {
       // Round Off Enabled
       this.netAmount = Math.round(this.grandTotal).toFixed(2);
     } else {

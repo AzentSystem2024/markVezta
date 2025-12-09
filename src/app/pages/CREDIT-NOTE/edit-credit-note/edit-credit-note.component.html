@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 70vh;
+      height: 75vh;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
@@ -173,7 +173,11 @@
               message="Max 250 characters allowed"
             ></dxi-validation-rule>
           </dxi-column>
-
+          <dxi-column
+            dataField="HSN_CODE"
+            caption="HSN Code"
+            dataType="string"
+          ></dxi-column>
           <dxi-column
             dataField="Amount"
             caption="Amount"
@@ -188,9 +192,25 @@
                 : ' GST %'
             "
             dataType="number"
+            [visible]="showGST"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
           </dxi-column>
+          <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
+            [allowEditing]="false"
+          ></dxi-column>
           <dxi-column
             dataField="gstAmount"
             [caption]="
@@ -203,11 +223,13 @@
             [calculateCellValue]="calculateTaxAmount"
           ></dxi-column>
           <dxi-column
-            dataField="HSN_CODE"
-            caption="HSN Code"
-            dataType="string"
+            dataField="TOTAL"
+            caption="Total"
+            dataType="number"
+            [visible]="true"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateTotalAmount"
           ></dxi-column>
-
           <dxi-column type="buttons">
             <dxi-button name="edit"></dxi-button>
             <dxi-button name="delete"></dxi-button>
@@ -228,10 +250,20 @@
               displayFormat="Total: {0}"
               alignment="right"
             ></dxi-total-item>
+            <dxi-total-item
+              column="TOTAL"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
 
         <!-- Narration Below Grid -->
+        <!-- Narration Below Grid -->
+        <!-- Narration + Vehicle No Below Grid -->
         <div
           style="
             margin-top: 15px;
@@ -242,17 +274,28 @@
             width: 100%;
           "
         >
-          <!-- Left: Narration -->
-          <dx-text-box
-            #narrationRef
-            [(value)]="creditFormData[0].NARRATION"
-            label="Narration"
-            labelMode="floating"
-            [width]="400"
-            (onKeyDown)="onNarrationKeyDown($event)"
-          ></dx-text-box>
+          <!-- LEFT SIDE: Narration + Vehicle No -->
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <!-- Narration -->
 
-          <!-- Right: Net Amount + Approve checkbox -->
+            <!-- Vehicle Number below narration -->
+            <dx-text-box
+              label="Vehicle Number"
+              labelMode="floating"
+              [(value)]="creditFormData[0].VEHICLE_NO"
+              [width]="200"
+            ></dx-text-box>
+            <dx-text-box
+              #narrationRef
+              [(value)]="creditFormData[0].NARRATION"
+              label="Narration"
+              labelMode="floating"
+              [width]="400"
+              (onKeyDown)="onNarrationKeyDown($event)"
+            ></dx-text-box>
+          </div>
+
+          <!-- RIGHT SIDE: Net Amount + Approve -->
           <div
             style="
               display: flex;
@@ -261,16 +304,22 @@
               gap: 5px;
             "
           >
-            <dx-text-box
-              [value]="calculatedNetAmount"
-              label="Net Amount"
-              labelMode="floating"
-              [width]="200"
-              [readOnly]="true"
-              [format]="{ type: 'fixedPoint', precision: 2 }"
-              [inputAttr]="{ style: 'text-align: right;' }"
-            ></dx-text-box>
-
+            <div style="display: flex; align-items: center; gap: 15px">
+              <dx-check-box
+                text="Round Off"
+                [(value)]="creditFormData.ROUND_OFF"
+                (onValueChanged)="onRoundOffChange()"
+              ></dx-check-box>
+              <dx-text-box
+                [value]="calculatedNetAmount"
+                label="Net Amount"
+                labelMode="floating"
+                [width]="200"
+                [readOnly]="true"
+                [format]="{ type: 'fixedPoint', precision: 2 }"
+                [inputAttr]="{ style: 'text-align: right;' }"
+              ></dx-text-box>
+            </div>
             <dx-check-box
               [(value)]="creditFormData.IS_APPROVED"
               text="Approve"

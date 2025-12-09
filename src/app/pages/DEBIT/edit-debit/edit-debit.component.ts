@@ -69,6 +69,8 @@ export class EditDebitComponent {
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
+originalNetAmount: number = 0;  // actual value from calculations
+  // UI display value
 
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
@@ -114,6 +116,10 @@ export class EditDebitComponent {
   companyState: any;
   selectedCompany: any;
   distributorList: any;
+  netAmount: number = 0;
+roundedNetAmount: number = 0;
+
+  companyStateID: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -250,7 +256,7 @@ ngOnChanges(changes: SimpleChanges): void {
     this.netAmountDisplay = parseFloat(data.NET_AMOUNT) || 0;
     this.transDate = new Date(data.TRANS_DATE);
     this.formattedTransDate = this.formatAsDDMMYYYY(this.transDate);
-
+ this.companyStateID = this.selectedCompany?.STATE_ID;
     // -----------------------------
     //  STEP 1: GET CUSTOMER STATE
     // -----------------------------
@@ -338,80 +344,109 @@ ngOnChanges(changes: SimpleChanges): void {
   }
 }
 
-onAddNewRow() {
-  const grid = this.itemsGridRef.instance;
-  const rows = grid.getVisibleRows();
+// onAddNewRow() {
+//   const grid = this.itemsGridRef.instance;
+//   const rows = grid.getVisibleRows();
 
-  // Prevent adding if any existing row is incomplete
-  const hasIncompleteRow = rows.some(
-    (r: any) => !r.data.ledgerName || !r.data.Amount
-  );
-  if (hasIncompleteRow) {
-    return;
+//   // Prevent adding if any existing row is incomplete
+//   const hasIncompleteRow = rows.some(
+//     (r: any) => !r.data.ledgerName || !r.data.Amount
+//   );
+//   if (hasIncompleteRow) {
+//     return;
+//   }
+
+//   const nextSlNo = this.noteDetails.length + 1;
+
+//   // ---------- NEW ROW BASE ----------
+//   const newRow: any = {
+//     SL_NO: nextSlNo,
+//     ledgerCode: null,
+//     ledgerName: '',
+//     particulars: '',
+//     Amount: null,
+//     gstAmount: null,
+//     HSN_CODE: '',
+//     CGST: 0,
+//     SGST: 0,
+//     GST: 0,
+//   };
+
+ 
+//   // ---------- PUSH ROW & FOCUS ----------
+//   this.noteDetails.push(newRow);
+
+//   setTimeout(() => {
+//     const gridInstance = this.itemsGridRef?.instance;
+//     const newRowIndex = this.noteDetails.length - 1;
+//     gridInstance?.editCell(newRowIndex, 'ledgerCode');
+//   }, 100);
+// }
+
+  private hasEmptyRow(): boolean {
+    return (this.noteDetails || []).some(
+      (r: any) =>
+        !r.ledgerCode &&
+        !r.ledgerName &&
+        !r.particulars &&
+        (!r.Amount || r.Amount === 0) &&
+        (!r.GST_PERC || r.GST_PERC === 0)
+    );
   }
 
-  const nextSlNo = this.noteDetails.length + 1;
+  applyGstForRow(row: any) {
+    const sessionGst = parseFloat(this.GST) || 0;
 
-  // ---------- NEW ROW BASE ----------
-  const newRow: any = {
-    SL_NO: nextSlNo,
-    ledgerCode: null,
-    ledgerName: '',
-    particulars: '',
-    Amount: null,
-    gstAmount: null,
-    HSN_CODE: '',
-    CGST: 0,
-    SGST: 0,
-    GST: 0,
-  };
-
-  // ---------- GST / CGST+SGST LOGIC ----------
-  const selectedSupplier = this.distributorList?.find(
-    (supplier: any) => supplier.ID === this.selectedSupplierId
-  );
-  console.log('selectedSupplier', selectedSupplier);
-
-  const company = this.companyState?.trim().toLowerCase();
-  const supplier = selectedSupplier?.STATE_NAME?.trim().toLowerCase();
-  const sessionGst = parseFloat(this.GST) || 0;
-  console.log('company:', company, 'supplier:', supplier, 'gst:', sessionGst);
-
-  if (company && supplier) {
-    if (company === supplier) {
-      console.log('Both states SAME → CGST + SGST apply');
-
-      this.showCGST = true;
-      this.showSGST = true;
-      this.showGST = false;
-
+    // Same State → CGST + SGST
+    if (this.companyStateID === this.selectedSupplier?.STATE_ID) {
       const half = sessionGst / 2;
 
-      newRow.CGST = half;
-      newRow.SGST = half;
-      newRow.GST = 0;
+      row.CGST = half;
+      row.SGST = half;
+      row.GST = 0;
     } else {
-      console.log('States DIFFERENT → GST applies');
-
-      this.showGST = true;
-      this.showCGST = false;
-      this.showSGST = false;
-
-      newRow.GST = sessionGst;
-      newRow.CGST = 0;
-      newRow.SGST = 0;
+      // Different State → IGST (GST only)
+      row.GST = sessionGst;
+      row.CGST = 0;
+      row.SGST = 0;
     }
   }
+  onAddNewRow() {
+    if (!this.noteDetails) {
+      this.noteDetails = [];
+    }
+    if (this.hasEmptyRow()) {
+      notify(
+        'Please fill the existing empty row before adding a new one.',
+        'warning',
+        2000
+      );
+      return;
+    }
+    const nextSlNo =
+      this.noteDetails.length > 0
+        ? Math.max(...this.noteDetails.map((r) => r.SL_NO)) + 1
+        : 1;
 
-  // ---------- PUSH ROW & FOCUS ----------
-  this.noteDetails.push(newRow);
+    const newRow = {
+      SL_NO: nextSlNo,
+      ledgerCode: '',
+      ledgerName: '',
+      particulars: '',
+      Amount: '',
+      gstAmount: '',
+      HEAD_ID: null,
+    };
+    this.applyGstForRow(newRow);
+    // Force change detection
+    this.noteDetails = [...this.noteDetails, newRow];
 
-  setTimeout(() => {
-    const gridInstance = this.itemsGridRef?.instance;
-    const newRowIndex = this.noteDetails.length - 1;
-    gridInstance?.editCell(newRowIndex, 'ledgerCode');
-  }, 100);
-}
+    setTimeout(() => {
+      const grid = this.itemsGridRef?.instance;
+      const newRowIndex = this.noteDetails.length - 1;
+      grid?.editCell(newRowIndex, 'ledgerCode');
+    }, 100);
+  }
 
 
   ngAfterViewInit(): void {
@@ -1033,7 +1068,15 @@ console.log(selectedSupplier)
     });
     this.net = (totalAmount + totalGST).toFixed(2);
     console.log('Net Amount (from getter):', this.net);
-    return (totalAmount + totalGST).toFixed(2);
+    // return (totalAmount + totalGST).toFixed(2);
+
+    // 🔥 If ROUND_OFF = true (from API or checkbox), round the value
+    let net = totalAmount + totalGST;
+  if (this.debitFormData?.[0]?.ROUND_OFF) {
+    net = Math.round(net);
+  }
+
+  return net.toFixed(2);
   }
 
   updateDebitNote() {
@@ -1236,11 +1279,39 @@ console.log(selectedSupplier)
   return amount + gst;
 };
 
-  onRoundOffChange(){}
+calculateNetAmount() {
+  const details = this.noteDetails || [];
+  let totalAmount = 0;
+  let totalGST = 0;
+
+  details.forEach((item: any) => {
+    const amount = Number(item.Amount) || 0;
+    const gstPerc = Number(item.GST_PERC) || 0;
+
+    totalAmount += amount;
+    totalGST += (amount * gstPerc) / 100;
+  });
+
+  this.netAmount = +(totalAmount + totalGST).toFixed(2);
+
+  // Apply RoundOff immediately if checkbox already selected
+  this.onRoundOffChange();
+}
+
+
+onRoundOffChange() {
+  if (this.debitFormData[0].ROUND_OFF) {
+    this.roundedNetAmount = Math.round(this.netAmount);  // Example: 1234.56 → 1235
+  } else {
+    this.roundedNetAmount = this.netAmount; // No rounding
+  }
+}
+
+
 }
 
 @NgModule({
-  imports: [
+  imports: [ 
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,

@@ -129,6 +129,7 @@
             useIcons: true
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
+          (onContentReady)="onContentReady($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
@@ -215,8 +216,24 @@
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
                 ? ' VAT %'
-                : ' GST %'
+                : ' IGST %'
             "
+            [visible]="showGST"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
@@ -257,7 +274,43 @@
             ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 3px;
+          "
+        >
+          <!-- LEFT SIDE → Vehicle No -->
+          <div>
+            <dx-text-box
+              label="Vehicle No"
+              labelMode="floating"
+              [(value)]="purchaseReturnFormData.VEHICLE_NO"
+              [width]="200"
+              [readOnly]="isReadOnlyMode"
+            ></dx-text-box>
+          </div>
 
+          <!-- RIGHT SIDE → Round Off + Net Amount -->
+          <div style="display: flex; align-items: center; gap: 16px">
+            <dx-check-box
+              text="Round Off"
+              [(value)]="purchaseReturnFormData.ROUND_OFF"
+              (onValueChanged)="onRoundOffChange()"
+              [readOnly]="isReadOnlyMode"
+            ></dx-check-box>
+
+            <dx-text-box
+              label="Net Amount"
+              labelMode="floating"
+              [value]="netAmount"
+              [width]="120"
+              [readOnly]="true"
+            ></dx-text-box>
+          </div>
+        </div>
         <div class="form-popup-buttons-container">
           <div class="approve-container">
             <dx-check-box
@@ -294,7 +347,6 @@
               (onClick)="isReadOnlyMode ? openPDF() : savePurchaseReturn()"
               stylingMode="contained"
               type="default"
-              [width]="120"
             ></dx-button>
           </div>
         </div>

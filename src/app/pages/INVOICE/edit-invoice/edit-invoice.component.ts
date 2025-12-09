@@ -103,6 +103,7 @@ export class EditInvoiceComponent {
   selectedCustomer: any;
   selectedCompany: any;
   companyState: any;
+  netAmount: any;
 
   constructor(
     private dataService: DataService,
@@ -175,7 +176,7 @@ export class EditInvoiceComponent {
       // Load saved GST from the API for edit mode
       this.mainInvoiceGridList = (firstInvoice.SALE_DETAILS || []).map(
         (row: any) => {
-          const igst = parseFloat(row.IGST) || 0;
+          const igst = parseFloat(row.GST) || 0;
           const cgst = parseFloat(row.CGST) || 0;
           const sgst = parseFloat(row.SGST) || 0;
 
@@ -332,39 +333,41 @@ export class EditInvoiceComponent {
   // }
 
   getCustomerOrUnitLst() {
-    this.dataService.getCustomerWithState().subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'DISTLISTPOPUP');
+    this.dataService
+      .getOutsideCustomerWithState()
+      .subscribe((response: any) => {
+        this.distributorList = response;
+        console.log(this.distributorList, 'DISTLISTPOPUP');
 
-      if (this.invoiceFormData && this.invoiceFormData.DISTRIBUTOR_ID) {
-        this.selectedCustomer = this.distributorList.find(
-          (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID
-        );
+        if (this.invoiceFormData && this.invoiceFormData.DISTRIBUTOR_ID) {
+          this.selectedCustomer = this.distributorList.find(
+            (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID
+          );
 
-        console.log('EDIT MODE — Selected Customer:', this.selectedCustomer);
+          console.log('EDIT MODE — Selected Customer:', this.selectedCustomer);
 
-        // ⭐ NOW CHECK STATES
-        if (this.selectedCustomer && this.companyState) {
-          const custState =
-            this.selectedCustomer.STATE_NAME.trim().toLowerCase();
-          const compState = this.companyState.trim().toLowerCase();
+          // ⭐ NOW CHECK STATES
+          if (this.selectedCustomer && this.companyState) {
+            const custState =
+              this.selectedCustomer.STATE_NAME.trim().toLowerCase();
+            const compState = this.companyState.trim().toLowerCase();
 
-          if (custState === compState) {
-            console.log('EDIT MODE — SAME STATE → CGST + SGST');
+            if (custState === compState) {
+              console.log('EDIT MODE — SAME STATE → CGST + SGST');
 
-            this.showCGST = true;
-            this.showSGST = true;
-            this.showGST = false;
-          } else {
-            console.log('EDIT MODE — DIFFERENT STATE → IGST');
+              this.showCGST = true;
+              this.showSGST = true;
+              this.showGST = false;
+            } else {
+              console.log('EDIT MODE — DIFFERENT STATE → IGST');
 
-            this.showCGST = false;
-            this.showSGST = false;
-            this.showGST = true;
+              this.showCGST = false;
+              this.showSGST = false;
+              this.showGST = true;
+            }
           }
         }
-      }
-    });
+      });
   }
 
   sessionData_tax() {
@@ -476,7 +479,8 @@ export class EditInvoiceComponent {
       this.totalAmount = this.summaryValues('AMOUNT');
       this.taxAmount = this.summaryValues('TAX_AMOUNT');
       this.grandTotal = this.summaryValues('TOTAL_AMOUNT');
-
+      this.netAmount = Number(this.grandTotal).toFixed(2);
+      this.onRoundOffChange();
       console.log('GROSS AMOUNT Summary:', this.totalAmount);
       console.log('TAX_AMOUNT Summary:', this.taxAmount);
       console.log('NET AMOUNT Summary:', this.grandTotal);
@@ -638,6 +642,8 @@ export class EditInvoiceComponent {
             TAX_AMOUNT: this.taxAmount,
             NET_AMOUNT: this.grandTotal,
             PARTY_NAME: this.invoiceFormData.PARTY_NAME,
+            ROUND_OFF: this.invoiceFormData.ROUND_OFF,
+            VEHICLE_NO: this.invoiceFormData.VEHICLE_NO,
             SALE_DETAILS: this.mainInvoiceGridList.map((row: any) => ({
               DN_DETAIL_ID: row.DN_DETAIL_ID || '',
               QUANTITY: row.TOTAL_PAIR_QTY || 0,
@@ -694,12 +700,14 @@ export class EditInvoiceComponent {
         TAX_AMOUNT: this.taxAmount,
         NET_AMOUNT: this.grandTotal,
         PARTY_NAME: this.invoiceFormData.PARTY_NAME,
+        ROUND_OFF: this.invoiceFormData.ROUND_OFF,
+        VEHICLE_NO: this.invoiceFormData.VEHICLE_NO,
         SALE_DETAILS: this.mainInvoiceGridList.map((row: any) => ({
           DN_DETAIL_ID: row.DN_DETAIL_ID || '',
           QUANTITY: row.TOTAL_PAIR_QTY || 0,
           PRICE: row.PRICE || 0,
 
-          IGST: row.GST || 0,
+          GST: row.GST || 0,
           CGST: row.CGST || 0,
           SGST: row.SGST || 0,
 
@@ -728,6 +736,16 @@ export class EditInvoiceComponent {
           console.error('Error updating invoice:', err);
         },
       });
+    }
+  }
+
+  onRoundOffChange() {
+    if (this.invoiceFormData.ROUND_OFF) {
+      // Round Off Enabled
+      this.netAmount = Math.round(this.grandTotal).toFixed(2);
+    } else {
+      // Round Off Disabled → return to original value
+      this.netAmount = Number(this.grandTotal).toFixed(2);
     }
   }
 

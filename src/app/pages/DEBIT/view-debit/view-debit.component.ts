@@ -95,13 +95,22 @@ export class ViewDebitComponent {
   supplierList: any;
   sessionData: any;
   selected_vat_id: any;
-
+showCGST:boolean =false;
+  showSGST:boolean = false;
+  showGST:boolean = false;
   HSNCODE: any;
   hsnLoaded: boolean;
 
    isPdfPopupVisible: boolean = false;
     pdfSrc: SafeResourceUrl | null = null;
   GST: any;
+  selectedCompany: any;
+  companyState: any;
+  invoiceNo: any;
+  companyStateID: any;
+  selectedSupplier: any;
+    netAmount: number = 0;
+roundedNetAmount: number = 0;
 
   constructor(private dataService: DataService,private sanitizer: DomSanitizer) {
      const userDataString = localStorage.getItem('userData');
@@ -114,12 +123,20 @@ export class ViewDebitComponent {
       console.log(this.HSNCODE, 'HSNCODE===================');
       this.hsnLoaded = true; // ADD THIS
     }
+    this.sessionData_tax();
   }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+
+    this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+ console.log(this.selectedCompany)
+ this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
+ console.log(this.companyState)
+ this.GST = this.sessionData.GeneralSettings.GST_PERC;
+ console.log(this.GST,'GST')
   }
 
   ngOnInit() {
@@ -148,34 +165,214 @@ export class ViewDebitComponent {
     this.sessionData_tax();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['debitFormData'] && this.debitFormData?.length) {
-      const data = this.debitFormData[0];
-      console.log(data, 'DATAAAAAAAAAAAAAAAAAAAAAAAA');
-      if (data.TRANS_TYPE === 36) {
-        data.IS_APPROVED = true;
+  // ngOnChanges(changes: SimpleChanges): void {
+  //   if (changes['debitFormData'] && this.debitFormData?.length) {
+  //     const data = this.debitFormData[0];
+  //     console.log(data, 'DATAAAAAAAAAAAAAAAAAAAAAAAA');
+  //     if (data.TRANS_TYPE === 36) {
+  //       data.IS_APPROVED = true;
+  //     }
+  //     this.transDate = new Date(data.TRANS_DATE);
+  //     this.formattedTransDate = this.formatAsDDMMYYYY(this.transDate);
+  //     console.log(this.formattedTransDate, 'FORMATTED TRANSDATE');
+  //     this.getLedgerCodeDropdown().then(() => {
+  //       this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
+  //         const match = this.ledgerList.find(
+  //           (l: any) => l.HEAD_ID === item.HEAD_ID
+  //         );
+  //         return {
+  //           ...item,
+  //           ledgerCode: match?.HEAD_CODE || '',
+  //           ledgerName: match?.HEAD_NAME || '',
+  //           particulars: item.REMARKS || '',
+  //           Amount: item.AMOUNT || '',
+  //           gstAmount: item.GST_AMOUNT || '',
+  //            HSN_CODE: this.HSNCODE,
+  //         };
+  //       });
+  //     });
+  //     this.selectedCompanyId = this.debitFormData[0].SUPP_ID;
+  //   }
+  // }
+
+ngOnChanges(changes: SimpleChanges): void {
+  if (changes['debitFormData'] && this.debitFormData?.length) {
+
+    const data = this.debitFormData[0];
+
+    this.debitFormData = [...this.debitFormData];
+    this.debitFormData.PARTY_NAME = data.PARTY_NAME;
+
+    this.invoiceNo = data.INVOICE_NO;
+    this.netAmountDisplay = parseFloat(data.NET_AMOUNT) || 0;
+    this.transDate = new Date(data.TRANS_DATE);
+    this.formattedTransDate = this.formatAsDDMMYYYY(this.transDate);
+
+    this.companyStateID = this.selectedCompany?.STATE_ID;
+
+    const customerState =
+      (data.CUST_STATE ||
+       data.SUPP_STATE_NAME ||
+       data.STATE_NAME ||
+       '').trim().toLowerCase();
+
+    const companyState = this.companyState?.trim().toLowerCase();
+    const sessionGST = parseFloat(this.GST) || 0;
+
+    console.log("Company:", companyState);
+    console.log("Customer:", customerState);
+
+    // -----------------------------
+    // APPLY GST
+    // -----------------------------
+    if (companyState === customerState) {
+      console.log("Same State → CGST + SGST");
+
+      this.showCGST = true;
+      this.showSGST = true;
+      this.showGST = false;
+
+      const half = sessionGST / 2;
+
+      data.NOTE_DETAIL?.forEach((row: any) => {
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0;
+      });
+
+    } else {
+      console.log("Different State → IGST");
+
+      this.showGST = true;
+      this.showCGST = false;
+      this.showSGST = false;
+
+      data.NOTE_DETAIL?.forEach((row: any) => {
+        row.GST = sessionGST;
+        row.CGST = 0;
+        row.SGST = 0;
+      });
+    }
+
+    // -----------------------------
+    // ⭐ ALWAYS APPLY ROUND OFF HERE
+    // -----------------------------
+    setTimeout(() => {
+      const rawNet = Number(this.debitFormData[0].NET_AMOUNT) || 0;
+
+      if (this.debitFormData[0].ROUND_OFF === true) {
+        this.debitFormData[0].NET_AMOUNT = Math.round(rawNet);
+      } else {
+        this.debitFormData[0].NET_AMOUNT = rawNet;
       }
-      this.transDate = new Date(data.TRANS_DATE);
-      this.formattedTransDate = this.formatAsDDMMYYYY(this.transDate);
-      console.log(this.formattedTransDate, 'FORMATTED TRANSDATE');
-      this.getLedgerCodeDropdown().then(() => {
-        this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
+
+      console.log("FINAL NET AMOUNT:", this.debitFormData[0].NET_AMOUNT);
+    });
+
+    // -----------------------------
+    // BUILD GRID ROWS
+    // -----------------------------
+    this.getLedgerCodeDropdown().then(() => {
+      this.noteDetails = (data.NOTE_DETAIL || []).map(
+        (item: any, index: number) => {
           const match = this.ledgerList.find(
             (l: any) => l.HEAD_ID === item.HEAD_ID
           );
+
           return {
+            SL_NO: index + 1,
             ...item,
-            ledgerCode: match?.HEAD_CODE || '',
-            ledgerName: match?.HEAD_NAME || '',
-            particulars: item.REMARKS || '',
-            Amount: item.AMOUNT || '',
-            gstAmount: item.GST_AMOUNT || '',
-             HSN_CODE: this.HSNCODE,
+            ledgerCode: match?.HEAD_CODE || "",
+            ledgerName: match?.HEAD_NAME || "",
+            particulars: item.REMARKS || "",
+            Amount: item.AMOUNT || "",
+            gstAmount: item.GST_AMOUNT || "",
+            HSN_CODE: this.HSNCODE
           };
+        }
+      );
+
+      if (this.noteDetails.length === 0) {
+        this.noteDetails.push({
+          SL_NO: 1,
+          ledgerCode: "",
+          ledgerName: "",
+          particulars: "",
+          Amount: "",
+          gstAmount: "",
+          HSN_CODE: "",
+          HEAD_ID: null,
         });
-      });
-      this.selectedCompanyId = this.debitFormData[0].SUPP_ID;
+      }
+    });
+  }
+}
+
+
+
+  private hasEmptyRow(): boolean {
+    return (this.noteDetails || []).some(
+      (r: any) =>
+        !r.ledgerCode &&
+        !r.ledgerName &&
+        !r.particulars &&
+        (!r.Amount || r.Amount === 0) &&
+        (!r.GST_PERC || r.GST_PERC === 0)
+    );
+  }
+
+  applyGstForRow(row: any) {
+    const sessionGst = parseFloat(this.GST) || 0;
+
+    // Same State → CGST + SGST
+    if (this.companyStateID === this.selectedSupplier?.STATE_ID) {
+      const half = sessionGst / 2;
+
+      row.CGST = half;
+      row.SGST = half;
+      row.GST = 0;
+    } else {
+      // Different State → IGST (GST only)
+      row.GST = sessionGst;
+      row.CGST = 0;
+      row.SGST = 0;
     }
+  }
+  onAddNewRow() {
+    if (!this.noteDetails) {
+      this.noteDetails = [];
+    }
+    if (this.hasEmptyRow()) {
+      notify(
+        'Please fill the existing empty row before adding a new one.',
+        'warning',
+        2000
+      );
+      return;
+    }
+    const nextSlNo =
+      this.noteDetails.length > 0
+        ? Math.max(...this.noteDetails.map((r) => r.SL_NO)) + 1
+        : 1;
+
+    const newRow = {
+      SL_NO: nextSlNo,
+      ledgerCode: '',
+      ledgerName: '',
+      particulars: '',
+      Amount: '',
+      gstAmount: '',
+      HEAD_ID: null,
+    };
+    this.applyGstForRow(newRow);
+    // Force change detection
+    this.noteDetails = [...this.noteDetails, newRow];
+
+    setTimeout(() => {
+      const grid = this.itemsGridRef?.instance;
+      const newRowIndex = this.noteDetails.length - 1;
+      grid?.editCell(newRowIndex, 'ledgerCode');
+    }, 100);
   }
 
   getDocNo() {
@@ -600,6 +797,52 @@ export class ViewDebitComponent {
     };
   }
 
+      calculateTotal = (row: any) => {
+    console.log(row)
+  const amount = Number(row.Amount) || 0;
+ const gst = this.calculateTaxAmount(row) || 0;
+  return amount + gst;
+};
+
+  calculateTaxAmount = (rowData: any) => {
+    const amount = Number(rowData.Amount) || 0;
+    const gstPerc = Number(rowData.GST_PERC) || 0;
+    return +((amount * gstPerc) / 100).toFixed(2);
+  };
+
+
+calculateNetAmount() {
+  const details = this.noteDetails || [];
+  let totalAmount = 0;
+  let totalGST = 0;
+
+  details.forEach((item: any) => {
+    const amount = Number(item.Amount) || 0;
+    const gstPerc = Number(item.GST_PERC) || 0;
+
+    totalAmount += amount;
+    totalGST += (amount * gstPerc) / 100;
+  });
+
+  // store raw net amount
+  this.netAmount = +(totalAmount + totalGST).toFixed(2);
+
+  // if already rounded in backend, apply round-off automatically
+  if (this.debitFormData[0]?.ROUND_OFF) {
+    this.roundedNetAmount = Math.round(this.netAmount);
+  } else {
+    this.roundedNetAmount = this.netAmount;
+  }
+}
+
+onRoundOffChange() {
+  if (this.debitFormData[0].ROUND_OFF) {
+    this.roundedNetAmount = Math.round(this.netAmount);
+  } else {
+    this.roundedNetAmount = this.netAmount;
+  }
+}
+
   viewPdf(): void {
     console.log(this.DNid, "ID received in viewPdf()");
     this.isPdfPopupVisible = true;
@@ -615,6 +858,8 @@ export class ViewDebitComponent {
     });
   
   }
+
+
 
   get_pdf(data: any): SafeResourceUrl {
       const doc = new jsPDF('p', 'mm', 'a4');

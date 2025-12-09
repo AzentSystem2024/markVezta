@@ -327,13 +327,16 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Customer/custdtl`, {});
   }
 
-   getCustomerStateTrout_Invoice(): Observable<any> {
+  getOutsideCustomerWithState(): Observable<any> {
+    return this.http.post(`${this.apiUrl}invoice/cust`, {});
+  }
+  getCustomerStateTrout_Invoice(): Observable<any> {
     return this.http.post(`${this.apiUrl}Trout_Invoice/cust`, {});
   }
 
-    getSupplierWithState(): Observable<any> {
-    return this.http.post(`${this.apiUrl}supplier/suppdtl`, {});
-  }
+  //   getSupplierWithState(): Observable<any> {
+  //   return this.http.post(`${this.apiUrl}supplier/suppdtl`, {});
+  // }
 
   insertInvoice(items: any) {
     const data = items;
@@ -415,6 +418,10 @@ export class DataService {
   }
   getPendingInvoicesForReturn(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseReturn/pendinglist`, data);
+  }
+
+  getSupplierWithState(): Observable<any> {
+    return this.http.post(`${this.apiUrl}supplier/suppdtl`, {});
   }
 
   insertPurchaseReturn(items: any) {
@@ -2016,7 +2023,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}state/list`, {});
   }
 
-    UpdateState(item: any) {
+  UpdateState(item: any) {
     const payload = item;
     return this.http.post(`${this.apiUrl}state/save`, payload);
   }
@@ -5920,19 +5927,16 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-    List_setting(payload) {
+  List_setting(payload) {
     const getEndpoint = `${this.apiUrl}DocSettings/list`;
     return this.http.post(getEndpoint, payload);
   }
-    Add_setting(payload) {
+  Add_setting(payload) {
     const getEndpoint = `${this.apiUrl}DocSettings/insert`;
     return this.http.post(getEndpoint, payload);
   }
-    Doc_Last_SNo(payload) {
+  Doc_Last_SNo(payload) {
     const getEndpoint = `${this.apiUrl}DocSettings/nextvoucherno`;
     return this.http.post(getEndpoint, payload);
   }
-
-
- 
 }
