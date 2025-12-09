@@ -1240,7 +1240,7 @@ console.log(selectedSupplier)
 }
 
 @NgModule({
-  imports: [
+  imports: [ 
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,
