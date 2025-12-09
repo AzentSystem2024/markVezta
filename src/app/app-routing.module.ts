@@ -889,14 +889,14 @@ const routes: Routes = [
         component: StateListComponent,
         canActivate: [AuthGuardService],
       },
-        {
+      {
         path: 'settings',
-        component:SettingsListComponent ,
+        component: SettingsListComponent,
         canActivate: [AuthGuardService],
       },
       {
         path: '**',
-        redirectTo: 'analytics-dashboard',
+        redirectTo: 'login',
         pathMatch: 'full',
       },
     ],

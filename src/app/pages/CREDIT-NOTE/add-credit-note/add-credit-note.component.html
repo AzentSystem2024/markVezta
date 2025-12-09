@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 70vh;
+      height: 75vh;
       display: flex;
       flex-direction: column;
 
@@ -280,19 +280,37 @@
           style="
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             width: 100%;
           "
         >
-          <!-- Left Side: Vehicle Number -->
-          <dx-text-box
-            label="Vehicle Number"
-            labelMode="floating"
-            [(value)]="creditFormData.VEHICLE_NO"
-            [width]="200"
-          ></dx-text-box>
+          <!--  LEFT SIDE: Vehicle Number + Narration -->
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              width: 250px;
+            "
+          >
+            <!-- Vehicle Number -->
+            <dx-text-box
+              label="Vehicle Number"
+              labelMode="floating"
+              [(value)]="creditFormData.VEHICLE_NO"
+              [width]="200"
+            ></dx-text-box>
 
-          <!-- ⭐ Right Side: Round Off + Net Amount -->
+            <!-- Narration -->
+            <dx-text-box
+              label="Narration"
+              labelMode="floating"
+              [(value)]="creditFormData.NARRATION"
+              [width]="200"
+            ></dx-text-box>
+          </div>
+
+          <!--  RIGHT SIDE: Round Off + Net Amount -->
           <div style="display: flex; align-items: center; gap: 15px">
             <dx-check-box
               text="Round Off"
@@ -317,6 +335,7 @@
     </div>
   </div>
 </dx-validation-group>
+
 <div
   style="
     margin: 16px 0 8px 0;

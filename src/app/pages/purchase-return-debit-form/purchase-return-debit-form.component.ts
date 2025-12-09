@@ -288,12 +288,14 @@ export class PurchaseReturnDebitFormComponent {
       SGST: item.SGST ?? 0,
       GST: item.VAT_PERC ?? 0,
     }));
+    console.log(this.mainGridData, 'MAINGRIDDATAAAAAAAAAAAAA');
 
     // Force VAT recalculation after grid loads
     setTimeout(() => {
       this.mainGridData = [...this.mainGridData];
       this.itemsGridRef?.instance?.refresh();
     }, 200);
+    console.log(this.mainGridData, '==========================]]]]]]]]]]]]]]');
   }
 
   getDocNo() {
