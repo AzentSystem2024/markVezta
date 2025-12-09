@@ -877,8 +877,10 @@ doc.text('Invoice Serial No', startX, startY);
 
 doc.setFont("helvetica", "normal");
 doc.text('Invoice Date:', startX, startY + gap);
-doc.text('Vehicle No:', startX, startY + gap * 2);
+doc.text('Vehicle No: ' + (data.VEHICLE_NO || ''), startX, startY + gap * 2);
 doc.text('Mode of Transport:', startX, startY + gap * 3);
+
+
 // doc.text('Dispatched From:', startX, startY + gap * 4);
 dispY += 6;
 doc.setFont('helvetica', 'normal');
@@ -1026,45 +1028,142 @@ dispatchLines.forEach(line => {
       ],
     });
 
-    // ============================================================
-    // 6) FOOTER TEXT BLOCK (LEFT SIDE BELOW TABLE)
-    // ============================================================
+// ============================================================
+// 6) FOOTER – GST SUMMARY + RIGHT TOTAL (PERFECT ALIGNMENT)
+// ============================================================
 
-    // Y-position immediately after table
-    const footerY = (doc as any).lastAutoTable.finalY + 8;
+const footStartY = (doc as any).lastAutoTable.finalY + 15;
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-
-    // E. & O.E
-    doc.text('E. & O.E', 15, footerY);
-
-    // User
-    doc.text(`User: ${data.USER_NAME || ''}`, 15, footerY + 5);
-
-    // Company PAN
-    doc.text("Company's PAN", 15, footerY + 10);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`: ${data.PAN_NO || ''}`, 45, footerY + 10);
-
-    // restore normal
-    doc.setFont('helvetica', 'normal');
-
-    let amtY = footerY + 20;
+// ---------------- LEFT GST SUMMARY TABLE ----------------
+let fx = 15;
+let fy = footStartY;
 
 doc.setFont('helvetica', 'bold');
 doc.setFontSize(10);
-doc.text("Amount Chargeable (in words)", 15, amtY);
 
-amtY += 6;
+// SUPER CLOSE columns
+const gstCol      = fx;        // GST %
+const taxableCol  = fx + 22;   // closer
+const igstCol     = fx + 50;   // closer
+const totalCol    = fx + 80;   // closer
+
+// Integrated Tax is now subdivided
+const igstRateCol = fx + 50;   // Rate
+const igstAmtCol  = fx + 65;   // Amount
+
+
+doc.text("GST %", gstCol, fy);
+doc.text("Taxable Value", taxableCol, fy);
+doc.text("Integrated Tax", igstRateCol, fy);
+doc.text("Total Tax Amount", totalCol, fy);
+
+// SUBHEADERS BELOW
+fy += 5;
+doc.setFontSize(8);
+doc.text("Rate", igstRateCol, fy);
+doc.text("Amount", igstAmtCol, fy);
+
+fy += 7;
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(9);
+
+// Row
+doc.text("5%", gstCol, fy);
+doc.text((data.TAXABLE_VALUE_5 || 0).toFixed(2), taxableCol, fy);
+doc.text("5%", igstCol, fy);
+doc.text((data.IGST_5 || 0).toFixed(2), igstCol + 10, fy); // 10px shift only
+doc.text((data.TOTAL_TAX_5 || 0).toFixed(2), totalCol, fy);
+
+// Total row
+fy += 7;
 doc.setFont('helvetica', 'bold');
-doc.text(`INR ${data.AMOUNT_IN_WORDS || ''}`, 15, amtY);
+doc.text((data.TAXABLE_VALUE_5 || 0).toFixed(2), taxableCol, fy);
+doc.text((data.IGST_5 || 0).toFixed(2), igstCol + 10, fy);
+doc.text((data.TOTAL_TAX_5 || 0).toFixed(2), totalCol, fy);
+
+// // Line
+// fy += 4;
+// doc.line(15, fy, pageWidth - 15, fy);
 
 
-    // THANK YOU
-    // doc.text('Thank you for your business!', pageWidth / 2, finalY + 25, {
-    //   align: 'center',
-    // });
+// ---------------- RIGHT TOTAL SUMMARY (PUSHED RIGHT) ----------------
+
+let rx = pageWidth - 60;   // <-- moved right
+let ry = footStartY;
+
+const lblX = rx;
+const colonX = rx + 30;
+const valX = rx + 42;
+
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(9);
+
+// Taxable Value 5%
+doc.text("Taxable Value 5%", lblX, ry);
+doc.text(":", colonX, ry);
+doc.text((data.TAXABLE_VALUE_5 || 0).toFixed(2), valX, ry);
+
+ry += 6;
+doc.text("Total Tax", lblX, ry);
+doc.text(":", colonX, ry);
+doc.text((data.TOTAL_TAX_5 || 0).toFixed(2), valX, ry);
+
+ry += 6;
+doc.text("TCS", lblX, ry);
+doc.text(":", colonX, ry);
+doc.text((data.TCS || 0).toFixed(2), valX, ry);
+
+ry += 6;
+doc.text("Round Off", lblX, ry);
+doc.text(":", colonX, ry);
+doc.text((data.ROUND_OFF || 0).toFixed(2), valX, ry);
+
+ry += 7;
+doc.setFont('helvetica', 'bold');
+doc.text("Invoice Total", lblX, ry);
+doc.text(":", colonX, ry);
+doc.text((data.INVOICE_TOTAL || 0).toFixed(2), valX, ry);
+
+
+// ---------------- AMOUNT IN WORDS ----------------
+let wordsY = ry + 15;
+
+// NEW LINE ABOVE AMOUNT IN WORDS
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(10);
+doc.text("Whether the tax is payable on Reverse charge basis:No Amount of tax subject to reverse charge", 15, wordsY);
+
+wordsY += 7; // push next line slightly down
+
+
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(10);
+doc.text("Amount in words :", 15, wordsY);
+
+doc.setFont('helvetica', 'normal');
+doc.text(`INR ${data.AMOUNT_IN_WORDS}`, 60, wordsY);
+
+// ---------------- DECLARATION + REMARK + SIGNATURE ----------------
+let blockY = wordsY + 12;
+
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(9);
+doc.text("Declaration :", 15, blockY);
+
+blockY += 10;
+doc.text(`Remark : ${data.REMARK || ""}`, 15, blockY);
+
+// Company signature
+doc.setFont('helvetica', 'bold');
+doc.text("For BOYZONE POLYMERS INDIA PVT LTD", pageWidth - 95, blockY);
+
+// Signature labels
+let sigY = blockY + 25;
+
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(9);
+ 
+doc.text("Authorised Signatory", pageWidth - 75, sigY);
 
     doc.output('dataurlnewwindow');
   }

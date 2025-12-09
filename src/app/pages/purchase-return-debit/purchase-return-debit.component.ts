@@ -430,7 +430,9 @@ export class PurchaseReturnDebitComponent {
   onDeletePurchaseReturn(event: any) {
     console.log(event)
     const returnId = event.data.TRANS_ID;
+    console.log(returnId)
     const status = event.data.TRANS_STATUS;
+    console.log(status)
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
       notify('This cannot be deleted.', 'error', 2000);
