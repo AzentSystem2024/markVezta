@@ -429,7 +429,7 @@ export class PurchaseReturnDebitComponent {
   }
   onDeletePurchaseReturn(event: any) {
     console.log(event)
-    const returnId = event.data.ID;
+    const returnId = event.data.TRANS_ID;
     const status = event.data.TRANS_STATUS;
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;

@@ -1112,8 +1112,8 @@ onRoundOffChange() {
             DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
             PARTY_NAME: this.creditFormData.PARTY_NAME,
             NOTE_DETAIL: buildNoteDetail(),
-            ROUND_OFF: this.creditFormData.ROUND_OFF,
-            VEHICLE_NO: this.creditFormData.VEHICLE_NO,
+            ROUND_OFF: this.creditFormData[0].ROUND_OFF,
+            VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
           };
 
           this.dataService.commitCreditNote(payload).subscribe(
@@ -1156,8 +1156,8 @@ onRoundOffChange() {
       PARTY_NAME: this.creditFormData.PARTY_NAME,
       IS_APPROVED: false,
       NOTE_DETAIL: buildNoteDetail(), // <- includes GST_PERC and GST_AMOUNT
-      ROUND_OFF: this.creditFormData.ROUND_OFF,
-      VEHICLE_NO: this.creditFormData.VEHICLE_NO,
+      ROUND_OFF: this.creditFormData[0].ROUND_OFF,
+      VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
     };
 
     console.log('Update Payload:', payload);
