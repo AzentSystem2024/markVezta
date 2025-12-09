@@ -131,6 +131,7 @@ export class EditCreditNoteComponent {
   netTotal: number;
   customerStateID: any;
   selectedCustomer: any;
+  roundedNetAmount: number = 0;
 
   constructor(
     private dataService: DataService,
@@ -793,51 +794,101 @@ export class EditCreditNoteComponent {
   //   return (totalAmount + totalGST).toFixed(2);
   // }
 
+  // get calculatedNetAmount(): string {
+  //   const details = this.noteDetails || [];
+  //   let totalAmount = 0;
+  //   let totalGST = 0;
+
+  //   const isSameState = this.companyStateID === this.selectedCustomer?.STATE_ID;
+
+  //   details.forEach((item: any) => {
+  //     const amount = Number(item.Amount) || 0;
+  //     totalAmount += amount;
+
+  //     if (isSameState) {
+  //       // SAME STATE → CGST + SGST
+  //       const cgst = Number(item.CGST) || 0;
+  //       const sgst = Number(item.SGST) || 0;
+  //       const totalGstPerc = cgst + sgst;
+
+  //       totalGST += (amount * totalGstPerc) / 100;
+  //     } else {
+  //       // ⭐ DIFFERENT STATE → IGST
+  //       const gstPerc = Number(item.GST_PERC) || 0;
+  //       totalGST += (amount * gstPerc) / 100;
+  //     }
+  //   });
+
+  //   // ⭐ Raw total (before round-off)
+  //   this.netTotal = totalAmount + totalGST;
+
+  //   // ⭐ Apply round-off only if checkbox enabled
+  //   if (this.creditFormData.ROUND_OFF) {
+  //     this.netTotal = Math.round(this.netTotal);
+  //   }
+  //   console.log(this.netTotal, 'NETTOTALLLLLLLL');
+  //   return this.netTotal.toFixed(2);
+  // }
+
   get calculatedNetAmount(): string {
-    const details = this.noteDetails || [];
-    let totalAmount = 0;
-    let totalGST = 0;
+  const details = this.noteDetails || [];
+  let totalAmount = 0;
+  let totalGST = 0;
 
-    const isSameState = this.companyStateID === this.selectedCustomer?.STATE_ID;
+  const isSameState = this.companyStateID === this.selectedCustomer?.STATE_ID;
 
-    details.forEach((item: any) => {
-      const amount = Number(item.Amount) || 0;
-      totalAmount += amount;
+  details.forEach((item: any) => {
+    const amount = Number(item.Amount) || 0;
+    totalAmount += amount;
 
-      if (isSameState) {
-        // SAME STATE → CGST + SGST
-        const cgst = Number(item.CGST) || 0;
-        const sgst = Number(item.SGST) || 0;
-        const totalGstPerc = cgst + sgst;
-
-        totalGST += (amount * totalGstPerc) / 100;
-      } else {
-        // ⭐ DIFFERENT STATE → IGST
-        const gstPerc = Number(item.GST_PERC) || 0;
-        totalGST += (amount * gstPerc) / 100;
-      }
-    });
-
-    // ⭐ Raw total (before round-off)
-    this.netTotal = totalAmount + totalGST;
-
-    // ⭐ Apply round-off only if checkbox enabled
-    if (this.creditFormData.ROUND_OFF) {
-      this.netTotal = Math.round(this.netTotal);
-    }
-    console.log(this.netTotal, 'NETTOTALLLLLLLL');
-    return this.netTotal.toFixed(2);
-  }
-
-  onRoundOffChange() {
-    if (this.creditFormData.ROUND_OFF) {
-      // Round Off Enabled
-      this.netAmount = Math.round(this.netTotal).toFixed(2);
+    if (isSameState) {
+      const cgst = Number(item.CGST) || 0;
+      const sgst = Number(item.SGST) || 0;
+      totalGST += (amount * (cgst + sgst)) / 100;
     } else {
-      // Round Off Disabled → return to original value
-      this.netAmount = Number(this.netTotal).toFixed(2);
+      const gstPerc = Number(item.GST_PERC) || 0;
+      totalGST += (amount * gstPerc) / 100;
     }
+  });
+
+  let finalNet = totalAmount + totalGST;
+
+  // ⭐ Apply round off if checkbox is checked
+  if (this.creditFormData[0].ROUND_OFF) {
+    finalNet = Math.round(finalNet);
   }
+
+  return finalNet.toFixed(2);
+}
+
+
+  calculateNetAmount() {
+  const details = this.noteDetails || [];
+  let totalAmount = 0;
+  let totalGST = 0;
+
+  details.forEach((item: any) => {
+    const amount = Number(item.Amount) || 0;
+    const gstPerc = Number(item.GST_PERC) || 0;
+
+    totalAmount += amount;
+    totalGST += (amount * gstPerc) / 100;
+  });
+
+  this.netAmount = +(totalAmount + totalGST).toFixed(2);
+
+  // Apply RoundOff immediately if checkbox already selected
+  this.onRoundOffChange();
+}
+
+onRoundOffChange() {
+  if (this.creditFormData[0].ROUND_OFF) {
+    this.roundedNetAmount = Math.round(this.netAmount);  // Example: 1234.56 → 1235
+  } else {
+    this.roundedNetAmount = this.netAmount; // No rounding
+  }
+}
+
 
   onCompanySelected(event: any): void {
     const grid = this.itemsGridRef?.instance;

@@ -159,6 +159,20 @@
           </dxi-column>
 
           <dxi-column
+            dataField="GST_PERC"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? ' VAT %'
+                : ' IGST %'
+            "
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+            [allowEditing]="false"
+            [visible]="showGST"
+          >
+          </dxi-column>
+
+          <dxi-column
             dataField="gstAmount"
             [caption]="
               selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
@@ -172,9 +186,33 @@
           </dxi-column>
 
           <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
             dataField="HSN_CODE"
             caption="HSN Code"
             dataType="string"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="Total"
+            caption="Total"
+            dataType="number"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateTotal"
           ></dxi-column>
 
           <dxo-summary>
@@ -189,6 +227,15 @@
 
             <dxi-total-item
               column="gstAmount"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+
+            <dxi-total-item
+              column="Total"
               summaryType="sum"
               valueFormat="#,##0.00"
               displayFormat="Total: {0}"
@@ -217,6 +264,21 @@
             [width]="400"
             [readOnly]="true"
           ></dx-text-box>
+
+          <dx-text-box
+            label="Vehicle No"
+            labelMode="floating"
+            [(value)]="debitFormData[0].VEHICLE_NO"
+            [width]="200"
+          ></dx-text-box>
+
+          <dx-check-box
+            text="Round Off"
+            [readOnly]="true"
+            [(value)]="debitFormData[0].ROUND_OFF"
+            (onValueChanged)="onRoundOffChange()"
+            style="margin-top: 18px"
+          ></dx-check-box>
 
           <!-- Right: Net Amount + Approve checkbox -->
           <div
