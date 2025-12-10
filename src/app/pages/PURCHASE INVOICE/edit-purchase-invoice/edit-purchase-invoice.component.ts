@@ -759,6 +759,18 @@ ngOnChanges(changes: SimpleChanges): void {
     });
   }
 
+  formatDate(dateStr: string): string {
+    if (!dateStr) return "";
+
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr; // if invalid, return original
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
   
   generatePDF(data: any) {
     const doc = new jsPDF('p', 'mm', 'a4');
@@ -792,9 +804,9 @@ ngOnChanges(changes: SimpleChanges): void {
     const purchDate = (data.PURCH_DATE || '').split('T')[0];
 
     const headerLines = [
-      `GST IN : ${data.PURCH_NO}`,
-      `CIN :`,
-      `PAN:`,
+      `GST IN : ${data.GST_NO}`,
+      `CIN :${data.CIN}`,
+      `PAN:${data.PAN_NO}`,
       `e-Way Bill No. : ${this.formatDateDDMMMyyyy(purchDate)}`,
     ];
 
@@ -861,22 +873,22 @@ let dispY = compBoxY + compBoxH + 10;   // positioned below company box
 
 
 let startX = 15;
-let startY =  compBoxY + compBoxH + 50; 
+let startY =  compBoxY + compBoxH + 25; 
 let gap = 7; // space between lines
 
-doc.setFont('helvetica', 'bold');
-doc.setFontSize(11);
-doc.text('Dispatched from', dispX, dispY);
+// doc.setFont('helvetica', 'bold');
+// doc.setFontSize(11);
+// doc.text('Dispatched from', dispX, dispY);
 
 
 
 doc.setFontSize(12);
 doc.setFont("helvetica", "bold");
 
-doc.text('Invoice Serial No', startX, startY);
+doc.text('Invoice Serial No:'+ (data.SUPP_INV_NO), startX, startY);
 
 doc.setFont("helvetica", "normal");
-doc.text('Invoice Date:', startX, startY + gap);
+doc.text('Invoice Date:'+(data.SUPP_INV_DATE), startX, startY + gap);
 doc.text('Vehicle No: ' + (data.VEHICLE_NO || ''), startX, startY + gap * 2);
 doc.text('Mode of Transport:', startX, startY + gap * 3);
 
@@ -886,20 +898,20 @@ dispY += 6;
 doc.setFont('helvetica', 'normal');
 doc.setFontSize(10);
 
-const dispatchLines = [
-  data.DISPATCH_ADDRESS1,
-  data.DISPATCH_ADDRESS2,
-  data.DISPATCH_ADDRESS3,
-  `Pin: ${data.DISPATCH_PIN}`,
-];
+// const dispatchLines = [
+//   data.DISPATCH_ADDRESS1,
+//   data.DISPATCH_ADDRESS2,
+//   data.DISPATCH_ADDRESS3,
+//   `Pin: ${data.DISPATCH_PIN}`,
+// ];
 
-// Print lines
-dispatchLines.forEach(line => {
-  if (line) {
-    doc.text(line, dispX, dispY);
-    dispY += 5;
-  }
-});
+// // Print lines
+// dispatchLines.forEach(line => {
+//   if (line) {
+//     doc.text(line, dispX, dispY);
+//     dispY += 5;
+//   }
+// });
 
     // ============================================================
     // 3) CONSIGNEE (SHIP TO)
@@ -952,81 +964,110 @@ dispatchLines.forEach(line => {
 
     // LINE BELOW BUYER BLOCK
     const tableLineY = buyerY + 40;
-    doc.setDrawColor(180);
-    doc.line(15, tableLineY, pageWidth - 15, tableLineY);
+    // doc.setDrawColor(180);
+    // doc.line(15, tableLineY, pageWidth - 15, tableLineY);
 
-    // ============================================================
-    // 5) TABLE — EXACT SAME WIDTH AS THE LINE (180mm)
-    // ============================================================
-    const tableStartY = tableLineY + 5;
+   // ============================================================
+// 5) TABLE — EXACT SAME WIDTH AS THE LINE (180mm)
+// ============================================================
+const tableStartY = tableLineY - 2;
 
-    const rows = data.PurchDetails.map((item: any, index: number) => [
-      index + 1, // Sl No
-      item.ITEM_NAME, // Description
-      item.GRN_QUANTITY, // Quantity
-      item.RATE.toFixed(2), // Rate
-      'pairs', // Per
-      item.VAT_PERC.toFixed(2) + ' %', // GST%
-      item.TOTAL_AMOUNT.toFixed(2), // Total Amount
-    ]);
+const companyState = this.companyState?.trim().toLowerCase();
+const supplierState = this.purchaseInvoiceFormData?.SUPP_STATE_NAME?.trim().toLowerCase();
 
-    autoTable(doc, {
-      startY: tableStartY,
-      theme: 'grid',
+const sameState = companyState === supplierState;
 
-      headStyles: {
-        fillColor: [240, 240, 240],
-        textColor: 0,
-        fontSize: 9,
-        halign: 'center',
-      },
-      bodyStyles: { fontSize: 9 },
-      footStyles: {
-        fillColor: [255, 255, 255], // same as table
-        textColor: 0,
-        fontSize: 10,
-        halign: 'right',
-      },
 
-      columnStyles: {
-        0: { cellWidth: 12, halign: 'center' },
-        1: { cellWidth: 70 },
-        2: { cellWidth: 20, halign: 'center' },
-        3: { cellWidth: 18, halign: 'right' },
-        4: { cellWidth: 15, halign: 'center' },
-        5: { cellWidth: 20, halign: 'center' },
-        6: { cellWidth: 25, halign: 'right' },
-      },
 
-      head: [
-        [
-          'Sl No',
-          'Description of goods',
-          'Quantity',
-          'Rate',
-          'Per',
-          'GST%',
-          'Total Amount',
-        ],
-      ],
+const rows = data.PurchDetails.map((item: any) => {
 
-      body: rows,
+  const amount = this.calculateAmount(item);
+  const gstAmount = this.calculateGstAmount(item);
 
-      // ⭐ PERFECTLY ALIGNED TOTAL ROW
-      foot: [
-        [
-          {
-            content: 'Total',
-            colSpan: 6,
-            styles: { halign: 'right', fontStyle: 'bold' },
-          },
-          {
-            content: data.NET_AMOUNT.toFixed(2),
-            styles: { fontStyle: 'bold' },
-          },
-        ],
-      ],
-    });
+  const common = [
+    // item.TRANSFER_NO || "",
+  this.formatDate(item.GRN_DATE) || "",
+    item.ITEM_NAME || "",
+    item.RATE.toFixed(2),
+    item.GRN_QUANTITY.toFixed(2),
+    item.QUANTITY.toFixed(2),
+    amount.toFixed(2),      // Amount
+    gstAmount.toFixed(2),   // GST Amount
+    item.HSN_CODE || this.HSNCODE || "" 
+  ];
+
+  if (sameState) {
+    return [
+      ...common,
+      (item.CGST || 0).toFixed(2),
+      (item.SGST || 0).toFixed(2),
+      item.TOTAL_AMOUNT.toFixed(2)
+    ];
+  } else {
+    return [
+      ...common,
+      (item.GST || 0).toFixed(2),    // IGST
+      item.TOTAL_AMOUNT.toFixed(2)
+    ];
+  }
+});
+
+
+
+autoTable(doc, {
+  startY: tableStartY,
+  theme: 'grid',
+
+  headStyles: {
+    fillColor: [240, 240, 240],
+    textColor: 0,
+    fontSize: 8,
+    halign: 'center',
+  },
+
+  bodyStyles: { fontSize: 8 },
+
+  columnStyles: {
+    // 0: { cellWidth: 10, halign: 'center' },  // TransferNo
+    0: { cellWidth: 18, halign: 'center' },  // Date
+    1: { cellWidth: 38 },                   // Item Name
+    2: { cellWidth: 13, halign: 'right' },  // Price
+    3: { cellWidth: 14, halign: 'center' }, // Pending Qty
+    4: { cellWidth: 13, halign: 'center' }, // Qty
+    5: { cellWidth: 14, halign: 'right' },  // Amount
+    6: { cellWidth: 14, halign: 'right' },  // GST Amount
+    7: { cellWidth: 14, halign: 'center' }, // HSN
+    8: { cellWidth: 13, halign: 'right' },  // CGST
+    9:{ cellWidth: 13, halign: 'right' },  // SGST
+    10:{ cellWidth: 18, halign: 'right' },  // Total Amount
+  },
+
+  head: [
+    [
+      // 'TransferNo.',
+      'Date',
+      'Item Name',
+      'Price',
+      'Pending Qty',
+      'Qty',
+      'Amount',
+      'GST Amount',
+      'HSN Code',
+      'CGST',
+      'SGST',
+      'Total Amount'
+    ],
+  ],
+
+  body: rows,
+
+  foot: [
+    [
+      { content: 'Total', colSpan: 10, styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: data.NET_AMOUNT.toFixed(2), styles: { fontStyle: 'bold' } },
+    ],
+  ],
+});
 
 // ============================================================
 // 6) FOOTER – GST SUMMARY + RIGHT TOTAL (PERFECT ALIGNMENT)
@@ -1067,19 +1108,35 @@ fy += 7;
 doc.setFont('helvetica', 'normal');
 doc.setFontSize(9);
 
+// Calculate IGST = NET_AMOUNT * VAT_PERC / 100
+const vatPerc = data.PurchDetails[0]?.VAT_PERC || 0;
+const igstAmount = (data.NET_AMOUNT * vatPerc) / 100;
+
 // Row
-doc.text("5%", gstCol, fy);
-doc.text((data.TAXABLE_VALUE_5 || 0).toFixed(2), taxableCol, fy);
-doc.text("5%", igstCol, fy);
-doc.text((data.IGST_5 || 0).toFixed(2), igstCol + 10, fy); // 10px shift only
-doc.text((data.TOTAL_TAX_5 || 0).toFixed(2), totalCol, fy);
+doc.text((data.PurchDetails[0].VAT_PERC || 0).toFixed(2) + "%", gstCol, fy);
+doc.text((data.NET_AMOUNT || 0).toFixed(2), taxableCol, fy);
+doc.text((data.PurchDetails[0].VAT_PERC || 0).toFixed(2) + "%", igstCol, fy);
+// Column width for AMOUNT column
+const amountColWidth = 20;
+
+// Center of the header column
+const amountCenterX = igstAmtCol + (amountColWidth / 2);
+
+// Center-align IGST Amount under the "Amount" header
+doc.text(igstAmount.toFixed(2), amountCenterX, fy, { align: "center" });
+
+// Center-align Total Tax Amount under its header
+doc.text((igstAmount || 0).toFixed(2), totalCol + (amountColWidth / 2), fy, { align: "center" });
+
+
 
 // Total row
 fy += 7;
 doc.setFont('helvetica', 'bold');
-doc.text((data.TAXABLE_VALUE_5 || 0).toFixed(2), taxableCol, fy);
-doc.text((data.IGST_5 || 0).toFixed(2), igstCol + 10, fy);
-doc.text((data.TOTAL_TAX_5 || 0).toFixed(2), totalCol, fy);
+doc.text((data.NET_AMOUNT || 0).toFixed(2), taxableCol, fy);
+doc.text(igstAmount.toFixed(2), amountCenterX, fy, { align: "center" });
+doc.text((igstAmount || 0).toFixed(2), totalCol + (amountColWidth / 2), fy, { align: "center" });
+
 
 // // Line
 // fy += 4;
@@ -1087,6 +1144,18 @@ doc.text((data.TOTAL_TAX_5 || 0).toFixed(2), totalCol, fy);
 
 
 // ---------------- RIGHT TOTAL SUMMARY (PUSHED RIGHT) ----------------
+
+
+const netAmount = data.NET_AMOUNT || 0;
+const gstAmount = igstAmount || 0;
+
+// Get decimals
+const netDecimal = this.getDecimalPart(netAmount);   // example -> .15
+const igstDecimal = this.getDecimalPart(gstAmount); // example -> .31
+
+// Add decimals
+const roundOffValue = (netDecimal + igstDecimal).toFixed(2);
+
 
 let rx = pageWidth - 60;   // <-- moved right
 let ry = footStartY;
@@ -1099,14 +1168,14 @@ doc.setFont('helvetica', 'normal');
 doc.setFontSize(9);
 
 // Taxable Value 5%
-doc.text("Taxable Value 5%", lblX, ry);
+doc.text("Taxable Value", lblX, ry);
 doc.text(":", colonX, ry);
-doc.text((data.TAXABLE_VALUE_5 || 0).toFixed(2), valX, ry);
+doc.text((data.NET_AMOUNT || 0).toFixed(2), valX, ry);
 
 ry += 6;
 doc.text("Total Tax", lblX, ry);
 doc.text(":", colonX, ry);
-doc.text((data.TOTAL_TAX_5 || 0).toFixed(2), valX, ry);
+doc.text((igstAmount || 0).toFixed(2), valX, ry);
 
 ry += 6;
 doc.text("TCS", lblX, ry);
@@ -1116,14 +1185,23 @@ doc.text((data.TCS || 0).toFixed(2), valX, ry);
 ry += 6;
 doc.text("Round Off", lblX, ry);
 doc.text(":", colonX, ry);
-doc.text((data.ROUND_OFF || 0).toFixed(2), valX, ry);
+doc.text(roundOffValue, valX, ry); 
+
+const taxableValue = data.NET_AMOUNT || 0;   // example: 100.12
+const totalTax = igstAmount || 0;      // example: 100.10
+const fullInvoiceValue = taxableValue + totalTax;      
+// round-off version
+const roundedInvoiceValue = Math.floor(fullInvoiceValue);
 
 ry += 7;
 doc.setFont('helvetica', 'bold');
 doc.text("Invoice Total", lblX, ry);
 doc.text(":", colonX, ry);
-doc.text((data.INVOICE_TOTAL || 0).toFixed(2), valX, ry);
-
+if (data.ROUND_OFF === true) {
+  doc.text(roundedInvoiceValue.toString(), valX, ry);   // NO DECIMALS
+} else {
+  doc.text(fullInvoiceValue.toFixed(2), valX, ry);      // EXACT AMOUNT
+}
 
 // ---------------- AMOUNT IN WORDS ----------------
 let wordsY = ry + 15;
@@ -1141,7 +1219,7 @@ doc.setFontSize(10);
 doc.text("Amount in words :", 15, wordsY);
 
 doc.setFont('helvetica', 'normal');
-doc.text(`INR ${data.AMOUNT_IN_WORDS}`, 60, wordsY);
+doc.text(`INR ${this.numberToWords(data.NET_AMOUNT)}`, 60, wordsY);
 
 // ---------------- DECLARATION + REMARK + SIGNATURE ----------------
 let blockY = wordsY + 12;
@@ -1151,7 +1229,7 @@ doc.setFontSize(9);
 doc.text("Declaration :", 15, blockY);
 
 blockY += 10;
-doc.text(`Remark : ${data.REMARK || ""}`, 15, blockY);
+doc.text(`Remark : ${data.NARRATION || ""}`, 15, blockY);
 
 // Company signature
 doc.setFont('helvetica', 'bold');
@@ -1168,10 +1246,45 @@ doc.text("Authorised Signatory", pageWidth - 75, sigY);
     doc.output('dataurlnewwindow');
   }
 
-  // Convert amount to words (simple version)
-  numberToWords(amount: number): string {
-    return 'INR ' + amount.toFixed(0) + ' Only';
+  //========sum of decimal parts for roundoff===============
+  getDecimalPart(num: number): number {
+  const str = num.toFixed(2);
+  const decimal = str.split(".")[1];
+  return Number("0." + decimal);
+}
+
+
+ numberToWords(amount: number): string {
+  if (amount === 0) return "Zero Rupees Only";
+
+  const words = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+    "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
+    "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen",
+    "Nineteen"
+  ];
+
+  const tens = [
+    "", "", "Twenty", "Thirty", "Forty", "Fifty",
+    "Sixty", "Seventy", "Eighty", "Ninety"
+  ];
+
+  function convert(num: number): string {
+    if (num < 20) return words[num];
+    if (num < 100)
+      return tens[Math.floor(num / 10)] + (num % 10 ? " " + words[num % 10] : "");
+    if (num < 1000)
+      return words[Math.floor(num / 100)] + " Hundred" + (num % 100 ? " " + convert(num % 100) : "");
+    if (num < 100000)
+      return convert(Math.floor(num / 1000)) + " Thousand" + (num % 1000 ? " " + convert(num % 1000) : "");
+    if (num < 10000000)
+      return convert(Math.floor(num / 100000)) + " Lakh" + (num % 100000 ? " " + convert(num % 100000) : "");
+    return convert(Math.floor(num / 10000000)) + " Crore" + (num % 10000000 ? " " + convert(num % 10000000) : "");
   }
+
+  return convert(Math.floor(amount)) + " Rupees Only";
+}
+
 
   cancel() {
     this.popupClosed?.emit();
@@ -1187,8 +1300,9 @@ private async convertToBase64(path: string): Promise<string> {
     reader.readAsDataURL(blob);
   });
 }
-
 }
+
+
 
 @NgModule({
   imports: [

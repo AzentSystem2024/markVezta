@@ -1227,13 +1227,15 @@ doc.text(`₹ ${Number(data.NET_AMOUNT).toFixed(2)}`, 170, y, { align: "right" }
          doc.setFont('helvetica', 'normal');
          doc.setFontSize(9);
          doc.text('Authorised Signatory', signBoxX + 3, signBoxY + 20);
-     
+     doc.output('dataurlnewwindow');
          // ======================================================
          // RETURN PDF
          // ======================================================
          const pdfBlob = doc.output('blob');
          const pdfUrl = URL.createObjectURL(pdfBlob);
          return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+
+         doc.output('dataurlnewwindow');
        }
 }
 
