@@ -1233,7 +1233,7 @@ doc.text(`Remark : ${data.NARRATION || ""}`, 15, blockY);
 
 // Company signature
 doc.setFont('helvetica', 'bold');
-doc.text("For BOYZONE POLYMERS INDIA PVT LTD", pageWidth - 95, blockY);
+doc.text(`For ${data.COMPANY_NAME}`, pageWidth - 95, blockY);
 
 // Signature labels
 let sigY = blockY + 25;
