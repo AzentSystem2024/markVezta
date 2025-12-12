@@ -222,6 +222,21 @@ export class AddInvoiceComponent {
     const selectedCustomer = this.distributorList.find(
       (cust: any) => cust.ID === e.value
     );
+    // If customer changed → clear previously added rows
+    if (this.mainInvoiceGridList && this.mainInvoiceGridList.length > 0) {
+      this.mainInvoiceGridList = []; // Clear the grid completely
+      this.totalAmount = 0;
+      this.taxAmount = 0;
+      this.grandTotal = 0;
+      this.netAmount = 0;
+
+      // Refresh grid UI
+      if (this.itemsGridRef?.instance) {
+        this.itemsGridRef.instance.refresh();
+      }
+
+      console.log('Cleared main grid due to customer change');
+    }
     this.selectedCustomerName = selectedCustomer.DESCRIPTION;
     this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
     console.log(selectedCustomer.STATE_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
@@ -229,8 +244,6 @@ export class AddInvoiceComponent {
     const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
     const sessionGst = parseFloat(this.GST) || 0; // main GST%
     if (company === customer) {
-      console.log('Both states SAME → CGST + SGST apply');
-
       this.showCGST = true;
       this.showSGST = true;
       this.showGST = false;
@@ -260,14 +273,6 @@ export class AddInvoiceComponent {
     }
 
     this.selectedCustomer = selectedCustomer;
-
-    // if (this.selectedCustomerId) {
-    //   this.selectedCustomer = this.distributorList.find(
-    //     (s: any) => s.ID === this.selectedCustomerId
-    //   );
-    //   this.invoiceFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
-    //   console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
-    // }
     this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
     if (this.selectedCustomerType) {
       console.log(
@@ -287,17 +292,6 @@ export class AddInvoiceComponent {
     }
   }
 
-  // onDistributorChanged(e: any) {
-  //   if (e && e.value) {
-  //     this.selectedDistributorId = e.value; // ✅ this is the selected ID
-  //     console.log('Selected Distributor ID:', e);
-
-  //     this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
-  //     this.invoiceFormData.UNIT_ID = 0;
-  //   }
-  //   this.getInvoiceListForGrid();
-  // }
-
   getInvoiceListForGrid() {
     console.log(this.invoiceFormData.DISTRIBUTOR_ID, 'INVOICELISTFORGRID');
     const payload = {
@@ -311,8 +305,13 @@ export class AddInvoiceComponent {
   }
 
   getInvoiceNo() {
-    this.dataService.getInvoiceNo().subscribe((response: any) => {
-      this.invoiceNo = response.INVOICE_NO;
+    const payload = {
+      TRANS_TYPE: 25,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.invoiceNo = response.DOC_NO;
+      this.invoiceFormData.DOC_NO = response.DOC_NO;
       console.log(response.INVOICE_NO, 'INVOICENO');
     });
   }
@@ -320,12 +319,6 @@ export class AddInvoiceComponent {
   calculateAmount = (row: any) => {
     return (parseFloat(row.PRICE) || 0) * (parseFloat(row.TOTAL_PAIR_QTY) || 0);
   };
-
-  // calculateGstAmount = (row: any) => {
-  //   const amt = this.calculateAmount(row);
-  //   const gstPercent = parseFloat(row.GST) || 0;
-  //   return amt * (gstPercent / 100);
-  // };
 
   calculateGstAmount = (row: any) => {
     const amt = this.calculateAmount(row);

@@ -251,8 +251,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}AC_CreditNote/update`, data);
   }
 
-  getDocNo(): Observable<any> {
-    return this.http.post(`${this.apiUrl}AC_CreditNote/DocNo`, {});
+  getDocNo(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}AC_CreditNote/DocNo`, data);
   }
 
   commitCreditNote(items: any) {
@@ -298,8 +298,8 @@ export class DataService {
     );
   }
 
-  getDocNoForDebit(): Observable<any> {
-    return this.http.post(`${this.apiUrl}ACTransactions/DocNo`, {});
+  getDocNoForDebit(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}AC_CreditNote/DocNo`, data);
   }
 
   getPendingInvoiceforDebit(payload: any): Observable<any> {

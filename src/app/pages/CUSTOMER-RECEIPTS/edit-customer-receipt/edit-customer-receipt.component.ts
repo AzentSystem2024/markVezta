@@ -143,7 +143,7 @@ export class EditCustomerReceiptComponent {
       }
       this.receiprtFormData = firstReceipt; // assign for form binding
       console.log(
-        this.receiprtFormData.VOUCHER_NO,
+        this.receiprtFormData.DOC_NO,
         'VOUCHERNOOOOOOOOOOOOOOOOOOOOOOOO'
       );
       this.selectedDistributorId = Number(firstReceipt.DISTRIBUTOR_ID);

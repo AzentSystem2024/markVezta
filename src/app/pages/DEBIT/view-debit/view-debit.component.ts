@@ -9,7 +9,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxComponent,
   DxTextBoxComponent,
@@ -62,7 +66,7 @@ import jsPDF from 'jspdf';
 export class ViewDebitComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() debitFormData: any;
-    @Input() DNid!: number;
+  @Input() DNid!: number;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -99,12 +103,15 @@ export class ViewDebitComponent {
   HSNCODE: any;
   hsnLoaded: boolean;
 
-   isPdfPopupVisible: boolean = false;
-    pdfSrc: SafeResourceUrl | null = null;
+  isPdfPopupVisible: boolean = false;
+  pdfSrc: SafeResourceUrl | null = null;
   GST: any;
 
-  constructor(private dataService: DataService,private sanitizer: DomSanitizer) {
-     const userDataString = localStorage.getItem('userData');
+  constructor(
+    private dataService: DataService,
+    private sanitizer: DomSanitizer
+  ) {
+    const userDataString = localStorage.getItem('userData');
     console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -143,7 +150,7 @@ export class ViewDebitComponent {
     }
     // this.getCompanyListDropdown();
     this.getLedgerCodeDropdown();
-    this.getDocNo();
+    // this.getDocNo();
     this.getSupplierDropdown();
     this.sessionData_tax();
   }
@@ -155,6 +162,7 @@ export class ViewDebitComponent {
       if (data.TRANS_TYPE === 36) {
         data.IS_APPROVED = true;
       }
+      this.docNo = data.DOC_NO;
       this.transDate = new Date(data.TRANS_DATE);
       this.formattedTransDate = this.formatAsDDMMYYYY(this.transDate);
       console.log(this.formattedTransDate, 'FORMATTED TRANSDATE');
@@ -170,7 +178,7 @@ export class ViewDebitComponent {
             particulars: item.REMARKS || '',
             Amount: item.AMOUNT || '',
             gstAmount: item.GST_AMOUNT || '',
-             HSN_CODE: this.HSNCODE,
+            HSN_CODE: this.HSNCODE,
           };
         });
       });
@@ -178,11 +186,11 @@ export class ViewDebitComponent {
     }
   }
 
-  getDocNo() {
-    this.dataService.getDocNoForDebit().subscribe((response: any) => {
-      this.docNo = response.DOC_NO;
-    });
-  }
+  // getDocNo() {
+  //   this.dataService.getDocNoForDebit().subscribe((response: any) => {
+  //     this.docNo = response.DOC_NO;
+  //   });
+  // }
 
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
@@ -601,326 +609,323 @@ export class ViewDebitComponent {
   }
 
   viewPdf(): void {
-    console.log(this.DNid, "ID received in viewPdf()");
+    console.log(this.DNid, 'ID received in viewPdf()');
     this.isPdfPopupVisible = true;
-    
+
     this.dataService.selectDebitNote(this.DNid).subscribe((response: any) => {
-       console.log(
-        response,
-        '=================DN response==================='
-      );
+      console.log(response, '=================DN response===================');
       if (response) {
         this.pdfSrc = this.get_pdf(response.Data[0]); // Update iframe source
       }
     });
-  
   }
 
   get_pdf(data: any): SafeResourceUrl {
-      const doc = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = doc.internal.pageSize.width;
-      const pageHeight = doc.internal.pageSize.height;
-      let y = 10;
-  
-      // ======================================================
-      // LOGO (LEFT TOP)
-      // ======================================================
-      const logoW = 55;
-      const logoH = 28;
-      doc.setDrawColor(180);
-      doc.rect(10, y, logoW, logoH); // TEMP LOGO BOX (replace with addImage)
-  
-      // ===============================================
-      //  DEBITNOTE HEADING (Centered between logo & reference block)
-      // ===============================================
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-  
-      // compute a centered X between left logo and right reference area
-      const leftEdge = 10 + logoW; // end of logo box
-      const rightEdge = pageWidth - 80; // start of reference block
-      const centerX = (leftEdge + rightEdge) / 2;
-  
-      doc.text('DEBIT NOTE', centerX, y + 25, { align: 'center' });
-  
-      // ======================================================
-      // RIGHT-TOP HEADER (Debit Note Info)
-      // ======================================================
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-  
-      const refX = pageWidth - 65; // moved 15mm right
-  
-      doc.text(`Invoice No : ${data.INVOICE_NO || ''}`, refX, y + 5);
-      doc.text(`Reference No : ${data.REF_NO || ''}`, refX, y + 11);
-      doc.text(`Date: ${data.TRANS_DATE || ''}`, refX, y + 17);
-  
-      // doc.text(`Dated : ${data[0].SALE_DATE || ""}`, pageWidth - 80, y + 23);
-  
-      y += 33;
-  
-      // ===============================================
-      // HORIZONTAL LINE ABOVE SELLER + CUSTOMER BLOCKS
-      // ===============================================
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.5);
-      doc.line(10, y, pageWidth - 10, y); // full width line
-  
-      y += 5; // small spacing
-  
-      // ======================================================
-      // BLUE SELLER BOX (LEFT)
-      // ======================================================
-      const blueX = 10;
-      const blueY = y;
-      const blueW = 100;
-      const blueH = 38;
-  
-      doc.setFillColor(204, 229, 255);
-      doc.rect(blueX, blueY, blueW, blueH, 'F');
-  
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text(data.COMPANY_NAME || '', blueX + 3, blueY + 7);
-  
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.text(data.ADDRESS1 || '', blueX + 3, blueY + 13);
-      doc.text(data.ADDRESS2 || '', blueX + 3, blueY + 18);
-      doc.text(data.ADDRESS3 || '', blueX + 3, blueY + 23);
-      doc.text(`GSTIN/UIN: ${data.GSTIN || ''}`, blueX + 3, blueY + 28);
-      doc.text(
-        `State : ${data.STATE || ''}, Code : ${data.STATE_CODE || ''}`,
-        blueX + 3,
-        blueY + 33
-      );
-      doc.text(`E-Mail : ${data.EMAIL || ''}`, blueX + 3, blueY + 38);
-  
-      // ======================================================
-      // CONSIGNEE (RIGHT SIDE)
-      // ======================================================
-      const shipX = 115;
-      const shipY = y;
-  
-      doc.setFont('helvetica', 'bold');
-      doc.text('Consignee (Ship to)', shipX, shipY + 5);
-  
-      doc.setFont('helvetica', 'normal');
-      doc.text(data.SUPP_NAME || '', shipX, shipY + 11);
-      doc.text(data.SUPP_ADDRESS1 || '', shipX, shipY + 16);
-      doc.text(data.SUPP_ADDRESS2 || '', shipX, shipY + 21);
-      doc.text(data.SUPP_ADDRESS3 || '', shipX, shipY + 26);
-      doc.text(`GSTIN/UIN : ${data.CUST_GSTIN || ''}`, shipX, shipY + 31);
-      doc.text(
-        `State : ${data.SUPP_STATE_NAME || ''}, Code : ${data.STATE_CODE || ''}`,
-        shipX,
-        shipY + 36
-      );
-  
-      y += 48;
-  
-      // ======================================================
-      // BUYER (BILL TO)
-      // ======================================================
-      const billX = 115;
-      const billY = y;
-  
-      doc.setFont('helvetica', 'bold');
-      doc.text('Buyer (Bill to)', billX, billY + 5);
-  
-      doc.setFont('helvetica', 'normal');
-      doc.text(data.SUPP_NAME || '', billX, billY + 11);
-      doc.text(data.SUPP_ADDRESS1 || '', billX, billY + 16);
-      doc.text(data.SUPP_ADDRESS2 || '', billX, billY + 21);
-      doc.text(data.SUPP_ADDRESS3 || '', billX, billY + 26);
-      doc.text(`GSTIN/UIN : ${data.CUST_GSTIN || ''}`, billX, billY + 31);
-      doc.text(
-        `State : ${data.SUPP_STATE_NAME || ''}, Code : ${data.STATE_CODE || ''}`,
-        billX,
-        billY + 36
-      );
-  
-      y += 50;
-  
-      // ======================================================
-      // TABLE — SAME FORMAT AS IMAGE
-      // ======================================================
-      const tableColumns = [
-        'Sl no.',
-        'Ledger Code',
-        'ledger Name',
-        'Particulars',
-        'Amount',
-        'Tax %',
-        'HSN Code',
-        'Tax Amount',
-        
-      ];
-  
-      const tableRows: any[] = [];
-      const footerRow = [
-        '',
-        '',
-        '',
-        '',
-        '₹ ' + Number(data.GROSS_AMOUNT).toFixed(2), // 5  (Amount)
-        '',
-        '',
-        '', // 6–7
-        // '₹ ' + Number(data.NET_AMOUNT).toFixed(2), // 8  (Tax Amount?) WRONG
-      ];
-  
-      data.NOTE_DETAIL.forEach((item: any, index: number) => {
-  tableRows.push([
-    item.SL_NO || '',
-     item.LEDGER_CODE || '',
-     item.LEDGER_NAME || '',                            
-    item.REMARKS || '',                  
-    (item.AMOUNT ?? 0).toFixed(2),       // Amount
-    item.GST_PERC ?? '',                 // GST %
-    item.HSN_CODE ?? '',                 // HSN
-    (item.GST_AMOUNT ?? 0).toFixed(2),   // Tax Amount
-  ]);
-});
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    let y = 10;
 
-      // Move y to bottom of Bill-to block
-      y = y + 2;
-  
-      // ===============================
-      // HORIZONTAL LINE LIKE THE FIGURE
-      // ===============================
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.5);
-      doc.line(10, y, pageWidth - 10, y); // Full width horizontal line
-  
-      y += 5; // small gap before table
-      (doc as any).autoTable({
-        startY: y,
-        head: [tableColumns],
-        body: tableRows,
-        foot: [footerRow],
-        theme: 'grid',
-        margin: { left: 10, right: 10 },
-        styles: { fontSize: 9, cellPadding: 2 },
-        headStyles: {
-          fillColor: [230, 230, 230],
-          textColor: 0,
-          halign: 'center',
-        },
-        footStyles: {
-          fillColor: [230, 230, 230], // same color as header
-          textColor: 0,
-          fontStyle: 'bold',
-          halign: 'right',
-        },
-        columnStyles: {
-          5: { halign: 'right' }, // Amount column
-          9: { halign: 'right' }, // Total column
-        },
-      });
-  
-     // Move below table
-y = (doc as any).lastAutoTable.finalY + 10;
+    // ======================================================
+    // LOGO (LEFT TOP)
+    // ======================================================
+    const logoW = 55;
+    const logoH = 28;
+    doc.setDrawColor(180);
+    doc.rect(10, y, logoW, logoH); // TEMP LOGO BOX (replace with addImage)
 
-// NET AMOUNT LABEL
-doc.setFont("helvetica", "bold");
-doc.setFontSize(11);
-doc.text("NET AMOUNT :", 130, y);  // Right side label
+    // ===============================================
+    //  DEBITNOTE HEADING (Centered between logo & reference block)
+    // ===============================================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
 
-// NET AMOUNT VALUE
-doc.setFont("helvetica", "bold");
-doc.text(`₹ ${Number(data.NET_AMOUNT).toFixed(2)}`, 170, y, { align: "right" });
-      y += 10;
-      // ======================================================
-      // AMOUNT IN WORDS BLOCKS
-      // ======================================================
-  
-      // ------------------------
-      // 1) GROSS AMOUNT (Amount Chargeable)
-      // ------------------------
-      const grossAmount = data.GROSS_AMOUNT || 0;
-      const grossRupees = Math.floor(grossAmount);
-      const grossPaise = Math.round((grossAmount - grossRupees) * 100);
-  
-      let grossWords = numberToWordsIndianNumber(grossRupees);
-      let grossPaiseWords =
-        grossPaise > 0 ? numberToWordsIndianNumber(grossPaise) : '';
-  
-      let grossText = 'INR ' + grossWords + ' Rupees';
-      if (grossPaise > 0) grossText += ' and ' + grossPaiseWords + ' Paise';
-      grossText += ' Only';
-  
-      // ------------------------
-      // 2) NET AMOUNT (Total Amount)
-      // ------------------------
-      const netAmount = data.NET_AMOUNT || 0;
-      const netRupees = Math.floor(netAmount);
-      const netPaise = Math.round((netAmount - netRupees) * 100);
-  
-      let netWords = numberToWordsIndianNumber(netRupees);
-      let netPaiseWords = netPaise > 0 ? numberToWordsIndianNumber(netPaise) : '';
-  
-      let netText = 'INR ' + netWords + ' Rupees';
-      if (netPaise > 0) netText += ' and ' + netPaiseWords + ' Paise';
-      netText += ' Only';
-  
-      // -----------------------------------
-      // RIGHT SIDE PRINTING (two sections)
-      // -----------------------------------
-      const rightX = pageWidth - 90;
-  
-      doc.setFont('helvetica', 'bold');
-      doc.text('Total Amount Chargeable (in words)', rightX, y);
-  
-      doc.setFont('helvetica', 'normal');
-      doc.text(grossText, rightX, y + 6, { maxWidth: 85 });
-  
-      doc.setFont('helvetica', 'bold');
-      doc.text('Total of NetAmount (in words)', rightX, y + 18);
-  
-      doc.setFont('helvetica', 'normal');
-      doc.text(netText, rightX, y + 24, { maxWidth: 85 });
-  
-      // -----------------------------------
-      // LEFT SIDE (E & OE, User, PAN)
-      // -----------------------------------
-      const leftX = 10;
-  
-      doc.setFont('helvetica', 'bold');
-      doc.text('E & OE :', leftX, y);
-  
-      doc.text(`User : ${data.USER || ''}`, leftX, y + 6);
-  
-      doc.text(`Company's PAN : ${data.PAN || ''}`, leftX, y + 12);
-  
-      // ======================================================
-      // SIGNATURE BOX WITH COMPANY NAME
-      // ======================================================
-      const extraLeft = 20;
-      const signBoxX = pageWidth - 70 - extraLeft;
-      const signBoxY = y + 34; // 24 + 10 padding
-      const signBoxW = 60 + extraLeft;
-      const signBoxH = 25;
-  
-      doc.rect(signBoxX, signBoxY, signBoxW, signBoxH);
-  
-      // Company name inside the box
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.text(`for ${data.COMPANY_NAME || ''}`, signBoxX + 3, signBoxY + 10);
-  
-      // Authorised Signatory text
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.text('Authorised Signatory', signBoxX + 3, signBoxY + 20);
-  
-      // ======================================================
-      // RETURN PDF
-      // ======================================================
-      const pdfBlob = doc.output('blob');
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
-    }
+    // compute a centered X between left logo and right reference area
+    const leftEdge = 10 + logoW; // end of logo box
+    const rightEdge = pageWidth - 80; // start of reference block
+    const centerX = (leftEdge + rightEdge) / 2;
+
+    doc.text('DEBIT NOTE', centerX, y + 25, { align: 'center' });
+
+    // ======================================================
+    // RIGHT-TOP HEADER (Debit Note Info)
+    // ======================================================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+
+    const refX = pageWidth - 65; // moved 15mm right
+
+    doc.text(`Invoice No : ${data.INVOICE_NO || ''}`, refX, y + 5);
+    doc.text(`Reference No : ${data.REF_NO || ''}`, refX, y + 11);
+    doc.text(`Date: ${data.TRANS_DATE || ''}`, refX, y + 17);
+
+    // doc.text(`Dated : ${data[0].SALE_DATE || ""}`, pageWidth - 80, y + 23);
+
+    y += 33;
+
+    // ===============================================
+    // HORIZONTAL LINE ABOVE SELLER + CUSTOMER BLOCKS
+    // ===============================================
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(10, y, pageWidth - 10, y); // full width line
+
+    y += 5; // small spacing
+
+    // ======================================================
+    // BLUE SELLER BOX (LEFT)
+    // ======================================================
+    const blueX = 10;
+    const blueY = y;
+    const blueW = 100;
+    const blueH = 38;
+
+    doc.setFillColor(204, 229, 255);
+    doc.rect(blueX, blueY, blueW, blueH, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(data.COMPANY_NAME || '', blueX + 3, blueY + 7);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text(data.ADDRESS1 || '', blueX + 3, blueY + 13);
+    doc.text(data.ADDRESS2 || '', blueX + 3, blueY + 18);
+    doc.text(data.ADDRESS3 || '', blueX + 3, blueY + 23);
+    doc.text(`GSTIN/UIN: ${data.GSTIN || ''}`, blueX + 3, blueY + 28);
+    doc.text(
+      `State : ${data.STATE || ''}, Code : ${data.STATE_CODE || ''}`,
+      blueX + 3,
+      blueY + 33
+    );
+    doc.text(`E-Mail : ${data.EMAIL || ''}`, blueX + 3, blueY + 38);
+
+    // ======================================================
+    // CONSIGNEE (RIGHT SIDE)
+    // ======================================================
+    const shipX = 115;
+    const shipY = y;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Consignee (Ship to)', shipX, shipY + 5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(data.SUPP_NAME || '', shipX, shipY + 11);
+    doc.text(data.SUPP_ADDRESS1 || '', shipX, shipY + 16);
+    doc.text(data.SUPP_ADDRESS2 || '', shipX, shipY + 21);
+    doc.text(data.SUPP_ADDRESS3 || '', shipX, shipY + 26);
+    doc.text(`GSTIN/UIN : ${data.CUST_GSTIN || ''}`, shipX, shipY + 31);
+    doc.text(
+      `State : ${data.SUPP_STATE_NAME || ''}, Code : ${data.STATE_CODE || ''}`,
+      shipX,
+      shipY + 36
+    );
+
+    y += 48;
+
+    // ======================================================
+    // BUYER (BILL TO)
+    // ======================================================
+    const billX = 115;
+    const billY = y;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Buyer (Bill to)', billX, billY + 5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(data.SUPP_NAME || '', billX, billY + 11);
+    doc.text(data.SUPP_ADDRESS1 || '', billX, billY + 16);
+    doc.text(data.SUPP_ADDRESS2 || '', billX, billY + 21);
+    doc.text(data.SUPP_ADDRESS3 || '', billX, billY + 26);
+    doc.text(`GSTIN/UIN : ${data.CUST_GSTIN || ''}`, billX, billY + 31);
+    doc.text(
+      `State : ${data.SUPP_STATE_NAME || ''}, Code : ${data.STATE_CODE || ''}`,
+      billX,
+      billY + 36
+    );
+
+    y += 50;
+
+    // ======================================================
+    // TABLE — SAME FORMAT AS IMAGE
+    // ======================================================
+    const tableColumns = [
+      'Sl no.',
+      'Ledger Code',
+      'ledger Name',
+      'Particulars',
+      'Amount',
+      'Tax %',
+      'HSN Code',
+      'Tax Amount',
+    ];
+
+    const tableRows: any[] = [];
+    const footerRow = [
+      '',
+      '',
+      '',
+      '',
+      '₹ ' + Number(data.GROSS_AMOUNT).toFixed(2), // 5  (Amount)
+      '',
+      '',
+      '', // 6–7
+      // '₹ ' + Number(data.NET_AMOUNT).toFixed(2), // 8  (Tax Amount?) WRONG
+    ];
+
+    data.NOTE_DETAIL.forEach((item: any, index: number) => {
+      tableRows.push([
+        item.SL_NO || '',
+        item.LEDGER_CODE || '',
+        item.LEDGER_NAME || '',
+        item.REMARKS || '',
+        (item.AMOUNT ?? 0).toFixed(2), // Amount
+        item.GST_PERC ?? '', // GST %
+        item.HSN_CODE ?? '', // HSN
+        (item.GST_AMOUNT ?? 0).toFixed(2), // Tax Amount
+      ]);
+    });
+
+    // Move y to bottom of Bill-to block
+    y = y + 2;
+
+    // ===============================
+    // HORIZONTAL LINE LIKE THE FIGURE
+    // ===============================
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(10, y, pageWidth - 10, y); // Full width horizontal line
+
+    y += 5; // small gap before table
+    (doc as any).autoTable({
+      startY: y,
+      head: [tableColumns],
+      body: tableRows,
+      foot: [footerRow],
+      theme: 'grid',
+      margin: { left: 10, right: 10 },
+      styles: { fontSize: 9, cellPadding: 2 },
+      headStyles: {
+        fillColor: [230, 230, 230],
+        textColor: 0,
+        halign: 'center',
+      },
+      footStyles: {
+        fillColor: [230, 230, 230], // same color as header
+        textColor: 0,
+        fontStyle: 'bold',
+        halign: 'right',
+      },
+      columnStyles: {
+        5: { halign: 'right' }, // Amount column
+        9: { halign: 'right' }, // Total column
+      },
+    });
+
+    // Move below table
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    // NET AMOUNT LABEL
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('NET AMOUNT :', 130, y); // Right side label
+
+    // NET AMOUNT VALUE
+    doc.setFont('helvetica', 'bold');
+    doc.text(`₹ ${Number(data.NET_AMOUNT).toFixed(2)}`, 170, y, {
+      align: 'right',
+    });
+    y += 10;
+    // ======================================================
+    // AMOUNT IN WORDS BLOCKS
+    // ======================================================
+
+    // ------------------------
+    // 1) GROSS AMOUNT (Amount Chargeable)
+    // ------------------------
+    const grossAmount = data.GROSS_AMOUNT || 0;
+    const grossRupees = Math.floor(grossAmount);
+    const grossPaise = Math.round((grossAmount - grossRupees) * 100);
+
+    let grossWords = numberToWordsIndianNumber(grossRupees);
+    let grossPaiseWords =
+      grossPaise > 0 ? numberToWordsIndianNumber(grossPaise) : '';
+
+    let grossText = 'INR ' + grossWords + ' Rupees';
+    if (grossPaise > 0) grossText += ' and ' + grossPaiseWords + ' Paise';
+    grossText += ' Only';
+
+    // ------------------------
+    // 2) NET AMOUNT (Total Amount)
+    // ------------------------
+    const netAmount = data.NET_AMOUNT || 0;
+    const netRupees = Math.floor(netAmount);
+    const netPaise = Math.round((netAmount - netRupees) * 100);
+
+    let netWords = numberToWordsIndianNumber(netRupees);
+    let netPaiseWords = netPaise > 0 ? numberToWordsIndianNumber(netPaise) : '';
+
+    let netText = 'INR ' + netWords + ' Rupees';
+    if (netPaise > 0) netText += ' and ' + netPaiseWords + ' Paise';
+    netText += ' Only';
+
+    // -----------------------------------
+    // RIGHT SIDE PRINTING (two sections)
+    // -----------------------------------
+    const rightX = pageWidth - 90;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Total Amount Chargeable (in words)', rightX, y);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(grossText, rightX, y + 6, { maxWidth: 85 });
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Total of NetAmount (in words)', rightX, y + 18);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(netText, rightX, y + 24, { maxWidth: 85 });
+
+    // -----------------------------------
+    // LEFT SIDE (E & OE, User, PAN)
+    // -----------------------------------
+    const leftX = 10;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('E & OE :', leftX, y);
+
+    doc.text(`User : ${data.USER || ''}`, leftX, y + 6);
+
+    doc.text(`Company's PAN : ${data.PAN || ''}`, leftX, y + 12);
+
+    // ======================================================
+    // SIGNATURE BOX WITH COMPANY NAME
+    // ======================================================
+    const extraLeft = 20;
+    const signBoxX = pageWidth - 70 - extraLeft;
+    const signBoxY = y + 34; // 24 + 10 padding
+    const signBoxW = 60 + extraLeft;
+    const signBoxH = 25;
+
+    doc.rect(signBoxX, signBoxY, signBoxW, signBoxH);
+
+    // Company name inside the box
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.text(`for ${data.COMPANY_NAME || ''}`, signBoxX + 3, signBoxY + 10);
+
+    // Authorised Signatory text
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text('Authorised Signatory', signBoxX + 3, signBoxY + 20);
+
+    // ======================================================
+    // RETURN PDF
+    // ======================================================
+    const pdfBlob = doc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+  }
 }
 
 function numberToWordsIndianNumber(num: number) {

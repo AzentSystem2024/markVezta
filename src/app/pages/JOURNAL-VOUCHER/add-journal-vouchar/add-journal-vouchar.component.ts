@@ -87,7 +87,7 @@ export class AddJournalVoucharComponent {
   journalVoucherFormData: any = {
     TRANS_ID: 0,
     TRANS_DATE: new Date(),
-    VOUCHER_NO: '',
+    // VOUCHER_NO: '',
     PARTY_NAME: '',
     TRANS_STATUS: 1,
     REF_NO: '',
@@ -124,10 +124,6 @@ export class AddJournalVoucharComponent {
   }
 
   ngOnInit(): void {
-    this.getJournalVoucherNo();
-    this.resetJournalVoucherForm();
-    this.getLedgerCodeDropdown();
-    this.Deparment_Drop_down();
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
@@ -156,7 +152,10 @@ export class AddJournalVoucharComponent {
           'COMPANYIDDDDDDDDD'
         );
       }
-
+      this.getJournalVoucherNo();
+      this.resetJournalVoucherForm();
+      this.getLedgerCodeDropdown();
+      this.Deparment_Drop_down();
       if (userData.USER_ID) {
         this.journalVoucherFormData.USER_ID = userData.USER_ID;
       }
@@ -745,14 +744,14 @@ export class AddJournalVoucharComponent {
   }
 
   getJournalVoucherNo() {
-    this.dataService.getVoucherNo().subscribe((response: any) => {
-      if (response?.VoucherNo) {
-        this.journalVoucherFormData.VOUCHER_NO = response.VoucherNo;
-        console.log(
-          'Assigned Journal No:',
-          this.journalVoucherFormData.VOUCHER_NO
-        );
-      }
+    const payload = {
+      TRANS_TYPE: 4,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    console.log(this.selectedCompanyId, 'payloadjvdocno');
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.journalVoucherFormData.DOC_NO = response.DOC_NO;
+      console.log('Assigned Journal No:', this.journalVoucherFormData.DOC_NO);
     });
   }
 
@@ -775,7 +774,7 @@ export class AddJournalVoucharComponent {
         // }
 
         // Reset form but keep newly assigned voucher number
-        this.resetJournalVoucherForm(true);
+        this.resetJournalVoucherForm();
 
         // Close popup
         this.popupClosed.emit();
@@ -908,11 +907,11 @@ export class AddJournalVoucharComponent {
     this.callInsertJournalVoucherAPI(finalPayload);
   }
 
-  resetJournalVoucherForm(keepJournalNo: boolean = false) {
+  resetJournalVoucherForm() {
     this.journalVoucherFormData = {
       TRANS_ID: 0,
       TRANS_DATE: new Date(),
-
+      DOC_NO: this.getJournalVoucherNo(),
       PARTY_NAME: '',
       REF_NO: '',
       TRANS_TYPE: 4,

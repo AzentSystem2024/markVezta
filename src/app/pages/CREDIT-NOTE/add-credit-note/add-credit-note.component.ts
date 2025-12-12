@@ -884,7 +884,11 @@ export class AddCreditNoteComponent {
   }
 
   getDocNo() {
-    this.dataService.getDocNo().subscribe((response: any) => {
+    const payload = {
+      TRANS_TYPE: 37,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
       console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });

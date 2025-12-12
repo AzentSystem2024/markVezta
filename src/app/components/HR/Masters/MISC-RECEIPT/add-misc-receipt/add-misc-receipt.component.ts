@@ -102,7 +102,7 @@ export class AddMiscReceiptComponent {
   finId: any;
   miscFormData: any = {
     TRANS_ID: '',
-    VOUCHER_NO: '',
+    // VOUCHER_NO: '',
     PARTY_NAME: '',
     TRANS_DATE: new Date(),
     PAY_HEAD_ID: '',
@@ -154,14 +154,6 @@ export class AddMiscReceiptComponent {
   }
   ngOnInit() {
     this.sessionDetails();
-    // this.getVoucherNo();
-    console.log('EditingResponseData on init:', this.EditingResponseData);
-    if (this.isEditing) {
-      this.isEditDataAvailable(); // load edit data
-    } else {
-      this.getVoucherNo(); // only fetch new number in add mode
-    }
-    this.getLedgerCodeDropdown();
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -182,6 +174,14 @@ export class AddMiscReceiptComponent {
         this.miscFormData.FIN_ID = firstFinYear.FIN_ID;
       }
     }
+    // this.getVoucherNo();
+    console.log('EditingResponseData on init:', this.EditingResponseData);
+    if (this.isEditing) {
+      this.isEditDataAvailable(); // load edit data
+    } else {
+      this.getVoucherNo(); // only fetch new number in add mode
+    }
+    this.getLedgerCodeDropdown();
   }
 
   ngAfterViewInit() {
@@ -191,8 +191,12 @@ export class AddMiscReceiptComponent {
   }
 
   getVoucherNo() {
-    this.dataService.getVoucherNoForMiscReceipt().subscribe((response: any) => {
-      this.miscFormData.VOUCHER_NO = response.VOUCHER_NO;
+    const payload = {
+      TRANS_TYPE: 2,
+      COMPANY_ID: this.companyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.miscFormData.DOC_NO = response.DOC_NO;
     });
   }
 
@@ -210,7 +214,7 @@ export class AddMiscReceiptComponent {
     this.receiptMode = payTypeReverseMapping[data.PAY_TYPE_ID] || 'Cash';
     // Map form fields
     this.miscFormData.PARTY_NAME = data.PARTY_NAME || '';
-    this.miscFormData.VOUCHER_NO = data.VOUCHER_NO || '';
+    this.miscFormData.DOC_NO = data.DOC_NO || '';
     this.miscFormData.TRANS_DATE = data.TRANS_DATE
       ? new Date(data.TRANS_DATE)
       : new Date();
@@ -628,7 +632,7 @@ export class AddMiscReceiptComponent {
           },
           'success'
         );
-        this.getVoucherNo();
+        // this.getVoucherNo();
         this.popupClosed.emit();
         // DO NOT REMOVE — Needed for auto-setting voucher number
         // if (response?.VoucherNo) {

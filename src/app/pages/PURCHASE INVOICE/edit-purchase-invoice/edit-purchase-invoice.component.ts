@@ -91,9 +91,9 @@ export class EditPurchaseInvoiceComponent {
   GST: any;
   selectedCompany: any;
   companyState: any;
-  showCGST:boolean = false;
-  showGST:boolean=false;
-  showSGST:boolean=false;
+  showCGST: boolean = false;
+  showGST: boolean = false;
+  showSGST: boolean = false;
   selectedSupplier: any;
   taxAmount: any;
   grandTotal: any;
@@ -125,123 +125,122 @@ export class EditPurchaseInvoiceComponent {
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
-      this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
- console.log(this.selectedCompany)
- this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
- console.log(this.companyState)
- this.GST = this.sessionData.GeneralSettings.GST_PERC;
- console.log(this.GST,'GST')
+    this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(this.selectedCompany);
+    this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
+    console.log(this.companyState);
+    this.GST = this.sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST, 'GST');
   }
 
-//   ngOnChanges(changes: SimpleChanges): void {
-//     if (changes['invoiceFormData']) {
-//       console.log('Changed invoiceFormData:', this.invoiceFormData);
-//       this.purchaseInvoiceFormData = this.invoiceFormData;
-//       this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
-//       console.log(this.mainGridData,'mainGridData')
-//       this.mainGridData = this.mainGridData.map((row: any) => ({
-//         HSN_CODE: this.HSNCODE, // force-create
-//         VAT_PERC: row.GST || this.GST, // already showing
-//         ...row, // merge original row at the end
-//       }));
-      
-     
-//       this.showCGST = true;
-//       this.showSGST = true;
-//       this.showGST = false;
+  //   ngOnChanges(changes: SimpleChanges): void {
+  //     if (changes['invoiceFormData']) {
+  //       console.log('Changed invoiceFormData:', this.invoiceFormData);
+  //       this.purchaseInvoiceFormData = this.invoiceFormData;
+  //       this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
+  //       console.log(this.mainGridData,'mainGridData')
+  //       this.mainGridData = this.mainGridData.map((row: any) => ({
+  //         HSN_CODE: this.HSNCODE, // force-create
+  //         VAT_PERC: row.GST || this.GST, // already showing
+  //         ...row, // merge original row at the end
+  //       }));
 
-// //       this.mainGridData = this.mainGridData.map((row: any) => ({
-        
-// //   ...row,
-// //   HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
-// //   GST: row.GST ?? 0,
-// //   CGST: row.CGST ?? 0,
-// //   SGST: row.SGST ?? 0,
-// //   VAT_PERC: row.VAT_PERC ?? this.GST,
-// // }));
+  //       this.showCGST = true;
+  //       this.showSGST = true;
+  //       this.showGST = false;
 
-//       this.purchaseInvoiceFormData.SUPP_ID = Number(
-//         this.invoiceFormData.SUPP_ID
-//       );
-//       this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
-//       if (this.selectedSupplierId) {
-//         this.getPendingGRNList();
-//       }
-//       console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
-//     }
-//   }
+  // //       this.mainGridData = this.mainGridData.map((row: any) => ({
 
+  // //   ...row,
+  // //   HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
+  // //   GST: row.GST ?? 0,
+  // //   CGST: row.CGST ?? 0,
+  // //   SGST: row.SGST ?? 0,
+  // //   VAT_PERC: row.VAT_PERC ?? this.GST,
+  // // }));
 
-ngOnChanges(changes: SimpleChanges): void {
-  if (changes['invoiceFormData']) {
-    console.log('Changed invoiceFormData:', this.invoiceFormData);
+  //       this.purchaseInvoiceFormData.SUPP_ID = Number(
+  //         this.invoiceFormData.SUPP_ID
+  //       );
+  //       this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
+  //       if (this.selectedSupplierId) {
+  //         this.getPendingGRNList();
+  //       }
+  //       console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
+  //     }
+  //   }
 
-    this.purchaseInvoiceFormData = this.invoiceFormData;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['invoiceFormData']) {
+      console.log('Changed invoiceFormData:', this.invoiceFormData);
 
-    // Load grid data
-    this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
+      this.purchaseInvoiceFormData = this.invoiceFormData;
 
-    // Get company and supplier state names
-    const companyState = this.companyState?.trim().toLowerCase();
-    const supplierState = this.purchaseInvoiceFormData?.SUPP_STATE_NAME?.trim().toLowerCase();
+      // Load grid data
+      this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
 
-    console.log("Company:", companyState, "Supplier:", supplierState);
+      // Get company and supplier state names
+      const companyState = this.companyState?.trim().toLowerCase();
+      const supplierState =
+        this.purchaseInvoiceFormData?.SUPP_STATE_NAME?.trim().toLowerCase();
 
-    // GST Percentage from session
-    const gstPerc = parseFloat(this.GST) || 0;
+      console.log('Company:', companyState, 'Supplier:', supplierState);
 
-    // ---------------------------------------------------------
-    // CONDITION: SAME STATE → CGST + SGST, DIFFERENT → GST ONLY
-    // ---------------------------------------------------------
-    if (companyState === supplierState) {
-      console.log("Same state → Apply CGST + SGST");
+      // GST Percentage from session
+      const gstPerc = parseFloat(this.GST) || 0;
 
-      this.showCGST = true;
-      this.showSGST = true;
-      this.showGST = false;
+      // ---------------------------------------------------------
+      // CONDITION: SAME STATE → CGST + SGST, DIFFERENT → GST ONLY
+      // ---------------------------------------------------------
+      if (companyState === supplierState) {
+        console.log('Same state → Apply CGST + SGST');
 
-      const half = gstPerc / 2;
+        this.showCGST = true;
+        this.showSGST = true;
+        this.showGST = false;
 
-      this.mainGridData = this.mainGridData.map((row: any) => ({
-        ...row,
-        HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
-        CGST: row.CGST ?? half,
-        SGST: row.SGST ?? half,
-        GST: 0,                 // GST disabled for same state
-        VAT_PERC: half + half,  // total GST
-      }));
-    } 
-    else {
-      console.log("Different state → Apply GST only");
+        const half = gstPerc / 2;
 
-      this.showCGST = false;
-      this.showSGST = false;
-      this.showGST = true;
+        this.mainGridData = this.mainGridData.map((row: any) => ({
+          ...row,
+          HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
+          CGST: row.CGST ?? half,
+          SGST: row.SGST ?? half,
+          GST: 0, // GST disabled for same state
+          VAT_PERC: half + half, // total GST
+        }));
+      } else {
+        console.log('Different state → Apply GST only');
 
-      this.mainGridData = this.mainGridData.map((row: any) => ({
-        ...row,
-        HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
-        GST: row.GST ?? gstPerc, // Full GST %
-        CGST: 0,
-        SGST: 0,
-        VAT_PERC: gstPerc,
-      }));
+        this.showCGST = false;
+        this.showSGST = false;
+        this.showGST = true;
+
+        this.mainGridData = this.mainGridData.map((row: any) => ({
+          ...row,
+          HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
+          GST: row.GST ?? gstPerc, // Full GST %
+          CGST: 0,
+          SGST: 0,
+          VAT_PERC: gstPerc,
+        }));
+      }
+
+      // ---------------------------------------------------------
+      // Supplier ID assignment
+      // ---------------------------------------------------------
+      this.purchaseInvoiceFormData.SUPP_ID = Number(
+        this.invoiceFormData.SUPP_ID
+      );
+      this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
+
+      if (this.selectedSupplierId) {
+        this.getPendingGRNList();
+      }
+
+      console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
     }
-
-    // ---------------------------------------------------------
-    // Supplier ID assignment
-    // ---------------------------------------------------------
-    this.purchaseInvoiceFormData.SUPP_ID = Number(this.invoiceFormData.SUPP_ID);
-    this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
-
-    if (this.selectedSupplierId) {
-      this.getPendingGRNList();
-    }
-
-    console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
   }
-}
-
 
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
@@ -253,7 +252,7 @@ ngOnChanges(changes: SimpleChanges): void {
     });
   }
 
-     getSupplierOrUnitLst() {
+  getSupplierOrUnitLst() {
     this.dataService.getSupplierWithState().subscribe((response: any) => {
       this.distributorList = response;
       console.log(this.distributorList, 'DISTLISTPOPUP');
@@ -276,14 +275,14 @@ ngOnChanges(changes: SimpleChanges): void {
       (supplier: any) => supplier.ID === this.selectedSupplierId
     );
 
-     const company = this.companyState?.trim().toLowerCase();
-     console.log(company)
-     const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
-     console.log(supplier)
-     const sessionGst = parseFloat(this.GST) || 0; // main GST%
-     console.log(sessionGst)
+    const company = this.companyState?.trim().toLowerCase();
+    console.log(company);
+    const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
+    console.log(supplier);
+    const sessionGst = parseFloat(this.GST) || 0; // main GST%
+    console.log(sessionGst);
 
-      if (company === supplier) {
+    if (company === supplier) {
       console.log('Both states SAME → CGST + SGST apply');
 
       this.showCGST = true;
@@ -313,7 +312,7 @@ ngOnChanges(changes: SimpleChanges): void {
         row.SGST = 0;
       });
     }
-    this.selectedSupplier = selectedSupplier
+    this.selectedSupplier = selectedSupplier;
 
     if (selectedSupplier) {
       this.purchaseInvoiceFormData.SUPPPLIER_NAME =
@@ -325,7 +324,7 @@ ngOnChanges(changes: SimpleChanges): void {
     console.log('Selected Supplier:', selectedSupplier);
   }
 
-    calculateGstAmount = (row: any) => {
+  calculateGstAmount = (row: any) => {
     const amt = this.calculateAmount(row);
 
     const igst = parseFloat(row.GST) || 0; // GST column = GST
@@ -352,7 +351,6 @@ ngOnChanges(changes: SimpleChanges): void {
     return amt + gst;
   };
 
-  
   validateQuantity = (e: any) => {
     const quantity = e.value;
     const pendingQty = e.data?.PO_QUANTITY ?? 0;
@@ -452,57 +450,57 @@ ngOnChanges(changes: SimpleChanges): void {
         const exists = this.mainGridData.some(
           (item) => item.GRN_DET_ID === row.GRN_DET_ID
         );
-         if (!exists) {
-        // Add row into mainGridData
-        const newRow: any = {
-          GRN_ID: row.GRN_ID,
-          ITEM_ID: row.ITEM_ID,
-          PO_DET_ID: row.PO_DET_ID,
-          COST: row.COST,
-          GRN_DET_ID: row.GRN_DET_ID,
-          UOM: row.UOM,
-          TRANSFER_NO: row.GRN_NO,
-          TRANSFER_DATE: row.GRN_DATE,
-          ITEM_NAME: row.ITEM_NAME,
-          PENDING_QTY: row.PENDING_QTY,
-          QUANTITY: 0,
-          RATE: row.RATE,
-          TAX_AMOUNT: 0,
-          AMOUNT: 0,
-          TOTAL_AMOUNT: 0,
-          HSN_CODE: this.HSNCODE,
-          VAT_PERC: this.GST,
-          SGST:0,
-          CGST:0
-        };
-        console.log(newRow)
-         // -----------------------------------------
-        // ✅ ADDING GST / CGST / SGST LOGIC HERE
-        // -----------------------------------------
-        const sessionGst = parseFloat(this.GST) || 0;
-        const company = this.companyState?.trim().toLowerCase();
-        const customer = this.purchaseInvoiceFormData?.SUPPPLIER_NAME
-          ? this.selectedSupplier?.STATE_NAME?.trim().toLowerCase()
-          : null;
+        if (!exists) {
+          // Add row into mainGridData
+          const newRow: any = {
+            GRN_ID: row.GRN_ID,
+            ITEM_ID: row.ITEM_ID,
+            PO_DET_ID: row.PO_DET_ID,
+            COST: row.COST,
+            GRN_DET_ID: row.GRN_DET_ID,
+            UOM: row.UOM,
+            TRANSFER_NO: row.GRN_NO,
+            TRANSFER_DATE: row.GRN_DATE,
+            ITEM_NAME: row.ITEM_NAME,
+            PENDING_QTY: row.PENDING_QTY,
+            QUANTITY: 0,
+            RATE: row.RATE,
+            TAX_AMOUNT: 0,
+            AMOUNT: 0,
+            TOTAL_AMOUNT: 0,
+            HSN_CODE: this.HSNCODE,
+            VAT_PERC: this.GST,
+            SGST: 0,
+            CGST: 0,
+          };
+          console.log(newRow);
+          // -----------------------------------------
+          // ✅ ADDING GST / CGST / SGST LOGIC HERE
+          // -----------------------------------------
+          const sessionGst = parseFloat(this.GST) || 0;
+          const company = this.companyState?.trim().toLowerCase();
+          const customer = this.purchaseInvoiceFormData?.SUPPPLIER_NAME
+            ? this.selectedSupplier?.STATE_NAME?.trim().toLowerCase()
+            : null;
 
-          console.log(sessionGst,'sesssionGST')
-          console.log(company,'company')
-          console.log(customer,'customer')
-        if (company === customer) {
-          // Same state → CGST + SGST
-          const half = sessionGst / 2;
-          newRow.CGST = half;
-          newRow.SGST = half;
-          newRow.GST = 0;
-        } else {
-          // Different state → GST only
-          newRow.GST = sessionGst;
-          newRow.CGST = 0;
-          newRow.SGST = 0;
-        }
-        // -----------------------------------------
+          console.log(sessionGst, 'sesssionGST');
+          console.log(company, 'company');
+          console.log(customer, 'customer');
+          if (company === customer) {
+            // Same state → CGST + SGST
+            const half = sessionGst / 2;
+            newRow.CGST = half;
+            newRow.SGST = half;
+            newRow.GST = 0;
+          } else {
+            // Different state → GST only
+            newRow.GST = sessionGst;
+            newRow.CGST = 0;
+            newRow.SGST = 0;
+          }
+          // -----------------------------------------
 
-        this.mainGridData.push(newRow);
+          this.mainGridData.push(newRow);
         }
       });
 
@@ -547,7 +545,7 @@ ngOnChanges(changes: SimpleChanges): void {
       return; // stop execution here
     }
 
-     // 1. Get updated summary values from the grid
+    // 1. Get updated summary values from the grid
     if (this.itemsGridRef?.instance) {
       this.totalAmount =
         this.itemsGridRef.instance.getTotalSummaryValue('AMOUNT') || 0;
@@ -567,7 +565,7 @@ ngOnChanges(changes: SimpleChanges): void {
         },
       });
     }
-    
+
     if (!this.mainGridData || this.mainGridData.length === 0) {
       notify(
         {
@@ -623,7 +621,7 @@ ngOnChanges(changes: SimpleChanges): void {
           NARRATION: this.purchaseInvoiceFormData.NARRATION,
           SGST: item.SGST,
           CGST: item.CGST,
-          GST: item.GST ?? 0
+          GST: item.GST ?? 0,
         };
       }
     );
@@ -684,8 +682,7 @@ ngOnChanges(changes: SimpleChanges): void {
     });
   }
 
-
-    logGridSummaries() {
+  logGridSummaries() {
     this.summaryValues = this.itemsGridRef?.instance?.getTotalSummaryValue;
 
     if (this.summaryValues) {
@@ -701,13 +698,13 @@ ngOnChanges(changes: SimpleChanges): void {
       console.log('TAX_AMOUNT Summary:', this.taxAmount);
       console.log('NET AMOUNT Summary:', this.grandTotal);
     } else {
-      console.warn('Summary values not ready yet.'); 
+      console.warn('Summary values not ready yet.');
     }
   }
   onContentReady(e: any): void {
     this.logGridSummaries();
   }
-  
+
   onRoundOffChange() {
     if (this.purchaseInvoiceFormData.ROUND_OFF) {
       // Round Off Enabled

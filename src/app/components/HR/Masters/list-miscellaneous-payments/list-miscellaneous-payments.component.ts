@@ -192,8 +192,12 @@ export class ListMiscellaneousPaymentsComponent {
           TRANS_DATE: dateValue,
         };
       })
-        // ✅ Sort by VOUCHER_NO descending (latest first)
-        .sort((a: any, b: any) => Number(b.VOUCHER_NO) - Number(a.VOUCHER_NO));
+        //Sort by VOUCHER_NO descending (latest first)
+        .sort((a: any, b: any) => {
+          const aNo = parseInt(a.DOC_NO.split('/').pop(), 10);
+          const bNo = parseInt(b.DOC_NO.split('/').pop(), 10);
+          return bNo - aNo; // descending order
+        });
 
       this.applyDateFilter();
     });
