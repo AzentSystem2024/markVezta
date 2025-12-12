@@ -226,7 +226,11 @@ export class CustomerReceiptsComponent {
           ...item,
           REC_DATE: dateValue,
         };
-      }).sort((a: any, b: any) => Number(b.VOUCHER_NO) - Number(a.VOUCHER_NO));
+      }).sort((a: any, b: any) => {
+        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+        return numB - numA; // descending order
+      });
 
       this.applyDateFilter();
     });

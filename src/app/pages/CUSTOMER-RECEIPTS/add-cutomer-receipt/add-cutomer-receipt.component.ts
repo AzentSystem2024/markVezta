@@ -134,10 +134,10 @@ export class AddCutomerReceiptComponent {
       this.companyList = userData.Companies || [];
       console.log(userData.SELECTED_COMPANY.COMPANY_ID, 'userData');
       this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
-      console.log('Loaded Companies:', this.companyList);
     } else {
       console.warn('No userData found in localStorage');
     }
+    console.log('Loaded Companies:', this.selectedCompanyId);
     this.getReceiptNo();
     this.getLedgerCodeDropdown();
     this.getCompanyListDropdown(); // only fetches distributor list
@@ -657,7 +657,7 @@ export class AddCutomerReceiptComponent {
     this.amountError = '';
     this.receiprtFormData = {
       TRANS_TYPE: 27,
-      REC_NO: '',
+      DOC_NO: this.getReceiptNo(),
       REC_DATE: new Date(),
       COMPANY_ID: 1,
       STORE_ID: 0,
@@ -683,7 +683,7 @@ export class AddCutomerReceiptComponent {
     this.selectedDistributorId = '';
     this.pendingInvoiceList?.forEach((row) => (row.RECEIVED_AMOUNT = 0));
     this.pendingInvoiceList = [];
-    this.getReceiptNo();
+    // this.getReceiptNo();
   }
 }
 

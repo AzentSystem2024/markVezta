@@ -139,7 +139,11 @@ export class EditCustomerReceiptComponent {
       const firstReceipt = this.receiprtFormData[0];
       if (firstReceipt.REC_DATE && typeof firstReceipt.REC_DATE === 'string') {
         const [day, month, year] = firstReceipt.REC_DATE.split('-').map(Number);
-        firstReceipt.REC_DATE = new Date(year, month - 1, day); // month is 0-based
+        firstReceipt.REC_DATE = `${year}-${String(month).padStart(
+          2,
+          '0'
+        )}-${String(day).padStart(2, '0')}`;
+        // Now REC_DATE = "2025-12-11"
       }
       this.receiprtFormData = firstReceipt; // assign for form binding
       console.log(
@@ -782,7 +786,7 @@ export class EditCustomerReceiptComponent {
         this.popupClosed.emit();
 
         // Reset form
-        this.resetForm();
+        // this.resetForm();
       },
       error: () => {
         notify('Commit failed.', 'error', 2000);
@@ -837,7 +841,7 @@ export class EditCustomerReceiptComponent {
         if (response.flag == 1) {
           notify('Receipt updated successfully', 'success', 3000);
           this.popupClosed.emit();
-          this.resetForm(); // or navigate back
+          // this.resetForm(); // or navigate back
         }
         // else {
         //   notify('Failed to update receipt', 'error', 3000);
