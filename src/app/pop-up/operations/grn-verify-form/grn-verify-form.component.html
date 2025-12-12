@@ -21,7 +21,7 @@
     <div class="left-section" style="display: flex; gap: 20px; flex: 1">
       <dx-text-box
         label="GRN NO."
-        [(value)]="newGrnData.GRN_NO"
+        [(value)]="newGrnData.DOC_NO"
         labelMode="floating"
         placeholder="Enter PO No"
         [readOnly]="true"
@@ -142,7 +142,6 @@
     class="custom-data-grid"
     [columnAutoWidth]="true"
     (onContentReady)="onGrnContentReady($event)"
-    
   >
     <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
 
@@ -259,7 +258,6 @@
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
-
   </dx-data-grid>
 </div>
 <div style="display: flex">
@@ -357,7 +355,12 @@
         ></dx-text-box>
       </div>
 
-      <div class="total-field"  *ngIf="!(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)">
+      <div
+        class="total-field"
+        *ngIf="
+          !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
+        "
+      >
         <label>Net Amount</label>
 
         <dx-text-box
@@ -371,7 +374,12 @@
     </div>
 
     <div class="vat-container">
-      <div class="vat-field" *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2">
+      <div
+        class="vat-field"
+        *ngIf="
+          selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2
+        "
+      >
         <label>Net Amount</label>
 
         <dx-text-box

@@ -24,6 +24,7 @@
         labelMode="floating"
         placeholder="Enter PO No"
         [readOnly]="true"
+        [value]="docNo"
         [elementAttr]="{ class: 'grntextbox' }"
       >
       </dx-text-box>
@@ -260,7 +261,6 @@
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
-
   </dx-data-grid>
 </div>
 
@@ -358,11 +358,15 @@
         ></dx-text-box>
       </div>
 
-      <div class="total-field"   *ngIf="!(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)">
+      <div
+        class="total-field"
+        *ngIf="
+          !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
+        "
+      >
         <label>Net Amount</label>
 
         <dx-text-box
-        
           placeholder="0.00"
           [width]="150"
           [readOnly]="true"
@@ -373,7 +377,12 @@
     </div>
 
     <div class="vat-container">
-      <div class="vat-field" *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2">
+      <div
+        class="vat-field"
+        *ngIf="
+          selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2
+        "
+      >
         <label>Net Amount</label>
 
         <dx-text-box

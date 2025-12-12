@@ -167,6 +167,8 @@ newGrnData:any=[]
     // this.getPurchaseOrderList();
   }
 
+  
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes.formdata && changes.formdata.currentValue) {
       console.log(this.formdata,"formdata============================================");

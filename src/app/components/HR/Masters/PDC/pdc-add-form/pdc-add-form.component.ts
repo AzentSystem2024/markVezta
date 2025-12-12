@@ -39,6 +39,7 @@ export class PdcAddFormComponent {
     { id: 3, name: 'Others' ,disabled: false},
   ];
   selectedBeneficiaryType = this.BeneficiaryType.find((p) => p.id === 1);
+  docNo: any;
 
   ngOnInit(): void {
   if (!this.selectedPDC) {
@@ -53,8 +54,20 @@ export class PdcAddFormComponent {
     // Call priority logic manually to apply disabled items
     // this.onPriorityChanged({ value: this.selectedType });
   }
+  this.getDocNo();
 }
 
+
+  getDocNo() {
+    const payload = {
+      TRANS_TYPE: 40,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
+  }
 
   PDCFormData: any = {
     ID: '',

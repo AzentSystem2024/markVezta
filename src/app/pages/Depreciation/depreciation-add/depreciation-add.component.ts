@@ -65,6 +65,7 @@ recordsCount:any
   selected_Company_id: any;
   selected_fin_id: any;
   Depreciation_List: any;
+  docNo: any;
 constructor( private dataService:DataService){
   this.Active_fixedasset_List()
 }
@@ -75,6 +76,19 @@ constructor( private dataService:DataService){
    
    this.Date = new Date(this.DepreciationPayload.DEPR_DATE)
    this.sesstion_Details()
+   this.getDocNo()
+  }
+
+
+    getDocNo() {
+    const payload = {
+      TRANS_TYPE: 9,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
   }
 
 //===============================Active_fixedasset_List======================

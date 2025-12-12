@@ -119,14 +119,42 @@ export class AddSupplierPaymentComponent {
   pdcList: any;
   selectedLedger: any;
   pdcPopupVisible: boolean = false;
+  selected_Company_id: any;
+  docNo: any;
 
-  constructor(private dataService: DataService, private ngZone: NgZone) {}
+  constructor(private dataService: DataService, private ngZone: NgZone) {
+    this.sesstion_Details();
+    this.getDocNo();
+  }
 
   ngOnInit() {
     this.getLedgerCodeDropdown();
     this.getSupplierDropdown();
     this.applyReceiptModeFilter();
     this.getPdcofSelectedSupplier();
+    this.sesstion_Details();
+    this.getDocNo();
+  }
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
+      getDocNo() {
+    const payload = {
+      TRANS_TYPE: 21,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
   }
 
   validateReceivedAmount = (e: any) => {

@@ -60,7 +60,7 @@
                   <dx-text-box
                     label="Voucher No"
                     labelMode="floating"
-                    [(value)]="paymentNo"
+                    [(value)]="docNo"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
@@ -331,7 +331,12 @@
 
 <div class="form-popup-buttons-container" *ngIf="!isReadOnlyMode">
   <div class="popup-footer">
-    <dx-button text="Cancel" stylingMode="outlined" type="normal" (onClick)="cancel()"></dx-button>
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      type="normal"
+      (onClick)="cancel()"
+    ></dx-button>
     <dx-button
       #saveButtonRef
       [text]="isEditing ? (isApproved ? 'Commit' : 'Update') : 'Save'"
