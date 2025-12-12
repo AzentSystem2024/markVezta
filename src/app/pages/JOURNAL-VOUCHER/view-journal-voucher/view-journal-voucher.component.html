@@ -49,7 +49,7 @@
                   <div *ngIf="journalVoucherFormData">
                     <dx-text-box
                       label="JV No."
-                      [(value)]="journalVoucherFormData.JOURNAL_NO"
+                      [(value)]="journalVoucherFormData.DOC_NO"
                       labelMode="floating"
                       [width]="200"
                       [readOnly]="true"
@@ -236,7 +236,7 @@
 
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
-     <dx-button
+    <dx-button
       icon="fas fa-file-pdf"
       text="PDF"
       type="normal"
@@ -254,7 +254,6 @@
     ></dx-button>
   </div>
 </div>
-
 
 <dx-popup
   [(visible)]="isPdfPopupVisible"

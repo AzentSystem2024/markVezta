@@ -9,7 +9,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -57,7 +61,7 @@ export class ViewJournalVoucherComponent {
   @Input() journalVoucherFormData: any = {
     TRANS_ID: 0,
     TRANS_DATE: new Date(),
-    VOUCHER_NO: '',
+    DOC_NO: '',
     PARTY_NAME: '',
     REFERENCE_NO: '',
     TRANS_TYPE: 4,
@@ -82,9 +86,12 @@ export class ViewJournalVoucherComponent {
   Company_list: any = [];
 
   pdfSrc: SafeResourceUrl | null = null;
-              isPdfPopupVisible: boolean = false;
+  isPdfPopupVisible: boolean = false;
 
-  constructor(private dataService: DataService,private sanitizer: DomSanitizer) {
+  constructor(
+    private dataService: DataService,
+    private sanitizer: DomSanitizer
+  ) {
     this.Deparment_Drop_down();
   }
 
@@ -227,29 +234,30 @@ export class ViewJournalVoucherComponent {
     this.popupClosed.emit();
   }
 
-   viewPdf(): void {  
-                 this.isPdfPopupVisible = true;
-                 this.dataService.selectJournalVoucher(this.JVid).subscribe((response: any) => {
-                  if(response){
-                  this.pdfSrc = this.get_pdf(response);
-                }
-                 })
-      }
-    
-        get_pdf(data: any): SafeResourceUrl {
-         
-           const doc = new jsPDF("p", "mm", "a4");
-           const pageWidth = doc.internal.pageSize.width;
-           const margin = 12;
-           let y = 12;
-      
-           // ===========================
-        //  RETURN PDF
-        // ===========================
-        const blob = doc.output("blob");
-        const url = URL.createObjectURL(blob);
-        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-         }
+  viewPdf(): void {
+    this.isPdfPopupVisible = true;
+    this.dataService
+      .selectJournalVoucher(this.JVid)
+      .subscribe((response: any) => {
+        if (response) {
+          this.pdfSrc = this.get_pdf(response);
+        }
+      });
+  }
+
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
+
+    // ===========================
+    //  RETURN PDF
+    // ===========================
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 }
 
 @NgModule({

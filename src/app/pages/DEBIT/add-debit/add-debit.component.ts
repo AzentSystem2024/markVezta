@@ -86,9 +86,9 @@ export class AddDebitComponent {
   selected_vat_id: any;
   dropdownJustOpened = false;
 
-  showCGST:boolean = false;
-  showGST:boolean = false;
-  showSGST:boolean = false;
+  showCGST: boolean = false;
+  showGST: boolean = false;
+  showSGST: boolean = false;
 
   debitFormData: any = {
     TRANS_TYPE: 36,
@@ -102,8 +102,8 @@ export class AddDebitComponent {
     INVOICE_NO: '',
     UNIT_ID: '',
     IS_APPROVED: false,
-    VEHICLE_NO:'',
-    ROUND_OFF:false,
+    VEHICLE_NO: '',
+    ROUND_OFF: false,
     NOTE_DETAIL: [
       {
         SL_NO: '',
@@ -111,8 +111,8 @@ export class AddDebitComponent {
         AMOUNT: '',
         GST_AMOUNT: '',
         REMARKS: '',
-        CGST:0,
-        SGST:0
+        CGST: 0,
+        SGST: 0,
       },
     ],
   };
@@ -129,13 +129,13 @@ export class AddDebitComponent {
   net: string;
   HSN_CODE: any;
   GST_PERC: any;
-netAmount: string;
+  netAmount: string;
   selectedCompany: any;
   companyState: any;
   GST: any;
   distributorList: any;
   grandTotal: number;
-  netTotal:number;
+  netTotal: number;
   companyStateID: any;
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -150,24 +150,27 @@ netAmount: string;
     );
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
-      this.HSN_CODE, '===========selected HSN CODE===================');
+      this.HSN_CODE,
+      '===========selected HSN CODE==================='
+    );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST_PERC, '===========selected GST PERC===================');
+    console.log(
+      this.GST_PERC,
+      '===========selected GST PERC==================='
+    );
   }
-
-
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
-     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
- console.log(this.selectedCompany)
- this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
- console.log(this.companyState)
- this.GST = this.sessionData.GeneralSettings.GST_PERC;
- console.log(this.GST,'GST')
+    this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(this.selectedCompany);
+    this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
+    console.log(this.companyState);
+    this.GST = this.sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST, 'GST');
   }
 
   ngOnInit() {
@@ -255,8 +258,7 @@ netAmount: string;
     });
   }
 
-
-      getSupplierOrUnitLst() {
+  getSupplierOrUnitLst() {
     this.dataService.getSupplierWithState().subscribe((response: any) => {
       this.distributorList = response;
       console.log(this.distributorList, 'DISTLISTPOPUP');
@@ -265,22 +267,21 @@ netAmount: string;
 
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
- console.log(this.selectedSupplierId)
-   
-     const selectedSupplier = this.distributorList.find(
+    console.log(this.selectedSupplierId);
+
+    const selectedSupplier = this.distributorList.find(
       (supplier: any) => supplier.ID === this.selectedSupplierId
     );
 
-    
-console.log(selectedSupplier)
-     const company = this.companyState?.trim().toLowerCase();
-     console.log(company)
-     const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
-     console.log(supplier)
-     const sessionGst = parseFloat(this.GST) || 0; // main GST%
-     console.log(sessionGst)
+    console.log(selectedSupplier);
+    const company = this.companyState?.trim().toLowerCase();
+    console.log(company);
+    const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
+    console.log(supplier);
+    const sessionGst = parseFloat(this.GST) || 0; // main GST%
+    console.log(sessionGst);
 
-      if (company === supplier) {
+    if (company === supplier) {
       console.log('Both states SAME → CGST + SGST apply');
 
       this.showCGST = true;
@@ -310,13 +311,12 @@ console.log(selectedSupplier)
         row.SGST = 0;
       });
     }
-    this.selectedSupplier = selectedSupplier
-    
+    this.selectedSupplier = selectedSupplier;
 
-     if (this.selectedSupplierId) {
+    if (this.selectedSupplierId) {
       this.debitFormData.PARTY_NAME = this.selectedSupplier.DESCRIPTION;
       console.log(this.selectedSupplier.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
-     }
+    }
 
     if (this.selectedSupplierId) {
       this.debitFormData.SUPP_ID = this.selectedSupplierId;
@@ -333,6 +333,7 @@ console.log(selectedSupplier)
   selectInvoice(e: any) {
     console.log('Invoice selected:', e);
     const selected = e.data;
+    console.log(selected, 'SELECTEPENDINGDATA');
     // this.debitFormData.INVOICE_NO = String(selected.INVOICE_NO);
     this.debitFormData.INVOICE_NO = selected.INVOICE_NO;
     this.debitFormData.DUE_AMOUNT = selected.PENDING_AMOUNT;
@@ -413,7 +414,6 @@ console.log(selectedSupplier)
   };
 
   onEditorPreparing(e: any) {
-   
     console.log(e, 'editor preparing event');
     if (
       e.dataField === 'SL_NO' ||
@@ -515,35 +515,40 @@ console.log(selectedSupplier)
         }
       };
 
-e.editorOptions.onValueChanged = (args: any) => {
-  const selectedLedger = this.ledgerList.find(
-    (item: any) => item.HEAD_CODE === args.value
-  );
+      e.editorOptions.onValueChanged = (args: any) => {
+        const selectedLedger = this.ledgerList.find(
+          (item: any) => item.HEAD_CODE === args.value
+        );
 
-  e.setValue(args.value);
+        e.setValue(args.value);
 
-  if (selectedLedger) {
-    // 1️⃣ Set ledger name
-    e.component.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
+        if (selectedLedger) {
+          // 1️⃣ Set ledger name
+          e.component.cellValue(
+            rowIndex,
+            'ledgerName',
+            selectedLedger.HEAD_NAME
+          );
 
-    // 2️⃣ Get HSN & GST from session
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
-    const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+          // 2️⃣ Get HSN & GST from session
+          const sessionData = JSON.parse(
+            sessionStorage.getItem('savedUserData')
+          );
+          const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
+          const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
 
-    // 3️⃣ Set HSN_CODE
-    e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+          // 3️⃣ Set HSN_CODE
+          e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
 
-    // 4️⃣ Set GST_PERC
-    e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+          // 4️⃣ Set GST_PERC
+          e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
 
-    // 5️⃣ Move to next field
-    setTimeout(() => {
-      this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-    }, 50);
-  }
-};
-      
+          // 5️⃣ Move to next field
+          setTimeout(() => {
+            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+          }, 50);
+        }
+      };
     }
 
     // ➤ ledgerName: move to particulars on Enter
@@ -587,12 +592,43 @@ e.editorOptions.onValueChanged = (args: any) => {
     if (e.dataField === 'Amount') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
-          const grid = e.component;
-          const rowIndex = e.row.rowIndex;
-          // Move focus to the "ledgerCode" column in the same row
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
-          });
+          const grid = this.itemsGridRef?.instance;
+          const rowData = e.row?.data;
+
+          // Must have Ledger + Amount filled
+          if (
+            rowData.ledgerCode &&
+            rowData.Amount != null &&
+            !this.hasEmptyRow()
+          ) {
+            const newRow = {
+              SL_NO: this.debitFormData.NOTE_DETAIL.length + 1,
+              HEAD_ID: '',
+              AMOUNT: '',
+              GST_PERC: '',
+              GST_AMOUNT: '',
+              HSN_CODE: '',
+              REMARKS: '',
+            };
+
+            this.debitFormData.NOTE_DETAIL.push(newRow);
+
+            setTimeout(() => {
+              grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
+
+              setTimeout(() => {
+                const visibleRows = grid.getVisibleRows();
+                const newRowIndex = visibleRows.findIndex(
+                  (r) => r.data === newRow
+                );
+
+                // 🔥 FOCUS EXACTLY LIKE GST_PERC LOGIC
+                if (newRowIndex >= 0) {
+                  grid.editCell(newRowIndex, 'ledgerCode');
+                }
+              }, 50);
+            }, 50);
+          }
         }
       };
     }
@@ -667,7 +703,7 @@ e.editorOptions.onValueChanged = (args: any) => {
                   AMOUNT: '',
                   GST_PERC: '',
                   GST_AMOUNT: '',
-                HSN_CODE: '',
+                  HSN_CODE: '',
                   REMARKS: '',
                 };
                 this.debitFormData.NOTE_DETAIL.push(newRow);
@@ -755,7 +791,11 @@ e.editorOptions.onValueChanged = (args: any) => {
   }
 
   getDocNo() {
-    this.dataService.getDocNoForDebit().subscribe((response: any) => {
+    const payload = {
+      TRANS_TYPE: 36,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDocNoForDebit(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
       this.debitFormData.DOC_NO = response.DOC_NO;
       console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
@@ -787,7 +827,7 @@ e.editorOptions.onValueChanged = (args: any) => {
     return amt + gst;
   };
 
-    get netAmountString(): string {
+  get netAmountString(): string {
     const details = this.debitFormData?.NOTE_DETAIL || [];
     let totalAmount = 0;
     let totalGST = 0;
@@ -822,7 +862,6 @@ e.editorOptions.onValueChanged = (args: any) => {
     console.log(this.netTotal, 'NETTOTALLLLLLLL');
     return this.netTotal.toFixed(2);
   }
-
 
   formatDate(date: any): string {
     const d = new Date(date);
@@ -931,8 +970,8 @@ e.editorOptions.onValueChanged = (args: any) => {
           HEAD_ID: ledger?.HEAD_ID || null,
           AMOUNT: Number(row.Amount) || 0,
           GST_PERC: Number(row.GST_PERC) || 0,
-          CGST:Number(row.CGST) || 0,
-          SGST:Number(row.SGST) || 0,
+          CGST: Number(row.CGST) || 0,
+          SGST: Number(row.SGST) || 0,
           GST_AMOUNT: gstAmount,
           REMARKS: row.particulars || '',
         };
@@ -973,6 +1012,7 @@ e.editorOptions.onValueChanged = (args: any) => {
       TRANS_TYPE: 36,
       COMPANY_ID: 1,
       STORE_ID: 0,
+      DOC_NO: this.getDocNo(),
       TRANS_DATE: new Date(),
       TRANS_STATUS: 1,
       SUPP_ID: '',
@@ -1049,27 +1089,25 @@ e.editorOptions.onValueChanged = (args: any) => {
 
     // // Refresh grid and focus the ledgerCode cell
 
-
     setTimeout(() => {
       const grid = this.itemsGridRef?.instance;
       const newRowIndex = this.debitFormData.NOTE_DETAIL.length - 1;
       grid?.editCell(newRowIndex, 'ledgerCode');
     }, 100);
 
-     const selectedSupplier = this.distributorList.find(
+    const selectedSupplier = this.distributorList.find(
       (supplier: any) => supplier.ID === this.selectedSupplierId
     );
 
-    
-console.log(selectedSupplier)
-     const company = this.companyState?.trim().toLowerCase();
-     console.log(company)
-     const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
-     console.log(supplier)
-     const sessionGst = parseFloat(this.GST) || 0; // main GST%
-     console.log(sessionGst)
+    console.log(selectedSupplier);
+    const company = this.companyState?.trim().toLowerCase();
+    console.log(company);
+    const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
+    console.log(supplier);
+    const sessionGst = parseFloat(this.GST) || 0; // main GST%
+    console.log(sessionGst);
 
-      if (company === supplier) {
+    if (company === supplier) {
       console.log('Both states SAME → CGST + SGST apply');
 
       this.showCGST = true;
@@ -1099,19 +1137,17 @@ console.log(selectedSupplier)
         row.SGST = 0;
       });
     }
-    this.selectedSupplier = selectedSupplier
-    
+    this.selectedSupplier = selectedSupplier;
   }
 
   calculateTotal = (row: any) => {
-    console.log(row)
-  const amount = Number(row.Amount) || 0;
- const gst = this.calculateTaxAmount(row) || 0;
-  return amount + gst;
-};
+    console.log(row);
+    const amount = Number(row.Amount) || 0;
+    const gst = this.calculateTaxAmount(row) || 0;
+    return amount + gst;
+  };
 
-
-   onRoundOffChange() {
+  onRoundOffChange() {
     if (this.debitFormData.ROUND_OFF) {
       // Round Off Enabled
       this.netAmount = Math.round(this.netTotal).toFixed(2);
@@ -1120,7 +1156,6 @@ console.log(selectedSupplier)
       this.netAmount = Number(this.netTotal).toFixed(2);
     }
   }
-
 }
 
 @NgModule({

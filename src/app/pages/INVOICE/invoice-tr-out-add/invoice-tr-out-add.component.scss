@@ -107,13 +107,13 @@
   content: "\00a0"; /* non-breaking space */
   display: block;
 }
-.form-popup-buttons-container {
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px 0 0 0; // no side padding since parent already has it
-  margin-right: 12px;
-  margin-top: 20px;
-}
+// .form-popup-buttons-container {
+//   display: flex;
+//   justify-content: flex-end;
+//   padding: 10px 0 0 0; // no side padding since parent already has it
+//   margin-right: 12px;
+//   margin-top: 20px;
+// }
 
 .popup-footer {
   display: flex;

@@ -215,21 +215,6 @@ export class ArticleAddComponent {
       this.articleData.CREATE_PACKING = false;
     }
   }
-  // onIsComponentChanged(e: any) {
-  //   if (e.value) {
-  //     console.log(
-  //       'Checked: this article will be used as a component for another article'
-  //     );
-  //   } else {
-  //     console.log('Unchecked');
-  //   }
-  // }
-
-  // getItems() {
-  //   this.dataService.getDropdownData('ITEMS').subscribe((response: any) => {
-  //     this.itemsList = response;
-  //   });
-  // }
 
   getItems() {
     this.dataService.listItemsForArticle().subscribe((response: any) => {

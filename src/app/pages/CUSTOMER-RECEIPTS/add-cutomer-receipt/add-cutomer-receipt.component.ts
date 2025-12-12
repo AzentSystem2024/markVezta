@@ -132,7 +132,8 @@ export class AddCutomerReceiptComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.companyList = userData.Companies || [];
-
+      console.log(userData.SELECTED_COMPANY.COMPANY_ID, 'userData');
+      this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
       console.log('Loaded Companies:', this.companyList);
     } else {
       console.warn('No userData found in localStorage');
@@ -515,8 +516,13 @@ export class AddCutomerReceiptComponent {
   }
 
   getReceiptNo() {
-    this.dataService.getReceiptNo().subscribe((response: any) => {
+    const payload = {
+      TRANS_TYPE: 27,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.receiptNo = response.RECEIPT_NO;
+      this.receiprtFormData.DOC_NO = response.DOC_NO;
       console.log(response.RECEIPT_NO, 'INVOICENO');
     });
   }
@@ -619,6 +625,7 @@ export class AddCutomerReceiptComponent {
       BANK_NAME: this.receiprtFormData.BANK_NAME,
       STORE_ID: this.selectedstoreId,
       PARTY_NAME: this.receiprtFormData.PARTY_NAME,
+      COMPANY_ID: this.selectedCompanyId,
     };
 
     console.log('Sending payload:', payload); // For debugging

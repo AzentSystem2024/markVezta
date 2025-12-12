@@ -972,23 +972,6 @@ onRoundOffChange() {
       });
   }
 
-  // getPendingInvoices() {
-  //   const payload = {
-  //     CUST_ID: this.selectedCustomerId, // or customerId if you pass it
-  //   };
-
-  //   this.dataService
-  //     .getPendingInvoiceList(payload)
-  //     .subscribe((response: any) => {
-  //       this.pendingInvoices = response.Data;
-  //       console.log(this.pendingInvoices, 'PENDINGINVOICES');
-  //       if (this.creditFormData?.length) {
-  //         const data = this.creditFormData[0];
-  //         this.invoiceNo = String(data.INVOICE_NO);
-  //       }
-  //     });
-  // }
-
   selectInvoice(e: any) {
     console.log('Invoice selected:', e);
     const selected = e.data;
@@ -1176,162 +1159,12 @@ onRoundOffChange() {
     });
   }
 
-  // updateCreditNote() {
-  //   if (this.creditFormData.IS_APPROVED) {
-  //     console.log('approved???????????????????????????????????');
-  //     confirm(
-  //       'It will approve and commit. Are you sure you want to commit?',
-  //       'Confirm Commit'
-  //     ).then((result) => {
-  //       if (result) {
-  //         const payload = {
-  //           TRANS_ID: this.creditFormData[0].TRANS_ID,
-  //           IS_APPROVED: true,
-  //           TRANS_TYPE: 37,
-  //           COMPANY_ID: this.selectedCompanyId,
-  //           FIN_ID: this.finId,
-  //           STORE_ID: 1,
-  //           TRANS_DATE: this.transDate,
-  //           TRANS_STATUS: 1,
-  //           NARRATION:
-  //             this.creditFormData[0].NARRATION ||
-  //             'Update Details of Credit Note',
-  //           INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
-  //           INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
-  //           UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
-  //           DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
-  //           PARTY_NAME: this.creditFormData.PARTY_NAME,
-  //           NOTE_DETAIL: this.noteDetails
-  //             .filter(
-  //               (item) =>
-  //                 item.ledgerCode ||
-  //                 item.ledgerName ||
-  //                 item.Amount ||
-  //                 item.GST_PERC ||
-  //                 item.gstAmount ||
-  //                 item.particulars
-  //             )
-  //             .map((item: any, index: number) => {
-  //               const match = this.ledgerList.find(
-  //                 (l) =>
-  //                   l.HEAD_CODE === item.ledgerCode ||
-  //                   l.HEAD_NAME === item.ledgerName
-  //               );
-  //               const gstAmount = this.calculateTaxAmount(item);
-  //               return {
-  //                 SL_NO: item.SL_NO || index + 1,
-  //                 HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
-  //                 AMOUNT: Number(item.Amount) || 0,
-  //                 GST_PERC: Number(item.GST_PERC) || 0,
-  //                 GST_AMOUNT: gstAmount,
-  //                 REMARKS: item.particulars || '',
-  //               };
-  //             }),
-  //         };
+  onRowRemoved(e: any) {
+    const removedData = e.data;
 
-  //         this.dataService.commitCreditNote(payload).subscribe(
-  //           (response: any) => {
-  //             if (response.flag === 1) {
-  //               notify('Credit Note approved successfully!', 'success', 3000);
-  //               this.popupClosed.emit(); // Close popup
-  //             } else {
-  //               notify(`Approval failed: ${response.Message}`, 'error', 4000);
-  //             }
-  //           },
-  //           (error) => {
-  //             console.error('Approval error:', error);
-  //             alert('Something went wrong while approving');
-  //           }
-  //         );
-  //       } else {
-  //         // ❌ User cancelled commit
-  //         notify('Approval cancelled.', 'info', 2000);
-  //       }
-  //     });
-
-  //     return; // 🚫 Prevent running normal update block
-  //   } else {
-  //     const payload = {
-  //       TRANS_ID: this.creditFormData[0].TRANS_ID,
-  //       TRANS_TYPE: 37,
-  //       COMPANY_ID: this.selectedCompanyId,
-  //       FIN_ID: this.finId,
-  //       STORE_ID: 1,
-  //       TRANS_DATE: this.transDate,
-  //       TRANS_STATUS: 1,
-  //       NARRATION:
-  //         this.creditFormData[0].NARRATION || 'Update Details of Credit Note',
-  //       INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
-  //       INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
-  //       UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
-  //       DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
-  //       PARTY_NAME: this.creditFormData.PARTY_NAME,
-  //       IS_APPROVED: false,
-  //       NOTE_DETAIL: this.noteDetails
-  //         .filter(
-  //           (item) =>
-  //             item.ledgerCode ||
-  //             item.ledgerName ||
-  //             item.Amount ||
-  //             item.gstAmount ||
-  //             item.particulars
-  //         )
-  //         .map((item: any, index: number) => {
-  //           const match = this.ledgerList.find(
-  //             (l) =>
-  //               l.HEAD_CODE === item.ledgerCode ||
-  //               l.HEAD_NAME === item.ledgerName
-  //           );
-  //           return {
-  //             SL_NO: item.SL_NO || index + 1,
-  //             HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
-  //             AMOUNT: Number(item.Amount) || 0,
-  //             GST_AMOUNT: Number(item.gstAmount) || 0,
-  //             REMARKS: item.particulars || '',
-  //           };
-  //         }),
-  //     };
-
-  //     console.log('Update Payload:', payload);
-
-  //     this.dataService.updateCreditNote(payload).subscribe((response) => {
-  //       if (response) {
-  //         notify(
-  //           {
-  //             message: 'Credit Note Updated Successfully',
-  //             position: { at: 'top right', my: 'top right' },
-  //           },
-  //           'success'
-  //         );
-  //         this.popupClosed.emit();
-  //         // this.resetCreditNoteForm();
-  //       }
-  //     });
-  //   }
-  // }
-
-  resetCreditNoteForm() {
-    this.creditFormData = {
-      TRANS_TYPE: 37,
-      COMPANY_ID: 1,
-      STORE_ID: 1,
-      TRANS_DATE: new Date(),
-      TRANS_STATUS: 1,
-      PARTY_ID: 1,
-      PARTY_NAME: '',
-      NARRATION: '',
-      INVOICE_ID: 0,
-      INVOICE_NO: '',
-      NOTE_DETAIL: [
-        {
-          SL_NO: '',
-          HEAD_ID: '',
-          AMOUNT: '',
-          GST_AMOUNT: '',
-          REMARKS: '',
-        },
-      ],
-    };
+    this.noteDetails = this.noteDetails.filter(
+      (item: any) => item !== removedData
+    );
   }
 
   cancel() {

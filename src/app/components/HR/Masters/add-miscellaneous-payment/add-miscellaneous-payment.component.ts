@@ -9,7 +9,11 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -155,9 +159,13 @@ export class AddMiscellaneousPaymentComponent {
   GST: any;
 
   pdfSrc: SafeResourceUrl | null = null;
-            isPdfPopupVisible: boolean = false;
+  isPdfPopupVisible: boolean = false;
 
-  constructor(private dataService: DataService, private ngZone: NgZone,private sanitizer: DomSanitizer) {}
+  constructor(
+    private dataService: DataService,
+    private ngZone: NgZone,
+    private sanitizer: DomSanitizer
+  ) {}
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -212,9 +220,13 @@ export class AddMiscellaneousPaymentComponent {
   }
 
   getPendingNo() {
-    this.dataService.getPendingNo().subscribe((response: any) => {
-      this.pendingNo = response.PAYMENT_NO;
-      this.miscFormData.PAYMENT_NO = response.PAYMENT_NO;
+    const payload = {
+      TRANS_TYPE: 3,
+      COMPANY_ID: this.companyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      // this.pendingNo = response.PAYMENT_NO;
+      this.miscFormData.DOC_NO = response.DOC_NO;
     });
   }
 
@@ -241,8 +253,8 @@ export class AddMiscellaneousPaymentComponent {
 
     // Map form fields
     this.miscFormData.PARTY_NAME = data.PARTY_NAME || '';
-    this.miscFormData.VOUCHER_NO = data.VOUCHER_NO || '';
-    console.log(this.miscFormData.VOUCHER_NO, 'VOUCHERNOOOOOOO');
+    this.miscFormData.DOC_NO = data.DOC_NO || '';
+    console.log(this.miscFormData.DOC_NO, 'VOUCHERNOOOOOOO');
     // this.miscFormData.TRANS_DATE = data.TRANS_DATE
     //   ? new Date(data.TRANS_DATE)
     //   : new Date();
@@ -1056,29 +1068,30 @@ export class AddMiscellaneousPaymentComponent {
     this.popupClosed.emit();
   }
 
-   viewPdf(): void {
-               this.isPdfPopupVisible = true;
-               this.dataService.selectMiscPayment(this.MiscPaymentId).subscribe((response: any) => {
-                if(response){
-                this.pdfSrc = this.get_pdf(response);
-              }
-               })
-    }
-  
-      get_pdf(data: any): SafeResourceUrl {
-       
-         const doc = new jsPDF("p", "mm", "a4");
-         const pageWidth = doc.internal.pageSize.width;
-         const margin = 12;
-         let y = 12;
-    
-         // ===========================
-      //  RETURN PDF
-      // ===========================
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-       }
+  viewPdf(): void {
+    this.isPdfPopupVisible = true;
+    this.dataService
+      .selectMiscPayment(this.MiscPaymentId)
+      .subscribe((response: any) => {
+        if (response) {
+          this.pdfSrc = this.get_pdf(response);
+        }
+      });
+  }
+
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
+
+    // ===========================
+    //  RETURN PDF
+    // ===========================
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 }
 
 @NgModule({

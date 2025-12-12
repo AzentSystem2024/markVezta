@@ -9,7 +9,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -62,7 +66,7 @@ export class EditJournalVoucherComponent {
   @Input() journalVoucherFormData: any = {
     TRANS_ID: 0,
     TRANS_DATE: new Date(),
-    VOUCHER_NO: '',
+    DOC_NO: '',
     PARTY_NAME: '',
     REFERENCE_NO: '',
     TRANS_TYPE_ID: 4,
@@ -95,10 +99,13 @@ export class EditJournalVoucherComponent {
   selectedDeptId: any;
 
   pdfSrc: SafeResourceUrl | null = null;
-            isPdfPopupVisible: boolean = false;
-  
+  isPdfPopupVisible: boolean = false;
 
-  constructor(private dataService: DataService, private router: Router,private sanitizer: DomSanitizer) {}
+  constructor(
+    private dataService: DataService,
+    private router: Router,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -792,7 +799,7 @@ export class EditJournalVoucherComponent {
           const payload = {
             TRANS_ID: this.journalVoucherFormData.TRANS_ID,
             IS_APPROVED: true,
-            VOUCHER_NO: this.journalVoucherFormData.VOUCHER_NO,
+            DOC_NO: this.journalVoucherFormData.DOC_NO,
             REF_NO: this.journalVoucherFormData.REF_NO,
             PARTY_NAME: this.journalVoucherFormData.PARTY_NAME,
             TRANS_DATE: this.formatDateToDDMMYYYY(
@@ -837,7 +844,7 @@ export class EditJournalVoucherComponent {
     // ✅ Step 4: normal UPDATE flow
     const payload = {
       TRANS_ID: this.journalVoucherFormData.TRANS_ID,
-      VOUCHER_NO: this.journalVoucherFormData.VOUCHER_NO,
+      DOC_NO: this.journalVoucherFormData.DOC_NO,
       REF_NO: this.journalVoucherFormData.REF_NO,
       PARTY_NAME: this.journalVoucherFormData.PARTY_NAME,
       TRANS_DATE: this.formatDateToDDMMYYYY(
@@ -873,8 +880,6 @@ export class EditJournalVoucherComponent {
   cancel() {
     this.popupClosed.emit();
   }
-
-  
 }
 
 @NgModule({

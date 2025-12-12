@@ -276,13 +276,6 @@ export class ArticleListComponent {
     },
   ];
 
-  //     sessionData_tax(){
-  //         // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-  //         this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-  //     console.log(this.sessionData,'=================session data==========')
-  // this.selected_vat_id=this.sessionData.VAT_ID
-  //   }
-
   private parseDateString(dateStr: string): Date {
     if (!dateStr || typeof dateStr !== 'string') {
       console.warn('Invalid date string:', dateStr);

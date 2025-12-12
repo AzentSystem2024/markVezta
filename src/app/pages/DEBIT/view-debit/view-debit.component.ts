@@ -9,7 +9,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxComponent,
   DxTextBoxComponent,
@@ -62,7 +66,7 @@ import jsPDF from 'jspdf';
 export class ViewDebitComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() debitFormData: any;
-    @Input() DNid!: number;
+  @Input() DNid!: number;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -95,9 +99,9 @@ export class ViewDebitComponent {
   supplierList: any;
   sessionData: any;
   selected_vat_id: any;
-showCGST:boolean =false;
-  showSGST:boolean = false;
-  showGST:boolean = false;
+  showCGST: boolean = false;
+  showSGST: boolean = false;
+  showGST: boolean = false;
   HSNCODE: any;
   hsnLoaded: boolean;
  logoBase64: string;
@@ -109,11 +113,14 @@ showCGST:boolean =false;
   invoiceNo: any;
   companyStateID: any;
   selectedSupplier: any;
-    netAmount: number = 0;
-roundedNetAmount: number = 0;
+  netAmount: number = 0;
+  roundedNetAmount: number = 0;
 
-  constructor(private dataService: DataService,private sanitizer: DomSanitizer) {
-     const userDataString = localStorage.getItem('userData');
+  constructor(
+    private dataService: DataService,
+    private sanitizer: DomSanitizer
+  ) {
+    const userDataString = localStorage.getItem('userData');
     console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -132,11 +139,11 @@ roundedNetAmount: number = 0;
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
- console.log(this.selectedCompany)
- this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
- console.log(this.companyState)
- this.GST = this.sessionData.GeneralSettings.GST_PERC;
- console.log(this.GST,'GST')
+    console.log(this.selectedCompany);
+    this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
+    console.log(this.companyState);
+    this.GST = this.sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST, 'GST');
   }
 
   ngOnInit() {
@@ -160,7 +167,7 @@ roundedNetAmount: number = 0;
     }
     // this.getCompanyListDropdown();
     this.getLedgerCodeDropdown();
-    this.getDocNo();
+    // this.getDocNo();
     this.getSupplierDropdown();
     this.sessionData_tax();
 
@@ -201,120 +208,119 @@ this.convertToBase64(imagePath).then((base64) => {
   //   }
   // }
 
-ngOnChanges(changes: SimpleChanges): void {
-  if (changes['debitFormData'] && this.debitFormData?.length) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['debitFormData'] && this.debitFormData?.length) {
+      const data = this.debitFormData[0];
 
-    const data = this.debitFormData[0];
+      this.debitFormData = [...this.debitFormData];
+      this.debitFormData.PARTY_NAME = data.PARTY_NAME;
 
-    this.debitFormData = [...this.debitFormData];
-    this.debitFormData.PARTY_NAME = data.PARTY_NAME;
+      this.invoiceNo = data.INVOICE_NO;
+      this.netAmountDisplay = parseFloat(data.NET_AMOUNT) || 0;
+      this.transDate = new Date(data.TRANS_DATE);
+      this.formattedTransDate = this.formatAsDDMMYYYY(this.transDate);
 
-    this.invoiceNo = data.INVOICE_NO;
-    this.netAmountDisplay = parseFloat(data.NET_AMOUNT) || 0;
-    this.transDate = new Date(data.TRANS_DATE);
-    this.formattedTransDate = this.formatAsDDMMYYYY(this.transDate);
+      this.companyStateID = this.selectedCompany?.STATE_ID;
 
-    this.companyStateID = this.selectedCompany?.STATE_ID;
+      const customerState = (
+        data.CUST_STATE ||
+        data.SUPP_STATE_NAME ||
+        data.STATE_NAME ||
+        ''
+      )
+        .trim()
+        .toLowerCase();
 
-    const customerState =
-      (data.CUST_STATE ||
-       data.SUPP_STATE_NAME ||
-       data.STATE_NAME ||
-       '').trim().toLowerCase();
+      const companyState = this.companyState?.trim().toLowerCase();
+      const sessionGST = parseFloat(this.GST) || 0;
 
-    const companyState = this.companyState?.trim().toLowerCase();
-    const sessionGST = parseFloat(this.GST) || 0;
+      console.log('Company:', companyState);
+      console.log('Customer:', customerState);
 
-    console.log("Company:", companyState);
-    console.log("Customer:", customerState);
+      // -----------------------------
+      // APPLY GST
+      // -----------------------------
+      if (companyState === customerState) {
+        console.log('Same State → CGST + SGST');
 
-    // -----------------------------
-    // APPLY GST
-    // -----------------------------
-    if (companyState === customerState) {
-      console.log("Same State → CGST + SGST");
+        this.showCGST = true;
+        this.showSGST = true;
+        this.showGST = false;
 
-      this.showCGST = true;
-      this.showSGST = true;
-      this.showGST = false;
+        const half = sessionGST / 2;
 
-      const half = sessionGST / 2;
-
-      data.NOTE_DETAIL?.forEach((row: any) => {
-        row.CGST = half;
-        row.SGST = half;
-        row.GST = 0;
-      });
-
-    } else {
-      console.log("Different State → IGST");
-
-      this.showGST = true;
-      this.showCGST = false;
-      this.showSGST = false;
-
-      data.NOTE_DETAIL?.forEach((row: any) => {
-        row.GST = sessionGST;
-        row.CGST = 0;
-        row.SGST = 0;
-      });
-    }
-
-    // -----------------------------
-    // ⭐ ALWAYS APPLY ROUND OFF HERE
-    // -----------------------------
-    setTimeout(() => {
-      const rawNet = Number(this.debitFormData[0].NET_AMOUNT) || 0;
-
-      if (this.debitFormData[0].ROUND_OFF === true) {
-        this.debitFormData[0].NET_AMOUNT = Math.round(rawNet);
+        data.NOTE_DETAIL?.forEach((row: any) => {
+          row.CGST = half;
+          row.SGST = half;
+          row.GST = 0;
+        });
       } else {
-        this.debitFormData[0].NET_AMOUNT = rawNet;
-      }
+        console.log('Different State → IGST');
 
-      console.log("FINAL NET AMOUNT:", this.debitFormData[0].NET_AMOUNT);
-    });
+        this.showGST = true;
+        this.showCGST = false;
+        this.showSGST = false;
 
-    // -----------------------------
-    // BUILD GRID ROWS
-    // -----------------------------
-    this.getLedgerCodeDropdown().then(() => {
-      this.noteDetails = (data.NOTE_DETAIL || []).map(
-        (item: any, index: number) => {
-          const match = this.ledgerList.find(
-            (l: any) => l.HEAD_ID === item.HEAD_ID
-          );
-
-          return {
-            SL_NO: index + 1,
-            ...item,
-            ledgerCode: match?.HEAD_CODE || "",
-            ledgerName: match?.HEAD_NAME || "",
-            particulars: item.REMARKS || "",
-            Amount: item.AMOUNT || "",
-            gstAmount: item.GST_AMOUNT || "",
-            HSN_CODE: this.HSNCODE
-          };
-        }
-      );
-
-      if (this.noteDetails.length === 0) {
-        this.noteDetails.push({
-          SL_NO: 1,
-          ledgerCode: "",
-          ledgerName: "",
-          particulars: "",
-          Amount: "",
-          gstAmount: "",
-          HSN_CODE: "",
-          HEAD_ID: null,
+        data.NOTE_DETAIL?.forEach((row: any) => {
+          row.GST = sessionGST;
+          row.CGST = 0;
+          row.SGST = 0;
         });
       }
-    });
+
+      // -----------------------------
+      // ⭐ ALWAYS APPLY ROUND OFF HERE
+      // -----------------------------
+      setTimeout(() => {
+        const rawNet = Number(this.debitFormData[0].NET_AMOUNT) || 0;
+
+        if (this.debitFormData[0].ROUND_OFF === true) {
+          this.debitFormData[0].NET_AMOUNT = Math.round(rawNet);
+        } else {
+          this.debitFormData[0].NET_AMOUNT = rawNet;
+        }
+
+        console.log('FINAL NET AMOUNT:', this.debitFormData[0].NET_AMOUNT);
+      });
+
+      // -----------------------------
+      // BUILD GRID ROWS
+      // -----------------------------
+      this.getLedgerCodeDropdown().then(() => {
+        this.noteDetails = (data.NOTE_DETAIL || []).map(
+          (item: any, index: number) => {
+            const match = this.ledgerList.find(
+              (l: any) => l.HEAD_ID === item.HEAD_ID
+            );
+
+            return {
+              SL_NO: index + 1,
+              ...item,
+              ledgerCode: match?.HEAD_CODE || '',
+              ledgerName: match?.HEAD_NAME || '',
+              particulars: item.REMARKS || '',
+              Amount: item.AMOUNT || '',
+              gstAmount: item.GST_AMOUNT || '',
+              HSN_CODE: this.HSNCODE,
+            };
+          }
+        );
+
+        if (this.noteDetails.length === 0) {
+          this.noteDetails.push({
+            SL_NO: 1,
+            ledgerCode: '',
+            ledgerName: '',
+            particulars: '',
+            Amount: '',
+            gstAmount: '',
+            HSN_CODE: '',
+            HEAD_ID: null,
+          });
+        }
+      });
+    }
   }
-}
-
-
 
   private hasEmptyRow(): boolean {
     return (this.noteDetails || []).some(
@@ -381,11 +387,11 @@ ngOnChanges(changes: SimpleChanges): void {
     }, 100);
   }
 
-  getDocNo() {
-    this.dataService.getDocNoForDebit().subscribe((response: any) => {
-      this.docNo = response.DOC_NO;
-    });
-  }
+  // getDocNo() {
+  //   this.dataService.getDocNoForDebit().subscribe((response: any) => {
+  //     this.docNo = response.DOC_NO;
+  //   });
+  // }
 
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
@@ -803,12 +809,12 @@ ngOnChanges(changes: SimpleChanges): void {
     };
   }
 
-      calculateTotal = (row: any) => {
-    console.log(row)
-  const amount = Number(row.Amount) || 0;
- const gst = this.calculateTaxAmount(row) || 0;
-  return amount + gst;
-};
+  calculateTotal = (row: any) => {
+    console.log(row);
+    const amount = Number(row.Amount) || 0;
+    const gst = this.calculateTaxAmount(row) || 0;
+    return amount + gst;
+  };
 
   calculateTaxAmount = (rowData: any) => {
     const amount = Number(rowData.Amount) || 0;
@@ -816,53 +822,48 @@ ngOnChanges(changes: SimpleChanges): void {
     return +((amount * gstPerc) / 100).toFixed(2);
   };
 
+  calculateNetAmount() {
+    const details = this.noteDetails || [];
+    let totalAmount = 0;
+    let totalGST = 0;
 
-calculateNetAmount() {
-  const details = this.noteDetails || [];
-  let totalAmount = 0;
-  let totalGST = 0;
+    details.forEach((item: any) => {
+      const amount = Number(item.Amount) || 0;
+      const gstPerc = Number(item.GST_PERC) || 0;
 
-  details.forEach((item: any) => {
-    const amount = Number(item.Amount) || 0;
-    const gstPerc = Number(item.GST_PERC) || 0;
+      totalAmount += amount;
+      totalGST += (amount * gstPerc) / 100;
+    });
 
-    totalAmount += amount;
-    totalGST += (amount * gstPerc) / 100;
-  });
+    // store raw net amount
+    this.netAmount = +(totalAmount + totalGST).toFixed(2);
 
-  // store raw net amount
-  this.netAmount = +(totalAmount + totalGST).toFixed(2);
-
-  // if already rounded in backend, apply round-off automatically
-  if (this.debitFormData[0]?.ROUND_OFF) {
-    this.roundedNetAmount = Math.round(this.netAmount);
-  } else {
-    this.roundedNetAmount = this.netAmount;
+    // if already rounded in backend, apply round-off automatically
+    if (this.debitFormData[0]?.ROUND_OFF) {
+      this.roundedNetAmount = Math.round(this.netAmount);
+    } else {
+      this.roundedNetAmount = this.netAmount;
+    }
   }
-}
 
-onRoundOffChange() {
-  if (this.debitFormData[0].ROUND_OFF) {
-    this.roundedNetAmount = Math.round(this.netAmount);
-  } else {
-    this.roundedNetAmount = this.netAmount;
+  onRoundOffChange() {
+    if (this.debitFormData[0].ROUND_OFF) {
+      this.roundedNetAmount = Math.round(this.netAmount);
+    } else {
+      this.roundedNetAmount = this.netAmount;
+    }
   }
-}
 
   viewPdf(): void {
     console.log(this.DNid, "ID received in viewPdf()");
     // this.isPdfPopupVisible = true;
     
     this.dataService.selectDebitNote(this.DNid).subscribe((response: any) => {
-       console.log(
-        response,
-        '=================DN response==================='
-      );
+      console.log(response, '=================DN response===================');
       if (response) {
         this.pdfSrc = this.get_pdf(response.Data[0]); // Update iframe source
       }
     });
-  
   }
 
 
@@ -1912,6 +1913,7 @@ doc.text("Authorised Signatory", pageWidth - 75, sigY);
     "", "", "Twenty", "Thirty", "Forty", "Fifty",
     "Sixty", "Seventy", "Eighty", "Ninety"
   ];
+
 
   function convert(num: number): string {
     if (num < 20) return words[num];

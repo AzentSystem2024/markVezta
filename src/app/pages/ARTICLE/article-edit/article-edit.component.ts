@@ -180,10 +180,12 @@ export class ArticleEditComponent {
               QUANTITY: bom.QUANTITY,
               ARTICLE_ID: bom.ARTICLE_ID,
               BOM_ID: bom.BOM_ID,
+              ITEM_ID: bom.ITEM_ID,
+              ITEM_CODE: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
             };
           });
 
-          console.log('🧩 Mapped BOM items:', this.items);
+          console.log('Mapped BOM items:', this.items);
         } else {
           this.items = [];
         }
@@ -216,8 +218,8 @@ export class ArticleEditComponent {
   }
 
   getItems() {
-    this.dataService.getDropdownData('ITEMS').subscribe((response: any) => {
-      this.itemsList = response;
+    this.dataService.listItemsForArticle().subscribe((response: any) => {
+      this.itemsList = response.DataList;
     });
   }
 
@@ -303,6 +305,13 @@ export class ArticleEditComponent {
         const matchedItem = this.itemsList.find(
           (p: any) => p.DESCRIPTION === selectedDescription
         );
+        if (matchedItem) {
+          grid.cellValue(rowIndex, 'ITEM_ID', matchedItem.ID);
+          grid.cellValue(rowIndex, 'ITEM', matchedItem.DESCRIPTION);
+          grid.cellValue(rowIndex, 'DESCRIPTION', matchedItem.DESCRIPTION);
+          grid.cellValue(rowIndex, 'UOM', matchedItem.UOM);
+        }
+
         this.selectedItemId = matchedItem ? matchedItem.ID : null;
         console.log(this.selectedItemId, 'SELECTEDITEMID');
         let itemCode = null;
@@ -319,7 +328,7 @@ export class ArticleEditComponent {
             if (response?.flag === 1 && response?.Data) {
               const data = response.Data;
 
-              // ✅ Update the same row with API data
+              // Update the same row with API data
               grid.cellValue(rowIndex, 'DESCRIPTION', data.DESCRIPTION);
               grid.cellValue(rowIndex, 'UOM', data.UOM);
             }
@@ -621,15 +630,14 @@ export class ArticleEditComponent {
           SizeValue: row.SizeValue,
           OrderNo: row.OrderNo?.toString() || '0',
         })) || [];
-    const bomGridData =
-      this.itemsGridRef?.instance
-        .getVisibleRows()
-        .map((row: any) => row.data)
-        .filter((row: any) => row.ITEM && row.QUANTITY > 0)
-        .map((row: any) => ({
-          ITEM_CODE: String(this.selectedItemId),
-          QUANTITY: row.QUANTITY,
-        })) || [];
+    const bomGridData = this.itemsGridRef.instance
+      .getVisibleRows()
+      .map((r) => r.data)
+      .filter((r) => r.ITEM_ID && r.QUANTITY > 0)
+      .map((r) => ({
+        ITEM_ID: r.ITEM_ID,
+        QUANTITY: r.QUANTITY,
+      }));
 
     console.log('BOM Data:', bomGridData);
     // Step 2: Prepare the full payload

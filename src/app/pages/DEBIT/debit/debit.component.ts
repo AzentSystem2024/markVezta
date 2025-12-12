@@ -185,7 +185,11 @@ export class DebitComponent {
           ...item,
           TRANS_DATE: dateValue,
         };
-      }).sort((a: any, b: any) => Number(b.DOC_NO) - Number(a.DOC_NO));
+      }).sort((a: any, b: any) => {
+        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+        return numB - numA; // descending
+      });
 
       this.applyDateFilter();
     });

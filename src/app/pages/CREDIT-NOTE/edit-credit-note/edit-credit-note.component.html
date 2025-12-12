@@ -37,6 +37,7 @@
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onInitNewRow)="onInitNewRow($event)"
+          (onRowRemoved)="onRowRemoved($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-toolbar>
@@ -98,6 +99,7 @@
                   labelMode="floating"
                   [width]="200"
                   displayFormat="dd-MM-yyyy"
+                  [readOnly]="true"
                 ></dx-date-box>
 
                 <!-- Due Amount + Plus Button -->
