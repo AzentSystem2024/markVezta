@@ -99,13 +99,28 @@ selectedRows: any[] = [];
 isEditReadOnly:boolean=false
   prepaymentpostingId: any;
   selectedprepaymentposting: any;
+  selected_Company_id: any;
   constructor (private ngZone:NgZone,private dataservice:DataService, private cdr:ChangeDetectorRef){
 this.get_prepayment_posting_list()
-
+this.sesstion_Details();
 
   }
+
+   sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
   get_prepayment_posting_list() {
-  this.dataservice.Prepayment_posting_list().subscribe((res: any) => {
+    const payload = {
+      COMPANY_ID:this.selected_Company_id
+    }
+  this.dataservice.Prepayment_posting_list(payload).subscribe((res: any) => {
     console.log(res);
 
     this.prepaymentList = res.Data

@@ -124,6 +124,7 @@ refreshButtonOptions = {
   allDepreciationLid: any;
   DepreciationId: any;
   selectedDepreciation: any;
+  selected_Company_id: any;
 
 
   addDepreciation(){
@@ -293,8 +294,27 @@ this.showCustomDatePopup=true
     this.get_Depreciation_list();
   }
 
+   sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
+
+  ngOnInit(){
+    this.sesstion_Details();
+  }
+
 get_Depreciation_list() {
-  this.dataService.list_Depreciation_api().subscribe((res: any) => {
+
+  const payload = {
+    COMPANY_ID : this.selected_Company_id
+  }
+  this.dataService.list_Depreciation_api(payload).subscribe((res: any) => {
     const allData = res.Data;
     const dateField = 'DEPR_DATE';
 
@@ -327,7 +347,10 @@ applyCustomDateFilter() {
   this.EndDate = end;
 
   // Filter immediately
-  this.dataService.list_Depreciation_api().subscribe((res: any) => {
+  const payload = {
+    COMPANY_ID : this.selected_Company_id
+  }
+  this.dataService.list_Depreciation_api(payload).subscribe((res: any) => {
     const allData = res.Data;
     this.Depreciation_List = allData.filter((item: any) => {
       const itemDate = new Date(item.DEPR_DATE);

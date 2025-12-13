@@ -179,7 +179,10 @@ onDepreciationDateChange(newDate: Date) {
 // for the d
 
 get_Depreciation_list() {
-  this.dataService.list_Depreciation_api().subscribe((res: any) => {
+  const payload = {
+    COMPANY_ID : this.selected_Company_id
+  }
+  this.dataService.list_Depreciation_api(payload).subscribe((res: any) => {
     const allData = res.Data;
     const dateField = 'DEPR_DATE';
   this.Depreciation_List = allData;

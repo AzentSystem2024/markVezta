@@ -118,8 +118,8 @@ this.selectedMonthYear=formattedDate
     
   const currentdata=this.selectedMonthYear
 const payload={
-  DUE_DATE:this.selectedMonthYear 
-
+  DUE_DATE:this.selectedMonthYear, 
+  COMPANY_ID:this.selected_Company_id
 }
 this.dataservice.Prepayment_pending_list(payload).subscribe((res:any)=>{
   console.log(res)

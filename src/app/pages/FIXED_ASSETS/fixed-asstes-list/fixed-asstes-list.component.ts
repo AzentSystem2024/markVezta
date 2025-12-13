@@ -70,6 +70,7 @@ canAdd = false;
 ];
   selectedFA: any;
   fixedAssetId: any;
+  selected_Company_id: any;
 
  //========================Export data ==========================
   onExporting(event: any) {
@@ -137,9 +138,27 @@ this.EditFixedAssetsPopupVisible=false
 this.list_fixed_assets()
   }
 
+     sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
+
+  ngOnInit(){
+    this.sesstion_Details();
+  }
+  
   list_fixed_assets(){
   
-    this.dataService.list_Fixed_Asset_api().subscribe((res:any)=>{
+    const payload ={
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.list_Fixed_Asset_api(payload).subscribe((res:any)=>{
       console.log(res)
 this.FixedAssets=res.Data
       
