@@ -92,6 +92,7 @@ canAdd = false;
 // }
 pdfSrc: SafeResourceUrl | null = null;
               isPdfPopupVisible: boolean = false;
+  selected_Company_id: any;
 
 constructor(private dataService:DataService,private router:Router,private sanitizer: DomSanitizer){
     const currentUrl = this.router.url;
@@ -130,10 +131,26 @@ ngOnChanges(changes: SimpleChanges) {
   }
 }
 
+ sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
 
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
+
+  ngOnInit(){
+    this.sesstion_Details();
+  }
 
   list_fixed_assets(){
-    this.dataService.list_Fixed_Asset_api().subscribe((res:any)=>{
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.list_Fixed_Asset_api(payload).subscribe((res:any)=>{
     console.log(res)
     this.FixedAssets=res.Data
     })
@@ -166,9 +183,13 @@ this.dataService.Asset_Leger_Dropdown().subscribe((res:any)=>{
 async UpdateData() {
   console.log('Update button called');
 
+ 
   // ✅ Await the asset list before proceeding
   try {
-    const res: any = await firstValueFrom(this.dataService.list_Fixed_Asset_api());
+     const payload = {
+    COMPANY_ID : this.selected_Company_id
+  }
+    const res: any = await firstValueFrom(this.dataService.list_Fixed_Asset_api(payload));
     this.FixedAssets = res.Data;
     console.log(this.FixedAssets, '==== fixed asset list (after async)');
   } catch (error) {

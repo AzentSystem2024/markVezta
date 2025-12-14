@@ -1,11 +1,14 @@
-<div class="pdc-form" style="max-width: 900px; margin: 0 auto; padding: 20px;">
+<div class="pdc-form" style="max-width: 900px; margin: 0 auto; padding: 20px">
   <!-- Row 1: Doc No, Date, Priority -->
-  <div class="d-flex" style="gap: 1rem; margin-bottom: 1rem; align-items: flex-start;">
+  <div
+    class="d-flex"
+    style="gap: 1rem; margin-bottom: 1rem; align-items: flex-start"
+  >
     <dx-text-box
       label="Doc No"
       labelMode="floating"
       [readOnly]="true"
-      [(value)]="PDCFormData.ENTRY_NO"
+      [(value)]="docNo"
     ></dx-text-box>
 
     <dx-date-box
@@ -27,8 +30,8 @@
   </div>
 
   <!-- Row 2: Beneficiary Type -->
-  <div style="margin-bottom: 1rem;">
-    <label style="margin-bottom: 6px; display: block;">Beneficiary Type</label>
+  <div style="margin-bottom: 1rem">
+    <label style="margin-bottom: 6px; display: block">Beneficiary Type</label>
     <dx-radio-group
       [items]="BeneficiaryType"
       [value]="selectedBeneficiaryType"
@@ -41,7 +44,7 @@
   </div>
 
   <!-- Row 3: Conditional Select/Textbox -->
-  <div style="margin-bottom: 1rem;">
+  <div style="margin-bottom: 1rem">
     <dx-select-box
       *ngIf="selectedBeneficiaryType?.id === 1"
       label="Supplier"
@@ -76,7 +79,7 @@
   </div>
 
   <!-- Row 4: Cheque No, Cheque Date, Amount -->
-  <div class="d-flex" style="gap: 1rem; margin-bottom: 1rem;">
+  <div class="d-flex" style="gap: 1rem; margin-bottom: 1rem">
     <dx-text-box
       label="Cheque No"
       labelMode="floating"
@@ -104,7 +107,7 @@
   </div>
 
   <!-- Row 5: Bank Account -->
-  <div style="margin-bottom: 1rem;">
+  <div style="margin-bottom: 1rem">
     <dx-select-box
       label="Bank Account"
       labelMode="floating"
@@ -117,7 +120,7 @@
   </div>
 
   <!-- Row 6: Remarks -->
-  <div style="margin-bottom: 1.5rem;">
+  <div style="margin-bottom: 1.5rem">
     <dx-text-box
       label="Remarks"
       labelMode="floating"
@@ -126,27 +129,19 @@
     ></dx-text-box>
   </div>
 
-  <div  style="margin-bottom: 1.5rem;">
-    <dx-check-box
-    text="Approve"
-   
-    [(value)]="PDCFormData.ENTRY_STATUS"
-    >
-  </dx-check-box>
+  <div style="margin-bottom: 1.5rem">
+    <dx-check-box text="Approve" [(value)]="PDCFormData.ENTRY_STATUS">
+    </dx-check-box>
   </div>
 
   <!-- Footer: Buttons -->
-  <div style="display: flex; justify-content: flex-end; gap: 10px;">
+  <div style="display: flex; justify-content: flex-end; gap: 10px">
     <dx-button
       text="Cancel"
       type="normal"
       stylingMode="outlined"
       (onClick)="cancel()"
     ></dx-button>
-    <dx-button
-      text="Save"
-      type="default"
-      (onClick)="savePDC()"
-    ></dx-button>
+    <dx-button text="Save" type="default" (onClick)="savePDC()"></dx-button>
   </div>
 </div>

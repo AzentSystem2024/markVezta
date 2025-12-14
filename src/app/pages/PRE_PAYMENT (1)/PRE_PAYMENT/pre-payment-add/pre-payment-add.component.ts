@@ -97,6 +97,7 @@ export class PrePaymentAddComponent {
   gstPercent: number = 0; // GST %
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
+  docNo: any;
 
   constructor(private dataservice: DataService, private ngZone: NgZone) {
     this.get_Supplier_dropdown();
@@ -104,6 +105,20 @@ export class PrePaymentAddComponent {
     this.sesstion_Details();
     this.get_PrePaymentLedger_dropdown();
     this.sessionData_tax();
+    this.getDocNo();
+    
+
+  }
+
+    getDocNo() {
+    const payload = {
+      TRANS_TYPE: 38,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
   }
 
   updateGSTAmount() {

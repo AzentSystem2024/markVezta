@@ -163,6 +163,7 @@ export class GrnNewFormComponent implements OnInit {
     GRNDetails: this.demoArray,
     GRN_DATE: new Date(),
   });
+  docNo: any;
 
   // add.component.ts
   clearDemoArray() {
@@ -180,6 +181,17 @@ export class GrnNewFormComponent implements OnInit {
     this.localCurrencySymbol = data ? data.CURRENCY_SYMBOL : null;
     console.log(this.grnData.GRN_DATE, 'grndate');
     console.log(this.grnData);
+  }
+
+    getDocNo() {
+    const payload = {
+      TRANS_TYPE: 18,
+      COMPANY_ID:  this.selected_Company_id,
+    };
+    this.service.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
   }
 
   highlightEditableColumns(event: any) {
@@ -1006,6 +1018,7 @@ export class GrnNewFormComponent implements OnInit {
     this.get_Supplier_dropdown();
     this.getStoreData();
     this.sesstion_Details();
+    this.getDocNo();
     // this.getPurchaseOrderList();
   }
 

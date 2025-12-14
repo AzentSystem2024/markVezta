@@ -6,7 +6,7 @@
         label="Doc No."
         labelMode="floating"
         [readOnly]="true"
-        [(value)]="PrePaymentFormData.VOUCHER_NO"
+        [(value)]="PrePaymentFormData.DOC_NO"
       ></dx-text-box>
       <dx-date-box
         label="Date"
@@ -291,20 +291,19 @@
     </div>
 
     <div class="fixed-footer" *ngIf="isReadOnly">
-         <dx-button
-      icon="fas fa-file-pdf"
-      text="PDF"
-      type="normal"
-      stylingMode="outlined"
-      [width]="100"
-      (onClick)="viewPdf()"
-      hint="View PDF"
-    >
-    </dx-button>
+      <dx-button
+        icon="fas fa-file-pdf"
+        text="PDF"
+        type="normal"
+        stylingMode="outlined"
+        [width]="100"
+        (onClick)="viewPdf()"
+        hint="View PDF"
+      >
+      </dx-button>
     </div>
   </div>
 </dx-validation-group>
-
 
 <dx-popup
   [(visible)]="isPdfPopupVisible"

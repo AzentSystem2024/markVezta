@@ -67,6 +67,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   maskRules = {
     X: /[0-9]/,
   };
+  selected_Company_id: any;
+  docNo: any;
 
   constructor(private service: DataService, private router: Router) {
     const settingsData = sessionStorage.getItem('settings');
@@ -79,6 +81,17 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     // this.localCurrencyCode = this.settingsData
     //   ? this.settingsData.CURRENCY_SYMBOL
     //   : null;
+  }
+
+      getDocNo() {
+    const payload = {
+      TRANS_TYPE: 17,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
   }
 
   width = '97vw';
@@ -322,11 +335,18 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.GST_PERC,
       '===========selected GST PERC==================='
     );
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
   }
 
   ngOnInit() {
     this.getPoNumber();
     this.sessionDetails();
+    this.getDocNo();
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     this.menuResponse = JSON.parse(

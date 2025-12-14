@@ -120,6 +120,8 @@ export class AddSalaryPaymentComponent {
   finId: any;
   selectedRows: any;
   selectedstoreId:any;
+  selected_Company_id: any;
+  docNo: any;
 
   constructor(private dataService: DataService) {}
 
@@ -128,6 +130,19 @@ export class AddSalaryPaymentComponent {
     this.getVoucherNo();
     this.loadUserData();
     this.sessionDetails();
+    this.getDocNo();
+  }
+
+
+      getDocNo() {
+    const payload = {
+      TRANS_TYPE: 30,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
   }
 
     sessionDetails(){
@@ -136,6 +151,12 @@ export class AddSalaryPaymentComponent {
     console.log(
       this.selectedstoreId,
       '===========selected store id==================='
+    );
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
     );
   }
 
@@ -525,7 +546,7 @@ onUpdateSalaryPayment() {
 
   console.log('Payload to send:', this.salaryPaymentData);
 
-  if (this.isApproved) {
+  if (this.isApproved === true) {
     // Call approve API if isApproved is true
     this.dataService
       .approveSalaryPayment(this.salaryPaymentData)

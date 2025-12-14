@@ -184,6 +184,7 @@ gridButtons = [
   }
 ];
   selected_Company_id: any;
+  docNo: any;
   constructor(private fb: FormBuilder, private dataService: DataService,private ngZone: NgZone,private cdr:ChangeDetectorRef,private router: Router) {
     this.formSource = this.fb.group({
       Id: [null],
@@ -201,8 +202,22 @@ gridButtons = [
     this.setupInstallmentCalculation();
     this.get_Employee_dropdown();
     this.get_advanceType_dropdown();
+    this.sesstion_Details();
+    this.getDocNo();
   }
 
+  
+
+    getDocNo() {
+    const payload = {
+      TRANS_TYPE: 28,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
+  }
 
         toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;

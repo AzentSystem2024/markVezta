@@ -144,7 +144,10 @@ this.dataService.Asset_Leger_Dropdown().subscribe((res:any)=>{
 
 
 list_fixed_assets(){
-this.dataService.list_Fixed_Asset_api().subscribe((res:any)=>{
+  const payload ={
+      COMPANY_ID : this.selected_Company_id
+  }
+this.dataService.list_Fixed_Asset_api(payload).subscribe((res:any)=>{
 console.log(res)
 this.FixedAssets=res.Data
       
@@ -175,7 +178,10 @@ async AddData() {
 
   // ✅ Await the asset list before proceeding
   try {
-    const res: any = await firstValueFrom(this.dataService.list_Fixed_Asset_api());
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    const res: any = await firstValueFrom(this.dataService.list_Fixed_Asset_api(payload));
     this.FixedAssets = res.Data;
     console.log(this.FixedAssets, '==== fixed asset list (after async)');
   } catch (error) {

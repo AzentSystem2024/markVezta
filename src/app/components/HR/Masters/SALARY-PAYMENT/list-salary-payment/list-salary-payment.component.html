@@ -43,7 +43,7 @@
       </dxo-column-chooser>
       <dxo-editing
         mode="popup"
-       [allowUpdating]="canEdit"
+        [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
@@ -93,7 +93,7 @@
         ></dxi-item>
 
         <dxi-item
-        *ngIf="canAdd"
+          *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"

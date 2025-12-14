@@ -78,17 +78,12 @@ export class DepreciationEditComponent {
 
   pdfSrc: SafeResourceUrl | null = null;
                 isPdfPopupVisible: boolean = false;
+  selected_Company_id: any;
 
   constructor(private dataService: DataService,private sanitizer: DomSanitizer) {
     this.Active_fixedasset_List();
   }
-  ngOnInit() {
-    // If API returns a string date:
-    // example
-    // this.Date = new Date(); // convert string → Date
 
-    // this.Date = this.DepreciationPayload.DEPR_DATE;
-  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (
@@ -393,9 +388,26 @@ export class DepreciationEditComponent {
     throw new Error('Method not implemented.');
   }
 
+     sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
+
+  ngOnInit(){
+    this.sesstion_Details();
+  }
 
   get_Depreciation_list() {
-  this.dataService.list_Depreciation_api().subscribe((res: any) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+  this.dataService.list_Depreciation_api(payload).subscribe((res: any) => {
     const allData = res.Data;
     const dateField = 'DEPR_DATE';
   this.Depreciation_List = allData;

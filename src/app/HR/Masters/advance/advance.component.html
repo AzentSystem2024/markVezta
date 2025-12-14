@@ -159,7 +159,7 @@
   (onHiding)="closeButton()"
   [(visible)]="isAddPopUp"
   titleText="Advance "
-  [width]=600
+  [width]="600"
   height="'100vh'"
   [dragEnabled]="true"
   (save)="Add_Advace()"
@@ -170,13 +170,14 @@
     <dx-form id="form" [formGroup]="formSource">
       <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
         <!-- Document No -->
-        <dxi-item>
+        <!-- <dxi-item>
           <dx-text-box
             label="Document No"
             [labelMode]="'floating'"
             [readOnly]="true"
+            [(value)]="docNo"
           ></dx-text-box>
-        </dxi-item>
+        </dxi-item> -->
 
         <!-- Date Picker -->
         <dxi-item>
@@ -434,14 +435,14 @@
   <dx-form id="form">
     <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
       <!-- Document No -->
-      <dxi-item>
+      <!-- <dxi-item>
         <dx-text-box
           label="Document No"
           [readOnly]="true"
-          [(value)]="adv_no_value"
+          [(value)]="docNo"
           [labelMode]="'floating'"
         ></dx-text-box>
-      </dxi-item>
+      </dxi-item> -->
 
       <!-- Date Picker -->
       <dxi-item>

@@ -5537,8 +5537,9 @@ The result can be exported to HTML or Markdown.`;
 
   //================================Fixed assests===============================
 
-  list_Fixed_Asset_api() {
-    return this.http.post(`${this.apiUrl}FixedAsset/list`, {});
+  list_Fixed_Asset_api(item:any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}FixedAsset/list`, payload);
   }
   //===============================Asset type dropdown==========
 
@@ -5594,11 +5595,9 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=====================list of depreciation================================
-  list_Depreciation_api() {
-    return this.http.post(
-      `${this.apiUrl}Depreciation/DepreciationList/List`,
-      {}
-    );
+  list_Depreciation_api(item:any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}Depreciation/DepreciationList/List`, payload);
   }
   //===========================insert depreciation=============================
 
@@ -5713,9 +5712,10 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-  Prepayment_posting_list() {
+  Prepayment_posting_list(item:any) {
+    const payload = item
     const getEndpoint = this.apiUrl + 'PrePayment_Posting/prepaylist';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, payload);
   }
   Insert_prepayment_data(item: any) {
     const payload = item;
