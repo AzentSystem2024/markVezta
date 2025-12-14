@@ -99,7 +99,7 @@
       </div>
       <!-- <dxi-column dataField="TRANS_TYPE" caption="Trans Type"></dxi-column> -->
       <dxi-column
-        dataField="INVOICE_NO"
+        dataField="DOC_NO"
         caption="Sale No"
         alignment="right"
       ></dxi-column>
@@ -122,7 +122,7 @@
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
       <dxi-column
-        dataField="GST_AMOUNT"
+        dataField="TAX_AMOUNT"
         [caption]="
           selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
             ? ' VAT Amount'

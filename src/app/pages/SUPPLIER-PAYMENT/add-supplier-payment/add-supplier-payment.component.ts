@@ -79,7 +79,7 @@ export class AddSupplierPaymentComponent {
     FIN_ID: 1,
     TRANS_DATE: new Date(),
     TRANS_STATUS: 1,
-    RECEIPT_NO: '',
+    RECEIPT_NO: 0,
     REF_NO: '',
     CHEQUE_NO: '',
     CHEQUE_DATE: '',
@@ -119,10 +119,29 @@ export class AddSupplierPaymentComponent {
   pdcList: any;
   selectedLedger: any;
   pdcPopupVisible: boolean = false;
+  companyState: any;
+  companyStateID: any;
+  selectedCompanyId: any;
+  companyList: any[];
 
   constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   ngOnInit() {
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      const selectedCompany = userData?.SELECTED_COMPANY;
+      console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
+      this.companyState = selectedCompany.STATE_NAME;
+      this.companyStateID = selectedCompany.STATE_ID;
+      console.log(this.companyStateID, 'COMPANYSTATE');
+      if (selectedCompany?.COMPANY_ID) {
+        this.selectedCompanyId = selectedCompany.COMPANY_ID;
+
+        this.companyList = [selectedCompany]; // Show only selected company
+      }
+    }
+    this.getReceiptNo();
     this.getLedgerCodeDropdown();
     this.getSupplierDropdown();
     this.applyReceiptModeFilter();
@@ -496,9 +515,13 @@ export class AddSupplierPaymentComponent {
   }
 
   getReceiptNo() {
-    this.dataService.getReceiptNo().subscribe((response: any) => {
+    const payload = {
+      TRANS_TYPE: 21,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.receiptNo = response.RECEIPT_NO;
-      this.paymentFormData.RECEIPT_NO = this.receiptNo;
+      this.paymentFormData.DOC_NO = response.DOC_NO;
       console.log(response.RECEIPT_NO, 'INVOICENO');
     });
   }
@@ -532,7 +555,7 @@ export class AddSupplierPaymentComponent {
       return;
     }
 
-    // 🔧 FIX: Assign SUPP_DETAIL before calling the API
+    // 🔧 FIX: Assign SUPP_DETAIL before calling the doc
     this.paymentFormData.SUPP_DETAIL = validDetails;
 
     // Set PAY_TYPE_ID based on receiptMode
@@ -549,7 +572,7 @@ export class AddSupplierPaymentComponent {
     // Calculate total received amount
     const netAmount = validDetails.reduce((sum, item) => sum + item.AMOUNT, 0);
     this.paymentFormData.NET_AMOUNT = netAmount;
-    this.paymentFormData.RECEIPT_NO = this.receiptNo;
+    // this.paymentFormData.RECEIPT_NO = this.receiptNo;
     this.paymentFormData.REC_DATE = new Date();
     this.paymentFormData.NARRATION = this.paymentFormData.NARRATION || '';
     this.paymentFormData.PDC_ID = this.paymentFormData.PDC_ID;
@@ -640,7 +663,7 @@ export class AddSupplierPaymentComponent {
       FIN_ID: 1,
       TRANS_DATE: new Date(),
       TRANS_STATUS: 1,
-      RECEIPT_NO: '',
+      RECEIPT_NO: 0,
       REF_NO: '',
       CHEQUE_NO: '',
       CHEQUE_DATE: '',
@@ -658,20 +681,7 @@ export class AddSupplierPaymentComponent {
       ],
     };
     this.paymentFormData.SUPP_ID = '';
-    // Reset receipt mode to default (e.g. Cash)
-    // this.receiptMode = 'Cash';
-
-    // Clear selection and editable values in the grid
-    // if (this.itemsGridRef?.instance) {
-    //   this.itemsGridRef.instance.clearSelection();
-    //   this.itemsGridRef.instance.refresh(); // refresh to clear any temporary values
-    // }
-
-    // Optionally reset receipt number if you auto-generate it
-    // this.receiptNo = '';
-
-    // Trigger change detection to update UI
-    // this.cdr.detectChanges();
+    this.getReceiptNo();
   }
 }
 

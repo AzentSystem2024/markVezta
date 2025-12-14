@@ -52,8 +52,6 @@ import { confirm } from 'devextreme/ui/dialog';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-
-
 @Component({
   selector: 'app-edit-purchase-invoice',
   templateUrl: './edit-purchase-invoice.component.html',
@@ -119,12 +117,12 @@ export class EditPurchaseInvoiceComponent {
     // this.getSupplierDropdown();
     this.getSupplierOrUnitLst();
     // this.getPendingGRNList();
-    this.getPurchNo();
-const imagePath = 'assets/markLogo.jpg';
-this.convertToBase64(imagePath).then((base64) => {
-  this.logoBase64 = base64;
-  console.log("Logo Base64 Loaded");
-});
+    // this.getPurchNo();
+    const imagePath = 'assets/markLogo.jpg';
+    this.convertToBase64(imagePath).then((base64) => {
+      this.logoBase64 = base64;
+      console.log('Logo Base64 Loaded');
+    });
 
     this.sessionData_tax();
   }
@@ -141,43 +139,6 @@ this.convertToBase64(imagePath).then((base64) => {
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
     console.log(this.GST, 'GST');
   }
-
-  //   ngOnChanges(changes: SimpleChanges): void {
-  //     if (changes['invoiceFormData']) {
-  //       console.log('Changed invoiceFormData:', this.invoiceFormData);
-  //       this.purchaseInvoiceFormData = this.invoiceFormData;
-  //       this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
-  //       console.log(this.mainGridData,'mainGridData')
-  //       this.mainGridData = this.mainGridData.map((row: any) => ({
-  //         HSN_CODE: this.HSNCODE, // force-create
-  //         VAT_PERC: row.GST || this.GST, // already showing
-  //         ...row, // merge original row at the end
-  //       }));
-
-  //       this.showCGST = true;
-  //       this.showSGST = true;
-  //       this.showGST = false;
-
-  // //       this.mainGridData = this.mainGridData.map((row: any) => ({
-
-  // //   ...row,
-  // //   HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
-  // //   GST: row.GST ?? 0,
-  // //   CGST: row.CGST ?? 0,
-  // //   SGST: row.SGST ?? 0,
-  // //   VAT_PERC: row.VAT_PERC ?? this.GST,
-  // // }));
-
-  //       this.purchaseInvoiceFormData.SUPP_ID = Number(
-  //         this.invoiceFormData.SUPP_ID
-  //       );
-  //       this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
-  //       if (this.selectedSupplierId) {
-  //         this.getPendingGRNList();
-  //       }
-  //       console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
-  //     }
-  //   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['invoiceFormData']) {
@@ -531,17 +492,6 @@ this.convertToBase64(imagePath).then((base64) => {
   }
 
   savePurchaseInvoice() {
-    if (!this.purchaseInvoiceFormData.SUPP_INV_NO) {
-      notify(
-        {
-          message: 'Please supplier invoice number',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-        3000
-      );
-      return;
-    }
     if (!this.purchaseInvoiceFormData.SUPP_ID) {
       notify(
         {
@@ -757,18 +707,18 @@ this.convertToBase64(imagePath).then((base64) => {
   }
 
   formatDate(dateStr: string): string {
-    if (!dateStr) return "";
+    if (!dateStr) return '';
 
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return dateStr; // if invalid, return original
 
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
   }
-  
+
   generatePDF(data: any) {
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -788,7 +738,7 @@ this.convertToBase64(imagePath).then((base64) => {
     doc.rect(logoX, logoY, logoW, logoH, 'F');
     doc.setFontSize(11);
     // doc.addImage('../', 'PNG', logoX, logoY, logoW, logoH);
-      doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
+    doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
 
     // doc.text('logo', logoX + logoW / 2, logoY + logoH / 2 + 3, {
     //   align: 'center',
@@ -861,54 +811,54 @@ this.convertToBase64(imagePath).then((base64) => {
       doc.text(line || '', compBoxX + 5, cy);
       doc.setTextColor(0, 0, 0);
     });
-// ============================================================
-// 3) DISPATCHED FROM (LEFT SIDE)
-// ============================================================
+    // ============================================================
+    // 3) DISPATCHED FROM (LEFT SIDE)
+    // ============================================================
 
-let dispX = compBoxX;                   // same left alignment
-let dispY = compBoxY + compBoxH + 10;   // positioned below company box
+    let dispX = compBoxX; // same left alignment
+    let dispY = compBoxY + compBoxH + 10; // positioned below company box
 
+    let startX = 15;
+    let startY = compBoxY + compBoxH + 25;
+    let gap = 7; // space between lines
 
-let startX = 15;
-let startY =  compBoxY + compBoxH + 25; 
-let gap = 7; // space between lines
+    // doc.setFont('helvetica', 'bold');
+    // doc.setFontSize(11);
+    // doc.text('Dispatched from', dispX, dispY);
 
-// doc.setFont('helvetica', 'bold');
-// doc.setFontSize(11);
-// doc.text('Dispatched from', dispX, dispY);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
 
+    doc.text('Invoice Serial No:' + data.SUPP_INV_NO, startX, startY);
 
+    doc.setFont('helvetica', 'normal');
+    doc.text('Invoice Date:' + data.SUPP_INV_DATE, startX, startY + gap);
+    doc.text(
+      'Vehicle No: ' + (data.VEHICLE_NO || ''),
+      startX,
+      startY + gap * 2
+    );
+    doc.text('Mode of Transport:', startX, startY + gap * 3);
 
-doc.setFontSize(12);
-doc.setFont("helvetica", "bold");
+    // doc.text('Dispatched From:', startX, startY + gap * 4);
+    dispY += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
 
-doc.text('Invoice Serial No:'+ (data.SUPP_INV_NO), startX, startY);
+    // const dispatchLines = [
+    //   data.DISPATCH_ADDRESS1,
+    //   data.DISPATCH_ADDRESS2,
+    //   data.DISPATCH_ADDRESS3,
+    //   `Pin: ${data.DISPATCH_PIN}`,
+    // ];
 
-doc.setFont("helvetica", "normal");
-doc.text('Invoice Date:'+(data.SUPP_INV_DATE), startX, startY + gap);
-doc.text('Vehicle No: ' + (data.VEHICLE_NO || ''), startX, startY + gap * 2);
-doc.text('Mode of Transport:', startX, startY + gap * 3);
-
-
-// doc.text('Dispatched From:', startX, startY + gap * 4);
-dispY += 6;
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(10);
-
-// const dispatchLines = [
-//   data.DISPATCH_ADDRESS1,
-//   data.DISPATCH_ADDRESS2,
-//   data.DISPATCH_ADDRESS3,
-//   `Pin: ${data.DISPATCH_PIN}`,
-// ];
-
-// // Print lines
-// dispatchLines.forEach(line => {
-//   if (line) {
-//     doc.text(line, dispX, dispY);
-//     dispY += 5;
-//   }
-// });
+    // // Print lines
+    // dispatchLines.forEach(line => {
+    //   if (line) {
+    //     doc.text(line, dispX, dispY);
+    //     dispY += 5;
+    //   }
+    // });
 
     // ============================================================
     // 3) CONSIGNEE (SHIP TO)
@@ -964,342 +914,387 @@ doc.setFontSize(10);
     // doc.setDrawColor(180);
     // doc.line(15, tableLineY, pageWidth - 15, tableLineY);
 
-   // ============================================================
-// 5) TABLE — EXACT SAME WIDTH AS THE LINE (180mm)
-// ============================================================
-const tableStartY = tableLineY - 2;
-
-const companyState = this.companyState?.trim().toLowerCase();
-const supplierState = this.purchaseInvoiceFormData?.SUPP_STATE_NAME?.trim().toLowerCase();
-
-const sameState = companyState === supplierState;
-
-
-
-const rows = data.PurchDetails.map((item: any) => {
-
-  const amount = this.calculateAmount(item);
-  const gstAmount = this.calculateGstAmount(item);
-
-  const common = [
-    // item.TRANSFER_NO || "",
-  this.formatDate(item.GRN_DATE) || "",
-    item.ITEM_NAME || "",
-    item.RATE.toFixed(2),
-    item.GRN_QUANTITY.toFixed(2),
-    item.QUANTITY.toFixed(2),
-    amount.toFixed(2),      // Amount
-    gstAmount.toFixed(2),   // GST Amount
-    item.HSN_CODE || this.HSNCODE || "" 
-  ];
-
-  if (sameState) {
-    return [
-      ...common,
-      (item.CGST || 0).toFixed(2),
-      (item.SGST || 0).toFixed(2),
-      item.TOTAL_AMOUNT.toFixed(2)
-    ];
-  } else {
-    return [
-      ...common,
-      (item.GST || 0).toFixed(2),    // IGST
-      item.TOTAL_AMOUNT.toFixed(2)
-    ];
-  }
-});
-
-
-
-autoTable(doc, {
-  startY: tableStartY,
-  theme: 'grid',
-
-  headStyles: {
-    fillColor: [240, 240, 240],
-    textColor: 0,
-    fontSize: 8,
-    halign: 'center',
-  },
-
-  bodyStyles: { fontSize: 8 },
-
-  columnStyles: {
-    // 0: { cellWidth: 10, halign: 'center' },  // TransferNo
-    0: { cellWidth: 18, halign: 'center' },  // Date
-    1: { cellWidth: 38 },                   // Item Name
-    2: { cellWidth: 13, halign: 'right' },  // Price
-    3: { cellWidth: 14, halign: 'center' }, // Pending Qty
-    4: { cellWidth: 13, halign: 'center' }, // Qty
-    5: { cellWidth: 14, halign: 'right' },  // Amount
-    6: { cellWidth: 14, halign: 'right' },  // GST Amount
-    7: { cellWidth: 14, halign: 'center' }, // HSN
-    8: { cellWidth: 13, halign: 'right' },  // CGST
-    9:{ cellWidth: 13, halign: 'right' },  // SGST
-    10:{ cellWidth: 18, halign: 'right' },  // Total Amount
-  },
-
-  head: [
-    [
-      // 'TransferNo.',
-      'Date',
-      'Item Name',
-      'Price',
-      'Pending Qty',
-      'Qty',
-      'Amount',
-      'GST Amount',
-      'HSN Code',
-      'CGST',
-      'SGST',
-      'Total Amount'
-    ],
-  ],
-
-  body: rows,
-
-  foot: [
-    [
-      { content: 'Total', colSpan: 10, styles: { halign: 'right', fontStyle: 'bold' } },
-      { content: data.NET_AMOUNT.toFixed(2), styles: { fontStyle: 'bold' } },
-    ],
-  ],
-});
-
-// ============================================================
-// 6) FOOTER – GST SUMMARY + RIGHT TOTAL (PERFECT ALIGNMENT)
-// ============================================================
-
-const footStartY = (doc as any).lastAutoTable.finalY + 15;
-
-// ---------------- LEFT GST SUMMARY TABLE ----------------
-let fx = 15;
-let fy = footStartY;
-
-doc.setFont('helvetica', 'bold');
-doc.setFontSize(10);
-
-// SUPER CLOSE columns
-const gstCol      = fx;        // GST %
-const taxableCol  = fx + 22;   // closer
-const igstCol     = fx + 50;   // closer
-const totalCol    = fx + 80;   // closer
-
-// Integrated Tax is now subdivided
-const igstRateCol = fx + 50;   // Rate
-const igstAmtCol  = fx + 65;   // Amount
-
-
-doc.text("GST %", gstCol, fy);
-doc.text("Taxable Value", taxableCol, fy);
-doc.text("Integrated Tax", igstRateCol, fy);
-doc.text("Total Tax Amount", totalCol, fy);
-
-// SUBHEADERS BELOW
-fy += 5;
-doc.setFontSize(8);
-doc.text("Rate", igstRateCol, fy);
-doc.text("Amount", igstAmtCol, fy);
-
-fy += 7;
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(9);
-
-// Calculate IGST = NET_AMOUNT * VAT_PERC / 100
-const vatPerc = data.PurchDetails[0]?.VAT_PERC || 0;
-const igstAmount = (data.NET_AMOUNT * vatPerc) / 100;
-
-// Row
-doc.text((data.PurchDetails[0].VAT_PERC || 0).toFixed(2) + "%", gstCol, fy);
-doc.text((data.NET_AMOUNT || 0).toFixed(2), taxableCol, fy);
-doc.text((data.PurchDetails[0].VAT_PERC || 0).toFixed(2) + "%", igstCol, fy);
-// Column width for AMOUNT column
-const amountColWidth = 20;
-
-// Center of the header column
-const amountCenterX = igstAmtCol + (amountColWidth / 2);
-
-// Center-align IGST Amount under the "Amount" header
-doc.text(igstAmount.toFixed(2), amountCenterX, fy, { align: "center" });
-
-// Center-align Total Tax Amount under its header
-doc.text((igstAmount || 0).toFixed(2), totalCol + (amountColWidth / 2), fy, { align: "center" });
-
-
-
-// Total row
-fy += 7;
-doc.setFont('helvetica', 'bold');
-doc.text((data.NET_AMOUNT || 0).toFixed(2), taxableCol, fy);
-doc.text(igstAmount.toFixed(2), amountCenterX, fy, { align: "center" });
-doc.text((igstAmount || 0).toFixed(2), totalCol + (amountColWidth / 2), fy, { align: "center" });
-
-
-// // Line
-// fy += 4;
-// doc.line(15, fy, pageWidth - 15, fy);
-
-
-// ---------------- RIGHT TOTAL SUMMARY (PUSHED RIGHT) ----------------
-
-
-const netAmount = data.NET_AMOUNT || 0;
-const gstAmount = igstAmount || 0;
-
-// Get decimals
-const netDecimal = this.getDecimalPart(netAmount);   // example -> .15
-const igstDecimal = this.getDecimalPart(gstAmount); // example -> .31
-
-// Add decimals
-const roundOffValue = (netDecimal + igstDecimal).toFixed(2);
-
-
-let rx = pageWidth - 60;   // <-- moved right
-let ry = footStartY;
-
-const lblX = rx;
-const colonX = rx + 30;
-const valX = rx + 42;
-
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(9);
-
-// Taxable Value 5%
-doc.text("Taxable Value", lblX, ry);
-doc.text(":", colonX, ry);
-doc.text((data.NET_AMOUNT || 0).toFixed(2), valX, ry);
-
-ry += 6;
-doc.text("Total Tax", lblX, ry);
-doc.text(":", colonX, ry);
-doc.text((igstAmount || 0).toFixed(2), valX, ry);
-
-ry += 6;
-doc.text("TCS", lblX, ry);
-doc.text(":", colonX, ry);
-doc.text((data.TCS || 0).toFixed(2), valX, ry);
-
-ry += 6;
-doc.text("Round Off", lblX, ry);
-doc.text(":", colonX, ry);
-doc.text(roundOffValue, valX, ry); 
-
-const taxableValue = data.NET_AMOUNT || 0;   // example: 100.12
-const totalTax = igstAmount || 0;      // example: 100.10
-const fullInvoiceValue = taxableValue + totalTax;      
-// round-off version
-const roundedInvoiceValue = Math.floor(fullInvoiceValue);
-
-ry += 7;
-doc.setFont('helvetica', 'bold');
-doc.text("Invoice Total", lblX, ry);
-doc.text(":", colonX, ry);
-if (data.ROUND_OFF === true) {
-  doc.text(roundedInvoiceValue.toString(), valX, ry);   // NO DECIMALS
-} else {
-  doc.text(fullInvoiceValue.toFixed(2), valX, ry);      // EXACT AMOUNT
-}
-
-// ---------------- AMOUNT IN WORDS ----------------
-let wordsY = ry + 15;
-
-// NEW LINE ABOVE AMOUNT IN WORDS
-doc.setFont('helvetica', 'bold');
-doc.setFontSize(10);
-doc.text("Whether the tax is payable on Reverse charge basis:No Amount of tax subject to reverse charge", 15, wordsY);
-
-wordsY += 7; // push next line slightly down
-
-
-doc.setFont('helvetica', 'bold');
-doc.setFontSize(10);
-doc.text("Amount in words :", 15, wordsY);
-
-doc.setFont('helvetica', 'normal');
-doc.text(`INR ${this.numberToWords(data.NET_AMOUNT)}`, 60, wordsY);
-
-// ---------------- DECLARATION + REMARK + SIGNATURE ----------------
-let blockY = wordsY + 12;
-
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(9);
-doc.text("Declaration :", 15, blockY);
-
-blockY += 10;
-doc.text(`Remark : ${data.NARRATION || ""}`, 15, blockY);
-
-// Company signature
-doc.setFont('helvetica', 'bold');
-doc.text(`For ${data.COMPANY_NAME}`, pageWidth - 95, blockY);
-
-// Signature labels
-let sigY = blockY + 25;
-
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(9);
- 
-doc.text("Authorised Signatory", pageWidth - 75, sigY);
+    // ============================================================
+    // 5) TABLE — EXACT SAME WIDTH AS THE LINE (180mm)
+    // ============================================================
+    const tableStartY = tableLineY - 2;
+
+    const companyState = this.companyState?.trim().toLowerCase();
+    const supplierState =
+      this.purchaseInvoiceFormData?.SUPP_STATE_NAME?.trim().toLowerCase();
+
+    const sameState = companyState === supplierState;
+
+    const rows = data.PurchDetails.map((item: any) => {
+      const amount = this.calculateAmount(item);
+      const gstAmount = this.calculateGstAmount(item);
+
+      const common = [
+        // item.TRANSFER_NO || "",
+        this.formatDate(item.GRN_DATE) || '',
+        item.ITEM_NAME || '',
+        item.RATE.toFixed(2),
+        item.GRN_QUANTITY.toFixed(2),
+        item.QUANTITY.toFixed(2),
+        amount.toFixed(2), // Amount
+        gstAmount.toFixed(2), // GST Amount
+        item.HSN_CODE || this.HSNCODE || '',
+      ];
+
+      if (sameState) {
+        return [
+          ...common,
+          (item.CGST || 0).toFixed(2),
+          (item.SGST || 0).toFixed(2),
+          item.TOTAL_AMOUNT.toFixed(2),
+        ];
+      } else {
+        return [
+          ...common,
+          (item.GST || 0).toFixed(2), // IGST
+          item.TOTAL_AMOUNT.toFixed(2),
+        ];
+      }
+    });
+
+    autoTable(doc, {
+      startY: tableStartY,
+      theme: 'grid',
+
+      headStyles: {
+        fillColor: [240, 240, 240],
+        textColor: 0,
+        fontSize: 8,
+        halign: 'center',
+      },
+
+      bodyStyles: { fontSize: 8 },
+
+      columnStyles: {
+        // 0: { cellWidth: 10, halign: 'center' },  // TransferNo
+        0: { cellWidth: 18, halign: 'center' }, // Date
+        1: { cellWidth: 38 }, // Item Name
+        2: { cellWidth: 13, halign: 'right' }, // Price
+        3: { cellWidth: 14, halign: 'center' }, // Pending Qty
+        4: { cellWidth: 13, halign: 'center' }, // Qty
+        5: { cellWidth: 14, halign: 'right' }, // Amount
+        6: { cellWidth: 14, halign: 'right' }, // GST Amount
+        7: { cellWidth: 14, halign: 'center' }, // HSN
+        8: { cellWidth: 13, halign: 'right' }, // CGST
+        9: { cellWidth: 13, halign: 'right' }, // SGST
+        10: { cellWidth: 18, halign: 'right' }, // Total Amount
+      },
+
+      head: [
+        [
+          // 'TransferNo.',
+          'Date',
+          'Item Name',
+          'Price',
+          'Pending Qty',
+          'Qty',
+          'Amount',
+          'GST Amount',
+          'HSN Code',
+          'CGST',
+          'SGST',
+          'Total Amount',
+        ],
+      ],
+
+      body: rows,
+
+      foot: [
+        [
+          {
+            content: 'Total',
+            colSpan: 10,
+            styles: { halign: 'right', fontStyle: 'bold' },
+          },
+          {
+            content: data.NET_AMOUNT.toFixed(2),
+            styles: { fontStyle: 'bold' },
+          },
+        ],
+      ],
+    });
+
+    // ============================================================
+    // 6) FOOTER – GST SUMMARY + RIGHT TOTAL (PERFECT ALIGNMENT)
+    // ============================================================
+
+    const footStartY = (doc as any).lastAutoTable.finalY + 15;
+
+    // ---------------- LEFT GST SUMMARY TABLE ----------------
+    let fx = 15;
+    let fy = footStartY;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+
+    // SUPER CLOSE columns
+    const gstCol = fx; // GST %
+    const taxableCol = fx + 22; // closer
+    const igstCol = fx + 50; // closer
+    const totalCol = fx + 80; // closer
+
+    // Integrated Tax is now subdivided
+    const igstRateCol = fx + 50; // Rate
+    const igstAmtCol = fx + 65; // Amount
+
+    doc.text('GST %', gstCol, fy);
+    doc.text('Taxable Value', taxableCol, fy);
+    doc.text('Integrated Tax', igstRateCol, fy);
+    doc.text('Total Tax Amount', totalCol, fy);
+
+    // SUBHEADERS BELOW
+    fy += 5;
+    doc.setFontSize(8);
+    doc.text('Rate', igstRateCol, fy);
+    doc.text('Amount', igstAmtCol, fy);
+
+    fy += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    // Calculate IGST = NET_AMOUNT * VAT_PERC / 100
+    const vatPerc = data.PurchDetails[0]?.VAT_PERC || 0;
+    const igstAmount = (data.NET_AMOUNT * vatPerc) / 100;
+
+    // Row
+    doc.text((data.PurchDetails[0].VAT_PERC || 0).toFixed(2) + '%', gstCol, fy);
+    doc.text((data.NET_AMOUNT || 0).toFixed(2), taxableCol, fy);
+    doc.text(
+      (data.PurchDetails[0].VAT_PERC || 0).toFixed(2) + '%',
+      igstCol,
+      fy
+    );
+    // Column width for AMOUNT column
+    const amountColWidth = 20;
+
+    // Center of the header column
+    const amountCenterX = igstAmtCol + amountColWidth / 2;
+
+    // Center-align IGST Amount under the "Amount" header
+    doc.text(igstAmount.toFixed(2), amountCenterX, fy, { align: 'center' });
+
+    // Center-align Total Tax Amount under its header
+    doc.text((igstAmount || 0).toFixed(2), totalCol + amountColWidth / 2, fy, {
+      align: 'center',
+    });
+
+    // Total row
+    fy += 7;
+    doc.setFont('helvetica', 'bold');
+    doc.text((data.NET_AMOUNT || 0).toFixed(2), taxableCol, fy);
+    doc.text(igstAmount.toFixed(2), amountCenterX, fy, { align: 'center' });
+    doc.text((igstAmount || 0).toFixed(2), totalCol + amountColWidth / 2, fy, {
+      align: 'center',
+    });
+
+    // // Line
+    // fy += 4;
+    // doc.line(15, fy, pageWidth - 15, fy);
+
+    // ---------------- RIGHT TOTAL SUMMARY (PUSHED RIGHT) ----------------
+
+    const netAmount = data.NET_AMOUNT || 0;
+    const gstAmount = igstAmount || 0;
+
+    // Get decimals
+    const netDecimal = this.getDecimalPart(netAmount); // example -> .15
+    const igstDecimal = this.getDecimalPart(gstAmount); // example -> .31
+
+    // Add decimals
+    const roundOffValue = (netDecimal + igstDecimal).toFixed(2);
+
+    let rx = pageWidth - 60; // <-- moved right
+    let ry = footStartY;
+
+    const lblX = rx;
+    const colonX = rx + 30;
+    const valX = rx + 42;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    // Taxable Value 5%
+    doc.text('Taxable Value', lblX, ry);
+    doc.text(':', colonX, ry);
+    doc.text((data.NET_AMOUNT || 0).toFixed(2), valX, ry);
+
+    ry += 6;
+    doc.text('Total Tax', lblX, ry);
+    doc.text(':', colonX, ry);
+    doc.text((igstAmount || 0).toFixed(2), valX, ry);
+
+    ry += 6;
+    doc.text('TCS', lblX, ry);
+    doc.text(':', colonX, ry);
+    doc.text((data.TCS || 0).toFixed(2), valX, ry);
+
+    ry += 6;
+    doc.text('Round Off', lblX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(roundOffValue, valX, ry);
+
+    const taxableValue = data.NET_AMOUNT || 0; // example: 100.12
+    const totalTax = igstAmount || 0; // example: 100.10
+    const fullInvoiceValue = taxableValue + totalTax;
+    // round-off version
+    const roundedInvoiceValue = Math.floor(fullInvoiceValue);
+
+    ry += 7;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Invoice Total', lblX, ry);
+    doc.text(':', colonX, ry);
+    if (data.ROUND_OFF === true) {
+      doc.text(roundedInvoiceValue.toString(), valX, ry); // NO DECIMALS
+    } else {
+      doc.text(fullInvoiceValue.toFixed(2), valX, ry); // EXACT AMOUNT
+    }
+
+    // ---------------- AMOUNT IN WORDS ----------------
+    let wordsY = ry + 15;
+
+    // NEW LINE ABOVE AMOUNT IN WORDS
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(
+      'Whether the tax is payable on Reverse charge basis:No Amount of tax subject to reverse charge',
+      15,
+      wordsY
+    );
+
+    wordsY += 7; // push next line slightly down
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('Amount in words :', 15, wordsY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(`INR ${this.numberToWords(data.NET_AMOUNT)}`, 60, wordsY);
+
+    // ---------------- DECLARATION + REMARK + SIGNATURE ----------------
+    let blockY = wordsY + 12;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text('Declaration :', 15, blockY);
+
+    blockY += 10;
+    doc.text(`Remark : ${data.NARRATION || ''}`, 15, blockY);
+
+    // Company signature
+    doc.setFont('helvetica', 'bold');
+    doc.text(`For ${data.COMPANY_NAME}`, pageWidth - 95, blockY);
+
+    // Signature labels
+    let sigY = blockY + 25;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    doc.text('Authorised Signatory', pageWidth - 75, sigY);
 
     doc.output('dataurlnewwindow');
   }
 
   //========sum of decimal parts for roundoff===============
   getDecimalPart(num: number): number {
-  const str = num.toFixed(2);
-  const decimal = str.split(".")[1];
-  return Number("0." + decimal);
-}
-
-
- numberToWords(amount: number): string {
-  if (amount === 0) return "Zero Rupees Only";
-
-  const words = [
-    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
-    "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
-    "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen",
-    "Nineteen"
-  ];
-
-  const tens = [
-    "", "", "Twenty", "Thirty", "Forty", "Fifty",
-    "Sixty", "Seventy", "Eighty", "Ninety"
-  ];
-
-  function convert(num: number): string {
-    if (num < 20) return words[num];
-    if (num < 100)
-      return tens[Math.floor(num / 10)] + (num % 10 ? " " + words[num % 10] : "");
-    if (num < 1000)
-      return words[Math.floor(num / 100)] + " Hundred" + (num % 100 ? " " + convert(num % 100) : "");
-    if (num < 100000)
-      return convert(Math.floor(num / 1000)) + " Thousand" + (num % 1000 ? " " + convert(num % 1000) : "");
-    if (num < 10000000)
-      return convert(Math.floor(num / 100000)) + " Lakh" + (num % 100000 ? " " + convert(num % 100000) : "");
-    return convert(Math.floor(num / 10000000)) + " Crore" + (num % 10000000 ? " " + convert(num % 10000000) : "");
+    const str = num.toFixed(2);
+    const decimal = str.split('.')[1];
+    return Number('0.' + decimal);
   }
 
-  return convert(Math.floor(amount)) + " Rupees Only";
-}
+  numberToWords(amount: number): string {
+    if (amount === 0) return 'Zero Rupees Only';
 
+    const words = [
+      '',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen',
+    ];
+
+    const tens = [
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety',
+    ];
+
+    function convert(num: number): string {
+      if (num < 20) return words[num];
+      if (num < 100)
+        return (
+          tens[Math.floor(num / 10)] + (num % 10 ? ' ' + words[num % 10] : '')
+        );
+      if (num < 1000)
+        return (
+          words[Math.floor(num / 100)] +
+          ' Hundred' +
+          (num % 100 ? ' ' + convert(num % 100) : '')
+        );
+      if (num < 100000)
+        return (
+          convert(Math.floor(num / 1000)) +
+          ' Thousand' +
+          (num % 1000 ? ' ' + convert(num % 1000) : '')
+        );
+      if (num < 10000000)
+        return (
+          convert(Math.floor(num / 100000)) +
+          ' Lakh' +
+          (num % 100000 ? ' ' + convert(num % 100000) : '')
+        );
+      return (
+        convert(Math.floor(num / 10000000)) +
+        ' Crore' +
+        (num % 10000000 ? ' ' + convert(num % 10000000) : '')
+      );
+    }
+
+    return convert(Math.floor(amount)) + ' Rupees Only';
+  }
 
   cancel() {
     this.popupClosed?.emit();
   }
 
-private async convertToBase64(path: string): Promise<string> {
-  const response = await fetch(path);
-  const blob = await response.blob();
+  private async convertToBase64(path: string): Promise<string> {
+    const response = await fetch(path);
+    const blob = await response.blob();
 
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.readAsDataURL(blob);
-  });
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  }
 }
-}
-
-
 
 @NgModule({
   imports: [
