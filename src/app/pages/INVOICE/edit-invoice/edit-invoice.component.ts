@@ -288,6 +288,7 @@ export class EditInvoiceComponent {
   getInvoiceListForGrid() {
     const payload = {
       CUST_ID: this.invoiceFormData.DISTRIBUTOR_ID,
+      COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
       this.staticTransfers = response.Data; // Save the original full list

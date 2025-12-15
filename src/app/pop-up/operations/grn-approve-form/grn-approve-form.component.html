@@ -117,7 +117,7 @@
       </dx-drop-down-box> -->
       <dx-text-box
         label="Purchase Order"
-        [(value)]="selectedPONo"
+        [(value)]="newGrnData.PO_NO"
         labelMode="floating"
         [readOnly]="true"
         [elementAttr]="{ class: 'grntextbox' }"
@@ -355,7 +355,12 @@
         ></dx-text-box>
       </div>
 
-      <div class="total-field"  *ngIf="!(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)">
+      <div
+        class="total-field"
+        *ngIf="
+          !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
+        "
+      >
         <label>Net Amount</label>
 
         <dx-text-box
@@ -369,7 +374,12 @@
     </div>
 
     <div class="vat-container">
-      <div class="vat-field" *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2">
+      <div
+        class="vat-field"
+        *ngIf="
+          selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2
+        "
+      >
         <label>Net Amount</label>
 
         <dx-text-box

@@ -157,7 +157,10 @@ export class InvoiceListComponent {
   }
 
   getInvoiceList() {
-    this.dataService.getInvoiceMainList().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    }
+    this.dataService.getInvoiceMainList(payload).subscribe((response: any) => {
       this.invoiceList = response.Data.map((item: any) => {
         let dateValue: Date;
 

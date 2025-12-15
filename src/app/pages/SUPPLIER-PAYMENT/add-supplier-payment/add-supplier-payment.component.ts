@@ -208,6 +208,7 @@ export class AddSupplierPaymentComponent {
   getPendingInvoiceList(supplierId: number) {
     const payload = {
       SUPP_ID: supplierId,
+      COMPANY_ID: this.selectedCompanyId,
     };
 
     this.dataService

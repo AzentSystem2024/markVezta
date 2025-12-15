@@ -170,6 +170,8 @@ export class PurchaseOrderComponent {
   selectedPoId: any;
   GST_PERC: any;
   HSN_CODE: any;
+  docNo: any;
+  selected_Company_id: any;
 
   constructor(
     private service: DataService,
@@ -195,6 +197,9 @@ export class PurchaseOrderComponent {
       this.GST_PERC,
       '===========selected GST PERC==================='
     );
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    
   }
 
   ngOnInit(): void {
@@ -227,6 +232,7 @@ export class PurchaseOrderComponent {
     this.getPurchaseOrderList();
     this.initializePrintTemplateData();
     this.getTemplateList();
+    this.getDocNo();
   }
 
   sessionData_tax() {
@@ -447,6 +453,18 @@ export class PurchaseOrderComponent {
 
   openPurchaseOrderForm() {
     this.isAddPopupOpened = true;
+    this.getDocNo();
+  }
+
+       getDocNo() {
+    const payload = {
+      TRANS_TYPE: 17,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
   }
 
   onTemplateReorder(event: any): void {
@@ -513,16 +531,31 @@ export class PurchaseOrderComponent {
       );
       return false;
     }
-    if (!data.PoDetails || data.PoDetails.length === 0) {
-      notify(
-        {
-          message: 'Please add at least one item',
-          position: { at: 'top center', my: 'top center' },
-        },
-        'error'
-      );
-      return false;
-    }
+
+    if (
+  !this.poNewForm.poData.PoDetails ||
+  this.poNewForm.poData.PoDetails.length === 0
+) {
+  notify(
+    {
+      message: 'Please add at least one item',
+      position: { at: 'top center', my: 'top center' },
+    },
+    'error'
+  );
+  return false;
+}
+
+    // if (!data.PoDetails || data.PoDetails.length === 0) {
+    //   notify(
+    //     {
+    //       message: 'Please add at least one item',
+    //       position: { at: 'top center', my: 'top center' },
+    //     },
+    //     'error'
+    //   );
+    //   return false;
+    // }
     // return true;
     // if (data.IS_APPROVED === true) {
     //   const result = confirm(
@@ -601,9 +634,10 @@ export class PurchaseOrderComponent {
         this.dataGrid.instance.refresh();
         this.isAddPopupOpened = false;
 
-        if (this.PurchaseOrderNewFormComponent?.resetForm) {
-          this.PurchaseOrderNewFormComponent.resetForm();
-        }
+       if (this.PurchaseOrderNewFormComponent?.resetForm) {
+  this.PurchaseOrderNewFormComponent.resetForm();
+}
+
 
         this.getPurchaseOrderList();
       } else {
@@ -622,7 +656,7 @@ export class PurchaseOrderComponent {
     console.log('UPDATEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
     const data = this.poEditForm.getNewPoData();
     data.PoDetails = [...this.poEditForm.poData.PoDetails];
-    console.log(data);
+    console.log(data,"PODETAILAAAAAAAAAAAAAAAAAAAAAAAA");
 
     if (this.isApproved) {
       // 🔹 Show confirmation dialog before approving

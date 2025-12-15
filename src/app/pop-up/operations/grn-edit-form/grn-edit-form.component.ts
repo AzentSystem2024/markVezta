@@ -419,7 +419,7 @@ console.log(this.newGrnData,"NEWGRNDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   onStoreValueChanged(e:any){
     const storeid=e.value;
-    this.service.getPendingPo(storeid,this.supplierId).subscribe((res:any)=>{
+    this.service.getPendingPo(storeid,this.supplierId,this.selected_Company_id).subscribe((res:any)=>{
       this.poList=res.data;
       this.filteredPOList = [...this.poList];
     })

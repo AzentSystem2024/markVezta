@@ -318,8 +318,9 @@ export class DataService {
   //   return this.http.post(`${this.apiUrl}Sales_Invoice/list`, payload);
   // }
 
-  getInvoiceMainList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Invoice/getlist`, {});
+  getInvoiceMainList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Invoice/getlist`, data);
   }
 
   getCustomerOrUnit(): Observable<any> {
@@ -875,8 +876,9 @@ export class DataService {
   }
 
   //SUPPLIER PAYMENT
-  getSupplierPaymentList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}SupplierPayment/list`, {});
+  getSupplierPaymentList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SupplierPayment/list`, data);
   }
 
   getPendingInvoiceforSupplierPayment(payload: any): Observable<any> {
@@ -3530,8 +3532,8 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}grn/polist`, reqBodyData);
   }
 
-  public getPendingPo(storeid: any, supplierId: any): Observable<any> {
-    const reqBodyData = { STORE_ID: storeid, SUPP_ID: supplierId };
+  public getPendingPo(storeid: any, supplierId: any,companyId: any): Observable<any> {
+    const reqBodyData = { STORE_ID: storeid, SUPP_ID: supplierId,COMPANY_ID: companyId, };
     return this.http.post(`${this.apiUrl}grn/pendingpo`, reqBodyData);
   }
 
@@ -3540,8 +3542,9 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}grn/insert`, data);
   }
 
-  public getGrnLogData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}grn/list`, {});
+  public getGrnLogData(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}grn/list`, data);
   }
 
   selectGrnData(id: number) {

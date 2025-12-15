@@ -110,15 +110,30 @@ export class SupplierPaymentListComponent {
   isReadOnlyReceipt: boolean = false;
   selectedSupplierPayment: any;
   supplierPaymentId: any;
+  sessionData: any;
+  selectedCompanyId: any;
 
-  constructor(private dataService: DataService, private ngZone: NgZone) {}
+  constructor(private dataService: DataService, private ngZone: NgZone) {
+    this.sessionData_tax();
+  }
 
   ngOnInit() {
     this.getSupplierPayments();
+    this.sessionData_tax();
+  }
+
+    sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    // this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   getSupplierPayments() {
-    this.dataService.getSupplierPaymentList().subscribe((response: any) => {
+    const payload = {
+        COMPANY_ID : this.selectedCompanyId
+    }
+    this.dataService.getSupplierPaymentList(payload).subscribe((response: any) => {
       this.supplierPaymentList = response.Data.map((item: any) => {
         let dateValue: Date;
         if (typeof item.PAY_DATE === 'string' && item.PAY_DATE.includes('-')) {

@@ -98,6 +98,9 @@ export class GrnComponent implements OnInit {
   grnApproveForm: GrnApproveFormComponent;
   selectedGrnId: any;
   isApproved: boolean = false;
+  selectedCompanyId: any;
+  sessionData: any;
+  docNo: any;
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = (cellInfo.data.STATUS || '').trim();
@@ -200,6 +203,18 @@ export class GrnComponent implements OnInit {
 
   openGRNForm() {
     this.isGRNPopupVisible = true;
+    this.getDocNo();
+  }
+
+         getDocNo() {
+    const payload = {
+      TRANS_TYPE: 18,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.service.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
   }
 
   closeEdit() {
@@ -337,8 +352,19 @@ export class GrnComponent implements OnInit {
       }
     });
   }
+
+   sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    // this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+  
   getGrnLogData() {
-    this.service.getGrnLogData().subscribe((res: any) => {
+    const payload ={
+      COMPANY_ID : this.selectedCompanyId
+    }
+    this.service.getGrnLogData(payload).subscribe((res: any) => {
       this.grnDataSource = res.grnheader;
     });
   }
@@ -346,6 +372,8 @@ export class GrnComponent implements OnInit {
   ngOnInit(): void {
     this.getGrnLogData();
     this.getTemplateList();
+    this.sessionData_tax();
+    this.getDocNo();
   }
   onEditingRow(event): void {
     console.log(event, 'event');
