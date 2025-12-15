@@ -72,6 +72,7 @@ export class MiscPaymentGstListComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  selectedCompanyId: any;
 
    //========================Export data ==========================
   onExporting(event: any) {
@@ -124,7 +125,9 @@ export class MiscPaymentGstListComponent {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router
-  ) {}
+  ) {
+    this.sessionData_tax();
+  }
 
   ngOnInit() {
     this.userId = sessionStorage.getItem('UserId');
@@ -160,6 +163,7 @@ export class MiscPaymentGstListComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -172,7 +176,10 @@ export class MiscPaymentGstListComponent {
   }
 
   getMiscPaymentList() {
-    this.dataService.getMiscpaymentList().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    }
+    this.dataService.getMiscpaymentList(payload).subscribe((response: any) => {
       this.miscPaymentsList = response.Data.map((item: any) => {
         let dateValue: Date;
 

@@ -155,7 +155,12 @@ export class ListMiscReceiptComponent {
   }
 
   getMiscReceipts() {
-    this.dataService.getMiscReceiptList().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: JSON.parse(
+        sessionStorage.getItem('savedUserData') || '{}'
+      ).SELECTED_COMPANY.COMPANY_ID,
+    }
+    this.dataService.getMiscReceiptList(payload).subscribe((response: any) => {
       this.miscReceipts = response.Data.map((item: any) => {
         let dateValue: Date;
 

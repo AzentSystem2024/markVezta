@@ -120,12 +120,21 @@ export class CustomerReceiptsComponent {
     text: '',
   };
   isReadOnlyReceipt: boolean;
+  sessionData: any;
+  selectedCompanyId: any;
 
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router
   ) {}
+
+    sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    // this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -153,6 +162,7 @@ export class CustomerReceiptsComponent {
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getCustomerReceipts();
+    this.sessionData_tax();
   }
   // getCustomerReceipts() {
   //   this.customerReciptList = new DataSource({
@@ -211,7 +221,10 @@ export class CustomerReceiptsComponent {
   // }
 
   getCustomerReceipts() {
-    this.dataService.getCustomerReciptList().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID : this.selectedCompanyId
+    }; // Add any necessary parameters here
+    this.dataService.getCustomerReciptList(payload).subscribe((response: any) => {
       this.customerReciptList = response.Data.map((item: any) => {
         let dateValue: Date;
 

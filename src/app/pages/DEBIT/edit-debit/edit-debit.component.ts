@@ -488,7 +488,7 @@ export class EditDebitComponent {
   }
 
   getPendingInvoices(savedData?: any) {
-    const payload = { SUPP_ID: this.selectedSupplierId };
+    const payload = { SUPP_ID: this.selectedSupplierId ,COMPANY_ID: this.selectedCompanyId};
 
     this.dataService
       .getPendingInvoiceforDebit(payload)

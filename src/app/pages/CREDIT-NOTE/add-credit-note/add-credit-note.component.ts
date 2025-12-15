@@ -863,6 +863,7 @@ export class AddCreditNoteComponent {
   getPendingInvoices() {
     const payload = {
       CUST_ID: this.selectedCustomerId, // or customerId if you pass it
+      COMPANY_ID: this.selectedCompanyId,
     };
 
     this.dataService

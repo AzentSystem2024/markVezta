@@ -939,6 +939,7 @@ onRoundOffChange() {
   getPendingInvoices(savedData?: any) {
     const payload = {
       CUST_ID: this.selectedCustomerId,
+      COMPANY_ID: this.selectedCompanyId,
     };
 
     this.dataService
