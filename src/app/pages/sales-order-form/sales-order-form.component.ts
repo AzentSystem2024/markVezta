@@ -1340,10 +1340,17 @@ export class SalesOrderFormComponent {
     }
 
     if (this.salesOrderFormData.ID) {
-      apiCall = this.dataService.updateSalesOrder(payload);
-      message = 'Sales Order updated successfully!';
+      console.log('SALESORDEREDIT');
+      console.log(payload, 'PAYLOAD');
+      // apiCall = this.dataService.updateSalesOrder(payload);
+      // message = 'Sales Order updated successfully!';
+      this.callApi(
+        this.dataService.updateSalesOrder(payload),
+        'Sales Order updated successfully!'
+      );
       return;
     }
+
     if (this.salesOrderFormData.IS_APPROVED) {
       // Show confirmation before insert
       const result = confirm(

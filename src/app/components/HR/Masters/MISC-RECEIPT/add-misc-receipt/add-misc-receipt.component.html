@@ -87,14 +87,16 @@
                 style="display: flex; flex-direction: column; gap: 0px"
               >
                 <div style="display: flex; gap: 5px; margin-left: auto">
-                  <dx-date-box
-                    label="Date"
+                  <!-- <dx-select-box
+                    label="Department"
                     labelMode="floating"
-                    [width]="200"
-                    [(value)]="miscFormData.TRANS_DATE"
-                    displayFormat="dd-MM-yyyy"
-                    [readOnly]="true"
-                  ></dx-date-box>
+                    [width]="333"
+                    [items]="Company_list"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [(value)]="miscFormData.DEPT_ID"
+                    [readOnly]="isReadOnlyMode"
+                  ></dx-select-box> -->
                 </div>
                 <div
                   style="
@@ -104,17 +106,15 @@
                     margin-top: 6px;
                   "
                 >
-                  <div style="margin-top: -6px">
-                    <dx-select-box
-                      label="Department"
+                  <div style="margin-top: 35px">
+                    <dx-date-box
+                      label="Date"
                       labelMode="floating"
-                      [width]="333"
-                      [items]="Company_list"
-                      displayExpr="DESCRIPTION"
-                      valueExpr="ID"
-                      [(value)]="miscFormData.DEPT_ID"
-                      [readOnly]="isReadOnlyMode"
-                    ></dx-select-box>
+                      [width]="200"
+                      [(value)]="miscFormData.TRANS_DATE"
+                      displayFormat="dd-MM-yyyy"
+                      [readOnly]="true"
+                    ></dx-date-box>
                   </div>
 
                   <!-- <dx-button
