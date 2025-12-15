@@ -199,8 +199,9 @@ export class DataService {
   }
 
   //JOURNAL VOUCHER
-  getJournalVoucherList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}ACTransactions/list`, {});
+  getJournalVoucherList(items : any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ACTransactions/list`, data);
   }
 
   getVoucherNo(): Observable<any> {
@@ -232,8 +233,9 @@ export class DataService {
   }
 
   //CREDIT-NOTE
-  getCreditNoteList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}AC_CreditNote/list`, {});
+  getCreditNoteList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}AC_CreditNote/list`, data);
   }
 
   insertCreditNote(items: any) {
@@ -265,8 +267,9 @@ export class DataService {
   }
 
   //-----------------------------------DEBIT NOTES-----------------------------------------------------//
-  getDebitNoteList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}ACTransactions/debitlist`, {});
+  getDebitNoteList(items:any): Observable<any> {
+    const data = items
+    return this.http.post(`${this.apiUrl}ACTransactions/debitlist`, data);
   }
 
   insertDebitNote(items: any) {
@@ -796,8 +799,9 @@ export class DataService {
   }
 
   //CUSTOMER RECEIPT
-  getCustomerReciptList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Receipt/list`, {});
+  getCustomerReciptList(items :any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Receipt/list`, data);
   }
   getInvoiceListForCustomerReceipt(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Receipt/invoicelist`, payload);
@@ -960,8 +964,9 @@ export class DataService {
   }
 
   //MISCELLANEOUS PAYMENT
-  getMiscpaymentList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}MiscPayment/list`, {});
+  getMiscpaymentList(items : any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscPayment/list`, data);
   }
 
   insertMiscPayment(items: any) {
@@ -986,8 +991,9 @@ export class DataService {
   }
 
   //MISCELLANEOUS-RECEIPT
-  getMiscReceiptList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}MiscReceipt/list`, {});
+  getMiscReceiptList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscReceipt/list`, data);
   }
   getVoucherNoForMiscReceipt(): Observable<any> {
     return this.http.post(`${this.apiUrl}MiscReceipt/voucherno`, {});
@@ -1016,8 +1022,9 @@ export class DataService {
 
   //SALARY-PAYMENT
 
-  getSalaryPaymentList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}SalaryPayment/view`, {});
+  getSalaryPaymentList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SalaryPayment/view`, data);
   }
   getPendingSalaryPayments(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}SalaryPayment/list`, data);

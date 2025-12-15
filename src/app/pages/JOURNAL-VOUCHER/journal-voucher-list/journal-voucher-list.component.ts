@@ -102,6 +102,8 @@ export class JournalVoucherListComponent {
   };
   selectedJV: any;
   JVid: any;
+  sessionData: any;
+  selectedCompanyId: any;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -172,10 +174,22 @@ export class JournalVoucherListComponent {
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getJournalVouchers();
+    this.sessionData_tax();
+  }
+
+   sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    // this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   getJournalVouchers() {
-    this.dataService.getJournalVoucherList().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID : this.selectedCompanyId
+    }
+    this.dataService.getJournalVoucherList(payload).subscribe((response: any) => {
       this.journalVoucherList = response.Data.map((item: any) => {
         let dateValue: Date;
 

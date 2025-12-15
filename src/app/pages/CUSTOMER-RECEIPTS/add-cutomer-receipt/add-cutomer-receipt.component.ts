@@ -163,6 +163,7 @@ export class AddCutomerReceiptComponent {
   getInvoiceList() {
     const payload = {
       CUST_ID: this.selectedDistributorId,
+      COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService
       .getInvoiceListForCustomerReceipt(payload)

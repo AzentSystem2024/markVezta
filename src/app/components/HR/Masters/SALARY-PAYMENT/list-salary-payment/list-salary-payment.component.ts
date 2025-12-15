@@ -110,6 +110,8 @@ export class ListSalaryPaymentComponent {
   editSalaryPopup: boolean = false;
   selectedSalaryData: any;
   salaryPaymentList: any;
+  sessionData: any;
+  selectedCompanyId: any;
 
   constructor(
     private dataService: DataService,
@@ -143,10 +145,22 @@ export class ListSalaryPaymentComponent {
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getSalaryPaymentList();
+    this.sessionData_tax();
   }
 
+    sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    // this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+
+
   getSalaryPaymentList() {
-    this.dataService.getSalaryPaymentList().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    }
+    this.dataService.getSalaryPaymentList(payload).subscribe((response: any) => {
       console.log(response);
       this.salaryPaymentList = response.Data;
       this.applyDateFilter();

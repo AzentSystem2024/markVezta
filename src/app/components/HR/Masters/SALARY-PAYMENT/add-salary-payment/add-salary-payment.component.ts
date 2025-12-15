@@ -251,6 +251,7 @@ console.log(this.selectedRows)
 
   getSalaryPendingList() {
     const payload = {
+      COMPANY_ID: this.companyId,
       SAL_MONTH: `${this.selectedMonth.getFullYear()}-${(
         this.selectedMonth.getMonth() + 1
       )

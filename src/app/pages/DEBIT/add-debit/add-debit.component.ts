@@ -345,6 +345,7 @@ export class AddDebitComponent {
   getPendingInvoices() {
     const payload = {
       SUPP_ID: this.selectedSupplierId,
+      COMPANY_ID: this.selectedCompanyId,
     };
 
     this.dataService

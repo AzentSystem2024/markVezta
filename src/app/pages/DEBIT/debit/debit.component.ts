@@ -110,6 +110,7 @@ export class DebitComponent {
   selected_vat_id: any;
   selectedDN: any;
   DNid: any;
+  selectedCompanyId: any;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -128,6 +129,7 @@ export class DebitComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   constructor(
@@ -166,7 +168,10 @@ export class DebitComponent {
   }
 
   getDebitNoteList() {
-    this.dataService.getDebitNoteList().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId
+    }
+    this.dataService.getDebitNoteList(payload).subscribe((response: any) => {
       this.debitList = response.Data.map((item: any) => {
         let dateValue: Date;
 

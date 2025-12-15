@@ -50,6 +50,7 @@ import { EditCreditNoteModule } from '../edit-credit-note/edit-credit-note.compo
 import { ViewCreditNoteModule } from '../view-credit-note/view-credit-note.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { selected } from '@devexpress/analytics-core/queryBuilder-metadata';
 
 @Component({
   selector: 'app-credit-note-list',
@@ -158,9 +159,17 @@ export class CreditNoteListComponent {
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getCreditNotes();
+    this.session_Details();
+  }
+
+  session_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
   }
   getCreditNotes() {
-    this.dataService.getCreditNoteList().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID :this.selectedCompanyId
+    }
+    this.dataService.getCreditNoteList(payload).subscribe((response: any) => {
       this.creditNotes = response.Data.map((item: any) => {
         let dateValue: Date;
 
@@ -273,6 +282,7 @@ export class CreditNoteListComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   applyDateFilter() {
