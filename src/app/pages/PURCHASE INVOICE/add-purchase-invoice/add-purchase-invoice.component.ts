@@ -108,8 +108,8 @@ export class AddPurchaseInvoiceComponent {
     ADJ_AMOUNT: 0,
     PAID_AMOUNT: 0,
     IS_APPROVED: false,
-    VEHICLE_NO:'',
-    ROUND_OFF:false,
+    VEHICLE_NO: '',
+    ROUND_OFF: false,
     PurchDetails: [
       {
         COMPANY_ID: '',
@@ -138,8 +138,8 @@ export class AddPurchaseInvoiceComponent {
         ITEM_CODE: '',
         PO_QUANTITY: '',
         GRN_QUANTITY: '',
-        SGST:0,
-        CGST:0
+        SGST: 0,
+        CGST: 0,
       },
     ],
   };
@@ -150,10 +150,10 @@ export class AddPurchaseInvoiceComponent {
   selectedCompanyId: any;
   companyList: any[];
 
-   companyState: any;
+  companyState: any;
   isSameState: boolean = false;
   selectedCompany: any;
-    showGST: boolean = false;
+  showGST: boolean = false;
   showCGST: boolean = false;
   showSGST: boolean = false;
   mainInvoiceGridList: any;
@@ -167,49 +167,50 @@ export class AddPurchaseInvoiceComponent {
   taxAmount: any;
 
   constructor(private dataService: DataService) {
-
-
-    this.sessionData_tax()
+    this.sessionData_tax();
   }
 
-  ngOnInit() {
+  // ngOnInit() {
+  //   console.log('working');
+  //   const userDataString = localStorage.getItem('userData');
+  //   // if (userDataString) {
+  //   const userData = JSON.parse(userDataString);
+  //   const selectedCompany = userData?.SELECTED_COMPANY;
+  //   console.log(selectedCompany, 'selected company');
+  //   this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+  //   this.GST = userData.GeneralSettings.GST_PERC;
+  //   console.log(this.HSNCODE, this.GST, 'HSNCODEANDGST');
 
-    console.log('working')
+  //   this.getSupplierOrUnitLst();
+  //   this.getPendingGRNList();
+  //   this.sessionData_tax();
+  //   this.getSuppInvNo();
+  // }
+
+  ngOnInit() {
     const userDataString = localStorage.getItem('userData');
-    // if (userDataString) {
+    if (!userDataString) return;
+
     const userData = JSON.parse(userDataString);
-    const selectedCompany = userData?.SELECTED_COMPANY;
-    console.log(selectedCompany,'selected company')
+    const selectedCompany = userData.SELECTED_COMPANY;
+
+    // ⭐ REQUIRED FOR DOC NO
+    this.selectedCompanyId = selectedCompany.COMPANY_ID;
+
+    // Bind company to form
+    this.purchaseInvoiceFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
+    this.companyList = [selectedCompany];
+
+    // Other settings
     this.HSNCODE = userData.GeneralSettings.HSN_CODE;
     this.GST = userData.GeneralSettings.GST_PERC;
-    console.log(this.HSNCODE, this.GST, 'HSNCODEANDGST');
 
-    // if (selectedCompany?.COMPANY_ID) {
-    //     this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
-    //     this.companyState = this.selectedCompany.STATE_NAME;
-    //     console.log(this.companyState, 'COMPANYSTATE');
-    //     this.companyList = [this.selectedCompany]; //  Show only selected company
-    // }
-    //   console.log(userData.GeneralSettings.HSN_CODE, 'HSNCODE');
-    //   if (selectedCompany?.COMPANY_ID) {
-    //     this.selectedCompanyId = selectedCompany.COMPANY_ID;
-    //     this.companyList = [selectedCompany]; //  Show only selected company
-    //     this.purchaseInvoiceFormData = selectedCompany.COMPANY_ID;
-    //   }
-
-    //   if (userData.USER_ID) {
-    //     this.purchaseInvoiceFormData.USER_ID = userData.USER_ID;
-    //   }
-
-    //   const firstFinYear = userData.FINANCIAL_YEARS?.[0];
-    //   if (firstFinYear?.FIN_ID) {
-    //     this.purchaseInvoiceFormData.FIN_ID = firstFinYear.FIN_ID;
-    //   }
-    // }
-    // this.getSupplierDropdown();
+    this.sessionData_tax();
     this.getSupplierOrUnitLst();
     this.getPendingGRNList();
-    this.sessionData_tax();
+
+    // ⭐ CALL DOC NO ONLY AFTER COMPANY_ID IS READY
+    this.getSuppInvNo();
   }
 
   getSupplierDropdown() {
@@ -222,7 +223,17 @@ export class AddPurchaseInvoiceComponent {
     });
   }
 
-    getSupplierOrUnitLst() {
+  getSuppInvNo() {
+    const payload = {
+      TRANS_TYPE: 19,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.purchaseInvoiceFormData.DOC_NO = response.DOC_NO;
+    });
+  }
+
+  getSupplierOrUnitLst() {
     this.dataService.getSupplierWithState().subscribe((response: any) => {
       this.distributorList = response;
       console.log(this.distributorList, 'DISTLISTPOPUP');
@@ -230,16 +241,16 @@ export class AddPurchaseInvoiceComponent {
   }
 
   sessionData_tax() {
-     console.log('working')
+    console.log('working');
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
-     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
- console.log(this.selectedCompany)
- this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
- console.log(this.companyState)
- this.GST = this.sessionData.GeneralSettings.GST_PERC;
- console.log(this.GST,'GST')
+    this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(this.selectedCompany);
+    this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
+    console.log(this.companyState);
+    this.GST = this.sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST, 'GST');
   }
 
   getPendingGRNList() {
@@ -258,14 +269,14 @@ export class AddPurchaseInvoiceComponent {
       (supplier: any) => supplier.ID === this.selectedSupplierId
     );
 
-     const company = this.companyState?.trim().toLowerCase();
-     console.log(company)
-     const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
-     console.log(supplier)
-     const sessionGst = parseFloat(this.GST) || 0; // main GST%
-     console.log(sessionGst)
+    const company = this.companyState?.trim().toLowerCase();
+    console.log(company);
+    const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
+    console.log(supplier);
+    const sessionGst = parseFloat(this.GST) || 0; // main GST%
+    console.log(sessionGst);
 
-      if (company === supplier) {
+    if (company === supplier) {
       console.log('Both states SAME → CGST + SGST apply');
 
       this.showCGST = true;
@@ -295,7 +306,7 @@ export class AddPurchaseInvoiceComponent {
         row.SGST = 0;
       });
     }
-    this.selectedSupplier = selectedSupplier
+    this.selectedSupplier = selectedSupplier;
 
     if (selectedSupplier) {
       this.purchaseInvoiceFormData.SUPPPLIER_NAME =
@@ -307,7 +318,7 @@ export class AddPurchaseInvoiceComponent {
     console.log('Selected Supplier:', selectedSupplier);
   }
 
-    calculateGstAmount = (row: any) => {
+  calculateGstAmount = (row: any) => {
     const amt = this.calculateAmount(row);
 
     const igst = parseFloat(row.GST) || 0; // GST column = GST
@@ -433,57 +444,57 @@ export class AddPurchaseInvoiceComponent {
         const exists = this.mainGridData.some(
           (item) => item.GRN_DET_ID === row.GRN_DET_ID
         );
-       if (!exists) {
-        // Add row into mainGridData
-        const newRow: any = {
-          GRN_ID: row.GRN_ID,
-          ITEM_ID: row.ITEM_ID,
-          PO_DET_ID: row.PO_DET_ID,
-          COST: row.COST,
-          GRN_DET_ID: row.GRN_DET_ID,
-          UOM: row.UOM,
-          TRANSFER_NO: row.GRN_NO,
-          TRANSFER_DATE: row.GRN_DATE,
-          ITEM_NAME: row.ITEM_NAME,
-          PENDING_QTY: row.PENDING_QTY,
-          QUANTITY: 0,
-          RATE: row.RATE,
-          TAX_AMOUNT: 0,
-          AMOUNT: 0,
-          TOTAL_AMOUNT: 0,
-          HSN_CODE: this.HSNCODE,
-          VAT_PERC: this.GST,
-          SGST:0,
-          CGST:0
-        };
-        console.log(newRow)
-         // -----------------------------------------
-        // ✅ ADDING GST / CGST / SGST LOGIC HERE
-        // -----------------------------------------
-        const sessionGst = parseFloat(this.GST) || 0;
-        const company = this.companyState?.trim().toLowerCase();
-        const customer = this.purchaseInvoiceFormData?.SUPPPLIER_NAME
-          ? this.selectedSupplier?.STATE_NAME?.trim().toLowerCase()
-          : null;
+        if (!exists) {
+          // Add row into mainGridData
+          const newRow: any = {
+            GRN_ID: row.GRN_ID,
+            ITEM_ID: row.ITEM_ID,
+            PO_DET_ID: row.PO_DET_ID,
+            COST: row.COST,
+            GRN_DET_ID: row.GRN_DET_ID,
+            UOM: row.UOM,
+            TRANSFER_NO: row.GRN_NO,
+            TRANSFER_DATE: row.GRN_DATE,
+            ITEM_NAME: row.ITEM_NAME,
+            PENDING_QTY: row.PENDING_QTY,
+            QUANTITY: 0,
+            RATE: row.RATE,
+            TAX_AMOUNT: 0,
+            AMOUNT: 0,
+            TOTAL_AMOUNT: 0,
+            HSN_CODE: this.HSNCODE,
+            VAT_PERC: this.GST,
+            SGST: 0,
+            CGST: 0,
+          };
+          console.log(newRow);
+          // -----------------------------------------
+          // ✅ ADDING GST / CGST / SGST LOGIC HERE
+          // -----------------------------------------
+          const sessionGst = parseFloat(this.GST) || 0;
+          const company = this.companyState?.trim().toLowerCase();
+          const customer = this.purchaseInvoiceFormData?.SUPPPLIER_NAME
+            ? this.selectedSupplier?.STATE_NAME?.trim().toLowerCase()
+            : null;
 
-          console.log(sessionGst,'sesssionGST')
-          console.log(company,'company')
-          console.log(customer,'customer')
-        if (company === customer) {
-          // Same state → CGST + SGST
-          const half = sessionGst / 2;
-          newRow.CGST = half;
-          newRow.SGST = half;
-          newRow.GST = 0;
-        } else {
-          // Different state → GST only
-          newRow.GST = sessionGst;
-          newRow.CGST = 0;
-          newRow.SGST = 0;
-        }
-        // -----------------------------------------
+          console.log(sessionGst, 'sesssionGST');
+          console.log(company, 'company');
+          console.log(customer, 'customer');
+          if (company === customer) {
+            // Same state → CGST + SGST
+            const half = sessionGst / 2;
+            newRow.CGST = half;
+            newRow.SGST = half;
+            newRow.GST = 0;
+          } else {
+            // Different state → GST only
+            newRow.GST = sessionGst;
+            newRow.CGST = 0;
+            newRow.SGST = 0;
+          }
+          // -----------------------------------------
 
-        this.mainGridData.push(newRow);
+          this.mainGridData.push(newRow);
         }
       });
 
@@ -504,17 +515,6 @@ export class AddPurchaseInvoiceComponent {
   }
 
   savePurchaseInvoice() {
-    if (!this.purchaseInvoiceFormData.SUPP_INV_NO) {
-      notify(
-        {
-          message: 'Please supplier invoice number',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-        3000
-      );
-      return;
-    }
     if (!this.purchaseInvoiceFormData.SUPP_ID) {
       notify(
         {
@@ -601,8 +601,7 @@ export class AddPurchaseInvoiceComponent {
           GRN_QUANTITY: 1,
           SGST: item.SGST,
           CGST: item.CGST,
-          GST: item.GST ?? 0
-
+          GST: item.GST ?? 0,
         };
       }
     );
@@ -677,13 +676,14 @@ export class AddPurchaseInvoiceComponent {
     };
 
     this.mainGridData = []; // clear grid rows
+    this.getSuppInvNo();
   }
 
   cancel() {
     this.popupClosed?.emit();
   }
 
-    logGridSummaries() {
+  logGridSummaries() {
     this.summaryValues = this.itemsGridRef?.instance?.getTotalSummaryValue;
 
     if (this.summaryValues) {
@@ -705,7 +705,7 @@ export class AddPurchaseInvoiceComponent {
   onContentReady(e: any): void {
     this.logGridSummaries();
   }
-  
+
   onRoundOffChange() {
     if (this.purchaseInvoiceFormData.ROUND_OFF) {
       // Round Off Enabled

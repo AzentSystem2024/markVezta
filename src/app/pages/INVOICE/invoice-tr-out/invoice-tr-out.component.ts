@@ -186,7 +186,11 @@ export class InvoiceTrOutComponent {
           ...item,
           INVOICE_DATE: dateValue,
         };
-      }).sort((a: any, b: any) => Number(b.INVOICE_NO) - Number(a.INVOICE_NO));
+      }).sort((a: any, b: any) => {
+        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+        return numB - numA; // descending order
+      });
 
       this.applyDateFilter();
     });

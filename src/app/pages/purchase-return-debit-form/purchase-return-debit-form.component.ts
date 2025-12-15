@@ -164,45 +164,79 @@ export class PurchaseReturnDebitFormComponent {
     private ngZone: NgZone
   ) {}
 
+  // ngOnInit() {
+  //   const userDataString = localStorage.getItem('userData');
+  //   if (userDataString) {
+  //     const userData = JSON.parse(userDataString);
+  //     const selectedCompany = userData?.SELECTED_COMPANY;
+  //     this.selectedCompanyId = selectedCompany.COMPANY_ID; // ⭐ IMPORTANT
+
+  //     this.purchaseReturnFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
+  //     this.companyList = [selectedCompany];
+
+  //     this.companyStateId = selectedCompany.STATE_ID;
+  //     this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+  //     this.GST = userData.GeneralSettings.GST_PERC;
+  //     console.log(this.HSNCODE, this.GST, 'HSNCODEANDGST');
+  //     if (this.selectedCompany?.COMPANY_ID) {
+  //       this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
+
+  //       console.log(this.companyState, 'COMPANYSTATE');
+  //       this.companyList = [this.selectedCompany]; //  Show only selected company
+  //     }
+
+  //     if (selectedCompany?.COMPANY_ID) {
+  //       this.purchaseReturnFormData.ACOMPANY_ID = selectedCompany.COMPANY_ID;
+  //       this.companyList = [selectedCompany]; //  Show only selected company
+  //     }
+  //     console.log(
+  //       this.purchaseReturnFormData.COMPANY_ID,
+  //       'COMPANYIDDDDDDDDDDDDDDDDDDD'
+  //     );
+  //     if (userData.USER_ID) {
+  //       this.purchaseReturnFormData.USER_ID = userData.USER_ID;
+  //     }
+
+  //     const firstFinYear = userData.FINANCIAL_YEARS?.[0];
+  //     if (firstFinYear?.FIN_ID) {
+  //       this.purchaseReturnFormData.FIN_ID = firstFinYear.FIN_ID;
+  //     }
+  //   }
+  //   console.log(this.EditingResponseData, 'EDITINGRESPONSEDATA');
+  //   this.sessionData_tax();
+  //   this.getSupplierLstWithState();
+  //   // this.isEditDataAvailable();
+  //   // this.getSupplierDropdown();
+  // }
+
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
-      const selectedCompany = userData?.SELECTED_COMPANY;
-      console.log(selectedCompany.STATE_ID, 'selectedcompanyyyyyyyyyyy');
-      this.companyStateId = selectedCompany.STATE_ID;
-      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-      this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, this.GST, 'HSNCODEANDGST');
-      if (this.selectedCompany?.COMPANY_ID) {
-        this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
+    if (!userDataString) return;
 
-        console.log(this.companyState, 'COMPANYSTATE');
-        this.companyList = [this.selectedCompany]; //  Show only selected company
-      }
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData.SELECTED_COMPANY;
 
-      if (selectedCompany?.COMPANY_ID) {
-        this.purchaseReturnFormData.ACOMPANY_ID = selectedCompany.COMPANY_ID;
-        this.companyList = [selectedCompany]; //  Show only selected company
-      }
-      console.log(
-        this.purchaseReturnFormData.COMPANY_ID,
-        'COMPANYIDDDDDDDDDDDDDDDDDDD'
-      );
-      if (userData.USER_ID) {
-        this.purchaseReturnFormData.USER_ID = userData.USER_ID;
-      }
+    // ⭐ SINGLE SOURCE OF TRUTH
+    this.selectedCompanyId = selectedCompany.COMPANY_ID;
+    this.companyStateId = selectedCompany.STATE_ID;
 
-      const firstFinYear = userData.FINANCIAL_YEARS?.[0];
-      if (firstFinYear?.FIN_ID) {
-        this.purchaseReturnFormData.FIN_ID = firstFinYear.FIN_ID;
-      }
+    this.purchaseReturnFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
+    this.companyList = [selectedCompany];
+
+    this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+    this.GST = userData.GeneralSettings.GST_PERC;
+
+    if (userData.USER_ID) {
+      this.purchaseReturnFormData.USER_ID = userData.USER_ID;
     }
-    console.log(this.EditingResponseData, 'EDITINGRESPONSEDATA');
+
+    const firstFinYear = userData.FINANCIAL_YEARS?.[0];
+    if (firstFinYear?.FIN_ID) {
+      this.purchaseReturnFormData.FIN_ID = firstFinYear.FIN_ID;
+    }
+
     this.sessionData_tax();
     this.getSupplierLstWithState();
-    // this.isEditDataAvailable();
-    // this.getSupplierDropdown();
   }
 
   sessionData_tax() {
@@ -210,91 +244,6 @@ export class PurchaseReturnDebitFormComponent {
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
-
-  // isEditDataAvailable() {
-  //   if (!this.isEditing || !this.EditingResponseData) {
-  //     return; // Not edit mode → nothing to load
-  //   }
-
-  //   const data = this.EditingResponseData;
-  //   console.log(data, 'DATAINEDITFORM');
-  //   // Populate header fields
-  //   this.purchaseReturnFormData = {
-  //     // ID: data.ID,
-  //     TRANS_ID: data.TRANS_ID,
-  //     COMPANY_ID: this.purchaseReturnFormData.COMPANY_ID,
-  //     STORE_ID: data.STORE_ID,
-  //     // RET_DATE: new Date(data.RET_DATE),
-  //     RET_DATE: data.RET_DATE,
-  //     SUPP_ID: data.SUPP_ID,
-  //     GRN_ID: data.GRN_ID,
-  //     GRN_NO: data.GRN_NO,
-  //     IS_CREDIT: data.IS_CREDIT,
-  //     GROSS_AMOUNT: data.GROSS_AMOUNT,
-  //     VAT_AMOUNT: data.VAT_AMOUNT,
-  //     NET_AMOUNT: data.NET_AMOUNT,
-  //     USER_ID: this.purchaseReturnFormData.USER_ID,
-  //     NARRATION: data.NARRATION,
-  //     CURRENCY_SYMBOL: data.CURRENCY_SYMBOL,
-  //     PurchDetail: data.PurchDetail || [],
-  //     SUPPPLIER_NAME: data.SUPPPLIER_NAME,
-  //     RETURN_AMOUNT: data.RETURN_AMOUNT,
-  //     FIN_ID: this.purchaseReturnFormData.FIN_ID,
-  //     RET_NO: data.RET_NO,
-  //     VEHICLE_NO: data.VEHICLE_NO,
-  //     ROUND_OFF: data.ROUND_OFF,
-  //   };
-
-  //   // Populate supplier selection
-  //   this.selectedSupplierId = data.SUPP_ID;
-  //   console.log(this.supplierList, 'SELECTEDSUPPLIERIDDDDDDDDDDDDDDD');
-  //   // Step 1: Find supplier from list
-  //   // FIX FOR GST COLUMNS IN EDIT MODE
-  //   const supplier = this.supplierList?.find(
-  //     (s: any) => s.ID === this.selectedSupplierId
-  //   );
-  //   console.log(supplier, 'SUPPLIERRRRRRRRRRR');
-  //   if (supplier) {
-  //     this.selectedSupplierStateId = supplier.STATE_ID;
-  //     this.sameState = this.selectedSupplierStateId === this.companyStateId;
-
-  //     this.showCGST = this.sameState;
-  //     this.showSGST = this.sameState;
-  //     this.showGST = !this.sameState;
-  //   }
-
-  //   // Fill grid rows
-  //   this.mainGridData = (data.PurchDetail || []).map((item) => ({
-  //     DETAIL_ID: item.PURCH_DET_ID,
-  //     ITEM_ID: item.ITEM_ID,
-  //     GRN_DET_ID: item.GRN_DET_ID,
-  //     TRANSFER_NO: item.DOC_NO,
-  //     TRANSFER_DATE: item.PURCH_DATE,
-  //     ITEM_NAME: item.ITEM_NAME,
-  //     PENDING_QTY: item.PENDING_QTY,
-  //     RATE: item.RATE,
-  //     QUANTITY: item.QUANTITY,
-  //     AMOUNT: item.AMOUNT,
-  //     VAT_AMOUNT: item.VAT_AMOUNT,
-  //     TOTAL_AMOUNT: item.TOTAL_AMOUNT,
-  //     UOM: item.UOM,
-  //     UOM_PURCH: item.UOM_PURCH,
-  //     UOM_MULTIPLE: item.UOM_MULTIPLE,
-  //     BARCODE: item.BAR_CODE,
-  //     HSN_CODE: this.HSNCODE,
-
-  //     // GST values
-  //     CGST: item.CGST ?? 0,
-  //     SGST: item.SGST ?? 0,
-  //     GST: item.VAT_PERC ?? 0,
-  //   }));
-
-  //   // Force VAT recalculation after grid loads
-  //   setTimeout(() => {
-  //     this.mainGridData = [...this.mainGridData];
-  //     this.itemsGridRef?.instance?.refresh();
-  //   }, 200);
-  // }
 
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
@@ -339,6 +288,7 @@ export class PurchaseReturnDebitFormComponent {
       CGST: item.CGST ?? 0,
       SGST: item.SGST ?? 0,
       GST: item.VAT_PERC ?? 0,
+      DOC_NO: item.DOC_NO,
     }));
 
     // Force grid refresh
@@ -353,8 +303,13 @@ export class PurchaseReturnDebitFormComponent {
   }
 
   getDocNo() {
-    this.dataService.getPurchaseReturnNo().subscribe((response: any) => {
+    const payload = {
+      TRANS_TYPE: 20,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.retNo = response.PURCHASE_NO;
+      this.purchaseReturnFormData.DOC_NO = response.DOC_NO;
     });
   }
 
@@ -791,7 +746,7 @@ export class PurchaseReturnDebitFormComponent {
                   this.dataService
                     .getPurchaseReturnNo()
                     .subscribe((resp: any) => {
-                      this.purchaseReturnFormData.RET_NO = resp.PURCHASE_NO;
+                      // this.purchaseReturnFormData.RET_NO = resp.PURCHASE_NO;
                       this.popupClosed.emit();
                     });
                 },
@@ -816,7 +771,7 @@ export class PurchaseReturnDebitFormComponent {
                 'success'
               );
               this.resetPurchaseReturnForm();
-              this.getDocNo();
+              // this.getDocNo();
               this.popupClosed.emit();
             },
             (error) => {
@@ -889,7 +844,7 @@ export class PurchaseReturnDebitFormComponent {
     const purchDate = (data.RET_DATE || '').split('T')[0];
 
     const headerLines = [
-      `Debit Note No : ${data.RET_NO}`,
+      `Debit Note No : ${data.DOC_NO}`,
       `e-Way Bill No :`,
       `Original Invoice No. & Date:`,
       `Dated : ${this.formatDateDDMMMyyyy(purchDate)}`,

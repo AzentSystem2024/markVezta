@@ -188,7 +188,11 @@ export class PurchaseReturnDebitComponent {
           ...item,
           RET_DATE: dateValue,
         };
-      }).sort((a: any, b: any) => Number(b.RET_NO) - Number(a.RET_NO));
+      }).sort((a: any, b: any) => {
+        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+        return numB - numA; // descending order
+      });
 
       this.applyDateFilter();
     });
@@ -428,11 +432,11 @@ export class PurchaseReturnDebitComponent {
       });
   }
   onDeletePurchaseReturn(event: any) {
-    console.log(event)
+    console.log(event);
     const returnId = event.data.TRANS_ID;
-    console.log(returnId)
+    console.log(returnId);
     const status = event.data.TRANS_STATUS;
-    console.log(status)
+    console.log(status);
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
       notify('This cannot be deleted.', 'error', 2000);

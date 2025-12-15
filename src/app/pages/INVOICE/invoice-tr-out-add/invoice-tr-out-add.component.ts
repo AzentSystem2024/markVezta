@@ -94,10 +94,10 @@ export class InvoiceTrOutAddComponent {
   stores: any;
   reasons: any;
 
-  netAmount:string;
-  showSGST:boolean =false;
-  showCGST:boolean = false;
-  showGST:boolean = false;
+  netAmount: string;
+  showSGST: boolean = false;
+  showCGST: boolean = false;
+  showGST: boolean = false;
 
   @ViewChild('refBoxRef', { static: false }) refBoxRef!: DxTextBoxComponent;
 
@@ -133,8 +133,8 @@ export class InvoiceTrOutAddComponent {
     NARRATION: '',
     CREATE_USER_ID: 0,
     IS_APPROVED: false,
-    VEHICLE_NO:'',
-    ROUND_OFF:false,
+    VEHICLE_NO: '',
+    ROUND_OFF: false,
     SALE_DETAILS: [
       {
         QUANTITY: 0,
@@ -144,8 +144,8 @@ export class InvoiceTrOutAddComponent {
         TAX_AMOUNT: 0,
         TOTAL_AMOUNT: 0,
         DN_DETAIL_ID: 0,
-        CGST:0,
-        SGST:0
+        CGST: 0,
+        SGST: 0,
       },
     ],
   };
@@ -180,11 +180,11 @@ export class InvoiceTrOutAddComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
- console.log(this.selectedCompany)
- this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
- console.log(this.companyState)
- this.GST = this.sessionData.GeneralSettings.GST_PERC;
- console.log(this.GST,'GST')
+    console.log(this.selectedCompany);
+    this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
+    console.log(this.companyState);
+    this.GST = this.sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST, 'GST');
   }
 
   ngOnInit() {
@@ -219,7 +219,9 @@ export class InvoiceTrOutAddComponent {
     // this.getInvoiceListForGrid();
     // this.getCompanyListDropdown();
     this.getCustomerOrUnitLst();
-    this.getInvoiceNo();
+    if (!this.isEditing) {
+      this.getInvoiceNo();
+    }
     this.sessionData_tax();
     this.isEditDataAvailable();
   }
@@ -244,7 +246,7 @@ export class InvoiceTrOutAddComponent {
     }
 
     const data = this.EditingResponseData.Data[0];
-    console.log(data)
+    console.log(data);
     const transactionDate = this.parseDMY(data.TRANS_DATE);
     // Populate header fields
     this.invoiceFormData = {
@@ -264,26 +266,27 @@ export class InvoiceTrOutAddComponent {
       PARTY_NAME: data.PARTY_NAME,
       FIN_ID: this.invoiceFormData.FIN_ID,
       REF_NO: data.REF_NO,
-      VEHICLE_NO:data.VEHICLE_NO,
-      ROUND_OFF:data.ROUND_OFF
+      VEHICLE_NO: data.VEHICLE_NO,
+      ROUND_OFF: data.ROUND_OFF,
+      DOC_NO: data.DOC_NO,
     };
 
     // Populate supplier selection
     this.invoiceFormData.CUST_ID = data.CUST_ID;
-   console.log(this.invoiceFormData.CUST_ID)
-    
- // ----------- STATE COMPARISON -----------
-  const companyState = this.companyState?.trim().toLowerCase();
+    console.log(this.invoiceFormData.CUST_ID);
 
-  // 👇 Change this line based on what your API sends for customer state
-  const customerState = (data.CUST_STATE || data.STATE_NAME || '')
-    .trim()
-    .toLowerCase();
+    // ----------- STATE COMPARISON -----------
+    const companyState = this.companyState?.trim().toLowerCase();
 
-  console.log('Company State:', companyState);
-  console.log('Customer State:', customerState);
+    // 👇 Change this line based on what your API sends for customer state
+    const customerState = (data.CUST_STATE || data.STATE_NAME || '')
+      .trim()
+      .toLowerCase();
 
-  const gstPerc = parseFloat(this.GST) || 0;
+    console.log('Company State:', companyState);
+    console.log('Customer State:', customerState);
+
+    const gstPerc = parseFloat(this.GST) || 0;
 
     // Populate grid rows from PurchDetail
     this.mainInvoiceGridList = (data.SALE_DETAILS || []).map((item) => ({
@@ -300,11 +303,11 @@ export class InvoiceTrOutAddComponent {
       ARTICLE: item.ARTICLE,
       TOTAL_PAIR_QTY: item.TOTAL_PAIR_QTY,
       CGST: item.CGST ?? 0,
-    SGST: item.SGST ?? 0,
-    GST: item.GST ?? 0,
+      SGST: item.SGST ?? 0,
+      GST: item.GST ?? 0,
     }));
 
-      if (companyState === customerState) {
+    if (companyState === customerState) {
       console.log('Both states SAME → CGST + SGST apply');
 
       this.showCGST = true;
@@ -334,9 +337,7 @@ export class InvoiceTrOutAddComponent {
         row.SGST = 0;
       });
     }
-   
 
-    
     // Refresh grid
     setTimeout(() => {
       if (this.itemsGridRef?.instance) {
@@ -355,12 +356,13 @@ export class InvoiceTrOutAddComponent {
     return `${day}-${month}-${year}`;
   }
 
-  
   getCustomerOrUnitLst() {
-    this.dataService.getCustomerStateTrout_Invoice().subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'DISTLISTPOPUP');
-    });
+    this.dataService
+      .getCustomerStateTrout_Invoice()
+      .subscribe((response: any) => {
+        this.distributorList = response;
+        console.log(this.distributorList, 'DISTLISTPOPUP');
+      });
   }
   onDistributorChanged(e: any) {
     // Find the selected customer from the distributorList
@@ -371,14 +373,14 @@ export class InvoiceTrOutAddComponent {
     this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
     console.log(selectedCustomer.DESCRIPTION, 'SELECTEDCUSTOMERRRRRRRRRR');
 
-     const company = this.companyState?.trim().toLowerCase();
-     console.log(company)
-     const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
-     console.log(customer)
-     const sessionGst = parseFloat(this.GST) || 0; // main GST%
-     console.log(sessionGst)
+    const company = this.companyState?.trim().toLowerCase();
+    console.log(company);
+    const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
+    console.log(customer);
+    const sessionGst = parseFloat(this.GST) || 0; // main GST%
+    console.log(sessionGst);
 
-      if (company === customer) {
+    if (company === customer) {
       console.log('Both states SAME → CGST + SGST apply');
 
       this.showCGST = true;
@@ -408,8 +410,7 @@ export class InvoiceTrOutAddComponent {
         row.SGST = 0;
       });
     }
-    this.selectedCustomer = selectedCustomer
-
+    this.selectedCustomer = selectedCustomer;
 
     if (this.selectedCustomerId) {
       this.selectedCustomer = this.distributorList.find(
@@ -452,9 +453,18 @@ export class InvoiceTrOutAddComponent {
   }
 
   getInvoiceNo() {
-    this.dataService.getInvoiceNoTrOut().subscribe((response: any) => {
-      this.invoiceNo = response.INVOICE_NO;
-      console.log(response.INVOICE_NO, 'INVOICENO');
+    const payload = {
+      TRANS_TYPE: 25,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.invoiceFormData = {
+        ...this.invoiceFormData,
+        DOC_NO: response.DOC_NO,
+      };
+
+      console.log(response.DOC_NO, 'DOC NO BOUND');
     });
   }
 
@@ -506,59 +516,66 @@ export class InvoiceTrOutAddComponent {
 
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+
     if (!selectedRows || selectedRows.length === 0) {
       notify('Please select at least one row.', 'warning', 2000);
       return;
     }
 
-    // Initialize mainInvoiceGridList if null
     if (!this.mainInvoiceGridList) {
       this.mainInvoiceGridList = [];
     }
 
-    // Get existing IDs to avoid duplicates
-    const existingTransferIds = this.mainInvoiceGridList.map(
+    const existingIds = this.mainInvoiceGridList.map(
       (item: any) => item.DN_DETAIL_ID
     );
 
-    // Only add new unique rows
-    const newRows = selectedRows.filter(
-      (row: any) => !existingTransferIds.includes(row.DN_DETAIL_ID)
-    );
-    newRows.forEach((row: any) => {
-      row.HSN_CODE = this.HSNCODE;
-      row.TAX_PERC = this.GST;
+    const sessionGst = Number(this.GST) || 0;
+    const company = this.companyState?.trim().toLowerCase();
+    const customer = this.selectedCustomer?.STATE_NAME?.trim().toLowerCase();
+    const sameState = company === customer;
+    const half = sessionGst / 2;
 
-       const sessionGst = parseFloat(this.GST) || 0;
-      const company = this.companyState?.trim().toLowerCase();
-      const customer = this.invoiceFormData?.PARTY_NAME
-        ? this.selectedCustomer?.STATE_NAME?.trim().toLowerCase()
-        : null;
+    selectedRows.forEach((row: any) => {
+      if (existingIds.includes(row.DN_DETAIL_ID)) return;
 
-        console.log(company)
-        console.log(customer)
-      if (company === customer) {
-        // Same state → CGST + SGST
-        const half = sessionGst / 2;
-        row.CGST = half;
-        row.SGST = half;
-        row.GST = 0; // GST = 0
-      } else {
-        // Different state → GST only
-        row.GST = sessionGst;
-        row.CGST = 0;
-        row.SGST = 0;
-      }
-      // or whatever your login session variable is
+      this.mainInvoiceGridList.push({
+        // ⭐ REQUIRED FIELD MAPPING
+        TRANSFER_NO: row.ART_NO, // popup → main
+        SALE_DATE: this.parseDDMMYYYY(row.DN_DATE), // popup → main (DATE object)
+
+        // already working fields
+        ARTICLE: row.ARTICLE,
+        HSN_CODE: this.HSNCODE,
+        TOTAL_PAIR_QTY: row.TOTAL_PAIR_QTY,
+        PRICE: 0,
+
+        // calculated columns
+        TAX_PERC: this.GST,
+        GST: sameState ? 0 : sessionGst,
+        CGST: sameState ? half : 0,
+        SGST: sameState ? half : 0,
+
+        DN_DETAIL_ID: row.DN_DETAIL_ID,
+      });
     });
-    //  Mutate the existing array (DON'T reassign!)
-    this.mainInvoiceGridList.push(...newRows);
 
-    // Close popup
     this.isTrOutPopupVisible = false;
 
-    // Optional: Trigger manual change detection if needed
-    this.cdr.detectChanges();
+    this.itemsGridRef?.instance?.refresh();
+  }
+
+  parseDDMMYYYY(dateStr: string): Date | null {
+    if (!dateStr) return null;
+
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return null;
+
+    const day = Number(parts[0]);
+    const month = Number(parts[1]) - 1; // JS months are 0-based
+    const year = Number(parts[2]);
+
+    return new Date(year, month, day);
   }
 
   onPopupHiding() {
@@ -628,7 +645,7 @@ export class InvoiceTrOutAddComponent {
 
   cancelPopup() {}
 
-logGridSummaries() {
+  logGridSummaries() {
     this.summaryValues = this.itemsGridRef?.instance?.getTotalSummaryValue;
 
     if (this.summaryValues) {
@@ -695,8 +712,8 @@ logGridSummaries() {
         TAXABLE_AMOUNT: this.calculateAmount(row),
         TAX_AMOUNT: this.calculateGstAmount(row),
         TOTAL_AMOUNT: this.calculateTotal(row),
-        CGST:row.CGST,
-        SGST:row.SGST
+        CGST: row.CGST,
+        SGST: row.SGST,
       })
     );
 
@@ -819,7 +836,7 @@ logGridSummaries() {
     this.popupClosed.emit();
   }
 
-   onRoundOffChange() {
+  onRoundOffChange() {
     if (this.invoiceFormData.ROUND_OFF) {
       // Round Off Enabled
       this.netAmount = Math.round(this.grandTotal).toFixed(2);

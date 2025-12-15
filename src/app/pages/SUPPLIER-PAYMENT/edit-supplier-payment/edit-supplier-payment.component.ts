@@ -130,14 +130,14 @@ export class EditSupplierPaymentComponent {
   ngOnInit() {
     this.getLedgerCodeDropdown();
     this.getSupplierDropdown();
-    this.getReceiptNo();
+    // this.getReceiptNo();
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['paymentData']) {
       console.log('Changed paymentData:', this.paymentData);
       this.paymentFormData = this.paymentData[0];
       console.log(this.paymentFormData, 'PAYMENTFORMDATA');
-      this.voucherNo = this.paymentData[0].SUPPLIER_NO;
+      this.voucherNo = this.paymentData[0].DOC_NO;
       console.log(this.voucherNo, 'VOUCHERNOOOOOOOOOOOOOO');
       setTimeout(() => {
         this.itemsGridRef?.instance.refresh();
@@ -150,7 +150,9 @@ export class EditSupplierPaymentComponent {
         this.mainGridData,
         'MAINGRIDDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
       );
-      this.paymentDate = this.paymentFormData.PAY_DATE;
+      if (this.paymentFormData.PAY_DATE) {
+        this.paymentDate = this.formatDateToYMD(this.paymentFormData.PAY_DATE);
+      }
       console.log(this.paymentDate, 'PAYMENTDATEEEEEEEEE');
       console.log(this.paymentFormData.PDC_AMOUNT, 'PDCAMOUNTTTTTTTTTTTTTTTTT');
       this.narration = this.paymentData.NARRATION;
@@ -202,6 +204,13 @@ export class EditSupplierPaymentComponent {
 
       console.log('SUPP_ID:', this.paymentFormData.SUPP_ID);
     }
+  }
+
+  formatDateToYMD(dateString: string): string {
+    if (!dateString) return '';
+
+    const [day, month, year] = dateString.split('-');
+    return `${year}-${month}-${day}`;
   }
 
   validateReceivedAmount = (e: any) => {
@@ -538,13 +547,13 @@ export class EditSupplierPaymentComponent {
     console.log('Popup should now close');
   }
 
-  getReceiptNo() {
-    this.dataService.getReceiptNo().subscribe((response: any) => {
-      this.receiptNo = response.RECEIPT_NO;
-      this.paymentFormData.RECEIPT_NO = this.receiptNo;
-      console.log(response.RECEIPT_NO, 'INVOICENO');
-    });
-  }
+  // getReceiptNo() {
+  //   this.dataService.getReceiptNo().subscribe((response: any) => {
+  //     this.receiptNo = response.RECEIPT_NO;
+  //     this.paymentFormData.RECEIPT_NO = this.receiptNo;
+  //     console.log(response.RECEIPT_NO, 'INVOICENO');
+  //   });
+  // }
 
   getPayTypeId(mode: string): number {
     switch (mode) {
