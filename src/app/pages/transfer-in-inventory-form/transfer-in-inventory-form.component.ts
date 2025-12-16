@@ -124,7 +124,7 @@ export class TransferInInventoryFormComponent {
   ngOnInit() {
     this.isEditDataAvailable();
 
-    this.getTransferNo(); // always fetch fresh number when popup opens
+    // always fetch fresh number when popup opens
 
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
@@ -135,14 +135,14 @@ export class TransferInInventoryFormComponent {
     console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
-    this.companyID = menuResponse.Companies[0].COMPANY_ID;
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/transfer-out-inventory');
-
+    this.getTransferNo();
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -167,9 +167,9 @@ export class TransferInInventoryFormComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
     const data = this.EditingResponseData;
-    console.log(data)
+    console.log(data);
     this.transferInFormData = {
-      TRANS_ID:data.TRANS_ID,
+      TRANS_ID: data.TRANS_ID,
       // ID: data.ID,
       REC_DATE: data.REC_DATE
         ? new Date(data.REC_DATE)
@@ -186,11 +186,15 @@ export class TransferInInventoryFormComponent {
   }
 
   getTransferNo() {
-    this.dataService.getTransferNoTrIn().subscribe({
+    const payload = {
+      TRANS_TYPE: 15,
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService.getDocNo(payload).subscribe({
       next: (res: any) => {
-        if (res && res.TRANSFER_NO) {
-          this.transferInFormData.TRANSFER_NO = res.TRANSFER_NO;
-          console.log('New Transfer No:', res.TRANSFER_NO);
+        if (res) {
+          this.transferInFormData.DOC_NO = res.DOC_NO;
+          console.log('New Transfer No:', res.DOC_NO);
         }
       },
       error: (err) => {

@@ -119,7 +119,7 @@ export class EditCustomerReceiptComponent {
     } else {
       console.warn('No userData found in localStorage');
     }
-    this.getInvoiceList();
+    // this.getInvoiceList();
     this.getLedgerCodeDropdown();
     // this.getCompanyListDropdown();
     this.getReceiptNo();
@@ -145,28 +145,35 @@ export class EditCustomerReceiptComponent {
         )}-${String(day).padStart(2, '0')}`;
         // Now REC_DATE = "2025-12-11"
       }
+      if (
+        firstReceipt.CHEQUE_DATE &&
+        typeof firstReceipt.CHEQUE_DATE === 'string'
+      ) {
+        // Handles "dd-MM-yyyy"
+        if (firstReceipt.CHEQUE_DATE.includes('-')) {
+          const [day, month, year] =
+            firstReceipt.CHEQUE_DATE.split('-').map(Number);
+
+          firstReceipt.CHEQUE_DATE = new Date(year, month - 1, day);
+        } else {
+          // ISO fallback
+          firstReceipt.CHEQUE_DATE = new Date(firstReceipt.CHEQUE_DATE);
+        }
+      }
+
       this.receiprtFormData = firstReceipt; // assign for form binding
-      console.log(
-        this.receiprtFormData.DOC_NO,
-        'VOUCHERNOOOOOOOOOOOOOOOOOOOOOOOO'
-      );
+
       this.selectedDistributorId = Number(firstReceipt.DISTRIBUTOR_ID);
       this.getCompanyListDropdown(firstReceipt.ID);
-      console.log(
-        this.selectedDistributorId,
-        'SELECTEDDISTRIIIIIIIIIIIIIIIIIIIII'
-      );
+
       if (!this.ledgerList?.length) {
         this.getLedgerCodeDropdown();
       } else if (this.receiptMode) {
         this.onReceiptModeChange({ value: this.receiptMode });
       }
       this.selectedCompanyId = firstReceipt.UNIT_ID;
-      console.log(
-        this.receiprtFormData.PAY_TYPE_ID,
-        'PAYTYPEIDDDDDDDDDDDDDD+++++++++++++++++++'
-      );
-      // ✅ Filter only the selected company
+
+      //Filter only the selected company
       const userDataString = localStorage.getItem('userData');
       if (userDataString) {
         const userData = JSON.parse(userDataString);
@@ -175,13 +182,12 @@ export class EditCustomerReceiptComponent {
           (company: any) => company.COMPANY_ID === this.selectedCompanyId
         );
       }
-      this.mainInvoiceGridList = firstReceipt.REC_DETAIL || []; // ✅ Store REC_DETAIL separately
+      console.log(this.receiprtFormData.REC_DETAIL[0].AMOUNT, 'AMOUNTPDC');
+      this.mainInvoiceGridList = firstReceipt.REC_DETAIL || []; // Store REC_DETAIL separately
       this.pendingInvoiceList = [...this.mainInvoiceGridList];
       this.selectedRowsKeys = this.pendingInvoiceList
         .filter((row) => row.AMOUNT > 0) // or use your own condition
         .map((row) => row.BILL_ID);
-      console.log(this.receiprtFormData.PAY_TYPE_ID, 'PAYTYPEIDDDDDDDDDDDDDDD');
-      console.log('mainInvoiceGridList:', this.mainInvoiceGridList);
       switch (this.receiprtFormData.PAY_TYPE_ID) {
         case 1:
           this.selectedPaymentMode = 'Cash';
@@ -331,6 +337,7 @@ export class EditCustomerReceiptComponent {
   }
 
   onReceiptModeChange(e: any) {
+    const previousMode = this.receiptMode;
     this.receiptMode = e.value;
 
     // ✅ Keep PAY_TYPE_ID in sync with selected mode
@@ -354,6 +361,12 @@ export class EditCustomerReceiptComponent {
     this.applyReceiptModeFilter();
 
     console.log('Updated PAY_TYPE_ID:', this.receiprtFormData.PAY_TYPE_ID);
+  }
+  clearPdcFields() {
+    this.receiprtFormData.CHEQUE_NO = '';
+    this.receiprtFormData.CHEQUE_DATE = null;
+    this.receiprtFormData.BANK_NAME = '';
+    this.receiprtFormData.AMOUNT = '';
   }
 
   applyReceiptModeFilter() {
@@ -414,25 +427,45 @@ export class EditCustomerReceiptComponent {
     });
   }
 
+  // onPdcSelected(e: any) {
+  //   const selectedCheque = e.data;
+  //   console.log('Selected Cheque:', selectedCheque);
+
+  //   // Example: assign selected cheque to form
+  //   this.receiprtFormData.CHEQUE_NO = selectedCheque.CHEQUE_NO;
+  //   if (selectedCheque.DUE_DATE) {
+  //     // Parse dd-MM-yyyy manually
+  //     const parts = selectedCheque.DUE_DATE.split('-'); // ["27","08","2025"]
+  //     this.receiprtFormData.CHEQUE_DATE = new Date(
+  //       Number(parts[2]), // year
+  //       Number(parts[1]) - 1, // month is 0-based
+  //       Number(parts[0]) // day
+  //     );
+  //   } else {
+  //     this.receiprtFormData.CHEQUE_DATE = null;
+  //   }
+  //   this.receiprtFormData.BANK_NAME = selectedCheque.BANK_NAME;
+  //   this.receiprtFormData.AMOUNT = selectedCheque.AMOUNT;
+
+  //   this.pdcPopupVisible = false;
+  // }
+
   onPdcSelected(e: any) {
     const selectedCheque = e.data;
-    console.log('Selected Cheque:', selectedCheque);
 
-    // Example: assign selected cheque to form
-    this.receiprtFormData.CHEQUE_NO = selectedCheque.CHEQUE_NO;
-    if (selectedCheque.DUE_DATE) {
-      // Parse dd-MM-yyyy manually
-      const parts = selectedCheque.DUE_DATE.split('-'); // ["27","08","2025"]
-      this.receiprtFormData.CHEQUE_DATE = new Date(
-        Number(parts[2]), // year
-        Number(parts[1]) - 1, // month is 0-based
-        Number(parts[0]) // day
-      );
-    } else {
-      this.receiprtFormData.CHEQUE_DATE = null;
-    }
-    this.receiprtFormData.BANK_NAME = selectedCheque.BANK_NAME;
-    this.receiprtFormData.AMOUNT = selectedCheque.AMOUNT;
+    this.receiprtFormData = {
+      ...this.receiprtFormData,
+      CHEQUE_NO: selectedCheque.CHEQUE_NO,
+      CHEQUE_DATE: selectedCheque.DUE_DATE
+        ? new Date(
+            selectedCheque.DUE_DATE.split('-')[2],
+            selectedCheque.DUE_DATE.split('-')[1] - 1,
+            selectedCheque.DUE_DATE.split('-')[0]
+          )
+        : null,
+      BANK_NAME: selectedCheque.BANK_NAME,
+      AMOUNT: Number(selectedCheque.AMOUNT), //  important
+    };
 
     this.pdcPopupVisible = false;
   }

@@ -25,12 +25,13 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'70vh'"
+          [height]="'65vh'"
           [width]="'auto'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
           [selection]="{ mode: 'single' }"
+          (onContentReady)="onContentReady($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
@@ -48,7 +49,7 @@
                 <div style="display: flex; gap: 5px">
                   <dx-text-box
                     #invoiceBoxRef
-                    [(value)]="invoiceFormData.SALE_NO"
+                    [(value)]="invoiceFormData.DOC_NO"
                     label="Invoice No."
                     labelMode="floating"
                     [width]="148"
@@ -60,6 +61,7 @@
                     labelMode="floating"
                     [(value)]="invoiceFormData.REF_NO"
                     [width]="148"
+                    [readOnly]="true"
                   ></dx-text-box>
                 </div>
                 <div
@@ -178,17 +180,41 @@
           ></dxi-column>
           <dxi-column
             dataField="GST"
-            caption="TAX%"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT %'
+                : ' IGST %'
+            "
             dataType="number"
+            [visible]="showGST"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="CGST"
+            caption="CGST"
+            dataType="number"
+            [visible]="showCGST"
             [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
+            dataField="SGST"
+            caption="SGST"
+            dataType="number"
+            [visible]="showSGST"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
             dataField="TAX_AMOUNT"
-            caption="Tax Amount"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT Amount'
+                : ' GST Amount'
+            "
             dataType="number"
             format="#,##0.00"
             [allowEditing]="false"
+            [calculateCellValue]="calculateGstAmount"
           ></dxi-column>
           <dxi-column
             dataField="TOTAL_AMOUNT"
@@ -224,6 +250,42 @@
             ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
+
+        <div
+          style="
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <!-- LEFT SIDE → Vehicle No -->
+          <div>
+            <dx-text-box
+              label="Vehicle No"
+              labelMode="floating"
+              [(value)]="invoiceFormData.VEHICLE_NO"
+              [width]="200"
+            ></dx-text-box>
+          </div>
+
+          <!-- RIGHT SIDE → Round Off + Net Amount -->
+          <div style="display: flex; align-items: center; gap: 16px">
+            <dx-check-box
+              text="Round Off"
+              [(value)]="invoiceFormData.ROUND_OFF"
+              [readOnly]="true"
+            ></dx-check-box>
+
+            <dx-text-box
+              label="Net Amount"
+              labelMode="floating"
+              [value]="netAmount"
+              [width]="150"
+              [readOnly]="true"
+            ></dx-text-box>
+          </div>
+        </div>
         <div
           style="
             width: 100%;

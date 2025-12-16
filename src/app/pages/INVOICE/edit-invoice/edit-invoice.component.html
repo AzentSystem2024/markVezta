@@ -56,7 +56,7 @@
                 <div style="display: flex; gap: 5px">
                   <dx-text-box
                     #invoiceBoxRef
-                    [(value)]="invoiceFormData.SALE_NO"
+                    [(value)]="invoiceFormData.DOC_NO"
                     label="Invoice No."
                     labelMode="floating"
                     [width]="148"
@@ -93,7 +93,6 @@
                     labelMode="floating"
                     style="margin-top: -1px"
                     (onValueChanged)="onDistributorChanged($event)"
-                    [readOnly]="true"
                   >
                   </dx-select-box>
                 </div>

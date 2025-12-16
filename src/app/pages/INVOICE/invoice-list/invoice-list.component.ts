@@ -119,6 +119,7 @@ export class InvoiceListComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  companyID: any;
 
   constructor(
     private dataService: DataService,
@@ -135,7 +136,7 @@ export class InvoiceListComponent {
       sessionStorage.getItem('savedUserData') || '{}'
     );
     console.log('Parsed ObjectData:', menuResponse);
-
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
@@ -158,8 +159,8 @@ export class InvoiceListComponent {
 
   getInvoiceList() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    }
+      COMPANY_ID: this.companyID,
+    };
     this.dataService.getInvoiceMainList(payload).subscribe((response: any) => {
       this.invoiceList = response.Data.map((item: any) => {
         let dateValue: Date;
@@ -179,7 +180,11 @@ export class InvoiceListComponent {
           ...item,
           SALE_DATE: dateValue,
         };
-      }).sort((a: any, b: any) => Number(b.SALE_NO) - Number(a.SALE_NO));
+      }).sort((a: any, b: any) => {
+        const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
+        const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
+        return numB - numA; // descending
+      });
 
       this.applyDateFilter();
     });

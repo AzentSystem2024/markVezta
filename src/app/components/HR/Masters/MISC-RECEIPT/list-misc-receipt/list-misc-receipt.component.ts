@@ -156,10 +156,9 @@ export class ListMiscReceiptComponent {
 
   getMiscReceipts() {
     const payload = {
-      COMPANY_ID: JSON.parse(
-        sessionStorage.getItem('savedUserData') || '{}'
-      ).SELECTED_COMPANY.COMPANY_ID,
-    }
+      COMPANY_ID: JSON.parse(sessionStorage.getItem('savedUserData') || '{}')
+        .SELECTED_COMPANY.COMPANY_ID,
+    };
     this.dataService.getMiscReceiptList(payload).subscribe((response: any) => {
       this.miscReceipts = response.Data.map((item: any) => {
         let dateValue: Date;
@@ -179,7 +178,11 @@ export class ListMiscReceiptComponent {
           ...item,
           TRANS_DATE: dateValue,
         };
-      }).sort((a: any, b: any) => Number(b.VOUCHER_NO) - Number(a.VOUCHER_NO));
+      }).sort((a: any, b: any) => {
+        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+        return numB - numA; // descending order
+      });
 
       this.applyDateFilter();
     });

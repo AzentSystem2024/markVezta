@@ -124,7 +124,7 @@ export class TransferOutInventoryAddComponent {
     console.log(this.isReadOnlyMode, 'READONLYMODE');
     this.isEditDataAvailable();
 
-    this.getTransferNo(); // always fetch fresh number when popup opens
+    // always fetch fresh number when popup opens
 
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
@@ -135,13 +135,17 @@ export class TransferOutInventoryAddComponent {
     console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
-    this.companyID = menuResponse.Companies[0].COMPANY_ID;
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    console.log(this.companyID, 'COMPANYIDDDDDDDDDD');
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/transfer-out-inventory');
+    if (!this.isEditing) {
+      this.getTransferNo();
+    }
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -178,9 +182,9 @@ export class TransferOutInventoryAddComponent {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const data = this.EditingResponseData;
-    console.log(data)
+    console.log(data);
     this.transferOutFormData = {
-      TRANS_ID:data.TRANS_ID,
+      TRANS_ID: data.TRANS_ID,
       // ID: data.ID,
       TRANSFER_DATE: data.TRANSFER_DATE ? new Date(data.TRANSFER_DATE) : null,
       DEST_STORE_ID: data.DEST_STORE_ID,
@@ -188,6 +192,7 @@ export class TransferOutInventoryAddComponent {
       DETAILS: data.DETAILS ? [...data.DETAILS] : [],
       NARRATION: data.NARRATION || '',
       NET_AMOUNT: data.NET_AMOUNT,
+      DOC_NO: data.DOC_NO,
     };
     this.transferOutFormData.DETAILS.forEach((row: any, index: number) => {
       row.SL_NO = index + 1;
@@ -388,11 +393,15 @@ export class TransferOutInventoryAddComponent {
   // }
 
   getTransferNo() {
-    this.dataService.getTransferNo().subscribe({
+    const payload = {
+      TRANS_TYPE: 14,
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService.getDocNo(payload).subscribe({
       next: (res: any) => {
-        if (res && res.TRANSFER_NO) {
-          this.transferOutFormData.TRANSFER_NO = res.TRANSFER_NO;
-          console.log('✅ New Transfer No:', res.TRANSFER_NO);
+        if (res) {
+          this.transferOutFormData.DOC_NO = res.DOC_NO;
+          console.log('✅ New Transfer No:', res.DOC_NO);
         }
       },
       error: (err) => {
