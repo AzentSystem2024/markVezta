@@ -120,6 +120,7 @@ export class DeliveryNoteComponent {
   isEditDelivery: boolean;
   selectedDelivery: any;
   isReadOnlyDelivery: boolean;
+  selected_Company_id: any;
 
   constructor(
     private dataService: DataService,
@@ -152,6 +153,7 @@ export class DeliveryNoteComponent {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
     }
+    this.sessionData_tax();
     this.getDeliveryNotes();
   }
   sessionData_tax() {
@@ -159,10 +161,14 @@ export class DeliveryNoteComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   getDeliveryNotes() {
-    this.dataService.getdeliveryNoteist().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    }
+    this.dataService.getdeliveryNoteist(payload).subscribe((response: any) => {
       this.deliveryNoteList = response.Data.map((item: any) => {
         let dateValue: Date;
 

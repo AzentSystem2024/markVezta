@@ -118,6 +118,7 @@ export class TransferInInventoryComponent {
   isEditTransferIn: boolean;
   selectedTrIn: any;
   isReadOnlyTrIn: boolean;
+  selected_Company_id: any;
 
   constructor(
     private dataService: DataService,
@@ -157,11 +158,15 @@ export class TransferInInventoryComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selected_Company_id= this.sessionData.SELECTED_COMPANY.COMPANY_ID
   }
 
   getTransferInList() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    }
     this.dataService
-      .getTransferInForInventoryMainList()
+      .getTransferInForInventoryMainList(payload)
       .subscribe((response: any) => {
         this.transferInList = response.data
           .map((item: any) => {

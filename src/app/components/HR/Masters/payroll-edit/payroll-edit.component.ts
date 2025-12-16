@@ -70,6 +70,7 @@ export class PayrollEditComponent {
   payRollData: any;
 
   salaryHeadList: any;
+  selected_Company_id: any;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef
@@ -231,8 +232,18 @@ export class PayrollEditComponent {
     this.payRollData.PAY_DETAILS = [...this.payRollData.PAY_DETAILS, newRow];
   }
 
+      sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   getSalaryHeadList() {
-    this.dataService.get_salary_head_list().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.get_salary_head_list(payload).subscribe((response: any) => {
       this.salaryHeadList = response.Data;
     });
   }

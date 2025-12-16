@@ -84,10 +84,9 @@
       ></dxo-search-panel>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header" style="font-size: 20px;">Salary Head</div>
+          <div class="grid-header" style="font-size: 20px">Salary Head</div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto">
-      
           <!-- <dx-button
             icon="plus"
             type="default"
@@ -96,66 +95,71 @@
           ></dx-button> -->
         </dxi-item>
 
-         <dxi-item
+        <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
-        ></dxi-item>
-    
-                          <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'search' : 'search',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
-      ></dxi-item>
+        ></dxi-item>
 
-   
-               <dxi-item
-               *ngIf="canAdd"
-      location="after"
-      widget="dxButton"
-      [options]="addButtonOptions"
-    ></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          showText="inMenu"
+          widget="dxButton"
+          [options]="{
+            icon: isFilterRowVisible ? 'search' : 'search',
+            hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+            onClick: toggleFilterRow,
+            stylingMode: 'text',
+            elementAttr: { class: 'commonButtons' }
+          }"
+        ></dxi-item>
+
+        <dxi-item
+          *ngIf="canAdd"
+          location="after"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
 
       <!-- <dxi-column dataField="serialNo" caption="SL.No" [aligement]="left"></dxi-column> -->
-       <dxi-column dataField="serialNo" caption="SL. No" [alignment]="'left'" [width]="80"></dxi-column>
+      <dxi-column
+        dataField="serialNo"
+        caption="SL. No"
+        [alignment]="'left'"
+        [width]="80"
+      ></dxi-column>
       <dxi-column dataField="HEAD_NAME" caption="Salary Head"></dxi-column>
       <dxi-column dataField="PAYSLIP_TITLE" caption="Title"></dxi-column>
       <dxi-column dataField="HEAD_TYPE" caption="Type"></dxi-column>
       <dxi-column
         dataField="IS_INACTIVE"
         caption="Status"
-          cellTemplate="statusCellTemplate"
+        cellTemplate="statusCellTemplate"
       ></dxi-column>
-        <div *dxTemplate="let cellData of 'statusCellTemplate'">
-      <i
-        class="fas fa-flag"
-        [ngClass]="getStatusFlagClass(cellData.value)"
-        [attr.title]="cellData.value ? true : false"
-        style="margin-left: 10px; cursor: default"
-      ></i>       
-    </div>
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value ? true : false"
+          style="margin-left: 10px; cursor: default"
+        ></i>
+              
+      </div>
     </dx-data-grid>
 
     <dx-popup
       [(visible)]="addSalaryHeadPopupOpened"
-     [width]="'90vw'"
-  [height]="'80vh'"
+      [width]="'90vw'"
+      [height]="'80vh'"
       title="Add Salary Head"
-       (onHiding)="handleEditClose()"
+      (onHiding)="handleEditClose()"
     >
       <app-salary-head-add
         [isOpen]="addSalaryHeadPopupOpened"
-         (formClosed)="handleEditClose()"
+        (formClosed)="handleEditClose()"
       ></app-salary-head-add>
     </dx-popup>
   </div>
@@ -164,7 +168,7 @@
   [(visible)]="EditSalaryHeadPopupOpened"
   [width]="'90vw'"
   [height]="'80vh'"
- title="Edit Salary Head"
+  title="Edit Salary Head"
   (onHiding)="handleEditClose()"
 >
   <app-salary-head-edit
