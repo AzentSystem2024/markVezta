@@ -113,6 +113,7 @@ export class TransferOutInventoryComponent {
   filteredInvoiceList: any;
   filteredTrOutList: any;
   isReadOnlyTrOut: boolean;
+  selected_Company_id: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -144,7 +145,9 @@ export class TransferOutInventoryComponent {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
     }
+     this.sessionData_tax();
     this.getTransferOutList();
+   
   }
 
   sessionData_tax() {
@@ -152,11 +155,15 @@ export class TransferOutInventoryComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selected_Company_id= this.sessionData.SELECTED_COMPANY.COMPANY_ID
   }
 
   getTransferOutList() {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id,
+    }
     this.dataService
-      .getTransferOutForInventoryMainList()
+      .getTransferOutForInventoryMainList(payload)
       .subscribe((response: any) => {
         this.transferOutList = response.Header.map((item: any) => {
           let dateValue: Date;

@@ -67,7 +67,7 @@ head_To:boolean = false
 SalaryHeadData=
 {
   ID: 0,
-  COMPANY_ID :1 ,
+  COMPANY_ID :0 ,
   HEAD_NAME: "",
   PAYSLIP_TITLE: "",
   HEAD_ACTIVE: true,
@@ -116,7 +116,9 @@ selectedRows: any[];
 
 isEnabled: boolean=false;
   HeadType_value: any;
+  selected_Company_id: any;
  constructor(private dataservice: DataService,) {
+  this.sesstion_Details();
   this.get_headnameGrid()
     
 this.dataservice.Dropdown_ac_head(name).subscribe((res:any)=>{
@@ -255,12 +257,22 @@ onSelectionChanged(event: any) {
 
 //=======================list data=============
   getSalaryHeadList() {
-    this.dataservice.get_salary_head_list().subscribe((res: any) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id
+    };
+    this.dataservice.get_salary_head_list(payload).subscribe((res: any) => {
       console.log('Salary Head List:', res);
 
       this.salaryHeadList=res.Data
     })
   }
+
+      sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
 
 // UpdateSalaryHeadData() {
 //   this.getSalaryHeadList()

@@ -212,6 +212,7 @@ export class TransferInInventoryFormComponent {
   getItemsList() {
     const payload = {
       STORE_ID: this.selectedStoreId,
+      COMPANY_ID: this.companyID,
     };
     this.dataService
       .getItemDetailsForTrInInventory(payload)

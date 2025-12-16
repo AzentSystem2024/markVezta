@@ -378,8 +378,9 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Trout_Invoice/list`, payload);
   }
 
-  getInvoiceMainListTrOut(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Trout_Invoice/getlist`, {});
+  getInvoiceMainListTrOut(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Trout_Invoice/getlist`, data);
   }
 
   getCustomerOrUnitTrOut(): Observable<any> {
@@ -502,8 +503,9 @@ export class DataService {
   getItemsListForInventory(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Inventory/itemDetails`, payload);
   }
-  getTransferOutForInventoryMainList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}TransferOutInv/list`, {});
+  getTransferOutForInventoryMainList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOutInv/list`, data);
   }
   insertTransferOutForInventory(items: any) {
     const data = items;
@@ -535,8 +537,9 @@ export class DataService {
   getItemDetailsForTrInInventory(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}TransferIn/getitem`, payload);
   }
-  getTransferInForInventoryMainList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}TransferIn/list`, {});
+  getTransferInForInventoryMainList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferIn/list`, data);
   }
   insertTransferInForInventory(items: any) {
     const data = items;
@@ -679,8 +682,9 @@ export class DataService {
     );
   }
   //........................................DELIVERY NOTE............................................//
-  getdeliveryNoteist(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Delivery_Note/list`, {});
+  getdeliveryNoteist(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Delivery_Note/list`, data);
   }
 
   getDalesOrderListForDeliveryNote(data: any): Observable<any> {
@@ -4170,8 +4174,9 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=============================Api For salaty Head List================================
-  get_salary_head_list() {
-    return this.http.post(`${this.apiUrl}SalaryHead/list`, {});
+  get_salary_head_list(items:any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SalaryHead/list`, data);
   }
 
   // =========================================salary head  Add Api==============================

@@ -121,8 +121,11 @@ export class SalaryHeadsComponent {
   //==================================== Get list Salary component=============================
 
   get_Salary_Head_list() {
+    const payload = {
+
+    };
     this.isLoading = true;
-    this.service.get_salary_head_list().subscribe((res: any) => {
+    this.service.get_salary_head_list(payload).subscribe((res: any) => {
       console.log(res);
       this.isLoading = false;
       if (res) {
@@ -220,7 +223,8 @@ export class SalaryHeadsComponent {
       is_Fixed
     );
   
-    this.service.get_salary_head_list().subscribe((res: any) => {
+    const payload = {};
+    this.service.get_salary_head_list(payload).subscribe((res: any) => {
       this.list_for_duplication = res.datas;
       console.log(this.list_for_duplication, 'dupli check');
     });

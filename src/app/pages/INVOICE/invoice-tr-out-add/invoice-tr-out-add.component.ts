@@ -442,6 +442,7 @@ export class InvoiceTrOutAddComponent {
     console.log(this.invoiceFormData.CUST_ID, 'INVOICELISTFORGRID');
     const payload = {
       CUST_ID: this.invoiceFormData.CUST_ID,
+      COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService
       .getInvoiceGridListTrOut(payload)

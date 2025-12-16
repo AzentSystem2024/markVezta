@@ -163,7 +163,10 @@ export class InvoiceTrOutComponent {
   }
 
   getInvoiceList() {
-    this.dataService.getInvoiceMainListTrOut().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id
+    }
+    this.dataService.getInvoiceMainListTrOut(payload).subscribe((response: any) => {
       this.invoiceList = response.Data.map((item: any) => {
         let saleDate = item.INVOICE_DATE;
         let dateValue: Date;

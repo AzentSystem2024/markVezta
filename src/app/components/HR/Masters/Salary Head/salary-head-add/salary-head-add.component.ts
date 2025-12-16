@@ -126,6 +126,7 @@ export class SalaryHeadAddComponent {
     RANGE_FROM: number;
     RANGE_TO: number;
   };
+  selected_Company_id: any;
 
   constructor(private dataservice: DataService) {
     this.get_headnameGrid();
@@ -205,9 +206,20 @@ export class SalaryHeadAddComponent {
     }
   }
 
+
+        sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   //=======================list data=============
   getSalaryHeadList() {
-    this.dataservice.get_salary_head_list().subscribe((res: any) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.get_salary_head_list(payload).subscribe((res: any) => {
       // console.log('Salary Head List:', res);
 
       this.salaryHeadList = res.Data;
