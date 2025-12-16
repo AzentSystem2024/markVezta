@@ -191,20 +191,6 @@ export class AddSupplierPaymentComponent {
     return value <= pending;
   };
 
-  // validateReceivedAmount = (e: any) => {
-  //   if (!e || !e.data) return true;
-
-  //   const value = Number(e.value);
-
-  //   // allow 0 or empty
-  //   if (!e.value || value === 0) {
-  //     return true;
-  //   }
-
-  //   // validate only when > 0
-  //   return value === Number(e.data.PENDING_AMOUNT);
-  // };
-
   getPendingInvoiceList(supplierId: number) {
     const payload = {
       SUPP_ID: supplierId,
@@ -218,7 +204,6 @@ export class AddSupplierPaymentComponent {
   }
 
   onSupplierChanged(event: any) {
-    console.log(event, 'eventttttttttttttttttttttttttttttttttt');
     this.selectedSupplierId = event.value;
 
     if (this.selectedSupplierId) {

@@ -129,7 +129,7 @@ export class CustomerReceiptsComponent {
     private router: Router
   ) {}
 
-    sessionData_tax() {
+  sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     // this.selected_vat_id = this.sessionData.VAT_ID;
@@ -158,95 +158,44 @@ export class CustomerReceiptsComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
+    this.sessionData_tax();
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getCustomerReceipts();
-    this.sessionData_tax();
   }
-  // getCustomerReceipts() {
-  //   this.customerReciptList = new DataSource({
-  //     load: () =>
-  //       new Promise((resolve, reject) => {
-  //         this.dataService.getCustomerReciptList().subscribe({
-  //           next: (response: any) => {
-  //             if (response?.Data && Array.isArray(response.Data)) {
-  //               // Sort data by VOUCHER_NO (descending)
-  //               const sortedData = response.Data.sort(
-  //                 (a: any, b: any) => b.VOUCHER_NO - a.VOUCHER_NO
-  //               );
-
-  //               // Format and add serial number
-  //               const formattedData = sortedData.map(
-  //                 (item: any, index: number) => {
-  //                   let dateValue: Date;
-
-  //                   if (
-  //                     typeof item.REC_DATE === 'string' &&
-  //                     item.REC_DATE.includes('-')
-  //                   ) {
-  //                     const [day, month, year] =
-  //                       item.REC_DATE.split('-').map(Number);
-  //                     dateValue = new Date(year, month - 1, day);
-  //                   } else {
-  //                     dateValue = new Date(item.REC_DATE);
-  //                   }
-
-  //                   return {
-  //                     ...item,
-  //                     sno: index + 1,
-  //                     REC_DATE: dateValue,
-  //                   };
-  //                 }
-  //               );
-
-  //               // ✅ Apply date filter *after* data is formatted
-  //               resolve(formattedData);
-
-  //               // Ensure filter runs only after the data is loaded
-  //               setTimeout(() => {
-  //                 this.applyDateFilter();
-  //               }, 0);
-  //             } else {
-  //               resolve([]);
-  //             }
-  //           },
-  //           error: (err) => {
-  //             console.error('Error loading Customer Receipt list:', err);
-  //             reject('Failed to load data');
-  //           },
-  //         });
-  //       }),
-  //   });
-  // }
 
   getCustomerReceipts() {
     const payload = {
-      COMPANY_ID : this.selectedCompanyId
+      COMPANY_ID: this.selectedCompanyId,
     }; // Add any necessary parameters here
-    this.dataService.getCustomerReciptList(payload).subscribe((response: any) => {
-      this.customerReciptList = response.Data.map((item: any) => {
-        let dateValue: Date;
+    this.dataService
+      .getCustomerReciptList(payload)
+      .subscribe((response: any) => {
+        this.customerReciptList = response.Data.map((item: any) => {
+          let dateValue: Date;
 
-        if (typeof item.REC_DATE === 'string' && item.REC_DATE.includes('-')) {
-          const [day, month, year] = item.REC_DATE.split('-').map(Number);
-          dateValue = new Date(year, month - 1, day);
-        } else {
-          dateValue = new Date(item.REC_DATE);
-        }
+          if (
+            typeof item.REC_DATE === 'string' &&
+            item.REC_DATE.includes('-')
+          ) {
+            const [day, month, year] = item.REC_DATE.split('-').map(Number);
+            dateValue = new Date(year, month - 1, day);
+          } else {
+            dateValue = new Date(item.REC_DATE);
+          }
 
-        return {
-          ...item,
-          REC_DATE: dateValue,
-        };
-      }).sort((a: any, b: any) => {
-        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-        return numB - numA; // descending order
+          return {
+            ...item,
+            REC_DATE: dateValue,
+          };
+        }).sort((a: any, b: any) => {
+          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+          return numB - numA; // descending order
+        });
+
+        this.applyDateFilter();
       });
-
-      this.applyDateFilter();
-    });
   }
 
   refreshGrid() {

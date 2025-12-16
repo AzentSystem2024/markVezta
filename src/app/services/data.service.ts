@@ -199,7 +199,7 @@ export class DataService {
   }
 
   //JOURNAL VOUCHER
-  getJournalVoucherList(items : any): Observable<any> {
+  getJournalVoucherList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}ACTransactions/list`, data);
   }
@@ -233,7 +233,7 @@ export class DataService {
   }
 
   //CREDIT-NOTE
-  getCreditNoteList(items:any): Observable<any> {
+  getCreditNoteList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}AC_CreditNote/list`, data);
   }
@@ -267,8 +267,8 @@ export class DataService {
   }
 
   //-----------------------------------DEBIT NOTES-----------------------------------------------------//
-  getDebitNoteList(items:any): Observable<any> {
-    const data = items
+  getDebitNoteList(items: any): Observable<any> {
+    const data = items;
     return this.http.post(`${this.apiUrl}ACTransactions/debitlist`, data);
   }
 
@@ -318,8 +318,8 @@ export class DataService {
   //   return this.http.post(`${this.apiUrl}Sales_Invoice/list`, payload);
   // }
 
-  getInvoiceMainList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Invoice/getlist`, {});
+  getInvoiceMainList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Invoice/getlist`, data);
   }
 
   getCustomerOrUnit(): Observable<any> {
@@ -799,7 +799,7 @@ export class DataService {
   }
 
   //CUSTOMER RECEIPT
-  getCustomerReciptList(items :any): Observable<any> {
+  getCustomerReciptList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}Receipt/list`, data);
   }
@@ -964,7 +964,7 @@ export class DataService {
   }
 
   //MISCELLANEOUS PAYMENT
-  getMiscpaymentList(items : any): Observable<any> {
+  getMiscpaymentList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}MiscPayment/list`, data);
   }
@@ -991,7 +991,7 @@ export class DataService {
   }
 
   //MISCELLANEOUS-RECEIPT
-  getMiscReceiptList(items:any): Observable<any> {
+  getMiscReceiptList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}MiscReceipt/list`, data);
   }
@@ -1022,7 +1022,7 @@ export class DataService {
 
   //SALARY-PAYMENT
 
-  getSalaryPaymentList(items:any): Observable<any> {
+  getSalaryPaymentList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}SalaryPayment/view`, data);
   }
@@ -5544,7 +5544,7 @@ The result can be exported to HTML or Markdown.`;
 
   //================================Fixed assests===============================
 
-  list_Fixed_Asset_api(item:any) {
+  list_Fixed_Asset_api(item: any) {
     const payload = item;
     return this.http.post(`${this.apiUrl}FixedAsset/list`, payload);
   }
@@ -5602,9 +5602,12 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=====================list of depreciation================================
-  list_Depreciation_api(item:any) {
+  list_Depreciation_api(item: any) {
     const payload = item;
-    return this.http.post(`${this.apiUrl}Depreciation/DepreciationList/List`, payload);
+    return this.http.post(
+      `${this.apiUrl}Depreciation/DepreciationList/List`,
+      payload
+    );
   }
   //===========================insert depreciation=============================
 
@@ -5719,8 +5722,8 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-  Prepayment_posting_list(item:any) {
-    const payload = item
+  Prepayment_posting_list(item: any) {
+    const payload = item;
     const getEndpoint = this.apiUrl + 'PrePayment_Posting/prepaylist';
     return this.http.post(getEndpoint, payload);
   }

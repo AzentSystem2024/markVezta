@@ -104,6 +104,8 @@ export class EditInvoiceComponent {
   selectedCompany: any;
   companyState: any;
   netAmount: any;
+  selectedCustomerName: any;
+  selectedCustomerType: any;
 
   constructor(
     private dataService: DataService,
@@ -220,74 +222,98 @@ export class EditInvoiceComponent {
     }
   }
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   if (changes['invoiceFormData'] && this.invoiceFormData?.length > 0) {
-  //     const firstInvoice = this.invoiceFormData[0];
-  //     this.invoiceFormData.PARTY_NAME = firstInvoice.PARTY_NAME;
-  //     console.table(this.mainInvoiceGridList);
-
-  //     if (
-  //       firstInvoice.SALE_DATE &&
-  //       typeof firstInvoice.SALE_DATE === 'string'
-  //     ) {
-  //       const [day, month, year] = firstInvoice.SALE_DATE.split('-');
-  //       const date = new Date(+year, +month - 1, +day);
-  //       date.setHours(12, 0, 0);
-  //       firstInvoice.SALE_DATE = date;
-  //     }
-  //     console.log(this.HSNCODE, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
-
-  //     this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
-  //     // Force-create missing fields so DevExtreme can bind them
-  //     this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => ({
-  //       HSN_CODE: this.HSNCODE, // force-create
-  //       GST: row.GST || this.GST, // already showing
-  //       ...row, // merge original row at the end
-  //     }));
-  //     console.log(this.mainInvoiceGridList, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
-  //     // ✔ Assign HSN Code & GST for each existing row when editing
-  //     this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
-  //       return {
-  //         ...row,
-  //         HSN_CODE: this.HSNCODE, // From session
-  //         // From session
-  //       };
-  //     });
-
-  //     this.invoiceFormData = firstInvoice;
-  //     console.log(this.mainInvoiceGridList, 'MAINGRIDINVOICELIST');
-  //     this.customerType = firstInvoice.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
-
-  //     if (this.customerType === 'Unit') {
-  //       this.populateCompanyFromSession(); // ✅ call here too
-  //     }
-
-  //     this.getCompanyListDropdown();
-  //   }
-  // }
   onDistributorChanged(e: any) {
-    if (e && e.value) {
-      this.selectedDistributorId = e.value; // ✅ this is the selected ID
-      console.log('Selected Distributor ID:', this.selectedDistributorId);
-      if (this.selectedDistributorId) {
-        this.selectedSupplierName = this.distributorList.find(
-          (s: any) => s.ID === this.selectedDistributorId
-        );
-        this.invoiceFormData.PARTY_NAME = this.selectedSupplierName.DESCRIPTION;
-        console.log(
-          this.selectedSupplierName.DESCRIPTION,
-          'PARTYNAMEEEEEEEEEEEEEE'
-        );
+    // Find the selected customer from the distributorList
+    const selectedCustomer = this.distributorList.find(
+      (cust: any) => cust.ID === e.value
+    );
+    // If customer changed → clear previously added rows
+    if (this.mainInvoiceGridList && this.mainInvoiceGridList.length > 0) {
+      this.mainInvoiceGridList = []; // Clear the grid completely
+      this.totalAmount = 0;
+      this.taxAmount = 0;
+      this.grandTotal = 0;
+      this.netAmount = 0;
+
+      // Refresh grid UI
+      if (this.itemsGridRef?.instance) {
+        this.itemsGridRef.instance.refresh();
       }
-      this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
-      this.invoiceFormData.UNIT_ID = 0;
+
+      console.log('Cleared main grid due to customer change');
+    }
+    this.selectedCustomerName = selectedCustomer.DESCRIPTION;
+    this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
+    console.log(selectedCustomer.STATE_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
+    const company = this.companyState?.trim().toLowerCase();
+    const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
+    const sessionGst = parseFloat(this.GST) || 0; // main GST%
+    if (company === customer) {
+      this.showCGST = true;
+      this.showSGST = true;
+      this.showGST = false;
+
+      //  Split GST into CGST + SGST
+      const half = sessionGst / 2;
+
+      // Update all grid rows
+      this.mainInvoiceGridList?.forEach((row: any) => {
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0; // GST becomes zero in same-state case
+      });
+    } else {
+      console.log('States DIFFERENT → GST applies');
+
+      this.showGST = true;
+      this.showCGST = false;
+      this.showSGST = false;
+
+      // ⭐ GST only
+      this.mainInvoiceGridList?.forEach((row: any) => {
+        row.GST = sessionGst;
+        row.CGST = 0;
+        row.SGST = 0;
+      });
+    }
+
+    this.selectedCustomer = selectedCustomer;
+    this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
+    if (this.selectedCustomerType) {
+      console.log(
+        'Selected Customer Type:',
+        this.selectedCustomerType.CUST_TYPE
+      );
+      console.log('Selected Customer :', this.selectedCustomerType);
+      // optional — store it if you need it later
+      this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
     }
     this.getInvoiceListForGrid();
   }
+  // onDistributorChanged(e: any) {
+  //   if (e && e.value) {
+  //     this.selectedDistributorId = e.value; // ✅ this is the selected ID
+  //     console.log('Selected Distributor ID:', this.selectedDistributorId);
+  //     if (this.selectedDistributorId) {
+  //       this.selectedSupplierName = this.distributorList.find(
+  //         (s: any) => s.ID === this.selectedDistributorId
+  //       );
+  //       this.invoiceFormData.PARTY_NAME = this.selectedSupplierName.DESCRIPTION;
+  //       console.log(
+  //         this.selectedSupplierName.DESCRIPTION,
+  //         'PARTYNAMEEEEEEEEEEEEEE'
+  //       );
+  //     }
+  //     this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
+  //     this.invoiceFormData.UNIT_ID = 0;
+  //   }
+  //   this.getInvoiceListForGrid();
+  // }
 
   getInvoiceListForGrid() {
     const payload = {
       CUST_ID: this.invoiceFormData.DISTRIBUTOR_ID,
+      COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
       this.staticTransfers = response.Data; // Save the original full list
@@ -320,17 +346,6 @@ export class EditInvoiceComponent {
       }
     }
   }
-
-  // getCompanyListDropdown() {
-  //   if (this.customerType === 'Unit') {
-  //     // Don't overwrite the session company list
-  //     return;
-  //   }
-
-  //   this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
-  //     this.distributorList = response;
-  //   });
-  // }
 
   getCustomerOrUnitLst() {
     this.dataService
@@ -375,7 +390,6 @@ export class EditInvoiceComponent {
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
-  c;
 
   calculateAmount = (row: any) => {
     return (parseFloat(row.PRICE) || 0) * (parseFloat(row.TOTAL_PAIR_QTY) || 0);
@@ -536,6 +550,17 @@ export class EditInvoiceComponent {
     }
   }
 
+  private formatDateOnly(date: Date | string): string {
+    if (!date) return null;
+
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
   updateInvoice() {
     if (!this.invoiceFormData || !this.invoiceFormData.TRANS_ID) {
       console.warn('Missing invoice data or TRANS_ID.');
@@ -631,8 +656,8 @@ export class EditInvoiceComponent {
             TRANS_TYPE: this.invoiceFormData.TRANS_TYPE,
             REF_NO: this.invoiceFormData.REF_NO,
             SALE_ID: this.invoiceFormData.SALE_ID,
-            SALE_NO: this.invoiceFormData.SALE_NO,
-            SALE_DATE: this.invoiceFormData.SALE_DATE,
+            // SALE_NO: this.invoiceFormData.SALE_NO,
+            SALE_DATE: this.formatDateOnly(this.invoiceFormData.SALE_DATE),
             UNIT_ID: this.selectedCompanyId || null,
             COMPANY_ID: this.selectedCompanyId,
             FIN_ID: this.finId || 1,
@@ -689,8 +714,8 @@ export class EditInvoiceComponent {
         TRANS_ID: this.invoiceFormData.TRANS_ID,
         REF_NO: this.invoiceFormData.REF_NO,
         SALE_ID: this.invoiceFormData.SALE_ID,
-        SALE_NO: this.invoiceFormData.SALE_NO,
-        SALE_DATE: this.invoiceFormData.SALE_DATE,
+        // SALE_NO: this.invoiceFormData.SALE_NO,
+        SALE_DATE: this.formatDateOnly(this.invoiceFormData.SALE_DATE),
         UNIT_ID: this.selectedCompanyId || null,
         COMPANY_ID: this.selectedCompanyId,
         FIN_ID: this.finId || 1,

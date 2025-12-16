@@ -173,7 +173,11 @@ export class TransferOutInventoryComponent {
             TRANSFER_DATE: dateValue,
             DESTINATION_STORE: item.STORE_NAME,
           };
-        }).sort((a: any, b: any) => Number(b.ISSUE_NO) - Number(a.ISSUE_NO));
+        }).sort((a: any, b: any) => {
+          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+          return numB - numA; // descending order
+        });
 
         console.log('TransferOutList after mapping:', this.transferOutList);
         this.applyDateFilter();

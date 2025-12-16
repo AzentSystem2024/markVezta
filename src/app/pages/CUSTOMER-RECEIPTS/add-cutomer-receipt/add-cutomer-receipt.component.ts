@@ -137,6 +137,7 @@ export class AddCutomerReceiptComponent {
     } else {
       console.warn('No userData found in localStorage');
     }
+    Object.freeze(this.selectedCompanyId);
     console.log('Loaded Companies:', this.selectedCompanyId);
     this.getReceiptNo();
     this.getLedgerCodeDropdown();
@@ -161,6 +162,14 @@ export class AddCutomerReceiptComponent {
   };
 
   getInvoiceList() {
+    if (!this.selectedCompanyId || !this.selectedDistributorId) {
+      console.warn(
+        'Skipping API call — missing company or distributor',
+        this.selectedCompanyId,
+        this.selectedDistributorId
+      );
+      return;
+    }
     const payload = {
       CUST_ID: this.selectedDistributorId,
       COMPANY_ID: this.selectedCompanyId,
@@ -660,8 +669,8 @@ export class AddCutomerReceiptComponent {
       TRANS_TYPE: 27,
       DOC_NO: this.getReceiptNo(),
       REC_DATE: new Date(),
-      COMPANY_ID: 1,
-      STORE_ID: 0,
+      COMPANY_ID: this.selectedCompanyId,
+      STORE_ID: this.selectedstoreId,
       FIN_ID: 1,
       TRANS_STATUS: 1,
       REF_NO: '',
@@ -680,7 +689,7 @@ export class AddCutomerReceiptComponent {
     this.bankName = '';
     this.dueDate = null;
     this.narration = '';
-    this.selectedCompanyId = '';
+    // this.selectedCompanyId = '';
     this.selectedDistributorId = '';
     this.pendingInvoiceList?.forEach((row) => (row.RECEIVED_AMOUNT = 0));
     this.pendingInvoiceList = [];

@@ -298,7 +298,7 @@
                   type="date"
                   displayFormat="dd-MM-yyyy"
                   [width]="'40%'"
-                  [disabled]="
+                  [readOnly]="
                     !(
                       receiptMode === 'Bank' ||
                       (receiptMode === 'PDC' && receiprtFormData.PAY_HEAD_ID)
@@ -308,20 +308,21 @@
               </div>
 
               <!-- Bank Name -->
-              <dx-text-box
-                class="bank-name-bo x"
-                [(value)]="receiprtFormData.BANK_NAME"
-                label="Bank Name"
-                labelMode="floating"
-                [width]="'100%'"
-                style="margin-top: 2px"
-                [disabled]="
-                  !(
-                    receiptMode === 'Bank' ||
-                    (receiptMode === 'PDC' && receiprtFormData.PAY_HEAD_ID)
-                  )
-                "
-              ></dx-text-box>
+              <!-- Bank Name -->
+              <div style="margin-top: 12px">
+                <dx-text-box
+                  [(value)]="receiprtFormData.BANK_NAME"
+                  label="Bank Name"
+                  labelMode="floating"
+                  [width]="'100%'"
+                  [disabled]="
+                    !(
+                      receiptMode === 'Bank' ||
+                      (receiptMode === 'PDC' && receiprtFormData.PAY_HEAD_ID)
+                    )
+                  "
+                ></dx-text-box>
+              </div>
             </div>
           </div>
 
@@ -337,7 +338,7 @@
             ></dx-text-box>
           </div>
           <div
-            *ngIf="receiptMode === 'PDC'"
+            [hidden]="receiptMode !== 'PDC'"
             style="display: flex; gap: 5px; margin-top: 2px"
           >
             <!-- Left column (Narration same width as Ledger) -->
@@ -353,13 +354,13 @@
 
             <!-- Right column (Amount same width as Bank Remittance side) -->
             <div style="flex: 1">
-              <dx-number-box
-                [(value)]="totalPendingAmount"
+              <dx-text-box
+                [(value)]="receiprtFormData.REC_DETAIL[0].NET_AMOUNT"
                 label="Amount"
                 labelMode="floating"
                 [width]="'100%'"
                 [readOnly]="isReadOnlyMode"
-              ></dx-number-box>
+              ></dx-text-box>
             </div>
           </div>
         </div>

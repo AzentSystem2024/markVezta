@@ -537,34 +537,28 @@ export class AddMiscReceiptComponent {
       };
     }
   }
+  private getValidInvoiceRows() {
+    const rows = this.getRowsFromGrid();
+
+    return rows.filter((row) => {
+      return row && row.ledgerCode && row.ledgerName && Number(row.AMOUNT) > 0;
+    });
+  }
 
   onRowRemoved(e: any) {
-    setTimeout(() => {
-      const grid = e.component;
+    if (e.rowIndex == null || e.rowIndex < 0) return;
 
-      // Ensure pendingInvoicelist exists
-      if (!this.pendingInvoicelist || this.pendingInvoicelist.length === 0) {
-        // Create a new blank row
-        const newRow = {
-          ledgerCode: '',
-          ledgerName: '',
-          REMARKS: '',
-          AMOUNT: '',
-        };
+    this.pendingInvoicelist.splice(e.rowIndex, 1);
 
-        // Reset the data source with one new row
-        this.pendingInvoicelist = [newRow];
-        grid.option('dataSource', [...this.pendingInvoicelist]);
-
-        // Focus the first cell of the new row
-        setTimeout(() => {
-          grid.focus(
-            grid.getCellElement(0, grid.columnOption('HEAD_ID', 'index'))
-          );
-          grid.editCell(0, 'HEAD_ID'); // Or whichever field should be focused first
-        }, 50);
-      }
-    }, 50); // small delay ensures deletion completes
+    // Optional: ensure at least one empty row exists
+    if (this.pendingInvoicelist.length === 0) {
+      this.pendingInvoicelist.push({
+        ledgerCode: '',
+        ledgerName: '',
+        REMARKS: '',
+        AMOUNT: null,
+      });
+    }
   }
 
   getLedgerCodeDropdown() {
@@ -618,6 +612,14 @@ export class AddMiscReceiptComponent {
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private getRowsFromGrid(): any[] {
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return [];
+
+    // This returns ONLY current rows (after delete)
+    return grid.getDataSource().items();
   }
 
   callInsertAPI(finalPayload: any) {
@@ -719,9 +721,12 @@ export class AddMiscReceiptComponent {
     }
     // 2. Commit any pending cell edits in grid
     this.itemsGridRef.instance.closeEditCell();
+    this.itemsGridRef.instance.saveEditData();
+
+    const validRows = this.getValidInvoiceRows();
     const details: any[] = [];
 
-    this.pendingInvoicelist.forEach((row) => {
+    validRows.forEach((row) => {
       const selectedLedger = this.ledgerList.find(
         (l) => l.HEAD_CODE === row.ledgerCode
       );
@@ -862,7 +867,7 @@ export class AddMiscReceiptComponent {
     this.itemsGridRef.instance.closeEditCell();
     const details: any[] = [];
 
-    this.pendingInvoicelist.forEach((row) => {
+    this.getValidInvoiceRows().forEach((row) => {
       const selectedLedger = this.ledgerList.find(
         (l) => l.HEAD_CODE === row.ledgerCode
       );
