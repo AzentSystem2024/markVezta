@@ -79,7 +79,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
   grnData: any = {
     GRN_DATE: new Date(),
-    COMPANY_ID: 1,
+    COMPANY_ID: 0,
     USER_ID: 1,
     STORE_ID: '',
     PO_ID: '',
@@ -101,7 +101,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     GRNDetails: [
       {
         ID: 0,
-        COMPANY_ID:1,
+        COMPANY_ID:0,
         STORE_ID: 0,
         PO_DETAIL_ID: 0,
         GRN_ID: 0,
@@ -191,7 +191,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       this.selected_Company_id,
       '============selected_Company_id=============='
     );
-
+this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
@@ -243,7 +243,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   onStoreValueChanged(e: any) {
     const storeid = e.value;
     this.service
-      .getPendingPo(storeid, this.supplierId)
+      .getPendingPo(storeid, this.supplierId,this.selected_Company_id)
       .subscribe((res: any) => {
         this.poList = res.data;
         this.filteredPOList = [...this.poList];
@@ -1033,8 +1033,8 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         }, 0)
         .toFixed(2);
 
-      this.selectedPONo = '2';
-      console.log(this.selectedPONo, '+++++++');
+      // this.selectedPONo = '2';
+      // console.log(this.selectedPONo, '+++++++');
 
       // this.newGrnData.GRNDetails= this.poDetails.map((item) => ({
       //   ID:item.ID,

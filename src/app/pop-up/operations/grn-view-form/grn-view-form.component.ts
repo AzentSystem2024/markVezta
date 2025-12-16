@@ -192,7 +192,7 @@ export class GrnViewFormComponent {
   selectedPONo: any;
 
   getPODetails(poId: any) {
-    this.service.getGrnPoDetails(poId).subscribe((res: any) => {
+    this.service.getGrnPoDetails(poId, this.selected_Company_id).subscribe((res: any) => {
       console.log(res, 'res');
       this.poDetails = res.Podetails.map((item: any, index: number) => ({
         ...item,
@@ -237,7 +237,7 @@ export class GrnViewFormComponent {
   onStoreValueChanged(e: any) {
     const storeid = e.value;
     this.service
-      .getPendingPo(storeid, this.supplierId)
+      .getPendingPo(storeid, this.supplierId, this.selected_Company_id)
       .subscribe((res: any) => {
         this.poList = res.data;
         this.filteredPOList = [...this.poList];
@@ -651,9 +651,7 @@ export class GrnViewFormComponent {
         }, 0)
         .toFixed(2);
 
-      this.selectedPONo = '2';
-      console.log(this.selectedPONo, '+++++++');
-
+  
       // this.newGrnData.GRNDetails= this.poDetails.map((item) => ({
       //   ID:item.ID,
       //   COMPANY_ID: 1, // Static value or dynamically set if needed

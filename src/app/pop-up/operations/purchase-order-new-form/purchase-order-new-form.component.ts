@@ -16,6 +16,7 @@ import {
   DxDateBoxModule,
   DxDropDownBoxModule,
   DxFileUploaderModule,
+  DxFormComponent,
   DxFormModule,
   DxPopupModule,
   DxProgressBarModule,
@@ -47,6 +48,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
+  @ViewChild(DxFormComponent) poForm!: DxFormComponent;
+
   poNo: number;
   poHistoryList: any;
   sessionData: any;
@@ -684,7 +687,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   loadPurchaseOrders(itemId: string) {
-    this.service.getLast5PoItemsList(itemId).subscribe((data: any[]) => {
+    this.service.getLast5PoItemsList(itemId,this.selected_Company_id).subscribe((data: any[]) => {
       // Filter out records where PO_NO matches this.newPOData.PO_NO
       this.purchaseOrders = data
         .filter((po) => po.PO_NO !== this.newPoData.PO_NO)
@@ -888,54 +891,61 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   // Parent component
-  resetForm() {
-    console.log('RESET FORM CALLEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD');
-    this.isSupplierTouched = false;
-    this.isSupplierValid = true;
-    this.newPoData = {
-      PO_NO: '',
-      PO_DATE: new Date(),
-      DELIVERY_DATE: new Date(),
-      REF_NO: '',
-      SUPP_ID: '',
-      STORE_ID: null,
-      SUPP_CONTACT: '',
-      SUPP_MOBILE: '',
-      SUPP_ADDRESS: '',
-      SHIP_TO: '',
-      PURPOSE: '',
-      CONTACT_NAME: '',
-      CONTACT_MOBILE: '',
-      DELIVERY_TERM_ID: null,
-      PAY_TERM_ID: null,
-      // DELIVERY_DATE: null,
-      DELIVERY_DESC: '',
-      NOTES: '',
-      NARRATION: '',
-      ISSUED_EMP_ID: null,
-      SUPP_GROSS_AMOUNT: 0,
-      GROSS_AMOUNT: 0,
-      TAX_AMOUNT: 0,
-      SUPP_NET_AMOUNT: 0,
-      NET_AMOUNT: 0,
-    };
-    this.SupplierCurrency = '';
-    this.vatRule = '';
-    this.supplierMail = '';
-    this.savedItems = [];
+resetForm() {
+  console.log('✅ RESET FORM CALLED');
 
-    // ✅ Reset dxForm if available
-    if (this.poData?.instance) {
-      this.poData.instance.resetValues();
-      this.poData.instance.option('formData', { ...this.newPoData });
-    }
+  this.isSupplierTouched = false;
+  this.isSupplierValid = true;
 
-    // ✅ Reset dxDataGrid explicitly
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.option('dataSource', this.savedItems);
-      this.dataGrid.instance.refresh();
-    }
+  // Reset source data
+  this.poData = {
+    ...this.poData,
+    PO_NO: '',
+    PO_DATE: new Date(),
+    DELIVERY_DATE: new Date(),
+    SUPP_ID: '',
+    STORE_ID: null,
+    SUPP_CONTACT: '',
+    SUPP_MOBILE: '',
+    SUPP_ADDRESS: '',
+    SHIP_TO: '',
+    PURPOSE: '',
+    CONTACT_NAME: '',
+    CONTACT_MOBILE: '',
+    DELIVERY_TERM_ID: null,
+    PAY_TERM_ID: null,
+    NOTES: '',
+    NARRATION: '',
+    ISSUED_EMP_ID: null,
+    SUPP_GROSS_AMOUNT: 0,
+    GROSS_AMOUNT: 0,
+    TAX_AMOUNT: 0,
+    SUPP_NET_AMOUNT: 0,
+    NET_AMOUNT: 0,
+    IS_APPROVED: false,
+    PoDetails: [], // ✅ correct place
+  };
+
+  // Sync UI model
+  this.newPoData = { ...this.poData };
+
+  // Clear grid
+  this.savedItems = [];
+
+  // Reset form UI
+  if (this.poForm?.instance) {
+    this.poForm.instance.option('formData', { ...this.newPoData });
+    this.poForm.instance.resetValues();
   }
+
+  // Reset grid UI
+  if (this.dataGrid?.instance) {
+    this.dataGrid.instance.option('dataSource', []);
+    this.dataGrid.instance.refresh();
+  }
+}
+
+
 }
 
 @NgModule({

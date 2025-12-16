@@ -256,6 +256,7 @@ export class AddPurchaseInvoiceComponent {
   getPendingGRNList() {
     const payload = {
       SUPP_ID: this.selectedSupplierId,
+      COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getPendingGRN(payload).subscribe((response: any) => {
       this.pendingGRNs = response.Data;

@@ -78,7 +78,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
 
   grnData: any = {
     GRN_DATE: new Date(),
-    COMPANY_ID: 1,
+    COMPANY_ID: 0,
     USER_ID: 1,
     STORE_ID: '',
     PO_ID: '',
@@ -100,7 +100,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
     GRNDetails: [
       {
         ID: 0,
-        COMPANY_ID: 1,
+        COMPANY_ID: 0,
         STORE_ID: 0,
         PO_DETAIL_ID: 0,
         GRN_ID: 0,
@@ -172,7 +172,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
   preparePayload() {
     this.newGrnData.GRNDetails = this.poDetails.map((item: any) => ({
       ID: item.ID || 0,
-      COMPANY_ID: 1,
+      COMPANY_ID: this.selected_Company_id,
       STORE_ID: this.newGrnData.STORE_ID,
       PO_DETAIL_ID: item.PO_DETAIL_ID,
       GRN_ID: this.newGrnData.ID || 0,
@@ -240,7 +240,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
       this.selected_Company_id,
       '============selected_Company_id=============='
     );
-
+this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
@@ -286,22 +286,22 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
   //     console.log(this.selectedPONo,"selectedpono")
   //   }
   // }
-  onGridBoxOptionChanged(e: any) {
-    if (e.name === 'value') {
-      this.isGridBoxOpened = false;
-      this.ref.detectChanges();
-    }
+  // onGridBoxOptionChanged(e: any) {
+  //   if (e.name === 'value') {
+  //     this.isGridBoxOpened = false;
+  //     this.ref.detectChanges();
+  //   }
 
-    console.log(this.selectedPONo, 'selectedpono');
-    const poId = this.selectedPONo[0].PO_ID;
-    this.newGrnData.PO_ID = poId;
-    // this.newGrnData.SUPP_ID = this.selectedPONo[0].SUPP_NAME;
-    console.log(poId, 'poID');
-    this.getPODetails(poId);
-  }
+  //   // console.log(this.selectedPONo, 'selectedpono');
+  //   // const poId = this.selectedPONo[0].PO_ID;
+  //   // this.newGrnData.PO_ID = poId;
+  //   // this.newGrnData.SUPP_ID = this.selectedPONo[0].SUPP_NAME;
+  //   console.log(poId, 'poID');
+  //   this.getPODetails(poId);
+  // }
 
   getPODetails(poId: any) {
-    this.service.getGrnPoDetails(poId).subscribe((res: any) => {
+    this.service.getGrnPoDetails(poId, this.selected_Company_id).subscribe((res: any) => {
       console.log(res, 'res');
       this.poDetails = res.Podetails.map((item: any, index: number) => ({
         ...item,
@@ -318,7 +318,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
   onStoreValueChanged(e: any) {
     const storeid = e.value;
     this.service
-      .getPendingPo(storeid, this.supplierId)
+      .getPendingPo(storeid, this.supplierId,this.selected_Company_id)
       .subscribe((res: any) => {
         this.poList = res.data;
         this.filteredPOList = [...this.poList];
@@ -552,7 +552,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
       console.log(this.updatedItems, 'All Updated Rows');
 
       const bindedData = this.updatedItems.map((item) => ({
-        COMPANY_ID: 1, // Static value or dynamically set if needed
+        COMPANY_ID: this.selected_Company_id, // Static value or dynamically set if needed
         STORE_ID: this.newGrnData.STORE_ID,
         PO_DETAIL_ID: item.PO_DETAIL_ID,
         ITEM_ID: item.ITEM_ID,
@@ -1069,12 +1069,10 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
         }, 0)
         .toFixed(2);
 
-      this.selectedPONo = '2';
-      console.log(this.selectedPONo, '+++++++');
 
       this.newGrnData.GRNDetails = this.poDetails.map((item) => ({
         ID: item.ID,
-        COMPANY_ID: 1, // Static value or dynamically set if needed
+        COMPANY_ID: this.selected_Company_id, // Static value or dynamically set if needed
         STORE_ID: this.newGrnData.STORE_ID,
         PO_DETAIL_ID: item.PO_DETAIL_ID,
         ITEM_ID: item.ITEM_ID,
@@ -1094,7 +1092,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
 
       this.newGrnData.GRNDetails = this.poDetails.map((item) => ({
         ID: item.ID,
-        COMPANY_ID: 1,
+        COMPANY_ID: this.selected_Company_id,
         STORE_ID: this.newGrnData.STORE_ID,
         PO_DETAIL_ID: item.PO_DETAIL_ID,
         ITEM_ID: item.ITEM_ID,

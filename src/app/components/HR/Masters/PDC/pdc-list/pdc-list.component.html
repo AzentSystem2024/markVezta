@@ -30,7 +30,7 @@
       focusStateEnabled="false"
       [groupPanel]="{ visible: true }"
       [grouping]="{ autoExpandAll: false }"
-       (onExporting)="onExporting($event)"
+      (onExporting)="onExporting($event)"
       (onEditingStart)="onEditPDC($event)"
       (onRowRemoving)="DeletePDC($event)"
     >
@@ -40,12 +40,12 @@
         [allowDeleting]="canDelete"
       ></dxo-editing>
 
-       <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
 
       <dxo-paging [pageSize]="20"></dxo-paging>
       <dxo-pager
@@ -63,28 +63,25 @@
       ></dxo-filter-row> -->
       <dxo-toolbar>
         <dxi-item location="before">
-          
           <h6>PDC</h6>
-          </dxi-item>
-         
-         
+        </dxi-item>
+
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
 
-   <!-- <div class="toolbar-margin-top "> -->
+        <!-- <div class="toolbar-margin-top "> -->
         <dxi-item location="center" locateInMenu="auto">
-             <dx-radio-group
-  [items]="priorities"
-  [(value)]="selectedType"
-  layout="horizontal"
-  displayExpr="name"
-  [stylingMode]="'outlined'"
-   (onValueChanged)="onTypeChanged($event)"
-  
->
-</dx-radio-group>
-</dxi-item>
+          <dx-radio-group
+            [items]="priorities"
+            [(value)]="selectedType"
+            layout="horizontal"
+            displayExpr="name"
+            [stylingMode]="'outlined'"
+            (onValueChanged)="onTypeChanged($event)"
+          >
+          </dx-radio-group>
+        </dxi-item>
 
- <dxi-item location="after" locateInMenu="auto">
+        <dxi-item location="after" locateInMenu="auto">
           <dx-select-box
             displayExpr="label"
             valueExpr="id"
@@ -100,43 +97,43 @@
           ></dx-select-box>
         </dxi-item>
 
-         <dxi-item location = "after">
-         <dx-select-box
-         label="Due Date"
-         labelMode="floating"
-         [dataSource]="dateRanges"
-         [displayExpr]="'label'"
-        valueExpr="value"
-        [(value)]="selectedDateRange"
-        (onValueChanged)="onDateRangeChanged($event)"
-         >
-        <div *dxTemplate="let item of 'item'">
-          {{ item.value === 'custom' ? 'Custom' : item.label }}
-        </div>
-        </dx-select-box>
+        <dxi-item location="after">
+          <dx-select-box
+            label="Due Date"
+            labelMode="floating"
+            [dataSource]="dateRanges"
+            [displayExpr]="'label'"
+            valueExpr="value"
+            [(value)]="selectedDateRange"
+            (onValueChanged)="onDateRangeChanged($event)"
+          >
+            <div *dxTemplate="let item of 'item'">
+              {{ item.value === "custom" ? "Custom" : item.label }}
+            </div>
+          </dx-select-box>
         </dxi-item>
 
-         <dxi-item location = "after">
-         <dx-select-box
-         label="Entry Date between"
-         labelMode="floating"
-        [dataSource]="entryDateRanges"
-         [displayExpr]="'label'"
-        valueExpr="value"
-        [(value)]="selectedEntryDateRange"
-       (onValueChanged)="onEntryDateRangeChanged($event)"
-         >
-         <div *dxTemplate="let item of 'item'">
-          {{ item.value === 'custom' ? 'Custom' : item.label }}
-        </div>
-        </dx-select-box>
+        <dxi-item location="after">
+          <dx-select-box
+            label="Entry Date between"
+            labelMode="floating"
+            [dataSource]="entryDateRanges"
+            [displayExpr]="'label'"
+            valueExpr="value"
+            [(value)]="selectedEntryDateRange"
+            (onValueChanged)="onEntryDateRangeChanged($event)"
+          >
+            <div *dxTemplate="let item of 'item'">
+              {{ item.value === "custom" ? "Custom" : item.label }}
+            </div>
+          </dx-select-box>
         </dxi-item>
 
-         <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="custom-export-button"
-      ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="custom-export-button"
+        ></dxi-item>
 
         <dxi-item
           location="after"
@@ -153,29 +150,29 @@
         [expandMode]="'rowClick'"
       ></dxo-grouping>
       <dxi-column dataField="ENTRY_NO" caption="Entry No."></dxi-column>
-       <dxi-column dataField="ENTRY_DATE" caption="Entry date"></dxi-column>
-      <dxi-column dataField="BENEFICIARY_NAME" caption="Beneficiary Name"></dxi-column>
+      <dxi-column dataField="ENTRY_DATE" caption="Entry date"></dxi-column>
+      <dxi-column
+        dataField="BENEFICIARY_NAME"
+        caption="Beneficiary Name"
+      ></dxi-column>
       <dxi-column dataField="CHEQUE_NO" caption="Cheque No."></dxi-column>
-       <dxi-column dataField="CHEQUE_DATE" caption="Due date."></dxi-column>
+      <dxi-column dataField="CHEQUE_DATE" caption="Due date."></dxi-column>
       <dxi-column
         dataField="AMOUNT"
         caption="Amount"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
-       <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
-       <dxi-column
-          dataField="ENTRY_STATUS"
-          caption="Status"
-          [cellTemplate]="statusCellRender"
-          width="100  "
-          alignment="right"
-        >
-    </dxi-column>
+      <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
+      <dxi-column
+        dataField="ENTRY_STATUS"
+        caption="Status"
+        [cellTemplate]="statusCellRender"
+        width="100  "
+        alignment="right"
+      >
+      </dxi-column>
 
-    <dxi-column
-  type="buttons"
-  [buttons]="gridButtons">
-</dxi-column>
+      <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column>
     </dx-data-grid>
 
     <dx-popup
@@ -187,7 +184,6 @@
     >
       <app-pdc-add-form
         [isOpen]="addPDCPopupOpened"
-        
         (formClosed)="handleClose()"
       ></app-pdc-add-form>
     </dx-popup>
@@ -199,7 +195,7 @@
   [width]="'50vw'"
   [height]="'90vh'"
   title="Edit PDC"
-   (onHiding)="handleClose()"
+  (onHiding)="handleClose()"
 >
   <app-pdc-edit-form
     [selectedPDC]="selectedPDC"
@@ -223,7 +219,7 @@
     <dx-date-box
       [(value)]="customStartDate"
       type="date"
-     displayFormat="dd-MM-yyyy"
+      displayFormat="dd-MM-yyyy"
       label="From Date"
     >
     </dx-date-box>
@@ -236,14 +232,13 @@
     >
     </dx-date-box>
 
-   <dx-button
-  text="Apply"
-  type="default"
-  stylingMode="contained"
-  (onClick)="applyCustomDateFilter()"
-  class="mt-3"
-></dx-button>
-
+    <dx-button
+      text="Apply"
+      type="default"
+      stylingMode="contained"
+      (onClick)="applyCustomDateFilter()"
+      class="mt-3"
+    ></dx-button>
   </div>
 </dx-popup>
 
@@ -273,13 +268,12 @@
     >
     </dx-date-box>
 
-   <dx-button
-  text="Apply"
-  type="default"
-  stylingMode="contained"
-  (onClick)="applyEntryCustomDateFilter()"
-  class="mt-3"
-></dx-button>
-
+    <dx-button
+      text="Apply"
+      type="default"
+      stylingMode="contained"
+      (onClick)="applyEntryCustomDateFilter()"
+      class="mt-3"
+    ></dx-button>
   </div>
 </dx-popup>

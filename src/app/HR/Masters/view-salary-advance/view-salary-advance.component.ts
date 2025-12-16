@@ -150,6 +150,7 @@ gridButtons = [
     visible: (e: any) => e.row?.data?.STATUS?.trim() === 'Open'
   }
 ];
+  selected_Company_id: any;
   constructor(private fb: FormBuilder, private dataService: DataService,private ngZone: NgZone) {
     this.formSource = this.fb.group({
       Id: [null],
@@ -237,9 +238,21 @@ onPaymentModeChanged(e: any) {
   initialLoad: boolean = true;
 //=================Get Advance List=========================
 
+  sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')
+//     
+  }
+
   get_advance_list(filterBy: string = 'all') {
     this.isLoading = true;
-    this.dataService.Get_Api_advance().subscribe((res: any) => {
+    const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    FILTER: filterBy   // optional, if backend supports it
+  };
+    this.dataService.Get_Api_advance(payload).subscribe((res: any) => {
       let data = res.data;
       console.log(data);
 
@@ -416,7 +429,7 @@ this.ledgerlist()
 
   
  this.setPaymentMode();
-
+this.sesstion_Details();
 
   }
 

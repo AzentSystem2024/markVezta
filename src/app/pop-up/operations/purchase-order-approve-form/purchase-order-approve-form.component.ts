@@ -49,6 +49,9 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
 
   @Input() formdata: any;
   poHistoryList: any;
+  selected_Company_id: any;
+  GST_PERC: any;
+  HSN_CODE: any;
 
   constructor(private service: DataService) {
     const settingsData = sessionStorage.getItem('settings');
@@ -262,6 +265,7 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
   }
   ngOnInit() {
     this.currentDate = new Date();
+    this.sessionDetails();
     this.GetSupplierList();
     this.GetStoresList();
     this.GetDeliveryTermsList();
@@ -553,8 +557,23 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
     this.loadPurchaseOrders(itemId);
   }
 
+    sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    console.log(
+      this.HSN_CODE,
+      '===========selected HSN CODE==================='
+    );
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(
+      this.GST_PERC,
+      '===========selected GST PERC==================='
+    );
+     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+
   loadPurchaseOrders(itemId: string) {
-    this.service.getLast5PoItemsList(itemId).subscribe((data: any[]) => {
+    this.service.getLast5PoItemsList(itemId,this.selected_Company_id).subscribe((data: any[]) => {
       // Filter out records where PO_NO matches this.newPOData.PO_NO
       this.purchaseOrders = data
         .filter((po) => po.PO_NO !== this.newPoData.PO_NO)

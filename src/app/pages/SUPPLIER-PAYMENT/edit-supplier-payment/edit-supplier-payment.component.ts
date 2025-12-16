@@ -120,12 +120,15 @@ export class EditSupplierPaymentComponent {
   selectedLedger: any;
   payHeadTouched: boolean;
   voucherNo: any;
+  sessionData: any;
 
   constructor(
     private dataService: DataService,
     private cdRef: ChangeDetectorRef,
     private sanitizer: DomSanitizer
-  ) {}
+  ) {
+    this.sessionData_tax();
+  }
 
   ngOnInit() {
     this.getLedgerCodeDropdown();
@@ -228,8 +231,17 @@ export class EditSupplierPaymentComponent {
     return value <= pending;
   };
 
+    sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+
+
   getPendingInvoiceList(supplierId: number) {
-    const payload = { SUPP_ID: supplierId };
+    const payload = { SUPP_ID: supplierId,
+      COMPANY_ID: this.selectedCompanyId
+     };
 
     this.dataService
       .getPendingInvoiceforSupplierPayment(payload)

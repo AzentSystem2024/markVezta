@@ -80,10 +80,11 @@ export class GrnNewFormComponent implements OnInit {
   };
   grnData: any = {
     GRN_DATE: new Date(),
-    COMPANY_ID: 1,
+    COMPANY_ID: 0,
+    DOC_NO: '',
     USER_ID: 1,
     STORE_ID: '',
-    PO_ID: '',
+    PO_ID: 0,
     SUPP_ID: '',
     NET_AMOUNT: 0,
     TOTAL_COST: 0,
@@ -102,7 +103,7 @@ export class GrnNewFormComponent implements OnInit {
     GRNDetails: [
       {
         ID: 0,
-        COMPANY_ID: 1,
+        COMPANY_ID: 0,
         STORE_ID: 0,
         PO_DETAIL_ID: 0,
         GRN_ID: 0,
@@ -181,6 +182,7 @@ export class GrnNewFormComponent implements OnInit {
     this.localCurrencySymbol = data ? data.CURRENCY_SYMBOL : null;
     console.log(this.grnData.GRN_DATE, 'grndate');
     console.log(this.grnData);
+    this.sesstion_Details();
   }
 
     getDocNo() {
@@ -248,7 +250,7 @@ export class GrnNewFormComponent implements OnInit {
   }
 
   getPODetails(poId: any) {
-    this.service.getGrnPoDetails(poId).subscribe((res: any) => {
+    this.service.getGrnPoDetails(poId, this.selected_Company_id).subscribe((res: any) => {
       console.log(res, 'res');
 
       // Populate poDetails with dynamic SL_NO and other calculations
@@ -365,26 +367,46 @@ export class GrnNewFormComponent implements OnInit {
   onStoreValueChanged(e: any) {
     const storeid = e.value;
     this.service
-      .getPendingPo(storeid, this.supplierId)
+      .getPendingPo(storeid, this.supplierId,this.selected_Company_id)
       .subscribe((res: any) => {
         this.poList = res.data;
         this.filteredPOList = [...this.poList];
       });
   }
+  // onSupplierValueChanged(e: any) {
+  //   console.log(e, 'supplier event');
+  //   const supplierid = e.value;
+  //   this.supplierId = supplierid;
+  //   this.selected_Company_id;
+  //   if (!supplierid) {
+  //     // If no supplier is selected, reset the list to all purchase orders
+  //     this.filteredPOList = [...this.poList];
+  //   } else {
+  //     // Filter the purchase order list based on the selected supplier ID
+  //     this.filteredPOList = this.poList.filter(
+  //       (po) => po.SUPP_ID === supplierid
+  //     );
+  //   }
+  // }
+
   onSupplierValueChanged(e: any) {
-    console.log(e, 'supplier event');
-    const supplierid = e.value;
-    this.supplierId = supplierid;
-    if (!supplierid) {
-      // If no supplier is selected, reset the list to all purchase orders
+  const supplierid = e.value;
+  this.supplierId = supplierid;
+
+  if (!this.newGrnData.STORE_ID) return;
+
+  this.service
+    .getPendingPo(
+      this.newGrnData.STORE_ID,
+      supplierid,
+      this.selected_Company_id
+    )
+    .subscribe((res: any) => {
+      this.poList = res.data;
       this.filteredPOList = [...this.poList];
-    } else {
-      // Filter the purchase order list based on the selected supplier ID
-      this.filteredPOList = this.poList.filter(
-        (po) => po.SUPP_ID === supplierid
-      );
-    }
-  }
+    });
+}
+
   // getSupplierData() {
   //   this.service.getDropdownData('SUPPLIER').subscribe((res) => {
   //     this.supplierList = res;
@@ -420,7 +442,7 @@ export class GrnNewFormComponent implements OnInit {
       this.selected_Company_id,
       '============selected_Company_id=============='
     );
-
+     this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
@@ -636,7 +658,7 @@ export class GrnNewFormComponent implements OnInit {
       console.log(this.updatedItems, 'All Updated Rows');
 
       const bindedData = this.updatedItems.map((item) => ({
-        COMPANY_ID: 1, // Static value or dynamically set if needed
+        COMPANY_ID: this.selected_Company_id, // Static value or dynamically set if needed
         STORE_ID: this.newGrnData.STORE_ID,
         PO_DETAIL_ID: item.PO_DETAIL_ID,
         ITEM_ID: item.ITEM_ID,
@@ -831,7 +853,7 @@ export class GrnNewFormComponent implements OnInit {
     console.log(selectedRow, 'Selected PO Row');
 
     // Update only PO-related fields
-    this.newGrnData.PO_ID = selectedRow.ID;
+    this.newGrnData.PO_ID = selectedRow.PO_ID;
     this.newGrnData.PO_NO = selectedRow.PO_NO;
 
     // Only update supplier if it's coming from PO
