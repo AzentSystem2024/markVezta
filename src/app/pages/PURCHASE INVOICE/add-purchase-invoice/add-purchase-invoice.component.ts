@@ -264,59 +264,139 @@ export class AddPurchaseInvoiceComponent {
     });
   }
 
+  // onSupplierChanged(event: any) {
+  //   this.selectedSupplierId = event.value;
+  //   const selectedSupplier = this.distributorList.find(
+  //     (supplier: any) => supplier.ID === this.selectedSupplierId
+  //   );
+
+  //   const company = this.companyState?.trim().toLowerCase();
+  //   console.log(company);
+  //   const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
+  //   console.log(supplier);
+  //   const sessionGst = parseFloat(this.GST) || 0; // main GST%
+  //   console.log(sessionGst);
+
+  //   if (company === supplier) {
+  //     console.log('Both states SAME → CGST + SGST apply');
+
+  //     this.showCGST = true;
+  //     this.showSGST = true;
+  //     this.showGST = false;
+
+  //     //  Split GST into CGST + SGST
+  //     const half = sessionGst / 2;
+
+  //     // Update all grid rows
+  //     this.mainGridData?.forEach((row: any) => {
+  //       row.CGST = half;
+  //       row.SGST = half;
+  //       row.GST = 0; // GST becomes zero in same-state case
+  //     });
+  //   } else {
+  //     console.log('States DIFFERENT → GST applies');
+
+  //     this.showGST = true;
+  //     this.showCGST = false;
+  //     this.showSGST = false;
+
+  //     // ⭐ GST only
+  //     this.mainGridData?.forEach((row: any) => {
+  //       row.GST = sessionGst;
+  //       row.CGST = 0;
+  //       row.SGST = 0;
+  //     });
+  //   }
+  //   this.selectedSupplier = selectedSupplier;
+
+  //   if (selectedSupplier) {
+  //     this.purchaseInvoiceFormData.SUPPPLIER_NAME =
+  //       selectedSupplier.DESCRIPTION;
+  //   } else {
+  //     this.purchaseInvoiceFormData.SUPPPLIER_NAME = '';
+  //   }
+
+  //   console.log('Selected Supplier:', selectedSupplier);
+  // }
+
   onSupplierChanged(event: any) {
-    this.selectedSupplierId = event.value;
-    const selectedSupplier = this.distributorList.find(
-      (supplier: any) => supplier.ID === this.selectedSupplierId
-    );
+    const newSupplierId = event.value;
 
-    const company = this.companyState?.trim().toLowerCase();
-    console.log(company);
-    const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
-    console.log(supplier);
-    const sessionGst = parseFloat(this.GST) || 0; // main GST%
-    console.log(sessionGst);
+    // Supplier changed → clear grid
+    if (this.selectedSupplierId && this.selectedSupplierId !== newSupplierId) {
+      this.clearGridAndChangeSupplier(newSupplierId);
+      return;
+    }
 
-    if (company === supplier) {
-      console.log('Both states SAME → CGST + SGST apply');
+    // First-time selection
+    this.applySupplierChange(newSupplierId);
+  }
 
+  updateGstColumnVisibility() {
+    const companyState = this.companyState?.trim().toLowerCase();
+    const supplierState =
+      this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+    if (!companyState || !supplierState) {
+      // Hide all if state info not ready
+      this.showGST = false;
+      this.showCGST = false;
+      this.showSGST = false;
+      return;
+    }
+
+    if (companyState === supplierState) {
+      // ✅ SAME STATE → CGST + SGST
       this.showCGST = true;
       this.showSGST = true;
       this.showGST = false;
-
-      //  Split GST into CGST + SGST
-      const half = sessionGst / 2;
-
-      // Update all grid rows
-      this.mainGridData?.forEach((row: any) => {
-        row.CGST = half;
-        row.SGST = half;
-        row.GST = 0; // GST becomes zero in same-state case
-      });
     } else {
-      console.log('States DIFFERENT → GST applies');
-
+      // ✅ DIFFERENT STATE → IGST
       this.showGST = true;
       this.showCGST = false;
       this.showSGST = false;
-
-      // ⭐ GST only
-      this.mainGridData?.forEach((row: any) => {
-        row.GST = sessionGst;
-        row.CGST = 0;
-        row.SGST = 0;
-      });
     }
+
+    // 🔴 IMPORTANT: force grid to redraw columns
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.repaint();
+    }, 0);
+  }
+
+  applySupplierChange(supplierId: any) {
+    this.selectedSupplierId = supplierId;
+
+    this.mainGridData = [];
+    this.itemsGridRef?.instance?.refresh();
+
+    // Reset GST visibility
+    this.showGST = false;
+    this.showCGST = false;
+    this.showSGST = false;
+
+    // Reset totals
+    this.totalAmount = 0;
+    this.taxAmount = 0;
+    this.grandTotal = 0;
+    this.netAmount = '0.00';
+
+    // Load supplier details again
+    const selectedSupplier = this.distributorList.find(
+      (s: any) => s.ID === supplierId
+    );
+
     this.selectedSupplier = selectedSupplier;
+    this.purchaseInvoiceFormData.SUPPPLIER_NAME =
+      selectedSupplier?.DESCRIPTION || '';
+    this.updateGstColumnVisibility();
+    // Load GRNs only when popup opens (recommended)
+  }
+  clearGridAndChangeSupplier(newSupplierId: any) {
+    this.mainGridData = [];
+    this.itemsGridRef?.instance?.clearSelection();
+    this.itemsGridRef?.instance?.refresh();
 
-    if (selectedSupplier) {
-      this.purchaseInvoiceFormData.SUPPPLIER_NAME =
-        selectedSupplier.DESCRIPTION;
-    } else {
-      this.purchaseInvoiceFormData.SUPPPLIER_NAME = '';
-    }
-
-    console.log('Selected Supplier:', selectedSupplier);
+    this.applySupplierChange(newSupplierId);
   }
 
   calculateGstAmount = (row: any) => {

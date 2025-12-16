@@ -291,21 +291,6 @@ export class EditCustomerReceiptComponent {
     });
   }
 
-  // getCompanyListDropdown() {
-  //   this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
-  //     this.distributorList = response;
-  //     console.log(this.distributorList, 'distributorList');
-
-  //     // Set selectedDistributorId only after distributorList is loaded
-  //     if (
-  //       this.customerType === 'Dealer' &&
-  //       this.receiprtFormData?.DISTRIBUTOR_ID
-  //     ) {
-  //       this.selectedDistributorId = this.receiprtFormData.DISTRIBUTOR_ID;
-  //     }
-  //   });
-  // }
-
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {

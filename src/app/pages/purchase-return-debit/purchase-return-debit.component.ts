@@ -128,6 +128,7 @@ export class PurchaseReturnDebitComponent {
   isViewPurchaseReturn: boolean;
   selectedPurchaseReturn: any;
   isReadOnlyPurchaseReturn: boolean;
+  companyID: any;
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -148,6 +149,7 @@ export class PurchaseReturnDebitComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}'
     );
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
@@ -172,30 +174,41 @@ export class PurchaseReturnDebitComponent {
   }
 
   getpurchaseReturnList() {
-    this.dataService.getPurchaseReturnMainList().subscribe((response: any) => {
-      this.purchaseReturnList = response.Data.map((item: any) => {
-        let dateValue: Date;
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService
+      .getPurchaseReturnMainList(payload)
+      .subscribe((response: any) => {
+        this.purchaseReturnList = response.Data.map((item: any) => {
+          let dateValue: Date;
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.RET_DATE))) {
-          dateValue = new Date(item.RET_DATE);
-        } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.RET_DATE);
-        }
+          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
+          if (!isNaN(Date.parse(item.RET_DATE))) {
+            dateValue = new Date(item.RET_DATE);
+          } else {
+            // Case 2: If backend gives dd-MM-yyyy format
+            dateValue = this.parseDateString(item.RET_DATE);
+          }
 
-        return {
-          ...item,
-          RET_DATE: dateValue,
-        };
-      }).sort((a: any, b: any) => {
-        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-        return numB - numA; // descending order
+          return {
+            ...item,
+            RET_DATE: dateValue,
+          };
+        }).sort((a: any, b: any) => {
+          const extractRunningNo = (docNo: string): number => {
+            if (!docNo) return 0;
+
+            // Matches PR0023 → 0023
+            const match = docNo.match(/PR(\d+)$/);
+            return match ? Number(match[1]) : 0;
+          };
+
+          return extractRunningNo(b.DOC_NO) - extractRunningNo(a.DOC_NO);
+        });
+
+        this.applyDateFilter();
       });
-
-      this.applyDateFilter();
-    });
   }
 
   refreshGrid() {

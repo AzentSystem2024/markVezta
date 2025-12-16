@@ -103,7 +103,8 @@ export class AccountsListComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
-    onExporting(event: any) {
+  companyID: any;
+  onExporting(event: any) {
     const fileName = 'ChartOfAccounts';
     this.dataService.exportDataGrid(event, fileName);
   }
@@ -119,6 +120,7 @@ export class AccountsListComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}'
     );
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuGroups);
@@ -205,7 +207,10 @@ export class AccountsListComponent {
     this.accountsGroupList = new DataSource({
       load: () =>
         new Promise((resolve, reject) => {
-          this.dataService.getAccountGroupHeadList().subscribe({
+          const payload = {
+            COMPANY_ID: this.companyID,
+          };
+          this.dataService.getAccountGroupHeadList(payload).subscribe({
             next: (response: any) => {
               if (response?.Data && Array.isArray(response.Data)) {
                 // Sort data by ID (descending)

@@ -156,6 +156,8 @@ export class PurchaseReturnDebitFormComponent {
   totalAmount: any;
   taxAmount: any;
   grandTotal: any;
+  userID: any;
+  finID: any;
 
   constructor(
     private dataService: DataService,
@@ -215,11 +217,12 @@ export class PurchaseReturnDebitFormComponent {
 
     const userData = JSON.parse(userDataString);
     const selectedCompany = userData.SELECTED_COMPANY;
-
+    console.log(userData, 'USERDATAAAAAAAAAAAAAAA');
     // ⭐ SINGLE SOURCE OF TRUTH
     this.selectedCompanyId = selectedCompany.COMPANY_ID;
     this.companyStateId = selectedCompany.STATE_ID;
-
+    this.userID = userData.USER_ID;
+    this.finID = userData.FINANCIAL_YEARS[0].FIN_ID;
     this.purchaseReturnFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
     this.companyList = [selectedCompany];
 
@@ -368,7 +371,10 @@ export class PurchaseReturnDebitFormComponent {
       return;
     }
 
-    const payload = { SUPP_ID: this.selectedSupplierId };
+    const payload = {
+      SUPP_ID: this.selectedSupplierId,
+      COMPANY_ID: this.selectedCompanyId,
+    };
 
     this.dataService
       .getPendingInvoicesForReturn(payload)
@@ -641,7 +647,7 @@ export class PurchaseReturnDebitFormComponent {
     this.purchaseReturnFormData.RETURN_AMOUNT = totalNet;
     this.purchaseReturnFormData.COMPANY_ID =
       this.purchaseReturnFormData.COMPANY_ID;
-    this.purchaseReturnFormData.FIN_ID = this.purchaseReturnFormData.FIN_ID;
+    this.purchaseReturnFormData.FIN_ID = this.finID;
     this.purchaseReturnFormData.USER_ID = this.purchaseReturnFormData.USER_ID;
     this.purchaseReturnFormData.RET_DATE = this.toDateOnlyString(
       this.purchaseReturnFormData.RET_DATE
@@ -1070,7 +1076,7 @@ export class PurchaseReturnDebitFormComponent {
 
   resetPurchaseReturnForm() {
     this.purchaseReturnFormData = {
-      COMPANY_ID: 0,
+      COMPANY_ID: this.selectedCompanyId,
       STORE_ID: 0,
       RET_DATE: new Date(),
       SUPP_ID: 0,
@@ -1080,7 +1086,7 @@ export class PurchaseReturnDebitFormComponent {
       GROSS_AMOUNT: 0,
       VAT_AMOUNT: 0,
       NET_AMOUNT: 0,
-      USER_ID: 0,
+      USER_ID: this.userID,
       NARRATION: '',
       CURRENCY_SYMBOL: '',
       PurchDetail: [], // ✔ empty detail list
@@ -1098,7 +1104,7 @@ export class PurchaseReturnDebitFormComponent {
     this.pendingList = []; // ✔ clear pending list
 
     this.isApproved = false; // ✔ reset approve checkbox
-
+    this.getDocNo();
     // Ensure UI updates
     this.cdr.detectChanges();
   }
