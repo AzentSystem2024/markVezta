@@ -370,9 +370,9 @@ export class GrnComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     this.sessionData_tax();
     this.getGrnLogData();
     this.getTemplateList();
-    this.sessionData_tax();
     this.getDocNo();
   }
   onEditingRow(event): void {

@@ -446,7 +446,10 @@ export class PurchaseOrderComponent {
   }
 
   getPurchaseOrderList() {
-    this.service.getPurchaseOrderList().subscribe((res) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    }
+    this.service.getPurchaseOrderList(payload).subscribe((res) => {
       this.dataSource = [...res.data].reverse();
     });
   }

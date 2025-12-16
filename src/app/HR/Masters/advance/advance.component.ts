@@ -318,7 +318,12 @@ onPaymentModeChanged(e: any) {
 
   get_advance_list(filterBy: string = 'all') {
     this.isLoading = true;
-    this.dataService.Get_Api_advance().subscribe((res: any) => {
+    const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    FILTER: filterBy   // optional, if backend supports it
+  };
+
+    this.dataService.Get_Api_advance(payload).subscribe((res: any) => {
       let data = res.data;
       console.log(data);
 

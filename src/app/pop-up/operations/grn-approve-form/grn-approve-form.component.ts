@@ -301,7 +301,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
   // }
 
   getPODetails(poId: any) {
-    this.service.getGrnPoDetails(poId).subscribe((res: any) => {
+    this.service.getGrnPoDetails(poId, this.selected_Company_id).subscribe((res: any) => {
       console.log(res, 'res');
       this.poDetails = res.Podetails.map((item: any, index: number) => ({
         ...item,

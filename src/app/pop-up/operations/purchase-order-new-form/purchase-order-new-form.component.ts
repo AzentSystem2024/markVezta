@@ -687,7 +687,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   loadPurchaseOrders(itemId: string) {
-    this.service.getLast5PoItemsList(itemId).subscribe((data: any[]) => {
+    this.service.getLast5PoItemsList(itemId,this.selected_Company_id).subscribe((data: any[]) => {
       // Filter out records where PO_NO matches this.newPOData.PO_NO
       this.purchaseOrders = data
         .filter((po) => po.PO_NO !== this.newPoData.PO_NO)

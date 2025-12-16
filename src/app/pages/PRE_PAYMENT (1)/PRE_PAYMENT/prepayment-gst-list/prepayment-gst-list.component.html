@@ -28,7 +28,7 @@
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
       [groupPanel]="{ visible: true }"
-       (onExporting)="onExporting($event)"
+      (onExporting)="onExporting($event)"
       [grouping]="{ autoExpandAll: false }"
       (onEditingStart)="onEditingStart($event)"
       (onRowRemoving)="DeletePrePayment($event)"
@@ -40,11 +40,11 @@
       ></dxo-editing>
 
       <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
 
       <dxo-paging [pageSize]="20"></dxo-paging>
       <dxo-pager
@@ -88,11 +88,11 @@
           }"
         ></dxi-item>
 
-          <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="custom-export-button"
-      ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="custom-export-button"
+        ></dxi-item>
 
         <dxi-item
           *ngIf="canAdd"
@@ -111,7 +111,7 @@
       ></dxo-grouping>
       <!-- <dxi-column dataField="TRANS_ID" caption="Trans ID"></dxi-column> -->
       <dxi-column
-        dataField="VOUCHER_NO"
+        dataField="DOC_NO"
         caption="Invoice No."
         alignment="left"
       ></dxi-column>

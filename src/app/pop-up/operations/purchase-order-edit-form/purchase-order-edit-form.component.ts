@@ -70,6 +70,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   GST: any;
   hsnLoaded: boolean;
   transID: any;
+  selected_Company_id: any;
 
   constructor(private service: DataService, private router: Router) {
     const userRights = sessionStorage.getItem('menuUserRightsResponse');
@@ -359,6 +360,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       this.GST_PERC,
       '===========selected GST PERC==================='
     );
+     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   ngOnInit() {
@@ -827,8 +829,10 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     this.loadPurchaseOrders(itemId);
   }
 
+
+
   loadPurchaseOrders(itemId: string) {
-    this.service.getLast5PoItemsList(itemId).subscribe((data: any[]) => {
+    this.service.getLast5PoItemsList(itemId,this.selected_Company_id).subscribe((data: any[]) => {
       // Filter out records where PO_NO matches this.newPOData.PO_NO
       this.purchaseOrders = data
         .filter((po) => po.PO_NO !== this.newPoData.PO_NO)

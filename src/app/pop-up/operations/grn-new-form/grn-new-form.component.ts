@@ -81,6 +81,7 @@ export class GrnNewFormComponent implements OnInit {
   grnData: any = {
     GRN_DATE: new Date(),
     COMPANY_ID: 0,
+    DOC_NO: '',
     USER_ID: 1,
     STORE_ID: '',
     PO_ID: 0,
@@ -249,7 +250,7 @@ export class GrnNewFormComponent implements OnInit {
   }
 
   getPODetails(poId: any) {
-    this.service.getGrnPoDetails(poId).subscribe((res: any) => {
+    this.service.getGrnPoDetails(poId, this.selected_Company_id).subscribe((res: any) => {
       console.log(res, 'res');
 
       // Populate poDetails with dynamic SL_NO and other calculations

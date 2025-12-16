@@ -925,8 +925,9 @@ export class DataService {
   }
 
   //PURCHASE INVOICE
-  getPurchaseInvoiceList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}PurchaseInvoice/list`, {});
+  getPurchaseInvoiceList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PurchaseInvoice/list`, data);
   }
 
   selectPurchaseInvoice(id: number) {
@@ -1090,9 +1091,10 @@ export class DataService {
   }
 
   //  ========PrePayment===============
-  get_PrePayment_List() {
+  get_PrePayment_List(items:any) {
+    const data = items;
     const getEndpoint = `${this.apiUrl}PrePayment/list`;
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, data);
   }
 
   ExxpenseLedger_Dropdown() {
@@ -1138,9 +1140,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
 
-  get_PDC_List() {
+  get_PDC_List(items:any) {
+    const data = items;
     const getEndpoint = `${this.apiUrl}PDC/list`;
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, data);
   }
 
   Insert_PDC(payload) {
@@ -3453,8 +3456,9 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
-  public getPurchaseOrderList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}purchaseorder/list`, {});
+  public getPurchaseOrderList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}purchaseorder/list`, data);
   }
 
   savePoData(items: Object): Observable<any> {
@@ -3462,8 +3466,8 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}purchaseorder/insert`, data);
   }
 
-  public getLast5PoItemsList(value: any): Observable<any> {
-    const reqBodyData = { ITEM_ID: value };
+  public getLast5PoItemsList(value: any,companyId: any): Observable<any> {
+    const reqBodyData = { ITEM_ID: value,COMPANY_ID: companyId };
     return this.http.post(`${this.apiUrl}purchaseorder/itemlist`, reqBodyData);
   }
 
@@ -3527,8 +3531,8 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
-  public getGrnPoDetails(id: any): Observable<any> {
-    const reqBodyData = { PO_ID: id };
+  public getGrnPoDetails(id: any,companyId: any): Observable<any> {
+    const reqBodyData = { PO_ID: id,COMPANY_ID: companyId };
     return this.http.post(`${this.apiUrl}grn/polist`, reqBodyData);
   }
 
@@ -4186,8 +4190,9 @@ The result can be exported to HTML or Markdown.`;
 
   //========================get advance======================
 
-  Get_Api_advance() {
-    return this.http.post(`${this.apiUrl}Advance/list`, {});
+  Get_Api_advance(items:any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Advance/list`, data);
   }
 
   //=============================employee dropdown============
