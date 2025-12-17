@@ -316,10 +316,37 @@ export class AddSupplierPaymentComponent {
     });
   }
 
+  // onReceiptModeChange(e: any) {
+  //   this.receiptMode = e.value;
+  //   this.applyReceiptModeFilter();
+  // }
+
   onReceiptModeChange(e: any) {
-    this.receiptMode = e.value;
+    const newMode = e.value;
+
+    // If mode is actually changed
+    if (this.receiptMode !== newMode) {
+      this.clearBankAndPdcFields();
+    }
+
+    this.receiptMode = newMode;
     this.applyReceiptModeFilter();
   }
+
+  clearBankAndPdcFields() {
+    this.paymentFormData.CHEQUE_NO = '';
+    this.paymentFormData.CHEQUE_DATE = null;
+    this.paymentFormData.BANK_NAME = '';
+    this.paymentFormData.AMOUNT = null;
+    this.paymentFormData.PDC_ID = 0;
+
+    // Optional but safer
+    this.paymentFormData.PAY_HEAD_ID = null;
+
+    // Close PDC popup if open
+    this.pdcPopupVisible = false;
+  }
+
   applyReceiptModeFilter() {
     console.log(
       this.filteredLedgerList,
@@ -474,8 +501,9 @@ export class AddSupplierPaymentComponent {
   }
 
   handleCancel() {
-    this.resetForm();
     this.popupClosed.emit();
+    this.resetForm();
+
     this.resetFillAmountForm();
     this.showFillAmountPopup = false;
   }

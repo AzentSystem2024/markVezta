@@ -147,7 +147,13 @@ export class EditPurchaseInvoiceComponent {
       this.purchaseInvoiceFormData = this.invoiceFormData;
 
       // Load grid data
-      this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
+      // this.mainGridData = this.purchaseInvoiceFormData.PurchDetails;
+      this.mainGridData = (this.purchaseInvoiceFormData.PurchDetails || []).map(
+        (row: any) => ({
+          ...row,
+          GRN_DATE: row.GRN_DATE ? new Date(row.GRN_DATE) : null,
+        })
+      );
 
       // Get company and supplier state names
       const companyState = this.companyState?.trim().toLowerCase();
@@ -324,7 +330,7 @@ export class EditPurchaseInvoiceComponent {
 
   validateQuantity = (e: any) => {
     const quantity = e.value;
-    const pendingQty = e.data?.PO_QUANTITY ?? 0;
+    const pendingQty = e.data?.PENDING_QTY ?? 0;
     return quantity <= pendingQty;
   };
 
@@ -402,27 +408,42 @@ export class EditPurchaseInvoiceComponent {
     return (parseFloat(row.RATE) || 0) * (parseFloat(row.QUANTITY) || 0);
   };
 
-  // calculateGstAmount = (row: any) => {
-  //   const amt = this.calculateAmount(row);
-  //   const vatPerc = parseFloat(row.VAT_PERC) || 0;
-  //   return amt * (vatPerc / 100);
-  // };
+  applyGstLogic(row: any) {
+    const company = this.companyState?.trim().toLowerCase();
+    const supplier =
+      this.purchaseInvoiceFormData?.SUPP_STATE_NAME?.trim().toLowerCase();
 
-  // calculateTotal = (row: any) => {
-  //   return this.calculateAmount(row) + this.calculateGstAmount(row);
-  // };
+    const sessionGst = parseFloat(this.GST) || 0;
+
+    if (company === supplier) {
+      // SAME STATE → CGST + SGST
+      const half = sessionGst / 2;
+
+      row.CGST = half;
+      row.SGST = half;
+      row.GST = 0;
+      row.VAT_PERC = sessionGst;
+    } else {
+      // DIFFERENT STATE → IGST
+      row.GST = sessionGst;
+      row.CGST = 0;
+      row.SGST = 0;
+      row.VAT_PERC = sessionGst;
+    }
+
+    return row;
+  }
 
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
 
     if (selectedRows && selectedRows.length > 0) {
       selectedRows.forEach((row) => {
-        // Optional: Check for duplicates based on GRN_ID or GRN_NO
         const exists = this.mainGridData.some(
           (item) => item.GRN_DET_ID === row.GRN_DET_ID
         );
+
         if (!exists) {
-          // Add row into mainGridData
           const newRow: any = {
             GRN_ID: row.GRN_ID,
             ITEM_ID: row.ITEM_ID,
@@ -430,60 +451,117 @@ export class EditPurchaseInvoiceComponent {
             COST: row.COST,
             GRN_DET_ID: row.GRN_DET_ID,
             UOM: row.UOM,
-            TRANSFER_NO: row.GRN_NO,
-            TRANSFER_DATE: row.GRN_DATE,
+            GRN_NO: row.GRN_NO,
+            GRN_DATE: row.GRN_DATE ? new Date(row.GRN_DATE) : null,
             ITEM_NAME: row.ITEM_NAME,
             PENDING_QTY: row.PENDING_QTY,
             QUANTITY: 0,
             RATE: row.RATE,
-            TAX_AMOUNT: 0,
             AMOUNT: 0,
+            TAX_AMOUNT: 0,
             TOTAL_AMOUNT: 0,
             HSN_CODE: this.HSNCODE,
             VAT_PERC: this.GST,
-            SGST: 0,
             CGST: 0,
+            SGST: 0,
+            GST: 0,
           };
-          console.log(newRow);
-          // -----------------------------------------
-          // ✅ ADDING GST / CGST / SGST LOGIC HERE
-          // -----------------------------------------
-          const sessionGst = parseFloat(this.GST) || 0;
-          const company = this.companyState?.trim().toLowerCase();
-          const customer = this.purchaseInvoiceFormData?.SUPPPLIER_NAME
-            ? this.selectedSupplier?.STATE_NAME?.trim().toLowerCase()
-            : null;
 
-          console.log(sessionGst, 'sesssionGST');
-          console.log(company, 'company');
-          console.log(customer, 'customer');
-          if (company === customer) {
-            // Same state → CGST + SGST
-            const half = sessionGst / 2;
-            newRow.CGST = half;
-            newRow.SGST = half;
-            newRow.GST = 0;
-          } else {
-            // Different state → GST only
-            newRow.GST = sessionGst;
-            newRow.CGST = 0;
-            newRow.SGST = 0;
-          }
-          // -----------------------------------------
+          // ✅ APPLY GST LOGIC HERE (THIS FIXES YOUR ISSUE)
+          this.applyGstLogic(newRow);
 
           this.mainGridData.push(newRow);
         }
       });
 
-      this.itemsGridRef.instance.refresh(); // Refresh main grid
-      setTimeout(() => {
-        const lastRowIndex = this.mainGridData.length - 1;
-        this.itemsGridRef.instance.editCell(lastRowIndex, 'QUANTITY');
-      }, 100);
+      // VERY IMPORTANT
+      this.itemsGridRef.instance.refresh(true);
+      this.logGridSummaries();
     }
 
-    this.isTrOutPopupVisible = false; // Close popup
+    this.isTrOutPopupVisible = false;
+
+    // Auto-focus Qty
+    setTimeout(() => {
+      const lastIndex = this.mainGridData.length - 1;
+      if (lastIndex >= 0) {
+        this.itemsGridRef.instance.editCell(lastIndex, 'QUANTITY');
+      }
+    }, 100);
   }
+
+  // onTransferSelectClick() {
+  //   const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+
+  //   if (selectedRows && selectedRows.length > 0) {
+  //     selectedRows.forEach((row) => {
+  //       // Optional: Check for duplicates based on GRN_ID or GRN_NO
+  //       const exists = this.mainGridData.some(
+  //         (item) => item.GRN_DET_ID === row.GRN_DET_ID
+  //       );
+  //       if (!exists) {
+  //         // Add row into mainGridData
+  //         const newRow: any = {
+  //           GRN_ID: row.GRN_ID,
+  //           ITEM_ID: row.ITEM_ID,
+  //           PO_DET_ID: row.PO_DET_ID,
+  //           COST: row.COST,
+  //           GRN_DET_ID: row.GRN_DET_ID,
+  //           UOM: row.UOM,
+  //           GRN_NO: row.GRN_NO,
+  //           GRN_DATE: row.GRN_DATE ? new Date(row.GRN_DATE) : null,
+  //           ITEM_NAME: row.ITEM_NAME,
+  //           PENDING_QTY: row.PENDING_QTY,
+  //           QUANTITY: 0,
+  //           RATE: row.RATE,
+  //           TAX_AMOUNT: 0,
+  //           AMOUNT: 0,
+  //           TOTAL_AMOUNT: 0,
+  //           HSN_CODE: this.HSNCODE,
+  //           VAT_PERC: this.GST,
+  //           SGST: 0,
+  //           CGST: 0,
+  //         };
+  //         console.log(newRow);
+  //         // -----------------------------------------
+  //         // ✅ ADDING GST / CGST / SGST LOGIC HERE
+  //         // -----------------------------------------
+  //         const sessionGst = parseFloat(this.GST) || 0;
+  //         const company = this.companyState?.trim().toLowerCase();
+  //         const customer = this.purchaseInvoiceFormData?.SUPPPLIER_NAME
+  //           ? this.selectedSupplier?.STATE_NAME?.trim().toLowerCase()
+  //           : null;
+
+  //         console.log(sessionGst, 'sesssionGST');
+  //         console.log(company, 'company');
+  //         console.log(customer, 'customer');
+  //         // if (company === customer) {
+  //         //   // Same state → CGST + SGST
+  //         //   const half = sessionGst / 2;
+  //         //   newRow.CGST = half;
+  //         //   newRow.SGST = half;
+  //         //   newRow.GST = 0;
+  //         // } else {
+  //         //   // Different state → GST only
+  //         //   newRow.GST = sessionGst;
+  //         //   newRow.CGST = 0;
+  //         //   newRow.SGST = 0;
+  //         // }
+  //         // -----------------------------------------
+
+  //         this.mainGridData.push(newRow);
+  //       }
+  //     });
+
+  //     this.itemsGridRef.instance.refresh(); // Refresh main grid
+  //     setTimeout(() => {
+  //       const lastRowIndex = this.mainGridData.length - 1;
+  //       this.itemsGridRef.instance.editCell(lastRowIndex, 'QUANTITY');
+  //     }, 100);
+  //   }
+
+  //   this.isTrOutPopupVisible = false; // Close popup
+  // }
 
   getPurchNo() {
     this.dataService.getPurchaseNo().subscribe((response: any) => {
@@ -576,8 +654,8 @@ export class EditPurchaseInvoiceComponent {
           STORE_NAME: '',
           ITEM_NAME: '',
           ITEM_CODE: '',
-          PO_QUANTITY: 1,
-          GRN_QUANTITY: 1,
+          PENDING_QTY: 0,
+          GRN_QUANTITY: 0,
           NARRATION: this.purchaseInvoiceFormData.NARRATION,
           SGST: item.SGST,
           CGST: item.CGST,

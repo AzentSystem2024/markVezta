@@ -129,6 +129,7 @@
                     hint="New Row"
                     [elementAttr]="{ class: 'small-btn' }"
                     (onClick)="onAddRow()"
+                    [disabled]="isReadOnlyMode"
                   ></dx-button>
                 </div>
               </div>
@@ -337,6 +338,7 @@
           <dxi-column
             dataField="QTY"
             caption="Quantity"
+            dataType="number"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
 

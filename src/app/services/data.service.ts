@@ -89,8 +89,8 @@ export class DataService {
     );
   }
 
-  getAccountGroupHeadList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}listGroupHead/list`, {});
+  getAccountGroupHeadList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}listGroupHead/list`, data);
   }
   getActiveLedger(): Observable<any> {
     return this.http.post(`${this.apiUrl}accountHead/getlist`, {});
@@ -418,8 +418,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}AC_CreditNote/invoicelist`, payload);
   }
   //--------------------------PURCHASE-RETURN-DEBIT-------------------------------------//
-  getPurchaseReturnMainList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}PurchaseReturn/list`, {});
+  getPurchaseReturnMainList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}PurchaseReturn/list`, data);
   }
   getPendingInvoicesForReturn(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseReturn/pendinglist`, data);
@@ -632,8 +632,8 @@ export class DataService {
   getCatSizeList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Salesorder/catsize`, data);
   }
-  getSalesOrderMainList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}SalesOrder/list`, {});
+  getSalesOrderMainList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}SalesOrder/list`, data);
   }
 
   getQuotationListForSalesOrder(data: any): Observable<any> {

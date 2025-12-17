@@ -446,40 +446,93 @@ export class EditInvoiceComponent {
     this.isTrOutPopupVisible = true;
   }
 
+  // onTransferSelectClick() {
+  //   const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+
+  //   if (!selectedRows || selectedRows.length === 0) {
+  //     return;
+  //   }
+
+  //   // Initialize mainInvoiceGridList if null
+  //   if (!this.mainInvoiceGridList) {
+  //     this.mainInvoiceGridList = [];
+  //   }
+
+  //   // Get existing IDs to avoid duplicates
+  //   const existingTransferIds = this.mainInvoiceGridList.map(
+  //     (item: any) => item.DN_DETAIL_ID
+  //   );
+
+  //   // Only add new unique rows
+  //   const newRows = selectedRows.filter(
+  //     (row: any) => !existingTransferIds.includes(row.DN_DETAIL_ID)
+  //   );
+  //   newRows.forEach((row: any) => {
+  //     row.HSN_CODE = this.HSNCODE;
+  //     row.GST = this.GST;
+  //     // or whatever your login session variable is
+  //   });
+  //   // ✅ Mutate the existing array (DON'T reassign!)
+  //   this.mainInvoiceGridList.push(...newRows);
+
+  //   // ✅ Close popup
+  //   this.isTrOutPopupVisible = false;
+
+  //   // Optional: Trigger manual change detection if needed
+  //   this.cdr.detectChanges();
+  // }
+
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+    if (!selectedRows || selectedRows.length === 0) return;
 
-    if (!selectedRows || selectedRows.length === 0) {
-      return;
-    }
-
-    // Initialize mainInvoiceGridList if null
     if (!this.mainInvoiceGridList) {
       this.mainInvoiceGridList = [];
     }
 
-    // Get existing IDs to avoid duplicates
-    const existingTransferIds = this.mainInvoiceGridList.map(
+    const existingIds = this.mainInvoiceGridList.map(
       (item: any) => item.DN_DETAIL_ID
     );
 
-    // Only add new unique rows
-    const newRows = selectedRows.filter(
-      (row: any) => !existingTransferIds.includes(row.DN_DETAIL_ID)
-    );
-    newRows.forEach((row: any) => {
-      row.HSN_CODE = this.HSNCODE;
-      row.GST = this.GST;
-      // or whatever your login session variable is
-    });
-    // ✅ Mutate the existing array (DON'T reassign!)
-    this.mainInvoiceGridList.push(...newRows);
+    const company = this.companyState?.trim().toLowerCase();
+    const customer = this.selectedCustomer?.STATE_NAME?.trim().toLowerCase();
+    const sessionGst = parseFloat(this.GST) || 0;
+    const half = sessionGst / 2;
 
-    // ✅ Close popup
+    selectedRows.forEach((row: any) => {
+      if (existingIds.includes(row.DN_DETAIL_ID)) return;
+
+      const newRow = {
+        ...row,
+        HSN_CODE: this.HSNCODE,
+
+        // 🔥 RESET GST values (important)
+        GST: 0,
+        CGST: 0,
+        SGST: 0,
+      };
+
+      // ✅ APPLY GST LOGIC HERE
+      if (company === customer) {
+        // SAME STATE → CGST + SGST
+        newRow.CGST = half;
+        newRow.SGST = half;
+        newRow.GST = 0;
+      } else {
+        // DIFFERENT STATE → IGST
+        newRow.GST = sessionGst;
+        newRow.CGST = 0;
+        newRow.SGST = 0;
+      }
+
+      this.mainInvoiceGridList.push(newRow);
+    });
+
     this.isTrOutPopupVisible = false;
 
-    // Optional: Trigger manual change detection if needed
-    this.cdr.detectChanges();
+    // Refresh grid & recalc summaries
+    this.itemsGridRef?.instance.refresh();
+    this.logGridSummaries();
   }
 
   cancelPopup() {

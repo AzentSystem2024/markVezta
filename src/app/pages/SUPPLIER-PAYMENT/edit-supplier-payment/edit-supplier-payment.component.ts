@@ -121,6 +121,7 @@ export class EditSupplierPaymentComponent {
   payHeadTouched: boolean;
   voucherNo: any;
   sessionData: any;
+  isInitialLoad = true;
 
   constructor(
     private dataService: DataService,
@@ -196,6 +197,9 @@ export class EditSupplierPaymentComponent {
       }
 
       this.onReceiptModeChange({ value: this.selectedPaymentMode });
+      setTimeout(() => {
+        this.isInitialLoad = false;
+      }, 0);
       if (!this.supplierList || this.supplierList.length === 0) {
         this.getSupplierDropdown();
       }
@@ -207,6 +211,22 @@ export class EditSupplierPaymentComponent {
 
       console.log('SUPP_ID:', this.paymentFormData.SUPP_ID);
     }
+  }
+  clearBankAndPdcFields() {
+    this.chequeNo = '';
+    this.chequeDate = null;
+    this.bank = '';
+
+    this.paymentFormData.PDC_AMOUNT = null;
+    this.paymentFormData.PDC_ID = null;
+
+    this.selectedLedger = null;
+    this.ledger = null;
+
+    this.pdcPopupVisible = false;
+
+    // ensure UI refresh
+    this.paymentFormData = { ...this.paymentFormData };
   }
 
   formatDateToYMD(dateString: string): string {
@@ -231,17 +251,14 @@ export class EditSupplierPaymentComponent {
     return value <= pending;
   };
 
-    sessionData_tax() {
+  sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
-
   getPendingInvoiceList(supplierId: number) {
-    const payload = { SUPP_ID: supplierId,
-      COMPANY_ID: this.selectedCompanyId
-     };
+    const payload = { SUPP_ID: supplierId, COMPANY_ID: this.selectedCompanyId };
 
     this.dataService
       .getPendingInvoiceforSupplierPayment(payload)
@@ -347,9 +364,19 @@ export class EditSupplierPaymentComponent {
   }
 
   onReceiptModeChange(e: any) {
-    this.receiptMode = e.value;
+    const newMode = e.value;
+
+    // ✅ Clear ONLY when user changes mode (not initial binding)
+    if (!this.isInitialLoad && this.receiptMode !== newMode) {
+      this.clearBankAndPdcFields();
+    }
+
+    this.receiptMode = newMode;
+    this.selectedPaymentMode = newMode;
+
     this.applyReceiptModeFilter();
   }
+
   applyReceiptModeFilter() {
     console.log(
       this.filteredLedgerList,
@@ -742,7 +769,9 @@ export class EditSupplierPaymentComponent {
   //   this.paymentDate = new Date();
   // }
 
-  cancel() {}
+  cancel() {
+    this.popupClosed.emit();
+  }
 
   viewPdf(): void {
     console.log(this.supplierPaymentId, 'SUPPLIERPAYMENTIDDDDDDDDDDDDDDDDD');

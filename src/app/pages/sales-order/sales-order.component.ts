@@ -107,6 +107,7 @@ export class SalesOrderComponent {
   selectedSalesOrder: any;
   salesOrderList: any;
   isAddSalesOrder: boolean;
+  companyID: any;
 
   constructor(
     private dataService: DataService,
@@ -120,6 +121,7 @@ export class SalesOrderComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}'
     );
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
@@ -150,28 +152,33 @@ export class SalesOrderComponent {
   }
 
   getsalesOrderList() {
-    this.dataService.getSalesOrderMainList().subscribe((response: any) => {
-      this.salesOrderList = response.Data.sort(
-        (a: any, b: any) => b.ID - a.ID
-      ).map((item: any) => {
-        let dateValue: Date;
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService
+      .getSalesOrderMainList(payload)
+      .subscribe((response: any) => {
+        this.salesOrderList = response.Data.sort(
+          (a: any, b: any) => b.ID - a.ID
+        ).map((item: any) => {
+          let dateValue: Date;
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.SO_DATE))) {
-          dateValue = new Date(item.SO_DATE);
-        } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.SO_DATE);
-        }
+          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
+          if (!isNaN(Date.parse(item.SO_DATE))) {
+            dateValue = new Date(item.SO_DATE);
+          } else {
+            // Case 2: If backend gives dd-MM-yyyy format
+            dateValue = this.parseDateString(item.SO_DATE);
+          }
 
-        return {
-          ...item,
-          SO_DATE: dateValue,
-        };
+          return {
+            ...item,
+            SO_DATE: dateValue,
+          };
+        });
+        // .sort((a: any, b: any) => b.SO_DATE.getTime() - a.SO_DATE.getTime());
+        this.applyDateFilter();
       });
-      // .sort((a: any, b: any) => b.SO_DATE.getTime() - a.SO_DATE.getTime());
-      this.applyDateFilter();
-    });
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
