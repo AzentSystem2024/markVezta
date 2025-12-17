@@ -65,7 +65,7 @@ export class TimesheetListComponent {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
-  CompanyID = 1;
+  // CompanyID = 1;
   selectedRows: any[] = [];
 
   GridSource: any;
@@ -161,6 +161,7 @@ export class TimesheetListComponent {
   selectedYear: number;
   yearSelectorVisible = false;
   years: number[] = [];
+  CompanyID: any;
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
@@ -173,6 +174,7 @@ export class TimesheetListComponent {
     });
     this.selectedYear = this.selectedMonth.getFullYear();
 
+    this.sesstion_Details();
     this.getTimesheet();
     this.getPayTimeEntries();
     this.generateYears();
@@ -195,6 +197,8 @@ export class TimesheetListComponent {
     //     // );
     //   });
   }
+
+
 
   generateYears() {
     const currentYear = new Date().getFullYear();
@@ -520,10 +524,29 @@ export class TimesheetListComponent {
     this.getTimesheet();
   }
 
+  // onSelectionChanged(e: any) {
+  //   this.selectedRows = e.selectedRowKeys;
+  //   console.log('User selected:', this.selectedRows);
+  // }
+
   onSelectionChanged(e: any) {
-    this.selectedRows = e.selectedRowKeys;
-    console.log('User selected:', this.selectedRows);
-  }
+  // ❌ Remove rows where STATUS === 'Approved'
+  const validSelection = e.selectedRowsData.filter(
+    (row: any) => row.STATUS !== 'Approved'
+  );
+
+  // ✅ Reset selection to only valid rows
+  this.selectedRows = validSelection;
+
+  // 🔁 Force grid to reflect corrected selection
+  this.dataGrid.instance.selectRows(
+    validSelection.map((row) => row.ID),
+    false
+  );
+
+  console.log('User selected (filtered):', this.selectedRows);
+}
+
 
   // ApproveBulkRows(){
   //   const payload = {
@@ -544,6 +567,13 @@ export class TimesheetListComponent {
 
   // }
 
+       sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.CompanyID=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.CompanyID,'============selected_Company_id==============')    
+  }
+
   fetchTimesheetList() {
     const payload = {
       CompanyId: this.CompanyID,
@@ -561,6 +591,7 @@ export class TimesheetListComponent {
     });
   }
 
+  
   ApproveBulkRows() {
     // Extract only the numeric IDs from the selected rows
     const selectedIDs = this.selectedRows.map((row) => row.ID);

@@ -68,7 +68,7 @@ export class SalaryHeadAddComponent {
   head_From: boolean = false;
   head_To: boolean = false;
   SalaryHeadData = {
-    COMPANY_ID: 1,
+  
     HEAD_NAME: '',
     PAYSLIP_TITLE: '',
     HEAD_ACTIVE: true,
@@ -108,6 +108,7 @@ export class SalaryHeadAddComponent {
   selectedRows: any[];
   salaryHeadList: any;
   payload: {
+    COMPANY_ID: any;
     HEAD_NATURE: any;
     HEAD_TYPE: any;
     HEAD_NAME: string;
@@ -162,8 +163,8 @@ export class SalaryHeadAddComponent {
       console.log('ac head dropdown', res);
       this.Ac_head_values = res;
     });
+    this.sesstion_Details();
   }
-
   //================disbled================
   //  isAdvanceSelected(): boolean {
   //   console.log(this.selectedPriority, "selectedType");
@@ -447,6 +448,7 @@ export class SalaryHeadAddComponent {
       if (this.SalaryHeadData.HEAD_NATURE === 3) {
         this.payload = {
           ...this.SalaryHeadData,
+           COMPANY_ID : this.selected_Company_id,
           HEAD_NATURE: this.selectedNatureId,
           FIXED_AMOUNT: 0,
           HEAD_TYPE: this.HeadType_value || 1,
@@ -454,7 +456,7 @@ export class SalaryHeadAddComponent {
       } else {
         this.payload = {
           ...this.SalaryHeadData,
-
+         COMPANY_ID : this.selected_Company_id,
           HEAD_NATURE: this.selectedNatureId,
           HEAD_TYPE: this.HeadType_value || 1,
         };
@@ -489,7 +491,7 @@ export class SalaryHeadAddComponent {
 
   resetForm() {
     this.SalaryHeadData = {
-      COMPANY_ID: 1,
+      
       HEAD_NAME: '',
       PAYSLIP_TITLE: '',
       HEAD_ACTIVE: true,

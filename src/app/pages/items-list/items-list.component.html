@@ -16,6 +16,7 @@
   [rowAlternationEnabled]="true"
   rowAlternationInterval="2"
   [showColumnLines]="true"
+  [columnAutoWidth]="true"
 >
   <dxo-paging [pageSize]="10"></dxo-paging>
   <dxo-search-panel
@@ -387,15 +388,15 @@
     [visible]="false"
     [width]="150"
   ></dxi-column>
-  <dxi-column dataField="TYPE_ID" caption="Type" [width]="150">
+  <!-- <dxi-column dataField="TYPE_ID" caption="Type" [width]="150">
     <dxo-lookup
       [dataSource]="itemtype"
       displayExpr="DESCRIPTION"
       valueExpr="ID"
       [visible]="true"
     >
-    </dxo-lookup>
-  </dxi-column>
+    </dxo-lookup> -->
+  <!-- </dxi-column>  -->
   <dxi-column dataField="DEPT_NAME" caption="Department" [width]="150">
   </dxi-column>
   <dxi-column dataField="CAT_ID" caption="Category" [width]="150">
@@ -461,7 +462,7 @@
   titleText="New Items"
   (save)="onClickSaveItems()"
   (closeAndRefresh)="refreshItems()"
-    [showApprove]="false"
+  [showApprove]="false"
 >
   <app-items-form></app-items-form>
 </form-popup>

@@ -337,7 +337,7 @@ console.log(CountryId, 'country id of selected state id')
         console.log(response, 'response++++++++++');
         this.State = response;
         
-      });
+      }); 
   }
 
 // get_State_Dropdown_List() {

@@ -173,6 +173,7 @@ export class PayrollListComponent {
       class: 'year-button',
     },
   };
+  selectedRows: any;
 
   constructor(
     private dataService: DataService,
@@ -301,13 +302,81 @@ export class PayrollListComponent {
     });
   }
 
-  onSelectionChanged(event: any) {
-    const selected = event.selectedRowKeys?.length > 0;
-    this.approveButtonOptions = {
-      ...this.approveButtonOptions,
-      disabled: !selected,
-    };
+  // onSelectionChanged(event: any) {
+  //   const selected = event.selectedRowKeys?.length > 0;
+  //   this.approveButtonOptions = {
+  //     ...this.approveButtonOptions,
+  //     disabled: !selected,
+  //   };
+  // }
+
+//   onSelectionChanged(event: any) {
+//   // Get selected row data safely
+//   const selectedRowsData = event.selectedRowsData || [];
+//   console.log('Selected Rows Data:', selectedRowsData);
+
+//   // ❌ Check if any selected row is Approved
+//   const hasApprovedRow = selectedRowsData.some(
+//     (row: any) => row.STATUS === 'Approved'
+//   );
+//   console.log('Has Approved Row:', hasApprovedRow);
+//   // ✅ Enable approve button ONLY if:
+//   // - at least one row selected
+//   // - NO approved rows selected
+//   const enableApprove =
+//     selectedRowsData.length > 0 && !hasApprovedRow;
+//     console.log('Enable Approve Button:', enableApprove);
+
+//   this.approveButtonOptions = {
+//     ...this.approveButtonOptions,
+//     disabled: !enableApprove,
+//   };
+// }
+
+// onSelectionChanged(event: any) {
+//   const selectedRowsData = event.selectedRowsData || [];
+// console.log('Selected Rows Data:', selectedRowsData);
+//   const hasApprovedRow = selectedRowsData.some(
+//     (row: any) => row.STATUS === 'Approved'
+//   );
+//   console.log('Has Approved Row:', hasApprovedRow);
+
+//   const enableApprove =
+//     selectedRowsData.length > 0 && !hasApprovedRow;
+// console.log('Enable Approve Button:', enableApprove);
+
+//   // ✅ ONLY toggle disabled flag (DO NOT recreate object)
+//   this.approveButtonOptions.disabled = !enableApprove;
+// }
+
+onSelectionChanged(event: any) {
+  const selectedRowsData = event.selectedRowsData || [];
+
+  // ❌ Remove rows where STATUS === 'Approved'
+  const validSelection = selectedRowsData.filter(
+    (row: any) => row.STATUS !== 'Approved'
+  );
+
+  // 🔁 Force grid to keep only valid selections
+  if (validSelection.length !== selectedRowsData.length) {
+    this.dataGrid.instance.selectRows(
+      validSelection.map((row) => row.ID),
+      false
+    );
   }
+
+  // ✅ Update selectedRows with valid rows only
+  this.selectedRows = validSelection;
+
+  // ✅ Enable approve button only if valid rows exist
+  const enableApprove = validSelection.length > 0;
+  this.approveButtonOptions.disabled = !enableApprove;
+
+  console.log('Selected Rows (filtered):', this.selectedRows);
+  console.log('Approve Button Enabled:', enableApprove);
+}
+
+
 
   generateYears() {
     const currentYear = new Date().getFullYear();

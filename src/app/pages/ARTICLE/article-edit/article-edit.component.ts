@@ -46,6 +46,7 @@ import { ArticleAddComponent } from '../article-add/article-add.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { ColumnExpressionCollectionHelper } from '@devexpress/analytics-core/queryBuilder-internal';
+import { selected } from '@devexpress/analytics-core/queryBuilder-metadata';
 
 @Component({
   selector: 'app-article-edit',
@@ -103,6 +104,7 @@ export class ArticleEditComponent {
   isDragOver: boolean = false;
   selectedItemId: any;
   selectedUnitsTooltip: string = '';
+  selected_Company_id: any;
 
   constructor(private dataService: DataService) {}
 
@@ -110,6 +112,7 @@ export class ArticleEditComponent {
     if (this.selectedProductionUnitId) {
       this.getLastOrderNo();
     }
+    this.sesstion_Details();
     this.getArticles();
     this.getItems();
   }
@@ -616,6 +619,14 @@ export class ArticleEditComponent {
     console.log('Selected rows:', this.selectedSizeRows);
   }
 
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
+
   updateArticle() {
     if (!this.articleData) {
       console.warn('No article data to update');
@@ -674,6 +685,7 @@ export class ArticleEditComponent {
       ComponentArticleName: this.articleData.ComponentArticleName || '',
       CreatedDate: this.articleData.CreatedDate || new Date().toISOString(),
       BOM: bomGridData,
+      COMPANY_ID : this.selected_Company_id
     };
 
     console.log('Sending update payload:', payload);

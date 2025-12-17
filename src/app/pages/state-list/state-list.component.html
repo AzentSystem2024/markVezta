@@ -8,8 +8,8 @@
     [showBorders]="true"
     [allowColumnReordering]="true"
     [showColumnHeaders]="true"
-      [columnAutoWidth]="true"
-      [allowColumnResizing]="true"
+    [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
     [rowAlternationEnabled]="true"
     [showColumnLines]="true"
     (onEditingStart)="onEditingRow($event)"
@@ -60,7 +60,18 @@
     ></dxo-search-panel> -->
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">State</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          State
+        </div>
       </dxi-item>
       <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
       <dxi-item
@@ -74,7 +85,7 @@
           stylingMode: 'text'
         }"
       ></dxi-item>
-      
+
       <!-- <dxi-item location="after" locateInMenu="auto"> -->
       <dxi-item
         location="after"
@@ -123,13 +134,12 @@
     [(visible)]="isAddStatePopupOpened"
     (save)="onClickSaveState()"
     titleText="New State"
-      [showApprove]="false"
-    
+    [showApprove]="false"
   >
     <app-state-form (formClosed)="CloseEditForm()"></app-state-form>
   </form-popup>
 
-    <dx-popup
+  <dx-popup
     [(visible)]="isEditPopupOpened"
     title="Edit State"
     [height]="'40vh'"
@@ -137,8 +147,8 @@
     (onHiding)="CloseEditForm()"
   >
     <app-state-edit
-    (formClosed)="CloseEditForm()"
-      [selectState]="selectedState"      
+      (formClosed)="CloseEditForm()"
+      [selectState]="selectedState"
     ></app-state-edit>
   </dx-popup>
 </div>

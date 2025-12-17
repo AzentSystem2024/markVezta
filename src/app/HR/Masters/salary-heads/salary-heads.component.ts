@@ -442,6 +442,7 @@ export class SalaryHeadsComponent {
 
   //============================Delete Data ====================
   deleteData(e: any) {
+    
     console.log(e);
         const id = e.data.ID;
 

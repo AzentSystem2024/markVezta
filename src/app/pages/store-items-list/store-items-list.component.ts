@@ -63,6 +63,7 @@ export class StoreItemsListComponent {
   totalRowCount: any;
   filteredStoreList: any[];
   filteredStoreId: any;
+  selected_Company_id: any;
 
   constructor(
     private dataservice: DataService,
@@ -96,6 +97,7 @@ export class StoreItemsListComponent {
     this.getSelectedItemsData(this.selectedData);
 
     // }
+    this.sesstion_Details();
     this.getDepartment();
   }
 
@@ -114,8 +116,10 @@ export class StoreItemsListComponent {
   }
 
   listAllItems() {
-    const payload = {};
-    this.dataservice.getItemsData().subscribe(
+      const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    }
+    this.dataservice.getItemsData(payload).subscribe(
       (items: any) => {
         this.allItems = items.data;
         this.allItemsList = this.allItems;
@@ -195,10 +199,21 @@ export class StoreItemsListComponent {
     });
   }
 
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
+
   listItemsByStoreId(storeId: number) {
     if (storeId == 1) {
-      const payload = {};
-      this.dataservice.getItemsData().subscribe((response: any) => {
+      
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    }
+      this.dataservice.getItemsData(payload).subscribe((response: any) => {
         this.items = response;
         this.itemsList = response.data;
       });

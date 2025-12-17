@@ -87,15 +87,15 @@ export class SupplierFormComponent implements OnInit {
       this.countryCode,
       '===========================country Code============'
     );
-    // this.get_Country_Dropdown_List();
+    this.get_Country_Dropdown_List();
     this.get_State_Dropdown_List();
     this.get_PaymentTerms_Dropdown_List();
     this.sesstion_Details()
     this.sessionData_tax()
-    service.getCountryWithFlags().subscribe((data) => {
-      this.CountryDropdownData = data;
-      console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
-    });
+    // service.getCountryWithFlags().subscribe((data) => {
+    //   this.CountryDropdownData = data;
+    //   console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
+    // });
   }
   newSupplier=this.formSupplierData;
 
@@ -161,7 +161,7 @@ onSelectionChanged(event: any): void {
     // console.log('function working');
 const CountryId = this.formSupplierData?.COUNTRY_ID;
     this.service
-      .get_State_Dropdown_Api('STATE_NAME', this.CountryId)
+      .get_State_Dropdown_Api('STATE_NAME', CountryId)
       .subscribe((response: any) => {
         console.log(response, 'response++++++++++');
         this.State = response;
