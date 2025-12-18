@@ -380,7 +380,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Trout_Invoice/list`, payload);
   }
 
-  getInvoiceMainListTrOut(items:any): Observable<any> {
+  getInvoiceMainListTrOut(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}Trout_Invoice/getlist`, data);
   }
@@ -505,7 +505,7 @@ export class DataService {
   getItemsListForInventory(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Inventory/itemDetails`, payload);
   }
-  getTransferOutForInventoryMainList(items:any): Observable<any> {
+  getTransferOutForInventoryMainList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}TransferOutInv/list`, data);
   }
@@ -539,7 +539,7 @@ export class DataService {
   getItemDetailsForTrInInventory(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}TransferIn/getitem`, payload);
   }
-  getTransferInForInventoryMainList(items:any): Observable<any> {
+  getTransferInForInventoryMainList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}TransferIn/list`, data);
   }
@@ -684,7 +684,7 @@ export class DataService {
     );
   }
   //........................................DELIVERY NOTE............................................//
-  getdeliveryNoteist(items:any): Observable<any> {
+  getdeliveryNoteist(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/list`, data);
   }
@@ -3454,12 +3454,9 @@ The result can be exported to HTML or Markdown.`;
     }
   }
 
-  public getSupplierItemsData(value: any): Observable<any> {
-    const reqBodyData = { SUPP_ID: value };
-    return this.http.post(
-      `${this.apiUrl}purchaseorder/supplierlist`,
-      reqBodyData
-    );
+  public getSupplierItemsData(data: any): Observable<any> {
+    // const reqBodyData = { SUPP_ID: value };
+    return this.http.post(`${this.apiUrl}purchaseorder/supplierlist`, data);
   }
 
   public getPurchaseOrderList(items: any): Observable<any> {
@@ -4184,7 +4181,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=============================Api For salaty Head List================================
-  get_salary_head_list(items:any) {
+  get_salary_head_list(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}SalaryHead/list`, data);
   }

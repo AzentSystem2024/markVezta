@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
+  CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   NgModule,
   NgZone,
@@ -19,6 +20,7 @@ import {
   DxSelectBoxModule,
   DxDataGridComponent,
   DxCheckBoxModule,
+  DxDateBoxModule,
 } from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
 import { FormPopupModule } from 'src/app/components';
@@ -54,6 +56,7 @@ import { confirm } from 'devextreme/ui/dialog';
 export class PurchaseOrderComponent {
   @ViewChild('PurchaseOrderNewFormComponent')
   PurchaseOrderNewFormComponent!: PurchaseOrderNewFormComponent;
+
   isAddPopupOpened: boolean = false;
   isEditPopupOpened: boolean = false;
   isVerifyPopupOpened: boolean = false;
@@ -172,6 +175,19 @@ export class PurchaseOrderComponent {
   HSN_CODE: any;
   docNo: any;
   selected_Company_id: any;
+  dateRanges = [
+    { label: 'Today', value: 'today' },
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
+  ];
+  selectedDateRange: string = 'today';
+  customStartDate: any = null;
+  customEndDate: any = null;
+  showCustomDatePopup = false;
+  filteredPOList: any;
 
   constructor(
     private service: DataService,
@@ -199,7 +215,6 @@ export class PurchaseOrderComponent {
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    
   }
 
   ngOnInit(): void {
@@ -370,36 +385,6 @@ export class PurchaseOrderComponent {
     ];
   }
 
-  // onEditClick = (e: any) => {
-  //   console.log(e);
-  //   const id = e.row.data.ID;
-  //   const status = e.row.data.STATUS;
-  //   console.log(status, 'STATUSSSSSSSSSSSSSSS');
-
-  //   this.service.selectPoData(id).subscribe((res) => {
-  //     this.selectedRowData = res;
-  //     console.log(this.selectedRowData, 'select row data');
-
-  //     if (status === 'Approved') {
-  //       // Open view popup
-  //       this.isViewPopupOpened = true;
-  //     } else {
-  //       // Open edit popup
-  //       this.isEditPopupOpened = true;
-  //     }
-  //   });
-  // };
-
-  // onViewClick = (e) => {
-  //   console.log(e);
-  //   const id = e.row.data.ID;
-  //   this.isViewPopupOpened = true;
-  //   this.service.selectPoData(id).subscribe((res) => {
-  //     this.selectedRowData = res;
-  //     console.log(this.selectedRowData, 'select row data');
-  //   });
-  // };
-
   onApproveClick = (e) => {
     console.log(e, 'EDITCLICKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK');
     const id = e.row.data.ID;
@@ -448,10 +433,208 @@ export class PurchaseOrderComponent {
   getPurchaseOrderList() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-    }
+    };
     this.service.getPurchaseOrderList(payload).subscribe((res) => {
-      this.dataSource = [...res.data].reverse();
+      this.dataSource = res.data
+        .map((item: any) => {
+          let dateValue: Date | null = null;
+
+          if (item.PO_DATE) {
+            if (typeof item.PO_DATE === 'string') {
+              // Handle dd-MM-yyyy
+              const parts = item.PO_DATE.split('T')[0].split('-');
+
+              if (parts[0].length === 2) {
+                // dd-MM-yyyy
+                const day = Number(parts[0]);
+                const month = Number(parts[1]) - 1;
+                const year = Number(parts[2]);
+                dateValue = new Date(year, month, day);
+              } else {
+                // ISO or yyyy-MM-dd
+                dateValue = new Date(item.PO_DATE);
+              }
+            } else {
+              dateValue = new Date(item.PO_DATE);
+            }
+          }
+
+          return {
+            ...item,
+            PO_DATE: dateValue, // ✅ ALWAYS Date
+          };
+        })
+
+        .sort((a: any, b: any) => {
+          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+          return numB - numA; // descending order
+        });
+
+      this.applyDateFilter();
     });
+  }
+
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+
+    if (e.value === 'custom') {
+      this.customStartDate = null;
+      this.customEndDate = null;
+      this.showCustomDatePopup = true;
+    } else {
+      // Reset the custom label
+      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
+      if (customOpt) {
+        customOpt.label = 'Custom';
+      }
+      this.applyDateFilter();
+    }
+  }
+
+  applyDateFilter() {
+    if (!this.selectedDateRange || !this.dataSource) {
+      this.filteredPOList = this.dataSource;
+      return;
+    }
+    if (this.selectedDateRange === 'all') {
+      this.filteredPOList = this.dataSource; // show full list
+      return;
+    }
+    const today = new Date();
+    let startDate: Date;
+    const endDate = new Date(); // today
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case 'last7':
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 6);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'last15':
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 14);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'last30':
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 29);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      default:
+        this.filteredPOList = this.dataSource;
+        return;
+    }
+
+    this.filteredPOList = this.dataSource.filter((item: any) => {
+      if (!item.PO_DATE) {
+        console.warn('Missing PO_DATE in item:', item);
+        return false;
+      }
+
+      if (!(item.PO_DATE instanceof Date)) return false;
+      const invoiceDate = item.PO_DATE;
+
+      return invoiceDate >= startDate && invoiceDate <= endDate;
+    });
+  }
+
+  applyCustomDateFilter() {
+    if (!(this.customStartDate && this.customEndDate)) return;
+
+    const start = new Date(this.customStartDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(this.customEndDate);
+    end.setHours(23, 59, 59, 999);
+
+    this.filteredPOList = this.dataSource.filter((item: any) => {
+      const invoiceDate = item.PO_DATE;
+      return invoiceDate >= start && invoiceDate <= end;
+    });
+
+    const fromLabel = this.formatAsDDMMYYYY(start);
+    const toLabel = this.formatAsDDMMYYYY(end);
+
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} to ${toLabel}` }
+        : option
+    );
+
+    this.showCustomDatePopup = false;
+  }
+
+  private parseDateString(dateStr: string): Date {
+    if (!dateStr || typeof dateStr !== 'string') {
+      console.warn('Invalid date string:', dateStr);
+      return new Date('Invalid'); // or new Date(0) if you want a fallback
+    }
+
+    const [day, month, year] = dateStr
+      .split('-')
+      .map((part) => parseInt(part, 10));
+    return new Date(year, month - 1, day);
+  }
+
+  displayExpr = (item: any) => {
+    if (!item) return '';
+
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      return `${from} to ${to}`;
+    }
+
+    return item.label;
+  };
+
+  openCustomDatePopup() {
+    this.customStartDate = null;
+    this.customEndDate = null;
+    this.showCustomDatePopup = true;
+  }
+
+  private formatAsDDMMYYYY(d: Date): string {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  get customStartDateFormatted(): string {
+    return this.customStartDate
+      ? this.formatAsDDMMYYYY(new Date(this.customStartDate))
+      : '';
+  }
+
+  get customEndDateFormatted(): string {
+    return this.customEndDate
+      ? this.formatAsDDMMYYYY(new Date(this.customEndDate))
+      : '';
+  }
+
+  attachItemClickHandler(e: any) {
+    setTimeout(() => {
+      const popup = e.component._popup;
+      const innerList =
+        popup && popup.$content().find('.dx-list').dxList('instance');
+      if (innerList) {
+        innerList.off('itemClick'); // unsubscribe first (to avoid duplicates)
+        innerList.on('itemClick', (clickEvent: any) => {
+          const clickedValue = clickEvent.itemData.value;
+          if (clickedValue === 'custom') {
+            this.openCustomDatePopup();
+            e.component.close();
+          }
+        });
+      }
+    }, 0);
   }
 
   openPurchaseOrderForm() {
@@ -459,7 +642,7 @@ export class PurchaseOrderComponent {
     this.getDocNo();
   }
 
-       getDocNo() {
+  getDocNo() {
     const payload = {
       TRANS_TYPE: 17,
       COMPANY_ID: this.selected_Company_id,
@@ -536,78 +719,38 @@ export class PurchaseOrderComponent {
     }
 
     if (
-  !this.poNewForm.poData.PoDetails ||
-  this.poNewForm.poData.PoDetails.length === 0
-) {
-  notify(
-    {
-      message: 'Please add at least one item',
-      position: { at: 'top center', my: 'top center' },
-    },
-    'error'
-  );
-  return false;
-}
+      !this.poNewForm.poData.PoDetails ||
+      this.poNewForm.poData.PoDetails.length === 0
+    ) {
+      notify(
+        {
+          message: 'Please add at least one item',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error'
+      );
+      return false;
+    }
+    const poDetails = this.poNewForm.poData.PoDetails.map((item: any) => {
+      // Inter-state → IGST
+      if (this.poNewForm.isInterState) {
+        return {
+          ...item,
+          TAX_PERCENT: item.VAT_PERC, // IGST %
+          CGST: 0,
+          SGST: 0,
+        };
+      }
 
-    // if (!data.PoDetails || data.PoDetails.length === 0) {
-    //   notify(
-    //     {
-    //       message: 'Please add at least one item',
-    //       position: { at: 'top center', my: 'top center' },
-    //     },
-    //     'error'
-    //   );
-    //   return false;
-    // }
-    // return true;
-    // if (data.IS_APPROVED === true) {
-    //   const result = confirm(
-    //     'Are you sure you want to approve and commit this invoice?',
-    //     'Confirm Approval'
-    //   );
-
-    //   result.then((dialogResult) => {
-    //     if (dialogResult) {
-    //       this.savePoToServer(data); // Only save if user confirms
-    //     }
-    //   });
-    // } else {
-    //   // Not approved → Save directly
-    //   this.savePoToServer(data);
-    // }
-    // this.service.savePoData(data).subscribe((res) => {
-    //   console.log('saved data');
-    //   if (res) {
-    //     notify(
-    //       {
-    //         message: 'Data Saved Successfully',
-    //         position: { at: 'top center', my: 'top center' },
-    //       },
-    //       'success'
-    //     );
-    //     this.refreshPo = true;
-    //     setTimeout(() => (this.refreshPo = false), 0);
-    //     this.dataGrid.instance.refresh();
-    //     this.isAddPopupOpened = false;
-    //     if (this.PurchaseOrderNewFormComponent?.resetForm) {
-    //       console.log(
-    //         'FORMRESETTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT'
-    //       );
-    //       this.PurchaseOrderNewFormComponent?.resetForm();
-    //     }
-    //     this.getPurchaseOrderList();
-    //   } else {
-    //     notify(
-    //       {
-    //         message: 'Your Data Not Saved',
-    //         position: { at: 'top right', my: 'top right' },
-    //       },
-    //       'error'
-    //     );
-    //   }
-    // });
-    // }
-
+      // Intra-state → CGST + SGST
+      return {
+        ...item,
+        TAX_PERCENT: 0,
+        CGST: item.CGST,
+        SGST: item.SGST,
+      };
+    });
+    data.PoDetails = poDetails;
     // savePoToServer(data: any) {
     this.service.savePoData(data).subscribe((res) => {
       console.log(res, 'saved data');
@@ -637,10 +780,9 @@ export class PurchaseOrderComponent {
         this.dataGrid.instance.refresh();
         this.isAddPopupOpened = false;
 
-       if (this.PurchaseOrderNewFormComponent?.resetForm) {
-  this.PurchaseOrderNewFormComponent.resetForm();
-}
-
+        if (this.PurchaseOrderNewFormComponent?.resetForm) {
+          this.PurchaseOrderNewFormComponent.resetForm();
+        }
 
         this.getPurchaseOrderList();
       } else {
@@ -658,8 +800,9 @@ export class PurchaseOrderComponent {
   UpdatePurchaseOrder() {
     console.log('UPDATEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
     const data = this.poEditForm.getNewPoData();
+    this.poEditForm.preparePoDetailsForSubmit();
     data.PoDetails = [...this.poEditForm.poData.PoDetails];
-    console.log(data,"PODETAILAAAAAAAAAAAAAAAAAAAAAAAA");
+    console.log(data, 'PODETAILAAAAAAAAAAAAAAAAAAAAAAAA');
 
     if (this.isApproved) {
       // 🔹 Show confirmation dialog before approving
@@ -871,9 +1014,11 @@ export class PurchaseOrderComponent {
     DxDataGridModule,
     PurchaseOrderEditFormModule,
     DxCheckBoxModule,
+    DxDateBoxModule,
   ],
   providers: [],
   exports: [],
   declarations: [PurchaseOrderComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class PurchaseOrderModule {}

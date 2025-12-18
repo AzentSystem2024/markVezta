@@ -122,6 +122,7 @@ export class AddCutomerReceiptComponent {
   selectedstoreId: any;
   partyName: any;
   selectedCustomer: any;
+  isFillAmountValid: boolean;
 
   constructor(private dataService: DataService, private ngZone: NgZone) {}
 
@@ -424,33 +425,41 @@ export class AddCutomerReceiptComponent {
   }
 
   autoFillReceivedAmounts() {
-    this.totalPending = Number(this.fillAmountData.field1);
-    console.log(this.totalPending, 'TOTALPENDING');
-    if (isNaN(this.totalPending) || this.totalPending <= 0) {
-      notify('Please enter a valid fill amount first.', 'warning', 3000);
+    const fillAmount = Number(this.fillAmountData.field1);
+
+    if (isNaN(fillAmount) || fillAmount <= 0) {
+      notify('Please enter a valid fill amount.', 'warning', 3000);
       return;
     }
 
     const selectedRows =
       this.itemsGridRef?.instance?.getSelectedRowsData() || [];
-    if (selectedRows.length === 0) {
-      notify('Please select at least one row', 'warning', 3000);
+
+    if (!selectedRows.length) {
+      notify('Please select at least one row.', 'warning', 3000);
       return;
     }
 
+    let remaining = fillAmount;
+
     selectedRows.forEach((row: any) => {
-      const pending = Number(row.PENDING_AMOUNT);
-      console.log(pending, 'PENDINGGGGGGGGGGGGGGGGGGGG');
-      if (pending <= this.totalPending) {
+      const pending = Number(row.PENDING_AMOUNT) || 0;
+
+      if (remaining <= 0) {
+        row.RECEIVED_AMOUNT = 0;
+        return;
+      }
+
+      if (remaining >= pending) {
         row.RECEIVED_AMOUNT = pending;
-        this.totalPending -= pending;
-        row.RECEIVED_AMOUNT = 0; //  Or if you want to SKIP partial fills:
+        remaining -= pending;
       } else {
-        row.RECEIVED_AMOUNT = 0; // Skip partial fills
+        row.RECEIVED_AMOUNT = remaining;
+        remaining = 0;
       }
     });
 
-    // Trigger change detection if needed
+    // 🔁 refresh grid
     this.pendingInvoiceList = [...this.pendingInvoiceList];
   }
 
@@ -470,59 +479,40 @@ export class AddCutomerReceiptComponent {
   }
 
   validateAmount(e: any) {
-    const valueStr = e.value;
-    const enteredAmount = parseFloat(valueStr);
+    const enteredValue = Number(e.value);
 
-    if (!valueStr || isNaN(enteredAmount)) {
-      this.amountError = 'Please enter a valid number';
-    } else if (enteredAmount > this.totalPendingAmount) {
-      this.amountError =
-        'The amount cannot be greater than the total pending amount';
-    } else {
-      // ✅ Clear the error when the input is valid
-      this.amountError = '';
+    if (isNaN(enteredValue) || enteredValue <= 0) {
+      this.amountError = 'Please enter a valid amount';
+      this.isFillAmountValid = false;
+      return;
     }
+
+    if (enteredValue > this.totalPending) {
+      this.amountError = `Entered amount cannot be greater than Total Pending Amount (${this.totalPending.toFixed(
+        2
+      )})`;
+      this.isFillAmountValid = false;
+      return;
+    }
+
+    // ✅ valid
+    this.amountError = '';
+    this.isFillAmountValid = true;
   }
 
   submitAmountPopup() {
-    const enteredAmount = Number(this.fillAmountData.field1);
-
-    if (isNaN(enteredAmount) || enteredAmount <= 0) {
-      notify('Please enter a valid received amount.', 'warning', 3000);
+    if (!this.isFillAmountValid) {
+      notify(
+        'Please correct the entered amount before submitting.',
+        'warning',
+        3000
+      );
       return;
     }
 
-    const selectedRows = this.itemsGridRef.instance.getSelectedRowsData();
-
-    if (!selectedRows.length) {
-      notify('Please select at least one row.', 'warning', 3000);
-      return;
-    }
-
-    let remainingAmount = enteredAmount;
-
-    // ✅ Fill from first selected row downwards
-    for (const row of selectedRows) {
-      const pending = Number(row.PENDING_AMOUNT);
-
-      if (remainingAmount <= 0) break;
-
-      if (pending <= remainingAmount) {
-        row.RECEIVED_AMOUNT = pending;
-        remainingAmount -= pending;
-      } else {
-        row.RECEIVED_AMOUNT = remainingAmount;
-        remainingAmount = 0;
-      }
-    }
-
-    // ✅ Update grid data source
-    this.pendingInvoiceList = [...this.pendingInvoiceList];
-
-    // ✅ Close popup
+    this.autoFillReceivedAmounts();
+    this.resetFillAmountForm();
     this.showFillAmountPopup = false;
-
-    notify('Amounts filled successfully.', 'success', 3000);
   }
 
   getReceiptNo() {
@@ -583,14 +573,30 @@ export class AddCutomerReceiptComponent {
         AMOUNT: Number(row.RECEIVED_AMOUNT),
       }));
 
-    if (validDetails.length === 0) {
+    const invalidRowIndexes: number[] = [];
+
+    selectedRows.forEach((row: any) => {
+      const rowIndex = this.pendingInvoiceList.findIndex(
+        (r: any) => r.BILL_ID === row.BILL_ID
+      );
+
+      if (!row.RECEIVED_AMOUNT || Number(row.RECEIVED_AMOUNT) <= 0) {
+        invalidRowIndexes.push(rowIndex);
+      }
+    });
+
+    if (invalidRowIndexes.length > 0) {
+      // Repaint only invalid rows
+      this.itemsGridRef.instance.repaintRows(invalidRowIndexes);
+
       notify(
-        'Please enter a valid Received Amount for at least one selected row',
+        'Please enter Received Amount for the selected rows.',
         'warning',
         3000
       );
       return;
     }
+
     switch (this.receiptMode) {
       case 'Cash':
         this.receiprtFormData.PAY_TYPE_ID = 1;

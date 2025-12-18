@@ -125,6 +125,7 @@ export class AddSupplierPaymentComponent {
   companyList: any[];
   selected_Company_id: any;
   docNo: any;
+  isFillAmountValid: boolean;
 
   constructor(private dataService: DataService, private ngZone: NgZone) {
     this.sesstion_Details();
@@ -526,8 +527,10 @@ export class AddSupplierPaymentComponent {
       );
 
       // Clamp back to totalPending
-      this.fillAmountData.field1 = this.totalPending;
+      this.isFillAmountValid = false;
+      return;
     }
+    this.isFillAmountValid = true;
   }
 
   submitAmountPopup() {
@@ -569,10 +572,25 @@ export class AddSupplierPaymentComponent {
   }
 
   saveReceipt() {
-    console.log(
-      this.paymentFormData,
-      'PAYLOADDDDDDDDDD--------------------------------p'
-    );
+    if (!this.selectedSupplierId) {
+      notify('Please select a supplier.', 'warning', 3000);
+      return;
+    }
+
+    if (!this.paymentFormData.TRANS_DATE) {
+      notify('Please select payment date.', 'warning', 3000);
+      return;
+    }
+
+    if (!this.receiptMode) {
+      notify('Please select payment mode.', 'warning', 3000);
+      return;
+    }
+
+    if (!this.selectedLedger) {
+      notify('Please select a ledger.', 'warning', 3000);
+      return;
+    }
     const selectedRows =
       this.itemsGridRef?.instance?.getSelectedRowsData() || [];
 

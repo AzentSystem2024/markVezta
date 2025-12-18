@@ -355,7 +355,7 @@
             <!-- Right column (Amount same width as Bank Remittance side) -->
             <div style="flex: 1">
               <dx-text-box
-                [(value)]="receiprtFormData.REC_DETAIL[0].NET_AMOUNT"
+                [(value)]="receiprtFormData.NET_AMOUNT"
                 label="Amount"
                 labelMode="floating"
                 [width]="'100%'"
@@ -500,6 +500,7 @@
       [columnResizingMode]="'nextColumn'"
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
+      [repaintChangesOnly]="true"
       [selection]="{
         mode: 'single',
         showCheckBoxesMode: 'always'

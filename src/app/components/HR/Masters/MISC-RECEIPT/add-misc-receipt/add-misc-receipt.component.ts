@@ -651,6 +651,11 @@ export class AddMiscReceiptComponent {
   }
 
   onSaveMiscReceipt() {
+    if (!this.miscFormData?.PAY_HEAD_ID) {
+      notify('Please select ledger before saving.', 'warning', 2000);
+      return;
+    }
+
     if (
       !this.miscFormData?.PAY_HEAD_ID ||
       !this.miscFormData?.PARTY_NAME ||

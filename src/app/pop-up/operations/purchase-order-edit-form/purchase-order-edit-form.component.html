@@ -44,7 +44,7 @@
       valueExpr="ID"
       [(value)]="newPoData.SUPP_ID"
       [isValid]="isSupplierValid"
-      (onValueChanged)="validateSupplier()"
+      (onValueChanged)="onSupplierChanged($event)"
       [validationMessageMode]="'always'"
       [validationError]="{ message: 'Please select a supplier' }"
       [searchEnabled]="true"
@@ -85,7 +85,7 @@
       <div class="supplier-details">
         <span class="section-title">Supplier Details</span>
 
-        <dx-text-box
+        <!-- <dx-text-box
           label="Currency"
           labelMode="floating"
           placeholder="Currency"
@@ -101,7 +101,7 @@
           [(value)]="currencyExchangeRate"
           [readOnly]="true"
         >
-        </dx-text-box>
+        </dx-text-box> -->
 
         <dx-text-box
           label="VAT Rule"
@@ -346,9 +346,13 @@
       width="auto"
       [allowEditing]="false"
     ></dxi-column>
+    <dxi-column
+      dataField="HSN_CODE"
+      caption="HSN Code"
+      dataType="string"
+    ></dxi-column>
     <!-- Conditionally add local currency column -->
     <dxi-column
-      *ngIf="showLocalCurrencyColumn"
       caption="Price"
       dataField="SUPP_PRICE"
       alignment="right"
@@ -399,7 +403,6 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
     <dxi-column
-      *ngIf="showLocalCurrencyColumn"
       caption="Taxable"
       dataField="taxable_Supplier"
       alignment="right"
@@ -409,19 +412,45 @@
     >
     </dxi-column>
 
-    <dxi-column
-      dataField="HSN_CODE"
-      caption="HSN Code"
-      dataType="string"
-    ></dxi-column>
-    <dxi-column
+    <!-- <dxi-column
       caption="Tax (%)"
       dataField="VAT_PERC"
       alignment="center"
       width="70"
       [allowEditing]="false"
       [editorOptions]="{ format: '#0', mode: 'number' }"
+    ></dxi-column> -->
+    <!-- IGST -->
+    <!-- IGST -->
+    <dxi-column
+      caption="IGST %"
+      dataField="VAT_PERC"
+      alignment="center"
+      width="70"
+      [allowEditing]="false"
+      [visible]="isInterState"
     ></dxi-column>
+
+    <!-- CGST -->
+    <dxi-column
+      caption="CGST %"
+      dataField="CGST"
+      alignment="center"
+      width="70"
+      [allowEditing]="false"
+      [visible]="isIntraState"
+    ></dxi-column>
+
+    <!-- SGST -->
+    <dxi-column
+      caption="SGST %"
+      dataField="SGST"
+      alignment="center"
+      width="70"
+      [allowEditing]="false"
+      [visible]="isIntraState"
+    ></dxi-column>
+
     <dxi-column
       caption="Tax Amount"
       alignment="right"
@@ -431,7 +460,6 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
     <dxi-column
-      *ngIf="showLocalCurrencyColumn"
       caption="Total"
       dataField="total"
       alignment="right"

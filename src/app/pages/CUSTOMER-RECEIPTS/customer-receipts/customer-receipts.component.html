@@ -152,21 +152,6 @@
   ></app-add-cutomer-receipt>
 </dx-popup>
 
-<!-- <dx-popup
-  [(visible)]="isEditReceipt"
-  [width]="'75vw'"
-  [height]="'100vh'"
-  title="Update Receipt"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditReceipt">
-    <app-edit-customer-receipt
-      [receiprtFormData]="selectedReceipt"
-      (popupClosed)="handleClose()"
-    ></app-edit-customer-receipt>
-  </ng-container>
-</dx-popup> -->
-
 <dx-popup
   [(visible)]="isEditReceipt"
   [width]="'100vw'"
@@ -182,18 +167,6 @@
     ></app-edit-customer-receipt>
   </ng-container>
 </dx-popup>
-<!-- <dx-popup
-  [(visible)]="isViewReceipt"
-  [width]="'80vw'"
-  [height]="'95vh'"
-  title="View Receipt"
-  (onHiding)="handleClose()"
->
-  <app-view-customer-receipt
-    [receiprtFormData]="selectedReceipt"
-    (popupClosed)="handleClose()"
-  ></app-view-customer-receipt>
-</dx-popup> -->
 
 <dx-popup
   [(visible)]="showCustomDatePopup"

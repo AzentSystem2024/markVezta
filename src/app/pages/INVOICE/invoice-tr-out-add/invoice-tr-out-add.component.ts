@@ -166,6 +166,7 @@ export class InvoiceTrOutAddComponent {
   GST: any;
   selectedCompany: any;
   companyState: any;
+  previousCustomerId: number | null = null;
 
   constructor(
     private dataService: DataService,
@@ -247,6 +248,7 @@ export class InvoiceTrOutAddComponent {
 
     const data = this.EditingResponseData.Data[0];
     console.log(data);
+    this.previousCustomerId = data.CUST_ID;
     const transactionDate = this.parseDMY(data.TRANS_DATE);
     // Populate header fields
     this.invoiceFormData = {
@@ -365,6 +367,17 @@ export class InvoiceTrOutAddComponent {
       });
   }
   onDistributorChanged(e: any) {
+    const newCustomerId = e.value;
+
+    // 🔴 CUSTOMER CHANGED → CLEAR GRID
+    if (
+      this.previousCustomerId !== null &&
+      this.previousCustomerId !== newCustomerId
+    ) {
+      this.clearInvoiceGrid();
+    }
+
+    this.previousCustomerId = newCustomerId;
     // Find the selected customer from the distributorList
     const selectedCustomer = this.distributorList.find(
       (cust: any) => cust.ID === e.value
@@ -430,6 +443,23 @@ export class InvoiceTrOutAddComponent {
       this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
     }
     this.getInvoiceListForGrid();
+  }
+
+  clearInvoiceGrid() {
+    this.mainInvoiceGridList = [];
+
+    // Reset totals
+    this.totalAmount = 0;
+    this.taxAmount = 0;
+    this.grandTotal = 0;
+    this.netAmount = '0.00';
+
+    // Clear grid state
+    if (this.itemsGridRef?.instance) {
+      this.itemsGridRef.instance.cancelEditData();
+      this.itemsGridRef.instance.clearSelection();
+      this.itemsGridRef.instance.refresh();
+    }
   }
 
   onUnitChanged(e: any) {
