@@ -72,6 +72,7 @@ export class ItemsEditFormComponent implements OnInit {
   ENABLE_Matrix_Code: boolean = false;
   edit_Suplier: any;
   Edit_Store: any;
+  selected_Company_id: any;
 
   get buttonContainerHtml() {
     return `
@@ -602,6 +603,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     console.log(this.ENABLE_Matrix_Code);
+      this.selected_Company_id= this.sessionData.SELECTED_COMPANY.COMPANY_ID
   }
   onRowUpdated(e: any) {
     console.log(e);
@@ -761,7 +763,8 @@ export class ItemsEditFormComponent implements OnInit {
       item_stores: this.Edit_Store || this.itemData.item_stores,
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
-      UOM_PURCH: this.selectedData
+      UOM_PURCH: this.selectedData,
+      COMPANY_ID: this.selected_Company_id
     };
     console.log(payload, 'PAYLOAD');
     // Call the service to update the items
@@ -795,6 +798,7 @@ export class ItemsEditFormComponent implements OnInit {
       }
     );
   }
+
 
   onFileInputChange(event: Event) {
     const input = event.target as HTMLInputElement;

@@ -138,6 +138,7 @@ export class ArticleListComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+  selected_Company_id: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -169,14 +170,25 @@ export class ArticleListComponent {
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
+    this.sesstion_Details();
     this.getArticles();
   }
+
+  sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
 
   getArticles() {
     this.articleList = new DataSource({
       load: () =>
         new Promise((resolve, reject) => {
-          this.dataService.getArticleList().subscribe({
+          const payload = {
+            COMPANY_ID : this.selected_Company_id
+          }; // Add any necessary payload data here
+          this.dataService.getArticleList(payload).subscribe({
             next: (response: any) => {
               if (response?.flag === 1 && Array.isArray(response.Data)) {
                 //  Sort articles by ID (latest first)

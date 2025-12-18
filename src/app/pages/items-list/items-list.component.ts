@@ -201,10 +201,11 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+     this.sesstion_Details();
     this.showItems();
     this.loadDropdownData();
     this.getStores();
-    this.sesstion_Details();
+   
   }
 
   sesstion_Details() {

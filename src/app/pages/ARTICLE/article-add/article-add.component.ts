@@ -219,7 +219,10 @@ export class ArticleAddComponent {
   }
 
   getItems() {
-    this.dataService.listItemsForArticle().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    };
+    this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
       this.itemsList = response.DataList;
     });
   }
@@ -447,12 +450,12 @@ export class ArticleAddComponent {
   }
 
   getArticles() {
-    const payload = {
-      DATE_FROM: new Date('1999-12-31T18:00:00.000Z'), // set specific from date
-      DATE_TO: new Date(), // keep to date as today
-    };
-
-    this.dataService.getArticleList().subscribe((response: any) => {
+    // const payload = {
+    //   DATE_FROM: new Date('1999-12-31T18:00:00.000Z'), // set specific from date
+    //   DATE_TO: new Date(), // keep to date as today
+    // };
+    const payload = { COMPANY_ID : this.selected_Company_id };
+    this.dataService.getArticleList(payload).subscribe((response: any) => {
       console.log(response, 'ARTICLELIST');
       if (response?.Data && Array.isArray(response.Data)) {
         // Store full list (reversed) in articleList

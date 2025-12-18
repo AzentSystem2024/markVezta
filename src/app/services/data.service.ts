@@ -149,11 +149,13 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/getitem`, data);
   }
 
-  listItemsForArticle(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Article/listitem`, {});
+  listItemsForArticle(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Article/listitem`, data);
   }
-  getArticleList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}article/List`, {});
+  getArticleList(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}article/List`, data);
   }
 
   insertArticle(items: any) {
@@ -4977,9 +4979,10 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //===============ARTICLE COLOR ==================
-  get_ArticleColor_Api() {
+  get_ArticleColor_Api(items:any) {
+    const data = items;
     const getEndpoint = this.apiUrl + 'ArticleColor/list';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, data);
   }
 
   Insert_ArticleColor_Api(payload) {
@@ -4996,7 +4999,8 @@ The result can be exported to HTML or Markdown.`;
     Id: any,
     Code: any,
     Color_English: any,
-    Color_Arabic: any
+    Color_Arabic: any,
+    COMPANY_ID: any
   ) {
     const getEndpoint = this.apiUrl + 'ArticleColor/update';
     const reqBody = {
@@ -5004,6 +5008,7 @@ The result can be exported to HTML or Markdown.`;
       CODE: Code,
       COLOR_ENGLISH: Color_English,
       COLOR_ARABIC: Color_Arabic,
+      COMPANY_ID: COMPANY_ID,
     };
     return this.http.post(getEndpoint, reqBody);
   }
@@ -5015,9 +5020,10 @@ The result can be exported to HTML or Markdown.`;
 
   //===============ARTICLE BRAND =======================
 
-  get_ArticleBrand_Api() {
+  get_ArticleBrand_Api(items:any) {
+    const data = items;
     const getEndpoint = this.apiUrl + 'ArticleBrand/list';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, data);
   }
 
   Insert_ArticleBrand_Api(payload) {
@@ -5033,7 +5039,8 @@ The result can be exported to HTML or Markdown.`;
     Id: any,
     Code: any,
     Description: any,
-    Is_Inactive: any
+    Is_Inactive: any,
+    COMPANY_ID: any
   ) {
     const getEndpoint = this.apiUrl + 'ArticleBrand/update';
     const reqBody = {
@@ -5041,6 +5048,7 @@ The result can be exported to HTML or Markdown.`;
       CODE: Code,
       DESCRIPTION: Description,
       IS_INACTIVE: Is_Inactive,
+      COMPANY_ID: COMPANY_ID,
     };
     return this.http.post(getEndpoint, reqBody);
   }
@@ -5051,9 +5059,10 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //==================ARTICLE TYPE=========================
-  get_ArticleType_Api() {
+  get_ArticleType_Api(items:any) {
+    const data = items;
     const getEndpoint = this.apiUrl + 'ArticleType/list';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, data);
   }
 
   Insert_ArticleType_Api(payload) {
@@ -5066,11 +5075,12 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Update_ArticleType_Api(Id: any, Description: any) {
+  Update_ArticleType_Api(Id: any, Description: any,COMPANY_ID:any) {
     const getEndpoint = this.apiUrl + 'ArticleType/update';
     const reqBody = {
       ID: Id,
       DESCRIPTION: Description,
+      COMPANY_ID :COMPANY_ID
     };
     return this.http.post(getEndpoint, reqBody);
   }

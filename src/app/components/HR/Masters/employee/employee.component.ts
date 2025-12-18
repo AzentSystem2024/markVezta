@@ -88,6 +88,7 @@ export class EmployeeComponent {
     },
     elementAttr: { class: 'add-button' }
   };
+  selected_Company_id: any;
 
   constructor(private dataservice: DataService,private ngZone: NgZone,private cdr:ChangeDetectorRef,private router: Router) {}
 
@@ -137,8 +138,16 @@ formatDates(cellData: any): string {
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
+    this.sesstion_Details();
     this.getEmployeeList();
   }
+
+       sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
 
   getEmployeeList() {
     this.isLoading = true;
@@ -147,9 +156,9 @@ formatDates(cellData: any): string {
     console.log(SELECTED_COMPANY)
     console.log(companyid);
     
-   const company_id=1
+ 
       const payload={
-      "CompanyId":company_id
+      "CompanyId":this.selected_Company_id
     }
     this.dataservice.employeeList(payload).subscribe((response: any) => {
       this.employeeList = response.reverse();

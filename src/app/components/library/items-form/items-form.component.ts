@@ -339,7 +339,7 @@ export class ItemsFormComponent implements OnInit {
       SHELF_LIFE: 0,
       NOTES: "",
       IS_DIFFERENT_UOM_PURCH: false,
-      UOM_PURCH: '',
+      UOM_PURCH: "",
       UOM_MULTPLE:0,
       IS_PRICE_REQUIRED: false,
       IS_NOT_DISCOUNTABLE: false,
@@ -421,6 +421,10 @@ export class ItemsFormComponent implements OnInit {
   newItems = this.formItemsData;
   getNewItems = () => ({
     ...this.newItems,
+    // ✅ Force UOM_PURCH as string before API call
+  UOM_PURCH: this.newItems.UOM_PURCH
+    ? String(this.newItems.UOM_PURCH)
+    : '',
     ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
     COMPANY_ID : this.selected_Company_id
   });
@@ -487,7 +491,7 @@ export class ItemsFormComponent implements OnInit {
 
   onUOMChange(event: any) {
     this.selectedUom = this.newItems.UNIT_ID;
-    this.formItemsData.UOM_PURCH = this.selectedUom;
+    this.formItemsData.UOM_PURCH = String(this.selectedUom);
     console.log(
       '===============UOM_PURCH==========',
       this.formItemsData.UOM_PURCH

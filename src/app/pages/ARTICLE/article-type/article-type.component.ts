@@ -39,11 +39,13 @@ export class ArticleTypeComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  selected_Company_id: any;
 
     constructor(private fb:FormBuilder,private dataservice : DataService,private router : Router,private cdr: ChangeDetectorRef,private ngZone: NgZone ){
         this.formsource = this.fb.group({
           Description : ['',Validators.required]  
         })
+        this.sesstion_Details();
         this.get_ArticleType_List();
       }
     refresh = () => {
@@ -134,10 +136,19 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
       this.UpdateArticleTypePopup = true
     }
 
+         sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
     //===================get data list========================
  get_ArticleType_List() {
+  const payload = {
+    COMPANY_ID: this.selected_Company_id
+  };
   // this.isLoading = true;
-  this.dataservice.get_ArticleType_Api().subscribe((res: any) => {
+  this.dataservice.get_ArticleType_Api(payload).subscribe((res: any) => {
     if (res) {
       this.Datasource = res.Data.map((item: any, index: any) => ({
         ...item,
@@ -154,7 +165,8 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
         console.log(Description);
         
         const payload ={
-          DESCRIPTION : Description
+          DESCRIPTION : Description,
+          COMPANY_ID : this.selected_Company_id
         }
     
 // Optional: Check for duplicate login name
@@ -207,7 +219,8 @@ Select_ArticleType(event:any){
     const validationResult = this.formValidationGroup?.instance?.validate();
     const Id = this.editingRowData.ID
     const Description = this.editingRowData.DESCRIPTION;
-    console.log(Id,Description);
+    const COMPANY_ID = this.selected_Company_id;
+    console.log(Id,Description,COMPANY_ID);
     
 
      // Optional: Check for duplicate login name
@@ -231,7 +244,7 @@ Select_ArticleType(event:any){
     }
 
      if(Description){
-      this.dataservice.Update_ArticleType_Api(Id,Description).subscribe((res:any)=>{
+      this.dataservice.Update_ArticleType_Api(Id,Description,COMPANY_ID).subscribe((res:any)=>{
             notify(
           {
             message: 'Data succesfully updated',

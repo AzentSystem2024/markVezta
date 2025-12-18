@@ -67,7 +67,6 @@ head_To:boolean = false
 SalaryHeadData=
 {
   ID: 0,
-  COMPANY_ID :1 ,
   HEAD_NAME: "",
   PAYSLIP_TITLE: "",
   HEAD_ACTIVE: true,
@@ -411,7 +410,7 @@ UpdateSalaryHeadData() {
 
       // HEAD_TYPE: this.selectedPriority,
       HEAD_TYPE: this.selectedPriority?.id ?? this.SalaryHeadData.HEAD_TYPE,
-
+      COMPANY_ID : this.selected_Company_id,
       HEAD_NATURE: selectedTypeId,
     };
 

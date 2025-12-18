@@ -51,6 +51,7 @@ export class ArticleColorComponent {
   
   formsource: any;
   selectedData: any;
+  selected_Company_id: any;
 
   constructor(private fb:FormBuilder,private dataservice : DataService , private router : Router,private ngZone: NgZone, private cdr: ChangeDetectorRef,){
     this.formsource = this.fb.group({
@@ -59,6 +60,7 @@ export class ArticleColorComponent {
       ColorArabic : ['', Validators.required]
     })
    
+    this.sesstion_Details();
    this.get_ArticleColor_List()
 
   }
@@ -173,10 +175,18 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
 
   }
 
+  sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   //===================get data list========================
  get_ArticleColor_List() {
   // this.isLoading = true;
-  this.dataservice.get_ArticleColor_Api().subscribe((res: any) => {
+  const payload = { COMPANY_ID : this.selected_Company_id }; // Add any necessary payload data here
+  this.dataservice.get_ArticleColor_Api(payload).subscribe((res: any) => {
     if (res) {
       this.Datasource = res.Data.map((item: any, index: any) => ({
         ...item,
@@ -206,7 +216,8 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     const payload ={
       CODE : Code,
       COLOR_ENGLISH : Color_English,
-      COLOR_ARABIC : Color_Arabic
+      COLOR_ARABIC : Color_Arabic,
+      COMPANY_ID : this.selected_Company_id
     }
 
     const trimmedCode = Code?.trim().toLowerCase();
@@ -301,7 +312,8 @@ Select_ArticleColor(event:any){
     const Code = this.editingRowData.CODE
     const Color_English = this.editingRowData.COLOR_ENGLISH
     const Color_Arabic = this.editingRowData.COLOR_ARABIC
-    console.log(Code,Color_English,Color_Arabic);
+    const COMPANY_ID = this.selected_Company_id
+    console.log(Code,Color_English,Color_Arabic,COMPANY_ID);
     
 
     const trimmedCode = Code?.trim().toLowerCase();
@@ -367,7 +379,7 @@ if (isCodeDuplicate || isColorEnglishDuplicate || isColorArabicDuplicate) {
 
 
      if(Code && Color_English && Color_Arabic){
-      this.dataservice.Update_ArticleColor_Api(Id,Code,Color_English,Color_Arabic).subscribe((res:any)=>{
+      this.dataservice.Update_ArticleColor_Api(Id,Code,Color_English,Color_Arabic,COMPANY_ID).subscribe((res:any)=>{
             notify(
           {
             message: 'Data succesfully updated',

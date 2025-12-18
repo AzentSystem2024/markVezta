@@ -152,6 +152,7 @@ export class EmployeeEditFormComponent {
   eighteenYearsAgo: Date;
   employeeList: any;
   COMPANY_ID: any;
+  selected_Company_id: any;
   constructor(
     public dataservice: DataService,
     private sanitizer: DomSanitizer
@@ -181,6 +182,7 @@ export class EmployeeEditFormComponent {
       today.getMonth(),
       today.getDate()
     );
+    this.sesstion_Details();
     this.getEmployeeList();
 
           const  SELECTED_COMPANY=JSON.parse(sessionStorage.getItem('savedUserData'))
@@ -482,11 +484,17 @@ export class EmployeeEditFormComponent {
     }
   };
 
-  getEmployeeList() {
-    const comapny_id=1
+  
+       sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
 
+  getEmployeeList() {
     const payload={
-      "CompanyId":comapny_id
+      "CompanyId": this.selected_Company_id
     }
     this.dataservice.employeeList(payload).subscribe((response: any) => {
       this.employeeList = response.reverse();

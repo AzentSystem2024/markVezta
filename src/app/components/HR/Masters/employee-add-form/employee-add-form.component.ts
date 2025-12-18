@@ -152,6 +152,7 @@ export class EmployeeAddFormComponent {
   eighteenYearsAgo: Date;
   employeeList: any;
   COMPANY_ID: any;
+  selected_Company_id: any;
   constructor(public dataservice: DataService) {
         dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
@@ -187,6 +188,7 @@ export class EmployeeAddFormComponent {
   }
 
   ngOnInit() {
+    this.sesstion_Details();
     this.getEmployeeList();
        const  SELECTED_COMPANY=JSON.parse(sessionStorage.getItem('savedUserData'))
     const companyid=SELECTED_COMPANY.SELECTED_COMPANY
@@ -309,10 +311,18 @@ export class EmployeeAddFormComponent {
     }
   }
 
+  
+       sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   getEmployeeList() {
-    const company_id=1
+   
      const payload={
-      "CompanyId":company_id
+      "CompanyId":this.selected_Company_id
     }
     this.dataservice.employeeList(payload).subscribe((response: any) => {
       this.employeeList = response.reverse();

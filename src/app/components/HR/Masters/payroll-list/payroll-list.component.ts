@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
@@ -88,11 +89,11 @@ export class PayrollListComponent {
 
   approveButtonOptions = {
     icon: 'check',
-    text: 'Approve',
+    text: 'Apprrove',
     type: 'default',
     stylingMode: 'outlined',
     hint: 'Approve selected payrolls',
-    disabled: true, // Initially disabled
+     disabled: true, // Initially disabled
     onClick: () => {
       this.approveSelectedPayroll();
     },
@@ -178,7 +179,8 @@ export class PayrollListComponent {
   constructor(
     private dataService: DataService,
     private zone: NgZone,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -349,33 +351,40 @@ export class PayrollListComponent {
 //   this.approveButtonOptions.disabled = !enableApprove;
 // }
 
-onSelectionChanged(event: any) {
-  const selectedRowsData = event.selectedRowsData || [];
+onSelectionChanged(e: any) {
+  const selectedRows = e.selectedRowsData || [];
 
-  // ❌ Remove rows where STATUS === 'Approved'
-  const validSelection = selectedRowsData.filter(
-    (row: any) => row.STATUS !== 'Approved'
+  const hasApproved = selectedRows.some(
+    (row: any) => row.STATUS === 'Approved'
   );
 
-  // 🔁 Force grid to keep only valid selections
-  if (validSelection.length !== selectedRowsData.length) {
-    this.dataGrid.instance.selectRows(
-      validSelection.map((row) => row.ID),
-      false
-    );
-  }
+  const enableApprove =
+    selectedRows.length > 0 && !hasApproved;
 
-  // ✅ Update selectedRows with valid rows only
-  this.selectedRows = validSelection;
-
-  // ✅ Enable approve button only if valid rows exist
-  const enableApprove = validSelection.length > 0;
+  // ✅ update disabled flag
   this.approveButtonOptions.disabled = !enableApprove;
 
-  console.log('Selected Rows (filtered):', this.selectedRows);
-  console.log('Approve Button Enabled:', enableApprove);
+   this.cdr.detectChanges();
 }
 
+
+
+
+onEditorPreparing(e: any) {
+  if (
+    e.parentType === 'dataRow' &&
+    e.command === 'select' &&
+    e.row?.data?.STATUS === 'Approved'
+  ) {
+    e.editorOptions.disabled = true; // 🚫 hard block
+  }
+}
+
+onRowClick(e: any) {
+  if (e.data.STATUS === 'Approved') {
+    e.component.deselectRows([e.data.ID]); // no effect on OPEN rows
+  }
+}
 
 
   generateYears() {
