@@ -167,6 +167,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     // { label: 'Custom', value: 'custom' },
     { label: this.customLabel, value: 'custom' },
   ];
+  selected_Company_id: any;
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
@@ -179,13 +180,16 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     const start = new Date(this.customStartDate); // keep as Date
     const end = new Date(this.customEndDate); // keep as Date
 
-    const payload = {
-      DATE_FROM: this.formatDate(start) || this.formatDate(new Date()),
-      DATE_TO: this.formatDate(end) || this.formatDate(new Date()),
-    };
+    // const payload = {
+    //   DATE_FROM: this.formatDate(start) || this.formatDate(new Date()),
+    //   DATE_TO: this.formatDate(end) || this.formatDate(new Date()),
+    // };
 
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    }
     // ✅ Use Date objects for filtering
-    this.dataservice.getItemsData().subscribe((res: any) => {
+    this.dataservice.getItemsData(payload).subscribe((res: any) => {
       const allData = res.data;
       this.itemsList = allData;
 
@@ -243,6 +247,8 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     console.log(this.ENABLE_Matrix_Code);
+
+    this.selected_Company_id=this.sessionData.SELECTED_COMPANY.COMPANY_ID
   }
 
   onDateRangeChanged(e: any) {
@@ -260,11 +266,15 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     } else if (this.selectedDateRange === 'all') {
       //  this.showItems();
 
-      const payload = {
-        DATE_FROM: '2000-01-01',
-        DATE_TO: this.formatDate(new Date()),
-      };
-      this.dataservice.getItemsData().subscribe((res: any) => {
+      // const payload = {
+      //   DATE_FROM: '2000-01-01',
+      //   DATE_TO: this.formatDate(new Date()),
+      // };
+      
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    }
+      this.dataservice.getItemsData(payload).subscribe((res: any) => {
         console.log(res);
         this.itemsList = res.data;
       });
@@ -354,6 +364,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     return date.toISOString().split('T')[0];
   }
 
+
   showItems() {
     this.isLoading = true;
     this.cdr.detectChanges();
@@ -364,7 +375,10 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     // };
     // console.log(payload)
 
-    this.dataservice.getItemsData().subscribe(
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    }
+    this.dataservice.getItemsData(payload).subscribe(
       (response: any) => {
         // Sort items by 'createdAt' in descending order
         this.itemsList = response.data.reverse();
@@ -407,17 +421,17 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     }
 
     // Check first supplier
-    if (!items.ITEM_SUPPLIERS || !items.ITEM_SUPPLIERS.length) {
-      notify(
-        {
-          message: 'Please select a Supplier',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'error',
-        4000
-      );
-      return; // 🔥 stop execution
-    }
+    // if (!items.ITEM_SUPPLIERS || !items.ITEM_SUPPLIERS.length) {
+    //   notify(
+    //     {
+    //       message: 'Please select a Supplier',
+    //       position: { at: 'top right', my: 'top right' },
+    //     },
+    //     'error',
+    //     4000
+    //   );
+    //   return; // 🔥 stop execution
+    // }
 
     if (items.COSTING_METHOD == 0 || '') {
       notify(

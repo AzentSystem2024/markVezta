@@ -33,7 +33,7 @@
       (onEditingStart)="onEditOrViewTimesheet($event)"
       (onRowRemoving)="onDeleteTimesheet($event)"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
-      [selectedRows]="selectedRows"
+      [selectedRowKeys]="selectedRows"
       (onSelectionChanged)="onSelectionChanged($event)"
     >
       <dxo-column-chooser

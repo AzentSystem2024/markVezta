@@ -2804,9 +2804,9 @@ export class DataService {
   }
 
   //items
-  getItemsData(): any {
-    // const payload = DateRange;
-    return this.http.post(`${this.apiUrl}items/list`, {});
+  getItemsData(items:any): any {
+    const data = items;
+    return this.http.post(`${this.apiUrl}items/list`, data);
   }
 
   public postItems(items: any) {
@@ -4229,7 +4229,8 @@ The result can be exported to HTML or Markdown.`;
     rec_install_count: any,
     rec_install_amount: any,
     remarks: any,
-    company_id: any
+    company_id: any,
+    fin_id: any
   ) {
     const reqBody = {
       EMP_ID: emp_id,
@@ -4247,6 +4248,7 @@ The result can be exported to HTML or Markdown.`;
       ADV_TYPE_NAME: '',
       STATUS: 'open',
       COMPANY_ID: company_id,
+      FIN_ID: fin_id,
     };
     return this.http.post(`${this.apiUrl}Advance/save`, reqBody);
   }

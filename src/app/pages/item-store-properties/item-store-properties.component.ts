@@ -176,7 +176,7 @@ export class ItemStorePropertiesComponent {
 
   listItems() {
     const payload = {};
-    this.dataservice.getItemsData().subscribe(
+    this.dataservice.getItemsData(payload).subscribe(
       (items: any) => {
         this.items = items;
         this.itemStoresList = items.data;
@@ -556,7 +556,7 @@ export class ItemStorePropertiesComponent {
   listItemsByStoreId(storeId: number) {
     if (storeId == 1) {
       const payload = {};
-      this.dataservice.getItemsData().subscribe((response: any) => {
+      this.dataservice.getItemsData(payload).subscribe((response: any) => {
         this.items = response;
         this.itemStoresList = response.data;
         this.dataGrid.instance.refresh();

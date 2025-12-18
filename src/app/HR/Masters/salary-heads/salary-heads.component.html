@@ -102,8 +102,7 @@
   (cancel)="close()"
 >
   <dx-form class="plain-styled-form" [formGroup]="formsource">
-        <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
-          
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
       <dxi-item cssClass="code-box">
         <dx-text-box
           label="Code"
@@ -123,7 +122,6 @@
           [labelMode]="'floating'"
         ></dx-radio-group>
       </dxi-item>
-
     </dxi-item>
     <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
       <dxi-item itemType="simple">
@@ -133,7 +131,6 @@
           valueChangeEvent="input"
           [labelMode]="'floating'"
           (onValueChanged)="OnDescInput($event)"
-
         ></dx-text-box>
       </dxi-item>
 
@@ -166,33 +163,34 @@
 
     <!-- <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
       <!-- Radio Group -->
-      <dxi-item cssClass="radio-group">
-        <dx-radio-group
-          [items]="salaryOptions"
-          layout="horizontal"
-          [(value)]="Sal_Value"
-          formControlName="IS_FIXED"
-          [labelMode]="'floating'"
-        ></dx-radio-group>
-      </dxi-item>
+    <dxi-item cssClass="radio-group">
+      <dx-radio-group
+        [items]="salaryOptions"
+        layout="horizontal"
+        [(value)]="Sal_Value"
+        formControlName="IS_FIXED"
+        [labelMode]="'floating'"
+      ></dx-radio-group>
+    </dxi-item>
 
-      <dxi-item cssClass="code-box">
-        <dx-text-box
-          label="Code"
-          width="150px"
-          valueChangeEvent="input"
-          formControlName="code"
-          [labelMode]="'floating'"
-        ></dx-text-box>
-        <dx-validator>
-          <dxi-validation-rule
-            type="stringLength"
-            max="3"
-            message="Max 3 digits allowed"
-          ></dxi-validation-rule>
-        </dx-validator>
-      </dxi-item>
-    <!-- </dxi-item> --> -->
+    <dxi-item cssClass="code-box">
+      <dx-text-box
+        label="Code"
+        width="150px"
+        valueChangeEvent="input"
+        formControlName="code"
+        [labelMode]="'floating'"
+      ></dx-text-box>
+      <dx-validator>
+        <dxi-validation-rule
+          type="stringLength"
+          max="3"
+          message="Max 3 digits allowed"
+        ></dxi-validation-rule>
+      </dx-validator>
+    </dxi-item>
+    <!-- </dxi-item> -->
+    -->
     <!-- Code Field -->
 
     <!-- Order in PaySlip -->
@@ -226,8 +224,8 @@
       style="margin-top: 20px"
     >
       <dxi-item style="margin-top: 20px">
-       <label >
-        Applicable only for working days:
+        <label>
+          Applicable only for working days:
           <dx-check-box
             [value]="workinDays"
             formControlName="IS_WORKING_DAY"
@@ -257,7 +255,7 @@
 <form-popup
   [(visible)]="isEditPopup"
   (save)="Update_Salary_Head()"
-  titleText="Salary Heads"
+  titleText="Salarys Heads"
   [width]="660"
   height="'100vh'"
 >
@@ -278,7 +276,11 @@
         </dx-text-box>
       </dxi-item>
       <dxi-item>
-        <dx-text-box label="Print Description"   [labelMode]="'floating'" [(value)]="print_description">
+        <dx-text-box
+          label="Print Description"
+          [labelMode]="'floating'"
+          [(value)]="print_description"
+        >
         </dx-text-box>
       </dxi-item>
     </dxi-item>

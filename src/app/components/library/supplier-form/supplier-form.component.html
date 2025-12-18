@@ -23,7 +23,6 @@
             label="Address"
             labelMode="floating"
             [(value)]="newSupplier.ADDRESS1"
-           
           >
             <dx-validator>
               <dxi-validation-rule
@@ -43,7 +42,6 @@
             label=" "
             labelMode="floating"
             [(value)]="newSupplier.ADDRESS2"
-          
           ></dx-text-box>
         </div>
       </dxi-item>
@@ -55,7 +53,6 @@
             label=" "
             labelMode="floating"
             [(value)]="newSupplier.ADDRESS3"
-            
           ></dx-text-box>
         </div>
       </dxi-item>
@@ -68,16 +65,14 @@
             labelMode="floating"
             [(value)]="DEFAULT_COUNTRY_CODE"
             class="country-code-input"
-            
           ></dx-text-box>
           <dx-text-box
             label="Mobile"
             labelMode="floating"
             class="phone-style"
             [(value)]="newSupplier.MOBILE_NO"
-           
             (keypress)="keyPressNumbers($event)"
-            [style]="{ 'width': '300px' }"
+            [style]="{ width: '300px' }"
           >
             <dx-validator>
               <dxi-validation-rule
@@ -90,43 +85,46 @@
         </div>
       </dxi-item>
       <dxi-item itemType="group" [colCount]="2">
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-text-box
-            label="Fax"
-            [(value)]="newSupplier.FAX_NO"
-            labelMode="floating"
-          >
-            <dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="Fax No. is required"
-              >
-              </dxi-validation-rule>
-            </dx-validator>
-          </dx-text-box>
-        </div>
+        <dxi-item>
+          <div *dxTemplate>
+            <dx-text-box
+              label="Fax"
+              [(value)]="newSupplier.FAX_NO"
+              labelMode="floating"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Fax No. is required"
+                >
+                </dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
+        </dxi-item>
+        <dxi-item>
+          <div *dxTemplate>
+            <dx-text-box
+              label="Email"
+              [(value)]="newSupplier.EMAIL"
+              labelMode="floating"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Email is required"
+                >
+                </dxi-validation-rule>
+                <dxi-validation-rule
+                  type="pattern"
+                  pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                  message="Invalid email format"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
+        </dxi-item>
       </dxi-item>
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-text-box
-            label="Email"
-            [(value)]="newSupplier.EMAIL"
-            labelMode="floating"
-          >
-            <dx-validator>
-              <dxi-validation-rule type="required" message="Email is required">
-              </dxi-validation-rule>
-              <dxi-validation-rule
-                type="pattern"
-                pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
-                message="Invalid email format"
-              ></dxi-validation-rule>
-            </dx-validator>
-          </dx-text-box>
-        </div>
-      </dxi-item>
-    </dxi-item>
       <!-- <dxi-item>
         <div *dxTemplate style="display: flex">
           <dx-text-box
@@ -201,18 +199,17 @@
 
     <dxi-item itemType="group" [colCount]="1">
       <dxi-item>
-         <div *dxTemplate>
-           <dx-check-box
+        <div *dxTemplate>
+          <dx-check-box
             [(value)]="newSupplier.IS_COMPANY_BRANCH"
             text="Company Branch"
             stylingMode="outlined"
             hint="Company Branch"
-             labelMode="floating"
+            labelMode="floating"
           ></dx-check-box>
-         </div>
+        </div>
       </dxi-item>
     </dxi-item>
-    
   </dxi-item>
 
   <dxi-item itemType="group">
@@ -292,7 +289,7 @@
           <dx-select-box
             label="Country"
             [items]="CountryDropdownData"
-            displayExpr="COUNTRY_NAME"
+            displayExpr="DESCRIPTION"
             valueExpr="ID"
             [(value)]="newSupplier.COUNTRY_ID"
             placeholder="Select Country"
@@ -315,8 +312,8 @@
             label="{{ stateLabel }}"
             [items]="StateDropdownData"
             displayExpr="DESCRIPTION"
-             valueExpr="ID"
-             [items]="State"
+            valueExpr="ID"
+            [items]="State"
             [(value)]="newSupplier.STATE_ID"
             placeholder="Select State {{ stateLabel }}"
             [searchEnabled]="true"
@@ -336,7 +333,7 @@
         <div *dxTemplate style="display: flex">
           <dx-text-box
             label=" "
-             [(value)]="DEFAULT_COUNTRY_CODE"
+            [(value)]="DEFAULT_COUNTRY_CODE"
             class="country-code-input"
             labelMode="floating"
           ></dx-text-box>
@@ -346,7 +343,7 @@
             [(value)]="newSupplier.PHONE"
             labelMode="floating"
             (keypress)="keyPressNumbers($event)"
-            [style]="{ 'width': '300px' }"
+            [style]="{ width: '300px' }"
           ></dx-text-box>
         </div>
       </dxi-item>
@@ -443,35 +440,34 @@
     </dxi-item>
   </dxi-item>
 
-   <dxi-item itemType="group" [colCount]="2">
-  <!-- LANDED COST -->
-  <dxi-item itemType="group" [colCount]="1">
-    <!-- <label class="landed-cost-label">Landed Cost</label> -->
+  <dxi-item itemType="group" [colCount]="2">
+    <!-- LANDED COST -->
+    <dxi-item itemType="group" [colCount]="1">
+      <!-- <label class="landed-cost-label">Landed Cost</label> -->
 
-    <!-- DataGrid for Cost Factors -->
-    <dx-data-grid
-     #landedCostGrid  
-    [dataSource]="landedcost" 
-    [height]="'200'"
-      [width]="'300'"  
-    [showColumnLines]="false"
-    [showRowLines]="true"
-    [selection]="{
-      mode: 'multiple',
-      showCheckBoxesMode: 'always'
-    }"
-    (onSelectionChanged)="onSelectionChanged($event)"
-  >
-    <dxo-paging [enabled]="false"></dxo-paging>
-    <dxo-pager [showPageSizeSelector]="false" [showInfo]="false"></dxo-pager>
-  
-    <!-- Only include the DESCRIPTION column -->
-    <dxi-column dataField="DESCRIPTION" caption="Landed Cost" ></dxi-column>
-  </dx-data-grid>
-  
+      <!-- DataGrid for Cost Factors -->
+      <dx-data-grid
+        #landedCostGrid
+        [dataSource]="landedcost"
+        [height]="'200'"
+        [width]="'300'"
+        [showColumnLines]="false"
+        [showRowLines]="true"
+        [selection]="{
+          mode: 'multiple',
+          showCheckBoxesMode: 'always'
+        }"
+        (onSelectionChanged)="onSelectionChanged($event)"
+      >
+        <dxo-paging [enabled]="false"></dxo-paging>
+        <dxo-pager
+          [showPageSizeSelector]="false"
+          [showInfo]="false"
+        ></dxo-pager>
+
+        <!-- Only include the DESCRIPTION column -->
+        <dxi-column dataField="DESCRIPTION" caption="Landed Cost"></dxi-column>
+      </dx-data-grid>
+    </dxi-item>
   </dxi-item>
-
-    
-</dxi-item>
-
 </dx-form>

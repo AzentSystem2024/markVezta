@@ -203,6 +203,7 @@ export class ItemsFormComponent implements OnInit {
   ENABLE_Matrix_Code: boolean;
   isParentItemDropdownOpen: boolean;
   selectedStoresMap: any;
+  selected_Company_id: any;
 
   constructor(
     private dataservice: DataService,
@@ -293,7 +294,7 @@ export class ItemsFormComponent implements OnInit {
       this.filterDropdownOptions();
     });
     const payload = {};
-    dataservice.getItemsData().subscribe((data) => {
+    dataservice.getItemsData(payload).subscribe((data) => {
       this.items = data;
     });
     dataservice.getDropdownData('COSTINGMETHOD').subscribe((data) => {
@@ -421,6 +422,7 @@ export class ItemsFormComponent implements OnInit {
   getNewItems = () => ({
     ...this.newItems,
     ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
+    COMPANY_ID : this.selected_Company_id
   });
 
   ngOnInit() {
@@ -468,6 +470,7 @@ export class ItemsFormComponent implements OnInit {
 
      this.selected_vat_id = this.sessionData.VAT_ID;
      console.log(this.selected_vat_id, 'SELECTED_VAT_ID=========');
+     this.selected_Company_id= this.sessionData.SELECTED_COMPANY.COMPANY_ID
   }
 
   onInitNewRowAlias(e: any) {
@@ -887,7 +890,7 @@ export class ItemsFormComponent implements OnInit {
     this.isLoading = true;
     this.cdr.detectChanges();
     const payload = {};
-    this.dataservice.getItemsData().subscribe(
+    this.dataservice.getItemsData(payload).subscribe(
       (response: any) => {
         // Sort items by 'createdAt' in descending order
         this.itemsList = response.data.reverse();

@@ -130,10 +130,12 @@ export class ArticleAddComponent {
   selectedUnitsTooltip: string = '';
   isDragOver: boolean = false;
   selectedItemID: any;
+  selected_Company_id: any;
 
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
+    this.sesstion_Details();
     this.getArticles();
     if (this.selectedCategoryId) {
       this.getCategory();
@@ -623,6 +625,13 @@ export class ArticleAddComponent {
     this.articleData.COMPONENT_ARTICLE_ID = '';
   }
 
+     sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   saveArticle() {
     // Validate mandatory fields
     if (!this.articleData.ART_NO) {
@@ -754,6 +763,7 @@ export class ArticleAddComponent {
           CATEGORY_ID: this.selectedCategoryId,
           ARTICLE_TYPE: this.selectedTypeId,
           BRAND_ID: this.selectedBrandId,
+          COMPANY_ID : this.selected_Company_id,
           // UNIT_ID: this.selectedProductionUnitId,
           Units: Array.isArray(this.selectedProductionUnitId)
             ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))

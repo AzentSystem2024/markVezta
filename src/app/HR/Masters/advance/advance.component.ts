@@ -185,6 +185,7 @@ gridButtons = [
 ];
   selected_Company_id: any;
   docNo: any;
+  selected_fin_id: any;
   constructor(private fb: FormBuilder, private dataService: DataService,private ngZone: NgZone,private cdr:ChangeDetectorRef,private router: Router) {
     this.formSource = this.fb.group({
       Id: [null],
@@ -624,8 +625,8 @@ this.ledgerlist()
     console.log(sessionData,'=================session data==========')
     this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
     console.log(this.selected_Company_id,'============selected_Company_id==============')
-//     this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
-//     console.log(this.selected_fin_id,'===========selected fin id===================')
+    this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
+    console.log(this.selected_fin_id,'===========selected fin id===================')
 //     
   }
   //  =====================================Add advance========================
@@ -641,7 +642,8 @@ this.ledgerlist()
     const rec_install_count = this.formSource.value.No_installments;
     const rec_install_amount = this.formSource.value.installmen_amt;
     const remarks = this.formSource.value.Remarks;
-   const company_id=this.selected_Company_id
+   const company_id=this.selected_Company_id;
+   const fin_id = this.selected_fin_id;
     // if (!emp_id || !date || !adv_type_id || !advance_Amount) {
     //   // Handle validation error here
     //   notify(
@@ -670,7 +672,8 @@ this.ledgerlist()
           rec_install_count,
           rec_install_amount,
           remarks,
-          company_id
+          company_id,
+          fin_id,
         )
         .subscribe((res: any) => {
           console.log(res);
