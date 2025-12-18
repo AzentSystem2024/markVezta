@@ -224,7 +224,10 @@ export class SupplierEditComponent {
   }
 
   listSupplier() {
-    this.dataservice.getSupplierData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getSupplierData(payload).subscribe((response) => {
       this.supplier = response;
       console.log(response);
     });

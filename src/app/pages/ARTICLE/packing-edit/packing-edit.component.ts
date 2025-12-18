@@ -85,17 +85,30 @@ export class PackingEditComponent {
   combinationString: string
  combination_value: any[]=[]
 PackingEntriesData:any;
+  selected_Company_id: any;
 
 
  
   constructor(private dataService: DataService) {
+    this.sesstion_Details();
     this.getDropdownLists();
-    this.dataService.get_packages_list_api().subscribe((res: any) => {
+
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.get_packages_list_api(payload).subscribe((res: any) => {
       console.log('response from get packing list api:', res);
 
       this.packing_list = res.Data;
     });
   }
+
+    sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
 
   closePopup() {
     this.popupClosed.emit();
@@ -342,6 +355,7 @@ const comb_Data = this.articleSizeData.map(item => `${item.Size}x${item.Qty}`).j
       color: this.PackingData.COLOR,
       categoryID: this.PackingData.CATEGORY_ID,
       unitID: this.PackingData.UNIT_ID,
+      COMPANY_ID : this.selected_Company_id
     };
 
     console.log('Payload for article data:', payload);
