@@ -56,6 +56,8 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   HSN_CODE: any;
   GST_PERC: any;
   selected_Company_id: any;
+  isInterState: boolean;
+  isIntraState: boolean;
   constructor(private service: DataService, private sanitizer: DomSanitizer) {
     const settingsData = sessionStorage.getItem('settings');
     this.settingsData = settingsData ? JSON.parse(settingsData) : null;
@@ -555,18 +557,20 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       '============selected_Company_id=============='
     );
   }
-  
+
   loadPurchaseOrders(itemId: string) {
-    this.service.getLast5PoItemsList(itemId,this.selected_Company_id).subscribe((data: any[]) => {
-      // Filter out records where PO_NO matches this.newPOData.PO_NO
-      this.purchaseOrders = data
-        .filter((po) => po.PO_NO !== this.newPoData.PO_NO)
-        .map((po) => ({
-          ...po,
-          // Ensure the PRICE field has 2 decimal places
-          PRICE: parseFloat(po.PRICE).toFixed(2),
-        }));
-    });
+    this.service
+      .getLast5PoItemsList(itemId, this.selected_Company_id)
+      .subscribe((data: any[]) => {
+        // Filter out records where PO_NO matches this.newPOData.PO_NO
+        this.purchaseOrders = data
+          .filter((po) => po.PO_NO !== this.newPoData.PO_NO)
+          .map((po) => ({
+            ...po,
+            // Ensure the PRICE field has 2 decimal places
+            PRICE: parseFloat(po.PRICE).toFixed(2),
+          }));
+      });
   }
 
   getPoHistoryList() {
@@ -619,75 +623,84 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.formdata && changes.formdata.currentValue) {
-      // Format imported date
       this.transID = this.formdata.TRANS_ID;
       this.fileDetails.DOC_ID = this.formdata.ID;
+
       this.newPoData = { ...this.formdata };
-      this.newPoData.PoDetails = this.formdata.PoDetails;
-      const podate = this.formdata.PO_DATE;
-      if (podate) {
-        const date = new Date(podate);
-        this.newPoData.PO_DATE = `${date.toLocaleDateString()}`;
-      } else {
-        this.newPoData.PO_DATE = '';
+      this.newPoData.PoDetails = this.formdata.PoDetails || [];
+
+      // 🔥 STEP 1: DETERMINE GST MODE FROM FIRST ROW
+      const firstDetail = this.newPoData.PoDetails[0];
+
+      if (firstDetail) {
+        if (firstDetail.TAX_PERCENT && firstDetail.TAX_PERCENT > 0) {
+          // IGST
+          this.isInterState = true;
+          this.isIntraState = false;
+        } else {
+          // CGST + SGST
+          this.isInterState = false;
+          this.isIntraState = true;
+        }
       }
-      const deldate = this.formdata.DELIVERY_DATE;
-      if (deldate) {
-        const date = new Date(deldate);
-        this.newPoData.DELIVERY_DATE = `${date.toLocaleDateString()}`;
-      } else {
-        this.newPoData.DELIVERY_DATE = '';
-      }
+
+      // 🔥 STEP 2: MAP ITEMS (NO CALCULATION CHANGE)
       this.savedItems = this.newPoData.PoDetails.map((item, index) => {
-        // Calculate the base amount after discount
         const baseAmount = item.QUANTITY * item.PRICE;
         const supplierAmount = item.QUANTITY * item.SUPP_PRICE;
 
         const discountAmount = (baseAmount * (item.DISC_PERCENT || 0)) / 100;
         const supplierDiscAmount =
           (supplierAmount * (item.DISC_PERCENT || 0)) / 100;
-        const taxableSupplier = supplierAmount - supplierDiscAmount; // Amount after discount for supplier
+
+        const taxableSupplier = supplierAmount - supplierDiscAmount;
         const taxable = baseAmount - discountAmount;
 
-        // Calculate VAT
-        const vatAmount = (taxable * (item.TAX_PERCENT || 0)) / 100;
+        let vatAmount = 0;
 
-        // Calculate totals
-        const totalSupplier = taxableSupplier;
-        const total = taxable + vatAmount;
+        if (item.TAX_PERCENT && item.TAX_PERCENT > 0) {
+          // IGST
+          vatAmount = (taxable * item.TAX_PERCENT) / 100;
+        } else {
+          // CGST + SGST
+          const cgst = item.CGST || 0;
+          const sgst = item.SGST || 0;
+          vatAmount = (taxable * (cgst + sgst)) / 100;
+        }
 
         return {
           ITEM_ID: item.ITEM_ID,
           slNo: index + 1,
-          ITEM_CODE: item.ITEM_CODE || '',
+          ITEM_CODE: item.ITEM_CODE,
           DESCRIPTION: item.ITEM_DESC,
           UOM: item.UOM,
           PACKING_NAME: item.PACKING,
           SUPP_PRICE: item.SUPP_PRICE,
-          PURCH_PRICE: item.PRICE || 0,
+          PURCH_PRICE: item.PRICE,
           qtyOrdered: item.QUANTITY,
-          Amount: Number(baseAmount.toFixed(2)),
+          Amount: +baseAmount.toFixed(2),
           discountPercentage: item.DISC_PERCENT,
-          discountAmount: Number(discountAmount.toFixed(2)),
-          taxable_Supplier: Number(taxableSupplier.toFixed(2)),
-          taxable: Number(taxable.toFixed(2)), // Convert to local currency if needed
-          VAT_PERC: item.TAX_PERCENT,
-          vatAmount: Number(vatAmount.toFixed(2)),
-          total_Supplier: Number(totalSupplier.toFixed(2)),
-          total: Number(total.toFixed(2)), // Convert to local currency if needed
+          discountAmount: +discountAmount.toFixed(2),
+          taxable_Supplier: +taxableSupplier.toFixed(2),
+          taxable: +taxable.toFixed(2),
+          VAT_PERC: item.TAX_PERCENT || 0,
+          CGST: item.CGST || 0,
+          SGST: item.SGST || 0,
+          vatAmount: +vatAmount.toFixed(2),
+          total_Supplier: +taxableSupplier.toFixed(2),
+          total: +(taxable + vatAmount).toFixed(2),
         };
       });
 
+      // 🔥 STEP 3: FORCE GRID TO REPAINT
+      setTimeout(() => {
+        this.dataGrid?.instance?.repaint();
+      }, 0);
+
+      // EXISTING CALLS
       this.getSupplierByid(this.newPoData.SUPP_ID);
-
-      console.log('Mapped PoDetails with calculated values:', this.savedItems);
-      console.log(this.newPoData.PoDetails, 'podetailsform');
-
       this.getAttachmentList();
       this.getPoHistoryList();
-
-      this.selectedRowKeys = this.savedItems.map((item) => item.ITEM_CODE);
-      console.log(this.selectedRowKeys, 'selectedrowkeys');
 
       this.calculateTotalQuantity();
       this.calculateTotalIncludingTax();

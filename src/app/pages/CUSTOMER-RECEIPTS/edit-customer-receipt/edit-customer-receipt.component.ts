@@ -99,6 +99,7 @@ export class EditCustomerReceiptComponent {
   pdcList: any;
   selectedstoreId: any;
   selectedCustomer: any;
+  private lastReceiptMode: string | null = null;
 
   constructor(private dataService: DataService) {}
 
@@ -177,17 +178,21 @@ export class EditCustomerReceiptComponent {
       const userDataString = localStorage.getItem('userData');
       if (userDataString) {
         const userData = JSON.parse(userDataString);
-        const allCompanies = userData.Companies || [];
-        this.companyList = allCompanies.filter(
-          (company: any) => company.COMPANY_ID === this.selectedCompanyId
-        );
+        this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
+        // const allCompanies = userData.Companies || [];
+        // this.companyList = allCompanies.filter(
+        //   (company: any) => company.COMPANY_ID === this.selectedCompanyId
+        // );
       }
       console.log(this.receiprtFormData.REC_DETAIL[0].AMOUNT, 'AMOUNTPDC');
-      this.mainInvoiceGridList = firstReceipt.REC_DETAIL || []; // Store REC_DETAIL separately
-      this.pendingInvoiceList = [...this.mainInvoiceGridList];
-      this.selectedRowsKeys = this.pendingInvoiceList
-        .filter((row) => row.AMOUNT > 0) // or use your own condition
-        .map((row) => row.BILL_ID);
+      this.mainInvoiceGridList = firstReceipt.REC_DETAIL || [];
+      this.selectedDistributorId = Number(firstReceipt.DISTRIBUTOR_ID);
+
+      // NOW call invoice list
+      this.getInvoiceList();
+      this.selectedRowsKeys = this.mainInvoiceGridList
+        .filter((row: any) => Number(row.AMOUNT) > 0)
+        .map((row: any) => row.BILL_ID);
       switch (this.receiprtFormData.PAY_TYPE_ID) {
         case 1:
           this.selectedPaymentMode = 'Cash';
@@ -226,7 +231,6 @@ export class EditCustomerReceiptComponent {
       this.customerType = firstReceipt.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
 
       this.getCompanyListDropdown();
-      this.getInvoiceList();
     }
   }
 
@@ -237,56 +241,63 @@ export class EditCustomerReceiptComponent {
     return this.pendingInvoiceList.indexOf(rowData) + 1; // 1-based numbering
   };
   getInvoiceList() {
+    if (!this.selectedDistributorId) return;
+
     const payload = {
       CUST_ID: this.selectedDistributorId,
       COMPANY_ID: this.selectedCompanyId,
     };
+
     this.dataService
       .getInvoiceListForCustomerReceipt(payload)
       .subscribe((response: any) => {
-        const allInvoices = response.Data || [];
-        const recDetails = this.mainInvoiceGridList || [];
+        const pendingList = response.Data || [];
+        const savedDetails = this.mainInvoiceGridList || [];
+        if (this.isReadOnlyMode) {
+          this.pendingInvoiceList = savedDetails.map((row: any) => ({
+            ...row,
+            AMOUNT: row.AMOUNT, // preserve saved amount
+          }));
 
-        const selectedKeys: number[] = [];
+          this.selectedRowsKeys = savedDetails.map((row: any) => row.BILL_ID);
 
-        recDetails.forEach((detail) => {
-          const billId = +detail.BILL_ID;
+          setTimeout(() => {
+            this.itemsGridRef?.instance?.refresh();
+          }, 0);
 
-          const matchedInvoice = allInvoices.find(
-            (invoice: any) => +invoice.BILL_ID === billId
-          );
+          return; //  stop further processing
+        }
+        console.log('Pending list from API:', pendingList);
+        console.log('Saved list:', savedDetails);
 
-          if (matchedInvoice) {
-            matchedInvoice.AMOUNT = detail.AMOUNT;
-            selectedKeys.push(billId);
-          }
-        });
+        if (pendingList.length > 0) {
+          // ✅ Merge pending + saved
+          this.pendingInvoiceList = pendingList.map((p) => {
+            const matched = savedDetails.find((s) => s.BILL_ID === p.BILL_ID);
+            return {
+              ...p,
+              AMOUNT: matched?.AMOUNT || 0,
+            };
+          });
+        } else {
+          // ✅ FALLBACK (this is what was missing)
+          this.pendingInvoiceList = [...savedDetails];
+        }
 
-        this.pendingInvoiceList = allInvoices;
-        this.selectedRowsKeys = selectedKeys;
-
-        console.log('Matched Invoices:', this.pendingInvoiceList);
-        console.log('Selected Row Keys:', this.selectedRowsKeys);
+        // ✅ Always select saved rows
+        this.selectedRowsKeys = savedDetails.map((s) => s.BILL_ID);
       });
   }
 
   getCompanyListDropdown(id?: number) {
     this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
       this.distributorList = response;
-      console.log(this.distributorList, 'distributorList');
 
-      // Use id if needed
-      if (id) {
-        console.log('Called with ID:', id);
-        // You can filter distributorList based on id if required
-      }
-
-      // Set selectedDistributorId only after distributorList is loaded
-      if (
-        this.customerType === 'Dealer' &&
-        this.receiprtFormData?.DISTRIBUTOR_ID
-      ) {
+      if (this.receiprtFormData?.DISTRIBUTOR_ID) {
         this.selectedDistributorId = this.receiprtFormData.DISTRIBUTOR_ID;
+
+        // ✅ CALL HERE (correct timing)
+        // this.getInvoiceList();
       }
     });
   }
@@ -322,11 +333,18 @@ export class EditCustomerReceiptComponent {
   }
 
   onReceiptModeChange(e: any) {
-    const previousMode = this.receiptMode;
-    this.receiptMode = e.value;
+    const newMode = e.value;
 
-    // ✅ Keep PAY_TYPE_ID in sync with selected mode
-    switch (this.receiptMode) {
+    // Only clear when user actually changes mode
+    if (this.lastReceiptMode && this.lastReceiptMode !== newMode) {
+      this.clearBankAndLedgerDetails();
+    }
+
+    this.receiptMode = newMode;
+    this.lastReceiptMode = newMode;
+
+    // Sync PAY_TYPE_ID
+    switch (newMode) {
       case 'Cash':
         this.receiprtFormData.PAY_TYPE_ID = 1;
         break;
@@ -344,9 +362,8 @@ export class EditCustomerReceiptComponent {
     }
 
     this.applyReceiptModeFilter();
-
-    console.log('Updated PAY_TYPE_ID:', this.receiprtFormData.PAY_TYPE_ID);
   }
+
   clearPdcFields() {
     this.receiprtFormData.CHEQUE_NO = '';
     this.receiprtFormData.CHEQUE_DATE = null;
@@ -386,6 +403,7 @@ export class EditCustomerReceiptComponent {
   }
 
   onSearchCheque() {
+    if (this.receiptMode !== 'PDC') return;
     // Show popup
     this.pdcPopupVisible = true;
 
@@ -396,7 +414,7 @@ export class EditCustomerReceiptComponent {
   getPdcofSelectedSupplier() {
     const payload = {
       CUST_ID: this.selectedDistributorId,
-      LEDGER_ID: this.selectedLedger,
+      LEDGER_ID: this.receiprtFormData.PAY_HEAD_ID,
     };
     this.dataService.getPdcListByCustomer(payload).subscribe({
       next: (response: any) => {
@@ -412,35 +430,14 @@ export class EditCustomerReceiptComponent {
     });
   }
 
-  // onPdcSelected(e: any) {
-  //   const selectedCheque = e.data;
-  //   console.log('Selected Cheque:', selectedCheque);
-
-  //   // Example: assign selected cheque to form
-  //   this.receiprtFormData.CHEQUE_NO = selectedCheque.CHEQUE_NO;
-  //   if (selectedCheque.DUE_DATE) {
-  //     // Parse dd-MM-yyyy manually
-  //     const parts = selectedCheque.DUE_DATE.split('-'); // ["27","08","2025"]
-  //     this.receiprtFormData.CHEQUE_DATE = new Date(
-  //       Number(parts[2]), // year
-  //       Number(parts[1]) - 1, // month is 0-based
-  //       Number(parts[0]) // day
-  //     );
-  //   } else {
-  //     this.receiprtFormData.CHEQUE_DATE = null;
-  //   }
-  //   this.receiprtFormData.BANK_NAME = selectedCheque.BANK_NAME;
-  //   this.receiprtFormData.AMOUNT = selectedCheque.AMOUNT;
-
-  //   this.pdcPopupVisible = false;
-  // }
-
   onPdcSelected(e: any) {
     const selectedCheque = e.data;
-
+    console.log(selectedCheque, 'SELECTEDCHEQUE');
+    const chequeAmount = Number(selectedCheque.AMOUNT || 0);
     this.receiprtFormData = {
       ...this.receiprtFormData,
       CHEQUE_NO: selectedCheque.CHEQUE_NO,
+      BANK_NAME: selectedCheque.BANK_NAME,
       CHEQUE_DATE: selectedCheque.DUE_DATE
         ? new Date(
             selectedCheque.DUE_DATE.split('-')[2],
@@ -448,11 +445,30 @@ export class EditCustomerReceiptComponent {
             selectedCheque.DUE_DATE.split('-')[0]
           )
         : null,
-      BANK_NAME: selectedCheque.BANK_NAME,
-      AMOUNT: Number(selectedCheque.AMOUNT), //  important
+      NET_AMOUNT: chequeAmount,
+      AMOUNT: chequeAmount, //  important
     };
 
     this.pdcPopupVisible = false;
+  }
+
+  clearBankAndLedgerDetails() {
+    // Clear bank / PDC fields
+    this.receiprtFormData = {
+      ...this.receiprtFormData,
+      CHEQUE_NO: null,
+      CHEQUE_DATE: null,
+      BANK_NAME: null,
+      AMOUNT: null,
+      NET_AMOUNT: null,
+      PAY_HEAD_ID: null,
+    };
+
+    this.selectedLedger = null;
+
+    // Clear PDC popup
+    this.pdcPopupVisible = false;
+    this.pdcList = [];
   }
 
   onGridContentReady(e: any) {
@@ -598,7 +614,7 @@ export class EditCustomerReceiptComponent {
       console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
     }
     if (selectedId) {
-      this.getInvoiceList();
+      // this.getInvoiceList();
     }
   }
 
@@ -681,37 +697,46 @@ export class EditCustomerReceiptComponent {
       return;
     }
 
-    const selectedRows = this.itemsGridRef.instance.getSelectedRowsData();
+    const selectedRows =
+      this.itemsGridRef?.instance?.getSelectedRowsData() || [];
 
     if (!selectedRows.length) {
       notify('Please select at least one row.', 'warning', 3000);
       return;
     }
 
-    let remainingAmount = enteredAmount;
+    // ✅ STEP 1: RESET all selected rows first
+    selectedRows.forEach((row: any) => {
+      row.AMOUNT = 0;
+    });
 
-    // ✅ Fill from first selected row downwards
+    // ✅ STEP 2: DISTRIBUTE amount sequentially
+    let remaining = enteredAmount;
+
     for (const row of selectedRows) {
-      const pending = Number(row.PENDING_AMOUNT);
+      const pending = Number(row.PENDING_AMOUNT) || 0;
 
-      if (remainingAmount <= 0) break;
+      if (remaining <= 0) {
+        row.AMOUNT = 0;
+        continue;
+      }
 
-      if (pending <= remainingAmount) {
+      if (remaining >= pending) {
         row.AMOUNT = pending;
-        remainingAmount -= pending;
+        remaining -= pending;
       } else {
-        row.AMOUNT = remainingAmount;
-        remainingAmount = 0;
+        row.AMOUNT = remaining;
+        remaining = 0;
       }
     }
 
-    // ✅ Update grid data source
+    // ✅ Refresh grid
     this.pendingInvoiceList = [...this.pendingInvoiceList];
 
-    // ✅ Close popup
+    // Close popup
     this.showFillAmountPopup = false;
 
-    notify('Amounts filled successfully.', 'success', 3000);
+    notify('Amounts filled successfully.', 'success', 2000);
   }
 
   resetForm() {

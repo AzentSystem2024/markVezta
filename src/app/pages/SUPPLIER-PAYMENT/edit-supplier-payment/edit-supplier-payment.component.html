@@ -107,40 +107,39 @@
           <dxi-column
             dataField="DOC_NO"
             caption="Doc No"
-            [allowEditing]="true"
-            [readOnly]="isReadOnlyMode"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
             dataField="PURCH_DATE"
             caption="Date"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
             dataField="SUPP_INV_NO"
             caption="Supplier Invoice No"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
             dataField="NET_AMOUNT"
             caption="Inv Amount"
-            [allowEditing]="true"
+            [allowEditing]="false"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [width]="120"
           ></dxi-column>
           <dxi-column
             dataField="PENDING_AMOUNT"
             caption="Balance"
-            [allowEditing]="true"
+            [allowEditing]="false"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
           </dxi-column>
           <dxi-column
             dataField="AMOUNT"
             caption="Received Amount"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
             <dxi-validation-rule
@@ -186,7 +185,7 @@
         <div
           class="bordered-grid"
           style="
-            margin-top: 10px;
+            margin-top: 5px;
             padding: 15px;
             display: flex;
             flex-direction: column;
@@ -281,7 +280,7 @@
                 label="Bank Name"
                 labelMode="floating"
                 [width]="'100%'"
-                style="margin-top: 5px"
+                style="margin-top: 8px"
                 [disabled]="!(receiptMode === 'Bank' || receiptMode === 'PDC')"
                 [readOnly]="isReadOnlyMode"
               ></dx-text-box>
@@ -291,7 +290,7 @@
           <!-- Narration & Amount Row -->
           <div
             *ngIf="receiptMode === 'PDC'"
-            style="display: flex; gap: 5px; margin-top: 2px"
+            style="display: flex; gap: 5px; margin-top: 1px"
           >
             <!-- Narration aligned with Ledger -->
             <div style="flex: 1">
@@ -324,7 +323,7 @@
               label="Narration"
               labelMode="floating"
               [width]="'100%'"
-              style="margin-top: 2px"
+              style="margin-top: 1px"
               [readOnly]="isReadOnlyMode"
             ></dx-text-box>
           </div>

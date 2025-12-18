@@ -164,39 +164,39 @@ export class InvoiceTrOutComponent {
 
   getInvoiceList() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id
-    }
-    this.dataService.getInvoiceMainListTrOut(payload).subscribe((response: any) => {
-      this.invoiceList = response.Data.map((item: any) => {
-        let saleDate = item.INVOICE_DATE;
-        let dateValue: Date;
+      COMPANY_ID: this.selected_Company_id,
+    };
 
-        // Case 1: DD-MM-YYYY (matches exactly 2-2-4 digits)
-        if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
-          const [day, month, year] = saleDate.split('-').map(Number);
-          dateValue = new Date(year, month - 1, day);
-        }
-        // Case 2: ISO format from backend
-        else if (typeof saleDate === 'string') {
-          dateValue = new Date(saleDate);
-        }
-        // Case 3: Already a date
-        else {
-          dateValue = new Date(saleDate);
-        }
+    this.dataService
+      .getInvoiceMainListTrOut(payload)
+      .subscribe((response: any) => {
+        this.invoiceList = response.Data.map((item: any) => {
+          // ---- Date normalization (unchanged) ----
+          let saleDate = item.INVOICE_DATE;
+          let dateValue: Date;
 
-        return {
-          ...item,
-          INVOICE_DATE: dateValue,
-        };
-      }).sort((a: any, b: any) => {
-        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-        return numB - numA; // descending order
+          if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
+            const [day, month, year] = saleDate.split('-').map(Number);
+            dateValue = new Date(year, month - 1, day);
+          } else {
+            dateValue = new Date(saleDate);
+          }
+
+          // ---- Extract numeric part of DOC_NO safely ----
+          const match = item.DOC_NO?.match(/\d+$/); // last number
+          const docNoNumber = match ? Number(match[0]) : 0;
+
+          return {
+            ...item,
+            INVOICE_DATE: dateValue,
+            _docNoNumber: docNoNumber, // helper field
+          };
+        })
+          // ✅ DESCENDING → latest first
+          .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
+
+        this.applyDateFilter();
       });
-
-      this.applyDateFilter();
-    });
   }
 
   // getInvoiceList() {

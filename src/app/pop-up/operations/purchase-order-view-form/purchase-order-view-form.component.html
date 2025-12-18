@@ -319,7 +319,14 @@
       [editorOptions]="{ format: '#0' }"
     >
     </dxi-column>
-    <!-- <dxi-column caption="Price ({{ localCurrencyCode }})" dataField="PURCH_PRICE" width="100" [allowEditing]="false" [format]="{ type: 'fixedPoint', precision: 2 }" [editorOptions]="{format: '#0'}"></dxi-column> -->
+    <dxi-column
+      caption="Price"
+      dataField="PURCH_PRICE"
+      width="100"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+      [editorOptions]="{ format: '#0' }"
+    ></dxi-column>
     <dxi-column
       caption="Qty"
       dataField="qtyOrdered"
@@ -373,6 +380,36 @@
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
+    <!-- IGST -->
+    <dxi-column
+      caption="IGST %"
+      dataField="VAT_PERC"
+      alignment="center"
+      width="70"
+      [visible]="isInterState"
+      [allowEditing]="false"
+    ></dxi-column>
+
+    <!-- CGST -->
+    <dxi-column
+      caption="CGST %"
+      dataField="CGST"
+      alignment="center"
+      width="70"
+      [visible]="isIntraState"
+      [allowEditing]="false"
+    ></dxi-column>
+
+    <!-- SGST -->
+    <dxi-column
+      caption="SGST %"
+      dataField="SGST"
+      alignment="center"
+      width="70"
+      [visible]="isIntraState"
+      [allowEditing]="false"
+    ></dxi-column>
+
     <!-- <dxi-column
       caption="Tax (%)"
       dataField="VAT_PERC"

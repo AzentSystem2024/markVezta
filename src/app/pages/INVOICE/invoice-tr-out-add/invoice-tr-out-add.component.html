@@ -199,18 +199,6 @@
             [visible]="showGST"
             [allowEditing]="false"
           ></dxi-column>
-          <dxi-column
-            dataField="TAX_AMOUNT"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? 'VAT Amount'
-                : ' GST Amount'
-            "
-            dataType="number"
-            format="#,##0.00"
-            [allowEditing]="false"
-            [calculateCellValue]="calculateGstAmount"
-          ></dxi-column>
 
           <dxi-column
             dataField="CGST"
@@ -227,7 +215,18 @@
             [visible]="showSGST"
             [allowEditing]="false"
           ></dxi-column>
-
+          <dxi-column
+            dataField="TAX_AMOUNT"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT Amount'
+                : ' GST Amount'
+            "
+            dataType="number"
+            format="#,##0.00"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateGstAmount"
+          ></dxi-column>
           <dxi-column
             dataField="TOTAL_AMOUNT"
             caption="Total"

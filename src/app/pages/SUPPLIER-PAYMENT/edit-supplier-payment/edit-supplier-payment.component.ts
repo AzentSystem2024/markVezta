@@ -268,7 +268,22 @@ export class EditSupplierPaymentComponent {
 
         console.log('pendingList:', pendingList);
         console.log('payDetails:', payDetails);
+        // READ-ONLY MODE → SHOW ONLY SAVED ROWS
+        if (this.isReadOnlyMode) {
+          this.mainGridData = payDetails.map((item: any) => ({
+            ...item,
+            AMOUNT: item.AMOUNT, // keep saved amount
+          }));
 
+          this.selectedBillIds = payDetails.map((item: any) => item.BILL_ID);
+
+          // Force grid refresh safely
+          setTimeout(() => {
+            this.itemsGridRef?.instance?.refresh();
+          }, 0);
+
+          return; //  stop further processing
+        }
         // ✅ Build list of selected BILL_IDs from PAY_DETAIL
         this.selectedBillIds = payDetails.map((detail: any) => detail.BILL_ID);
 
@@ -658,6 +673,21 @@ export class EditSupplierPaymentComponent {
   }
 
   saveReceipt() {
+    if (!this.selectedSupplierId) {
+      notify('Please select a supplier.', 'warning', 3000);
+      return;
+    }
+
+    if (!this.paymentDate) {
+      notify('Please select payment date.', 'warning', 3000);
+      return;
+    }
+
+    if (!this.selectedPaymentMode) {
+      notify('Please select payment mode.', 'warning', 3000);
+      return;
+    }
+
     const selectedRows =
       this.itemsGridRef?.instance?.getSelectedRowsData() || [];
 
@@ -677,6 +707,10 @@ export class EditSupplierPaymentComponent {
       return;
     }
     const netAmount = this.calculateNetAmount(validSuppDetails);
+    if (!this.ledger) {
+      notify('Please select a ledger.', 'warning', 3000);
+      return;
+    }
     const payload = {
       TRANS_ID: this.paymentFormData.TRANS_ID,
       TRANS_TYPE: 21,
