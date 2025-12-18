@@ -65,7 +65,7 @@ export class GrnComponent implements OnInit {
   displayMode: any = 'full';
   showPageSizeSelector = true;
   width: any = '90vw';
-  height: any = '90vh';
+  height: any = '100vh';
   grnDataSource: any;
   isEditPopupOpened: boolean = false;
   isVerifyPopupOpened: boolean = false;
@@ -206,7 +206,7 @@ export class GrnComponent implements OnInit {
     this.getDocNo();
   }
 
-         getDocNo() {
+  getDocNo() {
     const payload = {
       TRANS_TYPE: 18,
       COMPANY_ID: this.selectedCompanyId,
@@ -223,53 +223,50 @@ export class GrnComponent implements OnInit {
   }
 
   onClickSaveNewData() {
-  const data = this.grnNewForm.getNewGrnData();
-  console.log(data, 'grn new data');
-  data.IS_APPROVED = this.isApproved;
+    const data = this.grnNewForm.getNewGrnData();
+    console.log(data, 'grn new data');
+    data.IS_APPROVED = this.isApproved;
+    console.log(data, 'DATAAAAAAAAAAAAAAAAAAAAAA');
+    this.service.saveGrnData(data).subscribe((res) => {
+      console.log('data saved', res);
 
-  this.service.saveGrnData(data).subscribe((res) => {
-    console.log('data saved', res);
+      // Check proper save success
+      if (res.Message === 'Success' && res.Flag === 1) {
+        // Check approval from payload
+        if (data.IS_APPROVED === true) {
+          notify(
+            {
+              message: 'Data Saved & Approved Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success'
+          );
+        } else {
+          notify(
+            {
+              message: 'Data Saved Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success'
+          );
+        }
 
-    // Check proper save success
-    if (res.Message === 'Success' && res.Flag === 1) {
-
-      // Check approval from payload
-      if (data.IS_APPROVED === true) {
-        notify(
-          {
-            message: 'Data Saved & Approved Successfully',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'success'
-        );
+        // After success actions
+        this.ClearFormData();
+        this.GrnNewFormComponent?.clearDemoArray();
+        this.isGRNPopupVisible = false;
+        this.getGrnLogData();
       } else {
         notify(
           {
-            message: 'Data Saved Successfully',
-            position: { at: 'top center', my: 'top center' },
+            message: 'Your Data Not Saved',
+            position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'error'
         );
       }
-
-      // After success actions
-      this.ClearFormData();
-      this.GrnNewFormComponent?.clearDemoArray(); 
-      this.isGRNPopupVisible = false;
-      this.getGrnLogData();
-
-    } else {
-      notify(
-        {
-          message: 'Your Data Not Saved',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'error'
-      );
-    }
-  });
-}
-
+    });
+  }
 
   updateGrnData() {
     const data = this.grnEditForm.getNewGrnData();
@@ -353,24 +350,24 @@ export class GrnComponent implements OnInit {
     });
   }
 
-   sessionData_tax() {
+  sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
-  
+
   getGrnLogData() {
-    const payload ={
-      COMPANY_ID : this.selectedCompanyId
-    }
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
     this.service.getGrnLogData(payload).subscribe((res: any) => {
       this.grnDataSource = res.grnheader;
     });
   }
 
   ngOnInit(): void {
-     this.sessionData_tax();
+    this.sessionData_tax();
     this.getGrnLogData();
     this.getTemplateList();
     this.getDocNo();
@@ -380,7 +377,7 @@ export class GrnComponent implements OnInit {
     event.cancel = true;
     this.grnId = event.data.ID;
     const Id = event.data.ID;
-    
+
     console.log(Id, 'id');
     this.isVerifyPopupOpened = true;
     this.service.selectGrnData(Id).subscribe((res) => {
@@ -419,7 +416,7 @@ export class GrnComponent implements OnInit {
     console.log(e);
     e.cancel = true;
     const id = e.row.data.ID;
-     this.selectedGrnId = id;
+    this.selectedGrnId = id;
     this.isViewPopupOpened = true;
     this.change.detectChanges();
     this.service.selectGrnData(id).subscribe((res) => {
@@ -448,31 +445,24 @@ export class GrnComponent implements OnInit {
   }
 
   ClearFormData() {
-    // this.grnNewForm.clearForm();
     if (this.grnNewForm) {
-      this.grnNewForm.clearForm();
+      this.grnNewForm.clearForm(); // call ONCE
     }
 
     this.isGRNPopupVisible = false;
 
-    // Optional: clear form reference if using ViewChild
-    this.grnNewForm?.clearForm?.();
+    // Reset arrays only
+    this.grnNewForm.newGrnData.GRNDetails = [];
+    this.grnNewForm.newGrnData.GRN_Item_Cost = [];
+    this.grnNewForm.newGrnData.GRN_Cost = [];
 
-    // Reset local data
-    this.grnNewForm.newGrnData = {
-      NET_AMOUNT: 0,
-      SUPP_NET_AMOUNT: 0,
-      TOTAL_COST: 0,
-      GRNDetails: [],
-      GRN_Item_Cost: [],
-      GRN_Cost: [],
-      // ... other fields you want to reset
-    };
+    // Reset totals only
+    this.grnNewForm.newGrnData.NET_AMOUNT = 0;
+    this.grnNewForm.newGrnData.SUPP_NET_AMOUNT = 0;
+    this.grnNewForm.newGrnData.TOTAL_COST = 0;
 
-    // Optional: reset poDetails
+    // Reset helpers
     this.grnNewForm.poDetails = [];
-
-    // Optional: reset formatting
     this.grnNewForm.formattedNetAmount = '';
     this.grnNewForm.formattedLocalNetAmount = '';
   }
