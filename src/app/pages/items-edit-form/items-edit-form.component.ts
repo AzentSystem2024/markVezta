@@ -411,13 +411,14 @@ export class ItemsEditFormComponent implements OnInit {
     dataservice.getVatclassData().subscribe((data) => {
       this.vat = data;
     });
-    dataservice.getSupplierData().subscribe((data) => {
+    const payload = { COMPANY_ID : this.selected_Company_id };
+    dataservice.getSupplierData(payload).subscribe((data) => {
       this.supplier = data;
     });
     dataservice.getDropdownData('ITEMCATEGORY').subscribe((data) => {
       this.catagory = data;
     });
-    const payload = {};
+    
 
     dataservice.getItemsData(payload).subscribe((data) => {
       this.items = data;

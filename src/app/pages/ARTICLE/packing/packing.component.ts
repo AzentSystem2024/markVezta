@@ -64,8 +64,10 @@ userData:any
     onClick: () => this.refreshGrid(),
     text: '',
   };
+  selected_Company_id: any;
 
   constructor(private dataService: DataService,private ngZone: NgZone,private router:Router){
+    this.sesstion_Details();
     this.getPackingList()
 
   const currentUrl = this.router.url;
@@ -208,8 +210,18 @@ console.log('close packing popup called');
       
   //   })
   // }
+
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
   getPackingList() {
-  this.dataService.get_packages_list_api().subscribe((res: any) => {
+    const payload = {
+        COMPANY_ID : this.selected_Company_id
+    }; // Add any necessary parameters here
+  this.dataService.get_packages_list_api(payload).subscribe((res: any) => {
     console.log('response from get packing list api:', res);
 
     this.packingList = res.Data.map((item: any, index: number) => ({

@@ -207,7 +207,10 @@ export class CustomerListComponent {
     );
   }
   showCustomer() {
-    this.dataservice.getCustomerData().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.getCustomerData(payload).subscribe((response: any) => {
       console.log(response);
 
       this.customer = response.map((item: any, index: number) => ({

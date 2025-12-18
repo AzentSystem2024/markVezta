@@ -198,6 +198,7 @@ selectedPackIndex: number | null = null;
 
   isEditing: boolean;
   editIndex: number;
+  selected_Company_id: any;
   constructor(private fb: FormBuilder, private dataservice: DataService,private ngZone: NgZone, private router : Router,private cdr:ChangeDetectorRef) {
     this.sizeOptions = Array.from({ length: 12 }, (_, i) => i + 1);
     this.formsource = this.fb.group({
@@ -207,6 +208,7 @@ selectedPackIndex: number | null = null;
       IS_INACTIVE: [true],
       size: [[]],
     });
+    this.sesstion_Details();
     this.get_list_data_category();
   }
 
@@ -605,9 +607,20 @@ Add_packagesUpdate() {
 }
 
 
+
+     sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
     //===============list of data================
     get_list_data_category() {
-      this.dataservice.list_of_category().subscribe((res: any) => {
+      const payload = {
+        COMPANY_ID : this.selected_Company_id
+      };
+      this.dataservice.list_of_category(payload).subscribe((res: any) => {
         console.log(res);
         // this.CategoryList = res.CATEGORIES;
             this.CategoryList = res.CATEGORIES.map((item: any, index: number) => ({

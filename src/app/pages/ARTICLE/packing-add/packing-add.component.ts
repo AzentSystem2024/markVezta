@@ -85,7 +85,10 @@ packing_list: any
 
 //===================dummy datasource of =========================
   constructor(private dataService:DataService){
-       this.dataService.get_packages_list_api().subscribe((res:any)=>{
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+       this.dataService.get_packages_list_api(payload).subscribe((res:any)=>{
       console.log('response from get packing list api:', res);
 
       this.packing_list=res.Data
@@ -158,7 +161,8 @@ loadArticle(){
     artNo:this.PackingData.ART_NO,
     color:this.PackingData.COLOR,
     categoryID:this.PackingData.CATEGORY_ID,
-    unitID:this.selectedProductionUnitId
+    unitID:this.selectedProductionUnitId,
+    COMPANY_ID : this.selected_Company_id
   }
 
      const ArtvalidationResult = this.ArtnoValidationGroup?.instance?.validate();

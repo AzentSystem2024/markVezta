@@ -1852,8 +1852,9 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown`, { NAME: 'CURRENCY' });
   }
 
-  public getSupplierData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}supplier/list`, {});
+  public getSupplierData(items:any): Observable<any> {
+    const Data  = items;
+    return this.http.post(`${this.apiUrl}supplier/list`, Data);
   }
   public postSupplierData(
     HQID: any,
@@ -2402,8 +2403,9 @@ export class DataService {
   }
 
   //customer
-  public getCustomerData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}customer/list`, {});
+  public getCustomerData(items: any): Observable<any> {
+    const Data = items;
+    return this.http.post(`${this.apiUrl}customer/list`, Data);
   }
   Select_Customer_Api(ID: any) {
     const getEndpoint = `${this.apiUrl}customer/select/${ID}`;
@@ -5205,8 +5207,9 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
-  list_of_category() {
-    return this.http.post(`${this.apiUrl}ArticleCategory/listdata`, {});
+  list_of_category(items:any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ArticleCategory/listdata`, data);
   }
 
   Add_category_list(item: any) {
@@ -5442,9 +5445,10 @@ The result can be exported to HTML or Markdown.`;
 
   //==============================Api for package master=======================
 
-  get_packages_list_api() {
+  get_packages_list_api(items:any) {
+    const data = items;
     const getEndpoint = this.apiUrl + 'packing/List';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, data);
   }
 
   get_combinbation_list_api(payload: any) {
@@ -5452,8 +5456,8 @@ The result can be exported to HTML or Markdown.`;
       .set('artNo', payload.artNo)
       .set('color', payload.color)
       .set('categoryID', payload.categoryID)
-      .set('unitID', payload.unitID);
-
+      .set('unitID', payload.unitID)
+      .set('COMPANY_ID',payload.COMPANY_ID);
     const getEndpoint = this.apiUrl + 'packing/sizes-for-combination';
     return this.http.post(getEndpoint, {}, { params });
   }

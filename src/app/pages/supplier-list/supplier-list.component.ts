@@ -175,7 +175,10 @@ export class SupplierListComponent implements OnInit {
   }
 
   showSupplier() {
-  this.dataservice.getSupplierData().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+  this.dataservice.getSupplierData(payload).subscribe((response: any) => {
     console.log(response, 'SUPPLIERRRRRRRRR');
 
     this.supplier = response.map((item: any, index: number) => ({
