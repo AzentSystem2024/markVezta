@@ -491,6 +491,15 @@ export class LedgerStatementComponent {
         this.isEditPopUp = true;
         this.cdr.detectChanges();
       });
+    } 
+    else if (TRANS_TYPE_ID === 1) {
+      console.log('=====navigate =====');
+      
+      this.dataService.selectOpeningBalance(trans_id).subscribe((response: any) => {
+        this.selected_Data = response;
+        this.isEditPopUp = true;
+        this.cdr.detectChanges();
+      });
     } else if (TRANS_TYPE_ID === 28) {
       console.log('=====navigate =====');
       this.dataService.select_Advance(trans_id).subscribe((response: any) => {

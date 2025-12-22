@@ -140,6 +140,7 @@ export class BankReconciliationAddComponent {
       '============selected_Company_id=============='
     );
   }
+
   onToDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
@@ -246,6 +247,7 @@ export class BankReconciliationAddComponent {
     const payload = {
       HEAD_ID: this.selectedBankId,
       DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.BankReconciliation_List(payload).subscribe((res: any) => {
       console.log(res);

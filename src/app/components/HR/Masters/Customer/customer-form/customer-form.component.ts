@@ -134,6 +134,7 @@ export class CustomerFormComponent {
       this.CountryDropdownData = data;
       console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
     });
+    this.getStateDropDown();
   }
   newCustomer = this.formCustomerData;
 
@@ -221,7 +222,11 @@ export class CustomerFormComponent {
   }
 
   getDealerDropDown() {
-    this.service.getDropdownData('DEALER').subscribe((response: any) => {
+    const payload = {
+      NAME: 'DEALER',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((response: any) => {
       this.dealerList = response;
     });
   }
@@ -235,8 +240,11 @@ export class CustomerFormComponent {
     });
   }
   getVATRuleDropDown() {
-    const dropdownvat = 'VATRULE';
-    this.service.getDropdownData(dropdownvat).subscribe((data: any) => {
+    const payload = {
+      NAME: 'VATRULE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
     });
   }
@@ -273,6 +281,7 @@ export class CustomerFormComponent {
     const id = this.selecte_countyId;
     const payload = {
       NAME: 'STATE_NAME',
+      COMPANY_ID: this.selected_Company_id,
       COUNTRY_ID: this.selecte_countyId,
     };
     this.service.getStateData_Api(payload).subscribe((data: any) => {

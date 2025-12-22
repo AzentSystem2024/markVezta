@@ -140,10 +140,18 @@ export class CustomerListComponent {
     dataservice.getPaymentTermsData().subscribe((data) => {
       this.PaymentTermsDropdownData = data;
     });
-    dataservice.getDropdownData('PRICECLASS').subscribe((data) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME : 'PRICECLASS'
+    }
+    dataservice.getDropdownData(payload).subscribe((data) => {
       this.PriceClassDropdownData = data;
     });
-    dataservice.getDropdownData('VATRULE').subscribe((data) => {
+    const vatpayload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME : 'VATRULE'
+    }
+    dataservice.getDropdownData(vatpayload).subscribe((data) => {
       this.VatRuleDropdownData = data;
     });
 
@@ -446,14 +454,20 @@ export class CustomerListComponent {
     });
   }
   getPriceLevelDropDown() {
-    const dropdownprice = 'PRICECLASS';
-    this.dataservice.getDropdownData(dropdownprice).subscribe((data: any) => {
+    const payload ={
+      NAME : 'PRICECLASS',
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getDropdownData(payload).subscribe((data: any) => {
       this.PriceLevelDropdownData = data;
     });
   }
   getVATRuleDropDown() {
-    const dropdownvat = 'VATRULE';
-    this.dataservice.getDropdownData(dropdownvat).subscribe((data: any) => {
+    const payload ={
+      NAME : 'VATRULE',
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getDropdownData(payload).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
     });
   }

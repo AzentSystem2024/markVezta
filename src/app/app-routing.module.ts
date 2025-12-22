@@ -208,6 +208,7 @@ import { MiscPaymentGstListComponent } from './components/HR/Masters/misc-paymen
 import { PrepaymentGstListComponent } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
 import { InvoiceTrOutComponent } from './pages/INVOICE/invoice-tr-out/invoice-tr-out.component';
 import { SettingsListComponent } from './components/settings/settings-list/settings-list.component';
+import { GstReportComponent } from './pages/REPORT/gst-report/gst-report.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -581,7 +582,11 @@ const routes: Routes = [
         component: BalanceSheetComponent,
         canActivate: [AuthGuardService],
       },
-
+      {
+        path: 'gst-report',
+        component: GstReportComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: 'supplier-report',
         component: SupplierReportComponent,

@@ -117,7 +117,11 @@ export class SupplierFormComponent implements OnInit {
   }
 
   private loadDropdownData(): void {
-    this.service.getDropdownData('LANDED_COST').subscribe((data) => {
+    const payload = {
+      NAME: 'LANDED_COST',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((data) => {
       this.landedcost = data;
       console.log(this.landedcost, 'LANDEDCOST');
     });
@@ -186,8 +190,12 @@ export class SupplierFormComponent implements OnInit {
   //     )
   //  }
   getVATRuleDropDown() {
-    const dropdownvat = 'VATRULE';
-    this.service.getDropdownData(dropdownvat).subscribe((data: any) => {
+    const payload = {
+      NAME: 'VATRULE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    this.service.getDropdownData(payload).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
       console.log('dropdown', this.VATRuleDropdownData);
     });
@@ -225,7 +233,9 @@ export class SupplierFormComponent implements OnInit {
     });
   }
   onCountrySelectionChanged(event: any) {
+    console.log(event, 'event');
     this.selecte_countyId = event.value;
+    this.CountryId = event.value;
     console.log(this.CountryId, 'country selection change ');
     // const selectedCountry = this.CountryDropdownData.find(country => country.ID === event.value);
     // console.log('selected country',selectedCountry);
@@ -238,7 +248,7 @@ export class SupplierFormComponent implements OnInit {
     const selectedCountry = this.CountryDropdownData.find(
       (country: any) => country.ID === this.selecte_countyId
     );
-
+    console.log('Selected Country Object:', selectedCountry);
     // 4️⃣ If found, set code & name
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE; // e.g., '+971'

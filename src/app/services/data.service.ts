@@ -180,14 +180,6 @@ export class DataService {
     );
   }
 
-  // getLastOrderNo() {
-  //   return this.http.post<any>(`${this.apiUrl}article/LastOrderNo/`, {});
-  // }
-
-  // getLastOrderNoForArticle() {
-  //   return this.http.post<any>(`${this.apiUrl}article/LastOrderNo`, {});
-  // }
-
   getLastOrderNo(item: any) {
     const data = item;
     return this.http.post<any>(`${this.apiUrl}article/LastOrderNo`, data);
@@ -1142,11 +1134,6 @@ export class DataService {
     const reqbody = { NAME: 'SUPPLIER' };
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
-
-  // Bank_Dropdown() {
-  //   const reqbody = { NAME: 'BANK_AC', COMPANY_ID: 1 };
-  //   return this.http.post(`${this.apiUrl}dropdown`, reqbody);
-  // }
 
   Bank_Dropdown(companyId: any) {
     const reqbody = { NAME: 'BANK_AC', COMPANY_ID: companyId };
@@ -5469,14 +5456,15 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // get_combinbation_list_api(payload: any) {
-  //   const params = new HttpParams()
-  //     .set('artNo', payload.artNo)
-  //     .set('color', payload.color)
-  //     .set('categoryID', payload.categoryID)
-  //     .set('unitID', payload.unitID)
-  //     .set('COMPANY_ID', payload.COMPANY_ID);
+  //   const params = payload;
+  //   // const params = new HttpParams()
+  //   //   .set('artNo', payload.artNo)
+  //   //   .set('color', payload.color)
+  //   //   .set('categoryID', payload.categoryID)
+  //   //   .set('unitID', payload.unitID)
+  //   //   .set('COMPANY_ID',payload.COMPANY_ID);
   //   const getEndpoint = this.apiUrl + 'packing/sizes-for-combination';
-  //   return this.http.post(getEndpoint, {}, { params });
+  //   return this.http.post(getEndpoint, {}, params );
   // }
 
   get_combinbation_list_api(item: any) {
@@ -6006,6 +5994,12 @@ The result can be exported to HTML or Markdown.`;
   }
   Doc_Last_SNo(payload) {
     const getEndpoint = `${this.apiUrl}DocSettings/nextvoucherno`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //======================GST REPORT===========================
+  GST_Report_Api(payload) {
+    const getEndpoint = `${this.apiUrl}GSTReport/Gstrpt`;
     return this.http.post(getEndpoint, payload);
   }
 }

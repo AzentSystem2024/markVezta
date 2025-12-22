@@ -950,6 +950,7 @@ import {
 } from './pages/INVOICE/view-invoice-tr-out/view-invoice-tr-out.component';
 import { StateEditComponent, StateEditModule } from './state-edit/state-edit.component';
 import { SettingsListModule } from './components/settings/settings-list/settings-list.component';
+import { GstReportComponent, GstReportModule } from './pages/REPORT/gst-report/gst-report.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1301,7 +1302,8 @@ import { SettingsListModule } from './components/settings/settings-list/settings
     EditInvoiceTrOutModule,
     ViewInvoiceTrOutModule,
     StateEditModule,
-    SettingsListModule
+    SettingsListModule,
+    GstReportModule
   ],
   providers: [
     AuthService,

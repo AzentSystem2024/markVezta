@@ -285,6 +285,7 @@ export class AgedReceivableDetailsComponent {
         console.log('=====navigate to 37-CREDIT NOTE=====');
         this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
           this.selectedCreditNote = response.Data;
+          this.isViewCreditNote = true;
           this.cdr.detectChanges();
           console.log(this.selectedCreditNote, 'selected credit note');
         });

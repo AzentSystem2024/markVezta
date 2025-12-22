@@ -91,6 +91,17 @@
         <div
           style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px"
         >
+          <<<<<<< HEAD =======
+          <!-- <dx-radio-group
+        [(value)]="selectedType"
+        [items]="salaryHeadTypes"
+        displayExpr="label"
+        valueExpr="value"
+        layout="vertical"
+      (onValueChanged)="onTypeChange()"
+      ></dx-radio-group> -->
+
+          >>>>>>> 106a8ca84149f6d9db385b6654d36f4d65d3ff19
           <dx-radio-group
             [(value)]="selectedType"
             [items]="salaryHeadTypes"
@@ -100,6 +111,23 @@
             (onValueChanged)="onTypeChange()"
             [disabled]="!isEnabled"
           ></dx-radio-group>
+          <!-- 
+     (onValueChanged)="onselectedNatureTypeChanged($event)"
+      <dx-number-box
+  class="text-amount"
+  placeholder="Amount"
+  label="Amount"
+  [labelMode]="'floating'"
+  [(value)]="SalaryHeadData.FIXED_AMOUNT"
+  [width]="150"
+  [showSpinButtons]="true"
+  [format]="{
+    type: 'fixedPoint',
+    precision: 2
+  }"
+  [stylingMode]="'outlined'"
+  inputAttr="{ style: 'text-align: right' }"
+></dx-number-box> -->
 
           <dx-number-box
             class="text-amount"

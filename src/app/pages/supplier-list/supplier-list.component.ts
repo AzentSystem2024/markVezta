@@ -131,7 +131,11 @@ export class SupplierListComponent implements OnInit {
     dataservice.getCurrencyData().subscribe((data) => {
       this.currency = data;
     });
-    dataservice.getDropdownData('VATRULE').subscribe((data) => {
+    const payload ={
+      NAME : 'VATRULE',
+      COMPANY_ID : this.selected_Company_id
+    }
+    dataservice.getDropdownData(payload).subscribe((data) => {
       this.vatrule = data;
     });
 

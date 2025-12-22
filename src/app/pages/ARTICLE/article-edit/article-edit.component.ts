@@ -514,8 +514,9 @@ export class ArticleEditComponent {
 
   getLastOrderNo() {
     if (!this.selectedProductionUnitId) return;
-
-    const payload = { COMPANY_ID: this.selected_Company_id };
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService
       .getLastOrderNoForArticle(payload)
       .subscribe((response: any) => {
@@ -547,42 +548,54 @@ export class ArticleEditComponent {
         }
       };
 
-      this.dataService
-        .getDropdownDataForAccounts('PRODUCTION_UNITS')
-        .subscribe((res) => {
-          this.produCtionUnits = res;
-          checkIfDone();
-        });
-      this.dataService
-        .getDropdownDataForAccounts('MATERIAL_UNITS')
-        .subscribe((res) => {
-          this.materialUnits = res;
-          checkIfDone();
-        });
-      this.dataService
-        .getDropdownDataForAccounts('ARTICLECATEGORY')
-        .subscribe((res) => {
-          this.categoryList = res;
-          checkIfDone();
-        });
-      this.dataService
-        .getDropdownDataForAccounts('ARTICLETYPE')
-        .subscribe((res) => {
-          this.typeList = res;
-          checkIfDone();
-        });
-      this.dataService
-        .getDropdownDataForAccounts('ARTICLEBRAND')
-        .subscribe((res) => {
-          this.brandList = res;
-          checkIfDone();
-        });
-      this.dataService
-        .getDropdownDataForAccounts('ARTICLECOLOR')
-        .subscribe((res) => {
-          this.colorList = res;
-          checkIfDone();
-        });
+      const payload = {
+        COMPANY_ID: this.selected_Company_id,
+        NAME: 'PRODUCTION_UNITS',
+      };
+      this.dataService.getDropdownData(payload).subscribe((res) => {
+        this.produCtionUnits = res;
+        checkIfDone();
+      });
+      const payload1 = {
+        COMPANY_ID: this.selected_Company_id,
+        NAME: 'MATERIAL_UNITS',
+      };
+      this.dataService.getDropdownData(payload1).subscribe((res) => {
+        this.materialUnits = res;
+        checkIfDone();
+      });
+      const payload2 = {
+        COMPANY_ID: this.selected_Company_id,
+        NAME: 'ARTICLECATEGORY',
+      };
+      this.dataService.getDropdownData(payload2).subscribe((res) => {
+        this.categoryList = res;
+        checkIfDone();
+      });
+      const payload3 = {
+        COMPANY_ID: this.selected_Company_id,
+        NAME: 'ARTICLETYPE',
+      };
+      this.dataService.getDropdownData(payload3).subscribe((res) => {
+        this.typeList = res;
+        checkIfDone();
+      });
+      const payload4 = {
+        COMPANY_ID: this.selected_Company_id,
+        NAME: 'ARTICLEBRAND',
+      };
+      this.dataService.getDropdownData(payload4).subscribe((res) => {
+        this.brandList = res;
+        checkIfDone();
+      });
+      const payload5 = {
+        COMPANY_ID: this.selected_Company_id,
+        NAME: 'ARTICLECOLOR',
+      };
+      this.dataService.getDropdownData(payload5).subscribe((res) => {
+        this.colorList = res;
+        checkIfDone();
+      });
     });
   }
 
