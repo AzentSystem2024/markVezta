@@ -951,6 +951,7 @@ import {
 import { StateEditComponent, StateEditModule } from './state-edit/state-edit.component';
 import { SettingsListModule } from './components/settings/settings-list/settings-list.component';
 import { GstReportComponent, GstReportModule } from './pages/REPORT/gst-report/gst-report.component';
+import { GstReportB2CLComponent, GstReportB2CLModule } from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -958,7 +959,7 @@ import { GstReportComponent, GstReportModule } from './pages/REPORT/gst-report/g
 // import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1303,7 +1304,8 @@ import { GstReportComponent, GstReportModule } from './pages/REPORT/gst-report/g
     ViewInvoiceTrOutModule,
     StateEditModule,
     SettingsListModule,
-    GstReportModule
+    GstReportModule,
+    GstReportB2CLModule
   ],
   providers: [
     AuthService,

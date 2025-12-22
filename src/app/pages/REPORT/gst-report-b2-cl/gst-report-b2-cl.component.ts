@@ -23,13 +23,14 @@ import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 
 
+
 @Component({
-  selector: 'app-gst-report',
-  templateUrl: './gst-report.component.html',
-  styleUrls: ['./gst-report.component.scss']
+  selector: 'app-gst-report-b2-cl',
+  templateUrl: './gst-report-b2-cl.component.html',
+  styleUrls: ['./gst-report-b2-cl.component.scss']
 })
-export class GstReportComponent {
-      GST_datasource:any[]=[];
+export class GstReportB2CLComponent {
+  GST_datasource:any[]=[];
       readonly allowedPageSizes: any = [ 5,10, 'all'];
     displayMode: any = 'full';
       formatted_from_date: string;
@@ -231,7 +232,7 @@ isEditCustomerReceipt:boolean = false;
 
     console.log(payload, '==========manual payload===========');
 
-    this.dataService.GST_Report_Api(payload).subscribe((res: any) => {
+    this.dataService.GST_Report_Api_B2CL(payload).subscribe((res: any) => {
       console.log(res)
       this.GST_datasource = res.DATA || [];
          this.ledgerSummaryData=this.GST_datasource
@@ -450,6 +451,8 @@ else if (TransType == 38) {
     // }
   }
 }
+
+
 @NgModule({
   imports: [
     DxDataGridModule,
@@ -485,6 +488,6 @@ else if (TransType == 38) {
   ],
   providers: [],
   exports: [],
-  declarations: [GstReportComponent],
+  declarations: [GstReportB2CLComponent],
 })
-export class GstReportModule {}
+export class GstReportB2CLModule {}

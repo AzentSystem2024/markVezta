@@ -5997,9 +5997,15 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-  //======================GST REPORT===========================
+  //======================GST REPORT(B2B)===========================
   GST_Report_Api(payload) {
     const getEndpoint = `${this.apiUrl}GSTReport/Gstrpt`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //======================GST REPORT(B2CL)===========================
+  GST_Report_Api_B2CL(payload) {
+    const getEndpoint = `${this.apiUrl}GSTReport/Gstb2cl`;
     return this.http.post(getEndpoint, payload);
   }
 }

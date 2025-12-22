@@ -209,6 +209,7 @@ import { PrepaymentGstListComponent } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/
 import { InvoiceTrOutComponent } from './pages/INVOICE/invoice-tr-out/invoice-tr-out.component';
 import { SettingsListComponent } from './components/settings/settings-list/settings-list.component';
 import { GstReportComponent } from './pages/REPORT/gst-report/gst-report.component';
+import { GstReportB2CLComponent } from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -585,6 +586,11 @@ const routes: Routes = [
       {
         path: 'gst-report',
         component: GstReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'gst-report-b2cl',
+        component: GstReportB2CLComponent,
         canActivate: [AuthGuardService],
       },
       {
