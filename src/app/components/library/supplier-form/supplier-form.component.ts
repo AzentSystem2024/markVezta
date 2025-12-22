@@ -106,7 +106,11 @@ export class SupplierFormComponent implements OnInit {
 }
 
 private loadDropdownData(): void {
-  this.service.getDropdownData('LANDED_COST').subscribe((data) => {
+  const payload ={
+    NAME : 'LANDED_COST',
+    COMPANY_ID : this.selected_Company_id
+  }
+  this.service.getDropdownData(payload).subscribe((data) => {
     this.landedcost = data;
     console.log(this.landedcost,"LANDEDCOST")
   });
@@ -142,7 +146,7 @@ onSelectionChanged(event: any): void {
 }
 
   get_Country_Dropdown_List() {
-    this.service.CountryDropdown_Api().subscribe((response: any) => {
+    this.service.getCountryWithFlags().subscribe((response: any) => {
       // console.log(response, 'response++++++++++');
       this.CountryDropdownData = response;
       console.log(this.CountryDropdownData,'Country dropdown')
@@ -177,9 +181,13 @@ const CountryId = this.formSupplierData?.COUNTRY_ID;
 //     )
 //  }
  getVATRuleDropDown() {
-  const dropdownvat = 'VATRULE';
+  const payload ={
+    NAME : 'VATRULE',
+    COMPANY_ID : this.selected_Company_id
+  }
+  
   this.service
-    .getDropdownData(dropdownvat)
+    .getDropdownData(payload)
     .subscribe((data: any) => {
       this.VATRuleDropdownData = data;
       console.log('dropdown',this.VATRuleDropdownData);
@@ -220,7 +228,9 @@ getStateDropDown() {
     });
 }
  onCountrySelectionChanged(event: any) {
+  console.log(event,'event')
    this.selecte_countyId = event.value;
+    this.CountryId = event.value;
   console.log(this.CountryId,'country selection change ')
   // const selectedCountry = this.CountryDropdownData.find(country => country.ID === event.value);
   // console.log('selected country',selectedCountry);
@@ -233,7 +243,7 @@ getStateDropDown() {
   const selectedCountry = this.CountryDropdownData.find(
     (country: any) => country.ID === this.selecte_countyId
   );
-
+    console.log('Selected Country Object:', selectedCountry);
   // 4️⃣ If found, set code & name
   if (selectedCountry) {
     this.countryCode = selectedCountry.CODE;                // e.g., '+971'

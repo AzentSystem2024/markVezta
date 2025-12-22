@@ -119,6 +119,7 @@ BankRecData :any={
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
+    this.sesstion_Details();
     this.get_Bank_dropdown();
 
   // initial remaining = totals
@@ -131,13 +132,20 @@ BankRecData :any={
   this.selected_To_date = new Date();
 }
 
+  sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   onToDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
   }
 
   get_Bank_dropdown(){
-    this.dataService.Bank_Dropdown().subscribe((res: any) => {
+    this.dataService.Bank_Dropdown(this.selected_Company_id).subscribe((res: any) => {
       console.log('bank dropdown', res);
       this.Bank = res;
     });
@@ -229,7 +237,8 @@ BankRecData :any={
   Getdata(){
     const payload ={
       HEAD_ID : this.selectedBankId,
-      DATE_TO : this.selected_To_date
+      DATE_TO : this.selected_To_date,
+      COMPANY_ID : this.selected_Company_id
     }
    this.dataService.BankReconciliation_List(payload).subscribe((res: any) => {
     console.log(res)

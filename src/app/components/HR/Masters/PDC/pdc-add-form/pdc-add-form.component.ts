@@ -315,7 +315,7 @@ resetForm() {
   }
 
   get_Bank_dropdown(){
-    this.dataservice.Bank_Dropdown().subscribe((res: any) => {
+    this.dataservice.Bank_Dropdown(this.selected_Company_id).subscribe((res: any) => {
       console.log('bank dropdown', res);
       this.Bank = res;
     });

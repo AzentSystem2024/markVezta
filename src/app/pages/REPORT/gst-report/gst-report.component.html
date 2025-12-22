@@ -1,0 +1,522 @@
+<div class="salary-grid-wrapper" style="padding: 10px">
+  <div class="grid-container">
+    <dx-data-grid
+      [dataSource]="GST_datasource"
+      noDataText=""
+      width="100%"
+      height="83vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+      }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+    >
+      <!-- [summary.calculateCustomSummary]="summaryColumnsData.calculateCustomSummary" -->
+      <!-- (onEditingStart)="onEditLedger($event)" -->
+      <!-- <dxo-editing
+        mode="popup"
+        [allowUpdating]="true"
+      ></dxo-editing> -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            GST Report
+          </div>
+        </dxi-item>
+        <!-- <dxi-item>
+           <dx-select-box
+        [width]="150"
+        label="Fin Id"
+        labelMode="floating"
+         [items]="fin_id"
+    displayExpr="FIN_CODE"
+    valueExpr="FIN_ID"
+    [(value)]="selected_fin_id"
+    [searchEnabled]="true"
+    (onValueChanged)="onCompanyChange($event)"
+        >
+
+        </dx-select-box>
+
+        </dxi-item> -->
+        <!-- <dxi-item>
+           <dx-select-box
+    [width]="200"
+    label="Company Id"
+    labelMode="floating"
+    [items]="company_list"
+    displayExpr="COMPANY_NAME"
+    valueExpr="COMPANY_ID"
+    [(value)]="selectedCompanyId"
+    [searchEnabled]="true"
+    (onValueChanged)="onCompanyChange($event)">
+        >
+
+        </dx-select-box>
+
+        </dxi-item> -->
+        <!-- <dxi-item>
+           <dx-select-box
+        [width]="200"
+        label="Ledger"
+        labelMode="floating"
+         [items]="HEAD_ID_LIST"
+    displayExpr="NAME"
+    valueExpr="ID"
+    [(value)]="selected_Head_Id"
+    (onValueChanged)="onHeadIdChange($event)"
+    [searchEnabled]="true"
+        >
+        </dx-select-box>
+
+        </dxi-item> -->
+        <dxi-item>
+          <dx-date-box
+            [width]="150"
+            label="From Date"
+            labelMode="floating"
+            [value]="defaultDate"
+            [displayFormat]="'dd-MM-yyyy'"
+            (onValueChanged)="onFromDateChange($event)"
+          >
+          </dx-date-box>
+
+          <!-- <dx-date-box
+        [width]="150"
+        label="From Date"
+        labelMode="floating"
+            [(value)]="selected_from_date"
+              displayFormat="yyyy-MM-dd"
+        >
+
+        </dx-date-box> -->
+        </dxi-item>
+        <dxi-item itemType="simple" verticalAlignment="center">
+          <dx-date-box
+            [width]="150"
+            label="To Date"
+            labelMode="floating"
+            [value]="defaultDate"
+            displayFormat="dd-MM-yyyy"
+            (onValueChanged)="onToDateChange($event)"
+          >
+          </dx-date-box>
+        </dxi-item>
+
+        <dxi-item itemType="simple" verticalAlignment="center">
+          <dx-button
+            text="Apply"
+            icon="todo"
+            stylingMode="contained"
+            type="default"
+            [width]="100"
+            class="mt-2"
+            (onClick)="load_GST_data()"
+          >
+          </dx-button>
+        </dxi-item>
+        <dxi-item name="exportButton"></dxi-item>
+      </dxo-toolbar>
+      <dxo-sorting mode="none"></dxo-sorting>
+      <dxo-filter-row visible="true"></dxo-filter-row>
+      <dxo-header-filter visible="true"></dxo-header-filter>
+      <dxo-paging page-size="10"></dxo-paging>
+      <dxo-pager
+        show-page-size-selector="true"
+        show-info="true"
+        show-navigator="true"
+      ></dxo-pager>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <!-- <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row> -->
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <!-- <dxi-column dataField="TransID" caption="Trans Type Id" dataType="date"></dxi-column> -->
+      <dxi-column
+        dataField="DOC_DATE"
+        caption="Doc Date."
+        dataType="date"
+        [format]="{ type: 'custom', formatter: formatDates }"
+      ></dxi-column>
+      <dxi-column dataField="DOC_NAME" caption="Document Name"></dxi-column>
+      <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
+      <dxi-column dataField="GSTIN" caption="GSTIN"></dxi-column>
+      <dxi-column
+        dataField="INVOICE_AMOUNT"
+        caption="Invoice Amount"
+      ></dxi-column>
+      <dxi-column dataField="CGST" caption="CGST"></dxi-column>
+      <dxi-column dataField="SGST" caption="SGST"></dxi-column>
+      <dxi-column
+        dataField="RECEIVER_NAME"
+        caption="Received Name"
+      ></dxi-column>
+      <dxi-column
+        dataField="TAXABLE_AMOUNT"
+        caption="Taxable Amount"
+      ></dxi-column>
+      <dxi-column dataField="TOTAL_GST" caption="Total GST"></dxi-column>
+      <dxi-column
+        dataField="DebitAmount"
+        caption="Debit Amount"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="CreditAmount"
+        caption="Credit Amount"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <!-- <dxi-column dataField="BALANCE" caption="Balance"
+  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+  alignment="right">
+</dxi-column> -->
+      <dxi-column
+        *ngIf="GST_datasource.length > 0"
+        type="buttons"
+        [width]="100"
+      >
+        <dxi-button
+          hint="View"
+          icon="eyeopen"
+          text="View"
+          [onClick]="onViewClick.bind(this)"
+        ></dxi-button>
+      </dxi-column>
+    </dx-data-grid>
+  </div>
+</div>
+
+<!-- <dx-popup
+  [(visible)]="editLedgerPopup"
+  [width]="'50vw'"
+  [height]="'55vh'"
+  title="View Ledger statement"
+  (onHiding)="handleClose()"
+>
+<form>
+  <div style="display: flex;">
+    <dx-text-box></dx-text-box>
+      <dx-text-box></dx-text-box>
+  </div>
+</form>
+  
+</dx-popup> -->
+<!-- =================header filter======================== -->
+<!-- <dx-popup
+  [(visible)]="isCustomDatePopupVisible"
+  [width]="'300px'"
+  title="Select Custom Date Range"
+  [showCloseButton]="true"
+  [dragEnabled]="false"
+  [closeOnOutsideClick]="true"
+  [height]="'300px'"
+>
+  <div class="p-3">
+    <dx-date-box
+      [(value)]="fromDate"
+      type="date"
+      displayFormat="yyyy-MM-dd"
+      label="From Date"
+    >
+    </dx-date-box>
+
+    <dx-date-box
+      [(value)]="toDate"
+      type="date"
+      displayFormat="yyyy-MM-dd"
+      label="To Date"
+    >
+    </dx-date-box>
+
+    <button class="custom-apply-btn" (click)="applyCustomDate()">Apply</button>
+  </div>
+</dx-popup> -->
+
+<dx-popup
+  [(visible)]="isViewJournalVoucher"
+  [width]="'100vw'"
+  [deferRendering]="false"
+  [height]="'100vh'"
+  title="Journal Voucher"
+  (onHiding)="handleClose()"
+>
+  <app-view-journal-voucher
+    [journalVoucherFormData]="selectedJournalVoucher"
+    (popupClosed)="handleClose()"
+  ></app-view-journal-voucher>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isViewDebitNote"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="Debit Note"
+  [deferRendering]="false"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewDebitNote">
+    <app-view-debit
+      [debitFormData]="selectedDebitNote"
+      (popupClosed)="handleClose()"
+    ></app-view-debit>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isViewCreditNote"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="Credit Note"
+  [deferRendering]="false"
+  (onHiding)="handleClose()"
+>
+  <app-view-credit-note
+    [creditFormData]="selectedCreditNote"
+    (popupClosed)="handleClose()"
+  ></app-view-credit-note>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isViewInvoice"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  [deferRendering]="false"
+  title="View Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewInvoice">
+    <app-view-invoice
+      [invoiceFormData]="selectedInvoice"
+      (popupClosed)="handleClose()"
+    ></app-view-invoice>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditCustomerReceipt"
+  [width]="'75vw'"
+  [height]="'100vh'"
+  [deferRendering]="false"
+  title="View Receipt"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditCustomerReceipt">
+    <app-edit-customer-receipt
+      [receiprtFormData]="selectedReceipt"
+      [isReadOnlyMode]="isReadOnlyReceipt"
+      (popupClosed)="handleClose()"
+    ></app-edit-customer-receipt>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditInvoice"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  [deferRendering]="false"
+  title="Purchase Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditInvoice">
+    <app-edit-purchase-invoice
+      [invoiceFormData]="selectedInvoice"
+      [readOnly]="isEditInvoiceReadOnly"
+      (popupClosed)="handleClose()"
+    ></app-edit-purchase-invoice>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="editMiscPopup"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="Miscellaneous Receipt"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="editMiscPopup">
+    <app-add-misc-receipt
+      *ngIf="editMiscPopup"
+      [isEditing]="true"
+      [EditingResponseData]="selectedmiscellaneousData"
+      [isReadOnlyMode]="isReadOnlyPayment"
+      (popupClosed)="handleClose()"
+    ></app-add-misc-receipt>
+  </ng-container>
+  <!-- <ng-container *ngIf="editMiscPopup">
+  <app-add-misc-receipt
+    *ngIf="editMiscPopup"
+    [EditingResponseData]="selectedmiscellaneousData"
+    [isReadOnlyMode]="isReadOnlyPayment"
+    (popupClosed)="handleClose()"
+  ></app-add-misc-receipt>
+  </ng-container> -->
+</dx-popup>
+
+<!-- Prepayment -->
+<dx-popup
+  [(visible)]="editPrePaymentPopupOpened"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="PrePayment Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="editPrePaymentPopupOpened">
+    <app-pre-payment-edit
+      [selectedPrePayment]="selectedPrePayment"
+      [isReadOnly]="isEditReadOnly"
+      (formClosed)="handleClose()"
+    ></app-pre-payment-edit>
+  </ng-container>
+</dx-popup>
+
+<!-- Supplier Payment -->
+<dx-popup
+  [(visible)]="isEditReceipt"
+  [width]="'75vw'"
+  [height]="'100vh'"
+  title="Supplier Payment"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-edit-supplier-payment
+    [paymentData]="selectedReceipt"
+    [isReadOnlyMode]="isReadOnlyReceipt"
+    (popupClosed)="handleClose()"
+    [supplierPaymentId]="selectedSupplierPayment"
+  ></app-edit-supplier-payment>
+  <!-- </ng-container> -->
+</dx-popup>
+
+<!-- purchase return -->
+<dx-popup
+  [(visible)]="isEditPurchaseReturn"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="Purchase Return(Debit Note)"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditPurchaseReturn">
+    <app-purchase-return-debit-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedPurchaseReturn"
+      [isReadOnlyMode]="isReadOnlyPurchaseReturn"
+      (popupClosed)="handleClose()"
+    ></app-purchase-return-debit-form>
+  </ng-container>
+</dx-popup>
+
+<!-- Misc payment -->
+<dx-popup
+  [(visible)]="editMiscPopupOpened"
+  [width]="'75vw'"
+  [height]="'100vh'"
+  title="Miscellaneous Payment"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="editMiscPopupOpened">
+    <app-add-miscellaneous-payment
+      *ngIf="editMiscPopupOpened"
+      [isEditing]="true"
+      [EditingResponseData]="selectedmiscellaneousData"
+      [isReadOnlyMode]="isReadOnlyPayment"
+      (popupClosed)="handleClose()"
+      [MiscPaymentId]="selectedMiscPayment"
+    ></app-add-miscellaneous-payment>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditPopupPrepaymentPosting"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Edit Prepayment Posting"
+  (onHiding)="handleClose()"
+>
+  <app-prepayment-posting-edit
+    *ngIf="isEditPopupPrepaymentPosting"
+    [selecteprepaymentData]="selecte_prepayment_Data"
+    (popupClosed)="handleClose()"
+  >
+  </app-prepayment-posting-edit>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditTransferOut"
+  [width]="'75vw'"
+  [height]="'90vh'"
+  title="Transfer Out"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditTransferOut">
+    <app-transfer-out-inventory-add
+      [isEditing]="true"
+      [EditingResponseData]="selectedTrOut"
+      [isReadOnlyMode]="isReadOnlyTrOut"
+      (popupClosed)="handleClose()"
+    ></app-transfer-out-inventory-add>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditTransferIn"
+  [width]="'70vw'"
+  [height]="'90vh'"
+  title="Transfer In"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditTransferIn">
+    <app-transfer-in-inventory-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedTrIn"
+      [isReadOnlyMode]="isReadOnlyTrIn"
+      (popupClosed)="handleClose()"
+    ></app-transfer-in-inventory-form>
+  </ng-container>
+</dx-popup>

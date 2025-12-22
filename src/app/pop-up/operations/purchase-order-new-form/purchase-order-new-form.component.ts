@@ -152,7 +152,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
   poData: any = {
     ID: 0,
-    COMPANY_ID: 1,
+    COMPANY_ID: 0,
     USER_ID: 1,
     STORE_ID: '',
     PO_NO: '',

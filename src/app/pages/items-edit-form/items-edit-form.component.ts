@@ -345,6 +345,7 @@ export class ItemsEditFormComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router
   ) {
+    this.sesstion_Details();
     this.selectedPriority = 1;
     this.onDropZoneEnter = this.onDropZoneEnter.bind(this);
     this.onDropZoneLeave = this.onDropZoneLeave.bind(this);

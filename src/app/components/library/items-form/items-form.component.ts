@@ -225,6 +225,7 @@ export class ItemsFormComponent implements OnInit {
     this.itemlabel4 = authservice.getsettingsData().ITEM_PROPERTY4;
     this.itemlabel5 = authservice.getsettingsData().ITEM_PROPERTY5;
 
+    this.sesstion_Details();
     dataservice.Dropdown_ItemTax('VAT_CLASS').subscribe((data) => {
       console.log(data);
       this.VatClass = data;
@@ -282,7 +283,8 @@ export class ItemsFormComponent implements OnInit {
     dataservice.getVatclassData().subscribe((data) => {
       this.vat = data;
     });
-    const payload = { COMPANY_ID : this.selected_Company_id };
+    const payload = 
+    { COMPANY_ID : this.selected_Company_id };
     dataservice.getSupplierData(payload).subscribe((data) => {
       this.supplier = data;
     });

@@ -514,8 +514,10 @@ export class ArticleEditComponent {
 
   getLastOrderNo() {
     if (!this.selectedProductionUnitId) return;
-
-    this.dataService.getLastOrderNoForArticle().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.getLastOrderNoForArticle(payload).subscribe((response: any) => {
       console.log(response, 'LASTORDERNO');
       this.lastOrderNo = response?.LastOrderNo ?? '';
     });
@@ -544,38 +546,44 @@ export class ArticleEditComponent {
         }
       };
 
+      const payload = { COMPANY_ID : this.selected_Company_id ,NAME :'PRODUCTION_UNITS' };
       this.dataService
-        .getDropdownDataForAccounts('PRODUCTION_UNITS')
+        .getDropdownData(payload)
         .subscribe((res) => {
           this.produCtionUnits = res;
           checkIfDone();
         });
+        const payload1 = { COMPANY_ID : this.selected_Company_id ,NAME :'MATERIAL_UNITS' };
       this.dataService
-        .getDropdownDataForAccounts('MATERIAL_UNITS')
+        .getDropdownData(payload1)
         .subscribe((res) => {
           this.materialUnits = res;
           checkIfDone();
         });
+        const payload2 = { COMPANY_ID : this.selected_Company_id ,NAME :'ARTICLECATEGORY' };
       this.dataService
-        .getDropdownDataForAccounts('ARTICLECATEGORY')
+        .getDropdownData(payload2)
         .subscribe((res) => {
           this.categoryList = res;
           checkIfDone();
         });
+        const payload3 = { COMPANY_ID : this.selected_Company_id ,NAME :'ARTICLETYPE' };
       this.dataService
-        .getDropdownDataForAccounts('ARTICLETYPE')
+        .getDropdownData(payload3)
         .subscribe((res) => {
           this.typeList = res;
           checkIfDone();
         });
+        const payload4 = { COMPANY_ID : this.selected_Company_id ,NAME :'ARTICLEBRAND' };
       this.dataService
-        .getDropdownDataForAccounts('ARTICLEBRAND')
+        .getDropdownData(payload4)
         .subscribe((res) => {
           this.brandList = res;
           checkIfDone();
         });
+        const payload5 = { COMPANY_ID : this.selected_Company_id ,NAME :'ARTICLECOLOR' };
       this.dataService
-        .getDropdownDataForAccounts('ARTICLECOLOR')
+        .getDropdownData(payload5)
         .subscribe((res) => {
           this.colorList = res;
           checkIfDone();

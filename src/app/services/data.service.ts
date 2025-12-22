@@ -180,15 +180,17 @@ export class DataService {
     );
   }
 
-  getLastOrderNo(unitId: number) {
+  getLastOrderNo(item: any) {
+    const data = item;
     return this.http.post<any>(
-      `${this.apiUrl}article/LastOrderNo/${unitId}`,
-      {}
+      `${this.apiUrl}article/LastOrderNo`,
+      data
     );
   }
 
-  getLastOrderNoForArticle() {
-    return this.http.post<any>(`${this.apiUrl}article/LastOrderNo`, {});
+  getLastOrderNoForArticle(items: any) {
+    const data = items;
+    return this.http.post<any>(`${this.apiUrl}article/LastOrderNo`, data);
   }
   updateArticle(items: any) {
     const data = items;
@@ -1136,8 +1138,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
 
-  Bank_Dropdown() {
-    const reqbody = { NAME: 'BANK_AC', COMPANY_ID: 1 };
+  Bank_Dropdown(companyId: any) {
+    const reqbody = { NAME: 'BANK_AC', COMPANY_ID: companyId };
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
 
@@ -2920,9 +2922,14 @@ export class DataService {
   }
 
   //dropdown
-  public getDropdownData(type: any): Observable<any> {
-    const reqBodyData = { name: type };
-    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
+  // public getDropdownData(type: any): Observable<any> {
+  //   const reqBodyData = { name: type };
+  //   return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
+  // }
+
+  public getDropdownData(data: any): Observable<any> {
+    // const reqBodyData = { name: type };
+    return this.http.post(`${this.apiUrl}dropdown/`, data);
   }
 
   public getStateDropdownData(payload: {
@@ -5451,15 +5458,21 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, data);
   }
 
-  get_combinbation_list_api(payload: any) {
-    const params = new HttpParams()
-      .set('artNo', payload.artNo)
-      .set('color', payload.color)
-      .set('categoryID', payload.categoryID)
-      .set('unitID', payload.unitID)
-      .set('COMPANY_ID',payload.COMPANY_ID);
-    const getEndpoint = this.apiUrl + 'packing/sizes-for-combination';
-    return this.http.post(getEndpoint, {}, { params });
+  // get_combinbation_list_api(payload: any) {
+  //   const params = payload;
+  //   // const params = new HttpParams()
+  //   //   .set('artNo', payload.artNo)
+  //   //   .set('color', payload.color)
+  //   //   .set('categoryID', payload.categoryID)
+  //   //   .set('unitID', payload.unitID)
+  //   //   .set('COMPANY_ID',payload.COMPANY_ID);
+  //   const getEndpoint = this.apiUrl + 'packing/sizes-for-combination';
+  //   return this.http.post(getEndpoint, {}, params );
+  // }
+
+    get_combinbation_list_api(item: any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}packing/sizes-for-combination`, payload);
   }
   // selectArticle(id: number, payload: any) {
 
@@ -5631,8 +5644,9 @@ The result can be exported to HTML or Markdown.`;
 
   //==============================Active fixed Asset Lisst for grid============================
 
-  Active_list_Fixed_Asset_api() {
-    return this.http.post(`${this.apiUrl}Depreciation/FixedAsset/list`, {});
+  Active_list_Fixed_Asset_api(items:any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Depreciation/FixedAsset/list`, data);
   }
 
   //=====================list of depreciation================================
@@ -5981,6 +5995,12 @@ The result can be exported to HTML or Markdown.`;
   }
   Doc_Last_SNo(payload) {
     const getEndpoint = `${this.apiUrl}DocSettings/nextvoucherno`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+//======================GST REPORT===========================
+    GST_Report_Api(payload) {
+    const getEndpoint = `${this.apiUrl}GSTReport/Gstrpt`;
     return this.http.post(getEndpoint, payload);
   }
 }

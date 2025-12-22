@@ -125,7 +125,10 @@ export class DepreciationEditComponent {
 
   //===============================Active_fixedasset_List======================
   Active_fixedasset_List() {
-    this.dataService.Active_list_Fixed_Asset_api().subscribe((res: any) => {
+    const payload={
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.Active_list_Fixed_Asset_api(payload).subscribe((res: any) => {
       console.log(res);
 
       this.Active_fixed_asset_list = res.Data;
