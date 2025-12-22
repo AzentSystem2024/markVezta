@@ -124,6 +124,7 @@
 
 <div>
   <dx-data-grid
+    #itemsGridRef
     [showBorders]="true"
     class="data-grid"
     [dataSource]="poDetails"
@@ -137,6 +138,7 @@
     class="custom-data-grid"
     [columnAutoWidth]="true"
     [showColumnLines]="true"
+    (onEditorPreparing)="onEditorPreparing($event)"
   >
     <dxo-scrolling mode="virtual" columnRenderingMode="virtual"></dxo-scrolling>
 

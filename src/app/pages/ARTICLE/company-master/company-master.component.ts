@@ -87,9 +87,9 @@ export class CompanyMasterComponent {
       Email: ['', [Validators.required, Validators.email]],
       Inactive: [false],
       STATE_ID: ['', Validators.required],
-      PAN:['',Validators.required],
-      CIN:['',Validators.required],
-      GSTNo:['',Validators.required]
+      PAN: ['', Validators.required],
+      CIN: ['', Validators.required],
+      GSTNo: ['', Validators.required],
     });
     this.get_Company_List();
     this.get_Company_Dropdown_List();
@@ -259,13 +259,13 @@ export class CompanyMasterComponent {
   }
 
   addData() {
-    this.addPopup = false;
     const validationResult = this.formValidationGroup.instance.validate();
     if (!validationResult.isValid) {
       console.log('Validation failed');
       return;
     }
-    // const validationResult = this.formValidationGroup?.instance?.validate();
+
+    // Get form values
     const Company_code =
       this.formsource.get('Code')?.value?.toString().trim() || '';
     const Company_name =
@@ -287,28 +287,34 @@ export class CompanyMasterComponent {
       this.formsource.get('WhatsApp')?.value?.toString().trim() || '';
     const Company_type = this.formsource.get('CompanyType')?.value || 0;
     const STATE_ID = this.formsource.get('STATE_ID')?.value || 0;
-   const PAN = this.formsource.get('PAN')?.value || '';
-   const GSTNo = this.formsource.get('GSTNo')?.value || '';
-   const CIN = this.formsource.get('CIN')?.value || '';
-    // Log to debug
-    console.log(
-      Company_code,
-      Company_name,
-      First_address,
-      Second_address,
-      Third_address,
-      Contact_name,
-      Phone_no,
-      Mobile_no,
-      Email,
-      WhatsApp_no,
-      Company_type,
-      STATE_ID,
-      PAN,
-      CIN,
-      GSTNo
-    );
+    const PAN = this.formsource.get('PAN')?.value || '';
+    const GSTNo = this.formsource.get('GSTNo')?.value || '';
+    const CIN = this.formsource.get('CIN')?.value || '';
 
+    // ---------------- DUPLICATE CHECK (FIXED) ----------------
+    const newCode = Company_code.toLowerCase();
+    const newName = Company_name.toLowerCase();
+
+    const isDuplicate = this.Datasource?.some((data: any) => {
+      const existingCode = data.COMPANY_CODE?.toString().trim().toLowerCase();
+      const existingName = data.COMPANY_NAME?.toString().trim().toLowerCase();
+
+      return existingCode === newCode || existingName === newName;
+    });
+
+    if (isDuplicate) {
+      notify(
+        {
+          message: 'Company Code or Company Name already exists',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1000,
+        },
+        'error'
+      );
+      return;
+    }
+
+    // ---------------- PAYLOAD ----------------
     const payload = {
       COMPANY_CODE: Company_code,
       COMPANY_NAME: Company_name,
@@ -323,30 +329,12 @@ export class CompanyMasterComponent {
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: false,
       STATE_ID: STATE_ID,
-      GST_NO:GSTNo,
-      PAN_NO:PAN,
-      CIN:CIN
+      GST_NO: GSTNo,
+      PAN_NO: PAN,
+      CIN: CIN,
     };
 
-    const isDuplicate = this.Datasource?.some((data: any) => {
-      const existingCode = data.COMPANY_CODE?.toString().trim().toLowerCase();
-      const existingName = data.COMPANY_NAME?.toString().trim().toLowerCase();
-      return existingCode === Company_code || existingName === Company_name;
-    });
-
-    if (isDuplicate) {
-      notify(
-        {
-          message: 'Data already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error'
-      );
-      return;
-    }
-
-    // Only proceed if key fields are filled (optional check)
+    // ---------------- API CALL ----------------
     if (Company_code && Company_name && Company_type) {
       this.dataservice.Insert_CompanyList_Api(payload).subscribe((res: any) => {
         notify(
@@ -357,8 +345,11 @@ export class CompanyMasterComponent {
           },
           'success'
         );
+
+        // Close popup ONLY after success
         this.addPopup = false;
         this.editPopup = false;
+
         this.formsource.reset();
         this.get_Company_List();
       });
@@ -399,7 +390,7 @@ export class CompanyMasterComponent {
     const WhatsApp_no = this.editingRowData.WHATSAPP;
     const Company_type = this.selectedCompanyType;
     const STATE_ID = this.state;
-    const PAN = this.editingRowData.PAN_NO
+    const PAN = this.editingRowData.PAN_NO;
     const GSTNo = this.editingRowData.GST_NO;
     const CIN = this.editingRowData.CIN;
 
@@ -425,9 +416,9 @@ export class CompanyMasterComponent {
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: Is_Inactive,
       STATE_ID: STATE_ID,
-      PAN_NO:PAN,
-      GST_NO:GSTNo,
-      CIN:CIN
+      PAN_NO: PAN,
+      GST_NO: GSTNo,
+      CIN: CIN,
     };
 
     //   const isDuplicate = this.Datasource?.some((data: any) => {

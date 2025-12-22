@@ -4,6 +4,7 @@ import {
   EventEmitter,
   NgModule,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {
@@ -23,6 +24,7 @@ import {
   DxTabPanelModule,
   DxPopupModule,
   DxDropDownBoxModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 import { DxDropDownBoxTypes } from 'devextreme-angular/ui/drop-down-box';
 import notify from 'devextreme/ui/notify';
@@ -35,6 +37,7 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./grn-new-form.component.scss'],
 })
 export class GrnNewFormComponent implements OnInit {
+  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   financialYeaDate: string;
 
   SUPP_AMOUNT: any;
@@ -185,10 +188,10 @@ export class GrnNewFormComponent implements OnInit {
     this.sesstion_Details();
   }
 
-    getDocNo() {
+  getDocNo() {
     const payload = {
       TRANS_TYPE: 18,
-      COMPANY_ID:  this.selected_Company_id,
+      COMPANY_ID: this.selected_Company_id,
     };
     this.service.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
@@ -199,12 +202,54 @@ export class GrnNewFormComponent implements OnInit {
   highlightEditableColumns(event: any) {
     if (event.rowType === 'data' && event.column.allowEditing) {
       // Apply a custom style for editable cells
-      event.cellElement.style.backgroundColor = '#130452ff'; // Soft yellow background
-      event.cellElement.style.color = '#dfddd9ff'; // Dark yellow text
+      event.cellElement.style.backgroundColor = '#ffffffff'; // Soft yellow background
+      event.cellElement.style.color = '#000000'; // Dark yellow text
       event.cellElement.style.fontWeight = 'bold';
     }
   }
+  onEditorPreparing(e: any) {
+    if (e.dataField === 'RECEIVED_QTY') {
+      e.editorOptions = e.editorOptions || {};
 
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
+  }
   // purchaseOrderDataSource:any = [
   //   {
   //     PO_NO: 'PO12345',
@@ -250,100 +295,102 @@ export class GrnNewFormComponent implements OnInit {
   }
 
   getPODetails(poId: any) {
-    this.service.getGrnPoDetails(poId, this.selected_Company_id).subscribe((res: any) => {
-      console.log(res, 'res');
+    this.service
+      .getGrnPoDetails(poId, this.selected_Company_id)
+      .subscribe((res: any) => {
+        console.log(res, 'res');
 
-      // Populate poDetails with dynamic SL_NO and other calculations
-      this.poDetails = res.Podetails.map((item: any, index: number) => ({
-        ...item,
-        SL_NO: index + 1, // Add SL_NO property dynamically
-        QTY_TO_RECEIVE: item.QUANTITY - item.GRN_QTY,
-        SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
-        UNIT_COST: 0,
-      }));
+        // Populate poDetails with dynamic SL_NO and other calculations
+        this.poDetails = res.Podetails.map((item: any, index: number) => ({
+          ...item,
+          SL_NO: index + 1, // Add SL_NO property dynamically
+          QTY_TO_RECEIVE: item.QUANTITY - item.GRN_QTY,
+          SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
+          UNIT_COST: 0,
+        }));
 
-      this.cwidth = '100';
-      this.currencySymbol =
-        res.Podetails.length > 0 ? res.Podetails[0].CURRENCY_SYMBOL : ''; // Extract the first item's currency symbol
-      console.log(this.poDetails, 'Updated poDetails with SL_NO');
+        this.cwidth = '100';
+        this.currencySymbol =
+          res.Podetails.length > 0 ? res.Podetails[0].CURRENCY_SYMBOL : ''; // Extract the first item's currency symbol
+        console.log(this.poDetails, 'Updated poDetails with SL_NO');
 
-      // Populate landedCost
-      this.landedCost = res.LandedCost;
-      console.log(this.landedCost, 'landedcost');
+        // Populate landedCost
+        this.landedCost = res.LandedCost;
+        console.log(this.landedCost, 'landedcost');
 
-      // Populate costingMethodDataGrid
-      this.costingMethodDataGrid = this.landedCost.map((landedCost: any) => ({
-        ID: landedCost.ID,
-        DESCRIPTION: landedCost.DESCRIPTION,
-        CURRENCY: landedCost.IS_FIXED_AMOUNT
-          ? landedCost.IS_LOCAL_CURRENCY
-            ? this.localCurrencySymbol
-            : this.currencySymbol
-          : `${
-              landedCost.IS_LOCAL_CURRENCY
-                ? this.localCurrencySymbol
-                : this.currencySymbol
-            } %`,
-        RATE: landedCost.VALUE,
-        TOTAL: landedCost.IS_FIXED_AMOUNT
-          ? landedCost.VALUE
-          : (this.newGrnData.NET_AMOUNT * landedCost.VALUE) / 100,
-      }));
+        // Populate costingMethodDataGrid
+        this.costingMethodDataGrid = this.landedCost.map((landedCost: any) => ({
+          ID: landedCost.ID,
+          DESCRIPTION: landedCost.DESCRIPTION,
+          CURRENCY: landedCost.IS_FIXED_AMOUNT
+            ? landedCost.IS_LOCAL_CURRENCY
+              ? this.localCurrencySymbol
+              : this.currencySymbol
+            : `${
+                landedCost.IS_LOCAL_CURRENCY
+                  ? this.localCurrencySymbol
+                  : this.currencySymbol
+              } %`,
+          RATE: landedCost.VALUE,
+          TOTAL: landedCost.IS_FIXED_AMOUNT
+            ? landedCost.VALUE
+            : (this.newGrnData.NET_AMOUNT * landedCost.VALUE) / 100,
+        }));
 
-      console.log(this.costingMethodDataGrid, 'costingMethod');
+        console.log(this.costingMethodDataGrid, 'costingMethod');
 
-      // Now that poDetails and landedCost are populated, assign SUPP_GROSS_AMOUNT and SUPP_NET_AMOUNT
-      this.newGrnData.SUPP_GROSS_AMOUNT = Number(
-        this.poDetails[0].SUPP_GROSS_AMOUNT
-      );
-      this.newGrnData.SUPP_NET_AMOUNT = this.poDetails[0].SUPP_NET_AMOUNT;
+        // Now that poDetails and landedCost are populated, assign SUPP_GROSS_AMOUNT and SUPP_NET_AMOUNT
+        this.newGrnData.SUPP_GROSS_AMOUNT = Number(
+          this.poDetails[0].SUPP_GROSS_AMOUNT
+        );
+        this.newGrnData.SUPP_NET_AMOUNT = this.poDetails[0].SUPP_NET_AMOUNT;
 
-      // Create GRN_Cost based on the landedCost
-      const grnCost = this.landedCost.map((landedCost: any) => {
-        const COST_ID = landedCost.DESCRIPTION; // or use landedCost.COST_ID if available
-        const STORE_ID = this.newGrnData.STORE_ID; // Assuming STORE_ID is available in newGrnData
-        let PERCENT = 0;
-        let AMOUNT = 0;
-        let AMOUNT_FC = 0;
+        // Create GRN_Cost based on the landedCost
+        const grnCost = this.landedCost.map((landedCost: any) => {
+          const COST_ID = landedCost.DESCRIPTION; // or use landedCost.COST_ID if available
+          const STORE_ID = this.newGrnData.STORE_ID; // Assuming STORE_ID is available in newGrnData
+          let PERCENT = 0;
+          let AMOUNT = 0;
+          let AMOUNT_FC = 0;
 
-        // If IS_FIXED_AMOUNT is false, use VALUE as PERCENT
-        if (!landedCost.IS_FIXED_AMOUNT) {
-          PERCENT = landedCost.VALUE;
-          if (landedCost.IS_LOCAL_CURRENCY) {
-            AMOUNT = landedCost.VALUE; // Store in AMOUNT if IS_LOCAL_CURRENCY is true
-            AMOUNT_FC = 0; // No foreign currency amount
+          // If IS_FIXED_AMOUNT is false, use VALUE as PERCENT
+          if (!landedCost.IS_FIXED_AMOUNT) {
+            PERCENT = landedCost.VALUE;
+            if (landedCost.IS_LOCAL_CURRENCY) {
+              AMOUNT = landedCost.VALUE; // Store in AMOUNT if IS_LOCAL_CURRENCY is true
+              AMOUNT_FC = 0; // No foreign currency amount
+            } else {
+              AMOUNT_FC = landedCost.VALUE; // Store in AMOUNT_FC if IS_LOCAL_CURRENCY is false
+              AMOUNT = 0; // No local currency amount
+            }
           } else {
-            AMOUNT_FC = landedCost.VALUE; // Store in AMOUNT_FC if IS_LOCAL_CURRENCY is false
-            AMOUNT = 0; // No local currency amount
+            // If IS_FIXED_AMOUNT is true, store VALUE in AMOUNT and AMOUNT_FC based on IS_LOCAL_CURRENCY
+            if (landedCost.IS_LOCAL_CURRENCY) {
+              AMOUNT = landedCost.VALUE; // Store in AMOUNT if IS_LOCAL_CURRENCY is true
+              AMOUNT_FC = 0; // No foreign currency amount
+            } else {
+              AMOUNT_FC = landedCost.VALUE; // Store in AMOUNT_FC if IS_LOCAL_CURRENCY is false
+              AMOUNT = 0; // No local currency amount
+            }
           }
-        } else {
-          // If IS_FIXED_AMOUNT is true, store VALUE in AMOUNT and AMOUNT_FC based on IS_LOCAL_CURRENCY
-          if (landedCost.IS_LOCAL_CURRENCY) {
-            AMOUNT = landedCost.VALUE; // Store in AMOUNT if IS_LOCAL_CURRENCY is true
-            AMOUNT_FC = 0; // No foreign currency amount
-          } else {
-            AMOUNT_FC = landedCost.VALUE; // Store in AMOUNT_FC if IS_LOCAL_CURRENCY is false
-            AMOUNT = 0; // No local currency amount
-          }
-        }
 
-        return {
-          STORE_ID: STORE_ID,
-          COST_ID: landedCost.ID, // Assuming COST_ID is available in landedCost data
-          PERCENT:landedCost.VALUE,
-          AMOUNT_FC: AMOUNT_FC.toFixed(2), // Format AMOUNT_FC as needed
-          AMOUNT: AMOUNT.toFixed(2), // Format AMOUNT as needed
-        };
+          return {
+            STORE_ID: STORE_ID,
+            COST_ID: landedCost.ID, // Assuming COST_ID is available in landedCost data
+            PERCENT: landedCost.VALUE,
+            AMOUNT_FC: AMOUNT_FC.toFixed(2), // Format AMOUNT_FC as needed
+            AMOUNT: AMOUNT.toFixed(2), // Format AMOUNT as needed
+          };
+        });
+
+        // Log the final GRN_Cost array for debugging
+        console.log(grnCost, 'GRN_Cost');
+
+        this.newGrnData.GRN_Cost = []; // Clear existing data
+        this.newGrnData.GRN_Cost.push(...grnCost); // Push the new grnCost data
+
+        // You can now save or use grnCost as needed
       });
-
-      // Log the final GRN_Cost array for debugging
-      console.log(grnCost, 'GRN_Cost');
-
-      this.newGrnData.GRN_Cost = []; // Clear existing data
-      this.newGrnData.GRN_Cost.push(...grnCost); // Push the new grnCost data
-
-      // You can now save or use grnCost as needed
-    });
 
     // // Handle dropdown data if necessary
     this.service.getDropdownData('LANDED_COST').subscribe((res: any[]) => {
@@ -367,7 +414,7 @@ export class GrnNewFormComponent implements OnInit {
   onStoreValueChanged(e: any) {
     const storeid = e.value;
     this.service
-      .getPendingPo(storeid, this.supplierId,this.selected_Company_id)
+      .getPendingPo(storeid, this.supplierId, this.selected_Company_id)
       .subscribe((res: any) => {
         this.poList = res.data;
         this.filteredPOList = [...this.poList];
@@ -390,22 +437,22 @@ export class GrnNewFormComponent implements OnInit {
   // }
 
   onSupplierValueChanged(e: any) {
-  const supplierid = e.value;
-  this.supplierId = supplierid;
+    const supplierid = e.value;
+    this.supplierId = supplierid;
 
-  if (!this.newGrnData.STORE_ID) return;
+    if (!this.newGrnData.STORE_ID) return;
 
-  this.service
-    .getPendingPo(
-      this.newGrnData.STORE_ID,
-      supplierid,
-      this.selected_Company_id
-    )
-    .subscribe((res: any) => {
-      this.poList = res.data;
-      this.filteredPOList = [...this.poList];
-    });
-}
+    this.service
+      .getPendingPo(
+        this.newGrnData.STORE_ID,
+        supplierid,
+        this.selected_Company_id
+      )
+      .subscribe((res: any) => {
+        this.poList = res.data;
+        this.filteredPOList = [...this.poList];
+      });
+  }
 
   // getSupplierData() {
   //   this.service.getDropdownData('SUPPLIER').subscribe((res) => {
@@ -442,7 +489,7 @@ export class GrnNewFormComponent implements OnInit {
       this.selected_Company_id,
       '============selected_Company_id=============='
     );
-     this.newGrnData.COMPANY_ID = this.selected_Company_id;
+    this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
