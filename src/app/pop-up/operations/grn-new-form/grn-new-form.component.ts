@@ -460,15 +460,30 @@ export class GrnNewFormComponent implements OnInit {
   //   });
   // }
 
+  // get_Supplier_dropdown() {
+  //   this.service.Supplier_Dropdown().subscribe((res: any) => {
+  //     console.log('supplier dropdown', res);
+  //     this.supplierList = res;
+  //   });
+  // }
+
   get_Supplier_dropdown() {
-    this.service.Supplier_Dropdown().subscribe((res: any) => {
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.supplierList = res;
     });
   }
 
   getStoreData() {
-    this.service.getDropdownData('STORE').subscribe((res) => {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
     });
   }
@@ -530,14 +545,33 @@ export class GrnNewFormComponent implements OnInit {
         item.ITEM_ID === updatedData.ITEM_ID &&
         item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID
     );
+    const amount =
+      Number(updatedRow.RECEIVED_QTY || 0) * Number(updatedRow.PRICE || 0);
+
     const enrichedData = {
       ...updatedData,
-      ITEM_NAME: updatedRow.DESCRIPTION || updatedData.DESCRIPTION || '', // or whatever the field is
-      STORE_NAME: updatedRow.STORE_NAME || updatedData.STORE_NAME || '',
-      AMOUNT: (updatedRow.RECEIVED_QTY || 0) * (updatedRow.PRICE || 0),
-      SUPP_AMOUNT:
-        (updatedRow.RECEIVED_QTY || 0) * (updatedRow.SUPP_PRICE || 0),
+
+      ITEM_ID: updatedRow.ITEM_ID,
+      PO_DETAIL_ID: updatedRow.PO_DETAIL_ID,
+
+      QUANTITY: Number(updatedRow.RECEIVED_QTY),
+
+      RATE: Number(amount.toFixed(2)), // ✅ ADD THIS
+      AMOUNT: Number(amount.toFixed(2)),
+
+      SUPP_PRICE: Number(updatedRow.SUPP_PRICE || 0),
+      SUPP_AMOUNT: Number(
+        (updatedRow.RECEIVED_QTY * updatedRow.SUPP_PRICE).toFixed(2)
+      ),
+
+      UOM_PURCH: updatedRow.UOM_PURCH,
+      UOM: updatedRow.UOM,
+      UOM_MULTIPLE: updatedRow.UOM_MULTIPLE,
+
+      ITEM_NAME: updatedRow.DESCRIPTION || '',
+      STORE_NAME: updatedRow.STORE_NAME || '',
     };
+
     console.log(enrichedData, 'enrichedData');
 
     // const enrichedData = {
@@ -704,23 +738,29 @@ export class GrnNewFormComponent implements OnInit {
 
       console.log(this.updatedItems, 'All Updated Rows');
 
-      const bindedData = this.updatedItems.map((item) => ({
-        COMPANY_ID: this.selected_Company_id, // Static value or dynamically set if needed
-        STORE_ID: this.newGrnData.STORE_ID,
-        PO_DETAIL_ID: item.PO_DETAIL_ID,
-        ITEM_ID: item.ITEM_ID,
-        QUANTITY: Number(item.RECEIVED_QTY),
-        RATE: Number(item.PRICE),
-        // SUPP_AMOUNT: Number(item.LOCAL_AMOUNT),
-        AMOUNT: Number(item.PRICE * item.RECEIVED_QTY),
-        DISC_PERCENT: Number(item.DISC_PERCENT),
+      const bindedData = this.updatedItems.map((item) => {
+        const amount = Number(item.PRICE) * Number(item.RECEIVED_QTY);
 
-        SUPP_PRICE: Number(item.SUPP_PRICE),
-        SUPP_AMOUNT: Number(item.RECEIVED_QTY * item.SUPP_PRICE),
-        UOM_PURCH: item.UOM_PURCH,
-        UOM: item.UOM,
-        COST: item.UNIT_COST,
-      }));
+        return {
+          COMPANY_ID: this.selected_Company_id,
+          STORE_ID: this.newGrnData.STORE_ID,
+          PO_DETAIL_ID: item.PO_DETAIL_ID,
+          ITEM_ID: item.ITEM_ID,
+          QUANTITY: Number(item.RECEIVED_QTY),
+
+          RATE: Number(amount.toFixed(2)), // ✅ RATE = AMOUNT
+          AMOUNT: Number(amount.toFixed(2)),
+
+          DISC_PERCENT: Number(item.DISC_PERCENT || 0),
+
+          SUPP_PRICE: Number(item.SUPP_PRICE),
+          SUPP_AMOUNT: Number((item.RECEIVED_QTY * item.SUPP_PRICE).toFixed(2)),
+
+          UOM_PURCH: item.UOM_PURCH,
+          UOM: item.UOM,
+          COST: Number(item.UNIT_COST || 0),
+        };
+      });
 
       console.log(bindedData, 'binded data');
 

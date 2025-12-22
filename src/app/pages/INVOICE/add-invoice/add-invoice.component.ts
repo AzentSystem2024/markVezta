@@ -209,8 +209,11 @@ export class AddInvoiceComponent {
   }
 
   getCustomerOrUnitLst() {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
     this.dataService
-      .getOutsideCustomerWithState()
+      .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
         console.log(this.distributorList, 'DISTLISTPOPUP');
@@ -298,6 +301,7 @@ export class AddInvoiceComponent {
       CUST_ID: this.invoiceFormData.DISTRIBUTOR_ID,
       COMPANY_ID: this.selectedCompanyId,
     };
+    console.log(payload, 'PAYLOADDDDDDDDDDD');
     this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
       this.staticTransfers = response.Data; // Save the original full list
       console.log(this.staticTransfers, 'STATISCTRANSFERS');

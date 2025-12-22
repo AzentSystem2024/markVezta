@@ -125,7 +125,7 @@ export class ViewInvoiceComponent {
     console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-
+      this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
       console.log(this.HSNCODE, 'HSNCODE===================');
@@ -311,8 +311,11 @@ export class ViewInvoiceComponent {
   }
 
   getCustomerOrUnitLst() {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
     this.dataService
-      .getOutsideCustomerWithState()
+      .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
         console.log(this.distributorList, 'DISTLISTPOPUP');

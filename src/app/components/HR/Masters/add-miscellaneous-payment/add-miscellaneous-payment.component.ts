@@ -857,39 +857,6 @@ export class AddMiscellaneousPaymentComponent {
 
     // no approval → save directly
     this.callInsertAPI(payload);
-    // this.dataService.insertMiscPayment(payload).subscribe({
-    //   next: (response: any) => {
-    //     if (response?.flag == 1) {
-    //       notify(
-    //         {
-    //           message: 'Miscellaneous Payment Added Successfully',
-    //           position: { at: 'top center', my: 'top center' },
-    //         },
-    //         'success'
-    //       );
-    //       this.getPendingNo();
-    //       this.popupClosed.emit(); // Or reset form if needed
-    //     } else {
-    //       notify(
-    //         {
-    //           message: response?.Message || 'Failed to save data.',
-    //           position: { at: 'top center', my: 'top center' },
-    //         },
-    //         'error'
-    //       );
-    //     }
-    //   },
-    //   error: (err) => {
-    //     console.error('Save Error:', err);
-    //     notify(
-    //       {
-    //         message: 'Something went wrong while saving.',
-    //         position: { at: 'top center', my: 'top center' },
-    //       },
-    //       'error'
-    //     );
-    //   },
-    // });
   }
 
   formatDate(date: any): string {

@@ -220,7 +220,7 @@ export class ArticleAddComponent {
 
   getItems() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
+      COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
       this.itemsList = response.DataList;
@@ -454,7 +454,7 @@ export class ArticleAddComponent {
     //   DATE_FROM: new Date('1999-12-31T18:00:00.000Z'), // set specific from date
     //   DATE_TO: new Date(), // keep to date as today
     // };
-    const payload = { COMPANY_ID : this.selected_Company_id };
+    const payload = { COMPANY_ID: this.selected_Company_id };
     this.dataService.getArticleList(payload).subscribe((response: any) => {
       console.log(response, 'ARTICLELIST');
       if (response?.Data && Array.isArray(response.Data)) {
@@ -565,21 +565,24 @@ export class ArticleAddComponent {
     if (!this.selectedProductionUnitId) return;
     console.log(this.selectedProductionUnitId, 'SELECTEDPRODUCTIONUNITID');
     const ids = this.selectedProductionUnitId.join(',');
-    this.dataService.getLastOrderNoForArticle().subscribe((response: any) => {
-      const last = Number(response?.LastOrderNo ?? 0);
-      this.lastOrderNo = last;
-      let nextOrderNo = last + 1;
+    const payload = { COMPANY_ID: this.selected_Company_id };
+    this.dataService
+      .getLastOrderNoForArticle(payload)
+      .subscribe((response: any) => {
+        const last = Number(response?.LastOrderNo ?? 0);
+        this.lastOrderNo = last;
+        let nextOrderNo = last + 1;
 
-      if (Array.isArray(this.articleSizeData)) {
-        // Sort by SIZE ascending
-        this.articleSizeData = this.articleSizeData
-          .sort((a, b) => a.SIZE - b.SIZE)
-          .map((item: any) => ({
-            ...item,
-            ORDER_NO: nextOrderNo++,
-          }));
-      }
-    });
+        if (Array.isArray(this.articleSizeData)) {
+          // Sort by SIZE ascending
+          this.articleSizeData = this.articleSizeData
+            .sort((a, b) => a.SIZE - b.SIZE)
+            .map((item: any) => ({
+              ...item,
+              ORDER_NO: nextOrderNo++,
+            }));
+        }
+      });
   }
 
   openAttachPopup() {
@@ -628,12 +631,15 @@ export class ArticleAddComponent {
     this.articleData.COMPONENT_ARTICLE_ID = '';
   }
 
-     sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   saveArticle() {
     // Validate mandatory fields
@@ -766,7 +772,7 @@ export class ArticleAddComponent {
           CATEGORY_ID: this.selectedCategoryId,
           ARTICLE_TYPE: this.selectedTypeId,
           BRAND_ID: this.selectedBrandId,
-          COMPANY_ID : this.selected_Company_id,
+          COMPANY_ID: this.selected_Company_id,
           // UNIT_ID: this.selectedProductionUnitId,
           Units: Array.isArray(this.selectedProductionUnitId)
             ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))

@@ -92,7 +92,7 @@ export class AddDebitComponent {
 
   debitFormData: any = {
     TRANS_TYPE: 36,
-    COMPANY_ID: 1,
+    COMPANY_ID: 0,
     STORE_ID: 0,
     TRANS_DATE: new Date(),
     TRANS_STATUS: 1,
@@ -259,10 +259,15 @@ export class AddDebitComponent {
   }
 
   getSupplierOrUnitLst() {
-    this.dataService.getSupplierWithState().subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'DISTLISTPOPUP');
-    });
+    const payload = {
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService
+      .getSupplierWithState(payload)
+      .subscribe((response: any) => {
+        this.distributorList = response;
+        console.log(this.distributorList, 'DISTLISTPOPUP');
+      });
   }
 
   onSupplierChanged(event: any) {
@@ -986,6 +991,7 @@ export class AddDebitComponent {
     this.debitFormData.TRANS_DATE = this.formatDate(
       this.debitFormData.TRANS_DATE
     );
+    this.debitFormData.COMPANY_ID = this.selectedCompany;
     console.log(this.debitFormData.NET_AMOUNT, 'NETAMOUNT');
 
     //  NEW LOGIC HERE
@@ -1011,7 +1017,7 @@ export class AddDebitComponent {
   resetDebitNoteForm() {
     this.debitFormData = {
       TRANS_TYPE: 36,
-      COMPANY_ID: 1,
+      COMPANY_ID: 0,
       STORE_ID: 0,
       DOC_NO: this.getDocNo(),
       TRANS_DATE: new Date(),

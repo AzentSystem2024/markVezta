@@ -161,7 +161,7 @@
     [text]="isReadOnly ? 'Approved' : 'Approve'"
     [(value)]="isApproved"
     [width]="'auto'"
-    [disabled]="isReadOnly"
+    [disabled]="isApproveDisabled || isReadOnly"
     style="margin-left: 10px"
   ></dx-check-box>
 </div>

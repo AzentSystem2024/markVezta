@@ -174,19 +174,22 @@ export class ArticleListComponent {
     this.getArticles();
   }
 
-  sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   getArticles() {
     this.articleList = new DataSource({
       load: () =>
         new Promise((resolve, reject) => {
           const payload = {
-            COMPANY_ID : this.selected_Company_id
+            COMPANY_ID: this.selected_Company_id,
           }; // Add any necessary payload data here
           this.dataService.getArticleList(payload).subscribe({
             next: (response: any) => {

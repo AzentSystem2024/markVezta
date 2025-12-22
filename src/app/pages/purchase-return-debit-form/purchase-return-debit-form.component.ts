@@ -317,17 +317,22 @@ export class PurchaseReturnDebitFormComponent {
   }
 
   getSupplierLstWithState() {
-    this.dataService.getSupplierWithState().subscribe((response: any) => {
-      this.supplierList = response;
-      console.log(this.supplierList, 'SUPPLIER LIST LOADED');
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService
+      .getSupplierWithState(payload)
+      .subscribe((response: any) => {
+        this.supplierList = response;
+        console.log(this.supplierList, 'SUPPLIER LIST LOADED');
 
-      // ⭐ FIX: NOW load edit data only AFTER supplierList has data
-      if (this.isEditing) {
-        this.isEditDataAvailable();
-      } else {
-        this.getDocNo();
-      }
-    });
+        // ⭐ FIX: NOW load edit data only AFTER supplierList has data
+        if (this.isEditing) {
+          this.isEditDataAvailable();
+        } else {
+          this.getDocNo();
+        }
+      });
   }
 
   onSupplierChanged(event: any) {

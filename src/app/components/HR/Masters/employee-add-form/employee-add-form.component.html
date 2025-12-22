@@ -67,15 +67,7 @@
                   >
                   </dx-date-box>
                 </div>
-                <!-- <div class="gender-field">
-                <dx-radio-group
-                  [(value)]="employeeFormData.IS_MALE"
-                  [items]="['Male', 'Female']"
-                  layout="horizontal"
-                >
-                </dx-radio-group>
-              </div> -->
-                <!-- </div> -->
+
                 <div>
                   <dx-radio-group
                     [(value)]="employeeFormData.IS_MALE"
@@ -140,8 +132,6 @@
                   </dx-date-box>
                 </div>
                 <div>
-
-
                   <dx-select-box
                     label="Nationality"
                     displayExpr="COUNTRY_NAME"
@@ -222,38 +212,38 @@
                   </dx-select-box> -->
                 </div>
               </div>
-<div class="three-column-layout">
-  <div>
-    <dx-text-box
-      [(value)]="employeeFormData.PF_AC_NO"
-      [placeholder]="'Enter PF Account No'"
-      label="PF A/C No"
-      [labelMode]="'floating'"
-    >
-    </dx-text-box>
-  </div>
-  <div>
-    <dx-text-box
-      [(value)]="employeeFormData.ESI_NO"
-      [placeholder]="'Enter ESI No'"
-      label="ESI No"
-      [labelMode]="'floating'"
-    >
-    </dx-text-box>
-  </div>
-  <div>
-    <dx-number-box
-      [(value)]="employeeFormData.ESI_PERCENT"
-      [placeholder]="'Enter ESI %'"
-      label="ESI Percent"
-      [labelMode]="'floating'"
-      [min]="0"
-      [max]="100"
-      format="#0.## '%'"
-    >
-    </dx-number-box>
-  </div>
-</div>
+              <div class="three-column-layout">
+                <div>
+                  <dx-text-box
+                    [(value)]="employeeFormData.PF_AC_NO"
+                    [placeholder]="'Enter PF Account No'"
+                    label="PF A/C No"
+                    [labelMode]="'floating'"
+                  >
+                  </dx-text-box>
+                </div>
+                <div>
+                  <dx-text-box
+                    [(value)]="employeeFormData.ESI_NO"
+                    [placeholder]="'Enter ESI No'"
+                    label="ESI No"
+                    [labelMode]="'floating'"
+                  >
+                  </dx-text-box>
+                </div>
+                <div>
+                  <dx-number-box
+                    [(value)]="employeeFormData.ESI_PERCENT"
+                    [placeholder]="'Enter ESI %'"
+                    label="ESI Percent"
+                    [labelMode]="'floating'"
+                    [min]="0"
+                    [max]="100"
+                    format="#0.## '%'"
+                  >
+                  </dx-number-box>
+                </div>
+              </div>
 
               <!-- </dx-form> -->
             </div>
@@ -285,83 +275,83 @@
             />
           </div>
         </div>
-<div class="custom-card-address">
+        <div class="custom-card-address">
+          <!-- Row 1: Address fields -->
+          <div>
+            <dx-text-box
+              [(value)]="employeeFormData.ADDRESS1"
+              [placeholder]="'Enter Address'"
+              label="Address 1"
+              [labelMode]="'floating'"
+            ></dx-text-box>
+          </div>
 
+          <div>
+            <dx-text-box
+              [(value)]="employeeFormData.ADDRESS2"
+              [placeholder]="'Enter Address'"
+              label="Address 2"
+              [labelMode]="'floating'"
+            ></dx-text-box>
+          </div>
 
-  <!-- Row 1: Address fields -->
-  <div>
-    <dx-text-box
-      [(value)]="employeeFormData.ADDRESS1"
-      [placeholder]="'Enter Address'"
-      label="Address 1"
-      [labelMode]="'floating'"
-    ></dx-text-box>
-  </div>
+          <div>
+            <dx-text-box
+              [(value)]="employeeFormData.ADDRESS3"
+              [placeholder]="'Enter Address'"
+              label="Address 3"
+              [labelMode]="'floating'"
+            ></dx-text-box>
+          </div>
 
-  <div>
-    <dx-text-box
-      [(value)]="employeeFormData.ADDRESS2"
-      [placeholder]="'Enter Address'"
-      label="Address 2"
-      [labelMode]="'floating'"
-    ></dx-text-box>
-  </div>
+          <!-- Row 2: City, State, Mobile, Email (combine into 3 columns) -->
+          <div>
+            <dx-text-box
+              [(value)]="employeeFormData.CITY"
+              [placeholder]="'Enter City'"
+              label="City"
+              [labelMode]="'floating'"
+            ></dx-text-box>
+          </div>
 
-  <div>
-    <dx-text-box
-      [(value)]="employeeFormData.ADDRESS3"
-      [placeholder]="'Enter Address'"
-      label="Address 3"
-      [labelMode]="'floating'"
-    ></dx-text-box>
-  </div>
+          <div>
+            <dx-select-box
+              [(value)]="employeeFormData.STATE_ID"
+              [items]="states"
+              [valueExpr]="'ID'"
+              [displayExpr]="'DESCRIPTION'"
+              [placeholder]="'Select State'"
+              label="State"
+              [labelMode]="'floating'"
+              [searchEnabled]="true"
+              (onValueChanged)="onStateChange($event)"
+            ></dx-select-box>
+          </div>
 
-  <!-- Row 2: City, State, Mobile, Email (combine into 3 columns) -->
-  <div>
-    <dx-text-box
-      [(value)]="employeeFormData.CITY"
-      [placeholder]="'Enter City'"
-      label="City"
-      [labelMode]="'floating'"
-    ></dx-text-box>
-  </div>
+          <div>
+            <dx-text-box
+              [(value)]="employeeFormData.MOBILE"
+              [placeholder]="'Enter Mobile'"
+              label="Mobile"
+              [labelMode]="'floating'"
+              (input)="validateMobile($event)"
+            ></dx-text-box>
+            <div *ngIf="mobileError" class="error-message">
+              {{ mobileError }}
+            </div>
+          </div>
 
-  <div>
-    <dx-select-box
-      [(value)]="employeeFormData.STATE_ID"
-      [items]="states"
-      [valueExpr]="'ID'"
-      [displayExpr]="'DESCRIPTION'"
-      [placeholder]="'Select State'"
-      label="State"
-      [labelMode]="'floating'"
-      [searchEnabled]="true"
-      (onValueChanged)="onStateChange($event)"
-    ></dx-select-box>
-  </div>
-
-  <div>
-    <dx-text-box
-      [(value)]="employeeFormData.MOBILE"
-      [placeholder]="'Enter Mobile'"
-      label="Mobile"
-      [labelMode]="'floating'"
-      (input)="validateMobile($event)"
-    ></dx-text-box>
-    <div *ngIf="mobileError" class="error-message">{{ mobileError }}</div>
-  </div>
-
-  <div>
-    <dx-text-box
-      [(value)]="employeeFormData.EMAIL"
-      [placeholder]="'Enter Email'"
-      label="Email"
-      [labelMode]="'floating'"
-      (input)="validateEmail($event)"
-    ></dx-text-box>
-    <div *ngIf="emailError" class="error-message">{{ emailError }}</div>
-  </div>
-</div>
+          <div>
+            <dx-text-box
+              [(value)]="employeeFormData.EMAIL"
+              [placeholder]="'Enter Email'"
+              label="Email"
+              [labelMode]="'floating'"
+              (input)="validateEmail($event)"
+            ></dx-text-box>
+            <div *ngIf="emailError" class="error-message">{{ emailError }}</div>
+          </div>
+        </div>
 
         <div class="dx-card custom-card-passport">
           <span class="card-label">-- Visa Details --</span>
@@ -533,29 +523,27 @@
           </div>
         </div>
 
-        <div class="container">
-          <div class="left-column">
-            <div class="custom-card">
-              <div class="two-column-layout">
-                <div>
-                  <dx-check-box
-                    [(value)]="employeeFormData.IS_SALESMAN"
-                    text="Salesman"
-                  ></dx-check-box>
-                </div>
-                <div>
-                  <dx-check-box
-                    [(value)]="employeeFormData.IS_INACTIVE"
-                    text="Inactive"
-                  ></dx-check-box>
-                </div>
-              </div>
-            </div>
+        <!-- <div class="container"> -->
+        <!-- <div class="left-column"> -->
+        <!-- <div class="custom-card"> -->
+        <div class="two-column-layout">
+          <div>
+            <dx-check-box
+              [(value)]="employeeFormData.IS_SALESMAN"
+              text="Salesman"
+            ></dx-check-box>
+          </div>
+          <div>
+            <dx-check-box
+              [(value)]="employeeFormData.IS_INACTIVE"
+              text="Inactive"
+            ></dx-check-box>
           </div>
         </div>
+        <!-- </div> -->
+        <!-- </div> -->
+        <!-- </div> -->
       </dxi-item>
-
-
     </dx-tab-panel>
   </dx-validation-group>
   <div class="fixed-footer">

@@ -68,7 +68,6 @@ export class SalaryHeadAddComponent {
   head_From: boolean = false;
   head_To: boolean = false;
   SalaryHeadData = {
-  
     HEAD_NAME: '',
     PAYSLIP_TITLE: '',
     HEAD_ACTIVE: true,
@@ -129,42 +128,30 @@ export class SalaryHeadAddComponent {
   };
   selected_Company_id: any;
 
-  constructor(private dataservice: DataService) {
-    this.get_headnameGrid();
-    this.getSalaryHeadList();
-    console.log(this.selectedPriority, 'selectedType==========');
-    const defaultNumericValue = 1;
-
-    const defaultTypeMap: { [key: number]: string } = {
-      1: 'fixed',
-      2: 'percentage',
-      3: 'others',
-    };
-    // Set selectedType based on numeric default
-    this.selectedType = defaultTypeMap[defaultNumericValue];
-    this.dataservice.Dropdown_ac_head(name).subscribe((res: any) => {
-      console.log('ac head dropdown', res);
-      this.Ac_head_values = res;
-    });
-
-    // Reset other UI flags
-    this.selecteNatureTypeTwo = false;
-    this.head_percent = false;
-    this.head_From = false;
-    this.head_To = false;
-    this.ApplicableWithBasicRange = false;
-    this.ApplicableWorkingDay = false;
-    this.selecteNatureTypeone = false;
-  }
+  constructor(private dataservice: DataService) {}
 
   ngOnInit() {
+    // Default priority
     this.selectedPriority = this.priorities.find((p) => p.id === 1);
+    this.HeadType_value = 1;
+    this.isEnabled = true;
+
+    // Default radio selection
+    this.selectedType = 'fixed';
+
+    // 🔥 Apply UI enable/disable logic
+    this.onTypeChange();
+
+    // Load dropdowns & lists
+    this.get_headnameGrid();
+    this.sesstion_Details();
+    this.getSalaryHeadList();
+
     this.dataservice.Dropdown_ac_head(name).subscribe((res: any) => {
-      console.log('ac head dropdown', res);
       this.Ac_head_values = res;
     });
-    this.sesstion_Details();
   }
+
   //================disbled================
   //  isAdvanceSelected(): boolean {
   //   console.log(this.selectedPriority, "selectedType");
@@ -207,19 +194,21 @@ export class SalaryHeadAddComponent {
     }
   }
 
-
-        sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   //=======================list data=============
   getSalaryHeadList() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.get_salary_head_list(payload).subscribe((res: any) => {
       // console.log('Salary Head List:', res);
 
@@ -345,18 +334,6 @@ export class SalaryHeadAddComponent {
       this.selecteNatureTypeone = true;
       this.selecteNatureTypeTwo = true;
     }
-
-    // if(this.selectedNatureId==1){
-
-    // this.selecteNatureTypeTwo=true
-    // this.head_percent=true
-    // this.head_From=true
-    // this.head_To=true
-
-    // }
-    // else if(this.selectedNatureId==2){
-    //   // this.isDisable=true
-    // }
   }
 
   isValid() {
@@ -432,8 +409,11 @@ export class SalaryHeadAddComponent {
         return;
       }
       const selectedNatureId = this.selectedNatureId;
-      if (this.selectedNatureId === 2 && 
-      (!this.SalaryHeadData.PERCENT_HEAD_ID || this.SalaryHeadData.PERCENT_HEAD_ID.length === 0)) {
+      if (
+        this.selectedNatureId === 2 &&
+        (!this.SalaryHeadData.PERCENT_HEAD_ID ||
+          this.SalaryHeadData.PERCENT_HEAD_ID.length === 0)
+      ) {
         notify(
           {
             message: 'Please select Atleast one Head Name',
@@ -448,7 +428,7 @@ export class SalaryHeadAddComponent {
       if (this.SalaryHeadData.HEAD_NATURE === 3) {
         this.payload = {
           ...this.SalaryHeadData,
-           COMPANY_ID : this.selected_Company_id,
+          COMPANY_ID: this.selected_Company_id,
           HEAD_NATURE: this.selectedNatureId,
           FIXED_AMOUNT: 0,
           HEAD_TYPE: this.HeadType_value || 1,
@@ -456,7 +436,7 @@ export class SalaryHeadAddComponent {
       } else {
         this.payload = {
           ...this.SalaryHeadData,
-         COMPANY_ID : this.selected_Company_id,
+          COMPANY_ID: this.selected_Company_id,
           HEAD_NATURE: this.selectedNatureId,
           HEAD_TYPE: this.HeadType_value || 1,
         };
@@ -491,7 +471,6 @@ export class SalaryHeadAddComponent {
 
   resetForm() {
     this.SalaryHeadData = {
-      
       HEAD_NAME: '',
       PAYSLIP_TITLE: '',
       HEAD_ACTIVE: true,

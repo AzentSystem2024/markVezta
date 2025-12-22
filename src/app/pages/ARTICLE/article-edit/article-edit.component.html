@@ -192,7 +192,14 @@
               [disabled]="articleData.IS_COMPONENT"
             >
             </dx-text-box>
-
+            <div class="form-field">
+              <dx-text-box
+                label="Standard Packing"
+                labelMode="floating"
+                placeholder="Standard Packing"
+                [(value)]="articleData.STANDARD_PACKING"
+              ></dx-text-box>
+            </div>
             <!-- <div class="button-group-inline">
               <dx-button
                 text="Attach"

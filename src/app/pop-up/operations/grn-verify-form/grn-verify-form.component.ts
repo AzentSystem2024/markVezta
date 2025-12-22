@@ -101,7 +101,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     GRNDetails: [
       {
         ID: 0,
-        COMPANY_ID:0,
+        COMPANY_ID: 0,
         STORE_ID: 0,
         PO_DETAIL_ID: 0,
         GRN_ID: 0,
@@ -191,7 +191,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       this.selected_Company_id,
       '============selected_Company_id=============='
     );
-this.newGrnData.COMPANY_ID = this.selected_Company_id;
+    this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
@@ -243,7 +243,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
   onStoreValueChanged(e: any) {
     const storeid = e.value;
     this.service
-      .getPendingPo(storeid, this.supplierId,this.selected_Company_id)
+      .getPendingPo(storeid, this.supplierId, this.selected_Company_id)
       .subscribe((res: any) => {
         this.poList = res.data;
         this.filteredPOList = [...this.poList];
@@ -251,13 +251,22 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
   }
 
   getSupplierData() {
-    this.service.getDropdownData('SUPPLIER').subscribe((res) => {
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((res: any) => {
+      console.log('supplier dropdown', res);
       this.supplierList = res;
     });
   }
 
   getStoreData() {
-    this.service.getDropdownData('STORE').subscribe((res) => {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
     });
   }
@@ -951,9 +960,10 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
   }
 
   ngOnInit(): void {
+    this.sesstion_Details();
     this.getSupplierData();
     this.getStoreData();
-    this.sesstion_Details();
+
     // this.getPurchaseOrderList();
   }
 

@@ -234,10 +234,15 @@ export class AddPurchaseInvoiceComponent {
   }
 
   getSupplierOrUnitLst() {
-    this.dataService.getSupplierWithState().subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'DISTLISTPOPUP');
-    });
+    const payload = {
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService
+      .getSupplierWithState(payload)
+      .subscribe((response: any) => {
+        this.distributorList = response;
+        console.log(this.distributorList, 'DISTLISTPOPUP');
+      });
   }
 
   sessionData_tax() {
@@ -535,7 +540,7 @@ export class AddPurchaseInvoiceComponent {
             GRN_DET_ID: row.GRN_DET_ID,
             UOM: row.UOM,
             TRANSFER_NO: row.GRN_NO,
-            TRANSFER_DATE: row.GRN_DATE,
+            GRN_DATE: row.GRN_DATE,
             ITEM_NAME: row.ITEM_NAME,
             PENDING_QTY: row.PENDING_QTY,
             QUANTITY: 0,

@@ -945,31 +945,51 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   }
 
   GetSupplierList() {
-    this.service.getDropdownData('SUPPLIER').subscribe((res) => {
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.SupplierList = res;
     });
   }
 
   GetStoresList() {
-    this.service.getDropdownData('STORE').subscribe((res) => {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.StoreList = res;
     });
   }
 
   GetDeliveryTermsList() {
-    this.service.getDropdownData('DELIVERYTERMS').subscribe((res) => {
+    const payload = {
+      NAME: 'DELIVERYTERMS',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.deliveryTermsList = res;
     });
   }
 
   GetPaymentTermsList() {
-    this.service.getDropdownData('PAYMENTTERMS').subscribe((res) => {
+    const payload = {
+      NAME: 'PAYMENTTERMS',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.paymentTermsList = res;
     });
   }
 
   GetEmployeeList() {
-    this.service.getDropdownData('EMPLOYEE').subscribe((res) => {
+    const payload = {
+      NAME: 'EMPLOYEE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.employeeList = res;
     });
   }

@@ -290,7 +290,11 @@ export class EditCustomerReceiptComponent {
   }
 
   getCompanyListDropdown(id?: number) {
-    this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
+    const payload = {
+      NAME: 'CUSTOMER',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.distributorList = response;
 
       if (this.receiprtFormData?.DISTRIBUTOR_ID) {

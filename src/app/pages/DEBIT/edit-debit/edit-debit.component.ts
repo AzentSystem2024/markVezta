@@ -395,10 +395,15 @@ export class EditDebitComponent {
   }
 
   getSupplierOrUnitLst() {
-    this.dataService.getSupplierWithState().subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'DISTLISTPOPUP');
-    });
+    const payload = {
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService
+      .getSupplierWithState(payload)
+      .subscribe((response: any) => {
+        this.distributorList = response;
+        console.log(this.distributorList, 'DISTLISTPOPUP');
+      });
   }
 
   onSupplierChanged(event: any) {
@@ -488,7 +493,10 @@ export class EditDebitComponent {
   }
 
   getPendingInvoices(savedData?: any) {
-    const payload = { SUPP_ID: this.selectedSupplierId ,COMPANY_ID: this.selectedCompanyId};
+    const payload = {
+      SUPP_ID: this.selectedSupplierId,
+      COMPANY_ID: this.selectedCompanyId,
+    };
 
     this.dataService
       .getPendingInvoiceforDebit(payload)

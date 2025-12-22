@@ -1,67 +1,51 @@
 <dx-validation-group class="form-grid" #formValidationGroup>
-  <div
-    style="
-      display: flex;
-      flex-direction: row;
-      align-items: flex-end;
-      justify-content: space-between;
-      width: 100%;
-      gap: 10px;
-    "
-  >
+  <div style="display: flex; align-items: flex-end; gap: 16px; width: 100%">
     <!-- Document No -->
-    <div style="flex: 1">
-      <dx-text-box
-        label="Document No"
-        labelMode="floating"
-        [readOnly]="true"
-        [(value)]="docNo"
-        style="width: 200px"
-      >
-      </dx-text-box>
-    </div>
+    <dx-text-box
+      label="Document No"
+      labelMode="floating"
+      [readOnly]="true"
+      [(value)]="docNo"
+      style="width: 200px"
+    >
+    </dx-text-box>
 
     <!-- Date of Depreciation -->
-    <div style="flex: 1">
-      <dxi-item>
-        <dx-date-box
-          label="Date of Depreciation"
-          placeholder="dd/mm/yyyy"
-          [showClearButton]="true"
-          [useMaskBehavior]="true"
-          [displayFormat]="'dd/MM/yyyy'"
-          type="date"
-          [inputAttr]="{ 'aria-label': 'Date' }"
-          [(value)]="DepreciationPayload.DEPR_DATE"
-          [labelMode]="'floating'"
-          style="width: 250px; margin-left: 900px"
-          (onValueChanged)="onDateValueChanged($event)"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-date-box>
-      </dxi-item>
-    </div>
+    <dx-date-box
+      label="Date of Depreciation"
+      placeholder="dd/mm/yyyy"
+      [showClearButton]="true"
+      [useMaskBehavior]="true"
+      [displayFormat]="'dd/MM/yyyy'"
+      type="date"
+      [(value)]="DepreciationPayload.DEPR_DATE"
+      labelMode="floating"
+      style="width: 250px"
+      (onValueChanged)="onDateValueChanged($event)"
+    >
+      <dx-validator>
+        <dxi-validation-rule
+          type="required"
+          message="This field is required"
+        ></dxi-validation-rule>
+      </dx-validator>
+    </dx-date-box>
 
     <!-- Process Button -->
-    <div style="flex: 1; display: flex; justify-content: flex-end">
-      <dx-button
-        text="Process"
-        stylingMode="contained"
-        type="default"
-        (onClick)="Process_function()"
-        style="width: 120px"
-      >
-      </dx-button>
-    </div>
+    <dx-button
+      text="Process"
+      stylingMode="contained"
+      type="default"
+      (onClick)="Process_function()"
+      style="width: 120px"
+    >
+    </dx-button>
   </div>
 
   <dx-data-grid
     [showBorders]="true"
     [selection]="{ mode: 'multiple' }"
-    height="400"
+    [height]="'45vh'"
     [showRowLines]="true"
     [showColumnLines]="true"
     class="mt-3"

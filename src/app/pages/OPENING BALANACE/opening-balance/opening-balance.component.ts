@@ -5,7 +5,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -62,8 +66,8 @@ export class OpeningBalanceComponent {
   dataGrid: DxDataGridComponent;
 
   pdfSrc: SafeResourceUrl | null = null;
-            isPdfPopupVisible: boolean = false;
-            
+  isPdfPopupVisible: boolean = false;
+
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -94,108 +98,19 @@ export class OpeningBalanceComponent {
   transId: any;
   isReadOnlyBalance: boolean;
   addButtonOptions: any;
+  isApproveDisabled = true;
 
-   //========================Export data ==========================
+  //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'Opening_Balance_Data';
     this.dataService.exportDataGrid(event, fileName);
   }
 
-  constructor(private dataService: DataService, private router: Router,private sanitizer: DomSanitizer) {}
-
-  // ngOnInit() {
-  //   this.openingBalance = [];
-
-  //   const userDataString = localStorage.getItem('userData');
-  //   console.log(userDataString, 'USERDATASTRINGGGGGGGGGGG');
-  //   if (userDataString) {
-  //     const userData = JSON.parse(userDataString);
-  //     const selectedCompany = userData?.SELECTED_COMPANY;
-  //     const companyId = selectedCompany?.COMPANY_ID;
-  //     const finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
-  //     console.log(
-  //       companyId,
-  //       finId,
-  //       'COMPANYID FINID==========================='
-  //     );
-  //     if (companyId && finId) {
-  //       const payload = {
-  //         COMPANY_ID: companyId,
-  //         FIN_ID: finId,
-  //       };
-  //       this.dataService.selectOpeningBalance(payload).subscribe({
-  //         next: (response: any) => {
-  //           console.log(
-  //             'Opening Balance Data===================================:',
-  //             response.Data
-  //           );
-  //           this.openingBalance = response.Data;
-  //           const hasApproved = response.Data.some(
-  //             (item: any) => item.TRANS_STATUS === 5
-  //           );
-  //           console.log(hasApproved, 'HASAPPROVEDDDDDDDDDDDDDDDDDDDD');
-  //           this.isApproved = hasApproved;
-  //           this.isReadOnly = hasApproved;
-  //           console.log(this.isReadOnly, 'readonlyyyyyyyyyyyyyyyyyyyyyyyyyyy');
-  //           this.transId = response.Data?.[0]?.TRANS_ID || null;
-  //           if (this.isApproved) {
-  //             this.transId = response.Data?.[0]?.TRANS_ID || null;
-  //           }
-  //           console.log(this.transId, 'OPENINGBALANCEEEEEEEEEEEEEEEEEEE');
-  //           const transformedData = response.Data.map((item: any) => ({
-  //             ledgerCode: item.LEDGER_CODE,
-  //             ledgerName: item.LEDGER_NAME,
-  //             debitAmount: item.DEBIT_AMOUNT,
-  //             creditAmount: item.CREDIT_AMOUNT,
-  //             headId: item.HEAD_ID, // optional if needed elsewhere
-  //           }));
-  //           this.openingBalance = transformedData;
-  //           // Optional: refresh grid if you use one
-  //           this.itemsGridRef?.instance.option(
-  //             'dataSource',
-  //             this.openingBalance
-  //           );
-  //           this.itemsGridRef?.instance.refresh();
-  //         },
-  //         error: (error) => {
-  //           console.error('Error loading opening balance:', error);
-  //         },
-  //       });
-  //     }
-  //   }
-
-  //   const currentUrl = this.router.url;
-  //   console.log('Current URL:', currentUrl);
-  //   const menuResponse = JSON.parse(
-  //     sessionStorage.getItem('savedUserData') || '{}'
-  //   );
-  //   console.log('Parsed ObjectData:', menuResponse);
-  //   const menuGroups = menuResponse.MenuGroups || [];
-  //   console.log('MenuGroups:', menuGroups);
-  //   const packingRights = menuGroups
-  //     .flatMap((group) => group.Menus)
-  //     .find((menu) => menu.Path === '/opening-balance');
-  //   if (packingRights) {
-  //     this.canAdd = packingRights.CanAdd;
-  //     this.canEdit = packingRights.CanEdit;
-  //     this.canDelete = packingRights.CanDelete;
-  //     this.canPrint = packingRights.CanEdit;
-  //     this.canView = packingRights.canView;
-  //     this.canApprove = packingRights.canApprove;
-  //   }
-
-  //   this.getLedgerCodeDropdown();
-
-  //   setTimeout(() => {
-  //     this.openingBalance.push({});
-  //     this.itemsGridRef.instance.refresh();
-
-  //     // Wait until refresh and DOM updates complete
-  //     setTimeout(() => {
-  //       this.focusFirstEditableCell();
-  //     }, 100); // Slight delay helps stabilize focus
-  //   });
-  // }
+  constructor(
+    private dataService: DataService,
+    private router: Router,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit() {
     this.openingBalance = [];
@@ -225,60 +140,9 @@ export class OpeningBalanceComponent {
       if (companyId && finId) {
         const payload = { COMPANY_ID: companyId, FIN_ID: finId };
 
-        this.dataService.selectOpeningBalance(payload).subscribe({
-          next: (response: any) => {
-            console.log('Opening Balance Data:', response.Data);
-
-            // ✅ Normalize Data (null → [])
-            const data = Array.isArray(response.Data) ? response.Data : [];
-
-            const hasApproved = data.some(
-              (item: any) => item.TRANS_STATUS === 5
-            );
-            this.isApproved = hasApproved;
-            this.isReadOnly = hasApproved;
-            this.transId = data?.[0]?.TRANS_ID || null;
-
-            let transformedData = data.map((item: any) => ({
-              ledgerCode: item.LEDGER_CODE,
-              ledgerName: item.LEDGER_NAME,
-              debitAmount: item.DEBIT_AMOUNT,
-              creditAmount: item.CREDIT_AMOUNT,
-              headId: item.HEAD_ID,
-            }));
-
-            if (transformedData.length === 0) {
-              // ✅ No data or null case
-              // this.openingBalance = [];
-              this.itemsGridRef?.instance.option(
-                'dataSource',
-                this.openingBalance
-              );
-
-              setTimeout(() => {
-                if (!this.isReadOnly) {
-                  // this.itemsGridRef?.instance.addRow(); // 👈 always add blank row if editable
-                }
-              }, 200);
-            } else {
-              // ✅ Has data
-              this.openingBalance = transformedData;
-              this.itemsGridRef?.instance.option(
-                'dataSource',
-                this.openingBalance
-              );
-              this.itemsGridRef?.instance.refresh();
-            }
-
-            // Ensure focus on first cell only if editable
-            if (!this.isReadOnly) {
-              setTimeout(() => this.focusFirstEditableCell(), 100);
-            }
-          },
-          error: (error) => {
-            console.error('Error loading opening balance:', error);
-          },
-        });
+        if (companyId && finId) {
+          this.loadOpeningBalance(companyId, finId);
+        }
       }
     }
 
@@ -305,6 +169,47 @@ export class OpeningBalanceComponent {
     }
 
     this.getLedgerCodeDropdown();
+  }
+
+  loadOpeningBalance(companyId: number, finId: number) {
+    const payload = { COMPANY_ID: companyId, FIN_ID: finId };
+
+    this.dataService.selectOpeningBalance(payload).subscribe({
+      next: (response: any) => {
+        const data = Array.isArray(response.Data) ? response.Data : [];
+
+        // 🔒 Approve logic
+        this.isApproveDisabled = data.length === 0;
+
+        const hasApproved = data.some((item: any) => item.TRANS_STATUS === 5);
+        this.isApproved = hasApproved;
+        this.isReadOnly = hasApproved;
+
+        this.transId = data?.[0]?.TRANS_ID || null;
+
+        // 🧩 Transform grid data
+        const transformedData = data.map((item: any) => ({
+          ledgerCode: item.LEDGER_CODE,
+          ledgerName: item.LEDGER_NAME,
+          debitAmount: item.DEBIT_AMOUNT,
+          creditAmount: item.CREDIT_AMOUNT,
+          headId: item.HEAD_ID,
+        }));
+
+        this.openingBalance = transformedData;
+
+        this.itemsGridRef?.instance.option('dataSource', this.openingBalance);
+        this.itemsGridRef?.instance.refresh();
+
+        // Focus only if editable
+        if (!this.isReadOnly) {
+          setTimeout(() => this.focusFirstEditableCell(), 100);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading opening balance', err);
+      },
+    });
   }
 
   refreshGrid() {
@@ -785,6 +690,14 @@ export class OpeningBalanceComponent {
         next: (res) => {
           console.log('Opening balance saved successfully', res);
           notify('Opening balance saved successfully', 'success', 3000);
+          const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+          const companyId = userData?.SELECTED_COMPANY?.COMPANY_ID;
+          const finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
+
+          if (companyId && finId) {
+            // ✅ Reload fresh data from SELECT API
+            this.loadOpeningBalance(companyId, finId);
+          }
           this.openingBalance = this.openingBalance.filter(
             (row: any) => row.ledgerCode && row.ledgerName
           );
@@ -838,35 +751,36 @@ export class OpeningBalanceComponent {
   }
 
   viewPdf(): void {
-                 this.isPdfPopupVisible = true;
-                 const userDataString = localStorage.getItem('userData');
-                const userData = JSON.parse(userDataString);
-      const selectedCompany = userData?.SELECTED_COMPANY;
-      const companyId = selectedCompany?.COMPANY_ID;
-      const finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
+    this.isPdfPopupVisible = true;
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData?.SELECTED_COMPANY;
+    const companyId = selectedCompany?.COMPANY_ID;
+    const finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
 
-       const payload = { COMPANY_ID: companyId, FIN_ID: finId };
-                this.dataService.selectOpeningBalance(payload).subscribe((response: any) => {
-                  if(response){
-                  this.pdfSrc = this.get_pdf(response);
-                }
-                 })
-      }
-    
-        get_pdf(data: any): SafeResourceUrl {
-         
-           const doc = new jsPDF("p", "mm", "a4");
-           const pageWidth = doc.internal.pageSize.width;
-           const margin = 12;
-           let y = 12;
-      
-           // ===========================
-        //  RETURN PDF
-        // ===========================
-        const blob = doc.output("blob");
-        const url = URL.createObjectURL(blob);
-        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-         }
+    const payload = { COMPANY_ID: companyId, FIN_ID: finId };
+    this.dataService
+      .selectOpeningBalance(payload)
+      .subscribe((response: any) => {
+        if (response) {
+          this.pdfSrc = this.get_pdf(response);
+        }
+      });
+  }
+
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
+
+    // ===========================
+    //  RETURN PDF
+    // ===========================
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 }
 
 @NgModule({

@@ -77,13 +77,15 @@ export class DepreciationEditComponent {
   Depreciation_List: any;
 
   pdfSrc: SafeResourceUrl | null = null;
-                isPdfPopupVisible: boolean = false;
+  isPdfPopupVisible: boolean = false;
   selected_Company_id: any;
 
-  constructor(private dataService: DataService,private sanitizer: DomSanitizer) {
+  constructor(
+    private dataService: DataService,
+    private sanitizer: DomSanitizer
+  ) {
     this.Active_fixedasset_List();
   }
-
 
   ngOnChanges(changes: SimpleChanges) {
     if (
@@ -125,11 +127,16 @@ export class DepreciationEditComponent {
 
   //===============================Active_fixedasset_List======================
   Active_fixedasset_List() {
-    this.dataService.Active_list_Fixed_Asset_api().subscribe((res: any) => {
-      console.log(res);
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService
+      .Active_list_Fixed_Asset_api(payload)
+      .subscribe((res: any) => {
+        console.log(res);
 
-      this.Active_fixed_asset_list = res.Data;
-    });
+        this.Active_fixed_asset_list = res.Data;
+      });
   }
   bindDepreciationData(payload: any) {
     if (!payload || !payload.ASSET_IDS) return;
@@ -388,7 +395,7 @@ export class DepreciationEditComponent {
     throw new Error('Method not implemented.');
   }
 
-     sesstion_Details() {
+  sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(sessionData, '=================session data==========');
 
@@ -399,35 +406,35 @@ export class DepreciationEditComponent {
     );
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.sesstion_Details();
   }
 
   get_Depreciation_list() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
-  this.dataService.list_Depreciation_api(payload).subscribe((res: any) => {
-    const allData = res.Data;
-    const dateField = 'DEPR_DATE';
-  this.Depreciation_List = allData;
-  //   // If 'all' is selected, skip filtering
-  //   if (this.selectedDateRange === 'all') {
-  //     this.Depreciation_List = allData;
-  //   } else {
-  //     const start = new Date(this.startDate);
-  //     const end = new Date(this.EndDate);
-  //     end.setHours(23, 59, 59, 999);
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.list_Depreciation_api(payload).subscribe((res: any) => {
+      const allData = res.Data;
+      const dateField = 'DEPR_DATE';
+      this.Depreciation_List = allData;
+      //   // If 'all' is selected, skip filtering
+      //   if (this.selectedDateRange === 'all') {
+      //     this.Depreciation_List = allData;
+      //   } else {
+      //     const start = new Date(this.startDate);
+      //     const end = new Date(this.EndDate);
+      //     end.setHours(23, 59, 59, 999);
 
-  //     this.Depreciation_List = allData.filter((item: any) => {
-  //       const itemDate = new Date(item[dateField]);
-  //       return itemDate >= start && itemDate <= end;
-  //     });
-  //   }
+      //     this.Depreciation_List = allData.filter((item: any) => {
+      //       const itemDate = new Date(item[dateField]);
+      //       return itemDate >= start && itemDate <= end;
+      //     });
+      //   }
 
-  //   console.log(this.Depreciation_List, 'Filtered Depreciation List');
-  });
-}
+      //   console.log(this.Depreciation_List, 'Filtered Depreciation List');
+    });
+  }
 
   UpdateData() {
     const date = this.DepreciationPayload.DEPR_DATE;
@@ -476,10 +483,10 @@ export class DepreciationEditComponent {
             .Approve_Depreciation_api(payload)
             .subscribe((res: any) => {
               console.log('Approved & Committed:', res);
-               this.Active_fixedasset_List();
-             this.popupClosed.emit();
-             this.get_Depreciation_list()
-             
+              this.Active_fixedasset_List();
+              this.popupClosed.emit();
+              this.get_Depreciation_list();
+
               notify(
                 {
                   message: 'Depreciation approved and committed successfully',
@@ -489,9 +496,6 @@ export class DepreciationEditComponent {
                 'success'
               );
               // this.resetFormAfterUpdate();
-                 
-          
-
             });
         } else {
           notify('Approval cancelled.', 'info', 2000);
@@ -503,15 +507,15 @@ export class DepreciationEditComponent {
         .subscribe((res: any) => {
           console.log(res);
           this.popupClosed.emit();
-           notify(
-                {
-                  message: 'Depreciation Update  successfully',
-                  position: { at: 'top right', my: 'top right' },
-                  displayTime: 500,
-                },
-                'success'
-              );
-          this.get_Depreciation_list()
+          notify(
+            {
+              message: 'Depreciation Update  successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success'
+          );
+          this.get_Depreciation_list();
           this.grandTotal = 0;
           this.selectedRowsInGrid = [];
         });
@@ -524,36 +528,35 @@ export class DepreciationEditComponent {
     this.selectedRowsInGrid = [];
   }
   closePopup() {
-    
     this.popupClosed.emit();
     this.selectedRowsInGrid = [];
     this.grandTotal = 0;
   }
 
   viewPdf(): void {
-                   this.isPdfPopupVisible = true;
-                    this.dataService.select_Depreciation_Asset(this.DepreciationId).subscribe((response:any)=>{
-                    if(response){
-                    this.pdfSrc = this.get_pdf(response);
-                  }
-                   })
+    this.isPdfPopupVisible = true;
+    this.dataService
+      .select_Depreciation_Asset(this.DepreciationId)
+      .subscribe((response: any) => {
+        if (response) {
+          this.pdfSrc = this.get_pdf(response);
         }
-      
-          get_pdf(data: any): SafeResourceUrl {
-           
-             const doc = new jsPDF("p", "mm", "a4");
-             const pageWidth = doc.internal.pageSize.width;
-             const margin = 12;
-             let y = 12;
-        
-             // ===========================
-          //  RETURN PDF
-          // ===========================
-          const blob = doc.output("blob");
-          const url = URL.createObjectURL(blob);
-          return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-           }
-  
+      });
+  }
+
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
+
+    // ===========================
+    //  RETURN PDF
+    // ===========================
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 }
 
 @NgModule({
@@ -571,7 +574,7 @@ export class DepreciationEditComponent {
     ReactiveFormsModule,
     DxDateBoxModule,
     DxValidationGroupModule,
-    CommonModule
+    CommonModule,
   ],
   providers: [],
   exports: [DepreciationEditComponent],

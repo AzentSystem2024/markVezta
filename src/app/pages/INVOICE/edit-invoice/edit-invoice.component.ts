@@ -115,7 +115,7 @@ export class EditInvoiceComponent {
     console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-
+      this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
       console.log(this.HSNCODE, 'HSNCODE===================');
@@ -290,25 +290,6 @@ export class EditInvoiceComponent {
     }
     this.getInvoiceListForGrid();
   }
-  // onDistributorChanged(e: any) {
-  //   if (e && e.value) {
-  //     this.selectedDistributorId = e.value; // ✅ this is the selected ID
-  //     console.log('Selected Distributor ID:', this.selectedDistributorId);
-  //     if (this.selectedDistributorId) {
-  //       this.selectedSupplierName = this.distributorList.find(
-  //         (s: any) => s.ID === this.selectedDistributorId
-  //       );
-  //       this.invoiceFormData.PARTY_NAME = this.selectedSupplierName.DESCRIPTION;
-  //       console.log(
-  //         this.selectedSupplierName.DESCRIPTION,
-  //         'PARTYNAMEEEEEEEEEEEEEE'
-  //       );
-  //     }
-  //     this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
-  //     this.invoiceFormData.UNIT_ID = 0;
-  //   }
-  //   this.getInvoiceListForGrid();
-  // }
 
   getInvoiceListForGrid() {
     const payload = {
@@ -348,8 +329,13 @@ export class EditInvoiceComponent {
   }
 
   getCustomerOrUnitLst() {
+    console.log(this.selectedCompanyId, 'COMPANYIDDDDDDDDDDDDD');
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    console.log(payload, 'PAYLOAD');
     this.dataService
-      .getOutsideCustomerWithState()
+      .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
         console.log(this.distributorList, 'DISTLISTPOPUP');

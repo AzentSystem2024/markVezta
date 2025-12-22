@@ -222,7 +222,7 @@ export class ArticleEditComponent {
 
   getItems() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
+      COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
       this.itemsList = response.DataList;
@@ -387,7 +387,7 @@ export class ArticleEditComponent {
     //   DATE_TO: new Date(),
     // };
     const payload = {
-      COMPANY_ID : this.selected_Company_id
+      COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.getArticleList(payload).subscribe((response: any) => {
       console.log(response, 'ARTICLELIST');
@@ -515,10 +515,13 @@ export class ArticleEditComponent {
   getLastOrderNo() {
     if (!this.selectedProductionUnitId) return;
 
-    this.dataService.getLastOrderNoForArticle().subscribe((response: any) => {
-      console.log(response, 'LASTORDERNO');
-      this.lastOrderNo = response?.LastOrderNo ?? '';
-    });
+    const payload = { COMPANY_ID: this.selected_Company_id };
+    this.dataService
+      .getLastOrderNoForArticle(payload)
+      .subscribe((response: any) => {
+        console.log(response, 'LASTORDERNO');
+        this.lastOrderNo = response?.LastOrderNo ?? '';
+      });
   }
 
   onUnitChanged(e: any) {
@@ -625,13 +628,15 @@ export class ArticleEditComponent {
     console.log('Selected rows:', this.selectedSizeRows);
   }
 
-   sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
-
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   updateArticle() {
     if (!this.articleData) {
@@ -659,7 +664,7 @@ export class ArticleEditComponent {
     console.log('BOM Data:', bomGridData);
     // Step 2: Prepare the full payload
     const payload = {
-      // ID: this.articleData.ID || 0,
+      ID: this.articleData.ID || 0,
       ART_NO: this.articleData.ART_NO || '',
       LAST_ORDER_NO: this.lastOrderNo || '',
       DESCRIPTION: this.articleData.DESCRIPTION || '',
@@ -691,7 +696,7 @@ export class ArticleEditComponent {
       ComponentArticleName: this.articleData.ComponentArticleName || '',
       CreatedDate: this.articleData.CreatedDate || new Date().toISOString(),
       BOM: bomGridData,
-      COMPANY_ID : this.selected_Company_id
+      COMPANY_ID: this.selected_Company_id,
     };
 
     console.log('Sending update payload:', payload);

@@ -149,11 +149,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/getitem`, data);
   }
 
-  listItemsForArticle(items:any): Observable<any> {
+  listItemsForArticle(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}Article/listitem`, data);
   }
-  getArticleList(items:any): Observable<any> {
+  getArticleList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}article/List`, data);
   }
@@ -180,15 +180,22 @@ export class DataService {
     );
   }
 
-  getLastOrderNo(unitId: number) {
-    return this.http.post<any>(
-      `${this.apiUrl}article/LastOrderNo/${unitId}`,
-      {}
-    );
+  // getLastOrderNo() {
+  //   return this.http.post<any>(`${this.apiUrl}article/LastOrderNo/`, {});
+  // }
+
+  // getLastOrderNoForArticle() {
+  //   return this.http.post<any>(`${this.apiUrl}article/LastOrderNo`, {});
+  // }
+
+  getLastOrderNo(item: any) {
+    const data = item;
+    return this.http.post<any>(`${this.apiUrl}article/LastOrderNo`, data);
   }
 
-  getLastOrderNoForArticle() {
-    return this.http.post<any>(`${this.apiUrl}article/LastOrderNo`, {});
+  getLastOrderNoForArticle(items: any) {
+    const data = items;
+    return this.http.post<any>(`${this.apiUrl}article/LastOrderNo`, data);
   }
   updateArticle(items: any) {
     const data = items;
@@ -333,11 +340,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Customer/custdtl`, {});
   }
 
-  getOutsideCustomerWithState(): Observable<any> {
-    return this.http.post(`${this.apiUrl}invoice/cust`, {});
+  getOutsideCustomerWithState(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}invoice/cust`, data);
   }
-  getCustomerStateTrout_Invoice(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Trout_Invoice/cust`, {});
+  getCustomerStateTrout_Invoice(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Trout_Invoice/cust`, data);
   }
 
   //   getSupplierWithState(): Observable<any> {
@@ -427,8 +434,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}PurchaseReturn/pendinglist`, data);
   }
 
-  getSupplierWithState(): Observable<any> {
-    return this.http.post(`${this.apiUrl}supplier/suppdtl`, {});
+  getSupplierWithState(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}supplier/suppdtl`, data);
   }
 
   insertPurchaseReturn(items: any) {
@@ -1136,8 +1143,13 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
 
-  Bank_Dropdown() {
-    const reqbody = { NAME: 'BANK_AC', COMPANY_ID: 1 };
+  // Bank_Dropdown() {
+  //   const reqbody = { NAME: 'BANK_AC', COMPANY_ID: 1 };
+  //   return this.http.post(`${this.apiUrl}dropdown`, reqbody);
+  // }
+
+  Bank_Dropdown(companyId: any) {
+    const reqbody = { NAME: 'BANK_AC', COMPANY_ID: companyId };
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
 
@@ -1852,8 +1864,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown`, { NAME: 'CURRENCY' });
   }
 
-  public getSupplierData(items:any): Observable<any> {
-    const Data  = items;
+  public getSupplierData(items: any): Observable<any> {
+    const Data = items;
     return this.http.post(`${this.apiUrl}supplier/list`, Data);
   }
   public postSupplierData(
@@ -2808,7 +2820,7 @@ export class DataService {
   }
 
   //items
-  getItemsData(items:any): any {
+  getItemsData(items: any): any {
     const data = items;
     return this.http.post(`${this.apiUrl}items/list`, data);
   }
@@ -2920,9 +2932,14 @@ export class DataService {
   }
 
   //dropdown
-  public getDropdownData(type: any): Observable<any> {
-    const reqBodyData = { name: type };
-    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
+  // public getDropdownData(type: any): Observable<any> {
+  //   const reqBodyData = { name: type };
+  //   return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
+  // }
+
+  public getDropdownData(data: any): Observable<any> {
+    // const reqBodyData = { name: type };
+    return this.http.post(`${this.apiUrl}dropdown/`, data);
   }
 
   public getStateDropdownData(payload: {
@@ -4978,7 +4995,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //===============ARTICLE COLOR ==================
-  get_ArticleColor_Api(items:any) {
+  get_ArticleColor_Api(items: any) {
     const data = items;
     const getEndpoint = this.apiUrl + 'ArticleColor/list';
     return this.http.post(getEndpoint, data);
@@ -5019,7 +5036,7 @@ The result can be exported to HTML or Markdown.`;
 
   //===============ARTICLE BRAND =======================
 
-  get_ArticleBrand_Api(items:any) {
+  get_ArticleBrand_Api(items: any) {
     const data = items;
     const getEndpoint = this.apiUrl + 'ArticleBrand/list';
     return this.http.post(getEndpoint, data);
@@ -5058,7 +5075,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //==================ARTICLE TYPE=========================
-  get_ArticleType_Api(items:any) {
+  get_ArticleType_Api(items: any) {
     const data = items;
     const getEndpoint = this.apiUrl + 'ArticleType/list';
     return this.http.post(getEndpoint, data);
@@ -5074,12 +5091,12 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Update_ArticleType_Api(Id: any, Description: any,COMPANY_ID:any) {
+  Update_ArticleType_Api(Id: any, Description: any, COMPANY_ID: any) {
     const getEndpoint = this.apiUrl + 'ArticleType/update';
     const reqBody = {
       ID: Id,
       DESCRIPTION: Description,
-      COMPANY_ID :COMPANY_ID
+      COMPANY_ID: COMPANY_ID,
     };
     return this.http.post(getEndpoint, reqBody);
   }
@@ -5207,7 +5224,7 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
-  list_of_category(items:any) {
+  list_of_category(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}ArticleCategory/listdata`, data);
   }
@@ -5445,21 +5462,29 @@ The result can be exported to HTML or Markdown.`;
 
   //==============================Api for package master=======================
 
-  get_packages_list_api(items:any) {
+  get_packages_list_api(items: any) {
     const data = items;
     const getEndpoint = this.apiUrl + 'packing/List';
     return this.http.post(getEndpoint, data);
   }
 
-  get_combinbation_list_api(payload: any) {
-    const params = new HttpParams()
-      .set('artNo', payload.artNo)
-      .set('color', payload.color)
-      .set('categoryID', payload.categoryID)
-      .set('unitID', payload.unitID)
-      .set('COMPANY_ID',payload.COMPANY_ID);
-    const getEndpoint = this.apiUrl + 'packing/sizes-for-combination';
-    return this.http.post(getEndpoint, {}, { params });
+  // get_combinbation_list_api(payload: any) {
+  //   const params = new HttpParams()
+  //     .set('artNo', payload.artNo)
+  //     .set('color', payload.color)
+  //     .set('categoryID', payload.categoryID)
+  //     .set('unitID', payload.unitID)
+  //     .set('COMPANY_ID', payload.COMPANY_ID);
+  //   const getEndpoint = this.apiUrl + 'packing/sizes-for-combination';
+  //   return this.http.post(getEndpoint, {}, { params });
+  // }
+
+  get_combinbation_list_api(item: any) {
+    const payload = item;
+    return this.http.post(
+      `${this.apiUrl}packing/sizes-for-combination`,
+      payload
+    );
   }
   // selectArticle(id: number, payload: any) {
 
@@ -5631,10 +5656,10 @@ The result can be exported to HTML or Markdown.`;
 
   //==============================Active fixed Asset Lisst for grid============================
 
-  Active_list_Fixed_Asset_api() {
-    return this.http.post(`${this.apiUrl}Depreciation/FixedAsset/list`, {});
+  Active_list_Fixed_Asset_api(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Depreciation/FixedAsset/list`, data);
   }
-
   //=====================list of depreciation================================
   list_Depreciation_api(item: any) {
     const payload = item;

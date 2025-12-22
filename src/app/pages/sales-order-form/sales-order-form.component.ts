@@ -84,9 +84,9 @@ export class SalesOrderFormComponent {
   auto: string = 'auto';
   customer: any;
   salesOrderFormData: any = {
-    COMPANY_ID: 1,
-    FIN_ID: 1,
-    STORE_ID: 1,
+    COMPANY_ID: 0,
+    FIN_ID: 0,
+    STORE_ID: 0,
     SO_DATE: new Date(),
     CUST_ID: 0,
     SUBDEALER_ID: 0,
@@ -178,23 +178,6 @@ export class SalesOrderFormComponent {
   ) {}
 
   ngOnInit() {
-    this.updateTotalQty();
-    this.getListOfItemsInColumn();
-    if (
-      !this.salesOrderFormData.Details ||
-      this.salesOrderFormData.Details.length === 0
-    ) {
-      this.salesOrderFormData.Details = [];
-    }
-    this.getDealerDropdown();
-    if (!this.isEditing) {
-      this.getSalesOrderNo();
-    }
-    // this.getWarehouseDropdown();
-    // always fetch fresh number when popup opens
-
-    this.isEditDataAvailable();
-
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
@@ -205,9 +188,10 @@ export class SalesOrderFormComponent {
 
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
-    this.companyID = menuResponse.Companies[0].COMPANY_ID;
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    console.log(menuResponse, 'COMPANYIDDDDDDDDDDDDDDDDD');
     const menuGroups = menuResponse.MenuGroups || [];
-    this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+    this.salesOrderFormData.STORE_ID = menuResponse.Configuration[0].STORE_ID;
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/quotation');
@@ -225,6 +209,22 @@ export class SalesOrderFormComponent {
     } else {
       // this.getItemsList();
     }
+    this.updateTotalQty();
+    this.getListOfItemsInColumn();
+    if (
+      !this.salesOrderFormData.Details ||
+      this.salesOrderFormData.Details.length === 0
+    ) {
+      this.salesOrderFormData.Details = [];
+    }
+    this.getDealerDropdown();
+    if (!this.isEditing) {
+      this.getSalesOrderNo();
+    }
+    // this.getWarehouseDropdown();
+    // always fetch fresh number when popup opens
+
+    this.isEditDataAvailable();
   }
 
   isEditDataAvailable() {
@@ -1094,7 +1094,11 @@ export class SalesOrderFormComponent {
   // }
 
   getDealerDropdown() {
-    this.dataService.getDropdownData('DEALER').subscribe((response: any) => {
+    const payload = {
+      NAME: 'DEALER',
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.dealerList = response;
     });
   }
@@ -1283,8 +1287,8 @@ export class SalesOrderFormComponent {
 
     // --- Build payload ---
     const payload: any = {
-      COMPANY_ID: this.salesOrderFormData.COMPANY_ID,
-      FIN_ID: this.salesOrderFormData.FIN_ID,
+      COMPANY_ID: this.companyID,
+      FIN_ID: this.finID,
       STORE_ID: this.salesOrderFormData.STORE_ID,
       SO_DATE: formatDate(this.salesOrderFormData.SO_DATE),
       CUST_ID: this.salesOrderFormData.CUST_ID,

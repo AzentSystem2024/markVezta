@@ -735,28 +735,29 @@ export class AddMiscReceiptComponent {
       const selectedLedger = this.ledgerList.find(
         (l) => l.HEAD_CODE === row.ledgerCode
       );
-      if (!selectedLedger) return; // skip invalid row
+      if (!selectedLedger) return;
 
-      const headId = selectedLedger.HEAD_ID;
+      const expenseHeadId = selectedLedger.HEAD_ID;
+      const payHeadId = this.miscFormData.PAY_HEAD_ID;
       const amount = Number(row.AMOUNT) || 0;
       const remarks = row.REMARKS || '';
 
-      // Debit entry
+      // ✅ Debit: Expense / Adjustment ledger
       details.push({
-        HEAD_ID: this.miscFormData.PAY_HEAD_ID,
+        HEAD_ID: expenseHeadId,
         REMARKS: remarks,
         DEBIT_AMOUNT: amount,
         CREDIT_AMOUNT: 0,
-        OPP_HEAD_ID: headId,
+        OPP_HEAD_ID: payHeadId,
       });
 
-      // Credit entry
+      // ✅ Credit: Cash / Bank / Adjustment
       details.push({
-        HEAD_ID: headId,
+        HEAD_ID: payHeadId,
         REMARKS: remarks,
         DEBIT_AMOUNT: 0,
         CREDIT_AMOUNT: amount,
-        OPP_HEAD_ID: this.miscFormData.PAY_HEAD_ID,
+        OPP_HEAD_ID: expenseHeadId,
       });
     });
 

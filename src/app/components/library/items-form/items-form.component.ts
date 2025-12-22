@@ -65,7 +65,7 @@ export class ItemsFormComponent implements OnInit {
   //     { id: 2, name: 'Tally code' }
   //   ];
   selectedPriority: number = 1;
-   selected_vat_id: any;
+  selected_vat_id: any;
   isLoading: boolean = false;
   toolbarItems = [
     {
@@ -212,6 +212,7 @@ export class ItemsFormComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private countryFlagService: CountryServiceService
   ) {
+    this.sesstion_Details();
     this.selectedPriority = 1;
     // this.onDropZoneEnter = this.onDropZoneEnter.bind(this);
     // this.onDropZoneLeave = this.onDropZoneLeave.bind(this);
@@ -282,7 +283,7 @@ export class ItemsFormComponent implements OnInit {
     dataservice.getVatclassData().subscribe((data) => {
       this.vat = data;
     });
-    const payload = { COMPANY_ID : this.selected_Company_id };
+    const payload = { COMPANY_ID: this.selected_Company_id };
     dataservice.getSupplierData(payload).subscribe((data) => {
       this.supplier = data;
     });
@@ -294,7 +295,7 @@ export class ItemsFormComponent implements OnInit {
       console.log(this.uom, 'UOMMMMMMMM');
       this.filterDropdownOptions();
     });
-  
+
     dataservice.getItemsData(payload).subscribe((data) => {
       this.items = data;
     });
@@ -308,126 +309,121 @@ export class ItemsFormComponent implements OnInit {
   }
   ALias_list: any;
 
-
-  formItemsData : any = {
-    
-      ITEM_CODE: '',
-      BARCODE: '',
-      DESCRIPTION: "",
-      ARABIC_DESCRIPTION: "",
-      TYPE_ID: 0,
-      DEPT_ID: 0,
-      RESTOCK_LEVEL: 0,
-      IS_CONSIGNMENT: false,
-      CAT_ID: 0,
-      SUBCAT_ID: 0,
-      IS_INACTIVE: false,
-      BRAND_ID: 0,
-      LONG_DESCRIPTION: "",
-      SALE_PRICE: 0,
-      COST: 0,
-      PROFIT_MARGIN: 0,
-      MATRIX_CODE:'',
-      QTY_STOCK: 0,
-      QTY_COMMITTED: 0,
-      CREATED_DATE:new Date(),
-      LAST_PO_DATE: new Date(),
-      LAST_GRN_DATE: new Date(),
-      LAST_SALE_DATE: new Date(),
-      PARENT_ITEM_ID: 0,
-      CHILD_QTY: 0,
-      ORIGIN_COUNTRY: 0,
-      SHELF_LIFE: 0,
-      NOTES: "",
-      IS_DIFFERENT_UOM_PURCH: false,
-      UOM_PURCH: "",
-      UOM_MULTPLE:0,
-      IS_PRICE_REQUIRED: false,
-      IS_NOT_DISCOUNTABLE: false,
-      IS_NOT_PURCH_ITEM: false,
-      IS_NOT_SALE_ITEM: false,
-      IS_NOT_SALE_RETURN: false,
-      IS_BLOCKED: false,
-      IMAGE_NAME: "",
-      ITEM_SL: 0,
-      SALE_PRICE1:0,
-      SALE_PRICE2: 0,
-      SALE_PRICE3: 0,
-      SALE_PRICE4: 0,
-      SALE_PRICE5: 0,
-      PURCH_PRICE: 0,
-      BIN_LOCATION: "",
-      PURCH_CURRENCY: 0,
-      VAT_CLASS_ID: 0,
-      VAT_NAME: "",
-      ITEM_PROPERTY1: 0,
-      ITEM_PROPERTY2: 0,
-      ITEM_PROPERTY3: 0,
-      ITEM_PROPERTY4: 0,
-      ITEM_PROPERTY5: 0,
-      COSTING_METHOD: 0,
-      REORDER_POINT: 0,
-      UNIT_ID:0,
-      PACKING_ID:0,
-      POS_DESCRIPTION:"",
-      HSN_CODE :'',
-      GST_PERC:0,
-      ITEM_STORES: [
-        {
-          STORE_ID: '',
-          SALE_PRICE: 0,
-          SALE_PRICE1: 0,
-          SALE_PRICE2: 0,
-          SALE_PRICE3: 0,
-          SALE_PRICE4: 0,
-          SALE_PRICE5: 0,
-          STORE_CODE: "",
-          STORE_NAME:'',
-          COST:0,
-          IS_INACTIVE: false,
-          IS_NOT_SALE_ITEM: false,
-          IS_NOT_SALE_RETURN:false,
-          IS_PRICE_REQUIRED: false,
-          IS_NOT_DISCOUNTABLE: false,
-          LAST_MODIFIED_DATE: new Date(),
-          QTY_AVAILABLE:'',
-          IS_SELECTED: false,
-        }
-      ],
-      ITEM_ALIAS: [
-        {
-          ALIAS: "",
-          ALIAS_TYPE_ID:this.selectedPriority
-        }
-      ],
-      ITEM_SUPPLIERS: [
-        {
-          SUPP_ID: 0,
-          REORDER_NO: "",
-          COST: 0,
-          IS_PRIMARY: false,
-          IS_CONSIGNMENT: false
-        }
-      ],
-      ITEM_COMPONENTS: [
-        {
-          COMPONENT_ITEM_ID: 0,
-          QUANTITY: 0,
-          UOM: ''
-        }
-      ]
-
-    }
+  formItemsData: any = {
+    ITEM_CODE: '',
+    BARCODE: '',
+    DESCRIPTION: '',
+    ARABIC_DESCRIPTION: '',
+    TYPE_ID: 0,
+    DEPT_ID: 0,
+    RESTOCK_LEVEL: 0,
+    IS_CONSIGNMENT: false,
+    CAT_ID: 0,
+    SUBCAT_ID: 0,
+    IS_INACTIVE: false,
+    BRAND_ID: 0,
+    LONG_DESCRIPTION: '',
+    SALE_PRICE: 0,
+    COST: 0,
+    PROFIT_MARGIN: 0,
+    MATRIX_CODE: '',
+    QTY_STOCK: 0,
+    QTY_COMMITTED: 0,
+    CREATED_DATE: new Date(),
+    LAST_PO_DATE: new Date(),
+    LAST_GRN_DATE: new Date(),
+    LAST_SALE_DATE: new Date(),
+    PARENT_ITEM_ID: 0,
+    CHILD_QTY: 0,
+    ORIGIN_COUNTRY: 0,
+    SHELF_LIFE: 0,
+    NOTES: '',
+    IS_DIFFERENT_UOM_PURCH: false,
+    UOM_PURCH: '',
+    UOM_MULTPLE: 0,
+    IS_PRICE_REQUIRED: false,
+    IS_NOT_DISCOUNTABLE: false,
+    IS_NOT_PURCH_ITEM: false,
+    IS_NOT_SALE_ITEM: false,
+    IS_NOT_SALE_RETURN: false,
+    IS_BLOCKED: false,
+    IMAGE_NAME: '',
+    ITEM_SL: 0,
+    SALE_PRICE1: 0,
+    SALE_PRICE2: 0,
+    SALE_PRICE3: 0,
+    SALE_PRICE4: 0,
+    SALE_PRICE5: 0,
+    PURCH_PRICE: 0,
+    BIN_LOCATION: '',
+    PURCH_CURRENCY: 0,
+    VAT_CLASS_ID: 0,
+    VAT_NAME: '',
+    ITEM_PROPERTY1: 0,
+    ITEM_PROPERTY2: 0,
+    ITEM_PROPERTY3: 0,
+    ITEM_PROPERTY4: 0,
+    ITEM_PROPERTY5: 0,
+    COSTING_METHOD: 0,
+    REORDER_POINT: 0,
+    UNIT_ID: 0,
+    PACKING_ID: 0,
+    POS_DESCRIPTION: '',
+    HSN_CODE: '',
+    GST_PERC: 0,
+    ITEM_STORES: [
+      {
+        STORE_ID: '',
+        SALE_PRICE: 0,
+        SALE_PRICE1: 0,
+        SALE_PRICE2: 0,
+        SALE_PRICE3: 0,
+        SALE_PRICE4: 0,
+        SALE_PRICE5: 0,
+        STORE_CODE: '',
+        STORE_NAME: '',
+        COST: 0,
+        IS_INACTIVE: false,
+        IS_NOT_SALE_ITEM: false,
+        IS_NOT_SALE_RETURN: false,
+        IS_PRICE_REQUIRED: false,
+        IS_NOT_DISCOUNTABLE: false,
+        LAST_MODIFIED_DATE: new Date(),
+        QTY_AVAILABLE: '',
+        IS_SELECTED: false,
+      },
+    ],
+    ITEM_ALIAS: [
+      {
+        ALIAS: '',
+        ALIAS_TYPE_ID: this.selectedPriority,
+      },
+    ],
+    ITEM_SUPPLIERS: [
+      {
+        SUPP_ID: 0,
+        REORDER_NO: '',
+        COST: 0,
+        IS_PRIMARY: false,
+        IS_CONSIGNMENT: false,
+      },
+    ],
+    ITEM_COMPONENTS: [
+      {
+        COMPONENT_ITEM_ID: 0,
+        QUANTITY: 0,
+        UOM: '',
+      },
+    ],
+  };
 
   newItems = this.formItemsData;
   getNewItems = () => ({
     ...this.newItems,
     // ✅ Force UOM_PURCH as string before API call
-  UOM_PURCH: this.newItems.UOM_PURCH
-    ? String(this.newItems.UOM_PURCH)
-    : '',
+    UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
     ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
-    COMPANY_ID : this.selected_Company_id
+    COMPANY_ID: this.selected_Company_id,
   });
 
   ngOnInit() {
@@ -473,9 +469,9 @@ export class ItemsFormComponent implements OnInit {
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     console.log(this.ENABLE_Matrix_Code);
 
-     this.selected_vat_id = this.sessionData.VAT_ID;
-     console.log(this.selected_vat_id, 'SELECTED_VAT_ID=========');
-     this.selected_Company_id= this.sessionData.SELECTED_COMPANY.COMPANY_ID
+    this.selected_vat_id = this.sessionData.VAT_ID;
+    console.log(this.selected_vat_id, 'SELECTED_VAT_ID=========');
+    this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   onInitNewRowAlias(e: any) {
@@ -1001,7 +997,6 @@ export class ItemsFormComponent implements OnInit {
       DESCRIPTION: '',
       UOM: '',
       QUANTITY: '',
-      
     };
     this.selectedItemId = null;
   }

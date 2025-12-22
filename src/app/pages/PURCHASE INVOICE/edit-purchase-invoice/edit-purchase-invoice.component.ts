@@ -229,10 +229,15 @@ export class EditPurchaseInvoiceComponent {
   }
 
   getSupplierOrUnitLst() {
-    this.dataService.getSupplierWithState().subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'DISTLISTPOPUP');
-    });
+    const payload = {
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService
+      .getSupplierWithState(payload)
+      .subscribe((response: any) => {
+        this.distributorList = response;
+        console.log(this.distributorList, 'DISTLISTPOPUP');
+      });
   }
 
   getPendingGRNList() {

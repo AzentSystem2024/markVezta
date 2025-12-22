@@ -152,8 +152,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
   poData: any = {
     ID: 0,
-    COMPANY_ID: 1,
-    USER_ID: 1,
+    COMPANY_ID: 0,
+    USER_ID: 0,
     STORE_ID: '',
     PO_NO: '',
     PO_DATE: new Date(),
@@ -480,6 +480,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    // THIS IS THE MISSING LINK
+    this.poData.COMPANY_ID = this.companyID;
+    this.poData.USER_ID = sessionData.USER_ID;
     console.log(
       this.selected_Company_id,
       '============selected_Company_id=============='
@@ -797,31 +800,51 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   GetSupplierList() {
-    this.service.getDropdownData('SUPPLIER').subscribe((res) => {
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.companyID,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.SupplierList = res;
     });
   }
 
   GetStoresList() {
-    this.service.getDropdownData('STORE').subscribe((res) => {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.companyID,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.StoreList = res;
     });
   }
 
   GetDeliveryTermsList() {
-    this.service.getDropdownData('DELIVERYTERMS').subscribe((res) => {
+    const payload = {
+      NAME: 'DELIVERYTERMS',
+      COMPANY_ID: this.companyID,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.deliveryTermsList = res;
     });
   }
 
   GetPaymentTermsList() {
-    this.service.getDropdownData('PAYMENTTERMS').subscribe((res) => {
+    const payload = {
+      NAME: 'PAYMENTTERMS',
+      COMPANY_ID: this.companyID,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.paymentTermsList = res;
     });
   }
 
   GetEmployeeList() {
-    this.service.getDropdownData('EMPLOYEE').subscribe((res) => {
+    const payload = {
+      NAME: 'EMPLOYEE',
+      COMPANY_ID: this.companyID,
+    };
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.employeeList = res;
     });
   }

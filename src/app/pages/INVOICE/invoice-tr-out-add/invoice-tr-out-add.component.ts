@@ -120,11 +120,11 @@ export class InvoiceTrOutAddComponent {
 
   invoiceFormData: any = {
     // TRANS_TYPE: 25,
-    COMPANY_ID: 1,
-    STORE_ID: 1,
+    COMPANY_ID: 0,
+    STORE_ID: 0,
     TRANS_DATE: new Date(),
     CUST_ID: 0,
-    FIN_ID: 1,
+    FIN_ID: 0,
     GROSS_AMOUNT: '',
     TAX_AMOUNT: '',
     NET_AMOUNT: '',
@@ -186,6 +186,9 @@ export class InvoiceTrOutAddComponent {
     console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
     console.log(this.GST, 'GST');
+    this.invoiceFormData.FIN_ID = this.sessionData.FINANCIAL_YEARS.FIN_ID;
+    this.invoiceFormData.COMPANY_ID =
+      this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   ngOnInit() {
@@ -359,8 +362,11 @@ export class InvoiceTrOutAddComponent {
   }
 
   getCustomerOrUnitLst() {
+    const payload = {
+      COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+    };
     this.dataService
-      .getCustomerStateTrout_Invoice()
+      .getCustomerStateTrout_Invoice(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
         console.log(this.distributorList, 'DISTLISTPOPUP');
@@ -369,7 +375,7 @@ export class InvoiceTrOutAddComponent {
   onDistributorChanged(e: any) {
     const newCustomerId = e.value;
 
-    // 🔴 CUSTOMER CHANGED → CLEAR GRID
+    //  CUSTOMER CHANGED → CLEAR GRID
     if (
       this.previousCustomerId !== null &&
       this.previousCustomerId !== newCustomerId
