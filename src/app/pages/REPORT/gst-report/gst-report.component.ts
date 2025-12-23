@@ -277,19 +277,42 @@ else if(TransType == 36){
     console.log(this.selectedDebitNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
   });
 }
-  else if (TransType == 37) {
+//   else if (TransType == 37) {
  
-  console.log('=====navigate to 37-CREDIT NOTE=====');
-    this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-      console.log(response)
-    this.selectedCreditNote = response.Data;
-     this.loadingInvoice = false;
+//   console.log('=====navigate to 37-CREDIT NOTE=====');
+//     this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
+//       console.log(response)
+//     this.selectedCreditNote = response.Data;
+//      this.loadingInvoice = false;
 
+//       this.isViewCreditNote = true;
+//       this.cdr.detectChanges();
+//     console.log(this.selectedCreditNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
+//   });
+// }
+else if (TransType == 37) {
+  console.log('=====navigate to 37-CREDIT NOTE=====');
+
+  this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
+    console.log(response);
+
+    if (response?.Data?.length > 0) {
+      this.selectedCreditNote = response.Data[0]; 
       this.isViewCreditNote = true;
-      this.cdr.detectChanges();
-    console.log(this.selectedCreditNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
+    } else {
+      this.selectedCreditNote = null;
+    }
+
+    this.loadingInvoice = false;
+    this.cdr.detectChanges();
+
+    console.log(
+      this.selectedCreditNote,
+      'SELECTED CREDIT NOTE'
+    );
   });
 }
+
 else if (TransType == 25) {
  
   console.log('=====navigate to 25-SALES INVOICE=====');
