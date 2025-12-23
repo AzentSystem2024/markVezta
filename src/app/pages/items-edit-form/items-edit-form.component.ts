@@ -365,17 +365,29 @@ export class ItemsEditFormComponent implements OnInit {
     dataservice.getDropdownData(parentItemPayload).subscribe((data) => {
       this.parentitem = data;
     });
-    dataservice.getDropdownData('ITEMTYPE').subscribe((data) => {
+    const payload1 = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'ITEMTYPE',
+    }
+    dataservice.getDropdownData(payload1).subscribe((data) => {
       this.itemtype = data;
     });
-    dataservice.getDropdownData('BRAND').subscribe((data) => {
+    const brand = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'BRAND',
+    }
+    dataservice.getDropdownData(brand).subscribe((data) => {
       this.brand = data;
     });
     dataservice.getDropdownData('COUNTRY').subscribe((data) => {
       this.country = data;
       // console.log(this.country, 'COUNTRY');
     });
-    dataservice.getDropdownData('STORE').subscribe((data) => {
+    const store ={
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'STORE',
+    }
+    dataservice.getDropdownData(store).subscribe((data) => {
       this.store = data;
       this.selectedStoreIds = this.itemData.item_stores.map(
         (store) => store.ID
@@ -403,7 +415,11 @@ export class ItemsEditFormComponent implements OnInit {
     //   this.department = data;
     //   console.log(this.department,"DEP IN EDIT")
     // });
-    dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
+    const department = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'DEPARTMENT',
+    }
+    dataservice.getDropdownData(department).subscribe((data) => {
       this.department = data;
       console.log(this.department, 'DEPARTMENTTTTTTTTTTTT');
     });
@@ -420,18 +436,30 @@ export class ItemsEditFormComponent implements OnInit {
     dataservice.getSupplierData(payload).subscribe((data) => {
       this.supplier = data;
     });
-    dataservice.getDropdownData('ITEMCATEGORY').subscribe((data) => {
+    const category ={
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'ITEMCATEGORY',
+    }
+    dataservice.getDropdownData(category).subscribe((data) => {
       this.catagory = data;
     });
 
     dataservice.getItemsData(payload).subscribe((data) => {
       this.items = data;
     });
-    dataservice.getDropdownData('COSTINGMETHOD').subscribe((data) => {
+    const costiingmethod = {
+       COMPANY_ID: this.selected_Company_id,
+      NAME: 'COSTINGMETHOD',
+    }
+    dataservice.getDropdownData(costiingmethod).subscribe((data) => {
       this.costingMethodOptions = data;
       // console.log(this.costingMethodOptions,"COSTINGMETHOD")
     });
-    dataservice.getDropdownData('PACKING').subscribe((data) => {
+    const packing ={
+       COMPANY_ID: this.selected_Company_id,
+      NAME: 'PACKING',
+    }
+    dataservice.getDropdownData(packing).subscribe((data) => {
       this.packing = data;
       // console.log(this.packing,"packing")
     });
@@ -629,7 +657,11 @@ export class ItemsEditFormComponent implements OnInit {
   }
 
   getUOM() {
-    this.dataservice.getDropdownData('UOM').subscribe((data) => {
+    const uom = {
+      COMPANY_ID : this.selected_Company_id,
+      NAME : 'UOM'
+    }
+    this.dataservice.getDropdownData(uom).subscribe((data) => {
       this.uom = data;
       console.log(this.uom, 'UOMMMMMMMMMMMMMM');
       this.filteredUOMs = this.uom.filter(
