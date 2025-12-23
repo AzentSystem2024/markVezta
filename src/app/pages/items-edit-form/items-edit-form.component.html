@@ -48,12 +48,31 @@
             <dxi-item itemType="group" [colCount]="2" class="spacing-item">
               <dxi-item class="spacing-item">
                 <div *dxTemplate>
-                  <dx-text-box
+                  <dx-select-box
+                    class="spacing-item"
+                    label="Item Type"
+                    displayExpr="DESCRIPTION"
+                    [items]="itemtype"
+                    valueExpr="ID"
+                    [labelMode]="'floating'"
+                    placeholder="Select Item Type"
+                    [searchEnabled]="true"
+                    [(value)]="itemData.TYPE_ID"
+                    [width]="'100%'"
+                    (onValueChanged)="onTypeIdChange($event)"
+                  >
+                    <dx-validator>
+                      <dxi-validation-rule
+                        type="required"
+                        message="This field is required"
+                      ></dxi-validation-rule> </dx-validator
+                  ></dx-select-box>
+                  <!-- <dx-text-box
                     label="Metrics"
                     [(value)]="itemData.MATRIX_CODE"
                     [labelMode]="'floating'"
                     [visible]="ENABLE_Matrix_Code"
-                  ></dx-text-box>
+                  ></dx-text-box> -->
                 </div>
               </dxi-item>
 
@@ -113,25 +132,6 @@
 
               <dxi-item class="spacing-items">
                 <div *dxTemplate>
-                  <dx-text-box
-                    label="Arabic Description"
-                    [(value)]="itemData.ARABIC_DESCRIPTION"
-                    [labelMode]="'floating'"
-                  >
-                    <dx-validator>
-                      <dxi-validation-rule
-                        type="required"
-                        message="This field is required"
-                      ></dxi-validation-rule>
-                    </dx-validator>
-                  </dx-text-box>
-                </div>
-              </dxi-item>
-            </dxi-item>
-
-            <dxi-item itemType="group" [colCount]="2">
-              <dxi-item class="spacing-item">
-                <div *dxTemplate>
                   <dx-select-box
                     label="Department"
                     displayExpr="DESCRIPTION"
@@ -144,6 +144,9 @@
                   ></dx-select-box>
                 </div>
               </dxi-item>
+            </dxi-item>
+
+            <dxi-item itemType="group" [colCount]="2">
               <dxi-item class="spacing-item">
                 <div *dxTemplate>
                   <dx-select-box
@@ -157,6 +160,26 @@
                     [labelMode]="'floating'"
                   >
                   </dx-select-box>
+                </div>
+              </dxi-item>
+              <dxi-item class="spacing-item">
+                <div *dxTemplate>
+                  <dx-select-box
+                    label="Category"
+                    [items]="catagory"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [searchEnabled]="true"
+                    placeholder="Select Category"
+                    [labelMode]="'floating'"
+                    [(value)]="itemData.CAT_ID"
+                  >
+                    <dx-validator>
+                      <dxi-validation-rule
+                        type="required"
+                        message="This field is required"
+                      ></dxi-validation-rule> </dx-validator
+                  ></dx-select-box>
                 </div>
               </dxi-item>
             </dxi-item>
@@ -230,10 +253,16 @@
               </dxi-item>
               <dxi-item class="spacing-item">
                 <div *dxTemplate>
-                  <dx-number-box
-                    label="GST %"
-                    [(value)]="itemData.GST_PERC"
+                  <dx-select-box
+                    label="Unit of Measure"
                     labelMode="floating"
+                    [items]="uom"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    placeholder="Select Unit"
+                    [searchEnabled]="true"
+                    [(value)]="itemData.UNIT_ID"
+                    (onValueChanged)="onUOMChange($event)"
                   >
                     <dx-validator>
                       <dxi-validation-rule
@@ -241,13 +270,13 @@
                         message="This field is required"
                       ></dxi-validation-rule>
                     </dx-validator>
-                  </dx-number-box>
+                  </dx-select-box>
                 </div>
               </dxi-item>
             </dxi-item>
 
             <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-              <dxi-item>
+              <!-- <dxi-item>
                 <div *dxTemplate>
                   <dx-text-box
                     label="HSN Code"
@@ -261,7 +290,7 @@
                       ></dxi-validation-rule> </dx-validator
                   ></dx-text-box>
                 </div>
-              </dxi-item>
+              </dxi-item> -->
               <dxi-item class="spacing-item">
                 <div *dxTemplate>
                   <dx-select-box
