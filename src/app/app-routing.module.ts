@@ -209,6 +209,7 @@ import { PrepaymentGstListComponent } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/
 import { InvoiceTrOutComponent } from './pages/INVOICE/invoice-tr-out/invoice-tr-out.component';
 import { SettingsListComponent } from './components/settings/settings-list/settings-list.component';
 import { GstReportComponent } from './pages/REPORT/gst-report/gst-report.component';
+import { LedgerSettingsListComponent } from './components/settings/ledger-settings-list/ledger-settings-list.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -892,6 +893,11 @@ const routes: Routes = [
       {
         path: 'state',
         component: StateListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'ledger-settings',
+        component: LedgerSettingsListComponent,
         canActivate: [AuthGuardService],
       },
       {

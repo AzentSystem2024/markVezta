@@ -93,15 +93,15 @@ export class AddInvoiceComponent {
 
   invoiceFormData: any = {
     TRANS_TYPE: 25,
-    COMPANY_ID: 1,
-    STORE_ID: 1,
+    COMPANY_ID: 0,
+    STORE_ID: 0,
     TRANS_DATE: new Date(),
     TRANS_STATUS: 1,
     ADD_TIME: new Date(),
     SALE_DATE: new Date(),
-    UNIT_ID: 1,
+    UNIT_ID: 0,
     DISTRIBUTOR_ID: 0,
-    FIN_ID: 1,
+    FIN_ID: 0,
     GROSS_AMOUNT: '',
     GST_AMOUNT: '',
     NET_AMOUNT: '',
@@ -172,6 +172,8 @@ export class AddInvoiceComponent {
       console.log(this.GST, 'HSNCODE');
       if (this.selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
+        console.log(this.selectedCompanyId, 'SELECTEDCOMPANYIDDDDDDDDDDDDD');
+        this.invoiceFormData.COMPANY_ID = this.selectedCompanyId;
         this.companyState = this.selectedCompany.STATE_NAME;
         console.log(this.companyState, 'COMPANYSTATE');
         this.companyList = [this.selectedCompany]; //  Show only selected company
@@ -654,20 +656,6 @@ export class AddInvoiceComponent {
       }
     );
 
-    // this.invoiceFormData.SALE_DETAILS = this.mainInvoiceGridList.map(
-    //   (row: any) => ({
-    //     DN_DETAIL_ID: row.DN_DETAIL_ID || '',
-    //     QUANTITY: row.TOTAL_PAIR_QTY || 0,
-    //     PRICE: row.PRICE || 0,
-    //     GST: row.GST || 0,
-    //     AMOUNT: this.calculateAmount(row),
-    //     TAX_AMOUNT: this.calculateGstAmount(row),
-    //     TOTAL_AMOUNT: this.calculateTotal(row),
-
-    //     // Optional: Do not include row-level total if not needed
-    //   })
-    // );
-
     // 4. Set root-level totals
     this.invoiceFormData.GROSS_AMOUNT = this.totalAmount;
     this.invoiceFormData.GST_AMOUNT = this.taxAmount;
@@ -677,6 +665,7 @@ export class AddInvoiceComponent {
     this.invoiceFormData.SALE_DATE = new Date();
     this.invoiceFormData.ADD_TIME = new Date();
     this.invoiceFormData.VEHICLE_NO = this.invoiceFormData.VEHICLE_NO;
+    this.invoiceFormData.COMPANY_ID = this.selectedCompanyId;
     const callInsertAPI = () => {
       this.dataService.insertInvoice(this.invoiceFormData).subscribe(
         (response) => {

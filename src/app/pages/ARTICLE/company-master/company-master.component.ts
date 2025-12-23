@@ -144,18 +144,21 @@ export class CompanyMasterComponent {
   };
 
   getCompanyList() {
-    const payload = {COMPANY_ID : this.selected_Company_id, NAME: 'STATE' };
+    const payload = { COMPANY_ID: this.selected_Company_id, NAME: 'STATE' };
     this.dataservice.getDropdownData(payload).subscribe((response: any) => {
       this.stateList = response;
     });
   }
 
-       sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   ngOnInit() {
     const currentUrl = this.router.url;

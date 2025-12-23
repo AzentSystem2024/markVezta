@@ -269,61 +269,6 @@ export class AddPurchaseInvoiceComponent {
     });
   }
 
-  // onSupplierChanged(event: any) {
-  //   this.selectedSupplierId = event.value;
-  //   const selectedSupplier = this.distributorList.find(
-  //     (supplier: any) => supplier.ID === this.selectedSupplierId
-  //   );
-
-  //   const company = this.companyState?.trim().toLowerCase();
-  //   console.log(company);
-  //   const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
-  //   console.log(supplier);
-  //   const sessionGst = parseFloat(this.GST) || 0; // main GST%
-  //   console.log(sessionGst);
-
-  //   if (company === supplier) {
-  //     console.log('Both states SAME → CGST + SGST apply');
-
-  //     this.showCGST = true;
-  //     this.showSGST = true;
-  //     this.showGST = false;
-
-  //     //  Split GST into CGST + SGST
-  //     const half = sessionGst / 2;
-
-  //     // Update all grid rows
-  //     this.mainGridData?.forEach((row: any) => {
-  //       row.CGST = half;
-  //       row.SGST = half;
-  //       row.GST = 0; // GST becomes zero in same-state case
-  //     });
-  //   } else {
-  //     console.log('States DIFFERENT → GST applies');
-
-  //     this.showGST = true;
-  //     this.showCGST = false;
-  //     this.showSGST = false;
-
-  //     // ⭐ GST only
-  //     this.mainGridData?.forEach((row: any) => {
-  //       row.GST = sessionGst;
-  //       row.CGST = 0;
-  //       row.SGST = 0;
-  //     });
-  //   }
-  //   this.selectedSupplier = selectedSupplier;
-
-  //   if (selectedSupplier) {
-  //     this.purchaseInvoiceFormData.SUPPPLIER_NAME =
-  //       selectedSupplier.DESCRIPTION;
-  //   } else {
-  //     this.purchaseInvoiceFormData.SUPPPLIER_NAME = '';
-  //   }
-
-  //   console.log('Selected Supplier:', selectedSupplier);
-  // }
-
   onSupplierChanged(event: any) {
     const newSupplierId = event.value;
 
@@ -407,7 +352,7 @@ export class AddPurchaseInvoiceComponent {
   calculateGstAmount = (row: any) => {
     const amt = this.calculateAmount(row);
 
-    const igst = parseFloat(row.GST) || 0; // GST column = GST
+    const igst = parseFloat(row.VAT_PERC) || 0; // GST column = GST
     const cgst = parseFloat(row.CGST) || 0;
     const sgst = parseFloat(row.SGST) || 0;
 
@@ -687,7 +632,7 @@ export class AddPurchaseInvoiceComponent {
           GRN_QUANTITY: 1,
           SGST: item.SGST,
           CGST: item.CGST,
-          GST: item.GST ?? 0,
+          // GST: item.GST ?? 0,
         };
       }
     );

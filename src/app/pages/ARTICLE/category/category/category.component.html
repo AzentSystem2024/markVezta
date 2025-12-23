@@ -34,7 +34,7 @@
       <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
-       [allowDeleting]="canDelete"
+        [allowDeleting]="canDelete"
         [useIcons]="true"
         editIcon="edit"
       ></dxo-editing>
@@ -50,48 +50,54 @@
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
-      <dxo-filter-row
-        [visible]="isFilterRowVisible"
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
 
-      ></dxo-filter-row>
-          
       <dxo-header-filter [visible]="true">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
       <!-- <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel> -->
       <dxo-toolbar>
         <dxi-item location="before">
-                 <div class="grid-header"style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">Category</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Category
+          </div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-  
-              <dxi-item
+
+        <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
         <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'search' : 'search',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
-      ></dxi-item>
+          location="after"
+          locateInMenu="auto"
+          showText="inMenu"
+          widget="dxButton"
+          [options]="{
+            icon: isFilterRowVisible ? 'search' : 'search',
+            hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+            onClick: toggleFilterRow,
+            stylingMode: 'text',
+            elementAttr: { class: 'commonButtons' }
+          }"
+        ></dxi-item>
         <dxi-item
-      location="after"
-       *ngIf="canAdd"
-      widget="dxButton"
-      [options]="addButtonOptions"
-    ></dxi-item>
-     
-     
+          location="after"
+          *ngIf="canAdd"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
       <dxi-column dataField="SNO" caption="S.No" alignment="left"></dxi-column>
 
@@ -101,25 +107,25 @@
         caption="Category"
         alignment="left"
       ></dxi-column>
-                <dxi-column
-      dataField="IS_INACTIVE"
-      caption="Status"
-      alignment="right"
-      cellTemplate="statusCellTemplate"
-      width="100"
-      fixedPosition="right"
-    >
-    </dxi-column>
+      <dxi-column
+        dataField="IS_INACTIVE"
+        caption="Status"
+        alignment="right"
+        cellTemplate="statusCellTemplate"
+        width="100"
+        fixedPosition="right"
+      >
+      </dxi-column>
 
-    <div *dxTemplate="let cellData of 'statusCellTemplate'">
-      <i
-        class="fas fa-flag"
-        [ngClass]="getStatusFlagClass(cellData.value)"
-        [attr.title]="cellData.value ? 'Inactive ' : 'Active '"
-        style="margin-left: 10px; cursor: default"
-      ></i>
-            
-    </div>
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value ? 'Inactive ' : 'Active '"
+          style="margin-left: 10px; cursor: default"
+        ></i>
+              
+      </div>
     </dx-data-grid>
   </div>
 </div>
@@ -128,7 +134,7 @@
 <dx-popup
   [(visible)]="isAddPopup"
   [width]="'75%'"
-  [height]="'85vh'"
+  [height]="auto"
   title="Category"
   (onHiding)="handleClose()"
   ><dx-validation-group #formValidationGroup>
@@ -203,8 +209,8 @@
               [showBorders]="true"
               [editing]="{ mode: 'cell', allowUpdating: true }"
               [height]="'30vh'"
-              [width]="'100%'"              
-            (onRowClick)="onSelectPackAdd($event)"
+              [width]="'100%'"
+              (onRowClick)="onSelectPackAdd($event)"
               (onRowDblClick)="onEditPackUpdate($event)"
             >
               <dxi-column
@@ -231,7 +237,6 @@
             width: 400px;
           "
         >
- 
           <div style="display: flex; gap: 10px">
             <dx-text-box
               label="Pack Name"
@@ -252,13 +257,13 @@
               style="margin-top: 6px"
             ></dx-check-box>
           </div>
-          
+
           <dx-data-grid
             [dataSource]="packData.SIZEDETAILS"
             [showBorders]="true"
             style="display: flex; margin-top: 20px"
             [editing]="{ mode: 'cell', allowUpdating: true }"
-           (onRowUpdated)="calculateTotal()"
+            (onRowUpdated)="calculateTotal()"
             [height]="'30vh'"
             [width]="'100%'"
           >
@@ -273,7 +278,6 @@
               caption="Pair Quantity"
               dataType="number"
             ></dxi-column>
-      
           </dx-data-grid>
           <div
             style="
@@ -328,7 +332,7 @@
 <dx-popup
   [(visible)]="isEditPopup"
   [width]="'85vw'"
-  [height]="'90vh'"
+  [height]="auto"
   title="Category"
   (onHiding)="handleClose()"
 >
@@ -349,7 +353,7 @@
               border-radius: 5px;
             "
           >
-      <div style="display: flex;gap: 20px;">
+            <div style="display: flex; gap: 20px">
               <dx-text-box
                 type="text"
                 [(value)]="code_value"
@@ -362,7 +366,7 @@
                     message="This field is required"
                   ></dxi-validation-rule> </dx-validator
               ></dx-text-box>
-  
+
               <dx-text-box
                 type="text"
                 [(value)]="name_value"
@@ -375,18 +379,17 @@
                     message="This field is required"
                   ></dxi-validation-rule> </dx-validator
               ></dx-text-box>
-                <!-- Inactive checkbox -->
-      <div  style="display: flex;margin-top: 9px; gap: 8px;">
-        <label for="checboxadd" class="me-2">Inactive</label>
-        <dx-check-box
-          [(value)]="status_value"
-          [elementAttr]="{ 'aria-label': 'Unchecked' }"
-          id="checboxadd"
-        ></dx-check-box>
-      </div>
-            
-      </div>
-        <dx-tag-box
+              <!-- Inactive checkbox -->
+              <div style="display: flex; margin-top: 9px; gap: 8px">
+                <label for="checboxadd" class="me-2">Inactive</label>
+                <dx-check-box
+                  [(value)]="status_value"
+                  [elementAttr]="{ 'aria-label': 'Unchecked' }"
+                  id="checboxadd"
+                ></dx-check-box>
+              </div>
+            </div>
+            <dx-tag-box
               [(value)]="size_value"
               [items]="sizeOptions"
               label="Size"
@@ -413,10 +416,10 @@
               [showBorders]="true"
               [height]="'300px'"
               [width]="'100%'"
-             (onRowDblClick)="onEditPackUpdateedit($event)"
+              (onRowDblClick)="onEditPackUpdateedit($event)"
               [editing]="{ mode: 'cell', allowUpdating: true }"
               (onRowClick)="onSelectPack($event)"
-            > 
+            >
               <dxo-scrolling mode="standard"></dxo-scrolling>
               <dxi-column
                 dataField="NAME"
@@ -437,9 +440,7 @@
         <div
           style="flex: 1; padding: 10px; border: 1px solid; border-radius: 5px"
         >
-          
           <div style="display: flex; gap: 10px">
-       
             <dx-text-box
               label="Pack Name"
               [(value)]="packNameValue"
@@ -447,11 +448,8 @@
               style="flex: 1"
               width="150px"
             ></dx-text-box>
-           
-            <dx-check-box
-              text="Export packing"
-              [(value)]="isExport_value"
-            >
+
+            <dx-check-box text="Export packing" [(value)]="isExport_value">
             </dx-check-box>
 
             <dx-check-box
@@ -461,7 +459,6 @@
             >
             </dx-check-box>
           </div>
-         
 
           <dx-data-grid
             [dataSource]="packData_values"
@@ -469,15 +466,15 @@
             style="display: flex; margin-top: 20px"
             [editing]="{ mode: 'cell', allowUpdating: true }"
             [height]="'300px'"
-            [width]="'100%'" 
-           (onRowUpdated)="calculateTotalUpdate()"
+            [width]="'100%'"
+            (onRowUpdated)="calculateTotalUpdate()"
           >
             <dxo-scrolling mode="standard"></dxo-scrolling>
             <dxi-column
               dataField="size"
               caption="Size"
               [allowEditing]="false"
-               sortOrder="asc"
+              sortOrder="asc"
               [sortIndex]="0"
             ></dxi-column>
             <dxi-column

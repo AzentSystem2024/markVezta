@@ -140,7 +140,7 @@ export class DataService {
 
   public Dropdown_ItemTax(type: any): Observable<any> {
     const reqBodyData = { name: type };
-    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
+    return this.http.post(`${this.apiUrl}dropdown/`, type);
   }
   // --------------------------------------ARTICLE------------------------------------------------------------//
   getItemsForArticle(items: any) {
@@ -453,6 +453,11 @@ export class DataService {
   }
   deletePurchaseReturn(id: number) {
     return this.http.post<any>(`${this.apiUrl}PurchaseReturn/delete/` + id, {});
+  }
+
+  //--------------------------LEDGER-SETTINGS---------------------------------------------------//
+  getLedgerSettingsList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}ACDefaults/list`, data);
   }
   //--------------------------INVOICE-DELIVERY-------------------------------------//
 
@@ -2927,6 +2932,11 @@ export class DataService {
   public getDropdownData(data: any): Observable<any> {
     // const reqBodyData = { name: type };
     return this.http.post(`${this.apiUrl}dropdown/`, data);
+  }
+
+  public getDropdownDataForLedgerSettings(type: any): Observable<any> {
+    const reqBodyData = { name: type };
+    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
 
   public getStateDropdownData(payload: {

@@ -714,7 +714,7 @@ export class EditInvoiceComponent {
               PRICE: row.PRICE || 0,
 
               // NEW — pass all GST parts properly
-              IGST: row.GST || 0, // If IGST → row.GST contains value
+              GST: row.GST || 0, // If IGST → row.GST contains value
               CGST: row.CGST || 0, // If same state → CGST filled
               SGST: row.SGST || 0, // If same state → SGST filled
 

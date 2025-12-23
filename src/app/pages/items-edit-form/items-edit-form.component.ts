@@ -301,7 +301,7 @@ export class ItemsEditFormComponent implements OnInit {
         IS_CONSIGNMENT: false,
         CURRENCY: '',
       },
-    ], 
+    ],
     ITEM_COMPONENTS: [
       {
         COMPONENT_ITEM_ID: '',
@@ -358,7 +358,11 @@ export class ItemsEditFormComponent implements OnInit {
     this.itemlabel4 = authservice.getsettingsData().ITEM_PROPERTY4;
     this.itemlabel5 = authservice.getsettingsData().ITEM_PROPERTY5;
     // console.log('ItemsEditFormComponent constructor');
-    dataservice.getDropdownData('PARENTITEM').subscribe((data) => {
+    const parentItemPayload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'PARENTITEM',
+    };
+    dataservice.getDropdownData(parentItemPayload).subscribe((data) => {
       this.parentitem = data;
     });
     dataservice.getDropdownData('ITEMTYPE').subscribe((data) => {
@@ -412,14 +416,13 @@ export class ItemsEditFormComponent implements OnInit {
     dataservice.getVatclassData().subscribe((data) => {
       this.vat = data;
     });
-    const payload = { COMPANY_ID : this.selected_Company_id };
+    const payload = { COMPANY_ID: this.selected_Company_id };
     dataservice.getSupplierData(payload).subscribe((data) => {
       this.supplier = data;
     });
     dataservice.getDropdownData('ITEMCATEGORY').subscribe((data) => {
       this.catagory = data;
     });
-    
 
     dataservice.getItemsData(payload).subscribe((data) => {
       this.items = data;
@@ -605,7 +608,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     console.log(this.ENABLE_Matrix_Code);
-      this.selected_Company_id= this.sessionData.SELECTED_COMPANY.COMPANY_ID
+    this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
   onRowUpdated(e: any) {
     console.log(e);
@@ -766,7 +769,7 @@ export class ItemsEditFormComponent implements OnInit {
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
-      COMPANY_ID: this.selected_Company_id
+      COMPANY_ID: this.selected_Company_id,
     };
     console.log(payload, 'PAYLOAD');
     // Call the service to update the items
@@ -800,7 +803,6 @@ export class ItemsEditFormComponent implements OnInit {
       }
     );
   }
-
 
   onFileInputChange(event: Event) {
     const input = event.target as HTMLInputElement;
