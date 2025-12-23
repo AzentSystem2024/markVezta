@@ -796,121 +796,154 @@ export class EditDebitComponent {
         }
       };
     }
-    if (e.dataField === 'GST_PERC') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          event.event.preventDefault();
+    // if (e.dataField === 'GST_PERC') {
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     if (event.event.key === 'Enter') {
+    //       event.event.preventDefault();
 
-          const grid = this.itemsGridRef?.instance;
-          const rowData = e.row?.data;
+    //       const grid = this.itemsGridRef?.instance;
+    //       const rowData = e.row?.data;
 
-          // ✅ Validate ledgerCode and Amount before proceeding
-          if (!rowData.ledgerCode) {
-            notify(
-              'Please select a Ledger Code before proceeding.',
-              'warning',
-              2000
-            );
-            return;
-          }
-          if (rowData.Amount == null || rowData.Amount <= 0) {
-            notify(
-              'Please enter a valid Amount before proceeding.',
-              'warning',
-              2000
-            );
-            return;
-          }
+    //       // ✅ Validate ledgerCode and Amount before proceeding
+    //       if (!rowData.ledgerCode) {
+    //         notify(
+    //           'Please select a Ledger Code before proceeding.',
+    //           'warning',
+    //           2000
+    //         );
+    //         return;
+    //       }
+    //       if (rowData.Amount == null || rowData.Amount <= 0) {
+    //         notify(
+    //           'Please enter a valid Amount before proceeding.',
+    //           'warning',
+    //           2000
+    //         );
+    //         return;
+    //       }
 
-          // ✅ Ensure gstAmount is not greater than Amount
-          if (rowData.Amount != null && event.value > rowData.Amount) {
-            notify('GST Amount cannot be greater than Amount.', 'error', 2000);
-            event.value = rowData.Amount;
-            e.setCellValue(rowData, event.value);
-            return;
-          }
+    //       // ✅ Ensure gstAmount is not greater than Amount
+    //       if (rowData.Amount != null && event.value > rowData.Amount) {
+    //         notify('GST Amount cannot be greater than Amount.', 'error', 2000);
+    //         event.value = rowData.Amount;
+    //         e.setCellValue(rowData, event.value);
+    //         return;
+    //       }
 
-          // ✅ Force the editor to lose focus and commit its value
-          const editorElement = event.event.target as HTMLElement;
-          editorElement.blur();
+    //       // ✅ Force the editor to lose focus and commit its value
+    //       const editorElement = event.event.target as HTMLElement;
+    //       editorElement.blur();
 
-          // ✅ Delay to let grid register the committed value
-          setTimeout(() => {
-            grid?.saveEditData();
+    //       // ✅ Delay to let grid register the committed value
+    //       setTimeout(() => {
+    //         grid?.saveEditData();
 
-            // ✅ Recalculate net total
-            const rows = grid.getVisibleRows().map((r) => r.data);
-            let netTotal = 0;
-            for (const row of rows) {
-              const amount = parseFloat(row.Amount) || 0;
-              const gst = parseFloat(row.gstAmount) || 0;
-              netTotal += amount + gst;
-            }
-            this.netAmountDisplay = netTotal;
+    //         // ✅ Recalculate net total
+    //         const rows = grid.getVisibleRows().map((r) => r.data);
+    //         let netTotal = 0;
+    //         for (const row of rows) {
+    //           const amount = parseFloat(row.Amount) || 0;
+    //           const gst = parseFloat(row.gstAmount) || 0;
+    //           netTotal += amount + gst;
+    //         }
+    //         this.netAmountDisplay = netTotal;
 
-            // ✅ Add new row only if current row is fully filled
-            if (
-              rowData.ledgerCode &&
-              rowData.Amount != null &&
-              rowData.gstAmount != null
-            ) {
-              // ✅ Check if last row is empty, prevent multiple empty rows
-              const lastRow = this.noteDetails[this.noteDetails.length - 1];
-              if (!lastRow || (lastRow.ledgerCode && lastRow.Amount != null)) {
-                const newRow = {
-                  SL_NO: this.noteDetails.length + 1,
-                  HEAD_ID: '',
-                  AMOUNT: '',
-                  GST_AMOUNT: '',
-                  REMARKS: '',
-                };
-                this.noteDetails.push(newRow);
+    //         // ✅ Add new row only if current row is fully filled
+    //         if (
+    //           rowData.ledgerCode &&
+    //           rowData.Amount != null &&
+    //           rowData.gstAmount != null
+    //         ) {
+    //           // ✅ Check if last row is empty, prevent multiple empty rows
+    //           const lastRow = this.noteDetails[this.noteDetails.length - 1];
+    //           if (!lastRow || (lastRow.ledgerCode && lastRow.Amount != null)) {
+    //             const newRow = {
+    //               SL_NO: this.noteDetails.length + 1,
+    //               HEAD_ID: '',
+    //               AMOUNT: '',
+    //               GST_AMOUNT: '',
+    //               REMARKS: '',
+    //             };
+    //             this.noteDetails.push(newRow);
 
-                setTimeout(() => {
-                  grid.option('dataSource', [...this.noteDetails]);
+    //             setTimeout(() => {
+    //               grid.option('dataSource', [...this.noteDetails]);
 
-                  setTimeout(() => {
-                    const visibleRows = grid.getVisibleRows();
-                    const newRowIndex = visibleRows.findIndex(
-                      (r) => r.data === newRow
-                    );
-                    if (newRowIndex >= 0) {
-                      grid.editCell(newRowIndex, 'ledgerCode');
-                    }
-                  }, 50);
-                }, 50);
-              }
-            }
-          }, 50);
-        }
+    //               setTimeout(() => {
+    //                 const visibleRows = grid.getVisibleRows();
+    //                 const newRowIndex = visibleRows.findIndex(
+    //                   (r) => r.data === newRow
+    //                 );
+    //                 if (newRowIndex >= 0) {
+    //                   grid.editCell(newRowIndex, 'ledgerCode');
+    //                 }
+    //               }, 50);
+    //             }, 50);
+    //           }
+    //         }
+    //       }, 50);
+    //     }
 
-        if (event.event.key === 'Tab') {
-          event.event.preventDefault();
-          const grid = this.itemsGridRef?.instance;
-          const editorElement = event.event.target as HTMLElement;
+    //     if (event.event.key === 'Tab') {
+    //       event.event.preventDefault();
+    //       const grid = this.itemsGridRef?.instance;
+    //       const editorElement = event.event.target as HTMLElement;
 
-          editorElement.blur();
+    //       editorElement.blur();
 
-          setTimeout(() => {
-            grid?.saveEditData();
+    //       setTimeout(() => {
+    //         grid?.saveEditData();
 
-            // ✅ Recalculate net total
-            const rows = grid.getVisibleRows().map((r) => r.data);
-            let netTotal = 0;
-            for (const row of rows) {
-              const amount = parseFloat(row.Amount) || 0;
-              const gst = parseFloat(row.gstAmount) || 0;
-              netTotal += amount + gst;
-            }
-            this.netAmountDisplay = netTotal;
+    //         // ✅ Recalculate net total
+    //         const rows = grid.getVisibleRows().map((r) => r.data);
+    //         let netTotal = 0;
+    //         for (const row of rows) {
+    //           const amount = parseFloat(row.Amount) || 0;
+    //           const gst = parseFloat(row.gstAmount) || 0;
+    //           netTotal += amount + gst;
+    //         }
+    //         this.netAmountDisplay = netTotal;
 
-            setTimeout(() => {
-              this.narrationRef?.instance?.focus();
-            }, 50);
-          }, 50);
-        }
-      };
+    //         setTimeout(() => {
+    //           this.narrationRef?.instance?.focus();
+    //         }, 50);
+    //       }, 50);
+    //     }
+    //   };
+    // }
+     if (e.dataField === 'GST_PERC') {
+
+  const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+  e.editorOptions.onValueChanged = (args: any) => {
+    // keep existing behavior
+    if (originalOnValueChanged) {
+      originalOnValueChanged(args);
     }
+
+    e.setValue(args.value);
+
+    // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
+    e.row.data.CGST = 0;
+    e.row.data.SGST = 0;
+  };
+}
+
+if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+
+  const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+  e.editorOptions.onValueChanged = (args: any) => {
+    if (originalOnValueChanged) {
+      originalOnValueChanged(args);
+    }
+
+    e.setValue(args.value);
+
+    // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
+    e.row.data.GST_PERC = 0;
+  };
+}
   }
 
   onNarrationKeyDown(e: any): void {
@@ -1074,6 +1107,17 @@ export class EditDebitComponent {
               }),
           };
 
+          // ✅ FINAL TAX CLEANUP (APPROVAL)
+payload.NOTE_DETAIL.forEach((row: any) => {
+  if (row.CGST > 0 || row.SGST > 0) {
+    row.GST_PERC = 0;
+  } else if (row.GST_PERC > 0) {
+    row.CGST = 0;
+    row.SGST = 0;
+  }
+});
+
+
           this.dataService.commitDebitNote(payload).subscribe(
             (response: any) => {
               if (response.flag === 1) {
@@ -1146,6 +1190,17 @@ export class EditDebitComponent {
       };
 
       console.log('Update Payload:', payload);
+
+      // ✅ FINAL TAX CLEANUP (UPDATE)
+payload.NOTE_DETAIL.forEach((row: any) => {
+  if (row.CGST > 0 || row.SGST > 0) {
+    row.GST_PERC = 0;
+  } else if (row.GST_PERC > 0) {
+    row.CGST = 0;
+    row.SGST = 0;
+  }
+});
+
 
       this.dataService.updateDebitNote(payload).subscribe((response) => {
         if (response) {

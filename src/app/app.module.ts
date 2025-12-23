@@ -953,14 +953,19 @@ import {
   StateEditModule,
 } from './state-edit/state-edit.component';
 import { SettingsListModule } from './components/settings/settings-list/settings-list.component';
+
+import {
+  LedgerSettingsListComponent,
+  LedgerSettingsListModule,
+} from './components/settings/ledger-settings-list/ledger-settings-list.component';
 import {
   GstReportComponent,
   GstReportModule,
 } from './pages/REPORT/gst-report/gst-report.component';
 import {
-  LedgerSettingsListComponent,
-  LedgerSettingsListModule,
-} from './components/settings/ledger-settings-list/ledger-settings-list.component';
+  GstReportB2CLComponent,
+  GstReportB2CLModule,
+} from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1315,6 +1320,7 @@ import {
     SettingsListModule,
     GstReportModule,
     LedgerSettingsListModule,
+    GstReportB2CLModule,
   ],
   providers: [
     AuthService,
