@@ -2865,26 +2865,29 @@ export class DataService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const body = {}; // Replace with your actual body if needed
 
-    return this.http.post<any>(`${this.apiUrl}/uom/list`, body, { headers });
+    return this.http.post<any>(`${this.apiUrl}uom/list`, body, { headers });
   }
 
   postUOM(uom: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const body = { UOM: uom };
-    return this.http.post<any>(`${this.apiUrl}/uom/insert`, body, { headers });
+    return this.http.post<any>(`${this.apiUrl}uom/insert`, body, { headers });
   }
 
   updateUom(ID: any, UOM: any): Observable<any> {
     const data = { ID, UOM };
+    return this.http.post(`${this.apiUrl}uom/update`, data);
+  }
 
-    return this.http.post(`${this.apiUrl}/uom/update`, data);
+    SelectUom(id: any) {
+    return this.http.post(`${this.apiUrl}uom/select/${id}`, {});
   }
 
   removeUom(id: any, UOM: any) {
     const requestBody = {
       UOM: UOM,
     };
-    return this.http.post<any>(`${this.apiUrl}/uom/delete/` + id, requestBody);
+    return this.http.post<any>(`${this.apiUrl}uom/delete/` + id, requestBody);
   }
 
   //------------------------------Packing........................................................................

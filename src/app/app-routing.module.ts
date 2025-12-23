@@ -752,6 +752,11 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'uom',
+        component: UomListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'pay-slip',
         component: PaySlipComponent,
         canActivate: [AuthGuardService],
