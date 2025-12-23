@@ -368,14 +368,14 @@ export class ItemsEditFormComponent implements OnInit {
     const payload1 = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'ITEMTYPE',
-    }
+    };
     dataservice.getDropdownData(payload1).subscribe((data) => {
       this.itemtype = data;
     });
     const brand = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'BRAND',
-    }
+    };
     dataservice.getDropdownData(brand).subscribe((data) => {
       this.brand = data;
     });
@@ -383,10 +383,10 @@ export class ItemsEditFormComponent implements OnInit {
       this.country = data;
       // console.log(this.country, 'COUNTRY');
     });
-    const store ={
+    const store = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'STORE',
-    }
+    };
     dataservice.getDropdownData(store).subscribe((data) => {
       this.store = data;
       this.selectedStoreIds = this.itemData.item_stores.map(
@@ -418,7 +418,7 @@ export class ItemsEditFormComponent implements OnInit {
     const department = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'DEPARTMENT',
-    }
+    };
     dataservice.getDropdownData(department).subscribe((data) => {
       this.department = data;
       console.log(this.department, 'DEPARTMENTTTTTTTTTTTT');
@@ -436,10 +436,10 @@ export class ItemsEditFormComponent implements OnInit {
     dataservice.getSupplierData(payload).subscribe((data) => {
       this.supplier = data;
     });
-    const category ={
+    const category = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'ITEMCATEGORY',
-    }
+    };
     dataservice.getDropdownData(category).subscribe((data) => {
       this.catagory = data;
     });
@@ -448,17 +448,17 @@ export class ItemsEditFormComponent implements OnInit {
       this.items = data;
     });
     const costiingmethod = {
-       COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: this.selected_Company_id,
       NAME: 'COSTINGMETHOD',
-    }
+    };
     dataservice.getDropdownData(costiingmethod).subscribe((data) => {
       this.costingMethodOptions = data;
       // console.log(this.costingMethodOptions,"COSTINGMETHOD")
     });
-    const packing ={
-       COMPANY_ID: this.selected_Company_id,
+    const packing = {
+      COMPANY_ID: this.selected_Company_id,
       NAME: 'PACKING',
-    }
+    };
     dataservice.getDropdownData(packing).subscribe((data) => {
       this.packing = data;
       // console.log(this.packing,"packing")
@@ -658,9 +658,9 @@ export class ItemsEditFormComponent implements OnInit {
 
   getUOM() {
     const uom = {
-      COMPANY_ID : this.selected_Company_id,
-      NAME : 'UOM'
-    }
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'UOM',
+    };
     this.dataservice.getDropdownData(uom).subscribe((data) => {
       this.uom = data;
       console.log(this.uom, 'UOMMMMMMMMMMMMMM');
@@ -772,7 +772,12 @@ export class ItemsEditFormComponent implements OnInit {
       convertedData.push({
         ID: 0,
         SUPP_ID: item.SUPP_ID?.toString() || '',
-        REORDER_NO: item.REORDER_NO || '',
+        // REORDER_NO: item.REORDER_NO || '',
+        REORDER_NO:
+          item.REORDER_NO !== null && item.REORDER_NO !== undefined
+            ? String(item.REORDER_NO)
+            : '',
+
         COST: item.COST || 0,
         IS_PRIMARY: item.IS_PRIMARY || false,
         IS_CONSIGNMENT: item.IS_CONSIGNMENT || true,
