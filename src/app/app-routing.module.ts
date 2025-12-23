@@ -211,6 +211,7 @@ import { SettingsListComponent } from './components/settings/settings-list/setti
 import { GstReportComponent } from './pages/REPORT/gst-report/gst-report.component';
 import { LedgerSettingsListComponent } from './components/settings/ledger-settings-list/ledger-settings-list.component';
 import { GstReportB2CLComponent } from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
+import { GstReportCDNRComponent } from './pages/REPORT/gst-report-cdnr/gst-report-cdnr.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -909,6 +910,11 @@ const routes: Routes = [
       {
         path: 'settings',
         component: SettingsListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'gst-report-cdnr',
+        component: GstReportCDNRComponent,
         canActivate: [AuthGuardService],
       },
       {

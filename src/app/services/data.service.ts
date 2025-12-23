@@ -6018,4 +6018,10 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = `${this.apiUrl}GSTReport/Gstb2cl`;
     return this.http.post(getEndpoint, payload);
   }
+
+   //======================GST REPORT(CDNR)===========================
+  GST_Report_Api_CDNR(payload) {
+    const getEndpoint = `${this.apiUrl}GSTReport/Gstcdnr`;
+    return this.http.post(getEndpoint, payload);
+  }
 }
