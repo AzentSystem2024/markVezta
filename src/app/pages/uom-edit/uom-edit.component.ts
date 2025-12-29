@@ -14,14 +14,15 @@ import { DataService } from 'src/app/services';
 })
 export class UomEditComponent {
  @Input() selectedData :any;
-  @Output() formClosed = new EventEmitter<void>();
+    @Output() formClosed = new EventEmitter<void>();
 
     formUomData = {
     UOM: '',
     ID:''
   };
   uomList: any;
-  isEditPopupOpened :boolean = false;
+  selected_Company_id: any;
+  
 
     constructor(private service: DataService) {}
 
@@ -38,11 +39,22 @@ export class UomEditComponent {
           }
 
             ngOnInit(): void {
+              this.sesstion_Details();
     this.listUom();
   }
 
+    sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   listUom(){
-  this.service.getUomList().subscribe((data) => {
+    const payload ={
+      COMPANY_ID : this.selected_Company_id
+    }
+  this.service.getUomList(payload).subscribe((data) => {
     this.uomList = data
     console.log(this.uomList,"UOM")
   },
@@ -96,10 +108,8 @@ export class UomEditComponent {
                  },
                  'success'
                );
-              //  this.dataGrid.instance.refresh();
-                this.formClosed.emit();
-                this.isEditPopupOpened = false;
-               this.listUom();
+             this.listUom();
+    this.formClosed.emit();
              } else {
                notify(
                  {

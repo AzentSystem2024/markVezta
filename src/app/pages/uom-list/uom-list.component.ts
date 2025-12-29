@@ -31,6 +31,7 @@ export class UomListComponent implements OnInit{
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   selectedData: any;
+  selected_Company_id: any;
  
   constructor(private dataservice: DataService,private zone: NgZone
   ) {}
@@ -78,11 +79,22 @@ ngOnInit(){
   CloseEditForm(){
     //  this.isEditPopupOpened = false;
      this.isAddUomPopupOpened = false;
+     this.sesstion_Details();
      this.listUom();
   }
 
+  sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
 listUom(){
-  this.dataservice.getUomList().subscribe((data) => {
+  const payload = {
+    COMPANY_ID : this.selected_Company_id
+  }
+  this.dataservice.getUomList(payload).subscribe((data) => {
     this.uomList = data
     console.log(this.uomList,"UOM")
   },

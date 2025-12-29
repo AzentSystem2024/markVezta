@@ -56,6 +56,7 @@ export class ReasonEditComponent {
   reasons: any=[]
   selected_storeDate:any=[]
   ac_ledger_Data: any;
+  selected_Company_id: any;
     constructor(private service:DataService){}
        ngOnChanges(changes: SimpleChanges): void{
                       if (changes['selectedData'] && changes['selectedData'].currentValue) {
@@ -185,6 +186,7 @@ this.formClosed.emit()
       });
   }
    ngOnInit(): void {
+    this.sesstion_Details();
      this.showStores();
      this.getReasonTypeDropDown();
      this.getVATRuleDropDown();
@@ -214,9 +216,19 @@ this.formClosed.emit()
     // onSelectionChanged(e: any) {
     //   this.formReasonsData.reason_stores.STORE_ID=e.selectedRowKeys;
     // }
+
+      sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
     
 showStores() {
-  this.service.getStoresData().subscribe((response) => {
+  const payload = {
+    COMPANY_ID : this.selected_Company_id
+  }
+  this.service.getStoresData(payload).subscribe((response) => {
     this.stores = response;
 
     setTimeout(() => {

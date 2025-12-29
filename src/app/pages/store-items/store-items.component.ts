@@ -74,6 +74,7 @@ export class StoreItemsComponent {
   itemprop3: any;
   itemprop4: any;
   itemprop5: any;
+  selected_Company_id: any;
 
   constructor(private dataservice: DataService) {
     dataservice.getCountryWithFlags().subscribe((data) => {
@@ -89,7 +90,10 @@ export class StoreItemsComponent {
     dataservice.getDropdownData('UOM').subscribe((data) => {
       this.uom = data;
     });
-    dataservice.getSubCategoryData().subscribe((data) => {
+    const subcategory ={
+      COMPANY_ID : this.selected_Company_id
+    }
+    dataservice.getSubCategoryData(subcategory).subscribe((data) => {
       this.subcatagory = data;
     });
     dataservice.getVatclassData().subscribe((data) => {
@@ -102,7 +106,10 @@ export class StoreItemsComponent {
       this.brand = data;
       // console.log(this.brand, 'BRAND');
     });
-    dataservice.getDepartmentData().subscribe((data) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    dataservice.getDepartmentData(payload).subscribe((data) => {
       this.department = data;
     });
     dataservice.getDropdownData('ITEMTYPE').subscribe((data) => {
@@ -124,7 +131,15 @@ export class StoreItemsComponent {
 
   copyStoreData: any;
 
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   ngOnInit() {
+    this.sesstion_Details();
     if (this.storeData == undefined) {
       this.storeData = new StoreData();
     }

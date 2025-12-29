@@ -23,6 +23,7 @@ export class CategoryListComponent implements OnInit {
   isAddCategoryPopupOpened=false;
   showFilterRow=true;
   showHeaderFilter=true;c
+  selected_Company_id: any;
   constructor(private dataservice:DataService,private exportService: ExportService
     ){}
   onExporting(event: any) {
@@ -115,8 +116,18 @@ export class CategoryListComponent implements OnInit {
     event.cancel = true; // Prevent the default update operation
   }
   
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   showCategory(){
-     this.dataservice.getCategoryData().subscribe(
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+     this.dataservice.getCategoryData(payload).subscribe(
       (response)=>{
             this.category=response;
             console.log(response);
@@ -133,6 +144,7 @@ export class CategoryListComponent implements OnInit {
       });
   }
   ngOnInit(): void {
+    this.sesstion_Details();
     this.showCategory();
     this.getDepartmentDropDown();
   }

@@ -39,7 +39,12 @@ formDepartmentData = {
           this.sesstion_Details();
         }
   showDepartment(){
-     this.dataservice.getDepartmentData().subscribe(
+    const payload = {
+      COMPANY_ID : this.COMPANY_ID
+    }
+
+
+     this.dataservice.getDepartmentData(payload).subscribe(
       (response)=>{
             this.department=response;
             console.log(response,"department");
@@ -139,7 +144,7 @@ formDepartmentData = {
     ID: this.formDepartmentData.ID,
     CODE: this.formDepartmentData.CODE,
     DEPT_NAME: this.formDepartmentData.DEPT_NAME,
-    COMPANY_ID: "1",
+    COMPANY_ID:  this.COMPANY_ID,
     COMPANY_NAME: this.COMPANY_NAME,
   };
   console.log(payload);
@@ -209,7 +214,7 @@ formDepartmentData = {
      this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
     console.log(this.sessionData,'=================session data==========')
 
-    this.COMPANY_ID=this.sessionData.SELECTED_COMPANY.COMPANY_ID
+    this.COMPANY_ID= String(this.sessionData.SELECTED_COMPANY.COMPANY_ID)
     console.log(this.COMPANY_ID,'============selected_Company_id==============')
 
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME

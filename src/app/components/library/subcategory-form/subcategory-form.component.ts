@@ -27,12 +27,21 @@ export class SubcategoryFormComponent {
 
    categories:any = []
  public newSubCategory = this.subcategoryData;
+  selected_Company_id: any;
   constructor(private dataService : DataService){}
 
 
   getNewSubcategoryData = () => ({ ...this.newSubCategory });
 
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   ngOnInit(){
+    this.sesstion_Details();
     this.getDepartmentDropDown();
     this.getCategoryDropDown();
     this.getDepartmentData();
@@ -48,8 +57,12 @@ export class SubcategoryFormComponent {
     
   getCategoryDropDown() {
     const dropdownCategory = 'ITEMCATEGORY';
+    const payload = {
+      COMPANY_ID : this.selected_Company_id,
+      NAME : dropdownCategory
+    }
     this.dataService
-      .getDropdownData(dropdownCategory)
+      .getDropdownData(payload)
       .subscribe((data: any) => {
         // this.categoryList = data;  
         console.log(data,"}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}")
@@ -61,8 +74,12 @@ export class SubcategoryFormComponent {
 
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
+    const payload = {
+      COMPANY_ID : this.selected_Company_id,
+      NAME : dropdowndepartment
+    }
     this.dataService  
-      .getDropdownData(dropdowndepartment)
+      .getDropdownData(payload)
       .subscribe((data: any) => {
         this.departmetDropdownData = data;
         console.log('dropdownnnnnnn',this.departmetDropdownData);
@@ -71,7 +88,10 @@ export class SubcategoryFormComponent {
 
   getDepartmentData(){
     let departmentdata =[]
-    this.dataService.getDepartmentData().subscribe((data:any)=> {
+    const payload ={
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.getDepartmentData(payload).subscribe((data:any)=> {
       departmentdata = data;
       console.log('depttttttttt',data);
       let departmentNames = departmentdata.map(department=>{

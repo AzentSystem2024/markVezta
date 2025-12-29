@@ -34,6 +34,7 @@ export class SubcategoryEditComponent {
   //  newSubCategory:any
   newSubCategory:any 
   subCategory: any=[]
+  selected_Company_id: any;
   constructor(private dataService : DataService){}
 
 
@@ -53,10 +54,19 @@ export class SubcategoryEditComponent {
   // getNewSubcategoryData = () => ({ ...this.newSubCategory });
 
   ngOnInit(){
+     this.sesstion_Details();
     this.getDepartmentDropDown();
     this.getCategoryDropDown();
     this.getDepartmentData();
+   
   }
+
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
 
   // getCategoryDropdown(){
    
@@ -70,7 +80,10 @@ export class SubcategoryEditComponent {
     this.popupClosed.emit()
   }
     getSubCategory(){
-    this.dataService.getSubCategoryData().subscribe((response)=>
+      const payload = {
+        COMPANY_ID : this.selected_Company_id
+      }
+    this.dataService.getSubCategoryData(payload).subscribe((response)=>
     {
       this.subCategory = response;
       console.log(response,"subcategoryyyyyyyyyyyyyyy")
@@ -83,7 +96,10 @@ export class SubcategoryEditComponent {
   if (!result.isValid) {
     return;
   }
-  this.dataService.getSubCategoryData().subscribe((response)=>
+  const payload = {
+    COMPANY_ID : this.selected_Company_id
+  }
+  this.dataService.getSubCategoryData(payload).subscribe((response)=>
     {
       this.subCategory = response;
       console.log(response,"subcategoryyyyyyyyyyyyyyy")
@@ -92,7 +108,8 @@ export class SubcategoryEditComponent {
 const payload={
   ...this.newSubCategory,
    CODE: this.newSubCategory.CODE?.toLowerCase().trim(),
-    SUBCAT_NAME: this.newSubCategory.SUBCAT_NAME?.toLowerCase().trim()
+    SUBCAT_NAME: this.newSubCategory.SUBCAT_NAME?.toLowerCase().trim(),
+    COMPANY_ID : this.selected_Company_id
 }
   const isCodeDuplicate = this.subCategory.some(
     (item: any) =>
@@ -152,8 +169,13 @@ this.dataService.Update_subcategory_api(payload).subscribe((res:any)=>{
   }
   getCategoryDropDown() {
     const dropdownCategory = 'ITEMCATEGORY';
+    const payload = {
+      NAME : dropdownCategory,
+      COMPANY_ID : this.selected_Company_id
+    }
+    console.log(payload,'payload')
     this.dataService
-      .getDropdownData(dropdownCategory)
+      .getDropdownData(payload)
       .subscribe((data: any) => {
         // this.categoryList = data;  
         console.log(data,"}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}")
@@ -165,8 +187,12 @@ this.dataService.Update_subcategory_api(payload).subscribe((res:any)=>{
 
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
+    const payload  = {
+      COMPANY_ID : this.selected_Company_id,
+      NAME :dropdowndepartment
+    }
     this.dataService  
-      .getDropdownData(dropdowndepartment)
+      .getDropdownData(payload)
       .subscribe((data: any) => {
         this.departmetDropdownData = data;
         console.log('dropdownnnnnnn',this.departmetDropdownData);
@@ -174,8 +200,11 @@ this.dataService.Update_subcategory_api(payload).subscribe((res:any)=>{
   }
 
   getDepartmentData(){
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
     let departmentdata =[]
-    this.dataService.getDepartmentData().subscribe((data:any)=> {
+    this.dataService.getDepartmentData(payload).subscribe((data:any)=> {
       departmentdata = data;
       console.log('depttttttttt',data);
       let departmentNames = departmentdata.map(department=>{

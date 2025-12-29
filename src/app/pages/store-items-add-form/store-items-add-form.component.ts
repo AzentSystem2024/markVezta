@@ -111,6 +111,7 @@ export class StoreItemsAddFormComponent {
   allItemsList: any;
   selectedStoreId: any;
   filteredStoreIds: any;
+  selected_Company_id: any;
 
   constructor(
     private dataservice: DataService,
@@ -118,6 +119,7 @@ export class StoreItemsAddFormComponent {
   ) {}
 
   ngOnInit() {
+    this.sesstion_Details();
     this.listItems();
     this.getStore();
     this.selectedStores = [this.storeId];
@@ -162,8 +164,19 @@ export class StoreItemsAddFormComponent {
   //     console.log(this.store, 'STORESLIST');
   //   });
   // }
+
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   getStore() {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       // Filter the stores to exclude the store with ID 1
       this.store = response.filter((store: any) => store.ID !== 1);
 

@@ -72,7 +72,10 @@ export class DepartmentListComponent implements OnInit {
   };
   
   showDepartment(){
-     this.dataservice.getDepartmentData().subscribe(
+    const payload = {
+      COMPANY_ID : this.COMPANY_ID
+    }
+     this.dataservice.getDepartmentData(payload).subscribe(
       (response)=>{
             this.department=response;
             console.log(response,"department");
@@ -100,7 +103,7 @@ export class DepartmentListComponent implements OnInit {
      this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
     console.log(this.sessionData,'=================session data==========')
 
-    this.COMPANY_ID=this.sessionData.SELECTED_COMPANY.COMPANY_ID
+    this.COMPANY_ID=String(this.sessionData.SELECTED_COMPANY.COMPANY_ID)
     console.log(this.COMPANY_ID,'============selected_Company_id==============')
 
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME
@@ -109,7 +112,8 @@ export class DepartmentListComponent implements OnInit {
 }
 
   onClickSaveDepartment(){
-    const { CODE, DEPT_NAME, COMPANY_ID,COMPANY_NAME } =this.departmentComponent.getNewDepartmentData();
+    const { CODE, DEPT_NAME,COMPANY_NAME } =this.departmentComponent.getNewDepartmentData();
+    const COMPANY_ID = this.COMPANY_ID
     console.log('inserted data',CODE,DEPT_NAME,COMPANY_ID,COMPANY_NAME);
 
     // Check for duplicates in CategoryList

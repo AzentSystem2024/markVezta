@@ -1326,8 +1326,9 @@ export class DataService {
   }
 
   //department
-  public getDepartmentData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemdepartment/list`, {});
+  public getDepartmentData(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ItemDepartment/list`, data);
   }
   public postDepartmentData(
     CODE: any,
@@ -1337,7 +1338,7 @@ export class DataService {
   ): Observable<any> {
     const data = { CODE, DEPT_NAME, COMPANY_ID, COMPANY_NAME };
 
-    return this.http.post(`${this.apiUrl}itemdepartment/save`, data);
+    return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
   }
   removeDepartment(id: any) {
     return this.http.post(`${this.apiUrl}itemdepartment/delete/${id}`, {});
@@ -1485,8 +1486,9 @@ export class DataService {
   }
 
   //category
-  public getCategoryData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemcategory/list`, {});
+  public getCategoryData(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ItemCategory/list`, data);
   }
   select_category(id: any) {
     return this.http.post(`${this.apiUrl}itemcategory/select/${id}`, {});
@@ -1512,7 +1514,7 @@ export class DataService {
       COMPANY_ID,
     };
 
-    return this.http.post(`${this.apiUrl}itemcategory/save`, data);
+    return this.http.post(`${this.apiUrl}ItemCategory/save`, data);
   }
   removeCategory(
     id: any,
@@ -1572,16 +1574,18 @@ export class DataService {
 
   //subcategory
 
-  public getSubCategoryData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemsubcategory/list`, {});
+  public getSubCategoryData(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}itemsubcategory/list`, data);
   }
   public postSubCategoryData(
     CODE: any,
     SUBCAT_NAME: any,
     CAT_ID: any,
-    DEPT_ID: any
+    DEPT_ID: any,
+    COMPANY_ID:any
   ): Observable<any> {
-    const data = { CODE, SUBCAT_NAME, CAT_ID, DEPT_ID };
+    const data = { CODE, SUBCAT_NAME, CAT_ID, DEPT_ID ,COMPANY_ID};
 
     return this.http.post(`${this.apiUrl}itemsubcategory/save`, data);
   }
@@ -1717,8 +1721,9 @@ export class DataService {
   }
 
   //stores
-  public getStoresData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}stores/list`, {});
+  public getStoresData(items:any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}stores/list`, data);
   }
   public postStoresData(
     COMPANY_ID: any,
@@ -1737,7 +1742,8 @@ export class DataService {
     EMAIL: any,
     VAT_REGNO: any,
     GROUP_ID: any,
-    STORE_NO
+    STORE_NO,
+    IS_ACTIVE:any
   ): Observable<any> {
     const data = {
       COMPANY_ID,
@@ -1757,6 +1763,7 @@ export class DataService {
       VAT_REGNO,
       GROUP_ID,
       STORE_NO,
+      IS_ACTIVE
     };
 
     return this.http.post(`${this.apiUrl}stores/save`, data);
@@ -1820,7 +1827,8 @@ export class DataService {
     EMAIL: any,
     VAT_REGNO: any,
     GROUP_ID: any,
-    STORE_NO: any
+    STORE_NO: any,
+    IS_ACTIVE:any
   ): Observable<any> {
     const data = {
       ID,
@@ -1841,6 +1849,7 @@ export class DataService {
       VAT_REGNO,
       GROUP_ID,
       STORE_NO,
+      IS_ACTIVE
     };
 
     return this.http.post(`${this.apiUrl}stores/save`, data);
@@ -2861,9 +2870,9 @@ export class DataService {
 
   //---------------------------UOM----------------------------------------------------
 
-  getUomList(): Observable<any> {
+  getUomList(items:any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const body = {}; // Replace with your actual body if needed
+    const body = items; // Replace with your actual body if needed
 
     return this.http.post<any>(`${this.apiUrl}uom/list`, body, { headers });
   }

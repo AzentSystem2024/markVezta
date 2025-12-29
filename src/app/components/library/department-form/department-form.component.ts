@@ -27,7 +27,7 @@ COMPANY_ID : any;
     ID:'',
     CODE: '',
     DEPT_NAME: '',
-    COMPANY_ID: "1",
+    COMPANY_ID: "",
    COMPANY_NAME:''
   };
   newDepartment=this.formDepartmentData;
@@ -90,7 +90,7 @@ COMPANY_ID : any;
       ID:'',
     CODE: '',
     DEPT_NAME: '',
-    COMPANY_ID: "1",
+    COMPANY_ID: "",
    COMPANY_NAME:''
 
     }

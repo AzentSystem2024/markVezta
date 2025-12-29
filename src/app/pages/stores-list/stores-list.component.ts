@@ -37,14 +37,13 @@ export class StoresListComponent implements OnInit {
   group: any;
   state: any;
   isAddStoresPopupOpened = false;
-  addButtonOptions = {
+   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
     // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
       this.zone.run(() => {
         this.addStores();
@@ -65,6 +64,7 @@ export class StoresListComponent implements OnInit {
   canView: any;
   canApprove: any;
   selectedStore: any = null;
+  selected_Company_id: any;
 
   constructor(
     private dataservice: DataService,
@@ -166,7 +166,8 @@ export class StoresListComponent implements OnInit {
           storeData.EMAIL,
           storeData.VAT_REGNO,
           storeData.GROUP_ID,
-          storeData.STORE_NO
+          storeData.STORE_NO,
+          storeData.IS_ACTIVE
         )
         .subscribe((res) => {
           this.isAddStoresPopupOpened = false;
@@ -227,7 +228,8 @@ export class StoresListComponent implements OnInit {
           storeData.EMAIL,
           storeData.VAT_REGNO,
           storeData.GROUP_ID,
-          storeData.STORE_NO
+          storeData.STORE_NO,
+          storeData.IS_ACTIVE
         )
         .subscribe((res) => {
           this.isAddStoresPopupOpened = false;
@@ -274,15 +276,24 @@ export class StoresListComponent implements OnInit {
     });
   }
 
+    sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   showStores() {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       this.stores = response;
       console.log(response, '++');
     });
   }
   onClickSaveStores() {
     const {
-      COMPANY_ID,
       CODE,
       STORE_NAME,
       IS_PRODUCTION,
@@ -299,10 +310,11 @@ export class StoresListComponent implements OnInit {
       VAT_REGNO,
       GROUP_ID,
       STORE_NO,
+      IS_ACTIVE
     } = this.storesComponent.getNewStoresData();
     console.log(
       'inserted data',
-      COMPANY_ID,
+      
       CODE,
       STORE_NAME,
       IS_PRODUCTION,
@@ -318,7 +330,8 @@ export class StoresListComponent implements OnInit {
       EMAIL,
       VAT_REGNO,
       GROUP_ID,
-      STORE_NO
+      STORE_NO,
+      IS_ACTIVE
     );
     // --- Duplicate check ---
     const duplicate = this.stores.some(
@@ -344,7 +357,7 @@ export class StoresListComponent implements OnInit {
 
     this.dataservice
       .postStoresData(
-        COMPANY_ID,
+        this.selected_Company_id,
         CODE,
         STORE_NAME,
         IS_PRODUCTION,
@@ -360,7 +373,8 @@ export class StoresListComponent implements OnInit {
         EMAIL,
         VAT_REGNO,
         GROUP_ID,
-        STORE_NO
+        STORE_NO,
+        IS_ACTIVE
       )
       .subscribe((response) => {
         if (response) {
@@ -536,7 +550,7 @@ export class StoresListComponent implements OnInit {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
     }
-
+    this.sesstion_Details();
     this.showStores();
     this.getCountryDropDown();
     this.getGroupDropDown();

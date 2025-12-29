@@ -36,7 +36,6 @@ export class StoresFormComponent implements OnInit {
   StateDropdownData: any[] = [];
   countryCode: string = '971';
   formStoresData = {
-    COMPANY_ID: 1,
     CODE: '',
     STORE_NAME: '',
     IS_PRODUCTION: false,
@@ -51,8 +50,9 @@ export class StoresFormComponent implements OnInit {
     PHONE: '',
     EMAIL: '',
     VAT_REGNO: '',
-    GROUP_ID: '',
+    GROUP_ID: 0,
     STORE_NO: '0',
+    IS_ACTIVE:false
   };
   countryList: any;
   countries: any[];
@@ -76,7 +76,6 @@ export class StoresFormComponent implements OnInit {
   }
   resetForm() {
     this.newStores = {
-      COMPANY_ID: null,
       CODE: '',
       STORE_NAME: '',
       IS_PRODUCTION: false,
@@ -93,6 +92,7 @@ export class StoresFormComponent implements OnInit {
       VAT_REGNO: '',
       GROUP_ID: null,
       STORE_NO: '',
+      IS_ACTIVE : false
     };
   }
   submitForm() {

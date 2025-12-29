@@ -1,4 +1,4 @@
-import { Component, NgModule, ViewChild } from '@angular/core';
+import { Component, NgModule, NgZone, ViewChild } from '@angular/core';
 import { DxButtonModule, DxDataGridComponent, DxDataGridModule, DxPopupModule } from 'devextreme-angular';
 import {  SubCategoryFormModule, SubcategoryFormComponent } from 'src/app/components/library/subcategory-form/subcategory-form.component';
 import { DataService } from 'src/app/services';
@@ -33,9 +33,11 @@ export class SubcategoryListComponent {
   selectedType: string = '';
   selected_data: any=[]
 editSubcategory:boolean=false
-  constructor(private dataService : DataService){}
+  selected_Company_id: any;
+  constructor(private dataService : DataService,private ngZone: NgZone){}
 
   ngOnInit(){
+    this.sesstion_Details();
     this.getSubCategory();
     this.getDepartmentDropDown();
     this.getCategoryDropdown();
@@ -47,8 +49,24 @@ editSubcategory:boolean=false
     this.isAddSubcategoryPopupOpened=true;
   }
 
+              addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.addSubCategory());
+    },
+    elementAttr: { class: 'add-button' }
+  };
+
   getSubCategory(){
-    this.dataService.getSubCategoryData().subscribe((response)=>
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.getSubCategoryData(payload).subscribe((response)=>
     {
       this.subCategory = response;
       console.log(response,"subcategoryyyyyyyyyyyyyyy")
@@ -78,8 +96,8 @@ editSubcategory:boolean=false
   }
 
   onClickSaveSubCategory(){
-    const { CODE, SUBCAT_NAME, DEPT_ID,CAT_ID} =  this.subcategorycomponent.getNewSubcategoryData()
-
+    const { CODE, SUBCAT_NAME,CAT_ID, DEPT_ID,} =  this.subcategorycomponent.getNewSubcategoryData()
+    const COMPANY_ID = this.selected_Company_id
 
  // Check for duplicates in CategoryList
     const isCodeDuplicate = this.subCategory.some(
@@ -129,7 +147,7 @@ editSubcategory:boolean=false
 
 
 
-    this.dataService.postSubCategoryData(CODE,SUBCAT_NAME,DEPT_ID,CAT_ID).subscribe((response)=>{
+    this.dataService.postSubCategoryData(CODE,SUBCAT_NAME,DEPT_ID,CAT_ID,COMPANY_ID).subscribe((response)=>{
       console.log(response,"}}}}}}}}}}}}}}}}}}]]]]]]]]")
       this.getSubCategory()
       this.isAddSubcategoryPopupOpened=false
@@ -139,7 +157,7 @@ editSubcategory:boolean=false
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'success'
       );
     })
   }
@@ -196,9 +214,19 @@ onEditSubcategory(event:any){
       this.getSubCategory()
       
     }
+
+     sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   getCategoryDropdown(){
-    // let categories = []
-    this.dataService.getCategoryData().subscribe((response:any) => {   
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.getCategoryData(payload).subscribe((response:any) => {   
       console.log(response,"categories!!!!!!!!!!!!!!!!!!!!!!!!!!!!??????")
     })
   }

@@ -83,6 +83,7 @@ export class TimesheetVerifyComponent {
   };
   storeData: any;
   salaryHeadList: { SALARY_HEAD_ID: any; AMOUNT: any }[];
+  selected_Company_id: any;
 
   constructor(private dataService: DataService) {}
 
@@ -128,6 +129,7 @@ export class TimesheetVerifyComponent {
   }
 
   ngOnInit() {
+    this.sesstion_Details();
     this.loadStores();
     // this.getSalaryHead();
     this.getPayTimeEntries()
@@ -181,8 +183,18 @@ export class TimesheetVerifyComponent {
     }
   }
 
+    sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   loadStores() {
-    this.dataService.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.getStoresData(payload).subscribe((response) => {
       // Filter out "CENTRAL STORE" and populate the stores array
       this.stores = response.filter(
         (store: any) => store.STORE_NAME !== 'CENTRAL STORE'

@@ -150,6 +150,7 @@ export class ItemStorePricesEditComponent {
   selectedIds: any[];
   isFilterOpened = false;
   private filterApplied = false;
+  selected_Company_id: any;
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -172,6 +173,7 @@ export class ItemStorePricesEditComponent {
     this.dateFormat = sessionStorage.getItem('dateFormat');
     this.currencyFormt = sessionStorage.getItem('currencyFormat');
     console.log(this.currencyFormt, 'CURRENCYFORMAT');
+    this.sesstion_Details();
     this.getWorksheetData();
     if (this.selectedStoreId.length > 1) {
       const defaultStoreId = this.selectedStoreId.join(',');
@@ -328,15 +330,28 @@ export class ItemStorePricesEditComponent {
     }
   }
 
+    sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   loadStores() {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
       this.filteredStoreList = this.store;
     });
   }
 
   getStoresById(storeId: any) {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       this.filteredStoreList = response.filter(
         (store: any) => store.ID === storeId
       );
