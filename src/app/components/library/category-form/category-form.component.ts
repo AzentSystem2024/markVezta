@@ -1,4 +1,10 @@
-import { Component, EventEmitter, NgModule, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  NgModule,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
@@ -16,16 +22,16 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./category-form.component.scss'],
 })
 export class CategoryFormComponent implements OnInit {
-    @Output() popupClosed = new EventEmitter<void>();
+  @Output() popupClosed = new EventEmitter<void>();
 
   DepartmentDropdownData: any;
   formCategoryData = {
-  CODE: '',
-  CAT_NAME: '',
-  LOYALTY_POINT: 0,
-  COST_HEAD_ID: 0,
-  DEPT_ID: '',
-  COMPANY_ID: '',
+    CODE: '',
+    CAT_NAME: '',
+    LOYALTY_POINT: 0,
+    COST_HEAD_ID: 0,
+    DEPT_ID: '',
+    COMPANY_ID: '',
   };
   COMPANY_ID: string;
   constructor(private service: DataService) {}
@@ -34,39 +40,39 @@ export class CategoryFormComponent implements OnInit {
   getNewCategoryData = () => ({ ...this.newCategory });
 
   session_Details() {
-  const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-  this.COMPANY_ID = String(sessionData.SELECTED_COMPANY.COMPANY_ID);
-}
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.COMPANY_ID = String(sessionData.SELECTED_COMPANY.COMPANY_ID);
+  }
 
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
-     const payload = {
-    NAME: dropdowndepartment,
-    COMPANY_ID: this.COMPANY_ID
-  };
+    const payload = {
+      NAME: dropdowndepartment,
+      COMPANY_ID: this.COMPANY_ID,
+    };
 
     this.service.getDropdownData(payload).subscribe((data: any) => {
       this.DepartmentDropdownData = data;
-      this.popupClosed.emit()
+      this.popupClosed.emit();
     });
   }
   ngOnInit(): void {
     this.session_Details();
     this.getDepartmentDropDown();
   }
-  }
-  @NgModule({
-    imports: [
-      DxTextBoxModule,
-      DxFormModule,
-      DxValidatorModule,
-      FormTextboxModule,
-      FormPhotoUploaderModule,
-      CommonModule,
-      ReactiveFormsModule,
-      DxSelectBoxModule,
-    ],
-    declarations: [CategoryFormComponent],
-    exports: [CategoryFormComponent],
-  })
-  export class CategoryFormModule {}
+}
+@NgModule({
+  imports: [
+    DxTextBoxModule,
+    DxFormModule,
+    DxValidatorModule,
+    FormTextboxModule,
+    FormPhotoUploaderModule,
+    CommonModule,
+    ReactiveFormsModule,
+    DxSelectBoxModule,
+  ],
+  declarations: [CategoryFormComponent],
+  exports: [CategoryFormComponent],
+})
+export class CategoryFormModule {}
