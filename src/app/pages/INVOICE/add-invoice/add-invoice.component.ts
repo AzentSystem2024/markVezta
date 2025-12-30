@@ -223,71 +223,35 @@ export class AddInvoiceComponent {
   }
 
   onDistributorChanged(e: any) {
-    // Find the selected customer from the distributorList
     const selectedCustomer = this.distributorList.find(
       (cust: any) => cust.ID === e.value
     );
-    // If customer changed → clear previously added rows
+
     if (this.mainInvoiceGridList && this.mainInvoiceGridList.length > 0) {
-      this.mainInvoiceGridList = []; // Clear the grid completely
+      this.mainInvoiceGridList = [];
       this.totalAmount = 0;
       this.taxAmount = 0;
       this.grandTotal = 0;
       this.netAmount = 0;
 
-      // Refresh grid UI
       if (this.itemsGridRef?.instance) {
         this.itemsGridRef.instance.refresh();
       }
-
-      console.log('Cleared main grid due to customer change');
     }
+
     this.selectedCustomerName = selectedCustomer.DESCRIPTION;
     this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
-    console.log(selectedCustomer.STATE_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
-    const company = this.companyState?.trim().toLowerCase();
-    const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
-    const sessionGst = parseFloat(this.GST) || 0; // main GST%
-    if (company === customer) {
-      this.showCGST = true;
-      this.showSGST = true;
-      this.showGST = false;
-
-      //  Split GST into CGST + SGST
-      const half = sessionGst / 2;
-
-      // Update all grid rows
-      this.mainInvoiceGridList?.forEach((row: any) => {
-        row.CGST = half;
-        row.SGST = half;
-        row.GST = 0; // GST becomes zero in same-state case
-      });
-    } else {
-      console.log('States DIFFERENT → GST applies');
-
-      this.showGST = true;
-      this.showCGST = false;
-      this.showSGST = false;
-
-      // ⭐ GST only
-      this.mainInvoiceGridList?.forEach((row: any) => {
-        row.GST = sessionGst;
-        row.CGST = 0;
-        row.SGST = 0;
-      });
-    }
 
     this.selectedCustomer = selectedCustomer;
     this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
+
+    // 🔥 ONLY CHANGE
+    this.applyGstMode();
+
     if (this.selectedCustomerType) {
-      console.log(
-        'Selected Customer Type:',
-        this.selectedCustomerType.CUST_TYPE
-      );
-      console.log('Selected Customer :', this.selectedCustomerType);
-      // optional — store it if you need it later
       this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
     }
+
     this.getInvoiceListForGrid();
   }
 
@@ -382,6 +346,32 @@ export class AddInvoiceComponent {
     this.isTrOutPopupVisible = true;
   }
 
+  private applyGstMode() {
+    const company = this.companyState?.trim().toLowerCase();
+    const customer = this.selectedCustomer?.STATE_NAME?.trim().toLowerCase();
+
+    const isSameState = company === customer;
+
+    this.showCGST = isSameState;
+    this.showSGST = isSameState;
+    this.showGST = !isSameState;
+
+    this.mainInvoiceGridList?.forEach((row: any) => {
+      const rowGst = Number(row.GST_PERC || row.GST || 0); // ✅ ITEM GST
+
+      if (isSameState) {
+        const half = rowGst / 2;
+        row.CGST = half;
+        row.SGST = half;
+        row.GST = 0;
+      } else {
+        row.GST = rowGst;
+        row.CGST = 0;
+        row.SGST = 0;
+      }
+    });
+  }
+
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
     if (!selectedRows || selectedRows.length === 0) {
@@ -417,23 +407,20 @@ export class AddInvoiceComponent {
       (row: any) => !existingTransferIds.includes(row.DN_DETAIL_ID)
     );
     newRows.forEach((row: any) => {
-      row.HSN_CODE = this.HSNCODE;
+      // ✅ HSN from API
+      row.HSN_CODE = row.HSN_CODE || row.HSN || row.HSNCODE;
 
-      const sessionGst = parseFloat(this.GST) || 0;
+      const rowGst = Number(row.GST_PERC || 0); // ✅ GST FROM API
       const company = this.companyState?.trim().toLowerCase();
-      const customer = this.invoiceFormData?.PARTY_NAME
-        ? this.selectedCustomer?.STATE_NAME?.trim().toLowerCase()
-        : null;
+      const customer = this.selectedCustomer?.STATE_NAME?.trim().toLowerCase();
 
       if (company === customer) {
-        // Same state → CGST + SGST
-        const half = sessionGst / 2;
+        const half = rowGst / 2;
         row.CGST = half;
         row.SGST = half;
-        row.GST = 0; // GST = 0
+        row.GST = 0;
       } else {
-        // Different state → GST only
-        row.GST = sessionGst;
+        row.GST = rowGst;
         row.CGST = 0;
         row.SGST = 0;
       }

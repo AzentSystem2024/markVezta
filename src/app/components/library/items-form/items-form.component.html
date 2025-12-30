@@ -245,7 +245,36 @@
               </div>
             </dxi-item>
             <dxi-item class="spacing-item">
-              <div *dxTemplate></div>
+              <div *dxTemplate>
+                <dx-text-box
+                  label="GST %"
+                  labelMode="floating"
+                  [(value)]="newItems.GST_PERC"
+                >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="This field is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-text-box>
+              </div>
+            </dxi-item>
+            <dxi-item class="spacing-item">
+              <div *dxTemplate>
+                <dx-text-box
+                  label="HSN Code"
+                  labelMode="floating"
+                  [(value)]="newItems.HSN_CODE"
+                >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="This field is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-text-box>
+              </div>
             </dxi-item>
           </dxi-item>
 
@@ -263,6 +292,7 @@
                 </dx-check-box>
               </div>
             </dxi-item>
+
             <dxi-item *ngIf="newItems.IS_DIFFERENT_UOM_PURCH">
               <dx-select-box
                 label="Purchase UOM"

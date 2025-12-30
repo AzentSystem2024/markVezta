@@ -102,7 +102,10 @@ export class StoreItemsListComponent {
   }
 
   getDepartment() {
-    this.dataservice.getDepartmentData().subscribe(
+    const Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.getDepartmentData(Payload).subscribe(
       (response: any) => {
         this.departmentOptions = response.map((item: any) => ({
           ...item,
@@ -116,9 +119,9 @@ export class StoreItemsListComponent {
   }
 
   listAllItems() {
-      const payload = {
+    const payload = {
       COMPANY_ID: this.selected_Company_id,
-    }
+    };
     this.dataservice.getItemsData(payload).subscribe(
       (items: any) => {
         this.allItems = items.data;
@@ -199,20 +202,21 @@ export class StoreItemsListComponent {
     });
   }
 
-   sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
-
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   listItemsByStoreId(storeId: number) {
     if (storeId == 1) {
-      
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    }
+      const payload = {
+        COMPANY_ID: this.selected_Company_id,
+      };
       this.dataservice.getItemsData(payload).subscribe((response: any) => {
         this.items = response;
         this.itemsList = response.data;

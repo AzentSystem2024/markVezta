@@ -1,4 +1,4 @@
-import { Component,Input,NgModule } from '@angular/core';
+import { Component, Input, NgModule } from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
@@ -11,21 +11,56 @@ import { DxSelectBoxModule } from 'devextreme-angular';
 @Component({
   selector: 'app-item-property1-form',
   templateUrl: './item-property1-form.component.html',
-  styleUrls: ['./item-property1-form.component.scss']
+  styleUrls: ['./item-property1-form.component.scss'],
 })
 export class ItemProperty1FormComponent {
   formItemProperty1Data = {
     CODE: '',
     DESCRIPTION: '',
-    COMPANY_ID: '1'
+    COMPANY_ID: 0,
   };
-  newItemProperty1=this.formItemProperty1Data;
-isEditItemProperty1PopupOpened:boolean=false
-isEditing:boolean=false
+  @Input() companyId!: number;
+  newItemProperty1 = this.formItemProperty1Data;
+  isEditItemProperty1PopupOpened: boolean = false;
+  isEditing: boolean = false;
   getNewItemProperty1Data = () => ({ ...this.newItemProperty1 });
-  @Input() EditingResponseData
+  @Input() EditingResponseData;
+  HSN_CODE: any;
+  companyID: any;
+  companyStateID: any;
+  GST_PERC: any;
+  selected_Company_id: any;
+  poData: any;
 
+  ngOnInit() {
+    this.sessionDetails();
+  }
+  ngOnChanges() {
+    if (this.companyId) {
+      this.formItemProperty1Data.COMPANY_ID = this.companyId;
+    }
+  }
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
+    console.log(sessionData, '===========selected HSN CODE===================');
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(
+      this.GST_PERC,
+      '===========selected GST PERC==================='
+    );
 
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    // THIS IS THE MISSING LINK
+    this.poData.COMPANY_ID = this.companyID;
+    this.poData.USER_ID = sessionData.USER_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 }
 @NgModule({
   imports: [

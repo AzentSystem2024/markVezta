@@ -328,8 +328,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}CustTypeDrop`, {});
   }
 
-  getCustomerWithState(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Customer/custdtl`, {});
+  getCustomerWithState(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Customer/custdtl`, data);
   }
 
   getOutsideCustomerWithState(data: any): Observable<any> {
@@ -458,6 +458,10 @@ export class DataService {
   //--------------------------LEDGER-SETTINGS---------------------------------------------------//
   getLedgerSettingsList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}ACDefaults/list`, data);
+  }
+  insertLedgerSettings(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ACDefaults/Insert`, data);
   }
   //--------------------------INVOICE-DELIVERY-------------------------------------//
 
@@ -1326,8 +1330,8 @@ export class DataService {
   }
 
   //department
-  public getDepartmentData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemdepartment/list`, {});
+  public getDepartmentData(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}itemdepartment/list`, data);
   }
   public postDepartmentData(
     CODE: any,
@@ -1572,8 +1576,8 @@ export class DataService {
 
   //subcategory
 
-  public getSubCategoryData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemsubcategory/list`, {});
+  public getSubCategoryData(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}itemsubcategory/list`, data);
   }
   public postSubCategoryData(
     CODE: any,
@@ -1616,7 +1620,7 @@ export class DataService {
   }
 
   //vatclass
-  public getVatclassData(): Observable<any> {
+  public getVatclassData(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}vatclass/list`, {});
   }
   public postVatclassData(
@@ -2087,8 +2091,8 @@ export class DataService {
   }
 
   //item-property1
-  public getItemProperty1Data(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemproperty1/list`, {});
+  public getItemProperty1Data(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}itemproperty1/list`, data);
   }
 
   select_item_property1(id: any) {
@@ -2126,8 +2130,8 @@ export class DataService {
   }
 
   //item-property2
-  public getItemProperty2Data(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemproperty2/list`, {});
+  public getItemProperty2Data(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}itemproperty2/list`, data);
   }
   select_item_property2(id: any) {
     return this.http.post(`${this.apiUrl}itemproperty2/select/${id}`, {});
@@ -2164,8 +2168,8 @@ export class DataService {
   }
 
   //Item property 3
-  public getItemProperty3Data(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemproperty3/list`, {});
+  public getItemProperty3Data(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}itemproperty3/list`, data);
   }
   select_item_property3(id: any) {
     return this.http.post(`${this.apiUrl}itemproperty3/select/${id}`, {});
@@ -2205,8 +2209,8 @@ export class DataService {
   }
 
   // Item property 4
-  public getItemProperty4Data(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemproperty4/list`, {});
+  public getItemProperty4Data(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}itemproperty4/list`, data);
   }
   select_item_property4(id: any) {
     return this.http.post(`${this.apiUrl}itemproperty4/select/${id}`, {});
@@ -2251,8 +2255,8 @@ export class DataService {
   }
 
   //Item property 5
-  public getItemProperty5Data(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemproperty5/list`, {});
+  public getItemProperty5Data(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}itemproperty5/list`, data);
   }
 
   select_item_property5(id: any) {

@@ -137,6 +137,8 @@ export class AddDebitComponent {
   grandTotal: number;
   netTotal: number;
   companyStateID: any;
+  selectedInvoiceGST: number;
+  selectedInvoiceHSN: any;
   constructor(private dataService: DataService) {
     this.sessionData_tax();
   }
@@ -334,67 +336,90 @@ export class AddDebitComponent {
   //     // this.pendingInvoicelist = [];
   //   }
   // }
-onSupplierChanged(event: any) {
-  this.selectedSupplierId = event.value;
+  onSupplierChanged(event: any) {
+    this.selectedSupplierId = event.value;
 
-  const selectedSupplier = this.distributorList.find(
-    (supplier: any) => supplier.ID === this.selectedSupplierId
-  );
+    const selectedSupplier = this.distributorList.find(
+      (supplier: any) => supplier.ID === this.selectedSupplierId
+    );
 
-  if (!selectedSupplier) return;
+    if (!selectedSupplier) return;
 
-  this.selectedSupplier = selectedSupplier;
+    this.selectedSupplier = selectedSupplier;
 
-  // 🔹 Logged-in company state
-  const companyState = this.companyState?.trim().toLowerCase();
+    // 🔹 States
+    const companyState = this.companyState?.trim().toLowerCase();
+    const supplierState = selectedSupplier.STATE_NAME?.trim().toLowerCase();
 
-  // 🔹 Selected supplier state
-  const supplierState = selectedSupplier.STATE_NAME?.trim().toLowerCase();
+    const isSameState = companyState === supplierState;
 
-  // 🔹 Compare states
-  const isSameState = companyState === supplierState;
+    // 🔹 ONLY CONTROL VISIBILITY HERE
+    this.showCGST = isSameState;
+    this.showSGST = isSameState;
+    this.showGST = !isSameState;
 
-  if (isSameState) {
-    // ✅ SAME STATE → CGST + SGST
-    this.showCGST = true;
-    this.showSGST = true;
-    this.showGST = false;
+    // 🔹 Set supplier details
+    this.debitFormData.SUPP_ID = this.selectedSupplierId;
+    this.debitFormData.PARTY_NAME = selectedSupplier.DESCRIPTION;
 
-    // Clear IGST value in rows
-    this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
-      row.GST_PERC = 0;
-    });
-  } else {
-    // ✅ DIFFERENT STATE → IGST
-    this.showCGST = false;
-    this.showSGST = false;
-    this.showGST = true;
+    // 🔹 Re-apply GST ONLY if invoice already selected
+    if (this.selectedInvoiceGST) {
+      this.applyInvoiceGSTToRows();
+    }
 
-    // Clear CGST & SGST values in rows
-    this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
-      row.CGST = 0;
-      row.SGST = 0;
-    });
+    // 🔹 Reload pending invoices
+    this.getPendingInvoices();
   }
 
-  // Set supplier details
-  this.debitFormData.SUPP_ID = this.selectedSupplierId;
-  this.debitFormData.PARTY_NAME = selectedSupplier.DESCRIPTION;
-
-  // Load pending invoices
-  this.getPendingInvoices();
-}
-
   selectInvoice(e: any) {
-    console.log('Invoice selected:', e);
     const selected = e.data;
-    console.log(selected, 'SELECTEPENDINGDATA');
-    // this.debitFormData.INVOICE_NO = String(selected.INVOICE_NO);
+
     this.debitFormData.INVOICE_NO = selected.INVOICE_NO;
     this.debitFormData.DUE_AMOUNT = selected.PENDING_AMOUNT;
     this.debitFormData.INVOICE_ID = selected.BILL_ID;
 
+    // ✅ STORE GST & HSN FROM INVOICE
+    this.selectedInvoiceGST = Number(selected.GST_PERC) || 0;
+    this.selectedInvoiceHSN = selected.HSN_CODE || '';
+
+    // ✅ APPLY TAX MODE BASED ON STATE
+    this.applyInvoiceGSTToRows();
+
     this.invoicePopupVisible = false;
+  }
+  applyInvoiceGSTToRows() {
+    const companyState = this.companyState?.trim().toLowerCase();
+    const supplierState =
+      this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+    const isSameState = companyState === supplierState;
+
+    this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
+      // ✅ Set HSN from invoice
+      row.HSN_CODE = this.selectedInvoiceHSN;
+
+      if (isSameState) {
+        // SAME STATE → CGST + SGST
+        const half = this.selectedInvoiceGST / 2;
+
+        row.CGST = half;
+        row.SGST = half;
+        row.GST_PERC = 0;
+
+        this.showCGST = true;
+        this.showSGST = true;
+        this.showGST = false;
+      } else {
+        // DIFFERENT STATE → IGST
+        row.GST_PERC = this.selectedInvoiceGST;
+        row.CGST = 0;
+        row.SGST = 0;
+
+        this.showGST = true;
+        this.showCGST = false;
+        this.showSGST = false;
+      }
+    });
   }
 
   getPendingInvoices() {
@@ -465,7 +490,25 @@ onSupplierChanged(event: any) {
 
   calculateTaxAmount = (rowData: any) => {
     const amount = Number(rowData.Amount) || 0;
-    const gstPerc = Number(rowData.GST_PERC) || 0;
+
+    const companyState = this.companyState?.trim().toLowerCase();
+    const supplierState =
+      this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+    const isSameState = companyState === supplierState;
+
+    let gstPerc = 0;
+
+    if (isSameState) {
+      // ✅ SAME STATE → CGST + SGST
+      const cgst = Number(rowData.CGST) || 0;
+      const sgst = Number(rowData.SGST) || 0;
+      gstPerc = cgst + sgst;
+    } else {
+      // ✅ DIFFERENT STATE → IGST
+      gstPerc = Number(rowData.GST_PERC) || 0;
+    }
+
     return +((amount * gstPerc) / 100).toFixed(2);
   };
 
@@ -586,20 +629,19 @@ onSupplierChanged(event: any) {
             selectedLedger.HEAD_NAME
           );
 
-          // 2️⃣ Get HSN & GST from session
-          const sessionData = JSON.parse(
-            sessionStorage.getItem('savedUserData')
-          );
-          const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
-          const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+          // 2️⃣ Set HSN from SELECTED INVOICE (NOT SESSION)
+          if (this.selectedInvoiceHSN) {
+            e.component.cellValue(
+              rowIndex,
+              'HSN_CODE',
+              this.selectedInvoiceHSN
+            );
+          }
 
-          // 3️⃣ Set HSN_CODE
-          e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+          // 3️⃣ GST is already applied globally via applyInvoiceGSTToRows()
+          // ❌ DO NOT SET GST HERE
 
-          // 4️⃣ Set GST_PERC
-          e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
-
-          // 5️⃣ Move to next field
+          // 4️⃣ Move to next field
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
           }, 50);
@@ -813,39 +855,36 @@ onSupplierChanged(event: any) {
     // }
 
     if (e.dataField === 'GST_PERC') {
+      const originalOnValueChanged = e.editorOptions.onValueChanged;
 
-  const originalOnValueChanged = e.editorOptions.onValueChanged;
+      e.editorOptions.onValueChanged = (args: any) => {
+        // keep existing behavior
+        if (originalOnValueChanged) {
+          originalOnValueChanged(args);
+        }
 
-  e.editorOptions.onValueChanged = (args: any) => {
-    // keep existing behavior
-    if (originalOnValueChanged) {
-      originalOnValueChanged(args);
+        e.setValue(args.value);
+
+        // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
+        e.row.data.CGST = 0;
+        e.row.data.SGST = 0;
+      };
     }
 
-    e.setValue(args.value);
+    if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+      const originalOnValueChanged = e.editorOptions.onValueChanged;
 
-    // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
-    e.row.data.CGST = 0;
-    e.row.data.SGST = 0;
-  };
-}
+      e.editorOptions.onValueChanged = (args: any) => {
+        if (originalOnValueChanged) {
+          originalOnValueChanged(args);
+        }
 
-if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+        e.setValue(args.value);
 
-  const originalOnValueChanged = e.editorOptions.onValueChanged;
-
-  e.editorOptions.onValueChanged = (args: any) => {
-    if (originalOnValueChanged) {
-      originalOnValueChanged(args);
+        // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
+        e.row.data.GST_PERC = 0;
+      };
     }
-
-    e.setValue(args.value);
-
-    // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
-    e.row.data.GST_PERC = 0;
-  };
-}
-
 
     // e.row.data.HSN_CODE = this.HSN_CODE;
   }
@@ -1070,16 +1109,16 @@ if (e.dataField === 'CGST' || e.dataField === 'SGST') {
     );
 
     //  FINAL TAX CLEANUP (VERY IMPORTANT)
-this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
-  if (row.CGST > 0 || row.SGST > 0) {
-    // CGST / SGST present → clear IGST
-    row.GST_PERC = 0;
-  } else if (row.GST_PERC > 0) {
-    // IGST present → clear CGST & SGST
-    row.CGST = 0;
-    row.SGST = 0;
-  }
-});
+    this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
+      if (row.CGST > 0 || row.SGST > 0) {
+        // CGST / SGST present → clear IGST
+        row.GST_PERC = 0;
+      } else if (row.GST_PERC > 0) {
+        // IGST present → clear CGST & SGST
+        row.CGST = 0;
+        row.SGST = 0;
+      }
+    });
 
     // 4. Other fields
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
@@ -1111,7 +1150,6 @@ this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
     this.callInsertAPI();
   }
 
-  
   resetDebitNoteForm() {
     this.debitFormData = {
       TRANS_TYPE: 36,
@@ -1166,90 +1204,44 @@ this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
 
   onAddNewRow() {
     const grid = this.itemsGridRef.instance;
-    const rows = grid.getVisibleRows();
+
     if (this.hasEmptyRow()) {
       notify('Please fill the existing empty row first.', 'warning', 2000);
       return;
     }
-    // Prevent adding if any existing row is incomplete
-    // const hasIncompleteRow = rows.some(
-    //   (r: any) => !r.data.ledgerName || !r.data.Amount
-    // );
-    // if (hasIncompleteRow) {
-    //   return;
-    // }
 
-    // Add a new empty row with auto SL_NO
     const nextSlNo = this.debitFormData.NOTE_DETAIL.length + 1;
+
     const newRow = {
       SL_NO: nextSlNo,
       ledgerCode: null,
       ledgerName: '',
       particulars: '',
       Amount: null,
-      gstAmount: null,
+      GST_PERC: 0,
+      CGST: 0,
+      SGST: 0,
+      HSN_CODE: this.selectedInvoiceHSN || '',
     };
 
     this.debitFormData.NOTE_DETAIL.push(newRow);
 
-    // // Refresh grid and focus the ledgerCode cell
+    // ✅ APPLY GST FROM SELECTED INVOICE TO ALL ROWS (INCLUDING NEW)
+    if (this.selectedInvoiceGST) {
+      this.applyInvoiceGSTToRows();
+    }
 
+    // Focus ledgerCode
     setTimeout(() => {
-      const grid = this.itemsGridRef?.instance;
       const newRowIndex = this.debitFormData.NOTE_DETAIL.length - 1;
       grid?.editCell(newRowIndex, 'ledgerCode');
     }, 100);
-
-    const selectedSupplier = this.distributorList.find(
-      (supplier: any) => supplier.ID === this.selectedSupplierId
-    );
-
-    console.log(selectedSupplier);
-    const company = this.companyState?.trim().toLowerCase();
-    console.log(company);
-    const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
-    console.log(supplier);
-    const sessionGst = parseFloat(this.GST) || 0; // main GST%
-    console.log(sessionGst);
-
-    if (company === supplier) {
-      console.log('Both states SAME → CGST + SGST apply');
-
-      this.showCGST = true;
-      this.showSGST = true;
-      this.showGST = false;
-
-      //  Split GST into CGST + SGST
-      const half = sessionGst / 2;
-
-      // Update all grid rows
-      this.debitFormData.NOTE_DETAIL?.forEach((row: any) => {
-        row.CGST = half;
-        row.SGST = half;
-        row.GST = 0; // GST becomes zero in same-state case
-      });
-    } else {
-      console.log('States DIFFERENT → GST applies');
-
-      this.showGST = true;
-      this.showCGST = false;
-      this.showSGST = false;
-
-      // ⭐ GST only
-      this.debitFormData.NOTE_DETAIL?.forEach((row: any) => {
-        row.GST = sessionGst;
-        row.CGST = 0;
-        row.SGST = 0;
-      });
-    }
-    this.selectedSupplier = selectedSupplier;
   }
 
   calculateTotal = (row: any) => {
-    console.log(row);
     const amount = Number(row.Amount) || 0;
-    const gst = this.calculateTaxAmount(row) || 0;
-    return amount + gst;
+    const gst = this.calculateTaxAmount(row);
+    return +(amount + gst).toFixed(2);
   };
 
   onRoundOffChange() {

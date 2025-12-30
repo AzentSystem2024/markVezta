@@ -1,4 +1,11 @@
-import { Component,EventEmitter,Input,NgModule, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  NgModule,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
@@ -13,108 +20,135 @@ import { DataService } from 'src/app/services';
 @Component({
   selector: 'app-item-property3-edit',
   templateUrl: './item-property3-edit.component.html',
-  styleUrls: ['./item-property3-edit.component.scss']
+  styleUrls: ['./item-property3-edit.component.scss'],
 })
 export class ItemProperty3EditComponent {
-       @Input() selectedData: any={}
-      @Output() formClosed =new EventEmitter<void>()
-    formItemProperty3Data = {
-      ID:0,
-      CODE: '',
-      DESCRIPTION: '',
-      COMPANY_ID: '1'
-    };
-    itemproperty3: any=[]
-  
-      constructor(private service: DataService) {}
-            ngOnChanges(changes: SimpleChanges): void{
-                  if (changes['selectedData'] && changes['selectedData'].currentValue) {
-             const data = changes['selectedData'].currentValue;
-         console.log(data,"dataaaaaaaaaaaaaaaaaaaaaaaaaa")
-            this.formItemProperty3Data=data
-            console.log(this.formItemProperty3Data)
-       
-                }   
-               }
-    showItemProperty3(){
-       this.service.getItemProperty3Data().subscribe(
-        (response)=>{
-              this.itemproperty3=response;
-              console.log(response);
-        }
-       )
-    }
+  @Input() selectedData: any = {};
+  @Output() formClosed = new EventEmitter<void>();
+  formItemProperty3Data = {
+    ID: 0,
+    CODE: '',
+    DESCRIPTION: '',
+    COMPANY_ID: '1',
+  };
+  itemproperty3: any = [];
+  HSN_CODE: any;
+  companyID: any;
+  companyStateID: any;
+  GST_PERC: any;
+  selected_Company_id: any;
+  poData: any;
 
-               UpdateData(){
-                const payload={
-                  ...this.formItemProperty3Data
-                }
-                
-                this.showItemProperty3()
+  constructor(private service: DataService) {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedData'] && changes['selectedData'].currentValue) {
+      const data = changes['selectedData'].currentValue;
+      console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa');
+      this.formItemProperty3Data = data;
+      console.log(this.formItemProperty3Data);
+    }
+  }
+
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
+    console.log(sessionData, '===========selected HSN CODE===================');
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(
+      this.GST_PERC,
+      '===========selected GST PERC==================='
+    );
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    // THIS IS THE MISSING LINK
+    this.poData.COMPANY_ID = this.companyID;
+    this.poData.USER_ID = sessionData.USER_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
+  showItemProperty3() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getItemProperty3Data(payload).subscribe((response) => {
+      this.itemproperty3 = response;
+      console.log(response);
+    });
+  }
+
+  UpdateData() {
+    const payload = {
+      ...this.formItemProperty3Data,
+    };
+
+    this.showItemProperty3();
     // Exclude the current record (by ID) from duplicate check
     const isCodeDuplicate = this.itemproperty3.some(
       (item: any) =>
         item.ID !== payload.ID &&
         item.CODE?.toLowerCase().trim() === payload.CODE?.toLowerCase().trim()
     );
-  
+
     const isDescriptionDuplicate = this.itemproperty3.some(
       (item: any) =>
         item.ID !== payload.ID &&
-        item.DESCRIPTION?.toLowerCase().trim() === payload.DESCRIPTION?.toLowerCase().trim()
+        item.DESCRIPTION?.toLowerCase().trim() ===
+          payload.DESCRIPTION?.toLowerCase().trim()
     );
-  
+
     if (isCodeDuplicate && isDescriptionDuplicate) {
       notify(
         {
-          message: "Both Code and Description already exist",
-          position: { at: "top right", my: "top right" },
+          message: 'Both Code and Description already exist',
+          position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        "error"
+        'error'
       );
       return;
     } else if (isCodeDuplicate) {
       notify(
         {
-          message: "This Code already exists",
-          position: { at: "top right", my: "top right" },
+          message: 'This Code already exists',
+          position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        "error"
+        'error'
       );
       return;
     } else if (isDescriptionDuplicate) {
       notify(
         {
-          message: "This Description already exists",
-          position: { at: "top right", my: "top right" },
+          message: 'This Description already exists',
+          position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        "error"
+        'error'
       );
       return;
     }
-  
-                this.service.updateItemProperty3(payload).subscribe((res:any)=>{
-                    console.log(res)
-                    this.formClosed.emit()
-                      notify(
-      {
-        message: "Data updated successfully",
-        position: { at: "top right", my: "top right" },
-        displayTime: 1000,
-      },
-      "success"
-    );
-  
-                })
-               }
-  
-               closePopup(){
-                this.formClosed.emit()
-               }
 
+    this.service.updateItemProperty3(payload).subscribe((res: any) => {
+      console.log(res);
+      this.formClosed.emit();
+      notify(
+        {
+          message: 'Data updated successfully',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1000,
+        },
+        'success'
+      );
+    });
+  }
+
+  closePopup() {
+    this.formClosed.emit();
+  }
 }
 
 @NgModule({
@@ -127,10 +161,9 @@ export class ItemProperty3EditComponent {
     CommonModule,
     ReactiveFormsModule,
     DxSelectBoxModule,
-    DxButtonModule
+    DxButtonModule,
   ],
   declarations: [ItemProperty3EditComponent],
   exports: [ItemProperty3EditComponent],
-   
 })
 export class ItemProperty3EditModule {}

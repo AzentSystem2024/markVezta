@@ -250,16 +250,20 @@ export class InvoiceTrOutAddComponent {
     }
 
     const data = this.EditingResponseData.Data[0];
-    console.log(data);
+    console.log('EDIT RESPONSE:', data);
+
+    // Track previous customer (used to clear grid on change)
     this.previousCustomerId = data.CUST_ID;
+
+    // ---------------- DATE PARSE ----------------
     const transactionDate = this.parseDMY(data.TRANS_DATE);
-    // Populate header fields
+
+    // ---------------- HEADER DATA ----------------
     this.invoiceFormData = {
       ID: data.ID,
       TRANS_ID: data.TRANS_ID,
       COMPANY_ID: this.invoiceFormData.COMPANY_ID,
       STORE_ID: data.STORE_ID,
-      // RET_DATE: new Date(data.RET_DATE),
       TRANS_DATE: transactionDate,
       CUST_ID: data.CUST_ID,
       GROSS_AMOUNT: data.GROSS_AMOUNT,
@@ -276,81 +280,64 @@ export class InvoiceTrOutAddComponent {
       DOC_NO: data.DOC_NO,
     };
 
-    // Populate supplier selection
-    this.invoiceFormData.CUST_ID = data.CUST_ID;
-    console.log(this.invoiceFormData.CUST_ID);
-
-    // ----------- STATE COMPARISON -----------
-    const companyState = this.companyState?.trim().toLowerCase();
-
-    // 👇 Change this line based on what your API sends for customer state
-    const customerState = (data.CUST_STATE || data.STATE_NAME || '')
-      .trim()
-      .toLowerCase();
-
-    console.log('Company State:', companyState);
-    console.log('Customer State:', customerState);
-
-    const gstPerc = parseFloat(this.GST) || 0;
-
-    // Populate grid rows from PurchDetail
-    this.mainInvoiceGridList = (data.SALE_DETAILS || []).map((item) => ({
+    // ---------------- GRID DATA ----------------
+    this.mainInvoiceGridList = (data.SALE_DETAILS || []).map((item: any) => ({
       DN_DETAIL_ID: item.DN_DETAIL_ID,
+      TRANSFER_NO: item.ART_NO,
+      SALE_DATE: this.parseDDMMYYYY(item.DN_DATE),
+      ARTICLE: item.ARTICLE,
+
+      TOTAL_PAIR_QTY: item.TOTAL_PAIR_QTY,
       PRICE: item.PRICE,
-      QUANTITY: item.QUANTITY,
+
+      // ✅ AMOUNTS FROM API
       TAXABLE_AMOUNT: item.TAXABLE_AMOUNT,
       TAX_AMOUNT: item.TAX_AMOUNT,
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
-      HSN_CODE: this.HSNCODE,
-      TAX_PERC: this.GST,
-      TRANSFER_NO: item.ART_NO,
-      SALE_DATE: item.DN_DATE,
-      ARTICLE: item.ARTICLE,
-      TOTAL_PAIR_QTY: item.TOTAL_PAIR_QTY,
-      CGST: item.CGST ?? 0,
-      SGST: item.SGST ?? 0,
-      GST: item.GST ?? 0,
+
+      // ✅ HSN → keep saved, fallback to session
+      HSN_CODE: item.HSN_CODE || this.HSNCODE,
+
+      // ✅ IMPORTANT: KEEP SAVED GST VALUES (NO SESSION OVERRIDE)
+      GST: Number(item.GST) || 0,
+      CGST: Number(item.CGST) || 0,
+      SGST: Number(item.SGST) || 0,
     }));
 
-    if (companyState === customerState) {
-      console.log('Both states SAME → CGST + SGST apply');
+    // ---------------- GST COLUMN VISIBILITY ONLY ----------------
+    this.setGstVisibilityFromRows(this.mainInvoiceGridList);
 
-      this.showCGST = true;
-      this.showSGST = true;
-      this.showGST = false;
-
-      //  Split GST into CGST + SGST
-      const half = gstPerc / 2;
-
-      // Update all grid rows
-      this.mainInvoiceGridList?.forEach((row: any) => {
-        row.CGST = half;
-        row.SGST = half;
-        row.GST = 0; // GST becomes zero in same-state case
-      });
-    } else {
-      console.log('States DIFFERENT → GST applies');
-
-      this.showGST = true;
-      this.showCGST = false;
-      this.showSGST = false;
-
-      // ⭐ GST only
-      this.mainInvoiceGridList?.forEach((row: any) => {
-        row.GST = gstPerc;
-        row.CGST = 0;
-        row.SGST = 0;
-      });
-    }
-
-    // Refresh grid
+    // ---------------- GRID REFRESH ----------------
     setTimeout(() => {
       if (this.itemsGridRef?.instance) {
         this.itemsGridRef.instance.refresh();
       }
     }, 200);
 
-    console.log('EDIT MODE - Loaded Data:', this.mainInvoiceGridList);
+    console.log('EDIT MODE GRID DATA:', this.mainInvoiceGridList);
+  }
+
+  private setGstVisibilityFromRows(rows: any[]) {
+    if (!rows || rows.length === 0) {
+      this.showGST = false;
+      this.showCGST = false;
+      this.showSGST = false;
+      return;
+    }
+
+    const hasIGST = rows.some((r) => Number(r.GST) > 0);
+
+    if (hasIGST) {
+      // IGST case
+      this.showGST = true;
+      this.showCGST = false;
+      this.showSGST = false;
+    } else {
+      // CGST + SGST case
+      this.showGST = false;
+      this.showCGST = true;
+      this.showSGST = true;
+    }
   }
 
   formatDate(date: Date | string): string {
@@ -398,37 +385,16 @@ export class InvoiceTrOutAddComponent {
     console.log(customer);
     const sessionGst = parseFloat(this.GST) || 0; // main GST%
     console.log(sessionGst);
-
     if (company === customer) {
-      console.log('Both states SAME → CGST + SGST apply');
-
       this.showCGST = true;
       this.showSGST = true;
       this.showGST = false;
-
-      //  Split GST into CGST + SGST
-      const half = sessionGst / 2;
-
-      // Update all grid rows
-      this.mainInvoiceGridList?.forEach((row: any) => {
-        row.CGST = half;
-        row.SGST = half;
-        row.GST = 0; // GST becomes zero in same-state case
-      });
     } else {
-      console.log('States DIFFERENT → GST applies');
-
       this.showGST = true;
       this.showCGST = false;
       this.showSGST = false;
-
-      // ⭐ GST only
-      this.mainInvoiceGridList?.forEach((row: any) => {
-        row.GST = sessionGst;
-        row.CGST = 0;
-        row.SGST = 0;
-      });
     }
+
     this.selectedCustomer = selectedCustomer;
 
     if (this.selectedCustomerId) {
@@ -567,39 +533,49 @@ export class InvoiceTrOutAddComponent {
       (item: any) => item.DN_DETAIL_ID
     );
 
-    const sessionGst = Number(this.GST) || 0;
+    // ✅ State comparison (ONLY for split decision)
     const company = this.companyState?.trim().toLowerCase();
     const customer = this.selectedCustomer?.STATE_NAME?.trim().toLowerCase();
     const sameState = company === customer;
-    const half = sessionGst / 2;
 
     selectedRows.forEach((row: any) => {
       if (existingIds.includes(row.DN_DETAIL_ID)) return;
 
-      this.mainInvoiceGridList.push({
-        // ⭐ REQUIRED FIELD MAPPING
-        TRANSFER_NO: row.ART_NO, // popup → main
-        SALE_DATE: this.parseDDMMYYYY(row.DN_DATE), // popup → main (DATE object)
+      // ✅ GST MUST COME FROM ROW (NOT SESSION)
+      const rowGstPerc = Number(row.GST_PERC ?? row.TAX_PERC ?? 0);
+      const half = rowGstPerc / 2;
 
-        // already working fields
+      this.mainInvoiceGridList.push({
+        // ---------- IDENTIFIERS ----------
+        DN_DETAIL_ID: row.DN_DETAIL_ID,
+        TRANSFER_NO: row.ART_NO,
+        SALE_DATE: this.parseDDMMYYYY(row.DN_DATE),
+
+        // ---------- ITEM DETAILS ----------
         ARTICLE: row.ARTICLE,
-        HSN_CODE: this.HSNCODE,
+        HSN_CODE: row.HSN_CODE || this.HSNCODE,
         TOTAL_PAIR_QTY: row.TOTAL_PAIR_QTY,
         PRICE: 0,
 
-        // calculated columns
-        TAX_PERC: this.GST,
-        GST: sameState ? 0 : sessionGst,
-        CGST: sameState ? half : 0,
-        SGST: sameState ? half : 0,
+        // ---------- GST (ROW-BASED ONLY) ----------
+        GST: sameState ? 0 : rowGstPerc, // IGST
+        CGST: sameState ? half : 0, // CGST
+        SGST: sameState ? half : 0, // SGST
 
-        DN_DETAIL_ID: row.DN_DETAIL_ID,
+        // ---------- OPTIONAL ----------
+        TAX_PERC: rowGstPerc,
       });
     });
 
+    // ✅ Set column visibility based on actual data
+    this.setGstVisibilityFromRows(this.mainInvoiceGridList);
+
     this.isTrOutPopupVisible = false;
 
-    this.itemsGridRef?.instance?.refresh();
+    // Refresh grid
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.refresh();
+    }, 100);
   }
 
   parseDDMMYYYY(dateStr: string): Date | null {

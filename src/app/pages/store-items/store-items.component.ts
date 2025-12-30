@@ -74,6 +74,11 @@ export class StoreItemsComponent {
   itemprop3: any;
   itemprop4: any;
   itemprop5: any;
+  HSN_CODE: any;
+  companyID: any;
+  companyStateID: any;
+  GST_PERC: any;
+  selected_Company_id: any;
 
   constructor(private dataservice: DataService) {
     dataservice.getCountryWithFlags().subscribe((data) => {
@@ -89,10 +94,16 @@ export class StoreItemsComponent {
     dataservice.getDropdownData('UOM').subscribe((data) => {
       this.uom = data;
     });
-    dataservice.getSubCategoryData().subscribe((data) => {
+    const subCatpayload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getSubCategoryData(subCatpayload).subscribe((data) => {
       this.subcatagory = data;
     });
-    dataservice.getVatclassData().subscribe((data) => {
+    const vatClasspayload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getVatclassData(vatClasspayload).subscribe((data) => {
       this.vat = data;
     });
     dataservice.getDropdownData('ITEMCATEGORY').subscribe((data) => {
@@ -102,7 +113,10 @@ export class StoreItemsComponent {
       this.brand = data;
       // console.log(this.brand, 'BRAND');
     });
-    dataservice.getDepartmentData().subscribe((data) => {
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
+    dataservice.getDepartmentData(payload).subscribe((data) => {
       this.department = data;
     });
     dataservice.getDropdownData('ITEMTYPE').subscribe((data) => {
@@ -111,19 +125,46 @@ export class StoreItemsComponent {
     dataservice.getDropdownData('STORE').subscribe((data) => {
       this.store = data;
     });
-    dataservice.getItemProperty1Data().subscribe((data) => {
+    const itemProp1payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty1Data(itemProp1payload).subscribe((data) => {
       this.itemprop1 = data;
     });
-    dataservice.getItemProperty2Data().subscribe((data) => {
+    const itemProp2payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty2Data(itemProp2payload).subscribe((data) => {
       this.itemprop2 = data;
     });
-    dataservice.getItemProperty3Data().subscribe((data) => {
+    const itemProp3payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty3Data(itemProp3payload).subscribe((data) => {
       this.itemprop3 = data;
     });
   }
 
   copyStoreData: any;
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
+    console.log(sessionData, '===========selected HSN CODE===================');
+    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    console.log(
+      this.GST_PERC,
+      '===========selected GST PERC==================='
+    );
 
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    // THIS IS THE MISSING LINK
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
   ngOnInit() {
     if (this.storeData == undefined) {
       this.storeData = new StoreData();

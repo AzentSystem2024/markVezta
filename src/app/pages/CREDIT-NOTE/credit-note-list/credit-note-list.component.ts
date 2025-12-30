@@ -167,8 +167,8 @@ export class CreditNoteListComponent {
   }
   getCreditNotes() {
     const payload = {
-      COMPANY_ID :this.selectedCompanyId
-    }
+      COMPANY_ID: this.selectedCompanyId,
+    };
     this.dataService.getCreditNoteList(payload).subscribe((response: any) => {
       this.creditNotes = response.Data.map((item: any) => {
         let dateValue: Date;

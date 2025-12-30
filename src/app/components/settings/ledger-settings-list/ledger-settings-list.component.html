@@ -30,9 +30,10 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
+      (onEditorPreparing)="onEditorPreparing($event)"
     >
       <dxo-editing
-        mode="popup"
+        mode="cell"
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
@@ -80,13 +81,12 @@
         ></dxi-item>
       </dxo-toolbar>
       <dxi-column dataField="NAME" caption="Name"></dxi-column>
-      <dxi-column dataField="ID" caption="Ledger" [allowEditing]="true">
+      <dxi-column dataField="LEDGER_ID" caption="Ledger" [allowEditing]="true">
         <dxo-lookup
           [dataSource]="ledgerDropdown"
           valueExpr="ID"
           displayExpr="DESCRIPTION"
-        >
-        </dxo-lookup>
+        ></dxo-lookup>
       </dxi-column>
     </dx-data-grid>
   </div>

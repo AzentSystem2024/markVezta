@@ -116,7 +116,7 @@ export class EditInvoiceComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
-      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      // this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
       console.log(this.HSNCODE, 'HSNCODE===================');
       this.hsnLoaded = true; // ADD THIS
@@ -189,7 +189,8 @@ export class EditInvoiceComponent {
             GST: igst > 0 ? igst : 0, // IGST → GST column
             CGST: igst > 0 ? 0 : cgst, // Same-state
             SGST: igst > 0 ? 0 : sgst, // Same-state
-            HSN_CODE: this.HSNCODE, // keep your HSN logic
+            HSN_CODE: row.HSN_CODE,
+            // keep your HSN logic
           };
         }
       );
@@ -201,7 +202,7 @@ export class EditInvoiceComponent {
       this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
         return {
           ...row,
-          HSN_CODE: this.HSNCODE,
+          HSN_CODE: row.HSN_CODE,
         };
       });
 
@@ -222,72 +223,116 @@ export class EditInvoiceComponent {
     }
   }
 
+  // onDistributorChanged(e: any) {
+  //   // Find the selected customer from the distributorList
+  //   const selectedCustomer = this.distributorList.find(
+  //     (cust: any) => cust.ID === e.value
+  //   );
+  //   // If customer changed → clear previously added rows
+  //   if (this.mainInvoiceGridList && this.mainInvoiceGridList.length > 0) {
+  //     this.mainInvoiceGridList = []; // Clear the grid completely
+  //     this.totalAmount = 0;
+  //     this.taxAmount = 0;
+  //     this.grandTotal = 0;
+  //     this.netAmount = 0;
+
+  //     // Refresh grid UI
+  //     if (this.itemsGridRef?.instance) {
+  //       this.itemsGridRef.instance.refresh();
+  //     }
+
+  //     console.log('Cleared main grid due to customer change');
+  //   }
+  //   this.selectedCustomerName = selectedCustomer.DESCRIPTION;
+  //   this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
+  //   console.log(selectedCustomer.STATE_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
+  //   const company = this.companyState?.trim().toLowerCase();
+  //   const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
+  //   const sessionGst = parseFloat(this.GST) || 0; // main GST%
+  //   if (company === customer) {
+  //     this.showCGST = true;
+  //     this.showSGST = true;
+  //     this.showGST = false;
+
+  //     //  Split GST into CGST + SGST
+  //     const half = sessionGst / 2;
+
+  //     // Update all grid rows
+  //     this.mainInvoiceGridList?.forEach((row: any) => {
+  //       row.CGST = half;
+  //       row.SGST = half;
+  //       row.GST = 0; // GST becomes zero in same-state case
+  //     });
+  //   } else {
+  //     console.log('States DIFFERENT → GST applies');
+
+  //     this.showGST = true;
+  //     this.showCGST = false;
+  //     this.showSGST = false;
+
+  //     // ⭐ GST only
+  //     this.mainInvoiceGridList?.forEach((row: any) => {
+  //       row.GST = sessionGst;
+  //       row.CGST = 0;
+  //       row.SGST = 0;
+  //     });
+  //   }
+
+  //   this.selectedCustomer = selectedCustomer;
+  //   this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
+  //   if (this.selectedCustomerType) {
+  //     console.log(
+  //       'Selected Customer Type:',
+  //       this.selectedCustomerType.CUST_TYPE
+  //     );
+  //     console.log('Selected Customer :', this.selectedCustomerType);
+  //     // optional — store it if you need it later
+  //     this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
+  //   }
+  //   this.getInvoiceListForGrid();
+  // }
+
   onDistributorChanged(e: any) {
-    // Find the selected customer from the distributorList
     const selectedCustomer = this.distributorList.find(
       (cust: any) => cust.ID === e.value
     );
-    // If customer changed → clear previously added rows
+
     if (this.mainInvoiceGridList && this.mainInvoiceGridList.length > 0) {
-      this.mainInvoiceGridList = []; // Clear the grid completely
+      this.mainInvoiceGridList = [];
       this.totalAmount = 0;
       this.taxAmount = 0;
       this.grandTotal = 0;
       this.netAmount = 0;
 
-      // Refresh grid UI
       if (this.itemsGridRef?.instance) {
         this.itemsGridRef.instance.refresh();
       }
-
-      console.log('Cleared main grid due to customer change');
     }
+
     this.selectedCustomerName = selectedCustomer.DESCRIPTION;
     this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
-    console.log(selectedCustomer.STATE_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
+
     const company = this.companyState?.trim().toLowerCase();
     const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
-    const sessionGst = parseFloat(this.GST) || 0; // main GST%
+
+    // ✅ GST MODE ONLY (NO % CHANGE)
     if (company === customer) {
       this.showCGST = true;
       this.showSGST = true;
       this.showGST = false;
-
-      //  Split GST into CGST + SGST
-      const half = sessionGst / 2;
-
-      // Update all grid rows
-      this.mainInvoiceGridList?.forEach((row: any) => {
-        row.CGST = half;
-        row.SGST = half;
-        row.GST = 0; // GST becomes zero in same-state case
-      });
     } else {
-      console.log('States DIFFERENT → GST applies');
-
       this.showGST = true;
       this.showCGST = false;
       this.showSGST = false;
-
-      // ⭐ GST only
-      this.mainInvoiceGridList?.forEach((row: any) => {
-        row.GST = sessionGst;
-        row.CGST = 0;
-        row.SGST = 0;
-      });
     }
 
     this.selectedCustomer = selectedCustomer;
     this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
+
     if (this.selectedCustomerType) {
-      console.log(
-        'Selected Customer Type:',
-        this.selectedCustomerType.CUST_TYPE
-      );
-      console.log('Selected Customer :', this.selectedCustomerType);
-      // optional — store it if you need it later
       this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
     }
+
     this.getInvoiceListForGrid();
   }
 
@@ -482,23 +527,26 @@ export class EditInvoiceComponent {
 
     const company = this.companyState?.trim().toLowerCase();
     const customer = this.selectedCustomer?.STATE_NAME?.trim().toLowerCase();
-    const sessionGst = parseFloat(this.GST) || 0;
-    const half = sessionGst / 2;
 
     selectedRows.forEach((row: any) => {
       if (existingIds.includes(row.DN_DETAIL_ID)) return;
 
+      // ✅ GST MUST COME FROM ROW (NOT SESSION)
+      const rowGst = Number(row.GST_PERC || row.GST || 0);
+      const half = rowGst / 2;
+
       const newRow = {
         ...row,
-        HSN_CODE: this.HSNCODE,
 
-        // 🔥 RESET GST values (important)
+        // ✅ HSN FROM ROW
+        HSN_CODE: row.HSN_CODE,
+
+        // reset
         GST: 0,
         CGST: 0,
         SGST: 0,
       };
 
-      // ✅ APPLY GST LOGIC HERE
       if (company === customer) {
         // SAME STATE → CGST + SGST
         newRow.CGST = half;
@@ -506,7 +554,7 @@ export class EditInvoiceComponent {
         newRow.GST = 0;
       } else {
         // DIFFERENT STATE → IGST
-        newRow.GST = sessionGst;
+        newRow.GST = rowGst;
         newRow.CGST = 0;
         newRow.SGST = 0;
       }
@@ -516,7 +564,6 @@ export class EditInvoiceComponent {
 
     this.isTrOutPopupVisible = false;
 
-    // Refresh grid & recalc summaries
     this.itemsGridRef?.instance.refresh();
     this.logGridSummaries();
   }

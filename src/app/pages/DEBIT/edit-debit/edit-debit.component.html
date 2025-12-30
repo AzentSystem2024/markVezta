@@ -177,6 +177,11 @@
             ></dxi-validation-rule>
           </dxi-column>
           <dxi-column
+            dataField="HSN_CODE"
+            caption="HSN Code"
+            dataType="string"
+          ></dxi-column>
+          <dxi-column
             dataField="Amount"
             caption="Amount"
             dataType="number"
@@ -196,19 +201,6 @@
             [visible]="showGST"
           >
           </dxi-column>
-          <dxi-column
-            dataField="gstAmount"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? 'VAT Amount'
-                : ' GST Amount'
-            "
-            dataType="number"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-            [calculateCellValue]="calculateTaxAmount"
-            [allowEditing]="true"
-          >
-          </dxi-column>
 
           <dxi-column
             dataField="CGST"
@@ -225,12 +217,19 @@
             [visible]="showSGST"
             [allowEditing]="false"
           ></dxi-column>
-
           <dxi-column
-            dataField="HSN_CODE"
-            caption="HSN Code"
-            dataType="string"
-          ></dxi-column>
+            dataField="gstAmount"
+            [caption]="
+              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+                ? 'VAT Amount'
+                : ' GST Amount'
+            "
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+            [calculateCellValue]="calculateTaxAmount"
+            [allowEditing]="true"
+          >
+          </dxi-column>
 
           <dxi-column
             dataField="Total"

@@ -203,40 +203,14 @@ export class EditDebitComponent {
       // COMPANY STATE (already from session)
       const companyState = this.companyState?.trim().toLowerCase();
 
-      const sessionGST = parseFloat(this.GST) || 0;
-
-      console.log('Company:', companyState);
-      console.log('Customer:', customerState);
-
-      // -----------------------------
-      // STEP 2: APPLY GST / CGST+SGST
-      // -----------------------------
       if (companyState === customerState) {
-        console.log('Same State → Apply CGST + SGST');
-
         this.showCGST = true;
         this.showSGST = true;
         this.showGST = false;
-
-        const half = sessionGST / 2;
-
-        data.NOTE_DETAIL?.forEach((row: any) => {
-          row.CGST = half;
-          row.SGST = half;
-          row.GST = 0;
-        });
       } else {
-        console.log('Different State → Apply GST only');
-
         this.showGST = true;
         this.showCGST = false;
         this.showSGST = false;
-
-        data.NOTE_DETAIL?.forEach((row: any) => {
-          row.GST = sessionGST;
-          row.CGST = 0;
-          row.SGST = 0;
-        });
       }
 
       // -----------------------------
@@ -256,7 +230,10 @@ export class EditDebitComponent {
               particulars: item.REMARKS || '',
               Amount: item.AMOUNT || '',
               gstAmount: item.GST_AMOUNT || '',
-              HSN_CODE: this.HSNCODE,
+              HSN_CODE: item.HSN_CODE || this.HSNCODE,
+              GST_PERC: item.GST_PERC || 0,
+              CGST: item.CGST || 0,
+              SGST: item.SGST || 0,
             };
           }
         );
@@ -302,44 +279,35 @@ export class EditDebitComponent {
       HSN_CODE: '',
       CGST: 0,
       SGST: 0,
-      GST: 0,
+      GST_PERC: 0,
     };
 
-    // ---------- GST / CGST+SGST LOGIC ----------
-    const selectedSupplier = this.distributorList?.find(
-      (supplier: any) => supplier.ID === this.selectedSupplierId
-    );
-    console.log('selectedSupplier', selectedSupplier);
+    // ---------- GST / CGST+SGST FROM SAVED DATA ----------
+    const baseRow = this.noteDetails[0]; // 🔑 source of truth
 
-    const company = this.companyState?.trim().toLowerCase();
-    const supplier = selectedSupplier?.STATE_NAME?.trim().toLowerCase();
-    const sessionGst = parseFloat(this.GST) || 0;
-    console.log('company:', company, 'supplier:', supplier, 'gst:', sessionGst);
-
-    if (company && supplier) {
-      if (company === supplier) {
-        console.log('Both states SAME → CGST + SGST apply');
-
+    if (baseRow) {
+      if ((baseRow.CGST || 0) > 0 || (baseRow.SGST || 0) > 0) {
+        // ✅ SAME STATE → CGST + SGST
         this.showCGST = true;
         this.showSGST = true;
         this.showGST = false;
 
-        const half = sessionGst / 2;
-
-        newRow.CGST = half;
-        newRow.SGST = half;
-        newRow.GST = 0;
+        newRow.CGST = baseRow.CGST || 0;
+        newRow.SGST = baseRow.SGST || 0;
+        newRow.GST_PERC = 0;
       } else {
-        console.log('States DIFFERENT → GST applies');
-
+        // ✅ DIFFERENT STATE → IGST
         this.showGST = true;
         this.showCGST = false;
         this.showSGST = false;
 
-        newRow.GST = sessionGst;
+        newRow.GST_PERC = baseRow.GST_PERC || 0;
         newRow.CGST = 0;
         newRow.SGST = 0;
       }
+
+      // ✅ Copy HSN from saved data
+      newRow.HSN_CODE = baseRow.HSN_CODE || '';
     }
 
     // ---------- PUSH ROW & FOCUS ----------
@@ -729,14 +697,16 @@ export class EditDebitComponent {
           const sessionData = JSON.parse(
             sessionStorage.getItem('savedUserData')
           );
-          const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
-          const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+          // DO NOT TOUCH GST HERE
+          // GST already exists from saved data
 
-          // 3️⃣ Set HSN_CODE
-          e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
-
-          // 4️⃣ Set GST_PERC
-          e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+          if (!e.row.data.HSN_CODE) {
+            e.component.cellValue(
+              rowIndex,
+              'HSN_CODE',
+              this.noteDetails[0]?.HSN_CODE || this.HSNCODE
+            );
+          }
 
           // 5️⃣ Move to next field
           setTimeout(() => {
@@ -911,39 +881,37 @@ export class EditDebitComponent {
     //     }
     //   };
     // }
-     if (e.dataField === 'GST_PERC') {
+    if (e.dataField === 'GST_PERC') {
+      const originalOnValueChanged = e.editorOptions.onValueChanged;
 
-  const originalOnValueChanged = e.editorOptions.onValueChanged;
+      e.editorOptions.onValueChanged = (args: any) => {
+        // keep existing behavior
+        if (originalOnValueChanged) {
+          originalOnValueChanged(args);
+        }
 
-  e.editorOptions.onValueChanged = (args: any) => {
-    // keep existing behavior
-    if (originalOnValueChanged) {
-      originalOnValueChanged(args);
+        e.setValue(args.value);
+
+        // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
+        e.row.data.CGST = 0;
+        e.row.data.SGST = 0;
+      };
     }
 
-    e.setValue(args.value);
+    if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+      const originalOnValueChanged = e.editorOptions.onValueChanged;
 
-    // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
-    e.row.data.CGST = 0;
-    e.row.data.SGST = 0;
-  };
-}
+      e.editorOptions.onValueChanged = (args: any) => {
+        if (originalOnValueChanged) {
+          originalOnValueChanged(args);
+        }
 
-if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+        e.setValue(args.value);
 
-  const originalOnValueChanged = e.editorOptions.onValueChanged;
-
-  e.editorOptions.onValueChanged = (args: any) => {
-    if (originalOnValueChanged) {
-      originalOnValueChanged(args);
+        // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
+        e.row.data.GST_PERC = 0;
+      };
     }
-
-    e.setValue(args.value);
-
-    // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
-    e.row.data.GST_PERC = 0;
-  };
-}
   }
 
   onNarrationKeyDown(e: any): void {
@@ -1108,15 +1076,14 @@ if (e.dataField === 'CGST' || e.dataField === 'SGST') {
           };
 
           // ✅ FINAL TAX CLEANUP (APPROVAL)
-payload.NOTE_DETAIL.forEach((row: any) => {
-  if (row.CGST > 0 || row.SGST > 0) {
-    row.GST_PERC = 0;
-  } else if (row.GST_PERC > 0) {
-    row.CGST = 0;
-    row.SGST = 0;
-  }
-});
-
+          payload.NOTE_DETAIL.forEach((row: any) => {
+            if (row.CGST > 0 || row.SGST > 0) {
+              row.GST_PERC = 0;
+            } else if (row.GST_PERC > 0) {
+              row.CGST = 0;
+              row.SGST = 0;
+            }
+          });
 
           this.dataService.commitDebitNote(payload).subscribe(
             (response: any) => {
@@ -1192,15 +1159,14 @@ payload.NOTE_DETAIL.forEach((row: any) => {
       console.log('Update Payload:', payload);
 
       // ✅ FINAL TAX CLEANUP (UPDATE)
-payload.NOTE_DETAIL.forEach((row: any) => {
-  if (row.CGST > 0 || row.SGST > 0) {
-    row.GST_PERC = 0;
-  } else if (row.GST_PERC > 0) {
-    row.CGST = 0;
-    row.SGST = 0;
-  }
-});
-
+      payload.NOTE_DETAIL.forEach((row: any) => {
+        if (row.CGST > 0 || row.SGST > 0) {
+          row.GST_PERC = 0;
+        } else if (row.GST_PERC > 0) {
+          row.CGST = 0;
+          row.SGST = 0;
+        }
+      });
 
       this.dataService.updateDebitNote(payload).subscribe((response) => {
         if (response) {

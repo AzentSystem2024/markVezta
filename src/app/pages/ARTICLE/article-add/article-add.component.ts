@@ -112,6 +112,8 @@ export class ArticleAddComponent {
     SUPPLIER_ID: 0,
     CREATED_DATE: new Date(),
     STANDARD_PACKING: '',
+    GST_PERC: 0,
+    HSN_CODE: '',
   };
 
   articleList: any;
@@ -490,6 +492,8 @@ export class ArticleAddComponent {
   }
 
   getDropdownLists() {
+    console.log('Company ID before dropdown:', this.selected_Company_id);
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'PRODUCTION_UNITS',

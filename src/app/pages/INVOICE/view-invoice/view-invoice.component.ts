@@ -126,7 +126,7 @@ export class ViewInvoiceComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
-      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      // this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
       console.log(this.HSNCODE, 'HSNCODE===================');
     }
@@ -232,7 +232,7 @@ export class ViewInvoiceComponent {
             GST: igst > 0 ? igst : 0, // IGST → GST column
             CGST: igst > 0 ? 0 : cgst, // Same-state
             SGST: igst > 0 ? 0 : sgst, // Same-state
-            HSN_CODE: this.HSNCODE, // keep your HSN logic
+            HSN_CODE: row.HSN_CODE, // keep your HSN logic
           };
         }
       );
@@ -246,7 +246,7 @@ export class ViewInvoiceComponent {
       this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
         return {
           ...row,
-          HSN_CODE: this.HSNCODE,
+          HSN_CODE: row.HSN_CODE,
         };
       });
 

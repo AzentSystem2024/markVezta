@@ -155,6 +155,8 @@ export class AddCreditNoteComponent {
   HSNCODE: any;
   GST: any;
   netTotal: number;
+  selectedInvoiceGst: number;
+  selectedInvoiceHsn: any;
   constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   ngOnInit() {
@@ -267,6 +269,7 @@ export class AddCreditNoteComponent {
       Amount: '',
       gstAmount: '',
       HEAD_ID: null,
+      HSN_CODE: this.selectedInvoiceHsn || '',
     };
     this.applyGstForRow(newRow);
     // Force change detection
@@ -328,18 +331,20 @@ export class AddCreditNoteComponent {
   }
 
   applyGstForRow(row: any) {
-    const sessionGst = parseFloat(this.GST) || 0;
+    const gstPerc = Number(this.selectedInvoiceGst) || 0;
 
-    // Same State → CGST + SGST
+    // SAME STATE → CGST + SGST
     if (this.companyStateID === this.selectedCustomer?.STATE_ID) {
-      const half = sessionGst / 2;
+      const half = gstPerc / 2;
 
       row.CGST = half;
       row.SGST = half;
       row.GST = 0;
+      row.GST_PERC = 0; // IGST not used
     } else {
-      // Different State → IGST (GST only)
-      row.GST = sessionGst;
+      // DIFFERENT STATE → IGST
+      row.GST = gstPerc;
+      row.GST_PERC = gstPerc;
       row.CGST = 0;
       row.SGST = 0;
     }
@@ -616,29 +621,66 @@ export class AddCreditNoteComponent {
     console.log(rowIndex);
 
     // ➤ ledgerCode: open dropdown on Enter, move to ledgerName on second Enter
+    // if (e.dataField === 'ledgerCode') {
+    //   let enterPressedOnce = false;
+
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     if (event.event.key === 'Enter') {
+    //       event.event.preventDefault();
+
+    //       if (!enterPressedOnce) {
+    //         enterPressedOnce = true;
+    //         setTimeout(() => {
+    //           if (event.component?.open) {
+    //             event.component.open(); // open dropdown
+    //           }
+    //         }, 50);
+    //       } else {
+    //         enterPressedOnce = false;
+    //         setTimeout(() => {
+    //           this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+    //         }, 50);
+    //       }
+    //     }
+    //   };
+
+    //   e.editorOptions.onValueChanged = (args: any) => {
+    //     const selectedLedger = this.ledgerList.find(
+    //       (item: any) => item.HEAD_CODE === args.value
+    //     );
+
+    //     e.setValue(args.value);
+
+    //     if (selectedLedger) {
+    //       // 1️⃣ Set ledger name
+    //       e.component.cellValue(
+    //         rowIndex,
+    //         'ledgerName',
+    //         selectedLedger.HEAD_NAME
+    //       );
+
+    //       // 2️⃣ Get HSN & GST from session
+    //       const sessionData = JSON.parse(
+    //         sessionStorage.getItem('savedUserData')
+    //       );
+    //       const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
+    //       const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+
+    //       // 3️⃣ Set HSN_CODE
+    //       e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+
+    //       // 4️⃣ Set GST_PERC
+    //       e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+
+    //       // 5️⃣ Move to next field
+    //       setTimeout(() => {
+    //         this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+    //       }, 50);
+    //     }
+    //   };
+    // }
+
     if (e.dataField === 'ledgerCode') {
-      let enterPressedOnce = false;
-
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          event.event.preventDefault();
-
-          if (!enterPressedOnce) {
-            enterPressedOnce = true;
-            setTimeout(() => {
-              if (event.component?.open) {
-                event.component.open(); // open dropdown
-              }
-            }, 50);
-          } else {
-            enterPressedOnce = false;
-            setTimeout(() => {
-              this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-            }, 50);
-          }
-        }
-      };
-
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_CODE === args.value
@@ -654,20 +696,13 @@ export class AddCreditNoteComponent {
             selectedLedger.HEAD_NAME
           );
 
-          // 2️⃣ Get HSN & GST from session
-          const sessionData = JSON.parse(
-            sessionStorage.getItem('savedUserData')
-          );
-          const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
-          const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
+          // 2️⃣ Set HSN FROM SELECTED INVOICE
+          e.component.cellValue(rowIndex, 'HSN_CODE', this.selectedInvoiceHsn);
 
-          // 3️⃣ Set HSN_CODE
-          e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
+          // 3️⃣ Apply GST FROM SELECTED INVOICE
+          this.applyGstForRow(e.row.data);
 
-          // 4️⃣ Set GST_PERC
-          e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
-
-          // 5️⃣ Move to next field
+          // 4️⃣ Move focus
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
           }, 50);
@@ -848,10 +883,15 @@ export class AddCreditNoteComponent {
   // }
 
   getCustomerOrUnitLst() {
-    this.dataService.getCustomerWithState().subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(this.distributorList, 'DISTLISTPOPUP');
-    });
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService
+      .getCustomerWithState(payload)
+      .subscribe((response: any) => {
+        this.distributorList = response;
+        // this.cdr.detectChanges();
+      });
   }
 
   openInvoicePopup() {
@@ -874,14 +914,39 @@ export class AddCreditNoteComponent {
       });
   }
 
+  // selectInvoice(e: any) {
+  //   console.log('Invoice selected:', e);
+  //   const selected = e.data;
+  //   this.creditFormData.INVOICE_NO = selected.INVOICE_NO;
+  //   this.creditFormData.DUE_AMOUNT = selected.BALANCE_AMOUNT;
+  //   this.creditFormData.INVOICE_ID = selected.INVOICE_ID;
+  //   console.log(this.creditFormData.INVOICE_ID, 'INVOICEIDDDDDDDDDDDDDDDD');
+  //   this.invoicePopupVisible = false;
+  // }
+
   selectInvoice(e: any) {
-    console.log('Invoice selected:', e);
     const selected = e.data;
+
     this.creditFormData.INVOICE_NO = selected.INVOICE_NO;
     this.creditFormData.DUE_AMOUNT = selected.BALANCE_AMOUNT;
     this.creditFormData.INVOICE_ID = selected.INVOICE_ID;
-    console.log(this.creditFormData.INVOICE_ID, 'INVOICEIDDDDDDDDDDDDDDDD');
+
+    // ✅ STORE GST & HSN FROM INVOICE
+    this.selectedInvoiceGst = Number(selected.GST_PERC) || 0;
+    this.selectedInvoiceHsn = selected.HSN_CODE || '';
+
+    // ✅ APPLY TO ALL EXISTING ROWS
+    this.creditFormData.NOTE_DETAIL?.forEach((row: any) => {
+      row.HSN_CODE = this.selectedInvoiceHsn;
+      this.applyGstForRow(row);
+    });
+
     this.invoicePopupVisible = false;
+
+    // refresh grid
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.refresh();
+    }, 0);
   }
 
   getDocNo() {

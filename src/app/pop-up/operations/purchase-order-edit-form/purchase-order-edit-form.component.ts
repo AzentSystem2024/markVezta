@@ -343,19 +343,34 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       }, 0);
       // 🔄 UPDATE GST FOR ALL EXISTING ROWS
       this.savedItems.forEach((item) => {
+        const itemGst = Number(item.GST_PERC || item.VAT_PERC || 0);
+        const halfGst = +(itemGst / 2).toFixed(2);
+
         if (this.isInterState) {
-          // IGST
-          item.VAT_PERC = this.GST_PERC;
+          item.VAT_PERC = itemGst;
           item.CGST = 0;
           item.SGST = 0;
         } else {
-          // CGST + SGST
-          const halfGst = this.GST_PERC / 2;
           item.VAT_PERC = 0;
           item.CGST = halfGst;
           item.SGST = halfGst;
         }
       });
+
+      // this.savedItems.forEach((item) => {
+      //   if (this.isInterState) {
+      //     // IGST
+      //     item.VAT_PERC = this.GST_PERC;
+      //     item.CGST = 0;
+      //     item.SGST = 0;
+      //   } else {
+      //     // CGST + SGST
+      //     const halfGst = this.GST_PERC / 2;
+      //     item.VAT_PERC = 0;
+      //     item.CGST = halfGst;
+      //     item.SGST = halfGst;
+      //   }
+      // });
 
       //  FORCE RECALCULATION
       this.savedItems.forEach((item) =>
@@ -414,8 +429,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   onSelectionChanged(e) {
     this.selectedItems = e.selectedRowsData.map((item) => ({
       ...item,
-      HSN_CODE: this.HSN_CODE, // <-- Inject from session
-      GST_PERC: this.GST_PERC, // <-- Inject from session
+      HSN_CODE: item.HSN_CODE, // from item
+      GST_PERC: item.GST_PERC || item.VAT_PERC || 0, // from item
     }));
   }
 
@@ -436,6 +451,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         ? (supplierPrice / this.currencyExchangeRate).toFixed(2)
         : item.PURCH_PRICE;
 
+      const itemGst = Number(item.GST_PERC || item.VAT_PERC || 0);
+      const halfGst = +(itemGst / 2).toFixed(2);
       // Parse numeric fields and fallback to 0 if undefined or NaN
       const taxable = parseFloat(item.taxable) || 0;
       const vatAmount = parseFloat(item.vatAmount) || 0;
@@ -449,11 +466,17 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         PURCH_PRICE: parseFloat(purchPrice), // Ensure consistent numeric value
 
         // Bind session data
-        HSN_CODE: this.HSN_CODE,
-        GST_PERC: this.GST_PERC,
-        VAT_PERC: this.isInterState ? this.GST_PERC : 0,
-        CGST: this.isInterState ? 0 : this.GST_PERC / 2,
-        SGST: this.isInterState ? 0 : this.GST_PERC / 2,
+        // HSN_CODE: this.HSN_CODE,
+
+        HSN_CODE: item.HSN_CODE,
+        // GST_PERC: this.GST_PERC,
+        GST_PERC: itemGst,
+        VAT_PERC: this.isInterState ? itemGst : 0,
+        CGST: this.isInterState ? 0 : halfGst,
+        SGST: this.isInterState ? 0 : halfGst,
+        // VAT_PERC: this.isInterState ? this.GST_PERC : 0,
+        // CGST: this.isInterState ? 0 : this.GST_PERC / 2,
+        // SGST: this.isInterState ? 0 : this.GST_PERC / 2,
         supplierAmount,
         taxable,
         vatAmount,
@@ -688,26 +711,25 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         );
 
         // Calculate VAT Amount if VAT percentage is provided
-        if (updatedRow.VAT_PERC && updatedRow.VAT_PERC > 0) {
-          // IGST
-          item.vatAmount = parseFloat(
-            (item.taxable * (updatedRow.VAT_PERC / 100)).toFixed(2)
-          );
+        const itemGst = Number(item.GST_PERC || 0);
+        let totalTaxPerc = 0;
 
+        if (this.isInterState) {
+          item.VAT_PERC = itemGst;
           item.CGST = 0;
           item.SGST = 0;
+          totalTaxPerc = itemGst;
         } else {
-          // CGST + SGST
-          const cgst = updatedRow.CGST || item.CGST || 0;
-          const sgst = updatedRow.SGST || item.SGST || 0;
-
-          item.CGST = cgst;
-          item.SGST = sgst;
-
-          item.vatAmount = parseFloat(
-            (item.taxable * ((cgst + sgst) / 100)).toFixed(2)
-          );
+          const halfGst = +(itemGst / 2).toFixed(2);
+          item.VAT_PERC = 0;
+          item.CGST = halfGst;
+          item.SGST = halfGst;
+          totalTaxPerc = halfGst * 2;
         }
+
+        item.vatAmount = parseFloat(
+          (item.taxable * (totalTaxPerc / 100)).toFixed(2)
+        );
 
         console.log(item.taxable, item.vatAmount, 'TAXABLE,VATAMOUNT');
         // Calculate Total as Taxable Amount + VAT Amount

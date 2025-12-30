@@ -166,51 +166,6 @@ export class PurchaseReturnDebitFormComponent {
     private ngZone: NgZone
   ) {}
 
-  // ngOnInit() {
-  //   const userDataString = localStorage.getItem('userData');
-  //   if (userDataString) {
-  //     const userData = JSON.parse(userDataString);
-  //     const selectedCompany = userData?.SELECTED_COMPANY;
-  //     this.selectedCompanyId = selectedCompany.COMPANY_ID; // ⭐ IMPORTANT
-
-  //     this.purchaseReturnFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
-  //     this.companyList = [selectedCompany];
-
-  //     this.companyStateId = selectedCompany.STATE_ID;
-  //     this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-  //     this.GST = userData.GeneralSettings.GST_PERC;
-  //     console.log(this.HSNCODE, this.GST, 'HSNCODEANDGST');
-  //     if (this.selectedCompany?.COMPANY_ID) {
-  //       this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
-
-  //       console.log(this.companyState, 'COMPANYSTATE');
-  //       this.companyList = [this.selectedCompany]; //  Show only selected company
-  //     }
-
-  //     if (selectedCompany?.COMPANY_ID) {
-  //       this.purchaseReturnFormData.ACOMPANY_ID = selectedCompany.COMPANY_ID;
-  //       this.companyList = [selectedCompany]; //  Show only selected company
-  //     }
-  //     console.log(
-  //       this.purchaseReturnFormData.COMPANY_ID,
-  //       'COMPANYIDDDDDDDDDDDDDDDDDDD'
-  //     );
-  //     if (userData.USER_ID) {
-  //       this.purchaseReturnFormData.USER_ID = userData.USER_ID;
-  //     }
-
-  //     const firstFinYear = userData.FINANCIAL_YEARS?.[0];
-  //     if (firstFinYear?.FIN_ID) {
-  //       this.purchaseReturnFormData.FIN_ID = firstFinYear.FIN_ID;
-  //     }
-  //   }
-  //   console.log(this.EditingResponseData, 'EDITINGRESPONSEDATA');
-  //   this.sessionData_tax();
-  //   this.getSupplierLstWithState();
-  //   // this.isEditDataAvailable();
-  //   // this.getSupplierDropdown();
-  // }
-
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
     if (!userDataString) return;
@@ -227,7 +182,7 @@ export class PurchaseReturnDebitFormComponent {
     this.companyList = [selectedCompany];
 
     this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-    this.GST = userData.GeneralSettings.GST_PERC;
+    // this.GST = userData.GeneralSettings.GST_PERC;
 
     if (userData.USER_ID) {
       this.purchaseReturnFormData.USER_ID = userData.USER_ID;
@@ -287,10 +242,11 @@ export class PurchaseReturnDebitFormComponent {
       UOM_PURCH: item.UOM_PURCH,
       UOM_MULTIPLE: item.UOM_MULTIPLE,
       BARCODE: item.BAR_CODE,
-      HSN_CODE: this.HSNCODE,
-      CGST: item.CGST ?? 0,
-      SGST: item.SGST ?? 0,
-      GST: item.VAT_PERC ?? 0,
+      HSN_CODE: item.HSN_CODE,
+      CGST: this.sameState ? item.CGST ?? 0 : 0,
+      SGST: this.sameState ? item.SGST ?? 0 : 0,
+
+      VAT_PERC: this.sameState ? 0 : item.VAT_PERC ?? 0,
       DOC_NO: item.DOC_NO,
     }));
 
@@ -351,15 +307,15 @@ export class PurchaseReturnDebitFormComponent {
       this.purchaseReturnFormData.SUPPPLIER_NAME = selectedSupplier.DESCRIPTION;
       this.sameState = this.selectedSupplierStateId === this.companyStateId;
       // 👇 TAX IS CALCULATED HERE
-      if (this.sameState) {
-        this.CGST = this.GST / 2;
-        this.SGST = this.GST / 2;
-        this.IGST = 0;
-      } else {
-        this.CGST = 0;
-        this.SGST = 0;
-        this.IGST = this.GST;
-      }
+      // if (this.sameState) {
+      //   this.CGST = this.GST / 2;
+      //   this.SGST = this.GST / 2;
+      //   this.IGST = 0;
+      // } else {
+      //   this.CGST = 0;
+      //   this.SGST = 0;
+      //   this.IGST = this.GST;
+      // }
       this.showCGST = this.sameState;
       this.showSGST = this.sameState;
       this.showGST = !this.sameState;
@@ -406,7 +362,25 @@ export class PurchaseReturnDebitFormComponent {
         );
 
         if (!exists) {
-          console.log(this.CGST, 'CGST');
+          const gstPerc = Number(row.VAT_PERC) || 0;
+
+          let cgst = 0;
+          let sgst = 0;
+          let igst = 0;
+
+          // ✅ SAME STATE → Split GST
+          if (this.sameState) {
+            cgst = gstPerc / 2;
+            sgst = gstPerc / 2;
+            igst = 0;
+          }
+          // ✅ DIFFERENT STATE → IGST
+          else {
+            cgst = 0;
+            sgst = 0;
+            igst = gstPerc;
+          }
+
           this.mainGridData.push({
             DETAIL_ID: row.DETAIL_ID,
             ITEM_ID: row.ITEM_ID,
@@ -418,38 +392,89 @@ export class PurchaseReturnDebitFormComponent {
             RATE: row.RATE,
             QUANTITY: 0,
             AMOUNT: row.AMOUNT,
-            // VAT_PERC: row.VAT_PERC,
-            // VAT_AMOUNT: row.TAX_AMOUNT,
             TOTAL_AMOUNT: 0,
             UOM: row.UOM,
             UOM_PURCH: row.UOM_PURCH,
             UOM_MULTIPLE: row.UOM_MULTIPLE,
             BARCODE: row.BARCODE,
-            HSN_CODE: this.HSNCODE,
-            VAT_PERC: this.GST,
-            CGST: this.CGST,
-            SGST: this.SGST,
-            VAT_AMOUNT: row.TAX_AMOUNT,
+            HSN_CODE: row.HSN_CODE,
+
+            // ⭐ GST FROM PENDING LIST
+            VAT_PERC: igst, // IGST only
+            CGST: cgst,
+            SGST: sgst,
+            VAT_AMOUNT: 0,
           });
         }
       });
 
-      //  Force grid to detect changes
       this.mainGridData = [...this.mainGridData];
-
-      // Refresh both grids
       this.itemsGridRef.instance.refresh();
       this.popupGridRef.instance.clearSelection();
     }
 
-    // Close popup
     this.isTrOutPopupVisible = false;
 
-    // Focus the Qty cell
     setTimeout(() => {
       this.itemsGridRef.instance.editCell(0, 'QUANTITY');
     }, 200);
   }
+
+  // onTransferSelectClick() {
+  //   const selectedRows =
+  //     this.popupGridRef?.instance.getSelectedRowsData() || [];
+
+  //   if (selectedRows.length > 0) {
+  //     selectedRows.forEach((row) => {
+  //       const exists = this.mainGridData.some(
+  //         (item) => item.DETAIL_ID === row.DETAIL_ID
+  //       );
+
+  //       if (!exists) {
+  //         console.log(this.CGST, 'CGST');
+  //         this.mainGridData.push({
+  //           DETAIL_ID: row.DETAIL_ID,
+  //           ITEM_ID: row.ITEM_ID,
+  //           GRN_DET_ID: row.GRN_DET_ID,
+  //           TRANSFER_NO: row.DOC_NO,
+  //           TRANSFER_DATE: row.PURCH_DATE,
+  //           ITEM_NAME: row.ITEM_NAME,
+  //           PENDING_QTY: row.PENDING_QTY,
+  //           RATE: row.RATE,
+  //           QUANTITY: 0,
+  //           AMOUNT: row.AMOUNT,
+  //           // VAT_PERC: row.VAT_PERC,
+  //           // VAT_AMOUNT: row.TAX_AMOUNT,
+  //           TOTAL_AMOUNT: 0,
+  //           UOM: row.UOM,
+  //           UOM_PURCH: row.UOM_PURCH,
+  //           UOM_MULTIPLE: row.UOM_MULTIPLE,
+  //           BARCODE: row.BARCODE,
+  //           HSN_CODE: this.HSNCODE,
+  //           VAT_PERC: this.GST,
+  //           CGST: this.CGST,
+  //           SGST: this.SGST,
+  //           VAT_AMOUNT: row.TAX_AMOUNT,
+  //         });
+  //       }
+  //     });
+
+  //     //  Force grid to detect changes
+  //     this.mainGridData = [...this.mainGridData];
+
+  //     // Refresh both grids
+  //     this.itemsGridRef.instance.refresh();
+  //     this.popupGridRef.instance.clearSelection();
+  //   }
+
+  //   // Close popup
+  //   this.isTrOutPopupVisible = false;
+
+  //   // Focus the Qty cell
+  //   setTimeout(() => {
+  //     this.itemsGridRef.instance.editCell(0, 'QUANTITY');
+  //   }, 200);
+  // }
 
   onContentReady(e: any): void {
     this.logGridSummaries();
@@ -528,7 +553,10 @@ export class PurchaseReturnDebitFormComponent {
 
   calculateAmount = (rowData: any) => {
     const qty = Number(rowData.QUANTITY) || 0;
-    const rate = Number(rowData.RATE) || 0;
+    const totalRate = Number(rowData.RATE) || 0;
+    const pendingQty = Number(rowData.PENDING_QTY) || 0;
+    // const rate = Number(rowData.RATE) || 0;
+    const rate = pendingQty > 0 ? totalRate / pendingQty : 0;
 
     const amount = qty * rate;
 
@@ -537,16 +565,6 @@ export class PurchaseReturnDebitFormComponent {
 
     return amount;
   };
-
-  // calculateVATAmount = (rowData) => {
-  //   const amount = Number(rowData.AMOUNT) || 0;
-  //   const vatPerc = Number(rowData.VAT_PERC) || 0;
-
-  //   const vatAmount = (amount * vatPerc) / 100;
-  //   rowData.VAT_AMOUNT = vatAmount;
-
-  //   return vatAmount;
-  // };
 
   calculateVATAmount = (rowData: any) => {
     if (!rowData) return 0;

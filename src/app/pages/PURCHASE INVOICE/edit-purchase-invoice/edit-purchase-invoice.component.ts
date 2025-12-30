@@ -174,32 +174,12 @@ export class EditPurchaseInvoiceComponent {
         this.showCGST = true;
         this.showSGST = true;
         this.showGST = false;
-
-        const half = gstPerc / 2;
-
-        this.mainGridData = this.mainGridData.map((row: any) => ({
-          ...row,
-          HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
-          CGST: row.CGST ?? half,
-          SGST: row.SGST ?? half,
-          GST: 0, // GST disabled for same state
-          VAT_PERC: half + half, // total GST
-        }));
       } else {
         console.log('Different state → Apply GST only');
 
         this.showCGST = false;
         this.showSGST = false;
         this.showGST = true;
-
-        this.mainGridData = this.mainGridData.map((row: any) => ({
-          ...row,
-          HSN_CODE: row.HSN_CODE ?? this.HSNCODE,
-          GST: row.GST ?? gstPerc, // Full GST %
-          CGST: 0,
-          SGST: 0,
-          VAT_PERC: gstPerc,
-        }));
       }
 
       // ---------------------------------------------------------
@@ -442,58 +422,117 @@ export class EditPurchaseInvoiceComponent {
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
 
-    if (selectedRows && selectedRows.length > 0) {
-      selectedRows.forEach((row) => {
-        const exists = this.mainGridData.some(
-          (item) => item.GRN_DET_ID === row.GRN_DET_ID
-        );
+    selectedRows.forEach((row) => {
+      const exists = this.mainGridData.some(
+        (item) => item.GRN_DET_ID === row.GRN_DET_ID
+      );
+      if (exists) return;
 
-        if (!exists) {
-          const newRow: any = {
-            GRN_ID: row.GRN_ID,
-            ITEM_ID: row.ITEM_ID,
-            PO_DET_ID: row.PO_DET_ID,
-            COST: row.COST,
-            GRN_DET_ID: row.GRN_DET_ID,
-            UOM: row.UOM,
-            GRN_NO: row.GRN_NO,
-            GRN_DATE: row.GRN_DATE ? new Date(row.GRN_DATE) : null,
-            ITEM_NAME: row.ITEM_NAME,
-            PENDING_QTY: row.PENDING_QTY,
-            QUANTITY: 0,
-            RATE: row.RATE,
-            AMOUNT: 0,
-            TAX_AMOUNT: 0,
-            TOTAL_AMOUNT: 0,
-            HSN_CODE: this.HSNCODE,
-            VAT_PERC: this.GST,
-            CGST: 0,
-            SGST: 0,
-            // GST: 0,
-          };
+      const gstPerc = Number(row.GST_PERC) || 0;
 
-          // ✅ APPLY GST LOGIC HERE (THIS FIXES YOUR ISSUE)
-          this.applyGstLogic(newRow);
+      const companyState = this.companyState?.trim().toLowerCase();
+      const supplierState =
+        this.purchaseInvoiceFormData?.SUPP_STATE_NAME?.trim().toLowerCase();
 
-          this.mainGridData.push(newRow);
-        }
-      });
+      let igst = 0,
+        cgst = 0,
+        sgst = 0;
 
-      // VERY IMPORTANT
-      this.itemsGridRef.instance.refresh(true);
-      this.logGridSummaries();
-    }
-
-    this.isTrOutPopupVisible = false;
-
-    // Auto-focus Qty
-    setTimeout(() => {
-      const lastIndex = this.mainGridData.length - 1;
-      if (lastIndex >= 0) {
-        this.itemsGridRef.instance.editCell(lastIndex, 'QUANTITY');
+      if (companyState === supplierState) {
+        cgst = gstPerc / 2;
+        sgst = gstPerc / 2;
+      } else {
+        igst = gstPerc;
       }
-    }, 100);
+
+      const newRow: any = {
+        GRN_ID: row.GRN_ID,
+        GRN_DET_ID: row.GRN_DET_ID,
+        ITEM_ID: row.ITEM_ID,
+        ITEM_NAME: row.ITEM_NAME,
+        UOM: row.UOM,
+        GRN_NO: row.GRN_NO,
+        GRN_DATE: row.GRN_DATE ? new Date(row.GRN_DATE) : null,
+        RATE: row.RATE,
+        PRICE: row.RATE,
+        PENDING_QTY: row.PENDING_QTY,
+        QUANTITY: 0,
+
+        HSN_CODE: row.HSN_CODE,
+
+        // ✅ GST FROM GRN
+        VAT_PERC: igst,
+        CGST: cgst,
+        SGST: sgst,
+
+        AMOUNT: 0,
+        TAX_AMOUNT: 0,
+        TOTAL_AMOUNT: 0,
+      };
+
+      this.mainGridData.push(newRow);
+    });
+
+    this.itemsGridRef.instance.refresh(true);
+    this.logGridSummaries();
+    this.isTrOutPopupVisible = false;
   }
+
+  // onTransferSelectClick() {
+  //   const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+
+  //   if (selectedRows && selectedRows.length > 0) {
+  //     selectedRows.forEach((row) => {
+  //       const exists = this.mainGridData.some(
+  //         (item) => item.GRN_DET_ID === row.GRN_DET_ID
+  //       );
+
+  //       if (!exists) {
+  //         const newRow: any = {
+  //           GRN_ID: row.GRN_ID,
+  //           ITEM_ID: row.ITEM_ID,
+  //           PO_DET_ID: row.PO_DET_ID,
+  //           COST: row.COST,
+  //           GRN_DET_ID: row.GRN_DET_ID,
+  //           UOM: row.UOM,
+  //           GRN_NO: row.GRN_NO,
+  //           GRN_DATE: row.GRN_DATE ? new Date(row.GRN_DATE) : null,
+  //           ITEM_NAME: row.ITEM_NAME,
+  //           PENDING_QTY: row.PENDING_QTY,
+  //           QUANTITY: 0,
+  //           RATE: row.RATE,
+  //           AMOUNT: 0,
+  //           TAX_AMOUNT: 0,
+  //           TOTAL_AMOUNT: 0,
+  //           HSN_CODE: this.HSNCODE,
+  //           VAT_PERC: this.GST,
+  //           CGST: 0,
+  //           SGST: 0,
+  //           // GST: 0,
+  //         };
+
+  //         // ✅ APPLY GST LOGIC HERE (THIS FIXES YOUR ISSUE)
+  //         this.applyGstLogic(newRow);
+
+  //         this.mainGridData.push(newRow);
+  //       }
+  //     });
+
+  //     // VERY IMPORTANT
+  //     this.itemsGridRef.instance.refresh(true);
+  //     this.logGridSummaries();
+  //   }
+
+  //   this.isTrOutPopupVisible = false;
+
+  //   // Auto-focus Qty
+  //   setTimeout(() => {
+  //     const lastIndex = this.mainGridData.length - 1;
+  //     if (lastIndex >= 0) {
+  //       this.itemsGridRef.instance.editCell(lastIndex, 'QUANTITY');
+  //     }
+  //   }, 100);
+  // }
 
   getPurchNo() {
     this.dataService.getPurchaseNo().subscribe((response: any) => {

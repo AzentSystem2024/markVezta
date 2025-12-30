@@ -298,23 +298,23 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.isInterState = this.companyStateID !== this.supplierStateID;
       this.applyGstModeToItems();
       // ✅ Ensure GST is numeric
-      const gstPerc = Number(this.GST_PERC) || 0;
-      const halfGst = +(gstPerc / 2).toFixed(2);
+      // const gstPerc = Number(this.GST_PERC) || 0;
+      // const halfGst = +(gstPerc / 2).toFixed(2);
 
       // ✅ Apply GST ONLY to relevant fields
-      this.savedItems.forEach((item) => {
-        if (this.isInterState) {
-          // INTER-STATE → IGST
-          item.VAT_PERC = gstPerc;
-          item.CGST = 0;
-          item.SGST = 0;
-        } else {
-          // INTRA-STATE → CGST + SGST
-          item.VAT_PERC = 0;
-          item.CGST = halfGst;
-          item.SGST = halfGst;
-        }
-      });
+      // this.savedItems.forEach((item) => {
+      //   if (this.isInterState) {
+      //     // INTER-STATE → IGST
+      //     item.VAT_PERC = gstPerc;
+      //     item.CGST = 0;
+      //     item.SGST = 0;
+      //   } else {
+      //     // INTRA-STATE → CGST + SGST
+      //     item.VAT_PERC = 0;
+      //     item.CGST = halfGst;
+      //     item.SGST = halfGst;
+      //   }
+      // });
 
       // 🔁 Refresh grid so columns + values update
       setTimeout(() => {
@@ -426,59 +426,43 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   // }
 
   saveSelectedData() {
-    console.log('SAVE CALLINGGGGGGGGGGGGGGG');
-
-    const gstPerc = Number(this.GST_PERC) || 0;
-    const halfGst = +(gstPerc / 2).toFixed(2);
-
     const newItems = this.selectedItems.map((item, index) => {
-      const useSupplierPrice =
-        this.SupplierCurrencyCode !== this.localCurrencyCode;
-
-      const supplierPrice = useSupplierPrice ? item.PURCH_PRICE : 0;
-
-      const purchPrice = useSupplierPrice
-        ? (supplierPrice / this.newPoData.EXCHANGE_PRICE).toFixed(2)
-        : item.PURCH_PRICE;
-
-      const taxable = parseFloat(item.taxable) || 0;
-      const vatAmount = parseFloat(item.vatAmount) || 0;
-      const total = parseFloat(item.total) || 0;
-      const supplierAmount = parseFloat(item.supplierAmount) || 0;
-
+      // ✅ TAKE GST FROM ITEM
+      const itemGst = Number(item.GST_PERC || item.VAT_PERC || 0);
+      const halfGst = +(itemGst / 2).toFixed(2);
+      const suppPrice = Number(item.PURCH_PRICE || 0);
       return {
         ...item,
         slNo: this.savedItems.length + index + 1,
-        SUPP_PRICE: parseFloat(supplierPrice),
-        PURCH_PRICE: parseFloat(purchPrice),
+        SUPP_PRICE: suppPrice,
+        PURCH_PRICE: suppPrice,
+        HSN_CODE: item.HSN_CODE || item.HSNCODE || item.HSN || '',
 
-        // 🔑 EXISTING
-        HSN_CODE: this.HSN_CODE,
-        GST_PERC: gstPerc,
+        // ✅ STORE ORIGINAL GST
+        GST_PERC: itemGst,
 
-        // ✅ ADD GST DISTRIBUTION (SAFE)
-        VAT_PERC: this.isInterState ? gstPerc : 0,
+        // ✅ DISTRIBUTE BASED ON STATE
+        VAT_PERC: this.isInterState ? itemGst : 0,
         CGST: this.isInterState ? 0 : halfGst,
         SGST: this.isInterState ? 0 : halfGst,
 
-        supplierAmount,
-        taxable,
-        vatAmount,
-        total,
+        qtyOrdered: 0,
+        discountPercentage: 0,
+        Amount: 0,
+        taxable: 0,
+        vatAmount: 0,
+        total: 0,
       };
     });
 
-    const filteredNewItems = newItems.filter((newItem) => {
-      return !this.savedItems.some(
-        (savedItem) => savedItem.ITEM_ID === newItem.ITEM_ID
-      );
-    });
+    this.savedItems = [
+      ...this.savedItems,
+      ...newItems.filter(
+        (n) => !this.savedItems.some((s) => s.ITEM_ID === n.ITEM_ID)
+      ),
+    ];
 
-    this.savedItems = [...this.savedItems, ...filteredNewItems];
-
-    console.log(this.savedItems, 'savedItems');
-
-    this.selectedTabIndex = 1;
+    this.itemsGridRef?.instance?.refresh();
     this.showAddItemPopup = false;
   }
 
@@ -651,17 +635,17 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
     /* ---------------- GST / IGST ---------------- */
 
+    const itemGst = Number(item.GST_PERC || 0);
+
     let totalTaxPerc = 0;
 
     if (this.isInterState) {
-      // IGST
-      item.VAT_PERC = Number(this.GST_PERC) || 0;
+      item.VAT_PERC = itemGst;
       item.CGST = 0;
       item.SGST = 0;
-      totalTaxPerc = item.VAT_PERC;
+      totalTaxPerc = itemGst;
     } else {
-      // CGST + SGST
-      const halfGst = +(Number(this.GST_PERC) / 2).toFixed(2);
+      const halfGst = +(itemGst / 2).toFixed(2);
       item.VAT_PERC = 0;
       item.CGST = halfGst;
       item.SGST = halfGst;

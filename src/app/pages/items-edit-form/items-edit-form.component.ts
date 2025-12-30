@@ -394,20 +394,35 @@ export class ItemsEditFormComponent implements OnInit {
       );
       // console.log('Selected store IDs:', this.selectedStoreIds);
     });
-    dataservice.getItemProperty1Data().subscribe((data) => {
+    const itemProp1Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty1Data(itemProp1Payload).subscribe((data) => {
       this.itemprop1 = data;
     });
-    dataservice.getItemProperty2Data().subscribe((data) => {
+    const itemProp2Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty2Data(itemProp2Payload).subscribe((data) => {
       this.itemprop2 = data;
     });
-    dataservice.getItemProperty3Data().subscribe((data) => {
+    const itemProp3Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty3Data(itemProp3Payload).subscribe((data) => {
       this.itemprop3 = data;
       // console.log(this.itemprop3,"itemprop3")
     });
-    dataservice.getItemProperty4Data().subscribe((data) => {
+    const itemProp4Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty4Data(itemProp4Payload).subscribe((data) => {
       this.itemprop4 = data;
     });
-    dataservice.getItemProperty5Data().subscribe((data) => {
+    const itemProp5Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty5Data(itemProp5Payload).subscribe((data) => {
       this.itemprop5 = data;
     });
 
@@ -423,13 +438,19 @@ export class ItemsEditFormComponent implements OnInit {
       this.department = data;
       console.log(this.department, 'DEPARTMENTTTTTTTTTTTT');
     });
-    dataservice.getSubCategoryData().subscribe((data) => {
+    const subCatPayload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getSubCategoryData(subCatPayload).subscribe((data) => {
       this.subcatagory = data;
     });
     // dataservice.getBrandData().subscribe((data) => {
     //   this.brand = data;
     // });
-    dataservice.getVatclassData().subscribe((data) => {
+    const vatClassPayload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getVatclassData(vatClassPayload).subscribe((data) => {
       this.vat = data;
     });
     const payload = { COMPANY_ID: this.selected_Company_id };

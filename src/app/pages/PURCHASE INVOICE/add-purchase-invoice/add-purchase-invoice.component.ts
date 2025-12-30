@@ -120,6 +120,7 @@ export class AddPurchaseInvoiceComponent {
         PACKING: '',
         QUANTITY: '',
         RATE: '',
+        PRICE: '',
         AMOUNT: '',
         RETURN_QTY: '',
         ITEM_DESC: '',
@@ -170,23 +171,6 @@ export class AddPurchaseInvoiceComponent {
     this.sessionData_tax();
   }
 
-  // ngOnInit() {
-  //   console.log('working');
-  //   const userDataString = localStorage.getItem('userData');
-  //   // if (userDataString) {
-  //   const userData = JSON.parse(userDataString);
-  //   const selectedCompany = userData?.SELECTED_COMPANY;
-  //   console.log(selectedCompany, 'selected company');
-  //   this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-  //   this.GST = userData.GeneralSettings.GST_PERC;
-  //   console.log(this.HSNCODE, this.GST, 'HSNCODEANDGST');
-
-  //   this.getSupplierOrUnitLst();
-  //   this.getPendingGRNList();
-  //   this.sessionData_tax();
-  //   this.getSuppInvNo();
-  // }
-
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
     if (!userDataString) return;
@@ -216,10 +200,6 @@ export class AddPurchaseInvoiceComponent {
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
       this.supplierList = response;
-      console.log(
-        this.supplierList,
-        'distributorList=============================='
-      );
     });
   }
 
@@ -241,21 +221,15 @@ export class AddPurchaseInvoiceComponent {
       .getSupplierWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
 
   sessionData_tax() {
-    console.log('working');
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
   }
 
   getPendingGRNList() {
@@ -265,7 +239,6 @@ export class AddPurchaseInvoiceComponent {
     };
     this.dataService.getPendingGRN(payload).subscribe((response: any) => {
       this.pendingGRNs = response.Data;
-      console.log(this.pendingGRNs, 'PENDINGGRNSSSSSSSSSSSSSSSSSSSSSSSSS');
     });
   }
 
@@ -447,7 +420,7 @@ export class AddPurchaseInvoiceComponent {
   }
 
   calculateAmount = (row: any) => {
-    return (parseFloat(row.RATE) || 0) * (parseFloat(row.QUANTITY) || 0);
+    return (parseFloat(row.PRICE) || 0) * (parseFloat(row.QUANTITY) || 0);
   };
 
   // calculateGstAmount = (row: any) => {
@@ -469,79 +442,64 @@ export class AddPurchaseInvoiceComponent {
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
 
-    if (selectedRows && selectedRows.length > 0) {
-      selectedRows.forEach((row) => {
-        // Optional: Check for duplicates based on GRN_ID or GRN_NO
-        const exists = this.mainGridData.some(
-          (item) => item.GRN_DET_ID === row.GRN_DET_ID
-        );
-        if (!exists) {
-          // Add row into mainGridData
-          const newRow: any = {
-            GRN_ID: row.GRN_ID,
-            ITEM_ID: row.ITEM_ID,
-            PO_DET_ID: row.PO_DET_ID,
-            COST: row.COST,
-            GRN_DET_ID: row.GRN_DET_ID,
-            UOM: row.UOM,
-            TRANSFER_NO: row.GRN_NO,
-            GRN_DATE: row.GRN_DATE,
-            ITEM_NAME: row.ITEM_NAME,
-            PENDING_QTY: row.PENDING_QTY,
-            QUANTITY: 0,
-            RATE: row.RATE,
-            TAX_AMOUNT: 0,
-            AMOUNT: 0,
-            TOTAL_AMOUNT: 0,
-            HSN_CODE: this.HSNCODE,
-            VAT_PERC: this.GST,
-            SGST: 0,
-            CGST: 0,
-          };
-          console.log(newRow);
-          // -----------------------------------------
-          // ✅ ADDING GST / CGST / SGST LOGIC HERE
-          // -----------------------------------------
-          const sessionGst = parseFloat(this.GST) || 0;
-          const company = this.companyState?.trim().toLowerCase();
-          const customer = this.purchaseInvoiceFormData?.SUPPPLIER_NAME
-            ? this.selectedSupplier?.STATE_NAME?.trim().toLowerCase()
-            : null;
+    selectedRows.forEach((row) => {
+      const exists = this.mainGridData.some(
+        (item) => item.GRN_DET_ID === row.GRN_DET_ID
+      );
+      if (exists) return;
 
-          console.log(sessionGst, 'sesssionGST');
-          console.log(company, 'company');
-          console.log(customer, 'customer');
-          if (company === customer) {
-            // Same state → CGST + SGST
-            const half = sessionGst / 2;
-            newRow.CGST = half;
-            newRow.SGST = half;
-            newRow.GST = 0;
-          } else {
-            // Different state → GST only
-            newRow.GST = sessionGst;
-            newRow.CGST = 0;
-            newRow.SGST = 0;
-          }
-          // -----------------------------------------
+      const gstPerc = Number(row.GST_PERC) || 0;
 
-          this.mainGridData.push(newRow);
-        }
-      });
+      const companyState = this.companyState?.trim().toLowerCase();
+      const supplierState =
+        this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
 
-      this.itemsGridRef.instance.refresh(); // Refresh main grid
-      this.popupGridRef.instance.clearSelection();
-      // setTimeout(() => {
-      //   const lastRowIndex = this.mainGridData.length - 1;
-      //   this.itemsGridRef.instance.editCell(lastRowIndex, 'QUANTITY');
-      // }, 100);
-    }
+      let igst = 0,
+        cgst = 0,
+        sgst = 0;
 
-    this.isTrOutPopupVisible = false; // Close popup
-    setTimeout(() => {
-      if (this.itemsGridRef?.instance) {
-        this.itemsGridRef.instance.editCell(0, 'QUANTITY');
+      if (companyState === supplierState) {
+        // ✅ INTRA STATE → CGST + SGST
+        cgst = gstPerc / 2;
+        sgst = gstPerc / 2;
+      } else {
+        // ✅ INTER STATE → IGST
+        igst = gstPerc;
       }
+
+      const newRow: any = {
+        GRN_ID: row.GRN_ID,
+        GRN_DET_ID: row.GRN_DET_ID,
+        ITEM_ID: row.ITEM_ID,
+        ITEM_NAME: row.ITEM_NAME,
+        UOM: row.UOM,
+        TRANSFER_NO: row.GRN_NO,
+        GRN_DATE: row.GRN_DATE,
+        PRICE: row.PRICE,
+        PENDING_QTY: row.PENDING_QTY,
+        QUANTITY: 0,
+
+        HSN_CODE: row.HSN_CODE,
+
+        // ✅ GST FROM GRN
+        VAT_PERC: igst, // IGST %
+        CGST: cgst,
+        SGST: sgst,
+
+        AMOUNT: 0,
+        TAX_AMOUNT: 0,
+        TOTAL_AMOUNT: 0,
+      };
+
+      this.mainGridData.push(newRow);
+    });
+
+    this.itemsGridRef.instance.refresh();
+    this.popupGridRef.instance.clearSelection();
+    this.isTrOutPopupVisible = false;
+
+    setTimeout(() => {
+      this.itemsGridRef.instance.editCell(0, 'QUANTITY');
     }, 100);
   }
 
@@ -611,7 +569,8 @@ export class AddPurchaseInvoiceComponent {
           ITEM_ID: item.ITEM_ID,
           PACKING: item.PACKING || '',
           QUANTITY: item.QUANTITY || '',
-          RATE: item.RATE || '',
+          RATE: item.PRICE || '',
+          PRICE: item.PRICE || '',
           AMOUNT: this.calculateTotal(item),
           RETURN_QTY: 0, // optional
           ITEM_DESC: item.ITEM_DESC || '',
@@ -619,7 +578,7 @@ export class AddPurchaseInvoiceComponent {
           UOM: item.UOM,
           DISC_PERCENT: 0,
           COST: item.COST,
-          SUPP_PRICE: item.RATE || 0,
+          SUPP_PRICE: item.PRICE || 0,
           SUPP_AMOUNT: item.AMOUNT,
           VAT_PERC: item.VAT_PERC || 0,
           VAT_AMOUNT: this.calculateGstAmount(item),
@@ -651,7 +610,6 @@ export class AddPurchaseInvoiceComponent {
     this.purchaseInvoiceFormData.PURCH_DATE =
       this.purchaseInvoiceFormData.PURCH_DATE;
 
-    console.log('Final Payload:', this.purchaseInvoiceFormData);
     const callInsertAPI = () => {
       this.dataService
         .insertPurchaseInvoice(this.purchaseInvoiceFormData)
@@ -726,9 +684,6 @@ export class AddPurchaseInvoiceComponent {
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
       this.netAmount = Number(this.grandTotal).toFixed(2);
       this.onRoundOffChange();
-      console.log('GROSS AMOUNT Summary:', this.totalAmount);
-      console.log('TAX_AMOUNT Summary:', this.taxAmount);
-      console.log('NET AMOUNT Summary:', this.grandTotal);
     } else {
       console.warn('Summary values not ready yet.');
     }

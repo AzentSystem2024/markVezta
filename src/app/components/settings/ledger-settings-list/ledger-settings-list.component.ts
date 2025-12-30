@@ -46,6 +46,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./ledger-settings-list.component.scss'],
 })
 export class LedgerSettingsListComponent {
+  @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
   companyID: any;
   sessionData: any;
   selected_vat_id: any;
@@ -74,15 +75,15 @@ export class LedgerSettingsListComponent {
   ledgerList: any;
 
   addButtonOptions = {
-    text: 'New',
+    text: 'Save',
     icon: 'bi bi-file-earmark-plus',
     // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
-    hint: 'Add new entry',
+    hint: 'Save',
     onClick: () => {
       this.ngZone.run(() => {
-        this.addLedgerSettings();
+        this.saveLedgerSettings();
       });
     },
     elementAttr: { class: 'add-button' },
@@ -155,7 +156,83 @@ export class LedgerSettingsListComponent {
         this.ledgerDropdown = response;
       });
   }
-  addLedgerSettings() {}
+
+  onEditorPreparing(e: any) {
+    if (e.dataField === 'LEDGER_ID') {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+          `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+            height: 100%;
+            padding: 0 4px;
+            box-sizing: border-box;
+          `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
+  }
+  saveLedgerSettings() {
+    if (!this.ledgerList || this.ledgerList.length === 0) {
+      return;
+    }
+    const fieldMap: any = {
+      'Sales Account': 'AC_SALE_ID',
+      'Purchase Account': 'AC_PURCHASE_ID',
+      Inventory: 'AC_INVENTORY_ID',
+      'Input GST': 'AC_INPUT_VAT',
+      'Output GST': 'AC_OUTPUT_VAT',
+      'Depreciation Expense': 'AC_DEPRECIATION_EXPENSE_ID',
+      'Goods in Transit': 'AC_GOODS_TRANSIT',
+    };
+    const payload: any = {
+      COMPANY_ID: this.companyID,
+    };
+    this.ledgerList.forEach((row: any) => {
+      const key = fieldMap[row.NAME];
+      if (key && row.LEDGER_ID) {
+        payload[key] = row.LEDGER_ID;
+      }
+    });
+    this.dataService.insertLedgerSettings(payload).subscribe({
+      next: (res: any) => {
+        console.log('Save success', res);
+        // Optional: reload grid
+        this.getLedgerSettingsList();
+      },
+      error: (err: any) => {
+        console.error('Save failed', err);
+      },
+    });
+  }
 }
 @NgModule({
   imports: [

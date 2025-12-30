@@ -187,7 +187,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
 
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-    }
+    };
     // ✅ Use Date objects for filtering
     this.dataservice.getItemsData(payload).subscribe((res: any) => {
       const allData = res.data;
@@ -201,11 +201,10 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-     this.sesstion_Details();
+    this.sesstion_Details();
     this.showItems();
     this.loadDropdownData();
     this.getStores();
-   
   }
 
   sesstion_Details() {
@@ -249,7 +248,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     console.log(this.ENABLE_Matrix_Code);
 
-    this.selected_Company_id=this.sessionData.SELECTED_COMPANY.COMPANY_ID
+    this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   onDateRangeChanged(e: any) {
@@ -271,10 +270,10 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       //   DATE_FROM: '2000-01-01',
       //   DATE_TO: this.formatDate(new Date()),
       // };
-      
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    }
+
+      const payload = {
+        COMPANY_ID: this.selected_Company_id,
+      };
       this.dataservice.getItemsData(payload).subscribe((res: any) => {
         console.log(res);
         this.itemsList = res.data;
@@ -341,7 +340,11 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     this.dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
       this.department = data;
     });
-    this.dataservice.getSubCategoryData().subscribe((data) => {
+    const subCatPayload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'COSTINGMETHOD',
+    };
+    this.dataservice.getSubCategoryData(subCatPayload).subscribe((data) => {
       this.subcatagory = data;
     });
 
@@ -365,7 +368,6 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     return date.toISOString().split('T')[0];
   }
 
-
   showItems() {
     this.isLoading = true;
     this.cdr.detectChanges();
@@ -378,7 +380,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
 
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-    }
+    };
     this.dataservice.getItemsData(payload).subscribe(
       (response: any) => {
         // Sort items by 'createdAt' in descending order

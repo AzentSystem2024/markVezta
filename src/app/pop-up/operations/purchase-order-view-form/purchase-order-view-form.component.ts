@@ -633,7 +633,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       const firstDetail = this.newPoData.PoDetails[0];
 
       if (firstDetail) {
-        if (firstDetail.TAX_PERCENT && firstDetail.TAX_PERCENT > 0) {
+        if (Number(firstDetail.TAX_PERCENT) > 0) {
           // IGST
           this.isInterState = true;
           this.isIntraState = false;
@@ -644,7 +644,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
         }
       }
 
-      // 🔥 STEP 2: MAP ITEMS (NO CALCULATION CHANGE)
+      // 🔥 STEP 2: MAP ITEMS (GST LOGIC FIXED)
       this.savedItems = this.newPoData.PoDetails.map((item, index) => {
         const baseAmount = item.QUANTITY * item.PRICE;
         const supplierAmount = item.QUANTITY * item.SUPP_PRICE;
@@ -657,14 +657,18 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
         const taxable = baseAmount - discountAmount;
 
         let vatAmount = 0;
+        let igst = 0;
+        let cgst = 0;
+        let sgst = 0;
 
-        if (item.TAX_PERCENT && item.TAX_PERCENT > 0) {
-          // IGST
-          vatAmount = (taxable * item.TAX_PERCENT) / 100;
+        if (this.isInterState) {
+          // ✅ IGST
+          igst = Number(item.TAX_PERCENT) || 0;
+          vatAmount = (taxable * igst) / 100;
         } else {
-          // CGST + SGST
-          const cgst = item.CGST || 0;
-          const sgst = item.SGST || 0;
+          // ✅ CGST + SGST
+          cgst = Number(item.CGST) || 0;
+          sgst = Number(item.SGST) || 0;
           vatAmount = (taxable * (cgst + sgst)) / 100;
         }
 
@@ -675,17 +679,22 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
           DESCRIPTION: item.ITEM_DESC,
           UOM: item.UOM,
           PACKING_NAME: item.PACKING,
+
           SUPP_PRICE: item.SUPP_PRICE,
           PURCH_PRICE: item.PRICE,
           qtyOrdered: item.QUANTITY,
+
           Amount: +baseAmount.toFixed(2),
           discountPercentage: item.DISC_PERCENT,
           discountAmount: +discountAmount.toFixed(2),
           taxable_Supplier: +taxableSupplier.toFixed(2),
           taxable: +taxable.toFixed(2),
-          VAT_PERC: item.TAX_PERCENT || 0,
-          CGST: item.CGST || 0,
-          SGST: item.SGST || 0,
+
+          // 🔥 NORMALIZED GST FIELDS
+          VAT_PERC: this.isInterState ? igst : 0,
+          CGST: this.isInterState ? 0 : cgst,
+          SGST: this.isInterState ? 0 : sgst,
+
           vatAmount: +vatAmount.toFixed(2),
           total_Supplier: +taxableSupplier.toFixed(2),
           total: +(taxable + vatAmount).toFixed(2),
@@ -697,7 +706,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
         this.dataGrid?.instance?.repaint();
       }, 0);
 
-      // EXISTING CALLS
+      // EXISTING CALLS (UNCHANGED)
       this.getSupplierByid(this.newPoData.SUPP_ID);
       this.getAttachmentList();
       this.getPoHistoryList();
