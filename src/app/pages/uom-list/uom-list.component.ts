@@ -80,6 +80,7 @@ ngOnInit(){
   CloseEditForm(){
     //  this.isEditPopupOpened = false;
      this.isAddUomPopupOpened = false;
+     this.isEditUomPopupOpened = false;
      this.sesstion_Details();
      this.listUom();
   }
@@ -130,30 +131,30 @@ onRowRemoving(event){
   })
 }
 
-onRowUpdating(event){
-  const updatedData = {...event.oldData,...event.newData};
-  const{ID,UOM}=updatedData;
-  this.dataservice.updateUom(ID,UOM).subscribe((data) => {
-    try{
-      notify({
-        message : "UOM updated successfully",
-        position: { at: 'top right', my: 'top right' },
-      },
-      'success'
-    )
-    this.dataGrid.instance.refresh();
-    this.listUom();
-    }
-    catch(error){
-      notify({
-        message: "Edit operation failed",
-        position: { at: 'top right', my: 'top right' },
-      },
-      'error'
-    )
-    }
-  })
-}
+// onRowUpdating(event){
+//   const updatedData = {...event.oldData,...event.newData};
+//   const{ID,UOM COMPANY_ID}=updatedData;
+//   this.dataservice.updateUom(ID,UOM,COMPANY_ID).subscribe((data) => {
+//     try{
+//       notify({
+//         message : "UOM updated successfully",
+//         position: { at: 'top right', my: 'top right' },
+//       },
+//       'success'
+//     )
+//     this.dataGrid.instance.refresh();
+//     this.listUom();
+//     }
+//     catch(error){
+//       notify({
+//         message: "Edit operation failed",
+//         position: { at: 'top right', my: 'top right' },
+//       },
+//       'error'
+//     )
+//     }
+//   })
+// }
 
 
 
@@ -161,11 +162,10 @@ onRowUpdating(event){
 onClickSaveUom(){
   const {UOM} = this.UomAddFormComponent.getNewUomData();
   const payload = {
-    UOM: UOM,
+    UOM: UOM,                 // ✅ lowercase
     COMPANY_ID: this.selected_Company_id
   };
-
-   // 🔴 DUPLICATION CHECK (case-insensitive)
+   //  DUPLICATION CHECK (case-insensitive)
   const isDuplicate = this.uomList?.some(
     (item: any) =>
       item.UOM?.trim().toLowerCase() === UOM?.trim().toLowerCase()
@@ -179,7 +179,7 @@ onClickSaveUom(){
       },
       'warning'
     );
-    return; // ⛔ STOP INSERT
+    return; //  STOP INSERT
   }
   
   this.dataservice.postUOM(payload).subscribe((data) => {

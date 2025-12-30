@@ -78,6 +78,7 @@ export class UomEditComponent {
         //  let country_id = combinedData.COUNTRY_ID;
       const id = this.formUomData.ID;
   const uom = this.formUomData.UOM;
+  const company_id = this.selected_Company_id
 
    // DUPLICATION CHECK (ignore same ID)
   const isDuplicate = this.uomList?.some(
@@ -98,7 +99,7 @@ export class UomEditComponent {
   }
 
       console.log(id, uom,'payload')
-         this.service.updateUom(id, uom)
+         this.service.updateUom(id, uom,company_id)
            .subscribe((data: any) => {
              if (data) {
                notify(
