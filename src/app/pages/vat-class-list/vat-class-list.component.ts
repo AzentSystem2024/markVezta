@@ -5,6 +5,8 @@ import {
   ViewChild,
   ChangeDetectorRef,
   NgZone,
+  EventEmitter,
+  Output,
 } from '@angular/core';
 import { DxButtonModule, DxPopupModule } from 'devextreme-angular';
 import {
@@ -29,6 +31,7 @@ export class VatClassListComponent {
   @ViewChild(VatClassFormComponent) vatclassComponent: VatClassFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+   @Output() formClosed = new EventEmitter<void>();
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -54,37 +57,43 @@ export class VatClassListComponent {
     private exportService: ExportService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+   
+  }
   onExporting(event: any) {
     this.exportService.onExporting(event, 'VAT_class-list');
   }
   addVatclass() {
     this.isAddVatclassPopupOpened = true;
   }
-  sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-    this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
-    console.log(sessionData, '===========selected HSN CODE===================');
-    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC==================='
-    );
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    // THIS IS THE MISSING LINK
-    this.poData.COMPANY_ID = this.companyID;
-    this.poData.USER_ID = sessionData.USER_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
+    ngOnInit(): void {
+    this.sessionDetails();
+    this.showVatclass();
   }
+
+  sessionDetails() {
+  const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+
+  this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+  this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
+  this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+
+  this.selected_Company_id = this.companyID;
+
+  this.poData = {
+    COMPANY_ID: this.companyID,
+    USER_ID: sessionData.USER_ID,
+  };
+}
+
+
+ 
+
   showVatclass() {
     const payload = {
-      COMPANY_ID: this.companyID,
+      COMPANY_ID: this.selected_Company_id,
     };
     this.dataservice.getVatclassData(payload).subscribe((response) => {
       this.vatclass = response;
@@ -117,9 +126,11 @@ export class VatClassListComponent {
       this.vatclassComponent.getNewVatclassData();
     console.log('inserted data', CODE, VAT_NAME, VAT_PERC);
     this.dataservice
-      .postVatclassData(CODE, VAT_NAME, VAT_PERC)
+      .postVatclassData(CODE, VAT_NAME, VAT_PERC,this.selected_Company_id)
       .subscribe((response) => {
         if (response) {
+           this.formClosed.emit();
+           this.isAddVatclassPopupOpened = false
           this.showVatclass();
         }
       });
@@ -153,6 +164,9 @@ export class VatClassListComponent {
         }
       });
   }
+
+
+
   OnEditingStartVatReturn(event: any) {
     event.cancel = true; // Prevent the default editing behavior
     const id = event.data.ID;
@@ -216,13 +230,8 @@ export class VatClassListComponent {
   //   event.cancel = true; // Prevent the default update operation
   // }
 
-  ngOnInit(): void {
-    this.sesstion_Details();
-    this.showVatclass();
-  }
-  sesstion_Details() {
-    throw new Error('Method not implemented.');
-  }
+ 
+
 }
 @NgModule({
   imports: [

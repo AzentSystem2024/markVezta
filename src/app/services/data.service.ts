@@ -13,6 +13,7 @@ import { exportDataGrid as exportDataGridToPdf } from 'devextreme/pdf_exporter';
 import { exportDataGrid as exportDataGridToXLSX } from 'devextreme/excel_exporter';
 import { environment } from 'src/environments/environment';
 import { Verify } from 'crypto';
+import { AnyARecord } from 'dns';
 
 const API_URL = 'https://js.devexpress.com/Demos/RwaService/api';
 export interface ItemStorePayload {
@@ -244,8 +245,17 @@ export class DataService {
     return this.http.post(`${this.apiUrl}AC_CreditNote/Insert`, data);
   }
 
+  // selectCreditNote(id: number) {
+  //   return this.http.post<any>(`${this.apiUrl}AC_CreditNote/select/` + id, {});
+  // }
+
   selectCreditNote(id: number) {
-    return this.http.post<any>(`${this.apiUrl}AC_CreditNote/select/` + id, {});
+    return this.http
+      .post<any>(`${this.apiUrl}AC_CreditNote/select/${id}`, {})
+      .pipe(
+        // ✅ CLONE RESPONSE TO PREVENT MUTATION ISSUES
+        map((res) => structuredClone(res))
+      );
   }
 
   updateCreditNote(items: any) {
@@ -1630,9 +1640,10 @@ export class DataService {
   public postVatclassData(
     CODE: any,
     VAT_NAME: any,
-    VAT_PERC: any
+    VAT_PERC: any,
+    COMPANY_ID : AnyARecord
   ): Observable<any> {
-    const data = { CODE, VAT_NAME, VAT_PERC };
+    const data = { CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
 
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
@@ -1644,9 +1655,10 @@ export class DataService {
     ID: any,
     CODE: any,
     VAT_NAME: any,
-    VAT_PERC: any
+    VAT_PERC: any,
+    COMPANY_ID : any
   ): Observable<any> {
-    const data = { ID, CODE, VAT_NAME, VAT_PERC };
+    const data = { ID, CODE, VAT_NAME, VAT_PERC,COMPANY_ID };
 
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }

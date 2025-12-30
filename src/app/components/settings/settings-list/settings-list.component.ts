@@ -147,7 +147,7 @@ onEditorPreparing(e: any) {
 
     const row = e.row?.data;
 
-    if (row.LAST_NO == "0") {
+    if (row.LAST_NO == "0" || row.LAST_NO == null || row.LAST_NO == '') {
       e.editorOptions.readOnly = false;   // Editable
     } else {
       e.editorOptions.readOnly = true;    // Not editable

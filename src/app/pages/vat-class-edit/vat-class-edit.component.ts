@@ -23,8 +23,11 @@ export class VatClassEditComponent {
     VAT_PERC: ''
   };
   newVatclass=this.formVatclassData;
+  selected_Company_id: any;
   constructor(private dataservice:DataService
-    ){}
+    ){
+      this.sessionDetails();
+    }
   getNewVatclassData = () => ({ ...this.newVatclass });
   ngOnChanges(changes: SimpleChanges): void{
                 if (changes['selectedData'] && changes['selectedData'].currentValue) {
@@ -66,10 +69,15 @@ export class VatClassEditComponent {
       return true;
     }
   }
+    sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    }
   UpdateData(){
       const { ID,CODE,VAT_NAME,VAT_PERC } =this.formVatclassData
-    this.dataservice.updateVatclass(ID,CODE,VAT_NAME,VAT_PERC).subscribe(response=>{
+    this.dataservice.updateVatclass(ID,CODE,VAT_NAME,VAT_PERC,this.selected_Company_id).subscribe(response=>{
       console.log(response)
+      this.formClosed.emit()
     })
   }
 
