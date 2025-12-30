@@ -138,7 +138,7 @@ export class EditDebitComponent {
     console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
     console.log(this.companyState);
-    this.GST = this.sessionData.GeneralSettings.GST_PERC;
+    // this.GST = this.sessionData.GeneralSettings.GST_PERC;
     console.log(this.GST, 'GST');
   }
 
