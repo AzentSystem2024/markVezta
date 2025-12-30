@@ -165,6 +165,7 @@ export class PromotionComponent {
   isHappyHoursEnabled: boolean = false;
   happyHoursPopup: boolean = false;
   narration: any;
+  selected_Company_id: any;
   get displayTimeRange(): string {
     return this.fromTime && this.toTime
       ? `${this.fromTime} - ${this.toTime}`
@@ -181,6 +182,7 @@ export class PromotionComponent {
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     this.userId = sessionStorage.getItem('UserId');
+    this.sesstion_Details();
     this.loadStores();
     const defaultStoreId = '1';
     this.listItemsByMultipleStoreIds(defaultStoreId);
@@ -375,8 +377,18 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     this.listItemsByMultipleStoreIds(this.storeIds);
   }
 
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   loadStores() {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       // Filter out the central store
       this.store = response.filter((store: any) => store.STORE_NAME !== 'CENTRAL STORE');
       console.log(this.store, 'Filtered Stores');

@@ -102,10 +102,10 @@ export class StoreItemsListComponent {
   }
 
   getDepartment() {
-    const Payload = {
+    const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
-    this.dataservice.getDepartmentData(Payload).subscribe(
+    this.dataservice.getDepartmentData(payload).subscribe(
       (response: any) => {
         this.departmentOptions = response.map((item: any) => ({
           ...item,
@@ -173,7 +173,10 @@ export class StoreItemsListComponent {
 
   // Step 2: Function to filter stores by the same storeId
   getStoresById(storeId: any) {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       console.log(response, '=====================');
       this.filteredStores = response.filter(
         (store: any) => store.ID === storeId
@@ -192,7 +195,10 @@ export class StoreItemsListComponent {
   }
 
   loadStores() {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
       console.log(this.store, '=========');
       // Filter out the default store (ID = 1) from the dropdown list

@@ -75,7 +75,6 @@
           location="after"
           locateInMenu="auto"
           widget="dxButton"
-          [visible]="canAdd"
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
@@ -109,6 +108,7 @@
   [height]="'80vh'"
   [titleText]="selectedStore ? 'Edit Store' : 'New Store'"
   (save)="storesComponent.submitForm()"
+  [showApprove]="false"
 >
   <app-stores-form
     #storesComponent

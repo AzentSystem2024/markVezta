@@ -307,16 +307,17 @@ export class ItemsFormComponent implements OnInit {
     dataservice.getItemProperty5Data(itemProp5Payload).subscribe((data) => {
       this.itemprop5 = data;
     });
-    const departmentPayload = {
+
+    const department = {
       COMPANY_ID: this.selected_Company_id,
     };
-    dataservice.getDepartmentData(departmentPayload).subscribe((data) => {
+    dataservice.getDepartmentData(department).subscribe((data) => {
       this.department = data;
     });
-    const subCatPayload = {
+    const subcategory = {
       COMPANY_ID: this.selected_Company_id,
     };
-    dataservice.getSubCategoryData(subCatPayload).subscribe((data) => {
+    dataservice.getSubCategoryData(subcategory).subscribe((data) => {
       this.subcatagory = data;
     });
     const vatClassPayload = {

@@ -157,6 +157,7 @@ export class PromotionEditComponent {
   narration: any;
   wsNo: any;
   wsDate: any;
+  selected_Company_id: any;
 
   constructor(private dataservice : DataService, private router: Router,private cdr: ChangeDetectorRef){
     dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
@@ -191,6 +192,7 @@ export class PromotionEditComponent {
   ngOnInit(){
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     this.userId = sessionStorage.getItem('UserId');
+    this.sesstion_Details();
     this.schemaOptions()
     this.getPromotionData()
     // this.listStoreItemProperty();
@@ -370,10 +372,18 @@ onHappyHoursChanged(isEnabled: boolean): void {
       );
     }
   
-  
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
     
     loadStores() {
-      this.dataservice.getStoresData().subscribe((response) => {
+      const payload = {
+        COMPANY_ID : this.selected_Company_id
+      }
+      this.dataservice.getStoresData(payload).subscribe((response) => {
         // Filter out the central store
         this.store = response.filter((store: any) => store.STORE_NAME !== 'CENTRAL STORE');
         console.log(this.store, 'Filtered Stores');

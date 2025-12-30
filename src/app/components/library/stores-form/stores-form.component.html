@@ -81,7 +81,7 @@
       </div>
     </dxi-item>
   </dxi-item>
-  <dxi-item itemType="group" [colCount]="4">
+  <dxi-item itemType="group" [colCount]="2">
     <dxi-item>
       <div *dxTemplate>
         <dx-text-box
@@ -96,6 +96,22 @@
             ></dxi-validation-rule>
           </dx-validator>
         </dx-text-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-text-box
+          label="VAT Registration Number"
+          labelMode="floating"
+          [(value)]="newStores.VAT_REGNO"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
       </div>
     </dxi-item>
   </dxi-item>
@@ -126,7 +142,7 @@
     <dxi-item>
       <div *dxTemplate>
         <dx-select-box
-          label="Emirate"
+          label="State"
           labelMode="floating"
           [items]="StateDropdownData"
           displayExpr="DESCRIPTION"
@@ -210,7 +226,7 @@
     </dxi-item>
   </dxi-item>
 
-  <dxi-item itemType="group" [colCount]="2">
+  <!-- <dxi-item itemType="group" [colCount]="2">
     <dxi-item>
       <div *dxTemplate>
         <dx-select-box
@@ -232,20 +248,6 @@
       </div>
     </dxi-item>
 
-    <dxi-item>
-      <div *dxTemplate>
-        <dx-text-box
-          label="VAT Registration Number"
-          labelMode="floating"
-          [(value)]="newStores.VAT_REGNO"
-        >
-          <dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This Field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
-      </div>
-    </dxi-item>
-  </dxi-item>
+    
+  </dxi-item> -->
 </dx-form>

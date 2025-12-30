@@ -438,10 +438,10 @@ export class ItemsEditFormComponent implements OnInit {
       this.department = data;
       console.log(this.department, 'DEPARTMENTTTTTTTTTTTT');
     });
-    const subCatPayload = {
+    const subcategory = {
       COMPANY_ID: this.selected_Company_id,
     };
-    dataservice.getSubCategoryData(subCatPayload).subscribe((data) => {
+    dataservice.getSubCategoryData(subcategory).subscribe((data) => {
       this.subcatagory = data;
     });
     // dataservice.getBrandData().subscribe((data) => {

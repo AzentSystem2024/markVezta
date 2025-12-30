@@ -4,48 +4,56 @@
     [dataSource]="uomList"
     (onRowRemoving)="onRowRemoving($event)"
     (onRowUpdating)="onRowUpdating($event)"
-    [rowAlternationEnabled]="true"
+    (onEditingStart)="onEditingRow($event)"
     rowAlternationInterval="2"
     [showBorders]="true"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
+    [rowAlternationEnabled]="true"
+    [showColumnLines]="true"
   >
     <dxo-paging [pageSize]="10"> </dxo-paging>
     <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
-      <dxo-popup
+      <!-- <dxo-popup
         title="Edit UOM"
         [showTitle]="true"
         [width]="500"
         [height]="200"
       >
-      </dxo-popup>
+      </dxo-popup> -->
       <dxo-form class="plain-styled-form" [colCount]="1">
         <dxi-item itemType="group" [colCount]="1">
-            
-            <dxi-item itemType="group" [colCount]="1">
-              <dxi-item dataField="UOM"></dxi-item>
-            </dxi-item>
-            
+          <dxi-item itemType="group" [colCount]="1">
+            <dxi-item dataField="UOM"></dxi-item>
           </dxi-item>
-         </dxo-form>
+        </dxi-item>
+      </dxo-form>
     </dxo-editing>
 
-    <dxo-search-panel
-      [visible]="true"
-      placeholder="Data Search"
-    ></dxo-search-panel>
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header" stylingMode="filled">Unit of Measurement</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Unit of Measurement
+        </div>
       </dxi-item>
 
-      <dxi-item location="after" locateInMenu="auto">
-        <dx-button
-          text="Add"
-          icon="plus"
-          type="default"
-          stylingMode="contained"
-          (onClick)="addUom()"
-        ></dx-button>
-      </dxi-item>
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
       <dxi-item
         location="after"
         locateInMenu="auto"
@@ -63,15 +71,30 @@
       <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
     </dxo-toolbar>
 
-    <dxi-column dataField="UOM" caption="Uom" stylingMode="filled"> </dxi-column>
+    <dxi-column dataField="UOM" caption="Uom" stylingMode="filled">
+    </dxi-column>
   </dx-data-grid>
   <form-popup
-  [(visible)]="isAddUomPopupOpened"
-  [width]="550"
-  [height]="200"
-  (save)="onClickSaveUom()"
-  titleText="New UOM"
->
-  <app-uom-add-form></app-uom-add-form>
-</form-popup>
+    [(visible)]="isAddUomPopupOpened"
+    [width]="550"
+    [height]="200"
+    (save)="onClickSaveUom()"
+    titleText="New UOM"
+    [showApprove]="false"
+  >
+    <app-uom-add-form (formClosed)="CloseEditForm()"></app-uom-add-form>
+  </form-popup>
+
+  <dx-popup
+    [(visible)]="isEditUomPopupOpened"
+    title="Edit UOM"
+    [height]="'30vh'"
+    [width]="'40vw'"
+    (onHiding)="CloseEditForm()"
+  >
+    <app-uom-edit
+      (formClosed)="CloseEditForm()"
+      [selectedData]="selectedData"
+    ></app-uom-edit>
+  </dx-popup>
 </div>

@@ -188,6 +188,7 @@ export class ItemStorePricesComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  selected_Company_id: any;
 
   constructor(private dataservice: DataService, private router: Router) {
     this.loadDropdownData();
@@ -216,6 +217,7 @@ export class ItemStorePricesComponent {
       this.canApprove = packingRights.canApprove;
     }
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
+    this.sesstion_Details();
     this.loadStores();
     // this.getWorksheetData();
     const defaultStoreId = this.selectedStoreId.join(',');
@@ -337,8 +339,18 @@ export class ItemStorePricesComponent {
     );
   }
 
+    sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   loadStores() {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
       this.filteredStoreList = this.store;
     });

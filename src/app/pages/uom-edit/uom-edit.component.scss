@@ -1,0 +1,6 @@
+.fixed-footer {
+  display: flex;
+  justify-content: flex-end; /* push buttons to right */
+  gap: 0.5rem; /* space between buttons */
+  padding: 1rem; /* optional: breathing room */
+}

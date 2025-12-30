@@ -966,6 +966,8 @@ import {
   GstReportB2CLComponent,
   GstReportB2CLModule,
 } from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
+import { GstReportCDNRComponent, GstReportCDNRModule } from './pages/REPORT/gst-report-cdnr/gst-report-cdnr.component';
+import { UomEditComponent, UomEditModule } from './pages/uom-edit/uom-edit.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1321,6 +1323,8 @@ import {
     GstReportModule,
     LedgerSettingsListModule,
     GstReportB2CLModule,
+    UomEditModule,
+    GstReportCDNRModule,
   ],
   providers: [
     AuthService,

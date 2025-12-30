@@ -33,6 +33,7 @@ export class ItemcategoryEditComponent {
   };
     newCategory:any
   category: any=[]
+  selected_Company_id: any;
 
   constructor(private service: DataService) {}
 
@@ -56,8 +57,19 @@ export class ItemcategoryEditComponent {
 }
 
   
+  sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
+
   showCategory(){
-     this.service.getCategoryData().subscribe(
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+     this.service.getCategoryData(payload).subscribe(
       (response)=>{
             this.category=response;
             console.log(response);
@@ -66,11 +78,16 @@ export class ItemcategoryEditComponent {
   }
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
-    this.service.getDropdownData(dropdowndepartment).subscribe((data: any) => {
+     const payload = {
+    NAME: dropdowndepartment,
+    COMPANY_ID: this.selected_Company_id
+  };
+    this.service.getDropdownData(payload).subscribe((data: any) => {
       this.DepartmentDropdownData = data;
     });
   }
   ngOnInit(): void {
+    this.sesstion_Details();
     this.getDepartmentDropDown();
   }
 
@@ -84,7 +101,10 @@ export class ItemcategoryEditComponent {
     return;
   }
 console.log('edit category')
- this.service.getCategoryData().subscribe(
+const payload = {
+  COMPANY_ID : this.selected_Company_id
+}
+ this.service.getCategoryData(payload).subscribe(
       (response)=>{
             this.category=response;
             console.log(response);

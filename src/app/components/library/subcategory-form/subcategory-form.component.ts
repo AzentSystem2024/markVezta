@@ -29,12 +29,20 @@ export class SubcategoryFormComponent {
 
   categories: any = [];
   public newSubCategory = this.subcategoryData;
-  sessionData: any;
-  COMPANY_ID: any;
-  COMPANY_NAME: any;
+  selected_Company_id: any;
   constructor(private dataService: DataService) {}
 
   getNewSubcategoryData = () => ({ ...this.newSubCategory });
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   ngOnInit() {
     this.sesstion_Details();
@@ -53,49 +61,34 @@ export class SubcategoryFormComponent {
 
   getCategoryDropDown() {
     const dropdownCategory = 'ITEMCATEGORY';
-    this.dataService
-      .getDropdownData(dropdownCategory)
-      .subscribe((data: any) => {
-        // this.categoryList = data;
-        console.log(data, '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}');
-        this.categories = data;
-        // this.refresh();
-      });
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: dropdownCategory,
+    };
+    this.dataService.getDropdownData(payload).subscribe((data: any) => {
+      // this.categoryList = data;
+      console.log(data, '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}');
+      this.categories = data;
+      // this.refresh();
+    });
   }
 
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
-    this.dataService
-      .getDropdownData(dropdowndepartment)
-      .subscribe((data: any) => {
-        this.departmetDropdownData = data;
-        console.log('dropdownnnnnnn', this.departmetDropdownData);
-      });
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: dropdowndepartment,
+    };
+    this.dataService.getDropdownData(payload).subscribe((data: any) => {
+      this.departmetDropdownData = data;
+      console.log('dropdownnnnnnn', this.departmetDropdownData);
+    });
   }
 
-  sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
-
-    this.COMPANY_ID = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.COMPANY_ID,
-      '============selected_Company_id=============='
-    );
-
-    this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
-    console.log(this.COMPANY_NAME, '=======selected company name=====');
-    //       const sessionYear=this.sessionData.FINANCIAL_YEARS
-    //  this.financialYeaDate=sessionYear[0].DATE_FROM
-    // console.log(this.financialYeaDate,'=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[')
-    // this.formatted_from_date=this.financialYeaDate
-
-    // this.selected_vat_id=this.sessionData.VAT_ID
-  }
   getDepartmentData() {
     let departmentdata = [];
     const payload = {
-      COMPANY_ID: this.COMPANY_ID,
+      COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.getDepartmentData(payload).subscribe((data: any) => {
       departmentdata = data;

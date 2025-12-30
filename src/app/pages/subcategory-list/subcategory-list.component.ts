@@ -1,4 +1,4 @@
-import { Component, NgModule, ViewChild } from '@angular/core';
+import { Component, NgModule, NgZone, ViewChild } from '@angular/core';
 import {
   DxButtonModule,
   DxDataGridComponent,
@@ -42,16 +42,11 @@ export class SubcategoryListComponent {
   selectedType: string = '';
   selected_data: any = [];
   editSubcategory: boolean = false;
-  HSN_CODE: any;
-  companyID: any;
-  companyStateID: any;
-  GST_PERC: any;
   selected_Company_id: any;
-  poData: any;
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   ngOnInit() {
-    this.sessionDetails();
+    this.sesstion_Details();
     this.getSubCategory();
     this.getDepartmentDropDown();
     this.getCategoryDropdown();
@@ -62,30 +57,23 @@ export class SubcategoryListComponent {
   addSubCategory() {
     this.isAddSubcategoryPopupOpened = true;
   }
-  sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-    this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
-    console.log(sessionData, '===========selected HSN CODE===================');
-    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC==================='
-    );
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    // THIS IS THE MISSING LINK
-    this.poData.COMPANY_ID = this.companyID;
-    this.poData.USER_ID = sessionData.USER_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
-  }
+  addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.addSubCategory());
+    },
+    elementAttr: { class: 'add-button' },
+  };
+
   getSubCategory() {
     const payload = {
-      COMPANY_ID: this.companyID,
+      COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.getSubCategoryData(payload).subscribe((response) => {
       this.subCategory = response;
@@ -115,8 +103,9 @@ export class SubcategoryListComponent {
   }
 
   onClickSaveSubCategory() {
-    const { CODE, SUBCAT_NAME, DEPT_ID, CAT_ID } =
+    const { CODE, SUBCAT_NAME, CAT_ID, DEPT_ID } =
       this.subcategorycomponent.getNewSubcategoryData();
+    const COMPANY_ID = this.selected_Company_id;
 
     // Check for duplicates in CategoryList
     const isCodeDuplicate = this.subCategory.some(
@@ -163,7 +152,7 @@ export class SubcategoryListComponent {
     }
 
     this.dataService
-      .postSubCategoryData(CODE, SUBCAT_NAME, DEPT_ID, CAT_ID)
+      .postSubCategoryData(CODE, SUBCAT_NAME, DEPT_ID, CAT_ID, COMPANY_ID)
       .subscribe((response) => {
         console.log(response, '}}}}}}}}}}}}}}}}}}]]]]]]]]');
         this.getSubCategory();
@@ -174,7 +163,7 @@ export class SubcategoryListComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          'error'
+          'success'
         );
       });
   }
@@ -233,9 +222,22 @@ export class SubcategoryListComponent {
     this.editSubcategory = false;
     this.getSubCategory();
   }
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
+
   getCategoryDropdown() {
-    // let categories = []
-    this.dataService.getCategoryData().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getCategoryData(payload).subscribe((response: any) => {
       console.log(response, 'categories!!!!!!!!!!!!!!!!!!!!!!!!!!!!??????');
     });
   }

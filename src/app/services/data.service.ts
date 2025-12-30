@@ -1330,8 +1330,9 @@ export class DataService {
   }
 
   //department
-  public getDepartmentData(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemdepartment/list`, data);
+  public getDepartmentData(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ItemDepartment/list`, data);
   }
   public postDepartmentData(
     CODE: any,
@@ -1341,7 +1342,7 @@ export class DataService {
   ): Observable<any> {
     const data = { CODE, DEPT_NAME, COMPANY_ID, COMPANY_NAME };
 
-    return this.http.post(`${this.apiUrl}itemdepartment/save`, data);
+    return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
   }
   removeDepartment(id: any) {
     return this.http.post(`${this.apiUrl}itemdepartment/delete/${id}`, {});
@@ -1489,8 +1490,9 @@ export class DataService {
   }
 
   //category
-  public getCategoryData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}itemcategory/list`, {});
+  public getCategoryData(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ItemCategory/list`, data);
   }
   select_category(id: any) {
     return this.http.post(`${this.apiUrl}itemcategory/select/${id}`, {});
@@ -1516,7 +1518,7 @@ export class DataService {
       COMPANY_ID,
     };
 
-    return this.http.post(`${this.apiUrl}itemcategory/save`, data);
+    return this.http.post(`${this.apiUrl}ItemCategory/save`, data);
   }
   removeCategory(
     id: any,
@@ -1576,16 +1578,18 @@ export class DataService {
 
   //subcategory
 
-  public getSubCategoryData(data: any): Observable<any> {
+  public getSubCategoryData(items: any): Observable<any> {
+    const data = items;
     return this.http.post(`${this.apiUrl}itemsubcategory/list`, data);
   }
   public postSubCategoryData(
     CODE: any,
     SUBCAT_NAME: any,
     CAT_ID: any,
-    DEPT_ID: any
+    DEPT_ID: any,
+    COMPANY_ID: any
   ): Observable<any> {
-    const data = { CODE, SUBCAT_NAME, CAT_ID, DEPT_ID };
+    const data = { CODE, SUBCAT_NAME, CAT_ID, DEPT_ID, COMPANY_ID };
 
     return this.http.post(`${this.apiUrl}itemsubcategory/save`, data);
   }
@@ -1621,7 +1625,7 @@ export class DataService {
 
   //vatclass
   public getVatclassData(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}vatclass/list`, {});
+    return this.http.post(`${this.apiUrl}vatclass/list`, data);
   }
   public postVatclassData(
     CODE: any,
@@ -1721,8 +1725,9 @@ export class DataService {
   }
 
   //stores
-  public getStoresData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}stores/list`, {});
+  public getStoresData(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}stores/list`, data);
   }
   public postStoresData(
     COMPANY_ID: any,
@@ -1741,7 +1746,8 @@ export class DataService {
     EMAIL: any,
     VAT_REGNO: any,
     GROUP_ID: any,
-    STORE_NO
+    STORE_NO,
+    IS_ACTIVE: any
   ): Observable<any> {
     const data = {
       COMPANY_ID,
@@ -1761,6 +1767,7 @@ export class DataService {
       VAT_REGNO,
       GROUP_ID,
       STORE_NO,
+      IS_ACTIVE,
     };
 
     return this.http.post(`${this.apiUrl}stores/save`, data);
@@ -1824,7 +1831,8 @@ export class DataService {
     EMAIL: any,
     VAT_REGNO: any,
     GROUP_ID: any,
-    STORE_NO: any
+    STORE_NO: any,
+    IS_ACTIVE: any
   ): Observable<any> {
     const data = {
       ID,
@@ -1845,6 +1853,7 @@ export class DataService {
       VAT_REGNO,
       GROUP_ID,
       STORE_NO,
+      IS_ACTIVE,
     };
 
     return this.http.post(`${this.apiUrl}stores/save`, data);
@@ -2094,7 +2103,12 @@ export class DataService {
   public getItemProperty1Data(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}itemproperty1/list`, data);
   }
-
+  // public getItemProperty1Data(): Observable<any> {
+  //   return this.http.post(`${this.apiUrl}itemproperty1/list`, {});
+  // }
+  // public getItemProperty2Data(): Observable<any> {
+  //   return this.http.post(`${this.apiUrl}itemproperty2/list`, {});
+  // }
   select_item_property1(id: any) {
     return this.http.post(`${this.apiUrl}itemproperty1/select/${id}`, {});
   }
@@ -2133,6 +2147,7 @@ export class DataService {
   public getItemProperty2Data(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}itemproperty2/list`, data);
   }
+
   select_item_property2(id: any) {
     return this.http.post(`${this.apiUrl}itemproperty2/select/${id}`, {});
   }
@@ -2865,30 +2880,33 @@ export class DataService {
 
   //---------------------------UOM----------------------------------------------------
 
-  getUomList(): Observable<any> {
+  getUomList(items: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const body = {}; // Replace with your actual body if needed
+    const body = items; // Replace with your actual body if needed
 
-    return this.http.post<any>(`${this.apiUrl}/uom/list`, body, { headers });
+    return this.http.post<any>(`${this.apiUrl}uom/list`, body, { headers });
   }
 
   postUOM(uom: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const body = { UOM: uom };
-    return this.http.post<any>(`${this.apiUrl}/uom/insert`, body, { headers });
+    return this.http.post<any>(`${this.apiUrl}uom/insert`, body, { headers });
   }
 
   updateUom(ID: any, UOM: any): Observable<any> {
     const data = { ID, UOM };
+    return this.http.post(`${this.apiUrl}uom/update`, data);
+  }
 
-    return this.http.post(`${this.apiUrl}/uom/update`, data);
+  SelectUom(id: any) {
+    return this.http.post(`${this.apiUrl}uom/select/${id}`, {});
   }
 
   removeUom(id: any, UOM: any) {
     const requestBody = {
       UOM: UOM,
     };
-    return this.http.post<any>(`${this.apiUrl}/uom/delete/` + id, requestBody);
+    return this.http.post<any>(`${this.apiUrl}uom/delete/` + id, requestBody);
   }
 
   //------------------------------Packing........................................................................
@@ -6020,6 +6038,12 @@ The result can be exported to HTML or Markdown.`;
   //======================GST REPORT(B2CL)===========================
   GST_Report_Api_B2CL(payload) {
     const getEndpoint = `${this.apiUrl}GSTReport/Gstb2cl`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //======================GST REPORT(CDNR)===========================
+  GST_Report_Api_CDNR(payload) {
+    const getEndpoint = `${this.apiUrl}GSTReport/Gstcdnr`;
     return this.http.post(getEndpoint, payload);
   }
 }

@@ -48,10 +48,6 @@ export class SubcategoryEditComponent {
   //  newSubCategory:any
   newSubCategory: any;
   subCategory: any = [];
-  HSN_CODE: any;
-  companyID: any;
-  companyStateID: any;
-  GST_PERC: any;
   selected_Company_id: any;
   constructor(private dataService: DataService) {}
 
@@ -70,29 +66,22 @@ export class SubcategoryEditComponent {
   // getNewSubcategoryData = () => ({ ...this.newSubCategory });
 
   ngOnInit() {
+    this.sesstion_Details();
     this.getDepartmentDropDown();
     this.getCategoryDropDown();
     this.getDepartmentData();
   }
-  sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-    this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
-    console.log(sessionData, '===========selected HSN CODE===================');
-    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC==================='
-    );
 
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    // THIS IS THE MISSING LINK
     console.log(
       this.selected_Company_id,
       '============selected_Company_id=============='
     );
   }
+
   // getCategoryDropdown(){
 
   //   this.dataService.getCategoryData().subscribe((response:any) => {
@@ -131,6 +120,7 @@ export class SubcategoryEditComponent {
         ...this.newSubCategory,
         CODE: this.newSubCategory.CODE?.toLowerCase().trim(),
         SUBCAT_NAME: this.newSubCategory.SUBCAT_NAME?.toLowerCase().trim(),
+        COMPANY_ID: this.selected_Company_id,
       };
       const isCodeDuplicate = this.subCategory.some(
         (item: any) =>
@@ -191,29 +181,34 @@ export class SubcategoryEditComponent {
   }
   getCategoryDropDown() {
     const dropdownCategory = 'ITEMCATEGORY';
-    this.dataService
-      .getDropdownData(dropdownCategory)
-      .subscribe((data: any) => {
-        // this.categoryList = data;
-        console.log(data, '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}');
-        this.categories = data;
-        // this.refresh();
-      });
+    const payload = {
+      NAME: dropdownCategory,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    console.log(payload, 'payload');
+    this.dataService.getDropdownData(payload).subscribe((data: any) => {
+      // this.categoryList = data;
+      console.log(data, '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}');
+      this.categories = data;
+      // this.refresh();
+    });
   }
 
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
-    this.dataService
-      .getDropdownData(dropdowndepartment)
-      .subscribe((data: any) => {
-        this.departmetDropdownData = data;
-        console.log('dropdownnnnnnn', this.departmetDropdownData);
-      });
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: dropdowndepartment,
+    };
+    this.dataService.getDropdownData(payload).subscribe((data: any) => {
+      this.departmetDropdownData = data;
+      console.log('dropdownnnnnnn', this.departmetDropdownData);
+    });
   }
 
   getDepartmentData() {
     const payload = {
-      COMPANY_ID: this.companyID,
+      COMPANY_ID: this.selected_Company_id,
     };
     let departmentdata = [];
     this.dataService.getDepartmentData(payload).subscribe((data: any) => {

@@ -86,12 +86,14 @@ export class TimesheetAddComponent {
   stores: any;
   timesheetDetails: any[];
   selectedEmployeeId: any;
+  selected_Company_id: any;
 
   constructor(private dataService: DataService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
+    this.sesstion_Details();
     this.getEmployeeDropdown();
     // this.getSalaryHead();
     this.loadStores();
@@ -213,8 +215,18 @@ if (e.data.NORMAL_OT > 12 || e.data.HOLIDAY_OT > 12) {
     );
   }
 
+    sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   loadStores() {
-    this.dataService.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.getStoresData(payload).subscribe((response) => {
       // Filter out "CENTRAL STORE" and populate the stores array
       this.stores = response.filter(
         (store: any) => store.STORE_NAME !== 'CENTRAL STORE'

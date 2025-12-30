@@ -23,23 +23,35 @@ export class CategoryFormComponent implements OnInit {
   CODE: '',
   CAT_NAME: '',
   LOYALTY_POINT: 0,
-  COST_HEAD_ID: '5',
+  COST_HEAD_ID: '',
   DEPT_ID: '',
-  COMPANY_ID: '1',
+  COMPANY_ID: '',
   };
+  COMPANY_ID: string;
   constructor(private service: DataService) {}
   newCategory = this.formCategoryData;
 
   getNewCategoryData = () => ({ ...this.newCategory });
 
+  session_Details() {
+  const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+  this.COMPANY_ID = String(sessionData.SELECTED_COMPANY.COMPANY_ID);
+}
+
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
-    this.service.getDropdownData(dropdowndepartment).subscribe((data: any) => {
+     const payload = {
+    NAME: dropdowndepartment,
+    COMPANY_ID: this.COMPANY_ID
+  };
+
+    this.service.getDropdownData(payload).subscribe((data: any) => {
       this.DepartmentDropdownData = data;
       this.popupClosed.emit()
     });
   }
   ngOnInit(): void {
+    this.session_Details();
     this.getDepartmentDropDown();
   }
   }

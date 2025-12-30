@@ -51,6 +51,7 @@ export class ReasonsFormComponent {
   finID: any;
   userID: any;
   companyID: any;
+  selected_Company_id: any;
   constructor(private service:DataService){}
   newReasons=this.formReasonsData;
 
@@ -58,8 +59,18 @@ export class ReasonsFormComponent {
     COMPANY_ID:this.companyID
    });
 
+     sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   showStores(){
-    this.service.getStoresData().subscribe(
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.service.getStoresData(payload).subscribe(
      (response)=>{
            this.stores=response;
            console.log(response);
@@ -94,6 +105,7 @@ getDiscountTypeDropDown() {
     });
 }
  ngOnInit(): void {
+  this.sesstion_Details();
    this.showStores();
    this.getReasonTypeDropDown();
    this.getVATRuleDropDown();

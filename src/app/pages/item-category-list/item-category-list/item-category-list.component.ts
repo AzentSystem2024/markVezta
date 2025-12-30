@@ -2,6 +2,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import {
@@ -50,14 +51,33 @@ export class ItemCategoryListComponent {
   editItemCategory:boolean=false
   selectedData:any
   selected_data:any
-  constructor(private dataservice:DataService,private exportService: ExportService
-    ){}
+  selected_Company_id: any;
+  COMPANY_ID: any;
+  constructor(private dataservice:DataService,private exportService: ExportService,private ngZone: NgZone
+    ){
+      this.sesstion_Details();
+      this.showCategory();
+    }
   onExporting(event: any) {
     this.exportService.onExporting(event,'Catagory-list');
   }
   addCategory(){
     this.isAddCategoryPopupOpened=true;
   }
+
+            addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.addCategory());
+    },
+    elementAttr: { class: 'add-button' }
+  };
+
   onEditStart(event:any){
     event.cancel=true
 this.editItemCategory=true
@@ -70,9 +90,9 @@ this.editItemCategory=true
   }
   
   onClickSaveCategory(){
-    const { CODE, CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID } =this.categoryComponent.getNewCategoryData();
-    console.log('inserted data',CODE,CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID );
-
+    const { CODE, CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID } =this.categoryComponent.getNewCategoryData();
+    console.log('inserted data',CODE,CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID );
+   const COMPANY_ID = this.COMPANY_ID
  // Check for duplicates in CategoryList
     const isCodeDuplicate = this.category.some(
       // (item: any) => item.CODE === commonDetails.code
@@ -170,8 +190,18 @@ this.editItemCategory=true
     });
   }
 
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.COMPANY_ID=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.COMPANY_ID,'============selected_Company_id==============')    
+  }
+
   showCategory(){
-     this.dataservice.getCategoryData().subscribe(
+    const payload = {
+      COMPANY_ID : this.COMPANY_ID
+    }
+     this.dataservice.getCategoryData(payload).subscribe(
       (response)=>{
             this.category=response;
             console.log(response);
@@ -188,6 +218,7 @@ this.editItemCategory=true
       });
   }
   ngOnInit(): void {
+    this.sesstion_Details();
     this.showCategory();
     this.getDepartmentDropDown();
   }

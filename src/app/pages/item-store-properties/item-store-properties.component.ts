@@ -101,6 +101,7 @@ export class ItemStorePropertiesComponent {
   selectedItems: any;
   isSaved: boolean = false;
   isVerified: boolean = false;
+  selected_Company_id: any;
 
   constructor(
     private dataservice: DataService,
@@ -124,6 +125,7 @@ export class ItemStorePropertiesComponent {
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     console.log(this.AllowCommitWithSave, 'Allowcommit');
+    this.sesstion_Details();
     this.listStoreItemProperty();
     this.loadStore();
     this.updateColumnVisibility();
@@ -154,8 +156,18 @@ export class ItemStorePropertiesComponent {
     });
   }
 
+   sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')    
+  }
+
   loadStore() {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
     });
   }
@@ -543,7 +555,10 @@ export class ItemStorePropertiesComponent {
   }
 
   getStoresById(storeId: any) {
-    this.dataservice.getStoresData().subscribe((response) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.getStoresData(payload).subscribe((response) => {
       this.filteredStores = response.filter(
         (store: any) => store.ID === storeId
       );

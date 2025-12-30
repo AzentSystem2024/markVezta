@@ -340,11 +340,10 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     this.dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
       this.department = data;
     });
-    const subCatPayload = {
+    const payload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME: 'COSTINGMETHOD',
     };
-    this.dataservice.getSubCategoryData(subCatPayload).subscribe((data) => {
+    this.dataservice.getSubCategoryData(payload).subscribe((data) => {
       this.subcatagory = data;
     });
 
