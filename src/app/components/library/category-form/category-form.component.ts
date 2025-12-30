@@ -23,7 +23,7 @@ export class CategoryFormComponent implements OnInit {
   CODE: '',
   CAT_NAME: '',
   LOYALTY_POINT: 0,
-  COST_HEAD_ID: '',
+  COST_HEAD_ID: 0,
   DEPT_ID: '',
   COMPANY_ID: '',
   };

@@ -1,4 +1,4 @@
-import { Component, NgModule } from '@angular/core';
+import { Component, Input, NgModule, SimpleChanges } from '@angular/core';
 import { DxFormModule, DxSelectBoxModule, DxTextBoxModule, DxValidatorModule } from 'devextreme-angular';
 import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.component';
 import { FormPhotoUploaderModule } from '../../utils/form-photo-uploader/form-photo-uploader.component';
@@ -11,15 +11,23 @@ import { ReactiveFormsModule } from '@angular/forms';
   styleUrls: ['./item-property3-form.component.scss']
 })
 export class ItemProperty3FormComponent {
+@Input() companyId!: number;
 
   formItemProperty3Data = {
     CODE: '',
     DESCRIPTION: '',
-    COMPANY_ID: '1'
+    COMPANY_ID: 0
   };
   newItemProperty3=this.formItemProperty3Data;
 
   getNewItemProperty3Data = () => ({ ...this.newItemProperty3 });
+
+
+  ngOnChanges(changes: SimpleChanges) {
+      if (changes['companyId']?.currentValue) {
+        this.formItemProperty3Data.COMPANY_ID = changes['companyId'].currentValue;
+      }
+    }
 
 }
 @NgModule({

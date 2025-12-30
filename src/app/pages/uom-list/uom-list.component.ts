@@ -73,6 +73,7 @@ export class UomListComponent implements OnInit{
   }
 
 ngOnInit(){
+  this.sesstion_Details();
   this.listUom();
 }
 
@@ -159,6 +160,10 @@ onRowUpdating(event){
 
 onClickSaveUom(){
   const {UOM} = this.UomAddFormComponent.getNewUomData();
+  const payload = {
+    UOM: UOM,
+    COMPANY_ID: this.selected_Company_id
+  };
 
    // 🔴 DUPLICATION CHECK (case-insensitive)
   const isDuplicate = this.uomList?.some(
@@ -177,7 +182,7 @@ onClickSaveUom(){
     return; // ⛔ STOP INSERT
   }
   
-  this.dataservice.postUOM(UOM).subscribe((data) => {
+  this.dataservice.postUOM(payload).subscribe((data) => {
     if(data){
       try{
         notify({

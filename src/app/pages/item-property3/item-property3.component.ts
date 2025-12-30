@@ -153,6 +153,7 @@ export class ItemProperty3Component {
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    
     // THIS IS THE MISSING LINK
     this.poData.COMPANY_ID = this.companyID;
     this.poData.USER_ID = sessionData.USER_ID;
@@ -169,67 +170,147 @@ export class ItemProperty3Component {
       this.itemproperty3 = response;
     });
   }
+
+  // onClickSaveItemProperty3() {
+  //   const { CODE, DESCRIPTION, COMPANY_ID } =
+  //     this.ItemProperty3FormComponent.getNewItemProperty3Data();
+  //      console.log('inserted data', CODE, DESCRIPTION, COMPANY_ID);
+
+  //   const isCodeDuplicate = this.itemproperty3.some(
+  //     // (item: any) => item.CODE === commonDetails.code
+  //     (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
+  //   );
+
+  //   const isDescriptionDuplicate = this.itemproperty3.some(
+  //     // (item: any) => item.DESCRIPTION === commonDetails.category
+  //     (item: any) =>
+  //       item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase()
+  //   );
+
+  //   if (isCodeDuplicate && isDescriptionDuplicate) {
+  //     notify(
+  //       {
+  //         message: 'Both Code and category already exist',
+  //         position: { at: 'top right', my: 'top right' },
+  //         displayTime: 1000,
+  //       },
+  //       'error'
+  //     );
+  //     return;
+  //   } else if (isCodeDuplicate) {
+  //     notify(
+  //       {
+  //         message: 'This Code already exists',
+  //         position: { at: 'top right', my: 'top right' },
+  //         displayTime: 1000,
+  //       },
+  //       'error'
+  //     );
+  //     return;
+  //   } else if (isDescriptionDuplicate) {
+  //     notify(
+  //       {
+  //         message: 'This Description already exists',
+  //         position: { at: 'top right', my: 'top right' },
+  //         displayTime: 1000,
+  //       },
+  //       'error'
+  //     );
+  //     return;
+  //   }
+  //   this.dataservice
+  //     .insertItemProperty3Data(CODE, DESCRIPTION, COMPANY_ID)
+  //     .subscribe((response) => {
+  //       if (response) {
+  //         this.listItemProperty3();
+  //         notify(
+  //           {
+  //             message: 'Insert operation successful',
+  //             position: { at: 'top right', my: 'top right' },
+  //           },
+  //           'success'
+  //         );
+  //         this.isItemProperty3PopupOpened = false;
+  //       }
+  //     });
+  // }
   onClickSaveItemProperty3() {
-    const { CODE, DESCRIPTION, COMPANY_ID } =
-      this.ItemProperty3FormComponent.getNewItemProperty3Data();
-    const isCodeDuplicate = this.itemproperty3.some(
-      // (item: any) => item.CODE === commonDetails.code
-      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
-    );
+  const { CODE, DESCRIPTION, COMPANY_ID } =
+    this.ItemProperty3FormComponent.getNewItemProperty3Data();
 
-    const isDescriptionDuplicate = this.itemproperty3.some(
-      // (item: any) => item.DESCRIPTION === commonDetails.category
-      (item: any) =>
-        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase()
-    );
+  console.log('inserted data', CODE, DESCRIPTION, COMPANY_ID);
 
-    if (isCodeDuplicate && isDescriptionDuplicate) {
-      notify(
-        {
-          message: 'Both Code and category already exist',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error'
-      );
-      return;
-    } else if (isCodeDuplicate) {
-      notify(
-        {
-          message: 'This Code already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error'
-      );
-      return;
-    } else if (isDescriptionDuplicate) {
-      notify(
-        {
-          message: 'This Description already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error'
-      );
-      return;
-    }
-    this.dataservice
-      .insertItemProperty3Data(CODE, DESCRIPTION, COMPANY_ID)
-      .subscribe((response) => {
-        if (response) {
-          this.listItemProperty3();
-          notify(
-            {
-              message: 'Insert operation successful',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success'
-          );
-          this.isItemProperty3PopupOpened = false;
-        }
-      });
+  // 🔐 Safety guards
+  const list = this.itemproperty3 || [];
+  const code = (CODE || '').trim().toLowerCase();
+  const description = (DESCRIPTION || '').trim().toLowerCase();
+
+  const isCodeDuplicate = list.some(
+    (item: any) => item.CODE?.toLowerCase() === code
+  );
+
+  const isDescriptionDuplicate = list.some(
+    (item: any) => item.DESCRIPTION?.toLowerCase() === description
+  );
+
+  if (isCodeDuplicate && isDescriptionDuplicate) {
+    notify(
+      {
+        message: 'Both Code and Description already exist',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 1000,
+      },
+      'error'
+    );
+    return;
   }
+
+  if (isCodeDuplicate) {
+    notify(
+      {
+        message: 'This Code already exists',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 1000,
+      },
+      'error'
+    );
+    return;
+  }
+
+  if (isDescriptionDuplicate) {
+    notify(
+      {
+        message: 'This Description already exists',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 1000,
+      },
+      'error'
+    );
+    return;
+  }
+
+  // ✅ API CALL (NOW IT WILL EXECUTE)
+  this.dataservice
+    .insertItemProperty3Data(CODE, DESCRIPTION, COMPANY_ID)
+    .subscribe({
+      next: (response) => {
+        console.log('Insert response:', response);
+        this.listItemProperty3();
+        notify(
+          {
+            message: 'Insert operation successful',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+        this.isItemProperty3PopupOpened = false;
+      },
+      error: (err) => {
+        console.error('Insert failed:', err);
+      },
+    });
+}
+
   onRowRemoving(event) {
     const selectedRow = event.data;
     const { ID, CODE, DESCRIPTION, COMPANY_ID } = selectedRow;

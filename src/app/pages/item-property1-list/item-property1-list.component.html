@@ -28,7 +28,7 @@
     [showInfo]="true"
     [showNavigationButtons]="true"
   ></dxo-pager>
-  <dxo-editing mode="popup" [allowUpdating]="false" [allowDeleting]="true">
+  <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
     <dxo-popup
       title="Edit {{ itemlabel }}"
       [showTitle]="true"
@@ -108,6 +108,7 @@
   [(visible)]="isItemProperty1PopupOpened"
   (save)="onClickSaveItemProperty1()"
   titleText="New {{ itemlabel }}"
+  [showApprove]="false"
 >
   <app-item-property1-form
     [companyId]="selected_Company_id"
