@@ -188,7 +188,7 @@ export class EditCreditNoteComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['creditFormData'] && this.creditFormData?.length) {
       const data = this.creditFormData[0];
-
+      console.log(data, 'CREDITFORMDATAAAAAAAAAAAAAA=====');
       /* ---------------- Header bindings ---------------- */
       this.invoiceNo = String(data.INVOICE_NO);
       this.transDate = new Date(data.TRANS_DATE);
@@ -198,41 +198,31 @@ export class EditCreditNoteComponent {
 
       /* ---------------- Customer dropdown ---------------- */
       this.getCompanyListDropdown(data.DISTRIBUTOR_ID);
-      console.log(
-        'RAW creditFormData NOTE_DETAIL:',
-        JSON.stringify(this.creditFormData[0].NOTE_DETAIL, null, 2)
-      );
 
       /* ---------------- Grid binding ---------------- */
       this.getLedgerCodeDropdown().then(() => {
-        const backendNoteDetails = JSON.parse(
-          JSON.stringify(data.NOTE_DETAIL || [])
-        );
+        console.log('NOTE_DETAIL:', data.NOTE_DETAIL);
 
-        this.noteDetails = backendNoteDetails.map((item: any) => {
+        this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
           const ledger = this.ledgerList.find(
             (l: any) => l.HEAD_ID === item.HEAD_ID
           );
 
           return {
             SL_NO: item.SL_NO,
-            ledgerCode: ledger?.HEAD_CODE || item.LEDGER_CODE || '',
-            ledgerName: ledger?.HEAD_NAME || item.LEDGER_NAME || '',
+            ledgerCode: ledger?.HEAD_CODE || '',
+            ledgerName: ledger?.HEAD_NAME || '',
             particulars: item.REMARKS || '',
-            Amount: Number(item.AMOUNT) || 0,
-
-            // 🔐 FORCE BACKEND VALUES (NO MUTATION ALLOWED)
-            CGST: Number(item.CGST) === 1.5 ? 1.5 : Number(item.CGST),
-            SGST: Number(item.SGST) === 1.5 ? 1.5 : Number(item.SGST),
-            GST_PERC: Number(item.GST_PERC) || 0,
-
-            gstAmount: Number(item.GST_AMOUNT) || 0,
+            Amount: item.AMOUNT || '',
+            GST_PERC: item.GST_PERC ?? 0,
+            CGST: item.CGST ?? 0,
+            SGST: item.SGST ?? 0,
+            gstAmount: item.GST_AMOUNT ?? 0,
             HSN_CODE: item.HSN_CODE,
             HEAD_ID: item.HEAD_ID,
           };
         });
 
-        console.log('FINAL noteDetails used by grid:', this.noteDetails);
         this.cdr.detectChanges();
       });
 
@@ -365,8 +355,7 @@ export class EditCreditNoteComponent {
   }
 
   applyGstForRow(row: any) {
-    // EDIT MODE: GST comes ONLY from backend / existing row
-
+    // ✅ Just ensure saved values exist
     row.GST_PERC = Number(row.GST_PERC) || 0; // IGST %
     row.CGST = Number(row.CGST) || 0; // CGST %
     row.SGST = Number(row.SGST) || 0; // SGST %
@@ -615,6 +604,28 @@ export class EditCreditNoteComponent {
     const rowIndex = e.row?.rowIndex;
     console.log(rowIndex);
 
+    // ➤ SL_NO: Move to ledgerCode on Enter
+    // if (e.dataField === 'SL_NO') {
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     if (event.event.key === 'Enter') {
+    //       const grid = this.itemsGridRef?.instance;
+    //       const visibleRows = grid.getVisibleRows();
+
+    //       const rowIndex = visibleRows.findIndex(
+    //         (r) => r?.data === e.row?.data
+    //       );
+    //       console.log(
+    //         'SL_NO → Enter → move to ledgerCode, rowIndex:',
+    //         rowIndex
+    //       );
+
+    //       setTimeout(() => {
+    //         grid.focus(grid.getCellElement(rowIndex, 'ledgerCode'));
+    //       }, 50);
+    //     }
+    //   };
+    // }
+
     // ➤ ledgerCode: open dropdown on Enter, move to ledgerName on second Enter
     if (e.dataField === 'ledgerCode') {
       let enterPressedOnce = false;
@@ -626,7 +637,9 @@ export class EditCreditNoteComponent {
           if (!enterPressedOnce) {
             enterPressedOnce = true;
             setTimeout(() => {
-              event.component?.open?.();
+              if (event.component?.open) {
+                event.component.open(); // open dropdown
+              }
             }, 50);
           } else {
             enterPressedOnce = false;
@@ -645,20 +658,33 @@ export class EditCreditNoteComponent {
         e.setValue(args.value);
 
         if (selectedLedger) {
-          // ✅ Bind ledger name
+          // 1️⃣ Set ledger name
           e.component.cellValue(
             rowIndex,
             'ledgerName',
             selectedLedger.HEAD_NAME
           );
-
-          // ✅ Bind HSN only (GST MUST NOT be touched)
-          if (this.hsnLoaded) {
-            e.component.cellValue(rowIndex, 'HSN_CODE', this.HSNCODE);
+          if (!e.row.data.HSN_CODE) {
+            e.component.cellValue(
+              rowIndex,
+              'HSN_CODE',
+              this.noteDetails[0]?.HSN_CODE || this.HSNCODE
+            );
           }
+          // 2️⃣ Get HSN & GST from session
+          // const sessionData = JSON.parse(
+          //   sessionStorage.getItem('savedUserData')
+          // );
+          // const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
+          // const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
 
-          // 🚫 DO NOT set GST_PERC / CGST / SGST here
+          // // 3️⃣ Set HSN_CODE
+          // e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
 
+          // // 4️⃣ Set GST_PERC
+          // e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
+
+          // 5️⃣ Move to next field
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
           }, 50);
