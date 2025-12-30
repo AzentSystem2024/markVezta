@@ -2196,7 +2196,6 @@ export class DataService {
     COMPANY_ID: any
   ): Observable<any> {
     const data = { CODE, DESCRIPTION, COMPANY_ID };
-
     return this.http.post(`${this.apiUrl}itemproperty3/save`, data);
   }
 
@@ -2889,7 +2888,7 @@ export class DataService {
 
   postUOM(uom: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const body = { UOM: uom };
+    const body = { UOM: uom , COMPANY_ID : this.selected_Company_id};
     return this.http.post<any>(`${this.apiUrl}uom/insert`, body, { headers });
   }
 
