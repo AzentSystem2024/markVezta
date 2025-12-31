@@ -245,18 +245,19 @@ export class DataService {
     return this.http.post(`${this.apiUrl}AC_CreditNote/Insert`, data);
   }
 
-  // selectCreditNote(id: number) {
-  //   return this.http.post<any>(`${this.apiUrl}AC_CreditNote/select/` + id, {});
-  // }
-
   selectCreditNote(id: number) {
-    return this.http
-      .post<any>(`${this.apiUrl}AC_CreditNote/select/${id}`, {})
-      .pipe(
-        // ✅ CLONE RESPONSE TO PREVENT MUTATION ISSUES
-        map((res) => structuredClone(res))
-      );
+    return this.http.post<any>(`${this.apiUrl}AC_CreditNote/select/` + id, {});
   }
+  
+
+  // selectCreditNote(id: number) {
+  //   return this.http
+  //     .post<any>(`${this.apiUrl}AC_CreditNote/select/${id}`, {})
+  //     .pipe(
+  //       // ✅ CLONE RESPONSE TO PREVENT MUTATION ISSUES
+  //       map((res) => structuredClone(res))
+  //     );
+  // }
 
   updateCreditNote(items: any) {
     const data = items;

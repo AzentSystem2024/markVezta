@@ -471,12 +471,10 @@ export class CreditNoteListComponent {
     this.dataService
       .selectCreditNote(this.CreditNoteid)
       .subscribe((response: any) => {
-        console.log(structuredClone(response), 'FINAL RESPONSE');
-        this.selectedCreditNote = structuredClone(response.Data);
-        console.log(
-          structuredClone(this.selectedCreditNote),
-          'SELECTEDCREDITNOTEINLIST (SNAPSHOT)'
-        );
+        console.log(response, 'FINAL RESPONSE');
+
+        this.selectedCreditNote = response.Data;
+        
 
         if (transStatus === 5) {
           // Open view popup
