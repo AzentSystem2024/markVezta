@@ -200,12 +200,15 @@ export class EditCreditNoteComponent {
       console.log('EDIT → DISTRIBUTOR_ID:', data.DISTRIBUTOR_ID);
       console.log('EDIT → COMPANY_STATE_ID:', this.companyStateID);
 
+      console.log('+++++++++______', data.NOTE_DETAIL);
+
+
       /* ---------------- Customer dropdown ---------------- */
       this.getCompanyListDropdown(data.DISTRIBUTOR_ID);
 
       /* ---------------- Grid binding ---------------- */
       this.getLedgerCodeDropdown().then(() => {
-        console.log('NOTE_DETAIL:', data.NOTE_DETAIL);
+        console.log('SELECT NOTE_DETAIL:', data.NOTE_DETAIL);
 
         this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
           const ledger = this.ledgerList.find(
@@ -226,7 +229,7 @@ export class EditCreditNoteComponent {
             HEAD_ID: item.HEAD_ID,
           };
         });
-
+ console.log(this.noteDetails,'NOTE DETAILS')
         this.cdr.detectChanges();
       });
 
@@ -846,6 +849,7 @@ export class EditCreditNoteComponent {
     const gstPerc = Number(row.GST_PERC) || 0;
     return +((amount * gstPerc) / 100).toFixed(2);
   };
+  
   calculateTotalAmount = (row: any) => {
     const amount = Number(row.Amount) || 0;
     const gstAmount = this.calculateTaxAmount(row); // IGST or CGST+SGST
