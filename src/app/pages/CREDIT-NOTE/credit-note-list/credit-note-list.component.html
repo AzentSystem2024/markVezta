@@ -171,7 +171,7 @@
   </ng-container>
 </dx-popup>
 
-<dx-popup
+<!-- <dx-popup
   [(visible)]="isEditCreditNote"
   [width]="'90vw'"
   [height]="'100vh'"
@@ -181,6 +181,20 @@
   <ng-container *ngIf="isEditCreditNote && selectedCreditNote">
     <app-edit-credit-note
       [creditFormData]="selectedCreditNote"
+      (popupClosed)="handleClose()"
+    ></app-edit-credit-note>
+  </ng-container>
+</dx-popup> -->
+<dx-popup
+  [(visible)]="isEditCreditNote"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Update Credit Note"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditCreditNote">
+    <app-edit-credit-note
+      [creditFormData]="selectedCreditNoteForEdit"
       (popupClosed)="handleClose()"
     ></app-edit-credit-note>
   </ng-container>

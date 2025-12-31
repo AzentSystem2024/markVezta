@@ -86,6 +86,7 @@ export class CreditNoteListComponent {
   };
   selectedCredit: any;
   CreditNoteid: any;
+  selectedCreditNoteForEdit: any;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -457,6 +458,37 @@ export class CreditNoteListComponent {
   //   });
   // }
 
+  // onEditCreditNote(event: any) {
+  //   console.log(event, 'eventtttttttttttttt');
+  //   event.cancel = true; // Prevent default popup editing
+  //   const creditId = event.data.TRANS_ID;
+  //   this.CreditNoteid = event.data.TRANS_ID;
+  //   this.selectedCredit = creditId;
+  //   const transStatus = event.data.TRANS_STATUS;
+  //   console.log(event, 'transstatus');
+
+  //   this.dataService
+  //     .selectCreditNote(this.CreditNoteid)
+  //     .subscribe((response: any) => {
+  //       console.log(response, 'FINAL RESPONSE');
+
+  //       this.selectedCreditNote = response.Data;
+        
+
+  //       if (transStatus === 5) {
+  //         // Open view popup
+  //         this.isViewCreditNote = true;
+  //       } else {
+  //         // Open edit popup
+  //         this.isEditCreditNote = true;
+  //       }
+  //       console.log(
+  //         this.selectedCreditNote,
+  //         'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+  //       );
+  //     });
+  // }
+
   onEditCreditNote(event: any) {
     console.log(event, 'eventtttttttttttttt');
     event.cancel = true; // Prevent default popup editing
@@ -469,10 +501,12 @@ export class CreditNoteListComponent {
     this.dataService
       .selectCreditNote(this.CreditNoteid)
       .subscribe((response: any) => {
-        console.log(response, 'FINAL RESPONSE');
-
-        this.selectedCreditNote = response.Data;
-        
+        console.log(structuredClone(response), 'FINAL RESPONSE');
+        this.selectedCreditNote = structuredClone(response.Data);
+        console.log(
+          structuredClone(this.selectedCreditNote),
+          'SELECTEDCREDITNOTEINLIST (SNAPSHOT)'
+        );
 
         if (transStatus === 5) {
           // Open view popup
@@ -485,9 +519,13 @@ export class CreditNoteListComponent {
           this.selectedCreditNote,
           'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
         );
+
+        this.selectedCreditNoteForEdit = JSON.parse(
+  JSON.stringify(this.selectedCreditNote)
+);
       });
   }
-
+  
   onDeleteCreditNote(event: any) {
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;

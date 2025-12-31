@@ -156,7 +156,7 @@ export class StockMovementReportComponent {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
-      STORE_ID: this.selectedstoreId,
+      // STORE_ID: this.selectedstoreId,
       ITEM_ID: this.selected_item_Id || 0,
     };
     console.log(payload, '================payload===================');

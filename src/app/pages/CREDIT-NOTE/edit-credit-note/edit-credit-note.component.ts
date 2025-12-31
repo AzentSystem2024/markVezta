@@ -849,6 +849,7 @@ export class EditCreditNoteComponent {
     const gstPerc = Number(row.GST_PERC) || 0;
     return +((amount * gstPerc) / 100).toFixed(2);
   };
+  
   calculateTotalAmount = (row: any) => {
     const amount = Number(row.Amount) || 0;
     const gstAmount = this.calculateTaxAmount(row); // IGST or CGST+SGST
