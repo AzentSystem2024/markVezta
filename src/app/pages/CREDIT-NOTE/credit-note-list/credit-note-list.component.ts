@@ -159,12 +159,8 @@ export class CreditNoteListComponent {
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getCreditNotes();
-    this.session_Details();
   }
 
-  session_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-  }
   getCreditNotes() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
@@ -438,6 +434,29 @@ export class CreditNoteListComponent {
     }
   }
 
+  // onEditCreditNote(event: any) {
+  //   event.cancel = true; // Prevent default popup editing
+  //   const creditId = event.data.TRANS_ID;
+  //   this.CreditNoteid = event.data.TRANS_ID;
+  //   this.selectedCredit = creditId;
+  //   const transStatus = event.data.TRANS_STATUS;
+  //   console.log(event, 'transstatus');
+
+  //   this.dataService.selectCreditNote(creditId).subscribe((response: any) => {
+  //     console.log(response)
+  //     this.selectedCreditNote = response.Data;
+  //     console.log(this.selectedCreditNote)
+  //     if (transStatus === 5) {
+  //       // Open view popup
+  //       this.isViewCreditNote = true;
+  //     } else {
+  //       // Open edit popup
+  //       this.isEditCreditNote = true;
+  //     }
+  //     console.log(this.selectedCreditNote, 'SELECTEDJOURNALVOUCHERRRRRRRRRR');
+  //   });
+  // }
+
   onEditCreditNote(event: any) {
     console.log(event, 'eventtttttttttttttt');
     event.cancel = true; // Prevent default popup editing
@@ -450,9 +469,12 @@ export class CreditNoteListComponent {
     this.dataService
       .selectCreditNote(this.CreditNoteid)
       .subscribe((response: any) => {
-        console.log(response, 'FINAL RESPONSE');
-        this.selectedCreditNote = response.Data;
-        console.log(this.selectedCreditNote, 'SELECTEDCREDITNOTEINLIST');
+        console.log(structuredClone(response), 'FINAL RESPONSE');
+        this.selectedCreditNote = structuredClone(response.Data);
+        console.log(
+          structuredClone(this.selectedCreditNote),
+          'SELECTEDCREDITNOTEINLIST (SNAPSHOT)'
+        );
 
         if (transStatus === 5) {
           // Open view popup

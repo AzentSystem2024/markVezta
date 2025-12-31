@@ -573,4 +573,4 @@ export class StoresListComponent implements OnInit {
   exports: [],
   declarations: [StoresListComponent],
 })
-export class StoresListModule {}
+export class StoresListModule {} 

@@ -39,6 +39,7 @@ import {
 import { SettingsListComponent } from '../settings-list/settings-list.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-ledger-settings-list',
@@ -158,7 +159,7 @@ export class LedgerSettingsListComponent {
   }
 
   onEditorPreparing(e: any) {
-    if (e.dataField === 'LEDGER_ID') {
+    if (e.dataField === 'HEAD_ID') {
       e.editorOptions = e.editorOptions || {};
 
       // Let the editor inherit row height naturally (no fixed height)
@@ -207,7 +208,7 @@ export class LedgerSettingsListComponent {
     const fieldMap: any = {
       'Sales Account': 'AC_SALE_ID',
       'Purchase Account': 'AC_PURCHASE_ID',
-      Inventory: 'AC_INVENTORY_ID',
+      'Inventory': 'AC_INVENTORY_ID',
       'Input GST': 'AC_INPUT_VAT',
       'Output GST': 'AC_OUTPUT_VAT',
       'Depreciation Expense': 'AC_DEPRECIATION_EXPENSE_ID',
@@ -218,13 +219,23 @@ export class LedgerSettingsListComponent {
     };
     this.ledgerList.forEach((row: any) => {
       const key = fieldMap[row.NAME];
-      if (key && row.LEDGER_ID) {
-        payload[key] = row.LEDGER_ID;
+      if (key && row.HEAD_ID) {
+        payload[key] = row.HEAD_ID;
       }
     });
     this.dataService.insertLedgerSettings(payload).subscribe({
       next: (res: any) => {
         console.log('Save success', res);
+         notify(
+      {
+        message: 'Ledger settings added successfully!',
+        type: 'success',
+        displayTime: 3000,
+        position: { at: 'top center', my: 'top center' },
+      },
+      'success',
+      3000
+    );
         // Optional: reload grid
         this.getLedgerSettingsList();
       },

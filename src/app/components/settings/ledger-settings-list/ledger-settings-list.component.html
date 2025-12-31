@@ -81,7 +81,8 @@
         ></dxi-item>
       </dxo-toolbar>
       <dxi-column dataField="NAME" caption="Name"></dxi-column>
-      <dxi-column dataField="LEDGER_ID" caption="Ledger" [allowEditing]="true">
+
+      <dxi-column dataField="HEAD_ID" caption="Ledger" [allowEditing]="true">
         <dxo-lookup
           [dataSource]="ledgerDropdown"
           valueExpr="ID"

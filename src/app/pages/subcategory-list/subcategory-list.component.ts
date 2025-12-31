@@ -152,7 +152,7 @@ export class SubcategoryListComponent {
     }
 
     this.dataService
-      .postSubCategoryData(CODE, SUBCAT_NAME, DEPT_ID, CAT_ID, COMPANY_ID)
+      .postSubCategoryData(CODE, SUBCAT_NAME,CAT_ID, DEPT_ID, COMPANY_ID)
       .subscribe((response) => {
         console.log(response, '}}}}}}}}}}}}}}}}}}]]]]]]]]');
         this.getSubCategory();
