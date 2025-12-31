@@ -64,7 +64,14 @@ export class PackingEditComponent {
 
   @ViewChild('UnitValidationGroup')
   UnitValidationGroup: DxValidationGroupComponent;
-
+ @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
+ selectedTabIndex = 0;
+   readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+   isFilterRowVisible: boolean = false;
+    items: any[] = []; // grid data → BoM components
+  itemsList: any[] = [];
   articleData: any;
   colorList: any;
   categoryList: any;
@@ -117,6 +124,61 @@ PackingEntriesData:any;
     console.log('Purchasable changed:', e.value);
     // Add any custom logic here if needed
   }
+
+    addNewRow() {
+    const grid = this.itemsGridRef.instance; // reference to your dx-data-grid
+    const rows = grid.getVisibleRows();
+
+    // Check if any existing row is incomplete
+    const hasIncompleteRow = rows.some(
+      (r: any) => !r.data.ITEM || !r.data.QUANTITY
+    );
+
+    if (hasIncompleteRow) {
+      // Optionally, show a message
+      return; // Stop adding new row
+    }
+
+    // Add new row at the bottom
+    this.items.push({ ITEM: null, DESCRIPTION: '', UOM: '', QUANTITY: null });
+
+    setTimeout(() => {
+      const updatedRows = grid.getVisibleRows();
+      const newRowIndex = updatedRows.length - 1;
+      if (newRowIndex >= 0) {
+        grid.editCell(newRowIndex, 'ITEM'); // Focus ITEM of new row
+      }
+    }, 100);
+  }
+
+
+    onGridInitialized(e: any) {
+    const grid = e.component;
+    const store = grid.getDataSource().store();
+
+    // Remove empty row at start if present
+    setTimeout(() => {
+      const rows = grid.getVisibleRows();
+      if (rows.length === 1 && !rows[0].data.ITEM && !rows[0].data.QUANTITY) {
+        store.remove(rows[0].key);
+        grid.refresh();
+      }
+    });
+  }
+
+    onInitNewRow(e: any) {
+    const grid = e.component;
+    const rows = grid.getVisibleRows();
+
+    // Get the last row
+    const lastRow = rows[rows.length - 1];
+
+    // Check if last row exists and required fields are empty
+    if (lastRow && (!lastRow.data.ITEM || !lastRow.data.QUANTITY)) {
+      e.cancel = true; // Prevent adding new row
+    }
+  }
+  
   getDropdownLists() {
      const payload = { COMPANY_ID : this.selected_Company_id ,NAME :'PRODUCTION_UNITS' };
     this.dataService
