@@ -267,7 +267,7 @@ body {
   app-footer {
     // background-color: var(--base-bg);
     background-color: var(--bg-side-panel);
-     border-radius: 8px;
+    border-radius: 8px;
   }
   // .layout-body .menu-container.theme-dependent :hover{
   //   background-color: var(--bg-side-panel);
@@ -646,7 +646,7 @@ body {
 
 .custom-tab .dx-tabs-styling-mode-secondary .dx-tab {
   border-radius: 8px;
-  background-color: var(--tab-unselected-bg-color);
+  // background-color: var(--tab-unselected-bg-color);
   border: 1px solid var(--border-color);
 }
 
@@ -713,25 +713,24 @@ body {
   border-bottom: none;
 }
 
-
 // .dx-treeview-node[aria-expanded="true"] > .dx-item .dx-item-content {
 //   height: auto;
 //   color:var(--main-menu-expanded-color)!important;
 //   border-radius: 6px;
 //   padding: 4px 8px;
-  
+
 // }
 .dx-icon-edit:before {
   content: "\f023" !important;
-  color:#0073D8 !important;
+  color: #0073d8 !important;
 }
 .dx-icon-trash:before {
   content: "\f03e";
-  color: #d62a1e!important;
+  color: #d62a1e !important;
 }
 .dx-treeview-node[aria-expanded="true"] > .dx-item .dx-item-content {
   height: auto;
-  color:#0073D8;
+  color: #0073d8;
   border-radius: 6px;
   padding: 4px 8px;
 }
@@ -740,7 +739,7 @@ body {
 //   .dx-item-content {
 //   font-weight: 500 !important;
 //   height: auto !important;
-  
+
 // }
 
 .dx-treeview-node[aria-level="1"][aria-expanded="true"]
@@ -757,10 +756,8 @@ body {
   margin-right: 10px;
   margin-left: 10px;
   border-radius: 32px !important;
-  background-color: white!important;
-  
+  background-color: white !important;
 }
-
 
 // ::ng-deep.dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected {
 //     background-color: var(--sub-menu-bg-color) !important;
@@ -769,9 +766,9 @@ body {
 //     height: 46px;
 // }
 .dx-theme-fluent .dx-datagrid-headers.dx-datagrid-nowrap.dx-bordered-top-view {
-    border-radius: 8px 8px 0 0;
-    background-color:var(--grid-bg-color);
-    font-size: larger;
-    font-weight: bolder;
-    color: var(--grid-head-text-color);
+  border-radius: 8px 8px 0 0;
+  background-color: var(--grid-bg-color);
+  font-size: larger;
+  font-weight: bolder;
+  color: var(--grid-head-text-color);
 }

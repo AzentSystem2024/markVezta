@@ -159,10 +159,8 @@ export class CreditNoteListComponent {
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getCreditNotes();
-   
   }
 
- 
   getCreditNotes() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
