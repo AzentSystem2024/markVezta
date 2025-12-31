@@ -120,7 +120,9 @@ export class ArticleEditComponent {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['articleData'] && changes['articleData'].currentValue) {
       const incomingData = changes['articleData'].currentValue;
-
+      if (!this.selected_Company_id) {
+        this.sesstion_Details();
+      }
       console.log('Incoming articleData:', incomingData);
 
       this.getDropdownLists().then(() => {
