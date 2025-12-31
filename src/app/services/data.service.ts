@@ -248,6 +248,15 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}AC_CreditNote/select/` + id, {});
   }
 
+  // selectCreditNote(id: number) {
+  //   return this.http
+  //     .post<any>(`${this.apiUrl}AC_CreditNote/select/${id}`, {})
+  //     .pipe(
+  //       // ✅ CLONE RESPONSE TO PREVENT MUTATION ISSUES
+  //       map((res) => structuredClone(res))
+  //     );
+  // }
+
   updateCreditNote(items: any) {
     const data = items;
     // console.log(data,"insert service")
@@ -2892,17 +2901,14 @@ export class DataService {
   //   return this.http.post<any>(`${this.apiUrl}uom/insert`, body, { headers });
   // }
   postUOM(payload: { UOM: string; COMPANY_ID: number }): Observable<any> {
-  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  return this.http.post<any>(
-    `${this.apiUrl}uom/insert`,
-    payload,
-    { headers }
-  );
-}
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.apiUrl}uom/insert`, payload, {
+      headers,
+    });
+  }
 
-
-  updateUom(ID: any, UOM: any,COMPANY_ID:any): Observable<any> {
-    const data = { ID, UOM,COMPANY_ID };
+  updateUom(ID: any, UOM: any, COMPANY_ID: any): Observable<any> {
+    const data = { ID, UOM, COMPANY_ID };
     return this.http.post(`${this.apiUrl}uom/update`, data);
   }
 
@@ -5892,9 +5898,9 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //DROPDOWN ITEM
-  Item_Dropdown() {
-    const reqbody = { NAME: 'PARENTITEM' };
-    return this.http.post(`${this.apiUrl}dropdown`, reqbody);
+  Item_Dropdown(payload) {
+    // const reqbody = { NAME: 'PARENTITEM' };
+    return this.http.post(`${this.apiUrl}dropdown`, payload);
   }
 
   get_DeliveryRteurn_Data() {

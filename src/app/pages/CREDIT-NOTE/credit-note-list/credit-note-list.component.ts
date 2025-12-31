@@ -439,6 +439,7 @@ export class CreditNoteListComponent {
   }
 
   onEditCreditNote(event: any) {
+    console.log(event, 'eventtttttttttttttt');
     event.cancel = true; // Prevent default popup editing
     const creditId = event.data.TRANS_ID;
     this.CreditNoteid = event.data.TRANS_ID;
@@ -446,17 +447,25 @@ export class CreditNoteListComponent {
     const transStatus = event.data.TRANS_STATUS;
     console.log(event, 'transstatus');
 
-    this.dataService.selectCreditNote(creditId).subscribe((response: any) => {
-      this.selectedCreditNote = response.Data;
-      if (transStatus === 5) {
-        // Open view popup
-        this.isViewCreditNote = true;
-      } else {
-        // Open edit popup
-        this.isEditCreditNote = true;
-      }
-      console.log(this.selectedCreditNote, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-    });
+    this.dataService
+      .selectCreditNote(this.CreditNoteid)
+      .subscribe((response: any) => {
+        console.log(response, 'FINAL RESPONSE');
+        this.selectedCreditNote = response.Data;
+        console.log(this.selectedCreditNote, 'SELECTEDCREDITNOTEINLIST');
+
+        if (transStatus === 5) {
+          // Open view popup
+          this.isViewCreditNote = true;
+        } else {
+          // Open edit popup
+          this.isEditCreditNote = true;
+        }
+        console.log(
+          this.selectedCreditNote,
+          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+        );
+      });
   }
 
   onDeleteCreditNote(event: any) {

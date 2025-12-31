@@ -64,7 +64,22 @@ import { confirm } from 'devextreme/ui/dialog';
 })
 export class EditCreditNoteComponent {
   @Output() popupClosed = new EventEmitter<void>();
-  @Input() creditFormData: any;
+  // @Input() creditFormData: any;
+  private _creditFormData: any;
+  creditHeader!: any;
+
+  @Input()
+  set creditFormData(value: any) {
+    if (!value || !value.length) return;
+
+    const cloned = structuredClone(value);
+    this._creditFormData = cloned;
+    this.creditHeader = cloned[0]; // ⭐ SINGLE SOURCE
+  }
+  get creditFormData() {
+    return this._creditFormData;
+  }
+
   // @ViewChild(DxDataGridComponent, { static: true })
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   dataGrid: DxDataGridComponent;
@@ -136,18 +151,7 @@ export class EditCreditNoteComponent {
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef
-  ) {
-    const userDataString = localStorage.getItem('userData');
-    console.log(userDataString, 'USERDATASTRING');
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
-
-      // this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-      // this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, 'HSNCODE===================');
-      this.hsnLoaded = true; // ADD THIS
-    }
-  }
+  ) {}
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
@@ -188,7 +192,7 @@ export class EditCreditNoteComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['creditFormData'] && this.creditFormData?.length) {
       const data = this.creditFormData[0];
-      console.log(data, 'CREDITFORMDATAAAAAAAAAAAAAA=====');
+      console.log(this.creditFormData, 'CREDITFORMDATAAAAAAAAAAAAAA=====');
       /* ---------------- Header bindings ---------------- */
       this.invoiceNo = String(data.INVOICE_NO);
       this.transDate = new Date(data.TRANS_DATE);
@@ -344,21 +348,30 @@ export class EditCreditNoteComponent {
   }
 
   private hasEmptyRow(): boolean {
-    return (this.noteDetails || []).some(
-      (r: any) =>
-        !r.ledgerCode &&
-        !r.ledgerName &&
-        !r.particulars &&
-        (!r.Amount || r.Amount === 0) &&
-        (!r.GST_PERC || r.GST_PERC === 0)
-    );
+    return (this.noteDetails || []).some((r: any) => {
+      const hasAmount = Number(r.Amount) > 0;
+      const hasLedger = !!r.ledgerCode || !!r.ledgerName;
+
+      const hasIGST = Number(r.GST_PERC) > 0;
+      const hasCGSTSGST = Number(r.CGST) > 0 || Number(r.SGST) > 0;
+
+      return !hasLedger && !hasAmount && !hasIGST && !hasCGSTSGST;
+    });
   }
 
   applyGstForRow(row: any) {
-    // ✅ Just ensure saved values exist
-    row.GST_PERC = Number(row.GST_PERC) || 0; // IGST %
-    row.CGST = Number(row.CGST) || 0; // CGST %
-    row.SGST = Number(row.SGST) || 0; // SGST %
+    if (
+      row.CGST !== undefined ||
+      row.SGST !== undefined ||
+      row.GST_PERC !== undefined
+    ) {
+      // saved row → DO NOTHING
+      return;
+    }
+
+    row.GST_PERC = 0;
+    row.CGST = 0;
+    row.SGST = 0;
   }
 
   addNewManualRow() {
@@ -595,7 +608,7 @@ export class EditCreditNoteComponent {
             (r) => r?.data === e.row?.data
           );
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
           }, 50);
         }
       };
@@ -767,16 +780,16 @@ export class EditCreditNoteComponent {
             // ✅ Add new row manually
             if (!this.hasEmptyRow()) {
               const grid = this.itemsGridRef?.instance;
+              const baseRow = this.noteDetails[0] || {};
               const newRow = {
                 SL_NO: this.noteDetails.length + 1,
                 ledgerCode: '',
                 ledgerName: '',
                 particulars: '',
                 Amount: '',
-                GST_PERC: '',
-                GST: 0,
-                CGST: 0,
-                SGST: 0,
+                GST_PERC: baseRow.GST_PERC || 0,
+                CGST: baseRow.CGST || 0,
+                SGST: baseRow.SGST || 0,
                 gstAmount: '',
                 HEAD_ID: null,
               };
@@ -838,57 +851,6 @@ export class EditCreditNoteComponent {
     const gstAmount = this.calculateTaxAmount(row); // IGST or CGST+SGST
     return +(amount + gstAmount).toFixed(2);
   };
-  // get calculatedNetAmount(): string {
-  //   const details = this.noteDetails || [];
-  //   let totalAmount = 0;
-  //   let totalGST = 0;
-
-  //   details.forEach((item: any) => {
-  //     const amount = Number(item.Amount) || 0;
-  //     const gstPerc = Number(item.GST_PERC) || 0;
-
-  //     totalAmount += amount;
-  //     totalGST += (amount * gstPerc) / 100; // ✅ Recalculate GST dynamically
-  //   });
-
-  //   return (totalAmount + totalGST).toFixed(2);
-  // }
-
-  // get calculatedNetAmount(): string {
-  //   const details = this.noteDetails || [];
-  //   let totalAmount = 0;
-  //   let totalGST = 0;
-
-  //   const isSameState = this.companyStateID === this.selectedCustomer?.STATE_ID;
-
-  //   details.forEach((item: any) => {
-  //     const amount = Number(item.Amount) || 0;
-  //     totalAmount += amount;
-
-  //     if (isSameState) {
-  //       // SAME STATE → CGST + SGST
-  //       const cgst = Number(item.CGST) || 0;
-  //       const sgst = Number(item.SGST) || 0;
-  //       const totalGstPerc = cgst + sgst;
-
-  //       totalGST += (amount * totalGstPerc) / 100;
-  //     } else {
-  //       // ⭐ DIFFERENT STATE → IGST
-  //       const gstPerc = Number(item.GST_PERC) || 0;
-  //       totalGST += (amount * gstPerc) / 100;
-  //     }
-  //   });
-
-  //   // ⭐ Raw total (before round-off)
-  //   this.netTotal = totalAmount + totalGST;
-
-  //   // ⭐ Apply round-off only if checkbox enabled
-  //   if (this.creditFormData.ROUND_OFF) {
-  //     this.netTotal = Math.round(this.netTotal);
-  //   }
-  //   console.log(this.netTotal, 'NETTOTALLLLLLLL');
-  //   return this.netTotal.toFixed(2);
-  // }
 
   get calculatedNetAmount(): string {
     const details = this.noteDetails || [];
@@ -951,7 +913,7 @@ export class EditCreditNoteComponent {
   onCompanySelected(event: any): void {
     const grid = this.itemsGridRef?.instance;
     const selectedId = event.value;
-    this.creditFormData.UNIT_ID = selectedId;
+    this.creditFormData[0].UNIT_ID = selectedId;
     if (grid) {
       const editRowIndex = grid
         .getVisibleRows()
@@ -967,7 +929,7 @@ export class EditCreditNoteComponent {
   onDistributorSelected(event: any): void {
     const grid = this.itemsGridRef?.instance;
     this.selectedCustomerId = event.value;
-    this.creditFormData.DISTRIBUTOR_ID = this.selectedCustomerId;
+    this.creditFormData[0].DISTRIBUTOR_ID = this.selectedCustomerId;
     if (grid) {
       const editRowIndex = grid
         .getVisibleRows()
@@ -1034,16 +996,16 @@ export class EditCreditNoteComponent {
   selectInvoice(e: any) {
     console.log('Invoice selected:', e);
     const selected = e.data;
-    this.creditFormData.INVOICE_NO = selected.INVOICE_NO;
-    this.creditFormData.DUE_AMOUNT = selected.BALANCE_AMOUNT;
-    this.creditFormData.INVOICE_ID = selected.INVOICE_ID;
+    this.creditFormData[0].INVOICE_NO = selected.INVOICE_NO;
+    this.creditFormData[0].DUE_AMOUNT = selected.BALANCE_AMOUNT;
+    this.creditFormData[0].INVOICE_ID = selected.INVOICE_ID;
     console.log(this.creditFormData.INVOICE_ID, 'INVOICEIDDDDDDDDDDDDDDDD');
     this.invoicePopupVisible = false;
   }
 
   onApprovedChanged(e: any) {
     console.log('Checkbox value changed:', e.value);
-    this.creditFormData.IS_APPROVED = e.value;
+    this.creditFormData[0].IS_APPROVED = e.value;
   }
 
   updateCreditNote() {

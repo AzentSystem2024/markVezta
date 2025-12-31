@@ -37,7 +37,7 @@ export class StoresListComponent implements OnInit {
   group: any;
   state: any;
   isAddStoresPopupOpened = false;
-   addButtonOptions = {
+  addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
     // icon: 'add',
@@ -276,17 +276,20 @@ export class StoresListComponent implements OnInit {
     });
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   showStores() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.stores = response;
       console.log(response, '++');
@@ -310,11 +313,12 @@ export class StoresListComponent implements OnInit {
       VAT_REGNO,
       GROUP_ID,
       STORE_NO,
-      IS_ACTIVE
+      IS_ACTIVE,
+      COMPANY_ID,
     } = this.storesComponent.getNewStoresData();
     console.log(
       'inserted data',
-      
+
       CODE,
       STORE_NAME,
       IS_PRODUCTION,
@@ -331,7 +335,8 @@ export class StoresListComponent implements OnInit {
       VAT_REGNO,
       GROUP_ID,
       STORE_NO,
-      IS_ACTIVE
+      IS_ACTIVE,
+      COMPANY_ID
     );
     // --- Duplicate check ---
     const duplicate = this.stores.some(

@@ -178,7 +178,7 @@
   title="Update Credit Note"
   (onHiding)="handleClose()"
 >
-  <ng-container *ngIf="isEditCreditNote">
+  <ng-container *ngIf="isEditCreditNote && selectedCreditNote">
     <app-edit-credit-note
       [creditFormData]="selectedCreditNote"
       (popupClosed)="handleClose()"

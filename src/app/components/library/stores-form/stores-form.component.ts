@@ -30,6 +30,8 @@ import { CountryServiceService } from 'src/app/services/country-service.service'
 })
 export class StoresFormComponent implements OnInit {
   @Input() storeData: any = {}; // for edit mode
+  @Input() companyId!: number;
+
   @Output() formSubmit = new EventEmitter<any>();
   CountryDropdownData: any[] = [];
   GroupDropdownData: any[] = [];
@@ -52,7 +54,8 @@ export class StoresFormComponent implements OnInit {
     VAT_REGNO: '',
     GROUP_ID: 0,
     STORE_NO: '0',
-    IS_ACTIVE:false
+    IS_ACTIVE: false,
+    COMPANY_ID: 0,
   };
   countryList: any;
   countries: any[];
@@ -65,15 +68,24 @@ export class StoresFormComponent implements OnInit {
 
   getNewStoresData = () => ({ ...this.newStores });
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['storeData'] && this.storeData) {
-      // If editing → populate form with existing data
-      this.newStores = { ...this.formStoresData, ...this.storeData };
-      this.selectedCountryId = this.newStores.COUNTRY_ID;
-      if (this.selectedCountryId) {
-        this.getStateDropDown();
-      }
+    // EDIT MODE
+    if (
+      changes['storeData'] &&
+      this.storeData &&
+      Object.keys(this.storeData).length
+    ) {
+      this.newStores = {
+        ...this.formStoresData,
+        ...this.storeData,
+      };
+    }
+
+    // ADD MODE → ALWAYS set companyId when received
+    if (changes['companyId'] && this.companyId) {
+      this.newStores.COMPANY_ID = this.companyId;
     }
   }
+
   resetForm() {
     this.newStores = {
       CODE: '',
@@ -92,7 +104,8 @@ export class StoresFormComponent implements OnInit {
       VAT_REGNO: '',
       GROUP_ID: null,
       STORE_NO: '',
-      IS_ACTIVE : false
+      IS_ACTIVE: false,
+      COMPANY_ID: this.companyId,
     };
   }
   submitForm() {
