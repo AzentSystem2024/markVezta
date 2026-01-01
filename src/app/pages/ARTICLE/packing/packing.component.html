@@ -86,8 +86,8 @@
           ></dx-button>
         </dxi-item> -->
       </dxo-toolbar>
-      
-            <dxi-column dataField="SNO" caption="S.No." alignment="left"></dxi-column>
+
+      <dxi-column dataField="SNO" caption="S.No." alignment="left"></dxi-column>
 
       <dxi-column dataField="ArtNo" caption="Art No."></dxi-column>
       <dxi-column dataField="Color" caption="Color"></dxi-column>
@@ -97,7 +97,11 @@
       <dxi-column dataField="Type" caption="Type"></dxi-column>
       <dxi-column dataField="Brand" caption="Brand"></dxi-column>
       <!-- <dxi-column dataField="ID" caption="ID"></dxi-column> -->
-      <dxi-column dataField="UnitId"      alignment="Left" caption="Unit"></dxi-column>
+      <dxi-column
+        dataField="UnitId"
+        alignment="Left"
+        caption="Unit"
+      ></dxi-column>
       <dxi-column dataField="AliasNo" caption="Alias No."></dxi-column>
       <dxi-column dataField="PartNo" caption="Part No."></dxi-column>
       <dxi-column dataField="PairQty" caption="Pair Qty"></dxi-column>
@@ -114,11 +118,10 @@
           class="fas fa-flag"
           [ngClass]="getStatusFlagClass(cellData.value)"
           [attr.title]="cellData.value == 'Active' ? 'Active ' : 'Inactive '"
-          style="cursor: default ;align-items: center;"
+          style="cursor: default; align-items: center"
         ></i>
               
       </div>
-
     </dx-data-grid>
   </div>
 </div>
@@ -126,7 +129,7 @@
 <dx-popup
   [(visible)]="addPackingPopupVisible"
   [width]="'70vw'"
-  [height]="'77vh'"
+  [height]="'80vh'"
   title="New Packing"
   (onHiding)="handleClose()"
 >
@@ -136,7 +139,7 @@
 <dx-popup
   [(visible)]="editPackPopupOpened"
   [width]="'70vw'"
-  [height]="'77vh'"
+  [height]="'83vh'"
   title="Update Packing"
   (onHiding)="handleClose()"
 >

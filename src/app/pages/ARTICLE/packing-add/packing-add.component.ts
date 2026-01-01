@@ -126,6 +126,7 @@ export class PackingAddComponent {
   combinationString: string;
   selected_Company_id: any;
   selected_fin_id: any;
+  selectedItemID: any;
 
   //===================dummy datasource of =========================
   constructor(private dataService: DataService) {
@@ -145,6 +146,7 @@ export class PackingAddComponent {
     if (this.selectedProductionUnitId) {
       this.getLastOrderNo();
     }
+    this.getItems();
   }
 
   addNewRow() {
@@ -268,6 +270,15 @@ export class PackingAddComponent {
     }
   }
 
+    getItems() {
+      const payload = {
+        COMPANY_ID: this.selected_Company_id,
+      };
+      this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
+        this.itemsList = response.DataList;
+      });
+    }
+
   loadArticle() {
     const payload = {
       artNo: this.PackingData.ART_NO,
@@ -320,6 +331,175 @@ export class PackingAddComponent {
           Size: parseInt(item.Size, 10), // convert Size from string to number
         }));
       });
+  }
+
+   onEditorPreparings(e: any) {
+    if (
+      e.dataField === 'ITEM' ||
+      e.dataField === 'DESCRIPTION' ||
+      e.dataField === 'UOM' ||
+      e.dataField === 'QUANTITY'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
+    const grid = e.component;
+    const row = e.row?.data;
+    const rowIndex = e.row?.rowIndex;
+    const field = e.dataField;
+    if (e.dataField === 'ITEM' && e.editorName === 'dxSelectBox') {
+      e.editorOptions.onValueChanged = (args: any) => {
+        const selectedDescription = args.value;
+        const grid = e.component;
+        const rowIndex = e.row.rowIndex;
+        console.log(args, 'ARGSSSSSSSSSSSSSS');
+        // Keep the selected value in the grid
+        grid.cellValue(rowIndex, 'ITEM', selectedDescription);
+
+        // Find the matched item ID
+        const matchedItem = this.itemsList.find(
+          (p: any) => p.DESCRIPTION === selectedDescription
+        );
+        console.log(matchedItem.ID, 'MATCHEDITEMMMMMMMMMMMMMMMMMMM');
+        grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
+
+        console.log(this.selectedItemID, 'ID');
+        // Save ID separately
+        grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
+
+        let itemCode = null;
+        if (selectedDescription) {
+          itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
+        }
+        // Call API to get DESCRIPTION/UOM
+        const payload = { ITEM_CODE: String(itemCode) };
+        this.dataService.getItemsForArticle(payload).subscribe({
+          next: (response: any) => {
+            if (response?.flag === 1 && response?.Data) {
+              const data = response.Data;
+
+              // Fill DESCRIPTION and UOM
+              grid.cellValue(rowIndex, 'DESCRIPTION', data.DESCRIPTION);
+              grid.cellValue(rowIndex, 'UOM', data.UOM);
+              grid.cellValue(rowIndex, 'ITEM_ID', data.ID);
+
+              // Move focus automatically to QUANTITY
+              setTimeout(() => {
+                grid.editCell(rowIndex, 'QUANTITY');
+              }, 50); // slight delay for grid rendering
+            }
+          },
+          error: (err) => console.error('API Error:', err),
+        });
+      };
+    }
+
+    /** ---------------------- Auto-height Dropdowns ---------------------- */
+    const dropdownFields = ['ITEM', 'DESCRIPTION', 'UOM', 'QUANTITY'];
+    if (dropdownFields.includes(field)) {
+      e.editorOptions.dropDownOptions = {
+        onContentReady: (args: any) => {
+          const content =
+            args.component?.contentElement?.() || args.component?.content();
+          const list = content?.querySelector('.dx-list');
+          if (!list) return;
+          const h = Math.min(list.scrollHeight, 180);
+          content.style.height = `${h}px`;
+          content.style.overflowY =
+            list.scrollHeight > 180 ? 'auto' : 'visible';
+        },
+      };
+    }
+    // Handle QUANTITY input
+    if (field === 'QUANTITY') {
+      e.editorOptions.onValueChanged = (args: any) => {
+        const grid = e.component;
+        const rowIndex = e.row?.rowIndex;
+        const rowData = e.row?.data;
+
+        // Update current QUANTITY
+        e.setCellValue(rowData, args.value);
+
+        // Only proceed if ITEM and QUANTITY are filled
+        if (rowData?.ITEM && args.value > 0) {
+          const rows = grid.getVisibleRows();
+          const hasIncompleteRow = rows.some(
+            (r: any) => !r.data.ITEM || !r.data.QUANTITY
+          );
+
+          if (!hasIncompleteRow) {
+            // Add a new row at the bottom
+            this.items.push({
+              ITEM: null,
+              DESCRIPTION: '',
+              UOM: '',
+              QUANTITY: null,
+            });
+
+            // Use setTimeout to wait for grid to render the new row
+            setTimeout(() => {
+              const updatedRows = grid.getVisibleRows();
+              const newRowIndex = updatedRows.length - 1; // last row
+
+              // Make sure row exists
+              if (newRowIndex >= 0) {
+                // Start editing ITEM cell of new row
+                grid.editCell(newRowIndex, 'ITEM').then(() => {
+                  grid.focus(
+                    grid.getCellElement(newRowIndex, grid.columnOption('ITEM'))
+                  );
+                });
+              }
+            }, 100); // 100ms is usually enough
+          } else {
+            // If next row exists, just move focus to its ITEM
+            const nextRowIndex = rowIndex + 1;
+            if (nextRowIndex < rows.length) {
+              setTimeout(() => {
+                grid.editCell(nextRowIndex, 'ITEM');
+              }, 50);
+            }
+          }
+        }
+      };
+    }
   }
 
   onEditorPreparing(e: any) {
@@ -405,164 +585,342 @@ export class PackingAddComponent {
       '===========selected fin id==================='
     );
   }
+  // AddData() {
+  //   console.log(this.packing_list, '======================');
+
+  //   const validationResult = this.formValidationGroup?.instance?.validate();
+
+  //   if (!validationResult?.isValid) {
+  //     // Optional: Notify or prevent submission
+  //     return;
+  //   }
+  //   const Alias_no = Number(this.PackingData.ALIAS_NO);
+  //   const Part_no = Number(this.PackingData.PART_NO);
+
+  //   console.log(this.PackingData);
+
+  //   this.Alias_no = this.PackingData.ALIAS_NO.toString();
+  //   this.Part_no = this.PackingData.PART_NO.toString();
+  //   this.art_Serial_no = this.PackingData.ART_SERIAL.toString();
+  //   const payload = {
+  //     ...this.PackingData,
+  //     ALIAS_NO: this.Alias_no,
+  //     PART_NO: this.Part_no,
+  //     ART_SERIAL: this.art_Serial_no,
+  //     COMBINATION: this.combinationString,
+  //     PAIR_QTY: this.totalQuantity,
+  //     COMPANY_ID: this.selected_Company_id,
+  //     PackingEntries: this.articleSizeData
+  //       // .filter(item => Number(item.QUANTITY) > 0) // only include rows with quantity
+  //       .map((item) => ({
+  //         ARTICLE_ID: Number(item.ArticleID), // or whichever field holds article id
+  //         SIZE: String(item.Size),
+  //         QUANTITY: Number(item.QUANTITY),
+  //       })),
+  //   };
+  //   console.log(this.articleSizeData, '========article size data=========');
+  //   console.log(payload, '-----payload for packing list-----');
+
+  //   const unitName = this.produCtionUnits.find(
+  //     (u) => u.ID === payload.UNIT_ID
+  //   )?.DESCRIPTION;
+  //   console.log(unitName, '=============');
+  //   const CategoryId = this.categoryList.find(
+  //     (u) => u.ID === payload.CATEGORY_ID
+  //   )?.DESCRIPTION;
+  //   console.log(CategoryId, '=============');
+
+  //   const artno = payload.ART_NO;
+  //   const color = payload.COLOR;
+  //   const categoryID = CategoryId;
+  //   const unitID = unitName;
+  //   const packname = payload.DESCRIPTION;
+  //   const packqty = payload.PAIR_QTY;
+  //   console.log(
+  //     artno,
+  //     color,
+  //     categoryID,
+  //     unitID,
+  //     packname,
+  //     packqty,
+  //     '====================='
+  //   );
+
+  //   //  🔍 Check for duplicate entry based on employee ID
+  //   const duplicate = this.packing_list.find(
+  //     (item: any) =>
+  //       item.PackingName === packname &&
+  //       item.ArtNo === artno &&
+  //       item.Color === color &&
+  //       item.Category === categoryID &&
+  //       item.Unit === unitID
+  //   );
+
+  //   if (duplicate) {
+  //     notify(
+  //       {
+  //         message: 'This Packing Combination already .',
+  //         position: { at: 'top right', my: 'top right' },
+  //         displayTime: 500,
+  //       },
+  //       'error'
+  //     );
+  //     return;
+  //   }
+  //   if (packqty <= 1) {
+  //     notify(
+  //       {
+  //         message: 'Please Add Quantity.',
+  //         position: { at: 'top right', my: 'top right' },
+  //         displayTime: 500,
+  //       },
+  //       'error'
+  //     );
+  //     return;
+  //   }
+
+  //   this.dataService
+  //     .Add_packages_listapi(payload)
+  //     .subscribe((response: any) => {
+  //       console.log(response, 'PACKING DATA ADDED SUCCESSFULLY');
+  //       notify(
+  //         {
+  //           message: 'Data succesfully added',
+  //           position: { at: 'top right', my: 'top right' },
+  //           displayTime: 500,
+  //         },
+  //         'success'
+  //       );
+
+  //       this.popupClosed.emit();
+
+  //       setTimeout(() => {
+  //         this.formValidationGroup?.instance?.reset();
+  //       });
+  //       setTimeout(() => {
+  //         this.ArtnoValidationGroup?.instance?.reset();
+  //       });
+  //       setTimeout(() => {
+  //         this.ColorValidationGroup?.instance?.reset();
+  //       });
+  //       setTimeout(() => {
+  //         this.CategoryValidationGroup?.instance?.reset();
+  //       });
+  //       setTimeout(() => {
+  //         this.UnitValidationGroup?.instance?.reset();
+  //       });
+
+  //       // this.isArticleFieldsDisabled = false;
+  //       this.articleSizeData = []; // Clear the article size data after adding
+  //       this.combination_value = []; // Clear the combination value array
+  //       this.totalQuantity = 0; // Reset total quantity
+  //       this.PackingData.IS_PURCHASABLE = false;
+  //       this.PackingData.IS_EXPORT = false;
+  //       this.PackingData.IS_ANY_COMB = false;
+  //       this.PackingData.SUPP_ID = null; // Reset SUPP_ID if needed
+
+  //       // this.PackingData= {
+  //       //   ART_NO: '',
+  //       //   ORDER_NO: '',
+  //       //   CATEGORY_ID: null,
+  //       //   COLOR: '',
+  //       //   DESCRIPTION:'',
+  //       //    ARTICLE_TYPE: null,
+  //       //   PAIR_QTY: null,
+  //       //   IS_INACTIVE: false,
+  //       //   PART_NO: '',
+  //       //   ALIAS_NO: '',
+  //       //   ART_SERIAL:'',
+  //       //   COMBINATION:'2x4',
+  //       //   PACK_PRICE: null,
+  //       //   UNIT_ID: null,
+  //       //   IS_PURCHASABLE: false,
+  //       //   IS_EXPORT: false,
+  //       //  IS_ANY_COMB: false,
+
+  //       // };
+  //     });
+
+  //   this.popupVisible = false;
+  // }
+
   AddData() {
-    console.log(this.packing_list, '======================');
+  console.log(this.packing_list, '======================');
 
-    const validationResult = this.formValidationGroup?.instance?.validate();
+  // 🔹 Validate main form
+  const validationResult = this.formValidationGroup?.instance?.validate();
+  if (!validationResult?.isValid) {
+    return;
+  } 
 
-    if (!validationResult?.isValid) {
-      // Optional: Notify or prevent submission
-      return;
-    }
-    const Alias_no = Number(this.PackingData.ALIAS_NO);
+  // 🔹 Convert number fields to string as required by backend
+     const Alias_no = Number(this.PackingData.ALIAS_NO);
     const Part_no = Number(this.PackingData.PART_NO);
 
     console.log(this.PackingData);
 
     this.Alias_no = this.PackingData.ALIAS_NO.toString();
     this.Part_no = this.PackingData.PART_NO.toString();
-    this.art_Serial_no = this.PackingData.ART_SERIAL.toString();
-    const payload = {
-      ...this.PackingData,
-      ALIAS_NO: this.Alias_no,
-      PART_NO: this.Part_no,
-      ART_SERIAL: this.art_Serial_no,
-      COMBINATION: this.combinationString,
-      PAIR_QTY: this.totalQuantity,
-      COMPANY_ID: this.selected_Company_id,
-      PackingEntries: this.articleSizeData
-        // .filter(item => Number(item.QUANTITY) > 0) // only include rows with quantity
-        .map((item) => ({
-          ARTICLE_ID: Number(item.ArticleID), // or whichever field holds article id
-          SIZE: String(item.Size),
-          QUANTITY: Number(item.QUANTITY),
-        })),
-    };
-    console.log(this.articleSizeData, '========article size data=========');
-    console.log(payload, '-----payload for packing list-----');
 
-    const unitName = this.produCtionUnits.find(
-      (u) => u.ID === payload.UNIT_ID
-    )?.DESCRIPTION;
-    console.log(unitName, '=============');
-    const CategoryId = this.categoryList.find(
-      (u) => u.ID === payload.CATEGORY_ID
-    )?.DESCRIPTION;
-    console.log(CategoryId, '=============');
+    
+  this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
 
-    const artno = payload.ART_NO;
-    const color = payload.COLOR;
-    const categoryID = CategoryId;
-    const unitID = unitName;
-    const packname = payload.DESCRIPTION;
-    const packqty = payload.PAIR_QTY;
-    console.log(
-      artno,
-      color,
-      categoryID,
-      unitID,
-      packname,
-      packqty,
-      '====================='
+  // =====================================================
+  // 🔹 BUILD BOM PAYLOAD
+  // =====================================================
+  const bomPayload = (this.items || [])
+    .filter((item: any) => Number(item.QUANTITY) > 0)
+    .map((item: any) => ({
+      ITEM_ID: Number(item.ITEM_ID),
+      QUANTITY: Number(item.QUANTITY),
+    }));
+
+  console.log('BOM Payload:', bomPayload);
+
+  // Optional BOM validation
+  if (!bomPayload.length) {
+    notify(
+      {
+        message: 'Please add at least one BOM item.',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 800,
+      },
+      'warning'
     );
-
-    //  🔍 Check for duplicate entry based on employee ID
-    const duplicate = this.packing_list.find(
-      (item: any) =>
-        item.PackingName === packname &&
-        item.ArtNo === artno &&
-        item.Color === color &&
-        item.Category === categoryID &&
-        item.Unit === unitID
-    );
-
-    if (duplicate) {
-      notify(
-        {
-          message: 'This Packing Combination already .',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'error'
-      );
-      return;
-    }
-    if (packqty <= 1) {
-      notify(
-        {
-          message: 'Please Add Quantity.',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'error'
-      );
-      return;
-    }
-
-    this.dataService
-      .Add_packages_listapi(payload)
-      .subscribe((response: any) => {
-        console.log(response, 'PACKING DATA ADDED SUCCESSFULLY');
-        notify(
-          {
-            message: 'Data succesfully added',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success'
-        );
-
-        this.popupClosed.emit();
-
-        setTimeout(() => {
-          this.formValidationGroup?.instance?.reset();
-        });
-        setTimeout(() => {
-          this.ArtnoValidationGroup?.instance?.reset();
-        });
-        setTimeout(() => {
-          this.ColorValidationGroup?.instance?.reset();
-        });
-        setTimeout(() => {
-          this.CategoryValidationGroup?.instance?.reset();
-        });
-        setTimeout(() => {
-          this.UnitValidationGroup?.instance?.reset();
-        });
-
-        // this.isArticleFieldsDisabled = false;
-        this.articleSizeData = []; // Clear the article size data after adding
-        this.combination_value = []; // Clear the combination value array
-        this.totalQuantity = 0; // Reset total quantity
-        this.PackingData.IS_PURCHASABLE = false;
-        this.PackingData.IS_EXPORT = false;
-        this.PackingData.IS_ANY_COMB = false;
-        this.PackingData.SUPP_ID = null; // Reset SUPP_ID if needed
-
-        // this.PackingData= {
-        //   ART_NO: '',
-        //   ORDER_NO: '',
-        //   CATEGORY_ID: null,
-        //   COLOR: '',
-        //   DESCRIPTION:'',
-        //    ARTICLE_TYPE: null,
-        //   PAIR_QTY: null,
-        //   IS_INACTIVE: false,
-        //   PART_NO: '',
-        //   ALIAS_NO: '',
-        //   ART_SERIAL:'',
-        //   COMBINATION:'2x4',
-        //   PACK_PRICE: null,
-        //   UNIT_ID: null,
-        //   IS_PURCHASABLE: false,
-        //   IS_EXPORT: false,
-        //  IS_ANY_COMB: false,
-
-        // };
-      });
-
-    this.popupVisible = false;
+    return;
   }
+
+  // =====================================================
+  // 🔹 BUILD PACKING ENTRIES PAYLOAD
+  // =====================================================
+  const packingEntriesPayload = this.articleSizeData
+    .filter(item => Number(item.QUANTITY) > 0)
+    .map((item) => ({
+      ARTICLE_ID: Number(item.ArticleID),
+      SIZE: String(item.Size),
+      QUANTITY: Number(item.QUANTITY),
+    }));
+
+  console.log('PackingEntries Payload:', packingEntriesPayload);
+
+  // =====================================================
+  // 🔹 FINAL PAYLOAD
+  // =====================================================
+  const payload = {
+    ...this.PackingData,
+
+    COMPANY_ID: this.selected_Company_id,
+    ALIAS_NO: this.Alias_no,
+    PART_NO: this.Part_no,
+    ART_SERIAL: this.art_Serial_no,
+    COMBINATION: this.combinationString,
+    PAIR_QTY: this.totalQuantity,
+
+    // ✅ ADD BOM
+    BOM: bomPayload,
+
+    // ✅ ADD PACKING ENTRIES
+    PackingEntries: packingEntriesPayload,
+  };
+
+  console.log('FINAL INSERT PAYLOAD:', payload);
+
+  // =====================================================
+  // 🔹 DUPLICATE CHECK
+  // =====================================================
+  const unitName = this.produCtionUnits.find(
+    (u) => u.ID === payload.UNIT_ID
+  )?.DESCRIPTION;
+
+  const categoryName = this.categoryList.find(
+    (u) => u.ID === payload.CATEGORY_ID
+  )?.DESCRIPTION;
+
+  const duplicate = this.packing_list.find(
+    (item: any) =>
+      item.PackingName === payload.DESCRIPTION &&
+      item.ArtNo === payload.ART_NO &&
+      item.Color === payload.COLOR &&
+      item.Category === categoryName &&
+      item.Unit === unitName
+  );
+
+  if (duplicate) {
+    notify(
+      {
+        message: 'This Packing Combination already exists.',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 800,
+      },
+      'error'
+    );
+    return;
+  }
+
+  if (this.totalQuantity <= 1) {
+    notify(
+      {
+        message: 'Please add quantity.',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 800,
+      },
+      'error'
+    );
+    return;
+  }
+
+  // =====================================================
+  // 🔹 API CALL
+  // =====================================================
+  this.dataService.Add_packages_listapi(payload).subscribe(
+    (response: any) => {
+      console.log('PACKING DATA ADDED SUCCESSFULLY', response);
+
+      notify(
+        {
+          message: 'Data successfully added',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 800,
+        },
+        'success'
+      );
+
+      // Close popup
+      this.popupClosed.emit();
+
+      // =====================================================
+      // 🔹 RESET FORMS & STATE
+      // =====================================================
+      setTimeout(() => this.formValidationGroup?.instance?.reset());
+      setTimeout(() => this.ArtnoValidationGroup?.instance?.reset());
+      setTimeout(() => this.ColorValidationGroup?.instance?.reset());
+      setTimeout(() => this.CategoryValidationGroup?.instance?.reset());
+      setTimeout(() => this.UnitValidationGroup?.instance?.reset());
+
+      this.articleSizeData = [];
+      this.combination_value = [];
+      this.totalQuantity = 0;
+
+      this.PackingData.IS_PURCHASABLE = false;
+      this.PackingData.IS_EXPORT = false;
+      this.PackingData.IS_ANY_COMB = false;
+      this.PackingData.SUPP_ID = null;
+
+      this.popupVisible = false;
+    },
+    (error) => {
+      console.error('Insert failed', error);
+      notify(
+        {
+          message: 'Failed to save packing data.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error'
+      );
+    }
+  );
+}
+
 
   clearForm() {
     setTimeout(() => {
