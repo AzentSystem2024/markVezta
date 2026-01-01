@@ -192,31 +192,33 @@
               [disabled]="articleData.IS_COMPONENT"
             >
             </dx-text-box>
-            <div class="form-field">
-              <dx-text-box
-                label="Standard Packing"
-                labelMode="floating"
-                placeholder="Standard Packing"
-                [(value)]="articleData.STANDARD_PACKING"
-              ></dx-text-box>
-            </div>
-            <div class="form-field">
-              <dx-text-box
-                label="GST%"
-                labelMode="floating"
-                placeholder="GST%"
-                [(value)]="articleData.GST_PERC"
-              ></dx-text-box>
-            </div>
-            <div class="form-field">
-              <dx-text-box
-                label="HSN Code"
-                labelMode="floating"
-                placeholder="HSN Code"
-                [(value)]="articleData.HSN_CODE"
-              ></dx-text-box>
-            </div>
-            <!-- <div class="button-group-inline">
+          </div>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Standard Packing"
+            labelMode="floating"
+            placeholder="Standard Packing"
+            [(value)]="articleData.STANDARD_PACKING"
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="GST%"
+            labelMode="floating"
+            placeholder="GST%"
+            [(value)]="articleData.GST_PERC"
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="HSN Code"
+            labelMode="floating"
+            placeholder="HSN Code"
+            [(value)]="articleData.HSN_CODE"
+          ></dx-text-box>
+        </div>
+        <!-- <div class="button-group-inline">
               <dx-button
                 text="Attach"
                 stylingMode="outlined"
@@ -232,8 +234,7 @@
               >
               </dx-button>
             </div> -->
-          </div>
-        </div>
+
         <div class="checkbox-container">
           <dx-check-box
             text="Create packing on saving"
