@@ -93,6 +93,7 @@ export class PackingEditComponent {
  combination_value: any[]=[]
 PackingEntriesData:any;
   selected_Company_id: any;
+  selectedItemId: any;
 
 
  
@@ -178,6 +179,14 @@ PackingEntriesData:any;
       e.cancel = true; // Prevent adding new row
     }
   }
+    getItems() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
+      this.itemsList = response.DataList;
+    });
+  }
   
   getDropdownLists() {
      const payload = { COMPANY_ID : this.selected_Company_id ,NAME :'PRODUCTION_UNITS' };
@@ -220,6 +229,145 @@ PackingEntriesData:any;
       });
   }
 
+  ngOnInit() {
+    this.getItems();
+  }
+
+
+   onEditorPreparings(e: any) {
+    if (
+      e.dataField === 'ITEM' ||
+      e.dataField === 'DESCRIPTION' ||
+      e.dataField === 'UOM' ||
+      e.dataField === 'QUANTITY'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
+    const grid = e.component;
+    const row = e.row?.data;
+    const rowIndex = e.row?.rowIndex;
+    const field = e.dataField;
+    if (e.dataField === 'ITEM' && e.editorName === 'dxSelectBox') {
+      e.editorOptions.onValueChanged = (args: any) => {
+        const selectedDescription = args.value;
+        console.log('Selected Item Description:', selectedDescription);
+
+        const grid = e.component;
+        const rowIndex = e.row.rowIndex;
+
+        // keep the selected value in grid
+        grid.cellValue(rowIndex, 'ITEM', selectedDescription);
+        const matchedItem = this.itemsList.find(
+          (p: any) => p.DESCRIPTION === selectedDescription
+        );
+        if (matchedItem) {
+          grid.cellValue(rowIndex, 'ITEM_ID', matchedItem.ID);
+          grid.cellValue(rowIndex, 'ITEM', matchedItem.DESCRIPTION);
+          grid.cellValue(rowIndex, 'DESCRIPTION', matchedItem.DESCRIPTION);
+          grid.cellValue(rowIndex, 'UOM', matchedItem.UOM);
+        }
+
+        this.selectedItemId = matchedItem ? matchedItem.ID : null;
+        console.log(this.selectedItemId, 'SELECTEDITEMID');
+        let itemCode = null;
+        if (selectedDescription) {
+          itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
+        }
+        // Prepare payload and call API
+        const payload = { ITEM_CODE: String(selectedDescription) };
+
+        this.dataService.getItemsForArticle(payload).subscribe({
+          next: (response: any) => {
+            console.log('API Response:', response);
+
+            if (response?.flag === 1 && response?.Data) {
+              const data = response.Data;
+
+              // Update the same row with API data
+              grid.cellValue(rowIndex, 'DESCRIPTION', data.DESCRIPTION);
+              grid.cellValue(rowIndex, 'UOM', data.UOM);
+            }
+          },
+          error: (err) => console.error('API Error:', err),
+        });
+      };
+    }
+    /** ---------------------- Auto-height Dropdowns ---------------------- */
+    const dropdownFields = ['ITEM', 'DESCRIPTION', 'UOM', 'QUANTITY'];
+    if (dropdownFields.includes(field)) {
+      e.editorOptions.dropDownOptions = {
+        onContentReady: (args: any) => {
+          const content =
+            args.component?.contentElement?.() || args.component?.content();
+          const list = content?.querySelector('.dx-list');
+          if (!list) return;
+          const h = Math.min(list.scrollHeight, 180);
+          content.style.height = `${h}px`;
+          content.style.overflowY =
+            list.scrollHeight > 180 ? 'auto' : 'visible';
+        },
+      };
+    }
+    // Handle QUANTITY input
+    if (field === 'QUANTITY') {
+      e.editorOptions.onValueChanged = (args: any) => {
+        e.setCellValue(e.row.data, args.value);
+
+        if (args.value > 0) {
+          setTimeout(() => {
+            const rows = grid.getVisibleRows();
+            const hasEmpty = rows.some((r: any) => !r.data.ITEM);
+            if (!hasEmpty) {
+              const store = grid.getDataSource().store();
+              store.push([{ type: 'insert', data: {} }]);
+              grid.refresh().then(() => {
+                grid.editCell(rows.length, 'ITEM');
+              });
+            }
+          }, 100);
+        }
+      };
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['PackingData'] && changes['PackingData'].currentValue) {
       console.log('Received PackingData:', changes['PackingData'].currentValue);
@@ -255,6 +403,35 @@ PackingEntriesData:any;
       0
     );
     }
+
+     // ===============================
+    // 3️⃣ 🔥 BIND BOM (MAIN PART)
+    // ===============================
+    if (Array.isArray(this.PackingData.BOM)) {
+
+      this.items = this.PackingData.BOM.map((bom: any) => {
+  const matchedItem = this.itemsList?.find(
+    (i: any) => i.ID === bom.ITEM_ID
+  );
+console.log(this.items)
+
+  return {
+    BOM_ID: bom.BOM_ID,
+    ITEM_ID: bom.ITEM_ID,
+
+    // ✅ Bind SelectBox value using DESCRIPTION from getItems()
+    ITEM: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
+
+    DESCRIPTION: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
+    UOM: bom.UOM,
+    QUANTITY: Number(bom.QUANTITY),
+  };
+});
+
+    } else {
+      this.items = [];
+    }
+
     console.log(this.PackingData, 'MAINGROUPID');
     this.PackingEntriesData= this.PackingData.PackingEntries
     console.log(this.PackingEntriesData,'========packing entries data=========');
@@ -270,11 +447,24 @@ PackingEntriesData:any;
   ? this.PackingData.COMBINATION
   : this.combinationString;
 
+  // ===============================
+  // 🔹 BUILD BOM PAYLOAD
+  // ===============================
+  const bomPayload = (this.items || [])
+    .filter((item: any) => Number(item.QUANTITY) > 0)
+    .map((item: any) => ({
+      BOM_ID: item.BOM_ID || null,
+      ITEM_ID: Number(item.ITEM_ID),
+      QUANTITY: Number(item.QUANTITY),
+    }));
+
 console.log(combinationToUse, 'COMBINATION TO USE');
     const payload={
       ...this.PackingData,
       COMBINATION:combinationToUse,
       PAIR_QTY: this.totalQuantity,
+        // ✅ ADD BOM HERE
+    BOM: bomPayload,
      PackingEntries: this.articleSizeData
     // .filter(item => Number(item.QUANTITY) > 0) // only include rows with quantity
     .map(item => ({

@@ -105,6 +105,7 @@ export class ArticleEditComponent {
   selectedItemId: any;
   selectedUnitsTooltip: string = '';
   selected_Company_id: any;
+  ItemCode: any;
 
   constructor(private dataService: DataService) {}
 
@@ -170,7 +171,7 @@ export class ArticleEditComponent {
 
         // Handle Sizes only after articleSizeData is ready
         this.setSelectedSizes();
-        if (this.articleData.BOM && Array.isArray(this.articleData.BOM)) {
+      if (this.articleData.BOM && Array.isArray(this.articleData.BOM)) {  
           console.log(this.articleData, 'BOMMMMMMMMMMM');
           this.items = this.articleData.BOM.map((bom: any) => {
             // find the matching item from dropdown list
@@ -179,7 +180,8 @@ export class ArticleEditComponent {
             );
             console.log(matchedItem, 'MATCHEDITEMSINEDIT');
             return {
-              ITEM: bom.ITEM_CODE, // for ITEM column dropdown
+                ITEM: matchedItem?.DESCRIPTION || bom.DESCRIPTION,
+
               DESCRIPTION: bom.DESCRIPTION,
               UOM: bom.UOM,
               QUANTITY: bom.QUANTITY,
@@ -228,6 +230,9 @@ export class ArticleEditComponent {
     };
     this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
       this.itemsList = response.DataList;
+      console.log(this.itemsList)
+       this.ItemCode = this.itemsList[0].DESCRIPTION
+       console.log(this.ItemCode)
     });
   }
 
