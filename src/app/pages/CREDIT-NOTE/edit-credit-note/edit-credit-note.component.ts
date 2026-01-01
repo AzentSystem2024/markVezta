@@ -202,7 +202,6 @@ export class EditCreditNoteComponent {
 
       console.log('+++++++++______', data.NOTE_DETAIL);
 
-
       /* ---------------- Customer dropdown ---------------- */
       this.getCompanyListDropdown(data.DISTRIBUTOR_ID);
 
@@ -227,9 +226,10 @@ export class EditCreditNoteComponent {
             gstAmount: item.GST_AMOUNT ?? 0,
             HSN_CODE: item.HSN_CODE,
             HEAD_ID: item.HEAD_ID,
+            _isExisting: true,
           };
         });
- console.log(this.noteDetails,'NOTE DETAILS')
+        console.log(this.noteDetails, 'NOTE DETAILS');
         this.cdr.detectChanges();
       });
 
@@ -313,7 +313,9 @@ export class EditCreditNoteComponent {
           const selectedDistributor = this.distributorList.find(
             (d: any) => d.ID === selectedDistributorId
           );
-
+          if (selectedDistributor) {
+            this.selectedCustomer = selectedDistributor; // ✅ IMPORTANT
+          }
           if (selectedDistributor) {
             console.log(
               'Selected Distributor State ID:',
@@ -413,7 +415,7 @@ export class EditCreditNoteComponent {
     };
 
     // ✅ This now works because GST values exist
-    this.applyGstForRow(newRow);
+    // this.applyGstForRow(newRow);
 
     this.noteDetails = [...this.noteDetails, newRow];
 
@@ -746,25 +748,9 @@ export class EditCreditNoteComponent {
         }
       };
     }
+
     if (e.dataField === 'Amount') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = e.component;
-          const rowIndex = e.row.rowIndex;
-          // Move focus to the "ledgerCode" column in the same row
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
-          });
-        }
-      };
-      e.editorOptions.onValueChanged = (args: any) => {
-        e.setValue(args.value);
-        setTimeout(() => {
-          this.updateNetAmount();
-        }, 0);
-      };
-    }
-    if (e.dataField === 'Amount') {
+      // 👉 ENTER KEY HANDLING
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
@@ -772,89 +758,186 @@ export class EditCreditNoteComponent {
           const grid = this.itemsGridRef?.instance;
           const rowIndex = e.row.rowIndex;
 
-          // ✅ Force the editor to lose focus and commit its value
+          // Commit editor value
           const editorElement = event.event.target as HTMLElement;
           editorElement.blur();
 
-          // ✅ Delay to let grid register the committed value
           setTimeout(() => {
-            grid?.saveEditData(); // Now the value is committed
+            grid?.saveEditData();
 
-            // ✅ Add new row manually
-            if (!this.hasEmptyRow()) {
-              const grid = this.itemsGridRef?.instance;
-              const baseRow = this.noteDetails[0] || {};
-              const newRow = {
-                SL_NO: this.noteDetails.length + 1,
-                ledgerCode: '',
-                ledgerName: '',
-                particulars: '',
-                Amount: '',
-                GST_PERC: baseRow.GST_PERC || 0,
-                CGST: baseRow.CGST || 0,
-                SGST: baseRow.SGST || 0,
-                gstAmount: '',
-                HEAD_ID: null,
-              };
-              this.applyGstForRow(newRow);
-              this.noteDetails.push(newRow);
-
-              // ✅ Force rebind and refresh the grid
-              grid.option('dataSource', [...this.noteDetails]);
-              grid.refresh();
-
-              // ✅ Wait a bit longer to ensure row is rendered before focusing
-              setTimeout(() => {
-                const visibleRows = grid.getVisibleRows();
-                const newRowIndex = visibleRows.findIndex(
-                  (r) => r.data === newRow
-                );
-
-                if (newRowIndex >= 0) {
-                  // Small extra delay for rendering safety
-                  setTimeout(() => {
-                    grid.editCell(newRowIndex, 'ledgerCode');
-                  }, 50);
-                }
-              }, 100);
-            }
-          }, 50); // Let blur + commit happen
+            // Move to GST_PERC column
+            setTimeout(() => {
+              grid?.editCell(rowIndex, 'GST_PERC');
+            }, 50);
+          }, 50);
         }
       };
+
+      // 👉 VALUE CHANGE HANDLING (🔥 GST CALCULATION GOES HERE 🔥)
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
-        setTimeout(() => {
-          this.updateNetAmount();
-        }, 0);
+
+        const row = e.row.data;
+        const amount = Number(args.value) || 0;
+
+        const cgst = Number(row.CGST) || 0;
+        const sgst = Number(row.SGST) || 0;
+        const igst = Number(row.GST_PERC) || 0;
+
+        let gst = 0;
+
+        if (cgst > 0 || sgst > 0) {
+          gst = (amount * (cgst + sgst)) / 100;
+        } else if (igst > 0) {
+          gst = (amount * igst) / 100;
+        }
+
+        const grid = this.itemsGridRef.instance;
+        const gstValue = +gst.toFixed(2);
+
+        grid.cellValue(rowIndex, 'gstAmount', gstValue);
+
+        console.log('GST Amount:', gstValue);
       };
     }
+
+    // if (e.dataField === 'Amount') {
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     if (event.event.key === 'Enter') {
+    //       const grid = e.component;
+    //       const rowIndex = e.row.rowIndex;
+    //       // Move focus to the "ledgerCode" column in the same row
+    //       setTimeout(() => {
+    //         grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
+    //       });
+    //     }
+    //   };
+    //   e.editorOptions.onValueChanged = (args: any) => {
+    //     e.setValue(args.value);
+    //     setTimeout(() => {
+    //       this.updateNetAmount();
+    //     }, 0);
+    //   };
+    // }
+    // if (e.dataField === 'Amount') {
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     if (event.event.key === 'Enter') {
+    //       event.event.preventDefault();
+
+    //       const grid = this.itemsGridRef?.instance;
+    //       const rowIndex = e.row.rowIndex;
+
+    //       // ✅ Force the editor to lose focus and commit its value
+    //       const editorElement = event.event.target as HTMLElement;
+    //       editorElement.blur();
+
+    //       // ✅ Delay to let grid register the committed value
+    //       setTimeout(() => {
+    //         grid?.saveEditData(); // Now the value is committed
+
+    //         // ✅ Add new row manually
+    //         if (!this.hasEmptyRow()) {
+    //           const grid = this.itemsGridRef?.instance;
+    //           const baseRow = this.noteDetails[0] || {};
+    //           const newRow = {
+    //             SL_NO: this.noteDetails.length + 1,
+    //             ledgerCode: '',
+    //             ledgerName: '',
+    //             particulars: '',
+    //             Amount: '',
+    //             GST_PERC: baseRow.GST_PERC || 0,
+    //             CGST: baseRow.CGST || 0,
+    //             SGST: baseRow.SGST || 0,
+    //             gstAmount: '',
+    //             HEAD_ID: null,
+    //           };
+    //           this.applyGstForRow(newRow);
+    //           this.noteDetails.push(newRow);
+
+    //           // ✅ Force rebind and refresh the grid
+    //           grid.option('dataSource', [...this.noteDetails]);
+    //           grid.refresh();
+
+    //           // ✅ Wait a bit longer to ensure row is rendered before focusing
+    //           setTimeout(() => {
+    //             const visibleRows = grid.getVisibleRows();
+    //             const newRowIndex = visibleRows.findIndex(
+    //               (r) => r.data === newRow
+    //             );
+
+    //             if (newRowIndex >= 0) {
+    //               // Small extra delay for rendering safety
+    //               setTimeout(() => {
+    //                 grid.editCell(newRowIndex, 'ledgerCode');
+    //               }, 50);
+    //             }
+    //           }, 100);
+    //         }
+    //       }, 50); // Let blur + commit happen
+    //     }
+    //   };
+    //   e.editorOptions.onValueChanged = (args: any) => {
+    //     e.setValue(args.value);
+    //     setTimeout(() => {
+    //       this.updateNetAmount();
+    //     }, 0);
+    //   };
+    // }
   }
 
   updateNetAmount() {}
-  calculateTaxAmount = (row: any) => {
+
+  private calculateGstFromRow(row: any): number {
     const amount = Number(row.Amount) || 0;
 
-    // SAME STATE → CGST + SGST applies
-    if (this.companyStateID === this.selectedCustomer?.STATE_ID) {
-      const cgst = Number(row.CGST) || 0;
-      const sgst = Number(row.SGST) || 0;
+    const cgst = Number(row.CGST) || 0;
+    const sgst = Number(row.SGST) || 0;
+    const igst = Number(row.GST_PERC) || 0;
 
-      // Total GST% = CGST% + SGST%
-      const totalGstPerc = cgst + sgst;
-
-      return +((amount * totalGstPerc) / 100).toFixed(2);
+    if (cgst > 0 || sgst > 0) {
+      return +((amount * (cgst + sgst)) / 100).toFixed(2);
     }
 
-    // DIFFERENT STATE → IGST applies
-    const gstPerc = Number(row.GST_PERC) || 0;
-    return +((amount * gstPerc) / 100).toFixed(2);
-  };
-  
+    if (igst > 0) {
+      return +((amount * igst) / 100).toFixed(2);
+    }
+
+    return 0;
+  }
+
+  // calculateTaxAmount = (row: any) => {
+  //   // ✅ existing DB rows
+  //   if (row._isExisting && row.gstAmount != null) {
+  //     return Number(row.gstAmount) || 0;
+  //   }
+
+  //   const amount = Number(row.Amount) || 0;
+  //   let gst = 0;
+
+  //   if (this.companyStateID === this.selectedCustomer?.STATE_ID) {
+  //     gst =
+  //       (amount * ((Number(row.CGST) || 0) + (Number(row.SGST) || 0))) / 100;
+  //   } else {
+  //     gst = (amount * (Number(row.GST_PERC) || 0)) / 100;
+  //   }
+
+  //   // 🔥 THIS IS MANDATORY
+  //   row.gstAmount = +gst.toFixed(2);
+
+  //   return row.gstAmount;
+  // };
+
   calculateTotalAmount = (row: any) => {
     const amount = Number(row.Amount) || 0;
-    const gstAmount = this.calculateTaxAmount(row); // IGST or CGST+SGST
+    const gstAmount = Number(row.gstAmount) || 0;
     return +(amount + gstAmount).toFixed(2);
   };
+
+  // calculateTotalAmount = (row: any) => {
+  //   const amount = Number(row.Amount) || 0;
+  //   const gstAmount = this.calculateTaxAmount(row); // IGST or CGST+SGST
+  //   return +(amount + gstAmount).toFixed(2);
+  // };
 
   get calculatedNetAmount(): string {
     const details = this.noteDetails || [];
@@ -1012,6 +1095,17 @@ export class EditCreditNoteComponent {
     this.creditFormData[0].IS_APPROVED = e.value;
   }
 
+  private formatDateOnly(date: string | number | Date | null): string {
+    if (!date) return '';
+
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
   updateCreditNote() {
     // 1) Ensure in-progress edits are committed
     this.itemsGridRef?.instance?.saveEditData();
@@ -1060,37 +1154,24 @@ export class EditCreditNoteComponent {
           );
 
           const amount = Number(item.Amount) || 0;
-          const isSameState =
-            this.companyStateID === this.selectedCustomer?.STATE_ID;
-          let gstPerc = 0;
-          let gstAmount = 0;
-          let cgst = 0;
-          let sgst = 0;
 
-          if (isSameState) {
-            //  CGST + SGST mode
-            cgst = Number(item.CGST) || 0;
-            sgst = Number(item.SGST) || 0;
-
-            const totalGstPerc = cgst + sgst;
-            gstPerc = 0; // IGST not applicable
-            gstAmount = Number(((amount * totalGstPerc) / 100).toFixed(2));
-          } else {
-            //  IGST mode
-            gstPerc = Number(item.GST_PERC) || 0;
-            gstAmount = Number(((amount * gstPerc) / 100).toFixed(2)); // FIXED
-            cgst = 0;
-            sgst = 0;
-          }
+          // ✅ SINGLE SOURCE OF TRUTH
+          const gstAmount = this.calculateGstFromRow(item);
 
           return {
             SL_NO: item.SL_NO || index + 1,
             HEAD_ID: match?.HEAD_ID || item.HEAD_ID || null,
+
             AMOUNT: amount,
-            GST_PERC: gstPerc, // Only IGST or 0
-            CGST: cgst, // Only in same-state
-            SGST: sgst, // Only in same-state
-            GST_AMOUNT: gstAmount, // <-- computed
+
+            // Preserve exactly what row already has
+            GST_PERC: Number(item.GST_PERC) || 0,
+            CGST: Number(item.CGST) || 0,
+            SGST: Number(item.SGST) || 0,
+
+            // ✅ ALWAYS CORRECT (even if row untouched)
+            GST_AMOUNT: gstAmount,
+
             REMARKS: item.particulars || '',
           };
         });
@@ -1109,7 +1190,9 @@ export class EditCreditNoteComponent {
             COMPANY_ID: this.selectedCompanyId,
             FIN_ID: this.finId,
             STORE_ID: this.selectedstoreId,
-            TRANS_DATE: this.transDate,
+            // TRANS_DATE: this.transDate,
+            TRANS_DATE: this.formatDateOnly(this.transDate),
+
             TRANS_STATUS: 1,
             NARRATION:
               this.creditFormData[0].NARRATION ||
@@ -1153,7 +1236,8 @@ export class EditCreditNoteComponent {
       COMPANY_ID: this.selectedCompanyId,
       FIN_ID: this.finId,
       STORE_ID: 1,
-      TRANS_DATE: this.transDate,
+      // TRANS_DATE: this.transDate,
+      TRANS_DATE: this.formatDateOnly(this.transDate),
       TRANS_STATUS: 1,
       NARRATION:
         this.creditFormData[0].NARRATION || 'Update Details of Credit Note',
