@@ -332,7 +332,7 @@ export class ArticleEditComponent {
           itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
         }
         // Prepare payload and call API
-        const payload = { ITEM_CODE: String(selectedDescription) };
+        const payload = { ITEM_CODE: String(itemCode) };
 
         this.dataService.getItemsForArticle(payload).subscribe({
           next: (response: any) => {
