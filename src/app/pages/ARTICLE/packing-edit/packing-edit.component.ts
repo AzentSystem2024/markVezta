@@ -407,31 +407,60 @@ PackingEntriesData:any;
      // ===============================
     // 3️⃣ 🔥 BIND BOM (MAIN PART)
     // ===============================
-    if (Array.isArray(this.PackingData.BOM)) {
+//     if (Array.isArray(this.PackingData.BOM)) {
 
-      this.items = this.PackingData.BOM.map((bom: any) => {
-  const matchedItem = this.itemsList?.find(
-    (i: any) => i.ID === bom.ITEM_ID
-  );
-console.log(this.items)
+//       this.items = this.PackingData.BOM.map((bom: any) => {
+//   const matchedItem = this.itemsList?.find(
+//     (i: any) => i.ID === bom.ITEM_ID
+//   );
+// console.log(this.items)
 
-  return {
-    BOM_ID: bom.BOM_ID,
-    ITEM_ID: bom.ITEM_ID,
+//   return {
+//     BOM_ID: bom.BOM_ID,
+//     ITEM_ID: bom.ITEM_ID,
 
-    // ✅ Bind SelectBox value using DESCRIPTION from getItems()
-    ITEM: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
+//     // ✅ Bind SelectBox value using DESCRIPTION from getItems()
+//     ITEM: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
 
-    DESCRIPTION: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
-    UOM: bom.UOM,
-    QUANTITY: Number(bom.QUANTITY),
-  };
-});
+//     DESCRIPTION: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
+//     UOM: bom.UOM,
+//     QUANTITY: Number(bom.QUANTITY),
+//   };
+// });
 
-    } else {
-      this.items = [];
-    }
+//     } else {
+//       this.items = [];
+//     }
 
+      // this.getItems();
+
+      if (this.PackingData.BOM && Array.isArray(this.PackingData.BOM)) {  
+          console.log(this.PackingData, 'BOMMMMMMMMMMM');
+          console.log(this.itemsList,'ITEMS LIST----')
+          this.items = this.PackingData.BOM.map((bom: any) => {
+            // find the matching item from dropdown list
+            const matchedItem = this.itemsList?.find(
+              (i: any) => i.ID === bom.ITEM_ID
+            );
+            console.log(matchedItem, 'MATCHEDITEMSINEDIT');
+            return {
+                ITEM: bom.ITEM_CODE,
+                // ITEM:bom.ITEM_CODE,
+              DESCRIPTION: bom.DESCRIPTION,
+              UOM: bom.UOM,
+              QUANTITY: bom.QUANTITY,
+              ARTICLE_ID: bom.ARTICLE_ID,
+              BOM_ID: bom.BOM_ID,
+              ITEM_ID: bom.ITEM_ID,
+              ITEM_CODE: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
+            };
+          });
+
+          console.log('Mapped BOM items:', this.items);
+        } else {
+          this.items = [];
+        }
+        
     console.log(this.PackingData, 'MAINGROUPID');
     this.PackingEntriesData= this.PackingData.PackingEntries
     console.log(this.PackingEntriesData,'========packing entries data=========');

@@ -180,8 +180,8 @@ export class ArticleEditComponent {
             );
             console.log(matchedItem, 'MATCHEDITEMSINEDIT');
             return {
-                ITEM: matchedItem?.DESCRIPTION || bom.DESCRIPTION,
-
+                ITEM: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
+                // ITEM:bom.ITEM_CODE,
               DESCRIPTION: bom.DESCRIPTION,
               UOM: bom.UOM,
               QUANTITY: bom.QUANTITY,
