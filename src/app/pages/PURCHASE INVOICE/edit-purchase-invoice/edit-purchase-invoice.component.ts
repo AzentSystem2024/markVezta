@@ -101,6 +101,9 @@ export class EditPurchaseInvoiceComponent {
   netAmount: string;
   summaryValues: any;
   logoBase64: string;
+  fin_id: any;
+  user_id: any;
+  store_id: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -127,17 +130,18 @@ export class EditPurchaseInvoiceComponent {
     this.sessionData_tax();
   }
 
-  sessionData_tax() {
+ sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
-
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
+    this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    console.log(this.fin_id)
+     this.store_id = this.sessionData.Configuration?.[0]?.STORE_ID;
+    console.log(this.store_id)
+    this.user_id = this.sessionData.USER_ID;
+    console.log(this.user_id)
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -377,7 +381,7 @@ export class EditPurchaseInvoiceComponent {
             (r) => r?.data === e.row?.data
           );
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'TAX_AMOUNT'));
+            grid.focus(grid.getCellElement(rowIndex, 'VAT_AMOUNT'));
           }, 50);
         }
       };
@@ -466,7 +470,7 @@ export class EditPurchaseInvoiceComponent {
         SGST: sgst,
 
         AMOUNT: 0,
-        TAX_AMOUNT: 0,
+        VAT_AMOUNT: 0,
         TOTAL_AMOUNT: 0,
       };
 
@@ -559,7 +563,7 @@ export class EditPurchaseInvoiceComponent {
       this.totalAmount =
         this.itemsGridRef.instance.getTotalSummaryValue('AMOUNT') || 0;
       this.taxAmount =
-        this.itemsGridRef.instance.getTotalSummaryValue('TAX_AMOUNT') || 0;
+        this.itemsGridRef.instance.getTotalSummaryValue('VAT_AMOUNT') || 0;
       this.grandTotal =
         this.itemsGridRef.instance.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
     } else {
@@ -601,8 +605,10 @@ export class EditPurchaseInvoiceComponent {
 
         return {
           ID: this.purchaseInvoiceFormData.ID,
-          COMPANY_ID: this.purchaseInvoiceFormData.COMPANY_ID,
-          STORE_ID: this.purchaseInvoiceFormData.COMPANY_ID,
+          COMPANY_ID: this.selectedCompany,
+          USER_ID : this.user_id,
+          FIN_ID : this.fin_id,
+          STORE_ID: this.store_id,
           PURCH_ID: 0,
           GRN_DET_ID: item.GRN_DET_ID || '',
           ITEM_ID: item.ITEM_ID,
@@ -619,7 +625,7 @@ export class EditPurchaseInvoiceComponent {
           SUPP_PRICE: item.RATE || 0,
           SUPP_AMOUNT: item.AMOUNT,
           VAT_PERC: item.VAT_PERC || 0,
-          TAX_AMOUNT: this.calculateGstAmount(item),
+          VAT_AMOUNT: this.calculateGstAmount(item),
           GRN_STORE_ID: this.purchaseInvoiceFormData.COMPANY_ID,
           RETURN_AMOUNT: 0,
           STORE_NAME: '',
@@ -638,7 +644,7 @@ export class EditPurchaseInvoiceComponent {
     this.purchaseInvoiceFormData.GROSS_AMOUNT = parseFloat(
       grossAmount.toFixed(2)
     );
-    this.purchaseInvoiceFormData.TAX_AMOUNT = parseFloat(vatAmount.toFixed(2));
+    this.purchaseInvoiceFormData.VAT_AMOUNT = parseFloat(vatAmount.toFixed(2));
     this.purchaseInvoiceFormData.NET_AMOUNT = parseFloat(netAmount.toFixed(2));
     this.purchaseInvoiceFormData.SUPP_GROSS_AMOUNT = parseFloat(
       grossAmount.toFixed(2)
@@ -646,6 +652,11 @@ export class EditPurchaseInvoiceComponent {
     this.purchaseInvoiceFormData.SUPP_NET_AMOUNT = parseFloat(
       netAmount.toFixed(2)
     );
+
+      this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
+this.purchaseInvoiceFormData.USER_ID = this.user_id;
+this.purchaseInvoiceFormData.STORE_ID = this.store_id;
+this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
 
     if (this.isApproved) {
       // Ask confirmation only if approving
@@ -698,13 +709,13 @@ export class EditPurchaseInvoiceComponent {
       this.totalAmount =
         this.itemsGridRef?.instance?.getTotalSummaryValue('AMOUNT') || 0;
       this.taxAmount =
-        this.itemsGridRef?.instance?.getTotalSummaryValue('TAX_AMOUNT') || 0;
+        this.itemsGridRef?.instance?.getTotalSummaryValue('VAT_AMOUNT') || 0;
       this.grandTotal =
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
       this.netAmount = Number(this.grandTotal).toFixed(2);
       this.onRoundOffChange();
       console.log('GROSS AMOUNT Summary:', this.totalAmount);
-      console.log('TAX_AMOUNT Summary:', this.taxAmount);
+      console.log('VAT_AMOUNT Summary:', this.taxAmount);
       console.log('NET AMOUNT Summary:', this.grandTotal);
     } else {
       console.warn('Summary values not ready yet.');
