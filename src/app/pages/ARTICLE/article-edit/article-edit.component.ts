@@ -677,7 +677,7 @@ export class ArticleEditComponent {
       .map((r) => r.data)
       .filter((r) => r.ITEM_ID && r.QUANTITY > 0)
       .map((r) => ({
-        ITEM_ID: r.ITEM_ID,
+        ITEM_CODE: String(r.ITEM_ID),
         QUANTITY: r.QUANTITY,
       }));
 
