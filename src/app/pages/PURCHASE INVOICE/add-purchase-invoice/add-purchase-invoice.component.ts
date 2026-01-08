@@ -78,9 +78,9 @@ export class AddPurchaseInvoiceComponent {
   selectedGRNs: any[] = [];
   mainGridData: any[] = [];
   purchaseInvoiceFormData: any = {
-    COMPANY_ID: 1,
-    USER_ID: 1,
-    STORE_ID: 1,
+    COMPANY_ID: 0,
+    USER_ID: 0,
+    STORE_ID: 0,
     PURCH_NO: '',
     STORE_NAME: '',
     SUPPPLIER_NAME: '',
@@ -90,11 +90,11 @@ export class AddPurchaseInvoiceComponent {
     SUPP_ID: '',
     SUPP_INV_NO: '',
     SUPP_INV_DATE: new Date(),
-    PO_ID: 1,
-    PO_NO: 1,
-    FIN_ID: 1,
-    TRANS_ID: 1,
-    PURCH_TYPE: 1,
+    PO_ID: 0,
+    PO_NO: 0,
+    FIN_ID: 0,
+    TRANS_ID: 0,
+    PURCH_TYPE: 0,
     DISCOUNT_AMOUNT: 0,
     SUPP_GROSS_AMOUNT: 0,
     SUPP_NET_AMOUNT: 0,
@@ -166,6 +166,9 @@ export class AddPurchaseInvoiceComponent {
   summaryValues: any;
   totalAmount: any;
   taxAmount: any;
+  fin_id: any;
+  store_id: any;
+  user_id: any;
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -228,6 +231,12 @@ export class AddPurchaseInvoiceComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    console.log(this.fin_id);
+    this.store_id = this.sessionData.Configuration?.[0]?.STORE_ID;
+    console.log(this.store_id);
+    this.user_id = this.sessionData.USER_ID;
+    console.log(this.user_id);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
   }
@@ -487,7 +496,7 @@ export class AddPurchaseInvoiceComponent {
         SGST: sgst,
 
         AMOUNT: 0,
-        TAX_AMOUNT: 0,
+        VAT_AMOUNT: 0,
         TOTAL_AMOUNT: 0,
       };
 
@@ -521,7 +530,7 @@ export class AddPurchaseInvoiceComponent {
       this.totalAmount =
         this.itemsGridRef.instance.getTotalSummaryValue('AMOUNT') || 0;
       this.taxAmount =
-        this.itemsGridRef.instance.getTotalSummaryValue('TAX_AMOUNT') || 0;
+        this.itemsGridRef.instance.getTotalSummaryValue('VAT_AMOUNT') || 0;
       this.grandTotal =
         this.itemsGridRef.instance.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
     } else {
@@ -562,8 +571,10 @@ export class AddPurchaseInvoiceComponent {
         netAmount += amount + vat;
 
         return {
-          COMPANY_ID: this.purchaseInvoiceFormData.COMPANY_ID,
-          STORE_ID: this.purchaseInvoiceFormData.COMPANY_ID,
+          COMPANY_ID: this.selectedCompany,
+          USER_ID: this.user_id,
+          STORE_ID: this.store_id,
+          FIN_ID: this.fin_id,
           PURCH_ID: 0, // or a real ID if updating
           GRN_DET_ID: item.GRN_DET_ID || '', // populate based on GRN data
           ITEM_ID: item.ITEM_ID,
@@ -582,13 +593,13 @@ export class AddPurchaseInvoiceComponent {
           SUPP_AMOUNT: item.AMOUNT,
           VAT_PERC: item.VAT_PERC || 0,
           VAT_AMOUNT: this.calculateGstAmount(item),
-          GRN_STORE_ID: this.purchaseInvoiceFormData.COMPANY_ID,
+          GRN_STORE_ID: this.store_id,
           RETURN_AMOUNT: 0,
           STORE_NAME: '',
           ITEM_NAME: '',
           ITEM_CODE: '',
-          PO_QUANTITY: 1,
-          GRN_QUANTITY: 1,
+          PO_QUANTITY: 0,
+          GRN_QUANTITY: 0,
           SGST: item.SGST,
           CGST: item.CGST,
           // GST: item.GST ?? 0,
@@ -609,6 +620,11 @@ export class AddPurchaseInvoiceComponent {
     );
     this.purchaseInvoiceFormData.PURCH_DATE =
       this.purchaseInvoiceFormData.PURCH_DATE;
+
+    this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
+    this.purchaseInvoiceFormData.USER_ID = this.user_id;
+    this.purchaseInvoiceFormData.STORE_ID = this.store_id;
+    this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
 
     const callInsertAPI = () => {
       this.dataService
@@ -679,7 +695,7 @@ export class AddPurchaseInvoiceComponent {
       this.totalAmount =
         this.itemsGridRef?.instance?.getTotalSummaryValue('AMOUNT') || 0;
       this.taxAmount =
-        this.itemsGridRef?.instance?.getTotalSummaryValue('TAX_AMOUNT') || 0;
+        this.itemsGridRef?.instance?.getTotalSummaryValue('VAT_AMOUNT') || 0;
       this.grandTotal =
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
       this.netAmount = Number(this.grandTotal).toFixed(2);

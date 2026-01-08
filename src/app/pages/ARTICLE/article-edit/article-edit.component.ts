@@ -171,7 +171,7 @@ export class ArticleEditComponent {
 
         // Handle Sizes only after articleSizeData is ready
         this.setSelectedSizes();
-      if (this.articleData.BOM && Array.isArray(this.articleData.BOM)) {  
+        if (this.articleData.BOM && Array.isArray(this.articleData.BOM)) {
           console.log(this.articleData, 'BOMMMMMMMMMMM');
           this.items = this.articleData.BOM.map((bom: any) => {
             // find the matching item from dropdown list
@@ -180,8 +180,8 @@ export class ArticleEditComponent {
             );
             console.log(matchedItem, 'MATCHEDITEMSINEDIT');
             return {
-                ITEM: matchedItem?.DESCRIPTION || bom.DESCRIPTION,
-
+              ITEM: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
+              // ITEM:bom.ITEM_CODE,
               DESCRIPTION: bom.DESCRIPTION,
               UOM: bom.UOM,
               QUANTITY: bom.QUANTITY,
@@ -230,9 +230,9 @@ export class ArticleEditComponent {
     };
     this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
       this.itemsList = response.DataList;
-      console.log(this.itemsList)
-       this.ItemCode = this.itemsList[0].DESCRIPTION
-       console.log(this.ItemCode)
+      console.log(this.itemsList);
+      this.ItemCode = this.itemsList[0].DESCRIPTION;
+      console.log(this.ItemCode);
     });
   }
 
@@ -664,6 +664,16 @@ export class ArticleEditComponent {
       return;
     }
 
+    //  SIZE VALIDATION — ADD THIS
+    if (!this.selectedSizeRows || this.selectedSizeRows.length === 0) {
+      notify({
+        message: 'Please select at least one size before saving.',
+        type: 'error',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return; // STOP API CALL
+    }
     // Step 1: Collect selected sizes
     const selectedSizes =
       this.articleSizeData
@@ -677,7 +687,7 @@ export class ArticleEditComponent {
       .map((r) => r.data)
       .filter((r) => r.ITEM_ID && r.QUANTITY > 0)
       .map((r) => ({
-        ITEM_ID: r.ITEM_ID,
+        ITEM_CODE: String(r.ITEM_ID),
         QUANTITY: r.QUANTITY,
       }));
 
@@ -717,6 +727,9 @@ export class ArticleEditComponent {
       CreatedDate: this.articleData.CreatedDate || new Date().toISOString(),
       BOM: bomGridData,
       COMPANY_ID: this.selected_Company_id,
+      GST_PERC: this.articleData.GST_PERC,
+      HSN_CODE: this.articleData.HSN_CODE,
+      STANDARD_PACKING: this.articleData.STANDARD_PACKING,
     };
 
     console.log('Sending update payload:', payload);
@@ -735,7 +748,16 @@ export class ArticleEditComponent {
           this.popupVisible = false;
           this.popupClosed.emit();
         } else {
-          console.warn('Update failed:', response?.Message);
+          // Backend returned validation failure (flag = 0)
+          notify({
+            message:
+              response?.Message ||
+              response?.message ||
+              'Failed to save article.',
+            type: 'error',
+            displayTime: 4000,
+            position: { at: 'top right', my: 'top right' },
+          });
         }
       },
       (error) => {

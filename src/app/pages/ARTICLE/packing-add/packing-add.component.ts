@@ -83,11 +83,11 @@ export class PackingAddComponent {
   isArticleFieldsDisabled: boolean = false;
   duplicateFields: any[] = [];
   selectedTabIndex = 0;
-   readonly allowedPageSizes: any = [5, 10, 'all'];
+  readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-   isFilterRowVisible: boolean = false;
-    items: any[] = []; // grid data → BoM components
+  isFilterRowVisible: boolean = false;
+  items: any[] = []; // grid data → BoM components
   itemsList: any[] = []; // dropdown source → item master list
   PackingData: any = {
     ART_NO: '',
@@ -243,7 +243,7 @@ export class PackingAddComponent {
     });
   }
 
-    onGridInitialized(e: any) {
+  onGridInitialized(e: any) {
     const grid = e.component;
     const store = grid.getDataSource().store();
 
@@ -257,7 +257,7 @@ export class PackingAddComponent {
     });
   }
 
-    onInitNewRow(e: any) {
+  onInitNewRow(e: any) {
     const grid = e.component;
     const rows = grid.getVisibleRows();
 
@@ -270,14 +270,14 @@ export class PackingAddComponent {
     }
   }
 
-    getItems() {
-      const payload = {
-        COMPANY_ID: this.selected_Company_id,
-      };
-      this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
-        this.itemsList = response.DataList;
-      });
-    }
+  getItems() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
+      this.itemsList = response.DataList;
+    });
+  }
 
   loadArticle() {
     const payload = {
@@ -333,7 +333,7 @@ export class PackingAddComponent {
       });
   }
 
-   onEditorPreparings(e: any) {
+  onEditorPreparings(e: any) {
     if (
       e.dataField === 'ITEM' ||
       e.dataField === 'DESCRIPTION' ||
@@ -745,16 +745,16 @@ export class PackingAddComponent {
   // }
 
   AddData() {
-  console.log(this.packing_list, '======================');
+    console.log(this.packing_list, '======================');
 
-  // 🔹 Validate main form
-  const validationResult = this.formValidationGroup?.instance?.validate();
-  if (!validationResult?.isValid) {
-    return;
-  } 
+    // 🔹 Validate main form
+    const validationResult = this.formValidationGroup?.instance?.validate();
+    if (!validationResult?.isValid) {
+      return;
+    }
 
-  // 🔹 Convert number fields to string as required by backend
-     const Alias_no = Number(this.PackingData.ALIAS_NO);
+    // 🔹 Convert number fields to string as required by backend
+    const Alias_no = Number(this.PackingData.ALIAS_NO);
     const Part_no = Number(this.PackingData.PART_NO);
 
     console.log(this.PackingData);
@@ -762,165 +762,163 @@ export class PackingAddComponent {
     this.Alias_no = this.PackingData.ALIAS_NO.toString();
     this.Part_no = this.PackingData.PART_NO.toString();
 
-    
-  this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
+    this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
 
-  // =====================================================
-  // 🔹 BUILD BOM PAYLOAD
-  // =====================================================
-  const bomPayload = (this.items || [])
-    .filter((item: any) => Number(item.QUANTITY) > 0)
-    .map((item: any) => ({
-      ITEM_ID: Number(item.ITEM_ID),
-      QUANTITY: Number(item.QUANTITY),
-    }));
+    // =====================================================
+    // 🔹 BUILD BOM PAYLOAD
+    // =====================================================
+    const bomPayload = (this.items || [])
+      .filter((item: any) => Number(item.QUANTITY) > 0)
+      .map((item: any) => ({
+        ITEM_ID: Number(item.ITEM_ID),
+        QUANTITY: Number(item.QUANTITY),
+      }));
 
-  console.log('BOM Payload:', bomPayload);
+    console.log('BOM Payload:', bomPayload);
 
-  // Optional BOM validation
-  if (!bomPayload.length) {
-    notify(
-      {
-        message: 'Please add at least one BOM item.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 800,
-      },
-      'warning'
-    );
-    return;
-  }
-
-  // =====================================================
-  // 🔹 BUILD PACKING ENTRIES PAYLOAD
-  // =====================================================
-  const packingEntriesPayload = this.articleSizeData
-    .filter(item => Number(item.QUANTITY) > 0)
-    .map((item) => ({
-      ARTICLE_ID: Number(item.ArticleID),
-      SIZE: String(item.Size),
-      QUANTITY: Number(item.QUANTITY),
-    }));
-
-  console.log('PackingEntries Payload:', packingEntriesPayload);
-
-  // =====================================================
-  // 🔹 FINAL PAYLOAD
-  // =====================================================
-  const payload = {
-    ...this.PackingData,
-
-    COMPANY_ID: this.selected_Company_id,
-    ALIAS_NO: this.Alias_no,
-    PART_NO: this.Part_no,
-    ART_SERIAL: this.art_Serial_no,
-    COMBINATION: this.combinationString,
-    PAIR_QTY: this.totalQuantity,
-
-    // ✅ ADD BOM
-    BOM: bomPayload,
-
-    // ✅ ADD PACKING ENTRIES
-    PackingEntries: packingEntriesPayload,
-  };
-
-  console.log('FINAL INSERT PAYLOAD:', payload);
-
-  // =====================================================
-  // 🔹 DUPLICATE CHECK
-  // =====================================================
-  const unitName = this.produCtionUnits.find(
-    (u) => u.ID === payload.UNIT_ID
-  )?.DESCRIPTION;
-
-  const categoryName = this.categoryList.find(
-    (u) => u.ID === payload.CATEGORY_ID
-  )?.DESCRIPTION;
-
-  const duplicate = this.packing_list.find(
-    (item: any) =>
-      item.PackingName === payload.DESCRIPTION &&
-      item.ArtNo === payload.ART_NO &&
-      item.Color === payload.COLOR &&
-      item.Category === categoryName &&
-      item.Unit === unitName
-  );
-
-  if (duplicate) {
-    notify(
-      {
-        message: 'This Packing Combination already exists.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 800,
-      },
-      'error'
-    );
-    return;
-  }
-
-  if (this.totalQuantity <= 1) {
-    notify(
-      {
-        message: 'Please add quantity.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 800,
-      },
-      'error'
-    );
-    return;
-  }
-
-  // =====================================================
-  // 🔹 API CALL
-  // =====================================================
-  this.dataService.Add_packages_listapi(payload).subscribe(
-    (response: any) => {
-      console.log('PACKING DATA ADDED SUCCESSFULLY', response);
-
+    // Optional BOM validation
+    if (!bomPayload.length) {
       notify(
         {
-          message: 'Data successfully added',
+          message: 'Please add at least one BOM item.',
           position: { at: 'top right', my: 'top right' },
           displayTime: 800,
         },
-        'success'
+        'warning'
       );
+      return;
+    }
 
-      // Close popup
-      this.popupClosed.emit();
+    // =====================================================
+    // 🔹 BUILD PACKING ENTRIES PAYLOAD
+    // =====================================================
+    const packingEntriesPayload = this.articleSizeData
+      .filter((item) => Number(item.QUANTITY) > 0)
+      .map((item) => ({
+        ARTICLE_ID: Number(item.ArticleID),
+        SIZE: String(item.Size),
+        QUANTITY: Number(item.QUANTITY),
+      }));
 
-      // =====================================================
-      // 🔹 RESET FORMS & STATE
-      // =====================================================
-      setTimeout(() => this.formValidationGroup?.instance?.reset());
-      setTimeout(() => this.ArtnoValidationGroup?.instance?.reset());
-      setTimeout(() => this.ColorValidationGroup?.instance?.reset());
-      setTimeout(() => this.CategoryValidationGroup?.instance?.reset());
-      setTimeout(() => this.UnitValidationGroup?.instance?.reset());
+    console.log('PackingEntries Payload:', packingEntriesPayload);
 
-      this.articleSizeData = [];
-      this.combination_value = [];
-      this.totalQuantity = 0;
+    // =====================================================
+    // 🔹 FINAL PAYLOAD
+    // =====================================================
+    const payload = {
+      ...this.PackingData,
 
-      this.PackingData.IS_PURCHASABLE = false;
-      this.PackingData.IS_EXPORT = false;
-      this.PackingData.IS_ANY_COMB = false;
-      this.PackingData.SUPP_ID = null;
+      COMPANY_ID: this.selected_Company_id,
+      ALIAS_NO: this.Alias_no,
+      PART_NO: this.Part_no,
+      ART_SERIAL: this.art_Serial_no,
+      COMBINATION: this.combinationString,
+      PAIR_QTY: this.totalQuantity,
 
-      this.popupVisible = false;
-    },
-    (error) => {
-      console.error('Insert failed', error);
+      // ✅ ADD BOM
+      BOM: bomPayload,
+
+      // ✅ ADD PACKING ENTRIES
+      PackingEntries: packingEntriesPayload,
+    };
+
+    console.log('FINAL INSERT PAYLOAD:', payload);
+
+    // =====================================================
+    // 🔹 DUPLICATE CHECK
+    // =====================================================
+    const unitName = this.produCtionUnits.find(
+      (u) => u.ID === payload.UNIT_ID
+    )?.DESCRIPTION;
+
+    const categoryName = this.categoryList.find(
+      (u) => u.ID === payload.CATEGORY_ID
+    )?.DESCRIPTION;
+
+    const duplicate = this.packing_list.find(
+      (item: any) =>
+        item.PackingName === payload.DESCRIPTION &&
+        item.ArtNo === payload.ART_NO &&
+        item.Color === payload.COLOR &&
+        item.Category === categoryName &&
+        item.Unit === unitName
+    );
+
+    if (duplicate) {
       notify(
         {
-          message: 'Failed to save packing data.',
+          message: 'This Packing Combination already exists.',
           position: { at: 'top right', my: 'top right' },
+          displayTime: 800,
         },
         'error'
       );
+      return;
     }
-  );
-}
 
+    if (this.totalQuantity <= 1) {
+      notify(
+        {
+          message: 'Please add quantity.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 800,
+        },
+        'error'
+      );
+      return;
+    }
+
+    // =====================================================
+    // 🔹 API CALL
+    // =====================================================
+    this.dataService.Add_packages_listapi(payload).subscribe(
+      (response: any) => {
+        console.log('PACKING DATA ADDED SUCCESSFULLY', response);
+
+        notify(
+          {
+            message: 'Data successfully added',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 800,
+          },
+          'success'
+        );
+
+        // Close popup
+        this.popupClosed.emit();
+
+        // =====================================================
+        // 🔹 RESET FORMS & STATE
+        // =====================================================
+        setTimeout(() => this.formValidationGroup?.instance?.reset());
+        setTimeout(() => this.ArtnoValidationGroup?.instance?.reset());
+        setTimeout(() => this.ColorValidationGroup?.instance?.reset());
+        setTimeout(() => this.CategoryValidationGroup?.instance?.reset());
+        setTimeout(() => this.UnitValidationGroup?.instance?.reset());
+
+        this.articleSizeData = [];
+        this.combination_value = [];
+        this.totalQuantity = 0;
+
+        this.PackingData.IS_PURCHASABLE = false;
+        this.PackingData.IS_EXPORT = false;
+        this.PackingData.IS_ANY_COMB = false;
+        this.PackingData.SUPP_ID = null;
+
+        this.popupVisible = false;
+      },
+      (error) => {
+        console.error('Insert failed', error);
+        notify(
+          {
+            message: 'Failed to save packing data.',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error'
+        );
+      }
+    );
+  }
 
   clearForm() {
     setTimeout(() => {

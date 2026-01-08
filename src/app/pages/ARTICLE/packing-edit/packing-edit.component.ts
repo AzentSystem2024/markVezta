@@ -64,13 +64,13 @@ export class PackingEditComponent {
 
   @ViewChild('UnitValidationGroup')
   UnitValidationGroup: DxValidationGroupComponent;
- @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
- selectedTabIndex = 0;
-   readonly allowedPageSizes: any = [5, 10, 'all'];
+  @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
+  selectedTabIndex = 0;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-   isFilterRowVisible: boolean = false;
-    items: any[] = []; // grid data → BoM components
+  isFilterRowVisible: boolean = false;
+  items: any[] = []; // grid data → BoM components
   itemsList: any[] = [];
   articleData: any;
   colorList: any;
@@ -88,15 +88,13 @@ export class PackingEditComponent {
   isArticleFieldsDisabled: boolean = false;
   selectedProductionUnitId: any;
   packing_list: any;
-  selectedSizeRows: any[] = []
-  combinationString: string
- combination_value: any[]=[]
-PackingEntriesData:any;
+  selectedSizeRows: any[] = [];
+  combinationString: string;
+  combination_value: any[] = [];
+  PackingEntriesData: any;
   selected_Company_id: any;
   selectedItemId: any;
 
-
- 
   constructor(private dataService: DataService) {
     this.sesstion_Details();
     this.getDropdownLists();
@@ -111,12 +109,15 @@ PackingEntriesData:any;
     });
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   closePopup() {
     this.popupClosed.emit();
@@ -126,7 +127,7 @@ PackingEntriesData:any;
     // Add any custom logic here if needed
   }
 
-    addNewRow() {
+  addNewRow() {
     const grid = this.itemsGridRef.instance; // reference to your dx-data-grid
     const rows = grid.getVisibleRows();
 
@@ -152,8 +153,7 @@ PackingEntriesData:any;
     }, 100);
   }
 
-
-    onGridInitialized(e: any) {
+  onGridInitialized(e: any) {
     const grid = e.component;
     const store = grid.getDataSource().store();
 
@@ -167,7 +167,7 @@ PackingEntriesData:any;
     });
   }
 
-    onInitNewRow(e: any) {
+  onInitNewRow(e: any) {
     const grid = e.component;
     const rows = grid.getVisibleRows();
 
@@ -179,7 +179,7 @@ PackingEntriesData:any;
       e.cancel = true; // Prevent adding new row
     }
   }
-    getItems() {
+  getItems() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
@@ -187,54 +187,59 @@ PackingEntriesData:any;
       this.itemsList = response.DataList;
     });
   }
-  
+
   getDropdownLists() {
-     const payload = { COMPANY_ID : this.selected_Company_id ,NAME :'PRODUCTION_UNITS' };
-    this.dataService
-      .getDropdownData(payload)
-      .subscribe((response: any) => {
-        console.log(response, 'PRODUCTION UNIT');
-        this.produCtionUnits = response;
-      });
-       const payload1 = { COMPANY_ID : this.selected_Company_id ,NAME :'MATERIAL_UNITS' };
-    this.dataService
-      .getDropdownData(payload1)
-      .subscribe((response: any) => {
-        console.log(response, 'MATERIALUNIT');
-        this.materialUnits = response;
-      });
-       const payload2 = { COMPANY_ID : this.selected_Company_id ,NAME :'ARTICLECATEGORY' };
-    this.dataService
-      .getDropdownData(payload2)
-      .subscribe((response: any) => {
-        this.categoryList = response;
-      });
-       const payload3 = { COMPANY_ID : this.selected_Company_id ,NAME :'ARTICLETYPE' };
-    this.dataService
-      .getDropdownData(payload3)
-      .subscribe((response: any) => {
-        this.typeList = response;
-      });
-       const payload4 = { COMPANY_ID : this.selected_Company_id ,NAME :'ARTICLEBRAND' };
-    this.dataService
-      .getDropdownData(payload4)
-      .subscribe((response: any) => {
-        this.brandList = response;
-      });
-       const payload5 = { COMPANY_ID : this.selected_Company_id ,NAME :'ARTICLECOLOR' };
-    this.dataService
-      .getDropdownData(payload5)
-      .subscribe((response: any) => {
-        this.colorList = response;
-      });
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'PRODUCTION_UNITS',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      console.log(response, 'PRODUCTION UNIT');
+      this.produCtionUnits = response;
+    });
+    const payload1 = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'MATERIAL_UNITS',
+    };
+    this.dataService.getDropdownData(payload1).subscribe((response: any) => {
+      console.log(response, 'MATERIALUNIT');
+      this.materialUnits = response;
+    });
+    const payload2 = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'ARTICLECATEGORY',
+    };
+    this.dataService.getDropdownData(payload2).subscribe((response: any) => {
+      this.categoryList = response;
+    });
+    const payload3 = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'ARTICLETYPE',
+    };
+    this.dataService.getDropdownData(payload3).subscribe((response: any) => {
+      this.typeList = response;
+    });
+    const payload4 = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'ARTICLEBRAND',
+    };
+    this.dataService.getDropdownData(payload4).subscribe((response: any) => {
+      this.brandList = response;
+    });
+    const payload5 = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'ARTICLECOLOR',
+    };
+    this.dataService.getDropdownData(payload5).subscribe((response: any) => {
+      this.colorList = response;
+    });
   }
 
   ngOnInit() {
     this.getItems();
   }
 
-
-   onEditorPreparings(e: any) {
+  onEditorPreparings(e: any) {
     if (
       e.dataField === 'ITEM' ||
       e.dataField === 'DESCRIPTION' ||
@@ -382,98 +387,132 @@ PackingEntriesData:any;
         this.PackingData.CATEGORY_ID &&
         this.PackingData.UNIT_ID
       ) {
-        this.articleSizeData = this.PackingData.COMBINATION.split(',').map((item) => {
-  const [size, qty] = item.split('x').map(Number);
-  const articleEntry = this.PackingData.PackingEntries.find(
-      (entry) => entry.SIZE == size
-    );
- return {
-      Size: size,
-      Qty: qty,
-      ArticleID: articleEntry ? articleEntry.ARTICLE_ID : null,
-    };
-});
+        this.articleSizeData = this.PackingData.COMBINATION.split(',').map(
+          (item) => {
+            const [size, qty] = item.split('x').map(Number);
+            const articleEntry = this.PackingData.PackingEntries.find(
+              (entry) => entry.SIZE == size
+            );
+            return {
+              Size: size,
+              Qty: qty,
+              ArticleID: articleEntry ? articleEntry.ARTICLE_ID : null,
+            };
+          }
+        );
       }
-      console.log(this.articleSizeData)
-         this.totalQuantity = this.articleSizeData.reduce(
-      (sum: number, item: any) => {
-        const qty = parseInt(item.Qty, 10);
-        return sum + (isNaN(qty) ? 0 : qty);
-      },
-      0
-    );
+      console.log(this.articleSizeData);
+      this.totalQuantity = this.articleSizeData.reduce(
+        (sum: number, item: any) => {
+          const qty = parseInt(item.Qty, 10);
+          return sum + (isNaN(qty) ? 0 : qty);
+        },
+        0
+      );
     }
 
-     // ===============================
+    // ===============================
     // 3️⃣ 🔥 BIND BOM (MAIN PART)
     // ===============================
-    if (Array.isArray(this.PackingData.BOM)) {
+    //     if (Array.isArray(this.PackingData.BOM)) {
 
+    //       this.items = this.PackingData.BOM.map((bom: any) => {
+    //   const matchedItem = this.itemsList?.find(
+    //     (i: any) => i.ID === bom.ITEM_ID
+    //   );
+    // console.log(this.items)
+
+    //   return {
+    //     BOM_ID: bom.BOM_ID,
+    //     ITEM_ID: bom.ITEM_ID,
+
+    //     // ✅ Bind SelectBox value using DESCRIPTION from getItems()
+    //     ITEM: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
+
+    //     DESCRIPTION: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
+    //     UOM: bom.UOM,
+    //     QUANTITY: Number(bom.QUANTITY),
+    //   };
+    // });
+
+    //     } else {
+    //       this.items = [];
+    //     }
+
+    // this.getItems();
+
+    if (this.PackingData.BOM && Array.isArray(this.PackingData.BOM)) {
+      console.log(this.PackingData, 'BOMMMMMMMMMMM');
+      console.log(this.itemsList, 'ITEMS LIST----');
       this.items = this.PackingData.BOM.map((bom: any) => {
-  const matchedItem = this.itemsList?.find(
-    (i: any) => i.ID === bom.ITEM_ID
-  );
-console.log(this.items)
+        // find the matching item from dropdown list
+        const matchedItem = this.itemsList?.find(
+          (i: any) => i.ID === bom.ITEM_ID
+        );
+        console.log(matchedItem, 'MATCHEDITEMSINEDIT');
+        return {
+          ITEM: bom.ITEM_CODE,
+          // ITEM:bom.ITEM_CODE,
+          DESCRIPTION: bom.DESCRIPTION,
+          UOM: bom.UOM,
+          QUANTITY: bom.QUANTITY,
+          ARTICLE_ID: bom.ARTICLE_ID,
+          BOM_ID: bom.BOM_ID,
+          ITEM_ID: bom.ITEM_ID,
+          ITEM_CODE: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
+        };
+      });
 
-  return {
-    BOM_ID: bom.BOM_ID,
-    ITEM_ID: bom.ITEM_ID,
-
-    // ✅ Bind SelectBox value using DESCRIPTION from getItems()
-    ITEM: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
-
-    DESCRIPTION: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
-    UOM: bom.UOM,
-    QUANTITY: Number(bom.QUANTITY),
-  };
-});
-
+      console.log('Mapped BOM items:', this.items);
     } else {
       this.items = [];
     }
 
     console.log(this.PackingData, 'MAINGROUPID');
-    this.PackingEntriesData= this.PackingData.PackingEntries
-    console.log(this.PackingEntriesData,'========packing entries data=========');
+    this.PackingEntriesData = this.PackingData.PackingEntries;
+    console.log(
+      this.PackingEntriesData,
+      '========packing entries data========='
+    );
   }
 
   UpdateData() {
     // const payload = this.PackingData;
-  const validationResult = this.formValidationGroup?.instance?.validate();
-
+    const validationResult = this.formValidationGroup?.instance?.validate();
 
     console.log(this.combinationString, 'COMBINATION STRING');
-    const combinationToUse = this.combinationString === undefined
-  ? this.PackingData.COMBINATION
-  : this.combinationString;
+    const combinationToUse =
+      this.combinationString === undefined
+        ? this.PackingData.COMBINATION
+        : this.combinationString;
 
-  // ===============================
-  // 🔹 BUILD BOM PAYLOAD
-  // ===============================
-  const bomPayload = (this.items || [])
-    .filter((item: any) => Number(item.QUANTITY) > 0)
-    .map((item: any) => ({
-      BOM_ID: item.BOM_ID || null,
-      ITEM_ID: Number(item.ITEM_ID),
-      QUANTITY: Number(item.QUANTITY),
-    }));
+    // ===============================
+    // 🔹 BUILD BOM PAYLOAD
+    // ===============================
+    const bomPayload = (this.items || [])
+      .filter((item: any) => Number(item.QUANTITY) > 0)
+      .map((item: any) => ({
+        BOM_ID: item.BOM_ID || null,
+        ITEM_ID: Number(item.ITEM_ID),
+        QUANTITY: Number(item.QUANTITY),
+      }));
 
-console.log(combinationToUse, 'COMBINATION TO USE');
-    const payload={
+    console.log(combinationToUse, 'COMBINATION TO USE');
+    const payload = {
       ...this.PackingData,
-      COMBINATION:combinationToUse,
+      COMBINATION: combinationToUse,
       PAIR_QTY: this.totalQuantity,
-        // ✅ ADD BOM HERE
-    BOM: bomPayload,
-     PackingEntries: this.articleSizeData
-    // .filter(item => Number(item.QUANTITY) > 0) // only include rows with quantity
-    .map(item => ({
-      ARTICLE_ID: Number(item.ArticleID), // or whichever field holds article id
-      SIZE: String(item.Size),
-      QUANTITY: Number(item.Qty)
-    }))
-    }
-    console.log(this.articleSizeData,'========article size data=========');
+      // ✅ ADD BOM HERE
+      BOM: bomPayload,
+      PackingEntries: this.articleSizeData
+        // .filter(item => Number(item.QUANTITY) > 0) // only include rows with quantity
+        .map((item) => ({
+          ARTICLE_ID: Number(item.ArticleID), // or whichever field holds article id
+          SIZE: String(item.Size),
+          QUANTITY: Number(item.Qty),
+        })),
+    };
+    console.log(this.articleSizeData, '========article size data=========');
     const unitName = this.produCtionUnits.find(
       (u) => u.ID === payload.UNIT_ID
     )?.DESCRIPTION;
@@ -489,7 +528,7 @@ console.log(combinationToUse, 'COMBINATION TO USE');
     const unitID = unitName;
     const packname = payload.DESCRIPTION;
     const packqty = payload.PAIR_QTY;
-    const id=payload.ID
+    const id = payload.ID;
     console.log(
       artno,
       color,
@@ -500,16 +539,17 @@ console.log(combinationToUse, 'COMBINATION TO USE');
     );
 
     //  🔍 Check for duplicate entry based on employee ID
-const duplicate = this.packing_list.find((item: any) =>
-  item.PackingName === packname &&
-  item.ArtNo === artno &&
-  item.Color === color &&
-  item.Category === categoryID &&
-  item.Unit === unitID &&
-  item.ID !== id // ✅ ID must be different for true duplication
-);
+    const duplicate = this.packing_list.find(
+      (item: any) =>
+        item.PackingName === packname &&
+        item.ArtNo === artno &&
+        item.Color === color &&
+        item.Category === categoryID &&
+        item.Unit === unitID &&
+        item.ID !== id // ✅ ID must be different for true duplication
+    );
 
-console.log(duplicate, 'DUPLICATE CHECK');
+    console.log(duplicate, 'DUPLICATE CHECK');
     if (duplicate) {
       notify(
         {
@@ -522,7 +562,7 @@ console.log(duplicate, 'DUPLICATE CHECK');
       return;
     }
 
-    if(packqty<=1){
+    if (packqty <= 1) {
       notify(
         {
           message: 'Please Add Quantity.',
@@ -534,36 +574,34 @@ console.log(duplicate, 'DUPLICATE CHECK');
       return;
     }
 
-//     if (!validationResult?.isValid) {
-//   // Optional: Notify or prevent submission
-//   return;
-// }
-  // if (!validationResult?.isValid) {
-  //   notify(
-  //     {
-  //       message: 'Please fill all required fields correctly.',
-  //       position: { at: 'top right', my: 'top right' },
-  //       displayTime: 1000,
-  //     },
-  //     'error'
-  //   );
-  //   return; // ⛔ Stop if form is invalid
-  // }
+    //     if (!validationResult?.isValid) {
+    //   // Optional: Notify or prevent submission
+    //   return;
+    // }
+    // if (!validationResult?.isValid) {
+    //   notify(
+    //     {
+    //       message: 'Please fill all required fields correctly.',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 1000,
+    //     },
+    //     'error'
+    //   );
+    //   return; // ⛔ Stop if form is invalid
+    // }
 
-    this.dataService
-      .Update_packages_listapi(payload)
-      .subscribe((res: any) => {
-        console.log('response from update packing api:', res);
-        this.closePopup();
-        notify(
-          {
-            message: 'Data  Updated succesfully ',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success'
-        );
-      });
+    this.dataService.Update_packages_listapi(payload).subscribe((res: any) => {
+      console.log('response from update packing api:', res);
+      this.closePopup();
+      notify(
+        {
+          message: 'Data  Updated succesfully ',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'success'
+      );
+    });
   }
 
   // updateQtyFromCombination(combination: string) {
@@ -587,7 +625,9 @@ console.log(duplicate, 'DUPLICATE CHECK');
 
   onQuantityChanged() {
     console.log('Quantity changed', this.articleSizeData);
-const comb_Data = this.articleSizeData.map(item => `${item.Size}x${item.Qty}`).join(',');
+    const comb_Data = this.articleSizeData
+      .map((item) => `${item.Size}x${item.Qty}`)
+      .join(',');
     // Recalculate total quantity when any quantity is changed
     this.totalQuantity = this.articleSizeData.reduce(
       (sum: number, item: any) => {
@@ -598,8 +638,6 @@ const comb_Data = this.articleSizeData.map(item => `${item.Size}x${item.Qty}`).j
     );
 
     console.log(this.totalQuantity);
-
-    
   }
 
   loadArticle() {
@@ -613,7 +651,7 @@ const comb_Data = this.articleSizeData.map(item => `${item.Size}x${item.Qty}`).j
       color: this.PackingData.COLOR,
       categoryID: this.PackingData.CATEGORY_ID,
       unitID: this.PackingData.UNIT_ID,
-      COMPANY_ID : this.selected_Company_id
+      COMPANY_ID: this.selected_Company_id,
     };
 
     console.log('Payload for article data:', payload);
@@ -662,119 +700,118 @@ const comb_Data = this.articleSizeData.map(item => `${item.Size}x${item.Qty}`).j
     // this.isArticleFieldsDisabled = true;
 
     console.log(payload, 'PAYLOAD FOR COLLECTION LIST');
-    this.dataService.get_combinbation_list_api(payload).subscribe((response: any) => {
-      console.log(response, "COMBINATION LIST RESPONSE");
-      this.articleSizeData = response
-      console.log(this.articleSizeData)
-      this.PackingData.COMBINATION=''
-    })
+    this.dataService
+      .get_combinbation_list_api(payload)
+      .subscribe((response: any) => {
+        console.log(response, 'COMBINATION LIST RESPONSE');
+        this.articleSizeData = response;
+        console.log(this.articleSizeData);
+        this.PackingData.COMBINATION = '';
+      });
   }
   // selectedSizeRows: any[] = [];
 
-onSizeSelectionChanged(e: any) {
-  this.selectedSizeRows = e.selectedRowKeys;
-  console.log("Selected Rows:", this.selectedSizeRows);
-}
+  onSizeSelectionChanged(e: any) {
+    this.selectedSizeRows = e.selectedRowKeys;
+    console.log('Selected Rows:', this.selectedSizeRows);
+  }
 
-clearForm() {
-  this.PackingData = {
-    ART_NO: '',
-    ORDER_NO: '',
-    CATEGORY_ID: null,
-    COLOR: '',
-    DESCRIPTION: '',
-    ARTICLE_TYPE: null,
-    PAIR_QTY: null,
-    IS_INACTIVE: false,
-    PART_NO: '',
-    ALIAS_NO: '',
-    ART_SERIAL: '',
-    COMBINATION: '2x4',
-    PACK_PRICE: null,
-    UNIT_ID: null,
-    IS_PURCHASABLE: false,
-    IS_EXPORT: false,
-    IS_ANY_COMB: false,
-    SUPP_ID: null,
-  };
+  clearForm() {
+    this.PackingData = {
+      ART_NO: '',
+      ORDER_NO: '',
+      CATEGORY_ID: null,
+      COLOR: '',
+      DESCRIPTION: '',
+      ARTICLE_TYPE: null,
+      PAIR_QTY: null,
+      IS_INACTIVE: false,
+      PART_NO: '',
+      ALIAS_NO: '',
+      ART_SERIAL: '',
+      COMBINATION: '2x4',
+      PACK_PRICE: null,
+      UNIT_ID: null,
+      IS_PURCHASABLE: false,
+      IS_EXPORT: false,
+      IS_ANY_COMB: false,
+      SUPP_ID: null,
+    };
 
-  // ✅ Resets values and clears all validation UI
-  // this.formValidationGroup?.instance?.resetValues();
+    // ✅ Resets values and clears all validation UI
+    // this.formValidationGroup?.instance?.resetValues();
 
- 
-
-  this.articleSizeData = [];
-  this.combination_value = [];
-  this.totalQuantity = 0;
-}
-
-
+    this.articleSizeData = [];
+    this.combination_value = [];
+    this.totalQuantity = 0;
+  }
 
   close() {}
-  
-// onEditorPreparing(e: any) {
-// console.log(e, "EDITOR PREPARING EVENT");
-//   const rowData = e.row?.data;  
-  
-// console.log(rowData, "ROW DATA IN EDITOR PREPARING");
-    
-// const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
-// console.log(sizeQtyString, "SIZE QUANTITY STRING");
 
-// this.combination_value.push(sizeQtyString); // Add the size and quantity to the combination_value array   
-// if (!this.combination_value.includes(sizeQtyString)) {
-//   this.combination_value.push(sizeQtyString);
-// }
-// console.log(this.combination_value, "COMBINATION VALUE ARRAY");
+  // onEditorPreparing(e: any) {
+  // console.log(e, "EDITOR PREPARING EVENT");
+  //   const rowData = e.row?.data;
 
-// const validData = this.combination_value.filter(item => !item.includes('undefined'));
+  // console.log(rowData, "ROW DATA IN EDITOR PREPARING");
 
-// console.log(validData, "VALID DATA AFTER FILTERING");
+  // const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
+  // console.log(sizeQtyString, "SIZE QUANTITY STRING");
 
-// const combvalue= this.PackingData.COMBINATION
-// console.log(combvalue, "COMBINATION VALUE FROM PACKING DATA");
-// const combinationString = validData.join(', '); 
-// // Join the array into a string
-// console.log(this.combinationString, "COMBINATION STRING");
+  // this.combination_value.push(sizeQtyString); // Add the size and quantity to the combination_value array
+  // if (!this.combination_value.includes(sizeQtyString)) {
+  //   this.combination_value.push(sizeQtyString);
+  // }
+  // console.log(this.combination_value, "COMBINATION VALUE ARRAY");
 
-// console.log(' changed Data', this.articleSizeData);
+  // const validData = this.combination_value.filter(item => !item.includes('undefined'));
 
-// //=======take combination of all sizes and quantities==========
-// const firstcombinationString = this.articleSizeData
-//   .filter(item => item.Qty !== undefined && item.Qty !== null && item.Qty > 0)
-//   .map(item => `${item.Size}x${item.Qty}`)
-//   .join(', ');
+  // console.log(validData, "VALID DATA AFTER FILTERING");
 
-// this.combinationString = firstcombinationString;
+  // const combvalue= this.PackingData.COMBINATION
+  // console.log(combvalue, "COMBINATION VALUE FROM PACKING DATA");
+  // const combinationString = validData.join(', ');
+  // // Join the array into a string
+  // console.log(this.combinationString, "COMBINATION STRING");
 
-// console.log("Combination String:", this.combinationString);
+  // console.log(' changed Data', this.articleSizeData);
 
-// }
+  // //=======take combination of all sizes and quantities==========
+  // const firstcombinationString = this.articleSizeData
+  //   .filter(item => item.Qty !== undefined && item.Qty !== null && item.Qty > 0)
+  //   .map(item => `${item.Size}x${item.Qty}`)
+  //   .join(', ');
 
-onEditorPreparing(e: any) {
-  console.log(e, "EDITOR PREPARING EVENT");
-  if (e.dataField === 'Qty' && e.row?.data) {
-    const rowData = e.row.data;
-    const articleId = rowData.ArticleId || e.row.key?.ArticleId;
+  // this.combinationString = firstcombinationString;
 
-    if (!articleId) {
-      console.warn("ArticleId undefined during editor preparing", rowData);
-      return;
+  // console.log("Combination String:", this.combinationString);
+
+  // }
+
+  onEditorPreparing(e: any) {
+    console.log(e, 'EDITOR PREPARING EVENT');
+    if (e.dataField === 'Qty' && e.row?.data) {
+      const rowData = e.row.data;
+      const articleId = rowData.ArticleId || e.row.key?.ArticleId;
+
+      if (!articleId) {
+        console.warn('ArticleId undefined during editor preparing', rowData);
+        return;
+      }
+
+      const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
+      console.log(sizeQtyString, 'SIZE QUANTITY STRING');
+
+      if (!this.combination_value.includes(sizeQtyString)) {
+        this.combination_value.push(sizeQtyString);
+      }
+
+      const validData = this.combination_value.filter(
+        (item) => !item.includes('undefined')
+      );
+      this.combinationString = validData.join(', ');
+      console.log('Combination String:', this.combinationString);
     }
-
-    const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
-    console.log(sizeQtyString, "SIZE QUANTITY STRING");
-
-    if (!this.combination_value.includes(sizeQtyString)) {
-      this.combination_value.push(sizeQtyString);
-    }
-
-    const validData = this.combination_value.filter(item => !item.includes('undefined'));
-    this.combinationString = validData.join(', ');
-    console.log("Combination String:", this.combinationString);
   }
-}
-
 }
 
 @NgModule({
