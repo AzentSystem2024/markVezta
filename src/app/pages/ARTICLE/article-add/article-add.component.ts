@@ -751,6 +751,16 @@ export class ArticleAddComponent {
       });
       return;
     }
+     if (!this.articleData.PRICE) {
+      notify({
+        message: 'Please select the Price.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
+
 
     if (!this.selectedCategoryId) {
       notify({
@@ -772,6 +782,31 @@ export class ArticleAddComponent {
       return;
     }
 
+    if (!this.articleData.PACK_QTY) {
+      notify({
+        message: 'Please select the Packing Qty.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
+
+    if (
+    !this.selectedProductionUnitId ||
+    (Array.isArray(this.selectedProductionUnitId) &&
+      this.selectedProductionUnitId.length === 0)
+  ) {
+    notify({
+      message: 'Please select Production Unit.',
+      type: 'warning',
+      displayTime: 3000,
+      position: { at: 'top right', my: 'top right' },
+    });
+    return;
+  }
+
+
     if (!this.selectedSizeRowData || this.selectedSizeRowData.length === 0) {
       notify({
         message: 'Please select at least one size.',
@@ -792,6 +827,26 @@ export class ArticleAddComponent {
     //   });
     //   return;
     // }
+
+
+    // 🔴 ALIAS_NO duplicate check (only if provided)
+if (this.articleList && this.articleList.length > 0) {
+      const duplicate = this.articleList.find(
+        (article: any) =>
+          article.ALIAS_NO?.toLowerCase() ===
+          this.articleData.ALIAS_NO?.toLowerCase()
+      );
+
+      if (duplicate) {
+        notify({
+          message: `ItemCode "${this.articleData.ALIAS_NO}" already exists.`,
+          type: 'warning',
+          displayTime: 3000,
+          position: { at: 'top right', my: 'top right' },
+        });
+        return;
+      }
+    }
 
     const result = confirm(
       'Are you sure you want to save this article?',
