@@ -157,65 +157,125 @@ export class LoginFormComponent implements OnInit {
     }
   }
 
+  // onSubmit(event: Event) {
+  //   event.preventDefault();
+  //   this.loading = true;
+
+  //   if (!this.formData.LOGIN_NAME || !this.formData.PASSWORD) {
+  //     notify({
+  //       message: 'Please enter login name and password',
+  //       type: 'warning',
+  //       displayTime: 3000,
+  //       position: { at: 'top right', my: 'top right' },
+  //     });
+  //     this.loading = false;
+  //     return;
+  //   }
+
+  //   console.log('Attempting login with:', this.formData);
+
+  //   this.dataservice.login_function_api(this.formData).subscribe({
+  //     next: (res: any) => {
+  //       console.log('Login API response:', res);
+
+  //       if (res.flag === 1) {
+  //         // ✅ Successful login
+  //         localStorage.setItem('userData', JSON.stringify(res));
+  //         sessionStorage.setItem('savedUserData', JSON.stringify(res));
+  //         localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
+  //         this.router.navigate(['/analytics-dashboard']);
+
+  //         notify({
+  //           message: 'Login successful!',
+  //           type: 'success',
+  //           displayTime: 2000,
+  //           position: { at: 'top right', my: 'top right' },
+  //         });
+  //       } 
+  //       // else {
+  //       //   // ❌ Incorrect username or password
+  //       //   notify({
+  //       //     message: 'Username or password is incorrect',
+  //       //     type: 'error',
+  //       //     displayTime: 3000,
+  //       //     position: { at: 'top right', my: 'top right' },
+  //       //   });
+  //       // }
+
+  //       this.loading = false;
+  //     },
+  //     error: (err) => {
+  //       this.loading = false;
+  //       console.error('Login Error:', err);
+
+  //       notify({
+  //         message: 'Something went wrong. Please try again.',
+  //         type: 'error',
+  //         displayTime: 3000,
+  //         position: { at: 'top right', my: 'top right' },
+  //       });
+  //     },
+  //   });
+  // }
   onSubmit(event: Event) {
-    event.preventDefault();
-    this.loading = true;
+  event.preventDefault();
+  this.loading = true;
 
-    if (!this.formData.LOGIN_NAME || !this.formData.PASSWORD) {
-      notify({
-        message: 'Please enter login name and password',
-        type: 'warning',
-        displayTime: 3000,
-        position: { at: 'top right', my: 'top right' },
-      });
-      this.loading = false;
-      return;
-    }
+  if (!this.formData.LOGIN_NAME || !this.formData.PASSWORD) {
+    notify({
+      message: 'Please enter login name and password',
+      type: 'warning',
+      displayTime: 3000,
+      position: { at: 'top right', my: 'top right' },
+    });
+    this.loading = false;
+    return;
+  }
 
-    console.log('Attempting login with:', this.formData);
+  this.dataservice.login_function_api(this.formData).subscribe({
+    next: (res: any) => {
+      console.log('Login API response:', res);
 
-    this.dataservice.login_function_api(this.formData).subscribe({
-      next: (res: any) => {
-        console.log('Login API response:', res);
+      if (res.flag === 1) {
+        // ✅ Successful login
+        localStorage.setItem('userData', JSON.stringify(res));
+        sessionStorage.setItem('savedUserData', JSON.stringify(res));
+        localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
 
-        if (res.flag === 1) {
-          // ✅ Successful login
-          localStorage.setItem('userData', JSON.stringify(res));
-          sessionStorage.setItem('savedUserData', JSON.stringify(res));
-          localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
-          this.router.navigate(['/analytics-dashboard']);
-
-          notify({
-            message: 'Login successful!',
-            type: 'success',
-            displayTime: 2000,
-            position: { at: 'top right', my: 'top right' },
-          });
-        } else {
-          // ❌ Incorrect username or password
-          notify({
-            message: 'Username or password is incorrect',
-            type: 'error',
-            displayTime: 3000,
-            position: { at: 'top right', my: 'top right' },
-          });
-        }
-
-        this.loading = false;
-      },
-      error: (err) => {
-        this.loading = false;
-        console.error('Login Error:', err);
+        this.router.navigate(['/analytics-dashboard']);
 
         notify({
-          message: 'Something went wrong. Please try again.',
+          message: 'Login successful!',
+          type: 'success',
+          displayTime: 2000,
+          position: { at: 'top right', my: 'top right' },
+        });
+      } else {
+        // ❌ Backend validation message
+        notify({
+          message: res.Message || 'Username or password is incorrect',
           type: 'error',
           displayTime: 3000,
           position: { at: 'top right', my: 'top right' },
         });
-      },
-    });
-  }
+      }
+
+      this.loading = false;
+    },
+    error: (err) => {
+      this.loading = false;
+      console.error('Login Error:', err);
+
+      notify({
+        message: 'Something went wrong. Please try again.',
+        type: 'error',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+    },
+  });
+}
+
 }
 
 @NgModule({
