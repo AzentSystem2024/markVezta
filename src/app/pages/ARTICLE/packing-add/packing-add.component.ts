@@ -130,6 +130,7 @@ export class PackingAddComponent {
 
   //===================dummy datasource of =========================
   constructor(private dataService: DataService) {
+     this.sesstion_Details();
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
@@ -138,7 +139,7 @@ export class PackingAddComponent {
 
       this.packing_list = res.Data;
     });
-    this.sesstion_Details();
+   
   }
 
   ngOnInit() {
@@ -764,6 +765,7 @@ export class PackingAddComponent {
 
     
   this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
+  
 
   // =====================================================
   // 🔹 BUILD BOM PAYLOAD
@@ -824,6 +826,31 @@ export class PackingAddComponent {
   };
 
   console.log('FINAL INSERT PAYLOAD:', payload);
+
+// =====================================================
+// 🔴 ALIAS NO DUPLICATE CHECK (FINAL & CORRECT)
+// =====================================================
+const enteredAlias = String(payload.ALIAS_NO).trim();
+
+const aliasDuplicate = this.packing_list[0].some((item: any) => {
+  const existingAlias = String(item.ALIAS_NO ?? '').trim();
+  console.log('Existing:', existingAlias, 'Entered:', enteredAlias);
+  return existingAlias === enteredAlias;
+});
+console.log('Packing list first item:', this.packing_list[0]);
+
+if (aliasDuplicate) {
+  notify(
+    {
+      message: `Alias No "${enteredAlias}" already exists.`,
+      position: { at: 'top right', my: 'top right' },
+      displayTime: 1000,
+    },
+    'error'
+  );
+  return;
+}
+
 
   // =====================================================
   // 🔹 DUPLICATE CHECK
