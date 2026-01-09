@@ -130,16 +130,16 @@ export class EditPurchaseInvoiceComponent {
     this.sessionData_tax();
   }
 
- sessionData_tax() {
+  sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(this.fin_id)
-     this.store_id = this.sessionData.Configuration?.[0]?.STORE_ID;
-    console.log(this.store_id)
+    console.log(this.fin_id);
+    this.store_id = this.sessionData.Configuration?.[0]?.STORE_ID;
+    console.log(this.store_id);
     this.user_id = this.sessionData.USER_ID;
-    console.log(this.user_id)
+    console.log(this.user_id);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
   }
@@ -606,8 +606,8 @@ export class EditPurchaseInvoiceComponent {
         return {
           ID: this.purchaseInvoiceFormData.ID,
           COMPANY_ID: this.selectedCompany,
-          USER_ID : this.user_id,
-          FIN_ID : this.fin_id,
+          USER_ID: this.user_id,
+          FIN_ID: this.fin_id,
           STORE_ID: this.store_id,
           PURCH_ID: 0,
           GRN_DET_ID: item.GRN_DET_ID || '',
@@ -653,10 +653,10 @@ export class EditPurchaseInvoiceComponent {
       netAmount.toFixed(2)
     );
 
-      this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
-this.purchaseInvoiceFormData.USER_ID = this.user_id;
-this.purchaseInvoiceFormData.STORE_ID = this.store_id;
-this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
+    this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
+    this.purchaseInvoiceFormData.USER_ID = this.user_id;
+    this.purchaseInvoiceFormData.STORE_ID = this.store_id;
+    this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
 
     if (this.isApproved) {
       // Ask confirmation only if approving

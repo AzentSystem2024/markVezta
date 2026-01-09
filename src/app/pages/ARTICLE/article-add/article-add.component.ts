@@ -657,6 +657,79 @@ export class ArticleAddComponent {
     );
   }
 
+  // private getSelectedSizes(): number[] {
+  //   return (this.selectedSizeRowData || [])
+  //     .map((s: any) => Number(s.SIZE))
+  //     .filter((s) => !isNaN(s));
+  // }
+
+  // private isDuplicateArticle(): boolean {
+  //   if (!Array.isArray(this.articleList) || !this.articleList.length) {
+  //     return false;
+  //   }
+
+  //   const artNo = String(this.articleData.ART_NO).trim().toLowerCase();
+  //   const color = String(this.articleData.COLOR).trim().toLowerCase();
+  //   const price = Number(this.articleData.PRICE ?? 0);
+  //   const companyId = Number(this.selected_Company_id);
+
+  //   // 🔹 Category name from dropdown
+  //   const selectedCategory = this.categoryList?.find(
+  //     (c: any) => c.ID === this.selectedCategoryId
+  //   );
+  //   const categoryName = String(selectedCategory?.DESCRIPTION ?? '')
+  //     .trim()
+  //     .toLowerCase();
+
+  //   // 🔹 Selected sizes from UI
+  //   const selectedSizes = this.getSelectedSizes();
+
+  //   console.log(
+  //     artNo,
+  //     color,
+  //     categoryName,
+  //     price,
+  //     selectedSizes,
+  //     'FORM VALUES'
+  //   );
+
+  //   return this.articleList.some((article: any) => {
+  //     const baseMatch =
+  //       String(article.ART_NO ?? '')
+  //         .trim()
+  //         .toLowerCase() === artNo &&
+  //       String(article.COLOR ?? '')
+  //         .trim()
+  //         .toLowerCase() === color &&
+  //       String(article.CATEGORY_NAME ?? '')
+  //         .trim()
+  //         .toLowerCase() === categoryName &&
+  //       Number(article.PRICE ?? 0) === price &&
+  //       Number(article.COMPANY_ID) === companyId;
+
+  //     if (!baseMatch) return false;
+
+  //     // ✅ CORRECT SIZE EXTRACTION
+  //     const savedSizes: number[] = Array.isArray(article.SIZES)
+  //       ? article.SIZES.map((s: any) => Number(s.SizeValue)).filter(
+  //           (s) => !isNaN(s)
+  //         )
+  //       : [];
+
+  //     const hasSizeConflict = selectedSizes.some((s) => savedSizes.includes(s));
+
+  //     if (hasSizeConflict) {
+  //       console.warn('🚨 DUPLICATE SIZE FOUND', {
+  //         articleArtNo: article.ART_NO,
+  //         savedSizes,
+  //         selectedSizes,
+  //       });
+  //     }
+
+  //     return hasSizeConflict;
+  //   });
+  // }
+
   saveArticle() {
     // Validate mandatory fields
     if (!this.articleData.ART_NO) {
@@ -743,24 +816,17 @@ export class ArticleAddComponent {
       });
       return;
     }
-
-    if (this.articleList && this.articleList.length > 0) {
-      const duplicate = this.articleList.find(
-        (article: any) =>
-          article.ART_NO?.toLowerCase() ===
-          this.articleData.ART_NO?.toLowerCase()
-      );
-
-      if (duplicate) {
-        notify({
-          message: `Article No "${this.articleData.ART_NO}" already exists.`,
-          type: 'warning',
-          displayTime: 3000,
-          position: { at: 'top right', my: 'top right' },
-        });
-        return;
-      }
-    }
+    // Duplicate combination check
+    // if (this.isDuplicateArticle()) {
+    //   notify({
+    //     message:
+    //       'An article with the same Art No, Color, Category, Price and Size already exists.',
+    //     type: 'error',
+    //     displayTime: 4000,
+    //     position: { at: 'top right', my: 'top right' },
+    //   });
+    //   return;
+    // }
 
 
     // 🔴 ALIAS_NO duplicate check (only if provided)
@@ -789,7 +855,7 @@ if (this.articleList && this.articleList.length > 0) {
 
     result.then((dialogResult) => {
       if (dialogResult) {
-        // ✅ Proceed only if user confirms
+        // Proceed only if user confirms
         const parseDateString = (dateStr: string): Date | null => {
           if (!dateStr) return null;
 
@@ -806,7 +872,7 @@ if (this.articleList && this.articleList.length > 0) {
           return null;
         };
 
-        // ✅ Always return yyyy-MM-dd (and never null)
+        // Always return yyyy-MM-dd (and never null)
         const formatDate = (date: Date | string | null | undefined): string => {
           let d: Date | null = null;
 
@@ -873,12 +939,32 @@ if (this.articleList && this.articleList.length > 0) {
               // this.popupVisible = false;
               this.popupClosed.emit();
             } else {
-              alert('Failed to save article.');
+              // Backend returned validation failure (flag = 0)
+              notify({
+                message:
+                  response?.Message ||
+                  response?.message ||
+                  'Failed to save article.',
+                type: 'error',
+                displayTime: 4000,
+                position: { at: 'top right', my: 'top right' },
+              });
             }
           },
           error: (err) => {
             console.error('Save error:', err);
-            alert('An error occurred while saving.');
+
+            const backendMessage =
+              err?.error?.Message ||
+              err?.error?.message ||
+              'An error occurred while saving.';
+
+            notify({
+              message: backendMessage,
+              type: 'error',
+              displayTime: 4000,
+              position: { at: 'top right', my: 'top right' },
+            });
           },
         });
       }

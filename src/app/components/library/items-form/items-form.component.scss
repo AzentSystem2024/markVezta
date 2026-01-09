@@ -1,7 +1,7 @@
 .price-header {
   font-weight: bold;
   margin-top: 10px;
-  margin-bottom: 5px;
+  // margin-bottom: 5px;
 }
 .file-uploader-container {
   display: flex;
@@ -20,14 +20,14 @@
     width: 100%;
   }
 
-  .spacing-item {
-    padding: 5px; /* Adjust padding for smaller screens */
-  }
+  // .spacing-item {
+  //   padding: 5px; /* Adjust padding for smaller screens */
+  // }
 }
 
-.field-spacing {
-  margin-bottom: 16px; /* Adjust as needed */
-}
+// .field-spacing {
+//   margin-bottom: 6px; /* Adjust as needed */
+// }
 
 .clear-button-container {
   margin-left: 1px; /* Adjust as needed */
@@ -53,17 +53,17 @@
   margin-right: 8px;
 }
 
-.spacing-item {
-  margin-bottom: 10px; /* Adjust the value as needed */
-}
+// .spacing-item {
+//   margin-bottom: 6px; /* Adjust the value as needed */
+// }
 
-.spacing-custom-items {
-  margin-bottom: 30px; /* Adjust the value as needed */
-}
+// .spacing-custom-items {
+//   margin-bottom: 12px; /* Adjust the value as needed */
+// }
 
-.spacing-custom {
-  margin-bottom: 10px; /* Adjust the value as needed */
-}
+// .spacing-custom {
+//   margin-bottom: 6px; /* Adjust the value as needed */
+// }
 
 ::ng-deep #dropzone-external {
   width: 270px;
@@ -87,7 +87,7 @@
 ::ng-deep .widget-container > span {
   font-size: 22px;
   font-weight: bold;
-  margin-bottom: 16px;
+  // margin-bottom: 16px;
 }
 
 ::ng-deep #dropzone-image {
@@ -392,7 +392,7 @@
 }
 
 .spacing-itemUOM {
-  margin-top: 100px;
+  // margin-top: 100px;
 }
 
 .checkbox-container {

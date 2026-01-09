@@ -232,11 +232,11 @@ export class AddPurchaseInvoiceComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(this.fin_id)
-     this.store_id = this.sessionData.Configuration?.[0]?.STORE_ID;
-    console.log(this.store_id)
+    console.log(this.fin_id);
+    this.store_id = this.sessionData.Configuration?.[0]?.STORE_ID;
+    console.log(this.store_id);
     this.user_id = this.sessionData.USER_ID;
-    console.log(this.user_id)
+    console.log(this.user_id);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
   }
@@ -572,7 +572,7 @@ export class AddPurchaseInvoiceComponent {
 
         return {
           COMPANY_ID: this.selectedCompany,
-          USER_ID : this.user_id,
+          USER_ID: this.user_id,
           STORE_ID: this.store_id,
           FIN_ID: this.fin_id,
           PURCH_ID: 0, // or a real ID if updating
@@ -593,7 +593,7 @@ export class AddPurchaseInvoiceComponent {
           SUPP_AMOUNT: item.AMOUNT,
           VAT_PERC: item.VAT_PERC || 0,
           VAT_AMOUNT: this.calculateGstAmount(item),
-          GRN_STORE_ID:this.store_id,
+          GRN_STORE_ID: this.store_id,
           RETURN_AMOUNT: 0,
           STORE_NAME: '',
           ITEM_NAME: '',
@@ -621,10 +621,10 @@ export class AddPurchaseInvoiceComponent {
     this.purchaseInvoiceFormData.PURCH_DATE =
       this.purchaseInvoiceFormData.PURCH_DATE;
 
-      this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
-this.purchaseInvoiceFormData.USER_ID = this.user_id;
-this.purchaseInvoiceFormData.STORE_ID = this.store_id;
-this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
+    this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
+    this.purchaseInvoiceFormData.USER_ID = this.user_id;
+    this.purchaseInvoiceFormData.STORE_ID = this.store_id;
+    this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
 
     const callInsertAPI = () => {
       this.dataService

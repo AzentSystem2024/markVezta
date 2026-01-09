@@ -12,10 +12,8 @@
       [grouping]="{ autoExpandAll: false }"
       [filterRow]="{ visible: false }"
       [rowAlternationEnabled]="true"
-      [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
-      [filterRow]="{ visible: false }"
       id="dataGrid"
       [headerFilter]="{ visible: false }"
       [columnFixing]="{
@@ -204,7 +202,7 @@
   alignment="right">
 </dxi-column> -->
       <dxi-column
-        *ngIf="Ledger_statement_datasource.length > 0"
+        *ngIf="Ledger_statement_datasource?.length > 0"
         type="buttons"
         [width]="100"
       >
@@ -446,15 +444,15 @@
   title="Miscellaneous Payment"
   (onHiding)="handleClose()"
 >
- <ng-container *ngIf="editMiscPopupOpened">
-   <app-add-miscellaneous-payment
-    *ngIf="editMiscPopupOpened"
-    [isEditing]="true"
-    [EditingResponseData]="selectedmiscellaneousData"
-    [isReadOnlyMode]="isReadOnlyPayment"
-    (popupClosed)="handleClose()"
-    [MiscPaymentId]="selectedMiscPayment"
-  ></app-add-miscellaneous-payment>
+  <ng-container *ngIf="editMiscPopupOpened">
+    <app-add-miscellaneous-payment
+      *ngIf="editMiscPopupOpened"
+      [isEditing]="true"
+      [EditingResponseData]="selectedmiscellaneousData"
+      [isReadOnlyMode]="isReadOnlyPayment"
+      (popupClosed)="handleClose()"
+      [MiscPaymentId]="selectedMiscPayment"
+    ></app-add-miscellaneous-payment>
   </ng-container>
 </dx-popup>
 
@@ -469,11 +467,9 @@
     *ngIf="isEditPopupPrepaymentPosting"
     [selecteprepaymentData]="selecte_prepayment_Data"
     (popupClosed)="handleClose()"
-    
   >
   </app-prepayment-posting-edit>
 </dx-popup>
-
 
 <dx-popup
   [(visible)]="isEditTransferOut"
@@ -491,7 +487,6 @@
     ></app-transfer-out-inventory-add>
   </ng-container>
 </dx-popup>
-
 
 <dx-popup
   [(visible)]="isEditTransferIn"
