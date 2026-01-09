@@ -832,7 +832,7 @@ export class PackingAddComponent {
 // =====================================================
 const enteredAlias = String(payload.ALIAS_NO).trim();
 
-const aliasDuplicate = this.packing_list[0].some((item: any) => {
+const aliasDuplicate = this.packing_list.some((item: any) => {
   const existingAlias = String(item.ALIAS_NO ?? '').trim();
   console.log('Existing:', existingAlias, 'Entered:', enteredAlias);
   return existingAlias === enteredAlias;
@@ -896,6 +896,59 @@ if (aliasDuplicate) {
     return;
   }
 
+  // =====================================================
+  // 🔹 API CALL
+  // =====================================================
+  this.dataService.Add_packages_listapi(payload).subscribe(
+    (response: any) => {
+      console.log('PACKING DATA ADDED SUCCESSFULLY', response);
+    console.log('BOM Payload:', bomPayload);
+
+
+   
+        notify(
+          {
+            message: 'Data successfully added',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 800,
+          },
+          'success'
+        );
+
+        // Close popup
+        this.popupClosed.emit();
+
+        // =====================================================
+        // 🔹 RESET FORMS & STATE
+        // =====================================================
+        setTimeout(() => this.formValidationGroup?.instance?.reset());
+        setTimeout(() => this.ArtnoValidationGroup?.instance?.reset());
+        setTimeout(() => this.ColorValidationGroup?.instance?.reset());
+        setTimeout(() => this.CategoryValidationGroup?.instance?.reset());
+        setTimeout(() => this.UnitValidationGroup?.instance?.reset());
+
+        this.articleSizeData = [];
+        this.combination_value = [];
+        this.totalQuantity = 0;
+
+        this.PackingData.IS_PURCHASABLE = false;
+        this.PackingData.IS_EXPORT = false;
+        this.PackingData.IS_ANY_COMB = false;
+        this.PackingData.SUPP_ID = null;
+
+        this.popupVisible = false;
+      },
+      (error) => {
+        console.error('Insert failed', error);
+        notify(
+          {
+            message: 'Failed to save packing data.',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error'
+        );
+      }
+    );
 }
   
   clearForm() {
