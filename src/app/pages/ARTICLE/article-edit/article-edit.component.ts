@@ -73,7 +73,7 @@ export class ArticleEditComponent {
   attachGridData: any;
   selectedCategoryId: any;
   articleSizeData: any;
-  defaultDescription: string = 'PU Footware';
+  // defaultDescription: string = 'PU Footware';
   selectedMaterialUnitId: any;
   selectedProductionUnitId: any;
   selectedBrandId: any;
