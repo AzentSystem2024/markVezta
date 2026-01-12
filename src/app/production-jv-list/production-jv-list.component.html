@@ -96,3 +96,14 @@
     </dx-data-grid>
   </div>
 </div>
+
+<dx-popup
+  [(visible)]="isAddPopupVisible"
+  [width]="1200"
+  [height]="'100vh'"
+  title="Production"
+>
+  <app-production-jv-add
+    (formClosed)="handleFormClosed()"
+  ></app-production-jv-add>
+</dx-popup>

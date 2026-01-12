@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -53,6 +54,7 @@ import { InvoiceTrOutComponent } from '../pages/INVOICE/invoice-tr-out/invoice-t
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 import { Router } from '@angular/router';
+import { ProductionJvAddModule } from '../production-jv-add/production-jv-add.component';
 
 @Component({
   selector: 'app-production-jv-list',
@@ -78,7 +80,10 @@ export class ProductionJvListComponent {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    onClick: () => this.addProduction(),
+     onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.addProduction());
+    },
     elementAttr: { class: 'add-button' },
   };
   productionList: any;
@@ -120,11 +125,12 @@ export class ProductionJvListComponent {
   canApprove = false;
   canPrint = false;
   isReadOnlyInvoice: boolean;
-
+isAddPopupVisible : boolean = false;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+     private ngZone: NgZone
   ) {}
 
   ngOnInit() {
@@ -442,7 +448,11 @@ export class ProductionJvListComponent {
     }
   }
 
-  addProduction() {}
+  handleFormClosed(){}
+
+  addProduction() {
+    this.isAddPopupVisible = true;
+  }
 }
 @NgModule({
   imports: [
@@ -485,6 +495,7 @@ export class ProductionJvListComponent {
     EditInvoiceModule,
     ViewInvoiceModule,
     InvoiceTrOutAddModule,
+    ProductionJvAddModule,
   ],
   providers: [],
   declarations: [ProductionJvListComponent],
