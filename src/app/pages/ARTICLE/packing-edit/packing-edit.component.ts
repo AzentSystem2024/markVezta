@@ -623,22 +623,20 @@ export class PackingEditComponent {
   //   console.log(' 3Updated articleSizeData:', this.articleSizeData);
   // }
 
-  onQuantityChanged() {
-    console.log('Quantity changed', this.articleSizeData);
-    const comb_Data = this.articleSizeData
-      .map((item) => `${item.Size}x${item.Qty}`)
-      .join(',');
-    // Recalculate total quantity when any quantity is changed
-    this.totalQuantity = this.articleSizeData.reduce(
-      (sum: number, item: any) => {
-        const qty = parseInt(item.Qty, 10);
-        return sum + (isNaN(qty) ? 0 : qty);
-      },
-      0
-    );
+onQuantityChanged() {
+  console.log('Row updated:', this.PackingEntriesData);
 
-    console.log(this.totalQuantity);
-  }
+  this.totalQuantity = (this.PackingEntriesData || []).reduce(
+    (sum: number, item: any) => {
+      const qty = Number(item.QUANTITY || 0);
+      return sum + qty;
+    },
+    0
+  );
+
+  console.log('Total Quantity:', this.totalQuantity);
+}
+
 
   loadArticle() {
     console.log('button clicked');
@@ -791,6 +789,7 @@ export class PackingEditComponent {
     console.log(e, 'EDITOR PREPARING EVENT');
     if (e.dataField === 'Qty' && e.row?.data) {
       const rowData = e.row.data;
+      
       const articleId = rowData.ArticleId || e.row.key?.ArticleId;
 
       if (!articleId) {
