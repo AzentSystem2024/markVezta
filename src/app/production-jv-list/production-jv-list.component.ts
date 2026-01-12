@@ -36,36 +36,30 @@ import {
   DxiGroupModule,
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
-import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../../DEBIT/add-debit/add-debit.component';
-import { EditDebitModule } from '../../DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
-import {
-  AddInvoiceComponent,
-  AddInvoiceModule,
-} from '../add-invoice/add-invoice.component';
-import { EditInvoiceModule } from '../edit-invoice/edit-invoice.component';
-import { InvoiceListComponent } from '../invoice-list/invoice-list.component';
-import { ViewInvoiceModule } from '../view-invoice/view-invoice.component';
-import notify from 'devextreme/ui/notify';
-import { DataService } from 'src/app/services';
-import { Router } from '@angular/router';
+import { FormTextboxModule } from '../components';
+import { AddCreditNoteModule } from '../pages/CREDIT-NOTE/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../pages/CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { AddDebitModule } from '../pages/DEBIT/add-debit/add-debit.component';
+import { EditDebitModule } from '../pages/DEBIT/edit-debit/edit-debit.component';
+import { ViewDebitModule } from '../pages/DEBIT/view-debit/view-debit.component';
+import { AddInvoiceModule } from '../pages/INVOICE/add-invoice/add-invoice.component';
+import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.component';
 import {
   InvoiceTrOutAddComponent,
   InvoiceTrOutAddModule,
-} from '../invoice-tr-out-add/invoice-tr-out-add.component';
+} from '../pages/INVOICE/invoice-tr-out-add/invoice-tr-out-add.component';
+import { InvoiceTrOutComponent } from '../pages/INVOICE/invoice-tr-out/invoice-tr-out.component';
+import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
+import { DataService } from '../services';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-invoice-tr-out',
-  templateUrl: './invoice-tr-out.component.html',
-  styleUrls: ['./invoice-tr-out.component.scss'],
+  selector: 'app-production-jv-list',
+  templateUrl: './production-jv-list.component.html',
+  styleUrls: ['./production-jv-list.component.scss'],
 })
-export class InvoiceTrOutComponent {
-  @ViewChild(InvoiceTrOutAddComponent)
-  InvoiceTrOutAddComponent!: InvoiceTrOutAddComponent;
+export class ProductionJvListComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -84,9 +78,10 @@ export class InvoiceTrOutComponent {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    onClick: () => this.addInvoice(),
+    onClick: () => this.addProduction(),
     elementAttr: { class: 'add-button' },
   };
+  productionList: any;
   isAddInvoice: boolean = false;
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -100,8 +95,8 @@ export class InvoiceTrOutComponent {
   customStartDate: any = null;
   customEndDate: any = null;
   showCustomDatePopup = false;
-  filteredInvoiceList: any;
-  invoiceList: any;
+  filteredproductionList: any;
+  // productionList: any;
   isEditInvoice: boolean = false;
   selectedInvoice: any;
   isViewInvoice: boolean;
@@ -130,9 +125,7 @@ export class InvoiceTrOutComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router
-  ) {
-    this.sesstion_Details();
-  }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -159,49 +152,47 @@ export class InvoiceTrOutComponent {
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
-    this.getInvoiceList();
+    this.getProductionList();
   }
 
-  getInvoiceList() {
+  getProductionList() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
+    this.dataService.getProductionJVList(payload).subscribe((response: any) => {
+      this.productionList = response.Data.map((item: any) => {
+        // ---- Date normalization (unchanged) ----
+        let saleDate = item.INVOICE_DATE;
+        let dateValue: Date;
 
-    this.dataService
-      .getInvoiceMainListTrOut(payload)
-      .subscribe((response: any) => {
-        this.invoiceList = response.Data.map((item: any) => {
-          // ---- Date normalization (unchanged) ----
-          let saleDate = item.INVOICE_DATE;
-          let dateValue: Date;
+        if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
+          const [day, month, year] = saleDate.split('-').map(Number);
+          dateValue = new Date(year, month - 1, day);
+        } else {
+          dateValue = new Date(saleDate);
+        }
 
-          if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
-            const [day, month, year] = saleDate.split('-').map(Number);
-            dateValue = new Date(year, month - 1, day);
-          } else {
-            dateValue = new Date(saleDate);
-          }
+        // ---- Extract numeric part of DOC_NO safely ----
+        const match = item.DOC_NO?.match(/\d+$/); // last number
+        const docNoNumber = match ? Number(match[0]) : 0;
 
-          // ---- Extract numeric part of DOC_NO safely ----
-          const match = item.DOC_NO?.match(/\d+$/); // last number
-          const docNoNumber = match ? Number(match[0]) : 0;
+        return {
+          ...item,
+          INVOICE_DATE: dateValue,
+          _docNoNumber: docNoNumber, // helper field
+        };
+      })
+        // ✅ DESCENDING → latest first
+        .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
 
-          return {
-            ...item,
-            INVOICE_DATE: dateValue,
-            _docNoNumber: docNoNumber, // helper field
-          };
-        })
-          // ✅ DESCENDING → latest first
-          .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
-
-        this.applyDateFilter();
-      });
+      this.applyDateFilter();
+    });
   }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
+      this.getProductionList();
     }
   }
 
@@ -281,12 +272,12 @@ export class InvoiceTrOutComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
   applyDateFilter() {
-    if (!this.selectedDateRange || !this.invoiceList) {
-      this.filteredInvoiceList = this.invoiceList;
+    if (!this.selectedDateRange || !this.productionList) {
+      this.filteredproductionList = this.productionList;
       return;
     }
     if (this.selectedDateRange === 'all') {
-      this.filteredInvoiceList = this.invoiceList; // show full list
+      this.filteredproductionList = this.productionList; // show full list
       return;
     }
 
@@ -315,11 +306,11 @@ export class InvoiceTrOutComponent {
         startDate.setHours(0, 0, 0, 0);
         break;
       default:
-        this.filteredInvoiceList = this.invoiceList;
+        this.filteredproductionList = this.productionList;
         return;
     }
 
-    this.filteredInvoiceList = this.invoiceList.filter((item: any) => {
+    this.filteredproductionList = this.productionList.filter((item: any) => {
       const invoiceDate = item.INVOICE_DATE;
       return invoiceDate >= startDate && invoiceDate <= endDate;
     });
@@ -334,7 +325,7 @@ export class InvoiceTrOutComponent {
     const end = new Date(this.customEndDate);
     end.setHours(23, 59, 59, 999);
 
-    this.filteredInvoiceList = this.invoiceList.filter((item: any) => {
+    this.filteredproductionList = this.productionList.filter((item: any) => {
       const invoiceDate = item.INVOICE_DATE;
       return invoiceDate >= start && invoiceDate <= end;
     });
@@ -451,76 +442,8 @@ export class InvoiceTrOutComponent {
     }
   }
 
-  onEditInvoice(event: any) {
-    event.cancel = true;
-    const invoiceId = event.data.TRANS_ID;
-    const status = event.data.TRANS_STATUS;
-    this.dataService
-      .selectInvoiceTrOut(invoiceId)
-      .subscribe((response: any) => {
-        this.selectedInvoice = response;
-        console.log(this.selectedInvoice, 'SELECTEDTROUT');
-        this.isEditInvoice = true;
-        this.isReadOnlyInvoice = status === 5;
-      });
-  }
-
-  onDeleteInvoice(event: any) {
-    const invoiceId = event.data.TRANS_ID;
-    const status = event.data.TRANS_STATUS;
-    if (event.data.TRANS_STATUS === 5) {
-      event.cancel = true;
-      notify('This cannot be deleted.', 'error', 2000);
-      return;
-    }
-    event.cancel = true;
-    console.log(invoiceId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
-    // Call your delete API
-    this.dataService.deleteInvoiceTrOut(invoiceId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success'
-          );
-          this.getInvoiceList();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error'
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
-      },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      }
-    );
-  }
-
-  addInvoice() {
-    this.isAddInvoice = true;
-    this.cdr.detectChanges();
-  }
-
-  handleClose() {
-    this.isAddInvoice = false;
-    this.isEditInvoice = false;
-    this.isViewInvoice = false;
-    this.getInvoiceList();
-    if (this.InvoiceTrOutAddComponent) {
-      this.InvoiceTrOutAddComponent.resetInvoiceForm();
-    }
-  }
+  addProduction() {}
 }
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -564,8 +487,8 @@ export class InvoiceTrOutComponent {
     InvoiceTrOutAddModule,
   ],
   providers: [],
-  declarations: [InvoiceTrOutComponent],
-  exports: [InvoiceTrOutComponent],
+  declarations: [ProductionJvListComponent],
+  exports: [ProductionJvListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceTrOutModule {}
+export class ProductionJvListModule {}
