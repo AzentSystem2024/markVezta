@@ -188,10 +188,10 @@ export class ArticleListComponent {
     this.articleList = new DataSource({
       load: () =>
         new Promise((resolve, reject) => {
-          const payload = {
-            COMPANY_ID: this.selected_Company_id,
-          }; // Add any necessary payload data here
-          this.dataService.getArticleList(payload).subscribe({
+          // const payload = {
+          //   COMPANY_ID: this.selected_Company_id,
+          // }; // Add any necessary payload data here
+          this.dataService.getArticleList().subscribe({
             next: (response: any) => {
               if (response?.flag === 1 && Array.isArray(response.Data)) {
                 //  Sort articles by ID (latest first)

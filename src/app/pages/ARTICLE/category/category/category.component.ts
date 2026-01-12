@@ -535,10 +535,10 @@ export class CategoryComponent {
 
   //===============list of data================
   get_list_data_category() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataservice.list_of_category(payload).subscribe((res: any) => {
+    // const payload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    this.dataservice.list_of_category().subscribe((res: any) => {
       console.log(res);
       // this.CategoryList = res.CATEGORIES;
       this.CategoryList = res.CATEGORIES.map((item: any, index: number) => ({
@@ -620,7 +620,7 @@ export class CategoryComponent {
       IS_INACTIVE: false,
       SIZES: commonDetails.size,
       PACKING: this.PACKING,
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
     };
 
     console.log(payload);
@@ -683,7 +683,7 @@ export class CategoryComponent {
       DESCRIPTION: this.name_value,
       SIZES: this.size_value,
       PACKING: this.packing_values,
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
     };
 
     console.log('Update Payload:', updatedPayload);

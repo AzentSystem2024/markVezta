@@ -452,12 +452,9 @@ export class ArticleAddComponent {
   }
 
   getArticles() {
-    // const payload = {
-    //   DATE_FROM: new Date('1999-12-31T18:00:00.000Z'), // set specific from date
-    //   DATE_TO: new Date(), // keep to date as today
-    // };
-    const payload = { COMPANY_ID: this.selected_Company_id };
-    this.dataService.getArticleList(payload).subscribe((response: any) => {
+  
+    // const payload = { COMPANY_ID: this.selected_Company_id };
+    this.dataService.getArticleList().subscribe((response: any) => {
       console.log(response, 'ARTICLELIST');
       if (response?.Data && Array.isArray(response.Data)) {
         // Store full list (reversed) in articleList
@@ -909,7 +906,7 @@ if (this.articleList && this.articleList.length > 0) {
           CATEGORY_ID: this.selectedCategoryId,
           ARTICLE_TYPE: this.selectedTypeId,
           BRAND_ID: this.selectedBrandId,
-          COMPANY_ID: this.selected_Company_id,
+          // COMPANY_ID: this.selected_Company_id,
           // UNIT_ID: this.selectedProductionUnitId,
           Units: Array.isArray(this.selectedProductionUnitId)
             ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))

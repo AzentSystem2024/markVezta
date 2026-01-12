@@ -173,11 +173,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
   }
      //===================get data list========================
  get_ArticleBrand_List() {
-  // this.isLoading = true;
-  const payload = {
-    COMPANY_ID: this.selected_Company_id
-  };
-  this.dataservice.get_ArticleBrand_Api(payload).subscribe((res: any) => {
+  this.dataservice.get_ArticleBrand_Api().subscribe((res: any) => {
     if (res) {
       this.Datasource = res.Data.map((item: any, index: any) => ({
         ...item,
@@ -199,7 +195,6 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
          CODE : Code,
          DESCRIPTION : Description,  
          IS_INACTIVE : Is_Inactive ,
-          COMPANY_ID : this.selected_Company_id
        }
 
 
@@ -281,8 +276,7 @@ Select_ArticleBrand(event:any){
     const Code = this.editingRowData.CODE
     const Description = this.editingRowData.DESCRIPTION;
     const Is_Inactive = this.editingRowData.IS_INACTIVE;
-    const COMPANY_ID = this.selected_Company_id;
-    console.log(Code,Description,Is_Inactive,COMPANY_ID);
+    console.log(Code,Description,Is_Inactive);
     
 
       // Optional: Check for duplicate code or description (excluding current ID)
@@ -339,7 +333,7 @@ if (isCodeDuplicate || isDescriptionDuplicate) {
 
 
      if(Code && Description){
-      this.dataservice.Update_ArticleBrand_Api(Id ,Code ,Description ,Is_Inactive,COMPANY_ID).subscribe((res:any)=>{
+      this.dataservice.Update_ArticleBrand_Api(Id ,Code ,Description ,Is_Inactive).subscribe((res:any)=>{
             notify(
           {
             message: 'Data succesfully updated',

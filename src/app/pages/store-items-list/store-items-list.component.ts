@@ -119,10 +119,10 @@ export class StoreItemsListComponent {
   }
 
   listAllItems() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataservice.getItemsData(payload).subscribe(
+    // const payload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    this.dataservice.getItemsData().subscribe(
       (items: any) => {
         this.allItems = items.data;
         this.allItemsList = this.allItems;
@@ -220,10 +220,10 @@ export class StoreItemsListComponent {
 
   listItemsByStoreId(storeId: number) {
     if (storeId == 1) {
-      const payload = {
-        COMPANY_ID: this.selected_Company_id,
-      };
-      this.dataservice.getItemsData(payload).subscribe((response: any) => {
+      // const payload = {
+      //   COMPANY_ID: this.selected_Company_id,
+      // };
+      this.dataservice.getItemsData().subscribe((response: any) => {
         this.items = response;
         this.itemsList = response.data;
       });

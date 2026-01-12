@@ -390,13 +390,9 @@ export class ArticleEditComponent {
 
   getArticles() {
     // const payload = {
-    //   DATE_FROM: new Date(),
-    //   DATE_TO: new Date(),
+    //   COMPANY_ID: this.selected_Company_id,
     // };
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataService.getArticleList(payload).subscribe((response: any) => {
+    this.dataService.getArticleList().subscribe((response: any) => {
       console.log(response, 'ARTICLELIST');
       if (response?.Data && Array.isArray(response.Data)) {
         // Store full list (reversed) in articleList
@@ -726,7 +722,7 @@ export class ArticleEditComponent {
       ComponentArticleName: this.articleData.ComponentArticleName || '',
       CreatedDate: this.articleData.CreatedDate || new Date().toISOString(),
       BOM: bomGridData,
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
       GST_PERC: this.articleData.GST_PERC,
       HSN_CODE: this.articleData.HSN_CODE,
       STANDARD_PACKING: this.articleData.STANDARD_PACKING,

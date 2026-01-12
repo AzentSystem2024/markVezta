@@ -347,7 +347,7 @@ export class ItemsFormComponent implements OnInit {
       this.filterDropdownOptions();
     });
 
-    dataservice.getItemsData(payload).subscribe((data) => {
+    dataservice.getItemsData().subscribe((data) => {
       this.items = data;
     });
     const costingMethodPayload = {
@@ -482,7 +482,7 @@ export class ItemsFormComponent implements OnInit {
     // ✅ Force UOM_PURCH as string before API call
     UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
     ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
-    COMPANY_ID: this.selected_Company_id,
+    // COMPANY_ID: this.selected_Company_id,
   });
 
   ngOnInit() {
@@ -950,7 +950,7 @@ export class ItemsFormComponent implements OnInit {
     this.isLoading = true;
     this.cdr.detectChanges();
     const payload = {};
-    this.dataservice.getItemsData(payload).subscribe(
+    this.dataservice.getItemsData().subscribe(
       (response: any) => {
         // Sort items by 'createdAt' in descending order
         this.itemsList = response.data.reverse();
