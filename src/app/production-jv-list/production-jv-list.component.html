@@ -93,6 +93,30 @@
           </div>
         </dx-select-box>
       </div>
+
+      <dxi-column dataField="PROD_NO" caption="Production No"></dxi-column>
+
+      <dxi-column
+        dataField="PROD_DATE"
+        caption="Date"
+        dataType="date"
+        [allowEditing]="false"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+      <dxi-column
+        dataField="PRODUCED_QTY"
+        caption="Produced Qty"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="TOTAL_COST"
+        caption="
+          Total Cost
+        "
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </div>

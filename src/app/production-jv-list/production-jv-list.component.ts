@@ -140,7 +140,7 @@ export class ProductionJvListComponent {
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/invoice');
-
+    this.sesstion_Details();
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -159,10 +159,11 @@ export class ProductionJvListComponent {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
+    console.log(payload, 'PAYLOADDDDDDDDDDDD');
     this.dataService.getProductionJVList(payload).subscribe((response: any) => {
       this.productionList = response.Data.map((item: any) => {
         // ---- Date normalization (unchanged) ----
-        let saleDate = item.INVOICE_DATE;
+        let saleDate = item.PROD_DATE;
         let dateValue: Date;
 
         if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
@@ -178,7 +179,7 @@ export class ProductionJvListComponent {
 
         return {
           ...item,
-          INVOICE_DATE: dateValue,
+          PROD_DATE: dateValue,
           _docNoNumber: docNoNumber, // helper field
         };
       })
@@ -311,7 +312,7 @@ export class ProductionJvListComponent {
     }
 
     this.filteredproductionList = this.productionList.filter((item: any) => {
-      const invoiceDate = item.INVOICE_DATE;
+      const invoiceDate = item.PROD_DATE;
       return invoiceDate >= startDate && invoiceDate <= endDate;
     });
   }
@@ -326,7 +327,7 @@ export class ProductionJvListComponent {
     end.setHours(23, 59, 59, 999);
 
     this.filteredproductionList = this.productionList.filter((item: any) => {
-      const invoiceDate = item.INVOICE_DATE;
+      const invoiceDate = item.PROD_DATE;
       return invoiceDate >= start && invoiceDate <= end;
     });
 

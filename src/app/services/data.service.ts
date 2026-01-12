@@ -441,7 +441,7 @@ export class DataService {
   //.............................PRODUCTION JV...........................................................//
   getProductionJVList(items: any): Observable<any> {
     const data = items;
-    return this.http.post(`${this.apiUrl}Trout_Invoice/getlist`, data);
+    return this.http.post(`${this.apiUrl}Sync/production-list`, data);
   }
   //--------------------------PURCHASE-RETURN-DEBIT-------------------------------------//
   getPurchaseReturnMainList(data: any): Observable<any> {
