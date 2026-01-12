@@ -144,11 +144,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
   }
     //===================get data list========================
  get_ArticleType_List() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id
-  };
-  // this.isLoading = true;
-  this.dataservice.get_ArticleType_Api(payload).subscribe((res: any) => {
+  this.dataservice.get_ArticleType_Api().subscribe((res: any) => {
     if (res) {
       this.Datasource = res.Data.map((item: any, index: any) => ({
         ...item,
@@ -166,7 +162,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
         
         const payload ={
           DESCRIPTION : Description,
-          COMPANY_ID : this.selected_Company_id
+          // COMPANY_ID : this.selected_Company_id
         }
     
 // Optional: Check for duplicate login name
@@ -219,8 +215,8 @@ Select_ArticleType(event:any){
     const validationResult = this.formValidationGroup?.instance?.validate();
     const Id = this.editingRowData.ID
     const Description = this.editingRowData.DESCRIPTION;
-    const COMPANY_ID = this.selected_Company_id;
-    console.log(Id,Description,COMPANY_ID);
+    // const COMPANY_ID = this.selected_Company_id;
+    console.log(Id,Description);
     
 
      // Optional: Check for duplicate login name
@@ -244,7 +240,7 @@ Select_ArticleType(event:any){
     }
 
      if(Description){
-      this.dataservice.Update_ArticleType_Api(Id,Description,COMPANY_ID).subscribe((res:any)=>{
+      this.dataservice.Update_ArticleType_Api(Id,Description).subscribe((res:any)=>{
             notify(
           {
             message: 'Data succesfully updated',

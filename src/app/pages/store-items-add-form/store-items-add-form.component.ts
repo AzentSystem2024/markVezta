@@ -201,8 +201,8 @@ export class StoreItemsAddFormComponent {
   }
 
   listItems() {
-    const payload = {};
-    this.dataservice.getItemsData(payload).subscribe(
+    // const payload = {};
+    this.dataservice.getItemsData().subscribe(
       (items: any) => {
         if (this.filteredStores.IS_DEFAULT_STORE == true) {
           this.filteredItemsList = this.allItems;

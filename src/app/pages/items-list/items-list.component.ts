@@ -185,11 +185,11 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     //   DATE_TO: this.formatDate(end) || this.formatDate(new Date()),
     // };
 
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
+    // const payload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
     // ✅ Use Date objects for filtering
-    this.dataservice.getItemsData(payload).subscribe((res: any) => {
+    this.dataservice.getItemsData().subscribe((res: any) => {
       const allData = res.data;
       this.itemsList = allData;
 
@@ -271,10 +271,10 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       //   DATE_TO: this.formatDate(new Date()),
       // };
 
-      const payload = {
-        COMPANY_ID: this.selected_Company_id,
-      };
-      this.dataservice.getItemsData(payload).subscribe((res: any) => {
+      // const payload = {
+      //   COMPANY_ID: this.selected_Company_id,
+      // };
+      this.dataservice.getItemsData().subscribe((res: any) => {
         console.log(res);
         this.itemsList = res.data;
       });
@@ -370,17 +370,10 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   showItems() {
     this.isLoading = true;
     this.cdr.detectChanges();
-    //  const payload = {
-    //   DATE_FROM: this.formatDate(this.startDate)|| this.formatDate(new Date()),
-    //   DATE_TO: this.formatDate(this.EndDate)|| this.formatDate(new Date()),
-
+    // const payload = {
+    //   COMPANY_ID: this.selected_Company_id,
     // };
-    // console.log(payload)
-
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataservice.getItemsData(payload).subscribe(
+    this.dataservice.getItemsData().subscribe(
       (response: any) => {
         // Sort items by 'createdAt' in descending order
         this.itemsList = response.data.reverse();

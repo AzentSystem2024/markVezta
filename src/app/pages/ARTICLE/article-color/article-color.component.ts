@@ -185,8 +185,8 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
   //===================get data list========================
  get_ArticleColor_List() {
   // this.isLoading = true;
-  const payload = { COMPANY_ID : this.selected_Company_id }; // Add any necessary payload data here
-  this.dataservice.get_ArticleColor_Api(payload).subscribe((res: any) => {
+  // const payload = { COMPANY_ID : this.selected_Company_id }; // Add any necessary payload data here
+  this.dataservice.get_ArticleColor_Api().subscribe((res: any) => {
     if (res) {
       this.Datasource = res.Data.map((item: any, index: any) => ({
         ...item,
@@ -217,7 +217,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
       CODE : Code,
       COLOR_ENGLISH : Color_English,
       COLOR_ARABIC : Color_Arabic,
-      COMPANY_ID : this.selected_Company_id
+      // COMPANY_ID : this.selected_Company_id
     }
 
     const trimmedCode = Code?.trim().toLowerCase();
@@ -312,8 +312,8 @@ Select_ArticleColor(event:any){
     const Code = this.editingRowData.CODE
     const Color_English = this.editingRowData.COLOR_ENGLISH
     const Color_Arabic = this.editingRowData.COLOR_ARABIC
-    const COMPANY_ID = this.selected_Company_id
-    console.log(Code,Color_English,Color_Arabic,COMPANY_ID);
+    // const COMPANY_ID = this.selected_Company_id
+    console.log(Code,Color_English,Color_Arabic);
     
 
     const trimmedCode = Code?.trim().toLowerCase();
@@ -379,7 +379,7 @@ if (isCodeDuplicate || isColorEnglishDuplicate || isColorArabicDuplicate) {
 
 
      if(Code && Color_English && Color_Arabic){
-      this.dataservice.Update_ArticleColor_Api(Id,Code,Color_English,Color_Arabic,COMPANY_ID).subscribe((res:any)=>{
+      this.dataservice.Update_ArticleColor_Api(Id,Code,Color_English,Color_Arabic).subscribe((res:any)=>{
             notify(
           {
             message: 'Data succesfully updated',

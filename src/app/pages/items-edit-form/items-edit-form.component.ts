@@ -465,7 +465,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.catagory = data;
     });
 
-    dataservice.getItemsData(payload).subscribe((data) => {
+    dataservice.getItemsData().subscribe((data) => {
       this.items = data;
     });
     const costiingmethod = {
@@ -827,7 +827,7 @@ export class ItemsEditFormComponent implements OnInit {
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
     };
     console.log(payload, 'PAYLOAD');
     // Call the service to update the items
@@ -930,7 +930,7 @@ export class ItemsEditFormComponent implements OnInit {
   refreshItems() {
     const payload = {};
     // Implement this method to refresh the items from the server
-    this.dataservice.getItemsData(payload).subscribe(
+    this.dataservice.getItemsData().subscribe(
       (data) => {
         this.items = data; // Assuming 'items' is the data source for your grid
         console.log(this.items, 'after refresh');
@@ -968,7 +968,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.isLoading = true;
     this.cdr.detectChanges();
     const payload = {};
-    this.dataservice.getItemsData(payload).subscribe(
+    this.dataservice.getItemsData().subscribe(
       (response: any) => {
         // Sort items by 'createdAt' in descending order
         this.itemsList = response.data.reverse();
