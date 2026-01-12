@@ -26,6 +26,7 @@ import {
   DxTextBoxModule,
   DxValidatorModule,
 } from 'devextreme-angular';
+import { SessionService } from 'src/app/services/session.service';
 
 @Component({
   selector: 'app-login-form',
@@ -89,7 +90,8 @@ export class LoginFormComponent implements OnInit {
     private router: Router,
     private themeService: ThemeService,
     private dataservice: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sessionService: SessionService
   ) {
     this.themeService.isDark.subscribe((value: boolean) => {
       this.btnStylingMode = value ? 'outlined' : 'contained';
@@ -157,7 +159,55 @@ export class LoginFormComponent implements OnInit {
     }
   }
 
-  onSubmit(event: Event) {
+  // 🌐 Internet IP (public)
+  async getInternetIP(): Promise<string> {
+    try {
+      const res = await fetch('https://api.ipify.org?format=json');
+      const data = await res.json();
+      return data.ip || '';
+    } catch {
+      return '';
+    }
+  }
+
+  // 🖥 Local IP (best effort – browser dependent)
+  getLocalIP(): Promise<string> {
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        resolve(''); // ⛑ fallback if nothing happens
+      }, 1500);
+
+      try {
+        const pc = new RTCPeerConnection({ iceServers: [] });
+        pc.createDataChannel('');
+
+        pc.createOffer()
+          .then((offer) => pc.setLocalDescription(offer))
+          .catch(() => {
+            clearTimeout(timeout);
+            resolve('');
+          });
+
+        pc.onicecandidate = (event) => {
+          if (!event || !event.candidate) return;
+
+          const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+          const match = ipRegex.exec(event.candidate.candidate);
+
+          if (match) {
+            clearTimeout(timeout);
+            resolve(match[1]);
+            pc.close();
+          }
+        };
+      } catch {
+        clearTimeout(timeout);
+        resolve('');
+      }
+    });
+  }
+
+  async onSubmit(event: Event) {
     event.preventDefault();
     this.loading = true;
 
@@ -172,14 +222,31 @@ export class LoginFormComponent implements OnInit {
       return;
     }
 
-    console.log('Attempting login with:', this.formData);
+    const COMPUTER_NAME = 'AZENT-1';
+    const COMPUTER_USER = 'Vismaya';
+    const DOMAIN_NAME = window.location.hostname || '';
 
-    this.dataservice.login_function_api(this.formData).subscribe({
+    // ✅ SAFE async calls
+    const [INTERNET_IP, LOCAL_IP] = await Promise.all([
+      this.getInternetIP(),
+      this.getLocalIP(),
+    ]);
+
+    const payload = {
+      LOGIN_NAME: this.formData.LOGIN_NAME,
+      PASSWORD: this.formData.PASSWORD,
+      COMPANY_ID: this.formData.COMPANY_ID,
+      FINANCIAL_YEAR_ID: this.formData.FINANCIAL_YEAR_ID,
+      COMPUTER_NAME,
+      COMPUTER_USER,
+      DOMAIN_NAME,
+      LOCAL_IP,
+      INTERNET_IP,
+    };
+
+    this.dataservice.login_function_api(payload).subscribe({
       next: (res: any) => {
-        console.log('Login API response:', res);
-
         if (res.flag === 1) {
-          // ✅ Successful login
           localStorage.setItem('userData', JSON.stringify(res));
           sessionStorage.setItem('savedUserData', JSON.stringify(res));
           localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
@@ -192,30 +259,104 @@ export class LoginFormComponent implements OnInit {
             position: { at: 'top right', my: 'top right' },
           });
         } else {
-          // ❌ Incorrect username or password
           notify({
             message: 'Username or password is incorrect',
             type: 'error',
             displayTime: 3000,
-            position: { at: 'top right', my: 'top right' },
           });
         }
-
         this.loading = false;
       },
-      error: (err) => {
+      error: () => {
         this.loading = false;
-        console.error('Login Error:', err);
-
         notify({
           message: 'Something went wrong. Please try again.',
           type: 'error',
           displayTime: 3000,
-          position: { at: 'top right', my: 'top right' },
         });
       },
     });
   }
+
+  // async onSubmit(event: Event) {
+  //   event.preventDefault();
+  //   this.loading = true;
+
+  //   if (!this.formData.LOGIN_NAME || !this.formData.PASSWORD) {
+  //     notify({
+  //       message: 'Please enter login name and password',
+  //       type: 'warning',
+  //       displayTime: 3000,
+  //       position: { at: 'top right', my: 'top right' },
+  //     });
+  //     this.loading = false;
+  //     return;
+  //   }
+  //   // 🔒 Static values (as requested)
+  //   const COMPUTER_NAME = 'AZENT-1';
+  //   const COMPUTER_USER = 'Vismaya';
+  //   // 🌐 System-derived values
+  //   const DOMAIN_NAME = window.location.hostname || '';
+  //   const [INTERNET_IP, LOCAL_IP] = await Promise.all([
+  //     this.getInternetIP(),
+  //     this.getLocalIP(),
+  //   ]);
+
+  //   console.log('Attempting login with:', this.formData);
+  //   const payload = {
+  //     LOGIN_NAME: this.formData.LOGIN_NAME,
+  //     PASSWORD: this.formData.PASSWORD,
+  //     COMPANY_ID: this.formData.COMPANY_ID,
+  //     FINANCIAL_YEAR_ID: this.formData.FINANCIAL_YEAR_ID,
+  //     COMPUTER_NAME,
+  //     COMPUTER_USER,
+  //     DOMAIN_NAME,
+  //     LOCAL_IP,
+  //     INTERNET_IP,
+  //   };
+  //   this.dataservice.login_function_api(payload).subscribe({
+  //     next: (res: any) => {
+  //       console.log('Login API response:', res);
+
+  //       if (res.flag === 1) {
+  //         // ✅ Successful login
+  //         localStorage.setItem('userData', JSON.stringify(res));
+  //         sessionStorage.setItem('savedUserData', JSON.stringify(res));
+  //         localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
+  //         // this.sessionService.startSessionTimer();
+  //         this.router.navigate(['/analytics-dashboard']);
+
+  //         notify({
+  //           message: 'Login successful!',
+  //           type: 'success',
+  //           displayTime: 2000,
+  //           position: { at: 'top right', my: 'top right' },
+  //         });
+  //       } else {
+  //         // ❌ Incorrect username or password
+  //         notify({
+  //           message: 'Username or password is incorrect',
+  //           type: 'error',
+  //           displayTime: 3000,
+  //           position: { at: 'top right', my: 'top right' },
+  //         });
+  //       }
+
+  //       this.loading = false;
+  //     },
+  //     error: (err) => {
+  //       this.loading = false;
+  //       console.error('Login Error:', err);
+
+  //       notify({
+  //         message: 'Something went wrong. Please try again.',
+  //         type: 'error',
+  //         displayTime: 3000,
+  //         position: { at: 'top right', my: 'top right' },
+  //       });
+  //     },
+  //   });
+  // }
 }
 
 @NgModule({
