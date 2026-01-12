@@ -247,7 +247,6 @@ export class DataService {
   selectCreditNote(id: number) {
     return this.http.post<any>(`${this.apiUrl}AC_CreditNote/select/` + id, {});
   }
-  
 
   // selectCreditNote(id: number) {
   //   return this.http
@@ -436,6 +435,12 @@ export class DataService {
 
   getPendingInvoiceListTrOut(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}AC_CreditNote/invoicelist`, payload);
+  }
+
+  //.............................PRODUCTION JV...........................................................//
+  getProductionJVList(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Trout_Invoice/getlist`, data);
   }
   //--------------------------PURCHASE-RETURN-DEBIT-------------------------------------//
   getPurchaseReturnMainList(data: any): Observable<any> {
@@ -1650,7 +1655,7 @@ export class DataService {
     CODE: any,
     VAT_NAME: any,
     VAT_PERC: any,
-    COMPANY_ID : AnyARecord
+    COMPANY_ID: AnyARecord
   ): Observable<any> {
     const data = { CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
 
@@ -1665,9 +1670,9 @@ export class DataService {
     CODE: any,
     VAT_NAME: any,
     VAT_PERC: any,
-    COMPANY_ID : any
+    COMPANY_ID: any
   ): Observable<any> {
-    const data = { ID, CODE, VAT_NAME, VAT_PERC,COMPANY_ID };
+    const data = { ID, CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
 
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
