@@ -442,6 +442,9 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}Sync/production-list`, data);
   }
+  selectProduction(id: number) {
+    return this.http.post<any>(`${this.apiUrl}Sync/select/` + id, {});
+  }
   //--------------------------PURCHASE-RETURN-DEBIT-------------------------------------//
   getPurchaseReturnMainList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseReturn/list`, data);
@@ -5063,8 +5066,7 @@ The result can be exported to HTML or Markdown.`;
     Id: any,
     Code: any,
     Color_English: any,
-    Color_Arabic: any,
-    
+    Color_Arabic: any
   ) {
     const getEndpoint = this.apiUrl + 'ArticleColor/update';
     const reqBody = {
@@ -5085,7 +5087,7 @@ The result can be exported to HTML or Markdown.`;
 
   get_ArticleBrand_Api() {
     const getEndpoint = this.apiUrl + 'ArticleBrand/list';
-    return this.http.post(getEndpoint,{});
+    return this.http.post(getEndpoint, {});
   }
 
   Insert_ArticleBrand_Api(payload) {
@@ -5101,7 +5103,7 @@ The result can be exported to HTML or Markdown.`;
     Id: any,
     Code: any,
     Description: any,
-    Is_Inactive: any,
+    Is_Inactive: any
   ) {
     const getEndpoint = this.apiUrl + 'ArticleBrand/update';
     const reqBody = {

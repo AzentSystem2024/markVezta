@@ -259,7 +259,7 @@ export class AddCutomerReceiptComponent {
   getCompanyListDropdown() {
     const payload = {
       NAME: 'CUSTOMER',
-      COMPANY_ID: this.selectedCompanyId,
+      // COMPANY_ID: this.selectedCompanyId,
     };
     console.log('CUSTOMERDROPDOWNNNNNNNNNNNNNNNNNNNNNNNNNNNN');
     this.dataService.getDropdownData(payload).subscribe((response: any) => {

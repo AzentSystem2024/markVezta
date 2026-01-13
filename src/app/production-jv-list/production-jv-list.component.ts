@@ -80,7 +80,7 @@ export class ProductionJvListComponent {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-     onClick: () => {
+    onClick: () => {
       // Run inside Angular's zone
       this.ngZone.run(() => this.addProduction());
     },
@@ -125,12 +125,13 @@ export class ProductionJvListComponent {
   canApprove = false;
   canPrint = false;
   isReadOnlyInvoice: boolean;
-isAddPopupVisible : boolean = false;
+  isAddPopupVisible: boolean = false;
+  selectedProduction: any;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-     private ngZone: NgZone
+    private ngZone: NgZone
   ) {}
 
   ngOnInit() {
@@ -449,7 +450,21 @@ isAddPopupVisible : boolean = false;
     }
   }
 
-  handleFormClosed(){}
+  onEditProduction(event: any) {
+    event.cancel = true;
+    const productionId = event.data.TRANS_ID;
+    const status = event.data.TRANS_STATUS;
+    this.dataService
+      .selectProduction(productionId)
+      .subscribe((response: any) => {
+        this.selectedProduction = response;
+        console.log(this.selectedProduction, 'SELECTEDTROUT');
+        this.isEditInvoice = true;
+        this.isReadOnlyInvoice = status === 5;
+      });
+  }
+
+  handleFormClosed() {}
 
   addProduction() {
     this.isAddPopupVisible = true;

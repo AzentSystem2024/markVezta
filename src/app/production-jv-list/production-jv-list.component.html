@@ -131,3 +131,20 @@
     (formClosed)="handleFormClosed()"
   ></app-production-jv-add>
 </dx-popup>
+
+<!-- <dx-popup
+  [(visible)]="isEditInvoice"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="Update Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditInvoice">
+    <app-invoice-tr-out-add
+      [isEditing]="true"
+      [EditingResponseData]="selectedInvoice"
+      [isReadOnlyMode]="isReadOnlyInvoice"
+      (popupClosed)="handleClose()"
+    ></app-invoice-tr-out-add>
+  </ng-container>
+</dx-popup> -->

@@ -350,7 +350,7 @@ export class InvoiceTrOutAddComponent {
 
   getCustomerOrUnitLst() {
     const payload = {
-      COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+      // COMPANY_ID: this.invoiceFormData.COMPANY_ID,
     };
     this.dataService
       .getCustomerStateTrout_Invoice(payload)
