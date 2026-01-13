@@ -30,6 +30,7 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
+      (onEditingStart)="onEditProduction($event)"
     >
       <dxo-editing
         mode="popup"
@@ -94,7 +95,7 @@
         </dx-select-box>
       </div>
 
-      <dxi-column dataField="PROD_NO" caption="Production No"></dxi-column>
+      <dxi-column dataField="PROD_NO" caption="Document No"></dxi-column>
 
       <dxi-column
         dataField="PROD_DATE"
@@ -104,19 +105,25 @@
         format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column
+        dataField=""
+        caption="Item"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
         dataField="PRODUCED_QTY"
         caption="Produced Qty"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
-      <dxi-column
+      <!-- <dxi-column
         dataField="TOTAL_COST"
         caption="
           Total Cost
         "
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
+      ></dxi-column> -->
     </dx-data-grid>
   </div>
 </div>
@@ -127,24 +134,22 @@
   [height]="'100vh'"
   title="Production"
 >
-  <app-production-jv-add
-    (formClosed)="handleFormClosed()"
-  ></app-production-jv-add>
+  <app-production-jv-add (formClosed)="handleClose()"></app-production-jv-add>
 </dx-popup>
 
-<!-- <dx-popup
+<dx-popup
   [(visible)]="isEditInvoice"
-  [width]="'100vw'"
+  [width]="'90vw'"
   [height]="'100vh'"
-  title="Update Invoice"
+  title="View Production"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditInvoice">
-    <app-invoice-tr-out-add
+    <app-production-jv-view
       [isEditing]="true"
-      [EditingResponseData]="selectedInvoice"
+      [EditingResponseData]="selectedProduction"
       [isReadOnlyMode]="isReadOnlyInvoice"
       (popupClosed)="handleClose()"
-    ></app-invoice-tr-out-add>
+    ></app-production-jv-view>
   </ng-container>
-</dx-popup> -->
+</dx-popup>

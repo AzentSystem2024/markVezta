@@ -1,4 +1,12 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  EventEmitter,
+  Input,
+  NgModule,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import {
@@ -20,6 +28,7 @@ import {
   DxTabPanelModule,
   DxTabsModule,
   DxNumberBoxModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -48,15 +57,84 @@ import { DataService } from '../services';
   styleUrls: ['./production-jv-view.component.scss'],
 })
 export class ProductionJvViewComponent {
+  @Input() isEditing: boolean = false;
+  @Input() EditingResponseData: any;
+  @Input() isReadOnlyMode: boolean = false;
+  @Output() popupClosed = new EventEmitter<void>();
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+  @ViewChild('popupGridRef', { static: false })
+  popupGridRef!: DxDataGridComponent;
+  @ViewChild('itemsGridRef', { static: false })
+  itemsGridRef!: DxDataGridComponent;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showHeaderFilter: true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
+  isPopupVisible: boolean = false;
+  items: any[] = [];
+  // itemsForInventory: any[] = [];
+  barcodeList: any;
+  canAdd: any;
+  canEdit: any;
+  canDelete: any;
+  canPrint: any;
+  canView: any;
+  canApprove: any;
+  matrix: any;
+  storeFromSession: any;
+  stores: any;
+  reasons: any;
+  sessionData: any;
+  selected_vat_id: any;
+  selectedCompany: any;
+  companyState: any;
+  GST: any;
+  productionFormData: any;
+
   constructor(private dataService: DataService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.isEditDataAvailable();
+  }
+
+  sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+
+    this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(this.selectedCompany);
+    this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
+    console.log(this.companyState);
+    this.GST = this.sessionData.GeneralSettings.GST_PERC;
+    console.log(this.GST, 'GST');
+    this.productionFormData.FIN_ID = this.sessionData.FINANCIAL_YEARS.FIN_ID;
+    this.productionFormData.COMPANY_ID =
+      this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+
+  isEditDataAvailable() {
+    if (!this.isEditing || !this.EditingResponseData) {
+      return; // Not edit mode → nothing to load
+    }
+
+    const data = this.EditingResponseData.Header[0];
+    console.log('EDIT RESPONSE:', data);
+  }
 
   onRowRemoved(event: any) {}
 
   onEditorPreparing(event: any) {}
 
-  Cancel() {}
+  Cancel() {
+    this.popupClosed.emit();
+  }
 }
 @NgModule({
   imports: [

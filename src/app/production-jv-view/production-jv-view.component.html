@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 86vh;
+      height: 70vh;
       display: flex;
       flex-direction: column;
 
@@ -59,6 +59,7 @@
                     align-items: center;
                     gap: 6px;
                     margin-top: 6px;
+                    width: 100%;
                   "
                 >
                   <dx-text-box
@@ -67,26 +68,22 @@
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
+
                   <dx-text-box
                     label="Reference No"
                     labelMode="floating"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
-                  <dx-date-box
-                    label="Date"
-                    labelMode="floating"
-                    [width]="200"
-                    displayFormat="dd-MM-yyyy"
-                    [readOnly]="true"
-                  ></dx-date-box>
+
+                  <!-- Date box pushed to right end -->
                 </div>
+
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-select-box
-                    #beneficiaryNameRef
                     label="Product"
                     labelMode="floating"
-                    [width]="335"
+                    [width]="406"
                   ></dx-select-box>
                 </div>
               </div>
@@ -95,46 +92,38 @@
             <dxi-item location="after" locateInMenu="auto">
               <div
                 class="stacked-toolbar-group"
-                style="display: flex; flex-direction: column; gap: 0px"
+                style="display: flex; flex-direction: column; gap: 6px"
               >
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    margin-top: 6px;
-                  "
-                >
-                  <div style="margin-top: 35px">
-                    <dx-number-box
-                      label="Pending Qty"
-                      labelMode="floating"
-                      [width]="150"
-                      [readOnly]="true"
-                    ></dx-number-box>
-                    <!-- <dx-button
-                      text="Fill Component"
-                      stylingMode="contained"
-                      type="default"
-                    ></dx-button> -->
-                  </div>
+                <!-- Date Field (Top) -->
+                <dx-date-box
+                  label="Production Date"
+                  labelMode="floating"
+                  [width]="300"
+                  type="date"
+                ></dx-date-box>
+
+                <!-- Qty + Button Row -->
+                <div style="display: flex; align-items: flex-end; gap: 8px">
+                  <dx-number-box
+                    label="Production Qty"
+                    labelMode="floating"
+                    [width]="300"
+                  ></dx-number-box>
 
                   <!-- <dx-button
-                    icon="plus"
-                    stylingMode="outlined"
+                    text="Fill Component"
+                    stylingMode="contained"
                     type="default"
-                    (onClick)="onAddNewRow()"
-                    style="height: 32px; width: 32px; padding: 0"
+                    [width]="150"
+                    style="height: 32px"
                   ></dx-button> -->
                 </div>
-
-                <!--  -->
               </div>
             </dxi-item>
           </dxo-toolbar>
           <dxi-column
             dataField="ledgerCode"
-            caption="Ledger Code"
+            caption="Item Code"
             [width]="130"
             [editorType]="'dxSelectBox'"
             [lookup]="{
@@ -146,7 +135,7 @@
 
           <dxi-column
             dataField="ledgerName"
-            caption="Ledger Name"
+            caption="Item Description"
             [width]="200"
             [editorType]="'dxSelectBox'"
             [lookup]="{
@@ -158,7 +147,37 @@
 
           <dxi-column
             dataField="REMARKS"
-            caption="Description"
+            caption="UOM"
+            [allowEditing]="true"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="REMARKS"
+            caption="BoM Qty"
+            [allowEditing]="true"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="REMARKS"
+            caption="Qty Required"
+            [allowEditing]="true"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="REMARKS"
+            caption="Qty Available"
+            [allowEditing]="true"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="REMARKS"
+            caption="Qty used"
+            [allowEditing]="true"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="REMARKS"
+            caption="Cost"
             [allowEditing]="true"
           ></dxi-column>
 
@@ -169,11 +188,6 @@
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
-
-          <!-- <dxi-column type="buttons">
-            <dxi-button name="edit"></dxi-button>
-            <dxi-button name="delete"></dxi-button>
-          </dxi-column> -->
 
           <dxo-summary>
             <dxi-total-item
@@ -191,57 +205,52 @@
         <div
           style="display: flex; justify-content: flex-end; margin-top: 5px"
         ></div>
-        <!-- Two-column box: Bank Details (left) and Receipt Details (right) -->
         <div
           class="bordered-grid"
           style="
             margin-top: 10px;
-            padding: 15px;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 10px;
           "
         >
-          <!-- Row: Two columns side by side -->
-          <div style="display: flex; justify-content: space-between; gap: 5px">
-            <!-- Left: Receipt Details -->
-            <div style="flex: 1">
-              <dx-text-box
-                id="payHeadIdField"
-                displayExpr="HEAD_NAME"
-                valueExpr="HEAD_ID"
-                label="Additional Cost"
-                labelMode="floating"
-                [searchEnabled]="true"
-                [width]="'100%'"
-                style="margin-top: 2px"
-                [readOnly]="true"
-              ></dx-text-box>
-            </div>
+          <div style="display: flex; gap: 10px; align-items: center">
+            <!-- Remark -->
+            <dx-text-box
+              label="Additional Cost"
+              labelMode="floating"
+              style="flex: 2"
+              [readOnly]="false"
+            ></dx-text-box>
 
-            <div style="flex: 1">
-              <div style="display: flex; gap: 10px">
-                <dx-text-box
-                  label="Cost of Production"
-                  labelMode="floating"
-                  type="date"
-                  [width]="'100%'"
-                  style="flex: 1"
-                  [readOnly]="true"
-                ></dx-text-box>
-              </div>
-            </div>
+            <!-- Unit Product Cost -->
+            <dx-number-box
+              label="Cost of production"
+              labelMode="floating"
+              style="flex: 1"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
+              [readOnly]="true"
+            ></dx-number-box>
           </div>
 
-          <!-- Row: Narration spanning both columns -->
-          <div style="display: flex; gap: 10px">
+          <div style="display: flex; gap: 10px; align-items: center">
+            <!-- Remark -->
             <dx-text-box
               label="Remark"
               labelMode="floating"
-              [width]="'100%'"
-              style="margin-top: 2px"
+              style="flex: 2"
               [readOnly]="false"
             ></dx-text-box>
+
+            <!-- Unit Product Cost -->
+            <dx-number-box
+              label="Unit Product Cost"
+              labelMode="floating"
+              style="flex: 1"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
+              [readOnly]="true"
+            ></dx-number-box>
           </div>
         </div>
       </div>
@@ -257,22 +266,6 @@
       (onClick)="Cancel()"
       type="normal"
     ></dx-button>
-    <dx-button #saveButtonRef [text]="" stylingMode="contained" type="default">
-    </dx-button>
-  </div>
-</div>
-
-<div class="form-popup-buttons-container">
-  <div class="popup-footer">
-    <dx-button
-      icon="fas fa-file-pdf"
-      text="PDF"
-      type="normal"
-      stylingMode="outlined"
-      [width]="100"
-      hint="View PDF"
-    >
-    </dx-button>
   </div>
 </div>
 

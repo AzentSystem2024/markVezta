@@ -33,25 +33,26 @@
         <theme-switcher></theme-switcher>
       </ng-container>
     </dxi-item>
-    <!-- 
-    <dxi-item location="after">
-      <div *dxTemplate>
-        <div class="messages">
-          <dx-button icon="belloutline" stylingMode="text"> </dx-button>
-          <div class="dx-badge">4</div>
+
+    <dxi-item location="after" locateInMenu="auto">
+      <ng-container *dxTemplate>
+        <div class="user-info">
+          <div class="user-name">{{ UserName }}</div>
+          <div class="company-name">{{ company }}</div>
         </div>
-      </div>
-    </dxi-item> -->
-    <dxi-item
-  location="after"
-  locateInMenu="auto"
-  widget="dxButton"
-  [options]="{
-    text: UserName,
-    stylingMode: 'text',
-    elementAttr: { class: 'userNameLabel' }
-  }"
-></dxi-item>
+      </ng-container>
+    </dxi-item>
+
+    <!-- <dxi-item
+      location="after"
+      locateInMenu="auto"
+      widget="dxButton"
+      [options]="{
+        text: UserName,
+        stylingMode: 'text',
+        elementAttr: { class: 'userNameLabel' }
+      }"
+    ></dxi-item> -->
 
     <dxi-item location="after" locateInMenu="auto" menuItemTemplate="menuItem">
       <div *dxTemplate="let data of 'item'">
