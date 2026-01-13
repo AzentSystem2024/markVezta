@@ -69,8 +69,10 @@ export class ProductionJvAddComponent {
   }
 
   Cancel() {
-    
+
   }
+
+  onSave(){}
 }
 
 @NgModule({

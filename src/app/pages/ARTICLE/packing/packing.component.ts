@@ -218,10 +218,10 @@ console.log('close packing popup called');
     console.log(this.selected_Company_id,'============selected_Company_id==============')    
   }
   getPackingList() {
-    const payload = {
-        COMPANY_ID : this.selected_Company_id
-    }; // Add any necessary parameters here
-  this.dataService.get_packages_list_api(payload).subscribe((res: any) => {
+    // const payload = {
+    //     COMPANY_ID : this.selected_Company_id
+    // }; // Add any necessary parameters here
+  this.dataService.get_packages_list_api().subscribe((res: any) => {
     console.log('response from get packing list api:', res);
 
     this.packingList = res.Data.map((item: any, index: number) => ({

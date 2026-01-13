@@ -131,10 +131,10 @@ export class PackingAddComponent {
   //===================dummy datasource of =========================
   constructor(private dataService: DataService) {
      this.sesstion_Details();
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataService.get_packages_list_api(payload).subscribe((res: any) => {
+    // const payload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    this.dataService.get_packages_list_api().subscribe((res: any) => {
       console.log('response from get packing list api:', res);
 
       this.packing_list = res.Data;
@@ -272,10 +272,10 @@ export class PackingAddComponent {
   }
 
   getItems() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
+    // const payload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    this.dataService.listItemsForArticle().subscribe((response: any) => {
       this.itemsList = response.DataList;
     });
   }
@@ -286,7 +286,7 @@ export class PackingAddComponent {
       color: this.PackingData.COLOR,
       categoryID: this.PackingData.CATEGORY_ID,
       unitID: this.selectedProductionUnitId,
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
     };
 
     const ArtvalidationResult = this.ArtnoValidationGroup?.instance?.validate();
@@ -811,7 +811,7 @@ export class PackingAddComponent {
   const payload = {
     ...this.PackingData,
 
-    COMPANY_ID: this.selected_Company_id,
+    // COMPANY_ID: this.selected_Company_id,
     ALIAS_NO: this.Alias_no,
     PART_NO: this.Part_no,
     ART_SERIAL: this.art_Serial_no,

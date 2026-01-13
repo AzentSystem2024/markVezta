@@ -150,9 +150,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/getitem`, data);
   }
 
-  listItemsForArticle(items: any): Observable<any> {
-    const data = items;
-    return this.http.post(`${this.apiUrl}Article/listitem`, data);
+  listItemsForArticle(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Article/listitem`, {});
   }
   getArticleList(): Observable<any> {
     return this.http.post(`${this.apiUrl}article/List`, {});
@@ -5504,10 +5503,9 @@ The result can be exported to HTML or Markdown.`;
 
   //==============================Api for package master=======================
 
-  get_packages_list_api(items: any) {
-    const data = items;
+  get_packages_list_api() {
     const getEndpoint = this.apiUrl + 'packing/List';
-    return this.http.post(getEndpoint, data);
+    return this.http.post(getEndpoint, {});
   }
 
   // get_combinbation_list_api(payload: any) {

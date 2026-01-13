@@ -221,10 +221,10 @@ export class ArticleAddComponent {
   }
 
   getItems() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
+    // const payload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    this.dataService.listItemsForArticle().subscribe((response: any) => {
       this.itemsList = response.DataList;
     });
   }

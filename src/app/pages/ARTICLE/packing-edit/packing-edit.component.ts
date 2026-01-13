@@ -99,10 +99,10 @@ export class PackingEditComponent {
     this.sesstion_Details();
     this.getDropdownLists();
 
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataService.get_packages_list_api(payload).subscribe((res: any) => {
+    // const payload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    this.dataService.get_packages_list_api().subscribe((res: any) => {
       console.log('response from get packing list api:', res);
 
       this.packing_list = res.Data;
@@ -180,10 +180,10 @@ export class PackingEditComponent {
     }
   }
   getItems() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataService.listItemsForArticle(payload).subscribe((response: any) => {
+    // const payload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    this.dataService.listItemsForArticle().subscribe((response: any) => {
       this.itemsList = response.DataList;
     });
   }
@@ -649,7 +649,7 @@ onQuantityChanged() {
       color: this.PackingData.COLOR,
       categoryID: this.PackingData.CATEGORY_ID,
       unitID: this.PackingData.UNIT_ID,
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
     };
 
     console.log('Payload for article data:', payload);
