@@ -265,7 +265,7 @@ export class AddInvoiceComponent {
     console.log(this.invoiceFormData.DISTRIBUTOR_ID, 'INVOICELISTFORGRID');
     const payload = {
       CUST_ID: this.invoiceFormData.DISTRIBUTOR_ID,
-      COMPANY_ID: this.selectedCompanyId,
+      // COMPANY_ID: this.selectedCompanyId,
     };
     console.log(payload, 'PAYLOADDDDDDDDDDD');
     this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {

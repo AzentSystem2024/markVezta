@@ -979,6 +979,10 @@ import {
   ProductionJvListModule,
 } from './production-jv-list/production-jv-list.component';
 import { ProductionJvAddModule } from './production-jv-add/production-jv-add.component';
+import {
+  ProductionJvViewComponent,
+  ProductionJvViewModule,
+} from './production-jv-view/production-jv-view.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1337,7 +1341,8 @@ import { ProductionJvAddModule } from './production-jv-add/production-jv-add.com
     UomEditModule,
     GstReportCDNRModule,
     ProductionJvListModule,
-    ProductionJvAddModule
+    ProductionJvAddModule,
+    ProductionJvViewModule,
   ],
   providers: [
     AuthService,
