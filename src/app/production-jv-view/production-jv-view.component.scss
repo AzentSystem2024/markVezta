@@ -1,0 +1,15 @@
+.invoice-wrapper {
+  position: relative; /* anchor for footer */
+}
+
+.form-popup-buttons-container {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  z-index: 10;
+}
+
+.popup-footer {
+  display: flex;
+  justify-content: flex-end;
+}

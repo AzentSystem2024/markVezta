@@ -1,5 +1,11 @@
 import {
-  Component, NgModule, Input, Output, EventEmitter, OnInit, ChangeDetectorRef,
+  Component,
+  NgModule,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -16,7 +22,6 @@ import { Router } from '@angular/router';
   templateUrl: 'app-header.component.html',
   styleUrls: ['./app-header.component.scss'],
 })
-
 export class AppHeaderComponent implements OnInit {
   @Output()
   menuToggle = new EventEmitter<boolean>();
@@ -28,40 +33,50 @@ export class AppHeaderComponent implements OnInit {
   title!: string;
   customerInfo: any;
   user: IUser | null = { email: 'rererer' };
-UserName:any;
+  UserName: any;
 
   userMenuItems = [
-     {
+    {
       text: 'Change Password',
       icon: 'key',
       onClick: () => {
         this.changePassword();
       },
     },
-  {
-    text: 'Logout',
-    icon: 'runner',
-    onClick: () => {
-      this.authService.logOut();
-      localStorage.removeItem('menuData');
+    {
+      text: 'Logout',
+      icon: 'runner',
+      onClick: () => {
+        this.authService.logOut();
+        localStorage.removeItem('menuData');
+      },
     },
-  }];
+  ];
+  company: any;
 
-  constructor(private authService: AuthService,private changeDetectorRef: ChangeDetectorRef,private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.authService.getUser().then((e) => this.user = e.data);
+    this.authService.getUser().then((e) => (this.user = e.data));
     this.sesstion_Details();
   }
 
-      sesstion_Details() {
+  sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+    console.log(
+      sessionData.SELECTED_COMPANY.COMPANY_NAME,
+      '=================session data=========='
+    );
     this.UserName = sessionData.USER_NAME;
     console.log(this.UserName, 'Username');
+    this.company = sessionData.SELECTED_COMPANY.COMPANY_NAME;
   }
 
-    changePassword() {
+  changePassword() {
     this.router.navigateByUrl('/change-password');
   }
 
@@ -81,4 +96,4 @@ UserName:any;
   declarations: [AppHeaderComponent],
   exports: [AppHeaderComponent],
 })
-export class AppHeaderModule { }
+export class AppHeaderModule {}

@@ -55,6 +55,7 @@ import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.co
 import { DataService } from '../services';
 import { Router } from '@angular/router';
 import { ProductionJvAddModule } from '../production-jv-add/production-jv-add.component';
+import { ProductionJvViewModule } from '../production-jv-view/production-jv-view.component';
 
 @Component({
   selector: 'app-production-jv-list',
@@ -452,7 +453,7 @@ export class ProductionJvListComponent {
 
   onEditProduction(event: any) {
     event.cancel = true;
-    const productionId = event.data.TRANS_ID;
+    const productionId = event.data.PRODUCTION_ID;
     const status = event.data.TRANS_STATUS;
     this.dataService
       .selectProduction(productionId)
@@ -464,7 +465,7 @@ export class ProductionJvListComponent {
       });
   }
 
-  handleFormClosed() {}
+  handleClose() {}
 
   addProduction() {
     this.isAddPopupVisible = true;
@@ -512,6 +513,7 @@ export class ProductionJvListComponent {
     ViewInvoiceModule,
     InvoiceTrOutAddModule,
     ProductionJvAddModule,
+    ProductionJvViewModule,
   ],
   providers: [],
   declarations: [ProductionJvListComponent],
