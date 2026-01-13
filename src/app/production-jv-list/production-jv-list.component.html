@@ -16,7 +16,7 @@
       [showBorders]="true"
       [showRowLines]="true"
       [showColumnLines]="true"
-      [columnAutoWidth]="false"
+      [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
       [allowColumnReordering]="true"
@@ -61,8 +61,18 @@
 
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Article Production</div>
+          <!-- <div class="grid-header">Article Production</div> -->
+          <div class="grid-header">
+            {{ productionHeaderTitle }}
+          </div>
         </dxi-item>
+
+        <dxi-item
+          location="before"
+          locateInMenu="auto"
+          template="productionTypeTemplate"
+        ></dxi-item>
+
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item
           location="after"
@@ -78,6 +88,19 @@
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'productionTypeTemplate'">
+        <dx-select-box
+          [dataSource]="productionTypes"
+          displayExpr="name"
+          valueExpr="id"
+          [(value)]="selectedProductionType"
+          width="200"
+          (onValueChanged)="onProductionTypeChanged($event)"
+        >
+        </dx-select-box>
+      </div>
+
       <div *dxTemplate="let data of 'dateFilterTemplate'">
         <dx-select-box
           [dataSource]="dateRanges"

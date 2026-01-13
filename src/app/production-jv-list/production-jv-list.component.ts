@@ -128,6 +128,13 @@ export class ProductionJvListComponent {
   isReadOnlyInvoice: boolean;
   isAddPopupVisible: boolean = false;
   selectedProduction: any;
+  productionTypes = [
+    { id: 'ARTICLE', name: 'Article Production' },
+    { id: 'BOX', name: 'Box Production' },
+  ];
+
+  selectedProductionType = 'ARTICLE';
+
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -471,6 +478,22 @@ export class ProductionJvListComponent {
 
   addProduction() {
     this.isAddPopupVisible = true;
+  }
+
+  onProductionTypeChanged(e: any) {
+    console.log('Selected production type:', e.value);
+
+    if (e.value === 'ARTICLE') {
+      // Load article production list
+    } else if (e.value === 'BOX') {
+      // Load box production list
+    }
+  }
+
+  get productionHeaderTitle(): string {
+    return this.selectedProductionType === 'ARTICLE'
+      ? 'Article Production'
+      : 'Box Production';
   }
 }
 @NgModule({

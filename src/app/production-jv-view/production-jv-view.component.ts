@@ -121,11 +121,36 @@ export class ProductionJvViewComponent {
 
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) {
-      return; // Not edit mode → nothing to load
+      return;
     }
 
-    const data = this.EditingResponseData.Header[0];
-    console.log('EDIT RESPONSE:', data);
+    console.log('FULL RESPONSE:', this.EditingResponseData);
+
+    // Header is OBJECT
+    const header = this.EditingResponseData.Header;
+    const articles = this.EditingResponseData.ProducedArticles;
+    const rowMaterials = this.EditingResponseData.RawMaterials;
+    this.productionFormData = {
+      //HEADER DATA
+      PRODUCTION_ID: header.PRODUCTION_ID,
+      PROD_NO: header.PROD_NO,
+      PROD_DATE: new Date(header.PROD_DATE),
+      PRODUCT_ID: header.PRODUCT_ID,
+      PRODUCED_QTY: header.PRODUCED_QTY,
+      TOTAL_COST: header.TOTAL_COST,
+      UNIT_COST: header.UNIT_COST,
+      ADDL_COST: header.ADDL_COST,
+      ADDL_DESCRIPTION: header.ADDL_DESCRIPTION,
+      VOUCHER_NO: header.VOUCHER_NO,
+      //Footer DATA(RAW MATERIALS)
+      ADDL_ADDL_DESCRIPTION: header.ADDL_DESCRIPTION,
+    };
+
+    // Bind grid data
+    this.items = this.EditingResponseData.RawMaterials || [];
+
+    console.log('FORM DATA:', this.productionFormData);
+    console.log('GRID DATA:', this.items);
   }
 
   onRowRemoved(event: any) {}

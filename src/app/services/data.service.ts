@@ -439,10 +439,10 @@ export class DataService {
   //.............................PRODUCTION JV...........................................................//
   getProductionJVList(items: any): Observable<any> {
     const data = items;
-    return this.http.post(`${this.apiUrl}Sync/production-list`, data);
+    return this.http.post(`${this.apiUrl}ArticleProduction/production-list`, data);
   }
   selectProduction(id: number) {
-    return this.http.post<any>(`${this.apiUrl}Sync/select/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}ArticleProduction/select/` + id, {});
   }
   //--------------------------PURCHASE-RETURN-DEBIT-------------------------------------//
   getPurchaseReturnMainList(data: any): Observable<any> {

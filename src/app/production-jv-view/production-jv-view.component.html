@@ -13,6 +13,7 @@
       <div class="grid-container">
         <dx-data-grid
           #itemsGridRef
+          [dataSource]="items"
           [showBorders]="true"
           [showRowLines]="true"
           [showColumnLines]="true"
@@ -24,7 +25,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'52vh'"
+          [height]="'60vh'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
@@ -32,10 +33,10 @@
           [keyboardNavigation]="{ editOnKeyPress: true }"
           [editing]="{
             mode: 'cell',
-            allowUpdating: true,
-            allowDeleting: true,
-            allowAdding: true,
-            useIcons: true
+            allowUpdating: false,
+            allowDeleting: false,
+            allowAdding: false,
+            useIcons: false
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onRowRemoved)="onRowRemoved($event)"
@@ -65,6 +66,7 @@
                   <dx-text-box
                     label="Doc No"
                     labelMode="floating"
+                    [(value)]="productionFormData.VOUCHER_NO"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
@@ -84,6 +86,7 @@
                     label="Product"
                     labelMode="floating"
                     [width]="406"
+                    [readOnly]="true"
                   ></dx-select-box>
                 </div>
               </div>
@@ -98,8 +101,10 @@
                 <dx-date-box
                   label="Production Date"
                   labelMode="floating"
+                  [(value)]="productionFormData.PROD_DATE"
                   [width]="300"
                   type="date"
+                  [readOnly]="true"
                 ></dx-date-box>
 
                 <!-- Qty + Button Row -->
@@ -107,7 +112,9 @@
                   <dx-number-box
                     label="Production Qty"
                     labelMode="floating"
+                    [(value)]="productionFormData.PRODUCED_QTY"
                     [width]="300"
+                    [readOnly]="true"
                   ></dx-number-box>
 
                   <!-- <dx-button
@@ -122,82 +129,59 @@
             </dxi-item>
           </dxo-toolbar>
           <dxi-column
-            dataField="ledgerCode"
+            dataField="ITEM_CODE"
             caption="Item Code"
             [width]="130"
-            [editorType]="'dxSelectBox'"
-            [lookup]="{
-              valueExpr: 'HEAD_CODE',
-              displayExpr: 'HEAD_CODE',
-              searchEnabled: true
-            }"
           ></dxi-column>
 
           <dxi-column
-            dataField="ledgerName"
+            dataField="DESCRIPTION"
             caption="Item Description"
             [width]="200"
-            [editorType]="'dxSelectBox'"
-            [lookup]="{
-              valueExpr: 'HEAD_NAME',
-              displayExpr: 'HEAD_NAME',
-              searchEnabled: true
-            }"
           ></dxi-column>
 
-          <dxi-column
-            dataField="REMARKS"
-            caption="UOM"
-            [allowEditing]="true"
-          ></dxi-column>
+          <dxi-column dataField="UOM" caption="UOM" [width]="80"></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
+            dataField="BOM_QTY"
             caption="BoM Qty"
-            [allowEditing]="true"
+            dataType="number"
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
+            dataField="REQUIRED_QTY"
             caption="Qty Required"
-            [allowEditing]="true"
+            dataType="number"
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
-            caption="Qty Available"
-            [allowEditing]="true"
+            dataField="USED_QTY"
+            caption="Qty Used"
+            dataType="number"
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
-            caption="Qty used"
-            [allowEditing]="true"
-          ></dxi-column>
-
-          <dxi-column
-            dataField="REMARKS"
+            dataField="UNIT_COST"
             caption="Cost"
-            [allowEditing]="true"
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
 
           <dxi-column
-            dataField="AMOUNT"
+            dataField="TOTAL_COST"
             caption="Amount"
-            [allowEditing]="true"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
 
           <dxo-summary>
             <dxi-total-item
-              column="AMOUNT"
+              column="TOTAL_COST"
               summaryType="sum"
               valueFormat="#,##0.00"
               displayFormat="Total: {0}"
               alignment="right"
-            >
-            </dxi-total-item>
+            ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
 
@@ -220,8 +204,9 @@
             <dx-text-box
               label="Additional Cost"
               labelMode="floating"
+              [(value)]="productionFormData.ADDL_COST"
               style="flex: 2"
-              [readOnly]="false"
+              [readOnly]="true"
             ></dx-text-box>
 
             <!-- Unit Product Cost -->
@@ -239,14 +224,16 @@
             <dx-text-box
               label="Remark"
               labelMode="floating"
+              [(value)]="productionFormData.ADDL_DESCRIPTION"
               style="flex: 2"
-              [readOnly]="false"
+              [readOnly]="true"
             ></dx-text-box>
 
             <!-- Unit Product Cost -->
             <dx-number-box
               label="Unit Product Cost"
               labelMode="floating"
+              [(value)]="productionFormData.UNIT_COST"
               style="flex: 1"
               [format]="{ type: 'fixedPoint', precision: 2 }"
               [readOnly]="true"
