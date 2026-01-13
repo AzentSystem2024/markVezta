@@ -465,7 +465,9 @@ export class ProductionJvListComponent {
       });
   }
 
-  handleClose() {}
+  handleClose() {
+    this.isEditInvoice = false;
+  }
 
   addProduction() {
     this.isAddPopupVisible = true;
