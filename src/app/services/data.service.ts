@@ -2984,8 +2984,8 @@ export class DataService {
   // }
 
   public getDropdownData(data: any): Observable<any> {
-    // const reqBodyData = { name: type };
-    return this.http.post(`${this.apiUrl}dropdown/`, data);
+    const reqBodyData = { name: data };
+    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
 
   public getDropdownDataForLedgerSettings(type: any): Observable<any> {
@@ -6067,6 +6067,12 @@ The result can be exported to HTML or Markdown.`;
   //======================GST REPORT(CDNR)===========================
   GST_Report_Api_CDNR(payload) {
     const getEndpoint = `${this.apiUrl}GSTReport/Gstcdnr`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //==============PRODUCT IN ARTICLE PRODUCTION=================
+  get_Product_In_Article_Production_Api(payload) {
+    const getEndpoint = this.apiUrl + 'ArticleProduction/articlebomlist';
     return this.http.post(getEndpoint, payload);
   }
 }
