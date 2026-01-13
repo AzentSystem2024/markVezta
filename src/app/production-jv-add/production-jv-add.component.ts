@@ -62,8 +62,16 @@ import { get } from 'jquery';
   styleUrls: ['./production-jv-add.component.scss']
 })
 export class ProductionJvAddComponent {
+  @ViewChild('itemsGridRef', { static: false })
+itemsGrid!: DxDataGridComponent;
+
   Article: any;
   gridData: any[] = [];
+  totalAmount: number = 0;
+finalCost: number = 0;  
+additionalCost: number = 0;
+unitProductCost: number = 0;
+
 
     productionJVFormData: any = {
     COMPANY_ID: '',
@@ -149,7 +157,10 @@ onProductChange(e: any) {
     item.PRICE = 1000;
      this.calculateAmount(item);
   });
+ // 🔥 FORCE summary recalculation
+  this.calculateTotalAmount();
 
+  this.itemsGrid.instance.refresh();
 }
 
 onCellValueChanged(e: any) {
@@ -159,6 +170,48 @@ onCellValueChanged(e: any) {
   if (e.dataField === 'QTY_USED' || e.dataField === 'PRICE') {
     this.calculateAmount(e.data);
   }
+   this.calculateTotalAmount();
+
+   this.itemsGrid.instance.refresh();
+}
+
+calculateFinalCost() {
+  this.finalCost = (Number(this.totalAmount) || 0) +
+                   (Number(this.additionalCost) || 0);
+
+  console.log('Final Cost:', this.finalCost);
+  this.calculateUnitProductCost();
+}
+
+
+
+calculateTotalAmount() {
+  this.totalAmount = this.gridData.reduce((sum, row) => {
+    return sum + (Number(row.AMOUNT) || 0);
+  }, 0);
+
+  console.log('Total Amount:', this.totalAmount);
+  this.calculateFinalCost();
+}
+
+onAdditionalCostChange(e: any) {
+  this.additionalCost = Number(e.value) || 0;
+  console.log('Additional Cost Changed:', this.additionalCost);
+  this.calculateFinalCost();
+}
+
+//==================== Calculate Unit Product Cost ===================//
+calculateUnitProductCost() {
+  const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+  const totalCost = Number(this.finalCost) || 0;
+
+  if (prodQty > 0) {
+    this.unitProductCost = totalCost / prodQty;
+  } else {
+    this.unitProductCost = 0; // avoid divide-by-zero
+  }
+
+  console.log('Unit Product Cost:', this.unitProductCost);
 }
 
 

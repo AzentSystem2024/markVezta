@@ -229,12 +229,14 @@
         >
           <div style="display: flex; gap: 10px; align-items: center">
             <!-- Remark -->
-            <dx-text-box
+            <dx-number-box
               label="Additional Cost"
               labelMode="floating"
               style="flex: 2"
               [readOnly]="false"
-            ></dx-text-box>
+              [value]="additionalCost"
+              (onValueChanged)="onAdditionalCostChange($event)"
+            ></dx-number-box>
 
             <!-- Unit Product Cost -->
             <dx-number-box
@@ -243,6 +245,7 @@
               style="flex: 1"
               [format]="{ type: 'fixedPoint', precision: 2 }"
               [readOnly]="true"
+              [value]="finalCost"
             ></dx-number-box>
           </div>
 
@@ -262,6 +265,7 @@
               style="flex: 1"
               [format]="{ type: 'fixedPoint', precision: 2 }"
               [readOnly]="true"
+              [value]="unitProductCost"
             ></dx-number-box>
           </div>
         </div>
