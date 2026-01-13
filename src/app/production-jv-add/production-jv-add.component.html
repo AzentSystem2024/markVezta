@@ -13,6 +13,7 @@
       <div class="grid-container">
         <dx-data-grid
           #itemsGridRef
+          [dataSource]="gridData"
           [showBorders]="true"
           [showRowLines]="true"
           [showColumnLines]="true"
@@ -38,6 +39,7 @@
             useIcons: true
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
+          (onCellValueChanged)="onCellValueChanged($event)"
           (onRowRemoved)="onRowRemoved($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
@@ -73,7 +75,6 @@
                     label="Reference No"
                     labelMode="floating"
                     [width]="200"
-                    [readOnly]="true"
                   ></dx-text-box>
 
                   <!-- Date box pushed to right end -->
@@ -82,7 +83,7 @@
                     labelMode="floating"
                     [width]="200"
                     displayFormat="dd-MM-yyyy"
-                    [readOnly]="true"
+                    [readOnly]="false"
                     style="margin-left: auto"
                   ></dx-date-box>
                 </div>
@@ -92,6 +93,12 @@
                     label="Product"
                     labelMode="floating"
                     [width]="335"
+                    [valueExpr]="'ID'"
+                    [displayExpr]="'DESCRIPTION'"
+                    [items]="Article"
+                    [searchEnabled]="true"
+                    [(value)]="productionJVFormData.PRODUCT_ID"
+                    (onValueChanged)="onProductChange($event)"
                   ></dx-select-box>
                 </div>
               </div>
@@ -115,6 +122,8 @@
                     label="Production Qty"
                     labelMode="floating"
                     [width]="150"
+                    [(value)]="productionJVFormData.PROD_QTY"
+                    (onValueChanged)="onProductionQtyChange()"
                     [readOnly]="false"
                   ></dx-number-box>
 
@@ -124,6 +133,7 @@
                     stylingMode="contained"
                     type="default"
                     style="height: 32px"
+                    (onClick)="fillComponents()"
                   ></dx-button>
                 </div>
 
@@ -132,61 +142,53 @@
             </dxi-item>
           </dxo-toolbar>
           <dxi-column
-            dataField="ledgerCode"
+            dataField="ITEM_CODE"
             caption="Item Code"
             [width]="130"
             [editorType]="'dxSelectBox'"
-            [lookup]="{
-              valueExpr: 'HEAD_CODE',
-              displayExpr: 'HEAD_CODE',
-              searchEnabled: true
-            }"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
-            dataField="ledgerName"
+            dataField="DESCRIPTION"
             caption="Item Description"
             [width]="200"
             [editorType]="'dxSelectBox'"
-            [lookup]="{
-              valueExpr: 'HEAD_NAME',
-              displayExpr: 'HEAD_NAME',
-              searchEnabled: true
-            }"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
+            dataField="UOM"
             caption="UOM"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
+            dataField="QUANTITY"
             caption="BoM Qty"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
+            dataField="QTY_REQUIRED"
             caption="Qty Required"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
             dataField="REMARKS"
             caption="Qty Available"
-            [allowEditing]="true"
+            [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
+            dataField="QTY_USED"
             caption="Qty used"
             [allowEditing]="true"
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
+            dataField="PRICE"
             caption="Cost"
             [allowEditing]="true"
           ></dxi-column>
@@ -194,7 +196,7 @@
           <dxi-column
             dataField="AMOUNT"
             caption="Amount"
-            [allowEditing]="true"
+            [allowEditing]="false"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
@@ -228,7 +230,7 @@
           <div style="display: flex; gap: 10px; align-items: center">
             <!-- Remark -->
             <dx-text-box
-              label="Additional Cos"
+              label="Additional Cost"
               labelMode="floating"
               style="flex: 2"
               [readOnly]="false"
