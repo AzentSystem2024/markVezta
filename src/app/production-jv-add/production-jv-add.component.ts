@@ -2,8 +2,10 @@ import {
   ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  EventEmitter,
   NgModule,
   NgZone,
+  Output,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -64,6 +66,7 @@ import { get } from 'jquery';
 export class ProductionJvAddComponent {
   @ViewChild('itemsGridRef', { static: false })
 itemsGrid!: DxDataGridComponent;
+@Output() formClosed = new EventEmitter<void>();
 
   Article: any;
   gridData: any[] = [];
@@ -74,34 +77,43 @@ unitProductCost: number = 0;
 
 
     productionJVFormData: any = {
+    DOC_NO: '',
     COMPANY_ID: '',
     FIN_ID: '',
     USER_ID: '',
     REF_NO: '',
-    ADDL_COST: '',
-    ADDL_DESCRIPTION: '',
-    PRODUCT_ID: '',
+    PRODUCTION_DATE: new Date(),
+    REMARKS:'',
+    TOTAL_ITEM_COST:0,
+    ADDL_COST: 0,
+    COST_OF_PRODUCTION: 0,
+    PRODUCT_ID: 0,
+    UNIT_PRODUCT_COST: 0  ,
     PROD_QTY: 0,
-    gridData: [
+    RawMaterials: [
       {
-        ARTICLE_PRODUCTION_ID: '',
-        ARTICLE_ID: '',
-        BOX_ID:'',
-        BARCODE:'',
+        ID: 0,
+        UOM: '',
+        REQUIRED_QTY:0,
+        USED_QTY:0,
         QUANTITY: 0,
-        PRICE: 1200,
-        PRODUCTION_DATE: '',
+        COST: 0,
+        AMOUNT: 0,
       },
     ],
   };
+  selected_Company_id: any;
+  selected_fin_id: any;
+  user_id: any;
 
    constructor(private dataservice: DataService, private ngZone: NgZone) {
       
    }
 
    ngOnInit() {
+     this.sesstion_Details();
     this.get_ProductDropdown();
-  
+    this.getPendingNo();
    }
 
    
@@ -124,6 +136,17 @@ onProductChange(e: any) {
   this.get_Product_In_Article_Production();
 }
 
+sesstion_Details(){
+    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
+    console.log(sessionData,'=================session data==========')
+    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
+    console.log(this.selected_Company_id,'============selected_Company_id==============')
+    this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
+    console.log(this.selected_fin_id,'===========selected fin id===================')
+    this.user_id = sessionData.USER_ID
+    console.log(this.user_id,'============user id==================')
+//     
+  }
 
   onRowRemoved(e: any) {
   }
@@ -133,12 +156,13 @@ onProductChange(e: any) {
   }
 
   Cancel() {
-
+    this.resetForm();
+    this.formClosed.emit(); 
   }
 
   calculateAmount(row: any) {
-  const qtyUsed = Number(row.QTY_USED) || 0;
-  const price = Number(row.PRICE) || 0;
+  const qtyUsed = Number(row.USED_QTY) || 0;
+  const price = Number(row.COST) || 0;
   row.AMOUNT = qtyUsed * price;
 }
 
@@ -151,10 +175,10 @@ onProductChange(e: any) {
     console.log('BOM Qty for item', bomQty);
 
     // 🔥 Calculation
-    item.QTY_REQUIRED = prodQty * bomQty;
-    console.log('Updated QTY_REQUIRED for item:', item.QTY_REQUIRED);
-    item.QTY_USED = item.QTY_REQUIRED;
-    item.PRICE = 1000;
+    item.REQUIRED_QTY = prodQty * bomQty;
+    console.log('Updated REQUIRED_QTY for item:', item.REQUIRED_QTY);
+    item.USED_QTY = item.REQUIRED_QTY;
+    item.COST = 1000;
      this.calculateAmount(item);
   });
  // 🔥 FORCE summary recalculation
@@ -167,13 +191,29 @@ onCellValueChanged(e: any) {
   console.log('Cell Value Changed Event:', e);
 
   // React only to editable / relevant fields
-  if (e.dataField === 'QTY_USED' || e.dataField === 'PRICE') {
+  if (e.dataField === 'USED_QTY' || e.dataField === 'COST') {
     this.calculateAmount(e.data);
   }
    this.calculateTotalAmount();
 
    this.itemsGrid.instance.refresh();
 }
+
+// setUsedQty = (rowData: any, value: any) => {
+//   const usedQty = parseFloat(value) || 0;
+//   const cost = parseFloat(rowData.COST) || 0;
+
+//   rowData.USED_QTY = usedQty;
+//   rowData.AMOUNT = usedQty * cost;
+
+//   console.log('USED_QTY:', usedQty);
+//   console.log('COST:', cost);
+//   console.log('AMOUNT:', rowData.AMOUNT);
+
+//   this.calculateTotalAmount();
+// };
+
+
 
 calculateFinalCost() {
   this.finalCost = (Number(this.totalAmount) || 0) +
@@ -182,7 +222,7 @@ calculateFinalCost() {
   console.log('Final Cost:', this.finalCost);
   this.calculateUnitProductCost();
 }
-
+ 
 
 
 calculateTotalAmount() {
@@ -214,6 +254,20 @@ calculateUnitProductCost() {
   console.log('Unit Product Cost:', this.unitProductCost);
 }
 
+ getPendingNo() {
+    const payload = {
+      TRANS_TYPE: 103,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    console.log('Payload for Doc No:', payload);
+    this.dataservice.getDocNo(payload).subscribe((response: any) => {
+      console.log('Doc No Response Data:', response);
+      // this.pendingNo = response.PAYMENT_NO;
+      this.productionJVFormData.DOC_NO = response.DOC_NO;
+      console.log('Assigned DOC_NO:', this.productionJVFormData.DOC_NO);
+    });
+  }
+
 
   get_ProductDropdown(){
       this.dataservice.getDropdownData('ARTICLE').subscribe((response: any) => {
@@ -230,10 +284,99 @@ calculateUnitProductCost() {
     this.dataservice.get_Product_In_Article_Production_Api(payload).subscribe((response: any) => {
       console.log('Product In Article Production Data:', response);
       this.gridData = response.Data;
+
     });
   }
 
-  onSave(){}
+  onSave(){
+
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    FIN_ID: this.selected_fin_id,
+    USER_ID: this.user_id,
+    REMARKS : this.productionJVFormData.REMARKS,
+    PRODUCTION_DATE: this.productionJVFormData.PRODUCTION_DATE,
+    TOTAL_ITEM_COST: this.totalAmount,
+    COST_OF_PRODUCTION: this.finalCost,
+    UNIT_PRODUCT_COST: this.unitProductCost,
+    REF_NO: this.productionJVFormData.REF_NO,
+    ADDL_COST: this.additionalCost,
+    PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
+    PROD_QTY: this.productionJVFormData.PROD_QTY,
+    RawMaterials: this.gridData
+  };
+  console.log('Payload being sent:', payload);
+  this.dataservice.Insert_Article_Production_Api(payload).subscribe((res: any) => {
+    console.log('Insert success:', res);
+ this.resetForm();
+  this.formClosed.emit();
+    // reset + close only AFTER success
+  });
+    
+  }
+
+//   onSave() {
+//   const payload = {
+//     COMPANY_ID: this.productionJVFormData.COMPANY_ID,
+//     FIN_ID: this.productionJVFormData.FIN_ID,
+//     USER_ID: this.productionJVFormData.USER_ID,
+//     REF_NO: this.productionJVFormData.REF_NO,
+//     ADDL_COST: this.additionalCost,
+//     ADDL_DESCRIPTION: this.productionJVFormData.ADDL_DESCRIPTION,
+//     PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
+//     PROD_QTY: this.productionJVFormData.PROD_QTY,
+//     DETAILS: this.gridData
+//   };
+
+//   console.log('Payload being sent:', payload);
+
+//   this.dataservice.Insert_Article_Production_Api(payload).subscribe({
+//     next: (res: any) => {
+//       console.log('Insert success:', res);
+
+//       // reset + close only AFTER success
+//       this.resetForm();
+//       this.formClosed.emit();
+//     },
+//     error: (err: any) => {
+//       console.error('Insert failed:', err);
+//     }
+//   });
+// }
+
+
+  resetForm() {
+  // 🔹 Reset form model
+  this.productionJVFormData = {
+    COMPANY_ID: '',
+    FIN_ID: '',
+    USER_ID: '',
+    REF_NO: '',
+    ADDL_COST: '',
+    ADDL_DESCRIPTION: '',
+    PRODUCT_ID: '',
+    PROD_QTY: 0,
+    gridData: []
+  };
+
+  // 🔹 Reset grid
+  this.gridData = [];
+
+  // 🔹 Reset calculated values
+  this.totalAmount = 0;
+  this.additionalCost = 0;
+  this.finalCost = 0;
+  this.unitProductCost = 0;
+
+  // 🔹 Reset grid UI safely
+  if (this.itemsGrid) {
+    this.itemsGrid.instance.cancelEditData();
+    this.itemsGrid.instance.refresh();
+  }
+
+  console.log('Form reset completed');
+}
+
 }
 
 @NgModule({

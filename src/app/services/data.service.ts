@@ -6075,4 +6075,10 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'ArticleProduction/articlebomlist';
     return this.http.post(getEndpoint, payload);
   }
+
+  //==============INSERT IN ARTICLE PRODUCTION=================
+  Insert_Article_Production_Api(payload) {
+    const getEndpoint = this.apiUrl + 'ArticleProduction/insert';
+    return this.http.post(getEndpoint, payload);
+  }
 }
