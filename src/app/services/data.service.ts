@@ -2998,8 +2998,8 @@ export class DataService {
   // }
 
   public getDropdownData(data: any): Observable<any> {
-    // const reqBodyData = { name: data };
-    return this.http.post(`${this.apiUrl}dropdown`, data);
+    const reqBodyData = data;
+    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
 
   public getDropdownDataForLedgerSettings(type: any): Observable<any> {

@@ -400,7 +400,7 @@
     <!-- </dxi-column>  -->
     <dxi-column dataField="DEPT_NAME" caption="Department" [width]="150">
     </dxi-column>
-    <dxi-column dataField="CAT_ID" caption="Category" [width]="150">
+    <!-- <dxi-column dataField="CAT_ID" caption="Category" [width]="150">
       <dxo-lookup
         [dataSource]="catagory"
         displayExpr="DESCRIPTION"
@@ -408,6 +408,8 @@
         [visible]="true"
       >
       </dxo-lookup>
+    </dxi-column> -->
+    <dxi-column dataField="CAT_NAME" caption="Category" [width]="150">
     </dxi-column>
     <dxi-column dataField="SUBCAT_ID" caption="Subcategory" [width]="150">
       <dxo-lookup
@@ -418,7 +420,11 @@
       >
       </dxo-lookup>
     </dxi-column>
-    <dxi-column
+    <dxi-column dataField="TYPE_NAME" caption="Type" [width]="150">
+    </dxi-column>
+    <dxi-column dataField="BRAND_NAME" caption="Brand" [width]="150">
+    </dxi-column>
+    <!-- <dxi-column
       dataField="BRAND_ID"
       caption="Brand"
       [visible]="true"
@@ -431,7 +437,7 @@
         [visible]="true"
       >
       </dxo-lookup>
-    </dxi-column>
+    </dxi-column> -->
     <dxi-column
       dataField="PARENT_ITEM_ID"
       caption="Parent Item"

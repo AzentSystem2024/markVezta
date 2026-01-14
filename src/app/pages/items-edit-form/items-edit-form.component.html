@@ -69,30 +69,6 @@
                   ></dx-select-box>
                 </div>
               </dxi-item>
-
-              <dxi-item>
-                <div *dxTemplate>
-                  <dx-select-box
-                    class="spacing-item"
-                    label="Item Type"
-                    displayExpr="DESCRIPTION"
-                    [items]="itemtype"
-                    valueExpr="ID"
-                    [labelMode]="'floating'"
-                    placeholder="Select Item Type"
-                    [searchEnabled]="true"
-                    [(value)]="itemData.TYPE_ID"
-                    [width]="'100%'"
-                    (onValueChanged)="onTypeIdChange($event)"
-                  >
-                    <dx-validator>
-                      <dxi-validation-rule
-                        type="required"
-                        message="This field is required"
-                      ></dxi-validation-rule> </dx-validator
-                  ></dx-select-box>
-                </div>
-              </dxi-item>
             </dxi-item>
 
             <dxi-item itemType="group" [colCount]="1">
