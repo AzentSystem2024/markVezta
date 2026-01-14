@@ -54,7 +54,10 @@ import { InvoiceTrOutComponent } from '../pages/INVOICE/invoice-tr-out/invoice-t
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 import { Router } from '@angular/router';
-import { ProductionJvAddModule } from '../production-jv-add/production-jv-add.component';
+import {
+  ProductionJvAddComponent,
+  ProductionJvAddModule,
+} from '../production-jv-add/production-jv-add.component';
 import { ProductionJvViewModule } from '../production-jv-view/production-jv-view.component';
 
 @Component({
@@ -65,6 +68,9 @@ import { ProductionJvViewModule } from '../production-jv-view/production-jv-view
 export class ProductionJvListComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  @ViewChild(ProductionJvAddComponent)
+  productionForm!: ProductionJvAddComponent;
+
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -157,6 +163,7 @@ export class ProductionJvListComponent {
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/invoice');
     this.sesstion_Details();
+    this.getProductionList();
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -168,7 +175,6 @@ export class ProductionJvListComponent {
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
-    this.getProductionList();
   }
 
   getProductionList() {
@@ -493,6 +499,24 @@ export class ProductionJvListComponent {
 
   handleClose() {
     this.isViewProduction = false;
+    this.isAddPopupVisible = false;
+    this.isEditInvoice = false;
+
+    // 🔥 Reload list INSIDE Angular zone
+    this.ngZone.run(() => {
+      this.getProductionList(); // API call
+      this.cdr.detectChanges(); // force UI refresh
+    });
+  }
+
+  onPopupHiding() {
+    console.log('Popup closed');
+
+    if (this.productionForm) {
+      this.productionForm.resetForm(); // 🔥 RESET CHILD FORM
+    }
+
+    this.isAddPopupVisible = false;
   }
 
   addProduction() {

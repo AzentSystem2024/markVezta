@@ -45,7 +45,7 @@
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
-          <dxo-toolbar>
+          <!-- <dxo-toolbar>
             <div
               class="stacked-toolbar-group"
               style="display: flex; flex-direction: column; gap: 2px"
@@ -78,7 +78,7 @@
                   ></dx-text-box>
 
                   <!-- Date box pushed to right end -->
-                  <dx-date-box
+          <!-- <dx-date-box
                     label="Date"
                     labelMode="floating"
                     [width]="200"
@@ -116,8 +116,103 @@
                     gap: 8px;
                     margin-top: 35px;
                   "
+                > -->
+          <!-- Production / Pending Qty -->
+          <!-- <dx-number-box
+                    label="Production Qty"
+                    labelMode="floating"
+                    [width]="150"
+                    [(value)]="productionJVFormData.PROD_QTY"
+                    (onValueChanged)="onProductionQtyChange()"
+                    [readOnly]="false"
+                  ></dx-number-box> -->
+
+          <!-- Fill Component Button -->
+          <!-- <dx-button
+                    text="Fill Component"
+                    stylingMode="contained"
+                    type="default"
+                    style="height: 32px"
+                    (onClick)="fillComponents()"
+                  ></dx-button>
+                </div> -->
+
+          <!--  -->
+          <!-- </div>
+            </dxi-item> -->
+          <!-- </dxo-toolbar> -->
+
+          <dxo-toolbar>
+            <div
+              class="stacked-toolbar-group"
+              style="display: flex; flex-direction: column; gap: 2px"
+            ></div>
+            <dxi-item location="before" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 0px"
+              >
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    margin-top: 6px;
+                    width: 100%;
+                  "
                 >
-                  <!-- Production / Pending Qty -->
+                  <dx-text-box
+                    label="Doc No"
+                    labelMode="floating"
+                    [width]="200"
+                    [readOnly]="true"
+                    [(value)]="productionJVFormData.DOC_NO"
+                  ></dx-text-box>
+
+                  <dx-text-box
+                    label="Reference No"
+                    labelMode="floating"
+                    [width]="200"
+                    [(value)]="productionJVFormData.REF_NO"
+                  ></dx-text-box>
+
+                  <!-- Date box pushed to right end -->
+                </div>
+
+                <div style="display: flex; align-items: baseline; gap: 2px">
+                  <dx-select-box
+                    label="Product"
+                    labelMode="floating"
+                    [width]="400"
+                    [valueExpr]="'ID'"
+                    [displayExpr]="'DESCRIPTION'"
+                    [items]="Article"
+                    [searchEnabled]="true"
+                    [(value)]="productionJVFormData.PRODUCT_ID"
+                    (onValueChanged)="onProductChange($event)"
+                  ></dx-select-box>
+                </div>
+              </div>
+            </dxi-item>
+
+            <dxi-item location="after" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 6px"
+              >
+                <!-- Date Field (Top) -->
+                <dx-date-box
+                  label="Date"
+                  labelMode="floating"
+                  [width]="120"
+                  displayFormat="dd-MM-yyyy"
+                  [readOnly]="false"
+                  style="margin-left: auto"
+                  [(value)]="productionJVFormData.PRODUCTION_DATE"
+                ></dx-date-box>
+
+                <!-- Qty + Button Row -->
+                <div style="display: flex; align-items: flex-end; gap: 8px">
                   <dx-number-box
                     label="Production Qty"
                     labelMode="floating"
@@ -127,7 +222,6 @@
                     [readOnly]="false"
                   ></dx-number-box>
 
-                  <!-- Fill Component Button -->
                   <dx-button
                     text="Fill Component"
                     stylingMode="contained"
@@ -136,11 +230,10 @@
                     (onClick)="fillComponents()"
                   ></dx-button>
                 </div>
-
-                <!--  -->
               </div>
             </dxi-item>
           </dxo-toolbar>
+
           <dxi-column
             dataField="ITEM_CODE"
             caption="Item Code"
@@ -170,25 +263,25 @@
           ></dxi-column>
 
           <dxi-column
-            dataField="QTY_REQUIRED"
+            dataField="REQUIRED_QTY"
             caption="Qty Required"
             [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
+            dataField="QTY_AVAILABLE"
             caption="Qty Available"
             [allowEditing]="false"
           ></dxi-column>
 
           <dxi-column
-            dataField="QTY_USED"
+            dataField="USED_QTY"
             caption="Qty used"
             [allowEditing]="true"
           ></dxi-column>
 
           <dxi-column
-            dataField="PRICE"
+            dataField="COST"
             caption="Cost"
             [allowEditing]="true"
           ></dxi-column>
@@ -256,6 +349,7 @@
               labelMode="floating"
               style="flex: 2"
               [readOnly]="false"
+              [(value)]="productionJVFormData.REMARKS"
             ></dx-text-box>
 
             <!-- Unit Product Cost -->

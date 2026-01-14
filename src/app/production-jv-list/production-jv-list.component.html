@@ -151,6 +151,7 @@
   [width]="1200"
   [height]="'100vh'"
   title="Production"
+  (onHiding)="onPopupHiding()"
 >
   <app-production-jv-add (formClosed)="handleClose()"></app-production-jv-add>
 </dx-popup>
