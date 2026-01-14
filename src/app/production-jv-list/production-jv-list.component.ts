@@ -502,7 +502,7 @@ export class ProductionJvListComponent {
     this.isAddPopupVisible = false;
     this.isEditInvoice = false;
 
-    // 🔥 Reload list INSIDE Angular zone
+    //Reload list INSIDE Angular zone
     this.ngZone.run(() => {
       this.getProductionList(); // API call
       this.cdr.detectChanges(); // force UI refresh
