@@ -36,6 +36,9 @@
         mode="popup"
         [allowUpdating]="true"
         [allowDeleting]="canDelete"
+        [texts]="{
+          editRow: 'View'
+        }"
       ></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
