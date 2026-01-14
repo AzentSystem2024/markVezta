@@ -153,6 +153,35 @@ sesstion_Details(){
 
  onEditorPreparing(e: any) {
 
+  if (e.dataField === 'USED_QTY') {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+    }
+
   // Only for data rows & USED_QTY column
   if (
     e.parentType === 'dataRow' &&
