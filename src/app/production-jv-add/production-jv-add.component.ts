@@ -151,9 +151,35 @@ sesstion_Details(){
   onRowRemoved(e: any) {
   }
 
-  onEditorPreparing(e: any) {
+ onEditorPreparing(e: any) {
 
+  // Only for data rows & USED_QTY column
+  if (
+    e.parentType === 'dataRow' &&
+    e.dataField === 'USED_QTY'
+  ) {
+
+    const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+    e.editorOptions.onValueChanged = (args: any) => {
+
+      // 🔥 Update USED_QTY
+      e.row.data.USED_QTY = Number(args.value) || 0;
+
+      // 🔥 Recalculate amount
+      this.calculateAmount(e.row.data);
+
+      // 🔥 Update totals
+      this.calculateTotalAmount();
+
+      // Call default handler (important!)
+      if (originalOnValueChanged) {
+        originalOnValueChanged(args);
+      }
+    };
   }
+}
+
 
   Cancel() {
     this.resetForm();
@@ -187,32 +213,30 @@ sesstion_Details(){
   this.itemsGrid.instance.refresh();
 }
 
+// onCellValueChanged(e: any) {
+//   console.log('Cell Value Changed Event:', e);
+
+//   // React only to editable / relevant fields
+//   if (e.dataField === 'USED_QTY' || e.dataField === 'COST') {
+//     this.calculateAmount(e.data);
+//   }
+//    this.calculateTotalAmount();
+
+//    this.itemsGrid.instance.refresh();
+// }
+
+
 onCellValueChanged(e: any) {
   console.log('Cell Value Changed Event:', e);
+  const field = e?.column?.dataField;
 
-  // React only to editable / relevant fields
-  if (e.dataField === 'USED_QTY' || e.dataField === 'COST') {
+  console.log('Changed field:', field, 'Row:', e.data);
+
+  if (field === 'USED_QTY' || field === 'COST') {
     this.calculateAmount(e.data);
+    this.calculateTotalAmount();
   }
-   this.calculateTotalAmount();
-
-   this.itemsGrid.instance.refresh();
 }
-
-// setUsedQty = (rowData: any, value: any) => {
-//   const usedQty = parseFloat(value) || 0;
-//   const cost = parseFloat(rowData.COST) || 0;
-
-//   rowData.USED_QTY = usedQty;
-//   rowData.AMOUNT = usedQty * cost;
-
-//   console.log('USED_QTY:', usedQty);
-//   console.log('COST:', cost);
-//   console.log('AMOUNT:', rowData.AMOUNT);
-
-//   this.calculateTotalAmount();
-// };
-
 
 
 calculateFinalCost() {
