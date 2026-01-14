@@ -127,12 +127,7 @@
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column
-        dataField=""
-        caption="Item"
-        dataType="number"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
+      <dxi-column dataField="ITEM_CODE" caption="Item"></dxi-column>
       <dxi-column
         dataField="PRODUCED_QTY"
         caption="Produced Qty"
@@ -160,18 +155,18 @@
 >
   <app-production-jv-add (formClosed)="handleClose()"></app-production-jv-add>
 </dx-popup>
-
 <dx-popup
-  [(visible)]="isEditInvoice"
+  [(visible)]="isViewProduction"
   [width]="'90vw'"
   [height]="'100vh'"
   title="View Production"
   (onHiding)="handleClose()"
 >
-  <ng-container *ngIf="isEditInvoice">
+  <ng-container *ngIf="isViewProduction">
     <app-production-jv-view
       [isEditing]="true"
       [EditingResponseData]="selectedProduction"
+      [productionType]="selectedProductionType"
       [isReadOnlyMode]="isReadOnlyInvoice"
       (popupClosed)="handleClose()"
     ></app-production-jv-view>

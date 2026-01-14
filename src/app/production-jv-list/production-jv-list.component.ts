@@ -54,7 +54,10 @@ import { InvoiceTrOutComponent } from '../pages/INVOICE/invoice-tr-out/invoice-t
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 import { Router } from '@angular/router';
-import { ProductionJvAddComponent, ProductionJvAddModule } from '../production-jv-add/production-jv-add.component';
+import {
+  ProductionJvAddComponent,
+  ProductionJvAddModule,
+} from '../production-jv-add/production-jv-add.component';
 import { ProductionJvViewModule } from '../production-jv-view/production-jv-view.component';
 
 @Component({
@@ -66,7 +69,7 @@ export class ProductionJvListComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild(ProductionJvAddComponent)
-productionForm!: ProductionJvAddComponent;
+  productionForm!: ProductionJvAddComponent;
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -137,6 +140,7 @@ productionForm!: ProductionJvAddComponent;
   ];
 
   selectedProductionType = 'ARTICLE';
+  isViewProduction: boolean;
 
   constructor(
     private dataService: DataService,
@@ -159,7 +163,7 @@ productionForm!: ProductionJvAddComponent;
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/invoice');
     this.sesstion_Details();
-     this.getProductionList();
+    this.getProductionList();
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -171,7 +175,6 @@ productionForm!: ProductionJvAddComponent;
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
-   
   }
 
   getProductionList() {
@@ -464,39 +467,57 @@ productionForm!: ProductionJvAddComponent;
 
   onEditProduction(event: any) {
     event.cancel = true;
+
     const productionId = event.data.PRODUCTION_ID;
     const status = event.data.TRANS_STATUS;
-    this.dataService
-      .selectProduction(productionId)
-      .subscribe((response: any) => {
-        this.selectedProduction = response;
-        console.log(this.selectedProduction, 'SELECTEDTROUT');
-        this.isEditInvoice = true;
-        this.isReadOnlyInvoice = status === 5;
-      });
+
+    const api$ =
+      this.selectedProductionType === 'ARTICLE'
+        ? this.dataService.selectProduction(productionId)
+        : this.dataService.selectBoxProduction(productionId);
+
+    api$.subscribe((response: any) => {
+      this.selectedProduction = response;
+      this.isReadOnlyInvoice = status === 5;
+      this.isViewProduction = true;
+    });
   }
 
+  // onEditProduction(event: any) {
+  //   event.cancel = true;
+  //   const productionId = event.data.PRODUCTION_ID;
+  //   const status = event.data.TRANS_STATUS;
+  //   this.dataService
+  //     .selectProduction(productionId)
+  //     .subscribe((response: any) => {
+  //       this.selectedProduction = response;
+  //       console.log(this.selectedProduction, 'SELECTEDTROUT');
+  //       this.isEditInvoice = true;
+  //       this.isReadOnlyInvoice = status === 5;
+  //     });
+  // }
+
   handleClose() {
+    this.isViewProduction = false;
     this.isAddPopupVisible = false;
     this.isEditInvoice = false;
 
-     // 🔥 Reload list INSIDE Angular zone
-  this.ngZone.run(() => {
-    this.getProductionList(); // API call
-    this.cdr.detectChanges();         // force UI refresh
-  });
+    // 🔥 Reload list INSIDE Angular zone
+    this.ngZone.run(() => {
+      this.getProductionList(); // API call
+      this.cdr.detectChanges(); // force UI refresh
+    });
   }
 
   onPopupHiding() {
-  console.log('Popup closed');
+    console.log('Popup closed');
 
-  if (this.productionForm) {
-    this.productionForm.resetForm(); // 🔥 RESET CHILD FORM
+    if (this.productionForm) {
+      this.productionForm.resetForm(); // 🔥 RESET CHILD FORM
+    }
+
+    this.isAddPopupVisible = false;
   }
-
-  this.isAddPopupVisible = false;
-}
-
 
   addProduction() {
     this.isAddPopupVisible = true;
