@@ -133,7 +133,7 @@ onProductChange(e: any) {
   this.productionJVFormData.PRODUCT_ID = selectedProductId;
 
   // 🔥 Call API
-  this.get_Product_In_Article_Production();
+  // this.get_Product_In_Article_Production();
 }
 
 sesstion_Details(){
@@ -163,13 +163,13 @@ sesstion_Details(){
 
     e.editorOptions.onValueChanged = (args: any) => {
 
-      // 🔥 Update USED_QTY
+      //  Update USED_QTY
       e.row.data.USED_QTY = Number(args.value) || 0;
 
-      // 🔥 Recalculate amount
+      //  Recalculate amount
       this.calculateAmount(e.row.data);
 
-      // 🔥 Update totals
+      //  Update totals
       this.calculateTotalAmount();
 
       // Call default handler (important!)
@@ -192,39 +192,65 @@ sesstion_Details(){
   row.AMOUNT = qtyUsed * price;
 }
 
- fillComponents() {
-  const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
-  console.log('Production Qty:', prodQty);
+//  fillComponents() {
+//   const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+//   console.log('Production Qty:', prodQty);
 
-  this.gridData.forEach(item => {
-    const bomQty = Number(item.QUANTITY) || 0;
-    console.log('BOM Qty for item', bomQty);
+//   this.gridData.forEach(item => {
+//     const bomQty = Number(item.QUANTITY) || 0;
+//     console.log('BOM Qty for item', bomQty);
 
-    // 🔥 Calculation
-    item.REQUIRED_QTY = prodQty * bomQty;
-    console.log('Updated REQUIRED_QTY for item:', item.REQUIRED_QTY);
-    item.USED_QTY = item.REQUIRED_QTY;
-    item.COST = 1000;
-     this.calculateAmount(item);
-  });
- // 🔥 FORCE summary recalculation
-  this.calculateTotalAmount();
+//     // 🔥 Calculation
+//     item.REQUIRED_QTY = prodQty * bomQty;
+//     console.log('Updated REQUIRED_QTY for item:', item.REQUIRED_QTY);
+//     item.USED_QTY = item.REQUIRED_QTY;
+//     item.COST = 1000;
+//      this.calculateAmount(item);
+//   });
+//  // 🔥 FORCE summary recalculation
+//   this.calculateTotalAmount();
 
-  this.itemsGrid.instance.refresh();
-}
-
-// onCellValueChanged(e: any) {
-//   console.log('Cell Value Changed Event:', e);
-
-//   // React only to editable / relevant fields
-//   if (e.dataField === 'USED_QTY' || e.dataField === 'COST') {
-//     this.calculateAmount(e.data);
-//   }
-//    this.calculateTotalAmount();
-
-//    this.itemsGrid.instance.refresh();
+//   this.itemsGrid.instance.refresh();
 // }
 
+fillComponents() {
+  const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+
+  if (!this.productionJVFormData.PRODUCT_ID || prodQty <= 0) {
+    console.warn('Select product and enter production qty');
+    return;
+  }
+
+  const payload = {
+    ARTICLE_ID: this.productionJVFormData.PRODUCT_ID,
+  };
+
+  console.log('Payload for Product In Article Production:', payload);
+
+  this.dataservice
+    .get_Product_In_Article_Production_Api(payload)
+    .subscribe((response: any) => {
+
+      console.log('Product In Article Production Data:', response);
+
+      // ✅ Set grid data ONLY here
+      this.gridData = response.Data;
+
+      // ✅ Apply existing logic (UNCHANGED)
+      this.gridData.forEach(item => {
+        const bomQty = Number(item.QUANTITY) || 0;
+
+        item.REQUIRED_QTY = prodQty * bomQty;
+        item.USED_QTY = item.REQUIRED_QTY;
+        item.COST = 1000;
+
+        this.calculateAmount(item);
+      });
+
+      this.calculateTotalAmount();
+      this.itemsGrid.instance.refresh();
+    });
+}
 
 onCellValueChanged(e: any) {
   console.log('Cell Value Changed Event:', e);
