@@ -157,6 +157,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
+  getLastAliasNo(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
+  }
+
   insertArticle(items: any) {
     const data = items;
     // console.log(data,"insert service")
@@ -2994,8 +2998,8 @@ export class DataService {
   // }
 
   public getDropdownData(data: any): Observable<any> {
-    const reqBodyData = { name: data };
-    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
+    // const reqBodyData = { name: data };
+    return this.http.post(`${this.apiUrl}dropdown`, data);
   }
 
   public getDropdownDataForLedgerSettings(type: any): Observable<any> {

@@ -308,3 +308,12 @@
   white-space: normal;
   font-size: 13px;
 }
+
+/* Force selected row highlight in dx-data-grid */
+.dx-datagrid-rowsview .dx-selection.dx-row > td {
+  background-color: #dbeafe !important;
+}
+
+.dx-datagrid-rowsview .dx-selection.dx-row:hover > td {
+  background-color: #bfdbfe !important;
+}

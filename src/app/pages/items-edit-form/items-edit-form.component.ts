@@ -359,21 +359,22 @@ export class ItemsEditFormComponent implements OnInit {
     this.itemlabel5 = authservice.getsettingsData().ITEM_PROPERTY5;
     // console.log('ItemsEditFormComponent constructor');
     const parentItemPayload = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'PARENTITEM',
     };
     dataservice.getDropdownData(parentItemPayload).subscribe((data) => {
       this.parentitem = data;
     });
     const payload1 = {
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'ITEMTYPE',
     };
     dataservice.getDropdownData(payload1).subscribe((data) => {
       this.itemtype = data;
     });
     const brand = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'BRAND',
     };
     dataservice.getDropdownData(brand).subscribe((data) => {
@@ -384,7 +385,7 @@ export class ItemsEditFormComponent implements OnInit {
       // console.log(this.country, 'COUNTRY');
     });
     const store = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'STORE',
     };
     dataservice.getDropdownData(store).subscribe((data) => {

@@ -98,6 +98,14 @@
         </div>
         <div class="form-field">
           <dx-text-box
+            label="Standard Packing"
+            labelMode="floating"
+            placeholder="Standard Packing"
+            [(value)]="articleData.STANDARD_PACKING"
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
             label="Next Serial No."
             [(value)]="articleData.NEXT_SERIAL"
             labelMode="floating"
@@ -111,6 +119,22 @@
             [(value)]="articleData.PART_NO"
             labelMode="floating"
             placeholder="Part No."
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Item Code"
+            [(value)]="articleData.ALIAS_NO"
+            labelMode="floating"
+            placeholder="Item Code"
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Item Description"
+            [(value)]="articleData.DESCRIPTION"
+            labelMode="floating"
+            placeholder="Item Description"
           ></dx-text-box>
         </div>
         <div class="form-field">
@@ -131,14 +155,6 @@
           </dx-tag-box>
 
           <!--  -->
-        </div>
-        <div class="form-field">
-          <dx-text-box
-            label="Item Code"
-            [(value)]="articleData.ALIAS_NO"
-            labelMode="floating"
-            placeholder="Item Code"
-          ></dx-text-box>
         </div>
 
         <div class="form-field">
@@ -163,15 +179,8 @@
             [readOnly]="true"
           ></dx-text-box>
         </div>
-        <div class="form-field">
-          <dx-text-box
-            label="Item Description"
-            [(value)]="articleData.DESCRIPTION"
-            labelMode="floating"
-            placeholder="Item Description"
-          ></dx-text-box>
-        </div>
-        <div class="form-field component-with-buttons">
+
+        <!-- <div class="form-field component-with-buttons">
           <div class="component-input-group">
             <dx-text-box
               label="Component"
@@ -182,15 +191,15 @@
               [disabled]="articleData.IS_COMPONENT"
             ></dx-text-box>
           </div>
-        </div>
-        <div class="form-field">
+        </div> -->
+        <!-- <div class="form-field">
           <dx-text-box
             label="Standard Packing"
             labelMode="floating"
             placeholder="Standard Packing"
             [(value)]="articleData.STANDARD_PACKING"
           ></dx-text-box>
-        </div>
+        </div> -->
         <div class="form-field">
           <dx-text-box
             label="GST%"
@@ -206,6 +215,19 @@
             placeholder="HSN Code"
             [(value)]="articleData.HSN_CODE"
           ></dx-text-box>
+        </div>
+        <div class="form-field component-with-buttons">
+          <div class="component-input-group">
+            <dx-text-box
+              label="Component"
+              labelMode="floating"
+              placeholder="Component"
+              [(value)]="selectedComponentDescription"
+              [readOnly]="true"
+              [disabled]="articleData.IS_COMPONENT"
+              [visible]="false"
+            ></dx-text-box>
+          </div>
         </div>
         <div class="checkbox-container">
           <dx-check-box
@@ -309,6 +331,11 @@
         <div style="flex: 1; overflow: hidden">
           <dx-data-grid
             [dataSource]="attachGridData"
+            keyExpr="ID"
+            [selectedRowKeys]="selectedAttachRow ? [selectedAttachRow.ID] : []"
+            [focusedRowEnabled]="true"
+            [focusedRowKey]="selectedAttachRow?.ID"
+            [hoverStateEnabled]="true"
             [showBorders]="true"
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
@@ -346,7 +373,7 @@
         </div>
 
         <!-- Button aligned to bottom right -->
-        <div
+        <!-- <div
           style="display: flex; justify-content: flex-end; padding: 10px 0 0 0"
         >
           <dx-button
@@ -355,7 +382,7 @@
             [disabled]="!selectedAttachRow"
             (onClick)="attachComponent()"
           ></dx-button>
-        </div>
+        </div> -->
       </div>
     </div>
     <!-- End of Tab 2 content -->

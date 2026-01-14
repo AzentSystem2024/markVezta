@@ -95,6 +95,14 @@
         </div>
         <div class="form-field">
           <dx-text-box
+            label="Standard Packing"
+            labelMode="floating"
+            placeholder="Standard Packing"
+            [(value)]="articleData.STANDARD_PACKING"
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
             label="Next Serial No."
             [(value)]="articleData.NEXT_SERIAL"
             labelMode="floating"
@@ -108,6 +116,23 @@
             [(value)]="articleData.PART_NO"
             labelMode="floating"
             placeholder="Part No."
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Item Code"
+            [(value)]="articleData.ALIAS_NO"
+            labelMode="floating"
+            placeholder="Item Code"
+            [readOnly]="true"
+          ></dx-text-box>
+        </div>
+        <div class="form-field">
+          <dx-text-box
+            label="Item Description"
+            [(value)]="articleData.DESCRIPTION"
+            labelMode="floating"
+            placeholder="Item Description"
           ></dx-text-box>
         </div>
         <div class="form-field">
@@ -140,14 +165,14 @@
           </dx-tag-box>
           <!--  -->
         </div>
-        <div class="form-field">
+        <!-- <div class="form-field">
           <dx-text-box
             label="Item Code"
             [(value)]="articleData.ALIAS_NO"
             labelMode="floating"
             placeholder="Item Code"
           ></dx-text-box>
-        </div>
+        </div> -->
 
         <div class="form-field">
           <dx-select-box
@@ -172,15 +197,8 @@
             [readOnly]="true"
           ></dx-text-box>
         </div>
-        <div class="form-field">
-          <dx-text-box
-            label="Item Description"
-            [(value)]="articleData.DESCRIPTION"
-            labelMode="floating"
-            placeholder="Item Description"
-          ></dx-text-box>
-        </div>
-        <div class="form-field component-with-buttons">
+
+        <!-- <div class="form-field component-with-buttons">
           <div class="component-input-group">
             <dx-text-box
               label="Component"
@@ -192,15 +210,8 @@
             >
             </dx-text-box>
           </div>
-        </div>
-        <div class="form-field">
-          <dx-text-box
-            label="Standard Packing"
-            labelMode="floating"
-            placeholder="Standard Packing"
-            [(value)]="articleData.STANDARD_PACKING"
-          ></dx-text-box>
-        </div>
+        </div> -->
+
         <div class="form-field">
           <dx-text-box
             label="GST%"
@@ -338,13 +349,15 @@
         <div style="flex: 1; overflow: hidden">
           <dx-data-grid
             [dataSource]="attachGridData"
+            keyExpr="ID"
             [showBorders]="true"
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
             [height]="'100%'"
-            keyExpr="ID"
             [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
             [selectedRowKeys]="selectedAttachRowKeys"
+            [focusedRowEnabled]="true"
+            [focusedRowKey]="selectedAttachRowKeys[0]"
             (onSelectionChanged)="onAttachRowSelected($event)"
           >
             <dxo-paging [enabled]="true" [pageSize]="10"></dxo-paging>

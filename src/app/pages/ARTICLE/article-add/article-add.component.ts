@@ -145,6 +145,7 @@ export class ArticleAddComponent {
     if (this.selectedProductionUnitId) {
       this.getLastOrderNo();
     }
+    this.getAliasNo();
     this.getDropdownLists();
     this.getItems();
     this.items = [
@@ -452,7 +453,6 @@ export class ArticleAddComponent {
   }
 
   getArticles() {
-  
     // const payload = { COMPANY_ID: this.selected_Company_id };
     this.dataService.getArticleList().subscribe((response: any) => {
       console.log(response, 'ARTICLELIST');
@@ -492,7 +492,7 @@ export class ArticleAddComponent {
     console.log('Company ID before dropdown:', this.selected_Company_id);
 
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'PRODUCTION_UNITS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
@@ -500,7 +500,7 @@ export class ArticleAddComponent {
       this.produCtionUnits = response;
     });
     const payload1 = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'MATERIAL_UNITS',
     };
     this.dataService.getDropdownData(payload1).subscribe((response: any) => {
@@ -508,28 +508,28 @@ export class ArticleAddComponent {
       this.materialUnits = response;
     });
     const payload2 = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'ARTICLECATEGORY',
     };
     this.dataService.getDropdownData(payload2).subscribe((response: any) => {
       this.categoryList = response;
     });
     const payload3 = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'ARTICLETYPE',
     };
     this.dataService.getDropdownData(payload3).subscribe((response: any) => {
       this.typeList = response;
     });
     const payload4 = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'ARTICLEBRAND',
     };
     this.dataService.getDropdownData(payload4).subscribe((response: any) => {
       this.brandList = response;
     });
     const payload5 = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
       NAME: 'ARTICLECOLOR',
     };
     this.dataService.getDropdownData(payload5).subscribe((response: any) => {
@@ -540,14 +540,6 @@ export class ArticleAddComponent {
   onColorChanged(event: any) {
     console.log('Selected Color:', event.value);
   }
-
-  // getLastOrderNo() {
-  //   this.dataService.getLastOrderNo(this.selectedProductionUnitId).subscribe((response: any) => {
-  //     console.log(response, "LASTORDERNO");
-  //     this.lastOrderNo = response?.LastOrderNo ?? '';  // adjust based on actual response structure
-  //     console.log('Next Order No:', this.lastOrderNo + 1);
-  //   });
-  // }
 
   assignOrderNumbersToSizes() {
     const last = Number(this.lastOrderNo ?? 0);
@@ -578,7 +570,7 @@ export class ArticleAddComponent {
     if (!this.selectedProductionUnitId) return;
     console.log(this.selectedProductionUnitId, 'SELECTEDPRODUCTIONUNITID');
     const ids = this.selectedProductionUnitId.join(',');
-    const payload = { COMPANY_ID: this.selected_Company_id };
+    const payload = { COMPANY_ID: 0 };
     this.dataService
       .getLastOrderNoForArticle(payload)
       .subscribe((response: any) => {
@@ -603,28 +595,68 @@ export class ArticleAddComponent {
     this.isAttachPopupVisible = true;
   }
 
-  onAttachRowSelected(event: any) {
-    this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
-    console.log('Selected row:', this.selectedAttachRow);
+  getAliasNo() {
+    this.dataService.getLastAliasNo().subscribe((response: any) => {
+      this.articleData.ALIAS_NO = response.GetAliasNo;
+    });
   }
 
+  // onAttachRowSelected(event: any) {
+  //   this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
+  //   console.log('Selected row:', this.selectedAttachRow);
+  // }
+
+  onAttachRowSelected(event: any) {
+    const selectedRow = event.selectedRowsData[0];
+
+    if (!selectedRow) {
+      return;
+    }
+
+    // prevent re-saving the same row again
+    if (this.selectedAttachRow?.ID === selectedRow.ID) {
+      return;
+    }
+
+    this.selectedAttachRow = selectedRow;
+
+    // 🔥 AUTO SAVE ON SELECT
+    this.attachComponent();
+  }
   attachComponent() {
     if (this.selectedAttachRow) {
-      console.log(this.selectedAttachRow, 'SELECTEDATTACHROW');
-      // Assign the selected article's ID to articleData.ComponentArticleID
       this.articleData.COMPONENT_ARTICLE_ID = this.selectedAttachRow.ID;
       this.selectedComponentDescription =
         this.selectedAttachRow.DESCRIPTION || '';
 
-      // Optionally close popup
+      // Close popup / switch tab if required
       this.isAttachPopupVisible = false;
-      this.selectedTabIndex = 0;
+      // this.selectedTabIndex = 0;
+
       console.log(
         'Assigned ComponentArticleID:',
         this.articleData.COMPONENT_ARTICLE_ID
       );
     }
   }
+
+  // attachComponent() {
+  //   if (this.selectedAttachRow) {
+  //     console.log(this.selectedAttachRow, 'SELECTEDATTACHROW');
+  //     // Assign the selected article's ID to articleData.ComponentArticleID
+  //     this.articleData.COMPONENT_ARTICLE_ID = this.selectedAttachRow.ID;
+  //     this.selectedComponentDescription =
+  //       this.selectedAttachRow.DESCRIPTION || '';
+
+  //     // Optionally close popup
+  //     this.isAttachPopupVisible = false;
+  //     // this.selectedTabIndex = 0;
+  //     console.log(
+  //       'Assigned ComponentArticleID:',
+  //       this.articleData.COMPONENT_ARTICLE_ID
+  //     );
+  //   }
+  // }
 
   onSizeSelectionChanged(e: any) {
     this.selectedSizeRows = e.selectedRowKeys;
@@ -748,7 +780,7 @@ export class ArticleAddComponent {
       });
       return;
     }
-     if (!this.articleData.PRICE) {
+    if (!this.articleData.PRICE) {
       notify({
         message: 'Please select the Price.',
         type: 'warning',
@@ -757,7 +789,6 @@ export class ArticleAddComponent {
       });
       return;
     }
-
 
     if (!this.selectedCategoryId) {
       notify({
@@ -788,21 +819,29 @@ export class ArticleAddComponent {
       });
       return;
     }
+    // if (!this.articleData.selectedMaterialUnitId) {
+    //   notify({
+    //     message: 'Please select the Supplier.',
+    //     type: 'warning',
+    //     displayTime: 3000,
+    //     position: { at: 'top right', my: 'top right' },
+    //   });
+    //   return;
+    // }
 
     if (
-    !this.selectedProductionUnitId ||
-    (Array.isArray(this.selectedProductionUnitId) &&
-      this.selectedProductionUnitId.length === 0)
-  ) {
-    notify({
-      message: 'Please select Production Unit.',
-      type: 'warning',
-      displayTime: 3000,
-      position: { at: 'top right', my: 'top right' },
-    });
-    return;
-  }
-
+      !this.selectedProductionUnitId ||
+      (Array.isArray(this.selectedProductionUnitId) &&
+        this.selectedProductionUnitId.length === 0)
+    ) {
+      notify({
+        message: 'Please select Production Unit.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
 
     if (!this.selectedSizeRowData || this.selectedSizeRowData.length === 0) {
       notify({
@@ -825,9 +864,8 @@ export class ArticleAddComponent {
     //   return;
     // }
 
-
     // 🔴 ALIAS_NO duplicate check (only if provided)
-if (this.articleList && this.articleList.length > 0) {
+    if (this.articleList && this.articleList.length > 0) {
       const duplicate = this.articleList.find(
         (article: any) =>
           article.ALIAS_NO?.toLowerCase() ===
@@ -908,6 +946,9 @@ if (this.articleList && this.articleList.length > 0) {
           BRAND_ID: this.selectedBrandId,
           // COMPANY_ID: this.selected_Company_id,
           // UNIT_ID: this.selectedProductionUnitId,
+          COMPONENT_ARTICLE_ID: this.articleData.IS_COMPONENT
+            ? 0
+            : this.articleData.COMPONENT_ARTICLE_ID,
           Units: Array.isArray(this.selectedProductionUnitId)
             ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))
             : [{ UNIT_ID: this.selectedProductionUnitId }],
@@ -971,7 +1012,7 @@ if (this.articleList && this.articleList.length > 0) {
   resetForm() {
     this.articleData = {
       ART_NO: '',
-      DESCRIPTION: 'PU Footwear',
+      DESCRIPTION: '',
       COLOR: '',
       PRICE: '',
       PACK_QTY: '',
@@ -998,6 +1039,7 @@ if (this.articleList && this.articleList.length > 0) {
     this.selectedSizeRows = [];
     this.selectedComponentArtNo = '';
     this.selectedAttachRow = null;
+    this.getAliasNo();
     // if (this.itemsGridRef?.instance) {
     //   this.itemsGridRef.instance.option('dataSource', []);
     // }
