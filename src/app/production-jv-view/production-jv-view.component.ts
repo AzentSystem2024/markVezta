@@ -144,6 +144,9 @@ export class ProductionJvViewComponent {
       VOUCHER_NO: header.VOUCHER_NO,
       //Footer DATA(RAW MATERIALS)
       ADDL_ADDL_DESCRIPTION: header.ADDL_DESCRIPTION,
+      REF_NO: header.REF_NO,
+      DESCRIPTION: header.DESCRIPTION,
+      COST_PRODUCTION: header.COST_PRODUCTION,
     };
 
     // Bind grid data

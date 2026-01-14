@@ -74,6 +74,7 @@
                   <dx-text-box
                     label="Reference No"
                     labelMode="floating"
+                    [(value)]="productionFormData.REF_NO"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
@@ -82,12 +83,13 @@
                 </div>
 
                 <div style="display: flex; align-items: baseline; gap: 2px">
-                  <dx-select-box
+                  <dx-text-box
                     label="Product"
                     labelMode="floating"
+                    [(value)]="productionFormData.DESCRIPTION"
                     [width]="406"
                     [readOnly]="true"
-                  ></dx-select-box>
+                  ></dx-text-box>
                 </div>
               </div>
             </dxi-item>
@@ -104,6 +106,7 @@
                   [(value)]="productionFormData.PROD_DATE"
                   [width]="300"
                   type="date"
+                  displayFormat="dd-MM-yyyy"
                   [readOnly]="true"
                 ></dx-date-box>
 
@@ -213,6 +216,7 @@
             <dx-number-box
               label="Cost of production"
               labelMode="floating"
+              [(value)]="productionFormData.COST_PRODUCTION"
               style="flex: 1"
               [format]="{ type: 'fixedPoint', precision: 2 }"
               [readOnly]="true"

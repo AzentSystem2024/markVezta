@@ -134,6 +134,7 @@ export class ProductionJvListComponent {
   ];
 
   selectedProductionType = 'ARTICLE';
+  isViewProduction: boolean;
 
   constructor(
     private dataService: DataService,
@@ -460,20 +461,38 @@ export class ProductionJvListComponent {
 
   onEditProduction(event: any) {
     event.cancel = true;
+
     const productionId = event.data.PRODUCTION_ID;
     const status = event.data.TRANS_STATUS;
-    this.dataService
-      .selectProduction(productionId)
-      .subscribe((response: any) => {
-        this.selectedProduction = response;
-        console.log(this.selectedProduction, 'SELECTEDTROUT');
-        this.isEditInvoice = true;
-        this.isReadOnlyInvoice = status === 5;
-      });
+
+    const api$ =
+      this.selectedProductionType === 'ARTICLE'
+        ? this.dataService.selectProduction(productionId)
+        : this.dataService.selectBoxProduction(productionId);
+
+    api$.subscribe((response: any) => {
+      this.selectedProduction = response;
+      this.isReadOnlyInvoice = status === 5;
+      this.isViewProduction = true;
+    });
   }
 
+  // onEditProduction(event: any) {
+  //   event.cancel = true;
+  //   const productionId = event.data.PRODUCTION_ID;
+  //   const status = event.data.TRANS_STATUS;
+  //   this.dataService
+  //     .selectProduction(productionId)
+  //     .subscribe((response: any) => {
+  //       this.selectedProduction = response;
+  //       console.log(this.selectedProduction, 'SELECTEDTROUT');
+  //       this.isEditInvoice = true;
+  //       this.isReadOnlyInvoice = status === 5;
+  //     });
+  // }
+
   handleClose() {
-    this.isEditInvoice = false;
+    this.isViewProduction = false;
   }
 
   addProduction() {
