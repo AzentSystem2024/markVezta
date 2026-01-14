@@ -2994,7 +2994,7 @@ export class DataService {
   // }
 
   public getDropdownData(data: any): Observable<any> {
-    const reqBodyData = { name: data };
+    const reqBodyData = data;
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
 

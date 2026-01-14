@@ -983,6 +983,7 @@ import {
   ProductionJvViewComponent,
   ProductionJvViewModule,
 } from './production-jv-view/production-jv-view.component';
+import { BoxproductionJvAddComponent, BoxproductionJvAddModule } from './boxproduction-jv-add/boxproduction-jv-add.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -990,7 +991,7 @@ import {
 // import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1343,6 +1344,7 @@ import {
     ProductionJvListModule,
     ProductionJvAddModule,
     ProductionJvViewModule,
+    BoxproductionJvAddModule
   ],
   providers: [
     AuthService,

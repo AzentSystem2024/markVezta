@@ -513,7 +513,7 @@ export class ProductionJvListComponent {
     console.log('Popup closed');
 
     if (this.productionForm) {
-      this.productionForm.resetForm(); // 🔥 RESET CHILD FORM
+      this.productionForm.resetForm(); //  RESET CHILD FORM
     }
 
     this.isAddPopupVisible = false;

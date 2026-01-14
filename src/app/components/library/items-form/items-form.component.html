@@ -1073,6 +1073,7 @@
     <dxi-tab title="Supplier" *ngIf="newItems.TYPE_ID !== 8">
       <dxi-item>
         <dx-data-grid
+          #supplierGridRef
           class="grid theme-dependent"
           [columnAutoWidth]="true"
           height="300"

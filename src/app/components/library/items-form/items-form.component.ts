@@ -48,6 +48,7 @@ import { EventEmitter } from '@angular/core';
 import { CountryServiceService } from 'src/app/services/country-service.service';
 import { ImageService } from 'src/app/services/image.service';
 import { Console } from 'console';
+import notify from 'devextreme/ui/notify';
 @Component({
   selector: 'app-items-form',
   templateUrl: './items-form.component.html',
@@ -59,6 +60,9 @@ export class ItemsFormComponent implements OnInit {
   @ViewChild(DxFormComponent, { static: false }) form: DxFormComponent;
   @ViewChild('fileUploader', { static: false }) fileUploader!: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
+  @ViewChild('supplierGridRef')
+supplierGrid!: DxDataGridComponent;
+
   //  priorities: string[] = ['Standard code', 'Tally code',];
   //  priorities = [
   //     { id: 1, name: 'Standard code' },
@@ -245,10 +249,11 @@ export class ItemsFormComponent implements OnInit {
       console.log(this.parentitem, 'PARENTITEM');
     });
     const itemTypePayload = {
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
       NAME: 'ITEMTYPE',
     };
     dataservice.getDropdownData(itemTypePayload).subscribe((data) => {
+      console.log(data, 'ITEMTYPEDATA');
       this.itemtype = data;
       console.log(this.itemtype, 'ITEMTYPE');
     });
@@ -477,17 +482,60 @@ export class ItemsFormComponent implements OnInit {
   };
 
   newItems = this.formItemsData;
-  getNewItems = () => ({
+  // getNewItems = () => ({
+    
+  //   ...this.newItems,
+    
+  //   // ✅ Force UOM_PURCH as string before API call
+  //   UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
+  //   ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
+    
+  //   // COMPANY_ID: this.selected_Company_id,
+
+  //   //  SUPPLIER MAPPING (KEY FIX)
+  // ITEM_SUPPLIERS: (this.datasource || [])
+  //   .filter(s => s.SUPP_ID) // remove empty rows
+  //   .map(s => ({
+  //     SUPP_ID: Number(s.SUPP_ID),
+  //     REORDER_NO: String(s.REORDER_NO) || '',
+  //     COST: Number(s.COST) || 0,
+  //     IS_PRIMARY: !!s.IS_PRIMARY,
+  //     IS_CONSIGNMENT: !!s.IS_CONSIGNMENT,
+  //   })),
+  // });
+
+  getNewItems = () => {
+
+  // 🔥 FORCE supplier grid to commit edits
+  this.supplierGrid?.instance.saveEditData();
+
+  return {
     ...this.newItems,
-    // ✅ Force UOM_PURCH as string before API call
-    UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
+
+    UOM_PURCH: this.newItems.UOM_PURCH
+      ? String(this.newItems.UOM_PURCH)
+      : '',
+
     ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
-    // COMPANY_ID: this.selected_Company_id,
-  });
+
+    // ✅ SUPPLIER PAYLOAD (NOW WILL WORK)
+    ITEM_SUPPLIERS: (this.datasource || [])
+      .filter(s => s.SUPP_ID)
+      .map(s => ({
+        SUPP_ID: Number(s.SUPP_ID),
+        REORDER_NO: String(s.REORDER_NO || ''),
+        COST: Number(s.COST) || 0,
+        IS_PRIMARY: !!s.IS_PRIMARY,
+        IS_CONSIGNMENT: !!s.IS_CONSIGNMENT,
+      })),
+  };
+};
+
 
   ngOnInit() {
     this.showItems();
     this.sesstion_Details();
+    
     // this.loadImageFromLocalStorage();
   }
 
@@ -1008,6 +1056,7 @@ export class ItemsFormComponent implements OnInit {
   }
 
   saveItem(): void {
+
     console.log(this.selectedItemId, 'IN SAVEEEEEEEEEE');
     console.log('Form data:', this.formData);
     if (
