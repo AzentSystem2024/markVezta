@@ -213,6 +213,7 @@ import { LedgerSettingsListComponent } from './components/settings/ledger-settin
 import { GstReportB2CLComponent } from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
 import { GstReportCDNRComponent } from './pages/REPORT/gst-report-cdnr/gst-report-cdnr.component';
 import { ProductionJvListComponent } from './production-jv-list/production-jv-list.component';
+import { ArticleproductionJvListComponent } from './articleproduction-jv-list/articleproduction-jv-list.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -926,6 +927,11 @@ const routes: Routes = [
       {
         path: 'production-jv-list',
         component: ProductionJvListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'article-production-jv-list',
+        component: ArticleproductionJvListComponent,
         canActivate: [AuthGuardService],
       },
       {

@@ -3002,6 +3002,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
 
+  public getDropdownDataforProduct(type: any): Observable<any> {
+    const reqBodyData = { name: type };
+    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
+  }
+
   public getDropdownDataForLedgerSettings(type: any): Observable<any> {
     const reqBodyData = { name: type };
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
