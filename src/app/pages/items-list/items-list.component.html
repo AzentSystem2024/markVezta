@@ -47,7 +47,10 @@
     >
     </dxo-editing>
 
-    <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
 
     <dxo-toolbar>
       <dxi-item location="before">
@@ -84,13 +87,12 @@
     </dx-select-box> -->
       </dxi-item>
 
-      <dxi-item location="after" locateInMenu="auto">
-        <dx-button
-          icon="refresh"
-          stylingMode="text"
-          (onClick)="onRefreshButtonClick()"
-        ></dx-button>
-      </dxi-item>
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
 
       <dxi-item
         location="after"

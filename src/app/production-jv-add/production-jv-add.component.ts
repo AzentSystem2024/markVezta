@@ -57,6 +57,7 @@ import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.co
 import { DataService } from '../services';
 import { Router } from '@angular/router';
 import { get } from 'jquery';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-production-jv-add',
@@ -126,7 +127,7 @@ export class ProductionJvAddComponent {
     // Update form model explicitly (safe)
     this.productionJVFormData.PRODUCT_ID = selectedProductId;
 
-    // 🔥 Call API
+    //  Call API
     // this.get_Product_In_Article_Production();
   }
 
@@ -221,14 +222,14 @@ export class ProductionJvAddComponent {
   //     const bomQty = Number(item.QUANTITY) || 0;
   //     console.log('BOM Qty for item', bomQty);
 
-  //     // 🔥 Calculation
+  //     //  Calculation
   //     item.REQUIRED_QTY = prodQty * bomQty;
   //     console.log('Updated REQUIRED_QTY for item:', item.REQUIRED_QTY);
   //     item.USED_QTY = item.REQUIRED_QTY;
   //     item.COST = 1000;
   //      this.calculateAmount(item);
   //   });
-  //  // 🔥 FORCE summary recalculation
+  //  //  FORCE summary recalculation
   //   this.calculateTotalAmount();
 
   //   this.itemsGrid.instance.refresh();
@@ -237,10 +238,32 @@ export class ProductionJvAddComponent {
   fillComponents() {
     const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
 
-    if (!this.productionJVFormData.PRODUCT_ID || prodQty <= 0) {
-      console.warn('Select product and enter production qty');
-      return;
-    }
+
+    //  VALIDATION: Product required
+  if (!this.productionJVFormData.PRODUCT_ID) {
+    notify(
+      {
+        message: 'Please select a Product',
+        position: { at: 'top right', my: 'top right' },
+      },
+      'warning',
+      3000
+    );
+    return;
+  }
+
+  //  VALIDATION: Production Qty required
+  if (!prodQty || prodQty <= 0) {
+    notify(
+      {
+        message: 'Please enter Production Quantity',
+        position: { at: 'top right', my: 'top right' },
+      },
+      'warning',
+      3000
+    );
+    return; //  STOP execution
+  }
 
     const payload = {
       ARTICLE_ID: this.productionJVFormData.PRODUCT_ID,
@@ -253,16 +276,16 @@ export class ProductionJvAddComponent {
       .subscribe((response: any) => {
         console.log('Product In Article Production Data:', response);
 
-        // ✅ Set grid data ONLY here
+        //  Set grid data ONLY here
         this.gridData = response.Data;
 
-        // ✅ Apply existing logic (UNCHANGED)
+        //  Apply existing logic (UNCHANGED)
         this.gridData.forEach((item) => {
           const bomQty = Number(item.QUANTITY) || 0;
 
           item.REQUIRED_QTY = prodQty * bomQty;
           item.USED_QTY = item.REQUIRED_QTY;
-          item.COST = 1000;
+          // item.COST = 1000;
 
           this.calculateAmount(item);
         });
@@ -271,6 +294,8 @@ export class ProductionJvAddComponent {
         this.itemsGrid.instance.refresh();
       });
   }
+
+  
 
   onCellValueChanged(e: any) {
     console.log('Cell Value Changed Event:', e);
@@ -336,7 +361,7 @@ export class ProductionJvAddComponent {
   }
 
   get_ProductDropdown() {
-    this.dataservice.getDropdownData('ARTICLE').subscribe((response: any) => {
+    this.dataservice.getDropdownDataforProduct('ARTICLE').subscribe((response: any) => {
       console.log('Article Dropdown Data:', response);
       this.Article = response;
     });
@@ -356,6 +381,27 @@ export class ProductionJvAddComponent {
   }
 
   onSave() {
+
+    //  VALIDATION: USED_QTY must be <= AVAILABLE_QTY
+  const invalidRow = this.gridData.find((item: any) => {
+    const usedQty = Number(item.USED_QTY) || 0;
+    const availableQty = Number(item.AVAILABLE_QTY) || 0; //  adjust field name if needed
+
+    return usedQty > availableQty;
+  });
+
+  if (invalidRow) {
+    notify(
+      {
+        message: 'Used Quantity cannot be greater than Available Quantity',
+        position: { at: 'top right', my: 'top right' },
+      },
+      'error',
+      4000
+    );
+    return; //  STOP SAVE
+  }
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
@@ -412,7 +458,7 @@ export class ProductionJvAddComponent {
   // }
 
   resetForm() {
-    // 🔹 Reset form model
+    //  Reset form model
     this.productionJVFormData = {
       COMPANY_ID: '',
       FIN_ID: '',
@@ -425,16 +471,16 @@ export class ProductionJvAddComponent {
       gridData: [],
     };
 
-    // 🔹 Reset grid
+    //  Reset grid
     this.gridData = [];
 
-    // 🔹 Reset calculated values
+    //  Reset calculated values
     this.totalAmount = 0;
     this.additionalCost = 0;
     this.finalCost = 0;
     this.unitProductCost = 0;
 
-    // 🔹 Reset grid UI safely
+    //  Reset grid UI safely
     if (this.itemsGrid) {
       this.itemsGrid.instance.cancelEditData();
       this.itemsGrid.instance.refresh();

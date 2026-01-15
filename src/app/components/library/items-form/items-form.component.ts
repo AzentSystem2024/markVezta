@@ -506,7 +506,7 @@ supplierGrid!: DxDataGridComponent;
 
   getNewItems = () => {
 
-  // 🔥 FORCE supplier grid to commit edits
+  //  FORCE supplier grid to commit edits
   this.supplierGrid?.instance.saveEditData();
 
   return {
@@ -518,7 +518,7 @@ supplierGrid!: DxDataGridComponent;
 
     ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
 
-    // ✅ SUPPLIER PAYLOAD (NOW WILL WORK)
+    //  SUPPLIER PAYLOAD (NOW WILL WORK)
     ITEM_SUPPLIERS: (this.datasource || [])
       .filter(s => s.SUPP_ID)
       .map(s => ({
@@ -609,7 +609,7 @@ supplierGrid!: DxDataGridComponent;
   // onParentItemChanged(e: any) {
   //   if (e.selectedRowKeys.length > 0) {
   //     this.newItems.PARENT_ITEM_ID = e.selectedRowKeys[0];
-  //     this.isParentItemDropdownOpen = false;  // ✅ close dropdown
+  //     this.isParentItemDropdownOpen = false;  //  close dropdown
   //   }
   // }
 
@@ -839,7 +839,7 @@ supplierGrid!: DxDataGridComponent;
       };
     };
 
-    // ✅ Initialize array if not yet created
+    // Initialize array if not yet created
     if (!this.selectedStoresMap) {
       this.selectedStoresMap = [];
     }

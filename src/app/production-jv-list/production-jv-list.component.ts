@@ -538,6 +538,8 @@ export class ProductionJvListComponent {
       ? 'Article Production'
       : 'Box Production';
   }
+
+  
 }
 @NgModule({
   imports: [

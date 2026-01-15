@@ -984,6 +984,7 @@ import {
   ProductionJvViewModule,
 } from './production-jv-view/production-jv-view.component';
 import { BoxproductionJvAddComponent, BoxproductionJvAddModule } from './boxproduction-jv-add/boxproduction-jv-add.component';
+import { ArticleproductionJvListComponent, ArticleproductionJvListModule } from './articleproduction-jv-list/articleproduction-jv-list.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1344,7 +1345,8 @@ import { BoxproductionJvAddComponent, BoxproductionJvAddModule } from './boxprod
     ProductionJvListModule,
     ProductionJvAddModule,
     ProductionJvViewModule,
-    BoxproductionJvAddModule
+    BoxproductionJvAddModule,
+    ArticleproductionJvListModule
   ],
   providers: [
     AuthService,

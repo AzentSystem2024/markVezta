@@ -149,7 +149,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   ITEM_PROPERTY5: any;
   ENABLE_Matrix_Code: boolean;
   isParentItemDropdownOpen: boolean;
-
+auto: string = 'auto';
   //==============date filter===================
   customLabel = 'Custom';
   customStartDate: any = null;
@@ -176,6 +176,21 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     protected screen: ScreenService,
     private ngZone: NgZone
   ) {}
+
+  
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+    refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+  }
+
   applyCustomDateFilter() {
     const start = new Date(this.customStartDate); // keep as Date
     const end = new Date(this.customEndDate); // keep as Date
@@ -188,14 +203,14 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     // const payload = {
     //   COMPANY_ID: this.selected_Company_id,
     // };
-    // ✅ Use Date objects for filtering
+    //  Use Date objects for filtering
     this.dataservice.getItemsData().subscribe((res: any) => {
       const allData = res.data;
       this.itemsList = allData;
 
       this.selectedDateRange = 'custom';
 
-      // ✅ Close popup
+      //  Close popup
       this.showCustomDatePopup = false;
     });
   }
@@ -425,7 +440,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     //     'error',
     //     4000
     //   );
-    //   return; // 🔥 stop execution
+    //   return; //  stop execution
     // }
 
     if (items.COSTING_METHOD == 0 || '') {
@@ -437,7 +452,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
         'error',
         4000
       );
-      return; // 🔥 stop execution
+      return; //  stop execution
     }
     console.log(
       items,
