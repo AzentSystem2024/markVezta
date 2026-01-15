@@ -635,14 +635,50 @@ export class ArticleEditComponent {
   //   console.log('Selected row:', this.selectedAttachRow);
   // }
 
-  onAttachRowSelected(event: any) {
-    const row = event.selectedRowsData[0];
-    if (!row) return;
+  // onAttachRowSelected(event: any) {
+  //   const row = event.selectedRowsData[0];
+  //   if (!row) return;
 
-    this.selectedAttachRow = row;
-    this.selectedAttachRowKeys = [row.ID];
-    this.articleData.COMPONENT_ARTICLE_ID = row.ID;
+  //   this.selectedAttachRow = row;
+  //   this.selectedAttachRowKeys = [row.ID];
+
+  //   // 🔥 Auto-apply on click
+  //   this.attachComponent();
+  // }
+
+  onAttachRowSelected(event: any) {
+    const selectedKeys = event.selectedRowKeys || [];
+    const selectedRows = event.selectedRowsData || [];
+
+    // 🔴 Nothing selected → clear state
+    if (selectedKeys.length === 0) {
+      this.selectedAttachRow = null;
+      this.selectedAttachRowKeys = [];
+      return;
+    }
+
+    // 🟢 Keep ONLY the last selected row
+    const lastKey = selectedKeys[selectedKeys.length - 1];
+    const lastRow = selectedRows.find((row: any) => row.ID === lastKey);
+
+    if (!lastRow) return;
+
+    // 🔥 Enforce single selection
+    this.selectedAttachRow = lastRow;
+    this.selectedAttachRowKeys = [lastKey];
+
+    // Apply component (unchanged behavior)
+    this.attachComponent();
   }
+
+  // onAttachRowSelected(event: any) {
+  //   const row = event.selectedRowsData[0];
+  //   if (!row) return;
+
+  //   this.selectedAttachRow = row;
+  //   this.selectedAttachRowKeys = [row.ID];
+  //   this.articleData.COMPONENT_ARTICLE_ID = row.ID;
+  // }
 
   attachComponent() {
     if (this.selectedAttachRow) {
@@ -653,7 +689,7 @@ export class ArticleEditComponent {
       this.selectedAttachRowKeys = [this.selectedAttachRow.ID];
       // Optionally close popup
       this.isAttachPopupVisible = false;
-      this.selectedTabIndex = 0;
+      // this.selectedTabIndex = 0;
       console.log(
         'Assigned ComponentArticleID:',
         this.articleData.COMPONENT_ARTICLE_ID
@@ -745,7 +781,11 @@ export class ArticleEditComponent {
       SUPPLIER_ID: this.articleData.SUPPLIER_ID || 0,
       SupplierName: this.articleData.SupplierName || '',
       IS_COMPONENT: this.articleData.IS_COMPONENT ?? false,
-      COMPONENT_ARTICLE_ID: this.articleData.COMPONENT_ARTICLE_ID || 0,
+      // COMPONENT_ARTICLE_ID: this.articleData.COMPONENT_ARTICLE_ID || 0,
+      COMPONENT_ARTICLE_ID: this.articleData.IS_COMPONENT
+        ? 0
+        : this.articleData.COMPONENT_ARTICLE_ID || 0,
+
       ComponentArticleNo: this.articleData.ComponentArticleNo || '',
       ComponentArticleName: this.articleData.ComponentArticleName || '',
       CreatedDate: this.articleData.CreatedDate || new Date().toISOString(),

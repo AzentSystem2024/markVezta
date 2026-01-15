@@ -318,3 +318,22 @@
 .tooltip-wrapper * {
   pointer-events: auto !important; /* Allow hover to reach wrapper */
 }
+/* ---------- TAB CONTAINER ---------- */
+::ng-deep .custom-article-tabs .dx-tabs {
+  background: transparent;
+  border-bottom: none;
+  padding: 4px 0;
+  gap: 6px;
+}
+
+/* ---------- INDIVIDUAL TAB ---------- */
+::ng-deep .custom-article-tabs .dx-tab {
+  border-radius: 6px;
+  background: #f3f6fb;
+  color: #333;
+  padding: 6px 14px;
+  margin-right: 6px;
+  border: none;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}

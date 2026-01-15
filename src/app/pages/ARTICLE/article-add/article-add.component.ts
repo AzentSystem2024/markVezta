@@ -133,6 +133,7 @@ export class ArticleAddComponent {
   isDragOver: boolean = false;
   selectedItemID: any;
   selected_Company_id: any;
+  selectedAttachRowKeys: number[] = [];
 
   constructor(private dataService: DataService) {}
 
@@ -607,22 +608,52 @@ export class ArticleAddComponent {
   // }
 
   onAttachRowSelected(event: any) {
-    const selectedRow = event.selectedRowsData[0];
+    const selectedKeys = event.selectedRowKeys || [];
+    const selectedRows = event.selectedRowsData || [];
 
-    if (!selectedRow) {
+    //  Nothing selected
+    if (selectedKeys.length === 0) {
+      this.selectedAttachRow = null;
+      this.selectedAttachRowKeys = [];
       return;
     }
+
+    //  Keep ONLY the last selected row
+    const lastKey = selectedKeys[selectedKeys.length - 1];
+    const lastRow = selectedRows.find((r: any) => r.ID === lastKey);
+
+    if (!lastRow) return;
+    // THIS LINE CLEARS PREVIOUS SELECTIONS
+    this.selectedAttachRowKeys = [lastKey];
 
     // prevent re-saving the same row again
-    if (this.selectedAttachRow?.ID === selectedRow.ID) {
+    if (this.selectedAttachRow?.ID === lastRow.ID) {
       return;
     }
 
-    this.selectedAttachRow = selectedRow;
+    this.selectedAttachRow = lastRow;
 
-    // 🔥 AUTO SAVE ON SELECT
+    // Auto save on select (existing behavior)
     this.attachComponent();
   }
+
+  // onAttachRowSelected(event: any) {
+  //   const selectedRow = event.selectedRowsData[0];
+
+  //   if (!selectedRow) {
+  //     return;
+  //   }
+
+  //   // prevent re-saving the same row again
+  //   if (this.selectedAttachRow?.ID === selectedRow.ID) {
+  //     return;
+  //   }
+
+  //   this.selectedAttachRow = selectedRow;
+
+  //   // 🔥 AUTO SAVE ON SELECT
+  //   this.attachComponent();
+  // }
   attachComponent() {
     if (this.selectedAttachRow) {
       this.articleData.COMPONENT_ARTICLE_ID = this.selectedAttachRow.ID;
@@ -819,15 +850,16 @@ export class ArticleAddComponent {
       });
       return;
     }
-    // if (!this.articleData.selectedMaterialUnitId) {
-    //   notify({
-    //     message: 'Please select the Supplier.',
-    //     type: 'warning',
-    //     displayTime: 3000,
-    //     position: { at: 'top right', my: 'top right' },
-    //   });
-    //   return;
-    // }
+    // ✅ SUPPLIER VALIDATION
+    if (!this.selectedMaterialUnitId) {
+      notify({
+        message: 'Please select a Supplier.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
 
     if (
       !this.selectedProductionUnitId ||
@@ -975,6 +1007,7 @@ export class ArticleAddComponent {
                 'success'
               );
               // this.popupVisible = false;
+              this.resetForm();
               this.popupClosed.emit();
             } else {
               // Backend returned validation failure (flag = 0)
@@ -1039,6 +1072,11 @@ export class ArticleAddComponent {
     this.selectedSizeRows = [];
     this.selectedComponentArtNo = '';
     this.selectedAttachRow = null;
+    this.selectedAttachRowKeys = [];
+    //RESET BOM DATA
+    this.items = []; // clears grid datasource
+    this.selectedSizeRowData = []; // clears size-based BOM input
+
     this.getAliasNo();
     // if (this.itemsGridRef?.instance) {
     //   this.itemsGridRef.instance.option('dataSource', []);
