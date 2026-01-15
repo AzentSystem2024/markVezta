@@ -389,24 +389,43 @@ export class ArticleEditComponent {
   }
 
   getArticles() {
-    // const payload = {
-    //   COMPANY_ID: this.selected_Company_id,
-    // };
     this.dataService.getArticleList().subscribe((response: any) => {
-      console.log(response, 'ARTICLELIST');
       if (response?.Data && Array.isArray(response.Data)) {
-        // Store full list (reversed) in articleList
-        this.articleList = response.Data.reverse();
-
-        // Store only items with IsComponent === true in componentArticles
-        this.componentArticles = this.articleList.filter(
-          (article: any) => article.IS_COMPONENT === true
+        this.attachGridData = response.Data.filter(
+          (a: any) => a.IS_COMPONENT === true
         );
-        this.attachGridData = this.componentArticles;
-        console.log(this.attachGridData, 'COMPONENTARTICLE');
+
+        // 🔥 EDIT MODE SELECTION
+        if (this.articleData?.COMPONENT_ARTICLE_ID) {
+          this.selectedAttachRowKeys = [this.articleData.COMPONENT_ARTICLE_ID];
+
+          this.selectedAttachRow = this.attachGridData.find(
+            (row: any) => row.ID === this.articleData.COMPONENT_ARTICLE_ID
+          );
+        }
       }
     });
   }
+
+  // getArticles() {
+  //   // const payload = {
+  //   //   COMPANY_ID: this.selected_Company_id,
+  //   // };
+  //   this.dataService.getArticleList().subscribe((response: any) => {
+  //     console.log(response, 'ARTICLELIST');
+  //     if (response?.Data && Array.isArray(response.Data)) {
+  //       // Store full list (reversed) in articleList
+  //       this.articleList = response.Data.reverse();
+
+  //       // Store only items with IsComponent === true in componentArticles
+  //       this.componentArticles = this.articleList.filter(
+  //         (article: any) => article.IS_COMPONENT === true
+  //       );
+  //       this.attachGridData = this.componentArticles;
+  //       console.log(this.attachGridData, 'COMPONENTARTICLE');
+  //     }
+  //   });
+  // }
   clearComponentArticleId() {
     this.articleData.COMPONENT_ARTICLE_ID = '';
   }
@@ -518,7 +537,7 @@ export class ArticleEditComponent {
   getLastOrderNo() {
     if (!this.selectedProductionUnitId) return;
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
     };
     this.dataService
       .getLastOrderNoForArticle(payload)
@@ -552,7 +571,7 @@ export class ArticleEditComponent {
       };
 
       const payload = {
-        COMPANY_ID: this.selected_Company_id,
+        COMPANY_ID: 0,
         NAME: 'PRODUCTION_UNITS',
       };
       this.dataService.getDropdownData(payload).subscribe((res) => {
@@ -560,7 +579,7 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload1 = {
-        COMPANY_ID: this.selected_Company_id,
+        COMPANY_ID: 0,
         NAME: 'MATERIAL_UNITS',
       };
       this.dataService.getDropdownData(payload1).subscribe((res) => {
@@ -568,7 +587,7 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload2 = {
-        COMPANY_ID: this.selected_Company_id,
+        COMPANY_ID: 0,
         NAME: 'ARTICLECATEGORY',
       };
       this.dataService.getDropdownData(payload2).subscribe((res) => {
@@ -576,7 +595,7 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload3 = {
-        COMPANY_ID: this.selected_Company_id,
+        COMPANY_ID: 0,
         NAME: 'ARTICLETYPE',
       };
       this.dataService.getDropdownData(payload3).subscribe((res) => {
@@ -584,7 +603,7 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload4 = {
-        COMPANY_ID: this.selected_Company_id,
+        COMPANY_ID: 0,
         NAME: 'ARTICLEBRAND',
       };
       this.dataService.getDropdownData(payload4).subscribe((res) => {
@@ -592,7 +611,7 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload5 = {
-        COMPANY_ID: this.selected_Company_id,
+        COMPANY_ID: 0,
         NAME: 'ARTICLECOLOR',
       };
       this.dataService.getDropdownData(payload5).subscribe((res) => {
@@ -611,9 +630,18 @@ export class ArticleEditComponent {
     this.isAttachPopupVisible = true;
   }
 
+  // onAttachRowSelected(event: any) {
+  //   this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
+  //   console.log('Selected row:', this.selectedAttachRow);
+  // }
+
   onAttachRowSelected(event: any) {
-    this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
-    console.log('Selected row:', this.selectedAttachRow);
+    const row = event.selectedRowsData[0];
+    if (!row) return;
+
+    this.selectedAttachRow = row;
+    this.selectedAttachRowKeys = [row.ID];
+    this.articleData.COMPONENT_ARTICLE_ID = row.ID;
   }
 
   attachComponent() {

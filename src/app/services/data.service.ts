@@ -157,6 +157,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
+  getLastAliasNo(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
+  }
+
   insertArticle(items: any) {
     const data = items;
     // console.log(data,"insert service")
