@@ -90,6 +90,7 @@ export class ProductionJvAddComponent {
     PRODUCT_ID: 0,
     UNIT_PRODUCT_COST: 0,
     PROD_QTY: 0,
+    PRODUCTION_TYPE: 'ARTICLE',
     RawMaterials: [
       {
         ID: 0,
@@ -367,6 +368,7 @@ export class ProductionJvAddComponent {
     });
   }
 
+
   get_Product_In_Article_Production() {
     const payload = {
       ARTICLE_ID: this.productionJVFormData.PRODUCT_ID,
@@ -382,6 +384,37 @@ export class ProductionJvAddComponent {
 
   onSave() {
 
+
+    // =====================================================
+  //  VALIDATION 1: PRODUCT MUST BE SELECTED
+  // =====================================================
+  if (!this.productionJVFormData.PRODUCT_ID) {
+    notify(
+      {
+        message: 'Please select a product',
+        position: { at: 'top right', my: 'top right' },
+      },
+      'error',
+      3000
+    );
+    return;
+  }
+
+  // =====================================================
+  //  VALIDATION 2: PRODUCT QUANTITY MUST BE ENTERED
+  // =====================================================
+  const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+  if (prodQty <= 0) {
+    notify(
+      {
+        message: 'Please enter a product quantity',
+        position: { at: 'top right', my: 'top right' },
+      },
+      'error',
+      3000
+    );
+    return;
+  }
     //  VALIDATION: USED_QTY must be <= AVAILABLE_QTY
   const invalidRow = this.gridData.find((item: any) => {
     const usedQty = Number(item.USED_QTY) || 0;
@@ -415,6 +448,7 @@ export class ProductionJvAddComponent {
       ADDL_COST: this.additionalCost,
       PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
       PROD_QTY: this.productionJVFormData.PROD_QTY,
+       PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE === 'ARTICLE' ? 1 : 2,
       RawMaterials: this.gridData,
     };
     console.log('Payload being sent:', payload);

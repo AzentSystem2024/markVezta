@@ -153,7 +153,7 @@
   [(visible)]="isAddPopupVisible"
   [width]="1200"
   [height]="'100vh'"
-  title="Production"
+  title="Article Production"
   (onHiding)="onPopupHiding()"
 >
   <app-production-jv-add
@@ -161,20 +161,52 @@
     (formClosed)="handleClose()"
   ></app-production-jv-add>
 </dx-popup>
+
+<dx-popup
+  [(visible)]="isBoxPopupVisible"
+  [width]="1200"
+  [height]="'100vh'"
+  title="Box Production"
+  (onHiding)="onPopupHiding()"
+>
+  <app-boxproduction-jv-add
+    [productionType]="selectedProductionType"
+    (formClosed)="handleClose()"
+  ></app-boxproduction-jv-add>
+</dx-popup>
+
 <dx-popup
   [(visible)]="isViewProduction"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="View Production"
+  title="View Article Production"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isViewProduction">
-    <app-production-jv-view
+    <app-articleproduction-jv-view
       [isEditing]="true"
       [EditingResponseData]="selectedProduction"
       [productionType]="selectedProductionType"
       [isReadOnlyMode]="isReadOnlyInvoice"
       (popupClosed)="handleClose()"
-    ></app-production-jv-view>
+    ></app-articleproduction-jv-view>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isViewBoxProduction"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="View Box Production"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewBoxProduction">
+    <app-boxproduction-jv-view
+      [isEditing]="true"
+      [EditingResponseData]="selectedProduction"
+      [productionType]="selectedProductionType"
+      [isReadOnlyMode]="isReadOnlyInvoice"
+      (popupClosed)="handleClose()"
+    ></app-boxproduction-jv-view>
   </ng-container>
 </dx-popup>

@@ -57,6 +57,7 @@ import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.co
 import { DataService } from '../services';
 import { Router } from '@angular/router';
 import { get } from 'jquery';
+import notify from 'devextreme/ui/notify';
 
 
 @Component({
@@ -65,7 +66,463 @@ import { get } from 'jquery';
   styleUrls: ['./boxproduction-jv-add.component.scss']
 })
 export class BoxproductionJvAddComponent {
+     @ViewChild('itemsGridRef', { static: false })
+      itemsGrid!: DxDataGridComponent;
+      @Output() formClosed = new EventEmitter<void>();
+    
+      Article: any;
+      gridData: any[] = [];
+      totalAmount: number = 0;
+      finalCost: number = 0;
+      additionalCost: number = 0;
+      unitProductCost: number = 0;
+    
+      productionJVFormData: any = {
+        DOC_NO: '',
+        COMPANY_ID: '',
+        FIN_ID: '',
+        USER_ID: '',
+        REF_NO: '',
+        PRODUCTION_DATE: new Date(),
+        REMARKS: '',
+        TOTAL_ITEM_COST: 0,
+        ADDL_COST: 0,
+        COST_OF_PRODUCTION: 0,
+        PRODUCT_ID: 0,
+        UNIT_PRODUCT_COST: 0,
+        PROD_QTY: 0,
+        PRODUCTION_TYPE: 'BOM',
+        RawMaterials: [
+          {
+            ID: 0,
+            UOM: '',
+            REQUIRED_QTY: 0,
+            USED_QTY: 0,
+            QUANTITY: 0,
+            COST: 0,
+            AMOUNT: 0,
+          },
+        ],
+      };
+      selected_Company_id: any;
+      selected_fin_id: any;
+      user_id: any;
+    
+      constructor(private dataservice: DataService, private ngZone: NgZone) {}
+    
+      ngOnInit() {
+        this.sesstion_Details();
+        this.get_ProductDropdown();
+        this.getPendingNo();
+      }
+    
+      //==================== Production Qty Change Handler ===================//
+      onProductionQtyChange() {}
+    
+      onProductChange(e: any) {
+        const selectedProductId = e.value;
+    
+        if (!selectedProductId) {
+          return;
+        }
+    
+        // Update form model explicitly (safe)
+        this.productionJVFormData.PRODUCT_ID = selectedProductId;
+    
+        //  Call API
+        // this.get_Product_In_Article_Production();
+      }
+    
+      sesstion_Details() {
+        const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+        console.log(sessionData, '=================session data==========');
+        this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+        console.log(
+          this.selected_Company_id,
+          '============selected_Company_id=============='
+        );
+        this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+        console.log(
+          this.selected_fin_id,
+          '===========selected fin id==================='
+        );
+        this.user_id = sessionData.USER_ID;
+        console.log(this.user_id, '============user id==================');
+        //
+      }
+    
+      onRowRemoved(e: any) {}
+    
+      onEditorPreparing(e: any) {
+        if (e.dataField === 'USED_QTY') {
+          e.editorOptions = e.editorOptions || {};
+    
+          // Let the editor inherit row height naturally (no fixed height)
+          e.editorOptions.elementAttr = {
+            style: `
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+          `,
+          };
+    
+          // Make sure the input fits snugly inside
+          e.editorOptions.inputAttr = {
+            style: `
+            height: 100%;
+            padding: 0 4px;
+            box-sizing: border-box;
+          `,
+          };
+    
+          // Remove spin buttons to prevent layout changes
+          if (e.editorName === 'dxNumberBox') {
+            e.editorOptions.showSpinButtons = false;
+          }
+        }
+    
+        // Only for data rows & USED_QTY column
+        if (e.parentType === 'dataRow' && e.dataField === 'USED_QTY') {
+          const originalOnValueChanged = e.editorOptions.onValueChanged;
+    
+          e.editorOptions.onValueChanged = (args: any) => {
+            //  Update USED_QTY
+            e.row.data.USED_QTY = Number(args.value) || 0;
+    
+            //  Recalculate amount
+            this.calculateAmount(e.row.data);
+    
+            //  Update totals
+            this.calculateTotalAmount();
+    
+            // Call default handler (important!)
+            if (originalOnValueChanged) {
+              originalOnValueChanged(args);
+            }
+          };
+        }
+      }
+    
+      Cancel() {
+        this.resetForm();
+        this.formClosed.emit();
+      }
+    
+      calculateAmount(row: any) {
+        const qtyUsed = Number(row.USED_QTY) || 0;
+        const price = Number(row.COST) || 0;
+        row.AMOUNT = qtyUsed * price;
+      }
+    
+      //  fillComponents() {
+      //   const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+      //   console.log('Production Qty:', prodQty);
+    
+      //   this.gridData.forEach(item => {
+      //     const bomQty = Number(item.QUANTITY) || 0;
+      //     console.log('BOM Qty for item', bomQty);
+    
+      //     //  Calculation
+      //     item.REQUIRED_QTY = prodQty * bomQty;
+      //     console.log('Updated REQUIRED_QTY for item:', item.REQUIRED_QTY);
+      //     item.USED_QTY = item.REQUIRED_QTY;
+      //     item.COST = 1000;
+      //      this.calculateAmount(item);
+      //   });
+      //  //  FORCE summary recalculation
+      //   this.calculateTotalAmount();
+    
+      //   this.itemsGrid.instance.refresh();
+      // }
+    
+      fillComponents() {
+        const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+    
+    
+        //  VALIDATION: Product required
+      if (!this.productionJVFormData.PRODUCT_ID) {
+        notify(
+          {
+            message: 'Please select a Product',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'warning',
+          3000
+        );
+        return;
+      }
+    
+      //  VALIDATION: Production Qty required
+      if (!prodQty || prodQty <= 0) {
+        notify(
+          {
+            message: 'Please enter Production Quantity',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'warning',
+          3000
+        );
+        return; //  STOP execution
+      }
+    
+        const payload = {
+          ITEM_ID: this.productionJVFormData.PRODUCT_ID,
+        };
+    
+        console.log('Payload for Product In Article Production:', payload);
+    
+        this.dataservice
+          .get_Product_In_Bom_Production_Api(payload)
+          .subscribe((response: any) => {
+            console.log('Product In Article Production Data:', response);
+    
+            //  Set grid data ONLY here
+            this.gridData = response.Data;
+    
+            //  Apply existing logic (UNCHANGED)
+            this.gridData.forEach((item) => {
+              const bomQty = Number(item.QUANTITY) || 0;
+    
+              item.REQUIRED_QTY = prodQty * bomQty;
+              item.USED_QTY = item.REQUIRED_QTY;
+              // item.COST = 1000;
+    
+              this.calculateAmount(item);
+            });
+    
+            this.calculateTotalAmount();
+            this.itemsGrid.instance.refresh();
+          });
+      }
+    
+      
+    
+      onCellValueChanged(e: any) {
+        console.log('Cell Value Changed Event:', e);
+        const field = e?.column?.dataField;
+    
+        console.log('Changed field:', field, 'Row:', e.data);
+    
+        if (field === 'USED_QTY' || field === 'COST') {
+          this.calculateAmount(e.data);
+          this.calculateTotalAmount();
+        }
+      }
+    
+      calculateFinalCost() {
+        this.finalCost =
+          (Number(this.totalAmount) || 0) + (Number(this.additionalCost) || 0);
+    
+        console.log('Final Cost:', this.finalCost);
+        this.calculateUnitProductCost();
+      }
+    
+      calculateTotalAmount() {
+        this.totalAmount = this.gridData.reduce((sum, row) => {
+          return sum + (Number(row.AMOUNT) || 0);
+        }, 0);
+    
+        console.log('Total Amount:', this.totalAmount);
+        this.calculateFinalCost();
+      }
+    
+      onAdditionalCostChange(e: any) {
+        this.additionalCost = Number(e.value) || 0;
+        console.log('Additional Cost Changed:', this.additionalCost);
+        this.calculateFinalCost();
+      }
+    
+      //==================== Calculate Unit Product Cost ===================//
+      calculateUnitProductCost() {
+        const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+        const totalCost = Number(this.finalCost) || 0;
+    
+        if (prodQty > 0) {
+          this.unitProductCost = totalCost / prodQty;
+        } else {
+          this.unitProductCost = 0; // avoid divide-by-zero
+        }
+    
+        console.log('Unit Product Cost:', this.unitProductCost);
+      }
+    
+      getPendingNo() {
+        const payload = {
+          TRANS_TYPE: 104,
+          COMPANY_ID: this.selected_Company_id,
+        };
+        console.log('Payload for Doc No:', payload);
+        this.dataservice.getDocNo(payload).subscribe((response: any) => {
+          console.log('Doc No Response Data:', response);
+          // this.pendingNo = response.PAYMENT_NO;
+          this.productionJVFormData.DOC_NO = response.DOC_NO;
+          console.log('Assigned DOC_NO:', this.productionJVFormData.DOC_NO);
+        });
+      }
+    
+      get_ProductDropdown() {
+        this.dataservice.getDropdownDataforBoxProduct('PACKINGLIST').subscribe((response: any) => {
+          console.log('Article Dropdown Data:', response);
+          this.Article = response;
+        });
+      }
+    
+      get_Product_In_Article_Production() {
+        const payload = {
+          ITEM_ID: this.productionJVFormData.PRODUCT_ID,
+        };
+        console.log('Payload for Product In Article Production:', payload);
+        this.dataservice
+          .get_Product_In_Bom_Production_Api(payload)
+          .subscribe((response: any) => {
+            console.log('Product In Article Production Data:', response);
+            this.gridData = response.Data;
+          });
+      }
+    
+      onSave() {
 
+
+            // =====================================================
+          //  VALIDATION 1: PRODUCT MUST BE SELECTED
+          // =====================================================
+          if (!this.productionJVFormData.PRODUCT_ID) {
+            notify(
+              {
+                message: 'Please select a product',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+              3000
+            );
+            return;
+          }
+        
+          // =====================================================
+          //  VALIDATION 2: PRODUCT QUANTITY MUST BE ENTERED
+          // =====================================================
+          const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+          if (prodQty <= 0) {
+            notify(
+              {
+                message: 'Please enter a product quantity',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+              3000
+            );
+            return;
+          }
+    
+        //  VALIDATION: USED_QTY must be <= AVAILABLE_QTY
+      const invalidRow = this.gridData.find((item: any) => {
+        const usedQty = Number(item.USED_QTY) || 0;
+        const availableQty = Number(item.AVAILABLE_QTY) || 0; //  adjust field name if needed
+    
+        return usedQty > availableQty;
+      });
+    
+      if (invalidRow) {
+        notify(
+          {
+            message: 'Used Quantity cannot be greater than Available Quantity',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+          4000
+        );
+        return; //  STOP SAVE
+      }
+    
+        const payload = {
+          COMPANY_ID: this.selected_Company_id,
+          FIN_ID: this.selected_fin_id,
+          USER_ID: this.user_id,
+          REMARKS: this.productionJVFormData.REMARKS,
+          PRODUCTION_DATE: this.productionJVFormData.PRODUCTION_DATE,
+          TOTAL_ITEM_COST: this.totalAmount,
+          COST_OF_PRODUCTION: this.finalCost,
+          UNIT_PRODUCT_COST: this.unitProductCost,
+          REF_NO: this.productionJVFormData.REF_NO,
+          ADDL_COST: this.additionalCost,
+          PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
+          PROD_QTY: this.productionJVFormData.PROD_QTY,
+           PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE === 'BOM' ? 2 : 1,
+          RawMaterials: this.gridData,
+        };
+        console.log('Payload being sent:', payload);
+        this.dataservice
+          .Insert_Bom_Production_Api(payload)
+          .subscribe((res: any) => {
+            console.log('Insert success:', res);
+            this.resetForm();
+            this.formClosed.emit();
+            // reset + close only AFTER success
+          });
+      }
+    
+      //   onSave() {
+      //   const payload = {
+      //     COMPANY_ID: this.productionJVFormData.COMPANY_ID,
+      //     FIN_ID: this.productionJVFormData.FIN_ID,
+      //     USER_ID: this.productionJVFormData.USER_ID,
+      //     REF_NO: this.productionJVFormData.REF_NO,
+      //     ADDL_COST: this.additionalCost,
+      //     ADDL_DESCRIPTION: this.productionJVFormData.ADDL_DESCRIPTION,
+      //     PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
+      //     PROD_QTY: this.productionJVFormData.PROD_QTY,
+      //     DETAILS: this.gridData
+      //   };
+    
+      //   console.log('Payload being sent:', payload);
+    
+      //   this.dataservice.Insert_Article_Production_Api(payload).subscribe({
+      //     next: (res: any) => {
+      //       console.log('Insert success:', res);
+    
+      //       // reset + close only AFTER success
+      //       this.resetForm();
+      //       this.formClosed.emit();
+      //     },
+      //     error: (err: any) => {
+      //       console.error('Insert failed:', err);
+      //     }
+      //   });
+      // }
+    
+      resetForm() {
+        //  Reset form model
+        this.productionJVFormData = {
+          COMPANY_ID: '',
+          FIN_ID: '',
+          USER_ID: '',
+          REF_NO: '',
+          ADDL_COST: '',
+          ADDL_DESCRIPTION: '',
+          PRODUCT_ID: '',
+          PROD_QTY: 0,
+          gridData: [],
+        };
+    
+        //  Reset grid
+        this.gridData = [];
+    
+        //  Reset calculated values
+        this.totalAmount = 0;
+        this.additionalCost = 0;
+        this.finalCost = 0;
+        this.unitProductCost = 0;
+    
+        //  Reset grid UI safely
+        if (this.itemsGrid) {
+          this.itemsGrid.instance.cancelEditData();
+          this.itemsGrid.instance.refresh();
+        }
+    
+        console.log('Form reset completed');
+      }
 }
 @NgModule({
   imports: [
