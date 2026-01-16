@@ -772,3 +772,10 @@ body {
   font-weight: bolder;
   color: var(--grid-head-text-color);
 }
+.dx-datagrid-rowsview
+  .dx-row-focused.dx-data-row
+  > td:not(.dx-focused):not(.dx-cell-modified):not(.dx-datagrid-invalid),
+.dx-datagrid-rowsview .dx-row-focused.dx-data-row .dx-command-edit .dx-link {
+  background-color: #96ee8e !important;
+  font-weight: bold !important;
+}

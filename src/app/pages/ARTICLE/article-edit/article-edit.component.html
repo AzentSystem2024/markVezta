@@ -354,7 +354,7 @@
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
             [height]="'100%'"
-            [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
+            [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
             [selectedRowKeys]="selectedAttachRowKeys"
             [focusedRowEnabled]="true"
             [focusedRowKey]="selectedAttachRowKeys[0]"
@@ -392,12 +392,12 @@
         <div
           style="display: flex; justify-content: flex-end; padding: 10px 0 0 0"
         >
-          <dx-button
+          <!-- <dx-button
             text="Add"
             type="default"
             [disabled]="!selectedAttachRow"
             (onClick)="attachComponent()"
-          ></dx-button>
+          ></dx-button> -->
         </div>
       </div>
     </div>

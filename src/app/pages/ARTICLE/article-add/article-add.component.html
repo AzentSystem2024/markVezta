@@ -332,7 +332,7 @@
           <dx-data-grid
             [dataSource]="attachGridData"
             keyExpr="ID"
-            [selectedRowKeys]="selectedAttachRow ? [selectedAttachRow.ID] : []"
+            [selectedRowKeys]="selectedAttachRowKeys"
             [focusedRowEnabled]="true"
             [focusedRowKey]="selectedAttachRow?.ID"
             [hoverStateEnabled]="true"
@@ -340,7 +340,7 @@
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
             [height]="'54vh'"
-            [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
+            [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
             (onSelectionChanged)="onAttachRowSelected($event)"
           >
             <dxo-paging [enabled]="true" [pageSize]="10"></dxo-paging>
