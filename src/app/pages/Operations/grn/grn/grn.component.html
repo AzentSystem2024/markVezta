@@ -67,7 +67,7 @@
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
           stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
+          elementAttr: { class: 'commonButtons' },
         }"
       ></dxi-item>
 
@@ -124,8 +124,8 @@
 
     <dxi-column type="buttons" width="100" [buttons]="allButtonsEditDelete">
     </dxi-column>
-    <dxi-column type="buttons" width="100" [buttons]="customButtons">
-    </dxi-column>
+    <!-- <dxi-column type="buttons" width="100" [buttons]="customButtons">
+    </dxi-column> -->
   </dx-data-grid>
 </div>
 

@@ -59,6 +59,9 @@ import {
   ProductionJvAddModule,
 } from '../production-jv-add/production-jv-add.component';
 import { ProductionJvViewModule } from '../production-jv-view/production-jv-view.component';
+import { BoxproductionJvAddModule } from '../boxproduction-jv-add/boxproduction-jv-add.component';
+import { ArticleproductionJvViewModule } from '../articleproduction-jv-view/articleproduction-jv-view.component';
+import { BoxproductionJvViewModule } from '../boxproduction-jv-view/boxproduction-jv-view.component';
 
 @Component({
   selector: 'app-articleproduction-jv-list',
@@ -134,6 +137,7 @@ export class ArticleproductionJvListComponent {
     canPrint = false;
     isReadOnlyInvoice: boolean;
     isAddPopupVisible: boolean = false;
+    isBoxPopupVisible : boolean = false;
     selectedProduction: any;
     productionTypes = [
       { id: 'ARTICLE', name: 'Article Production' },
@@ -142,6 +146,7 @@ export class ArticleproductionJvListComponent {
   
     selectedProductionType = 'ARTICLE';
     isViewProduction: boolean;
+    isViewBoxProduction : boolean;
   
     constructor(
       private dataService: DataService,
@@ -178,40 +183,88 @@ export class ArticleproductionJvListComponent {
       console.log(this.canAdd, this.canEdit, this.canDelete);
     }
   
+    // getProductionList() {
+    //   const payload = {
+    //     COMPANY_ID: this.selected_Company_id,
+    //   };
+    //   console.log(payload, 'PAYLOADDDDDDDDDDDD');
+    //   this.dataService.getArticleProductionJVList(payload).subscribe((response: any) => {
+    //     this.productionList = response.Data.map((item: any) => {
+    //       // ---- Date normalization (unchanged) ----
+    //       let saleDate = item.PROD_DATE;
+    //       let dateValue: Date;
+  
+    //       if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
+    //         const [day, month, year] = saleDate.split('-').map(Number);
+    //         dateValue = new Date(year, month - 1, day);
+    //       } else {
+    //         dateValue = new Date(saleDate);
+    //       }
+  
+    //       // ---- Extract numeric part of DOC_NO safely ----
+    //       const match = item.DOC_NO?.match(/\d+$/); // last number
+    //       const docNoNumber = match ? Number(match[0]) : 0;
+  
+    //       return {
+    //         ...item,
+    //         PROD_DATE: dateValue,
+    //         _docNoNumber: docNoNumber, // helper field
+    //       };
+    //     })
+    //       // ✅ DESCENDING → latest first
+    //       .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
+  
+    //     this.applyDateFilter();
+    //   });
+    // }
+
     getProductionList() {
-      const payload = {
-        COMPANY_ID: this.selected_Company_id,
-      };
-      console.log(payload, 'PAYLOADDDDDDDDDDDD');
-      this.dataService.getProductionJVList(payload).subscribe((response: any) => {
-        this.productionList = response.Data.map((item: any) => {
-          // ---- Date normalization (unchanged) ----
-          let saleDate = item.PROD_DATE;
-          let dateValue: Date;
-  
-          if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
-            const [day, month, year] = saleDate.split('-').map(Number);
-            dateValue = new Date(year, month - 1, day);
-          } else {
-            dateValue = new Date(saleDate);
-          }
-  
-          // ---- Extract numeric part of DOC_NO safely ----
-          const match = item.DOC_NO?.match(/\d+$/); // last number
-          const docNoNumber = match ? Number(match[0]) : 0;
-  
-          return {
-            ...item,
-            PROD_DATE: dateValue,
-            _docNoNumber: docNoNumber, // helper field
-          };
-        })
-          // ✅ DESCENDING → latest first
-          .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
-  
-        this.applyDateFilter();
-      });
-    }
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+  };
+
+  console.log(payload, 'PAYLOADDDDDDDDDDDD');
+
+  // ✅ Choose API based on production type
+  const api$ =
+    this.selectedProductionType === 'ARTICLE'
+      ? this.dataService.getArticleProductionJVList(payload)
+      : this.dataService.getBoxProductionJVList(payload);
+
+  api$.subscribe((response: any) => {
+    this.productionList = response.Data
+    
+      .map((item: any) => {
+        // ---- Date normalization ----
+        let saleDate = item.PROD_DATE;
+        let dateValue: Date;
+
+        if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
+          const [day, month, year] = saleDate.split('-').map(Number);
+          dateValue = new Date(year, month - 1, day);
+        } else {
+          dateValue = new Date(saleDate);
+        }
+
+        // ---- Extract numeric part of DOC_NO ----
+        const match = item.DOC_NO?.match(/\d+$/);
+        const docNoNumber = match ? Number(match[0]) : 0;
+
+        return {
+          ...item,
+          PROD_DATE: dateValue,
+          _docNoNumber: docNoNumber,
+        };
+      })
+      // ✅ Latest first
+      .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
+
+    this.applyDateFilter();
+  });
+
+  console.log(this.productionList, '=================production list===================');
+}
+
   
     refreshGrid() {
       if (this.dataGrid?.instance) {
@@ -466,24 +519,54 @@ export class ArticleproductionJvListComponent {
       }
     }
   
+    // onEditProduction(event: any) {
+    //   event.cancel = true;
+  
+    //   const productionId = event.data.PRODUCTION_ID;
+    //   const status = event.data.TRANS_STATUS;
+  
+    //   const api$ =
+    //     this.selectedProductionType === 'ARTICLE'
+    //       ? this.dataService.selectArticleProduction(productionId)
+    //       : this.dataService.selectBoxProduction(productionId);
+  
+    //   api$.subscribe((response: any) => {
+    //     this.selectedProduction = response;
+    //     this.isReadOnlyInvoice = status === 5;
+    //     this.isViewProduction = true;
+
+    //   });
+    // }
+  
     onEditProduction(event: any) {
-      event.cancel = true;
-  
-      const productionId = event.data.PRODUCTION_ID;
-      const status = event.data.TRANS_STATUS;
-  
-      const api$ =
-        this.selectedProductionType === 'ARTICLE'
-          ? this.dataService.selectProduction(productionId)
-          : this.dataService.selectBoxProduction(productionId);
-  
-      api$.subscribe((response: any) => {
-        this.selectedProduction = response;
-        this.isReadOnlyInvoice = status === 5;
-        this.isViewProduction = true;
-      });
+  event.cancel = true;
+
+  const productionId = event.data.PRODUCTION_ID;
+  const status = event.data.TRANS_STATUS;
+
+  const isArticle = this.selectedProductionType === 'ARTICLE';
+
+  const api$ = isArticle
+    ? this.dataService.selectArticleProduction(productionId)
+    : this.dataService.selectBoxProduction(productionId);
+
+  api$.subscribe((response: any) => {
+    this.selectedProduction = response;
+    this.isReadOnlyInvoice = status === 5;
+
+    // reset both views first
+    this.isViewProduction = false;
+    this.isViewBoxProduction = false;
+
+    // open correct view
+    if (isArticle) {
+      this.isViewProduction = true;
+    } else {
+      this.isViewBoxProduction = true;
     }
-  
+  });
+}
+
     // onEditProduction(event: any) {
     //   event.cancel = true;
     //   const productionId = event.data.PRODUCTION_ID;
@@ -499,7 +582,9 @@ export class ArticleproductionJvListComponent {
     // }
   
     handleClose() {
+      this.isBoxPopupVisible = false;
       this.isViewProduction = false;
+      this.isViewBoxProduction = false;
       this.isAddPopupVisible = false;
       this.isEditInvoice = false;
   
@@ -518,10 +603,19 @@ export class ArticleproductionJvListComponent {
       }
   
       this.isAddPopupVisible = false;
+      this.isBoxPopupVisible = false;
     }
   
     addProduction() {
-      this.isAddPopupVisible = true;
+     this.isAddPopupVisible = false;
+  this.isBoxPopupVisible = false;
+
+  if (this.selectedProductionType === 'ARTICLE') {
+    this.isAddPopupVisible = true;
+  } else if (this.selectedProductionType === 'BOX') {
+    this.isBoxPopupVisible = true;
+  }
+      // this.isAddPopupVisible = true;
     }
   
     onProductionTypeChanged(e: any) {
@@ -532,7 +626,10 @@ export class ArticleproductionJvListComponent {
       } else if (e.value === 'BOX') {
         // Load box production list
       }
-    }
+
+        this.getProductionList();
+
+    } 
   
     get productionHeaderTitle(): string {
       return this.selectedProductionType === 'ARTICLE'
@@ -584,6 +681,9 @@ export class ArticleproductionJvListComponent {
     InvoiceTrOutAddModule,
     ProductionJvAddModule,
     ProductionJvViewModule,
+    BoxproductionJvAddModule,
+    ArticleproductionJvViewModule,
+    BoxproductionJvViewModule
   ],
   providers: [],
   declarations: [ArticleproductionJvListComponent],

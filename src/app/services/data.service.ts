@@ -445,6 +445,23 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}Sync/production-list`, data);
   }
+
+    getArticleProductionJVList(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(
+      `${this.apiUrl}ArticleProduction/articlelist`,
+      data
+    );
+  }
+
+  getBoxProductionJVList(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(
+      `${this.apiUrl}BoxProduction/Packinglist`,
+      data
+    );
+  }
+
   selectProduction(id: number) {
     return this.http.post<any>(`${this.apiUrl}Sync/select/` + id, {});
   }
@@ -452,6 +469,13 @@ export class DataService {
   getBoxProductionJVList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}Sync/boxlist`, data);
+  }
+
+   selectArticleProduction(id: number) {
+    return this.http.post<any>(
+      `${this.apiUrl}ArticleProduction/select/` + id,
+      {}
+    );
   }
 
   selectBoxProduction(id: number) {
@@ -3007,6 +3031,11 @@ export class DataService {
   }
 
   public getDropdownDataforProduct(type: any): Observable<any> {
+    const reqBodyData = { name: type };
+    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
+  }
+
+    public getDropdownDataforBoxProduct(type: any): Observable<any> {
     const reqBodyData = { name: type };
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
@@ -6102,6 +6131,18 @@ The result can be exported to HTML or Markdown.`;
   //==============INSERT IN ARTICLE PRODUCTION=================
   Insert_Article_Production_Api(payload) {
     const getEndpoint = this.apiUrl + 'ArticleProduction/insert';
+    return this.http.post(getEndpoint, payload);
+  }
+
+   //==============INSERT IN BOM PRODUCTION=================
+  Insert_Bom_Production_Api(payload) {
+    const getEndpoint = this.apiUrl + 'BoxProduction/insert';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //==============PRODUCT IN BOM PRODUCTION=================
+  get_Product_In_Bom_Production_Api(payload) {
+    const getEndpoint = this.apiUrl + 'BoxProduction/packingbomlist';
     return this.http.post(getEndpoint, payload);
   }
 }

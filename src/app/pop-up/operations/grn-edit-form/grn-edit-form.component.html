@@ -52,7 +52,6 @@
         [(value)]="newGrnData.STORE_ID"
         placeholder="Select Store"
         [searchEnabled]="true"
-        [readOnly]="true"
         [elementAttr]="{ class: 'grndropdown' }"
         (onValueChanged)="onStoreValueChanged($event)"
       >
@@ -72,7 +71,6 @@
         [(value)]="newGrnData.SUPP_ID"
         placeholder="Select Supplier"
         [searchEnabled]="true"
-        [readOnly]="true"
         [elementAttr]="{ class: 'grndropdown' }"
         width="390"
       >
@@ -220,7 +218,7 @@
         showSpinButtons: true,
         min: 0,
         format: '#0',
-        mode: 'number'
+        mode: 'number',
       }"
     ></dxi-column>
     <dxi-column

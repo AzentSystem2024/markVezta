@@ -45,7 +45,7 @@
       <dx-select-box
         label="Store"
         labelMode="floating"
-        [dataSource]="storeList"
+        [dataSource]=""
         displayExpr="DESCRIPTION"
         valueExpr="ID"
         [(value)]="newGrnData.STORE_ID"
@@ -99,10 +99,10 @@
                 dataField: 'PO_DATE',
                 caption: 'PO DATE',
                 dataType: 'date',
-                format: 'MM/dd/yyyy'
+                format: 'MM/dd/yyyy',
               },
               { dataField: 'SUPP_NAME', caption: 'SUPPLIER' },
-              { dataField: 'ID', caption: 'ID', visible: false }
+              { dataField: 'ID', caption: 'ID', visible: false },
             ]"
             [selection]="{ mode: 'single' }"
             [hoverStateEnabled]="true"
@@ -218,7 +218,7 @@
         showSpinButtons: true,
         min: 0,
         format: '#0',
-        mode: 'number'
+        mode: 'number',
       }"
     ></dxi-column>
     <dxi-column

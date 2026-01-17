@@ -166,7 +166,7 @@ export class GrnComponent implements OnInit {
   allButtonsEditDelete = [
     {
       name: 'edit',
-      visible: (e) => e.row.data.STATUS !== 'Approved',
+      visible: (e) => e.row.data.STATUS !== 'Approved' || e.row.data.STATUS === 'Approved',
     },
     {
       name: 'delete',
@@ -299,7 +299,7 @@ export class GrnComponent implements OnInit {
   verifyGrnData() {
     const data = this.grnVerifyForm.getNewGrnData();
     console.log(data, 'grn verified data===============================');
-    this.service.verifyGrnData(data).subscribe((res) => {
+    this.service.approveGrnData(data).subscribe((res) => {
       console.log('data verified', res);
       if (res.Message === 'Success') {
         notify(
