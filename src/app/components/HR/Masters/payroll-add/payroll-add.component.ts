@@ -66,7 +66,7 @@ export class PayrollAddComponent {
     TS_ID: string;
     USER_ID: Number;
   } = {
-    COMPANY_ID : '',
+    COMPANY_ID: '',
     TS_ID: '',
     USER_ID: 0,
   };
@@ -74,46 +74,50 @@ export class PayrollAddComponent {
   constructor(private dataSerivice: DataService) {}
 
   ngOnInit() {
-    
     console.log(this.selectedMonth, 'SELECTEDMONTH');
     // this.payRollData.SAL_MONTH = this.selectedMonth;
     this.getTimesheetList();
   }
 
-     getStatusFlagClass(status: string): string {
+  getStatusFlagClass(status: string): string {
     switch (status) {
-      case 'Open': return 'flag-open';       // White or gray
-      case 'Verified': return 'flag-verified'; // Orange
-      case 'Approved': return 'flag-approved'; // Green
-      default: return '';
+      case 'Open':
+        return 'flag-open'; // White or gray
+      case 'Verified':
+        return 'flag-verified'; // Orange
+      case 'Approved':
+        return 'flag-approved'; // Green
+      default:
+        return '';
     }
   }
-
 
   getTimesheetList() {
     if (!this.selectedMonth) {
       console.warn('No month selected.');
       return;
     }
-   const payload = {
-  CompanyId: this.CompanyID,
-  Month: new Date(this.selectedMonth).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  }).replace(/\s/g, ''),
-};
+    const payload = {
+      CompanyId: this.CompanyID,
+      Month: new Date(this.selectedMonth)
+        .toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        })
+        .replace(/\s/g, ''),
+    };
 
-
-  this.dataSerivice.getTimesheetListForPayroll(payload).subscribe((response: any) => {
-    console.log(response, 'Timesheet List Response');
-    this.timesheetList = response.data;
-  });
+    this.dataSerivice
+      .getTimesheetListForPayroll(payload)
+      .subscribe((response: any) => {
+        console.log(response, 'Timesheet List Response');
+        this.timesheetList = response.data;
+      });
   }
 
-generatePayroll() {
-
-
+  generatePayroll() {
     const selectedRows = this.dataGrid.instance.getSelectedRowsData();
+
     if (!selectedRows || selectedRows.length === 0) {
       notify(
         {
@@ -126,35 +130,99 @@ generatePayroll() {
     }
 
     const userId = Number(sessionStorage.getItem('USER_ID'));
-const row = selectedRows[0]; // Only take first row (or loop if needed)
-    const payload = {
-      COMPANY_ID: this.CompanyID, // already available
-      TS_ID: row.ID,
-      USER_ID: userId, // Use the userId from sessionStorage
-    };
-this.dataSerivice.generatePayroll(payload).subscribe((response: any) => {
-  console.log('Payroll Generation Response:', response);
-  if (response.flag == "1") {
-    notify(
-      {
-        message: 'Payroll Generated Successfully',
-        position: { at: 'top center', my: 'top center' },
-      },
-      'success'
-    );
-    this.popupClosed.emit();
-  } else {
-    notify(
-      {
-        message: 'Payroll Not Generated',
-        position: { at: 'top right', my: 'top right' },
-      },
-      'error'
-    );
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    selectedRows.forEach((row) => {
+      const payload = {
+        COMPANY_ID: this.CompanyID,
+        TS_ID: row.ID,
+        USER_ID: userId,
+      };
+
+      this.dataSerivice.generatePayroll(payload).subscribe({
+        next: (response: any) => {
+          if (response.flag === '1') {
+            successCount++;
+          } else {
+            errorCount++;
+          }
+
+          // Show message only after last API call
+          if (successCount + errorCount === selectedRows.length) {
+            if (errorCount === 0) {
+              notify(
+                {
+                  message:
+                    'Payroll generated successfully for selected employees.',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success'
+              );
+              this.popupClosed.emit();
+            } else {
+              notify(
+                {
+                  message: `Payroll generated for ${successCount} rows. Failed for ${errorCount} rows.`,
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'warning'
+              );
+            }
+          }
+        },
+        error: () => {
+          errorCount++;
+        },
+      });
+    });
   }
-})
-    console.log('Payload to save:', payload);
-  }
+
+  // generatePayroll() {
+
+  //     const selectedRows = this.dataGrid.instance.getSelectedRowsData();
+  //     if (!selectedRows || selectedRows.length === 0) {
+  //       notify(
+  //         {
+  //           message: 'Please select at least one row to generate payroll.',
+  //           position: { at: 'top center', my: 'top center' },
+  //         },
+  //         'error'
+  //       );
+  //       return;
+  //     }
+
+  //     const userId = Number(sessionStorage.getItem('USER_ID'));
+  // const row = selectedRows[0]; // Only take first row (or loop if needed)
+  //     const payload = {
+  //       COMPANY_ID: this.CompanyID, // already available
+  //       TS_ID: row.ID,
+  //       USER_ID: userId, // Use the userId from sessionStorage
+  //     };
+  // this.dataSerivice.generatePayroll(payload).subscribe((response: any) => {
+  //   console.log('Payroll Generation Response:', response);
+  //   if (response.flag == "1") {
+  //     notify(
+  //       {
+  //         message: 'Payroll Generated Successfully',
+  //         position: { at: 'top center', my: 'top center' },
+  //       },
+  //       'success'
+  //     );
+  //     this.popupClosed.emit();
+  //   } else {
+  //     notify(
+  //       {
+  //         message: 'Payroll Not Generated',
+  //         position: { at: 'top right', my: 'top right' },
+  //       },
+  //       'error'
+  //     );
+  //   }
+  // })
+  //     console.log('Payload to save:', payload);
+  //   }
 }
 
 @NgModule({

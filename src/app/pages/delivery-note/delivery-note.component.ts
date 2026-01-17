@@ -167,27 +167,29 @@ export class DeliveryNoteComponent {
   getDeliveryNotes() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-    }
-    this.dataService.getdeliveryNoteist(payload).subscribe((response: any) => {
-      this.deliveryNoteList = response.Data.map((item: any) => {
-        let dateValue: Date;
+    };
+    this.dataService
+      .getdeliveryNoteViewist(payload)
+      .subscribe((response: any) => {
+        this.deliveryNoteList = response.Data.map((item: any) => {
+          let dateValue: Date;
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.DN_DATE))) {
-          dateValue = new Date(item.DN_DATE);
-        } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.DN_DATE);
-        }
+          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
+          if (!isNaN(Date.parse(item.DN_DATE))) {
+            dateValue = new Date(item.DN_DATE);
+          } else {
+            // Case 2: If backend gives dd-MM-yyyy format
+            dateValue = this.parseDateString(item.DN_DATE);
+          }
 
-        return {
-          ...item,
-          DN_DATE: dateValue,
-        };
-      }).sort((a: any, b: any) => Number(b.DN_NO) - Number(a.DN_NO));
+          return {
+            ...item,
+            DN_DATE: dateValue,
+          };
+        }).sort((a: any, b: any) => Number(b.DN_NO) - Number(a.DN_NO));
 
-      this.applyDateFilter();
-    });
+        this.applyDateFilter();
+      });
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
@@ -388,6 +390,7 @@ export class DeliveryNoteComponent {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.getDeliveryNotes();
   }
 
   onToolbarPreparing(e: any) {
@@ -428,13 +431,16 @@ export class DeliveryNoteComponent {
 
   onEditDelivery(event: any) {
     event.cancel = true;
+
     const deliveryId = event.data.ID;
     const status = event.data.STATUS;
+
     this.dataService
       .selectDeliveryNote(deliveryId)
       .subscribe((response: any) => {
-        this.selectedDelivery = response;
-        console.log(this.selectedDelivery, 'SELECTEDTROUT');
+        this.selectedDelivery = response.Data; // ✅ FIX
+        console.log(this.selectedDelivery, 'SELECTED DELIVERY');
+
         this.isEditDelivery = true;
         this.isReadOnlyDelivery = status === 'APPROVED';
       });

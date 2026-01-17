@@ -181,36 +181,77 @@ export class ProductionJvListComponent {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
-    console.log(payload, 'PAYLOADDDDDDDDDDDD');
-    this.dataService.getProductionJVList(payload).subscribe((response: any) => {
-      this.productionList = response.Data.map((item: any) => {
-        // ---- Date normalization (unchanged) ----
-        let saleDate = item.PROD_DATE;
-        let dateValue: Date;
 
-        if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
-          const [day, month, year] = saleDate.split('-').map(Number);
-          dateValue = new Date(year, month - 1, day);
-        } else {
-          dateValue = new Date(saleDate);
-        }
+    const api$ =
+      this.selectedProductionType === 'BOX'
+        ? this.dataService.getBoxProductionJVList(payload)
+        : this.dataService.getProductionJVList(payload);
 
-        // ---- Extract numeric part of DOC_NO safely ----
-        const match = item.DOC_NO?.match(/\d+$/); // last number
-        const docNoNumber = match ? Number(match[0]) : 0;
+    api$.subscribe((response: any) => {
+      this.productionList = (response.Data || [])
+        .map((item: any) => {
+          // ---- Date normalization ----
+          let saleDate = item.PROD_DATE;
+          let dateValue: Date;
 
-        return {
-          ...item,
-          PROD_DATE: dateValue,
-          _docNoNumber: docNoNumber, // helper field
-        };
-      })
-        // ✅ DESCENDING → latest first
+          if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
+            const [day, month, year] = saleDate.split('-').map(Number);
+            dateValue = new Date(year, month - 1, day);
+          } else {
+            dateValue = new Date(saleDate);
+          }
+
+          // ---- Extract numeric part of DOC_NO ----
+          const match = item.DOC_NO?.match(/\d+$/);
+          const docNoNumber = match ? Number(match[0]) : 0;
+
+          return {
+            ...item,
+            PROD_DATE: dateValue,
+            _docNoNumber: docNoNumber,
+          };
+        })
+        // ✅ Latest first
         .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
 
       this.applyDateFilter();
     });
   }
+
+  // getProductionList() {
+  //   const payload = {
+  //     COMPANY_ID: this.selected_Company_id,
+  //   };
+  //   console.log(payload, 'PAYLOADDDDDDDDDDDD');
+  //   this.dataService.getProductionJVList(payload).subscribe((response: any) => {
+  //     this.productionList = response.Data.map((item: any) => {
+  //       // ---- Date normalization (unchanged) ----
+  //       let saleDate = item.PROD_DATE;
+  //       let dateValue: Date;
+
+  //       if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
+  //         const [day, month, year] = saleDate.split('-').map(Number);
+  //         dateValue = new Date(year, month - 1, day);
+  //       } else {
+  //         dateValue = new Date(saleDate);
+  //       }
+
+  //       // ---- Extract numeric part of DOC_NO safely ----
+  //       const match = item.DOC_NO?.match(/\d+$/); // last number
+  //       const docNoNumber = match ? Number(match[0]) : 0;
+
+  //       return {
+  //         ...item,
+  //         PROD_DATE: dateValue,
+  //         _docNoNumber: docNoNumber, // helper field
+  //       };
+  //     })
+  //       // ✅ DESCENDING → latest first
+  //       .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
+
+  //     this.applyDateFilter();
+  //   });
+  // }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -524,13 +565,8 @@ export class ProductionJvListComponent {
   }
 
   onProductionTypeChanged(e: any) {
-    console.log('Selected production type:', e.value);
-
-    if (e.value === 'ARTICLE') {
-      // Load article production list
-    } else if (e.value === 'BOX') {
-      // Load box production list
-    }
+    this.selectedProductionType = e.value; // ARTICLE / BOX
+    this.getProductionList(); // reload list
   }
 
   get productionHeaderTitle(): string {
@@ -538,8 +574,6 @@ export class ProductionJvListComponent {
       ? 'Article Production'
       : 'Box Production';
   }
-
-  
 }
 @NgModule({
   imports: [

@@ -93,7 +93,7 @@ export class PayrollListComponent {
     type: 'default',
     stylingMode: 'outlined',
     hint: 'Approve selected payrolls',
-     disabled: true, // Initially disabled
+    disabled: true, // Initially disabled
     onClick: () => {
       this.approveSelectedPayroll();
     },
@@ -175,6 +175,7 @@ export class PayrollListComponent {
     },
   };
   selectedRows: any;
+  approveDisabled = true;
 
   constructor(
     private dataService: DataService,
@@ -303,89 +304,47 @@ export class PayrollListComponent {
       }
     });
   }
+  onSelectionChanged(e: any) {
+    const selectedRows = e.selectedRowsData || [];
 
-  // onSelectionChanged(event: any) {
-  //   const selected = event.selectedRowKeys?.length > 0;
-  //   this.approveButtonOptions = {
-  //     ...this.approveButtonOptions,
-  //     disabled: !selected,
-  //   };
+    const hasApproved = selectedRows.some(
+      (row: any) => row.STATUS === 'Approved'
+    );
+
+    this.approveDisabled = selectedRows.length === 0 || hasApproved;
+  }
+
+  // onSelectionChanged(e: any) {
+  //   const selectedRows = e.selectedRowsData || [];
+
+  //   const hasApproved = selectedRows.some(
+  //     (row: any) => row.STATUS === 'Approved'
+  //   );
+
+  //   const enableApprove =
+  //     selectedRows.length > 0 && !hasApproved;
+
+  //   // ✅ update disabled flag
+  //   this.approveButtonOptions.disabled = !enableApprove;
+
+  //    this.cdr.detectChanges();
   // }
 
-//   onSelectionChanged(event: any) {
-//   // Get selected row data safely
-//   const selectedRowsData = event.selectedRowsData || [];
-//   console.log('Selected Rows Data:', selectedRowsData);
-
-//   // ❌ Check if any selected row is Approved
-//   const hasApprovedRow = selectedRowsData.some(
-//     (row: any) => row.STATUS === 'Approved'
-//   );
-//   console.log('Has Approved Row:', hasApprovedRow);
-//   // ✅ Enable approve button ONLY if:
-//   // - at least one row selected
-//   // - NO approved rows selected
-//   const enableApprove =
-//     selectedRowsData.length > 0 && !hasApprovedRow;
-//     console.log('Enable Approve Button:', enableApprove);
-
-//   this.approveButtonOptions = {
-//     ...this.approveButtonOptions,
-//     disabled: !enableApprove,
-//   };
-// }
-
-// onSelectionChanged(event: any) {
-//   const selectedRowsData = event.selectedRowsData || [];
-// console.log('Selected Rows Data:', selectedRowsData);
-//   const hasApprovedRow = selectedRowsData.some(
-//     (row: any) => row.STATUS === 'Approved'
-//   );
-//   console.log('Has Approved Row:', hasApprovedRow);
-
-//   const enableApprove =
-//     selectedRowsData.length > 0 && !hasApprovedRow;
-// console.log('Enable Approve Button:', enableApprove);
-
-//   // ✅ ONLY toggle disabled flag (DO NOT recreate object)
-//   this.approveButtonOptions.disabled = !enableApprove;
-// }
-
-onSelectionChanged(e: any) {
-  const selectedRows = e.selectedRowsData || [];
-
-  const hasApproved = selectedRows.some(
-    (row: any) => row.STATUS === 'Approved'
-  );
-
-  const enableApprove =
-    selectedRows.length > 0 && !hasApproved;
-
-  // ✅ update disabled flag
-  this.approveButtonOptions.disabled = !enableApprove;
-
-   this.cdr.detectChanges();
-}
-
-
-
-
-onEditorPreparing(e: any) {
-  if (
-    e.parentType === 'dataRow' &&
-    e.command === 'select' &&
-    e.row?.data?.STATUS === 'Approved'
-  ) {
-    e.editorOptions.disabled = true; // 🚫 hard block
+  onEditorPreparing(e: any) {
+    if (
+      e.parentType === 'dataRow' &&
+      e.command === 'select' &&
+      e.row?.data?.STATUS === 'Approved'
+    ) {
+      e.editorOptions.disabled = true; // 🚫 hard block
+    }
   }
-}
 
-onRowClick(e: any) {
-  if (e.data.STATUS === 'Approved') {
-    e.component.deselectRows([e.data.ID]); // no effect on OPEN rows
+  onRowClick(e: any) {
+    if (e.data.STATUS === 'Approved') {
+      e.component.deselectRows([e.data.ID]); // no effect on OPEN rows
+    }
   }
-}
-
 
   generateYears() {
     const currentYear = new Date().getFullYear();

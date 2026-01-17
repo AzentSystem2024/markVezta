@@ -205,8 +205,9 @@ export class DeliveryNoteFormComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
 
-    const data = this.EditingResponseData.Data;
-    console.log(data, 'DATAINDELIVERYEDIT');
+    // ✅ EditingResponseData IS ALREADY DATA
+    const data = this.EditingResponseData;
+    console.log(data, 'DATA IN DELIVERY EDIT');
 
     this.deliveryFormData = {
       ID: data.ID,
@@ -225,18 +226,20 @@ export class DeliveryNoteFormComponent {
       USER_ID: data.USER_ID || this.userID,
       NARRATION: data.NARRATION || '',
       DN_TYPE: data.DN_TYPE,
-      DETAILS: data.DETAILS
-        ? data.DETAILS.map((row: any) => ({
-            ...row,
-            DELIVERED_QUANTITY: row.DELIVERED_QUANTITY || row.QUANTITY || 0,
-            SO_DETAIL_ID: row.SO_DETAIL_ID || 0,
-          }))
-        : [],
+      DN_NO: data.DN_NO,
+      COMPANY_NAME: data.COMPANY_NAME,
+
+      // ✅ GRID DATA BINDING
+      Details: (data.Details || []).map((row: any) => ({
+        ...row,
+        DELIVERED_QUANTITY: row.DELIVERED_QUANTITY ?? row.QUANTITY ?? 0,
+        SO_DETAIL_ID: row.SO_DETAIL_ID ?? 0,
+      })),
     };
 
     this.selectedCustomerId = this.deliveryFormData.CUST_ID;
 
-    this.reindexDetails();
+    this.updateTotalQty();
 
     console.log('Edit Mode: deliveryFormData loaded:', this.deliveryFormData);
   }
@@ -367,7 +370,7 @@ export class DeliveryNoteFormComponent {
     }
 
     // Map each selected row into the DETAILS format
-    this.deliveryFormData.DETAILS = selectedRows.map((row: any) => ({
+    this.deliveryFormData.Details = selectedRows.map((row: any) => ({
       ID: row.ID,
       BRAND: row.BRAND || '',
       ART_NO: row.ART_NO || '',
@@ -393,7 +396,7 @@ export class DeliveryNoteFormComponent {
     this.salesOrderPopupOpened = false;
 
     console.log('Selected SO_DETAIL_IDs:', this.deliveryFormData.SO_DETAIL_IDs);
-    console.log('Updated DETAILS:', this.deliveryFormData.DETAILS);
+    console.log('Updated DETAILS:', this.deliveryFormData.Details);
   }
 
   getItemsList() {
@@ -492,7 +495,7 @@ export class DeliveryNoteFormComponent {
   }
 
   updateTotalQty() {
-    this.deliveryFormData.TOTAL_QTY = this.deliveryFormData.DETAILS.reduce(
+    this.deliveryFormData.TOTAL_QTY = this.deliveryFormData.Details.reduce(
       (sum: number, item: any) => sum + (Number(item.DELIVERED_QUANTITY) || 0),
       0
     );
@@ -512,14 +515,14 @@ export class DeliveryNoteFormComponent {
       return;
     }
 
-    if (!this.deliveryFormData.DETAILS.length) {
+    if (!this.deliveryFormData.Details.length) {
       notify('Please add at least one item.', 'warning', 3000);
       return;
     }
 
     let isValid = true;
 
-    this.deliveryFormData.DETAILS.forEach((item: any, index: number) => {
+    this.deliveryFormData.Details.forEach((item: any, index: number) => {
       if (!item.SO_DETAIL_ID) {
         notify(`Row ${index + 1}: Item is required.`, 'warning', 3000);
         isValid = false;
@@ -560,7 +563,7 @@ export class DeliveryNoteFormComponent {
       FIN_ID: this.finID,
       USER_ID: this.userID,
       DN_DATE: formatDate(this.deliveryFormData.DN_DATE),
-      DETAILS: (this.deliveryFormData.DETAILS || []).map((item: any) => ({
+      Details: (this.deliveryFormData.Details || []).map((item: any) => ({
         // ITEM_ID: item.ITEM_ID,
         BRAND: item.BRAND,
         ART_NO: item.ART_NO,

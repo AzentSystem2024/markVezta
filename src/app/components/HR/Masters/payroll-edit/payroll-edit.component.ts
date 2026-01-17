@@ -78,6 +78,7 @@ export class PayrollEditComponent {
 
   ngOnInit() {
     // this.getSalaryHeadDropdown();
+    this.sesstion_Details();
     this.getSalaryHeadList();
   }
 
@@ -232,20 +233,30 @@ export class PayrollEditComponent {
     this.payRollData.PAY_DETAILS = [...this.payRollData.PAY_DETAILS, newRow];
   }
 
-      sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
   getSalaryHeadList() {
-    const payload = {
-      COMPANY_ID : this.selected_Company_id
+    if (!this.selected_Company_id) {
+      console.warn('Company ID not available');
+      return;
     }
-    this.dataService.get_salary_head_list(payload).subscribe((response: any) => {
-      this.salaryHeadList = response.Data;
-    });
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService
+      .get_salary_head_list(payload)
+      .subscribe((response: any) => {
+        this.salaryHeadList = response.Data;
+      });
+    console.log(this.salaryHeadList, 'SALARYYYYYYYYYYYYYYYYYYYY');
   }
   update() {
     const details = this.payRollData?.PAY_DETAILS || [];
@@ -260,7 +271,7 @@ export class PayrollEditComponent {
       );
       return;
     }
-
+    console.log(this.salaryHeadList, 'SALARYHEADLISTTTTTTTTTTTTTTTTT');
     // Check if all relevant amount fields are empty or zero
     const hasValidAmount = details.some((detail: any) => {
       const head = this.salaryHeadList.find(

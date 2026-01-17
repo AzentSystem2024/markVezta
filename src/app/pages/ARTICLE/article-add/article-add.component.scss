@@ -274,7 +274,7 @@
 
 .fixed-footer-buttons {
   position: absolute; /* or fixed if you want it to stay on screen while scrolling */
-  bottom: 10px; /* distance from bottom */
+  bottom: 24px; /* distance from bottom */
   right: 20px; /* distance from right */
   display: flex;
   gap: 10px; /* space between buttons */
@@ -285,6 +285,12 @@
 .innert-tab.custom-article-tabs {
   padding-bottom: 80px; /* must be >= height of buttons + margin */
 }
+
+:host ::ng-deep .dx-popup-content-scrollable {
+  overflow-y: hidden !important;
+  max-height: none !important;
+}
+
 .preview-wrapper {
   width: 200px; /* FIXED width */
   height: 150px; /* FIXED height */

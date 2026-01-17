@@ -161,12 +161,23 @@
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>
-        <dxi-item
+        <!-- <dxi-item
           name="approveButton"
           location="after"
           widget="dxButton"
           [options]="approveButtonOptions"
-        ></dxi-item>
+        ></dxi-item> -->
+        <dxi-item location="after">
+          <dx-button
+            icon="check"
+            text="Approve"
+            type="default"
+            stylingMode="outlined"
+            hint="Approve Selected Payroll"
+            [disabled]="approveDisabled"
+            (onClick)="approveSelectedPayroll()"
+          ></dx-button>
+        </dxi-item>
       </dxo-toolbar>
       <dxi-column
         dataField="SALARY_BILL_NO"

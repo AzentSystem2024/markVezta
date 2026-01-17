@@ -147,14 +147,52 @@ export class ProductionJvViewComponent {
       REF_NO: header.REF_NO,
       DESCRIPTION: header.DESCRIPTION,
       COST_PRODUCTION: header.COST_PRODUCTION,
+      AVERAGE_COST: 0,
     };
 
     // Bind grid data
     this.items = this.EditingResponseData.RawMaterials || [];
+    this.calculateAverageCost();
 
     console.log('FORM DATA:', this.productionFormData);
     console.log('GRID DATA:', this.items);
   }
+
+  private calculateAverageCost(): void {
+    if (!this.items || this.items.length === 0) {
+      this.productionFormData.AVERAGE_COST = 0;
+      return;
+    }
+
+    // Find the Pairs row
+    const pairRow = this.items.find(
+      (row: any) => row.UOM?.toLowerCase() === 'pairs'
+    );
+
+    if (!pairRow) {
+      this.productionFormData.AVERAGE_COST = 0;
+      return;
+    }
+
+    const pairQty = Number(pairRow.USED_QTY || pairRow.REQUIRED_QTY || 0);
+
+    const totalCost = Number(this.productionFormData.COST_PRODUCTION || 0);
+
+    if (pairQty > 0) {
+      this.productionFormData.AVERAGE_COST = Number(
+        (totalCost / pairQty).toFixed(2)
+      );
+    } else {
+      this.productionFormData.AVERAGE_COST = 0;
+    }
+  }
+  averageFormat = {
+    type: 'fixedPoint',
+    precision: 2,
+    customizeText: (e: any) => {
+      return `${e.valueText} pairs`;
+    },
+  };
 
   onRowRemoved(event: any) {}
 

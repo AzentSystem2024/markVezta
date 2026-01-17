@@ -234,14 +234,26 @@
             ></dx-text-box>
 
             <!-- Unit Product Cost -->
-            <dx-number-box
-              label="Unit Product Cost"
-              labelMode="floating"
-              [(value)]="productionFormData.UNIT_COST"
-              style="flex: 1"
-              [format]="{ type: 'fixedPoint', precision: 2 }"
-              [readOnly]="true"
-            ></dx-number-box>
+            <div style="flex: 1; display: flex; gap: 6px">
+              <dx-number-box
+                label="Unit Product Cost"
+                labelMode="floating"
+                [(value)]="productionFormData.UNIT_COST"
+                [format]="{ type: 'fixedPoint', precision: 2 }"
+                [readOnly]="true"
+                style="flex: 1"
+              ></dx-number-box>
+
+              <dx-number-box
+                label="Average(Pair)"
+                labelMode="floating"
+                [value]="productionFormData.AVERAGE_COST"
+                [format]="averageFormat"
+                [format]="{ type: 'fixedPoint', precision: 2 }"
+                [readOnly]="true"
+                style="flex: 1"
+              ></dx-number-box>
+            </div>
           </div>
         </div>
       </div>

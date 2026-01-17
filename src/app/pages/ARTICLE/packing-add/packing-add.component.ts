@@ -130,16 +130,10 @@ export class PackingAddComponent {
 
   //===================dummy datasource of =========================
   constructor(private dataService: DataService) {
-     this.sesstion_Details();
+    this.sesstion_Details();
     // const payload = {
     //   COMPANY_ID: this.selected_Company_id,
     // };
-    this.dataService.get_packages_list_api().subscribe((res: any) => {
-      console.log('response from get packing list api:', res);
-
-      this.packing_list = res.Data;
-    });
-   
   }
 
   ngOnInit() {
@@ -148,8 +142,16 @@ export class PackingAddComponent {
       this.getLastOrderNo();
     }
     this.getItems();
+    this.getPackingList();
   }
+  getPackingList() {
+    this.dataService.get_packages_list_api().subscribe((res: any) => {
+      console.log('response from get packing list api:', res);
 
+      this.packing_list = res.Data;
+      console.log(this.packing_list, 'PACKINGLIST');
+    });
+  }
   addNewRow() {
     const grid = this.itemsGridRef.instance; // reference to your dx-data-grid
     const rows = grid.getVisibleRows();
@@ -748,13 +750,13 @@ export class PackingAddComponent {
   AddData() {
     console.log(this.packing_list, '======================');
 
-    // 🔹 Validate main form
+    //  Validate main form
     const validationResult = this.formValidationGroup?.instance?.validate();
     if (!validationResult?.isValid) {
       return;
     }
 
-    // 🔹 Convert number fields to string as required by backend
+    //  Convert number fields to string as required by backend
     const Alias_no = Number(this.PackingData.ALIAS_NO);
     const Part_no = Number(this.PackingData.PART_NO);
 
@@ -763,12 +765,10 @@ export class PackingAddComponent {
     this.Alias_no = this.PackingData.ALIAS_NO.toString();
     this.Part_no = this.PackingData.PART_NO.toString();
 
-    
-  this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
-  
+    this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
 
     // =====================================================
-    // 🔹 BUILD BOM PAYLOAD
+    //  BUILD BOM PAYLOAD
     // =====================================================
     const bomPayload = (this.items || [])
       .filter((item: any) => Number(item.QUANTITY) > 0)
@@ -777,135 +777,140 @@ export class PackingAddComponent {
         QUANTITY: Number(item.QUANTITY),
       }));
 
-  console.log('BOM Payload:', bomPayload);
-
-  // Optional BOM validation
-  if (!bomPayload.length) {
-    notify(
-      {
-        message: 'Please add at least one BOM item.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 800,
-      },
-      'warning'
-    );
-    return;
-  }
-
-  // =====================================================
-  // 🔹 BUILD PACKING ENTRIES PAYLOAD
-  // =====================================================
-  const packingEntriesPayload = this.articleSizeData
-    .filter(item => Number(item.QUANTITY) > 0)
-    .map((item) => ({
-      ARTICLE_ID: Number(item.ArticleID),
-      SIZE: String(item.Size),
-      QUANTITY: Number(item.QUANTITY),
-    }));
-
-  console.log('PackingEntries Payload:', packingEntriesPayload);
-
-  // =====================================================
-  // 🔹 FINAL PAYLOAD
-  // =====================================================
-  const payload = {
-    ...this.PackingData,
-
-    // COMPANY_ID: this.selected_Company_id,
-    ALIAS_NO: this.Alias_no,
-    PART_NO: this.Part_no,
-    ART_SERIAL: this.art_Serial_no,
-    COMBINATION: this.combinationString,
-    PAIR_QTY: this.totalQuantity,
-
-    // ✅ ADD BOM
-    BOM: bomPayload,
-
-    // ✅ ADD PACKING ENTRIES
-    PackingEntries: packingEntriesPayload,
-  };
-
-  console.log('FINAL INSERT PAYLOAD:', payload);
-
-// =====================================================
-// 🔴 ALIAS NO DUPLICATE CHECK (FINAL & CORRECT)
-// =====================================================
-const enteredAlias = String(payload.ALIAS_NO).trim();
-
-const aliasDuplicate = this.packing_list.some((item: any) => {
-  const existingAlias = String(item.ALIAS_NO ?? '').trim();
-  console.log('Existing:', existingAlias, 'Entered:', enteredAlias);
-  return existingAlias === enteredAlias;
-});
-console.log('Packing list first item:', this.packing_list[0]);
-
-if (aliasDuplicate) {
-  notify(
-    {
-      message: `Alias No "${enteredAlias}" already exists.`,
-      position: { at: 'top right', my: 'top right' },
-      displayTime: 1000,
-    },
-    'error'
-  );
-  return;
-}
-
-
-  // =====================================================
-  // 🔹 DUPLICATE CHECK
-  // =====================================================
-  const unitName = this.produCtionUnits.find(
-    (u) => u.ID === payload.UNIT_ID
-  )?.DESCRIPTION;
-
-  const categoryName = this.categoryList.find(
-    (u) => u.ID === payload.CATEGORY_ID
-  )?.DESCRIPTION;
-
-  const duplicate = this.packing_list.find(
-    (item: any) =>
-      item.PackingName === payload.DESCRIPTION &&
-      item.ArtNo === payload.ART_NO &&
-      item.Color === payload.COLOR &&
-      item.Category === categoryName &&
-      item.Unit === unitName
-  );
-
-  if (duplicate) {
-    notify(
-      {
-        message: 'This Packing Combination already exists.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 800,
-      },
-      'error'
-    );
-    return;
-  }
-
-  if (this.totalQuantity <= 1) {
-    notify(
-      {
-        message: 'Please add quantity.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 800,
-      },
-      'error'
-    );
-    return;
-  }
-
-  // =====================================================
-  // 🔹 API CALL
-  // =====================================================
-  this.dataService.Add_packages_listapi(payload).subscribe(
-    (response: any) => {
-      console.log('PACKING DATA ADDED SUCCESSFULLY', response);
     console.log('BOM Payload:', bomPayload);
 
+    // Optional BOM validation
+    if (!bomPayload.length) {
+      notify(
+        {
+          message: 'Please add at least one BOM item.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 800,
+        },
+        'warning'
+      );
+      return;
+    }
 
-   
+    // =====================================================
+    //  BUILD PACKING ENTRIES PAYLOAD
+    // =====================================================
+    const packingEntriesPayload = this.articleSizeData
+      .filter((item) => Number(item.QUANTITY) > 0)
+      .map((item) => ({
+        ARTICLE_ID: Number(item.ArticleID),
+        SIZE: String(item.Size),
+        QUANTITY: Number(item.QUANTITY),
+      }));
+
+    console.log('PackingEntries Payload:', packingEntriesPayload);
+
+    // =====================================================
+    //  FINAL PAYLOAD
+    // =====================================================
+    const payload = {
+      ...this.PackingData,
+
+      // COMPANY_ID: this.selected_Company_id,
+      ALIAS_NO: this.Alias_no,
+      PART_NO: this.Part_no,
+      ART_SERIAL: this.art_Serial_no,
+      COMBINATION: this.combinationString,
+      PAIR_QTY: this.totalQuantity,
+
+      // ✅ ADD BOM
+      BOM: bomPayload,
+
+      // ✅ ADD PACKING ENTRIES
+      PackingEntries: packingEntriesPayload,
+    };
+
+    console.log('FINAL INSERT PAYLOAD:', payload);
+
+    // =====================================================
+    //  ALIAS NO DUPLICATE CHECK (FIXED)
+    // =====================================================
+    const enteredAlias = String(payload.ALIAS_NO ?? '').trim();
+
+    console.log('Entered Alias:', enteredAlias);
+
+    const aliasDuplicate = (this.packing_list || []).some((item: any) => {
+      const existingAlias = String(item.AliasNo ?? '').trim();
+      console.log('Existing:', existingAlias, 'Entered:', enteredAlias);
+      return existingAlias === enteredAlias;
+    });
+
+    if (aliasDuplicate) {
+      notify(
+        {
+          message: `Alias No "${enteredAlias}" already exists.`,
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1200,
+        },
+        'error'
+      );
+      return;
+    }
+
+    // =====================================================
+    //  DUPLICATE CHECK
+    // =====================================================
+    const unitName = this.produCtionUnits.find(
+      (u) => u.ID === payload.UNIT_ID
+    )?.DESCRIPTION;
+
+    const categoryName = this.categoryList.find(
+      (u) => u.ID === payload.CATEGORY_ID
+    )?.DESCRIPTION;
+
+    const duplicate = this.packing_list.find(
+      (item: any) =>
+        item.PackingName === payload.DESCRIPTION &&
+        item.ArtNo === payload.ART_NO &&
+        item.Color === payload.COLOR &&
+        item.Category === categoryName &&
+        item.Unit === unitName
+    );
+
+    if (duplicate) {
+      notify(
+        {
+          message: 'This Packing Combination already exists.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 800,
+        },
+        'error'
+      );
+      return;
+    }
+
+    if (this.totalQuantity <= 1) {
+      notify(
+        {
+          message: 'Please add quantity.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 800,
+        },
+        'error'
+      );
+      return;
+    }
+    if (!Array.isArray(this.packing_list)) {
+      notify(
+        { message: 'Packing list not loaded yet', displayTime: 800 },
+        'warning'
+      );
+      return;
+    }
+
+    // =====================================================
+    //  API CALL
+    // =====================================================
+    this.dataService.Add_packages_listapi(payload).subscribe(
+      (response: any) => {
+        console.log('PACKING DATA ADDED SUCCESSFULLY', response);
+        console.log('BOM Payload:', bomPayload);
+
         notify(
           {
             message: 'Data successfully added',
@@ -949,8 +954,8 @@ if (aliasDuplicate) {
         );
       }
     );
-}
-  
+  }
+
   clearForm() {
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();

@@ -443,16 +443,15 @@ export class DataService {
   //.............................PRODUCTION JV...........................................................//
   getProductionJVList(items: any): Observable<any> {
     const data = items;
-    return this.http.post(
-      `${this.apiUrl}ArticleProduction/production-list`,
-      data
-    );
+    return this.http.post(`${this.apiUrl}Sync/production-list`, data);
   }
   selectProduction(id: number) {
-    return this.http.post<any>(
-      `${this.apiUrl}ArticleProduction/select/` + id,
-      {}
-    );
+    return this.http.post<any>(`${this.apiUrl}Sync/select/` + id, {});
+  }
+
+  getBoxProductionJVList(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Sync/boxlist`, data);
   }
 
   selectBoxProduction(id: number) {
@@ -737,6 +736,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Delivery_Note/list`, data);
   }
 
+  getdeliveryNoteViewist(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Sync/DNlist`, data);
+  }
+
   getDalesOrderListForDeliveryNote(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Delivery_Note/getso`, data);
   }
@@ -749,7 +753,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Delivery_Note/insert`, data);
   }
   selectDeliveryNote(id: number) {
-    return this.http.post<any>(`${this.apiUrl}Delivery_Note/select/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}Sync/dnselect/` + id, {});
   }
   updateDeliveryNote(items: any) {
     const data = items;
