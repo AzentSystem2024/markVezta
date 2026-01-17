@@ -184,7 +184,7 @@ export class ProductionJvListComponent {
 
     const api$ =
       this.selectedProductionType === 'BOX'
-        ? this.dataService.getBoxProductionJVList(payload)
+        ? this.dataService.getBoxProductionJVListView(payload)
         : this.dataService.getProductionJVList(payload);
 
     api$.subscribe((response: any) => {

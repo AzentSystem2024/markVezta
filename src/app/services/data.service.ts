@@ -446,20 +446,14 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Sync/production-list`, data);
   }
 
-    getArticleProductionJVList(items: any): Observable<any> {
+  getArticleProductionJVList(items: any): Observable<any> {
     const data = items;
-    return this.http.post(
-      `${this.apiUrl}ArticleProduction/articlelist`,
-      data
-    );
+    return this.http.post(`${this.apiUrl}ArticleProduction/articlelist`, data);
   }
 
-  getBoxProductionJVList(items: any): Observable<any> {
+  getBoxProductionJVListView(items: any): Observable<any> {
     const data = items;
-    return this.http.post(
-      `${this.apiUrl}BoxProduction/Packinglist`,
-      data
-    );
+    return this.http.post(`${this.apiUrl}BoxProduction/Packinglist`, data);
   }
 
   selectProduction(id: number) {
@@ -471,7 +465,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Sync/boxlist`, data);
   }
 
-   selectArticleProduction(id: number) {
+  selectArticleProduction(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}ArticleProduction/select/` + id,
       {}
@@ -3035,7 +3029,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
 
-    public getDropdownDataforBoxProduct(type: any): Observable<any> {
+  public getDropdownDataforBoxProduct(type: any): Observable<any> {
     const reqBodyData = { name: type };
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
@@ -6134,7 +6128,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-   //==============INSERT IN BOM PRODUCTION=================
+  //==============INSERT IN BOM PRODUCTION=================
   Insert_Bom_Production_Api(payload) {
     const getEndpoint = this.apiUrl + 'BoxProduction/insert';
     return this.http.post(getEndpoint, payload);
