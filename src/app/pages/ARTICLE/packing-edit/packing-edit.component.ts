@@ -373,6 +373,8 @@ export class PackingEditComponent {
     }
   }
 
+  
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['PackingData'] && changes['PackingData'].currentValue) {
       console.log('Received PackingData:', changes['PackingData'].currentValue);
@@ -394,7 +396,7 @@ export class PackingEditComponent {
               (entry) => entry.SIZE == size
             );
             return {
-              Size: size,
+              Size: (size),
               Qty: qty,
               ArticleID: articleEntry ? articleEntry.ARTICLE_ID : null,
             };
@@ -504,13 +506,12 @@ export class PackingEditComponent {
       PAIR_QTY: this.totalQuantity,
       // ✅ ADD BOM HERE
       BOM: bomPayload,
-      PackingEntries: this.articleSizeData
-        // .filter(item => Number(item.QUANTITY) > 0) // only include rows with quantity
-        .map((item) => ({
-          ARTICLE_ID: Number(item.ArticleID), // or whichever field holds article id
-          SIZE: String(item.Size),
-          QUANTITY: Number(item.Qty),
-        })),
+     PackingEntries: this.PackingEntriesData.map((item: any) => ({
+  ID: item.ID, // if exists
+  ARTICLE_ID: Number(item.ARTICLE_ID),
+  SIZE: String(item.SIZE),
+  QUANTITY: Number(item.QUANTITY),
+})),
     };
     console.log(this.articleSizeData, '========article size data=========');
     const unitName = this.produCtionUnits.find(
@@ -785,32 +786,68 @@ onQuantityChanged() {
 
   // }
 
-  onEditorPreparing(e: any) {
-    console.log(e, 'EDITOR PREPARING EVENT');
-    if (e.dataField === 'Qty' && e.row?.data) {
-      const rowData = e.row.data;
-      
-      const articleId = rowData.ArticleId || e.row.key?.ArticleId;
+onEditorPreparing(e: any) {
+  if (e.dataField === 'QUANTITY' && e.row?.data) {
+    e.editorOptions.onValueChanged = (args: any) => {
+      const newQty = Number(args.value) || 0;
 
-      if (!articleId) {
-        console.warn('ArticleId undefined during editor preparing', rowData);
-        return;
-      }
+      // ✅ 1. Update the grid row object
+      e.row.data.QUANTITY = newQty;
 
-      const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
-      console.log(sizeQtyString, 'SIZE QUANTITY STRING');
-
-      if (!this.combination_value.includes(sizeQtyString)) {
-        this.combination_value.push(sizeQtyString);
-      }
-
-      const validData = this.combination_value.filter(
-        (item) => !item.includes('undefined')
+      // ✅ 2. Ensure main datasource array is updated
+      const index = this.PackingEntriesData.findIndex(
+        (i: any) =>
+          i.ARTICLE_ID === e.row.data.ARTICLE_ID &&
+          i.SIZE === e.row.data.SIZE
       );
-      this.combinationString = validData.join(', ');
-      console.log('Combination String:', this.combinationString);
-    }
+
+      if (index !== -1) {
+        this.PackingEntriesData[index].QUANTITY = newQty;
+      }
+
+      // ✅ 3. Recalculate total
+      this.onQuantityChanged();
+
+      console.log(
+        'Updated PackingEntriesData:',
+        this.PackingEntriesData.map(
+          (i: any) => `${i.SIZE}x${i.QUANTITY}`
+        )
+      );
+    this.combinationString = String(this.PackingEntriesData.map(
+          (i: any) => `${i.SIZE}x${i.QUANTITY}`
+        ))
+    };
   }
+}
+
+
+  // onEditorPreparing(e: any) {
+  //   console.log(e, 'EDITOR PREPARING EVENT');
+  //   if (e.dataField === 'Qty' && e.row?.data) {
+  //     const rowData = e.row.data;
+      
+  //     const articleId = rowData.ArticleId || e.row.key?.ArticleId;
+
+  //     if (!articleId) {
+  //       console.warn('ArticleId undefined during editor preparing', rowData);
+  //       return;
+  //     }
+
+  //     const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
+  //     console.log(sizeQtyString, 'SIZE QUANTITY STRING');
+
+  //     if (!this.combination_value.includes(sizeQtyString)) {
+  //       this.combination_value.push(sizeQtyString);
+  //     }
+
+  //     const validData = this.combination_value.filter(
+  //       (item) => !item.includes('undefined')
+  //     );
+  //     this.combinationString = validData.join(', ');
+  //     console.log('Combination String:', this.combinationString);
+  //   }
+  // }
 }
 
 @NgModule({
