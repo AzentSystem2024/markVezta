@@ -5,7 +5,11 @@ import {
   NgModule,
   SimpleChanges,
 } from '@angular/core';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -37,7 +41,7 @@ import { DataService } from 'src/app/services';
 })
 export class GrnViewFormComponent {
   @Input() formdata: any;
-   @Input() grnId: any; 
+  @Input() grnId: any;
 
   financialYeaDate: string;
   selected_vat_id: any;
@@ -70,8 +74,8 @@ export class GrnViewFormComponent {
   landedCostList: any;
   width: any;
   pdfSrc: SafeResourceUrl | null = null;
-      isPdfPopupVisible: boolean = false;
-      
+  isPdfPopupVisible: boolean = false;
+
   costData: any = {
     ID: '',
     DESCRIPTION: '',
@@ -162,7 +166,11 @@ export class GrnViewFormComponent {
   newGrnData = this.grnData;
   getNewGrnData = () => ({ ...this.newGrnData });
 
-  constructor(private service: DataService, private ref: ChangeDetectorRef,private sanitizer: DomSanitizer) {
+  constructor(
+    private service: DataService,
+    private ref: ChangeDetectorRef,
+    private sanitizer: DomSanitizer,
+  ) {
     this.today = new Date();
     const settingsData = sessionStorage.getItem('settings');
     const data = settingsData ? JSON.parse(settingsData) : null;
@@ -192,16 +200,18 @@ export class GrnViewFormComponent {
   selectedPONo: any;
 
   getPODetails(poId: any) {
-    this.service.getGrnPoDetails(poId, this.selected_Company_id).subscribe((res: any) => {
-      console.log(res, 'res');
-      this.poDetails = res.Podetails.map((item: any, index: number) => ({
-        ...item,
-        SL_NO: index + 1, // Add SL_NO property dynamically
-        QTY_TO_RECEIVE: item.PO_QUANTITY - item.RETURN_QTY_QTY,
-        SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
-      }));
-      console.log(this.poDetails, 'Updated poDetails with SL_NO');
-    });
+    this.service
+      .getGrnPoDetails(poId, this.selected_Company_id)
+      .subscribe((res: any) => {
+        console.log(res, 'res');
+        this.poDetails = res.Podetails.map((item: any, index: number) => ({
+          ...item,
+          SL_NO: index + 1, // Add SL_NO property dynamically
+          QTY_TO_RECEIVE: item.PO_QUANTITY - item.RETURN_QTY_QTY,
+          SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
+        }));
+        console.log(this.poDetails, 'Updated poDetails with SL_NO');
+      });
     this.newGrnData.SUPP_GROSS_AMOUNT = this.poDetails[0].SUPP_GROSS_AMOUNT;
     this.newGrnData.SUPP_NET_AMOUNT = this.poDetails[0].SUPP_NET_AMOUNT;
   }
@@ -213,21 +223,21 @@ export class GrnViewFormComponent {
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
     console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
     console.log(
       this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[['
+      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
     );
     this.formatted_from_date = this.financialYeaDate;
 
@@ -282,14 +292,14 @@ export class GrnViewFormComponent {
 
       // Filter out COST_IDs that already exist in this.newGrnData.GRN_Cost
       const existingCostIds = this.newGrnData.GRN_Cost.map(
-        (cost: any) => cost.COST_ID
+        (cost: any) => cost.COST_ID,
       );
 
       console.log(existingCostIds, 'existingCostIds');
 
       // Filter the data from formdata.GRN_Cost excluding the COST_IDs already present in newGrnData.GRN_Cost
       const filteredGRNCost = landedCostDropDown.filter(
-        (cost: any) => !existingCostIds.includes(cost.ID)
+        (cost: any) => !existingCostIds.includes(cost.ID),
       );
 
       this.landedCostDropDown = filteredGRNCost;
@@ -339,7 +349,7 @@ export class GrnViewFormComponent {
 
       // Check if the costData already exists in costingMethodDataGrid
       const isExistingCost = this.costingMethodDataGrid.some(
-        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION
+        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION,
       );
 
       if (isExistingCost) {
@@ -359,7 +369,7 @@ export class GrnViewFormComponent {
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          2000
+          2000,
         );
         return; // Exit the function
       }
@@ -375,7 +385,7 @@ export class GrnViewFormComponent {
 
       // Check if the description already exists in dynamicColumns
       const existingDescriptions = this.dynamicColumns.map(
-        (col: any) => col.dataField
+        (col: any) => col.dataField,
       );
 
       // Push only new descriptions to dynamicColumns
@@ -416,7 +426,7 @@ export class GrnViewFormComponent {
       this.ref.detectChanges();
     } else {
       console.error(
-        'Invalid costData. Ensure all required fields are populated.'
+        'Invalid costData. Ensure all required fields are populated.',
       );
     }
   }
@@ -465,7 +475,7 @@ export class GrnViewFormComponent {
     // Update this.newGrnData.GRN_Cost with grnCost
     grnCost.forEach((newCost: any) => {
       const existingIndex = this.newGrnData.GRN_Cost.findIndex(
-        (cost: any) => cost.COST_ID === newCost.COST_ID
+        (cost: any) => cost.COST_ID === newCost.COST_ID,
       );
 
       if (existingIndex > -1) {
@@ -483,7 +493,7 @@ export class GrnViewFormComponent {
     this.newGrnData.GRNDetails.forEach((detail: any) => {
       // Find the matching entry in poDetails
       const matchingPoDetail = this.poDetails.find(
-        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID
+        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID,
       );
 
       if (matchingPoDetail) {
@@ -511,7 +521,7 @@ export class GrnViewFormComponent {
 
         // Filter all matching rows in poDetails using the description
         const matchingRows = this.poDetails.filter((poRow: any) =>
-          Object.keys(poRow).some((key) => key.toUpperCase() === description)
+          Object.keys(poRow).some((key) => key.toUpperCase() === description),
         );
 
         console.log(matchingRows, 'Matching Rows');
@@ -522,7 +532,7 @@ export class GrnViewFormComponent {
             const existingEntry = this.newGrnData.GRN_Item_Cost.find(
               (item: any) =>
                 item.DESCRIPTION.toUpperCase() === description &&
-                item.ITEM_ID === matchingRow.ITEM_ID // Match with the description heading
+                item.ITEM_ID === matchingRow.ITEM_ID, // Match with the description heading
             );
 
             if (existingEntry) {
@@ -533,7 +543,7 @@ export class GrnViewFormComponent {
               existingEntry.AMOUNT = matchingRow[description]; // Update AMOUNT using the description key
             } else {
               console.warn(
-                `No existing entry found in GRN_Item_Cost for DESCRIPTION: ${description}`
+                `No existing entry found in GRN_Item_Cost for DESCRIPTION: ${description}`,
               );
 
               this.newGrnData.GRN_Item_Cost.push({
@@ -549,7 +559,7 @@ export class GrnViewFormComponent {
           });
         } else {
           console.log(
-            `No matching rows found in poDetails for description: ${description}`
+            `No matching rows found in poDetails for description: ${description}`,
           );
         }
       });
@@ -563,7 +573,7 @@ export class GrnViewFormComponent {
   getTotalQuantity(): any {
     return this.poDetails.reduce(
       (total, item) => total + (item.QUANTITY || 0),
-      0
+      0,
     );
   }
 
@@ -576,8 +586,8 @@ export class GrnViewFormComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['grnId'] && changes['grnId'].currentValue) {
-    console.log("Received GRN ID:", this.grnId);
-  }
+      console.log('Received GRN ID:', this.grnId);
+    }
     if (changes.formdata && changes.formdata.currentValue) {
       console.log(this.formdata, 'formdata');
 
@@ -638,7 +648,7 @@ export class GrnViewFormComponent {
 
       this.poDetails = this.processPoDetails(
         this.poDetails,
-        this.newGrnData.GRN_Item_Cost
+        this.newGrnData.GRN_Item_Cost,
       );
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
@@ -651,7 +661,6 @@ export class GrnViewFormComponent {
         }, 0)
         .toFixed(2);
 
-  
       // this.newGrnData.GRNDetails= this.poDetails.map((item) => ({
       //   ID:item.ID,
       //   COMPANY_ID: 1, // Static value or dynamically set if needed
@@ -710,9 +719,9 @@ export class GrnViewFormComponent {
       const uniqueDescriptions = Array.from(
         new Set(
           this.newGrnData.GRN_Item_Cost.map((cost) =>
-            cost.DESCRIPTION.toUpperCase()
-          )
-        )
+            cost.DESCRIPTION.toUpperCase(),
+          ),
+        ),
       );
 
       // Step 2: Generate dynamic columns based on unique DESCRIPTION values
@@ -731,7 +740,7 @@ export class GrnViewFormComponent {
   getCostsForItem(itemId: string) {
     console.log(itemId, ':::::::::');
     const data = this.newGrnData.GRN_Item_Cost.filter(
-      (cost) => cost.ITEM_ID === itemId
+      (cost) => cost.ITEM_ID === itemId,
     );
     console.log(data, '11111111111111111111111111111111111111111');
     return data;
@@ -746,7 +755,7 @@ export class GrnViewFormComponent {
     const updatedPoDetails = poDetails.map((poDetail) => {
       // Find matching costs for the ITEM_ID
       const itemCosts = grnItemCost.filter(
-        (cost) => cost.ITEM_ID === poDetail.ITEM_ID
+        (cost) => cost.ITEM_ID === poDetail.ITEM_ID,
       );
 
       // Add cost fields dynamically
@@ -835,160 +844,169 @@ export class GrnViewFormComponent {
     this.isCostPopUpOpened = false;
   }
 
-   viewPdf(): void {
-  console.log(this.grnId, "ID received in viewPdf()");
-
-  this.isPdfPopupVisible = true;
-
- this.service.selectGrnData(this.grnId).subscribe((res) => {
-    console.log(res, "Selected response");
-
-    if (res) {
-      this.pdfSrc = this.get_pdf(res);
+  onEditorPreparing(e: any) {
+    if (e.dataField === 'RECEIVED_QTY') {
+      e.editorOptions.readOnly = true;
+      e.cancel = true;
     }
-  });
-}
+  }
 
-get_pdf(data: any): SafeResourceUrl {
- const doc = new jsPDF("p", "mm", "a4");
-   const pageWidth = doc.internal.pageSize.width;
-   const margin = 12;
-   let y = 12;
- 
-   // ===========================
-   //  HEADER - COMPANY DETAILS
-   // ===========================
-   doc.setFont("helvetica", "bold").setFontSize(12);
-   doc.text(data.COMPANY_NAME || "RADIANT MOULDS & COMPOUNDS", margin, y);
- 
-   doc.setFont("helvetica", "normal").setFontSize(10);
-   y += 6;
-   doc.text(data.ADDRESS1 || "43/981, Rahiman Bazar", margin, y);
-   y += 5;
-   doc.text(data.ADDRESS2 || "Cheruvannur", margin, y);
-   y += 5;
-   doc.text(data.ADDRESS3 || "Calicut - 673655, Kerala, India", margin, y);
-   y += 5;
- 
-   doc.text("Mob :", margin, y);
-   doc.text(data.CONTACT_MOBILE || "0495-2421733", margin + 18, y);
-   y += 5;
-   doc.text("Email :", margin, y);
-   doc.text(data.EMAIL || "enquiry@mmarkgroup.com", margin +18, y);
- 
-   // Horizontal Line
-   y += 8;
-   doc.setLineWidth(0.5);
-   doc.line(margin, y, pageWidth - margin, y);
+  viewPdf(): void {
+    console.log(this.grnId, 'ID received in viewPdf()');
 
-   // ===========================
-  //  TITLE - LOCAL PURCHASE ORDER
-  // ===========================
-  y += 10;
-  doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text("GOOD RECEIPT NOTE", pageWidth / 2, y, { align: "center" });
+    this.isPdfPopupVisible = true;
 
- // ===========================
-  //  TWO COLUMN MAIN DETAILS
-  // ===========================
-  y += 12;
-  doc.setFontSize(10);
+    this.service.selectGrnData(this.grnId).subscribe((res) => {
+      console.log(res, 'Selected response');
 
-  const leftX = margin;
-  const rightX = pageWidth / 2 + 5;
+      if (res) {
+        this.pdfSrc = this.get_pdf(res);
+      }
+    });
+  }
 
-  doc.text("Supplier :", leftX, y);
-  doc.text(data.SUPPPLIER_NAME || "", leftX + 25, y);
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
 
-  doc.text("LPO NO. :", rightX, y);
-  doc.text(data.PO_NO || "", rightX + 30, y);
+    // ===========================
+    //  HEADER - COMPANY DETAILS
+    // ===========================
+    doc.setFont('helvetica', 'bold').setFontSize(12);
+    doc.text(data.COMPANY_NAME || 'RADIANT MOULDS & COMPOUNDS', margin, y);
 
-  y += 8;
-  doc.text("Tel :", leftX, y);
-  doc.text(data.SUPP_NAME || "", leftX + 25, y);
+    doc.setFont('helvetica', 'normal').setFontSize(10);
+    y += 6;
+    doc.text(data.ADDRESS1 || '43/981, Rahiman Bazar', margin, y);
+    y += 5;
+    doc.text(data.ADDRESS2 || 'Cheruvannur', margin, y);
+    y += 5;
+    doc.text(data.ADDRESS3 || 'Calicut - 673655, Kerala, India', margin, y);
+    y += 5;
 
-  doc.text("Date :", rightX, y);
-  doc.text(data.GRN_DATE || "", rightX + 30, y);
+    doc.text('Mob :', margin, y);
+    doc.text(data.CONTACT_MOBILE || '0495-2421733', margin + 18, y);
+    y += 5;
+    doc.text('Email :', margin, y);
+    doc.text(data.EMAIL || 'enquiry@mmarkgroup.com', margin + 18, y);
 
-  y += 8;
-  doc.text("Fax :", leftX, y);
-  doc.text(data.SUPP_ADDRESS || "", leftX + 25, y);
+    // Horizontal Line
+    y += 8;
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
 
-  // ===========================
+    // ===========================
+    //  TITLE - LOCAL PURCHASE ORDER
+    // ===========================
+    y += 10;
+    doc.setFont('helvetica', 'bold').setFontSize(14);
+    doc.text('GOOD RECEIPT NOTE', pageWidth / 2, y, { align: 'center' });
+
+    // ===========================
+    //  TWO COLUMN MAIN DETAILS
+    // ===========================
+    y += 12;
+    doc.setFontSize(10);
+
+    const leftX = margin;
+    const rightX = pageWidth / 2 + 5;
+
+    doc.text('Supplier :', leftX, y);
+    doc.text(data.SUPPPLIER_NAME || '', leftX + 25, y);
+
+    doc.text('LPO NO. :', rightX, y);
+    doc.text(data.PO_NO || '', rightX + 30, y);
+
+    y += 8;
+    doc.text('Tel :', leftX, y);
+    doc.text(data.SUPP_NAME || '', leftX + 25, y);
+
+    doc.text('Date :', rightX, y);
+    doc.text(data.GRN_DATE || '', rightX + 30, y);
+
+    y += 8;
+    doc.text('Fax :', leftX, y);
+    doc.text(data.SUPP_ADDRESS || '', leftX + 25, y);
+
+    // ===========================
     // ITEMS TABLE
     // ===========================
     y += 15;
-  
+
     const itemRows =
       data.GRNDetails?.map((item: any, i: number) => [
         i + 1,
-        item.ITEM_CODE || "",
-        item.ITEM_NAME || "",
-        item.SUPP_PRICE || "",
-        item.PO_QUANTITY || "",
-        item.UOM || "",
-        item.GRN_QUANTITY || "",
-        item.RECEIVED_QTY || "",
+        item.ITEM_CODE || '',
+        item.ITEM_NAME || '',
+        item.SUPP_PRICE || '',
+        item.PO_QUANTITY || '',
+        item.UOM || '',
+        item.GRN_QUANTITY || '',
+        item.RECEIVED_QTY || '',
         item.SUPP_AMOUNT || 0,
         item.SUPP_PRICE || 0,
       ]) || [];
-  
+
     autoTable(doc, {
       startY: y,
-      theme: "grid",
-      headStyles: { fillColor: [230, 230, 230],textColor: 0, fontSize: 9, halign: "center" },
-      styles: { fontSize: 9, valign: "middle", cellPadding: 2 },
+      theme: 'grid',
+      headStyles: {
+        fillColor: [230, 230, 230],
+        textColor: 0,
+        fontSize: 9,
+        halign: 'center',
+      },
+      styles: { fontSize: 9, valign: 'middle', cellPadding: 2 },
       margin: { left: margin, right: margin },
       head: [
         [
-          "Sl#",
-          "Item Code",
-          "Description",
-          "Price",
-          "Qty in PO",
-          "Purch UOM",
-          "Recieved to Date",
-          "Qty Received",
-          "Amount",
-          "Unit Cost"
-        ]
+          'Sl#',
+          'Item Code',
+          'Description',
+          'Price',
+          'Qty in PO',
+          'Purch UOM',
+          'Recieved to Date',
+          'Qty Received',
+          'Amount',
+          'Unit Cost',
+        ],
       ],
-      body: itemRows
+      body: itemRows,
     });
-  
+
     y = (doc as any).lastAutoTable.finalY + 10;
-  
+
     // ===========================
     //  TOTAL SECTION (Bottom Right)
     // ===========================
-    doc.setFont("helvetica", "bold").setFontSize(11);
-  
+    doc.setFont('helvetica', 'bold').setFontSize(11);
+
     const amtX = pageWidth - margin - 50;
-    doc.text("Total Amount :", amtX, y);
+    doc.text('Total Amount :', amtX, y);
     doc.text(String(data.NET_AMOUNT || 0), amtX + 35, y);
-  
+
     // ===========================
-  //  FOOTER (E & OE + SIGNATORY)
-  // ===========================
-  
-  y += 20; // spacing after total
-  
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  
-  // Left side – E & OE
-  doc.text("E & OE", margin, y);
-  
-  // Right side – Authorised Signatory
-  doc.text("Authorised Signatory", pageWidth - margin - 40, y);
-  
+    //  FOOTER (E & OE + SIGNATORY)
+    // ===========================
 
-   
+    y += 20; // spacing after total
 
-  // -------------------- EXPORT --------------------
-  const pdfBlob = doc.output('blob');
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
-}
+    doc.setFont('helvetica', 'bold').setFontSize(10);
+
+    // Left side – E & OE
+    doc.text('E & OE', margin, y);
+
+    // Right side – Authorised Signatory
+    doc.text('Authorised Signatory', pageWidth - margin - 40, y);
+
+    // -------------------- EXPORT --------------------
+    const pdfBlob = doc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+  }
 }
 
 @NgModule({

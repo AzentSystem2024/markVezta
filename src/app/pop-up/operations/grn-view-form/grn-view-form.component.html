@@ -142,7 +142,7 @@
     [columnAutoWidth]="true"
     (onContentReady)="onGrnContentReady($event)"
   >
-    <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
+    <dxo-editing mode="cell" [allowUpdating]="false"></dxo-editing>
 
     <dxi-column
       caption="SL NO"
@@ -212,7 +212,7 @@
       dataField="RECEIVED_QTY"
       [width]="cwidth"
       caption="QTY RECEIVED"
-      [allowEditing]="false"
+      [editorOptions]="{ readOnly: true }"
       alignment="center"
     ></dxi-column>
     <dxi-column
