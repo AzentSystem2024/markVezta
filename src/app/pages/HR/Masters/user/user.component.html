@@ -45,6 +45,56 @@
 
     <dxo-toolbar>
       <dxi-item location="before">
+        <div class="grid-header">User</div>
+      </dxi-item>
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="{
+          icon: 'search',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'contained',
+          elementAttr: { class: 'toolbar-icon-btn' },
+        }"
+      ></dxi-item>
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="{
+          icon: 'refresh',
+          onClick: refresh,
+          hint: 'Refresh',
+          stylingMode: 'contained',
+          elementAttr: { class: 'toolbar-icon-btn' },
+        }"
+      ></dxi-item>
+
+      <!-- Search -->
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="toolbar-icon-btn export-btn"
+      ></dxi-item>
+
+      <!-- Add -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        *ngIf="canAdd"
+        [options]="addButtonOptions"
+      ></dxi-item>
+    </dxo-toolbar>
+
+    <!-- <dxo-toolbar>
+      <dxi-item location="before">
         <div
           class="grid-header"
           style="
@@ -69,7 +119,7 @@
           icon: 'refresh',
           onClick: refresh,
           stylingMode: 'text',
-          hint: 'refresh'
+          hint: 'refresh',
         }"
       ></dxi-item>
 
@@ -83,7 +133,7 @@
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
           stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
+          elementAttr: { class: 'commonButtons' },
         }"
       ></dxi-item>
 
@@ -98,7 +148,7 @@
         *ngIf="canAdd"
         [options]="addButtonOptions"
       ></dxi-item>
-    </dxo-toolbar>
+    </dxo-toolbar> -->
 
     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>

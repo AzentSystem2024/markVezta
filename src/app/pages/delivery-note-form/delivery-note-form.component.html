@@ -20,7 +20,7 @@
             mode: 'cell',
             allowAdding: true,
             allowUpdating: true,
-            allowDeleting: !isReadOnlyMode
+            allowDeleting: !isReadOnlyMode,
           }"
           (onInitNewRow)="onInitNewRow($event)"
           (onRowUpdated)="onRowUpdated($event)"
@@ -84,7 +84,14 @@
                     margin-top: -5px;
                   "
                 >
-                  <dx-select-box
+                  <dx-text-box
+                    [(value)]="deliveryFormData.COMPANY_NAME"
+                    label="Company"
+                    labelMode="floating"
+                    [width]="200"
+                    [readOnly]="isReadOnlyMode"
+                  ></dx-text-box>
+                  <!-- <dx-select-box
                     [(value)]="deliveryFormData.CUST_ID"
                     [dataSource]="customerList"
                     displayExpr="DESCRIPTION"
@@ -95,7 +102,7 @@
                     labelMode="floating"
                     [readOnly]="isReadOnlyMode"
                     (onValueChanged)="customerChanged($event)"
-                  ></dx-select-box>
+                  ></dx-select-box> -->
 
                   <!-- Plus Button (now aligned to the right of Customer select) -->
                 </div>
@@ -264,8 +271,8 @@
                   isReadOnlyMode
                     ? 'PDF'
                     : deliveryFormData.IS_APPROVED
-                    ? 'Commit'
-                    : 'Save'
+                      ? 'Commit'
+                      : 'Save'
                 "
                 (onClick)="isReadOnlyMode ? openPDF() : saveDeliveryNote()"
                 stylingMode="contained"

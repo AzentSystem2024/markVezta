@@ -265,11 +265,29 @@ export class GrnViewFormComponent {
   //     this.filteredPOList = this.poList.filter(po => po.SUPP_ID === supplierid);
   //   }
   // }
+
   getSupplierData() {
     this.service.getDropdownData('SUPPLIER').subscribe((res) => {
       this.supplierList = res;
+
+      // ✅ Force rebind AFTER datasource is ready
+      if (this.newGrnData?.SUPP_ID) {
+        const suppId = this.newGrnData.SUPP_ID;
+        this.newGrnData.SUPP_ID = null;
+
+        setTimeout(() => {
+          this.newGrnData.SUPP_ID = suppId;
+          this.ref.detectChanges();
+        });
+      }
     });
   }
+
+  // getSupplierData() {
+  //   this.service.getDropdownData('SUPPLIER').subscribe((res) => {
+  //     this.supplierList = res;
+  //   });
+  // }
 
   getStoreData() {
     this.service.getDropdownData('STORE').subscribe((res) => {
@@ -640,7 +658,11 @@ export class GrnViewFormComponent {
         SL_NO: index + 1, // Add SL_NO starting from 1
         QTY_TO_RECEIVE: item.PO_QUANTITY - item.GRN_QUANTITY,
         SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
-        QTY_BASE_UNIT: `${item.RECEIVED_QTY / item.UOM_MULTIPLE} ${item.UOM}`,
+        // QTY_BASE_UNIT: `${item.RECEIVED_QTY / item.UOM_MULTIPLE} ${item.UOM}`,
+        QTY_BASE_UNIT: item.UOM_MULTIPLE
+          ? `${item.RECEIVED_QTY / item.UOM_MULTIPLE} ${item.UOM}`
+          : `${item.RECEIVED_QTY} ${item.UOM}`,
+
         DESCRIPTION: item.ITEM_NAME,
       }));
 
@@ -693,7 +715,9 @@ export class GrnViewFormComponent {
         AMOUNT: parseFloat(item.AMOUNT),
         PRICE: Number(item.PRICE),
         DISC_PERCENT: Number(item.DISC_PERCENT),
-        QTY_BASE_UNIT: Number(item.QTY_BASE_UNIT),
+        // QTY_BASE_UNIT: Number(item.QTY_BASE_UNIT),
+        QTY_BASE_UNIT: item.QTY_BASE_UNIT,
+
         SUPP_PRICE: Number(item.SUPP_PRICE),
         SUPP_AMOUNT: Number(item.SUPP_AMOUNT),
 

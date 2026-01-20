@@ -125,14 +125,14 @@ export class DeliveryNoteComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax()
@@ -168,25 +168,35 @@ export class DeliveryNoteComponent {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
+
     this.dataService
       .getdeliveryNoteViewist(payload)
       .subscribe((response: any) => {
         this.deliveryNoteList = response.Data.map((item: any) => {
           let dateValue: Date;
 
-          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-          if (!isNaN(Date.parse(item.DN_DATE))) {
+          // Handle dd-MM-yyyy format ONLY
+          if (
+            typeof item.DN_DATE === 'string' &&
+            /^\d{2}-\d{2}-\d{4}$/.test(item.DN_DATE)
+          ) {
+            const [day, month, year] = item.DN_DATE.split('-').map(Number);
+            dateValue = new Date(year, month - 1, day);
+          }
+          // Handle ISO date or Date object
+          else {
             dateValue = new Date(item.DN_DATE);
-          } else {
-            // Case 2: If backend gives dd-MM-yyyy format
-            dateValue = this.parseDateString(item.DN_DATE);
           }
 
           return {
             ...item,
             DN_DATE: dateValue,
           };
-        }).sort((a: any, b: any) => Number(b.DN_NO) - Number(a.DN_NO));
+        }).sort((a: any, b: any) => {
+          const numA = parseInt(a.DN_NO.split('/').pop(), 10);
+          const numB = parseInt(b.DN_NO.split('/').pop(), 10);
+          return numB - numA; // descending order
+        });
 
         this.applyDateFilter();
       });
@@ -305,7 +315,7 @@ export class DeliveryNoteComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -398,7 +408,7 @@ export class DeliveryNoteComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -465,7 +475,7 @@ export class DeliveryNoteComponent {
               message: 'Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getDeliveryNotes();
           // this.dataGrid.instance.refresh();
@@ -475,14 +485,14 @@ export class DeliveryNoteComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

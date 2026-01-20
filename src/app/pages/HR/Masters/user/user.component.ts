@@ -38,27 +38,31 @@ import { FormBuilder } from '@angular/forms';
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
-  styleUrls: ['./user.component.scss']
+  styleUrls: ['./user.component.scss'],
 })
 export class UserComponent {
-@ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
 
   @ViewChild(UserNewFormComponent, { static: false })
   userNewForm: UserNewFormComponent;
 
-    @ViewChild(UserEditFormComponent, { static: false })
+  @ViewChild(UserEditFormComponent, { static: false })
   userEditForm: UserEditFormComponent;
   DataSource: any;
   userList: any;
 
-constructor(private fb: FormBuilder, private dataservice: DataService , private cdr: ChangeDetectorRef,private ngZone: NgZone,private router : Router) {
- 
-}
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private router: Router,
+  ) {}
 
   selectedData: any;
   popupwidth: any = '75%';
-UserListDatasource : any
+  UserListDatasource: any;
   isAddFormPopupOpened: boolean = false;
   isEditPopupOpened: boolean = false;
   selectedRowData: any;
@@ -73,19 +77,40 @@ UserListDatasource : any
   canDelete = false;
   canApprove = false;
   canPrint = false;
-
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.show_new_Form());
     },
-    elementAttr: { class: 'add-button' }
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
+
+  // addButtonOptions = {
+  //   text: 'New',
+  //   icon: 'bi bi-file-earmark-plus',
+  //   type: 'default',
+  //   stylingMode: 'contained',
+  //   hint: 'Add new entry',
+  //   onClick: () => {
+  //     // Run inside Angular's zone
+  //     this.ngZone.run(() => this.show_new_Form());
+  //   },
+  //   elementAttr: { class: 'add-button' }
+  // };
 
   isFilterRowVisible: boolean = false;
   currentPathName: string;
@@ -97,22 +122,22 @@ UserListDatasource : any
   };
 
   //=================== Page refreshing==========================
-   refresh = () => {
+  refresh = () => {
     this.dataGrid.instance.refresh();
   };
 
-datasource = new DataSource<any>({
+  datasource = new DataSource<any>({
     load: () =>
       new Promise((resolve, reject) => {
         this.dataservice.get_User_data().subscribe({
           next: (data: any) => {
-                    // add serial number before resolving
-          const dataWithSlNo = data.Data.map((item: any, index: number) => ({
-            ...item,
-            SlNo: index + 1   // serial number
-          }));
+            // add serial number before resolving
+            const dataWithSlNo = data.Data.map((item: any, index: number) => ({
+              ...item,
+              SlNo: index + 1, // serial number
+            }));
 
-          resolve(dataWithSlNo); 
+            resolve(dataWithSlNo);
             // resolve(data.Data);
             // console.log(data.Data);
           },
@@ -121,72 +146,71 @@ datasource = new DataSource<any>({
       }),
   });
 
-
   isDeleteIconVisible({ row }: { row: any }): boolean {
     return row.data.UserRoleName !== 'Administrator';
   }
 
   show_new_Form() {
-   this.isAddFormPopupOpened = true;
+    this.isAddFormPopupOpened = true;
   }
 
   onEditingRow(event): void {
     event.cancel = true;
-     this.selectedRowData = event.data;
+    this.selectedRowData = event.data;
     const ID = event.data.ID;
     this.isEditPopupOpened = true;
-    this.dataservice.get_User_Data_By_Id(ID).subscribe((res:any) => {
-      
+    this.dataservice.get_User_Data_By_Id(ID).subscribe((res: any) => {
       this.selectedRowData = res.Data[0];
-      console.log(this.selectedRowData,'selectedrowdata')
+      console.log(this.selectedRowData, 'selectedrowdata');
       this.cdr.detectChanges(); // Ensure Angular picks up the change
     });
   }
 
-    ngOnInit(){
-const currentUrl = this.router.url;
-  console.log('Current URL:', currentUrl);
-   const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
-  console.log('Parsed ObjectData:', menuResponse);
+  ngOnInit() {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
 
-  const menuGroups = menuResponse.MenuGroups || [];
-  console.log('MenuGroups:', menuGroups);
-const packingRights = menuGroups
-  .flatMap(group => group.Menus)
-  .find(menu => menu.Path === '/user');
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/user');
 
-if (packingRights) {
-  this.canAdd = packingRights.CanAdd;
-  this.canEdit = packingRights.CanEdit;
-  this.canDelete = packingRights.CanDelete;
-    this.canPrint = packingRights.CanEdit;
-  this.canView = packingRights.canView;
-   this.canApprove = packingRights.canApprove;
-}
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
 
-console.log('packingRights',packingRights);
-console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
-
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
   onClickSaveNewData() {
     const data = this.userNewForm.getNewUserData();
-    console.log(data,"PAYLOAD IN SAVE")
+    console.log(data, 'PAYLOAD IN SAVE');
 
-// const loginName = data.LOGIN_NAME?.toString().trim().toLowerCase();
+    // const loginName = data.LOGIN_NAME?.toString().trim().toLowerCase();
 
-//   // ✅ Defensive check
-//   if (!loginName) {
-//     notify(
-//       {
-//         message: 'Login Name is required',
-//         position: { at: 'top right', my: 'top right' },
-//         displayTime: 1000,
-//       },
-//       'error'
-//     );
-//     return;
-//   }
+    //   // ✅ Defensive check
+    //   if (!loginName) {
+    //     notify(
+    //       {
+    //         message: 'Login Name is required',
+    //         position: { at: 'top right', my: 'top right' },
+    //         displayTime: 1000,
+    //       },
+    //       'error'
+    //     );
+    //     return;
+    //   }
 
     this.dataservice.insert_User_Data(data).subscribe((res: any) => {
       try {
@@ -197,7 +221,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
         }
@@ -208,64 +232,61 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'error'
+          'error',
         );
       }
     });
-    this.isAddFormPopupOpened = false
-    this.loadUserDataSource()   //call the reload datasource function after inserting data
-
+    this.isAddFormPopupOpened = false;
+    this.loadUserDataSource(); //call the reload datasource function after inserting data
   }
 
-   onRowUpdating() {
-  //   const data = this.userEditForm.getEditUserData();
-  //   console.log(data,"PAYLOAD IN SAVE")
-  //   this.dataservice.update_User_Data(data).subscribe((res: any) => {
-  //     console.log(data,'data');
-      
-  //     try {
-  //       if (res.message === 'Success') {
-  //         notify(
-  //           {
-  //             message: 'data saved successfully',
-  //             position: { at: 'top right', my: 'top right' },
-  //             displayTime: 500,
-  //           },
-  //           'success'
-  //         );
-  //         this.dataGrid.instance.refresh();
-  //       }
-  //     } catch (error) {
-  //       notify(
-  //         {
-  //           message: 'save operation failed',
-  //           position: { at: 'top right', my: 'top right' },
-  //           displayTime: 500,
-  //         },
-  //         'error'
-  //       );
-  //     }
-  //   });
-  //   this.isAddFormPopupOpened = false
-  //   this.loadUserDataSource()   //call the reload datasource function after inserting data
-  //   this.isEditPopupOpened = false
+  onRowUpdating() {
+    //   const data = this.userEditForm.getEditUserData();
+    //   console.log(data,"PAYLOAD IN SAVE")
+    //   this.dataservice.update_User_Data(data).subscribe((res: any) => {
+    //     console.log(data,'data');
+    //     try {
+    //       if (res.message === 'Success') {
+    //         notify(
+    //           {
+    //             message: 'data saved successfully',
+    //             position: { at: 'top right', my: 'top right' },
+    //             displayTime: 500,
+    //           },
+    //           'success'
+    //         );
+    //         this.dataGrid.instance.refresh();
+    //       }
+    //     } catch (error) {
+    //       notify(
+    //         {
+    //           message: 'save operation failed',
+    //           position: { at: 'top right', my: 'top right' },
+    //           displayTime: 500,
+    //         },
+    //         'error'
+    //       );
+    //     }
+    //   });
+    //   this.isAddFormPopupOpened = false
+    //   this.loadUserDataSource()   //call the reload datasource function after inserting data
+    //   this.isEditPopupOpened = false
   }
- 
+
   //=========Reload the datasource after inserting data
   loadUserDataSource() {
-  this.datasource = new DataSource<any>({
-    load: () =>
-      new Promise((resolve, reject) => {
-        this.dataservice.get_User_data().subscribe({
-          next: (data: any) => {
-            resolve(data.Data);
-          },
-          error: (error) => reject(error.message),
-        });
-      }),
-  });
-}
-
+    this.datasource = new DataSource<any>({
+      load: () =>
+        new Promise((resolve, reject) => {
+          this.dataservice.get_User_data().subscribe({
+            next: (data: any) => {
+              resolve(data.Data);
+            },
+            error: (error) => reject(error.message),
+          });
+        }),
+    });
+  }
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -273,7 +294,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     this.dataservice.exportDataGrid(event, fileName);
   }
 
-   onClearData() {
+  onClearData() {
     this.userNewForm.clearData();
   }
 
@@ -288,7 +309,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
         this.dataGrid.instance.refresh();
       } catch (error) {
@@ -298,7 +319,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'error'
+          'error',
         );
       }
       event.component.refresh();
@@ -306,7 +327,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     });
   }
 
-statusCellTemplate = (cellElement: any, cellInfo: any) => {
+  statusCellTemplate = (cellElement: any, cellInfo: any) => {
     const status = cellInfo.value; // Get the value from `calculateCellValue`
 
     // Determine background color and display text based on the status
@@ -334,18 +355,16 @@ statusCellTemplate = (cellElement: any, cellInfo: any) => {
     return IS_INACTIVE ? 'flag-red' : 'flag-green';
   }
 
-get_userlist(){
-    this.dataservice.get_User_data().subscribe((res:any)=>{
+  get_userlist() {
+    this.dataservice.get_User_data().subscribe((res: any) => {
       console.log(res);
-
-      
-    })
+    });
   }
-  
+
   CloseEditForm() {
     this.isEditPopupOpened = false;
-    
-    this.get_userlist()
+
+    this.get_userlist();
     // this.getUSerData();
     this.dataGrid.instance.refresh();
   }

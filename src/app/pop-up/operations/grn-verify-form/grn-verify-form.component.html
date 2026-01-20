@@ -140,6 +140,7 @@
     class="custom-data-grid"
     [columnAutoWidth]="true"
     (onContentReady)="onGrnContentReady($event)"
+    (onEditorPreparing)="onEditorPreparing($event)"
   >
     <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
 

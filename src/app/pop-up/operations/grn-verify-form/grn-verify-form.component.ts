@@ -162,7 +162,10 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
   // getNewGrnData = () => ({ ...this.newGrnData });
 
-  constructor(private service: DataService, private ref: ChangeDetectorRef) {
+  constructor(
+    private service: DataService,
+    private ref: ChangeDetectorRef,
+  ) {
     const settingsData = sessionStorage.getItem('settings');
     const data = settingsData ? JSON.parse(settingsData) : null;
     // Access CURRENCY_ID
@@ -174,8 +177,8 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   highlightEditableColumns(event: any) {
     if (event.rowType === 'data' && event.column.allowEditing) {
       // Apply a custom style for editable cells
-      event.cellElement.style.backgroundColor = '#130452ff'; // Soft yellow background
-      event.cellElement.style.color = '#dfddd9ff'; // Dark yellow text
+      event.cellElement.style.backgroundColor = '##FFFFFF'; // Soft yellow background
+      event.cellElement.style.color = 'rgb(12, 12, 11)'; // Dark yellow text
       event.cellElement.style.fontWeight = 'bold';
     }
   }
@@ -189,21 +192,21 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
     this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
     console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
     console.log(
       this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[['
+      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
     );
     this.formatted_from_date = this.financialYeaDate;
 
@@ -291,7 +294,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     const index = this.demoArray.findIndex(
       (item) =>
         item.ITEM_ID === updatedData.ITEM_ID &&
-        item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID
+        item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID,
     );
     const enrichedData = {
       ...updatedData,
@@ -345,7 +348,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          2000
+          2000,
         );
 
         // Optionally reset the RECEIVED_QTY field or prevent further processing
@@ -369,7 +372,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       const idx = this.poDetails.findIndex(
         (r) =>
           r.PO_DETAIL_ID === updatedRow.PO_DETAIL_ID &&
-          r.ITEM_ID === updatedRow.ITEM_ID
+          r.ITEM_ID === updatedRow.ITEM_ID,
       );
 
       if (idx > -1) {
@@ -454,7 +457,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       // Add the updated row to the array of updated items
       const existingIndex = this.updatedItems.findIndex(
-        (item) => item.SL_NO === updatedRow.SL_NO
+        (item) => item.SL_NO === updatedRow.SL_NO,
       );
 
       if (existingIndex > -1) {
@@ -497,7 +500,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         const isDuplicate = this.newGrnData.GRNDetails.some(
           (existingItem) =>
             existingItem.PO_DETAIL_ID === item.PO_DETAIL_ID &&
-            existingItem.ITEM_ID === item.ITEM_ID
+            existingItem.ITEM_ID === item.ITEM_ID,
         );
 
         if (!isDuplicate) {
@@ -543,7 +546,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
           (existingCost) =>
             existingCost.STORE_ID === costData.STORE_ID &&
             existingCost.COST_ID === costData.COST_ID &&
-            existingCost.ITEM_ID === costData.ITEM_ID
+            existingCost.ITEM_ID === costData.ITEM_ID,
         );
 
         if (!isDuplicate) {
@@ -553,7 +556,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       console.log(
         this.newGrnData.GRN_Item_Cost,
-        'Updated GRN_Item_Cost with Proportional Values'
+        'Updated GRN_Item_Cost with Proportional Values',
       );
     }
 
@@ -595,14 +598,14 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       // Filter out COST_IDs that already exist in this.newGrnData.GRN_Cost
       const existingCostIds = this.newGrnData.GRN_Cost.map(
-        (cost: any) => cost.COST_ID
+        (cost: any) => cost.COST_ID,
       );
 
       console.log(existingCostIds, 'existingCostIds');
 
       // Filter the data from formdata.GRN_Cost excluding the COST_IDs already present in newGrnData.GRN_Cost
       const filteredGRNCost = landedCostDropDown.filter(
-        (cost: any) => !existingCostIds.includes(cost.ID)
+        (cost: any) => !existingCostIds.includes(cost.ID),
       );
 
       this.landedCostDropDown = filteredGRNCost;
@@ -652,7 +655,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       // Check if the costData already exists in costingMethodDataGrid
       const isExistingCost = this.costingMethodDataGrid.some(
-        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION
+        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION,
       );
 
       if (isExistingCost) {
@@ -672,7 +675,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          2000
+          2000,
         );
         return; // Exit the function
       }
@@ -688,7 +691,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       // Check if the description already exists in dynamicColumns
       const existingDescriptions = this.dynamicColumns.map(
-        (col: any) => col.dataField
+        (col: any) => col.dataField,
       );
 
       // Push only new descriptions to dynamicColumns
@@ -752,7 +755,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       this.ref.detectChanges();
     } else {
       console.error(
-        'Invalid costData. Ensure all required fields are populated.'
+        'Invalid costData. Ensure all required fields are populated.',
       );
     }
   }
@@ -801,7 +804,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     // Update this.newGrnData.GRN_Cost with grnCost
     grnCost.forEach((newCost: any) => {
       const existingIndex = this.newGrnData.GRN_Cost.findIndex(
-        (cost: any) => cost.COST_ID === newCost.COST_ID
+        (cost: any) => cost.COST_ID === newCost.COST_ID,
       );
 
       if (existingIndex > -1) {
@@ -819,7 +822,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     this.newGrnData.GRNDetails.forEach((detail: any) => {
       // Find the matching entry in poDetails
       const matchingPoDetail = this.poDetails.find(
-        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID
+        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID,
       );
 
       if (matchingPoDetail) {
@@ -880,7 +883,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     // Merge edits from demoArray into prepared.GRNDetails
     const mergedDetails = prepared.GRNDetails.map((row: any) => {
       const editedRow = this.demoArray?.find(
-        (demo: any) => demo.ITEM_ID === row.ITEM_ID
+        (demo: any) => demo.ITEM_ID === row.ITEM_ID,
       );
       return editedRow ? { ...row, ...editedRow } : row; // overwrite if edited
     });
@@ -891,7 +894,33 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       GRN_DATE: new Date(), // ✅ override with current date
     };
   };
+  onEditorPreparing(e: any) {
+    if (e.dataField === 'RECEIVED_QTY') {
+      e.editorOptions = e.editorOptions || {};
 
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+    }
+  }
   onGrnContentReady(e: any): void {
     console.log(e, 'Content Ready Event');
     console.log(this.poDetails, 'poDetails Data');
@@ -903,7 +932,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
         // Filter all matching rows in poDetails using the description
         const matchingRows = this.poDetails.filter((poRow: any) =>
-          Object.keys(poRow).some((key) => key.toUpperCase() === description)
+          Object.keys(poRow).some((key) => key.toUpperCase() === description),
         );
 
         console.log(matchingRows, 'Matching Rows');
@@ -914,7 +943,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
             const existingEntry = this.newGrnData.GRN_Item_Cost.find(
               (item: any) =>
                 item.DESCRIPTION.toUpperCase() === description &&
-                item.ITEM_ID === matchingRow.ITEM_ID // Match with the description heading
+                item.ITEM_ID === matchingRow.ITEM_ID, // Match with the description heading
             );
 
             if (existingEntry) {
@@ -925,7 +954,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
               existingEntry.AMOUNT = matchingRow[description]; // Update AMOUNT using the description key
             } else {
               console.warn(
-                `No existing entry found in GRN_Item_Cost for DESCRIPTION: ${description}`
+                `No existing entry found in GRN_Item_Cost for DESCRIPTION: ${description}`,
               );
 
               this.newGrnData.GRN_Item_Cost.push({
@@ -941,7 +970,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
           });
         } else {
           console.log(
-            `No matching rows found in poDetails for description: ${description}`
+            `No matching rows found in poDetails for description: ${description}`,
           );
         }
       });
@@ -955,11 +984,12 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   getTotalQuantity(): any {
     return this.poDetails.reduce(
       (total, item) => total + (item.RECEIVED_QTY || 0),
-      0
+      0,
     );
   }
 
   ngOnInit(): void {
+    console.log('///////////////////////////////////////////////////////');
     this.sesstion_Details();
     this.getSupplierData();
     this.getStoreData();
@@ -1030,7 +1060,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       this.poDetails = this.processPoDetails(
         this.poDetails,
-        this.newGrnData.GRN_Item_Cost
+        this.newGrnData.GRN_Item_Cost,
       );
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
@@ -1104,9 +1134,9 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       const uniqueDescriptions = Array.from(
         new Set(
           this.newGrnData.GRN_Item_Cost.map((cost) =>
-            cost.DESCRIPTION.toUpperCase()
-          )
-        )
+            cost.DESCRIPTION.toUpperCase(),
+          ),
+        ),
       );
 
       // Step 2: Generate dynamic columns based on unique DESCRIPTION values
@@ -1125,7 +1155,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   getCostsForItem(itemId: string) {
     console.log(itemId, ':::::::::');
     const data = this.newGrnData.GRN_Item_Cost.filter(
-      (cost) => cost.ITEM_ID === itemId
+      (cost) => cost.ITEM_ID === itemId,
     );
     console.log(data, '11111111111111111111111111111111111111111');
     return data;
@@ -1140,7 +1170,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     const updatedPoDetails = poDetails.map((poDetail) => {
       // Find matching costs for the ITEM_ID
       const itemCosts = grnItemCost.filter(
-        (cost) => cost.ITEM_ID === poDetail.ITEM_ID
+        (cost) => cost.ITEM_ID === poDetail.ITEM_ID,
       );
 
       // Add cost fields dynamically
