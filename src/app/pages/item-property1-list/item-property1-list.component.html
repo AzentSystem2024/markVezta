@@ -68,7 +68,7 @@
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
           stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
+          elementAttr: { class: 'commonButtons' },
         }"
       ></dxi-item>
 
@@ -87,7 +87,7 @@
           text: 'Refresh',
           icon: 'refresh',
           onClick: refresh,
-          stylingMode: 'text'
+          stylingMode: 'text',
         }"
       ></dxi-item>
 
@@ -124,7 +124,7 @@
   (save)="onClickSaveItemProperty1()"
   titleText="Edit Item property1"
   height="30vh"
-  width="40vw"
+  width="35vw"
 >
   <app-item-property1-edit
     [selectedData]="selected_data"

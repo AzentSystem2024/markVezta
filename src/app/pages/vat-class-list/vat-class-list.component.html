@@ -66,7 +66,7 @@
         hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
         onClick: toggleFilterRow,
         stylingMode: 'text',
-        elementAttr: { class: 'commonButtons' }
+        elementAttr: { class: 'commonButtons' },
       }"
     ></dxi-item>
 
@@ -85,7 +85,7 @@
         text: 'Refresh',
         icon: 'refresh',
         onClick: refresh,
-        stylingMode: 'text'
+        stylingMode: 'text',
       }"
     ></dxi-item>
 
@@ -122,7 +122,7 @@
   [(visible)]="isEditVatclassPopupOpened"
   title="Edit VAT Class"
   height="40vh"
-  width="40vw"
+  width="35vw"
 >
   <app-vat-class-edit
     [selectedData]="selected_data"

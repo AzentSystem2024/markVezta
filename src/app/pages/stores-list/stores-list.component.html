@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="stores"
@@ -62,7 +62,7 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Store</div>
+          <div class="grid-header">Stores</div>
         </dxi-item>
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <dxi-item
@@ -105,7 +105,7 @@
 <form-popup
   [(visible)]="isAddStoresPopupOpened"
   [width]="700"
-  [height]="'80vh'"
+  [height]="'65vh'"
   [titleText]="selectedStore ? 'Edit Store' : 'New Store'"
   (save)="storesComponent.submitForm()"
   [showApprove]="false"

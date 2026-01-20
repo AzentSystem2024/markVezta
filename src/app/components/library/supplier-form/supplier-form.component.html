@@ -1,6 +1,6 @@
 <dx-form class="plain-styled-form" [colCount]="3">
   <dxi-item itemType="group">
-    <dxi-item itemType="group" [colCount]="2">
+    <dxi-item itemType="group" [colCount]="3">
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
@@ -455,7 +455,7 @@
         [showRowLines]="true"
         [selection]="{
           mode: 'multiple',
-          showCheckBoxesMode: 'always'
+          showCheckBoxesMode: 'always',
         }"
         (onSelectionChanged)="onSelectionChanged($event)"
       >

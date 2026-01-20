@@ -63,7 +63,7 @@
         hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
         onClick: toggleFilterRow,
         stylingMode: 'text',
-        elementAttr: { class: 'commonButtons' }
+        elementAttr: { class: 'commonButtons' },
       }"
     ></dxi-item>
 
@@ -82,7 +82,7 @@
         text: 'Refresh',
         icon: 'refresh',
         onClick: refresh,
-        stylingMode: 'text'
+        stylingMode: 'text',
       }"
     ></dxi-item>
 
@@ -116,7 +116,7 @@
   [height]="250"
   [(visible)]="isEditDepartmentPopupOpened"
   [width]="500"
-  titleText="Edit Department"
+  title="Edit Department"
   (formClosed)="handleClose()"
 >
   <app-department-edit

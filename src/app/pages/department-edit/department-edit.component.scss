@@ -3,12 +3,35 @@
 //   justify-content: flex-end; /* pushes buttons to the right */
 //   gap: 10px; /* spacing between buttons */
 // }
-.button-container {
-  display: flex;
-  justify-content: flex-end; /* align right */
-  gap: 10px; /* spacing between buttons */
+::ng-deep .fixed-footer {
+  padding: 14px 20px 10px;
 }
 
-.btn {
-  margin-top: 12px; /* keep your mt-3 spacing */
+/* Right alignment & spacing */
+::ng-deep .popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Common button size */
+::ng-deep .popup-footer .btn.dx-button {
+  min-width: 90px;
+  height: 36px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* Cancel button style */
+::ng-deep .popup-footer .cancel-btn.dx-button {
+  background-color: #ffffff;
+  border-color: #cfcfcf;
+  color: #333333;
+}
+
+/* Save button style */
+::ng-deep .popup-footer .save-btn.dx-button {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #ffffff;
 }

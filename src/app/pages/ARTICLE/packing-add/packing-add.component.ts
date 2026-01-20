@@ -304,20 +304,20 @@ export class PackingAddComponent {
       !CatgoryvalidationResult.isValid ||
       !UnitvalidationResult.isValid
     ) {
-      return; // ❌ Prevent saving if form is invalid
+      return; //  Prevent saving if form is invalid
     }
-    // if(!payload.artNo || !payload.color || !payload.categoryID || !payload.unitID) {
-    //   notify(
-    //     {
-    //       message: 'Please fill all required fields',
-    //       position: { at: 'top right', my: 'top right' },
-    //       displayTime: 500,
-    //     },
-    //     'error'
-    //   );
-    //   return;
-    // }
-    // this.isArticleFieldsDisabled = true;
+    if(!payload.artNo || !payload.color || !payload.categoryID || !payload.unitID) {
+      notify(
+        {
+          message: 'Please fill all required fields',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'error'
+      );
+      return;
+    }
+    this.isArticleFieldsDisabled = true;
 
     console.log(payload, 'PAYLOAD FOR COLLECTION LIST');
     this.dataService
@@ -989,7 +989,7 @@ export class PackingAddComponent {
       IS_ANY_COMB: false,
       SUPP_ID: null,
     };
-    // this.isArticleFieldsDisabled = false;
+    this.isArticleFieldsDisabled = false;
     this.articleSizeData = []; // Clear the article size data after adding
     this.combination_value = []; // Clear the combination value array
     this.totalQuantity = 0;
