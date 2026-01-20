@@ -118,6 +118,10 @@ export class PrePaymentEditComponent {
 
   ngOnInit() {
     // initialize flags on load
+        this.get_Supplier_dropdown();
+    this.get_ExpenseLedger_dropdown();
+    this.sesstion_Details();
+    this.get_PrePaymentLedger_dropdown();
     this.fieldChanged = false;
     this.scheduleGenerated = false;
   }
@@ -329,7 +333,11 @@ export class PrePaymentEditComponent {
   }
 
   get_Supplier_dropdown() {
-    this.dataservice.Supplier_Dropdown().subscribe((res: any) => {
+        const payload={
+      NAME:'SUPPLIER',
+      COMPANY_ID:this.selected_Company_id
+    }
+    this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
     });

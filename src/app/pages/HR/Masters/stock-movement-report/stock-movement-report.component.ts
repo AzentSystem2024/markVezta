@@ -123,7 +123,6 @@ export class StockMovementReportComponent {
 
   get_Item_Dropdown() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
       NAME: 'ITEMS',
     };
     this.dataService.Item_Dropdown(payload).subscribe((res: any) => {

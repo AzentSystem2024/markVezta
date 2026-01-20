@@ -374,7 +374,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.itemtype = data;
     });
     const brand = {
-      COMPANY_ID: 0,
+    
       NAME: 'BRAND',
     };
     dataservice.getDropdownData(brand).subscribe((data) => {
@@ -478,7 +478,7 @@ export class ItemsEditFormComponent implements OnInit {
       // console.log(this.costingMethodOptions,"COSTINGMETHOD")
     });
     const packing = {
-      COMPANY_ID: this.selected_Company_id,
+     
       NAME: 'PACKING',
     };
     dataservice.getDropdownData(packing).subscribe((data) => {
