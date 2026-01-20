@@ -166,7 +166,8 @@ export class GrnComponent implements OnInit {
   allButtonsEditDelete = [
     {
       name: 'edit',
-      visible: (e) => e.row.data.STATUS !== 'Approved' || e.row.data.STATUS === 'Approved',
+      visible: (e) =>
+        e.row.data.STATUS !== 'Approved' || e.row.data.STATUS === 'Approved',
     },
     {
       name: 'delete',
@@ -198,7 +199,7 @@ export class GrnComponent implements OnInit {
     private service: DataService,
     private change: ChangeDetectorRef,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   openGRNForm() {
@@ -239,7 +240,7 @@ export class GrnComponent implements OnInit {
               message: 'Data Saved & Approved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -247,7 +248,7 @@ export class GrnComponent implements OnInit {
               message: 'Data Saved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
         }
 
@@ -262,7 +263,7 @@ export class GrnComponent implements OnInit {
             message: 'Your Data Not Saved',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -280,7 +281,7 @@ export class GrnComponent implements OnInit {
             message: 'Data Updated Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
 
         this.isEditPopupOpened = false;
@@ -291,7 +292,7 @@ export class GrnComponent implements OnInit {
             message: 'Your Data Not Updated',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -307,7 +308,7 @@ export class GrnComponent implements OnInit {
             message: 'Data Verified Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
         this.getGrnLogData();
         this.isVerifyPopupOpened = false;
@@ -317,7 +318,7 @@ export class GrnComponent implements OnInit {
             message: 'Your Data Not Verified',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -334,7 +335,7 @@ export class GrnComponent implements OnInit {
             message: 'Data Approved Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
         this.getGrnLogData();
         this.isApprovePopupOpened = false;
@@ -344,7 +345,7 @@ export class GrnComponent implements OnInit {
             message: 'Your Data Not Approved',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -372,19 +373,45 @@ export class GrnComponent implements OnInit {
     this.getTemplateList();
     this.getDocNo();
   }
-  onEditingRow(event): void {
-    console.log(event, 'event');
-    event.cancel = true;
-    this.grnId = event.data.ID;
-    const Id = event.data.ID;
+  // onEditingRow(event): void {
+  //   console.log(event, 'event');
+  //   event.cancel = true;
+  //   this.grnId = event.data.ID;
+  //   const Id = event.data.ID;
 
-    console.log(Id, 'id');
-    this.isVerifyPopupOpened = true;
-    this.service.selectGrnData(Id).subscribe((res) => {
+  //   console.log(Id, 'id');
+  //   this.isVerifyPopupOpened = true;
+  //   this.service.selectGrnData(Id).subscribe((res) => {
+  //     this.selectedRowData = res;
+  //     this.cdr.detectChanges();
+  //     this.selectedGrnId = Id;
+  //     console.log(this.selectedRowData, 'select row data');
+  //   });
+  // }
+
+  onEditingRow(event): void {
+    event.cancel = true; // stop default grid edit
+
+    const rowData = event.data;
+    const grnId = rowData.ID;
+    const status = rowData.STATUS;
+
+    this.grnId = grnId;
+    this.selectedGrnId = grnId;
+
+    // Fetch full GRN data first
+    this.service.selectGrnData(grnId).subscribe((res) => {
       this.selectedRowData = res;
       this.cdr.detectChanges();
-      this.selectedGrnId = Id;
-      console.log(this.selectedRowData, 'select row data');
+
+      // ✅ If Approved → View only
+      if (status === 'Approved') {
+        this.isViewPopupOpened = true;
+      }
+      // ✅ Else → Verify
+      else {
+        this.isVerifyPopupOpened = true;
+      }
     });
   }
 
@@ -475,7 +502,7 @@ export class GrnComponent implements OnInit {
     this.service.getTemplateList(this.doc).subscribe((res: any) => {
       this.templateList = res.data;
       const defaultTemplate = this.templateList.find(
-        (item: any) => item.IS_DEFAULT === true
+        (item: any) => item.IS_DEFAULT === true,
       );
       if (defaultTemplate) {
         this.selectedTemplate = defaultTemplate.TEMPLATE_NAME;
@@ -494,7 +521,7 @@ export class GrnComponent implements OnInit {
 
       this.reportName = this.selectedTemplate;
       this.viewer.bindingSender.OpenReport(
-        this.reportName + '&parameter1=' + this.grnId
+        this.reportName + '&parameter1=' + this.grnId,
       );
       this.showTemplatePopup = false; // Close the popup after applying
       this.showReportDesigner = true;
@@ -507,7 +534,7 @@ export class GrnComponent implements OnInit {
     console.log(event, 'event');
     var invisibleIntParamValue = 42;
     var intParam = event.args.ActualParametersInfo.filter(
-      (x: any) => x.parameterDescriptor.name == 'intParam'
+      (x: any) => x.parameterDescriptor.name == 'intParam',
     )[0];
     intParam.value = invisibleIntParamValue;
     console.log(intParam, 'intparam');

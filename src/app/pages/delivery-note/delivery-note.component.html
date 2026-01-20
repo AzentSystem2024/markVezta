@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="filteredDeliveryList"
@@ -103,15 +103,22 @@
       ></dxi-column>
       <dxi-column
         dataField="DN_DATE"
+        caption="Date"
+        dataType="date"
+        [allowEditing]="false"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+      <!-- <dxi-column
+        dataField="DN_DATE"
         caption="Delivery Date"
         [allowEditing]="false"
         dataType="date"
         [format]="{ type: 'custom', formatter: formatDate }"
       >
-      </dxi-column>
+      </dxi-column> -->
 
       <dxi-column
-        dataField="STORE_NAME"
+        dataField="COMPANY_NAME"
         caption="Company"
         [allowEditing]="false"
       ></dxi-column>
@@ -133,7 +140,7 @@
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
       >
       </dxi-column>

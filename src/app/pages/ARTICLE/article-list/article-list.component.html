@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="articleList"
@@ -75,18 +75,27 @@
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <dxi-item
           location="after"
-          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <!-- Refresh -->
+        <dxi-item
+          location="after"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
 
+        <!-- Search -->
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item
-          *ngIf="canAdd"
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
+          *ngIf="canAdd"
         ></dxi-item>
       </dxo-toolbar>
       <dxi-column dataField="ID" caption="ID" [visible]="false"></dxi-column>

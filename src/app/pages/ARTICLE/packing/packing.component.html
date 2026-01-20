@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="packingList"
@@ -52,9 +52,9 @@
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row>
-      <dxo-header-filter [visible]="isFilterOpened">
+      <!-- <dxo-header-filter [visible]="isFilterOpened">
         <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter>
+      </dxo-header-filter> -->
 
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
@@ -63,28 +63,31 @@
           <div class="grid-header">Packing</div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+
         <dxi-item
           location="after"
-          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <!-- Refresh -->
+        <dxi-item
+          location="after"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+        <!-- Search -->
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item
           location="after"
           widget="dxButton"
           [options]="addButtonOptions"
           *ngIf="canAdd"
         ></dxi-item>
-
-        <!-- <dxi-item location="after" locateInMenu="auto">
-          <dx-button
-            icon="plus"
-            hint="Add"
-            type="default"
-            stylingMode="contained"
-  (onClick)="addPacking()"
-          ></dx-button>
-        </dxi-item> -->
       </dxo-toolbar>
 
       <dxi-column dataField="SNO" caption="S.No." alignment="left"></dxi-column>

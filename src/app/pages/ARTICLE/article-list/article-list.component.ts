@@ -103,20 +103,49 @@ export class ArticleListComponent {
   canApprove = false;
   canPrint = false;
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addArticle(),
     onClick: () => {
-      this.zone.run(() => {
-        this.addArticle();
-      });
+      this.ngZone.run(() => this.addArticle());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+  // addButtonOptions = {
+  //   text: 'New',
+  //   icon: 'bi bi-file-earmark-plus',
+  //   // icon: 'add',
+  //   type: 'default',
+  //   stylingMode: 'contained',
+  //   hint: 'Add new entry',
+  //   // onClick: () => this.addArticle(),
+  //   onClick: () => {
+  //     this.zone.run(() => {
+  //       this.addArticle();
+  //     });
+  //   },
+  //   elementAttr: { class: 'add-button' },
+  // };
 
   dateRanges = [
     { label: 'All', value: 'all' },
@@ -131,25 +160,31 @@ export class ArticleListComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   filteredInvoiceList: any;
-
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
+  // refreshButtonOptions = {
+  //   icon: 'refresh',
+  //   hint: 'Refresh',
+  //   onClick: () => this.refreshGrid(),
+  //   text: '',
+  // };
   selected_Company_id: any;
   constructor(
     private dataService: DataService,
     private router: Router,
-    private zone: NgZone
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -180,7 +215,7 @@ export class ArticleListComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -196,7 +231,7 @@ export class ArticleListComponent {
               if (response?.flag === 1 && Array.isArray(response.Data)) {
                 //  Sort articles by ID (latest first)
                 const sortedData = response.Data.sort(
-                  (a: any, b: any) => b.ID - a.ID
+                  (a: any, b: any) => b.ID - a.ID,
                 );
 
                 // Add serial number (sno)
@@ -204,18 +239,18 @@ export class ArticleListComponent {
                   (item: any, index: number) => ({
                     ...item,
                     sno: index + 1,
-                  })
+                  }),
                 );
 
                 resolve(formattedData); // Return formatted data
                 console.log(
                   ' Sorted Article List (latest first):',
-                  formattedData
+                  formattedData,
                 );
               } else {
                 resolve([]); // Handle empty or invalid response
                 console.warn(
-                  'No article data found or invalid response format.'
+                  'No article data found or invalid response format.',
                 );
               }
             },
@@ -244,24 +279,23 @@ export class ArticleListComponent {
     }
   }
   onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'search',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
+    // const toolbarItems = e.toolbarOptions.items;
+    // // Avoid adding the button more than once
+    // const alreadyAdded = toolbarItems.some(
+    //   (item: any) => item.name === 'toggleFilterButton',
+    // );
+    // if (!alreadyAdded) {
+    //   toolbarItems.splice(toolbarItems.length - 1, 0, {
+    //     widget: 'dxButton',
+    //     name: 'toggleFilterButton', // custom name to avoid duplicates
+    //     location: 'after',
+    //     options: {
+    //       icon: 'search',
+    //       hint: 'Search Column',
+    //       onClick: () => this.toggleFilters(),
+    //     },
+    //   });
+    // }
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
@@ -377,7 +411,7 @@ export class ArticleListComponent {
               message: 'Article Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getArticles();
           // this.dataGrid.instance.refresh();
@@ -387,14 +421,14 @@ export class ArticleListComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 
