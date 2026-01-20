@@ -69,7 +69,7 @@ export class CompanyMasterComponent {
     private dataservice: DataService,
     private router: Router,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.formsource = this.fb.group({
       //  ID :[null, Validators.required],
@@ -108,24 +108,39 @@ export class CompanyMasterComponent {
   }
 
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addCompany());
     },
-
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
 
-  //=================================refresh=============================
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -156,7 +171,7 @@ export class CompanyMasterComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -164,7 +179,7 @@ export class CompanyMasterComponent {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -312,7 +327,7 @@ export class CompanyMasterComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -346,7 +361,7 @@ export class CompanyMasterComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
 
         // Close popup ONLY after success
@@ -453,7 +468,7 @@ export class CompanyMasterComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
 
         this.formsource.reset();

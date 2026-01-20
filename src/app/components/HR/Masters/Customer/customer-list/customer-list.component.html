@@ -123,65 +123,44 @@
         </div>
       </dxi-item>
 
-      <!-- <dxi-item location="after" locateInMenu="auto">
-        <dx-button
-          text="Add"
-          icon="plus"
-          type="default"
-          stylingMode="contained"
-          (onClick)="addCustomer()"
-          
-        ></dx-button>
-      </dxi-item> -->
-
-        <dxi-item
+      <dxi-item
         location="after"
-        locateInMenu="auto"
+        widget="dxButton"
+        [options]="{
+          icon: 'search',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'contained',
+          elementAttr: { class: 'toolbar-icon-btn' },
+        }"
+      ></dxi-item>
+
+      <dxi-item
+        location="after"
         widget="dxButton"
         [options]="refreshButtonOptions"
       ></dxi-item>
 
-    
+      <!-- Search -->
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="toolbar-icon-btn export-btn"
+      ></dxi-item>
+
+      <!-- Add -->
       <dxi-item
         location="after"
-        locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'search' : 'search',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
-      ></dxi-item>
-
-    
-
-      <!-- <dxi-item
-            location="after"
-            locateInMenu="auto"
-            showText="inMenu"
-            widget="dxButton"
-            [options]="{
-              text: 'Refresh',
-              icon: 'refresh',
-              stylingMode: 'text'
-            }"
-          ></dxi-item> -->
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
-      <dxi-item name="exportButton"></dxi-item>
-
-        <dxi-item
-        location="after"
-        widget="dxButton"
+        [visible]="canAdd"
         [options]="addButtonOptions"
       ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
       <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
     </dxo-toolbar>
     <dxo-pager
@@ -455,7 +434,7 @@
   </dx-data-grid>
   <form-popup
     [(visible)]="isAddCustomerPopupOpened"
-      [showApprove]="false"
+    [showApprove]="false"
     [width]="900"
     [height]="'100vh'"
     titleText="New Customer"
@@ -469,7 +448,7 @@
     [width]="950"
     [height]="'100vh'"
     titleText="Edit Customer"
-      [showApprove]="false"
+    [showApprove]="false"
     (save)="onClickUpdateCustomer()"
   >
     <!-- <app-customer-form></app-customer-form> -->

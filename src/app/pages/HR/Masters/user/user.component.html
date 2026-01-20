@@ -2,7 +2,7 @@
   <dx-data-grid
     class="grid theme-dependent"
     noDataText=""
-    height="600"
+    [height]="'75vh'"
     [dataSource]="datasource"
     [showBorders]="true"
     [allowColumnResizing]="true"
@@ -11,7 +11,6 @@
     rowAlternationInterval="2"
     (onEditingStart)="onEditingRow($event)"
     (onRowRemoving)="onRowRemoving($event)"
-    height="84vh"
     [showColumnLines]="true"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>

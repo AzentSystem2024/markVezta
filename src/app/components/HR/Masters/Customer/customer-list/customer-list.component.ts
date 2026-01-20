@@ -33,6 +33,7 @@ import {
 } from '../customer-form/customer-form.component';
 import { CustomerEditFormModule } from '../customer-edit-form/customer-edit-form.component';
 import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.component';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-customer-list',
   templateUrl: './customer-list.component.html',
@@ -63,25 +64,60 @@ export class CustomerListComponent {
   selecte_countyId: any;
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
-
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
   //========Variables for Pagination ====================
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showInfo = true;
   showNavButtons = true;
-  //=================================refresh=============================
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.addCustomer());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
-    text: '',
   };
+
   dob = new Date();
 
   formCustomerData = {
-    WAREHOUSE_ID:'',
-    DELIVERY_ADDRESS_ID:'',
+    WAREHOUSE_ID: '',
+    DELIVERY_ADDRESS_ID: '',
     COMPANY_ID: 0,
     CUST_CODE: '',
     FIRST_NAME: '',
@@ -112,18 +148,18 @@ export class CustomerListComponent {
 
   //==========================Dummy data===========================
 
-  addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
-    onClick: () => {
-      // Run inside Angular's zone
-      this.ngZone.run(() => this.addCustomer());
-    },
-    elementAttr: { class: 'add-button' },
-  };
+  // addButtonOptions = {
+  //   text: 'New',
+  //   icon: 'bi bi-file-earmark-plus',
+  //   type: 'default',
+  //   stylingMode: 'contained',
+  //   hint: 'Add new entry',
+  //   onClick: () => {
+  //     // Run inside Angular's zone
+  //     this.ngZone.run(() => this.addCustomer());
+  //   },
+  //   elementAttr: { class: 'add-button' },
+  // };
   Selected_Customer_Data: any;
   changed_Customer_Data: any;
 
@@ -132,7 +168,8 @@ export class CustomerListComponent {
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {
     dataservice.getCountryData().subscribe((data) => {
       this.country = data;
@@ -142,15 +179,15 @@ export class CustomerListComponent {
     });
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME : 'PRICECLASS'
-    }
+      NAME: 'PRICECLASS',
+    };
     dataservice.getDropdownData(payload).subscribe((data) => {
       this.PriceClassDropdownData = data;
     });
     const vatpayload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME : 'VATRULE'
-    }
+      NAME: 'VATRULE',
+    };
     dataservice.getDropdownData(vatpayload).subscribe((data) => {
       this.VatRuleDropdownData = data;
     });
@@ -171,8 +208,8 @@ export class CustomerListComponent {
     this.sesstion_Details();
 
     this.formCustomerData = {
-      WAREHOUSE_ID:'',
-      DELIVERY_ADDRESS_ID:'',
+      WAREHOUSE_ID: '',
+      DELIVERY_ADDRESS_ID: '',
       COMPANY_ID: 0,
       CUST_CODE: '',
       FIRST_NAME: '',
@@ -211,7 +248,7 @@ export class CustomerListComponent {
     });
     console.log(
       this.Selected_Customer_Data,
-      '=================================================='
+      '==================================================',
     );
   }
   showCustomer() {
@@ -243,12 +280,12 @@ export class CustomerListComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
   }
   onClickSaveCustomer() {
@@ -281,8 +318,6 @@ export class CustomerListComponent {
       CUST_VAT_RULE_ID,
       VAT_REGNO,
       CUST_TYPE,
-  
-      
     } = this.customerComponent.getNewCustomerData();
 
     // this.dataservice.postCustomerData(COMPANY_ID,CUST_CODE, FIRST_NAME,LAST_NAME,DOB,NATIONALITY,CONTACT_NAME,ADDRESS1,ADDRESS2,ADDRESS3,ZIP,STATE_ID,CITY,COUNTRY_ID,PHONE,MOBILE_NO,
@@ -303,7 +338,7 @@ export class CustomerListComponent {
           message: 'Customer data Added successfully',
           position: { at: 'top right', my: 'top right' },
         },
-        'success'
+        'success',
       );
       this.isAddCustomerPopupOpened = false;
       this.showCustomer();
@@ -319,7 +354,7 @@ export class CustomerListComponent {
 
     // OR Option B: Update the existing row in the list directly
     const index = this.customer.findIndex(
-      (c) => c.CUST_CODE === updatedCustomer.CUST_CODE
+      (c) => c.CUST_CODE === updatedCustomer.CUST_CODE,
     );
     if (index > -1) {
       this.customer[index] = { ...updatedCustomer };
@@ -342,7 +377,7 @@ export class CustomerListComponent {
               message: 'Customer data updated successfully',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.isEditCustomerPopupOpened = false;
           this.dataGrid.instance.refresh();
@@ -353,7 +388,7 @@ export class CustomerListComponent {
               message: 'Edit operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -416,7 +451,7 @@ export class CustomerListComponent {
         PRICE_CLASS_ID,
         DISCOUNT_PERCENT,
         CUST_VAT_RULE_ID,
-        VAT_REGNO
+        VAT_REGNO,
       )
       .subscribe(() => {
         try {
@@ -425,7 +460,7 @@ export class CustomerListComponent {
               message: 'Customer data deleted successfully',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
         } catch {
           notify(
@@ -433,12 +468,36 @@ export class CustomerListComponent {
               message: 'Delete operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
   }
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/user');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.showCustomer();
     this.getPaymentTerms();
 
@@ -454,19 +513,19 @@ export class CustomerListComponent {
     });
   }
   getPriceLevelDropDown() {
-    const payload ={
-      NAME : 'PRICECLASS',
-      COMPANY_ID : this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'PRICECLASS',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getDropdownData(payload).subscribe((data: any) => {
       this.PriceLevelDropdownData = data;
     });
   }
   getVATRuleDropDown() {
-    const payload ={
-      NAME : 'VATRULE',
-      COMPANY_ID : this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'VATRULE',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getDropdownData(payload).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
     });
@@ -500,7 +559,7 @@ export class CustomerListComponent {
     console.log(this.selecte_countyId, '======county id============');
     this.getStateDropDown();
     const selectedCountry = this.CountryDropdownData.find(
-      (country) => country.ID === event.value
+      (country) => country.ID === event.value,
     );
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE;
@@ -550,7 +609,7 @@ export class CustomerListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
