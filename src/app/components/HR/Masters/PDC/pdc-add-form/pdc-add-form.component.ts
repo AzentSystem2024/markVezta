@@ -63,6 +63,9 @@ export class PdcAddFormComponent {
   docNo: any;
 
   ngOnInit(): void {
+    this.get_Supplier_dropdown();
+    this.get_Bank_dropdown();
+    this.get_Customer_dropdown();
     if (!this.selectedPDC) {
       // Default to 'Issued' (id = 1)
       this.selectedType = this.priorities.find((p) => p.id === 1);
@@ -151,9 +154,9 @@ export class PdcAddFormComponent {
   isBeneficiaryTypeDisabled = (data: any) => data.disabled;
 
   constructor(private dataservice: DataService) {
-    this.get_Supplier_dropdown();
-    this.get_Bank_dropdown();
-    this.get_Customer_dropdown();
+    // this.get_Supplier_dropdown();
+    // this.get_Bank_dropdown();
+    // this.get_Customer_dropdown();
     this.sesstion_Details();
   }
 
@@ -328,7 +331,11 @@ export class PdcAddFormComponent {
   }
 
   get_Supplier_dropdown() {
-    this.dataservice.Supplier_Dropdown().subscribe((res: any) => {
+      const payload={
+      NAME:'SUPPLIER',
+      COMPANY_ID:this.selected_Company_id
+    }
+    this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
     });
@@ -344,7 +351,11 @@ export class PdcAddFormComponent {
   }
 
   get_Customer_dropdown() {
-    this.dataservice.Customer_Dropdown().subscribe((res: any) => {
+          const payload={
+      NAME:'CUSTOMER',
+      COMPANY_ID:this.selected_Company_id
+    }
+    this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('customer dropdown', res);
       this.Customer = res;
     });

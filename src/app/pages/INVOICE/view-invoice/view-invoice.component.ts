@@ -313,6 +313,7 @@ export class ViewInvoiceComponent {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      NAME:'CUSTOMER'
     };
     this.dataService
       .getOutsideCustomerWithState(payload)

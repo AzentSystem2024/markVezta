@@ -106,10 +106,12 @@ export class PrePaymentAddComponent {
     this.get_PrePaymentLedger_dropdown();
     this.sessionData_tax();
     this.getDocNo();
-    
+      
 
   }
-
+  ngOnInit(){
+      this.get_Supplier_dropdown();
+  }
     getDocNo() {
     const payload = {
       TRANS_TYPE: 38,
@@ -280,7 +282,11 @@ export class PrePaymentAddComponent {
   }
 
   get_Supplier_dropdown() {
-    this.dataservice.Supplier_Dropdown().subscribe((res: any) => {
+    const payload={
+      NAME:'SUPPLIER',
+      COMPANY_ID:this.selected_Company_id
+    }
+    this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
     });

@@ -509,43 +509,38 @@ export class ArticleAddComponent {
       this.materialUnits = response;
     });
     const payload2 = {
-      COMPANY_ID: 0,
+    
       NAME: 'ARTICLECATEGORY',
     };
     this.dataService.getDropdownData(payload2).subscribe((response: any) => {
       this.categoryList = response;
     });
     const payload3 = {
-      COMPANY_ID: 0,
+    
       NAME: 'ARTICLETYPE',
     };
     this.dataService.getDropdownData(payload3).subscribe((response: any) => {
       this.typeList = response;
     });
     const payload4 = {
-      COMPANY_ID: 0,
       NAME: 'ARTICLEBRAND',
     };
     this.dataService.getDropdownData(payload4).subscribe((response: any) => {
       this.brandList = response;
     });
     const payload5 = {
-      COMPANY_ID: 0,
       NAME: 'ARTICLECOLOR',
     };
     this.dataService.getDropdownData(payload5).subscribe((response: any) => {
       this.colorList = response;
     });
   }
-
   onColorChanged(event: any) {
     console.log('Selected Color:', event.value);
   }
-
   assignOrderNumbersToSizes() {
     const last = Number(this.lastOrderNo ?? 0);
     let nextOrderNo = last + 1;
-
     if (Array.isArray(this.articleSizeData)) {
       this.articleSizeData = this.articleSizeData.map((item: any) => ({
         ...item,
@@ -566,7 +561,6 @@ export class ArticleAddComponent {
       .join(', ');
     this.getLastOrderNo();
   }
-
   getLastOrderNo() {
     if (!this.selectedProductionUnitId) return;
     console.log(this.selectedProductionUnitId, 'SELECTEDPRODUCTIONUNITID');
@@ -590,67 +584,52 @@ export class ArticleAddComponent {
         }
       });
   }
-
   openAttachPopup() {
     this.getArticles();
     this.isAttachPopupVisible = true;
   }
-
   getAliasNo() {
     this.dataService.getLastAliasNo().subscribe((response: any) => {
       this.articleData.ALIAS_NO = response.GetAliasNo;
     });
   }
-
   // onAttachRowSelected(event: any) {
   //   this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
   //   console.log('Selected row:', this.selectedAttachRow);
   // }
-
   onAttachRowSelected(event: any) {
     const selectedKeys = event.selectedRowKeys || [];
     const selectedRows = event.selectedRowsData || [];
-
     //  Nothing selected
     if (selectedKeys.length === 0) {
       this.selectedAttachRow = null;
       this.selectedAttachRowKeys = [];
       return;
     }
-
     //  Keep ONLY the last selected row
     const lastKey = selectedKeys[selectedKeys.length - 1];
     const lastRow = selectedRows.find((r: any) => r.ID === lastKey);
-
     if (!lastRow) return;
     // THIS LINE CLEARS PREVIOUS SELECTIONS
     this.selectedAttachRowKeys = [lastKey];
-
     // prevent re-saving the same row again
     if (this.selectedAttachRow?.ID === lastRow.ID) {
       return;
     }
-
     this.selectedAttachRow = lastRow;
-
     // Auto save on select (existing behavior)
     this.attachComponent();
   }
-
   // onAttachRowSelected(event: any) {
   //   const selectedRow = event.selectedRowsData[0];
-
   //   if (!selectedRow) {
   //     return;
   //   }
-
   //   // prevent re-saving the same row again
   //   if (this.selectedAttachRow?.ID === selectedRow.ID) {
   //     return;
   //   }
-
   //   this.selectedAttachRow = selectedRow;
-
   //   // 🔥 AUTO SAVE ON SELECT
   //   this.attachComponent();
   // }

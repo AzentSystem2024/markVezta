@@ -1135,6 +1135,7 @@ export class SalesOrderFormComponent {
   getWarehouseList(dealerId: number) {
     const payload = {
       CUST_ID: dealerId,
+       COMPANY_ID: this.companyID,
     };
     this.dataService.getWarehouse(payload).subscribe((response: any) => {
       this.warehouse = response.Data;
@@ -1149,11 +1150,12 @@ export class SalesOrderFormComponent {
   getDeliveryAddressDropdown(dealerId: number) {
     const payload = {
       CUST_ID: dealerId,
+       COMPANY_ID: this.companyID,
     };
 
     this.dataService.getDealerDropdown(payload).subscribe((response: any) => {
       this.deliveryAddress = response || [];
-
+      console.log(this.deliveryAddress,'===============delivery address')
       if (this.deliveryAddress.length > 0) {
         // Automatically bind first delivery address
         const firstAddress = this.deliveryAddress[0];

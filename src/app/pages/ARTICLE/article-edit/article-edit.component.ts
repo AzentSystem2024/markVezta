@@ -587,7 +587,6 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload2 = {
-        COMPANY_ID: 0,
         NAME: 'ARTICLECATEGORY',
       };
       this.dataService.getDropdownData(payload2).subscribe((res) => {
@@ -595,7 +594,7 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload3 = {
-        COMPANY_ID: 0,
+      
         NAME: 'ARTICLETYPE',
       };
       this.dataService.getDropdownData(payload3).subscribe((res) => {
@@ -603,7 +602,6 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload4 = {
-        COMPANY_ID: 0,
         NAME: 'ARTICLEBRAND',
       };
       this.dataService.getDropdownData(payload4).subscribe((res) => {
@@ -611,7 +609,7 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload5 = {
-        COMPANY_ID: 0,
+     
         NAME: 'ARTICLECOLOR',
       };
       this.dataService.getDropdownData(payload5).subscribe((res) => {

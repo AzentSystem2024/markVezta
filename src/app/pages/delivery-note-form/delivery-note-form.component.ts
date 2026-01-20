@@ -286,9 +286,9 @@ export class DeliveryNoteFormComponent {
       .getDropdownData('INSIDE_CUSTOMER')
       .subscribe((response: any) => {
         this.customerList = response;
-      });
+  });
   }
-
+                 
   getOutsideCustomerList() {
     this.dataService
       .getDropdownData('OUTSIDE_CUSTOMER')

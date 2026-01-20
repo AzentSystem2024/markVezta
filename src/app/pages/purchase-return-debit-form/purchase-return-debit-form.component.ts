@@ -274,7 +274,8 @@ export class PurchaseReturnDebitFormComponent {
 
   getSupplierLstWithState() {
     const payload = {
-      // COMPANY_ID: this.selectedCompanyId,
+      COMPANY_ID: this.selectedCompanyId,
+      NAME:'SUPPLIER'
     };
     this.dataService
       .getSupplierWithState(payload)

@@ -321,7 +321,12 @@ export class EditSupplierPaymentComponent {
   }
 
   getSupplierDropdown() {
-    this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
+    const payload={
+      NAME:'SUPPLIER',
+      COMPANY_ID:this.selectedCompanyId
+
+    }
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.supplierList = response;
       console.log(
         this.supplierList,

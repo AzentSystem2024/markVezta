@@ -206,28 +206,24 @@ export class PackingEditComponent {
       this.materialUnits = response;
     });
     const payload2 = {
-      COMPANY_ID: this.selected_Company_id,
       NAME: 'ARTICLECATEGORY',
     };
     this.dataService.getDropdownData(payload2).subscribe((response: any) => {
       this.categoryList = response;
     });
     const payload3 = {
-      COMPANY_ID: this.selected_Company_id,
       NAME: 'ARTICLETYPE',
     };
     this.dataService.getDropdownData(payload3).subscribe((response: any) => {
       this.typeList = response;
     });
     const payload4 = {
-      COMPANY_ID: this.selected_Company_id,
       NAME: 'ARTICLEBRAND',
     };
     this.dataService.getDropdownData(payload4).subscribe((response: any) => {
       this.brandList = response;
     });
     const payload5 = {
-      COMPANY_ID: this.selected_Company_id,
       NAME: 'ARTICLECOLOR',
     };
     this.dataService.getDropdownData(payload5).subscribe((response: any) => {

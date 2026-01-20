@@ -270,7 +270,7 @@ supplierGrid!: DxDataGridComponent;
       this.store = data;
     });
     const brandPayload = {
-      COMPANY_ID: this.selected_Company_id,
+    
       NAME: 'brand',
     };
     dataservice.getDropdownData(brandPayload).subscribe((data) => {
@@ -363,7 +363,7 @@ supplierGrid!: DxDataGridComponent;
       this.costingMethodOptions = data;
     });
     const packingPayload = {
-      COMPANY_ID: this.selected_Company_id,
+     
       NAME: 'PACKING',
     };
     dataservice.getDropdownData(packingPayload).subscribe((data) => {

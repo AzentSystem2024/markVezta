@@ -761,7 +761,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
             (options.value.qtyOrdered || 0) +
             (options.value.Amount || 0) +
             (options.value.discountAmount || 0) +
-            (options.value.taxable || 0) + // ✅ FIXED
+            (options.value.taxable || 0) + //  FIXED
             (options.value.vatAmount || 0);
         }
         break;
@@ -769,6 +769,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   GetSupplierList() {
+    console.log('supplier list ===== function in purchase order')
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.companyID,

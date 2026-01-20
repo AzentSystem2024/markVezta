@@ -485,6 +485,7 @@ export class GrnNewFormComponent implements OnInit {
     };
     this.service.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
+      console.log(res)
     });
   }
 
