@@ -20,6 +20,7 @@ import { DxPopupModule } from 'devextreme-angular';
 import { CommonModule } from '@angular/common';
 import { ExportService } from 'src/app/services/export.service';
 import { DepartmentEditModule } from '../department-edit/department-edit.component';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-department-list',
   templateUrl: './department-list.component.html',
@@ -45,11 +46,39 @@ export class DepartmentListComponent implements OnInit {
   COMPANY_ID: any;
   sessionData: any;
   COMPANY_NAME: any;
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.addDepartment());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {
     this.sesstion_Details();
     this.showDepartment();
@@ -94,20 +123,20 @@ export class DepartmentListComponent implements OnInit {
     });
   }
 
-  addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
+  // addButtonOptions = {
+  //   text: 'New',
+  //   icon: 'bi bi-file-earmark-plus',
+  //   type: 'default',
+  //   stylingMode: 'contained',
+  //   hint: 'Add new entry',
 
-    onClick: () => {
-      // Run inside Angular's zone
-      this.ngZone.run(() => this.addDepartment());
-    },
+  //   onClick: () => {
+  //     // Run inside Angular's zone
+  //     this.ngZone.run(() => this.addDepartment());
+  //   },
 
-    elementAttr: { class: 'add-button' },
-  };
+  //   elementAttr: { class: 'add-button' },
+  // };
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -116,7 +145,7 @@ export class DepartmentListComponent implements OnInit {
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
     console.log(
       this.COMPANY_ID,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
@@ -132,12 +161,12 @@ export class DepartmentListComponent implements OnInit {
     // Check for duplicates in CategoryList
     const isCodeDuplicate = this.department.some(
       // (item: any) => item.CODE === commonDetails.code
-      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
+      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
     );
 
     const isDescriptionDuplicate = this.department.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
-      (item: any) => item.DEPT_NAME.toLowerCase() === DEPT_NAME.toLowerCase()
+      (item: any) => item.DEPT_NAME.toLowerCase() === DEPT_NAME.toLowerCase(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -147,7 +176,7 @@ export class DepartmentListComponent implements OnInit {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -157,7 +186,7 @@ export class DepartmentListComponent implements OnInit {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -167,7 +196,7 @@ export class DepartmentListComponent implements OnInit {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -185,7 +214,7 @@ export class DepartmentListComponent implements OnInit {
               position: { at: 'top right', my: 'top right' },
               displayTime: 1000,
             },
-            'success'
+            'success',
           );
           this.departmentComponent.resetButton();
         }
@@ -204,7 +233,7 @@ export class DepartmentListComponent implements OnInit {
             message: 'Delete operation successful',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
         this.dataGrid.instance.refresh();
         this.showDepartment();
@@ -214,7 +243,7 @@ export class DepartmentListComponent implements OnInit {
             message: 'Delete operation failed',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -231,6 +260,30 @@ export class DepartmentListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/user');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.showDepartment();
   }
   refresh = () => {

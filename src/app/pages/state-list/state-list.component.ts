@@ -1,4 +1,12 @@
-import { Component, OnInit, NgModule, ViewChild, NgZone, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  NgModule,
+  ViewChild,
+  NgZone,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { DxButtonModule, DxPopupModule } from 'devextreme-angular';
 import {
   DxDataGridComponent,
@@ -26,8 +34,8 @@ export class StateListComponent {
   @ViewChild(StateFormComponent) stateComponent: StateFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-   @Output() formClosed = new EventEmitter<void>();
-    
+  @Output() formClosed = new EventEmitter<void>();
+
   state: any;
   CountryDropdownData: any;
   isAddStatePopupOpened = false;
@@ -39,7 +47,7 @@ export class StateListComponent {
   showPageSizeSelector = true;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
-  isEditPopupOpened :boolean = false;
+  isEditPopupOpened: boolean = false;
   auto: string = 'auto';
   debitList: any;
   canAdd = false;
@@ -67,7 +75,7 @@ export class StateListComponent {
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'state-list');
@@ -76,10 +84,10 @@ export class StateListComponent {
     this.isAddStatePopupOpened = true;
   }
 
-  CloseEditForm(){
-     this.isEditPopupOpened = false;
-     this.isAddStatePopupOpened = false;
-     this.showState();
+  CloseEditForm() {
+    this.isEditPopupOpened = false;
+    this.isAddStatePopupOpened = false;
+    this.showState();
   }
 
   showState() {
@@ -94,7 +102,7 @@ export class StateListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -135,11 +143,11 @@ export class StateListComponent {
                 message: 'State is successfully added',
                 position: { at: 'top right', my: 'top right' },
               },
-              'success'
+              'success',
             );
             // this.dataGrid.instance.refresh();
-              this.formClosed.emit();
-              this.isAddStatePopupOpened = false
+            this.formClosed.emit();
+            this.isAddStatePopupOpened = false;
             this.showState();
           } catch (error) {
             notify(
@@ -147,7 +155,7 @@ export class StateListComponent {
                 message: 'Add operation failed',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
         }
@@ -167,7 +175,7 @@ export class StateListComponent {
               message: 'Delete operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.showState();
@@ -177,49 +185,49 @@ export class StateListComponent {
               message: 'Delete operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
   }
-//  onRowUpdating (event) {
-//     const updataDate = event.newData;
-//     const oldData = event.oldData;
-//     const combinedData = { ...oldData, ...updataDate };
-//     let id = combinedData.ID;
-//     let stateCode = combinedData.STATE_CODE;
-//     let statename = combinedData.STATE_NAME;
-//     let country_id = combinedData.COUNTRY_ID;
+  //  onRowUpdating (event) {
+  //     const updataDate = event.newData;
+  //     const oldData = event.oldData;
+  //     const combinedData = { ...oldData, ...updataDate };
+  //     let id = combinedData.ID;
+  //     let stateCode = combinedData.STATE_CODE;
+  //     let statename = combinedData.STATE_NAME;
+  //     let country_id = combinedData.COUNTRY_ID;
 
-//     this.dataservice
-//       .updateState(id, stateCode, statename, country_id)
-//       .subscribe((data: any) => {
-//         if (data) {
-//           notify(
-//             {
-//               message: 'State updated Successfully',
-//               position: { at: 'top right', my: 'top right' },
-//             },
-//             'success'
-//           );
-//           this.dataGrid.instance.refresh();
-//           this.showState();
-//         } else {
-//           notify(
-//             {
-//               message: 'Your Data Not Saved',
-//               position: { at: 'top right', my: 'top right' },
-//             },
-//             'error'
-//           );
-//         }
-//       });
-//     console.log('old data:', oldData);
-//     console.log('new data:', updataDate);
-//     console.log('modified data:', combinedData);
+  //     this.dataservice
+  //       .updateState(id, stateCode, statename, country_id)
+  //       .subscribe((data: any) => {
+  //         if (data) {
+  //           notify(
+  //             {
+  //               message: 'State updated Successfully',
+  //               position: { at: 'top right', my: 'top right' },
+  //             },
+  //             'success'
+  //           );
+  //           this.dataGrid.instance.refresh();
+  //           this.showState();
+  //         } else {
+  //           notify(
+  //             {
+  //               message: 'Your Data Not Saved',
+  //               position: { at: 'top right', my: 'top right' },
+  //             },
+  //             'error'
+  //           );
+  //         }
+  //       });
+  //     console.log('old data:', oldData);
+  //     console.log('new data:', updataDate);
+  //     console.log('modified data:', combinedData);
 
-//     event.cancel = true; // Prevent the default update operation
-//   }
+  //     event.cancel = true; // Prevent the default update operation
+  //   }
   ngOnInit(): void {
     this.showState();
     this.getCountryDropDown();
@@ -231,25 +239,32 @@ export class StateListComponent {
     });
   }
 
-  onEditingRow(event:any){
-   event.cancel = true;
-   this.isEditPopupOpened = true;
-   console.log(event)
-   this.selectedState = event.data
-   this.selectState(event)
+  onEditingRow(event: any) {
+    event.cancel = true;
+    this.isEditPopupOpened = true;
+    console.log(event);
+    this.selectedState = event.data;
+    this.selectState(event);
   }
 
-  selectState(event:any){
-      console.log(event);
-      const id = event.data.ID
-      this.dataservice.SelectState(id).subscribe((res: any) => {
-    console.log(res);
-    this.selectedState = res
-      })
+  selectState(event: any) {
+    console.log(event);
+    const id = event.data.ID;
+    this.dataservice.SelectState(id).subscribe((res: any) => {
+      console.log(res);
+      this.selectedState = res;
+    });
   }
 }
 @NgModule({
-  imports: [DxDataGridModule, DxButtonModule, FormPopupModule, StateFormModule,DxPopupModule,StateEditModule,],
+  imports: [
+    DxDataGridModule,
+    DxButtonModule,
+    FormPopupModule,
+    StateFormModule,
+    DxPopupModule,
+    StateEditModule,
+  ],
   providers: [],
   exports: [],
   declarations: [StateListComponent],

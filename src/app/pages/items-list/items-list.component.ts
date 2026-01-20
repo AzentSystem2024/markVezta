@@ -149,7 +149,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   ITEM_PROPERTY5: any;
   ENABLE_Matrix_Code: boolean;
   isParentItemDropdownOpen: boolean;
-auto: string = 'auto';
+  auto: string = 'auto';
   //==============date filter===================
   customLabel = 'Custom';
   customStartDate: any = null;
@@ -168,24 +168,60 @@ auto: string = 'auto';
     { label: this.customLabel, value: 'custom' },
   ];
   selected_Company_id: any;
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
     private countryFlagService: CountryServiceService,
     private router: Router,
     protected screen: ScreenService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {}
 
-  
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.addItems());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
 
-    refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
@@ -216,6 +252,31 @@ auto: string = 'auto';
   }
 
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/packing');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
+
     this.sesstion_Details();
     this.showItems();
     this.loadDropdownData();
@@ -229,25 +290,25 @@ auto: string = 'auto';
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
     console.log(
       this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1=============='
+      '============ITEM_PROPERTY1==============',
     );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
     console.log(
       this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2=============='
+      '============ITEM_PROPERTY2==============',
     );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
     console.log(
       this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3=============='
+      '============ITEM_PROPERTY3==============',
     );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
     console.log(
       this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5=============='
+      '============ITEM_PROPERTY5==============',
     );
 
     this.ENABLE_Matrix_Code =
@@ -257,7 +318,7 @@ auto: string = 'auto';
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
     console.log(
       this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5=============='
+      '============ITEM_PROPERTY5==============',
     );
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
@@ -332,20 +393,20 @@ auto: string = 'auto';
     this.cdr.detectChanges();
   };
 
-  addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
+  // addButtonOptions = {
+  //   text: 'New',
+  //   icon: 'bi bi-file-earmark-plus',
+  //   type: 'default',
+  //   stylingMode: 'contained',
+  //   hint: 'Add new entry',
 
-    onClick: () => {
-      // Run inside Angular's zone
-      this.ngZone.run(() => this.addItems());
-    },
+  //   onClick: () => {
+  //     // Run inside Angular's zone
+  //     this.ngZone.run(() => this.addItems());
+  //   },
 
-    elementAttr: { class: 'add-button' },
-  };
+  //   elementAttr: { class: 'add-button' },
+  // };
 
   loadDropdownData(): void {
     this.dataservice.getDropdownData('BRAND').subscribe((data) => {
@@ -399,7 +460,7 @@ auto: string = 'auto';
       (error) => {
         console.error('Error fetching items:', error);
         this.isLoading = false;
-      }
+      },
     );
   }
 
@@ -414,7 +475,7 @@ auto: string = 'auto';
     if (items.ITEM_ALIAS && items.ITEM_ALIAS.length > 0) {
       // First filter out objects with empty ALIAS
       items.ITEM_ALIAS = items.ITEM_ALIAS.filter(
-        (item) => item.ALIAS && item.ALIAS.trim() !== ''
+        (item) => item.ALIAS && item.ALIAS.trim() !== '',
       );
 
       // Then set ALIAS_TYPE_ID: 1 for remaining objects
@@ -450,13 +511,13 @@ auto: string = 'auto';
           position: { at: 'top right', my: 'top right' },
         },
         'error',
-        4000
+        4000,
       );
       return; //  stop execution
     }
     console.log(
       items,
-      '================================================================================================'
+      '================================================================================================',
     );
 
     this.dataservice.postItems(items).subscribe((response: any) => {
@@ -471,7 +532,7 @@ auto: string = 'auto';
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          4000
+          4000,
         );
       } else {
         // success case
@@ -481,7 +542,7 @@ auto: string = 'auto';
             position: { at: 'top right', my: 'top right' },
           },
           'success',
-          4000
+          4000,
         );
         this.dataGrid.instance.refresh();
         this.showItems();
@@ -498,7 +559,7 @@ auto: string = 'auto';
       },
       (error) => {
         console.error('Failed to fetch all stores:', error);
-      }
+      },
     );
   }
 
@@ -548,7 +609,7 @@ auto: string = 'auto';
     // Map over the full store list and update selected ones
     this.combinedStores = this.store.map((store) => {
       const selectedStore = this.item_stores.find(
-        (s) => s.STORE_ID === store.ID.toString()
+        (s) => s.STORE_ID === store.ID.toString(),
       );
       const isSelected = !!selectedStore; // Check if store is selected
 
@@ -611,7 +672,7 @@ auto: string = 'auto';
             message: 'Delete operation successful',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
         this.dataGrid.instance.refresh();
         this.showItems();
@@ -621,7 +682,7 @@ auto: string = 'auto';
             message: 'Delete operation failed',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -632,7 +693,7 @@ auto: string = 'auto';
     const removedAlias = event.data;
     if (this.item_alias) {
       this.item_alias = this.item_alias.filter(
-        (alias) => alias.ALIAS !== removedAlias.ALIAS
+        (alias) => alias.ALIAS !== removedAlias.ALIAS,
       );
     }
     // console.log("Updated item_alias after removal", this.item_alias);
@@ -649,7 +710,7 @@ auto: string = 'auto';
 
     // Check if the alias already exists based on the ALIAS field
     const exists = this.selectedItemData.item_alias.some(
-      (alias) => alias.ALIAS === newAlias.ALIAS
+      (alias) => alias.ALIAS === newAlias.ALIAS,
     );
 
     if (!exists) {
@@ -670,7 +731,7 @@ auto: string = 'auto';
 
     // Update the existing alias in item_alias array
     this.item_alias = this.item_alias.map((alias) =>
-      alias.ALIAS === updatedAlias.ALIAS ? updatedAlias : alias
+      alias.ALIAS === updatedAlias.ALIAS ? updatedAlias : alias,
     );
 
     // console.log("Updated item_alias", this.item_alias);
@@ -689,7 +750,7 @@ auto: string = 'auto';
       this.selectedItemData = JSON.parse(JSON.stringify(response));
       console.log(
         this.selectedItemData,
-        '========================selected items======================'
+        '========================selected items======================',
       );
       //       const clonedResponse = JSON.parse(JSON.stringify(response));
       // console.log("RAW deep clone ===>", clonedResponse);
