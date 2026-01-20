@@ -30,7 +30,6 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
-      (onToolbarPreparing)="onToolbarPreparing($event)"
       (onEditingStart)="onEditStore($event)"
       (onRowRemoving)="onRowRemoving($event)"
     >
@@ -50,7 +49,7 @@
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
-      <dxo-filter-row
+      <!-- <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row>
@@ -59,7 +58,7 @@
       </dxo-header-filter>
       <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-filter-builder [allowHierarchicalFields]="true">
-      </dxo-filter-builder>
+      </dxo-filter-builder> -->
       <dxo-toolbar>
         <dxi-item location="before">
           <div class="grid-header">Stores</div>
@@ -67,15 +66,27 @@
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <dxi-item
           location="after"
-          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <!-- Refresh -->
+        <dxi-item
+          location="after"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+        <!-- Search -->
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
+          [visible]="canAdd"
         ></dxi-item>
       </dxo-toolbar>
       <!-- <div *dxTemplate="let data of 'dateFilterTemplate'">

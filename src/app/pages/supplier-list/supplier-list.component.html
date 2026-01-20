@@ -30,47 +30,42 @@
         <div class="grid-header">Supplier</div>
       </dxi-item>
 
-      <!-- <dxi-item location="after" locateInMenu="auto">
-      <dx-button
-        text="Add"
-        icon="plus"
-        type="default"
-        stylingMode="contained"
-        (onClick)="addSupplier()"
-        
-      ></dx-button>
-    </dxi-item> -->
-
       <dxi-item
         location="after"
-        locateInMenu="auto"
+        widget="dxButton"
+        [options]="{
+          icon: 'search',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'contained',
+          elementAttr: { class: 'toolbar-icon-btn' },
+        }"
+      ></dxi-item>
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
         widget="dxButton"
         [options]="refreshButtonOptions"
       ></dxi-item>
 
-      <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'search' : 'search',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
-      ></dxi-item>
-
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
+      <!-- Search -->
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
       </dxi-item>
 
-      <dxi-item name="exportButton"></dxi-item>
-
+      <!-- Export (built-in, kept) -->
       <dxi-item
         location="after"
         widget="dxButton"
+        [options]="exportButtonOptions"
+      ></dxi-item>
+
+      <!-- Add -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [visible]="canAdd"
         [options]="addButtonOptions"
       ></dxi-item>
     </dxo-toolbar>
@@ -138,7 +133,7 @@
   </dx-data-grid>
   <form-popup
     [(visible)]="isAddSupplierPopupOpened"
-      [showApprove]="false"
+    [showApprove]="false"
     [width]="1000"
     [height]="'90vh'"
     (save)="onClickSaveSupplier()"

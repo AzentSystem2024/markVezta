@@ -38,22 +38,39 @@ export class StoresListComponent implements OnInit {
   state: any;
   isAddStoresPopupOpened = false;
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.zone.run(() => {
-        this.addStores();
-      });
+      this.ngZone.run(() => this.addStores());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -69,8 +86,8 @@ export class StoresListComponent implements OnInit {
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
-    private zone: NgZone,
-    private router: Router
+    private ngZone: NgZone,
+    private router: Router,
   ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Stores-list');
@@ -96,7 +113,7 @@ export class StoresListComponent implements OnInit {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -167,7 +184,7 @@ export class StoresListComponent implements OnInit {
           storeData.VAT_REGNO,
           storeData.GROUP_ID,
           storeData.STORE_NO,
-          storeData.IS_ACTIVE
+          storeData.IS_ACTIVE,
         )
         .subscribe((res) => {
           this.isAddStoresPopupOpened = false;
@@ -181,7 +198,7 @@ export class StoresListComponent implements OnInit {
               position: { at: 'top center', my: 'top center' },
             },
             'success',
-            3000
+            3000,
           );
         });
     } else {
@@ -191,7 +208,7 @@ export class StoresListComponent implements OnInit {
           store.CODE.toLowerCase().trim() ===
             storeData.CODE.toLowerCase().trim() ||
           store.STORE_NAME.toLowerCase().trim() ===
-            storeData.STORE_NAME.toLowerCase().trim()
+            storeData.STORE_NAME.toLowerCase().trim(),
       );
 
       if (duplicate) {
@@ -204,7 +221,7 @@ export class StoresListComponent implements OnInit {
             position: { at: 'top center', my: 'top center' },
           },
           'error',
-          3000
+          3000,
         );
         return; // stop saving
       }
@@ -229,7 +246,7 @@ export class StoresListComponent implements OnInit {
           storeData.VAT_REGNO,
           storeData.GROUP_ID,
           storeData.STORE_NO,
-          storeData.IS_ACTIVE
+          storeData.IS_ACTIVE,
         )
         .subscribe((res) => {
           this.isAddStoresPopupOpened = false;
@@ -246,7 +263,7 @@ export class StoresListComponent implements OnInit {
               position: { at: 'top center', my: 'top center' },
             },
             'success',
-            3000
+            3000,
           );
         });
     }
@@ -282,7 +299,7 @@ export class StoresListComponent implements OnInit {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -336,13 +353,13 @@ export class StoresListComponent implements OnInit {
       GROUP_ID,
       STORE_NO,
       IS_ACTIVE,
-      COMPANY_ID
+      COMPANY_ID,
     );
     // --- Duplicate check ---
     const duplicate = this.stores.some(
       (store: any) =>
         store.CODE.toLowerCase() === CODE.toLowerCase().trim() ||
-        store.STORE_NAME.toLowerCase() === STORE_NAME.toLowerCase().trim()
+        store.STORE_NAME.toLowerCase() === STORE_NAME.toLowerCase().trim(),
     );
 
     if (duplicate) {
@@ -355,7 +372,7 @@ export class StoresListComponent implements OnInit {
           position: { at: 'top center', my: 'top center' },
         },
         'error',
-        3000
+        3000,
       );
       return; // stop saving
     }
@@ -379,7 +396,7 @@ export class StoresListComponent implements OnInit {
         VAT_REGNO,
         GROUP_ID,
         STORE_NO,
-        IS_ACTIVE
+        IS_ACTIVE,
       )
       .subscribe((response) => {
         if (response) {
@@ -428,7 +445,7 @@ export class StoresListComponent implements OnInit {
         PHONE,
         EMAIL,
         VAT_REGNO,
-        GROUP_ID
+        GROUP_ID,
       )
       .subscribe(() => {
         try {
@@ -438,7 +455,7 @@ export class StoresListComponent implements OnInit {
               message: 'Delete operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.showStores();
@@ -448,7 +465,7 @@ export class StoresListComponent implements OnInit {
               message: 'Delete operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -534,7 +551,7 @@ export class StoresListComponent implements OnInit {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax()
@@ -573,4 +590,4 @@ export class StoresListComponent implements OnInit {
   exports: [],
   declarations: [StoresListComponent],
 })
-export class StoresListModule {} 
+export class StoresListModule {}

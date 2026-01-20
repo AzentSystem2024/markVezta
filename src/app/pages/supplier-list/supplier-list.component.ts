@@ -40,16 +40,17 @@ import {
 })
 export class SupplierListComponent implements OnInit {
   @ViewChild(SupplierFormComponent) supplierComponent: SupplierFormComponent;
-  @ViewChild(DxDataGridComponent,{ static: true }) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
   @ViewChild(SupplierFormComponent) supplierForm!: SupplierFormComponent;
   @Output()
   editingStart = new EventEmitter<any>();
-@Output() formClosed = new EventEmitter<void>();
- selected_Company_id: number;
+  @Output() formClosed = new EventEmitter<void>();
+  selected_Company_id: number;
   savedUserData: any;
-  company_list:any=[]
-    isFilterRowVisible: boolean = false;
- isFilterOpened = false;
+  company_list: any = [];
+  isFilterRowVisible: boolean = false;
+  isFilterOpened = false;
   // dataGrid: DxDataGridComponent;
   width = '100vw';
   height = '100vh';
@@ -68,12 +69,12 @@ export class SupplierListComponent implements OnInit {
   selectedLandedCosts: any;
   selectedSupplier: any;
   isEditSupplierPopupOpened: boolean = false;
-    readonly allowedPageSizes: any = [5, 10, 'all'];
+  readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-    showInfo = true;
+  showInfo = true;
   showNavButtons = true;
-   canAdd = false;
+  canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
@@ -98,25 +99,45 @@ export class SupplierListComponent implements OnInit {
     },
   ];
 
-   //=================================refresh=============================
-   refreshButtonOptions = {
+  //=================================refresh=============================
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
 
-      refreshGrid(){
-          if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh();
-       // Or reload data from API if needed
-       this.showSupplier()
-      
-    }
-       
-    }
+  exportButtonOptions = {
+    hint: 'Export',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn export-btn' },
+    // onClick: () => this.exportToExcel(),
+    template: () => `
+    <div class="export-icon-wrap">
+      <span class="iconify"
+            data-icon="clarity:export-line"
+            data-width="20"
+            data-height="20"></span>
 
-        toggleFilterRow = () => {
+      <!-- DOWNWARD ARROW -->
+      <span class="iconify"
+            data-icon="grommet-icons:form-down"
+            data-width="14"
+            data-height="14"></span>
+    </div>
+  `,
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.showSupplier();
+    }
+  }
+
+  toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
@@ -126,21 +147,20 @@ export class SupplierListComponent implements OnInit {
     private exportService: ExportService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {
     dataservice.getCurrencyData().subscribe((data) => {
       this.currency = data;
     });
-    const payload ={
-      NAME : 'VATRULE',
-      COMPANY_ID : this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'VATRULE',
+      COMPANY_ID: this.selected_Company_id,
+    };
     dataservice.getDropdownData(payload).subscribe((data) => {
       this.vatrule = data;
     });
 
-    this.sesstion_Details()
-    
+    this.sesstion_Details();
   }
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Supplier-list');
@@ -153,26 +173,27 @@ export class SupplierListComponent implements OnInit {
     });
   }
 
-    addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-  
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addSupplier());
     },
-    
-    elementAttr: { class: 'add-button' },
-    
-    
-  };
+    elementAttr: { class: 'add-button' },
 
-
-
-
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
 
   addSupplier() {
     this.isAddSupplierPopupOpened = true;
@@ -180,17 +201,17 @@ export class SupplierListComponent implements OnInit {
 
   showSupplier() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
-  this.dataservice.getSupplierData(payload).subscribe((response: any) => {
-    console.log(response, 'SUPPLIERRRRRRRRR');
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.getSupplierData(payload).subscribe((response: any) => {
+      console.log(response, 'SUPPLIERRRRRRRRR');
 
-    this.supplier = response.map((item: any, index: number) => ({
-      ...item,
-      SNO: index + 1   // serial number starts from 1
-    }));
-  });
-}
+      this.supplier = response.map((item: any, index: number) => ({
+        ...item,
+        SNO: index + 1, // serial number starts from 1
+      }));
+    });
+  }
 
   // showSupplier() {
   //   this.dataservice.getSupplierData().subscribe((response) => {
@@ -229,7 +250,6 @@ export class SupplierListComponent implements OnInit {
     console.log('Selected Landed Costs Before Save:', this.selectedLandedCosts);
 
     const {
-      
       HQID,
       SUPP_CODE,
       SUPP_NAME,
@@ -255,108 +275,103 @@ export class SupplierListComponent implements OnInit {
       Supplier_cost,
     } = this.supplierComponent.getNewSupplierData();
 
-    const newSupplierData = this.supplierComponent.getNewSupplierData()
+    const newSupplierData = this.supplierComponent.getNewSupplierData();
 
-
-     const isInactiveBoolean = IS_INACTIVE === 1 ? true : false;
-     const currencyIdNumber = parseInt(CURRENCY_ID); // or use Number(CURRENCY_ID);
+    const isInactiveBoolean = IS_INACTIVE === 1 ? true : false;
+    const currencyIdNumber = parseInt(CURRENCY_ID); // or use Number(CURRENCY_ID);
     const StateID = parseInt(STATE_ID);
-   
+
     const payload = {
       ...newSupplierData,
-      COMPANY_ID : this.selected_Company_id,
-      CURRENCY_ID : currencyIdNumber,
-      STATE_ID : StateID,
-      IS_INACTIVE : isInactiveBoolean
-    }
-    console.log(payload,'=======payload===========')
-    this.dataservice.saveSupplierData(payload).subscribe((res:any)=>{
-              if (res.flag == 1) {
-              notify(
-                {
-                  message: 'Supplier added successfully',
-                  position: { at: 'top right', my: 'top right' },
-                },
-                'success'
-              );
-             
-              this.dataGrid.instance.refresh();
-               this.isAddSupplierPopupOpened = false
-              this.formClosed.emit(); // tell parent to close
-               this.showSupplier();
+      COMPANY_ID: this.selected_Company_id,
+      CURRENCY_ID: currencyIdNumber,
+      STATE_ID: StateID,
+      IS_INACTIVE: isInactiveBoolean,
+    };
+    console.log(payload, '=======payload===========');
+    this.dataservice.saveSupplierData(payload).subscribe((res: any) => {
+      if (res.flag == 1) {
+        notify(
+          {
+            message: 'Supplier added successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success',
+        );
 
+        this.dataGrid.instance.refresh();
+        this.isAddSupplierPopupOpened = false;
+        this.formClosed.emit(); // tell parent to close
+        this.showSupplier();
 
-                // ✅ Call child form reset
-    this.supplierForm.resetPartialForm();
-            }
-    })
+        // ✅ Call child form reset
+        this.supplierForm.resetPartialForm();
+      }
+    });
   }
-    // this.dataservice
-    //   .postSupplierData(
-    //     HQID,
-    //     SUPP_CODE,
-    //     SUPP_NAME,
-    //     CONTACT_NAME,
-    //     ADDRESS1,
-    //     ADDRESS2,
-    //     ADDRESS3,
-    //     ZIP,
-    //     StateID,
-    //     CITY,
-    //     COUNTRY_ID,
-    //     PHONE,
-    //     EMAIL,
-    //     // IS_INACTIVE,
-    //     isInactiveBoolean,
-    //     MOBILE_NO,
-    //     NOTES,
-    //     FAX_NO,
-    //     VAT_REGNO,
-    //     // CURRENCY_ID,
-    //     currencyIdNumber,
-    //     PAY_TERM_ID,
-    //     VAT_RULE_ID,
-    //     IS_COMPANY_BRANCH,
-    //     Supplier_cost
-    //   )
-    //   .subscribe((response) => {
-    //     console.log('API Response:', response);
-    //     if (response) {
-    //       try {
-    //         if (response.flag == 1) {
-    //           notify(
-    //             {
-    //               message: 'Supplier added successfully',
-    //               position: { at: 'top right', my: 'top right' },
-    //             },
-    //             'success'
-    //           );
-              
-                
-             
-    //           this.dataGrid.instance.refresh();
-    //            this.isAddSupplierPopupOpened = false
-    //           this.formClosed.emit(); // tell parent to close
-    //            this.showSupplier();
+  // this.dataservice
+  //   .postSupplierData(
+  //     HQID,
+  //     SUPP_CODE,
+  //     SUPP_NAME,
+  //     CONTACT_NAME,
+  //     ADDRESS1,
+  //     ADDRESS2,
+  //     ADDRESS3,
+  //     ZIP,
+  //     StateID,
+  //     CITY,
+  //     COUNTRY_ID,
+  //     PHONE,
+  //     EMAIL,
+  //     // IS_INACTIVE,
+  //     isInactiveBoolean,
+  //     MOBILE_NO,
+  //     NOTES,
+  //     FAX_NO,
+  //     VAT_REGNO,
+  //     // CURRENCY_ID,
+  //     currencyIdNumber,
+  //     PAY_TERM_ID,
+  //     VAT_RULE_ID,
+  //     IS_COMPANY_BRANCH,
+  //     Supplier_cost
+  //   )
+  //   .subscribe((response) => {
+  //     console.log('API Response:', response);
+  //     if (response) {
+  //       try {
+  //         if (response.flag == 1) {
+  //           notify(
+  //             {
+  //               message: 'Supplier added successfully',
+  //               position: { at: 'top right', my: 'top right' },
+  //             },
+  //             'success'
+  //           );
 
-           
-    //         }
-    //       } catch (error) {
-    //         // notify(
-    //         //   {
-    //         //     message: 'Add operation failed',
-    //         //     position: { at: 'top right', my: 'top right' },
-    //         //   },
-    //         //   'error'
-    //         // );
-    //       }
-    //     }
+  //           this.dataGrid.instance.refresh();
+  //            this.isAddSupplierPopupOpened = false
+  //           this.formClosed.emit(); // tell parent to close
+  //            this.showSupplier();
 
-    //     // if (response) {
-    //     //   this.showSupplier();
-    //     // }
-    //   });
-  
+  //         }
+  //       } catch (error) {
+  //         // notify(
+  //         //   {
+  //         //     message: 'Add operation failed',
+  //         //     position: { at: 'top right', my: 'top right' },
+  //         //   },
+  //         //   'error'
+  //         // );
+  //       }
+  //     }
+
+  //     // if (response) {
+  //     //   this.showSupplier();
+  //     // }
+  //   });
+
   onRowRemoving(event) {
     const selectedRow = event.data;
     const {
@@ -401,7 +416,7 @@ export class SupplierListComponent implements OnInit {
         VAT_REGNO,
         CURRENCY_ID,
         PAY_TERM_ID,
-        VAT_RULE_ID
+        VAT_RULE_ID,
       )
       .subscribe(() => {
         try {
@@ -411,7 +426,7 @@ export class SupplierListComponent implements OnInit {
               message: 'Delete operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.showSupplier();
@@ -439,7 +454,7 @@ export class SupplierListComponent implements OnInit {
             message: 'Supplier Updated Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
         this.dataGrid.instance.refresh();
         this.showSupplier();
@@ -449,7 +464,7 @@ export class SupplierListComponent implements OnInit {
             message: 'Your Data Not Saved',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -513,25 +528,23 @@ export class SupplierListComponent implements OnInit {
     this.isAddSupplierPopupOpened = false;
     this.dataGrid.instance.refresh();
     this.showSupplier();
-       if (this.supplierForm) {
-      this.supplierForm.resetPartialForm();  // ✅ reset on close
+    if (this.supplierForm) {
+      this.supplierForm.resetPartialForm(); // ✅ reset on close
     }
-
   }
 
-
   onCancelSupplier() {
-  // reset first (child still alive)
-  this.supplierForm?.resetPartialForm();
-  // then close
-  this.isAddSupplierPopupOpened = false;
-}
+    // reset first (child still alive)
+    this.supplierForm?.resetPartialForm();
+    // then close
+    this.isAddSupplierPopupOpened = false;
+  }
 
   ngOnInit(): void {
-      const currentUrl = this.router.url;
+    const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -560,26 +573,22 @@ export class SupplierListComponent implements OnInit {
     this.getPaymentTerms();
   }
 
-   get_sessionstorage_data(){
+  get_sessionstorage_data() {
     this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
-     console.log(this.savedUserData)
-    this.company_list=this.savedUserData.Companies
-    
-    }
+    console.log(this.savedUserData);
+    this.company_list = this.savedUserData.Companies;
+  }
 
- sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
 
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')
-
-    
-  }
-
-
-
-
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+  }
 }
 
 @NgModule({

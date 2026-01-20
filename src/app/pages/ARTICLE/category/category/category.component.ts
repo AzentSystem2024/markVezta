@@ -176,21 +176,39 @@ export class CategoryComponent {
   anyCombination_value: boolean = false;
   status_value: any;
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.openPopup());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
   };
 
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -203,7 +221,7 @@ export class CategoryComponent {
     private dataservice: DataService,
     private ngZone: NgZone,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.sizeOptions = Array.from({ length: 12 }, (_, i) => i + 1);
     this.formsource = this.fb.group({
@@ -227,7 +245,7 @@ export class CategoryComponent {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -299,7 +317,7 @@ export class CategoryComponent {
     this.packData.SIZEDETAILS = selectedSizes.map((size: number) => {
       // Preserve existing pairQty if already selected
       const existing = this.packData.SIZEDETAILS.find(
-        (s: any) => s.size === size
+        (s: any) => s.size === size,
       );
       return {
         size,
@@ -341,7 +359,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -364,7 +382,7 @@ export class CategoryComponent {
     } else {
       // ✅ Add Mode
       const existingIndex = this.packingData.findIndex(
-        (pack) => pack.PACK_NAME.toLowerCase() === packName.toLowerCase()
+        (pack) => pack.PACK_NAME.toLowerCase() === packName.toLowerCase(),
       );
 
       if (existingIndex !== -1) {
@@ -374,7 +392,7 @@ export class CategoryComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 2000,
           },
-          'error'
+          'error',
         );
         return;
       }
@@ -410,13 +428,13 @@ export class CategoryComponent {
 
     this.totalPairQty = this.packData.SIZEDETAILS.reduce(
       (sum, item) => sum + (item.pairQty || 0),
-      0
+      0,
     );
 
     // ✅ Enable Edit Mode
     this.isEditing = true;
     this.editIndex = this.packingData.findIndex(
-      (p) => p.PACK_NAME === selectedData.PACK_NAME
+      (p) => p.PACK_NAME === selectedData.PACK_NAME,
     );
 
     console.log('Selected Pack for Editing:', selectedData);
@@ -448,7 +466,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -467,7 +485,7 @@ export class CategoryComponent {
     };
 
     const existingIndex = this.packing_values.findIndex(
-      (pack) => pack.NAME.toLowerCase() === packName.toLowerCase()
+      (pack) => pack.NAME.toLowerCase() === packName.toLowerCase(),
     );
 
     // 🟢 EDITING MODE
@@ -480,7 +498,7 @@ export class CategoryComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 2000,
           },
-          'error'
+          'error',
         );
         return;
       }
@@ -499,7 +517,7 @@ export class CategoryComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 2000,
           },
-          'error'
+          'error',
         );
         return;
       }
@@ -529,7 +547,7 @@ export class CategoryComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -563,7 +581,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -572,13 +590,13 @@ export class CategoryComponent {
     const isCodeDuplicate = this.CategoryList.some(
       // (item: any) => item.CODE === commonDetails.code
       (item: any) =>
-        item.CODE.toLowerCase() === commonDetails.code.toLowerCase()
+        item.CODE.toLowerCase() === commonDetails.code.toLowerCase(),
     );
 
     const isDescriptionDuplicate = this.CategoryList.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) =>
-        item.DESCRIPTION.toLowerCase() === commonDetails.category.toLowerCase()
+        item.DESCRIPTION.toLowerCase() === commonDetails.category.toLowerCase(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -588,7 +606,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -598,7 +616,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -608,7 +626,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -639,7 +657,7 @@ export class CategoryComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          'success'
+          'success',
         );
         this.get_list_data_category();
         this.handleClose(); // Close the popup if successful
@@ -652,9 +670,9 @@ export class CategoryComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          'error'
+          'error',
         );
-      }
+      },
     );
   }
 
@@ -692,14 +710,14 @@ export class CategoryComponent {
     const isCodeDuplicate = this.CategoryList.some(
       (item: any) =>
         item.CODE?.toLowerCase() === updatedPayload.CODE?.toLowerCase() &&
-        item.ID !== updatedPayload.ID
+        item.ID !== updatedPayload.ID,
     );
 
     const isDescriptionDuplicate = this.CategoryList.some(
       (item: any) =>
         item.DESCRIPTION?.toLowerCase() ===
           updatedPayload.DESCRIPTION?.toLowerCase() &&
-        item.ID !== updatedPayload.ID
+        item.ID !== updatedPayload.ID,
     );
     if (isCodeDuplicate && isDescriptionDuplicate) {
       notify(
@@ -708,7 +726,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -718,7 +736,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -728,7 +746,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -743,7 +761,7 @@ export class CategoryComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          'success'
+          'success',
         );
         this.isEditPopup = false;
         this.get_list_data_category();
@@ -756,9 +774,9 @@ export class CategoryComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          'error'
+          'error',
         );
-      }
+      },
     );
   }
 
@@ -774,7 +792,7 @@ export class CategoryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'success'
+        'success',
       );
       this.get_list_data_category();
     });
@@ -819,7 +837,7 @@ export class CategoryComponent {
   onSelectPack(e: any) {
     const selectedPack = e.data;
     const index = this.packing_values.findIndex(
-      (p) => p.NAME === selectedPack.NAME
+      (p) => p.NAME === selectedPack.NAME,
     );
     this.selectedPackIndex = index !== -1 ? index : null;
 
@@ -831,7 +849,7 @@ export class CategoryComponent {
       }));
       this.totalPairQty = this.packData_values.reduce(
         (sum, item) => sum + (item.QUANTITY || 0),
-        0
+        0,
       );
       this.packNameValue = selectedPack.NAME || '';
       this.isExport_value = selectedPack.ISEXPORT;
@@ -864,7 +882,7 @@ export class CategoryComponent {
           (item: any) => ({
             size: item.size,
             pairQty: item.pairQty,
-          })
+          }),
         );
 
         // ✅ bind checkboxes
@@ -899,7 +917,7 @@ export class CategoryComponent {
   onPairQtyChangedValue() {
     this.Pair_quantity_value = this.packData_values.reduce(
       (sum, item) => sum + (item.QUANTITY || 0),
-      0
+      0,
     );
   }
 
