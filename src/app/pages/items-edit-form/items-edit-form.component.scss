@@ -561,3 +561,90 @@ button:hover {
   gap: 10px; /* space between buttons */
   margin-top: 20px; /* add some top spacing */
 }
+
+::ng-deep .fixed-footer {
+  padding: 8px 20px 8px;   /* tighter than before */
+  margin-top: 4px;        /* reduced top gap */
+}
+
+/* Right aligned buttons */
+::ng-deep .popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Optional: shift footer slightly right (replaces margin-left:60%) */
+::ng-deep .right-footer {
+  width: 100%;
+}
+
+/* Common button size */
+::ng-deep .popup-footer .dx-button {
+  min-width: 90px;
+  height: 36px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* Cancel button */
+::ng-deep
+  .popup-footer
+  .dx-button.dx-button-normal.dx-button-outlined {
+  background-color: #ffffff;
+  border-color: #cfcfcf;
+  color: #333333;
+}
+
+/* Save button */
+::ng-deep
+  .popup-footer
+  .dx-button.dx-button-default.dx-button-contained {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #ffffff;
+}
+
+
+::ng-deep .fixed-footer {
+  padding: 14px 20px 10px;
+}
+
+/* Right aligned buttons */
+::ng-deep .popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+::ng-deep .fixed-footer {
+  margin-top: 0px;   /* reduce space above buttons */
+  padding-top: 6px;  /* optional: tighter look */
+}
+
+
+/* Common button size */
+::ng-deep .popup-footer .dx-button {
+  min-width: 90px;
+  height: 36px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* Cancel button (outlined) */
+::ng-deep
+  .popup-footer
+  .dx-button.dx-button-normal.dx-button-outlined {
+  background-color: #ffffff;
+  border-color: #cfcfcf;
+  color: #333333;
+}
+
+/* Save button (blue primary) */
+::ng-deep
+  .popup-footer
+  .dx-button.dx-button-default.dx-button-contained {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #ffffff;
+}

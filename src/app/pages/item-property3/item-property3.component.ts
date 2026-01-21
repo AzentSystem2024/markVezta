@@ -155,17 +155,18 @@ export class ItemProperty3Component {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     
     // THIS IS THE MISSING LINK
-    this.poData.COMPANY_ID = this.companyID;
-    this.poData.USER_ID = sessionData.USER_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
+    // this.poData.COMPANY_ID = this.companyID;
+    // this.poData.USER_ID = sessionData.USER_ID;
+    // console.log(
+    //   this.selected_Company_id,
+    //   '============selected_Company_id=============='
+    // );
   }
   listItemProperty3() {
     const payload = {
       COMPANY_ID: this.companyID,
     };
+    console.log
     this.dataservice.getItemProperty3Data(payload).subscribe((response) => {
       this.itemproperty3 = response;
     });

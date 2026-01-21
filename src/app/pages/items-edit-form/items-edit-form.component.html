@@ -926,7 +926,7 @@
                         *ngIf="!isLoading"
                         [dataSource]="parentitem"
                         [columns]="[
-                          { dataField: 'DESCRIPTION', caption: 'Description' }
+                          { dataField: 'DESCRIPTION', caption: 'Description' },
                         ]"
                         [selection]="{ mode: 'single' }"
                         [hoverStateEnabled]="true"
@@ -1129,7 +1129,7 @@
               allowUpdating: true,
               allowDeleting: true,
               allowAdding: true,
-              useIcons: true
+              useIcons: true,
             }"
           >
             <dxo-scrolling mode="standard"></dxo-scrolling>
@@ -1271,7 +1271,7 @@
                 [columns]="[
                   { dataField: 'ITEM_CODE', caption: 'Code' },
                   { dataField: 'DESCRIPTION', caption: 'Description' },
-                  { dataField: 'UOM', caption: 'UOM', visible: false }
+                  { dataField: 'UOM', caption: 'UOM', visible: false },
                 ]"
                 [selection]="{ mode: 'single' }"
                 [hoverStateEnabled]="true"
@@ -1295,12 +1295,21 @@
     </dx-form>
   </div>
 
-  <div class="button-container1">
-    <dx-button text="Save" type="default" (onClick)="saveItem()"></dx-button>
+  <div class="fixed-footer popup-footer">
     <dx-button
       text="Cancel"
       type="normal"
+      stylingMode="outlined"
+      class="cancel-btn"
       (onClick)="cancelPopup()"
+    ></dx-button>
+
+    <dx-button
+      text="Save"
+      type="default"
+      stylingMode="contained"
+      class="save-btn"
+      (onClick)="saveItem()"
     ></dx-button>
   </div>
 

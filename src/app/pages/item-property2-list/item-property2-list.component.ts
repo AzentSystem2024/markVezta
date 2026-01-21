@@ -68,7 +68,9 @@ export class ItemProperty2ListComponent {
     private cdr: ChangeDetectorRef
   ) {
     this.itemlabel = authservice.getsettingsData().ITEM_PROPERTY2;
+   
     this.sesstion_Details();
+  
   }
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -146,12 +148,12 @@ export class ItemProperty2ListComponent {
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     // THIS IS THE MISSING LINK
-    this.poData.COMPANY_ID = this.companyID;
-    this.poData.USER_ID = sessionData.USER_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
+    // this.poData.COMPANY_ID = this.companyID;
+    // this.poData.USER_ID = sessionData.USER_ID;
+    // console.log(
+    //   this.selected_Company_id,
+    //   '============selected_Company_id=============='
+    // );
   }
   showItemProperty2() {
     const payload = {

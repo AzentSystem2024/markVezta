@@ -109,10 +109,10 @@
   </dx-data-grid>
 </div>
 <form-popup
-  height="300px"
+  height="35vh"
   [(visible)]="isItemProperty1PopupOpened"
   (save)="onClickSaveItemProperty1()"
-  titleText="New {{ itemlabel }}"
+  titleText="New Size"
   [showApprove]="false"
 >
   <app-item-property1-form
@@ -122,9 +122,9 @@
 <dx-popup
   [(visible)]="isEditItemProperty1PopupOpened"
   (save)="onClickSaveItemProperty1()"
-  titleText="Edit Item property1"
+  title="Edit Size"
   height="30vh"
-  width="35vw"
+  width="30vw"
 >
   <app-item-property1-edit
     [selectedData]="selected_data"
