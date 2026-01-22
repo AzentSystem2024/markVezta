@@ -1,5 +1,5 @@
 @use "variables.scss" as *;
-
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 // html,
 // body {
 //   margin: 0;
@@ -917,4 +917,123 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+//........................................TAB-PANEL-FORMS..............................................//
+/* ===============================
+   form tab style
+   =============================== */
+
+.dx-theme-fluent .form-tabs.dx-tabpanel {
+  /* ❌ REMOVE DevExtreme hover underline */
+  .dx-tab:hover::after,
+  .dx-tab.dx-state-hover::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* ❌ Also remove hover underline on text if theme applies it */
+  .dx-tab:hover .dx-tab-text::before,
+  .dx-tab.dx-state-hover .dx-tab-text::before {
+    display: none !important;
+  }
+
+  /* 🔥 Kill ALL default tab separators */
+  .dx-tabpanel-tabs,
+  .dx-tabpanel-tabs .dx-tabs {
+    border: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+
+  .dx-tabpanel-tabs .dx-tabs::before,
+  .dx-tabpanel-tabs .dx-tabs::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* Restore spacing */
+  .dx-tabs-wrapper {
+    display: flex;
+    gap: 24px;
+  }
+
+  .dx-tab {
+    padding: 8px 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Tab text */
+  .dx-tab-text {
+    position: relative;
+    padding: 0 2px;
+    white-space: nowrap;
+    font-weight: 500;
+    color: #333;
+  }
+
+  /* Remove any tab-level underline */
+  .dx-tab.dx-tab-selected::after {
+    display: none !important;
+  }
+
+  .dx-tab.dx-tab-selected .dx-tab-text::after {
+    bottom: -3px;
+  }
+}
+
+//=======================================================================================//
+
+.dx-datagrid
+  .dx-datagrid-filter-row
+  .dx-editor-with-menu
+  .dx-texteditor
+  .dx-texteditor-input,
+.dx-datagrid
+  .dx-datagrid-filter-row
+  .dx-editor-with-menu
+  .dx-texteditor
+  .dx-placeholder::before,
+.dx-datagrid-container
+  .dx-datagrid-filter-row
+  .dx-editor-with-menu
+  .dx-texteditor
+  .dx-texteditor-input,
+.dx-datagrid-container
+  .dx-datagrid-filter-row
+  .dx-editor-with-menu
+  .dx-texteditor
+  .dx-placeholder::before {
+  padding-left: 40px !important;
+}
+
+.dx-datagrid-filter-row {
+  background-color: var(--filter-Row-bg) !important;
+}
+
+// ==================== filter row style changes ============ //
+.dx-datagrid-content .dx-datagrid-table .dx-row .dx-editor-container {
+  overflow: hidden;
+  height: 35px !important;
+}
+
+.dx-datagrid .dx-datagrid-filter-row .dx-editor-with-menu .dx-menu-item-content,
+.dx-datagrid-container
+  .dx-datagrid-filter-row
+  .dx-editor-with-menu
+  .dx-menu-item-content {
+  display: flex;
+  justify-content: center;
+  align-items: normal;
+}
+
+.dx-tabs-styling-mode-secondary.dx-tab-indicator-position-top
+  .dx-tab.dx-tab-selected
+  .dx-tab-content::after,
+.dx-tabs-styling-mode-secondary.dx-tab-indicator-position-bottom
+  .dx-tab.dx-tab-selected
+  .dx-tab-content::after {
+  background-color: rgb(71, 158, 245);
+  display: none;
 }

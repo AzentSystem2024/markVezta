@@ -1,13 +1,12 @@
 <!-- Grid Section -->
 <dx-tab-panel
-  class="innert-tab custom-article-tabs"
+  class="form-tabs"
   [(selectedIndex)]="selectedTabIndex"
   [animationEnabled]="true"
   [deferRendering]="false"
-  style="border: none"
 >
   <dxi-item title="Details">
-    <div style="margin-top: 8px">
+    <div style="margin-top: 10px">
       <div class="form-grid">
         <!-- 2-column form fields -->
         <div class="form-field">
@@ -322,7 +321,7 @@
   <!-- Footer Buttons -->
 
   <dxi-item title="Component" [visible]="!articleData.IS_COMPONENT">
-    <div style="margin-top: 16px">
+    <div style="margin-top: 10px">
       <!-- Tab 2: Show dx-popup content statically in tab -->
       <div
         class="popup-content"
@@ -340,7 +339,7 @@
             [showBorders]="true"
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
-            [height]="'54vh'"
+            [height]="'69vh'"
             [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
             (onSelectionChanged)="onAttachRowSelected($event)"
           >
@@ -354,7 +353,7 @@
               [showNavigationButtons]="true"
             ></dxo-pager>
             <dxo-load-panel [showPane]="false"></dxo-load-panel>
-            <dxo-scrolling mode="standard"></dxo-scrolling>
+            <dxo-scrolling mode="virtual"></dxo-scrolling>
             <dxo-filter-row
               [visible]="isFilterRowVisible"
               [applyFilter]="'auto'"
@@ -414,7 +413,7 @@
             [showBorders]="true"
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
-            [height]="'54vh'"
+            [height]="'63vh'"
             [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
             (onInitialized)="onGridInitialized($event)"
             (onInitNewRow)="onInitNewRow($event)"
@@ -438,7 +437,7 @@
               [showNavigationButtons]="true"
             ></dxo-pager>
             <dxo-load-panel [showPane]="false"></dxo-load-panel>
-            <dxo-scrolling mode="standard"></dxo-scrolling>
+            <dxo-scrolling mode="virtual"></dxo-scrolling>
             <dxo-filter-row
               [visible]="isFilterRowVisible"
               [applyFilter]="'auto'"

@@ -126,7 +126,9 @@ export class ProductionJvListComponent {
     { label: 'Last 30 Days', value: 'last30' },
     { label: 'Custom', value: 'custom' },
   ];
-  selectedDateRange: string = 'today';
+  // selectedDateRange: string = 'today';
+  selectedDateRange: any = 'today';
+
   customStartDate: any = null;
   customEndDate: any = null;
   showCustomDatePopup = false;
@@ -196,19 +198,22 @@ export class ProductionJvListComponent {
   }
 
   getProductionList() {
-    const payload = {
+    const { fromDate, toDate } = this.getDateRange();
+
+    const payload: any = {
       COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: fromDate, // 👈 backend filter
+      DATE_TO: toDate, // 👈 backend filter
     };
 
     const api$ =
       this.selectedProductionType === 'BOX'
-        ? this.dataService.getBoxProductionJVListView(payload)
+        ? this.dataService.getBoxProductionJVList(payload)
         : this.dataService.getProductionJVList(payload);
 
     api$.subscribe((response: any) => {
       this.productionList = (response.Data || [])
         .map((item: any) => {
-          // ---- Date normalization ----
           let saleDate = item.PROD_DATE;
           let dateValue: Date;
 
@@ -219,7 +224,6 @@ export class ProductionJvListComponent {
             dateValue = new Date(saleDate);
           }
 
-          // ---- Extract numeric part of DOC_NO ----
           const match = item.DOC_NO?.match(/\d+$/);
           const docNoNumber = match ? Number(match[0]) : 0;
 
@@ -229,47 +233,38 @@ export class ProductionJvListComponent {
             _docNoNumber: docNoNumber,
           };
         })
-        // ✅ Latest first
         .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
 
-      this.applyDateFilter();
+      this.filteredproductionList = this.productionList; // ✅ backend already filtered
     });
   }
+  onDateDropdownFocus() {
+    if (this.selectedDateRange === 'custom') {
+      this.showCustomDatePopup = true;
+    }
+  }
 
-  // getProductionList() {
-  //   const payload = {
-  //     COMPANY_ID: this.selected_Company_id,
-  //   };
-  //   console.log(payload, 'PAYLOADDDDDDDDDDDD');
-  //   this.dataService.getProductionJVList(payload).subscribe((response: any) => {
-  //     this.productionList = response.Data.map((item: any) => {
-  //       // ---- Date normalization (unchanged) ----
-  //       let saleDate = item.PROD_DATE;
-  //       let dateValue: Date;
+  dateDisplayExpr = (item: any) => {
+    if (!item) return '';
 
-  //       if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
-  //         const [day, month, year] = saleDate.split('-').map(Number);
-  //         dateValue = new Date(year, month - 1, day);
-  //       } else {
-  //         dateValue = new Date(saleDate);
-  //       }
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(
+        this.customStartDate instanceof Date
+          ? this.customStartDate
+          : new Date(this.customStartDate),
+      );
 
-  //       // ---- Extract numeric part of DOC_NO safely ----
-  //       const match = item.DOC_NO?.match(/\d+$/); // last number
-  //       const docNoNumber = match ? Number(match[0]) : 0;
+      const to = this.formatAsDDMMYYYY(
+        this.customEndDate instanceof Date
+          ? this.customEndDate
+          : new Date(this.customEndDate),
+      );
 
-  //       return {
-  //         ...item,
-  //         PROD_DATE: dateValue,
-  //         _docNoNumber: docNoNumber, // helper field
-  //       };
-  //     })
-  //       // ✅ DESCENDING → latest first
-  //       .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
+      return `${from} - ${to}`;
+    }
 
-  //     this.applyDateFilter();
-  //   });
-  // }
+    return item.label;
+  };
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -289,41 +284,53 @@ export class ProductionJvListComponent {
     }
   }
   onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton',
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'search',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
+    // const toolbarItems = e.toolbarOptions.items;
+    // // Avoid adding the button more than once
+    // const alreadyAdded = toolbarItems.some(
+    //   (item: any) => item.name === 'toggleFilterButton',
+    // );
+    // if (!alreadyAdded) {
+    //   toolbarItems.splice(toolbarItems.length - 1, 0, {
+    //     widget: 'dxButton',
+    //     name: 'toggleFilterButton', // custom name to avoid duplicates
+    //     location: 'after',
+    //     options: {
+    //       icon: 'search',
+    //       hint: 'Search Column',
+    //       onClick: () => this.toggleFilters(),
+    //     },
+    //   });
+    // }
   }
 
-  onDateRangeChanged(e: any) {
-    this.selectedDateRange = e.value;
+  onDateRangeChanged(value: string) {
+    this.selectedDateRange = value;
 
-    if (e.value === 'custom') {
-      this.customStartDate = null;
-      this.customEndDate = null;
+    if (value === 'custom') {
+      //  DO NOT reset dates here
       this.showCustomDatePopup = true;
-    } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
+      return;
     }
+
+    // other ranges
+    this.customStartDate = null;
+    this.customEndDate = null;
+    this.getProductionList();
+  }
+
+  applyCustomDateFilter() {
+    if (!this.customStartDate || !this.customEndDate) return;
+
+    if (this.customStartDate > this.customEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
+
+    // keep value as custom
+    this.selectedDateRange = 'custom';
+
+    this.showCustomDatePopup = false;
+    this.getProductionList();
   }
 
   sesstion_Details() {
@@ -353,76 +360,140 @@ export class ProductionJvListComponent {
 
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
-  applyDateFilter() {
-    if (!this.selectedDateRange || !this.productionList) {
-      this.filteredproductionList = this.productionList;
-      return;
-    }
-    if (this.selectedDateRange === 'all') {
-      this.filteredproductionList = this.productionList; // show full list
-      return;
-    }
 
+  private getDateRange(): { fromDate: string | null; toDate: string | null } {
     const today = new Date();
-    let startDate: Date;
-    const endDate = new Date(); // today
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
 
     switch (this.selectedDateRange) {
       case 'today':
-        startDate = new Date();
-        startDate.setHours(0, 0, 0, 0);
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
+
       case 'last7':
-        startDate = new Date();
-        startDate.setDate(today.getDate() - 6);
-        startDate.setHours(0, 0, 0, 0);
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
+
       case 'last15':
-        startDate = new Date();
-        startDate.setDate(today.getDate() - 14);
-        startDate.setHours(0, 0, 0, 0);
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
+
       case 'last30':
-        startDate = new Date();
-        startDate.setDate(today.getDate() - 29);
-        startDate.setHours(0, 0, 0, 0);
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
-      default:
-        this.filteredproductionList = this.productionList;
-        return;
+
+      case 'all':
+        return { fromDate: null, toDate: null };
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
     }
 
-    this.filteredproductionList = this.productionList.filter((item: any) => {
-      const invoiceDate = item.PROD_DATE;
-      return invoiceDate >= startDate && invoiceDate <= endDate;
-    });
+    return {
+      fromDate: fromDate ? this.formatDate(fromDate) : null,
+      toDate: toDate ? this.formatDate(toDate) : null,
+    };
   }
 
-  applyCustomDateFilter() {
-    if (!(this.customStartDate && this.customEndDate)) return;
-
-    const start = new Date(this.customStartDate);
-    start.setHours(0, 0, 0, 0);
-
-    const end = new Date(this.customEndDate);
-    end.setHours(23, 59, 59, 999);
-
-    this.filteredproductionList = this.productionList.filter((item: any) => {
-      const invoiceDate = item.PROD_DATE;
-      return invoiceDate >= start && invoiceDate <= end;
-    });
-
-    const fromLabel = this.formatAsDDMMYYYY(start);
-    const toLabel = this.formatAsDDMMYYYY(end);
-
-    this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom'
-        ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option,
-    );
-
-    this.showCustomDatePopup = false;
+  private formatDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`; // backend friendly
   }
+
+  // applyDateFilter() {
+  //   if (!this.selectedDateRange || !this.productionList) {
+  //     this.filteredproductionList = this.productionList;
+  //     return;
+  //   }
+  //   if (this.selectedDateRange === 'all') {
+  //     this.filteredproductionList = this.productionList; // show full list
+  //     return;
+  //   }
+
+  //   const today = new Date();
+  //   let startDate: Date;
+  //   const endDate = new Date(); // today
+
+  //   switch (this.selectedDateRange) {
+  //     case 'today':
+  //       startDate = new Date();
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last7':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 6);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last15':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 14);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last30':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 29);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     default:
+  //       this.filteredproductionList = this.productionList;
+  //       return;
+  //   }
+
+  //   this.filteredproductionList = this.productionList.filter((item: any) => {
+  //     const invoiceDate = item.PROD_DATE;
+  //     return invoiceDate >= startDate && invoiceDate <= endDate;
+  //   });
+  // }
+
+  // applyCustomDateFilter() {
+  //   if (!(this.customStartDate && this.customEndDate)) return;
+
+  //   const start = new Date(this.customStartDate);
+  //   start.setHours(0, 0, 0, 0);
+
+  //   const end = new Date(this.customEndDate);
+  //   end.setHours(23, 59, 59, 999);
+
+  //   this.filteredproductionList = this.productionList.filter((item: any) => {
+  //     const invoiceDate = item.PROD_DATE;
+  //     return invoiceDate >= start && invoiceDate <= end;
+  //   });
+
+  //   const fromLabel = this.formatAsDDMMYYYY(start);
+  //   const toLabel = this.formatAsDDMMYYYY(end);
+
+  //   this.dateRanges = this.dateRanges.map((option) =>
+  //     option.value === 'custom'
+  //       ? { ...option, label: `${fromLabel} to ${toLabel}` }
+  //       : option,
+  //   );
+
+  //   this.showCustomDatePopup = false;
+  // }
 
   private parseDateString(dateStr: string): Date {
     const [day, month, year] = dateStr
