@@ -14,7 +14,7 @@
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 0.5fr; /* 2 columns for fields, 1 for image/grid */
-  gap: 6px 8px;
+  gap: 9px 10px;
   margin-bottom: 16px;
   align-items: start;
 }
@@ -42,13 +42,15 @@
 .image-upload-box {
   width: 100%;
   height: 100%;
-  border: 1px dashed #ccc;
+  border: 1px dashed #0073d8;
+  border-radius: 3px;
   position: relative;
   overflow: hidden;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #e9f3fd;
   // background-color: #f8f8f8;
 }
 
@@ -274,7 +276,7 @@
 
 .fixed-footer-buttons {
   position: absolute; /* or fixed if you want it to stay on screen while scrolling */
-  bottom: 10px; /* distance from bottom */
+  bottom: 24px; /* distance from bottom */
   right: 20px; /* distance from right */
   display: flex;
   gap: 10px; /* space between buttons */
@@ -285,6 +287,12 @@
 .innert-tab.custom-article-tabs {
   padding-bottom: 80px; /* must be >= height of buttons + margin */
 }
+
+:host ::ng-deep .dx-popup-content-scrollable {
+  overflow-y: hidden !important;
+  max-height: none !important;
+}
+
 .preview-wrapper {
   width: 200px; /* FIXED width */
   height: 150px; /* FIXED height */
@@ -308,14 +316,34 @@
   white-space: normal;
   font-size: 13px;
 }
-
-/* Force selected row highlight in dx-data-grid */
-.dx-datagrid-rowsview .dx-selection.dx-row > td {
-  background-color: #dbeafe !important;
+.tooltip-wrapper {
+  display: inline-block;
+  pointer-events: auto !important; /* Enables hover */
+  position: relative;
+  z-index: 1; /* Ensure wrapper stays above the form background */
 }
 
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > td {
-  background-color: #bfdbfe !important;
+.tooltip-wrapper * {
+  pointer-events: auto !important; /* Allow hover to reach wrapper */
+}
+/* ---------- TAB CONTAINER ---------- */
+::ng-deep .custom-article-tabs .dx-tabs {
+  background: transparent;
+  border-bottom: none;
+  padding: 4px 0;
+  gap: 6px;
+}
+
+/* ---------- INDIVIDUAL TAB ---------- */
+::ng-deep .custom-article-tabs .dx-tab {
+  border-radius: 6px;
+  background: #f3f6fb;
+  color: #333;
+  padding: 6px 14px;
+  margin-right: 6px;
+  border: none;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
 }
 
 ::ng-deep .fixed-footer {
@@ -330,10 +358,9 @@
 }
 
 ::ng-deep .fixed-footer {
-  margin-top: 0px;   /* reduce space above buttons */
-  padding-top: 6px;  /* optional: tighter look */
+  margin-top: 0px; /* reduce space above buttons */
+  padding-top: 6px; /* optional: tighter look */
 }
-
 
 /* Common button size */
 ::ng-deep .popup-footer .dx-button {
@@ -344,19 +371,31 @@
 }
 
 /* Cancel button (outlined) */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-normal.dx-button-outlined {
+::ng-deep .popup-footer .dx-button.dx-button-normal.dx-button-outlined {
   background-color: #ffffff;
   border-color: #cfcfcf;
   color: #333333;
 }
 
 /* Save button (blue primary) */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-default.dx-button-contained {
+::ng-deep .popup-footer .dx-button.dx-button-default.dx-button-contained {
   background-color: #0d6efd;
   border-color: #0d6efd;
   color: #ffffff;
+}
+
+.custom-form-tabs.dx-tabpanel {
+  border: none;
+}
+
+/* Tabs container */
+.custom-form-tabs .dx-tabs {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Tab item */
+.custom-form-tabs .dx-tab {
+  background: transparent;
+  border: none;
+  padding: 10px 18px;
 }

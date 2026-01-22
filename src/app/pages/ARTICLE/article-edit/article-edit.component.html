@@ -1,12 +1,12 @@
 <!-- Grid Section -->
 <dx-tab-panel
-  class="innert-tab custom-article-tabs"
+  class="form-tabs"
   [(selectedIndex)]="selectedTabIndex"
   [animationEnabled]="true"
   [deferRendering]="false"
 >
   <dxi-item title="Details">
-    <div style="margin-top: 8px">
+    <div style="margin-top: 10px">
       <div class="form-grid">
         <!-- 2-column form fields -->
         <div class="form-field">
@@ -339,7 +339,7 @@
   <!-- Footer Buttons -->
 
   <dxi-item title="Component" [visible]="!articleData.IS_COMPONENT">
-    <div style="margin-top: 16px">
+    <div style="margin-top: 10px">
       <div
         class="popup-content"
         style="height: 100%; display: flex; flex-direction: column"
@@ -352,7 +352,7 @@
             [showBorders]="true"
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
-            [height]="'100%'"
+            [height]="'69vh'"
             [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
             [selectedRowKeys]="selectedAttachRowKeys"
             [focusedRowEnabled]="true"
@@ -427,7 +427,7 @@
             [showBorders]="true"
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
-            [height]="'54vh'"
+            [height]="'63vh'"
             [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
             (onInitialized)="onGridInitialized($event)"
             (onInitNewRow)="onInitNewRow($event)"

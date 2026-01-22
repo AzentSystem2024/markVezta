@@ -16,7 +16,6 @@
       [showBorders]="true"
       [showRowLines]="true"
       [showColumnLines]="true"
-      [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
       [allowColumnReordering]="true"
@@ -26,7 +25,7 @@
       [columnResizingMode]="'nextColumn'"
       [filterRow]="{ visible: false }"
       [headerFilter]="{ visible: false }"
-      [scrolling]="{ mode: 'standard' }"
+      [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
@@ -56,8 +55,8 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <dxo-scrolling mode="standard"></dxo-scrolling>
-      <dxo-filter-row
+      <!-- <dxo-scrolling mode="standard"></dxo-scrolling> -->
+      <!-- <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row>
@@ -66,7 +65,7 @@
       </dxo-header-filter>
       <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-filter-builder [allowHierarchicalFields]="true">
-      </dxo-filter-builder>
+      </dxo-filter-builder> -->
 
       <dxo-toolbar>
         <dxi-item location="before">
@@ -102,13 +101,13 @@
           cssClass="export-btn"
         ></dxi-item>
 
-        <dxi-item
+        <!-- <dxi-item
           *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
-        ></dxi-item>
+        ></dxi-item> -->
       </dxo-toolbar>
 
       <div *dxTemplate="let data of 'productionTypeTemplate'">
@@ -126,17 +125,12 @@
       <div *dxTemplate="let data of 'dateFilterTemplate'">
         <dx-select-box
           [dataSource]="dateRanges"
-          [displayExpr]="displayExpr"
+          [displayExpr]="dateDisplayExpr"
           valueExpr="value"
           [(value)]="selectedDateRange"
-          (onValueChanged)="onDateRangeChanged($event)"
-          (onOpened)="attachItemClickHandler($event)"
+          (onValueChanged)="onDateRangeChanged($event.value)"
           width="180"
         >
-          <!-- This controls the dropdown list rendering -->
-          <div *dxTemplate="let item of 'item'">
-            {{ item.value === "custom" ? "Custom" : item.label }}
-          </div>
         </dx-select-box>
       </div>
 
@@ -149,12 +143,11 @@
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column dataField="ITEM_CODE" caption="Item"></dxi-column>
+      <dxi-column dataField="DESCRIPTION" caption="Item Name"></dxi-column>
       <dxi-column
         dataField="PRODUCED_QTY"
         caption="Produced Qty"
         dataType="number"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
       <!-- <dxi-column
         dataField="TOTAL_COST"
@@ -196,4 +189,40 @@
       (popupClosed)="handleClose()"
     ></app-production-jv-view>
   </ng-container>
+</dx-popup>
+<dx-popup
+  [(visible)]="showCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="170"
+  [dragEnabled]="false"
+>
+  <div>
+    <div class="date-range-container">
+      <dx-date-box
+        [(value)]="customStartDate"
+        type="date"
+        width="300"
+        placeholder="From Date"
+      >
+      </dx-date-box>
+
+      <dx-date-box
+        [(value)]="customEndDate"
+        type="date"
+        placeholder="To Date"
+        width="300"
+      >
+      </dx-date-box>
+    </div>
+
+    <div class="button-container">
+      <dx-button
+        text="Apply"
+        type="default"
+        (onClick)="applyCustomDateFilter()"
+      ></dx-button>
+    </div>
+  </div>
 </dx-popup>

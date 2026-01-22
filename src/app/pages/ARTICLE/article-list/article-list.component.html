@@ -36,6 +36,12 @@
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -85,7 +91,11 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="toolbar-icon-btn export-btn"
+        ></dxi-item>
         <!-- Search -->
         <!-- Divider -->
         <dxi-item location="after">

@@ -103,7 +103,7 @@ export class JournalBookComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     // this.get_sessionstorage_data();
     // this.get_fin_id();
@@ -111,6 +111,7 @@ export class JournalBookComponent {
   }
 
   ngOnInit() {
+    this.resetPopups();
     const raw = sessionStorage.getItem('savedUserData');
 
     // if (!raw) {
@@ -140,41 +141,34 @@ export class JournalBookComponent {
     this.load_JournalBook_data();
   }
 
-  // ngOnInit() {
-  //   // this.loadLedgerData();
+  ngAfterViewInit() {
+    setTimeout(() => this.resetPopups());
+  }
 
-  //   this.ledgerSummaryData=this.Ledger_statement_datasource
-  //   this.onFromDateChange({ value: this.defaultDate });
-  //   this.onToDateChange({ value: this.defaultDate });
-
-  // }
+  resetPopups() {
+    this.isViewJournalVoucher = false;
+    this.isViewDebitNote = false;
+    this.isViewCreditNote = false;
+    this.isViewInvoice = false;
+    this.isEditInvoice = false;
+    this.isEditCustomerReceipt = false;
+    this.editMiscPopup = false;
+    this.editMiscPopupOpened = false;
+    this.editPrePaymentPopupOpened = false;
+    this.isEditReceipt = false;
+    this.isEditPurchaseReturn = false;
+    this.isEditTransferOut = false;
+    this.isEditTransferIn = false;
+    this.isEditPopupPrepaymentPosting = false;
+  }
 
   getSessionData(key: string) {
     const data = sessionStorage.getItem(key);
     return data ? JSON.parse(data) : null;
   }
 
-  //      sesstion_Details(){
-  //     const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-  //     console.log(sessionData,'=================session data==========')
-
-  //     this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-  //     console.log(this.selected_Company_id,'============selected_Company_id==============')
-
-  //     this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
-
-  //     console.log(this.selected_fin_id,'===========selected fin id===================')
-  //
-  //   }
-
   sesstion_Details() {
     const sessionDataRaw = sessionStorage.getItem('savedUserData');
-
-    // if (!sessionDataRaw) {
-    //   // Redirect to login or dashboard
-    //   this.router.navigate(['/login']);
-    //   return;
-    // }
 
     const sessionData = JSON.parse(sessionDataRaw);
 
@@ -267,7 +261,7 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedJournalVoucher,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TransType === 36) {
@@ -279,7 +273,7 @@ export class JournalBookComponent {
         this.cdr.detectChanges();
         console.log(
           this.selectedDebitNote,
-          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
         );
       });
     } else if (TransType === 37) {
@@ -292,7 +286,7 @@ export class JournalBookComponent {
         this.cdr.detectChanges();
         console.log(
           this.selectedCreditNote,
-          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
         );
       });
     } else if (TransType === 25) {
@@ -325,7 +319,7 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedReceipt,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TransType === 2) {
@@ -339,7 +333,7 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedmiscellaneousData,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TransType === 38) {
@@ -353,7 +347,7 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedPrePayment,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TransType === 21) {
@@ -368,7 +362,7 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedPrePayment,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TransType === 20) {
@@ -383,7 +377,7 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedPurchaseReturn,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TransType === 14) {
@@ -423,7 +417,7 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.selecte_prepayment_Data,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TransType === 3) {
@@ -439,7 +433,7 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedmiscellaneousData,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     }

@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="ArticleProductionDatasource"
@@ -23,7 +23,7 @@
       [allowColumnResizing]="true"
       [columnResizingMode]="'nextColumn'"
       [headerFilter]="{ visible: true, allowSearch: true }"
-      [scrolling]="{ mode: 'standard' }"
+      [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
@@ -40,7 +40,7 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <!-- <dxo-scrolling mode="standard"></dxo-scrolling> -->
       <!-- <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
@@ -178,8 +178,6 @@
     </div>
   </div>
 </dx-popup> -->
-
-
 
 <dx-popup
   [(visible)]="showCustomDatePopup"
