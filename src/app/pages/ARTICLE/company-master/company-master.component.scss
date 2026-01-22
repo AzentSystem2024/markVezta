@@ -152,3 +152,34 @@
   background-color: rgba(0, 0, 0, 0.15);
   margin: 0 4px;
 }
+
+.form-popup-buttons-container {
+  padding: 16px 20px 10px;
+}
+
+.popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.popup-btn {
+  min-width: 90px;
+  height: 36px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* Cancel button look */
+.cancel-btn.dx-button {
+  color: #333;
+  border-color: #cfcfcf;
+  background-color: #fff;
+}
+
+/* Save button look */
+.save-btn.dx-button {
+  background-color: #0d6efd; /* DevExtreme blue */
+  border-color: #0d6efd;
+  color: #fff;
+}

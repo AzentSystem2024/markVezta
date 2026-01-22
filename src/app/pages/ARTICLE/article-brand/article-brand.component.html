@@ -124,7 +124,7 @@
   <dx-validation-group #formValidationGroup>
     <dx-form class="plain-styled-form" [formGroup]="formsource">
       <dxi-item>
-        <dx-text-box label="Code" formControlName="Code">
+        <dx-text-box label="Code" formControlName="Code" labelMode="floating">
           <dx-validator>
             <dxi-validation-rule
               type="required"
@@ -135,7 +135,11 @@
       </dxi-item>
 
       <dxi-item>
-        <dx-text-box label="Description" formControlName="Description">
+        <dx-text-box
+          label="Description"
+          formControlName="Description"
+          labelMode="floating"
+        >
           <dx-validator>
             <dxi-validation-rule
               type="required"
@@ -151,13 +155,17 @@
 <form-popup
   [(visible)]="UpdateArticleBrandPopup"
   [showApprove]="false"
-  titleText="Update Article Color"
+  titleText="Update Article Brand"
   (save)="editData()"
 >
   <dx-validation-group #formValidationGroup>
     <dx-form class="plain-styled-form">
       <dxi-item>
-        <dx-text-box label="Code" [(value)]="editingRowData.CODE">
+        <dx-text-box
+          label="Code"
+          [(value)]="editingRowData.CODE"
+          labelMode="floating"
+        >
           <dx-validator>
             <dxi-validation-rule
               type="required"
@@ -168,7 +176,11 @@
       </dxi-item>
 
       <dxi-item>
-        <dx-text-box label="Description" [(value)]="editingRowData.DESCRIPTION">
+        <dx-text-box
+          label="Description"
+          [(value)]="editingRowData.DESCRIPTION"
+          labelMode="floating"
+        >
           <dx-validator>
             <dxi-validation-rule
               type="required"

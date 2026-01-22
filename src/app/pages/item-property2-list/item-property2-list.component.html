@@ -54,7 +54,7 @@
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
           stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
+          elementAttr: { class: 'commonButtons' },
         }"
       ></dxi-item>
 
@@ -73,7 +73,7 @@
           text: 'Refresh',
           icon: 'refresh',
           onClick: refresh,
-          stylingMode: 'text'
+          stylingMode: 'text',
         }"
       ></dxi-item>
       <dxi-item location="after" locateInMenu="auto">
@@ -103,8 +103,8 @@
 <form-popup
   [(visible)]="isItemProperty2PopupOpened"
   (save)="onClickSaveItemProperty2()"
-  titleText="New {{ itemlabel }}"
-  height="300px"
+  titleText="New Color"
+  height="35vh"
   [showApprove]="false"
 >
   <app-item-property2-form
@@ -113,9 +113,9 @@
 </form-popup>
 <dx-popup
   [(visible)]="isEditItemProperty2PopupOpened"
-  titleText="Edit Item property2"
+  title="Edit Color"
   height="30vh"
-  width="40vw"
+  width="30vw"
 >
   <app-item-property2-edit
     [selectedData]="selected_data"

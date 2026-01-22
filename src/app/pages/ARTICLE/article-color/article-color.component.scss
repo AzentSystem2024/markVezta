@@ -124,3 +124,7 @@
   background-color: rgba(0, 0, 0, 0.15);
   margin: 0 4px;
 }
+
+::ng-deep .plain-styled-form .dx-field-item {
+  margin-bottom: 5px; /* adjust spacing here */
+}

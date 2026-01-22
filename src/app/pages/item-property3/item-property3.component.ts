@@ -167,6 +167,7 @@ export class ItemProperty3Component {
     const payload = {
       COMPANY_ID: this.companyID,
     };
+    console.log;
     this.dataservice.getItemProperty3Data(payload).subscribe((response) => {
       this.itemproperty3 = response;
     });

@@ -92,7 +92,7 @@ export class ItemcategoryEditComponent {
   }
 
   closePopup(){
-
+     this.popupClosed.emit()
   }
   UpdateData(){
     

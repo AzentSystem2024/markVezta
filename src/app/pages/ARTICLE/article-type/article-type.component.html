@@ -109,7 +109,11 @@
   <dx-validation-group #formValidationGroup>
     <dx-form class="plain-styled-form" [formGroup]="formsource">
       <dxi-item>
-        <dx-text-box label="Description" formControlName="Description">
+        <dx-text-box
+          label="Description"
+          formControlName="Description"
+          labelMode="floating"
+        >
           <dx-validator>
             <dxi-validation-rule
               type="required"
@@ -131,7 +135,11 @@
   <dx-validation-group #formValidationGroup>
     <dx-form class="plain-styled-form">
       <dxi-item>
-        <dx-text-box label="Description" [(value)]="editingRowData.DESCRIPTION">
+        <dx-text-box
+          label="Description"
+          [(value)]="editingRowData.DESCRIPTION"
+          labelMode="floating"
+        >
           <dx-validator>
             <dxi-validation-rule
               type="required"

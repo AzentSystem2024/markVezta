@@ -79,8 +79,8 @@
         icon: 'search',
         hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
         onClick: toggleFilterRow,
-        stylingMode: 'contained',
-        elementAttr: { class: 'toolbar-icon-btn' },
+        stylingMode: 'text',
+        elementAttr: { class: 'commonButtons' },
       }"
     ></dxi-item>
     <!-- Refresh -->
@@ -90,12 +90,9 @@
       [options]="{
         icon: 'refresh',
         onClick: refresh,
-        hint: 'Refresh',
-        stylingMode: 'contained',
-        elementAttr: { class: 'toolbar-icon-btn' },
+        stylingMode: 'text',
       }"
     ></dxi-item>
-
     <!-- Search -->
     <!-- Divider -->
     <dxi-item location="after">
@@ -145,7 +142,7 @@
   [height]="250"
   [(visible)]="isEditDepartmentPopupOpened"
   [width]="500"
-  titleText="Edit Department"
+  title="Edit Department"
   (formClosed)="handleClose()"
 >
   <app-department-edit

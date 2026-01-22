@@ -1,5 +1,5 @@
 <dx-validation-group #departmentValidationGroup>
-<dx-form class="plain-styled-form" >
+  <dx-form class="plain-styled-form">
     <dxi-item itemType="group">
       <dxo-col-count-by-screen
         [xs]="1"
@@ -12,49 +12,54 @@
           <dx-text-box
             label="Code"
             [(value)]="formDepartmentData.CODE"
-             labelMode="floating"
+            labelMode="floating"
             (keypress)="keyPressCode($event)"
-          ><dx-validator>
-  <dxi-validation-rule type="required" message="Department Code is required"></dxi-validation-rule>
-</dx-validator>
+            ><dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Department Code is required"
+              ></dxi-validation-rule>
+            </dx-validator>
           </dx-text-box>
         </div>
       </dxi-item>
-  
+
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
             label="Department Name"
             [(value)]="formDepartmentData.DEPT_NAME"
-           labelMode="floating"
+            labelMode="floating"
             (keypress)="keyPressDepartment($event)"
-          ><dx-validator>
-  <dxi-validation-rule type="required" message="Department Name is required"></dxi-validation-rule>
-</dx-validator>
+            ><dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Department Name is required"
+              ></dxi-validation-rule>
+            </dx-validator>
           </dx-text-box>
         </div>
       </dxi-item>
 
-<dxi-item>
-  <div class="button-container">
-    <dx-button
-      text="Cancel"
-      stylingMode="outlined"
-      type="normal"
-      class="btn"
-      (onClick)="cancel()"
-    ></dx-button>
+      <dxi-item>
+        <div class="fixed-footer popup-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            type="normal"
+            class="btn"
+            (onClick)="cancel()"
+          ></dx-button>
 
-    <dx-button
-      text="Save"
-      stylingMode="contained"
-      type="default"
-      class="btn"
-      (onClick)="UpdateDepartment()"
-    ></dx-button>
-  </div>
-</dxi-item>
-
+          <dx-button
+            text="Save"
+            stylingMode="contained"
+            type="default"
+            class="btn"
+            (onClick)="UpdateDepartment()"
+          ></dx-button>
+        </div>
+      </dxi-item>
     </dxi-item>
   </dx-form>
-  </dx-validation-group>
+</dx-validation-group>

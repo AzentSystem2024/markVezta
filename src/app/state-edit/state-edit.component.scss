@@ -1,6 +1,32 @@
 .fixed-footer {
+  padding: 16px 20px 10px;
+}
+
+/* Button alignment */
+.popup-footer {
   display: flex;
-  justify-content: flex-end; /* push buttons to right */
-  gap: 0.5rem; /* space between buttons */
-  padding: 1rem; /* optional: breathing room */
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Common button size */
+.action-btn.dx-button {
+  min-width: 90px;
+  height: 36px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* Cancel button */
+.cancel-btn.dx-button {
+  color: #333;
+  border-color: #cfcfcf;
+  background-color: #fff;
+}
+
+/* Save button */
+.save-btn.dx-button {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
 }

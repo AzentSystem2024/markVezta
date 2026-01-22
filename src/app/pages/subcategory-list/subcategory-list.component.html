@@ -70,7 +70,7 @@
         text: 'Refresh',
         icon: 'refresh',
         onClick: refresh,
-        stylingMode: 'text'
+        stylingMode: 'text',
       }"
     ></dxi-item>
     <!-- <dxi-item location="after" locateInMenu="auto">
@@ -125,7 +125,7 @@
 <form-popup
   [(visible)]="isAddSubcategoryPopupOpened"
   (save)="onClickSaveSubCategory()"
-  titleText="New Category"
+  titleText="New SubCategory"
   [showApprove]="false"
 >
   <app-subcategory-form></app-subcategory-form>
@@ -133,8 +133,8 @@
 
 <dx-popup
   [(visible)]="editSubcategory"
-  [width]="'40vw'"
-  [height]="'50vh'"
+  [width]="'30vw'"
+  [height]="'40vh'"
   title="Update Subcategory"
   (onHiding)="handleClose()"
 >

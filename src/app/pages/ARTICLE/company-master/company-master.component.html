@@ -345,16 +345,18 @@
   <div class="form-popup-buttons-container">
     <div class="popup-footer">
       <dx-button
-        class="btn me-1 border border-1 equal-button"
-        (click)="closePop()"
-      >
-        Cancel
-      </dx-button>
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        class="popup-btn cancel-btn"
+        (onClick)="closePop()"
+      ></dx-button>
+
       <dx-button
-        class="equal-button"
         text="Save"
-        type="default"
         stylingMode="contained"
+        type="default"
+        class="popup-btn save-btn"
         (onClick)="addData()"
       ></dx-button>
     </div>
@@ -364,7 +366,7 @@
 <dx-popup
   [(visible)]="editPopup"
   [width]="630"
-  [height]="'100vh'"
+  height="670"
   title="Update Company"
   [shading]="false"
   [showCloseButton]="true"
@@ -598,21 +600,22 @@
     </div>
   </dxi-item>
 
-  <!-- BUTTONS -->
   <div class="form-popup-buttons-container">
     <div class="popup-footer">
       <dx-button
-        class="btn me-1 border border-1 equal-button"
-        (click)="closePop()"
-      >
-        Cancel
-      </dx-button>
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        class="popup-btn cancel-btn"
+        (onClick)="closePop()"
+      ></dx-button>
+
       <dx-button
-        class="equal-button"
         text="Save"
-        type="default"
         stylingMode="contained"
-        (onClick)="editData()"
+        type="default"
+        class="popup-btn save-btn"
+        (onClick)="addData()"
       ></dx-button>
     </div>
   </div>

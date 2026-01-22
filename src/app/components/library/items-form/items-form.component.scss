@@ -541,6 +541,11 @@ button:hover {
   background: transparent;
   margin-left: 20px;
 }
+
+::ng-deep .field-spacing {
+  margin-bottom: 16px;   /* space between fields */
+}
+
 // .plus-btn {
 //   width: 28px;
 //   height: 28px;
