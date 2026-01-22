@@ -140,24 +140,39 @@ export class PurchaseOrderComponent {
   auto: string = 'auto';
   isApproved: boolean = false;
 
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
-      this.zone.run(() => {
-        this.openPurchaseOrderForm();
-      });
+      this.ngZone.run(() => this.openPurchaseOrderForm());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
 
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -191,8 +206,8 @@ export class PurchaseOrderComponent {
 
   constructor(
     private service: DataService,
-    private zone: NgZone,
-    private router: Router
+    private ngZone: NgZone,
+    private router: Router,
   ) {
     // const userRights = sessionStorage.getItem('menuUserRightsResponse');
     // this.userRights = JSON.parse(userRights);
@@ -206,12 +221,12 @@ export class PurchaseOrderComponent {
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
       this.HSN_CODE,
-      '===========selected HSN CODE==================='
+      '===========selected HSN CODE===================',
     );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     console.log(
       this.GST_PERC,
-      '===========selected GST PERC==================='
+      '===========selected GST PERC===================',
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -222,7 +237,7 @@ export class PurchaseOrderComponent {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
@@ -279,7 +294,7 @@ export class PurchaseOrderComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -326,7 +341,7 @@ export class PurchaseOrderComponent {
     this.service.getTemplateList(this.doc).subscribe((res: any) => {
       this.templateList = res.data;
       const defaultTemplate = this.templateList.find(
-        (item: any) => item.IS_DEFAULT === true
+        (item: any) => item.IS_DEFAULT === true,
       );
       if (defaultTemplate) {
         this.selectedTemplate = defaultTemplate.TEMPLATE_NAME;
@@ -564,7 +579,7 @@ export class PurchaseOrderComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -683,7 +698,7 @@ export class PurchaseOrderComponent {
           message: 'Please select Store',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return false;
     }
@@ -693,7 +708,7 @@ export class PurchaseOrderComponent {
           message: 'Please select Supplier',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return false;
     }
@@ -703,7 +718,7 @@ export class PurchaseOrderComponent {
           message: 'Please select PO Date',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return false;
     }
@@ -713,7 +728,7 @@ export class PurchaseOrderComponent {
           message: 'Please select Delivery Date',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return false;
     }
@@ -727,7 +742,7 @@ export class PurchaseOrderComponent {
           message: 'Please add at least one item',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return false;
     }
@@ -762,7 +777,7 @@ export class PurchaseOrderComponent {
               message: 'Data Saved & Approved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -770,7 +785,7 @@ export class PurchaseOrderComponent {
               message: 'Data Saved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
         }
 
@@ -791,7 +806,7 @@ export class PurchaseOrderComponent {
             message: 'Your Data Not Saved',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -808,7 +823,7 @@ export class PurchaseOrderComponent {
       // 🔹 Show confirmation dialog before approving
       confirm(
         'Are you sure you want to approve this Purchase Order?',
-        'Confirm Approval'
+        'Confirm Approval',
       ).then((dialogResult) => {
         if (dialogResult) {
           // User confirmed → call approve API
@@ -819,7 +834,7 @@ export class PurchaseOrderComponent {
                   message: 'Purchase Order Approved',
                   position: { at: 'top center', my: 'top center' },
                 },
-                'success'
+                'success',
               );
               this.CloseEditForm();
               this.getPurchaseOrderList();
@@ -829,7 +844,7 @@ export class PurchaseOrderComponent {
                   message: res?.Message || 'Approval Failed',
                   position: { at: 'top center', my: 'top center' },
                 },
-                'error'
+                'error',
               );
             }
           });
@@ -846,7 +861,7 @@ export class PurchaseOrderComponent {
               message: 'Data Updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.CloseEditForm();
           this.getPurchaseOrderList();
@@ -856,7 +871,7 @@ export class PurchaseOrderComponent {
               message: 'Your Data Not Updated',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -875,7 +890,7 @@ export class PurchaseOrderComponent {
             message: 'Data Verified Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
         this.CloseEditForm();
         this.getPurchaseOrderList();
@@ -885,7 +900,7 @@ export class PurchaseOrderComponent {
             message: 'Your Data Not Verified',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -903,7 +918,7 @@ export class PurchaseOrderComponent {
             message: 'Data Approved Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
         this.CloseEditForm();
         this.getPurchaseOrderList();
@@ -913,7 +928,7 @@ export class PurchaseOrderComponent {
             message: 'Your Data Not Approved',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -981,7 +996,7 @@ export class PurchaseOrderComponent {
     console.log(event, 'event');
     var invisibleIntParamValue = 42;
     var intParam = event.args.ActualParametersInfo.filter(
-      (x: any) => x.parameterDescriptor.name == 'intParam'
+      (x: any) => x.parameterDescriptor.name == 'intParam',
     )[0];
     intParam.value = invisibleIntParamValue;
     console.log(intParam, 'intparam');

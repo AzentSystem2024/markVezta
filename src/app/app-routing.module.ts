@@ -214,6 +214,7 @@ import { GstReportB2CLComponent } from './pages/REPORT/gst-report-b2-cl/gst-repo
 import { GstReportCDNRComponent } from './pages/REPORT/gst-report-cdnr/gst-report-cdnr.component';
 import { ProductionJvListComponent } from './production-jv-list/production-jv-list.component';
 import { ArticleproductionJvListComponent } from './articleproduction-jv-list/articleproduction-jv-list.component';
+import { StockViewComponent } from './stock-view/stock-view.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -932,6 +933,11 @@ const routes: Routes = [
       {
         path: 'article-production-jv-list',
         component: ArticleproductionJvListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'stock-view',
+        component: StockViewComponent,
         canActivate: [AuthGuardService],
       },
       {

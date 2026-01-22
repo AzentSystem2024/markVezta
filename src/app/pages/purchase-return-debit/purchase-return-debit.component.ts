@@ -81,19 +81,41 @@ export class PurchaseReturnDebitComponent {
   canApprove = false;
   canPrint = false;
 
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.ngZone.run(() => {
-        this.addPurchaseReturn();
-      });
+      this.ngZone.run(() => this.addPurchaseReturn());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
   };
   isAddDebitNote: boolean = false;
   isEditDebitNote: boolean = false;
@@ -117,12 +139,12 @@ export class PurchaseReturnDebitComponent {
   sessionData: any;
   selected_vat_id: any;
 
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
+  // refreshButtonOptions = {
+  //   icon: 'refresh',
+  //   hint: 'Refresh',
+  //   onClick: () => this.refreshGrid(),
+  //   text: '',
+  // };
   isAddPurchaseReturn: boolean;
   isEditPurchaseReturn: boolean;
   isViewPurchaseReturn: boolean;
@@ -140,14 +162,14 @@ export class PurchaseReturnDebitComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     console.log('Parsed ObjectData:', menuResponse);
@@ -215,6 +237,7 @@ export class PurchaseReturnDebitComponent {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.getpurchaseReturnList();
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
@@ -275,7 +298,7 @@ export class PurchaseReturnDebitComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -336,7 +359,7 @@ export class PurchaseReturnDebitComponent {
         // const journalDate = this.parseDateString(item.RET_DATE);
         const journalDate = item.RET_DATE;
         return journalDate >= startDate && journalDate <= endDate;
-      }
+      },
     );
   }
 
@@ -354,7 +377,7 @@ export class PurchaseReturnDebitComponent {
         // const journalDate = this.parseDateString(item.RET_DATE);
         const journalDate = item.RET_DATE;
         return journalDate >= start && journalDate <= end;
-      }
+      },
     );
 
     const fromLabel = this.formatAsDDMMYYYY(start);
@@ -363,7 +386,7 @@ export class PurchaseReturnDebitComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -466,7 +489,7 @@ export class PurchaseReturnDebitComponent {
               message: 'Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getpurchaseReturnList();
           // this.dataGrid.instance.refresh();
@@ -476,14 +499,14 @@ export class PurchaseReturnDebitComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="filteredJournalVoucherList"
@@ -31,7 +31,6 @@
       focusStateEnabled="false"
       (onEditingStart)="onEditJournalVoucher($event)"
       (onRowRemoving)="onDeleteJournalVoucher($event)"
-      (onToolbarPreparing)="onToolbarPreparing($event)"
       (onExporting)="onExporting($event)"
       (onCellPrepared)="onCellPrepared($event)"
     >
@@ -79,21 +78,27 @@
           location="after"
           locateInMenu="auto"
           widget="dxButton"
-          [options]="refreshButtonOptions"
-        ></dxi-item>
-
-        <dxi-item
-          name="exportButton"
-          location="after"
-          cssClass="custom-export-button"
+          [options]="searchButtonOptions"
         ></dxi-item>
 
         <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
-          [options]="addButtonOptions"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
           *ngIf="canAdd"
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
 
@@ -133,7 +138,7 @@
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
       >
       </dxi-column>

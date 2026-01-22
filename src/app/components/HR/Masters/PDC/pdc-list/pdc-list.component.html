@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="PDCListDataSource"
@@ -130,14 +130,28 @@
         </dxi-item>
 
         <dxi-item
-          name="exportButton"
           location="after"
-          cssClass="custom-export-button"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
         ></dxi-item>
 
         <dxi-item
           location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
           *ngIf="canAdd"
+          location="after"
+          locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>

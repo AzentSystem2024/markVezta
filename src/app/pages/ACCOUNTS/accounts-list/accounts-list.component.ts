@@ -82,24 +82,39 @@ export class AccountsListComponent {
   };
   auto: string = 'auto';
   selectedAccountHead: any;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.ngZone.run(() => {
-        this.addAccount();
-      });
+      this.ngZone.run(() => this.addAccount());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
 
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -111,14 +126,14 @@ export class AccountsListComponent {
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     console.log('Parsed ObjectData:', menuResponse);
@@ -156,6 +171,7 @@ export class AccountsListComponent {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.getAccountsGroupList();
   }
 
   toggleFilters() {
@@ -173,7 +189,7 @@ export class AccountsListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -215,7 +231,7 @@ export class AccountsListComponent {
               if (response?.Data && Array.isArray(response.Data)) {
                 // Sort data by ID (descending)
                 const sortedData = response.Data.sort(
-                  (a: any, b: any) => b.ID - a.ID
+                  (a: any, b: any) => b.ID - a.ID,
                 );
 
                 // Add serial number
@@ -223,7 +239,7 @@ export class AccountsListComponent {
                   (item: any, index: number) => ({
                     ...item,
                     sno: index + 1,
-                  })
+                  }),
                 );
 
                 resolve(formattedData); // ✅ return the formatted data
@@ -313,7 +329,7 @@ export class AccountsListComponent {
               message: 'Account Head Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getAccountsGroupList();
           // this.dataGrid.instance.refresh();
@@ -323,14 +339,14 @@ export class AccountsListComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

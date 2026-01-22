@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -80,21 +81,41 @@ export class PurchaseInvoiceListComponent {
   canApprove = false;
   canPrint = false;
 
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    onClick: () => this.addPurchaseInvoice(),
+    onClick: () => {
+      this.ngZone.run(() => this.addPurchaseInvoice());
+    },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
   };
 
   dateRanges = [
@@ -119,14 +140,15 @@ export class PurchaseInvoiceListComponent {
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private ngZone: NgZone,
+    private router: Router,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -151,41 +173,46 @@ export class PurchaseInvoiceListComponent {
     this.getPurchaseInvoiceList();
   }
 
-     sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+  }
 
   getPurchaseInvoiceList() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id
-    }
-    this.dataService.getPurchaseInvoiceList(payload).subscribe((response: any) => {
-      this.purchaseInvoiceList = response.PurchHeaders.map((item: any) => {
-        let dateValue: Date;
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService
+      .getPurchaseInvoiceList(payload)
+      .subscribe((response: any) => {
+        this.purchaseInvoiceList = response.PurchHeaders.map((item: any) => {
+          let dateValue: Date;
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.PURCH_DATE))) {
-          dateValue = new Date(item.PURCH_DATE);
-        } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.PURCH_DATE);
-        }
+          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
+          if (!isNaN(Date.parse(item.PURCH_DATE))) {
+            dateValue = new Date(item.PURCH_DATE);
+          } else {
+            // Case 2: If backend gives dd-MM-yyyy format
+            dateValue = this.parseDateString(item.PURCH_DATE);
+          }
 
-        return {
-          ...item,
-          PURCH_DATE: dateValue,
-        };
-      }).sort((a: any, b: any) => {
-        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-        return numB - numA; // descending order
+          return {
+            ...item,
+            PURCH_DATE: dateValue,
+          };
+        }).sort((a: any, b: any) => {
+          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+          return numB - numA; // descending order
+        });
+
+        this.applyDateFilter();
       });
-
-      this.applyDateFilter();
-    });
   }
 
   refreshGrid() {
@@ -236,7 +263,7 @@ export class PurchaseInvoiceListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -316,7 +343,7 @@ export class PurchaseInvoiceListComponent {
 
         const invoiceDate = item.PURCH_DATE;
         return invoiceDate >= startDate && invoiceDate <= endDate;
-      }
+      },
     );
   }
 
@@ -333,7 +360,7 @@ export class PurchaseInvoiceListComponent {
       (item: any) => {
         const invoiceDate = item.PURCH_DATE;
         return invoiceDate >= start && invoiceDate <= end;
-      }
+      },
     );
 
     const fromLabel = this.formatAsDDMMYYYY(start);
@@ -342,7 +369,7 @@ export class PurchaseInvoiceListComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -459,7 +486,7 @@ export class PurchaseInvoiceListComponent {
               message: 'Invoice Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getPurchaseInvoiceList();
           // this.dataGrid.instance.refresh();
@@ -469,14 +496,14 @@ export class PurchaseInvoiceListComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

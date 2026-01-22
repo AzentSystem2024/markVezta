@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="filteredInvoiceList"
@@ -33,7 +33,6 @@
       (onExporting)="onExporting($event)"
       (onEditingStart)="onEditCreditNote($event)"
       (onRowRemoving)="onDeleteCreditNote($event)"
-      (onToolbarPreparing)="onToolbarPreparing($event)"
       (onCellPrepared)="onCellPrepared($event)"
     >
       <dxo-editing
@@ -77,13 +76,21 @@
           location="after"
           locateInMenu="auto"
           widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
         <dxi-item
           name="exportButton"
           location="after"
-          cssClass="custom-export-button"
+          cssClass="export-btn"
         ></dxi-item>
+
         <dxi-item
           *ngIf="canAdd"
           location="after"
@@ -149,7 +156,7 @@
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
         [fixed]="true"
         fixedPosition="right"

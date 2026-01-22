@@ -79,14 +79,14 @@ export class DataService {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
   }
 
@@ -179,7 +179,7 @@ export class DataService {
 
     return this.http.post<any>(
       `${this.apiUrl}article/select/` + id,
-      {} // removed /${id}
+      {}, // removed /${id}
     );
   }
 
@@ -302,7 +302,7 @@ export class DataService {
   selectDebitNote(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}ACTransactions/debitselect/` + id,
-      {}
+      {},
     );
   }
 
@@ -319,7 +319,7 @@ export class DataService {
   deleteDebitNote(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}ACTransactions/debitdelete/` + id,
-      {}
+      {},
     );
   }
 
@@ -393,6 +393,11 @@ export class DataService {
 
   getPendingInvoiceList(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}AC_CreditNote/invoicelist`, payload);
+  }
+
+  //--------------------------------STOCK VIEW----------------------------------------------------------//
+  getStockViewList(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}ItemStockRpt/itemstockrpt`, payload);
   }
   //-------------------------------INVOICE-TRANSFER-OUT-------------------------------------//
   //---------------------------------------INVOICE-------------------------------------------//
@@ -468,7 +473,7 @@ export class DataService {
   selectArticleProduction(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}ArticleProduction/select/` + id,
-      {}
+      {},
     );
   }
 
@@ -556,7 +561,7 @@ export class DataService {
   getInvoiceNoDelivery(): Observable<any> {
     return this.http.post(
       `${this.apiUrl}Sales_Invoice/GetLatestVoucherNumber`,
-      {}
+      {},
     );
   }
   //   getPendingInvoiceforSupplierPayment(payload: any): Observable<any> {
@@ -745,7 +750,7 @@ export class DataService {
   getVoucherNoForSalesOrder(): Observable<any> {
     return this.http.post(
       `${this.apiUrl}SalesOrder/GetLatestVoucherNumber`,
-      {}
+      {},
     );
   }
   //........................................DELIVERY NOTE............................................//
@@ -830,7 +835,7 @@ export class DataService {
   getVoucherNoPhysicalInventry(): Observable<any> {
     return this.http.post(
       `${this.apiUrl}PhysicalStock/GetLatestVoucherNumber`,
-      {}
+      {},
     );
   }
   //----------------------------------------PAY-SLIP-------------------------------------------------//
@@ -863,7 +868,7 @@ export class DataService {
   getItemQuantityStock(data: any) {
     return this.http.post(
       `${this.apiUrl}ItemQtyReport/itemquantityreport`,
-      data
+      data,
     );
   }
 
@@ -871,7 +876,7 @@ export class DataService {
   getItemStockValue(data: any) {
     return this.http.post(
       `${this.apiUrl}ItemStockValueRept/itemstockvaluereport`,
-      data
+      data,
     );
   }
 
@@ -969,21 +974,21 @@ export class DataService {
   getPdcList(payload: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}SupplierPayment/GetPDCListBySupplierId`,
-      payload
+      payload,
     );
   }
 
   getPdcListByCustomer(payload: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}Receipt/GetPDCListByCustomerId`,
-      payload
+      payload,
     );
   }
 
   selectSupplierPayment(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}SupplierPayment/select/` + id,
-      {}
+      {},
     );
   }
 
@@ -1009,7 +1014,7 @@ export class DataService {
   selectPurchaseInvoice(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}PurchaseInvoice/select/` + id,
-      {}
+      {},
     );
   }
 
@@ -1038,7 +1043,7 @@ export class DataService {
   deletePurchaseInvoice(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}PurchaseInvoice/delete/` + id,
-      {}
+      {},
     );
   }
 
@@ -1303,42 +1308,42 @@ export class DataService {
   saveWorksheetPrice(payload: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}worksheetitemproperty/insertprice`,
-      payload
+      payload,
     );
   }
 
   updateworksheetItemPrice(payload: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}worksheetitemproperty/updateprice`,
-      payload
+      payload,
     );
   }
 
   selectWorksheetForPrice(id: number): Observable<any> {
     return this.http.post(
       `${this.apiUrl}worksheetitemproperty/selectprice/${id}`,
-      {}
+      {},
     );
   }
 
   verifyItemStorePrices(payload: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}worksheetitemproperty/Verifyprice`,
-      payload
+      payload,
     ); // Use 'httpClient', not 'HttpClient'
   }
 
   approveworksheetItemPrices(payload: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}worksheetitemproperty/Approvalprice`,
-      payload
+      payload,
     );
   }
 
   deleteWorksheetOfStorePrices(id: number): Observable<any> {
     return this.http.post(
       `${this.apiUrl}worksheetitemproperty/delete/${id}`,
-      {}
+      {},
     );
   }
 
@@ -1354,7 +1359,7 @@ export class DataService {
   //denail
   public getDenialsData() {
     return this.http.get<any>(
-      'http://103.180.120.134/projectx/api/DenialMaster/List'
+      'http://103.180.120.134/projectx/api/DenialMaster/List',
     );
   }
   //uservelel_menus
@@ -1400,7 +1405,7 @@ export class DataService {
     CODE: any,
     DEPT_NAME: any,
     COMPANY_ID: any,
-    COMPANY_NAME: any
+    COMPANY_NAME: any,
   ): Observable<any> {
     const data = { CODE, DEPT_NAME, COMPANY_ID, COMPANY_NAME };
 
@@ -1433,7 +1438,7 @@ export class DataService {
   public postCountryData(
     CODE: any,
     COUNTRY_NAME: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { CODE, COUNTRY_NAME, COMPANY_ID };
 
@@ -1456,7 +1461,7 @@ export class DataService {
   public postBrandData(
     CODE: any,
     BRAND_NAME: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { CODE, BRAND_NAME, COMPANY_ID };
 
@@ -1470,14 +1475,14 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}/itembrand/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updateBrand(
     ID: any,
     CODE: any,
     BRAND_NAME: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { ID, CODE, BRAND_NAME, COMPANY_ID };
 
@@ -1494,7 +1499,7 @@ export class DataService {
     DESCRIPTION: any,
     FRACTION_UNIT: any,
     EXCHANGE: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = {
       CODE,
@@ -1514,7 +1519,7 @@ export class DataService {
     description: any,
     fraction_unit: any,
     exchange: any,
-    companyId: string
+    companyId: string,
   ) {
     const requestBody = {
       CODE: code,
@@ -1526,7 +1531,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}/currency/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updateCurrency(
@@ -1536,7 +1541,7 @@ export class DataService {
     DESCRIPTION: any,
     FRACTION_UNIT: any,
     EXCHANGE: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = {
       ID,
@@ -1569,7 +1574,7 @@ export class DataService {
     LOYALTY_POINT: any,
     COST_HEAD_ID: any,
     DEPT_ID: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = {
       CODE,
@@ -1589,7 +1594,7 @@ export class DataService {
     loyaltypoint: any,
     cost_head_id: any,
     dept_id: any,
-    companyId: any
+    companyId: any,
   ) {
     const requestBody = {
       CODE: code,
@@ -1601,7 +1606,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}itemcategory/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   // updateCategory(
@@ -1649,7 +1654,7 @@ export class DataService {
     SUBCAT_NAME: any,
     CAT_ID: any,
     DEPT_ID: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { CODE, SUBCAT_NAME, CAT_ID, DEPT_ID, COMPANY_ID };
 
@@ -1663,7 +1668,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}itemsubcategory/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   //==============new update api--    subcategory
@@ -1678,7 +1683,7 @@ export class DataService {
     CODE: any,
     SUBCAT_NAME: any,
     CAT_ID: any,
-    DEPT_ID: any
+    DEPT_ID: any,
   ): Observable<any> {
     const data = { ID, CODE, SUBCAT_NAME, CAT_ID, DEPT_ID };
 
@@ -1693,7 +1698,7 @@ export class DataService {
     CODE: any,
     VAT_NAME: any,
     VAT_PERC: any,
-    COMPANY_ID: AnyARecord
+    COMPANY_ID: AnyARecord,
   ): Observable<any> {
     const data = { CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
 
@@ -1708,7 +1713,7 @@ export class DataService {
     CODE: any,
     VAT_NAME: any,
     VAT_PERC: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { ID, CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
 
@@ -1722,7 +1727,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}vatclass/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
 
@@ -1754,7 +1759,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}/paymentterm/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updatePaymentTerms(ID: any, CODE: any, DESCRIPTION: any): Observable<any> {
@@ -1779,7 +1784,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}/deliveryterm/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updateDeliveryTerms(ID: any, CODE: any, DESCRIPTION: any): Observable<any> {
@@ -1811,7 +1816,7 @@ export class DataService {
     VAT_REGNO: any,
     GROUP_ID: any,
     STORE_NO,
-    IS_ACTIVE: any
+    IS_ACTIVE: any,
   ): Observable<any> {
     const data = {
       COMPANY_ID,
@@ -1853,7 +1858,7 @@ export class DataService {
     phone: any,
     email: any,
     vat_regno: any,
-    group_id: any
+    group_id: any,
   ) {
     const requestBody = {
       CODE: code,
@@ -1874,7 +1879,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}stores/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updateStores(
@@ -1896,7 +1901,7 @@ export class DataService {
     VAT_REGNO: any,
     GROUP_ID: any,
     STORE_NO: any,
-    IS_ACTIVE: any
+    IS_ACTIVE: any,
   ): Observable<any> {
     const data = {
       ID,
@@ -1960,7 +1965,7 @@ export class DataService {
     PAY_TERM_ID: any,
     VAT_RULE_ID: any,
     IS_COMPANY_BRANCH: any,
-    Supplier_cost: any
+    Supplier_cost: any,
   ): Observable<any> {
     const data = {
       COMPANY_ID: this.selected_Company_id,
@@ -2026,7 +2031,7 @@ export class DataService {
     PAY_TERM_ID: any,
     VAT_RULE_ID: any,
     IS_COMPANY_BRANCH: any,
-    Supplier_cost: any
+    Supplier_cost: any,
   ): Observable<any> {
     const data = {
       COMPANY_ID: this.selected_Company_id,
@@ -2082,7 +2087,7 @@ export class DataService {
     vat_regno: any,
     currency_id: any,
     payterm_id: any,
-    vatrule_id: any
+    vatrule_id: any,
   ) {
     const requestBody = {
       SUPP_CODE: code,
@@ -2107,14 +2112,14 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}supplier/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updateSupplier(data: any): Observable<any> {
     return this.http.post<any>(
       `
     ${this.apiUrl}supplier/save`,
-      data
+      data,
     );
   }
 
@@ -2134,7 +2139,7 @@ export class DataService {
   public postStateData(
     STATE_CODE: any,
     STATE_NAME: any,
-    COUNTRY_ID: any
+    COUNTRY_ID: any,
   ): Observable<any> {
     const data = { STATE_CODE, STATE_NAME, COUNTRY_ID };
 
@@ -2152,7 +2157,7 @@ export class DataService {
     ID: any,
     STATE_CODE: any,
     STATE_NAME: any,
-    COUNTRY_ID: any
+    COUNTRY_ID: any,
   ): Observable<any> {
     const data = { ID, STATE_CODE, STATE_NAME, COUNTRY_ID };
 
@@ -2179,7 +2184,7 @@ export class DataService {
   public postItemProperty1Data(
     CODE: any,
     DESCRIPTION: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { CODE, DESCRIPTION, COMPANY_ID };
 
@@ -2189,7 +2194,7 @@ export class DataService {
     id: any,
     code: string,
     description: string,
-    companyId: string
+    companyId: string,
   ) {
     const requestBody = {
       CODE: code,
@@ -2198,7 +2203,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}itemproperty1/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updateItemProperty1(item: any) {
@@ -2218,7 +2223,7 @@ export class DataService {
   public postItemProperty2Data(
     CODE: any,
     DESCRIPTION: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { CODE, DESCRIPTION, COMPANY_ID };
 
@@ -2228,7 +2233,7 @@ export class DataService {
     id: any,
     code: string,
     description: string,
-    companyId: string
+    companyId: string,
   ) {
     const requestBody = {
       CODE: code,
@@ -2237,7 +2242,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}itemproperty2/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updateItemProperty2(item: any) {
@@ -2257,7 +2262,7 @@ export class DataService {
   public insertItemProperty3Data(
     CODE: any,
     DESCRIPTION: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { CODE, DESCRIPTION, COMPANY_ID };
     return this.http.post(`${this.apiUrl}itemproperty3/save`, data);
@@ -2273,7 +2278,7 @@ export class DataService {
     id: any,
     code: string,
     description: string,
-    companyId: string
+    companyId: string,
   ) {
     const requestBody = {
       CODE: code,
@@ -2282,7 +2287,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}itemproperty3/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
 
@@ -2302,7 +2307,7 @@ export class DataService {
   insertItemProperty4Data(
     CODE: any,
     DESCRIPTION: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { CODE, DESCRIPTION, COMPANY_ID };
 
@@ -2313,7 +2318,7 @@ export class DataService {
     id: any,
     code: string,
     description: string,
-    companyId: string
+    companyId: string,
   ) {
     const requestBody = {
       CODE: code,
@@ -2322,7 +2327,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}itemproperty4/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
 
@@ -2343,7 +2348,7 @@ export class DataService {
   public insertItemProperty5Data(
     CODE: any,
     DESCRIPTION: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = { CODE, DESCRIPTION, COMPANY_ID };
 
@@ -2354,7 +2359,7 @@ export class DataService {
     id: any,
     code: string,
     description: string,
-    companyId: string
+    companyId: string,
   ) {
     const requestBody = {
       CODE: code,
@@ -2363,7 +2368,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}itemproperty5/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
 
@@ -2385,7 +2390,7 @@ export class DataService {
     MOBILE: any,
     EMAIL: any,
     IQAMA_NO: any,
-    INCENTIVE_PERCENT: any
+    INCENTIVE_PERCENT: any,
   ): Observable<any> {
     const data = {
       EMP_CODE,
@@ -2422,7 +2427,7 @@ export class DataService {
     MOBILE: any,
     EMAIL: any,
     IQAMA_NO: any,
-    INCENTIVE_PERCENT: any
+    INCENTIVE_PERCENT: any,
   ): Observable<any> {
     const data = {
       ID,
@@ -2458,7 +2463,7 @@ export class DataService {
     mobile: any,
     email: any,
     iqama: any,
-    incentive: any
+    incentive: any,
   ) {
     const requestBody = {
       EMP_CODE: code,
@@ -2477,14 +2482,14 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}/employees/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updateSalesman(data: any): Observable<any> {
     return this.http.post<any>(
       `
     ${this.apiUrl}/employees/save`,
-      data
+      data,
     );
   }
 
@@ -2591,7 +2596,7 @@ export class DataService {
     PRICE_CLASS_ID: any,
     DISCOUNT_PERCENT: any,
     VAT_RULE_ID: any,
-    VAT_REGNO: any
+    VAT_REGNO: any,
   ): Observable<any> {
     const data = {
       ID,
@@ -2651,7 +2656,7 @@ export class DataService {
     PRICE_CLASS_ID: any,
     DISCOUNT_PERCENT: any,
     VAT_RULE_ID: any,
-    VAT_REGNO: any
+    VAT_REGNO: any,
   ) {
     const requestBody = {
       CUST_CODE: CUST_CODE,
@@ -2682,7 +2687,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}customer/delete/` + ID,
-      requestBody
+      requestBody,
     );
   }
 
@@ -2702,7 +2707,7 @@ export class DataService {
     IS_FIXED_AMOUNT: any,
     VALUE: any,
     COMPANY_ID: any,
-    IS_INACTIVE: any
+    IS_INACTIVE: any,
   ): Observable<any> {
     const data = {
       DESCRIPTION,
@@ -2723,7 +2728,7 @@ export class DataService {
     IS_FIXED_AMOUNT: any,
     VALUE: any,
     COMPANY_ID: any,
-    IS_INACTIVE: any
+    IS_INACTIVE: any,
   ): Observable<any> {
     const data = {
       ID,
@@ -2744,7 +2749,7 @@ export class DataService {
     is_amount: any,
     value: any,
     companyid: any,
-    is_inactive: any
+    is_inactive: any,
   ) {
     const requestBody = {
       DESCRIPTION: description,
@@ -2756,7 +2761,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}landedcost/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
 
@@ -2774,7 +2779,7 @@ export class DataService {
     CURRENCY_ID,
     ALLOW_OPENING: any,
     ALLOW_DECLARATION: any,
-    ADDITIONAL_INFO_REQUIRED: any
+    ADDITIONAL_INFO_REQUIRED: any,
   ): Observable<any> {
     const data = {
       CODE,
@@ -2803,7 +2808,7 @@ export class DataService {
     currencyid: any,
     allow_opening: any,
     allow_declaration: any,
-    additional_info: any
+    additional_info: any,
   ) {
     const requestBody = {
       CODE: code,
@@ -2819,7 +2824,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}/tender/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
   updateTenders(data: any): Observable<any> {
@@ -2849,7 +2854,7 @@ export class DataService {
     AC_HEAD_ID: any,
     DISCOUNT_PERCENT: any,
     REASON_STORES: any,
-    COMPANY_ID: any
+    COMPANY_ID: any,
   ): Observable<any> {
     const data = {
       CODE,
@@ -2877,7 +2882,7 @@ export class DataService {
     reasonType: any,
     discountType: any,
     discountPercent: any,
-    reasonStores: any
+    reasonStores: any,
   ) {
     const requestBody = {
       CODE: code,
@@ -3009,7 +3014,7 @@ export class DataService {
     };
     return this.http.post<any>(
       `${this.apiUrl}/packing/delete/` + id,
-      requestBody
+      requestBody,
     );
   }
 
@@ -3064,7 +3069,7 @@ export class DataService {
     const DenialAddData = { CODE, DESCRIPTION, TYPE_ID, CATEGORY_ID };
     return this.http.post(
       'http://projectxapi.diligenzit.com/api/DenialMaster/insert',
-      DenialAddData
+      DenialAddData,
     );
   }
 
@@ -3074,19 +3079,19 @@ export class DataService {
     CODE: any,
     DESCRIPTION: any,
     TYPE_ID: any,
-    CATEGORY_ID: any
+    CATEGORY_ID: any,
   ) {
     const DenialUpdateData = { ID, CODE, DESCRIPTION, TYPE_ID, CATEGORY_ID };
     return this.http.post(
       'http://103.180.120.134/projectx/api/DenialMaster/Update',
-      DenialUpdateData
+      DenialUpdateData,
     );
   }
 
   //================REmove Denial=========================
   removeDenial(id: any) {
     return this.http.get(
-      'http://103.180.120.134/projectx/api/DenialMaster/delete/' + id
+      'http://103.180.120.134/projectx/api/DenialMaster/delete/' + id,
     );
   }
 
@@ -3131,7 +3136,7 @@ export class DataService {
 
   public getSalesByStateAndCity = (startDate: string, endDate: string) =>
     this.http.get(
-      `${API_URL}/Analytics/SalesByStateAndCity/${startDate}/${endDate}`
+      `${API_URL}/Analytics/SalesByStateAndCity/${startDate}/${endDate}`,
     );
 
   public getSalesByState = (data) => {
@@ -3155,7 +3160,7 @@ export class DataService {
             percentage,
           };
         }),
-        toArray()
+        toArray(),
       )
       .subscribe((data) => {
         dataByState = data;
@@ -3166,17 +3171,17 @@ export class DataService {
 
   public getOpportunitiesByCategory = (startDate: string, endDate: string) =>
     this.http.get<SalesOrOpportunitiesByCategory>(
-      `${API_URL}/Analytics/OpportunitiesByCategory/${startDate}/${endDate}`
+      `${API_URL}/Analytics/OpportunitiesByCategory/${startDate}/${endDate}`,
     );
 
   public getSalesByCategory = (startDate: string, endDate: string) =>
     this.http.get<SalesOrOpportunitiesByCategory>(
-      `${API_URL}/Analytics/SalesByCategory/${startDate}/${endDate}`
+      `${API_URL}/Analytics/SalesByCategory/${startDate}/${endDate}`,
     );
 
   public getSalesByOrderDate = (groupByPeriod: string) =>
     this.http.get<Sale[]>(
-      `${API_URL}/Analytics/SalesByOrderDate/${groupByPeriod}`
+      `${API_URL}/Analytics/SalesByOrderDate/${groupByPeriod}`,
     );
 
   public getSales = (startDate: string, endDate: string) =>
@@ -3197,7 +3202,7 @@ export class DataService {
         // data.address = '405 E 42nd St';
         // data.supervisor = 'Sam Adamson';
         // return data;
-      })
+      }),
     );
 
   public getListDS = () =>
@@ -3380,7 +3385,7 @@ The result can be exported to HTML or Markdown.`;
         //     calendarId: weekDay,
         //   };
         // });
-      })
+      }),
     );
   };
 
@@ -3424,7 +3429,7 @@ The result can be exported to HTML or Markdown.`;
   selectImportTemplateData(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}/importtemplate/select/` + id,
-      {}
+      {},
     );
   }
   public getImportTemplateData(): Observable<any> {
@@ -3433,7 +3438,7 @@ The result can be exported to HTML or Markdown.`;
   public viewImportedData(data: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/importitemlog/ItemLogEntryList/`,
-      data
+      data,
     );
   }
   public getImportLogData(): Observable<any> {
@@ -3447,7 +3452,7 @@ The result can be exported to HTML or Markdown.`;
   removeImportTemplateData(id: number, data: object) {
     return this.http.post<any>(
       `${this.apiUrl}/importtemplate/delete/ + id`,
-      data
+      data,
     );
   }
 
@@ -3459,21 +3464,21 @@ The result can be exported to HTML or Markdown.`;
   savePromotionSchema(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}/promotionschema/insert`,
-      payload
+      payload,
     );
   }
 
   selectPromotionSchema(id: number): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}/promotionschema/select/${id}`,
-      {}
+      {},
     );
   }
 
   updatePromotionSchema(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}/promotionschema/update`,
-      payload
+      payload,
     );
   }
 
@@ -3490,49 +3495,49 @@ The result can be exported to HTML or Markdown.`;
   PromotionLogList(): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}/worksheetitemproperty/Promotionlist`,
-      {}
+      {},
     );
   }
 
   savePromotion(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}/worksheetitemproperty/insertpromotion`,
-      payload
+      payload,
     );
   }
 
   selectPromotionWorksheet(id: number): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}/worksheetitemproperty/selectpromotion/${id}`,
-      {}
+      {},
     );
   }
 
   updatePromotion(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}/worksheetitemproperty/updatepromotion`,
-      payload
+      payload,
     );
   }
 
   verifyPromotion(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}/worksheetitemproperty/Verifypromotion`,
-      payload
+      payload,
     );
   }
 
   approvePromotion(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}/worksheetitemproperty/approvepromotion`,
-      payload
+      payload,
     );
   }
 
   delete(id: number): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/worksheetitemproperty/deletepromotion/${id}`,
-      {}
+      {},
     );
   }
 
@@ -3562,7 +3567,7 @@ The result can be exported to HTML or Markdown.`;
         workbook.xlsx.writeBuffer().then((buffer) => {
           saveAs(
             new Blob([buffer], { type: 'application/octet-stream' }),
-            `${fileName}.xlsx` // Save the Excel file
+            `${fileName}.xlsx`, // Save the Excel file
           );
         });
       });
@@ -3646,7 +3651,7 @@ The result can be exported to HTML or Markdown.`;
     const reqBodyData = { DOC_TYPE_ID: id };
     return this.http.post(
       `${this.apiUrl}reporttemplate/templatelist`,
-      reqBodyData
+      reqBodyData,
     );
   }
 
@@ -3658,7 +3663,7 @@ The result can be exported to HTML or Markdown.`;
   public getPendingPo(
     storeid: any,
     supplierId: any,
-    companyId: any
+    companyId: any,
   ): Observable<any> {
     const reqBodyData = {
       STORE_ID: storeid,
@@ -3777,7 +3782,7 @@ The result can be exported to HTML or Markdown.`;
 
   public getPendingTransferOutList(
     dest_store_id: any,
-    storeid: any
+    storeid: any,
   ): Observable<any> {
     const reqBodyData = { STORE_ID: storeid, DEST_STORE_ID: dest_store_id };
     return this.http.post(`${this.apiUrl}/tranferout/pendinglist`, reqBodyData);
@@ -3791,7 +3796,7 @@ The result can be exported to HTML or Markdown.`;
   public getTransferInLogList(
     storeid: any,
     datefrom: any,
-    dateto: any
+    dateto: any,
   ): Observable<any> {
     const reqBodyData = {
       StoreID: storeid,
@@ -3827,7 +3832,7 @@ The result can be exported to HTML or Markdown.`;
   public getInterStoreTransferList(
     userid: any,
     datafrom: any,
-    dateto: any
+    dateto: any,
   ): Observable<any> {
     const reqBodyData = {
       UserID: userid,
@@ -3836,7 +3841,7 @@ The result can be exported to HTML or Markdown.`;
     };
     return this.http.post(
       `${this.apiUrl}/tranferout/transferreport`,
-      reqBodyData
+      reqBodyData,
     );
   }
 
@@ -3936,7 +3941,7 @@ The result can be exported to HTML or Markdown.`;
     CODE: any,
     DESCRIPTION: any,
     IS_INACTIVE: boolean,
-    COMPANY_ID: number
+    COMPANY_ID: number,
   ) {
     const getEndpoint = this.apiUrl + '/EOS/save';
     const reqBody = {
@@ -3955,7 +3960,7 @@ The result can be exported to HTML or Markdown.`;
     DESCRIPTION: any,
     IS_INACTIVE: any,
     ID: any,
-    COMPANY_ID: number
+    COMPANY_ID: number,
   ) {
     const getEndpoint = this.apiUrl + '/EOS/edit';
     const reqBody = {
@@ -4013,7 +4018,7 @@ The result can be exported to HTML or Markdown.`;
     LS_Expense_Head_ID: any,
     LS_Payable_Head_ID: any,
     EOS_Expense_Head_ID: any,
-    EOS_Payable_Head_ID: any
+    EOS_Payable_Head_ID: any,
   ) {
     const getEndpoint = this.apiUrl + '/PaySettings/save';
     const reqBody = {
@@ -4047,7 +4052,7 @@ The result can be exported to HTML or Markdown.`;
     CODE: any,
     DESCRIPTION: any,
     LEAVE_SALARY_PAYABLE: any,
-    IS_INACTIVE: boolean
+    IS_INACTIVE: boolean,
   ) {
     const getEndpoint = this.apiUrl + '/LeaveType/save';
     const reqBody = {
@@ -4066,7 +4071,7 @@ The result can be exported to HTML or Markdown.`;
     DESCRIPTION: any,
     IS_INACTIVE: any,
     LEAVE_SALARY_PAYABLE: any,
-    ID: any
+    ID: any,
   ) {
     const getEndpoint = this.apiUrl + '/LeaveType/update';
     const reqBody = {
@@ -4123,7 +4128,7 @@ The result can be exported to HTML or Markdown.`;
     isInactive: any,
     salary_Exp: any,
     head_type: any,
-    is_Fixed: any
+    is_Fixed: any,
   ): Observable<any> {
     const reqBody = {
       CODE: code,
@@ -4154,7 +4159,7 @@ The result can be exported to HTML or Markdown.`;
     salary_Exp: any,
     head_type: any,
     is_Fixed: any,
-    is_syetm: any
+    is_syetm: any,
   ): Observable<any> {
     const reqBody = {
       ID: id,
@@ -4227,7 +4232,7 @@ The result can be exported to HTML or Markdown.`;
     description: any,
     print_Description: any,
     isInactive: any,
-    salary_Exp: any
+    salary_Exp: any,
   ): Observable<any> {
     const reqBody = {
       CODE: code,
@@ -4254,7 +4259,7 @@ The result can be exported to HTML or Markdown.`;
     description: any,
     print_Description: any,
     isInactive: any,
-    salary_Exp: any
+    salary_Exp: any,
   ): Observable<any> {
     const reqBody = {
       ID: id,
@@ -4348,7 +4353,7 @@ The result can be exported to HTML or Markdown.`;
     rec_install_amount: any,
     remarks: any,
     company_id: any,
-    fin_id: any
+    fin_id: any,
   ) {
     const reqBody = {
       EMP_ID: emp_id,
@@ -4386,7 +4391,7 @@ The result can be exported to HTML or Markdown.`;
     rec_start_month: any,
     rec_install_count: any,
     rec_install_amount: any,
-    remarks: any
+    remarks: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4413,7 +4418,7 @@ The result can be exported to HTML or Markdown.`;
     rec_start_month: any,
     rec_install_count: any,
     rec_install_amount: any,
-    remarks: any
+    remarks: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4456,7 +4461,7 @@ The result can be exported to HTML or Markdown.`;
     trans_id: any,
     cheque_no: any,
     cheque_date: any,
-    pay_Type_id: any
+    pay_Type_id: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4498,7 +4503,7 @@ The result can be exported to HTML or Markdown.`;
     trans_id: any,
     cheque_no: any,
     cheque_date: any,
-    pay_Type_id: any
+    pay_Type_id: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4529,7 +4534,7 @@ The result can be exported to HTML or Markdown.`;
   getSalaryDetails(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}/PayRevision/getEmployeeSalaryDetails`,
-      { EMP_ID: id }
+      { EMP_ID: id },
     );
   }
 
@@ -4632,7 +4637,7 @@ The result can be exported to HTML or Markdown.`;
     date: any,
     emp_id: any,
     reason_id: any,
-    remarks: any
+    remarks: any,
   ) {
     const reqBody = {
       USER_ID: user_id,
@@ -4660,7 +4665,7 @@ The result can be exported to HTML or Markdown.`;
     const reqbody = { EMP_ID: id };
     return this.http.post(
       `${this.apiUrl}/EmployeeEOS/getEmployeeData`,
-      reqbody
+      reqbody,
     );
   }
 
@@ -4677,7 +4682,7 @@ The result can be exported to HTML or Markdown.`;
     date: any,
     emp_id: any,
     reason_id: any,
-    remarks: any
+    remarks: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4710,7 +4715,7 @@ The result can be exported to HTML or Markdown.`;
     date: any,
     emp_id: any,
     reason_id: any,
-    remarks: any
+    remarks: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4739,7 +4744,7 @@ The result can be exported to HTML or Markdown.`;
     date: any,
     emp_id: any,
     reason_id: any,
-    remarks: any
+    remarks: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4882,7 +4887,7 @@ The result can be exported to HTML or Markdown.`;
     Dept_date: any,
     Expected_rejoin_date: any,
     Remarks: any,
-    Leave_salary_payable: any
+    Leave_salary_payable: any,
   ) {
     const getEndpoint = this.apiUrl + '/EmployeeVacation/save';
     const reqBody = {
@@ -4953,7 +4958,7 @@ The result can be exported to HTML or Markdown.`;
     Rejoin_date: any,
     Actual_days: any,
     Deduct_days: any,
-    Left_reason: any
+    Left_reason: any,
   ) {
     const getEndpoint = this.apiUrl + '/EmployeeVacation/update';
     const reqBody = {
@@ -5001,7 +5006,7 @@ The result can be exported to HTML or Markdown.`;
     Rejoin_date: any,
     Actual_days: any,
     Deduct_days: any,
-    Left_reason: any
+    Left_reason: any,
   ) {
     const getEndpoint = this.apiUrl + '/EmployeeVacation/verify';
     const reqBody = {
@@ -5049,7 +5054,7 @@ The result can be exported to HTML or Markdown.`;
     Rejoin_date: any,
     Actual_days: any,
     Deduct_days: any,
-    Left_reason: any
+    Left_reason: any,
   ) {
     const getEndpoint = this.apiUrl + '/EmployeeVacation/approve';
     const reqBody = {
@@ -5111,7 +5116,7 @@ The result can be exported to HTML or Markdown.`;
     Id: any,
     Code: any,
     Color_English: any,
-    Color_Arabic: any
+    Color_Arabic: any,
   ) {
     const getEndpoint = this.apiUrl + 'ArticleColor/update';
     const reqBody = {
@@ -5148,7 +5153,7 @@ The result can be exported to HTML or Markdown.`;
     Id: any,
     Code: any,
     Description: any,
-    Is_Inactive: any
+    Is_Inactive: any,
   ) {
     const getEndpoint = this.apiUrl + 'ArticleBrand/update';
     const reqBody = {
@@ -5310,7 +5315,7 @@ The result can be exported to HTML or Markdown.`;
     const category = item;
     return this.http.post(
       `${this.apiUrl}ArticleCategory/listpacking`,
-      category
+      category,
     );
   }
 
@@ -5572,7 +5577,7 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(
       `${this.apiUrl}packing/sizes-for-combination`,
-      payload
+      payload,
     );
   }
   // selectArticle(id: number, payload: any) {
@@ -5676,7 +5681,7 @@ The result can be exported to HTML or Markdown.`;
         workbook.xlsx.writeBuffer().then((buffer) => {
           saveAs(
             new Blob([buffer], { type: 'application/octet-stream' }),
-            `${fileName}.xlsx`
+            `${fileName}.xlsx`,
           );
         });
       });
@@ -5754,7 +5759,7 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(
       `${this.apiUrl}Depreciation/DepreciationList/List`,
-      payload
+      payload,
     );
   }
   //===========================insert depreciation=============================
@@ -6015,7 +6020,7 @@ The result can be exported to HTML or Markdown.`;
     location: any,
     mobile: any,
     phone: any,
-    isinactive: any
+    isinactive: any,
   ) {
     const getEndpoint = this.apiUrl + 'CustomerAddress/Update';
     const reqBody = {

@@ -983,10 +983,26 @@ import {
   ProductionJvViewComponent,
   ProductionJvViewModule,
 } from './production-jv-view/production-jv-view.component';
-import { BoxproductionJvAddComponent, BoxproductionJvAddModule } from './boxproduction-jv-add/boxproduction-jv-add.component';
-import { ArticleproductionJvListComponent, ArticleproductionJvListModule } from './articleproduction-jv-list/articleproduction-jv-list.component';
-import { ArticleproductionJvViewComponent, ArticleproductionJvViewModule } from './articleproduction-jv-view/articleproduction-jv-view.component';
-import { BoxproductionJvViewComponent, BoxproductionJvViewModule } from './boxproduction-jv-view/boxproduction-jv-view.component';
+import {
+  BoxproductionJvAddComponent,
+  BoxproductionJvAddModule,
+} from './boxproduction-jv-add/boxproduction-jv-add.component';
+import {
+  ArticleproductionJvListComponent,
+  ArticleproductionJvListModule,
+} from './articleproduction-jv-list/articleproduction-jv-list.component';
+import {
+  ArticleproductionJvViewComponent,
+  ArticleproductionJvViewModule,
+} from './articleproduction-jv-view/articleproduction-jv-view.component';
+import {
+  BoxproductionJvViewComponent,
+  BoxproductionJvViewModule,
+} from './boxproduction-jv-view/boxproduction-jv-view.component';
+import {
+  StockViewComponent,
+  StockViewModule,
+} from './stock-view/stock-view.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -994,7 +1010,7 @@ import { BoxproductionJvViewComponent, BoxproductionJvViewModule } from './boxpr
 // import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1350,7 +1366,8 @@ import { BoxproductionJvViewComponent, BoxproductionJvViewModule } from './boxpr
     BoxproductionJvAddModule,
     ArticleproductionJvListModule,
     ArticleproductionJvViewModule,
-    BoxproductionJvViewModule
+    BoxproductionJvViewModule,
+    StockViewModule,
   ],
   providers: [
     AuthService,

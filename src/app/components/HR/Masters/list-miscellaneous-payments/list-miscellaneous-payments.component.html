@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="filteredInvoiceList"
@@ -31,7 +31,6 @@
       (onEditingStart)="onEditOrViewMiscPayment($event)"
       (onRowRemoving)="onDeleteMiscPayment($event)"
       (onExporting)="onExporting($event)"
-      (onToolbarPreparing)="onToolbarPreparing($event)"
       (onCellPrepared)="onCellPrepared($event)"
     >
       <dxo-column-chooser
@@ -90,13 +89,19 @@
           location="after"
           locateInMenu="auto"
           widget="dxButton"
-          [options]="refreshButtonOptions"
+          [options]="searchButtonOptions"
         ></dxi-item>
 
         <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
           name="exportButton"
           location="after"
-          cssClass="custom-export-button"
+          cssClass="export-btn"
         ></dxi-item>
 
         <dxi-item
@@ -149,7 +154,7 @@
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
       >
       </dxi-column>

@@ -49,6 +49,7 @@ import {
   GrnViewFormComponent,
   GrnViewFormModule,
 } from 'src/app/pop-up/operations/grn-view-form/grn-view-form.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-grn',
@@ -101,6 +102,13 @@ export class GrnComponent implements OnInit {
   selectedCompanyId: any;
   sessionData: any;
   docNo: any;
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  companyID: any;
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = (cellInfo.data.STATUS || '').trim();
@@ -148,9 +156,39 @@ export class GrnComponent implements OnInit {
     },
   ];
 
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilterRow(),
+  };
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.openGRNForm());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -180,26 +218,12 @@ export class GrnComponent implements OnInit {
     this.cdr.detectChanges();
   };
 
-  addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
-
-    onClick: () => {
-      // Run inside Angular's zone
-      this.ngZone.run(() => this.openGRNForm());
-    },
-
-    elementAttr: { class: 'add-button' },
-  };
-
   constructor(
     private service: DataService,
     private change: ChangeDetectorRef,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {}
 
   openGRNForm() {
@@ -368,6 +392,30 @@ export class GrnComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    console.log('Parsed ObjectData:', menuResponse);
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/accounts');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sessionData_tax();
     this.getGrnLogData();
     this.getTemplateList();

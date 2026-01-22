@@ -1,3 +1,4 @@
+// @use "../../../../../variables.scss" as *;
 @use "../../../variables.scss" as *;
 @use "sass:math";
 
@@ -6,16 +7,10 @@
 
   width: 100%;
   display: contents;
+  overflow: auto;
 }
 
 .view-wrapper {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  flex-direction: row;
-
   .grid {
     .name-template {
       .position {
@@ -49,15 +44,18 @@
   }
 }
 
-.edit-cell {
-  position: relative;
-
-  contact-status {
-    position: absolute;
-    margin-top: 10px;
-    margin-left: 11px;
-  }
+.date-range-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
 }
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
 ::ng-deep .toolbar-icon-btn.dx-button {
   width: 40px;
   height: 35px;

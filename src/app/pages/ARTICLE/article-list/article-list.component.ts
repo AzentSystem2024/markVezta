@@ -131,21 +131,6 @@ export class ArticleListComponent {
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
-  // addButtonOptions = {
-  //   text: 'New',
-  //   icon: 'bi bi-file-earmark-plus',
-  //   // icon: 'add',
-  //   type: 'default',
-  //   stylingMode: 'contained',
-  //   hint: 'Add new entry',
-  //   // onClick: () => this.addArticle(),
-  //   onClick: () => {
-  //     this.zone.run(() => {
-  //       this.addArticle();
-  //     });
-  //   },
-  //   elementAttr: { class: 'add-button' },
-  // };
 
   dateRanges = [
     { label: 'All', value: 'all' },
@@ -167,12 +152,7 @@ export class ArticleListComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
-  // refreshButtonOptions = {
-  //   icon: 'refresh',
-  //   hint: 'Refresh',
-  //   onClick: () => this.refreshGrid(),
-  //   text: '',
-  // };
+
   selected_Company_id: any;
   constructor(
     private dataService: DataService,

@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="filteredSupplierPaymentList"
@@ -30,7 +30,6 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
-      (onToolbarPreparing)="onToolbarPreparing($event)"
       (onEditingStart)="onEditReceiptNote($event)"
       (onRowRemoving)="onDeleteReceiptNote($event)"
       (onCellPrepared)="onCellPrepared($event)"
@@ -40,6 +39,12 @@
         [allowUpdating]="true"
         [allowDeleting]="true"
       ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -75,10 +80,23 @@
           location="after"
           locateInMenu="auto"
           widget="dxButton"
-          [options]="refreshButtonOptions"
+          [options]="searchButtonOptions"
         ></dxi-item>
 
         <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          [visible]="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
@@ -135,7 +153,7 @@
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
       >
       </dxi-column>

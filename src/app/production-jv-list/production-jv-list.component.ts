@@ -80,18 +80,41 @@ export class ProductionJvListComponent {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addProduction());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
   };
   productionList: any;
   isAddInvoice: boolean = false;
@@ -112,12 +135,7 @@ export class ProductionJvListComponent {
   isEditInvoice: boolean = false;
   selectedInvoice: any;
   isViewInvoice: boolean;
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
+
   sessionData: any;
   selected_Company_id: any;
   selected_fin_id: any;
@@ -146,14 +164,14 @@ export class ProductionJvListComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -275,7 +293,7 @@ export class ProductionJvListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -315,21 +333,21 @@ export class ProductionJvListComponent {
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
     console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
     console.log(
       this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[['
+      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
     );
     this.formatted_from_date = this.financialYeaDate;
 
@@ -400,7 +418,7 @@ export class ProductionJvListComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;

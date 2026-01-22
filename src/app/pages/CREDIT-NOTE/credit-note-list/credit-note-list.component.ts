@@ -70,23 +70,36 @@ export class CreditNoteListComponent {
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
-      this.zone.run(() => {
-        this.addCreditNote();
-      });
+      this.zone.run(() => this.addCreditNote());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
   selectedCredit: any;
   CreditNoteid: any;
   selectedCreditNoteForEdit: any;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -121,6 +134,7 @@ export class CreditNoteListComponent {
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -131,14 +145,14 @@ export class CreditNoteListComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
@@ -199,6 +213,7 @@ export class CreditNoteListComponent {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.getCreditNotes();
   }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
@@ -215,7 +230,7 @@ export class CreditNoteListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -351,7 +366,7 @@ export class CreditNoteListComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -473,7 +488,6 @@ export class CreditNoteListComponent {
   //       console.log(response, 'FINAL RESPONSE');
 
   //       this.selectedCreditNote = response.Data;
-        
 
   //       if (transStatus === 5) {
   //         // Open view popup
@@ -505,7 +519,7 @@ export class CreditNoteListComponent {
         this.selectedCreditNote = structuredClone(response.Data);
         console.log(
           structuredClone(this.selectedCreditNote),
-          'SELECTEDCREDITNOTEINLIST (SNAPSHOT)'
+          'SELECTEDCREDITNOTEINLIST (SNAPSHOT)',
         );
 
         if (transStatus === 5) {
@@ -517,15 +531,15 @@ export class CreditNoteListComponent {
         }
         console.log(
           this.selectedCreditNote,
-          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
         );
 
         this.selectedCreditNoteForEdit = JSON.parse(
-  JSON.stringify(this.selectedCreditNote)
-);
+          JSON.stringify(this.selectedCreditNote),
+        );
       });
   }
-  
+
   onDeleteCreditNote(event: any) {
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
@@ -544,7 +558,7 @@ export class CreditNoteListComponent {
               message: 'Credit Note Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getCreditNotes();
           // this.dataGrid.instance.refresh();
@@ -554,14 +568,14 @@ export class CreditNoteListComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

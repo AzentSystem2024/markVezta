@@ -84,9 +84,11 @@ export class OpeningBalanceComponent {
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
   canAdd = false;
   canEdit = false;
   canView = false;
@@ -109,7 +111,7 @@ export class OpeningBalanceComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {}
 
   ngOnInit() {
@@ -120,7 +122,7 @@ export class OpeningBalanceComponent {
       stylingMode: 'contained',
       hint: 'Add Row',
       width: 32,
-      height: 25,
+      height: 30,
       onClick: () => this.addNewManualRow(), // ✅ Arrow function preserves `this`
     };
 
@@ -134,7 +136,7 @@ export class OpeningBalanceComponent {
       console.log(
         companyId,
         finId,
-        'COMPANYID FINID==========================='
+        'COMPANYID FINID===========================',
       );
 
       if (companyId && finId) {
@@ -149,7 +151,7 @@ export class OpeningBalanceComponent {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
@@ -233,7 +235,7 @@ export class OpeningBalanceComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -374,7 +376,7 @@ export class OpeningBalanceComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -412,14 +414,14 @@ export class OpeningBalanceComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'debitAmount');
@@ -441,14 +443,14 @@ export class OpeningBalanceComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -498,14 +500,14 @@ export class OpeningBalanceComponent {
                 (!r.ledgerCode || r.ledgerCode === '') &&
                 (!r.ledgerName || r.ledgerName === '') &&
                 (!r.debitAmount || r.debitAmount === 0) &&
-                (!r.creditAmount || r.creditAmount === 0)
+                (!r.creditAmount || r.creditAmount === 0),
             );
 
             if (hasEmptyRow) {
               notify(
                 'Finish the current empty row before adding a new one.',
                 'info',
-                2000
+                2000,
               );
               return;
             }
@@ -583,14 +585,14 @@ export class OpeningBalanceComponent {
         (!r.ledgerCode || r.ledgerCode === '') &&
         (!r.ledgerName || r.ledgerName === '') &&
         (!r.debitAmount || r.debitAmount === 0) &&
-        (!r.creditAmount || r.creditAmount === 0)
+        (!r.creditAmount || r.creditAmount === 0),
     );
 
     if (hasEmptyRow) {
       notify(
         'Finish the current empty row before adding a new one.',
         'warning',
-        2000
+        2000,
       );
       return;
     }
@@ -624,12 +626,13 @@ export class OpeningBalanceComponent {
     const selectedCompany = userData?.SELECTED_COMPANY;
     // Step 1: Filter out empty rows (no ledger selected)
     const validRows = this.openingBalance.filter(
-      (item: any) => item.ledgerCode || item.ledgerName
+      (item: any) => item.ledgerCode || item.ledgerName,
     );
 
     // Step 2: Validation - prevent rows with both debit and credit
     const hasBothAmounts = validRows.some(
-      (item: any) => (item.debitAmount || 0) > 0 && (item.creditAmount || 0) > 0
+      (item: any) =>
+        (item.debitAmount || 0) > 0 && (item.creditAmount || 0) > 0,
     );
     if (hasBothAmounts) {
       alert('Each row must have either Debit or Credit amount, not both.');
@@ -639,23 +642,23 @@ export class OpeningBalanceComponent {
     //  Step 3: Ensure total debit = total credit
     const totalDebit = validRows.reduce(
       (sum: number, item: any) => sum + parseFloat(item.debitAmount || 0),
-      0
+      0,
     );
     const totalCredit = validRows.reduce(
       (sum: number, item: any) => sum + parseFloat(item.creditAmount || 0),
-      0
+      0,
     );
 
     const epsilon = 0.01; // tolerance for rounding
     if (Math.abs(totalDebit - totalCredit) > epsilon) {
       notify(
         `Total Debit (${totalDebit.toFixed(
-          2
+          2,
         )}) and Total Credit (${totalCredit.toFixed(
-          2
+          2,
         )}) must be equal before saving.`,
         'warning',
-        3000
+        3000,
       );
       return;
     }
@@ -667,7 +670,8 @@ export class OpeningBalanceComponent {
         .map((item: any) => {
           const ledger = this.ledgerList.find(
             (l: any) =>
-              l.HEAD_CODE === item.ledgerCode || l.HEAD_NAME === item.ledgerName
+              l.HEAD_CODE === item.ledgerCode ||
+              l.HEAD_NAME === item.ledgerName,
           );
 
           return {
@@ -699,7 +703,7 @@ export class OpeningBalanceComponent {
             this.loadOpeningBalance(companyId, finId);
           }
           this.openingBalance = this.openingBalance.filter(
-            (row: any) => row.ledgerCode && row.ledgerName
+            (row: any) => row.ledgerCode && row.ledgerName,
           );
 
           // Optionally: force grid refresh
@@ -719,7 +723,7 @@ export class OpeningBalanceComponent {
     }
     const confirmResult = confirm(
       'Are you sure you want to approve this Opening Balance?',
-      'Confirm Approval'
+      'Confirm Approval',
     );
     const commitPayload = {
       ...payload,

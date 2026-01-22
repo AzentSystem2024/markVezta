@@ -1,4 +1,4 @@
-<div class="salary-grid-wrapper" style="padding: 10px">
+<div class="view-wrapper list-page">
   <div class="grid-container">
     <dx-data-grid
       [dataSource]="Ledger_statement_datasource"
@@ -18,7 +18,7 @@
       [headerFilter]="{ visible: false }"
       [columnFixing]="{
         enabled: true,
-        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
@@ -55,53 +55,7 @@
             Journal Book
           </div>
         </dxi-item>
-        <!-- <dxi-item>
-           <dx-select-box
-        [width]="150"
-        label="Fin Id"
-        labelMode="floating"
-         [items]="fin_id"
-    displayExpr="FIN_CODE"
-    valueExpr="FIN_ID"
-    [(value)]="selected_fin_id"
-    [searchEnabled]="true"
-    (onValueChanged)="onCompanyChange($event)"
-        >
 
-        </dx-select-box>
-
-        </dxi-item> -->
-        <!-- <dxi-item>
-           <dx-select-box
-    [width]="200"
-    label="Company Id"
-    labelMode="floating"
-    [items]="company_list"
-    displayExpr="COMPANY_NAME"
-    valueExpr="COMPANY_ID"
-    [(value)]="selectedCompanyId"
-    [searchEnabled]="true"
-    (onValueChanged)="onCompanyChange($event)">
-        >
-
-        </dx-select-box>
-
-        </dxi-item> -->
-        <!-- <dxi-item>
-           <dx-select-box
-        [width]="200"
-        label="Ledger"
-        labelMode="floating"
-         [items]="HEAD_ID_LIST"
-    displayExpr="NAME"
-    valueExpr="ID"
-    [(value)]="selected_Head_Id"
-    (onValueChanged)="onHeadIdChange($event)"
-    [searchEnabled]="true"
-        >
-        </dx-select-box>
-
-        </dxi-item> -->
         <dxi-item>
           <dx-date-box
             [width]="150"

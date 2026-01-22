@@ -146,7 +146,7 @@ export class AddInvoiceComponent {
 
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   sessionData_tax() {
@@ -211,6 +211,7 @@ export class AddInvoiceComponent {
   }
 
   getCustomerOrUnitLst() {
+    console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
     };
@@ -224,7 +225,7 @@ export class AddInvoiceComponent {
 
   onDistributorChanged(e: any) {
     const selectedCustomer = this.distributorList.find(
-      (cust: any) => cust.ID === e.value
+      (cust: any) => cust.ID === e.value,
     );
 
     if (this.mainInvoiceGridList && this.mainInvoiceGridList.length > 0) {
@@ -265,7 +266,7 @@ export class AddInvoiceComponent {
     console.log(this.invoiceFormData.DISTRIBUTOR_ID, 'INVOICELISTFORGRID');
     const payload = {
       CUST_ID: this.invoiceFormData.DISTRIBUTOR_ID,
-      // COMPANY_ID: this.selectedCompanyId,
+      COMPANY_ID: this.selectedCompanyId,
     };
     console.log(payload, 'PAYLOADDDDDDDDDDD');
     this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
@@ -341,7 +342,7 @@ export class AddInvoiceComponent {
     console.log(this.selectedTransfers, 'SELECTEDTRANSFERSSSSSSSS');
     // Filter the full list before showing in popup
     this.invoiceGridList = this.staticTransfers.filter(
-      (item: any) => !selectedTransferNos.includes(item.DN_DETAIL_ID)
+      (item: any) => !selectedTransferNos.includes(item.DN_DETAIL_ID),
     );
     this.isTrOutPopupVisible = true;
   }
@@ -390,7 +391,7 @@ export class AddInvoiceComponent {
     console.log(selectedRows, 'SELECTEDROWSSSSSSSSSSSSSSSS');
     console.log(
       'Selected DN_DETAIL_IDs:',
-      selectedRows.map((x: any) => x.DN_DETAIL_ID)
+      selectedRows.map((x: any) => x.DN_DETAIL_ID),
     );
     // Initialize mainInvoiceGridList if null
     if (!this.mainInvoiceGridList) {
@@ -399,12 +400,12 @@ export class AddInvoiceComponent {
 
     // Get existing IDs to avoid duplicates
     const existingTransferIds = this.mainInvoiceGridList.map(
-      (item: any) => item.DN_DETAIL_ID
+      (item: any) => item.DN_DETAIL_ID,
     );
 
     // Only add new unique rows
     const newRows = selectedRows.filter(
-      (row: any) => !existingTransferIds.includes(row.DN_DETAIL_ID)
+      (row: any) => !existingTransferIds.includes(row.DN_DETAIL_ID),
     );
     newRows.forEach((row: any) => {
       // ✅ HSN from API
@@ -486,7 +487,7 @@ export class AddInvoiceComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -596,13 +597,13 @@ export class AddInvoiceComponent {
           position: { at: 'top center', my: 'center top' },
         },
         'warning',
-        3000
+        3000,
       );
       return;
     }
 
     const hasInvalidPrice = this.mainInvoiceGridList.some(
-      (row: any) => !row.PRICE || row.PRICE === 0
+      (row: any) => !row.PRICE || row.PRICE === 0,
     );
     if (hasInvalidPrice) {
       notify(
@@ -611,7 +612,7 @@ export class AddInvoiceComponent {
           position: { at: 'top center', my: 'top center' },
         },
         'warning',
-        3000
+        3000,
       );
       return;
     }
@@ -640,7 +641,7 @@ export class AddInvoiceComponent {
           TAX_AMOUNT: this.calculateGstAmount(row),
           TOTAL_AMOUNT: this.calculateTotal(row),
         };
-      }
+      },
     );
 
     // 4. Set root-level totals
@@ -663,7 +664,7 @@ export class AddInvoiceComponent {
               position: { at: 'top center', my: 'top center' },
             },
             'success',
-            3000
+            3000,
           );
           this.resetInvoiceForm();
           this.popupClosed?.emit();
@@ -676,16 +677,16 @@ export class AddInvoiceComponent {
               position: { at: 'top center', my: 'top center' },
             },
             'error',
-            3000
+            3000,
           );
-        }
+        },
       );
     };
     // 5. Call the API to save invoice
     if (this.invoiceFormData.IS_APPROVED === true) {
       const result = confirm(
         'Are you sure you want to approve and commit this invoice?',
-        'Confirmation'
+        'Confirmation',
       );
 
       result.then((confirmed) => {

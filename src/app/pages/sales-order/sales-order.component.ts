@@ -67,26 +67,41 @@ export class SalesOrderComponent {
   canPrint = false;
   sessionData: any;
   selected_vat_id: any;
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
-      this.zone.run(() => {
-        this.addSalesOrder();
-      });
+      this.zone.run(() => this.addSalesOrder());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
   };
 
   dateRanges = [
@@ -112,14 +127,14 @@ export class SalesOrderComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     console.log('Parsed ObjectData:', menuResponse);
@@ -159,7 +174,7 @@ export class SalesOrderComponent {
       .getSalesOrderMainList(payload)
       .subscribe((response: any) => {
         this.salesOrderList = response.Data.sort(
-          (a: any, b: any) => b.ID - a.ID
+          (a: any, b: any) => b.ID - a.ID,
         ).map((item: any) => {
           let dateValue: Date;
 
@@ -295,7 +310,7 @@ export class SalesOrderComponent {
       (item: any) => {
         const invoiceDate = item.SO_DATE;
         return invoiceDate >= start && invoiceDate <= end;
-      }
+      },
     );
 
     const fromLabel = this.formatAsDDMMYYYY(start);
@@ -304,7 +319,7 @@ export class SalesOrderComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -396,7 +411,7 @@ export class SalesOrderComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -453,7 +468,7 @@ export class SalesOrderComponent {
               message: 'Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getsalesOrderList();
           // this.dataGrid.instance.refresh();
@@ -463,14 +478,14 @@ export class SalesOrderComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
   onCellPrepared(e: any) {

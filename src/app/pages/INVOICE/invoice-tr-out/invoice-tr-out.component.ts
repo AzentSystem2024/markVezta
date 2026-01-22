@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -77,15 +78,41 @@ export class InvoiceTrOutComponent {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    onClick: () => this.addInvoice(),
+    onClick: () => {
+      this.ngZone.run(() => this.addInvoice());
+    },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
   };
   isAddInvoice: boolean = false;
   dateRanges = [
@@ -105,12 +132,7 @@ export class InvoiceTrOutComponent {
   isEditInvoice: boolean = false;
   selectedInvoice: any;
   isViewInvoice: boolean;
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
+
   sessionData: any;
   selected_Company_id: any;
   selected_fin_id: any;
@@ -129,7 +151,8 @@ export class InvoiceTrOutComponent {
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
   ) {
     this.sesstion_Details();
   }
@@ -138,7 +161,7 @@ export class InvoiceTrOutComponent {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -220,7 +243,7 @@ export class InvoiceTrOutComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -260,21 +283,21 @@ export class InvoiceTrOutComponent {
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
     console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
     console.log(
       this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[['
+      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
     );
     this.formatted_from_date = this.financialYeaDate;
 
@@ -345,7 +368,7 @@ export class InvoiceTrOutComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -484,7 +507,7 @@ export class InvoiceTrOutComponent {
               message: 'Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getInvoiceList();
           // this.dataGrid.instance.refresh();
@@ -494,14 +517,14 @@ export class InvoiceTrOutComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

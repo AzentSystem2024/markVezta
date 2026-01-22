@@ -12,7 +12,7 @@
     (onExporting)="onExporting($event)"
     (onRowRemoving)="onRowRemoving($event)"
     (onEditingStart)="onEditingStart($event)"
-    height="84vh"
+    [height]="'75vh'"
     [showColumnLines]="true"
   >
     <dxo-paging [pageSize]="100"></dxo-paging>
@@ -54,41 +54,40 @@
 
       <dxi-item
         location="after"
-        locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
         [options]="{
-          text: 'Refresh',
-          icon: 'refresh',
-          onClick: refresh,
-          stylingMode: 'text',
-          hint: 'refresh'
+          icon: 'search',
+          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+          onClick: toggleFilterRow,
+          stylingMode: 'contained',
+          elementAttr: { class: 'toolbar-icon-btn' },
         }"
       ></dxi-item>
 
       <dxi-item
         location="after"
-        locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'search' : 'search',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
+        [options]="refreshButtonOptions"
       ></dxi-item>
 
+      <!-- Search -->
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <!-- Export (built-in, kept) -->
       <dxi-item
         name="exportButton"
         location="after"
-        cssClass="custom-export-button"
+        cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
+
+      <!-- Add -->
       <dxi-item
-        *ngIf="canAdd"
         location="after"
         widget="dxButton"
+        [visible]="canAdd"
         [options]="addButtonOptions"
       ></dxi-item>
     </dxo-toolbar>

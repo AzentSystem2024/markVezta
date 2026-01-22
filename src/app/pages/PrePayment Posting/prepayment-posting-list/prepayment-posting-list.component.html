@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="prepaymentList"
@@ -35,6 +35,12 @@
         [allowUpdating]="true"
         [allowDeleting]="true"
       ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -81,7 +87,7 @@
               (onClick)="goToPreviousMonth()"
             ></dx-button>
             <span class="month-label" (click)="toggleCalendar()">
-              {{ selectedMonth | date : "MMMM yyyy" }}
+              {{ selectedMonth | date: "MMMM yyyy" }}
             </span>
             <dx-button
               icon="chevronright"
@@ -136,10 +142,25 @@
           location="after"
           locateInMenu="auto"
           widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
         <dxi-item
+          name="exportButton"
           location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          *ngIf="canAdd"
+          location="after"
+          locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>

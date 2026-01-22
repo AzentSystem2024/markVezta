@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="Depreciation_List"
@@ -37,6 +37,12 @@
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -86,28 +92,28 @@
           location="after"
           locateInMenu="auto"
           widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-        <!-- <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
-      ></dxi-item> -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
         <dxi-item
           *ngIf="canAdd"
           location="after"
+          locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>
-
         <!-- <dxi-item location="after" locateInMenu="auto">
           <dx-button
             icon="plus"

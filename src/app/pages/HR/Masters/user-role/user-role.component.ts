@@ -9,7 +9,7 @@ import {
   ViewChild,
   OnChanges,
   ChangeDetectorRef,
-  NgZone
+  NgZone,
 } from '@angular/core';
 import {
   DxTabPanelModule,
@@ -37,24 +37,27 @@ import { FormBuilder } from '@angular/forms';
 @Component({
   selector: 'app-user-role',
   templateUrl: './user-role.component.html',
-  styleUrls: ['./user-role.component.scss']
+  styleUrls: ['./user-role.component.scss'],
 })
 export class UserRoleComponent {
-
-  
-
-   @ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild(UserLevelNewFormComponent, { static: false })
   userlevelNewForm: UserLevelNewFormComponent;
-   @ViewChild(UserLevelEditFormComponent, { static: false })
+  @ViewChild(UserLevelEditFormComponent, { static: false })
   userlevelEditForm: UserLevelEditFormComponent;
   selectedData: any;
   popupGrid: any;
 
-   constructor(private fb: FormBuilder, private dataservice: DataService,private cdr: ChangeDetectorRef,private ngZone: NgZone,private router : Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private router: Router,
+  ) {}
 
- popup_width: any = '60%';
+  popup_width: any = '60%';
   isAddFormVisible: boolean = false;
 
   //========Variables for Pagination ====================
@@ -67,28 +70,65 @@ export class UserRoleComponent {
   isAddFormPopupOpened: boolean = false;
   iseditFormVisible: boolean = false;
   clickedRowData: any;
-    isFilterRowVisible: boolean = false;
-    MenuDatasource: any;
- canAdd = false;
+  isFilterRowVisible: boolean = false;
+  MenuDatasource: any;
+  canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
   canApprove = false;
   canPrint = false;
 
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.show_new_Form());
+    },
+    elementAttr: { class: 'add-button' },
 
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refresh(),
+  };
   dataSource = new DataSource<any>({
     load: () =>
       new Promise((resolve, reject) => {
         this.dataservice.get_UserLevelData_List_Api().subscribe({
           next: (response: any) => {
-               // add serial number before resolving
-          const dataWithSlNo = response.data.map((item: any, index: number) => ({
-            ...item,
-            SlNo: index + 1   // serial number
-          }));
+            // add serial number before resolving
+            const dataWithSlNo = response.data.map(
+              (item: any, index: number) => ({
+                ...item,
+                SlNo: index + 1, // serial number
+              }),
+            );
 
-          resolve(dataWithSlNo);
+            resolve(dataWithSlNo);
             // resolve(response.data);
           },
           error: (error) => reject(error.message),
@@ -96,58 +136,54 @@ export class UserRoleComponent {
       }),
   });
 
-    ngOnInit(){
-const currentUrl = this.router.url;
-  console.log('Current URL:', currentUrl);
-   const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
-  console.log('Parsed ObjectData:', menuResponse);
+  ngOnInit() {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
 
-  const menuGroups = menuResponse.MenuGroups || [];
-  console.log('MenuGroups:', menuGroups);
-const packingRights = menuGroups
-  .flatMap(group => group.Menus)
-  .find(menu => menu.Path === '/user-role');
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/user-role');
 
-if (packingRights) {
-  this.canAdd = packingRights.CanAdd;
-  this.canEdit = packingRights.CanEdit;
-  this.canDelete = packingRights.CanDelete;
-    this.canPrint = packingRights.CanEdit;
-  this.canView = packingRights.canView;
-   this.canApprove = packingRights.canApprove;
-}
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
 
-console.log('packingRights',packingRights);
-console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
-
-
-
-
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
-  addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
-        onClick: () => {
-      // Run inside Angular's zone
-      this.ngZone.run(() => this.show_new_Form());
-    },
-    elementAttr: { class: 'add-button' }
-   
-    
-  };
+  // addButtonOptions = {
+  //   text: 'New',
+  //   icon: 'bi bi-file-earmark-plus',
+  //   type: 'default',
+  //   stylingMode: 'contained',
+  //   hint: 'Add new entry',
+  //       onClick: () => {
+  //     // Run inside Angular's zone
+  //     this.ngZone.run(() => this.show_new_Form());
+  //   },
+  //   elementAttr: { class: 'add-button' }
 
-  
- //========================Export data ==========================
+  // };
+
+  //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'Speciality';
     this.dataservice.exportDataGrid(event, fileName);
   }
 
- //=================== Page refreshing==========================
+  //=================== Page refreshing==========================
   refresh = () => {
     this.dataGrid.instance.refresh();
   };
@@ -157,59 +193,53 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     this.cdr.detectChanges();
   };
 
- show_new_Form() {
+  show_new_Form() {
     this.isAddFormVisible = true;
-    
   }
 
-    isDeleteIconVisible({ row }: { row: any }): boolean {
+  isDeleteIconVisible({ row }: { row: any }): boolean {
     return row.data.UserRoles !== 'Administrator';
   }
 
- onEditingStart(event:any){
-  event.cancel = true; // Cancel the editing if a certain condition is met
+  onEditingStart(event: any) {
+    event.cancel = true; // Cancel the editing if a certain condition is met
 
-  console.log(event.data);
-  
+    console.log(event.data);
+
     this.clickedRowData = event.data;
     this.selectData(event);
     event.cancel = true;
     this.iseditFormVisible = true;
     this.cdr.detectChanges();
- }
-
- onPopupClose(): void {
-    this.isAddFormVisible = false;
-    
-    
   }
 
-   onClearData() {
+  onPopupClose(): void {
+    this.isAddFormVisible = false;
+  }
 
+  onClearData() {
     this.userlevelNewForm.clearData();
     this.userlevelEditForm.clearData();
   }
 
- onEditPopupClose(){
-   this.iseditFormVisible = false;
+  onEditPopupClose() {
+    this.iseditFormVisible = false;
     // this.userlevelEditForm.resetUserChanges();
- }
+  }
 
- //=================OnClick save new data=======================
+  //=================OnClick save new data=======================
   onClickSaveNewData() {
     const menuData: any = this.userlevelNewForm.getNewUSerLevelData();
 
-    console.log(this.userlevelNewForm,'userlevelnewform')
-    const userlevelvalues = this.userlevelNewForm.UserLevelValue
+    console.log(this.userlevelNewForm, 'userlevelnewform');
+    const userlevelvalues = this.userlevelNewForm.UserLevelValue;
     console.log(userlevelvalues);
-    const userlistdata = this.userlevelNewForm.UserListdataSource
+    const userlistdata = this.userlevelNewForm.UserListdataSource;
     console.log(userlistdata);
-    
-    
+
     const isDuplicate = userlistdata?.some((data: any) => {
       const existingName = data.UserRoles?.toString().trim().toLowerCase();
-      return  existingName === userlevelvalues
-;
+      return existingName === userlevelvalues;
     });
 
     if (isDuplicate) {
@@ -219,12 +249,12 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
-    
-    console.log("menu insert data :>>",menuData)
+
+    console.log('menu insert data :>>', menuData);
     this.dataservice
       .Insert_UserLevelList_Api(menuData)
       .subscribe((response: any) => {
@@ -236,7 +266,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
               message: `New User Level  saved Successfully`,
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -244,16 +274,14 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
               message: ` Your Data Not Saved`,
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
-      this.isAddFormVisible = false
-      this.iseditFormVisible= false
-       this.dataGrid.instance.refresh();
-
+    this.isAddFormVisible = false;
+    this.iseditFormVisible = false;
+    this.dataGrid.instance.refresh();
   }
-
 
   //=================Select row Data====================
   selectData(event: any) {
@@ -271,19 +299,17 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     }
   }
 
-
-
   //=======================row data update=======================
   onRowUpdating() {
     console.log('working');
-    
+
     const editedData: any = this.userlevelEditForm.getNewUSerLevelEditedData();
-    console.log(editedData,'menu edited');
+    console.log(editedData, 'menu edited');
     this.dataservice
       .Update_UserLevelList_Api(editedData)
       .subscribe((data: any) => {
-        console.log(data,'data');
-        
+        console.log(data, 'data');
+
         if (data) {
           this.dataGrid.instance.refresh();
 
@@ -293,7 +319,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -302,11 +328,11 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'error'
+            'error',
           );
         }
-        this.isAddFormVisible = false
-        this.iseditFormVisible= false
+        this.isAddFormVisible = false;
+        this.iseditFormVisible = false;
         this.dataGrid.instance.refresh();
       });
   }
@@ -315,34 +341,32 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
   onRowRemoving(event: any) {
     event.cancel = true;
     let SelectedRow = event.key;
-    this.dataservice
-      .Remove_userLevel_Row_Data(SelectedRow.ID)
-      .subscribe(() => {
-        try {
-          notify(
-            {
-              message: 'Delete operation successful',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success'
-          );
-        } catch (error) {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'error'
-          );
-        }
-        event.component.refresh();
-        this.dataGrid.instance.refresh();
-      });
+    this.dataservice.Remove_userLevel_Row_Data(SelectedRow.ID).subscribe(() => {
+      try {
+        notify(
+          {
+            message: 'Delete operation successful',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          },
+          'success',
+        );
+      } catch (error) {
+        notify(
+          {
+            message: 'Delete operation failed',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          },
+          'error',
+        );
+      }
+      event.component.refresh();
+      this.dataGrid.instance.refresh();
+    });
   }
 
- formatLastModifiedTime(rowData: any): string {
+  formatLastModifiedTime(rowData: any): string {
     const celldate = rowData.LastModifiedTime;
     if (!celldate) return '';
 
@@ -380,7 +404,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     DxTreeViewModule,
     FormPopupModule,
     UserLevelNewFormModule,
-    UserLevelEditFormModule
+    UserLevelEditFormModule,
   ],
   providers: [],
   exports: [],

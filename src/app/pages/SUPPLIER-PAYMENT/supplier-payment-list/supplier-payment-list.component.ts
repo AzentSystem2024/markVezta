@@ -48,6 +48,7 @@ import {
 } from '../add-supplier-payment/add-supplier-payment.component';
 import { EditSupplierPaymentModule } from '../edit-supplier-payment/edit-supplier-payment.component';
 import notify from 'devextreme/ui/notify';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-supplier-payment-list',
@@ -69,25 +70,47 @@ export class SupplierPaymentListComponent {
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
   supplierPaymentList: any;
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.ngZone.run(() => {
-        this.addSupplierPayment(); // show your popup here
-      });
+      this.ngZone.run(() => this.addSupplierPayment());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
   };
 
   dateRanges = [
@@ -112,17 +135,46 @@ export class SupplierPaymentListComponent {
   supplierPaymentId: any;
   sessionData: any;
   selectedCompanyId: any;
+  companyID: any;
 
-  constructor(private dataService: DataService, private ngZone: NgZone) {
+  constructor(
+    private dataService: DataService,
+    private ngZone: NgZone,
+    private router: Router,
+  ) {
     this.sessionData_tax();
   }
 
   ngOnInit() {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    console.log('Parsed ObjectData:', menuResponse);
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/accounts');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getSupplierPayments();
     this.sessionData_tax();
   }
 
-    sessionData_tax() {
+  sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     // this.selected_vat_id = this.sessionData.VAT_ID;
@@ -131,30 +183,35 @@ export class SupplierPaymentListComponent {
 
   getSupplierPayments() {
     const payload = {
-        COMPANY_ID : this.selectedCompanyId
-    }
-    this.dataService.getSupplierPaymentList(payload).subscribe((response: any) => {
-      this.supplierPaymentList = response.Data.map((item: any) => {
-        let dateValue: Date;
-        if (typeof item.PAY_DATE === 'string' && item.PAY_DATE.includes('-')) {
-          const [day, month, year] = item.PAY_DATE.split('-').map(Number);
-          dateValue = new Date(year, month - 1, day);
-        } else {
-          dateValue = new Date(item.PAY_DATE);
-        }
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService
+      .getSupplierPaymentList(payload)
+      .subscribe((response: any) => {
+        this.supplierPaymentList = response.Data.map((item: any) => {
+          let dateValue: Date;
+          if (
+            typeof item.PAY_DATE === 'string' &&
+            item.PAY_DATE.includes('-')
+          ) {
+            const [day, month, year] = item.PAY_DATE.split('-').map(Number);
+            dateValue = new Date(year, month - 1, day);
+          } else {
+            dateValue = new Date(item.PAY_DATE);
+          }
 
-        return {
-          ...item,
-          PAY_DATE: dateValue,
-        };
-      }).sort((a: any, b: any) => {
-        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-        return numB - numA; // descending order
+          return {
+            ...item,
+            PAY_DATE: dateValue,
+          };
+        }).sort((a: any, b: any) => {
+          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+          return numB - numA; // descending order
+        });
+
+        this.applyDateFilter();
       });
-
-      this.applyDateFilter();
-    });
   }
 
   toggleFilters() {
@@ -172,7 +229,7 @@ export class SupplierPaymentListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -286,12 +343,12 @@ export class SupplierPaymentListComponent {
       (item: any) => {
         const payDate = new Date(item.PAY_DATE);
         return payDate >= startDate && payDate <= endDate;
-      }
+      },
     );
 
     console.log(
       'Filtered list count:',
-      this.filteredSupplierPaymentList.length
+      this.filteredSupplierPaymentList.length,
     );
   }
 
@@ -308,7 +365,7 @@ export class SupplierPaymentListComponent {
       (item: any) => {
         const journalDate = item.PAY_DATE;
         return journalDate >= start && journalDate <= end;
-      }
+      },
     );
 
     const fromLabel = this.formatAsDDMMYYYY(start);
@@ -317,7 +374,7 @@ export class SupplierPaymentListComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -434,7 +491,7 @@ export class SupplierPaymentListComponent {
               message: 'Receipt Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getSupplierPayments();
           // this.dataGrid.instance.refresh();
@@ -444,14 +501,14 @@ export class SupplierPaymentListComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

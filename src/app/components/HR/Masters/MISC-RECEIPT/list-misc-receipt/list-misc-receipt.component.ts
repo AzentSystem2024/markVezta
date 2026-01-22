@@ -72,6 +72,13 @@ export class ListMiscReceiptComponent {
   canPrint = false;
   selectedMiscReceipt: any;
   MiscReceiptId: any;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -82,6 +89,7 @@ export class ListMiscReceiptComponent {
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -124,14 +132,14 @@ export class ListMiscReceiptComponent {
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
@@ -195,6 +203,7 @@ export class ListMiscReceiptComponent {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.getMiscReceipts();
   }
 
   toggleFilters() {
@@ -212,7 +221,7 @@ export class ListMiscReceiptComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -341,7 +350,7 @@ export class ListMiscReceiptComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -464,7 +473,7 @@ export class ListMiscReceiptComponent {
               message: 'Miscellaneous Receipt Log Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getMiscReceipts();
           // this.dataGrid.instance.refresh();
@@ -474,14 +483,14 @@ export class ListMiscReceiptComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

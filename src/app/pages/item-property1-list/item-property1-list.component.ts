@@ -20,6 +20,7 @@ import {
 } from 'src/app/components/library/item-property1-form/item-property1-form.component';
 import { ExportService } from 'src/app/services/export.service';
 import { ItemProperty1EditModule } from 'src/app/components/library/item-property1-edit/item-property1-edit.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-item-property1-list',
@@ -55,14 +56,22 @@ export class ItemProperty1ListComponent {
   companyStateID: any;
   GST_PERC: any;
   selected_Company_id: any;
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
   constructor(
     private dataservice: DataService,
     authservice: AuthService,
     private exportService: ExportService,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {
     this.itemlabel = authservice.getsettingsData().ITEM_PROPERTY1;
+    console.log(this.itemlabel, 'ITEMLABELLLLLLLLLLLLLLLLLL');
     this.sesstion_Details();
   }
 
@@ -75,36 +84,39 @@ export class ItemProperty1ListComponent {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
+    console.log(
+      this.sessionData,
+      '=================session data==========1111',
+    );
 
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
     console.log(
       this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1=============='
+      '============ITEM_PROPERTY1==============',
     );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
     console.log(
       this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2=============='
+      '============ITEM_PROPERTY2==============',
     );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
     console.log(
       this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3=============='
+      '============ITEM_PROPERTY3==============',
     );
 
     this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
     console.log(
       this.ITEM_PROPERTY4,
-      '============ITEM_PROPERTY4=============='
+      '============ITEM_PROPERTY4==============',
     );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
     console.log(
       this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5=============='
+      '============ITEM_PROPERTY5==============',
     );
   }
 
@@ -114,18 +126,25 @@ export class ItemProperty1ListComponent {
   };
 
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addItemProperty1());
     },
-
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -136,16 +155,17 @@ export class ItemProperty1ListComponent {
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     console.log(
       this.GST_PERC,
-      '===========selected GST PERC==================='
+      '===========selected GST PERC===================',
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     // THIS IS THE MISSING LINK
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
+
   showItemProperty1() {
     const payload = {
       COMPANY_ID: this.companyID,
@@ -165,13 +185,13 @@ export class ItemProperty1ListComponent {
 
     const isCodeDuplicate = this.itemproperty1.some(
       // (item: any) => item.CODE === commonDetails.code
-      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
+      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
     );
 
     const isDescriptionDuplicate = this.itemproperty1.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) =>
-        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase()
+        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -181,7 +201,7 @@ export class ItemProperty1ListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -191,7 +211,7 @@ export class ItemProperty1ListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -201,7 +221,7 @@ export class ItemProperty1ListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -216,7 +236,7 @@ export class ItemProperty1ListComponent {
               message: 'Insert operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
         }
       });
@@ -235,7 +255,7 @@ export class ItemProperty1ListComponent {
               message: 'Delete operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.showItemProperty1();
@@ -245,7 +265,7 @@ export class ItemProperty1ListComponent {
               message: 'Delete operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -261,6 +281,30 @@ export class ItemProperty1ListComponent {
   }
 
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/user');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sessionDetails();
     this.showItemProperty1();
   }

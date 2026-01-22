@@ -25,7 +25,7 @@
         allowDeleting: !isReadOnly,
         allowAdding: !isReadOnly,
         newRowPosition: 'first',
-        useIcons: true
+        useIcons: true,
       }"
       (onEditorPreparing)="onEditorPreparing($event)"
       (onContentReady)="onGridContentReady($event)"
@@ -71,11 +71,10 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-
         <dxi-item
           name="exportButton"
           location="after"
-          cssClass="custom-export-button"
+          cssClass="export-btn"
         ></dxi-item>
 
         <dxi-item
@@ -103,7 +102,7 @@
           dataSource: ledgerList,
           valueExpr: 'HEAD_CODE',
           displayExpr: 'HEAD_CODE',
-          searchEnabled: true
+          searchEnabled: true,
         }"
       ></dxi-column>
 
@@ -116,7 +115,7 @@
           dataSource: ledgerList,
           valueExpr: 'HEAD_NAME',
           displayExpr: 'HEAD_NAME',
-          searchEnabled: true
+          searchEnabled: true,
         }"
       ></dxi-column>
 

@@ -25,87 +25,129 @@ import {
 import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
-import { CategoryFormComponent, CategoryFormModule } from 'src/app/components/library/category-form/category-form.component';
+import {
+  CategoryFormComponent,
+  CategoryFormModule,
+} from 'src/app/components/library/category-form/category-form.component';
 import { ExportService } from 'src/app/services/export.service';
 import { ItemcategoryEditModule } from 'src/app/pages/itemcategory-edit/itemcategory-edit.component';
 import { CommonModule } from '@angular/common';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-item-category-list',
   templateUrl: './item-category-list.component.html',
-  styleUrls: ['./item-category-list.component.scss']
+  styleUrls: ['./item-category-list.component.scss'],
 })
 export class ItemCategoryListComponent {
   @ViewChild(CategoryFormComponent) categoryComponent: CategoryFormComponent;
-  @ViewChild(DxDataGridComponent,{ static: true }) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
 
-   readonly allowedPageSizes: any = [5, 10, 'all'];
+  readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  category:any;
-  DepartmentDropdownData:any;
-  isAddCategoryPopupOpened=false;
-  showFilterRow=true;
-  showHeaderFilter=true;
-  editItemCategory:boolean=false
-  selectedData:any
-  selected_data:any
+  category: any;
+  DepartmentDropdownData: any;
+  isAddCategoryPopupOpened = false;
+  showFilterRow = true;
+  showHeaderFilter = true;
+  editItemCategory: boolean = false;
+  selectedData: any;
+  selected_data: any;
   selected_Company_id: any;
   COMPANY_ID: any;
-  constructor(private dataservice:DataService,private exportService: ExportService,private ngZone: NgZone
-    ){
-      this.sesstion_Details();
-      this.showCategory();
-    }
-  onExporting(event: any) {
-    this.exportService.onExporting(event,'Catagory-list');
-  }
-  addCategory(){
-    this.isAddCategoryPopupOpened=true;
-  }
+  isFilterRowVisible: boolean = false;
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
-            addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addCategory());
     },
-    elementAttr: { class: 'add-button' }
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
-
-  onEditStart(event:any){
-    event.cancel=true
-this.editItemCategory=true
-  const id=event.data.ID
-
-  this.dataservice.select_category(id).subscribe((res:any)=>{
-  console.log(res)
-    this.selected_data=res
-  })
+  constructor(
+    private dataservice: DataService,
+    private exportService: ExportService,
+    private ngZone: NgZone,
+    private router: Router,
+  ) {
+    this.sesstion_Details();
+    this.showCategory();
   }
-  
-  onClickSaveCategory(){
-    const { CODE, CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID } =this.categoryComponent.getNewCategoryData();
-    console.log('inserted data',CODE,CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID );
-   const COMPANY_ID = this.COMPANY_ID
- // Check for duplicates in CategoryList
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Catagory-list');
+  }
+  addCategory() {
+    this.isAddCategoryPopupOpened = true;
+  }
+
+  //           addButtonOptions = {
+  //   text: 'New',
+  //   icon: 'bi bi-file-earmark-plus',
+  //   type: 'default',
+  //   stylingMode: 'contained',
+  //   hint: 'Add new entry',
+  //   onClick: () => {
+  //     // Run inside Angular's zone
+  //     this.ngZone.run(() => this.addCategory());
+  //   },
+  //   elementAttr: { class: 'add-button' }
+  // };
+
+  onEditStart(event: any) {
+    event.cancel = true;
+    this.editItemCategory = true;
+    const id = event.data.ID;
+
+    this.dataservice.select_category(id).subscribe((res: any) => {
+      console.log(res);
+      this.selected_data = res;
+    });
+  }
+
+  onClickSaveCategory() {
+    const { CODE, CAT_NAME, LOYALTY_POINT, COST_HEAD_ID, DEPT_ID } =
+      this.categoryComponent.getNewCategoryData();
+    console.log(
+      'inserted data',
+      CODE,
+      CAT_NAME,
+      LOYALTY_POINT,
+      COST_HEAD_ID,
+      DEPT_ID,
+    );
+    const COMPANY_ID = this.COMPANY_ID;
+    // Check for duplicates in CategoryList
     const isCodeDuplicate = this.category.some(
       // (item: any) => item.CODE === commonDetails.code
-        (item: any) => item.CODE.toLowerCase() ===CODE.toLowerCase()
+      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
     );
 
     const isDescriptionDuplicate = this.category.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
-            (item: any) =>
-    item.CAT_NAME.toLowerCase() === CAT_NAME.toLowerCase()
+      (item: any) => item.CAT_NAME.toLowerCase() === CAT_NAME.toLowerCase(),
     );
-
-    
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
       notify(
@@ -114,7 +156,7 @@ this.editItemCategory=true
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -124,7 +166,7 @@ this.editItemCategory=true
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -134,79 +176,101 @@ this.editItemCategory=true
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
 
-
-    
-    this.dataservice.postCategoryData(CODE,CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID).subscribe(
-      (response)=>{
-        if(response){
-
+    this.dataservice
+      .postCategoryData(
+        CODE,
+        CAT_NAME,
+        LOYALTY_POINT,
+        COST_HEAD_ID,
+        DEPT_ID,
+        COMPANY_ID,
+      )
+      .subscribe((response) => {
+        if (response) {
           this.showCategory();
-          this.isAddCategoryPopupOpened=false
-             notify(
-                    {
-                      message: "This Item Category inserted successfully",
-                      position: { at: "top right", my: "top right" },
-                      displayTime: 1000,
-                    },
-                    "success"
-                  );
-                  return;
+          this.isAddCategoryPopupOpened = false;
+          notify(
+            {
+              message: 'This Item Category inserted successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 1000,
+            },
+            'success',
+          );
+          return;
         }
-      }
-    )
-
+      });
   }
-  
+
   onRowRemoving(event) {
     const selectedRow = event.data;
-    const { ID, CODE, CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID } = selectedRow;
-    
-    this.dataservice.removeCategory(ID, CODE, CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID ).subscribe(() => {
-      try {
-        // Your delete logic here
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success'
-        );
-        this.dataGrid.instance.refresh();
-        this.showCategory();
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error'
-        );
-      }
-    });
+    const {
+      ID,
+      CODE,
+      CAT_NAME,
+      LOYALTY_POINT,
+      COST_HEAD_ID,
+      DEPT_ID,
+      COMPANY_ID,
+    } = selectedRow;
+
+    this.dataservice
+      .removeCategory(
+        ID,
+        CODE,
+        CAT_NAME,
+        LOYALTY_POINT,
+        COST_HEAD_ID,
+        DEPT_ID,
+        COMPANY_ID,
+      )
+      .subscribe(() => {
+        try {
+          // Your delete logic here
+          notify(
+            {
+              message: 'Delete operation successful',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+          this.dataGrid.instance.refresh();
+          this.showCategory();
+        } catch (error) {
+          notify(
+            {
+              message: 'Delete operation failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+        }
+      });
   }
 
-   sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.COMPANY_ID=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.COMPANY_ID,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.COMPANY_ID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.COMPANY_ID,
+      '============selected_Company_id==============',
+    );
+  }
 
-  showCategory(){
+  showCategory() {
     const payload = {
-      COMPANY_ID : this.COMPANY_ID
-    }
-     this.dataservice.getCategoryData(payload).subscribe(
-      (response)=>{
-            this.category=response;
-            console.log(response);
-      }
-     )
+      COMPANY_ID: this.COMPANY_ID,
+    };
+    this.dataservice.getCategoryData(payload).subscribe((response) => {
+      this.category = response;
+      console.log(response);
+    });
   }
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
@@ -214,24 +278,50 @@ this.editItemCategory=true
       .getDropdownData(dropdowndepartment)
       .subscribe((data: any) => {
         this.DepartmentDropdownData = data;
-        console.log('dropdown',this.DepartmentDropdownData);
+        console.log('dropdown', this.DepartmentDropdownData);
       });
   }
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/user');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sesstion_Details();
     this.showCategory();
     this.getDepartmentDropDown();
   }
   refresh = () => {
     this.dataGrid.instance.refresh();
-       this.showCategory();
-
+    this.showCategory();
   };
-  handleClose(){
-    this.isAddCategoryPopupOpened=false
-    this.editItemCategory=false
-    this.showCategory()
-
+  toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    // this.cdr.detectChanges();
+  };
+  handleClose() {
+    this.isAddCategoryPopupOpened = false;
+    this.editItemCategory = false;
+    this.showCategory();
   }
 }
 
@@ -249,11 +339,11 @@ this.editItemCategory=true
     ReactiveFormsModule,
     CategoryFormModule,
     ItemcategoryEditModule,
-    CommonModule
+    CommonModule,
   ],
   providers: [],
   exports: [ItemCategoryListComponent],
   declarations: [ItemCategoryListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemCategoryModule {}
+export class ItemCategoryModule {}

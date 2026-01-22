@@ -7,7 +7,7 @@ import {
   NgZone,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common'; 
+import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -38,12 +38,13 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-fixed-asstes-list',
   templateUrl: './fixed-asstes-list.component.html',
-  styleUrls: ['./fixed-asstes-list.component.scss']
+  styleUrls: ['./fixed-asstes-list.component.scss'],
 })
 export class FixedAsstesListComponent {
-  @ViewChild(DxDataGridComponent,{ static: true }) dataGrid: DxDataGridComponent;
-FixedAssets:any
-readonly allowedPageSizes: any = [5, 10, 'all'];
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+  FixedAssets: any;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter: true;
@@ -51,10 +52,10 @@ readonly allowedPageSizes: any = [5, 10, 'all'];
   isFilterOpened = false;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
-EditFixedAssetsPopupVisible:boolean=false
-AddFixedAssetsPopupVisible:boolean=false
-Selected_fixedAssets_data:any
-canAdd = false;
+  EditFixedAssetsPopupVisible: boolean = false;
+  AddFixedAssetsPopupVisible: boolean = false;
+  Selected_fixedAssets_data: any;
+  canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
@@ -62,46 +63,68 @@ canAdd = false;
   canPrint = false;
 
   gridButtons = [
-  'edit',
-  {
-    name: 'delete',
-   visible: (e: any) => !e.row?.data?.NET_DEPRECIATION
-  }
-];
+    'edit',
+    {
+      name: 'delete',
+      visible: (e: any) => !e.row?.data?.NET_DEPRECIATION,
+    },
+  ];
   selectedFA: any;
   fixedAssetId: any;
   selected_Company_id: any;
 
- //========================Export data ==========================
+  //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'fixed_assets';
     this.dataService.exportDataGrid(event, fileName);
   }
 
-refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
   };
-   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addFixedAssets());
     },
-    elementAttr: { class: 'add-button' }
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
 
-    constructor(private dataService: DataService,private ngZone: NgZone,private cdr:ChangeDetectorRef,private router: Router){
-      const currentUrl = this.router.url;
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+  constructor(
+    private dataService: DataService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {
+    const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
@@ -121,104 +144,100 @@ refreshButtonOptions = {
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
-      this.list_fixed_assets()
+    this.list_fixed_assets();
+  }
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
 
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
     }
-
+  }
   //==========insert open popup=============
-  addFixedAssets(){
-    this.AddFixedAssetsPopupVisible=true
-
+  addFixedAssets() {
+    this.AddFixedAssetsPopupVisible = true;
   }
-  handleClose(){
-this.AddFixedAssetsPopupVisible=false
-this.EditFixedAssetsPopupVisible=false
+  handleClose() {
+    this.AddFixedAssetsPopupVisible = false;
+    this.EditFixedAssetsPopupVisible = false;
 
-
-this.list_fixed_assets()
+    this.list_fixed_assets();
   }
 
-     sesstion_Details() {
+  sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.sesstion_Details();
   }
-  
-  list_fixed_assets(){
-  
-    const payload ={
-      COMPANY_ID : this.selected_Company_id
-    }
-    this.dataService.list_Fixed_Asset_api(payload).subscribe((res:any)=>{
-      console.log(res)
-this.FixedAssets=res.Data
-      
-    })
+
+  list_fixed_assets() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.list_Fixed_Asset_api(payload).subscribe((res: any) => {
+      console.log(res);
+      this.FixedAssets = res.Data;
+    });
   }
-//=============onedit start==========================
-onEditFixedAssets(event:any){
-  event.cancel=true
-  this.EditFixedAssetsPopupVisible=true
-console.log(event)
-  const id=event.data.ID
-  this.fixedAssetId = event.data.ID;
-  this.selectedFA = id;
-  this.dataService.select_Fixed_Asset(id).subscribe((res:any)=>{
-    console.log(res)
-    this.Selected_fixedAssets_data=res.Data
-  })
+  //=============onedit start==========================
+  onEditFixedAssets(event: any) {
+    event.cancel = true;
+    this.EditFixedAssetsPopupVisible = true;
+    console.log(event);
+    const id = event.data.ID;
+    this.fixedAssetId = event.data.ID;
+    this.selectedFA = id;
+    this.dataService.select_Fixed_Asset(id).subscribe((res: any) => {
+      console.log(res);
+      this.Selected_fixedAssets_data = res.Data;
+    });
+  }
 
-}
-
-//========================Delete functionality========
-delete_FixedAssets_Data(event:any){
-  const id=event.data.ID
-  this.dataService.Delete_FixedAsset_Api(id).subscribe((res:any)=>{
-       notify(
-            {
-              message: 'This Fixed Asset date deleted successfully .',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success'
-          );
-
-  })
-
-}
+  //========================Delete functionality========
+  delete_FixedAssets_Data(event: any) {
+    const id = event.data.ID;
+    this.dataService.Delete_FixedAsset_Api(id).subscribe((res: any) => {
+      notify(
+        {
+          message: 'This Fixed Asset date deleted successfully .',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'success',
+      );
+    });
+  }
 
   getStatusFlagClass(Status: string): string {
     // console.log('Status:', Status);
-    
- return Status ? 'flag-red' : 'flag-green';
-}
 
+    return Status ? 'flag-red' : 'flag-green';
+  }
 
-refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
-       // Or reload data from API if needed
-       this.list_fixed_assets()
+      // Or reload data from API if needed
+      this.list_fixed_assets();
     }
   }
-    toggleFilterRow = () => {
+  toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
-
-
-
 }
-
 
 @NgModule({
   imports: [
@@ -235,8 +254,7 @@ refreshGrid() {
     ReactiveFormsModule,
     CommonModule,
     FixedAsstesEditModule,
-    FixedAsstesAddModule
-    
+    FixedAsstesAddModule,
   ],
   providers: [],
   exports: [FixedAsstesListComponent],

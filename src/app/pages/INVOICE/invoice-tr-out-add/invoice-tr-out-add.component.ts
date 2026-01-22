@@ -167,10 +167,11 @@ export class InvoiceTrOutAddComponent {
   selectedCompany: any;
   companyState: any;
   previousCustomerId: number | null = null;
+  pendingCustomerId: number | null = null;
 
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.sessionData_tax();
   }
@@ -351,15 +352,44 @@ export class InvoiceTrOutAddComponent {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.invoiceFormData.COMPANY_ID,
-       NAME:'CUSTOMER'
+      NAME: 'CUSTOMER',
     };
+
     this.dataService
       .getCustomerStateTrout_Invoice(payload)
       .subscribe((response: any) => {
-        this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
+        this.distributorList = response || [];
+
+        // ✅ BIND CUSTOMER AFTER DATASOURCE IS READY
+        if (this.isEditing && this.pendingCustomerId) {
+          const exists = this.distributorList.some(
+            (c: any) => c.ID === this.pendingCustomerId,
+          );
+
+          if (exists) {
+            this.invoiceFormData.CUST_ID = this.pendingCustomerId;
+          }
+
+          this.pendingCustomerId = null;
+
+          // Force DevExtreme refresh
+          this.cdr.detectChanges();
+        }
       });
   }
+
+  // getCustomerOrUnitLst() {
+  //   const payload = {
+  //     COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+  //      NAME:'CUSTOMER'
+  //   };
+  //   this.dataService
+  //     .getCustomerStateTrout_Invoice(payload)
+  //     .subscribe((response: any) => {
+  //       this.distributorList = response;
+  //       console.log(this.distributorList, 'DISTLISTPOPUP');
+  //     });
+  // }
   onDistributorChanged(e: any) {
     const newCustomerId = e.value;
 
@@ -374,7 +404,7 @@ export class InvoiceTrOutAddComponent {
     this.previousCustomerId = newCustomerId;
     // Find the selected customer from the distributorList
     const selectedCustomer = this.distributorList.find(
-      (cust: any) => cust.ID === e.value
+      (cust: any) => cust.ID === e.value,
     );
     this.selectedCustomerName = selectedCustomer.DESCRIPTION;
     this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
@@ -400,7 +430,7 @@ export class InvoiceTrOutAddComponent {
 
     if (this.selectedCustomerId) {
       this.selectedCustomer = this.distributorList.find(
-        (s: any) => s.ID === this.selectedCustomerId
+        (s: any) => s.ID === this.selectedCustomerId,
       );
       this.invoiceFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
       console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
@@ -409,7 +439,7 @@ export class InvoiceTrOutAddComponent {
     if (this.selectedCustomerType) {
       console.log(
         'Selected Customer Type:',
-        this.selectedCustomerType.CUST_TYPE
+        this.selectedCustomerType.CUST_TYPE,
       );
       console.log('Selected Customer :', this.selectedCustomerType);
       // optional — store it if you need it later
@@ -513,7 +543,7 @@ export class InvoiceTrOutAddComponent {
     console.log(this.selectedTransfers, 'SELECTEDTRANSFERSSSSSSSS');
     // Filter the full list before showing in popup
     this.invoiceGridList = this.staticTransfers.filter(
-      (item: any) => !selectedTransferNos.includes(item.DN_DETAIL_ID)
+      (item: any) => !selectedTransferNos.includes(item.DN_DETAIL_ID),
     );
     this.isTrOutPopupVisible = true;
   }
@@ -531,7 +561,7 @@ export class InvoiceTrOutAddComponent {
     }
 
     const existingIds = this.mainInvoiceGridList.map(
-      (item: any) => item.DN_DETAIL_ID
+      (item: any) => item.DN_DETAIL_ID,
     );
 
     // ✅ State comparison (ONLY for split decision)
@@ -633,7 +663,7 @@ export class InvoiceTrOutAddComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'TAX_PERC'));
@@ -698,7 +728,7 @@ export class InvoiceTrOutAddComponent {
     }
 
     const hasInvalidPrice = this.mainInvoiceGridList.some(
-      (row: any) => !row.PRICE || row.PRICE === 0
+      (row: any) => !row.PRICE || row.PRICE === 0,
     );
 
     if (hasInvalidPrice) {
@@ -728,7 +758,7 @@ export class InvoiceTrOutAddComponent {
         TOTAL_AMOUNT: this.calculateTotal(row),
         CGST: row.CGST,
         SGST: row.SGST,
-      })
+      }),
     );
 
     // ----------------------- ROOT-LEVEL VALUES -----------------------
@@ -763,7 +793,7 @@ export class InvoiceTrOutAddComponent {
     const callApproveAPI = () => {
       const result = confirm(
         'Are you sure you want to APPROVE this invoice?',
-        'Confirmation'
+        'Confirmation',
       );
 
       result.then((confirmed) => {
@@ -795,7 +825,7 @@ export class InvoiceTrOutAddComponent {
         // Ask confirmation only for approved INSERT
         const result = confirm(
           'Are you sure you want to approve and commit this invoice?',
-          'Confirmation'
+          'Confirmation',
         );
 
         result.then((confirmed) => {

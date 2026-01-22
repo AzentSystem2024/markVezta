@@ -73,7 +73,13 @@ export class ListMiscellaneousPaymentsComponent {
   selectedMiscPayment: any;
   MiscPaymentId: any;
   selectedCompanyId: any;
-
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'Micellaneous_Payments';
@@ -83,23 +89,46 @@ export class ListMiscellaneousPaymentsComponent {
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.ngZone.run(() => {
-        this.addMiscPayment(); // show your popup here
-      });
+      this.ngZone.run(() => this.addMiscPayment());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
+  // addButtonOptions = {
+  //   text: 'New',
+  //   icon: 'bi bi-file-earmark-plus',
+  //   // icon: 'add',
+  //   type: 'default',
+  //   stylingMode: 'contained',
+  //   hint: 'Add new entry',
+  //   onClick: () => {
+  //     this.ngZone.run(() => {
+  //       this.addMiscPayment(); // show your popup here
+  //     });
+  //   },
+  //   elementAttr: { class: 'add-button' },
+  // };
   addMiscPaymentPopup: boolean = false;
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -124,7 +153,7 @@ export class ListMiscellaneousPaymentsComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private router: Router
+    private router: Router,
   ) {
     this.sessionData_tax();
   }
@@ -135,7 +164,7 @@ export class ListMiscellaneousPaymentsComponent {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
@@ -175,11 +204,10 @@ export class ListMiscellaneousPaymentsComponent {
     this.addMiscPaymentPopup = true;
   }
 
-
   getMiscPaymentList() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
-    }
+    };
     this.dataService.getMiscpaymentList(payload).subscribe((response: any) => {
       this.miscPaymentsList = response.Data.map((item: any) => {
         let dateValue: Date;
@@ -226,7 +254,7 @@ export class ListMiscellaneousPaymentsComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -355,7 +383,7 @@ export class ListMiscellaneousPaymentsComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -480,7 +508,7 @@ export class ListMiscellaneousPaymentsComponent {
               message: 'Miscellaneous Payment Log Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getMiscPaymentList();
           // this.dataGrid.instance.refresh();
@@ -490,14 +518,14 @@ export class ListMiscellaneousPaymentsComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

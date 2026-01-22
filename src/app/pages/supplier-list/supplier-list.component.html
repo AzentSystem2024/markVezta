@@ -41,7 +41,7 @@
           elementAttr: { class: 'toolbar-icon-btn' },
         }"
       ></dxi-item>
-      <!-- Refresh -->
+
       <dxi-item
         location="after"
         widget="dxButton"
@@ -56,9 +56,9 @@
 
       <!-- Export (built-in, kept) -->
       <dxi-item
+        name="exportButton"
         location="after"
-        widget="dxButton"
-        [options]="exportButtonOptions"
+        cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
 
       <!-- Add -->

@@ -22,35 +22,39 @@ import {
   DxPopupModule,
 } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
-import { PrepaymentPostingAddComponent, PrepaymentPostingAddModule } from '../prepayment-posting-add/prepayment-posting-add.component';
+import {
+  PrepaymentPostingAddComponent,
+  PrepaymentPostingAddModule,
+} from '../prepayment-posting-add/prepayment-posting-add.component';
 import { PrepaymentPostingEditModule } from '../prepayment-posting-edit/prepayment-posting-edit.component';
 import notify from 'devextreme/ui/notify';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-prepayment-posting-list',
   templateUrl: './prepayment-posting-list.component.html',
-  styleUrls: ['./prepayment-posting-list.component.scss']
+  styleUrls: ['./prepayment-posting-list.component.scss'],
 })
 export class PrepaymentPostingListComponent {
-   @ViewChild(PrepaymentPostingAddComponent) PrepaymentPostingAddComponent: PrepaymentPostingAddComponent;
-     @ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild(PrepaymentPostingAddComponent)
+  PrepaymentPostingAddComponent: PrepaymentPostingAddComponent;
+  @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-selectedRows: any[] = [];
+  selectedRows: any[] = [];
 
   // Paging
-
 
   allowedPageSizes: number[] = [5, 10, 20];
   displayMode: any;
   showPageSizeSelector: boolean = true;
-  isEditPopupPrepaymentPosting:boolean=false
+  isEditPopupPrepaymentPosting: boolean = false;
   // Calendar/month selector
-  selectedMonth: Date  = new Date();
+  selectedMonth: Date = new Date();
   selectedYear: number = new Date().getFullYear();
   calendarVisible: boolean = false;
   yearSelectorVisible: boolean = false;
-  isAddPopupPrepaymentPosting:boolean=false
+  isAddPopupPrepaymentPosting: boolean = false;
   selectedMonthForAdd: string;
-  prepaymentList:any
+  prepaymentList: any;
   // editPackPopupOpened:boolean
   years: number[] = [];
   months = Array.from({ length: 12 }, (_, i) => new Date(2022, i, 1)); // Example for 2022
@@ -68,80 +72,144 @@ selectedRows: any[] = [];
     'November',
     'December',
   ];
-      addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.openPopup());
     },
-    elementAttr: { class: 'add-button' }
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
-    refreshButtonOptions = { 
+
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
 
-    gridButtons = [
-  'edit', 
-  {
-    name: 'delete',
-    visible: (e: any) => e.row?.data?.TRANS_STATUS?.trim() === 'Open'
-  }
-]; 
- 
+  gridButtons = [
+    'edit',
+    {
+      name: 'delete',
+      visible: (e: any) => e.row?.data?.TRANS_STATUS?.trim() === 'Open',
+    },
+  ];
+
   selecte_prepayment_Data: any;
-isEditReadOnly:boolean=false
+  isEditReadOnly: boolean = false;
   prepaymentpostingId: any;
   selectedprepaymentposting: any;
   selected_Company_id: any;
-  constructor (private ngZone:NgZone,private dataservice:DataService, private cdr:ChangeDetectorRef){
-this.get_prepayment_posting_list()
-this.sesstion_Details();
-
+  isFilterOpened: boolean;
+  companyID: any;
+  constructor(
+    private ngZone: NgZone,
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {
+    this.get_prepayment_posting_list();
+    this.sesstion_Details();
   }
+  ngOnInit() {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    console.log('Parsed ObjectData:', menuResponse);
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/accounts');
 
-   sesstion_Details() {
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
+    // this.getAccountsGroupList();
+  }
+  sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
   get_prepayment_posting_list() {
     const payload = {
-      COMPANY_ID:this.selected_Company_id
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.Prepayment_posting_list(payload).subscribe((res: any) => {
+      console.log(res);
+
+      this.prepaymentList = res.Data
+        // filter by selectedMonth
+        .filter((item: any) =>
+          this.isSameMonthYear(item.TRANS_DATE, this.selectedMonth),
+        )
+        // add serial number
+        .map((item: any, index: number) => ({
+          ...item,
+          SNO: index + 1,
+        }));
+      if (this.prepaymentList.TRANS_STATUS == 'Approved') {
+        this.isEditReadOnly = true;
+      }
+    });
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
     }
-  this.dataservice.Prepayment_posting_list(payload).subscribe((res: any) => {
-    console.log(res);
-
-    this.prepaymentList = res.Data
-      // filter by selectedMonth
-      .filter((item: any) =>
-        this.isSameMonthYear(item.TRANS_DATE, this.selectedMonth)
-      )
-      // add serial number
-      .map((item: any, index: number) => ({
-        ...item,
-        SNO: index + 1,
-      }));
-      if(this.prepaymentList.TRANS_STATUS=='Approved'){
-
-  this.isEditReadOnly=true
-}
-  });
-}
-
-
-
+  }
 
   // get_prepayment_posting_list(){
   //   this.dataservice.Prepayment_posting_list().subscribe((res:any)=>{
@@ -156,116 +224,108 @@ this.sesstion_Details();
   //   })
   // }
 
- getStatusFlagClass(Status: string): string {
+  getStatusFlagClass(Status: string): string {
     // console.log('Status:', Status);
-  
- return Status =='Open' ? 'flag-oranged' : 'flag-green';
-}
 
-
-onEditPrePayment(e:any){
-e.cancel=true
-this.isEditPopupPrepaymentPosting=true
-this.selected_Data(e)
-
-}
-
-selected_Data(e:any){
-
-  const id=e.data.TRANS_ID
-  this.prepaymentpostingId = e.data.TRANS_ID
-  this.selectedprepaymentposting = id
-  this.dataservice.select_Prepayment_Posting(id).subscribe((Res:any)=>{
-    console.log(Res)
-   this.selecte_prepayment_Data= Res.Data
-
-  })
-
-}
-  openPopup(){
-this.isAddPopupPrepaymentPosting=true
-this.PrepaymentPostingAddComponent.get_prepayment_pending_list()
-
+    return Status == 'Open' ? 'flag-oranged' : 'flag-green';
   }
-  handleClose(){
-this.isAddPopupPrepaymentPosting=false
-this.get_prepayment_posting_list()
-this.isEditPopupPrepaymentPosting=false
 
+  onEditPrePayment(e: any) {
+    e.cancel = true;
+    this.isEditPopupPrepaymentPosting = true;
+    this.selected_Data(e);
   }
-  onDeletePrepayment(event:any){
-    console.log(event)
-    event.cancel=true
 
-     if (event.data.TRANS_STATUS === "Approved") {
-          event.cancel = true;
-          notify('Prepayment posting cannot be deleted.', 'error', 2000);
-          return;
-        }
-    const id=event.data.TRANS_ID
-    this.dataservice.Delete_Prepayment_Posting(id).subscribe((res:any)=>{
-      console.log(res)
-         notify(
-                      {
-                        message: 'Prepayment Deleted successfully',
-                        position: { at: 'top right', my: 'top right' },
-                        displayTime: 500,
-                      },
-                      'success'
-                    );
-    })
+  selected_Data(e: any) {
+    const id = e.data.TRANS_ID;
+    this.prepaymentpostingId = e.data.TRANS_ID;
+    this.selectedprepaymentposting = id;
+    this.dataservice.select_Prepayment_Posting(id).subscribe((Res: any) => {
+      console.log(Res);
+      this.selecte_prepayment_Data = Res.Data;
+    });
+  }
+  openPopup() {
+    this.isAddPopupPrepaymentPosting = true;
+    this.PrepaymentPostingAddComponent.get_prepayment_pending_list();
+  }
+  handleClose() {
+    this.isAddPopupPrepaymentPosting = false;
+    this.get_prepayment_posting_list();
+    this.isEditPopupPrepaymentPosting = false;
+  }
+  onDeletePrepayment(event: any) {
+    console.log(event);
+    event.cancel = true;
 
-    this.get_prepayment_posting_list()
+    if (event.data.TRANS_STATUS === 'Approved') {
+      event.cancel = true;
+      notify('Prepayment posting cannot be deleted.', 'error', 2000);
+      return;
+    }
+    const id = event.data.TRANS_ID;
+    this.dataservice.Delete_Prepayment_Posting(id).subscribe((res: any) => {
+      console.log(res);
+      notify(
+        {
+          message: 'Prepayment Deleted successfully',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'success',
+      );
+    });
 
+    this.get_prepayment_posting_list();
   }
   isSameMonthYear(transDate: string, selectedMonth: Date): boolean {
-  if (!transDate) return false;
+    if (!transDate) return false;
 
-  // TRANS_DATE is dd-MM-yyyy
-  const [day, month, year] = transDate.split("-").map(Number);
-  const itemDate = new Date(year, month - 1, day);
+    // TRANS_DATE is dd-MM-yyyy
+    const [day, month, year] = transDate.split('-').map(Number);
+    const itemDate = new Date(year, month - 1, day);
 
-  return (
-    itemDate.getMonth() === selectedMonth.getMonth() &&
-    itemDate.getFullYear() === selectedMonth.getFullYear()
-  );
-}
+    return (
+      itemDate.getMonth() === selectedMonth.getMonth() &&
+      itemDate.getFullYear() === selectedMonth.getFullYear()
+    );
+  }
 
-  goToPreviousMonth(){
-   const currentDate = new Date(this.selectedMonth); // Ensure it's a Date object
+  goToPreviousMonth() {
+    const currentDate = new Date(this.selectedMonth); // Ensure it's a Date object
     currentDate.setMonth(currentDate.getMonth() - 1);
     this.selectedMonth = currentDate;
     // this.getTimesheet();
 
-    console.log( this.selectedMonth,'=========== this.selectedMonth====================')
-    console.log(this.formatToQuarterEnd(this.selectedMonth));  
-    this.get_prepayment_posting_list()
+    console.log(
+      this.selectedMonth,
+      '=========== this.selectedMonth====================',
+    );
+    console.log(this.formatToQuarterEnd(this.selectedMonth));
+    this.get_prepayment_posting_list();
   }
-formatToQuarterEnd(dateInput: Date | string): string {
-  const date = new Date(dateInput);
-  if (isNaN(date.getTime())) return ''; // invalid date check
+  formatToQuarterEnd(dateInput: Date | string): string {
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return ''; // invalid date check
 
-  // Keep the original date as it is
-  const dd = String(date.getDate()).padStart(2, '0');
-  const mm = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-based
-  const yyyy = date.getFullYear();
+    // Keep the original date as it is
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-based
+    const yyyy = date.getFullYear();
 
-  return `${dd}-${mm}-${yyyy}`;
-}
-
-
-  toggleCalendar(){
-
+    return `${dd}-${mm}-${yyyy}`;
   }
-    selectMonthByIndex(monthIndex: number) {
+
+  toggleCalendar() {}
+  selectMonthByIndex(monthIndex: number) {
     this.selectedMonth = new Date(this.selectedYear, monthIndex, 1, 12); // Set the date to the 1st of the selected month
     this.onMonthChange({ value: this.selectedMonth }); // Pass the selected month to onMonthChange
 
-      this.calendarVisible=false;
+    this.calendarVisible = false;
 
     // Hide calendar after selection (optional)
   }
-    onMonthChange(event: any): void {
+  onMonthChange(event: any): void {
     const selectedDate = new Date(event.value);
 
     if (isNaN(selectedDate.getTime())) return;
@@ -275,7 +335,7 @@ formatToQuarterEnd(dateInput: Date | string): string {
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
       1,
-      12
+      12,
     );
 
     this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString('en-US', {
@@ -285,64 +345,64 @@ formatToQuarterEnd(dateInput: Date | string): string {
 
     // this.getTimesheet();
   }
-  
+
   selectYear(year: number, event: MouseEvent) {
     event.stopPropagation(); // Prevent calendar from closing
     this.selectedYear = year;
     this.yearSelectorVisible = false;
   }
-    nextYear() {
+  nextYear() {
     this.selectedYear++;
   }
-      onSelectionChanged(e: any) {
-  this.selectedRows = e.selectedRowKeys;
-  console.log('User selected:', this.selectedRows);
-}
+  onSelectionChanged(e: any) {
+    this.selectedRows = e.selectedRowKeys;
+    console.log('User selected:', this.selectedRows);
+  }
 
-    toggleYearSelector() {
+  toggleYearSelector() {
     this.yearSelectorVisible = !this.yearSelectorVisible;
   }
-    previousYear() {
+  previousYear() {
     this.selectedYear--;
   }
-   goToNextMonth() {
+  goToNextMonth() {
     const currentDate = new Date(this.selectedMonth); // Ensure it's a Date object
     currentDate.setMonth(currentDate.getMonth() + 1);
     this.selectedMonth = currentDate;
 
-        console.log( this.selectedMonth,'=========== this.selectedMonth====================')
-    console.log(this.formatToQuarterEnd(this.selectedMonth));  
-    this.get_prepayment_posting_list()
+    console.log(
+      this.selectedMonth,
+      '=========== this.selectedMonth====================',
+    );
+    console.log(this.formatToQuarterEnd(this.selectedMonth));
+    this.get_prepayment_posting_list();
     // this.getTimesheet();
-  //    const payload ={
-  //      CompanyId: this.CompanyID,
-  //      Month: this.selectedMonth.toLocaleDateString('en-US', {
-  //   month: 'long',
-  //   year: 'numeric',
-  // }).replace(/\s/g, ''), // removes the space → "July2025"
-  //   }
-  //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-  //     console.log(response, 'Timesheet List Response');
-  //     this.timesheetList = response.data
-  //     // console.log(
-  //     //   this.timesheetList,
-  //     //   'Filtered Timesheet for',
-  //     //   selectedMonthStr
-  //     // );  
-  //   });
-  // this.fetchTimesheetList();
+    //    const payload ={
+    //      CompanyId: this.CompanyID,
+    //      Month: this.selectedMonth.toLocaleDateString('en-US', {
+    //   month: 'long',
+    //   year: 'numeric',
+    // }).replace(/\s/g, ''), // removes the space → "July2025"
+    //   }
+    //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
+    //     console.log(response, 'Timesheet List Response');
+    //     this.timesheetList = response.data
+    //     // console.log(
+    //     //   this.timesheetList,
+    //     //   'Filtered Timesheet for',
+    //     //   selectedMonthStr
+    //     // );
+    //   });
+    // this.fetchTimesheetList();
   }
-      refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
-   this.cdr.detectChanges(); // optional
-      this.get_prepayment_posting_list()
+      this.cdr.detectChanges(); // optional
+      this.get_prepayment_posting_list();
     }
   }
-
-
 }
-
 
 @NgModule({
   imports: [
@@ -353,11 +413,10 @@ formatToQuarterEnd(dateInput: Date | string): string {
     DxDropDownButtonModule,
     DxSelectBoxModule,
     DxTextBoxModule,
-    DxLookupModule, 
+    DxLookupModule,
     DxPopupModule,
     PrepaymentPostingAddModule,
-    PrepaymentPostingEditModule
-  
+    PrepaymentPostingEditModule,
   ],
   providers: [],
   declarations: [PrepaymentPostingListComponent],

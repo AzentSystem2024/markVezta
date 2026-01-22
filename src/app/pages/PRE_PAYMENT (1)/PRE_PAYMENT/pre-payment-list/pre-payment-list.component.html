@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="PrePaymentListDataSource"
@@ -71,32 +71,25 @@
           location="after"
           locateInMenu="auto"
           widget="dxButton"
-          [options]="refreshButtonOptions"
+          [options]="searchButtonOptions"
         ></dxi-item>
 
         <dxi-item
           location="after"
           locateInMenu="auto"
-          showText="inMenu"
           widget="dxButton"
-          [options]="{
-            icon: isFilterRowVisible ? 'search' : 'search',
-            hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-            onClick: toggleFilterRow,
-            stylingMode: 'text',
-            elementAttr: { class: 'commonButtons' }
-          }"
+          [options]="refreshButtonOptions"
         ></dxi-item>
-
         <dxi-item
           name="exportButton"
           location="after"
-          cssClass="custom-export-button"
+          cssClass="export-btn"
         ></dxi-item>
 
         <dxi-item
           *ngIf="canAdd"
           location="after"
+          locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>

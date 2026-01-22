@@ -85,20 +85,33 @@ export class JournalVoucherListComponent {
 
   startDate: Date;
   endDate: Date;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addJournalVoucher(),
     onClick: () => {
-      this.zone.run(() => {
-        this.addJournalVoucher();
-      });
+      this.zone.run(() => this.addJournalVoucher());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
   selectedJV: any;
   JVid: any;
@@ -138,6 +151,7 @@ export class JournalVoucherListComponent {
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -145,14 +159,14 @@ export class JournalVoucherListComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -177,7 +191,7 @@ export class JournalVoucherListComponent {
     this.sessionData_tax();
   }
 
-   sessionData_tax() {
+  sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
@@ -187,32 +201,34 @@ export class JournalVoucherListComponent {
 
   getJournalVouchers() {
     const payload = {
-      COMPANY_ID : this.selectedCompanyId
-    }
-    this.dataService.getJournalVoucherList(payload).subscribe((response: any) => {
-      this.journalVoucherList = response.Data.map((item: any) => {
-        let dateValue: Date;
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService
+      .getJournalVoucherList(payload)
+      .subscribe((response: any) => {
+        this.journalVoucherList = response.Data.map((item: any) => {
+          let dateValue: Date;
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.TRANS_DATE))) {
-          dateValue = new Date(item.TRANS_DATE);
-        } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.TRANS_DATE);
-        }
+          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
+          if (!isNaN(Date.parse(item.TRANS_DATE))) {
+            dateValue = new Date(item.TRANS_DATE);
+          } else {
+            // Case 2: If backend gives dd-MM-yyyy format
+            dateValue = this.parseDateString(item.TRANS_DATE);
+          }
 
-        return {
-          ...item,
-          TRANS_DATE: dateValue,
-        };
-      }).sort((a: any, b: any) => {
-        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-        return numB - numA; // descending order
+          return {
+            ...item,
+            TRANS_DATE: dateValue,
+          };
+        }).sort((a: any, b: any) => {
+          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+          return numB - numA; // descending order
+        });
+
+        this.applyDateFilter();
       });
-
-      this.applyDateFilter();
-    });
   }
 
   private parseDateString(dateStr: string): Date {
@@ -249,7 +265,7 @@ export class JournalVoucherListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -357,7 +373,7 @@ export class JournalVoucherListComponent {
       (item: any) => {
         const journalDate = new Date(item.TRANS_DATE);
         return journalDate >= startDate && journalDate <= endDate;
-      }
+      },
     );
   }
 
@@ -374,7 +390,7 @@ export class JournalVoucherListComponent {
       (item: any) => {
         const journalDate = item.TRANS_DATE;
         return journalDate >= start && journalDate <= end;
-      }
+      },
     );
 
     const fromLabel = this.formatAsDDMMYYYY(start);
@@ -383,7 +399,7 @@ export class JournalVoucherListComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -483,7 +499,7 @@ export class JournalVoucherListComponent {
         }
         console.log(
           this.selectedJournalVoucher,
-          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
         );
       });
   }
@@ -506,7 +522,7 @@ export class JournalVoucherListComponent {
               message: 'Journal Voucher Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getJournalVouchers();
           // this.dataGrid.instance.refresh();
@@ -516,14 +532,14 @@ export class JournalVoucherListComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

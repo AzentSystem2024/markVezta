@@ -72,7 +72,7 @@ export class StockMovementReportComponent {
   constructor(
     private dataService: DataService,
     private sanitizer: DomSanitizer,
-    private exportService: ExportService
+    private exportService: ExportService,
   ) {
     this.sesstion_Details();
     this.get_Item_Dropdown();
@@ -85,7 +85,7 @@ export class StockMovementReportComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
     this.selected_Company_name = sessionData.SELECTED_COMPANY.COMPANY_NAME;
     const sessionYear = sessionData.FINANCIAL_YEARS;
@@ -93,7 +93,7 @@ export class StockMovementReportComponent {
     this.financialYeaDate = sessionYear[0].DATE_FROM;
     console.log(
       this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[['
+      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
     );
 
     this.formatted_from_date = this.financialYeaDate;
@@ -102,13 +102,13 @@ export class StockMovementReportComponent {
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
 
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
   }
 
@@ -117,13 +117,13 @@ export class StockMovementReportComponent {
     this.selected_item_Id = event.value;
     console.log(
       this.selected_item_Id,
-      '=================selected item id==================='
+      '=================selected item id===================',
     );
   }
 
   get_Item_Dropdown() {
     const payload = {
-      NAME: 'ITEMS',
+      NAME: 'ITEMTYPE',
     };
     this.dataService.Item_Dropdown(payload).subscribe((res: any) => {
       console.log('Item dropdown', res);
@@ -156,18 +156,18 @@ export class StockMovementReportComponent {
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
       // STORE_ID: this.selectedstoreId,
-      ITEM_ID: this.selected_item_Id || 0,
+      ITEM_TYPE: this.selected_item_Id || 0,
     };
     console.log(payload, '================payload===================');
     this.dataService.StockMovement_Api(payload).subscribe((res: any) => {
       console.log(
         res,
-        '=================Stock Movement Report==================='
+        '=================Stock Movement Report===================',
       );
       this.StockMovementDatasource = res.data;
       console.log(
         this.StockMovementDatasource,
-        '=================Stock Movement Report DataSource==================='
+        '=================Stock Movement Report DataSource===================',
       );
     });
   }

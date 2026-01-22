@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -76,16 +77,33 @@ export class DebitComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
-
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    onClick: () => this.addDebitNote(),
+    onClick: () => {
+      this.ngZone.run(() => this.addDebitNote());
+    },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
   isAddDebitNote: boolean = false;
   isEditDebitNote: boolean = false;
@@ -121,6 +139,7 @@ export class DebitComponent {
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
@@ -135,14 +154,15 @@ export class DebitComponent {
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
@@ -169,8 +189,8 @@ export class DebitComponent {
 
   getDebitNoteList() {
     const payload = {
-      COMPANY_ID: this.selectedCompanyId
-    }
+      COMPANY_ID: this.selectedCompanyId,
+    };
     this.dataService.getDebitNoteList(payload).subscribe((response: any) => {
       this.debitList = response.Data.map((item: any) => {
         let dateValue: Date;
@@ -204,6 +224,7 @@ export class DebitComponent {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.getDebitNoteList();
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
@@ -264,7 +285,7 @@ export class DebitComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -348,7 +369,7 @@ export class DebitComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -465,7 +486,7 @@ export class DebitComponent {
               message: 'Debit Note Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getDebitNoteList();
           // this.dataGrid.instance.refresh();
@@ -475,14 +496,14 @@ export class DebitComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 
