@@ -46,6 +46,8 @@ export class SupplierEditComponent {
   @Output() formClosed: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  @ViewChild('landedCostGrid', { static: false })
+  landedCostGrid!: DxDataGridComponent; 
   @ViewChild(SupplierFormComponent) itemsComponent: SupplierFormComponent;
   popupVisible: boolean = true;
   CountryDropdownData: any[] = [];
@@ -181,6 +183,7 @@ export class SupplierEditComponent {
 
         //  this.get_Country_Dropdown_List()
           this.get_State_Dropdown_List()
+          
 
         const savedCostIDs = (this.supplierData.Supplier_cost || []).map(
           (cost: any) => cost.COST_ID
@@ -216,8 +219,12 @@ export class SupplierEditComponent {
     // this.get_Country_Dropdown_List();
   }
 
-  loadDropdownData(): void {
-    this.dataservice.getDropdownData('LANDED_COST').subscribe((data) => {
+  private loadDropdownData(): void {
+    const payload = {
+      NAME: 'LANDED_COST',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.getDropdownData(payload).subscribe((data) => {
       this.landedcost = data;
       console.log(this.landedcost, 'LANDEDCOST');
     });

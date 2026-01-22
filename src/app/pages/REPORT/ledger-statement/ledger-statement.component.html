@@ -1,6 +1,4 @@
 <div class="salary-grid-wrapper" style="padding: 10px">
-  
- 
   <div class="grid-container">
     <dx-data-grid
       [dataSource]="Ledger_statement_datasource"
@@ -11,7 +9,7 @@
       [showColumnLines]="true"
       [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
-        [grouping]="{ autoExpandAll: false }"
+      [grouping]="{ autoExpandAll: false }"
       [filterRow]="{ visible: false }"
       [rowAlternationEnabled]="true"
       [rowAlternationEnabled]="true"
@@ -19,24 +17,31 @@
       [allowColumnReordering]="true"
       [filterRow]="{ visible: false }"
       id="dataGrid"
+      [scrolling]="{ mode: 'virtual' }"
       [headerFilter]="{ visible: false }"
       [columnFixing]="{
         enabled: true,
-        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
-
-[summary]="summaryColumnsData"
-    [summary.calculateCustomSummary]="summaryColumnsData.calculateCustomSummary"
-    (onExporting)="onExporting($event)"
+      [summary]="summaryColumnsData"
+      [summary.calculateCustomSummary]="
+        summaryColumnsData.calculateCustomSummary
+      "
+      (onExporting)="onExporting($event)"
     >
-       <!-- (onEditingStart)="onEditLedger($event)" -->
-         <!-- <dxo-editing
+      <!-- (onEditingStart)="onEditLedger($event)" -->
+      <!-- <dxo-editing
         mode="popup"
         [allowUpdating]="true"
       ></dxo-editing> -->
-     <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"  style="padding-right: 15px;"> </dxo-export>
-<!-- <dxo-pager
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export
+        [enabled]="true"
+        [formats]="['xlsx', 'pdf']"
+        style="padding-right: 15px"
+      >
+      </dxo-export>
+      <!-- <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
         [displayMode]="displayMode"
@@ -44,15 +49,29 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager> -->
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"  style="padding-right: 15px;"> </dxo-export>
+      <dxo-export
+        [enabled]="true"
+        [formats]="['xlsx', 'pdf']"
+        style="padding-right: 15px"
+      >
+      </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">
-          Ledger Statement
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right:  3px;
+            "
+          >
+            Ledger Statement
           </div>
         </dxi-item>
 
-           <!-- <dxi-item>
+        <!-- <dxi-item>
            <dx-select-box
     [width]="200"
     label="Company Id"
@@ -68,32 +87,32 @@
         </dx-select-box>
 
         </dxi-item> -->
-           <dxi-item>
-           <dx-select-box
-        [width]="200"
-        label="Ledger"
-        labelMode="floating"
-         [items]="HEAD_ID_LIST"
-    displayExpr="NAME"
-    valueExpr="ID"
-    [(value)]="selected_Head_Id"
-    (onValueChanged)="onHeadIdChange($event)"
-    [searchEnabled]="true"
-        >
-        </dx-select-box>
-
+        <dxi-item>
+          <dx-select-box
+            [width]="200"
+            label="Ledger"
+            labelMode="floating"
+            [items]="HEAD_ID_LIST"
+            displayExpr="NAME"
+            valueExpr="ID"
+            [(value)]="selected_Head_Id"
+            (onValueChanged)="onHeadIdChange($event)"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
         </dxi-item>
-           <dxi-item>
-            <dx-date-box
-  [width]="150"
-  label="From Date"
-  labelMode="floating"
-  [(value)]="selected_from_date"
-  [displayFormat]="'dd-MM-yyyy'"
-  (onValueChanged)="onFromDateChange($event)">
-</dx-date-box>
+        <dxi-item>
+          <dx-date-box
+            [width]="150"
+            label="From Date"
+            labelMode="floating"
+            [(value)]="selected_from_date"
+            [displayFormat]="'dd-MM-yyyy'"
+            (onValueChanged)="onFromDateChange($event)"
+          >
+          </dx-date-box>
 
-           <!-- <dx-date-box
+          <!-- <dx-date-box
         [width]="150"
         label="From Date"
         labelMode="floating"
@@ -102,20 +121,17 @@
         >
 
         </dx-date-box> -->
-
         </dxi-item>
-           <dxi-item>
-           <dx-date-box
-        [width]="150"
-        label="To Date"
-        labelMode="floating"
-          [(value)]="selected_To_date"
+        <dxi-item>
+          <dx-date-box
+            [width]="150"
+            label="To Date"
+            labelMode="floating"
+            [(value)]="selected_To_date"
             displayFormat="dd-MM-yyyy"
-              (onValueChanged)="onToDateChange($event)"
-        >
-
-        </dx-date-box>
-
+            (onValueChanged)="onToDateChange($event)"
+          >
+          </dx-date-box>
         </dxi-item>
         <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
         <!-- <dxi-item
@@ -132,22 +148,20 @@
         }"
       ></dxi-item> -->
 
-  <dxi-item>
-    <dx-button
-    text="Apply"
-    icon="todo"
-    stylingMode="contained"
-    type="default"
-    [width]="100"
-    class="mt-2"
-    (onClick)="load_Ledgre_data()"
-    >
-
-    </dx-button>
-  </dxi-item>
-       <dxi-item name="exportButton"></dxi-item>
+        <dxi-item>
+          <dx-button
+            text="Apply"
+            icon="todo"
+            stylingMode="contained"
+            type="default"
+            [width]="100"
+            class="mt-2"
+            (onClick)="load_Ledgre_data()"
+          >
+          </dx-button>
+        </dxi-item>
+        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
-      
 
       <dxo-sorting mode="none"></dxo-sorting>
       <dxo-filter-row visible="true"></dxo-filter-row>
@@ -158,10 +172,10 @@
         show-info="true"
         show-navigator="true"
       ></dxo-pager>
-        <dxo-header-filter [visible]="true">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
-     <!-- <dxo-filter-row
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <!-- <dxo-filter-row
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row> -->
@@ -170,41 +184,61 @@
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-      <dxi-column dataField="TRANS_DATE" caption="Date" dataType="date" [format]="{ type: 'custom', formatter: formatDates }"></dxi-column>
-<dxi-column dataField="TRANS_TYPE_NAME" caption="Document Type"></dxi-column>
-<dxi-column dataField="VOUCHER_NO" caption="Voucher No"></dxi-column>
-<dxi-column dataField="PARTICULARS" caption="Particulars"></dxi-column>
-<dxi-column dataField="DR_AMOUNT" caption="Debit Amount"
-  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-  alignment="right">
-</dxi-column>
+      <dxi-column
+        dataField="TRANS_DATE"
+        caption="Date"
+        dataType="date"
+        [format]="{ type: 'custom', formatter: formatDates }"
+      ></dxi-column>
+      <dxi-column
+        dataField="TRANS_TYPE_NAME"
+        caption="Document Type"
+      ></dxi-column>
+      <dxi-column dataField="VOUCHER_NO" caption="Voucher No"></dxi-column>
+      <dxi-column dataField="PARTICULARS" caption="Particulars"></dxi-column>
+      <dxi-column
+        dataField="DR_AMOUNT"
+        caption="Debit Amount"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        alignment="right"
+      >
+      </dxi-column>
 
-<dxi-column dataField="CR_AMOUNT" caption="Credit Amount"
-  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-  alignment="right">
-</dxi-column>
+      <dxi-column
+        dataField="CR_AMOUNT"
+        caption="Credit Amount"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        alignment="right"
+      >
+      </dxi-column>
 
-<dxi-column dataField="BALANCE" caption="Balance"
-  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-  alignment="right">
-</dxi-column>
-<dxi-column  *ngIf="Ledger_statement_datasource.length > 0" type="buttons" [width]="100">
-  <dxi-button
-    hint="View"
-    icon="eyeopen"  
-    text="View"
-[onClick]="onViewClick.bind(this)"
-  ></dxi-button>
-</dxi-column>
-
+      <dxi-column
+        dataField="BALANCE"
+        caption="Balance"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        alignment="right"
+      >
+      </dxi-column>
+      <dxi-column
+        *ngIf="Ledger_statement_datasource.length > 0"
+        type="buttons"
+        [width]="100"
+      >
+        <dxi-button
+          hint="View"
+          icon="eyeopen"
+          text="View"
+          [onClick]="onViewClick.bind(this)"
+        ></dxi-button>
+      </dxi-column>
     </dx-data-grid>
   </div>
 </div>
 
 <!-- ==========================Journal Voucher   ======== =========== -->
 
-
 <dx-popup
+  *ngIf="isViewJournalVoucher"
   [(visible)]="isViewJournalVoucher"
   [width]="'90vw'"
   [height]="'90vh'"
@@ -217,9 +251,7 @@
   ></app-view-journal-voucher>
 </dx-popup>
 
-
 <!-- ==========================Debit View   ======== =========== -->
-
 
 <dx-popup
   [(visible)]="isViewDebitNote"
@@ -228,15 +260,13 @@
   title="Debit Note"
   (onHiding)="handleClose()"
 >
- 
-     <ng-container *ngIf="isViewDebitNote">
+  <ng-container *ngIf="isViewDebitNote">
     <app-view-debit
-    [debitFormData]="selectedDebitNote"
+      [debitFormData]="selectedDebitNote"
       (popupClosed)="handleClose()"
     ></app-view-debit>
   </ng-container>
-
-</dx-popup> 
+</dx-popup>
 
 <!-- =========================view of credit note============================== -->
 
@@ -270,7 +300,6 @@
     ></app-view-invoice>
   </ng-container>
 </dx-popup>
-
 
 <!-- //======================= coustom receipt=================== -->
 
@@ -307,9 +336,7 @@
   <!-- </ng-container> -->
 </dx-popup>
 
-
 <!-- //=======================salary payment=================== -->
-
 
 <dx-popup
   [(visible)]="editSalaryPopup"
@@ -327,26 +354,23 @@
   ></app-add-salary-payment>
 </dx-popup>
 
-
 <!-- //=======================Supplier payment=================== -->
 
-
-
-<dx-popup
+<!-- <dx-popup
   [(visible)]="isEditReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
   title="Supplier Payment"
   (onHiding)="handleClose()"
 >
-  <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-edit-supplier-payment
+   <ng-container *ngIf="isAddInvoice"> -->
+<!-- <app-edit-supplier-payment
     [paymentData]="selectedReceipt"
     [isReadOnlyMode]="isReadOnlyReceipt"
     (popupClosed)="handleClose()"
-  ></app-edit-supplier-payment>
-  <!-- </ng-container> -->
-</dx-popup>
+  ></app-edit-supplier-payment> -->
+<!-- </ng-container> -->
+<!-- </dx-popup> -->
 
 <!-- //=======================Pre payment=================== -->
 
@@ -368,8 +392,6 @@
 
 <!-- //=======================  Depreciation=================== -->
 
-
-
 <dx-popup
   [(visible)]="EditDepreciationPopupVisible"
   [width]="'100vw'"
@@ -378,12 +400,10 @@
   (onHiding)="handleClose()"
 >
   <app-depreciation-edit
-  
-      [SelectDepreciationData]="Selected_Depreciation_data"
+    [SelectDepreciationData]="Selected_Depreciation_data"
     (popupClosed)="handleClose()"
   ></app-depreciation-edit>
 </dx-popup>
-
 
 <!-- //======================= mis_payment=================== -->
 
@@ -403,24 +423,19 @@
   ></app-add-miscellaneous-payment>
 </dx-popup>
 
-
-
 <!-- ====================Salary Advance(LOANS)================================================ -->
 
- <dx-popup
-   [(visible)]="isEditPopUp"
-     title=" View Advance "
-     [height]="640"
-     [width]="700"
-   >
-<app-view-salary-advance
-  [advanceData]="selected_Data"
-  >
-</app-view-salary-advance>
- </dx-popup>
+<dx-popup
+  [(visible)]="isEditPopUp"
+  title=" View Advance "
+  [height]="640"
+  [width]="700"
+>
+  <app-view-salary-advance [advanceData]="selected_Data">
+  </app-view-salary-advance>
+</dx-popup>
 
-
- <!-- ====================Misc Receipt=========================== -->
+<!-- ====================Misc Receipt=========================== -->
 
 <dx-popup
   [(visible)]="editMiscPopup"
@@ -449,7 +464,7 @@
 </dx-popup>
 
 <!-- ==========================Purchase Invoice =============================== -->
- <dx-popup
+<dx-popup
   [(visible)]="isEditInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -467,7 +482,7 @@
 </dx-popup>
 
 <!-- =================================Pucrhase Return============================= -->
-  <dx-popup
+<dx-popup
   [(visible)]="isEditPurchaseReturn"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -483,7 +498,6 @@
     ></app-purchase-return-debit-form>
   </ng-container>
 </dx-popup>
-
 
 <!-- ===============================TransferOut================================== -->
 <dx-popup

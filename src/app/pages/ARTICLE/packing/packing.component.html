@@ -24,7 +24,8 @@
       [columnResizingMode]="'nextColumn'"
       [filterRow]="{ visible: false }"
       [headerFilter]="{ visible: false }"
-      [scrolling]="{ mode: 'standard' }"
+      t
+      [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
@@ -47,7 +48,7 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
       <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"

@@ -12,6 +12,7 @@
     [height]="'80vh'"
     noDataText=" "
     (onEditingStart)="onEditingStart($event)"
+    [scrolling]="{ mode: 'virtual' }"
   >
     <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
 

@@ -10,7 +10,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="employeeList"
@@ -21,18 +21,18 @@
       [headerFilter]="{ visible: true }"
       [allowColumnReordering]="true"
       [showColumnHeaders]="true"
-      [columnAutoWidth]="true"   
+      [columnAutoWidth]="true"
       [allowColumnResizing]="true"
       [columnResizingMode]="'nextColumn'"
       [headerFilter]="{ visible: true }"
-      [scrolling]="{ mode: 'standard' }"
+      [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       (onEditingStart)="onEditEmployee($event)"
       (onRowRemoving)="onDeleteEmployee($event)"
       [columnFixing]="{
         enabled: true,
-        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
     >
       <dxo-column-chooser
@@ -64,7 +64,7 @@
         [highlightCaseSensitive]="false"
       ></dxo-search-panel>
       <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
-          <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
       <dxo-export
         [enabled]="true"
         [allowExportSelectedData]="true"
@@ -88,7 +88,6 @@
           <div class="grid-header">Employee</div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto">
-      
           <!-- <dx-button
             icon="plus"
             type="default"
@@ -102,29 +101,28 @@
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
-        ></dxi-item>
-  
-                  <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'search' : 'search',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
-      ></dxi-item>
+        ></dxi-item>
 
-    
-               <dxi-item
-               *ngIf="canAdd"
-      location="after"
-      widget="dxButton"
-      [options]="addButtonOptions"
-    ></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          showText="inMenu"
+          widget="dxButton"
+          [options]="{
+            icon: isFilterRowVisible ? 'search' : 'search',
+            hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+            onClick: toggleFilterRow,
+            stylingMode: 'text',
+            elementAttr: { class: 'commonButtons' },
+          }"
+        ></dxi-item>
+
+        <dxi-item
+          *ngIf="canAdd"
+          location="after"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
 
       <dxi-column dataField="EMP_CODE" caption="Employee Code"></dxi-column>
@@ -154,7 +152,7 @@
       <dxi-column
         dataField="LAST_REJOIN_DATE"
         caption="Last Rejoin Date"
-         dataType="date"
+        dataType="date"
         [format]="{ type: 'custom', formatter: formatDates }"
       ></dxi-column>
       <dxi-column dataField="LEAVE_CREDIT" caption="Leave Credits"></dxi-column>
@@ -166,10 +164,16 @@
       <dxi-column
         dataField="LICENSE_EXPIRY"
         caption="License Expiry"
-        dataType="date" [format]="{ type: 'custom', formatter: formatDates }"
+        dataType="date"
+        [format]="{ type: 'custom', formatter: formatDates }"
       ></dxi-column>
       <dxi-column dataField="PP_NO" caption="PP No."></dxi-column>
-      <dxi-column dataField="PP_EXPIRY"  dataType="date" [format]="{ type: 'custom', formatter: formatDates }" caption="PP Expiry"></dxi-column>
+      <dxi-column
+        dataField="PP_EXPIRY"
+        dataType="date"
+        [format]="{ type: 'custom', formatter: formatDates }"
+        caption="PP Expiry"
+      ></dxi-column>
 
       <!-- <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column> -->
       <dxi-column dataField="VISA_NO" caption="Visa No."></dxi-column>
@@ -184,16 +188,17 @@
       <dxi-column
         dataField="IS_INACTIVE"
         caption="Status"
-          cellTemplate="statusCellTemplate"
+        cellTemplate="statusCellTemplate"
       ></dxi-column>
-        <div *dxTemplate="let cellData of 'statusCellTemplate'">
-      <i
-        class="fas fa-flag"
-        [ngClass]="getStatusFlagClass(cellData.value)"
-        [attr.title]="cellData.value ? 'Inactive ' : 'Active '"
-        style="margin-left: 10px; cursor: default"
-      ></i>       
-    </div>
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value ? 'Inactive ' : 'Active '"
+          style="margin-left: 10px; cursor: default"
+        ></i>
+              
+      </div>
     </dx-data-grid>
 
     <dx-popup

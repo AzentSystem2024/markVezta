@@ -12,6 +12,7 @@
   [rowAlternationEnabled]="true"
   [showColumnLines]="true"
   (onExporting)="onExporting($event)"
+  [scrolling]="{ mode: 'virtual' }"
   (onEditingStart)="OnEditingStartVatReturn($event)"
 >
   <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>

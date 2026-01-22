@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="payrollList"
@@ -25,11 +25,11 @@
       [columnAutoWidth]="true"
       [allowColumnResizing]="true"
       [columnResizingMode]="'nextColumn'"
-      [scrolling]="{ mode: 'standard' }"
+      [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{
         mode: 'multiple',
-        showCheckBoxesMode: 'always'
+        showCheckBoxesMode: 'always',
       }"
       focusStateEnabled="false"
       (onEditingStart)="onEditOrViewPayroll($event)"
@@ -92,7 +92,7 @@
               (onClick)="goToPreviousMonth()"
             ></dx-button>
             <span class="month-label" (click)="toggleCalendar()">
-              {{ selectedMonth | date : "MMMM yyyy" }}
+              {{ selectedMonth | date: "MMMM yyyy" }}
             </span>
             <dx-button
               icon="chevronright"
@@ -215,7 +215,7 @@
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
       >
       </dxi-column>

@@ -17,10 +17,11 @@
       [allowColumnReordering]="true"
       [filterRow]="{ visible: false }"
       id="dataGrid"
+      [scrolling]="{ mode: 'virtual' }"
       [headerFilter]="{ visible: false }"
       [columnFixing]="{
         enabled: true,
-        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"

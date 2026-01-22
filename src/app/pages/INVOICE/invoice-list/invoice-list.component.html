@@ -30,6 +30,7 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
+      [scrolling]="{ mode: 'virtual' }"
       (onEditingStart)="onEditInvoice($event)"
       (onRowRemoving)="onDeleteInvoice($event)"
       (onCellPrepared)="onCellPrepared($event)"
