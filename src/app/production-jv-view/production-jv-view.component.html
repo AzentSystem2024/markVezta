@@ -36,7 +36,7 @@
             allowUpdating: false,
             allowDeleting: false,
             allowAdding: false,
-            useIcons: false
+            useIcons: false,
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onRowRemoved)="onRowRemoved($event)"
@@ -244,7 +244,7 @@
                 style="flex: 1"
               ></dx-number-box>
 
-              <dx-number-box
+              <!-- <dx-number-box
                 label="Average(Pair)"
                 labelMode="floating"
                 [value]="productionFormData.AVERAGE_COST"
@@ -252,7 +252,7 @@
                 [format]="{ type: 'fixedPoint', precision: 2 }"
                 [readOnly]="true"
                 style="flex: 1"
-              ></dx-number-box>
+              ></dx-number-box> -->
             </div>
           </div>
         </div>

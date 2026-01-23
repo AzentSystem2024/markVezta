@@ -62,62 +62,90 @@ export class EmployeeComponent {
   selectedEmployee: any;
   editEmployeePopupOpened: boolean = false;
   isLoading: boolean = false;
- isFilterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
   canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
   canApprove = false;
   canPrint = false;
-   //=================================refresh=============================
-   refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
-      addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
+  //=================================refresh=============================
+
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addEmployee());
     },
-    elementAttr: { class: 'add-button' }
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+       <div class="add-btn-content">
+         <span class="iconify"
+               data-icon="formkit:add"
+               data-width="20"
+               data-height="20"></span>
+         <span class="add-text">New</span>
+       </div>
+     `;
+    },
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  onExporting(event: any) {
+    const fileName = 'Credit_Note';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
   };
   selected_Company_id: any;
 
-  constructor(private dataservice: DataService,private ngZone: NgZone,private cdr:ChangeDetectorRef,private router: Router) {}
+  constructor(
+    private dataservice: DataService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {}
 
+  formatDates(cellData: any): string {
+    if (!cellData) return '';
 
-formatDates(cellData: any): string {
-  if (!cellData) return '';
+    const date = cellData instanceof Date ? cellData : new Date(cellData);
+    if (isNaN(date.getTime())) return '';
 
-  const date = cellData instanceof Date ? cellData : new Date(cellData);
-  if (isNaN(date.getTime())) return '';
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
 
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-
-  return `${day}-${month}-${year}`;
-}
-
+    return `${day}-${month}-${year}`;
+  }
 
   getStatusFlagClass(IS_INACTIVE: string): string {
     // console.log('Status:', Status);
-    
- return IS_INACTIVE ? 'flag-red' : 'flag-green';
-}
+
+    return IS_INACTIVE ? 'flag-red' : 'flag-green';
+  }
 
   ngOnInit() {
-      const currentUrl = this.router.url;
+    const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -142,24 +170,37 @@ formatDates(cellData: any): string {
     this.getEmployeeList();
   }
 
-       sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+  }
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
 
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
   getEmployeeList() {
     this.isLoading = true;
-    const  SELECTED_COMPANY=JSON.parse(sessionStorage.getItem('savedUserData'))
-    const companyid=SELECTED_COMPANY
-    console.log(SELECTED_COMPANY)
+    const SELECTED_COMPANY = JSON.parse(
+      sessionStorage.getItem('savedUserData'),
+    );
+    const companyid = SELECTED_COMPANY;
+    console.log(SELECTED_COMPANY);
     console.log(companyid);
-    
- 
-      const payload={
-      "CompanyId":this.selected_Company_id
-    }
+
+    const payload = {
+      CompanyId: this.selected_Company_id,
+    };
     this.dataservice.employeeList(payload).subscribe((response: any) => {
       this.employeeList = response.reverse();
       this.isLoading = false;
@@ -185,13 +226,12 @@ formatDates(cellData: any): string {
 
   onEditEmployee(e: any) {
     e.cancel = true;
-  console.log(e,'=============event================================')
+    console.log(e, '=============event================================');
     const employeeId = e.data.ID;
     this.editEmployeePopupOpened = true;
     this.dataservice.selectEmployee(employeeId).subscribe((response: any) => {
       this.selectedEmployee = response;
-      console.log(this.selectedEmployee,'selected response');
-      
+      console.log(this.selectedEmployee, 'selected response');
     });
   }
 
@@ -200,11 +240,11 @@ formatDates(cellData: any): string {
 
     // Optionally prevent the default delete behavior
     e.cancel = true;
-     if (e.data.TRANS_STATUS === 5) {
-          e.cancel = true;
-          notify('This Employee cannot be deleted.', 'error', 2000);
-          return;
-        }
+    if (e.data.TRANS_STATUS === 5) {
+      e.cancel = true;
+      notify('This Employee cannot be deleted.', 'error', 2000);
+      return;
+    }
 
     // Call your delete API
     this.dataservice.deleteEmployee(employeeId).subscribe(
@@ -215,7 +255,7 @@ formatDates(cellData: any): string {
               message: 'Employee deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getEmployeeList();
           // this.dataGrid.instance.refresh();
@@ -225,26 +265,25 @@ formatDates(cellData: any): string {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
-  
-    refreshGrid(){
-          if (this.dataGrid?.instance) {
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
-       // Or reload data from API if needed
-       this.getEmployeeList()
-      
+      // Or reload data from API if needed
+      this.getEmployeeList();
     }
   }
-           toggleFilterRow = () => {
+  toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };

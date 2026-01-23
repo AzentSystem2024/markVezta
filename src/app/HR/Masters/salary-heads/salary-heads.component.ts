@@ -4,7 +4,7 @@ import {
   NgModule,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common'; 
+import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -32,14 +32,18 @@ import { FormPopupModule, FormTextboxModule } from 'src/app/components';
 // import { SalesmanFormModule } from 'src/app/components/library/salesman-form/salesman-form.component';
 import { DataService } from 'src/app/services';
 
-
-
 @Component({
   selector: 'app-salary-heads',
   templateUrl: './salary-heads.component.html',
   styleUrls: ['./salary-heads.component.scss'],
 })
 export class SalaryHeadsComponent {
+  addEmployee() {
+    throw new Error('Method not implemented.');
+  }
+  refreshGrid() {
+    throw new Error('Method not implemented.');
+  }
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
   salaryType: any[];
@@ -80,13 +84,59 @@ export class SalaryHeadsComponent {
   filteredHeads: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
-  showPageSizeSelector = true;
+  showPageSizeSelector = true;
   isSystem: boolean;
-  is_System:boolean=false
+  is_System: boolean = false;
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.Add_Salary_Head());
+    },
+    elementAttr: { class: 'add-button' },
 
+    template: () => {
+      return `
+       <div class="add-btn-content">
+         <span class="iconify"
+               data-icon="formkit:add"
+               data-width="20"
+               data-height="20"></span>
+         <span class="add-text">New</span>
+       </div>
+     `;
+    },
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+  ngZone: any;
+  isFilterOpened: boolean;
+
+  onExporting(event: any) {
+    const fileName = 'Credit_Note';
+    this.service.exportDataGrid(event, fileName);
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGridList(),
+    text: '',
+  };
   //=================Form Structure==============================
 
-  constructor(private service: DataService, private fb: FormBuilder) {
+  constructor(
+    private service: DataService,
+    private fb: FormBuilder,
+  ) {
     this.formsource = this.fb.group({
       Id: [null],
       code: ['', [Validators.required]],
@@ -106,7 +156,6 @@ export class SalaryHeadsComponent {
     return data.IS_INACTIVE ? 'Inactive' : 'Active';
   }
 
-
   formatStatusHeadType(data: any): string {
     if (data.HEAD_TYPE == 1) {
       return 'Gross';
@@ -116,14 +165,29 @@ export class SalaryHeadsComponent {
       return 'Unknown';
     }
   }
-  
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshGridList() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.get_Salary_Head_list();
+    }
+  }
 
   //==================================== Get list Salary component=============================
 
   get_Salary_Head_list() {
-    const payload = {
-
-    };
+    const payload = {};
     this.isLoading = true;
     this.service.get_salary_head_list(payload).subscribe((res: any) => {
       console.log(res);
@@ -133,15 +197,16 @@ export class SalaryHeadsComponent {
         const salary_head_res = res.datas;
         // this.filteredHeads = salary_head_res.filter(item => item.HEAD_TYPE === 1 && item.HEAD_TYPE === 2 );
         this.filteredHeads = salary_head_res.filter(
-          item => item.HEAD_TYPE === 1 || item.HEAD_TYPE === 2
+          (item) => item.HEAD_TYPE === 1 || item.HEAD_TYPE === 2,
         );
-        
-        this.salarySource = this.filteredHeads.map((item: any, index: number) => ({
-          ...item,
-          SlNo: index + 1,
-        }));
+
+        this.salarySource = this.filteredHeads.map(
+          (item: any, index: number) => ({
+            ...item,
+            SlNo: index + 1,
+          }),
+        );
         console.log(this.salarySource);
-        
       }
     });
   }
@@ -161,9 +226,9 @@ export class SalaryHeadsComponent {
       IS_INACTIVE: false,
     });
     // Reset component-level variables if needed
-    this.Head_type_Value = '';  // or any default value like 'Gross' if desired
-    this.Sal_Value = '';        // or default as needed
-    
+    this.Head_type_Value = ''; // or any default value like 'Gross' if desired
+    this.Sal_Value = ''; // or default as needed
+
     console.log('button clicked');
   }
 
@@ -172,9 +237,7 @@ export class SalaryHeadsComponent {
     this.formsource.get('print_Description')?.setValue(Description);
   }
 
-
   //============================Add Salary Head==================================
-
 
   Add_Salary_Head() {
     console.log(this.formsource.value);
@@ -187,13 +250,12 @@ export class SalaryHeadsComponent {
     // const salary_Exp = this.formsource.value.AC_HEAD_ID;
     const salary_Exp = this.formsource.value.AC_HEAD_ID ?? 0;
 
-  
-  
-    
     //  Validate dropdowns BEFORE assigning values
     if (
-      !this.Head_type_Value || this.Head_type_Value === '' ||
-      !this.Sal_Value || this.Sal_Value === ''
+      !this.Head_type_Value ||
+      this.Head_type_Value === '' ||
+      !this.Sal_Value ||
+      this.Sal_Value === ''
     ) {
       notify(
         {
@@ -201,16 +263,16 @@ export class SalaryHeadsComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'error'
+        'error',
       );
       this.isAddPopup = true;
       return;
     }
-  
+
     // ✅ Only assign if valid
     let head_type = this.Head_type_Value === 'Gross' ? 1 : 2;
-    let is_Fixed = this.Sal_Value === 'Regular Salary'; 
-  
+    let is_Fixed = this.Sal_Value === 'Regular Salary';
+
     console.log(
       description,
       print_Description,
@@ -220,27 +282,28 @@ export class SalaryHeadsComponent {
       isInactive,
       salary_Exp,
       head_type,
-      is_Fixed
+      is_Fixed,
     );
-  
+
     const payload = {};
     this.service.get_salary_head_list(payload).subscribe((res: any) => {
       this.list_for_duplication = res.datas;
       console.log(this.list_for_duplication, 'dupli check');
     });
-  
+
     const isDuplicate = this.list_for_duplication?.some((item: any) => {
       if (item.HEAD_TYPE === 1 || item.HEAD_TYPE === 2) {
         return (
-          (item.CODE?.trim().toLowerCase() || '') === (code?.trim().toLowerCase() || '') ||
-          (item.HEAD_NAME?.trim().toLowerCase() || '') === (description?.trim().toLowerCase() || '') ||
-          (item.PRINT_DESCRIPTION?.trim().toLowerCase() || '') === (print_Description?.trim().toLowerCase() || '')
+          (item.CODE?.trim().toLowerCase() || '') ===
+            (code?.trim().toLowerCase() || '') ||
+          (item.HEAD_NAME?.trim().toLowerCase() || '') ===
+            (description?.trim().toLowerCase() || '') ||
+          (item.PRINT_DESCRIPTION?.trim().toLowerCase() || '') ===
+            (print_Description?.trim().toLowerCase() || '')
         );
       }
       return false; // Must return something for the `.some()` check
     });
-    
-       
 
     if (isDuplicate) {
       console.log('Duplication Checking Triggered');
@@ -250,18 +313,18 @@ export class SalaryHeadsComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'error'
+        'error',
       );
       return;
     }
-  
+
     // Main form field validation
     if (
       !code ||
       !description ||
       !print_Description ||
       Number(orderSlip) === 0 ||
-      isNaN(Number(orderSlip)) 
+      isNaN(Number(orderSlip))
     ) {
       notify(
         {
@@ -269,7 +332,7 @@ export class SalaryHeadsComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'error'
+        'error',
       );
       this.isAddPopup = true;
       return;
@@ -284,18 +347,18 @@ export class SalaryHeadsComponent {
           isInactive,
           salary_Exp,
           head_type,
-          is_Fixed
+          is_Fixed,
         )
         .subscribe((res: any) => {
           console.log(res);
-  
+
           notify(
             {
               message: 'Salary Head Added successfully',
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'success'
+            'success',
           );
           this.isAddPopup = false;
           console.log(this.formsource);
@@ -306,20 +369,16 @@ export class SalaryHeadsComponent {
             IS_WORKING_DAY: false,
             IS_INACTIVE: false,
           });
-          
+
           // Reset component-level variables if needed
-          this.Head_type_Value = '';  // or any default value like 'Gross' if desired
-          this.Sal_Value = '';        // or default as needed
+          this.Head_type_Value = ''; // or any default value like 'Gross' if desired
+          this.Sal_Value = ''; // or default as needed
           this.get_Salary_Head_list();
         });
     }
-  
-    this.get_Salary_Head_list();
-  
-  
-  }
-  
 
+    this.get_Salary_Head_list();
+  }
 
   close() {
     console.log('close button is working');
@@ -340,10 +399,10 @@ export class SalaryHeadsComponent {
     const orderSlip = this.head_order_value;
     const isWorkingday = this.is_working_Day_value;
     const isInactive = this.is_inactive_value;
-    const salary_Exp = this.selected_salary_EXP??0;
+    const salary_Exp = this.selected_salary_EXP ?? 0;
     const head_type = this.Head_type_Value === 'Gross' ? 1 : 2;
     const is_Fixed = this.Sal_Value === 'Regular Salary';
-    const is_System=this.is_System
+    const is_System = this.is_System;
     console.log(
       description,
       print_Description,
@@ -354,8 +413,7 @@ export class SalaryHeadsComponent {
       salary_Exp,
       head_type,
       is_Fixed,
-      is_System
-
+      is_System,
     );
     const isDuplicate = this.salarySource?.some((item: any) => {
       if (item.ID === id) return false; // Skip current item (being edited)
@@ -378,7 +436,7 @@ export class SalaryHeadsComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -404,7 +462,7 @@ export class SalaryHeadsComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'error'
+        'error',
       );
       this.isEditPopup = true;
       return; // Stop execution
@@ -421,7 +479,7 @@ export class SalaryHeadsComponent {
           salary_Exp,
           head_type,
           is_Fixed,
-          is_System
+          is_System,
         )
         .subscribe((res: any) => {
           console.log(res);
@@ -431,7 +489,7 @@ export class SalaryHeadsComponent {
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'success'
+            'success',
           );
           this.isEditPopup = false;
           // or default as needed
@@ -442,154 +500,141 @@ export class SalaryHeadsComponent {
 
   //============================Delete Data ====================
   deleteData(e: any) {
-    
     console.log(e);
-        const id = e.data.ID;
+    const id = e.data.ID;
 
-        this.service.delete_salary_Head(id).subscribe((res: any) => {
-          notify(
-            {
-              message: 'Salary  Head Deleted successfully',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success'
-          );
-          this.get_Salary_Head_list();
-        
-        });
-    
-        this.isLoading = false;
-      // }
-    }
-    openPopUp() {
-      this.isAddPopup = true;
-    }
+    this.service.delete_salary_Head(id).subscribe((res: any) => {
+      notify(
+        {
+          message: 'Salary  Head Deleted successfully',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'success',
+      );
+      this.get_Salary_Head_list();
+    });
 
-    
-    //==========================Edit event===================================
-    onEditingStart(e: any) {
-      e.cancel = true; // Prevents default editing behavior
-      this.edit_Salary_Head = e.data; // Store the selected Salary Head details
-      console.log(this.edit_Salary_Head);
-      this.isEditPopup = true; // Show the edit popup
-      this.isSystem = e.data.IS_SYSTEM; // Save IS_SYSTEM status
-      this.selected_item(e);
-    }
+    this.isLoading = false;
+    // }
+  }
+  openPopUp() {
+    this.isAddPopup = true;
+  }
 
-    //===================================select function============================
-    selected_item(e: any) {
-      console.log(e, 'event');
-      const id = e.data.ID;
-      this.service.select_salary_head(id).subscribe((res: any) => {
-        console.log(res,'SELECTRESPONSEEE');
-        this.selected_Data = res;
-        console.log(this.selected_Data);
-        this.id_value = this.selected_Data.ID;
-        this.code_value = this.selected_Data.CODE;
-        this.description_value = this.selected_Data.HEAD_NAME;
-        this.print_description = this.selected_Data.PRINT_DESCRIPTION;
-        this.head_order_value = this.selected_Data.HEAD_ORDER;
-        this.is_inactive_value = this.selected_Data.IS_INACTIVE;
-        this.is_working_Day_value = this.selected_Data.IS_WORKING_DAY;
-        this.selected_salary_EXP=this.selected_Data.AC_HEAD_ID;
-        console.log(this.selected_salary_EXP,'selaary ac head id')                                           
-        this.Head_type_Value = this.selected_Data.HEAD_TYPE;    
-        this.is_System=this.selected_Data.IS_SYSTEM
-        this.Sal_Value = this.selected_Data.IS_FIXED
-        console.log(this.Sal_Value); // Now stores true/false
+  //==========================Edit event===================================
+  onEditingStart(e: any) {
+    e.cancel = true; // Prevents default editing behavior
+    this.edit_Salary_Head = e.data; // Store the selected Salary Head details
+    console.log(this.edit_Salary_Head);
+    this.isEditPopup = true; // Show the edit popup
+    this.isSystem = e.data.IS_SYSTEM; // Save IS_SYSTEM status
+    this.selected_item(e);
+  }
 
-        console.log(
-          this.id_value,
-          this.code_value,
-          this.description_value,
-          this.print_description,
-          this.salary_Exp_value,
-          this.head_order_value,
-          this.is_inactive_value,
-          this.is_working_Day_value,
-          this.Sal_Value,
-          this.Head_type_Value
-        );
+  //===================================select function============================
+  selected_item(e: any) {
+    console.log(e, 'event');
+    const id = e.data.ID;
+    this.service.select_salary_head(id).subscribe((res: any) => {
+      console.log(res, 'SELECTRESPONSEEE');
+      this.selected_Data = res;
+      console.log(this.selected_Data);
+      this.id_value = this.selected_Data.ID;
+      this.code_value = this.selected_Data.CODE;
+      this.description_value = this.selected_Data.HEAD_NAME;
+      this.print_description = this.selected_Data.PRINT_DESCRIPTION;
+      this.head_order_value = this.selected_Data.HEAD_ORDER;
+      this.is_inactive_value = this.selected_Data.IS_INACTIVE;
+      this.is_working_Day_value = this.selected_Data.IS_WORKING_DAY;
+      this.selected_salary_EXP = this.selected_Data.AC_HEAD_ID;
+      console.log(this.selected_salary_EXP, 'selaary ac head id');
+      this.Head_type_Value = this.selected_Data.HEAD_TYPE;
+      this.is_System = this.selected_Data.IS_SYSTEM;
+      this.Sal_Value = this.selected_Data.IS_FIXED;
+      console.log(this.Sal_Value); // Now stores true/false
 
-    
+      console.log(
+        this.id_value,
+        this.code_value,
+        this.description_value,
+        this.print_description,
+        this.salary_Exp_value,
+        this.head_order_value,
+        this.is_inactive_value,
+        this.is_working_Day_value,
+        this.Sal_Value,
+        this.Head_type_Value,
+      );
 
-        if (this.selected_Data.IS_FIXED === true) {
-          this.Sal_Value = 'Regular Salary';
-          console.log(this.salarySource, 'salary');
-        } else {
-          this.Sal_Value = 'Timesheet Entry';
-          console.log(this.Sal_Value, 'salary false');
-        }
+      if (this.selected_Data.IS_FIXED === true) {
+        this.Sal_Value = 'Regular Salary';
+        console.log(this.salarySource, 'salary');
+      } else {
+        this.Sal_Value = 'Timesheet Entry';
+        console.log(this.Sal_Value, 'salary false');
+      }
 
-        // this.is_fixed_value = this.selected_Data.IS_FIXED; //  This is a boolean
-        // this.Sal_Value = this.is_fixed_value ? 'Regular Salary' : 'Timesheet Entry'; // This sets radio button value
-        
-        if (this.selected_Data.HEAD_TYPE === 1) {
-          this.Head_type_Value = 'Gross';
-        } else {
-          this.Head_type_Value = 'Deduction';
-        }
-      });
-    }
+      // this.is_fixed_value = this.selected_Data.IS_FIXED; //  This is a boolean
+      // this.Sal_Value = this.is_fixed_value ? 'Regular Salary' : 'Timesheet Entry'; // This sets radio button value
 
+      if (this.selected_Data.HEAD_TYPE === 1) {
+        this.Head_type_Value = 'Gross';
+      } else {
+        this.Head_type_Value = 'Deduction';
+      }
+    });
+  }
 
-    //=======================Salary Expense  drop down====================
-    
-    get_salary_expence_drp() {
-      this.service.Dropdown_salary_exp(name).subscribe((res: any) => {
-        console.log(res,'=====================================');
-        this.AC_HEAD_VALUE = res;
-        console.log(this.AC_HEAD_VALUE,'===========================');
-        
-      });
-    }
-    onValueChangedSalary(e: any) {
-      this.Sal_Value = e.value;
-      this.is_fixed_value = e.value === 'Regular Salary'; // Optional: keep a separate boolean
-    }
-    
+  //=======================Salary Expense  drop down====================
 
+  get_salary_expence_drp() {
+    this.service.Dropdown_salary_exp(name).subscribe((res: any) => {
+      console.log(res, '=====================================');
+      this.AC_HEAD_VALUE = res;
+      console.log(this.AC_HEAD_VALUE, '===========================');
+    });
+  }
+  onValueChangedSalary(e: any) {
+    this.Sal_Value = e.value;
+    this.is_fixed_value = e.value === 'Regular Salary'; // Optional: keep a separate boolean
+  }
 
-    onSalary_ExpChange(event: any) {
-      this.selected_salary_EXP = event.value;  
+  onSalary_ExpChange(event: any) {
+    this.selected_salary_EXP = event.value;
 
-      console.log(this.selected_salary_EXP, 'Selected Item');
-    
-    
-    }
+    console.log(this.selected_salary_EXP, 'Selected Item');
+  }
 
-    onCellPrepared(e: any) {
-      if (e.rowType === 'data' && e.column.command === 'edit') {
-        const is_System = e.data.IS_SYSTEM;
-    
-        if (is_System) {
-          // Disable delete button for system rows
-          const deleteButton = e.cellElement.querySelector('.dx-link-delete');
-          if (deleteButton) {
-            deleteButton.classList.add('dx-state-disabled');
-            deleteButton.onclick = (event: Event) => {
-              event.preventDefault(); // Prevent delete action
-              notify(
-                {
-                  message: "This salary head is system-defined and cannot be deleted.",
-                  position: { at: 'top right', my: 'top right' },
-                  displayTime: 1500,
-                },
-                'warning'
-              );
-            };
-          }
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      const is_System = e.data.IS_SYSTEM;
+
+      if (is_System) {
+        // Disable delete button for system rows
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.classList.add('dx-state-disabled');
+          deleteButton.onclick = (event: Event) => {
+            event.preventDefault(); // Prevent delete action
+            notify(
+              {
+                message:
+                  'This salary head is system-defined and cannot be deleted.',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 1500,
+              },
+              'warning',
+            );
+          };
         }
       }
     }
-    
-    
+  }
+
   refreshData() {
     this.dataGrid.instance.refresh();
-
   }
-  
 }
 @NgModule({
   imports: [
@@ -606,7 +651,6 @@ export class SalaryHeadsComponent {
     DxCheckBoxModule,
     DxValidatorModule,
     ReactiveFormsModule,
-    
   ],
   providers: [],
   exports: [],

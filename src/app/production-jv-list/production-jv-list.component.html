@@ -12,7 +12,7 @@
         showPane: true,
       }"
       class="grid theme-dependent"
-      [dataSource]="filteredproductionList"
+      [dataSource]="productionList"
       [showBorders]="true"
       [showRowLines]="true"
       [showColumnLines]="true"
@@ -30,6 +30,7 @@
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
       (onEditingStart)="onEditProduction($event)"
+      (onCellPrepared)="onCellPrepared($event)"
     >
       <dxo-editing
         mode="popup"
@@ -101,13 +102,13 @@
           cssClass="export-btn"
         ></dxi-item>
 
-        <!-- <dxi-item
+        <dxi-item
           *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
-        ></dxi-item> -->
+        ></dxi-item>
       </dxo-toolbar>
 
       <div *dxTemplate="let data of 'productionTypeTemplate'">
@@ -129,8 +130,13 @@
           valueExpr="value"
           [(value)]="selectedDateRange"
           (onValueChanged)="onDateRangeChanged($event.value)"
-          width="180"
+          (onOpened)="attachItemClickHandler($event)"
+          width="220"
         >
+          <!--  THIS FIXES THE DROPDOWN -->
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
         </dx-select-box>
       </div>
 
@@ -149,6 +155,16 @@
         caption="Produced Qty"
         dataType="number"
       ></dxi-column>
+
+      <dxo-summary>
+        <dxi-total-item
+          column="PRODUCED_QTY"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          alignment="right"
+        >
+        </dxi-total-item>
+      </dxo-summary>
       <!-- <dxi-column
         dataField="TOTAL_COST"
         caption="

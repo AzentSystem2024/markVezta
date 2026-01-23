@@ -113,7 +113,10 @@ export class ProductionJvListComponent {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
     text: '',
   };
   productionList: any;
@@ -197,13 +200,60 @@ export class ProductionJvListComponent {
     console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
+  // getProductionList() {
+  //   const { fromDate, toDate } = this.getDateRange();
+
+  //   const payload: any = {
+  //     COMPANY_ID: this.selected_Company_id,
+  //     DATE_FROM: fromDate, // 👈 backend filter
+  //     DATE_TO: toDate, // 👈 backend filter
+  //   };
+
+  //   const api$ =
+  //     this.selectedProductionType === 'BOX'
+  //       ? this.dataService.getBoxProductionJVList(payload)
+  //       : this.dataService.getProductionJVList(payload);
+
+  //   api$.subscribe((response: any) => {
+  //     this.productionList = (response.Data || [])
+  //       .map((item: any) => {
+  //         let saleDate = item.PROD_DATE;
+  //         let dateValue: Date;
+
+  //         if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
+  //           const [day, month, year] = saleDate.split('-').map(Number);
+  //           dateValue = new Date(year, month - 1, day);
+  //         } else {
+  //           dateValue = new Date(saleDate);
+  //         }
+
+  //         const match = item.DOC_NO?.match(/\d+$/);
+  //         const docNoNumber = match ? Number(match[0]) : 0;
+
+  //         return {
+  //           ...item,
+  //           PROD_DATE: dateValue,
+  //           _docNoNumber: docNoNumber,
+  //         };
+  //       })
+  //       .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
+
+  //     this.filteredproductionList = this.productionList; // ✅ backend already filtered
+  //   });
+  // }
+
   getProductionList() {
+    const grid = this.dataGrid?.instance;
+
+    // 🔵 START LOADING
+    grid?.beginCustomLoading('Loading...');
+
     const { fromDate, toDate } = this.getDateRange();
 
     const payload: any = {
       COMPANY_ID: this.selected_Company_id,
-      DATE_FROM: fromDate, // 👈 backend filter
-      DATE_TO: toDate, // 👈 backend filter
+      DATE_FROM: fromDate,
+      DATE_TO: toDate,
     };
 
     const api$ =
@@ -211,66 +261,59 @@ export class ProductionJvListComponent {
         ? this.dataService.getBoxProductionJVList(payload)
         : this.dataService.getProductionJVList(payload);
 
-    api$.subscribe((response: any) => {
-      this.productionList = (response.Data || [])
-        .map((item: any) => {
-          let saleDate = item.PROD_DATE;
-          let dateValue: Date;
+    api$.subscribe({
+      next: (response: any) => {
+        this.productionList = (response.Data || [])
+          .map((item: any) => {
+            let dateValue: Date;
 
-          if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
-            const [day, month, year] = saleDate.split('-').map(Number);
-            dateValue = new Date(year, month - 1, day);
-          } else {
-            dateValue = new Date(saleDate);
-          }
+            if (/^\d{2}-\d{2}-\d{4}$/.test(item.PROD_DATE)) {
+              const [d, m, y] = item.PROD_DATE.split('-').map(Number);
+              dateValue = new Date(y, m - 1, d);
+            } else {
+              dateValue = new Date(item.PROD_DATE);
+            }
 
-          const match = item.DOC_NO?.match(/\d+$/);
-          const docNoNumber = match ? Number(match[0]) : 0;
+            const match = item.DOC_NO?.match(/\d+$/);
+            const docNoNumber = match ? Number(match[0]) : 0;
 
-          return {
-            ...item,
-            PROD_DATE: dateValue,
-            _docNoNumber: docNoNumber,
-          };
-        })
-        .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
+            return {
+              ...item,
+              PROD_DATE: dateValue,
+              _docNoNumber: docNoNumber,
+            };
+          })
+          .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
 
-      this.filteredproductionList = this.productionList; // ✅ backend already filtered
+        this.filteredproductionList = this.productionList;
+      },
+      error: () => {
+        // optional: handle error
+      },
+      complete: () => {
+        // STOP LOADING
+        grid?.endCustomLoading();
+      },
     });
   }
+
   onDateDropdownFocus() {
     if (this.selectedDateRange === 'custom') {
       this.showCustomDatePopup = true;
     }
   }
 
-  dateDisplayExpr = (item: any) => {
-    if (!item) return '';
+  dateDisplayExpr = (item: any) => item?.label ?? '';
 
-    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
-      const from = this.formatAsDDMMYYYY(
-        this.customStartDate instanceof Date
-          ? this.customStartDate
-          : new Date(this.customStartDate),
-      );
-
-      const to = this.formatAsDDMMYYYY(
-        this.customEndDate instanceof Date
-          ? this.customEndDate
-          : new Date(this.customEndDate),
-      );
-
-      return `${from} - ${to}`;
-    }
-
-    return item.label;
-  };
+  // refreshGrid() {
+  //   if (this.dataGrid?.instance) {
+  //     this.dataGrid.instance.refresh(); // Or reload data from API if needed
+  //     this.getProductionList();
+  //   }
+  // }
 
   refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-      this.getProductionList();
-    }
+    this.getProductionList(); // only API call
   }
 
   toggleFilters() {
@@ -307,16 +350,35 @@ export class ProductionJvListComponent {
     this.selectedDateRange = value;
 
     if (value === 'custom') {
-      //  DO NOT reset dates here
       this.showCustomDatePopup = true;
       return;
     }
 
-    // other ranges
+    // reset custom label when switching away
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+    );
+
     this.customStartDate = null;
     this.customEndDate = null;
+
     this.getProductionList();
   }
+
+  // onDateRangeChanged(value: string) {
+  //   this.selectedDateRange = value;
+
+  //   if (value === 'custom') {
+  //     //  DO NOT reset dates here
+  //     this.showCustomDatePopup = true;
+  //     return;
+  //   }
+
+  //   // other ranges
+  //   this.customStartDate = null;
+  //   this.customEndDate = null;
+  //   this.getProductionList();
+  // }
 
   applyCustomDateFilter() {
     if (!this.customStartDate || !this.customEndDate) return;
@@ -326,12 +388,45 @@ export class ProductionJvListComponent {
       return;
     }
 
-    // keep value as custom
-    this.selectedDateRange = 'custom';
+    const fromLabel = this.formatAsDDMMYYYY(
+      this.customStartDate instanceof Date
+        ? this.customStartDate
+        : new Date(this.customStartDate),
+    );
 
+    const toLabel = this.formatAsDDMMYYYY(
+      this.customEndDate instanceof Date
+        ? this.customEndDate
+        : new Date(this.customEndDate),
+    );
+
+    // 🔑 THIS IS THE MISSING PIECE
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        : option,
+    );
+
+    this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
+
     this.getProductionList();
   }
+
+  // applyCustomDateFilter() {
+  //   if (!this.customStartDate || !this.customEndDate) return;
+
+  //   if (this.customStartDate > this.customEndDate) {
+  //     alert('From date cannot be greater than To date');
+  //     return;
+  //   }
+
+  //   // keep value as custom
+  //   this.selectedDateRange = 'custom';
+
+  //   this.showCustomDatePopup = false;
+  //   this.getProductionList();
+  // }
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -544,12 +639,15 @@ export class ProductionJvListComponent {
       const popup = e.component._popup;
       const innerList =
         popup && popup.$content().find('.dx-list').dxList('instance');
+
       if (innerList) {
-        innerList.off('itemClick'); // unsubscribe first (to avoid duplicates)
+        innerList.off('itemClick'); // prevent duplicate bindings
+
         innerList.on('itemClick', (clickEvent: any) => {
           const clickedValue = clickEvent.itemData.value;
+
           if (clickedValue === 'custom') {
-            this.openCustomDatePopup();
+            this.showCustomDatePopup = true;
             e.component.close();
           }
         });
@@ -586,7 +684,7 @@ export class ProductionJvListComponent {
 
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
-      if (e.data.TRANS_STATUS === 5) {
+      if (e.data.STATUS === '5') {
         const deleteButton = e.cellElement.querySelector('.dx-link-delete');
         if (deleteButton) {
           deleteButton.style.display = 'none';
@@ -612,6 +710,25 @@ export class ProductionJvListComponent {
       this.isViewProduction = true;
     });
   }
+
+  //   onCellPrepared(e: any) {
+  //   if (e.rowType === 'data' && e.column.command === 'edit') {
+  //     const status = e.data.TRANS_STATUS;
+
+  //     // 🚫 Hide Edit & Delete when status = 1
+  //     if (status === 1) {
+  //       const editButton = e.cellElement.querySelector('.dx-link-edit');
+  //       const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+
+  //       if (editButton) {
+  //         editButton.style.display = 'none';
+  //       }
+  //       if (deleteButton) {
+  //         deleteButton.style.display = 'none';
+  //       }
+  //     }
+  //   }
+  // }
 
   // onEditProduction(event: any) {
   //   event.cancel = true;

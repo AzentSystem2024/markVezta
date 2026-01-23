@@ -30,6 +30,7 @@
       [groupPanel]="{ visible: true }"
       [grouping]="{ autoExpandAll: false }"
       [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -40,6 +41,12 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <!-- <dxo-scrolling mode="standard"></dxo-scrolling> -->
       <!-- <dxo-filter-row
         [visible]="isFilterRowVisible"
@@ -95,6 +102,24 @@
             ></dx-button>
           </div>
         </dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
       </dxo-toolbar>
 
       <!-- <div *dxTemplate="let data of 'dateFilterTemplate'">

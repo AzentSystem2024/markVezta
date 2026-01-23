@@ -1,49 +1,95 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+  NgZone,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { DxDataGridModule } from 'devextreme-angular';
+import { DxDataGridComponent, DxDataGridModule } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 
 @Component({
   selector: 'app-article-stock-view',
   templateUrl: './article-stock-view.component.html',
-  styleUrls: ['./article-stock-view.component.scss']
+  styleUrls: ['./article-stock-view.component.scss'],
 })
 export class ArticleStockViewComponent {
-
-    Datasource: any[];
-    displayMode: any = 'full';
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+  Datasource: any[];
+  displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter: true;
   showFilterRow = true;
   isFilterOpened = false;
-articleStockList: any[] = [];
+  articleStockList: any[] = [];
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   addPackingPopupVisible: boolean = false;
-  editPackPopupOpened:boolean=false
-   formsource: any;
+  editPackPopupOpened: boolean = false;
+  formsource: any;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
 
-   constructor(private fb:FormBuilder,private dataservice : DataService ){
-           this.formsource = this.fb.group({
-             
-             
-           })
-           this.get_ArticleStock_List()
-         }
+  //========================Export data ==========================
 
-     get_ArticleStock_List(){
-     const payload ={
-        USER_ID : 0
-       }
-      this.dataservice.get_ArticleStock_Api(payload).subscribe((res: any) => {
-        this.articleStockList = res.Data;
-    console.log(this.articleStockList,"response")
-  });
-     }  
-     
-     
-     summaryColumnsData = {
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private zone: NgZone,
+  ) {
+    this.formsource = this.fb.group({});
+    this.get_ArticleStock_List();
+  }
+
+  get_ArticleStock_List() {
+    const payload = {
+      USER_ID: 0,
+    };
+    this.dataservice.get_ArticleStock_Api(payload).subscribe((res: any) => {
+      this.articleStockList = res.Data;
+      console.log(this.articleStockList, 'response');
+    });
+  }
+
+  onExporting(event: any) {
+    const fileName = 'Article Stock';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_ArticleStock_List();
+  }
+  summaryColumnsData = {
     totalItems: [
       {
         column: 'QTY_AVAILABLE',
@@ -71,44 +117,38 @@ articleStockList: any[] = [];
       },
     ],
     groupItems: [
-    {
-      column: 'QTY_AVAILABLE',
-      summaryType: 'sum',
-      displayFormat: '{0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'QTY_MULTIBOX',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'QTY_TOTAL',
-      summaryType: 'sum',
-      displayFormat: '{0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-  ],
+      {
+        column: 'QTY_AVAILABLE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'QTY_MULTIBOX',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'QTY_TOTAL',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+    ],
     calculateCustomSummary: (options) => {
       if (options.name === 'summaryRow') {
         // Custom logic if needed
       }
     },
   };
-
 }
 
 @NgModule({
-  imports: [
-    BrowserModule,
-   
-    DxDataGridModule,
-   
-  ],
+  imports: [BrowserModule, DxDataGridModule],
   providers: [],
   declarations: [ArticleStockViewComponent],
   exports: [ArticleStockViewComponent],

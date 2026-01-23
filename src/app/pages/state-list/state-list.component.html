@@ -4,7 +4,7 @@
     [dataSource]="state"
     (onRowRemoving)="onRowRemoving($event)"
     [width]="'100%'"
-    [height]="'85vh'"
+    [height]="'80vh'"
     [showBorders]="true"
     [allowColumnReordering]="true"
     [showColumnHeaders]="true"
@@ -14,7 +14,6 @@
     [showColumnLines]="true"
     (onEditingStart)="onEditingRow($event)"
     (onExporting)="onExporting($event)"
-    (onToolbarPreparing)="onToolbarPreparing($event)"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
@@ -77,38 +76,29 @@
       <dxi-item
         location="after"
         locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          text: 'Refresh',
-          icon: 'refresh',
-          stylingMode: 'text',
-        }"
+        [options]="searchButtonOptions"
       ></dxi-item>
 
-      <!-- <dxi-item location="after" locateInMenu="auto"> -->
       <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
+
+      <dxi-item
+        [visible]="canAdd"
         location="after"
         locateInMenu="auto"
         widget="dxButton"
         [options]="addButtonOptions"
       ></dxi-item>
-      <!-- <dx-button
-          text="Add"
-          icon="plus"
-          type="default"
-          stylingMode="contained"
-          (onClick)="addState()"
-        ></dx-button> -->
-      <!-- </dxi-item> -->
-
-      <!-- <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item> -->
-      <dxi-item name="exportButton"></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
     </dxo-toolbar>
     <dxi-column dataField="STATE_CODE" caption="State Codes"></dxi-column>
     <dxi-column dataField="STATE_NAME" caption="State Name">

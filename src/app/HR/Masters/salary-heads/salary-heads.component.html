@@ -43,8 +43,33 @@
       <dxi-item location="before">
         <div class="grid-header">Salary Heads</div>
       </dxi-item>
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
 
-      <dxi-item location="after" locateInMenu="auto">
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
+
+      <dxi-item
+        *ngIf="canAdd"
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
+      <!-- <dxi-item location="after" locateInMenu="auto">
         <dx-button
           icon="plus"
           type="default"
@@ -59,7 +84,7 @@
           stylingMode="text"
           (onClick)="refreshData()"
         ></dx-button>
-      </dxi-item>
+      </dxi-item> -->
       <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
     </dxo-toolbar>
 
