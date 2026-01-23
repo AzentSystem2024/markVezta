@@ -262,6 +262,22 @@ export class StockMovementReportComponent {
         showInColumn: 'ADJUSTED',
         alignment: 'Right',
       },
+      {
+        column: 'PRODUCTION_QTY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'PRODUCTION_QTY',
+        alignment: 'Right',
+      },
+      {
+        column: 'CONSUMPTION_QTY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'CONSUMPTION_QTY',
+        alignment: 'Right',
+      },
     ],
     groupItems: [
       {
@@ -336,6 +352,20 @@ export class StockMovementReportComponent {
       },
       {
         column: 'ADJUSTED',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'PRODUCTION_QTY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'CONSUMPTION_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },

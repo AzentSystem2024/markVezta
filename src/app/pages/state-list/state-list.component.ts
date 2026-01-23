@@ -24,6 +24,7 @@ import { saveAs } from 'file-saver-es';
 import { jsPDF } from 'jspdf';
 import { ExportService } from 'src/app/services/export.service';
 import { StateEditModule } from 'src/app/state-edit/state-edit.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-state-list',
@@ -58,24 +59,53 @@ export class StateListComponent {
   canPrint = false;
 
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.zone.run(() => {
-        this.addState();
-      });
+      this.zone.run(() => this.addState());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
   };
   selectedState: any;
+  sessionData: any;
+  selected_vat_id: any;
+  selectedCompanyId: any;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private zone: NgZone,
+    private router: Router,
   ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'state-list');
@@ -96,7 +126,12 @@ export class StateListComponent {
       console.log(response);
     });
   }
-
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.showState();
+  }
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 
@@ -229,6 +264,30 @@ export class StateListComponent {
   //     event.cancel = true; // Prevent the default update operation
   //   }
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
+    this.sessionData_tax();
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/credit-note');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.showState();
     this.getCountryDropDown();
   }
@@ -237,6 +296,13 @@ export class StateListComponent {
       this.CountryDropdownData = data;
       console.log('dropdown', this.CountryDropdownData);
     });
+  }
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   onEditingRow(event: any) {

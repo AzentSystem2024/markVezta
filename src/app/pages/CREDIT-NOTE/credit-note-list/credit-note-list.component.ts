@@ -135,7 +135,10 @@ export class CreditNoteListComponent {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
     text: '',
   };
   sessionData: any;

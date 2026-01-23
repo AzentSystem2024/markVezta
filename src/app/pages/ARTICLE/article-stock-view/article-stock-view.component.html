@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="articleStockList"
@@ -29,14 +29,13 @@
       focusStateEnabled="false"
       [groupPanel]="{ visible: true }"
       [grouping]="{ autoExpandAll: false }"
-      [summary]="summaryColumnsData" 
+      [summary]="summaryColumnsData"
       [showColumnLines]="true"
+      (onExporting)="onExporting($event)"
     >
-      
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
-       
         [displayMode]="displayMode"
         [showPageSizeSelector]="showPageSizeSelector"
         [showInfo]="true"
@@ -44,44 +43,87 @@
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <!-- <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row> -->
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header"  style="
-            font-weight: 600;
-            font-size: 20px;
-            margin-left: 12px;
-            padding: -3px;
-            margin-right: 3px;
-          ">Article Stock view</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Article Stock view
+          </div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
-        <dxi-item location="after" locateInMenu="auto">
-       
-        </dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
       </dxo-toolbar>
 
-       <dxo-grouping
+      <dxo-grouping
         [autoExpandAll]="false"
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-<!-- <dxi-column dataField="ARTICLE_ID" caption="Id"></dxi-column> -->
-<dxi-column dataField="ART_NO" caption="Art No." alignment="left"></dxi-column>
-<dxi-column dataField="COLOR" caption="Color" alignment="left"></dxi-column>
-<dxi-column dataField="CATEGORY" caption="Category" alignment="left"></dxi-column>
-<dxi-column dataField="SIZE" caption="Size" alignment="left"></dxi-column>
-<dxi-column dataField="PRODUCTION_UNIT" caption="Production Unit" alignment="left"></dxi-column>
-<dxi-column dataField="QTY_AVAILABLE" caption="Qty Available"></dxi-column>
-<dxi-column dataField="QTY_MULTIBOX" caption="Qty Multibox"></dxi-column>
-<dxi-column dataField="QTY_TOTAL" caption="Qty Total"></dxi-column>
-
-
+      <!-- <dxi-column dataField="ARTICLE_ID" caption="Id"></dxi-column> -->
+      <dxi-column
+        dataField="ART_NO"
+        caption="Art No."
+        alignment="left"
+      ></dxi-column>
+      <dxi-column
+        dataField="COLOR"
+        caption="Color"
+        alignment="left"
+      ></dxi-column>
+      <dxi-column
+        dataField="CATEGORY"
+        caption="Category"
+        alignment="left"
+      ></dxi-column>
+      <dxi-column dataField="SIZE" caption="Size" alignment="left"></dxi-column>
+      <dxi-column
+        dataField="PRODUCTION_UNIT"
+        caption="Production Unit"
+        alignment="left"
+      ></dxi-column>
+      <dxi-column
+        dataField="QTY_AVAILABLE"
+        caption="Qty Available"
+      ></dxi-column>
+      <dxi-column dataField="QTY_MULTIBOX" caption="Qty Multibox"></dxi-column>
+      <dxi-column dataField="QTY_TOTAL" caption="Qty Total"></dxi-column>
     </dx-data-grid>
   </div>
 </div>
-

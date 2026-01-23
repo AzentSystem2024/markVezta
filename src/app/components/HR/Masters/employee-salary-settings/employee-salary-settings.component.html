@@ -54,34 +54,49 @@
         [applyFilter]="auto"
       ></dxo-filter-row> -->
       <dxo-toolbar>
-        <dxi-item location="before">
-          <h6>Employee Salary Settings</h6>
-        </dxi-item>
-        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+        <!-- TITLE -->
+        <dxi-item location="before" text="Employee Salary Settings"> </dxi-item>
 
-        <dxi-item location="after" locateInMenu="auto">
-          <dx-select-box
-            displayExpr="label"
-            valueExpr="value"
-            displayExpr="text"
-            label="Select"
-            labelMode="floating"
-            [width]="220"
-            [searchEnabled]="true"
-            [acceptCustomValue]="true"
-            [items]="filterOptions"
-            [(value)]="selectedFilterAction"
-            (onValueChanged)="getEmployeeSalarySettingsList()"
-          ></dx-select-box>
+        <!-- FILTER SELECT BOX (STABLE) -->
+        <dxi-item
+          location="after"
+          locateInMenu="never"
+          widget="dxSelectBox"
+          [options]="filterSelectBoxOptions"
+        >
         </dxi-item>
 
+        <!-- SEARCH BUTTON -->
         <dxi-item
           location="after"
           widget="dxButton"
-          [options]="addButtonOptions"
-        ></dxi-item>
-      </dxo-toolbar>
+          [options]="searchButtonOptions"
+        >
+        </dxi-item>
 
+        <!-- REFRESH BUTTON -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        >
+        </dxi-item>
+
+        <!-- EXPORT -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+        <!-- ADD BUTTON -->
+        <dxi-item
+          *ngIf="canAdd"
+          location="after"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        >
+        </dxi-item>
+      </dxo-toolbar>
       <dxo-grouping
         [autoExpandAll]="false"
         [contextMenuEnabled]="true"

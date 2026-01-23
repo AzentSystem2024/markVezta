@@ -1,10 +1,18 @@
 // import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, Input, NgModule } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  NgModule,
+  NgZone,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxLoadIndicatorModule,
@@ -42,6 +50,8 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
   styleUrls: ['./journal-book.component.scss'],
 })
 export class JournalBookComponent {
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
   Ledger_statement_datasource: any[] = [];
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -100,9 +110,19 @@ export class JournalBookComponent {
   isEditTransferIn: boolean = false;
   isReadOnlyTrIn: boolean = true;
   isEditCustomerReceipt: boolean = false;
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
   constructor(
     private dataService: DataService,
     private router: Router,
+    private zone: NgZone,
     private cdr: ChangeDetectorRef,
   ) {
     // this.get_sessionstorage_data();
@@ -161,7 +181,12 @@ export class JournalBookComponent {
     this.isEditTransferIn = false;
     this.isEditPopupPrepaymentPosting = false;
   }
-
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.load_JournalBook_data();
+  }
   getSessionData(key: string) {
     const data = sessionStorage.getItem(key);
     return data ? JSON.parse(data) : null;
