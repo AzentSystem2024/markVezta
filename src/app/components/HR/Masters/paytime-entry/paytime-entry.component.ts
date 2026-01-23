@@ -308,7 +308,23 @@ export class PaytimeEntryComponent {
   }
 
   Save() {
-    // ❗ Check: If no rows are selected, stop save
+    // Validate Salary Head selection
+  if (
+    this.selectedSalaryHeadType == null ||
+    this.selectedSalaryHeadType === '' ||
+    this.selectedSalaryHeadType === 0
+  ) {
+    notify(
+      {
+        message: 'Please select a salary head',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 2000,
+      },
+      'warning'
+    );
+    return; // stop save
+  }
+    //  Check: If no rows are selected, stop save
     if (!this.selectedRows || this.selectedRows.length === 0) {
       notify(
         {
@@ -321,7 +337,7 @@ export class PaytimeEntryComponent {
       return;
     }
 
-    // ❗ Validate: Ensure all selected rows have valid AMOUNT and DAYS
+    //  Validate: Ensure all selected rows have valid AMOUNT and DAYS
     const invalidRows = this.selectedRows.filter((row) => {
       return (
         row.AMOUNT == null ||
@@ -373,7 +389,7 @@ export class PaytimeEntryComponent {
           'success'
         );
 
-        // ✅ Update the local data source manually
+        //  Update the local data source manually
         // this.selectedRows.forEach(updatedRow => {
         //   const rowInGrid = this.PayEntryList.find(p => p.EMP_ID === updatedRow.EMP_ID);
         //   if (rowInGrid) {

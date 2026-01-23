@@ -82,6 +82,7 @@ export class ArticleproductionJvListComponent {
   isFilterOpened = false;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
+  isEditPopupVisible : boolean = false;
   auto: string = 'auto';
   searchButtonOptions = {
     icon: 'search',
@@ -234,6 +235,22 @@ export class ArticleproductionJvListComponent {
   //     this.applyDateFilter();
   //   });
   // }
+
+
+    onEditingStart(event: any) {
+      console.log('Editing started for row:', event.data);
+    event.cancel = true;
+    const invoiceId = event.data.TRANS_ID;
+    const status = event.data.STATUS;
+    this.dataService
+      .selectProduction(invoiceId)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response;
+        console.log(this.selectedInvoice, 'SELECTEDTROUT');
+        this.isEditPopupVisible = true;
+        this.isReadOnlyInvoice = status === 5;
+      });
+  }
 
   getProductionList() {
     const payload = {
@@ -499,7 +516,7 @@ export class ArticleproductionJvListComponent {
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
+    const status = cellInfo.data.STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
@@ -527,7 +544,7 @@ export class ArticleproductionJvListComponent {
 
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
-      if (e.data.TRANS_STATUS === 5) {
+      if (e.data.STATUS === 5) {
         const deleteButton = e.cellElement.querySelector('.dx-link-delete');
         if (deleteButton) {
           deleteButton.style.display = 'none';
@@ -564,20 +581,20 @@ export class ArticleproductionJvListComponent {
     const isArticle = this.selectedProductionType === 'ARTICLE';
 
     const api$ = isArticle
-      ? this.dataService.selectArticleProduction(productionId)
+      ? this.dataService.selectProduction(productionId)
       : this.dataService.selectBoxProduction(productionId);
 
     api$.subscribe((response: any) => {
       this.selectedProduction = response;
-      this.isReadOnlyInvoice = status === 5;
+      // this.isReadOnlyInvoice = status === 5;
 
       // reset both views first
-      this.isViewProduction = false;
+      this.isEditPopupVisible = false;
       this.isViewBoxProduction = false;
 
       // open correct view
       if (isArticle) {
-        this.isViewProduction = true;
+        this.isEditPopupVisible = true;
       } else {
         this.isViewBoxProduction = true;
       }
@@ -603,6 +620,7 @@ export class ArticleproductionJvListComponent {
     this.isViewProduction = false;
     this.isViewBoxProduction = false;
     this.isAddPopupVisible = false;
+    this.isEditPopupVisible = false;
     this.isEditInvoice = false;
 
     //Reload list INSIDE Angular zone
@@ -652,6 +670,8 @@ export class ArticleproductionJvListComponent {
       ? 'Article Production'
       : 'Box Production';
   }
+
+  
 }
 
 @NgModule({

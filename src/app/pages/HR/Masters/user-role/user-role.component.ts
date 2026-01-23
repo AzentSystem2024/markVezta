@@ -229,8 +229,8 @@ export class UserRoleComponent {
 
   //=================OnClick save new data=======================
   onClickSaveNewData() {
-    const menuData: any = this.userlevelNewForm.getNewUSerLevelData();
-
+    const menuData = this.userlevelNewForm.getNewUSerLevelData();
+   console.log('menuData', menuData);
     console.log(this.userlevelNewForm, 'userlevelnewform');
     const userlevelvalues = this.userlevelNewForm.UserLevelValue;
     console.log(userlevelvalues);

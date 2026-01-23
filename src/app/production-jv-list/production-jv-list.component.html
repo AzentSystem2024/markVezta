@@ -149,6 +149,13 @@
         caption="Produced Qty"
         dataType="number"
       ></dxi-column>
+
+      <dxi-column
+        dataField="STATUS"
+        [cellTemplate]="statusCellRender"
+        caption="Status"
+      ></dxi-column>
+
       <!-- <dxi-column
         dataField="TOTAL_COST"
         caption="
@@ -173,6 +180,24 @@
     (formClosed)="handleClose()"
   ></app-production-jv-add>
 </dx-popup>
+
+<dx-popup
+  [(visible)]="isEditPopupVisible"
+  [width]="1200"
+  [height]="'100vh'"
+  title="Article Production"
+  (onHiding)="onPopupHiding()"
+>
+  <ng-container *ngIf="isEditPopupVisible">
+    <app-production-jv-add
+      [isEditing]="true"
+      [EditingResponseData]="selectedProduction"
+      [productionType]="selectedProductionType"
+      (formClosed)="handleClose()"
+    ></app-production-jv-add>
+  </ng-container>
+</dx-popup>
+
 <dx-popup
   [(visible)]="isViewProduction"
   [width]="'90vw'"

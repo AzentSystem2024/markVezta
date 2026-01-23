@@ -274,19 +274,23 @@ export class UserComponent {
   }
 
   //=========Reload the datasource after inserting data
-  loadUserDataSource() {
-    this.datasource = new DataSource<any>({
-      load: () =>
-        new Promise((resolve, reject) => {
-          this.dataservice.get_User_data().subscribe({
-            next: (data: any) => {
-              resolve(data.Data);
-            },
-            error: (error) => reject(error.message),
-          });
-        }),
-    });
-  }
+loadUserDataSource() {
+  this.datasource = new DataSource<any>({
+    load: () =>
+      new Promise((resolve, reject) => {
+        this.dataservice.get_User_data().subscribe({
+          next: (data: any) => {
+            const dataWithSlNo = data.Data.map((item, index) => ({
+              ...item,
+              SlNo: index + 1,
+            }));
+            resolve(dataWithSlNo);
+          },
+          error: (error) => reject(error.message),
+        });
+      }),
+  });
+}
 
   //========================Export data ==========================
   onExporting(event: any) {

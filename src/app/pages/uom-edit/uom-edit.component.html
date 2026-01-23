@@ -1,21 +1,30 @@
-<div class="form-container">
-  <dx-text-box label="Uom" labelMode="floating" [(value)]="formUomData.UOM">
-  </dx-text-box>
-</div>
+<dx-validation-group #editValidationGroup>
+  <div class="form-container">
+    <dx-text-box label="Uom" labelMode="floating" [(value)]="formUomData.UOM">
+      <dx-validator>
+        <dxi-validation-rule
+          type="required"
+          message="UOM is required"
+        ></dxi-validation-rule>
+      </dx-validator>
+    </dx-text-box>
+  </div>
 
-<div class="fixed-footer popup-footer">
-  <dx-button
-    text="Cancel"
-    stylingMode="outlined"
-    type="normal"
-    class="action-btn"
-    (onClick)="cancel()"
-  ></dx-button>
-  <dx-button
-    text="Save"
-    stylingMode="contained"
-    type="default"
-    class="action-btn"
-    (onClick)="onRowUpdating()"
-  ></dx-button>
-</div>
+  <div class="fixed-footer popup-footer">
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      type="normal"
+      class="action-btn"
+      (onClick)="cancel()"
+    ></dx-button>
+
+    <dx-button
+      text="Save"
+      stylingMode="contained"
+      type="default"
+      class="action-btn"
+      (onClick)="onRowUpdating()"
+    ></dx-button>
+  </div>
+</dx-validation-group>

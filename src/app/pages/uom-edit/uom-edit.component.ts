@@ -15,6 +15,7 @@ import { DataService } from 'src/app/services';
 export class UomEditComponent {
  @Input() selectedData :any;
     @Output() formClosed = new EventEmitter<void>();
+    
 
     formUomData = {
     UOM: '',

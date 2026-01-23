@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   NgZone,
   Output,
@@ -10,6 +11,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { confirm } from 'devextreme/ui/dialog';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -68,6 +70,8 @@ export class ProductionJvAddComponent {
   @ViewChild('itemsGridRef', { static: false })
   itemsGrid!: DxDataGridComponent;
   @Output() formClosed = new EventEmitter<void>();
+     @Input() isEditing: boolean = false;
+     @Input() EditingResponseData: any;
 
   Article: any;
   gridData: any[] = [];
@@ -75,8 +79,10 @@ export class ProductionJvAddComponent {
   finalCost: number = 0;
   additionalCost: number = 0;
   unitProductCost: number = 0;
+    isApproved: boolean = false;
 
   productionJVFormData: any = {
+    ID:0,
     DOC_NO: '',
     COMPANY_ID: '',
     FIN_ID: '',
@@ -90,6 +96,7 @@ export class ProductionJvAddComponent {
     PRODUCT_ID: 0,
     UNIT_PRODUCT_COST: 0,
     PROD_QTY: 0,
+    STATUS: 1,
     PRODUCTION_TYPE: 'ARTICLE',
     RawMaterials: [
       {
@@ -113,6 +120,7 @@ export class ProductionJvAddComponent {
     this.sesstion_Details();
     this.get_ProductDropdown();
     this.getPendingNo();
+    this.isEditDataAvailable();
   }
 
   //==================== Production Qty Change Handler ===================//
@@ -347,6 +355,104 @@ export class ProductionJvAddComponent {
     console.log('Unit Product Cost:', this.unitProductCost);
   }
 
+  //  isEditDataAvailable() {
+  //   if (!this.isEditing || !this.EditingResponseData) {
+  //     return; // Not edit mode → nothing to load
+  //   }
+
+  //   const data = this.EditingResponseData;
+  //   console.log('EDIT RESPONSE:', data);
+  // }
+
+  isEditDataAvailable() {
+  if (!this.isEditing || !this.EditingResponseData) {
+    return; // Not edit mode → nothing to load
+  }
+
+  const header = this.EditingResponseData.Header;
+  const rawMaterials = this.EditingResponseData.RawMaterials || [];
+
+  console.log('EDIT HEADER:', header);
+  console.log('EDIT RAW MATERIALS:', rawMaterials);
+
+  // ================= DATE PARSE =================
+  const productionDate = header.PROD_DATE
+    ? new Date(header.PROD_DATE)
+    : new Date();
+
+  // ================= HEADER BINDING =================
+  this.productionJVFormData = {
+    ID: header.PRODUCTION_ID,
+    DOC_NO: header.PROD_NO,
+    COMPANY_ID: this.selected_Company_id,
+    FIN_ID: this.selected_fin_id,
+    USER_ID: this.user_id,
+
+    REF_NO: header.REF_NO,
+    PRODUCTION_DATE: productionDate,
+    REMARKS: header.ADDL_DESCRIPTION || '',
+    TOTAL_ITEM_COST: header.TOTAL_COST || 0,
+    ADDL_COST: header.ADDL_COST || 0,
+    COST_OF_PRODUCTION: header.COST_PRODUCTION || 0,
+    STATUS: this.productionJVFormData.STATUS,
+    PRODUCT_ID: header.PRODUCT_ID,
+    PROD_QTY: header.PRODUCED_QTY || 0,
+    UNIT_PRODUCT_COST: header.UNIT_COST || 0,
+
+    PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE || 'ARTICLE',
+
+    RawMaterials: [], // will be set below
+  };
+
+  // ================= GRID DATA =================
+  this.gridData = rawMaterials.map((item: any) => ({
+    ID: item.ID,
+    ITEM_ID: item.ITEM_ID,
+    ITEM_CODE: item.ITEM_CODE,
+    DESCRIPTION: item.DESCRIPTION,
+    UOM: item.UOM,
+
+    BOM_QTY: Number(item.BOM_QTY) || 0,
+    REQUIRED_QTY: Number(item.REQUIRED_QTY) || 0,
+    USED_QTY: Number(item.USED_QTY) || 0,
+
+    UNIT_COST: Number(item.UNIT_COST) || 0,
+    TOTAL_COST: Number(item.TOTAL_COST) || 0,
+
+    // derived / editable fields
+    QUANTITY: Number(item.USED_QTY) || 0,
+    COST: Number(item.UNIT_COST) || 0,
+    AMOUNT:
+      (Number(item.USED_QTY) || 0) *
+      (Number(item.UNIT_COST) || 0),
+  }));
+
+  // ================= RECALCULATE TOTALS =================
+  this.totalAmount = this.gridData.reduce(
+    (sum: number, row: any) => sum + (row.AMOUNT || 0),
+    0,
+  );
+
+  this.finalCost =
+    this.totalAmount + (Number(this.productionJVFormData.ADDL_COST) || 0);
+
+  this.unitProductCost =
+    this.productionJVFormData.PROD_QTY > 0
+      ? this.finalCost / this.productionJVFormData.PROD_QTY
+      : 0;
+
+  // ================= GRID REFRESH =================
+  // setTimeout(() => {
+  //   if (this.itemsGridRef?.instance) {
+  //     this.itemsGridRef.instance.refresh();
+  //   }
+  // }, 200);
+
+  console.log('EDIT MODE FORM DATA:', this.productionJVFormData);
+  console.log('EDIT MODE GRID DATA:', this.gridData);
+}
+
+
   getPendingNo() {
     const payload = {
       TRANS_TYPE: 103,
@@ -382,114 +488,232 @@ export class ProductionJvAddComponent {
       });
   }
 
+  // onSave() {
+
+
+  //   // =====================================================
+  // //  VALIDATION 1: PRODUCT MUST BE SELECTED
+  // // =====================================================
+  // if (!this.productionJVFormData.PRODUCT_ID) {
+  //   notify(
+  //     {
+  //       message: 'Please select a product',
+  //       position: { at: 'top right', my: 'top right' },
+  //     },
+  //     'error',
+  //     3000
+  //   );
+  //   return;
+  // }
+
+  // // =====================================================
+  // //  VALIDATION 2: PRODUCT QUANTITY MUST BE ENTERED
+  // // =====================================================
+  // const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+  // if (prodQty <= 0) {
+  //   notify(
+  //     {
+  //       message: 'Please enter a product quantity',
+  //       position: { at: 'top right', my: 'top right' },
+  //     },
+  //     'error',
+  //     3000
+  //   );
+  //   return;
+  // }
+  //   //  VALIDATION: USED_QTY must be <= AVAILABLE_QTY
+  // const invalidRow = this.gridData.find((item: any) => {
+  //   const usedQty = Number(item.USED_QTY) || 0;
+  //   const availableQty = Number(item.AVAILABLE_QTY) || 0; //  adjust field name if needed
+
+  //   return usedQty > availableQty;
+  // });
+
+  // if (invalidRow) {
+  //   notify(
+  //     {
+  //       message: 'Used Quantity cannot be greater than Available Quantity',
+  //       position: { at: 'top right', my: 'top right' },
+  //     },
+  //     'error',
+  //     4000
+  //   );
+  //   return; //  STOP SAVE
+  // }
+
+  //   const payload = {
+  //     COMPANY_ID: this.selected_Company_id,
+  //     FIN_ID: this.selected_fin_id,
+  //     USER_ID: this.user_id,
+  //     REMARKS: this.productionJVFormData.REMARKS,
+  //     PRODUCTION_DATE: this.productionJVFormData.PRODUCTION_DATE,
+  //     TOTAL_ITEM_COST: this.totalAmount,
+  //     COST_OF_PRODUCTION: this.finalCost,
+  //     UNIT_PRODUCT_COST: this.unitProductCost,
+  //     REF_NO: this.productionJVFormData.REF_NO,
+  //     ADDL_COST: this.additionalCost,
+  //     PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
+  //     PROD_QTY: this.productionJVFormData.PROD_QTY,
+  //      PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE === 'ARTICLE' ? 1 : 2,
+  //     RawMaterials: this.gridData,
+  //   };
+  //   console.log('Payload being sent:', payload);
+  //   this.dataservice
+  //     .Insert_Article_Production_Api(payload)
+  //     .subscribe((res: any) => {
+  //       console.log('Insert success:', res);
+  //       this.resetForm();
+  //       this.formClosed.emit();
+  //       // reset + close only AFTER success
+  //     });
+  // }
+
   onSave() {
 
-
-    // =====================================================
-  //  VALIDATION 1: PRODUCT MUST BE SELECTED
+  // =====================================================
+  // VALIDATION 1: PRODUCT MUST BE SELECTED
   // =====================================================
   if (!this.productionJVFormData.PRODUCT_ID) {
-    notify(
-      {
-        message: 'Please select a product',
-        position: { at: 'top right', my: 'top right' },
-      },
-      'error',
-      3000
-    );
+    notify('Please select a product', 'error', 3000);
     return;
   }
 
   // =====================================================
-  //  VALIDATION 2: PRODUCT QUANTITY MUST BE ENTERED
+  // VALIDATION 2: PRODUCT QUANTITY
   // =====================================================
   const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
   if (prodQty <= 0) {
-    notify(
-      {
-        message: 'Please enter a product quantity',
-        position: { at: 'top right', my: 'top right' },
-      },
-      'error',
-      3000
-    );
+    notify('Please enter a product quantity', 'error', 3000);
     return;
   }
-    //  VALIDATION: USED_QTY must be <= AVAILABLE_QTY
+
+  // =====================================================
+  // VALIDATION 3: USED_QTY <= AVAILABLE_QTY
+  // =====================================================
   const invalidRow = this.gridData.find((item: any) => {
     const usedQty = Number(item.USED_QTY) || 0;
-    const availableQty = Number(item.AVAILABLE_QTY) || 0; //  adjust field name if needed
-
+    const availableQty = Number(item.AVAILABLE_QTY) || 0;
     return usedQty > availableQty;
   });
 
   if (invalidRow) {
     notify(
-      {
-        message: 'Used Quantity cannot be greater than Available Quantity',
-        position: { at: 'top right', my: 'top right' },
-      },
+      'Used Quantity cannot be greater than Available Quantity',
       'error',
       4000
     );
-    return; //  STOP SAVE
+    return;
   }
 
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.selected_fin_id,
-      USER_ID: this.user_id,
-      REMARKS: this.productionJVFormData.REMARKS,
-      PRODUCTION_DATE: this.productionJVFormData.PRODUCTION_DATE,
-      TOTAL_ITEM_COST: this.totalAmount,
-      COST_OF_PRODUCTION: this.finalCost,
-      UNIT_PRODUCT_COST: this.unitProductCost,
-      REF_NO: this.productionJVFormData.REF_NO,
-      ADDL_COST: this.additionalCost,
-      PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
-      PROD_QTY: this.productionJVFormData.PROD_QTY,
-       PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE === 'ARTICLE' ? 1 : 2,
-      RawMaterials: this.gridData,
-    };
-    console.log('Payload being sent:', payload);
+  // =====================================================
+  // PREPARE PAYLOAD
+  // =====================================================
+  const payload: any = {
+     ID: this.isEditing ? this.productionJVFormData.ID : 0,
+    COMPANY_ID: this.selected_Company_id,
+    FIN_ID: this.selected_fin_id,
+    USER_ID: this.user_id,
+    REMARKS: this.productionJVFormData.REMARKS,
+    PRODUCTION_DATE: this.productionJVFormData.PRODUCTION_DATE,
+    TOTAL_ITEM_COST: this.totalAmount,
+    COST_OF_PRODUCTION: this.finalCost,
+    UNIT_PRODUCT_COST: this.unitProductCost,
+    REF_NO: this.productionJVFormData.REF_NO,
+    ADDL_COST: this.additionalCost,
+    PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
+    PROD_QTY: this.productionJVFormData.PROD_QTY,
+    STATUS: this.productionJVFormData.STATUS ?? 1,
+    PRODUCTION_TYPE:
+      this.productionJVFormData.PRODUCTION_TYPE === 'ARTICLE' ? 1 : 2,
+    RawMaterials: this.gridData,
+    // IS_APPROVED: this.isApproved,
+  };
+
+  console.log('Final Payload:', payload);
+
+  // =====================================================
+  // API CALL HELPERS
+  // =====================================================
+  const callInsertAPI = () => {
     this.dataservice
       .Insert_Article_Production_Api(payload)
-      .subscribe((res: any) => {
-        console.log('Insert success:', res);
+      .subscribe(() => {
+        notify('Production saved successfully', 'success', 3000);
         this.resetForm();
         this.formClosed.emit();
-        // reset + close only AFTER success
       });
-  }
+  };
 
-  //   onSave() {
-  //   const payload = {
-  //     COMPANY_ID: this.productionJVFormData.COMPANY_ID,
-  //     FIN_ID: this.productionJVFormData.FIN_ID,
-  //     USER_ID: this.productionJVFormData.USER_ID,
-  //     REF_NO: this.productionJVFormData.REF_NO,
-  //     ADDL_COST: this.additionalCost,
-  //     ADDL_DESCRIPTION: this.productionJVFormData.ADDL_DESCRIPTION,
-  //     PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
-  //     PROD_QTY: this.productionJVFormData.PROD_QTY,
-  //     DETAILS: this.gridData
-  //   };
+  const callUpdateAPI = () => {
+    this.dataservice
+      .Update_Article_Production_Api(payload)
+      .subscribe(() => {
+        notify('Production updated successfully', 'success', 3000);
+         this.resetForm();
+        this.formClosed.emit();
+      });
+  };
 
-  //   console.log('Payload being sent:', payload);
+  const callCommitAPI = () => {
+    const result = confirm(
+      'Are you sure you want to APPROVE this production?',
+      'Confirmation'
+    );
 
-  //   this.dataservice.Insert_Article_Production_Api(payload).subscribe({
-  //     next: (res: any) => {
-  //       console.log('Insert success:', res);
+    result.then((confirmed) => {
+      if (confirmed) {
+        this.dataservice
+          .Commit_Article_Production_Api(payload)
+          .subscribe(() => {
+            notify('Production approved successfully', 'success', 3000);
+            this.formClosed.emit();
+          });
+      }
+    });
+  };
 
-  //       // reset + close only AFTER success
-  //       this.resetForm();
-  //       this.formClosed.emit();
-  //     },
-  //     error: (err: any) => {
-  //       console.error('Insert failed:', err);
-  //     }
-  //   });
+  // =====================================================
+// FINAL DECISION LOGIC (STATUS DRIVEN)
+// =====================================================
+
+if (!this.isEditing) {
+  // -------- ADD MODE --------
+  callInsertAPI();
+  return;
+}
+
+// -------- EDIT MODE --------
+if (payload.STATUS === 1) {
+  // STATUS = 1 → UPDATE
+  callUpdateAPI();
+} 
+else if (payload.STATUS === 5) {
+  // STATUS = 5 → COMMIT
+  // const confirmed = confirm(
+  //   'Are you sure you want to APPROVE this production?'
+  // );
+
+  // if (confirmed) {
+    callCommitAPI();
   // }
+}
+else {
+  notify('Invalid production status', 'error', 3000);
+}
+
+}
+
+onApproveChanged(e: any) {
+  this.isApproved = e.value;
+
+  // STATUS logic
+  this.productionJVFormData.STATUS = this.isApproved ? 5 : 1;
+
+  console.log('Approve checked:', this.isApproved);
+  console.log('Current STATUS:', this.productionJVFormData.STATUS);
+}
+
+
 
   resetForm() {
     //  Reset form model

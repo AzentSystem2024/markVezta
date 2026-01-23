@@ -79,6 +79,7 @@ export class ProductionJvListComponent {
   isFilterOpened = false;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
+  isViewBoxProduction : boolean = false;
   auto: string = 'auto';
   searchButtonOptions = {
     icon: 'search',
@@ -154,6 +155,7 @@ export class ProductionJvListComponent {
   isReadOnlyInvoice: boolean;
   isAddPopupVisible: boolean = false;
   selectedProduction: any;
+    isEditPopupVisible : boolean = false;
   productionTypes = [
     { id: 'ARTICLE', name: 'Article Production' },
     { id: 'BOX', name: 'Box Production' },
@@ -558,7 +560,7 @@ export class ProductionJvListComponent {
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
+    const status = cellInfo.data.STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
@@ -586,7 +588,7 @@ export class ProductionJvListComponent {
 
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
-      if (e.data.TRANS_STATUS === 5) {
+      if (e.data.STATUS === 5) {
         const deleteButton = e.cellElement.querySelector('.dx-link-delete');
         if (deleteButton) {
           deleteButton.style.display = 'none';
@@ -595,21 +597,60 @@ export class ProductionJvListComponent {
     }
   }
 
-  onEditProduction(event: any) {
+  // onEditProduction(event: any) {
+  //   event.cancel = true;
+
+  //   const productionId = event.data.PRODUCTION_ID;
+  //   const status = event.data.TRANS_STATUS;
+
+  //    const isArticle = this.selectedProductionType === 'ARTICLE';
+
+  //   const api$ =
+  //     this.selectedProductionType === 'ARTICLE'
+  //       ? this.dataService.selectProduction(productionId)
+  //       : this.dataService.selectBoxProduction(productionId);
+
+  //   api$.subscribe((response: any) => {
+  //     this.selectedProduction = response;
+  //     // this.isReadOnlyInvoice = status === 5;
+  //     this.isEditPopupVisible = false;
+
+
+  //     if (isArticle) {
+  //       this.isEditPopupVisible = true;
+  //     } else {
+  //       this.isViewBoxProduction = true;
+  //     }
+  //     // this.isViewBoxProduction = false;
+  //   });
+  // }
+
+    onEditProduction(event: any) {
     event.cancel = true;
 
     const productionId = event.data.PRODUCTION_ID;
     const status = event.data.TRANS_STATUS;
 
-    const api$ =
-      this.selectedProductionType === 'ARTICLE'
-        ? this.dataService.selectProduction(productionId)
-        : this.dataService.selectBoxProduction(productionId);
+    const isArticle = this.selectedProductionType === 'ARTICLE';
+
+    const api$ = isArticle
+      ? this.dataService.selectProduction(productionId)
+      : this.dataService.selectBoxProduction(productionId);
 
     api$.subscribe((response: any) => {
       this.selectedProduction = response;
-      this.isReadOnlyInvoice = status === 5;
-      this.isViewProduction = true;
+      // this.isReadOnlyInvoice = status === 5;
+
+      // reset both views first
+      this.isEditPopupVisible = false;
+      this.isViewBoxProduction = false;
+
+      // open correct view
+      if (isArticle) {
+        this.isEditPopupVisible = true;
+      } else {
+        this.isViewBoxProduction = true;
+      }
     });
   }
 
@@ -630,6 +671,8 @@ export class ProductionJvListComponent {
   handleClose() {
     this.isViewProduction = false;
     this.isAddPopupVisible = false;
+    this.isEditPopupVisible = false;
+    this.isViewBoxProduction = false;
     this.isEditInvoice = false;
 
     //Reload list INSIDE Angular zone

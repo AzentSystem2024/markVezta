@@ -6133,6 +6133,17 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
+
+  Update_Article_Production_Api(payload) {
+    const getEndpoint = this.apiUrl + 'ArticleProduction/update';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  Commit_Article_Production_Api(payload) {
+    const getEndpoint = this.apiUrl + 'ArticleProduction/commit';
+    return this.http.post(getEndpoint, payload);
+  }
+
   //==============INSERT IN BOM PRODUCTION=================
   Insert_Bom_Production_Api(payload) {
     const getEndpoint = this.apiUrl + 'BoxProduction/insert';

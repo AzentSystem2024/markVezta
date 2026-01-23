@@ -230,46 +230,95 @@ console.log(this.sharedValue,'selected');
 }
 
 
-   combineSelectedRows(): void {
+//    combineSelectedRows(): void {
+//   this.allSelectedRows = [];
+
+//   // ✅ Step 1: Collect all selected MenuIds 
+// const selectedMenuIds = new Set<number>();
+// Object.values(this.selectedRows).forEach((menuList: any[]) => {
+//   menuList.forEach(menu => selectedMenuIds.add(menu.MenuId));
+// });
+
+// // ✅ Step 2: Collect ONLY selected and enriched menus
+// const enrichedMenus: any[] = [];
+
+// (this.MenuDatasource || []).forEach((group: any) => {
+//   (group.Menus || []).forEach((menu: any) => {
+//     if (selectedMenuIds.has(menu.MenuId)) {
+//       enrichedMenus.push({
+//         MenuId: menu.MenuId,
+//         MenuName: menu.MenuName,
+//         MenuOrder: menu.MenuOrder,
+//         Selected: true,
+
+//         CanAdd: menu.canAdd ?? false,
+//         CanView: menu.canView ?? true,
+//          CanEdit: menu.canEdit ?? false,
+//           CanApprove: menu.canApprove ?? false,
+//          CanDelete: menu.canDelete ?? false,
+//         CanPrint: menu.canPrint ?? false,     
+        
+//       });
+//     }
+//   });
+// });
+
+//   // Step 3: Store userLevelname and real enriched menus
+//   this.allSelectedRows.push({
+//     userLevelname: this.UserLevelValue,
+//     Menus: enrichedMenus,
+     
+//   });
+//   console.log(' Combined selected rows with permissions:', this.allSelectedRows);
+// }
+
+onPermissionCheckboxChanged(e: any): void {
+  this.combineSelectedRows(); // Rebuild the latest data from updated grid values
+}
+
+combineSelectedRows(): void {
+  console.log('combineSelectedRows CALLED');
+
   this.allSelectedRows = [];
 
-  // ✅ Step 1: Collect all selected MenuIds 
-const selectedMenuIds = new Set<number>();
-Object.values(this.selectedRows).forEach((menuList: any[]) => {
-  menuList.forEach(menu => selectedMenuIds.add(menu.MenuId));
-});
+  const selectedMenuIds = new Set<string>();
 
-// ✅ Step 2: Collect ONLY selected and enriched menus
-const enrichedMenus: any[] = [];
-
-(this.MenuDatasource || []).forEach((group: any) => {
-  (group.Menus || []).forEach((menu: any) => {
-    if (selectedMenuIds.has(menu.MenuId)) {
-      enrichedMenus.push({
-        MenuId: menu.MenuId,
-        MenuName: menu.MenuName,
-        MenuOrder: menu.MenuOrder,
-        Selected: true,
-
-        CanAdd: menu.canAdd ?? false,
-        CanView: menu.canView ?? true,
-         CanEdit: menu.canEdit ?? false,
-          CanApprove: menu.canApprove ?? false,
-         CanDelete: menu.canDelete ?? false,
-        CanPrint: menu.canPrint ?? false,     
-        
-      });
-    }
+  Object.values(this.selectedRows || {}).forEach((menuIds: any[]) => {
+    menuIds.forEach(menuId =>
+      selectedMenuIds.add(String(menuId))
+    );
   });
-});
 
-  // Step 3: Store userLevelname and real enriched menus
+  const enrichedMenus: any[] = [];
+
+  (this.MenuDatasource || []).forEach((group: any) => {
+    (group.Menus || []).forEach((menu: any) => {
+      if (selectedMenuIds.has(String(menu.MenuId))) {
+        enrichedMenus.push({
+          MenuId: menu.MenuId,
+          MenuName: menu.MenuName,
+          MenuOrder: menu.MenuOrder,
+          Selected: true,
+
+          CanAdd: menu.canAdd ?? false,
+          CanView: menu.canView ?? true,
+          CanEdit: menu.canEdit ?? false,
+          CanApprove: menu.canApprove ?? false,
+          CanDelete: menu.canDelete ?? false,
+          CanPrint: menu.canPrint ?? false,
+        });
+      }
+    });
+  });
+
   this.allSelectedRows.push({
     userLevelname: this.UserLevelValue,
     Menus: enrichedMenus,
-     
   });
+
+  console.log('Combined selected rows:', this.allSelectedRows);
 }
+
 
 
 

@@ -49,7 +49,7 @@ articleStockList: any[] = [];
         column: 'QTY_AVAILABLE',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        
         showInColumn: 'QTY_AVAILABLE',
         alignment: 'Right',
       },
@@ -57,7 +57,7 @@ articleStockList: any[] = [];
         column: 'QTY_MULTIBOX',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        
         showInColumn: 'QTY_MULTIBOX',
         alignment: 'right',
       },
@@ -65,7 +65,7 @@ articleStockList: any[] = [];
         column: 'QTY_TOTAL',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        
         showInColumn: 'QTY_TOTAL',
         alignment: 'right',
       },
@@ -75,21 +75,21 @@ articleStockList: any[] = [];
       column: 'QTY_AVAILABLE',
       summaryType: 'sum',
       displayFormat: '{0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+      
       alignByColumn: true,
     },
     {
       column: 'QTY_MULTIBOX',
       summaryType: 'sum',
       displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+      
       alignByColumn: true,
     },
     {
       column: 'QTY_TOTAL',
       summaryType: 'sum',
       displayFormat: '{0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+      
       alignByColumn: true,
     },
   ],
