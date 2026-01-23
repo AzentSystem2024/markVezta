@@ -15,7 +15,7 @@
     [showColumnLines]="true"
     (onEditingStart)="onEditStart($event)"
     (onRowRemoved)="deleteData($event)"
-    [scrolling]="{ mode: 'standard' }"
+    [scrolling]="{ mode: 'virtual' }"
     [filterRow]="{ visible: false }"
     [headerFilter]="{ visible: false }"
   >
@@ -90,7 +90,7 @@
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
           stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
+          elementAttr: { class: 'commonButtons' },
         }"
       ></dxi-item>
 
@@ -329,7 +329,7 @@
             [inputAttr]="{ 'aria-label': 'Recovery_Date' }"
             [calendarOptions]="{
               maxZoomLevel: 'year',
-              minZoomLevel: 'century'
+              minZoomLevel: 'century',
             }"
             (onValueChanged)="onRecoveryDateChanged($event)"
           >
@@ -582,7 +582,7 @@
           [inputAttr]="{ 'aria-label': 'Recovery_Date' }"
           [calendarOptions]="{
             maxZoomLevel: 'year',
-            minZoomLevel: 'century'
+            minZoomLevel: 'century',
           }"
           labelMode="floating"
           style="border: 1px"

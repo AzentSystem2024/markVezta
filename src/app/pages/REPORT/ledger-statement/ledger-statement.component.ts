@@ -132,6 +132,7 @@ export class LedgerStatementComponent {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
   ) {
+    // this.resetPopups();
     this.get_sessionstorage_data();
     this.get_fin_id();
     this.sesstion_Details();
@@ -147,6 +148,13 @@ export class LedgerStatementComponent {
   }
 
   ngOnInit() {
+      // this.resetPopups();
+       // Prevent stale popup rendering
+  setTimeout(() => {
+    this.popupReady = false;
+    this.cdr.detectChanges();
+  });
+
     this.loadLedgerData();
 
     this.ledgerSummaryData = this.Ledger_statement_datasource;
@@ -157,6 +165,31 @@ export class LedgerStatementComponent {
         console.log(this.HEAD_ID_LIST);
       });
   }
+
+  //  ngAfterViewInit() {
+  //   setTimeout(() => this.resetPopups());
+  // }
+
+  //   resetPopups() {
+  //   this.isViewJournalVoucher = false;
+  //   this.isViewDebitNote = false;
+  //   this.isViewCreditNote = false;
+  //   this.isViewInvoice = false;
+  //   this.isEditInvoice = false;
+  //   this.isEditCustomerReceipt = false;
+  //   this.editMiscPopup = false;
+  //   this.editMiscPopupOpened = false;
+  //   this.editPrePaymentPopupOpened = false;
+  //   this.isEditReceipt = false;
+  //   this.isEditPurchaseReturn = false;
+  //   this.isEditTransferOut = false;
+  //   this.isEditTransferIn = false;
+  //   this.editSalaryPopup = false;
+  //   this.EditDepreciationPopupVisible = false;
+  //   this.isEditPopUp = false;
+    
+  //   // this.isEditPopupPrepaymentPosting = false;
+  // }
 
   getSessionData(key: string) {
     const data = sessionStorage.getItem(key);
@@ -512,6 +545,8 @@ export class LedgerStatementComponent {
       console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
     }
   }
+
+ 
   // POPUP shown → allow child to render
   onPopupShown() {
     this.popupReady = true;

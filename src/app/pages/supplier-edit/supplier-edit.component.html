@@ -1,9 +1,8 @@
-
 <dx-form class="plain-styled-form" [colCount]="3">
-    <dxi-item itemType="group">
-      <dxi-item itemType="group" [colCount]="2">
-        <dxi-item>
-          <div *ngIf="supplierData">
+  <dxi-item itemType="group">
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
               label="Code"
@@ -17,11 +16,11 @@
             </dx-text-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
-      <dxi-item itemType="group" [colCount]="1">
-        <dxi-item>
-          <div *ngIf="supplierData">
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
               label="Address"
@@ -38,11 +37,11 @@
             </dx-text-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
-      <dxi-item itemType="group" [colCount]="1">
-        <dxi-item>
-          <div *ngIf="supplierData">
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
               label=" "
@@ -51,11 +50,11 @@
             ></dx-text-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
-      <dxi-item itemType="group" [colCount]="1">
-        <dxi-item>
-          <div *ngIf="supplierData">
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
               label=" "
@@ -64,17 +63,17 @@
             ></dx-text-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
-      <dxi-item itemType="group" [colCount]="1">
-        <dxi-item>
-          <div *ngIf="supplierData">
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate style="display: flex">
             <dx-text-box
               label=" "
               [(value)]="DEFAULT_COUNTRY_CODE"
               class="country-code-input"
-             labelMode="floating"
+              labelMode="floating"
             ></dx-text-box>
             <dx-text-box
               label="Mobile"
@@ -93,128 +92,136 @@
             </dx-text-box>
           </div>
         </div>
-        </dxi-item>
-        <dxi-item itemType="group" [colCount]="2">
+      </dxi-item>
+      <dxi-item itemType="group" [colCount]="2">
         <dxi-item>
           <div *ngIf="supplierData">
-          <div *dxTemplate>
-            <dx-text-box
-              label="Fax"
-              [(value)]="supplierData.FAX_NO"
-              labelMode="floating"
-            >
-              <dx-validator>
-                <dxi-validation-rule
-                  type="required"
-                  message="Fax No. is required"
-                >
-                </dxi-validation-rule>
-              </dx-validator>
-            </dx-text-box>
+            <div *dxTemplate>
+              <dx-text-box
+                label="Fax"
+                [(value)]="supplierData.FAX_NO"
+                labelMode="floating"
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Fax No. is required"
+                  >
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-text-box>
+            </div>
           </div>
-        </div>
         </dxi-item>
         <dxi-item>
           <div *ngIf="supplierData">
-          <div *dxTemplate>
-            <dx-text-box
-              label="Email"
-              [(value)]="supplierData.EMAIL"
-              labelMode="floating"
-            >
-              <dx-validator>
-                <dxi-validation-rule type="required" message="Email is required">
-                </dxi-validation-rule>
-                <dxi-validation-rule
-                  type="pattern"
-                  pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
-                  message="Invalid email format"
-                ></dxi-validation-rule>
-              </dx-validator>
-            </dx-text-box>
+            <div *dxTemplate>
+              <dx-text-box
+                label="Email"
+                [(value)]="supplierData.EMAIL"
+                labelMode="floating"
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Email is required"
+                  >
+                  </dxi-validation-rule>
+                  <dxi-validation-rule
+                    type="pattern"
+                    pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                    message="Invalid email format"
+                  ></dxi-validation-rule>
+                </dx-validator>
+              </dx-text-box>
+            </div>
           </div>
-        </div>
         </dxi-item>
       </dxi-item>
       <dxi-item itemType="group" [colCount]="2">
         <dxi-item>
           <div *ngIf="supplierData">
-          <div *dxTemplate>
-            <div class="checkbox">Accepted Currency</div>
-            <dx-check-box
-              [value]="isCurrencyAccepted"
-              (onValueChanged)="toggleCurrencyDropdown($event.value)"
-              [elementAttr]="{ 'aria-label': 'Checked' }"
-            ></dx-check-box>
-            Default
+            <div *dxTemplate>
+              <div class="checkbox">Accepted Currency</div>
+              <dx-check-box
+                [value]="isCurrencyAccepted"
+                (onValueChanged)="toggleCurrencyDropdown($event.value)"
+                [elementAttr]="{ 'aria-label': 'Checked' }"
+              ></dx-check-box>
+              Default
+            </div>
           </div>
-        </div>
         </dxi-item>
-        
-  
+
         <dxi-item>
           <div *ngIf="supplierData">
-          <div *dxTemplate>
-            <dx-select-box
-              label=" "
-              [items]="CurrencyDropdownData"
-              displayExpr="DESCRIPTION"
-              valueExpr="ID"
-              [(value)]="supplierData.CURRENCY_ID"
-              [disabled]="isCurrencyAccepted"
-              placeholder="Select Currency"
-              labelMode="floating"
-            >
-              <dx-validator>
-                <dxi-validation-rule type="required" message="Select Currency">
-                </dxi-validation-rule>
-              </dx-validator>
-            </dx-select-box>
+            <div *dxTemplate>
+              <dx-select-box
+                label=" "
+                [items]="CurrencyDropdownData"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                [(value)]="supplierData.CURRENCY_ID"
+                [disabled]="isCurrencyAccepted"
+                placeholder="Select Currency"
+                labelMode="floating"
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Select Currency"
+                  >
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-select-box>
+            </div>
           </div>
-        </div>
         </dxi-item>
       </dxi-item>
 
       <dxi-item itemType="group" [colCount]="1">
         <dxi-item>
           <div *ngIf="supplierData">
-          <div *dxTemplate>
-            <dx-select-box
-              label="VAT Rule"
-              [items]="VATRuleDropdownData"
-              displayExpr="DESCRIPTION"
-              valueExpr="ID"
-              [(value)]="supplierData.VAT_RULE_ID"
-              placeholder="Select VAT Rule"
-              labelMode="floating"
-            >
-              <dx-validator>
-                <dxi-validation-rule type="required" message="Select VAT rule">
-                </dxi-validation-rule>
-              </dx-validator>
-            </dx-select-box>
+            <div *dxTemplate>
+              <dx-select-box
+                label="VAT Rule"
+                [items]="VATRuleDropdownData"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                [(value)]="supplierData.VAT_RULE_ID"
+                placeholder="Select VAT Rule"
+                labelMode="floating"
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Select VAT rule"
+                  >
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-select-box>
+            </div>
           </div>
-        </div>
         </dxi-item>
       </dxi-item>
 
       <dxi-item itemType="group" [colCount]="1">
- <dxi-item>
-      <div *ngIf="supplierData">
-        <div *dxTemplate>
-          <dx-check-box
-           [(value)]="supplierData.IS_COMPANY_BRANCH"
-            text="Company Branch"
-            stylingMode="outlined"
-            hint="Company Branch"
-             labelMode="floating"
-          ></dx-check-box>
-        </div>
-      </div>
-</dxi-item> 
-</dxi-item>
+        <dxi-item>
+          <div *ngIf="supplierData">
+            <div *dxTemplate>
+              <dx-check-box
+                [(value)]="supplierData.IS_COMPANY_BRANCH"
+                text="Company Branch"
+                stylingMode="outlined"
+                hint="Company Branch"
+                labelMode="floating"
+              ></dx-check-box>
+            </div>
+          </div>
+        </dxi-item>
+      </dxi-item>
 
-        <!-- <dxi-item>
+      <!-- <dxi-item>
           <div *ngIf="supplierData">
           <div *dxTemplate style="display: flex">
             <dx-text-box
@@ -233,8 +240,8 @@
           </div>
         </div>
         </dxi-item> -->
-      </dxi-item>
-      <!-- <dxi-item itemType="group" [colCount]="2">
+    </dxi-item>
+    <!-- <dxi-item itemType="group" [colCount]="2">
         <dxi-item>
           <div *ngIf="supplierData">
           <div *dxTemplate>
@@ -271,7 +278,7 @@
         </div>
         </dxi-item>
       </dxi-item> -->
-      <!-- <dxi-item itemType="group" [colCount]="1">
+    <!-- <dxi-item itemType="group" [colCount]="1">
         <dxi-item>
           <div *ngIf="supplierData">
           <div *dxTemplate>
@@ -293,14 +300,12 @@
         </div>
         </dxi-item>
       </dxi-item> -->
-  
-     
-    </dxi-item>
-  
-    <dxi-item itemType="group">
-      <dxi-item itemType="group" [colCount]="2">
-        <dxi-item>
-          <div *ngIf="supplierData">
+  </dxi-item>
+
+  <dxi-item itemType="group">
+    <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
               label="Supplier Name"
@@ -317,10 +322,10 @@
             </dx-text-box>
           </div>
         </div>
-        </dxi-item>
-  
-        <dxi-item>
-          <div *ngIf="supplierData">
+      </dxi-item>
+
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
               label="Contact Name"
@@ -337,11 +342,11 @@
             </dx-text-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
-      <dxi-item itemType="group" [colCount]="2">
-        <dxi-item>
-          <div *ngIf="supplierData">
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
               label="City"
@@ -355,9 +360,9 @@
             </dx-text-box>
           </div>
         </div>
-        </dxi-item>
-        <dxi-item>
-          <div *ngIf="supplierData">
+      </dxi-item>
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
               label="Zip Code"
@@ -374,15 +379,15 @@
             </dx-text-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
-      <dxi-item itemType="group" [colCount]="1">
-        <dxi-item>
-          <div *ngIf="supplierData">
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-select-box
               label="Country"
-              [items]="CountryDropdownData" 
+              [items]="CountryDropdownData"
               displayExpr="COUNTRY_NAME"
               valueExpr="ID"
               [(value)]="supplierData.COUNTRY_ID"
@@ -398,15 +403,14 @@
             </dx-select-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
-      <dxi-item itemType="group" [colCount]="1">
-        <dxi-item>
-          <div *ngIf="supplierData">
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-select-box
               label="{{ stateLabel }}"
-             
               [items]="State"
               displayExpr="DESCRIPTION"
               valueExpr="ID"
@@ -414,7 +418,7 @@
               placeholder="Select {{ stateLabel }}"
               [searchEnabled]="true"
               labelMode="floating"
-               (onValueChanged)="onStateValue($event)"
+              (onValueChanged)="onStateValue($event)"
             >
               <dx-validator>
                 <dxi-validation-rule type="required" message="Select state">
@@ -423,11 +427,11 @@
             </dx-select-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
-      <!-- <dxi-item itemType="group" [colCount]="1"> -->
-      <dxi-item>
-        <div *ngIf="supplierData">
+    </dxi-item>
+    <!-- <dxi-item itemType="group" [colCount]="1"> -->
+    <dxi-item>
+      <div *ngIf="supplierData">
         <div *dxTemplate style="display: flex">
           <dx-text-box
             label=" "
@@ -444,11 +448,11 @@
           ></dx-text-box>
         </div>
       </div>
-      </dxi-item>
+    </dxi-item>
     <!-- </dxi-item> -->
 
-      <dxi-item itemType="group" [colCount]="2">
-        <!-- <dxi-item>
+    <dxi-item itemType="group" [colCount]="2">
+      <!-- <dxi-item>
           <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
@@ -467,7 +471,7 @@
           </div>
         </div>
         </dxi-item> -->
-        <!-- <dxi-item>
+      <!-- <dxi-item>
           <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
@@ -488,21 +492,21 @@
           </div>
         </div>
         </dxi-item> -->
-      </dxi-item>
-      <dxi-item itemType="group" [colCount]="1">
-        <dxi-item>
-          <div *ngIf="supplierData">
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-select-box
               label="Payment Terms"
               [items]="PaymentTermsDropdownData"
-               [items]="PaymentTerms"
+              [items]="PaymentTerms"
               displayExpr="DESCRIPTION"
               valueExpr="ID"
               [(value)]="supplierData.PAY_TERM_ID"
               placeholder="Select Payment Terms"
               labelMode="floating"
-               (onValueChanged)="onPayTermSelectionChanged($event)"
+              (onValueChanged)="onPayTermSelectionChanged($event)"
             >
               <dx-validator>
                 <dxi-validation-rule
@@ -514,11 +518,11 @@
             </dx-select-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
-      <dxi-item itemType="group" [colCount]="1">
-        <dxi-item>
-          <div *ngIf="supplierData">
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
               label="VAT Registration Number"
@@ -535,11 +539,11 @@
             </dx-text-box>
           </div>
         </div>
-        </dxi-item>
       </dxi-item>
+    </dxi-item>
 
-       <dxi-item [colSpan]="2">
-        <div *ngIf="supplierData">
+    <dxi-item [colSpan]="2">
+      <div *ngIf="supplierData">
         <div *dxTemplate>
           <dx-text-area
             label="Additional Info."
@@ -548,45 +552,47 @@
           ></dx-text-area>
         </div>
       </div>
-      </dxi-item>
     </dxi-item>
-  
-     <dxi-item itemType="group" [colCount]=" 1">
+  </dxi-item>
+
+  <dxi-item itemType="group" [colCount]="1">
     <!-- LANDED COST -->
     <dxi-item [colCount]="1">
       <!-- <label class="landed-cost-label">Landed Cost</label> -->
-  
+
       <!-- DataGrid for Cost Factors -->
       <dx-data-grid
-      [dataSource]="landedcost" 
-      [height]="'200'"
-      [width]="'100%'" 
-      [showColumnLines]="false"
-      [showRowLines]="true"
-      [selection]="{
-        mode: 'multiple',
-        showCheckBoxesMode: 'always'
-      }"
-      [keyExpr]="'ID'"
-      [selectedRowKeys]="selectedLandedCostKeys"
-      (onSelectionChanged)="onSelectedCostChanged($event)"
-    >
-      <dxo-paging [enabled]="false"></dxo-paging>
-      <dxo-pager [showPageSizeSelector]="false" [showInfo]="false"></dxo-pager>
-    <!-- Only include the DESCRIPTION column -->
-      <dxi-column dataField="DESCRIPTION" caption="Landed Cost" width="400"></dxi-column>
-    </dx-data-grid>
-    
+        #landedCostGrid
+        [dataSource]="landedcost"
+        [height]="'200'"
+        [width]="'100%'"
+        [showColumnLines]="false"
+        [showRowLines]="true"
+        [selection]="{
+          mode: 'multiple',
+          showCheckBoxesMode: 'always',
+        }"
+        [keyExpr]="'ID'"
+        [selectedRowKeys]="selectedLandedCostKeys"
+        (onSelectionChanged)="onSelectedCostChanged($event)"
+      >
+        <dxo-paging [enabled]="false"></dxo-paging>
+        <dxo-pager
+          [showPageSizeSelector]="false"
+          [showInfo]="false"
+        ></dxo-pager>
+        <!-- Only include the DESCRIPTION column -->
+        <dxi-column
+          dataField="DESCRIPTION"
+          caption="Landed Cost"
+          width="400"
+        ></dxi-column>
+      </dx-data-grid>
     </dxi-item>
+  </dxi-item>
+</dx-form>
 
-   </dxi-item>
-  </dx-form>
-  
-
-  <div
-  class="form-popup-buttons-container"
-
->
+<div class="form-popup-buttons-container">
   <dx-button
     text="Cancel"
     stylingMode="outlined"
@@ -598,6 +604,5 @@
     stylingMode="contained"
     type="default"
     (onClick)="updateSupplier()"
-
   ></dx-button>
 </div>

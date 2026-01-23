@@ -8,6 +8,7 @@
     rowAlternationInterval="2"
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
+    [scrolling]="{ mode: 'virtual' }"
     (onRowRemoved)="delete_Data($event)"
     [height]="'75vh'"
     noDataText=" "

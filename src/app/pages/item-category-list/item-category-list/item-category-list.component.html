@@ -13,6 +13,7 @@
       (onExporting)="onExporting($event)"
       (onEditingStart)="onEditStart($event)"
       [showColumnLines]="true"
+      [scrolling]="{ mode: 'virtual' }"
       [height]="'75vh'"
     >
       <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>

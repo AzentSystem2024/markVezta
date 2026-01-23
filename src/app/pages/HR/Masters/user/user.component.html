@@ -12,6 +12,7 @@
     (onEditingStart)="onEditingRow($event)"
     (onRowRemoving)="onRowRemoving($event)"
     [showColumnLines]="true"
+    [scrolling]="{ mode: 'virtual' }"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-editing
@@ -29,7 +30,7 @@
       [showNavigationButtons]="showNavButtons"
     ></dxo-pager>
     <dxo-load-panel [showPane]="false"></dxo-load-panel>
-    <dxo-scrolling mode="standard"></dxo-scrolling>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
     <dxo-sorting mode="multiple"></dxo-sorting>
     <dxo-header-filter [visible]="true"></dxo-header-filter>
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
@@ -193,7 +194,7 @@
   <dx-popup
     [(visible)]="isEditPopupOpened"
     title="Edit User"
-    [height]="'100vh'"
+    [height]="'95vh'"
     [width]="popupwidth"
     (onHiding)="CloseEditForm()"
   >

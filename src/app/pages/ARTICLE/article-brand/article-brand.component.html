@@ -11,6 +11,7 @@
     (onRowRemoved)="delete_Data($event)"
     [height]="'75vh'"
     noDataText=" "
+    [scrolling]="{ mode: 'virtual' }"
     (onEditingStart)="onEditingStart($event)"
   >
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>

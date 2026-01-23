@@ -9,6 +9,7 @@
   [showBorders]="true"
   [width]="'100%'"
   [height]="'75vh'"
+  [scrolling]="{ mode: 'virtual' }"
   (onEditingStart)="onEditSubcategory($event)"
 >
   <dxo-paging [pageSize]="10"></dxo-paging>
@@ -42,7 +43,7 @@
           margin-right: 3px;
         "
       >
-        Sub Category
+        Item Sub Category
       </div>
     </dxi-item>
 

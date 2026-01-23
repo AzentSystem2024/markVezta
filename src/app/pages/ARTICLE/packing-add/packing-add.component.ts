@@ -792,13 +792,20 @@ export class PackingAddComponent {
     // =====================================================
     //  BUILD PACKING ENTRIES PAYLOAD
     // =====================================================
-    const packingEntriesPayload = this.articleSizeData
-      .filter((item) => Number(item.QUANTITY) > 0)
-      .map((item) => ({
-        ARTICLE_ID: Number(item.ArticleID),
-        SIZE: String(item.Size),
-        QUANTITY: Number(item.QUANTITY),
-      }));
+    // const packingEntriesPayload = this.articleSizeData
+    //   .filter((item) => Number(item.QUANTITY) > 0)
+    //   .map((item) => ({
+    //     ARTICLE_ID: Number(item.ArticleID),
+    //     SIZE: String(item.Size),
+    //     QUANTITY: Number(item.QUANTITY),
+    //   }));
+
+    const packingEntriesPayload = (this.articleSizeData || []).map((item) => ({
+  ARTICLE_ID: Number(item.ArticleID),
+  SIZE: String(item.Size),
+  QUANTITY: Number(item.QUANTITY) || 0,   // 👈 force 0 if empty
+}));
+
 
     console.log('PackingEntries Payload:', packingEntriesPayload);
 

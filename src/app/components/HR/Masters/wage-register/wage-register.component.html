@@ -9,10 +9,22 @@
       [dataSource]="gridData"
       [showBorders]="true"
       [columnAutoWidth]="true"
+      [scrolling]="{ mode: 'virtual' }"
     >
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">Wage Register</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Wage Register
+          </div>
         </dxi-item>
 
         <dxi-item>
@@ -46,14 +58,15 @@
         </dxi-item> -->
 
         <dxi-item>
- <dx-select-box
-  [dataSource]="reportTypesDataSource"
-  displayExpr="name"
-  valueExpr="id"
-  [(value)]="selectedReport"
-  placeholder="Select Report Type"
-  [width]="250">
-</dx-select-box>
+          <dx-select-box
+            [dataSource]="reportTypesDataSource"
+            displayExpr="name"
+            valueExpr="id"
+            [(value)]="selectedReport"
+            placeholder="Select Report Type"
+            [width]="250"
+          >
+          </dx-select-box>
         </dxi-item>
 
         <dxi-item>

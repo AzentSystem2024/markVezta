@@ -9,10 +9,22 @@
       [dataSource]="gridData"
       [showBorders]="true"
       [columnAutoWidth]="true"
+      [scrolling]="{ mode: 'virtual' }"
     >
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;"  >Attendance sheet</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Attendance sheet
+          </div>
         </dxi-item>
 
         <dxi-item>
@@ -44,7 +56,6 @@
             (onSelectionChanged)="handleSelection($event, tagBox)"
           ></dx-tag-box>
         </dxi-item> -->
-
 
         <dxi-item>
           <dx-button
@@ -83,4 +94,3 @@
     ></iframe>
   </div>
 </div>
-

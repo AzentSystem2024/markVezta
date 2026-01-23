@@ -11,6 +11,7 @@
     (onExporting)="onExporting($event)"
     (onEditingStart)="openEditingStart($event)"
     [height]="'80vh'"
+    [scrolling]="{ mode: 'virtual' }"
     [showColumnLines]="true"
   >
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
