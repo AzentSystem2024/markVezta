@@ -4,7 +4,7 @@
       #dataGrid
       noDataText="No data available"
       [width]="'100%'"
-      [height]="'75vh'"
+      [height]="'82vh'"
       [loadPanel]="{
         enabled: true,
         text: 'Loading...',
@@ -106,7 +106,7 @@
           [(value)]="selectedDateRange"
           (onValueChanged)="onDateRangeChanged($event)"
           (onOpened)="attachItemClickHandler($event)"
-          width="180"
+          width="220"
         >
           <div *dxTemplate="let item of 'item'">
             {{ item.value === "custom" ? "Custom" : item.label }}
@@ -194,4 +194,40 @@
       (popupClosed)="handleClose()"
     ></app-sales-order-form>
   </ng-container>
+</dx-popup>
+<dx-popup
+  [(visible)]="showCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="170"
+  [dragEnabled]="false"
+>
+  <div>
+    <div class="date-range-container">
+      <dx-date-box
+        [(value)]="customStartDate"
+        type="date"
+        width="300"
+        placeholder="From Date"
+      >
+      </dx-date-box>
+
+      <dx-date-box
+        [(value)]="customEndDate"
+        type="date"
+        placeholder="To Date"
+        width="300"
+      >
+      </dx-date-box>
+    </div>
+
+    <div class="button-container">
+      <dx-button
+        text="Apply"
+        type="default"
+        (onClick)="applyCustomDateFilter()"
+      ></dx-button>
+    </div>
+  </div>
 </dx-popup>

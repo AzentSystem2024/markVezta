@@ -25,6 +25,8 @@ import {
 import { DataService } from 'src/app/services';
 import { UomEditModule } from '../uom-edit/uom-edit.component';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
+
 
 @Component({
   selector: 'app-uom-list',
@@ -37,7 +39,9 @@ export class UomListComponent implements OnInit {
   dataGrid: DxDataGridComponent;
   @Output() formClosed = new EventEmitter<void>();
   uom: any;
-  uomList: any[] = [];
+  UomDataSource: DataSource;
+  uomArray: any[] = [];
+  uomCount = 0;
   isAddUomPopupOpened = false;
   isEditUomPopupOpened = false;
   showFilterRow = true;
@@ -186,19 +190,32 @@ export class UomListComponent implements OnInit {
   }
 
   listUom() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataservice.getUomList(payload).subscribe(
-      (data) => {
-        this.uomList = data;
-        console.log(this.uomList, 'UOM');
-      },
-      (error) => {
-        console.error('Error in fetching UOM', error);
-      },
-    );
-  }
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+  };
+
+  this.UomDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getUomList(payload).subscribe({
+          next: (data: any[]) => {
+            const list = data || [];
+
+            this.uomArray = list;        // local cache
+            this.uomCount = list.length;
+
+            resolve(list);               // 🔑 stops grid loader
+          },
+          error: () => {
+            this.uomArray = [];
+            this.uomCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   onRowRemoving(event) {
     const selectedRow = event.data;
@@ -258,7 +275,7 @@ export class UomListComponent implements OnInit {
       COMPANY_ID: this.selected_Company_id,
     };
     //  DUPLICATION CHECK (case-insensitive)
-    const isDuplicate = this.uomList?.some(
+    const isDuplicate = this.uomArray?.some(
       (item: any) =>
         item.UOM?.trim().toLowerCase() === UOM?.trim().toLowerCase(),
     );
@@ -299,6 +316,12 @@ export class UomListComponent implements OnInit {
       }
     });
   }
+
+  onExporting(event: any) {
+      const fileName = 'uom-list';
+      this.dataservice.exportDataGrid(event, fileName);
+  }
+
 }
 @NgModule({
   imports: [

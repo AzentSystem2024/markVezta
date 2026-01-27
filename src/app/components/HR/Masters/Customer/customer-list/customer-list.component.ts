@@ -33,7 +33,8 @@ import {
 } from '../customer-form/customer-form.component';
 import { CustomerEditFormModule } from '../customer-edit-form/customer-edit-form.component';
 import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.component';
-import { Router } from '@angular/router';
+import { Router } from '@angular/router'
+import DataSource from 'devextreme/data/data_source';
 @Component({
   selector: 'app-customer-list',
   templateUrl: './customer-list.component.html',
@@ -44,7 +45,9 @@ export class CustomerListComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   // @ViewChild(SFormComponent) supplierForm!: SupplierFormComponent;
-  customer: any;
+  CustomerDataSource: DataSource;
+  customerList: any[] = [];
+  customerRowCount = 0;
   country: any;
   selected_Company_id: any = null; // or ''
 
@@ -200,9 +203,17 @@ export class CustomerListComponent {
     this.showCustomer();
     this.sesstion_Details();
   }
+  // onExporting(event: any) {
+  //   this.exportService.onExporting(event, 'Customer-list');
+  // }
+
+  //========================Export data ==========================
   onExporting(event: any) {
-    this.exportService.onExporting(event, 'Customer-list');
+    const fileName = 'customer-list';
+    this.dataservice.exportDataGrid(event, fileName);
   }
+
+
   addCustomer() {
     this.isAddCustomerPopupOpened = true;
     this.sesstion_Details();
@@ -252,18 +263,37 @@ export class CustomerListComponent {
     );
   }
   showCustomer() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataservice.getCustomerData(payload).subscribe((response: any) => {
-      console.log(response);
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+  };
 
-      this.customer = response.map((item: any, index: number) => ({
-        ...item,
-        SNO: index + 1, // serial number starts from 1
-      }));
-    });
-  }
+  this.CustomerDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getCustomerData(payload).subscribe({
+          next: (response: any[]) => {
+            const data = (response || []).map(
+              (item: any, index: number) => ({
+                ...item,
+                SNO: index + 1,
+              }),
+            );
+
+            this.customerList = data;           // ✅ array cache
+            this.customerRowCount = data.length;
+
+            resolve(data);                      // 🔑 stop grid loader
+          },
+          error: () => {
+            this.customerList = [];
+            this.customerRowCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   // showCustomer(){
   //    this.dataservice.getCustomerData().subscribe(
@@ -353,11 +383,11 @@ export class CustomerListComponent {
     this.showCustomer();
 
     // OR Option B: Update the existing row in the list directly
-    const index = this.customer.findIndex(
+    const index = this.customerList.findIndex(
       (c) => c.CUST_CODE === updatedCustomer.CUST_CODE,
     );
     if (index > -1) {
-      this.customer[index] = { ...updatedCustomer };
+      this.customerList[index] = { ...updatedCustomer };
     }
 
     this.isEditCustomerPopupOpened = false; // close popup if needed

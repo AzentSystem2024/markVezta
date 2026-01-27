@@ -4,7 +4,7 @@
       #dataGrid
       noDataText="No data available"
       [width]="'100%'"
-      [height]="'75vh'"
+      [height]="'82vh'"
       [loadPanel]="{
         enabled: true,
         text: 'Loading...',
@@ -12,7 +12,7 @@
         showPane: true,
       }"
       class="grid theme-dependent"
-      [dataSource]="ArticleProductionDatasource"
+      [dataSource]="ArticleProductionDataSource"
       [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
@@ -56,7 +56,11 @@
         <dxi-item location="before">
           <div class="custom-toolbar-stack">
             <div class="grid-header">Article Production view</div>
-            <dx-select-box
+          </div>
+        </dxi-item>
+
+        <dxi-item location ="before">
+          <dx-select-box
               [dataSource]="dateRanges"
               [displayExpr]="'label'"
               valueExpr="value"
@@ -70,12 +74,12 @@
                 {{ item.value === "custom" ? "Custom" : item.label }}
               </div>
             </dx-select-box>
-          </div>
         </dxi-item>
 
         <dxi-item location="after">
-          <div class="toolbar-margin-top">
+          <div>
             <dx-tag-box
+              class="mb-2"
               [items]="CompanyDetails"
               valueExpr="COMPANY_ID"
               displayExpr="COMPANY_NAME"

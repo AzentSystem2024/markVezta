@@ -4,7 +4,7 @@
       #dataGrid
       noDataText="No data available"
       [width]="'100%'"
-      [height]="'75vh'"
+      [height]="'82vh'"
       [loadPanel]="{
         enabled: true,
         text: 'Loading...',
@@ -12,7 +12,7 @@
         showPane: true,
       }"
       class="grid theme-dependent"
-      [dataSource]="packingList"
+      [dataSource]="PackingDataSource"
       [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
@@ -32,6 +32,7 @@
       (onEditingStart)="onEditPacking($event)"
       (onRowRemoving)="delete_Packing_Data($event)"
       (onToolbarPreparing)="onToolbarPreparing($event)"
+      (onExporting)="onExporting($event)"
     >
       <dxo-editing
         mode="popup"
@@ -53,6 +54,13 @@
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row>
+
+      <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="false"
+      [formats]="['xlsx']"
+    >
+    </dxo-export>
       <!-- <dxo-header-filter [visible]="isFilterOpened">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter> -->
@@ -78,11 +86,19 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
 
-        <!-- Search -->
-        <!-- Divider -->
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
+        <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="toolbar-icon-btn export-btn"
+      ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+
         <dxi-item
           location="after"
           widget="dxButton"

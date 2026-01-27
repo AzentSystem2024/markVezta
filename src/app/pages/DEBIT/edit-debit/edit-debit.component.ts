@@ -89,7 +89,9 @@ export class EditDebitComponent {
   @ViewChild('narrationRef', { static: false })
   narrationRef!: DxTextBoxComponent;
   @ViewChild('saveButtonRef', { static: false }) saveButtonRef!: any;
-  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
+  @ViewChild('itemsGridRef', { static: false })
+  itemsGridRef!: DxDataGridComponent;
+
   netAmountDisplay: any;
   formattedTransDate: string;
   userId: any;
@@ -114,6 +116,8 @@ export class EditDebitComponent {
   companyState: any;
   selectedCompany: any;
   distributorList: any;
+
+  isUpdating = false;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -147,7 +151,7 @@ export class EditDebitComponent {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
   }
 
@@ -177,6 +181,10 @@ export class EditDebitComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['debitFormData'] && this.debitFormData?.length) {
       const data = this.debitFormData[0];
+
+      setTimeout(() => {
+        this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
+      });
 
       this.debitFormData = [...this.debitFormData];
       this.debitFormData.PARTY_NAME = data.PARTY_NAME;
@@ -216,41 +224,46 @@ export class EditDebitComponent {
       // -----------------------------
       // STEP 3: BUILD GRID ROWS
       // -----------------------------
-      this.getLedgerCodeDropdown().then(() => {
-        this.noteDetails = (data.NOTE_DETAIL || []).map(
-          (item: any, index: number) => {
-            const match = this.ledgerList.find(
-              (l: any) => l.HEAD_ID === item.HEAD_ID
-            );
-            return {
-              SL_NO: index + 1,
-              ...item,
-              ledgerCode: match?.HEAD_CODE || '',
-              ledgerName: match?.HEAD_NAME || '',
-              particulars: item.REMARKS || '',
-              Amount: item.AMOUNT || '',
-              gstAmount: item.GST_AMOUNT || '',
-              HSN_CODE: item.HSN_CODE || this.HSNCODE,
-              GST_PERC: item.GST_PERC || 0,
-              CGST: item.CGST || 0,
-              SGST: item.SGST || 0,
-            };
-          }
-        );
+      this.getLedgerCodeDropdown()
+        .then(() => {
+          this.noteDetails = (data.NOTE_DETAIL || []).map(
+            (item: any, index: number) => {
+              const match = this.ledgerList.find(
+                (l: any) => l.HEAD_ID === item.HEAD_ID,
+              );
+              return {
+                SL_NO: index + 1,
+                ...item,
+                ledgerCode: match?.HEAD_CODE || '',
+                ledgerName: match?.HEAD_NAME || '',
+                particulars: item.REMARKS || '',
+                Amount: item.AMOUNT || '',
+                gstAmount: item.GST_AMOUNT || '',
+                HSN_CODE: item.HSN_CODE || this.HSNCODE,
+                GST_PERC: item.GST_PERC || 0,
+                CGST: item.CGST || 0,
+                SGST: item.SGST || 0,
+              };
+            },
+          );
 
-        if (this.noteDetails.length === 0) {
-          this.noteDetails.push({
-            SL_NO: 1,
-            ledgerCode: '',
-            ledgerName: '',
-            particulars: '',
-            Amount: '',
-            gstAmount: '',
-            HSN_CODE: '',
-            HEAD_ID: null,
-          });
-        }
-      });
+          if (this.noteDetails.length === 0) {
+            this.noteDetails.push({
+              SL_NO: 1,
+              ledgerCode: '',
+              ledgerName: '',
+              particulars: '',
+              Amount: '',
+              gstAmount: '',
+              HSN_CODE: '',
+              HEAD_ID: null,
+            });
+          }
+        })
+        .finally(() => {
+          // 🟢 STOP GRID LOADING
+          this.itemsGridRef?.instance?.endCustomLoading();
+        });
     }
   }
 
@@ -260,7 +273,7 @@ export class EditDebitComponent {
 
     // Prevent adding if any existing row is incomplete
     const hasIncompleteRow = rows.some(
-      (r: any) => !r.data.ledgerName || !r.data.Amount
+      (r: any) => !r.data.ledgerName || !r.data.Amount,
     );
     if (hasIncompleteRow) {
       return;
@@ -357,7 +370,7 @@ export class EditDebitComponent {
       this.supplierList = response;
       console.log(
         this.supplierList,
-        'distributorList=============================='
+        'distributorList==============================',
       );
     });
   }
@@ -379,7 +392,7 @@ export class EditDebitComponent {
     console.log(this.selectedSupplierId);
 
     const selectedSupplier = this.distributorList.find(
-      (supplier: any) => supplier.ID === this.selectedSupplierId
+      (supplier: any) => supplier.ID === this.selectedSupplierId,
     );
 
     console.log(selectedSupplier);
@@ -431,7 +444,7 @@ export class EditDebitComponent {
       this.debitFormData.SUPP_ID = this.selectedSupplierId;
       console.log(
         this.selectedSupplierId,
-        'SELECTEDSUPPLIERIDDDDDDDDDDDDDDDDDD'
+        'SELECTEDSUPPLIERIDDDDDDDDDDDDDDDDDD',
       );
       this.getPendingInvoices(); // Pass supplier ID here
     } else {
@@ -455,7 +468,7 @@ export class EditDebitComponent {
       this.debitFormData.INVOICE_NO,
       this.debitFormData.DUE_AMOUNT,
       this.debitFormData.INVOICE_ID,
-      '=============+++++++++++++++++++++++++++++++++++++'
+      '=============+++++++++++++++++++++++++++++++++++++',
     );
     this.invoicePopupVisible = false;
   }
@@ -475,7 +488,7 @@ export class EditDebitComponent {
         if (savedData && savedData.INVOICE_NO) {
           const exists = this.pendingInvoicelist.some(
             (inv: any) =>
-              String(inv.INVOICE_NO) === String(savedData.INVOICE_NO)
+              String(inv.INVOICE_NO) === String(savedData.INVOICE_NO),
           );
 
           if (!exists) {
@@ -620,7 +633,7 @@ export class EditDebitComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -640,11 +653,11 @@ export class EditDebitComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           console.log(
             'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex
+            rowIndex,
           );
 
           setTimeout(() => {
@@ -680,7 +693,7 @@ export class EditDebitComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
 
         e.setValue(args.value);
@@ -690,12 +703,12 @@ export class EditDebitComponent {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
 
           // 2️⃣ Get HSN & GST from session
           const sessionData = JSON.parse(
-            sessionStorage.getItem('savedUserData')
+            sessionStorage.getItem('savedUserData'),
           );
           // DO NOT TOUCH GST HERE
           // GST already exists from saved data
@@ -704,7 +717,7 @@ export class EditDebitComponent {
             e.component.cellValue(
               rowIndex,
               'HSN_CODE',
-              this.noteDetails[0]?.HSN_CODE || this.HSNCODE
+              this.noteDetails[0]?.HSN_CODE || this.HSNCODE,
             );
           }
 
@@ -729,14 +742,14 @@ export class EditDebitComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -996,6 +1009,12 @@ export class EditDebitComponent {
   }
 
   updateDebitNote() {
+    if (this.isUpdating) {
+      return;
+    }
+
+    this.isUpdating = true;
+
     const details = this.noteDetails || [];
     let totalAmount = 0;
     let totalGST = 0;
@@ -1021,8 +1040,9 @@ export class EditDebitComponent {
       console.log('approved???????????????????????????????????');
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit'
+        'Confirm Commit',
       ).then((result) => {
+        this.isUpdating = true;
         if (result) {
           const payload = {
             TRANS_ID: this.debitFormData[0].TRANS_ID,
@@ -1033,9 +1053,7 @@ export class EditDebitComponent {
             STORE_ID: 1,
             TRANS_DATE: this.formatDate(this.debitFormData[0].TRANS_DATE),
             TRANS_STATUS: 1,
-            NARRATION:
-              this.debitFormData[0].NARRATION ||
-              'Update Details of Credit Note',
+            NARRATION: this.debitFormData[0].NARRATION,
             INVOICE_ID: this.debitFormData[0].INVOICE_ID || 0,
             INVOICE_NO: this.debitFormData[0].INVOICE_NO || '',
             SUPP_ID: this.debitFormData[0].SUPP_ID || 0,
@@ -1053,13 +1071,13 @@ export class EditDebitComponent {
                   item.gstAmount ||
                   item.particulars ||
                   item.SGST ||
-                  item.CGST
+                  item.CGST,
               )
               .map((item: any, index: number) => {
                 const match = this.ledgerList.find(
                   (l) =>
                     l.HEAD_CODE === item.ledgerCode ||
-                    l.HEAD_NAME === item.ledgerName
+                    l.HEAD_NAME === item.ledgerName,
                 );
                 const gstAmount = this.calculateTaxAmount(item);
                 return {
@@ -1090,21 +1108,25 @@ export class EditDebitComponent {
               if (response.flag === 1) {
                 notify('Debit Note approved successfully!', 'success', 3000);
                 this.popupClosed.emit(); // Close popup
+                this.isUpdating = false;
               } else {
                 notify(`Approval failed: ${response.Message}`, 'error', 4000);
+                this.isUpdating = false;
               }
             },
             (error) => {
               console.error('Approval error:', error);
               alert('Something went wrong while approving');
-            }
+              this.isUpdating = false;
+            },
           );
         } else {
           // ❌ User cancelled commit
           notify('Approval cancelled.', 'info', 2000);
+          this.isUpdating = false;
         }
       });
-
+      this.isUpdating = false;
       return; // 🚫 Prevent running normal update block
     } else {
       const payload = {
@@ -1115,8 +1137,7 @@ export class EditDebitComponent {
         STORE_ID: this.selectedstoreId,
         TRANS_DATE: this.formatDate(this.transDate),
         TRANS_STATUS: 1,
-        NARRATION:
-          this.debitFormData[0].NARRATION || 'Update Details of Credit Note',
+        NARRATION: this.debitFormData[0].NARRATION,
         INVOICE_ID: this.debitFormData[0].INVOICE_ID || 0,
         INVOICE_NO: this.debitFormData[0].INVOICE_NO || '',
         SUPP_ID: this.debitFormData[0].SUPP_ID || 0,
@@ -1134,13 +1155,13 @@ export class EditDebitComponent {
               item.gstAmount ||
               item.particulars ||
               item.CGST ||
-              item.SGST
+              item.SGST,
           )
           .map((item: any, index: number) => {
             const match = this.ledgerList.find(
               (l) =>
                 l.HEAD_CODE === item.ledgerCode ||
-                l.HEAD_NAME === item.ledgerName
+                l.HEAD_NAME === item.ledgerName,
             );
             const gstAmount = this.calculateTaxAmount(item);
             return {
@@ -1175,10 +1196,11 @@ export class EditDebitComponent {
               message: 'Debit Note Updated Successfully',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.popupClosed.emit();
           this.resetDebitNoteForm();
+          this.isUpdating = false;
         }
       });
     }

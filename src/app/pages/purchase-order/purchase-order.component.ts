@@ -279,6 +279,69 @@ export class PurchaseOrderComponent {
     }
   }
 
+  private getDateRange(): { fromDate: string | null; toDate: string | null } {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'all':
+        return { fromDate: null, toDate: null };
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+    }
+
+    return {
+      fromDate: fromDate ? this.formatDate(fromDate) : null,
+      toDate: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+
+  private formatDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
@@ -446,47 +509,59 @@ export class PurchaseOrderComponent {
   }
 
   getPurchaseOrderList() {
+    const grid = this.dataGrid?.instance;
+    grid?.beginCustomLoading('Loading...');
+
+    const { fromDate, toDate } = this.getDateRange();
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: fromDate,
+      DATE_TO: toDate,
     };
-    this.service.getPurchaseOrderList(payload).subscribe((res) => {
-      this.dataSource = res.data
-        .map((item: any) => {
-          let dateValue: Date | null = null;
 
-          if (item.PO_DATE) {
-            if (typeof item.PO_DATE === 'string') {
-              // Handle dd-MM-yyyy
-              const parts = item.PO_DATE.split('T')[0].split('-');
+    this.service.getPurchaseOrderList(payload).subscribe({
+      next: (res: any) => {
+        this.dataSource = (res.data || [])
+          .map((item: any) => {
+            let dateValue: Date | null = null;
 
-              if (parts[0].length === 2) {
-                // dd-MM-yyyy
-                const day = Number(parts[0]);
-                const month = Number(parts[1]) - 1;
-                const year = Number(parts[2]);
-                dateValue = new Date(year, month, day);
+            if (item.PO_DATE) {
+              if (typeof item.PO_DATE === 'string') {
+                const parts = item.PO_DATE.split('T')[0].split('-');
+
+                if (parts[0].length === 2) {
+                  // dd-MM-yyyy
+                  const day = Number(parts[0]);
+                  const month = Number(parts[1]) - 1;
+                  const year = Number(parts[2]);
+                  dateValue = new Date(year, month, day);
+                } else {
+                  dateValue = new Date(item.PO_DATE);
+                }
               } else {
-                // ISO or yyyy-MM-dd
                 dateValue = new Date(item.PO_DATE);
               }
-            } else {
-              dateValue = new Date(item.PO_DATE);
             }
-          }
 
-          return {
-            ...item,
-            PO_DATE: dateValue, // ✅ ALWAYS Date
-          };
-        })
+            return {
+              ...item,
+              PO_DATE: dateValue,
+            };
+          })
+          .sort((a: any, b: any) => {
+            const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+            const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+            return numB - numA;
+          });
 
-        .sort((a: any, b: any) => {
-          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-          return numB - numA; // descending order
-        });
-
-      this.applyDateFilter();
+        // ✅ SAME AS PRODUCTION JV
+        this.filteredPOList = this.dataSource;
+      },
+      error: () => {},
+      complete: () => {
+        grid?.endCustomLoading();
+      },
     });
   }
 
@@ -494,17 +569,19 @@ export class PurchaseOrderComponent {
     this.selectedDateRange = e.value;
 
     if (e.value === 'custom') {
-      this.customStartDate = null;
-      this.customEndDate = null;
       this.showCustomDatePopup = true;
-    } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
+      return;
     }
+
+    // reset custom label
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+    );
+
+    this.customStartDate = null;
+    this.customEndDate = null;
+
+    this.getPurchaseOrderList();
   }
 
   applyDateFilter() {
@@ -560,29 +637,26 @@ export class PurchaseOrderComponent {
   }
 
   applyCustomDateFilter() {
-    if (!(this.customStartDate && this.customEndDate)) return;
+    if (!this.customStartDate || !this.customEndDate) return;
 
-    const start = new Date(this.customStartDate);
-    start.setHours(0, 0, 0, 0);
+    if (this.customStartDate > this.customEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
 
-    const end = new Date(this.customEndDate);
-    end.setHours(23, 59, 59, 999);
-
-    this.filteredPOList = this.dataSource.filter((item: any) => {
-      const invoiceDate = item.PO_DATE;
-      return invoiceDate >= start && invoiceDate <= end;
-    });
-
-    const fromLabel = this.formatAsDDMMYYYY(start);
-    const toLabel = this.formatAsDDMMYYYY(end);
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
-        ? { ...option, label: `${fromLabel} to ${toLabel}` }
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
         : option,
     );
 
+    this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
+
+    this.getPurchaseOrderList();
   }
 
   private parseDateString(dateStr: string): Date {

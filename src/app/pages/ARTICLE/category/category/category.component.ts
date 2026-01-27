@@ -52,6 +52,7 @@ import {
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
 @Component({
   selector: 'app-category',
   templateUrl: './category.component.html',
@@ -82,7 +83,9 @@ export class CategoryComponent {
   isPackagesPopup: boolean = false;
   selectedTabIndex = 0;
   list_packs: any = [];
-  CategoryList: any = [];
+  CategoryDataSource: DataSource;
+  CategoryList: any[] = [];   // 🔑 KEEP for duplicates & logic
+  categoryRowCount = 0;
   sizeOptions: number[] = [];
   selected_Data: any = {};
   datasss: any;
@@ -553,18 +556,33 @@ export class CategoryComponent {
 
   //===============list of data================
   get_list_data_category() {
-    // const payload = {
-    //   COMPANY_ID: this.selected_Company_id,
-    // };
-    this.dataservice.list_of_category().subscribe((res: any) => {
-      console.log(res);
-      // this.CategoryList = res.CATEGORIES;
-      this.CategoryList = res.CATEGORIES.map((item: any, index: number) => ({
-        ...item,
-        SNO: index + 1,
-      }));
-    });
-  }
+  this.CategoryDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.list_of_category().subscribe({
+          next: (res: any) => {
+            const data = (res?.CATEGORIES || []).map(
+              (item: any, index: number) => ({
+                ...item,
+                SNO: index + 1,
+              }),
+            );
+
+            this.CategoryList = data;          // ✅ array cache
+            this.categoryRowCount = data.length;
+
+            resolve(data);                     // 🔑 stop loader
+          },
+          error: () => {
+            this.CategoryList = [];
+            this.categoryRowCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   //=============================ADD DATA========================
   AddData() {
@@ -942,6 +960,13 @@ export class CategoryComponent {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
       this.get_list_data_category();
     }
+  }
+
+  
+  //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'category';
+    this.dataservice.exportDataGrid(event, fileName);
   }
 }
 

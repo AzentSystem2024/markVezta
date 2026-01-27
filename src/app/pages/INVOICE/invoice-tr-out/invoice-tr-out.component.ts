@@ -186,40 +186,111 @@ export class InvoiceTrOutComponent {
   }
 
   getInvoiceList() {
+    const grid = this.dataGrid?.instance;
+    grid?.beginCustomLoading('Loading...');
+
+    const { fromDate, toDate } = this.getDateRange();
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: fromDate,
+      DATE_TO: toDate,
     };
 
-    this.dataService
-      .getInvoiceMainListTrOut(payload)
-      .subscribe((response: any) => {
-        this.invoiceList = response.Data.map((item: any) => {
-          // ---- Date normalization (unchanged) ----
-          let saleDate = item.INVOICE_DATE;
-          let dateValue: Date;
+    this.dataService.getInvoiceMainListTrOut(payload).subscribe({
+      next: (response: any) => {
+        this.invoiceList = (response.Data || [])
+          .map((item: any) => {
+            let dateValue: Date;
 
-          if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
-            const [day, month, year] = saleDate.split('-').map(Number);
-            dateValue = new Date(year, month - 1, day);
-          } else {
-            dateValue = new Date(saleDate);
-          }
+            if (/^\d{2}-\d{2}-\d{4}$/.test(item.INVOICE_DATE)) {
+              const [d, m, y] = item.INVOICE_DATE.split('-').map(Number);
+              dateValue = new Date(y, m - 1, d);
+            } else {
+              dateValue = new Date(item.INVOICE_DATE);
+            }
 
-          // ---- Extract numeric part of DOC_NO safely ----
-          const match = item.DOC_NO?.match(/\d+$/); // last number
-          const docNoNumber = match ? Number(match[0]) : 0;
+            const match = item.DOC_NO?.match(/\d+$/);
+            const docNoNumber = match ? Number(match[0]) : 0;
 
-          return {
-            ...item,
-            INVOICE_DATE: dateValue,
-            _docNoNumber: docNoNumber, // helper field
-          };
-        })
-          // ✅ DESCENDING → latest first
+            return {
+              ...item,
+              INVOICE_DATE: dateValue,
+              _docNoNumber: docNoNumber,
+            };
+          })
           .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
 
-        this.applyDateFilter();
-      });
+        // ✅ SAME AS PRODUCTION JV
+        this.filteredInvoiceList = this.invoiceList;
+      },
+      error: () => {},
+      complete: () => {
+        grid?.endCustomLoading();
+      },
+    });
+  }
+
+  private getDateRange(): { fromDate: string | null; toDate: string | null } {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'all':
+        return { fromDate: null, toDate: null };
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+    }
+
+    return {
+      fromDate: fromDate ? this.formatDate(fromDate) : null,
+      toDate: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+  private formatDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   refreshGrid() {
@@ -263,17 +334,19 @@ export class InvoiceTrOutComponent {
     this.selectedDateRange = e.value;
 
     if (e.value === 'custom') {
-      this.customStartDate = null;
-      this.customEndDate = null;
       this.showCustomDatePopup = true;
-    } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
+      return;
     }
+
+    // reset custom label
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+    );
+
+    this.customStartDate = null;
+    this.customEndDate = null;
+
+    this.getInvoiceList();
   }
 
   sesstion_Details() {
@@ -349,29 +422,27 @@ export class InvoiceTrOutComponent {
   }
 
   applyCustomDateFilter() {
-    if (!(this.customStartDate && this.customEndDate)) return;
+    if (!this.customStartDate || !this.customEndDate) return;
 
-    const start = new Date(this.customStartDate);
-    start.setHours(0, 0, 0, 0);
+    if (this.customStartDate > this.customEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
 
-    const end = new Date(this.customEndDate);
-    end.setHours(23, 59, 59, 999);
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
-    this.filteredInvoiceList = this.invoiceList.filter((item: any) => {
-      const invoiceDate = item.INVOICE_DATE;
-      return invoiceDate >= start && invoiceDate <= end;
-    });
-
-    const fromLabel = this.formatAsDDMMYYYY(start);
-    const toLabel = this.formatAsDDMMYYYY(end);
-
+    // 🔑 update label
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
-        ? { ...option, label: `${fromLabel} to ${toLabel}` }
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
         : option,
     );
 
+    this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
+
+    this.getInvoiceList();
   }
 
   private parseDateString(dateStr: string): Date {

@@ -1,10 +1,11 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
     <dx-data-grid
+      class="grid theme-dependent"
       height="100%"
-      [dataSource]="Ledger_statement_datasource"
-      noDataText=""
-      width="'80vh'"
+      [dataSource]="JournalBookDataSource"
+      noDataText="No data available"
+      [height]="'79vh'"
       [showBorders]="true"
       [showColumnLines]="true"
       [columnAutoWidth]="true"
@@ -151,7 +152,7 @@
   alignment="right">
 </dxi-column> -->
       <dxi-column
-        *ngIf="Ledger_statement_datasource?.length > 0"
+        *ngIf="journalBookCount> 0"
         type="buttons"
         [width]="100"
       >

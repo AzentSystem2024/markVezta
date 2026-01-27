@@ -188,36 +188,119 @@ export class DebitComponent {
   }
 
   getDebitNoteList() {
+    const grid = this.dataGrid?.instance;
+    grid?.beginCustomLoading('Loading...');
+
+    const datePayload = this.getDateRangePayload();
+
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
     };
-    this.dataService.getDebitNoteList(payload).subscribe((response: any) => {
-      this.debitList = response.Data.map((item: any) => {
-        let dateValue: Date;
 
-        // Always parse TRANS_DATE as dd-MM-yyyy manually
-        if (
-          typeof item.TRANS_DATE === 'string' &&
-          item.TRANS_DATE.includes('-')
-        ) {
-          const [day, month, year] = item.TRANS_DATE.split('-').map(Number);
-          dateValue = new Date(year, month - 1, day);
-        } else {
-          dateValue = new Date(item.TRANS_DATE);
-        }
+    this.dataService.getDebitNoteList(payload).subscribe({
+      next: (response: any) => {
+        this.debitList = (response.Data || [])
+          .map((item: any) => {
+            let dateValue: Date;
 
-        return {
-          ...item,
-          TRANS_DATE: dateValue,
-        };
-      }).sort((a: any, b: any) => {
-        const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-        const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-        return numB - numA; // descending
-      });
+            if (
+              typeof item.TRANS_DATE === 'string' &&
+              item.TRANS_DATE.includes('-')
+            ) {
+              const [day, month, year] = item.TRANS_DATE.split('-').map(Number);
+              dateValue = new Date(year, month - 1, day);
+            } else {
+              dateValue = new Date(item.TRANS_DATE);
+            }
 
-      this.applyDateFilter();
+            return {
+              ...item,
+              TRANS_DATE: dateValue,
+            };
+          })
+          .sort((a: any, b: any) => {
+            const aNo = parseInt(a.DOC_NO.split('/').pop(), 10);
+            const bNo = parseInt(b.DOC_NO.split('/').pop(), 10);
+            return bNo - aNo;
+          });
+
+        // ✅ bind once
+        this.filteredJournalVoucherList = this.debitList;
+        this.isEmptyDatagrid = this.debitList.length === 0;
+      },
+      error: () => {},
+      complete: () => {
+        grid?.endCustomLoading();
+      },
     });
+  }
+
+  private getDateRangePayload(): {
+    DATE_FROM: string | null;
+    DATE_TO: string | null;
+  } {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+    }
+
+    return {
+      DATE_FROM: fromDate ? this.formatDate(fromDate) : null,
+      DATE_TO: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+
+  private formatDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   refreshGrid() {
@@ -257,17 +340,18 @@ export class DebitComponent {
     this.selectedDateRange = e.value;
 
     if (e.value === 'custom') {
-      this.customStartDate = null;
-      this.customEndDate = null;
       this.showCustomDatePopup = true;
-    } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
+      return;
     }
+
+    this.customStartDate = null;
+    this.customEndDate = null;
+
+    this.dateRanges = this.dateRanges.map((opt) =>
+      opt.value === 'custom' ? { ...opt, label: 'Custom' } : opt,
+    );
+
+    this.getDebitNoteList();
   }
 
   toggleFilters() {
@@ -349,30 +433,26 @@ export class DebitComponent {
   }
 
   applyCustomDateFilter() {
-    if (!(this.customStartDate && this.customEndDate)) return;
+    if (!this.customStartDate || !this.customEndDate) return;
 
-    const start = new Date(this.customStartDate);
-    start.setHours(0, 0, 0, 0);
+    if (this.customStartDate > this.customEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
 
-    const end = new Date(this.customEndDate);
-    end.setHours(23, 59, 59, 999);
-
-    this.filteredJournalVoucherList = this.debitList.filter((item: any) => {
-      // const journalDate = this.parseDateString(item.TRANS_DATE);
-      const journalDate = item.TRANS_DATE;
-      return journalDate >= start && journalDate <= end;
-    });
-
-    const fromLabel = this.formatAsDDMMYYYY(start);
-    const toLabel = this.formatAsDDMMYYYY(end);
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
-        ? { ...option, label: `${fromLabel} to ${toLabel}` }
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
         : option,
     );
 
+    this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
+
+    this.getDebitNoteList();
   }
 
   private parseDateString(dateStr: string): Date {

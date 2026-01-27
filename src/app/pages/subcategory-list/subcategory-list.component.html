@@ -1,14 +1,16 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
 <dx-data-grid
   [showColumnLines]="true"
   class="grid theme-dependent"
-  [dataSource]="subCategory"
+  [dataSource]="SubCategoryDataSource"
   [rowAlternationEnabled]="true"
   rowAlternationInterval="2"
   (onRowRemoving)="onRowRemoving($event)"
   (onRowUpdating)="onRowUpdating($event)"
   [showBorders]="true"
   [width]="'100%'"
-  [height]="'75vh'"
+  [height]="'82vh'"
   [scrolling]="{ mode: 'virtual' }"
   (onEditingStart)="onEditSubcategory($event)"
 >
@@ -123,6 +125,8 @@
     </dxo-lookup>
   </dxi-column> -->
 </dx-data-grid>
+</div>
+</div>
 <form-popup
   [(visible)]="isAddSubcategoryPopupOpened"
   (save)="onClickSaveSubCategory()"

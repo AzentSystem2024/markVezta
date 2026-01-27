@@ -164,7 +164,7 @@ boxProductionForm!: BoxproductionJvAddComponent;
   isReadOnlyInvoice: boolean;
   isAddPopupVisible: boolean = false;
   selectedProduction: any;
-    isEditPopupVisible : boolean = false;
+  isEditPopupVisible: boolean = false;
   productionTypes = [
     { id: 'ARTICLE', name: 'Article Production' },
     { id: 'BOX', name: 'Box Production' },
@@ -720,7 +720,6 @@ boxProductionForm!: BoxproductionJvAddComponent;
   //     // this.isReadOnlyInvoice = status === 5;
   //     this.isEditPopupVisible = false;
 
-
   //     if (isArticle) {
   //       this.isEditPopupVisible = true;
   //     } else {
@@ -730,11 +729,11 @@ boxProductionForm!: BoxproductionJvAddComponent;
   //   });
   // }
 
-    onEditProduction(event: any) {
+  onEditProduction(event: any) {
     event.cancel = true;
 
     const productionId = event.data.PRODUCTION_ID;
-    const status = event.data.TRANS_STATUS;
+    const status = event.data.STATUS;
 
     const isArticle = this.selectedProductionType === 'ARTICLE';
     const isBox = this.selectedProductionType === 'BOX';
@@ -745,24 +744,29 @@ boxProductionForm!: BoxproductionJvAddComponent;
 
     api$.subscribe((response: any) => {
       this.selectedProduction = response;
-      // this.isReadOnlyInvoice = status === 5;
+      this.isReadOnlyInvoice = status === '5';
 
       // reset both views first
       this.isEditPopupVisible = false;
+      this.isViewProduction = false;
       this.isViewBoxProduction = false;
-
+      if (status === '5') {
+        //  VIEW MODE
+        this.isViewProduction = true;
+      } else {
+        //  EDIT MODE
+        if (isArticle && status !== '5') {
+          this.isEditPopupVisible = true;
+        } else {
+          this.isViewBoxProduction = true;
+        }
+      }
       // open correct view
-      if (isArticle) {
-        this.isEditPopupVisible = true;
-      } else {
-        this.isViewBoxProduction = true;
-      }
-
-      if (isBox) {
-        this.isEditBoxPopupVisible = true;
-      } else {
-        this.isViewBoxProduction = true;
-      }
+      // if (isArticle) {
+      //   this.isEditPopupVisible = true;
+      // } else {
+      //   this.isViewBoxProduction = true;
+      // }
     });
   }
 

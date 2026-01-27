@@ -1,7 +1,7 @@
 <div class="view-wrapper list-page">
   <dx-data-grid
     class="grid theme-dependent"
-    [dataSource]="itemproperty2"
+    [dataSource]="ItemProperty2DataSource"
     [rowAlternationEnabled]="true"
     rowAlternationInterval="2"
     [showBorders]="true"
@@ -11,7 +11,7 @@
     [allowColumnResizing]="true"
     [showColumnLines]="true"
     [width]="'100%'"
-    [height]="'75vh'"
+    [height]="'82vh'"
     [scrolling]="{ mode: 'virtual' }"
     (onExporting)="onExporting($event)"
   >

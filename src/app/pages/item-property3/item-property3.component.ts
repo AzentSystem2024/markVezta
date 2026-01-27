@@ -21,6 +21,8 @@ import {
   ItemProperty3FormModule,
 } from 'src/app/components/library/item-property3-form/item-property3-form.component';
 import { AuthService, DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
+
 
 @Component({
   selector: 'app-item-property3',
@@ -36,7 +38,9 @@ export class ItemProperty3Component {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  itemproperty3: any;
+  ItemProperty3DataSource: DataSource;
+  itemProperty3Array: any[] = [];
+  itemProperty3Count = 0;
   isItemProperty3PopupOpened = false;
   itemlabel: any;
   isFilterRowVisible: boolean = false;
@@ -162,16 +166,34 @@ export class ItemProperty3Component {
       '============selected_Company_id==============',
     );
   }
+
   listItemProperty3() {
-    console.log('ITEMPROPERTYLISTTTTTTTTTTTTTTTTTTTTTTT');
-    const payload = {
-      COMPANY_ID: this.companyID,
-    };
-    console.log;
-    this.dataservice.getItemProperty3Data(payload).subscribe((response) => {
-      this.itemproperty3 = response;
-    });
-  }
+  const payload = {
+    COMPANY_ID: this.companyID,
+  };
+
+  this.ItemProperty3DataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getItemProperty3Data(payload).subscribe({
+          next: (response: any[]) => {
+            const list = response || [];
+
+            this.itemProperty3Array = list;   // 🔑 cache for logic
+            this.itemProperty3Count = list.length;
+
+            resolve(list);                    // 🔑 stops grid loader
+          },
+          error: () => {
+            this.itemProperty3Array = [];
+            this.itemProperty3Count = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   onClickSaveItemProperty3() {
     const { CODE, DESCRIPTION, COMPANY_ID } =
@@ -180,7 +202,7 @@ export class ItemProperty3Component {
     console.log('inserted data', CODE, DESCRIPTION, COMPANY_ID);
 
     // 🔐 Safety guards
-    const list = this.itemproperty3 || [];
+    const list = this.itemProperty3Array || [];
     const code = (CODE || '').trim().toLowerCase();
     const description = (DESCRIPTION || '').trim().toLowerCase();
 

@@ -24,6 +24,7 @@ import notify from 'devextreme/ui/notify';
 import { FormPopupModule } from 'src/app/components';
 import { DepartmentFormModule } from 'src/app/components/library/department-form/department-form.component';
 import { DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-article-brand',
@@ -39,7 +40,9 @@ export class ArticleBrandComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  Datasource: any[];
+  Datasource: DataSource;          // for grid + loader
+  articleBrandList: any[] = [];    // for forEach / validation
+  articleBrandRowCount = 0;        // for UI conditions
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
   showFilterRow: boolean = true;
@@ -206,16 +209,33 @@ export class ArticleBrandComponent {
   }
   //===================get data list========================
   get_ArticleBrand_List() {
-    this.dataservice.get_ArticleBrand_Api().subscribe((res: any) => {
-      if (res) {
-        this.Datasource = res.Data.map((item: any, index: any) => ({
-          ...item,
-          SlNo: index + 1, // Assign serial number
-        }));
-      }
-      console.log(res, 'response');
-    });
-  }
+  this.Datasource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.get_ArticleBrand_Api().subscribe({
+          next: (res: any) => {
+            const data = (res?.Data || []).map(
+              (item: any, index: number) => ({
+                ...item,
+                SlNo: index + 1,
+              }),
+            );
+
+            this.articleBrandList = data;           // ✅ array logic
+            this.articleBrandRowCount = data.length;
+
+            resolve(data);                          // 🔑 grid loader stops
+          },
+          error: () => {
+            this.articleBrandList = [];
+            this.articleBrandRowCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   addData() {
     const validationResult = this.formValidationGroup?.instance?.validate();
@@ -237,7 +257,7 @@ export class ArticleBrandComponent {
     let isCodeDuplicate = false;
     let isDescriptionDuplicate = false;
 
-    this.Datasource?.forEach((data: any) => {
+    this.articleBrandList?.forEach((data: any) => {
       const dataCode = data.CODE?.trim().toLowerCase();
       const dataDescription = data.DESCRIPTION?.trim().toLowerCase();
 
@@ -318,7 +338,7 @@ export class ArticleBrandComponent {
     let isCodeDuplicate = false;
     let isDescriptionDuplicate = false;
 
-    this.Datasource?.forEach((data: any) => {
+    this.articleBrandList?.forEach((data: any) => {
       const dataId = data.ID;
       const dataCode = data.CODE?.trim().toLowerCase();
       const dataDescription = data.DESCRIPTION?.trim().toLowerCase();
@@ -393,6 +413,12 @@ export class ArticleBrandComponent {
       );
       console.log(response, 'deleted');
     });
+  }
+
+  //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'article_brand';
+    this.dataservice.exportDataGrid(event, fileName);
   }
 }
 

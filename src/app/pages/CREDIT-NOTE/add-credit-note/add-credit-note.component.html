@@ -1,14 +1,5 @@
 <dx-validation-group #creditNoteGroup>
-  <div
-    class="invoice-wrapper"
-    style="
-      height: 75vh;
-      display: flex;
-      flex-direction: column;
 
-      box-sizing: border-box;
-    "
-  >
     <div class="salary-grid-wrapper" style="padding: 0 10px">
       <div class="grid-container">
         <dx-data-grid
@@ -23,7 +14,7 @@
           [allowColumnReordering]="true"
           [showColumnHeaders]="true"
           [allowColumnResizing]="true"
-          [height]="'55vh'"
+          [height]="'70vh'"
           [columnResizingMode]="'nextColumn'"
           [headerFilter]="{ visible: true }"
           [scrolling]="{ mode: 'virtual' }"
@@ -288,24 +279,23 @@
           <div
             style="
               display: flex;
-              flex-direction: column;
               gap: 10px;
-              width: 250px;
+              width: 750px;
             "
           >
-            <!-- Vehicle Number -->
-            <dx-text-box
-              label="Vehicle Number"
-              labelMode="floating"
-              [(value)]="creditFormData.VEHICLE_NO"
-              [width]="200"
-            ></dx-text-box>
-
             <!-- Narration -->
             <dx-text-box
               label="Narration"
               labelMode="floating"
               [(value)]="creditFormData.NARRATION"
+              [width]="400"
+            ></dx-text-box>
+
+            <!-- Vehicle Number -->
+            <dx-text-box
+              label="Vehicle Number"
+              labelMode="floating"
+              [(value)]="creditFormData.VEHICLE_NO"
               [width]="200"
             ></dx-text-box>
           </div>
@@ -333,25 +323,18 @@
         <div style="margin-top: 15px; padding: 0 0 0 5px"></div>
       </div>
     </div>
-  </div>
+
 </dx-validation-group>
 
-<div
-  style="
-    margin: 16px 0 8px 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-  "
->
-  <dx-check-box
-    text="Approve"
-    [(value)]="creditFormData.IS_APPROVED"
-  ></dx-check-box>
-</div>
+
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
+    <div>
+    <dx-check-box
+      text="Approve"
+      [(value)]="creditFormData.IS_APPROVED"
+    ></dx-check-box>
+  </div>
     <dx-button
       text="Cancel"
       (onClick)="cancel()"
@@ -361,7 +344,12 @@
     <dx-button
       #saveButtonRef
       id="saveBtn"
-      text="Save"
+      [text]="
+        isSaving
+          ? (creditFormData.IS_APPROVED ? 'Committing…' : 'Saving…')
+          : (creditFormData.IS_APPROVED ? 'Commit' : 'Save')
+      "
+      [disabled]="isSaving"
       (onClick)="saveCreditNote()"
       stylingMode="contained"
       type="default"

@@ -22,6 +22,7 @@ import { ExportService } from 'src/app/services/export.service';
 import { ItemProperty1EditModule } from 'src/app/components/library/item-property1-edit/item-property1-edit.component';
 import { Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-item-property1-list',
   templateUrl: './item-property1-list.component.html',
@@ -36,7 +37,9 @@ export class ItemProperty1ListComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  itemproperty1: any = [];
+  ItemProperty1DataSource: DataSource;
+  itemProperty1Array: any[] = [];
+  itemProperty1Count = 0;
   isItemProperty1PopupOpened = false;
   itemlabel: any;
   showFilterRow = true;
@@ -167,15 +170,32 @@ export class ItemProperty1ListComponent {
   }
 
   showItemProperty1() {
-    const payload = {
-      COMPANY_ID: this.companyID,
-    };
-    this.dataservice.getItemProperty1Data(payload).subscribe((response) => {
-      this.itemproperty1 = response;
-      console.log(response);
-      console.log('item label', this.itemlabel);
-    });
-  }
+  const payload = {
+    COMPANY_ID: this.companyID,
+  };
+
+  this.ItemProperty1DataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getItemProperty1Data(payload).subscribe({
+          next: (response: any[]) => {
+            const list = response || [];
+
+            this.itemProperty1Array = list;     // local cache
+            this.itemProperty1Count = list.length;
+
+            resolve(list);                      // 🔑 stops dx loader
+          },
+          error: () => {
+            this.itemProperty1Array = [];
+            this.itemProperty1Count = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
   onClickSaveItemProperty1() {
     const { CODE, DESCRIPTION, COMPANY_ID } =
       this.itemproperty1Component.getNewItemProperty1Data();
@@ -183,12 +203,12 @@ export class ItemProperty1ListComponent {
 
     // Check for duplicates in CategoryList
 
-    const isCodeDuplicate = this.itemproperty1.some(
+    const isCodeDuplicate = this.itemProperty1Array.some(
       // (item: any) => item.CODE === commonDetails.code
       (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
     );
 
-    const isDescriptionDuplicate = this.itemproperty1.some(
+    const isDescriptionDuplicate = this.itemProperty1Array.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) =>
         item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase(),

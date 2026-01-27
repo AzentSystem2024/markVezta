@@ -139,6 +139,9 @@ export class AddDebitComponent {
   companyStateID: any;
   selectedInvoiceGST: number;
   selectedInvoiceHSN: any;
+
+  isSaving = false;
+
   constructor(private dataService: DataService) {
     this.sessionData_tax();
   }
@@ -148,17 +151,17 @@ export class AddDebitComponent {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
       this.HSN_CODE,
-      '===========selected HSN CODE==================='
+      '===========selected HSN CODE===================',
     );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     console.log(
       this.GST_PERC,
-      '===========selected GST PERC==================='
+      '===========selected GST PERC===================',
     );
   }
 
@@ -255,7 +258,7 @@ export class AddDebitComponent {
       this.supplierList = response;
       console.log(
         this.supplierList,
-        'distributorList=============================='
+        'distributorList==============================',
       );
     });
   }
@@ -340,7 +343,7 @@ export class AddDebitComponent {
     this.selectedSupplierId = event.value;
 
     const selectedSupplier = this.distributorList.find(
-      (supplier: any) => supplier.ID === this.selectedSupplierId
+      (supplier: any) => supplier.ID === this.selectedSupplierId,
     );
 
     if (!selectedSupplier) return;
@@ -556,7 +559,7 @@ export class AddDebitComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -576,11 +579,11 @@ export class AddDebitComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           console.log(
             'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex
+            rowIndex,
           );
 
           setTimeout(() => {
@@ -616,7 +619,7 @@ export class AddDebitComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
 
         e.setValue(args.value);
@@ -626,7 +629,7 @@ export class AddDebitComponent {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
 
           // 2️⃣ Set HSN from SELECTED INVOICE (NOT SESSION)
@@ -634,7 +637,7 @@ export class AddDebitComponent {
             e.component.cellValue(
               rowIndex,
               'HSN_CODE',
-              this.selectedInvoiceHSN
+              this.selectedInvoiceHSN,
             );
           }
 
@@ -662,14 +665,14 @@ export class AddDebitComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -717,7 +720,7 @@ export class AddDebitComponent {
               setTimeout(() => {
                 const visibleRows = grid.getVisibleRows();
                 const newRowIndex = visibleRows.findIndex(
-                  (r) => r.data === newRow
+                  (r) => r.data === newRow,
                 );
 
                 // 🔥 FOCUS EXACTLY LIKE GST_PERC LOGIC
@@ -946,7 +949,7 @@ export class AddDebitComponent {
       'GST:',
       gstTotal,
       'Net Total:',
-      this.netAmountDisplay
+      this.netAmountDisplay,
     );
   }
 
@@ -1002,23 +1005,40 @@ export class AddDebitComponent {
   }
 
   callInsertAPI() {
-    this.dataService.insertDebitNote(this.debitFormData).subscribe(
+    if (this.isSaving) {
+      return;
+    }
+    this.isSaving = true;
+
+    const payload = JSON.parse(
+      JSON.stringify({
+        ...this.debitFormData,
+        TRANS_DATE: this.formatDate(this.debitFormData.TRANS_DATE),
+        ADD_TIME: this.formatDate(new Date()),
+        SALE_DATE: this.formatDate(new Date()),
+      }),
+    );
+    console.log('FRONTEND FINAL PAYLOAD:', JSON.stringify(payload, null, 2));
+
+    this.dataService.insertDebitNote(payload).subscribe(
       (response: any) => {
         notify(
           {
             message: 'Debit Note Saved Successfully',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
 
         this.popupClosed.emit();
         this.resetDebitNoteForm();
+        this.isSaving = false;
       },
       (error) => {
         notify('Failed to save Debit Note. Please try again.', 'error', 2000);
         console.error('Save error:', error);
-      }
+        this.isSaving = false;
+      },
     );
   }
 
@@ -1055,7 +1075,7 @@ export class AddDebitComponent {
         row.Amount ||
         row.GST_PERC ||
         row.gstAmount ||
-        row.particulars
+        row.particulars,
     );
 
     // ✅ 1. Form-level validations
@@ -1078,7 +1098,7 @@ export class AddDebitComponent {
     const invalidAmountRow = validRows.find(
       (row: any) =>
         (row.ledgerCode || row.ledgerName) &&
-        (!row.Amount || Number(row.Amount) === 0)
+        (!row.Amount || Number(row.Amount) === 0),
     );
 
     if (invalidAmountRow) {
@@ -1092,7 +1112,7 @@ export class AddDebitComponent {
         const ledger = this.ledgerList.find(
           (item: any) =>
             item.HEAD_CODE === row.ledgerCode ||
-            item.HEAD_NAME === row.ledgerName
+            item.HEAD_NAME === row.ledgerName,
         );
         const gstAmount = this.calculateTaxAmount(row);
         return {
@@ -1105,7 +1125,7 @@ export class AddDebitComponent {
           GST_AMOUNT: gstAmount,
           REMARKS: row.particulars || '',
         };
-      }
+      },
     );
 
     //  FINAL TAX CLEANUP (VERY IMPORTANT)
@@ -1124,8 +1144,14 @@ export class AddDebitComponent {
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
     this.debitFormData.STORE_ID = this.selectedstoreId;
     this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
+    // this.debitFormData.TRANS_DATE = this.formatDate(
+    //   this.debitFormData.TRANS_DATE
+    // );
     this.debitFormData.TRANS_DATE = this.formatDate(
-      this.debitFormData.TRANS_DATE
+      this.debitFormData.TRANS_DATE,
+    );
+    this.debitFormData.SALE_DATE = this.formatDate(
+      this.debitFormData.SALE_DATE,
     );
     this.debitFormData.COMPANY_ID = this.selectedCompany;
     console.log(this.debitFormData.NET_AMOUNT, 'NETAMOUNT');
@@ -1134,7 +1160,7 @@ export class AddDebitComponent {
     if (this.debitFormData.IS_APPROVED) {
       const result = confirm(
         'A new Debit Note will be created and approved. Do you want to continue?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
 
       result.then((dialogResult) => {
@@ -1198,7 +1224,7 @@ export class AddDebitComponent {
       (r: any) =>
         (!r.ledgerCode || r.ledgerCode === '') &&
         (!r.ledgerName || r.ledgerName === '') &&
-        (!r.Amount || r.Amount === 0)
+        (!r.Amount || r.Amount === 0),
     );
   }
 

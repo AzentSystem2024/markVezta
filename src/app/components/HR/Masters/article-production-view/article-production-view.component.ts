@@ -29,6 +29,8 @@ import {
 } from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
+
 
 @Component({
   selector: 'app-article-production-view',
@@ -38,7 +40,9 @@ import { DataService } from 'src/app/services';
 export class ArticleProductionViewComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-  ArticleProductionDatasource: any[];
+  ArticleProductionDataSource: DataSource;
+articleProductionArray: any[] = [];
+articleProductionCount = 0;
   isFilterRowVisible: boolean;
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -168,7 +172,7 @@ export class ArticleProductionViewComponent {
   applyDateFilter() {
     console.log('apply filter button called===========');
     if (!this.selectedDateRange || !this.listofArticlesView) {
-      this.ArticleProductionDatasource = this.listofArticlesView;
+      this.ArticleProductionDataSource = this.listofArticlesView;
       return;
     }
 
@@ -197,7 +201,7 @@ export class ArticleProductionViewComponent {
       //   startDate.setHours(0, 0, 0, 0);
       //   break;
       default:
-        this.ArticleProductionDatasource = this.listofArticlesView;
+        this.ArticleProductionDataSource = this.listofArticlesView;
         return;
     }
 
@@ -339,44 +343,41 @@ export class ArticleProductionViewComponent {
   }
 
   get_DataSource() {
-    console.log(this.selectedDateRange, '=====selected date range=====');
+  const from = new Date(this.startDate);
+  from.setHours(0, 0, 0, 0);
 
-    console.log(this.startDate, this.EndDate, '=========date----===---==');
+  const to = new Date(this.EndDate);
+  to.setHours(23, 59, 59, 999);
 
-    // Format start date to 00:00:00
-    const from = new Date(this.startDate);
-    from.setHours(0, 0, 0, 0);
+  const payload = {
+    COMPANY_ID: this.company_id.join(','),
+    DATE_FROM: from.toISOString(),
+    DATE_TO: to.toISOString(),
+  };
 
-    // Format end date to 23:59:59
-    const to = new Date(this.EndDate);
-    to.setHours(23, 59, 59, 999);
+  this.ArticleProductionDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.get_ArticleProduction_view(payload).subscribe({
+          next: (res: any) => {
+            const list = res?.data || [];
 
-    // If you want them as strings (ISO format)
-    const DATE_FROM = from.toISOString(); // "2025-07-28T00:00:00.000Z"
-    const DATE_TO = to.toISOString(); // "2025-07-28T23:59:59.999Z"
+            // 🔑 cache for logic / counts
+            this.articleProductionArray = list;
+            this.articleProductionCount = list.length;
 
-    console.log('DATE_FROM:', DATE_FROM);
-    console.log('DATE_TO:', DATE_TO);
+            resolve(list);
+          },
+          error: () => {
+            this.articleProductionArray = [];
+            this.articleProductionCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
 
-    // Example payload
-    const companyIdsAsString = this.company_id.join(',');
-    console.log(companyIdsAsString, '======company id======');
-
-    const payload = {
-      COMPANY_ID: companyIdsAsString,
-      DATE_FROM: DATE_FROM,
-      DATE_TO: DATE_TO,
-    };
-
-    console.log(payload, '==== selected data========');
-    console.log(this.company_id, '======company id======');
-    this.dataservice
-      .get_ArticleProduction_view(payload)
-      .subscribe((res: any) => {
-        console.log(res);
-        this.ArticleProductionDatasource = res.data;
-      });
-  }
 
   summaryColumnsData = {
     totalItems: [

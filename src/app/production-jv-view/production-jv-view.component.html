@@ -38,6 +38,12 @@
             allowAdding: false,
             useIcons: false,
           }"
+          [loadPanel]="{
+            enabled: true,
+            text: 'Loading materials...',
+            showIndicator: true,
+            showPane: true,
+          }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onRowRemoved)="onRowRemoved($event)"
         >

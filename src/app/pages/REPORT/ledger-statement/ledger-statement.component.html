@@ -1,10 +1,11 @@
-<div class="salary-grid-wrapper" style="padding: 10px">
+<div class="view-wrapper list-page">
   <div class="grid-container">
     <dx-data-grid
+      class="grid theme-dependent"
       [dataSource]="Ledger_statement_datasource"
       width="100%"
       noDataText=""
-      height="70vh"
+      height="78vh"
       [showBorders]="true"
       [showColumnLines]="true"
       [columnAutoWidth]="true"
@@ -220,7 +221,7 @@
       >
       </dxi-column>
       <dxi-column
-        *ngIf="Ledger_statement_datasource.length > 0"
+        *ngIf="ledgerRowCount > 0"
         type="buttons"
         [width]="100"
       >

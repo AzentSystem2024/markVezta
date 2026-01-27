@@ -21,6 +21,8 @@ import {
   ItemProperty4FormModule,
 } from 'src/app/components/library/item-property4-form/item-property4-form.component';
 import { AuthService, DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
+
 
 @Component({
   selector: 'app-item-property4-list',
@@ -32,7 +34,9 @@ export class ItemProperty4ListComponent {
   ItemProperty4FormComponent: ItemProperty4FormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-  itemproperty4: any = [];
+  ItemProperty4DataSource: DataSource;
+  itemProperty4Array: any[] = [];
+  itemProperty4Count = 0;
   isItemProperty4PopupOpened = false;
   itemlabel: any;
   isFilterRowVisible: boolean = false;
@@ -103,24 +107,43 @@ export class ItemProperty4ListComponent {
     );
   }
   listItemProperty4() {
-    const payload = {
-      COMPANY_ID: this.companyID,
-    };
-    this.dataservice.getItemProperty4Data(payload).subscribe((response) => {
-      this.itemproperty4 = response;
-    });
-  }
+  const payload = {
+    COMPANY_ID: this.companyID,
+  };
+
+  this.ItemProperty4DataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getItemProperty4Data(payload).subscribe({
+          next: (response: any[]) => {
+            const list = response || [];
+
+            this.itemProperty4Array = list;   // ✅ ARRAY
+            this.itemProperty4Count = list.length;
+
+            resolve(list);                    // ✅ GRID DATA
+          },
+          error: () => {
+            this.itemProperty4Array = [];
+            this.itemProperty4Count = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   onClickSaveItemProperty4() {
     const { CODE, DESCRIPTION, COMPANY_ID } =
       this.ItemProperty4FormComponent.getNewItemProperty4Data();
 
-    const isCodeDuplicate = this.itemproperty4.some(
+    const isCodeDuplicate = this.itemProperty4Array.some(
       // (item: any) => item.CODE === commonDetails.code
       (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
     );
 
-    const isDescriptionDuplicate = this.itemproperty4.some(
+    const isDescriptionDuplicate = this.itemProperty4Array.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) =>
         item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase()
