@@ -36,7 +36,7 @@
             allowUpdating: true,
             allowDeleting: true,
             allowAdding: true,
-            useIcons: true
+            useIcons: true,
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onCellValueChanged)="onCellValueChanged($event)"
@@ -369,20 +369,39 @@
 </dx-validation-group>
 
 <div class="form-popup-buttons-container">
-  <div class="popup-footer">
-    <dx-button
-      text="Cancel"
-      stylingMode="outlined"
-      (onClick)="Cancel()"
-      type="normal"
-    ></dx-button>
-    <dx-button
-      text="Save"
-      stylingMode="contained"
-      type="default"
-      (onClick)="onSave()"
-    >
-    </dx-button>
+  <div
+    class="popup-footer"
+    style="
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    "
+  >
+    <!-- ✅ Approve Checkbox -->
+    <dx-check-box
+      *ngIf="isEditing"
+      text="Approve"
+      [(value)]="isApproved"
+      (onValueChanged)="onApproveChanged($event)"
+    ></dx-check-box>
+
+    <!-- Action buttons -->
+    <div style="display: flex; gap: 10px">
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        (onClick)="Cancel()"
+        type="normal"
+      ></dx-button>
+
+      <dx-button
+        text="Save"
+        stylingMode="contained"
+        type="default"
+        (onClick)="onSave()"
+      ></dx-button>
+    </div>
   </div>
 </div>
 
