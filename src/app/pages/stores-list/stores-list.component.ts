@@ -13,6 +13,7 @@ import {
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-stores-list',
@@ -32,7 +33,9 @@ export class StoresListComponent implements OnInit {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
-  stores: any;
+  StoresDataSource: DataSource;
+  storesArray: any[] = [];
+  storesCount = 0;
   country: any;
   group: any;
   state: any;
@@ -89,9 +92,9 @@ export class StoresListComponent implements OnInit {
     private ngZone: NgZone,
     private router: Router,
   ) {}
-  onExporting(event: any) {
-    this.exportService.onExporting(event, 'Stores-list');
-  }
+  // onExporting(event: any) {
+  //   this.exportService.onExporting(event, 'Stores-list');
+  // }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -203,7 +206,7 @@ export class StoresListComponent implements OnInit {
         });
     } else {
       // 🔹 Duplicate check before inserting
-      const duplicate = this.stores.some(
+      const duplicate = this.storesArray.some(
         (store: any) =>
           store.CODE.toLowerCase().trim() ===
             storeData.CODE.toLowerCase().trim() ||
@@ -304,14 +307,32 @@ export class StoresListComponent implements OnInit {
   }
 
   showStores() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataservice.getStoresData(payload).subscribe((response) => {
-      this.stores = response;
-      console.log(response, '++');
-    });
-  }
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+  };
+
+  this.StoresDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getStoresData(payload).subscribe({
+          next: (response: any[]) => {
+            const list = response || [];
+
+            this.storesArray = list;      // local cache
+            this.storesCount = list.length;
+
+            resolve(list);                // 🔑 stops dx loader
+          },
+          error: () => {
+            this.storesArray = [];
+            this.storesCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
   onClickSaveStores() {
     const {
       CODE,
@@ -356,7 +377,7 @@ export class StoresListComponent implements OnInit {
       COMPANY_ID,
     );
     // --- Duplicate check ---
-    const duplicate = this.stores.some(
+    const duplicate = this.storesArray.some(
       (store: any) =>
         store.CODE.toLowerCase() === CODE.toLowerCase().trim() ||
         store.STORE_NAME.toLowerCase() === STORE_NAME.toLowerCase().trim(),
@@ -577,6 +598,11 @@ export class StoresListComponent implements OnInit {
     this.getCountryDropDown();
     this.getGroupDropDown();
     // this.getStateDropDown();
+  }
+
+  onExporting(event: any) {
+      const fileName = 'stores-list';
+      this.dataservice.exportDataGrid(event, fileName);
   }
 }
 @NgModule({

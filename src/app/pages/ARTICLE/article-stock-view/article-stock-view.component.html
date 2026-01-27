@@ -4,7 +4,7 @@
       #dataGrid
       noDataText="No data available"
       [width]="'100%'"
-      [height]="'75vh'"
+      [height]="'82vh'"
       [loadPanel]="{
         enabled: true,
         text: 'Loading...',
@@ -12,7 +12,7 @@
         showPane: true,
       }"
       class="grid theme-dependent"
-      [dataSource]="articleStockList"
+      [dataSource]="ArticleStockDataSource"
       [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
@@ -23,7 +23,7 @@
       [allowColumnResizing]="true"
       [columnResizingMode]="'nextColumn'"
       [headerFilter]="{ visible: true, allowSearch: true }"
-      [scrolling]="{ mode: 'standard' }"
+      [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"

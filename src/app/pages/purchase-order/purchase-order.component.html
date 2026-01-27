@@ -20,7 +20,7 @@
     [selection]="{ mode: 'single' }"
     focusStateEnabled="false"
     [width]="'100%'"
-    [height]="'75vh'"
+    [height]="'82vh'"
     (onEditingStart)="onEditingRow($event)"
     (onRowRemoved)="deletePOData($event)"
     (onCellPrepared)="onCellPrepared($event)"
@@ -99,7 +99,7 @@
         [(value)]="selectedDateRange"
         (onValueChanged)="onDateRangeChanged($event)"
         (onOpened)="attachItemClickHandler($event)"
-        width="180"
+        width="220"
       >
         <!-- This controls the dropdown list rendering -->
         <div *dxTemplate="let item of 'item'">

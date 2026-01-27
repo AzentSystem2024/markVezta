@@ -40,7 +40,9 @@ export class ItemProperty2ListComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  itemproperty2: any[] = [];
+  ItemProperty2DataSource: DataSource;
+  itemProperty2Array: any[] = [];
+  itemProperty2Count = 0;
   isItemProperty2PopupOpened = false;
   itemlabel: any;
   showFilterRow = true;
@@ -156,26 +158,44 @@ export class ItemProperty2ListComponent {
     // );
   }
   showItemProperty2() {
-    const payload = {
-      COMPANY_ID: this.companyID,
-    };
-    this.dataservice.getItemProperty2Data(payload).subscribe((response) => {
-      this.itemproperty2 = response;
-      console.log(response);
-    });
-  }
+  const payload = {
+    COMPANY_ID: this.companyID,
+  };
+
+  this.ItemProperty2DataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getItemProperty2Data(payload).subscribe({
+          next: (response: any[]) => {
+            const list = response || [];
+
+            this.itemProperty2Array = list;    // cache for logic
+            this.itemProperty2Count = list.length;
+
+            resolve(list);                     // 🔑 stops grid loader
+          },
+          error: () => {
+            this.itemProperty2Array = [];
+            this.itemProperty2Count = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
   onClickSaveItemProperty2() {
     const { CODE, DESCRIPTION, COMPANY_ID } =
       this.itemProperty2Form.getNewItemProperty2Data();
     console.log('inserted data', CODE, DESCRIPTION, COMPANY_ID);
 
     // Check for duplicates in CategoryList
-    const isCodeDuplicate = this.itemproperty2.some(
+    const isCodeDuplicate = this.itemProperty2Array.some(
       // (item: any) => item.CODE === commonDetails.code
       (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
     );
 
-    const isDescriptionDuplicate = this.itemproperty2.some(
+    const isDescriptionDuplicate = this.itemProperty2Array.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) =>
         item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase()

@@ -92,7 +92,9 @@ export class ViewDebitComponent {
   @ViewChild('narrationRef', { static: false })
   narrationRef!: DxTextBoxComponent;
   @ViewChild('saveButtonRef', { static: false }) saveButtonRef!: any;
-  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
+  @ViewChild('itemsGridRef', { static: false })
+  itemsGridRef!: DxDataGridComponent;
+
   netAmountDisplay: number;
   formattedTransDate: any;
   docNo: any;
@@ -183,6 +185,10 @@ export class ViewDebitComponent {
 
     const data = this.debitFormData[0];
 
+    setTimeout(() => {
+        this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
+      });
+
     // -----------------------------
     // BASIC HEADER BINDINGS
     // -----------------------------
@@ -250,7 +256,11 @@ export class ViewDebitComponent {
       if (this.noteDetails.length === 0) {
         this.noteDetails = [];
       }
-    });
+    })
+    .finally(() => {
+        // 🟢 STOP GRID LOADING
+        this.itemsGridRef?.instance?.endCustomLoading();
+      });
   }
 
   private hasEmptyRow(): boolean {
@@ -325,13 +335,14 @@ export class ViewDebitComponent {
   // }
 
   getSupplierDropdown() {
-    this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
-      this.supplierList = response;
-      console.log(
-        this.supplierList,
-        'distributorList=============================='
-      );
-    });
+    const payload = {
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService
+      .getSupplierWithState(payload)
+      .subscribe((response: any) => {
+        this.supplierList = response;
+      });
   }
 
   formatDateColumn = (rowData: any) => {

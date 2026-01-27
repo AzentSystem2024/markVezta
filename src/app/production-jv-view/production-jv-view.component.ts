@@ -96,6 +96,7 @@ export class ProductionJvViewComponent {
   companyState: any;
   GST: any;
   productionFormData: any;
+  isGridLoading = false;
 
   constructor(private dataService: DataService) {}
 
@@ -123,7 +124,7 @@ export class ProductionJvViewComponent {
     if (!this.isEditing || !this.EditingResponseData) {
       return;
     }
-
+    this.isGridLoading = true;
     console.log('FULL RESPONSE:', this.EditingResponseData);
 
     // Header is OBJECT
@@ -166,7 +167,7 @@ export class ProductionJvViewComponent {
 
     // Find the Pairs row
     const pairRow = this.items.find(
-      (row: any) => row.UOM?.toLowerCase() === 'pairs'
+      (row: any) => row.UOM?.toLowerCase() === 'pairs',
     );
 
     if (!pairRow) {
@@ -180,7 +181,7 @@ export class ProductionJvViewComponent {
 
     if (pairQty > 0) {
       this.productionFormData.AVERAGE_COST = Number(
-        (totalCost / pairQty).toFixed(2)
+        (totalCost / pairQty).toFixed(2),
       );
     } else {
       this.productionFormData.AVERAGE_COST = 0;

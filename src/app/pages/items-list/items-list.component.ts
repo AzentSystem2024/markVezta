@@ -42,6 +42,7 @@ import { AfterViewInit } from '@angular/core';
 import { switchMap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Observable } from 'rxjs';
+import DataSource from 'devextreme/data/data_source';
 import {
   ItemsEditFormComponent,
   ItemsEditFormModule,
@@ -133,7 +134,9 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   packing: any[] = [];
   selectedData: any = {};
   selectedItemData: any = {};
-  itemsList: any;
+  ItemsDataSource: DataSource;
+  itemsArray: any[] = [];
+  itemsCount = 0;
   newAliasArray: any[] = [];
   newAlias: any;
   isEditItemsPopupOpened = false;
@@ -242,7 +245,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     //  Use Date objects for filtering
     this.dataservice.getItemsData().subscribe((res: any) => {
       const allData = res.data;
-      this.itemsList = allData;
+      this.itemsArray = allData;
 
       this.selectedDateRange = 'custom';
 
@@ -352,7 +355,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       // };
       this.dataservice.getItemsData().subscribe((res: any) => {
         console.log(res);
-        this.itemsList = res.data;
+        this.itemsArray = res.data;
       });
     } else if (this.selectedDateRange === 'last7') {
       this.startDate = new Date(today);
@@ -444,25 +447,28 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   }
 
   showItems() {
-    this.isLoading = true;
-    this.cdr.detectChanges();
-    // const payload = {
-    //   COMPANY_ID: this.selected_Company_id,
-    // };
-    this.dataservice.getItemsData().subscribe(
-      (response: any) => {
-        // Sort items by 'createdAt' in descending order
-        this.itemsList = response.data.reverse();
-        // console.log(this.itemsList,"ITEMSLIST")
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      (error) => {
-        console.error('Error fetching items:', error);
-        this.isLoading = false;
-      },
-    );
-  }
+  this.ItemsDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getItemsData().subscribe({
+          next: (response: any) => {
+            const data = (response?.data || []).reverse();
+
+            this.itemsArray = data;        // local cache
+            this.itemsCount = data.length;
+
+            resolve(data);                 // 🔑 stop loader
+          },
+          error: () => {
+            this.itemsArray = [];
+            this.itemsCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   //  : '',
   //     : '',
@@ -801,6 +807,12 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     this.refreshItems();
     this.showItems();
   }
+
+  onExporting(event: any) {
+      const fileName = 'items-list';
+      this.dataservice.exportDataGrid(event, fileName);
+    }
+
 }
 @NgModule({
   imports: [

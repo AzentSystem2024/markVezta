@@ -294,7 +294,7 @@ loadUserDataSource() {
 
   //========================Export data ==========================
   onExporting(event: any) {
-    const fileName = 'Speciality';
+    const fileName = 'user';
     this.dataservice.exportDataGrid(event, fileName);
   }
 

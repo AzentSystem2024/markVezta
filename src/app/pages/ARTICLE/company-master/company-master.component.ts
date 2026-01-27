@@ -29,6 +29,7 @@ import {
 import notify from 'devextreme/ui/notify';
 import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-company-master',
@@ -44,7 +45,9 @@ export class CompanyMasterComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  Datasource: any[];
+  Datasource: DataSource;
+  companyList: any[] = [];
+  companyRowCount = 0;
   formsource: any;
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
@@ -265,16 +268,33 @@ export class CompanyMasterComponent {
 
   //===================get data list========================
   get_Company_List() {
-    this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
-      console.log(res);
-      if (res) {
-        this.Datasource = res.Data.map((item: any, index: any) => ({
-          ...item,
-          SlNo: index + 1, // Assign serial number
-        })).sort((a: any, b: any) => Number(b.ID) - Number(a.ID));
-      }
-    });
-  }
+  this.Datasource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.get_CompanyList_Api().subscribe({
+          next: (res: any) => {
+            const data = (res?.Data || [])
+              .map((item: any, index: number) => ({
+                ...item,
+                SlNo: index + 1,
+              }))
+              .sort((a: any, b: any) => Number(b.ID) - Number(a.ID));
+
+            this.companyList = data;              // ✅ array cache
+            this.companyRowCount = data.length;
+
+            resolve(data);                        // 🔑 grid loader stops
+          },
+          error: () => {
+            this.companyList = [];
+            this.companyRowCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   addData() {
     const validationResult = this.formValidationGroup.instance.validate();
@@ -313,7 +333,7 @@ export class CompanyMasterComponent {
     const newCode = Company_code.toLowerCase();
     const newName = Company_name.toLowerCase();
 
-    const isDuplicate = this.Datasource?.some((data: any) => {
+    const isDuplicate = this.companyList?.some((data: any) => {
       const existingCode = data.COMPANY_CODE?.toString().trim().toLowerCase();
       const existingName = data.COMPANY_NAME?.toString().trim().toLowerCase();
 
@@ -490,6 +510,13 @@ export class CompanyMasterComponent {
       },
     });
   }
+
+  //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'company';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
+
 }
 
 @NgModule({

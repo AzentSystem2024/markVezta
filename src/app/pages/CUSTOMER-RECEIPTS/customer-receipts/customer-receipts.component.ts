@@ -83,6 +83,9 @@ export class CustomerReceiptsComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  ReceiptDataSource: DataSource;
+  receiptArray: any[] = [];
+  receiptCount = 0;
 
   searchButtonOptions = {
     icon: 'search',
@@ -186,38 +189,112 @@ export class CustomerReceiptsComponent {
     this.getCustomerReceipts();
   }
 
-  getCustomerReceipts() {
+  getCustomerReceipts(dateRange: string = this.selectedDateRange) {
+    const datePayload = this.getDateRangePayload(dateRange);
+
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
-    }; // Add any necessary parameters here
-    this.dataService
-      .getCustomerReciptList(payload)
-      .subscribe((response: any) => {
-        this.customerReciptList = response.Data.map((item: any) => {
-          let dateValue: Date;
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
+    };
 
-          if (
-            typeof item.REC_DATE === 'string' &&
-            item.REC_DATE.includes('-')
-          ) {
-            const [day, month, year] = item.REC_DATE.split('-').map(Number);
-            dateValue = new Date(year, month - 1, day);
-          } else {
-            dateValue = new Date(item.REC_DATE);
-          }
+    this.ReceiptDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.getCustomerReciptList(payload).subscribe({
+            next: (response: any) => {
+              const list = (response?.Data || [])
+                .map((item: any) => {
+                  let dateValue: Date;
 
-          return {
-            ...item,
-            REC_DATE: dateValue,
-          };
-        }).sort((a: any, b: any) => {
-          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-          return numB - numA; // descending order
-        });
+                  if (
+                    typeof item.REC_DATE === 'string' &&
+                    item.REC_DATE.includes('-')
+                  ) {
+                    const [day, month, year] =
+                      item.REC_DATE.split('-').map(Number);
+                    dateValue = new Date(year, month - 1, day);
+                  } else {
+                    dateValue = new Date(item.REC_DATE);
+                  }
 
-        this.applyDateFilter();
-      });
+                  return {
+                    ...item,
+                    REC_DATE: dateValue,
+                  };
+                })
+                .sort((a: any, b: any) => {
+                  const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
+                  const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
+                  return numB - numA;
+                });
+
+              this.receiptArray = list;
+              this.receiptCount = list.length;
+
+              resolve(list);
+            },
+            error: () => {
+              this.receiptArray = [];
+              this.receiptCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
+
+  private getDateRangePayload(range: string) {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (range) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        break;
+
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+
+      default:
+        return { DATE_FROM: null, DATE_TO: null };
+    }
+
+    return {
+      DATE_FROM: this.formatAsYYYYMMDD(fromDate),
+      DATE_TO: this.formatAsYYYYMMDD(toDate),
+    };
+  }
+
+  private formatAsYYYYMMDD(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    const dd = date.getDate().toString().padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   refreshGrid() {
@@ -297,14 +374,10 @@ export class CustomerReceiptsComponent {
       this.customStartDate = null;
       this.customEndDate = null;
       this.showCustomDatePopup = true;
-    } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
+      return;
     }
+
+    this.getCustomerReceipts(e.value);
   }
 
   applyDateFilter() {
@@ -354,25 +427,26 @@ export class CustomerReceiptsComponent {
   applyCustomDateFilter() {
     if (!(this.customStartDate && this.customEndDate)) return;
 
-    const start = new Date(this.customStartDate);
-    start.setHours(0, 0, 0, 0);
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+      DATE_FROM: this.formatAsYYYYMMDD(new Date(this.customStartDate)),
+      DATE_TO: this.formatAsYYYYMMDD(new Date(this.customEndDate)),
+    };
 
-    const end = new Date(this.customEndDate);
-    end.setHours(23, 59, 59, 999);
-
-    this.filteredReceiptList = this.customerReciptList.filter((item: any) => {
-      const invoiceDate = item.REC_DATE;
-      return invoiceDate >= start && invoiceDate <= end;
+    this.ReceiptDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.getCustomerReciptList(payload).subscribe({
+            next: (response: any) => {
+              const list = response?.Data || [];
+              this.receiptArray = list;
+              this.receiptCount = list.length;
+              resolve(list);
+            },
+            error: () => resolve([]),
+          });
+        }),
     });
-
-    const fromLabel = this.formatAsDDMMYYYY(start);
-    const toLabel = this.formatAsDDMMYYYY(end);
-
-    this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom'
-        ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option,
-    );
 
     this.showCustomDatePopup = false;
   }

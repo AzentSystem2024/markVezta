@@ -123,4 +123,14 @@
       [formdata]="selectedRowData"
     ></app-user-levels-edit-form>
   </form-popup>
+
+  <dx-load-panel
+  [visible]="isSaving || isUpdating"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  [message]="isSaving ? 'Saving...' : 'Updating...'"
+>
+</dx-load-panel>
+
 </div>

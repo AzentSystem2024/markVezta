@@ -53,6 +53,7 @@ import {
   PurchaseReturnDebitFormComponent,
   PurchaseReturnDebitFormModule,
 } from '../purchase-return-debit-form/purchase-return-debit-form.component';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-purchase-return-debit',
@@ -151,6 +152,9 @@ export class PurchaseReturnDebitComponent {
   selectedPurchaseReturn: any;
   isReadOnlyPurchaseReturn: boolean;
   companyID: any;
+  PurchaseReturnDataSource: any;
+  purchaseReturnArray: any[] = [];
+  purchaseReturnCount = 0;
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -195,42 +199,111 @@ export class PurchaseReturnDebitComponent {
     this.sessionData_tax();
   }
 
-  getpurchaseReturnList() {
+  getpurchaseReturnList(dateRange: string = this.selectedDateRange) {
+    const datePayload = this.getDateRangePayload(dateRange);
+
     const payload = {
       COMPANY_ID: this.companyID,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
     };
-    this.dataService
-      .getPurchaseReturnMainList(payload)
-      .subscribe((response: any) => {
-        this.purchaseReturnList = response.Data.map((item: any) => {
-          let dateValue: Date;
 
-          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-          if (!isNaN(Date.parse(item.RET_DATE))) {
-            dateValue = new Date(item.RET_DATE);
-          } else {
-            // Case 2: If backend gives dd-MM-yyyy format
-            dateValue = this.parseDateString(item.RET_DATE);
-          }
+    this.PurchaseReturnDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.getPurchaseReturnMainList(payload).subscribe({
+            next: (response: any) => {
+              const list = (response?.Data || [])
+                .map((item: any) => {
+                  let dateValue: Date;
 
-          return {
-            ...item,
-            RET_DATE: dateValue,
-          };
-        }).sort((a: any, b: any) => {
-          const extractRunningNo = (docNo: string): number => {
-            if (!docNo) return 0;
+                  if (!isNaN(Date.parse(item.RET_DATE))) {
+                    dateValue = new Date(item.RET_DATE);
+                  } else {
+                    dateValue = this.parseDateString(item.RET_DATE);
+                  }
 
-            // Matches PR0023 → 0023
-            const match = docNo.match(/PR(\d+)$/);
-            return match ? Number(match[1]) : 0;
-          };
+                  return {
+                    ...item,
+                    RET_DATE: dateValue,
+                  };
+                })
+                .sort((a: any, b: any) => {
+                  const extractRunningNo = (docNo: string): number => {
+                    const match = docNo?.match(/PR(\d+)$/);
+                    return match ? Number(match[1]) : 0;
+                  };
+                  return (
+                    extractRunningNo(b.DOC_NO) - extractRunningNo(a.DOC_NO)
+                  );
+                });
 
-          return extractRunningNo(b.DOC_NO) - extractRunningNo(a.DOC_NO);
-        });
+              this.purchaseReturnArray = list;
+              this.purchaseReturnCount = list.length;
 
-        this.applyDateFilter();
-      });
+              resolve(list);
+            },
+            error: () => {
+              this.purchaseReturnArray = [];
+              this.purchaseReturnCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
+
+  private getDateRangePayload(range: string) {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (range) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        break;
+
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+
+      default:
+        return { DATE_FROM: null, DATE_TO: null };
+    }
+
+    return {
+      DATE_FROM: this.formatAsYYYYMMDD(fromDate),
+      DATE_TO: this.formatAsYYYYMMDD(toDate),
+    };
+  }
+
+  private formatAsYYYYMMDD(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    const dd = date.getDate().toString().padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   refreshGrid() {
@@ -273,14 +346,10 @@ export class PurchaseReturnDebitComponent {
       this.customStartDate = null;
       this.customEndDate = null;
       this.showCustomDatePopup = true;
-    } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
+      return;
     }
+
+    this.getpurchaseReturnList(e.value);
   }
 
   toggleFilters() {
@@ -366,28 +435,26 @@ export class PurchaseReturnDebitComponent {
   applyCustomDateFilter() {
     if (!(this.customStartDate && this.customEndDate)) return;
 
-    const start = new Date(this.customStartDate);
-    start.setHours(0, 0, 0, 0);
+    const payload = {
+      COMPANY_ID: this.companyID,
+      DATE_FROM: this.formatAsYYYYMMDD(new Date(this.customStartDate)),
+      DATE_TO: this.formatAsYYYYMMDD(new Date(this.customEndDate)),
+    };
 
-    const end = new Date(this.customEndDate);
-    end.setHours(23, 59, 59, 999);
-
-    this.filteredJournalVoucherList = this.purchaseReturnList.filter(
-      (item: any) => {
-        // const journalDate = this.parseDateString(item.RET_DATE);
-        const journalDate = item.RET_DATE;
-        return journalDate >= start && journalDate <= end;
-      },
-    );
-
-    const fromLabel = this.formatAsDDMMYYYY(start);
-    const toLabel = this.formatAsDDMMYYYY(end);
-
-    this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom'
-        ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option,
-    );
+    this.PurchaseReturnDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.getPurchaseReturnMainList(payload).subscribe({
+            next: (response: any) => {
+              const list = response?.Data || [];
+              this.purchaseReturnArray = list;
+              this.purchaseReturnCount = list.length;
+              resolve(list);
+            },
+            error: () => resolve([]),
+          });
+        }),
+    });
 
     this.showCustomDatePopup = false;
   }

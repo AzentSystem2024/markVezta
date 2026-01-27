@@ -18,6 +18,8 @@ import { CategoryListComponent } from '../category-list/category-list.component'
 import { DxSelectBoxModule } from 'devextreme-angular';
 import { SubcategoryEditModule } from '../subcategory-edit/subcategory-edit.component';
 import { CommonModule } from '@angular/common';
+import DataSource from 'devextreme/data/data_source';
+
 
 @Component({
   selector: 'app-subcategory-list',
@@ -35,7 +37,9 @@ export class SubcategoryListComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  subCategory: any = [];
+  SubCategoryDataSource: DataSource;
+  subCategoryArray: any[] = [];
+  subCategoryCount = 0;
   departmentDropdownData: any;
   isAddSubcategoryPopupOpened: boolean = false;
   categoryList: any[] = [];
@@ -72,14 +76,32 @@ export class SubcategoryListComponent {
   };
 
   getSubCategory() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataService.getSubCategoryData(payload).subscribe((response) => {
-      this.subCategory = response;
-      console.log(response, 'subcategoryyyyyyyyyyyyyyy');
-    });
-  }
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+  };
+
+  this.SubCategoryDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataService.getSubCategoryData(payload).subscribe({
+          next: (response: any[]) => {
+            const list = response || [];
+
+            this.subCategoryArray = list;        // cache
+            this.subCategoryCount = list.length;
+
+            resolve(list);                       // 🔑 stops dx loader
+          },
+          error: () => {
+            this.subCategoryArray = [];
+            this.subCategoryCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
@@ -108,12 +130,12 @@ export class SubcategoryListComponent {
     const COMPANY_ID = this.selected_Company_id;
 
     // Check for duplicates in CategoryList
-    const isCodeDuplicate = this.subCategory.some(
+    const isCodeDuplicate = this.subCategoryArray.some(
       // (item: any) => item.CODE === commonDetails.code
       (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
     );
 
-    const isDescriptionDuplicate = this.subCategory.some(
+    const isDescriptionDuplicate = this.subCategoryArray.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) =>
         item.SUBCAT_NAME.toLowerCase() === SUBCAT_NAME.toLowerCase()

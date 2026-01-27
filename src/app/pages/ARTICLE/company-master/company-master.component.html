@@ -9,12 +9,13 @@
     [allowColumnResizing]="true"
     [showColumnLines]="true"
     (onRowRemoved)="delete_Data($event)"
-    [height]="'80vh'"
+    [height]="'82vh'"
     noDataText=" "
     (onEditingStart)="onEditingStart($event)"
     [scrolling]="{ mode: 'virtual' }"
+    (onExporting)="onExporting($event)"
   >
-    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
 
@@ -71,9 +72,18 @@
 
       <!-- Search -->
       <!-- Divider -->
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="toolbar-icon-btn export-btn"
+      ></dxi-item>
+
+      <!-- Divider -->
       <dxi-item location="after">
         <div class="toolbar-divider"></div>
       </dxi-item>
+
       <dxi-item
         location="after"
         widget="dxButton"
@@ -120,7 +130,7 @@
 <dx-popup
   [(visible)]="addPopup"
   [width]="630"
-  height="620"
+  height="640"
   title="New Company"
   [shading]="false"
   [showCloseButton]="true"

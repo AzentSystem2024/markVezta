@@ -10,15 +10,23 @@
     [allowColumnResizing]="true"
     [scrolling]="{ mode: 'virtual' }"
     (onRowRemoved)="delete_Data($event)"
-    [height]="'75vh'"
+    [height]="'82vh'"
     noDataText=" "
     (onEditingStart)="onEditingStart($event)"
+    (onExporting)="onExporting($event)"
   >
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
 
     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
+
+    <dxo-export
+      [enabled]="true"
+      [allowExportSelectedData]="false"
+      [formats]="['xlsx']"
+    >
+    </dxo-export>
 
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
@@ -73,11 +81,18 @@
         [options]="refreshButtonOptions"
       ></dxi-item>
 
-      <!-- Search -->
+       <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="toolbar-icon-btn export-btn"
+      ></dxi-item>
+
       <!-- Divider -->
       <dxi-item location="after">
         <div class="toolbar-divider"></div>
       </dxi-item>
+      
       <dxi-item
         location="after"
         widget="dxButton"

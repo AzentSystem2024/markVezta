@@ -26,6 +26,9 @@ import notify from 'devextreme/ui/notify';
 import { FormPopupModule } from 'src/app/components';
 import { DepartmentFormModule } from 'src/app/components/library/department-form/department-form.component';
 import { DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
+
+
 
 @Component({
   selector: 'app-article-type',
@@ -41,7 +44,9 @@ export class ArticleTypeComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  Datasource: any[];
+  Datasource: DataSource;
+  articleTypeList: any[] = [];
+  articleTypeRowCount = 0;
   showFilterRow: boolean = true;
   currentFilter: string = 'auto';
   AddArticleTypePopup = false;
@@ -201,16 +206,33 @@ export class ArticleTypeComponent {
   }
   //===================get data list========================
   get_ArticleType_List() {
-    this.dataservice.get_ArticleType_Api().subscribe((res: any) => {
-      if (res) {
-        this.Datasource = res.Data.map((item: any, index: any) => ({
-          ...item,
-          SlNo: index + 1, // Assign serial number
-        }));
-      }
-      console.log(res, 'response');
-    });
-  }
+  this.Datasource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.get_ArticleType_Api().subscribe({
+          next: (res: any) => {
+            const data = (res?.Data || []).map(
+              (item: any, index: number) => ({
+                ...item,
+                SlNo: index + 1,
+              }),
+            );
+
+            this.articleTypeList = data;           // ✅ array logic
+            this.articleTypeRowCount = data.length;
+
+            resolve(data);                         // 🔑 grid loader stops
+          },
+          error: () => {
+            this.articleTypeList = [];
+            this.articleTypeRowCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   addData() {
     const validationResult = this.formValidationGroup?.instance?.validate();
@@ -223,7 +245,7 @@ export class ArticleTypeComponent {
     };
 
     // Optional: Check for duplicate login name
-    const isDuplicate = this.Datasource?.some((data: any) => {
+    const isDuplicate = this.articleTypeList?.some((data: any) => {
       return (
         data.DESCRIPTION?.trim().toLowerCase() === Description.toLowerCase()
       );
@@ -277,7 +299,7 @@ export class ArticleTypeComponent {
     console.log(Id, Description);
 
     // Optional: Check for duplicate login name
-    const isDuplicate = this.Datasource?.some((data: any) => {
+    const isDuplicate = this.articleTypeList?.some((data: any) => {
       return (
         data.DESCRIPTION?.trim().toLowerCase() === Description.toLowerCase() &&
         data.ID !== Id
@@ -330,6 +352,13 @@ export class ArticleTypeComponent {
       console.log(response, 'deleted');
     });
   }
+
+  //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'article_type';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
+
 }
 
 @NgModule({

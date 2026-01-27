@@ -920,6 +920,16 @@ body {
   justify-content: center;
 }
 
+.dx-tabs-styling-mode-secondary.dx-tab-indicator-position-top
+  .dx-tab.dx-tab-selected
+  .dx-tab-content::after,
+.dx-tabs-styling-mode-secondary.dx-tab-indicator-position-bottom
+  .dx-tab.dx-tab-selected
+  .dx-tab-content::after {
+  background-color: rgb(71, 158, 245);
+  display: none;
+}
+
 //........................................TAB-PANEL-FORMS..............................................//
 /* ===============================
    form tab style
@@ -932,6 +942,12 @@ body {
     display: none !important;
     content: none !important;
   }
+
+  .dx-tabs-styling-mode-secondary
+.dx-tab.dx-tab-selected
+.dx-tab-content::after {
+  display: block !important;
+}
 
   /* ❌ Also remove hover underline on text if theme applies it */
   .dx-tab:hover .dx-tab-text::before,
@@ -1029,12 +1045,3 @@ body {
   align-items: normal;
 }
 
-.dx-tabs-styling-mode-secondary.dx-tab-indicator-position-top
-  .dx-tab.dx-tab-selected
-  .dx-tab-content::after,
-.dx-tabs-styling-mode-secondary.dx-tab-indicator-position-bottom
-  .dx-tab.dx-tab-selected
-  .dx-tab-content::after {
-  background-color: rgb(71, 158, 245);
-  display: none;
-}

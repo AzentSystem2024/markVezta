@@ -1,7 +1,7 @@
 <div class="view-wrapper list-page">
   <dx-data-grid
     class="grid theme-dependent"
-    [dataSource]="supplier"
+    [dataSource]="SupplierDataSource"
     (onRowRemoving)="onRowRemoving($event)"
     [rowAlternationEnabled]="true"
     rowAlternationInterval="2"
@@ -10,7 +10,7 @@
     [allowColumnResizing]="true"
     (onExporting)="onExporting($event)"
     (onEditingStart)="openEditingStart($event)"
-    [height]="'80vh'"
+    [height]="'82vh'"
     [scrolling]="{ mode: 'virtual' }"
     [showColumnLines]="true"
   >
@@ -23,7 +23,7 @@
       [allowDeleting]="canDelete"
     >
     </dxo-editing>
-    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
 
     <dxo-toolbar>
@@ -48,19 +48,18 @@
         widget="dxButton"
         [options]="refreshButtonOptions"
       ></dxi-item>
-
-      <!-- Search -->
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
-
+    
       <!-- Export (built-in, kept) -->
       <dxi-item
         name="exportButton"
         location="after"
         cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
 
       <!-- Add -->
       <dxi-item

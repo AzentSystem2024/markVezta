@@ -1,8 +1,7 @@
-<div class="salary-grid-wrapper" style="padding: 10px">
-  
- 
+<div class="view-wrapper list-page">
   <div class="grid-container">
     <dx-data-grid
+      class="grid theme-dependent"
       [dataSource]="SupplierStatementDetailsDataSource"
       noDataText=""
        width="100%"
@@ -11,13 +10,12 @@
       [showColumnLines]="true"
       [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
-        [grouping]="{ autoExpandAll: false }"
+      [grouping]="{ autoExpandAll: false }"
       [filterRow]="{ visible: false }"
       [rowAlternationEnabled]="true"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
-     
       [filterRow]="{ visible: false }"
       id="dataGrid"
       [headerFilter]="{ visible: false }"
@@ -26,7 +24,7 @@
         texts: { fix: 'Freeze', unfix: 'Unfreeze' }
       }"
 
-[summary]="summaryColumnsData"
+    [summary]="summaryColumnsData"
     [summary.calculateCustomSummary]="summaryColumnsData.calculateCustomSummary"
     (onExporting)="onExporting($event)"
     >

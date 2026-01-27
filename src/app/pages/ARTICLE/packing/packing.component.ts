@@ -48,13 +48,13 @@ import {
 import { PackingEditModule } from '../packing-edit/packing-edit.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
 @Component({
   selector: 'app-packing',
   templateUrl: './packing.component.html',
   styleUrls: ['./packing.component.scss'],
 })
 export class PackingComponent {
-  packingList: any[] = [];
 
   @ViewChild(PackingAddComponent)
   PackingAddComponent!: PackingAddComponent;
@@ -69,6 +69,11 @@ export class PackingComponent {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
+
+  PackingDataSource: DataSource;
+  packingArray: any[] = [];
+  packingCount = 0;
+
 
   addPackingPopupVisible: boolean = false;
   editPackPopupOpened: boolean = false;
@@ -267,19 +272,36 @@ export class PackingComponent {
       '============selected_Company_id==============',
     );
   }
+  
   getPackingList() {
-    // const payload = {
-    //     COMPANY_ID : this.selected_Company_id
-    // }; // Add any necessary parameters here
-    this.dataService.get_packages_list_api().subscribe((res: any) => {
-      console.log('response from get packing list api:', res);
+  this.PackingDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataService.get_packages_list_api().subscribe({
+          next: (res: any) => {
+            const list = (res?.Data || []).map(
+              (item: any, index: number) => ({
+                ...item,
+                SNO: index + 1,
+              }),
+            );
 
-      this.packingList = res.Data.map((item: any, index: number) => ({
-        ...item,
-        SNO: index + 1, // add serial number starting from 1
-      }));
-    });
-  }
+            // 🔑 cache for logic
+            this.packingArray = list;
+            this.packingCount = list.length;
+
+            resolve(list); // 🔑 grid receives data
+          },
+          error: () => {
+            this.packingArray = [];
+            this.packingCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   delete_Packing_Data(event: any) {
     const id = event.data.ID;
@@ -307,6 +329,12 @@ export class PackingComponent {
       console.log('response from select packing api:', res);
       this.selectedPacking = res.Data;
     });
+  }
+
+  //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'packing';
+    this.dataService.exportDataGrid(event, fileName);
   }
 }
 

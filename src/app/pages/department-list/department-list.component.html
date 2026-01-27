@@ -1,8 +1,10 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
 <dx-data-grid
   #dataGrid
   noDataText="No data available"
   [width]="'100%'"
-  [height]="'75vh'"
+  [height]="'82vh'"
   [loadPanel]="{
     enabled: true,
     text: 'Loading...',
@@ -36,7 +38,7 @@
 
   <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
 
-  <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+  <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
   <dxo-paging [pageSize]="10"></dxo-paging>
   <dxo-pager
@@ -93,18 +95,18 @@
         stylingMode: 'text',
       }"
     ></dxi-item>
-    <!-- Search -->
-    <!-- Divider -->
-    <dxi-item location="after">
-      <div class="toolbar-divider"></div>
-    </dxi-item>
-
+  
     <!-- Export (built-in, kept) -->
     <dxi-item
       name="exportButton"
       location="after"
       cssClass="toolbar-icon-btn export-btn"
     ></dxi-item>
+
+    <!-- Divider -->
+    <dxi-item location="after">
+      <div class="toolbar-divider"></div>
+    </dxi-item>
 
     <!-- Add -->
     <dxi-item
@@ -128,6 +130,8 @@
     </dxi-validation-rule>
   </dxi-column>
 </dx-data-grid>
+</div>
+</div>
 <form-popup
   [height]="250"
   [(visible)]="isAddDepartmentPopupOpened"

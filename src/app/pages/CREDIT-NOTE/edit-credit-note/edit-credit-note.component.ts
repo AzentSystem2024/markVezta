@@ -81,8 +81,9 @@ export class EditCreditNoteComponent {
   }
 
   // @ViewChild(DxDataGridComponent, { static: true })
-  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
-  dataGrid: DxDataGridComponent;
+  @ViewChild('itemsGridRef', { static: false })
+  itemsGridRef!: DxDataGridComponent;
+
   @ViewChild('creditNoteGroup') invoiceFormGroup: DxValidationGroupComponent;
   @ViewChild('invoiceBoxRef', { static: false })
   invoiceBoxRef!: DxTextBoxComponent;
@@ -148,9 +149,11 @@ export class EditCreditNoteComponent {
   selectedCustomer: any;
   roundedNetAmount: number = 0;
 
+  isUpdating = false;
+
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -185,7 +188,7 @@ export class EditCreditNoteComponent {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
   }
 
@@ -193,6 +196,11 @@ export class EditCreditNoteComponent {
     if (changes['creditFormData'] && this.creditFormData?.length) {
       const data = this.creditFormData[0];
       console.log(this.creditFormData, 'CREDITFORMDATAAAAAAAAAAAAAA=====');
+
+      setTimeout(() => {
+        this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
+      });
+
       /* ---------------- Header bindings ---------------- */
       this.invoiceNo = String(data.INVOICE_NO);
       this.transDate = new Date(data.TRANS_DATE);
@@ -206,32 +214,37 @@ export class EditCreditNoteComponent {
       this.getCompanyListDropdown(data.DISTRIBUTOR_ID);
 
       /* ---------------- Grid binding ---------------- */
-      this.getLedgerCodeDropdown().then(() => {
-        console.log('SELECT NOTE_DETAIL:', data.NOTE_DETAIL);
+      this.getLedgerCodeDropdown()
+        .then(() => {
+          console.log('SELECT NOTE_DETAIL:', data.NOTE_DETAIL);
 
-        this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
-          const ledger = this.ledgerList.find(
-            (l: any) => l.HEAD_ID === item.HEAD_ID
-          );
+          this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
+            const ledger = this.ledgerList.find(
+              (l: any) => l.HEAD_ID === item.HEAD_ID,
+            );
 
-          return {
-            SL_NO: item.SL_NO,
-            ledgerCode: ledger?.HEAD_CODE || '',
-            ledgerName: ledger?.HEAD_NAME || '',
-            particulars: item.REMARKS || '',
-            Amount: item.AMOUNT || '',
-            GST_PERC: item.GST_PERC ?? 0,
-            CGST: item.CGST ?? 0,
-            SGST: item.SGST ?? 0,
-            gstAmount: item.GST_AMOUNT ?? 0,
-            HSN_CODE: item.HSN_CODE,
-            HEAD_ID: item.HEAD_ID,
-            _isExisting: true,
-          };
+            return {
+              SL_NO: item.SL_NO,
+              ledgerCode: ledger?.HEAD_CODE || '',
+              ledgerName: ledger?.HEAD_NAME || '',
+              particulars: item.REMARKS || '',
+              Amount: item.AMOUNT || '',
+              GST_PERC: item.GST_PERC ?? 0,
+              CGST: item.CGST ?? 0,
+              SGST: item.SGST ?? 0,
+              gstAmount: item.GST_AMOUNT ?? 0,
+              HSN_CODE: item.HSN_CODE,
+              HEAD_ID: item.HEAD_ID,
+              _isExisting: true,
+            };
+          });
+          console.log(this.noteDetails, 'NOTE DETAILS');
+          this.cdr.detectChanges();
+        })
+        .finally(() => {
+          // 🟢 STOP GRID LOADING
+          this.itemsGridRef?.instance?.endCustomLoading();
         });
-        console.log(this.noteDetails, 'NOTE DETAILS');
-        this.cdr.detectChanges();
-      });
 
       /* ---------------- Pending invoice ---------------- */
       this.getPendingInvoices(data);
@@ -242,7 +255,7 @@ export class EditCreditNoteComponent {
           clearInterval(interval);
 
           const distributor = this.distributorList.find(
-            (d: any) => d.ID === data.DISTRIBUTOR_ID
+            (d: any) => d.ID === data.DISTRIBUTOR_ID,
           );
 
           if (!distributor) {
@@ -311,7 +324,7 @@ export class EditCreditNoteComponent {
 
           // ✅ FIND SELECTED DISTRIBUTOR
           const selectedDistributor = this.distributorList.find(
-            (d: any) => d.ID === selectedDistributorId
+            (d: any) => d.ID === selectedDistributorId,
           );
           if (selectedDistributor) {
             this.selectedCustomer = selectedDistributor; // ✅ IMPORTANT
@@ -319,11 +332,11 @@ export class EditCreditNoteComponent {
           if (selectedDistributor) {
             console.log(
               'Selected Distributor State ID:',
-              selectedDistributor.STATE_ID
+              selectedDistributor.STATE_ID,
             );
             console.log(
               'Selected Distributor State Name:',
-              selectedDistributor.STATE_NAME
+              selectedDistributor.STATE_NAME,
             );
           } else {
             console.warn('Selected distributor not found in distributorList');
@@ -388,7 +401,7 @@ export class EditCreditNoteComponent {
       notify(
         'Please fill the existing empty row before adding a new one.',
         'warning',
-        2000
+        2000,
       );
       return;
     }
@@ -610,7 +623,7 @@ export class EditCreditNoteComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
@@ -670,7 +683,7 @@ export class EditCreditNoteComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
 
         e.setValue(args.value);
@@ -680,13 +693,13 @@ export class EditCreditNoteComponent {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
           if (!e.row.data.HSN_CODE) {
             e.component.cellValue(
               rowIndex,
               'HSN_CODE',
-              this.noteDetails[0]?.HSN_CODE || this.HSNCODE
+              this.noteDetails[0]?.HSN_CODE || this.HSNCODE,
             );
           }
           // 2️⃣ Get HSN & GST from session
@@ -723,14 +736,14 @@ export class EditCreditNoteComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -1058,7 +1071,7 @@ export class EditCreditNoteComponent {
         if (savedData && savedData.INVOICE_NO) {
           const exists = this.pendingInvoices.some(
             (inv: any) =>
-              String(inv.INVOICE_NO) === String(savedData.INVOICE_NO)
+              String(inv.INVOICE_NO) === String(savedData.INVOICE_NO),
           );
 
           if (!exists) {
@@ -1107,6 +1120,10 @@ export class EditCreditNoteComponent {
   }
 
   updateCreditNote() {
+    if (this.isUpdating) {
+      return;
+    }
+    this.isUpdating = true;
     // 1) Ensure in-progress edits are committed
     this.itemsGridRef?.instance?.saveEditData();
 
@@ -1133,6 +1150,7 @@ export class EditCreditNoteComponent {
     // ✅ Validation check
     if (netAmount > dueAmount) {
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
+      this.isUpdating = false;
       return;
     }
     // Build NOTE_DETAIL consistently (use same shape for both branches)
@@ -1145,12 +1163,13 @@ export class EditCreditNoteComponent {
             item.ledgerName ||
             item.Amount ||
             item.GST_PERC ||
-            item.particulars
+            item.particulars,
         )
         .map((item: any, index: number) => {
           const match = this.ledgerList.find(
             (l) =>
-              l.HEAD_CODE === item.ledgerCode || l.HEAD_NAME === item.ledgerName
+              l.HEAD_CODE === item.ledgerCode ||
+              l.HEAD_NAME === item.ledgerName,
           );
 
           const amount = Number(item.Amount) || 0;
@@ -1180,8 +1199,9 @@ export class EditCreditNoteComponent {
     if (this.creditFormData.IS_APPROVED) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit'
+        'Confirm Commit',
       ).then((result) => {
+        this.isUpdating = true;
         if (result) {
           const payload = {
             TRANS_ID: this.creditFormData[0].TRANS_ID,
@@ -1194,9 +1214,7 @@ export class EditCreditNoteComponent {
             TRANS_DATE: this.formatDateOnly(this.transDate),
 
             TRANS_STATUS: 1,
-            NARRATION:
-              this.creditFormData[0].NARRATION ||
-              'Update Details of Credit Note',
+            NARRATION: this.creditFormData[0].NARRATION,
             INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
             INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
             UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
@@ -1212,20 +1230,24 @@ export class EditCreditNoteComponent {
               if (response.flag === 1) {
                 notify('Credit Note approved successfully!', 'success', 3000);
                 this.popupClosed.emit();
+                this.isUpdating = false;
               } else {
                 notify(`Approval failed: ${response.Message}`, 'error', 4000);
+                this.isUpdating = false;
               }
             },
             (error) => {
               console.error('Approval error:', error);
               alert('Something went wrong while approving');
-            }
+              this.isUpdating = false;
+            },
           );
         } else {
           notify('Approval cancelled.', 'info', 2000);
+          this.isUpdating = false;
         }
       });
-
+      this.isUpdating = false;
       return;
     }
 
@@ -1239,8 +1261,7 @@ export class EditCreditNoteComponent {
       // TRANS_DATE: this.transDate,
       TRANS_DATE: this.formatDateOnly(this.transDate),
       TRANS_STATUS: 1,
-      NARRATION:
-        this.creditFormData[0].NARRATION || 'Update Details of Credit Note',
+      NARRATION: this.creditFormData[0].NARRATION,
       INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
       INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
       UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
@@ -1261,9 +1282,10 @@ export class EditCreditNoteComponent {
             message: 'Credit Note Updated Successfully',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
         this.popupClosed.emit();
+        this.isUpdating = false;
       }
     });
   }
@@ -1272,7 +1294,7 @@ export class EditCreditNoteComponent {
     const removedData = e.data;
 
     this.noteDetails = this.noteDetails.filter(
-      (item: any) => item !== removedData
+      (item: any) => item !== removedData,
     );
   }
 

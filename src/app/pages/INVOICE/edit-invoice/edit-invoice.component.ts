@@ -106,10 +106,11 @@ export class EditInvoiceComponent {
   netAmount: any;
   selectedCustomerName: any;
   selectedCustomerType: any;
+  isUpdating = false;
 
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     const userDataString = localStorage.getItem('userData');
     console.log(userDataString, 'USERDATASTRING');
@@ -192,7 +193,7 @@ export class EditInvoiceComponent {
             HSN_CODE: row.HSN_CODE,
             // keep your HSN logic
           };
-        }
+        },
       );
       // -----------------------------------------------------
 
@@ -218,7 +219,7 @@ export class EditInvoiceComponent {
       this.getCustomerOrUnitLst();
       console.log(
         firstInvoice.DISTRIBUTOR_ID,
-        'DISTRIBUTORIDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
+        'DISTRIBUTORIDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
       );
     }
   }
@@ -294,7 +295,7 @@ export class EditInvoiceComponent {
 
   onDistributorChanged(e: any) {
     const selectedCustomer = this.distributorList.find(
-      (cust: any) => cust.ID === e.value
+      (cust: any) => cust.ID === e.value,
     );
 
     if (this.mainInvoiceGridList && this.mainInvoiceGridList.length > 0) {
@@ -345,7 +346,7 @@ export class EditInvoiceComponent {
       this.staticTransfers = response.Data; // Save the original full list
       console.log(
         this.staticTransfers,
-        'STATISCTRANSFERS=============================='
+        'STATISCTRANSFERS==============================',
       );
       this.invoiceGridList = [...this.staticTransfers]; // Initial value
     });
@@ -387,7 +388,7 @@ export class EditInvoiceComponent {
 
         if (this.invoiceFormData && this.invoiceFormData.DISTRIBUTOR_ID) {
           this.selectedCustomer = this.distributorList.find(
-            (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID
+            (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID,
           );
 
           console.log('EDIT MODE — Selected Customer:', this.selectedCustomer);
@@ -472,7 +473,7 @@ export class EditInvoiceComponent {
 
     // Filter the full list before showing in popup
     this.invoiceGridList = this.staticTransfers.filter(
-      (item: any) => !selectedTransferNos.includes(item.DN_DETAIL_ID)
+      (item: any) => !selectedTransferNos.includes(item.DN_DETAIL_ID),
     );
     this.isTrOutPopupVisible = true;
   }
@@ -522,7 +523,7 @@ export class EditInvoiceComponent {
     }
 
     const existingIds = this.mainInvoiceGridList.map(
-      (item: any) => item.DN_DETAIL_ID
+      (item: any) => item.DN_DETAIL_ID,
     );
 
     const company = this.companyState?.trim().toLowerCase();
@@ -626,7 +627,7 @@ export class EditInvoiceComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -648,6 +649,9 @@ export class EditInvoiceComponent {
   }
 
   updateInvoice() {
+    if (this.isUpdating) {
+      return; // prevent double click
+    }
     if (!this.invoiceFormData || !this.invoiceFormData.TRANS_ID) {
       console.warn('Missing invoice data or TRANS_ID.');
       return;
@@ -699,7 +703,7 @@ export class EditInvoiceComponent {
           position: { at: 'top center', my: 'top center' },
         },
         'warning',
-        3000
+        3000,
       );
     }
     console.log(this.mainInvoiceGridList.length, 'MAINGRIDDDDDDDDDDDDDDDDD');
@@ -711,13 +715,13 @@ export class EditInvoiceComponent {
           position: { at: 'top center', my: 'top center' },
         },
         'warning',
-        3000
+        3000,
       );
       return;
     }
 
     const hasInvalidPrice = this.mainInvoiceGridList.some(
-      (row: any) => !row.PRICE || row.PRICE === 0
+      (row: any) => !row.PRICE || row.PRICE === 0,
     );
     if (hasInvalidPrice) {
       notify(
@@ -726,16 +730,17 @@ export class EditInvoiceComponent {
           position: { at: 'top center', my: 'top center' },
         },
         'warning',
-        3000
+        3000,
       );
       return;
     }
     if (this.invoiceFormData.IS_APPROVED) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit'
+        'Confirm Commit',
       ).then((dialogResult) => {
         if (dialogResult) {
+          this.isUpdating = true;
           const commitPayload = {
             TRANS_ID: this.invoiceFormData.TRANS_ID,
             IS_APPROVED: true,
@@ -782,12 +787,14 @@ export class EditInvoiceComponent {
                   position: { at: 'top center', my: 'top center' },
                 },
                 'success',
-                3000
+                3000,
               );
+              this.isUpdating = false;
               this.popupClosed?.emit();
             },
             error: (err) => {
               console.error('Error committing invoice:', err);
+              this.isUpdating = false;
             },
           });
         } else {
@@ -829,7 +836,7 @@ export class EditInvoiceComponent {
       };
 
       console.log('Sending update payload:', updatePayload);
-
+      this.isUpdating = true;
       this.dataService.updateInvoice(updatePayload).subscribe({
         next: (response) => {
           console.log('Invoice updated successfully:', response);
@@ -839,12 +846,14 @@ export class EditInvoiceComponent {
               position: { at: 'top center', my: 'top center' },
             },
             'success',
-            3000
+            3000,
           );
+          this.isUpdating = false;
           this.popupClosed?.emit();
         },
         error: (err) => {
           console.error('Error updating invoice:', err);
+          this.isUpdating = false;
         },
       });
     }

@@ -1,14 +1,14 @@
 <div class="view-wrapper list-page">
   <dx-data-grid
     class="grid theme-dependent"
-    [dataSource]="itemproperty5"
+    [dataSource]="ItemProperty5DataSource"
     [rowAlternationEnabled]="true"
     rowAlternationInterval="2"
     [showBorders]="true"
     (onRowRemoving)="onRowRemoving($event)"
     [showColumnLines]="true"
     [width]="'100%'"
-    [height]="'75vh'"
+    [height]="'82vh'"
     (onEditingStart)="OnEditingStartItem($event)"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>

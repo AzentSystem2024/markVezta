@@ -33,6 +33,7 @@ import {
   SupplierEditComponent,
   SupplierEditModule,
 } from '../supplier-edit/supplier-edit.component';
+import DataSource from 'devextreme/data/data_source';
 @Component({
   selector: 'app-supplier-list',
   templateUrl: './supplier-list.component.html',
@@ -54,7 +55,9 @@ export class SupplierListComponent implements OnInit {
   // dataGrid: DxDataGridComponent;
   width = '100vw';
   height = '100vh';
-  supplier: any;
+  SupplierDataSource: DataSource;
+  supplierList: any[] = [];
+  supplierRowCount = 0;
   isAddSupplierPopupOpened = false;
   currency: any;
   CountryDropdownData: any;
@@ -162,9 +165,14 @@ export class SupplierListComponent implements OnInit {
 
     this.sesstion_Details();
   }
+  // onExporting(event: any) {
+  //   this.exportService.onExporting(event, 'Supplier-list');
+  // }
+
   onExporting(event: any) {
-    this.exportService.onExporting(event, 'Supplier-list');
-  }
+      const fileName = 'supplier-list';
+      this.dataservice.exportDataGrid(event, fileName);
+    }
 
   private loadDropdownData(): void {
     this.dataservice.getDropdownData('LANDED_COST').subscribe((data) => {
@@ -200,18 +208,37 @@ export class SupplierListComponent implements OnInit {
   }
 
   showSupplier() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataservice.getSupplierData(payload).subscribe((response: any) => {
-      console.log(response, 'SUPPLIERRRRRRRRR');
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+  };
 
-      this.supplier = response.map((item: any, index: number) => ({
-        ...item,
-        SNO: index + 1, // serial number starts from 1
-      }));
-    });
-  }
+  this.SupplierDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getSupplierData(payload).subscribe({
+          next: (response: any[]) => {
+            const data = (response || []).map(
+              (item: any, index: number) => ({
+                ...item,
+                SNO: index + 1,
+              }),
+            );
+
+            this.supplierList = data;         // ✅ cache array
+            this.supplierRowCount = data.length;
+
+            resolve(data);                    // 🔑 stop loader
+          },
+          error: () => {
+            this.supplierList = [];
+            this.supplierRowCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   // showSupplier() {
   //   this.dataservice.getSupplierData().subscribe((response) => {

@@ -79,7 +79,7 @@ export class ProductionJvListComponent {
   isFilterOpened = false;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
-  isViewBoxProduction : boolean = false;
+  isViewBoxProduction: boolean = false;
   auto: string = 'auto';
   searchButtonOptions = {
     icon: 'search',
@@ -158,7 +158,7 @@ export class ProductionJvListComponent {
   isReadOnlyInvoice: boolean;
   isAddPopupVisible: boolean = false;
   selectedProduction: any;
-    isEditPopupVisible : boolean = false;
+  isEditPopupVisible: boolean = false;
   productionTypes = [
     { id: 'ARTICLE', name: 'Article Production' },
     { id: 'BOX', name: 'Box Production' },
@@ -663,8 +663,8 @@ export class ProductionJvListComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color = status === '5' ? '#5cac6fff' : '#d87f7fff';
+    icon.title = status === '5' ? 'Approved' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -713,7 +713,6 @@ export class ProductionJvListComponent {
   //     // this.isReadOnlyInvoice = status === 5;
   //     this.isEditPopupVisible = false;
 
-
   //     if (isArticle) {
   //       this.isEditPopupVisible = true;
   //     } else {
@@ -723,11 +722,11 @@ export class ProductionJvListComponent {
   //   });
   // }
 
-    onEditProduction(event: any) {
+  onEditProduction(event: any) {
     event.cancel = true;
 
     const productionId = event.data.PRODUCTION_ID;
-    const status = event.data.TRANS_STATUS;
+    const status = event.data.STATUS;
 
     const isArticle = this.selectedProductionType === 'ARTICLE';
 
@@ -737,18 +736,29 @@ export class ProductionJvListComponent {
 
     api$.subscribe((response: any) => {
       this.selectedProduction = response;
-      // this.isReadOnlyInvoice = status === 5;
+      this.isReadOnlyInvoice = status === '5';
 
       // reset both views first
       this.isEditPopupVisible = false;
+      this.isViewProduction = false;
       this.isViewBoxProduction = false;
-
-      // open correct view
-      if (isArticle) {
-        this.isEditPopupVisible = true;
+      if (status === '5') {
+        //  VIEW MODE
+        this.isViewProduction = true;
       } else {
-        this.isViewBoxProduction = true;
+        //  EDIT MODE
+        if (isArticle && status !== '5') {
+          this.isEditPopupVisible = true;
+        } else {
+          this.isViewBoxProduction = true;
+        }
       }
+      // open correct view
+      // if (isArticle) {
+      //   this.isEditPopupVisible = true;
+      // } else {
+      //   this.isViewBoxProduction = true;
+      // }
     });
   }
 

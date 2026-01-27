@@ -3,7 +3,7 @@
     <dx-data-grid
       class="grid theme-dependent"
       [showColumnLines]="true"
-      [dataSource]="category"
+      [dataSource]="CategoryDataSource"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       (onRowRemoving)="onRowRemoving($event)"
@@ -14,11 +14,11 @@
       (onEditingStart)="onEditStart($event)"
       [showColumnLines]="true"
       [scrolling]="{ mode: 'virtual' }"
-      [height]="'75vh'"
+      [height]="'82vh'"
     >
       <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
 
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -88,18 +88,17 @@
           }"
         ></dxi-item>
 
-        <!-- Search -->
-        <!-- Divider -->
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-
         <!-- Export (built-in, kept) -->
         <dxi-item
           name="exportButton"
           location="after"
           cssClass="toolbar-icon-btn export-btn"
         ></dxi-item>
+        
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
 
         <!-- Add -->
         <dxi-item

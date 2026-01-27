@@ -19,6 +19,7 @@ import {
   DxButtonModule,
   DxDataGridModule,
   DxDataGridComponent,
+  DxLoadPanelModule,
 } from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
 import { DxTabsModule } from 'devextreme-angular/ui/tabs';
@@ -33,6 +34,8 @@ import { UserLevelNewFormComponent } from '../../Masters/user-level-new-form/use
 import { UserLevelEditFormModule } from '../../Masters/user-level-edit-form/user-level-edit-form.component';
 import { UserLevelEditFormComponent } from '../../Masters/user-level-edit-form/user-level-edit-form.component';
 import { FormBuilder } from '@angular/forms';
+import { finalize, timeout } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-user-role',
@@ -78,6 +81,9 @@ export class UserRoleComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+
+  isSaving = false;
+  isUpdating = false;
 
   addButtonOptions = {
     type: 'default',
@@ -179,7 +185,7 @@ export class UserRoleComponent {
 
   //========================Export data ==========================
   onExporting(event: any) {
-    const fileName = 'Speciality';
+    const fileName = 'user_role';
     this.dataservice.exportDataGrid(event, fileName);
   }
 
@@ -229,6 +235,7 @@ export class UserRoleComponent {
 
   //=================OnClick save new data=======================
   onClickSaveNewData() {
+    this.isSaving = true;
     const menuData = this.userlevelNewForm.getNewUSerLevelData();
    console.log('menuData', menuData);
     console.log(this.userlevelNewForm, 'userlevelnewform');
@@ -251,33 +258,56 @@ export class UserRoleComponent {
         },
         'error',
       );
+      this.isSaving = false;
       return;
     }
 
     console.log('menu insert data :>>', menuData);
     this.dataservice
-      .Insert_UserLevelList_Api(menuData)
-      .subscribe((response: any) => {
+    .Insert_UserLevelList_Api(menuData)
+    .pipe(
+      timeout(15000), // ⏱️ prevents infinite wait
+      finalize(() => {
+        this.isSaving = false; // ✅ ALWAYS reset loader
+      })
+    )
+    .subscribe({
+      next: (response: any) => {
         if (response) {
-          this.dataGrid.instance.refresh();
-
           notify(
             {
-              message: `New User Level  saved Successfully`,
+              message: 'New User Level saved Successfully',
               position: { at: 'top right', my: 'top right' },
             },
-            'success',
+            'success'
           );
+
+          this.isAddFormVisible = false;
+          this.iseditFormVisible = false;
+
+          this.dataGrid.instance.refresh();
         } else {
           notify(
             {
-              message: ` Your Data Not Saved`,
+              message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error',
+            'error'
           );
         }
-      });
+      },
+      error: (err) => {
+        notify(
+          {
+            message: 'Network error. Please check your internet connection.',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 1500,
+          },
+          'error'
+        );
+        console.error(err);
+      },
+    });
     this.isAddFormVisible = false;
     this.iseditFormVisible = false;
     this.dataGrid.instance.refresh();
@@ -301,70 +331,90 @@ export class UserRoleComponent {
 
   //=======================row data update=======================
   onRowUpdating() {
-    console.log('working');
+  console.log('working');
+  this.isUpdating = true;
 
-    const editedData: any = this.userlevelEditForm.getNewUSerLevelEditedData();
-    console.log(editedData, 'menu edited');
-    this.dataservice
-      .Update_UserLevelList_Api(editedData)
-      .subscribe((data: any) => {
-        console.log(data, 'data');
+  const editedData: any =
+    this.userlevelEditForm.getNewUSerLevelEditedData();
 
-        if (data) {
-          this.dataGrid.instance.refresh();
+  this.dataservice
+    .Update_UserLevelList_Api(editedData)
+    .pipe(
+      timeout(15000), // ⏱️ stop infinite loading after 15 sec
+      finalize(() => {
+        this.isUpdating = false; // ✅ ALWAYS executes
+      })
+    )
+    .subscribe({
+      next: (data: any) => {
+        this.dataGrid.instance.refresh();
 
-          notify(
-            {
-              message: `User Level updated Successfully`,
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success',
-          );
-        } else {
-          notify(
-            {
-              message: `Your Data Not Saved`,
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'error',
-          );
-        }
+        notify(
+          {
+            message: 'User Level updated Successfully',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          },
+          'success'
+        );
+
         this.isAddFormVisible = false;
         this.iseditFormVisible = false;
-        this.dataGrid.instance.refresh();
-      });
-  }
+      },
+      error: (err) => {
+        notify(
+          {
+            message: 'Network error. Please check your internet connection.',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 1500,
+          },
+          'error'
+        );
+        console.error(err);
+      },
+    });
+}
 
   //=======================row data removing ====================
-  onRowRemoving(event: any) {
-    event.cancel = true;
-    let SelectedRow = event.key;
-    this.dataservice.Remove_userLevel_Row_Data(SelectedRow.ID).subscribe(() => {
-      try {
+
+onRowRemoving(event: any) {
+  event.cancel = true; // prevent default delete
+
+  const selectedRow = event.key;
+
+  this.dataservice
+    .Remove_userLevel_Row_Data(selectedRow.ID)
+    .pipe(
+      timeout(15000) // ⏱️ prevent infinite wait
+    )
+    .subscribe({
+      next: () => {
         notify(
           {
             message: 'Delete operation successful',
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success',
+          'success'
         );
-      } catch (error) {
+
+        event.component.refresh();
+        this.dataGrid.instance.refresh();
+      },
+      error: (err) => {
         notify(
           {
-            message: 'Delete operation failed',
+            message: 'Delete failed. Please check your internet connection.',
             position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
+            displayTime: 1500,
           },
-          'error',
+          'error'
         );
-      }
-      event.component.refresh();
-      this.dataGrid.instance.refresh();
+        console.error(err);
+      },
     });
-  }
+}
+
 
   formatLastModifiedTime(rowData: any): string {
     const celldate = rowData.LastModifiedTime;
@@ -405,6 +455,7 @@ export class UserRoleComponent {
     FormPopupModule,
     UserLevelNewFormModule,
     UserLevelEditFormModule,
+    DxLoadPanelModule
   ],
   providers: [],
   exports: [],

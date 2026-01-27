@@ -9,6 +9,8 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { DxDataGridComponent, DxDataGridModule } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
+
 
 @Component({
   selector: 'app-article-stock-view',
@@ -24,7 +26,9 @@ export class ArticleStockViewComponent {
   showHeaderFilter: true;
   showFilterRow = true;
   isFilterOpened = false;
-  articleStockList: any[] = [];
+  ArticleStockDataSource: DataSource;  // ONLY for dx-data-grid
+articleStockArray: any[] = [];       // ONLY for logic / summary
+articleStockCount = 0;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   addPackingPopupVisible: boolean = false;
@@ -60,14 +64,30 @@ export class ArticleStockViewComponent {
   }
 
   get_ArticleStock_List() {
-    const payload = {
-      USER_ID: 0,
-    };
-    this.dataservice.get_ArticleStock_Api(payload).subscribe((res: any) => {
-      this.articleStockList = res.Data;
-      console.log(this.articleStockList, 'response');
-    });
-  }
+  const payload = { USER_ID: 0 };
+
+  this.ArticleStockDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.get_ArticleStock_Api(payload).subscribe({
+          next: (res: any) => {
+            const list = res?.Data || [];
+
+            // 🔑 cache for summary / logic
+            this.articleStockArray = list;
+            this.articleStockCount = list.length;
+
+            resolve(list); // 🔑 grid gets data
+          },
+          error: () => {
+            this.articleStockArray = [];
+            this.articleStockCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
 
   onExporting(event: any) {
     const fileName = 'Article Stock';

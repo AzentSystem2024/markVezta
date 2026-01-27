@@ -21,6 +21,8 @@ import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import { VatClassEditModule } from '../vat-class-edit/vat-class-edit.component';
 import { CommonModule } from '@angular/common';
+import DataSource from 'devextreme/data/data_source';
+
 
 @Component({
   selector: 'app-vat-class-list',
@@ -36,7 +38,9 @@ export class VatClassListComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  vatclass: any;
+  VatClassDataSource: DataSource;
+  vatClassArray: any[] = [];
+  vatClassCount = 0;
   isAddVatclassPopupOpened = false;
   isFilterRowVisible: boolean = false;
   showFilterRow = true;
@@ -92,14 +96,31 @@ export class VatClassListComponent {
  
 
   showVatclass() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataservice.getVatclassData(payload).subscribe((response) => {
-      this.vatclass = response;
-      console.log(response);
-    });
-  }
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+  };
+
+  this.VatClassDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getVatclassData(payload).subscribe({
+          next: (response: any[]) => {
+            const list = response || [];
+
+            this.vatClassArray = list;      // 🔑 cache for logic
+            this.vatClassCount = list.length;
+
+            resolve(list);                  // 🔑 stops grid loader
+          },
+          error: () => {
+            this.vatClassArray = [];
+            this.vatClassCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
 
   toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;

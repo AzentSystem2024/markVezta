@@ -33,6 +33,8 @@ import { ExportService } from 'src/app/services/export.service';
 import { ItemcategoryEditModule } from 'src/app/pages/itemcategory-edit/itemcategory-edit.component';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
+
 
 @Component({
   selector: 'app-item-category-list',
@@ -47,7 +49,9 @@ export class ItemCategoryListComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  category: any;
+  CategoryDataSource: DataSource;
+  categoryArray: any[] = [];
+  categoryCount = 0;
   DepartmentDropdownData: any;
   isAddCategoryPopupOpened = false;
   showFilterRow = true;
@@ -95,9 +99,9 @@ export class ItemCategoryListComponent {
     this.sesstion_Details();
     this.showCategory();
   }
-  onExporting(event: any) {
-    this.exportService.onExporting(event, 'Catagory-list');
-  }
+  // onExporting(event: any) {
+  //   this.exportService.onExporting(event, 'Catagory-list');
+  // }
   addCategory() {
     this.isAddCategoryPopupOpened = true;
   }
@@ -139,12 +143,12 @@ export class ItemCategoryListComponent {
     );
     const COMPANY_ID = this.COMPANY_ID;
     // Check for duplicates in CategoryList
-    const isCodeDuplicate = this.category.some(
+    const isCodeDuplicate = this.categoryArray.some(
       // (item: any) => item.CODE === commonDetails.code
       (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
     );
 
-    const isDescriptionDuplicate = this.category.some(
+    const isDescriptionDuplicate = this.categoryArray.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) => item.CAT_NAME.toLowerCase() === CAT_NAME.toLowerCase(),
     );
@@ -264,14 +268,32 @@ export class ItemCategoryListComponent {
   }
 
   showCategory() {
-    const payload = {
-      COMPANY_ID: this.COMPANY_ID,
-    };
-    this.dataservice.getCategoryData(payload).subscribe((response) => {
-      this.category = response;
-      console.log(response);
-    });
-  }
+  const payload = {
+    COMPANY_ID: this.COMPANY_ID,
+  };
+
+  this.CategoryDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getCategoryData(payload).subscribe({
+          next: (response: any[]) => {
+            const list = response || [];
+
+            this.categoryArray = list;     // local cache
+            this.categoryCount = list.length;
+
+            resolve(list);                 // 🔑 stops dx loader
+          },
+          error: () => {
+            this.categoryArray = [];
+            this.categoryCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
     this.dataservice
@@ -323,6 +345,12 @@ export class ItemCategoryListComponent {
     this.editItemCategory = false;
     this.showCategory();
   }
+  
+  onExporting(event: any) {
+      const fileName = 'item-category-list';
+      this.dataservice.exportDataGrid(event, fileName);
+  }
+
 }
 
 @NgModule({

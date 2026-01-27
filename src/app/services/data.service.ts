@@ -478,7 +478,7 @@ export class DataService {
   }
 
   selectBoxProduction(id: number) {
-    return this.http.post<any>(`${this.apiUrl}BoxProduction/select/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}Sync/boxselect/` + id, {});
   }
   //--------------------------PURCHASE-RETURN-DEBIT-------------------------------------//
   getPurchaseReturnMainList(data: any): Observable<any> {

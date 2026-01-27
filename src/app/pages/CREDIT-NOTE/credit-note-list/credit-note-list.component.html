@@ -4,7 +4,7 @@
       #dataGrid
       noDataText="No data available"
       [width]="'100%'"
-      [height]="'75vh'"
+      [height]="'82vh'"
       [loadPanel]="{
         enabled: true,
         text: 'Loading...',
@@ -107,7 +107,7 @@
           [(value)]="selectedDateRange"
           (onValueChanged)="onDateRangeChanged($event)"
           (onOpened)="attachItemClickHandler($event)"
-          width="180"
+          width="220"
         >
           <!-- This controls the dropdown list rendering -->
           <div *dxTemplate="let item of 'item'">
@@ -170,7 +170,7 @@
   [(visible)]="isAddCreditNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Credit Note"
+  title="New Credit Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddCreditNote">
@@ -196,7 +196,7 @@
   [(visible)]="isEditCreditNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Update Credit Note"
+  title="Edit Credit Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditCreditNote">
@@ -211,7 +211,7 @@
   [(visible)]="isViewCreditNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Credit Note"
+  title="View Credit Note"
   (onHiding)="handleClose()"
 >
   <app-view-credit-note

@@ -26,6 +26,7 @@ import {
 } from 'src/app/components/library/user-levels-edit-form/user-levels-edit-form.component';
 import { ExportService } from 'src/app/services/export.service';
 import { Router } from '@angular/router';
+import { DxLoadPanelModule } from 'devextreme-angular';
 
 @Component({
   selector: 'app-user-levels',
@@ -47,6 +48,8 @@ export class UserLevelsComponent implements OnInit {
   dataSource: any;
   selectedRowData: any;
   popupwidth: any = '65%';
+  isSaving = false;
+  isUpdating = false;
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -190,6 +193,7 @@ export class UserLevelsComponent implements OnInit {
   }
 
   onClickSaveUserLevel() {
+    this.isSaving = true;
     const rowData = this.userlevelComponent.combineSelectedRows();
     console.log(rowData, 'rowData');
     const formData = this.userlevelComponent.getNewUserLevelData();
@@ -211,6 +215,7 @@ export class UserLevelsComponent implements OnInit {
           },
           'success',
         );
+        this.isSaving = false;
         this.dataGrid.instance.refresh();
         this.getUserLevelData();
       } else {
@@ -221,6 +226,8 @@ export class UserLevelsComponent implements OnInit {
           },
           'error',
         );
+        this.isSaving = false;
+
       }
     });
   }
@@ -252,6 +259,7 @@ export class UserLevelsComponent implements OnInit {
   }
 
   onClickUpdateUserLevel() {
+    this.isUpdating = true;
     // Step 1: Combine selected rows
     let rowData = this.userleveleditComponent.combineSelectedRows();
 
@@ -278,6 +286,7 @@ export class UserLevelsComponent implements OnInit {
           },
           'success',
         );
+        this.isUpdating = false;
         this.dataGrid.instance.refresh();
         this.getUserLevelData();
       } else {
@@ -288,6 +297,7 @@ export class UserLevelsComponent implements OnInit {
           },
           'error',
         );
+        this.isUpdating = false;
       }
     });
   }
@@ -300,6 +310,7 @@ export class UserLevelsComponent implements OnInit {
     UserLevelsFormModule,
     DxPopupModule,
     UserLevelsEditFormModule,
+    DxLoadPanelModule
   ],
   providers: [UserLevelsComponent],
   exports: [],

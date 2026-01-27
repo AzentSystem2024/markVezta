@@ -62,6 +62,8 @@ import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/
 import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
+import DataSource from 'devextreme/data/data_source';
+
 // import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 // import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 @Component({
@@ -70,7 +72,7 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
   styleUrls: ['./ledger-statement.component.scss'],
 })
 export class LedgerStatementComponent {
-  Ledger_statement_datasource: any = [];
+  Ledger_statement_datasource: DataSource;
   isEditJournalVoucher: boolean = false;
   isViewJournalVoucher: boolean = false;
   isViewDebitNote: boolean = false;
@@ -126,6 +128,7 @@ export class LedgerStatementComponent {
   isReadOnlyTrOut: boolean = true;
   isReadOnlyTrIn: boolean = true;
   isEditCustomerReceipt: boolean = false;
+  ledgerRowCount = 0;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -195,6 +198,29 @@ export class LedgerStatementComponent {
     const data = sessionStorage.getItem(key);
     return data ? JSON.parse(data) : null;
   }
+
+  createLedgerDataSource(payload: any) {
+  this.Ledger_statement_datasource = new DataSource({
+    load: () =>
+      new Promise((resolve, reject) => {
+        this.dataService.get_ladger_statement_api(payload).subscribe({
+          next: (res: any) => {
+            const data = res?.data || [];
+
+            this.ledgerSummaryData = data;
+            this.ledgerRowCount = data.length; // ✅ store length
+
+            resolve(data);
+          },
+          error: () => {
+            this.ledgerRowCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   async loadLedgerData() {
     // this.ledgerSummaryData=this.Ledger_statement_datasource
@@ -294,22 +320,19 @@ export class LedgerStatementComponent {
       '===========selected fin id==================='
     );
   }
+  
   load_Ledgre_data() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.selected_fin_id,
-      HEAD_ID: this.selected_Head_Id,
-      DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
-      DATE_TO: this.formatted_To_date ?? this.selected_To_date,
-    };
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    FIN_ID: this.selected_fin_id,
+    HEAD_ID: this.selected_Head_Id,
+    DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
+    DATE_TO: this.formatted_To_date ?? this.selected_To_date,
+  };
 
-    console.log(payload, '==========manual payload===========');
+  this.createLedgerDataSource(payload);
+}
 
-    this.dataService.get_ladger_statement_api(payload).subscribe((res: any) => {
-      this.Ledger_statement_datasource = res.data || [];
-      this.ledgerSummaryData = this.Ledger_statement_datasource;
-    });
-  }
 
   formatDates(cellData: any): string {
     const date = new Date(cellData);

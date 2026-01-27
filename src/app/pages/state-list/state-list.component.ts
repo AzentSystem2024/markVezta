@@ -25,6 +25,7 @@ import { jsPDF } from 'jspdf';
 import { ExportService } from 'src/app/services/export.service';
 import { StateEditModule } from 'src/app/state-edit/state-edit.component';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-state-list',
@@ -37,7 +38,9 @@ export class StateListComponent {
   dataGrid: DxDataGridComponent;
   @Output() formClosed = new EventEmitter<void>();
 
-  state: any;
+  StateDataSource: DataSource;
+  stateArray: any[] = [];
+  stateCount = 0;
   CountryDropdownData: any;
   isAddStatePopupOpened = false;
   showFilterRow = true;
@@ -107,9 +110,9 @@ export class StateListComponent {
     private zone: NgZone,
     private router: Router,
   ) {}
-  onExporting(event: any) {
-    this.exportService.onExporting(event, 'state-list');
-  }
+  // onExporting(event: any) {
+  //   this.exportService.onExporting(event, 'state-list');
+  // }
   addState() {
     this.isAddStatePopupOpened = true;
   }
@@ -121,11 +124,27 @@ export class StateListComponent {
   }
 
   showState() {
-    this.dataservice.getStateData().subscribe((response) => {
-      this.state = response;
-      console.log(response);
-    });
-  }
+  this.StateDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getStateData().subscribe({
+          next: (response: any) => {
+            const data = response || [];
+
+            this.stateArray = data;     // local usage if needed
+            this.stateCount = data.length;
+
+            resolve(data);              // 🔑 stops grid loader
+          },
+          error: () => {
+            this.stateArray = [];
+            this.stateCount = 0;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
@@ -320,6 +339,11 @@ export class StateListComponent {
       console.log(res);
       this.selectedState = res;
     });
+  }
+
+  onExporting(event: any) {
+      const fileName = 'states-list';
+      this.dataservice.exportDataGrid(event, fileName);
   }
 }
 @NgModule({

@@ -4,7 +4,7 @@
     [rowAlternationEnabled]="true"
     rowAlternationInterval="2"
     [showBorders]="true"
-    height="84vh"
+    height="82vh"
     [dataSource]="grnDataSource"
     [showColumnLines]="true"
     [scrolling]="{ mode: 'virtual' }"
@@ -12,7 +12,7 @@
     (onEditingStart)="onEditingRow($event)"
   >
     <dxo-load-panel [showPane]="false"></dxo-load-panel>
-    <dxo-scrolling mode="standard"></dxo-scrolling>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
     <dxo-sorting mode="multiple"></dxo-sorting>
     <dxo-header-filter [visible]="true"></dxo-header-filter>
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>

@@ -203,35 +203,114 @@ export class JournalVoucherListComponent {
   }
 
   getJournalVouchers() {
+    const grid = this.dataGrid?.instance;
+    grid?.beginCustomLoading('Loading...');
+
+    const datePayload = this.getDateRangePayload();
+
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
     };
-    this.dataService
-      .getJournalVoucherList(payload)
-      .subscribe((response: any) => {
-        this.journalVoucherList = response.Data.map((item: any) => {
-          let dateValue: Date;
 
-          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-          if (!isNaN(Date.parse(item.TRANS_DATE))) {
-            dateValue = new Date(item.TRANS_DATE);
-          } else {
-            // Case 2: If backend gives dd-MM-yyyy format
-            dateValue = this.parseDateString(item.TRANS_DATE);
-          }
+    this.dataService.getJournalVoucherList(payload).subscribe({
+      next: (response: any) => {
+        this.journalVoucherList = (response.Data || [])
+          .map((item: any) => {
+            let dateValue: Date;
 
-          return {
-            ...item,
-            TRANS_DATE: dateValue,
-          };
-        }).sort((a: any, b: any) => {
-          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-          return numB - numA; // descending order
-        });
+            if (!isNaN(Date.parse(item.TRANS_DATE))) {
+              dateValue = new Date(item.TRANS_DATE);
+            } else {
+              dateValue = this.parseDateString(item.TRANS_DATE);
+            }
 
-        this.applyDateFilter();
-      });
+            return {
+              ...item,
+              TRANS_DATE: dateValue,
+            };
+          })
+          .sort((a: any, b: any) => {
+            const aNo = parseInt(a.DOC_NO.split('/').pop(), 10);
+            const bNo = parseInt(b.DOC_NO.split('/').pop(), 10);
+            return bNo - aNo;
+          });
+
+        // ✅ single binding source
+        this.filteredJournalVoucherList = this.journalVoucherList;
+      },
+      error: () => {},
+      complete: () => {
+        grid?.endCustomLoading();
+      },
+    });
+  }
+
+  private getDateRangePayload(): {
+    DATE_FROM: string | null;
+    DATE_TO: string | null;
+  } {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+    }
+
+    return {
+      DATE_FROM: fromDate ? this.formatDate(fromDate) : null,
+      DATE_TO: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+
+  private formatDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   private parseDateString(dateStr: string): Date {
@@ -321,17 +400,18 @@ export class JournalVoucherListComponent {
     this.selectedDateRange = e.value;
 
     if (e.value === 'custom') {
-      this.customStartDate = null;
-      this.customEndDate = null;
       this.showCustomDatePopup = true;
-    } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
+      return;
     }
+
+    this.customStartDate = null;
+    this.customEndDate = null;
+
+    this.dateRanges = this.dateRanges.map((opt) =>
+      opt.value === 'custom' ? { ...opt, label: 'Custom' } : opt,
+    );
+
+    this.getJournalVouchers();
   }
 
   applyDateFilter() {
@@ -381,31 +461,26 @@ export class JournalVoucherListComponent {
   }
 
   applyCustomDateFilter() {
-    if (!(this.customStartDate && this.customEndDate)) return;
+    if (!this.customStartDate || !this.customEndDate) return;
 
-    const start = new Date(this.customStartDate);
-    start.setHours(0, 0, 0, 0);
+    if (this.customStartDate > this.customEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
 
-    const end = new Date(this.customEndDate);
-    end.setHours(23, 59, 59, 999);
-
-    this.filteredJournalVoucherList = this.journalVoucherList.filter(
-      (item: any) => {
-        const journalDate = item.TRANS_DATE;
-        return journalDate >= start && journalDate <= end;
-      },
-    );
-
-    const fromLabel = this.formatAsDDMMYYYY(start);
-    const toLabel = this.formatAsDDMMYYYY(end);
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
-        ? { ...option, label: `${fromLabel} to ${toLabel}` }
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
         : option,
     );
 
+    this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
+
+    this.getJournalVouchers();
   }
 
   displayExpr = (item: any) => {

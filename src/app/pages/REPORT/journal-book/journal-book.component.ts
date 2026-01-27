@@ -43,6 +43,7 @@ import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/
 import { TransferInInventoryModule } from '../../transfer-in-inventory/transfer-in-inventory.component';
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-journal-book',
@@ -52,7 +53,9 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 export class JournalBookComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-  Ledger_statement_datasource: any[] = [];
+  JournalBookDataSource: DataSource;   // ONLY for dx-data-grid
+  journalBookArray: any[] = [];             // ONLY for logic / checks
+  journalBookCount = 0;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   company_list: any[] = [];
@@ -249,20 +252,39 @@ export class JournalBookComponent {
   }
 
   load_JournalBook_data() {
-    const payload = {
-      CompanyId: this.selected_Company_id,
-      FinId: this.selected_fin_id,
-      DateFrom: this.formatted_from_date ?? this.selected_from_date,
-      DateTo: this.formatted_To_date ?? this.selected_To_date,
-    };
+  const payload = {
+    CompanyId: this.selected_Company_id,
+    FinId: this.selected_fin_id,
+    DateFrom: this.formatted_from_date ?? this.selected_from_date,
+    DateTo: this.formatted_To_date ?? this.selected_To_date,
+  };
 
-    console.log(payload, '==========manual payload===========');
+  this.JournalBookDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataService.Journal_Booking_Api(payload).subscribe({
+          next: (res: any) => {
+            const list = res?.data || [];
 
-    this.dataService.Journal_Booking_Api(payload).subscribe((res: any) => {
-      this.Ledger_statement_datasource = res.data || [];
-      this.ledgerSummaryData = this.Ledger_statement_datasource;
-    });
-  }
+            // 🔑 cache for logic
+            this.journalBookArray = list;
+            this.journalBookCount = list.length;
+
+            this.ledgerSummaryData = list;
+
+            resolve(list); // 🔑 grid gets data
+          },
+          error: () => {
+            this.journalBookArray = [];
+            this.journalBookCount = 0;
+            this.ledgerSummaryData = [];
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
 
   onViewClick(e: any) {
     console.log(e, '=======event==========');

@@ -69,7 +69,9 @@ export class ViewCreditNoteComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() creditFormData: any;
   // @ViewChild(DxDataGridComponent, { static: true })
-  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
+  @ViewChild('itemsGridRef', { static: false })
+  itemsGridRef!: DxDataGridComponent;
+
   dataGrid: DxDataGridComponent;
   @ViewChild('creditNoteGroup') invoiceFormGroup: DxValidationGroupComponent;
   @ViewChild('invoiceBoxRef', { static: false })
@@ -188,6 +190,10 @@ export class ViewCreditNoteComponent {
       const data = this.creditFormData[0];
       console.log(data, 'INEDITTTTTTTTTTT');
 
+      setTimeout(() => {
+        this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
+      });
+
       // -----------------------------
       // BASIC FIELD BINDING
       // -----------------------------
@@ -285,6 +291,10 @@ export class ViewCreditNoteComponent {
 
         // ✅ 🔥 CALL VISIBILITY LOGIC AFTER MAPPING
         this.setTaxVisibilityFromNoteDetails(this.noteDetails);
+      })
+      .finally(() => {
+        // 🟢 STOP GRID LOADING
+        this.itemsGridRef?.instance?.endCustomLoading();
       });
 
       console.log(this.noteDetails, 'NOTDETAILSSSSSSSSSS');

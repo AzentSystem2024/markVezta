@@ -24,6 +24,8 @@ import notify from 'devextreme/ui/notify';
 import { FormPopupModule } from 'src/app/components';
 import { DepartmentFormModule } from 'src/app/components/library/department-form/department-form.component';
 import { DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
+
 
 @Component({
   selector: 'app-article-color',
@@ -44,7 +46,7 @@ export class ArticleColorComponent {
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
   editingRowData: any = {};
-  Datasource: any[];
+  Datasource: DataSource;
   showFilterRow: boolean = true;
   currentFilter: string = 'auto';
   canAdd = false;
@@ -57,6 +59,7 @@ export class ArticleColorComponent {
   formsource: any;
   selectedData: any;
   selected_Company_id: any;
+  articleColorList: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -105,11 +108,7 @@ export class ArticleColorComponent {
     text: '',
   };
   refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh();
-      // Or reload data from API if needed
       this.get_ArticleColor_List();
-    }
   }
 
   searchButtonOptions = {
@@ -203,18 +202,34 @@ export class ArticleColorComponent {
 
   //===================get data list========================
   get_ArticleColor_List() {
-    // this.isLoading = true;
-    // const payload = { COMPANY_ID : this.selected_Company_id }; // Add any necessary payload data here
-    this.dataservice.get_ArticleColor_Api().subscribe((res: any) => {
-      if (res) {
-        this.Datasource = res.Data.map((item: any, index: any) => ({
-          ...item,
-          SlNo: index + 1, // Assign serial number
-        }));
-      }
-      console.log(res, 'response');
-    });
-  }
+  this.Datasource = new DataSource({
+    load: () =>
+      new Promise((resolve, reject) => {
+        this.dataservice.get_ArticleColor_Api().subscribe({
+          next: (res: any) => {
+            const data = (res?.Data || []).map(
+              (item: any, index: number) => ({
+                ...item,
+                SlNo: index + 1,
+              }),
+            );
+
+            this.articleColorList = data; 
+
+            // this.articleColorRowCount = data.length; // ✅ store count
+            resolve(data); // 🔑 grid loader stops here
+          },
+          error: (err) => {
+            console.error(err);
+            this.articleColorList = [];
+            // this.articleColorRowCount = 0;
+            resolve([]); // 🔑 always resolve
+          },
+        });
+      }),
+  });
+}
+
 
   onEditingStart(event: any) {
     event.cancel = true;
@@ -246,7 +261,7 @@ export class ArticleColorComponent {
     let isColorEnglishDuplicate = false;
     let isColorArabicDuplicate = false;
 
-    this.Datasource?.forEach((data: any) => {
+    this.articleColorList?.forEach((data: any) => {
       const dataCode = data.CODE?.trim().toLowerCase();
       const dataColorEnglish = data.COLOR_ENGLISH?.trim().toLowerCase();
       const dataColorArabic = data.COLOR_ARABIC?.trim().toLowerCase();
@@ -346,7 +361,7 @@ export class ArticleColorComponent {
     let isColorEnglishDuplicate = false;
     let isColorArabicDuplicate = false;
 
-    this.Datasource?.forEach((data: any) => {
+    this.articleColorList?.forEach((data: any) => {
       // Skip current record by ID
       if (data.ID === Id) return;
 
@@ -436,6 +451,12 @@ export class ArticleColorComponent {
       );
       console.log(response, 'deleted');
     });
+  }
+
+  //========================Export data ==========================
+  onExporting(event: any) {
+    const fileName = 'article_color';
+    this.dataservice.exportDataGrid(event, fileName);
   }
 }
 

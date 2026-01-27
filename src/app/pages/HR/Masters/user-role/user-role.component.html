@@ -12,7 +12,7 @@
     (onExporting)="onExporting($event)"
     (onRowRemoving)="onRowRemoving($event)"
     (onEditingStart)="onEditingStart($event)"
-    [height]="'75vh'"
+    [height]="'82vh'"
     [showColumnLines]="true"
     [scrolling]="{ mode: 'virtual' }"
   >
@@ -72,10 +72,6 @@
       ></dxi-item>
 
       <!-- Search -->
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
 
       <!-- Export (built-in, kept) -->
       <dxi-item
@@ -83,6 +79,11 @@
         location="after"
         cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
 
       <!-- Add -->
       <dxi-item
@@ -139,4 +140,14 @@
       [editValue]="clickedRowData"
     ></app-user-level-edit-form>
   </form-popup>
+
+  <dx-load-panel
+  [visible]="isSaving || isUpdating"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  [message]="isSaving ? 'Saving...' : 'Updating...'"
+>
+</dx-load-panel>
+
 </div>

@@ -157,6 +157,9 @@ export class AddCreditNoteComponent {
   netTotal: number;
   selectedInvoiceGst: number;
   selectedInvoiceHsn: any;
+
+  isSaving = false;
+
   constructor(private dataService: DataService, private ngZone: NgZone) {}
 
   ngOnInit() {
@@ -969,6 +972,10 @@ export class AddCreditNoteComponent {
   }
 
   callAPI(finalPayload: any) {
+     if (this.isSaving) {
+      return;
+    }
+    this.isSaving = true;
     this.dataService.insertCreditNote(finalPayload).subscribe(
       (response: any) => {
         console.log(response, 'SAVED SUCCESSFULLY');
@@ -991,11 +998,14 @@ export class AddCreditNoteComponent {
 
         // Close popup
         this.popupClosed.emit();
+        this.isSaving = false;
       },
       (error) => {
         notify('Failed to save Credit Note. Please try again.', 'error', 2000);
         console.error('Save error:', error);
+        this.isSaving = false;
       }
+      
     );
   }
 
