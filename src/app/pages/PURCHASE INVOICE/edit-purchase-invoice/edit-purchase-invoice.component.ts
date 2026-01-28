@@ -104,6 +104,7 @@ export class EditPurchaseInvoiceComponent {
   fin_id: any;
   user_id: any;
   store_id: any;
+  isSaving = false;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -156,7 +157,7 @@ export class EditPurchaseInvoiceComponent {
         (row: any) => ({
           ...row,
           GRN_DATE: row.GRN_DATE ? new Date(row.GRN_DATE) : null,
-        })
+        }),
       );
 
       // Get company and supplier state names
@@ -190,7 +191,7 @@ export class EditPurchaseInvoiceComponent {
       // Supplier ID assignment
       // ---------------------------------------------------------
       this.purchaseInvoiceFormData.SUPP_ID = Number(
-        this.invoiceFormData.SUPP_ID
+        this.invoiceFormData.SUPP_ID,
       );
       this.selectedSupplierId = this.purchaseInvoiceFormData.SUPP_ID;
 
@@ -207,7 +208,7 @@ export class EditPurchaseInvoiceComponent {
       this.supplierList = response;
       console.log(
         this.supplierList,
-        'distributorList=============================='
+        'distributorList==============================',
       );
     });
   }
@@ -238,7 +239,7 @@ export class EditPurchaseInvoiceComponent {
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
     const selectedSupplier = this.distributorList.find(
-      (supplier: any) => supplier.ID === this.selectedSupplierId
+      (supplier: any) => supplier.ID === this.selectedSupplierId,
     );
 
     const company = this.companyState?.trim().toLowerCase();
@@ -357,7 +358,7 @@ export class EditPurchaseInvoiceComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -378,7 +379,7 @@ export class EditPurchaseInvoiceComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'VAT_AMOUNT'));
@@ -428,7 +429,7 @@ export class EditPurchaseInvoiceComponent {
 
     selectedRows.forEach((row) => {
       const exists = this.mainGridData.some(
-        (item) => item.GRN_DET_ID === row.GRN_DET_ID
+        (item) => item.GRN_DET_ID === row.GRN_DET_ID,
       );
       if (exists) return;
 
@@ -553,7 +554,7 @@ export class EditPurchaseInvoiceComponent {
           position: { at: 'top right', my: 'top right' },
         },
         'warning',
-        3000
+        3000,
       );
       return; // stop execution here
     }
@@ -586,7 +587,7 @@ export class EditPurchaseInvoiceComponent {
           position: { at: 'top right', my: 'top right' },
         },
         'warning',
-        3000
+        3000,
       );
       return; // stop execution here
     }
@@ -638,19 +639,19 @@ export class EditPurchaseInvoiceComponent {
           CGST: item.CGST,
           // GST: item.GST ?? 0,
         };
-      }
+      },
     );
 
     this.purchaseInvoiceFormData.GROSS_AMOUNT = parseFloat(
-      grossAmount.toFixed(2)
+      grossAmount.toFixed(2),
     );
     this.purchaseInvoiceFormData.VAT_AMOUNT = parseFloat(vatAmount.toFixed(2));
     this.purchaseInvoiceFormData.NET_AMOUNT = parseFloat(netAmount.toFixed(2));
     this.purchaseInvoiceFormData.SUPP_GROSS_AMOUNT = parseFloat(
-      grossAmount.toFixed(2)
+      grossAmount.toFixed(2),
     );
     this.purchaseInvoiceFormData.SUPP_NET_AMOUNT = parseFloat(
-      netAmount.toFixed(2)
+      netAmount.toFixed(2),
     );
 
     this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
@@ -662,14 +663,16 @@ export class EditPurchaseInvoiceComponent {
       // Ask confirmation only if approving
       const result = confirm(
         'Are you sure you want to approve and commit this invoice?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
       result.then((dialogResult) => {
         if (dialogResult) {
+          this.isSaving = true;
           this.submitInvoice(); // Call actual API logic
         }
       });
     } else {
+      this.isSaving = true;
       this.submitInvoice(); // Direct for update
     }
   }
@@ -682,6 +685,7 @@ export class EditPurchaseInvoiceComponent {
 
     apiCall.subscribe({
       next: (res) => {
+        this.isSaving = false;
         const message = this.isApproved
           ? 'Invoice approved successfully'
           : 'Invoice updated successfully';
@@ -692,11 +696,12 @@ export class EditPurchaseInvoiceComponent {
             position: { at: 'top right', my: 'top right' },
           },
           'success',
-          3000
+          3000,
         );
         this.popupClosed?.emit();
       },
       error: (err) => {
+        this.isSaving = false;
         console.error('Operation failed', err);
       },
     });
@@ -757,13 +762,21 @@ export class EditPurchaseInvoiceComponent {
   }
 
   openPDF() {
-    // Call your PDF API or open a URL
+    this.isSaving = true;
+
     console.log('Open PDF clicked');
     const invId = this.purchaseInvoiceFormData.TRANS_ID;
-    // Example:
-    this.dataService.selectPurchaseInvoice(invId).subscribe((res: any) => {
-      this.selectedInvoice = res.Data;
-      this.generatePDF(this.selectedInvoice);
+
+    this.dataService.selectPurchaseInvoice(invId).subscribe({
+      next: (res: any) => {
+        this.selectedInvoice = res.Data;
+        this.generatePDF(this.selectedInvoice);
+        this.isSaving = false; // ✅ STOP loading
+      },
+      error: () => {
+        this.isSaving = false; // ✅ STOP loading
+        notify('Failed to generate PDF', 'error', 3000);
+      },
     });
   }
 
@@ -897,7 +910,7 @@ export class EditPurchaseInvoiceComponent {
     doc.text(
       'Vehicle No: ' + (data.VEHICLE_NO || ''),
       startX,
-      startY + gap * 2
+      startY + gap * 2,
     );
     doc.text('Mode of Transport:', startX, startY + gap * 3);
 
@@ -1128,7 +1141,7 @@ export class EditPurchaseInvoiceComponent {
     doc.text(
       (data.PurchDetails[0].VAT_PERC || 0).toFixed(2) + '%',
       igstCol,
-      fy
+      fy,
     );
     // Column width for AMOUNT column
     const amountColWidth = 20;
@@ -1224,7 +1237,7 @@ export class EditPurchaseInvoiceComponent {
     doc.text(
       'Whether the tax is payable on Reverse charge basis:No Amount of tax subject to reverse charge',
       15,
-      wordsY
+      wordsY,
     );
 
     wordsY += 7; // push next line slightly down

@@ -170,18 +170,20 @@ export class SalesOrderFormComponent {
   combination: any;
   dealerID: any;
   selectedSubdealerId: any;
+  isSaving = false;
+
   constructor(
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
 
     this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
@@ -231,7 +233,7 @@ export class SalesOrderFormComponent {
     if (this.isEditing && this.EditingResponseData) {
       console.log(
         'Editing mode enabled. Populating data:',
-        this.EditingResponseData
+        this.EditingResponseData,
       );
 
       const response = this.EditingResponseData;
@@ -328,7 +330,7 @@ export class SalesOrderFormComponent {
                           .subscribe((packRes: any) => {
                             this.packingList = packRes.Data || [];
                             console.log(
-                              'All dropdown lists preloaded for edit mode.'
+                              'All dropdown lists preloaded for edit mode.',
                             );
                             this.cdr.detectChanges();
                           });
@@ -591,14 +593,14 @@ export class SalesOrderFormComponent {
     };
 
     this.selectedPackingID = this.packingList.find(
-      (p) => p.DESCRIPTION === e.value
+      (p) => p.DESCRIPTION === e.value,
     )?.ARTICLE_ID;
     const selectedPackingId = {
       PACKING_ID: this.selectedPackingID,
     };
     // Get the selected PACKING description text
     const selectedPackingText = this.packingList.find(
-      (p) => p.ARTICLE_ID === e.value
+      (p) => p.ARTICLE_ID === e.value,
     )?.DESCRIPTION;
 
     console.log('Selected Packing:', selectedPackingText);
@@ -791,7 +793,7 @@ export class SalesOrderFormComponent {
           console.log(packing);
 
           this.selectedPackingID = this.packingList.find(
-            (p) => p.DESCRIPTION === packing
+            (p) => p.DESCRIPTION === packing,
           )?.ARTICLE_ID;
           const selectedPackingId = {
             PACKING_ID: this.selectedPackingID,
@@ -886,7 +888,7 @@ export class SalesOrderFormComponent {
           (_, i) => ({
             size: start + i,
             quantity: null,
-          })
+          }),
         );
       }
 
@@ -973,7 +975,7 @@ export class SalesOrderFormComponent {
 
         const total = allData.reduce(
           (sum: number, row: any) => sum + (Number(row.quantity) || 0),
-          0
+          0,
         );
 
         this.totalQty = total;
@@ -1015,7 +1017,7 @@ export class SalesOrderFormComponent {
   updateTotalQty() {
     this.totalQty = this.cutsizeValues.reduce(
       (sum, item) => sum + (Number(item.quantity) || 0),
-      0
+      0,
     );
 
     console.log('Total Quantity:', this.totalQty);
@@ -1062,7 +1064,7 @@ export class SalesOrderFormComponent {
 
         console.log(
           `CONTENT updated at row ${this.cutsizeRowIndex}:`,
-          rowData.CONTENT
+          rowData.CONTENT,
         );
       } else {
         console.warn('Row data not found for Cutsize update.');
@@ -1135,7 +1137,7 @@ export class SalesOrderFormComponent {
   getWarehouseList(dealerId: number) {
     const payload = {
       CUST_ID: dealerId,
-       COMPANY_ID: this.companyID,
+      COMPANY_ID: this.companyID,
     };
     this.dataService.getWarehouse(payload).subscribe((response: any) => {
       this.warehouse = response.Data;
@@ -1150,12 +1152,12 @@ export class SalesOrderFormComponent {
   getDeliveryAddressDropdown(dealerId: number) {
     const payload = {
       CUST_ID: dealerId,
-       COMPANY_ID: this.companyID,
+      COMPANY_ID: this.companyID,
     };
 
     this.dataService.getDealerDropdown(payload).subscribe((response: any) => {
       this.deliveryAddress = response || [];
-      console.log(this.deliveryAddress,'===============delivery address')
+      console.log(this.deliveryAddress, '===============delivery address');
       if (this.deliveryAddress.length > 0) {
         // Automatically bind first delivery address
         const firstAddress = this.deliveryAddress[0];
@@ -1177,7 +1179,7 @@ export class SalesOrderFormComponent {
   onDeliveryAddressChanged(e: any) {
     const selectedId = e.value;
     const selectedAddress = this.deliveryAddress.find(
-      (item: any) => item.Id === selectedId
+      (item: any) => item.Id === selectedId,
     );
 
     if (selectedAddress) {
@@ -1222,14 +1224,14 @@ export class SalesOrderFormComponent {
       },
       (err) => {
         console.error('API error:', err);
-      }
+      },
     );
   }
 
   calculateTotalQuantity(): number {
     return this.salesOrderFormData.Details.reduce(
       (sum: number, item: any) => sum + (Number(item.QTY) || 0),
-      0
+      0,
     );
   }
 
@@ -1268,7 +1270,7 @@ export class SalesOrderFormComponent {
       notify(
         'Please add at least one valid item before saving.',
         'warning',
-        2000
+        2000,
       );
       return;
     }
@@ -1276,7 +1278,7 @@ export class SalesOrderFormComponent {
     // --- Total Qty ---
     const totalQty = validDetails.reduce(
       (sum: number, d: any) => sum + (Number(d.QTY) || 0),
-      0
+      0,
     );
 
     // --- Format date (yyyy-MM-dd) ---
@@ -1328,11 +1330,12 @@ export class SalesOrderFormComponent {
       // Confirm approval before calling API
       const result = confirm(
         'Are you sure you want to approve this Sales Order?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
 
       result.then((dialogResult) => {
         if (dialogResult) {
+          this.isSaving = true;
           // User confirmed → call approve API
           apiCall = this.dataService.approveSalesOrder(payload);
           message = 'Sales Order approved successfully!';
@@ -1348,11 +1351,12 @@ export class SalesOrderFormComponent {
     if (this.salesOrderFormData.ID) {
       console.log('SALESORDEREDIT');
       console.log(payload, 'PAYLOAD');
+      this.isSaving = true;
       // apiCall = this.dataService.updateSalesOrder(payload);
       // message = 'Sales Order updated successfully!';
       this.callApi(
         this.dataService.updateSalesOrder(payload),
-        'Sales Order updated successfully!'
+        'Sales Order updated successfully!',
       );
       return;
     }
@@ -1361,16 +1365,17 @@ export class SalesOrderFormComponent {
       // Show confirmation before insert
       const result = confirm(
         'Are you sure you want to save and approve this Sales Order?',
-        'Confirm Save & Approve'
+        'Confirm Save & Approve',
       );
 
       result.then((dialogResult) => {
         if (dialogResult) {
           //  Run API inside Angular zone
           this.ngZone.run(() => {
+            this.isSaving = true;
             this.callApi(
               this.dataService.saveSalesOrder(payload),
-              'Sales Order saved & approved successfully!'
+              'Sales Order saved & approved successfully!',
             );
           });
         } else {
@@ -1378,10 +1383,11 @@ export class SalesOrderFormComponent {
         }
       });
     } else {
+      this.isSaving = true;
       // Normal save (no confirmation)
       this.callApi(
         this.dataService.saveSalesOrder(payload),
-        'Sales Order saved successfully!'
+        'Sales Order saved successfully!',
       );
     }
     // else {
@@ -1396,6 +1402,7 @@ export class SalesOrderFormComponent {
   private callApi(apiCall: any, successMessage: string) {
     apiCall.subscribe({
       next: (response: any) => {
+        this.isSaving = false;
         if (response.Flag === '1' || response.Flag === 1) {
           notify(successMessage, 'success', 2000);
           this.popupClosed.emit();
@@ -1404,8 +1411,16 @@ export class SalesOrderFormComponent {
         }
       },
       error: (err) => {
-        console.error(' API failed:', err);
-        notify('Error performing operation. Please try again.', 'error', 2000);
+        this.isSaving = false; // ✅ STOP loading
+        console.error('API failed:', err);
+
+        notify(
+          err?.status === 0
+            ? 'Network error. Please check your internet connection.'
+            : 'Error performing operation. Please try again.',
+          'error',
+          2000,
+        );
       },
     });
   }

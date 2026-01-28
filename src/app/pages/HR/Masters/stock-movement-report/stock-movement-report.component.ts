@@ -1,4 +1,9 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   BrowserModule,
@@ -8,6 +13,7 @@ import {
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxDropDownBoxModule,
@@ -45,10 +51,17 @@ import { ExportService } from 'src/app/services/export.service';
   styleUrls: ['./stock-movement-report.component.scss'],
 })
 export class StockMovementReportComponent {
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
   StockMovementDatasource: any[] = [];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   auto: string = 'auto';
+  showHeaderFilter: true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
   months: any[] = [];
   selectedMonth: string;
   payloadDate: string;
@@ -64,6 +77,13 @@ export class StockMovementReportComponent {
   selected_fin_id: any;
   selectedstoreId: any;
   selected_item_Id: any;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -110,6 +130,19 @@ export class StockMovementReportComponent {
       this.selectedstoreId,
       '===========selected store id===================',
     );
+  }
+  toggleFilters() {
+    const grid = this.dataGrid?.instance;
+    if (!grid) return;
+
+    this.isFilterOpened = !this.isFilterOpened;
+
+    grid.beginUpdate();
+    grid.option({
+      filterRow: { visible: this.isFilterOpened },
+      headerFilter: { visible: this.isFilterOpened },
+    });
+    grid.endUpdate();
   }
 
   onItemIdChange(event: any) {

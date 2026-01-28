@@ -109,7 +109,9 @@ export class SupplierPaymentListComponent {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
     text: '',
   };
 
@@ -223,7 +225,16 @@ export class SupplierPaymentListComponent {
         // ✅ single binding variable
         this.filteredSupplierPaymentList = this.supplierPaymentList;
       },
-      error: () => {},
+
+      error: (err) => {
+        // ✅ ONLY ADDITION
+        const message =
+          err?.status === 0
+            ? 'Network connection lost. Please check your internet.'
+            : 'Unable to load supplier payments. Please try again.';
+
+        notify(message, 'error', 3000);
+      },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -328,6 +339,7 @@ export class SupplierPaymentListComponent {
   }
 
   refreshGrid() {
+    this.getSupplierPayments();
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }

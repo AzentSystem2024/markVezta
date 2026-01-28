@@ -100,6 +100,7 @@ export class EditCustomerReceiptComponent {
   selectedstoreId: any;
   selectedCustomer: any;
   private lastReceiptMode: string | null = null;
+  isSaving = false;
 
   constructor(private dataService: DataService) {}
 
@@ -777,10 +778,12 @@ export class EditCustomerReceiptComponent {
 
       result.then((dialogResult) => {
         if (dialogResult) {
+          this.isSaving = true;
           this.commitReceipt(); // call your API if user clicked "Yes"
         }
       });
     } else {
+      this.isSaving = true;
       this.UpdateReceipt(); // normal update
     }
   }
@@ -819,6 +822,7 @@ export class EditCustomerReceiptComponent {
     console.log(commitPayload, 'COMMITPAYLOADDDDDDDDDDDDDDDDDDDDDDDD');
     this.dataService.commitCustomerReceipt(commitPayload).subscribe({
       next: () => {
+        this.isSaving = false;
         notify('Receipt committed successfully!', 'success', 2000);
 
         // Emit popup close event
@@ -828,6 +832,7 @@ export class EditCustomerReceiptComponent {
         // this.resetForm();
       },
       error: () => {
+        this.isSaving = false;
         notify('Commit failed.', 'error', 2000);
       },
     });
@@ -877,6 +882,7 @@ export class EditCustomerReceiptComponent {
     // Call API
     this.dataService.updateReceipt(payload).subscribe({
       next: (response: any) => {
+        this.isSaving = false;
         if (response.flag == 1) {
           notify('Receipt updated successfully', 'success', 3000);
           this.popupClosed.emit();
@@ -887,6 +893,7 @@ export class EditCustomerReceiptComponent {
         // }
       },
       error: (err) => {
+        this.isSaving = false;
         console.error('Update error:', err);
         notify('An error occurred while updating the receipt', 'error', 3000);
       },

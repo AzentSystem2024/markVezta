@@ -31,7 +31,7 @@
           rowAlternationInterval="2"
           [selection]="{
             mode: 'multiple',
-            showCheckBoxesMode: 'always'
+            showCheckBoxesMode: 'always',
           }"
           (onContentReady)="onGridContentReady($event)"
           (onSelectionChanged)="onSelectionChanged($event)"
@@ -241,7 +241,7 @@
               <div
                 class="section-label"
                 [ngStyle]="{
-                  color: receiptMode === 'Bank' ? 'inherit' : '#888'
+                  color: receiptMode === 'Bank' ? 'inherit' : '#888',
                 }"
               >
                 Bank Remittance Details
@@ -363,11 +363,28 @@
     ></dx-button>
     <dx-button
       #saveButtonRef
-      [text]="paymentFormData.IS_APPROVED ? 'Commit' : 'Save'"
+      [text]="
+        isSaving
+          ? paymentFormData.IS_APPROVED
+            ? 'Committing...'
+            : 'Saving...'
+          : paymentFormData.IS_APPROVED
+            ? 'Commit'
+            : 'Save'
+      "
+      [disabled]="isSaving"
       stylingMode="contained"
       type="default"
       (onClick)="saveReceipt()"
     ></dx-button>
+
+    <!-- <dx-button
+      #saveButtonRef
+      [text]="paymentFormData.IS_APPROVED ? 'Commit' : 'Save'"
+      stylingMode="contained"
+      type="default"
+      (onClick)="saveReceipt()"
+    ></dx-button> -->
   </div>
 </div>
 
@@ -392,7 +409,7 @@
   >
     <!-- Display Total Pending Amount (read-only) -->
     <dx-text-box
-      [value]="totalPending | number : '1.2-2'"
+      [value]="totalPending | number: '1.2-2'"
       label="Total Pending Amount"
       labelMode="floating"
       [readOnly]="true"
@@ -459,7 +476,7 @@
       rowAlternationInterval="2"
       [selection]="{
         mode: 'single',
-        showCheckBoxesMode: 'always'
+        showCheckBoxesMode: 'always',
       }"
       (onRowDblClick)="onPdcSelected($event)"
     >

@@ -122,16 +122,39 @@ export class EditSupplierPaymentComponent {
   voucherNo: any;
   sessionData: any;
   isInitialLoad = true;
+  companyState: any;
+  companyStateID: any;
+  finID: any;
+  isSaving: boolean;
 
   constructor(
     private dataService: DataService,
     private cdRef: ChangeDetectorRef,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     this.sessionData_tax();
   }
 
   ngOnInit() {
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      const selectedCompany = userData?.SELECTED_COMPANY;
+      console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
+      this.companyState = selectedCompany.STATE_NAME;
+      this.companyStateID = selectedCompany.STATE_ID;
+      console.log(this.companyStateID, 'COMPANYSTATE');
+      this.finID = userData.FINANCIAL_YEARS?.[0].FIN_ID;
+      console.log(userData.FINANCIAL_YEARS?.[0].FIN_ID, 'FINIDDDDDDDDDDDDDDDD');
+      if (selectedCompany?.COMPANY_ID) {
+        this.selectedCompanyId = selectedCompany.COMPANY_ID;
+        console.log(
+          this.selectedCompanyId,
+          'SELECTEDCOMPANYIDDDDDDDDDDDDDDDDDDDDDDD',
+        );
+        this.companyList = [selectedCompany]; // Show only selected company
+      }
+    }
     this.getLedgerCodeDropdown();
     this.getSupplierDropdown();
     // this.getReceiptNo();
@@ -152,7 +175,7 @@ export class EditSupplierPaymentComponent {
 
       console.log(
         this.mainGridData,
-        'MAINGRIDDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        'MAINGRIDDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       );
       if (this.paymentFormData.PAY_DATE) {
         this.paymentDate = this.formatDateToYMD(this.paymentFormData.PAY_DATE);
@@ -175,7 +198,7 @@ export class EditSupplierPaymentComponent {
       this.selectedSupplierId = this.paymentFormData.SUPP_ID;
       console.log(
         this.selectedSupplierId,
-        'SUPPLIERIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
+        'SUPPLIERIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
       );
       // Map PAY_TYPE_ID to mode string
       console.log(this.paymentFormData.PAY_TYPE_ID, 'PAYTYPEIDDDDDD');
@@ -291,7 +314,7 @@ export class EditSupplierPaymentComponent {
           // ✅ Merge RECEIVED_AMOUNT from payDetails into the full pending list
           this.mainGridData = pendingList.map((pending: any) => {
             const matched = payDetails.find(
-              (item: any) => item.BILL_ID === pending.BILL_ID
+              (item: any) => item.BILL_ID === pending.BILL_ID,
             );
             return {
               ...pending,
@@ -321,16 +344,15 @@ export class EditSupplierPaymentComponent {
   }
 
   getSupplierDropdown() {
-    const payload={
-      NAME:'SUPPLIER',
-      COMPANY_ID:this.selectedCompanyId
-
-    }
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selectedCompanyId,
+    };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.supplierList = response;
       console.log(
         this.supplierList,
-        'distributorList=============================='
+        'distributorList==============================',
       );
 
       if (this.paymentFormData && this.paymentFormData.SUPP_ID) {
@@ -400,15 +422,15 @@ export class EditSupplierPaymentComponent {
   applyReceiptModeFilter() {
     console.log(
       this.filteredLedgerList,
-      '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{'
+      '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{',
     );
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13
+        (item: any) => item.GROUP_ID === 13,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
@@ -416,11 +438,11 @@ export class EditSupplierPaymentComponent {
           item.GROUP_ID !== 13 &&
           item.GROUP_ID !== 14 &&
           item.GROUP_ID !== 15 &&
-          item.GROUP_ID !== 41
+          item.GROUP_ID !== 41,
       );
     } else if (this.receiptMode === 'PDC') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
       console.log(this.filteredLedgerList, 'FILTEREDLEDGERLIST');
     } else {
@@ -437,7 +459,7 @@ export class EditSupplierPaymentComponent {
       next: (response: any) => {
         console.log(
           response,
-          'PDC List Response=============================-----------'
+          'PDC List Response=============================-----------',
         );
         this.pdcList = response?.Data || []; // store it in a variable
       },
@@ -476,7 +498,7 @@ export class EditSupplierPaymentComponent {
       this.chequeDate = new Date(
         Number(parts[2]), // year
         Number(parts[1]) - 1, // month is 0-based
-        Number(parts[0]) // day
+        Number(parts[0]), // day
       );
     } else {
       this.chequeDate = null;
@@ -494,7 +516,7 @@ export class EditSupplierPaymentComponent {
     // Calculate selected total balance
     this.totalPending = e.selectedRowsData.reduce(
       (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-      0
+      0,
     );
 
     console.log('Selected Balance Total:', this.totalPending.toFixed(2));
@@ -505,7 +527,7 @@ export class EditSupplierPaymentComponent {
       notify(
         'Please select at least one row before proceeding.',
         'warning',
-        3000
+        3000,
       );
       return;
     }
@@ -565,10 +587,10 @@ export class EditSupplierPaymentComponent {
     if (enteredValue > this.totalPending) {
       notify(
         `Entered amount cannot be greater than Total Pending Amount (${this.totalPending.toFixed(
-          2
+          2,
         )})`,
         'warning',
-        3000
+        3000,
       );
 
       // Clamp back to totalPending
@@ -588,10 +610,10 @@ export class EditSupplierPaymentComponent {
     if (enteredAmount - this.totalPending > 0.01) {
       notify(
         `Entered amount cannot be greater than Total Pending Amount (${this.totalPending.toFixed(
-          2
+          2,
         )})`,
         'error',
-        3000
+        3000,
       );
       return;
     }
@@ -667,7 +689,7 @@ export class EditSupplierPaymentComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -707,7 +729,7 @@ export class EditSupplierPaymentComponent {
       notify(
         'Please select at least one row with a valid amount.',
         'warning',
-        3000
+        3000,
       );
       return;
     }
@@ -720,10 +742,10 @@ export class EditSupplierPaymentComponent {
       TRANS_ID: this.paymentFormData.TRANS_ID,
       TRANS_TYPE: 21,
       PAY_DATE: this.paymentDate,
-      COMPANY_ID: 1,
+      COMPANY_ID: this.selectedCompanyId,
       STORE_ID: 1,
-      FIN_ID: 1,
-      TRANS_STATUS: 1,
+      FIN_ID: this.finID,
+      // TRANS_STATUS: 1,
       RECEIPT_NO: this.paymentFormData.RECEIPT_NO,
       REF_NO: this.refNo,
       CHEQUE_NO: this.chequeNo,
@@ -747,7 +769,7 @@ export class EditSupplierPaymentComponent {
         notify(
           `PDC amount (${pdcAmount}) must equal the total received amount (${netAmount})`,
           'error',
-          4000
+          4000,
         );
         return;
       }
@@ -756,17 +778,20 @@ export class EditSupplierPaymentComponent {
     if (this.isApproved) {
       const result = confirm(
         'Are you sure you want to approve and commit this invoice?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
 
       result.then((dialogResult) => {
         if (dialogResult) {
+          this.isSaving = true;
           this.dataService.approveSupplierPayment(payload).subscribe({
             next: (res) => {
+              this.isSaving = false;
               notify('Payment approved successfully!', 'success', 3000);
               this.popupClosed.emit();
             },
             error: (err) => {
+              this.isSaving = false;
               console.error('Approval failed:', err);
               notify('Approval failed. Please try again.', 'error', 3000);
             },
@@ -774,39 +799,23 @@ export class EditSupplierPaymentComponent {
         }
       });
     } else {
-      // ❌ Otherwise, call update API
+      this.isSaving = true;
+      // Otherwise, call update API
       this.dataService.updateSupplierPayment(payload).subscribe({
         next: (response: any) => {
+          this.isSaving = false;
           notify('Payment updated successfully!', 'success', 3000);
           // this.resetForm();
           this.popupClosed.emit();
         },
         error: (err) => {
+          this.isSaving = false;
           console.error('Update failed:', err);
           notify('Update failed. Please try again.', 'error', 3000);
         },
       });
     }
   }
-
-  // resetForm() {
-  //   this.paymentFormData = {}; // or re-assign your default object
-  //   this.refNo = '';
-  //   this.chequeNo = '';
-  //   this.chequeDate = null;
-  //   this.bank = '';
-  //   this.narration = '';
-  //   this.selectedPaymentMode = null;
-  //   this.ledger = null;
-  //   this.selectedSupplierId = null;
-  //   this.isApproved = false;
-
-  //   // clear selected rows in grid
-  //   this.itemsGridRef?.instance?.clearSelection();
-
-  //   // optionally reset date to today
-  //   this.paymentDate = new Date();
-  // }
 
   cancel() {
     this.popupClosed.emit();

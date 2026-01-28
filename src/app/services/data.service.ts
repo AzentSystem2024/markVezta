@@ -16,6 +16,7 @@ import { Verify } from 'crypto';
 import { AnyARecord } from 'dns';
 
 const API_URL = 'https://js.devexpress.com/Demos/RwaService/api';
+const version = '1.0';
 export interface ItemStorePayload {
   ITEM_ID: number;
   STORE_ID: number;
@@ -42,6 +43,10 @@ export class DataService {
   }
   getDepartments() {
     throw new Error('Method not implemented.');
+  }
+
+  get_version() {
+    return version;
   }
 
   private worksheetDataSubject = new BehaviorSubject<any>(null); // Initialize with null
@@ -6132,7 +6137,6 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'ArticleProduction/insert';
     return this.http.post(getEndpoint, payload);
   }
-
 
   Update_Article_Production_Api(payload) {
     const getEndpoint = this.apiUrl + 'ArticleProduction/update';

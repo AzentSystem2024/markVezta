@@ -56,7 +56,6 @@ import { ViewInvoiceModule } from '../view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
 
-
 @Component({
   selector: 'app-invoice-list',
   templateUrl: './invoice-list.component.html',
@@ -108,7 +107,9 @@ export class InvoiceListComponent {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
     text: '',
   };
   isAddInvoice: boolean = false;
@@ -126,8 +127,8 @@ export class InvoiceListComponent {
   showCustomDatePopup = false;
   filteredInvoiceList: any;
   InvoiceDataSource: DataSource;
-invoiceArray: any[] = [];
-invoiceCount = 0;
+  invoiceArray: any[] = [];
+  invoiceCount = 0;
   isEditInvoice: boolean = false;
   selectedInvoice: any;
   isViewInvoice: boolean;
@@ -253,62 +254,60 @@ invoiceCount = 0;
   // }
 
   getInvoiceList(dateRange: string = this.selectedDateRange) {
-  const datePayload = this.getDateRangePayload(dateRange);
+    const datePayload = this.getDateRangePayload(dateRange);
 
-  const payload = {
-    COMPANY_ID: this.companyID,
-    DATE_FROM: datePayload.DATE_FROM,
-    DATE_TO: datePayload.DATE_TO,
-  };
+    const payload = {
+      COMPANY_ID: this.companyID,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
+    };
 
-  this.InvoiceDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataService.getInvoiceMainList(payload).subscribe({
-          next: (response: any) => {
-            const list = (response?.Data || [])
-              .map((item: any) => {
-                let dateValue: Date;
+    this.InvoiceDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.getInvoiceMainList(payload).subscribe({
+            next: (response: any) => {
+              const list = (response?.Data || [])
+                .map((item: any) => {
+                  let dateValue: Date;
 
-                if (
-                  typeof item.SALE_DATE === 'string' &&
-                  item.SALE_DATE.includes('-')
-                ) {
-                  const [day, month, year] = item.SALE_DATE
-                    .split('-')
-                    .map(Number);
-                  dateValue = new Date(year, month - 1, day);
-                } else {
-                  dateValue = new Date(item.SALE_DATE);
-                }
+                  if (
+                    typeof item.SALE_DATE === 'string' &&
+                    item.SALE_DATE.includes('-')
+                  ) {
+                    const [day, month, year] =
+                      item.SALE_DATE.split('-').map(Number);
+                    dateValue = new Date(year, month - 1, day);
+                  } else {
+                    dateValue = new Date(item.SALE_DATE);
+                  }
 
-                return {
-                  ...item,
-                  SALE_DATE: dateValue,
-                };
-              })
-              .sort((a: any, b: any) => {
-                const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
-                const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
-                return numB - numA; // descending
-              });
+                  return {
+                    ...item,
+                    SALE_DATE: dateValue,
+                  };
+                })
+                .sort((a: any, b: any) => {
+                  const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
+                  const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
+                  return numB - numA; // descending
+                });
 
-            // 🔑 cache for logic
-            this.invoiceArray = list;
-            this.invoiceCount = list.length;
+              // 🔑 cache for logic
+              this.invoiceArray = list;
+              this.invoiceCount = list.length;
 
-            resolve(list); // 🔑 grid data
-          },
-          error: () => {
-            this.invoiceArray = [];
-            this.invoiceCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(list); // 🔑 grid data
+            },
+            error: () => {
+              this.invoiceArray = [];
+              this.invoiceCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   private getDateRangePayload(range: string) {
     const today = new Date();
@@ -555,32 +554,31 @@ invoiceCount = 0;
   // }
 
   applyCustomDateFilter() {
-  if (!(this.customStartDate && this.customEndDate)) return;
+    if (!(this.customStartDate && this.customEndDate)) return;
 
-  const payload = {
-    COMPANY_ID: this.companyID,
-    DATE_FROM: this.formatAsYYYYMMDD(new Date(this.customStartDate)),
-    DATE_TO: this.formatAsYYYYMMDD(new Date(this.customEndDate)),
-  };
+    const payload = {
+      COMPANY_ID: this.companyID,
+      DATE_FROM: this.formatAsYYYYMMDD(new Date(this.customStartDate)),
+      DATE_TO: this.formatAsYYYYMMDD(new Date(this.customEndDate)),
+    };
 
-  this.InvoiceDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataService.getInvoiceMainList(payload).subscribe({
-          next: (response: any) => {
-            const list = response?.Data || [];
-            this.invoiceArray = list;
-            this.invoiceCount = list.length;
-            resolve(list);
-          },
-          error: () => resolve([]),
-        });
-      }),
-  });
+    this.InvoiceDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.getInvoiceMainList(payload).subscribe({
+            next: (response: any) => {
+              const list = response?.Data || [];
+              this.invoiceArray = list;
+              this.invoiceCount = list.length;
+              resolve(list);
+            },
+            error: () => resolve([]),
+          });
+        }),
+    });
 
-  this.showCustomDatePopup = false;
-}
-
+    this.showCustomDatePopup = false;
+  }
 
   private parseDateString(dateStr: string): Date {
     const [day, month, year] = dateStr

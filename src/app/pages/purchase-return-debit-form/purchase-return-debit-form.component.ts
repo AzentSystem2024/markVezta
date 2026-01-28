@@ -61,7 +61,8 @@ import { confirm } from 'devextreme/ui/dialog';
 })
 export class PurchaseReturnDebitFormComponent {
   @ViewChild('popupGridRef', { static: false }) popupGridRef: any;
-  @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
+  @ViewChild('itemsGridRef', { static: false })
+  itemsGridRef!: DxDataGridComponent;
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
@@ -158,12 +159,13 @@ export class PurchaseReturnDebitFormComponent {
   grandTotal: any;
   userID: any;
   finID: any;
+  isSaving = false;
 
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
@@ -207,7 +209,9 @@ export class PurchaseReturnDebitFormComponent {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const data = this.EditingResponseData;
-
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
+    });
     // Form patch
     this.purchaseReturnFormData = { ...this.purchaseReturnFormData, ...data };
 
@@ -243,10 +247,10 @@ export class PurchaseReturnDebitFormComponent {
       UOM_MULTIPLE: item.UOM_MULTIPLE,
       BARCODE: item.BAR_CODE,
       HSN_CODE: item.HSN_CODE,
-      CGST: this.sameState ? item.CGST ?? 0 : 0,
-      SGST: this.sameState ? item.SGST ?? 0 : 0,
+      CGST: this.sameState ? (item.CGST ?? 0) : 0,
+      SGST: this.sameState ? (item.SGST ?? 0) : 0,
 
-      VAT_PERC: this.sameState ? 0 : item.VAT_PERC ?? 0,
+      VAT_PERC: this.sameState ? 0 : (item.VAT_PERC ?? 0),
       DOC_NO: item.DOC_NO,
     }));
 
@@ -257,6 +261,8 @@ export class PurchaseReturnDebitFormComponent {
         this.itemsGridRef.instance.option('dataSource', this.mainGridData);
         this.itemsGridRef.instance.endUpdate();
         this.itemsGridRef.instance.refresh();
+
+        this.itemsGridRef?.instance?.endCustomLoading();
       }
     }, 50);
   }
@@ -275,7 +281,7 @@ export class PurchaseReturnDebitFormComponent {
   getSupplierLstWithState() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
-      NAME:'SUPPLIER'
+      NAME: 'SUPPLIER',
     };
     this.dataService
       .getSupplierWithState(payload)
@@ -300,7 +306,7 @@ export class PurchaseReturnDebitFormComponent {
       console.log('Grid cleared because supplier changed.');
     }
     const selectedSupplier = this.supplierList.find(
-      (supplier: any) => supplier.ID === this.selectedSupplierId
+      (supplier: any) => supplier.ID === this.selectedSupplierId,
     );
     this.selectedSupplierStateId = selectedSupplier.STATE_ID;
 
@@ -359,11 +365,11 @@ export class PurchaseReturnDebitFormComponent {
     if (selectedRows.length > 0) {
       selectedRows.forEach((row) => {
         const exists = this.mainGridData.some(
-          (item) => item.DETAIL_ID === row.DETAIL_ID
+          (item) => item.DETAIL_ID === row.DETAIL_ID,
         );
 
         if (!exists) {
-          const gstPerc = Number(row.VAT_PERC) || 0;
+          const gstPerc = Number(row.GST_PERC) || 0;
 
           let cgst = 0;
           let sgst = 0;
@@ -531,7 +537,7 @@ export class PurchaseReturnDebitFormComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -557,10 +563,10 @@ export class PurchaseReturnDebitFormComponent {
     const totalRate = Number(rowData.RATE) || 0;
     const pendingQty = Number(rowData.PENDING_QTY) || 0;
     // const rate = Number(rowData.RATE) || 0;
-    const rate = pendingQty > 0 ? totalRate / pendingQty : 0;
+    // const rate = pendingQty > 0 ? totalRate / pendingQty : 0;
 
-    const amount = qty * rate;
-
+    // const amount = qty * rate;
+    const amount = qty * totalRate;
     // also store the calculated amount inside the row (optional)
     rowData.AMOUNT = amount;
 
@@ -622,7 +628,7 @@ export class PurchaseReturnDebitFormComponent {
 
     // Validate quantity
     const invalidQtyRow = this.mainGridData.find(
-      (row) => !row.QUANTITY || row.QUANTITY <= 0
+      (row) => !row.QUANTITY || row.QUANTITY <= 0,
     );
     if (invalidQtyRow) {
       notify('Please enter a valid Quantity for all items.', 'warning', 2000);
@@ -661,7 +667,7 @@ export class PurchaseReturnDebitFormComponent {
           UOM_PURCH: row.UOM_PURCH ?? '',
           UOM_MULTIPLE: row.UOM_MULTIPLE ?? 0,
         };
-      }
+      },
     );
     this.purchaseReturnFormData.VEHICLE_NO =
       this.purchaseReturnFormData.VEHICLE_NO;
@@ -674,7 +680,7 @@ export class PurchaseReturnDebitFormComponent {
     this.purchaseReturnFormData.FIN_ID = this.finID;
     this.purchaseReturnFormData.USER_ID = this.purchaseReturnFormData.USER_ID;
     this.purchaseReturnFormData.RET_DATE = this.toDateOnlyString(
-      this.purchaseReturnFormData.RET_DATE
+      this.purchaseReturnFormData.RET_DATE,
     );
 
     // --- ADD MODE vs EDIT MODE ---
@@ -691,30 +697,46 @@ export class PurchaseReturnDebitFormComponent {
       if (this.purchaseReturnFormData.IS_APPROVED === true) {
         const result = confirm(
           `Are you sure you want to approve this Purchase Return?`,
-          'Confirm Approval'
+          'Confirm Approval',
         );
 
         result.then((dialogResult) => {
           if (dialogResult) {
+            this.isSaving = true;
             // user clicked OK → call APPROVE API
             this.dataService
               .approvePurchaseReturn(this.purchaseReturnFormData)
               .subscribe(
                 (response: any) => {
+                  this.isSaving = false;
                   notify(
                     {
                       message: 'Purchase Return Approved Successfully',
                       position: { at: 'top right', my: 'top right' },
                     },
-                    'success'
+                    'success',
                   );
 
                   this.popupClosed.emit();
                 },
                 (error) => {
-                  console.error('APPROVE ERROR:', error);
-                  notify('Error approving purchase return.', 'error');
-                }
+                  this.isSaving = false;
+                  console.error('SAVE ERROR:', error);
+
+                  if (error?.status === 0) {
+                    notify(
+                      'Network error. Please check your internet connection and try again.',
+                      'error',
+                      3000,
+                    );
+                  } else {
+                    notify(
+                      'Error saving purchase return. Please try again.',
+                      'error',
+                      3000,
+                    );
+                  }
+                },
               );
           } else {
             // user clicked Cancel → do nothing
@@ -725,24 +747,40 @@ export class PurchaseReturnDebitFormComponent {
         return; // prevent continuing to update API block
       } else {
         // Otherwise → UPDATE API
+        this.isSaving = true;
         this.dataService
           .updatePurchaseReturn(this.purchaseReturnFormData)
           .subscribe(
             (response: any) => {
+              this.isSaving = false;
               notify(
                 {
                   message: 'Purchase Return Updated Successfully',
                   position: { at: 'top right', my: 'top right' },
                 },
-                'success'
+                'success',
               );
 
               this.popupClosed.emit();
             },
             (error) => {
-              console.error('UPDATE ERROR:', error);
-              notify('Error updating purchase return.', 'error');
-            }
+              this.isSaving = false;
+              console.error('SAVE ERROR:', error);
+
+              if (error?.status === 0) {
+                notify(
+                  'Network error. Please check your internet connection and try again.',
+                  'error',
+                  3000,
+                );
+              } else {
+                notify(
+                  'Error saving purchase return. Please try again.',
+                  'error',
+                  3000,
+                );
+              }
+            },
           );
       }
     } else {
@@ -753,22 +791,24 @@ export class PurchaseReturnDebitFormComponent {
       if (this.purchaseReturnFormData.IS_APPROVED === true) {
         const result = confirm(
           'Are you sure you want to approve and commit this invoice?',
-          'Confirmation'
+          'Confirmation',
         );
 
         result.then((confirmed) => {
           if (confirmed) {
             // User clicked YES → Save
+            this.isSaving = true;
             this.dataService
               .insertPurchaseReturn(this.purchaseReturnFormData)
               .subscribe(
                 (response: any) => {
+                  this.isSaving = false;
                   notify(
                     {
                       message: 'Purchase Return Saved Successfully',
                       position: { at: 'top right', my: 'top right' },
                     },
-                    'success'
+                    'success',
                   );
                   this.resetPurchaseReturnForm();
 
@@ -781,33 +821,63 @@ export class PurchaseReturnDebitFormComponent {
                     });
                 },
                 (error) => {
+                  this.isSaving = false;
                   console.error('SAVE ERROR:', error);
-                  notify('Error saving purchase return.', 'error');
-                }
+
+                  if (error?.status === 0) {
+                    notify(
+                      'Network error. Please check your internet connection and try again.',
+                      'error',
+                      3000,
+                    );
+                  } else {
+                    notify(
+                      'Error saving purchase return. Please try again.',
+                      'error',
+                      3000,
+                    );
+                  }
+                },
               );
           }
         });
       } else {
+        this.isSaving = true;
         // Not approved → Direct INSERT
         this.dataService
           .insertPurchaseReturn(this.purchaseReturnFormData)
           .subscribe(
             (response: any) => {
+              this.isSaving = false;
               notify(
                 {
                   message: 'Purchase Return Saved Successfully',
                   position: { at: 'top right', my: 'top right' },
                 },
-                'success'
+                'success',
               );
               this.resetPurchaseReturnForm();
               // this.getDocNo();
               this.popupClosed.emit();
             },
             (error) => {
+              this.isSaving = false;
               console.error('SAVE ERROR:', error);
-              notify('Error saving purchase return.', 'error');
-            }
+
+              if (error?.status === 0) {
+                notify(
+                  'Network error. Please check your internet connection and try again.',
+                  'error',
+                  3000,
+                );
+              } else {
+                notify(
+                  'Error saving purchase return. Please try again.',
+                  'error',
+                  3000,
+                );
+              }
+            },
           );
       }
     }
