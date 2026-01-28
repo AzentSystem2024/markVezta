@@ -59,6 +59,8 @@ import {
   ProductionJvAddModule,
 } from '../production-jv-add/production-jv-add.component';
 import { ProductionJvViewModule } from '../production-jv-view/production-jv-view.component';
+import { BoxproductionJvAddComponent, BoxproductionJvAddModule } from '../boxproduction-jv-add/boxproduction-jv-add.component';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-production-jv-list',
@@ -70,6 +72,8 @@ export class ProductionJvListComponent {
   dataGrid: DxDataGridComponent;
   @ViewChild(ProductionJvAddComponent)
   productionForm!: ProductionJvAddComponent;
+@ViewChild(BoxproductionJvAddComponent)
+boxProductionForm!: BoxproductionJvAddComponent;
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -79,7 +83,9 @@ export class ProductionJvListComponent {
   isFilterOpened = false;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
-  isViewBoxProduction: boolean = false;
+  isViewBoxProduction : boolean = false;
+  isBoxAddPopupVisible :boolean = false;
+  isEditBoxPopupVisible : boolean = false;
   auto: string = 'auto';
   searchButtonOptions = {
     icon: 'search',
@@ -658,13 +664,14 @@ export class ProductionJvListComponent {
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo.data, 'statussssssssss');
     const status = cellInfo.data.STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === '5' ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === '5' ? 'Approved' : 'Open';
+    icon.style.color = status === "5" ? '#5cac6fff' : 'rgb(236, 75, 75)';
+    icon.title = status === "5" ? 'Approved' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -729,6 +736,7 @@ export class ProductionJvListComponent {
     const status = event.data.STATUS;
 
     const isArticle = this.selectedProductionType === 'ARTICLE';
+    const isBox = this.selectedProductionType === 'BOX';
 
     const api$ = isArticle
       ? this.dataService.selectProduction(productionId)
@@ -749,6 +757,9 @@ export class ProductionJvListComponent {
         //  EDIT MODE
         if (isArticle && status !== '5') {
           this.isEditPopupVisible = true;
+        } 
+        else if (isBox && status !== '5') {
+          this.isEditBoxPopupVisible = true;
         } else {
           this.isViewBoxProduction = true;
         }
@@ -798,7 +809,9 @@ export class ProductionJvListComponent {
   handleClose() {
     this.isViewProduction = false;
     this.isAddPopupVisible = false;
+    this.isBoxAddPopupVisible = false;  
     this.isEditPopupVisible = false;
+    this.isEditBoxPopupVisible = false;
     this.isViewBoxProduction = false;
     this.isEditInvoice = false;
 
@@ -809,19 +822,30 @@ export class ProductionJvListComponent {
     });
   }
 
+
   onPopupHiding() {
-    console.log('Popup closed');
+  console.log('Popup closed');
 
-    if (this.productionForm) {
-      this.productionForm.resetForm(); //  RESET CHILD FORM
-    }
+  if (this.selectedProductionType === 'BOX') {
+    this.boxProductionForm?.resetForm();
+  } else {
+    this.productionForm?.resetForm();
+  }
 
+  this.isAddPopupVisible = false;
+  this.isBoxAddPopupVisible = false;
+}
+
+
+ addProduction() {
+  if (this.selectedProductionType === 'BOX') {
+    this.isBoxAddPopupVisible = true;
     this.isAddPopupVisible = false;
-  }
-
-  addProduction() {
+  } else {
     this.isAddPopupVisible = true;
+    this.isBoxAddPopupVisible = false;
   }
+}
 
   onProductionTypeChanged(e: any) {
     this.selectedProductionType = e.value; // ARTICLE / BOX
@@ -833,6 +857,42 @@ export class ProductionJvListComponent {
       ? 'Article Production'
       : 'Box Production';
   }
+
+  delete_Data(event: any) {
+  console.log(event, 'to delete id');
+
+  const Id = event?.data?.PRODUCTION_ID;
+  if (!Id) {
+    notify('Invalid production id', 'error', 2000);
+    return;
+  }
+
+  const api$ =
+    this.selectedProductionType === 'BOX'
+      ? this.dataService.Delete_Box_Production_Api(Id)
+      : this.dataService.Delete_Article_Production_Api(Id);
+
+  api$.subscribe({
+    next: () => {
+      notify(
+        {
+          message: 'Data successfully deleted',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1500,
+        },
+        'success'
+      );
+
+      // 🔄 Refresh list after delete
+      this.getProductionList();
+    },
+    error: (err) => {
+      console.error('Delete failed:', err);
+      notify('Failed to delete data', 'error', 3000);
+    },
+  });
+}
+
 }
 @NgModule({
   imports: [
@@ -877,6 +937,7 @@ export class ProductionJvListComponent {
     InvoiceTrOutAddModule,
     ProductionJvAddModule,
     ProductionJvViewModule,
+    BoxproductionJvAddModule
   ],
   providers: [],
   declarations: [ProductionJvListComponent],

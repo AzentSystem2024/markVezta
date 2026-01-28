@@ -6148,13 +6148,31 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-  //==============INSERT IN BOM PRODUCTION=================
-  Insert_Bom_Production_Api(payload) {
+  Delete_Article_Production_Api(id: number) {
+    return this.http.post<any>(`${this.apiUrl}ArticleProduction/delete/` + id, {});
+  }
+
+  //==============INSERT IN BOX PRODUCTION=================
+  Insert_Box_Production_Api(payload) {
     const getEndpoint = this.apiUrl + 'BoxProduction/insert';
     return this.http.post(getEndpoint, payload);
   }
 
-  //==============PRODUCT IN BOM PRODUCTION=================
+   Update_Box_Production_Api(payload) {
+    const getEndpoint = this.apiUrl + 'BoxProduction/update';
+    return this.http.post(getEndpoint, payload);
+  }
+
+   Commit_Box_Production_Api(payload) {
+    const getEndpoint = this.apiUrl + 'BoxProduction/commit';
+    return this.http.post(getEndpoint, payload);
+  }
+
+    Delete_Box_Production_Api(id: number) {
+    return this.http.post<any>(`${this.apiUrl}BoxProduction/delete/` + id, {});
+  }
+
+  //==============PRODUCT IN BOX PRODUCTION=================
   get_Product_In_Bom_Production_Api(payload) {
     const getEndpoint = this.apiUrl + 'BoxProduction/packingbomlist';
     return this.http.post(getEndpoint, payload);

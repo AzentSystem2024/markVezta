@@ -72,12 +72,14 @@ export class ProductionJvAddComponent {
   @Output() formClosed = new EventEmitter<void>();
      @Input() isEditing: boolean = false;
      @Input() EditingResponseData: any;
+     @Input() selectedProductionType: 'ARTICLE' | 'BOX' = 'ARTICLE';
+
 
   Article: any;
   gridData: any[] = [];
   totalAmount: number = 0;
   finalCost: number = 0;
-  additionalCost: number = 0;
+  // additionalCost: number = 0;
   unitProductCost: number = 0;
     isApproved: boolean = false;
 
@@ -97,12 +99,14 @@ export class ProductionJvAddComponent {
     UNIT_PRODUCT_COST: 0,
     PROD_QTY: 0,
     STATUS: 1,
-    PRODUCTION_TYPE: 'ARTICLE',
+    PRODUCTION_TYPE: 1, // 1 = ARTICLE, 2 = BOX
+
     RawMaterials: [
       {
         ID: 0,
         UOM: '',
         REQUIRED_QTY: 0,
+        QTY_AVAILABLE: 0,
         USED_QTY: 0,
         QUANTITY: 0,
         COST: 0,
@@ -119,9 +123,46 @@ export class ProductionJvAddComponent {
   ngOnInit() {
     this.sesstion_Details();
     this.get_ProductDropdown();
-    this.getPendingNo();
+    // this.getPendingNo();
+     if (!this.isEditing) {
+    this.initAddForm();
+  }
+    if (!this.isEditing) {
+    this.productionJVFormData.PRODUCTION_DATE = new Date();
+  }
+
     this.isEditDataAvailable();
   }
+
+  initAddForm() {
+  this.productionJVFormData = {
+    ID: 0,
+    DOC_NO: '',
+    COMPANY_ID: this.selected_Company_id,
+    FIN_ID: this.selected_fin_id,
+    USER_ID: this.user_id,
+    REF_NO: '',
+    PRODUCTION_DATE: new Date(),   // ✅ ALWAYS SET
+    REMARKS: '',
+    TOTAL_ITEM_COST: 0,
+    ADDL_COST: 0,
+    COST_OF_PRODUCTION: 0,
+    PRODUCT_ID: 0,
+    UNIT_PRODUCT_COST: 0,
+    PROD_QTY: 0,
+    STATUS: 1,
+    PRODUCTION_TYPE: 1,
+    RawMaterials: [],
+  };
+
+  this.gridData = [];
+  this.totalAmount = 0;
+  // this.additionalCost = 0;
+  this.finalCost = 0;
+  this.unitProductCost = 0;
+
+  this.getPendingNo(); // ✅ ALWAYS FETCH NEW DOC NO
+}
 
   //==================== Production Qty Change Handler ===================//
   onProductionQtyChange() {}
@@ -291,7 +332,7 @@ export class ProductionJvAddComponent {
         //  Apply existing logic (UNCHANGED)
         this.gridData.forEach((item) => {
           const bomQty = Number(item.QUANTITY) || 0;
-
+          item.QTY_AVAILABLE = item.QTY_AVAILABLE;
           item.REQUIRED_QTY = prodQty * bomQty;
           item.USED_QTY = item.REQUIRED_QTY;
           // item.COST = 1000;
@@ -318,13 +359,23 @@ export class ProductionJvAddComponent {
     }
   }
 
-  calculateFinalCost() {
-    this.finalCost =
-      (Number(this.totalAmount) || 0) + (Number(this.additionalCost) || 0);
+  // calculateFinalCost() {
+  //   //  const addlCost = Number(this.productionJVFormData.ADDL_COST) || 0;
+  //   this.finalCost =
+  //     (Number(this.totalAmount) || 0) + (Number(this.additionalCost) || 0);
 
-    console.log('Final Cost:', this.finalCost);
-    this.calculateUnitProductCost();
-  }
+  //   console.log('Final Cost:', this.finalCost);
+  //   this.calculateUnitProductCost();
+  // }
+
+  calculateFinalCost() {
+  this.finalCost =
+    (Number(this.totalAmount) || 0) +
+    (Number(this.productionJVFormData.ADDL_COST) || 0);
+
+  this.calculateUnitProductCost();
+}
+
 
   calculateTotalAmount() {
     this.totalAmount = this.gridData.reduce((sum, row) => {
@@ -335,11 +386,19 @@ export class ProductionJvAddComponent {
     this.calculateFinalCost();
   }
 
+  // onAdditionalCostChange(e: any) {
+    
+  //   this.additionalCost = Number(e.value) || 0;
+  //   console.log('Additional Cost Changed:', this.additionalCost);
+  //   this.calculateFinalCost();
+  // } 
+
   onAdditionalCostChange(e: any) {
-    this.additionalCost = Number(e.value) || 0;
-    console.log('Additional Cost Changed:', this.additionalCost);
-    this.calculateFinalCost();
-  }
+  this.productionJVFormData.ADDL_COST = Number(e.value) || 0;
+  console.log('Additional Cost Changed:', this.productionJVFormData.ADDL_COST);
+  this.calculateFinalCost();
+}
+
 
   //==================== Calculate Unit Product Cost ===================//
   calculateUnitProductCost() {
@@ -355,14 +414,18 @@ export class ProductionJvAddComponent {
     console.log('Unit Product Cost:', this.unitProductCost);
   }
 
-  //  isEditDataAvailable() {
-  //   if (!this.isEditing || !this.EditingResponseData) {
-  //     return; // Not edit mode → nothing to load
-  //   }
 
-  //   const data = this.EditingResponseData;
-  //   console.log('EDIT RESPONSE:', data);
-  // }
+private formatDateForApi(date: Date | string): string {
+  if (!date) return '';
+
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`; // yyyy-MM-dd
+}
+
 
   isEditDataAvailable() {
   if (!this.isEditing || !this.EditingResponseData) {
@@ -390,35 +453,35 @@ export class ProductionJvAddComponent {
 
     REF_NO: header.REF_NO,
     PRODUCTION_DATE: productionDate,
-    REMARKS: header.ADDL_DESCRIPTION || '',
+    REMARKS: header.REMARKS || '',
     TOTAL_ITEM_COST: header.TOTAL_COST || 0,
     ADDL_COST: header.ADDL_COST || 0,
     COST_OF_PRODUCTION: header.COST_PRODUCTION || 0,
-    STATUS: this.productionJVFormData.STATUS,
+     STATUS: header.STATUS,
     PRODUCT_ID: header.PRODUCT_ID,
     PROD_QTY: header.PRODUCED_QTY || 0,
     UNIT_PRODUCT_COST: header.UNIT_COST || 0,
 
-    PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE || 'ARTICLE',
+  PRODUCTION_TYPE: header.PRODUCTION_TYPE ?? 1,
 
     RawMaterials: [], // will be set below
   };
 
   // ================= GRID DATA =================
   this.gridData = rawMaterials.map((item: any) => ({
-    ID: item.ID,
-    ITEM_ID: item.ITEM_ID,
+    ID: item.ITEM_ID,
+    // ITEM_ID: item.ITEM_ID,
     ITEM_CODE: item.ITEM_CODE,
     DESCRIPTION: item.DESCRIPTION,
     UOM: item.UOM,
 
-    BOM_QTY: Number(item.BOM_QTY) || 0,
+    // BOM_QTY: Number(item.BOM_QTY) || 0,
     REQUIRED_QTY: Number(item.REQUIRED_QTY) || 0,
     USED_QTY: Number(item.USED_QTY) || 0,
 
     UNIT_COST: Number(item.UNIT_COST) || 0,
-    TOTAL_COST: Number(item.TOTAL_COST) || 0,
-
+    // TOTAL_COST: Number(item.TOTAL_COST) || 0,
+    QTY_AVAILABLE: Number(item.QTY_AVAILABLE) || 0,
     // derived / editable fields
     QUANTITY: Number(item.USED_QTY) || 0,
     COST: Number(item.UNIT_COST) || 0,
@@ -592,7 +655,7 @@ export class ProductionJvAddComponent {
   // =====================================================
   const invalidRow = this.gridData.find((item: any) => {
     const usedQty = Number(item.USED_QTY) || 0;
-    const availableQty = Number(item.AVAILABLE_QTY) || 0;
+    const availableQty = Number(item.QTY_AVAILABLE) || 0;
     return usedQty > availableQty;
   });
 
@@ -614,17 +677,17 @@ export class ProductionJvAddComponent {
     FIN_ID: this.selected_fin_id,
     USER_ID: this.user_id,
     REMARKS: this.productionJVFormData.REMARKS,
-    PRODUCTION_DATE: this.productionJVFormData.PRODUCTION_DATE,
+    PRODUCTION_DATE: this.formatDateForApi(this.productionJVFormData.PRODUCTION_DATE),
     TOTAL_ITEM_COST: this.totalAmount,
     COST_OF_PRODUCTION: this.finalCost,
     UNIT_PRODUCT_COST: this.unitProductCost,
     REF_NO: this.productionJVFormData.REF_NO,
-    ADDL_COST: this.additionalCost,
+    ADDL_COST: this.productionJVFormData.ADDL_COST,
     PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
     PROD_QTY: this.productionJVFormData.PROD_QTY,
     STATUS: this.productionJVFormData.STATUS ?? 1,
-    PRODUCTION_TYPE:
-      this.productionJVFormData.PRODUCTION_TYPE === 'ARTICLE' ? 1 : 2,
+   PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE,
+
     RawMaterials: this.gridData,
     // IS_APPROVED: this.isApproved,
   };
@@ -677,29 +740,18 @@ export class ProductionJvAddComponent {
 // =====================================================
 
 if (!this.isEditing) {
-  // -------- ADD MODE --------
   callInsertAPI();
   return;
 }
 
-// -------- EDIT MODE --------
-if (payload.STATUS === 1) {
-  // STATUS = 1 → UPDATE
-  callUpdateAPI();
+if (payload.STATUS === 5) {
+  callCommitAPI();
 } 
-else if (payload.STATUS === 5) {
-  // STATUS = 5 → COMMIT
-  // const confirmed = confirm(
-  //   'Are you sure you want to APPROVE this production?'
-  // );
-
-  // if (confirmed) {
-    callCommitAPI();
-  // }
-}
 else {
-  notify('Invalid production status', 'error', 3000);
+  // ✅ Any other status → UPDATE
+  callUpdateAPI();
 }
+
 
 }
 
@@ -715,37 +767,17 @@ onApproveChanged(e: any) {
 
 
 
-  resetForm() {
-    //  Reset form model
-    this.productionJVFormData = {
-      COMPANY_ID: '',
-      FIN_ID: '',
-      USER_ID: '',
-      REF_NO: '',
-      ADDL_COST: '',
-      ADDL_DESCRIPTION: '',
-      PRODUCT_ID: '',
-      PROD_QTY: 0,
-      gridData: [],
-    };
+resetForm() {
+  this.initAddForm();
 
-    //  Reset grid
-    this.gridData = [];
-
-    //  Reset calculated values
-    this.totalAmount = 0;
-    this.additionalCost = 0;
-    this.finalCost = 0;
-    this.unitProductCost = 0;
-
-    //  Reset grid UI safely
-    if (this.itemsGrid) {
-      this.itemsGrid.instance.cancelEditData();
-      this.itemsGrid.instance.refresh();
-    }
-
-    console.log('Form reset completed');
+  if (this.itemsGrid) {
+    this.itemsGrid.instance.cancelEditData();
+    this.itemsGrid.instance.refresh();
   }
+
+  console.log('Form reset + reinitialized');
+}
+
 }
 
 @NgModule({

@@ -31,6 +31,7 @@
       focusStateEnabled="false"
       (onEditingStart)="onEditProduction($event)"
       (onCellPrepared)="onCellPrepared($event)"
+      (onRowRemoved)="delete_Data($event)"
     >
       <dxo-editing
         mode="popup"
@@ -178,8 +179,9 @@
   [(visible)]="isAddPopupVisible"
   [width]="1200"
   [height]="'100vh'"
-  title="Production"
+  title="Article Production"
   (onHiding)="onPopupHiding()"
+  [showApprove]="false"
 >
   <app-production-jv-add
     [productionType]="selectedProductionType"
@@ -205,6 +207,37 @@
 </dx-popup>
 
 <dx-popup
+  [(visible)]="isBoxAddPopupVisible"
+  [width]="1200"
+  [height]="'100vh'"
+  title="Box Production"
+  (onHiding)="onPopupHiding()"
+  [showApprove]="false"
+>
+  <app-boxproduction-jv-add
+    [productionType]="selectedProductionType"
+    (formClosed)="handleClose()"
+  ></app-boxproduction-jv-add>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditBoxPopupVisible"
+  [width]="1200"
+  [height]="'100vh'"
+  title="Box Production"
+  (onHiding)="onPopupHiding()"
+>
+  <ng-container *ngIf="isEditBoxPopupVisible">
+    <app-boxproduction-jv-add
+      [isEditing]="true"
+      [EditingResponseData]="selectedProduction"
+      [productionType]="selectedProductionType"
+      (formClosed)="handleClose()"
+    ></app-boxproduction-jv-add>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
   [(visible)]="isViewProduction"
   [width]="'90vw'"
   [height]="'100vh'"
@@ -221,6 +254,7 @@
     ></app-production-jv-view>
   </ng-container>
 </dx-popup>
+
 <dx-popup
   [(visible)]="showCustomDatePopup"
   [showTitle]="true"
