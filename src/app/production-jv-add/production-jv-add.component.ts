@@ -79,7 +79,7 @@ export class ProductionJvAddComponent {
   gridData: any[] = [];
   totalAmount: number = 0;
   finalCost: number = 0;
-  additionalCost: number = 0;
+  // additionalCost: number = 0;
   unitProductCost: number = 0;
     isApproved: boolean = false;
 
@@ -106,6 +106,7 @@ export class ProductionJvAddComponent {
         ID: 0,
         UOM: '',
         REQUIRED_QTY: 0,
+        QTY_AVAILABLE: 0,
         USED_QTY: 0,
         QUANTITY: 0,
         COST: 0,
@@ -156,7 +157,7 @@ export class ProductionJvAddComponent {
 
   this.gridData = [];
   this.totalAmount = 0;
-  this.additionalCost = 0;
+  // this.additionalCost = 0;
   this.finalCost = 0;
   this.unitProductCost = 0;
 
@@ -331,7 +332,7 @@ export class ProductionJvAddComponent {
         //  Apply existing logic (UNCHANGED)
         this.gridData.forEach((item) => {
           const bomQty = Number(item.QUANTITY) || 0;
-
+          item.QTY_AVAILABLE = item.QTY_AVAILABLE;
           item.REQUIRED_QTY = prodQty * bomQty;
           item.USED_QTY = item.REQUIRED_QTY;
           // item.COST = 1000;
@@ -358,14 +359,23 @@ export class ProductionJvAddComponent {
     }
   }
 
-  calculateFinalCost() {
-    //  const addlCost = Number(this.productionJVFormData.ADDL_COST) || 0;
-    this.finalCost =
-      (Number(this.totalAmount) || 0) + (Number(this.additionalCost) || 0);
+  // calculateFinalCost() {
+  //   //  const addlCost = Number(this.productionJVFormData.ADDL_COST) || 0;
+  //   this.finalCost =
+  //     (Number(this.totalAmount) || 0) + (Number(this.additionalCost) || 0);
 
-    console.log('Final Cost:', this.finalCost);
-    this.calculateUnitProductCost();
-  }
+  //   console.log('Final Cost:', this.finalCost);
+  //   this.calculateUnitProductCost();
+  // }
+
+  calculateFinalCost() {
+  this.finalCost =
+    (Number(this.totalAmount) || 0) +
+    (Number(this.productionJVFormData.ADDL_COST) || 0);
+
+  this.calculateUnitProductCost();
+}
+
 
   calculateTotalAmount() {
     this.totalAmount = this.gridData.reduce((sum, row) => {
@@ -376,12 +386,19 @@ export class ProductionJvAddComponent {
     this.calculateFinalCost();
   }
 
-  onAdditionalCostChange(e: any) {
+  // onAdditionalCostChange(e: any) {
     
-    this.additionalCost = Number(e.value) || 0;
-    console.log('Additional Cost Changed:', this.additionalCost);
-    this.calculateFinalCost();
-  } 
+  //   this.additionalCost = Number(e.value) || 0;
+  //   console.log('Additional Cost Changed:', this.additionalCost);
+  //   this.calculateFinalCost();
+  // } 
+
+  onAdditionalCostChange(e: any) {
+  this.productionJVFormData.ADDL_COST = Number(e.value) || 0;
+  console.log('Additional Cost Changed:', this.productionJVFormData.ADDL_COST);
+  this.calculateFinalCost();
+}
+
 
   //==================== Calculate Unit Product Cost ===================//
   calculateUnitProductCost() {
@@ -464,7 +481,7 @@ private formatDateForApi(date: Date | string): string {
 
     UNIT_COST: Number(item.UNIT_COST) || 0,
     // TOTAL_COST: Number(item.TOTAL_COST) || 0,
-
+    QTY_AVAILABLE: Number(item.QTY_AVAILABLE) || 0,
     // derived / editable fields
     QUANTITY: Number(item.USED_QTY) || 0,
     COST: Number(item.UNIT_COST) || 0,
@@ -636,20 +653,20 @@ private formatDateForApi(date: Date | string): string {
   // =====================================================
   // VALIDATION 3: USED_QTY <= AVAILABLE_QTY
   // =====================================================
-  // const invalidRow = this.gridData.find((item: any) => {
-  //   const usedQty = Number(item.USED_QTY) || 0;
-  //   const availableQty = Number(item.AVAILABLE_QTY) || 0;
-  //   return usedQty > availableQty;
-  // });
+  const invalidRow = this.gridData.find((item: any) => {
+    const usedQty = Number(item.USED_QTY) || 0;
+    const availableQty = Number(item.QTY_AVAILABLE) || 0;
+    return usedQty > availableQty;
+  });
 
-  // if (invalidRow) {
-  //   notify(
-  //     'Used Quantity cannot be greater than Available Quantity',
-  //     'error',
-  //     4000
-  //   );
-  //   return;
-  // }
+  if (invalidRow) {
+    notify(
+      'Used Quantity cannot be greater than Available Quantity',
+      'error',
+      4000
+    );
+    return;
+  }
 
   // =====================================================
   // PREPARE PAYLOAD
@@ -723,29 +740,18 @@ private formatDateForApi(date: Date | string): string {
 // =====================================================
 
 if (!this.isEditing) {
-  // -------- ADD MODE --------
   callInsertAPI();
   return;
 }
 
-// -------- EDIT MODE --------
-if (payload.STATUS === 1) {
-  // STATUS = 1 → UPDATE
-  callUpdateAPI();
+if (payload.STATUS === 5) {
+  callCommitAPI();
 } 
-else if (payload.STATUS === 5) {
-  // STATUS = 5 → COMMIT
-  // const confirmed = confirm(
-  //   'Are you sure you want to APPROVE this production?'
-  // );
-
-  // if (confirmed) {
-    callCommitAPI();
-  // }
-}
 else {
-  notify('Invalid production status', 'error', 3000);
+  // ✅ Any other status → UPDATE
+  callUpdateAPI();
 }
+
 
 }
 

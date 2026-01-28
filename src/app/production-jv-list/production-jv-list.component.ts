@@ -757,6 +757,9 @@ boxProductionForm!: BoxproductionJvAddComponent;
         //  EDIT MODE
         if (isArticle && status !== '5') {
           this.isEditPopupVisible = true;
+        } 
+        else if (isBox && status !== '5') {
+          this.isEditBoxPopupVisible = true;
         } else {
           this.isViewBoxProduction = true;
         }

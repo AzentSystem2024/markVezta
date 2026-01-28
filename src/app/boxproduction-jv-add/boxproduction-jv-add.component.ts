@@ -78,7 +78,7 @@ export class BoxproductionJvAddComponent {
   gridData: any[] = [];
   totalAmount: number = 0;
   finalCost: number = 0;
-  additionalCost: number = 0;
+  // additionalCost: number = 0;
   unitProductCost: number = 0;
     isApproved: boolean = false;
 
@@ -99,13 +99,14 @@ export class BoxproductionJvAddComponent {
     PROD_QTY: 0,
     STATUS: 1,
     PRODUCTION_TYPE: 2, // 1 = ARTICLE, 2 = BOX
-
+        
     RawMaterials: [
       {
         ID: 0,
         UOM: '',
         REQUIRED_QTY: 0,
         USED_QTY: 0,
+        QTY_AVAILABLE: 0,
         QUANTITY: 0,
         COST: 0,
         AMOUNT: 0,
@@ -164,7 +165,7 @@ export class BoxproductionJvAddComponent {
     
       onRowRemoved(e: any) {}
     
-     onEditorPreparing(e: any) {
+    onEditorPreparing(e: any) {
     if (e.dataField === 'USED_QTY') {
       e.editorOptions = e.editorOptions || {};
 
@@ -295,7 +296,7 @@ export class BoxproductionJvAddComponent {
            //  Apply existing logic (UNCHANGED)
            this.gridData.forEach((item) => {
              const bomQty = Number(item.QUANTITY) || 0;
-   
+            item.QTY_AVAILABLE = item.QTY_AVAILABLE;
              item.REQUIRED_QTY = prodQty * bomQty;
              item.USED_QTY = item.REQUIRED_QTY;
              // item.COST = 1000;
@@ -322,12 +323,12 @@ export class BoxproductionJvAddComponent {
   }
 
   calculateFinalCost() {
-    this.finalCost =
-      (Number(this.totalAmount) || 0) + (Number(this.additionalCost) || 0);
+  this.finalCost =
+    (Number(this.totalAmount) || 0) +
+    (Number(this.productionJVFormData.ADDL_COST) || 0);
 
-    console.log('Final Cost:', this.finalCost);
-    this.calculateUnitProductCost();
-  }
+  this.calculateUnitProductCost();
+}
 
   calculateTotalAmount() {
     this.totalAmount = this.gridData.reduce((sum, row) => {
@@ -339,11 +340,11 @@ export class BoxproductionJvAddComponent {
   }
 
     
-      onAdditionalCostChange(e: any) {
-    this.additionalCost = Number(e.value) || 0;
-    console.log('Additional Cost Changed:', this.additionalCost);
-    this.calculateFinalCost();
-  }
+  onAdditionalCostChange(e: any) {
+  this.productionJVFormData.ADDL_COST = Number(e.value) || 0;
+  console.log('Additional Cost Changed:', this.productionJVFormData.ADDL_COST);
+  this.calculateFinalCost();
+}
 
   //==================== Calculate Unit Product Cost ===================//
   calculateUnitProductCost() {
@@ -419,7 +420,7 @@ export class BoxproductionJvAddComponent {
     ITEM_CODE: item.ITEM_CODE,
     DESCRIPTION: item.DESCRIPTION,
     UOM: item.UOM,
-
+     QTY_AVAILABLE: Number(item.QTY_AVAILABLE) || 0,
     // BOM_QTY: Number(item.BOM_QTY) || 0,
     REQUIRED_QTY: Number(item.REQUIRED_QTY) || 0,
     USED_QTY: Number(item.USED_QTY) || 0,
@@ -531,7 +532,7 @@ export class BoxproductionJvAddComponent {
         //  VALIDATION: USED_QTY must be <= AVAILABLE_QTY
       // const invalidRow = this.gridData.find((item: any) => {
       //   const usedQty = Number(item.USED_QTY) || 0;
-      //   const availableQty = Number(item.AVAILABLE_QTY) || 0; //  adjust field name if needed
+      //   const availableQty = Number(item.QTY_AVAILABLE) || 0; //  adjust field name if needed
     
       //   return usedQty > availableQty;
       // });
@@ -559,7 +560,7 @@ export class BoxproductionJvAddComponent {
     COST_OF_PRODUCTION: this.finalCost,
     UNIT_PRODUCT_COST: this.unitProductCost,
     REF_NO: this.productionJVFormData.REF_NO,
-    ADDL_COST: this.additionalCost,
+    ADDL_COST: this.productionJVFormData.ADDL_COST,
     PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
     PROD_QTY: this.productionJVFormData.PROD_QTY,
     STATUS: this.productionJVFormData.STATUS ?? 1,
@@ -697,7 +698,7 @@ else {
     
         //  Reset calculated values
         this.totalAmount = 0;
-        this.additionalCost = 0;
+        // this.additionalCost = 0;
         this.finalCost = 0;
         this.unitProductCost = 0;
     
