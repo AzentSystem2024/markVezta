@@ -160,11 +160,12 @@ export class AddMiscellaneousPaymentComponent {
 
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
+  isSaving: boolean;
 
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {}
 
   sessionDetails() {
@@ -172,7 +173,7 @@ export class AddMiscellaneousPaymentComponent {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
   }
 
@@ -357,7 +358,7 @@ export class AddMiscellaneousPaymentComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -387,7 +388,7 @@ export class AddMiscellaneousPaymentComponent {
         if (isLastCell) {
           setTimeout(() => {
             const ledgerSelect = document.querySelector(
-              '#payHeadIdField input'
+              '#payHeadIdField input',
             ) as HTMLElement;
             if (ledgerSelect) {
               ledgerSelect.focus();
@@ -422,7 +423,7 @@ export class AddMiscellaneousPaymentComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
         e.setValue(args.value);
 
@@ -456,7 +457,7 @@ export class AddMiscellaneousPaymentComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
 
@@ -530,7 +531,7 @@ export class AddMiscellaneousPaymentComponent {
                   !r.DESCRIPTION &&
                   (!r.AMOUNT || r.AMOUNT === 0) &&
                   (!r.TAX || r.TAX === 0) &&
-                  (!r.TAX_AMOUNT || r.TAX_AMOUNT === 0)
+                  (!r.TAX_AMOUNT || r.TAX_AMOUNT === 0),
               );
 
               if (!hasEmptyRow) {
@@ -621,7 +622,7 @@ export class AddMiscellaneousPaymentComponent {
         // Focus the first cell of the new row
         setTimeout(() => {
           grid.focus(
-            grid.getCellElement(0, grid.columnOption('HEAD_ID', 'index'))
+            grid.getCellElement(0, grid.columnOption('HEAD_ID', 'index')),
           );
           grid.editCell(0, 'HEAD_ID'); // Or whichever field should be focused first
         }, 50);
@@ -637,7 +638,7 @@ export class AddMiscellaneousPaymentComponent {
         !row.HEAD_ID &&
         !row.DESCRIPTION &&
         (!row.AMOUNT || row.AMOUNT === 0) &&
-        (!row.TAX || row.TAX === 0)
+        (!row.TAX || row.TAX === 0),
     );
 
     if (!hasEmptyRow) {
@@ -673,7 +674,7 @@ export class AddMiscellaneousPaymentComponent {
         this.onReceiptModeChange({ value: this.receiptMode });
         console.log(
           'Ledger List Loaded=============================:',
-          this.ledgerList
+          this.ledgerList,
         );
       },
       error: (err) => {
@@ -700,15 +701,15 @@ export class AddMiscellaneousPaymentComponent {
 
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13
+        (item: any) => item.GROUP_ID === 13,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14
+        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
@@ -725,8 +726,10 @@ export class AddMiscellaneousPaymentComponent {
   }
 
   callInsertAPI(finalPayload: any) {
+    this.isSaving = true;
     this.dataService.insertMiscPayment(finalPayload).subscribe(
       (response: any) => {
+        this.isSaving = false;
         console.log(response, 'SAVED SUCCESSFULLY');
 
         notify(
@@ -734,7 +737,7 @@ export class AddMiscellaneousPaymentComponent {
             message: 'Payment Saved Successfully',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
 
         // DO NOT REMOVE — Needed for auto-setting voucher number
@@ -746,9 +749,10 @@ export class AddMiscellaneousPaymentComponent {
         this.popupClosed.emit();
       },
       (error) => {
+        this.isSaving = false;
         notify('Failed to save Credit Note. Please try again.', 'error', 2000);
         console.error('Save error:', error);
-      }
+      },
     );
   }
 
@@ -788,12 +792,12 @@ export class AddMiscellaneousPaymentComponent {
           message: 'Please add at least one line item.',
           position: 'top center',
         },
-        'error'
+        'error',
       );
       return;
     }
     this.miscFormData.MISC_DETAIL = this.miscFormData.MISC_DETAIL.filter(
-      (row) => row.ledgerCode || row.amount != null || row.taxPercent != null
+      (row) => row.ledgerCode || row.amount != null || row.taxPercent != null,
     );
 
     // ✅ Department validation (only when Approve is checked)
@@ -803,7 +807,7 @@ export class AddMiscellaneousPaymentComponent {
           message: 'Please select department.',
           position: 'top center',
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -821,7 +825,7 @@ export class AddMiscellaneousPaymentComponent {
 
         // Find the HEAD_ID from ledgerList using ledgerCode
         const matchedLedger = this.ledgerList.find(
-          (ledger: any) => ledger.HEAD_CODE === item.ledgerCode
+          (ledger: any) => ledger.HEAD_CODE === item.ledgerCode,
         );
 
         return {
@@ -841,7 +845,7 @@ export class AddMiscellaneousPaymentComponent {
     if (this.miscFormData.IS_APPROVED) {
       const result = confirm(
         'A new Payment will be created and approved. Do you want to continue?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
 
       result.then((dialogResult) => {
@@ -902,14 +906,14 @@ export class AddMiscellaneousPaymentComponent {
           message: 'Please add at least one line item.',
           position: 'top center',
         },
-        'error'
+        'error',
       );
       return;
     }
 
     const { DetailList, ...cleanedFormData } = this.miscFormData;
     this.miscFormData.TRANS_DATE = this.formatDate(
-      this.miscFormData.TRANS_DATE
+      this.miscFormData.TRANS_DATE,
     );
     const payload = {
       ...this.miscFormData,
@@ -921,7 +925,7 @@ export class AddMiscellaneousPaymentComponent {
 
         // Find the HEAD_ID from ledgerList using ledgerCode
         const matchedLedger = this.ledgerList.find(
-          (ledger: any) => ledger.HEAD_CODE === item.ledgerCode
+          (ledger: any) => ledger.HEAD_CODE === item.ledgerCode,
         );
 
         return {
@@ -942,19 +946,21 @@ export class AddMiscellaneousPaymentComponent {
     if (this.isApproved) {
       confirm(
         'Are you sure you want to approve this Miscellaneous Payment?',
-        'Confirm Approval'
+        'Confirm Approval',
       ).then((dialogResult) => {
         if (dialogResult) {
+          this.isSaving = true;
           // YES -> Call approve API
           this.dataService.approveMiscPayment(payload).subscribe({
             next: (response: any) => {
+              this.isSaving = false;
               if (response?.flag == 1) {
                 notify(
                   {
                     message: 'Miscellaneous Payment Approved Successfully',
                     position: { at: 'top center', my: 'top center' },
                   },
-                  'success'
+                  'success',
                 );
                 this.popupClosed.emit();
               } else {
@@ -963,18 +969,19 @@ export class AddMiscellaneousPaymentComponent {
                     message: response?.Message || 'Failed to approve.',
                     position: { at: 'top center', my: 'top center' },
                   },
-                  'error'
+                  'error',
                 );
               }
             },
             error: (err) => {
+              this.isSaving = false;
               console.error('Approve Error:', err);
               notify(
                 {
                   message: 'Something went wrong while approving.',
                   position: { at: 'top center', my: 'top center' },
                 },
-                'error'
+                'error',
               );
             },
           });
@@ -984,17 +991,18 @@ export class AddMiscellaneousPaymentComponent {
 
       return; // Stop here
     }
-
+    this.isSaving = true;
     // NOT APPROVED → normal update API
     this.dataService.updateMiscPayment(payload).subscribe({
       next: (response: any) => {
+        this.isSaving = false;
         if (response?.flag == 1) {
           notify(
             {
               message: 'Miscellaneous Payment Updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.popupClosed.emit();
         } else {
@@ -1003,18 +1011,19 @@ export class AddMiscellaneousPaymentComponent {
               message: response?.Message || 'Failed to update.',
               position: { at: 'top center', my: 'top center' },
             },
-            'error'
+            'error',
           );
         }
       },
       error: (err) => {
+        this.isSaving = false;
         console.error('Update Error:', err);
         notify(
           {
             message: 'Something went wrong while updating.',
             position: { at: 'top center', my: 'top center' },
           },
-          'error'
+          'error',
         );
       },
     });

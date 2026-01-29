@@ -100,18 +100,19 @@ export class EditJournalVoucherComponent {
 
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
+  isSaving = false;
 
   constructor(
     private dataService: DataService,
     private router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
 
@@ -149,7 +150,7 @@ export class EditJournalVoucherComponent {
           const matchedLedger = this.ledgerList.find(
             (l: any) =>
               l.HEAD_CODE === item.LEDGER_CODE ||
-              l.HEAD_NAME === item.LEDGER_NAME
+              l.HEAD_NAME === item.LEDGER_NAME,
           );
 
           return {
@@ -160,7 +161,7 @@ export class EditJournalVoucherComponent {
             debitAmount: item.DEBIT_AMOUNT ?? '',
             creditAmount: item.CREDIT_AMOUNT ?? '',
           };
-        }
+        },
       );
 
       const userDataString = localStorage.getItem('userData');
@@ -194,7 +195,7 @@ export class EditJournalVoucherComponent {
     this.dataService.Department_Dropdown().subscribe((res: any) => {
       console.log(
         res,
-        '========================department data========================='
+        '========================department data=========================',
       );
 
       this.Company_list = res;
@@ -204,7 +205,7 @@ export class EditJournalVoucherComponent {
             this.journalVoucherFormData.DEPT_ID;
           console.log(
             'Department set after data load:',
-            this.journalVoucherFormData.DEPT_ID
+            this.journalVoucherFormData.DEPT_ID,
           );
         }, 100);
       }
@@ -270,7 +271,7 @@ export class EditJournalVoucherComponent {
         this.journalVoucherFormData.DETAILS =
           this.journalVoucherFormData.DETAILS.map((item: any) => {
             const matchedLedger = this.ledgerList.find(
-              (l: any) => l.HEAD_CODE === item.LEDGER_CODE
+              (l: any) => l.HEAD_CODE === item.LEDGER_CODE,
             );
 
             return {
@@ -279,7 +280,7 @@ export class EditJournalVoucherComponent {
               ledgerName:
                 item.LEDGER_NAME?.trim() !== ''
                   ? item.LEDGER_NAME
-                  : matchedLedger?.HEAD_NAME ?? '',
+                  : (matchedLedger?.HEAD_NAME ?? ''),
               particulars: item.PARTICULARS ?? '',
               debitAmount: item.DEBIT_AMOUNT ?? '',
               creditAmount: item.CREDIT_AMOUNT ?? '',
@@ -330,7 +331,7 @@ export class EditJournalVoucherComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -350,11 +351,11 @@ export class EditJournalVoucherComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           console.log(
             'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex
+            rowIndex,
           );
 
           setTimeout(() => {
@@ -390,14 +391,14 @@ export class EditJournalVoucherComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
@@ -419,14 +420,14 @@ export class EditJournalVoucherComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -504,13 +505,13 @@ export class EditJournalVoucherComponent {
                 !r.ledgerName &&
                 !r.particulars &&
                 (r.debitAmount === '' || r.debitAmount === 0) &&
-                (r.creditAmount === '' || r.creditAmount === 0)
+                (r.creditAmount === '' || r.creditAmount === 0),
             );
             if (emptyRows.length > 1) {
               // remove the last duplicate
               const indexToRemove =
                 this.journalVoucherFormData.DETAILS.lastIndexOf(
-                  emptyRows[emptyRows.length - 1]
+                  emptyRows[emptyRows.length - 1],
                 );
               this.journalVoucherFormData.DETAILS.splice(indexToRemove, 1);
             }
@@ -523,7 +524,7 @@ export class EditJournalVoucherComponent {
               setTimeout(() => {
                 const visibleRows = grid.getVisibleRows();
                 const newRowIndex = visibleRows.findIndex(
-                  (r) => r.data === newRow
+                  (r) => r.data === newRow,
                 );
                 if (newRowIndex >= 0) {
                   grid.editCell(newRowIndex, 'ledgerCode');
@@ -611,14 +612,14 @@ export class EditJournalVoucherComponent {
 
     // Check for an empty row: only rows with no ledgerCode and ledgerName are empty
     const hasEmptyRow = this.journalVoucherFormData.DETAILS.some(
-      (r) => !r.ledgerCode && !r.ledgerName
+      (r) => !r.ledgerCode && !r.ledgerName,
     );
 
     if (hasEmptyRow) {
       // Focus on the first empty row instead of adding a new one
       const grid = this.itemsGridRef?.instance;
       const emptyRowIndex = this.journalVoucherFormData.DETAILS.findIndex(
-        (r) => !r.ledgerCode && !r.ledgerName
+        (r) => !r.ledgerCode && !r.ledgerName,
       );
       setTimeout(() => {
         grid?.editCell(emptyRowIndex, 'ledgerCode');
@@ -630,7 +631,7 @@ export class EditJournalVoucherComponent {
     const nextSlNo =
       this.journalVoucherFormData.DETAILS.length > 0
         ? Math.max(
-            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo)
+            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
           ) + 1
         : 1;
 
@@ -699,7 +700,7 @@ export class EditJournalVoucherComponent {
     // Update ledger name if ledger code is edited
     if (e.column.dataField === 'ledgerCode') {
       const selectedLedger = this.ledgerList.find(
-        (item) => item.HEAD_CODE === e.value
+        (item) => item.HEAD_CODE === e.value,
       );
       if (selectedLedger) {
         e.data.ledgerName = selectedLedger.HEAD_NAME;
@@ -714,7 +715,7 @@ export class EditJournalVoucherComponent {
       const currentRow = this.journalVoucherFormData.DETAILS[rowIndex];
 
       const hasValue = Object.values(currentRow).some(
-        (v) => v !== null && v !== '' && v !== undefined
+        (v) => v !== null && v !== '' && v !== undefined,
       );
 
       if (hasValue) {
@@ -755,7 +756,7 @@ export class EditJournalVoucherComponent {
 
       .map((item: any) => {
         const matchedLedger = this.ledgerList.find(
-          (l) => l.HEAD_CODE === item.ledgerCode
+          (l) => l.HEAD_CODE === item.ledgerCode,
         );
         return {
           BILL_NO: String(item.billNo),
@@ -769,11 +770,11 @@ export class EditJournalVoucherComponent {
 
     const debitTotal = transformedDetails.reduce(
       (sum, item) => sum + (item.DEBIT_AMOUNT || 0),
-      0
+      0,
     );
     const creditTotal = transformedDetails.reduce(
       (sum, item) => sum + (item.CREDIT_AMOUNT || 0),
-      0
+      0,
     );
 
     // ✅ Step 2: common validation for both approve + update
@@ -781,7 +782,7 @@ export class EditJournalVoucherComponent {
       notify(
         'Debit and Credit totals must be equal before saving!',
         'error',
-        3000
+        3000,
       );
       return;
     }
@@ -792,7 +793,7 @@ export class EditJournalVoucherComponent {
 
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit'
+        'Confirm Commit',
       ).then((result) => {
         console.log('Confirm dialog result:', result);
         if (result) {
@@ -803,7 +804,7 @@ export class EditJournalVoucherComponent {
             REF_NO: this.journalVoucherFormData.REF_NO,
             PARTY_NAME: this.journalVoucherFormData.PARTY_NAME,
             TRANS_DATE: this.formatDateToDDMMYYYY(
-              this.journalVoucherFormData.TRANS_DATE
+              this.journalVoucherFormData.TRANS_DATE,
             ),
             DEPT_ID: this.journalVoucherFormData.DEPT_ID,
             TRANS_TYPE: this.journalVoucherFormData.TRANS_TYPE_ID || 4,
@@ -814,14 +815,15 @@ export class EditJournalVoucherComponent {
             TRANS_STATUS: 1,
             DETAILS: transformedDetails,
           };
-
+          this.isSaving = true;
           this.dataService.commitJournalVoucher(payload).subscribe(
             (response: any) => {
+              this.isSaving = false;
               if (response.flag === 1) {
                 notify(
                   'Journal voucher approved successfully!',
                   'success',
-                  3000
+                  3000,
                 );
                 this.popupClosed.emit();
               } else {
@@ -829,9 +831,10 @@ export class EditJournalVoucherComponent {
               }
             },
             (error) => {
+              this.isSaving = false;
               console.error('Approval error:', error);
               alert('Something went wrong while approving');
-            }
+            },
           );
         } else {
           notify('Approval cancelled.', 'info', 2000);
@@ -848,7 +851,7 @@ export class EditJournalVoucherComponent {
       REF_NO: this.journalVoucherFormData.REF_NO,
       PARTY_NAME: this.journalVoucherFormData.PARTY_NAME,
       TRANS_DATE: this.formatDateToDDMMYYYY(
-        this.journalVoucherFormData.TRANS_DATE
+        this.journalVoucherFormData.TRANS_DATE,
       ),
       TRANS_TYPE: this.journalVoucherFormData.TRANS_TYPE_ID || 4,
       NARRATION: this.journalVoucherFormData.NARRATION,
@@ -860,9 +863,10 @@ export class EditJournalVoucherComponent {
       DETAILS: transformedDetails,
       IS_APPROVED: false,
     };
-
+    this.isSaving = true;
     this.dataService.updateJournalVoucher(payload).subscribe(
       (response: any) => {
+        this.isSaving = false;
         if (response.flag === 1) {
           notify('Journal voucher updated successfully!', 'success', 3000);
           this.popupClosed.emit();
@@ -871,9 +875,10 @@ export class EditJournalVoucherComponent {
         }
       },
       (error) => {
+        this.isSaving = false;
         console.error('Update error:', error);
         alert('Something went wrong while updating');
-      }
+      },
     );
   }
 

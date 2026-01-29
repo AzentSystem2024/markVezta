@@ -93,6 +93,7 @@ export class AddAccountComponent {
   };
   accountsGroupList: any;
   ledgerList: any;
+  isSaving = false;
 
   constructor(private dataService: DataService) {}
 
@@ -108,7 +109,7 @@ export class AddAccountComponent {
         this.groupingList = response.Data;
         console.log(this.groupingList, 'GROUPINGLIST');
         this.mainGroupList = this.groupingList.filter(
-          (item) => item.GROUP_SUPER_ID === 0
+          (item) => item.GROUP_SUPER_ID === 0,
         );
         console.log(this.mainGroupList, 'Filtered Main Groups');
       }
@@ -119,21 +120,21 @@ export class AddAccountComponent {
     this.selectedMainGroupId = event.value;
     console.log('Selected Main Group ID:', event.value);
     this.subGroupList = this.groupingList.filter(
-      (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId
+      (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId,
     );
     console.log(this.subGroupList, 'SUBGROUPLIST');
   }
 
   get selectedMainGroupName(): string {
     const selectedGroup = this.mainGroupList.find(
-      (item) => item.GROUP_ID === this.selectedMainGroupId
+      (item) => item.GROUP_ID === this.selectedMainGroupId,
     );
     return selectedGroup ? selectedGroup.GROUP_NAME : '';
   }
 
   get selectedSubGroupName(): string {
     const selected = this.subGroupList?.find(
-      (item) => item.GROUP_ID === this.selectedSubGroupId
+      (item) => item.GROUP_ID === this.selectedSubGroupId,
     );
     return selected ? selected.GROUP_NAME : '';
   }
@@ -142,7 +143,7 @@ export class AddAccountComponent {
     this.selectedSubGroupId = event.value;
     console.log('selected sub group', this.selectedSubGroupId);
     this.categoryList = this.groupingList.filter(
-      (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId
+      (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId,
     );
     console.log(this.categoryList, 'CATEGORYLIST');
   }
@@ -157,7 +158,7 @@ export class AddAccountComponent {
       this.ledgerList = response.Data;
       console.log(
         this.ledgerList,
-        '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}'
+        '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}',
       );
     });
   }
@@ -172,7 +173,7 @@ export class AddAccountComponent {
           message: 'Please enter Account Head Name',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -183,7 +184,7 @@ export class AddAccountComponent {
           message: 'Please select a Category before adding Account Head',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -197,7 +198,7 @@ export class AddAccountComponent {
           message: 'Please enter Serial Number',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -206,7 +207,7 @@ export class AddAccountComponent {
     const duplicate = this.ledgerList?.some(
       (h) =>
         h.HEAD_NAME?.toLowerCase() ===
-        this.accountHeadData.HEAD_NAME?.trim().toLowerCase()
+        this.accountHeadData.HEAD_NAME?.trim().toLowerCase(),
     );
     if (duplicate) {
       notify(
@@ -214,7 +215,7 @@ export class AddAccountComponent {
           message: 'Account Head already exists',
           position: { at: 'top center', my: 'top center' },
         },
-        'warning'
+        'warning',
       );
       return;
     }
@@ -227,21 +228,23 @@ export class AddAccountComponent {
       IS_ACTIVE: this.accountHeadData.IS_ACTIVE,
       SERIAL_NO: this.accountHeadData.SERIAL_NO,
     };
-
+    this.isSaving = true;
     this.dataService.insertAccountHead(payload).subscribe({
       next: (response) => {
+        this.isSaving = false;
         console.log('Account Head inserted successfully', response);
         notify(
           {
             message: 'Account Head Saved Successfully',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
         this.popupVisible = false;
         this.popupClosed.emit(); // notify parent to refresh & close
       },
       error: (error) => {
+        this.isSaving = false;
         console.error('Insert failed:', error);
         notify('Failed to add Account Head', 'error', 3000);
       },
@@ -261,7 +264,7 @@ export class AddAccountComponent {
           message: 'Please enter Group Name',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -272,7 +275,7 @@ export class AddAccountComponent {
           message: 'Please select a Sub Group before adding Category',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -283,7 +286,7 @@ export class AddAccountComponent {
           message: 'Please select a Main Group before adding Sub Group',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -292,8 +295,8 @@ export class AddAccountComponent {
     const groupSuperId = isSubGroup
       ? this.selectedMainGroupId
       : isCategory
-      ? this.selectedSubGroupId
-      : 0;
+        ? this.selectedSubGroupId
+        : 0;
 
     const payload = {
       GROUP_ID: 0,
@@ -317,7 +320,7 @@ export class AddAccountComponent {
           message: 'Account Group Added Successfully',
           position: { at: 'top center', my: 'top center' },
         },
-        'success'
+        'success',
       );
 
       // Reset input
@@ -330,7 +333,7 @@ export class AddAccountComponent {
 
           if (isSubGroup) {
             this.subGroupList = this.groupingList.filter(
-              (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId
+              (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId,
             );
             setTimeout(() => {
               this.selectedSubGroup = newGroupId;
@@ -344,7 +347,7 @@ export class AddAccountComponent {
 
           if (isCategory) {
             this.categoryList = this.groupingList.filter(
-              (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId
+              (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId,
             );
             this.selectedCategoryId = newGroupId;
           }

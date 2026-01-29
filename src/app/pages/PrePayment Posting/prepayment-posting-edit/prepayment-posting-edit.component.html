@@ -22,7 +22,7 @@
     enabled: true,
     text: 'Loading...',
     showIndicator: true,
-    showPane: true
+    showPane: true,
   }"
   class="grid theme-dependent"
   [showBorders]="true"
@@ -45,7 +45,7 @@
   style="margin-top: 10px"
   [editing]="{
     mode: 'cell',
-    allowUpdating: true
+    allowUpdating: true,
   }"
 >
   <dxo-paging [pageSize]="10"></dxo-paging>
@@ -141,11 +141,22 @@
     ></dx-button>
     <dx-button
       [visible]="!isEditReadOnly"
-      [text]="approveValue ? 'Update & Commit' : 'Update'"
+      [text]="
+        isSaving ? 'Processing...' : approveValue ? 'Update & Commit' : 'Update'
+      "
+      [disabled]="isSaving"
       stylingMode="contained"
       type="default"
       (onClick)="Update_Prepayment()"
     ></dx-button>
+
+    <!-- <dx-button
+      [visible]="!isEditReadOnly"
+      [text]="approveValue ? 'Update & Commit' : 'Update'"
+      stylingMode="contained"
+      type="default"
+      (onClick)="Update_Prepayment()"
+    ></dx-button> -->
   </div>
 </div>
 

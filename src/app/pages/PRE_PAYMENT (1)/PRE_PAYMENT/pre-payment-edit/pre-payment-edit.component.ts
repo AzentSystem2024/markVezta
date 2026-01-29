@@ -10,7 +10,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxButtonModule,
   DxCheckBoxModule,
@@ -69,13 +73,13 @@ export class PrePaymentEditComponent {
   periodFrom: string | number | Date | null = null;
 
   pdfSrc: SafeResourceUrl | null = null;
-          isPdfPopupVisible: boolean = false;
+  isPdfPopupVisible: boolean = false;
 
   PrePaymentFormData: any = {
     COMPANY_ID: '',
     FIN_ID: '',
 
-    TRANS_TYPE: 38, 
+    TRANS_TYPE: 38,
     TRANS_DATE: '',
     REF_NO: '',
     NARRATION: '',
@@ -107,8 +111,13 @@ export class PrePaymentEditComponent {
   gstPercent: number = 0; // GST %
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
+  isSaving = false;
 
-  constructor(private dataservice: DataService, private ngZone: NgZone,private sanitizer: DomSanitizer) {
+  constructor(
+    private dataservice: DataService,
+    private ngZone: NgZone,
+    private sanitizer: DomSanitizer,
+  ) {
     this.get_Supplier_dropdown();
     this.get_ExpenseLedger_dropdown();
     this.sesstion_Details();
@@ -118,7 +127,7 @@ export class PrePaymentEditComponent {
 
   ngOnInit() {
     // initialize flags on load
-        this.get_Supplier_dropdown();
+    this.get_Supplier_dropdown();
     this.get_ExpenseLedger_dropdown();
     this.sesstion_Details();
     this.get_PrePaymentLedger_dropdown();
@@ -195,7 +204,7 @@ export class PrePaymentEditComponent {
 
       if (this.PrePaymentFormData.NO_OF_MONTHS) {
         newDate.setMonth(
-          newDate.getMonth() + this.PrePaymentFormData.NO_OF_MONTHS
+          newDate.getMonth() + this.PrePaymentFormData.NO_OF_MONTHS,
         );
       }
 
@@ -238,7 +247,7 @@ export class PrePaymentEditComponent {
       endDateFinal = new Date(
         endDateFinal.getFullYear(),
         endDateFinal.getMonth(),
-        0
+        0,
       );
     }
     const totalDays = this.daysBetween(startDate, endDateFinal);
@@ -252,7 +261,7 @@ export class PrePaymentEditComponent {
       let periodEnd = new Date(
         current.getFullYear(),
         current.getMonth() + 1,
-        0
+        0,
       );
 
       // Keep end date within overall DATE_TO
@@ -333,10 +342,10 @@ export class PrePaymentEditComponent {
   }
 
   get_Supplier_dropdown() {
-        const payload={
-      NAME:'SUPPLIER',
-      COMPANY_ID:this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
@@ -430,25 +439,25 @@ export class PrePaymentEditComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
 
     this.selected_user_id = sessionData.USER_ID;
     console.log(
       this.selected_user_id,
-      '===========selected user id==================='
+      '===========selected user id===================',
     );
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
   }
 
@@ -471,27 +480,12 @@ export class PrePaymentEditComponent {
     }
     console.log(
       this.ExpenseAmountDetails,
-      '=================ExpenseAmountDetails=========='
+      '=================ExpenseAmountDetails==========',
     );
   }
 
   savePrePayment() {
-    //              const validationResult = this.formValidationGroup?.instance?.validate();
-    //   if (!validationResult?.isValid) {
-    //     console.log('Validation failed');
-    //     return;
-    //   }
-
-    // if (this.fieldChanged && !this.scheduleGenerated) {
-    //     notify({
-    //       message: 'Please click "Generate Schedule" before saving since Date/Months/Days were modified.',
-    //       type: 'warning',
-    //       position: { at: 'top right', my: 'top right' },
-    //       displayTime: 2000,
-    //     });
-    //     return;
-    //   }
-
+    this.isSaving = true;
     const result = (this.ExpenseAmountDetails || []).map((item) => ({
       DUE_DATE: this.convertToISO(item.DUE_DATE),
       DUE_AMOUNT: item.DUE_AMOUNT,
@@ -527,53 +521,67 @@ export class PrePaymentEditComponent {
     console.log('Payload to save PrePayment:', payload);
 
     if (this.PrePaymentFormData.TRANS_STATUS === true) {
-      this.dataservice
-        .Approve_PrePayment(payload)
-        .subscribe((approveRes: any) => {
+      this.dataservice.Approve_PrePayment(payload).subscribe(
+        (approveRes: any) => {
+          this.isSaving = false;
           console.log('Response from approve PrePayment:', approveRes);
           //  this.resetForm();
           this.formClosed.emit();
-        });
+        },
+        (error) => {
+          this.isSaving = false; // ✅ STOP loading
+          notify('Error while approving PrePayment', 'error', 2000);
+          console.error(error);
+        },
+      );
     } else {
-      this.dataservice.Update_PrePayment(payload).subscribe((res: any) => {
-        console.log('Response from save PrePayment:', res);
+      this.dataservice.Update_PrePayment(payload).subscribe(
+        (res: any) => {
+          this.isSaving = false;
+          console.log('Response from save PrePayment:', res);
 
-        notify({
-          message: 'PrePayment Updated successfully',
-          type: 'success',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        });
-        // this.resetForm();
-        this.formClosed.emit();
-      });
+          notify({
+            message: 'PrePayment Updated successfully',
+            type: 'success',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          });
+          // this.resetForm();
+          this.formClosed.emit();
+        },
+        (error) => {
+          this.isSaving = false; // ✅ STOP loading
+          notify('Error while updating PrePayment', 'error', 2000);
+          console.error(error);
+        },
+      );
     }
   }
 
   viewPdf(): void {
     this.isPdfPopupVisible = true;
-         this.dataservice.Select_PrePayment(this.PrepaymentId).subscribe((res: any) => {
-           if(res){
+    this.dataservice
+      .Select_PrePayment(this.PrepaymentId)
+      .subscribe((res: any) => {
+        if (res) {
           this.pdfSrc = this.get_pdf(res);
         }
-         })
+      });
   }
 
-   get_pdf(data: any): SafeResourceUrl {
-     
-       const doc = new jsPDF("p", "mm", "a4");
-       const pageWidth = doc.internal.pageSize.width;
-       const margin = 12;
-       let y = 12;
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
 
-       // ===========================
-  //  RETURN PDF
-  // ===========================
-  const blob = doc.output("blob");
-  const url = URL.createObjectURL(blob);
-  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-   }
-  
+    // ===========================
+    //  RETURN PDF
+    // ===========================
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 }
 
 @NgModule({

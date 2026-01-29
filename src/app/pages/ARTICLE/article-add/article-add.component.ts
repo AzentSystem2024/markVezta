@@ -134,6 +134,7 @@ export class ArticleAddComponent {
   selectedItemID: any;
   selected_Company_id: any;
   selectedAttachRowKeys: number[] = [];
+  isSaving = false;
 
   constructor(private dataService: DataService) {}
 
@@ -270,7 +271,7 @@ export class ArticleAddComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -293,7 +294,7 @@ export class ArticleAddComponent {
 
         // Find the matched item ID
         const matchedItem = this.itemsList.find(
-          (p: any) => p.DESCRIPTION === selectedDescription
+          (p: any) => p.DESCRIPTION === selectedDescription,
         );
         console.log(matchedItem.ID, 'MATCHEDITEMMMMMMMMMMMMMMMMMMM');
         grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
@@ -359,7 +360,7 @@ export class ArticleAddComponent {
         if (rowData?.ITEM && args.value > 0) {
           const rows = grid.getVisibleRows();
           const hasIncompleteRow = rows.some(
-            (r: any) => !r.data.ITEM || !r.data.QUANTITY
+            (r: any) => !r.data.ITEM || !r.data.QUANTITY,
           );
 
           if (!hasIncompleteRow) {
@@ -381,7 +382,7 @@ export class ArticleAddComponent {
                 // Start editing ITEM cell of new row
                 grid.editCell(newRowIndex, 'ITEM').then(() => {
                   grid.focus(
-                    grid.getCellElement(newRowIndex, grid.columnOption('ITEM'))
+                    grid.getCellElement(newRowIndex, grid.columnOption('ITEM')),
                   );
                 });
               }
@@ -433,7 +434,7 @@ export class ArticleAddComponent {
 
     // Check if any existing row is incomplete
     const hasIncompleteRow = rows.some(
-      (r: any) => !r.data.ITEM || !r.data.QUANTITY
+      (r: any) => !r.data.ITEM || !r.data.QUANTITY,
     );
 
     if (hasIncompleteRow) {
@@ -463,7 +464,7 @@ export class ArticleAddComponent {
 
         // Store only items with IsComponent === true in componentArticles
         this.componentArticles = this.articleList.filter(
-          (article: any) => article.IS_COMPONENT === true
+          (article: any) => article.IS_COMPONENT === true,
         );
         this.attachGridData = this.componentArticles;
         console.log(this.componentArticles, 'COMPONENTARTICLE');
@@ -509,14 +510,12 @@ export class ArticleAddComponent {
       this.materialUnits = response;
     });
     const payload2 = {
-    
       NAME: 'ARTICLECATEGORY',
     };
     this.dataService.getDropdownData(payload2).subscribe((response: any) => {
       this.categoryList = response;
     });
     const payload3 = {
-    
       NAME: 'ARTICLETYPE',
     };
     this.dataService.getDropdownData(payload3).subscribe((response: any) => {
@@ -645,7 +644,7 @@ export class ArticleAddComponent {
 
       console.log(
         'Assigned ComponentArticleID:',
-        this.articleData.COMPONENT_ARTICLE_ID
+        this.articleData.COMPONENT_ARTICLE_ID,
       );
     }
   }
@@ -692,7 +691,7 @@ export class ArticleAddComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -863,24 +862,11 @@ export class ArticleAddComponent {
       });
       return;
     }
-    // Duplicate combination check
-    // if (this.isDuplicateArticle()) {
-    //   notify({
-    //     message:
-    //       'An article with the same Art No, Color, Category, Price and Size already exists.',
-    //     type: 'error',
-    //     displayTime: 4000,
-    //     position: { at: 'top right', my: 'top right' },
-    //   });
-    //   return;
-    // }
-
-    // 🔴 ALIAS_NO duplicate check (only if provided)
     if (this.articleList && this.articleList.length > 0) {
       const duplicate = this.articleList.find(
         (article: any) =>
           article.ALIAS_NO?.toLowerCase() ===
-          this.articleData.ALIAS_NO?.toLowerCase()
+          this.articleData.ALIAS_NO?.toLowerCase(),
       );
 
       if (duplicate) {
@@ -896,7 +882,7 @@ export class ArticleAddComponent {
 
     const result = confirm(
       'Are you sure you want to save this article?',
-      'Confirm Save'
+      'Confirm Save',
     );
 
     result.then((dialogResult) => {
@@ -974,16 +960,17 @@ export class ArticleAddComponent {
         };
 
         console.log('Saving article with payload:', payload);
-
+        this.isSaving = true;
         this.dataService.insertArticle(payload).subscribe({
           next: (response: any) => {
+            this.isSaving = false;
             if (response?.flag === 1) {
               notify(
                 {
                   message: 'Article Saved Successfully',
                   position: { at: 'top right', my: 'top right' },
                 },
-                'success'
+                'success',
               );
               // this.popupVisible = false;
               this.resetForm();
@@ -1002,6 +989,7 @@ export class ArticleAddComponent {
             }
           },
           error: (err) => {
+            this.isSaving = false;
             console.error('Save error:', err);
 
             const backendMessage =

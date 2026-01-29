@@ -66,6 +66,8 @@ export class DepreciationAddComponent {
   selected_fin_id: any;
   Depreciation_List: any;
   docNo: any;
+  isSaving = false;
+
   constructor(private dataService: DataService) {
     this.Active_fixedasset_List();
   }
@@ -110,7 +112,7 @@ export class DepreciationAddComponent {
     this.selectedData_in_Fixed_asset = event.selectedRowsData;
     console.log(
       this.selectedData_in_Fixed_asset,
-      '========selectedData_in_Fixed_asset==========='
+      '========selectedData_in_Fixed_asset===========',
     );
 
     this.recordsCount = this.selectedData_in_Fixed_asset.length;
@@ -121,7 +123,7 @@ export class DepreciationAddComponent {
         Asset_ID: row.ID, // from keyExpr
         Days: row.Days || 0, // from grid column
         Depr_Amount: row.Depreciation_amount || 0,
-      })
+      }),
     );
 
     console.log(this.DepreciationPayload.ASSET_IDS);
@@ -213,7 +215,7 @@ export class DepreciationAddComponent {
     // ✅ Process only the newly selected rows
     this.selectedRowsInGrid.forEach((id: number) => {
       const asset = this.Active_fixed_asset_list.find(
-        (item: any) => item.ID === id
+        (item: any) => item.ID === id,
       );
 
       if (asset) {
@@ -252,7 +254,7 @@ export class DepreciationAddComponent {
 
     console.log(this.Active_fixed_asset_list);
     this.formattedAssets = this.Active_fixed_asset_list.filter(
-      (item) => item.Days > 0 && item.Depreciation_amount > 0
+      (item) => item.Days > 0 && item.Depreciation_amount > 0,
     ).map((item) => ({
       Asset_ID: item.ID,
       Days: item.Days,
@@ -278,7 +280,7 @@ export class DepreciationAddComponent {
     console.log(this.depreciationDate, '==========depreciationDate========');
     console.log(
       this.DepreciationPayload,
-      '====================payload=========='
+      '====================payload==========',
     );
     console.log(this.formattedAssets);
     const date = this.DepreciationPayload.DEPR_DATE;
@@ -303,7 +305,7 @@ export class DepreciationAddComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -315,14 +317,14 @@ export class DepreciationAddComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
       return;
     }
     console.log(this.processd_Date, '============this.processd_Date==========');
     console.log(
       this.depreciationDate,
-      '============this.processd_Date=========='
+      '============this.processd_Date==========',
     );
     if (this.processd_Date !== this.depreciationDate) {
       // Show error and return
@@ -333,7 +335,7 @@ export class DepreciationAddComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -359,29 +361,37 @@ export class DepreciationAddComponent {
     //              );
     //     }
     //   })
+    this.isSaving = true;
+    this.dataService.Add_Depreciation_api(payload).subscribe(
+      (res: any) => {
+        this.isSaving = false;
+        console.log(res);
 
-    this.dataService.Add_Depreciation_api(payload).subscribe((res: any) => {
-      console.log(res);
-
-      if (res.success == true) {
-        this.popupClosed.emit();
-        this.get_Depreciation_list();
-        this.grandTotal = 0;
-        this.selectedRowsInGrid = [];
-        this.DepreciationPayload.DEPR_DATE = new Date();
-      } else {
-        notify(
-          {
-            message:
-              res.message ||
-              'There is an open record in the list. Please approve or delete it before adding new data.',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 2500,
-          },
-          'error'
-        );
-      }
-    });
+        if (res.success == true) {
+          this.popupClosed.emit();
+          this.get_Depreciation_list();
+          this.grandTotal = 0;
+          this.selectedRowsInGrid = [];
+          this.DepreciationPayload.DEPR_DATE = new Date();
+        } else {
+          notify(
+            {
+              message:
+                res.message ||
+                'There is an open record in the list. Please approve or delete it before adding new data.',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 2500,
+            },
+            'error',
+          );
+        }
+      },
+      (error) => {
+        this.isSaving = false; // ✅ STOP loading
+        notify('Failed to save depreciation data.', 'error', 2000);
+        console.error(error);
+      },
+    );
   }
   SetDefaultRest() {
     this.grandTotal = 0;
@@ -401,12 +411,12 @@ export class DepreciationAddComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
   }
 }

@@ -505,9 +505,17 @@
     type="normal"
   ></dx-button>
   <dx-button
+    [text]="isSaving ? 'Updating...' : 'Save'"
+    [disabled]="isSaving"
+    stylingMode="contained"
+    type="default"
+    (onClick)="updateArticle()"
+  ></dx-button>
+
+  <!-- <dx-button
     text="Save"
     (onClick)="updateArticle()"
     stylingMode="contained"
     type="default"
-  ></dx-button>
+  ></dx-button> -->
 </div>
