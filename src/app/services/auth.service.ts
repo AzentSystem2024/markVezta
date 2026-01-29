@@ -42,12 +42,15 @@ export class AuthService {
     this._lastAuthenticatedPath = value;
   }
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {
     this.endpoint = `${this.apiUrl}/users/login`;
 
     this.menuData = JSON.parse(localStorage.getItem('menuData') || '[]');
     this.settingsData = JSON.parse(
-      localStorage.getItem('settingsData') || '[]'
+      localStorage.getItem('settingsData') || '[]',
     );
   }
 
@@ -192,7 +195,7 @@ export class AuthService {
     }
 
     const hasArticleColor = menuData.some(
-      (item: any) => item.psth === '/article-color'
+      (item: any) => item.psth === '/article-color',
     );
     if (!hasArticleColor) {
     }
@@ -211,7 +214,10 @@ export class AuthService {
 
 @Injectable()
 export class AuthGuardService implements CanActivate {
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
     const isLoggedIn = this.authService.loggedIn;

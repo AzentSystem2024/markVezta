@@ -15,7 +15,7 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) {}
   intercept(
     req: HttpRequest<any>,
-    next: HttpHandler
+    next: HttpHandler,
   ): Observable<HttpEvent<any>> {
     if (req.url.startsWith('https://js.devexpress.com')) {
       return next.handle(req); // Skip authentication for these requests
@@ -23,14 +23,14 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const token = sessionStorage.getItem('authToken'); //adding token to http request header
 
-    if (token) {
-      const clonedReq = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return next.handle(clonedReq);
-    }
+    // if (token) {
+    //   const clonedReq = req.clone({
+    //     setHeaders: {
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //   });
+    //   return next.handle(clonedReq);
+    // }
 
     return next.handle(req);
   }
