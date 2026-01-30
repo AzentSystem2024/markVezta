@@ -13,7 +13,7 @@ import { DxButtonModule } from 'devextreme-angular/ui/button';
 import { DxToolbarModule } from 'devextreme-angular/ui/toolbar';
 
 import { UserPanelModule } from '../user-panel/user-panel.component';
-import { AuthService, IUser } from 'src/app/services';
+import { AuthService, DataService, IUser } from 'src/app/services';
 import { ThemeSwitcherModule } from 'src/app/components/library/theme-switcher/theme-switcher.component';
 import { Router } from '@angular/router';
 
@@ -53,23 +53,26 @@ export class AppHeaderComponent implements OnInit {
     },
   ];
   company: any;
+  version: any;
 
   constructor(
     private authService: AuthService,
     private changeDetectorRef: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private dataservice: DataService,
   ) {}
 
   ngOnInit() {
     this.authService.getUser().then((e) => (this.user = e.data));
     this.sesstion_Details();
+    this.version = this.dataservice.get_version();
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(
       sessionData.SELECTED_COMPANY.COMPANY_NAME,
-      '=================session data=========='
+      '=================session data==========',
     );
     this.UserName = sessionData.USER_NAME;
     console.log(this.UserName, 'Username');

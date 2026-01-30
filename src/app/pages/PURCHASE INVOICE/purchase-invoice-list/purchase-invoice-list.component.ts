@@ -114,7 +114,9 @@ export class PurchaseInvoiceListComponent {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
     text: '',
   };
 
@@ -221,7 +223,15 @@ export class PurchaseInvoiceListComponent {
         // ✅ SAME AS PRODUCTION JV
         this.filteredPurchaseInvoices = this.purchaseInvoiceList;
       },
-      error: () => {},
+      error: (err) => {
+        // ✅ ONLY ADDITION
+        const message =
+          err?.status === 0
+            ? 'Network connection lost. Please check your internet.'
+            : 'Unable to load purchase invoices. Please try again.';
+
+        notify(message, 'error', 3000);
+      },
       complete: () => {
         grid?.endCustomLoading();
       },

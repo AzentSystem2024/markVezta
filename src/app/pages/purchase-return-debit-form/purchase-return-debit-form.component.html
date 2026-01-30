@@ -126,7 +126,7 @@
             allowUpdating: true,
             allowDeleting: !isReadOnlyMode,
             allowAdding: false,
-            useIcons: true
+            useIcons: true,
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onContentReady)="onContentReady($event)"
@@ -338,16 +338,37 @@
             <dx-button
               #saveButtonRef
               [text]="
-                isReadOnlyMode
-                  ? 'PDF'
-                  : purchaseReturnFormData.IS_APPROVED
-                  ? 'Commit'
-                  : 'Save'
+                isSaving
+                  ? isReadOnlyMode
+                    ? 'Opening...'
+                    : purchaseReturnFormData.IS_APPROVED
+                      ? 'Committing...'
+                      : 'Saving...'
+                  : isReadOnlyMode
+                    ? 'PDF'
+                    : purchaseReturnFormData.IS_APPROVED
+                      ? 'Commit'
+                      : 'Save'
               "
+              [disabled]="isSaving"
               (onClick)="isReadOnlyMode ? openPDF() : savePurchaseReturn()"
               stylingMode="contained"
               type="default"
             ></dx-button>
+
+            <!-- <dx-button
+              #saveButtonRef
+              [text]="
+                isReadOnlyMode
+                  ? 'PDF'
+                  : purchaseReturnFormData.IS_APPROVED
+                    ? 'Commit'
+                    : 'Save'
+              "
+              (onClick)="isReadOnlyMode ? openPDF() : savePurchaseReturn()"
+              stylingMode="contained"
+              type="default"
+            ></dx-button> -->
           </div>
         </div>
       </div>

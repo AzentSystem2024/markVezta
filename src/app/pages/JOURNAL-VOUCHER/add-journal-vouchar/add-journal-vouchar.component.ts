@@ -119,7 +119,12 @@ export class AddJournalVoucharComponent {
   selectedCompany: any;
   selectedCompanyId: any;
   selectedFinId: any;
-  constructor(private dataService: DataService, private router: Router) {
+  isSaving = false;
+
+  constructor(
+    private dataService: DataService,
+    private router: Router,
+  ) {
     this.Deparment_Drop_down();
   }
 
@@ -127,7 +132,7 @@ export class AddJournalVoucharComponent {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     this.journalVoucherFormData.COMPANY_ID =
       menuResponse?.Companies[0].COMPANY_ID;
@@ -149,7 +154,7 @@ export class AddJournalVoucharComponent {
           this.selectedCompany.COMPANY_ID;
         console.log(
           this.journalVoucherFormData.COMPANY_ID,
-          'COMPANYIDDDDDDDDD'
+          'COMPANYIDDDDDDDDD',
         );
       }
       this.getJournalVoucherNo();
@@ -181,7 +186,7 @@ export class AddJournalVoucharComponent {
     this.dataService.Department_Dropdown().subscribe((res: any) => {
       console.log(
         res,
-        '========================department data========================='
+        '========================department data=========================',
       );
 
       this.Company_list = res;
@@ -292,7 +297,7 @@ export class AddJournalVoucharComponent {
   onInitNewRow(e: any) {
     // Prevent multiple unsaved rows
     const hasNewRow = this.journalVoucherFormData.DETAILS.some(
-      (row) => !row.ID
+      (row) => !row.ID,
     );
     if (hasNewRow) {
       e.cancel = true;
@@ -352,7 +357,7 @@ export class AddJournalVoucharComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -372,11 +377,11 @@ export class AddJournalVoucharComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           console.log(
             'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex
+            rowIndex,
           );
 
           setTimeout(() => {
@@ -412,14 +417,14 @@ export class AddJournalVoucharComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
@@ -441,14 +446,14 @@ export class AddJournalVoucharComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -526,13 +531,13 @@ export class AddJournalVoucharComponent {
                 !r.ledgerName &&
                 !r.particulars &&
                 (r.debitAmount === '' || r.debitAmount === 0) &&
-                (r.creditAmount === '' || r.creditAmount === 0)
+                (r.creditAmount === '' || r.creditAmount === 0),
             );
             if (emptyRows.length > 1) {
               // remove the last duplicate
               const indexToRemove =
                 this.journalVoucherFormData.DETAILS.lastIndexOf(
-                  emptyRows[emptyRows.length - 1]
+                  emptyRows[emptyRows.length - 1],
                 );
               this.journalVoucherFormData.DETAILS.splice(indexToRemove, 1);
             }
@@ -545,7 +550,7 @@ export class AddJournalVoucharComponent {
               setTimeout(() => {
                 const visibleRows = grid.getVisibleRows();
                 const newRowIndex = visibleRows.findIndex(
-                  (r) => r.data === newRow
+                  (r) => r.data === newRow,
                 );
                 if (newRowIndex >= 0) {
                   grid.editCell(newRowIndex, 'ledgerCode');
@@ -612,14 +617,14 @@ export class AddJournalVoucharComponent {
 
     // Check for an empty row: only rows with no ledgerCode and ledgerName are empty
     const hasEmptyRow = this.journalVoucherFormData.DETAILS.some(
-      (r) => !r.ledgerCode && !r.ledgerName
+      (r) => !r.ledgerCode && !r.ledgerName,
     );
 
     if (hasEmptyRow) {
       // Focus on the first empty row instead of adding a new one
       const grid = this.itemsGridRef?.instance;
       const emptyRowIndex = this.journalVoucherFormData.DETAILS.findIndex(
-        (r) => !r.ledgerCode && !r.ledgerName
+        (r) => !r.ledgerCode && !r.ledgerName,
       );
       setTimeout(() => {
         grid?.editCell(emptyRowIndex, 'ledgerCode');
@@ -631,7 +636,7 @@ export class AddJournalVoucharComponent {
     const nextSlNo =
       this.journalVoucherFormData.DETAILS.length > 0
         ? Math.max(
-            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo)
+            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
           ) + 1
         : 1;
 
@@ -709,7 +714,7 @@ export class AddJournalVoucharComponent {
     // Update ledger name if ledger code is edited
     if (e.column.dataField === 'ledgerCode') {
       const selectedLedger = this.ledgerList.find(
-        (item) => item.HEAD_CODE === e.value
+        (item) => item.HEAD_CODE === e.value,
       );
       if (selectedLedger) {
         e.data.ledgerName = selectedLedger.HEAD_NAME;
@@ -724,7 +729,7 @@ export class AddJournalVoucharComponent {
       const currentRow = this.journalVoucherFormData.DETAILS[rowIndex];
 
       const hasValue = Object.values(currentRow).some(
-        (v) => v !== null && v !== '' && v !== undefined
+        (v) => v !== null && v !== '' && v !== undefined,
       );
 
       if (hasValue) {
@@ -756,8 +761,10 @@ export class AddJournalVoucharComponent {
   }
 
   callInsertJournalVoucherAPI(finalPayload: any) {
+    this.isSaving = true;
     this.dataService.insertJournalVoucher(finalPayload).subscribe(
       (response: any) => {
+        this.isSaving = false;
         console.log(response, 'SAVED SUCCESSFULLY');
 
         notify(
@@ -765,7 +772,7 @@ export class AddJournalVoucharComponent {
             message: 'Journal Voucher Saved Successfully',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
 
         // // ⭐ DO NOT REMOVE — Needed for auto-setting voucher number
@@ -780,13 +787,14 @@ export class AddJournalVoucharComponent {
         this.popupClosed.emit();
       },
       (error) => {
+        this.isSaving = false;
         notify(
           'Failed to save Journal Voucher. Please try again.',
           'error',
-          2000
+          2000,
         );
         console.error('Save error:', error);
-      }
+      },
     );
   }
 
@@ -815,7 +823,7 @@ export class AddJournalVoucharComponent {
           (item.creditAmount && item.creditAmount != 0);
 
         return hasAnyValue; // Only include if there’s real content
-      }
+      },
     );
     cleanedDetails.forEach((item, index) => {
       item.billNo = (index + 1).toString(); // ensure billNo is string
@@ -835,11 +843,11 @@ export class AddJournalVoucharComponent {
     // 🔹 Step 4: Calculate totals
     const totalDebit = cleanedDetails.reduce(
       (sum, item) => sum + (parseFloat(item.debitAmount) || 0),
-      0
+      0,
     );
     const totalCredit = cleanedDetails.reduce(
       (sum, item) => sum + (parseFloat(item.creditAmount) || 0),
-      0
+      0,
     );
 
     if (totalDebit !== totalCredit) {
@@ -852,14 +860,14 @@ export class AddJournalVoucharComponent {
       (item) =>
         (!item.ledgerCode || item.ledgerCode.trim() === '') &&
         ((item.debitAmount && item.debitAmount != 0) ||
-          (item.creditAmount && item.creditAmount != 0))
+          (item.creditAmount && item.creditAmount != 0)),
     );
 
     if (hasLedgerCodeMissing) {
       notify(
         'One or more rows with debit/credit amount are missing a ledger code.',
         'error',
-        3000
+        3000,
       );
       return;
     }
@@ -867,7 +875,7 @@ export class AddJournalVoucharComponent {
     // 🔹 Step 6: Map ledgerCode (HeadCode) → HeadID for payload
     const transformedDetails = cleanedDetails.map((item) => {
       const matchedLedger = this.ledgerList.find(
-        (l) => l.HEAD_CODE === item.ledgerCode
+        (l) => l.HEAD_CODE === item.ledgerCode,
       );
 
       return {
@@ -891,7 +899,7 @@ export class AddJournalVoucharComponent {
     if (this.journalVoucherFormData.IS_APPROVED) {
       const result = confirm(
         'A new Journal Voucher will be created and approved. Do you want to continue?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
 
       result.then((dialogResult) => {

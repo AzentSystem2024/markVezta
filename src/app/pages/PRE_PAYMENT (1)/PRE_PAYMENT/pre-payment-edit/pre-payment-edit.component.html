@@ -281,13 +281,6 @@
         class="action-btn"
         (onClick)="cancel()"
       ></dx-button>
-      <!-- <dx-button
-        text="Save"
-        stylingMode="contained"
-        type="default"
-        class="action-btn"
-        (onClick)="savePrePayment()"
-      ></dx-button> -->
       <dx-button
         class="action-btn"
         [text]="isSaving ? 'Saving...' : 'Save'"
@@ -296,9 +289,14 @@
         type="default"
         (onClick)="savePrePayment()"
       ></dx-button>
-    </div>
 
-    <div class="fixed-footer" *ngIf="isReadOnly">
+      <!-- <dx-button
+        text="Save"
+        stylingMode="contained"
+        type="default"
+        class="action-btn"
+        (onClick)="savePrePayment()"
+      ></dx-button> -->
       <dx-button
         icon="fas fa-file-pdf"
         text="PDF"

@@ -79,10 +79,11 @@ export class DepreciationEditComponent {
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
   selected_Company_id: any;
+  isSaving = false;
 
   constructor(
     private dataService: DataService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     this.Active_fixedasset_List();
   }
@@ -102,7 +103,7 @@ export class DepreciationEditComponent {
       this.deafultASSET_IDs = this.DepreciationPayload.ASSET_IDS;
       console.log(
         this.deafultASSET_IDs,
-        '===========deafultASSET_IDs============='
+        '===========deafultASSET_IDs=============',
       );
       this.approveValue = this.SelectDepreciationData.TRANS_STATUS == '5';
 
@@ -110,7 +111,7 @@ export class DepreciationEditComponent {
     }
     this.bindDepreciationData(this.SelectDepreciationData);
     this.selectedRowsInGrid = this.Active_fixed_asset_list.filter(
-      (row) => row.Depreciation_amount > 0
+      (row) => row.Depreciation_amount > 0,
     ).map((row) => row.ID);
 
     // this.Process_function()
@@ -186,7 +187,7 @@ export class DepreciationEditComponent {
 
     // Map selected IDs
     const selectedIds = this.selectedData_in_Fixed_asset.map(
-      (row: any) => row.ID
+      (row: any) => row.ID,
     );
 
     // Reset depreciation fields for ALL assets first
@@ -210,7 +211,7 @@ export class DepreciationEditComponent {
         Asset_ID: row.ID,
         Days: row.Days || 0,
         Depr_Amount: row.Depreciation_amount || 0,
-      })
+      }),
     );
 
     // Trigger UI refresh
@@ -351,7 +352,7 @@ export class DepreciationEditComponent {
 
       // ✅ Skip negative days
       const diffDays = Math.floor(
-        (today.getTime() - baseDate.getTime()) / (1000 * 3600 * 24)
+        (today.getTime() - baseDate.getTime()) / (1000 * 3600 * 24),
       );
       if (diffDays <= 0) return;
 
@@ -376,7 +377,7 @@ export class DepreciationEditComponent {
 
     // ✅ Prepare formatted assets for API
     this.formattedAssets = this.Active_fixed_asset_list.filter(
-      (item) => item.Days > 0 && item.Depreciation_amount > 0
+      (item) => item.Days > 0 && item.Depreciation_amount > 0,
     ).map((item) => ({
       Asset_ID: item.ID,
       Days: item.Days,
@@ -402,7 +403,7 @@ export class DepreciationEditComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -446,7 +447,7 @@ export class DepreciationEditComponent {
 
     console.log(
       this.DepreciationPayload,
-      '===================================without change'
+      '===================================without change',
     );
     const payload = {
       ...this.DepreciationPayload,
@@ -467,21 +468,21 @@ export class DepreciationEditComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 2000,
           },
-          'error'
+          'error',
         );
         return;
       }
     }
-
+    this.isSaving = true;
     if (this.approveValue === true) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit'
+        'Confirm Commit',
       ).then((result) => {
         if (result) {
-          this.dataService
-            .Approve_Depreciation_api(payload)
-            .subscribe((res: any) => {
+          this.dataService.Approve_Depreciation_api(payload).subscribe(
+            (res: any) => {
+              this.isSaving = false;
               console.log('Approved & Committed:', res);
               this.Active_fixedasset_List();
               this.popupClosed.emit();
@@ -493,18 +494,25 @@ export class DepreciationEditComponent {
                   position: { at: 'top right', my: 'top right' },
                   displayTime: 500,
                 },
-                'success'
+                'success',
               );
               // this.resetFormAfterUpdate();
-            });
+            },
+            (error) => {
+              this.isSaving = false; // ✅ STOP loading
+              notify('Failed to approve depreciation.', 'error', 2000);
+              console.error(error);
+            },
+          );
         } else {
+          this.isSaving = false;
           notify('Approval cancelled.', 'info', 2000);
         }
       });
     } else {
-      this.dataService
-        .Update_Depreciation_api(payload)
-        .subscribe((res: any) => {
+      this.dataService.Update_Depreciation_api(payload).subscribe(
+        (res: any) => {
+          this.isSaving = false;
           console.log(res);
           this.popupClosed.emit();
           notify(
@@ -513,12 +521,18 @@ export class DepreciationEditComponent {
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'success'
+            'success',
           );
           this.get_Depreciation_list();
           this.grandTotal = 0;
           this.selectedRowsInGrid = [];
-        });
+        },
+        (error) => {
+          this.isSaving = false; // ✅ STOP loading
+          notify('Failed to update depreciation.', 'error', 2000);
+          console.error(error);
+        },
+      );
     }
   }
 

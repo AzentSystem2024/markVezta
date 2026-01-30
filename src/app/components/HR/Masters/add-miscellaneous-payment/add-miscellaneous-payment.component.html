@@ -37,7 +37,7 @@
             allowDeleting: !isReadOnlyMode,
             allowAdding: true,
             newRowPosition: 'last',
-            useIcons: true
+            useIcons: true,
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onRowRemoved)="onRowRemoved($event)"
@@ -150,7 +150,7 @@
               dataSource: ledgerList,
               valueExpr: 'HEAD_CODE',
               displayExpr: 'HEAD_CODE',
-              searchEnabled: true
+              searchEnabled: true,
             }"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
@@ -164,7 +164,7 @@
               dataSource: ledgerList,
               valueExpr: 'HEAD_NAME',
               displayExpr: 'HEAD_NAME',
-              searchEnabled: true
+              searchEnabled: true,
             }"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
@@ -289,7 +289,7 @@
               <div
                 class="section-label"
                 [ngStyle]="{
-                  color: receiptMode === 'Bank' ? 'inherit' : '#888'
+                  color: receiptMode === 'Bank' ? 'inherit' : '#888',
                 }"
               >
                 Bank Remittance Details
@@ -384,6 +384,30 @@
     <dx-button
       #saveButtonRef
       [text]="
+        isSaving
+          ? miscFormData?.IS_APPROVED || isApproved
+            ? 'Committing...'
+            : isEditing
+              ? 'Updating...'
+              : 'Saving...'
+          : miscFormData?.IS_APPROVED
+            ? 'Commit'
+            : isEditing
+              ? isApproved
+                ? 'Commit'
+                : 'Update'
+              : 'Save'
+      "
+      [disabled]="isSaving"
+      stylingMode="contained"
+      type="default"
+      (onClick)="isEditing ? onUpdateMiscReceipt() : onSave()"
+    >
+    </dx-button>
+
+    <!-- <dx-button
+      #saveButtonRef
+      [text]="
         miscFormData?.IS_APPROVED
           ? 'Commit'
           : isEditing
@@ -395,7 +419,7 @@
       stylingMode="contained"
       type="default"
       (onClick)="isEditing ? onUpdateMiscReceipt() : onSave()"
-    ></dx-button>
+    ></dx-button> -->
   </div>
 </div>
 

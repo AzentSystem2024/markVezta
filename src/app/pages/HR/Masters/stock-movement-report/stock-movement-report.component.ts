@@ -1,4 +1,9 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule, NgZone, ViewChild } from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   BrowserModule,
@@ -46,20 +51,22 @@ import { ExportService } from 'src/app/services/export.service';
   styleUrls: ['./stock-movement-report.component.scss'],
 })
 export class StockMovementReportComponent {
-   @ViewChild(DxDataGridComponent, { static: true })
-    dataGrid: DxDataGridComponent;
-    
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
   StockMovementDatasource: any[] = [];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   auto: string = 'auto';
+  showHeaderFilter: true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
   months: any[] = [];
   selectedMonth: string;
   payloadDate: string;
   pdfData: any;
   ItemList: any;
-    showFilterRow = true;
-  isFilterOpened = false;
 
   formatted_To_date: string;
   formatted_from_date: string;
@@ -70,6 +77,13 @@ export class StockMovementReportComponent {
   selected_fin_id: any;
   selectedstoreId: any;
   selected_item_Id: any;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -79,7 +93,6 @@ export class StockMovementReportComponent {
     private dataService: DataService,
     private sanitizer: DomSanitizer,
     private exportService: ExportService,
-    private zone: NgZone,
   ) {
     this.sesstion_Details();
     this.get_Item_Dropdown();
@@ -118,45 +131,19 @@ export class StockMovementReportComponent {
       '===========selected store id===================',
     );
   }
+  toggleFilters() {
+    const grid = this.dataGrid?.instance;
+    if (!grid) return;
 
-    refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    // onClick: () => this.refreshGrid(),
-    onClick: () => {
-      this.zone.run(() => this.refreshGrid());
-    },
-    text: '',
-  };
+    this.isFilterOpened = !this.isFilterOpened;
 
-    refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-    this.getStockMovement();
+    grid.beginUpdate();
+    grid.option({
+      filterRow: { visible: this.isFilterOpened },
+      headerFilter: { visible: this.isFilterOpened },
+    });
+    grid.endUpdate();
   }
-
-  searchButtonOptions = {
-    icon: 'search',
-    hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
-    onClick: () => this.toggleFilters(),
-  };
-
-   toggleFilters() {
-  this.isFilterOpened = !this.isFilterOpened;
-
-  const grid = this.dataGrid?.instance;
-  // if (!grid) return ;
-
-  grid.beginUpdate();
-  grid.option('filterRow.visible', this.isFilterOpened);
-  grid.option('headerFilter.visible', this.isFilterOpened);
-  grid.endUpdate();
-}
-
 
   onItemIdChange(event: any) {
     console.log(event, '=================item id===================');

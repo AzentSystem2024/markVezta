@@ -122,11 +122,19 @@
         (onClick)="closePopup()"
       ></dx-button>
       <dx-button
+        [text]="isSaving ? 'Updating...' : 'Update'"
+        [disabled]="isSaving"
+        stylingMode="contained"
+        type="default"
+        (onClick)="updateAccountHead()"
+      ></dx-button>
+
+      <!-- <dx-button
         text="Update"
         (onClick)="updateAccountHead()"
         stylingMode="contained"
         type="default"
-      ></dx-button>
+      ></dx-button> -->
     </div>
   </div>
 

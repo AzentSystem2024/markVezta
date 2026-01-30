@@ -91,7 +91,7 @@ export class LoginFormComponent implements OnInit {
     private themeService: ThemeService,
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
-    private sessionService: SessionService
+    private sessionService: SessionService,
   ) {
     this.themeService.isDark.subscribe((value: boolean) => {
       this.btnStylingMode = value ? 'outlined' : 'contained';
@@ -258,16 +258,15 @@ export class LoginFormComponent implements OnInit {
             displayTime: 2000,
             position: { at: 'top right', my: 'top right' },
           });
-        } 
-       else {
-        // Backend validation message
-        notify({
-          message: res.Message || 'Username or password is incorrect',
-          type: 'error',
-          displayTime: 3000,
-          position: { at: 'top right', my: 'top right' },
-        });
-      }
+        } else {
+          // Backend validation message
+          notify({
+            message: res.Message || 'Username or password is incorrect',
+            type: 'error',
+            displayTime: 3000,
+            position: { at: 'top right', my: 'top right' },
+          });
+        }
         this.loading = false;
       },
       error: () => {

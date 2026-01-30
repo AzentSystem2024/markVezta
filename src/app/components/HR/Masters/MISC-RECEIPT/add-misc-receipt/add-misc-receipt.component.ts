@@ -135,11 +135,12 @@ export class AddMiscReceiptComponent {
 
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
+  isSaving = false;
 
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     this.Deparment_Drop_down();
   }
@@ -149,7 +150,7 @@ export class AddMiscReceiptComponent {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
   }
   ngOnInit() {
@@ -223,7 +224,7 @@ export class AddMiscReceiptComponent {
     if (Array.isArray(data.DETAILS) && data.DETAILS.length > 0) {
       // Pick only debit entries (DEBIT_AMOUNT > 0)
       this.pendingInvoicelist = data.DETAILS.filter(
-        (item) => item.DEBIT_AMOUNT > 0
+        (item) => item.DEBIT_AMOUNT > 0,
       ).map((item) => ({
         ledgerCode: item.LEDGER_CODE, // optional logic if needed
         ledgerName: item.OPP_HEAD_NAME,
@@ -271,7 +272,7 @@ export class AddMiscReceiptComponent {
         (!row.ledgerCode || row.ledgerCode === '') &&
         (!row.ledgerName || row.ledgerName === '') &&
         (!row.REMARKS || row.REMARKS === '') &&
-        (row.AMOUNT === null || row.AMOUNT === '' || row.AMOUNT === 0)
+        (row.AMOUNT === null || row.AMOUNT === '' || row.AMOUNT === 0),
     );
   }
 
@@ -350,7 +351,7 @@ export class AddMiscReceiptComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -380,7 +381,7 @@ export class AddMiscReceiptComponent {
         if (isLastCell) {
           setTimeout(() => {
             const ledgerSelect = document.querySelector(
-              '#payHeadIdField input'
+              '#payHeadIdField input',
             ) as HTMLElement;
             if (ledgerSelect) {
               ledgerSelect.focus();
@@ -415,14 +416,14 @@ export class AddMiscReceiptComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'REMARKS');
@@ -444,14 +445,14 @@ export class AddMiscReceiptComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -577,7 +578,7 @@ export class AddMiscReceiptComponent {
     this.dataService.Department_Dropdown().subscribe((res: any) => {
       console.log(
         res,
-        '========================department data========================='
+        '========================department data=========================',
       );
 
       this.Company_list = res;
@@ -588,15 +589,15 @@ export class AddMiscReceiptComponent {
 
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13
+        (item: any) => item.GROUP_ID === 13,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14
+        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
@@ -623,8 +624,10 @@ export class AddMiscReceiptComponent {
   }
 
   callInsertAPI(finalPayload: any) {
+    this.isSaving = true;
     this.dataService.insertMiscReceipt(finalPayload).subscribe(
       (response: any) => {
+        this.isSaving = false;
         console.log(response, 'SAVED SUCCESSFULLY');
 
         notify(
@@ -632,7 +635,7 @@ export class AddMiscReceiptComponent {
             message: 'Miscellaneous Receipt Saved Successfully',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
         // this.getVoucherNo();
         this.popupClosed.emit();
@@ -644,9 +647,10 @@ export class AddMiscReceiptComponent {
         // Close popup
       },
       (error) => {
+        this.isSaving = false;
         notify('Failed to save Credit Note. Please try again.', 'error', 2000);
         console.error('Save error:', error);
-      }
+      },
     );
   }
 
@@ -678,14 +682,14 @@ export class AddMiscReceiptComponent {
 
     // 🔍 Validation for missing ledger info with amount
     const invalidRows = this.pendingInvoicelist.filter(
-      (row) => Number(row.AMOUNT) > 0 && (!row.ledgerCode || !row.ledgerName)
+      (row) => Number(row.AMOUNT) > 0 && (!row.ledgerCode || !row.ledgerName),
     );
 
     if (invalidRows.length > 0) {
       notify(
         'Please select Ledger Code and Ledger Name for all rows with amount entered',
         'warning',
-        2500
+        2500,
       );
       return;
     }
@@ -733,7 +737,7 @@ export class AddMiscReceiptComponent {
 
     validRows.forEach((row) => {
       const selectedLedger = this.ledgerList.find(
-        (l) => l.HEAD_CODE === row.ledgerCode
+        (l) => l.HEAD_CODE === row.ledgerCode,
       );
       if (!selectedLedger) return;
 
@@ -787,7 +791,7 @@ export class AddMiscReceiptComponent {
     if (this.miscFormData.IS_APPROVED) {
       const result = confirm(
         'A new Payment will be created and approved. Do you want to continue?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
 
       result.then((dialogResult) => {
@@ -823,14 +827,14 @@ export class AddMiscReceiptComponent {
 
     // 🔍 Validation for missing ledger info with amount
     const invalidRows = this.pendingInvoicelist.filter(
-      (row) => Number(row.AMOUNT) > 0 && (!row.ledgerCode || !row.ledgerName)
+      (row) => Number(row.AMOUNT) > 0 && (!row.ledgerCode || !row.ledgerName),
     );
 
     if (invalidRows.length > 0) {
       notify(
         'Please select Ledger Code and Ledger Name for all rows with amount entered',
         'warning',
-        2500
+        2500,
       );
       return;
     }
@@ -875,7 +879,7 @@ export class AddMiscReceiptComponent {
 
     this.getValidInvoiceRows().forEach((row) => {
       const selectedLedger = this.ledgerList.find(
-        (l) => l.HEAD_CODE === row.ledgerCode
+        (l) => l.HEAD_CODE === row.ledgerCode,
       );
       if (!selectedLedger) return; // skip invalid row
 
@@ -939,30 +943,46 @@ export class AddMiscReceiptComponent {
     if (this.isApproved) {
       const result = confirm(
         'Are you sure you want to approve this Miscellaneous Receipt?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
       result.then((dialogResult) => {
         if (dialogResult) {
-          this.dataService.approveMiscReceipt(payload).subscribe((res: any) => {
-            if (res.flag === 1) {
-              notify(successMsg, 'success', 2000);
-              this.popupClosed.emit();
-            } else {
+          this.isSaving = true;
+          this.dataService.approveMiscReceipt(payload).subscribe(
+            (res: any) => {
+              if (res.flag === 1) {
+                this.isSaving = false;
+                notify(successMsg, 'success', 2000);
+                this.popupClosed.emit();
+              } else {
+                notify(errorMsg, 'error', 2000);
+              }
+            },
+            () => {
+              this.isSaving = false; // ✅ ADD
               notify(errorMsg, 'error', 2000);
-            }
-          });
+            },
+          );
         }
       });
     } else {
+      this.isSaving = true;
       // ✅ Update directly
-      this.dataService.updateMiscReceipt(payload).subscribe((res: any) => {
-        if (res.flag === 1) {
-          notify(successMsg, 'success', 2000);
-          this.popupClosed.emit();
-        } else {
+      this.dataService.updateMiscReceipt(payload).subscribe(
+        (res: any) => {
+          if (res.flag === 1) {
+            this.isSaving = false;
+            notify(successMsg, 'success', 2000);
+            this.popupClosed.emit();
+          } else {
+            notify(errorMsg, 'error', 2000);
+          }
+        },
+        () => {
+          this.isSaving = false; // ✅ ADD
           notify(errorMsg, 'error', 2000);
-        }
-      });
+        },
+      );
     }
     // apiCall.subscribe((res: any) => {
     //   if (res.flag === 1) {

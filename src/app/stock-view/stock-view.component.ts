@@ -72,8 +72,19 @@ export class StockViewComponent {
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
     text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
   };
   stockViewList: any;
   constructor(
@@ -119,8 +130,20 @@ export class StockViewComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
   refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    // if (this.dataGrid?.instance) {
+    //   this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    this.getStockViewList();
+    // }
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
   getStockViewList() {

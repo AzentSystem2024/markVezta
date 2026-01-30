@@ -243,10 +243,18 @@ export class PurchaseReturnDebitComponent {
 
               resolve(list);
             },
-            error: () => {
+            error: (err) => {
               this.purchaseReturnArray = [];
               this.purchaseReturnCount = 0;
-              resolve([]);
+
+              const message =
+                err?.status === 0
+                  ? 'Network connection lost. Please check your internet.'
+                  : 'Something went wrong. Please try again.';
+
+              notify(message, 'error', 3000);
+
+              resolve([]); // unchanged functionality
             },
           });
         }),

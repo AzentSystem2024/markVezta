@@ -140,7 +140,7 @@
             allowUpdating: true,
             allowDeleting: true,
             allowAdding: false,
-            useIcons: true
+            useIcons: true,
           }"
           (onContentReady)="onContentReady($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
@@ -331,11 +331,28 @@
               ></dx-button>
               <dx-button
                 #saveButtonRef
-                [text]="purchaseInvoiceFormData.IS_APPROVED ? 'Commit' : 'Save'"
+                [text]="
+                  isSaving
+                    ? purchaseInvoiceFormData.IS_APPROVED
+                      ? 'Committing...'
+                      : 'Saving...'
+                    : purchaseInvoiceFormData.IS_APPROVED
+                      ? 'Commit'
+                      : 'Save'
+                "
+                [disabled]="isSaving"
                 stylingMode="contained"
                 type="default"
                 (onClick)="savePurchaseInvoice()"
               ></dx-button>
+
+              <!-- <dx-button
+                #saveButtonRef
+                [text]="purchaseInvoiceFormData.IS_APPROVED ? 'Commit' : 'Save'"
+                stylingMode="contained"
+                type="default"
+                (onClick)="savePurchaseInvoice()"
+              ></dx-button> -->
             </div>
           </div>
         </div>

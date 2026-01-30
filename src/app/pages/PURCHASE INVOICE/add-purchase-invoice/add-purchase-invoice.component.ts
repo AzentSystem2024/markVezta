@@ -169,6 +169,7 @@ export class AddPurchaseInvoiceComponent {
   fin_id: any;
   store_id: any;
   user_id: any;
+  isSaving = false;
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -314,7 +315,7 @@ export class AddPurchaseInvoiceComponent {
 
     // Load supplier details again
     const selectedSupplier = this.distributorList.find(
-      (s: any) => s.ID === supplierId
+      (s: any) => s.ID === supplierId,
     );
 
     this.selectedSupplier = selectedSupplier;
@@ -392,7 +393,7 @@ export class AddPurchaseInvoiceComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -407,7 +408,7 @@ export class AddPurchaseInvoiceComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'VAT_AMOUNT'));
@@ -453,7 +454,7 @@ export class AddPurchaseInvoiceComponent {
 
     selectedRows.forEach((row) => {
       const exists = this.mainGridData.some(
-        (item) => item.GRN_DET_ID === row.GRN_DET_ID
+        (item) => item.GRN_DET_ID === row.GRN_DET_ID,
       );
       if (exists) return;
 
@@ -520,7 +521,7 @@ export class AddPurchaseInvoiceComponent {
           position: { at: 'top right', my: 'top right' },
         },
         'warning',
-        3000
+        3000,
       );
       return; // stop execution here
     }
@@ -553,7 +554,7 @@ export class AddPurchaseInvoiceComponent {
           position: { at: 'top right', my: 'top right' },
         },
         'warning',
-        3000
+        3000,
       );
       return; // stop execution here
     }
@@ -604,19 +605,19 @@ export class AddPurchaseInvoiceComponent {
           CGST: item.CGST,
           // GST: item.GST ?? 0,
         };
-      }
+      },
     );
 
     this.purchaseInvoiceFormData.GROSS_AMOUNT = parseFloat(
-      grossAmount.toFixed(2)
+      grossAmount.toFixed(2),
     );
     this.purchaseInvoiceFormData.VAT_AMOUNT = parseFloat(vatAmount.toFixed(2));
     this.purchaseInvoiceFormData.NET_AMOUNT = parseFloat(netAmount.toFixed(2));
     this.purchaseInvoiceFormData.SUPP_GROSS_AMOUNT = parseFloat(
-      grossAmount.toFixed(2)
+      grossAmount.toFixed(2),
     );
     this.purchaseInvoiceFormData.SUPP_NET_AMOUNT = parseFloat(
-      netAmount.toFixed(2)
+      netAmount.toFixed(2),
     );
     this.purchaseInvoiceFormData.PURCH_DATE =
       this.purchaseInvoiceFormData.PURCH_DATE;
@@ -627,22 +628,25 @@ export class AddPurchaseInvoiceComponent {
     this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
 
     const callInsertAPI = () => {
+      this.isSaving = true;
       this.dataService
         .insertPurchaseInvoice(this.purchaseInvoiceFormData)
         .subscribe({
           next: (res) => {
+            this.isSaving = false;
             notify(
               {
                 message: 'Invoice saved successfully',
                 position: { at: 'top right', my: 'top right' },
               },
               'success',
-              3000
+              3000,
             );
             this.resetInvoiceForm();
             this.popupClosed?.emit();
           },
           error: (err) => {
+            this.isSaving = false;
             console.error('Save failed', err);
           },
         });
@@ -650,7 +654,7 @@ export class AddPurchaseInvoiceComponent {
     if (this.purchaseInvoiceFormData.IS_APPROVED === true) {
       const dialog = confirm(
         'Are you sure you want to approve and commit this invoice?',
-        'Confirmation'
+        'Confirmation',
       );
 
       dialog.then((confirmed: boolean) => {

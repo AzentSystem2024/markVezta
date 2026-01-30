@@ -190,8 +190,9 @@ export class JournalVoucherListComponent {
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
-    this.getJournalVouchers();
+
     this.sessionData_tax();
+    this.getJournalVouchers();
   }
 
   sessionData_tax() {
@@ -240,7 +241,15 @@ export class JournalVoucherListComponent {
         // ✅ single binding source
         this.filteredJournalVoucherList = this.journalVoucherList;
       },
-      error: () => {},
+      error: (err) => {
+        // ✅ ONLY ADDITION
+        const message =
+          err?.status === 0
+            ? 'Network connection lost. Please check your internet.'
+            : 'Unable to load journal vouchers. Please try again.';
+
+        notify(message, 'error', 3000);
+      },
       complete: () => {
         grid?.endCustomLoading();
       },

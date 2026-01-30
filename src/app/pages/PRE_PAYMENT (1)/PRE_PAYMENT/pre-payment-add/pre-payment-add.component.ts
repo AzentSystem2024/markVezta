@@ -101,22 +101,23 @@ export class PrePaymentAddComponent {
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
   docNo: any;
-isSaving : boolean = false;
+  isSaving = false;
 
-  constructor(private dataservice: DataService, private ngZone: NgZone) {
+  constructor(
+    private dataservice: DataService,
+    private ngZone: NgZone,
+  ) {
     this.get_Supplier_dropdown();
     this.get_ExpenseLedger_dropdown();
     this.sesstion_Details();
     this.get_PrePaymentLedger_dropdown();
     this.sessionData_tax();
     this.getDocNo();
-      
-
   }
-  ngOnInit(){
-      this.get_Supplier_dropdown();
+  ngOnInit() {
+    this.get_Supplier_dropdown();
   }
-    getDocNo() {
+  getDocNo() {
     const payload = {
       TRANS_TYPE: 38,
       COMPANY_ID: this.selected_Company_id,
@@ -156,7 +157,7 @@ isSaving : boolean = false;
 
       if (this.PrePaymentFormData.NO_OF_MONTHS) {
         newDate.setMonth(
-          newDate.getMonth() + this.PrePaymentFormData.NO_OF_MONTHS
+          newDate.getMonth() + this.PrePaymentFormData.NO_OF_MONTHS,
         );
       }
 
@@ -207,7 +208,7 @@ isSaving : boolean = false;
       endDateFinal = new Date(
         endDateFinal.getFullYear(),
         endDateFinal.getMonth(),
-        0
+        0,
       );
     }
 
@@ -223,7 +224,7 @@ isSaving : boolean = false;
       let periodEnd = new Date(
         current.getFullYear(),
         current.getMonth() + 1,
-        0
+        0,
       );
 
       // Keep end date within overall DATE_TO
@@ -297,10 +298,10 @@ isSaving : boolean = false;
   }
 
   get_Supplier_dropdown() {
-    const payload={
-      NAME:'SUPPLIER',
-      COMPANY_ID:this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
@@ -441,25 +442,25 @@ isSaving : boolean = false;
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
 
     this.selected_user_id = sessionData.USER_ID;
     console.log(
       this.selected_user_id,
-      '===========selected user id==================='
+      '===========selected user id===================',
     );
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
   }
 
@@ -541,7 +542,7 @@ const totalExpense = Number(this.totalExpense);
     if (this.PrePaymentFormData.IS_APPROVED) {
       confirm(
         'A new PrePayment will be created and approved. Do you want to continue?',
-        'Confirm Approval'
+        'Confirm Approval',
       ).then((dialogResult) => {
         if (dialogResult) {
           this.callInsertPrePayment(payload); // handle API call here
@@ -570,10 +571,10 @@ const totalExpense = Number(this.totalExpense);
   }
 
   callInsertPrePayment(payload: any) {
-     this.isSaving = true;
+    this.isSaving = true;
     this.dataservice.Insert_PrePayment(payload).subscribe(
       (res: any) => {
-          this.isSaving = false;
+        this.isSaving = false;
         console.log('Response from save PrePayment:', res);
 
         if (res.Message === 'Success') {
@@ -594,7 +595,7 @@ const totalExpense = Number(this.totalExpense);
         this.isSaving = false;
         notify('Error while saving PrePayment', 'error', 2000);
         console.error('Save Error:', error);
-      }
+      },
     );
   }
 }

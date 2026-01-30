@@ -20,7 +20,7 @@
             mode: 'cell',
             allowAdding: true,
             allowUpdating: true,
-            allowDeleting: !isReadOnlyMode
+            allowDeleting: !isReadOnlyMode,
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
         >
@@ -153,20 +153,19 @@
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
-              pageSize: 50
+              pageSize: 50,
             }"
             [editorOptions]="{
               dataSource: {
                 store: {
                   type: 'array',
-                  data: itemsList
+                  data: itemsList,
                 },
                 paginate: true,
-                pageSize: 50
+                pageSize: 50,
               },
               showScrollbar: 'always',
               virtualScrollingEnabled: true,
-           
             }"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
@@ -180,19 +179,19 @@
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
-              pageSize: 50
+              pageSize: 50,
             }"
             [editorOptions]="{
               dataSource: {
                 store: {
                   type: 'array',
-                  data: typeList
+                  data: typeList,
                 },
                 paginate: true,
-                pageSize: 50
+                pageSize: 50,
               },
               showScrollbar: 'always',
-              virtualScrollingEnabled: true
+              virtualScrollingEnabled: true,
             }"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
@@ -221,17 +220,17 @@
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
-              pageSize: 50
+              pageSize: 50,
             }"
             [editorOptions]="{
               dropDownOptions: { height: 300 },
               dataSource: {
                 store: {
                   type: 'array',
-                  data: catList
+                  data: catList,
                 },
                 paginate: true,
-                pageSize: 50
+                pageSize: 50,
               },
               showScrollbar: 'always',
               virtualScrollingEnabled: true,
@@ -251,20 +250,20 @@
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
-              pageSize: 50
+              pageSize: 50,
             }"
             [editorOptions]="{
               dropDownOptions: { height: 300 },
               dataSource: {
                 store: {
                   type: 'array',
-                  data: artNoList
+                  data: artNoList,
                 },
                 paginate: true,
-                pageSize: 50
+                pageSize: 50,
               },
               showScrollbar: 'always',
-              virtualScrollingEnabled: true
+              virtualScrollingEnabled: true,
             }"
             [allowEditing]="!isReadOnlyMode"
             [cellTemplate]="artNoCellTemplate"
@@ -280,20 +279,20 @@
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
-              pageSize: 50
+              pageSize: 50,
             }"
             [editorOptions]="{
               dropDownOptions: { height: 300 },
               dataSource: {
                 store: {
                   type: 'array',
-                  data: colorList
+                  data: colorList,
                 },
                 paginate: true,
-                pageSize: 50
+                pageSize: 50,
               },
               showScrollbar: 'always',
-              virtualScrollingEnabled: true
+              virtualScrollingEnabled: true,
             }"
             [allowEditing]="!isReadOnlyMode"
             [cellTemplate]="colorCellTemplate"
@@ -310,17 +309,17 @@
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               paginate: true,
-              pageSize: 50
+              pageSize: 50,
             }"
             [editorOptions]="{
               dropDownOptions: { height: 300 },
               dataSource: {
                 store: {
                   type: 'array',
-                  data: packingList
+                  data: packingList,
                 },
                 paginate: true,
-                pageSize: 50
+                pageSize: 50,
               },
 
               showScrollbar: 'always',
@@ -416,6 +415,23 @@
               <dx-button
                 *ngIf="!isReadOnlyMode"
                 [text]="
+                  isSaving
+                    ? salesOrderFormData.IS_APPROVED
+                      ? 'Committing...'
+                      : 'Saving...'
+                    : salesOrderFormData.IS_APPROVED
+                      ? 'Commit'
+                      : 'Save'
+                "
+                [disabled]="isSaving"
+                (onClick)="saveSalesOrder()"
+                stylingMode="contained"
+                type="default"
+              ></dx-button>
+
+              <!-- <dx-button
+                *ngIf="!isReadOnlyMode"
+                [text]="
                   isReadOnlyMode
                     ? 'PDF'
                     : salesOrderFormData.IS_APPROVED
@@ -425,7 +441,7 @@
                 (onClick)="saveSalesOrder()"
                 stylingMode="contained"
                 type="default"
-              ></dx-button>
+              ></dx-button> -->
             </div>
           </div>
         </div>
@@ -461,7 +477,7 @@
     [editing]="{
       mode: 'cell',
       allowUpdating: true,
-      allowDeleting: false
+      allowDeleting: false,
     }"
     (onEditorPreparing)="onCustSizeEditorPreparing($event)"
   >

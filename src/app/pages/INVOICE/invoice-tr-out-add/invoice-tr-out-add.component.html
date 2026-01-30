@@ -35,7 +35,7 @@
             allowUpdating: true,
             allowDeleting: true,
             allowAdding: true,
-            useIcons: true
+            useIcons: true,
           }"
           (onContentReady)="onContentReady($event)"
           (onKeyDown)="handleKeyDown($event)"
@@ -318,6 +318,28 @@
               <dx-button
                 #saveButtonRef
                 [text]="
+                  isSaving
+                    ? isReadOnlyMode
+                      ? 'Opening...'
+                      : invoiceFormData.IS_APPROVED
+                        ? 'Committing...'
+                        : 'Saving...'
+                    : isReadOnlyMode
+                      ? 'PDF'
+                      : invoiceFormData.IS_APPROVED
+                        ? 'Commit'
+                        : 'Save'
+                "
+                [disabled]="isSaving"
+                (onClick)="isReadOnlyMode ? openPDF() : saveInvoice()"
+                stylingMode="contained"
+                type="default"
+                [width]="120"
+              ></dx-button>
+
+              <!-- <dx-button
+                #saveButtonRef
+                [text]="
                   isReadOnlyMode
                     ? 'PDF'
                     : invoiceFormData.IS_APPROVED
@@ -328,7 +350,7 @@
                 stylingMode="contained"
                 type="default"
                 [width]="120"
-              ></dx-button>
+              ></dx-button> -->
             </div>
           </div>
         </div>

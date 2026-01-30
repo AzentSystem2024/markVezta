@@ -8,7 +8,7 @@
       [options]="{
         icon: 'menu',
         stylingMode: 'text',
-        onClick: toggleMenu
+        onClick: toggleMenu,
       }"
     >
     </dxi-item>
@@ -20,12 +20,17 @@
     >
     </dxi-item> -->
     <dxi-item location="before" cssClass="header-title">
-      <img
-        src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png"
-        alt="Logo"
-        class="logo-image"
-        height="40px"
-      />
+      <div *dxTemplate class="d-flex align-items-end">
+        <img
+          src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png"
+          alt="Logo"
+          class="logo-image"
+          height="40px"
+        />
+        <span class="fw-bold versionText small" style="margin-bottom: -2px"
+          >V {{ version }}</span
+        >
+      </div>
     </dxi-item>
 
     <dxi-item location="after" locateInMenu="never">
@@ -35,7 +40,7 @@
     </dxi-item>
 
     <dxi-item location="after">
-        <div class="toolbar-divider"></div>
+      <div class="toolbar-divider"></div>
     </dxi-item>
 
     <dxi-item location="after" locateInMenu="auto">

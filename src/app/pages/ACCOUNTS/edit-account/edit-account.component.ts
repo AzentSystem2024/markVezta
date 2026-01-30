@@ -82,6 +82,7 @@ export class EditAccountComponent implements OnChanges {
   category: any;
   selectedCategory: any;
   ledgerList: any;
+  isSaving = false;
 
   constructor(private dataService: DataService) {}
 
@@ -94,7 +95,7 @@ export class EditAccountComponent implements OnChanges {
     if (changes['accountHeadData'] && changes['accountHeadData'].currentValue) {
       console.log(
         'Received accountHeadData:',
-        changes['accountHeadData'].currentValue
+        changes['accountHeadData'].currentValue,
       );
       this.accountHeadData = {
         ...this.accountHeadData,
@@ -113,14 +114,14 @@ export class EditAccountComponent implements OnChanges {
 
         // Find the Sub Group and Main Group
         const categoryItem = this.groupingList.find(
-          (item) => item.GROUP_ID === this.selectedCategory
+          (item) => item.GROUP_ID === this.selectedCategory,
         );
 
         if (categoryItem) {
           this.subGroupId = categoryItem.GROUP_SUPER_ID;
 
           const subGroupItem = this.groupingList.find(
-            (item) => item.GROUP_ID === this.subGroupId
+            (item) => item.GROUP_ID === this.subGroupId,
           );
 
           if (subGroupItem) {
@@ -131,15 +132,15 @@ export class EditAccountComponent implements OnChanges {
 
         // Populate all lists
         this.mainGroupList = this.groupingList.filter(
-          (item) => item.GROUP_SUPER_ID === 0
+          (item) => item.GROUP_SUPER_ID === 0,
         );
 
         this.subGroupList = this.groupingList.filter(
-          (item) => item.GROUP_SUPER_ID === this.mainGroupId
+          (item) => item.GROUP_SUPER_ID === this.mainGroupId,
         );
         this.accountHeadData.SubGroupId = this.subGroupId;
         this.categoryList = this.groupingList.filter(
-          (item) => item.GROUP_SUPER_ID === this.subGroupId
+          (item) => item.GROUP_SUPER_ID === this.subGroupId,
         );
       }
     });
@@ -149,21 +150,21 @@ export class EditAccountComponent implements OnChanges {
     this.selectedMainGroupId = event.value;
     console.log('Selected Main Group ID:', event.value);
     this.subGroupList = this.groupingList.filter(
-      (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId
+      (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId,
     );
     console.log(this.subGroupList, 'SUBGROUPLIST');
   }
 
   get selectedMainGroupName(): string {
     const selectedGroup = this.mainGroupList.find(
-      (item) => item.GROUP_ID === this.selectedMainGroupId
+      (item) => item.GROUP_ID === this.selectedMainGroupId,
     );
     return selectedGroup ? selectedGroup.GROUP_NAME : '';
   }
 
   get selectedSubGroupName(): string {
     const selected = this.subGroupList?.find(
-      (item) => item.GROUP_ID === this.selectedSubGroupId
+      (item) => item.GROUP_ID === this.selectedSubGroupId,
     );
     return selected ? selected.GROUP_NAME : '';
   }
@@ -172,7 +173,7 @@ export class EditAccountComponent implements OnChanges {
     this.selectedSubGroupId = event.value;
     console.log('selected sub group', this.selectedSubGroupId);
     this.categoryList = this.groupingList.filter(
-      (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId
+      (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId,
     );
     console.log(this.categoryList, 'CATEGORYLIST');
   }
@@ -187,7 +188,7 @@ export class EditAccountComponent implements OnChanges {
       this.ledgerList = response.Data;
       console.log(
         this.ledgerList,
-        '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}'
+        '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}',
       );
     });
   }
@@ -202,7 +203,7 @@ export class EditAccountComponent implements OnChanges {
           message: 'Please enter Account Head Name',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -228,7 +229,7 @@ export class EditAccountComponent implements OnChanges {
           message: 'Account Head already exists',
           position: { at: 'top center', my: 'top center' },
         },
-        'warning'
+        'warning',
       );
       return;
     }
@@ -245,14 +246,16 @@ export class EditAccountComponent implements OnChanges {
       GROUP_LEVEL: this.accountHeadData.GROUP_LEVEL || 0,
       IS_INACTIVE: !!this.accountHeadData.IS_INACTIVE,
     };
+    this.isSaving = true;
     this.dataService.updateAccountHead(payload).subscribe((response: any) => {
       if (response?.flag === 1) {
+        this.isSaving = false;
         notify(
           {
             message: 'Account Group Updated Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
         this.popupVisible = false;
         this.popupClosed.emit();
@@ -267,7 +270,7 @@ export class EditAccountComponent implements OnChanges {
             message: response?.message || 'Update failed',
             position: { at: 'top center', my: 'top center' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -281,8 +284,8 @@ export class EditAccountComponent implements OnChanges {
     const groupSuperId = isSubGroup
       ? this.selectedMainGroupId
       : isCategory
-      ? this.selectedSubGroupId
-      : 0;
+        ? this.selectedSubGroupId
+        : 0;
 
     const payload = {
       GROUP_ID: 0,
@@ -306,7 +309,7 @@ export class EditAccountComponent implements OnChanges {
           message: 'Account Group Added Successfully',
           position: { at: 'top center', my: 'top center' },
         },
-        'success'
+        'success',
       );
 
       // Reset input
@@ -319,11 +322,11 @@ export class EditAccountComponent implements OnChanges {
 
           if (isSubGroup) {
             this.subGroupList = this.groupingList.filter(
-              (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId
+              (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId,
             );
 
             const newSubGroup = this.groupingList.find(
-              (item) => item.GROUP_ID === newGroupId
+              (item) => item.GROUP_ID === newGroupId,
             );
 
             if (
@@ -342,11 +345,11 @@ export class EditAccountComponent implements OnChanges {
 
           if (isCategory) {
             this.categoryList = this.groupingList.filter(
-              (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId
+              (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId,
             );
 
             const newCategory = this.groupingList.find(
-              (item) => item.GROUP_ID === newGroupId
+              (item) => item.GROUP_ID === newGroupId,
             );
 
             if (

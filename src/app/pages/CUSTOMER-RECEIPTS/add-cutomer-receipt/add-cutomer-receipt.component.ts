@@ -123,8 +123,12 @@ export class AddCutomerReceiptComponent {
   partyName: any;
   selectedCustomer: any;
   isFillAmountValid: boolean;
+  isSaving = false;
 
-  constructor(private dataService: DataService, private ngZone: NgZone) {}
+  constructor(
+    private dataService: DataService,
+    private ngZone: NgZone,
+  ) {}
 
   ngOnInit() {
     this.sessionDetails();
@@ -151,7 +155,7 @@ export class AddCutomerReceiptComponent {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
   }
 
@@ -167,7 +171,7 @@ export class AddCutomerReceiptComponent {
       console.warn(
         'Skipping API call — missing company or distributor',
         this.selectedCompanyId,
-        this.selectedDistributorId
+        this.selectedDistributorId,
       );
       return;
     }
@@ -245,7 +249,7 @@ export class AddCutomerReceiptComponent {
     this.partyName = event.value;
     if (selectedId) {
       this.selectedCustomer = this.distributorList.find(
-        (s: any) => s.ID === selectedId
+        (s: any) => s.ID === selectedId,
       );
       this.receiprtFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
       console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
@@ -266,7 +270,7 @@ export class AddCutomerReceiptComponent {
       this.distributorList = response;
       console.log(
         this.distributorList,
-        'distributorList=============================='
+        'distributorList==============================',
       );
     });
   }
@@ -279,7 +283,7 @@ export class AddCutomerReceiptComponent {
         this.onReceiptModeChange({ value: this.receiptMode });
         console.log(
           'Ledger List Loaded=============================:',
-          this.ledgerList
+          this.ledgerList,
         );
       },
       error: (err) => {
@@ -316,15 +320,15 @@ export class AddCutomerReceiptComponent {
   applyReceiptModeFilter() {
     console.log(
       this.filteredLedgerList,
-      '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{'
+      '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{',
     );
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13
+        (item: any) => item.GROUP_ID === 13,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
@@ -332,11 +336,11 @@ export class AddCutomerReceiptComponent {
           item.GROUP_ID !== 13 &&
           item.GROUP_ID !== 14 &&
           item.GROUP_ID !== 15 &&
-          item.GROUP_ID !== 41
+          item.GROUP_ID !== 41,
       );
     } else if (this.receiptMode === 'PDC') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
       console.log(this.filteredLedgerList, 'FILTEREDLEDGERLIST');
     } else {
@@ -353,7 +357,7 @@ export class AddCutomerReceiptComponent {
       next: (response: any) => {
         console.log(
           response,
-          'PDC List Response=============================-----------'
+          'PDC List Response=============================-----------',
         );
         this.pdcList = response?.Data || []; // store it in a variable
       },
@@ -392,7 +396,7 @@ export class AddCutomerReceiptComponent {
       this.receiprtFormData.CHEQUE_DATE = new Date(
         Number(parts[2]), // year
         Number(parts[1]) - 1, // month is 0-based
-        Number(parts[0]) // day
+        Number(parts[0]), // day
       );
     } else {
       this.receiprtFormData.CHEQUE_DATE = null;
@@ -414,7 +418,7 @@ export class AddCutomerReceiptComponent {
       notify(
         'Please select at least one row before proceeding.',
         'warning',
-        3000
+        3000,
       );
       return;
     }
@@ -422,7 +426,7 @@ export class AddCutomerReceiptComponent {
     // Calculate total pending of selected rows
     this.totalPending = selectedRows.reduce(
       (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-      0
+      0,
     );
 
     this.showFillAmountPopup = true;
@@ -493,7 +497,7 @@ export class AddCutomerReceiptComponent {
 
     if (enteredValue > this.totalPending) {
       this.amountError = `Entered amount cannot be greater than Total Pending Amount (${this.totalPending.toFixed(
-        2
+        2,
       )})`;
       this.isFillAmountValid = false;
       return;
@@ -509,7 +513,7 @@ export class AddCutomerReceiptComponent {
       notify(
         'Please correct the entered amount before submitting.',
         'warning',
-        3000
+        3000,
       );
       return;
     }
@@ -535,13 +539,13 @@ export class AddCutomerReceiptComponent {
     this.dataService.insertCustomerReceipt(finalPayload).subscribe(
       (response: any) => {
         console.log(response, 'SAVED SUCCESSFULLY');
-
+        this.isSaving = false;
         notify(
           {
             message: 'Receipt Saved Successfully',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
 
         // DO NOT REMOVE — Needed for auto-setting voucher number
@@ -556,9 +560,10 @@ export class AddCutomerReceiptComponent {
         this.popupClosed.emit();
       },
       (error) => {
+        this.isSaving = false;
         notify('Failed to save Credit Note. Please try again.', 'error', 2000);
         console.error('Save error:', error);
-      }
+      },
     );
   }
 
@@ -581,7 +586,7 @@ export class AddCutomerReceiptComponent {
 
     selectedRows.forEach((row: any) => {
       const rowIndex = this.pendingInvoiceList.findIndex(
-        (r: any) => r.BILL_ID === row.BILL_ID
+        (r: any) => r.BILL_ID === row.BILL_ID,
       );
 
       if (!row.RECEIVED_AMOUNT || Number(row.RECEIVED_AMOUNT) <= 0) {
@@ -596,7 +601,7 @@ export class AddCutomerReceiptComponent {
       notify(
         'Please enter Received Amount for the selected rows.',
         'warning',
-        3000
+        3000,
       );
       return;
     }
@@ -619,7 +624,7 @@ export class AddCutomerReceiptComponent {
     }
     const netAmount = validDetails.reduce(
       (sum: number, row: any) => sum + row.AMOUNT,
-      0
+      0,
     );
 
     if (this.receiptMode === 'PDC') {
@@ -628,7 +633,7 @@ export class AddCutomerReceiptComponent {
         notify(
           `PDC amount (${pdcAmount}) must equal the total received amount (${netAmount})`,
           'error',
-          4000
+          4000,
         );
         return;
       }
@@ -654,12 +659,13 @@ export class AddCutomerReceiptComponent {
     if (this.receiprtFormData.IS_APPROVED) {
       const result = confirm(
         'A new Credit Note will be created and approved. Do you want to continue?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
 
       result.then((dialogResult: any) => {
         if (dialogResult) {
           this.ngZone.run(() => {
+            this.isSaving = true;
             this.callAPI(payload);
           });
         }
@@ -667,7 +673,7 @@ export class AddCutomerReceiptComponent {
 
       return;
     }
-
+    this.isSaving = true;
     // Normal flow (Not Approved)
     this.callAPI(payload);
   }

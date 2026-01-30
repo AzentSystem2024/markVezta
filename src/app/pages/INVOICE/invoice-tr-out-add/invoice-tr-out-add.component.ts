@@ -168,6 +168,7 @@ export class InvoiceTrOutAddComponent {
   companyState: any;
   previousCustomerId: number | null = null;
   pendingCustomerId: number | null = null;
+  isSaving = false;
 
   constructor(
     private dataService: DataService,
@@ -772,9 +773,11 @@ export class InvoiceTrOutAddComponent {
     // ----------------------- API CALLS -----------------------
 
     const callInsertAPI = () => {
+      this.isSaving = true;
       this.dataService
         .insertInvoiceTrOut(this.invoiceFormData)
         .subscribe(() => {
+          this.isSaving = false;
           notify('Invoice saved successfully', 'success', 3000);
           this.resetInvoiceForm();
           this.popupClosed.emit();
@@ -782,9 +785,11 @@ export class InvoiceTrOutAddComponent {
     };
 
     const callUpdateAPI = () => {
+      this.isSaving = true;
       this.dataService
         .updateInvoiceTrOut(this.invoiceFormData)
         .subscribe(() => {
+          this.isSaving = false;
           notify('Invoice updated successfully', 'success', 3000);
           this.popupClosed.emit();
         });
@@ -798,9 +803,11 @@ export class InvoiceTrOutAddComponent {
 
       result.then((confirmed) => {
         if (confirmed) {
+          this.isSaving = true;
           this.dataService
             .commitInvoiceTrOut(this.invoiceFormData)
             .subscribe(() => {
+              this.isSaving = false;
               notify('Invoice approved successfully', 'success', 3000);
               this.popupClosed.emit();
             });

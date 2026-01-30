@@ -32,7 +32,7 @@
           rowAlternationInterval="2"
           [selection]="{
             mode: 'multiple',
-            showCheckBoxesMode: 'always'
+            showCheckBoxesMode: 'always',
           }"
           [selectedRowKeys]="selectedRowsKeys"
           (onContentReady)="onGridContentReady($event)"
@@ -200,7 +200,7 @@
             class="blue-outline-btn"
             [disabled]="selectedRowsCount === 0"
             [elementAttr]="{
-              class: selectedRowsCount === 0 ? 'disabled-button' : ''
+              class: selectedRowsCount === 0 ? 'disabled-button' : '',
             }"
             (onClick)="onFillAmountClick()"
           ></dx-button>
@@ -256,7 +256,7 @@
               <div
                 class="section-label"
                 [ngStyle]="{
-                  color: receiptMode === 'Bank' ? 'inherit' : '#888'
+                  color: receiptMode === 'Bank' ? 'inherit' : '#888',
                 }"
               >
                 Bank Remittance Details
@@ -399,11 +399,29 @@
     <dx-button
       *ngIf="!isReadOnlyMode"
       #saveButtonRef
+      [text]="
+        isSaving
+          ? receiprtFormData.IS_APPROVED
+            ? 'Updating & Committing...'
+            : 'Updating...'
+          : receiprtFormData.IS_APPROVED
+            ? 'Update & Commit'
+            : 'Update'
+      "
+      stylingMode="contained"
+      type="default"
+      [disabled]="isSaving"
+      (onClick)="onSaveClick()"
+    ></dx-button>
+
+    <!-- <dx-button
+      *ngIf="!isReadOnlyMode"
+      #saveButtonRef
       [text]="receiprtFormData.IS_APPROVED ? 'Update & Commit' : 'Update'"
       stylingMode="contained"
       type="default"
       (onClick)="onSaveClick()"
-    ></dx-button>
+    ></dx-button> -->
   </div>
 </div>
 
@@ -428,7 +446,7 @@
   >
     <!-- Display Total Pending Amount (read-only) -->
     <dx-text-box
-      [value]="totalPending | number : '1.2-2'"
+      [value]="totalPending | number: '1.2-2'"
       label="Total Pending Amount"
       labelMode="floating"
       [readOnly]="true"
@@ -503,7 +521,7 @@
       [repaintChangesOnly]="true"
       [selection]="{
         mode: 'single',
-        showCheckBoxesMode: 'always'
+        showCheckBoxesMode: 'always',
       }"
       (onRowDblClick)="onPdcSelected($event)"
     >

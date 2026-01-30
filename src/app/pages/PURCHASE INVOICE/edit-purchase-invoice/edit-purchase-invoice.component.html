@@ -144,7 +144,7 @@
             allowUpdating: !readOnly,
             allowDeleting: !readOnly,
             allowAdding: false,
-            useIcons: true
+            useIcons: true,
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onContentReady)="onContentReady($event)"
@@ -338,11 +338,28 @@
               ></dx-button>
               <dx-button
                 #saveButtonRef
-                [text]="readOnly ? 'PDF' : 'Save'"
+                [text]="
+                  isSaving
+                    ? readOnly
+                      ? 'Opening...'
+                      : 'Saving...'
+                    : readOnly
+                      ? 'PDF'
+                      : 'Save'
+                "
+                [disabled]="isSaving"
                 stylingMode="contained"
                 type="default"
                 (onClick)="readOnly ? openPDF() : savePurchaseInvoice()"
               ></dx-button>
+
+              <!-- <dx-button
+                #saveButtonRef
+                [text]="readOnly ? 'PDF' : 'Save'"
+                stylingMode="contained"
+                type="default"
+                (onClick)="readOnly ? openPDF() : savePurchaseInvoice()"
+              ></dx-button> -->
             </div>
           </div>
         </div>

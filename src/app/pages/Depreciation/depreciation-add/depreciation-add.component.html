@@ -58,7 +58,7 @@
     width="100%"
     [editing]="{
       mode: 'cell',
-      allowUpdating: false
+      allowUpdating: false,
     }"
   >
     <dxo-header-filter [visible]="true"></dxo-header-filter>
@@ -227,10 +227,18 @@
       type="normal"
     ></dx-button>
     <dx-button
-      text="Save"
+      [text]="isSaving ? 'Saving...' : 'Save'"
+      [disabled]="isSaving"
       stylingMode="contained"
       type="default"
       (onClick)="AddData()"
     ></dx-button>
+
+    <!-- <dx-button
+      text="Save"
+      stylingMode="contained"
+      type="default"
+      (onClick)="AddData()"
+    ></dx-button> -->
   </div>
 </div>

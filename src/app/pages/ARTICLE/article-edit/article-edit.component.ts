@@ -106,6 +106,7 @@ export class ArticleEditComponent {
   selectedUnitsTooltip: string = '';
   selected_Company_id: any;
   ItemCode: any;
+  isSaving = false;
 
   constructor(private dataService: DataService) {}
 
@@ -137,14 +138,14 @@ export class ArticleEditComponent {
           typeof this.articleData.UNIT_ID === 'string'
         ) {
           this.articleData.UNIT_ID = this.articleData.UNIT_ID.split(',').map(
-            (x: string) => Number(x.trim())
+            (x: string) => Number(x.trim()),
           );
         }
 
         // ✅ CASE 2: When backend sends array of objects
         if (incomingData.Units && Array.isArray(incomingData.Units)) {
           this.articleData.UNIT_ID = incomingData.Units.map(
-            (u: any) => u.UNIT_ID
+            (u: any) => u.UNIT_ID,
           );
         }
 
@@ -159,7 +160,7 @@ export class ArticleEditComponent {
           : [];
         if (this.articleData.COMPONENT_ARTICLE_ID && this.articleList?.length) {
           const selectedComponent = this.articleList.find(
-            (item: any) => item.ID === this.articleData.COMPONENT_ARTICLE_ID
+            (item: any) => item.ID === this.articleData.COMPONENT_ARTICLE_ID,
           );
           this.selectedComponentArtNo = selectedComponent?.ART_NO || '';
         }
@@ -176,7 +177,7 @@ export class ArticleEditComponent {
           this.items = this.articleData.BOM.map((bom: any) => {
             // find the matching item from dropdown list
             const matchedItem = this.itemsList?.find(
-              (i: any) => i.ID === bom.ITEM_ID
+              (i: any) => i.ID === bom.ITEM_ID,
             );
             console.log(matchedItem, 'MATCHEDITEMSINEDIT');
             return {
@@ -208,7 +209,7 @@ export class ArticleEditComponent {
       this.savedSizes = this.articleData.SIZES;
 
       const sizeStrings: string[] = this.savedSizes.map((s: any) =>
-        s.SizeValue.toString()
+        s.SizeValue.toString(),
       );
 
       const selectedKeys = this.articleSizeData
@@ -293,7 +294,7 @@ export class ArticleEditComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -316,7 +317,7 @@ export class ArticleEditComponent {
         // keep the selected value in grid
         grid.cellValue(rowIndex, 'ITEM', selectedDescription);
         const matchedItem = this.itemsList.find(
-          (p: any) => p.DESCRIPTION === selectedDescription
+          (p: any) => p.DESCRIPTION === selectedDescription,
         );
         if (matchedItem) {
           grid.cellValue(rowIndex, 'ITEM_ID', matchedItem.ID);
@@ -392,7 +393,7 @@ export class ArticleEditComponent {
     this.dataService.getArticleList().subscribe((response: any) => {
       if (response?.Data && Array.isArray(response.Data)) {
         this.attachGridData = response.Data.filter(
-          (a: any) => a.IS_COMPONENT === true
+          (a: any) => a.IS_COMPONENT === true,
         );
 
         // 🔥 EDIT MODE SELECTION
@@ -400,7 +401,7 @@ export class ArticleEditComponent {
           this.selectedAttachRowKeys = [this.articleData.COMPONENT_ARTICLE_ID];
 
           this.selectedAttachRow = this.attachGridData.find(
-            (row: any) => row.ID === this.articleData.COMPONENT_ARTICLE_ID
+            (row: any) => row.ID === this.articleData.COMPONENT_ARTICLE_ID,
           );
         }
       }
@@ -501,13 +502,13 @@ export class ArticleEditComponent {
       if (response?.flag === 1 && Array.isArray(response?.Data)) {
         const apiSizes = response.Data;
         let orderNoCounter = parseInt(
-          this.articleData?.LAST_ORDER_NO || this.lastOrderNo || '0'
+          this.articleData?.LAST_ORDER_NO || this.lastOrderNo || '0',
         );
 
         this.articleSizeData = apiSizes.map((apiSize) => {
           const sizeValue = apiSize.SIZE?.toString();
           const match = this.savedSizes?.find(
-            (saved) => saved.SizeValue?.toString() === sizeValue
+            (saved) => saved.SizeValue?.toString() === sizeValue,
           );
 
           return {
@@ -517,12 +518,12 @@ export class ArticleEditComponent {
         });
 
         this.selectedSizeRows = this.savedSizes.map((s) =>
-          s.SizeValue?.toString()
+          s.SizeValue?.toString(),
         );
         this.sizeGridSelectedKeys = [...this.selectedSizeRows];
 
         this.articleData.SIZES = this.articleSizeData.filter((item) =>
-          this.selectedSizeRows.includes(item.SizeValue)
+          this.selectedSizeRows.includes(item.SizeValue),
         );
       } else {
         // fallback: no category sizes returned
@@ -594,7 +595,6 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload3 = {
-      
         NAME: 'ARTICLETYPE',
       };
       this.dataService.getDropdownData(payload3).subscribe((res) => {
@@ -609,7 +609,6 @@ export class ArticleEditComponent {
         checkIfDone();
       });
       const payload5 = {
-     
         NAME: 'ARTICLECOLOR',
       };
       this.dataService.getDropdownData(payload5).subscribe((res) => {
@@ -690,7 +689,7 @@ export class ArticleEditComponent {
       // this.selectedTabIndex = 0;
       console.log(
         'Assigned ComponentArticleID:',
-        this.articleData.COMPONENT_ARTICLE_ID
+        this.articleData.COMPONENT_ARTICLE_ID,
       );
     }
   }
@@ -712,7 +711,7 @@ export class ArticleEditComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -795,17 +794,18 @@ export class ArticleEditComponent {
     };
 
     console.log('Sending update payload:', payload);
-
+    this.isSaving = true;
     // Step 3: Send update request
     this.dataService.updateArticle(payload).subscribe(
       (response: any) => {
+        this.isSaving = false;
         if (response?.flag === 1) {
           notify(
             {
               message: 'Article Updated Successfully',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.popupVisible = false;
           this.popupClosed.emit();
@@ -823,8 +823,16 @@ export class ArticleEditComponent {
         }
       },
       (error) => {
+        this.isSaving = false; //  STOP loading
         console.error('Update error:', error);
-      }
+
+        notify({
+          message: 'Error while updating article.',
+          type: 'error',
+          displayTime: 4000,
+          position: { at: 'top right', my: 'top right' },
+        });
+      },
     );
   }
 
@@ -861,7 +869,7 @@ export class ArticleEditComponent {
 
     // Check if any existing row is incomplete
     const hasIncompleteRow = rows.some(
-      (r: any) => !r.data.ITEM || !r.data.QUANTITY
+      (r: any) => !r.data.ITEM || !r.data.QUANTITY,
     );
 
     if (hasIncompleteRow) {
@@ -887,7 +895,7 @@ export class ArticleEditComponent {
       'Selected Supplier ID:',
       e.value,
       'Name:',
-      this.articleData.SupplierName
+      this.articleData.SupplierName,
     );
   }
 

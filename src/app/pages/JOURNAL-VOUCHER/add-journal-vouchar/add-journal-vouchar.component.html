@@ -35,7 +35,7 @@
             allowUpdating: true,
             allowDeleting: true,
             allowAdding: true,
-            useIcons: true
+            useIcons: true,
           }"
           (onInitNewRow)="onInitNewRow($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
@@ -159,7 +159,7 @@
               dataSource: ledgerList,
               valueExpr: 'HEAD_CODE',
               displayExpr: 'HEAD_CODE',
-              searchEnabled: true
+              searchEnabled: true,
             }"
           ></dxi-column>
 
@@ -171,7 +171,7 @@
               dataSource: ledgerList,
               valueExpr: 'HEAD_NAME',
               displayExpr: 'HEAD_NAME',
-              searchEnabled: true
+              searchEnabled: true,
             }"
           ></dxi-column>
 
@@ -274,10 +274,28 @@
     <dx-button
       #saveBtnRef
       id="saveBtn"
-      [text]="journalVoucherFormData.IS_APPROVED ? 'Commit' : 'Save'"
+      [text]="
+        isSaving
+          ? journalVoucherFormData.IS_APPROVED
+            ? 'Committing...'
+            : 'Saving...'
+          : journalVoucherFormData.IS_APPROVED
+            ? 'Commit'
+            : 'Save'
+      "
+      [disabled]="isSaving"
       (onClick)="saveJournalVoucher()"
       stylingMode="contained"
       type="default"
     ></dx-button>
+
+    <!-- <dx-button
+      #saveBtnRef
+      id="saveBtn"
+      [text]="journalVoucherFormData.IS_APPROVED ? 'Commit' : 'Save'"
+      (onClick)="saveJournalVoucher()"
+      stylingMode="contained"
+      type="default"
+    ></dx-button> -->
   </div>
 </div>
