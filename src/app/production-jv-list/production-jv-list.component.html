@@ -162,7 +162,15 @@
         [cellTemplate]="statusCellRender"
         caption="Status"
       ></dxi-column>
-
+      <dxo-summary>
+        <dxi-total-item
+          column="PRODUCED_QTY"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          alignment="right"
+        >
+        </dxi-total-item>
+      </dxo-summary>
       <!-- <dxi-column
         dataField="TOTAL_COST"
         caption="

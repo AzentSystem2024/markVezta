@@ -15,7 +15,7 @@
     flex: 1;
     padding-top: var(--toolbar-vertical-padding);
     padding-bottom: var(--footer-height);
-    
+
     ::ng-deep .dx-treeview {
       // ## Long text positioning
       white-space: nowrap;
@@ -51,26 +51,21 @@
 
       // ##
 
-  
-.dx-treeview-node {
-  &[aria-level="1"] .dx-treeview-item-content {
-    font-weight: bold;
-    text-align: left;
-    position: relative;
-    
-  }
- 
+      .dx-treeview-node {
+        &[aria-level="1"] .dx-treeview-item-content {
+          font-weight: bold;
+          text-align: left;
+          position: relative;
+        }
 
-  &[aria-level="2"] .dx-treeview-item-content {
-    font-weight: normal;
-   
-    padding-left: calc(var(--side-panel-min-width) + 20px);
-    /* adjust 20px until the submenu sits under the main menu's center */
-  }
-}
+        &[aria-level="2"] .dx-treeview-item-content {
+          font-weight: normal;
 
+          padding-left: calc(var(--side-panel-min-width) + 20px);
+          /* adjust 20px until the submenu sits under the main menu's center */
+        }
+      }
 
-      
       // ##
     }
 
@@ -88,34 +83,78 @@
 /* Right-align only Reports submenu */
 
 /* Accounts > Reports is the 10th child in your staticMenu */
-::ng-deep .dx-treeview-node[aria-level="2"]:nth-of-type(10)
-  .dx-treeview-node-container {
-  left: auto !important;
-  right: 0 !important;
+// ::ng-deep .dx-treeview-node[aria-level="2"]:nth-of-type(10)
+//   .dx-treeview-node-container {
+//   left: auto !important;
+//   right: 0 !important;
+// }
+
+// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-hover {
+//    background-color:var(--sub-menu-bg-color)!important;
+//     color: var(--sub-menu-color) !important; /* dark blue text */
+//   border-radius: 15px;
+//   height: 46px;
+//   // margin-left: 50px;
+// }
+
+// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="1"] > .dx-treeview-item.dx-state-hover  {
+//    background-color:var(--bg-side-panel)!important;
+
+//   border-radius: 8px;
+//   height: 46px;
+
+// }
+
+// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-hover,
+// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="3"] > .dx-treeview-item.dx-state-hover {
+//    background-color: var(--sub-menu-bg-color)!important;
+//   // border-radius: 8px;
+
+// }
+// /* 🌟 SELECTED (level 2 and 3) */
+// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected,
+// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="3"] > .dx-treeview-item.dx-state-selected {
+//   background-color: var(--sub-menu-bg-color) !important;
+//   // border-radius: 8px!important;
+//   //  color: rgba(25, 108, 153, 1) !important; /* dark blue text */
+
+// }
+
+// /* ✅ FORCE text color for selected item text (DevExtreme overrides this) */
+// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected .dx-item-content,
+// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="3"] > .dx-treeview-item.dx-state-selected .dx-item-content {
+//   color: rgba(25, 108, 153, 1) !important;
+// }
+
+// ::ng-deep .dx-treeview-item.dx-state-focused:not(.dx-state-selected) .dx-item-content {
+//   color: inherit !important;
+//   background: transparent !important;
+// }
+
+/* 🔥 RESET ALL submenu text color */
+::ng-deep .dx-treeview-node[aria-level="2"] .dx-item-content,
+::ng-deep .dx-treeview-node[aria-level="3"] .dx-item-content {
+  color: var(--toobar-button-text) !important;
 }
 
-
-::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-hover {
-   background-color:var(--sub-menu-bg-color)!important;
-    color: var(--sub-menu-color) !important; /* dark blue text */
-  border-radius: 15px;
-  height: 46px;
-  // margin-left: 50px; 
-}
-::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] 
-  > .dx-treeview-item.dx-state-selected 
-  .dx-treeview-item-content {
-    background-color: red !important;
-    color: var(--sub-menu-color) !important;
-    border-radius: 15px;
-    height: 46px;
+/* 🔥 ONLY selected item should be blue */
+::ng-deep
+  .dx-treeview-node[aria-level="2"]
+  > .dx-treeview-item.dx-state-selected
+  .dx-item-content,
+::ng-deep
+  .dx-treeview-node[aria-level="3"]
+  > .dx-treeview-item.dx-state-selected
+  .dx-item-content {
+  color: rgba(25, 108, 153, 1) !important;
+  height: 0 !important;
 }
 
-::ng-deep .dx-treeview .dx-treeview-node[aria-level="1"] > .dx-treeview-item.dx-state-hover  {
-   background-color:var(--bg-side-panel)!important;
-    
-  border-radius: 8px;
-  height: 46px;
-
+/* 🔥 kill focus styling completely */
+::ng-deep .dx-treeview-item.dx-state-focused {
+  background: transparent !important;
 }
 
+::ng-deep .dx-treeview-item.dx-state-focused .dx-item-content {
+  color: #333 !important;
+}

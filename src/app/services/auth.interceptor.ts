@@ -23,14 +23,14 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const token = sessionStorage.getItem('authToken'); //adding token to http request header
 
-    // if (token) {
-    //   const clonedReq = req.clone({
-    //     setHeaders: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   });
-    //   return next.handle(clonedReq);
-    // }
+    if (token) {
+      const clonedReq = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return next.handle(clonedReq);
+    }
 
     return next.handle(req);
   }
