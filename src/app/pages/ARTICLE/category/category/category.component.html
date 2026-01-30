@@ -58,11 +58,11 @@
       </dxo-header-filter>
 
       <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
 
       <!-- <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel> -->
       <dxo-toolbar>
@@ -95,18 +95,18 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
 
-        <!-- Export (built-in, kept) -->
-      <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="toolbar-icon-btn export-btn"
-      ></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
 
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
-      
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="toolbar-icon-btn export-btn"
+        ></dxi-item>
+
         <dxi-item
           location="after"
           widget="dxButton"

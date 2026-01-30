@@ -69,6 +69,8 @@ export class ItemCategoryListComponent {
   canApprove = false;
   canPrint = false;
 
+  isFilterOpened = false;
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -97,6 +99,42 @@ export class ItemCategoryListComponent {
     private router: Router,
   ) {
     this.sesstion_Details();
+    this.showCategory();
+  }
+
+    searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
+    onClick: () => this.toggleFilters(),
+  };
+
+   toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+   refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+    refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
     this.showCategory();
   }
   // onExporting(event: any) {

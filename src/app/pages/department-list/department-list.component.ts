@@ -52,6 +52,9 @@ export class DepartmentListComponent implements OnInit {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+
+  isFilterOpened = false;
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -82,6 +85,41 @@ export class DepartmentListComponent implements OnInit {
   ) {
     this.sesstion_Details();
     this.showDepartment();
+  }
+
+   searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+   refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.showDepartment();
+  }
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
 
   addDepartment() {

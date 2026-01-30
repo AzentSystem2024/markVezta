@@ -115,13 +115,7 @@ export class PackingComponent {
     onClick: () => this.toggleFilters(),
   };
 
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
+ 
   selected_Company_id: any;
 
   constructor(
@@ -135,6 +129,17 @@ export class PackingComponent {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
   }
+
+   refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
 
   ngOnInit() {
     const currentUrl = this.router.url;

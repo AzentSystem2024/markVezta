@@ -145,6 +145,14 @@ export class StockMovementReportComponent {
     grid.endUpdate();
   }
 
+  //   refreshButtonOptions = {
+  //   icon: 'refresh',
+  //   hint: 'Refresh',
+  //   elementAttr: { class: 'toolbar-icon-btn' },
+  //   onClick: () => this.refreshGrid(),
+  //   text: '',
+  // };
+
   onItemIdChange(event: any) {
     console.log(event, '=================item id===================');
     this.selected_item_Id = event.value;

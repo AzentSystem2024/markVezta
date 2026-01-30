@@ -65,6 +65,8 @@ export class ItemProperty1ListComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  isFilterOpened = false;
+
   constructor(
     private dataservice: DataService,
     authservice: AuthService,
@@ -76,6 +78,42 @@ export class ItemProperty1ListComponent {
     this.itemlabel = authservice.getsettingsData().ITEM_PROPERTY1;
     console.log(this.itemlabel, 'ITEMLABELLLLLLLLLLLLLLLLLL');
     this.sesstion_Details();
+  }
+
+   searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
+    onClick: () => this.toggleFilters(),
+  };
+
+   toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+   refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+    refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.showItemProperty1();
   }
 
   addItemProperty1() {

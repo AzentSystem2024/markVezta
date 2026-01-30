@@ -112,7 +112,7 @@ export class PrePaymentEditComponent {
   gstPercent: number = 0; // GST %
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
-  isSaving = false;
+
 
   constructor(
     private dataservice: DataService,

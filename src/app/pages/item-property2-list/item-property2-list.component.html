@@ -48,15 +48,26 @@
       <dxi-item
         location="after"
         locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' },
-        }"
+        [options]="searchButtonOptions"
+      ></dxi-item>
+
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
       ></dxi-item>
 
       <dxi-item
@@ -65,25 +76,6 @@
         [options]="addButtonOptions"
       ></dxi-item>
 
-      <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          text: 'Refresh',
-          icon: 'refresh',
-          onClick: refresh,
-          stylingMode: 'text',
-        }"
-      ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
-      <dxi-item name="exportButton"></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
       <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
     </dxo-toolbar>
 
