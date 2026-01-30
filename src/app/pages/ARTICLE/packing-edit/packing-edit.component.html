@@ -68,23 +68,26 @@
 
       <div class="form-field">
         <dx-validation-group #UnitValidationGroup>
-          <dx-select-box
+          <dx-tag-box
             label="Production Unit"
             labelMode="floating"
             placeholder="Unit"
-            [(value)]="PackingData.UNIT_ID"
             [dataSource]="produCtionUnits"
             valueExpr="ID"
             displayExpr="DESCRIPTION"
-            [disabled]="isArticleFieldsDisabled"
             [searchEnabled]="true"
+            [selectAllMode]="'allPages'"
+            [(value)]="PackingData.UNIT_ID"
+            [showSelectionControls]="true"
+            [hint]="selectedUnitsHint"
+            [disabled]="isArticleFieldsDisabled"
             ><dx-validator>
               <dxi-validation-rule
                 type="required"
                 message="This field is required"
               ></dxi-validation-rule>
             </dx-validator>
-          </dx-select-box>
+          </dx-tag-box>
         </dx-validation-group>
       </div>
       <div class="form-field">

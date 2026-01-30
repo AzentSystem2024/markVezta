@@ -185,6 +185,9 @@
         height="200"
         class="mt-3"
         [dataSource]="ExpenseAmountDetails"
+        (onRowInserted)="recalculateTotalExpense()"
+        (onRowUpdated)="recalculateTotalExpense()"
+        (onRowRemoved)="recalculateTotalExpense()"
         (onSelectionChanged)="onSelectionChanged($event)"
         (onEditorPreparing)="onEditorPreparing($event)"
         width="100%"
@@ -239,7 +242,7 @@
         label="Total Expense"
         width="200px"
         labelMode="floating"
-        [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
+        [(value)]="totalExpense"
       ></dx-number-box>
     </div>
     <div
@@ -283,5 +286,5 @@
         (onClick)="savePrePayment()"
       ></dx-button> -->
     </div>
-  </div>
-</dx-validation-group>
+  </div></dx-validation-group
+>

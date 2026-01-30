@@ -116,6 +116,7 @@ export class InvoiceTrOutComponent {
     },
     text: '',
   };
+  
   isAddInvoice: boolean = false;
   dateRanges = [
     { label: 'Today', value: 'today' },

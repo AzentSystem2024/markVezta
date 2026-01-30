@@ -97,7 +97,7 @@ export class JournalBookComponent {
   isReadOnlyPurchaseReturn: boolean = true;
   isEditPurchaseReturn: boolean = false;
   // @Input() MiscReceiptId : any;
-
+isFilterOpened = false;
   defaultDate: Date = new Date();
   selectedmiscellaneousData: any;
   selectedPrePayment: any;
@@ -166,6 +166,25 @@ export class JournalBookComponent {
 
   ngAfterViewInit() {
     setTimeout(() => this.resetPopups());
+  }
+
+   searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+   toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
 
   resetPopups() {
