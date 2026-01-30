@@ -66,6 +66,7 @@ export class CompanyMasterComponent {
   stateList: any;
   state: any;
   selected_Company_id: any;
+  isSaving = false;
 
   constructor(
     private fb: FormBuilder,
@@ -268,33 +269,32 @@ export class CompanyMasterComponent {
 
   //===================get data list========================
   get_Company_List() {
-  this.Datasource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.get_CompanyList_Api().subscribe({
-          next: (res: any) => {
-            const data = (res?.Data || [])
-              .map((item: any, index: number) => ({
-                ...item,
-                SlNo: index + 1,
-              }))
-              .sort((a: any, b: any) => Number(b.ID) - Number(a.ID));
+    this.Datasource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.get_CompanyList_Api().subscribe({
+            next: (res: any) => {
+              const data = (res?.Data || [])
+                .map((item: any, index: number) => ({
+                  ...item,
+                  SlNo: index + 1,
+                }))
+                .sort((a: any, b: any) => Number(b.ID) - Number(a.ID));
 
-            this.companyList = data;              // ✅ array cache
-            this.companyRowCount = data.length;
+              this.companyList = data; // ✅ array cache
+              this.companyRowCount = data.length;
 
-            resolve(data);                        // 🔑 grid loader stops
-          },
-          error: () => {
-            this.companyList = [];
-            this.companyRowCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(data); // 🔑 grid loader stops
+            },
+            error: () => {
+              this.companyList = [];
+              this.companyRowCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   addData() {
     const validationResult = this.formValidationGroup.instance.validate();
@@ -374,23 +374,40 @@ export class CompanyMasterComponent {
 
     // ---------------- API CALL ----------------
     if (Company_code && Company_name && Company_type) {
-      this.dataservice.Insert_CompanyList_Api(payload).subscribe((res: any) => {
-        notify(
-          {
-            message: 'Data successfully added',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success',
-        );
+      this.isSaving = true;
+      this.dataservice.Insert_CompanyList_Api(payload).subscribe(
+        (res: any) => {
+          this.isSaving = false;
+          notify(
+            {
+              message: 'Data successfully added',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
 
-        // Close popup ONLY after success
-        this.addPopup = false;
-        this.editPopup = false;
+          // Close popup ONLY after success
+          this.addPopup = false;
+          this.editPopup = false;
 
-        this.formsource.reset();
-        this.get_Company_List();
-      });
+          this.formsource.reset();
+          this.get_Company_List();
+        },
+        (error) => {
+          this.isSaving = false; // ✅ STOP loading
+          console.error('Insert company failed:', error);
+
+          notify(
+            {
+              message: 'Failed to add company. Please try again.',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 1500,
+            },
+            'error',
+          );
+        },
+      );
     }
   }
 
@@ -481,32 +498,71 @@ export class CompanyMasterComponent {
     // }
 
     if (Company_code && Company_name && Company_type) {
-      this.dataservice.Update_CompanyList_Api(payload).subscribe((res: any) => {
-        notify(
-          {
-            message: 'Data succesfully updated',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success',
-        );
+      this.isSaving = true;
+      this.dataservice.Update_CompanyList_Api(payload).subscribe(
+        (res: any) => {
+          this.isSaving = false;
+          notify(
+            {
+              message: 'Data succesfully updated',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
 
-        this.formsource.reset();
-        this.get_Company_List();
-        this.editPopup = false;
-      });
+          this.formsource.reset();
+          this.get_Company_List();
+          this.editPopup = false;
+        },
+        (error) => {
+          this.isSaving = false; // ✅ STOP loading
+          console.error('Update failed:', error);
+
+          notify(
+            {
+              message: 'Failed to update data. Please try again.',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 1500,
+            },
+            'error',
+          );
+        },
+      );
     }
   }
 
   delete_Data(event: any) {
-    const Id = event.data?.ID;
-    this.dataservice.Delete_CompanyList_Api(Id).subscribe({
-      next: (response) => {
-        console.log('Delete Success:', response);
-        // You can refresh your list or show notify message here
+    const id = event.data.ID;
+
+    event.cancel = true; // prevent default delete
+
+    this.dataservice.Delete_CompanyList_Api(id).subscribe({
+      next: () => {
+        notify(
+          {
+            message: 'Company deleted successfully',
+            type: 'success',
+            displayTime: 3000,
+          },
+          'success',
+          3000,
+        );
+
+        event.component.refresh();
       },
-      error: (error) => {
-        console.error('Delete Error:', error);
+      error: (err) => {
+        notify(
+          {
+            message: 'Failed to delete data',
+            type: 'error',
+            displayTime: 3000,
+          },
+          'error',
+          3000,
+        );
+
+        console.error(err);
       },
     });
   }
@@ -516,7 +572,6 @@ export class CompanyMasterComponent {
     const fileName = 'company';
     this.dataservice.exportDataGrid(event, fileName);
   }
-
 }
 
 @NgModule({

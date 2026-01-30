@@ -84,7 +84,7 @@ export class CategoryComponent {
   selectedTabIndex = 0;
   list_packs: any = [];
   CategoryDataSource: DataSource;
-  CategoryList: any[] = [];   // 🔑 KEEP for duplicates & logic
+  CategoryList: any[] = []; // 🔑 KEEP for duplicates & logic
   categoryRowCount = 0;
   sizeOptions: number[] = [];
   selected_Data: any = {};
@@ -219,6 +219,7 @@ export class CategoryComponent {
   isEditing: boolean;
   editIndex: number;
   selected_Company_id: any;
+  isSaving: boolean;
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,
@@ -556,33 +557,32 @@ export class CategoryComponent {
 
   //===============list of data================
   get_list_data_category() {
-  this.CategoryDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.list_of_category().subscribe({
-          next: (res: any) => {
-            const data = (res?.CATEGORIES || []).map(
-              (item: any, index: number) => ({
-                ...item,
-                SNO: index + 1,
-              }),
-            );
+    this.CategoryDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.list_of_category().subscribe({
+            next: (res: any) => {
+              const data = (res?.CATEGORIES || []).map(
+                (item: any, index: number) => ({
+                  ...item,
+                  SNO: index + 1,
+                }),
+              );
 
-            this.CategoryList = data;          // ✅ array cache
-            this.categoryRowCount = data.length;
+              this.CategoryList = data; // ✅ array cache
+              this.categoryRowCount = data.length;
 
-            resolve(data);                     // 🔑 stop loader
-          },
-          error: () => {
-            this.CategoryList = [];
-            this.categoryRowCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(data); // 🔑 stop loader
+            },
+            error: () => {
+              this.CategoryList = [];
+              this.categoryRowCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   //=============================ADD DATA========================
   AddData() {
@@ -665,9 +665,10 @@ export class CategoryComponent {
       // notify('Please correct the validation errors before saving.', 'error', 3000);
       return; // ❌ Prevent saving if form is invalid
     }
-
+    this.isSaving = true;
     this.dataservice.Add_category_list(payload).subscribe(
       (res: any) => {
+        this.isSaving = false;
         console.log(res);
         notify(
           {
@@ -681,6 +682,7 @@ export class CategoryComponent {
         this.handleClose(); // Close the popup if successful
       },
       (error) => {
+        this.isSaving = false;
         console.error(error);
         notify(
           {
@@ -768,10 +770,11 @@ export class CategoryComponent {
       );
       return;
     }
-
+    this.isSaving = true;
     // If no duplicates, proceed with update
     this.dataservice.update_category_details(updatedPayload).subscribe(
       (res: any) => {
+        this.isSaving = false;
         console.log(res);
         notify(
           {
@@ -785,6 +788,7 @@ export class CategoryComponent {
         this.get_list_data_category();
       },
       (error) => {
+        this.isSaving = false;
         console.error(error);
         notify(
           {
@@ -962,7 +966,6 @@ export class CategoryComponent {
     }
   }
 
-  
   //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'category';

@@ -168,10 +168,6 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
       if (this.menuOpened) {
         pointerEvent?.preventDefault();
       }
-      if (this.hideMenuAfterNavigation) {
-        this.menuOpened = false;
-        pointerEvent?.stopPropagation();
-      }
 
       this.cdr.detectChanges();
     } else {
@@ -182,10 +178,10 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
       this.temporaryMenuOpened = true;
     }
 
-    const previousState = this.menuOpened;
-    this.menuOpened = !this.menuOpened;
-
-    if (previousState !== this.menuOpened) {
+    // close ONLY on mobile (overlap mode)
+    if (path && this.menuMode === 'overlap') {
+      this.menuOpened = false;
+      pointerEvent?.stopPropagation();
       this.cdr.detectChanges();
     }
   }

@@ -143,6 +143,7 @@ export class AddInvoiceComponent {
   showCGST: boolean = false;
   showSGST: boolean = false;
   netAmount: any;
+  isSaving: boolean;
 
   constructor(
     private dataService: DataService,
@@ -655,8 +656,10 @@ export class AddInvoiceComponent {
     this.invoiceFormData.VEHICLE_NO = this.invoiceFormData.VEHICLE_NO;
     this.invoiceFormData.COMPANY_ID = this.selectedCompanyId;
     const callInsertAPI = () => {
+      this.isSaving = true;
       this.dataService.insertInvoice(this.invoiceFormData).subscribe(
         (response) => {
+          this.isSaving = false;
           console.log('Invoice saved successfully:', response);
           notify(
             {
@@ -670,6 +673,7 @@ export class AddInvoiceComponent {
           this.popupClosed?.emit();
         },
         (error) => {
+          this.isSaving = false;
           console.error('Error saving invoice:', error);
           notify(
             {

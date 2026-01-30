@@ -12,13 +12,20 @@
     (onRowRemoving)="onRowRemoving($event)"
     (onEditingStart)="openEditingStart($event)"
     (onExporting)="onExporting($event)"
+    [showBorders]="true"
     [columnAutoWidth]="false"
     [wordWrapEnabled]="false"
     [rowAlternationEnabled]="true"
-    rowAlternationInterval="2"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
     [showColumnLines]="true"
     [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
+    [columnResizingMode]="'nextColumn'"
+    [filterRow]="{ visible: false }"
+    [headerFilter]="{ visible: true }"
     [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-search-panel

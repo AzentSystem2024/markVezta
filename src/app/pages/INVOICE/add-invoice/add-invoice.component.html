@@ -323,11 +323,28 @@
 
             <dx-button
               #saveButtonRef
-              [text]="invoiceFormData.IS_APPROVED ? 'Commit' : 'Save'"
+              [text]="
+                isSaving
+                  ? invoiceFormData.IS_APPROVED
+                    ? 'Committing...'
+                    : 'Saving...'
+                  : invoiceFormData.IS_APPROVED
+                    ? 'Commit'
+                    : 'Save'
+              "
+              [disabled]="isSaving"
               (onClick)="saveInvoice()"
               stylingMode="contained"
               type="default"
             ></dx-button>
+
+            <!-- <dx-button
+              #saveButtonRef
+              [text]="invoiceFormData.IS_APPROVED ? 'Commit' : 'Save'"
+              (onClick)="saveInvoice()"
+              stylingMode="contained"
+              type="default"
+            ></dx-button> -->
           </div>
         </div>
       </div>

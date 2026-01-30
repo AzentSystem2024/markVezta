@@ -106,6 +106,13 @@
             ></dx-button>
           </div>
         </dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
         <!-- <dxi-item
           location="after"
           locateInMenu="auto"
@@ -119,11 +126,11 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item> -->
-        <!-- <dxi-item
+        <dxi-item
           name="exportButton"
           location="after"
           cssClass="export-btn"
-        ></dxi-item> -->
+        ></dxi-item>
       </dxo-toolbar>
 
       <!-- <div *dxTemplate="let data of 'dateFilterTemplate'">
