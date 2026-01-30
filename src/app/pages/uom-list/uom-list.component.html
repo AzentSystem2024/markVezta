@@ -29,7 +29,7 @@
       >
       
       </dxo-popup> -->
-      
+
       <dxo-form class="plain-styled-form" [colCount]="1">
         <dxi-item itemType="group" [colCount]="1">
           <dxi-item itemType="group" [colCount]="1">
@@ -68,15 +68,17 @@
         [options]="refreshButtonOptions"
       ></dxi-item>
 
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
       <dxi-item
         name="exportButton"
         location="after"
         cssClass="export-btn"
       ></dxi-item>
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
+
       <dxi-item
         location="after"
         widget="dxButton"

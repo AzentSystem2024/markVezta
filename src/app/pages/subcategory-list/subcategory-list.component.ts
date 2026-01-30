@@ -19,6 +19,7 @@ import { DxSelectBoxModule } from 'devextreme-angular';
 import { SubcategoryEditModule } from '../subcategory-edit/subcategory-edit.component';
 import { CommonModule } from '@angular/common';
 import DataSource from 'devextreme/data/data_source';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -47,9 +48,41 @@ export class SubcategoryListComponent {
   selected_data: any = [];
   editSubcategory: boolean = false;
   selected_Company_id: any;
-  constructor(private dataService: DataService, private ngZone: NgZone) {}
+  isFilterOpened = false;
+   canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  
+  constructor(private dataService: DataService, private ngZone: NgZone,private router: Router,) {}
 
   ngOnInit() {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/user');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sesstion_Details();
     this.getSubCategory();
     this.getDepartmentDropDown();
@@ -62,17 +95,62 @@ export class SubcategoryListComponent {
     this.isAddSubcategoryPopupOpened = true;
   }
 
-  addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
+   searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+   toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+   refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+    refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.getSubCategory();
+  }
+
+ addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addSubCategory());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
 
   getSubCategory() {

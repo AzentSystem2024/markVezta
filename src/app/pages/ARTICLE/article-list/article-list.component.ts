@@ -145,20 +145,24 @@ export class ArticleListComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   filteredInvoiceList: any;
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
-
+  
   selected_Company_id: any;
   constructor(
     private dataService: DataService,
     private router: Router,
     private ngZone: NgZone,
   ) {}
+
+   refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
 
   ngOnInit() {
     const currentUrl = this.router.url;
