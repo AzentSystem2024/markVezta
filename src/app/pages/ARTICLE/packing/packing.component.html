@@ -56,11 +56,11 @@
       ></dxo-filter-row>
 
       <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <!-- <dxo-header-filter [visible]="isFilterOpened">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter> -->
@@ -87,17 +87,16 @@
         ></dxi-item>
 
         <!-- Export (built-in, kept) -->
-      <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="toolbar-icon-btn export-btn"
-      ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="toolbar-icon-btn export-btn"
+        ></dxi-item>
 
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
-
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
 
         <dxi-item
           location="after"
@@ -117,11 +116,11 @@
       <dxi-column dataField="Type" caption="Type"></dxi-column>
       <dxi-column dataField="Brand" caption="Brand"></dxi-column>
       <!-- <dxi-column dataField="ID" caption="ID"></dxi-column> -->
-      <dxi-column
+      <!-- <dxi-column
         dataField="UnitId"
         alignment="Left"
         caption="Unit"
-      ></dxi-column>
+      ></dxi-column> -->
       <dxi-column dataField="AliasNo" caption="Item Code"></dxi-column>
       <dxi-column dataField="PartNo" caption="Part No."></dxi-column>
       <dxi-column dataField="PairQty" caption="Pair Qty"></dxi-column>
