@@ -1,11 +1,10 @@
 <app-header
   class="layout-header"
   [menuToggleEnabled]="true"
-
   (menuToggle)="navigationClick()"
   [title]="appInfo.title"
 ></app-header>
-  <!-- (menuToggle)="menuOpened = !menuOpened" -->
+<!-- (menuToggle)="menuOpened = !menuOpened" -->
 <dx-drawer
   class="layout-body"
   position="before"
@@ -27,11 +26,10 @@
     <!-- <app-footer
       >Copyright © {{ appInfo.currentYear }} <br />
       Developer Express Inc.</app-footer -->
-    
   </side-navigation-menu>
 
-   <!-- Content Area -->
-   <div class="content">
+  <!-- Content Area -->
+  <div class="content">
     <dx-sortable
       class="custom-tab"
       filter=".dx-tab"
@@ -51,7 +49,7 @@
         [showNavButtons]="true"
         [repaintChangesOnly]="true"
         [selectedIndex]="selectedIndex"
-         (selectedIndexChange)="onTabChanged($event)"
+        (selectedIndexChange)="onTabChanged($event)"
       >
         <div
           class="tabItems"

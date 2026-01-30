@@ -159,7 +159,7 @@ export class PackingAddComponent {
 
     // Check if any existing row is incomplete
     const hasIncompleteRow = rows.some(
-      (r: any) => !r.data.ITEM || !r.data.QUANTITY
+      (r: any) => !r.data.ITEM || !r.data.QUANTITY,
     );
 
     if (hasIncompleteRow) {
@@ -203,13 +203,12 @@ export class PackingAddComponent {
       this.categoryList = response;
     });
     const payload3 = {
-
       NAME: 'ARTICLETYPE',
     };
     this.dataService.getDropdownData(payload3).subscribe((response: any) => {
       this.typeList = response;
     });
-    const payload4 = {    
+    const payload4 = {
       NAME: 'ARTICLEBRAND',
     };
     this.dataService.getDropdownData(payload4).subscribe((response: any) => {
@@ -307,14 +306,19 @@ export class PackingAddComponent {
     ) {
       return; //  Prevent saving if form is invalid
     }
-    if(!payload.artNo || !payload.color || !payload.categoryID || !payload.unitID) {
+    if (
+      !payload.artNo ||
+      !payload.color ||
+      !payload.categoryID ||
+      !payload.unitID
+    ) {
       notify(
         {
           message: 'Please fill all required fields',
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -373,7 +377,7 @@ export class PackingAddComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -396,7 +400,7 @@ export class PackingAddComponent {
 
         // Find the matched item ID
         const matchedItem = this.itemsList.find(
-          (p: any) => p.DESCRIPTION === selectedDescription
+          (p: any) => p.DESCRIPTION === selectedDescription,
         );
         console.log(matchedItem.ID, 'MATCHEDITEMMMMMMMMMMMMMMMMMMM');
         grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
@@ -462,7 +466,7 @@ export class PackingAddComponent {
         if (rowData?.ITEM && args.value > 0) {
           const rows = grid.getVisibleRows();
           const hasIncompleteRow = rows.some(
-            (r: any) => !r.data.ITEM || !r.data.QUANTITY
+            (r: any) => !r.data.ITEM || !r.data.QUANTITY,
           );
 
           if (!hasIncompleteRow) {
@@ -484,7 +488,7 @@ export class PackingAddComponent {
                 // Start editing ITEM cell of new row
                 grid.editCell(newRowIndex, 'ITEM').then(() => {
                   grid.focus(
-                    grid.getCellElement(newRowIndex, grid.columnOption('ITEM'))
+                    grid.getCellElement(newRowIndex, grid.columnOption('ITEM')),
                   );
                 });
               }
@@ -517,7 +521,7 @@ export class PackingAddComponent {
     }
     console.log(this.combination_value, 'COMBINATION VALUE ARRAY');
     const validData = this.combination_value.filter(
-      (item) => !item.includes('undefined')
+      (item) => !item.includes('undefined'),
     );
 
     console.log(validData, 'VALID DATA AFTER FILTERING');
@@ -537,7 +541,7 @@ export class PackingAddComponent {
         const qty = parseInt(item.QUANTITY, 10);
         return sum + (isNaN(qty) ? 0 : qty);
       },
-      0
+      0,
     );
 
     console.log(this.totalQuantity);
@@ -578,12 +582,12 @@ export class PackingAddComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
   }
   // AddData() {
@@ -754,26 +758,26 @@ export class PackingAddComponent {
       return;
     }
 
-      const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
-    ? this.PackingData.UNIT_ID
-    : [];
+    const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
+      ? this.PackingData.UNIT_ID
+      : [];
 
-  if (!selectedUnits.length) {
-    notify(
-      {
-        message: 'Please select at least one Unit.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 800,
-      },
-      'warning'
-    );
-    return;
-  }
+    if (!selectedUnits.length) {
+      notify(
+        {
+          message: 'Please select at least one Unit.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 800,
+        },
+        'warning',
+      );
+      return;
+    }
 
-  const mainUnitId = selectedUnits[0]; // 🔹 main UNIT_ID
-  const unitsPayload = selectedUnits.map(id => ({
-    UNIT_ID: Number(id),
-  }));
+    const mainUnitId = selectedUnits[0]; // 🔹 main UNIT_ID
+    const unitsPayload = selectedUnits.map((id) => ({
+      UNIT_ID: Number(id),
+    }));
 
     //  Convert number fields to string as required by backend
     const Alias_no = Number(this.PackingData.ALIAS_NO);
@@ -785,8 +789,6 @@ export class PackingAddComponent {
     this.Part_no = this.PackingData.PART_NO.toString();
 
     this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
-
-    
 
     // =====================================================
     //  BUILD BOM PAYLOAD
@@ -825,11 +827,10 @@ export class PackingAddComponent {
     //   }));
 
     const packingEntriesPayload = (this.articleSizeData || []).map((item) => ({
-  ARTICLE_ID: Number(item.ArticleID),
-  SIZE: String(item.Size),
-  QUANTITY: Number(item.QUANTITY) || 0,   // 👈 force 0 if empty
-}));
-
+      ARTICLE_ID: Number(item.ArticleID),
+      SIZE: String(item.Size),
+      QUANTITY: Number(item.QUANTITY) || 0, // 👈 force 0 if empty
+    }));
 
     console.log('PackingEntries Payload:', packingEntriesPayload);
 
@@ -848,7 +849,7 @@ export class PackingAddComponent {
       UNIT_ID: mainUnitId,
       //  ADD BOM
       BOM: bomPayload,
-      
+
       //  ADD PACKING ENTRIES
       PackingEntries: packingEntriesPayload,
       Units: unitsPayload,
@@ -876,7 +877,7 @@ export class PackingAddComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1200,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -885,11 +886,11 @@ export class PackingAddComponent {
     //  DUPLICATE CHECK
     // =====================================================
     const unitName = this.produCtionUnits.find(
-      (u) => u.ID === payload.UNIT_ID
+      (u) => u.ID === payload.UNIT_ID,
     )?.DESCRIPTION;
 
     const categoryName = this.categoryList.find(
-      (u) => u.ID === payload.CATEGORY_ID
+      (u) => u.ID === payload.CATEGORY_ID,
     )?.DESCRIPTION;
 
     const duplicate = this.packing_list.find(
@@ -898,7 +899,7 @@ export class PackingAddComponent {
         item.ArtNo === payload.ART_NO &&
         item.Color === payload.COLOR &&
         item.Category === categoryName &&
-        item.Unit === unitName
+        item.Unit === unitName,
     );
 
     if (duplicate) {
@@ -908,7 +909,7 @@ export class PackingAddComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 800,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -920,14 +921,14 @@ export class PackingAddComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 800,
         },
-        'error'
+        'error',
       );
       return;
     }
     if (!Array.isArray(this.packing_list)) {
       notify(
         { message: 'Packing list not loaded yet', displayTime: 800 },
-        'warning'
+        'warning',
       );
       return;
     }
@@ -946,7 +947,7 @@ export class PackingAddComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 800,
           },
-          'success'
+          'success',
         );
 
         // Close popup
@@ -979,9 +980,9 @@ export class PackingAddComponent {
             message: 'Failed to save packing data.',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
-      }
+      },
     );
   }
 
@@ -1134,16 +1135,15 @@ export class PackingAddComponent {
   }
 
   get selectedUnitsHint(): string {
-  if (!this.PackingData.UNIT_ID?.length) {
-    return 'No unit selected';
+    if (!this.PackingData.UNIT_ID?.length) {
+      return 'No unit selected';
+    }
+
+    return this.produCtionUnits
+      .filter((u) => this.PackingData.UNIT_ID.includes(u.ID))
+      .map((u) => u.DESCRIPTION)
+      .join(', ');
   }
-
-  return this.produCtionUnits
-    .filter(u => this.PackingData.UNIT_ID.includes(u.ID))
-    .map(u => u.DESCRIPTION)
-    .join(', ');
-}
-
 }
 
 @NgModule({

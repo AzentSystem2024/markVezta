@@ -18,6 +18,8 @@ import * as events from 'devextreme/events';
 import { AuthService } from 'src/app/services/auth.service'; // Replace with your API service
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
+import { NavigationEnd } from '@angular/router';
+import { OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'side-navigation-menu',
@@ -37,6 +39,7 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
 
   private _items!: Record<string, unknown>[];
   internalItems: any[];
+  selectedKeys: string[] = [];
 
   get items() {
     return this._items;
@@ -46,12 +49,35 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
     private authService: AuthService,
     private elementRef: ElementRef,
     private service: DataService,
-    private router: Router
+    private router: Router,
   ) {}
 
   async ngOnInit() {
     this.refreshMenu();
   }
+
+  public selectByPath(path: string) {
+    const find = (items: any[]): any => {
+      for (const item of items) {
+        if (item.path === path) return item;
+        if (item.items) {
+          const found = find(item.items);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const node = find(this.internalItems);
+
+    if (node) {
+      setTimeout(() => {
+        this.menu.instance.selectItem(node);
+        this.menu.instance.expandItem(node);
+      }, 0);
+    }
+  }
+
   // refreshMenu() {
   //   // Use static menu for now
   //   this.internalItems = this.staticMenu;
@@ -60,7 +86,7 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
 
   refreshMenu() {
     const menuGroups = JSON.parse(
-      localStorage.getItem('sideMenuItems') || '[]'
+      localStorage.getItem('sideMenuItems') || '[]',
     );
 
     this.internalItems = [];
@@ -72,7 +98,7 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
 
       // Remove duplicate menus based on MenuID (in case of repeated Timesheet)
       const uniqueMenus = Array.from(
-        new Map(menus.map((item) => [item.MenuID, item])).values()
+        new Map(menus.map((item) => [item.MenuID, item])).values(),
       );
 
       const children = uniqueMenus
@@ -190,13 +216,16 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
   // }
 
   onItemClick(e: any) {
+    e.event?.stopPropagation(); // prevent sidebar collapse
+
     const item = e.itemData;
 
-    if (item && item.path) {
-      this.router.navigate([item.path]);
+    if (item?.path) {
+      this.menu.instance.selectItem(item); // ✅ highlight menu
+      this.router.navigate([item.path]); // ✅ routing
     }
 
-    this.selectedItemChanged.emit(e); // now parent gets the event
+    this.selectedItemChanged.emit(e); // ✅ tabs / parent logic
   }
 
   ngAfterViewInit() {
@@ -204,6 +233,30 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
     events.on(this.elementRef.nativeElement, 'dxclick', (e: Event) => {
       this.openMenu.next(e);
     });
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.selectByRoute(event.urlAfterRedirects);
+      }
+    });
+  }
+
+  selectByRoute(route: string) {
+    const find = (items: any[]): any => {
+      for (const item of items) {
+        if (item.path === route) return item;
+        if (item.items) {
+          const found = find(item.items);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const node = find(this.internalItems);
+
+    if (node) {
+      this.menu.instance.selectItem(node); // 🔥 sync sidebar
+    }
   }
 
   ngOnDestroy() {

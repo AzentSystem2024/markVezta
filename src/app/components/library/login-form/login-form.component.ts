@@ -250,6 +250,7 @@ export class LoginFormComponent implements OnInit {
           localStorage.setItem('userData', JSON.stringify(res));
           sessionStorage.setItem('savedUserData', JSON.stringify(res));
           localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
+          sessionStorage.setItem('authToken', res.Token);
           this.router.navigate(['/analytics-dashboard']);
 
           notify({

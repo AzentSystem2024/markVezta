@@ -147,6 +147,7 @@ export class AuthService {
     localStorage.removeItem('menuData');
     localStorage.removeItem('authToken');
     localStorage.removeItem('settingsData');
+    sessionStorage.removeItem('authToken');
 
     // Optional: Reset user
     this._user = null;

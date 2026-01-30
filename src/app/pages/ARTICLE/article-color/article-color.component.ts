@@ -26,7 +26,6 @@ import { DepartmentFormModule } from 'src/app/components/library/department-form
 import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
 
-
 @Component({
   selector: 'app-article-color',
   templateUrl: './article-color.component.html',
@@ -108,7 +107,7 @@ export class ArticleColorComponent {
     text: '',
   };
   refreshGrid() {
-      this.get_ArticleColor_List();
+    this.get_ArticleColor_List();
   }
 
   searchButtonOptions = {
@@ -202,34 +201,33 @@ export class ArticleColorComponent {
 
   //===================get data list========================
   get_ArticleColor_List() {
-  this.Datasource = new DataSource({
-    load: () =>
-      new Promise((resolve, reject) => {
-        this.dataservice.get_ArticleColor_Api().subscribe({
-          next: (res: any) => {
-            const data = (res?.Data || []).map(
-              (item: any, index: number) => ({
-                ...item,
-                SlNo: index + 1,
-              }),
-            );
+    this.Datasource = new DataSource({
+      load: () =>
+        new Promise((resolve, reject) => {
+          this.dataservice.get_ArticleColor_Api().subscribe({
+            next: (res: any) => {
+              const data = (res?.Data || []).map(
+                (item: any, index: number) => ({
+                  ...item,
+                  SlNo: index + 1,
+                }),
+              );
 
-            this.articleColorList = data; 
+              this.articleColorList = data;
 
-            // this.articleColorRowCount = data.length; // ✅ store count
-            resolve(data); // 🔑 grid loader stops here
-          },
-          error: (err) => {
-            console.error(err);
-            this.articleColorList = [];
-            // this.articleColorRowCount = 0;
-            resolve([]); // 🔑 always resolve
-          },
-        });
-      }),
-  });
-}
-
+              // this.articleColorRowCount = data.length; // ✅ store count
+              resolve(data); // 🔑 grid loader stops here
+            },
+            error: (err) => {
+              console.error(err);
+              this.articleColorList = [];
+              // this.articleColorRowCount = 0;
+              resolve([]); // 🔑 always resolve
+            },
+          });
+        }),
+    });
+  }
 
   onEditingStart(event: any) {
     event.cancel = true;
@@ -255,7 +253,7 @@ export class ArticleColorComponent {
 
     const trimmedCode = Code?.trim().toLowerCase();
     const trimmedColorEnglish = Color_English?.trim().toLowerCase();
-    const trimmedColorArabic = Color_Arabic?.trim().toLowerCase();
+    // const trimmedColorArabic = Color_Arabic?.trim().toLowerCase();
 
     let isCodeDuplicate = false;
     let isColorEnglishDuplicate = false;
@@ -264,7 +262,7 @@ export class ArticleColorComponent {
     this.articleColorList?.forEach((data: any) => {
       const dataCode = data.CODE?.trim().toLowerCase();
       const dataColorEnglish = data.COLOR_ENGLISH?.trim().toLowerCase();
-      const dataColorArabic = data.COLOR_ARABIC?.trim().toLowerCase();
+      // const dataColorArabic = data.COLOR_ARABIC?.trim().toLowerCase();
 
       if (dataCode === trimmedCode) {
         isCodeDuplicate = true;
@@ -274,34 +272,33 @@ export class ArticleColorComponent {
         isColorEnglishDuplicate = true;
       }
 
-      if (dataColorArabic === trimmedColorArabic) {
-        isColorArabicDuplicate = true;
-      }
+      // if (dataColorArabic === trimmedColorArabic) {
+      //   isColorArabicDuplicate = true;
+      // }
     });
 
     // Show appropriate message
-    if (isCodeDuplicate || isColorEnglishDuplicate || isColorArabicDuplicate) {
+    if (isCodeDuplicate || isColorEnglishDuplicate) {
       let message = '';
 
-      if (
-        isCodeDuplicate &&
-        isColorEnglishDuplicate &&
-        isColorArabicDuplicate
-      ) {
+      if (isCodeDuplicate && isColorEnglishDuplicate) {
         message = 'Code, Color English, and Color Arabic already exist';
       } else if (isCodeDuplicate && isColorEnglishDuplicate) {
         message = 'Code and Color English already exist';
-      } else if (isCodeDuplicate && isColorArabicDuplicate) {
-        message = 'Code and Color Arabic already exist';
-      } else if (isColorEnglishDuplicate && isColorArabicDuplicate) {
+      }
+      //  else if (isCodeDuplicate && isColorArabicDuplicate) {
+      //   message = 'Code and Color Arabic already exist';
+      // }
+      else if (isColorEnglishDuplicate && isColorArabicDuplicate) {
         message = 'Color English and Color Arabic already exist';
       } else if (isCodeDuplicate) {
         message = 'Code already exists';
       } else if (isColorEnglishDuplicate) {
         message = 'Color English already exists';
-      } else if (isColorArabicDuplicate) {
-        message = 'Color Arabic already exists';
       }
+      //  else if (isColorArabicDuplicate) {
+      //   message = 'Color Arabic already exists';
+      // }
 
       notify(
         {
@@ -315,7 +312,7 @@ export class ArticleColorComponent {
       return;
     }
 
-    if (Code && Color_English && Color_Arabic) {
+    if (Code && Color_English) {
       this.dataservice
         .Insert_ArticleColor_Api(payload)
         .subscribe((res: any) => {
@@ -349,17 +346,17 @@ export class ArticleColorComponent {
     const Id = this.editingRowData.ID;
     const Code = this.editingRowData.CODE;
     const Color_English = this.editingRowData.COLOR_ENGLISH;
-    const Color_Arabic = this.editingRowData.COLOR_ARABIC;
+    // const Color_Arabic = this.editingRowData.COLOR_ARABIC;
     // const COMPANY_ID = this.selected_Company_id
-    console.log(Code, Color_English, Color_Arabic);
+    // console.log(Code, Color_English, Color_Arabic);
 
     const trimmedCode = Code?.trim().toLowerCase();
     const trimmedColorEnglish = Color_English?.trim().toLowerCase();
-    const trimmedColorArabic = Color_Arabic?.trim().toLowerCase();
+    // const trimmedColorArabic = Color_Arabic?.trim().toLowerCase();
 
     let isCodeDuplicate = false;
     let isColorEnglishDuplicate = false;
-    let isColorArabicDuplicate = false;
+    // let isColorArabicDuplicate = false;
 
     this.articleColorList?.forEach((data: any) => {
       // Skip current record by ID
@@ -367,7 +364,7 @@ export class ArticleColorComponent {
 
       const dataCode = data.CODE?.trim().toLowerCase();
       const dataColorEnglish = data.COLOR_ENGLISH?.trim().toLowerCase();
-      const dataColorArabic = data.COLOR_ARABIC?.trim().toLowerCase();
+      // const dataColorArabic = data.COLOR_ARABIC?.trim().toLowerCase();
 
       if (dataCode === trimmedCode) {
         isCodeDuplicate = true;
@@ -377,34 +374,34 @@ export class ArticleColorComponent {
         isColorEnglishDuplicate = true;
       }
 
-      if (dataColorArabic === trimmedColorArabic) {
-        isColorArabicDuplicate = true;
-      }
+      // if (dataColorArabic === trimmedColorArabic) {
+      //   isColorArabicDuplicate = true;
+      // }
     });
 
     // Show appropriate message
-    if (isCodeDuplicate || isColorEnglishDuplicate || isColorArabicDuplicate) {
+    if (isCodeDuplicate || isColorEnglishDuplicate) {
       let message = '';
 
-      if (
-        isCodeDuplicate &&
-        isColorEnglishDuplicate &&
-        isColorArabicDuplicate
-      ) {
+      if (isCodeDuplicate && isColorEnglishDuplicate) {
         message = 'Code, Color English, and Color Arabic already exist';
       } else if (isCodeDuplicate && isColorEnglishDuplicate) {
         message = 'Code and Color English already exist';
-      } else if (isCodeDuplicate && isColorArabicDuplicate) {
-        message = 'Code and Color Arabic already exist';
-      } else if (isColorEnglishDuplicate && isColorArabicDuplicate) {
-        message = 'Color English and Color Arabic already exist';
-      } else if (isCodeDuplicate) {
+      }
+      //  else if (isCodeDuplicate && isColorArabicDuplicate) {
+      //   message = 'Code and Color Arabic already exist';
+      // }
+      //  else if (isColorEnglishDuplicate && isColorArabicDuplicate) {
+      //   message = 'Color English and Color Arabic already exist';
+      // }
+      else if (isCodeDuplicate) {
         message = 'Code already exists';
       } else if (isColorEnglishDuplicate) {
         message = 'Color English already exists';
-      } else if (isColorArabicDuplicate) {
-        message = 'Color Arabic already exists';
       }
+      // else if (isColorArabicDuplicate) {
+      //   message = 'Color Arabic already exists';
+      // }
 
       notify(
         {
@@ -417,7 +414,7 @@ export class ArticleColorComponent {
 
       return;
     }
-
+    const Color_Arabic = '';
     if (Code && Color_English && Color_Arabic) {
       this.dataservice
         .Update_ArticleColor_Api(Id, Code, Color_English, Color_Arabic)

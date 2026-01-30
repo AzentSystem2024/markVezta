@@ -18,6 +18,7 @@ import {
   SideNavigationMenuModule,
   AppHeaderModule,
   AppFooterModule,
+  SideNavigationMenuComponent,
 } from '../../components';
 
 import { Subscription } from 'rxjs';
@@ -35,6 +36,9 @@ import { DxTabPanelModule } from 'devextreme-angular';
 export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: true })
   scrollView!: DxScrollViewComponent;
+
+  @ViewChild(SideNavigationMenuComponent)
+  sideMenu!: SideNavigationMenuComponent;
 
   @Input()
   title!: string;
@@ -66,8 +70,9 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     public appInfo: AppInfoService,
     private cdr: ChangeDetectorRef,
     // private inactiveservice: InactivityService,
-    private dataService: DataService
+    private dataService: DataService,
   ) {
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     this.routerSubscription = this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationEnd) {
         this.selectedRoute = event.urlAfterRedirects.split('?')[0];
@@ -88,7 +93,7 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     this.menuOpened = this.screen.sizes['screen-large'];
 
     this.screenSubscription = this.screen.changed.subscribe(() =>
-      this.updateDrawer()
+      this.updateDrawer(),
     );
 
     this.updateDrawer();
@@ -190,6 +195,9 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     const selectedTab = this.tabs[index];
     if (selectedTab) {
       this.router.navigate([selectedTab.path]);
+
+      // 🔥 FORCE SIDEBAR SELECTION
+      this.sideMenu.selectByPath(selectedTab.path);
     }
   }
 
