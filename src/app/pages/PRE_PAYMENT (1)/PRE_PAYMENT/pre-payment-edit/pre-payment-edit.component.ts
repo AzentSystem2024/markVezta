@@ -71,6 +71,7 @@ export class PrePaymentEditComponent {
   pdfSrc: SafeResourceUrl | null = null;
           isPdfPopupVisible: boolean = false;
 
+          isSaving:boolean=false;
   PrePaymentFormData: any = {
     COMPANY_ID: '',
     FIN_ID: '',

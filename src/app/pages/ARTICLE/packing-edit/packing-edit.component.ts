@@ -33,6 +33,7 @@ import {
   DxBoxModule,
   DxDataGridComponent,
   DxValidationGroupComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -94,6 +95,7 @@ export class PackingEditComponent {
   PackingEntriesData: any;
   selected_Company_id: any;
   selectedItemId: any;
+  
 
   constructor(private dataService: DataService) {
     this.sesstion_Details();
@@ -109,6 +111,10 @@ export class PackingEditComponent {
     });
   }
 
+  ngOnInit() {
+    this.getDropdownLists();
+    this.getItems();
+  }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(sessionData, '=================session data==========');
@@ -231,9 +237,6 @@ export class PackingEditComponent {
     });
   }
 
-  ngOnInit() {
-    this.getItems();
-  }
 
   onEditorPreparings(e: any) {
     if (
@@ -374,11 +377,29 @@ export class PackingEditComponent {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['PackingData'] && changes['PackingData'].currentValue) {
       console.log('Received PackingData:', changes['PackingData'].currentValue);
+      const incomingData = changes['PackingData'].currentValue;
       this.PackingData = {
         ...this.PackingData,
         ...changes['PackingData'].currentValue,
+         ...incomingData,
       };
       console.log(this.PackingData, 'UPDATED PACKING DATA');
+this.isArticleFieldsDisabled = true;
+       if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
+      // Backend → UI
+      this.PackingData.UNIT_ID = incomingData.Units.map(
+        (u: any) => u.UNIT_ID
+      );
+      console.log(this.PackingData.UNIT_ID, 'UNIT_ID in ngOnChanges');
+    } else if (incomingData.UNIT_ID) {
+      // Backward compatibility
+      this.PackingData.UNIT_ID = [incomingData.UNIT_ID];
+    } else {
+      this.PackingData.UNIT_ID = [];
+    }
+
+    console.log('UNIT_ID after bind:', this.PackingData.UNIT_ID);
+
       if (
         this.PackingData.ART_NO &&
         this.PackingData.COLOR &&
@@ -472,6 +493,9 @@ export class PackingEditComponent {
       this.PackingEntriesData,
       '========packing entries data========='
     );
+
+
+        this.getDropdownLists();
   }
 
   UpdateData() {
@@ -483,6 +507,27 @@ export class PackingEditComponent {
       this.combinationString === undefined
         ? this.PackingData.COMBINATION
         : this.combinationString;
+
+         const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
+    ? this.PackingData.UNIT_ID
+    : [];
+
+  if (!selectedUnits.length) {
+    notify(
+      {
+        message: 'Please select at least one Unit.',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 800,
+      },
+      'warning'
+    );
+    return;
+  }
+
+  const mainUnitId = selectedUnits[0]; // 🔹 main unit
+  const unitsPayload = selectedUnits.map(id => ({
+    UNIT_ID: Number(id),
+  }));
 
     // ===============================
     // 🔹 BUILD BOM PAYLOAD
@@ -500,7 +545,9 @@ export class PackingEditComponent {
       ...this.PackingData,
       COMBINATION: combinationToUse,
       PAIR_QTY: this.totalQuantity,
-      // ✅ ADD BOM HERE
+      UNIT_ID: mainUnitId,        // single main unit
+    Units: unitsPayload,
+      // ADD BOM HERE
       BOM: bomPayload,
      PackingEntries: this.PackingEntriesData.map((item: any) => ({
   ID: item.ID, // if exists
@@ -692,7 +739,7 @@ onQuantityChanged() {
     //   );
     //   return;
     // }
-    // this.isArticleFieldsDisabled = true;
+    this.isArticleFieldsDisabled = true;
 
     console.log(payload, 'PAYLOAD FOR COLLECTION LIST');
     this.dataService
@@ -703,6 +750,7 @@ onQuantityChanged() {
         console.log(this.articleSizeData);
         this.PackingData.COMBINATION = '';
       });
+      
   }
   // selectedSizeRows: any[] = [];
 
@@ -735,7 +783,7 @@ onQuantityChanged() {
 
     // ✅ Resets values and clears all validation UI
     // this.formValidationGroup?.instance?.resetValues();
-
+ this.isArticleFieldsDisabled = false;
     this.articleSizeData = [];
     this.combination_value = [];
     this.totalQuantity = 0;
@@ -844,6 +892,17 @@ onEditorPreparing(e: any) {
   //     console.log('Combination String:', this.combinationString);
   //   }
   // }
+
+  get selectedUnitsHint(): string {
+  if (!this.PackingData.UNIT_ID?.length) {
+    return 'No unit selected';
+  }
+
+  return this.produCtionUnits
+    .filter(u => this.PackingData.UNIT_ID.includes(u.ID))
+    .map(u => u.DESCRIPTION)
+    .join(', ');
+}
 }
 
 @NgModule({
@@ -878,6 +937,7 @@ onEditorPreparing(e: any) {
     DxNumberBoxModule,
     DxoSummaryModule,
     DxBoxModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [PackingEditComponent],

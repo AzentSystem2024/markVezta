@@ -58,6 +58,9 @@ export class PrePaymentAddComponent {
   selected_vat_id: any;
   selectedstoreId: any;
 
+  isCalendarClicked = false;
+
+
   periodTo: string | number | Date | null = null;
   periodFrom: string | number | Date | null = null;
 
@@ -98,6 +101,7 @@ export class PrePaymentAddComponent {
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
   docNo: any;
+isSaving : boolean = false;
 
   constructor(private dataservice: DataService, private ngZone: NgZone) {
     this.get_Supplier_dropdown();
@@ -172,10 +176,19 @@ export class PrePaymentAddComponent {
   }
 
   onCalendarClick() {
+    this.isCalendarClicked = true;
     this.showGrid = true;
     this.generateSchedule();
     this.totalExpense = this.PrePaymentFormData.EXPENSE_AMOUNT || 0; // Copy Amount to Total Expense
   }
+
+  recalculateTotalExpense() {
+  this.totalExpense = this.ExpenseAmountDetails
+    ?.reduce((sum, item) => {
+      return sum + (Number(item.DUE_AMOUNT) || 0);
+    }, 0) || 0;
+}
+
 
   generateSchedule() {
     if (
@@ -245,6 +258,8 @@ export class PrePaymentAddComponent {
 
     this.ExpenseAmountDetails = schedule;
     this.showGrid = true;
+
+     this.recalculateTotalExpense();
   }
 
   onSelectionChanged(e: any) {
@@ -449,25 +464,47 @@ export class PrePaymentAddComponent {
   }
 
   savePrePayment() {
+
+    const expenseAmount = Number(this.PrePaymentFormData.EXPENSE_AMOUNT);
+const totalExpense = Number(this.totalExpense);
+    // ✅ Calendar click validation
+  if (!this.isCalendarClicked) {
+    notify({
+      message: 'Please click the calendar to generate the schedule.',
+      type: 'warning',
+      position: { at: 'top right', my: 'top right' },
+      displayTime: 1500,
+    });
+    return;
+  }
+
     const validationResult = this.formValidationGroup?.instance?.validate();
     if (!validationResult?.isValid) {
       console.log('Validation failed');
       return;
     }
 
-    // ✅ Validation before save
-    if (
-      Number(this.PrePaymentFormData.EXPENSE_AMOUNT) !==
-      Number(this.totalExpense)
-    ) {
-      notify({
-        message: 'Amount and Total Expense must be the same.',
-        type: 'error',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 1500,
-      });
-      return; // stop save
-    }
+    if (isNaN(expenseAmount) || isNaN(totalExpense)) {
+  notify({
+    message: 'Expense amount or total expense is invalid.',
+    type: 'error',
+    position: { at: 'top right', my: 'top right' },
+    displayTime: 1500,
+  });
+  return;
+}
+
+    // Validation before save
+    if (expenseAmount !== totalExpense) {
+  notify({
+    message: 'Amount and Total Expense must be the same.',
+    type: 'error',
+    position: { at: 'top right', my: 'top right' },
+    displayTime: 1500,
+  });
+  return;
+}
+
     const result = this.ExpenseAmountDetails.map((item) => ({
       DUE_DATE: this.convertToISO(item.DUE_DATE),
       DUE_AMOUNT: item.DUE_AMOUNT,
@@ -533,8 +570,10 @@ export class PrePaymentAddComponent {
   }
 
   callInsertPrePayment(payload: any) {
+     this.isSaving = true;
     this.dataservice.Insert_PrePayment(payload).subscribe(
       (res: any) => {
+          this.isSaving = false;
         console.log('Response from save PrePayment:', res);
 
         if (res.Message === 'Success') {
@@ -552,6 +591,7 @@ export class PrePaymentAddComponent {
         this.formClosed.emit();
       },
       (error) => {
+        this.isSaving = false;
         notify('Error while saving PrePayment', 'error', 2000);
         console.error('Save Error:', error);
       }

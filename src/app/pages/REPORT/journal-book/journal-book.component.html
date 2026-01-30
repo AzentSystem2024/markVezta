@@ -85,6 +85,25 @@
           </dx-date-box>
         </dxi-item>
 
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
         <dxi-item itemType="simple" verticalAlignment="center">
           <dx-button
             text="Apply"
@@ -97,7 +116,7 @@
           >
           </dx-button>
         </dxi-item>
-        <dxi-item name="exportButton"></dxi-item>
+        <!-- <dxi-item name="exportButton"></dxi-item> -->
       </dxo-toolbar>
       <dxo-sorting mode="none"></dxo-sorting>
       <dxo-filter-row visible="true"></dxo-filter-row>
@@ -151,11 +170,7 @@
   [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
   alignment="right">
 </dxi-column> -->
-      <dxi-column
-        *ngIf="journalBookCount> 0"
-        type="buttons"
-        [width]="100"
-      >
+      <dxi-column *ngIf="journalBookCount > 0" type="buttons" [width]="100">
         <dxi-button
           hint="View"
           icon="eyeopen"

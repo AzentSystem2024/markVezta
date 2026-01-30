@@ -208,7 +208,7 @@
         width="100%"
         [editing]="{
           mode: 'cell',
-          allowUpdating: true
+          allowUpdating: true,
         }"
       >
         <dxo-header-filter [visible]="true"></dxo-header-filter>
@@ -281,11 +281,19 @@
         class="action-btn"
         (onClick)="cancel()"
       ></dx-button>
-      <dx-button
+      <!-- <dx-button
         text="Save"
         stylingMode="contained"
         type="default"
         class="action-btn"
+        (onClick)="savePrePayment()"
+      ></dx-button> -->
+      <dx-button
+        class="action-btn"
+        [text]="isSaving ? 'Saving...' : 'Save'"
+        [disabled]="isSaving"
+        stylingMode="contained"
+        type="default"
         (onClick)="savePrePayment()"
       ></dx-button>
     </div>

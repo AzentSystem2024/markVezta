@@ -216,11 +216,13 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     onClick: () => this.toggleFilterRow(),
   };
 
-  refreshButtonOptions = {
+ refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
     text: '',
   };
 

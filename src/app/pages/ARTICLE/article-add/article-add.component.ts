@@ -591,6 +591,7 @@ export class ArticleAddComponent {
   getAliasNo() {
     this.dataService.getLastAliasNo().subscribe((response: any) => {
       this.articleData.ALIAS_NO = response.GetAliasNo;
+      console.log(this.articleData.ALIAS_NO, 'ALIASNO');
     });
   }
   // onAttachRowSelected(event: any) {

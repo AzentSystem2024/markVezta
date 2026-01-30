@@ -111,9 +111,13 @@ export class InvoiceTrOutComponent {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
     text: '',
   };
+  
   isAddInvoice: boolean = false;
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -297,6 +301,7 @@ export class InvoiceTrOutComponent {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.getInvoiceList();
   }
 
   toggleFilters() {

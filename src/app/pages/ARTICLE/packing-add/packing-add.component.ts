@@ -31,6 +31,7 @@ import {
   DxDataGridComponent,
   DxValidationGroupComponent,
   DxValidationGroupModule,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -753,6 +754,27 @@ export class PackingAddComponent {
       return;
     }
 
+      const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
+    ? this.PackingData.UNIT_ID
+    : [];
+
+  if (!selectedUnits.length) {
+    notify(
+      {
+        message: 'Please select at least one Unit.',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 800,
+      },
+      'warning'
+    );
+    return;
+  }
+
+  const mainUnitId = selectedUnits[0]; // 🔹 main UNIT_ID
+  const unitsPayload = selectedUnits.map(id => ({
+    UNIT_ID: Number(id),
+  }));
+
     //  Convert number fields to string as required by backend
     const Alias_no = Number(this.PackingData.ALIAS_NO);
     const Part_no = Number(this.PackingData.PART_NO);
@@ -763,6 +785,8 @@ export class PackingAddComponent {
     this.Part_no = this.PackingData.PART_NO.toString();
 
     this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
+
+    
 
     // =====================================================
     //  BUILD BOM PAYLOAD
@@ -777,17 +801,17 @@ export class PackingAddComponent {
     console.log('BOM Payload:', bomPayload);
 
     // Optional BOM validation
-    if (!bomPayload.length) {
-      notify(
-        {
-          message: 'Please add at least one BOM item.',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 800,
-        },
-        'warning'
-      );
-      return;
-    }
+    // if (!bomPayload.length) {
+    //   notify(
+    //     {
+    //       message: 'Please add at least one BOM item.',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 800,
+    //     },
+    //     'warning'
+    //   );
+    //   return;
+    // }
 
     // =====================================================
     //  BUILD PACKING ENTRIES PAYLOAD
@@ -821,12 +845,13 @@ export class PackingAddComponent {
       ART_SERIAL: this.art_Serial_no,
       COMBINATION: this.combinationString,
       PAIR_QTY: this.totalQuantity,
-
-      // ✅ ADD BOM
+      UNIT_ID: mainUnitId,
+      //  ADD BOM
       BOM: bomPayload,
-
-      // ✅ ADD PACKING ENTRIES
+      
+      //  ADD PACKING ENTRIES
       PackingEntries: packingEntriesPayload,
+      Units: unitsPayload,
     };
 
     console.log('FINAL INSERT PAYLOAD:', payload);
@@ -1107,6 +1132,18 @@ export class PackingAddComponent {
     //       this.PackingData.IS_EXPORT=false;
     //       this.PackingData.IS_ANY_COMB=false;
   }
+
+  get selectedUnitsHint(): string {
+  if (!this.PackingData.UNIT_ID?.length) {
+    return 'No unit selected';
+  }
+
+  return this.produCtionUnits
+    .filter(u => this.PackingData.UNIT_ID.includes(u.ID))
+    .map(u => u.DESCRIPTION)
+    .join(', ');
+}
+
 }
 
 @NgModule({
@@ -1142,6 +1179,7 @@ export class PackingAddComponent {
     DxoSummaryModule,
     DxBoxModule,
     DxValidationGroupModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [PackingAddComponent],

@@ -59,21 +59,21 @@
           </div>
         </dxi-item>
 
-        <dxi-item location ="before">
+        <dxi-item location="after">
           <dx-select-box
-              [dataSource]="dateRanges"
-              [displayExpr]="'label'"
-              valueExpr="value"
-              [(value)]="selectedDateRange"
-              (onValueChanged)="onDateRangeChanged($event)"
-              [searchEnabled]="true"
-              [width]="250"
-              placeholder="Select Date Range"
-            >
-              <div *dxTemplate="let item of 'item'">
-                {{ item.value === "custom" ? "Custom" : item.label }}
-              </div>
-            </dx-select-box>
+            [dataSource]="dateRanges"
+            [displayExpr]="'label'"
+            valueExpr="value"
+            [(value)]="selectedDateRange"
+            (onValueChanged)="onDateRangeChanged($event)"
+            [searchEnabled]="true"
+            [width]="250"
+            placeholder="Select Date Range"
+          >
+            <div *dxTemplate="let item of 'item'">
+              {{ item.value === "custom" ? "Custom" : item.label }}
+            </div>
+          </dx-select-box>
         </dxi-item>
 
         <dxi-item location="after">
@@ -106,7 +106,7 @@
             ></dx-button>
           </div>
         </dxi-item>
-        <dxi-item
+        <!-- <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
@@ -118,12 +118,12 @@
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
-        ></dxi-item>
-        <dxi-item
+        ></dxi-item> -->
+        <!-- <dxi-item
           name="exportButton"
           location="after"
           cssClass="export-btn"
-        ></dxi-item>
+        ></dxi-item> -->
       </dxo-toolbar>
 
       <!-- <div *dxTemplate="let data of 'dateFilterTemplate'">

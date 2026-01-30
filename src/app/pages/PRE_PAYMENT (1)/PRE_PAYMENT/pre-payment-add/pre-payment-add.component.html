@@ -185,12 +185,15 @@
         height="200"
         class="mt-3"
         [dataSource]="ExpenseAmountDetails"
+        (onRowInserted)="recalculateTotalExpense()"
+        (onRowUpdated)="recalculateTotalExpense()"
+        (onRowRemoved)="recalculateTotalExpense()"
         (onSelectionChanged)="onSelectionChanged($event)"
         (onEditorPreparing)="onEditorPreparing($event)"
         width="100%"
         [editing]="{
           mode: 'cell',
-          allowUpdating: true
+          allowUpdating: true,
         }"
       >
         <dxo-header-filter [visible]="true"></dxo-header-filter>
@@ -239,7 +242,7 @@
         label="Total Expense"
         width="200px"
         labelMode="floating"
-        [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
+        [(value)]="totalExpense"
       ></dx-number-box>
     </div>
     <div
@@ -265,13 +268,22 @@
         class="action-btn"
         (onClick)="cancel()"
       ></dx-button>
-      <dx-button
+      <!-- <dx-button
         text="Save"
         stylingMode="contained"
         type="default"
         class="action-btn"
         (onClick)="savePrePayment()"
-      ></dx-button>
+      ></dx-button> -->
+      <dx-button
+        class="action-btn"
+        [text]="isSaving ? 'Saving...' : 'Save'"
+        [disabled]="isSaving"
+        stylingMode="contained"
+        type="default"
+        (onClick)="savePrePayment()"
+      >
+      </dx-button>
     </div>
   </div>
 </dx-validation-group>

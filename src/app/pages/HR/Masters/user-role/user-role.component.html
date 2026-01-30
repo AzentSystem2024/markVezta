@@ -72,7 +72,9 @@
       ></dxi-item>
 
       <!-- Search -->
-
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
       <!-- Export (built-in, kept) -->
       <dxi-item
         name="exportButton"
@@ -81,9 +83,6 @@
       ></dxi-item>
 
       <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
 
       <!-- Add -->
       <dxi-item
@@ -142,12 +141,11 @@
   </form-popup>
 
   <dx-load-panel
-  [visible]="isSaving || isUpdating"
-  [showIndicator]="true"
-  [showPane]="true"
-  [shading]="true"
-  [message]="isSaving ? 'Saving...' : 'Updating...'"
->
-</dx-load-panel>
-
+    [visible]="isSaving || isUpdating"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="true"
+    [message]="isSaving ? 'Saving...' : 'Updating...'"
+  >
+  </dx-load-panel>
 </div>
