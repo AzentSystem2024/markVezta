@@ -225,11 +225,12 @@ export class ArticleAddComponent {
   }
 
   getItems() {
-    // const payload = {
-    //   COMPANY_ID: this.selected_Company_id,
-    // };
-    this.dataService.listItemsForArticle().subscribe((response: any) => {
-      this.itemsList = response.DataList;
+    const payload = {
+      NAME: "ITEMS"
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      console.log(response)
+      this.itemsList = response;
     });
   }
 

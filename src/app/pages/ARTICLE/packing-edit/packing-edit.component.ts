@@ -197,12 +197,13 @@ export class PackingEditComponent {
       e.cancel = true; // Prevent adding new row
     }
   }
-  getItems() {
-    // const payload = {
-    //   COMPANY_ID: this.selected_Company_id,
-    // };
-    this.dataService.listItemsForArticle().subscribe((response: any) => {
-      this.itemsList = response.DataList;
+ getItems() {
+    const payload = {
+      NAME: "ITEMS"
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      console.log(response)
+      this.itemsList = response;
     });
   }
 
