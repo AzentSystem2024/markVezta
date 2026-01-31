@@ -146,7 +146,7 @@ export class ArticleAddComponent {
       this.getCategory();
     }
     // if (this.selectedProductionUnitId) {
-      this.getLastOrderNo();
+    this.getLastOrderNo();
     // }
     this.getAliasNo();
     this.getDropdownLists();
@@ -226,10 +226,10 @@ export class ArticleAddComponent {
 
   getItems() {
     const payload = {
-      NAME: "ITEMS"
+      NAME: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      console.log(response)
+      console.log(response);
       this.itemsList = response;
     });
   }
@@ -483,7 +483,7 @@ export class ArticleAddComponent {
           if (response?.flag === 1 && Array.isArray(response?.Data)) {
             this.articleSizeData = response.Data;
             // if (this.selectedProductionUnitId) {
-              this.getLastOrderNo();
+            this.getLastOrderNo();
             // }
           } else {
             this.articleSizeData = [];
@@ -587,15 +587,17 @@ export class ArticleAddComponent {
   }
 
   getLastOrderNoOnAdd() {
-  const payload = { COMPANY_ID: 0 };
+    const payload = { COMPANY_ID: 0 };
 
-  this.dataService.getLastOrderNoForArticle(payload).subscribe((response: any) => {
-    const last = Number(response?.LastOrderNo ?? 0);
-    this.lastOrderNo = last;
+    this.dataService
+      .getLastOrderNoForArticle(payload)
+      .subscribe((response: any) => {
+        const last = Number(response?.LastOrderNo ?? 0);
+        this.lastOrderNo = last;
 
-    let nextOrderNo = last + 1;
+        let nextOrderNo = last + 1;
 
-    if (Array.isArray(this.articleSizeData)) {
+        if (Array.isArray(this.articleSizeData)) {
           // Sort by SIZE ascending
           this.articleSizeData = this.articleSizeData
             .sort((a, b) => a.SIZE - b.SIZE)
@@ -604,8 +606,8 @@ export class ArticleAddComponent {
               ORDER_NO: nextOrderNo++,
             }));
         }
-  });
-}
+      });
+  }
 
   openAttachPopup() {
     this.getArticles();
@@ -704,23 +706,22 @@ export class ArticleAddComponent {
       input.value = input.value.slice(0, 6); // Trim visible input
       this.articleData.ART_NO = input.value; // Sync model
     }
-     
   }
 
   onArtNoChanged(e: any) {
-  let value = e.value || '';
+    let value = e.value || '';
 
-  // Enforce max length
-  if (value.length > 6) {
-    value = value.slice(0, 6);
-    e.component.option('value', value);
+    // Enforce max length
+    if (value.length > 6) {
+      value = value.slice(0, 6);
+      e.component.option('value', value);
+    }
+
+    this.articleData.ART_NO = value;
+
+    // 🔥 Update description AFTER value is set
+    this.updateItemDescription();
   }
-
-  this.articleData.ART_NO = value;
-
-  // 🔥 Update description AFTER value is set
-  this.updateItemDescription();
-}
 
   clearComponentArticleId() {
     this.articleData.COMPONENT_ARTICLE_ID = '';
@@ -1078,7 +1079,7 @@ export class ArticleAddComponent {
       PRICE: '',
       PACK_QTY: '',
       PART_NO: '',
-      ALIAS_NO: '',
+      ALIAS_NO: this.getAliasNo(),
       UNIT_ID: '',
       ARTICLE_TYPE: '',
       CATEGORY_ID: '',
@@ -1121,28 +1122,22 @@ export class ArticleAddComponent {
   }
 
   updateItemDescription() {
-  const artNo = this.articleData.ART_NO || '';
-  const color = this.articleData.COLOR || '';
-  const packing = this.articleData.STANDARD_PACKING || '';
-  const price = this.articleData.PRICE ?? '';
+    const artNo = this.articleData.ART_NO || '';
+    const color = this.articleData.COLOR || '';
+    const packing = this.articleData.STANDARD_PACKING || '';
+    const price = this.articleData.PRICE ?? '';
 
-  const categoryName =
-    this.categoryList?.find(c => c.ID === this.selectedCategoryId)
-      ?.DESCRIPTION || '';
+    const categoryName =
+      this.categoryList?.find((c) => c.ID === this.selectedCategoryId)
+        ?.DESCRIPTION || '';
 
-  // Build exact format
-  const parts = [
-    'SF',
-    artNo,
-    color,
-    packing,
-    categoryName,
-    price
-  ].filter(p => p !== '' && p !== null && p !== undefined);
+    // Build exact format
+    const parts = ['SF', artNo, color, packing, categoryName, price].filter(
+      (p) => p !== '' && p !== null && p !== undefined,
+    );
 
-  this.articleData.DESCRIPTION = parts.join('-');
-}
-
+    this.articleData.DESCRIPTION = parts.join('-');
+  }
 }
 
 @NgModule({

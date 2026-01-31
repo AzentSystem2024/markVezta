@@ -90,7 +90,7 @@ export class PackingAddComponent {
   isFilterRowVisible: boolean = false;
   items: any[] = []; // grid data → BoM components
   itemsList: any[] = [];
-  company_code:any; // dropdown source → item master list
+  company_code: any; // dropdown source → item master list
   PackingData: any = {
     ART_NO: '',
     ORDER_NO: '',
@@ -111,8 +111,8 @@ export class PackingAddComponent {
     IS_ANY_COMB: false,
     SUPP_ID: 0,
     COMPANY_ID: 0,
-    STD_PRICE:0,
-    STD_PRICE_EFFECT_FROM : new Date(),
+    STD_PRICE: 0,
+    STD_PRICE_EFFECT_FROM: new Date(),
     PackingEntries: [
       {
         ARTICLE_ID: 0,
@@ -160,7 +160,7 @@ export class PackingAddComponent {
 
   getAliasNo() {
     this.dataService.getPackingLastAliasNo().subscribe((response: any) => {
-      console.log(response)
+      console.log(response);
       this.PackingData.ALIAS_NO = response.GetAliasNo;
       console.log(this.PackingData.ALIAS_NO, 'ALIASNO');
     });
@@ -285,10 +285,10 @@ export class PackingAddComponent {
 
   getItems() {
     const payload = {
-      NAME: "ITEMS"
+      NAME: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      console.log(response)
+      console.log(response);
       this.itemsList = response;
     });
   }
@@ -606,7 +606,6 @@ export class PackingAddComponent {
 
     this.company_code = sessionData.SELECTED_COMPANY.COMPANY_CODE;
     console.log(this.company_code, '============company code==============');
-
   }
   // AddData() {
   //   console.log(this.packing_list, '======================');
@@ -777,35 +776,34 @@ export class PackingAddComponent {
     }
 
     // ===============================
-// 🔹 UNIT HANDLING (FIXED)
-// ===============================
-const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
-  ? this.PackingData.UNIT_ID
-  : this.PackingData.UNIT_ID
-  ? [this.PackingData.UNIT_ID]
-  : [];
+    // 🔹 UNIT HANDLING (FIXED)
+    // ===============================
+    const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
+      ? this.PackingData.UNIT_ID
+      : this.PackingData.UNIT_ID
+        ? [this.PackingData.UNIT_ID]
+        : [];
 
-// 🚨 hard validation
-if (!selectedUnits.length) {
-  notify(
-    {
-      message: 'Please select at least one Unit',
-      position: { at: 'top right', my: 'top right' },
-      displayTime: 800,
-    },
-    'warning'
-  );
-  return;
-}
+    // 🚨 hard validation
+    if (!selectedUnits.length) {
+      notify(
+        {
+          message: 'Please select at least one Unit',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 800,
+        },
+        'warning',
+      );
+      return;
+    }
 
-// ✅ Header UNIT_ID (single)
-const mainUnitId = Number(selectedUnits[0]);
+    // ✅ Header UNIT_ID (single)
+    const mainUnitId = Number(selectedUnits[0]);
 
-// ✅ Units array (multi)
-const unitsPayload = selectedUnits.map(id => ({
-  UNIT_ID: Number(id),
-}));
-
+    // ✅ Units array (multi)
+    const unitsPayload = selectedUnits.map((id) => ({
+      UNIT_ID: Number(id),
+    }));
 
     //  Convert number fields to string as required by backend
     const Alias_no = Number(this.PackingData.ALIAS_NO);
@@ -964,53 +962,52 @@ const unitsPayload = selectedUnits.map(id => ({
     // =====================================================
     //  API CALL
     // =====================================================
-   this.dataService.Add_packages_listapi(payload).subscribe(
-  (res: any) => {
-    console.log('Add packing response:', res);
+    this.dataService.Add_packages_listapi(payload).subscribe(
+      (res: any) => {
+        console.log('Add packing response:', res);
 
-    //  BUSINESS ERROR (duplicate etc.)
-    if (res?.flag === -1) {
-      notify(
-        {
-          message: res.Message || 'A similar record already exists.',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 2000,
-        },
-        'error'
-      );
-      return; //  stop further execution
-    }
+        //  BUSINESS ERROR (duplicate etc.)
+        if (res?.flag === -1) {
+          notify(
+            {
+              message: res.Message || 'A similar record already exists.',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 2000,
+            },
+            'error',
+          );
+          return; //  stop further execution
+        }
 
-    //  SUCCESS
-    notify(
-      {
-        message: 'Data successfully added',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 800,
+        //  SUCCESS
+        notify(
+          {
+            message: 'Data successfully added',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 800,
+          },
+          'success',
+        );
+
+        this.getPackingList();
+        this.popupClosed.emit();
+        this.popupVisible = false;
+
+        // optional resets if needed
       },
-      'success'
-    );
+      (error) => {
+        console.error('HTTP error:', error);
 
-    this.getPackingList();
-    this.popupClosed.emit();
-    this.popupVisible = false;
-
-    // optional resets if needed
-  },
-  (error) => {
-    console.error('HTTP error:', error);
-
-    notify(
-      {
-        message: 'Server error. Please try again later.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 2000,
+        notify(
+          {
+            message: 'Server error. Please try again later.',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 2000,
+          },
+          'error',
+        );
       },
-      'error'
     );
-  }
-);
-
   }
 
   clearForm() {
@@ -1032,7 +1029,7 @@ const unitsPayload = selectedUnits.map(id => ({
     this.PackingData = {
       ART_NO: '',
       ORDER_NO: '',
-      ALIAS_NO:'',
+      ALIAS_NO: this.getAliasNo(),
       CATEGORY_ID: null,
       COLOR: '',
       DESCRIPTION: '',
@@ -1083,22 +1080,22 @@ const unitsPayload = selectedUnits.map(id => ({
     // };
 
     this.PackingData.ART_NO = '';
-  this.PackingData.ORDER_NO = '';
-  this.PackingData.CATEGORY_ID = null;
-  this.PackingData.COLOR = '';
-  this.PackingData.DESCRIPTION = '';
-  this.PackingData.ARTICLE_TYPE = null;
-  this.PackingData.PAIR_QTY = null;
-  this.PackingData.IS_INACTIVE = false;
-  this.PackingData.PART_NO = '';
-  this.PackingData.ART_SERIAL = '';
-  this.PackingData.COMBINATION = '2x4';
-  this.PackingData.PACK_PRICE = null;
-  this.PackingData.UNIT_ID = null;
-  this.PackingData.IS_PURCHASABLE = false;
-  this.PackingData.IS_EXPORT = false;
-  this.PackingData.IS_ANY_COMB = false;
-  this.PackingData.SUPP_ID = null;
+    this.PackingData.ORDER_NO = '';
+    this.PackingData.CATEGORY_ID = null;
+    this.PackingData.COLOR = '';
+    this.PackingData.DESCRIPTION = '';
+    this.PackingData.ARTICLE_TYPE = null;
+    this.PackingData.PAIR_QTY = null;
+    this.PackingData.IS_INACTIVE = false;
+    this.PackingData.PART_NO = '';
+    this.PackingData.ART_SERIAL = '';
+    this.PackingData.COMBINATION = '2x4';
+    this.PackingData.PACK_PRICE = null;
+    this.PackingData.UNIT_ID = null;
+    this.PackingData.IS_PURCHASABLE = false;
+    this.PackingData.IS_EXPORT = false;
+    this.PackingData.IS_ANY_COMB = false;
+    this.PackingData.SUPP_ID = null;
 
     this.formValidationGroup?.instance?.reset();
     this.ArtnoValidationGroup?.instance?.reset();
@@ -1124,13 +1121,13 @@ const unitsPayload = selectedUnits.map(id => ({
   }
   closePopup() {
     const preservedAliasNo = this.PackingData.ALIAS_NO;
-  const preservedEffectFrom = this.PackingData.STD_PRICE_EFFECT_FROM;
+    const preservedEffectFrom = this.PackingData.STD_PRICE_EFFECT_FROM;
     this.popupClosed.emit();
     console.log('this cancel close popup');
     this.resetForm();
     // restore preserved fields
-  this.PackingData.ALIAS_NO = preservedAliasNo;
-  this.PackingData.STD_PRICE_EFFECT_FROM = preservedEffectFrom;
+    this.PackingData.ALIAS_NO = preservedAliasNo;
+    this.PackingData.STD_PRICE_EFFECT_FROM = preservedEffectFrom;
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
     });
@@ -1197,37 +1194,34 @@ const unitsPayload = selectedUnits.map(id => ({
   }
 
   updateItemDescription() {
-  const companyCode = this.company_code || '';
+    const companyCode = this.company_code || '';
 
-  const brandName =
-    this.brandList?.find(
-      (b: any) => b.ID === this.PackingData.BRAND_ID
-    )?.DESCRIPTION || '';
+    const brandName =
+      this.brandList?.find((b: any) => b.ID === this.PackingData.BRAND_ID)
+        ?.DESCRIPTION || '';
 
-  const categoryName =
-    this.categoryList?.find(
-      (c: any) => c.ID === this.PackingData.CATEGORY_ID
-    )?.DESCRIPTION || '';
+    const categoryName =
+      this.categoryList?.find((c: any) => c.ID === this.PackingData.CATEGORY_ID)
+        ?.DESCRIPTION || '';
 
-  const artNo = this.PackingData.ART_NO || '';
-  const color = this.PackingData.COLOR || '';
-  const packing = this.PackingData.STANDARD_PACKING || '';
-  const price = this.PackingData.PACK_PRICE ?? '';
+    const artNo = this.PackingData.ART_NO || '';
+    const color = this.PackingData.COLOR || '';
+    const packing = this.PackingData.STANDARD_PACKING || '';
+    const price = this.PackingData.PACK_PRICE ?? '';
 
-  const parts = [
-    'FOOTWEARE',
-    companyCode,
-    brandName,
-    artNo,
-    color,
-    packing,
-    categoryName,
-    price
-  ].filter(p => p !== '' && p !== null && p !== undefined);
+    const parts = [
+      'FOOTWEARE',
+      companyCode,
+      brandName,
+      artNo,
+      color,
+      packing,
+      categoryName,
+      price,
+    ].filter((p) => p !== '' && p !== null && p !== undefined);
 
-  this.PackingData.DESCRIPTION = parts.join('-');
-}
-
+    this.PackingData.DESCRIPTION = parts.join('-');
+  }
 }
 
 @NgModule({

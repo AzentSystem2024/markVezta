@@ -27,11 +27,14 @@ import {
   DxSortableTypes,
 } from 'devextreme-angular/ui/sortable';
 import { DxTabPanelModule } from 'devextreme-angular';
+import { CustomReuseStrategy } from 'src/app/custome-reuse-strategy';
+import { RouteReuseStrategy } from '@angular/router';
 
 @Component({
   selector: 'app-side-nav-outer-toolbar',
   templateUrl: './side-nav-outer-toolbar.component.html',
   styleUrls: ['./side-nav-outer-toolbar.component.scss'],
+  providers: [DataService],
 })
 export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
   @ViewChild(DxScrollViewComponent, { static: true })
@@ -70,9 +73,10 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     public appInfo: AppInfoService,
     private cdr: ChangeDetectorRef,
     // private inactiveservice: InactivityService,
+    private reuseStrategy: RouteReuseStrategy,
+
     private dataService: DataService,
   ) {
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     this.routerSubscription = this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationEnd) {
         this.selectedRoute = event.urlAfterRedirects.split('?')[0];
@@ -238,20 +242,67 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     return true;
   }
 
+  //   closeButtonHandler(tab: any) {
+  //   const index = this.tabs.indexOf(tab);
+  //   const isCurrentRoute = this.router.url === tab.path;
+
+  //   if (index > -1) {
+  //     (this.reuseStrategy as CustomReuseStrategy).removeStoredComponent(tab.path);
+  //     this.tabs.splice(index, 1);
+
+  //     if (this.selectedIndex >= this.tabs.length) {
+  //       this.selectedIndex = this.tabs.length - 1;
+  //     }
+  //   }
+
+  //   if (isCurrentRoute && this.selectedIndex >= 0) {
+  //     const nextPath = this.tabs[this.selectedIndex].path;
+
+  //     // 🔥 normal navigation now destroys component
+  //     this.router.navigate([nextPath]);
+  //   }
+  // }
+
   closeButtonHandler(tab: any) {
     const index = this.tabs.indexOf(tab);
-    if (index > -1) {
-      this.tabs.splice(index, 1);
+    if (index === -1) return;
 
-      if (this.selectedIndex >= this.tabs.length) {
-        this.selectedIndex = this.tabs.length - 1;
-      }
-    }
-    if (this.selectedIndex >= 0) {
-      const selectedTab = this.tabs[this.selectedIndex];
-      let path = selectedTab.path;
-      this.router.navigate([path]);
+    const isCurrent = this.router.url.replace(/^\/+/, '') === tab.path;
+
+    // remove tab first from UI list
+    this.tabs.splice(index, 1);
+
+    if (this.tabs.length === 0) return;
+
+    // select last tab
+    this.selectedIndex = this.tabs.length - 1;
+    const nextPath = this.tabs[this.selectedIndex].path;
+
+    if (isCurrent) {
+      // 🔥 navigate to real remaining tab (forces detach/store)
+      this.router.navigate([nextPath]).then(() => {
+        (this.reuseStrategy as CustomReuseStrategy).removeStoredComponent(
+          tab.path,
+        );
+      });
     } else {
+      (this.reuseStrategy as CustomReuseStrategy).removeStoredComponent(
+        tab.path,
+      );
+    }
+  }
+
+  private finishClose(tab: any, index: number) {
+    (this.reuseStrategy as CustomReuseStrategy).removeStoredComponent(tab.path);
+
+    this.tabs.splice(index, 1);
+
+    if (this.selectedIndex >= this.tabs.length) {
+      this.selectedIndex = this.tabs.length - 1;
+    }
+
+    if (this.selectedIndex >= 0) {
+      this.router.navigate([this.tabs[this.selectedIndex].path]);
     }
   }
 }
