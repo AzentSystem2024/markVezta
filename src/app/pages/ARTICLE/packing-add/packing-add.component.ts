@@ -963,55 +963,53 @@ const unitsPayload = selectedUnits.map(id => ({
     // =====================================================
     //  API CALL
     // =====================================================
-    this.dataService.Add_packages_listapi(payload).subscribe(
-      (response: any) => {
-        console.log('PACKING DATA ADDED SUCCESSFULLY', response);
-        console.log('BOM Payload:', bomPayload);
+   this.dataService.Add_packages_listapi(payload).subscribe(
+  (res: any) => {
+    console.log('Add packing response:', res);
 
-        notify(
-          {
-            message: 'Data successfully added',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 800,
-          },
-          'success',
-        );
+    //  BUSINESS ERROR (duplicate etc.)
+    if (res?.flag === -1) {
+      notify(
+        {
+          message: res.Message || 'A similar record already exists.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 2000,
+        },
+        'error'
+      );
+      return; //  stop further execution
+    }
 
-        this.getPackingList();
-        // Close popup
-        this.popupClosed.emit();
-
-        // =====================================================
-        // 🔹 RESET FORMS & STATE
-        // =====================================================
-        setTimeout(() => this.formValidationGroup?.instance?.reset());
-        setTimeout(() => this.ArtnoValidationGroup?.instance?.reset());
-        setTimeout(() => this.ColorValidationGroup?.instance?.reset());
-        setTimeout(() => this.CategoryValidationGroup?.instance?.reset());
-        setTimeout(() => this.UnitValidationGroup?.instance?.reset());
-
-        this.articleSizeData = [];
-        this.combination_value = [];
-        this.totalQuantity = 0;
-
-        this.PackingData.IS_PURCHASABLE = false;
-        this.PackingData.IS_EXPORT = false;
-        this.PackingData.IS_ANY_COMB = false;
-        this.PackingData.SUPP_ID = null;
-
-        this.popupVisible = false;
+    //  SUCCESS
+    notify(
+      {
+        message: 'Data successfully added',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 800,
       },
-      (error) => {
-        console.error('Insert failed', error);
-        notify(
-          {
-            message: 'Failed to save packing data.',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-      },
+      'success'
     );
+
+    this.getPackingList();
+    this.popupClosed.emit();
+    this.popupVisible = false;
+
+    // optional resets if needed
+  },
+  (error) => {
+    console.error('HTTP error:', error);
+
+    notify(
+      {
+        message: 'Server error. Please try again later.',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 2000,
+      },
+      'error'
+    );
+  }
+);
+
   }
 
   clearForm() {
@@ -1062,26 +1060,44 @@ const unitsPayload = selectedUnits.map(id => ({
 
   resetForm() {
     console.log('Reset form called');
-    this.PackingData = {
-      ART_NO: '',
-      ORDER_NO: '',
-      CATEGORY_ID: null,
-      COLOR: '',
-      DESCRIPTION: '',
-      ARTICLE_TYPE: null,
-      PAIR_QTY: null,
-      IS_INACTIVE: false,
-      PART_NO: '',
-      ALIAS_NO: '',
-      ART_SERIAL: '',
-      COMBINATION: '2x4',
-      PACK_PRICE: null,
-      UNIT_ID: null,
-      IS_PURCHASABLE: false,
-      IS_EXPORT: false,
-      IS_ANY_COMB: false,
-      SUPP_ID: null,
-    };
+    // this.PackingData = {
+    //   ART_NO: '',
+    //   ORDER_NO: '',
+    //   CATEGORY_ID: null,
+    //   COLOR: '',
+    //   DESCRIPTION: '',
+    //   ARTICLE_TYPE: null,
+    //   PAIR_QTY: null,
+    //   IS_INACTIVE: false,
+    //   PART_NO: '',
+    //   ALIAS_NO: '',
+    //   ART_SERIAL: '',
+    //   COMBINATION: '2x4',
+    //   PACK_PRICE: null,
+    //   UNIT_ID: null,
+    //   IS_PURCHASABLE: false,
+    //   IS_EXPORT: false,
+    //   IS_ANY_COMB: false,
+    //   SUPP_ID: null,
+    // };
+
+    this.PackingData.ART_NO = '';
+  this.PackingData.ORDER_NO = '';
+  this.PackingData.CATEGORY_ID = null;
+  this.PackingData.COLOR = '';
+  this.PackingData.DESCRIPTION = '';
+  this.PackingData.ARTICLE_TYPE = null;
+  this.PackingData.PAIR_QTY = null;
+  this.PackingData.IS_INACTIVE = false;
+  this.PackingData.PART_NO = '';
+  this.PackingData.ART_SERIAL = '';
+  this.PackingData.COMBINATION = '2x4';
+  this.PackingData.PACK_PRICE = null;
+  this.PackingData.UNIT_ID = null;
+  this.PackingData.IS_PURCHASABLE = false;
+  this.PackingData.IS_EXPORT = false;
+  this.PackingData.IS_ANY_COMB = false;
+  this.PackingData.SUPP_ID = null;
 
     this.formValidationGroup?.instance?.reset();
     this.ArtnoValidationGroup?.instance?.reset();
@@ -1106,9 +1122,14 @@ const unitsPayload = selectedUnits.map(id => ({
     });
   }
   closePopup() {
+    const preservedAliasNo = this.PackingData.ALIAS_NO;
+  const preservedEffectFrom = this.PackingData.STD_PRICE_EFFECT_FROM;
     this.popupClosed.emit();
     console.log('this cancel close popup');
     this.resetForm();
+    // restore preserved fields
+  this.PackingData.ALIAS_NO = preservedAliasNo;
+  this.PackingData.STD_PRICE_EFFECT_FROM = preservedEffectFrom;
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
     });

@@ -414,26 +414,34 @@ this.isArticleFieldsDisabled = true;
 
     console.log('UNIT_ID after bind:', this.PackingData.UNIT_ID);
 
-      if (
-        this.PackingData.ART_NO &&
-        this.PackingData.COLOR &&
-        this.PackingData.CATEGORY_ID &&
-        this.PackingData.UNIT_ID
-      ) {
-        this.articleSizeData = this.PackingData.COMBINATION.split(',').map(
-          (item) => {
-            const [size, qty] = item.split('x').map(Number);
-            const articleEntry = this.PackingData.PackingEntries.find(
-              (entry) => entry.SIZE == size
-            );
-            return {
-              Size: (size),
-              Qty: qty,
-              ArticleID: articleEntry ? articleEntry.ARTICLE_ID : null,
-            };
-          }
-        );
-      }
+    if (
+  this.PackingData.ART_NO &&
+  this.PackingData.COLOR &&
+  this.PackingData.CATEGORY_ID &&
+  this.PackingData.UNIT_ID
+) {
+  this.articleSizeData = this.PackingData.COMBINATION
+    .split(',')
+    .map((item) => {
+      const [size, qty] = item.split('x').map(Number);
+
+      const articleEntry = this.PackingData.PackingEntries.find(
+        (entry) => Number(entry.SIZE) === size
+      );
+
+     return {
+  Size: Number(size),   // 🔥 ensure number
+  Qty: Number(qty),
+  ArticleID: articleEntry ? articleEntry.ARTICLE_ID : null,
+};
+
+    })
+    // 🔥 SORT SIZE ASCENDING (NUMERIC)
+    .sort((a, b) => a.Size - b.Size);
+}
+
+console.log(this.articleSizeData);
+
       console.log(this.articleSizeData);
       // this.totalQuantity = this.articleSizeData.reduce(
       //   (sum: number, item: any) => {

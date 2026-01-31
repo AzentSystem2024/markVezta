@@ -362,6 +362,7 @@
           [height]="'30vh'"
           [width]="'100%'"
           (onRowUpdated)="onQuantityChanged()"
+          [sorting]="{ mode: 'single' }"
           (onEditorPreparing)="onEditorPreparing($event)"
         >
           <dxi-column
@@ -372,6 +373,7 @@
             caption="Size"
             sortOrder="asc"
             alignment="center"
+            dataType="number"
           ></dxi-column>
           <dxi-column
             dataField="QUANTITY"
