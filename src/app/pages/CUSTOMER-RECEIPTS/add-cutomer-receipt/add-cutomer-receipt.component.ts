@@ -572,9 +572,17 @@ export class AddCutomerReceiptComponent {
       notify('Please select a customer', 'warning', 3000);
       return;
     }
+
     const selectedRows =
       this.itemsGridRef?.instance?.getSelectedRowsData() || [];
-
+    if (selectedRows.length === 0) {
+      notify(
+        'Please select at least one invoice before saving.',
+        'warning',
+        3000,
+      );
+      return; // ❌ STOP SAVE
+    }
     const validDetails = selectedRows
       .filter((row: any) => Number(row.RECEIVED_AMOUNT) > 0)
       .map((row: any) => ({

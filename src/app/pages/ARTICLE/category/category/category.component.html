@@ -332,11 +332,19 @@
           (click)="handleClose()"
         ></dx-button>
         <dx-button
-          text="Save"
+          [text]="isSaving ? 'Saving...' : 'Save'"
+          [disabled]="isSaving"
           type="default"
           stylingMode="contained"
           (onClick)="AddData()"
         ></dx-button>
+
+        <!-- <dx-button
+          text="Save"
+          type="default"
+          stylingMode="contained"
+          (onClick)="AddData()"
+        ></dx-button> -->
       </div>
     </form>
   </dx-validation-group>
@@ -534,11 +542,18 @@
           (click)="handleClose()"
         ></dx-button>
         <dx-button
-          text="Update"
+          [text]="isSaving ? 'Saving...' : 'Save'"
+          [disabled]="isSaving"
           type="default"
           stylingMode="contained"
           (onClick)="UpdateData()"
         ></dx-button>
+        <!-- <dx-button
+          text="Update"
+          type="default"
+          stylingMode="contained"
+          (onClick)="UpdateData()"
+        ></dx-button> -->
       </div>
     </form>
   </dx-validation-group>

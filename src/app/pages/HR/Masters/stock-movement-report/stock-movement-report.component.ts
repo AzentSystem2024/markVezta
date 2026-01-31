@@ -2,6 +2,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -84,6 +85,18 @@ export class StockMovementReportComponent {
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+  fromDate: Date | string | number;
+  toDate: Date | string | number;
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -93,9 +106,32 @@ export class StockMovementReportComponent {
     private dataService: DataService,
     private sanitizer: DomSanitizer,
     private exportService: ExportService,
+    private zone: NgZone,
   ) {
     this.sesstion_Details();
     this.get_Item_Dropdown();
+  }
+
+  ngOnInit() {
+    this.sesstion_Details();
+    this.get_Item_Dropdown();
+
+    // ✅ SET TODAY AS DEFAULT
+    const today = new Date();
+
+    this.fromDate = today;
+    this.toDate = today;
+
+    this.formatted_from_date = this.formatDate(today);
+    this.formatted_To_date = this.formatDate(today);
+  }
+
+  ngAfterViewInit() {
+    // ✅ Grid is now ready → show loading
+    setTimeout(() => {
+      this.dataGrid?.instance?.beginCustomLoading('Loading...');
+      this.getStockMovement();
+    });
   }
 
   sesstion_Details() {
@@ -130,6 +166,13 @@ export class StockMovementReportComponent {
       this.selectedstoreId,
       '===========selected store id===================',
     );
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.getStockMovement();
   }
   toggleFilters() {
     const grid = this.dataGrid?.instance;
@@ -192,26 +235,54 @@ export class StockMovementReportComponent {
   }
 
   getStockMovement() {
+    const grid = this.dataGrid?.instance;
+
+    grid?.beginCustomLoading('Loading...'); // optional but recommended
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
-      // STORE_ID: this.selectedstoreId,
       ITEM_TYPE: this.selected_item_Id || 0,
     };
-    console.log(payload, '================payload===================');
-    this.dataService.StockMovement_Api(payload).subscribe((res: any) => {
-      console.log(
-        res,
-        '=================Stock Movement Report===================',
-      );
-      this.StockMovementDatasource = res.data;
-      console.log(
-        this.StockMovementDatasource,
-        '=================Stock Movement Report DataSource===================',
-      );
+
+    this.dataService.StockMovement_Api(payload).subscribe({
+      next: (res: any) => {
+        this.StockMovementDatasource = res.data || [];
+
+        // 🔑 FORCE GRID REFRESH
+        grid?.refresh();
+      },
+      complete: () => {
+        grid?.endCustomLoading();
+      },
+      error: () => {
+        grid?.endCustomLoading();
+      },
     });
   }
+
+  // getStockMovement() {
+  //   const payload = {
+  //     COMPANY_ID: this.selected_Company_id,
+  //     DATE_FROM: this.formatted_from_date,
+  //     DATE_TO: this.formatted_To_date,
+  //     // STORE_ID: this.selectedstoreId,
+  //     ITEM_TYPE: this.selected_item_Id || 0,
+  //   };
+  //   console.log(payload, '================payload===================');
+  //   this.dataService.StockMovement_Api(payload).subscribe((res: any) => {
+  //     console.log(
+  //       res,
+  //       '=================Stock Movement Report===================',
+  //     );
+  //     this.StockMovementDatasource = res.data;
+  //     console.log(
+  //       this.StockMovementDatasource,
+  //       '=================Stock Movement Report DataSource===================',
+  //     );
+  //   });
+  // }
 
   summaryColumnsData = {
     totalItems: [

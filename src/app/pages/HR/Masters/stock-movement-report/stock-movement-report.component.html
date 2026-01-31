@@ -24,7 +24,7 @@
       [allowColumnResizing]="true"
       [columnResizingMode]="'nextColumn'"
       [filterRow]="{ visible: false }"
-      [headerFilter]="{ visible: false }"
+      [headerFilter]="{ visible: true }"
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
@@ -43,9 +43,14 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
 
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-header-filter
+        [visible]="true"
+        [allowSearch]="true"
+      ></dxo-header-filter>
+
       <!-- <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
@@ -86,6 +91,7 @@
             label="Date From"
             labelMode="floating"
             [displayFormat]="'dd-MM-yyyy'"
+            [(value)]="fromDate"
             (onValueChanged)="onFromDateChange($event)"
           ></dx-date-box>
         </dxi-item>
@@ -96,6 +102,7 @@
             label="Date To"
             labelMode="floating"
             [displayFormat]="'dd-MM-yyyy'"
+            [(value)]="toDate"
             (onValueChanged)="onToDateChange($event)"
           ></dx-date-box>
         </dxi-item>
@@ -110,7 +117,17 @@
             (onClick)="getStockMovement()"
           ></dx-button>
         </dxi-item>
-
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <!-- <dxi-item
           location="after"

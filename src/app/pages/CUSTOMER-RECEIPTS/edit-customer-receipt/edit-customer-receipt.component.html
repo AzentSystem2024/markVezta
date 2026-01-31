@@ -198,7 +198,7 @@
             type="normal"
             stylingMode="outlined"
             class="blue-outline-btn"
-            [disabled]="selectedRowsCount === 0"
+            [disabled]="selectedRowsCount === 0 || isReadOnlyMode"
             [elementAttr]="{
               class: selectedRowsCount === 0 ? 'disabled-button' : '',
             }"

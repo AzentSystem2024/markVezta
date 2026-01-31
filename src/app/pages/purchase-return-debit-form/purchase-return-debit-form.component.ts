@@ -175,7 +175,7 @@ export class PurchaseReturnDebitFormComponent {
     const userData = JSON.parse(userDataString);
     const selectedCompany = userData.SELECTED_COMPANY;
     console.log(userData, 'USERDATAAAAAAAAAAAAAAA');
-    // ⭐ SINGLE SOURCE OF TRUTH
+    // SINGLE SOURCE OF TRUTH
     this.selectedCompanyId = selectedCompany.COMPANY_ID;
     this.companyStateId = selectedCompany.STATE_ID;
     this.userID = userData.USER_ID;
@@ -203,6 +203,12 @@ export class PurchaseReturnDebitFormComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
+    });
   }
 
   isEditDataAvailable() {

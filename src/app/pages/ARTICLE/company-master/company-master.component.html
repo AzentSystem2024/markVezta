@@ -8,13 +8,14 @@
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
     [showColumnLines]="true"
-    (onRowRemoved)="delete_Data($event)"
+    (onRowRemoving)="delete_Data($event)"
     [height]="'82vh'"
     noDataText=" "
     (onEditingStart)="onEditingStart($event)"
     [scrolling]="{ mode: 'virtual' }"
     (onExporting)="onExporting($event)"
   >
+    <dxo-editing mode="row" [allowDeleting]="true"></dxo-editing>
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
@@ -363,14 +364,22 @@
         class="popup-btn cancel-btn"
         (onClick)="closePop()"
       ></dx-button>
-
       <dx-button
-        text="Save"
+        [text]="isSaving ? 'Saving...' : 'Save'"
+        [disabled]="isSaving"
         stylingMode="contained"
         type="default"
         class="popup-btn save-btn"
         (onClick)="addData()"
       ></dx-button>
+
+      <!-- <dx-button
+        text="Save"
+        stylingMode="contained"
+        type="default"
+        class="popup-btn save-btn"
+        (onClick)="addData()"
+      ></dx-button> -->
     </div>
   </div>
 </dx-popup>
@@ -623,12 +632,21 @@
       ></dx-button>
 
       <dx-button
+        [text]="isSaving ? 'Saving...' : 'Save'"
+        [disabled]="isSaving"
+        stylingMode="contained"
+        type="default"
+        class="popup-btn save-btn"
+        (onClick)="editData()"
+      ></dx-button>
+
+      <!-- <dx-button
         text="Save"
         stylingMode="contained"
         type="default"
         class="popup-btn save-btn"
-        (onClick)="addData()"
-      ></dx-button>
+        (onClick)="editData()"
+      ></dx-button> -->
     </div>
   </div>
 </dx-popup>

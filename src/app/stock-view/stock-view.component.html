@@ -104,6 +104,15 @@
       <dxi-column dataField="SUB_CATEGORY" caption="Sub Category"></dxi-column>
       <dxi-column dataField="BRAND" caption="Brand"></dxi-column>
       <dxi-column dataField="CURRENT_STOCK" caption="Stock"></dxi-column>
+      <dxo-summary>
+        <dxi-total-item
+          column="CURRENT_STOCK"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          alignment="right"
+        >
+        </dxi-total-item>
+      </dxo-summary>
     </dx-data-grid>
   </div>
 </div>
