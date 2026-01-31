@@ -499,7 +499,9 @@ export class CompanyMasterComponent {
   }
 
   delete_Data(event: any) {
+    console.log(event, 'delete event');
     const Id = event.data?.ID;
+    console.log('Deleting ID:', Id);
     this.dataservice.Delete_CompanyList_Api(Id).subscribe({
       next: (response) => {
         console.log('Delete Success:', response);

@@ -731,6 +731,19 @@ export class ArticleEditComponent {
       });
       return; // STOP API CALL
     }
+
+    if (!this.articleData.HSN_CODE) {
+          notify({
+            message: 'Please enter the HSN Code.',
+            type: 'warning',
+            displayTime: 3000,
+            position: { at: 'top right', my: 'top right' },
+          });
+          return;
+        }
+
+
+
     // Step 1: Collect selected sizes
     const selectedSizes =
       this.articleSizeData
@@ -902,6 +915,44 @@ export class ArticleEditComponent {
   closePopup() {
     this.popupClosed.emit();
   }
+
+  onArtNoChanged(e: any) {
+  let value = e.value || '';
+
+  // Enforce max length
+  if (value.length > 6) {
+    value = value.slice(0, 6);
+    e.component.option('value', value);
+  }
+
+  this.articleData.ART_NO = value;
+
+  // 🔥 Update description AFTER value is set
+  this.updateItemDescription();
+}
+
+    updateItemDescription() {
+  const artNo = this.articleData.ART_NO || '';
+  const color = this.articleData.COLOR || '';
+  const packing = this.articleData.STANDARD_PACKING || '';
+  const price = this.articleData.PRICE ?? '';
+
+  const categoryName =
+    this.categoryList?.find(c => c.ID === this.selectedCategoryId)
+      ?.DESCRIPTION || '';
+
+  // Build exact format
+  const parts = [
+    'SF',
+    artNo,
+    color,
+    packing,
+    categoryName,
+    price
+  ].filter(p => p !== '' && p !== null && p !== undefined);
+
+  this.articleData.DESCRIPTION = parts.join('-');
+}
 }
 
 @NgModule({

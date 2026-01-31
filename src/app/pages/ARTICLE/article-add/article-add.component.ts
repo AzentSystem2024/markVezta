@@ -141,12 +141,13 @@ export class ArticleAddComponent {
   ngOnInit() {
     this.sesstion_Details();
     this.getArticles();
+    this.getLastOrderNoOnAdd();
     if (this.selectedCategoryId) {
       this.getCategory();
     }
-    if (this.selectedProductionUnitId) {
+    // if (this.selectedProductionUnitId) {
       this.getLastOrderNo();
-    }
+    // }
     this.getAliasNo();
     this.getDropdownLists();
     this.getItems();
@@ -480,9 +481,9 @@ export class ArticleAddComponent {
           console.log(response, 'CATEGORYLIST');
           if (response?.flag === 1 && Array.isArray(response?.Data)) {
             this.articleSizeData = response.Data;
-            if (this.selectedProductionUnitId) {
+            // if (this.selectedProductionUnitId) {
               this.getLastOrderNo();
-            }
+            // }
           } else {
             this.articleSizeData = [];
           }
@@ -549,21 +550,21 @@ export class ArticleAddComponent {
   }
   onProductionUnitChanged(e: any) {
     this.selectedSizeRowData = []; // clear selected sizes
-    this.articleSizeData = this.articleSizeData.map((item: any) => ({
-      ...item,
-      ORDER_NO: null,
-    }));
+    // this.articleSizeData = this.articleSizeData.map((item: any) => ({
+    //   ...item,
+    //   ORDER_NO: null,
+    // }));
     // Build tooltip string for ADD form
     this.selectedUnitsTooltip = this.produCtionUnits
       ?.filter((u: any) => e.value.includes(u.ID))
       .map((u: any) => u.DESCRIPTION)
       .join(', ');
-    this.getLastOrderNo();
+    // this.getLastOrderNo();
   }
   getLastOrderNo() {
-    if (!this.selectedProductionUnitId) return;
+    // if (!this.selectedProductionUnitId) return;
     console.log(this.selectedProductionUnitId, 'SELECTEDPRODUCTIONUNITID');
-    const ids = this.selectedProductionUnitId.join(',');
+    // const ids = this.selectedProductionUnitId.join(',');
     const payload = { COMPANY_ID: 0 };
     this.dataService
       .getLastOrderNoForArticle(payload)
@@ -583,6 +584,28 @@ export class ArticleAddComponent {
         }
       });
   }
+
+  getLastOrderNoOnAdd() {
+  const payload = { COMPANY_ID: 0 };
+
+  this.dataService.getLastOrderNoForArticle(payload).subscribe((response: any) => {
+    const last = Number(response?.LastOrderNo ?? 0);
+    this.lastOrderNo = last;
+
+    let nextOrderNo = last + 1;
+
+    if (Array.isArray(this.articleSizeData)) {
+          // Sort by SIZE ascending
+          this.articleSizeData = this.articleSizeData
+            .sort((a, b) => a.SIZE - b.SIZE)
+            .map((item: any) => ({
+              ...item,
+              ORDER_NO: nextOrderNo++,
+            }));
+        }
+  });
+}
+
   openAttachPopup() {
     this.getArticles();
     this.isAttachPopupVisible = true;
@@ -680,7 +703,23 @@ export class ArticleAddComponent {
       input.value = input.value.slice(0, 6); // Trim visible input
       this.articleData.ART_NO = input.value; // Sync model
     }
+     
   }
+
+  onArtNoChanged(e: any) {
+  let value = e.value || '';
+
+  // Enforce max length
+  if (value.length > 6) {
+    value = value.slice(0, 6);
+    e.component.option('value', value);
+  }
+
+  this.articleData.ART_NO = value;
+
+  // 🔥 Update description AFTER value is set
+  this.updateItemDescription();
+}
 
   clearComponentArticleId() {
     this.articleData.COMPONENT_ARTICLE_ID = '';
@@ -820,6 +859,16 @@ export class ArticleAddComponent {
       return;
     }
 
+    // if (!this.articleData.BRAND_ID) {
+    //   notify({
+    //     message: 'Please select a Brand.',
+    //     type: 'warning',
+    //     displayTime: 3000,
+    //     position: { at: 'top right', my: 'top right' },
+    //   });
+    //   return;
+    // }
+
     if (!this.articleData.PACK_QTY) {
       notify({
         message: 'Please select the Packing Qty.',
@@ -857,6 +906,16 @@ export class ArticleAddComponent {
     if (!this.selectedSizeRowData || this.selectedSizeRowData.length === 0) {
       notify({
         message: 'Please select at least one size.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
+
+    if (!this.articleData.HSN_CODE) {
+      notify({
+        message: 'Please enter the HSN Code.',
         type: 'warning',
         displayTime: 3000,
         position: { at: 'top right', my: 'top right' },
@@ -1059,6 +1118,30 @@ export class ArticleAddComponent {
   closePopup() {
     this.popupClosed.emit();
   }
+
+  updateItemDescription() {
+  const artNo = this.articleData.ART_NO || '';
+  const color = this.articleData.COLOR || '';
+  const packing = this.articleData.STANDARD_PACKING || '';
+  const price = this.articleData.PRICE ?? '';
+
+  const categoryName =
+    this.categoryList?.find(c => c.ID === this.selectedCategoryId)
+      ?.DESCRIPTION || '';
+
+  // Build exact format
+  const parts = [
+    'SF',
+    artNo,
+    color,
+    packing,
+    categoryName,
+    price
+  ].filter(p => p !== '' && p !== null && p !== undefined);
+
+  this.articleData.DESCRIPTION = parts.join('-');
+}
+
 }
 
 @NgModule({

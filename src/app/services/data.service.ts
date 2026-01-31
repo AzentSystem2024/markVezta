@@ -166,6 +166,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
   }
 
+    getPackingLastAliasNo(): Observable<any> {
+    return this.http.post(`${this.apiUrl}packing/Lastaliasno`, {});
+  }
+
   insertArticle(items: any) {
     const data = items;
     // console.log(data,"insert service")
@@ -6175,6 +6179,16 @@ The result can be exported to HTML or Markdown.`;
   //==============PRODUCT IN BOX PRODUCTION=================
   get_Product_In_Bom_Production_Api(payload) {
     const getEndpoint = this.apiUrl + 'BoxProduction/packingbomlist';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  Insert_PackingPrice_Change_Api(payload){
+    const getEndpoint = this.apiUrl + 'Packing/InsertPackingPriceLog';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  View_PackingPrice_Change_Api(payload){
+    const getEndpoint = this.apiUrl + 'Packing/GetPackingPriceLog';
     return this.http.post(getEndpoint, payload);
   }
 }

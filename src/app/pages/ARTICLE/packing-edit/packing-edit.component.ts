@@ -95,7 +95,14 @@ export class PackingEditComponent {
   PackingEntriesData: any;
   selected_Company_id: any;
   selectedItemId: any;
-  
+  pricePopupVisible : boolean = false;
+  company_code:any;
+  ViewpricePopupVisible:any;
+  user_id:any;
+  stdPriceEffectFrom:any;
+  stdPrice:any;
+  priceHistoryList:any[]=[]
+
 
   constructor(private dataService: DataService) {
     this.sesstion_Details();
@@ -123,6 +130,11 @@ export class PackingEditComponent {
       this.selected_Company_id,
       '============selected_Company_id=============='
     );
+
+    this.company_code = sessionData.SELECTED_COMPANY.COMPANY_CODE;
+    console.log(this.company_code, '============company code==============');
+     this.user_id = sessionData.USER_ID;
+        console.log(this.user_id, '============user id==================');
   }
 
   closePopup() {
@@ -384,6 +396,8 @@ export class PackingEditComponent {
          ...incomingData,
       };
       console.log(this.PackingData, 'UPDATED PACKING DATA');
+                      this.totalQuantity=this.PackingData.PAIR_QTY
+                      console.log(this.totalQuantity)
 this.isArticleFieldsDisabled = true;
        if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
       // Backend → UI
@@ -421,13 +435,14 @@ this.isArticleFieldsDisabled = true;
         );
       }
       console.log(this.articleSizeData);
-      this.totalQuantity = this.articleSizeData.reduce(
-        (sum: number, item: any) => {
-          const qty = parseInt(item.Qty, 10);
-          return sum + (isNaN(qty) ? 0 : qty);
-        },
-        0
-      );
+      // this.totalQuantity = this.articleSizeData.reduce(
+      //   (sum: number, item: any) => {
+      //     const qty = parseInt(item.Qty, 10);
+      //     return sum + (isNaN(qty) ? 0 : qty);
+      //   },
+      //   0
+      // );
+      // console.log(this.totalQuantity)
     }
 
     // ===============================
@@ -498,6 +513,27 @@ this.isArticleFieldsDisabled = true;
         this.getDropdownLists();
   }
 
+ private normalizeDateOnly(value: any): string {
+  if (!value) return value;
+
+  // If already a string like "2026-02-07" or "2026-02-07T..."
+  if (typeof value === 'string') {
+    return value.substring(0, 10) + 'T00:00:00';
+  }
+
+  // If it's a Date object
+  if (value instanceof Date) {
+    const y = value.getFullYear();
+    const m = String(value.getMonth() + 1).padStart(2, '0');
+    const d = String(value.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}T00:00:00`;
+  }
+
+  return value;
+}
+
+
+
   UpdateData() {
     // const payload = this.PackingData;
     const validationResult = this.formValidationGroup?.instance?.validate();
@@ -507,6 +543,8 @@ this.isArticleFieldsDisabled = true;
       this.combinationString === undefined
         ? this.PackingData.COMBINATION
         : this.combinationString;
+
+        
 
          const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
     ? this.PackingData.UNIT_ID
@@ -529,6 +567,23 @@ this.isArticleFieldsDisabled = true;
     UNIT_ID: Number(id),
   }));
 
+
+  // ===============================
+  // 🔹 STD PRICE (SMART MERGE)
+  // ===============================
+  const finalStdPrice =
+    this.stdPrice !== null && this.stdPrice !== undefined
+      ? Number(this.stdPrice)
+      : this.PackingData.STD_PRICE;
+
+  const finalStdEffectFrom =
+  this.stdPriceEffectFrom
+    ? this.normalizeDateOnly(this.stdPriceEffectFrom)
+    : this.normalizeDateOnly(this.PackingData.STD_PRICE_EFFECT_FROM);
+
+
+
+
     // ===============================
     // 🔹 BUILD BOM PAYLOAD
     // ===============================
@@ -545,6 +600,8 @@ this.isArticleFieldsDisabled = true;
       ...this.PackingData,
       COMBINATION: combinationToUse,
       PAIR_QTY: this.totalQuantity,
+      STD_PRICE: finalStdPrice,
+    STD_PRICE_EFFECT_FROM: finalStdEffectFrom,
       UNIT_ID: mainUnitId,        // single main unit
     Units: unitsPayload,
       // ADD BOM HERE
@@ -903,6 +960,100 @@ onEditorPreparing(e: any) {
     .map(u => u.DESCRIPTION)
     .join(', ');
 }
+
+ updateItemDescription() {
+  const companyCode = this.company_code || '';
+
+  const brandName =
+    this.brandList?.find(
+      (b: any) => b.ID === this.PackingData.BRAND_ID
+    )?.DESCRIPTION || '';
+
+  const categoryName =
+    this.categoryList?.find(
+      (c: any) => c.ID === this.PackingData.CATEGORY_ID
+    )?.DESCRIPTION || '';
+
+  const artNo = this.PackingData.ART_NO || '';
+  const color = this.PackingData.COLOR || '';
+  const packing = this.PackingData.STANDARD_PACKING || '';
+  const price = this.PackingData.PACK_PRICE ?? '';
+
+  const parts = [
+    'FOOTWEARE',
+    companyCode,
+    brandName,
+    artNo,
+    color,
+    packing,
+    categoryName,
+    price
+  ].filter(p => p !== '' && p !== null && p !== undefined);
+
+  this.PackingData.DESCRIPTION = parts.join('-');
+}
+
+onChangePrice(){
+  this.pricePopupVisible = true;
+}
+onViewPriceHistory(){
+  const payload = {
+    PACKING_ID: Number(this.PackingData.ID)              // from packing select response
+  };
+  this.dataService.View_PackingPrice_Change_Api(payload).subscribe({
+    next: (res: any) => {
+      console.log(res,'responseeeeeeeeeee')
+      this.priceHistoryList = res.Data
+    }
+  })
+ this.ViewpricePopupVisible = true
+}
+
+savePriceChange() {
+  //  Basic safety checks
+  if (!this.PackingData?.ID) {
+    notify('Packing ID not found', 'error', 800);
+    return;
+  }
+
+  if (!this.PackingData.STD_PRICE || !this.PackingData.STD_PRICE_EFFECT_FROM) {
+    notify('Please enter price and effective date', 'warning', 800);
+    return;
+  }
+
+  // ✅ Build payload exactly as backend expects
+  const payload = {
+    ID: Number(this.PackingData.ID),                // from packing select response
+    STD_PRICE: this.PackingData.STD_PRICE,               // user input
+    STD_PRICE_EFFECT_FROM: this.PackingData.STD_PRICE_EFFECT_FROM,                         // user input
+    CHANGE_USER_ID: Number(this.user_id),            // from session
+  };
+
+  console.log('Price Change Payload:', payload);
+
+  // 🚀 Call API
+  this.dataService.Insert_PackingPrice_Change_Api(payload).subscribe({
+    next: (res: any) => {
+      console.log('Price change saved:', res);
+
+      notify(
+        {
+          message: 'Price updated successfully',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 800,
+        },
+        'success'
+      );
+
+      this.pricePopupVisible = false; // close popup
+    },
+    error: (err) => {
+      console.error('Price change error:', err);
+      notify('Failed to update price', 'error', 800);
+    },
+  });
+}
+
 }
 
 @NgModule({

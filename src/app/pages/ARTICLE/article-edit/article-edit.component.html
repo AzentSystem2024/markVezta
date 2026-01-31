@@ -14,6 +14,8 @@
             label="Art No."
             [(value)]="articleData.ART_NO"
             labelMode="floating"
+            (onInput)="updateItemDescription()"
+            (onValueChanged)="onArtNoChanged($event); updateItemDescription()"
             placeholder="Art No."
           ></dx-text-box>
         </div>
@@ -27,7 +29,7 @@
             valueExpr="DESCRIPTION"
             displayExpr="DESCRIPTION"
             [searchEnabled]="true"
-            (onValueChanged)="onColorChanged($event)"
+            (onValueChanged)="onColorChanged($event); updateItemDescription()"
           >
           </dx-select-box>
         </div>
@@ -42,7 +44,7 @@
             displayExpr="DESCRIPTION"
             [searchEnabled]="true"
             [(value)]="articleData.CATEGORY_ID"
-            (onValueChanged)="getCategory()"
+            (onValueChanged)="getCategory(); updateItemDescription()"
           >
           </dx-select-box>
         </div>
@@ -91,6 +93,7 @@
             placeholder="Price"
             [min]="0"
             [showSpinButtons]="true"
+            (onValueChanged)="updateItemDescription()"
           ></dx-number-box>
         </div>
         <div class="form-field">
@@ -99,6 +102,7 @@
             labelMode="floating"
             placeholder="Standard Packing"
             [(value)]="articleData.STANDARD_PACKING"
+            (onValueChanged)="updateItemDescription()"
           ></dx-text-box>
         </div>
         <div class="form-field">
@@ -133,6 +137,7 @@
             [(value)]="articleData.DESCRIPTION"
             labelMode="floating"
             placeholder="Item Description"
+            [readOnly]="true"
           ></dx-text-box>
         </div>
         <div class="form-field">

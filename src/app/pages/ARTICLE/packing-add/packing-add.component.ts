@@ -89,7 +89,8 @@ export class PackingAddComponent {
   showPageSizeSelector = true;
   isFilterRowVisible: boolean = false;
   items: any[] = []; // grid data → BoM components
-  itemsList: any[] = []; // dropdown source → item master list
+  itemsList: any[] = [];
+  company_code:any; // dropdown source → item master list
   PackingData: any = {
     ART_NO: '',
     ORDER_NO: '',
@@ -110,6 +111,8 @@ export class PackingAddComponent {
     IS_ANY_COMB: false,
     SUPP_ID: 0,
     COMPANY_ID: 0,
+    STD_PRICE:0,
+    STD_PRICE_EFFECT_FROM : new Date(),
     PackingEntries: [
       {
         ARTICLE_ID: 0,
@@ -142,6 +145,7 @@ export class PackingAddComponent {
     if (this.selectedProductionUnitId) {
       this.getLastOrderNo();
     }
+    this.getAliasNo();
     this.getItems();
     this.getPackingList();
   }
@@ -153,6 +157,15 @@ export class PackingAddComponent {
       console.log(this.packing_list, 'PACKINGLIST');
     });
   }
+
+  getAliasNo() {
+    this.dataService.getPackingLastAliasNo().subscribe((response: any) => {
+      console.log(response)
+      this.PackingData.ALIAS_NO = response.GetAliasNo;
+      console.log(this.PackingData.ALIAS_NO, 'ALIASNO');
+    });
+  }
+
   addNewRow() {
     const grid = this.itemsGridRef.instance; // reference to your dx-data-grid
     const rows = grid.getVisibleRows();
@@ -589,6 +602,10 @@ export class PackingAddComponent {
       this.selected_fin_id,
       '===========selected fin id===================',
     );
+
+    this.company_code = sessionData.SELECTED_COMPANY.COMPANY_CODE;
+    console.log(this.company_code, '============company code==============');
+
   }
   // AddData() {
   //   console.log(this.packing_list, '======================');
@@ -758,26 +775,36 @@ export class PackingAddComponent {
       return;
     }
 
-    const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
-      ? this.PackingData.UNIT_ID
-      : [];
+    // ===============================
+// 🔹 UNIT HANDLING (FIXED)
+// ===============================
+const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
+  ? this.PackingData.UNIT_ID
+  : this.PackingData.UNIT_ID
+  ? [this.PackingData.UNIT_ID]
+  : [];
 
-    if (!selectedUnits.length) {
-      notify(
-        {
-          message: 'Please select at least one Unit.',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 800,
-        },
-        'warning',
-      );
-      return;
-    }
+// 🚨 hard validation
+if (!selectedUnits.length) {
+  notify(
+    {
+      message: 'Please select at least one Unit',
+      position: { at: 'top right', my: 'top right' },
+      displayTime: 800,
+    },
+    'warning'
+  );
+  return;
+}
 
-    const mainUnitId = selectedUnits[0]; // 🔹 main UNIT_ID
-    const unitsPayload = selectedUnits.map((id) => ({
-      UNIT_ID: Number(id),
-    }));
+// ✅ Header UNIT_ID (single)
+const mainUnitId = Number(selectedUnits[0]);
+
+// ✅ Units array (multi)
+const unitsPayload = selectedUnits.map(id => ({
+  UNIT_ID: Number(id),
+}));
+
 
     //  Convert number fields to string as required by backend
     const Alias_no = Number(this.PackingData.ALIAS_NO);
@@ -950,6 +977,7 @@ export class PackingAddComponent {
           'success',
         );
 
+        this.getPackingList();
         // Close popup
         this.popupClosed.emit();
 
@@ -1005,6 +1033,7 @@ export class PackingAddComponent {
     this.PackingData = {
       ART_NO: '',
       ORDER_NO: '',
+      ALIAS_NO:'',
       CATEGORY_ID: null,
       COLOR: '',
       DESCRIPTION: '',
@@ -1012,7 +1041,7 @@ export class PackingAddComponent {
       PAIR_QTY: null,
       IS_INACTIVE: false,
       PART_NO: '',
-      ALIAS_NO: '',
+      // ALIAS_NO: '',
       ART_SERIAL: '',
       COMBINATION: '2x4',
       PACK_PRICE: null,
@@ -1144,6 +1173,39 @@ export class PackingAddComponent {
       .map((u) => u.DESCRIPTION)
       .join(', ');
   }
+
+  updateItemDescription() {
+  const companyCode = this.company_code || '';
+
+  const brandName =
+    this.brandList?.find(
+      (b: any) => b.ID === this.PackingData.BRAND_ID
+    )?.DESCRIPTION || '';
+
+  const categoryName =
+    this.categoryList?.find(
+      (c: any) => c.ID === this.PackingData.CATEGORY_ID
+    )?.DESCRIPTION || '';
+
+  const artNo = this.PackingData.ART_NO || '';
+  const color = this.PackingData.COLOR || '';
+  const packing = this.PackingData.STANDARD_PACKING || '';
+  const price = this.PackingData.PACK_PRICE ?? '';
+
+  const parts = [
+    'FOOTWEARE',
+    companyCode,
+    brandName,
+    artNo,
+    color,
+    packing,
+    categoryName,
+    price
+  ].filter(p => p !== '' && p !== null && p !== undefined);
+
+  this.PackingData.DESCRIPTION = parts.join('-');
+}
+
 }
 
 @NgModule({

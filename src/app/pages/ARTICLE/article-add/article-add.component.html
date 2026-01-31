@@ -17,6 +17,7 @@
             placeholder="Art No."
             [maxLength]="6"
             (onInput)="enforceArtNoLimit($event)"
+            (onValueChanged)="onArtNoChanged($event); updateItemDescription()"
           ></dx-text-box>
         </div>
         <div class="form-field">
@@ -29,7 +30,7 @@
             displayExpr="DESCRIPTION"
             [searchEnabled]="true"
             [(value)]="articleData.COLOR"
-            (onValueChanged)="onColorChanged($event)"
+            (onValueChanged)="onColorChanged($event); updateItemDescription()"
           >
           </dx-select-box>
         </div>
@@ -44,7 +45,7 @@
             displayExpr="DESCRIPTION"
             [searchEnabled]="true"
             [(value)]="selectedCategoryId"
-            (onValueChanged)="getCategory()"
+            (onValueChanged)="getCategory(); updateItemDescription()"
           >
           </dx-select-box>
         </div>
@@ -93,6 +94,7 @@
             placeholder="Price"
             [min]="0"
             [showSpinButtons]="true"
+            (onValueChanged)="updateItemDescription()"
           ></dx-number-box>
         </div>
         <div class="form-field">
@@ -101,6 +103,7 @@
             labelMode="floating"
             placeholder="Standard Packing"
             [(value)]="articleData.STANDARD_PACKING"
+            (onValueChanged)="updateItemDescription()"
           ></dx-text-box>
         </div>
         <div class="form-field">
@@ -135,6 +138,7 @@
             [(value)]="articleData.DESCRIPTION"
             labelMode="floating"
             placeholder="Item Description"
+           
           ></dx-text-box>
         </div>
         <div class="form-field">

@@ -310,7 +310,7 @@ export class PackingComponent {
 
   delete_Packing_Data(event: any) {
     const id = event.data.ID;
-
+    
     this.dataService.Delete_Package_Api(id).subscribe((res: any) => {
       console.log('response from delete packing api:', res);
       this.getPackingList();

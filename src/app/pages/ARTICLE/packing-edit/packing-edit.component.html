@@ -15,6 +15,7 @@
             labelMode="floating"
             placeholder="Art No."
             [disabled]="isArticleFieldsDisabled"
+            (onValueChanged)="updateItemDescription()"
             ><dx-validator>
               <dxi-validation-rule
                 type="required"
@@ -35,6 +36,7 @@
             displayExpr="DESCRIPTION"
             [searchEnabled]="true"
             [disabled]="isArticleFieldsDisabled"
+            (onValueChanged)="updateItemDescription()"
             ><dx-validator>
               <dxi-validation-rule
                 type="required"
@@ -56,6 +58,7 @@
             displayExpr="DESCRIPTION"
             [searchEnabled]="true"
             [disabled]="isArticleFieldsDisabled"
+            (onValueChanged)="updateItemDescription()"
             ><dx-validator>
               <dxi-validation-rule
                 type="required"
@@ -71,7 +74,7 @@
           <dx-tag-box
             label="Production Unit"
             labelMode="floating"
-            placeholder="Unit"
+            placeholder="Production Unit"
             [dataSource]="produCtionUnits"
             valueExpr="ID"
             displayExpr="DESCRIPTION"
@@ -131,6 +134,7 @@
           [(value)]="PackingData.BRAND_ID"
           valueExpr="ID"
           displayExpr="DESCRIPTION"
+          (onValueChanged)="updateItemDescription()"
           [searchEnabled]="true"
           ><dx-validator>
             <dxi-validation-rule
@@ -187,6 +191,7 @@
           [(value)]="PackingData.ALIAS_NO"
           labelMode="floating"
           placeholder="Item Code"
+          [readOnly]="true"
           ><dx-validator>
             <dxi-validation-rule
               type="required"
@@ -209,6 +214,7 @@
           [format]="'#,##0.##'"
           labelMode="floating"
           placeholder="Price"
+          (onValueChanged)="updateItemDescription()"
           [min]="0"
           [showSpinButtons]="true"
           ><dx-validator>
@@ -218,6 +224,59 @@
             ></dxi-validation-rule> </dx-validator
         ></dx-number-box>
       </div>
+
+      <div class="form-field">
+        <dx-number-box
+          label="Standered Price"
+          [format]="'#,##0.##'"
+          labelMode="floating"
+          placeholder="Standered Price"
+          [min]="0"
+          [showSpinButtons]="true"
+          [(value)]="PackingData.STD_PRICE"
+          [readOnly]="true"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-number-box>
+      </div>
+
+      <div class="form-field">
+        <dx-date-box
+          label="Effect From"
+          [displayFormat]="'dd/MM/yyyy'"
+          labelMode="floating"
+          placeholder="Effect From"
+          [(value)]="PackingData.STD_PRICE_EFFECT_FROM"
+          [showSpinButtons]="true"
+          [readOnly]="true"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-date-box>
+      </div>
+
+      <!-- Change Button -->
+      <dx-button
+        text="Change"
+        stylingMode="outlined"
+        type="default"
+        (onClick)="onChangePrice()"
+      >
+      </dx-button>
+
+      <!-- View Button -->
+      <dx-button
+        text="View"
+        stylingMode="outlined"
+        type="normal"
+        (onClick)="onViewPriceHistory()"
+      >
+      </dx-button>
 
       <!-- <div class="form-field">
     <dx-text-box
@@ -479,3 +538,129 @@
     ></dx-button>
   </div>
 </div>
+
+<dx-popup
+  [(visible)]="pricePopupVisible"
+  title="Change Standard Price"
+  [width]="420"
+  [height]="'auto'"
+  [showCloseButton]="true"
+  [dragEnabled]="false"
+  [hideOnOutsideClick]="true"
+>
+  <div class="popup-form">
+    <!-- Standard Price -->
+    <dx-number-box
+      label="Standered Price"
+      labelMode="floating"
+      [format]="'#,##0.##'"
+      [min]="0"
+      [showSpinButtons]="true"
+      [(value)]="PackingData.STD_PRICE"
+    >
+      <dx-validator>
+        <dxi-validation-rule
+          type="required"
+          message="Standard Price is required"
+        >
+        </dxi-validation-rule>
+      </dx-validator>
+    </dx-number-box>
+
+    <!-- Effect From -->
+    <dx-date-box
+      label="Effect From"
+      labelMode="floating"
+      [displayFormat]="'dd/MM/yyyy'"
+      [(value)]="PackingData.STD_PRICE_EFFECT_FROM"
+    >
+      <dx-validator>
+        <dxi-validation-rule type="required" message="Effect From is required">
+        </dxi-validation-rule>
+      </dx-validator>
+    </dx-date-box>
+
+    <!-- Buttons -->
+    <div class="popup-footer">
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        (onClick)="pricePopupVisible = false"
+      >
+      </dx-button>
+
+      <dx-button
+        text="Save"
+        type="default"
+        stylingMode="contained"
+        (onClick)="savePriceChange()"
+      >
+      </dx-button>
+    </div>
+  </div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="ViewpricePopupVisible"
+  title="Standard Price History"
+  [width]="650"
+  [height]="400"
+  [showCloseButton]="true"
+  [dragEnabled]="false"
+  [hideOnOutsideClick]="true"
+>
+  <dx-data-grid
+    [dataSource]="priceHistoryList"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [rowAlternationEnabled]="true"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
+    [columnResizingMode]="'nextColumn'"
+    [filterRow]="{ visible: false }"
+    [headerFilter]="{ visible: false }"
+    [scrolling]="{ mode: 'virtual' }"
+  >
+    <!-- Price -->
+    <dxi-column
+      dataField="STD_PRICE"
+      caption="Standard Price"
+      dataType="number"
+      format="#,##0.00"
+    >
+    </dxi-column>
+
+    <!-- Effect From -->
+    <dxi-column
+      dataField="STD_PRICE_EFFECT_FROM"
+      caption="Effect From"
+      dataType="date"
+      format="dd/MM/yyyy"
+    >
+    </dxi-column>
+
+    <!-- Created Time -->
+    <dxi-column
+      dataField="CREATED_TIME"
+      caption="Created On"
+      dataType="datetime"
+      format="dd/MM/yyyy HH:mm"
+    >
+    </dxi-column>
+
+    <!-- User -->
+    <dxi-column dataField="USER_NAME" caption="Changed By"> </dxi-column>
+  </dx-data-grid>
+
+  <!-- Footer -->
+  <div class="popup-footer">
+    <dx-button
+      text="Close"
+      stylingMode="outlined"
+      (onClick)="ViewpricePopupVisible = false"
+    >
+    </dx-button>
+  </div>
+</dx-popup>

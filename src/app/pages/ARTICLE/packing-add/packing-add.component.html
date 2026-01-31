@@ -15,6 +15,7 @@
             labelMode="floating"
             placeholder="Art No."
             [disabled]="isArticleFieldsDisabled"
+            (onValueChanged)="updateItemDescription()"
             ><dx-validator>
               <dxi-validation-rule
                 type="required"
@@ -35,6 +36,7 @@
             displayExpr="DESCRIPTION"
             [searchEnabled]="true"
             [disabled]="isArticleFieldsDisabled"
+            (onValueChanged)="updateItemDescription()"
             ><dx-validator>
               <dxi-validation-rule
                 type="required"
@@ -56,6 +58,7 @@
             displayExpr="DESCRIPTION"
             [searchEnabled]="true"
             [disabled]="isArticleFieldsDisabled"
+            (onValueChanged)="updateItemDescription()"
           >
             <dx-validator>
               <dxi-validation-rule
@@ -68,7 +71,7 @@
       </div>
       <div class="form-field">
         <dx-validation-group #UnitValidationGroup>
-          <dx-tag-box
+          <dx-select-box
             label="Production Unit"
             labelMode="floating"
             placeholder="Unit"
@@ -88,9 +91,24 @@
                 message="This field is required"
               ></dxi-validation-rule>
             </dx-validator>
-          </dx-tag-box>
+          </dx-select-box>
         </dx-validation-group>
       </div>
+
+      <div class="form-field">
+        <dx-number-box
+          label="Item Code"
+          [(value)]="PackingData.ALIAS_NO"
+          labelMode="floating"
+          placeholder="Item Code"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-number-box>
+      </div>
+
       <div class="form-field">
         <dx-text-box
           label="Item Description"
@@ -133,6 +151,7 @@
           valueExpr="ID"
           displayExpr="DESCRIPTION"
           [searchEnabled]="true"
+          (onValueChanged)="updateItemDescription()"
           ><dx-validator>
             <dxi-validation-rule
               type="required"
@@ -182,19 +201,7 @@
             ></dxi-validation-rule> </dx-validator
         ></dx-number-box>
       </div>
-      <div class="form-field">
-        <dx-number-box
-          label="Item Code"
-          [(value)]="PackingData.ALIAS_NO"
-          labelMode="floating"
-          placeholder="Item Code"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-number-box>
-      </div>
+
       <!-- <div class="form-field">
       <dx-number-box
         label="Total Pair Qty"
@@ -210,11 +217,29 @@
     </div> -->
       <div class="form-field">
         <dx-number-box
-          label="Price"
+          label="MRP"
           [(value)]="PackingData.PACK_PRICE"
           [format]="'#,##0.##'"
           labelMode="floating"
-          placeholder="Price"
+          placeholder="MRP"
+          [min]="0"
+          [showSpinButtons]="true"
+          (onValueChanged)="updateItemDescription()"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-number-box>
+      </div>
+
+      <div class="form-field">
+        <dx-number-box
+          label="Standered Price"
+          [format]="'#,##0.##'"
+          labelMode="floating"
+          placeholder="Standered Price"
+          [(value)]="PackingData.STD_PRICE"
           [min]="0"
           [showSpinButtons]="true"
           ><dx-validator>
@@ -223,6 +248,22 @@
               message="This field is required"
             ></dxi-validation-rule> </dx-validator
         ></dx-number-box>
+      </div>
+
+      <div class="form-field">
+        <dx-date-box
+          label="Effect From"
+          [displayFormat]="'dd/MM/yyyy'"
+          labelMode="floating"
+          placeholder="Effect From"
+          [(value)]="PackingData.STD_PRICE_EFFECT_FROM"
+          [showSpinButtons]="true"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-date-box>
       </div>
 
       <!-- <div class="form-field">
