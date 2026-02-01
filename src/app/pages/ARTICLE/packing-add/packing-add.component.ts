@@ -104,6 +104,7 @@ export class PackingAddComponent {
     ALIAS_NO: '',
     ART_SERIAL: '',
     COMBINATION: '',
+    STANDARD_PACKING:'',
     PACK_PRICE: null,
     UNIT_ID: null,
     IS_PURCHASABLE: false,
@@ -1058,44 +1059,28 @@ export class PackingAddComponent {
 
   resetForm() {
     console.log('Reset form called');
-    // this.PackingData = {
-    //   ART_NO: '',
-    //   ORDER_NO: '',
-    //   CATEGORY_ID: null,
-    //   COLOR: '',
-    //   DESCRIPTION: '',
-    //   ARTICLE_TYPE: null,
-    //   PAIR_QTY: null,
-    //   IS_INACTIVE: false,
-    //   PART_NO: '',
-    //   ALIAS_NO: '',
-    //   ART_SERIAL: '',
-    //   COMBINATION: '2x4',
-    //   PACK_PRICE: null,
-    //   UNIT_ID: null,
-    //   IS_PURCHASABLE: false,
-    //   IS_EXPORT: false,
-    //   IS_ANY_COMB: false,
-    //   SUPP_ID: null,
-    // };
-
-    this.PackingData.ART_NO = '';
-    this.PackingData.ORDER_NO = '';
-    this.PackingData.CATEGORY_ID = null;
-    this.PackingData.COLOR = '';
-    this.PackingData.DESCRIPTION = '';
-    this.PackingData.ARTICLE_TYPE = null;
-    this.PackingData.PAIR_QTY = null;
-    this.PackingData.IS_INACTIVE = false;
-    this.PackingData.PART_NO = '';
-    this.PackingData.ART_SERIAL = '';
-    this.PackingData.COMBINATION = '2x4';
-    this.PackingData.PACK_PRICE = null;
-    this.PackingData.UNIT_ID = null;
-    this.PackingData.IS_PURCHASABLE = false;
-    this.PackingData.IS_EXPORT = false;
-    this.PackingData.IS_ANY_COMB = false;
-    this.PackingData.SUPP_ID = null;
+     const preservedAliasNo = this.PackingData.ALIAS_NO;
+    this.PackingData = {
+      ART_NO: '',
+      ORDER_NO: '',
+      CATEGORY_ID: null,
+      COLOR: '',
+      DESCRIPTION: '',
+      ARTICLE_TYPE: null,
+      PAIR_QTY: null,
+      IS_INACTIVE: false,
+      PART_NO: '',
+      ALIAS_NO: preservedAliasNo,
+      ART_SERIAL: '',
+      COMBINATION: '2x4',
+      PACK_PRICE: null,
+      UNIT_ID: null,
+      IS_PURCHASABLE: false,
+      IS_EXPORT: false,
+      IS_ANY_COMB: false,
+      SUPP_ID: null,
+      STD_PRICE_EFFECT_FROM: new Date()
+    };
 
     this.formValidationGroup?.instance?.reset();
     this.ArtnoValidationGroup?.instance?.reset();
@@ -1120,14 +1105,13 @@ export class PackingAddComponent {
     });
   }
   closePopup() {
-    const preservedAliasNo = this.PackingData.ALIAS_NO;
-    const preservedEffectFrom = this.PackingData.STD_PRICE_EFFECT_FROM;
+    const aliasNo = this.PackingData.ALIAS_NO;
     this.popupClosed.emit();
     console.log('this cancel close popup');
     this.resetForm();
-    // restore preserved fields
-    this.PackingData.ALIAS_NO = preservedAliasNo;
-    this.PackingData.STD_PRICE_EFFECT_FROM = preservedEffectFrom;
+    this.PackingData.ALIAS_NO = aliasNo;                 // keep alias
+  this.PackingData.STD_PRICE_EFFECT_FROM = new Date();
+    // restore preserved field
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
     });

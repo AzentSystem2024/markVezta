@@ -234,6 +234,22 @@
       </div>
 
       <div class="form-field">
+        <dx-text-box
+          label="Standered Packing"
+          [(value)]="PackingData.STANDARD_PACKING"
+          labelMode="floating"
+          placeholder="Standered Packing"
+          [showSpinButtons]="true"
+          (onValueChanged)="updateItemDescription()"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+
+      <div class="form-field">
         <dx-number-box
           label="Standered Price"
           [format]="'#,##0.##'"
