@@ -1029,7 +1029,7 @@ export class PackingAddComponent {
     this.PackingData = {
       ART_NO: '',
       ORDER_NO: '',
-      ALIAS_NO: this.getAliasNo(),
+      ALIAS_NO: '',
       CATEGORY_ID: null,
       COLOR: '',
       DESCRIPTION: '',

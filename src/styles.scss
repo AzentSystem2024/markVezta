@@ -752,13 +752,18 @@ body {
 }
 
 .dx-treeview-search {
-  margin-bottom: 5px;
-  margin-top: 13px;
-  margin-right: 10px;
-  margin-left: 10px;
-  border-radius: 32px !important;
+  margin-top: 0px !important;
   background-color: white !important;
 }
+
+// .dx-treeview-search {
+//   margin-bottom: 5px;
+//   margin-top: 13px;
+//   margin-right: 10px;
+//   margin-left: 10px;
+//   border-radius: 32px !important;
+//   background-color: white !important;
+// }
 
 // ::ng-deep.dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected {
 //     background-color: var(--sub-menu-bg-color) !important;
@@ -944,10 +949,10 @@ body {
   }
 
   .dx-tabs-styling-mode-secondary
-.dx-tab.dx-tab-selected
-.dx-tab-content::after {
-  display: block !important;
-}
+    .dx-tab.dx-tab-selected
+    .dx-tab-content::after {
+    display: block !important;
+  }
 
   /* ❌ Also remove hover underline on text if theme applies it */
   .dx-tab:hover .dx-tab-text::before,
@@ -1044,4 +1049,3 @@ body {
   justify-content: center;
   align-items: normal;
 }
-

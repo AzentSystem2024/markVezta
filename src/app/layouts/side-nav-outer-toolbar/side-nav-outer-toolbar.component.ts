@@ -48,6 +48,8 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
 
   selectedRoute = '';
 
+  private lastScrollTop = 0;
+
   menuOpened!: boolean;
 
   temporaryMenuOpened = false;

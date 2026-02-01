@@ -70,12 +70,29 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
 
     const node = find(this.internalItems);
 
-    if (node) {
-      setTimeout(() => {
-        this.menu.instance.selectItem(node);
-        this.menu.instance.expandItem(node);
-      }, 0);
-    }
+    if (!node) return;
+
+    setTimeout(() => {
+      // select leaf
+      this.menu.instance.selectItem(node);
+
+      // find parent group
+      const parent = this.internalItems.find((g) =>
+        g.items?.some((i) => i.path === path),
+      );
+
+      if (parent) {
+        // 🔥 expand correct group
+        this.menu.instance.expandItem(parent);
+
+        // 🔥 collapse all others
+        this.internalItems.forEach((group) => {
+          if (group !== parent) {
+            this.menu.instance.collapseItem(group);
+          }
+        });
+      }
+    }, 0);
   }
 
   // refreshMenu() {
@@ -226,6 +243,19 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
     }
 
     this.selectedItemChanged.emit(e); // ✅ tabs / parent logic
+  }
+
+  onItemExpanded(e: any) {
+    const expandedItem = e.itemData;
+
+    // Only act on MAIN menus (level 1)
+    if (!expandedItem?.items) return;
+
+    this.internalItems.forEach((item) => {
+      if (item !== expandedItem) {
+        this.menu.instance.collapseItem(item);
+      }
+    });
   }
 
   ngAfterViewInit() {
