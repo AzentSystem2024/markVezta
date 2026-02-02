@@ -91,13 +91,13 @@
           cssClass="export-btn"
         ></dxi-item>
 
-        <dxi-item
+        <!-- <dxi-item
           *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
-        ></dxi-item>
+        ></dxi-item> -->
       </dxo-toolbar>
       <div *dxTemplate="let data of 'dateFilterTemplate'">
         <dx-select-box
@@ -117,6 +117,11 @@
       <dxi-column
         dataField="DN_NO"
         caption="Delivery No."
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="REF_NO"
+        caption="Reference No."
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
@@ -148,6 +153,7 @@
       <dxi-column
         dataField="TOTAL_QTY"
         caption="Total Qty"
+        dataType="number"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
@@ -162,6 +168,15 @@
         }"
       >
       </dxi-column>
+      <dxo-summary>
+        <dxi-total-item
+          column="TOTAL_QTY"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          alignment="right"
+        >
+        </dxi-total-item>
+      </dxo-summary>
     </dx-data-grid>
   </div>
 </div>

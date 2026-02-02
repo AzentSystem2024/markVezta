@@ -59,14 +59,14 @@
                     [(value)]="invoiceFormData.DOC_NO"
                     label="Invoice No."
                     labelMode="floating"
-                    [width]="148"
+                    [width]="185"
                   ></dx-text-box>
                   <dx-text-box
                     #invoiceBoxRef
                     label="Reference No."
                     labelMode="floating"
                     [(value)]="invoiceFormData.REF_NO"
-                    [width]="148"
+                    [width]="185"
                   ></dx-text-box>
                 </div>
                 <div
@@ -81,20 +81,29 @@
                   <!-- Radio Group -->
 
                   <!-- Company Select -->
-
+                  <dx-date-box
+                    label="Transaction Date"
+                    [(value)]="invoiceFormData.SALE_DATE"
+                    type="date"
+                    labelMode="floating"
+                    [width]="375"
+                    [displayFormat]="'dd-MM-yyyy'"
+                    [readOnly]="true"
+                    style="margin-top: -1px"
+                  ></dx-date-box>
                   <!-- Distributor Select -->
-                  <dx-select-box
+                  <!-- <dx-select-box
                     [(value)]="invoiceFormData.DISTRIBUTOR_ID"
                     [dataSource]="distributorList"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
-                    [width]="300"
+                    [width]="375"
                     label="Customer"
                     labelMode="floating"
                     style="margin-top: -1px"
                     (onValueChanged)="onDistributorChanged($event)"
                   >
-                  </dx-select-box>
+                  </dx-select-box> -->
                 </div>
               </div>
             </dxi-item>
@@ -112,13 +121,24 @@
                     text="Fill Pending Deliveries"
                     icon="event"
                     (onClick)="openTrOutSelector()"
-                    [width]="200"
+                    [width]="375"
                     stylingMode="outlined"
                     class="blue-outline-btn"
                   ></dx-button>
                 </div>
                 <div style="display: flex; gap: 2px; margin-bottom: 0">
-                  <dx-date-box
+                  <dx-select-box
+                    [(value)]="invoiceFormData.DISTRIBUTOR_ID"
+                    [dataSource]="distributorList"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="375"
+                    label="Customer"
+                    labelMode="floating"
+                    (onValueChanged)="onDistributorChanged($event)"
+                  >
+                  </dx-select-box>
+                  <!-- <dx-date-box
                     label="Transaction Date"
                     [(value)]="invoiceFormData.SALE_DATE"
                     type="date"
@@ -126,7 +146,7 @@
                     [width]="200"
                     [displayFormat]="'dd-MM-yyyy'"
                     [readOnly]="true"
-                  ></dx-date-box>
+                  ></dx-date-box> -->
                 </div>
               </div>
             </dxi-item>
