@@ -16,8 +16,9 @@
       [allowColumnResizing]="true"
       [editing]="{
         mode: 'cell',
-        allowUpdating: true
+        allowUpdating: true,
       }"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
       [selectedRowKeys]="selectedRowKeys"
       (onSelectionChanged)="onSelectionChanged($event)"
       [keyExpr]="'ID'"
