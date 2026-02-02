@@ -194,39 +194,70 @@ export class DeliveryNoteComponent {
     this.dataService.getdeliveryNoteViewist(payload).subscribe({
       next: (response: any) => {
         this.deliveryNoteList = (response.Data || [])
-          .map((item: any) => {
-            let dateValue: Date;
-
-            if (
-              typeof item.DN_DATE === 'string' &&
-              /^\d{2}-\d{2}-\d{4}$/.test(item.DN_DATE)
-            ) {
-              const [day, month, year] = item.DN_DATE.split('-').map(Number);
-              dateValue = new Date(year, month - 1, day);
-            } else {
-              dateValue = new Date(item.DN_DATE);
-            }
-
-            return {
-              ...item,
-              DN_DATE: dateValue,
-            };
-          })
+          .map((item: any) => ({
+            ...item,
+            DN_DATE: new Date(item.DN_DATE),
+          }))
           .sort((a: any, b: any) => {
             const numA = parseInt(a.DN_NO.split('/').pop(), 10);
             const numB = parseInt(b.DN_NO.split('/').pop(), 10);
             return numB - numA;
           });
 
-        // ✅ same pattern everywhere
         this.filteredDeliveryList = this.deliveryNoteList;
       },
-      error: () => {},
-      complete: () => {
-        grid?.endCustomLoading();
-      },
+      complete: () => grid?.endCustomLoading(),
     });
   }
+
+  // getDeliveryNotes() {
+  //   const grid = this.dataGrid?.instance;
+  //   grid?.beginCustomLoading('Loading...');
+
+  //   const { fromDate, toDate } = this.getDateRange();
+
+  //   const payload = {
+  //     COMPANY_ID: this.selected_Company_id,
+  //     DATE_FROM: fromDate,
+  //     DATE_TO: toDate,
+  //   };
+
+  //   this.dataService.getdeliveryNoteViewist(payload).subscribe({
+  //     next: (response: any) => {
+  //       this.deliveryNoteList = (response.Data || [])
+  //         .map((item: any) => {
+  //           let dateValue: Date;
+
+  //           if (
+  //             typeof item.DN_DATE === 'string' &&
+  //             /^\d{2}-\d{2}-\d{4}$/.test(item.DN_DATE)
+  //           ) {
+  //             const [day, month, year] = item.DN_DATE.split('-').map(Number);
+  //             dateValue = new Date(year, month - 1, day);
+  //           } else {
+  //             dateValue = new Date(item.DN_DATE);
+  //           }
+
+  //           return {
+  //             ...item,
+  //             DN_DATE: dateValue,
+  //           };
+  //         })
+  //         .sort((a: any, b: any) => {
+  //           const numA = parseInt(a.DN_NO.split('/').pop(), 10);
+  //           const numB = parseInt(b.DN_NO.split('/').pop(), 10);
+  //           return numB - numA;
+  //         });
+
+  //       // ✅ same pattern everywhere
+  //       this.filteredDeliveryList = this.deliveryNoteList;
+  //     },
+  //     error: () => {},
+  //     complete: () => {
+  //       grid?.endCustomLoading();
+  //     },
+  //   });
+  // }
 
   private getDateRange(): { fromDate: string | null; toDate: string | null } {
     const today = new Date();
@@ -333,8 +364,28 @@ export class DeliveryNoteComponent {
     this.customStartDate = null;
     this.customEndDate = null;
 
+    // ✅ CALL API WITH DATE_FROM & DATE_TO
     this.getDeliveryNotes();
   }
+
+  // onDateRangeChanged(e: any) {
+  //   this.selectedDateRange = e.value;
+
+  //   if (e.value === 'custom') {
+  //     this.showCustomDatePopup = true;
+  //     return;
+  //   }
+
+  //   // reset custom label
+  //   this.dateRanges = this.dateRanges.map((option) =>
+  //     option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+  //   );
+
+  //   this.customStartDate = null;
+  //   this.customEndDate = null;
+
+  //   this.getDeliveryNotes();
+  // }
 
   applyDateFilter() {
     if (!this.selectedDateRange || !this.deliveryNoteList) {
@@ -389,7 +440,7 @@ export class DeliveryNoteComponent {
     if (!this.customStartDate || !this.customEndDate) return;
 
     if (this.customStartDate > this.customEndDate) {
-      alert('From date cannot be greater than To date');
+      notify('From date cannot be greater than To date', 'error', 2000);
       return;
     }
 
@@ -405,8 +456,32 @@ export class DeliveryNoteComponent {
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
 
+    // ✅ CALL API WITH DATE_FROM & DATE_TO
     this.getDeliveryNotes();
   }
+
+  // applyCustomDateFilter() {
+  //   if (!this.customStartDate || !this.customEndDate) return;
+
+  //   if (this.customStartDate > this.customEndDate) {
+  //     alert('From date cannot be greater than To date');
+  //     return;
+  //   }
+
+  //   const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+  //   const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+
+  //   this.dateRanges = this.dateRanges.map((option) =>
+  //     option.value === 'custom'
+  //       ? { ...option, label: `${fromLabel} - ${toLabel}` }
+  //       : option,
+  //   );
+
+  //   this.selectedDateRange = 'custom';
+  //   this.showCustomDatePopup = false;
+
+  //   this.getDeliveryNotes();
+  // }
 
   private parseDateString(dateStr: string): Date {
     if (!dateStr || typeof dateStr !== 'string') {
