@@ -191,10 +191,9 @@
   text-align: center;
 }
 
-
 ::ng-deep .fixed-footer {
-  padding: 8px 20px 8px;   /* tighter than before */
-  margin-top: 4px;        /* reduced top gap */
+  padding: 8px 20px 8px; /* tighter than before */
+  margin-top: 4px; /* reduced top gap */
 }
 
 /* Right aligned buttons */
@@ -218,19 +217,19 @@
 }
 
 /* Cancel button */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-normal.dx-button-outlined {
+::ng-deep .popup-footer .dx-button.dx-button-normal.dx-button-outlined {
   background-color: #ffffff;
   border-color: #cfcfcf;
   color: #333333;
 }
 
 /* Save button */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-default.dx-button-contained {
+::ng-deep .popup-footer .dx-button.dx-button-default.dx-button-contained {
   background-color: #0d6efd;
   border-color: #0d6efd;
   color: #ffffff;
+}
+/* Force new row before Standard Price */
+.standard-pack-row {
+  grid-column-start: 1; /* start new row */
 }
