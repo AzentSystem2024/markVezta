@@ -235,10 +235,10 @@
 
       <div class="form-field standard-pack-row">
         <dx-text-box
-          label="Standered Packing"
+          label="Standard Packing"
           [(value)]="PackingData.STANDARD_PACKING"
           labelMode="floating"
-          placeholder="Standered Packing"
+          placeholder="Standard Packing"
           [showSpinButtons]="true"
           (onValueChanged)="updateItemDescription()"
           ><dx-validator>
@@ -253,10 +253,10 @@
 
       <div class="form-field">
         <dx-number-box
-          label="Standered Price"
+          label="Standard Price"
           [format]="'#,##0.##'"
           labelMode="floating"
-          placeholder="Standered Price"
+          placeholder="Standard Price"
           [(value)]="PackingData.STD_PRICE"
           [min]="0"
           [showSpinButtons]="true"
@@ -438,6 +438,7 @@
             labelMode="floating"
             [(value)]="totalQuantity"
             placeholder="Quantity"
+            [readOnly]="true"
           ></dx-number-box>
         </div>
 
