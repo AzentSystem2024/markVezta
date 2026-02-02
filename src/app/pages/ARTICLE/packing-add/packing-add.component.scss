@@ -230,6 +230,6 @@
   color: #ffffff;
 }
 /* Force new row before Standard Price */
-.form-field.break-row {
-  grid-column: 1 / -1;
+.standard-pack-row {
+  grid-column-start: 1; /* start new row */
 }
