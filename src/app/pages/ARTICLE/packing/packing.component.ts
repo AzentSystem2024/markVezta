@@ -304,6 +304,7 @@ export class PackingComponent {
   }
 
   delete_Packing_Data(event: any) {
+    console.log(event)
     const id = event.data.ID;
     event.cancel = true;
     this.dataService.Delete_Package_Api(id).subscribe((res: any) => {
