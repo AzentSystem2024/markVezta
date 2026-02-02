@@ -535,59 +535,6 @@ export class CreditNoteListComponent {
     }
   }
 
-  // onEditCreditNote(event: any) {
-  //   event.cancel = true; // Prevent default popup editing
-  //   const creditId = event.data.TRANS_ID;
-  //   this.CreditNoteid = event.data.TRANS_ID;
-  //   this.selectedCredit = creditId;
-  //   const transStatus = event.data.TRANS_STATUS;
-  //   console.log(event, 'transstatus');
-
-  //   this.dataService.selectCreditNote(creditId).subscribe((response: any) => {
-  //     console.log(response)
-  //     this.selectedCreditNote = response.Data;
-  //     console.log(this.selectedCreditNote)
-  //     if (transStatus === 5) {
-  //       // Open view popup
-  //       this.isViewCreditNote = true;
-  //     } else {
-  //       // Open edit popup
-  //       this.isEditCreditNote = true;
-  //     }
-  //     console.log(this.selectedCreditNote, 'SELECTEDJOURNALVOUCHERRRRRRRRRR');
-  //   });
-  // }
-
-  // onEditCreditNote(event: any) {
-  //   console.log(event, 'eventtttttttttttttt');
-  //   event.cancel = true; // Prevent default popup editing
-  //   const creditId = event.data.TRANS_ID;
-  //   this.CreditNoteid = event.data.TRANS_ID;
-  //   this.selectedCredit = creditId;
-  //   const transStatus = event.data.TRANS_STATUS;
-  //   console.log(event, 'transstatus');
-
-  //   this.dataService
-  //     .selectCreditNote(this.CreditNoteid)
-  //     .subscribe((response: any) => {
-  //       console.log(response, 'FINAL RESPONSE');
-
-  //       this.selectedCreditNote = response.Data;
-
-  //       if (transStatus === 5) {
-  //         // Open view popup
-  //         this.isViewCreditNote = true;
-  //       } else {
-  //         // Open edit popup
-  //         this.isEditCreditNote = true;
-  //       }
-  //       console.log(
-  //         this.selectedCreditNote,
-  //         'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-  //       );
-  //     });
-  // }
-
   onEditCreditNote(event: any) {
     console.log(event, 'eventtttttttttttttt');
     event.cancel = true; // Prevent default popup editing

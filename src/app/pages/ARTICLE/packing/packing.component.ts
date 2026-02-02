@@ -55,7 +55,6 @@ import DataSource from 'devextreme/data/data_source';
   styleUrls: ['./packing.component.scss'],
 })
 export class PackingComponent {
-
   @ViewChild(PackingAddComponent)
   PackingAddComponent!: PackingAddComponent;
   @ViewChild(DxDataGridComponent, { static: true })
@@ -73,7 +72,6 @@ export class PackingComponent {
   PackingDataSource: DataSource;
   packingArray: any[] = [];
   packingCount = 0;
-
 
   addPackingPopupVisible: boolean = false;
   editPackPopupOpened: boolean = false;
@@ -115,7 +113,6 @@ export class PackingComponent {
     onClick: () => this.toggleFilters(),
   };
 
- 
   selected_Company_id: any;
 
   constructor(
@@ -130,7 +127,7 @@ export class PackingComponent {
     console.log('Current URL:', currentUrl);
   }
 
-   refreshButtonOptions = {
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
@@ -139,7 +136,6 @@ export class PackingComponent {
     },
     text: '',
   };
-
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -277,44 +273,43 @@ export class PackingComponent {
       '============selected_Company_id==============',
     );
   }
-  
+
   getPackingList() {
-  this.PackingDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataService.get_packages_list_api().subscribe({
-          next: (res: any) => {
-            const list = (res?.Data || []).map(
-              (item: any, index: number) => ({
-                ...item,
-                SNO: index + 1,
-              }),
-            );
+    this.PackingDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.get_packages_list_api().subscribe({
+            next: (res: any) => {
+              const list = (res?.Data || []).map(
+                (item: any, index: number) => ({
+                  ...item,
+                  SNO: index + 1,
+                }),
+              );
 
-            // 🔑 cache for logic
-            this.packingArray = list;
-            this.packingCount = list.length;
+              // 🔑 cache for logic
+              this.packingArray = list;
+              this.packingCount = list.length;
 
-            resolve(list); // 🔑 grid receives data
-          },
-          error: () => {
-            this.packingArray = [];
-            this.packingCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(list); // 🔑 grid receives data
+            },
+            error: () => {
+              this.packingArray = [];
+              this.packingCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   delete_Packing_Data(event: any) {
     const id = event.data.ID;
-    
+    event.cancel = true;
     this.dataService.Delete_Package_Api(id).subscribe((res: any) => {
       console.log('response from delete packing api:', res);
-      this.getPackingList();
-      this.dataGrid.instance.refresh();
+
+      // this.dataGrid.instance.refresh();
       notify(
         {
           message: 'Data succesfully added',
@@ -323,6 +318,7 @@ export class PackingComponent {
         },
         'success',
       );
+      this.getPackingList();
     });
   }
 
