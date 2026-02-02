@@ -29,6 +29,7 @@ import {
 import { DxTabPanelModule } from 'devextreme-angular';
 import { CustomReuseStrategy } from 'src/app/custome-reuse-strategy';
 import { RouteReuseStrategy } from '@angular/router';
+import { InactivityService } from 'src/app/services/inactivity.service';
 
 @Component({
   selector: 'app-side-nav-outer-toolbar',
@@ -74,7 +75,7 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     private router: Router,
     public appInfo: AppInfoService,
     private cdr: ChangeDetectorRef,
-    // private inactiveservice: InactivityService,
+    private inactiveservice: InactivityService,
     private reuseStrategy: RouteReuseStrategy,
 
     private dataService: DataService,
@@ -84,6 +85,7 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
         this.selectedRoute = event.urlAfterRedirects.split('?')[0];
       }
     });
+    inactiveservice.startTheInactiveService();
   }
 
   ngOnInit() {

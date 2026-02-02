@@ -36,6 +36,10 @@ export class AuthService {
     return !!this._user;
   }
 
+  get isTokenValid(): boolean {
+    return !!sessionStorage.getItem('authToken');
+  }
+
   private _lastAuthenticatedPath: string = defaultPath;
 
   set lastAuthenticatedPath(value: string) {
@@ -141,7 +145,7 @@ export class AuthService {
 
   async logOut() {
     // Navigate to login route
-    await this.router.navigate(['/auth/login']);
+    await this.router.navigate(['/auth/login'], { replaceUrl: true });
 
     // Clear local storage items
     localStorage.removeItem('menuData');
@@ -221,7 +225,8 @@ export class AuthGuardService implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
-    const isLoggedIn = this.authService.loggedIn;
+    const isLoggedIn = this.authService.isTokenValid;
+
     const isAuthForm = [
       'login',
       'reset-password',
@@ -229,15 +234,11 @@ export class AuthGuardService implements CanActivate {
       'change-password/:recoveryCode',
     ].includes(route.routeConfig?.path || defaultPath);
 
-    // if (!isLoggedIn && isAuthForm) {
-    //   this.router.navigate(['/auth/login']);
-    // }
-
-    if (isLoggedIn) {
-      this.authService.lastAuthenticatedPath =
-        route.routeConfig?.path || defaultPath;
+    if (!isLoggedIn && !isAuthForm) {
+      this.router.navigate(['/auth/login'], { replaceUrl: true });
+      return false;
     }
 
-    return isLoggedIn || isAuthForm;
+    return true;
   }
 }

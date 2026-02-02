@@ -13,7 +13,7 @@
       rowAlternationInterval="2"
       [editing]="{
         mode: 'cell',
-        allowUpdating: true
+        allowUpdating: true,
       }"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
       keyExpr="ID"
@@ -66,7 +66,7 @@
             valueExpr="ID"
             [(value)]="selectedStoreId"
             displayExpr="STORE_NAME"
-            label="Select Store"
+            label="Select Items"
             labelMode="floating"
             labelLocation="left"
             [showSelectionControls]="true"
@@ -116,7 +116,6 @@
         </dxi-item>
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
           <dx-button
-            *ngIf="!isSaved && !isVerified"
             text="Save"
             stylingMode="contained"
             type="default"
@@ -179,7 +178,7 @@
         [allowEditing]="false"
       ></dxi-column>
 
-      <dxi-column caption="Price" [width]="120" alignment="center">
+      <dxi-column caption="MRP" [width]="120" alignment="center">
         <dxi-column
           dataField="SALE_PRICE"
           caption="Present"
@@ -199,7 +198,7 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 1" [width]="120" alignment="center">
+      <dxi-column caption="Standard Price" [width]="120" alignment="center">
         <dxi-column
           dataField="SALE_PRICE1"
           caption="Present"
