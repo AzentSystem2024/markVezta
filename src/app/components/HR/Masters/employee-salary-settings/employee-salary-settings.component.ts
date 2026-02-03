@@ -244,7 +244,7 @@ export class EmployeeSalarySettingsComponent {
     const BatchId = e.data.BATCH_ID;
     console.log(employeeId, 'Selected Employee ID for Edit');
     this.editEmployeePopupOpened = true;
-    // ✅ Format EFFECT_FROM to 'yyyy-MM-dd'
+    //  Format EFFECT_FROM to 'yyyy-MM-dd'
     const formattedEffectFrom = formatDate(EffectFrom, 'yyyy-MM-dd', 'en-US');
     const payload = {
       EMP_ID: employeeId,

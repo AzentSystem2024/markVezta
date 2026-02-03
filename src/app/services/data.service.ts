@@ -207,10 +207,13 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/update`, data);
   }
 
-
-  deleteArticle(id: number) {
-    return this.http.post<any>(`${this.apiUrl}article/delete/` + id, {});
+  deleteArticle(payload) {
+    return this.http.post<any>(`${this.apiUrl}article/delete`, payload);
   }
+
+  // deleteArticle(id: number) {
+  //   return this.http.post<any>(`${this.apiUrl}article/delete/` + id, {});
+  // }
 
   //JOURNAL VOUCHER
   getJournalVoucherList(items: any): Observable<any> {

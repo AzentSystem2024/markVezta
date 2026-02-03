@@ -70,61 +70,6 @@
       </div>
 
       <div class="form-field">
-        <dx-validation-group #UnitValidationGroup>
-          <dx-tag-box
-            label="Production Unit"
-            labelMode="floating"
-            placeholder="Production Unit"
-            [dataSource]="produCtionUnits"
-            valueExpr="ID"
-            displayExpr="DESCRIPTION"
-            [searchEnabled]="true"
-            [selectAllMode]="'allPages'"
-            [(value)]="PackingData.UNIT_ID"
-            [showSelectionControls]="true"
-            [hint]="selectedUnitsHint"
-            [disabled]="isArticleFieldsDisabled"
-            ><dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="This field is required"
-              ></dxi-validation-rule>
-            </dx-validator>
-          </dx-tag-box>
-        </dx-validation-group>
-      </div>
-
-       <div class="form-field">
-        <dx-text-box
-          label="Item Code"
-          [(value)]="PackingData.ALIAS_NO"
-          labelMode="floating"
-          placeholder="Item Code"
-          [readOnly]="true"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
-      </div>
-
-      <div class="form-field">
-        <dx-text-box
-          label="Item Description"
-          [(value)]="PackingData.DESCRIPTION"
-          labelMode="floating"
-          [readOnly]="true"
-          placeholder="Art No."
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
-      </div>
-
-      <div class="form-field">
         <dx-select-box
           label="Type"
           labelMode="floating"
@@ -163,12 +108,31 @@
       </div>
 
       <div class="form-field">
-        <dx-text-box
-          label="Packing Order No."
-          [(value)]="PackingData.ORDER_NO"
+        <dx-number-box
+          label="MRP"
+          [(value)]="PackingData.PACK_PRICE"
+          [format]="'#,##0.##'"
           labelMode="floating"
-           [readOnly]="true"
-          placeholder="Packing Order No."
+          placeholder="MRP"
+          (onValueChanged)="updateItemDescription()"
+          [min]="0"
+          [showSpinButtons]="true"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-number-box>
+      </div>
+
+      <div class="form-field">
+        <dx-text-box
+          label="Standard Packing"
+          [(value)]="PackingData.STANDARD_PACKING"
+          labelMode="floating"
+          placeholder="Standard Packing"
+          [showSpinButtons]="true"
+          (onValueChanged)="updateItemDescription()"
           ><dx-validator>
             <dxi-validation-rule
               type="required"
@@ -176,6 +140,21 @@
             ></dxi-validation-rule> </dx-validator
         ></dx-text-box>
       </div>
+
+      <div class="form-field">
+        <dx-text-box
+          label="Description"
+          [(value)]="PackingData.DESCRIPTION"
+          labelMode="floating"
+          placeholder="Description"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+
       <div class="form-field">
         <dx-text-box
           label="Serial No."
@@ -204,7 +183,76 @@
             ></dxi-validation-rule> </dx-validator
         ></dx-text-box>
       </div>
-     
+
+      <div class="form-field">
+        <dx-text-box
+          label="Item Code"
+          [(value)]="PackingData.ALIAS_NO"
+          labelMode="floating"
+          placeholder="Item Code"
+          [readOnly]="true"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+
+      <div class="form-field">
+        <dx-text-box
+          label="Item Description"
+          [(value)]="PackingData.ITEM_DESCRIPTION"
+          labelMode="floating"
+          [readOnly]="true"
+          placeholder="Art No."
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+
+      <div class="form-field">
+        <dx-validation-group #UnitValidationGroup>
+          <dx-select-box
+            label="Production Unit"
+            labelMode="floating"
+            placeholder="Production Unit"
+            [dataSource]="produCtionUnits"
+            valueExpr="ID"
+            displayExpr="DESCRIPTION"
+            [searchEnabled]="true"
+            [selectAllMode]="'allPages'"
+            [(value)]="PackingData.UNIT_ID"
+            [showSelectionControls]="true"
+            [hint]="selectedUnitsHint"
+            ><dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="This field is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </dx-validation-group>
+      </div>
+
+      <div class="form-field">
+        <dx-text-box
+          label="Packing Order No."
+          [(value)]="PackingData.ORDER_NO"
+          labelMode="floating"
+          [readOnly]="true"
+          placeholder="Packing Order No."
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+
       <!-- <div class="form-field">
     <dx-number-box
       label="Total Pair Qty"
@@ -213,39 +261,6 @@
       placeholder="Total Pair Qty"
     ></dx-number-box>
   </div> -->
-      <div class="form-field">
-        <dx-number-box
-          label="MRP"
-          [(value)]="PackingData.PACK_PRICE"
-          [format]="'#,##0.##'"
-          labelMode="floating"
-          placeholder="MRP"
-          (onValueChanged)="updateItemDescription()"
-          [min]="0"
-          [showSpinButtons]="true"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-number-box>
-      </div>
-
-      <div class="form-field standard-pack-row">
-        <dx-text-box
-          label="Standard Packing"
-          [(value)]="PackingData.STANDARD_PACKING"
-          labelMode="floating"
-          placeholder="Standard Packing"
-          [showSpinButtons]="true"
-          (onValueChanged)="updateItemDescription()"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
-      </div>
 
       <div class="form-field">
         <dx-number-box
