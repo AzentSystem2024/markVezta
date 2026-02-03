@@ -582,6 +582,27 @@ export class EditInvoiceComponent {
     this.logGridSummaries();
   }
 
+  onTrOutPopupClose() {
+    // Restore original data
+    this.invoiceGridList = [...this.staticTransfers];
+
+    if (this.popupGridRef?.instance) {
+      const grid = this.popupGridRef.instance;
+
+      // ✅ Clears filter row AND header filter
+      grid.clearFilter();
+
+      // ✅ Clear row selections
+      grid.clearSelection();
+
+      // ✅ Reset paging
+      grid.pageIndex(0);
+
+      // ✅ Refresh grid
+      grid.refresh();
+    }
+  }
+
   cancelPopup() {
     this.popupClosed.emit();
   }

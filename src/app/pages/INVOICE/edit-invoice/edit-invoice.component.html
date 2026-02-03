@@ -131,11 +131,11 @@
           </dxo-toolbar>
 
           <dxi-column
-            dataField="TRANSFER_NO"
+            dataField="DN_NO"
             [caption]="
               invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
                 ? 'Item Code'
-                : 'Transfer No'
+                : 'Delivery No'
             "
           ></dxi-column>
           <dxi-column
@@ -336,6 +336,7 @@
   title="Invoice Pending Deliveries"
   [dragEnabled]="true"
   [closeOnOutsideClick]="true"
+  (onHiding)="onTrOutPopupClose()"
 >
   <div *dxTemplate="let data of 'content'">
     <dx-data-grid
@@ -396,28 +397,31 @@
 
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
       </dxo-toolbar>
-      <dxi-column
+      <!-- <dxi-column
         dataField="TRANSFER_NO"
         [caption]="
           invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
             ? 'Item Code'
             : 'Transfer No'
         "
-      ></dxi-column>
+      ></dxi-column> -->
+      <dxi-column dataField="REF_NO" caption="Reference No"></dxi-column>
+      <dxi-column dataField="DN_NO" caption="Delivery No"></dxi-column>
       <dxi-column
         dataField="DATE"
         caption="Date"
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column
+      <dxi-column dataField="ARTICLE" caption="Description"></dxi-column>
+      <!-- <dxi-column
         dataField="ARTICLE"
         [caption]="
           invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
             ? 'Item Description'
             : 'Article'
         "
-      ></dxi-column>
+      ></dxi-column> -->
       <dxi-column
         dataField="TOTAL_PAIR_QTY"
         caption="Qty"

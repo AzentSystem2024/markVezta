@@ -128,11 +128,11 @@
           </dxo-toolbar>
 
           <dxi-column
-            dataField="TRANSFER_NO"
+            dataField="DN_NO"
             [caption]="
               invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
                 ? 'Item Code'
-                : 'Transfer No'
+                : 'Delivery No'
             "
             [width]="120"
           ></dxi-column>
@@ -426,21 +426,23 @@
             : 'Delivery No'
         "
       ></dxi-column> -->
-      <dxi-column dataField="REF_NO" caption="Delivery No"></dxi-column>
+      <dxi-column dataField="REF_NO" caption="Reference No"></dxi-column>
+      <dxi-column dataField="DN_NO" caption="Delivery No"></dxi-column>
       <dxi-column
         dataField="TRANSFER_DATE"
         caption="Date"
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column
+      <dxi-column dataField="ARTICLE" caption="Description"></dxi-column>
+      <!-- <dxi-column
         dataField="ARTICLE"
         [caption]="
           invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
             ? 'Item Descriptiom'
             : 'Article'
         "
-      ></dxi-column>
+      ></dxi-column> -->
       <dxi-column
         dataField="TOTAL_PAIR_QTY"
         caption="Qty"

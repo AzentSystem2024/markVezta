@@ -167,7 +167,10 @@ export class EmployeeAddFormComponent {
         amount: null,
       }));
     });
-    dataservice.getDropdownData('EMPLOYEE DEPARTMENT').subscribe((data) => {
+    const dept_payload = {
+      NAME: 'EMPLOYEE DEPARTMENT',
+    };
+    dataservice.getDropdownData(dept_payload).subscribe((data) => {
       this.departments = data;
     });
     const payload = {

@@ -482,9 +482,23 @@ export class AddInvoiceComponent {
   }
 
   onPopupHiding() {
+    // Restore original data
+    this.invoiceGridList = [...this.staticTransfers];
+
     if (this.popupGridRef?.instance) {
-      this.popupGridRef.instance.clearSelection(); // ✅ clear selected rows
-      this.popupGridRef.instance.refresh(); // ✅ refresh grid datasource
+      const grid = this.popupGridRef.instance;
+
+      // ✅ Clears filter row AND header filter
+      grid.clearFilter();
+
+      // ✅ Clear row selections
+      grid.clearSelection();
+
+      // ✅ Reset paging
+      grid.pageIndex(0);
+
+      // ✅ Refresh grid
+      grid.refresh();
     }
   }
 
