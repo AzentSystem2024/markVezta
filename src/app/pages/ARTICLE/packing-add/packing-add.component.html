@@ -100,6 +100,7 @@
           label="Item Code"
           [(value)]="PackingData.ALIAS_NO"
           labelMode="floating"
+          [readOnly]="true"
           placeholder="Item Code"
           ><dx-validator>
             <dxi-validation-rule
@@ -114,6 +115,7 @@
           label="Item Description"
           [(value)]="PackingData.DESCRIPTION"
           labelMode="floating"
+          [readOnly]="true"
           placeholder="Item Description"
         >
           <dx-validator>
@@ -166,6 +168,7 @@
           label="Packing Order No."
           [(value)]="PackingData.ORDER_NO"
           labelMode="floating"
+           [readOnly]="true"
           placeholder="Packing Order No."
           ><dx-validator>
             <dxi-validation-rule
@@ -194,6 +197,7 @@
           [(value)]="PackingData.PART_NO"
           labelMode="floating"
           placeholder="Part No."
+         
           ><dx-validator>
             <dxi-validation-rule
               type="required"
