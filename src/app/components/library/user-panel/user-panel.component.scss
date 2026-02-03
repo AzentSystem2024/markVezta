@@ -52,3 +52,44 @@
     }
   }
 }
+
+::ng-deep .user-button .dx-button-text {
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  background: #1a73e8; /* Google blue */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0;
+}
+
+::ng-deep .user-button.dx-button {
+  padding: 0 !important;
+  min-width: auto;
+}
+
+/* Remove DevExtreme hover background */
+::ng-deep .user-button.dx-button.dx-state-hover {
+  background: transparent !important;
+}
+
+/* Remove focus / active backgrounds */
+::ng-deep .user-button.dx-button.dx-state-focused,
+::ng-deep .user-button.dx-button.dx-state-active {
+  background: transparent !important;
+}
+
+/* Ensure container has zero padding */
+::ng-deep .user-button.dx-button,
+::ng-deep .user-button .dx-button-content {
+  padding: 0 !important;
+}
+
+/* Circle hover only */
+::ng-deep .user-button .dx-button-text:hover {
+  box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.15);
+}

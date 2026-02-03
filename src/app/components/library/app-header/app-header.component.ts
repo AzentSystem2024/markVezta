@@ -54,6 +54,7 @@ export class AppHeaderComponent implements OnInit {
   ];
   company: any;
   version: any;
+  userInitials = '';
 
   constructor(
     private authService: AuthService,
@@ -68,15 +69,33 @@ export class AppHeaderComponent implements OnInit {
     this.version = this.dataservice.get_version();
   }
 
+  private getInitials(name: string): string {
+    if (!name) return '';
+
+    return name
+      .trim()
+      .split(/\s+/)
+      .map((w) => w[0])
+      .join('')
+      .toUpperCase();
+  }
+
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(
-      sessionData.SELECTED_COMPANY.COMPANY_NAME,
-      '=================session data==========',
-    );
+
     this.UserName = sessionData.USER_NAME;
-    console.log(this.UserName, 'Username');
     this.company = sessionData.SELECTED_COMPANY.COMPANY_NAME;
+
+    const initials = this.UserName?.trim()
+      .split(/\s+/)
+      .map((x) => x[0])
+      .join('')
+      .toUpperCase();
+
+    this.user = {
+      ...this.user,
+      initials,
+    };
   }
 
   changePassword() {
