@@ -239,3 +239,10 @@
   display: flex;
   gap: 15px;
 }
+::ng-deep .blue-outline-btn.dx-button .dx-icon {
+  color: #007bff !important; /* blue icon */
+}
+::ng-deep .blue-outline-btn.dx-button {
+  border: 1px solid #007bff !important; /* blue border */
+  // color: #007bff !important;           /* blue text */
+}

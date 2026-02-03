@@ -3,13 +3,13 @@
     *ngIf="menuMode === 'context'"
     stylingMode="text"
     dropDownContentTemplate="dropDownTemplate"
-    [icon]="user?.avatarUrl"
+    [text]="user?.initials"
     [showArrowIcon]="false"
     [elementAttr]="{
-      class: 'user-button'
+      class: 'user-button',
     }"
     [dropDownOptions]="{
-      width: 'auto'
+      width: 'auto',
     }"
     (onContentReady)="handleDropDownButtonContentReady($event)"
   >

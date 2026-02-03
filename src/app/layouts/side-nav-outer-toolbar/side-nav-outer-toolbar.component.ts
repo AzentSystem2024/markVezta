@@ -126,73 +126,81 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     return this.menuMode === 'overlap' || this.temporaryMenuOpened;
   }
 
-  get showMenuAfterClick() {
-    return !this.menuOpened;
-  }
+  // get showMenuAfterClick() {
+  //   return !this.menuOpened;
+  // }
 
-  // navigationChanged(event: DxTreeViewTypes.ItemClickEvent) {
-  //   const path = (event.itemData as any).path;
-  //   const pointerEvent = event.event;
-
-  //   if (path && this.menuOpened) {
-  //     if (event.node?.selected) {
-  //       pointerEvent?.preventDefault();
-  //     } else {
-  //       this.router.navigate([path]);
-  //     }
-
-  //     if (this.hideMenuAfterNavigation) {
-  //       this.temporaryMenuOpened = false;
-  //       this.menuOpened = false;
-  //       pointerEvent?.stopPropagation();
-  //     }
-  //   } else {
-  //     pointerEvent?.preventDefault();
-  //   }
+  //   get showMenuAfterClick() {
+  //   return !this.menuOpened;
   // }
 
   navigationChanged(event: DxTreeViewTypes.ItemClickEvent) {
-    console.log('SIDENAVMENUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU');
-    console.log('Menu clicked:', event);
+    const path = (event.itemData as any)?.path;
+    const title = (event.itemData as any)?.text;
 
-    const path = (event.itemData as any).path;
-    const title = (event.itemData as any).text;
+    if (!path) return;
 
-    const pointerEvent = event.event;
-
-    if (path) {
-      const tabExists = this.tabs.some((tab) => tab.path === path);
-      console.log('Tab exists?', tabExists);
-
-      if (!tabExists) {
-        this.tabs.push({ title, path });
-        console.log('Tab added:', { title, path });
-      }
-
-      this.selectedIndex = this.tabs.findIndex((tab) => tab.path === path);
-      console.log('Selected index:', this.selectedIndex);
-
-      this.router.navigate([path]);
-      if (this.menuOpened) {
-        pointerEvent?.preventDefault();
-      }
-
-      this.cdr.detectChanges();
-    } else {
-      pointerEvent?.preventDefault();
+    const tabExists = this.tabs.some((tab) => tab.path === path);
+    if (!tabExists) {
+      this.tabs.push({ title, path });
     }
 
-    if (this.showMenuAfterClick) {
-      this.temporaryMenuOpened = true;
-    }
+    this.selectedIndex = this.tabs.findIndex((tab) => tab.path === path);
+    this.router.navigate([path]);
 
-    // close ONLY on mobile (overlap mode)
-    if (path && this.menuMode === 'overlap') {
+    // 🔥 IMPORTANT FIX
+    this.temporaryMenuOpened = false;
+
+    // close ONLY on mobile overlap
+    if (this.menuMode === 'overlap') {
       this.menuOpened = false;
-      pointerEvent?.stopPropagation();
-      this.cdr.detectChanges();
     }
+
+    this.cdr.detectChanges();
   }
+
+  // navigationChanged(event: DxTreeViewTypes.ItemClickEvent) {
+  //   console.log('SIDENAVMENUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU');
+  //   console.log('Menu clicked:', event);
+
+  //   const path = (event.itemData as any).path;
+  //   const title = (event.itemData as any).text;
+
+  //   const pointerEvent = event.event;
+
+  //   if (path) {
+  //     const tabExists = this.tabs.some((tab) => tab.path === path);
+  //     console.log('Tab exists?', tabExists);
+
+  //     if (!tabExists) {
+  //       this.tabs.push({ title, path });
+  //       console.log('Tab added:', { title, path });
+  //     }
+
+  //     this.selectedIndex = this.tabs.findIndex((tab) => tab.path === path);
+  //     console.log('Selected index:', this.selectedIndex);
+
+  //     this.router.navigate([path]);
+  //     if (this.menuOpened) {
+  //       pointerEvent?.preventDefault();
+  //     }
+
+  //     this.cdr.detectChanges();
+  //   } else {
+  //     pointerEvent?.preventDefault();
+  //   }
+
+  //   if (this.showMenuAfterClick) {
+  //     this.temporaryMenuOpened = true;
+  //   }
+
+  //   // close ONLY on mobile (overlap mode)
+  //   if (path && this.menuMode === 'overlap') {
+  //     this.menuOpened = false;
+  //     pointerEvent?.stopPropagation();
+  //     this.cdr.detectChanges();
+  //   }
+  // }
 
   onTabChanged(index: number) {
     this.selectedIndex = index;
@@ -206,23 +214,24 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
   }
 
   navigationClick() {
-    if (this.showMenuAfterClick) {
-      this.temporaryMenuOpened = true;
-    }
-
-    const previousState = this.menuOpened;
     this.menuOpened = !this.menuOpened;
 
-    if (previousState !== this.menuOpened) {
-      this.cdr.detectChanges();
-    }
+    // reset temporary state safely
+    this.temporaryMenuOpened = false;
+
+    this.cdr.detectChanges();
   }
 
   // navigationClick() {
-  //   // this.menuOpened = !this.menuOpened;
   //   if (this.showMenuAfterClick) {
   //     this.temporaryMenuOpened = true;
-  //     this.menuOpened = true;
+  //   }
+
+  //   const previousState = this.menuOpened;
+  //   this.menuOpened = !this.menuOpened;
+
+  //   if (previousState !== this.menuOpened) {
+  //     this.cdr.detectChanges();
   //   }
   // }
 
@@ -245,27 +254,6 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
   showCloseButton() {
     return true;
   }
-
-  //   closeButtonHandler(tab: any) {
-  //   const index = this.tabs.indexOf(tab);
-  //   const isCurrentRoute = this.router.url === tab.path;
-
-  //   if (index > -1) {
-  //     (this.reuseStrategy as CustomReuseStrategy).removeStoredComponent(tab.path);
-  //     this.tabs.splice(index, 1);
-
-  //     if (this.selectedIndex >= this.tabs.length) {
-  //       this.selectedIndex = this.tabs.length - 1;
-  //     }
-  //   }
-
-  //   if (isCurrentRoute && this.selectedIndex >= 0) {
-  //     const nextPath = this.tabs[this.selectedIndex].path;
-
-  //     // 🔥 normal navigation now destroys component
-  //     this.router.navigate([nextPath]);
-  //   }
-  // }
 
   closeButtonHandler(tab: any) {
     const index = this.tabs.indexOf(tab);

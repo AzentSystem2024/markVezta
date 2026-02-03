@@ -31,20 +31,16 @@
           <dxo-toolbar>
             <dxi-item location="before" locateInMenu="auto">
               <div class="stacked-toolbar-group">
-                <!-- ROW 1 -->
-                <!-- <div style="display: flex; gap: 5px">
-                  <dx-date-box
-                    [(value)]="deliveryFormData.DN_DATE"
-                    label="Date"
-                    labelMode="floating"
-                    [width]="200"
-                    displayFormat="dd-MM-yyyy"
-                    [readOnly]="true"
-                  ></dx-date-box>
-                </div> -->
-
                 <!-- ROW 2 -->
-                <div style="margin-top: -4px; display: flex; gap: 10px">
+                <div
+                  style="
+                    margin-top: -4px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                  "
+                >
+                  <!-- Row 1 : Date -->
                   <dx-date-box
                     [(value)]="deliveryFormData.DN_DATE"
                     label="Date"
@@ -54,36 +50,35 @@
                     [readOnly]="true"
                   ></dx-date-box>
 
-                  <dx-text-box
-                    [(value)]="deliveryFormData.DN_NO"
-                    label="Reference No"
-                    labelMode="floating"
-                    [width]="200"
-                    [readOnly]="isReadOnlyMode"
-                  ></dx-text-box>
+                  <!-- Row 2 : DN No + New Field -->
+                  <div style="display: flex; gap: 10px">
+                    <dx-text-box
+                      [(value)]="deliveryFormData.DN_NO"
+                      label="Delivery No"
+                      labelMode="floating"
+                      [width]="200"
+                      [readOnly]="isReadOnlyMode"
+                    ></dx-text-box>
+
+                    <dx-text-box
+                      [(value)]="deliveryFormData.REF_NO"
+                      label="Reference No"
+                      labelMode="floating"
+                      [width]="200"
+                      [readOnly]="isReadOnlyMode"
+                    ></dx-text-box>
+                  </div>
                 </div>
               </div>
             </dxi-item>
 
             <dxi-item location="after" locateInMenu="auto">
               <div class="stacked-toolbar-group">
-                <div style="display: flex; align-items: center; gap: 5px">
-                  <!-- <dx-text-box
-                    [(value)]="deliveryFormData.REF_NO"
-                    label="Document No"
-                    labelMode="floating"
-                    [width]="405"
-                    [readOnly]="isReadOnlyMode"
-                  ></dx-text-box> -->
-                </div>
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    margin-top: -5px;
-                  "
-                >
+                <!-- Row 1 : spacer to match Date row -->
+                <div style="height: 40px"></div>
+
+                <!-- Row 2 : Company (aligned with DN / Ref No) -->
+                <div style="display: flex; align-items: center">
                   <dx-text-box
                     [(value)]="deliveryFormData.COMPANY_NAME"
                     label="Company"
@@ -91,29 +86,7 @@
                     [width]="400"
                     [readOnly]="isReadOnlyMode"
                   ></dx-text-box>
-                  <!-- <dx-select-box
-                    [(value)]="deliveryFormData.CUST_ID"
-                    [dataSource]="customerList"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    [width]="405"
-                    [searchEnabled]="true"
-                    label="Company"
-                    labelMode="floating"
-                    [readOnly]="isReadOnlyMode"
-                    (onValueChanged)="customerChanged($event)"
-                  ></dx-select-box> -->
-
-                  <!-- Plus Button (now aligned to the right of Customer select) -->
                 </div>
-                <div
-                  style="
-                    display: flex;
-                    gap: 5px;
-                    margin-top: -4px;
-                    align-items: flex-start;
-                  "
-                ></div>
               </div>
             </dxi-item>
           </dxo-toolbar>

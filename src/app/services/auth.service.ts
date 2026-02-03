@@ -8,6 +8,7 @@ export interface IUser {
   email: string;
   name?: string;
   avatarUrl?: string;
+  initials?: string;
 }
 
 export interface IResponse {
@@ -20,8 +21,7 @@ const defaultPath = '/';
 export const defaultUser: IUser = {
   email: '',
   name: '',
-  avatarUrl:
-    'https://js.devexpress.com/Demos/WidgetsGallery/JSDemos/images/employees/01.png',
+  avatarUrl: '',
 };
 
 @Injectable()

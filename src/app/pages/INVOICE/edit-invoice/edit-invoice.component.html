@@ -91,19 +91,6 @@
                     [readOnly]="true"
                     style="margin-top: -1px"
                   ></dx-date-box>
-                  <!-- Distributor Select -->
-                  <!-- <dx-select-box
-                    [(value)]="invoiceFormData.DISTRIBUTOR_ID"
-                    [dataSource]="distributorList"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    [width]="375"
-                    label="Customer"
-                    labelMode="floating"
-                    style="margin-top: -1px"
-                    (onValueChanged)="onDistributorChanged($event)"
-                  >
-                  </dx-select-box> -->
                 </div>
               </div>
             </dxi-item>
@@ -117,16 +104,6 @@
               >
                 <!-- Row 1: Date only -->
                 <div style="display: flex; gap: 2px; justify-content: flex-end">
-                  <dx-button
-                    text="Fill Pending Deliveries"
-                    icon="event"
-                    (onClick)="openTrOutSelector()"
-                    [width]="375"
-                    stylingMode="outlined"
-                    class="blue-outline-btn"
-                  ></dx-button>
-                </div>
-                <div style="display: flex; gap: 2px; margin-bottom: 0">
                   <dx-select-box
                     [(value)]="invoiceFormData.DISTRIBUTOR_ID"
                     [dataSource]="distributorList"
@@ -138,26 +115,27 @@
                     (onValueChanged)="onDistributorChanged($event)"
                   >
                   </dx-select-box>
-                  <!-- <dx-date-box
-                    label="Transaction Date"
-                    [(value)]="invoiceFormData.SALE_DATE"
-                    type="date"
-                    labelMode="floating"
-                    [width]="200"
-                    [displayFormat]="'dd-MM-yyyy'"
-                    [readOnly]="true"
-                  ></dx-date-box> -->
+                </div>
+                <div style="display: flex; gap: 2px; margin-bottom: 0">
+                  <dx-button
+                    text="Fill Pending Deliveries"
+                    icon="event"
+                    (onClick)="openTrOutSelector()"
+                    [width]="375"
+                    stylingMode="outlined"
+                    class="blue-outline-btn"
+                  ></dx-button>
                 </div>
               </div>
             </dxi-item>
           </dxo-toolbar>
 
           <dxi-column
-            dataField="TRANSFER_NO"
+            dataField="DN_NO"
             [caption]="
               invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
                 ? 'Item Code'
-                : 'Transfer No'
+                : 'Delivery No'
             "
           ></dxi-column>
           <dxi-column
@@ -358,6 +336,7 @@
   title="Invoice Pending Deliveries"
   [dragEnabled]="true"
   [closeOnOutsideClick]="true"
+  (onHiding)="onTrOutPopupClose()"
 >
   <div *dxTemplate="let data of 'content'">
     <dx-data-grid
@@ -418,28 +397,31 @@
 
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
       </dxo-toolbar>
-      <dxi-column
+      <!-- <dxi-column
         dataField="TRANSFER_NO"
         [caption]="
           invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
             ? 'Item Code'
             : 'Transfer No'
         "
-      ></dxi-column>
+      ></dxi-column> -->
+      <dxi-column dataField="REF_NO" caption="Reference No"></dxi-column>
+      <dxi-column dataField="DN_NO" caption="Delivery No"></dxi-column>
       <dxi-column
         dataField="DATE"
         caption="Date"
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column
+      <dxi-column dataField="ARTICLE" caption="Description"></dxi-column>
+      <!-- <dxi-column
         dataField="ARTICLE"
         [caption]="
           invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
             ? 'Item Description'
             : 'Article'
         "
-      ></dxi-column>
+      ></dxi-column> -->
       <dxi-column
         dataField="TOTAL_PAIR_QTY"
         caption="Qty"

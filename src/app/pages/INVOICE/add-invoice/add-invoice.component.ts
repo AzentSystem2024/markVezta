@@ -144,6 +144,7 @@ export class AddInvoiceComponent {
   showSGST: boolean = false;
   netAmount: any;
   isSaving: boolean;
+  isTransfersLoading: boolean;
 
   constructor(
     private dataService: DataService,
@@ -253,7 +254,7 @@ export class AddInvoiceComponent {
     if (this.selectedCustomerType) {
       this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
     }
-
+    this.isTransfersLoading = true;
     this.getInvoiceListForGrid();
   }
 
@@ -270,11 +271,18 @@ export class AddInvoiceComponent {
       COMPANY_ID: this.selectedCompanyId,
     };
     console.log(payload, 'PAYLOADDDDDDDDDDD');
-    this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
-      this.staticTransfers = response.Data; // Save the original full list
-      console.log(this.staticTransfers, 'STATISCTRANSFERS');
-      this.invoiceGridList = [...this.staticTransfers]; // Initial value
-    });
+    this.dataService.getInvoiceGridList(payload).subscribe(
+      (response: any) => {
+        this.staticTransfers = response.Data; // Save the original full list
+        console.log(this.staticTransfers, 'STATISCTRANSFERS');
+        this.invoiceGridList = [...this.staticTransfers]; // Initial value
+        this.isTransfersLoading = false;
+      },
+      () => {
+        // ADD THIS (error safety)
+        this.isTransfersLoading = false;
+      },
+    );
   }
 
   getInvoiceNo() {
@@ -325,6 +333,32 @@ export class AddInvoiceComponent {
   // };
 
   openTrOutSelector() {
+    if (this.isTransfersLoading) {
+      notify({
+        message: 'Please wait, loading deliveries...',
+        type: 'warning',
+        displayTime: 2000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
+      return;
+    }
+    if (!this.invoiceFormData?.DISTRIBUTOR_ID) {
+      notify({
+        message: 'Please select a customer.',
+        type: 'warning',
+        displayTime: 2000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
+      return; // stop execution here
+    }
     if (!this.staticTransfers || this.staticTransfers.length === 0) {
       notify({
         message: 'No data found.',
@@ -448,9 +482,23 @@ export class AddInvoiceComponent {
   }
 
   onPopupHiding() {
+    // Restore original data
+    this.invoiceGridList = [...this.staticTransfers];
+
     if (this.popupGridRef?.instance) {
-      this.popupGridRef.instance.clearSelection(); // ✅ clear selected rows
-      this.popupGridRef.instance.refresh(); // ✅ refresh grid datasource
+      const grid = this.popupGridRef.instance;
+
+      // ✅ Clears filter row AND header filter
+      grid.clearFilter();
+
+      // ✅ Clear row selections
+      grid.clearSelection();
+
+      // ✅ Reset paging
+      grid.pageIndex(0);
+
+      // ✅ Refresh grid
+      grid.refresh();
     }
   }
 
