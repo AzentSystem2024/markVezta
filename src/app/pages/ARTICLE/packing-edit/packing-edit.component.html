@@ -93,11 +93,28 @@
           </dx-tag-box>
         </dx-validation-group>
       </div>
+
+       <div class="form-field">
+        <dx-text-box
+          label="Item Code"
+          [(value)]="PackingData.ALIAS_NO"
+          labelMode="floating"
+          placeholder="Item Code"
+          [readOnly]="true"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-text-box>
+      </div>
+
       <div class="form-field">
         <dx-text-box
           label="Item Description"
           [(value)]="PackingData.DESCRIPTION"
           labelMode="floating"
+          [readOnly]="true"
           placeholder="Art No."
           ><dx-validator>
             <dxi-validation-rule
@@ -150,6 +167,7 @@
           label="Packing Order No."
           [(value)]="PackingData.ORDER_NO"
           labelMode="floating"
+           [readOnly]="true"
           placeholder="Packing Order No."
           ><dx-validator>
             <dxi-validation-rule
@@ -178,19 +196,6 @@
           [(value)]="PackingData.PART_NO"
           labelMode="floating"
           placeholder="Part No."
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
-      </div>
-      <div class="form-field">
-        <dx-text-box
-          label="Item Code"
-          [(value)]="PackingData.ALIAS_NO"
-          labelMode="floating"
-          placeholder="Item Code"
           [readOnly]="true"
           ><dx-validator>
             <dxi-validation-rule
@@ -199,6 +204,7 @@
             ></dxi-validation-rule> </dx-validator
         ></dx-text-box>
       </div>
+     
       <!-- <div class="form-field">
     <dx-number-box
       label="Total Pair Qty"

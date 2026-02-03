@@ -380,14 +380,15 @@ export class ArticleListComponent {
   onDeleteArticle(event: any) {
     console.log(event.data);
     const articleArtNo = event.data.ART_NO;
-    const payload = {
-      ART_NO: articleArtNo,
-    };
+    const id = event.data.ID;
+    // const payload = {
+    //   ART_NO: articleArtNo,
+    // };
 
     event.cancel = true;
     console.log(articleArtNo);
     // Call your delete API
-    this.dataService.deleteArticle(payload).subscribe(
+    this.dataService.deleteArticle(id).subscribe(
       (response: any) => {
         if (response) {
           notify(
