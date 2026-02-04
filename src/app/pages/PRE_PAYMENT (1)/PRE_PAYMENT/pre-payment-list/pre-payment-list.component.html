@@ -65,7 +65,7 @@
         <dxi-item location="before">
           <h6>PrePayment Invoice</h6>
         </dxi-item>
-
+        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
         <dxi-item
           location="after"
@@ -80,11 +80,8 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-        <dxi-item
-          name="exportButton"
-          location="after"
-          cssClass="export-btn"
-        ></dxi-item>
+        <dxi-item name="exportButton" location="after" cssClass="export-btn">
+        </dxi-item>
 
         <dxi-item
           *ngIf="canAdd"
@@ -96,6 +93,23 @@
 
         <!-- </div> -->
       </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'dateFilterTemplate'">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="220"
+        >
+          <!-- This controls the dropdown list rendering -->
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
+        </dx-select-box>
+      </div>
 
       <dxo-grouping
         [autoExpandAll]="false"
