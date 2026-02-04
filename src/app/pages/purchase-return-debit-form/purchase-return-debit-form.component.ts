@@ -205,11 +205,11 @@ export class PurchaseReturnDebitFormComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
-  ngAfterViewInit() {
-    setTimeout(() => {
-      this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
-    });
-  }
+  // ngAfterViewInit() {
+  //   setTimeout(() => {
+  //     this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
+  //   });
+  // }
 
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;

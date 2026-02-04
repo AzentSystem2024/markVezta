@@ -72,6 +72,8 @@
             Fixed Assets
           </div>
         </dxi-item>
+        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
         <dxi-item
           location="after"
@@ -109,6 +111,22 @@
           ></dx-button>
         </dxi-item> -->
       </dxo-toolbar>
+      <div *dxTemplate="let data of 'dateFilterTemplate'">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="220"
+        >
+          <!-- This controls the dropdown list rendering -->
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
+        </dx-select-box>
+      </div>
       <dxi-column dataField="CODE" caption="Code"></dxi-column>
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
 
@@ -217,3 +235,39 @@
     (popupClosed)="handleClose()"
   ></app-article-edit>
 </dx-popup> -->
+<dx-popup
+  [(visible)]="showCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="170"
+  [dragEnabled]="false"
+>
+  <div>
+    <div class="date-range-container">
+      <dx-date-box
+        [(value)]="customStartDate"
+        type="date"
+        width="300"
+        placeholder="From Date"
+      >
+      </dx-date-box>
+
+      <dx-date-box
+        [(value)]="customEndDate"
+        type="date"
+        placeholder="To Date"
+        width="300"
+      >
+      </dx-date-box>
+    </div>
+
+    <div class="button-container">
+      <dx-button
+        text="Apply"
+        type="default"
+        (onClick)="applyCustomDateFilter()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>

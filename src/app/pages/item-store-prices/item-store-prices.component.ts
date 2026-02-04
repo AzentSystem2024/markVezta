@@ -239,7 +239,7 @@ export class ItemStorePricesComponent {
     console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/credit-note');
+      .find((menu) => menu.Path === '/change-price-add');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -1108,7 +1108,7 @@ export class ItemStorePricesComponent {
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
+    // BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,
     DxDateBoxModule,

@@ -166,7 +166,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
   }
 
-    getPackingLastAliasNo(): Observable<any> {
+  getPackingLastAliasNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}packing/Lastaliasno`, {});
   }
 
@@ -528,6 +528,11 @@ export class DataService {
   }
   deletePurchaseReturn(id: number) {
     return this.http.post<any>(`${this.apiUrl}PurchaseReturn/delete/` + id, {});
+  }
+
+  //-------------------------------------SALE-RETURN------------------------------------------------------//
+  getSaleReturnMainList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}PurchaseReturn/list`, data);
   }
 
   //--------------------------LEDGER-SETTINGS---------------------------------------------------//
@@ -1363,7 +1368,7 @@ export class DataService {
   //itemstoreprices
   getItemListByStoreId(): Observable<any> {
     console.log('IN SERVICE');
-  
+
     return this.http.post(`${this.apiUrl}itemvizard/itempricewizard`, {});
   }
 
@@ -5613,7 +5618,7 @@ The result can be exported to HTML or Markdown.`;
   Delete_Package_Api(id: any) {
     return this.http.post(`${this.apiUrl}packing/Delete/${id}`, {});
   }
- 
+
   //  Delete_Package_Api(id: any){
   //   const getEndpoint = this.apiUrl + `packing/Delete/${id}`;
   //   return this.http.post(getEndpoint,{});
@@ -6156,7 +6161,10 @@ The result can be exported to HTML or Markdown.`;
   }
 
   Delete_Article_Production_Api(id: number) {
-    return this.http.post<any>(`${this.apiUrl}ArticleProduction/delete/` + id, {});
+    return this.http.post<any>(
+      `${this.apiUrl}ArticleProduction/delete/` + id,
+      {},
+    );
   }
 
   //==============INSERT IN BOX PRODUCTION=================
@@ -6165,17 +6173,17 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-   Update_Box_Production_Api(payload) {
+  Update_Box_Production_Api(payload) {
     const getEndpoint = this.apiUrl + 'BoxProduction/update';
     return this.http.post(getEndpoint, payload);
   }
 
-   Commit_Box_Production_Api(payload) {
+  Commit_Box_Production_Api(payload) {
     const getEndpoint = this.apiUrl + 'BoxProduction/commit';
     return this.http.post(getEndpoint, payload);
   }
 
-    Delete_Box_Production_Api(id: number) {
+  Delete_Box_Production_Api(id: number) {
     return this.http.post<any>(`${this.apiUrl}BoxProduction/delete/` + id, {});
   }
 
@@ -6185,12 +6193,12 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-  Insert_PackingPrice_Change_Api(payload){
+  Insert_PackingPrice_Change_Api(payload) {
     const getEndpoint = this.apiUrl + 'Packing/InsertPackingPriceLog';
     return this.http.post(getEndpoint, payload);
   }
 
-  View_PackingPrice_Change_Api(payload){
+  View_PackingPrice_Change_Api(payload) {
     const getEndpoint = this.apiUrl + 'Packing/GetPackingPriceLog';
     return this.http.post(getEndpoint, payload);
   }

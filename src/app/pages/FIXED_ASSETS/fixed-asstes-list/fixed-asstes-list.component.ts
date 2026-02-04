@@ -23,6 +23,7 @@ import {
   DxCheckBoxModule,
   DxDataGridComponent,
   DxDataGridModule,
+  DxDateBoxModule,
   DxFormModule,
   DxNumberBoxModule,
   DxPopupModule,
@@ -115,6 +116,22 @@ export class FixedAsstesListComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
+  dateRanges = [
+    { label: 'Today', value: 'today' },
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
+  ];
+
+  selectedDateRange: string = 'today';
+  customStartDate: any = null;
+  customEndDate: any = null;
+
+  showCustomDatePopup = false;
+
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
@@ -160,6 +177,107 @@ export class FixedAsstesListComponent {
   addFixedAssets() {
     this.AddFixedAssetsPopupVisible = true;
   }
+
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+
+    if (e.value === 'custom') {
+      this.showCustomDatePopup = true;
+      return;
+    }
+
+    this.list_fixed_assets(e.value);
+  }
+
+  applyCustomDateFilter() {
+    if (!(this.customStartDate && this.customEndDate)) return;
+
+    const fromLabel = this.formatAsDDMMYYYY(this.customStartDate);
+    const toLabel = this.formatAsDDMMYYYY(this.customEndDate);
+
+    // 🔑 SAME AS CREDIT NOTE
+    this.dateRanges = this.dateRanges.map((opt) =>
+      opt.value === 'custom'
+        ? { ...opt, label: `${fromLabel} - ${toLabel}` }
+        : opt,
+    );
+
+    this.selectedDateRange = 'custom';
+    this.showCustomDatePopup = false;
+
+    this.list_fixed_assets('custom');
+  }
+
+  private getDateRangePayload(range: string) {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (range) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+    }
+
+    return {
+      DATE_FROM: fromDate ? this.formatAsYYYYMMDD(fromDate) : null,
+      DATE_TO: toDate ? this.formatAsYYYYMMDD(toDate) : null,
+    };
+  }
+
+  private formatAsYYYYMMDD(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    const dd = date.getDate().toString().padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private formatAsDDMMYYYY(date: Date): string {
+    const dd = date.getDate().toString().padStart(2, '0');
+    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
   handleClose() {
     this.AddFixedAssetsPopupVisible = false;
     this.EditFixedAssetsPopupVisible = false;
@@ -182,15 +300,52 @@ export class FixedAsstesListComponent {
     this.sesstion_Details();
   }
 
-  list_fixed_assets() {
+  list_fixed_assets(range: string = this.selectedDateRange) {
+    const datePayload = this.getDateRangePayload(range);
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
     };
+
     this.dataService.list_Fixed_Asset_api(payload).subscribe((res: any) => {
-      console.log(res);
       this.FixedAssets = res.Data;
     });
   }
+
+  displayExpr = (item: any) => {
+    if (!item) return '';
+
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      return `${from} - ${to}`;
+    }
+
+    return item.label;
+  };
+
+  attachItemClickHandler(e: any) {
+    setTimeout(() => {
+      const popup = e.component?._popup;
+      const innerList =
+        popup && popup.$content().find('.dx-list').dxList('instance');
+
+      if (innerList) {
+        innerList.off('itemClick');
+        innerList.on('itemClick', (clickEvent: any) => {
+          if (clickEvent.itemData.value === 'custom') {
+            this.customStartDate = null;
+            this.customEndDate = null;
+            this.showCustomDatePopup = true;
+            e.component.close();
+          }
+        });
+      }
+    }, 0);
+  }
+
   //=============onedit start==========================
   onEditFixedAssets(event: any) {
     event.cancel = true;
@@ -255,6 +410,7 @@ export class FixedAsstesListComponent {
     CommonModule,
     FixedAsstesEditModule,
     FixedAsstesAddModule,
+    DxDateBoxModule,
   ],
   providers: [],
   exports: [FixedAsstesListComponent],
