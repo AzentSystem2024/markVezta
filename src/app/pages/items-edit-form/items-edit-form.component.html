@@ -590,8 +590,7 @@
                   <label>Price:</label>
 
                   <dx-number-box
-                    [(value)]="itemData.SALE_PRICE"
-                    (onValueChanged)="onPriceChange($event)"
+                    [(value)]="salePrice"
                     [format]="{ type: 'fixedPoint', precision: 2 }"
                     [labelMode]="'floating'"
                     [width]="200"

@@ -396,7 +396,7 @@ export class ArticleListComponent {
     // Call your delete API
     this.dataService.deleteArticle(payload).subscribe(
       (response: any) => {
-        if (response) {
+       if (response?.flag === 1) {
           notify(
             {
               message: 'Article Deleted Successfully',
@@ -406,7 +406,17 @@ export class ArticleListComponent {
           );
           this.getArticles();
           // this.dataGrid.instance.refresh();
-        } else {
+        }
+        else if (response?.flag === 0) {
+        // Article already used in Packing
+        notify(
+          {
+            message: response.Message || 'Article already used in Packing',
+            position: { at: 'top center', my: 'top center' },
+          },
+          'error'
+        );
+      }  else {
           notify(
             {
               message: 'Your Data Not deleted',

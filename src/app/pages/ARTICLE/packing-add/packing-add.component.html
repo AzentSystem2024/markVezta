@@ -110,24 +110,6 @@
       </div>
 
       <div class="form-field">
-        <dx-number-box
-          label="MRP"
-          [(value)]="PackingData.PACK_PRICE"
-          [format]="'#,##0.##'"
-          labelMode="floating"
-          placeholder="MRP"
-          [min]="0"
-          [showSpinButtons]="true"
-          (onValueChanged)="updateItemDescription()"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-number-box>
-      </div>
-
-      <div class="form-field standard-pack-row">
         <dx-text-box
           label="Standard Packing"
           [(value)]="PackingData.STANDARD_PACKING"
@@ -141,24 +123,6 @@
               message="This field is required"
             ></dxi-validation-rule> </dx-validator
         ></dx-text-box>
-      </div>
-
-      <div class="form-field">
-        <dx-text-box
-          label="Description"
-          [(value)]="PackingData.DESCRIPTION"
-          labelMode="floating"
-          placeholder="Description"
-          [showSpinButtons]="true"
-          (onValueChanged)="updateItemDescription()"
-        >
-          <!-- <dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        > -->
-        </dx-text-box>
       </div>
 
       <div class="form-field">
@@ -258,6 +222,42 @@
               message="This field is required"
             ></dxi-validation-rule> </dx-validator
         ></dx-text-box>
+      </div>
+
+      <div class="form-field">
+        <dx-text-box
+          label="Description"
+          [(value)]="PackingData.DESCRIPTION"
+          labelMode="floating"
+          placeholder="Description"
+          [showSpinButtons]="true"
+          (onValueChanged)="updateItemDescription()"
+        >
+          <!-- <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        > -->
+        </dx-text-box>
+      </div>
+
+      <div class="form-field">
+        <dx-number-box
+          label="MRP"
+          [(value)]="PackingData.PACK_PRICE"
+          [format]="'#,##0.##'"
+          labelMode="floating"
+          placeholder="MRP"
+          [min]="0"
+          [showSpinButtons]="true"
+          (onValueChanged)="updateItemDescription()"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-number-box>
       </div>
 
       <!-- <div class="form-field">
