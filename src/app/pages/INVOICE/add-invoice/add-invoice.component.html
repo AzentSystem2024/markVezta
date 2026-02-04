@@ -80,12 +80,12 @@
                 >
                   <dx-date-box
                     label="Transaction Date"
-                    [(value)]="invoiceFormData.TRANS_DATE"
+                    [(value)]="invoiceFormData.SALE_DATE"
                     type="date"
                     labelMode="floating"
                     [width]="375"
-                    [displayFormat]="'dd-MM-yyyy'"
                     [readOnly]="true"
+                    [displayFormat]="'dd-MM-yyyy'"
                     style="margin-top: -1px"
                   ></dx-date-box>
                 </div>
@@ -144,12 +144,17 @@
             format="dd-MM-yyyy"
             [width]="120"
           ></dxi-column>
+          <!-- <dxi-column
+            dataField="ARTICLE"
+            caption="Article"
+            [allowEditing]="false"
+          ></dxi-column> -->
           <dxi-column
             dataField="ARTICLE"
             [caption]="
               invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
-                ? 'Item Description'
-                : 'Article'
+                ? 'Description'
+                : 'Description'
             "
             [width]="150"
           ></dxi-column>

@@ -88,7 +88,6 @@
                     labelMode="floating"
                     [width]="375"
                     [displayFormat]="'dd-MM-yyyy'"
-                    [readOnly]="true"
                     style="margin-top: -1px"
                   ></dx-date-box>
                 </div>
@@ -148,8 +147,8 @@
             dataField="ARTICLE"
             [caption]="
               invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
-                ? 'Item Description'
-                : 'Article'
+                ? 'Description'
+                : 'Description'
             "
           ></dxi-column>
           <dxi-column
