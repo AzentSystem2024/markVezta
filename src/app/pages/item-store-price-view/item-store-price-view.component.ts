@@ -142,11 +142,33 @@ export class ItemStorePriceViewComponent {
   currencyFormt: string;
   private filterApplied = false;
   selected_Company_id: any;
+  narrationText: any;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  //----------------select columns--------
+  priceColumnOptions = [
+    { text: 'MRP', value: 'MRP' },
+    { text: 'Standard Price', value: 'PRICE1' },
+    { text: 'Price 2', value: 'PRICE2' },
+    { text: 'Price 3', value: 'PRICE3' },
+    { text: 'Price 4', value: 'PRICE4' },
+    { text: 'Price 5', value: 'PRICE5' },
+  ];
 
+  selectedPriceColumns: string[] = ['MRP']; // default visible
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
   constructor(
     private dataservice: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
       this.department = data;
@@ -184,25 +206,18 @@ export class ItemStorePriceViewComponent {
       this.worksheetItems = this.worksheetData.worksheet_item_price;
       this.isApplyButtonDisabled = this.statusOfWorksheet === 'Approved';
       console.log('Received worksheet data:', this.worksheetData);
+      this.narrationText = this.worksheetData.NARRATION;
+      console.log(this.narrationText, 'NARRATION TEXT');
       console.log(data.status, 'GETTING');
       if (
         this.worksheetData.worksheet_item_price &&
         this.worksheetData.worksheet_item_price.length > 0
       ) {
-        // this.worksheetItems = this.worksheetData.worksheet_item_price.map((item) => ({
-        //   ...item,
-        //   PRICE_NEW: '',
-        //   PRICE_LEVEL1_NEW: '',
-        //   PRICE_LEVEL2_NEW: '',
-        //   PRICE_LEVEL3_NEW: '',
-        //   PRICE_LEVEL4_NEW: '',
-        //   PRICE_LEVEL5_NEW: ''
-        // }));
         this.selectedItems = this.worksheetItems.filter(
-          (item) => item.Selected === true
+          (item) => item.Selected === true,
         );
         const storId = this.worksheetData.worksheet_item_store.map(
-          (storeID) => storeID.STORE_ID
+          (storeID) => storeID.STORE_ID,
         );
         this.payloadForVerify = {
           // ...cleanedPayload, // Use cleanedPayload without worksheet_item_store
@@ -230,7 +245,7 @@ export class ItemStorePriceViewComponent {
 
       if (this.worksheetData?.worksheet_item_store?.length > 0) {
         this.selectedStoreId = this.worksheetData.worksheet_item_store.map(
-          (store) => store.STORE_ID
+          (store) => store.STORE_ID,
         );
         console.log(this.selectedStoreId, 'SELECTEDSTOREID');
       } else {
@@ -254,7 +269,7 @@ export class ItemStorePriceViewComponent {
     const currencyFormat = sessionStorage.getItem('currencyFormat') || 'USD';
     console.log(
       'Retrieved currency format from sessionStorage:',
-      currencyFormat
+      currencyFormat,
     );
     const formattedCurrency = new Intl.NumberFormat(undefined, {
       style: 'currency',
@@ -264,17 +279,20 @@ export class ItemStorePriceViewComponent {
     cellElement.innerText = formattedCurrency || '$0.00'; // Fallback to default if empty
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+  }
 
   loadStores() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
       this.filteredStoreList = this.store;
@@ -283,11 +301,11 @@ export class ItemStorePriceViewComponent {
 
   getStoresById(storeId: any) {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.filteredStoreList = response.filter(
-        (store: any) => store.ID === storeId
+        (store: any) => store.ID === storeId,
       );
       if (this.filteredStoreList.length > 0) {
         this.listItemsByMultipleStoreIds(storeId);
@@ -296,12 +314,12 @@ export class ItemStorePriceViewComponent {
   }
 
   listItemsByMultipleStoreIds(storeIds: string) {
-    this.dataservice.getItemListByStoreId(storeIds).subscribe(
+    this.dataservice.getItemListByStoreId().subscribe(
       (response) => {
         console.log(response);
         this.worksheetItems = response.PriceWizardData;
         this.selectedItems = this.worksheetItems.filter(
-          (item) => item.Selected === true
+          (item) => item.Selected === true,
         );
         if (this.selectedItems.length > 0) {
           this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
@@ -313,7 +331,7 @@ export class ItemStorePriceViewComponent {
       },
       (error) => {
         console.error('Error fetching item list:', error);
-      }
+      },
     );
   }
 
@@ -407,7 +425,7 @@ export class ItemStorePriceViewComponent {
 
     console.log(
       'Updated row data and reset PRICE_NEW values:',
-      this.updatedItems[rowId]
+      this.updatedItems[rowId],
     );
   }
 
@@ -448,7 +466,7 @@ export class ItemStorePriceViewComponent {
 
       console.log(
         'Old values found for selected row:',
-        this.oldValues[this.selectedRowId]
+        this.oldValues[this.selectedRowId],
       );
     } else {
       this.selectedRowId = null;
@@ -483,7 +501,7 @@ export class ItemStorePriceViewComponent {
           message: 'No rows selected. Please select at least one row to save.',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
+        'error',
       );
       return; // Stop execution if no rows are selected
     }
@@ -536,7 +554,7 @@ export class ItemStorePriceViewComponent {
               message: 'Worksheet Updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -544,13 +562,13 @@ export class ItemStorePriceViewComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       },
       (error) => {
         console.error('Error saving data:', error);
-      }
+      },
     );
   }
 
@@ -608,7 +626,7 @@ export class ItemStorePriceViewComponent {
               message: 'Worksheet Verified Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           // this.dataGrid.instance.refresh();
         } else {
@@ -617,7 +635,7 @@ export class ItemStorePriceViewComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         console.log('Verification successful:', verifyResponse);
@@ -674,7 +692,7 @@ export class ItemStorePriceViewComponent {
               message: 'Worksheet Approved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           // this.dataGrid.instance.refresh();
         } else {
@@ -683,7 +701,7 @@ export class ItemStorePriceViewComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -699,7 +717,7 @@ export class ItemStorePriceViewComponent {
       const selectedRowsData = [];
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.worksheetItems.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
         if (selectedRow) {
           selectedRowsData.push(selectedRow);
@@ -718,12 +736,12 @@ export class ItemStorePriceViewComponent {
           } else {
             console.log(
               'Old values already stored:',
-              this.oldValues[this.selectedRowId]
+              this.oldValues[this.selectedRowId],
             );
           }
         } else {
           console.error(
-            `Selected row with ID ${selectedRowId} not found in the data source.`
+            `Selected row with ID ${selectedRowId} not found in the data source.`,
           );
         }
       });
@@ -757,12 +775,12 @@ export class ItemStorePriceViewComponent {
             originalPrice - originalPrice * (percentageValue / 100); // Decrease
         }
         console.log(
-          `Updated row ID ${rowId}: ${salePriceKey} is now ${this.newPrice}`
+          `Updated row ID ${rowId}: ${salePriceKey} is now ${this.newPrice}`,
         );
         this.newPrice = this.applyRounding();
         // Log the adjusted price
         console.log(
-          `Updated row ID after processed ${rowId}: ${salePriceKey} is now ${this.newPrice}`
+          `Updated row ID after processed ${rowId}: ${salePriceKey} is now ${this.newPrice}`,
         );
       } else {
         console.error(`Row ID ${rowId} not found in the data source.`);
@@ -775,17 +793,17 @@ export class ItemStorePriceViewComponent {
     if (this.selectedRowKeys.length > 0) {
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.worksheetItems.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
         if (selectedRow) {
           const salePriceValue = selectedRow[selectedOption];
           console.log(
             `Selected SALE_PRICE option for row ID ${selectedRowId}:`,
-            salePriceValue
+            salePriceValue,
           );
         } else {
           console.error(
-            `Selected row with ID ${selectedRowId} not found in the data source.`
+            `Selected row with ID ${selectedRowId} not found in the data source.`,
           );
         }
       });
@@ -799,7 +817,7 @@ export class ItemStorePriceViewComponent {
       // Loop through each selected row
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.worksheetItems.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
 
         if (selectedRow) {
@@ -820,7 +838,7 @@ export class ItemStorePriceViewComponent {
           // this.onRowUpdated({ data: selectedRow });
           console.log(
             `Processed ${selectedOption} for row ID ${selectedRowId}:`,
-            this.newPrice
+            this.newPrice,
           );
         } else {
           console.error(`Selected row with ID ${selectedRowId} not found.`);
@@ -860,7 +878,7 @@ export class ItemStorePriceViewComponent {
 
           console.log(
             `Updated ${selectedOption} for row ID ${selectedRow.ID}:`,
-            finalPrice
+            finalPrice,
           );
         } else {
           console.error('Selected row not found in the data source.');
@@ -891,6 +909,21 @@ export class ItemStorePriceViewComponent {
     this.isIncrease = !this.isIncrease;
     console.log(this.isIncrease ? 'Increase selected' : 'Decrease selected');
     this.handlePercentageChange({ value: this.percentageString });
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      // grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+  onPriceColumnChange() {}
+  isVisible(code: string): boolean {
+    return this.selectedPriceColumns.includes(code);
   }
 }
 @NgModule({

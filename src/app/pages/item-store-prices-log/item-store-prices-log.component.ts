@@ -124,23 +124,32 @@ export class ItemStorePricesLogComponent {
     },
     elementAttr: { class: 'add-button' },
   };
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
   canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  isFilterOpened = false;
   constructor(
     private dataservice: DataService,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax();
@@ -178,8 +187,25 @@ export class ItemStorePricesLogComponent {
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
-      // this.getLoglist();
+      this.getLoglist();
     }
+  }
+
+  getStatusFlagClass(Status: string): string {
+    // console.log('Status:', Status);
+
+    return Status === 'Open' ? 'flag-red' : 'flag-green';
+  }
+
+  listItemsByMultipleStoreIds() {
+    this.dataservice.getItemListByStoreId().subscribe(
+      (response) => {
+        // this.itemStoresList = response.PriceWizardData;
+      },
+      (error) => {
+        // console.error('Error fetching item list:', error);
+      },
+    );
   }
   getLoglist() {
     this.dataservice
@@ -217,7 +243,7 @@ export class ItemStorePricesLogComponent {
       .selectWorksheetForPrice(worksheetId)
       .subscribe((response: any) => {
         const ws = this.logList.find(
-          (worksheet) => worksheet.ID == response.ID
+          (worksheet) => worksheet.ID == response.ID,
         );
         this.status = ws.Status;
         this.selectedWorksheetData = { ...response, status: this.status };
@@ -253,7 +279,7 @@ export class ItemStorePricesLogComponent {
       .selectWorksheetForPrice(worksheetId)
       .subscribe((response: any) => {
         const ws = this.logList.find(
-          (worksheet) => worksheet.ID == response.ID
+          (worksheet) => worksheet.ID == response.ID,
         );
         this.status = ws.Status;
         this.selectedWorksheetData = { ...response, status: this.status };
@@ -291,6 +317,7 @@ export class ItemStorePricesLogComponent {
     console.log('add called');
     this.isFormVisible = true;
     this.router.navigate(['/change-price-add']);
+    this.listItemsByMultipleStoreIds();
   }
   onApproveClick(e: any) {
     if (this.AllowCommitWithSave) {
@@ -313,7 +340,7 @@ export class ItemStorePricesLogComponent {
       .selectWorksheetForPrice(worksheetId)
       .subscribe((response: any) => {
         const ws = this.logList.find(
-          (worksheet) => worksheet.ID == response.ID
+          (worksheet) => worksheet.ID == response.ID,
         );
         this.status = ws.Status;
         console.log(this.status, 'STATUS IN APPROVE');
@@ -341,7 +368,7 @@ export class ItemStorePricesLogComponent {
 
     const worksheetItemPrices = selectedWorksheetData.worksheet_item_price;
     const filteredPrices = worksheetItemPrices.filter(
-      (item: any) => item.ID !== 0
+      (item: any) => item.ID !== 0,
     );
 
     const updatedPrices = filteredPrices.map((item: any) => {
@@ -361,7 +388,7 @@ export class ItemStorePricesLogComponent {
     const { worksheet_item_store, ...cleanedPayload } = selectedWorksheetData;
 
     const storId = selectedWorksheetData.worksheet_item_store.map(
-      (storeID) => storeID.STORE_ID
+      (storeID) => storeID.STORE_ID,
     );
 
     const payload = {
@@ -380,7 +407,7 @@ export class ItemStorePricesLogComponent {
         if (response) {
           this.isApproved = true;
           const rowIndex = this.logList.findIndex(
-            (item) => item.ID === selectedWorksheetData.ID
+            (item) => item.ID === selectedWorksheetData.ID,
           );
           if (rowIndex > -1) {
             this.logList[rowIndex].isApproved = true;
@@ -391,7 +418,7 @@ export class ItemStorePricesLogComponent {
               message: 'Worksheet Approved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
         } else {
@@ -400,11 +427,11 @@ export class ItemStorePricesLogComponent {
               message: 'Your Data Not Approved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       },
-      (error) => {}
+      (error) => {},
     );
   }
 
@@ -434,7 +461,7 @@ export class ItemStorePricesLogComponent {
         const selectedWorksheetData = response;
         console.log(
           'Fetched Worksheet Data for Verification:',
-          selectedWorksheetData
+          selectedWorksheetData,
         );
         // if (
         //   response.worksheet_item_price &&
@@ -470,7 +497,7 @@ export class ItemStorePricesLogComponent {
       },
       (error) => {
         console.error('Error fetching worksheet for verification:', error);
-      }
+      },
     );
   }
 
@@ -483,7 +510,7 @@ export class ItemStorePricesLogComponent {
 
     const worksheetItemPrices = selectedWorksheetData.worksheet_item_price;
     const filteredPrices = worksheetItemPrices.filter(
-      (item: any) => item.ID !== 0
+      (item: any) => item.ID !== 0,
     );
 
     const updatedPrices = filteredPrices.map((item: any) => {
@@ -503,7 +530,7 @@ export class ItemStorePricesLogComponent {
     const { worksheet_item_store, ...cleanedPayload } = selectedWorksheetData;
 
     const storId = selectedWorksheetData.worksheet_item_store.map(
-      (storeID) => storeID.STORE_ID
+      (storeID) => storeID.STORE_ID,
     );
 
     const payload = {
@@ -544,7 +571,7 @@ export class ItemStorePricesLogComponent {
                 message: 'Worksheet Deleted Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
-              'success'
+              'success',
             );
             // this.dataGrid.instance.refresh();
           } else {
@@ -553,7 +580,7 @@ export class ItemStorePricesLogComponent {
                 message: 'Your Data Not Saved',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
           console.log('Worksheet deleted successfully:', response);
@@ -566,11 +593,24 @@ export class ItemStorePricesLogComponent {
         (error) => {
           console.error('Error deleting worksheet:', error);
           event.cancel = true; // Prevent row removal if there's an error
-        }
+        },
       );
     } else {
       console.warn('No valid row data to delete');
       event.cancel = true; // Prevent row removal if there's no valid data
+    }
+  }
+
+  //==================toggle filters==================
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
 

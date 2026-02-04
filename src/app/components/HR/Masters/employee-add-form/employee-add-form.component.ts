@@ -167,9 +167,10 @@ export class EmployeeAddFormComponent {
         amount: null,
       }));
     });
+
     const dept_payload = {
-      NAME: 'EMPLOYEE DEPARTMENT',
-    };
+      NAME : 'EMPLOYEE DEPARTMENT'
+    }
     dataservice.getDropdownData(dept_payload).subscribe((data) => {
       this.departments = data;
     });
@@ -179,10 +180,16 @@ export class EmployeeAddFormComponent {
     dataservice.getDropdownData(payload).subscribe((data) => {
       this.designations = data;
     });
-    dataservice.getDropdownData('SALARY PAYMENT TYPE').subscribe((data) => {
+    const paymentType_payload = {
+      NAME : 'SALARY PAYMENT TYPE'
+    }
+    dataservice.getDropdownData(paymentType_payload).subscribe((data) => {
       this.paymentType = data;
     });
-    dataservice.getDropdownData('STATE').subscribe((data) => {
+    const state_payload = {
+      NAME : 'STATE'
+    }
+    dataservice.getDropdownData(state_payload).subscribe((data) => {
       this.states = data;
     });
   }

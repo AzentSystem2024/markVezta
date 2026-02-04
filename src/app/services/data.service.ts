@@ -207,10 +207,13 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/update`, data);
   }
 
-
-  deleteArticle(id: number) {
-    return this.http.post<any>(`${this.apiUrl}article/delete/` + id, {});
+  deleteArticle(payload) {
+    return this.http.post<any>(`${this.apiUrl}article/delete`, payload);
   }
+
+  // deleteArticle(id: number) {
+  //   return this.http.post<any>(`${this.apiUrl}article/delete/` + id, {});
+  // }
 
   //JOURNAL VOUCHER
   getJournalVoucherList(items: any): Observable<any> {
@@ -1358,12 +1361,10 @@ export class DataService {
   }
 
   //itemstoreprices
-  getItemListByStoreId(storeIds: any): Observable<any> {
+  getItemListByStoreId(): Observable<any> {
     console.log('IN SERVICE');
-    const body = {
-      STORE_ID: storeIds,
-    };
-    return this.http.post(`${this.apiUrl}itemvizard/itempricewizard`, body);
+  
+    return this.http.post(`${this.apiUrl}itemvizard/itempricewizard`, {});
   }
 
   //denail

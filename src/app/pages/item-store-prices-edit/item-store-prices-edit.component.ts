@@ -16,6 +16,7 @@ import {
   DxDateBoxModule,
   DxFileUploaderModule,
   DxFormModule,
+  DxNumberBoxModule,
   DxPopupModule,
   DxProgressBarModule,
   DxRadioGroupModule,
@@ -123,12 +124,12 @@ export class ItemStorePricesEditComponent {
   isIncrease: boolean = true;
   selectedSalePrice: any;
   salePriceOptions = [
-    { value: 'SALE_PRICE', text: 'Sale Price ' },
-    { value: 'SALE_PRICE1', text: 'Sale Price 1' },
-    { value: 'SALE_PRICE2', text: 'Sale Price 2' },
-    { value: 'SALE_PRICE3', text: 'Sale Price 3' },
-    { value: 'SALE_PRICE4', text: 'Sale Price 4' },
-    { value: 'SALE_PRICE5', text: 'Sale Price 5' },
+    { value: 'SALE_PRICE', text: 'MRP ' },
+    { value: 'SALE_PRICE1', text: 'Standard Price' },
+    { value: 'SALE_PRICE2', text: ' Price 2' },
+    { value: 'SALE_PRICE3', text: ' Price 3' },
+    { value: 'SALE_PRICE4', text: ' Price 4' },
+    { value: 'SALE_PRICE5', text: ' Price 5' },
   ];
   newPrice: any;
   isEditable: boolean = true;
@@ -151,10 +152,34 @@ export class ItemStorePricesEditComponent {
   isFilterOpened = false;
   private filterApplied = false;
   selected_Company_id: any;
+  selected_ItemType: any;
+  itemtype: any;
+  narrationText: any;
+
+  //----------------select columns--------
+  priceColumnOptions = [
+    { text: 'MRP', value: 'MRP' },
+    { text: 'Standard Price', value: 'PRICE1' },
+    { text: 'Price 2', value: 'PRICE2' },
+    { text: 'Price 3', value: 'PRICE3' },
+    { text: 'Price 4', value: 'PRICE4' },
+    { text: 'Price 5', value: 'PRICE5' },
+  ];
+
+  selectedPriceColumns: string[] = ['MRP']; // default visible
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+  selected_data: any;
   constructor(
     private dataservice: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
       this.department = data;
@@ -164,6 +189,12 @@ export class ItemStorePricesEditComponent {
     });
     dataservice.getDropdownData('BRAND').subscribe((data) => {
       this.brand = data;
+    });
+    const payload = {
+      NAME: 'ITEMTYPE',
+    };
+    dataservice.getDropdownData(payload).subscribe((data) => {
+      this.itemtype = data;
     });
   }
 
@@ -181,25 +212,25 @@ export class ItemStorePricesEditComponent {
     }
     this.loadStores();
   }
+
   getWorksheetData(): void {
     this.dataservice.worksheetData$.subscribe((data) => {
       this.worksheetData = data;
       console.log(this.worksheetData, 'IN EDITTTT');
 
-      const allItems = this.worksheetData.worksheet_item_price || [];
-      console.log(allItems, 'ALL WORKSHEET ITEMS');
-
-      if (!this.filterApplied) {
-        this.worksheetItems = allItems.filter((item) => item.Selected === true);
-        this.filterApplied = true; // Mark filtering done
-      }
-
-      console.log(this.worksheetItems, 'FILTERED SELECTED ITEMS');
+      this.worksheetItems = this.worksheetData.worksheet_item_price || [];
+      console.log(this.worksheetItems, '+++++++++=');
+      this.narrationText = this.worksheetData.NARRATION;
 
       this.itemIds = this.worksheetItems.map((item) => +item.ITEM_ID);
       console.log(this.itemIds, 'Extracted ITEM_IDs as numbers');
 
-      this.selectedItems = this.worksheetItems;
+      // Select rows that have Selected === true
+      this.selectedItems = this.worksheetItems.filter(
+        (item) => item.Selected === true,
+      );
+
+      // Now set selectedRowKeys after selecting items
       this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
       console.log(this.selectedRowKeys, 'Selected Row Keys');
 
@@ -209,7 +240,7 @@ export class ItemStorePricesEditComponent {
 
       if (this.worksheetData?.worksheet_item_price?.length > 0) {
         const storId = this.worksheetData.worksheet_item_store.map(
-          (store) => store.STORE_ID
+          (store) => store.STORE_ID,
         );
         this.payloadForVerify = {
           ID: this.worksheetData.ID,
@@ -226,68 +257,22 @@ export class ItemStorePricesEditComponent {
 
       if (this.worksheetData?.worksheet_item_store?.length > 0) {
         this.selectedStoreId = this.worksheetData.worksheet_item_store.map(
-          (store) => store.STORE_ID
+          (store) => store.STORE_ID,
         );
       } else {
         this.selectedStoreId = [];
       }
 
-      this.cdr.detectChanges();
+      this.cdr.detectChanges(); // Ensure UI refresh
     });
   }
 
-  // getWorksheetData(): void {
-  //   this.dataservice.worksheetData$.subscribe((data) => {
-  //     this.worksheetData = data;
-  //     console.log(this.worksheetData, 'IN EDITTTT');
+  isVisible(code: string): boolean {
+    return this.selectedPriceColumns.includes(code);
+  }
 
-  //     this.worksheetItems = this.worksheetData.worksheet_item_price || [];
-  //     console.log(this.worksheetItems, '+++++++++=');
+  onPriceColumnChange() {}
 
-  //     this.itemIds = this.worksheetItems.map((item) => +item.ITEM_ID);
-  //     console.log(this.itemIds, 'Extracted ITEM_IDs as numbers');
-
-  //     // Select rows that have Selected === true
-  //     this.selectedItems = this.worksheetItems.filter(
-  //       (item) => item.Selected === true
-  //     );
-
-  //     // Now set selectedRowKeys after selecting items
-  //     this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
-  //     console.log(this.selectedRowKeys, 'Selected Row Keys');
-
-  //     this.statusOfWorksheet = data.status;
-  //     this.isApplyButtonDisabled = this.statusOfWorksheet === 'Approved';
-  //     this.disableIfVerified = this.statusOfWorksheet === 'Verified';
-
-  //     if (this.worksheetData?.worksheet_item_price?.length > 0) {
-  //       const storId = this.worksheetData.worksheet_item_store.map(
-  //         (store) => store.STORE_ID
-  //       );
-  //       this.payloadForVerify = {
-  //         ID: this.worksheetData.ID,
-  //         COMPANY_ID: 1,
-  //         USER_ID: 1,
-  //         STORE_ID: storId[0],
-  //         NARRATION: '',
-  //         worksheet_item_price: this.worksheetItems,
-  //       };
-  //       this.isButtonDisabled = this.selectedItems.length === 0;
-  //     } else {
-  //       console.warn('worksheet_item_price is empty or not present.');
-  //     }
-
-  //     if (this.worksheetData?.worksheet_item_store?.length > 0) {
-  //       this.selectedStoreId = this.worksheetData.worksheet_item_store.map(
-  //         (store) => store.STORE_ID
-  //       );
-  //     } else {
-  //       this.selectedStoreId = [];
-  //     }
-
-  //     this.cdr.detectChanges(); // Ensure UI refresh
-  //   });
-  // }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
@@ -303,7 +288,7 @@ export class ItemStorePricesEditComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -330,17 +315,20 @@ export class ItemStorePricesEditComponent {
     }
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+  }
 
   loadStores() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
       this.filteredStoreList = this.store;
@@ -349,11 +337,11 @@ export class ItemStorePricesEditComponent {
 
   getStoresById(storeId: any) {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.filteredStoreList = response.filter(
-        (store: any) => store.ID === storeId
+        (store: any) => store.ID === storeId,
       );
       if (this.filteredStoreList.length > 0) {
         this.listItemsByMultipleStoreIds(storeId);
@@ -363,11 +351,14 @@ export class ItemStorePricesEditComponent {
 
   listItemsByMultipleStoreIds(storeIds: string) {
     console.log(storeIds, 'STOREIDSSSSSSSSSSSSSSS');
-    this.dataservice.getItemListByStoreId(storeIds).subscribe(
+    storeIds = storeIds.toString();
+    storeIds = storeIds.toString();
+
+    this.dataservice.getItemListByStoreId().subscribe(
       (response) => {
         this.worksheetItems = response.PriceWizardData;
         this.selectedItems = this.worksheetItems.filter(
-          (item) => item.Selected === true
+          (item) => item.Selected === true,
         );
         if (this.selectedItems.length > 0) {
           this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
@@ -378,33 +369,83 @@ export class ItemStorePricesEditComponent {
       },
       (error) => {
         // console.error('Error fetching item list:', error);
-      }
+      },
     );
   }
 
+  // onRowUpdated(event: any) {
+  //   console.log('on RowUpdated event data:', event);
+  //   const updatedData = event.data;
+  //   const rowId = updatedData.ID;
+  //   const eventRowdata = event.data;
+  //   this.updatedItems[rowId] = {
+  //     ITEM_ID: rowId,
+  //     SALE_PRICE: updatedData.SALE_PRICE || 0.0,
+  //     SALE_PRICE1: updatedData.SALE_PRICE1 || 0.0,
+  //     SALE_PRICE2: updatedData.SALE_PRICE2 || 0.0,
+  //     SALE_PRICE3: updatedData.SALE_PRICE3 || 0.0,
+  //     SALE_PRICE4: updatedData.SALE_PRICE4 || 0.0,
+  //     SALE_PRICE5: updatedData.SALE_PRICE5 || 0.0,
+
+  //     PRICE_NEW: updatedData.PRICE_NEW || '',
+  //     PRICE_LEVEL1_NEW: updatedData.PRICE_LEVEL1_NEW || '',
+  //     PRICE_LEVEL2_NEW: updatedData.PRICE_LEVEL2_NEW || '',
+  //     PRICE_LEVEL3_NEW: updatedData.PRICE_LEVEL3_NEW || '',
+  //     PRICE_LEVEL4_NEW: updatedData.PRICE_LEVEL4_NEW || '',
+  //     PRICE_LEVEL5_NEW: updatedData.PRICE_LEVEL5_NEW || '',
+  //   };
+  // }
+
   onRowUpdated(event: any) {
-    const updatedData = event.data;
-    const rowId = updatedData.ID;
+    const updatedRow = event.data;
+    const rowId = updatedRow.ID;
+
+    // 🔍 selected_data il already undo enn check
+    const index = this.selected_data.findIndex(
+      (item: any) => item.ID === rowId,
+    );
+
+    if (index !== -1) {
+      //  Already selected → update values
+      this.selected_data[index] = {
+        ...this.selected_data[index],
+        ...updatedRow,
+      };
+    } else {
+      // ➕ Not selected → add newly
+      this.selected_data.push(updatedRow);
+    }
+
+    // (Optional) backend save / payload use cheyyan
     this.updatedItems[rowId] = {
       ITEM_ID: rowId,
-      SALE_PRICE: updatedData.SALE_PRICE || 0.0,
-      SALE_PRICE1: updatedData.SALE_PRICE1 || 0.0,
-      SALE_PRICE2: updatedData.SALE_PRICE2 || 0.0,
-      SALE_PRICE3: updatedData.SALE_PRICE3 || 0.0,
-      SALE_PRICE4: updatedData.SALE_PRICE4 || 0.0,
-      SALE_PRICE5: updatedData.SALE_PRICE5 || 0.0,
+      SALE_PRICE: updatedRow.SALE_PRICE || 0,
+      SALE_PRICE1: updatedRow.SALE_PRICE1 || 0,
+      SALE_PRICE2: updatedRow.SALE_PRICE2 || 0,
+      SALE_PRICE3: updatedRow.SALE_PRICE3 || 0,
+      SALE_PRICE4: updatedRow.SALE_PRICE4 || 0,
+      SALE_PRICE5: updatedRow.SALE_PRICE5 || 0,
 
-      PRICE_NEW: updatedData.PRICE_NEW || '',
-      PRICE_LEVEL1_NEW: updatedData.PRICE_LEVEL1_NEW || '',
-      PRICE_LEVEL2_NEW: updatedData.PRICE_LEVEL2_NEW || '',
-      PRICE_LEVEL3_NEW: updatedData.PRICE_LEVEL3_NEW || '',
-      PRICE_LEVEL4_NEW: updatedData.PRICE_LEVEL4_NEW || '',
-      PRICE_LEVEL5_NEW: updatedData.PRICE_LEVEL5_NEW || '',
+      PRICE_NEW: updatedRow.PRICE_NEW || '',
+      PRICE_LEVEL1_NEW: updatedRow.PRICE_LEVEL1_NEW || '',
+      PRICE_LEVEL2_NEW: updatedRow.PRICE_LEVEL2_NEW || '',
+      PRICE_LEVEL3_NEW: updatedRow.PRICE_LEVEL3_NEW || '',
+      PRICE_LEVEL4_NEW: updatedRow.PRICE_LEVEL4_NEW || '',
+      PRICE_LEVEL5_NEW: updatedRow.PRICE_LEVEL5_NEW || '',
     };
+
+    console.log('Updated selected_data:', this.selected_data);
   }
 
   onSelectionChanged(event: any) {
     const totalItemsCount = event.component.getDataSource().items().length;
+
+    console.log(
+      event,
+      '==================SELECTION CHANGED EVENT===================',
+    );
+
+    this.selected_data = [...event.selectedRowsData];
 
     // Automatically select all rows if there are items available
     if (totalItemsCount > 0 && this.selectedRowCount === 0) {
@@ -493,7 +534,7 @@ export class ItemStorePricesEditComponent {
       this.itemStoresList = [];
     } else {
       this.selectedStoreId = this.storeIds;
-      this.listItemsByMultipleStoreIds(this.storeIds);
+      // this.listItemsByMultipleStoreIds(this.storeIds);
     }
   }
 
@@ -509,80 +550,64 @@ export class ItemStorePricesEditComponent {
           message: 'No rows selected. Please select at least one row to save.',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
+        'error',
       );
       return;
     }
-    const ID = this.worksheetData.ID;
-    const companyId = 1;
-    const userId = 1;
-    const narration = 'Narration';
-    const defaultStoreId = 1;
-    const worksheetItemPrice = this.itemIds.map((itemId, index) => {
-      const originalItem = this.worksheetData.worksheet_item_price[index]; // Get original item data
-      // console.log(itemId,"ITEMID")
-      // Get updated item, if any
-      const updatedItem = this.updatedItems[itemId] || {};
-
-      return {
-        ITEM_ID: itemId,
-        SALE_PRICE: updatedItem.SALE_PRICE ?? originalItem.SALE_PRICE ?? 0.0,
-        SALE_PRICE1: updatedItem.SALE_PRICE1 ?? originalItem.SALE_PRICE1 ?? 0.0,
-        SALE_PRICE2: updatedItem.SALE_PRICE2 ?? originalItem.SALE_PRICE2 ?? 0.0,
-        SALE_PRICE3: updatedItem.SALE_PRICE3 ?? originalItem.SALE_PRICE3 ?? 0.0,
-        SALE_PRICE4: updatedItem.SALE_PRICE4 ?? originalItem.SALE_PRICE4 ?? 0.0,
-        SALE_PRICE5: updatedItem.SALE_PRICE5 ?? originalItem.SALE_PRICE5 ?? 0.0,
-        PRICE_NEW: updatedItem.PRICE_NEW ?? originalItem.PRICE_NEW ?? 0.0, // Ensure this reflects the updated value
-        PRICE_LEVEL1_NEW:
-          updatedItem.PRICE_LEVEL1_NEW ?? originalItem.PRICE_LEVEL1_NEW ?? 0.0,
-        PRICE_LEVEL2_NEW:
-          updatedItem.PRICE_LEVEL2_NEW ?? originalItem.PRICE_LEVEL2_NEW ?? 0.0,
-        PRICE_LEVEL3_NEW:
-          updatedItem.PRICE_LEVEL3_NEW ?? originalItem.PRICE_LEVEL3_NEW ?? 0.0,
-        PRICE_LEVEL4_NEW:
-          updatedItem.PRICE_LEVEL4_NEW ?? originalItem.PRICE_LEVEL4_NEW ?? 0.0,
-        PRICE_LEVEL5_NEW:
-          updatedItem.PRICE_LEVEL5_NEW ?? originalItem.PRICE_LEVEL5_NEW ?? 0.0,
-      };
-    });
-
-    console.log(worksheetItemPrice, 'WORKSHEETITEMPRICE');
-    let storeId = this.worksheetData.worksheet_item_store
-      .map((storeID) => storeID.STORE_ID)
-      .join(',');
-    if (storeId.includes(',')) {
-      storeId = '1';
-    }
     const payload = {
-      ID: ID,
-      COMPANY_ID: companyId,
-      USER_ID: userId,
-      // STORE_ID: storeId || defaultStoreId,
-      STORE_ID: String(this.storeIds || defaultStoreId),
-      NARRATION: narration,
-      worksheet_item_price: worksheetItemPrice,
+      ...this.worksheetData,
+      NARRATION: this.narrationText,
+      worksheet_item_price: this.selected_data || this.worksheetItems,
     };
-    console.log(payload, 'PAYLOADDDD');
+    console.log(payload, 'PAYLOAD TO SAVE');
 
+    const invalidItems = payload.worksheet_item_price.filter(
+      (item: any) => item.PRICE_NEW <= item.PRICE_LEVEL1_NEW,
+    );
+
+    if (invalidItems.length > 0) {
+      //  Get all item codes
+      const itemCodes = invalidItems
+        .map((item: any) => item.ITEM_CODE)
+        .join(', ');
+
+      notify(
+        `MRP must be greater than Standard Price for Item(s): ${itemCodes}`,
+        'error',
+        5000,
+      );
+
+      return; //  Stop saving
+    }
     if (this.isApproved) {
       const result = confirm(
         'Are you sure you want to approve this worksheet?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
 
       result.then((dialogResult) => {
         if (dialogResult) {
-          // ✅ User confirmed approval
+          //  User confirmed approval
           this.dataservice.approveworksheetItemPrices(payload).subscribe(
             (response) => {
-              notify(
-                {
-                  message: 'Worksheet Approved Successfully',
-                  position: { at: 'top center', my: 'top center' },
-                },
-                'success'
-              );
-              this.router.navigate(['/change-price']);
+              if (response.flag == 1) {
+                notify(
+                  {
+                    message: 'Worksheet Approved Successfully',
+                    position: { at: 'top center', my: 'top center' },
+                  },
+                  'success',
+                );
+                this.router.navigate(['/change-price']);
+              } else {
+                notify(
+                  {
+                    message: response.message || 'Worksheet Approved failed',
+                    position: { at: 'top center', my: 'top center' },
+                  },
+                  'error',
+                );
+              }
             },
             (error) => {
               console.error('Error approving worksheet:', error);
@@ -591,33 +616,23 @@ export class ItemStorePricesEditComponent {
                   message: 'Error approving worksheet',
                   position: { at: 'top right', my: 'top right' },
                 },
-                'error'
+                'error',
               );
-            }
+            },
           );
         }
       });
     } else {
-      // ✅ Call update API
+      console.log(payload, 'PAYLOAD TO SAVE');
       this.dataservice.updateworksheetItemPrice(payload).subscribe(
         (response) => {
-          if (response) {
-            this.savedWorksheet = {
-              ID: this.selectedRowId,
-              COMPANY_ID: companyId,
-              USER_ID: userId,
-              WS_DATE: new Date(),
-              WS_NO: 'WS-001',
-              flag: 1,
-              message: 'Success',
-              worksheet_item_price: worksheetItemPrice,
-            };
+          if (response.flag === 1) {
             notify(
               {
                 message: 'Worksheet Updated Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
-              'success'
+              'success',
             );
             if (!this.AllowCommitWithSave) {
               this.router.navigate(['/change-price']);
@@ -625,55 +640,19 @@ export class ItemStorePricesEditComponent {
           } else {
             notify(
               {
-                message: 'Your Data Not Saved',
+                message: response.message || 'Your Data Not Saved',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
         },
+
         (error) => {
           console.error('Error saving data:', error);
-        }
+        },
       );
     }
-    // this.dataservice.updateworksheetItemPrice(payload).subscribe(
-    //   (response) => {
-    //     if (response) {
-    //       this.savedWorksheet = {
-    //         ID: this.selectedRowId,
-    //         COMPANY_ID: companyId,
-    //         USER_ID: userId,
-    //         WS_DATE: new Date(),
-    //         WS_NO: 'WS-001',
-    //         flag: 1, // Assuming success
-    //         message: 'Success',
-    //         worksheet_item_price: worksheetItemPrice,
-    //       };
-    //       notify(
-    //         {
-    //           message: 'Worksheet Updated Successfully',
-    //           position: { at: 'top center', my: 'top center' },
-    //         },
-    //         'success'
-    //       );
-    //       if (!this.AllowCommitWithSave) {
-    //         this.router.navigate(['/change-price']); // Adjust the route if necessary
-    //       }
-    //     } else {
-    //       notify(
-    //         {
-    //           message: 'Your Data Not Saved',
-    //           position: { at: 'top right', my: 'top right' },
-    //         },
-    //         'error'
-    //       );
-    //     }
-    //   },
-    //   (error) => {
-    //     console.error('Error saving data:', error);
-    //   }
-    // );
   }
 
   onVerify() {
@@ -697,7 +676,7 @@ export class ItemStorePricesEditComponent {
           PRICE_LEVEL3_NEW: item.PRICE_LEVEL3_NEW ?? 0.0,
           PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? 0.0,
           PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? 0.0,
-        })
+        }),
       );
       const ID = this.worksheetData.ID;
       let storeId = this.worksheetData.worksheet_item_store
@@ -732,7 +711,7 @@ export class ItemStorePricesEditComponent {
                 message: 'Worksheet Verified Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
-              'success'
+              'success',
             );
             this.isVerified = true;
           } else {
@@ -741,7 +720,7 @@ export class ItemStorePricesEditComponent {
                 message: 'Your Data Not Saved',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
           console.log('Verification successful:', verifyResponse);
@@ -779,7 +758,7 @@ export class ItemStorePricesEditComponent {
           PRICE_LEVEL3_NEW: item.PRICE_LEVEL3_NEW ?? 0.0,
           PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? 0.0,
           PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? 0.0,
-        })
+        }),
       );
       const ID = this.worksheetData.ID;
       let storeId = this.worksheetData.worksheet_item_store
@@ -814,7 +793,7 @@ export class ItemStorePricesEditComponent {
                 message: 'Worksheet Approved Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
-              'success'
+              'success',
             );
           } else {
             notify(
@@ -822,7 +801,7 @@ export class ItemStorePricesEditComponent {
                 message: 'Your Data Not Saved',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
         });
@@ -857,7 +836,7 @@ export class ItemStorePricesEditComponent {
       const selectedRowsData = [];
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.worksheetItems.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
         if (selectedRow) {
           selectedRowsData.push(selectedRow);
@@ -927,7 +906,7 @@ export class ItemStorePricesEditComponent {
 
             console.log(
               `Updated ${selectedOption} for row ID ${selectedRow.ID}:`,
-              finalPrice
+              finalPrice,
             );
           });
         } else {
@@ -949,7 +928,7 @@ export class ItemStorePricesEditComponent {
     if (this.selectedRowKeys.length > 0 && this.selectedSalePrice.length > 0) {
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.worksheetItems.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
         if (selectedRow) {
           // Iterate over each selected option
@@ -966,7 +945,7 @@ export class ItemStorePricesEditComponent {
 
             console.log(
               `Rounded price for ${selectedOption}, row ID ${selectedRowId}:`,
-              this.newPrice
+              this.newPrice,
             );
           });
         } else {
@@ -1029,6 +1008,7 @@ export class ItemStorePricesEditComponent {
     DxRadioGroupModule,
     DxPopupModule,
     DxTagBoxModule,
+    DxNumberBoxModule,
   ],
   providers: [],
   exports: [],

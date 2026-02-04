@@ -207,6 +207,7 @@ export class ItemsEditFormComponent implements OnInit {
   newAlias: any;
   selectedRowKeys: number[] = [];
   checkedStoreIDs: number[] = [];
+  salePrice : any
 
   formItemsData: any = {
     ID: '',
@@ -493,7 +494,9 @@ export class ItemsEditFormComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['itemData'] && this.itemData) {
       console.log(JSON.parse(JSON.stringify(this.itemData)), 'IN NGONCHANGES');
-      console.log(this.itemData.PARENT_ITEM_ID, 'IMAGE_NAME in ngOnChanges');
+     
+      console.log(this.itemData.SALE_PRICE,'sale price')
+      this.salePrice = this.itemData.SALE_PRICE;
       this.formItemsData = this.itemData;
       if (this.itemData.IMAGE_NAME) {
         this.imageSource = this.itemData.IMAGE_NAME; // Set the Base64 string to the imageSource

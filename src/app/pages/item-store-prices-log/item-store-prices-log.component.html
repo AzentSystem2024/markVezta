@@ -10,6 +10,7 @@
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
+      [showColumnLines]="true"
       rowAlternationInterval="2"
       (onSelectionChanged)="onSelectionChanged($event)"
       (onEditingStart)="openEditingStart($event)"
@@ -46,7 +47,11 @@
         <dxi-item location="before">
           <div class="grid-header">Change Item Price</div>
         </dxi-item>
-
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -95,19 +100,28 @@
       <dxi-column
         dataField="NARRATION"
         caption="Remarks"
-        [width]="'auto'"
+        [width]="'600'"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
         dataField="Status"
         caption="Status"
-        [width]="'auto'"
+        [width]="150"
         [allowEditing]="false"
+        cellTemplate="statusCellTemplate"
+        alignment="center"
       ></dxi-column>
-      <dxi-column type="buttons" width="150" [buttons]="allButtonsEditDelete">
-      </dxi-column>
 
-      <dxi-column type="buttons" width="150" [buttons]="customButtons">
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value == 'Open' ? 'Open ' : 'Approve '"
+          style="cursor: default; align-items: center"
+        ></i>
+              
+      </div>
+      <dxi-column type="buttons" [width]="150" [buttons]="allButtonsEditDelete">
       </dxi-column>
       <!-- <dxi-column type="buttons" width="150" [buttons]="allButtons">
         </dxi-column> -->

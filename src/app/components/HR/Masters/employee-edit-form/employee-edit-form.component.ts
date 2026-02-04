@@ -161,16 +161,28 @@ export class EmployeeEditFormComponent {
       this.countries = data;
     });
 
-    dataservice.getDropdownData('EMPLOYEE DEPARTMENT').subscribe((data) => {
+    const payload = {
+      NAME:'EMPLOYEE DEPARTMENT'
+    }
+    dataservice.getDropdownData(payload).subscribe((data) => {
       this.departments = data;
     });
-    dataservice.getDropdownData('DESIGNATION').subscribe((data) => {
+    const designation_payload = {
+      NAME :'DESIGNATION'
+    }
+    dataservice.getDropdownData(designation_payload).subscribe((data) => {
       this.designations = data;
     });
-    dataservice.getDropdownData('SALARY PAYMENT TYPE').subscribe((data) => {
+    const PaymentType_payload = {
+      NAME : 'SALARY PAYMENT TYPE'
+    }
+    dataservice.getDropdownData(PaymentType_payload).subscribe((data) => {
       this.paymentType = data;
     });
-    dataservice.getDropdownData('STATE').subscribe((data) => {
+    const state_payload = {
+      NAME : 'STATE'
+    }
+    dataservice.getDropdownData(state_payload).subscribe((data) => {
       this.states = data;
     });
   }

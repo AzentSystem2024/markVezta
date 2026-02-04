@@ -1,127 +1,3 @@
-// @use "../../../variables.scss" as *;
-// @use "sass:math";
-
-// :host {
-//   --side-panel-toolbar-height: 76px;
-
-//   width: 100%;
-//   display: contents;
-//   overflow: auto; 
-// }
-
-// .view-wrapper {
-  
-//     .grid {
-//       .name-template {
-//         .position {
-//           font-size: 12px;
-//           color: var(--texteditor-label-color);
-//         }
-//       }
-  
-//       ::ng-deep & {
-//         .dx-datagrid-header-panel {
-//           padding: 0 var(--content-padding);
-//         }
-  
-//         .dx-toolbar {
-//           margin-bottom: 0;
-//           padding: var(--toolbar-margin-bottom) 0;
-//         }
-  
-//         .dx-datagrid-content .dx-row {
-//           cursor: pointer;
-//         }
-//       }
-  
-//       .grid-header {
-//         @include header();
-//       }
-//     }
-  
-//     user-panel {
-//       display: inherit;
-//     }
-//   }
-  
- 
-//   .popup-content {
-//     padding: 20px;
-//   }
-  
-//   .popup-content > div {
-//     margin-bottom: 15px;
-//   }
-
-
-// .form-row {
-//   margin: 20px 0; /* Space around the form row */
-// }
-
-// .input-container {
-//   display: flex; /* Use flexbox to align items */
-//   align-items: center; /* Center vertically */
-// }
-// .toggle-container {
-//   display: flex; /* Flexbox for alignment */
-//   align-items: center; /* Center items vertically */
-//   position: relative; /* Position relative for the slider */
-//   width: 60px; /* Width of the toggle switch */
-//   height: 30px; /* Height of the toggle switch */
-//   border-radius: 20px; /* Rounded corners */
-//   background-color: #ccc; /* Background color */
-//   cursor: pointer; /* Pointer cursor on hover */
-//   margin-left: 10px; /* Space between input and toggle */
-// }
-
-// .toggle-slider {
-//   position: absolute; /* Position absolute for sliding effect */
-//   display: flex;
-//   top: 2px; /* Align to the top of the toggle container */
-//   left: 0; /* Start at the left */
-//   width: 28px; /* Width of the slider */
-//   height: 28px; /* Full height */
-//   border-radius: 20px; /* Rounded corners */
-//   background-color: #007bff; /* Slider color */
-//   transition: transform 0.3s ease; /* Smooth transition for sliding */
-//   justify-content: center;
-//   align-items: center;
-// }
-
-
-
-// .toggle-option {
-//   font-size: 30px; /* Adjust font size */
-//   line-height: 30px; /* Center text vertically */
-//   flex: 1; /* Make each option take equal space */
-//   text-align: center; /* Center text horizontally */
-//   cursor: pointer;
-// }
-
-// .decrease-option {
-//   text-align: left; /* Align "-" to the left */
-//   padding-left: 5px; /* Space from the left */
-// }
-
-// .increase-option {
-//   text-align: right; /* Align "+" to the right */
-//   padding-right: 5px; /* Space from the right */
-// }
-
-// .increase {
-//   transform: translateX(30px); /* Adjust to move the slider */
-// }
-
-// .decrease {
-//   transform: translateX(0); /* Initial position */
-// }
-
-// .toggle-option.active {
-//   color: #0a0a0a; /* Change color for active state */
-//   font-weight: bold; /* Optional: make active option bold */
-// }
-
-
 @use "../../../variables.scss" as *;
 @use "sass:math";
 
@@ -297,3 +173,10 @@ font-weight: bolder !important;
   font-weight: 400;
   padding-right: 25px;
 }
+
+
+::ng-deep.dx-editor-outlined.dx-texteditor-with-label, .dx-editor-outlined.dx-texteditor-with-floating-label{
+  outline: none;
+  margin-top: 1px !important;
+}
+
