@@ -7,12 +7,18 @@ import {
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { finalize } from 'rxjs/operators';
+import { InactivityService } from './inactivity.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService) {}
+  private activeRequests = 0;
+  constructor(
+    private authService: AuthService,
+    private inactivityService: InactivityService,
+  ) {}
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler,
@@ -23,15 +29,26 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const token = sessionStorage.getItem('authToken'); //adding token to http request header
 
+    let clonedReq = req;
+
+    // Temporarily avoid passing token (keep code for future use)
     if (token) {
-      const clonedReq = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
+      clonedReq = req.clone({
+        setHeaders: { Authorization: `Bearer ${token}` },
       });
-      return next.handle(clonedReq);
     }
 
-    return next.handle(req);
+    // Track requests
+    this.activeRequests++;
+    this.inactivityService.setApiInProgress(true);
+
+    return next.handle(clonedReq).pipe(
+      finalize(() => {
+        this.activeRequests--;
+        if (this.activeRequests === 0) {
+          this.inactivityService.setApiInProgress(false);
+        }
+      }),
+    );
   }
 }

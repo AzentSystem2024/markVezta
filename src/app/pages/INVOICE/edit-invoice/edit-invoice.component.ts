@@ -340,7 +340,7 @@ export class EditInvoiceComponent {
   getInvoiceListForGrid() {
     const payload = {
       CUST_ID: this.invoiceFormData.DISTRIBUTOR_ID,
-      // COMPANY_ID: this.selectedCompanyId,
+      COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
       this.staticTransfers = response.Data; // Save the original full list
@@ -466,6 +466,19 @@ export class EditInvoiceComponent {
   // };
 
   openTrOutSelector() {
+    if (!this.staticTransfers || this.staticTransfers.length === 0) {
+      notify({
+        message: 'No data found.',
+        type: 'warning',
+        displayTime: 2000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
+      return; // stop execution here
+    }
     console.log('staticTransfers:', this.staticTransfers);
 
     const selectedTransferNos =
@@ -567,6 +580,27 @@ export class EditInvoiceComponent {
 
     this.itemsGridRef?.instance.refresh();
     this.logGridSummaries();
+  }
+
+  onTrOutPopupClose() {
+    // Restore original data
+    this.invoiceGridList = [...this.staticTransfers];
+
+    if (this.popupGridRef?.instance) {
+      const grid = this.popupGridRef.instance;
+
+      // ✅ Clears filter row AND header filter
+      grid.clearFilter();
+
+      // ✅ Clear row selections
+      grid.clearSelection();
+
+      // ✅ Reset paging
+      grid.pageIndex(0);
+
+      // ✅ Refresh grid
+      grid.refresh();
+    }
   }
 
   cancelPopup() {

@@ -113,6 +113,7 @@ export class PackingAddComponent {
     SUPP_ID: 0,
     COMPANY_ID: 0,
     STD_PRICE: 0,
+    ITEM_DESCRIPTION:'',
     STD_PRICE_EFFECT_FROM: new Date(),
     PackingEntries: [
       {
@@ -299,7 +300,7 @@ export class PackingAddComponent {
       artNo: this.PackingData.ART_NO,
       color: this.PackingData.COLOR,
       categoryID: this.PackingData.CATEGORY_ID,
-      unitID: this.selectedProductionUnitId,
+      // unitID: this.selectedProductionUnitId,
       // COMPANY_ID: this.selected_Company_id,
     };
 
@@ -311,21 +312,21 @@ export class PackingAddComponent {
     const CatgoryvalidationResult =
       this.CategoryValidationGroup?.instance?.validate();
 
-    const UnitvalidationResult = this.UnitValidationGroup?.instance?.validate();
+    // const UnitvalidationResult = this.UnitValidationGroup?.instance?.validate();
 
     if (
       !ArtvalidationResult.isValid ||
       !ColorvalidationResult.isValid ||
-      !CatgoryvalidationResult.isValid ||
-      !UnitvalidationResult.isValid
+      !CatgoryvalidationResult.isValid 
+      // !UnitvalidationResult.isValid
     ) {
       return; //  Prevent saving if form is invalid
     }
     if (
       !payload.artNo ||
       !payload.color ||
-      !payload.categoryID ||
-      !payload.unitID
+      !payload.categoryID 
+      // !payload.unitID
     ) {
       notify(
         {
@@ -817,6 +818,24 @@ export class PackingAddComponent {
 
     this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
 
+    // ===============================
+//  PRICE VALIDATION
+// ===============================
+const mrp = Number(this.PackingData.PACK_PRICE);
+const stdPrice = Number(this.PackingData.STD_PRICE);
+
+if (mrp <= stdPrice) {
+  notify(
+    {
+      message: 'MRP must be greater than Standard Price',
+      position: { at: 'top right', my: 'top right' },
+      displayTime: 1200,
+    },
+    'error'
+  );
+  return; //  STOP SAVE
+}
+
     // =====================================================
     //  BUILD BOM PAYLOAD
     // =====================================================
@@ -1232,11 +1251,11 @@ export class PackingAddComponent {
 
     const brandName =
       this.brandList?.find((b: any) => b.ID === this.PackingData.BRAND_ID)
-        ?.DESCRIPTION || '';
+        ?.ITEM_DESCRIPTION || '';
 
     const categoryName =
       this.categoryList?.find((c: any) => c.ID === this.PackingData.CATEGORY_ID)
-        ?.DESCRIPTION || '';
+        ?.ITEM_DESCRIPTION || '';
 
     const artNo = this.PackingData.ART_NO || '';
     const color = this.PackingData.COLOR || '';
@@ -1254,7 +1273,7 @@ export class PackingAddComponent {
       price,
     ].filter((p) => p !== '' && p !== null && p !== undefined);
 
-    this.PackingData.DESCRIPTION = parts.join('-');
+    this.PackingData.ITEM_DESCRIPTION = parts.join('-');
   }
 }
 

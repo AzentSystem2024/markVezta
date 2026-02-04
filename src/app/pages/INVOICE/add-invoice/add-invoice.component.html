@@ -59,14 +59,14 @@
                     label="Invoice No."
                     labelMode="floating"
                     [(value)]="invoiceFormData.DOC_NO"
-                    [width]="148"
+                    [width]="185"
                   ></dx-text-box>
                   <dx-text-box
                     #refBoxRef
                     label="Reference No."
                     labelMode="floating"
                     [(value)]="invoiceFormData.REF_NO"
-                    [width]="148"
+                    [width]="185"
                   ></dx-text-box>
                 </div>
                 <div
@@ -78,21 +78,16 @@
                     margin-bottom: 24px;
                   "
                 >
-                  <!-- Radio Group -->
-
-                  <!-- Distributor Select -->
-                  <dx-select-box
-                    [(value)]="invoiceFormData.DISTRIBUTOR_ID"
-                    [dataSource]="distributorList"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    [width]="300"
-                    label="Customer"
+                  <dx-date-box
+                    label="Transaction Date"
+                    [(value)]="invoiceFormData.TRANS_DATE"
+                    type="date"
                     labelMode="floating"
+                    [width]="375"
+                    [displayFormat]="'dd-MM-yyyy'"
+                    [readOnly]="true"
                     style="margin-top: -1px"
-                    (onValueChanged)="onDistributorChanged($event)"
-                  >
-                  </dx-select-box>
+                  ></dx-date-box>
                 </div>
               </div>
             </dxi-item>
@@ -106,36 +101,38 @@
               >
                 <!-- Row 1: Date only -->
                 <div style="display: flex; gap: 2px; justify-content: flex-end">
+                  <dx-select-box
+                    [(value)]="invoiceFormData.DISTRIBUTOR_ID"
+                    [dataSource]="distributorList"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="375"
+                    label="Customer"
+                    labelMode="floating"
+                    (onValueChanged)="onDistributorChanged($event)"
+                  >
+                  </dx-select-box>
+                </div>
+                <div style="display: flex; gap: 2px; margin-bottom: 0">
                   <dx-button
                     text="Fill Pending Deliveries"
                     icon="event"
                     (onClick)="openTrOutSelector()"
-                    [width]="200"
+                    [width]="375"
                     stylingMode="outlined"
                     class="blue-outline-btn"
                   ></dx-button>
-                </div>
-                <div style="display: flex; gap: 2px; margin-bottom: 0">
-                  <dx-date-box
-                    label="Transaction Date"
-                    [(value)]="invoiceFormData.TRANS_DATE"
-                    type="date"
-                    labelMode="floating"
-                    [width]="200"
-                    [displayFormat]="'dd-MM-yyyy'"
-                    [readOnly]="true"
-                  ></dx-date-box>
                 </div>
               </div>
             </dxi-item>
           </dxo-toolbar>
 
           <dxi-column
-            dataField="TRANSFER_NO"
+            dataField="DN_NO"
             [caption]="
               invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
                 ? 'Item Code'
-                : 'Transfer No'
+                : 'Delivery No'
             "
             [width]="120"
           ></dxi-column>
@@ -421,28 +418,31 @@
 
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
       </dxo-toolbar>
-      <dxi-column
+      <!-- <dxi-column
         dataField="TRANSFER_NO"
         [caption]="
           invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
             ? 'Item Code'
-            : 'Transfer No'
+            : 'Delivery No'
         "
-      ></dxi-column>
+      ></dxi-column> -->
+      <dxi-column dataField="REF_NO" caption="Reference No"></dxi-column>
+      <dxi-column dataField="DN_NO" caption="Delivery No"></dxi-column>
       <dxi-column
         dataField="TRANSFER_DATE"
         caption="Date"
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column
+      <dxi-column dataField="ARTICLE" caption="Description"></dxi-column>
+      <!-- <dxi-column
         dataField="ARTICLE"
         [caption]="
           invoiceGridList?.length && invoiceGridList[0]?.CUST_TYPE === 2
             ? 'Item Descriptiom'
             : 'Article'
         "
-      ></dxi-column>
+      ></dxi-column> -->
       <dxi-column
         dataField="TOTAL_PAIR_QTY"
         caption="Qty"

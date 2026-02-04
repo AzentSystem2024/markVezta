@@ -60,6 +60,7 @@
   align-items: center;
   z-index: 2;
   position: relative;
+  min-height: 90px; /* increase height */
 }
 
 ::ng-deep

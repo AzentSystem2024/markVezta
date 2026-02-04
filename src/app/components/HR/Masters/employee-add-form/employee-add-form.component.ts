@@ -74,10 +74,10 @@ export class EmployeeAddFormComponent {
     ADDRESS3: '',
     CITY: '',
     STATE_ID: 0,
-    PF_AC_NO:'',
-    ESI_NO:'',
-    ESI_PERCENT:0,
-    COUNTRY_ID:0,
+    PF_AC_NO: '',
+    ESI_NO: '',
+    ESI_PERCENT: 0,
+    COUNTRY_ID: 0,
     MOBILE: '',
     EMAIL: '',
     IS_MALE: true,
@@ -119,7 +119,6 @@ export class EmployeeAddFormComponent {
     PAYMENT_TYPE: 0,
     LEAVE_DAY_BALANCE: 0,
     DAYS_DEDUCTED: 0,
-  
   };
   imageUrl: string | ArrayBuffer | null = null;
   uploadedFile: any;
@@ -154,9 +153,9 @@ export class EmployeeAddFormComponent {
   COMPANY_ID: any;
   selected_Company_id: any;
   constructor(public dataservice: DataService) {
-        dataservice.getCountryWithFlags().subscribe((data) => {
+    dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
-      console.log(this.countries,"COUNTRY;;;;;;;;;;")
+      console.log(this.countries, 'COUNTRY;;;;;;;;;;');
     });
     // dataservice.get_Country_Dropdown_Api().subscribe((data) => {
     //   this.countries = data;
@@ -168,33 +167,52 @@ export class EmployeeAddFormComponent {
         amount: null,
       }));
     });
-    dataservice.getDropdownData('EMPLOYEE DEPARTMENT').subscribe((data) => {
+
+    const dept_payload = {
+      NAME : 'EMPLOYEE DEPARTMENT'
+    }
+    dataservice.getDropdownData(dept_payload).subscribe((data) => {
       this.departments = data;
     });
-    dataservice.getDropdownData('DESIGNATION').subscribe((data) => {
+    const payload = {
+      NAME: 'DESIGNATION',
+    };
+    dataservice.getDropdownData(payload).subscribe((data) => {
       this.designations = data;
     });
-    dataservice.getDropdownData('SALARY PAYMENT TYPE').subscribe((data) => {
+    const paymentType_payload = {
+      NAME : 'SALARY PAYMENT TYPE'
+    }
+    dataservice.getDropdownData(paymentType_payload).subscribe((data) => {
       this.paymentType = data;
     });
-    dataservice.getDropdownData('STATE').subscribe((data) => {
+    const state_payload = {
+      NAME : 'STATE'
+    }
+    dataservice.getDropdownData(state_payload).subscribe((data) => {
       this.states = data;
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     const today = new Date();
-    this.eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    this.eighteenYearsAgo = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getDate(),
+    );
   }
 
   ngOnInit() {
     this.sesstion_Details();
     this.getEmployeeList();
-       const  SELECTED_COMPANY=JSON.parse(sessionStorage.getItem('savedUserData'))
-    const companyid=SELECTED_COMPANY.SELECTED_COMPANY
+    const SELECTED_COMPANY = JSON.parse(
+      sessionStorage.getItem('savedUserData'),
+    );
+    const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
 
-    console.log(SELECTED_COMPANY)
-    this.COMPANY_ID=companyid.COMPANY_ID
+    console.log(SELECTED_COMPANY);
+    this.COMPANY_ID = companyid.COMPANY_ID;
     console.log(companyid);
   }
 
@@ -239,7 +257,7 @@ export class EmployeeAddFormComponent {
     event.stopPropagation();
     const modal = document.getElementById('imageModal')!;
     const modalImage = document.getElementById(
-      'modalImage'
+      'modalImage',
     ) as HTMLImageElement;
     modal.style.display = 'block';
     modalImage.src = this.imageSource!;
@@ -311,19 +329,20 @@ export class EmployeeAddFormComponent {
     }
   }
 
-  
-       sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+  }
 
   getEmployeeList() {
-   
-     const payload={
-      "CompanyId":this.selected_Company_id
-    }
+    const payload = {
+      CompanyId: this.selected_Company_id,
+    };
     this.dataservice.employeeList(payload).subscribe((response: any) => {
       this.employeeList = response.reverse();
     });
@@ -370,7 +389,7 @@ export class EmployeeAddFormComponent {
 
     if (headId !== undefined && amount !== undefined) {
       const existingIndex = this.employeeFormData.EmployeeSalary.findIndex(
-        (item) => item.HEAD_ID === headId
+        (item) => item.HEAD_ID === headId,
       );
 
       if (existingIndex > -1) {
@@ -392,28 +411,26 @@ export class EmployeeAddFormComponent {
     return this.employeeFormGroup.instance.validate().isValid;
   }
 
- 
-
   saveEmployee() {
     if (!this.isValid()) return;
-
 
     // Check for duplicate employee code
     const enteredEmpCode = this.employeeFormData.EMP_CODE?.trim().toUpperCase();
 
-    const isDuplicate = this.employeeList.some(emp =>
-      emp.EMP_CODE?.trim().toUpperCase() === enteredEmpCode &&
-      (!this.employeeFormData.EMP_ID || emp.EMP_ID !== this.employeeFormData.EMP_ID)
+    const isDuplicate = this.employeeList.some(
+      (emp) =>
+        emp.EMP_CODE?.trim().toUpperCase() === enteredEmpCode &&
+        (!this.employeeFormData.EMP_ID ||
+          emp.EMP_ID !== this.employeeFormData.EMP_ID),
     );
-  
-    
+
     if (isDuplicate) {
       notify(
         {
           message: 'Employee Code already exists. Please enter a unique code.',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -427,11 +444,8 @@ export class EmployeeAddFormComponent {
     //   AMOUNT: item.amount || 0,
     // }));
 
-    
-    const payload = { ...this.employeeFormData ,
-      Company_Id:  this.COMPANY_ID
-    };
-console.log(payload);
+    const payload = { ...this.employeeFormData, Company_Id: this.COMPANY_ID };
+    console.log(payload);
 
     this.dataservice.saveEmployeeData(payload).subscribe({
       next: (response: any) => {
@@ -441,7 +455,7 @@ console.log(payload);
               message: 'Employee saved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.formClosed.emit(true);
           this.selectedTabIndex = 0;
@@ -451,7 +465,7 @@ console.log(payload);
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       },
@@ -461,7 +475,7 @@ console.log(payload);
             message: 'Something went wrong!',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       },
       complete: () => {

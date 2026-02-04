@@ -211,6 +211,10 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}article/delete`, payload);
   }
 
+  // deleteArticle(id: number) {
+  //   return this.http.post<any>(`${this.apiUrl}article/delete/` + id, {});
+  // }
+
   //JOURNAL VOUCHER
   getJournalVoucherList(items: any): Observable<any> {
     const data = items;
@@ -5605,10 +5609,11 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(`${this.apiUrl}packing/Update`, payload);
   }
+
   Delete_Package_Api(id: any) {
-    const getEndpoint = this.apiUrl + `packing/Delete/${id}`;
-    return this.http.post(getEndpoint, {});
+    return this.http.post(`${this.apiUrl}packing/Delete/${id}`, {});
   }
+ 
   //  Delete_Package_Api(id: any){
   //   const getEndpoint = this.apiUrl + `packing/Delete/${id}`;
   //   return this.http.post(getEndpoint,{});

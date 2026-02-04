@@ -166,6 +166,25 @@
           >
           </dx-button>
         </dxi-item>
+
+        <!-- <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item> -->
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
       </dxo-toolbar>
 
       <dxi-column dataField="EMP_NO" caption="Employee No."></dxi-column>

@@ -22,27 +22,41 @@
 
       // ## Icon width customization
       .dx-treeview-item {
-        padding-left: 0;
+        padding-left: 5px;
         flex-direction: row-reverse;
-        border-radius: 0;
+        border-radius: 8px;
+        min-height: 36px; /* instead of fixed height */
+        margin-top: 3px;
+        align-items: center;
+        white-space: normal; /* allow wrapping */
+        line-height: 1.3em;
+        padding-right: 7px;
+
+        .dx-treeview-item-content {
+          white-space: normal; /* allow wrapping for text */
+          word-break: break-word;
+        }
 
         .dx-icon.dx-icon {
           width: var(--side-panel-min-width);
-          margin: 0;
+          font-weight: bold;
+          margin-bottom: 1px;
+          margin-right: 1px;
+          flex-shrink: 0;
         }
       }
 
       // ##
 
       // ## Arrow customization
-      .dx-treeview-node.dx-treeview-node {
-        padding: 0 0;
-      }
+      // .dx-treeview-node.dx-treeview-node {
+      //   padding: 0 0;
+      // }
 
-      .dx-treeview-toggle-item-visibility {
-        right: 10px;
-        left: auto;
-      }
+      // .dx-treeview-toggle-item-visibility {
+      //   right: 10px;
+      //   left: auto;
+      // }
 
       .dx-rtl .dx-treeview-toggle-item-visibility {
         left: 10px;
@@ -61,7 +75,7 @@
         &[aria-level="2"] .dx-treeview-item-content {
           font-weight: normal;
 
-          padding-left: calc(var(--side-panel-min-width) + 20px);
+          padding-left: calc(var(--side-panel-min-width) + 5px);
           /* adjust 20px until the submenu sits under the main menu's center */
         }
       }

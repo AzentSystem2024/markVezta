@@ -184,7 +184,9 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     private router: Router,
     protected screen: ScreenService,
     private ngZone: NgZone,
-  ) {}
+  ) {
+    this.showItems();
+  }
 
   addButtonOptions = {
     type: 'default',
@@ -230,6 +232,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.showItems();
   }
 
   applyCustomDateFilter() {

@@ -400,18 +400,26 @@ export class PackingEditComponent {
                       this.totalQuantity=this.PackingData.PAIR_QTY
                       console.log(this.totalQuantity)
 this.isArticleFieldsDisabled = true;
-       if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
-      // Backend → UI
-      this.PackingData.UNIT_ID = incomingData.Units.map(
-        (u: any) => u.UNIT_ID
-      );
-      console.log(this.PackingData.UNIT_ID, 'UNIT_ID in ngOnChanges');
-    } else if (incomingData.UNIT_ID) {
-      // Backward compatibility
-      this.PackingData.UNIT_ID = [incomingData.UNIT_ID];
-    } else {
-      this.PackingData.UNIT_ID = [];
-    }
+    //    if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
+    //   // Backend → UI
+    //   this.PackingData.UNIT_ID = incomingData.Units.map(
+    //     (u: any) => u.UNIT_ID
+    //   );
+    //   console.log(this.PackingData.UNIT_ID, 'UNIT_ID in ngOnChanges');
+    // } else if (incomingData.UNIT_ID) {
+    //   // Backward compatibility
+    //   this.PackingData.UNIT_ID = [incomingData.UNIT_ID];
+    // } else {
+    //   this.PackingData.UNIT_ID = [];
+    // }
+
+    if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
+  this.PackingData.UNIT_ID = incomingData.Units[0].UNIT_ID; // ✅ SINGLE VALUE
+} else if (incomingData.UNIT_ID) {
+  this.PackingData.UNIT_ID = incomingData.UNIT_ID;
+} else {
+  this.PackingData.UNIT_ID = null;
+}
 
     console.log('UNIT_ID after bind:', this.PackingData.UNIT_ID);
 
@@ -555,28 +563,55 @@ console.log(this.articleSizeData);
 
         
 
-         const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
-    ? this.PackingData.UNIT_ID
-    : [];
+        // ===============================
+            // 🔹 UNIT HANDLING (FIXED)
+            // ===============================
+            const selectedUnits: number[] = Array.isArray(this.PackingData.UNIT_ID)
+              ? this.PackingData.UNIT_ID
+              : this.PackingData.UNIT_ID
+                ? [this.PackingData.UNIT_ID]
+                : [];
+        
+            // 🚨 hard validation
+            if (!selectedUnits.length) {
+              notify(
+                {
+                  message: 'Please select at least one Unit',
+                  position: { at: 'top right', my: 'top right' },
+                  displayTime: 800,
+                },
+                'warning',
+              );
+              return;
+            }
+        
+            // ✅ Header UNIT_ID (single)
+            const mainUnitId = Number(selectedUnits[0]);
+        
+            // ✅ Units array (multi)
+            const unitsPayload = selectedUnits.map((id) => ({
+              UNIT_ID: Number(id),
+            }));
 
-  if (!selectedUnits.length) {
-    notify(
-      {
-        message: 'Please select at least one Unit.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 800,
-      },
-      'warning'
-    );
-    return;
-  }
 
-  const mainUnitId = selectedUnits[0]; // 🔹 main unit
-  const unitsPayload = selectedUnits.map(id => ({
-    UNIT_ID: Number(id),
-  }));
-
-
+                // ===============================
+            //  PRICE VALIDATION
+            // ===============================
+            const mrp = Number(this.PackingData.PACK_PRICE);
+            const stdPrice = Number(this.PackingData.STD_PRICE);
+            
+            if (mrp <= stdPrice) {
+              notify(
+                {
+                  message: 'MRP must be greater than Standard Price',
+                  position: { at: 'top right', my: 'top right' },
+                  displayTime: 1200,
+                },
+                'error'
+              );
+              return; //  STOP SAVE
+            }
+            
   // ===============================
   // 🔹 STD PRICE (SMART MERGE)
   // ===============================
@@ -611,7 +646,7 @@ console.log(this.articleSizeData);
       PAIR_QTY: this.totalQuantity,
       STD_PRICE: finalStdPrice,
     STD_PRICE_EFFECT_FROM: finalStdEffectFrom,
-      UNIT_ID: mainUnitId,        // single main unit
+       UNIT_ID: mainUnitId,      // single main unit
     Units: unitsPayload,
       // ADD BOM HERE
       BOM: bomPayload,
@@ -758,7 +793,7 @@ onQuantityChanged() {
       artNo: this.PackingData.ART_NO,
       color: this.PackingData.COLOR,
       categoryID: this.PackingData.CATEGORY_ID,
-      unitID: this.PackingData.UNIT_ID,
+      // unitID: this.PackingData.UNIT_ID,
       // COMPANY_ID: this.selected_Company_id,
     };
 
@@ -976,12 +1011,12 @@ onEditorPreparing(e: any) {
   const brandName =
     this.brandList?.find(
       (b: any) => b.ID === this.PackingData.BRAND_ID
-    )?.DESCRIPTION || '';
+    )?.ITEM_DESCRIPTION || '';
 
   const categoryName =
     this.categoryList?.find(
       (c: any) => c.ID === this.PackingData.CATEGORY_ID
-    )?.DESCRIPTION || '';
+    )?.ITEM_DESCRIPTION || '';
 
   const artNo = this.PackingData.ART_NO || '';
   const color = this.PackingData.COLOR || '';
@@ -999,7 +1034,7 @@ onEditorPreparing(e: any) {
     price
   ].filter(p => p !== '' && p !== null && p !== undefined);
 
-  this.PackingData.DESCRIPTION = parts.join('-');
+  this.PackingData.ITEM_DESCRIPTION = parts.join('-');
 }
 
 onChangePrice(){

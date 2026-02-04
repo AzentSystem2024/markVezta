@@ -2,6 +2,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -162,7 +163,17 @@ export class TimesheetListComponent {
   yearSelectorVisible = false;
   years: number[] = [];
   CompanyID: any;
-  constructor(private dataService: DataService) {}
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+  constructor(
+    private dataService: DataService,
+    private zone: NgZone,
+  ) {}
 
   ngOnInit() {
     const today = new Date();
@@ -198,7 +209,27 @@ export class TimesheetListComponent {
     //   });
   }
 
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
 
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
 
   generateYears() {
     const currentYear = new Date().getFullYear();
@@ -234,11 +265,11 @@ export class TimesheetListComponent {
       this.selectedMonth = new Date(
         updatedMonth.getFullYear(),
         updatedMonth.getMonth() - 1,
-        1
+        1,
       );
       this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString(
         'en-US',
-        { month: 'long', year: 'numeric' }
+        { month: 'long', year: 'numeric' },
       );
     }
   }
@@ -252,6 +283,13 @@ export class TimesheetListComponent {
     } else {
       document.removeEventListener('click', this.outsideClickListener);
     }
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.fetchTimesheetList();
   }
 
   toggleYearSelector() {
@@ -307,7 +345,7 @@ export class TimesheetListComponent {
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
       1,
-      12
+      12,
     );
 
     this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString('en-US', {
@@ -460,7 +498,7 @@ export class TimesheetListComponent {
       next: (response: any) => {
         this.selectedTimesheet = response;
         const actionButton = this.allActionButtons.find(
-          (btn) => btn.name === 'edit'
+          (btn) => btn.name === 'edit',
         );
         if (actionButton) {
           actionButton.hint =
@@ -494,7 +532,7 @@ export class TimesheetListComponent {
               message: 'Timesheet Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getTimesheet();
           // this.dataGrid.instance.refresh();
@@ -504,14 +542,14 @@ export class TimesheetListComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 
@@ -530,23 +568,22 @@ export class TimesheetListComponent {
   // }
 
   onSelectionChanged(e: any) {
-  // ❌ Remove rows where STATUS === 'Approved'
-  const validSelection = e.selectedRowsData.filter(
-    (row: any) => row.STATUS !== 'Approved'
-  );
+    // ❌ Remove rows where STATUS === 'Approved'
+    const validSelection = e.selectedRowsData.filter(
+      (row: any) => row.STATUS !== 'Approved',
+    );
 
-  // ✅ Reset selection to only valid rows
-  this.selectedRows = validSelection;
+    // ✅ Reset selection to only valid rows
+    this.selectedRows = validSelection;
 
-  // 🔁 Force grid to reflect corrected selection
-  this.dataGrid.instance.selectRows(
-    validSelection.map((row) => row.ID),
-    false
-  );
+    // 🔁 Force grid to reflect corrected selection
+    this.dataGrid.instance.selectRows(
+      validSelection.map((row) => row.ID),
+      false,
+    );
 
-  console.log('User selected (filtered):', this.selectedRows);
-}
-
+    console.log('User selected (filtered):', this.selectedRows);
+  }
 
   // ApproveBulkRows(){
   //   const payload = {
@@ -567,12 +604,15 @@ export class TimesheetListComponent {
 
   // }
 
-       sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.CompanyID=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.CompanyID,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.CompanyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.CompanyID,
+      '============selected_Company_id==============',
+    );
+  }
 
   fetchTimesheetList() {
     const payload = {
@@ -591,7 +631,6 @@ export class TimesheetListComponent {
     });
   }
 
-  
   ApproveBulkRows() {
     // Extract only the numeric IDs from the selected rows
     const selectedIDs = this.selectedRows.map((row) => row.ID);
@@ -614,7 +653,7 @@ export class TimesheetListComponent {
             message: `Approved Successfully`,
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
         this.fetchTimesheetList();
       });
