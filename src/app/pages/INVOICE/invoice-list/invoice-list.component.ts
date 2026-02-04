@@ -319,6 +319,7 @@ export class InvoiceListComponent {
         fromDate = new Date();
         fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'last7':
@@ -326,6 +327,7 @@ export class InvoiceListComponent {
         fromDate.setDate(today.getDate() - 6);
         fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'last15':
@@ -333,6 +335,7 @@ export class InvoiceListComponent {
         fromDate.setDate(today.getDate() - 14);
         fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'last30':
@@ -340,20 +343,28 @@ export class InvoiceListComponent {
         fromDate.setDate(today.getDate() - 29);
         fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
         break;
 
       case 'all':
         return { DATE_FROM: null, DATE_TO: null };
-
-      default:
-        return { DATE_FROM: null, DATE_TO: null };
     }
 
     return {
-      DATE_FROM: this.formatAsYYYYMMDD(fromDate),
-      DATE_TO: this.formatAsYYYYMMDD(toDate),
+      DATE_FROM: fromDate ? this.formatAsYYYYMMDD(fromDate) : null,
+      DATE_TO: toDate ? this.formatAsYYYYMMDD(toDate) : null,
     };
   }
+
   private formatAsYYYYMMDD(date: Date): string {
     const yyyy = date.getFullYear();
     const mm = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -420,13 +431,19 @@ export class InvoiceListComponent {
     this.selectedDateRange = e.value;
 
     if (e.value === 'custom') {
-      this.customStartDate = null;
-      this.customEndDate = null;
       this.showCustomDatePopup = true;
       return;
     }
 
-    this.getInvoiceList(e.value);
+    // reset custom label when switching away
+    this.customStartDate = null;
+    this.customEndDate = null;
+
+    this.dateRanges = this.dateRanges.map((opt) =>
+      opt.value === 'custom' ? { ...opt, label: 'Custom' } : opt,
+    );
+
+    this.getInvoiceList();
   }
 
   sesstion_Details() {
@@ -554,30 +571,27 @@ export class InvoiceListComponent {
   // }
 
   applyCustomDateFilter() {
-    if (!(this.customStartDate && this.customEndDate)) return;
+    if (!this.customStartDate || !this.customEndDate) return;
 
-    const payload = {
-      COMPANY_ID: this.companyID,
-      DATE_FROM: this.formatAsYYYYMMDD(new Date(this.customStartDate)),
-      DATE_TO: this.formatAsYYYYMMDD(new Date(this.customEndDate)),
-    };
+    if (this.customStartDate > this.customEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
 
-    this.InvoiceDataSource = new DataSource({
-      load: () =>
-        new Promise((resolve) => {
-          this.dataService.getInvoiceMainList(payload).subscribe({
-            next: (response: any) => {
-              const list = response?.Data || [];
-              this.invoiceArray = list;
-              this.invoiceCount = list.length;
-              resolve(list);
-            },
-            error: () => resolve([]),
-          });
-        }),
-    });
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
+    // 🔑 THIS IS THE MAGIC (same as Credit Note)
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        : option,
+    );
+
+    this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
+
+    this.getInvoiceList('custom');
   }
 
   private parseDateString(dateStr: string): Date {

@@ -271,6 +271,7 @@ export class PurchaseReturnDebitComponent {
         fromDate = new Date();
         fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'last7':
@@ -278,6 +279,7 @@ export class PurchaseReturnDebitComponent {
         fromDate.setDate(today.getDate() - 6);
         fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'last15':
@@ -285,6 +287,7 @@ export class PurchaseReturnDebitComponent {
         fromDate.setDate(today.getDate() - 14);
         fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'last30':
@@ -292,18 +295,26 @@ export class PurchaseReturnDebitComponent {
         fromDate.setDate(today.getDate() - 29);
         fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'all':
         return { DATE_FROM: null, DATE_TO: null };
 
-      default:
-        return { DATE_FROM: null, DATE_TO: null };
+      // 🔑 MISSING PART (SAME AS CREDIT NOTE)
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
     }
 
     return {
-      DATE_FROM: this.formatAsYYYYMMDD(fromDate),
-      DATE_TO: this.formatAsYYYYMMDD(toDate),
+      DATE_FROM: fromDate ? this.formatAsYYYYMMDD(fromDate) : null,
+      DATE_TO: toDate ? this.formatAsYYYYMMDD(toDate) : null,
     };
   }
 
@@ -443,28 +454,21 @@ export class PurchaseReturnDebitComponent {
   applyCustomDateFilter() {
     if (!(this.customStartDate && this.customEndDate)) return;
 
-    const payload = {
-      COMPANY_ID: this.companyID,
-      DATE_FROM: this.formatAsYYYYMMDD(new Date(this.customStartDate)),
-      DATE_TO: this.formatAsYYYYMMDD(new Date(this.customEndDate)),
-    };
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
-    this.PurchaseReturnDataSource = new DataSource({
-      load: () =>
-        new Promise((resolve) => {
-          this.dataService.getPurchaseReturnMainList(payload).subscribe({
-            next: (response: any) => {
-              const list = response?.Data || [];
-              this.purchaseReturnArray = list;
-              this.purchaseReturnCount = list.length;
-              resolve(list);
-            },
-            error: () => resolve([]),
-          });
-        }),
-    });
+    // 🔑 SAME AS CREDIT NOTE
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        : option,
+    );
 
+    this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
+
+    // reload grid
+    this.getpurchaseReturnList('custom');
   }
 
   private parseDateString(dateStr: string): Date {

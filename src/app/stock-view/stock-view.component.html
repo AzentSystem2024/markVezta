@@ -31,11 +31,11 @@
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
     >
-      <dxo-editing
+      <!-- <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
-      ></dxo-editing>
+      ></dxo-editing> -->
       <dxo-export
         [enabled]="true"
         [allowExportSelectedData]="false"
@@ -71,6 +71,21 @@
       <dxo-toolbar>
         <dxi-item location="before">
           <div class="grid-header">Stock View</div>
+        </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto">
+          <!-- <dx-select-box
+            [width]="200"
+            label="Type"
+            labelMode="floating"
+            [items]="ItemList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="selected_item_Id"
+            (onValueChanged)="onItemIdChange($event)"
+            [searchEnabled]="true"
+          >
+          </dx-select-box> -->
         </dxi-item>
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <!-- <dxi-item widget="dxButton" [options]="filterButtonOptions"></dxi-item> -->

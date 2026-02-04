@@ -700,6 +700,7 @@ export class AddInvoiceComponent {
     this.invoiceFormData.PARTY_NAME = this.invoiceFormData.PARTY_NAME;
     this.invoiceFormData.TRANS_TYPE = 25;
     this.invoiceFormData.SALE_DATE = new Date();
+    // this.invoiceFormData.SALE_DATE = this.invoiceFormData.SALE_DATE;
     this.invoiceFormData.ADD_TIME = new Date();
     this.invoiceFormData.VEHICLE_NO = this.invoiceFormData.VEHICLE_NO;
     this.invoiceFormData.COMPANY_ID = this.selectedCompanyId;

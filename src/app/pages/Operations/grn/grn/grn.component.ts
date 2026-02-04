@@ -24,6 +24,7 @@ import {
   DxSelectBoxModule,
   DxDataGridComponent,
   DxCheckBoxModule,
+  DxDateBoxModule,
 } from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
@@ -109,6 +110,19 @@ export class GrnComponent implements OnInit {
   canApprove = false;
   canPrint = false;
   companyID: any;
+  dateRanges = [
+    { label: 'Today', value: 'today' },
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
+  ];
+
+  selectedDateRange: string = 'today';
+  customStartDate: any = null;
+  customEndDate: any = null;
+  showCustomDatePopup = false;
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = (cellInfo.data.STATUS || '').trim();
@@ -383,13 +397,172 @@ export class GrnComponent implements OnInit {
   }
 
   getGrnLogData() {
+    const datePayload = this.getDateRangePayload();
+
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
     };
+
     this.service.getGrnLogData(payload).subscribe((res: any) => {
       this.grnDataSource = res.grnheader;
     });
   }
+
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+
+    if (e.value === 'custom') {
+      this.showCustomDatePopup = true;
+      return;
+    }
+
+    // reset custom dates
+    this.customStartDate = null;
+    this.customEndDate = null;
+
+    // reset label back to "Custom"
+    this.dateRanges = this.dateRanges.map((opt) =>
+      opt.value === 'custom' ? { ...opt, label: 'Custom' } : opt,
+    );
+
+    this.getGrnLogData();
+  }
+
+  applyCustomDateFilter() {
+    if (!this.customStartDate || !this.customEndDate) return;
+
+    if (this.customStartDate > this.customEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
+
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+
+    // 🔑 EXACT SAME LOGIC AS CREDIT NOTE
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        : option,
+    );
+
+    this.selectedDateRange = 'custom';
+    this.showCustomDatePopup = false;
+
+    // reload grid
+    this.getGrnLogData();
+  }
+
+  private getDateRangePayload(): {
+    DATE_FROM: string | null;
+    DATE_TO: string | null;
+  } {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+    }
+
+    return {
+      DATE_FROM: fromDate ? this.formatDate(fromDate) : null,
+      DATE_TO: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+  private formatDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  private formatAsDDMMYYYY(d: Date): string {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  attachItemClickHandler(e: any) {
+    setTimeout(() => {
+      const popup = e.component?._popup;
+      const innerList =
+        popup && popup.$content().find('.dx-list').dxList('instance');
+
+      if (innerList) {
+        innerList.off('itemClick'); // avoid duplicate handlers
+        innerList.on('itemClick', (clickEvent: any) => {
+          const clickedValue = clickEvent.itemData.value;
+
+          if (clickedValue === 'custom') {
+            this.openCustomDatePopup(); // same behavior as Credit Note
+            e.component.close();
+          }
+        });
+      }
+    }, 0);
+  }
+
+  openCustomDatePopup() {
+    this.customStartDate = null;
+    this.customEndDate = null;
+    this.showCustomDatePopup = true;
+  }
+
+  displayExpr = (item: any) => {
+    if (!item) return '';
+
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      return `${from} - ${to}`;
+    }
+
+    return item.label;
+  };
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
@@ -610,6 +783,7 @@ export class GrnComponent implements OnInit {
     GrnApproveFormModule,
     DxCheckBoxModule,
     GrnViewFormModule,
+    DxDateBoxModule,
   ],
   providers: [],
   exports: [],
