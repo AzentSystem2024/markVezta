@@ -174,7 +174,7 @@ export class ItemStorePriceApproveComponent {
   constructor(
     private dataservice: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
       this.department = data;
@@ -213,10 +213,10 @@ export class ItemStorePriceApproveComponent {
         this.worksheetData.worksheet_item_price.length > 0
       ) {
         this.selectedItems = this.worksheetItems.filter(
-          (item) => item.Selected === true
+          (item) => item.Selected === true,
         );
         const storId = this.worksheetData.worksheet_item_store.map(
-          (storeID) => storeID.STORE_ID
+          (storeID) => storeID.STORE_ID,
         );
         this.payloadForVerify = {
           ID: this.worksheetData.ID,
@@ -246,30 +246,33 @@ export class ItemStorePriceApproveComponent {
     });
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+  }
 
   loadStores() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
       this.filteredStoreList = this.store;
     });
   }
 
-  getStoresById(storeId: any) {
+  getStoresById(storeId: string) {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.filteredStoreList = response.filter(
-        (store: any) => store.ID === storeId
+        (store: any) => store.ID === storeId.toString(),
       );
       if (this.filteredStoreList.length > 0) {
         this.listItemsByMultipleStoreIds(storeId);
@@ -278,12 +281,12 @@ export class ItemStorePriceApproveComponent {
   }
 
   listItemsByMultipleStoreIds(storeIds: string) {
-    this.dataservice.getItemListByStoreId(storeIds).subscribe(
+    this.dataservice.getItemListByStoreId().subscribe(
       (response) => {
         console.log(response);
         this.worksheetItems = response.PriceWizardData;
         this.selectedItems = this.worksheetItems.filter(
-          (item) => item.Selected === true
+          (item) => item.Selected === true,
         );
         if (this.selectedItems.length > 0) {
           this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
@@ -294,7 +297,7 @@ export class ItemStorePriceApproveComponent {
       },
       (error) => {
         console.error('Error fetching item list:', error);
-      }
+      },
     );
   }
 
@@ -406,7 +409,7 @@ export class ItemStorePriceApproveComponent {
           message: 'No rows selected. Please select at least one row to save.',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -444,7 +447,7 @@ export class ItemStorePriceApproveComponent {
               message: 'Worksheet Updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -452,13 +455,13 @@ export class ItemStorePriceApproveComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       },
       (error) => {
         console.error('Error saving data:', error);
-      }
+      },
     );
   }
 
@@ -490,7 +493,7 @@ export class ItemStorePriceApproveComponent {
           PRICE_LEVEL3_NEW: item.PRICE_LEVEL3_NEW ?? 0.0,
           PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? 0.0,
           PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? 0.0,
-        })
+        }),
       );
       const verificationPayload = {
         COMPANY_ID: companyId,
@@ -513,7 +516,7 @@ export class ItemStorePriceApproveComponent {
               message: 'Worksheet Verified Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -521,7 +524,7 @@ export class ItemStorePriceApproveComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         this.isVerified = true;
@@ -575,7 +578,7 @@ export class ItemStorePriceApproveComponent {
               message: 'Worksheet Approved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -583,7 +586,7 @@ export class ItemStorePriceApproveComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -616,7 +619,7 @@ export class ItemStorePriceApproveComponent {
       const selectedRowsData = [];
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.worksheetItems.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
         if (selectedRow) {
           selectedRowsData.push(selectedRow);
@@ -703,7 +706,7 @@ export class ItemStorePriceApproveComponent {
     if (this.selectedRowKeys.length > 0 && this.selectedSalePrice.length > 0) {
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.worksheetItems.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
         if (selectedRow) {
           this.selectedSalePrice.forEach((selectedOption) => {

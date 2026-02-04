@@ -13,9 +13,10 @@
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
       [allowColumnResizing]="true"
+      [showColumnLines]="true"
       [editing]="{
         mode: 'cell',
-        allowUpdating: true
+        allowUpdating: true,
       }"
       [keyExpr]="'ID'"
       (onSelectionChanged)="onSelectionChanged($event)"
@@ -38,65 +39,17 @@
       <dxo-editing mode="popup" [alloAdding]="true"> </dxo-editing>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Change Price</div>
+          <div class="grid-header">Change Price View</div>
         </dxi-item>
-        <dxi-item location="before"> </dxi-item>
-        <dxi-item location="before"> </dxi-item>
-        <dxi-item location="before" locateInMenu="auto">
-          <dx-tag-box
-            [items]="store"
-            valueExpr="ID"
-            [value]="selectedStoreId"
-            displayExpr="STORE_NAME"
-            label="Select Store"
-            labelMode="floating"
-            labelLocation="left"
-            [multiline]="false"
-            [width]="300"
-            [disabled]="true"
-          >
-          </dx-tag-box>
-        </dxi-item>
+        <dxi-item location="after" template="priceColumnSelector"> </dxi-item>
+        <dxi-item location="after" template="narration"> </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
-        <dxi-item location="after" locateInMenu="auto">
-          <!-- <dx-button icon="refresh" stylingMode="text"></dx-button> -->
-        </dxi-item>
-
-        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-          <!-- <div class="separator"></div> -->
-        </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-          <!-- <div class="separator"></div> -->
-        </dxi-item>
-        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
-        <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
-
-        <dxi-item location="after">
-          <dx-button
-            hint="Back"
-            icon="back"
-            stylingMode="contained"
-            type="default"
-            (onClick)="Cancel()"
-          ></dx-button>
-        </dxi-item>
-
-        <dxi-item location="after" cssClass="bottom-toolbar-buttons">
-          <!-- <dx-button
-              icon="formula"
-              hint="Apply Formula"
-              stylingMode="contained"
-              type="default"
-              (onClick)="applyFormula($event)"
-              [disabled]="isButtonDisabled"
-          
-            ></dx-button> -->
-        </dxi-item>
+        <dxi-item location="after" template="backButton"> </dxi-item>
 
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
           <!-- <dx-button *ngIf="!isSaved && !isVerified" 
@@ -128,15 +81,53 @@
                        style="width: 100px;"></dx-button> -->
         </dxi-item>
       </dxo-toolbar>
+      <div *dxTemplate="let data of 'priceColumnSelector'">
+        <dx-tag-box
+          [items]="priceColumnOptions"
+          valueExpr="value"
+          displayExpr="text"
+          width="250"
+          label="Select Prices"
+          [(value)]="selectedPriceColumns"
+          placeholder="Select Prices"
+          labelMode="floating"
+          [showSelectionControls]="true"
+          (onValueChanged)="onPriceColumnChange()"
+        >
+        </dx-tag-box>
+      </div>
+      <div *dxTemplate="let data of 'narration'">
+        <dx-text-box
+          [(value)]="narrationText"
+          placeholder="Enter Remarks"
+          style="width: 250px"
+          [disabled]="true"
+        ></dx-text-box>
+      </div>
+      <div *dxTemplate="let data of 'backButton'">
+        <dx-button
+          hint="Back"
+          icon="back"
+          stylingMode="contained"
+          type="default"
+          (onClick)="Cancel()"
+        ></dx-button>
+      </div>
       <dxi-column
-        dataField="BARCODE"
-        caption="Barcode"
+        dataField="ITEM_CODE"
+        caption="item Code"
         [width]="150"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
         dataField="DESCRIPTION"
         caption="Description"
+        [width]="220"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="ITEM_TYPE"
+        caption="Item Type"
         [width]="220"
         [allowEditing]="false"
       ></dxi-column>
@@ -159,7 +150,12 @@
         [allowEditing]="false"
       ></dxi-column>
 
-      <dxi-column caption="Price" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price"
+        [width]="120"
+        [visible]="isVisible('MRP')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE"
           caption="Present"
@@ -179,7 +175,12 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 1" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price 1"
+        [width]="120"
+        [visible]="isVisible('PRICE1')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE1"
           caption="Present"
@@ -198,7 +199,12 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 2" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price 2"
+        [width]="120"
+        [visible]="isVisible('PRICE2')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE2"
           caption="Present"
@@ -217,7 +223,12 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 3" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price 3"
+        [width]="120"
+        [visible]="isVisible('PRICE3')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE3"
           caption="Present"
@@ -236,7 +247,12 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 4" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price 4"
+        [width]="120"
+        [visible]="isVisible('PRICE4')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE4"
           caption="Present"
@@ -255,7 +271,12 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 5" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price 5"
+        [width]="120"
+        [visible]="isVisible('PRICE5')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE5"
           caption="Present"

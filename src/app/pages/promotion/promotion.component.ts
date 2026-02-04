@@ -55,8 +55,8 @@ export class PromotionComponent {
   minDate: Date = new Date(); // Today's date
   fromDate: any = new Date(); // Default value for 'from' date
   toDate: any = new Date();
-  fromTime:any = new Date();
-  toTime:any = new Date();
+  fromTime: any = new Date();
+  toTime: any = new Date();
   department: any;
   catagory: any;
   brand: any;
@@ -147,7 +147,7 @@ export class PromotionComponent {
   selectedOption: string = 'onSaleStatus';
   showDropdown: boolean;
   selectedPromotionLevel: any;
-  defaultTextValue:any;
+  defaultTextValue: any;
   selectedSchemaType: any;
   originalGridHeight = '540px';
   filteredItemStoresList: any;
@@ -161,7 +161,7 @@ export class PromotionComponent {
   showError: boolean;
   showTooltip = false;
   isTimeRangeEnabled: boolean = false;
-  timeRange: any; 
+  timeRange: any;
   isHappyHoursEnabled: boolean = false;
   happyHoursPopup: boolean = false;
   narration: any;
@@ -175,9 +175,10 @@ export class PromotionComponent {
   isPromotionApplied: boolean = false;
   isRowsSelected: boolean = false;
 
-  constructor(private dataservice: DataService, private router: Router) {
-   
-  }
+  constructor(
+    private dataservice: DataService,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
@@ -187,10 +188,8 @@ export class PromotionComponent {
     const defaultStoreId = '1';
     this.listItemsByMultipleStoreIds(defaultStoreId);
     this.schemaOptions();
-    this.loadDropdownData(); 
+    this.loadDropdownData();
   }
-
-
 
   private loadDropdownData(): void {
     this.dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
@@ -224,41 +223,39 @@ export class PromotionComponent {
   }
 
   onCheckboxChange(event: any): void {
-
     if (!event.value) {
-        this.fromTime = null;
-        this.toTime = null;
+      this.fromTime = null;
+      this.toTime = null;
     }
-}
-
-onHappyHoursChanged(isEnabled: boolean): void {
-  this.isHappyHoursEnabled = isEnabled;
-
-  if (!isEnabled) {
-    // Reset time values to '00:00' when disabled
-    this.fromTime = '00:00';
-    this.toTime = '00:00';
   }
-}
 
-dateCellTemplate(cellElement: any, cellInfo: any) {
-  if (cellInfo.value) {
-    const date = new Date(cellInfo.value);
-    const dateFormat = sessionStorage.getItem('dateFormat') || 'MM/DD/YYYY';
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); 
-    const year = String(date.getFullYear());
-    let formattedDate = dateFormat
-      .replace('dd', day)
-      .replace('mm', month)
-      .replace('yyyy', year)
-      .replace('yy', year.slice(-2));
-    cellElement.innerText = formattedDate;
-  } else {
-    cellElement.innerText = '';
+  onHappyHoursChanged(isEnabled: boolean): void {
+    this.isHappyHoursEnabled = isEnabled;
+
+    if (!isEnabled) {
+      // Reset time values to '00:00' when disabled
+      this.fromTime = '00:00';
+      this.toTime = '00:00';
+    }
   }
-}
 
+  dateCellTemplate(cellElement: any, cellInfo: any) {
+    if (cellInfo.value) {
+      const date = new Date(cellInfo.value);
+      const dateFormat = sessionStorage.getItem('dateFormat') || 'MM/DD/YYYY';
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = String(date.getFullYear());
+      let formattedDate = dateFormat
+        .replace('dd', day)
+        .replace('mm', month)
+        .replace('yyyy', year)
+        .replace('yy', year.slice(-2));
+      cellElement.innerText = formattedDate;
+    } else {
+      cellElement.innerText = '';
+    }
+  }
 
   onPriceLevelChanged(event: any): void {
     // Handle change in promotion level selection
@@ -292,10 +289,10 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     // console.log(this.selectedSchemaType,"SCHEMATYPE")
 
     if (this.selectedOption !== 'schemaLevelPromotion') {
-      this.clearFilter()
+      this.clearFilter();
       // this.selectedSchemaId = null; // Reset the value of the dx-select-box
     }
-    if(this.selectedOption == 'schemaLevelPromotion'){
+    if (this.selectedOption == 'schemaLevelPromotion') {
       this.firstDropdownValue = '';
       this.operationValue = '';
       this.defaultTextValue = '';
@@ -313,24 +310,24 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
 
   onSchemaChanged(event: any) {
     const selectedSchema = this.promotionSchema.find(
-      (schema) => schema.ID == event.value  // Use event.value to get the selected ID
+      (schema) => schema.ID == event.value, // Use event.value to get the selected ID
     );
     // console.log(selectedSchema.REMARKS,"SELECTEDSCHEMA")
     if (selectedSchema) {
       this.selectedSchemaId = selectedSchema.ID;
       this.selectedSchemaName = selectedSchema.DESCRIPTION;
       // console.log(selectedSchema.REMARKS,"REMARKSSSSSSSSSSSSS")
-      if(selectedSchema.REMARKS == '4'){
+      if (selectedSchema.REMARKS == '4') {
         // console.log("schemachangeddddddddd")
         this.isBuy = 1;
         this.isGet = 0;
-      }else if(selectedSchema.REMARKS == '1'){
+      } else if (selectedSchema.REMARKS == '1') {
         this.isBuy = 1;
         this.isGet = 0;
-      }else if(selectedSchema.REMARKS == '2'){
+      } else if (selectedSchema.REMARKS == '2') {
         this.isBuy = 1;
         this.isGet = 1;
-      }else if(selectedSchema.REMARKS == '3'){
+      } else if (selectedSchema.REMARKS == '3') {
         this.isBuy = 1;
         this.isGet = 0;
       }
@@ -343,30 +340,30 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     }
   }
 
-
   listItemsByMultipleStoreIds(storeIds: string): void {
     const allStoreIds = '2,3,4'; // Define all store IDs here
 
     // Determine the payload based on the storeId
     // const payloadStoreIds = storeIds === '1' ? allStoreIds : storeIds;
-  
+
     this.isLoading = true;
-  
-    this.dataservice.getItemListByStoreId(allStoreIds).subscribe(
+
+    this.dataservice.getItemListByStoreId().subscribe(
       (response: any) => {
         this.itemStoresList = response.PriceWizardData;
         this.isLoading = false;
-        console.log(this.itemStoresList, 'Items loaded for store IDs:', allStoreIds);
+        console.log(
+          this.itemStoresList,
+          'Items loaded for store IDs:',
+          allStoreIds,
+        );
       },
       (error) => {
         this.isLoading = false;
         console.error('Error fetching item list for store IDs:', error);
-      }
+      },
     );
   }
-  
-
-
 
   onDropdownValueChanged(event: any) {
     const selectedStoreIds = event.value;
@@ -377,24 +374,29 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     this.listItemsByMultipleStoreIds(this.storeIds);
   }
 
-   sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+  }
 
   loadStores() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       // Filter out the central store
-      this.store = response.filter((store: any) => store.STORE_NAME !== 'CENTRAL STORE');
+      this.store = response.filter(
+        (store: any) => store.STORE_NAME !== 'CENTRAL STORE',
+      );
       console.log(this.store, 'Filtered Stores');
     });
   }
-  
+
   handleDateChange() {
     if (this.fromDate && this.toDate) {
       // console.log('From Date:', this.fromDate.toString()); // Logs full date and time
@@ -403,7 +405,7 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
   }
 
   setPromotion(selectedRowKeys: any[]) {
-    console.log(this.selectedStoreId,"INSETPROMOTION")
+    console.log(this.selectedStoreId, 'INSETPROMOTION');
 
     if (!selectedRowKeys || selectedRowKeys.length === 0) {
       notify(
@@ -411,56 +413,52 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
           message: 'Please select at least one row to set promotion.',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
+        'error',
       );
-    } 
-  else if(!this.selectedDays){
-    console.log("Please select at least one day to set promotion.")
+    } else if (!this.selectedDays) {
+      console.log('Please select at least one day to set promotion.');
       notify(
         {
           message: 'Please select at least one day to set promotion.',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
+        'error',
       );
-    }
-
-    else if (this.selectedStoreId.length === 1 && this.selectedStoreId[0] === 1) {
-      console.log("CENTRAL STORE cannot be selected for promotion.");
+    } else if (
+      this.selectedStoreId.length === 1 &&
+      this.selectedStoreId[0] === 1
+    ) {
+      console.log('CENTRAL STORE cannot be selected for promotion.');
       notify(
         {
-          message: 'Please select a store other than CENTRAL STORE to set promotion.',
+          message:
+            'Please select a store other than CENTRAL STORE to set promotion.',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
+        'error',
       );
-    }
-  
-    
-    else if (!this.selectedStoreId || this.selectedStoreId.length === 0) {
-     
-      console.log("Please select at least one store to set promotion.");
+    } else if (!this.selectedStoreId || this.selectedStoreId.length === 0) {
+      console.log('Please select at least one store to set promotion.');
       notify(
         {
           message: 'Please select at least one store to set promotion.',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
+        'error',
       );
-    }
-    else {
+    } else {
       this.isVisible = true; // Open the popup when rows are selected
     }
   }
 
   selectDays() {
     const selectedDaysArray = Object.keys(this.selectedDays).filter(
-      (day) => this.selectedDays[day]
+      (day) => this.selectedDays[day],
     );
-// else {
-      // Join the selected days into a comma-separated string
-      const selectedDaysString = selectedDaysArray.join(',');
-      return selectedDaysString; // Return or use the joined string where needed
+    // else {
+    // Join the selected days into a comma-separated string
+    const selectedDaysString = selectedDaysArray.join(',');
+    return selectedDaysString; // Return or use the joined string where needed
     // }
   }
 
@@ -469,40 +467,41 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     // console.log('Selected Row:', event.data);
   }
 
-
   applyPromotion() {
     this.isPromotionApplied = true;
-  
+
     // Validation: Ensure a schema or promotion details are selected
     if (!this.selectedSchemaId && !this.valueToUse) {
       alert('Please select a promotion schema or provide promotion details.');
       return; // Exit if no schema or promotion details are provided
     }
-  
+
     if (this.selectedSchemaId) {
       const selectedSchema = this.promotionSchema.find(
-        (schema) => schema.ID === this.selectedSchemaId
+        (schema) => schema.ID === this.selectedSchemaId,
       );
       if (selectedSchema) {
         console.log(selectedSchema.REMARKS);
         if (selectedSchema.REMARKS === '4') {
           this.heading = 'Items To Buy';
-  
+
           // Filter the item stores list
           this.filteredItemStoresList = this.itemStoresList.filter((item) => {
-            const isItemSelected = this.selectedRow.some((row) => row.ID === item.ID);
+            const isItemSelected = this.selectedRow.some(
+              (row) => row.ID === item.ID,
+            );
             return !isItemSelected; // Keep only items that are NOT selected
           });
-  
+
           this.originalGridHeight = '300px';
         }
-  
+
         this.selectedSchemaName = selectedSchema.DESCRIPTION; // Store the selected schema name
-  
+
         // Apply schema to selected rows
         this.selectedRow.forEach((row) => {
           const selectedRowIndex = this.itemStoresList.findIndex(
-            (item) => item.ID === row.ID
+            (item) => item.ID === row.ID,
           );
           if (selectedRowIndex !== -1) {
             this.itemStoresList[selectedRowIndex].PROMOTION_NAME =
@@ -514,7 +513,7 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
             return; // Exit if invalid item is found
           }
         });
-  
+
         this.closePopup(); // Exit if schema is successfully applied
         return;
       } else {
@@ -522,34 +521,32 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
         return; // Exit if no schema is found
       }
     }
-  
-    // Validation for manual promotion details
-    const missingPromotionName =  !this.promotionName;
 
-  
+    // Validation for manual promotion details
+    const missingPromotionName = !this.promotionName;
+
     if (missingPromotionName) {
-      notify({
-        message: 'Please provide Promotion Name',
-        position: { at: 'top right', my: 'top right' },
-      },
-      'error'
-    )
+      notify(
+        {
+          message: 'Please provide Promotion Name',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+      );
       // alert('Please provide both Promotion Name for all selected items.');
       return; // Exit if validation fails
     }
-  
+
     // If no schema is selected, proceed with the promotion logic
     this.applySelectedValue();
-  
+
     if (this.valueToUse != null) {
       this.calculateResult();
       this.updatePromotionPrice();
     }
-  
+
     this.closePopup(); // Close the popup after applying promotion
   }
-  
-
 
   // applyPromotion() {
   //   this.isPromotionApplied = true;
@@ -563,14 +560,12 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
   //       if(selectedSchema.REMARKS == '4'){
   //         this.heading = 'Items To Buy';
 
-
-
   //         this.filteredItemStoresList = this.itemStoresList.filter((item) => {
   //           const isItemSelected = this.selectedRow.some((row) => row.ID === item.ID);
-  
+
   //           return !isItemSelected; // Keep only items that are NOT selected
   //         });
-  //         this.originalGridHeight = '300px'; 
+  //         this.originalGridHeight = '300px';
   //       }
   //       this.selectedSchemaName = selectedSchema.DESCRIPTION
   //       this.selectedSchemaName = selectedSchema.DESCRIPTION; // Store the selected schema name
@@ -579,7 +574,7 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
   //           (item) => item.ID === row.ID
   //         );
   //         if (selectedRowIndex !== -1) {
-        
+
   //             this.itemStoresList[selectedRowIndex].PROMOTION_NAME =
   //             this.selectedSchemaName;
   //             this.itemStoresList[selectedRowIndex].PROMOTION_SCHEMA_ID =
@@ -592,30 +587,30 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
   //     this.closePopup(); // Exit the function early if schema is selected
   //     return;
   //   }
-  
+
   //   // If no schema is selected, proceed with the promotion logic
   //   this.applySelectedValue();
-  
+
   //   if (this.valueToUse != null) {
   //     this.calculateResult();
   //     this.updatePromotionPrice();
   //   }
-    
+
   //   this.closePopup(); // Close the popup after applying promotion
   // }
 
-  onAddClick(){
+  onAddClick() {
     this.popupForItemsToGet = true;
   }
 
   AddSelectedItems() {
     const selectedSchema = this.promotionSchema.find(
-      (schema) => schema.ID === this.selectedSchemaId
+      (schema) => schema.ID === this.selectedSchemaId,
     );
-  
+
     if (selectedSchema) {
-      console.log(selectedSchema, "SELECTED SCHEMA");
-  
+      console.log(selectedSchema, 'SELECTED SCHEMA');
+
       // Update the selected items with schema details
       this.selectedItems = this.selectedRowNew.map((item) => ({
         ...item,
@@ -624,13 +619,12 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
         isBuy: selectedSchema.REMARKS === '4' ? 0 : this.isBuy,
         isGet: selectedSchema.REMARKS === '4' ? 1 : this.isGet,
       }));
-  
-      console.log(this.selectedItems, "UPDATED SELECTED ITEMS");
+
+      console.log(this.selectedItems, 'UPDATED SELECTED ITEMS');
     }
-  
+
     this.popupForItemsToGet = false; // Close the popup after adding items
   }
-  
 
   // AddSelectedItems(){
   //   this.selectedItems = this.selectedRowNew;
@@ -644,10 +638,9 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
 
   clearFilter() {
     this.filteredItemStoresList = [];
-    this.selectedSchemaId=null;
+    this.selectedSchemaId = null;
     this.originalGridHeight = '540px'; // Reset to the original size
   }
-
 
   closePopup() {
     // this.selectedSchemaId = null;
@@ -659,7 +652,6 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     // this.promotionName = null;
     this.isVisible = false; // Close the popup (bind this to `visible` in the popup component)
   }
-  
 
   onSelectionChanged(e) {
     this.selectedRowKeys = e.selectedRowKeys;
@@ -676,7 +668,7 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     });
   }
 
-  onSelectionChangedforNewItem(e){
+  onSelectionChangedforNewItem(e) {
     this.selectedRowForNewList = e.selectedRowKeys;
     console.log(this.selectedRowForNewList, 'SELECTEDROWFORNEWLIST');
     this.selectedRowNew = e.selectedRowsData; // Gets the first selected row
@@ -686,11 +678,10 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     });
     this.selectedRowNew = this.selectedRowNew.map((item) => ({
       ...item,
-      PROMOTION_NAME : this.promotionName,
+      PROMOTION_NAME: this.promotionName,
       isBuy: 0, // Always set isBuy to 0
       isGet: 1, // Always set isGet to 1
     }));
-
   }
 
   applySelectedValue() {
@@ -706,11 +697,11 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
       // Log each row's sale price with its ID
       this.selectedRow.forEach((row, index) => {
         console.log(
-          `Row ID: ${row.ID}, Sale Price: ${this.selectedSalePrice[index]}`
+          `Row ID: ${row.ID}, Sale Price: ${this.selectedSalePrice[index]}`,
         );
       });
       console.log(this.valueToUse, 'SALE PRICES OF SELECTED ROWS');
-    }   else if (this.firstDropdownValue === 'defaultPrice') {
+    } else if (this.firstDropdownValue === 'defaultPrice') {
       if (!this.defaultTextValue) {
         console.error('Default value is required.');
         return;
@@ -718,14 +709,15 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
       console.log('Default value entered:', this.defaultTextValue);
       const fieldName = 'PROMOTION_PRICE'; // This could be dynamic too if needed
       this.selectedRow.forEach((row) => {
-        const matchingRow = this.itemStoresList.find((gridRow) => gridRow.ID === row.ID);
+        const matchingRow = this.itemStoresList.find(
+          (gridRow) => gridRow.ID === row.ID,
+        );
         if (matchingRow) {
           matchingRow.PROMOTION_PRICE = this.defaultTextValue; // Directly updating the field
           matchingRow.PROMOTION_NAME = this.promotionName;
         }
       });
-    }
-    else {
+    } else {
       console.log('Please select a valid option.');
       return;
     }
@@ -801,7 +793,7 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
 
       // Log the row ID and the updated value
       console.log(
-        `Row ID: ${this.selectedRow[index].ID}, Updated Value: ${roundedValue}`
+        `Row ID: ${this.selectedRow[index].ID}, Updated Value: ${roundedValue}`,
       );
 
       // Return the rounded value
@@ -811,7 +803,7 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     // Log the result for each row
     console.log(
       'Updated Values for Each Selected Row (After Operation and Rounding):',
-      this.operationResult
+      this.operationResult,
     );
   }
 
@@ -851,22 +843,22 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
       this.selectedRow.forEach((row, index) => {
         // Find the corresponding row in `itemStoresList` by ID
         const selectedRowIndex = this.itemStoresList.findIndex(
-          (item) => item.ID === row.ID
+          (item) => item.ID === row.ID,
         );
 
         if (selectedRowIndex !== -1) {
           // Update the PROMOTION_PRICE for this row
           this.itemStoresList[selectedRowIndex].PROMOTION_PRICE =
             this.operationResult[index];
-            this.itemStoresList[selectedRowIndex].PROMOTION_NAME =
+          this.itemStoresList[selectedRowIndex].PROMOTION_NAME =
             this.promotionName;
           console.log(
             `Updated PROMOTION_PRICE for row ID ${row.ID}:`,
-            this.itemStoresList[selectedRowIndex]
+            this.itemStoresList[selectedRowIndex],
           );
         } else {
           console.log(
-            `Selected row with ID ${row.ID} not found in itemStoresList.`
+            `Selected row with ID ${row.ID} not found in itemStoresList.`,
           );
         }
       });
@@ -899,27 +891,31 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     const selectedDateTime = event.value;
 
     // Extract the date part
-    const datePart = selectedDateTime.toISOString().split('T')[0];  // 'yyyy-MM-dd'
+    const datePart = selectedDateTime.toISOString().split('T')[0]; // 'yyyy-MM-dd'
     const localTime = new Date(selectedDateTime);
     // Extract the time part
-    const timePart = selectedDateTime.toISOString().split('T')[1].slice(0, 8);  // 'HH:mm:ss'
-    const timePartLocal = localTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }); // 24-hour format
+    const timePart = selectedDateTime.toISOString().split('T')[1].slice(0, 8); // 'HH:mm:ss'
+    const timePartLocal = localTime.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }); // 24-hour format
     console.log('Selected Date:', datePart);
     console.log('Selected Time:', timePart);
 
     // Optionally store the extracted date and time separately
-    this.fromTime = timePartLocal;  // You can store it in a variable like this
-    this.toTime = timePartLocal;  // Store time as well if needed
+    this.fromTime = timePartLocal; // You can store it in a variable like this
+    this.toTime = timePartLocal; // Store time as well if needed
   }
   handleDisabledDropdownClick(): void {
     if (!this.areDatesSelected) {
       notify(
         {
-          message:'Please select dates before choosing days',
+          message: 'Please select dates before choosing days',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
-      )
+        'error',
+      );
     }
   }
 
@@ -929,10 +925,11 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     //   this.selectedDays.length === this.daysOfWeek.length &&
     //   this.selectedDays.every((value, index) => value === this.daysOfWeek[index].value);
     // this.selectedDays = 'All Days'
-    console.log('Selected Days:', this.isAllDaysSelected ? 'All Days' : this.selectedDays);
+    console.log(
+      'Selected Days:',
+      this.isAllDaysSelected ? 'All Days' : this.selectedDays,
+    );
   }
-  
-  
 
   // handleDaySelection(event: any) {
   //   this.selectedDays = event.value;
@@ -945,11 +942,7 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
   //   }
   // }
 
-  
-
-
-  savePromotion() { 
-    
+  savePromotion() {
     const companyId = 1; // example company ID
     const userId = this.userId; // example user ID
     const narration = '';
@@ -959,15 +952,15 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
       return;
     }
     const storeID = this.selectedStoreId.join(',') || '1';
-  
+
     // Check if selectedSchemaId is set and fetch the schema
     if (this.selectedSchemaId) {
-      console.log(this.selectedSchemaId, "]]]");
+      console.log(this.selectedSchemaId, ']]]');
       const selectedSchema = this.promotionSchema.find(
-        (schema) => schema.ID === this.selectedSchemaId
+        (schema) => schema.ID === this.selectedSchemaId,
       );
-      console.log(selectedSchema, "SELECTEDSCHEMAAAAA");
-  
+      console.log(selectedSchema, 'SELECTEDSCHEMAAAAA');
+
       if (selectedSchema) {
         if (selectedSchema.REMARKS !== '4') {
           worksheetPromotionSchema = this.selectedRow.map((row) => ({
@@ -1051,7 +1044,7 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
         IS_HAPPY_HOUR: this.isHappyHoursEnabled,
       }));
     }
-  
+
     const payload = {
       COMPANY_ID: companyId, // Company ID
       USER_ID: userId, // User ID
@@ -1059,9 +1052,9 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
       NARRATION: this.narration, // Narration (can be a more descriptive value)
       worksheet_promotion_schema: worksheetPromotionSchema, // This should have the data now
     };
-  
-    console.log(payload, "PAYLOAD IN SAVE");
-  
+
+    console.log(payload, 'PAYLOAD IN SAVE');
+
     // Call the savePromotion API
     this.dataservice.savePromotion(payload).subscribe((response: any) => {
       console.log(response, 'SAVE RESPONSE');
@@ -1071,7 +1064,7 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
             message: 'Promotion added successfully',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
         this.router.navigate(['/Promotion']);
         this.dataGrid.instance.refresh();
@@ -1081,13 +1074,12 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
             message: 'Add operation failed',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
-  
   }
-  
+
   Cancel() {
     this.router.navigate(['/Promotion']);
   }
@@ -1102,10 +1094,6 @@ dateCellTemplate(cellElement: any, cellInfo: any) {
     // Show or hide the error message based on input validity
     this.showError = sanitizedValue !== inputValue;
   }
-  
-  
-
-
 }
 
 @NgModule({

@@ -1357,12 +1357,10 @@ export class DataService {
   }
 
   //itemstoreprices
-  getItemListByStoreId(storeIds: any): Observable<any> {
+  getItemListByStoreId(): Observable<any> {
     console.log('IN SERVICE');
-    const body = {
-      STORE_ID: storeIds,
-    };
-    return this.http.post(`${this.apiUrl}itemvizard/itempricewizard`, body);
+  
+    return this.http.post(`${this.apiUrl}itemvizard/itempricewizard`, {});
   }
 
   //denail

@@ -18,6 +18,7 @@ import {
   DxDateBoxModule,
   DxFileUploaderModule,
   DxFormModule,
+  DxNumberBoxModule,
   DxPopupModule,
   DxProgressBarModule,
   DxRadioGroupModule,
@@ -56,7 +57,7 @@ export class ItemStorePricesComponent {
   allItems: any;
   allItemsList: any;
   totalRowCount: any;
-  selectedStoreId: number[] = [1];
+  selectedStoreId: any;
   store: any[] = [];
   department: any;
   catagory: any;
@@ -157,8 +158,8 @@ export class ItemStorePricesComponent {
   isIncrease: boolean = true;
   selectedSalePrice: any;
   salePriceOptions = [
-    { value: 'SALE_PRICE', text: 'Sale Price ' },
-    { value: 'SALE_PRICE1', text: 'Sale Price 1' },
+    { value: 'SALE_PRICE', text: 'MRP ' },
+    { value: 'SALE_PRICE1', text: 'Standard Price' },
     { value: 'SALE_PRICE2', text: 'Sale Price 2' },
     { value: 'SALE_PRICE3', text: 'Sale Price 3' },
     { value: 'SALE_PRICE4', text: 'Sale Price 4' },
@@ -189,16 +190,48 @@ export class ItemStorePricesComponent {
   canApprove = false;
   canPrint = false;
   selected_Company_id: any;
+  itemtype: any[] = [];
 
-  constructor(private dataservice: DataService, private router: Router) {
+  //----------------select columns--------
+  priceColumnOptions = [
+    { text: 'MRP', value: 'MRP' },
+    { text: 'Standard Price', value: 'PRICE1' },
+    { text: 'Price 2', value: 'PRICE2' },
+    { text: 'Price 3', value: 'PRICE3' },
+    { text: 'Price 4', value: 'PRICE4' },
+    { text: 'Price 5', value: 'PRICE5' },
+  ];
+
+  selectedPriceColumns: string[] = ['MRP']; // default visible
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+  narrationText: any;
+
+  constructor(
+    private dataservice: DataService,
+    private router: Router,
+  ) {
     this.loadDropdownData();
+    const payload = {
+      NAME: 'ITEMTYPE',
+    };
+    dataservice.getDropdownData(payload).subscribe((data) => {
+      this.itemtype = data;
+    });
   }
 
   ngOnInit() {
+    console.log('Item Store Prices Component Initialized');
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax();
@@ -220,10 +253,16 @@ export class ItemStorePricesComponent {
     this.sesstion_Details();
     this.loadStores();
     // this.getWorksheetData();
-    const defaultStoreId = this.selectedStoreId.join(',');
+    const defaultStoreId = this.selectedStoreId;
     this.listItemsByMultipleStoreIds(defaultStoreId);
+    this.itemStoresList = [];
   }
 
+  isVisible(code: string): boolean {
+    return this.selectedPriceColumns.includes(code);
+  }
+
+  onPriceColumnChange() {}
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
@@ -231,28 +270,27 @@ export class ItemStorePricesComponent {
 
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
+      // grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
   onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'filter',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
+    // const toolbarItems = e.toolbarOptions.items;
+    // // Avoid adding the button more than once
+    // const alreadyAdded = toolbarItems.some(
+    //   (item: any) => item.name === 'toggleFilterButton',
+    // );
+    //   if (!alreadyAdded) {
+    //     toolbarItems.splice(toolbarItems.length - 1, 0, {
+    //       widget: 'dxButton',
+    //       name: 'toggleFilterButton', // custom name to avoid duplicates
+    //       location: 'after',
+    //       options: {
+    //         icon: 'filter',
+    //         hint: 'Search Column',
+    //         onClick: () => this.toggleFilters(),
+    //       },
+    //     });
+    //   }
   }
   getWorksheetData(): void {
     this.dataservice.worksheetData$.subscribe((data) => {
@@ -271,10 +309,10 @@ export class ItemStorePricesComponent {
             SALE_PRICE3: item.PRICE_LEVEL3_NEW || item.SALE_PRICE3 || 0,
             SALE_PRICE4: item.PRICE_LEVEL4_NEW || item.SALE_PRICE4 || 0,
             SALE_PRICE5: item.PRICE_LEVEL5_NEW || item.SALE_PRICE5 || 0,
-          })
+          }),
         );
         this.selectedItems = this.worksheetItems.filter(
-          (item) => item.Selected === true
+          (item) => item.Selected === true,
         );
         if (this.selectedItems.length > 0) {
           this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
@@ -309,20 +347,20 @@ export class ItemStorePricesComponent {
   }
 
   listItemsByMultipleStoreIds(storeIds: string) {
-    this.dataservice.getItemListByStoreId(storeIds).subscribe(
+    console.log('item price wizard api call');
+    this.dataservice.getItemListByStoreId().subscribe(
       (response) => {
         this.itemStoresList = response.PriceWizardData;
       },
       (error) => {
-        // console.error('Error fetching item list:', error);
-      }
+        console.error('Error fetching item list:', error);
+      },
     );
   }
 
   onDropdownValueChanged(event: any) {
     const selectedStoreIds = event.value;
-    this.storeIds =
-      selectedStoreIds.length > 0 ? selectedStoreIds.join(',') : '1';
+    this.storeIds = selectedStoreIds;
     this.listItemsByMultipleStoreIds(this.storeIds);
   }
 
@@ -335,21 +373,24 @@ export class ItemStorePricesComponent {
       },
       (error) => {
         console.error('Error fetching items:', error);
-      }
+      },
     );
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+  }
 
   loadStores() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
       this.filteredStoreList = this.store;
@@ -499,14 +540,14 @@ export class ItemStorePricesComponent {
           message: 'No rows selected. Please select at least one row to save.',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
+        'error',
       );
       return;
     }
 
     const companyId = 1;
     const userId = 1;
-    const narration = 'Narration';
+    const narration = this.narrationText;
     const defaultStoreId = 1;
 
     // Helper to safely convert empty strings or nulls to 0
@@ -528,7 +569,7 @@ export class ItemStorePricesComponent {
         PRICE_LEVEL3_NEW: toNumberOrZero(item.PRICE_LEVEL3_NEW),
         PRICE_LEVEL4_NEW: toNumberOrZero(item.PRICE_LEVEL4_NEW),
         PRICE_LEVEL5_NEW: toNumberOrZero(item.PRICE_LEVEL5_NEW),
-      })
+      }),
     );
 
     const hasEnteredPrice = worksheetItemPrice.some(
@@ -538,7 +579,7 @@ export class ItemStorePricesComponent {
         item.PRICE_LEVEL2_NEW > 0 ||
         item.PRICE_LEVEL3_NEW > 0 ||
         item.PRICE_LEVEL4_NEW > 0 ||
-        item.PRICE_LEVEL5_NEW > 0
+        item.PRICE_LEVEL5_NEW > 0,
     );
 
     if (!hasEnteredPrice) {
@@ -548,7 +589,7 @@ export class ItemStorePricesComponent {
             'Please enter at least one price value (New Price Value) before saving.',
           position: { at: 'top right', my: 'top right' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -558,10 +599,28 @@ export class ItemStorePricesComponent {
       COMPANY_ID: companyId,
       USER_ID: userId,
       STORE_ID: String(this.storeIds || defaultStoreId),
-      NARRATION: narration,
+      NARRATION: this.narrationText,
       worksheet_item_price: worksheetItemPrice,
     };
+    console.log(payload, '=================SAVE PAYLOAD===================');
+    const invalidItems = payload.worksheet_item_price.filter(
+      (item: any) => item.PRICE_NEW <= item.PRICE_LEVEL1_NEW,
+    );
 
+    if (invalidItems.length > 0) {
+      //  Get all item codes
+      const itemCodes = invalidItems
+        .map((item: any) => item.ITEM_CODE)
+        .join(', ');
+
+      notify(
+        `MRP must be greater than Standard Price for Item(s): ${itemCodes}`,
+        'error',
+        5000,
+      );
+
+      return; //  Stop saving
+    }
     this.dataservice.saveWorksheetPrice(payload).subscribe(
       (response) => {
         this.worksheetID = response.data.ID;
@@ -581,10 +640,11 @@ export class ItemStorePricesComponent {
               message: 'Worksheet Added Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.isSaved = true;
           this.afterSave.emit();
+          this.Cancel();
           if (!this.AllowCommitWithSave) {
             this.router.navigate(['/change-price']);
           }
@@ -594,13 +654,13 @@ export class ItemStorePricesComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       },
       (error) => {
         console.error('Error saving data:', error);
-      }
+      },
     );
   }
 
@@ -647,7 +707,7 @@ export class ItemStorePricesComponent {
                 message: 'Worksheet Verified Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
-              'success'
+              'success',
             );
             this.isVerified = true;
             console.log(this.isVerified, 'ISVERIFIED');
@@ -657,7 +717,7 @@ export class ItemStorePricesComponent {
                 message: 'Your Data Not Saved',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
           console.log('Verification successful:', verifyResponse);
@@ -756,7 +816,7 @@ export class ItemStorePricesComponent {
                 message: 'Worksheet Approved Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
-              'success'
+              'success',
             );
             this.isApproved = true;
           } else {
@@ -765,7 +825,7 @@ export class ItemStorePricesComponent {
                 message: 'Your Data Not Saved',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
           this.router.navigate(['/change-price']);
@@ -806,8 +866,9 @@ export class ItemStorePricesComponent {
     }
 
     // Reload default store list data (optional)
-    const defaultStoreId = this.selectedStoreId.join(',');
+    const defaultStoreId = this.selectedStoreId;
     this.listItemsByMultipleStoreIds(defaultStoreId);
+    this.narrationText = '';
 
     // Navigate back
     this.router.navigate(['/change-price']);
@@ -819,7 +880,7 @@ export class ItemStorePricesComponent {
       const selectedRowsData = [];
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.itemStoresList.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
         if (selectedRow) {
           selectedRowsData.push(selectedRow);
@@ -840,12 +901,12 @@ export class ItemStorePricesComponent {
           } else {
             console.log(
               'Old values already stored:',
-              this.oldValues[this.selectedRowId]
+              this.oldValues[this.selectedRowId],
             );
           }
         } else {
           console.error(
-            `Selected row with ID ${selectedRowId} not found in the data source.`
+            `Selected row with ID ${selectedRowId} not found in the data source.`,
           );
         }
       });
@@ -891,7 +952,7 @@ export class ItemStorePricesComponent {
     if (this.selectedRowKeys.length > 0) {
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.itemStoresList.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
         if (selectedRow) {
           // Loop through each selected option
@@ -899,12 +960,12 @@ export class ItemStorePricesComponent {
             const salePriceValue = selectedRow[option]; // Accessing the property dynamically
             console.log(
               `Selected SALE_PRICE option '${option}' for row ID ${selectedRowId}:`,
-              salePriceValue
+              salePriceValue,
             );
           });
         } else {
           console.error(
-            `Selected row with ID ${selectedRowId} not found in the data source.`
+            `Selected row with ID ${selectedRowId} not found in the data source.`,
           );
         }
       });
@@ -917,7 +978,7 @@ export class ItemStorePricesComponent {
     if (this.selectedRowKeys.length > 0) {
       this.selectedRowKeys.forEach((selectedRowId) => {
         const selectedRow = this.itemStoresList.find(
-          (row) => row.ID === selectedRowId
+          (row) => row.ID === selectedRowId,
         );
 
         if (selectedRow) {
@@ -935,7 +996,7 @@ export class ItemStorePricesComponent {
           // selectedRow[selectedOption] = this.newPrice; // Only update the new price field
           console.log(
             `Processed ${selectedOption} for row ID ${selectedRowId}:`,
-            this.newPrice
+            this.newPrice,
           );
         } else {
           console.error(`Selected row with ID ${selectedRowId} not found.`);
@@ -987,7 +1048,7 @@ export class ItemStorePricesComponent {
             this.onRowUpdated({ data: selectedRow });
             console.log(
               `Updated ${selectedOption} for row ID ${selectedRow.ID}:`,
-              finalPrice
+              finalPrice,
             );
           });
         } else {
@@ -1072,6 +1133,7 @@ export class ItemStorePricesComponent {
     DxTagBoxModule,
     DxToastModule,
     DxSwitchModule,
+    DxNumberBoxModule,
   ],
   providers: [],
   exports: [],
