@@ -4,12 +4,13 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
   NgModule,
+  OnInit,
   Output,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
@@ -39,7 +40,7 @@ import {
   DxoLookupModule,
 } from 'devextreme-angular/ui/nested';
 import notify from 'devextreme/ui/notify';
-import { forkJoin } from 'rxjs';
+import { filter, forkJoin } from 'rxjs';
 import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
@@ -224,6 +225,7 @@ export class ItemStorePricesComponent {
     dataservice.getDropdownData(payload).subscribe((data) => {
       this.itemtype = data;
     });
+    console.log('constructor called');
   }
 
   ngOnInit() {
@@ -256,6 +258,15 @@ export class ItemStorePricesComponent {
     const defaultStoreId = this.selectedStoreId;
     this.listItemsByMultipleStoreIds(defaultStoreId);
     this.itemStoresList = [];
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        console.log('Route refreshed');
+
+        // Call your load functions again
+        this.loadStores();
+        this.listItemsByMultipleStoreIds(this.selectedStoreId);
+      });
   }
 
   isVisible(code: string): boolean {
