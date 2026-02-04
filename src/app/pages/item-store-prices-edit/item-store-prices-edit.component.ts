@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
@@ -39,6 +39,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
 import { confirm } from 'devextreme/ui/dialog';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-item-store-prices-edit',
@@ -206,11 +207,17 @@ export class ItemStorePricesEditComponent {
     console.log(this.currencyFormt, 'CURRENCYFORMAT');
     this.sesstion_Details();
     this.getWorksheetData();
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        console.log('Route refreshed');
+      });
     if (this.selectedStoreId.length > 1) {
       const defaultStoreId = this.selectedStoreId.join(',');
-      this.listItemsByMultipleStoreIds(defaultStoreId);
+      // this.listItemsByMultipleStoreIds(defaultStoreId);
     }
     this.loadStores();
+    this.isApproved = false;
   }
 
   getWorksheetData(): void {
@@ -344,7 +351,7 @@ export class ItemStorePricesEditComponent {
         (store: any) => store.ID === storeId,
       );
       if (this.filteredStoreList.length > 0) {
-        this.listItemsByMultipleStoreIds(storeId);
+        // this.listItemsByMultipleStoreIds(storeId);
       }
     });
   }
@@ -525,6 +532,7 @@ export class ItemStorePricesEditComponent {
 
   Cancel() {
     this.router.navigate(['/change-price']);
+    this.isApproved = false;
   }
 
   onDropdownValueChanged(event: any) {
@@ -599,6 +607,7 @@ export class ItemStorePricesEditComponent {
                   'success',
                 );
                 this.router.navigate(['/change-price']);
+                this.isApproved = false;
               } else {
                 notify(
                   {
