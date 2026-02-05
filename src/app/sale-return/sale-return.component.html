@@ -12,7 +12,7 @@
         showPane: true,
       }"
       class="grid theme-dependent"
-      [dataSource]="InvoiceDataSource"
+      [dataSource]="saleReturnDataSource"
       [showBorders]="true"
       [showRowLines]="true"
       [showColumnLines]="true"
@@ -30,14 +30,10 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
-      [scrolling]="{ mode: 'virtual' }"
-      (onEditingStart)="onEditInvoice($event)"
-      (onRowRemoving)="onDeleteInvoice($event)"
-      (onCellPrepared)="onCellPrepared($event)"
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
+        [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-export
@@ -56,7 +52,7 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <!-- <dxo-scrolling mode="standard"></dxo-scrolling> -->
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
       <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
@@ -67,11 +63,17 @@
       <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
+
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Invoice</div>
+          <div class="grid-header">Sale Return</div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <!-- <dxi-item widget="dxButton" [options]="filterButtonOptions"></dxi-item> -->
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -85,12 +87,6 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-
-        <!-- Divider -->
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-
         <dxi-item
           name="exportButton"
           location="after"
@@ -105,7 +101,6 @@
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
-
       <div *dxTemplate="let data of 'dateFilterTemplate'">
         <dx-select-box
           [dataSource]="dateRanges"
@@ -122,20 +117,15 @@
           </div>
         </dx-select-box>
       </div>
-      <!-- <dxi-column dataField="TRANS_TYPE" caption="Trans Type"></dxi-column> -->
+      <dxi-column dataField="DOC_NO" caption="Return No"></dxi-column>
       <dxi-column
-        dataField="DOC_NO"
-        caption="Sale No"
-        alignment="right"
-      ></dxi-column>
-      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
-      <dxi-column
-        dataField="SALE_DATE"
-        caption="Date"
+        dataField="RET_DATE"
+        caption="Return Date"
         dataType="date"
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
+      <dxi-column dataField="SUPP_NAME" caption="Customer"></dxi-column>
       <dxi-column
         dataField="GROSS_AMOUNT"
         caption="Gross Amount"
@@ -143,10 +133,10 @@
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
       <dxi-column
-        dataField="GST_AMOUNT"
+        dataField="VAT_AMOUNT"
         [caption]="
           selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-            ? ' VAT Amount'
+            ? 'VAT Amount'
             : ' GST Amount'
         "
         dataType="number"
@@ -154,14 +144,15 @@
       ></dxi-column>
       <dxi-column
         dataField="NET_AMOUNT"
-        caption="Net Amount"
+        caption="NET Amount"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
+      <!-- <dxi-column dataField="NARRATION" caption="Narration"></dxi-column> -->
 
       <dxi-column
         caption="Status"
-        dataField="STATUS"
+        dataField="TRANS_STATUS"
         [width]="80"
         [cellTemplate]="statusCellRender"
         [allowHeaderFiltering]="true"
@@ -169,54 +160,13 @@
           dataSource: getStatusFilterData,
           encodeHtml: false,
         }"
+        [fixed]="true"
+        fixedPosition="right"
       >
       </dxi-column>
     </dx-data-grid>
   </div>
 </div>
-
-<dx-popup
-  [(visible)]="isAddInvoice"
-  [width]="'100vw'"
-  [height]="'100vh'"
-  title="New Invoice"
-  (onHiding)="handleClose()"
->
-  <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-add-invoice (popupClosed)="handleClose()"></app-add-invoice>
-  <!-- </ng-container> -->
-</dx-popup>
-
-<dx-popup
-  [(visible)]="isEditInvoice"
-  [width]="'100vw'"
-  [height]="'100vh'"
-  title="Update Invoice"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditInvoice">
-    <app-edit-invoice
-      [invoiceFormData]="selectedInvoice"
-      (popupClosed)="handleClose()"
-    ></app-edit-invoice>
-  </ng-container>
-</dx-popup>
-
-<dx-popup
-  [(visible)]="isViewInvoice"
-  [width]="'100vw'"
-  [height]="'100vh'"
-  title="View Invoice"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isViewInvoice">
-    <app-view-invoice
-      [invoiceFormData]="selectedInvoice"
-      (popupClosed)="handleClose()"
-    ></app-view-invoice>
-  </ng-container>
-</dx-popup>
-
 <dx-popup
   [(visible)]="showCustomDatePopup"
   [showTitle]="true"
@@ -240,8 +190,8 @@
         [(value)]="customEndDate"
         type="date"
         placeholder="To Date"
-        displayFormat="dd-MM-yyyy"
         width="300"
+        displayFormat="dd-MM-yyyy"
       >
       </dx-date-box>
     </div>

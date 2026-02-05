@@ -1003,6 +1003,10 @@ import {
   StockViewComponent,
   StockViewModule,
 } from './stock-view/stock-view.component';
+import {
+  SaleReturnComponent,
+  SaleReturnModule,
+} from './sale-return/sale-return.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1368,6 +1372,7 @@ import {
     ArticleproductionJvViewModule,
     BoxproductionJvViewModule,
     StockViewModule,
+    SaleReturnModule,
   ],
   providers: [
     AuthService,

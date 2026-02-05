@@ -52,18 +52,33 @@
           </div>
         </dxi-item>
 
-        <dxi-item>
-          <dx-date-box
-            [width]="150"
-            label="From Date"
-            labelMode="floating"
-            [value]="defaultDate"
-            [displayFormat]="'dd-MM-yyyy'"
-            (onValueChanged)="onFromDateChange($event)"
-          >
-          </dx-date-box>
+        <dxi-item
+          location="after"
+          template="FromDateButton"
+          cssClass="bottom-toolbar-buttons"
+        >
+        </dxi-item>
 
-          <!-- <dx-date-box
+        <dxi-item
+          location="after"
+          template="ToDateButton"
+          cssClass="bottom-toolbar-buttons"
+        >
+        </dxi-item>
+
+        <div *dxTemplate="let data of 'FromDateButton'">
+          <dxi-item>
+            <dx-date-box
+              [width]="150"
+              label="From Date"
+              labelMode="floating"
+              [value]="defaultDate"
+              [displayFormat]="'dd-MM-yyyy'"
+              (onValueChanged)="onFromDateChange($event)"
+            >
+            </dx-date-box>
+
+            <!-- <dx-date-box
         [width]="150"
         label="From Date"
         labelMode="floating"
@@ -72,18 +87,22 @@
         >
 
         </dx-date-box> -->
-        </dxi-item>
-        <dxi-item itemType="simple" verticalAlignment="center">
-          <dx-date-box
-            [width]="150"
-            label="To Date"
-            labelMode="floating"
-            [value]="defaultDate"
-            displayFormat="dd-MM-yyyy"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
+          </dxi-item>
+        </div>
+
+        <div *dxTemplate="let data of 'ToDateButton'">
+          <dxi-item itemType="simple" verticalAlignment="center">
+            <dx-date-box
+              [width]="150"
+              label="To Date"
+              labelMode="floating"
+              [value]="defaultDate"
+              displayFormat="dd-MM-yyyy"
+              (onValueChanged)="onToDateChange($event)"
+            >
+            </dx-date-box>
+          </dxi-item>
+        </div>
 
         <dxi-item
           location="after"
@@ -98,24 +117,39 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
         <dxi-item
           name="exportButton"
           location="after"
           cssClass="export-btn"
         ></dxi-item>
 
-        <dxi-item itemType="simple" verticalAlignment="center">
-          <dx-button
-            text="Apply"
-            icon="todo"
-            stylingMode="contained"
-            type="default"
-            [width]="100"
-            class="mt-2"
-            (onClick)="load_JournalBook_data()"
-          >
-          </dx-button>
+        <dxi-item
+          location="after"
+          template="ApplyButton"
+          cssClass="bottom-toolbar-buttons"
+        >
         </dxi-item>
+
+        <div *dxTemplate="let data of 'ApplyButton'">
+          <dxi-item itemType="simple" verticalAlignment="center">
+            <dx-button
+              text="Apply"
+              icon="todo"
+              stylingMode="contained"
+              type="default"
+              [width]="100"
+              class="mt-2"
+              (onClick)="load_JournalBook_data()"
+            >
+            </dx-button>
+          </dxi-item>
+        </div>
         <!-- <dxi-item name="exportButton"></dxi-item> -->
       </dxo-toolbar>
       <dxo-sorting mode="none"></dxo-sorting>

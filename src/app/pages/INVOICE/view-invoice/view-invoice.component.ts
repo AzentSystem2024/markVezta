@@ -119,7 +119,7 @@ export class ViewInvoiceComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     const userDataString = localStorage.getItem('userData');
     console.log(userDataString, 'USERDATASTRING');
@@ -234,7 +234,7 @@ export class ViewInvoiceComponent {
             SGST: igst > 0 ? 0 : sgst, // Same-state
             HSN_CODE: row.HSN_CODE, // keep your HSN logic
           };
-        }
+        },
       );
       this.setGstColumnVisibilityFromData(this.mainInvoiceGridList);
 
@@ -262,7 +262,7 @@ export class ViewInvoiceComponent {
       this.getCustomerOrUnitLst();
       console.log(
         firstInvoice.DISTRIBUTOR_ID,
-        'DISTRIBUTORIDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
+        'DISTRIBUTORIDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
       );
     }
   }
@@ -313,7 +313,7 @@ export class ViewInvoiceComponent {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
-      NAME:'CUSTOMER'
+      NAME: 'CUSTOMER',
     };
     this.dataService
       .getOutsideCustomerWithState(payload)
@@ -323,7 +323,7 @@ export class ViewInvoiceComponent {
 
         if (this.invoiceFormData && this.invoiceFormData.DISTRIBUTOR_ID) {
           this.selectedCustomer = this.distributorList.find(
-            (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID
+            (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID,
           );
 
           console.log('EDIT MODE — Selected Customer:', this.selectedCustomer);
@@ -362,12 +362,12 @@ export class ViewInvoiceComponent {
       console.log('Selected Distributor ID:', this.selectedDistributorId);
       if (this.selectedDistributorId) {
         this.selectedSupplierName = this.distributorList.find(
-          (s: any) => s.ID === this.selectedDistributorId
+          (s: any) => s.ID === this.selectedDistributorId,
         );
         this.invoiceFormData.PARTY_NAME = this.selectedSupplierName.DESCRIPTION;
         console.log(
           this.selectedSupplierName.DESCRIPTION,
-          'PARTYNAMEEEEEEEEEEEEEE'
+          'PARTYNAMEEEEEEEEEEEEEE',
         );
       }
       this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
@@ -392,13 +392,13 @@ export class ViewInvoiceComponent {
 
       // ✅ Ensure ID is correctly matched
       const matched = response.find(
-        (d) => d.ID === this.invoiceFormData?.DISTRIBUTOR_ID
+        (d) => d.ID === this.invoiceFormData?.DISTRIBUTOR_ID,
       );
 
       if (!matched) {
         console.warn(
           'No matching distributor for ID:',
-          this.invoiceFormData?.DISTRIBUTOR_ID
+          this.invoiceFormData?.DISTRIBUTOR_ID,
         );
       }
     });
@@ -411,7 +411,7 @@ export class ViewInvoiceComponent {
       // Optional: Ensure selected value is set after data arrives
       if (!this.invoiceFormData.DISTRIBUTOR_ID && response.length) {
         const matched = response.find(
-          (d) => d.ID === this.invoiceFormData.DISTRIBUTOR_ID
+          (d) => d.ID === this.invoiceFormData.DISTRIBUTOR_ID,
         );
         if (matched) {
           this.invoiceFormData.DISTRIBUTOR_ID = matched.ID;
@@ -458,7 +458,7 @@ export class ViewInvoiceComponent {
     this.dataService.selectInvoice(invoiceId).subscribe((response: any) => {
       console.log(
         response,
-        '=================invoice response==================='
+        '=================invoice response===================',
       );
       if (response) {
         this.pdfSrc = this.get_pdf(response.Data); // Update iframe source
@@ -572,7 +572,7 @@ export class ViewInvoiceComponent {
     doc.text(
       `State : ${data[0].STATE || ''}, Code : ${data[0].STATE_CODE || ''}`,
       blueX + 3,
-      blueY + 33
+      blueY + 33,
     );
     doc.text(`E-Mail : ${data[0].EMAIL || ''}`, blueX + 3, blueY + 38);
 
@@ -594,7 +594,7 @@ export class ViewInvoiceComponent {
     doc.text(
       `State : ${data[0].CUST_STATE || ''}, Code : ${data[0].STATE_CODE || ''}`,
       shipX,
-      shipY + 36
+      shipY + 36,
     );
 
     y += 48;
@@ -617,7 +617,7 @@ export class ViewInvoiceComponent {
     doc.text(
       `State : ${data[0].CUST_STATE || ''}, Code : ${data[0].STATE_CODE || ''}`,
       billX,
-      billY + 36
+      billY + 36,
     );
 
     y += 50;

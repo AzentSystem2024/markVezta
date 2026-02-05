@@ -215,6 +215,7 @@ import { GstReportCDNRComponent } from './pages/REPORT/gst-report-cdnr/gst-repor
 import { ProductionJvListComponent } from './production-jv-list/production-jv-list.component';
 import { ArticleproductionJvListComponent } from './articleproduction-jv-list/articleproduction-jv-list.component';
 import { StockViewComponent } from './stock-view/stock-view.component';
+import { SaleReturnComponent } from './sale-return/sale-return.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -938,6 +939,11 @@ const routes: Routes = [
       {
         path: 'stock-view',
         component: StockViewComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'sale-return',
+        component: SaleReturnComponent,
         canActivate: [AuthGuardService],
       },
       {

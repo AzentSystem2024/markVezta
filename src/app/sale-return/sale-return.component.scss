@@ -1,12 +1,5 @@
-// .flag-red {
-//   color: red;
-// }
-
-// .flag-green {
-//   color: green;
-// }
 // @use "../../../../../variables.scss" as *;
-@use "../../../../variables.scss" as *;
+@use "../../variables.scss" as *;
 @use "sass:math";
 
 :host {
@@ -62,10 +55,8 @@
   justify-content: flex-end;
   width: 100%;
 }
-.flag-red {
-  color: red;
-}
-
-.flag-green {
-  color: green;
+.bordered-grid {
+  border: 1px solid #ccc; /* or a lighter color if using dark theme */
+  border-radius: 4px; /* optional */
+  overflow: hidden; /* ensures inner content stays inside border */
 }

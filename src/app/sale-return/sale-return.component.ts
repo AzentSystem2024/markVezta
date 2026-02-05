@@ -37,32 +37,20 @@ import {
   DxiGroupModule,
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
-import { FormTextboxModule } from 'src/app/components';
-import { ArticleAddModule } from '../ARTICLE/article-add/article-add.component';
-import { ArticleEditModule } from '../ARTICLE/article-edit/article-edit.component';
-import { AddJournalVoucharModule } from '../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import { AddPurchaseInvoiceModule } from '../PURCHASE INVOICE/add-purchase-invoice/add-purchase-invoice.component';
-import { EditPurchaseInvoiceModule } from '../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
-import { PurchaseInvoiceListComponent } from '../PURCHASE INVOICE/purchase-invoice-list/purchase-invoice-list.component';
+import { FormTextboxModule } from '../components';
+import { PurchaseReturnDebitFormModule } from '../pages/purchase-return-debit-form/purchase-return-debit-form.component';
+import { PurchaseReturnDebitComponent } from '../pages/purchase-return-debit/purchase-return-debit.component';
+import { DataService } from '../services';
 import { Router } from '@angular/router';
-import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
-import {
-  PurchaseReturnDebitFormComponent,
-  PurchaseReturnDebitFormModule,
-} from '../purchase-return-debit-form/purchase-return-debit-form.component';
 import DataSource from 'devextreme/data/data_source';
 
 @Component({
-  selector: 'app-purchase-return-debit',
-  templateUrl: './purchase-return-debit.component.html',
-  styleUrls: ['./purchase-return-debit.component.scss'],
+  selector: 'app-sale-return',
+  templateUrl: './sale-return.component.html',
+  styleUrls: ['./sale-return.component.scss'],
 })
-export class PurchaseReturnDebitComponent {
-  @ViewChild(PurchaseReturnDebitFormComponent)
-  PurchaseReturnDebitFormComponent!: PurchaseReturnDebitFormComponent;
+export class SaleReturnComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -94,20 +82,20 @@ export class PurchaseReturnDebitComponent {
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.ngZone.run(() => this.addPurchaseReturn());
+      this.ngZone.run(() => this.addSaleReturn());
     },
     elementAttr: { class: 'add-button' },
 
     template: () => {
       return `
-      <div class="add-btn-content">
-        <span class="iconify"
-              data-icon="formkit:add"
-              data-width="20"
-              data-height="20"></span>
-        <span class="add-text">New</span>
-      </div>
-    `;
+        <div class="add-btn-content">
+          <span class="iconify"
+                data-icon="formkit:add"
+                data-width="20"
+                data-height="20"></span>
+          <span class="add-text">New</span>
+        </div>
+      `;
     },
   };
 
@@ -141,35 +129,22 @@ export class PurchaseReturnDebitComponent {
   isEmptyDatagrid: boolean = false;
   sessionData: any;
   selected_vat_id: any;
-
-  // refreshButtonOptions = {
-  //   icon: 'refresh',
-  //   hint: 'Refresh',
-  //   onClick: () => this.refreshGrid(),
-  //   text: '',
-  // };
-  isAddPurchaseReturn: boolean;
-  isEditPurchaseReturn: boolean;
-  isViewPurchaseReturn: boolean;
-  selectedPurchaseReturn: any;
-  isReadOnlyPurchaseReturn: boolean;
+  saleReturnDataSource;
   companyID: any;
-  PurchaseReturnDataSource: any;
-  purchaseReturnArray: any[] = [];
-  purchaseReturnCount = 0;
-
-  sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
-    this.selected_vat_id = this.sessionData.VAT_ID;
-  }
-
+  saleReturnArray: any[] = [];
+  saleReturnCount = 0;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
   ) {}
+
+  sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+  }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -197,11 +172,11 @@ export class PurchaseReturnDebitComponent {
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
-    this.getpurchaseReturnList();
+    this.getSaleReturnList();
     this.sessionData_tax();
   }
 
-  getpurchaseReturnList(dateRange: string = this.selectedDateRange) {
+  getSaleReturnList(dateRange: string = this.selectedDateRange) {
     const datePayload = this.getDateRangePayload(dateRange);
 
     const payload = {
@@ -210,10 +185,10 @@ export class PurchaseReturnDebitComponent {
       DATE_TO: datePayload.DATE_TO,
     };
 
-    this.PurchaseReturnDataSource = new DataSource({
+    this.saleReturnDataSource = new DataSource({
       load: () =>
         new Promise((resolve) => {
-          this.dataService.getPurchaseReturnMainList(payload).subscribe({
+          this.dataService.getSaleReturnMainList(payload).subscribe({
             next: (response: any) => {
               const list = (response?.Data || [])
                 .map((item: any) => {
@@ -240,14 +215,14 @@ export class PurchaseReturnDebitComponent {
                   );
                 });
 
-              this.purchaseReturnArray = list;
-              this.purchaseReturnCount = list.length;
+              this.saleReturnArray = list;
+              this.saleReturnCount = list.length;
 
               resolve(list);
             },
             error: (err) => {
-              this.purchaseReturnArray = [];
-              this.purchaseReturnCount = 0;
+              this.saleReturnArray = [];
+              this.saleReturnCount = 0;
 
               const message =
                 err?.status === 0
@@ -327,13 +302,6 @@ export class PurchaseReturnDebitComponent {
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-    this.getpurchaseReturnList();
-  }
-
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
@@ -360,6 +328,7 @@ export class PurchaseReturnDebitComponent {
       value: 'Open',
     },
   ];
+
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
 
@@ -370,38 +339,7 @@ export class PurchaseReturnDebitComponent {
       return;
     }
 
-    this.getpurchaseReturnList(e.value);
-  }
-
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
-  }
-  onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton',
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'search',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
+    this.getSaleReturnList(e.value);
   }
 
   applyDateFilter() {
@@ -470,7 +408,7 @@ export class PurchaseReturnDebitComponent {
     this.showCustomDatePopup = false;
 
     // reload grid
-    this.getpurchaseReturnList('custom');
+    this.getSaleReturnList('custom');
   }
 
   private parseDateString(dateStr: string): Date {
@@ -535,86 +473,27 @@ export class PurchaseReturnDebitComponent {
     }, 0);
   }
 
-  onEditPurchaseReturn(event: any) {
-    event.cancel = true;
-    const returnId = event.data.TRANS_ID;
-    const status = event.data.TRANS_STATUS;
-    this.dataService
-      .selectPurchaseReturn(returnId)
-      .subscribe((response: any) => {
-        this.selectedPurchaseReturn = response;
-        console.log(this.selectedPurchaseReturn, 'SELECTEDTROUT');
-        this.isEditPurchaseReturn = true;
-        this.isReadOnlyPurchaseReturn = status === 5;
-      });
-  }
-  onDeletePurchaseReturn(event: any) {
-    console.log(event);
-    const returnId = event.data.TRANS_ID;
-    console.log(returnId);
-    const status = event.data.TRANS_STATUS;
-    console.log(status);
-    if (event.data.TRANS_STATUS === 5) {
-      event.cancel = true;
-      notify('This cannot be deleted.', 'error', 2000);
-      return;
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
     }
-    event.cancel = true;
-    console.log(returnId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
-    // Call your delete API
-    this.dataService.deletePurchaseReturn(returnId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.getpurchaseReturnList();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
-      },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      },
-    );
   }
 
-  onCellPrepared(e: any) {
-    if (e.rowType === 'data' && e.column.command === 'edit') {
-      if (e.data.TRANS_STATUS === 5) {
-        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
-        if (deleteButton) {
-          deleteButton.style.display = 'none';
-        }
-      }
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
-  }
-  addPurchaseReturn() {
-    this.isAddPurchaseReturn = true;
+    this.getSaleReturnList();
   }
 
-  handleClose() {
-    this.isAddPurchaseReturn = false;
-    this.isEditPurchaseReturn = false;
-    this.isViewPurchaseReturn = false;
-    if (this.PurchaseReturnDebitFormComponent) {
-      this.PurchaseReturnDebitFormComponent.resetPurchaseReturnForm();
-    }
-    this.getpurchaseReturnList();
-  }
+  addSaleReturn() {}
 }
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -649,8 +528,8 @@ export class PurchaseReturnDebitComponent {
     PurchaseReturnDebitFormModule,
   ],
   providers: [],
-  declarations: [PurchaseReturnDebitComponent],
-  exports: [PurchaseReturnDebitComponent],
+  declarations: [SaleReturnComponent],
+  exports: [SaleReturnComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseReturnDebitModule {}
+export class SaleReturnModule {}
