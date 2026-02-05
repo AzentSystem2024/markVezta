@@ -614,24 +614,29 @@ export class ItemStorePricesComponent {
       worksheet_item_price: worksheetItemPrice,
     };
     console.log(payload, '=================SAVE PAYLOAD===================');
-    const invalidItems = payload.worksheet_item_price.filter(
-      (item: any) => item.PRICE_NEW <= item.PRICE_LEVEL1_NEW,
-    );
+    const invalidItems = payload.worksheet_item_price.filter((item: any) => {
+      const priceToCheck =
+        Number(item.PRICE_NEW) === 0
+          ? Number(item.SALE_PRICE)
+          : Number(item.PRICE_NEW);
+
+      return priceToCheck <= Number(item.PRICE_LEVEL1_NEW);
+    });
 
     if (invalidItems.length > 0) {
-      //  Get all item codes
       const itemCodes = invalidItems
         .map((item: any) => item.ITEM_CODE)
         .join(', ');
 
       notify(
-        `MRP must be greater than Standard Price for Item(s): ${itemCodes}`,
+        `Price must be greater than Standard Price for Item(s): ${itemCodes}`,
         'error',
         5000,
       );
 
-      return; //  Stop saving
+      return;
     }
+
     this.dataservice.saveWorksheetPrice(payload).subscribe(
       (response) => {
         this.worksheetID = response.data.ID;
@@ -673,6 +678,19 @@ export class ItemStorePricesComponent {
         console.error('Error saving data:', error);
       },
     );
+  }
+
+  onEditorPreparing(e: any) {
+    // Skip selection checkbox column
+    if (e.command === 'select') return;
+
+    if (e.parentType === 'dataRow') {
+      const isSelected = this.selectedRowKeys.includes(e.row.key);
+
+      if (!isSelected) {
+        e.editorOptions.disabled = true;
+      }
+    }
   }
 
   onVerify() {
