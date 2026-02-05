@@ -266,6 +266,36 @@ export class ItemStorePricesComponent {
         // Call your load functions again
         this.loadStores();
         this.listItemsByMultipleStoreIds(this.selectedStoreId);
+        this.updatedItems = {};
+        this.selectedRowKeys = [];
+        this.selectedRowCount = 0;
+        this.oldValues = {};
+        this.newValues = {
+          PRICE_NEW: '',
+          PRICE_LEVEL1_NEW: '',
+          PRICE_LEVEL2_NEW: '',
+          PRICE_LEVEL3_NEW: '',
+          PRICE_LEVEL4_NEW: '',
+          PRICE_LEVEL5_NEW: '',
+        };
+        this.isSaved = false;
+        this.isVerified = false;
+        this.isApproved = false;
+        this.isPopupVisible = false;
+        this.percentageString = '';
+        this.selectedSalePrice = [];
+        this.roundingOption = 'none';
+        this.isIncrease = true;
+
+        // Clear grid selection visually (if applicable)
+        if (this.dataGrid && this.dataGrid.instance) {
+          this.dataGrid.instance.clearSelection();
+          this.dataGrid.instance.refresh();
+        }
+
+        // Reload default store list data (optional)
+
+        this.narrationText = '';
       });
   }
 
@@ -619,11 +649,12 @@ export class ItemStorePricesComponent {
         Number(item.PRICE_NEW) === 0
           ? Number(item.SALE_PRICE)
           : Number(item.PRICE_NEW);
-
+      console.log(priceToCheck, 'PRICE TO CHECK');
       return priceToCheck <= Number(item.PRICE_LEVEL1_NEW);
     });
 
     if (invalidItems.length > 0) {
+      console.log(invalidItems, 'INVALID ITEMS');
       const itemCodes = invalidItems
         .map((item: any) => item.ITEM_CODE)
         .join(', ');
