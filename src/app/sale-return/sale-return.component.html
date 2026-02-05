@@ -117,7 +117,7 @@
           </div>
         </dx-select-box>
       </div>
-      <dxi-column dataField="DOC_NO" caption="Return No"></dxi-column>
+      <dxi-column dataField="RET_NO" caption="Return No"></dxi-column>
       <dxi-column
         dataField="RET_DATE"
         caption="Return Date"
@@ -125,7 +125,7 @@
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column dataField="SUPP_NAME" caption="Customer"></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
       <dxi-column
         dataField="GROSS_AMOUNT"
         caption="Gross Amount"
@@ -167,6 +167,33 @@
     </dx-data-grid>
   </div>
 </div>
+
+<dx-popup
+  [(visible)]="isAddSaleReturn"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Sale Return"
+  (onHiding)="handleClose()"
+>
+  <app-sale-return-form (popupClosed)="handleClose()"></app-sale-return-form>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditSaleReturn"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Sale Return"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditSaleReturn">
+    <app-sale-return-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedSaleReturn"
+      [isReadOnlyMode]="isReadOnlySaleReturn"
+      (popupClosed)="handleClose()"
+    ></app-sale-return-form>
+  </ng-container>
+</dx-popup>
 <dx-popup
   [(visible)]="showCustomDatePopup"
   [showTitle]="true"
