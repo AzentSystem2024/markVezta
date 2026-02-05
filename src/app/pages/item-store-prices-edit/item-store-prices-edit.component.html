@@ -371,6 +371,24 @@
           labelMode="floating"
           style="width: 350px"
         ></dx-number-box>
+        <div class="toggle-container" (click)="toggleAdjustment()">
+          <div
+            class="toggle-slider"
+            [ngClass]="{ increase: isIncrease, decrease: !isIncrease }"
+          ></div>
+          <span
+            class="toggle-option"
+            [class.active]="isIncrease"
+            title="Decrease Price"
+            >-</span
+          >
+          <span
+            class="toggle-option"
+            [class.active]="!isIncrease"
+            title="Increase Price"
+            >+</span
+          >
+        </div>
       </div>
     </div>
 

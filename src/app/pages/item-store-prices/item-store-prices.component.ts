@@ -266,6 +266,36 @@ export class ItemStorePricesComponent {
         // Call your load functions again
         this.loadStores();
         this.listItemsByMultipleStoreIds(this.selectedStoreId);
+        this.updatedItems = {};
+        this.selectedRowKeys = [];
+        this.selectedRowCount = 0;
+        this.oldValues = {};
+        this.newValues = {
+          PRICE_NEW: '',
+          PRICE_LEVEL1_NEW: '',
+          PRICE_LEVEL2_NEW: '',
+          PRICE_LEVEL3_NEW: '',
+          PRICE_LEVEL4_NEW: '',
+          PRICE_LEVEL5_NEW: '',
+        };
+        this.isSaved = false;
+        this.isVerified = false;
+        this.isApproved = false;
+        this.isPopupVisible = false;
+        this.percentageString = '';
+        this.selectedSalePrice = [];
+        this.roundingOption = 'none';
+        this.isIncrease = true;
+
+        // Clear grid selection visually (if applicable)
+        if (this.dataGrid && this.dataGrid.instance) {
+          this.dataGrid.instance.clearSelection();
+          this.dataGrid.instance.refresh();
+        }
+
+        // Reload default store list data (optional)
+
+        this.narrationText = '';
       });
   }
 
@@ -614,24 +644,30 @@ export class ItemStorePricesComponent {
       worksheet_item_price: worksheetItemPrice,
     };
     console.log(payload, '=================SAVE PAYLOAD===================');
-    const invalidItems = payload.worksheet_item_price.filter(
-      (item: any) => item.PRICE_NEW <= item.PRICE_LEVEL1_NEW,
-    );
+    const invalidItems = payload.worksheet_item_price.filter((item: any) => {
+      const priceToCheck =
+        Number(item.PRICE_NEW) === 0
+          ? Number(item.SALE_PRICE)
+          : Number(item.PRICE_NEW);
+      console.log(priceToCheck, 'PRICE TO CHECK');
+      return priceToCheck <= Number(item.PRICE_LEVEL1_NEW);
+    });
 
     if (invalidItems.length > 0) {
-      //  Get all item codes
+      console.log(invalidItems, 'INVALID ITEMS');
       const itemCodes = invalidItems
         .map((item: any) => item.ITEM_CODE)
         .join(', ');
 
       notify(
-        `MRP must be greater than Standard Price for Item(s): ${itemCodes}`,
+        `Price must be greater than Standard Price for Item(s): ${itemCodes}`,
         'error',
         5000,
       );
 
-      return; //  Stop saving
+      return;
     }
+
     this.dataservice.saveWorksheetPrice(payload).subscribe(
       (response) => {
         this.worksheetID = response.data.ID;
@@ -673,6 +709,19 @@ export class ItemStorePricesComponent {
         console.error('Error saving data:', error);
       },
     );
+  }
+
+  onEditorPreparing(e: any) {
+    // Skip selection checkbox column
+    if (e.command === 'select') return;
+
+    if (e.parentType === 'dataRow') {
+      const isSelected = this.selectedRowKeys.includes(e.row.key);
+
+      if (!isSelected) {
+        e.editorOptions.disabled = true;
+      }
+    }
   }
 
   onVerify() {

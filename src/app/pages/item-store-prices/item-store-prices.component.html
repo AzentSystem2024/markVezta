@@ -21,8 +21,8 @@
       (onSelectionChanged)="onSelectionChanged($event)"
       [(selectedRowKeys)]="selectedRowKeys"
       (onRowUpdated)="onRowUpdated($event)"
-      (onSaved)="onSaved($event)"
       (onCellValueChanged)="onCellValueChanged($event)"
+      (onEditorPreparing)="onEditorPreparing($event)"
     >
       <!-- <dxo-paging [pageSize]="10"></dxo-paging> -->
       <dxo-editing
@@ -366,6 +366,24 @@
           label="Percentage (%)"
           labelMode="floating"
         ></dx-number-box>
+        <div class="toggle-container" (click)="toggleAdjustment()">
+          <div
+            class="toggle-slider"
+            [ngClass]="{ increase: isIncrease, decrease: !isIncrease }"
+          ></div>
+          <span
+            class="toggle-option"
+            [class.active]="isIncrease"
+            title="Decrease Price"
+            >-</span
+          >
+          <span
+            class="toggle-option"
+            [class.active]="!isIncrease"
+            title="Increase Price"
+            >+</span
+          >
+        </div>
       </div>
     </div>
 

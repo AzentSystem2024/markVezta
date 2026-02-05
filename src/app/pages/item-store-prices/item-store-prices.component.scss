@@ -167,11 +167,8 @@ font-weight: bolder !important;
   font-weight: 400;
   padding-right: 25px;
 }
-::ng-deep .dx-editor-outlined.dx-texteditor-with-label, .dx-editor-outlined.dx-texteditor-with-floating-label{
-  outline: none;
+.dx-editor-outlined.dx-texteditor-with-label,
+.dx-editor-outlined.dx-texteditor-with-floating-label {
+  outline: none !important;
   margin-top: 1px !important;
-}
-::ng-deep .dx-editor-outlined.dx-texteditor-with-label, .dx-editor-outlined.dx-texteditor-with-floating-label {
-    outline: none;
-    /* margin-top: 7.5px; */
 }
