@@ -111,18 +111,20 @@
 
       <div class="form-field">
         <dx-text-box
-          label="Standard Packing"
-          [(value)]="PackingData.STANDARD_PACKING"
+          label="Description"
+          [(value)]="PackingData.DESCRIPTION"
           labelMode="floating"
-          placeholder="Standard Packing"
+          placeholder="Description"
           [showSpinButtons]="true"
           (onValueChanged)="updateItemDescription()"
-          ><dx-validator>
+        >
+          <dx-validator>
             <dxi-validation-rule
               type="required"
               message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
       </div>
 
       <div class="form-field">
@@ -226,20 +228,18 @@
 
       <div class="form-field">
         <dx-text-box
-          label="Description"
-          [(value)]="PackingData.DESCRIPTION"
+          label="Standard Packing"
+          [(value)]="PackingData.STANDARD_PACKING"
           labelMode="floating"
-          placeholder="Description"
+          placeholder="Standard Packing"
           [showSpinButtons]="true"
           (onValueChanged)="updateItemDescription()"
-        >
-          <!-- <dx-validator>
+          ><dx-validator>
             <dxi-validation-rule
               type="required"
               message="This field is required"
             ></dxi-validation-rule> </dx-validator
-        > -->
-        </dx-text-box>
+        ></dx-text-box>
       </div>
 
       <div class="form-field">
@@ -400,6 +400,11 @@
           [width]="'100%'"
           (onRowUpdated)="onQuantityChanged()"
           (onEditorPreparing)="onEditorPreparing($event)"
+          (onSelectionChanged)="onSelectionChanged($event)"
+          [selection]="{
+            mode: 'multiple',
+            showCheckBoxesMode: 'always',
+          }"
         >
           <dxi-column
             [allowEditing]="false"

@@ -66,6 +66,10 @@ export class PackingEditComponent {
   @ViewChild('UnitValidationGroup')
   UnitValidationGroup: DxValidationGroupComponent;
   @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
+
+  @ViewChild('sizeGrid', { static: false })
+sizeGrid!: DxDataGridComponent;
+
   selectedTabIndex = 0;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -102,7 +106,7 @@ export class PackingEditComponent {
   stdPriceEffectFrom:any;
   stdPrice:any;
   priceHistoryList:any[]=[]
-
+ selectedRowKeys: any[] = [];
 
   constructor(private dataService: DataService) {
     this.sesstion_Details();
@@ -520,7 +524,33 @@ console.log(this.articleSizeData);
     }
 
     console.log(this.PackingData, 'MAINGROUPID');
-    this.PackingEntriesData = this.PackingData.PackingEntries;
+    // this.PackingEntriesData = this.PackingData.PackingEntries;
+   this.PackingEntriesData = [];
+
+setTimeout(() => {
+  this.PackingEntriesData = (this.PackingData.PackingEntries || [])
+    .filter((r: any) => r && r.SIZE !== undefined)
+    .map((row: any) => ({
+      ...row,
+      QUANTITY: Number(row.QUANTITY || 0),
+      rowKey: `${row.ARTICLE_ID}_${row.SIZE}` // 🔥 MUST EXIST
+    }));
+
+  // 🔄 Force grid refresh
+  this.sizeGrid?.instance?.refresh();
+
+  // ✅ Auto-select rows with quantity
+  const keysToSelect = this.PackingEntriesData
+    .filter((r: any) => r.QUANTITY > 0)
+    .map((r: any) => r.rowKey);
+
+  this.sizeGrid?.instance?.selectRows(keysToSelect, false);
+  this.selectedRowKeys = keysToSelect;
+
+  console.log('Auto-selected:', keysToSelect);
+});
+
+
     console.log(
       this.PackingEntriesData,
       '========packing entries data========='
@@ -738,6 +768,30 @@ console.log(this.articleSizeData);
     this.dataService.Update_packages_listapi(payload).subscribe((res: any) => {
       console.log('response from update packing api:', res);
       this.closePopup();
+       if (res?.flag === -1) {
+                notify(
+                  {
+                    message: res.Message || 'A similar record already exists.',
+                    position: { at: 'top right', my: 'top right' },
+                    displayTime: 2000,
+                  },
+                  'error',
+                );
+                return; //  stop further execution
+              }
+
+              if (res?.flag === 0) {
+                notify(
+                  {
+                    message: res.Message || 'A similar record already exists.',
+                    position: { at: 'top right', my: 'top right' },
+                    displayTime: 2000,
+                  },
+                  'error',
+                );
+                return; //  stop further execution
+              }
+      
       notify(
         {
           message: 'Data  Updated succesfully ',
@@ -856,7 +910,7 @@ onQuantityChanged() {
   // selectedSizeRows: any[] = [];
 
   onSizeSelectionChanged(e: any) {
-    this.selectedSizeRows = e.selectedRowKeys;
+    this.selectedRows = e.selectedRowKeys;
     console.log('Selected Rows:', this.selectedSizeRows);
   }
 
@@ -930,69 +984,99 @@ onQuantityChanged() {
   // console.log("Combination String:", this.combinationString);
 
   // }
-
-onEditorPreparing(e: any) {
-  if (e.dataField === 'QUANTITY' && e.row?.data) {
-    e.editorOptions.onValueChanged = (args: any) => {
-      const newQty = Number(args.value) || 0;
-
-      // ✅ 1. Update the grid row object
-      e.row.data.QUANTITY = newQty;
-
-      // ✅ 2. Ensure main datasource array is updated
-      const index = this.PackingEntriesData.findIndex(
-        (i: any) =>
-          i.ARTICLE_ID === e.row.data.ARTICLE_ID &&
-          i.SIZE === e.row.data.SIZE
-      );
-
-      if (index !== -1) {
-        this.PackingEntriesData[index].QUANTITY = newQty;
-      }
-
-      // ✅ 3. Recalculate total
-      this.onQuantityChanged();
-
-      console.log(
-        'Updated PackingEntriesData:',
-        this.PackingEntriesData.map(
-          (i: any) => `${i.SIZE}x${i.QUANTITY}`
-        )
-      );
-    this.combinationString = String(this.PackingEntriesData.map(
-          (i: any) => `${i.SIZE}x${i.QUANTITY}`
-        ))
-    };
-  }
+  onSelectionChanged(e: any) {
+  this.selectedRowKeys = e.selectedRowKeys;
 }
 
+// onEditorPreparing(e: any) {
+//   if (e.dataField === 'QUANTITY' && e.row?.data) {
+//     e.editorOptions.onValueChanged = (args: any) => {
+//       const newQty = Number(args.value) || 0;
 
-  // onEditorPreparing(e: any) {
-  //   console.log(e, 'EDITOR PREPARING EVENT');
-  //   if (e.dataField === 'Qty' && e.row?.data) {
-  //     const rowData = e.row.data;
-      
-  //     const articleId = rowData.ArticleId || e.row.key?.ArticleId;
+//       // ✅ 1. Update the grid row object
+//       e.row.data.QUANTITY = newQty;
 
-  //     if (!articleId) {
-  //       console.warn('ArticleId undefined during editor preparing', rowData);
-  //       return;
-  //     }
+//       // ✅ 2. Ensure main datasource array is updated
+//       const index = this.PackingEntriesData.findIndex(
+//         (i: any) =>
+//           i.ARTICLE_ID === e.row.data.ARTICLE_ID &&
+//           i.SIZE === e.row.data.SIZE
+//       );
 
-  //     const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
-  //     console.log(sizeQtyString, 'SIZE QUANTITY STRING');
+//       if (index !== -1) {
+//         this.PackingEntriesData[index].QUANTITY = newQty;
+//       }
 
-  //     if (!this.combination_value.includes(sizeQtyString)) {
-  //       this.combination_value.push(sizeQtyString);
-  //     }
+//       // ✅ 3. Recalculate total
+//       this.onQuantityChanged();
 
-  //     const validData = this.combination_value.filter(
-  //       (item) => !item.includes('undefined')
-  //     );
-  //     this.combinationString = validData.join(', ');
-  //     console.log('Combination String:', this.combinationString);
-  //   }
-  // }
+//       console.log(
+//         'Updated PackingEntriesData:',
+//         this.PackingEntriesData.map(
+//           (i: any) => `${i.SIZE}x${i.QUANTITY}`
+//         )
+//       );
+//     this.combinationString = String(this.PackingEntriesData.map(
+//           (i: any) => `${i.SIZE}x${i.QUANTITY}`
+//         ))
+//     };
+//   }
+// }
+
+
+onEditorPreparing(e: any) {
+
+  // ✅ Only for Quantity column in data rows
+  if (e.parentType !== 'dataRow' || e.dataField !== 'QUANTITY') {
+    return;
+  }
+
+  const rowKey = e.row.key;
+  const isRowSelected = this.selectedRowKeys.includes(rowKey);
+
+  // 🔒 Allow editing ONLY if row is selected
+  e.editorOptions.readOnly = !isRowSelected;
+  // OR if you want it fully disabled:
+  // e.editorOptions.disabled = !isRowSelected;
+
+  // ❌ Do not attach onValueChanged if row is not selected
+  if (!isRowSelected) {
+    return;
+  }
+
+  // ===============================
+  // ✅ Your existing edit logic
+  e.editorOptions.onValueChanged = (args: any) => {
+    const newQty = Number(args.value) || 0;
+
+    // 1️⃣ Update grid row
+    e.row.data.QUANTITY = newQty;
+
+    // 2️⃣ Update main datasource
+    const index = this.PackingEntriesData.findIndex(
+      (i: any) =>
+        i.ARTICLE_ID === e.row.data.ARTICLE_ID &&
+        i.SIZE === e.row.data.SIZE
+    );
+
+    if (index !== -1) {
+      this.PackingEntriesData[index].QUANTITY = newQty;
+    }
+
+    // 3️⃣ Recalculate total
+    this.onQuantityChanged();
+
+    // 4️⃣ Update combination string
+    this.combinationString = this.PackingEntriesData
+      .map((i: any) => `${i.SIZE}x${i.QUANTITY}`)
+      .join(', ');
+
+    console.log(
+      'Updated PackingEntriesData:',
+      this.combinationString
+    );
+  };
+}
 
   get selectedUnitsHint(): string {
   if (!this.PackingData.UNIT_ID?.length) {
