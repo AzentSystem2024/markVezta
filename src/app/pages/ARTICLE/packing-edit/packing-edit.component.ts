@@ -523,7 +523,7 @@ console.log(this.articleSizeData);
       this.items = [];
     }
 
-    console.log(this.PackingData, 'MAINGROUPIDppppp');
+    console.log(this.PackingData, 'MAINGROUPID');
     // this.PackingEntriesData = this.PackingData.PackingEntries;
    this.PackingEntriesData = [];
 
