@@ -44,6 +44,10 @@ import { DataService } from '../services';
 import { Router } from '@angular/router';
 import notify from 'devextreme/ui/notify';
 import DataSource from 'devextreme/data/data_source';
+import {
+  SaleReturnFormComponent,
+  SaleReturnFormModule,
+} from '../sale-return-form/sale-return-form.component';
 
 @Component({
   selector: 'app-sale-return',
@@ -51,6 +55,8 @@ import DataSource from 'devextreme/data/data_source';
   styleUrls: ['./sale-return.component.scss'],
 })
 export class SaleReturnComponent {
+  @ViewChild(SaleReturnFormComponent)
+  SaleReturnFormComponent!: SaleReturnFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -133,6 +139,11 @@ export class SaleReturnComponent {
   companyID: any;
   saleReturnArray: any[] = [];
   saleReturnCount = 0;
+  isAddSaleReturn: boolean;
+  selectedSaleReturn: any;
+  isEditSaleReturn: boolean;
+  isReadOnlySaleReturn: boolean;
+  isViewSaleReturn: boolean;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -491,7 +502,87 @@ export class SaleReturnComponent {
     this.getSaleReturnList();
   }
 
-  addSaleReturn() {}
+  onEditPurchaseReturn(event: any) {
+    event.cancel = true;
+    const returnId = event.data.TRANS_ID;
+    const status = event.data.TRANS_STATUS;
+    this.dataService
+      .selectPurchaseReturn(returnId)
+      .subscribe((response: any) => {
+        this.selectedSaleReturn = response;
+        console.log(this.selectedSaleReturn, 'SELECTEDTROUT');
+        this.isEditSaleReturn = true;
+        this.isReadOnlySaleReturn = status === 5;
+      });
+  }
+
+  onDeletePurchaseReturn(event: any) {
+    console.log(event);
+    const returnId = event.data.TRANS_ID;
+    console.log(returnId);
+    const status = event.data.TRANS_STATUS;
+    console.log(status);
+    if (event.data.TRANS_STATUS === 5) {
+      event.cancel = true;
+      notify('This cannot be deleted.', 'error', 2000);
+      return;
+    }
+    event.cancel = true;
+    console.log(returnId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
+    // Call your delete API
+    this.dataService.deletePurchaseReturn(returnId).subscribe(
+      (response: any) => {
+        if (response) {
+          notify(
+            {
+              message: 'Deleted Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success',
+          );
+          this.getSaleReturnList();
+          // this.dataGrid.instance.refresh();
+        } else {
+          notify(
+            {
+              message: 'Your Data Not deleted',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+        }
+        // or whatever method you use to refresh `employeeList`
+      },
+      (error) => {
+        console.error('Error deleting employee:', error);
+      },
+    );
+  }
+
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.TRANS_STATUS === 5) {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
+  }
+
+  addSaleReturn() {
+    this.isAddSaleReturn = true;
+  }
+
+  handleClose() {
+    this.isAddSaleReturn = false;
+    this.isEditSaleReturn = false;
+    this.isViewSaleReturn = false;
+    if (this.SaleReturnFormComponent) {
+      this.SaleReturnFormComponent.resetPurchaseReturnForm();
+    }
+    this.getSaleReturnList();
+  }
 }
 
 @NgModule({
@@ -526,6 +617,7 @@ export class SaleReturnComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     PurchaseReturnDebitFormModule,
+    SaleReturnFormModule,
   ],
   providers: [],
   declarations: [SaleReturnComponent],

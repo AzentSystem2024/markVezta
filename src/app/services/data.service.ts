@@ -532,7 +532,7 @@ export class DataService {
 
   //-------------------------------------SALE-RETURN------------------------------------------------------//
   getSaleReturnMainList(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}PurchaseReturn/list`, data);
+    return this.http.post(`${this.apiUrl}SaleReturn/list`, data);
   }
 
   //--------------------------LEDGER-SETTINGS---------------------------------------------------//
