@@ -91,6 +91,7 @@ export class PackingAddComponent {
   items: any[] = []; // grid data → BoM components
   itemsList: any[] = [];
   company_code: any; // dropdown source → item master list
+  selectedRowKeys: any[] = [];
   PackingData: any = {
     ART_NO: '',
     ORDER_NO: '',
@@ -150,6 +151,7 @@ export class PackingAddComponent {
     this.getAliasNo();
     this.getItems();
     this.getPackingList();
+    this.PackingData.ART_SERIAL = 1;
   }
   getPackingList() {
     this.dataService.get_packages_list_api().subscribe((res: any) => {
@@ -523,28 +525,67 @@ export class PackingAddComponent {
     }
   }
 
-  onEditorPreparing(e: any) {
-    console.log(e, 'EDITOR PREPARING EVENT');
-    const rowData = e.row?.data;
-    console.log(rowData, 'ROW DATA IN EDITOR PREPARING');
+  onSelectionChanged(e: any) {
+  this.selectedRowKeys = e.selectedRowKeys;
+}
 
-    const sizeQtyString = `${rowData.Size}x${rowData.QUANTITY}`;
-    console.log(sizeQtyString, 'SIZE QUANTITY STRING');
+  // onEditorPreparing(e: any) {
+    
+  //   console.log(e, 'EDITOR PREPARING EVENT');
+  //   const rowData = e.row?.data;
+  //   console.log(rowData, 'ROW DATA IN EDITOR PREPARING');
 
-    // this.combination_value.push(sizeQtyString); // Add the size and quantity to the combination_value array
-    if (!this.combination_value.includes(sizeQtyString)) {
-      this.combination_value.push(sizeQtyString);
-    }
-    console.log(this.combination_value, 'COMBINATION VALUE ARRAY');
-    const validData = this.combination_value.filter(
-      (item) => !item.includes('undefined'),
-    );
+  //   const sizeQtyString = `${rowData.Size}x${rowData.QUANTITY}`;
+  //   console.log(sizeQtyString, 'SIZE QUANTITY STRING');
 
-    console.log(validData, 'VALID DATA AFTER FILTERING');
+  //   // this.combination_value.push(sizeQtyString); // Add the size and quantity to the combination_value array
+  //   if (!this.combination_value.includes(sizeQtyString)) {
+  //     this.combination_value.push(sizeQtyString);
+  //   }
+  //   console.log(this.combination_value, 'COMBINATION VALUE ARRAY');
+  //   const validData = this.combination_value.filter(
+  //     (item) => !item.includes('undefined'),
+  //   );
 
-    this.combinationString = validData.join(', '); // Join the array into a string
-    console.log(this.combinationString, 'COMBINATION STRING');
+  //   console.log(validData, 'VALID DATA AFTER FILTERING');
+
+  //   this.combinationString = validData.join(', '); // Join the array into a string
+  //   console.log(this.combinationString, 'COMBINATION STRING');
+  // }
+
+ onEditorPreparing(e: any) {
+
+  //  Run only for data rows & Quantity column
+  if (e.parentType !== 'dataRow' || e.dataField !== 'QUANTITY') {
+    return;
   }
+
+  const rowData = e.row?.data;
+  if (!rowData) {
+    return;
+  }
+
+  // ===============================
+  //  Allow edit only if row is selected
+  const isRowSelected = this.selectedRowKeys.includes(e.row.key);
+  e.editorOptions.readOnly = !isRowSelected;
+  // OR use disabled instead:
+  // e.editorOptions.disabled = !isRowSelected;
+
+  // ===============================
+  //  Your existing logic (safe now)
+  const sizeQtyString = `${rowData.Size}x${rowData.QUANTITY}`;
+
+  if (!this.combination_value.includes(sizeQtyString)) {
+    this.combination_value.push(sizeQtyString);
+  }
+
+  const validData = this.combination_value.filter(
+    (item) => !item.includes('undefined')
+  );
+
+  this.combinationString = validData.join(', ');
+}
 
   totalQuantity: number = 0;
 
@@ -786,7 +827,7 @@ export class PackingAddComponent {
         ? [this.PackingData.UNIT_ID]
         : [];
 
-    // 🚨 hard validation
+    //  hard validation
     if (!selectedUnits.length) {
       notify(
         {
@@ -799,10 +840,10 @@ export class PackingAddComponent {
       return;
     }
 
-    // ✅ Header UNIT_ID (single)
+    //  Header UNIT_ID (single)
     const mainUnitId = Number(selectedUnits[0]);
 
-    // ✅ Units array (multi)
+    //  Units array (multi)
     const unitsPayload = selectedUnits.map((id) => ({
       UNIT_ID: Number(id),
     }));
@@ -999,6 +1040,18 @@ if (mrp <= stdPrice) {
           return; //  stop further execution
         }
 
+         if (res?.flag === 0) {
+                        notify(
+                          {
+                            message: res.Message || 'A similar record already exists.',
+                            position: { at: 'top right', my: 'top right' },
+                            displayTime: 2000,
+                          },
+                          'error',
+                        );
+                        return; //  stop further execution
+                      }
+
         //  SUCCESS
         notify(
           {
@@ -1142,7 +1195,7 @@ if (mrp <= stdPrice) {
     this.PackingData.PAIR_QTY = null;
     this.PackingData.IS_INACTIVE = false;
     this.PackingData.PART_NO = '';
-    this.PackingData.ART_SERIAL = '';
+    this.PackingData.ART_SERIAL = '1';
     this.PackingData.COMBINATION = '2x4';
     this.PackingData.PACK_PRICE = null;
     this.PackingData.UNIT_ID = null;

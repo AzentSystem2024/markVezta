@@ -109,12 +109,10 @@
 
       <div class="form-field">
         <dx-text-box
-          label="Standard Packing"
-          [(value)]="PackingData.STANDARD_PACKING"
+          label="Description"
+          [(value)]="PackingData.DESCRIPTION"
           labelMode="floating"
-          placeholder="Standard Packing"
-          [showSpinButtons]="true"
-          (onValueChanged)="updateItemDescription()"
+          placeholder="Description"
           ><dx-validator>
             <dxi-validation-rule
               type="required"
@@ -223,10 +221,12 @@
 
       <div class="form-field">
         <dx-text-box
-          label="Description"
-          [(value)]="PackingData.DESCRIPTION"
+          label="Standard Packing"
+          [(value)]="PackingData.STANDARD_PACKING"
           labelMode="floating"
-          placeholder="Description"
+          placeholder="Standard Packing"
+          [showSpinButtons]="true"
+          (onValueChanged)="updateItemDescription()"
           ><dx-validator>
             <dxi-validation-rule
               type="required"
@@ -393,6 +393,7 @@
           ></dx-button>
         </div>
         <dx-data-grid
+          #sizeGrid
           [dataSource]="PackingEntriesData"
           [showBorders]="true"
           [editing]="{ mode: 'cell', allowUpdating: true }"
@@ -401,6 +402,13 @@
           (onRowUpdated)="onQuantityChanged()"
           [sorting]="{ mode: 'single' }"
           (onEditorPreparing)="onEditorPreparing($event)"
+          (onSelectionChanged)="onSelectionChanged($event)"
+          [(selectedRowKeys)]="selectedRows"
+          keyExpr="rowKey"
+          [selection]="{
+            mode: 'multiple',
+            showCheckBoxesMode: 'always',
+          }"
         >
           <dxi-column
             sortOrder="asc"
