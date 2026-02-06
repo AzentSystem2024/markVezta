@@ -535,6 +535,33 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SaleReturn/list`, data);
   }
 
+  getPendingInvoicesForSaleReturn(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}SaleReturn/pendinglist`, data);
+  }
+
+  saveSaleReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SaleReturn/save`, data);
+  }
+
+  approveSaleReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SaleReturn/commit`, data);
+  }
+
+  selectSaleReturn(id: number) {
+    return this.http.post<any>(`${this.apiUrl}SaleReturn/select/` + id, {});
+  }
+
+  updateSaleReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SaleReturn/update`, data);
+  }
+
+  deleteSaleReturn(id: number) {
+    return this.http.post<any>(`${this.apiUrl}SaleReturn/delete/` + id, {});
+  }
+
   //--------------------------LEDGER-SETTINGS---------------------------------------------------//
   getLedgerSettingsList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}ACDefaults/list`, data);

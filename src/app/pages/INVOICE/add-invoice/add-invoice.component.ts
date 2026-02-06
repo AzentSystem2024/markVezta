@@ -585,6 +585,14 @@ export class AddInvoiceComponent {
     this.logGridSummaries();
   }
 
+  formatDateOnly(date: Date | string): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   saveInvoice() {
     console.log('save clicked');
     if (!this.invoiceFormData.DISTRIBUTOR_ID) {
@@ -692,15 +700,26 @@ export class AddInvoiceComponent {
         };
       },
     );
-
+    // const firstRow = this.mainGridData[0];
+    const today = new Date();
+    const saleDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+    // ==============================
     // 4. Set root-level totals
     this.invoiceFormData.GROSS_AMOUNT = this.totalAmount;
     this.invoiceFormData.GST_AMOUNT = this.taxAmount;
     this.invoiceFormData.NET_AMOUNT = this.grandTotal;
     this.invoiceFormData.PARTY_NAME = this.invoiceFormData.PARTY_NAME;
     this.invoiceFormData.TRANS_TYPE = 25;
-    this.invoiceFormData.SALE_DATE = new Date();
-    // this.invoiceFormData.SALE_DATE = this.invoiceFormData.SALE_DATE;
+    // this.invoiceFormData.SALE_DATE = new Date();
+    // this.invoiceFormData.SALE_DATE = this.formatDateOnly(
+    //   this.invoiceFormData.SALE_DATE,
+    // );
+    this.invoiceFormData.SALE_DATE = saleDate;
     this.invoiceFormData.ADD_TIME = new Date();
     this.invoiceFormData.VEHICLE_NO = this.invoiceFormData.VEHICLE_NO;
     this.invoiceFormData.COMPANY_ID = this.selectedCompanyId;

@@ -40,6 +40,8 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from '../components';
 import { PurchaseReturnDebitFormComponent } from '../pages/purchase-return-debit-form/purchase-return-debit-form.component';
+import notify from 'devextreme/ui/notify';
+import { DataService } from '../services';
 
 @Component({
   selector: 'app-sale-return-form',
@@ -86,9 +88,9 @@ export class SaleReturnFormComponent {
     COMPANY_ID: 0,
     STORE_ID: 0,
     RET_DATE: new Date(),
-    SUPP_ID: 0,
-    GRN_ID: 0,
-    GRN_NO: '',
+    CUST_ID: 0,
+    SALE_ID: 0,
+    SALE_NO: '',
     IS_CREDIT: true,
     GROSS_AMOUNT: 0,
     VAT_AMOUNT: 0,
@@ -97,21 +99,19 @@ export class SaleReturnFormComponent {
     NARRATION: '',
     CURRENCY_SYMBOL: '',
     IS_APPROVED: false,
-    // RET_NO: '',
+    RET_NO: '',
     VEHICLE_NO: '',
     ROUND_OFF: false,
-    PurchDetail: [
+    Details: [
       {
         COMPANY_ID: 0,
         STORE_ID: 0,
         BAR_CODE: '',
-        GRN_DET_ID: 0,
+        SALE_DET_ID: 0,
         ITEM_ID: 0,
-        BATCH_NO: '',
-        EXPIRY_DATE: 2025 - 11 - 20,
         PENDING_QTY: 0,
         QUANTITY: 0,
-        RATE: 0,
+        PRICE: 0,
         AMOUNT: 0,
         VAT_PERC: 0,
         CGST: 0,
@@ -121,17 +121,320 @@ export class SaleReturnFormComponent {
         UOM: '',
         UOM_PURCH: '',
         UOM_MULTIPLE: 0,
-        PURCH_DET_ID: 0,
       },
     ],
   };
-  constructor() {}
+  selectedCompanyId: any;
+  userID: any;
+  finID: any;
+  companyList: any[];
+  selectedCustomerId: any;
+  selectedCustomer: any;
+  selectedCustomerStateId: any;
+  companyStateId: any;
+  retNo: any;
+  summaryValues: (summaryItemName: string) => any;
+  constructor(private dataService: DataService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    const userDataString = localStorage.getItem('userData');
+    if (!userDataString) return;
 
-  onCustomerChanged(e: any) {}
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData.SELECTED_COMPANY;
+    console.log(userData, 'USERDATAAAAAAAAAAAAAAA');
+    // SINGLE SOURCE OF TRUTH
+    this.selectedCompanyId = selectedCompany.COMPANY_ID;
+    this.companyStateId = selectedCompany.STATE_ID;
+    this.userID = userData.USER_ID;
+    this.finID = userData.FINANCIAL_YEARS[0].FIN_ID;
+    this.salesReturnFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
+    this.companyList = [selectedCompany];
 
-  onTransferSelectClick() {}
+    // this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+    // this.GST = userData.GeneralSettings.GST_PERC;
+
+    if (userData.USER_ID) {
+      this.salesReturnFormData.USER_ID = userData.USER_ID;
+    }
+
+    const firstFinYear = userData.FINANCIAL_YEARS?.[0];
+    if (firstFinYear?.FIN_ID) {
+      this.salesReturnFormData.FIN_ID = firstFinYear.FIN_ID;
+    }
+    if (!this.isEditing) {
+      this.getDocNo();
+    }
+    this.getCustomerOrUnitLst();
+    this.sessionData_tax();
+    setTimeout(() => {
+      this.isEditDataAvailable();
+    }, 300);
+  }
+
+  isEditDataAvailable() {
+    if (!this.isEditing || !this.EditingResponseData) return;
+
+    const { Header, Details } = this.EditingResponseData;
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
+    });
+    // ============================
+    // PATCH HEADER (CORRECT OBJECT)
+    // ============================
+    this.salesReturnFormData = {
+      ...this.salesReturnFormData,
+      ...Header,
+      RET_DATE: new Date(Header.RET_DATE),
+    };
+
+    // ============================
+    // CUSTOMER & GST LOGIC (SAFE)
+    // ============================
+    const waitForCustomerList = () => {
+      if (!this.customerList || this.customerList.length === 0) {
+        setTimeout(waitForCustomerList, 100);
+        return;
+      }
+
+      const customer = this.customerList.find(
+        (c: any) => c.ID === Header.CUST_ID,
+      );
+
+      if (customer) {
+        this.selectedCustomer = customer;
+        this.selectedCustomerStateId = customer.STATE_ID;
+        this.sameState = this.selectedCustomerStateId === this.companyStateId;
+
+        this.showCGST = this.sameState;
+        this.showSGST = this.sameState;
+        this.showGST = !this.sameState;
+      }
+
+      bindGrid();
+    };
+
+    // ============================
+    // GRID BINDING (CORRECT FIELDS)
+    // ============================
+    const bindGrid = () => {
+      this.mainGridData = [];
+
+      this.mainGridData = (Details || []).map((item: any) => ({
+        ID: item.ID,
+        SALE_DET_ID: item.SALE_DET_ID,
+        ITEM_ID: item.ITEM_ID,
+        SLAE_ID: Header.SALE_ID,
+        SALE_NO: Header.SALE_NO,
+
+        TRANSFER_NO: Header.SALE_NO,
+        TRANSFER_DATE: new Date(Header.RET_DATE),
+
+        ITEM_NAME: item.DESCRIPTION,
+        PENDING_QTY: item.QUANTITY,
+        QUANTITY: item.QUANTITY,
+
+        PRICE: item.PRICE,
+        AMOUNT: item.AMOUNT,
+        VAT_AMOUNT: item.VAT_AMOUNT,
+        TOTAL_AMOUNT: item.TOTAL_AMOUNT,
+
+        UOM: item.UOM,
+        UOM_PURCH: item.UOM_PURCH,
+        UOM_MULTIPLE: item.UOM_MULTIPLE,
+
+        BARCODE: item.BARCODE,
+        HSN_CODE: item.HSN_CODE,
+
+        CGST: this.sameState ? item.CGST : 0,
+        SGST: this.sameState ? item.SGST : 0,
+        VAT_PERC: this.sameState ? 0 : item.VAT_PERC,
+      }));
+
+      setTimeout(() => {
+        this.itemsGridRef?.instance?.option('dataSource', this.mainGridData);
+        this.itemsGridRef?.instance?.refresh();
+        this.itemsGridRef.instance.endCustomLoading();
+        this.logGridSummaries();
+      }, 50);
+    };
+
+    waitForCustomerList();
+  }
+
+  sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+  }
+
+  getDocNo() {
+    const payload = {
+      TRANS_TYPE: 26,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.retNo = response.DOC_NO;
+      this.salesReturnFormData.RET_NO = response.DOC_NO;
+    });
+  }
+
+  applyGstVisibility() {
+    if (this.sameState) {
+      // Same state → CGST + SGST
+      this.showCGST = true;
+      this.showSGST = true;
+      this.showGST = false;
+    } else {
+      // Different state → IGST
+      this.showCGST = false;
+      this.showSGST = false;
+      this.showGST = true;
+    }
+
+    // Refresh grid so columns update
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.refresh();
+    });
+  }
+
+  getCustomerOrUnitLst() {
+    console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService
+      .getOutsideCustomerWithState(payload)
+      .subscribe((response: any) => {
+        this.customerList = response;
+        console.log(this.distributorList, 'DISTLISTPOPUP');
+      });
+  }
+
+  onCustomerChanged(e: any) {
+    const selectedCustomerId = e.value;
+
+    // Clear grid when customer changes
+    if (this.mainGridData.length > 0) {
+      this.mainGridData = [];
+      this.itemsGridRef?.instance?.refresh();
+    }
+
+    this.salesReturnFormData.CUST_ID = selectedCustomerId;
+
+    const selectedCustomer = this.customerList.find(
+      (cust: any) => cust.ID === selectedCustomerId,
+    );
+
+    if (selectedCustomer) {
+      this.selectedCustomer = selectedCustomer;
+      this.selectedCustomerStateId = selectedCustomer.STATE_ID;
+      this.salesReturnFormData.PARTY_NAME = selectedCustomer.DESCRIPTION;
+
+      // ✅ STATE COMPARISON
+      this.sameState = this.selectedCustomerStateId === this.companyStateId;
+
+      // ✅ APPLY COLUMN VISIBILITY
+      this.applyGstVisibility();
+    }
+  }
+
+  openPendingGrnPopup() {
+    if (!this.salesReturnFormData.CUST_ID) {
+      notify('Please Select A Supplier', 'warning', 2000);
+      return;
+    }
+
+    const payload = {
+      CUST_ID: this.salesReturnFormData.CUST_ID,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+
+    this.dataService
+      .getPendingInvoicesForSaleReturn(payload)
+      .subscribe((response: any) => {
+        this.pendingList = response.Data || [];
+        console.log(this.pendingList, 'PENDING GRN LIST');
+
+        if (this.pendingList.length === 0) {
+          notify('No Data Available', 'warning', 2000);
+        } else {
+          this.isTrOutPopupVisible = true; // Only open if data exists
+        }
+      });
+  }
+
+  onTransferSelectClick() {
+    const selectedRows =
+      this.popupGridRef?.instance.getSelectedRowsData() || [];
+
+    if (selectedRows.length > 0) {
+      selectedRows.forEach((row) => {
+        const exists = this.mainGridData.some(
+          (item) => item.DETAIL_ID === row.DETAIL_ID,
+        );
+
+        if (!exists) {
+          const gstPerc = Number(row.GST_PERC) || 0;
+
+          let cgst = 0;
+          let sgst = 0;
+          let igst = 0;
+
+          // ✅ SAME STATE → Split GST
+          if (this.sameState) {
+            cgst = Number(row.CGST);
+            sgst = Number(row.SGST);
+            igst = 0;
+          }
+          // ✅ DIFFERENT STATE → IGST
+          else {
+            cgst = 0;
+            sgst = 0;
+            igst = gstPerc;
+          }
+
+          this.mainGridData.push({
+            SALE_DET_ID: row.SALE_DET_ID,
+            ITEM_ID: row.ITEM_ID,
+            SLAE_ID: row.ID,
+            SALE_NO: row.DOC_NO,
+            // GRN_DET_ID: row.GRN_DET_ID,
+            TRANSFER_NO: row.DOC_NO,
+            TRANSFER_DATE: row.PURCH_DATE,
+            ITEM_NAME: row.ITEM_NAME,
+            PENDING_QTY: row.PENDING_QTY,
+            PRICE: row.PRICE,
+            QUANTITY: 0,
+            AMOUNT: row.AMOUNT,
+            TOTAL_AMOUNT: 0,
+            UOM: row.UOM,
+            UOM_PURCH: row.UOM_PURCH,
+            UOM_MULTIPLE: row.UOM_MULTIPLE,
+            BARCODE: row.BARCODE,
+            HSN_CODE: row.HSN_CODE,
+
+            // GST FROM PENDING LIST
+            VAT_PERC: igst, // IGST only
+            CGST: cgst,
+            SGST: sgst,
+            VAT_AMOUNT: 0,
+          });
+        }
+      });
+
+      this.mainGridData = [...this.mainGridData];
+      console.log('MAIN GRID DATA:', this.mainGridData);
+      this.itemsGridRef.instance.refresh();
+      this.popupGridRef.instance.clearSelection();
+    }
+
+    this.isTrOutPopupVisible = false;
+
+    setTimeout(() => {
+      this.itemsGridRef.instance.editCell(0, 'QUANTITY');
+    }, 200);
+  }
 
   validateQuantity = (e) => {
     const row = e.data;
@@ -146,13 +449,13 @@ export class SaleReturnFormComponent {
 
   calculateAmount = (rowData: any) => {
     const qty = Number(rowData.QUANTITY) || 0;
-    const totalRate = Number(rowData.RATE) || 0;
+    const totalPRICE = Number(rowData.PRICE) || 0;
     const pendingQty = Number(rowData.PENDING_QTY) || 0;
-    // const rate = Number(rowData.RATE) || 0;
-    // const rate = pendingQty > 0 ? totalRate / pendingQty : 0;
+    // const PRICE = Number(rowData.PRICE) || 0;
+    // const PRICE = pendingQty > 0 ? totalPRICE / pendingQty : 0;
 
-    // const amount = qty * rate;
-    const amount = qty * totalRate;
+    // const amount = qty * PRICE;
+    const amount = qty * totalPRICE;
     // also store the calculated amount inside the row (optional)
     rowData.AMOUNT = amount;
 
@@ -179,6 +482,22 @@ export class SaleReturnFormComponent {
     return this.calculateAmount(rowData) + this.calculateVATAmount(rowData);
   };
 
+  logGridSummaries() {
+    this.summaryValues = this.itemsGridRef?.instance?.getTotalSummaryValue;
+
+    if (this.summaryValues) {
+      this.grandTotal =
+        this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
+      this.netAmount = Number(this.grandTotal).toFixed(2);
+      this.onRoundOffChange();
+      // console.log('GROSS AMOUNT Summary:', this.totalAmount);
+      // console.log('TAX_AMOUNT Summary:', this.taxAmount);
+      console.log('NET AMOUNT Summary:', this.grandTotal);
+    } else {
+      console.warn('Summary values not ready yet.');
+    }
+  }
+
   onRoundOffChange() {
     if (this.salesReturnFormData.ROUND_OFF) {
       // Round Off Enabled
@@ -189,17 +508,313 @@ export class SaleReturnFormComponent {
     }
   }
 
-  onEditorPreparing(e: any) {}
+  onEditorPreparing(e: any) {
+    if (e.dataField === 'QUANTITY') {
+      e.editorOptions = e.editorOptions || {};
 
-  openPendingGrnPopup() {}
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
 
-  onContentReady(e: any) {}
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+    }
+  }
 
-  saveSaleReturn() {}
+  onContentReady(e: any) {
+    this.logGridSummaries();
+  }
 
-  cancel() {}
+  saveSaleReturn() {
+    // ==============================
+    // BASIC VALIDATIONS
+    // ==============================
+    if (!this.salesReturnFormData.REF_NO) {
+      notify('Please enter Reference No', 'warning', 2000);
+      return;
+    }
+    if (!this.salesReturnFormData.CUST_ID) {
+      notify('Please select a customer', 'warning', 2000);
+      return;
+    }
 
-  resetPurchaseReturnForm() {}
+    if (!this.mainGridData || this.mainGridData.length === 0) {
+      notify('Please add at least one item', 'warning', 2000);
+      return;
+    }
+
+    // ==============================
+    // ROW LEVEL VALIDATION
+    // ==============================
+    const invalidRow = this.mainGridData.find(
+      (row) =>
+        !row.QUANTITY || row.QUANTITY <= 0 || row.QUANTITY > row.PENDING_QTY,
+    );
+
+    if (invalidRow) {
+      notify(
+        'Quantity must be greater than 0 and less than or equal to Pending Qty',
+        'warning',
+        3000,
+      );
+      return;
+    }
+
+    // ==============================
+    // PREPARE DETAILS
+    // ==============================
+    const details = this.mainGridData.map((row) => {
+      const amount = this.calculateAmount(row);
+      const vatAmount = this.calculateVATAmount(row);
+      const totalAmount = amount + vatAmount;
+
+      return {
+        SALE_DET_ID: row.SALE_DET_ID,
+
+        // DETAIL LEVEL SALE INFO
+        SALE_ID: row.SLAE_ID,
+        SALE_NO: row.SALE_NO,
+
+        ITEM_ID: row.ITEM_ID,
+        PENDING_QTY: row.PENDING_QTY,
+        QUANTITY: row.QUANTITY,
+        PRICE: row.PRICE,
+        AMOUNT: amount,
+
+        // GST HANDLING
+        VAT_PERC: this.sameState ? 0 : row.VAT_PERC,
+        CGST: this.sameState ? row.CGST : 0,
+        SGST: this.sameState ? row.SGST : 0,
+        VAT_AMOUNT: vatAmount,
+        TOTAL_AMOUNT: totalAmount,
+
+        UOM: row.UOM,
+        UOM_PURCH: row.UOM_PURCH,
+        UOM_MULTIPLE: row.UOM_MULTIPLE,
+        BAR_CODE: row.BARCODE,
+        HSN_CODE: row.HSN_CODE,
+
+        COMPANY_ID: this.selectedCompanyId,
+        STORE_ID: 0,
+      };
+    });
+
+    // ==============================
+    // CALCULATE TOTALS
+    // ==============================
+    const grossAmount = details.reduce((sum, d) => sum + d.AMOUNT, 0);
+    const vatAmount = details.reduce((sum, d) => sum + d.VAT_AMOUNT, 0);
+    const netAmount = grossAmount + vatAmount;
+
+    // ==============================
+    // HEADER SALE REFERENCE
+    // ==============================
+    const firstRow = this.mainGridData[0];
+    const today = new Date();
+    const retDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+    // ==============================
+    // FINAL PAYLOAD
+    // ==============================
+    const payload = {
+      ...this.salesReturnFormData,
+      ID: this.salesReturnFormData.RET_ID,
+      COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userID,
+      FIN_ID: this.finID,
+
+      // HEADER LEVEL SALE INFO
+      SALE_ID: firstRow?.SLAE_ID || 0,
+      SALE_NO: firstRow?.SALE_NO || '',
+
+      // RET_DATE: new Date().toISOString(),
+      RET_DATE: retDate,
+      REF_NO: this.salesReturnFormData.REF_NO,
+      NARRATION: this.salesReturnFormData.NARRATION,
+      VEHICLE_NO: this.salesReturnFormData.VEHICLE_NO,
+
+      GROSS_AMOUNT: Number(grossAmount.toFixed(2)),
+      VAT_AMOUNT: Number(vatAmount.toFixed(2)),
+      NET_AMOUNT: Number(netAmount.toFixed(2)),
+
+      Details: details,
+    };
+
+    // ==============================
+    // DEBUG PAYLOAD
+    // ==============================
+    console.log(
+      this.salesReturnFormData.IS_APPROVED
+        ? 'FINAL APPROVE PAYLOAD:'
+        : 'FINAL SAVE PAYLOAD:',
+      payload,
+    );
+
+    // ==============================
+    // SAVE / APPROVE API CALL
+    // ==============================
+    this.isSaving = true;
+
+    let apiCall$;
+
+    // APPROVE → highest priority (new OR edit)
+    if (this.salesReturnFormData.IS_APPROVED) {
+      apiCall$ = this.dataService.approveSaleReturn(payload);
+    }
+    // UPDATE → edit but not approved
+    else if (this.isEditing && !this.salesReturnFormData.IS_APPROVED) {
+      apiCall$ = this.dataService.updateSaleReturn(payload);
+    }
+    // SAVE → new record
+    else {
+      apiCall$ = this.dataService.saveSaleReturn(payload);
+    }
+
+    apiCall$.subscribe(
+      () => {
+        this.isSaving = false;
+        notify(
+          this.salesReturnFormData.IS_APPROVED
+            ? 'Sales return approved successfully'
+            : 'Sales return saved successfully',
+          'success',
+          3000,
+        );
+        this.resetSaleReturnForm();
+        this.popupClosed.emit();
+      },
+      (error) => {
+        this.isSaving = false;
+        console.error(error);
+        notify(
+          this.salesReturnFormData.IS_APPROVED
+            ? 'Failed to approve sales return'
+            : 'Failed to save sales return',
+          'error',
+          3000,
+        );
+      },
+    );
+  }
+
+  cancel() {
+    this.popupClosed.emit();
+  }
+
+  onPendingPopupClose() {
+    const grid = this.popupGridRef?.instance;
+
+    if (grid) {
+      // 1️⃣ Clear row selection
+      grid.clearSelection();
+
+      // 2️⃣ Clear filter row & search
+      grid.clearFilter();
+      grid.clearFilter('row');
+      grid.searchByText('');
+
+      // 3️⃣ 🔥 CLEAR HEADER FILTER SELECTIONS (THIS IS THE KEY)
+      grid.getVisibleColumns().forEach((col: any) => {
+        if (col.dataField) {
+          grid.columnOption(col.dataField, 'filterValues', null);
+          grid.columnOption(col.dataField, 'filterType', null);
+        }
+      });
+
+      // 4️⃣ Reset scroll
+      grid.getScrollable()?.scrollTo({ top: 0 });
+
+      // 5️⃣ Force UI refresh
+      grid.refresh();
+    }
+
+    this.isTrOutPopupVisible = false;
+
+    console.log('Pending Invoice popup fully reset (header filter included)');
+  }
+
+  resetSaleReturnForm() {
+    // ==============================
+    // RESET HEADER FORM DATA
+    // ==============================
+    this.salesReturnFormData = {
+      COMPANY_ID: this.selectedCompanyId,
+      STORE_ID: 0,
+      RET_DATE: new Date(),
+      CUST_ID: 0,
+      SALE_ID: 0,
+      SALE_NO: '',
+      IS_CREDIT: true,
+      GROSS_AMOUNT: 0,
+      VAT_AMOUNT: 0,
+      NET_AMOUNT: 0,
+      USER_ID: this.userID,
+      NARRATION: '',
+      CURRENCY_SYMBOL: '',
+      IS_APPROVED: false,
+      RET_NO: '',
+      VEHICLE_NO: '',
+      ROUND_OFF: false,
+      Details: [],
+    };
+
+    // ==============================
+    // RESET GRID DATA
+    // ==============================
+    this.mainGridData = [];
+    this.itemsGridRef?.instance?.refresh();
+
+    // ==============================
+    // RESET CUSTOMER & STATE INFO
+    // ==============================
+    this.selectedCustomer = null;
+    this.selectedCustomerId = null;
+    this.selectedCustomerStateId = null;
+    this.sameState = false;
+
+    // ==============================
+    // RESET GST VISIBILITY
+    // ==============================
+    this.showGST = false;
+    this.showCGST = false;
+    this.showSGST = false;
+
+    // ==============================
+    // RESET TOTALS
+    // ==============================
+    this.netAmount = '0.00';
+    this.grandTotal = 0;
+
+    // ==============================
+    // RESET POPUPS & FLAGS
+    // ==============================
+    this.isTrOutPopupVisible = false;
+    this.isSaving = false;
+
+    // ==============================
+    // RE-GENERATE DOC NUMBER
+    // ==============================
+    this.getDocNo();
+
+    console.log('Sales Return form reset successfully');
+  }
 
   openPDF() {}
 }

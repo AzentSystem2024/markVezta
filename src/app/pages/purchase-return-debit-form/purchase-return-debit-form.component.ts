@@ -319,16 +319,7 @@ export class PurchaseReturnDebitFormComponent {
     if (selectedSupplier) {
       this.purchaseReturnFormData.SUPPPLIER_NAME = selectedSupplier.DESCRIPTION;
       this.sameState = this.selectedSupplierStateId === this.companyStateId;
-      // 👇 TAX IS CALCULATED HERE
-      // if (this.sameState) {
-      //   this.CGST = this.GST / 2;
-      //   this.SGST = this.GST / 2;
-      //   this.IGST = 0;
-      // } else {
-      //   this.CGST = 0;
-      //   this.SGST = 0;
-      //   this.IGST = this.GST;
-      // }
+
       this.showCGST = this.sameState;
       this.showSGST = this.sameState;
       this.showGST = !this.sameState;
