@@ -122,6 +122,7 @@ isEditCustomerReceipt:boolean = false;
 
       this.selected_from_date = SystemDate;
       this.selected_To_date = SystemDate;
+      this.load_GST_data();
 
   }
       sesstion_Details(){

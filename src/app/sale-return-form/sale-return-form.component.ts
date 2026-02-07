@@ -42,6 +42,8 @@ import { FormTextboxModule } from '../components';
 import { PurchaseReturnDebitFormComponent } from '../pages/purchase-return-debit-form/purchase-return-debit-form.component';
 import notify from 'devextreme/ui/notify';
 import { DataService } from '../services';
+import autoTable from 'jspdf-autotable';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-sale-return-form',
@@ -84,6 +86,7 @@ export class SaleReturnFormComponent {
   showGST: boolean = false;
   showCGST: boolean = false;
   showSGST: boolean = false;
+   logoBase64: string;
   salesReturnFormData: any = {
     COMPANY_ID: 0,
     STORE_ID: 0,
@@ -170,7 +173,25 @@ export class SaleReturnFormComponent {
     setTimeout(() => {
       this.isEditDataAvailable();
     }, 300);
+
+     const imagePath = 'assets/markLogo.jpg';
+    this.convertToBase64(imagePath).then((base64) => {
+      this.logoBase64 = base64;
+      console.log('Logo Base64 Loaded');
+    });
   }
+
+   private async convertToBase64(path: string): Promise<string> {
+    const response = await fetch(path);
+    const blob = await response.blob();
+
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  }
+
 
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
@@ -187,7 +208,7 @@ export class SaleReturnFormComponent {
       ...Header,
       RET_DATE: new Date(Header.RET_DATE),
     };
-
+console.log(this.EditingResponseData,"EDITRESPONSEEEEEEEEEEEEEEEEEEEEEE")
     // ============================
     // CUSTOMER & GST LOGIC (SAFE)
     // ============================
@@ -816,7 +837,415 @@ export class SaleReturnFormComponent {
     console.log('Sales Return form reset successfully');
   }
 
-  openPDF() {}
+  openPDF() {
+    console.log(this.EditingResponseData.Header,'Open PDF clicked');  
+    const returnId = this.EditingResponseData.Header.RET_ID;
+    console.log(returnId)
+    this.dataService.selectSaleReturn(returnId).subscribe((res: any) => {
+      console.log(res,'res-----')
+      this.generatePDF(res);
+    });
+  }
+
+generatePDF(data: any) {
+
+  // ============================
+  // NORMALIZE API RESPONSE
+  // ============================
+  const header = data.Header;
+  const details = data.Details || [];
+
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 10;
+  let y = 10;
+
+  // ============================
+  // LOGO
+  // ============================
+  const logoX = 18;
+  const logoY = 12;
+  const logoW = 30;
+  const logoH = 30;
+
+  doc.setFillColor(225, 225, 225);
+  doc.rect(logoX, logoY, logoW, logoH, 'F');
+
+  if (this.logoBase64) {
+    doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
+  }
+
+  // ============================
+  // TITLE
+  // ============================
+  y = logoY + logoH + 10;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('SALE RETURN', pageWidth / 2, y, { align: 'center' });
+
+  // ============================
+  // RIGHT HEADER DETAILS
+  // ============================
+  doc.setFontSize(10);
+  const rightX = pageWidth - 70;
+
+  doc.text(`Return No : ${header.RET_NO}`, rightX, logoY + 5);
+  doc.text(`Return Date : ${header.RET_DATE.split('T')[0]}`, rightX, logoY + 11);
+  doc.text(`Sale No : ${header.SALE_NO}`, rightX, logoY + 17);
+
+  // ============================
+  // HORIZONTAL LINE
+  // ============================
+  y += 8;
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 6;
+
+ // ============================
+// SELLER (BLUE BOX - LEFT)
+// ============================
+const leftX = margin;
+let blockY = y;
+const leftW = 95;
+const leftH = 48;
+
+doc.setFillColor(214, 236, 255);
+doc.rect(leftX, blockY, leftW, leftH, 'F');
+
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(10);
+doc.text(header.COMPANY_NAME, leftX + 3, blockY + 6);
+
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(9);
+doc.text(header.COMPANY_ADDRESS1 || 'Kallai', leftX + 3, blockY + 12);
+doc.text(header.COMPANY_ADDRESS2 || 'Kozhikode', leftX + 3, blockY + 17);
+doc.text(header.COMPANY_ADDRESS3 || 'Kozhikode', leftX + 3, blockY + 22);
+doc.text(`GSTIN/UIN : ${header.GST_NO}`, leftX + 3, blockY + 27);
+doc.text(`State : KERALA, Code : 32`, leftX + 3, blockY + 32);
+doc.text(`E-Mail : ${header.EMAIL || '-'}`, leftX + 3, blockY + 37);
+
+// ============================
+// CONSIGNEE (SHIP TO) - RIGHT
+// ============================
+const rightBlockX = 120;
+let rightY = blockY + 5;
+
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(10);
+doc.text('Consignee (Ship to)', rightBlockX, rightY);
+
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(9);
+rightY += 6;
+
+doc.text(header.CUST_NAME, rightBlockX, rightY);
+doc.text(header.CUST_ADDRESS1 || 'Kozhikode', rightBlockX, rightY + 5);
+doc.text(header.CUST_ADDRESS2 || 'Kozhikode', rightBlockX, rightY + 10);
+doc.text(header.CUST_ADDRESS3 || 'Kozhikode', rightBlockX, rightY + 15);
+doc.text(`GSTIN/UIN : ${header.CUST_CODE}`, rightBlockX, rightY + 20);
+doc.text(`State : KERALA, Code : 32`, rightBlockX, rightY + 25);
+
+// ============================
+// DISPATCHED FROM - LEFT BELOW
+// ============================
+let dispatchY = blockY + leftH + 8;
+
+doc.setFont('helvetica', 'bold');
+doc.text('Dispatched From', leftX, dispatchY);
+
+doc.setFont('helvetica', 'normal');
+dispatchY += 6;
+doc.text(header.COMPANY_NAME, leftX, dispatchY);
+doc.text('Kozhikode', leftX, dispatchY + 5);
+doc.text('Kozhikode', leftX, dispatchY + 10);
+doc.text('Kozhikode', leftX, dispatchY + 15);
+doc.text(`GSTIN/UIN : ${header.COMPANY_GST}`, leftX, dispatchY + 20);
+
+// ============================
+// BUYER (BILL TO) - RIGHT BELOW
+// ============================
+let buyerY = dispatchY;
+
+doc.setFont('helvetica', 'bold');
+doc.text('Buyer (Bill to)', rightBlockX, buyerY);
+
+doc.setFont('helvetica', 'normal');
+buyerY += 6;
+doc.text(header.CUST_NAME, rightBlockX, buyerY);
+doc.text('Kozhikode', rightBlockX, buyerY + 5);
+doc.text('Kozhikode', rightBlockX, buyerY + 10);
+doc.text('Kozhikode', rightBlockX, buyerY + 15);
+doc.text(`GSTIN/UIN : ${header.CUST_CODE}`, rightBlockX, buyerY + 20);
+doc.text(`State : KERALA, Code : 32`, rightBlockX, buyerY + 25);
+
+// ============================
+// INVOICE INFO - LEFT
+// ============================
+let infoY = buyerY + 35;
+
+doc.setFont('helvetica', 'bold');
+doc.text(`Invoice Serial No : ${header.SALE_NO}`, leftX, infoY);
+
+doc.setFont('helvetica', 'normal');
+infoY += 6;
+doc.text(`Invoice Date : ${header.RET_DATE.split('T')[0]}`, leftX, infoY);
+infoY += 6;
+doc.text(`Vehicle No : ${header.VEHICLE_NO || '-'}`, leftX, infoY);
+infoY += 6;
+doc.text(`Mode of Transport :`, leftX, infoY);
+
+// ============================
+// MOVE Y FOR TABLE
+// ============================
+y = infoY + 10;
+
+  
+
+  // ============================
+  // TABLE
+  // ============================
+  
+  const rows = details.map((item: any, index: number) => [
+    index + 1,
+    item.DESCRIPTION || '-',
+    item.HSN_CODE || '-',
+    item.UOM || '-',
+    Number(item.PRICE).toFixed(2),
+    Number(item.QUANTITY),
+    Number(item.AMOUNT).toFixed(2),
+    Number(item.VAT_PERC).toFixed(2),
+    Number(item.VAT_AMOUNT).toFixed(2),
+    Number(item.TOTAL_AMOUNT).toFixed(2)
+  ]);
+
+  autoTable(doc, {
+    startY: y,
+    head: [[
+      'Sl',
+      'Item Description',
+      'HSN',
+      'UOM',
+      'Rate',
+      'Qty',
+      'Amount',
+      'GST %',
+      'GST Amt',
+      'Total'
+    ]],
+    body: rows,
+    theme: 'grid',
+    styles: { fontSize: 9 ,overflow: 'linebreak'},
+    headStyles: { fillColor: [230, 230, 230] },
+    foot: [[
+      { content: 'Total', colSpan: 9, styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: Number(header.NET_AMOUNT).toFixed(2), styles: { fontStyle: 'bold' } }
+    ]]
+  });
+
+
+  const pageHeight = doc.internal.pageSize.getHeight();
+const footerRequiredHeight = 90; // approx height of footer block
+
+let footY = (doc as any).lastAutoTable.finalY + 15;
+
+// 🔥 If footer won't fit, move to next page
+if (footY + footerRequiredHeight > pageHeight) {
+  doc.addPage();
+  footY = 20; // reset top margin for footer
+}
+
+  // ============================
+  // FOOTER (EXACT SCREENSHOT)
+  // ============================
+  // const footY = (doc as any).lastAutoTable.finalY + 15;
+
+  const taxableValue = Number(header.GROSS_AMOUNT || 0);
+  const totalTax = Number(header.VAT_AMOUNT || 0);
+  const invoiceTotal = taxableValue + totalTax;
+
+  const gstPerc =
+    Number(details[0]?.CGST || 0) +
+    Number(details[0]?.SGST || 0);
+
+  // ---------- LEFT GST SUMMARY ----------
+  let lx = 15;
+  let ly = footY;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+
+  doc.text('GST %', lx, ly);
+  doc.text('Taxable Value', lx + 22, ly);
+  doc.text('Rate', lx + 55, ly);
+  doc.text('Amount', lx + 75, ly);
+  doc.text('Total Tax Amount', lx + 90, ly);
+
+  ly += 8;
+  doc.setFont('helvetica', 'normal');
+
+  doc.text(`${gstPerc.toFixed(2)}%`, lx, ly);
+  doc.text(taxableValue.toFixed(2), lx + 22, ly);
+  doc.text(`${gstPerc.toFixed(2)}%`, lx + 55, ly);
+  doc.text(totalTax.toFixed(2), lx + 75, ly);
+  doc.text(totalTax.toFixed(2), lx + 90, ly);
+
+  ly += 8;
+  doc.setFont('helvetica', 'bold');
+  doc.text(taxableValue.toFixed(2), lx + 22, ly);
+  doc.text(totalTax.toFixed(2), lx + 75, ly);
+  doc.text(totalTax.toFixed(2), lx + 100, ly);
+
+  // ---------- RIGHT TOTAL SUMMARY ----------
+  let rx = pageWidth - 60;
+  let ry = footY;
+
+  doc.setFont('helvetica', 'normal');
+
+  doc.text('Taxable Value', rx, ry);
+  doc.text(':', rx + 30, ry);
+  doc.text(taxableValue.toFixed(2), rx + 40, ry);
+
+  ry += 6;
+  doc.text('Total Tax', rx, ry);
+  doc.text(':', rx + 30, ry);
+  doc.text(totalTax.toFixed(2), rx + 40, ry);
+
+  ry += 6;
+  doc.text('TCS', rx, ry);
+  doc.text(':', rx + 30, ry);
+  doc.text('0.00', rx + 40, ry);
+
+  ry += 6;
+  doc.text('Round Off', rx, ry);
+  doc.text(':', rx + 30, ry);
+  doc.text('0.00', rx + 40, ry);
+
+  ry += 8;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Invoice Total', rx, ry);
+  doc.text(':', rx + 30, ry);
+  doc.text(invoiceTotal.toFixed(2), rx + 40, ry);
+
+  // ---------- REVERSE CHARGE ----------
+  ry += 15;
+  doc.setFont('helvetica', 'bold');
+  doc.text(
+    'Whether the tax is payable on Reverse charge basis:',
+    15,
+    ry
+  );
+
+  doc.setFont('helvetica', 'normal');
+  doc.text(
+    'No Amount of tax subject to reverse charge',
+    120,
+    ry
+  );
+
+  // ---------- AMOUNT IN WORDS ----------
+  ry += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Amount in words :', 15, ry);
+
+  doc.setFont('helvetica', 'normal');
+  doc.text(
+    `INR ${this.numberToWords(invoiceTotal)} Rupees Only`,
+    60,
+    ry
+  );
+
+  // ---------- DECLARATION / REMARK ----------
+  ry += 15;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Declaration :', 15, ry);
+
+  ry += 10;
+  doc.text('Remark :', 15, ry);
+
+  doc.setFont('helvetica', 'normal');
+  doc.text(header.NARRATION || '-', 40, ry);
+
+
+  // ============================
+  // OPEN PDF
+  // ============================
+  doc.output('dataurlnewwindow');
+}
+
+   numberToWords(amount: number): string {
+    if (amount === 0) return 'Zero Rupees Only';
+
+    const words = [
+      '',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen',
+    ];
+
+    const tens = [
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety',
+    ];
+
+    function convert(num: number): string {
+      if (num < 20) return words[num];
+      if (num < 100)
+        return (
+          tens[Math.floor(num / 10)] + (num % 10 ? ' ' + words[num % 10] : '')
+        );
+      if (num < 1000)
+        return (
+          words[Math.floor(num / 100)] +
+          ' Hundred' +
+          (num % 100 ? ' ' + convert(num % 100) : '')
+        );
+      if (num < 100000)
+        return (
+          convert(Math.floor(num / 1000)) +
+          ' Thousand' +
+          (num % 1000 ? ' ' + convert(num % 1000) : '')
+        );
+      if (num < 10000000)
+        return (
+          convert(Math.floor(num / 100000)) +
+          ' Lakh' +
+          (num % 100000 ? ' ' + convert(num % 100000) : '')
+        );
+      return (
+        convert(Math.floor(num / 10000000)) +
+        ' Crore' +
+        (num % 10000000 ? ' ' + convert(num % 10000000) : '')
+      );
+    }
+
+    return convert(Math.floor(amount)) + ' Rupees Only';
+  }
+
 }
 
 @NgModule({
