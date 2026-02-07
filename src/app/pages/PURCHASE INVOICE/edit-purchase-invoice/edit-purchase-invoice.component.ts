@@ -654,6 +654,15 @@ export class EditPurchaseInvoiceComponent {
       netAmount.toFixed(2),
     );
 
+     const today = new Date();
+    const invoiceDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+   
+    this.purchaseInvoiceFormData.PURCH_DATE = invoiceDate;
     this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
     this.purchaseInvoiceFormData.USER_ID = this.user_id;
     this.purchaseInvoiceFormData.STORE_ID = this.store_id;
@@ -801,7 +810,7 @@ export class EditPurchaseInvoiceComponent {
     // 1) TOP HEADER (LOGO + RIGHT DETAILS)
     // ============================================================
     const headerY = 12;
-
+    let y = 10;
     // LOGO BOX (SMALL)
     const logoX = 18;
     const logoY = headerY;
@@ -817,6 +826,19 @@ export class EditPurchaseInvoiceComponent {
     // doc.text('logo', logoX + logoW / 2, logoY + logoH / 2 + 3, {
     //   align: 'center',
     // });
+
+    // ===============================================
+    // SALES INVOICE HEADING (Centered between logo & reference block)
+    // ===============================================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+
+    // compute a centered X between left logo and right reference area
+    const leftEdge = 10 + logoW; // end of logo box
+    const rightEdge = pageWidth - 80; // start of reference block
+    const centerX = (leftEdge + rightEdge) / 2;
+
+    doc.text('PURCHASE INVOICE', centerX, y + 25, { align: 'center' });
 
     // RIGHT-TOP DETAILS
     const rightX = pageWidth - 15;

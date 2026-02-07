@@ -373,6 +373,25 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Trout_Invoice/cust`, data);
   }
 
+  private months: { name: string; value: any }[] = [
+    { name: 'All', value: '' },
+    { name: 'January', value: 0 },
+    { name: 'February', value: 1 },
+    { name: 'March', value: 2 },
+    { name: 'April', value: 3 },
+    { name: 'May', value: 4 },
+    { name: 'June', value: 5 },
+    { name: 'July', value: 6 },
+    { name: 'August', value: 7 },
+    { name: 'September', value: 8 },
+    { name: 'October', value: 9 },
+    { name: 'November', value: 10 },
+    { name: 'December', value: 11 },
+  ];
+
+  getMonths(): { name: string; value: number }[] {
+    return this.months;
+  }
   //   getSupplierWithState(): Observable<any> {
   //   return this.http.post(`${this.apiUrl}supplier/suppdtl`, {});
   // }
@@ -4613,13 +4632,10 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //==========Dropdown for Employee Salary Settings==========
-  getEmployeeDropDown() {
-    const reqbody = {
-      NAME: 'Employee',
-    };
-    return this.http.post(`${this.apiUrl}dropdown`, reqbody);
+  getEmployeeDropDown(payload) {
+    const getEndpoint = `${this.apiUrl}dropdown`;
+    return this.http.post(getEndpoint, payload);
   }
-
   //=========List of SalaryHead============
   get_SalaryHeadList_Api(payload) {
     const getEndpoint = `${this.apiUrl}EmployeeSalary/list`;

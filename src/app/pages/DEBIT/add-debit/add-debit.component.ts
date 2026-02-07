@@ -706,7 +706,7 @@ export class AddDebitComponent {
               SL_NO: this.debitFormData.NOTE_DETAIL.length + 1,
               HEAD_ID: '',
               AMOUNT: '',
-              GST_PERC: '',
+              GST_PERC: this.selectedInvoiceGST,
               GST_AMOUNT: '',
               HSN_CODE: '',
               REMARKS: '',
@@ -812,6 +812,23 @@ export class AddDebitComponent {
     });
   }
 
+  onRowRemoving(e: any) {
+    // Remove row from your source array
+    const index = this.debitFormData.NOTE_DETAIL.indexOf(e.data);
+
+    if (index > -1) {
+      this.debitFormData.NOTE_DETAIL.splice(index, 1);
+    }
+
+    // 🔥 Reassign datasource so DevExtreme refreshes properly
+    this.itemsGridRef.instance.option('dataSource', [
+      ...this.debitFormData.NOTE_DETAIL,
+    ]);
+
+    // 🔢 Fix SL_NO
+    this.updateSerialNumbers();
+  }
+
   onSummaryCalculated(e: any): void {
     const totalItems = e.totalValue;
 
@@ -869,7 +886,7 @@ export class AddDebitComponent {
     if (this.debitFormData.ROUND_OFF) {
       this.netTotal = Math.round(this.netTotal);
     }
-    console.log(this.netTotal, 'NETTOTALLLLLLLL');
+    // console.log(this.netTotal, 'NETTOTALLLLLLLL');
     return this.netTotal.toFixed(2);
   }
 
@@ -1016,13 +1033,7 @@ export class AddDebitComponent {
         };
       },
     );
-    const today = new Date();
-    const debitDate =
-      today.getFullYear() +
-      '-' +
-      String(today.getMonth() + 1).padStart(2, '0') +
-      '-' +
-      String(today.getDate()).padStart(2, '0');
+
     //  FINAL TAX CLEANUP (VERY IMPORTANT)
     this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
       if (row.CGST > 0 || row.SGST > 0) {
@@ -1039,10 +1050,12 @@ export class AddDebitComponent {
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
     this.debitFormData.STORE_ID = this.selectedstoreId;
     this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
-    this.debitFormData.TRANS_DATE = debitDate;
     // this.debitFormData.TRANS_DATE = this.formatDate(
-    //   this.debitFormData.TRANS_DATE,
+    //   this.debitFormData.TRANS_DATE
     // );
+    this.debitFormData.TRANS_DATE = this.formatDate(
+      this.debitFormData.TRANS_DATE,
+    );
     this.debitFormData.SALE_DATE = this.formatDate(
       this.debitFormData.SALE_DATE,
     );
@@ -1100,26 +1113,30 @@ export class AddDebitComponent {
     this.resetDebitNoteForm();
   }
 
-  // onAddNewRow() {
-  //   const nextSlNo = this.debitFormData.NOTE_DETAIL.length + 1;
-  //   this.debitFormData.NOTE_DETAIL.push({
-  //     SL_NO: nextSlNo,
-  //     ledgerCode: '',
-  //     ledgerName: '',
-  //     particulars: '',
-  //     Amount: '',
-  //     gstAmount: '',
-  //     HEAD_ID: null,
-  //   });
-  // }
-  private hasEmptyRow(): boolean {
-    return (this.debitFormData?.NOTE_DETAIL || []).some(
-      (r: any) =>
-        (!r.ledgerCode || r.ledgerCode === '') &&
-        (!r.ledgerName || r.ledgerName === '') &&
-        (!r.Amount || r.Amount === 0),
-    );
+  hasEmptyRow(): boolean {
+    return this.debitFormData.NOTE_DETAIL.some((row: any) => {
+      const isCompletelyEmpty =
+        (!row.ledgerCode || row.ledgerCode === '') &&
+        (row.Amount === null || row.Amount === '' || row.Amount === undefined);
+
+      //  ignore rows that were auto-created but never edited
+      const hasAnyValue =
+        row.ledgerCode ||
+        row.ledgerName ||
+        row.particulars ||
+        Number(row.Amount) > 0;
+
+      return isCompletelyEmpty && hasAnyValue;
+    });
   }
+  // private hasEmptyRow(): boolean {
+  //   return (this.debitFormData?.NOTE_DETAIL || []).some(
+  //     (r: any) =>
+  //       (!r.ledgerCode || r.ledgerCode === '') &&
+  //       (!r.ledgerName || r.ledgerName === '') &&
+  //       (!r.Amount || r.Amount === 0),
+  //   );
+  // }
 
   onAddNewRow() {
     const grid = this.itemsGridRef.instance;

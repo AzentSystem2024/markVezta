@@ -262,6 +262,7 @@ export class GrnComponent implements OnInit {
   }
 
   onClickSaveNewData() {
+    
     const data = this.grnNewForm.getNewGrnData();
     console.log(data, 'grn new data');
     data.IS_APPROVED = this.isApproved;

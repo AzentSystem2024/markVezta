@@ -74,6 +74,7 @@ export class GrnNewFormComponent implements OnInit {
   cwidth: any = 'auto';
   isCostPopUpOpened: boolean = false;
   width: any;
+  
   costData: any = {
     ID: '',
     DESCRIPTION: '',
@@ -82,7 +83,7 @@ export class GrnNewFormComponent implements OnInit {
     TOTAL: '',
   };
   grnData: any = {
-    GRN_DATE: new Date(),
+    GRN_DATE: '',
     COMPANY_ID: 0,
     DOC_NO: '',
     USER_ID: 1,
@@ -161,10 +162,12 @@ export class GrnNewFormComponent implements OnInit {
     ],
   };
 
+  
   newGrnData = this.grnData;
   getNewGrnData = () => ({
     ...this.newGrnData,
     GRNDetails: this.demoArray,
+    
     GRN_DATE: new Date(),
   });
   docNo: any;

@@ -81,12 +81,13 @@ export class PurchaseReturnDebitComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  id:any;
 
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -538,6 +539,7 @@ export class PurchaseReturnDebitComponent {
   onEditPurchaseReturn(event: any) {
     event.cancel = true;
     const returnId = event.data.TRANS_ID;
+    this.id = event.data.TRANS_ID;
     const status = event.data.TRANS_STATUS;
     this.dataService
       .selectPurchaseReturn(returnId)

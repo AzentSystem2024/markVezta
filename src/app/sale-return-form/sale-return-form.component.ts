@@ -231,7 +231,7 @@ export class SaleReturnFormComponent {
         TRANSFER_DATE: new Date(Header.RET_DATE),
 
         ITEM_NAME: item.DESCRIPTION,
-        PENDING_QTY: item.QUANTITY,
+        PENDING_QTY: item.PENDING_QTY,
         QUANTITY: item.QUANTITY,
 
         PRICE: item.PRICE,
