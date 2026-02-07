@@ -262,17 +262,19 @@ export class AddCutomerReceiptComponent {
 
   getCompanyListDropdown() {
     const payload = {
-      NAME: 'CUSTOMER',
+      // NAME: 'CUSTOMER',
       COMPANY_ID: this.selectedCompanyId,
     };
     console.log('CUSTOMERDROPDOWN');
-    this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.distributorList = response;
-      console.log(
-        this.distributorList,
-        'distributorList==============================',
-      );
-    });
+    this.dataService
+      .getOutsideCustomerWithState(payload)
+      .subscribe((response: any) => {
+        this.distributorList = response;
+        console.log(
+          this.distributorList,
+          'distributorList==============================',
+        );
+      });
   }
 
   getLedgerCodeDropdown() {
@@ -651,8 +653,16 @@ export class AddCutomerReceiptComponent {
     // this.receiprtFormData.PAY_TYPE_ID = this.receiprtFormData.PAY_TYPE_ID || 1;
     this.receiprtFormData.NET_AMOUNT = netAmount;
     // Build payload with only SUPP_ID and REC_DETAIL
+    const today = new Date();
+    const recDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
     const payload = {
       ...this.receiprtFormData,
+      REC_DATE: recDate,
       DISTRIBUTOR_ID: this.selectedDistributorId, // or whatever your selected supplier ID is
       REC_DETAIL: validDetails,
       BANK_NAME: this.receiprtFormData.BANK_NAME,

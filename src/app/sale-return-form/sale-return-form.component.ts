@@ -134,7 +134,6 @@ export class SaleReturnFormComponent {
   companyStateId: any;
   retNo: any;
   summaryValues: (summaryItemName: string) => any;
-  selectedSaleReturn: any;
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
@@ -177,7 +176,6 @@ export class SaleReturnFormComponent {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const { Header, Details } = this.EditingResponseData;
-    console.log(this.EditingResponseData)
     setTimeout(() => {
       this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
     });
@@ -818,28 +816,7 @@ export class SaleReturnFormComponent {
     console.log('Sales Return form reset successfully');
   }
 
- openPDF() {
-    this.isSaving = true;
-
-    console.log('Open PDF clicked');
-    const invId = this.EditingResponseData.ID;
-  console.log(invId)
-    this.dataService.selectSaleReturn(invId).subscribe({
-      next: (res: any) => {
-        this.selectedSaleReturn = res.Data;
-        this.generatePDF(this.selectedSaleReturn);
-        this.isSaving = false; // ✅ STOP loading
-      },
-      error: () => {
-        this.isSaving = false; // ✅ STOP loading
-        notify('Failed to generate PDF', 'error', 3000);
-      },
-    });
-  }
-
-  generatePDF(data:any){}
-
-
+  openPDF() {}
 }
 
 @NgModule({

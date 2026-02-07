@@ -231,7 +231,7 @@ export class LoginFormComponent implements OnInit {
       this.getInternetIP(),
       this.getLocalIP(),
     ]);
-
+    const SYSTEM_DATETIME = new Date().toISOString();
     const payload = {
       LOGIN_NAME: this.formData.LOGIN_NAME,
       PASSWORD: this.formData.PASSWORD,
@@ -242,6 +242,7 @@ export class LoginFormComponent implements OnInit {
       DOMAIN_NAME,
       LOCAL_IP,
       INTERNET_IP,
+      SYSTEM_DATETIME,
     };
 
     this.dataservice.login_function_api(payload).subscribe({
@@ -259,15 +260,24 @@ export class LoginFormComponent implements OnInit {
             displayTime: 2000,
             position: { at: 'top right', my: 'top right' },
           });
-        } else {
-          // Backend validation message
+        }
+        if (res.UTC_DIFF_MESSAGE && res.UTC_DIFF_MESSAGE.trim() !== '') {
           notify({
-            message: res.Message || 'Username or password is incorrect',
-            type: 'error',
-            displayTime: 3000,
+            message: res.UTC_DIFF_MESSAGE,
+            type: 'warning', // best for time mismatch
+            displayTime: 5000,
             position: { at: 'top right', my: 'top right' },
           });
         }
+        // else {
+        //   // Backend validation message
+        //   notify({
+        //     message: res.Message || 'Username or password is incorrect',
+        //     type: 'error',
+        //     displayTime: 3000,
+        //     position: { at: 'top right', my: 'top right' },
+        //   });
+        // }
         this.loading = false;
       },
       error: () => {

@@ -160,7 +160,10 @@ export class AddCreditNoteComponent {
 
   isSaving = false;
 
-  constructor(private dataService: DataService, private ngZone: NgZone) {}
+  constructor(
+    private dataService: DataService,
+    private ngZone: NgZone,
+  ) {}
 
   ngOnInit() {
     this.sessionDetails();
@@ -222,17 +225,17 @@ export class AddCreditNoteComponent {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     console.log(
       this.selectedstoreId,
-      '===========selected store id==================='
+      '===========selected store id===================',
     );
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
       this.HSN_CODE,
-      '===========selected HSN CODE==================='
+      '===========selected HSN CODE===================',
     );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     console.log(
       this.GST_PERC,
-      '===========selected GST PERC==================='
+      '===========selected GST PERC===================',
     );
   }
 
@@ -243,7 +246,7 @@ export class AddCreditNoteComponent {
         !r.ledgerName &&
         !r.particulars &&
         (!r.Amount || r.Amount === 0) &&
-        (!r.GST_PERC || r.GST_PERC === 0)
+        (!r.GST_PERC || r.GST_PERC === 0),
     );
   }
 
@@ -255,7 +258,7 @@ export class AddCreditNoteComponent {
       notify(
         'Please fill the existing empty row before adding a new one.',
         'warning',
-        2000
+        2000,
       );
       return;
     }
@@ -376,7 +379,7 @@ export class AddCreditNoteComponent {
 
     if (this.selectedCustomerId) {
       this.selectedCustomer = this.distributorList.find(
-        (s: any) => s.ID === this.selectedCustomerId
+        (s: any) => s.ID === this.selectedCustomerId,
       );
 
       this.creditFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
@@ -611,7 +614,7 @@ export class AddCreditNoteComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -686,7 +689,7 @@ export class AddCreditNoteComponent {
     if (e.dataField === 'ledgerCode') {
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
 
         e.setValue(args.value);
@@ -696,7 +699,7 @@ export class AddCreditNoteComponent {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
 
           // 2️⃣ Set HSN FROM SELECTED INVOICE
@@ -726,14 +729,14 @@ export class AddCreditNoteComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -815,7 +818,7 @@ export class AddCreditNoteComponent {
               setTimeout(() => {
                 const visibleRows = grid.getVisibleRows();
                 const newRowIndex = visibleRows.findIndex(
-                  (r) => r.data === newRow
+                  (r) => r.data === newRow,
                 );
 
                 if (newRowIndex >= 0) {
@@ -852,6 +855,38 @@ export class AddCreditNoteComponent {
             }, 50);
           }, 50);
         }
+      };
+    }
+
+    if (e.dataField === 'GST_PERC') {
+      const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        // keep existing behavior
+        if (originalOnValueChanged) {
+          originalOnValueChanged(args);
+        }
+
+        e.setValue(args.value);
+
+        // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
+        e.row.data.CGST = 0;
+        e.row.data.SGST = 0;
+      };
+    }
+
+    if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+      const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        if (originalOnValueChanged) {
+          originalOnValueChanged(args);
+        }
+
+        e.setValue(args.value);
+
+        // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
+        e.row.data.GST_PERC = 0;
       };
     }
   }
@@ -972,7 +1007,7 @@ export class AddCreditNoteComponent {
   }
 
   callAPI(finalPayload: any) {
-     if (this.isSaving) {
+    if (this.isSaving) {
       return;
     }
     this.isSaving = true;
@@ -985,7 +1020,7 @@ export class AddCreditNoteComponent {
             message: 'Credit Note Saved Successfully',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
 
         // DO NOT REMOVE — Needed for auto-setting voucher number
@@ -1004,8 +1039,7 @@ export class AddCreditNoteComponent {
         notify('Failed to save Credit Note. Please try again.', 'error', 2000);
         console.error('Save error:', error);
         this.isSaving = false;
-      }
-      
+      },
     );
   }
 
@@ -1042,7 +1076,7 @@ export class AddCreditNoteComponent {
           position: { at: 'top right', my: 'top right' },
         },
         'error',
-        3000
+        3000,
       );
       return;
     }
@@ -1054,7 +1088,7 @@ export class AddCreditNoteComponent {
           position: { at: 'top right', my: 'top right' },
         },
         'error',
-        3000
+        3000,
       );
       return;
     }
@@ -1067,11 +1101,11 @@ export class AddCreditNoteComponent {
           row.ledgerName ||
           row.Amount ||
           row.GGST_PERC ||
-          row.particulars
+          row.particulars,
       )
       .map((row: any, index: number) => {
         const ledger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === row.ledgerCode
+          (item: any) => item.HEAD_CODE === row.ledgerCode,
         );
 
         const amount = Number(row.Amount) || 0;
@@ -1126,7 +1160,7 @@ export class AddCreditNoteComponent {
           position: { at: 'top right', my: 'top right' },
         },
         'error',
-        3000
+        3000,
       );
       return;
     }
@@ -1151,7 +1185,7 @@ export class AddCreditNoteComponent {
     if (this.creditFormData.IS_APPROVED) {
       const result = confirm(
         'A new Credit Note will be created and approved. Do you want to continue?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
 
       result.then((dialogResult: any) => {

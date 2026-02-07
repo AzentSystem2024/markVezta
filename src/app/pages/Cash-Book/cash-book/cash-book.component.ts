@@ -61,9 +61,8 @@ import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAY
 @Component({
   selector: 'app-cash-book',
   templateUrl: './cash-book.component.html',
-  styleUrls: ['./cash-book.component.scss']
+  styleUrls: ['./cash-book.component.scss'],
 })
-
 export class CashBookComponent {
   isEditJournalVoucher: boolean = false;
   isViewJournalVoucher: boolean = false;
@@ -77,9 +76,9 @@ export class CashBookComponent {
   HEAD_ID_LIST: any[] = [];
   fin_id: any[] = [];
   selectedYear: number | null = null;
-   years: number[] = [];
-   monthDataSource: { name: string; value: any }[];
-   selectedmonth: any = '';
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[];
+  selectedmonth: any = '';
   //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
@@ -96,26 +95,29 @@ export class CashBookComponent {
     }
   }
 
-
-   //================Month value change ===================
+  //================Month value change ===================
   onMonthValueChanged(e: any) {
     this.selectedmonth = e.value ?? '';
     if (this.selectedmonth === '') {
       this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
       this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
     } else {
-      this.selected_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.selected_from_date = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
       this.selected_To_date = new Date(
         this.selectedYear,
         this.selectedmonth + 1,
-        0
+        0,
       );
     }
   }
 
-   readonly allowedPageSizes: any = [ 5,10, 'all'];
-            displayMode: any = 'full';
-  
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+
   savedUserData: any;
   selected_from_date: any;
   selected_To_date: any;
@@ -142,28 +144,30 @@ export class CashBookComponent {
   editPrePaymentPopupOpened: boolean = false;
   isEditReceipt: boolean = false;
   isReadOnlyReceipt: boolean = true;
-  editMiscPopupOpened: boolean =false;
+  editMiscPopupOpened: boolean = false;
   editSalaryPopup: boolean = false;
-  selectedSalaryData:any
+  selectedSalaryData: any;
 
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.sesstion_Details();
-     //============Year field dataSource===============
+    //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
     this.selectedYear = currentYear;
-      //============Month field dataSource===============
-     this.monthDataSource = this.dataService.getMonths();
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataService.getMonths();
   }
   ngOnInit() {
+    this.handleClose();
+
     this.Cash_book_Data_Values = this.Cash_book_datasource;
 
-     const today = new Date();
+    const today = new Date();
     const SystemDate =
       today.getFullYear() +
       '-' +
@@ -171,22 +175,36 @@ export class CashBookComponent {
       '-' +
       String(today.getDate()).padStart(2, '0');
 
-      this.selected_from_date = SystemDate;
-      this.selected_To_date = SystemDate;
+    this.selected_from_date = SystemDate;
+    this.selected_To_date = SystemDate;
   }
+  ngAfterViewInit() {
+    setTimeout(() => this.handleClose());
+  }
+  handleClose() {
+    this.editMiscPopup = false;
+    this.EditDepreciationPopupVisible = false;
+    this.editPrePaymentPopupOpened = false;
+    this.isEditReceipt = false;
+    this.isViewJournalVoucher = false;
+    this.isViewDebitNote = false;
+    this.isViewCreditNote = false;
+    this.isViewInvoice = false;
+    this.isViewReceipt = false;
+    this.editMiscPopupOpened = false;
+    this.editSalaryPopup = false;
+    this.selectedJournalVoucher = null;
+    this.selectedDebitNote = null;
+    this.selectedCreditNote = null;
+    this.selectedInvoice = null;
+    this.selectedReceipt = null;
+    this.selectedmiscellaneousData = null;
+    this.Selected_Depreciation_data = null;
+    this.selectedPrePayment = null;
+    this.selectedSalaryData = null;
 
-  handleClose(){
-    this.editMiscPopup=false
-    this.EditDepreciationPopupVisible=false
-    this.editPrePaymentPopupOpened=false
-    this.isEditReceipt=false
-    this.isViewJournalVoucher=false
-    this.isViewDebitNote=false
-    this.isViewCreditNote=false
-    this.isViewInvoice=false
-    this.isViewReceipt=false
-    this.editMiscPopupOpened=false
-    this.editSalaryPopup=false
+    // Optional but helpful
+    this.cdr.detectChanges();
   }
 
   sesstion_Details() {
@@ -196,16 +214,15 @@ export class CashBookComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
-
   }
 
   Cash_book_data() {
@@ -262,12 +279,12 @@ export class CashBookComponent {
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE;
     console.log(
       TRANS_TYPE_ID,
-      ']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]'
+      ']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]',
     );
     const trans_id = e.row.data.TRANS_ID;
     console.log(
       trans_id,
-      '============================================================================='
+      '=============================================================================',
     );
 
     if (TRANS_TYPE_ID == 4) {
@@ -279,7 +296,7 @@ export class CashBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedJournalVoucher,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TRANS_TYPE_ID === 36) {
@@ -293,7 +310,7 @@ export class CashBookComponent {
       console.log('=====navigate to 37-CREDIT NOTE=====');
       this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
         this.selectedCreditNote = response.Data;
-         this.isViewCreditNote=true
+        this.isViewCreditNote = true;
         this.cdr.detectChanges();
         console.log(this.selectedCreditNote, 'selected credit note');
       });
@@ -323,10 +340,8 @@ export class CashBookComponent {
           this.selectedmiscellaneousData = response;
           this.editMiscPopupOpened = true;
           this.cdr.detectChanges();
-          
         });
-    } 
-    else if (TRANS_TYPE_ID === 2) {
+    } else if (TRANS_TYPE_ID === 2) {
       console.log('=====navigate to 2 mis payament=====');
       this.dataService
         .selectMiscReceipt(trans_id)
@@ -334,10 +349,8 @@ export class CashBookComponent {
           this.selectedmiscellaneousData = response;
           this.editMiscPopup = true;
           this.cdr.detectChanges();
-          
         });
-    } 
-    else if (TRANS_TYPE_ID === 9) {
+    } else if (TRANS_TYPE_ID === 9) {
       console.log('=====navigate to 2 mis payament=====');
       this.dataService
         .select_Depreciation_Asset(trans_id)
@@ -347,7 +360,7 @@ export class CashBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.Selected_Depreciation_data,
-            'Selected_Depreciation_data====='
+            'Selected_Depreciation_data=====',
           );
         });
     } else if (TRANS_TYPE_ID === 38) {
@@ -360,26 +373,23 @@ export class CashBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.Selected_Depreciation_data,
-            'Selected_Depreciation_data====='
+            'Selected_Depreciation_data=====',
           );
         });
-    } 
-    else if (TRANS_TYPE_ID === 30) {
+    } else if (TRANS_TYPE_ID === 30) {
       console.log('=====navigate =====');
       this.dataService
         .selectSalaryPayment(trans_id)
         .subscribe((response: any) => {
           this.selectedSalaryData = response.Data;
           this.editSalaryPopup = true;
-            this.cdr.detectChanges();
+          this.cdr.detectChanges();
           console.log(
             this.selectedSalaryData,
-            'Selected_Depreciation_data====='
+            'Selected_Depreciation_data=====',
           );
-
         });
-    }
-        else if (TRANS_TYPE_ID === 21) {
+    } else if (TRANS_TYPE_ID === 21) {
       console.log('=====navigate =====');
       this.dataService
         .selectSupplierPayment(trans_id)
@@ -389,12 +399,10 @@ export class CashBookComponent {
           this.cdr.detectChanges();
           console.log(
             this.Selected_Depreciation_data,
-            'Selected_Depreciation_data====='
+            'Selected_Depreciation_data=====',
           );
         });
-    }
-    
-    else {
+    } else {
       console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
     }
   }
@@ -402,8 +410,7 @@ export class CashBookComponent {
   summaryColumnsData = {
     totalItems: [
       // 1. Total Debitṅ
-                 {
-
+      {
         column: 'REMARKS',
         summaryType: '',
         displayFormat: ' Total',
@@ -411,8 +418,7 @@ export class CashBookComponent {
         showInColumn: 'REMARKS',
         alignment: 'right',
       },
-                 {
-
+      {
         column: 'REMARKS',
         summaryType: '',
         displayFormat: ' Closing Balance',
@@ -420,8 +426,7 @@ export class CashBookComponent {
         showInColumn: 'REMARKS',
         alignment: 'right',
       },
-                 {
-
+      {
         column: 'REMARKS',
         summaryType: '',
         displayFormat: ' Grand Total',
@@ -499,60 +504,61 @@ export class CashBookComponent {
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
-
     ],
 
-
-
     calculateCustomSummary: (options: any) => {
-  if (options.summaryProcess === 'finalize') {
-    const items = this.Cash_book_datasource || [];
+      if (options.summaryProcess === 'finalize') {
+        const items = this.Cash_book_datasource || [];
 
-    const totalDr = items.reduce((sum, item) => {
-      const val = parseFloat(String(item?.DR_AMOUNT || '0').replace(/,/g, '').trim());
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
+        const totalDr = items.reduce((sum, item) => {
+          const val = parseFloat(
+            String(item?.DR_AMOUNT || '0')
+              .replace(/,/g, '')
+              .trim(),
+          );
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
 
-    const totalCr = items.reduce((sum, item) => {
-      const val = parseFloat(String(item?.CR_AMOUNT || '0').replace(/,/g, '').trim());
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
+        const totalCr = items.reduce((sum, item) => {
+          const val = parseFloat(
+            String(item?.CR_AMOUNT || '0')
+              .replace(/,/g, '')
+              .trim(),
+          );
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
 
-    const closingBalance = totalDr - totalCr;
+        const closingBalance = totalDr - totalCr;
 
-    // Closing balance logic
-    if (options.name === 'closingBalanceDr') {
-      options.totalValue =
-        closingBalance < 0 ? Math.abs(closingBalance) : 0; // ✅ show "0" instead of null
-    }
+        // Closing balance logic
+        if (options.name === 'closingBalanceDr') {
+          options.totalValue =
+            closingBalance < 0 ? Math.abs(closingBalance) : 0; // ✅ show "0" instead of null
+        }
 
-    if (options.name === 'closingBalanceCr') {
-      options.totalValue =
-        closingBalance > 0 ? Math.abs(closingBalance) : 0; // ✅ show "0" instead of null
-    }
+        if (options.name === 'closingBalanceCr') {
+          options.totalValue =
+            closingBalance > 0 ? Math.abs(closingBalance) : 0; // ✅ show "0" instead of null
+        }
 
-    // Grand totals
-    if (options.name === 'grandTotalDr') {
-      options.totalValue =
-        totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-    }
+        // Grand totals
+        if (options.name === 'grandTotalDr') {
+          options.totalValue =
+            totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
+        }
 
-    if (options.name === 'grandTotalCr') {
-      options.totalValue =
-        totalCr + (closingBalance > 0 ? Math.abs(closingBalance) : 0);
-    }
+        if (options.name === 'grandTotalCr') {
+          options.totalValue =
+            totalCr + (closingBalance > 0 ? Math.abs(closingBalance) : 0);
+        }
 
-    // ✅ Always ensure totalValue is not null
-    if (options.totalValue == null || isNaN(options.totalValue)) {
-      options.totalValue = 0;
-    }
-  }
-}
-
-
- 
+        // ✅ Always ensure totalValue is not null
+        if (options.totalValue == null || isNaN(options.totalValue)) {
+          options.totalValue = 0;
+        }
+      }
+    },
   };
-  
 }
 
 @NgModule({
@@ -600,7 +606,7 @@ export class CashBookComponent {
     AddMiscellaneousPaymentModule,
     AddSalaryPaymentModule,
     DxLoadPanelModule,
-    DxoLoadPanelModule
+    DxoLoadPanelModule,
   ],
   providers: [],
   declarations: [CashBookComponent],

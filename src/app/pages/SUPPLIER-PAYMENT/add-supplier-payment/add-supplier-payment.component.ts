@@ -628,7 +628,13 @@ export class AddSupplierPaymentComponent {
       );
       return;
     }
-
+    const today = new Date();
+    const paymentDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
     // 🔧 FIX: Assign SUPP_DETAIL before calling the doc
     this.paymentFormData.SUPP_DETAIL = validDetails;
 
@@ -639,7 +645,7 @@ export class AddSupplierPaymentComponent {
       PDC: 3,
       Adjustments: 4,
     };
-
+    this.paymentFormData.TRANS_DATE = paymentDate;
     this.paymentFormData.PAY_TYPE_ID = payTypeMapping[this.receiptMode] || null;
     this.paymentFormData.UNIT_ID = 0;
 
@@ -647,7 +653,7 @@ export class AddSupplierPaymentComponent {
     const netAmount = validDetails.reduce((sum, item) => sum + item.AMOUNT, 0);
     this.paymentFormData.NET_AMOUNT = netAmount;
     // this.paymentFormData.RECEIPT_NO = this.receiptNo;
-    this.paymentFormData.REC_DATE = new Date();
+    // this.paymentFormData.REC_DATE = new Date();
     this.paymentFormData.NARRATION = this.paymentFormData.NARRATION || '';
     this.paymentFormData.PDC_ID = this.paymentFormData.PDC_ID;
     this.paymentFormData.COMPANY_ID = this.selected_Company_id;
