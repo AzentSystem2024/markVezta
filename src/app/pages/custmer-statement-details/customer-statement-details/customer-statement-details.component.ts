@@ -72,8 +72,8 @@ export class CustomerStatementDetailsComponent {
   selected_Head_Id: any;
   selected_fin_id: any;
   selectedJournalVoucher: any;
-  formatted_from_date: string;
-  formatted_To_date: string;
+  formatted_from_date: any;
+  formatted_To_date: any;
   editLedgerPopup: boolean = false;
   selectedDebitNote: any;
   isViewCreditNote: boolean = false;
@@ -89,7 +89,10 @@ select_customer_id:any
 customer_list:any
 loadingInvoice = false;
   popupReady = false;
-
+selectedYear: number | null = null;
+   years: number[] = [];
+   monthDataSource: { name: string; value: any }[];
+   selectedmonth: any = '';
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -109,6 +112,13 @@ loadingInvoice = false;
       });
 
       this.get_customer_list()
+      const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2015; year--) {
+      this.years.push(year);
+    }
+    this.selectedYear = currentYear;
+      //============Month field dataSource===============
+     this.monthDataSource = this.dataService.getMonths();
   }
 
   ngOnInit() {
@@ -124,6 +134,50 @@ this.get_customer_list()
         this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
         console.log(this.HEAD_ID_LIST);
       });
+
+      const today = new Date();
+    const SystemDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
+      this.formatted_from_date = SystemDate;
+      this.formatted_To_date = SystemDate;
+  }
+
+  //================ Year value change ===================
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      // Set from date to the start of the year and to date to today
+      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
+      this.formatted_To_date = today; // Today's date
+    } else {
+      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1
+      this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31
+    }
+  }
+
+
+   //================Month value change ===================
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
+      this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
+    } else {
+      this.formatted_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.formatted_To_date = new Date(
+        this.selectedYear,
+        this.selectedmonth + 1,
+        0
+      );
+    }
   }
 
   // getSessionData(key: string) {
@@ -143,8 +197,10 @@ this.get_customer_list()
     console.log(session)
 
     this.select_customer_id=session.CUSTOMER_ID
-    this.selected_from_date=session.DATE_FROM
-    this.selected_To_date=session.DATE_TO
+    // this.selected_from_date=session.DATE_FROM
+    // this.selected_To_date=session.DATE_TO
+    this.selected_from_date = this.formatted_from_date,
+    this.selected_To_date=this.formatted_To_date
      
    await this.dataService.Customer_statement_Details_Api(session).subscribe((res: any) => {
       this.CustomerListDataSource = res.Data || [];
@@ -155,7 +211,11 @@ this.get_customer_list()
   }
 
         get_customer_list(){
-          this.dataService.Customer_Dropdown().subscribe((res:any)=>{
+          const payload = {
+            COMPANY_ID : this.selected_Company_id,
+            NAME:'CUSTOMER'
+          }
+          this.dataService.Customer_Dropdown(payload).subscribe((res:any)=>{
             console.log(res)
             this.customer_list=res
             console.log(this.customer_list)

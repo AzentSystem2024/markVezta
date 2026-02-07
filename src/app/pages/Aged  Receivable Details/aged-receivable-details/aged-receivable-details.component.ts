@@ -88,6 +88,10 @@ export class AgedReceivableDetailsComponent {
   select_customer_id:any
   customer_list:any
   
+  selectedYear: number | null = null;
+   years: number[] = [];
+   monthDataSource: { name: string; value: any }[];
+   selectedmonth: any = '';
     constructor(
       private dataService: DataService,
       private router: Router,
@@ -107,6 +111,15 @@ export class AgedReceivableDetailsComponent {
         });
   
         this.get_customer_list()
+
+         //============Year field dataSource===============
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2015; year--) {
+      this.years.push(year);
+    }
+    this.selectedYear = currentYear;
+      //============Month field dataSource===============
+     this.monthDataSource = this.dataService.getMonths();
     }
   
     ngOnInit() {
@@ -122,8 +135,52 @@ export class AgedReceivableDetailsComponent {
           this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
           console.log(this.HEAD_ID_LIST);
         });
+
+         const today = new Date();
+    const SystemDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
+      this.selected_from_date = SystemDate;
+      this.selected_To_date = SystemDate;
+
     }
   
+      //================ Year value change ===================
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      // Set from date to the start of the year and to date to today
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
+      this.selected_To_date = today; // Today's date
+    } else {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
+    }
+  }
+
+
+   //================Month value change ===================
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
+    } else {
+      this.selected_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.selected_To_date = new Date(
+        this.selectedYear,
+        this.selectedmonth + 1,
+        0
+      );
+    }
+  }
     // getSessionData(key: string) {
     //   const data = sessionStorage.getItem(key);
     //   return data ? JSON.parse(data) : null;
@@ -153,7 +210,11 @@ export class AgedReceivableDetailsComponent {
     }
   
           get_customer_list(){
-            this.dataService.Customer_Dropdown().subscribe((res:any)=>{
+            const payload = {
+              NAME:'CUSTOMER',
+              COMPANY_ID:this.selected_Company_id
+            }
+            this.dataService.Customer_Dropdown(payload).subscribe((res:any)=>{
               console.log(res)
               this.customer_list=res
               console.log(this.customer_list)

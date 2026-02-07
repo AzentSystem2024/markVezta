@@ -241,7 +241,11 @@ export class PdcEditFormComponent {
   }
 
   get_Customer_dropdown() {
-    this.dataservice.Customer_Dropdown().subscribe((res: any) => {
+    const payload  = {
+      NAME:'CUSTOMER',
+      COMPANY_ID: this.selected_Company_id
+    }
+    this.dataservice.Customer_Dropdown(payload).subscribe((res: any) => {
       console.log('customer dropdown', res);
       this.Customer = res;
     });

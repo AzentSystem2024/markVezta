@@ -34,29 +34,35 @@
             type="date"
             labelMode="floating"
             [width]="200"
+            [(value)]="salesReturnFormData.RET_DATE"
             [displayFormat]="'dd-MM-yyyy'"
             [readOnly]="true"
           >
           </dx-date-box>
 
           <dx-text-box
-            label="Supplier Invoice No."
+            label="Reference No."
             labelMode="floating"
+            [(value)]="salesReturnFormData.REF_NO"
+            [readOnly]="isReadOnlyMode"
             [width]="200"
-            [readOnly]="true"
           >
           </dx-text-box>
         </div>
-        <dx-button
-          *ngIf="!isReadOnlyMode"
-          text="Fill Pending Invoice"
-          icon="event"
-          [width]="200"
-          stylingMode="outlined"
-          class="blue-outline-btn"
-          [disabled]="isReadOnlyMode"
+
+        <dx-select-box
+          [dataSource]="customerList"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [width]="410"
+          [(value)]="salesReturnFormData.CUST_ID"
+          label="Customer"
+          labelMode="floating"
+          (onValueChanged)="onCustomerChanged($event)"
+          [readOnly]="isReadOnlyMode"
           style="margin-top: 15px"
-        ></dx-button>
+        >
+        </dx-select-box>
       </div>
 
       <div
@@ -68,26 +74,27 @@
         "
       >
         <div style="display: flex; gap: 10px">
-          <dx-select-box
-            [dataSource]="supplierList"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [width]="410"
-            label="Supplier"
+          <dx-text-box
+            label="Doc No."
             labelMode="floating"
-            (onValueChanged)="onCustomerChanged($event)"
+            [(value)]="salesReturnFormData.RET_NO"
             [readOnly]="isReadOnlyMode"
+            [width]="410"
           >
-          </dx-select-box>
+          </dx-text-box>
         </div>
 
         <div style="display: flex; gap: 2px; justify-content: flex-end">
-          <dx-text-box
-            label="Narration"
-            labelMode="floating"
-            [width]="400"
-            [readOnly]="isReadOnlyMode"
-          ></dx-text-box>
+          <dx-button
+            *ngIf="!isReadOnlyMode"
+            text="Fill Pending Invoice"
+            icon="event"
+            (onClick)="openPendingGrnPopup()"
+            [width]="410"
+            stylingMode="outlined"
+            class="blue-outline-btn"
+            [disabled]="isReadOnlyMode"
+          ></dx-button>
         </div>
       </div>
     </div>
@@ -125,18 +132,21 @@
         >
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
-          <dxi-column
-            dataField="DETAIL_ID"
+          <!-- <dxi-column
+            dataField="ID"
             caption="Detail ID"
-            [allowEditing]="!isReadOnlyMode"
             [visible]="false"
           ></dxi-column>
           <dxi-column
-            dataField="GRN_DET_ID"
+            dataField="SALE_DET_ID"
             caption="GRN Detail Id"
-            [allowEditing]="!isReadOnlyMode"
             [visible]="false"
           ></dxi-column>
+          <dxi-column
+            dataField="DOC_NO"
+            caption="GRN Detail Id"
+            [visible]="false"
+          ></dxi-column> -->
           <dxi-column
             dataField="ITEM_ID"
             caption="Item ID"
@@ -145,7 +155,7 @@
           ></dxi-column>
           <dxi-column
             dataField="TRANSFER_NO"
-            caption="Transfer No"
+            caption="Invoice No"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
           <dxi-column
@@ -167,7 +177,7 @@
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
-            dataField="RATE"
+            dataField="PRICE"
             caption="Price"
             dataType="number"
             format="#,##0.00"
@@ -267,6 +277,7 @@
             <dx-text-box
               label="Vehicle No"
               labelMode="floating"
+              [(value)]="salesReturnFormData.VEHICLE_NO"
               [width]="200"
               [readOnly]="isReadOnlyMode"
             ></dx-text-box>
@@ -276,12 +287,15 @@
           <div style="display: flex; align-items: center; gap: 16px">
             <dx-check-box
               text="Round Off"
+              [(value)]="salesReturnFormData.ROUND_OFF"
               [readOnly]="isReadOnlyMode"
+              (onValueChanged)="onRoundOffChange()"
             ></dx-check-box>
 
             <dx-text-box
               label="Net Amount"
               labelMode="floating"
+              [value]="netAmount"
               [width]="120"
               [readOnly]="true"
             ></dx-text-box>
@@ -336,3 +350,135 @@
     </div>
   </div>
 </dx-validation-group>
+
+<dx-popup
+  [(visible)]="isTrOutPopupVisible"
+  [width]="800"
+  [height]="500"
+  [showTitle]="true"
+  title="Pending Invoice"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+  (onHiding)="onPendingPopupClose()"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-data-grid
+      #popupGridRef
+      [dataSource]="pendingList"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [height]="'60vh'"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+
+      <dxo-toolbar>
+        <div
+          class="stacked-toolbar-group"
+          style="display: flex; flex-direction: column; gap: 2px"
+        ></div>
+        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
+
+        <dxi-item location="after">
+          <div class="toolbar-button-wrapper">
+            <dx-button
+              text="Select Invoice"
+              icon="check"
+              type="default"
+              stylingMode="contained"
+              class="blue-outline-btn"
+              (onClick)="onTransferSelectClick()"
+            ></dx-button>
+          </div>
+        </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+      </dxo-toolbar>
+      <dxi-column dataField="DOC_NO" caption="Doc No"></dxi-column>
+      <dxi-column
+        dataField="ID"
+        caption="SALE ID"
+        [visible]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_DET_ID"
+        caption="ID"
+        [visible]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_NO"
+        caption="ID"
+        [visible]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="SALE_DATE"
+        caption="Date"
+        dataType="date"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+      <dxi-column
+        dataField="ITEM_NAME"
+        caption="Item Name"
+        dataType="date"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column
+        dataField="PENDING_QTY"
+        caption="Quantity"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column
+        dataField="PRICE"
+        caption="Price"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="AMOUNT"
+        caption="Amount"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="VAT_PERC"
+        caption="Tax%"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+        [visible]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="TAX_AMOUNT"
+        caption="Tax Amount"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+    </dx-data-grid>
+  </div>
+</dx-popup>

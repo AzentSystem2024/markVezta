@@ -18,7 +18,7 @@ export class AgedPayablesComponent {
         displayMode: any = 'full';
         formatted_from_date: any;
         defaultDate: Date = new Date();
-      formatted_To_date: string;
+      formatted_To_date: any;
       auto:string='auto'
        HeadId: any;
        SuppId: any
@@ -31,18 +31,73 @@ export class AgedPayablesComponent {
           selected_Company_id : any;
  selectedSupplierId: any;
   isEditInvoiceReadOnly: boolean = true;
+  selectedYear: number | null = null;
+   years: number[] = [];
+   monthDataSource: { name: string; value: any }[];
+   selectedmonth: any = '';
 
           constructor(private dataservice: DataService, private fb: FormBuilder,private cdr: ChangeDetectorRef, private router : Router) {
                      this.get_sessionstorage_data()
                      this.sesstion_Details();
                      this.get_Supplier_dropdown()
+                       //============Year field dataSource===============
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2015; year--) {
+      this.years.push(year);
+    }
+    this.selectedYear = currentYear;
+      //============Month field dataSource===============
+     this.monthDataSource = this.dataservice.getMonths();
                     }
 
 ngOnInit() {
   // initialize with today's date
   this.onToDateChange({ value: this.defaultDate });
   this.get_DataSource() //get datasource======== function call==========
+  const today = new Date();
+    const SystemDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
+      this.formatted_from_date = SystemDate;
+      this.formatted_To_date = SystemDate;
 }                    
+
+ //================ Year value change ===================
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      // Set from date to the start of the year and to date to today
+      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
+      this.formatted_To_date = today; // Today's date
+    } else {
+      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1
+      this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31
+    }
+  }
+
+
+   //================Month value change ===================
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
+      this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
+    } else {
+      this.formatted_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.formatted_To_date = new Date(
+        this.selectedYear,
+        this.selectedmonth + 1,
+        0
+      );
+    }
+  }
 
   onExporting(event: any) {
           const fileName = 'SupplierReport';

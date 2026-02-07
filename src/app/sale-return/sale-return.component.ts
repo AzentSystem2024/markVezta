@@ -502,18 +502,16 @@ export class SaleReturnComponent {
     this.getSaleReturnList();
   }
 
-  onEditPurchaseReturn(event: any) {
+  onEditSaleReturn(event: any) {
     event.cancel = true;
-    const returnId = event.data.TRANS_ID;
+    const returnId = event.data.ID;
     const status = event.data.TRANS_STATUS;
-    this.dataService
-      .selectPurchaseReturn(returnId)
-      .subscribe((response: any) => {
-        this.selectedSaleReturn = response;
-        console.log(this.selectedSaleReturn, 'SELECTEDTROUT');
-        this.isEditSaleReturn = true;
-        this.isReadOnlySaleReturn = status === 5;
-      });
+    this.dataService.selectSaleReturn(returnId).subscribe((response: any) => {
+      this.selectedSaleReturn = response;
+      console.log(this.selectedSaleReturn, 'SELECTEDTROUT');
+      this.isEditSaleReturn = true;
+      this.isReadOnlySaleReturn = status === 5;
+    });
   }
 
   onDeletePurchaseReturn(event: any) {
@@ -530,7 +528,7 @@ export class SaleReturnComponent {
     event.cancel = true;
     console.log(returnId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
     // Call your delete API
-    this.dataService.deletePurchaseReturn(returnId).subscribe(
+    this.dataService.deleteSaleReturn(returnId).subscribe(
       (response: any) => {
         if (response) {
           notify(
@@ -560,9 +558,12 @@ export class SaleReturnComponent {
   }
 
   onCellPrepared(e: any) {
+    console.log('DELETEEEEEEEEEE');
+    console.log(e, 'eventttttttttttttttttttt');
     if (e.rowType === 'data' && e.column.command === 'edit') {
       if (e.data.TRANS_STATUS === 5) {
         const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+
         if (deleteButton) {
           deleteButton.style.display = 'none';
         }
@@ -579,7 +580,7 @@ export class SaleReturnComponent {
     this.isEditSaleReturn = false;
     this.isViewSaleReturn = false;
     if (this.SaleReturnFormComponent) {
-      this.SaleReturnFormComponent.resetPurchaseReturnForm();
+      this.SaleReturnFormComponent.resetSaleReturnForm();
     }
     this.getSaleReturnList();
   }

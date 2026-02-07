@@ -136,7 +136,11 @@ financialYeaDate: string
   }
 
         get_customer_list(){
-          this.dataService.Customer_Dropdown().subscribe((res:any)=>{
+          const payload = {
+            NAME:'CUSTOMER',
+            COMPANY_ID:this.selected_Company_id
+          }
+          this.dataService.Customer_Dropdown(payload).subscribe((res:any)=>{
             console.log(res)
             this.customer_list=res
             console.log(this.customer_list)

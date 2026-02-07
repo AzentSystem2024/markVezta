@@ -194,6 +194,38 @@ export class LedgerStatementComponent {
 
   }
 
+   //================ Year value change ===================
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      // Set from date to the start of the year and to date to today
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
+      this.selected_To_date = today; // Today's date
+    } else {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
+    }
+  }
+
+
+   //================Month value change ===================
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
+    } else {
+      this.selected_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.selected_To_date = new Date(
+        this.selectedYear,
+        this.selectedmonth + 1,
+        0
+      );
+    }
+  }
   //  ngAfterViewInit() {
   //   setTimeout(() => this.resetPopups());
   // }
@@ -297,38 +329,7 @@ export class LedgerStatementComponent {
     }
   }
 
-   //================ Year value change ===================
-  onYearChanged(e: any): void {
-    this.selectedYear = e.value;
-    this.selectedmonth = '';
-    const currentYear = new Date().getFullYear();
-    const today = new Date();
-    if (this.selectedYear === currentYear) {
-      // Set from date to the start of the year and to date to today
-      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
-      this.selected_To_date = today; // Today's date
-    } else {
-      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
-      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
-    }
-  }
-
-
-   //================Month value change ===================
-  onMonthValueChanged(e: any) {
-    this.selectedmonth = e.value ?? '';
-    if (this.selectedmonth === '') {
-      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
-      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
-    } else {
-      this.selected_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
-      this.selected_To_date = new Date(
-        this.selectedYear,
-        this.selectedmonth + 1,
-        0
-      );
-    }
-  }
+  
 
   onCompanyChange(event: any) {
     this.company_id = event.value;
