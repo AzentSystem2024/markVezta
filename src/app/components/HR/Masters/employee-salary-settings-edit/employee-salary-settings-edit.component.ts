@@ -27,7 +27,7 @@ selectedFilterAction: number = 4; // default is "All"
 selectedEmployeeId: number = null;
 SalaryDetails : any[] = [];
 selected_Batch_id:any
-CompanyID =1 ;
+selected_Company_id :any;
 FinID = 1;
    selectedRows: any[] = [];
    PreviousRevision: any;
@@ -90,8 +90,21 @@ onEffectFromChanged(e: any) {
   }
 }
 
+ sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
+
   EmployeeListDropDown() {
-     this.dataservice.getEmployeeDropDown().subscribe((response: any) => {
+    const payload = {
+      NAME : 'Employee',
+      COMPANY_ID : this.selected_Company_id
+    }
+     this.dataservice.getEmployeeDropDown(payload).subscribe((response: any) => {
       console.log(response, 'response++++++++++');
       this.EmployeeDropdown = response;
     //  if (response && response.Data) {
@@ -112,7 +125,7 @@ get_SalaryHead_List() {
 
   const payload = {
     EMP_ID: this.selectedEmployeeId,
-    COMPANY_ID: this.CompanyID,
+    COMPANY_ID: this.selected_Company_id,
   };
 
   console.log(payload, 'payload for SalaryHeadList');
@@ -163,7 +176,10 @@ this.selectedRows = selecteddata
   //   })
   // }
 
-  
+  ngOnInit(){
+    this.sessionDetails()
+    this.EmployeeListDropDown()
+  }
 
 ngOnChanges(changes: SimpleChanges) {
   console.log('ngOnChanges triggered', changes);
@@ -295,7 +311,7 @@ saveEmployee() {
   const payload = {
     ID: 0,
     EMP_ID: this.selectedEmployee ? this.selectedEmployee.ID : 0,
-    COMPANY_ID: this.CompanyID,
+    COMPANY_ID: this.selected_Company_id,
     FIN_ID: this.FinID,
    BATCH_ID :  this.selected_Batch_id,
     // EMP_CODE: String(this.selectedEmployee.EMP_CODE),

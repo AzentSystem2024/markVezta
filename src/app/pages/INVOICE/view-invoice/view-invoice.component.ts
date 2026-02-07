@@ -96,6 +96,7 @@ export class ViewInvoiceComponent {
   selectedCompanyId: any;
   selectedDistributorId: any;
   isViewInvoice: boolean;
+   logoBase64: string;
 
   pdfSrc: SafeResourceUrl | null = null;
   selectedInvoice: any;
@@ -164,6 +165,11 @@ export class ViewInvoiceComponent {
     this.getInvoiceListForGrid();
 
     this.invoiceFormData.IS_APPROVED = true;
+     const imagePath = 'assets/markLogo.jpg';
+    this.convertToBase64(imagePath).then((base64) => {
+      this.logoBase64 = base64;
+      console.log('Logo Base64 Loaded');
+    });
   }
 
   // ngOnChanges(changes: SimpleChanges): void {
@@ -460,9 +466,10 @@ export class ViewInvoiceComponent {
         response,
         '=================invoice response===================',
       );
-      if (response) {
-        this.pdfSrc = this.get_pdf(response.Data); // Update iframe source
-      }
+      // if (response) {
+      //   this.pdfSrc = this.get_pdf(response.Data); // Update iframe source
+      // }
+      this.get_pdf(response.Data)
     });
   }
 
@@ -496,19 +503,106 @@ export class ViewInvoiceComponent {
     this.logGridSummaries();
   }
 
-  get_pdf(data: any): SafeResourceUrl {
+  private async convertToBase64(path: string): Promise<string> {
+    const response = await fetch(path);
+    const blob = await response.blob();
+
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  }
+
+   numberToWords(amount: number): string {
+    if (amount === 0) return 'Zero Rupees Only';
+
+    const words = [
+      '',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen',
+    ];
+
+    const tens = [
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety',
+    ];
+
+    function convert(num: number): string {
+      if (num < 20) return words[num];
+      if (num < 100)
+        return (
+          tens[Math.floor(num / 10)] + (num % 10 ? ' ' + words[num % 10] : '')
+        );
+      if (num < 1000)
+        return (
+          words[Math.floor(num / 100)] +
+          ' Hundred' +
+          (num % 100 ? ' ' + convert(num % 100) : '')
+        );
+      if (num < 100000)
+        return (
+          convert(Math.floor(num / 1000)) +
+          ' Thousand' +
+          (num % 1000 ? ' ' + convert(num % 1000) : '')
+        );
+      if (num < 10000000)
+        return (
+          convert(Math.floor(num / 100000)) +
+          ' Lakh' +
+          (num % 100000 ? ' ' + convert(num % 100000) : '')
+        );
+      return (
+        convert(Math.floor(num / 10000000)) +
+        ' Crore' +
+        (num % 10000000 ? ' ' + convert(num % 10000000) : '')
+      );
+    }
+
+    return convert(Math.floor(amount)) + ' Rupees Only';
+  }
+
+  get_pdf(data: any) {
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
     let y = 10;
 
+   // ======================================================
+    // LOGO LEFT TOP
     // ======================================================
-    // LOGO (LEFT TOP)
-    // ======================================================
-    const logoW = 55;
-    const logoH = 28;
-    doc.setDrawColor(180);
-    doc.rect(10, y, logoW, logoH); // TEMP LOGO BOX (replace with addImage)
+    const logoX = 18,
+      logoY = 12,
+      logoW = 30,
+      logoH = 30;
+    doc.setFillColor(225, 225, 225);
+    doc.rect(logoX, logoY, logoW, logoH, 'F');
+    doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
 
     // ===============================================
     // SALES INVOICE HEADING (Centered between logo & reference block)
@@ -706,95 +800,134 @@ export class ViewInvoiceComponent {
     });
 
     y = (doc as any).lastAutoTable.finalY + 12;
-    // ======================================================
-    // AMOUNT IN WORDS BLOCKS
-    // ======================================================
+    
 
-    // ------------------------
-    // 1) GROSS AMOUNT (Amount Chargeable)
-    // ------------------------
-    const grossAmount = data[0].GROSS_AMOUNT || 0;
-    const grossRupees = Math.floor(grossAmount);
-    const grossPaise = Math.round((grossAmount - grossRupees) * 100);
+   // ============================================================
+// FOOTER – GST SUMMARY + TOTALS (LIKE generatePDF)
+// ============================================================
 
-    let grossWords = numberToWordsIndianNumber(grossRupees);
-    let grossPaiseWords =
-      grossPaise > 0 ? numberToWordsIndianNumber(grossPaise) : '';
+const footStartY = y + 3;
 
-    let grossText = 'INR ' + grossWords + ' Rupees';
-    if (grossPaise > 0) grossText += ' and ' + grossPaiseWords + ' Paise';
-    grossText += ' Only';
+// ---------------- LEFT GST SUMMARY ----------------
+let lx = 15;
+let ly = footStartY;
 
-    // ------------------------
-    // 2) NET AMOUNT (Total Amount)
-    // ------------------------
-    const netAmount = data[0].NET_AMOUNT || 0;
-    const netRupees = Math.floor(netAmount);
-    const netPaise = Math.round((netAmount - netRupees) * 100);
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(10);
 
-    let netWords = numberToWordsIndianNumber(netRupees);
-    let netPaiseWords = netPaise > 0 ? numberToWordsIndianNumber(netPaise) : '';
+// Header
+doc.text('GST %', lx, ly);
+doc.text('Taxable Value', lx + 22, ly);
+doc.text('Integrated Tax', lx + 55, ly);
+doc.text('Total Tax Amount', lx + 95, ly);
 
-    let netText = 'INR ' + netWords + ' Rupees';
-    if (netPaise > 0) netText += ' and ' + netPaiseWords + ' Paise';
-    netText += ' Only';
+// Sub headers
+doc.setFontSize(8);
+doc.text('Rate', lx + 55, ly + 5);
+doc.text('Amount', lx + 72, ly + 5);
 
-    // -----------------------------------
-    // RIGHT SIDE PRINTING (two sections)
-    // -----------------------------------
-    const rightX = pageWidth - 90;
+// Values
+ly += 12;
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(10);
 
-    doc.setFont('helvetica', 'bold');
-    doc.text('Total Amount Chargeable (in words)', rightX, y);
+const taxable = Number(data[0].GROSS_AMOUNT || 0);
+const gstAmount = Number(data[0].TAX_AMOUNT || 0);
+const gstPerc =
+  Number(data[0].SALE_DETAILS[0]?.CGST || 0) +
+  Number(data[0].SALE_DETAILS[0]?.SGST || 0);
 
-    doc.setFont('helvetica', 'normal');
-    doc.text(grossText, rightX, y + 6, { maxWidth: 85 });
+doc.text(gstPerc.toFixed(2) + '%', lx, ly);
+doc.text(taxable.toFixed(2), lx + 22, ly);
+doc.text(gstPerc.toFixed(2) + '%', lx + 55, ly);
+doc.text(gstAmount.toFixed(2), lx + 72, ly);
+doc.text(gstAmount.toFixed(2), lx + 95, ly);
 
-    doc.setFont('helvetica', 'bold');
-    doc.text('Total of NetAmount (in words)', rightX, y + 18);
+// Total row
+ly += 10;
+doc.setFont('helvetica', 'bold');
+doc.text(taxable.toFixed(2), lx + 22, ly);
+doc.text(gstAmount.toFixed(2), lx + 72, ly);
+doc.text(gstAmount.toFixed(2), lx + 95, ly);
 
-    doc.setFont('helvetica', 'normal');
-    doc.text(netText, rightX, y + 24, { maxWidth: 85 });
+// ---------------- RIGHT TOTAL SUMMARY ----------------
+let rx = pageWidth - 65;
+let ry = footStartY;
 
-    // -----------------------------------
-    // LEFT SIDE (E & OE, User, PAN)
-    // -----------------------------------
-    const leftX = 10;
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(10);
 
-    doc.setFont('helvetica', 'bold');
-    doc.text('E & OE :', leftX, y);
+const labelX = rx;
+const colonX = rx + 30;
+const valueX = rx + 40;
 
-    doc.text(`User : ${data[0].USER || ''}`, leftX, y + 6);
+doc.text('Taxable Value', labelX, ry);
+doc.text(':', colonX, ry);
+doc.text(taxable.toFixed(2), valueX, ry);
 
-    doc.text(`Company's PAN : ${data[0].PAN || ''}`, leftX, y + 12);
+ry += 6;
+doc.text('Total Tax', labelX, ry);
+doc.text(':', colonX, ry);
+doc.text(gstAmount.toFixed(2), valueX, ry);
 
-    // ======================================================
-    // SIGNATURE BOX WITH COMPANY NAME
-    // ======================================================
-    const extraLeft = 20;
-    const signBoxX = pageWidth - 70 - extraLeft;
-    const signBoxY = y + 34; // 24 + 10 padding
-    const signBoxW = 60 + extraLeft;
-    const signBoxH = 25;
+ry += 6;
+doc.text('Round Off', labelX, ry);
+doc.text(':', colonX, ry);
+doc.text('0.00', valueX, ry);
 
-    doc.rect(signBoxX, signBoxY, signBoxW, signBoxH);
+ry += 8;
+doc.setFont('helvetica', 'bold');
+doc.text('Invoice Total', labelX, ry);
+doc.text(':', colonX, ry);
+doc.text(Number(data[0].NET_AMOUNT).toFixed(2), valueX, ry);
 
-    // Company name inside the box
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.text(`for ${data[0].COMPANY_NAME || ''}`, signBoxX + 3, signBoxY + 10);
+// ---------------- REVERSE CHARGE ----------------
+let wordsY = ry + 15;
 
-    // Authorised Signatory text
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.text('Authorised Signatory', signBoxX + 3, signBoxY + 20);
+doc.setFont('helvetica', 'bold');
+doc.text(
+  'Whether the tax is payable on Reverse charge basis:',
+  15,
+  wordsY
+);
+
+doc.setFont('helvetica', 'normal');
+doc.text('No', 150, wordsY);
+
+// ---------------- AMOUNT IN WORDS ----------------
+wordsY += 10;
+
+doc.setFont('helvetica', 'bold');
+doc.text('Amount in words :', 15, wordsY);
+
+doc.setFont('helvetica', 'normal');
+doc.text(
+  `INR ${numberToWordsIndianNumber(Math.floor(data[0].NET_AMOUNT))} Rupees Only`,
+  60,
+  wordsY
+);
+
+
+// ---------------- DECLARATION & REMARK ----------------
+let blockY = wordsY + 15;
+
+doc.setFont('helvetica', 'bold');
+doc.text('Declaration :', 15, blockY);
+
+blockY += 10;
+doc.text('Remark :', 15, blockY);
+
+doc.setFont('helvetica', 'normal');
+doc.text(data[0].REF_NO || '', 40, blockY);
+
 
     // ======================================================
     // RETURN PDF
     // ======================================================
-    const pdfBlob = doc.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+    // const pdfBlob = doc.output('blob');
+    // const pdfUrl = URL.createObjectURL(pdfBlob);
+    // return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+    doc.output('dataurlnewwindow');
   }
 }
 

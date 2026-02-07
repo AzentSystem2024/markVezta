@@ -54,8 +54,8 @@ export class EmployeeSalarySettingsAddComponent {
   PreviousRevision: any;
   minDate: Date;
 
-
-  CompanyID = 1;
+selected_Company_id :any;
+  // CompanyID = 1;
   FinID = 1;
   selectedRows: any[] = [];
   employeeFormData: any = {
@@ -72,11 +72,23 @@ export class EmployeeSalarySettingsAddComponent {
     this.get_SalaryHead_List();
   }
 
+  ngOnInit(){
+    this.sessionDetails();
+    this.EmployeeListDropDown();
+  }
 // ngOnInit() {
 //     // Default to current month if it's a new form
 //     this.employeeFormData.EFFECT_FROM = new Date(); // today’s date, shown as current month/year
 //   }
 
+ sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id=============='
+    );
+  }
 
 getFirstDayDateString(date: Date): string {
   const year = date.getFullYear();
@@ -182,7 +194,11 @@ validateEffectFrom = (e: any): boolean => {
 
 
   EmployeeListDropDown() {
-    this.dataservice.getEmployeeDropDown().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id,
+      NAME : 'Employee'
+    }
+    this.dataservice.getEmployeeDropDown(payload).subscribe((response: any) => {
       console.log(response, 'response++++++++++');
       this.EmployeeDropdown = response;
     });
@@ -196,7 +212,7 @@ validateEffectFrom = (e: any): boolean => {
 
     const payload = {
       EMP_ID: this.selectedEmployeeId,
-      COMPANY_ID: this.CompanyID,
+      COMPANY_ID: this.selected_Company_id,
       // EFFECT_FROM: this.getLocalDateString(this.employeeFormData.EFFECT_FROM),
     };
 
@@ -367,7 +383,7 @@ if (prevStr && effectStr <= prevStr) {
     const payload = {
       ID:  0,
       // BATCH_ID :this.selectedEmployee.batchId,
-      COMPANY_ID: this.CompanyID,
+      COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.FinID,
       EMP_ID: this.selectedEmployee ? this.selectedEmployee.ID : 0,
 

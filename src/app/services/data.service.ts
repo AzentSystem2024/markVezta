@@ -535,33 +535,6 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SaleReturn/list`, data);
   }
 
-  getPendingInvoicesForSaleReturn(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}SaleReturn/pendinglist`, data);
-  }
-
-  saveSaleReturn(items: any) {
-    const data = items;
-    return this.http.post(`${this.apiUrl}SaleReturn/save`, data);
-  }
-
-  approveSaleReturn(items: any) {
-    const data = items;
-    return this.http.post(`${this.apiUrl}SaleReturn/commit`, data);
-  }
-
-  selectSaleReturn(id: number) {
-    return this.http.post<any>(`${this.apiUrl}SaleReturn/select/` + id, {});
-  }
-
-  updateSaleReturn(items: any) {
-    const data = items;
-    return this.http.post(`${this.apiUrl}SaleReturn/update`, data);
-  }
-
-  deleteSaleReturn(id: number) {
-    return this.http.post<any>(`${this.apiUrl}SaleReturn/delete/` + id, {});
-  }
-
   //--------------------------LEDGER-SETTINGS---------------------------------------------------//
   getLedgerSettingsList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}ACDefaults/list`, data);
@@ -4613,11 +4586,9 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //==========Dropdown for Employee Salary Settings==========
-  getEmployeeDropDown() {
-    const reqbody = {
-      NAME: 'Employee',
-    };
-    return this.http.post(`${this.apiUrl}dropdown`, reqbody);
+  getEmployeeDropDown(payload) {
+     const getEndpoint = `${this.apiUrl}dropdown`;
+    return this.http.post(getEndpoint, payload);
   }
 
   //=========List of SalaryHead============
@@ -6228,5 +6199,25 @@ The result can be exported to HTML or Markdown.`;
   View_PackingPrice_Change_Api(payload) {
     const getEndpoint = this.apiUrl + 'Packing/GetPackingPriceLog';
     return this.http.post(getEndpoint, payload);
+  }
+
+   private months: { name: string; value: any }[] = [
+    { name: 'All', value: '' },
+    { name: 'January', value: 0 },
+    { name: 'February', value: 1 },
+    { name: 'March', value: 2 },
+    { name: 'April', value: 3 },
+    { name: 'May', value: 4 },
+    { name: 'June', value: 5 },
+    { name: 'July', value: 6 },
+    { name: 'August', value: 7 },
+    { name: 'September', value: 8 },
+    { name: 'October', value: 9 },
+    { name: 'November', value: 10 },
+    { name: 'December', value: 11 },
+  ];
+  
+   getMonths(): { name: string; value: number }[] {
+    return this.months;
   }
 }

@@ -355,6 +355,20 @@
               stylingMode="contained"
               type="default"
             ></dx-button>
+
+            <!-- <dx-button
+              #saveButtonRef
+              [text]="
+                isReadOnlyMode
+                  ? 'PDF'
+                  : purchaseReturnFormData.IS_APPROVED
+                    ? 'Commit'
+                    : 'Save'
+              "
+              (onClick)="isReadOnlyMode ? openPDF() : savePurchaseReturn()"
+              stylingMode="contained"
+              type="default"
+            ></dx-button> -->
           </div>
         </div>
       </div>

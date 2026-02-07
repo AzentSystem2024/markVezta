@@ -287,12 +287,20 @@ export class DepreciationAddComponent {
 
     console.log('Date=================', date);
     console.log(this.formatDateToDMY(date));
+    const today = new Date();
+    const deprDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
     const payload = {
       ...this.DepreciationPayload,
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
       ASSET_IDS: this.formattedAssets,
-      DEPR_DATE: this.formatDateToDMY(date),
+      DEPR_DATE: deprDate,
     };
 
     console.log(payload, '===============payload=====');

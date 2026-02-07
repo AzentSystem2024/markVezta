@@ -129,6 +129,10 @@ export class LedgerStatementComponent {
   isReadOnlyTrIn: boolean = true;
   isEditCustomerReceipt: boolean = false;
   ledgerRowCount = 0;
+   selectedYear: number | null = null;
+   years: number[] = [];
+   monthDataSource: { name: string; value: any }[];
+   selectedmonth: any = '';
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -148,6 +152,15 @@ export class LedgerStatementComponent {
           this.loadLedgerData();
         }
       });
+
+       //============Year field dataSource===============
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2015; year--) {
+      this.years.push(year);
+    }
+    this.selectedYear = currentYear;
+      //============Month field dataSource===============
+     this.monthDataSource = this.dataService.getMonths();
   }
 
   ngOnInit() {
@@ -167,6 +180,18 @@ export class LedgerStatementComponent {
         this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
         console.log(this.HEAD_ID_LIST);
       });
+
+      const today = new Date();
+    const SystemDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
+      this.selected_from_date = SystemDate;
+      this.selected_To_date = SystemDate;
+
   }
 
   //  ngAfterViewInit() {
@@ -200,6 +225,7 @@ export class LedgerStatementComponent {
   }
 
   createLedgerDataSource(payload: any) {
+    console.log("testingssssssss+++++++++++++++++++++++++")
   this.Ledger_statement_datasource = new DataSource({
     load: () =>
       new Promise((resolve, reject) => {
@@ -268,6 +294,39 @@ export class LedgerStatementComponent {
     this.fin_id = this.savedUserData?.FINANCIAL_YEARS || [];
     if (this.fin_id.length) {
       this.selected_fin_id = this.fin_id[0].FIN_ID;
+    }
+  }
+
+   //================ Year value change ===================
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      // Set from date to the start of the year and to date to today
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
+      this.selected_To_date = today; // Today's date
+    } else {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
+    }
+  }
+
+
+   //================Month value change ===================
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
+    } else {
+      this.selected_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.selected_To_date = new Date(
+        this.selectedYear,
+        this.selectedmonth + 1,
+        0
+      );
     }
   }
 

@@ -1127,13 +1127,7 @@ export class AddDebitComponent {
         };
       },
     );
-    const today = new Date();
-    const debitDate =
-      today.getFullYear() +
-      '-' +
-      String(today.getMonth() + 1).padStart(2, '0') +
-      '-' +
-      String(today.getDate()).padStart(2, '0');
+
     //  FINAL TAX CLEANUP (VERY IMPORTANT)
     this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
       if (row.CGST > 0 || row.SGST > 0) {
@@ -1150,10 +1144,12 @@ export class AddDebitComponent {
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
     this.debitFormData.STORE_ID = this.selectedstoreId;
     this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
-    this.debitFormData.TRANS_DATE = debitDate;
     // this.debitFormData.TRANS_DATE = this.formatDate(
-    //   this.debitFormData.TRANS_DATE,
+    //   this.debitFormData.TRANS_DATE
     // );
+    this.debitFormData.TRANS_DATE = this.formatDate(
+      this.debitFormData.TRANS_DATE,
+    );
     this.debitFormData.SALE_DATE = this.formatDate(
       this.debitFormData.SALE_DATE,
     );

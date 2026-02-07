@@ -97,3 +97,14 @@
   }
 } 
 
+.form-popup-buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 10px 0 10px;
+  margin-top: 10px; /* ⬅ increased from -6px to -10px */
+}
+
+.popup-footer {
+  display: flex;
+  gap: 10px;
+}

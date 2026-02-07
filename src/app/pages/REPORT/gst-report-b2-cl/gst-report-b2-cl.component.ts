@@ -78,10 +78,15 @@ isEditCustomerReceipt:boolean = false;
   selected_fin_id: any;
   fin_id: any;
     savedUserData: any;
-  selected_from_date: string;
-  selected_To_date: string;
+  selected_from_date: any;
+  selected_To_date: any;
    popupReady = false;
   ledgerSummaryData:any=[]
+
+  selectedYear: number | null = null;
+   years: number[] = [];
+   monthDataSource: { name: string; value: any }[];
+   selectedmonth: any = '';
 
    constructor(
        private dataService: DataService,
@@ -90,6 +95,15 @@ isEditCustomerReceipt:boolean = false;
      ) {
       this.sesstion_Details();
       this.get_fin_id();
+
+       //============Year field dataSource===============
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2015; year--) {
+      this.years.push(year);
+    }
+    this.selectedYear = currentYear;
+      //============Month field dataSource===============
+     this.monthDataSource = this.dataService.getMonths();
      }
 
        ngOnInit() {
@@ -98,6 +112,17 @@ isEditCustomerReceipt:boolean = false;
     this.ledgerSummaryData=this.GST_datasource
     this.onFromDateChange({ value: this.defaultDate });
     this.onToDateChange({ value: this.defaultDate });
+
+     const today = new Date();
+    const SystemDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
+      this.selected_from_date = SystemDate;
+      this.selected_To_date = SystemDate;
 
   }
       sesstion_Details(){
@@ -114,6 +139,38 @@ isEditCustomerReceipt:boolean = false;
     
   }
 
+ //================ Year value change ===================
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      // Set from date to the start of the year and to date to today
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
+      this.selected_To_date = today; // Today's date
+    } else {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
+    }
+  }
+
+
+   //================Month value change ===================
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
+    } else {
+      this.selected_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.selected_To_date = new Date(
+        this.selectedYear,
+        this.selectedmonth + 1,
+        0
+      );
+    }
+  }
 
   get_fin_id() {
     this.fin_id = this.savedUserData?.FINANCIAL_YEARS || [];

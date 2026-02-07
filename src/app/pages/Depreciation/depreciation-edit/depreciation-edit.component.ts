@@ -449,9 +449,18 @@ export class DepreciationEditComponent {
       this.DepreciationPayload,
       '===================================without change',
     );
+    
+    const today = new Date();
+    const DeprDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
     const payload = {
       ...this.DepreciationPayload,
-      DEPR_DATE: formattedDate,
+      DEPR_DATE: DeprDate,
       // ASSET_IDS: this.formattedAssets ||this.deafultASSET_IDs
       ASSET_IDS: this.isProcessClicked
         ? this.formattedAssets

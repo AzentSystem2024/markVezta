@@ -284,13 +284,13 @@ export class AddPurchaseInvoiceComponent {
       this.showSGST = true;
       this.showGST = false;
     } else {
-      // ✅ DIFFERENT STATE → IGST
+      //  DIFFERENT STATE → IGST
       this.showGST = true;
       this.showCGST = false;
       this.showSGST = false;
     }
 
-    // 🔴 IMPORTANT: force grid to redraw columns
+    //  IMPORTANT: force grid to redraw columns
     setTimeout(() => {
       this.itemsGridRef?.instance?.repaint();
     }, 0);
@@ -469,11 +469,11 @@ export class AddPurchaseInvoiceComponent {
         sgst = 0;
 
       if (companyState === supplierState) {
-        // ✅ INTRA STATE → CGST + SGST
+        //  INTRA STATE → CGST + SGST
         cgst = gstPerc / 2;
         sgst = gstPerc / 2;
       } else {
-        // ✅ INTER STATE → IGST
+        //  INTER STATE → IGST
         igst = gstPerc;
       }
 
@@ -491,7 +491,7 @@ export class AddPurchaseInvoiceComponent {
 
         HSN_CODE: row.HSN_CODE,
 
-        // ✅ GST FROM GRN
+        //  GST FROM GRN
         VAT_PERC: igst, // IGST %
         CGST: cgst,
         SGST: sgst,
@@ -622,10 +622,19 @@ export class AddPurchaseInvoiceComponent {
     this.purchaseInvoiceFormData.PURCH_DATE =
       this.purchaseInvoiceFormData.PURCH_DATE;
 
+      const today = new Date();
+    const invoiceDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
     this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
     this.purchaseInvoiceFormData.USER_ID = this.user_id;
     this.purchaseInvoiceFormData.STORE_ID = this.store_id;
     this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
+    this.purchaseInvoiceFormData.PURCH_DATE = invoiceDate;
 
     const callInsertAPI = () => {
       this.isSaving = true;
