@@ -904,30 +904,107 @@ export class SaleReturnFormComponent {
     y += 6;
 
     // ============================
-    // COMPANY / CUSTOMER BLOCK
+    // SELLER (BLUE BOX - LEFT)
     // ============================
-    const blueX = margin;
-    const blueY = y;
-    const blueW = 100;
-    const blueH = 28;
+    const leftX = margin;
+    let blockY = y;
+    const leftW = 95;
+    const leftH = 48;
 
-    doc.setFillColor(204, 229, 255);
-    doc.rect(blueX, blueY, blueW, blueH, 'F');
+    doc.setFillColor(214, 236, 255);
+    doc.rect(leftX, blockY, leftW, leftH, 'F');
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
-    doc.text(header.COMPANY_NAME, blueX + 3, blueY + 7);
+    doc.text(header.COMPANY_NAME, leftX + 3, blockY + 6);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
-    doc.text(`Customer : ${header.CUST_NAME}`, blueX + 3, blueY + 14);
-    doc.text(`Reference No : ${header.REF_NO}`, blueX + 3, blueY + 20);
-    doc.text(`Addresss : ${header.CUST_ADDRESS}`, blueX + 3, blueY + 26);
+    doc.text(header.COMPANY_ADDRESS1 || 'Kallai', leftX + 3, blockY + 12);
+    doc.text(header.COMPANY_ADDRESS2 || 'Kozhikode', leftX + 3, blockY + 17);
+    doc.text(header.COMPANY_ADDRESS3 || 'Kozhikode', leftX + 3, blockY + 22);
+    doc.text(`GSTIN/UIN : ${header.GST_NO}`, leftX + 3, blockY + 27);
+    doc.text(`State : KERALA, Code : 32`, leftX + 3, blockY + 32);
+    doc.text(`E-Mail : ${header.EMAIL || '-'}`, leftX + 3, blockY + 37);
+
+    // ============================
+    // CONSIGNEE (SHIP TO) - RIGHT
+    // ============================
+    const rightBlockX = 120;
+    let rightY = blockY + 5;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('Consignee (Ship to)', rightBlockX, rightY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    rightY += 6;
+
+    doc.text(header.CUST_NAME, rightBlockX, rightY);
+    doc.text(header.CUST_ADDRESS1 || 'Kozhikode', rightBlockX, rightY + 5);
+    doc.text(header.CUST_ADDRESS2 || 'Kozhikode', rightBlockX, rightY + 10);
+    doc.text(header.CUST_ADDRESS3 || 'Kozhikode', rightBlockX, rightY + 15);
+    doc.text(`GSTIN/UIN : ${header.CUST_CODE}`, rightBlockX, rightY + 20);
+    doc.text(`State : KERALA, Code : 32`, rightBlockX, rightY + 25);
+
+    // ============================
+    // DISPATCHED FROM - LEFT BELOW
+    // ============================
+    let dispatchY = blockY + leftH + 8;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Dispatched From', leftX, dispatchY);
+
+    doc.setFont('helvetica', 'normal');
+    dispatchY += 6;
+    doc.text(header.COMPANY_NAME, leftX, dispatchY);
+    doc.text('Kozhikode', leftX, dispatchY + 5);
+    doc.text('Kozhikode', leftX, dispatchY + 10);
+    doc.text('Kozhikode', leftX, dispatchY + 15);
+    doc.text(`GSTIN/UIN : ${header.COMPANY_GST}`, leftX, dispatchY + 20);
+
+    // ============================
+    // BUYER (BILL TO) - RIGHT BELOW
+    // ============================
+    let buyerY = dispatchY;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Buyer (Bill to)', rightBlockX, buyerY);
+
+    doc.setFont('helvetica', 'normal');
+    buyerY += 6;
+    doc.text(header.CUST_NAME, rightBlockX, buyerY);
+    doc.text(header.CUST_ADDRESS1 || 'Kozhikode', rightBlockX, buyerY + 5);
+    doc.text(header.CUST_ADDRESS2 || 'Kozhikode', rightBlockX, buyerY + 10);
+    doc.text(header.CUST_ADDRESS3 || 'Kozhikode', rightBlockX, buyerY + 15);
+    doc.text(`GSTIN/UIN : ${header.CUST_CODE}`, rightBlockX, buyerY + 20);
+    doc.text(`State : KERALA, Code : 32`, rightBlockX, buyerY + 25);
+
+    // ============================
+    // INVOICE INFO - LEFT
+    // ============================
+    let infoY = buyerY + 35;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Invoice Serial No : ${header.SALE_NO}`, leftX, infoY);
+
+    doc.setFont('helvetica', 'normal');
+    infoY += 6;
+    doc.text(`Invoice Date : ${header.RET_DATE.split('T')[0]}`, leftX, infoY);
+    infoY += 6;
+    doc.text(`Vehicle No : ${header.VEHICLE_NO || '-'}`, leftX, infoY);
+    infoY += 6;
+    doc.text(`Mode of Transport :`, leftX, infoY);
+
+    // ============================
+    // MOVE Y FOR TABLE
+    // ============================
+    y = infoY + 10;
 
     // ============================
     // TABLE
     // ============================
-    y = blueY + blueH + 10;
 
     const rows = details.map((item: any, index: number) => [
       index + 1,
