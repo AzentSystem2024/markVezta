@@ -68,7 +68,7 @@ export class TrialBalanceReportComponent {
 
       this.formatted_from_date = SystemDate;
       this.formatted_To_date = SystemDate;
-
+  this.get_DataSource();
    }
 
    //================ Year value change ===================

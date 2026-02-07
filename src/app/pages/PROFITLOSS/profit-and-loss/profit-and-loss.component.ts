@@ -75,6 +75,7 @@ totalExpense: number = 0;
 
       this.formatted_from_date = SystemDate;
       this.formatted_To_date = SystemDate;
+      this.get_DataSource();
        }
 
        sesstion_Details(){

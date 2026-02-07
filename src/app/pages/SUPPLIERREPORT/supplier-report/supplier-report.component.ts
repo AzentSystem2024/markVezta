@@ -58,8 +58,8 @@ export class SupplierReportComponent {
 
              ngOnInit() {
   // initialize with today's date
-  this.onToDateChange({ value: this.defaultDate });
-  this.get_DataSource() //get datasource======== function call==========
+  // this.onToDateChange({ value: this.defaultDate });
+  //get datasource======== function call==========
 
    const today = new Date();
     const SystemDate =
@@ -71,7 +71,7 @@ export class SupplierReportComponent {
 
       this.formatted_from_date = SystemDate;
       this.formatted_To_date = SystemDate;
-
+ this.get_DataSource()
 }
 
   //================ Year value change ===================
@@ -153,7 +153,7 @@ export class SupplierReportComponent {
             console.log(sessionYear,'==================session year==========')
 const financialYeaDate=sessionYear[0].DATE_FROM
 console.log(financialYeaDate,'=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[')
-this.formatted_from_date=financialYeaDate
+// this.formatted_from_date=financialYeaDate
   }
 
   onSupplierChanged(event:any){
@@ -240,7 +240,11 @@ onViewClick(e: any) {
     
 
        get_Supplier_dropdown(){
-    this.dataservice.Supplier_Dropdown().subscribe((res: any) => {
+        const payload = {
+          NAME : 'SUPPLIER',
+          COMPANY_ID: this.selected_Company_id
+        }
+    this.dataservice.Supplier_Dropdown(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
     });

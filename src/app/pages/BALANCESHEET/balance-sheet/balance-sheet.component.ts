@@ -58,8 +58,8 @@ export class BalanceSheetComponent {
 
            ngOnInit() {
   // initialize with today's date
-  this.onToDateChange({ value: this.defaultDate });
-  this.get_DataSource() //get datasource======== function call==========
+  // this.onToDateChange({ value: this.defaultDate });
+   //get datasource======== function call==========
   const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -70,6 +70,7 @@ export class BalanceSheetComponent {
 
       this.formatted_from_date = SystemDate;
       this.formatted_To_date = SystemDate;
+      this.get_DataSource()
 }
     
  //================ Year value change ===================

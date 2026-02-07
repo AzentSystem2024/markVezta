@@ -235,7 +235,11 @@ generateSchedule() {
   }
 
   get_Supplier_dropdown(){
-    this.dataservice.Supplier_Dropdown().subscribe((res: any) => {
+    const payload  = {
+      NAME : 'SUPPLIER',
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.Supplier_Dropdown(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
     });

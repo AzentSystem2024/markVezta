@@ -1270,9 +1270,13 @@ export class DataService {
     return this.http.post(getEndpoint, payload);
   }
   //=============PDC===============
-  Supplier_Dropdown() {
-    const reqbody = { NAME: 'SUPPLIER' };
-    return this.http.post(`${this.apiUrl}dropdown`, reqbody);
+  // Supplier_Dropdown() {
+  //   const reqbody = { NAME: 'SUPPLIER' };
+  //   return this.http.post(`${this.apiUrl}dropdown`, reqbody);
+  // }
+  Supplier_Dropdown(payload) {
+    const getEndpoint = `${this.apiUrl}dropdown`;
+    return this.http.post(getEndpoint, payload);
   }
 
   Bank_Dropdown(companyId: any) {

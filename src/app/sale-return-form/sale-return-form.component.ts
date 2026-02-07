@@ -957,10 +957,10 @@ doc.text('Dispatched From', leftX, dispatchY);
 doc.setFont('helvetica', 'normal');
 dispatchY += 6;
 doc.text(header.COMPANY_NAME, leftX, dispatchY);
-doc.text('Kozhikode', leftX, dispatchY + 5);
-doc.text('Kozhikode', leftX, dispatchY + 10);
-doc.text('Kozhikode', leftX, dispatchY + 15);
-doc.text(`GSTIN/UIN : ${header.COMPANY_GST}`, leftX, dispatchY + 20);
+doc.text(header.COMPANY_ADDRESS1 || 'Kozhikode', leftX, dispatchY + 5);
+doc.text(header.COMPANY_ADDRESS2 || 'Kozhikode', leftX, dispatchY + 10);
+doc.text(header.COMPANY_ADDRESS3 || 'Kozhikode', leftX, dispatchY + 15);
+doc.text(`GSTIN/UIN : ${header.CUST_CODE}`, leftX, dispatchY + 20);
 
 // ============================
 // BUYER (BILL TO) - RIGHT BELOW
@@ -973,9 +973,9 @@ doc.text('Buyer (Bill to)', rightBlockX, buyerY);
 doc.setFont('helvetica', 'normal');
 buyerY += 6;
 doc.text(header.CUST_NAME, rightBlockX, buyerY);
-doc.text('Kozhikode', rightBlockX, buyerY + 5);
-doc.text('Kozhikode', rightBlockX, buyerY + 10);
-doc.text('Kozhikode', rightBlockX, buyerY + 15);
+doc.text(header.CUST_ADDRESS1 || 'Kozhikode', rightBlockX, buyerY + 5);
+doc.text(header.CUST_ADDRESS2 || 'Kozhikode', rightBlockX, buyerY + 10);
+doc.text(header.CUST_ADDRESS3 || 'Kozhikode', rightBlockX, buyerY + 15);
 doc.text(`GSTIN/UIN : ${header.CUST_CODE}`, rightBlockX, buyerY + 20);
 doc.text(`State : KERALA, Code : 32`, rightBlockX, buyerY + 25);
 
