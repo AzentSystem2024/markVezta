@@ -42,6 +42,7 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./purchase-order-new-form.component.scss'],
 })
 export class PurchaseOrderNewFormComponent implements OnInit {
+  @ViewChild('supplierItemsGrid') supplierItemsGrid: DxDataGridComponent;
   @Input() refreshPoNumber = false;
   @Output() netAmountChange = new EventEmitter<any>();
   @Output() netSupplierAmountChange = new EventEmitter<any>();
@@ -492,6 +493,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.selectedTabIndex = 0;
     this.getPoNumber();
     this.sessionDetails();
     this.getDocNo();
@@ -1035,8 +1037,21 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.savedItems = [];
     this.isSupplierTouched = false;
     this.isSupplierValid = true;
+    this.supplierItemsGrid?.instance?.clearSelection();
     // this.resetForm();        // optional: clear form data
     this.showAddItemPopup = false; // 🔥 close popup
+  }
+
+  onPopupClosing() {
+    // clear grid selection
+    this.supplierItemsGrid?.instance?.clearSelection();
+
+    // optional: reset form
+    // this.resetForm();
+    // this.newPoData = {};
+    // this.savedItems = [];
+    // this.isSupplierTouched = false;
+    // this.isSupplierValid = true;
   }
 
   // Parent component

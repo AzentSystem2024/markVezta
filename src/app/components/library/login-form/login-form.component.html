@@ -24,8 +24,8 @@
         {
           name: 'user',
           location: 'before',
-          options: { icon: 'user', stylingMode: 'text' }
-        }
+          options: { icon: 'user', stylingMode: 'text', tabIndex: -1 },
+        },
       ]"
     >
       <div *dxTemplate="let data of 'before'">
@@ -34,7 +34,7 @@
     </dx-text-box>
     <dx-validator
       [validationRules]="[
-        { type: 'required', message: 'Username is required' }
+        { type: 'required', message: 'Username is required' },
       ]"
     >
     </dx-validator>
@@ -53,7 +53,7 @@
         {
           name: 'user',
           location: 'before',
-          options: { icon: 'lock', stylingMode: 'text' }
+          options: { icon: 'lock', stylingMode: 'text', tabIndex: -1 },
         },
         {
           name: 'togglePassword',
@@ -62,9 +62,9 @@
             icon:
               passwordMode === 'password' ? 'fas fa-eye-slash' : 'fas fa-eye',
             stylingMode: 'text',
-            onClick: togglePasswordVisibility
-          }
-        }
+            onClick: togglePasswordVisibility,
+          },
+        },
       ]"
     >
       <!-- Lock icon before input -->
@@ -86,7 +86,7 @@
     </dx-text-box>
     <dx-validator
       [validationRules]="[
-        { type: 'required', message: 'Password is required' }
+        { type: 'required', message: 'Password is required' },
       ]"
     >
     </dx-validator>
@@ -103,7 +103,7 @@
     >
       <dx-validator
         [validationRules]="[
-          { type: 'required', message: 'Company Name is required' }
+          { type: 'required', message: 'Company Name is required' },
         ]"
       ></dx-validator>
     </dx-select-box>
@@ -121,7 +121,7 @@
     </dx-select-box>
     <dx-validator
       [validationRules]="[
-        { type: 'required', message: 'Financial Year is required' }
+        { type: 'required', message: 'Financial Year is required' },
       ]"
     >
     </dx-validator>

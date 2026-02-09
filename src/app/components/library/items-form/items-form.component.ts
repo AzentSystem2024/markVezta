@@ -61,7 +61,7 @@ export class ItemsFormComponent implements OnInit {
   @ViewChild('fileUploader', { static: false }) fileUploader!: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('supplierGridRef')
-supplierGrid!: DxDataGridComponent;
+  supplierGrid!: DxDataGridComponent;
 
   //  priorities: string[] = ['Standard code', 'Tally code',];
   //  priorities = [
@@ -214,7 +214,7 @@ supplierGrid!: DxDataGridComponent;
     authservice: AuthService,
     private imageService: ImageService,
     private cdr: ChangeDetectorRef,
-    private countryFlagService: CountryServiceService
+    private countryFlagService: CountryServiceService,
   ) {
     this.sesstion_Details();
     this.selectedPriority = 1;
@@ -270,7 +270,6 @@ supplierGrid!: DxDataGridComponent;
       this.store = data;
     });
     const brandPayload = {
-    
       NAME: 'brand',
     };
     dataservice.getDropdownData(brandPayload).subscribe((data) => {
@@ -363,7 +362,6 @@ supplierGrid!: DxDataGridComponent;
       this.costingMethodOptions = data;
     });
     const packingPayload = {
-     
       NAME: 'PACKING',
     };
     dataservice.getDropdownData(packingPayload).subscribe((data) => {
@@ -430,7 +428,7 @@ supplierGrid!: DxDataGridComponent;
     ITEM_PROPERTY5: 0,
     COSTING_METHOD: 0,
     REORDER_POINT: 0,
-    UNIT_ID: 0,
+    UNIT_ID: null,
     PACKING_ID: 0,
     POS_DESCRIPTION: '',
     HSN_CODE: '',
@@ -483,13 +481,13 @@ supplierGrid!: DxDataGridComponent;
 
   newItems = this.formItemsData;
   // getNewItems = () => ({
-    
+
   //   ...this.newItems,
-    
+
   //   // ✅ Force UOM_PURCH as string before API call
   //   UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
   //   ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
-    
+
   //   // COMPANY_ID: this.selected_Company_id,
 
   //   //  SUPPLIER MAPPING (KEY FIX)
@@ -505,37 +503,33 @@ supplierGrid!: DxDataGridComponent;
   // });
 
   getNewItems = () => {
+    //  FORCE supplier grid to commit edits
+    this.supplierGrid?.instance.saveEditData();
 
-  //  FORCE supplier grid to commit edits
-  this.supplierGrid?.instance.saveEditData();
+    return {
+      ...this.newItems,
 
-  return {
-    ...this.newItems,
+      UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
 
-    UOM_PURCH: this.newItems.UOM_PURCH
-      ? String(this.newItems.UOM_PURCH)
-      : '',
+      ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
 
-    ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
-
-    //  SUPPLIER PAYLOAD (NOW WILL WORK)
-    ITEM_SUPPLIERS: (this.datasource || [])
-      .filter(s => s.SUPP_ID)
-      .map(s => ({
-        SUPP_ID: Number(s.SUPP_ID),
-        REORDER_NO: String(s.REORDER_NO || ''),
-        COST: Number(s.COST) || 0,
-        IS_PRIMARY: !!s.IS_PRIMARY,
-        IS_CONSIGNMENT: !!s.IS_CONSIGNMENT,
-      })),
+      //  SUPPLIER PAYLOAD (NOW WILL WORK)
+      ITEM_SUPPLIERS: (this.datasource || [])
+        .filter((s) => s.SUPP_ID)
+        .map((s) => ({
+          SUPP_ID: Number(s.SUPP_ID),
+          REORDER_NO: String(s.REORDER_NO || ''),
+          COST: Number(s.COST) || 0,
+          IS_PRIMARY: !!s.IS_PRIMARY,
+          IS_CONSIGNMENT: !!s.IS_CONSIGNMENT,
+        })),
+    };
   };
-};
-
 
   ngOnInit() {
     this.showItems();
     this.sesstion_Details();
-    
+
     // this.loadImageFromLocalStorage();
   }
 
@@ -546,31 +540,31 @@ supplierGrid!: DxDataGridComponent;
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
     console.log(
       this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1=============='
+      '============ITEM_PROPERTY1==============',
     );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
     console.log(
       this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2=============='
+      '============ITEM_PROPERTY2==============',
     );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
     console.log(
       this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3=============='
+      '============ITEM_PROPERTY3==============',
     );
 
     this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
     console.log(
       this.ITEM_PROPERTY4,
-      '============ITEM_PROPERTY4=============='
+      '============ITEM_PROPERTY4==============',
     );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
     console.log(
       this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5=============='
+      '============ITEM_PROPERTY5==============',
     );
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
@@ -587,7 +581,7 @@ supplierGrid!: DxDataGridComponent;
 
   filterDropdownOptions() {
     this.filteredDropdownOptions = this.uom.filter(
-      (option) => option.ID !== this.selectedUom
+      (option) => option.ID !== this.selectedUom,
     );
     console.log(this.filteredDropdownOptions, 'FILTERED');
   }
@@ -598,7 +592,7 @@ supplierGrid!: DxDataGridComponent;
     this.formItemsData.UOM_PURCH = String(this.selectedUom);
     console.log(
       '===============UOM_PURCH==========',
-      this.formItemsData.UOM_PURCH
+      this.formItemsData.UOM_PURCH,
     );
     this.filterDropdownOptions(); // Filter the options when the selection changes
   }
@@ -753,7 +747,7 @@ supplierGrid!: DxDataGridComponent;
     if (selectedRows.length > 0) {
       console.log(
         selectedRows,
-        '=============selected row==========================='
+        '=============selected row===========================',
       );
       selectedRows.forEach((row) => {
         row.SALE_PRICE = this.formItemsData.SALE_PRICE;
@@ -814,7 +808,7 @@ supplierGrid!: DxDataGridComponent;
     const storeId = e.data.ID;
     console.log(
       storeId,
-      '[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]][[][][][]'
+      '[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]][[][][][]',
     );
     const createDummyItemStore = (storeData: any) => {
       return {
@@ -845,7 +839,7 @@ supplierGrid!: DxDataGridComponent;
     }
 
     const existingIndex = this.selectedStoresMap.findIndex(
-      (item: any) => item.STORE_ID === e.data.ID
+      (item: any) => item.STORE_ID === e.data.ID,
     );
 
     if (existingIndex > -1) {
@@ -869,7 +863,7 @@ supplierGrid!: DxDataGridComponent;
         // console.log('hellow', e);
         const selectedSupplierId = e.value;
         const selectedSupplier = this.supplier.find(
-          (supplier) => supplier.ID === selectedSupplierId
+          (supplier) => supplier.ID === selectedSupplierId,
         );
         if (selectedSupplier) {
           // Update currency value based on selected supplier
@@ -881,19 +875,19 @@ supplierGrid!: DxDataGridComponent;
           event.component.cellValue(
             event.row.rowIndex,
             'CURRENCY',
-            this.CURRENCY
+            this.CURRENCY,
           );
 
           console.log(
             event,
-            '===================event========================='
+            '===================event=========================',
           );
           console.log(
             event.component.cellValue(
               event.row.rowIndex,
               'CURRENCY',
-              this.CURRENCY
-            )
+              this.CURRENCY,
+            ),
           );
         } else {
           // Reset currency value if no supplier is selected
@@ -918,7 +912,7 @@ supplierGrid!: DxDataGridComponent;
   onRowInserted(event: any) {
     console.log(
       event,
-      '===========================test==========================='
+      '===========================test===========================',
     );
     // const newRecordIsPrimary = event.data.IS_PRIMARY === true;
 
@@ -935,7 +929,7 @@ supplierGrid!: DxDataGridComponent;
         (supplier) => supplier.REORDER_NO.trim() !== '',
         (supplier) => supplier.COST.trim() !== '',
         (supplier) => supplier.IS_PRIMARY.trim() !== '',
-        (supplier) => supplier.IS_CONSIGNMENT.trim() !== ''
+        (supplier) => supplier.IS_CONSIGNMENT.trim() !== '',
       );
 
     this.formItemsData.ITEM_SUPPLIERS.push({
@@ -970,7 +964,7 @@ supplierGrid!: DxDataGridComponent;
   onRowUpdatedAlias(event: any) {
     // Find the index of the alias being updated
     const index = this.formItemsData.ITEM_ALIAS.findIndex(
-      (alias) => alias.ALIAS === event.oldData.ALIAS
+      (alias) => alias.ALIAS === event.oldData.ALIAS,
     );
     if (index !== -1) {
       // Update the alias value
@@ -1020,7 +1014,7 @@ supplierGrid!: DxDataGridComponent;
       (error) => {
         console.error('Error fetching items:', error);
         this.isLoading = false;
-      }
+      },
     );
   }
 
@@ -1043,7 +1037,7 @@ supplierGrid!: DxDataGridComponent;
       this.selectedItemCode = selectedItem.ITEM_CODE; // Optionally capture the ITEM_CODE
       // Optionally, bind them to your form data or use them in your application
       const selectedItemDetails = this.newItemList.find(
-        (item) => item.ID === this.selectedItemId
+        (item) => item.ID === this.selectedItemId,
       );
       this.newItemList.forEach((item) => {
         item.displayValue = `${item.ITEM_CODE} - ${item.DESCRIPTION}`;
@@ -1056,7 +1050,6 @@ supplierGrid!: DxDataGridComponent;
   }
 
   saveItem(): void {
-
     console.log(this.selectedItemId, 'IN SAVEEEEEEEEEE');
     console.log('Form data:', this.formData);
     if (
@@ -1070,7 +1063,7 @@ supplierGrid!: DxDataGridComponent;
 
     // Get the description for the selected item
     const selectedItem = this.newItemList.find(
-      (item) => item.ID === this.selectedItemId
+      (item) => item.ID === this.selectedItemId,
     );
     // const selectedUom = this.newItemList.find(item => === this.)
     console.log(selectedItem, 'SELECTEDITEMMMMMMMMM');

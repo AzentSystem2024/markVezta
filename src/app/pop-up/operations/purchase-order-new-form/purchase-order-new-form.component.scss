@@ -238,3 +238,22 @@
 .dx-datagrid .dx-editor-cell {
   background-color: transparent !important; /* removes the yellowish background */
 }
+:host ::ng-deep .dx-tabs .dx-tab {
+  background-color: transparent !important; /* unselected tabs */
+  color: inherit;
+  box-shadow: none !important;
+}
+
+/* selected tab → light blue */
+:host ::ng-deep .dx-tabs .dx-tab.dx-tab-selected {
+  background-color: #e8f3ff !important; /* very light blue */
+  color: #1f4e79 !important;
+}
+
+/* remove dark hover / focus / active effects */
+:host ::ng-deep .dx-tabs .dx-tab.dx-state-hover,
+:host ::ng-deep .dx-tabs .dx-tab.dx-state-focused,
+:host ::ng-deep .dx-tabs .dx-tab.dx-state-active {
+  background-color: #e8f3ff !important;
+  box-shadow: none !important;
+}

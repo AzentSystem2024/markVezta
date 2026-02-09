@@ -268,16 +268,15 @@ export class LoginFormComponent implements OnInit {
             displayTime: 5000,
             position: { at: 'top right', my: 'top right' },
           });
+        } else {
+          // Backend validation message
+          notify({
+            message: res.Message || 'Username or password is incorrect',
+            type: 'success',
+            displayTime: 3000,
+            position: { at: 'top right', my: 'top right' },
+          });
         }
-        // else {
-        //   // Backend validation message
-        //   notify({
-        //     message: res.Message || 'Username or password is incorrect',
-        //     type: 'error',
-        //     displayTime: 3000,
-        //     position: { at: 'top right', my: 'top right' },
-        //   });
-        // }
         this.loading = false;
       },
       error: () => {

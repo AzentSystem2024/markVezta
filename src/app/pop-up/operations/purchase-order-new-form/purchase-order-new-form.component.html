@@ -444,7 +444,7 @@
         showSpinButtons: true,
         min: 0,
         format: '#0',
-        mode: 'number'
+        mode: 'number',
       }"
     ></dxi-column>
     <dxi-column
@@ -630,9 +630,11 @@
     [showTitle]="true"
     [title]="'Add Item'"
     [closeOnOutsideClick]="true"
+    (onHiding)="onPopupClosing()"
   >
     <div *dxTemplate="let data of 'content'">
       <dx-data-grid
+        #supplierItemsGrid
         [columnAutoWidth]="true"
         [showBorders]="true"
         [height]="'70vh'"
