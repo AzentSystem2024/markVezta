@@ -129,15 +129,15 @@ export class LedgerStatementComponent {
   isReadOnlyTrIn: boolean = true;
   isEditCustomerReceipt: boolean = false;
   ledgerRowCount = 0;
-   selectedYear: number | null = null;
-   years: number[] = [];
-   monthDataSource: { name: string; value: any }[];
-   selectedmonth: any = '';
+  selectedYear: number | null = null;
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[];
+  selectedmonth: any = '';
   constructor(
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {
     // this.resetPopups();
     this.get_sessionstorage_data();
@@ -153,23 +153,23 @@ export class LedgerStatementComponent {
         }
       });
 
-       //============Year field dataSource===============
+    //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
     this.selectedYear = currentYear;
-      //============Month field dataSource===============
-     this.monthDataSource = this.dataService.getMonths();
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataService.getMonths();
   }
 
   ngOnInit() {
-      // this.resetPopups();
-       // Prevent stale popup rendering
-  setTimeout(() => {
-    this.popupReady = false;
-    this.cdr.detectChanges();
-  });
+    // this.resetPopups();
+    // Prevent stale popup rendering
+    setTimeout(() => {
+      this.popupReady = false;
+      this.cdr.detectChanges();
+    });
 
     this.loadLedgerData();
 
@@ -181,7 +181,7 @@ export class LedgerStatementComponent {
         console.log(this.HEAD_ID_LIST);
       });
 
-      const today = new Date();
+    const today = new Date();
     const SystemDate =
       today.getFullYear() +
       '-' +
@@ -189,12 +189,11 @@ export class LedgerStatementComponent {
       '-' +
       String(today.getDate()).padStart(2, '0');
 
-      this.selected_from_date = SystemDate;
-      this.selected_To_date = SystemDate;
-
+    this.selected_from_date = SystemDate;
+    this.selected_To_date = SystemDate;
   }
 
-   //================ Year value change ===================
+  //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
     this.selectedmonth = '';
@@ -210,19 +209,22 @@ export class LedgerStatementComponent {
     }
   }
 
-
-   //================Month value change ===================
+  //================Month value change ===================
   onMonthValueChanged(e: any) {
     this.selectedmonth = e.value ?? '';
     if (this.selectedmonth === '') {
       this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
       this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
     } else {
-      this.selected_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.selected_from_date = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
       this.selected_To_date = new Date(
         this.selectedYear,
         this.selectedmonth + 1,
-        0
+        0,
       );
     }
   }
@@ -247,7 +249,7 @@ export class LedgerStatementComponent {
   //   this.editSalaryPopup = false;
   //   this.EditDepreciationPopupVisible = false;
   //   this.isEditPopUp = false;
-    
+
   //   // this.isEditPopupPrepaymentPosting = false;
   // }
 
@@ -257,28 +259,27 @@ export class LedgerStatementComponent {
   }
 
   createLedgerDataSource(payload: any) {
-    console.log("testingssssssss+++++++++++++++++++++++++")
-  this.Ledger_statement_datasource = new DataSource({
-    load: () =>
-      new Promise((resolve, reject) => {
-        this.dataService.get_ladger_statement_api(payload).subscribe({
-          next: (res: any) => {
-            const data = res?.data || [];
+    console.log('testingssssssss+++++++++++++++++++++++++');
+    this.Ledger_statement_datasource = new DataSource({
+      load: () =>
+        new Promise((resolve, reject) => {
+          this.dataService.get_ladger_statement_api(payload).subscribe({
+            next: (res: any) => {
+              const data = res?.data || [];
 
-            this.ledgerSummaryData = data;
-            this.ledgerRowCount = data.length; // ✅ store length
+              this.ledgerSummaryData = data;
+              this.ledgerRowCount = data.length; // ✅ store length
 
-            resolve(data);
-          },
-          error: () => {
-            this.ledgerRowCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(data);
+            },
+            error: () => {
+              this.ledgerRowCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   async loadLedgerData() {
     // this.ledgerSummaryData=this.Ledger_statement_datasource
@@ -329,8 +330,6 @@ export class LedgerStatementComponent {
     }
   }
 
-  
-
   onCompanyChange(event: any) {
     this.company_id = event.value;
     console.log(this.company_id, 'COMPANYOD');
@@ -370,29 +369,28 @@ export class LedgerStatementComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
   }
-  
+
   load_Ledgre_data() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id,
-    FIN_ID: this.selected_fin_id,
-    HEAD_ID: this.selected_Head_Id,
-    DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
-    DATE_TO: this.formatted_To_date ?? this.selected_To_date,
-  };
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.selected_fin_id,
+      HEAD_ID: this.selected_Head_Id,
+      DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
+      DATE_TO: this.formatted_To_date ?? this.selected_To_date,
+    };
 
-  this.createLedgerDataSource(payload);
-}
-
+    this.createLedgerDataSource(payload);
+  }
 
   formatDates(cellData: any): string {
     const date = new Date(cellData);
@@ -435,7 +433,7 @@ export class LedgerStatementComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedJournalVoucher,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TRANS_TYPE_ID === 36) {
@@ -487,7 +485,7 @@ export class LedgerStatementComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedPurchaseReturn,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TRANS_TYPE_ID === 14) {
@@ -544,7 +542,7 @@ export class LedgerStatementComponent {
           this.cdr.detectChanges();
           console.log(
             this.Selected_Depreciation_data,
-            'Selected_Depreciation_data====='
+            'Selected_Depreciation_data=====',
           );
         });
     } else if (TRANS_TYPE_ID === 38) {
@@ -557,7 +555,7 @@ export class LedgerStatementComponent {
           this.cdr.detectChanges();
           console.log(
             this.Selected_Depreciation_data,
-            'Selected_Depreciation_data====='
+            'Selected_Depreciation_data=====',
           );
         });
     } else if (TRANS_TYPE_ID === 30) {
@@ -570,7 +568,7 @@ export class LedgerStatementComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedSalaryData,
-            'Selected_Depreciation_data====='
+            'Selected_Depreciation_data=====',
           );
         });
     } else if (TRANS_TYPE_ID === 21) {
@@ -597,7 +595,7 @@ export class LedgerStatementComponent {
           this.cdr.detectChanges();
           console.log(
             this.selectedmiscellaneousData,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TRANS_TYPE_ID === 28) {
@@ -607,15 +605,16 @@ export class LedgerStatementComponent {
         this.isEditPopUp = true;
         this.cdr.detectChanges();
       });
-    } 
-    else if (TRANS_TYPE_ID === 1) {
+    } else if (TRANS_TYPE_ID === 1) {
       console.log('=====navigate =====');
-      
-      this.dataService.selectOpeningBalance(trans_id).subscribe((response: any) => {
-        this.selected_Data = response;
-        this.isEditPopUp = true;
-        this.cdr.detectChanges();
-      });
+
+      this.dataService
+        .selectOpeningBalance(trans_id)
+        .subscribe((response: any) => {
+          this.selected_Data = response;
+          this.isEditPopUp = true;
+          this.cdr.detectChanges();
+        });
     } else if (TRANS_TYPE_ID === 28) {
       console.log('=====navigate =====');
       this.dataService.select_Advance(trans_id).subscribe((response: any) => {
@@ -629,7 +628,6 @@ export class LedgerStatementComponent {
     }
   }
 
- 
   // POPUP shown → allow child to render
   onPopupShown() {
     this.popupReady = true;
@@ -725,7 +723,7 @@ export class LedgerStatementComponent {
           const val = parseFloat(
             String(item?.DR_AMOUNT || '0')
               .replace(/,/g, '')
-              .trim()
+              .trim(),
           );
           return sum + (isNaN(val) ? 0 : val);
         }, 0);
@@ -734,7 +732,7 @@ export class LedgerStatementComponent {
           const val = parseFloat(
             String(item?.CR_AMOUNT || '0')
               .replace(/,/g, '')
-              .trim()
+              .trim(),
           );
           return sum + (isNaN(val) ? 0 : val);
         }, 0);

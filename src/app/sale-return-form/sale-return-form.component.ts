@@ -1169,7 +1169,7 @@ export class SaleReturnFormComponent {
     doc.output('dataurlnewwindow');
   }
 
-   numberToWords(amount: number): string {
+  numberToWords(amount: number): string {
     if (amount === 0) return 'Zero Rupees Only';
 
     const words = [

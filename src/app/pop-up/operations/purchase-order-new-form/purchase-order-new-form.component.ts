@@ -77,7 +77,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   companyStateID: any;
   previousSupplierId: any;
 
-  constructor(private service: DataService, private router: Router) {
+  constructor(
+    private service: DataService,
+    private router: Router,
+  ) {
     const settingsData = sessionStorage.getItem('settings');
     this.settingsData = settingsData ? JSON.parse(settingsData) : null;
   }
@@ -146,7 +149,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     ID: 0,
     COMPANY_ID: 0,
     USER_ID: 0,
-    STORE_ID: '',
+    STORE_ID: 0,
     PO_NO: '',
     PO_DATE: new Date(),
     SUPP_ID: '',
@@ -458,7 +461,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.savedItems = [
       ...this.savedItems,
       ...newItems.filter(
-        (n) => !this.savedItems.some((s) => s.ITEM_ID === n.ITEM_ID)
+        (n) => !this.savedItems.some((s) => s.ITEM_ID === n.ITEM_ID),
       ),
     ];
 
@@ -475,7 +478,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     console.log(
       this.GST_PERC,
-      '===========selected GST PERC==================='
+      '===========selected GST PERC===================',
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -484,7 +487,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.poData.USER_ID = sessionData.USER_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -495,11 +498,11 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     this.menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log(
       'Parsed ObjectData:',
-      this.menuResponse.GeneralSettings.STORE_TITLE
+      this.menuResponse.GeneralSettings.STORE_TITLE,
     );
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
     // this.sessionData_tax()
@@ -535,7 +538,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   calculateTotalQuantity() {
     this.totalQuantity = this.savedItems.reduce(
       (sum, item) => sum + Number(item.qtyOrdered || 0),
-      0
+      0,
     );
     this.netQuantityChange.emit(this.totalQuantity);
   }
@@ -600,7 +603,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
       if (this.SupplierCurrencyCode !== this.localCurrencyCode) {
         item.PURCH_PRICE = parseFloat(
-          (item.SUPP_PRICE / this.newPoData.EXCHANGE_PRICE).toFixed(2)
+          (item.SUPP_PRICE / this.newPoData.EXCHANGE_PRICE).toFixed(2),
         );
       } else {
         item.PURCH_PRICE = Number(updatedRow.PURCH_PRICE) || 0;
@@ -655,7 +658,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     /* ---------------- VAT AMOUNT ---------------- */
 
     item.vatAmount = parseFloat(
-      (item.taxable * (totalTaxPerc / 100)).toFixed(2)
+      (item.taxable * (totalTaxPerc / 100)).toFixed(2),
     );
 
     /* ---------------- TOTAL ---------------- */
@@ -693,7 +696,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     };
 
     const index = this.poData.PoDetails.findIndex(
-      (d: any) => d.ITEM_ID === item.ITEM_ID
+      (d: any) => d.ITEM_ID === item.ITEM_ID,
     );
 
     if (index !== -1) {
@@ -769,7 +772,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   GetSupplierList() {
-    console.log('supplier list ===== function in purchase order')
+    console.log('supplier list ===== function in purchase order');
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.companyID,
@@ -884,7 +887,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -943,7 +946,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   customSum(
-    options: Parameters<DxDataGridTypes.Summary['calculateCustomSummary']>[0]
+    options: Parameters<DxDataGridTypes.Summary['calculateCustomSummary']>[0],
   ) {
     console.log('options:', options); // Log the entire options object
     // Start each column's calculation

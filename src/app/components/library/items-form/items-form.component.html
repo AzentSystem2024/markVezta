@@ -276,6 +276,7 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-check-box
+                  class="custom-checkbox"
                   [(value)]="newItems.IS_DIFFERENT_UOM_PURCH"
                   text="Is Different UOM"
                   [width]="150"
@@ -543,7 +544,7 @@
           allowUpdating: true,
           allowDeleting: true,
           allowAdding: true,
-          useIcons: true
+          useIcons: true,
         }"
       >
         <dxi-column
@@ -880,7 +881,7 @@
                     <dx-data-grid
                       [dataSource]="parentitem"
                       [columns]="[
-                        { dataField: 'DESCRIPTION', caption: 'Description' }
+                        { dataField: 'DESCRIPTION', caption: 'Description' },
                       ]"
                       [selection]="{ mode: 'single' }"
                       [hoverStateEnabled]="true"
@@ -889,7 +890,7 @@
                       [filterRow]="{ visible: true }"
                       [searchPanel]="{
                         visible: true,
-                        highlightCaseSensitive: false
+                        highlightCaseSensitive: false,
                       }"
                       [height]="'50vh'"
                       (onSelectionChanged)="onParentItemChanged($event)"
@@ -1087,7 +1088,7 @@
             allowUpdating: true,
             allowDeleting: true,
             allowAdding: true,
-            useIcons: true
+            useIcons: true,
           }"
         >
           <!-- <dxo-editing mode="row" [allowAdding]="true" [allowDeleting]="true"> -->
@@ -1200,7 +1201,7 @@
                 [columns]="[
                   { dataField: 'ITEM_CODE', caption: 'Code' },
                   { dataField: 'DESCRIPTION', caption: 'Description' },
-                  { dataField: 'UOM', caption: 'UOM', visible: false }
+                  { dataField: 'UOM', caption: 'UOM', visible: false },
                 ]"
                 [selection]="{ mode: 'single' }"
                 [hoverStateEnabled]="true"

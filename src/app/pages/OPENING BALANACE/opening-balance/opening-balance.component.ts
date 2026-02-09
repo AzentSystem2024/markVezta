@@ -190,7 +190,8 @@ export class OpeningBalanceComponent {
         this.transId = data?.[0]?.TRANS_ID || null;
 
         // 🧩 Transform grid data
-        const transformedData = data.map((item: any) => ({
+        const transformedData = data.map((item: any, index: number) => ({
+          SL_NO: index + 1,
           ledgerCode: item.LEDGER_CODE,
           ledgerName: item.LEDGER_NAME,
           debitAmount: item.DEBIT_AMOUNT,
