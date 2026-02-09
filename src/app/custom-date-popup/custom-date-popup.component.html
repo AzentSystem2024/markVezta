@@ -1,0 +1,31 @@
+<dx-popup
+  [(visible)]="visible"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="170"
+  [dragEnabled]="false"
+  (onHiding)="onCancel()"
+>
+  <div class="date-range-container">
+    <dx-date-box
+      [(value)]="startDate"
+      type="date"
+      width="300"
+      displayFormat="dd-MM-yyyy"
+      placeholder="From Date"
+    ></dx-date-box>
+
+    <dx-date-box
+      [(value)]="endDate"
+      type="date"
+      placeholder="To Date"
+      displayFormat="dd-MM-yyyy"
+      width="300"
+    ></dx-date-box>
+  </div>
+
+  <div class="button-container">
+    <dx-button text="Apply" type="default" (onClick)="apply()"></dx-button>
+  </div>
+</dx-popup>

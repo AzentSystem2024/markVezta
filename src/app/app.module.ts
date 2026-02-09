@@ -1011,6 +1011,10 @@ import {
   SaleReturnFormComponent,
   SaleReturnFormModule,
 } from './sale-return-form/sale-return-form.component';
+import {
+  CustomDatePopupComponent,
+  CustomDatePopupModule,
+} from './custom-date-popup/custom-date-popup.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1378,6 +1382,7 @@ import {
     StockViewModule,
     SaleReturnModule,
     SaleReturnFormModule,
+    CustomDatePopupModule,
   ],
   providers: [
     AuthService,

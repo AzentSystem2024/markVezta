@@ -1,0 +1,127 @@
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  EventEmitter,
+  Input,
+  NgModule,
+  Output,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import {
+  DxSelectBoxModule,
+  DxTextAreaModule,
+  DxDateBoxModule,
+  DxFormModule,
+  DxTextBoxModule,
+  DxCheckBoxModule,
+  DxRadioGroupModule,
+  DxFileUploaderModule,
+  DxDataGridModule,
+  DxButtonModule,
+  DxValidatorModule,
+  DxProgressBarModule,
+  DxPopupModule,
+  DxDropDownBoxModule,
+  DxToolbarModule,
+  DxTabPanelModule,
+  DxTabsModule,
+  DxNumberBoxModule,
+} from 'devextreme-angular';
+import {
+  DxoItemModule,
+  DxoFormItemModule,
+  DxoLookupModule,
+  DxiItemModule,
+  DxiGroupModule,
+  DxoSummaryModule,
+} from 'devextreme-angular/ui/nested';
+import { FormTextboxModule } from '../components';
+import { AddCreditNoteModule } from '../pages/CREDIT-NOTE/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../pages/CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { AddDebitModule } from '../pages/DEBIT/add-debit/add-debit.component';
+import { EditDebitModule } from '../pages/DEBIT/edit-debit/edit-debit.component';
+import { ViewDebitModule } from '../pages/DEBIT/view-debit/view-debit.component';
+import { AddInvoiceModule } from '../pages/INVOICE/add-invoice/add-invoice.component';
+import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.component';
+import { InvoiceListComponent } from '../pages/INVOICE/invoice-list/invoice-list.component';
+import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
+
+@Component({
+  selector: 'app-custom-date-popup',
+  templateUrl: './custom-date-popup.component.html',
+  styleUrls: ['./custom-date-popup.component.scss'],
+})
+export class CustomDatePopupComponent {
+  @Input() visible = false;
+  @Input() startDate: Date | string | number | null = null;
+  @Input() endDate: Date | string | number | null = null;
+
+  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() applyDates = new EventEmitter<any>();
+  apply() {
+    if (!this.startDate || !this.endDate) return;
+
+    this.applyDates.emit({
+      start: this.startDate,
+      end: this.endDate,
+    });
+
+    this.visible = false;
+    this.visibleChange.emit(false);
+  }
+
+  onCancel() {
+    this.visible = false;
+    this.visibleChange.emit(false);
+  }
+}
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    DxSelectBoxModule,
+    DxTextAreaModule,
+    DxDateBoxModule,
+    DxFormModule,
+    DxTextBoxModule,
+    FormTextboxModule,
+    DxCheckBoxModule,
+    DxRadioGroupModule,
+    DxFileUploaderModule,
+    DxDataGridModule,
+    DxButtonModule,
+    DxoItemModule,
+    DxoFormItemModule,
+    DxoLookupModule,
+    DxValidatorModule,
+    DxProgressBarModule,
+    DxPopupModule,
+    DxDropDownBoxModule,
+    DxButtonModule,
+    DxToolbarModule,
+    DxiItemModule,
+    DxoItemModule,
+    DxTabPanelModule,
+    DxTabsModule,
+    DxiGroupModule,
+    FormsModule,
+    DxNumberBoxModule,
+    DxoSummaryModule,
+    AddCreditNoteModule,
+    EditCreditNoteModule,
+    ViewCreditNoteModule,
+    AddDebitModule,
+    EditDebitModule,
+    ViewDebitModule,
+    AddInvoiceModule,
+    EditInvoiceModule,
+    ViewInvoiceModule,
+  ],
+  providers: [],
+  declarations: [CustomDatePopupComponent],
+  exports: [CustomDatePopupComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class CustomDatePopupModule {}

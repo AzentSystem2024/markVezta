@@ -55,6 +55,7 @@ import notify from 'devextreme/ui/notify';
 import { ViewInvoiceModule } from '../view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-invoice-list',
@@ -751,6 +752,12 @@ export class InvoiceListComponent {
     );
   }
 
+  onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
   addInvoice() {
     this.isAddInvoice = true;
     this.cdr.detectChanges();
@@ -807,6 +814,7 @@ export class InvoiceListComponent {
     AddInvoiceModule,
     EditInvoiceModule,
     ViewInvoiceModule,
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [InvoiceListComponent],
