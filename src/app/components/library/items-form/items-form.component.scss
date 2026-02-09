@@ -543,7 +543,15 @@ button:hover {
 }
 
 ::ng-deep .field-spacing {
-  margin-bottom: 16px;   /* space between fields */
+  margin-bottom: 16px; /* space between fields */
+}
+
+.custom-checkbox .dx-checkbox-icon {
+  display: none;
+}
+
+.custom-checkbox .dx-checkbox-text {
+  margin-left: 0;
 }
 
 // .plus-btn {

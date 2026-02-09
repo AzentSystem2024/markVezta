@@ -255,7 +255,7 @@ export class LoginFormComponent implements OnInit {
           this.router.navigate(['/analytics-dashboard']);
 
           notify({
-            message: res.Message || 'Login successful!',
+            message: 'Login successful!',
             type: 'success',
             displayTime: 2000,
             position: { at: 'top right', my: 'top right' },
@@ -268,12 +268,11 @@ export class LoginFormComponent implements OnInit {
             displayTime: 5000,
             position: { at: 'top right', my: 'top right' },
           });
-        }
-        else  {
+        } else {
           // Backend validation message
           notify({
             message: res.Message || 'Username or password is incorrect',
-            type: 'error',
+            type: 'success',
             displayTime: 3000,
             position: { at: 'top right', my: 'top right' },
           });

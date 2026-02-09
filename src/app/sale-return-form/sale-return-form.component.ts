@@ -387,7 +387,10 @@ export class SaleReturnFormComponent {
   onTransferSelectClick() {
     const selectedRows =
       this.popupGridRef?.instance.getSelectedRowsData() || [];
-
+    if (!selectedRows.length) {
+      notify('Please select at least one row', 'warning', 3000);
+      return;
+    }
     if (selectedRows.length > 0) {
       selectedRows.forEach((row) => {
         const exists = this.mainGridData.some(
@@ -1169,7 +1172,7 @@ export class SaleReturnFormComponent {
     doc.output('dataurlnewwindow');
   }
 
-   numberToWords(amount: number): string {
+  numberToWords(amount: number): string {
     if (amount === 0) return 'Zero Rupees Only';
 
     const words = [

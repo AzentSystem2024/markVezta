@@ -78,10 +78,10 @@ export class StockMovementReportComponent {
   selected_fin_id: any;
   selectedstoreId: any;
   selected_item_Id: any;
-   selectedYear: number | null = null;
-   years: number[] = [];
-   monthDataSource: { name: string; value: any }[];
-   selectedmonth: any = '';
+  selectedYear: number | null = null;
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[];
+  selectedmonth: any = '';
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -117,14 +117,14 @@ export class StockMovementReportComponent {
     this.sesstion_Details();
     this.get_Item_Dropdown();
 
-     //============Year field dataSource===============
+    //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
     this.selectedYear = currentYear;
-      //============Month field dataSource===============
-     this.monthDataSource = this.dataService.getMonths();
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataService.getMonths();
   }
 
   ngOnInit() {
@@ -139,14 +139,10 @@ export class StockMovementReportComponent {
       String(today.getMonth() + 1).padStart(2, '0') +
       '-' +
       String(today.getDate()).padStart(2, '0');
-
       this.selected_from_date = SystemDate;
       this.selected_To_date = SystemDate;
       this.getStockMovement
-    // this.fromDate = today;
-    // this.toDate = today;
-
-    // this.formatted_from_date = this.formatDate(today);
+    
     // this.formatted_To_date = this.formatDate(today);
   }
 
@@ -158,7 +154,7 @@ export class StockMovementReportComponent {
     });
   }
 
-   //================ Year value change ===================
+  //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
     this.selectedmonth = '';
@@ -174,19 +170,22 @@ export class StockMovementReportComponent {
     }
   }
 
-
-   //================Month value change ===================
+  //================Month value change ===================
   onMonthValueChanged(e: any) {
     this.selectedmonth = e.value ?? '';
     if (this.selectedmonth === '') {
       this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
       this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
     } else {
-      this.selected_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.selected_from_date = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
       this.selected_To_date = new Date(
         this.selectedYear,
         this.selectedmonth + 1,
-        0
+        0,
       );
     }
   }
@@ -302,7 +301,7 @@ export class StockMovementReportComponent {
       DATE_TO: this.selected_To_date,
       ITEM_TYPE: this.selected_item_Id || 0,
     };
-
+    console.log(payload, 'PAYLOADDDDDDDDDDDDDDDDDDDD');
     this.dataService.StockMovement_Api(payload).subscribe({
       next: (res: any) => {
         this.StockMovementDatasource = res.data || [];

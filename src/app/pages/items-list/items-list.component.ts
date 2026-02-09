@@ -218,7 +218,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     onClick: () => this.toggleFilterRow(),
   };
 
- refreshButtonOptions = {
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
@@ -229,11 +229,27 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   };
 
   refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-    this.showItems();
+    const grid = this.dataGrid?.instance;
+    if (!grid) return;
+
+    // ✅ clear all filters (header filter + filter row + search)
+    grid.clearFilter();
+
+    // optional: clear sorting also
+    // grid.clearSorting();
+
+    // refresh data
+    grid.refresh();
+
+    this.showItems(); // reload API if needed
   }
+
+  // refreshGrid() {
+  //   if (this.dataGrid?.instance) {
+  //     this.dataGrid.instance.refresh(); // Or reload data from API if needed
+  //   }
+  //   this.showItems();
+  // }
 
   applyCustomDateFilter() {
     const start = new Date(this.customStartDate); // keep as Date
@@ -452,28 +468,27 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   }
 
   showItems() {
-  this.ItemsDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getItemsData().subscribe({
-          next: (response: any) => {
-            const data = (response?.data || []).reverse();
+    this.ItemsDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getItemsData().subscribe({
+            next: (response: any) => {
+              const data = (response?.data || []).reverse();
 
-            this.itemsArray = data;        // local cache
-            this.itemsCount = data.length;
+              this.itemsArray = data; // local cache
+              this.itemsCount = data.length;
 
-            resolve(data);                 // 🔑 stop loader
-          },
-          error: () => {
-            this.itemsArray = [];
-            this.itemsCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(data); // 🔑 stop loader
+            },
+            error: () => {
+              this.itemsArray = [];
+              this.itemsCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   //  : '',
   //     : '',
@@ -814,10 +829,9 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   }
 
   onExporting(event: any) {
-      const fileName = 'items-list';
-      this.dataservice.exportDataGrid(event, fileName);
-    }
-
+    const fileName = 'items-list';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
 }
 @NgModule({
   imports: [
