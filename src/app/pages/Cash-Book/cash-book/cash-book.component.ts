@@ -177,6 +177,7 @@ export class CashBookComponent {
 
     this.selected_from_date = SystemDate;
     this.selected_To_date = SystemDate;
+    this.Cash_book_data();
   }
   ngAfterViewInit() {
     setTimeout(() => this.handleClose());

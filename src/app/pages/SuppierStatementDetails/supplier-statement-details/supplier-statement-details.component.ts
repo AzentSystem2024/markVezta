@@ -92,7 +92,11 @@ export class SupplierStatementDetailsComponent {
     //     this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
     //     console.log(this.HEAD_ID_LIST);
     //   });
-    this.dataService.Supplier_Dropdown().subscribe((res: any) => {
+    const payload = {
+      COMPANY_ID : this.selected_Company_id,
+      NAME: ' SUPPLIER'
+    }
+    this.dataService.Supplier_Dropdown(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
     });

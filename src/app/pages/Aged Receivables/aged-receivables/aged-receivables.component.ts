@@ -100,8 +100,8 @@ customer_list:any[]=[]
   }
   ngOnInit() {
   // initialize with today's date
-  this.onToDateChange({ value: this.defaultDate });
-  this.GET_CUSTOMER_LIST() //get datasource======== function call==========
+  // this.onToDateChange({ value: this.defaultDate });
+   //get datasource======== function call==========
    const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -112,7 +112,7 @@ customer_list:any[]=[]
 
       this.formatted_from_date = SystemDate;
       this.formatted_To_date = SystemDate;
-
+this.GET_CUSTOMER_LIST()
 }
 
  //================ Year value change ===================

@@ -256,7 +256,11 @@ const TRANS_TYPE = e.row.data.DOC_TYPE
     
 
        get_Supplier_dropdown(){
-    this.dataservice.Supplier_Dropdown().subscribe((res: any) => {
+        const payload = {
+          COMPANY_ID : this.selected_Company_id,
+          NAME :'SUPPLIER'
+        }
+    this.dataservice.Supplier_Dropdown(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
     });
