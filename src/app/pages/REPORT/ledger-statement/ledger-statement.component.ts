@@ -63,6 +63,7 @@ import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 import DataSource from 'devextreme/data/data_source';
+import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 
 // import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 // import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
@@ -123,16 +124,20 @@ export class LedgerStatementComponent {
   isReadOnlyPurchaseReturn: boolean = true;
   selectedTrOut: any;
   selectedTrIn: any;
+  selectedSaleReturn : any;
   isEditTransferOut: boolean = false;
   isEditTransferIn: boolean = false;
   isReadOnlyTrOut: boolean = true;
   isReadOnlyTrIn: boolean = true;
+  isReadOnlySaleReturn : boolean = true;
   isEditCustomerReceipt: boolean = false;
+  isEditSaleReturn : boolean = false;
   ledgerRowCount = 0;
    selectedYear: number | null = null;
    years: number[] = [];
    monthDataSource: { name: string; value: any }[];
    selectedmonth: any = '';
+  transtypeId: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -419,6 +424,7 @@ export class LedgerStatementComponent {
     console.log(e, '=======event==========');
 
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
+   
     const trans_id = e.row.data.TRANS_ID;
     this.selectedInvoice = null;
     this.loadingInvoice = true;
@@ -624,10 +630,25 @@ export class LedgerStatementComponent {
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
+    } 
+    else if (TRANS_TYPE_ID === 26) {
+      console.log('=====navigate =====');
+      this.dataService.selectSaleReturn(trans_id).subscribe((response: any) => {
+        this.selectedSaleReturn = response;
+        this.isEditSaleReturn = true;
+        this.cdr.detectChanges();
+        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+      });
     } else {
       console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
     }
   }
+
+  isViewVisible(e: any): boolean {
+    console.log(e.row.data,'event')
+       this.transtypeId = e.row.data.TRANS_TYPE_ID
+  return this.transtypeId !== 0;
+}
 
  
   // POPUP shown → allow child to render
@@ -822,6 +843,7 @@ export class LedgerStatementComponent {
     PurchaseReturnDebitFormModule,
     TransferOutInventoryAddModule,
     TransferInInventoryFormModule,
+    SaleReturnFormModule,
   ],
   providers: [],
   declarations: [LedgerStatementComponent],

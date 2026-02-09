@@ -255,6 +255,7 @@
           icon="eyeopen"
           text="View"
           [onClick]="onViewClick.bind(this)"
+          [visible]="isViewVisible"
         ></dxi-button>
       </dxi-column>
     </dx-data-grid>
@@ -559,5 +560,22 @@
       [isReadOnlyMode]="isReadOnlyTrIn"
       (popupClosed)="handleClose()"
     ></app-transfer-in-inventory-form>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEditSaleReturn"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Sale Return"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditSaleReturn">
+    <app-sale-return-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedSaleReturn"
+      [isReadOnlyMode]="isReadOnlySaleReturn"
+      (popupClosed)="handleClose()"
+    ></app-sale-return-form>
   </ng-container>
 </dx-popup>

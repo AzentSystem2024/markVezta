@@ -163,10 +163,10 @@ export class CashBookComponent {
     this.monthDataSource = this.dataService.getMonths();
   }
   ngOnInit() {
-    this.handleClose();
+    console.log('ngOnInit CALLED ');
+    
 
-    this.Cash_book_Data_Values = this.Cash_book_datasource;
-
+    
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -175,9 +175,12 @@ export class CashBookComponent {
       '-' +
       String(today.getDate()).padStart(2, '0');
 
-    this.selected_from_date = SystemDate;
+    this.selected_from_date = new Date();
+    console.log(this.selected_from_date)
     this.selected_To_date = SystemDate;
+    console.log(this.selected_To_date)
     this.Cash_book_data();
+    
   }
   ngAfterViewInit() {
     setTimeout(() => this.handleClose());
