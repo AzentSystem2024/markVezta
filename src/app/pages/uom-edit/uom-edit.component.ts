@@ -53,7 +53,7 @@ export class UomEditComponent {
 
   listUom(){
     const payload ={
-      COMPANY_ID : this.selected_Company_id
+      // COMPANY_ID : this.selected_Company_id
     }
   this.service.getUomList(payload).subscribe((data) => {
     this.uomList = data
@@ -79,7 +79,7 @@ export class UomEditComponent {
         //  let country_id = combinedData.COUNTRY_ID;
       const id = this.formUomData.ID;
   const uom = this.formUomData.UOM;
-  const company_id = this.selected_Company_id
+  // const company_id = this.selected_Company_id
 
    // DUPLICATION CHECK (ignore same ID)
   const isDuplicate = this.uomList?.some(
@@ -100,7 +100,7 @@ export class UomEditComponent {
   }
 
       console.log(id, uom,'payload')
-         this.service.updateUom(id, uom,company_id)
+         this.service.updateUom(id, uom)
            .subscribe((data: any) => {
              if (data) {
                notify(

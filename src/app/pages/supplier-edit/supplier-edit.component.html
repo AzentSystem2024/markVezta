@@ -5,7 +5,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
-              label="Code"
+              label="Code *"
               [(value)]="supplierData.SUPP_CODE"
               labelMode="floating"
             >
@@ -23,7 +23,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
-              label="Address"
+              label="Address *"
               [(value)]="supplierData.ADDRESS1"
               labelMode="floating"
             >
@@ -44,7 +44,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
-              label=" "
+              label="Address"
               [(value)]="supplierData.ADDRESS2"
               labelMode="floating"
             ></dx-text-box>
@@ -57,7 +57,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
-              label=" "
+              label="Address"
               [(value)]="supplierData.ADDRESS3"
               labelMode="floating"
             ></dx-text-box>
@@ -70,13 +70,13 @@
         <div *ngIf="supplierData">
           <div *dxTemplate style="display: flex">
             <dx-text-box
-              label=" "
+              label="Address"
               [(value)]="DEFAULT_COUNTRY_CODE"
               class="country-code-input"
               labelMode="floating"
             ></dx-text-box>
             <dx-text-box
-              label="Mobile"
+              label="Mobile *"
               class="phone-style"
               [(value)]="supplierData.MOBILE_NO"
               labelMode="floating"
@@ -98,7 +98,7 @@
           <div *ngIf="supplierData">
             <div *dxTemplate>
               <dx-text-box
-                label="Fax"
+                label="Fax *"
                 [(value)]="supplierData.FAX_NO"
                 labelMode="floating"
               >
@@ -117,7 +117,7 @@
           <div *ngIf="supplierData">
             <div *dxTemplate>
               <dx-text-box
-                label="Email"
+                label="Email *"
                 [(value)]="supplierData.EMAIL"
                 labelMode="floating"
               >
@@ -184,7 +184,7 @@
           <div *ngIf="supplierData">
             <div *dxTemplate>
               <dx-select-box
-                label="VAT Rule"
+                label="VAT Rule *"
                 [items]="VATRuleDropdownData"
                 displayExpr="DESCRIPTION"
                 valueExpr="ID"
@@ -308,7 +308,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
-              label="Supplier Name"
+              label="Supplier Name *"
               [(value)]="supplierData.SUPP_NAME"
               labelMode="floating"
             >
@@ -328,7 +328,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
-              label="Contact Name"
+              label="Contact Name *"
               [(value)]="supplierData.CONTACT_NAME"
               labelMode="floating"
             >
@@ -349,7 +349,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
-              label="City"
+              label="City *"
               [(value)]="supplierData.CITY"
               labelMode="floating"
             >
@@ -365,7 +365,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
-              label="Zip Code"
+              label="Zip Code *"
               [(value)]="supplierData.ZIP"
               labelMode="floating"
             >
@@ -386,7 +386,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-select-box
-              label="Country"
+              label="Country *"
               [items]="CountryDropdownData"
               displayExpr="COUNTRY_NAME"
               valueExpr="ID"
@@ -415,7 +415,7 @@
               displayExpr="DESCRIPTION"
               valueExpr="ID"
               [(value)]="supplierData.STATE_ID"
-              placeholder="Select {{ stateLabel }}"
+              placeholder="Select {{ stateLabel }} *"
               [searchEnabled]="true"
               labelMode="floating"
               (onValueChanged)="onStateValue($event)"
@@ -498,7 +498,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-select-box
-              label="Payment Terms"
+              label="Payment Terms *"
               [items]="PaymentTermsDropdownData"
               [items]="PaymentTerms"
               displayExpr="DESCRIPTION"
@@ -525,7 +525,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate>
             <dx-text-box
-              label="VAT Registration Number"
+              label="VAT Registration Number *"
               [(value)]="supplierData.VAT_REGNO"
               labelMode="floating"
             >

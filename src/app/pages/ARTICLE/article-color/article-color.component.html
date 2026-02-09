@@ -121,7 +121,7 @@
   <dx-validation-group #formValidationGroup>
     <dx-form class="plain-styled-form" [formGroup]="formsource">
       <dxi-item>
-        <dx-text-box label="Code" formControlName="Code" labelMode="floating">
+        <dx-text-box label="Code *" formControlName="Code" labelMode="floating">
           <dx-validator>
             <dxi-validation-rule
               type="required"
@@ -134,7 +134,7 @@
       <dxi-item>
         <dx-text-box
           labelMode="floating"
-          label="Color English"
+          label="Color English *"
           formControlName="ColorEnglish"
         >
           <dx-validator>
@@ -174,7 +174,7 @@
     <dx-form class="plain-styled-form">
       <dxi-item>
         <dx-text-box
-          label="Code"
+          label="Code *"
           labelMode="floating"
           [(value)]="editingRowData.CODE"
         >
@@ -189,7 +189,7 @@
 
       <dxi-item>
         <dx-text-box
-          label="Color English"
+          label="Color English *"
           labelMode="floating"
           [(value)]="editingRowData.COLOR_ENGLISH"
         >
@@ -202,10 +202,10 @@
         </dx-text-box>
       </dxi-item>
 
-      <dxi-item>
+      <!-- <dxi-item>
         <dx-text-box
           labelMode="floating"
-          label="Color Arabic"
+          label="Color Arabic *"
           [(value)]="editingRowData.COLOR_ARABIC"
         >
           <dx-validator>
@@ -215,7 +215,7 @@
             ></dxi-validation-rule>
           </dx-validator>
         </dx-text-box>
-      </dxi-item>
+      </dxi-item> -->
     </dx-form>
   </dx-validation-group>
 </form-popup>

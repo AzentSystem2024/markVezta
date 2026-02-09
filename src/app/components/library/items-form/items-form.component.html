@@ -7,7 +7,7 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-text-box
-                  label="Item Code"
+                  label="Item Code *"
                   labelMode="floating"
                   [(value)]="newItems.ITEM_CODE"
                 >
@@ -24,7 +24,7 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-text-box
-                  label="Bar Code"
+                  label="Bar Code *"
                   labelMode="floating"
                   [(value)]="newItems.BARCODE"
                 >
@@ -84,7 +84,7 @@
               <div *dxTemplate>
                 <dx-text-box
                   class="field-spacing"
-                  label="Description"
+                  label="Description *"
                   [(value)]="newItems.DESCRIPTION"
                   labelMode="floating"
                 >
@@ -218,7 +218,7 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-select-box
-                  label="Unit of Measure"
+                  label="Unit of Measure *"
                   labelMode="floating"
                   [items]="uom"
                   displayExpr="DESCRIPTION"
@@ -256,7 +256,7 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-text-box
-                  label="HSN Code"
+                  label="HSN Code *"
                   labelMode="floating"
                   [(value)]="newItems.HSN_CODE"
                 >

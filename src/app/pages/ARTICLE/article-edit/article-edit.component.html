@@ -11,7 +11,7 @@
         <!-- 2-column form fields -->
         <div class="form-field">
           <dx-text-box
-            label="Art No."
+            label="Art No. *"
             [(value)]="articleData.ART_NO"
             labelMode="floating"
             (onInput)="updateItemDescription()"
@@ -21,7 +21,7 @@
         </div>
         <div class="form-field">
           <dx-select-box
-            label="Color"
+            label="Color *"
             [(value)]="articleData.COLOR"
             labelMode="floating"
             placeholder="Color"
@@ -36,7 +36,7 @@
 
         <div class="form-field">
           <dx-select-box
-            label="Category"
+            label="Category *"
             labelMode="floating"
             placeholder="Category"
             [dataSource]="categoryList"
@@ -50,7 +50,7 @@
         </div>
         <div class="form-field">
           <dx-select-box
-            label="Type"
+            label="Type *"
             labelMode="floating"
             placeholder="Type"
             [(value)]="articleData.ARTICLE_TYPE"
@@ -77,7 +77,7 @@
         </div>
         <div class="form-field">
           <dx-text-box
-            label="Packing Qty"
+            label="Packing Qty *"
             [(value)]="articleData.PACK_QTY"
             labelMode="floating"
             placeholder="Packing Qty"
@@ -86,7 +86,7 @@
 
         <div class="form-field">
           <dx-number-box
-            label="MRP"
+            label="MRP *"
             [(value)]="articleData.PRICE"
             [format]="'#,##0.##'"
             labelMode="floating"
@@ -133,7 +133,7 @@
         </div>
         <div class="form-field">
           <dx-text-box
-            label="Item Description"
+            label="Item Description *"
             [(value)]="articleData.DESCRIPTION"
             labelMode="floating"
             placeholder="Item Description"
@@ -154,7 +154,7 @@
           >
           </dx-select-box> -->
           <dx-tag-box
-            label="Production Unit"
+            label="Production Unit *"
             labelMode="floating"
             placeholder="Select Units"
             [dataSource]="produCtionUnits"
@@ -181,7 +181,7 @@
 
         <div class="form-field">
           <dx-select-box
-            label="Supplier"
+            label="Supplier *"
             labelMode="floating"
             placeholder="Supplier"
             [dataSource]="materialUnits"
@@ -195,7 +195,7 @@
         </div>
         <div class="form-field">
           <dx-text-box
-            label="Last Order No."
+            label="Last Order No. *"
             labelMode="floating"
             placeholder="Last Order No."
             [(value)]="lastOrderNo"
@@ -227,7 +227,7 @@
         </div>
         <div class="form-field">
           <dx-text-box
-            label="HSN Code"
+            label="HSN Code *"
             labelMode="floating"
             placeholder="HSN Code"
             [(value)]="articleData.HSN_CODE"

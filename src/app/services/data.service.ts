@@ -3030,15 +3030,15 @@ export class DataService {
   //   const body = { UOM: uom , COMPANY_ID : this.selected_Company_id};
   //   return this.http.post<any>(`${this.apiUrl}uom/insert`, body, { headers });
   // }
-  postUOM(payload: { UOM: string; COMPANY_ID: number }): Observable<any> {
+  postUOM(payload: { UOM: string;  }): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.apiUrl}uom/insert`, payload, {
       headers,
     });
   }
 
-  updateUom(ID: any, UOM: any, COMPANY_ID: any): Observable<any> {
-    const data = { ID, UOM, COMPANY_ID };
+  updateUom(ID: any, UOM: any,): Observable<any> {
+    const data = { ID, UOM, };
     return this.http.post(`${this.apiUrl}uom/update`, data);
   }
 

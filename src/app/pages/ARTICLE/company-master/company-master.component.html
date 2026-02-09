@@ -150,7 +150,7 @@
             <dxi-item>
               <dx-select-box
                 #dealerTypeBoxRef
-                label="Company Type"
+                label="Company Type *"
                 labelMode="floating"
                 alignment="center"
                 formControlName="CompanyType"
@@ -175,7 +175,7 @@
                 type="text"
                 formControlName="Code"
                 class="form-control mt-1"
-                label="Company Code"
+                label="Company Code *"
                 labelMode="floating"
               >
                 <dx-validator>
@@ -195,7 +195,7 @@
                 type="text"
                 formControlName="CompanyName"
                 class="form-control mt-1"
-                label="Company Name"
+                label="Company Name *"
                 labelMode="floating"
               >
                 <dx-validator>
@@ -219,7 +219,7 @@
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
             <dxi-item>
               <dx-select-box
-                label="State"
+                label="State *"
                 labelMode="floating"
                 alignment="center"
                 valueExpr="ID"
@@ -405,7 +405,7 @@
             <dxi-item>
               <dx-select-box
                 #dealerTypeBoxRef
-                label="Company Type"
+                label="Company Type *"
                 labelMode="floating"
                 alignment="center"
                 valueExpr="ID"
@@ -429,7 +429,7 @@
                 #dealerCodeBoxRef
                 type="text"
                 class="form-control mt-1"
-                label="Company Code"
+                label="Company Code *"
                 labelMode="floating"
                 [(value)]="editingRowData.COMPANY_CODE"
               >
@@ -448,7 +448,7 @@
                 #dealerNameBoxRef
                 type="text"
                 class="form-control mt-1"
-                label="Company Name"
+                label="Company Name *"
                 labelMode="floating"
                 [(value)]="editingRowData.COMPANY_NAME"
               >
@@ -474,7 +474,7 @@
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
             <dxi-item>
               <dx-select-box
-                label="State"
+                label="State *"
                 labelMode="floating"
                 alignment="center"
                 valueExpr="ID"
