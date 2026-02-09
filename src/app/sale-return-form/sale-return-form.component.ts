@@ -959,10 +959,10 @@ export class SaleReturnFormComponent {
     doc.setFont('helvetica', 'normal');
     dispatchY += 6;
     doc.text(header.COMPANY_NAME, leftX, dispatchY);
-    doc.text('Kozhikode', leftX, dispatchY + 5);
-    doc.text('Kozhikode', leftX, dispatchY + 10);
-    doc.text('Kozhikode', leftX, dispatchY + 15);
-    doc.text(`GSTIN/UIN : ${header.COMPANY_GST}`, leftX, dispatchY + 20);
+    doc.text(header.COMPANY_ADDRESS1 || 'Kozhikode', leftX, dispatchY + 5);
+    doc.text(header.COMPANY_ADDRESS2 || 'Kozhikode', leftX, dispatchY + 10);
+    doc.text(header.COMPANY_ADDRESS3 || 'Kozhikode', leftX, dispatchY + 15);
+    doc.text(`GSTIN/UIN : ${header.CUST_CODE}`, leftX, dispatchY + 20);
 
     // ============================
     // BUYER (BILL TO) - RIGHT BELOW
