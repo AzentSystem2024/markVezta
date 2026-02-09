@@ -655,7 +655,7 @@ export class SaleReturnFormComponent {
     // ==============================
     const payload = {
       ...this.salesReturnFormData,
-      ID: this.salesReturnFormData.RET_ID,
+      ID: this.salesReturnFormData.TRANS_ID,
       COMPANY_ID: this.selectedCompanyId,
       USER_ID: this.userID,
       FIN_ID: this.finID,
@@ -838,7 +838,7 @@ export class SaleReturnFormComponent {
 
   openPDF() {
     console.log(this.EditingResponseData.Header, 'Open PDF clicked');
-    const returnId = this.EditingResponseData.Header.RET_ID;
+    const returnId = this.EditingResponseData.Header.TRANS_ID;
     console.log(returnId);
     this.dataService.selectSaleReturn(returnId).subscribe((res: any) => {
       console.log(res, 'res-----');

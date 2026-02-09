@@ -131,7 +131,7 @@ export class StockMovementReportComponent {
     this.sesstion_Details();
     this.get_Item_Dropdown();
 
-    // ✅ SET TODAY AS DEFAULT
+    //  SET TODAY AS DEFAULT
      const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -142,7 +142,7 @@ export class StockMovementReportComponent {
 
       this.selected_from_date = SystemDate;
       this.selected_To_date = SystemDate;
-
+      this.getStockMovement
     // this.fromDate = today;
     // this.toDate = today;
 
@@ -151,7 +151,7 @@ export class StockMovementReportComponent {
   }
 
   ngAfterViewInit() {
-    // ✅ Grid is now ready → show loading
+    //  Grid is now ready → show loading
     setTimeout(() => {
       this.dataGrid?.instance?.beginCustomLoading('Loading...');
       this.getStockMovement();
@@ -298,8 +298,8 @@ export class StockMovementReportComponent {
 
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      DATE_FROM: this.formatted_from_date,
-      DATE_TO: this.formatted_To_date,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
       ITEM_TYPE: this.selected_item_Id || 0,
     };
 

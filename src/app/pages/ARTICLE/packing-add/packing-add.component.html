@@ -72,7 +72,7 @@
 
       <div class="form-field">
         <dx-select-box
-          label="Type"
+          label="Type *"
           labelMode="floating"
           placeholder="Type"
           [(value)]="PackingData.ARTICLE_TYPE"
@@ -91,7 +91,7 @@
 
       <div class="form-field">
         <dx-select-box
-          label="Brand"
+          label="Brand *"
           labelMode="floating"
           placeholder="Brand"
           [dataSource]="brandList"
@@ -111,7 +111,7 @@
 
       <div class="form-field">
         <dx-text-box
-          label="Description"
+          label="Description *"
           [(value)]="PackingData.DESCRIPTION"
           labelMode="floating"
           placeholder="Description"
@@ -143,7 +143,7 @@
 
       <div class="form-field">
         <dx-number-box
-          label="Part No."
+          label="Part No. *"
           [(value)]="PackingData.PART_NO"
           labelMode="floating"
           placeholder="Part No."
@@ -172,7 +172,7 @@
 
       <div class="form-field">
         <dx-text-box
-          label="Item Description"
+          label="Item Description *"
           [(value)]="PackingData.ITEM_DESCRIPTION"
           labelMode="floating"
           [readOnly]="true"
@@ -213,7 +213,7 @@
 
       <div class="form-field">
         <dx-text-box
-          label="Packing Order No."
+          label="Packing Order No. *"
           [(value)]="PackingData.ORDER_NO"
           labelMode="floating"
           [readOnly]="true"
@@ -228,7 +228,7 @@
 
       <div class="form-field">
         <dx-text-box
-          label="Standard Packing"
+          label="Standard Packing *"
           [(value)]="PackingData.STANDARD_PACKING"
           labelMode="floating"
           placeholder="Standard Packing"
@@ -244,7 +244,7 @@
 
       <div class="form-field">
         <dx-number-box
-          label="MRP"
+          label="MRP *"
           [(value)]="PackingData.PACK_PRICE"
           [format]="'#,##0.##'"
           labelMode="floating"

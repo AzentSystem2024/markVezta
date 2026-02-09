@@ -12,7 +12,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Code"
+                label="Code *"
                 [(value)]="newCustomer.CUST_CODE"
                 labelMode="floating"
               >
@@ -32,7 +32,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="First Name"
+                label="First Name *"
                 [(value)]="newCustomer.FIRST_NAME"
                 labelMode="floating"
               >
@@ -48,7 +48,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Last Name"
+                label="Last Name *"
                 [(value)]="newCustomer.LAST_NAME"
                 labelMode="floating"
               >
@@ -110,7 +110,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Contact Name"
+                label="Contact Name *"
                 [(value)]="newCustomer.CONTACT_NAME"
                 labelMode="floating"
                 width="400px"
@@ -131,7 +131,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Address"
+                label="Address *"
                 [(value)]="newCustomer.ADDRESS1"
                 labelMode="floating"
                 width="400px"
@@ -192,7 +192,7 @@
                 </dx-validator>
               </dx-text-box>
               <dx-text-box
-                label="Mobile"
+                label="Mobile *"
                 class="phone-style"
                 [(value)]="newCustomer.MOBILE_NO"
                 labelMode="floating"
@@ -232,7 +232,7 @@
                 </dx-validator>
               </dx-text-box>
               <dx-text-box
-                label="Phone"
+                label="Phone *"
                 class="phone-style"
                 [(value)]="newCustomer.PHONE"
                 labelMode="floating"
@@ -260,7 +260,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Fax"
+                label="Fax *"
                 [(value)]="newCustomer.FAX_NO"
                 labelMode="floating"
               >
@@ -277,7 +277,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Email"
+                label="Email *"
                 [(value)]="newCustomer.EMAIL"
                 labelMode="floating"
               >
@@ -297,7 +297,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-select-box
-                label="Country"
+                label="Country *"
                 [items]="CountryDropdownData"
                 displayExpr="COUNTRY_NAME"
                 valueExpr="ID"
@@ -321,7 +321,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-select-box
-                label="State"
+                label="State *"
                 labelMode="floating"
                 displayExpr="DESCRIPTION"
                 [items]="StateDropdownData"
@@ -343,7 +343,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="City"
+                label="City *"
                 [(value)]="newCustomer.CITY"
                 labelMode="floating"
               >
@@ -361,7 +361,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Zip Code"
+                label="Zip Code *"
                 [(value)]="newCustomer.ZIP"
                 labelMode="floating"
               >
@@ -445,7 +445,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Credit Limit"
+                label="Credit Limit *"
                 labelMode="floating"
                 [(value)]="newCustomer.CREDIT_LIMIT"
               >
@@ -462,7 +462,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Current Credit"
+                label="Current Credit *"
                 [(value)]="newCustomer.CURRENT_CREDIT"
                 labelMode="floating"
               >
@@ -482,7 +482,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-select-box
-                label="Payment Terms"
+                label="Payment Terms *"
                 [items]="PaymentTermsDropdownData"
                 displayExpr="DESCRIPTION"
                 valueExpr="ID"
@@ -515,7 +515,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-select-box
-                label="Default Price Level"
+                label="Default Price Level *"
                 [items]="PriceLevelDropdownData"
                 displayExpr="DESCRIPTION"
                 valueExpr="ID"
@@ -536,7 +536,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Discount %"
+                label="Discount % *"
                 labelMode="floating"
                 [(value)]="newCustomer.DISCOUNT_PERCENT"
               >
@@ -583,8 +583,8 @@
                 [label]="
                   selected_vat_id == sessionData.VAT_ID &&
                   sessionData.VAT_ID == 2
-                    ? '  VAT Registration Number'
-                    : ' GST Registration Number'
+                    ? '  VAT Registration Number *'
+                    : ' GST Registration Number *'
                 "
                 [(value)]="newCustomer.VAT_REGNO"
                 labelMode="floating"

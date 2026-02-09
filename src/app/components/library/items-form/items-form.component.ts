@@ -23,6 +23,8 @@ import {
   DxPopupModule,
   DxTabPanelModule,
   DxTabsModule,
+  DxValidationGroupComponent,
+  DxValidationGroupModule,
 } from 'devextreme-angular';
 import { DxoItemModule } from 'devextreme-angular/ui/nested';
 import { DxoFormItemModule } from 'devextreme-angular/ui/nested';
@@ -62,6 +64,8 @@ export class ItemsFormComponent implements OnInit {
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('supplierGridRef')
 supplierGrid!: DxDataGridComponent;
+@ViewChild('ArtnoValidationGroup')
+  uomValidationGroup: DxValidationGroupComponent;
 
   //  priorities: string[] = ['Standard code', 'Tally code',];
   //  priorities = [
@@ -343,7 +347,7 @@ supplierGrid!: DxDataGridComponent;
       this.catagory = data;
     });
     const uomPayload = {
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
       NAME: 'UOM',
     };
     dataservice.getDropdownData(uomPayload).subscribe((data) => {
@@ -430,7 +434,7 @@ supplierGrid!: DxDataGridComponent;
     ITEM_PROPERTY5: 0,
     COSTING_METHOD: 0,
     REORDER_POINT: 0,
-    UNIT_ID: 0,
+    UNIT_ID: null,
     PACKING_ID: 0,
     POS_DESCRIPTION: '',
     HSN_CODE: '',
@@ -531,6 +535,9 @@ supplierGrid!: DxDataGridComponent;
   };
 };
 
+uomValidation = (e: any) => {
+  return e.value !== null && e.value !== 0;
+};
 
   ngOnInit() {
     this.showItems();
@@ -1148,6 +1155,7 @@ supplierGrid!: DxDataGridComponent;
     DxoFormItemModule,
     DxoLookupModule,
     DxValidatorModule,
+    DxValidationGroupModule,
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,

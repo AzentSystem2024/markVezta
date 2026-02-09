@@ -191,7 +191,7 @@ export class UomListComponent implements OnInit {
 
   listUom() {
   const payload = {
-    COMPANY_ID: this.selected_Company_id,
+    // COMPANY_ID: this.selected_Company_id,
   };
 
   this.UomDataSource = new DataSource({

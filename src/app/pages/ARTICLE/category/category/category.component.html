@@ -173,7 +173,7 @@
               <dx-text-box
                 type="text"
                 formControlName="code"
-                label="Code"
+                label="Code *"
                 labelMode="floating"
                 style="flex: 1"
                 width="250px"
@@ -187,7 +187,7 @@
               <dx-text-box
                 type="text"
                 formControlName="category"
-                label="Category"
+                label="Category *"
                 labelMode="floating"
                 style="flex: 1"
                 width="250px"
@@ -201,7 +201,7 @@
             <dx-tag-box
               formControlName="size"
               [items]="sizeOptions"
-              label="Size"
+              label="Size *"
               labelMode="floating"
               [showSelectionControls]="true"
               [applyValueMode]="'useButtons'"
@@ -380,7 +380,7 @@
               <dx-text-box
                 type="text"
                 [(value)]="code_value"
-                label="Code"
+                label="Code *"
                 labelMode="floating"
                 style="flex: 1"
                 ><dx-validator>
@@ -393,7 +393,7 @@
               <dx-text-box
                 type="text"
                 [(value)]="name_value"
-                label="Category"
+                label="Category *"
                 labelMode="floating"
                 style="flex: 1"
                 ><dx-validator>
@@ -415,7 +415,7 @@
             <dx-tag-box
               [(value)]="size_value"
               [items]="sizeOptions"
-              label="Size"
+              label="Size *"
               labelMode="floating"
               [showSelectionControls]="true"
               [applyValueMode]="'useButtons'"

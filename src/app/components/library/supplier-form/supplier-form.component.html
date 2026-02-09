@@ -4,7 +4,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="Code"
+            label="Code *"
             labelMode="floating"
             [(value)]="newSupplier.SUPP_CODE"
           >
@@ -20,7 +20,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="Address"
+            label="Address *"
             labelMode="floating"
             [(value)]="newSupplier.ADDRESS1"
           >
@@ -50,7 +50,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label=" "
+            label="Address"
             labelMode="floating"
             [(value)]="newSupplier.ADDRESS3"
           ></dx-text-box>
@@ -61,13 +61,13 @@
       <dxi-item>
         <div *dxTemplate style="display: flex">
           <dx-text-box
-            label=" "
+            label="Address"
             labelMode="floating"
             [(value)]="DEFAULT_COUNTRY_CODE"
             class="country-code-input"
           ></dx-text-box>
           <dx-text-box
-            label="Mobile"
+            label="Mobile *"
             labelMode="floating"
             class="phone-style"
             [(value)]="newSupplier.MOBILE_NO"
@@ -88,7 +88,7 @@
         <dxi-item>
           <div *dxTemplate>
             <dx-text-box
-              label="Fax"
+              label="Fax *"
               [(value)]="newSupplier.FAX_NO"
               labelMode="floating"
             >
@@ -105,7 +105,7 @@
         <dxi-item>
           <div *dxTemplate>
             <dx-text-box
-              label="Email"
+              label="Email *"
               [(value)]="newSupplier.EMAIL"
               labelMode="floating"
             >
@@ -180,7 +180,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-select-box
-            label="VAT Rule"
+            label="VAT Rule *"
             [items]="VATRuleDropdownData"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
@@ -217,7 +217,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="Supplier Name"
+            label="Supplier Name *"
             [(value)]="newSupplier.SUPP_NAME"
             labelMode="floating"
           >
@@ -235,7 +235,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="Contact Name"
+            label="Contact Name *"
             [(value)]="newSupplier.CONTACT_NAME"
             labelMode="floating"
           >
@@ -255,7 +255,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="City"
+            label="City *"
             [(value)]="newSupplier.CITY"
             labelMode="floating"
           >
@@ -269,7 +269,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="Zip Code"
+            label="Zip Code *"
             [(value)]="newSupplier.ZIP"
             labelMode="floating"
           >
@@ -288,7 +288,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-select-box
-            label="Country"
+            label="Country *"
             [items]="CountryDropdownData"
             displayExpr="COUNTRY_NAME"
             valueExpr="ID"
@@ -316,7 +316,7 @@
             valueExpr="ID"
             [items]="State"
             [(value)]="newSupplier.STATE_ID"
-            placeholder="Select State {{ stateLabel }}"
+            placeholder="Select State {{ stateLabel }} *"
             [searchEnabled]="true"
             labelMode="floating"
             (onValueChanged)="onStateValue($event)"
@@ -389,7 +389,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-select-box
-            label="Payment Terms"
+            label="Payment Terms *"
             [items]="PaymentTermsDropdownData"
             [items]="PaymentTerms"
             displayExpr="DESCRIPTION"
@@ -414,7 +414,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="VAT Registration Number"
+            label="VAT Registration Number *"
             [(value)]="newSupplier.VAT_REGNO"
             labelMode="floating"
           >
