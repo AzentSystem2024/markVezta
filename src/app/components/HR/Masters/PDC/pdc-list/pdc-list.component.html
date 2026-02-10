@@ -220,7 +220,7 @@
   ></app-pdc-edit-form>
 </dx-popup>
 
-<dx-popup
+<!-- <dx-popup
   [(visible)]="showCustomDatePopup"
   [width]="'300px'"
   title="iSelect Custom Date Range"
@@ -254,9 +254,17 @@
       class="mt-3"
     ></dx-button>
   </div>
-</dx-popup>
+</dx-popup> -->
 
-<dx-popup
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>
+
+<!-- <dx-popup
   [(visible)]="showEntryCustomDatePopup"
   [width]="'300px'"
   title="Select Custom Date Range"
@@ -289,5 +297,73 @@
       (onClick)="applyEntryCustomDateFilter()"
       class="mt-3"
     ></dx-button>
+  </div>
+</dx-popup> -->
+<dx-popup
+  [(visible)]="showEntryCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="380"
+  [height]="250"
+  [dragEnabled]="false"
+>
+  <div class="date-range-container">
+    <!-- Row 1 : Year + Month -->
+    <div class="date-row">
+      <dx-select-box
+        label="Year"
+        labelMode="floating"
+        [width]="160"
+        [(value)]="selectedYear"
+        [dataSource]="years"
+        (onValueChanged)="onYearChanged($event)"
+      >
+      </dx-select-box>
+
+      <dx-select-box
+        label="Month"
+        labelMode="floating"
+        [width]="160"
+        [dataSource]="monthDataSource"
+        displayExpr="name"
+        valueExpr="value"
+        [(value)]="selectedmonth"
+        (onValueChanged)="onMonthValueChanged($event)"
+      >
+      </dx-select-box>
+    </div>
+
+    <!-- Row 2 : From + To Date -->
+    <div class="date-row">
+      <dx-date-box
+        label="From Date"
+        labelMode="floating"
+        type="date"
+        displayFormat="dd-MM-yyyy"
+        [(value)]="entrycustomStartDate"
+        [width]="160"
+      >
+      </dx-date-box>
+
+      <dx-date-box
+        label="To Date"
+        labelMode="floating"
+        type="date"
+        displayFormat="dd-MM-yyyy"
+        [(value)]="entrycustomEndDate"
+        [width]="160"
+      >
+      </dx-date-box>
+    </div>
+
+    <!-- Row 3 : Button -->
+    <div class="button-row">
+      <dx-button
+        text="Apply"
+        type="default"
+        (onClick)="applyEntryCustomDateFilter()"
+      >
+      </dx-button>
+    </div>
   </div>
 </dx-popup>

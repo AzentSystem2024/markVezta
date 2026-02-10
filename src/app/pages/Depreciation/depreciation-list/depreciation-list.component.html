@@ -209,7 +209,15 @@
   ></app-depreciation-edit>
 </dx-popup>
 
-<dx-popup
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>
+
+<!-- <dx-popup
   [(visible)]="showCustomDatePopup"
   [showTitle]="true"
   title="Select Dates"
@@ -242,9 +250,9 @@
         labelMode="floating"
       >
       </dx-date-box>
-    </div>
+    </div> -->
 
-    <!-- <div class="date-range-container">
+<!-- <div class="date-range-container">
       <dx-date-box
         [(value)]="customStartDate"
         type="date"
@@ -265,7 +273,7 @@
       </dx-date-box>
     </div> -->
 
-    <div class="button-container">
+<!-- <div class="button-container">
       <dx-button
         text="Apply"
         type="default"
@@ -273,4 +281,4 @@
       ></dx-button>
     </div>
   </div>
-</dx-popup>
+</dx-popup> -->

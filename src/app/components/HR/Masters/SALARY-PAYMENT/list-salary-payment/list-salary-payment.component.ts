@@ -38,6 +38,7 @@ import { AddSalaryPaymentModule } from '../add-salary-payment/add-salary-payment
 import { DataService } from 'src/app/services/data.service';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-list-salary-payment',
@@ -450,6 +451,13 @@ export class ListSalaryPaymentComponent {
     this.editSalaryPopup = false;
     this.getSalaryPaymentList();
   }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 
 @NgModule({
@@ -478,6 +486,7 @@ export class ListSalaryPaymentComponent {
     DxiItemModule,
     DxoItemModule,
     AddSalaryPaymentModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [ListSalaryPaymentComponent],

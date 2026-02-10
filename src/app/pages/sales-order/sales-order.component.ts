@@ -41,6 +41,7 @@ import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { SalesOrderFormModule } from '../sales-order-form/sales-order-form.component';
 import notify from 'devextreme/ui/notify';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-sales-order',
@@ -576,6 +577,13 @@ export class SalesOrderComponent {
     this.isEditSalesOrder = false;
     this.getsalesOrderList();
   }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 
 @NgModule({
@@ -610,6 +618,7 @@ export class SalesOrderComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     SalesOrderFormModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [SalesOrderComponent],

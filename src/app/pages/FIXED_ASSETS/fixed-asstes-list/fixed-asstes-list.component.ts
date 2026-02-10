@@ -36,6 +36,7 @@ import { DataService } from 'src/app/services';
 import { FixedAsstesEditModule } from '../fixed-asstes-edit/fixed-asstes-edit.component';
 import { FixedAsstesAddModule } from '../fixed-asstes-add/fixed-asstes-add.component';
 import { Router } from '@angular/router';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 @Component({
   selector: 'app-fixed-asstes-list',
   templateUrl: './fixed-asstes-list.component.html',
@@ -392,6 +393,13 @@ export class FixedAsstesListComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 
 @NgModule({
@@ -411,6 +419,7 @@ export class FixedAsstesListComponent {
     FixedAsstesEditModule,
     FixedAsstesAddModule,
     DxDateBoxModule,
+    CustomDatePopupModule
   ],
   providers: [],
   exports: [FixedAsstesListComponent],

@@ -98,7 +98,7 @@ const payload = {
   };
 
 
-    // ✅ Create PDF
+    //  Create PDF
    const doc = new jsPDF({
   orientation: "landscape",
   unit: "pt",
@@ -123,11 +123,11 @@ const payload = {
 
     const data = []
 
-     // ✅ Parse year & month
+     //  Parse year & month
     const [year, month] = monthToUse.split("-").map(Number);
     const daysInMonth = new Date(year, month, 0).getDate(); // total days in month
 
-    // ✅ Generate header with day + weekday
+    //  Generate header with day + weekday
     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const dynamicDays = Array.from({ length: daysInMonth }, (_, i) => {
       const date = new Date(year, month - 1, i + 1);
@@ -136,7 +136,7 @@ const payload = {
 
     const head = [["Staff Id", "Name", ...dynamicDays]];
 
-    // ✅ Table Body
+    //  Table Body
     const body = data.map((row: any) => [
       row.StaffId,
       row.Name,

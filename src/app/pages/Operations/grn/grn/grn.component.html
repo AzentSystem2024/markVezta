@@ -206,6 +206,7 @@
   titleText="Edit Goods Receipt Note"
   [height]="'100vh'"
   [width]="width"
+  [(isApproved)]="isApproved"
   (save)="verifyGrnData()"
 >
   <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>

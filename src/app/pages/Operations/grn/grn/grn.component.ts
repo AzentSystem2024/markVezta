@@ -344,33 +344,117 @@ export class GrnComponent implements OnInit {
       }
     });
   }
+  // verifyGrnData() {
+  //   const data = this.grnVerifyForm.getNewGrnData();
+  //   console.log(data, 'grn verified data===============================');
+  //   this.service.updateGrnData(data).subscribe((res) => {
+  //     console.log('data verified', res);
+  //     if (res.Message === 'Success') {
+  //       notify(
+  //         {
+  //           message: 'Data Updated Successfully',
+  //           position: { at: 'top center', my: 'top center' },
+  //         },
+  //         'success',
+  //       );
+  //       this.getGrnLogData();
+  //       this.isVerifyPopupOpened = false;
+  //     } 
+  //     else if (data.IS_APPROVED === true){
+  //        this.service.approveGrnData(data).subscribe((res) => {
+  //     console.log('data approved', res);
+  //     if ((res.Message = 'Success')) {
+  //       notify(
+  //         {
+  //           message: 'Data Approved Successfully',
+  //           position: { at: 'top center', my: 'top center' },
+  //         },
+  //         'success',
+  //       );
+  //       this.getGrnLogData();
+  //       this.isApprovePopupOpened = false;
+  //     }
+  //   })
+  //     }
+  //     else {
+  //       notify(
+  //         {
+  //           message: 'Your Data Not Verified',
+  //           position: { at: 'top right', my: 'top right' },
+  //         },
+  //         'error',
+  //       );
+  //     }
+  //   });
+  // }
+
   verifyGrnData() {
-    const data = this.grnVerifyForm.getNewGrnData();
-    console.log(data, 'grn verified data===============================');
-    this.service.approveGrnData(data).subscribe((res) => {
-      console.log('data verified', res);
-      if (res.Message === 'Success') {
+  const data = this.grnVerifyForm.getNewGrnData();
+  console.log(data, 'grn verified data');
+
+  this.service.updateGrnData(data).subscribe((res) => {
+    console.log('data verified', res);
+
+    //  Step 1: Update success
+    if (res.Message === 'Success') {
+
+      //  Step 2: If approved → call approve API
+      if (this.isApproved === true) {
+        this.service.approveGrnData(data).subscribe((approveRes) => {
+          console.log('data approved', approveRes);
+
+          if (approveRes.Message === 'Success') {
+            notify(
+              {
+                message: 'Data Verified & Approved Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success'
+            );
+
+            this.getGrnLogData();
+            this.isVerifyPopupOpened = false;
+            this.isApprovePopupOpened = false;
+          } else {
+            notify(
+              {
+                message: 'Verification done, but Approval failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error'
+            );
+          }
+        });
+      }
+      //  Step 3: Only verification
+      else {
         notify(
           {
             message: 'Data Verified Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success',
+          'success'
         );
+
         this.getGrnLogData();
         this.isVerifyPopupOpened = false;
-      } else {
-        notify(
-          {
-            message: 'Your Data Not Verified',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
       }
-    });
-  }
+    }
+    //  Update failed
+    else {
+      notify(
+        {
+          message: 'Your Data Not Verified',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error'
+      );
+    }
+  });
+}
+
   approveGrnData() {
+    console.log("======================================================================================")
     const data = this.grnApproveForm.getNewGrnData();
     console.log(data, 'grn approved data');
 

@@ -44,6 +44,7 @@ import {
 } from '../depreciation-add/depreciation-add.component';
 import { DepreciationEditModule } from '../depreciation-edit/depreciation-edit.component';
 import { Router } from '@angular/router';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-depreciation-list',
@@ -435,6 +436,13 @@ export class DepreciationListComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 
 @NgModule({
@@ -455,6 +463,7 @@ export class DepreciationListComponent {
     DepreciationAddModule,
     DepreciationEditModule,
     CommonModule,
+    CustomDatePopupModule
   ],
   providers: [],
   exports: [DepreciationListComponent],

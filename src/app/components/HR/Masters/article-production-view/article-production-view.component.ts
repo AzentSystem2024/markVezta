@@ -75,7 +75,7 @@ articleProductionCount = 0;
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilterRow(),
   };
   refreshButtonOptions = {
@@ -301,7 +301,7 @@ articleProductionCount = 0;
     const fromLabel = this.formatAsDDMMYYYY(start);
     const toLabel = this.formatAsDDMMYYYY(end);
 
-    // 🔁 Update label of custom option in dateRanges
+    //  Update label of custom option in dateRanges
     this.dateRanges = this.dateRanges.map((range) => {
       if (range.value === 'custom') {
         return {
@@ -312,7 +312,7 @@ articleProductionCount = 0;
       return range;
     });
 
-    // ✅ Set selectedDateRange to 'custom' to reflect it in the select box
+    //  Set selectedDateRange to 'custom' to reflect it in the select box
     this.selectedDateRange = 'custom';
 
     this.showCustomDatePopup = false;
@@ -363,7 +363,7 @@ articleProductionCount = 0;
           next: (res: any) => {
             const list = res?.data || [];
 
-            // 🔑 cache for logic / counts
+            //  cache for logic / counts
             this.articleProductionArray = list;
             this.articleProductionCount = list.length;
 

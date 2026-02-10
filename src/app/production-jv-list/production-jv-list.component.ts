@@ -61,6 +61,7 @@ import {
 import { ProductionJvViewModule } from '../production-jv-view/production-jv-view.component';
 import { BoxproductionJvAddComponent, BoxproductionJvAddModule } from '../boxproduction-jv-add/boxproduction-jv-add.component';
 import notify from 'devextreme/ui/notify';
+import { CustomDatePopupModule } from '../custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-production-jv-list',
@@ -893,6 +894,13 @@ boxProductionForm!: BoxproductionJvAddComponent;
   });
 }
 
+  onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
+
 }
 @NgModule({
   imports: [
@@ -937,7 +945,8 @@ boxProductionForm!: BoxproductionJvAddComponent;
     InvoiceTrOutAddModule,
     ProductionJvAddModule,
     ProductionJvViewModule,
-    BoxproductionJvAddModule
+    BoxproductionJvAddModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [ProductionJvListComponent],

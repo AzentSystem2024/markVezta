@@ -186,7 +186,15 @@
   </div>
 </div>
 
-<dx-popup
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>
+
+<!-- <dx-popup
   [(visible)]="showCustomDatePopup"
   [showTitle]="true"
   title="Select Dates"
@@ -223,7 +231,7 @@
       ></dx-button>
     </div>
   </div>
-</dx-popup>
+</dx-popup> -->
 
 <dx-popup
   [(visible)]="isAddDelivery"

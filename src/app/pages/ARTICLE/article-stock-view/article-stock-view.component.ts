@@ -38,7 +38,7 @@ articleStockCount = 0;
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
 
@@ -73,11 +73,11 @@ articleStockCount = 0;
           next: (res: any) => {
             const list = res?.Data || [];
 
-            // 🔑 cache for summary / logic
+            //  cache for summary / logic
             this.articleStockArray = list;
             this.articleStockCount = list.length;
 
-            resolve(list); // 🔑 grid gets data
+            resolve(list); //  grid gets data
           },
           error: () => {
             this.articleStockArray = [];

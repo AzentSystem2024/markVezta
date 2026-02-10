@@ -30,6 +30,7 @@ import { PdcAddFormModule } from '../pdc-add-form/pdc-add-form.component';
 import { PdcEditFormModule } from '../pdc-edit-form/pdc-edit-form.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-pdc-list',
@@ -71,6 +72,10 @@ export class PdcListComponent {
   showEntryCustomDatePopup: boolean = false;
   selectedStatusId: number | null = null;
 
+  selectedYear: number | null = null;
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[];
+  selectedmonth: any = '';
   dateRanges = [
     //  {
     //   label: 'All',
@@ -195,7 +200,57 @@ export class PdcListComponent {
     console.log(this.canAdd, this.canEdit, this.canDelete);
 
     this.sesstion_Details();
+
+
+    const today = new Date();
+    const SystemDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
+    this.entrycustomStartDate = SystemDate;
+    this.entrycustomEndDate = SystemDate;
     this.get_PDC_list();
+
+
+  }
+
+   //================ Year value change ===================
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      // Set from date to the start of the year and to date to today
+      this.entrycustomStartDate = new Date(this.selectedYear, 0, 1); // January 1 of the current year
+      this.entrycustomEndDate = today; // Today's date
+    } else {
+      this.entrycustomStartDate = new Date(this.selectedYear, 0, 1); // January 1
+      this.entrycustomEndDate = new Date(this.selectedYear, 11, 31); // December 31
+    }
+  }
+
+  //================Month value change ===================
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.entrycustomStartDate = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
+      this.entrycustomEndDate = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
+    } else {
+      this.entrycustomStartDate = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
+      this.entrycustomEndDate = new Date(
+        this.selectedYear,
+        this.selectedmonth + 1,
+        0,
+      );
+    }
   }
 
   toggleFilters() {
@@ -311,6 +366,13 @@ export class PdcListComponent {
     private ngZone: NgZone,
     private router: Router,
   ) {
+     const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2015; year--) {
+      this.years.push(year);
+    }
+    this.selectedYear = currentYear;
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataservice.getMonths();
     this.get_PDC_list();
   }
 
@@ -613,6 +675,13 @@ export class PdcListComponent {
     );
   }
 
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
+
   get_PDC_list() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -664,6 +733,7 @@ export class PdcListComponent {
     DxNumberBoxModule,
     PdcAddFormModule,
     PdcEditFormModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [PdcListComponent],

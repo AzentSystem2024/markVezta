@@ -49,6 +49,7 @@ import {
 import { EditSupplierPaymentModule } from '../edit-supplier-payment/edit-supplier-payment.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-supplier-payment-list',
@@ -614,6 +615,12 @@ export class SupplierPaymentListComponent {
       this.addSupplierPaymentComponent.resetForm();
     }
   }
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 
 @NgModule({
@@ -649,6 +656,7 @@ export class SupplierPaymentListComponent {
     DxoSummaryModule,
     AddSupplierPaymentModule,
     EditSupplierPaymentModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [SupplierPaymentListComponent],

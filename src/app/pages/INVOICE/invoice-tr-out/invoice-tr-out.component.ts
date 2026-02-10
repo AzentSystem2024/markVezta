@@ -58,6 +58,7 @@ import {
   InvoiceTrOutAddComponent,
   InvoiceTrOutAddModule,
 } from '../invoice-tr-out-add/invoice-tr-out-add.component';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-invoice-tr-out',
@@ -186,6 +187,13 @@ export class InvoiceTrOutComponent {
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getInvoiceList();
+  }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
   }
 
   getInvoiceList() {
@@ -669,6 +677,7 @@ export class InvoiceTrOutComponent {
     EditInvoiceModule,
     ViewInvoiceModule,
     InvoiceTrOutAddModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [InvoiceTrOutComponent],
