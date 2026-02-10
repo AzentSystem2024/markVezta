@@ -145,7 +145,7 @@ export class ArticleListComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   filteredInvoiceList: any;
-  
+
   selected_Company_id: any;
   constructor(
     private dataService: DataService,
@@ -153,7 +153,7 @@ export class ArticleListComponent {
     private ngZone: NgZone,
   ) {}
 
-   refreshButtonOptions = {
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
@@ -162,7 +162,6 @@ export class ArticleListComponent {
     },
     text: '',
   };
-
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -214,9 +213,10 @@ export class ArticleListComponent {
             next: (response: any) => {
               if (response?.flag === 1 && Array.isArray(response.Data)) {
                 //  Sort articles by ID (latest first)
-                const sortedData = response.Data.sort(
-                  (a: any, b: any) => b.ID - a.ID,
-                );
+                const sortedData = response.Data;
+                // .sort(
+                //   (a: any, b: any) => b.ID - a.ID,
+                // );
 
                 // Add serial number (sno)
                 const formattedData = sortedData.map(
@@ -383,12 +383,12 @@ export class ArticleListComponent {
     const color = event.data.COLOR;
     const categoryId = event.data.CATEGORY_ID;
     const price = event.data.PRICE;
-    
+
     const payload = {
       ART_NO: articleArtNo,
-      COLOR : color,
+      COLOR: color,
       CATEGORY_ID: categoryId,
-      PRICE: price
+      PRICE: price,
     };
 
     event.cancel = true;
@@ -396,7 +396,7 @@ export class ArticleListComponent {
     // Call your delete API
     this.dataService.deleteArticle(payload).subscribe(
       (response: any) => {
-       if (response?.flag === 1) {
+        if (response?.flag === 1) {
           notify(
             {
               message: 'Article Deleted Successfully',
@@ -406,17 +406,16 @@ export class ArticleListComponent {
           );
           this.getArticles();
           // this.dataGrid.instance.refresh();
-        }
-        else if (response?.flag === 0) {
-        // Article already used in Packing
-        notify(
-          {
-            message: response.Message || 'Article already used in Packing',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'error'
-        );
-      }  else {
+        } else if (response?.flag === 0) {
+          // Article already used in Packing
+          notify(
+            {
+              message: response.Message || 'Article already used in Packing',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'error',
+          );
+        } else {
           notify(
             {
               message: 'Your Data Not deleted',
