@@ -52,6 +52,34 @@
           </div>
         </dxi-item>
 
+        <dxi-item>
+          <dx-select-box
+            labelMode="floating"
+            labelLocation="left"
+            label="Year"
+            [width]="150"
+            [(value)]="selectedYear"
+            [dataSource]="years"
+            (onValueChanged)="onYearChanged($event)"
+            placeholder="Year"
+          ></dx-select-box>
+        </dxi-item>
+
+        <dxi-item>
+          <dx-select-box
+            labelMode="floating"
+            labelLocation="left"
+            label="month"
+            [dataSource]="monthDataSource"
+            displayExpr="name"
+            valueExpr="value"
+            [(value)]="selectedmonth"
+            (onValueChanged)="onMonthValueChanged($event)"
+            [dropDownOptions]="{ width: 'auto' }"
+          >
+          </dx-select-box>
+        </dxi-item>
+
         <dxi-item
           location="after"
           template="FromDateButton"
@@ -72,7 +100,7 @@
               [width]="150"
               label="From Date"
               labelMode="floating"
-              [value]="defaultDate"
+              [value]="selected_from_date"
               [displayFormat]="'dd-MM-yyyy'"
               (onValueChanged)="onFromDateChange($event)"
             >
@@ -96,7 +124,7 @@
               [width]="150"
               label="To Date"
               labelMode="floating"
-              [value]="defaultDate"
+              [value]="selected_To_date"
               displayFormat="dd-MM-yyyy"
               (onValueChanged)="onToDateChange($event)"
             >

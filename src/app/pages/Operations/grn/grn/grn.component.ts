@@ -51,6 +51,7 @@ import {
   GrnViewFormModule,
 } from 'src/app/pop-up/operations/grn-view-form/grn-view-form.component';
 import { Router } from '@angular/router';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-grn',
@@ -144,6 +145,13 @@ export class GrnComponent implements OnInit {
     icon.style.alignItems = 'center';
 
     cellElement.appendChild(icon);
+  }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
   }
 
   customButtons = [
@@ -785,6 +793,7 @@ export class GrnComponent implements OnInit {
     DxCheckBoxModule,
     GrnViewFormModule,
     DxDateBoxModule,
+    CustomDatePopupModule
   ],
   providers: [],
   exports: [],

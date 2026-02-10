@@ -54,6 +54,7 @@ import {
   PurchaseReturnDebitFormModule,
 } from '../purchase-return-debit-form/purchase-return-debit-form.component';
 import DataSource from 'devextreme/data/data_source';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-purchase-return-debit',
@@ -616,6 +617,12 @@ export class PurchaseReturnDebitComponent {
     }
     this.getpurchaseReturnList();
   }
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 @NgModule({
   imports: [
@@ -649,6 +656,7 @@ export class PurchaseReturnDebitComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     PurchaseReturnDebitFormModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [PurchaseReturnDebitComponent],

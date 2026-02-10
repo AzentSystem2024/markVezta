@@ -48,6 +48,7 @@ import {
   SaleReturnFormComponent,
   SaleReturnFormModule,
 } from '../sale-return-form/sale-return-form.component';
+import { CustomDatePopupModule } from '../custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-sale-return',
@@ -311,6 +312,13 @@ export class SaleReturnComponent {
     const mm = (date.getMonth() + 1).toString().padStart(2, '0');
     const dd = date.getDate().toString().padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
+  }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
@@ -619,6 +627,7 @@ export class SaleReturnComponent {
     DxoSummaryModule,
     PurchaseReturnDebitFormModule,
     SaleReturnFormModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [SaleReturnComponent],

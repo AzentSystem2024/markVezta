@@ -51,6 +51,7 @@ import { EditDebitModule } from '../edit-debit/edit-debit.component';
 import { ViewDebitModule } from '../view-debit/view-debit.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-debit',
@@ -601,6 +602,13 @@ export class DebitComponent {
     }
     this.getDebitNoteList();
   }
+
+  onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 
 @NgModule({
@@ -640,6 +648,7 @@ export class DebitComponent {
     AddDebitModule,
     EditDebitModule,
     ViewDebitModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [DebitComponent],

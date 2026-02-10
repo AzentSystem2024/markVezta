@@ -48,6 +48,7 @@ import {
 import { DataService } from 'src/app/services';
 import { EditPurchaseInvoiceModule } from '../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
 import { confirm } from 'devextreme/ui/dialog';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 @Component({
   selector: 'app-purchase-order',
   templateUrl: './purchase-order.component.html',
@@ -270,6 +271,13 @@ export class PurchaseOrderComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+  }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
   }
 
   refreshGrid() {
@@ -1103,6 +1111,7 @@ export class PurchaseOrderComponent {
     DxDataGridModule,
     PurchaseOrderEditFormModule,
     DxCheckBoxModule,
+    CustomDatePopupModule,
     DxDateBoxModule,
   ],
   providers: [],

@@ -44,6 +44,7 @@ import { filter, forkJoin } from 'rxjs';
 import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-item-store-prices',
@@ -202,6 +203,33 @@ export class ItemStorePricesComponent {
     { text: 'Price 4', value: 'PRICE4' },
     { text: 'Price 5', value: 'PRICE5' },
   ];
+  priceValidationMap: any = {
+    MRP: {
+      field: 'PRICE_NEW',
+      message: 'MRP',
+    },
+    PRICE1: {
+      field: 'PRICE_LEVEL1_NEW',
+      message: 'Standard Price',
+    },
+    PRICE2: {
+      field: 'PRICE_LEVEL2_NEW',
+      message: 'Price 2',
+    },
+    PRICE3: {
+      field: 'PRICE_LEVEL3_NEW',
+      message: 'Price 3',
+    },
+    PRICE4: {
+      field: 'PRICE_LEVEL4_NEW',
+      message: 'Price 4',
+    },
+    PRICE5: {
+      field: 'PRICE_LEVEL5_NEW',
+      message: 'Price 5',
+    },
+  };
+  zeroColumns: any[] = [];
 
   selectedPriceColumns: string[] = ['MRP']; // default visible
 
@@ -459,6 +487,7 @@ export class ItemStorePricesComponent {
   }
 
   onCellValueChanged(event: any) {
+    console.log(event, 'CELL VALUE CHANGED');
     const updatedData = event.data;
     const changedField = event.column.dataField;
     const newValue = event.value;
@@ -643,7 +672,12 @@ export class ItemStorePricesComponent {
       NARRATION: this.narrationText,
       worksheet_item_price: worksheetItemPrice,
     };
-    console.log(payload, '=================SAVE PAYLOAD===================');
+
+    console.log(
+      this.selectedPriceColumns,
+      '===========selectedPriceColumns=======',
+    );
+
     const invalidItems = payload.worksheet_item_price.filter((item: any) => {
       const priceToCheck =
         Number(item.PRICE_NEW) === 0
@@ -656,15 +690,51 @@ export class ItemStorePricesComponent {
     if (invalidItems.length > 0) {
       console.log(invalidItems, 'INVALID ITEMS');
       const itemCodes = invalidItems
-        .map((item: any) => item.ITEM_CODE)
+        .map((item: any) => item.PRICE_LEVEL1_NEW)
         .join(', ');
 
       notify(
-        `Price must be greater than Standard Price for Item(s): ${itemCodes}`,
+        `MRP  must be greater than Standard Price : ${itemCodes}`,
         'error',
         5000,
       );
 
+      return;
+    }
+    this.zeroColumns = [];
+
+    this.selectedPriceColumns.forEach((column: any) => {
+      const config = this.priceValidationMap[column];
+      console.log(config, '========CONFIG========');
+
+      if (!config) return;
+
+      const hasZero = payload.worksheet_item_price.some(
+        (item: any) => item[config.field] <= 0,
+      );
+
+      if (hasZero) {
+        console.log(hasZero, '========HAS ZERO========');
+        this.zeroColumns.push(config.message);
+        console.log(this.zeroColumns, '========ZERO COLUMNS========');
+      }
+    });
+    if (this.zeroColumns.length > 0) {
+      console.log(
+        this.zeroColumns,
+        '========ZERO COLUMNS BEFORE CONFIRM========',
+      );
+   notify({
+        message: 'selected column value must be update',
+        type: 'error',
+        displayTime: 2000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
+      
       return;
     }
 
@@ -786,6 +856,7 @@ export class ItemStorePricesComponent {
   }
 
   onSelectionChanged(event: any) {
+    console.log(event, 'SELECTION CHANGED EVENT');
     this.selectedRowCount = event.selectedRowKeys.length;
     this.selectedRowKeys = event.selectedRowKeys;
     this.isButtonDisabled = this.selectedRowCount === 0;

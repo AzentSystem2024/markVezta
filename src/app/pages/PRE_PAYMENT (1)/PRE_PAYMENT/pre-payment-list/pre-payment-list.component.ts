@@ -30,6 +30,7 @@ import { PrePaymentAddModule } from '../pre-payment-add/pre-payment-add.componen
 import { PrePaymentEditModule } from '../pre-payment-edit/pre-payment-edit.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-pre-payment-list',
@@ -133,6 +134,13 @@ export class PrePaymentListComponent {
       // Or reload data from API if needed
       this.get_PrePaymentList();
     }
+  }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
   }
 
   toggleFilterRow = () => {
@@ -462,6 +470,7 @@ export class PrePaymentListComponent {
     DxNumberBoxModule,
     PrePaymentAddModule,
     PrePaymentEditModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [PrePaymentListComponent],

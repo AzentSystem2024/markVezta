@@ -52,6 +52,7 @@ import {
 import { EditPurchaseInvoiceModule } from '../edit-purchase-invoice/edit-purchase-invoice.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-purchase-invoice-list',
@@ -601,6 +602,13 @@ export class PurchaseInvoiceListComponent {
     this.isAddInvoice = true;
     this.cdr.detectChanges();
   }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 
 @NgModule({
@@ -641,6 +649,7 @@ export class PurchaseInvoiceListComponent {
     ViewJournalVoucherModule,
     AddPurchaseInvoiceModule,
     EditPurchaseInvoiceModule,
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [PurchaseInvoiceListComponent],

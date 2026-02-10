@@ -30,6 +30,7 @@ import {
 import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 
 @Component({
@@ -405,6 +406,13 @@ articleProductionCount = 0;
       }
     },
   };
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 
 @NgModule({
@@ -428,6 +436,7 @@ articleProductionCount = 0;
     DxNumberBoxModule,
     DxTagBoxModule,
     DxDateBoxModule,
+    CustomDatePopupModule
   ],
   providers: [],
   exports: [],

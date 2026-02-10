@@ -3,6 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
   NgModule,
+  NgZone,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -124,6 +125,7 @@ export class AddJournalVoucharComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
+    private zone: NgZone,
   ) {
     this.Deparment_Drop_down();
   }
@@ -181,6 +183,28 @@ export class AddJournalVoucharComponent {
       },
     ];
   }
+
+   addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new row',
+    onClick: () => {
+      this.zone.run(() => this.addNewManualRow());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">Add Row</span>
+      </div>
+    `;
+    },
+  };
 
   Deparment_Drop_down() {
     this.dataService.Department_Dropdown().subscribe((res: any) => {

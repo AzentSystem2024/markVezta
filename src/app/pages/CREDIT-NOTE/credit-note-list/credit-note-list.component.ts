@@ -51,6 +51,7 @@ import { ViewCreditNoteModule } from '../view-credit-note/view-credit-note.compo
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 import { selected } from '@devexpress/analytics-core/queryBuilder-metadata';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-credit-note-list',
@@ -233,6 +234,13 @@ export class CreditNoteListComponent {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
     this.getCreditNotes();
+  }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
   }
 
   private getDateRangePayload(): {
@@ -659,6 +667,7 @@ export class CreditNoteListComponent {
     AddCreditNoteModule,
     EditCreditNoteModule,
     ViewCreditNoteModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [CreditNoteListComponent],

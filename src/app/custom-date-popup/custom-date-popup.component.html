@@ -2,30 +2,63 @@
   [(visible)]="visible"
   [showTitle]="true"
   title="Select Dates"
-  [width]="350"
-  [height]="170"
+  [width]="380"
+  [height]="250"
   [dragEnabled]="false"
   (onHiding)="onCancel()"
 >
   <div class="date-range-container">
-    <dx-date-box
-      [(value)]="startDate"
-      type="date"
-      width="300"
-      displayFormat="dd-MM-yyyy"
-      placeholder="From Date"
-    ></dx-date-box>
+    <!-- Row 1 : Year + Month -->
+    <div class="date-row">
+      <dx-select-box
+        label="Year"
+        labelMode="floating"
+        [width]="160"
+        [(value)]="selectedYear"
+        [dataSource]="years"
+        (onValueChanged)="onYearChanged($event)"
+      >
+      </dx-select-box>
 
-    <dx-date-box
-      [(value)]="endDate"
-      type="date"
-      placeholder="To Date"
-      displayFormat="dd-MM-yyyy"
-      width="300"
-    ></dx-date-box>
-  </div>
+      <dx-select-box
+        label="Month"
+        labelMode="floating"
+        [width]="160"
+        [dataSource]="monthDataSource"
+        displayExpr="name"
+        valueExpr="value"
+        [(value)]="selectedmonth"
+        (onValueChanged)="onMonthValueChanged($event)"
+      >
+      </dx-select-box>
+    </div>
 
-  <div class="button-container">
-    <dx-button text="Apply" type="default" (onClick)="apply()"></dx-button>
+    <!-- Row 2 : From + To Date -->
+    <div class="date-row">
+      <dx-date-box
+        label="From Date"
+        labelMode="floating"
+        type="date"
+        displayFormat="dd-MM-yyyy"
+        [(value)]="selected_from_date"
+        [width]="160"
+      >
+      </dx-date-box>
+
+      <dx-date-box
+        label="To Date"
+        labelMode="floating"
+        type="date"
+        displayFormat="dd-MM-yyyy"
+        [(value)]="selected_To_date"
+        [width]="160"
+      >
+      </dx-date-box>
+    </div>
+
+    <!-- Row 3 : Button -->
+    <div class="button-row">
+      <dx-button text="Apply" type="default" (onClick)="apply()"> </dx-button>
+    </div>
   </div>
 </dx-popup>

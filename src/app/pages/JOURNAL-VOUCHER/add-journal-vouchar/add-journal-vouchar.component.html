@@ -139,6 +139,12 @@
                     style="margin-top: 6px"
                     (onClick)="addNewManualRow()"
                   ></dx-button>
+                  <!-- <dxi-item
+                    location="after"
+                    locateInMenu="auto"
+                    widget="dxButton"
+                    [options]="addButtonOptions"
+                  ></dxi-item> -->
                 </div>
               </div>
             </dxi-item>
@@ -257,14 +263,13 @@
     justify-content: flex-end;
     gap: 10px;
   "
->
-  <dx-check-box
-    text="Approve"
-    [(value)]="journalVoucherFormData.IS_APPROVED"
-  ></dx-check-box>
-</div>
+></div>
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
+    <dx-check-box
+      text="Approve"
+      [(value)]="journalVoucherFormData.IS_APPROVED"
+    ></dx-check-box>
     <dx-button
       text="Cancel"
       (onClick)="cancel()"
