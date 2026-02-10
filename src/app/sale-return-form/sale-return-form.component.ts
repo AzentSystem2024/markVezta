@@ -361,7 +361,16 @@ export class SaleReturnFormComponent {
 
   openPendingGrnPopup() {
     if (!this.salesReturnFormData.CUST_ID) {
-      notify('Please Select A Supplier', 'warning', 2000);
+      notify({
+        message: 'Please select Customer',
+        type: 'warning',
+        displayTime: 3000,
+        position: {
+          my: 'center top',
+          at: 'center top',
+          of: window,
+        },
+      });
       return;
     }
 
@@ -697,16 +706,15 @@ export class SaleReturnFormComponent {
 
     let apiCall$;
 
-    // APPROVE → highest priority (new OR edit)
-    if (this.salesReturnFormData.IS_APPROVED) {
-      apiCall$ = this.dataService.approveSaleReturn(payload);
-    }
-    // UPDATE → edit but not approved
-    else if (this.isEditing && !this.salesReturnFormData.IS_APPROVED) {
-      apiCall$ = this.dataService.updateSaleReturn(payload);
-    }
-    // SAVE → new record
-    else {
+    if (this.isEditing) {
+      // Editing mode
+      if (this.salesReturnFormData.IS_APPROVED) {
+        apiCall$ = this.dataService.approveSaleReturn(payload);
+      } else {
+        apiCall$ = this.dataService.updateSaleReturn(payload);
+      }
+    } else {
+      // Add mode (always insert)
       apiCall$ = this.dataService.saveSaleReturn(payload);
     }
 

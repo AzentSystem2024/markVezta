@@ -78,7 +78,7 @@
             label="Doc No."
             labelMode="floating"
             [(value)]="salesReturnFormData.RET_NO"
-            [readOnly]="isReadOnlyMode"
+            [readOnly]="true"
             [width]="410"
           >
           </dx-text-box>
@@ -132,21 +132,7 @@
         >
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
-          <!-- <dxi-column
-            dataField="ID"
-            caption="Detail ID"
-            [visible]="false"
-          ></dxi-column>
-          <dxi-column
-            dataField="SALE_DET_ID"
-            caption="GRN Detail Id"
-            [visible]="false"
-          ></dxi-column>
-          <dxi-column
-            dataField="DOC_NO"
-            caption="GRN Detail Id"
-            [visible]="false"
-          ></dxi-column> -->
+
           <dxi-column
             dataField="ITEM_ID"
             caption="Item ID"

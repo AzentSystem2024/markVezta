@@ -54,6 +54,7 @@ import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-add-misc-receipt',
@@ -136,6 +137,7 @@ export class AddMiscReceiptComponent {
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
   isSaving = false;
+  logoBase64: string;
 
   constructor(
     private dataService: DataService,
@@ -183,8 +185,22 @@ export class AddMiscReceiptComponent {
       this.getVoucherNo(); // only fetch new number in add mode
     }
     this.getLedgerCodeDropdown();
+    const imagePath = 'assets/markLogo.jpg';
+    this.convertToBase64(imagePath).then((base64) => {
+      this.logoBase64 = base64;
+      console.log('Logo Base64 Loaded');
+    });
   }
+  private async convertToBase64(path: string): Promise<string> {
+    const response = await fetch(path);
+    const blob = await response.blob();
 
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  }
   ngAfterViewInit() {
     setTimeout(() => {
       this.beneficiaryNameRef.instance.focus();
@@ -998,28 +1014,172 @@ export class AddMiscReceiptComponent {
   }
 
   viewPdf(): void {
-    this.isPdfPopupVisible = true;
     this.dataService
       .selectMiscReceipt(this.MiscReceiptId)
       .subscribe((response: any) => {
         if (response) {
-          this.pdfSrc = this.get_pdf(response);
+          this.get_pdf(response);
         }
       });
   }
 
-  get_pdf(data: any): SafeResourceUrl {
+  get_pdf(response: any): void {
+    const data = response.Data;
+
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.width;
-    const margin = 12;
-    let y = 12;
+    let y = 10;
 
-    // ===========================
-    //  RETURN PDF
-    // ===========================
-    const blob = doc.output('blob');
-    const url = URL.createObjectURL(blob);
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    // ================= COMPANY (STATIC)
+    const company = {
+      COMPANY_NAME: 'Mark Traders',
+      ADDRESS1: 'Kallai',
+      ADDRESS2: 'Kozhikode',
+      ADDRESS3: 'Kerala',
+      GSTIN: '32AAAA0000A1Z5',
+      STATE: 'KERALA',
+      STATE_CODE: '32',
+      EMAIL: 'anu@gmail.com',
+    };
+
+    const party = {
+      NAME: data.PARTY_NAME || 'Test Party',
+      ADDRESS1: 'Kozhikode',
+      ADDRESS2: 'Kozhikode',
+      ADDRESS3: 'Kerala',
+    };
+
+    // ================= LOGO
+    if (this.logoBase64) {
+      doc.addImage(this.logoBase64, 'JPEG', 18, 12, 30, 30);
+    }
+
+    // ================= TITLE
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text('MISC RECEIPT', pageWidth / 2, 32, { align: 'center' });
+
+    // ================= HEADER
+    doc.setFontSize(10);
+    doc.text(`Voucher No : ${data.TRANS_ID}`, pageWidth - 70, 15);
+    doc.text(`Reference No : ${data.DOC_NO}`, pageWidth - 70, 21);
+
+    const date = new Date(data.TRANS_DATE).toLocaleDateString('en-GB');
+    doc.text(`Date : ${date}`, pageWidth - 70, 27);
+
+    y = 50;
+
+    // ================= COMPANY BLOCK
+    doc.setFillColor(204, 229, 255);
+    doc.rect(10, y, 100, 38, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.text(company.COMPANY_NAME, 13, y + 7);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(company.ADDRESS1, 13, y + 13);
+    doc.text(company.ADDRESS2, 13, y + 18);
+    doc.text(company.ADDRESS3, 13, y + 23);
+    doc.text(`GSTIN : ${company.GSTIN}`, 13, y + 28);
+    doc.text(
+      `State : ${company.STATE}, Code : ${company.STATE_CODE}`,
+      13,
+      y + 33,
+    );
+    doc.text(`Email : ${company.EMAIL}`, 13, y + 38);
+
+    // ================= CONSIGNEE
+    doc.setFont('helvetica', 'bold');
+    doc.text('Consignee (Ship to)', 115, y + 5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(party.NAME, 115, y + 12);
+    doc.text(party.ADDRESS1, 115, y + 17);
+    doc.text(party.ADDRESS2, 115, y + 22);
+    doc.text(party.ADDRESS3, 115, y + 27);
+
+    // ================= BUYER
+    doc.setFont('helvetica', 'bold');
+    doc.text('Buyer (Bill to)', 115, y + 45);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(party.NAME, 115, y + 52);
+    doc.text(party.ADDRESS1, 115, y + 57);
+    doc.text(party.ADDRESS2, 115, y + 62);
+    doc.text(party.ADDRESS3, 115, y + 67);
+
+    y += 80;
+
+    // ================= TABLE
+    const rows = data.DETAILS.map((d: any) => [
+      d.SL_NO,
+      d.LEDGER_CODE,
+      d.LEDGER_NAME,
+      d.REMARKS || '',
+      Number(d.DEBIT_AMOUNT).toFixed(2),
+      Number(d.CREDIT_AMOUNT).toFixed(2),
+    ]);
+
+    autoTable(doc, {
+      startY: y,
+      head: [
+        ['Sl', 'Ledger Code', 'Ledger Name', 'Remarks', 'Debit', 'Credit'],
+      ],
+      body: rows,
+      theme: 'grid',
+    });
+
+    // ================= FOOTER GST + TOTALS
+    let footY = (doc as any).lastAutoTable.finalY + 10;
+
+    const taxable = 20419.2;
+    const gstAmount = 3675.46;
+    const gstPerc = 18.0;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('GST %', 15, footY);
+    doc.text('Taxable Value', 37, footY);
+    doc.text('Integrated Tax', 70, footY);
+    doc.text('Total Tax Amount', 110, footY);
+
+    footY += 12;
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(gstPerc.toFixed(2) + '%', 15, footY);
+    doc.text(taxable.toFixed(2), 37, footY);
+    doc.text(gstAmount.toFixed(2), 87, footY);
+    doc.text(gstAmount.toFixed(2), 110, footY);
+
+    // RIGHT TOTALS
+    let rx = pageWidth - 65;
+    let ry = footY - 12;
+
+    doc.text('Taxable Value', rx, ry);
+    doc.text(': 20419.20', rx + 30, ry);
+
+    ry += 6;
+    doc.text('Total Tax', rx, ry);
+    doc.text(': 3675.46', rx + 30, ry);
+
+    ry += 6;
+    doc.text('Round Off', rx, ry);
+    doc.text(': 0.00', rx + 30, ry);
+
+    ry += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Invoice Total', rx, ry);
+    doc.text(': 24094.66', rx + 30, ry);
+
+    // ================= WORDS
+    let wordsY = ry + 15;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Amount in words :', 15, wordsY);
+    doc.setFont('helvetica', 'normal');
+    doc.text('INR Twenty Four Thousand Ninety Four Rupees Only', 60, wordsY);
+
+    // ================= OPEN IN NEW TAB
+    const url = doc.output('bloburl');
+    window.open(url, '_blank');
   }
 }
 
