@@ -275,6 +275,7 @@ export class ItemStorePricesEditComponent {
   }
 
   isVisible(code: string): boolean {
+    // console.log(this.selectedPriceColumns, 'SELECTEDPRICECOLUMNSSSSSSSSSS');
     return this.selectedPriceColumns.includes(code);
   }
 

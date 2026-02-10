@@ -692,14 +692,15 @@ export class AddInvoiceComponent {
         };
       },
     );
-
+    const today = new Date();
     // 4. Set root-level totals
     this.invoiceFormData.GROSS_AMOUNT = this.totalAmount;
     this.invoiceFormData.GST_AMOUNT = this.taxAmount;
     this.invoiceFormData.NET_AMOUNT = this.grandTotal;
     this.invoiceFormData.PARTY_NAME = this.invoiceFormData.PARTY_NAME;
     this.invoiceFormData.TRANS_TYPE = 25;
-    this.invoiceFormData.SALE_DATE = new Date();
+    // this.invoiceFormData.SALE_DATE = new Date();
+    this.invoiceFormData.SALE_DATE = today.toISOString().split('T')[0];
     // this.invoiceFormData.SALE_DATE = this.invoiceFormData.SALE_DATE;
     this.invoiceFormData.ADD_TIME = new Date();
     this.invoiceFormData.VEHICLE_NO = this.invoiceFormData.VEHICLE_NO;
