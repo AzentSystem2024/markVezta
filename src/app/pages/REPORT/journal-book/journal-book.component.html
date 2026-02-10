@@ -545,3 +545,20 @@
     ></app-transfer-in-inventory-form>
   </ng-container>
 </dx-popup>
+
+<dx-popup
+  [(visible)]="isEditSaleReturn"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Sale Return"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditSaleReturn">
+    <app-sale-return-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedSaleReturn"
+      [isReadOnlyMode]="isReadOnlySaleReturn"
+      (popupClosed)="handleClose()"
+    ></app-sale-return-form>
+  </ng-container>
+</dx-popup>
