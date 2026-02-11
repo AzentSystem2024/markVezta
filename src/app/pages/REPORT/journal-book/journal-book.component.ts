@@ -44,6 +44,7 @@ import { TransferInInventoryModule } from '../../transfer-in-inventory/transfer-
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 import DataSource from 'devextreme/data/data_source';
+import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 
 @Component({
   selector: 'app-journal-book',
@@ -92,6 +93,10 @@ export class JournalBookComponent {
   isReadOnlyReceipt: boolean = true;
   loadingInvoice = false;
   popupReady = false;
+
+  selectedSaleReturn: any;
+  isReadOnlySaleReturn: boolean = true;
+   isEditSaleReturn: boolean = false;
 
   selectedYear: number | null = null;
   years: number[] = [];
@@ -548,7 +553,15 @@ isFilterOpened = false;
             'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
-    } else if (TransType === 3) {
+    } else if (TransType === 26) {
+      console.log('=====navigate =====');
+      this.dataService.selectSaleReturn(trans_id).subscribe((response: any) => {
+        this.selectedSaleReturn = response;
+        this.isEditSaleReturn = true;
+        this.cdr.detectChanges();
+        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+      });
+    }else if (TransType === 3) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectMiscPayment(trans_id)
@@ -683,6 +696,7 @@ isFilterOpened = false;
     TransferOutInventoryAddModule,
     TransferInInventoryFormModule,
     EditCustomerReceiptModule,
+    SaleReturnFormModule
   ],
   providers: [],
   exports: [],
