@@ -151,6 +151,7 @@ export class CashBookComponent {
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {
     this.sesstion_Details();
     //============Year field dataSource===============
@@ -161,12 +162,16 @@ export class CashBookComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
+    // IMPORTANT: reset popups whenever page is entered again
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.resetPopups();
+      });
   }
   ngOnInit() {
     console.log('ngOnInit CALLED ');
-    
 
-    
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -176,11 +181,34 @@ export class CashBookComponent {
       String(today.getDate()).padStart(2, '0');
 
     this.selected_from_date = new Date();
-    console.log(this.selected_from_date)
+    console.log(this.selected_from_date);
     this.selected_To_date = SystemDate;
-    console.log(this.selected_To_date)
+    console.log(this.selected_To_date);
     this.Cash_book_data();
-    
+  }
+
+  resetPopups() {
+    this.isViewJournalVoucher = false;
+    this.isViewDebitNote = false;
+    this.isViewCreditNote = false;
+    this.isViewInvoice = false;
+    this.isViewReceipt = false;
+    this.editMiscPopup = false;
+    this.editMiscPopupOpened = false;
+    this.editSalaryPopup = false;
+    this.isEditReceipt = false;
+    this.EditDepreciationPopupVisible = false;
+    this.editPrePaymentPopupOpened = false;
+
+    this.selectedJournalVoucher = null;
+    this.selectedDebitNote = null;
+    this.selectedCreditNote = null;
+    this.selectedInvoice = null;
+    this.selectedReceipt = null;
+    this.selectedmiscellaneousData = null;
+    this.Selected_Depreciation_data = null;
+    this.selectedPrePayment = null;
+    this.selectedSalaryData = null;
   }
   ngAfterViewInit() {
     setTimeout(() => this.handleClose());
