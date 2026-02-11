@@ -947,6 +947,11 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'import-items',
+        component: ImportItemsComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: '**',
         redirectTo: 'login',
         pathMatch: 'full',
