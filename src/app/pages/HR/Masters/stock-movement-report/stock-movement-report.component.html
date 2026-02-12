@@ -33,6 +33,7 @@
       [grouping]="{ autoExpandAll: false }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
+      (onCellClick)="onCellClick($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -283,3 +284,265 @@
     </dx-data-grid>
   </div>
 </div>
+
+<!-- ...................details popup.............. -->
+<dx-popup
+  [(visible)]="isPopupVisible"
+  [width]="'50vw'"
+  [height]="'60vh'"
+  [showTitle]="true"
+  title="Details"
+  [closeOnOutsideClick]="true"
+>
+  <!-- <div class="custom-popup-header">
+    {{ popupTitle }}
+  </div> -->
+
+  <!-- GRN grid -->
+  <dx-data-grid
+    *ngIf="popupType === 'grn'"
+    [dataSource]="GrnDetails"
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [headerFilter]="{ visible: true }"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [allowColumnResizing]="true"
+    [height]="'40vh'"
+    [columnResizingMode]="'nextColumn'"
+    [headerFilter]="{ visible: true }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+
+    <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
+    <dxi-column dataField="TRANS_TYPE" caption="Type"></dxi-column>
+
+    <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+
+    <dxi-column
+      dataField="DOC_DATE"
+      caption="Date"
+      dataType="date"
+      format="dd/MM/yyyy"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="QUANTITY"
+      caption="Quantity"
+      dataType="number"
+      alignment="right"
+    ></dxi-column>
+  </dx-data-grid>
+
+  <!-- Purch return -->
+  <dx-data-grid
+    *ngIf="popupType === 'purchReturn'"
+    [dataSource]="PurchReturnDetails"
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [headerFilter]="{ visible: true }"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [allowColumnResizing]="true"
+    [height]="'40vh'"
+    [columnResizingMode]="'nextColumn'"
+    [headerFilter]="{ visible: true }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+
+    <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
+    <dxi-column dataField="TRANS_TYPE" caption="Type"></dxi-column>
+
+    <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+
+    <dxi-column
+      dataField="DOC_DATE"
+      caption="Date"
+      dataType="date"
+      format="dd/MM/yyyy"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="QUANTITY"
+      caption="Quantity"
+      dataType="number"
+      alignment="right"
+    ></dxi-column>
+  </dx-data-grid>
+
+  <!-- Production Grid -->
+  <dx-data-grid
+    *ngIf="popupType === 'production'"
+    [dataSource]="productionDetails"
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [headerFilter]="{ visible: true }"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [allowColumnResizing]="true"
+    [height]="'40vh'"
+    [columnResizingMode]="'nextColumn'"
+    [headerFilter]="{ visible: true }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
+
+    <dxi-column dataField="TRANS_TYPE" caption="Type"></dxi-column>
+
+    <dxi-column
+      dataField="DOC_DATE"
+      caption="Date"
+      dataType="date"
+      format="dd/MM/yyyy"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="QUANTITY"
+      caption="Quantity"
+      dataType="number"
+      alignment="right"
+    ></dxi-column>
+  </dx-data-grid>
+
+  <!-- Consumption Grid -->
+  <dx-data-grid
+    *ngIf="popupType === 'consumption'"
+    [dataSource]="consumptionDetails"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [headerFilter]="{ visible: true }"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [allowColumnResizing]="true"
+    [height]="'40vh'"
+    [columnResizingMode]="'nextColumn'"
+    [headerFilter]="{ visible: true }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
+
+    <dxi-column dataField="TRANS_TYPE" caption="Type"></dxi-column>
+
+    <dxi-column
+      dataField="DOC_DATE"
+      caption="Date"
+      dataType="date"
+      format="dd/MM/yyyy"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="QUANTITY"
+      caption="Quantity"
+      dataType="number"
+      alignment="right"
+    ></dxi-column>
+  </dx-data-grid>
+
+  <dx-data-grid
+    *ngIf="popupType === 'deliveryReturn'"
+    [dataSource]="deliveryReturnDetails"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+  >
+  </dx-data-grid>
+</dx-popup>

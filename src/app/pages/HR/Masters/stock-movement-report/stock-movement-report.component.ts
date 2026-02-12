@@ -54,6 +54,8 @@ import { ExportService } from 'src/app/services/export.service';
 export class StockMovementReportComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+
   StockMovementDatasource: any[] = [];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -103,6 +105,24 @@ export class StockMovementReportComponent {
   toDate: Date | string | number;
   selected_To_date: any;
   selected_from_date: any;
+  isProductionPopupVisible: boolean = false;
+  selectedRowData: any = null;
+  selectedItemId: any;
+  popupType:
+    | 'grn'
+    | 'purchReturn'
+    | 'production'
+    | 'consumption'
+    | 'delivery'
+    | 'deliveryReturn'
+    | null = null;
+  isPopupVisible: boolean = false;
+  GrnDetails:any[] = [];
+  productionDetails: any[] = [];
+  PurchReturnDetails:any[] = [];
+  consumptionDetails: any[] = [];
+  deliveryDetails: any[] = [];
+  deliveryReturnDetails: any[] = [];
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -132,17 +152,17 @@ export class StockMovementReportComponent {
     this.get_Item_Dropdown();
 
     //  SET TODAY AS DEFAULT
-     const today = new Date();
+    const today = new Date();
     const SystemDate =
       today.getFullYear() +
       '-' +
       String(today.getMonth() + 1).padStart(2, '0') +
       '-' +
       String(today.getDate()).padStart(2, '0');
-      this.selected_from_date = SystemDate;
-      this.selected_To_date = SystemDate;
-      this.getStockMovement
-    
+    this.selected_from_date = SystemDate;
+    this.selected_To_date = SystemDate;
+    this.getStockMovement;
+
     // this.formatted_To_date = this.formatDate(today);
   }
 
@@ -546,6 +566,171 @@ export class StockMovementReportComponent {
       }
     },
   };
+
+  onCellClick(e: any) {
+    if (e.rowType !== 'data') return;
+
+    const field = e.column?.dataField;
+    const itemId = e.data.ITEM_ID;
+
+    if (!itemId) return;
+
+    this.selectedRowData = e.data;
+    this.selectedItemId = itemId;
+
+    if (field === 'PRODUCTION_QTY') {
+      this.popupType = 'production';
+      this.loadProductionDetails(itemId);
+      this.isPopupVisible = true;
+    }
+
+    if (field === 'CONSUMPTION_QTY') {
+      this.popupType = 'consumption';
+      this.loadConsumptionDetails(itemId);
+      this.isPopupVisible = true;
+    }
+
+    if (field === 'DELIVERY_QTY') {
+      this.popupType = 'delivery';
+      this.loadDeliveryDetails(itemId);
+      this.isPopupVisible = true;
+    }
+    if (field === 'DELIVERY_RETURN_QTY') {
+      this.popupType = 'deliveryReturn';
+      this.loadDeliveryReturnDetails(itemId);
+      this.isPopupVisible = true;
+    }
+    if (field === 'GRN_QTY') {
+       this.popupType = 'grn' ;
+       this.loadGrnDetails(itemId)
+       this.isPopupVisible = true;
+    }
+    if (field === 'PURCH_RETURN') {
+       this.popupType = 'purchReturn' ;
+       this.loadPurchReturnDetails(itemId)
+       this.isPopupVisible = true;
+    }
+  }
+  loadProductionDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+      TRANS_TYPE: 'PRODUCTION'
+    };
+
+    console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
+
+    // API CALL HERE
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+      console.log(res,'res')
+      this.productionDetails = res.data || [];
+      console.log(this.productionDetails)
+    });
+  }
+
+  loadConsumptionDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+      TRANS_TYPE:'CONSUMPTION'
+    };
+
+    console.log(payload, 'CONSUMPTION DETAIL PAYLOAD');
+
+    // API CALL HERE
+    // this.dataService.getConsumptionDetails(payload).subscribe(res => {
+    //   this.consumptionDetails = res.data || [];
+    // });
+  }
+  loadDeliveryDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+      TRANS_TYPE:'DELIVERY'
+    };
+
+    console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
+
+    // API CALL HERE
+    // this.dataService.getProductionDetails(payload).subscribe(res => {
+    //   this.productionDetails = res.data || [];
+    // });
+  }
+
+  loadDeliveryReturnDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
+
+    // API CALL HERE
+    // this.dataService.getProductionDetails(payload).subscribe(res => {
+    //   this.productionDetails = res.data || [];
+    // });
+  }
+
+  loadGrnDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+      TRANS_TYPE:'GRN'
+    };
+
+    console.log(payload, 'GRN DETAIL PAYLOAD');
+
+    // API CALL HERE
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+      this.GrnDetails = res.data || [];
+    });
+  }
+
+  loadPurchReturnDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+      TRANS_TYPE : 'PURCHASE_RETURN'
+    };
+
+    console.log(payload, 'GRN DETAIL PAYLOAD');
+
+    // API CALL HERE
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+      this.PurchReturnDetails = res.data || [];
+    });
+  }
+
+  get popupTitle(): string {
+    switch (this.popupType) {
+      case 'production':
+        return 'Production Details';
+      case 'consumption':
+        return 'Consumption Details';
+      case 'delivery':
+        return 'Delivery Details';
+      case 'deliveryReturn':
+        return 'Delivery Return Details';
+      case 'grn' :
+        return 'Grn Details';  
+      case 'purchReturn':
+        return 'Purch Return Details';  
+      default:
+        return '';
+    }
+  }
 }
 
 @NgModule({

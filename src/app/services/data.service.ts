@@ -6254,4 +6254,16 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'Packing/GetPackingPriceLog';
     return this.http.post(getEndpoint, payload);
   }
+
+  // ===================stock movement drilldown==================
+  // Fetch_StockMovement_Details(payload){
+  //   const getEndpoint = this.apiUrl + 'StockMovementRpt/stockDrilldown';
+  //   return this.http.post(getEndpoint, payload);
+  // }
+  Fetch_StockMovement_Details(payload: any) {
+     const getEndpoint = this.apiUrl + 'StockMovementRpt/stockDrilldown';
+  return this.http.post<{ data: any[] }>(getEndpoint, payload);
+}
+
+
 }
