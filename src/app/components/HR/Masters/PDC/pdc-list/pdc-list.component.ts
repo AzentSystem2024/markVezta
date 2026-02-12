@@ -481,11 +481,12 @@ export class PdcListComponent {
 
     this.selectedDateRange = 'custom';
 
-    this.customStartDate = null;
-    this.customEndDate = null;
+    // this.customStartDate = null;
+    // this.customEndDate = null;
     this.showCustomDatePopup = false;
 
-    this.applyAllFilters(); // ✅ Handles everything centrally
+    this.applyAllFilters(); // Handles everything centrally
+    this.get_PDC_list('custom');
   }
 
   applyEntryCustomDateFilter() {
@@ -523,11 +524,12 @@ export class PdcListComponent {
 
     this.selectedEntryDateRange = 'custom';
 
-    this.entrycustomStartDate = null;
-    this.entrycustomEndDate = null;
+    // this.entrycustomStartDate = null;
+    // this.entrycustomEndDate = null;
     this.showEntryCustomDatePopup = false;
 
-    this.applyAllFilters(); // ✅ Handles everything centrally
+    this.applyAllFilters(); // Handles everything centrally
+    this.get_PDC_list('custom')
   }
 
   onTypeChanged(event: any) {
@@ -682,7 +684,7 @@ export class PdcListComponent {
     this.applyCustomDateFilter(); // your existing function
   }
 
-  get_PDC_list() {
+  get_PDC_list(dateRange: string = this.selectedDateRange) {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
@@ -690,8 +692,8 @@ export class PdcListComponent {
       console.log(res, 'response of PDC list');
       this.fullPDCList = res.Data;
 
-      this.onDateRangeChanged({ value: this.selectedDateRange });
-      this.onEntryDateRangeChanged({ value: this.selectedEntryDateRange });
+      // this.onDateRangeChanged({ value: this.selectedDateRange });
+      // this.onEntryDateRangeChanged({ value: this.selectedEntryDateRange });
 
       // Apply all filters together
       this.applyAllFilters();

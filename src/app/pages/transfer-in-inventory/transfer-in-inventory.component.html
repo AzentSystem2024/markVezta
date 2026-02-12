@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="filteredTrInList"
@@ -137,7 +137,7 @@
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
       >
       </dxi-column>
@@ -147,7 +147,15 @@
   </div>
 </div>
 
-<dx-popup
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>
+
+<!-- <dx-popup
   [(visible)]="showCustomDatePopup"
   [showTitle]="true"
   title="Select Dates"
@@ -182,7 +190,7 @@
       ></dx-button>
     </div>
   </div>
-</dx-popup>
+</dx-popup> -->
 
 <dx-popup
   [(visible)]="isAddTransferIn"

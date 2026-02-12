@@ -103,20 +103,7 @@
           ></dxi-validation-rule>
         </dx-validator>
       </dx-select-box>
-      <dx-select-box label="Location" labelMode="floating"></dx-select-box>
-    </div>
 
-    <!-- Row 6 -->
-    <div class="form-row">
-      <dx-text-box
-        label="Narration"
-        labelMode="floating"
-        [(value)]="PrePaymentFormData.NARRATION"
-      ></dx-text-box>
-    </div>
-
-    <!-- Row 7 -->
-    <div class="form-row">
       <dx-select-box
         label="Prepayment Ledger"
         [searchEnabled]="true"
@@ -133,7 +120,20 @@
           ></dxi-validation-rule>
         </dx-validator>
       </dx-select-box>
+      <!-- <dx-select-box label="Location" labelMode="floating"></dx-select-box> -->
     </div>
+
+    <!-- Row 6 -->
+    <div class="form-row">
+      <dx-text-box
+        label="Narration"
+        labelMode="floating"
+        [(value)]="PrePaymentFormData.NARRATION"
+      ></dx-text-box>
+    </div>
+
+    <!-- Row 7 -->
+    <div class="form-row"></div>
 
     <!-- Row 8 -->
     <div class="period-row">

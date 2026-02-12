@@ -45,6 +45,7 @@ import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { TransferOutInventoryAddModule } from '../transfer-out-inventory-add/transfer-out-inventory-add.component';
 import notify from 'devextreme/ui/notify';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-transfer-out-inventory',
@@ -158,7 +159,7 @@ export class TransferOutInventoryComponent {
     this.selected_Company_id= this.sessionData.SELECTED_COMPANY.COMPANY_ID
   }
 
-  getTransferOutList() {
+  getTransferOutList(dateRange: string = this.selectedDateRange) {
     const payload = {
       COMPANY_ID : this.selected_Company_id,
     }
@@ -308,6 +309,7 @@ export class TransferOutInventoryComponent {
     );
 
     this.showCustomDatePopup = false;
+    this.getTransferOutList('custom')
   }
 
   private parseDateString(dateStr: string): Date {
@@ -515,6 +517,12 @@ export class TransferOutInventoryComponent {
     this.isEditTransferOut = false;
     this.getTransferOutList();
   }
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
 }
 
 @NgModule({
@@ -552,6 +560,7 @@ export class TransferOutInventoryComponent {
     EditCreditNoteModule,
     ViewCreditNoteModule,
     TransferOutInventoryAddModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [TransferOutInventoryComponent],

@@ -46,6 +46,7 @@ import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { TransferInInventoryFormModule } from '../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import notify from 'devextreme/ui/notify';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 @Component({
   selector: 'app-transfer-in-inventory',
@@ -161,7 +162,8 @@ export class TransferInInventoryComponent {
     this.selected_Company_id= this.sessionData.SELECTED_COMPANY.COMPANY_ID
   }
 
-  getTransferInList() {
+  getTransferInList(dateRange: string = this.selectedDateRange) {
+    // const datePayload = this.getDateRangePayload(dateRange);
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     }
@@ -310,6 +312,7 @@ export class TransferInInventoryComponent {
     );
 
     this.showCustomDatePopup = false;
+    this.getTransferInList('custom');
   }
 
   private parseDateString(dateStr: string): Date {
@@ -490,6 +493,14 @@ export class TransferInInventoryComponent {
     this.isEditTransferIn = false;
     this.getTransferInList();
   }
+
+    onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
+
 }
 
 @NgModule({
@@ -528,6 +539,7 @@ export class TransferInInventoryComponent {
     ViewCreditNoteModule,
     TransferOutInventoryAddModule,
     TransferInInventoryFormModule,
+    CustomDatePopupModule
   ],
   providers: [],
   declarations: [TransferInInventoryComponent],

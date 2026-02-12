@@ -157,7 +157,7 @@ export class ListSalaryPaymentComponent {
   }
 
 
-  getSalaryPaymentList() {
+  getSalaryPaymentList(dateRange: string = this.selectedDateRange) {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
     }
@@ -377,6 +377,7 @@ export class ListSalaryPaymentComponent {
     );
 
     this.showCustomDatePopup = false;
+    this.getSalaryPaymentList('custom')
   }
 
   private parseDateString(dateStr: string): Date {
