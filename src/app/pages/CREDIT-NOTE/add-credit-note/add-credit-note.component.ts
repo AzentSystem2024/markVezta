@@ -240,14 +240,13 @@ export class AddCreditNoteComponent {
   }
 
   private hasEmptyRow(): boolean {
-    return (this.creditFormData?.NOTE_DETAIL || []).some(
-      (r: any) =>
-        !r.ledgerCode &&
-        !r.ledgerName &&
-        !r.particulars &&
-        (!r.Amount || r.Amount === 0) &&
-        (!r.GST_PERC || r.GST_PERC === 0),
-    );
+    return (this.creditFormData?.NOTE_DETAIL || []).some((r: any) => {
+      const hasLedger = !!r.ledgerCode;
+      const hasAmount = Number(r.Amount) > 0;
+
+      // Block only if ledger selected but amount missing
+      return hasLedger && !hasAmount;
+    });
   }
 
   addNewManualRow() {
@@ -1236,6 +1235,22 @@ export class AddCreditNoteComponent {
     }
     console.log(this.netTotal, 'NETTOTALLLLLLLL');
     return this.netTotal.toFixed(2);
+  }
+
+  onRowRemoving(e: any) {
+    const index = this.creditFormData.NOTE_DETAIL.indexOf(e.data);
+
+    if (index > -1) {
+      this.creditFormData.NOTE_DETAIL.splice(index, 1);
+    }
+
+    // 🔥 Force datasource refresh
+    this.itemsGridRef.instance.option('dataSource', [
+      ...this.creditFormData.NOTE_DETAIL,
+    ]);
+
+    // 🔥 Force recalculation
+    this.itemsGridRef.instance.refresh();
   }
 
   onRoundOffChange() {

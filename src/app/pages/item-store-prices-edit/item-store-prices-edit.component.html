@@ -144,7 +144,8 @@
           stylingMode="contained"
           type="default"
           (onClick)="onSaveButtonClick()"
-          [disabled]="isApplyButtonDisabled || !areRowsSelected()"
+          [disabled]="isApplyButtonDisabled || !areRowsSelected() || isSaving"
+          [loading]="isSaving"
           style="width: 100px"
         ></dx-button>
 
@@ -163,6 +164,8 @@
           stylingMode="contained"
           type="default"
           (onClick)="onApprove()"
+          [disabled]="isApproving"
+          [loading]="isApproving"
           style="width: 100px"
         ></dx-button>
       </div>

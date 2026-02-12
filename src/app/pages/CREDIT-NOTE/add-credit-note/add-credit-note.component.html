@@ -27,6 +27,7 @@
           useIcons: true,
         }"
         (onEditorPreparing)="onEditorPreparing($event)"
+        (onRowRemoving)="onRowRemoving($event)"
       >
         <dxo-load-panel [showPane]="false"></dxo-load-panel>
         <dxo-filter-builder [allowHierarchicalFields]="true">

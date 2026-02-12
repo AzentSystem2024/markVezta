@@ -54,6 +54,8 @@ import { ExportService } from 'src/app/services/export.service';
 export class StockMovementReportComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+
   StockMovementDatasource: any[] = [];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -103,6 +105,20 @@ export class StockMovementReportComponent {
   toDate: Date | string | number;
   selected_To_date: any;
   selected_from_date: any;
+  isProductionPopupVisible: boolean = false;
+  selectedRowData: any = null;
+  selectedItemId: any;
+  popupType:
+    | 'production'
+    | 'consumption'
+    | 'delivery'
+    | 'deliveryReturn'
+    | null = null;
+  isPopupVisible: boolean = false;
+  productionDetails: any[] = [];
+  consumptionDetails: any[] = [];
+  deliveryDetails: any[] = [];
+  deliveryReturnDetails: any[] = [];
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -132,17 +148,17 @@ export class StockMovementReportComponent {
     this.get_Item_Dropdown();
 
     //  SET TODAY AS DEFAULT
-     const today = new Date();
+    const today = new Date();
     const SystemDate =
       today.getFullYear() +
       '-' +
       String(today.getMonth() + 1).padStart(2, '0') +
       '-' +
       String(today.getDate()).padStart(2, '0');
-      this.selected_from_date = SystemDate;
-      this.selected_To_date = SystemDate;
-      this.getStockMovement
-    
+    this.selected_from_date = SystemDate;
+    this.selected_To_date = SystemDate;
+    this.getStockMovement;
+
     // this.formatted_To_date = this.formatDate(today);
   }
 
@@ -168,6 +184,7 @@ export class StockMovementReportComponent {
       this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
       this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
     }
+    this.triggerStockReload();
   }
 
   //================Month value change ===================
@@ -188,6 +205,7 @@ export class StockMovementReportComponent {
         0,
       );
     }
+    this.triggerStockReload();
   }
 
   sesstion_Details() {
@@ -255,6 +273,7 @@ export class StockMovementReportComponent {
   onItemIdChange(event: any) {
     console.log(event, '=================item id===================');
     this.selected_item_Id = event.value;
+    this.triggerStockReload();
     console.log(
       this.selected_item_Id,
       '=================selected item id===================',
@@ -274,6 +293,7 @@ export class StockMovementReportComponent {
   onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
+    this.triggerStockReload();
     console.log('Formatted Date:', this.formatted_from_date); // example: "2025-04-01"
   }
 
@@ -281,6 +301,7 @@ export class StockMovementReportComponent {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
     console.log('Formatted Date:', this.formatted_To_date); // example: "2025-04-01"
+    this.triggerStockReload();
   }
 
   formatDate(date: Date): string {
@@ -289,7 +310,12 @@ export class StockMovementReportComponent {
     const day = ('0' + date.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
   }
+  private triggerStockReload() {
+    // Optional guard – prevents API call before grid is ready
+    if (!this.dataGrid?.instance) return;
 
+    this.getStockMovement();
+  }
   getStockMovement() {
     const grid = this.dataGrid?.instance;
 
@@ -546,6 +572,118 @@ export class StockMovementReportComponent {
       }
     },
   };
+
+  onCellClick(e: any) {
+    if (e.rowType !== 'data') return;
+
+    const field = e.column?.dataField;
+    const itemId = e.data.ITEM_ID;
+
+    if (!itemId) return;
+
+    this.selectedRowData = e.data;
+    this.selectedItemId = itemId;
+
+    if (field === 'PRODUCTION_QTY') {
+      this.popupType = 'production';
+      this.loadProductionDetails(itemId);
+      this.isPopupVisible = true;
+    }
+
+    if (field === 'CONSUMPTION_QTY') {
+      this.popupType = 'consumption';
+      this.loadConsumptionDetails(itemId);
+      this.isPopupVisible = true;
+    }
+
+    if (field === 'DELIVERY_QTY') {
+      this.popupType = 'delivery';
+      this.loadDeliveryDetails(itemId);
+      this.isPopupVisible = true;
+    }
+    if (field === 'DELIVERY_RETURN_QTY') {
+      this.popupType = 'deliveryReturn';
+      this.loadDeliveryReturnDetails(itemId);
+      this.isPopupVisible = true;
+    }
+  }
+  loadProductionDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
+
+    // API CALL HERE
+    // this.dataService.getProductionDetails(payload).subscribe(res => {
+    //   this.productionDetails = res.data || [];
+    // });
+  }
+
+  loadConsumptionDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    console.log(payload, 'CONSUMPTION DETAIL PAYLOAD');
+
+    // API CALL HERE
+    // this.dataService.getConsumptionDetails(payload).subscribe(res => {
+    //   this.consumptionDetails = res.data || [];
+    // });
+  }
+  loadDeliveryDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
+
+    // API CALL HERE
+    // this.dataService.getProductionDetails(payload).subscribe(res => {
+    //   this.productionDetails = res.data || [];
+    // });
+  }
+
+  loadDeliveryReturnDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
+
+    // API CALL HERE
+    // this.dataService.getProductionDetails(payload).subscribe(res => {
+    //   this.productionDetails = res.data || [];
+    // });
+  }
+
+  get popupTitle(): string {
+    switch (this.popupType) {
+      case 'production':
+        return 'Production Details';
+      case 'consumption':
+        return 'Consumption Details';
+      case 'delivery':
+        return 'Delivery Details';
+      case 'deliveryReturn':
+        return 'Delivery Return Details';
+      default:
+        return '';
+    }
+  }
 }
 
 @NgModule({

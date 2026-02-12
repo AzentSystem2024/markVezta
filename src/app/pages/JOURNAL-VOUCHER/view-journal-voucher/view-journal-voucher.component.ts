@@ -90,7 +90,7 @@ export class ViewJournalVoucherComponent {
 
   constructor(
     private dataService: DataService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     this.Deparment_Drop_down();
   }
@@ -104,7 +104,7 @@ export class ViewJournalVoucherComponent {
     this.dataService.Department_Dropdown().subscribe((res: any) => {
       console.log(
         res,
-        '========================department data========================='
+        '========================department data=========================',
       );
 
       this.Company_list = res;
@@ -123,7 +123,7 @@ export class ViewJournalVoucherComponent {
           const matchedLedger = this.ledgerList.find(
             (l: any) =>
               l.HEAD_CODE === item.LEDGER_CODE ||
-              l.HEAD_NAME === item.LEDGER_NAME
+              l.HEAD_NAME === item.LEDGER_NAME,
           );
 
           return {
@@ -134,7 +134,7 @@ export class ViewJournalVoucherComponent {
             debitAmount: item.DEBIT_AMOUNT ?? '',
             creditAmount: item.CREDIT_AMOUNT ?? '',
           };
-        }
+        },
       );
 
       const userDataString = localStorage.getItem('userData');
@@ -211,7 +211,7 @@ export class ViewJournalVoucherComponent {
         this.journalVoucherFormData.DETAILS =
           this.journalVoucherFormData.DETAILS.map((item: any) => {
             const matchedLedger = this.ledgerList.find(
-              (l: any) => l.HEAD_CODE === item.LEDGER_CODE
+              (l: any) => l.HEAD_CODE === item.LEDGER_CODE,
             );
 
             return {
@@ -220,7 +220,7 @@ export class ViewJournalVoucherComponent {
               ledgerName:
                 item.LEDGER_NAME?.trim() !== ''
                   ? item.LEDGER_NAME
-                  : matchedLedger?.HEAD_NAME ?? '',
+                  : (matchedLedger?.HEAD_NAME ?? ''),
               particulars: item.PARTICULARS ?? '',
               debitAmount: item.DEBIT_AMOUNT ?? '',
               creditAmount: item.CREDIT_AMOUNT ?? '',

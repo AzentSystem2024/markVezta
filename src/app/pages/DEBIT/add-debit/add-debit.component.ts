@@ -1129,17 +1129,11 @@ export class AddDebitComponent {
       return isCompletelyEmpty && hasAnyValue;
     });
   }
-  // private hasEmptyRow(): boolean {
-  //   return (this.debitFormData?.NOTE_DETAIL || []).some(
-  //     (r: any) =>
-  //       (!r.ledgerCode || r.ledgerCode === '') &&
-  //       (!r.ledgerName || r.ledgerName === '') &&
-  //       (!r.Amount || r.Amount === 0),
-  //   );
-  // }
 
   onAddNewRow() {
-    const grid = this.itemsGridRef.instance;
+    const grid = this.itemsGridRef?.instance;
+
+    if (!grid) return;
 
     if (this.hasEmptyRow()) {
       notify('Please fill the existing empty row first.', 'warning', 2000);
@@ -1160,17 +1154,25 @@ export class AddDebitComponent {
       HSN_CODE: this.selectedInvoiceHSN || '',
     };
 
+    // 1️⃣ Push into array
     this.debitFormData.NOTE_DETAIL.push(newRow);
 
-    // ✅ APPLY GST FROM SELECTED INVOICE TO ALL ROWS (INCLUDING NEW)
+    // 2️⃣ 🔥 IMPORTANT → Reassign datasource
+    grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
+
+    // 3️⃣ Apply GST if needed
     if (this.selectedInvoiceGST) {
       this.applyInvoiceGSTToRows();
     }
 
-    // Focus ledgerCode
+    // 4️⃣ Focus new row
     setTimeout(() => {
-      const newRowIndex = this.debitFormData.NOTE_DETAIL.length - 1;
-      grid?.editCell(newRowIndex, 'ledgerCode');
+      const visibleRows = grid.getVisibleRows();
+      const newRowIndex = visibleRows.findIndex((r) => r.data === newRow);
+
+      if (newRowIndex >= 0) {
+        grid.editCell(newRowIndex, 'ledgerCode');
+      }
     }, 100);
   }
 
