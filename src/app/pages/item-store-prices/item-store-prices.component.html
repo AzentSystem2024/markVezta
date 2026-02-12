@@ -128,7 +128,8 @@
           type="default"
           (onClick)="onSaveButtonClick()"
           style="width: 100px"
-          [disabled]="isButtonDisabled"
+          [disabled]="isButtonDisabled || isSaving"
+          [loading]="isSaving"
         ></dx-button>
 
         <dx-button

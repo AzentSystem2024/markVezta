@@ -177,6 +177,8 @@ export class ItemStorePricesEditComponent {
     onClick: () => this.toggleFilters(),
   };
   selected_data: any;
+  isSaving = false;
+  isApproving = false;
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -548,6 +550,7 @@ export class ItemStorePricesEditComponent {
   }
 
   onSaveButtonClick() {
+    if (this.isSaving) return;
     this.Save();
     this.isSaved = true;
   }
@@ -563,12 +566,17 @@ export class ItemStorePricesEditComponent {
       );
       return;
     }
+
+    this.isSaving = true;
+
     const payload = {
       ...this.worksheetData,
       NARRATION: this.narrationText,
       worksheet_item_price: this.selected_data || this.worksheetItems,
     };
+
     console.log(payload, 'PAYLOAD TO SAVE');
+
     const invalidItems = payload.worksheet_item_price.filter((item: any) => {
       const priceToCheck =
         Number(item.PRICE_NEW) === 0
@@ -589,6 +597,7 @@ export class ItemStorePricesEditComponent {
         5000,
       );
 
+      this.isSaving = false; // ✅ stop loading
       return;
     }
 
@@ -599,47 +608,56 @@ export class ItemStorePricesEditComponent {
       );
 
       result.then((dialogResult) => {
-        if (dialogResult) {
-          //  User confirmed approval
-          this.dataservice.approveworksheetItemPrices(payload).subscribe(
-            (response) => {
-              if (response.flag == 1) {
-                notify(
-                  {
-                    message: 'Worksheet Approved Successfully',
-                    position: { at: 'top center', my: 'top center' },
-                  },
-                  'success',
-                );
-                this.router.navigate(['/change-price']);
-                this.isApproved = false;
-              } else {
-                notify(
-                  {
-                    message: response.message || 'Worksheet Approved failed',
-                    position: { at: 'top center', my: 'top center' },
-                  },
-                  'error',
-                );
-              }
-            },
-            (error) => {
-              console.error('Error approving worksheet:', error);
+        if (!dialogResult) {
+          this.isSaving = false; // ✅ stop loading if cancelled
+          return;
+        }
+
+        this.dataservice.approveworksheetItemPrices(payload).subscribe(
+          (response) => {
+            this.isSaving = false; // ✅ stop loading
+
+            if (response.flag == 1) {
               notify(
                 {
-                  message: 'Error approving worksheet',
-                  position: { at: 'top right', my: 'top right' },
+                  message: 'Worksheet Approved Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
+              this.router.navigate(['/change-price']);
+              this.isApproved = false;
+            } else {
+              notify(
+                {
+                  message: response.message || 'Worksheet Approved failed',
+                  position: { at: 'top center', my: 'top center' },
                 },
                 'error',
               );
-            },
-          );
-        }
+            }
+          },
+          (error) => {
+            this.isSaving = false; // ✅ stop loading
+
+            console.error('Error approving worksheet:', error);
+            notify(
+              {
+                message: 'Error approving worksheet',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          },
+        );
       });
     } else {
       console.log(payload, 'PAYLOAD TO SAVE');
+
       this.dataservice.updateworksheetItemPrice(payload).subscribe(
         (response) => {
+          this.isSaving = false; // ✅ stop loading
+
           if (response.flag === 1) {
             notify(
               {
@@ -661,8 +679,9 @@ export class ItemStorePricesEditComponent {
             );
           }
         },
-
         (error) => {
+          this.isSaving = false; // ✅ stop loading
+
           console.error('Error saving data:', error);
         },
       );
@@ -744,14 +763,22 @@ export class ItemStorePricesEditComponent {
   }
 
   onApprove() {
+    if (this.isApproving) return; // ✅ prevent double click
+
+    this.isApproving = true;
     if (this.AllowCommitWithSave) {
       if (this.payloadForVerify) {
         this.dataservice
           .approveworksheetItemPrices(this.payloadForVerify)
-          .subscribe((response) => {
-            console.log('APPROVED');
-            this.selectedRowKeys = [];
-          });
+          .subscribe(
+            (response) => {
+              console.log('APPROVED');
+              this.selectedRowKeys = [];
+            },
+            (error) => {
+              this.isApproving = false; // ✅ stop loading on error
+            },
+          );
       }
       const companyId = 1; // Example: this.companyId = 1
       const userId = 1; // Example: this.userId = 1
@@ -793,6 +820,8 @@ export class ItemStorePricesEditComponent {
       };
 
       this.approveItemStoreProperties(approvePayload);
+    } else {
+      this.isApproving = false; // ✅ stop loading if not allowed
     }
   }
 
@@ -800,25 +829,31 @@ export class ItemStorePricesEditComponent {
     if (this.AllowCommitWithSave) {
       this.dataservice
         .approveworksheetItemPrices(this.payloadForVerify)
-        .subscribe((approveResponse) => {
-          if (approveResponse) {
-            notify(
-              {
-                message: 'Worksheet Approved Successfully',
-                position: { at: 'top center', my: 'top center' },
-              },
-              'success',
-            );
-          } else {
-            notify(
-              {
-                message: 'Your Data Not Saved',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'error',
-            );
-          }
-        });
+        .subscribe(
+          (approveResponse) => {
+            if (approveResponse) {
+              this.isApproving = false;
+              notify(
+                {
+                  message: 'Worksheet Approved Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
+            } else {
+              notify(
+                {
+                  message: 'Your Data Not Saved',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error',
+              );
+            }
+          },
+          (error) => {
+            this.isApproving = false; // ✅ stop loading on error
+          },
+        );
       this.router.navigate(['/change-price']);
     }
   }

@@ -241,6 +241,7 @@ export class ItemStorePricesComponent {
     onClick: () => this.toggleFilters(),
   };
   narrationText: any;
+  isSaving = false;
 
   constructor(
     private dataservice: DataService,
@@ -614,7 +615,7 @@ export class ItemStorePricesComponent {
       );
       return;
     }
-
+    this.isSaving = true;
     const companyId = 1;
     const userId = 1;
     const narration = this.narrationText;
@@ -661,6 +662,7 @@ export class ItemStorePricesComponent {
         },
         'error',
       );
+      this.isSaving = false;
       return;
     }
 
@@ -698,7 +700,7 @@ export class ItemStorePricesComponent {
         'error',
         5000,
       );
-
+      this.isSaving = false;
       return;
     }
     this.zeroColumns = [];
@@ -724,7 +726,7 @@ export class ItemStorePricesComponent {
         this.zeroColumns,
         '========ZERO COLUMNS BEFORE CONFIRM========',
       );
-   notify({
+      notify({
         message: 'selected column value must be update',
         type: 'error',
         displayTime: 2000,
@@ -734,12 +736,13 @@ export class ItemStorePricesComponent {
           of: window,
         },
       });
-      
+      this.isSaving = false;
       return;
     }
 
     this.dataservice.saveWorksheetPrice(payload).subscribe(
       (response) => {
+        this.isSaving = false;
         this.worksheetID = response.data.ID;
         this.savedWorksheet = {
           ID: this.selectedRowId,
@@ -776,6 +779,7 @@ export class ItemStorePricesComponent {
         }
       },
       (error) => {
+        this.isSaving = false;
         console.error('Error saving data:', error);
       },
     );
@@ -1226,6 +1230,7 @@ export class ItemStorePricesComponent {
   }
 
   onSaveButtonClick() {
+    if (this.isSaving) return;
     this.Save();
     // this.isSaved = true;
   }

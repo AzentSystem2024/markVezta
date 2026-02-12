@@ -188,6 +188,7 @@ export class StockMovementReportComponent {
       this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
       this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
     }
+    this.triggerStockReload();
   }
 
   //================Month value change ===================
@@ -208,6 +209,7 @@ export class StockMovementReportComponent {
         0,
       );
     }
+    this.triggerStockReload();
   }
 
   sesstion_Details() {
@@ -275,6 +277,7 @@ export class StockMovementReportComponent {
   onItemIdChange(event: any) {
     console.log(event, '=================item id===================');
     this.selected_item_Id = event.value;
+    this.triggerStockReload();
     console.log(
       this.selected_item_Id,
       '=================selected item id===================',
@@ -294,6 +297,7 @@ export class StockMovementReportComponent {
   onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
+    this.triggerStockReload();
     console.log('Formatted Date:', this.formatted_from_date); // example: "2025-04-01"
   }
 
@@ -301,6 +305,7 @@ export class StockMovementReportComponent {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
     console.log('Formatted Date:', this.formatted_To_date); // example: "2025-04-01"
+    this.triggerStockReload();
   }
 
   formatDate(date: Date): string {
@@ -309,7 +314,12 @@ export class StockMovementReportComponent {
     const day = ('0' + date.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
   }
+  private triggerStockReload() {
+    // Optional guard – prevents API call before grid is ready
+    if (!this.dataGrid?.instance) return;
 
+    this.getStockMovement();
+  }
   getStockMovement() {
     const grid = this.dataGrid?.instance;
 
@@ -618,10 +628,7 @@ export class StockMovementReportComponent {
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
       TRANS_TYPE: 'PRODUCTION'
-    };
-
-    console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
-
+    }
     // API CALL HERE
     this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
       console.log(res,'res')
@@ -639,10 +646,6 @@ export class StockMovementReportComponent {
       TRANS_TYPE:'CONSUMPTION'
     };
 
-    console.log(payload, 'CONSUMPTION DETAIL PAYLOAD');
-
-    // API CALL HERE
-    // this.dataService.getConsumptionDetails(payload).subscribe(res => {
     //   this.consumptionDetails = res.data || [];
     // });
   }
@@ -654,8 +657,6 @@ export class StockMovementReportComponent {
       COMPANY_ID: this.selected_Company_id,
       TRANS_TYPE:'DELIVERY'
     };
-
-    console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
 
     // API CALL HERE
     // this.dataService.getProductionDetails(payload).subscribe(res => {
