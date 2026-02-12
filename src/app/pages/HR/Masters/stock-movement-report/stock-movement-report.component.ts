@@ -336,7 +336,7 @@ export class StockMovementReportComponent {
       next: (res: any) => {
         this.StockMovementDatasource = res.data || [];
 
-        // 🔑 FORCE GRID REFRESH
+        //  FORCE GRID REFRESH
         grid?.refresh();
       },
       complete: () => {
@@ -615,7 +615,7 @@ export class StockMovementReportComponent {
        this.loadGrnDetails(itemId)
        this.isPopupVisible = true;
     }
-    if (field === 'PURCH_RETURN') {
+    if (field === 'PURCHASE_RETURN') {
        this.popupType = 'purchReturn' ;
        this.loadPurchReturnDetails(itemId)
        this.isPopupVisible = true;
@@ -646,8 +646,10 @@ export class StockMovementReportComponent {
       TRANS_TYPE:'CONSUMPTION'
     };
 
-    //   this.consumptionDetails = res.data || [];
-    // });
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+      console.log(res,'res')
+      this.consumptionDetails = res.data || [];
+    });
   }
   loadDeliveryDetails(itemId: number) {
     const payload = {
@@ -659,9 +661,9 @@ export class StockMovementReportComponent {
     };
 
     // API CALL HERE
-    // this.dataService.getProductionDetails(payload).subscribe(res => {
-    //   this.productionDetails = res.data || [];
-    // });
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+      this.deliveryDetails = res.data || [];
+    });
   }
 
   loadDeliveryReturnDetails(itemId: number) {
@@ -670,6 +672,7 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
+      TRANS_TYPE:'DELIVERY_RETURN'
     };
 
     console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
@@ -679,6 +682,8 @@ export class StockMovementReportComponent {
     //   this.productionDetails = res.data || [];
     // });
   }
+
+  
 
   loadGrnDetails(itemId: number) {
     const payload = {
