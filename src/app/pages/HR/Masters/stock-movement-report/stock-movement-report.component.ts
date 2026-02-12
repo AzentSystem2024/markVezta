@@ -117,9 +117,9 @@ export class StockMovementReportComponent {
     | 'deliveryReturn'
     | null = null;
   isPopupVisible: boolean = false;
-  GrnDetails:any[] = [];
+  GrnDetails: any[] = [];
   productionDetails: any[] = [];
-  PurchReturnDetails:any[] = [];
+  PurchReturnDetails: any[] = [];
   consumptionDetails: any[] = [];
   deliveryDetails: any[] = [];
   deliveryReturnDetails: any[] = [];
@@ -611,14 +611,14 @@ export class StockMovementReportComponent {
       this.isPopupVisible = true;
     }
     if (field === 'GRN_QTY') {
-       this.popupType = 'grn' ;
-       this.loadGrnDetails(itemId)
-       this.isPopupVisible = true;
+      this.popupType = 'grn';
+      this.loadGrnDetails(itemId);
+      this.isPopupVisible = true;
     }
     if (field === 'PURCH_RETURN') {
-       this.popupType = 'purchReturn' ;
-       this.loadPurchReturnDetails(itemId)
-       this.isPopupVisible = true;
+      this.popupType = 'purchReturn';
+      this.loadPurchReturnDetails(itemId);
+      this.isPopupVisible = true;
     }
   }
   loadProductionDetails(itemId: number) {
@@ -627,13 +627,13 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE: 'PRODUCTION'
-    }
+      TRANS_TYPE: 'PRODUCTION',
+    };
     // API CALL HERE
-    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
-      console.log(res,'res')
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
+      console.log(res, 'res');
       this.productionDetails = res.data || [];
-      console.log(this.productionDetails)
+      console.log(this.productionDetails);
     });
   }
 
@@ -643,11 +643,14 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE:'CONSUMPTION'
+      TRANS_TYPE: 'CONSUMPTION',
     };
 
-    //   this.consumptionDetails = res.data || [];
-    // });
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
+      console.log(res, 'res');
+      this.consumptionDetails = res.data || [];
+      console.log(this.consumptionDetails);
+    });
   }
   loadDeliveryDetails(itemId: number) {
     const payload = {
@@ -655,7 +658,7 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE:'DELIVERY'
+      TRANS_TYPE: 'DELIVERY',
     };
 
     // API CALL HERE
@@ -686,13 +689,13 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE:'GRN'
+      TRANS_TYPE: 'GRN',
     };
 
     console.log(payload, 'GRN DETAIL PAYLOAD');
 
     // API CALL HERE
-    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
       this.GrnDetails = res.data || [];
     });
   }
@@ -703,13 +706,13 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE : 'PURCHASE_RETURN'
+      TRANS_TYPE: 'PURCHASE_RETURN',
     };
 
     console.log(payload, 'GRN DETAIL PAYLOAD');
 
     // API CALL HERE
-    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
       this.PurchReturnDetails = res.data || [];
     });
   }
@@ -724,10 +727,10 @@ export class StockMovementReportComponent {
         return 'Delivery Details';
       case 'deliveryReturn':
         return 'Delivery Return Details';
-      case 'grn' :
-        return 'Grn Details';  
+      case 'grn':
+        return 'Grn Details';
       case 'purchReturn':
-        return 'Purch Return Details';  
+        return 'Purch Return Details';
       default:
         return '';
     }
