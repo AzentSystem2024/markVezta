@@ -3030,15 +3030,15 @@ export class DataService {
   //   const body = { UOM: uom , COMPANY_ID : this.selected_Company_id};
   //   return this.http.post<any>(`${this.apiUrl}uom/insert`, body, { headers });
   // }
-  postUOM(payload: { UOM: string;  }): Observable<any> {
+  postUOM(payload: { UOM: string }): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.apiUrl}uom/insert`, payload, {
       headers,
     });
   }
 
-  updateUom(ID: any, UOM: any,): Observable<any> {
-    const data = { ID, UOM, };
+  updateUom(ID: any, UOM: any): Observable<any> {
+    const data = { ID, UOM };
     return this.http.post(`${this.apiUrl}uom/update`, data);
   }
 
@@ -4400,9 +4400,13 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=============================employee dropdown============
+  // Dropdown_advance_employee(type: any) {
+  //   const reqbody = { NAME: 'EMPLOYEE' };
+  //   return this.http.post(`${this.apiUrl}DropDown`, reqbody);
+  // }
+
   Dropdown_advance_employee(type: any) {
-    const reqbody = { NAME: 'EMPLOYEE' };
-    return this.http.post(`${this.apiUrl}DropDown`, reqbody);
+    return this.http.post(`${this.apiUrl}DropDown`, type);
   }
 
   // ===================dropdown for advance Types================
@@ -6261,9 +6265,7 @@ The result can be exported to HTML or Markdown.`;
   //   return this.http.post(getEndpoint, payload);
   // }
   Fetch_StockMovement_Details(payload: any) {
-     const getEndpoint = this.apiUrl + 'StockMovementRpt/stockDrilldown';
-  return this.http.post<{ data: any[] }>(getEndpoint, payload);
-}
-
-
+    const getEndpoint = this.apiUrl + 'StockMovementRpt/stockDrilldown';
+    return this.http.post<{ data: any[] }>(getEndpoint, payload);
+  }
 }
