@@ -137,7 +137,7 @@
           ></dx-date-box>
         </dxi-item>
 
-        <dxi-item>
+        <!-- <dxi-item>
           <dx-button
             text="Apply"
             icon="todo"
@@ -146,7 +146,7 @@
             [width]="100"
             (onClick)="getStockMovement()"
           ></dx-button>
-        </dxi-item>
+        </dxi-item> -->
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -190,35 +190,30 @@
       <dxi-column
         dataField="OPENING_QTY"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Opening Qty"
       ></dxi-column>
       <dxi-column
         dataField="GRN_QTY"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="GRN Qty"
       ></dxi-column>
       <dxi-column
         dataField="PURCHASE_RETURN_QTY"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Purch.Return"
       ></dxi-column>
       <dxi-column
         dataField="PRODUCTION_QTY"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Production"
       ></dxi-column>
       <dxi-column
         dataField="CONSUMPTION_QTY"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Consumption"
       ></dxi-column>
@@ -239,42 +234,36 @@
       <dxi-column
         dataField="DELIVERY_QTY"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Delivery Out"
       ></dxi-column>
       <dxi-column
         dataField="DELIVERY_RETURN_QTY"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Delivery Return"
       ></dxi-column>
       <dxi-column
         dataField="SALE_QTY"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Sale Qty"
       ></dxi-column>
       <dxi-column
         dataField="SALE_RETURN_QTY"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Sales Return"
       ></dxi-column>
       <dxi-column
         dataField="ADJUSTED"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Adjusted"
       ></dxi-column>
       <dxi-column
         dataField="BALANCE_STOCK"
         dataType="number"
-        format="#,##0.00"
         alignment="right"
         caption="Closing"
       ></dxi-column>
@@ -317,6 +306,7 @@
     [scrolling]="{ mode: 'virtual' }"
     rowAlternationInterval="2"
     [selection]="{ mode: 'single' }"
+    (onRowDblClick)="onPopupRowClick($event, 'grn')"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
@@ -378,6 +368,7 @@
     [scrolling]="{ mode: 'virtual' }"
     rowAlternationInterval="2"
     [selection]="{ mode: 'single' }"
+    (onRowDblClick)="onPopupRowClick($event, 'purchReturn')"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
@@ -439,6 +430,7 @@
     [scrolling]="{ mode: 'virtual' }"
     rowAlternationInterval="2"
     [selection]="{ mode: 'single' }"
+    (onRowDblClick)="onPopupRowClick($event, 'consumption')"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
@@ -498,6 +490,7 @@
     [scrolling]="{ mode: 'virtual' }"
     rowAlternationInterval="2"
     [selection]="{ mode: 'single' }"
+    (onRowDblClick)="onPopupRowClick($event, 'production')"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
@@ -556,6 +549,7 @@
     [scrolling]="{ mode: 'virtual' }"
     rowAlternationInterval="2"
     [selection]="{ mode: 'single' }"
+    (onRowDblClick)="onPopupRowClick($event, 'delivery')"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
@@ -601,6 +595,292 @@
     [dataSource]="deliveryReturnDetails"
     [showBorders]="true"
     [columnAutoWidth]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [headerFilter]="{ visible: true }"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [allowColumnResizing]="true"
+    [height]="'40vh'"
+    [columnResizingMode]="'nextColumn'"
+    [headerFilter]="{ visible: true }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+    (onRowDblClick)="onPopupRowClick($event, 'deliveryReturn')"
   >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
+
+    <dxi-column dataField="TRANS_TYPE" caption="Type"></dxi-column>
+
+    <dxi-column
+      dataField="DOC_DATE"
+      caption="Date"
+      dataType="date"
+      format="dd/MM/yyyy"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="QUANTITY"
+      caption="Quantity"
+      dataType="number"
+      alignment="right"
+    ></dxi-column>
+    >
   </dx-data-grid>
+
+  <dx-data-grid
+    *ngIf="popupType === 'saleReturn'"
+    [dataSource]="saleReturnDetails"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [headerFilter]="{ visible: true }"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [allowColumnResizing]="true"
+    [height]="'40vh'"
+    [columnResizingMode]="'nextColumn'"
+    [headerFilter]="{ visible: true }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+    (onRowDblClick)="onPopupRowClick($event, 'saleReturn')"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
+
+    <dxi-column dataField="TRANS_TYPE" caption="Type"></dxi-column>
+
+    <dxi-column
+      dataField="DOC_DATE"
+      caption="Date"
+      dataType="date"
+      format="dd/MM/yyyy"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="QUANTITY"
+      caption="Quantity"
+      dataType="number"
+      alignment="right"
+    ></dxi-column>
+    >
+  </dx-data-grid>
+
+  <dx-data-grid
+    *ngIf="popupType === 'salesInvoice'"
+    [dataSource]="salesInvoiceDetails"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [headerFilter]="{ visible: true }"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [allowColumnResizing]="true"
+    [height]="'40vh'"
+    [columnResizingMode]="'nextColumn'"
+    [headerFilter]="{ visible: true }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+    (onRowDblClick)="onPopupRowClick($event, 'salesInvoice')"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
+
+    <dxi-column dataField="TRANS_TYPE" caption="Type"></dxi-column>
+
+    <dxi-column
+      dataField="DOC_DATE"
+      caption="Date"
+      dataType="date"
+      format="dd/MM/yyyy"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="QUANTITY"
+      caption="Quantity"
+      dataType="number"
+      alignment="right"
+    ></dxi-column>
+    >
+  </dx-data-grid>
+</dx-popup>
+
+<!-- .....................................................view page............................... -->
+
+<dx-popup
+  [(visible)]="isEditProductionPopupVisible"
+  [width]="1200"
+  [height]="'100vh'"
+  title="Article Production"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditProductionPopupVisible">
+    <app-production-jv-add
+      [isEditing]="true"
+      [EditingResponseData]="selectedProduction"
+      [productionType]="selectedProductionType"
+      (formClosed)="handleClose()"
+    ></app-production-jv-add>
+  </ng-container>
+</dx-popup>
+
+<!-- ....GRN..... -->
+
+<dx-popup
+  [(visible)]="isViewGrnPopupOpened"
+  title="View Goods Receipt Note"
+  [height]="'95vh'"
+  [width]="'90vw'"
+  [showTitle]="true"
+  [closeOnOutsideClick]="true"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewGrnPopupOpened">
+    <app-grn-view-form
+      [formdata]="selectedRowData"
+      [grnId]="selectedGrnId"
+      (formClosed)="handleClose()"
+    ></app-grn-view-form>
+  </ng-container>
+</dx-popup>
+
+<!-- ....PURCHASE RETURN..... -->
+<dx-popup
+  [(visible)]="isEditPurchaseReturn"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="Purchase Return (Debit Note)"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditPurchaseReturn">
+    <app-purchase-return-debit-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedPurchaseReturn"
+      [isReadOnlyMode]="isReadOnlyPurchaseReturn"
+      (formClosed)="handleClose()"
+    ></app-purchase-return-debit-form>
+  </ng-container>
+</dx-popup>
+<!-- .................................SALE RETURN.............................................. -->
+<dx-popup
+  [(visible)]="isEditSaleReturn"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Sale Return"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditSaleReturn">
+    <app-sale-return-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedSaleReturn"
+      [isReadOnlyMode]="isReadOnlySaleReturn"
+      (formClosed)="handleClose()"
+    ></app-sale-return-form>
+  </ng-container>
+</dx-popup>
+
+<!-- ...................................SALES INVOICE.......................................... -->
+<dx-popup
+  [(visible)]="isViewInvoice"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="View Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewInvoice">
+    <app-view-invoice
+      [invoiceFormData]="selectedInvoice"
+      (popupClosed)="handleClose()"
+    ></app-view-invoice>
+  </ng-container>
+</dx-popup>
+
+<!-- .....................................DELIVERY NOTE................................. -->
+<dx-popup
+  [(visible)]="isEditDelivery"
+  [width]="'80vw'"
+  [height]="'90vh'"
+  title="Delivery Note"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditDelivery">
+    <app-delivery-note-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedDelivery"
+      [isReadOnlyMode]="isReadOnlyDelivery"
+      (popupClosed)="handleClose()"
+    ></app-delivery-note-form>
+  </ng-container>
 </dx-popup>
