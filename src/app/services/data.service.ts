@@ -1209,11 +1209,13 @@ export class DataService {
     return this.http.post(`${this.apiUrl}AC_Report/Boxproduction`, payload);
   }
 
+  //===========Paytime Entry===================
+  
   SalaryHead_Dropdown() {
     const reqbody = { NAME: 'SALARYHEAD' };
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
-
+  
   get_PaytimeEntry_list(payload) {
     const getEndpoint = `${this.apiUrl}PayTimeEntry/select`;
     return this.http.post(getEndpoint, payload);
