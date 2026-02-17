@@ -125,6 +125,7 @@ export class StockMovementReportComponent {
     | 'deliveryReturn'
     | 'saleReturn'
     | 'salesInvoice'
+    | 'adjusted'
     | null = null;
   isPopupVisible: boolean = false;
   GrnDetails: any[] = [];
@@ -135,6 +136,7 @@ export class StockMovementReportComponent {
   deliveryReturnDetails: any[] = [];
   saleReturnDetails: any[] = [];
   salesInvoiceDetails: any[] = [];
+  adjustedDetails : any [] = [];
   isEditProductionPopupVisible: boolean;
   selectedProduction: any;
   isReadOnlyInvoice: boolean;
@@ -612,7 +614,7 @@ export class StockMovementReportComponent {
 
     const field = e.column?.dataField;
     const itemId = e.data.ITEM_ID;
-
+    console.log(field)
     if (!itemId) return;
 
     this.selectedRowData = e.data;
@@ -658,6 +660,11 @@ export class StockMovementReportComponent {
     if (field === 'SALE_QTY') {
       this.popupType = 'salesInvoice';
       this.loadSalesInvoiceDetails(itemId);
+      this.isPopupVisible = true;
+    }
+    if (field === 'ADJUSTED') {
+      this.popupType = 'adjusted';
+      this.loadAdjustedDetails(itemId);
       this.isPopupVisible = true;
     }
   }
@@ -718,9 +725,9 @@ export class StockMovementReportComponent {
     console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
 
     // API CALL HERE
-    // this.dataService.getProductionDetails(payload).subscribe(res => {
-    //   this.productionDetails = res.data || [];
-    // });
+     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
+      this.deliveryReturnDetails = res.data || [];
+    });
   }
 
   loadGrnDetails(itemId: number) {
@@ -790,6 +797,23 @@ export class StockMovementReportComponent {
     });
   }
 
+  loadAdjustedDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+      TRANS_TYPE: 'ADJUSTMENT',
+    };
+
+    console.log(payload, 'GRN DETAIL PAYLOAD');
+
+    // API CALL HERE
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
+      this.adjustedDetails = res.data || [];
+    });
+  }
+
   get popupTitle(): string {
     switch (this.popupType) {
       case 'production':
@@ -804,6 +828,12 @@ export class StockMovementReportComponent {
         return 'Grn Details';
       case 'purchReturn':
         return 'Purch Return Details';
+        case 'salesInvoice':
+        return 'Sales Invoice Details';
+        case 'saleReturn':
+        return 'Sale Return Details';
+        case 'adjusted':
+        return 'Stock Adjustment Details';
       default:
         return '';
     }
@@ -911,7 +941,7 @@ export class StockMovementReportComponent {
       }
 
       case 'salesInvoice': {
-        const returnId = row.TRANS_ID; // 🔑 Sale Return uses TRANS_ID
+        const returnId = row.TRANS_ID; //  Sale Return uses TRANS_ID
         const status = row.TRANS_STATUS;
 
         if (!returnId) return;

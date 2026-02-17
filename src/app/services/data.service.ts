@@ -1200,7 +1200,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SalaryPayment/commit`, data);
   }
 
-  //ANUSREE
+  //  ===========ARTICLE PRODUCTION======================
   get_ArticleProduction_view(payload) {
     return this.http.post(`${this.apiUrl}AC_Report/articleproduction`, payload);
   }

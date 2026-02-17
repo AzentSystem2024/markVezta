@@ -277,15 +277,20 @@
 <!-- ...................details popup.............. -->
 <dx-popup
   [(visible)]="isPopupVisible"
-  [width]="'50vw'"
+  [width]="'70vw'"
   [height]="'60vh'"
   [showTitle]="true"
-  title="Details"
   [closeOnOutsideClick]="true"
+  [showCloseButton]="true"
 >
   <!-- <div class="custom-popup-header">
     {{ popupTitle }}
   </div> -->
+  <div *dxTemplate="let data of 'title'">
+    <div class="custom-popup-title">
+      {{ popupTitle }}
+    </div>
+  </div>
 
   <!-- GRN grid -->
   <dx-data-grid
@@ -317,15 +322,16 @@
       [showInfo]="true"
       [showNavigationButtons]="true"
     ></dxo-pager>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
     <dxo-load-panel [showPane]="false"></dxo-load-panel>
     <dxo-scrolling mode="virtual"></dxo-scrolling>
     <dxo-filter-row
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row>
-    <dxo-header-filter [visible]="isFilterOpened">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
 
@@ -394,9 +400,10 @@
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row>
-    <dxo-header-filter [visible]="isFilterOpened">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
 
@@ -465,9 +472,10 @@
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row>
-    <dxo-header-filter [visible]="isFilterOpened">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
     <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
@@ -534,9 +542,10 @@
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row>
-    <dxo-header-filter [visible]="isFilterOpened">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
     <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
@@ -567,6 +576,7 @@
     </dxo-summary>
   </dx-data-grid>
 
+  <!-- Delivery out -->
   <dx-data-grid
     *ngIf="popupType === 'delivery'"
     [dataSource]="deliveryDetails"
@@ -602,9 +612,10 @@
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row>
-    <dxo-header-filter [visible]="isFilterOpened">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
     <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
@@ -635,6 +646,7 @@
     </dxo-summary>
   </dx-data-grid>
 
+  <!-- Delivery Return -->
   <dx-data-grid
     *ngIf="popupType === 'deliveryReturn'"
     [dataSource]="deliveryReturnDetails"
@@ -672,9 +684,10 @@
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row>
-    <dxo-header-filter [visible]="isFilterOpened">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
     <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
@@ -694,7 +707,7 @@
       dataType="number"
       alignment="right"
     ></dxi-column>
-    <<<<<<< HEAD
+
     <dxo-summary>
       <dxi-total-item
         column="QUANTITY"
@@ -704,9 +717,9 @@
       >
       </dxi-total-item>
     </dxo-summary>
-    ======= > >>>>>>> 7bc121c21ac6be54125490e71a9cdbee245f3dac
   </dx-data-grid>
 
+  <!-- Sale Return -->
   <dx-data-grid
     *ngIf="popupType === 'saleReturn'"
     [dataSource]="saleReturnDetails"
@@ -744,9 +757,10 @@
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row>
-    <dxo-header-filter [visible]="isFilterOpened">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
     <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
@@ -766,7 +780,6 @@
       dataType="number"
       alignment="right"
     ></dxi-column>
-    <<<<<<< HEAD
     <dxo-summary>
       <dxi-total-item
         column="QUANTITY"
@@ -776,9 +789,9 @@
       >
       </dxi-total-item>
     </dxo-summary>
-    ======= > >>>>>>> 7bc121c21ac6be54125490e71a9cdbee245f3dac
   </dx-data-grid>
 
+  <!-- Sales Invoice -->
   <dx-data-grid
     *ngIf="popupType === 'salesInvoice'"
     [dataSource]="salesInvoiceDetails"
@@ -816,9 +829,82 @@
       [visible]="isFilterRowVisible"
       [applyFilter]="auto"
     ></dxo-filter-row>
-    <dxo-header-filter [visible]="isFilterOpened">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
+
+    <dxi-column dataField="TRANS_TYPE" caption="Type"></dxi-column>
+
+    <dxi-column
+      dataField="DOC_DATE"
+      caption="Date"
+      dataType="date"
+      format="dd/MM/yyyy"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="QUANTITY"
+      caption="Quantity"
+      dataType="number"
+      alignment="right"
+    ></dxi-column>
+    <dxo-summary>
+      <dxi-total-item
+        column="QUANTITY"
+        summaryType="sum"
+        displayFormat="Total: {0}"
+        valueFormat="#,##0.00"
+      >
+      </dxi-total-item>
+    </dxo-summary>
+  </dx-data-grid>
+
+  <!-- Adjusted  -->
+  <dx-data-grid
+    *ngIf="popupType === 'adjusted'"
+    [dataSource]="adjustedDetails"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [headerFilter]="{ visible: true }"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [allowColumnResizing]="true"
+    [height]="'40vh'"
+    [columnResizingMode]="'nextColumn'"
+    [headerFilter]="{ visible: true }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+    (onRowDblClick)="onPopupRowClick($event, 'adjusted')"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
     <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
