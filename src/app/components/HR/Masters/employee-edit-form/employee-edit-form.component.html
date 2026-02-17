@@ -1,5 +1,10 @@
 <div class="content-wrapper">
-  <dx-tab-panel [(selectedIndex)]="selectedTabIndex" [animationEnabled]="true">
+  <dx-tab-panel
+    class="form-tabs"
+    [(selectedIndex)]="selectedTabIndex"
+    [animationEnabled]="true"
+    [deferRendering]="false"
+  >
     <!-- GENERAL TAB -->
     <dxi-item title="General">
       <!-- Two Column Container -->
@@ -472,26 +477,17 @@
         </div>
       </div>
 
-      <!-- <div class="container">
-        <div class="left-column">
-          <div class="custom-card"> -->
-      <div class="two-column-layout">
-        <div>
-          <dx-check-box
-            [(value)]="employeeFormData.IS_SALESMAN"
-            text="Salesman"
-          ></dx-check-box>
-        </div>
-        <div>
-          <dx-check-box
-            [(value)]="employeeFormData.IS_INACTIVE"
-            text="Inactive"
-          ></dx-check-box>
-        </div>
+      <div class="form-status-row">
+        <dx-check-box
+          [(value)]="employeeFormData.IS_SALESMAN"
+          text="Salesman"
+        ></dx-check-box>
+
+        <dx-check-box
+          [(value)]="employeeFormData.IS_INACTIVE"
+          text="Inactive"
+        ></dx-check-box>
       </div>
-      <!-- </div>
-        </div>
-      </div> -->
     </dxi-item>
 
     <dxi-item title="Attachments">

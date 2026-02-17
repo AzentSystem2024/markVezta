@@ -67,7 +67,7 @@ export class EmployeeSalarySettingsEditComponent {
     private cdr: ChangeDetectorRef,
   ) {
     // this.getEmployeeSalarySettingsList();
-    this.EmployeeListDropDown();
+    // this.EmployeeListDropDown();
     this.get_SalaryHead_List();
   }
 

@@ -43,32 +43,57 @@
 }
 
 .image-upload-container {
-  border: 2px dashed #ccc;
-  // width: 200px;
   width: 100%;
-  height: 217px;
-  cursor: pointer;
+  height: 270px;
+
+  border: 2px dashed #4da3ff;
+  border-radius: 6px;
+
+  background-color: #eef6ff;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  overflow: hidden;
-  // margin-top: -10px;
+
+  cursor: pointer;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.upload-icon {
+  font-size: 30px;
+  color: #1e88e5; /* DevExtreme blue */
+}
+
+.image-upload-container:hover {
+  border-color: #3b82f6;
+  background-color: #f1f6ff;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .image-preview img {
   width: 100%;
   height: 100%;
-  // object-fit: cover;
   object-fit: contain;
-  object-position: center;
-  margin-top: -10px;
 }
 
-.upload-placeholder {
-  font-size: 16px;
-  color: #777;
-  margin-top: -10px;
+.upload-spinner {
+  font-size: 28px;
+  color: #3b82f6; /* DevExtreme blue */
 }
 
 .hidden-file-uploader {
@@ -96,7 +121,7 @@
 }
 .two-column-layout {
   display: flex;
-
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px; /* Adjust space between columns */
 }
 .two-column-layout > div {
@@ -159,20 +184,22 @@ dx-text-box {
 
 .custom-card {
   border: 1px solid #838181;
+  opacity: 0.7;
   border-radius: 8px;
 
   padding: 20px;
   // margin: 10px;
   width: 100%;
   overflow-y: auto;
-  margin-left: -75px;
-  margin-right: -75px;
+  margin-left: 1px; /* was -75px */
+  margin-right: -5px;
   margin-top: 8px;
 }
 
 // box-shadow: 0px 2px 20px rgba(7, 7, 7, 0.1);
 .custom-card-passport {
   border: 1px solid #838181;
+  opacity: 0.7;
   border-radius: 8px;
   padding: 20px;
   // margin: 20px;
@@ -184,14 +211,15 @@ dx-text-box {
 
 .custom-card-passport-2 {
   border: 1px solid #838181;
+  opacity: 0.7;
   border-radius: 8px;
-  margin-top: 8px;
   padding: 20px;
-  // margin: 20px;
-  width: 10 0%;
+  margin-top: 8px;
   overflow-y: auto;
-  margin-left: -75px;
-  margin-right: -75px;
+
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .dx-form .dx-field-item {
@@ -356,6 +384,7 @@ dx-text-box {
 
 .custom-card-address {
   border: 1px solid #838181;
+  opacity: 0.7;
   border-radius: 8px;
   padding: 8px;
   width: 98%;
@@ -459,4 +488,29 @@ dx-text-box {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px; /* spacing between fields */
+}
+.form-status-row {
+  display: flex;
+  justify-content: flex-end; /* move to right */
+  align-items: center;
+  gap: 20px;
+
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding-right: 20px;
+}
+.custom-form-tabs.dx-tabpanel {
+  border: none;
+}
+
+/* Tabs container */
+.custom-form-tabs .dx-tabs {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Tab item */
+.custom-form-tabs .dx-tab {
+  background: transparent;
+  border: none;
+  padding: 10px 18px;
 }

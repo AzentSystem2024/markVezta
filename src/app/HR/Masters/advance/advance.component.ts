@@ -40,10 +40,10 @@ import { Router } from '@angular/router';
   styleUrls: ['./advance.component.scss'],
 })
 export class AdvanceComponent {
-    @ViewChild('formValidationGroup', { static: false }) formValidationGroup: DxValidationGroupComponent;
-  
-  @ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild('formValidationGroup', { static: false })
+  formValidationGroup: DxValidationGroupComponent;
 
+  @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
   isLoading: boolean = true;
 
@@ -60,7 +60,7 @@ export class AdvanceComponent {
   ADVANCETYPE_VALUE: any;
   Advance_types_ID: any;
   selected_Data: any = [];
-Payment_Head:any
+  Payment_Head: any;
   adv_type_name: any;
   Advance_Amount_value: any;
   adv_no_value: any;
@@ -81,7 +81,7 @@ Payment_Head:any
   selected_Cheque_Date: any;
   //data box
   approveValue: boolean = false;
-selectTransId:any
+  selectTransId: any;
   dateRanges = [
     { label: 'All', value: 'all' },
     { label: 'Today', value: 'today' },
@@ -95,7 +95,7 @@ selectTransId:any
 
   fromDate: string | number | Date = new Date();
   toDate: string | number | Date = new Date();
-  payment_Detilas:any=[]
+  payment_Detilas: any = [];
   isCustomDatePopupVisible = false;
 
   //All buttons
@@ -135,7 +135,7 @@ selectTransId:any
     //   visible: (e) => e.row.data.STATUS === 'Verified',
     // },
   ];
-    tempPaymentMode: any = 0;
+  tempPaymentMode: any = 0;
   verifiedAdvancePopUp: boolean = false;
   approveAdvancePopUp: boolean = false;
   isviewpopup: boolean = false;
@@ -144,11 +144,11 @@ selectTransId:any
   filterddata: any;
   trans_id: any;
   paymentModes = [
-  { value: '13', label: 'Cash' },
-  { value: '14', label: 'Bank' }
-];
+    { value: '13', label: 'Cash' },
+    { value: '14', label: 'Bank' },
+  ];
 
-selectedPaymentMode: string // default selection
+  selectedPaymentMode: string; // default selection
   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
@@ -159,34 +159,40 @@ selectedPaymentMode: string // default selection
       // Run inside Angular's zone
       this.ngZone.run(() => this.add_pop());
     },
-    elementAttr: { class: 'add-button' }
+    elementAttr: { class: 'add-button' },
   };
   isEditReadOnly: boolean = false;
   selectedpayid: any;
   selected_pay_type_id: any;
   isFilterOpened: boolean;
   auto: string = 'auto';
-   isFilterRowVisible: boolean = false;
-isReadOnlyReceipt:boolean=false
- canAdd = false;
+  isFilterRowVisible: boolean = false;
+  isReadOnlyReceipt: boolean = false;
+  canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
   canApprove = false;
   canPrint = false;
 
-
-gridButtons = [
-  'edit',
-  {
-    name: 'delete',
-    visible: (e: any) => e.row?.data?.STATUS?.trim() === 'Open'
-  }
-];
+  gridButtons = [
+    'edit',
+    {
+      name: 'delete',
+      visible: (e: any) => e.row?.data?.STATUS?.trim() === 'Open',
+    },
+  ];
   selected_Company_id: any;
   docNo: any;
   selected_fin_id: any;
-  constructor(private fb: FormBuilder, private dataService: DataService,private ngZone: NgZone,private cdr:ChangeDetectorRef,private router: Router) {
+  companyId: any;
+  constructor(
+    private fb: FormBuilder,
+    private dataService: DataService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {
     this.formSource = this.fb.group({
       Id: [null],
       employee_ID: [''],
@@ -197,7 +203,7 @@ gridButtons = [
       Recovery_Date: [''],
       No_installments: [''],
       installmen_amt: [''],
-      Remarks: [""],
+      Remarks: [''],
     });
     this.get_advance_list();
     this.setupInstallmentCalculation();
@@ -207,9 +213,7 @@ gridButtons = [
     this.getDocNo();
   }
 
-  
-
-    getDocNo() {
+  getDocNo() {
     const payload = {
       TRANS_TYPE: 28,
       COMPANY_ID: this.selected_Company_id,
@@ -220,47 +224,44 @@ gridButtons = [
     });
   }
 
-        toggleFilterRow = () => {
+  toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
 
-     //=================================refresh=============================
-   refreshButtonOptions = {
+  //=================================refresh=============================
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     onClick: () => this.refreshGrid(),
     text: '',
   };
 
-      refreshGrid(){
-          if (this.dataGrid?.instance) {
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
-       // Or reload data from API if needed
-       this.get_advance_list()
-      
+      // Or reload data from API if needed
+      this.get_advance_list();
     }
-       
+  }
+
+  setPaymentMode() {
+    if (this.selected_pay_type_id === 0) {
+      this.tempPaymentMode = this.selectedPaymentMode;
+    } else {
+      this.tempPaymentMode = this.selected_pay_type_id;
     }
-
-
-setPaymentMode() {
-  if (this.selected_pay_type_id === 0) {
-    this.tempPaymentMode = this.selectedPaymentMode;
-  } else {
-    this.tempPaymentMode = this.selected_pay_type_id;
   }
-}
 
-onPaymentModeChanged(e: any) {
-  const value = e.value;
-  if (this.selected_pay_type_id === 0) {
-    this.selectedPaymentMode = value;
-  } else {
-    this.selected_pay_type_id = value;
+  onPaymentModeChanged(e: any) {
+    const value = e.value;
+    if (this.selected_pay_type_id === 0) {
+      this.selectedPaymentMode = value;
+    } else {
+      this.selected_pay_type_id = value;
+    }
   }
-}
-//======================Installment Amount=====================
+  //======================Installment Amount=====================
   setupInstallmentCalculation() {
     this.formSource.get('Net_Amount_recoverd')?.valueChanges.subscribe(() => {
       this.calculateInstallmentAmount();
@@ -270,7 +271,7 @@ onPaymentModeChanged(e: any) {
       this.calculateInstallmentAmount();
     });
   }
-//=================Calculate Installment Amount========================
+  //=================Calculate Installment Amount========================
   calculateInstallmentAmount() {
     const netAmt = this.formSource.get('Net_Amount_recoverd')?.value || 0;
     const installments = this.formSource.get('No_installments')?.value || 0;
@@ -284,7 +285,7 @@ onPaymentModeChanged(e: any) {
       this.formSource.get('installmen_amt')?.setValue(0, { emitEvent: false });
     }
   }
-//===============refresh data=========================
+  //===============refresh data=========================
   refreshData() {
     this.dataGrid.instance.refresh();
   }
@@ -296,16 +297,14 @@ onPaymentModeChanged(e: any) {
   //=================Add Pop up=========================
   add_pop() {
     this.isAddPopUp = true;
-         setTimeout(() => {
+    setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
     });
-    
-   
   }
   onApprovedChanged(event: any) {
-    console.log(event,'======function chngeeeeeee===')
-     console.log(this.approveValue,'======function chngeeeeeee===')
-    
+    console.log(event, '======function chngeeeeeee===');
+    console.log(this.approveValue, '======function chngeeeeeee===');
+
     // const isChecked = event.value;
     // if (isChecked) {
     //   this.approveAdvancePopUp = true;
@@ -315,14 +314,14 @@ onPaymentModeChanged(e: any) {
   }
   // Add a class variable to track first load
   initialLoad: boolean = true;
-//=================Get Advance List=========================
+  //=================Get Advance List=========================
 
   get_advance_list(filterBy: string = 'all') {
     this.isLoading = true;
     const payload = {
-    COMPANY_ID: this.selected_Company_id,
-    FILTER: filterBy   // optional, if backend supports it
-  };
+      COMPANY_ID: this.selected_Company_id,
+      FILTER: filterBy, // optional, if backend supports it
+    };
 
     this.dataService.Get_Api_advance(payload).subscribe((res: any) => {
       let data = res.data;
@@ -454,7 +453,7 @@ onPaymentModeChanged(e: any) {
     this.get_advance_list('custom');
   }
 
-//===================On Edit Start=========================
+  //===================On Edit Start=========================
 
   onEditStart(e: any) {
     e.cancel = true;
@@ -462,35 +461,33 @@ onPaymentModeChanged(e: any) {
     const id = e.data.TRANS_ID;
     // this.dataService.select_Advance(id).subscribe((res: any) => {
     // });
-     this.isEditPopUp = true;
-    
-  const status = e.data?.STATUS?.trim();
-  // this.isEditReadOnly = (status === 'Approved'); 
-  if(status === 'Approved'){
-    console.log(status)
-    this.isEditReadOnly=true
-    console.log(this.isEditReadOnly)
-  }
-  else{
-      this.isEditReadOnly=false
-  }
-    
-    this.select_api_Advance(e);
-this.ledgerlist()
-    console.log(statusValue, '===========satus value============');
-      console.log(this.selectedPaymentMode,'------pyment mode------')
+    this.isEditPopUp = true;
 
-       // Set a flag to determine if the form should be read-only
+    const status = e.data?.STATUS?.trim();
+    // this.isEditReadOnly = (status === 'Approved');
+    if (status === 'Approved') {
+      console.log(status);
+      this.isEditReadOnly = true;
+      console.log(this.isEditReadOnly);
+    } else {
+      this.isEditReadOnly = false;
+    }
+
+    this.select_api_Advance(e);
+    this.ledgerlist();
+    console.log(statusValue, '===========satus value============');
+    console.log(this.selectedPaymentMode, '------pyment mode------');
+
+    // Set a flag to determine if the form should be read-only
     // this.isEditReceipt = true;
     // this.isReadOnlyReceipt = (STATUS === 5); // true if status is approved
 
-
-//        if( this.selected_Cheque_No){
-//     this.selectedPaymentMode=='14'
-//  }
-//  else{
-//    this.selectedPaymentMode=='13'
-//  }
+    //        if( this.selected_Cheque_No){
+    //     this.selectedPaymentMode=='14'
+    //  }
+    //  else{
+    //    this.selectedPaymentMode=='13'
+    //  }
   }
   minDate: Date;
 
@@ -502,10 +499,10 @@ this.ledgerlist()
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
-
+    console.log('Parsed ObjectData:', menuResponse.SELECTED_COMPANY.COMPANY_ID);
+    this.companyId = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
@@ -523,25 +520,26 @@ this.ledgerlist()
 
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
-    this.get_advance_list()
- this.setPaymentMode();
-
-
+    this.get_Employee_dropdown();
+    this.get_advance_list();
+    this.setPaymentMode();
   }
 
   // ==========================Employeee drpdown========================
   get_Employee_dropdown() {
-    this.dataService.Dropdown_advance_employee(name).subscribe((res: any) => {
-      console.log(res);
-      this.EMPLOYEE_VALUE = res;
+    const payload = {
+      COMPANY_ID: this.companyId,
+      NAME: 'EMPLOYEE',
+    };
+    this.dataService
+      .Dropdown_advance_employee(payload)
+      .subscribe((res: any) => {
+        console.log(res);
+        this.EMPLOYEE_VALUE = res;
 
-      console.log(this.EMPLOYEE_VALUE);
-    });
+        console.log(this.EMPLOYEE_VALUE);
+      });
   }
-
-
-
-
 
   // onToolbarPreparing(e: any) {
   //   const toolbarItems = e.toolbarOptions.items;
@@ -563,7 +561,6 @@ this.ledgerlist()
   //     });
   //   }
   // }
-
 
   // ==========================Employeee drpdown========================
   get_advanceType_dropdown() {
@@ -587,7 +584,7 @@ this.ledgerlist()
 
       // Create a date using only year and month, and set time to 00:00:00 UTC
       const normalizedDate = new Date(
-        Date.UTC(selected.getFullYear(), selected.getMonth(), 1)
+        Date.UTC(selected.getFullYear(), selected.getMonth(), 1),
       );
 
       // Set it to the form
@@ -613,22 +610,28 @@ this.ledgerlist()
   calculateInstallmentAmountUpdate(): void {
     if (this.reco_inst_count_value && this.reco_Amount_value) {
       this.reco_install_Amount_value = parseFloat(
-        (this.reco_Amount_value / this.reco_inst_count_value).toFixed(2)
+        (this.reco_Amount_value / this.reco_inst_count_value).toFixed(2),
       );
     } else {
       this.reco_install_Amount_value = 0; // Set to 0 if values are invalid
     }
   }
-  
-  sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')
-    this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
-    console.log(this.selected_fin_id,'===========selected fin id===================')
-//     
-  }
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    console.log(
+      this.selected_fin_id,
+      '===========selected fin id===================',
+    );
+    //
+  }
   //  =====================================Add advance========================
   Add_Advace() {
     console.log('Add button clicked');
@@ -642,8 +645,8 @@ this.ledgerlist()
     const rec_install_count = this.formSource.value.No_installments;
     const rec_install_amount = this.formSource.value.installmen_amt;
     const remarks = this.formSource.value.Remarks;
-   const company_id=this.selected_Company_id;
-   const fin_id = this.selected_fin_id;
+    const company_id = this.selected_Company_id;
+    const fin_id = this.selected_fin_id;
     // if (!emp_id || !date || !adv_type_id || !advance_Amount) {
     //   // Handle validation error here
     //   notify(
@@ -655,45 +658,43 @@ this.ledgerlist()
     //     'error'
     //   );
     // } else {
-  //       const validationResult = this.formValidationGroup?.instance?.validate();
-  // if (!validationResult?.isValid) {
-  //   console.log('Validation failed');
-  //   return;
-  // }
-  
-      this.dataService
-        .Api_Add_advance(
-          emp_id,
-          date,
-          adv_type_id,
-          advance_Amount,
-          rec_amount,
-          rec_start_month,
-          rec_install_count,
-          rec_install_amount,
-          remarks,
-          company_id,
-          fin_id,
-        )
-        .subscribe((res: any) => {
-          console.log(res);
+    //       const validationResult = this.formValidationGroup?.instance?.validate();
+    // if (!validationResult?.isValid) {
+    //   console.log('Validation failed');
+    //   return;
+    // }
 
-          notify(
-            {
-              message: 'Advance added successfully',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success'
-          );
-          this.get_advance_list();
-          this.isAddPopUp = false;
-          this.formSource.reset({
-            Date: new Date()
-          });
+    this.dataService
+      .Api_Add_advance(
+        emp_id,
+        date,
+        adv_type_id,
+        advance_Amount,
+        rec_amount,
+        rec_start_month,
+        rec_install_count,
+        rec_install_amount,
+        remarks,
+        company_id,
+        fin_id,
+      )
+      .subscribe((res: any) => {
+        console.log(res);
 
+        notify(
+          {
+            message: 'Advance added successfully',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          },
+          'success',
+        );
+        this.get_advance_list();
+        this.isAddPopUp = false;
+        this.formSource.reset({
+          Date: new Date(),
         });
-  
+      });
   }
 
   getAdvanceTypeName(id: any): string {
@@ -710,7 +711,10 @@ this.ledgerlist()
       console.log(res);
 
       this.selected_Data = res;
-      console.log(this.selected_Data, 'SELECTEDDTA============================= ');
+      console.log(
+        this.selected_Data,
+        'SELECTEDDTA============================= ',
+      );
 
       this.id = this.selected_Data.ID;
 
@@ -719,39 +723,38 @@ this.ledgerlist()
       this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID;
       this.adv_type_name = this.selected_Data.ADV_TYPE_NAME;
       console.log(this.adv_type_name, 'ADVANCENAME');
-      console.log(this.selected_Data.DATE)
-      this.date_value=this.selected_Data.DATE
-      this.Payment_Head=this.selected_Data.PAY_HEAD_ID
+      console.log(this.selected_Data.DATE);
+      this.date_value = this.selected_Data.DATE;
+      this.Payment_Head = this.selected_Data.PAY_HEAD_ID;
       console.log(this.Payment_Head, 'Payment Head ID');
-      this.selectTransId=this.selected_Data.TRANS_ID
-      this.selected_Cheque_No=this.selected_Data.CHEQUE_NO
-      this.selected_Cheque_Date=this.selected_Data.CHEQUE_DATE
-      this.selected_pay_type_id=this.selected_Data.PAY_TYPE_ID
+      this.selectTransId = this.selected_Data.TRANS_ID;
+      this.selected_Cheque_No = this.selected_Data.CHEQUE_NO;
+      this.selected_Cheque_Date = this.selected_Data.CHEQUE_DATE;
+      this.selected_pay_type_id = this.selected_Data.PAY_TYPE_ID;
 
+      if (this.selected_pay_type_id === 0 || this.selected_pay_type_id === 1) {
+        this.selectedPaymentMode = '13'; // Cash
+      } else {
+        this.selectedPaymentMode = '14'; // Bank
+      }
 
-if (this.selected_pay_type_id === 0 || this.selected_pay_type_id === 1) {
-  this.selectedPaymentMode = '13'; // Cash
-} else {
-  this.selectedPaymentMode = '14'; // Bank
-}
- 
       // console.log(this.selectTransId, 'Transaction ID');
-//       if (this.selected_Data?.DATE) {
-//   const parts = this.selected_Data.DATE.split('/');
-//   if (parts.length === 3) {
-//     const day = +parts[0];
-//     const month = +parts[1] - 1; // JS months are 0-based
-//     let year = +parts[2];
-//     year += year < 100 ? 2000 : 0; // Handle 2-digit years
-//     this.date_value = new Date(year, month, day); // Set time to 18:30:00 if needed
-//   } else {
-//     this.date_value = null;
-//   }
-// } else {
-//   this.date_value = null;
-// }
+      //       if (this.selected_Data?.DATE) {
+      //   const parts = this.selected_Data.DATE.split('/');
+      //   if (parts.length === 3) {
+      //     const day = +parts[0];
+      //     const month = +parts[1] - 1; // JS months are 0-based
+      //     let year = +parts[2];
+      //     year += year < 100 ? 2000 : 0; // Handle 2-digit years
+      //     this.date_value = new Date(year, month, day); // Set time to 18:30:00 if needed
+      //   } else {
+      //     this.date_value = null;
+      //   }
+      // } else {
+      //   this.date_value = null;
+      // }
 
-console.log(this.date_value); // Outputs: 2025-05-10T13:00:00.000Z (depending on timezone)
+      console.log(this.date_value); // Outputs: 2025-05-10T13:00:00.000Z (depending on timezone)
 
       // if (this.selected_Data.DATE) {
       //   const parts = this.selected_Data.DATE.split('/');
@@ -776,15 +779,18 @@ console.log(this.date_value); // Outputs: 2025-05-10T13:00:00.000Z (depending on
       this.reco_inst_count_value = this.selected_Data.REC_INSTALL_COUNT;
       this.reco_stat_month = this.selected_Data.REC_START_MONTH;
       this.remark_value = this.selected_Data.REMARKS;
-      this.trans_id=this.selected_Data.TRANS_ID
-      this.selectedpayid=this.selected_Data.PAY_TYPE_ID
+      this.trans_id = this.selected_Data.TRANS_ID;
+      this.selectedpayid = this.selected_Data.PAY_TYPE_ID;
       console.log(this.remark_value, ' this.remark_value');
       this.approveValue = this.selected_Data.STATUS === 'Approved';
 
-        this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
+      this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
 
-        console.log(this.selected_Data.PAY_TYPE_ID,'=======PAY TYPE ID===========')
-        console.log(
+      console.log(
+        this.selected_Data.PAY_TYPE_ID,
+        '=======PAY TYPE ID===========',
+      );
+      console.log(
         this.Advance_Amount_value,
         this.adv_no_value,
         this.adv_type_id_value,
@@ -795,123 +801,130 @@ console.log(this.date_value); // Outputs: 2025-05-10T13:00:00.000Z (depending on
         this.reco_install_Amount_value,
         this.reco_inst_count_value,
         this.reco_stat_month,
-        this.remark_value
+        this.remark_value,
       );
-      // this.payment_functionality() 
+      // this.payment_functionality()
     });
-   
   }
   paymentModesValue(event: any) {
     console.log(event.value);
-    console.log(this.selectedPaymentMode)
-    this.ledgerlist()
+    console.log(this.selectedPaymentMode);
+    this.ledgerlist();
   }
 
-  ledgerlist(){
+  ledgerlist() {
     this.dataService.listledgerlist().subscribe((res: any) => {
       console.log(res);
       // this.payment_Detilas = res;
 
-const filterdledgerlist=res.Data
-      console.log(filterdledgerlist.filter(item => item.GROUP_ID == this.selectedPaymentMode));
-      
-      this.payment_Detilas=filterdledgerlist.filter(item => item.GROUP_ID == this.selectedPaymentMode);
+      const filterdledgerlist = res.Data;
+      console.log(
+        filterdledgerlist.filter(
+          (item) => item.GROUP_ID == this.selectedPaymentMode,
+        ),
+      );
+
+      this.payment_Detilas = filterdledgerlist.filter(
+        (item) => item.GROUP_ID == this.selectedPaymentMode,
+      );
       console.log(this.payment_Detilas, 'Payment Details');
     });
 
-
-  //    const filtered = this.payment_Detilas.filter(item => allowedGroupIds.includes(item.GROUP_ID));
-  // console.log('Filtered Items:', filtered);
+    //    const filtered = this.payment_Detilas.filter(item => allowedGroupIds.includes(item.GROUP_ID));
+    // console.log('Filtered Items:', filtered);
   }
   //  =======================Update Advance=================================
   // ======================Delete data in advance===========================
 
+  Update_advance() {
+    this.isFormSubmitted = true;
 
-Update_advance() {
-  this.isFormSubmitted = true;
+    const id = this.id;
+    const emp_id = this.emp_id;
+    const date = this.date_value;
+    const adv_type_id = this.adv_type_id_value;
+    const advance_Amount = this.Advance_Amount_value;
+    const rec_amount = this.reco_Amount_value;
+    const rec_start_month = this.reco_stat_month;
+    const rec_install_count = this.reco_inst_count_value;
+    const rec_install_amount = this.reco_install_Amount_value;
+    const remarks = this.remark_value;
+    const pay_head_id = this.Payment_Head;
+    const trans_id = this.selectTransId;
+    const cheque_no = this.selected_Cheque_No;
+    const cheque_date = this.selected_Cheque_Date;
 
-  const id = this.id;
-  const emp_id = this.emp_id;
-  const date = this.date_value;
-  const adv_type_id = this.adv_type_id_value;
-  const advance_Amount = this.Advance_Amount_value;
-  const rec_amount = this.reco_Amount_value;
-  const rec_start_month = this.reco_stat_month;
-  const rec_install_count = this.reco_inst_count_value;
-  const rec_install_amount = this.reco_install_Amount_value;
-  const remarks = this.remark_value;
-  const pay_head_id = this.Payment_Head;
-  const trans_id = this.selectTransId;
-  const cheque_no =this.selected_Cheque_No
-  const cheque_date = this.selected_Cheque_Date;
-
-this.selected_pay_type_id = this.selectedPaymentMode === '13'
-  ? 1
-  : this.selectedPaymentMode === '14'
-    ? 2
-    : this.selected_pay_type_id;
-  console.log(this.selected_pay_type_id,'=====================selected pay type id============')
-  const pay_Type_id=this.selected_pay_type_id
-  console.log(this.selectTransId, 'Transaction ID');
-  console.log
-  if (!emp_id || !date || !adv_type_id || !advance_Amount) {
-    notify(
-      {
-        message: 'Please fill all the required fields.',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 500,
-      },
-      'error'
+    this.selected_pay_type_id =
+      this.selectedPaymentMode === '13'
+        ? 1
+        : this.selectedPaymentMode === '14'
+          ? 2
+          : this.selected_pay_type_id;
+    console.log(
+      this.selected_pay_type_id,
+      '=====================selected pay type id============',
     );
-    this.isEditPopUp = true;
-    return;
-  }
+    const pay_Type_id = this.selected_pay_type_id;
+    console.log(this.selectTransId, 'Transaction ID');
+    console.log;
+    if (!emp_id || !date || !adv_type_id || !advance_Amount) {
+      notify(
+        {
+          message: 'Please fill all the required fields.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'error',
+      );
+      this.isEditPopUp = true;
+      return;
+    }
 
-  if (this.approveValue === true) {
-    confirm(
-      'It will approve and commit. Are you sure you want to commit?',
-      'Confirm Commit'
-    ).then((result) => {
-      if (result) {
-        this.dataService
-          .Api_Approve_advance(
-            id,
-            emp_id,
-            date,
-            adv_type_id,
-            advance_Amount,
-            rec_amount,
-            rec_start_month,
-            rec_install_count,
-            rec_install_amount,
-            remarks,
-            pay_head_id,
-            trans_id,
-            cheque_no,
-            cheque_date,
-            pay_Type_id
-          )
-          .subscribe((res: any) => {
-            console.log('Approved & Committed:', res);
-            notify(
-              {
-                message: 'Advance approved and committed successfully',
-                position: { at: 'top right', my: 'top right' },
-                displayTime: 500,
-              },
-              'success'
-            );
-            // this.resetFormAfterUpdate();
-            this.isEditPopUp = false;
-            this.get_advance_list();
-          });
-      } else {
-        notify('Approval cancelled.', 'info', 2000);
-      }
-    });
-  } else {
-  
-    console.log( id,
+    if (this.approveValue === true) {
+      confirm(
+        'It will approve and commit. Are you sure you want to commit?',
+        'Confirm Commit',
+      ).then((result) => {
+        if (result) {
+          this.dataService
+            .Api_Approve_advance(
+              id,
+              emp_id,
+              date,
+              adv_type_id,
+              advance_Amount,
+              rec_amount,
+              rec_start_month,
+              rec_install_count,
+              rec_install_amount,
+              remarks,
+              pay_head_id,
+              trans_id,
+              cheque_no,
+              cheque_date,
+              pay_Type_id,
+            )
+            .subscribe((res: any) => {
+              console.log('Approved & Committed:', res);
+              notify(
+                {
+                  message: 'Advance approved and committed successfully',
+                  position: { at: 'top right', my: 'top right' },
+                  displayTime: 500,
+                },
+                'success',
+              );
+              // this.resetFormAfterUpdate();
+              this.isEditPopUp = false;
+              this.get_advance_list();
+            });
+        } else {
+          notify('Approval cancelled.', 'info', 2000);
+        }
+      });
+    } else {
+      console.log(
+        id,
         emp_id,
         date,
         adv_type_id,
@@ -920,46 +933,47 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
         rec_start_month,
         rec_install_count,
         rec_install_amount,
-        remarks, 
+        remarks,
         pay_head_id,
         trans_id,
         cheque_no,
-        cheque_date,'=============Update Advance Data=============');
-          
-    this.dataService
-      .Api_Update_advance(
-          id,
-            emp_id,
-            date,
-            adv_type_id,
-            advance_Amount,
-            rec_amount,
-            rec_start_month,
-            rec_install_count,
-            rec_install_amount,
-            remarks,
-            pay_head_id,
-            trans_id,
-            cheque_no,
-            cheque_date,
-            pay_Type_id
-      )
-      .subscribe((res: any) => {
-        console.log('Updated:', res);
-        notify(
-          {
-            message: 'Advance updated successfully',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success'
-        );
-        // this.resetFormAfterUpdate();
-        this.isEditPopUp=false
-      });
-  }
-}
+        cheque_date,
+        '=============Update Advance Data=============',
+      );
 
+      this.dataService
+        .Api_Update_advance(
+          id,
+          emp_id,
+          date,
+          adv_type_id,
+          advance_Amount,
+          rec_amount,
+          rec_start_month,
+          rec_install_count,
+          rec_install_amount,
+          remarks,
+          pay_head_id,
+          trans_id,
+          cheque_no,
+          cheque_date,
+          pay_Type_id,
+        )
+        .subscribe((res: any) => {
+          console.log('Updated:', res);
+          notify(
+            {
+              message: 'Advance updated successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+          // this.resetFormAfterUpdate();
+          this.isEditPopUp = false;
+        });
+    }
+  }
 
   deleteData(event: any) {
     const id = event.data.ID;
@@ -971,7 +985,7 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'success'
+        'success',
       );
       this.get_advance_list();
       this.isLoading = false;
@@ -984,30 +998,28 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
     this.approveAdvancePopUp = false;
     this.isEditPopUp = false;
     console.log('close buttom clicked======================');
-    this.isFormSubmitted = false; 
+    this.isFormSubmitted = false;
     this.isAddPopUp = false;
     this.formSource.reset({
-      Recovery_Date:'',
+      Recovery_Date: '',
       Date: new Date(),
-      emp_id:0,
-      adv_type_id:0,
-    })
-     this.reco_Amount_value = 0
-      this.reco_stat_month= " "
-      this.employee_ID=0
-      this.emp_id=0
-      
-   
+      emp_id: 0,
+      adv_type_id: 0,
+    });
+    this.reco_Amount_value = 0;
+    this.reco_stat_month = ' ';
+    this.employee_ID = 0;
+    this.emp_id = 0;
   }
 
-  closeButton() { 
+  closeButton() {
     console.log('on Hiding close buttom clicked======================');
-    
+
     this.formSource.reset({
       Date: new Date(),
-    Recovery_Date:''
-  })
- }
+      Recovery_Date: '',
+    });
+  }
   onNetAmountChanged(): void {
     this.updateInstallmentCalculation();
   }
@@ -1022,7 +1034,7 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
 
     if (amount && count && count > 0) {
       this.selected_Data.REC_INSTALL_AMOUNT = parseFloat(
-        (amount / count).toFixed(2)
+        (amount / count).toFixed(2),
       );
     } else {
       this.selected_Data.REC_INSTALL_AMOUNT = 0;
@@ -1089,7 +1101,7 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
         rec_start_month,
         rec_install_count,
         rec_install_amount,
-        remarks
+        remarks,
       )
       .subscribe((res: any) => {
         console.log(res);
@@ -1100,11 +1112,11 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
         this.verifiedAdvancePopUp = false;
         this.formSource.reset({
-          Date: new Date()
+          Date: new Date(),
         });
       });
   }
@@ -1166,7 +1178,7 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
         rec_start_month,
         rec_install_count,
         rec_install_amount,
-        remarks
+        remarks,
       )
       .subscribe((res: any) => {
         console.log(res);
@@ -1176,7 +1188,7 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
         this.get_advance_list();
         this.approveAdvancePopUp = false;
@@ -1187,20 +1199,20 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
   // payment_functionality() {
   //   const id=this.trans_id
   //   console.log(id, '=================id====================');
-    
+
   //   console.log('payment functionality');
   //   this.dataService.get_paymentDetails(id).subscribe((res: any) => {
   //     console.log(res);
 
   //     this.payment_Detilas=res
   //   });
-      
+
   // }
 
   //====================min date for update validation=========================
   onDateValueChanged(e: any): void {
     this.date_value = e.value;
-  
+
     if (this.date_value) {
       // Set minDateUpdate to the 1st day of the next month
       const d = new Date(this.date_value);
@@ -1209,10 +1221,14 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
   }
   getStatusFlagClass(status: string): string {
     switch (status) {
-      case 'Open': return 'flag-open';       // White or gray
-      case 'Verified': return 'flag-verified'; // Orange
-      case 'Approved': return 'flag-approved'; // Green
-      default: return '';
+      case 'Open':
+        return 'flag-open'; // White or gray
+      case 'Verified':
+        return 'flag-verified'; // Orange
+      case 'Approved':
+        return 'flag-approved'; // Green
+      default:
+        return '';
     }
   }
 }
@@ -1234,7 +1250,7 @@ this.selected_pay_type_id = this.selectedPaymentMode === '13'
     DxNumberBoxModule,
     DxValidatorModule,
     CommonModule,
-    DxRadioGroupModule 
+    DxRadioGroupModule,
   ],
   providers: [],
   exports: [],

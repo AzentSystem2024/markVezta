@@ -286,9 +286,9 @@ export class TimesheetListComponent {
   }
 
   refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
+    // if (this.dataGrid?.instance) {
+    //   this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    // }
     this.fetchTimesheetList();
   }
 
