@@ -32,3 +32,14 @@
 .popup-close-btn {
   margin-right: 24px;
 }
+::ng-deep .dx-popup-title,
+::ng-deep .dx-toolbar-label {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+.custom-popup-title {
+  font-size: 18px;
+  font-weight: 600;
+}
