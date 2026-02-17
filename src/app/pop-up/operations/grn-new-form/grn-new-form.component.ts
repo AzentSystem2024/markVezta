@@ -175,7 +175,7 @@ export class GrnNewFormComponent implements OnInit {
   // add.component.ts
   clearDemoArray() {
     this.demoArray = [];
-    console.log('✅ demoArray cleared');
+    console.log(' demoArray cleared');
   }
 
   constructor(private service: DataService, private ref: ChangeDetectorRef) {
@@ -560,7 +560,7 @@ export class GrnNewFormComponent implements OnInit {
 
       QUANTITY: Number(updatedRow.RECEIVED_QTY),
 
-      RATE: Number(amount.toFixed(2)), // ✅ ADD THIS
+      RATE: Number(amount.toFixed(2)), // ADD THIS
       AMOUNT: Number(amount.toFixed(2)),
 
       SUPP_PRICE: Number(updatedRow.SUPP_PRICE || 0),
@@ -590,7 +590,7 @@ export class GrnNewFormComponent implements OnInit {
     //     (Number(updatedRow.SUPP_PRICE) || 0),
     // };
 
-    console.log(enrichedData, 'enrichedData ✅');
+    console.log(enrichedData, 'enrichedData ');
     if (index > -1) {
       // Update existing entry
       this.demoArray[index] = { ...this.demoArray[index], ...enrichedData };
@@ -599,7 +599,7 @@ export class GrnNewFormComponent implements OnInit {
       this.demoArray.push({ ...enrichedData });
     }
 
-    console.log(this.demoArray, '✅ demoArray (stored updated rows)');
+    console.log(this.demoArray, ' demoArray (stored updated rows)');
     // this.GRNDetails
 
     if ('RECEIVED_QTY' in updatedData) {
@@ -652,7 +652,7 @@ export class GrnNewFormComponent implements OnInit {
         this.poDetails = [...this.poDetails]; // force Angular to detect change
       }
 
-      console.log(this.poDetails[idx], '✅ Updated row now bound to grid');
+      console.log(this.poDetails[idx], ' Updated row now bound to grid');
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
         return sum + Number(item.RECEIVED_QTY || 0);
@@ -752,7 +752,7 @@ export class GrnNewFormComponent implements OnInit {
           ITEM_ID: item.ITEM_ID,
           QUANTITY: Number(item.RECEIVED_QTY),
 
-          RATE: Number(amount.toFixed(2)), // ✅ RATE = AMOUNT
+          RATE: Number(amount.toFixed(2)), //  RATE = AMOUNT
           AMOUNT: Number(amount.toFixed(2)),
 
           DISC_PERCENT: Number(item.DISC_PERCENT || 0),
@@ -865,7 +865,7 @@ export class GrnNewFormComponent implements OnInit {
       GRN_QUANTITY: Number(updatedData.GRN_QTY || 0),
     };
 
-    console.log(this.newGrnData.GRNDetails, '✅ Transformed GRNDetails');
+    console.log(this.newGrnData.GRNDetails, ' Transformed GRNDetails');
   }
 
   // onGrnContentReady(e: any) {

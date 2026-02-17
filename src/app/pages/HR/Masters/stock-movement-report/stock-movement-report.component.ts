@@ -43,6 +43,14 @@ import {
 } from 'devextreme-angular/ui/nested';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { BoxproductionJvAddModule } from 'src/app/boxproduction-jv-add/boxproduction-jv-add.component';
+import { DeliveryNoteFormModule } from 'src/app/pages/delivery-note-form/delivery-note-form.component';
+import { ViewInvoiceModule } from 'src/app/pages/INVOICE/view-invoice/view-invoice.component';
+import { PurchaseReturnDebitFormModule } from 'src/app/pages/purchase-return-debit-form/purchase-return-debit-form.component';
+import { GrnViewFormModule } from 'src/app/pop-up/operations/grn-view-form/grn-view-form.component';
+import { ProductionJvAddModule } from 'src/app/production-jv-add/production-jv-add.component';
+import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
+import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { DataService } from 'src/app/services';
 import { ExportService } from 'src/app/services/export.service';
 
@@ -115,14 +123,36 @@ export class StockMovementReportComponent {
     | 'consumption'
     | 'delivery'
     | 'deliveryReturn'
+    | 'saleReturn'
+    | 'salesInvoice'
     | null = null;
   isPopupVisible: boolean = false;
-  GrnDetails:any[] = [];
+  GrnDetails: any[] = [];
   productionDetails: any[] = [];
-  PurchReturnDetails:any[] = [];
+  PurchReturnDetails: any[] = [];
   consumptionDetails: any[] = [];
   deliveryDetails: any[] = [];
   deliveryReturnDetails: any[] = [];
+  saleReturnDetails: any[] = [];
+  salesInvoiceDetails: any[] = [];
+  isEditProductionPopupVisible: boolean;
+  selectedProduction: any;
+  isReadOnlyInvoice: boolean;
+  selectedProductionType: string;
+  selectedGrnId: any;
+  isViewGrnPopupOpened: boolean;
+  selectedPurchaseReturnId: any;
+  isEditPurchaseReturn: boolean;
+  selectedPurchaseReturn: any;
+  selectedDelivery:any;
+  isReadOnlyPurchaseReturn: boolean;
+  isEditSaleReturn: boolean;
+  isEditDelivery:boolean;
+  selectedSaleReturn: any;
+  isReadOnlySaleReturn = true;
+  isReadOnlyDelivery = true;
+  selectedInvoice: any;
+  isViewInvoice: boolean;
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -611,14 +641,24 @@ export class StockMovementReportComponent {
       this.isPopupVisible = true;
     }
     if (field === 'GRN_QTY') {
-       this.popupType = 'grn' ;
-       this.loadGrnDetails(itemId)
-       this.isPopupVisible = true;
+      this.popupType = 'grn';
+      this.loadGrnDetails(itemId);
+      this.isPopupVisible = true;
     }
-    if (field === 'PURCHASE_RETURN') {
-       this.popupType = 'purchReturn' ;
-       this.loadPurchReturnDetails(itemId)
-       this.isPopupVisible = true;
+    if (field === 'PURCHASE_RETURN_QTY') {
+      this.popupType = 'purchReturn';
+      this.loadPurchReturnDetails(itemId);
+      this.isPopupVisible = true;
+    }
+    if (field === 'SALE_RETURN_QTY') {
+      this.popupType = 'saleReturn';
+      this.loadSaleReturnDetails(itemId);
+      this.isPopupVisible = true;
+    }
+    if (field === 'SALE_QTY') {
+      this.popupType = 'salesInvoice';
+      this.loadSalesInvoiceDetails(itemId);
+      this.isPopupVisible = true;
     }
   }
   loadProductionDetails(itemId: number) {
@@ -627,13 +667,13 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE: 'PRODUCTION'
-    }
+      TRANS_TYPE: 'PRODUCTION',
+    };
     // API CALL HERE
-    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
-      console.log(res,'res')
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
+      console.log(res, 'res');
       this.productionDetails = res.data || [];
-      console.log(this.productionDetails)
+      console.log(this.productionDetails);
     });
   }
 
@@ -643,11 +683,11 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE:'CONSUMPTION'
+      TRANS_TYPE: 'CONSUMPTION',
     };
 
-    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
-      console.log(res,'res')
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
+      console.log(res, 'res');
       this.consumptionDetails = res.data || [];
     });
   }
@@ -657,11 +697,11 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE:'DELIVERY'
+      TRANS_TYPE: 'DELIVERY',
     };
 
     // API CALL HERE
-    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
       this.deliveryDetails = res.data || [];
     });
   }
@@ -672,7 +712,7 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE:'DELIVERY_RETURN'
+      TRANS_TYPE: 'DELIVERY_RETURN',
     };
 
     console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
@@ -683,21 +723,19 @@ export class StockMovementReportComponent {
     // });
   }
 
-  
-
   loadGrnDetails(itemId: number) {
     const payload = {
       ITEM_ID: itemId,
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE:'GRN'
+      TRANS_TYPE: 'GRN',
     };
 
     console.log(payload, 'GRN DETAIL PAYLOAD');
 
     // API CALL HERE
-    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
       this.GrnDetails = res.data || [];
     });
   }
@@ -708,14 +746,47 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       COMPANY_ID: this.selected_Company_id,
-      TRANS_TYPE : 'PURCHASE_RETURN'
+      TRANS_TYPE: 'PURCHASE_RETURN',
     };
 
     console.log(payload, 'GRN DETAIL PAYLOAD');
 
     // API CALL HERE
-    this.dataService.Fetch_StockMovement_Details(payload).subscribe(res => {
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
       this.PurchReturnDetails = res.data || [];
+    });
+  }
+  loadSaleReturnDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+      TRANS_TYPE: 'SALE_RETURN_QTY',
+    };
+
+    console.log(payload, 'GRN DETAIL PAYLOAD');
+
+    // API CALL HERE
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
+      this.saleReturnDetails = res.data || [];
+    });
+  }
+
+  loadSalesInvoiceDetails(itemId: number) {
+    const payload = {
+      ITEM_ID: itemId,
+      DATE_FROM: this.selected_from_date,
+      DATE_TO: this.selected_To_date,
+      COMPANY_ID: this.selected_Company_id,
+      TRANS_TYPE: 'SALE_QTY',
+    };
+
+    console.log(payload, 'GRN DETAIL PAYLOAD');
+
+    // API CALL HERE
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
+      this.salesInvoiceDetails = res.data || [];
     });
   }
 
@@ -729,13 +800,189 @@ export class StockMovementReportComponent {
         return 'Delivery Details';
       case 'deliveryReturn':
         return 'Delivery Return Details';
-      case 'grn' :
-        return 'Grn Details';  
+      case 'grn':
+        return 'Grn Details';
       case 'purchReturn':
-        return 'Purch Return Details';  
+        return 'Purch Return Details';
       default:
         return '';
     }
+  }
+
+  onPopupRowClick(e: any, type: string) {
+    const row = e.data;
+    const id = row.ID;
+    const status = row.STATUS;
+
+    if (!id) return;
+
+    this.isEditProductionPopupVisible = false;
+
+    let api$;
+
+    switch (type) {
+      // 🔑 SAME logic for Production & Consumption
+      case 'production':
+      case 'consumption': {
+        // TYPE: 1 = Article, 2 = Box
+        api$ =
+          row.PRODUCTION_TYPE === 1
+            ? this.dataService.selectProduction(id)
+            : this.dataService.selectBoxProduction(id);
+        break;
+      }
+
+      // 🔹 GRN → View / Verify popup
+      case 'grn': {
+        this.selectedGrnId = id;
+
+        this.dataService.selectGrnData(id).subscribe((res: any) => {
+          this.selectedRowData = res;
+
+          // Approved → View only
+          this.isViewGrnPopupOpened = true;
+        });
+        break;
+      }
+
+      case 'purchReturn': {
+        const returnId = row.TRANS_ID; // 🔑 Purchase Return uses TRANS_ID
+        const status = row.TRANS_STATUS; // same as your original logic
+
+        if (!returnId) return;
+
+        // reset popup first
+        this.isEditPurchaseReturn = false;
+
+        this.dataService
+          .selectPurchaseReturn(returnId)
+          .subscribe((response: any) => {
+            this.selectedPurchaseReturn = response;
+            this.isReadOnlyPurchaseReturn = true;
+
+            // 🔑 open existing Purchase Return popup
+            this.isEditPurchaseReturn = true;
+          });
+
+        break;
+      }
+
+        case 'delivery': {
+        this.selectedDelivery = id; //  Purchase Return uses TRANS_ID
+        const status = row.TRANS_STATUS; // same as your original logic
+
+       
+
+        // reset popup first
+        this.isEditDelivery = false;
+
+        this.dataService
+          .selectDeliveryNote(id)
+          .subscribe((response: any) => {
+            this.selectedDelivery = response.Data;
+            this.isReadOnlyDelivery = true;
+
+            //  open existing Purchase Return popup
+            this.isEditDelivery = true;
+          });
+
+        break;
+      }
+      case 'saleReturn': {
+        const returnId = row.TRANS_ID; // 🔑 Sale Return uses TRANS_ID
+        const status = row.TRANS_STATUS;
+
+        if (!returnId) return;
+
+        // reset popup first
+        this.isEditSaleReturn = false;
+
+        this.dataService
+          .selectSaleReturn(returnId)
+          .subscribe((response: any) => {
+            this.selectedSaleReturn = response;
+            this.isReadOnlySaleReturn = true;
+
+            // 🔑 open existing Sale Return popup
+            this.isEditSaleReturn = true;
+          });
+
+        return; // ⛔ important → stop further execution
+      }
+
+      case 'salesInvoice': {
+        const returnId = row.TRANS_ID; // 🔑 Sale Return uses TRANS_ID
+        const status = row.TRANS_STATUS;
+
+        if (!returnId) return;
+
+        // reset popup first
+        this.isEditSaleReturn = false;
+
+        this.dataService.selectInvoice(returnId).subscribe((response: any) => {
+          this.selectedInvoice = response.Data;
+
+          // Open view popup
+          this.isViewInvoice = true;
+
+          console.log(
+            this.selectedInvoice,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
+          );
+        });
+
+        return; // ⛔ important → stop further execution
+      }
+
+      default:
+        return;
+    }
+
+    api$.subscribe((res: any) => {
+      this.selectedProduction = res;
+      this.isReadOnlyInvoice = status === '5';
+
+      //  open popup after data is ready
+      this.isEditProductionPopupVisible = true;
+    });
+  }
+
+  handleClose() {
+    //  Close main details popup
+    this.isPopupVisible = false;
+    this.popupType = null;
+
+    //  Production / Consumption
+    this.isEditProductionPopupVisible = false;
+    this.selectedProduction = null;
+
+    //  GRN view
+    this.isViewGrnPopupOpened = false;
+    this.selectedRowData = null;
+    this.selectedGrnId = null;
+
+    // Purchase Return
+    this.isEditPurchaseReturn = false;
+    this.selectedPurchaseReturn = null;
+    this.isReadOnlyPurchaseReturn = false;
+
+    //  Sale Return
+    this.isEditSaleReturn = false;
+    this.selectedSaleReturn = null;
+    this.isReadOnlySaleReturn = false;
+
+    // Debit note
+    this.isEditDelivery = false;
+    this.selectedDelivery = null;
+    this.isReadOnlyDelivery = false;
+
+
+    //  Invoice View
+    this.isViewInvoice = false;
+    this.selectedInvoice = null;
+
+    // Optional: reset common flags
+    this.isReadOnlyInvoice = false;
   }
 }
 
@@ -770,6 +1017,14 @@ export class StockMovementReportComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     DxTagBoxModule,
+    ProductionJvAddModule,
+    ProductionJvViewModule,
+    BoxproductionJvAddModule,
+    GrnViewFormModule,
+    PurchaseReturnDebitFormModule,
+    SaleReturnFormModule,
+    DeliveryNoteFormModule,
+    ViewInvoiceModule
   ],
   providers: [],
   declarations: [StockMovementReportComponent],

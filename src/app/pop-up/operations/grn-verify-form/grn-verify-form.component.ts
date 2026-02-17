@@ -318,7 +318,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     //     (Number(updatedRow.SUPP_PRICE) || 0),
     // };
 
-    console.log(enrichedData, 'enrichedData ✅');
+    console.log(enrichedData, 'enrichedData ');
     if (index > -1) {
       // Update existing entry
       this.demoArray[index] = { ...this.demoArray[index], ...enrichedData };
@@ -327,7 +327,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       this.demoArray.push({ ...enrichedData });
     }
 
-    console.log(this.demoArray, '✅ demoArray (stored updated rows)');
+    console.log(this.demoArray, ' demoArray (stored updated rows)');
     // this.GRNDetails
 
     if ('RECEIVED_QTY' in updatedData) {
@@ -587,7 +587,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       GRN_QUANTITY: Number(updatedData.GRN_QTY || 0),
     };
 
-    console.log(this.newGrnData.GRNDetails, '✅ Transformed GRNDetails');
+    console.log(this.newGrnData.GRNDetails, ' Transformed GRNDetails');
   }
 
   getLandedCostDropDownData() {
@@ -872,7 +872,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     // Refresh costs
     this.onCostContentReady(null);
 
-    console.log(this.newGrnData, '✅ Final GRN Payload');
+    console.log(this.newGrnData, ' Final GRN Payload');
     return this.newGrnData;
   }
 
@@ -890,8 +890,8 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
     return {
       ...prepared,
-      GRNDetails: mergedDetails, // ✅ full list with edits merged
-      GRN_DATE: new Date(), // ✅ override with current date
+      GRNDetails: mergedDetails, //  full list with edits merged
+      GRN_DATE: new Date(),  //  override with current date
     };
   };
   onEditorPreparing(e: any) {
@@ -1116,7 +1116,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         UOM: item.UOM,
         COST: item.COST,
 
-        // ✅ Add these missing fields back
+        //  Add these missing fields back
         ITEM_NAME: item.ITEM_NAME || item.DESCRIPTION || '',
         ITEM_CODE: item.ITEM_CODE || '',
         STORE_NAME: item.STORE_NAME || '',

@@ -200,7 +200,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
     // Refresh costs
     this.onCostContentReady(null);
 
-    console.log(this.newGrnData, '✅ Final GRN Payload');
+    console.log(this.newGrnData, ' Final GRN Payload');
     return this.newGrnData;
   }
 
@@ -217,8 +217,8 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
 
     return {
       ...prepared,
-      GRNDetails: mergedDetails, // ✅ full list with edits merged
-      GRN_DATE: new Date(), // ✅ override with current date
+      GRNDetails: mergedDetails, //  full list with edits merged
+      GRN_DATE: new Date(),  //  override with current date
     };
   };
 
@@ -399,7 +399,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
     //     (Number(updatedRow.SUPP_PRICE) || 0),
     // };
 
-    console.log(enrichedData, 'enrichedData ✅');
+    console.log(enrichedData, 'enrichedData ');
     if (index > -1) {
       // Update existing entry
       this.demoArray[index] = { ...this.demoArray[index], ...enrichedData };
@@ -408,7 +408,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
       this.demoArray.push({ ...enrichedData });
     }
 
-    console.log(this.demoArray, '✅ demoArray (stored updated rows)');
+    console.log(this.demoArray, ' demoArray (stored updated rows)');
     // this.GRNDetails
 
     if ('RECEIVED_QTY' in updatedData) {
@@ -461,7 +461,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
         this.poDetails = [...this.poDetails]; // force Angular to detect change
       }
 
-      console.log(this.poDetails[idx], '✅ Updated row now bound to grid');
+      console.log(this.poDetails[idx], 'Updated row now bound to grid');
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
         return sum + Number(item.RECEIVED_QTY || 0);
@@ -668,7 +668,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
       GRN_QUANTITY: Number(updatedData.GRN_QTY || 0),
     };
 
-    console.log(this.newGrnData.GRNDetails, '✅ Transformed GRNDetails');
+    console.log(this.newGrnData.GRNDetails, ' Transformed GRNDetails');
   }
   getLandedCostDropDownData() {
     this.service.getDropdownData('LANDED_COST').subscribe((res: any[]) => {
@@ -1109,7 +1109,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
         UOM: item.UOM,
         COST: item.COST,
 
-        // ✅ Add these missing fields back
+        // Add these missing fields back
         ITEM_NAME: item.ITEM_NAME || item.DESCRIPTION || '',
         ITEM_CODE: item.ITEM_CODE || '',
         STORE_NAME: item.STORE_NAME || '',
