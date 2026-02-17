@@ -54,8 +54,8 @@ import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.
 export class JournalBookComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-  JournalBookDataSource: DataSource;   // ONLY for dx-data-grid
-  journalBookArray: any[] = [];             // ONLY for logic / checks
+  JournalBookDataSource: DataSource; // ONLY for dx-data-grid
+  journalBookArray: any[] = []; // ONLY for logic / checks
   journalBookCount = 0;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -96,7 +96,7 @@ export class JournalBookComponent {
 
   selectedSaleReturn: any;
   isReadOnlySaleReturn: boolean = true;
-   isEditSaleReturn: boolean = false;
+  isEditSaleReturn: boolean = false;
 
   selectedYear: number | null = null;
   years: number[] = [];
@@ -107,7 +107,7 @@ export class JournalBookComponent {
   isReadOnlyPurchaseReturn: boolean = true;
   isEditPurchaseReturn: boolean = false;
   // @Input() MiscReceiptId : any;
-isFilterOpened = false;
+  isFilterOpened = false;
   defaultDate: Date = new Date();
   selectedmiscellaneousData: any;
   selectedPrePayment: any;
@@ -142,7 +142,7 @@ isFilterOpened = false;
     // this.get_fin_id();
     // this.sesstion_Details();
 
-     //============Year field dataSource===============
+    //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
@@ -180,7 +180,7 @@ isFilterOpened = false;
     // this.onFromDateChange({ value: this.defaultDate });
     // this.onToDateChange({ value: this.defaultDate });
 
-     const today = new Date();
+    const today = new Date();
     const SystemDate =
       today.getFullYear() +
       '-' +
@@ -197,9 +197,12 @@ isFilterOpened = false;
   ngAfterViewInit() {
     setTimeout(() => this.resetPopups());
   }
+  private reloadJournalBook() {
+    if (!this.dataGrid?.instance) return;
 
-
-   //================ Year value change ===================
+    this.load_JournalBook_data();
+  }
+  //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
     this.selectedmonth = '';
@@ -213,6 +216,7 @@ isFilterOpened = false;
       this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
       this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
     }
+    this.reloadJournalBook();
   }
 
   //================Month value change ===================
@@ -233,9 +237,10 @@ isFilterOpened = false;
         0,
       );
     }
+    this.reloadJournalBook();
   }
-  
-   searchButtonOptions = {
+
+  searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
@@ -243,7 +248,7 @@ isFilterOpened = false;
     onClick: () => this.toggleFilters(),
   };
 
-   toggleFilters() {
+  toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
     const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
@@ -314,16 +319,19 @@ isFilterOpened = false;
       .subscribe((res: any) => {
         this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
       });
+    this.reloadJournalBook();
   }
 
   onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
+    this.reloadJournalBook();
   }
 
   onToDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
+    this.reloadJournalBook();
   }
 
   formatDate(date: Date): string {
@@ -338,39 +346,38 @@ isFilterOpened = false;
   }
 
   load_JournalBook_data() {
-  const payload = {
-    CompanyId: this.selected_Company_id,
-    FinId: this.selected_fin_id,
-    DateFrom: this.formatted_from_date ?? this.selected_from_date,
-    DateTo: this.formatted_To_date ?? this.selected_To_date,
-  };
+    const payload = {
+      CompanyId: this.selected_Company_id,
+      FinId: this.selected_fin_id,
+      DateFrom: this.formatted_from_date ?? this.selected_from_date,
+      DateTo: this.formatted_To_date ?? this.selected_To_date,
+    };
 
-  this.JournalBookDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataService.Journal_Booking_Api(payload).subscribe({
-          next: (res: any) => {
-            const list = res?.data || [];
+    this.JournalBookDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.Journal_Booking_Api(payload).subscribe({
+            next: (res: any) => {
+              const list = res?.data || [];
 
-            // 🔑 cache for logic
-            this.journalBookArray = list;
-            this.journalBookCount = list.length;
+              // 🔑 cache for logic
+              this.journalBookArray = list;
+              this.journalBookCount = list.length;
 
-            this.ledgerSummaryData = list;
+              this.ledgerSummaryData = list;
 
-            resolve(list); // 🔑 grid gets data
-          },
-          error: () => {
-            this.journalBookArray = [];
-            this.journalBookCount = 0;
-            this.ledgerSummaryData = [];
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(list); // 🔑 grid gets data
+            },
+            error: () => {
+              this.journalBookArray = [];
+              this.journalBookCount = 0;
+              this.ledgerSummaryData = [];
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onViewClick(e: any) {
     console.log(e, '=======event==========');
@@ -561,7 +568,7 @@ isFilterOpened = false;
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
-    }else if (TransType === 3) {
+    } else if (TransType === 3) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectMiscPayment(trans_id)
@@ -696,7 +703,7 @@ isFilterOpened = false;
     TransferOutInventoryAddModule,
     TransferInInventoryFormModule,
     EditCustomerReceiptModule,
-    SaleReturnFormModule
+    SaleReturnFormModule,
   ],
   providers: [],
   exports: [],

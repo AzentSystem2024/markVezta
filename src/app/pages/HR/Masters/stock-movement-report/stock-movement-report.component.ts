@@ -821,7 +821,7 @@ export class StockMovementReportComponent {
     let api$;
 
     switch (type) {
-      // 🔑 SAME logic for Production & Consumption
+      // SAME logic for Production & Consumption
       case 'production':
       case 'consumption': {
         // TYPE: 1 = Article, 2 = Box
@@ -846,7 +846,7 @@ export class StockMovementReportComponent {
       }
 
       case 'purchReturn': {
-        const returnId = row.TRANS_ID; // 🔑 Purchase Return uses TRANS_ID
+        const returnId = row.TRANS_ID; // Purchase Return uses TRANS_ID
         const status = row.TRANS_STATUS; // same as your original logic
 
         if (!returnId) return;
@@ -860,7 +860,7 @@ export class StockMovementReportComponent {
             this.selectedPurchaseReturn = response;
             this.isReadOnlyPurchaseReturn = true;
 
-            // 🔑 open existing Purchase Return popup
+            // open existing Purchase Return popup
             this.isEditPurchaseReturn = true;
           });
 
@@ -889,7 +889,7 @@ export class StockMovementReportComponent {
         break;
       }
       case 'saleReturn': {
-        const returnId = row.TRANS_ID; // 🔑 Sale Return uses TRANS_ID
+        const returnId = row.TRANS_ID; // Sale Return uses TRANS_ID
         const status = row.TRANS_STATUS;
 
         if (!returnId) return;
@@ -903,11 +903,11 @@ export class StockMovementReportComponent {
             this.selectedSaleReturn = response;
             this.isReadOnlySaleReturn = true;
 
-            // 🔑 open existing Sale Return popup
+            // open existing Sale Return popup
             this.isEditSaleReturn = true;
           });
 
-        return; // ⛔ important → stop further execution
+        return; // important → stop further execution
       }
 
       case 'salesInvoice': {
@@ -924,14 +924,9 @@ export class StockMovementReportComponent {
 
           // Open view popup
           this.isViewInvoice = true;
-
-          console.log(
-            this.selectedInvoice,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
 
-        return; // ⛔ important → stop further execution
+        return; // important → stop further execution
       }
 
       default:
@@ -975,7 +970,6 @@ export class StockMovementReportComponent {
     this.isEditDelivery = false;
     this.selectedDelivery = null;
     this.isReadOnlyDelivery = false;
-
 
     //  Invoice View
     this.isViewInvoice = false;
