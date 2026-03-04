@@ -55,12 +55,13 @@
                 <dx-select-box
                   *ngIf="subType"
                   [dataSource]="subTypeList"
-                  displayExpr="DESCRIPTION"
-                  valueExpr="ID"
+                  displayExpr="SUB_TYPE_NAME"
+                  valueExpr="SUB_TYPE_ID"
                   label="Select Subtype"
                   labelMode="floating"
                   placeholder="Select Subtype"
                   [width]="200"
+                  (onValueChanged)="onSubTypeChange($event)"
                 >
                 </dx-select-box>
                 <!--  -->

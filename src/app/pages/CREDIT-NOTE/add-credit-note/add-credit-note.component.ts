@@ -110,6 +110,7 @@ export class AddCreditNoteComponent {
     UNIT_ID: '',
     IS_APPROVED: false,
     ROUND_OFF: false,
+    SUB_TYPE_ID: 0,
     NOTE_DETAIL: [
       {
         SL_NO: '',
@@ -160,6 +161,7 @@ export class AddCreditNoteComponent {
   subTypeList: any;
   isSaving = false;
   subType: boolean = false;
+  selectedSubTypeId: any;
 
   constructor(
     private dataService: DataService,
@@ -175,7 +177,7 @@ export class AddCreditNoteComponent {
     );
 
     console.log(userData.Configuration, 'CONFIGURATION');
-    this.subType = userData.Configuration[0].SUB_TYPE_ID;
+    this.subType = userData?.Configuration?.[0]?.SUB_TYPE_ID || 0;
     console.log(this.subType, 'SUBTYPEEEEEEEEE');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -204,6 +206,7 @@ export class AddCreditNoteComponent {
     }
     this.creditFormData.TRANS_DATE = this.formatAsDDMMYYYY(new Date());
     console.log('ADDCOMPONENT TRIGERRED');
+    this.getSupTypeList();
     this.getLedgerCodeDropdown();
     // this.getCompanyListDropdown();
     this.getCustomerOrUnitLst();
@@ -246,6 +249,26 @@ export class AddCreditNoteComponent {
       this.GST_PERC,
       '===========selected GST PERC===================',
     );
+  }
+
+  getSupTypeList() {
+    const payload = {
+      TRANS_TYPE: 37,
+    };
+    this.dataService
+      .getSubTypeCreditNote(payload)
+      .subscribe((response: any) => {
+        this.subTypeList = response.Data;
+      });
+  }
+
+  onSubTypeChange(e: any) {
+    this.selectedSubTypeId = e.value;
+    this.creditFormData.SUB_TYPE_ID = e.value;
+
+    console.log('Selected Subtype:', this.selectedSubTypeId);
+
+    this.getDocNo();
   }
 
   private hasEmptyRow(): boolean {
@@ -998,11 +1021,19 @@ export class AddCreditNoteComponent {
   getDocNo() {
     const payload = {
       TRANS_TYPE: 37,
+      SUB_TYPE_ID: this.selectedSubTypeId || 0,
       COMPANY_ID: this.selectedCompanyId,
     };
+
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+
+      // force UI refresh
+      setTimeout(() => {
+        this.docNo = response.DOC_NO;
+      });
+
+      console.log(this.docNo, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -1077,6 +1108,17 @@ export class AddCreditNoteComponent {
       return;
     }
     // --- Validations ---
+    if (!this.creditFormData.SUB_TYPE_ID) {
+      notify(
+        {
+          message: 'Please select a sub type.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        3000,
+      );
+      return;
+    }
     if (!this.creditFormData.INVOICE_NO) {
       notify(
         {

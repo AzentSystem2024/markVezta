@@ -301,6 +301,10 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}AC_CreditNote/delete/` + id, {});
   }
 
+  getSubTypeCreditNote(data: any) {
+    return this.http.post(`${this.apiUrl}AC_CreditNote/getsubtype`, data);
+  }
+
   //-----------------------------------DEBIT NOTES-----------------------------------------------------//
   getDebitNoteList(items: any): Observable<any> {
     const data = items;
@@ -1034,6 +1038,9 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}SupplierPayment/insert`, data);
   }
+  getPdcDocNo(): Observable<any> {
+    return this.http.post(`${this.apiUrl}PDC/DocNo`, {});
+  }
 
   getPdcList(payload: any): Observable<any> {
     return this.http.post(
@@ -1210,12 +1217,12 @@ export class DataService {
   }
 
   //===========Paytime Entry===================
-  
+
   SalaryHead_Dropdown() {
     const reqbody = { NAME: 'SALARYHEAD' };
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
-  
+
   get_PaytimeEntry_list(payload) {
     const getEndpoint = `${this.apiUrl}PayTimeEntry/select`;
     return this.http.post(getEndpoint, payload);

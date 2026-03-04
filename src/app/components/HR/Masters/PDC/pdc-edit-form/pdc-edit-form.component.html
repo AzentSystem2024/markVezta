@@ -4,7 +4,12 @@
     class="d-flex"
     style="gap: 1rem; margin-bottom: 1rem; align-items: flex-start"
   >
-    <dx-text-box label="Doc No." labelMode="floating" [readOnly]="true">
+    <dx-text-box
+      label="Doc No."
+      labelMode="floating"
+      [readOnly]="true"
+      [(value)]="PDCFormData.ENTRY_NO"
+    >
     </dx-text-box>
 
     <dx-date-box
@@ -146,7 +151,7 @@
   </div>
 
   <div style="display: flex; justify-content: flex-end; gap: 10px">
-    <dx-button
+    <!-- <dx-button
       icon="fas fa-file-pdf"
       text="PDF"
       type="normal"
@@ -155,14 +160,19 @@
       (onClick)="viewPdf()"
       hint="View PDF"
     >
-    </dx-button>
+    </dx-button> -->
     <dx-button
       text="Cancel"
       type="normal"
       class="ml-2"
       (onClick)="cancel()"
     ></dx-button>
-    <dx-button text="Update" type="default" (onClick)="savePDC()"></dx-button>
+    <dx-button
+      *ngIf="!isReadOnly"
+      text="Update"
+      type="default"
+      (onClick)="savePDC()"
+    ></dx-button>
   </div>
 </div>
 

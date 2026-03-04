@@ -141,16 +141,16 @@ export class SettingsListComponent {
     this.service.List_setting(payload).subscribe((res: any) => {
       console.log(res);
       this.DOcList = res.Data;
-      let data = res.Data;
-      if (this.subType) {
-        data = data.filter(
-          (item: any) => !(item.ID === 37 && item.SUB_TYPE_ID === 0),
-        );
-      }
+      // let data = res.Data;
+      // if (this.subType) {
+      //   data = data.filter(
+      //     (item: any) => !(item.ID === 37 && item.SUB_TYPE_ID === 0),
+      //   );
+      // }
 
-      this.DOcList = data;
+      // this.DOcList = data;
 
-      console.log(this.DOcList, 'Filtered Doc List');
+      // console.log(this.DOcList, 'Filtered Doc List');
     });
   }
   //=========================grid refresh with call list==========================
@@ -171,23 +171,26 @@ export class SettingsListComponent {
   // /===============
 
   onEditorPreparing(e: any) {
-    if (e.parentType === 'dataRow') {
-      const row = e.row?.data;
+    // if (e.parentType === 'dataRow') {
+    //   const row = e.row?.data;
 
-      if (this.subType && row?.ID === 37 && row?.SUB_TYPE_ID === 0) {
-        // disable editing
-        e.editorOptions.disabled = true;
-      }
-    }
+    //   if (this.subType && row?.ID === 37 && row?.SUB_TYPE_ID === 0) {
+    //     // disable editing
+    //     e.editorOptions.disabled = true;
+    //   }
+    // }
     if (e.parentType === 'dataRow' && e.dataField === 'START') {
-      const row = e.row?.data;
-
-      if (row.LAST_NO == '0' || row.LAST_NO == null || row.LAST_NO == '') {
-        e.editorOptions.readOnly = false; // Editable
-      } else {
-        e.editorOptions.readOnly = true; // Not editable
-      }
+      e.editorOptions.readOnly = false;
     }
+    // if (e.parentType === 'dataRow' && e.dataField === 'START') {
+    //   const row = e.row?.data;
+
+    //   if (row.LAST_NO == '0' || row.LAST_NO == null || row.LAST_NO == '') {
+    //     e.editorOptions.readOnly = false; // Editable
+    //   } else {
+    //     e.editorOptions.readOnly = true; // Not editable
+    //   }
+    // }
   }
 
   //=====================Save function======================================
@@ -201,6 +204,7 @@ export class SettingsListComponent {
       START: item.START ?? 0,
       WIDTH: item.WIDTH ?? 0,
       VERIFY_REQUIRED: item.VERIFY_REQUIRED ?? false,
+      SUB_TYPE_ID: item.SUB_TYPE_ID,
     }));
     const payload = {
       COMPANY_ID: this.selectedCompany,
