@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -74,7 +75,13 @@ export class SettingsListComponent {
     elementAttr: { class: 'add-button' },
   };
   trans_id: any;
-  constructor(private service: DataService, private cdr: ChangeDetectorRef) {
+  subTypeList: any;
+  subType: boolean = false;
+  constructor(
+    private service: DataService,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {
     this.sessionData_tax();
   }
   //=================session data================
@@ -87,6 +94,30 @@ export class SettingsListComponent {
     this.finId = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
     this.user_id = this.sessionData.USER_ID;
     this.getlist();
+  }
+
+  ngOnInit() {
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    console.log(userData.Configuration, 'CONFIGURATION');
+    this.subType = userData.Configuration[0].SUB_TYPE_ID;
+    console.log(this.subType, 'SUBTYPEEEEEEEEE');
+
+    // if (packingRights) {
+    //   this.canAdd = packingRights.CanAdd;
+    //   this.canEdit = packingRights.CanEdit;
+    //   this.canDelete = packingRights.CanDelete;
+    //   this.canPrint = packingRights.CanEdit;
+    //   this.canView = packingRights.canView;
+    //   this.canApprove = packingRights.canApprove;
+    // }
+
+    // console.log('packingRights', packingRights);
+    // console.log(this.canAdd, this.canEdit, this.canDelete);
+    // this.getCreditNotes();
   }
 
   //================api for Serial number validation=================
@@ -110,6 +141,16 @@ export class SettingsListComponent {
     this.service.List_setting(payload).subscribe((res: any) => {
       console.log(res);
       this.DOcList = res.Data;
+      let data = res.Data;
+      if (this.subType) {
+        data = data.filter(
+          (item: any) => !(item.ID === 37 && item.SUB_TYPE_ID === 0),
+        );
+      }
+
+      this.DOcList = data;
+
+      console.log(this.DOcList, 'Filtered Doc List');
     });
   }
   //=========================grid refresh with call list==========================
@@ -130,6 +171,14 @@ export class SettingsListComponent {
   // /===============
 
   onEditorPreparing(e: any) {
+    if (e.parentType === 'dataRow') {
+      const row = e.row?.data;
+
+      if (this.subType && row?.ID === 37 && row?.SUB_TYPE_ID === 0) {
+        // disable editing
+        e.editorOptions.disabled = true;
+      }
+    }
     if (e.parentType === 'dataRow' && e.dataField === 'START') {
       const row = e.row?.data;
 
@@ -170,7 +219,7 @@ export class SettingsListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'success'
+        'success',
       );
     });
   }

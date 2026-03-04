@@ -141,6 +141,8 @@ export class AddDebitComponent {
   selectedInvoiceHSN: any;
 
   isSaving = false;
+  subType: boolean = false;
+  subTypeList: any;
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -181,6 +183,12 @@ export class AddDebitComponent {
   ngOnInit() {
     this.sessionDetails();
     const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    console.log(userData.Configuration, 'CONFIGURATION');
+    this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
@@ -696,38 +704,54 @@ export class AddDebitComponent {
           const grid = this.itemsGridRef?.instance;
           const rowData = e.row?.data;
 
-          // Must have Ledger + Amount filled
           if (
             rowData.ledgerCode &&
             rowData.Amount != null &&
             !this.hasEmptyRow()
           ) {
-            const newRow = {
+            const companyState = this.companyState?.trim().toLowerCase();
+            const supplierState =
+              this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+            const isSameState = companyState === supplierState;
+
+            let newRow: any = {
               SL_NO: this.debitFormData.NOTE_DETAIL.length + 1,
-              HEAD_ID: '',
-              AMOUNT: '',
-              GST_PERC: this.selectedInvoiceGST,
-              GST_AMOUNT: '',
-              HSN_CODE: '',
-              REMARKS: '',
+              ledgerCode: '',
+              ledgerName: '',
+              particulars: '',
+              Amount: null,
+              HSN_CODE: this.selectedInvoiceHSN || '',
+              GST_PERC: 0,
+              CGST: 0,
+              SGST: 0,
             };
+
+            // ⭐ APPLY GST
+            if (this.selectedInvoiceGST) {
+              if (isSameState) {
+                const half = this.selectedInvoiceGST / 2;
+                newRow.CGST = half;
+                newRow.SGST = half;
+              } else {
+                newRow.GST_PERC = this.selectedInvoiceGST;
+              }
+            }
 
             this.debitFormData.NOTE_DETAIL.push(newRow);
 
+            grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
+            grid.refresh();
+
             setTimeout(() => {
-              grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
+              const visibleRows = grid.getVisibleRows();
+              const newRowIndex = visibleRows.findIndex(
+                (r) => r.data === newRow,
+              );
 
-              setTimeout(() => {
-                const visibleRows = grid.getVisibleRows();
-                const newRowIndex = visibleRows.findIndex(
-                  (r) => r.data === newRow,
-                );
-
-                // 🔥 FOCUS EXACTLY LIKE GST_PERC LOGIC
-                if (newRowIndex >= 0) {
-                  grid.editCell(newRowIndex, 'ledgerCode');
-                }
-              }, 50);
+              if (newRowIndex >= 0) {
+                grid.editCell(newRowIndex, 'ledgerCode');
+              }
             }, 50);
           }
         }
@@ -1142,30 +1166,45 @@ export class AddDebitComponent {
 
     const nextSlNo = this.debitFormData.NOTE_DETAIL.length + 1;
 
-    const newRow = {
+    const companyState = this.companyState?.trim().toLowerCase();
+    const supplierState =
+      this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+    const isSameState = companyState === supplierState;
+
+    let newRow: any = {
       SL_NO: nextSlNo,
       ledgerCode: null,
       ledgerName: '',
       particulars: '',
       Amount: null,
+      HSN_CODE: this.selectedInvoiceHSN || '',
       GST_PERC: 0,
       CGST: 0,
       SGST: 0,
-      HSN_CODE: this.selectedInvoiceHSN || '',
     };
 
-    // 1️⃣ Push into array
-    this.debitFormData.NOTE_DETAIL.push(newRow);
-
-    // 2️⃣ 🔥 IMPORTANT → Reassign datasource
-    grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
-
-    // 3️⃣ Apply GST if needed
     if (this.selectedInvoiceGST) {
-      this.applyInvoiceGSTToRows();
+      if (isSameState) {
+        const half = this.selectedInvoiceGST / 2;
+
+        newRow.CGST = half;
+        newRow.SGST = half;
+        newRow.GST_PERC = 0;
+      } else {
+        newRow.GST_PERC = this.selectedInvoiceGST;
+        newRow.CGST = 0;
+        newRow.SGST = 0;
+      }
     }
 
-    // 4️⃣ Focus new row
+    // push row
+    this.debitFormData.NOTE_DETAIL.push(newRow);
+
+    // refresh datasource
+    grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
+
+    // focus ledgerCode
     setTimeout(() => {
       const visibleRows = grid.getVisibleRows();
       const newRowIndex = visibleRows.findIndex((r) => r.data === newRow);

@@ -157,8 +157,9 @@ export class AddCreditNoteComponent {
   netTotal: number;
   selectedInvoiceGst: number;
   selectedInvoiceHsn: any;
-
+  subTypeList: any;
   isSaving = false;
+  subType: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -169,8 +170,16 @@ export class AddCreditNoteComponent {
     this.sessionDetails();
     this.sessionData_tax();
     const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    console.log(userData.Configuration, 'CONFIGURATION');
+    this.subType = userData.Configuration[0].SUB_TYPE_ID;
+    console.log(this.subType, 'SUBTYPEEEEEEEEE');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
+      console.log(userData.Configuration, 'CONFIGURATIONNNNNNNNNNN');
       const selectedCompany = userData?.SELECTED_COMPANY;
       console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
       this.companyState = selectedCompany.STATE_NAME;

@@ -298,7 +298,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
+    console.log('packingRights----', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
 
     this.sesstion_Details();

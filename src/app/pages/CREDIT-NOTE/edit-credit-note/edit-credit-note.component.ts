@@ -148,8 +148,9 @@ export class EditCreditNoteComponent {
   customerStateID: any;
   selectedCustomer: any;
   roundedNetAmount: number = 0;
-
   isUpdating = false;
+  subType: boolean = false;
+  subTypeList: any;
 
   constructor(
     private dataService: DataService,
@@ -158,6 +159,12 @@ export class EditCreditNoteComponent {
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    console.log(userData.Configuration, 'CONFIGURATION');
+    this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;

@@ -137,6 +137,8 @@ export class ViewCreditNoteComponent {
   companyStateID: any;
   netAmount: number = 0;
   roundedNetAmount: number = 0;
+  subType: boolean = false;
+  subTypeList: any;
 
   constructor(
     private dataService: DataService,
@@ -159,6 +161,12 @@ export class ViewCreditNoteComponent {
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    console.log(userData.Configuration, 'CONFIGURATION');
+    this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
@@ -269,33 +277,34 @@ export class ViewCreditNoteComponent {
       // -----------------------------
       // STEP 3: BUILD GRID ROWS
       // -----------------------------
-      this.getLedgerCodeDropdown().then(() => {
-        this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
-          const match = this.ledgerList.find(
-            (l: any) => l.HEAD_ID === item.HEAD_ID,
-          );
+      this.getLedgerCodeDropdown()
+        .then(() => {
+          this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
+            const match = this.ledgerList.find(
+              (l: any) => l.HEAD_ID === item.HEAD_ID,
+            );
 
-          return {
-            ...item, // ✅ KEEP CGST, SGST, GST_PERC AS-IS
-            ledgerCode: match?.HEAD_CODE || '',
-            ledgerName: match?.HEAD_NAME || '',
-            particulars: item.REMARKS || '',
-            Amount: item.AMOUNT || 0,
-            gstAmount: item.GST_AMOUNT || 0, // ✅ IMPORTANT
-            HSN_CODE: item.HSN_CODE || this.HSNCODE,
-            CGST: Number(item.CGST) || 0,
-            SGST: Number(item.SGST) || 0,
-            GST_PERC: Number(item.GST_PERC) || 0,
-          };
+            return {
+              ...item, // ✅ KEEP CGST, SGST, GST_PERC AS-IS
+              ledgerCode: match?.HEAD_CODE || '',
+              ledgerName: match?.HEAD_NAME || '',
+              particulars: item.REMARKS || '',
+              Amount: item.AMOUNT || 0,
+              gstAmount: item.GST_AMOUNT || 0, // ✅ IMPORTANT
+              HSN_CODE: item.HSN_CODE || this.HSNCODE,
+              CGST: Number(item.CGST) || 0,
+              SGST: Number(item.SGST) || 0,
+              GST_PERC: Number(item.GST_PERC) || 0,
+            };
+          });
+
+          // ✅ 🔥 CALL VISIBILITY LOGIC AFTER MAPPING
+          this.setTaxVisibilityFromNoteDetails(this.noteDetails);
+        })
+        .finally(() => {
+          // 🟢 STOP GRID LOADING
+          this.itemsGridRef?.instance?.endCustomLoading();
         });
-
-        // ✅ 🔥 CALL VISIBILITY LOGIC AFTER MAPPING
-        this.setTaxVisibilityFromNoteDetails(this.noteDetails);
-      })
-      .finally(() => {
-        // 🟢 STOP GRID LOADING
-        this.itemsGridRef?.instance?.endCustomLoading();
-      });
 
       console.log(this.noteDetails, 'NOTDETAILSSSSSSSSSS');
 

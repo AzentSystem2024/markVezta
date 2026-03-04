@@ -28,13 +28,14 @@
       [headerFilter]="{ visible: true }"
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
-      [selection]="{ mode: 'single' }"
+      keyExpr="ID"
       focusStateEnabled="false"
-      (onEditingStart)="onEditOrViewTimesheet($event)"
+      (onExporting)="onExporting($event)"
       (onRowRemoving)="onDeleteTimesheet($event)"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
-      [selectedRowKeys]="selectedRows"
+      [selectedRowKeys]="selectedRowKeys"
       (onSelectionChanged)="onSelectionChanged($event)"
+      (onCellPrepared)="onCellPrepared($event)"
     >
       <dxo-column-chooser
         [height]="500"
@@ -43,11 +44,17 @@
         mode="select"
       >
       </dxo-column-chooser>
-      <!-- <dxo-editing
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
+      <dxo-editing
         mode="popup"
         [allowUpdating]="true"
         [allowDeleting]="true"
-      ></dxo-editing> -->
+      ></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -145,7 +152,7 @@
           </div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-        <!-- <dxi-item location="after" locateInMenu="auto">
+        <dxi-item location="after" locateInMenu="auto">
           <dx-button
             icon="plus"
             hint="add"
@@ -153,26 +160,20 @@
             stylingMode="contained"
             (onClick)="addTimesheet()"
           ></dx-button>
-        </dxi-item> -->
-
-        <dxi-item>
-          <dx-button
-            text="Approve"
-            type="default"
-            stylingMode="contained"
-            [width]="100"
-            class="mt-2"
-            (onClick)="ApproveBulkRows()"
-          >
-          </dx-button>
         </dxi-item>
 
-        <!-- <dxi-item
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="approveButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="searchButtonOptions"
-        ></dxi-item> -->
+        ></dxi-item>
 
         <dxi-item
           location="after"
@@ -185,6 +186,18 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
+
+        <!-- <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item> -->
       </dxo-toolbar>
 
       <dxi-column dataField="EMP_NO" caption="Employee No."></dxi-column>

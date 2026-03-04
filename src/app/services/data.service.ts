@@ -3487,7 +3487,7 @@ The result can be exported to HTML or Markdown.`;
   //import
 
   public getTemplateColumnData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/importColumn/list`, {});
+    return this.http.post(`${this.apiUrl}/ImportTemplateColumn/list`, {});
   }
   updateImportTemplateData(data: object): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/importtemplate/update`, data);

@@ -11,7 +11,7 @@
 >
   <!-- Column 1: Month + Employee Fields -->
   <!-- Column 2: Leave Period -->
-  <div style="width: 100%; margin-bottom: 10px;">
+  <div style="width: 100%; margin-bottom: 10px">
     <dx-text-box
       label="Month"
       [labelMode]="'floating'"
@@ -38,8 +38,6 @@
   >
     <p style="margin: 0 0 0"><strong>Employee</strong></p>
     <div style="display: flex; gap: 20px; flex-wrap: wrap">
-      
-
       <!-- Employee Field -->
       <div style="flex: 1 1 45%; min-width: 200px">
         <dx-select-box
@@ -77,26 +75,44 @@
     <!-- Single row for all 3 fields -->
     <div style="display: flex; gap: 20px; flex-wrap: wrap">
       <!-- From Date -->
-      <dx-text-box
+      <!-- <dx-text-box
         [(value)]="timesheetFormData.LEAVE_FROM"
         label="From"
         [labelMode]="'floating'"
         type="date"
         placeholder="Select From Date"
         style="flex: 1 1 30%"
-      ></dx-text-box>
+      ></dx-text-box> -->
+      <dx-date-box
+        [(value)]="timesheetFormData.LEAVE_FROM"
+        label="From"
+        [labelMode]="'floating'"
+        type="date"
+        displayFormat="dd-MM-yyyy"
+        placeholder="Select From Date"
+        style="flex: 1 1 30%"
+      ></dx-date-box>
 
       <!-- Total Days Worked -->
 
       <!-- Upto Date -->
-      <dx-text-box
+      <dx-date-box
+        [(value)]="timesheetFormData.LEAVE_TO"
+        label="From"
+        [labelMode]="'floating'"
+        type="date"
+        displayFormat="dd-MM-yyyy"
+        placeholder="Select Upto Date"
+        style="flex: 1 1 30%"
+      ></dx-date-box>
+      <!-- <dx-text-box
         [(value)]="timesheetFormData.LEAVE_TO"
         label="To"
         [labelMode]="'floating'"
         type="date"
         placeholder="Select Upto Date"
         style="flex: 1 1 30%"
-      ></dx-text-box>
+      ></dx-text-box> -->
       <dx-number-box
         [(value)]="timesheetFormData.DAYS"
         label="Total Days Worked"
@@ -131,7 +147,7 @@
             enabled: true,
             text: 'Loading...',
             showIndicator: true,
-            showPane: true
+            showPane: true,
           }"
           class="grid theme-dependent"
           [dataSource]="timesheetDetails"
@@ -149,6 +165,7 @@
           focusStateEnabled="false"
           [editing]="{ mode: 'cell', allowUpdating: true }"
           (onRowUpdated)="onTimesheetDetailsUpdated($event)"
+          (onEditorPreparing)="onEditorPreparing($event)"
         >
           <dxi-column dataField="STORE" caption="Store">
             <dxo-lookup
@@ -160,8 +177,18 @@
           </dxi-column>
 
           <dxi-column dataField="DAYS" caption="Worked Days"></dxi-column>
-          <dxi-column dataField="NORMAL_OT" caption="OT Hours" dataType="number" [editorOptions]="{ max: 12 }"></dxi-column>
-          <dxi-column dataField="HOLIDAY_OT" caption="Holiday OT" dataType="number" [editorOptions]="{ max: 12 }"></dxi-column>
+          <dxi-column
+            dataField="NORMAL_OT"
+            caption="OT Hours"
+            dataType="number"
+            [editorOptions]="{ max: 12 }"
+          ></dxi-column>
+          <dxi-column
+            dataField="HOLIDAY_OT"
+            caption="Holiday OT"
+            dataType="number"
+            [editorOptions]="{ max: 12 }"
+          ></dxi-column>
         </dx-data-grid>
       </div>
     </div>
@@ -188,7 +215,7 @@
             enabled: true,
             text: 'Loading...',
             showIndicator: true,
-            showPane: true
+            showPane: true,
           }"
           class="grid theme-dependent"
           [dataSource]="salaryDataSource"
@@ -206,6 +233,7 @@
           focusStateEnabled="false"
           [editing]="{ mode: 'cell', allowUpdating: true }"
           (onRowUpdated)="onSalaryHeadUpdated($event)"
+          (onEditorPreparing)="onEditorPreparing($event)"
         >
           <dxi-column dataField="SALARY_HEAD_ID" caption="Salary Head">
             <dxo-lookup
@@ -217,8 +245,12 @@
             </dxo-lookup>
           </dxi-column>
 
-          <dxi-column dataField="AMOUNT" caption="Amount" [format]="{ type: 'fixedPoint', precision: 2 }"
-          [customizeText]="formatAmount"></dxi-column>
+          <dxi-column
+            dataField="AMOUNT"
+            caption="Amount"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+            [customizeText]="formatAmount"
+          ></dxi-column>
         </dx-data-grid>
       </div>
 
@@ -300,7 +332,7 @@
       "
     >
       <!-- <p style="margin: 0 0 10px"><strong>Summary</strong></p> -->
-  
+
       <div
         style="
           display: flex;
@@ -355,12 +387,7 @@
         </div>
       </div>
     </div>
-  
-  
   </div>
-  
-  
-  
 </div>
 
 <!-- Buttons Section -->

@@ -48,6 +48,7 @@ import {
   TimesheetViewComponent,
   TimesheetViewModule,
 } from '../timesheet-view/timesheet-view.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-timesheet-list',
@@ -67,7 +68,7 @@ export class TimesheetListComponent {
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
   // CompanyID = 1;
-  selectedRows: any[] = [];
+  selectedRowKeys: any[] = [];
 
   GridSource: any;
   isLoading: boolean = false;
@@ -137,9 +138,18 @@ export class TimesheetListComponent {
     },
   ];
 
+  approveButtonOptions: any = {
+    text: 'Approve',
+    type: 'default',
+    stylingMode: 'contained',
+    width: 100,
+    disabled: false,
+    onClick: () => this.ApproveBulkRows(),
+  };
+
   // selectedMonth: string | number | Date = new Date();
   selectedMonth: Date = new Date();
-
+  // selectedRowKeys: any[] = [];
   timesheetData: any;
   timesheet: any;
   selectedMonthForAdd: string;
@@ -163,19 +173,53 @@ export class TimesheetListComponent {
   yearSelectorVisible = false;
   years: number[] = [];
   CompanyID: any;
-  searchButtonOptions = {
-    icon: 'search',
-    hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
-    onClick: () => this.toggleFilters(),
-  };
+  companyID: any;
+  canAdd: any;
+  canEdit: any;
+  canDelete: any;
+  canPrint: any;
+  canView: any;
+  canApprove: any;
+  onExporting(event: any) {
+    const fileName = 'Timesheet';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+  // searchButtonOptions = {
+  //   icon: 'search',
+  //   hint: 'Show / Hide Filters',
+  //   stylingMode: 'contained',
+  //   elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+  //   onClick: () => this.toggleFilters(),
+  // };
   constructor(
     private dataService: DataService,
     private zone: NgZone,
+    private router: Router,
   ) {}
 
   ngOnInit() {
+    console.log(this.selectedMonth, 'SELECTEDMONTH===========');
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/credit-note');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
     const today = new Date();
     this.selectedMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); // Previous month
 
@@ -229,6 +273,14 @@ export class TimesheetListComponent {
       this.zone.run(() => this.refreshGrid());
     },
     text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
   };
 
   generateYears() {
@@ -461,7 +513,7 @@ export class TimesheetListComponent {
 
   onApproveClick(e: any): void {
     // console.log('Verify clicked:', e); // <-- Add this
-
+    console.log(e, 'EVENTTTTTTTTTTT');
     e.cancel = true;
     const employeeId = e.row?.data?.ID;
 
@@ -484,10 +536,21 @@ export class TimesheetListComponent {
   }
 
   addTimesheet() {
-    const month = this.selectedMonth.toISOString().slice(0, 7);
-    this.selectedMonthForAdd = month;
+    const year = this.selectedMonth.getFullYear();
+    const month = ('0' + (this.selectedMonth.getMonth() + 1)).slice(-2);
+
+    this.selectedMonthForAdd = `${year}-${month}`;
+
+    console.log(this.selectedMonthForAdd, 'SELECTEDMONTH');
     this.addTimesheetPopupOpened = true;
   }
+
+  // addTimesheet() {
+  //   const month = this.selectedMonth.toISOString().slice(0, 7);
+  //   this.selectedMonthForAdd = month;
+  //   console.log(month, 'SELECTEDMONTHHHHHHHH');
+  //   this.addTimesheetPopupOpened = true;
+  // }
 
   onEditOrViewTimesheet(e: any) {
     e.cancel = true;
@@ -563,37 +626,40 @@ export class TimesheetListComponent {
   }
 
   // onSelectionChanged(e: any) {
-  //   this.selectedRows = e.selectedRowKeys;
-  //   console.log('User selected:', this.selectedRows);
+  //   this.selectedRowKeys = e.selectedRowKeys;
+  //   console.log('User selected:', this.selectedRowKeys);
   // }
 
   onSelectionChanged(e: any) {
-    // ❌ Remove rows where STATUS === 'Approved'
-    const validSelection = e.selectedRowsData.filter(
-      (row: any) => row.STATUS !== 'Approved',
-    );
+    const filteredKeys = e.selectedRowKeys.filter((key: any) => {
+      const row = e.component.getRowByKey(key);
+      return row?.data?.STATUS !== 'Approved';
+    });
 
-    // ✅ Reset selection to only valid rows
-    this.selectedRows = validSelection;
-
-    // 🔁 Force grid to reflect corrected selection
-    this.dataGrid.instance.selectRows(
-      validSelection.map((row) => row.ID),
-      false,
-    );
-
-    console.log('User selected (filtered):', this.selectedRows);
+    this.selectedRowKeys = filteredKeys;
   }
+  onCellPrepared(e: any) {
+    if (
+      e.rowType === 'data' &&
+      e.column.command === 'select' &&
+      e.data.STATUS === 'Approved'
+    ) {
+      // Disable checkbox
+      e.cellElement.classList.add('dx-state-disabled');
 
+      // Prevent clicking
+      e.cellElement.style.pointerEvents = 'none';
+    }
+  }
   // ApproveBulkRows(){
   //   const payload = {
-  //     // IDs: this.selectedRows,
-  //      IDs: this.selectedRows[0]
+  //     // IDs: this.selectedRowKeys,
+  //      IDs: this.selectedRowKeys[0]
   //   }
   //   this.dataService.Timesheet_Approval_Api(payload).subscribe((response: any) => {
   //     console.log(response, 'Timesheet Approve   List Response');
   //     this.timesheetList = response.data
-  //     this.selectedRows = []; // clear selection after success
+  //     this.selectedRowKeys = []; // clear selection after success
 
   //     // console.log(
   //     //   this.timesheetList,
@@ -607,16 +673,16 @@ export class TimesheetListComponent {
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     console.log(sessionData, '=================session data==========');
-    this.CompanyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.CompanyID,
-      '============selected_Company_id==============',
-    );
+    // this.CompanyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    // console.log(
+    //   this.CompanyID,
+    //   '============selected_Company_id==============',
+    // );
   }
 
   fetchTimesheetList() {
     const payload = {
-      CompanyId: this.CompanyID,
+      CompanyId: this.companyID,
       Month: this.selectedMonth
         .toLocaleDateString('en-US', {
           month: 'long',
@@ -628,15 +694,46 @@ export class TimesheetListComponent {
     this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
       console.log(response, 'Timesheet List Response');
       this.timesheetList = response.data;
+      this.updateApproveButtonState();
     });
   }
 
-  ApproveBulkRows() {
-    // Extract only the numeric IDs from the selected rows
-    const selectedIDs = this.selectedRows.map((row) => row.ID);
+  updateApproveButtonState() {
+    if (!this.timesheetList || this.timesheetList.length === 0) {
+      this.setApproveDisabled(true);
+      return;
+    }
 
+    const allApproved = this.timesheetList.every(
+      (row: any) => row.STATUS === 'Approved',
+    );
+
+    this.setApproveDisabled(allApproved);
+  }
+
+  setApproveDisabled(state: boolean) {
+    this.approveButtonOptions = {
+      ...this.approveButtonOptions,
+      disabled: state,
+    };
+  }
+
+  ApproveBulkRows() {
+    console.log(this.selectedRowKeys, 'INAPPROVE');
+    //  Check if nothing selected
+    if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
+      notify(
+        {
+          message: 'Please select at least one row',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        3000,
+      );
+      return; // stop execution
+    }
     const payload = {
-      IDs: selectedIDs,
+      IDs: this.selectedRowKeys,
     };
 
     console.log('Payload sent to API:', payload);
@@ -645,9 +742,9 @@ export class TimesheetListComponent {
       .Timesheet_Approval_Api(payload)
       .subscribe((response: any) => {
         console.log(response, 'Timesheet Approve List Response');
-        this.timesheetList = response;
+        // this.timesheetList = response;
         console.log(this.timesheetList, 'Filtered Timesheet for');
-        this.selectedRows = []; // Clear selection after success
+        this.selectedRowKeys = []; // Clear selection after success
         notify(
           {
             message: `Approved Successfully`,

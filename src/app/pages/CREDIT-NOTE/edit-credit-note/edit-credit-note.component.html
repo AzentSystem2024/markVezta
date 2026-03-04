@@ -44,16 +44,16 @@
                 ></dx-text-box>
 
                 <dx-select-box
-                  [(value)]="invoiceNo"
-                  [items]="pendingInvoices"
-                  label="Select Invoice"
+                  *ngIf="subType"
+                  [dataSource]="subTypeList"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  label="Select Subtype"
                   labelMode="floating"
-                  displayExpr="INVOICE_NO"
-                  valueExpr="INVOICE_NO"
-                  placeholder="Select Invoice No."
+                  placeholder="Select Subtype"
                   [width]="200"
-                  (onFocusIn)="openInvoicePopup()"
-                ></dx-select-box>
+                >
+                </dx-select-box>
               </div>
               <div style="display: flex; align-items: baseline; gap: 5px">
                 <dx-select-box
@@ -69,6 +69,17 @@
                   (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
                   (onValueChanged)="onDistributorSelected($event)"
                   [readOnly]="true"
+                ></dx-select-box>
+                <dx-select-box
+                  [(value)]="invoiceNo"
+                  [items]="pendingInvoices"
+                  label="Select Invoice"
+                  labelMode="floating"
+                  displayExpr="INVOICE_NO"
+                  valueExpr="INVOICE_NO"
+                  placeholder="Select Invoice No."
+                  [width]="200"
+                  (onFocusIn)="openInvoicePopup()"
                 ></dx-select-box>
               </div>
             </div>
