@@ -301,6 +301,10 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}AC_CreditNote/delete/` + id, {});
   }
 
+  getSubTypeCreditNote(data: any) {
+    return this.http.post(`${this.apiUrl}AC_CreditNote/getsubtype`, data);
+  }
+
   //-----------------------------------DEBIT NOTES-----------------------------------------------------//
   getDebitNoteList(items: any): Observable<any> {
     const data = items;
@@ -1034,6 +1038,9 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}SupplierPayment/insert`, data);
   }
+  getPdcDocNo(): Observable<any> {
+    return this.http.post(`${this.apiUrl}PDC/DocNo`, {});
+  }
 
   getPdcList(payload: any): Observable<any> {
     return this.http.post(
@@ -1210,12 +1217,12 @@ export class DataService {
   }
 
   //===========Paytime Entry===================
-  
+
   SalaryHead_Dropdown() {
     const reqbody = { NAME: 'SALARYHEAD' };
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
-  
+
   get_PaytimeEntry_list(payload) {
     const getEndpoint = `${this.apiUrl}PayTimeEntry/select`;
     return this.http.post(getEndpoint, payload);
@@ -1767,29 +1774,50 @@ export class DataService {
   public getVatclassData(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}vatclass/list`, data);
   }
-  public postVatclassData(
-    CODE: any,
-    VAT_NAME: any,
-    VAT_PERC: any,
-    COMPANY_ID: AnyARecord,
-  ): Observable<any> {
-    const data = { CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
 
+  postVatclassData(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
+  // public postVatclassData(
+  //   CODE: string,
+  //   VAT_NAME: string,
+
+  //   CGST_PERC: string | null,
+  //   CGST_INPUT_HEAD_ID: number | null,
+  //   CGST_OUTPUT_HEAD_ID: number | null,
+
+  //   SGST_PERC: string | null,
+  //   SGST_INPUT_HEAD_ID: number | null,
+  //   SGST_OUTPUT_HEAD_ID: number | null,
+
+  //   IGST_PERC: string | null,
+  //   IGST_INPUT_HEAD_ID: number | null,
+  //   IGST_OUTPUT_HEAD_ID: number | null,
+  // ): Observable<any> {
+  //   const data = {
+  //     CODE,
+  //     VAT_NAME,
+
+  //     CGST_PERC,
+  //     CGST_INPUT_HEAD_ID,
+  //     CGST_OUTPUT_HEAD_ID,
+
+  //     SGST_PERC,
+  //     SGST_INPUT_HEAD_ID,
+  //     SGST_OUTPUT_HEAD_ID,
+
+  //     IGST_PERC,
+  //     IGST_INPUT_HEAD_ID,
+  //     IGST_OUTPUT_HEAD_ID,
+  //   };
+
+  //   return this.http.post(`${this.apiUrl}vatclass/save`, data);
+  // }
   select_Vatclass_Data(id: any) {
     return this.http.post(`${this.apiUrl}vatclass/select/${id}`, {});
   }
 
-  updateVatclass(
-    ID: any,
-    CODE: any,
-    VAT_NAME: any,
-    VAT_PERC: any,
-    COMPANY_ID: any,
-  ): Observable<any> {
-    const data = { ID, CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
-
+  updateVatclass(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
   removeVatclass(id: any, code: any, vatname: any, vatperc: any) {
@@ -2141,53 +2169,58 @@ export class DataService {
     return this.http.post<any>(url, {});
   }
 
-  removeSupplier(
-    id: any,
-    code: any,
-    supplierName: any,
-    address1: any,
-    address2: any,
-    address3: any,
-    zip: any,
-    state_id: any,
-    city: any,
-    country_id: any,
-    phone: any,
-    email: any,
-    mobile: any,
-    notes: any,
-    fax: any,
-    vat_regno: any,
-    currency_id: any,
-    payterm_id: any,
-    vatrule_id: any,
-  ) {
-    const requestBody = {
-      SUPP_CODE: code,
-      SUPP_NAME: supplierName,
-      ADDRESS1: address1,
-      ADDRESS2: address2,
-      ADDRESS3: address3,
-      ZIP: zip,
-      STATE_ID: state_id,
-      CITY: city,
-      COUNTRY_ID: country_id,
-      PHONE: phone,
-      EMAIL: email,
-      MOBILE_NO: mobile,
-      NOTES: notes,
-      FAX_NO: fax,
-      VAT_REGNO: vat_regno,
-      CURRENCY_ID: currency_id,
-      PAY_TERM_ID: payterm_id,
-      VAT_RULE_ID: vatrule_id,
-      COMPANY_ID: this.selected_Company_id,
-    };
-    return this.http.post<any>(
-      `${this.apiUrl}supplier/delete/` + id,
-      requestBody,
-    );
+  // removeSupplier(
+  //   id: any,
+  //   code: any,
+  //   supplierName: any,
+  //   address1: any,
+  //   address2: any,
+  //   address3: any,
+  //   zip: any,
+  //   state_id: any,
+  //   city: any,
+  //   country_id: any,
+  //   phone: any,
+  //   email: any,
+  //   mobile: any,
+  //   notes: any,
+  //   fax: any,
+  //   vat_regno: any,
+  //   currency_id: any,
+  //   payterm_id: any,
+  //   vatrule_id: any,
+  // ) {
+  //   const requestBody = {
+  //     SUPP_CODE: code,
+  //     SUPP_NAME: supplierName,
+  //     ADDRESS1: address1,
+  //     ADDRESS2: address2,
+  //     ADDRESS3: address3,
+  //     ZIP: zip,
+  //     STATE_ID: state_id,
+  //     CITY: city,
+  //     COUNTRY_ID: country_id,
+  //     PHONE: phone,
+  //     EMAIL: email,
+  //     MOBILE_NO: mobile,
+  //     NOTES: notes,
+  //     FAX_NO: fax,
+  //     VAT_REGNO: vat_regno,
+  //     CURRENCY_ID: currency_id,
+  //     PAY_TERM_ID: payterm_id,
+  //     VAT_RULE_ID: vatrule_id,
+  //     COMPANY_ID: this.selected_Company_id,
+  //   };
+  //   return this.http.post<any>(
+  //     `${this.apiUrl}supplier/delete/` + id,
+  //     requestBody,
+  //   );
+  // }
+  removeSupplier(ID: any) {
+    const getEndpoint = this.apiUrl + `supplier/delete/${ID}`;
+    return this.http.post(getEndpoint, {});
   }
+
   updateSupplier(data: any): Observable<any> {
     return this.http.post<any>(
       `

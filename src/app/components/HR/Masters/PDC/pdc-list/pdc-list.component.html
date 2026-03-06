@@ -102,10 +102,11 @@
             label="Due Date"
             labelMode="floating"
             [dataSource]="dateRanges"
-            [displayExpr]="'label'"
+            [displayExpr]="displayDueDateExpr"
             valueExpr="value"
             [(value)]="selectedDateRange"
             (onValueChanged)="onDateRangeChanged($event)"
+            (onItemClick)="handleDueDateItemClick($event)"
           >
             <div *dxTemplate="let item of 'item'">
               {{ item.value === "custom" ? "Custom" : item.label }}
@@ -118,10 +119,11 @@
             label="Entry Date between"
             labelMode="floating"
             [dataSource]="entryDateRanges"
-            [displayExpr]="'label'"
+            [displayExpr]="displayEntryDateExpr"
             valueExpr="value"
             [(value)]="selectedEntryDateRange"
             (onValueChanged)="onEntryDateRangeChanged($event)"
+            (onItemClick)="handleEntryDateItemClick($event)"
           >
             <div *dxTemplate="let item of 'item'">
               {{ item.value === "custom" ? "Custom" : item.label }}

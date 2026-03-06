@@ -400,54 +400,12 @@ export class SupplierListComponent implements OnInit {
   //   });
 
   onRowRemoving(event) {
-    const selectedRow = event.data;
-    const {
-      ID,
-      SUPP_CODE,
-      SUPP_NAME,
-      ADDRESS1,
-      ADDRESS2,
-      ADDRESS3,
-      ZIP,
-      STATE_ID,
-      CITY,
-      COUNTRY_ID,
-      PHONE,
-      EMAIL,
-      MOBILE_NO,
-      NOTES,
-      FAX_NO,
-      VAT_REGNO,
-      CURRENCY_ID,
-      PAY_TERM_ID,
-      VAT_RULE_ID,
-    } = selectedRow;
-
+    console.log(event)
+    const id = event.data.ID
     this.dataservice
-      .removeSupplier(
-        ID,
-        SUPP_CODE,
-        SUPP_NAME,
-        ADDRESS1,
-        ADDRESS2,
-        ADDRESS3,
-        ZIP,
-        STATE_ID,
-        CITY,
-        COUNTRY_ID,
-        PHONE,
-        EMAIL,
-        MOBILE_NO,
-        NOTES,
-        FAX_NO,
-        VAT_REGNO,
-        CURRENCY_ID,
-        PAY_TERM_ID,
-        VAT_RULE_ID,
-      )
+      .removeSupplier(id)
       .subscribe(() => {
-        try {
-          // Your delete logic here
+
           notify(
             {
               message: 'Delete operation successful',
@@ -457,15 +415,7 @@ export class SupplierListComponent implements OnInit {
           );
           this.dataGrid.instance.refresh();
           this.showSupplier();
-        } catch (error) {
-          // notify(
-          //   {
-          //     message: 'Delete operation failed',
-          //     position: { at: 'top right', my: 'top right' },
-          //   },
-          //   'error'
-          // );
-        }
+    
       });
   }
 
@@ -529,7 +479,8 @@ export class SupplierListComponent implements OnInit {
     // Fetch the item data
     this.dataservice.selectSupplier(ID).subscribe((response: any) => {
       // console.log(response, "select!!!");
-      this.selectedSupplier = response;
+      // this.selectedSupplier = response;
+      // console.log(this.selectedSupplier)
       this.isEditSupplierPopupOpened = true;
       this.selectSupplier(response);
     });
@@ -544,6 +495,7 @@ export class SupplierListComponent implements OnInit {
     this.dataservice.selectSupplier(ID).subscribe((response: any) => {
       console.log('Supplier selected successfully:', response);
       this.selectedSupplier = response;
+      console.log(response)
       this.cdr.detectChanges();
 
       // Open the popup

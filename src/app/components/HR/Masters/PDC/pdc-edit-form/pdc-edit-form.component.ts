@@ -91,7 +91,7 @@ export class PdcEditFormComponent {
     const selectedId = e.value;
     this.selectedBeneficiaryTypeID = selectedId;
     this.selectedBeneficiaryType = this.BeneficiaryType.find(
-      (b) => b.id === selectedId
+      (b) => b.id === selectedId,
     );
     console.log(this.selectedBeneficiaryType, 'selected beneficiary type');
   }
@@ -110,7 +110,7 @@ export class PdcEditFormComponent {
       }));
 
       this.selectedBeneficiaryType = this.BeneficiaryType.find(
-        (b) => b.id === 1
+        (b) => b.id === 1,
       );
       this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
     } else {
@@ -121,7 +121,7 @@ export class PdcEditFormComponent {
       }));
 
       this.selectedBeneficiaryType = this.BeneficiaryType.find(
-        (b) => b.id === 2
+        (b) => b.id === 2,
       );
       this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
     }
@@ -130,7 +130,7 @@ export class PdcEditFormComponent {
 
   constructor(
     private dataservice: DataService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     this.get_Supplier_dropdown();
     this.get_Bank_dropdown();
@@ -159,7 +159,7 @@ export class PdcEditFormComponent {
     const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-based
     const day = String(d.getDate()).padStart(2, '0');
 
-    return `${year}-${month}-${day}`; // ✅ No timezone involved
+    return `${year}-${month}-${day}`; //  No timezone involved
   }
 
   sesstion_Details() {
@@ -169,7 +169,7 @@ export class PdcEditFormComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -217,7 +217,7 @@ export class PdcEditFormComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
         this.formClosed.emit();
       }
@@ -226,9 +226,9 @@ export class PdcEditFormComponent {
 
   get_Supplier_dropdown() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id,
-      NAME : 'SUPPLIER'
-    }
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'SUPPLIER',
+    };
     this.dataservice.Supplier_Dropdown(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
@@ -245,10 +245,10 @@ export class PdcEditFormComponent {
   }
 
   get_Customer_dropdown() {
-    const payload  = {
-      NAME:'CUSTOMER',
-      COMPANY_ID: this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'CUSTOMER',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.Customer_Dropdown(payload).subscribe((res: any) => {
       console.log('customer dropdown', res);
       this.Customer = res;
@@ -264,9 +264,11 @@ export class PdcEditFormComponent {
     }
     console.log(
       this.selectedBeneficiaryType,
-      'selectedBeneficiaryType================='
+      'selectedBeneficiaryType=================',
     );
     console.log(this.selectedBeneficiaryTypeID, 'selectedBeneficiaryID=======');
+    this.get_Supplier_dropdown();
+    this.get_Bank_dropdown();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -294,11 +296,11 @@ export class PdcEditFormComponent {
       };
       console.log(
         this.PDCFormData,
-        'PDCFORMDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        'PDCFORMDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       );
       this.selectedType = this.PDCFormData.IS_PAYMENT;
       this.selectedBeneficiaryType = this.BeneficiaryType.find(
-        (b) => b.id === data.BENEFICIARY_TYPE
+        (b) => b.id === data.BENEFICIARY_TYPE,
       );
       this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
 
@@ -308,14 +310,15 @@ export class PdcEditFormComponent {
       // );
       if (data.BENEFICIARY_TYPE) {
         this.selectedBeneficiaryType = this.BeneficiaryType.find(
-          (b) => b.id === data.BENEFICIARY_TYPE
+          (b) => b.id === data.BENEFICIARY_TYPE,
         );
         this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType?.id;
       }
       console.log(
         this.selectedBeneficiaryTypeID,
-        'SELECTEDBENNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN'
+        'SELECTEDBENNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
       );
+      this.get_Supplier_dropdown();
     }
 
     // if (!this.selectedPDC) {

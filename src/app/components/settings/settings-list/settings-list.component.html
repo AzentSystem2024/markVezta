@@ -1,19 +1,19 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
-<dx-data-grid
-  class="grid theme-dependent"
-  [dataSource]="DOcList"
-  [rowAlternationEnabled]="true"
-  rowAlternationInterval="2"
-  [showBorders]="true"
-  [scrolling]="{ mode: 'virtual' }"
-  [showColumnLines]="true"
-  [width]="'100%'"
-  (onEditorPreparing)="onEditorPreparing($event)"
-  [height]="'75vh'"
->
-  <!-- <dxo-paging [pageSize]="10"></dxo-paging> -->
-  <!-- <dxo-pager
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="DOcList"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [showBorders]="true"
+      [scrolling]="{ mode: 'virtual' }"
+      [showColumnLines]="true"
+      [width]="'100%'"
+      (onEditorPreparing)="onEditorPreparing($event)"
+      [height]="'75vh'"
+    >
+      <!-- <dxo-paging [pageSize]="10"></dxo-paging> -->
+      <!-- <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
         [displayMode]="displayMode"
@@ -21,100 +21,99 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager> -->
-  <dxo-scrolling mode="virtual"></dxo-scrolling>
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
 
-  <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
-  <dxo-editing mode="cell" [allowUpdating]="true"> </dxo-editing>
-  <dxo-toolbar>
-    <dxi-item location="before">
-      <div
-        class="grid-header"
-        style="
-          font-weight: 600;
-          font-size: 20px;
-          margin-left: 12px;
-          padding: -3px;
-          margin-right:  3px;
-        "
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+      <dxo-editing mode="cell" [allowUpdating]="true"> </dxo-editing>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right:  3px;
+            "
+          >
+            Doc.No Settings
+          </div>
+        </dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          showText="inMenu"
+          widget="dxButton"
+          [options]="{
+            icon: isFilterRowVisible ? 'filter' : 'filter',
+            hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
+            onClick: toggleFilterRow,
+            stylingMode: 'text',
+            elementAttr: { class: 'commonButtons' },
+          }"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Document Type"
+        [allowEditing]="false"
       >
-        Doc.No Settings
-      </div>
-    </dxi-item>
-    <dxi-item
-      location="after"
-      locateInMenu="auto"
-      widget="dxButton"
-      [options]="refreshButtonOptions"
-    ></dxi-item>
-
-    <dxi-item
-      location="after"
-      locateInMenu="auto"
-      showText="inMenu"
-      widget="dxButton"
-      [options]="{
-        icon: isFilterRowVisible ? 'filter' : 'filter',
-        hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-        onClick: toggleFilterRow,
-        stylingMode: 'text',
-        elementAttr: { class: 'commonButtons' },
-      }"
-    ></dxi-item>
-
-    <dxi-item
-      location="after"
-      widget="dxButton"
-      [options]="addButtonOptions"
-    ></dxi-item>
-  </dxo-toolbar>
-
-  <dxi-column
-    dataField="DESCRIPTION"
-    caption="Document Type"
-    [allowEditing]="false"
-  >
-  </dxi-column>
-  <dxi-column
-    dataField="PREFIX"
-    caption="Prefix"
-    [allowFiltering]="false"
-    [width]="'150'"
-  >
-  </dxi-column>
-  <dxi-column
-    dataField="LAST_NO"
-    caption="Last SNo."
-    [allowFiltering]="false"
-    [height]="'20'"
-    [allowEditing]="false"
-    alignment="center"
-    [width]="'150'"
-  ></dxi-column>
-  <dxi-column
-    dataField="START"
-    caption="Starting No."
-    [allowFiltering]="false"
-    alignment="center"
-    [width]="'150'"
-  >
-  </dxi-column>
-  <dxi-column
-    dataField="WIDTH"
-    caption="Width"
-    alignment="center"
-    [allowFiltering]="false"
-    [width]="'100'"
-  >
-  </dxi-column>
-  <dxo-summary>
-    <dxi-total-item
-      summaryType="count"
-      column="DESCRIPTION"
-      displayFormat="Total Count: {0}"
-    >
-    </dxi-total-item>
-  </dxo-summary>
-</dx-data-grid>
-
-</div>
+      </dxi-column>
+      <dxi-column
+        dataField="PREFIX"
+        caption="Prefix"
+        [allowFiltering]="false"
+        [width]="'150'"
+      >
+      </dxi-column>
+      <dxi-column
+        dataField="LAST_NO"
+        caption="Last SNo."
+        [allowFiltering]="false"
+        [height]="'20'"
+        [allowEditing]="false"
+        alignment="center"
+        [width]="'150'"
+      ></dxi-column>
+      <dxi-column
+        dataField="START"
+        caption="Starting No."
+        [allowFiltering]="false"
+        alignment="center"
+        [width]="'150'"
+      >
+      </dxi-column>
+      <dxi-column
+        dataField="WIDTH"
+        caption="Width"
+        alignment="center"
+        [allowFiltering]="false"
+        [width]="'100'"
+      >
+      </dxi-column>
+      <dxo-summary>
+        <dxi-total-item
+          summaryType="count"
+          column="DESCRIPTION"
+          displayFormat="Total Count: {0}"
+        >
+        </dxi-total-item>
+      </dxo-summary>
+    </dx-data-grid>
+  </div>
 </div>

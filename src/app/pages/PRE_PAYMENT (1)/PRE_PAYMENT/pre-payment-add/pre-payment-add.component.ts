@@ -60,7 +60,6 @@ export class PrePaymentAddComponent {
 
   isCalendarClicked = false;
 
-
   periodTo: string | number | Date | null = null;
   periodFrom: string | number | Date | null = null;
 
@@ -69,7 +68,7 @@ export class PrePaymentAddComponent {
     FIN_ID: '',
     IS_APPROVED: false,
     TRANS_TYPE: 38,
-    TRANS_DATE: '',
+    TRANS_DATE: new Date(),
     REF_NO: '',
     NARRATION: '',
     CREATE_USER_ID: '',
@@ -184,12 +183,11 @@ export class PrePaymentAddComponent {
   }
 
   recalculateTotalExpense() {
-  this.totalExpense = this.ExpenseAmountDetails
-    ?.reduce((sum, item) => {
-      return sum + (Number(item.DUE_AMOUNT) || 0);
-    }, 0) || 0;
-}
-
+    this.totalExpense =
+      this.ExpenseAmountDetails?.reduce((sum, item) => {
+        return sum + (Number(item.DUE_AMOUNT) || 0);
+      }, 0) || 0;
+  }
 
   generateSchedule() {
     if (
@@ -232,12 +230,12 @@ export class PrePaymentAddComponent {
         periodEnd = new Date(endDateFinal);
       }
 
-      // ✅ Adjust the start date for the first row to match DATE_FROM
+      //  Adjust the start date for the first row to match DATE_FROM
       if (schedule.length === 0) {
         periodStart = new Date(startDate);
       }
 
-      // ✅ Adjust the end date for the last row to match DATE_TO
+      // Adjust the end date for the last row to match DATE_TO
       if (periodEnd > endDateFinal) {
         periodEnd = new Date(endDateFinal);
       }
@@ -260,7 +258,7 @@ export class PrePaymentAddComponent {
     this.ExpenseAmountDetails = schedule;
     this.showGrid = true;
 
-     this.recalculateTotalExpense();
+    this.recalculateTotalExpense();
   }
 
   onSelectionChanged(e: any) {
@@ -328,7 +326,7 @@ export class PrePaymentAddComponent {
       FIN_ID: '',
 
       TRANS_TYPE: 38,
-      TRANS_DATE: '',
+      TRANS_DATE: new Date(),
       REF_NO: '',
       NARRATION: '',
       CREATE_USER_ID: '',
@@ -348,8 +346,8 @@ export class PrePaymentAddComponent {
 
     this.ExpenseAmountDetails = [];
     this.showGrid = false;
-
-    // ✅ Reset form validations after value reset
+    this.totalExpense = 0;
+    //  Reset form validations after value reset
     setTimeout(() => {
       // Reset previous validation results
       this.formValidationGroup?.instance?.reset();
@@ -465,19 +463,18 @@ export class PrePaymentAddComponent {
   }
 
   savePrePayment() {
-
     const expenseAmount = Number(this.PrePaymentFormData.EXPENSE_AMOUNT);
-const totalExpense = Number(this.totalExpense);
-    // ✅ Calendar click validation
-  if (!this.isCalendarClicked) {
-    notify({
-      message: 'Please click the calendar to generate the schedule.',
-      type: 'warning',
-      position: { at: 'top right', my: 'top right' },
-      displayTime: 1500,
-    });
-    return;
-  }
+    const totalExpense = Number(this.totalExpense);
+    //  Calendar click validation
+    if (!this.isCalendarClicked) {
+      notify({
+        message: 'Please click the calendar to generate the schedule.',
+        type: 'warning',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 1500,
+      });
+      return;
+    }
 
     const validationResult = this.formValidationGroup?.instance?.validate();
     if (!validationResult?.isValid) {
@@ -486,25 +483,25 @@ const totalExpense = Number(this.totalExpense);
     }
 
     if (isNaN(expenseAmount) || isNaN(totalExpense)) {
-  notify({
-    message: 'Expense amount or total expense is invalid.',
-    type: 'error',
-    position: { at: 'top right', my: 'top right' },
-    displayTime: 1500,
-  });
-  return;
-}
+      notify({
+        message: 'Expense amount or total expense is invalid.',
+        type: 'error',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 1500,
+      });
+      return;
+    }
 
     // Validation before save
     if (expenseAmount !== totalExpense) {
-  notify({
-    message: 'Amount and Total Expense must be the same.',
-    type: 'error',
-    position: { at: 'top right', my: 'top right' },
-    displayTime: 1500,
-  });
-  return;
-}
+      notify({
+        message: 'Amount and Total Expense must be the same.',
+        type: 'error',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 1500,
+      });
+      return;
+    }
 
     const result = this.ExpenseAmountDetails.map((item) => ({
       DUE_DATE: this.convertToISO(item.DUE_DATE),
@@ -533,7 +530,7 @@ const totalExpense = Number(this.totalExpense);
       NO_OF_MONTHS: Number(this.PrePaymentFormData.NO_OF_MONTHS) || null,
       STORE_ID: this.selectedstoreId,
       IS_APPROVED: this.PrePaymentFormData.IS_APPROVED,
-      // ✅ Map from the grid data source, not the form object
+      //  Map from the grid data source, not the form object
       PREPAY_DETAIL: result,
     };
 

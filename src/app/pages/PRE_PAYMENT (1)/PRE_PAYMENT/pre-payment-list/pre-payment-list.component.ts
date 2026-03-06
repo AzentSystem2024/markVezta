@@ -197,8 +197,11 @@ export class PrePaymentListComponent {
   }
 
   get_PrePaymentList() {
+    const datePayload = this.getDateRangePayload();
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
     };
     this.dataservice.get_PrePayment_List(payload).subscribe((res: any) => {
       console.log(res);
@@ -269,7 +272,7 @@ export class PrePaymentListComponent {
       // Store original string if needed
       this.selectedPrePayment = {
         ...res.Data,
-        TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved', // ✅ boolean for checkbox
+        TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved', //  boolean for checkbox
       };
     });
   }
@@ -323,7 +326,7 @@ export class PrePaymentListComponent {
     const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
     const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
-    // 🔑 EXACT SAME LOGIC AS CREDIT NOTE
+    //  EXACT SAME LOGIC AS CREDIT NOTE
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} - ${toLabel}` }

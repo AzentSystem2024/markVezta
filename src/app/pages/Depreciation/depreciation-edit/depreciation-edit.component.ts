@@ -84,9 +84,7 @@ export class DepreciationEditComponent {
   constructor(
     private dataService: DataService,
     private sanitizer: DomSanitizer,
-  ) {
-    this.Active_fixedasset_List();
-  }
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (
@@ -409,6 +407,7 @@ export class DepreciationEditComponent {
 
   ngOnInit() {
     this.sesstion_Details();
+    this.Active_fixedasset_List();
   }
 
   get_Depreciation_list() {
@@ -449,7 +448,7 @@ export class DepreciationEditComponent {
       this.DepreciationPayload,
       '===================================without change',
     );
-    
+
     const today = new Date();
     const DeprDate =
       today.getFullYear() +
@@ -460,7 +459,7 @@ export class DepreciationEditComponent {
 
     const payload = {
       ...this.DepreciationPayload,
-      DEPR_DATE: DeprDate,
+      DEPR_DATE: date,
       // ASSET_IDS: this.formattedAssets ||this.deafultASSET_IDs
       ASSET_IDS: this.isProcessClicked
         ? this.formattedAssets

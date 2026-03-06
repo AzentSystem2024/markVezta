@@ -110,6 +110,7 @@ export class AddCreditNoteComponent {
     UNIT_ID: '',
     IS_APPROVED: false,
     ROUND_OFF: false,
+    SUB_TYPE_ID: 0,
     NOTE_DETAIL: [
       {
         SL_NO: '',
@@ -160,6 +161,7 @@ export class AddCreditNoteComponent {
   subTypeList: any;
   isSaving = false;
   subType: boolean = false;
+  selectedSubTypeId: any;
 
   constructor(
     private dataService: DataService,
@@ -173,18 +175,12 @@ export class AddCreditNoteComponent {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-
-    console.log(userData.Configuration, 'CONFIGURATION');
-    this.subType = userData.Configuration[0].SUB_TYPE_ID;
-    console.log(this.subType, 'SUBTYPEEEEEEEEE');
+    this.subType = userData?.Configuration?.[0]?.SUB_TYPE_ID || 0;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      console.log(userData.Configuration, 'CONFIGURATIONNNNNNNNNNN');
       const selectedCompany = userData?.SELECTED_COMPANY;
-      console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
       this.companyState = selectedCompany.STATE_NAME;
       this.companyStateID = selectedCompany.STATE_ID;
-      console.log(this.companyStateID, 'COMPANYSTATE');
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
       if (selectedCompany?.COMPANY_ID) {
@@ -203,9 +199,8 @@ export class AddCreditNoteComponent {
       }
     }
     this.creditFormData.TRANS_DATE = this.formatAsDDMMYYYY(new Date());
-    console.log('ADDCOMPONENT TRIGERRED');
+    this.getSupTypeList();
     this.getLedgerCodeDropdown();
-    // this.getCompanyListDropdown();
     this.getCustomerOrUnitLst();
     this.getDocNo();
     this.getPendingInvoices();
@@ -225,27 +220,33 @@ export class AddCreditNoteComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-    console.log(
-      this.HSN_CODE,
-      '===========selected HSN CODE===================',
-    );
+
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
+  }
+
+  getSupTypeList() {
+    const payload = {
+      TRANS_TYPE: 37,
+    };
+    this.dataService
+      .getSubTypeCreditNote(payload)
+      .subscribe((response: any) => {
+        this.subTypeList = response.Data;
+      });
+  }
+
+  onSubTypeChange(e: any) {
+    this.selectedSubTypeId = e.value;
+    this.creditFormData.SUB_TYPE_ID = e.value;
+
+    this.getDocNo();
   }
 
   private hasEmptyRow(): boolean {
@@ -391,9 +392,6 @@ export class AddCreditNoteComponent {
       );
 
       this.creditFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
-
-      console.log(this.selectedCustomer.DESCRIPTION, 'PARTY NAME');
-      console.log(this.selectedCustomer.STATE_ID, 'SELECTED CUSTOMER STATE ID');
 
       // SHOW OR HIDE GST COLUMNS
       if (this.companyStateID === this.selectedCustomer.STATE_ID) {
@@ -552,7 +550,6 @@ export class AddCreditNoteComponent {
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
-      console.log('Ledger List Loaded:', this.ledgerList);
     });
   }
 
@@ -632,7 +629,6 @@ export class AddCreditNoteComponent {
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
 
     // ➤ ledgerCode: open dropdown on Enter, move to ledgerName on second Enter
     // if (e.dataField === 'ledgerCode') {
@@ -796,7 +792,6 @@ export class AddCreditNoteComponent {
               netTotal += amount + gst;
             }
             this.netAmountDisplay = netTotal;
-            console.log('Net Amount Updated:', this.netAmountDisplay);
 
             // ✅ Add new empty row
 
@@ -857,7 +852,6 @@ export class AddCreditNoteComponent {
               netTotal += amount + gst;
             }
             this.netAmountDisplay = netTotal;
-            console.log('Net Amount Updated:', this.netAmountDisplay);
             setTimeout(() => {
               this.narrationRef?.instance?.focus();
             }, 50);
@@ -941,7 +935,6 @@ export class AddCreditNoteComponent {
   }
 
   openInvoicePopup() {
-    console.log('EVENT ');
     this.getPendingInvoices(); // Ensure you load fresh data
     this.invoicePopupVisible = true;
   }
@@ -956,7 +949,6 @@ export class AddCreditNoteComponent {
       .getPendingInvoiceList(payload)
       .subscribe((response: any) => {
         this.pendingInvoices = response.Data;
-        console.log(this.pendingInvoices, 'PENDINGINVOICES');
       });
   }
 
@@ -998,11 +990,17 @@ export class AddCreditNoteComponent {
   getDocNo() {
     const payload = {
       TRANS_TYPE: 37,
+      SUB_TYPE_ID: this.selectedSubTypeId || 0,
       COMPANY_ID: this.selectedCompanyId,
     };
+
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+
+      // force UI refresh
+      setTimeout(() => {
+        this.docNo = response.DOC_NO;
+      });
     });
   }
 
@@ -1010,7 +1008,6 @@ export class AddCreditNoteComponent {
     if (this.itemsGridRef?.instance) {
       this.itemsGridRef.instance.addRow();
     } else {
-      console.warn('Grid instance not ready to add row.');
     }
   }
 
@@ -1021,8 +1018,6 @@ export class AddCreditNoteComponent {
     this.isSaving = true;
     this.dataService.insertCreditNote(finalPayload).subscribe(
       (response: any) => {
-        console.log(response, 'SAVED SUCCESSFULLY');
-
         notify(
           {
             message: 'Credit Note Saved Successfully',
@@ -1077,6 +1072,17 @@ export class AddCreditNoteComponent {
       return;
     }
     // --- Validations ---
+    if (!this.creditFormData.SUB_TYPE_ID) {
+      notify(
+        {
+          message: 'Please select a sub type.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        3000,
+      );
+      return;
+    }
     if (!this.creditFormData.INVOICE_NO) {
       notify(
         {
@@ -1242,7 +1248,6 @@ export class AddCreditNoteComponent {
     if (this.creditFormData.ROUND_OFF) {
       this.netTotal = Math.round(this.netTotal);
     }
-    console.log(this.netTotal, 'NETTOTALLLLLLLL');
     return this.netTotal.toFixed(2);
   }
 

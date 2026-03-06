@@ -66,8 +66,7 @@ export class PrePaymentEditComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedstoreId: any;
-   logoBase64: string;
-
+  logoBase64: string;
 
   fieldChanged = false;
   scheduleGenerated = false;
@@ -137,14 +136,14 @@ export class PrePaymentEditComponent {
     this.get_PrePaymentLedger_dropdown();
     this.fieldChanged = false;
     this.scheduleGenerated = false;
-     const imagePath = 'assets/markLogo.jpg';
+    const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
       console.log('Logo Base64 Loaded');
     });
   }
 
-   private async convertToBase64(path: string): Promise<string> {
+  private async convertToBase64(path: string): Promise<string> {
     const response = await fetch(path);
     const blob = await response.blob();
 
@@ -194,27 +193,27 @@ export class PrePaymentEditComponent {
   //   return date.toISOString();  // Converts to ISO string
   // }
   convertToISO(dateStr: any): string {
-    if (!dateStr) return ''; // ⛔ Return empty if missing
+    if (!dateStr) return ''; //  Return empty if missing
 
-    // ✅ If it's already a Date object
+    //  If it's already a Date object
     if (dateStr instanceof Date) {
       return dateStr.toISOString();
     }
 
-    // ✅ If it's a string like "DD/MM/YYYY"
+    //  If it's a string like "DD/MM/YYYY"
     if (typeof dateStr === 'string' && dateStr.includes('/')) {
       const [day, month, year] = dateStr.split('/').map(Number);
       const date = new Date(year, month - 1, day);
       return date.toISOString();
     }
 
-    // ✅ If it’s already in ISO or unexpected format, try to parse
+    //  If it’s already in ISO or unexpected format, try to parse
     const parsed = new Date(dateStr);
     if (!isNaN(parsed.getTime())) {
       return parsed.toISOString();
     }
 
-    console.warn('⚠️ Unrecognized date format:', dateStr);
+    console.warn(' Unrecognized date format:', dateStr);
     return '';
   }
 
@@ -289,12 +288,12 @@ export class PrePaymentEditComponent {
         periodEnd = new Date(endDateFinal);
       }
 
-      // ✅ Adjust the start date for the first row to match DATE_FROM
+      //  Adjust the start date for the first row to match DATE_FROM
       if (schedule.length === 0) {
         periodStart = new Date(startDate);
       }
 
-      // ✅ Adjust the end date for the last row to match DATE_TO
+      //  Adjust the end date for the last row to match DATE_TO
       if (periodEnd > endDateFinal) {
         periodEnd = new Date(endDateFinal);
       }
@@ -415,7 +414,7 @@ export class PrePaymentEditComponent {
 
   //   this.ExpenseAmountDetails = [];
   //   this.showGrid = false;
-  //       // ✅ Reset form validations after value reset
+  //       //  Reset form validations after value reset
   //   setTimeout(() => {
   //      // Reset previous validation results
   //   this.formValidationGroup?.instance?.reset();
@@ -534,7 +533,7 @@ export class PrePaymentEditComponent {
       NO_OF_MONTHS: Number(this.PrePaymentFormData.NO_OF_MONTHS) || null,
       TRANS_STATUS: this.PrePaymentFormData.TRANS_STATUS ? 5 : 1,
       STORE_ID: this.selectedstoreId,
-      // ✅ Map from the grid data source, not the form object
+      //  Map from the grid data source, not the form object
       PREPAY_DETAIL: result,
     };
 
@@ -549,7 +548,7 @@ export class PrePaymentEditComponent {
           this.formClosed.emit();
         },
         (error) => {
-          this.isSaving = false; // ✅ STOP loading
+          this.isSaving = false; //  STOP loading
           notify('Error while approving PrePayment', 'error', 2000);
           console.error(error);
         },
@@ -570,7 +569,7 @@ export class PrePaymentEditComponent {
           this.formClosed.emit();
         },
         (error) => {
-          this.isSaving = false; // ✅ STOP loading
+          this.isSaving = false; //  STOP loading
           notify('Error while updating PrePayment', 'error', 2000);
           console.error(error);
         },
@@ -580,14 +579,13 @@ export class PrePaymentEditComponent {
 
   viewPdf(): void {
     this.isPdfPopupVisible = true;
-    const id = this.PrePaymentFormData.TRANS_ID
-    this.dataservice
-      .Select_PrePayment(id).subscribe((res: any) => {
-        console.log(res)
-        if (res?.flag === 1 && res?.Data) {
+    const id = this.PrePaymentFormData.TRANS_ID;
+    this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
+      console.log(res);
+      if (res?.flag === 1 && res?.Data) {
         this.pdfSrc = this.get_pdf(res.Data);
       }
-      });
+    });
   }
 
   // get_pdf(data: any): SafeResourceUrl {
@@ -604,138 +602,134 @@ export class PrePaymentEditComponent {
   //   return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   // }
 
-get_pdf(data: any): SafeResourceUrl {
-
-  if (!data) {
-    return this.sanitizer.bypassSecurityTrustResourceUrl('');
-  }
-
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.width;
-  const margin = 12;
-
-  // ===========================
-  // LOGO (TOP LEFT)
-  // ===========================
-  const logoX = 18;
-  const logoY = 12;
-  const logoW = 30;
-  const logoH = 30;
-
-  doc.addImage(this.logoBase64, 'JPEG', logoX, logoY, logoW, logoH);
-
-  // ===========================
-  // TITLE (CENTER, BELOW LOGO)
-  // ===========================
-  let y = logoY + logoH + 6; // 🔥 always below logo
-
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Pre-Payment Invoice', pageWidth / 2, y, { align: 'center' });
-
-  // ===========================
-  // HORIZONTAL LINE (BELOW TITLE)
-  // ===========================
-  y += 4;
-  doc.setLineWidth(0.5);
-  doc.line(margin, y, pageWidth - margin, y);
-
-  // ===========================
-  // HEADER DETAILS
-  // ===========================
-  y += 8;
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-
-  doc.text(`Doc No : ${data.DOC_NO}`, margin, y);
-  doc.text(`Date : ${data.TRANS_DATE}`, pageWidth / 2 + 5, y);
-
-  y += 6;
-  doc.text(`Supplier : ${data.SUPP_NAME || '-'}`, margin, y);
-  doc.text(`Amount : ${data.EXPENSE_AMOUNT}`, pageWidth / 2 + 5, y);
-
-  y += 6;
-  doc.text(`Reference No : ${data.REF_NO || '-'}`, margin, y);
-
-  y += 6;
-  doc.text(`Narration : ${data.NARRATION || '-'}`, margin, y);
-
-  // ===========================
-  // PERIOD DETAILS
-  // ===========================
-  y += 10;
-  doc.setFont('helvetica', 'bold');
-  doc.text('Period Details', margin, y);
-
-  y += 6;
-  doc.setFont('helvetica', 'normal');
-  doc.text(`From : ${data.DATE_FROM}`, margin, y);
-  doc.text(`To : ${data.DATE_TO}`, pageWidth / 2 + 5, y);
-
-  y += 6;
-  doc.text(`No. of Months : ${data.NO_OF_MONTHS}`, margin, y);
-  doc.text(`No. of Days : ${data.NO_OF_DAYS}`, pageWidth / 2 + 5, y);
-
-  // ===========================
-  // EXPENSE TABLE
-  // ===========================
-  y += 10;
-
-  autoTable(doc, {
-    startY: y,
-    head: [['Due Date', 'Amount']],
-    body: (data.Details || []).map((row: any) => [
-      row.DUE_DATE,
-      Number(row.DUE_AMOUNT || 0).toFixed(2)
-    ]),
-    styles: {
-      fontSize: 9,
-      halign: 'center'
-    },
-    headStyles: {
-      fillColor: [52, 140, 196],
-      textColor: 255,
-      fontStyle: 'bold'
-    },
-    columnStyles: {
-      1: { halign: 'right' }
+  get_pdf(data: any): SafeResourceUrl {
+    if (!data) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl('');
     }
-  });
 
-  // ===========================
-  // TOTAL
-  // ===========================
-  const finalY = (doc as any).lastAutoTable.finalY + 8;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
 
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
-  doc.text(
-    `Total Expense : ${data.EXPENSE_AMOUNT}`,
-    pageWidth - margin,
-    finalY,
-    { align: 'right' }
-  );
+    // ===========================
+    // LOGO (TOP LEFT)
+    // ===========================
+    const logoX = 18;
+    const logoY = 12;
+    const logoW = 30;
+    const logoH = 30;
 
-  // ===========================
-  // STATUS
-  // ===========================
-  if (data.TRANS_STATUS === 'Approved') {
-    doc.setTextColor(0, 150, 0);
-    doc.text('APPROVED', margin, finalY);
-    doc.setTextColor(0, 0, 0);
+    doc.addImage(this.logoBase64, 'JPEG', logoX, logoY, logoW, logoH);
+
+    // ===========================
+    // TITLE (CENTER, BELOW LOGO)
+    // ===========================
+    let y = logoY + logoH + 6; //  always below logo
+
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Pre-Payment Invoice', pageWidth / 2, y, { align: 'center' });
+
+    // ===========================
+    // HORIZONTAL LINE (BELOW TITLE)
+    // ===========================
+    y += 4;
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+
+    // ===========================
+    // HEADER DETAILS
+    // ===========================
+    y += 8;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    doc.text(`Doc No : ${data.DOC_NO}`, margin, y);
+    doc.text(`Date : ${data.TRANS_DATE}`, pageWidth / 2 + 5, y);
+
+    y += 6;
+    doc.text(`Supplier : ${data.SUPP_NAME || '-'}`, margin, y);
+    doc.text(`Amount : ${data.EXPENSE_AMOUNT}`, pageWidth / 2 + 5, y);
+
+    y += 6;
+    doc.text(`Reference No : ${data.REF_NO || '-'}`, margin, y);
+
+    y += 6;
+    doc.text(`Narration : ${data.NARRATION || '-'}`, margin, y);
+
+    // ===========================
+    // PERIOD DETAILS
+    // ===========================
+    y += 10;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Period Details', margin, y);
+
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.text(`From : ${data.DATE_FROM}`, margin, y);
+    doc.text(`To : ${data.DATE_TO}`, pageWidth / 2 + 5, y);
+
+    y += 6;
+    doc.text(`No. of Months : ${data.NO_OF_MONTHS}`, margin, y);
+    doc.text(`No. of Days : ${data.NO_OF_DAYS}`, pageWidth / 2 + 5, y);
+
+    // ===========================
+    // EXPENSE TABLE
+    // ===========================
+    y += 10;
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Due Date', 'Amount']],
+      body: (data.Details || []).map((row: any) => [
+        row.DUE_DATE,
+        Number(row.DUE_AMOUNT || 0).toFixed(2),
+      ]),
+      styles: {
+        fontSize: 9,
+        halign: 'center',
+      },
+      headStyles: {
+        fillColor: [52, 140, 196],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+      columnStyles: {
+        1: { halign: 'right' },
+      },
+    });
+
+    // ===========================
+    // TOTAL
+    // ===========================
+    const finalY = (doc as any).lastAutoTable.finalY + 8;
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(
+      `Total Expense : ${data.EXPENSE_AMOUNT}`,
+      pageWidth - margin,
+      finalY,
+      { align: 'right' },
+    );
+
+    // ===========================
+    // STATUS
+    // ===========================
+    if (data.TRANS_STATUS === 'Approved') {
+      doc.setTextColor(0, 150, 0);
+      doc.text('APPROVED', margin, finalY);
+      doc.setTextColor(0, 0, 0);
+    }
+
+    // ===========================
+    // RETURN PDF
+    // ===========================
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
-
-  // ===========================
-  // RETURN PDF
-  // ===========================
-  const blob = doc.output('blob');
-  const url = URL.createObjectURL(blob);
-
-  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-}
-
-
-
 }
 
 @NgModule({

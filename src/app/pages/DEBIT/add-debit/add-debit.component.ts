@@ -104,6 +104,7 @@ export class AddDebitComponent {
     IS_APPROVED: false,
     VEHICLE_NO: '',
     ROUND_OFF: false,
+    SUB_TYPE_ID: 0,
     NOTE_DETAIL: [
       {
         SL_NO: '',
@@ -143,6 +144,7 @@ export class AddDebitComponent {
   isSaving = false;
   subType: boolean = false;
   subTypeList: any;
+  selectedSubTypeId: any;
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -209,6 +211,7 @@ export class AddDebitComponent {
     }
     // this.debitFormData.TRANS_DATE = this.formatAsDDMMYYYY(new Date());
     this.debitFormData.TRANS_DATE = new Date();
+    this.getSupTypeList();
     this.getDocNo();
     this.getLedgerCodeDropdown();
     this.getCompanyListDropdown();
@@ -252,6 +255,26 @@ export class AddDebitComponent {
   preventDateChange(e: any) {
     // Revert to original value to prevent change
     e.component.option('value', this.debitFormData.TRANS_DATE);
+  }
+
+  getSupTypeList() {
+    const payload = {
+      TRANS_TYPE: 36,
+    };
+    this.dataService
+      .getSubTypeCreditNote(payload)
+      .subscribe((response: any) => {
+        this.subTypeList = response.Data;
+      });
+  }
+
+  onSubTypeChange(e: any) {
+    this.selectedSubTypeId = e.value;
+    this.debitFormData.SUB_TYPE_ID = e.value;
+
+    console.log('Selected Subtype:', this.selectedSubTypeId);
+
+    this.getDocNo();
   }
 
   getCompanyListDropdown() {
@@ -827,6 +850,7 @@ export class AddDebitComponent {
   getDocNo() {
     const payload = {
       TRANS_TYPE: 36,
+      SUB_TYPE_ID: this.selectedSubTypeId || 0,
       COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getDocNoForDebit(payload).subscribe((response: any) => {

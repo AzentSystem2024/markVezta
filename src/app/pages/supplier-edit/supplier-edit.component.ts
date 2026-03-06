@@ -20,6 +20,7 @@ import {
   DxDateBoxModule,
   DxFormModule,
   DxPopupModule,
+  DxRadioGroupModule,
   DxSelectBoxModule,
   DxTextAreaModule,
   DxTextBoxModule,
@@ -100,6 +101,7 @@ export class SupplierEditComponent {
   CountryId:any;
    State:any[]=[];
     selectedStateId: any[] = [];
+    SupplierCategory:any[] =[];
      PaymentId:any;
  StateId :any;
    PaymentTerms:any;
@@ -108,6 +110,12 @@ export class SupplierEditComponent {
    sessionData: any;
   selected_vat_id: any;
   DEFAULT_COUNTRY_CODE: any;
+  Supplier_Category: any;
+purchType: number = 0;
+    purchaseTypeOptions = [
+  { text: 'Local Purchase', value: 1 },
+  { text: 'Interstate Purchase', value: 2 }
+];
 
   constructor(
     private dataservice: DataService,
@@ -177,28 +185,33 @@ export class SupplierEditComponent {
     this.isCurrencyAccepted = checked;
   }
 
-    ngOnChanges(changes: SimpleChanges): void {
-      if (changes['supplierData'] && changes['supplierData'].currentValue) {
-        console.log('SupplierData:', this.supplierData);
+      ngOnChanges(changes: SimpleChanges): void {
+        if (changes['supplierData'] && changes['supplierData'].currentValue) {
+          console.log('SupplierData:', this.supplierData);
+      this.Supplier_Category = this.supplierData.SUPP_CAT_ID
+     setTimeout(() => {
+      this.purchType = Number(this.supplierData.PURCH_TYPE);
+      console.log('Radio value:', this.purchType);
+      this.cdr.detectChanges();
+    });
+          //  this.get_Country_Dropdown_List()
+            this.get_State_Dropdown_List()
+            
 
-        //  this.get_Country_Dropdown_List()
-          this.get_State_Dropdown_List()
-          
+          const savedCostIDs = (this.supplierData.Supplier_cost || []).map(
+            (cost: any) => cost.COST_ID
+          );
+          console.log('Saved Cost IDs:', savedCostIDs);
+          const selectedCosts = (this.landedcost || []).filter((cost: any) =>
+            savedCostIDs.includes(cost.ID)
+          );
+          this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
 
-        const savedCostIDs = (this.supplierData.Supplier_cost || []).map(
-          (cost: any) => cost.COST_ID
-        );
-        console.log('Saved Cost IDs:', savedCostIDs);
-        const selectedCosts = (this.landedcost || []).filter((cost: any) =>
-          savedCostIDs.includes(cost.ID)
-        );
-        this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
-
-        console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
-       
+          console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
+        
+        }
+      
       }
-    
-    }
 
   ngOnInit() {
     console.log('EDIT COMPONENT111');
@@ -210,6 +223,7 @@ export class SupplierEditComponent {
     this.loadDropdownData();
     this.listSupplier();
     this.getVATRuleDropDown();
+    this.getSuppliercategoryDropDown()
     this.get_State_Dropdown_List();
     // this.listCountry();
     this.listState();
@@ -227,6 +241,18 @@ export class SupplierEditComponent {
     this.dataservice.getDropdownData(payload).subscribe((data) => {
       this.landedcost = data;
       console.log(this.landedcost, 'LANDEDCOST');
+    });
+  }
+
+      getSuppliercategoryDropDown() {
+    const payload = {
+      NAME: 'SUPPLIER_CATEGORY',
+      // COMPANY_ID: this.selected_Company_id,
+    };
+
+    this.dataservice.getDropdownData(payload).subscribe((data: any) => {
+      this.SupplierCategory = data;
+      console.log('dropdown', this.SupplierCategory);
     });
   }
 
@@ -292,8 +318,12 @@ export class SupplierEditComponent {
   }
 
   getVATRuleDropDown() {
-    const dropdownvat = 'VATRULE';
-    this.dataservice.getDropdownData(dropdownvat).subscribe((data: any) => {
+    const payload = {
+      NAME: 'VATRULE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    this.dataservice.getDropdownData(payload).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
       console.log('dropdown', this.VATRuleDropdownData);
     });
@@ -414,10 +444,14 @@ console.log(CountryId, 'country id of selected state id')
   }
 
   updateSupplier() {
-    const payload = this.supplierData;
+    const payload = {
+    ...this.supplierData,
+    SUPP_CAT_ID: this.Supplier_Category,
+    PURCH_TYPE : this.purchType
+  };
     console.log(payload, 'PAYLOADINEDIT');
     this.dataservice
-      .updateSuppliers(payload.ID, payload)
+      .updateSuppliers(payload.ID, payload,)
       .subscribe((response: any) => {
         try {
           notify(
@@ -473,6 +507,7 @@ console.log(CountryId, 'country id of selected state id')
     DxButtonModule,
     FormsModule,
     SupplierFormModule,
+    DxRadioGroupModule,
   ],
   providers: [],
   exports: [SupplierEditComponent],

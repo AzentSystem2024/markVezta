@@ -207,16 +207,24 @@
 
       <dxi-item itemType="group" [colCount]="1">
         <dxi-item>
-          <div *ngIf="supplierData">
-            <div *dxTemplate>
-              <dx-check-box
-                [(value)]="supplierData.IS_COMPANY_BRANCH"
-                text="Company Branch"
-                stylingMode="outlined"
-                hint="Company Branch"
-                labelMode="floating"
-              ></dx-check-box>
-            </div>
+          <div *dxTemplate>
+            <dx-select-box
+              label="Category*"
+              [items]="SupplierCategory"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              [(value)]="Supplier_Category"
+              placeholder="Select Category"
+              labelMode="floating"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Select SupplierCategory"
+                >
+                </dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
           </div>
         </dxi-item>
       </dxi-item>
@@ -241,65 +249,6 @@
         </div>
         </dxi-item> -->
     </dxi-item>
-    <!-- <dxi-item itemType="group" [colCount]="2">
-        <dxi-item>
-          <div *ngIf="supplierData">
-          <div *dxTemplate>
-            <div class="checkbox">Accepted Currency</div>
-            <dx-check-box
-              [value]="isCurrencyAccepted"
-              (onValueChanged)="toggleCurrencyDropdown($event.value)"
-              [elementAttr]="{ 'aria-label': 'Checked' }"
-            ></dx-check-box>
-            Default
-          </div>
-        </div>
-        </dxi-item>
-  
-        <dxi-item>
-          <div *ngIf="supplierData">
-          <div *dxTemplate>
-            <dx-select-box
-              label=" "
-              [items]="CurrencyDropdownData"
-              displayExpr="DESCRIPTION"
-              valueExpr="ID"
-              [(value)]="supplierData.CURRENCY_ID"
-              [disabled]="isCurrencyAccepted"
-              placeholder="Select Currency"
-              stylingMode="filled"
-            >
-              <dx-validator>
-                <dxi-validation-rule type="required" message="Select Currency">
-                </dxi-validation-rule>
-              </dx-validator>
-            </dx-select-box>
-          </div>
-        </div>
-        </dxi-item>
-      </dxi-item> -->
-    <!-- <dxi-item itemType="group" [colCount]="1">
-        <dxi-item>
-          <div *ngIf="supplierData">
-          <div *dxTemplate>
-            <dx-select-box
-              label="VAT Rule"
-              [items]="VATRuleDropdownData"
-              displayExpr="DESCRIPTION"
-              valueExpr="ID"
-              [(value)]="supplierData.VAT_RULE_ID"
-              placeholder="Select VAT Rule"
-              stylingMode="filled"
-            >
-              <dx-validator>
-                <dxi-validation-rule type="required" message="Select VAT rule">
-                </dxi-validation-rule>
-              </dx-validator>
-            </dx-select-box>
-          </div>
-        </div>
-        </dxi-item>
-      </dxi-item> -->
   </dxi-item>
 
   <dxi-item itemType="group">
@@ -552,6 +501,57 @@
           ></dx-text-area>
         </div>
       </div>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="1">
+      <!-- <dxi-item>
+        <div *dxTemplate>
+          <dx-select-box
+            label="Category*"
+            [items]="SupplierCategory"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="Supplier_Category"
+            placeholder="Select Category"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Select SupplierCategory"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item> -->
+
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-radio-group
+            [items]="purchaseTypeOptions"
+            displayExpr="text"
+            valueExpr="value"
+            layout="horizontal"
+            [(value)]="purchType"
+          >
+          </dx-radio-group>
+        </div>
+      </dxi-item>
+
+      <dxi-item>
+        <div *ngIf="supplierData">
+          <div *dxTemplate>
+            <dx-check-box
+              [(value)]="supplierData.IS_COMPANY_BRANCH"
+              text="Company Branch"
+              stylingMode="outlined"
+              hint="Company Branch"
+              labelMode="floating"
+            ></dx-check-box>
+          </div>
+        </div>
+      </dxi-item>
     </dxi-item>
   </dxi-item>
 
