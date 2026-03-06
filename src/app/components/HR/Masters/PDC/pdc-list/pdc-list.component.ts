@@ -114,7 +114,7 @@ export class PdcListComponent {
   StatusfilterOptions = [
     { id: 1, name: 'Open' },
     { id: 2, name: 'Approved' },
-    { id: 3, name: 'Realized' },
+    { id: 3, name: 'Closed' },
   ];
 
   selectedStatus = this.StatusfilterOptions[0].id;
@@ -126,7 +126,7 @@ export class PdcListComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -201,7 +201,6 @@ export class PdcListComponent {
 
     this.sesstion_Details();
 
-
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -212,12 +211,26 @@ export class PdcListComponent {
 
     this.entrycustomStartDate = SystemDate;
     this.entrycustomEndDate = SystemDate;
+
+    //  Initialize default Due Date = Today
+
+    this.startDate = new Date();
+    this.startDate.setHours(0, 0, 0, 0);
+
+    this.EndDate = new Date();
+    this.EndDate.setHours(23, 59, 59, 999);
+
+    //  Initialize default Entry Date = Today
+    this.entrystartDate = new Date();
+    this.entrystartDate.setHours(0, 0, 0, 0);
+
+    this.entryEndDate = new Date();
+    this.entryEndDate.setHours(23, 59, 59, 999);
+
     this.get_PDC_list();
-
-
   }
 
-   //================ Year value change ===================
+  //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
     this.selectedmonth = '';
@@ -276,7 +289,10 @@ export class PdcListComponent {
     this.selectedDateRange = e.value;
 
     if (e.value === 'today') {
-      this.startDate = new Date(today.setHours(0, 0, 0, 0));
+      const start = new Date();
+      start.setDate(today.getDate() - 29);
+      start.setHours(0, 0, 0, 0);
+      this.startDate = start;
       this.EndDate = new Date(today.setHours(23, 59, 59, 999));
     } else if (e.value === 'all') {
       this.selectedEntryDateRange = 'all';
@@ -312,7 +328,7 @@ export class PdcListComponent {
     }
 
     this.showCustomDatePopup = false;
-    this.applyAllFilters();
+    this.get_PDC_list();
   }
 
   onEntryDateRangeChanged(e: any) {
@@ -358,7 +374,7 @@ export class PdcListComponent {
     // Only close popup if NOT custom
     this.showEntryCustomDatePopup = false;
 
-    this.applyAllFilters();
+    this.get_PDC_list();
   }
 
   constructor(
@@ -366,7 +382,7 @@ export class PdcListComponent {
     private ngZone: NgZone,
     private router: Router,
   ) {
-     const currentYear = new Date().getFullYear();
+    const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
@@ -409,30 +425,6 @@ export class PdcListComponent {
     cellElement.appendChild(icon);
   }
 
-  displayDueDateExpr = (item: any) => {
-    if (!item) return '';
-    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
-      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
-      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
-      return `${from} to ${to}`;
-    }
-    return item.label;
-  };
-
-  displayEntryDateExpr = (item: any) => {
-    if (!item) return '';
-    if (
-      item.value === 'custom' &&
-      this.entrycustomStartDate &&
-      this.entrycustomEndDate
-    ) {
-      const from = this.formatAsDDMMYYYY(new Date(this.entrycustomStartDate));
-      const to = this.formatAsDDMMYYYY(new Date(this.entrycustomEndDate));
-      return `${from} to ${to}`;
-    }
-    return item.label;
-  };
-
   private parseDateString(dateStr: string): Date {
     const [day, month, year] = dateStr
       .split('-')
@@ -446,6 +438,47 @@ export class PdcListComponent {
     return `${day}-${month}-${year}`;
   }
 
+  //=========for open custom popup in due ===========
+  handleDueDateItemClick(e: any) {
+    if (e.itemData.value === 'custom') {
+      this.showCustomDatePopup = true;
+    }
+  }
+
+  //==============for open custom popup in entry============
+  handleEntryDateItemClick(e: any) {
+    if (e.itemData.value === 'custom') {
+      this.showEntryCustomDatePopup = true;
+    }
+  }
+
+  //====to show the selected custom date range in due==========
+  displayDueDateExpr = (item: any) => {
+    if (!item) return '';
+
+    if (item.value === 'custom' && this.startDate && this.EndDate) {
+      const from = this.formatAsDDMMYYYY(this.startDate);
+      const to = this.formatAsDDMMYYYY(this.EndDate);
+      return `${from} to ${to}`;
+    }
+
+    return item.label;
+  };
+
+  //====to show the selected custom date range in entry==========
+  displayEntryDateExpr = (item: any) => {
+    if (!item) return '';
+
+    if (item.value === 'custom' && this.entrystartDate && this.entryEndDate) {
+      const from = this.formatAsDDMMYYYY(this.entrystartDate);
+      const to = this.formatAsDDMMYYYY(this.entryEndDate);
+      return `${from} to ${to}`;
+    }
+
+    return item.label;
+  };
+
+  // ========Due custom date===============
   applyCustomDateFilter() {
     if (!this.customStartDate || !this.customEndDate) {
       alert('Please select both From and To dates.');
@@ -463,32 +496,17 @@ export class PdcListComponent {
       return;
     }
 
+    //  ONLY update Due Date
     this.startDate = start;
     this.EndDate = end;
 
-    // Optional: if you also want to apply to entry date
-    this.entrystartDate = start;
-    this.entryEndDate = end;
-
-    const fromLabel = this.formatAsDDMMYYYY(start);
-    const toLabel = this.formatAsDDMMYYYY(end);
-
-    this.dateRanges = this.dateRanges.map((range) =>
-      range.value === 'custom'
-        ? { ...range, label: `${fromLabel} to ${toLabel}` }
-        : range,
-    );
-
     this.selectedDateRange = 'custom';
-
-    // this.customStartDate = null;
-    // this.customEndDate = null;
     this.showCustomDatePopup = false;
 
-    this.applyAllFilters(); // Handles everything centrally
-    this.get_PDC_list('custom');
+    this.get_PDC_list();
   }
 
+  // =======Entry custom date=============
   applyEntryCustomDateFilter() {
     if (!this.entrycustomStartDate || !this.entrycustomEndDate) {
       alert('Please select both From and To dates.');
@@ -506,30 +524,14 @@ export class PdcListComponent {
       return;
     }
 
-    this.startDate = entrystart;
-    this.EndDate = entryend;
-
-    // Optional: if you also want to apply to entry date
+    //  ONLY update Entry Date
     this.entrystartDate = entrystart;
     this.entryEndDate = entryend;
 
-    const fromLabel = this.formatAsDDMMYYYY(entrystart);
-    const toLabel = this.formatAsDDMMYYYY(entryend);
-
-    this.entryDateRanges = this.entryDateRanges.map((range) =>
-      range.value === 'custom'
-        ? { ...range, label: `${fromLabel} to ${toLabel}` }
-        : range,
-    );
-
     this.selectedEntryDateRange = 'custom';
-
-    // this.entrycustomStartDate = null;
-    // this.entrycustomEndDate = null;
     this.showEntryCustomDatePopup = false;
 
-    this.applyAllFilters(); // Handles everything centrally
-    this.get_PDC_list('custom')
+    this.get_PDC_list();
   }
 
   onTypeChanged(event: any) {
@@ -554,7 +556,7 @@ export class PdcListComponent {
         !selectedStatus ||
         (selectedStatus === 1 && item.ENTRY_STATUS === 'Open') ||
         (selectedStatus === 2 && item.ENTRY_STATUS === 'Approved') ||
-        (selectedStatus === 3 && item.ENTRY_STATUS === 'Realization');
+        (selectedStatus === 3 && item.ENTRY_STATUS === 'Closed');
 
       return typeMatch && statusMatch;
     });
@@ -588,7 +590,7 @@ export class PdcListComponent {
         !status ||
         (status === 1 && item.ENTRY_STATUS?.trim() === 'Open') ||
         (status === 2 && item.ENTRY_STATUS?.trim() === 'Approved') ||
-        (status === 3 && item.ENTRY_STATUS?.trim() === 'Realization');
+        (status === 3 && item.ENTRY_STATUS?.trim() === 'Closed');
 
       let chequeDateValid = true;
       if (dueStart && dueEnd && item.CHEQUE_DATE) {
@@ -677,16 +679,54 @@ export class PdcListComponent {
     );
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
     this.applyCustomDateFilter(); // your existing function
   }
 
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private getDueDateRangePayload(): {
+    DUE_DATE_FROM: string | null;
+    DUE_DATE_TO: string | null;
+  } {
+    let fromDate: Date | null = this.startDate || null;
+    let toDate: Date | null = this.EndDate || null;
+
+    return {
+      DUE_DATE_FROM: fromDate ? this.formatDate(fromDate) : null,
+      DUE_DATE_TO: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+
+  private getEntryDateRangePayload(): {
+    ENTRY_DATE_FROM: string | null;
+    ENTRY_DATE_TO: string | null;
+  } {
+    let fromDate: Date | null = this.entrystartDate || null;
+    let toDate: Date | null = this.entryEndDate || null;
+
+    return {
+      ENTRY_DATE_FROM: fromDate ? this.formatDate(fromDate) : null,
+      ENTRY_DATE_TO: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+
   get_PDC_list(dateRange: string = this.selectedDateRange) {
+    const dueDatePayload = this.getDueDateRangePayload();
+    const entryDatePayload = this.getEntryDateRangePayload();
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      ...dueDatePayload,
+      ...entryDatePayload,
     };
     this.dataservice.get_PDC_List(payload).subscribe((res: any) => {
       console.log(res, 'response of PDC list');
@@ -735,7 +775,7 @@ export class PdcListComponent {
     DxNumberBoxModule,
     PdcAddFormModule,
     PdcEditFormModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [PdcListComponent],

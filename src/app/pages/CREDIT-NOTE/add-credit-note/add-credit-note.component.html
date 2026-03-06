@@ -43,6 +43,42 @@
               style="display: flex; flex-direction: column; gap: 5px"
             >
               <div style="display: flex; align-items: baseline; gap: 5px">
+                <dx-text-box
+                  [(value)]="docNo"
+                  label="Doc No"
+                  labelMode="floating"
+                  [width]="200"
+                  [readOnly]="true"
+                ></dx-text-box>
+
+                <dx-select-box
+                  *ngIf="subType"
+                  [dataSource]="subTypeList"
+                  displayExpr="SUB_TYPE_NAME"
+                  valueExpr="SUB_TYPE_ID"
+                  label="Select Subtype"
+                  labelMode="floating"
+                  placeholder="Select Subtype"
+                  [width]="405"
+                  (onValueChanged)="onSubTypeChange($event)"
+                >
+                </dx-select-box>
+                <!-- <dx-select-box
+                  #distributorRef
+                  [(value)]="selectedDistributorId"
+                  [dataSource]="distributorList"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [width]="405"
+                  [searchEnabled]="true"
+                  label="Customer"
+                  labelMode="floating"
+                  (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
+                  (onValueChanged)="onDistributorSelected($event)"
+                ></dx-select-box> -->
+              </div>
+
+              <div style="display: flex; align-items: baseline; gap: 5px">
                 <dx-select-box
                   #distributorRef
                   [(value)]="selectedDistributorId"
@@ -56,10 +92,18 @@
                   (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
                   (onValueChanged)="onDistributorSelected($event)"
                 ></dx-select-box>
-              </div>
-
-              <div style="display: flex; align-items: baseline; gap: 5px">
-                <dx-text-box
+                <dx-select-box
+                  [value]="creditFormData.INVOICE_NO"
+                  [items]="pendingInvoices"
+                  displayExpr="INVOICE_NO"
+                  valueExpr="INVOICE_NO"
+                  label="Select Invoice"
+                  labelMode="floating"
+                  placeholder="Select Invoice No."
+                  [width]="200"
+                  (onFocusIn)="openInvoicePopup()"
+                ></dx-select-box>
+                <!-- <dx-text-box
                   [(value)]="docNo"
                   label="Doc No"
                   labelMode="floating"
@@ -77,7 +121,7 @@
                   placeholder="Select Invoice No."
                   [width]="200"
                   (onFocusIn)="openInvoicePopup()"
-                ></dx-select-box>
+                ></dx-select-box> -->
               </div>
             </div>
           </dxi-item>

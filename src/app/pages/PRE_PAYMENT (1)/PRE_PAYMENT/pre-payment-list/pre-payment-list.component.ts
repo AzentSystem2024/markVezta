@@ -62,7 +62,7 @@ export class PrePaymentListComponent {
   selectprepayment: any;
   PrepaymentId: any;
   selected_Company_id: any;
-   dateRanges = [
+  dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
     { label: 'Last 7 Days', value: 'last7' },
@@ -89,7 +89,7 @@ export class PrePaymentListComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilterRow(),
   };
   addButtonOptions = {
@@ -136,7 +136,7 @@ export class PrePaymentListComponent {
     }
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -198,8 +198,11 @@ export class PrePaymentListComponent {
   }
 
   get_PrePaymentList() {
+    const datePayload = this.getDateRangePayload();
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
     };
     this.dataservice.get_PrePayment_List(payload).subscribe((res: any) => {
       console.log(res);
@@ -270,7 +273,7 @@ export class PrePaymentListComponent {
       // Store original string if needed
       this.selectedPrePayment = {
         ...res.Data,
-        TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved', // ✅ boolean for checkbox
+        TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved', //  boolean for checkbox
       };
     });
   }
@@ -324,7 +327,7 @@ export class PrePaymentListComponent {
     const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
     const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
-    // 🔑 EXACT SAME LOGIC AS CREDIT NOTE
+    //  EXACT SAME LOGIC AS CREDIT NOTE
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} - ${toLabel}` }
@@ -446,7 +449,6 @@ export class PrePaymentListComponent {
 
     return item.label;
   };
-
 }
 
 @NgModule({
@@ -470,7 +472,7 @@ export class PrePaymentListComponent {
     DxNumberBoxModule,
     PrePaymentAddModule,
     PrePaymentEditModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [PrePaymentListComponent],

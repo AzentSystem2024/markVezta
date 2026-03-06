@@ -117,10 +117,12 @@ export class ViewDebitComponent {
   selectedSupplier: any;
   netAmount: number = 0;
   roundedNetAmount: number = 0;
+  subType: boolean = false;
+  subTypeList: any;
 
   constructor(
     private dataService: DataService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     const userDataString = localStorage.getItem('userData');
     console.log(userDataString, 'USERDATASTRING');
@@ -150,7 +152,12 @@ export class ViewDebitComponent {
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
+    console.log(userData.Configuration, 'CONFIGURATION');
+    this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       console.log(userData, 'USERDATAAAAAA');
@@ -186,8 +193,8 @@ export class ViewDebitComponent {
     const data = this.debitFormData[0];
 
     setTimeout(() => {
-        this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
-      });
+      this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
+    });
 
     // -----------------------------
     // BASIC HEADER BINDINGS
@@ -225,39 +232,40 @@ export class ViewDebitComponent {
     // -----------------------------
     // BUILD GRID ROWS (READ ONLY)
     // -----------------------------
-    this.getLedgerCodeDropdown().then(() => {
-      this.noteDetails = (data.NOTE_DETAIL || []).map(
-        (item: any, index: number) => {
-          const match = this.ledgerList.find(
-            (l: any) => l.HEAD_ID === item.HEAD_ID
-          );
+    this.getLedgerCodeDropdown()
+      .then(() => {
+        this.noteDetails = (data.NOTE_DETAIL || []).map(
+          (item: any, index: number) => {
+            const match = this.ledgerList.find(
+              (l: any) => l.HEAD_ID === item.HEAD_ID,
+            );
 
-          return {
-            SL_NO: index + 1,
+            return {
+              SL_NO: index + 1,
 
-            // 🔥 TRUST BACKEND VALUES
-            HEAD_ID: item.HEAD_ID,
-            Amount: Number(item.AMOUNT) || 0,
-            gstAmount: Number(item.GST_AMOUNT) || 0,
-            GST_PERC: Number(item.GST_PERC) || 0,
-            CGST: Number(item.CGST) || 0,
-            SGST: Number(item.SGST) || 0,
-            HSN_CODE: item.HSN_CODE || '',
+              // 🔥 TRUST BACKEND VALUES
+              HEAD_ID: item.HEAD_ID,
+              Amount: Number(item.AMOUNT) || 0,
+              gstAmount: Number(item.GST_AMOUNT) || 0,
+              GST_PERC: Number(item.GST_PERC) || 0,
+              CGST: Number(item.CGST) || 0,
+              SGST: Number(item.SGST) || 0,
+              HSN_CODE: item.HSN_CODE || '',
 
-            // DISPLAY HELPERS
-            ledgerCode: match?.HEAD_CODE || '',
-            ledgerName: match?.HEAD_NAME || '',
-            particulars: item.REMARKS || '',
-          };
+              // DISPLAY HELPERS
+              ledgerCode: match?.HEAD_CODE || '',
+              ledgerName: match?.HEAD_NAME || '',
+              particulars: item.REMARKS || '',
+            };
+          },
+        );
+
+        // SAFETY: empty view
+        if (this.noteDetails.length === 0) {
+          this.noteDetails = [];
         }
-      );
-
-      // SAFETY: empty view
-      if (this.noteDetails.length === 0) {
-        this.noteDetails = [];
-      }
-    })
-    .finally(() => {
+      })
+      .finally(() => {
         // 🟢 STOP GRID LOADING
         this.itemsGridRef?.instance?.endCustomLoading();
       });
@@ -270,7 +278,7 @@ export class ViewDebitComponent {
         !r.ledgerName &&
         !r.particulars &&
         (!r.Amount || r.Amount === 0) &&
-        (!r.GST_PERC || r.GST_PERC === 0)
+        (!r.GST_PERC || r.GST_PERC === 0),
     );
   }
 
@@ -299,7 +307,7 @@ export class ViewDebitComponent {
       notify(
         'Please fill the existing empty row before adding a new one.',
         'warning',
-        2000
+        2000,
       );
       return;
     }
@@ -439,11 +447,11 @@ export class ViewDebitComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           console.log(
             'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex
+            rowIndex,
           );
 
           setTimeout(() => {
@@ -479,14 +487,14 @@ export class ViewDebitComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
@@ -508,14 +516,14 @@ export class ViewDebitComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -586,7 +594,7 @@ export class ViewDebitComponent {
               setTimeout(() => {
                 const visibleRows = grid.getVisibleRows();
                 const newRowIndex = visibleRows.findIndex(
-                  (r) => r.data === newRow
+                  (r) => r.data === newRow,
                 );
                 if (newRowIndex >= 0) {
                   grid.editCell(newRowIndex, 'SL_NO');
@@ -640,7 +648,7 @@ export class ViewDebitComponent {
       console.log('approved???????????????????????????????????');
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit'
+        'Confirm Commit',
       ).then((result) => {
         if (result) {
           const payload = {
@@ -660,7 +668,7 @@ export class ViewDebitComponent {
             (error) => {
               console.error('Approval error:', error);
               alert('Something went wrong while approving');
-            }
+            },
           );
         } else {
           // ❌ User cancelled commit
@@ -691,13 +699,13 @@ export class ViewDebitComponent {
               item.ledgerName ||
               item.Amount ||
               item.gstAmount ||
-              item.particulars
+              item.particulars,
           )
           .map((item: any, index: number) => {
             const match = this.ledgerList.find(
               (l) =>
                 l.HEAD_CODE === item.ledgerCode ||
-                l.HEAD_NAME === item.ledgerName
+                l.HEAD_NAME === item.ledgerName,
             );
             return {
               SL_NO: item.SL_NO || index + 1,
@@ -718,7 +726,7 @@ export class ViewDebitComponent {
               message: 'Debit Note Updated Successfully',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.popupClosed.emit();
           this.resetDebitNoteForm();
@@ -1179,7 +1187,7 @@ export class ViewDebitComponent {
     doc.text(
       `State : ${data.SUPP_STATE_NAME}, Code : 32`,
       blueX + 3,
-      blueY + 33
+      blueY + 33,
     );
     doc.text(`E-Mail : ${data.EMAIL}`, blueX + 3, blueY + 38);
 
@@ -1239,7 +1247,7 @@ export class ViewDebitComponent {
     doc.text(
       `State : ${data.SUPP_STATE_NAME}, Code : 32`,
       rightX,
-      rightY + gap * 6
+      rightY + gap * 6,
     );
 
     // ======================================================
@@ -1259,7 +1267,7 @@ export class ViewDebitComponent {
     doc.text(
       `State : ${data.SUPP_STATE_NAME}, Code : 32`,
       rightX,
-      buyerY + gap * 6
+      buyerY + gap * 6,
     );
 
     y = Math.max(leftBlockBottom, buyerY + gap * 7 + 10);
@@ -1429,7 +1437,7 @@ export class ViewDebitComponent {
     doc.text(
       'Whether the tax is payable on Reverse charge basis: ',
       15,
-      wordsY
+      wordsY,
     );
 
     doc.setFont('helvetica', 'normal');

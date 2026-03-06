@@ -492,55 +492,6 @@ button:hover {
   height: 24px !important; /* Reduce input field height */
 }
 
-/* Make the whole tab strip dark */
-::ng-deep .dx-tab {
-  background-color: #1e1e1e; /* dark background */
-  color: #ccc; /* light gray text */
-  font-weight: 500;
-  padding: 10px 20px;
-  border: none;
-}
-
-/* Change hover state */
-::ng-deep .dx-tab:hover {
-  color: #fff; /* white on hover */
-}
-
-/* Selected (active) tab */
-::ng-deep .dx-tab.dx-tab-selected {
-  color: #2979ff; /* blue text */
-  border-bottom: 2px solid #2979ff; /* blue underline */
-}
-
-/* Remove default borders */
-::ng-deep .dx-tabs {
-  border-bottom: 1px solid #333; /* subtle line under tabs */
-  background-color: #1e1e1e; /* dark bar */
-}
-::ng-deep .dx-tabpanel .dx-tabpanel-tabs .dx-tabs {
-  height: 100%;
-  background-color: var(--tab-bg-color);
-  border: none;
-}
-::ng-deep .dx-tab.dx-tab-selected {
-  color: #2979ff;
-  border-bottom: 0px;
-  background: transparent;
-  // margin-right: 10px;
-}
-
-::ng-deep .dx-tab .dx-tab-text {
-  background-color: transparent !important;
-  font-size: large;
-}
-
-::ng-deep .dx-tabpanel .dx-tabpanel-tab {
-  flex-basis: unset;
-  flex-grow: 0;
-  flex-shrink: 0;
-  background: transparent;
-  margin-left: 20px;
-}
 // .plus-btn {
 //   width: 28px;
 //   height: 28px;
@@ -563,8 +514,8 @@ button:hover {
 }
 
 ::ng-deep .fixed-footer {
-  padding: 8px 20px 8px;   /* tighter than before */
-  margin-top: 4px;        /* reduced top gap */
+  padding: 8px 20px 8px; /* tighter than before */
+  margin-top: 4px; /* reduced top gap */
 }
 
 /* Right aligned buttons */
@@ -588,23 +539,18 @@ button:hover {
 }
 
 /* Cancel button */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-normal.dx-button-outlined {
+::ng-deep .popup-footer .dx-button.dx-button-normal.dx-button-outlined {
   background-color: #ffffff;
   border-color: #cfcfcf;
   color: #333333;
 }
 
 /* Save button */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-default.dx-button-contained {
+::ng-deep .popup-footer .dx-button.dx-button-default.dx-button-contained {
   background-color: #0d6efd;
   border-color: #0d6efd;
   color: #ffffff;
 }
-
 
 ::ng-deep .fixed-footer {
   padding: 14px 20px 10px;
@@ -618,10 +564,9 @@ button:hover {
 }
 
 ::ng-deep .fixed-footer {
-  margin-top: 0px;   /* reduce space above buttons */
-  padding-top: 6px;  /* optional: tighter look */
+  margin-top: 0px; /* reduce space above buttons */
+  padding-top: 6px; /* optional: tighter look */
 }
-
 
 /* Common button size */
 ::ng-deep .popup-footer .dx-button {
@@ -632,19 +577,75 @@ button:hover {
 }
 
 /* Cancel button (outlined) */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-normal.dx-button-outlined {
+::ng-deep .popup-footer .dx-button.dx-button-normal.dx-button-outlined {
   background-color: #ffffff;
   border-color: #cfcfcf;
   color: #333333;
 }
 
 /* Save button (blue primary) */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-default.dx-button-contained {
+::ng-deep .popup-footer .dx-button.dx-button-default.dx-button-contained {
   background-color: #0d6efd;
   border-color: #0d6efd;
   color: #ffffff;
+}
+
+::ng-deep .dx-theme-fluent .plain-styled-form {
+  /* Kill all DevExtreme default borders */
+  .dx-tabpanel-tabs,
+  .dx-tabs {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  /* Horizontal layout + spacing */
+  .dx-tabs-wrapper {
+    display: flex !important;
+    gap: 24px;
+  }
+
+  /* Individual tab */
+  .dx-tab {
+    padding: 8px 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Tab text */
+  .dx-tab-text {
+    position: relative;
+    font-weight: 500;
+    color: #333;
+    padding: 0 2px;
+    white-space: nowrap;
+  }
+
+  /* ❌ remove hover underline */
+  .dx-tab:hover::after,
+  .dx-tab:hover .dx-tab-text::before {
+    display: none !important;
+  }
+
+  /* ❌ remove default selected underline */
+  .dx-tab.dx-tab-selected::after {
+    display: none !important;
+  }
+
+  /* ✅ ACTIVE TAB UNDERLINE (this was missing) */
+  .dx-tab.dx-tab-selected .dx-tab-text::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 2px;
+    background-color: #2979ff;
+    border-radius: 2px;
+  }
+
+  /* Active tab text color */
+  .dx-tab.dx-tab-selected .dx-tab-text {
+    color: #2979ff;
+  }
 }

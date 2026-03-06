@@ -74,7 +74,7 @@ export class GrnNewFormComponent implements OnInit {
   cwidth: any = 'auto';
   isCostPopUpOpened: boolean = false;
   width: any;
-  
+
   costData: any = {
     ID: '',
     DESCRIPTION: '',
@@ -162,12 +162,11 @@ export class GrnNewFormComponent implements OnInit {
     ],
   };
 
-  
   newGrnData = this.grnData;
   getNewGrnData = () => ({
     ...this.newGrnData,
     GRNDetails: this.demoArray,
-    
+
     GRN_DATE: new Date(),
   });
   docNo: any;
@@ -178,7 +177,10 @@ export class GrnNewFormComponent implements OnInit {
     console.log(' demoArray cleared');
   }
 
-  constructor(private service: DataService, private ref: ChangeDetectorRef) {
+  constructor(
+    private service: DataService,
+    private ref: ChangeDetectorRef,
+  ) {
     this.today = new Date();
     const settingsData = sessionStorage.getItem('settings');
     const data = settingsData ? JSON.parse(settingsData) : null;
@@ -244,7 +246,7 @@ export class GrnNewFormComponent implements OnInit {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -306,8 +308,9 @@ export class GrnNewFormComponent implements OnInit {
         // Populate poDetails with dynamic SL_NO and other calculations
         this.poDetails = res.Podetails.map((item: any, index: number) => ({
           ...item,
+          PO_QUANTITY: item.PO_QUANTITY,
           SL_NO: index + 1, // Add SL_NO property dynamically
-          QTY_TO_RECEIVE: item.QUANTITY - item.GRN_QTY,
+          QTY_TO_RECEIVE: item.PO_QUANTITY - item.GRN_QTY,
           SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
           UNIT_COST: 0,
         }));
@@ -344,7 +347,7 @@ export class GrnNewFormComponent implements OnInit {
 
         // Now that poDetails and landedCost are populated, assign SUPP_GROSS_AMOUNT and SUPP_NET_AMOUNT
         this.newGrnData.SUPP_GROSS_AMOUNT = Number(
-          this.poDetails[0].SUPP_GROSS_AMOUNT
+          this.poDetails[0].SUPP_GROSS_AMOUNT,
         );
         this.newGrnData.SUPP_NET_AMOUNT = this.poDetails[0].SUPP_NET_AMOUNT;
 
@@ -401,8 +404,8 @@ export class GrnNewFormComponent implements OnInit {
         .filter(
           (item) =>
             !this.landedCost.some(
-              (cost) => cost.DESCRIPTION === item.DESCRIPTION
-            )
+              (cost) => cost.DESCRIPTION === item.DESCRIPTION,
+            ),
         )
         .map(({ ...rest }) => rest);
 
@@ -449,7 +452,7 @@ export class GrnNewFormComponent implements OnInit {
       .getPendingPo(
         this.newGrnData.STORE_ID,
         supplierid,
-        this.selected_Company_id
+        this.selected_Company_id,
       )
       .subscribe((res: any) => {
         this.poList = res.data;
@@ -488,7 +491,7 @@ export class GrnNewFormComponent implements OnInit {
     };
     this.service.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
-      console.log(res)
+      console.log(res);
     });
   }
 
@@ -506,21 +509,21 @@ export class GrnNewFormComponent implements OnInit {
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
     this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
     console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
     console.log(
       this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[['
+      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
     );
     this.formatted_from_date = this.financialYeaDate;
 
@@ -547,7 +550,7 @@ export class GrnNewFormComponent implements OnInit {
     const index = this.demoArray.findIndex(
       (item) =>
         item.ITEM_ID === updatedData.ITEM_ID &&
-        item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID
+        item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID,
     );
     const amount =
       Number(updatedRow.RECEIVED_QTY || 0) * Number(updatedRow.PRICE || 0);
@@ -565,7 +568,7 @@ export class GrnNewFormComponent implements OnInit {
 
       SUPP_PRICE: Number(updatedRow.SUPP_PRICE || 0),
       SUPP_AMOUNT: Number(
-        (updatedRow.RECEIVED_QTY * updatedRow.SUPP_PRICE).toFixed(2)
+        (updatedRow.RECEIVED_QTY * updatedRow.SUPP_PRICE).toFixed(2),
       ),
 
       UOM_PURCH: updatedRow.UOM_PURCH,
@@ -620,7 +623,7 @@ export class GrnNewFormComponent implements OnInit {
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          2000
+          2000,
         );
 
         // Optionally reset the RECEIVED_QTY field or prevent further processing
@@ -644,7 +647,7 @@ export class GrnNewFormComponent implements OnInit {
       const idx = this.poDetails.findIndex(
         (r) =>
           r.PO_DETAIL_ID === updatedRow.PO_DETAIL_ID &&
-          r.ITEM_ID === updatedRow.ITEM_ID
+          r.ITEM_ID === updatedRow.ITEM_ID,
       );
 
       if (idx > -1) {
@@ -729,7 +732,7 @@ export class GrnNewFormComponent implements OnInit {
 
       // Add the updated row to the array of updated items
       const existingIndex = this.updatedItems.findIndex(
-        (item) => item.SL_NO === updatedRow.SL_NO
+        (item) => item.SL_NO === updatedRow.SL_NO,
       );
 
       if (existingIndex > -1) {
@@ -778,7 +781,7 @@ export class GrnNewFormComponent implements OnInit {
         const isDuplicate = this.newGrnData.GRNDetails.some(
           (existingItem) =>
             existingItem.PO_DETAIL_ID === item.PO_DETAIL_ID &&
-            existingItem.ITEM_ID === item.ITEM_ID
+            existingItem.ITEM_ID === item.ITEM_ID,
         );
 
         if (!isDuplicate) {
@@ -824,7 +827,7 @@ export class GrnNewFormComponent implements OnInit {
           (existingCost) =>
             existingCost.STORE_ID === costData.STORE_ID &&
             existingCost.COST_ID === costData.COST_ID &&
-            existingCost.ITEM_ID === costData.ITEM_ID
+            existingCost.ITEM_ID === costData.ITEM_ID,
         );
 
         if (!isDuplicate) {
@@ -834,7 +837,7 @@ export class GrnNewFormComponent implements OnInit {
 
       console.log(
         this.newGrnData.GRN_Item_Cost,
-        'Updated GRN_Item_Cost with Proportional Values'
+        'Updated GRN_Item_Cost with Proportional Values',
       );
     }
 
@@ -932,7 +935,7 @@ export class GrnNewFormComponent implements OnInit {
   getTotalQuantity(): any {
     return this.poDetails.reduce(
       (total, item) => total + (item.QUANTITY || 0),
-      0
+      0,
     );
   }
 
@@ -1109,7 +1112,7 @@ export class GrnNewFormComponent implements OnInit {
     this.newGrnData.GRNDetails.forEach((detail: any) => {
       // Find the matching entry in poDetails
       const matchingPoDetail = this.poDetails.find(
-        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID
+        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID,
       );
 
       console.log(matchingPoDetail, '()()');
@@ -1180,7 +1183,7 @@ export class GrnNewFormComponent implements OnInit {
     // Check if costData is valid and contains necessary fields
     if (this.costData && this.costData.ID && this.costData.DESCRIPTION) {
       const isExistingCost = this.costingMethodDataGrid.some(
-        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION
+        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION,
       );
 
       if (isExistingCost) {
@@ -1190,7 +1193,7 @@ export class GrnNewFormComponent implements OnInit {
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          2000
+          2000,
         );
         return; // Exit the function
       }
@@ -1252,7 +1255,7 @@ export class GrnNewFormComponent implements OnInit {
       console.log(this.costingMethodDataGrid, 'Updated costingMethodDataGrid');
     } else {
       console.error(
-        'Invalid costData. Ensure all required fields are populated.'
+        'Invalid costData. Ensure all required fields are populated.',
       );
     }
   }

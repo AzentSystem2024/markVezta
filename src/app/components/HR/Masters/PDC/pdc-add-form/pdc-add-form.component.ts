@@ -63,6 +63,7 @@ export class PdcAddFormComponent {
   docNo: any;
 
   ngOnInit(): void {
+    this.getDocNo();
     this.get_Supplier_dropdown();
     this.get_Bank_dropdown();
     this.get_Customer_dropdown();
@@ -78,7 +79,6 @@ export class PdcAddFormComponent {
       // Call priority logic manually to apply disabled items
       // this.onPriorityChanged({ value: this.selectedType });
     }
-    this.getDocNo();
   }
 
   getDocNo() {
@@ -86,8 +86,9 @@ export class PdcAddFormComponent {
       TRANS_TYPE: 40,
       COMPANY_ID: this.selected_Company_id,
     };
-    this.dataservice.getDocNo(payload).subscribe((response: any) => {
+    this.dataservice.getPdcDocNo().subscribe((response: any) => {
       this.docNo = response.DOC_NO;
+      this.PDCFormData.ENTRY_NO = response.DOC_NO;
       console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
@@ -100,7 +101,7 @@ export class PdcAddFormComponent {
     BENEFICIARY_NAME: '',
     BENEFICIARY_TYPE: '',
     ENTRY_NO: '',
-    ENTRY_DATE: '',
+    ENTRY_DATE: new Date(),
     CHEQUE_NO: '',
     CHEQUE_DATE: '',
     AMOUNT: '',
@@ -115,7 +116,7 @@ export class PdcAddFormComponent {
     this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
     console.log(
       this.selectedBeneficiaryTypeID,
-      'selected beneficiary type ========'
+      'selected beneficiary type ========',
     );
     //  this.selectedBeneficiaryType = this.BeneficiaryType.find(b => b.id === data.BENEFICIARY_TYPE);
   }
@@ -134,7 +135,7 @@ export class PdcAddFormComponent {
       }));
 
       this.selectedBeneficiaryType = this.BeneficiaryType.find(
-        (b) => b.id === 1
+        (b) => b.id === 1,
       );
       this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
     } else {
@@ -145,7 +146,7 @@ export class PdcAddFormComponent {
       }));
 
       this.selectedBeneficiaryType = this.BeneficiaryType.find(
-        (b) => b.id === 2
+        (b) => b.id === 2,
       );
       this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
     }
@@ -166,7 +167,7 @@ export class PdcAddFormComponent {
 
     // Find and log the selected supplier's DESCRIPTION
     const selectedSupplier = this.Supplier.find(
-      (item: any) => item.ID === this.selectedSupplierId
+      (item: any) => item.ID === this.selectedSupplierId,
     );
     if (selectedSupplier) {
       console.log('Selected ID:', selectedSupplier.ID);
@@ -184,7 +185,7 @@ export class PdcAddFormComponent {
 
     // Find and log the selected supplier's DESCRIPTION
     const selectedCustomer = this.Supplier.find(
-      (item: any) => item.ID === this.selectedCustomerId
+      (item: any) => item.ID === this.selectedCustomerId,
     );
     if (selectedCustomer) {
       console.log('Selected ID:', selectedCustomer.ID);
@@ -204,7 +205,7 @@ export class PdcAddFormComponent {
 
     this.PDCFormData.IS_PAYMENT = defaultType;
 
-    // 👇 Manually trigger the priority change logic with a mock event
+    // Manually trigger the priority change logic with a mock event
     this.onPriorityChanged({ value: defaultType });
   }
 
@@ -217,19 +218,20 @@ export class PdcAddFormComponent {
     const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-based
     const day = String(d.getDate()).padStart(2, '0');
 
-    return `${year}-${month}-${day}`; // ✅ No timezone involved
+    return `${year}-${month}-${day}`; //  No timezone involved
   }
 
   resetForm() {
+    this.getDocNo();
     this.PDCFormData = {
       ID: 0,
       BANK_HEAD_ID: null,
       CUST_ID: null,
       SUPP_ID: null,
-      ENTRY_NO: '',
+
       BENEFICIARY_NAME: '',
       BENEFICIARY_TYPE: null,
-      ENTRY_DATE: null,
+      ENTRY_DATE: new Date(),
       CHEQUE_NO: '',
       CHEQUE_DATE: null,
       AMOUNT: null,
@@ -253,12 +255,12 @@ export class PdcAddFormComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
   savePDC() {
-    // ✅ Basic field validation before building payload
+    //  Basic field validation before building payload
     if (
       !this.PDCFormData.BANK_HEAD_ID ||
       !this.PDCFormData.CHEQUE_NO ||
@@ -306,10 +308,10 @@ export class PdcAddFormComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
       }
-      this.resetForm(); // ✅ Reset all form fields
+      this.resetForm(); //  Reset all form fields
       this.formClosed.emit();
 
       this.selectedType = this.priorities.find((p) => p.id === 1);
@@ -320,7 +322,7 @@ export class PdcAddFormComponent {
 
       this.PDCFormData.IS_PAYMENT = defaultType;
 
-      // 👇 Manually trigger the priority change logic with a mock event
+      //  Manually trigger the priority change logic with a mock event
       this.onPriorityChanged({ value: defaultType });
 
       if (res?.Flag === 1 && res?.Data) {
@@ -331,10 +333,10 @@ export class PdcAddFormComponent {
   }
 
   get_Supplier_dropdown() {
-      const payload={
-      NAME:'SUPPLIER',
-      COMPANY_ID:this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
@@ -351,10 +353,10 @@ export class PdcAddFormComponent {
   }
 
   get_Customer_dropdown() {
-          const payload={
-      NAME:'CUSTOMER',
-      COMPANY_ID:this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'CUSTOMER',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('customer dropdown', res);
       this.Customer = res;

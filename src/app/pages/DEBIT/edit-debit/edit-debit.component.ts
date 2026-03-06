@@ -118,9 +118,17 @@ export class EditDebitComponent {
   distributorList: any;
 
   isUpdating = false;
+  subType: boolean = false;
+  subTypeList: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    console.log(userData.Configuration, 'CONFIGURATION');
+    this.subType = userData.Configuration[0].SUB_TYPE_ID;
     console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -767,18 +775,89 @@ export class EditDebitComponent {
         }
       };
     }
+
     if (e.dataField === 'Amount') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
-          const grid = e.component;
-          const rowIndex = e.row.rowIndex;
-          // Move focus to the "ledgerCode" column in the same row
+          const grid = this.itemsGridRef?.instance;
+          const rowData = e.row?.data;
+
+          // validate
+          if (!rowData.ledgerCode || rowData.Amount == null) {
+            return;
+          }
+
+          // prevent multiple empty rows
+          const lastRow = this.noteDetails[this.noteDetails.length - 1];
+          if (!lastRow.ledgerCode && !lastRow.Amount) {
+            return;
+          }
+
+          const nextSlNo = this.noteDetails.length + 1;
+
+          const newRow: any = {
+            SL_NO: nextSlNo,
+            ledgerCode: '',
+            ledgerName: '',
+            particulars: '',
+            Amount: null,
+            gstAmount: null,
+            HSN_CODE: '',
+            CGST: 0,
+            SGST: 0,
+            GST_PERC: 0,
+          };
+
+          // ⭐ COPY TAX STRUCTURE FROM FIRST ROW
+          const baseRow = this.noteDetails[0];
+
+          if (baseRow) {
+            if ((baseRow.CGST || 0) > 0 || (baseRow.SGST || 0) > 0) {
+              this.showCGST = true;
+              this.showSGST = true;
+              this.showGST = false;
+
+              newRow.CGST = baseRow.CGST || 0;
+              newRow.SGST = baseRow.SGST || 0;
+            } else {
+              this.showGST = true;
+              this.showCGST = false;
+              this.showSGST = false;
+
+              newRow.GST_PERC = baseRow.GST_PERC || 0;
+            }
+
+            newRow.HSN_CODE = baseRow.HSN_CODE || '';
+          }
+
+          this.noteDetails.push(newRow);
+
+          grid.option('dataSource', [...this.noteDetails]);
+
+          //  focus new row ledgerCode
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
-          });
+            const visibleRows = grid.getVisibleRows();
+            const newRowIndex = visibleRows.findIndex((r) => r.data === newRow);
+
+            if (newRowIndex >= 0) {
+              grid.editCell(newRowIndex, 'ledgerCode');
+            }
+          }, 80);
         }
       };
     }
+    // if (e.dataField === 'Amount') {
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     if (event.event.key === 'Enter') {
+    //       const grid = e.component;
+    //       const rowIndex = e.row.rowIndex;
+    //       // Move focus to the "ledgerCode" column in the same row
+    //       setTimeout(() => {
+    //         grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
+    //       });
+    //     }
+    //   };
+    // }
     // if (e.dataField === 'GST_PERC') {
     //   e.editorOptions.onKeyDown = (event: any) => {
     //     if (event.event.key === 'Enter') {

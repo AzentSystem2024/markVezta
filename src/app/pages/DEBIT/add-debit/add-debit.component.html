@@ -45,6 +45,28 @@
               style="display: flex; flex-direction: column; gap: 5px"
             >
               <div style="display: flex; gap: 5px">
+                <dx-text-box
+                  label="Doc No"
+                  [(value)]="debitFormData.DOC_NO"
+                  labelMode="floating"
+                  [width]="200"
+                  [readOnly]="true"
+                ></dx-text-box>
+                <dx-select-box
+                  *ngIf="subType"
+                  [dataSource]="subTypeList"
+                  displayExpr="SUB_TYPE_NAME"
+                  valueExpr="SUB_TYPE_ID"
+                  label="Select Subtype"
+                  labelMode="floating"
+                  placeholder="Select Subtype"
+                  [width]="200"
+                  (onValueChanged)="onSubTypeChange($event)"
+                >
+                </dx-select-box>
+                <!--  -->
+              </div>
+              <div style="display: flex; gap: 5px">
                 <dx-select-box
                   #distributorRef
                   [(value)]="debitFormData.SUPP_ID"
@@ -57,16 +79,6 @@
                   labelMode="floating"
                   (onValueChanged)="onSupplierChanged($event)"
                 ></dx-select-box>
-                <!--  -->
-              </div>
-              <div style="display: flex; gap: 5px">
-                <dx-text-box
-                  label="Doc No"
-                  [(value)]="debitFormData.DOC_NO"
-                  labelMode="floating"
-                  [width]="200"
-                  [readOnly]="true"
-                ></dx-text-box>
 
                 <dx-select-box
                   [(value)]="debitFormData.INVOICE_NO"
@@ -379,6 +391,7 @@
     [showColumnLines]="true"
     [height]="'40vh'"
     [hoverStateEnabled]="true"
+    [scrolling]="{ mode: 'virtual' }"
     [selection]="{ mode: 'single' }"
     (onRowClick)="selectInvoice($event)"
   >

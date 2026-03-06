@@ -96,7 +96,8 @@ export class ListMiscReceiptComponent {
   };
   addButtonOptions = {
     text: 'New',
-    icon: 'bi bi-file-earmark-plus',
+    // icon: 'bi bi-file-earmark-plus',
+
     // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
@@ -107,6 +108,17 @@ export class ListMiscReceiptComponent {
       });
     },
     elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
   addMiscPaymentPopup: boolean = false;
   dateRanges = [
@@ -586,7 +598,7 @@ export class ListMiscReceiptComponent {
     this.getMiscReceipts();
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -621,7 +633,7 @@ export class ListMiscReceiptComponent {
     DxoItemModule,
     AddMiscReceiptModule,
     EditMiscReceiptModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [ListMiscReceiptComponent],
