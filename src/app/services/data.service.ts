@@ -1774,29 +1774,50 @@ export class DataService {
   public getVatclassData(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}vatclass/list`, data);
   }
-  public postVatclassData(
-    CODE: any,
-    VAT_NAME: any,
-    VAT_PERC: any,
-    COMPANY_ID: AnyARecord,
-  ): Observable<any> {
-    const data = { CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
 
+  postVatclassData(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
+  // public postVatclassData(
+  //   CODE: string,
+  //   VAT_NAME: string,
+
+  //   CGST_PERC: string | null,
+  //   CGST_INPUT_HEAD_ID: number | null,
+  //   CGST_OUTPUT_HEAD_ID: number | null,
+
+  //   SGST_PERC: string | null,
+  //   SGST_INPUT_HEAD_ID: number | null,
+  //   SGST_OUTPUT_HEAD_ID: number | null,
+
+  //   IGST_PERC: string | null,
+  //   IGST_INPUT_HEAD_ID: number | null,
+  //   IGST_OUTPUT_HEAD_ID: number | null,
+  // ): Observable<any> {
+  //   const data = {
+  //     CODE,
+  //     VAT_NAME,
+
+  //     CGST_PERC,
+  //     CGST_INPUT_HEAD_ID,
+  //     CGST_OUTPUT_HEAD_ID,
+
+  //     SGST_PERC,
+  //     SGST_INPUT_HEAD_ID,
+  //     SGST_OUTPUT_HEAD_ID,
+
+  //     IGST_PERC,
+  //     IGST_INPUT_HEAD_ID,
+  //     IGST_OUTPUT_HEAD_ID,
+  //   };
+
+  //   return this.http.post(`${this.apiUrl}vatclass/save`, data);
+  // }
   select_Vatclass_Data(id: any) {
     return this.http.post(`${this.apiUrl}vatclass/select/${id}`, {});
   }
 
-  updateVatclass(
-    ID: any,
-    CODE: any,
-    VAT_NAME: any,
-    VAT_PERC: any,
-    COMPANY_ID: any,
-  ): Observable<any> {
-    const data = { ID, CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
-
+  updateVatclass(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
   removeVatclass(id: any, code: any, vatname: any, vatperc: any) {

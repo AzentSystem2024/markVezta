@@ -1,0 +1,20 @@
+.gst-header {
+  display: grid;
+  grid-template-columns: 70px 90px 1fr 1fr;
+  gap: 10px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.gst-row {
+  display: grid;
+  grid-template-columns: 70px 90px 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.gst-label {
+  font-weight: 500;
+}

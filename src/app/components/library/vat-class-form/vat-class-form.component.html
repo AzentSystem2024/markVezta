@@ -1,43 +1,222 @@
-<dx-form class="plain-styled-form">
-  <dxi-item itemType="group">
-    <dxo-col-count-by-screen
-      [xs]="1"
-      [sm]="1"
-      [md]="1"
-      [lg]="1"
-    ></dxo-col-count-by-screen>
-    <dxi-item>
-      <div *dxTemplate>
-        <dx-text-box
-          label="Code"
-          [(value)]="newVatclass.CODE"
-          labelMode="floating"
-          (keypress)="keyPressCode($event)"
-        >
-        </dx-text-box>
-      </div>
-    </dxi-item>
+<dx-validation-group #vatValidationGroup>
+  <dx-form class="plain-styled-form">
+    <dxi-item itemType="group">
+      <dxo-col-count-by-screen [xs]="1" [sm]="1" [md]="1" [lg]="1">
+      </dxo-col-count-by-screen>
 
-    <dxi-item>
-      <div *dxTemplate>
-        <dx-text-box
-          label="GST Name"
-          [(value)]="newVatclass.VAT_NAME"
-          labelMode="floating"
-          (keypress)="keyPressVatname($event)"
-        >
-        </dx-text-box>
-      </div>
+      <!-- CODE -->
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="Code"
+            [(value)]="newVatclass.CODE"
+            labelMode="floating"
+            (keypress)="keyPressCode($event)"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Code is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+
+      <!-- GST NAME -->
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-text-box
+            label="GST Name"
+            [(value)]="newVatclass.VAT_NAME"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="GST Name is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+      </dxi-item>
+
+      <!-- GST PERCENT -->
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-number-box
+            label="GST %"
+            [(value)]="newVatclass.VAT_PERC"
+            labelMode="floating"
+            [showSpinButtons]="true"
+            (onValueChanged)="onGstChange($event)"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="GST % is required"
+              ></dxi-validation-rule>
+
+              <dxi-validation-rule
+                type="range"
+                [min]="0"
+                [max]="100"
+                message="GST must be between 0 and 100"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-number-box>
+        </div>
+      </dxi-item>
+
+      <!-- HEADER -->
+      <dxi-item *ngIf="newVatclass.VAT_PERC">
+        <div *dxTemplate>
+          <div class="gst-header">
+            <div></div>
+            <div>%</div>
+            <div>Input Ledger</div>
+            <div>Output Ledger</div>
+          </div>
+        </div>
+      </dxi-item>
+
+      <!-- CGST -->
+      <dxi-item>
+        <div *dxTemplate>
+          <div class="gst-row">
+            <div class="gst-label">CGST</div>
+
+            <dx-number-box
+              [(value)]="newVatclass.CGST_PERC"
+              [showSpinButtons]="true"
+              placeholder="%"
+            >
+            </dx-number-box>
+
+            <dx-select-box
+              [dataSource]="ledgerList"
+              displayExpr="HEAD_NAME"
+              valueExpr="HEAD_ID"
+              [(value)]="newVatclass.CGST_INPUT_HEAD_ID"
+              placeholder="Input Ledger"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Select CGST Input Ledger"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+
+            <dx-select-box
+              [dataSource]="ledgerList"
+              displayExpr="HEAD_NAME"
+              valueExpr="HEAD_ID"
+              [(value)]="newVatclass.CGST_OUTPUT_HEAD_ID"
+              placeholder="Output Ledger"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Select CGST Output Ledger"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+          </div>
+        </div>
+      </dxi-item>
+
+      <!-- SGST -->
+      <dxi-item>
+        <div *dxTemplate>
+          <div class="gst-row">
+            <div class="gst-label">SGST</div>
+
+            <dx-number-box
+              [(value)]="newVatclass.SGST_PERC"
+              [showSpinButtons]="true"
+              placeholder="%"
+            >
+            </dx-number-box>
+
+            <dx-select-box
+              [dataSource]="ledgerList"
+              displayExpr="HEAD_NAME"
+              valueExpr="HEAD_ID"
+              [(value)]="newVatclass.SGST_INPUT_HEAD_ID"
+              placeholder="Input Ledger"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Select SGST Input Ledger"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+
+            <dx-select-box
+              [dataSource]="ledgerList"
+              displayExpr="HEAD_NAME"
+              valueExpr="HEAD_ID"
+              [(value)]="newVatclass.SGST_OUTPUT_HEAD_ID"
+              placeholder="Output Ledger"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Select SGST Output Ledger"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+          </div>
+        </div>
+      </dxi-item>
+
+      <!-- IGST -->
+      <dxi-item>
+        <div *dxTemplate>
+          <div class="gst-row">
+            <div class="gst-label">IGST</div>
+
+            <dx-number-box
+              [(value)]="newVatclass.IGST_PERC"
+              [showSpinButtons]="true"
+              placeholder="%"
+            >
+            </dx-number-box>
+
+            <dx-select-box
+              [dataSource]="ledgerList"
+              displayExpr="HEAD_NAME"
+              valueExpr="HEAD_ID"
+              [(value)]="newVatclass.IGST_INPUT_HEAD_ID"
+              placeholder="Input Ledger"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Select IGST Input Ledger"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+
+            <dx-select-box
+              [dataSource]="ledgerList"
+              displayExpr="HEAD_NAME"
+              valueExpr="HEAD_ID"
+              [(value)]="newVatclass.IGST_OUTPUT_HEAD_ID"
+              placeholder="Output Ledger"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Select IGST Output Ledger"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+          </div>
+        </div>
+      </dxi-item>
     </dxi-item>
-    <dxi-item>
-      <div *dxTemplate>
-        <dx-text-box
-          label="GST Percentage"
-          [(value)]="newVatclass.VAT_PERC"
-          labelMode="floating"
-        >
-        </dx-text-box>
-      </div>
-    </dxi-item>
-  </dxi-item>
-</dx-form>
+  </dx-form>
+</dx-validation-group>
