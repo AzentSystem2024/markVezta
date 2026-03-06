@@ -1,7 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, NgModule } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { DxButtonModule, DxCheckBoxModule, DxDataGridModule, DxDateBoxModule, DxLoadIndicatorModule, DxLoadPanelModule, DxNumberBoxModule, DxPopupModule, DxSelectBoxModule, DxTextBoxModule, DxValidationGroupModule, DxValidatorModule } from 'devextreme-angular';
+import {
+  DxButtonModule,
+  DxCheckBoxModule,
+  DxDataGridModule,
+  DxDateBoxModule,
+  DxLoadIndicatorModule,
+  DxLoadPanelModule,
+  DxNumberBoxModule,
+  DxPopupModule,
+  DxSelectBoxModule,
+  DxTextBoxModule,
+  DxValidationGroupModule,
+  DxValidatorModule,
+} from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { Router, NavigationEnd } from '@angular/router';
@@ -22,93 +35,92 @@ import { TransferInInventoryModule } from '../../transfer-in-inventory/transfer-
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 
-
 @Component({
   selector: 'app-gst-report',
   templateUrl: './gst-report.component.html',
-  styleUrls: ['./gst-report.component.scss']
+  styleUrls: ['./gst-report.component.scss'],
 })
 export class GstReportComponent {
-      GST_datasource:any[]=[];
-      readonly allowedPageSizes: any = [ 5,10, 'all'];
-    displayMode: any = 'full';
-      formatted_from_date: string;
+  GST_datasource: any[] = [];
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  formatted_from_date: string;
   formatted_To_date: string;
-   defaultDate: Date = new Date();
-loadingInvoice = false;
+  defaultDate: Date = new Date();
+  loadingInvoice = false;
 
-   isViewDebitNote: boolean = false;
+  isViewDebitNote: boolean = false;
   isViewCreditNote: boolean = false;
   isViewInvoice: boolean = false;
   isViewReceipt: boolean = false;
-  editMiscPopup:boolean = false;
+  editMiscPopup: boolean = false;
   selectedJournalVoucher: any;
   selectedDebitNote: any;
   selectedCreditNote: any;
   selectedInvoice: any;
   selectedReceipt: any;
-  selected_Company_id:any;
+  selected_Company_id: any;
   isEditInvoice: boolean = false;
   isEditInvoiceReadOnly: boolean = true;
-  editPrePaymentPopupOpened :boolean = false;
-  isReadOnlyPayment:boolean = true;
-  isEditReceipt : boolean = false;
-  isReadOnlyReceipt : boolean=true;
-   editMiscPopupOpened :boolean = false;
+  editPrePaymentPopupOpened: boolean = false;
+  isReadOnlyPayment: boolean = true;
+  isEditReceipt: boolean = false;
+  isReadOnlyReceipt: boolean = true;
+  editMiscPopupOpened: boolean = false;
   isReadOnlyPurchaseReturn: boolean = true;
   isEditPurchaseReturn: boolean = false;
   selectedmiscellaneousData: any;
   selectedPrePayment: any;
   selectedSupplierPayment: any;
   selectedPurchaseReturn: any;
-selectedMiscPayment: any;
+  selectedMiscPayment: any;
   selecte_prepayment_Data: any;
   isEditPopupPrepaymentPosting: boolean = false;
   selectedTrOut: any;
-  isEditTransferOut:boolean = false;
-  isReadOnlyTrOut : boolean= true;
+  isEditTransferOut: boolean = false;
+  isReadOnlyTrOut: boolean = true;
   selectedTrIn: any;
   isEditTransferIn: boolean = false;
-isReadOnlyTrIn: boolean = true;
-isEditCustomerReceipt:boolean = false;
+  isReadOnlyTrIn: boolean = true;
+  isEditCustomerReceipt: boolean = false;
   editLedgerPopup: boolean = false;
-   isViewJournalVoucher: boolean = false;
-   isEditReadOnly: boolean = true;
+  isViewJournalVoucher: boolean = false;
+  isEditReadOnly: boolean = true;
   selected_fin_id: any;
   fin_id: any;
-    savedUserData: any;
+  savedUserData: any;
   selected_from_date: any;
   selected_To_date: any;
-   popupReady = false;
-  ledgerSummaryData:any=[]
+  popupReady = false;
+  ledgerSummaryData: any = [];
 
   selectedYear: number | null = null;
-   years: number[] = [];
-   monthDataSource: { name: string; value: any }[];
-   selectedmonth: any = '';
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[];
+  selectedmonth: any = '';
 
-   constructor(
-       private dataService: DataService,
-       private router: Router,
-        private cdr: ChangeDetectorRef
-     ) {
-      this.sesstion_Details();
-      this.get_fin_id();
+  constructor(
+    private dataService: DataService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+  ) {
+    this.sesstion_Details();
+    this.get_fin_id();
 
-       //============Year field dataSource===============
+    //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
     this.selectedYear = currentYear;
-      //============Month field dataSource===============
-     this.monthDataSource = this.dataService.getMonths();
-     }
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataService.getMonths();
+  }
 
-       ngOnInit() {
+  ngOnInit() {
     // this.loadLedgerData();
 
-    this.ledgerSummaryData=this.GST_datasource
+    this.ledgerSummaryData = this.GST_datasource;
     this.onFromDateChange({ value: this.defaultDate });
     this.onToDateChange({ value: this.defaultDate });
 
@@ -120,26 +132,29 @@ isEditCustomerReceipt:boolean = false;
       '-' +
       String(today.getDate()).padStart(2, '0');
 
-      this.selected_from_date = SystemDate;
-      this.selected_To_date = SystemDate;
-      this.load_GST_data();
-
+    this.selected_from_date = SystemDate;
+    this.selected_To_date = SystemDate;
+    this.load_GST_data();
   }
-      sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
 
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
 
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
+    console.log(
+      this.selected_fin_id,
+      '===========selected fin id===================',
+    );
+  }
 
-    console.log(this.selected_fin_id,'===========selected fin id===================')
-    
-  }
-
-//================ Year value change ===================
+  //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
     this.selectedmonth = '';
@@ -155,19 +170,22 @@ isEditCustomerReceipt:boolean = false;
     }
   }
 
-
-   //================Month value change ===================
+  //================Month value change ===================
   onMonthValueChanged(e: any) {
     this.selectedmonth = e.value ?? '';
     if (this.selectedmonth === '') {
       this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
       this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
     } else {
-      this.selected_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.selected_from_date = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
       this.selected_To_date = new Date(
         this.selectedYear,
         this.selectedmonth + 1,
-        0
+        0,
       );
     }
   }
@@ -177,17 +195,15 @@ isEditCustomerReceipt:boolean = false;
     if (this.fin_id.length) {
       this.selected_fin_id = this.fin_id[0].FIN_ID;
     }
-  console.log(this.selected_fin_id, '========financial year');
-    
+    console.log(this.selected_fin_id, '========financial year');
   }
 
-
-       onExporting(event: any) {
+  onExporting(event: any) {
     const fileName = 'GST Report';
     this.dataService.exportDataGridReport(event, fileName);
   }
 
-      onFromDateChange(event: any) {
+  onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
   }
@@ -198,15 +214,15 @@ isEditCustomerReceipt:boolean = false;
   }
 
   formatDates(cellData: any): string {
-  const date = new Date(cellData);
-  if (isNaN(date.getTime())) return '';
+    const date = new Date(cellData);
+    if (isNaN(date.getTime())) return '';
 
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
 
-  return `${day}-${month}-${year}`;
-}
+    return `${day}-${month}-${year}`;
+  }
 
   formatDate(date: Date): string {
     const year = date.getFullYear();
@@ -215,8 +231,8 @@ isEditCustomerReceipt:boolean = false;
     return `${year}-${month}-${day}`;
   }
 
-    handleClose() {
-     this.editLedgerPopup = false;
+  handleClose() {
+    this.editLedgerPopup = false;
     this.isViewJournalVoucher = false;
     this.isViewDebitNote = false;
     this.isViewCreditNote = false;
@@ -226,7 +242,7 @@ isEditCustomerReceipt:boolean = false;
     this.editMiscPopup = false;
   }
 
-    summaryColumnsData = {
+  summaryColumnsData = {
     totalItems: [
       // 1. Total Debitṅ
       {
@@ -279,159 +295,152 @@ isEditCustomerReceipt:boolean = false;
     },
   };
 
-  load_GST_data(){
-       const payload = {
+  load_GST_data() {
+    const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
-      DATE_TO: this.formatted_To_date ?? this.selected_To_date
+      DATE_TO: this.formatted_To_date ?? this.selected_To_date,
     };
 
     console.log(payload, '==========manual payload===========');
 
     this.dataService.GST_Report_Api(payload).subscribe((res: any) => {
-      console.log(res)
+      console.log(res);
       this.GST_datasource = res.DATA || [];
-         this.ledgerSummaryData=this.GST_datasource
+      this.ledgerSummaryData = this.GST_datasource;
     });
   }
 
-  onViewClick(e: any){
-console.log(e,'=======event==========');
- 
- const TransType=e.row.data.DOC_TYPE
-  const trans_id=e.row.data.TRANS_ID
+  onViewClick(e: any) {
+    console.log(e, '=======event==========');
+
+    const TransType = e.row.data.DOC_TYPE;
+    const trans_id = e.row.data.TRANS_ID;
 
     this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
-console.log(TransType , trans_id)
-if(TransType==4){
-    this.dataService
-      .selectJournalVoucher(trans_id)
-      .subscribe((response: any) => {
-        console.log(response)
+    console.log(TransType, trans_id);
+    if (TransType == 4) {
+      this.dataService
+        .selectJournalVoucher(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
           this.selectedJournalVoucher = response.Data;
-           this.loadingInvoice = false;
+          this.loadingInvoice = false;
 
+          this.isViewJournalVoucher = true;
+          this.cdr.detectChanges();
+          console.log(
+            this.selectedJournalVoucher,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
+          );
+        });
+    } else if (TransType == 36) {
+      this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
+        console.log(response);
+        this.selectedDebitNote = response.Data;
+        this.loadingInvoice = false;
 
-           this.isViewJournalVoucher = true;
-           this.cdr.detectChanges();
+        this.isViewDebitNote = true;
+        this.cdr.detectChanges();
         console.log(
-          this.selectedJournalVoucher,
-          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+          this.selectedDebitNote,
+          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
         );
       });
-}
-else if(TransType == 36){
-
-    this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
-      console.log(response)
-    this.selectedDebitNote = response.Data;
-     this.loadingInvoice = false;
-
-     this.isViewDebitNote = true;
-     this.cdr.detectChanges();
-    console.log(this.selectedDebitNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
-  });
-}
-//   else if (TransType == 37) {
- 
-//   console.log('=====navigate to 37-CREDIT NOTE=====');
-//     this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-//       console.log(response)
-//     this.selectedCreditNote = response.Data;
-//      this.loadingInvoice = false;
-
-//       this.isViewCreditNote = true;
-//       this.cdr.detectChanges();
-//     console.log(this.selectedCreditNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
-//   });
-// }
-else if (TransType == 37) {
-  console.log('=====navigate to 37-CREDIT NOTE=====');
-
-  this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-    console.log(response);
-
-    if (response?.Data?.length > 0) {
-      this.selectedCreditNote = response.Data[0]; 
-      this.isViewCreditNote = true;
-    } else {
-      this.selectedCreditNote = null;
     }
+    //   else if (TransType == 37) {
 
-    this.loadingInvoice = false;
-    this.cdr.detectChanges();
+    //   console.log('=====navigate to 37-CREDIT NOTE=====');
+    //     this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
+    //       console.log(response)
+    //     this.selectedCreditNote = response.Data;
+    //      this.loadingInvoice = false;
 
-    console.log(
-      this.selectedCreditNote,
-      'SELECTED CREDIT NOTE'
-    );
-  });
-}
+    //       this.isViewCreditNote = true;
+    //       this.cdr.detectChanges();
+    //     console.log(this.selectedCreditNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
+    //   });
+    // }
+    else if (TransType == 37) {
+      console.log('=====navigate to 37-CREDIT NOTE=====');
 
-else if (TransType == 25) {
- 
-  console.log('=====navigate to 25-SALES INVOICE=====');
-   this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
-      this.selectedInvoice = response.Data;
-       this.loadingInvoice = false;
+      this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
+        console.log(response);
+
+        if (response?.Data?.length > 0) {
+          this.selectedCreditNote = response.Data[0];
+          this.isViewCreditNote = true;
+        } else {
+          this.selectedCreditNote = null;
+        }
+
+        this.loadingInvoice = false;
+        this.cdr.detectChanges();
+
+        console.log(this.selectedCreditNote, 'SELECTED CREDIT NOTE');
+      });
+    } else if (TransType == 25) {
+      console.log('=====navigate to 25-SALES INVOICE=====');
+      this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+        this.loadingInvoice = false;
 
         this.isViewInvoice = true;
         this.cdr.detectChanges();
-      console.log(this.selectedInvoice, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-    });
-}
-     else if(TransType == 19){
+        console.log(this.selectedInvoice, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+      });
+    } else if (TransType == 19) {
       this.dataService
         .selectPurchaseInvoice(trans_id)
         .subscribe((response: any) => {
           this.selectedInvoice = response.Data;
- this.loadingInvoice = false;
-
+          this.loadingInvoice = false;
 
           this.isEditInvoice = true;
           this.cdr.detectChanges();
-         
         });
-      }
- else if (TransType == 27) {
- 
-  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-     this.dataService
-      .selectCustomerReceipt(trans_id).subscribe((response: any) => {
+    } else if (TransType == 27) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectCustomerReceipt(trans_id)
+        .subscribe((response: any) => {
           this.selectedReceipt = response.Data;
           this.isEditCustomerReceipt = true;
           this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-} 
-
-else if (TransType == 2) {
- 
-  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-     this.dataService
-      .selectMiscReceipt(trans_id).subscribe((response: any) => {
-        console.log(response)
+          console.log(
+            this.selectedReceipt,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
+          );
+        });
+    } else if (TransType == 2) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectMiscReceipt(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
           this.selectedmiscellaneousData = response.Data;
           this.editMiscPopup = true;
           this.cdr.detectChanges();
-        console.log(this.selectedmiscellaneousData, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-      });
-} 
-else if (TransType == 38) {
- 
-  console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-     this.dataService
-      .Select_PrePayment(trans_id).subscribe((response: any) => {
-        console.log(response)
+          console.log(
+            this.selectedmiscellaneousData,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
+          );
+        });
+    } else if (TransType == 38) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .Select_PrePayment(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
           this.selectedPrePayment = response.Data;
           this.editPrePaymentPopupOpened = true;
           this.cdr.detectChanges();
           console.log(
             this.selectedPrePayment,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TransType == 21) {
@@ -446,7 +455,7 @@ else if (TransType == 38) {
           this.cdr.detectChanges();
           console.log(
             this.selectedPrePayment,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     } else if (TransType == 20) {
@@ -461,11 +470,10 @@ else if (TransType == 38) {
           this.cdr.detectChanges();
           console.log(
             this.selectedPurchaseReturn,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
-    } 
-    else if (TransType == 14) {
+    } else if (TransType == 14) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectTransferOutForInventory(trans_id)
@@ -476,24 +484,21 @@ else if (TransType == 38) {
           this.isEditTransferOut = true;
 
           this.cdr.detectChanges();
-          console.log(
-            this.selectedTrOut,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-          );
+          console.log(this.selectedTrOut, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
-    }
-    else if (TransType == 15) {
-  console.log('=====navigate to 25-SALES INVOICE=====');
-   this.dataService.selectTransferInForInventory(trans_id).subscribe((response: any) => {
-      this.selectedTrIn = response;
-       this.loadingInvoice = false;
+    } else if (TransType == 15) {
+      console.log('=====navigate to 25-SALES INVOICE=====');
+      this.dataService
+        .selectTransferInForInventory(trans_id)
+        .subscribe((response: any) => {
+          this.selectedTrIn = response;
+          this.loadingInvoice = false;
 
-        this.isEditTransferIn = true;
-        this.cdr.detectChanges();
-      console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-    });
-}
-    else if (TransType == 39) {
+          this.isEditTransferIn = true;
+          this.cdr.detectChanges();
+          console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+        });
+    } else if (TransType == 39) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .select_Prepayment_Posting(trans_id)
@@ -505,11 +510,10 @@ else if (TransType == 38) {
           this.cdr.detectChanges();
           console.log(
             this.selecte_prepayment_Data,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
-    } 
-    else if (TransType == 3) {
+    } else if (TransType == 3) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectMiscPayment(trans_id)
@@ -522,7 +526,7 @@ else if (TransType == 38) {
           this.cdr.detectChanges();
           console.log(
             this.selectedmiscellaneousData,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
     }
@@ -547,22 +551,22 @@ else if (TransType == 38) {
     DxDateBoxModule,
     DxSelectBoxModule,
     DxButtonModule,
-      DxPopupModule,
-      ViewJournalVoucherModule,
-      ViewDebitModule,
-      ViewCreditNoteModule,
-  ViewInvoiceModule,
-  ViewCustomerReceiptModule,
-  EditPurchaseInvoiceModule,
-  AddMiscReceiptModule,
-  PrePaymentEditModule,
-  EditSupplierPaymentModule,
-  PurchaseReturnDebitFormModule,
-  AddMiscellaneousPaymentModule,
-  PrepaymentPostingEditModule,
-  TransferOutInventoryAddModule,
-  TransferInInventoryFormModule,
-  EditCustomerReceiptModule,
+    DxPopupModule,
+    ViewJournalVoucherModule,
+    ViewDebitModule,
+    ViewCreditNoteModule,
+    ViewInvoiceModule,
+    ViewCustomerReceiptModule,
+    EditPurchaseInvoiceModule,
+    AddMiscReceiptModule,
+    PrePaymentEditModule,
+    EditSupplierPaymentModule,
+    PurchaseReturnDebitFormModule,
+    AddMiscellaneousPaymentModule,
+    PrepaymentPostingEditModule,
+    TransferOutInventoryAddModule,
+    TransferInInventoryFormModule,
+    EditCustomerReceiptModule,
   ],
   providers: [],
   exports: [],
