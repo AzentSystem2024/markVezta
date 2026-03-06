@@ -442,7 +442,8 @@ console.log(CountryId, 'country id of selected state id')
   updateSupplier() {
     const payload = {
     ...this.supplierData,
-    SUPP_CAT_ID: this.Supplier_Category
+    SUPP_CAT_ID: this.Supplier_Category,
+    PURCH_TYPE : this.purchType
   };
     console.log(payload, 'PAYLOADINEDIT');
     this.dataservice
