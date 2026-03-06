@@ -104,27 +104,6 @@
 //   font-family: "bootstrap-icons";
 //   content: "\f4c4"; /* Unicode for bi-file-earmark-plus */
 // }
-::ng-deep .toolbar-icon-btn.dx-button {
-  width: 40px;
-  height: 35px;
-  border-radius: 8px;
-  background-color: rgba(230, 230, 230, 1);
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-::ng-deep .toolbar-icon-btn .dx-button-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-::ng-deep .toolbar-icon-btn .dx-icon {
-  font-size: 18px;
-  color: rgba(52, 52, 52, 1);
-}
 
 /* =============================== */
 /* EXPORT BUTTON – ICON ONLY */
@@ -227,7 +206,6 @@
 .toolbar-divider {
   width: 1px;
   height: 24px;
-  background-color: rgba(0, 0, 0, 0.15);
   margin: 0 4px;
 }
 
@@ -243,33 +221,6 @@
 }
 
 ::ng-deep .fixed-footer {
-  margin-top: 0px;   /* reduce space above buttons */
-  padding-top: 6px;  /* optional: tighter look */
-}
-
-
-/* Common button size */
-::ng-deep .popup-footer .dx-button {
-  min-width: 90px;
-  height: 36px;
-  font-size: 14px;
-  border-radius: 6px;
-}
-
-/* Cancel button (outlined) */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-normal.dx-button-outlined {
-  background-color: #ffffff;
-  border-color: #cfcfcf;
-  color: #333333;
-}
-
-/* Save button (blue primary) */
-::ng-deep
-  .popup-footer
-  .dx-button.dx-button-default.dx-button-contained {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-  color: #ffffff;
+  margin-top: 0px; /* reduce space above buttons */
+  padding-top: 6px; /* optional: tighter look */
 }

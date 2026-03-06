@@ -101,7 +101,6 @@ export class DepreciationListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -437,7 +436,7 @@ export class DepreciationListComponent {
     this.cdr.detectChanges();
   };
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -463,7 +462,7 @@ export class DepreciationListComponent {
     DepreciationAddModule,
     DepreciationEditModule,
     CommonModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   exports: [DepreciationListComponent],

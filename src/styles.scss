@@ -430,7 +430,7 @@ body {
   background-color: rgba(255, 0, 0, 0.9);
   color: white;
   padding: 5px;
-  border-radius: 4px;
+  border-radius: 8px;
   z-index: 1000;
   white-space: nowrap; // Prevent text wrapping
   font-size: 12px; // Font size
@@ -438,8 +438,18 @@ body {
 .dx-datagrid-header-panel
   .dx-toolbar-text-auto-hide
   .dx-button.dx-button-has-icon {
-  border-radius: 4px;
-  background-color: #00a0e028;
+  border-radius: 8px !important;
+  background-color: var(--toolbar-icon);
+  height: 32px;
+  width: 32px;
+}
+.dx-datagrid-header-panel
+  .dx-toolbar-text-auto-hide
+  .dx-button.dx-button-has-icon:hover {
+  border-radius: 8px;
+  background-color: var(--toolbar-icon-hover-bg);
+  height: 32px;
+  width: 32px;
 }
 .dx-datagrid-headers.dx-datagrid-nowrap.dx-bordered-top-view {
   border-radius: 8px 8px 0 0;
@@ -619,6 +629,7 @@ body {
   flex-grow: 0;
   flex-shrink: 0;
   margin-left: 3px;
+  margin-right: 15px;
 }
 .dx-tabpanel .dx-tabpanel-tab {
   flex-basis: unset;
@@ -637,18 +648,32 @@ body {
 
 .dx-tabpanel .dx-tabpanel-tabs .dx-tabs {
   height: 100%;
-  background-color: var(--tab-bg-color);
+  background-color: var(--base-bg);
   margin-top: 3px;
   border-radius: 5px;
-  margin-left: 8px;
+  margin-left: 12px;
   margin-right: 20px;
   // border: 1px solid var(--border-color);
 }
 
+.dx-tabpanel-tabs-position-top .dx-tabs {
+  border-bottom: none !important;
+}
+.dx-tabs.dx-state-focused .dx-tab.dx-state-focused {
+  background: none !important;
+  color: var(--selected-text-color);
+}
+
+.dx-tab .dx-tab-text .dx-tab-text-span {
+  position: relative;
+  display: block;
+  font-weight: 500;
+  visibility: hidden;
+  font-size: 15px !important;
+}
 .custom-tab .dx-tabs-styling-mode-secondary .dx-tab {
   border-radius: 8px;
-  // background-color: var(--tab-unselected-bg-color);
-  border: 1px solid var(--border-color);
+  background-color: var(--tab-unselected-bg-color);
 }
 
 .custom-tab .dx-tab.dx-tab-selected {
@@ -656,17 +681,22 @@ body {
   color: var(--text-color);
   border-radius: 8px;
 }
+.custom-tab .dx-tab.dx-tab-selected:hover {
+  background-color: var(--tab-selected-bg-color);
+  color: var(--text-color);
+  border-radius: 8px;
+}
 .custom-tab .dx-tab.dx-tab-selected .dx-icon {
-  color: black;
+  color: var(--close-icon-color);
 }
 
 .custom-tab .dx-tabs.dx-state-focused .dx-tab.dx-state-focused {
   background-color: var(--tab-selected-bg-color);
-  color: var(--text-color);
+  color: var(--selected-text-color);
 }
 .custom-tab .dx-tab.dx-state-hover {
   background-color: var(--tab-hover-bg-color);
-  color: var(--text-color);
+  color: var(--selected-text-color);
   // color: black;
 }
 .custom-tab .dx-tabs-wrapper {
@@ -677,29 +707,24 @@ body {
   padding-bottom: 4px;
 }
 .custom-tab .dx-tabpanel-tabs-position-top .dx-tabs {
-  border-bottom: none;
+  border-bottom: none !important;
 }
 
 .innert-tab .dx-tabs-styling-mode-secondary .dx-tab {
-  border: 1px solid var(--border-color);
-  padding: 8px 16px;
+  padding: 8px 10px;
 }
 
-.innert-tab .dx-tab.dx-tab-selected {
-  background-color: var(--tab-selected-bg-color);
-  color: var(--text-color);
-}
 .inner-tab .dx-tab.dx-tab-selected .dx-icon {
   color: black;
 }
 
 .inner-tab .dx-tabs.dx-state-focused .dx-tab.dx-state-focused {
   background-color: var(--tab-selected-bg-color);
-  color: var(--text-color);
+  color: var(--selected-text-color);
 }
 .inner-tab .dx-tab.dx-state-hover {
   background-color: var(--tab-hover-bg-color);
-  color: var(--text-color);
+  color: var(--text-color-tab);
   // color: black;
 }
 .inner-tab .dx-tabs-wrapper {
@@ -765,12 +790,6 @@ body {
 //   background-color: white !important;
 // }
 
-// ::ng-deep.dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected {
-//     background-color: var(--sub-menu-bg-color) !important;
-//     color: var(--sub-menu-color) !important;
-//     border-radius: 15px;
-//     height: 46px;
-// }
 .dx-theme-fluent .dx-datagrid-headers.dx-datagrid-nowrap.dx-bordered-top-view {
   border-radius: 8px 8px 0 0;
   background-color: var(--grid-bg-color);
@@ -786,41 +805,14 @@ body {
   font-weight: bold !important;
 }
 
-//................toolbar-styling..............................//
-/* =============================== */
-/* COMMON TOOLBAR ICON BUTTON */
-/* =============================== */
-
-.toolbar-icon-btn.dx-button {
-  width: 40px;
-  height: 32px;
-  border-radius: 8px;
-  background-color: rgba(230, 230, 230, 1);
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-.toolbar-icon-btn .dx-button-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.toolbar-icon-btn .dx-icon {
-  font-size: 16px;
-  color: rgba(52, 52, 52, 1);
-}
-
 /* =============================== */
 /* EXPORT BUTTON – ICON ONLY */
 /* =============================== */
 
 .export-btn .dx-dropdownbutton {
-  width: 40px;
-  height: 32px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px !important;
   background-color: rgba(230, 230, 230, 1);
   padding: 0;
 }
@@ -868,143 +860,6 @@ body {
   margin-left: 12px;
 }
 
-/* =============================== */
-/* + NEW BUTTON */
-/* =============================== */
-
-.add-button {
-  background-color: #1e88e5;
-  border-radius: 8px;
-  height: 35px;
-  padding: 0 24px;
-  border: none;
-}
-
-.add-button .dx-button-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.add-btn-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #ffffff;
-}
-
-.add-btn-content .iconify {
-  width: 20px;
-  height: 20px;
-  color: #ffffff;
-}
-
-.add-text {
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  white-space: nowrap;
-}
-
-/* =============================== */
-/* TOOLBAR DIVIDER */
-/* =============================== */
-
-.toolbar-divider {
-  width: 1px;
-  height: 24px;
-  background-color: rgba(0, 0, 0, 0.15);
-  margin: 0 4px;
-}
-.toolbar-icon-btn .dx-button-content,
-.export-btn .dx-button-content {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dx-tabs-styling-mode-secondary.dx-tab-indicator-position-top
-  .dx-tab.dx-tab-selected
-  .dx-tab-content::after,
-.dx-tabs-styling-mode-secondary.dx-tab-indicator-position-bottom
-  .dx-tab.dx-tab-selected
-  .dx-tab-content::after {
-  background-color: rgb(71, 158, 245);
-  display: none;
-}
-
-//........................................TAB-PANEL-FORMS..............................................//
-/* ===============================
-   form tab style
-   =============================== */
-
-.dx-theme-fluent .form-tabs.dx-tabpanel {
-  /* ❌ REMOVE DevExtreme hover underline */
-  .dx-tab:hover::after,
-  .dx-tab.dx-state-hover::after {
-    display: none !important;
-    content: none !important;
-  }
-
-  .dx-tabs-styling-mode-secondary
-    .dx-tab.dx-tab-selected
-    .dx-tab-content::after {
-    display: block !important;
-  }
-
-  /* ❌ Also remove hover underline on text if theme applies it */
-  .dx-tab:hover .dx-tab-text::before,
-  .dx-tab.dx-state-hover .dx-tab-text::before {
-    display: none !important;
-  }
-
-  /* 🔥 Kill ALL default tab separators */
-  .dx-tabpanel-tabs,
-  .dx-tabpanel-tabs .dx-tabs {
-    border: none !important;
-    box-shadow: none !important;
-    background-image: none !important;
-  }
-
-  .dx-tabpanel-tabs .dx-tabs::before,
-  .dx-tabpanel-tabs .dx-tabs::after {
-    display: none !important;
-    content: none !important;
-  }
-
-  /* Restore spacing */
-  .dx-tabs-wrapper {
-    display: flex;
-    gap: 24px;
-  }
-
-  .dx-tab {
-    padding: 8px 0 !important;
-    margin: 0 !important;
-    background: transparent !important;
-  }
-
-  /* Tab text */
-  .dx-tab-text {
-    position: relative;
-    padding: 0 2px;
-    white-space: nowrap;
-    font-weight: 500;
-    color: #333;
-  }
-
-  /* Remove any tab-level underline */
-  .dx-tab.dx-tab-selected::after {
-    display: none !important;
-  }
-
-  .dx-tab.dx-tab-selected .dx-tab-text::after {
-    bottom: -3px;
-  }
-}
-
 //=======================================================================================//
 
 .dx-datagrid
@@ -1048,4 +903,148 @@ body {
   display: flex;
   justify-content: center;
   align-items: normal;
+}
+
+::ng-deep {
+  .dx-treeview-item-without-checkbox.dx-state-selected > .dx-treeview-item {
+    /* color: #21293b; */
+    background-color: red !important;
+  }
+}
+//=======================new changes==========================
+
+::ng-deep.dx-button-mode-text {
+  background-color: var(--toolbar-icon);
+  color: #0073d8 !important;
+}
+
+.dx-button.dx-state-hover {
+  background-color: var(--toolbar-icon-hover-bg);
+}
+.dx-button.dx-state-hover,
+.dx-button.dx-state-hover .dx-icon {
+  color: var(--toolbar-icon-hover) !important;
+}
+::ng-deep.dx-datagrid-header-panel
+  .dx-toolbar-text-auto-hide
+  .dx-button.dx-button-has-icon {
+  border-radius: 8px !important;
+}
+.dx-button.dx-button-default {
+  border-radius: 8px !important;
+  background-color: rgb(71, 158, 245) !important;
+  color: #ffff !important;
+  padding-left: 8px;
+  padding-right: 10px;
+}
+.dx-button.dx-button-default:hover {
+  border-radius: 8px !important;
+  background-color: #005cad !important;
+  color: #fff !important;
+  padding-left: 8px;
+  padding-right: 10px;
+}
+
+.grid .dx-button-mode-text {
+  color: #ffffff;
+  border-radius: 25px;
+  background-color: var(--btn-bg-color);
+  // border: 2px solid var(--border-color);
+}
+
+.toolbar-icon-btn.dx-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--toolbar-icon);
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.toolbar-icon-btn.dx-button:hover {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 8px;
+  background-color: var(--toolbar-icon-hover-bg);
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--divider);
+  margin: 0 4px;
+}
+.dx-button-mode-outlined {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #b0b0b0 !important;
+  color: #21293b;
+  border-radius: 8px !important;
+}
+.dx-button-mode-outlined:hover {
+  border-width: 1px;
+  border-style: solid;
+  background-color: #b0b0b0 !important;
+  color: #444444 !important;
+  border-radius: 8px;
+}
+
+.dx-button-mode-text.dx-button-default .dx-icon {
+  color: #e6f1fb !important;
+}
+
+.dx-theme-fluent .form-tabs.dx-tabpanel {
+  /* ❌ REMOVE DevExtreme hover underline */
+  .dx-tab:hover::after,
+  .dx-tab.dx-state-hover::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* ❌ Also remove hover underline on text if theme applies it */
+  .dx-tab:hover .dx-tab-text::before,
+  .dx-tab.dx-state-hover .dx-tab-text::before {
+    display: none !important;
+  }
+
+  /* 🔥 Kill ALL default tab separators */
+  .dx-tabpanel-tabs,
+  .dx-tabpanel-tabs .dx-tabs {
+    border: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+
+  .dx-tabpanel-tabs .dx-tabs::before,
+  .dx-tabpanel-tabs .dx-tabs::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* Restore spacing */
+  .dx-tabs-wrapper {
+    display: flex;
+    gap: 24px;
+  }
+
+  .dx-tab {
+    padding: 8px 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Remove any tab-level underline */
+  .dx-tab.dx-tab-selected::after {
+    display: none !important;
+  }
+
+  .dx-tab.dx-tab-selected .dx-tab-text::after {
+    color: #0073d8;
+    bottom: -3px;
+  }
+}
+
+.dx-tab.dx-tab-selected .dx-tab-text {
+  color: #0073d8;
 }

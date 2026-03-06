@@ -417,12 +417,20 @@
           <dx-button
             text="Add"
             (onClick)="addNewRow()"
-            [width]="120"
             stylingMode="contained"
             type="default"
-            icon="plus"
             hint="New Row"
             style="padding: 8px 8px"
+            ><div *dxTemplate="let data of 'content'">
+              <div class="add-btn-content">
+                <span
+                  class="iconify"
+                  data-icon="formkit:add"
+                  data-width="20"
+                  data-height="20"
+                ></span>
+                <span class="add-text"></span>
+              </div></div
           ></dx-button>
         </div>
         <div style="flex: 1; overflow: hidden">

@@ -147,7 +147,7 @@ export class GrnComponent implements OnInit {
     cellElement.appendChild(icon);
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -181,7 +181,6 @@ export class GrnComponent implements OnInit {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilterRow(),
   };
@@ -270,7 +269,6 @@ export class GrnComponent implements OnInit {
   }
 
   onClickSaveNewData() {
-    
     const data = this.grnNewForm.getNewGrnData();
     console.log(data, 'grn new data');
     data.IS_APPROVED = this.isApproved;
@@ -359,7 +357,7 @@ export class GrnComponent implements OnInit {
   //       );
   //       this.getGrnLogData();
   //       this.isVerifyPopupOpened = false;
-  //     } 
+  //     }
   //     else if (data.IS_APPROVED === true){
   //        this.service.approveGrnData(data).subscribe((res) => {
   //     console.log('data approved', res);
@@ -389,72 +387,73 @@ export class GrnComponent implements OnInit {
   // }
 
   verifyGrnData() {
-  const data = this.grnVerifyForm.getNewGrnData();
-  console.log(data, 'grn verified data');
+    const data = this.grnVerifyForm.getNewGrnData();
+    console.log(data, 'grn verified data');
 
-  this.service.updateGrnData(data).subscribe((res) => {
-    console.log('data verified', res);
+    this.service.updateGrnData(data).subscribe((res) => {
+      console.log('data verified', res);
 
-    //  Step 1: Update success
-    if (res.Message === 'Success') {
+      //  Step 1: Update success
+      if (res.Message === 'Success') {
+        //  Step 2: If approved → call approve API
+        if (this.isApproved === true) {
+          this.service.approveGrnData(data).subscribe((approveRes) => {
+            console.log('data approved', approveRes);
 
-      //  Step 2: If approved → call approve API
-      if (this.isApproved === true) {
-        this.service.approveGrnData(data).subscribe((approveRes) => {
-          console.log('data approved', approveRes);
+            if (approveRes.Message === 'Success') {
+              notify(
+                {
+                  message: 'Data Verified & Approved Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
 
-          if (approveRes.Message === 'Success') {
-            notify(
-              {
-                message: 'Data Verified & Approved Successfully',
-                position: { at: 'top center', my: 'top center' },
-              },
-              'success'
-            );
+              this.getGrnLogData();
+              this.isVerifyPopupOpened = false;
+              this.isApprovePopupOpened = false;
+            } else {
+              notify(
+                {
+                  message: 'Verification done, but Approval failed',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error',
+              );
+            }
+          });
+        }
+        //  Step 3: Only verification
+        else {
+          notify(
+            {
+              message: 'Data Verified Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success',
+          );
 
-            this.getGrnLogData();
-            this.isVerifyPopupOpened = false;
-            this.isApprovePopupOpened = false;
-          } else {
-            notify(
-              {
-                message: 'Verification done, but Approval failed',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'error'
-            );
-          }
-        });
+          this.getGrnLogData();
+          this.isVerifyPopupOpened = false;
+        }
       }
-      //  Step 3: Only verification
+      //  Update failed
       else {
         notify(
           {
-            message: 'Data Verified Successfully',
-            position: { at: 'top center', my: 'top center' },
+            message: 'Your Data Not Verified',
+            position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'error',
         );
-
-        this.getGrnLogData();
-        this.isVerifyPopupOpened = false;
       }
-    }
-    //  Update failed
-    else {
-      notify(
-        {
-          message: 'Your Data Not Verified',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'error'
-      );
-    }
-  });
-}
+    });
+  }
 
   approveGrnData() {
-    console.log("======================================================================================")
+    console.log(
+      '======================================================================================',
+    );
     const data = this.grnApproveForm.getNewGrnData();
     console.log(data, 'grn approved data');
 
@@ -877,7 +876,7 @@ export class GrnComponent implements OnInit {
     DxCheckBoxModule,
     GrnViewFormModule,
     DxDateBoxModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   exports: [],

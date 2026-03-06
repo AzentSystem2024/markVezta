@@ -82,12 +82,11 @@ export class PurchaseReturnDebitComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  id:any;
+  id: any;
 
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
@@ -617,7 +616,7 @@ export class PurchaseReturnDebitComponent {
     }
     this.getpurchaseReturnList();
   }
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -656,7 +655,7 @@ export class PurchaseReturnDebitComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     PurchaseReturnDebitFormModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [PurchaseReturnDebitComponent],

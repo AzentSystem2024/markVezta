@@ -76,15 +76,15 @@
       <!-- Export (built-in, kept) -->
 
       <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
 
       <dxi-item
         name="exportButton"
         location="after"
         cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
 
       <dxi-item
         location="after"
@@ -361,7 +361,7 @@
         text="Cancel"
         stylingMode="outlined"
         type="normal"
-        class="popup-btn cancel-btn"
+        class="popup-btn"
         (onClick)="closePop()"
       ></dx-button>
       <dx-button
@@ -369,7 +369,7 @@
         [disabled]="isSaving"
         stylingMode="contained"
         type="default"
-        class="popup-btn save-btn"
+        class="popup-btn"
         (onClick)="addData()"
       ></dx-button>
 

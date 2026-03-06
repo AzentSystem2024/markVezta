@@ -32,7 +32,6 @@ import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
-
 @Component({
   selector: 'app-article-production-view',
   templateUrl: './article-production-view.component.html',
@@ -42,8 +41,8 @@ export class ArticleProductionViewComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   ArticleProductionDataSource: DataSource;
-articleProductionArray: any[] = [];
-articleProductionCount = 0;
+  articleProductionArray: any[] = [];
+  articleProductionCount = 0;
   isFilterRowVisible: boolean;
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -74,7 +73,6 @@ articleProductionCount = 0;
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilterRow(),
   };
@@ -344,41 +342,40 @@ articleProductionCount = 0;
   }
 
   get_DataSource() {
-  const from = new Date(this.startDate);
-  from.setHours(0, 0, 0, 0);
+    const from = new Date(this.startDate);
+    from.setHours(0, 0, 0, 0);
 
-  const to = new Date(this.EndDate);
-  to.setHours(23, 59, 59, 999);
+    const to = new Date(this.EndDate);
+    to.setHours(23, 59, 59, 999);
 
-  const payload = {
-    COMPANY_ID: this.company_id.join(','),
-    DATE_FROM: from.toISOString(),
-    DATE_TO: to.toISOString(),
-  };
+    const payload = {
+      COMPANY_ID: this.company_id.join(','),
+      DATE_FROM: from.toISOString(),
+      DATE_TO: to.toISOString(),
+    };
 
-  this.ArticleProductionDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.get_ArticleProduction_view(payload).subscribe({
-          next: (res: any) => {
-            const list = res?.data || [];
+    this.ArticleProductionDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.get_ArticleProduction_view(payload).subscribe({
+            next: (res: any) => {
+              const list = res?.data || [];
 
-            //  cache for logic / counts
-            this.articleProductionArray = list;
-            this.articleProductionCount = list.length;
+              //  cache for logic / counts
+              this.articleProductionArray = list;
+              this.articleProductionCount = list.length;
 
-            resolve(list);
-          },
-          error: () => {
-            this.articleProductionArray = [];
-            this.articleProductionCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(list);
+            },
+            error: () => {
+              this.articleProductionArray = [];
+              this.articleProductionCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   summaryColumnsData = {
     totalItems: [
@@ -407,7 +404,7 @@ articleProductionCount = 0;
     },
   };
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -436,7 +433,7 @@ articleProductionCount = 0;
     DxNumberBoxModule,
     DxTagBoxModule,
     DxDateBoxModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   exports: [],

@@ -91,7 +91,6 @@ export class CustomerReceiptsComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -608,7 +607,6 @@ export class CustomerReceiptsComponent {
     this.getCustomerReceipts();
   }
 
-  
   onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
@@ -651,7 +649,7 @@ export class CustomerReceiptsComponent {
     AddCutomerReceiptModule,
     EditCustomerReceiptModule,
     ViewCustomerReceiptModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [CustomerReceiptsComponent],

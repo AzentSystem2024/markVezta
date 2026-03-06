@@ -71,7 +71,6 @@ export class SalesOrderComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -578,7 +577,7 @@ export class SalesOrderComponent {
     this.getsalesOrderList();
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -618,7 +617,7 @@ export class SalesOrderComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     SalesOrderFormModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [SalesOrderComponent],

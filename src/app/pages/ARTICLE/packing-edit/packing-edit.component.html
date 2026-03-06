@@ -357,33 +357,32 @@
             </dx-select-box>
           </div>
         </div>
-        <div style="display: flex">
-          <dx-check-box
-            text="Inactive"
-            [(value)]="PackingData.IS_INACTIVE"
-          ></dx-check-box>
 
-          <dx-check-box
-            text="Any Combination"
-            [(value)]="PackingData.IS_ANY_COMB"
-          ></dx-check-box>
-          <!-- <dx-check-box text="Purchasable Item"      [(value)]="PackingData.IS_PURCHASABLE"></dx-check-box> -->
+        <dx-check-box
+          text="Inactive"
+          [(value)]="PackingData.IS_INACTIVE"
+        ></dx-check-box>
 
-          <dx-check-box
-            text="Export"
-            [(value)]="PackingData.IS_EXPORT"
-          ></dx-check-box>
-        </div>
+        <dx-check-box
+          text="Any Combination"
+          [(value)]="PackingData.IS_ANY_COMB"
+        ></dx-check-box>
+        <!-- <dx-check-box text="Purchasable Item"      [(value)]="PackingData.IS_PURCHASABLE"></dx-check-box> -->
+
+        <dx-check-box
+          text="Export"
+          [(value)]="PackingData.IS_EXPORT"
+        ></dx-check-box>
       </div>
 
       <div class="image-grid-wrapper">
         <div class="combination">
           <dx-button
-            text="Clear"
-            hind="clear form"
+            text="Reset"
+            hind="Reset form"
             stylingMode="outlined"
             (onClick)="clearForm()"
-            type="default"
+            style="border-color: #ffc3c3 !important; color: #ff2c2c"
           ></dx-button>
           <dx-button
             text="Load Article"
@@ -483,15 +482,24 @@
       >
         <div style="display: flex; justify-content: flex-end; margin: 10px 0">
           <dx-button
-            text="Add"
             (onClick)="addNewRow()"
             [width]="120"
             stylingMode="contained"
             type="default"
-            icon="plus"
             hint="New Row"
             style="padding: 8px 8px"
-          ></dx-button>
+            ><div *dxTemplate="let data of 'content'">
+              <div class="add-btn-content">
+                <span
+                  class="iconify"
+                  data-icon="formkit:add"
+                  data-width="20"
+                  data-height="20"
+                ></span>
+                <span class="add-text">New</span>
+              </div>
+            </div></dx-button
+          >
         </div>
         <div style="flex: 1; overflow: hidden">
           <dx-data-grid

@@ -26,28 +26,6 @@
   color: green;
 }
 
-::ng-deep .toolbar-icon-btn.dx-button {
-  width: 40px;
-  height: 35px;
-  border-radius: 8px;
-  background-color: rgba(230, 230, 230, 1);
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-::ng-deep .toolbar-icon-btn .dx-button-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-::ng-deep .toolbar-icon-btn .dx-icon {
-  font-size: 18px;
-  color: rgba(52, 52, 52, 1);
-}
-
 /* =============================== */
 /* EXPORT BUTTON – ICON ONLY */
 /* =============================== */
@@ -142,17 +120,6 @@
   white-space: nowrap;
 }
 
-/* =============================== */
-/* TOOLBAR DIVIDER */
-/* =============================== */
-
-.toolbar-divider {
-  width: 1px;
-  height: 24px;
-  background-color: rgba(0, 0, 0, 0.15);
-  margin: 0 4px;
-}
-
 .form-popup-buttons-container {
   padding: 10px 20px 10px;
 }
@@ -168,18 +135,4 @@
   height: 36px;
   font-size: 14px;
   border-radius: 6px;
-}
-
-/* Cancel button look */
-.cancel-btn.dx-button {
-  color: #333;
-  border-color: #cfcfcf;
-  background-color: #fff;
-}
-
-/* Save button look */
-.save-btn.dx-button {
-  background-color: #0d6efd; /* DevExtreme blue */
-  border-color: #0d6efd;
-  color: #fff;
 }

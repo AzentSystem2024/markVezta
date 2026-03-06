@@ -108,7 +108,6 @@ export class PackingComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
@@ -304,7 +303,7 @@ export class PackingComponent {
   }
 
   delete_Packing_Data(event: any) {
-    console.log(event)
+    console.log(event);
     const id = event.data.ID;
     event.cancel = true;
     this.dataService.Delete_Package_Api(id).subscribe((res: any) => {

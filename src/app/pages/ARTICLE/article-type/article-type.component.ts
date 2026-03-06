@@ -28,8 +28,6 @@ import { DepartmentFormModule } from 'src/app/components/library/department-form
 import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
 
-
-
 @Component({
   selector: 'app-article-type',
   templateUrl: './article-type.component.html',
@@ -98,7 +96,6 @@ export class ArticleTypeComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilterRow(),
   };
@@ -206,33 +203,32 @@ export class ArticleTypeComponent {
   }
   //===================get data list========================
   get_ArticleType_List() {
-  this.Datasource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.get_ArticleType_Api().subscribe({
-          next: (res: any) => {
-            const data = (res?.Data || []).map(
-              (item: any, index: number) => ({
-                ...item,
-                SlNo: index + 1,
-              }),
-            );
+    this.Datasource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.get_ArticleType_Api().subscribe({
+            next: (res: any) => {
+              const data = (res?.Data || []).map(
+                (item: any, index: number) => ({
+                  ...item,
+                  SlNo: index + 1,
+                }),
+              );
 
-            this.articleTypeList = data;           // ✅ array logic
-            this.articleTypeRowCount = data.length;
+              this.articleTypeList = data; // ✅ array logic
+              this.articleTypeRowCount = data.length;
 
-            resolve(data);                         // 🔑 grid loader stops
-          },
-          error: () => {
-            this.articleTypeList = [];
-            this.articleTypeRowCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(data); // 🔑 grid loader stops
+            },
+            error: () => {
+              this.articleTypeList = [];
+              this.articleTypeRowCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   addData() {
     const validationResult = this.formValidationGroup?.instance?.validate();
@@ -358,7 +354,6 @@ export class ArticleTypeComponent {
     const fileName = 'article_type';
     this.dataservice.exportDataGrid(event, fileName);
   }
-
 }
 
 @NgModule({

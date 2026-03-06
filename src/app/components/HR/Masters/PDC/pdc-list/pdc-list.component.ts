@@ -125,7 +125,6 @@ export class PdcListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -201,7 +200,6 @@ export class PdcListComponent {
 
     this.sesstion_Details();
 
-
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -213,11 +211,9 @@ export class PdcListComponent {
     this.entrycustomStartDate = SystemDate;
     this.entrycustomEndDate = SystemDate;
     this.get_PDC_list();
-
-
   }
 
-   //================ Year value change ===================
+  //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
     this.selectedmonth = '';
@@ -366,7 +362,7 @@ export class PdcListComponent {
     private ngZone: NgZone,
     private router: Router,
   ) {
-     const currentYear = new Date().getFullYear();
+    const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
@@ -529,7 +525,7 @@ export class PdcListComponent {
     this.showEntryCustomDatePopup = false;
 
     this.applyAllFilters(); // Handles everything centrally
-    this.get_PDC_list('custom')
+    this.get_PDC_list('custom');
   }
 
   onTypeChanged(event: any) {
@@ -677,7 +673,7 @@ export class PdcListComponent {
     );
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -735,7 +731,7 @@ export class PdcListComponent {
     DxNumberBoxModule,
     PdcAddFormModule,
     PdcEditFormModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [PdcListComponent],

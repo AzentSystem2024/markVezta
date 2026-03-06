@@ -97,7 +97,6 @@ export class CreditNoteListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -236,7 +235,7 @@ export class CreditNoteListComponent {
     this.getCreditNotes();
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -667,7 +666,7 @@ export class CreditNoteListComponent {
     AddCreditNoteModule,
     EditCreditNoteModule,
     ViewCreditNoteModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [CreditNoteListComponent],

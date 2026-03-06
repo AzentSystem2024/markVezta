@@ -25,7 +25,7 @@
         padding-left: 5px;
         flex-direction: row-reverse;
         border-radius: 8px;
-        min-height: 36px; /* instead of fixed height */
+        min-height: 46px; /* instead of fixed height */
         margin-top: 3px;
         align-items: center;
         white-space: normal; /* allow wrapping */
@@ -86,6 +86,14 @@
     // ##
   }
 }
+.dx-treeview
+  .dx-treeview-node[aria-level="2"]
+  > .dx-treeview-item.dx-state-selected {
+  background-color: var(--sub-menu-bg-color) !important;
+  color: var(--sub-menu-color) !important;
+  border-radius: 8px;
+  height: 46px;
+}
 // dx-tree-view{
 //   background-color: #a7cff7;
 // }
@@ -103,72 +111,32 @@
 //   right: 0 !important;
 // }
 
-// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-hover {
-//    background-color:var(--sub-menu-bg-color)!important;
-//     color: var(--sub-menu-color) !important; /* dark blue text */
-//   border-radius: 15px;
-//   height: 46px;
-//   // margin-left: 50px;
-// }
-
-// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="1"] > .dx-treeview-item.dx-state-hover  {
-//    background-color:var(--bg-side-panel)!important;
-
-//   border-radius: 8px;
-//   height: 46px;
-
-// }
-
-// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-hover,
-// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="3"] > .dx-treeview-item.dx-state-hover {
-//    background-color: var(--sub-menu-bg-color)!important;
-//   // border-radius: 8px;
-
-// }
-// /* 🌟 SELECTED (level 2 and 3) */
-// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected,
-// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="3"] > .dx-treeview-item.dx-state-selected {
-//   background-color: var(--sub-menu-bg-color) !important;
-//   // border-radius: 8px!important;
-//   //  color: rgba(25, 108, 153, 1) !important; /* dark blue text */
-
-// }
-
-// /* ✅ FORCE text color for selected item text (DevExtreme overrides this) */
-// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="2"] > .dx-treeview-item.dx-state-selected .dx-item-content,
-// ::ng-deep .dx-treeview .dx-treeview-node[aria-level="3"] > .dx-treeview-item.dx-state-selected .dx-item-content {
-//   color: rgba(25, 108, 153, 1) !important;
-// }
-
-// ::ng-deep .dx-treeview-item.dx-state-focused:not(.dx-state-selected) .dx-item-content {
-//   color: inherit !important;
-//   background: transparent !important;
-// }
-
-/* 🔥 RESET ALL submenu text color */
-::ng-deep .dx-treeview-node[aria-level="2"] .dx-item-content,
-::ng-deep .dx-treeview-node[aria-level="3"] .dx-item-content {
-  color: var(--toobar-button-text) !important;
-}
-
-/* 🔥 ONLY selected item should be blue */
 ::ng-deep
+  .dx-treeview
   .dx-treeview-node[aria-level="2"]
-  > .dx-treeview-item.dx-state-selected
-  .dx-item-content,
+  > .dx-treeview-item.dx-state-hover {
+  color: var(--select-menu-text-color);
+  background-color: var(--select-menu-bg-color) !important;
+  border-radius: 8px;
+  height: 46px;
+  // margin-left: 50px;
+}
 ::ng-deep
-  .dx-treeview-node[aria-level="3"]
-  > .dx-treeview-item.dx-state-selected
-  .dx-item-content {
-  color: rgba(25, 108, 153, 1) !important;
-  height: 0 !important;
+  .dx-treeview
+  .dx-treeview-node[aria-level="2"]
+  > .dx-treeview-item.dx-state-selected {
+  background-color: var(--sub-menu-bg-color) !important;
+  color: var(--sub-menu-color) !important; /* dark blue text */
+  border-radius: 8px;
+  // margin-left: 50px;
 }
 
-/* 🔥 kill focus styling completely */
-::ng-deep .dx-treeview-item.dx-state-focused {
-  background: transparent !important;
-}
+//==================new changes========================
 
-::ng-deep .dx-treeview-item.dx-state-focused .dx-item-content {
-  color: #333 !important;
+::ng-deep {
+  .dx-treeview-item-without-checkbox.dx-state-selected > .dx-treeview-item {
+    color: var(--select-menu-text-color);
+    background-color: var(--select-menu-bg-color) !important;
+    height: 46px;
+  }
 }

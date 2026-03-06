@@ -21,7 +21,6 @@ import { CommonModule } from '@angular/common';
 import DataSource from 'devextreme/data/data_source';
 import { Router } from '@angular/router';
 
-
 @Component({
   selector: 'app-subcategory-list',
   templateUrl: './subcategory-list.component.html',
@@ -49,14 +48,18 @@ export class SubcategoryListComponent {
   editSubcategory: boolean = false;
   selected_Company_id: any;
   isFilterOpened = false;
-   canAdd = false;
+  canAdd = false;
   canEdit = false;
   canView = false;
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  
-  constructor(private dataService: DataService, private ngZone: NgZone,private router: Router,) {}
+
+  constructor(
+    private dataService: DataService,
+    private ngZone: NgZone,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -95,15 +98,14 @@ export class SubcategoryListComponent {
     this.isAddSubcategoryPopupOpened = true;
   }
 
-   searchButtonOptions = {
+  searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
 
-   toggleFilters() {
+  toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
     const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
@@ -114,7 +116,7 @@ export class SubcategoryListComponent {
     }
   }
 
-   refreshButtonOptions = {
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
@@ -124,14 +126,14 @@ export class SubcategoryListComponent {
     text: '',
   };
 
-    refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
     this.getSubCategory();
   }
 
- addButtonOptions = {
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
@@ -154,32 +156,31 @@ export class SubcategoryListComponent {
   };
 
   getSubCategory() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id,
-  };
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
 
-  this.SubCategoryDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataService.getSubCategoryData(payload).subscribe({
-          next: (response: any[]) => {
-            const list = response || [];
+    this.SubCategoryDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.getSubCategoryData(payload).subscribe({
+            next: (response: any[]) => {
+              const list = response || [];
 
-            this.subCategoryArray = list;        // cache
-            this.subCategoryCount = list.length;
+              this.subCategoryArray = list; // cache
+              this.subCategoryCount = list.length;
 
-            resolve(list);                       // 🔑 stops dx loader
-          },
-          error: () => {
-            this.subCategoryArray = [];
-            this.subCategoryCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(list); // 🔑 stops dx loader
+            },
+            error: () => {
+              this.subCategoryArray = [];
+              this.subCategoryCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
@@ -210,13 +211,13 @@ export class SubcategoryListComponent {
     // Check for duplicates in CategoryList
     const isCodeDuplicate = this.subCategoryArray.some(
       // (item: any) => item.CODE === commonDetails.code
-      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
+      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
     );
 
     const isDescriptionDuplicate = this.subCategoryArray.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) =>
-        item.SUBCAT_NAME.toLowerCase() === SUBCAT_NAME.toLowerCase()
+        item.SUBCAT_NAME.toLowerCase() === SUBCAT_NAME.toLowerCase(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -226,7 +227,7 @@ export class SubcategoryListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -236,7 +237,7 @@ export class SubcategoryListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -246,13 +247,13 @@ export class SubcategoryListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
 
     this.dataService
-      .postSubCategoryData(CODE, SUBCAT_NAME,CAT_ID, DEPT_ID, COMPANY_ID)
+      .postSubCategoryData(CODE, SUBCAT_NAME, CAT_ID, DEPT_ID, COMPANY_ID)
       .subscribe((response) => {
         console.log(response, '}}}}}}}}}}}}}}}}}}]]]]]]]]');
         this.getSubCategory();
@@ -263,7 +264,7 @@ export class SubcategoryListComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          'success'
+          'success',
         );
       });
   }
@@ -302,7 +303,7 @@ export class SubcategoryListComponent {
               message: ' Delete operation successfull',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.getSubCategory();
@@ -312,7 +313,7 @@ export class SubcategoryListComponent {
               message: 'Delete operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -329,7 +330,7 @@ export class SubcategoryListComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 

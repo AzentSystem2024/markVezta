@@ -131,7 +131,6 @@
           icon: 'search',
           hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
           onClick: toggleFilterRow,
-          stylingMode: 'contained',
           elementAttr: { class: 'toolbar-icon-btn' },
         }"
       ></dxi-item>
@@ -142,18 +141,16 @@
         [options]="refreshButtonOptions"
       ></dxi-item>
 
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
-
       <!-- Export (built-in, kept) -->
       <dxi-item
         name="exportButton"
         location="after"
         cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
-
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
       <!-- Add -->
       <dxi-item
         location="after"

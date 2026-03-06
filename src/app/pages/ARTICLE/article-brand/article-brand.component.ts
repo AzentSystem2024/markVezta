@@ -40,9 +40,9 @@ export class ArticleBrandComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  Datasource: DataSource;          // for grid + loader
-  articleBrandList: any[] = [];    // for forEach / validation
-  articleBrandRowCount = 0;        // for UI conditions
+  Datasource: DataSource; // for grid + loader
+  articleBrandList: any[] = []; // for forEach / validation
+  articleBrandRowCount = 0; // for UI conditions
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
   showFilterRow: boolean = true;
@@ -101,7 +101,6 @@ export class ArticleBrandComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilterRow(),
   };
@@ -209,33 +208,32 @@ export class ArticleBrandComponent {
   }
   //===================get data list========================
   get_ArticleBrand_List() {
-  this.Datasource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.get_ArticleBrand_Api().subscribe({
-          next: (res: any) => {
-            const data = (res?.Data || []).map(
-              (item: any, index: number) => ({
-                ...item,
-                SlNo: index + 1,
-              }),
-            );
+    this.Datasource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.get_ArticleBrand_Api().subscribe({
+            next: (res: any) => {
+              const data = (res?.Data || []).map(
+                (item: any, index: number) => ({
+                  ...item,
+                  SlNo: index + 1,
+                }),
+              );
 
-            this.articleBrandList = data;           // ✅ array logic
-            this.articleBrandRowCount = data.length;
+              this.articleBrandList = data; // ✅ array logic
+              this.articleBrandRowCount = data.length;
 
-            resolve(data);                          // 🔑 grid loader stops
-          },
-          error: () => {
-            this.articleBrandList = [];
-            this.articleBrandRowCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(data); // 🔑 grid loader stops
+            },
+            error: () => {
+              this.articleBrandList = [];
+              this.articleBrandRowCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   addData() {
     const validationResult = this.formValidationGroup?.instance?.validate();

@@ -33,7 +33,7 @@ import {
 } from '../customer-form/customer-form.component';
 import { CustomerEditFormModule } from '../customer-edit-form/customer-edit-form.component';
 import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.component';
-import { Router } from '@angular/router'
+import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
 @Component({
   selector: 'app-customer-list',
@@ -81,7 +81,6 @@ export class CustomerListComponent {
   showNavButtons = true;
   addButtonOptions = {
     type: 'default',
-    stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
       this.ngZone.run(() => this.addCustomer());
@@ -103,7 +102,6 @@ export class CustomerListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
@@ -111,7 +109,6 @@ export class CustomerListComponent {
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
   };
@@ -213,7 +210,6 @@ export class CustomerListComponent {
     this.dataservice.exportDataGrid(event, fileName);
   }
 
-
   addCustomer() {
     this.isAddCustomerPopupOpened = true;
     this.sesstion_Details();
@@ -263,37 +259,34 @@ export class CustomerListComponent {
     );
   }
   showCustomer() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id,
-  };
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
 
-  this.CustomerDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getCustomerData(payload).subscribe({
-          next: (response: any[]) => {
-            const data = (response || []).map(
-              (item: any, index: number) => ({
+    this.CustomerDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getCustomerData(payload).subscribe({
+            next: (response: any[]) => {
+              const data = (response || []).map((item: any, index: number) => ({
                 ...item,
                 SNO: index + 1,
-              }),
-            );
+              }));
 
-            this.customerList = data;           // ✅ array cache
-            this.customerRowCount = data.length;
+              this.customerList = data; // ✅ array cache
+              this.customerRowCount = data.length;
 
-            resolve(data);                      // 🔑 stop grid loader
-          },
-          error: () => {
-            this.customerList = [];
-            this.customerRowCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(data); // 🔑 stop grid loader
+            },
+            error: () => {
+              this.customerList = [];
+              this.customerRowCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   // showCustomer(){
   //    this.dataservice.getCustomerData().subscribe(

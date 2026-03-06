@@ -68,12 +68,11 @@ export class ItemProperty2ListComponent {
     authservice: AuthService,
     private exportService: ExportService,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.itemlabel = authservice.getsettingsData().ITEM_PROPERTY2;
-   
+
     this.sesstion_Details();
-  
   }
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -82,31 +81,31 @@ export class ItemProperty2ListComponent {
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
     console.log(
       this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1=============='
+      '============ITEM_PROPERTY1==============',
     );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
     console.log(
       this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2=============='
+      '============ITEM_PROPERTY2==============',
     );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
     console.log(
       this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3=============='
+      '============ITEM_PROPERTY3==============',
     );
 
     this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
     console.log(
       this.ITEM_PROPERTY4,
-      '============ITEM_PROPERTY4=============='
+      '============ITEM_PROPERTY4==============',
     );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
     console.log(
       this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5=============='
+      '============ITEM_PROPERTY5==============',
     );
   }
 
@@ -123,15 +122,14 @@ export class ItemProperty2ListComponent {
     this.cdr.detectChanges();
   };
 
-    searchButtonOptions = {
+  searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
 
-   toggleFilters() {
+  toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
     const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
@@ -142,7 +140,7 @@ export class ItemProperty2ListComponent {
     }
   }
 
-   refreshButtonOptions = {
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
@@ -152,7 +150,7 @@ export class ItemProperty2ListComponent {
     text: '',
   };
 
-    refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
@@ -182,7 +180,7 @@ export class ItemProperty2ListComponent {
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     console.log(
       this.GST_PERC,
-      '===========selected GST PERC==================='
+      '===========selected GST PERC===================',
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -195,31 +193,31 @@ export class ItemProperty2ListComponent {
     // );
   }
   showItemProperty2() {
-  const payload = {
-    COMPANY_ID: this.companyID,
-  };
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
 
-  this.ItemProperty2DataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getItemProperty2Data(payload).subscribe({
-          next: (response: any[]) => {
-            const list = response || [];
+    this.ItemProperty2DataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getItemProperty2Data(payload).subscribe({
+            next: (response: any[]) => {
+              const list = response || [];
 
-            this.itemProperty2Array = list;    // cache for logic
-            this.itemProperty2Count = list.length;
+              this.itemProperty2Array = list; // cache for logic
+              this.itemProperty2Count = list.length;
 
-            resolve(list);                     // 🔑 stops grid loader
-          },
-          error: () => {
-            this.itemProperty2Array = [];
-            this.itemProperty2Count = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(list); // 🔑 stops grid loader
+            },
+            error: () => {
+              this.itemProperty2Array = [];
+              this.itemProperty2Count = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onClickSaveItemProperty2() {
     const { CODE, DESCRIPTION, COMPANY_ID } =
@@ -229,13 +227,13 @@ export class ItemProperty2ListComponent {
     // Check for duplicates in CategoryList
     const isCodeDuplicate = this.itemProperty2Array.some(
       // (item: any) => item.CODE === commonDetails.code
-      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
+      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
     );
 
     const isDescriptionDuplicate = this.itemProperty2Array.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) =>
-        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase()
+        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -245,7 +243,7 @@ export class ItemProperty2ListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -255,7 +253,7 @@ export class ItemProperty2ListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -265,7 +263,7 @@ export class ItemProperty2ListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -281,7 +279,7 @@ export class ItemProperty2ListComponent {
               position: { at: 'top right', my: 'top right' },
               displayTime: 1000,
             },
-            'success'
+            'success',
           );
         }
       });
@@ -304,7 +302,7 @@ export class ItemProperty2ListComponent {
               message: 'Delete operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.showItemProperty2();
@@ -314,7 +312,7 @@ export class ItemProperty2ListComponent {
               message: 'Delete operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });

@@ -62,7 +62,7 @@ export class PrePaymentListComponent {
   selectprepayment: any;
   PrepaymentId: any;
   selected_Company_id: any;
-   dateRanges = [
+  dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
     { label: 'Last 7 Days', value: 'last7' },
@@ -88,7 +88,6 @@ export class PrePaymentListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilterRow(),
   };
@@ -136,7 +135,7 @@ export class PrePaymentListComponent {
     }
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -446,7 +445,6 @@ export class PrePaymentListComponent {
 
     return item.label;
   };
-
 }
 
 @NgModule({
@@ -470,7 +468,7 @@ export class PrePaymentListComponent {
     DxNumberBoxModule,
     PrePaymentAddModule,
     PrePaymentEditModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [PrePaymentListComponent],
