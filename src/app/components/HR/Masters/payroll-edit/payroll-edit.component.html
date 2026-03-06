@@ -23,7 +23,7 @@
         allowAdding: true,
         allowDeleting: true,
         allowUpdating: true,
-        useIcons: true
+        useIcons: true,
       }"
       (onEditorPreparing)="onEditorPreparing($event)"
       (onContentReady)="onContentReady($event)"
@@ -132,7 +132,7 @@
         [lookup]="{
           dataSource: salaryHeadList,
           valueExpr: 'ID',
-          displayExpr: 'HEAD_NAME'
+          displayExpr: 'HEAD_NAME',
         }"
       >
       </dxi-column>

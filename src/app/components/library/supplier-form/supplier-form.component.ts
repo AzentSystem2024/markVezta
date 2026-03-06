@@ -12,6 +12,7 @@ import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.compone
 import {
   DxCheckBoxModule,
   DxDataGridComponent,
+  DxRadioGroupModule,
   DxValidationGroupComponent,
   DxValidatorModule,
 } from 'devextreme-angular';
@@ -41,6 +42,7 @@ export class SupplierFormComponent implements OnInit {
 
   CountryDropdownData: any[] = [];
   VATRuleDropdownData: any[] = [];
+  SupplierCategory:any[] = [];
   PaymentTermsDropdownData: any[] = [];
   CurrencyDropdownData: any[] = [];
   StateDropdownData: any[] = [];
@@ -80,6 +82,8 @@ export class SupplierFormComponent implements OnInit {
     CURRENCY_ID: '',
     PAY_TERM_ID: '',
     VAT_RULE_ID: '',
+    SUPP_CAT_ID:'',
+    PURCH_TYPE:'',
     IS_COMPANY_BRANCH: false,
     // Supplier_cost:''
     Supplier_cost: [] as { COST_ID: number; SUPP_ID: number }[],
@@ -89,6 +93,11 @@ export class SupplierFormComponent implements OnInit {
   CountryId: any;
   PaymentTerms: any;
   PaymentId: any;
+
+  purchaseTypeOptions = [
+  { text: 'Local Purchase', value: '1' },
+  { text: 'Interstate Purchase', value: '2' }
+];
 
   constructor(private service: DataService, authservice: AuthService) {
     this.stateLabel = authservice.getsettingsData().STATE_LABEL;
@@ -200,6 +209,19 @@ export class SupplierFormComponent implements OnInit {
       console.log('dropdown', this.VATRuleDropdownData);
     });
   }
+
+    getSuppliercategoryDropDown() {
+    const payload = {
+      NAME: 'SUPPLIER_CATEGORY',
+      // COMPANY_ID: this.selected_Company_id,
+    };
+
+    this.service.getDropdownData(payload).subscribe((data: any) => {
+      this.SupplierCategory = data;
+      console.log('dropdown', this.SupplierCategory);
+    });
+  }
+
   getPaymentTerms() {
     this.service.getPaymentTermsData().subscribe((response) => {
       this.PaymentTermsDropdownData = response;
@@ -284,6 +306,7 @@ export class SupplierFormComponent implements OnInit {
     this.getPaymentTerms();
     //  this.showCountry();
     this.getVATRuleDropDown();
+    this.getSuppliercategoryDropDown();
     this.getStateDropDown();
     this.getCurrency();
     this.getCurrency_Dropdown();
@@ -341,6 +364,7 @@ export class SupplierFormComponent implements OnInit {
   imports: [
     BrowserModule,
     DxSelectBoxModule,
+    DxRadioGroupModule,
     DxTextAreaModule,
     DxDateBoxModule,
     DxFormModule,
