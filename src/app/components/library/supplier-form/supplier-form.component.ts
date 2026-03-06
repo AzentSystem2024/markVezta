@@ -83,7 +83,7 @@ export class SupplierFormComponent implements OnInit {
     PAY_TERM_ID: '',
     VAT_RULE_ID: '',
     SUPP_CAT_ID:'',
-    PURCH_TYPE:'',
+    PURCH_TYPE:0,
     IS_COMPANY_BRANCH: false,
     // Supplier_cost:''
     Supplier_cost: [] as { COST_ID: number; SUPP_ID: number }[],
@@ -95,8 +95,8 @@ export class SupplierFormComponent implements OnInit {
   PaymentId: any;
 
   purchaseTypeOptions = [
-  { text: 'Local Purchase', value: '1' },
-  { text: 'Interstate Purchase', value: '2' }
+  { text: 'Local Purchase', value: 1 },
+  { text: 'Interstate Purchase', value: 2 }
 ];
 
   constructor(private service: DataService, authservice: AuthService) {

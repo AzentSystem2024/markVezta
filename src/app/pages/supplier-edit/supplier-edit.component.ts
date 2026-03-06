@@ -113,8 +113,8 @@ export class SupplierEditComponent {
   Supplier_Category: any;
 purchType: number = 0;
     purchaseTypeOptions = [
-  { text: 'Local Purchase', value: '1' },
-  { text: 'Interstate Purchase', value: '2' }
+  { text: 'Local Purchase', value: 1 },
+  { text: 'Interstate Purchase', value: 2 }
 ];
 
   constructor(
@@ -189,7 +189,11 @@ purchType: number = 0;
         if (changes['supplierData'] && changes['supplierData'].currentValue) {
           console.log('SupplierData:', this.supplierData);
       this.Supplier_Category = this.supplierData.SUPP_CAT_ID
-      this.purchType = Number(this.supplierData.PURCH_TYPE)
+     setTimeout(() => {
+      this.purchType = Number(this.supplierData.PURCH_TYPE);
+      console.log('Radio value:', this.purchType);
+      this.cdr.detectChanges();
+    });
           //  this.get_Country_Dropdown_List()
             this.get_State_Dropdown_List()
             
