@@ -125,6 +125,7 @@
           </div>
         </dxi-item>
       </dxi-item>
+
       <!-- <dxi-item>
         <div *dxTemplate style="display: flex">
           <dx-text-box
@@ -196,9 +197,30 @@
         </div>
       </dxi-item>
     </dxi-item>
-
     <dxi-item itemType="group" [colCount]="1">
       <dxi-item>
+        <div *dxTemplate>
+          <dx-select-box
+            label="Category*"
+            [items]="SupplierCategory"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="newSupplier.SUPP_CAT_ID"
+            placeholder="Select Category"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Select SupplierCategory"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item>
+
+      <!-- <dxi-item>
         <div *dxTemplate>
           <dx-check-box
             [(value)]="newSupplier.IS_COMPANY_BRANCH"
@@ -208,7 +230,7 @@
             labelMode="floating"
           ></dx-check-box>
         </div>
-      </dxi-item>
+      </dxi-item> -->
     </dxi-item>
   </dxi-item>
 
@@ -438,6 +460,56 @@
           labelMode="floating"
         ></dx-text-area>
       </div>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <!-- <dxi-item>
+        <div *dxTemplate>
+          <dx-select-box
+            label="Category*"
+            [items]="SupplierCategory"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="newSupplier.SUPP_CAT_ID"
+            placeholder="Select Category"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Select SupplierCategory"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item> -->
+
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-radio-group
+            [items]="purchaseTypeOptions"
+            displayExpr="text"
+            valueExpr="value"
+            layout="horizontal"
+            [(value)]="newSupplier.PURCH_TYPE"
+          >
+          </dx-radio-group>
+        </div>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-check-box
+            [(value)]="newSupplier.IS_COMPANY_BRANCH"
+            text="Company Branch"
+            stylingMode="outlined"
+            hint="Company Branch"
+            labelMode="floating"
+          ></dx-check-box>
+        </div>
+      </dxi-item>
     </dxi-item>
   </dxi-item>
 
