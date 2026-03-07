@@ -86,27 +86,7 @@
                 <div style="height: 40px"></div>
 
                 <!-- Address row -->
-                <div
-                  style="
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 5px;
-                    margin-top: -4px;
-                  "
-                >
-                  <dx-select-box
-                    [(value)]="salesOrderFormData.SUBDEALER_ID"
-                    [dataSource]="subDealerList"
-                    displayExpr="SUBDEALER"
-                    valueExpr="ID"
-                    [width]="'100%'"
-                    [searchEnabled]="true"
-                    label="Sub Dealer"
-                    labelMode="floating"
-                    [readOnly]="isReadOnlyMode"
-                    (onValueChanged)="onSuDealerValueChanged($event)"
-                  ></dx-select-box>
-                </div>
+
                 <div
                   style="
                     display: flex;
