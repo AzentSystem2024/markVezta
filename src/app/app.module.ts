@@ -1015,6 +1015,10 @@ import {
   CustomDatePopupComponent,
   CustomDatePopupModule,
 } from './custom-date-popup/custom-date-popup.component';
+import {
+  MiscellaneousInvoiceComponent,
+  MiscellaneousInvoiceModule,
+} from './pages/miscellaneous-invoice/miscellaneous-invoice.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1383,6 +1387,7 @@ import {
     SaleReturnModule,
     SaleReturnFormModule,
     CustomDatePopupModule,
+    MiscellaneousInvoiceModule,
   ],
   providers: [
     AuthService,
