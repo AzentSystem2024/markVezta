@@ -114,13 +114,18 @@
   overflow: hidden;
 }
 ::ng-deep .blue-outline-btn.dx-button {
-  border: 1px solid #007bff !important; /* blue border */
-  // color: #007bff !important;           /* blue text */
+  border: none !important; /* blue border */
+  color: #0056a2 !important;
+  background-color: #d9eaf9; /* blue text */
 }
 
 ::ng-deep .blue-outline-btn.dx-button .dx-icon {
-  color: #007bff !important; /* blue icon */
+  color: #0056a2 !important; /* blue icon */
 }
+::ng-deep .blue-outline-btn.dx-button:hover {
+  background-color: #b0d4f3 !important; /* blue text */
+}
+
 .disabled-button {
   opacity: 0.5;
   pointer-events: auto; /* Allow clicking */

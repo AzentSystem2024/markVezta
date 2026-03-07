@@ -88,7 +88,7 @@
               <div class="stacked-toolbar-group"></div>
             </dxi-item>
             <dxi-item location="after" locateInMenu="auto">
-              <div style="position: relative; top: 35px">
+              <div>
                 <!-- push it down -->
                 <dx-date-box
                   label="Date"
@@ -265,10 +265,8 @@
                 <!-- Search Icon Button -->
                 <dx-button
                   icon="search"
-                  stylingMode="outlined"
-                  type="default"
                   (onClick)="onSearchCheque()"
-                  style="width: 40px; align-self: flex-end"
+                  class="toolbar-icon-btn mt-2"
                   [disabled]="
                     !(receiptMode === 'PDC' && receiprtFormData.PAY_HEAD_ID)
                   "
@@ -376,7 +374,7 @@
   <!-- Checkbox right above buttons -->
 
   <!-- Buttons row -->
-  <div style="display: flex; gap: 1px">
+  <div style="display: flex; gap: 13px">
     <dx-check-box
       [(value)]="receiprtFormData.IS_APPROVED"
       text="Approve"

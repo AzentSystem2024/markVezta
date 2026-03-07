@@ -83,19 +83,17 @@
                   <!-- Radio Group -->
 
                   <!-- Distributor Select -->
-                  <dx-select-box
-                    [(value)]="invoiceFormData.CUST_ID"
-                    [dataSource]="distributorList"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    [width]="300"
-                    label="Customer"
-                    labelMode="floating"
-                    style="margin-top: -1px"
-                    (onValueChanged)="onDistributorChanged($event)"
-                    [readOnly]="isReadOnlyMode"
-                  >
-                  </dx-select-box>
+                  <div style="display: flex; gap: 2px; margin-bottom: 0">
+                    <dx-date-box
+                      label="Transaction Date"
+                      [(value)]="invoiceFormData.TRANS_DATE"
+                      type="date"
+                      labelMode="floating"
+                      [width]="148"
+                      [displayFormat]="'dd-MM-yyyy'"
+                      [readOnly]="true"
+                    ></dx-date-box>
+                  </div>
                 </div>
               </div>
             </dxi-item>
@@ -107,28 +105,42 @@
                 class="stacked-toolbar-group"
                 style="display: flex; flex-direction: column; gap: 5px"
               >
+                <dx-select-box
+                  [(value)]="invoiceFormData.CUST_ID"
+                  [dataSource]="distributorList"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [width]="300"
+                  label="Customer"
+                  labelMode="floating"
+                  style="margin-top: -1px"
+                  (onValueChanged)="onDistributorChanged($event)"
+                  [readOnly]="isReadOnlyMode"
+                >
+                </dx-select-box>
                 <!-- Row 1: Date only -->
                 <div style="display: flex; gap: 2px; justify-content: flex-end">
                   <dx-button
                     *ngIf="!isReadOnlyMode"
-                    text="Fill Pending Deliveries"
-                    icon="event"
                     (onClick)="openTrOutSelector()"
                     [width]="200"
-                    stylingMode="outlined"
                     class="blue-outline-btn"
-                  ></dx-button>
-                </div>
-                <div style="display: flex; gap: 2px; margin-bottom: 0">
-                  <dx-date-box
-                    label="Transaction Date"
-                    [(value)]="invoiceFormData.TRANS_DATE"
-                    type="date"
-                    labelMode="floating"
-                    [width]="200"
-                    [displayFormat]="'dd-MM-yyyy'"
-                    [readOnly]="true"
-                  ></dx-date-box>
+                  >
+                    <div
+                      *dxTemplate="let data of 'content'"
+                      style="display: flex; align-items: center; gap: 6px"
+                    >
+                      <span
+                        class="iconify"
+                        data-icon="mingcute:time-line"
+                        data-width="18"
+                        data-height="18"
+                      >
+                      </span>
+
+                      <span>Fill Pending Deliveries</span>
+                    </div>
+                  </dx-button>
                 </div>
               </div>
             </dxi-item>
@@ -269,6 +281,7 @@
           <div style="display: flex; align-items: center; gap: 16px">
             <!-- Round Off Checkbox -->
             <dx-check-box
+              style="margin-right: 26px"
               text="Round Off"
               [(value)]="invoiceFormData.ROUND_OFF"
               (onValueChanged)="onRoundOffChange()"

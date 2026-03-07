@@ -132,19 +132,14 @@
           <dxi-item location="after" locateInMenu="auto">
             <div
               class="stacked-toolbar-group"
-              style="
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-                align-items: flex-start;
-              "
+              style="display: flex; flex-direction: column; gap: 8px"
             >
               <!-- Row 1: Date Field -->
               <dx-text-box
                 [(value)]="creditFormData.TRANS_DATE"
                 label="Date"
                 labelMode="floating"
-                [width]="242"
+                [width]="252"
                 displayFormat="dd-MM-yyyy"
               ></dx-text-box>
 
@@ -165,15 +160,26 @@
                 ></dx-number-box>
 
                 <dx-button
-                  icon="plus"
                   type="default"
                   stylingMode="outlined"
                   hint="Add Row"
-                  [width]="32"
-                  [height]="30"
                   style="margin-top: 4px"
                   (onClick)="addNewManualRow()"
-                ></dx-button>
+                >
+                  <div
+                    *dxTemplate="let data of 'content'"
+                    class="add-btn-content"
+                  >
+                    <span
+                      class="iconify"
+                      data-icon="formkit:add"
+                      data-width="20"
+                      data-height="20"
+                    ></span>
+
+                    <span class="add-text">Add Row</span>
+                  </div></dx-button
+                >
               </div>
             </div>
           </dxi-item>

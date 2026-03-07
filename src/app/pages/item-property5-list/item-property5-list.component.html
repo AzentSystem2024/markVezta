@@ -36,52 +36,34 @@
       <dxi-item location="before">
         <div class="grid-header">Item Property 5</div>
       </dxi-item>
-      <!-- <dxi-item location="before">
-      <div
-        class="grid-header"
-        style="
-          font-weight: 600;
-          font-size: 20px;
-          margin-left: 12px;
-          padding: -3px;
-          margin-right: 3px;
-        "
-      >
-        Item Property 5
-      </div>
-    </dxi-item> -->
-
       <dxi-item
         location="after"
-        locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
+        [options]="searchButtonOptions"
       ></dxi-item>
+
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="toolbar-icon-btn export-btn"
+      ></dxi-item>
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
 
       <dxi-item
         location="after"
         widget="dxButton"
         [options]="addButtonOptions"
-      ></dxi-item>
-
-      <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          text: 'Refresh',
-          icon: 'refresh',
-          onClick: refresh,
-          stylingMode: 'text'
-        }"
       ></dxi-item>
     </dxo-toolbar>
 

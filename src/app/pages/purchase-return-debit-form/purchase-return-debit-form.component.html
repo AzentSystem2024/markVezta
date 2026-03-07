@@ -50,28 +50,6 @@
           >
           </dx-text-box>
         </div>
-        <dx-button
-          *ngIf="!isReadOnlyMode"
-          text="Fill Pending Invoice"
-          icon="event"
-          (onClick)="openPendingGrnPopup()"
-          [width]="200"
-          stylingMode="outlined"
-          class="blue-outline-btn"
-          [disabled]="isReadOnlyMode"
-          style="margin-top: 15px"
-        ></dx-button>
-      </div>
-
-      <!-- Row 2: Supplier + Narration on left, Fill Pending GRN button on right -->
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 10px;
-        "
-      >
         <div style="display: flex; gap: 10px">
           <dx-select-box
             [dataSource]="supplierList"
@@ -86,16 +64,47 @@
           >
           </dx-select-box>
         </div>
+      </div>
 
+      <!-- Row 2: Supplier + Narration on left, Fill Pending GRN button on right -->
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 10px;
+        "
+      >
         <div style="display: flex; gap: 2px; justify-content: flex-end">
           <dx-text-box
             label="Narration"
             [(value)]="purchaseReturnFormData.NARRATION"
             labelMode="floating"
-            [width]="400"
             [readOnly]="isReadOnlyMode"
+            [width]="410"
           ></dx-text-box>
         </div>
+
+        <dx-button
+          *ngIf="!isReadOnlyMode"
+          text="Fill Pending Invoice"
+          (onClick)="openPendingGrnPopup()"
+          [width]="200"
+          class="blue-outline-btn"
+          [disabled]="isReadOnlyMode"
+        >
+          <div *dxTemplate="let data of 'content'">
+            <div style="display: flex; align-items: center; gap: 6px">
+              <span
+                class="iconify"
+                data-icon="mingcute:time-line"
+                data-width="20"
+                data-height="20"
+              ></span>
+              <span>Fill Pending Invoice</span>
+            </div>
+          </div>
+        </dx-button>
       </div>
     </div>
 
@@ -296,6 +305,7 @@
           <!-- RIGHT SIDE → Round Off + Net Amount -->
           <div style="display: flex; align-items: center; gap: 16px">
             <dx-check-box
+              style="margin-right: 24px"
               text="Round Off"
               [(value)]="purchaseReturnFormData.ROUND_OFF"
               (onValueChanged)="onRoundOffChange()"

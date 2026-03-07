@@ -937,6 +937,13 @@ body {
   padding-left: 8px;
   padding-right: 10px;
 }
+.dx-button.dx-button-default.dx-state-hover {
+  border-radius: 8px !important;
+  background-color: #005cad !important;
+  color: #fff !important;
+  padding-left: 8px;
+  padding-right: 10px;
+}
 .dx-button.dx-button-default:hover {
   border-radius: 8px !important;
   background-color: #005cad !important;
@@ -1047,4 +1054,8 @@ body {
 
 .dx-tab.dx-tab-selected .dx-tab-text {
   color: #0073d8;
+}
+
+.dx-tabs-styling-mode-primary .dx-tab.dx-state-hover {
+  background-color: none !important;
 }
