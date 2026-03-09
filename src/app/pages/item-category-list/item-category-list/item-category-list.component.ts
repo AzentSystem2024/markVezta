@@ -35,7 +35,6 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
 
-
 @Component({
   selector: 'app-item-category-list',
   templateUrl: './item-category-list.component.html',
@@ -102,15 +101,14 @@ export class ItemCategoryListComponent {
     this.showCategory();
   }
 
-    searchButtonOptions = {
+  searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
 
-   toggleFilters() {
+  toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
     const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
@@ -121,7 +119,7 @@ export class ItemCategoryListComponent {
     }
   }
 
-   refreshButtonOptions = {
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
@@ -131,7 +129,7 @@ export class ItemCategoryListComponent {
     text: '',
   };
 
-    refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
@@ -306,31 +304,31 @@ export class ItemCategoryListComponent {
   }
 
   showCategory() {
-  const payload = {
-    COMPANY_ID: this.COMPANY_ID,
-  };
+    const payload = {
+      COMPANY_ID: this.COMPANY_ID,
+    };
 
-  this.CategoryDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getCategoryData(payload).subscribe({
-          next: (response: any[]) => {
-            const list = response || [];
+    this.CategoryDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getCategoryData(payload).subscribe({
+            next: (response: any[]) => {
+              const list = response || [];
 
-            this.categoryArray = list;     // local cache
-            this.categoryCount = list.length;
+              this.categoryArray = list; // local cache
+              this.categoryCount = list.length;
 
-            resolve(list);                 // 🔑 stops dx loader
-          },
-          error: () => {
-            this.categoryArray = [];
-            this.categoryCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(list); // 🔑 stops dx loader
+            },
+            error: () => {
+              this.categoryArray = [];
+              this.categoryCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
@@ -383,12 +381,11 @@ export class ItemCategoryListComponent {
     this.editItemCategory = false;
     this.showCategory();
   }
-  
-  onExporting(event: any) {
-      const fileName = 'item-category-list';
-      this.dataservice.exportDataGrid(event, fileName);
-  }
 
+  onExporting(event: any) {
+    const fileName = 'item-category-list';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
 }
 
 @NgModule({

@@ -146,12 +146,13 @@
 <form-popup
   [(visible)]="isAddVatclassPopupOpened"
   (save)="onClickSaveVatclass()"
+  (onShown)="onPopupShown()"
   titleText="New GST Class"
   [showApprove]="false"
   [width]="800"
   [height]="'auto'"
 >
-  <app-vat-class-form (formClosed)="handleClose()"></app-vat-class-form>
+  <app-vat-class-form></app-vat-class-form>
 </form-popup>
 <dx-popup
   [(visible)]="isEditVatclassPopupOpened"

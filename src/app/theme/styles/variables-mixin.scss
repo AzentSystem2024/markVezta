@@ -58,18 +58,43 @@ $theme-mode: null !default;
   --toobar-button-text: rgba(52, 52, 52, 1);
   --filter-Row-bg: #b8d1df;
   --side-menu-selected-bg: #b0d4f3;
+  --select-menu-text-color: #fe4a49;
+  --select-menu-bg-color: #f1f8ff;
+  --tab-hover-bg-color: #d9eaf9;
+  --select-tab-hover-bg-color: #9ed2ff;
+  --close-icon-color: #1d1b20;
+  --text-color-tab: #343434;
+  --selected-text-color: #060606;
+  --toolbar-icon: #e6e6e6;
+  --toolbar-icon-hover-bg: #d9eaf9;
+  --toolbar-icon-hover: #0073d8;
+  --icon-color: #3333;
+  --icon-color-select: #3333;
+  --divider: #64748b;
 
   @if $theme-mode == dark {
     --card-background: var(--base-bg-darken-5);
     --bg-side-panel: rgb(41, 41, 41);
     --tab-bg-color: #131111;
-    --tab-selected-bg-color: #131111;
-    --tab-unselected-bg-color: rgb(41, 41, 41);
+    --tab-selected-bg-color: #000000;
+    --tab-unselected-bg-color: #343434;
     --grid-bg-color: #131111;
     --toolbar-button-bg: #131111;
     --toobar-button-text: rgb(255, 255, 255);
     --filter-Row-bg: rgb(7, 7, 7);
     --side-menu-selected-bg: rgb(7, 7, 7);
+    --select-menu-text-color: #e6e6e6;
+    --select-menu-bg-color: #444444;
+    --tab-hover-bg-color: #444444;
+    --select-tab-hover-bg-color: #444444;
+    --close-icon-color: #e6e6e6;
+    --text-color-tab: #d9d9d9;
+    --selected-text-color: #e6e6e6;
+    --toolbar-icon: #1f1f1f;
+    --toolbar-icon-hover-bg: #060606;
+    --toolbar-icon-hover: #e6e6e6;
+    --icon-color: #e6f1fb;
+    --divider: #64748b;
   }
 
   --border-color: #{$base-border-color};

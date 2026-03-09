@@ -119,7 +119,15 @@ export class VatClassListComponent {
   onExporting(event: any) {
     this.exportService.onExporting(event, 'VAT_class-list');
   }
+  // addVatclass() {
+  //   this.isAddVatclassPopupOpened = true;
+  // }
+
   addVatclass() {
+    if (this.vatclassComponent) {
+      this.vatclassComponent.resetForm();
+    }
+
     this.isAddVatclassPopupOpened = true;
   }
 
@@ -296,6 +304,7 @@ export class VatClassListComponent {
   //     });
   // }
   onRowRemoving(event) {
+    event.cancel = true;
     const selectedRow = event.data;
     const { ID, CODE, VAT_NAME, VAT_PERC } = selectedRow;
 
@@ -311,8 +320,8 @@ export class VatClassListComponent {
             },
             'success',
           );
-          this.dataGrid.instance.refresh();
           this.showVatclass();
+          this.dataGrid.instance.refresh();
         } catch (error) {
           notify(
             {
@@ -338,66 +347,44 @@ export class VatClassListComponent {
     this.dataGrid.instance.refresh();
     this.showVatclass();
   }
+
+  onPopupShown() {
+    if (this.vatclassComponent) {
+      this.vatclassComponent.resetForm();
+    }
+  }
+  // handleClose() {
+  //   this.isAddVatclassPopupOpened = false;
+  //   this.isEditVatclassPopupOpened = false;
+  //   this.vatclassComponent.formVatclassData = {
+  //     CODE: '',
+  //     VAT_NAME: '',
+  //     // VAT_PERC: '',
+  //     CGST_PERC: '',
+  //     CGST_INPUT_HEAD_ID: '',
+  //     CGST_OUTPUT_HEAD_ID: '',
+
+  //     SGST_PERC: '',
+  //     SGST_INPUT_HEAD_ID: '',
+  //     SGST_OUTPUT_HEAD_ID: '',
+
+  //     IGST_PERC: '',
+  //     IGST_INPUT_HEAD_ID: '',
+  //     IGST_OUTPUT_HEAD_ID: '',
+  //   };
+  //   this.dataGrid.instance.refresh();
+  //   this.showVatclass();
+  // }
   handleClose() {
     this.isAddVatclassPopupOpened = false;
     this.isEditVatclassPopupOpened = false;
-    this.vatclassComponent.formVatclassData = {
-      CODE: '',
-      VAT_NAME: '',
-      // VAT_PERC: '',
-      CGST_PERC: '',
-      CGST_INPUT_HEAD_ID: '',
-      CGST_OUTPUT_HEAD_ID: '',
 
-      SGST_PERC: '',
-      SGST_INPUT_HEAD_ID: '',
-      SGST_OUTPUT_HEAD_ID: '',
+    if (this.vatclassComponent) {
+      this.vatclassComponent.resetForm(); // 🔑 clear form
+    }
 
-      IGST_PERC: '',
-      IGST_INPUT_HEAD_ID: '',
-      IGST_OUTPUT_HEAD_ID: '',
-    };
-    this.dataGrid.instance.refresh();
     this.showVatclass();
   }
-  // onRowUpdating(event) {
-  //   const updataDate = event.newData;
-  //   const oldData = event.oldData;
-  //   const combinedData = { ...oldData, ...updataDate };
-  //   let id = combinedData.ID;
-  //   let code = combinedData.CODE;
-  //   let vatname = combinedData.VAT_NAME;
-  //   let vatclass = combinedData.CAT_ID;
-
-  //   this.dataservice
-  //     .updateVatclass(id, code, vatname,vatclass)
-  //     .subscribe((data: any) => {
-  //       if (data) {
-  //         notify(
-  //           {
-  //             message: 'Vat Class Updated Successfully',
-  //             position: { at: 'top center', my: 'top center' },
-  //           },
-  //           'success'
-  //         );
-  //         this.dataGrid.instance.refresh();
-  //         this.showVatclass();
-  //       } else {
-  //         notify(
-  //           {
-  //             message: 'Your Data Not Saved',
-  //             position: { at: 'top right', my: 'top right' },
-  //           },
-  //           'error'
-  //         );
-  //       }
-  //     });
-  //   console.log('old data:', oldData);
-  //   console.log('new data:', updataDate);
-  //   console.log('modified data:', combinedData);
-
-  //   event.cancel = true; // Prevent the default update operation
-  // }
 }
 @NgModule({
   imports: [

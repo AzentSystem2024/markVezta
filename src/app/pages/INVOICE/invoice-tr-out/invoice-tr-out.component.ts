@@ -82,7 +82,6 @@ export class InvoiceTrOutComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -117,7 +116,7 @@ export class InvoiceTrOutComponent {
     },
     text: '',
   };
-  
+
   isAddInvoice: boolean = false;
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -189,7 +188,7 @@ export class InvoiceTrOutComponent {
     this.getInvoiceList();
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -677,7 +676,7 @@ export class InvoiceTrOutComponent {
     EditInvoiceModule,
     ViewInvoiceModule,
     InvoiceTrOutAddModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [InvoiceTrOutComponent],

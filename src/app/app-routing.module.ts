@@ -216,6 +216,7 @@ import { ProductionJvListComponent } from './production-jv-list/production-jv-li
 import { ArticleproductionJvListComponent } from './articleproduction-jv-list/articleproduction-jv-list.component';
 import { StockViewComponent } from './stock-view/stock-view.component';
 import { SaleReturnComponent } from './sale-return/sale-return.component';
+import { MiscellaneousInvoiceComponent } from './pages/miscellaneous-invoice/miscellaneous-invoice.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -949,6 +950,11 @@ const routes: Routes = [
       {
         path: 'import-items',
         component: ImportItemsComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'miscellaneous-invoice',
+        component: MiscellaneousInvoiceComponent,
         canActivate: [AuthGuardService],
       },
       {

@@ -129,13 +129,26 @@
                   [readOnly]="true"
                 ></dx-number-box>
                 <dx-button
-                  icon="plus"
-                  stylingMode="outlined"
+                  stylingMode="contained"
                   hint="Add New Row"
                   type="default"
                   (onClick)="onAddNewRow()"
                   style="margin-top: 10px"
-                ></dx-button>
+                >
+                  <div
+                    *dxTemplate="let data of 'content'"
+                    class="add-btn-content"
+                  >
+                    <span
+                      class="iconify"
+                      data-icon="formkit:add"
+                      data-width="20"
+                      data-height="20"
+                    ></span>
+
+                    <span class="add-text">Add Row</span>
+                  </div></dx-button
+                >
               </div>
             </div>
           </dxi-item>

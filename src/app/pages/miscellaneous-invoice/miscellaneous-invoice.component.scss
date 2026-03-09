@@ -4,10 +4,12 @@
 
 :host {
   --side-panel-toolbar-height: 76px;
+
   width: 100%;
   display: contents;
   overflow: auto;
 }
+
 .view-wrapper {
   .grid {
     .name-template {
@@ -42,15 +44,19 @@
   }
 }
 
-.add-button .dx-button {
-  background-color: #0d6efd !important; /* Bootstrap primary */
-  color: white !important;
+.date-range-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.flag-red {
-  color: red;
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
-
-.flag-green {
-  color: green;
+.bordered-grid {
+  border: 1px solid #ccc; /* or a lighter color if using dark theme */
+  border-radius: 4px; /* optional */
+  overflow: hidden; /* ensures inner content stays inside border */
 }

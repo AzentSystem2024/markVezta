@@ -27,7 +27,6 @@ import { UomEditModule } from '../uom-edit/uom-edit.component';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
 
-
 @Component({
   selector: 'app-uom-list',
   templateUrl: './uom-list.component.html',
@@ -92,7 +91,6 @@ export class UomListComponent implements OnInit {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
@@ -190,32 +188,31 @@ export class UomListComponent implements OnInit {
   }
 
   listUom() {
-  const payload = {
-    // COMPANY_ID: this.selected_Company_id,
-  };
+    const payload = {
+      // COMPANY_ID: this.selected_Company_id,
+    };
 
-  this.UomDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getUomList(payload).subscribe({
-          next: (data: any[]) => {
-            const list = data || [];
+    this.UomDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getUomList(payload).subscribe({
+            next: (data: any[]) => {
+              const list = data || [];
 
-            this.uomArray = list;        // local cache
-            this.uomCount = list.length;
+              this.uomArray = list; // local cache
+              this.uomCount = list.length;
 
-            resolve(list);               // 🔑 stops grid loader
-          },
-          error: () => {
-            this.uomArray = [];
-            this.uomCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(list); // 🔑 stops grid loader
+            },
+            error: () => {
+              this.uomArray = [];
+              this.uomCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onRowRemoving(event) {
     const selectedRow = event.data;
@@ -318,10 +315,9 @@ export class UomListComponent implements OnInit {
   }
 
   onExporting(event: any) {
-      const fileName = 'uom-list';
-      this.dataservice.exportDataGrid(event, fileName);
+    const fileName = 'uom-list';
+    this.dataservice.exportDataGrid(event, fileName);
   }
-
 }
 @NgModule({
   imports: [

@@ -157,6 +157,31 @@ export class VatClassFormComponent {
       return true;
     }
   }
+
+  resetForm() {
+    this.newVatclass = {
+      COMPANY_ID: this.formVatclassData.COMPANY_ID,
+      CODE: '',
+      VAT_NAME: '',
+      VAT_PERC: null,
+
+      CGST_PERC: null,
+      CGST_INPUT_HEAD_ID: null,
+      CGST_OUTPUT_HEAD_ID: null,
+
+      SGST_PERC: null,
+      SGST_INPUT_HEAD_ID: null,
+      SGST_OUTPUT_HEAD_ID: null,
+
+      IGST_PERC: null,
+      IGST_INPUT_HEAD_ID: null,
+      IGST_OUTPUT_HEAD_ID: null,
+    };
+
+    if (this.validationGroup) {
+      this.validationGroup.instance.reset();
+    }
+  }
 }
 @NgModule({
   imports: [

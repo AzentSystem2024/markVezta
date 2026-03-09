@@ -51,20 +51,20 @@ import notify from 'devextreme/ui/notify';
 @Component({
   selector: 'app-delivery-return',
   templateUrl: './delivery-return.component.html',
-  styleUrls: ['./delivery-return.component.scss']
+  styleUrls: ['./delivery-return.component.scss'],
 })
 export class DeliveryReturnComponent {
-
-   @ViewChild(DxDataGridComponent,{ static: true }) dataGrid: DxDataGridComponent;
-    DeliveryReturnDatasource:any[]=[];
-    DeliveryReturnData : any;
-    readonly allowedPageSizes: any = [5, 10, 'all'];
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+  DeliveryReturnDatasource: any[] = [];
+  DeliveryReturnData: any;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   addDeliveryReturnPopupOpened = false;
   editDeliveryReturnPopupOpened = false;
-      isFilterRowVisible: boolean = false;
- isFilterOpened = false;
+  isFilterRowVisible: boolean = false;
+  isFilterOpened = false;
   canAdd = false;
   canEdit = false;
   canView = false;
@@ -72,119 +72,130 @@ export class DeliveryReturnComponent {
   canApprove = false;
   canPrint = false;
 
+  constructor(
+    private dataservice: DataService,
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+  ) {
+    this.get_DeliveryReturnList();
+  }
 
- constructor(private dataservice : DataService , private router : Router,private ngZone: NgZone, private cdr: ChangeDetectorRef,){
-    this.get_DeliveryReturnList()
- }
+  ngOnInit() {
+    this.get_DeliveryReturnList();
+  }
 
- ngOnInit(){
-    this.get_DeliveryReturnList()
- }
-
- addDeliveryReturn(){
-  this.addDeliveryReturnPopupOpened = true;
- }
+  addDeliveryReturn() {
+    this.addDeliveryReturnPopupOpened = true;
+  }
 
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-  
+
     onClick: () => {
       // Run inside Angular's zone
       this.ngZone.run(() => this.addDeliveryReturn());
     },
-    
-    elementAttr: { class: 'add-button' },    
-  };
 
-   refreshButtonOptions = {
+    elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refreshGrid(),
     text: '',
   };
 
-refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
-       // Or reload data from API if needed
-       this.get_DeliveryReturnList();
+      // Or reload data from API if needed
+      this.get_DeliveryReturnList();
     }
   }
 
-        toggleFilterRow = () => {
+  toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
 
- getStatusFlagClass(Status: string): string {
+  getStatusFlagClass(Status: string): string {
     // console.log('Status:', Status);
-    
- return Status =='OPEN' ? 'flag-oranged' : 'flag-green';
-}
 
-onCellPrepared(e: any) {
-  if (e.rowType === 'data' && e.column.command === 'edit') {
-    // Find the delete button in the cell
-    const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+    return Status == 'OPEN' ? 'flag-oranged' : 'flag-green';
+  }
 
-    // If STATUS !== "OPEN", hide delete icon
-    if (deleteButton && e.data.STATUS !== 'OPEN') {
-      deleteButton.style.display = 'none';
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      // Find the delete button in the cell
+      const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+
+      // If STATUS !== "OPEN", hide delete icon
+      if (deleteButton && e.data.STATUS !== 'OPEN') {
+        deleteButton.style.display = 'none';
+      }
     }
   }
-}
 
-
-    onEditingStart(event:any){
+  onEditingStart(event: any) {
     event.cancel = true;
     this.editDeliveryReturnPopupOpened = true;
-    console.log("Edit Data",event.data);
+    console.log('Edit Data', event.data);
     this.select_DeliveryReturn_Data(event);
-    }
+  }
 
-    select_DeliveryReturn_Data(event:any){
-      const id = event.data.ID;
-      this.dataservice.select_DeliveryRteurn_Data(id).subscribe((response:any)=>{
-        console.log("Selected Delivery Return Data",response);
-        this.DeliveryReturnData = response.Data 
-        console.log(this.DeliveryReturnData)
-        
-        
-      })
-    }
+  select_DeliveryReturn_Data(event: any) {
+    const id = event.data.ID;
+    this.dataservice
+      .select_DeliveryRteurn_Data(id)
+      .subscribe((response: any) => {
+        console.log('Selected Delivery Return Data', response);
+        this.DeliveryReturnData = response.Data;
+        console.log(this.DeliveryReturnData);
+      });
+  }
 
-    get_DeliveryReturnList(){
-      this.dataservice.get_DeliveryRteurn_Data().subscribe((response:any)=>{
-        this.DeliveryReturnDatasource = response.Data;
-        console.log("Delivery Return List",this.DeliveryReturnDatasource);
-      })
-    }
+  get_DeliveryReturnList() {
+    this.dataservice.get_DeliveryRteurn_Data().subscribe((response: any) => {
+      this.DeliveryReturnDatasource = response.Data;
+      console.log('Delivery Return List', this.DeliveryReturnDatasource);
+    });
+  }
 
-    handleClose(){
-      this.addDeliveryReturnPopupOpened = false
-      this.editDeliveryReturnPopupOpened = false
-      this.get_DeliveryReturnList();
-    }
+  handleClose() {
+    this.addDeliveryReturnPopupOpened = false;
+    this.editDeliveryReturnPopupOpened = false;
+    this.get_DeliveryReturnList();
+  }
 
-   delete_Data(event:any){
-     const id=event.data.ID
-     this.dataservice.delete_DeliveryRteurn_Data(id).subscribe((res:any)=>{
-          notify(
-               {
-                 message: 'This Delivery Return deleted successfully .', 
-                 position: { at: 'top right', my: 'top right' },
-                 displayTime: 500,
-               },
-               'success'
-             );
-   
-     })
-   
-   }
+  delete_Data(event: any) {
+    const id = event.data.ID;
+    this.dataservice.delete_DeliveryRteurn_Data(id).subscribe((res: any) => {
+      notify(
+        {
+          message: 'This Delivery Return deleted successfully .',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'success',
+      );
+    });
+  }
 }
 
 @NgModule({

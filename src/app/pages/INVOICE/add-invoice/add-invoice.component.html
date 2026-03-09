@@ -113,15 +113,31 @@
                   >
                   </dx-select-box>
                 </div>
-                <div style="display: flex; gap: 2px; margin-bottom: 0">
+                <div
+                  style="
+                    display: flex;
+                    gap: 2px;
+                    margin-bottom: 0;
+                    justify-content: end;
+                  "
+                >
                   <dx-button
-                    text="Fill Pending Deliveries"
-                    icon="event"
-                    (onClick)="openTrOutSelector()"
-                    [width]="375"
-                    stylingMode="outlined"
+                    stylingMode="contained"
                     class="blue-outline-btn"
-                  ></dx-button>
+                    (onClick)="openTrOutSelector()"
+                  >
+                    <div *dxTemplate="let data of 'content'">
+                      <div style="display: flex; align-items: center; gap: 6px">
+                        <span
+                          class="iconify"
+                          data-icon="mingcute:time-line"
+                          data-width="20"
+                          data-height="20"
+                        ></span>
+                        <span>Fill Pending Deliveries</span>
+                      </div>
+                    </div>
+                  </dx-button>
                 </div>
               </div>
             </dxi-item>
@@ -283,6 +299,7 @@
           <!-- RIGHT SIDE → Round Off + Net Amount -->
           <div style="display: flex; align-items: center; gap: 16px">
             <dx-check-box
+              style="margin-right: 21px"
               text="Round Off"
               [(value)]="invoiceFormData.ROUND_OFF"
               (onValueChanged)="onRoundOffChange()"

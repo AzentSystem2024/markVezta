@@ -4725,7 +4725,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   saveTimesheetData(payload: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/TimeSheet/save`, payload);
+    return this.http.post(`${this.apiUrl}TimeSheet/save`, payload);
   }
   Timesheet_Approval_Api(payload) {
     const getEndpoint = `${this.apiUrl}TimeSheet/approvetimesheet`;
@@ -6302,5 +6302,11 @@ The result can be exported to HTML or Markdown.`;
   Fetch_StockMovement_Details(payload: any) {
     const getEndpoint = this.apiUrl + 'StockMovementRpt/stockDrilldown';
     return this.http.post<{ data: any[] }>(getEndpoint, payload);
+  }
+
+
+  //--------------------------MISCELLANEOUS-INVOICE----------------------------------//
+    getMiscInvoiceMainList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}PurchaseReturn/list`, data);
   }
 }

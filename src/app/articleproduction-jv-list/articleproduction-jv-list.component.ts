@@ -82,12 +82,11 @@ export class ArticleproductionJvListComponent {
   isFilterOpened = false;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
-  isEditPopupVisible : boolean = false;
+  isEditPopupVisible: boolean = false;
   auto: string = 'auto';
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -236,20 +235,17 @@ export class ArticleproductionJvListComponent {
   //   });
   // }
 
-
-    onEditingStart(event: any) {
-      console.log('Editing started for row:', event.data);
+  onEditingStart(event: any) {
+    console.log('Editing started for row:', event.data);
     event.cancel = true;
     const invoiceId = event.data.TRANS_ID;
     const status = event.data.STATUS;
-    this.dataService
-      .selectProduction(invoiceId)
-      .subscribe((response: any) => {
-        this.selectedInvoice = response;
-        console.log(this.selectedInvoice, 'SELECTEDTROUT');
-        this.isEditPopupVisible = true;
-        this.isReadOnlyInvoice = status === 5;
-      });
+    this.dataService.selectProduction(invoiceId).subscribe((response: any) => {
+      this.selectedInvoice = response;
+      console.log(this.selectedInvoice, 'SELECTEDTROUT');
+      this.isEditPopupVisible = true;
+      this.isReadOnlyInvoice = status === 5;
+    });
   }
 
   getProductionList() {
@@ -670,8 +666,6 @@ export class ArticleproductionJvListComponent {
       ? 'Article Production'
       : 'Box Production';
   }
-
-  
 }
 
 @NgModule({

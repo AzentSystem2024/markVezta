@@ -95,7 +95,6 @@ export class StockMovementReportComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -136,7 +135,7 @@ export class StockMovementReportComponent {
   deliveryReturnDetails: any[] = [];
   saleReturnDetails: any[] = [];
   salesInvoiceDetails: any[] = [];
-  adjustedDetails : any [] = [];
+  adjustedDetails: any[] = [];
   isEditProductionPopupVisible: boolean;
   selectedProduction: any;
   isReadOnlyInvoice: boolean;
@@ -146,10 +145,10 @@ export class StockMovementReportComponent {
   selectedPurchaseReturnId: any;
   isEditPurchaseReturn: boolean;
   selectedPurchaseReturn: any;
-  selectedDelivery:any;
+  selectedDelivery: any;
   isReadOnlyPurchaseReturn: boolean;
   isEditSaleReturn: boolean;
-  isEditDelivery:boolean;
+  isEditDelivery: boolean;
   selectedSaleReturn: any;
   isReadOnlySaleReturn = true;
   isReadOnlyDelivery = true;
@@ -614,7 +613,7 @@ export class StockMovementReportComponent {
 
     const field = e.column?.dataField;
     const itemId = e.data.ITEM_ID;
-    console.log(field)
+    console.log(field);
     if (!itemId) return;
 
     this.selectedRowData = e.data;
@@ -725,7 +724,7 @@ export class StockMovementReportComponent {
     console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
 
     // API CALL HERE
-     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
+    this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
       this.deliveryReturnDetails = res.data || [];
     });
   }
@@ -828,11 +827,11 @@ export class StockMovementReportComponent {
         return 'Grn Details';
       case 'purchReturn':
         return 'Purch Return Details';
-        case 'salesInvoice':
+      case 'salesInvoice':
         return 'Sales Invoice Details';
-        case 'saleReturn':
+      case 'saleReturn':
         return 'Sale Return Details';
-        case 'adjusted':
+      case 'adjusted':
         return 'Stock Adjustment Details';
       default:
         return '';
@@ -897,24 +896,20 @@ export class StockMovementReportComponent {
         break;
       }
 
-        case 'delivery': {
+      case 'delivery': {
         this.selectedDelivery = id; //  Purchase Return uses TRANS_ID
         const status = row.TRANS_STATUS; // same as your original logic
-
-       
 
         // reset popup first
         this.isEditDelivery = false;
 
-        this.dataService
-          .selectDeliveryNote(id)
-          .subscribe((response: any) => {
-            this.selectedDelivery = response.Data;
-            this.isReadOnlyDelivery = true;
+        this.dataService.selectDeliveryNote(id).subscribe((response: any) => {
+          this.selectedDelivery = response.Data;
+          this.isReadOnlyDelivery = true;
 
-            //  open existing Purchase Return popup
-            this.isEditDelivery = true;
-          });
+          //  open existing Purchase Return popup
+          this.isEditDelivery = true;
+        });
 
         break;
       }
@@ -1048,7 +1043,7 @@ export class StockMovementReportComponent {
     PurchaseReturnDebitFormModule,
     SaleReturnFormModule,
     DeliveryNoteFormModule,
-    ViewInvoiceModule
+    ViewInvoiceModule,
   ],
   providers: [],
   declarations: [StockMovementReportComponent],

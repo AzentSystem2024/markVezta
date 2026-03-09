@@ -23,7 +23,6 @@ import {
 import { AuthService, DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
 
-
 @Component({
   selector: 'app-item-property5-list',
   templateUrl: './item-property5-list.component.html',
@@ -55,7 +54,7 @@ export class ItemProperty5ListComponent {
     private dataservice: DataService,
     authservice: AuthService,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.itemlabel = authservice.getsettingsData().ITEM_PROPERTY5;
   }
@@ -81,9 +80,22 @@ export class ItemProperty5ListComponent {
     this.isEditItemProperty5PopupOpened = false;
     this.listItemProperty5();
   }
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refresh());
+    },
+    text: '',
+  };
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.toggleFilters(),
+  };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
@@ -94,6 +106,18 @@ export class ItemProperty5ListComponent {
     },
 
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
 
   sessionDetails() {
@@ -105,7 +129,7 @@ export class ItemProperty5ListComponent {
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     console.log(
       this.GST_PERC,
-      '===========selected GST PERC==================='
+      '===========selected GST PERC===================',
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -114,48 +138,48 @@ export class ItemProperty5ListComponent {
     this.poData.USER_ID = sessionData.USER_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
   listItemProperty5() {
-  const payload = {
-    COMPANY_ID: this.companyID,
-  };
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
 
-  this.ItemProperty5DataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getItemProperty5Data(payload).subscribe({
-          next: (response: any[]) => {
-            const list = response || [];
+    this.ItemProperty5DataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getItemProperty5Data(payload).subscribe({
+            next: (response: any[]) => {
+              const list = response || [];
 
-            this.itemProperty5Array = list;   // ✅ ARRAY for logic
-            this.itemProperty5Count = list.length;
+              this.itemProperty5Array = list; // ✅ ARRAY for logic
+              this.itemProperty5Count = list.length;
 
-            resolve(list);                    // ✅ GRID data
-          },
-          error: () => {
-            this.itemProperty5Array = [];
-            this.itemProperty5Count = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(list); // ✅ GRID data
+            },
+            error: () => {
+              this.itemProperty5Array = [];
+              this.itemProperty5Count = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onClickSaveItemProperty5() {
     const { CODE, DESCRIPTION, COMPANY_ID } =
       this.ItemProperty5FormComponent.getNewItemProperty5Data();
     const isCodeDuplicate = this.itemProperty5Array.some(
       // (item: any) => item.CODE === commonDetails.code
-      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
+      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
     );
 
     const isDescriptionDuplicate = this.itemProperty5Array.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
       (item: any) =>
-        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase()
+        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -165,7 +189,7 @@ export class ItemProperty5ListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -175,7 +199,7 @@ export class ItemProperty5ListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -185,7 +209,7 @@ export class ItemProperty5ListComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -198,7 +222,7 @@ export class ItemProperty5ListComponent {
               message: 'Data added Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.listItemProperty5();
@@ -209,7 +233,7 @@ export class ItemProperty5ListComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -238,7 +262,7 @@ export class ItemProperty5ListComponent {
               message: 'Delete operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.listItemProperty5();
@@ -248,7 +272,7 @@ export class ItemProperty5ListComponent {
               message: 'Delete operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });

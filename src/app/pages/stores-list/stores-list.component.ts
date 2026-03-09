@@ -65,7 +65,6 @@ export class StoresListComponent implements OnInit {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
@@ -307,31 +306,31 @@ export class StoresListComponent implements OnInit {
   }
 
   showStores() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id,
-  };
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
 
-  this.StoresDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getStoresData(payload).subscribe({
-          next: (response: any[]) => {
-            const list = response || [];
+    this.StoresDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getStoresData(payload).subscribe({
+            next: (response: any[]) => {
+              const list = response || [];
 
-            this.storesArray = list;      // local cache
-            this.storesCount = list.length;
+              this.storesArray = list; // local cache
+              this.storesCount = list.length;
 
-            resolve(list);                // 🔑 stops dx loader
-          },
-          error: () => {
-            this.storesArray = [];
-            this.storesCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(list); // 🔑 stops dx loader
+            },
+            error: () => {
+              this.storesArray = [];
+              this.storesCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onClickSaveStores() {
     const {
@@ -601,8 +600,8 @@ export class StoresListComponent implements OnInit {
   }
 
   onExporting(event: any) {
-      const fileName = 'stores-list';
-      this.dataservice.exportDataGrid(event, fileName);
+    const fileName = 'stores-list';
+    this.dataservice.exportDataGrid(event, fileName);
   }
 }
 @NgModule({

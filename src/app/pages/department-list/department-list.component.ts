@@ -87,10 +87,9 @@ export class DepartmentListComponent implements OnInit {
     this.showDepartment();
   }
 
-   searchButtonOptions = {
+  searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
@@ -105,7 +104,7 @@ export class DepartmentListComponent implements OnInit {
     text: '',
   };
 
-   refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }

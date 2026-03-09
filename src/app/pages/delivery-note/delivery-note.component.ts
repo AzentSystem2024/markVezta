@@ -75,7 +75,6 @@ export class DeliveryNoteComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -676,7 +675,7 @@ export class DeliveryNoteComponent {
     this.getDeliveryNotes();
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -715,7 +714,7 @@ export class DeliveryNoteComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     DeliveryNoteFormModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [DeliveryNoteComponent],

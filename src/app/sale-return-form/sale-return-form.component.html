@@ -87,14 +87,24 @@
         <div style="display: flex; gap: 2px; justify-content: flex-end">
           <dx-button
             *ngIf="!isReadOnlyMode"
-            text="Fill Pending Invoice"
-            icon="event"
             (onClick)="openPendingGrnPopup()"
             [width]="410"
             stylingMode="outlined"
             class="blue-outline-btn"
             [disabled]="isReadOnlyMode"
-          ></dx-button>
+          >
+            <div *dxTemplate="let data of 'content'">
+              <div style="display: flex; align-items: center; gap: 6px">
+                <span
+                  class="iconify"
+                  data-icon="mingcute:time-line"
+                  data-width="20"
+                  data-height="20"
+                ></span>
+                <span>Fill Pending Invoice</span>
+              </div>
+            </div></dx-button
+          >
         </div>
       </div>
     </div>
@@ -272,6 +282,7 @@
           <!-- RIGHT SIDE → Round Off + Net Amount -->
           <div style="display: flex; align-items: center; gap: 16px">
             <dx-check-box
+              style="margin-right: 23px"
               text="Round Off"
               [(value)]="salesReturnFormData.ROUND_OFF"
               [readOnly]="isReadOnlyMode"

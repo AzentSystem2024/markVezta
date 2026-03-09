@@ -1,18 +1,10 @@
-
-.dx-datagrid-header-panel
-.dx-toolbar-text-auto-hide
-.dx-button.dx-button-has-icon {
-  border-radius: 4px !important;
-  background-color: #00a0e028 !important;
-}
-
 .dx-datagrid-headers.dx-datagrid-nowrap.dx-bordered-top-view {
-border-radius: 10px 10px 0 0 !important;
-background-color: #4699b920 !important;
-font-size: 1.25rem !important;
-font-weight: bolder !important;
-font-weight: bolder !important;
-// border-bottom: 1px solid #000 !important; 
+  border-radius: 10px 10px 0 0 !important;
+  background-color: #4699b920 !important;
+  font-size: 1.25rem !important;
+  font-weight: bolder !important;
+  font-weight: bolder !important;
+  // border-bottom: 1px solid #000 !important;
 }
 .dx-datagrid-headers .dx-datagrid-header-row .dx-datagrid-action {
   border-left: 1px solid #000 !important; /* Define a border between columns */
@@ -22,7 +14,11 @@ font-weight: bolder !important;
   border-right: 1px solid #000 !important; /* Ensure column borders are visible */
 }
 
-.dx-datagrid-headers.dx-header-multi-row .dx-datagrid-content .dx-datagrid-table .dx-row.dx-header-row > td {
+.dx-datagrid-headers.dx-header-multi-row
+  .dx-datagrid-content
+  .dx-datagrid-table
+  .dx-row.dx-header-row
+  > td {
   padding-top: 12px;
   padding-bottom: 12px;
   vertical-align: bottom;
@@ -45,8 +41,8 @@ font-weight: bolder !important;
   padding-right: 25px;
 }
 
-
-::ng-deep.dx-editor-outlined.dx-texteditor-with-label, .dx-editor-outlined.dx-texteditor-with-floating-label{
+::ng-deep.dx-editor-outlined.dx-texteditor-with-label,
+.dx-editor-outlined.dx-texteditor-with-floating-label {
   outline: none;
   margin-top: 1px !important;
 }

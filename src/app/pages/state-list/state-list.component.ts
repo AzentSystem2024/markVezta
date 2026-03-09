@@ -86,7 +86,6 @@ export class StateListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -124,27 +123,27 @@ export class StateListComponent {
   }
 
   showState() {
-  this.StateDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getStateData().subscribe({
-          next: (response: any) => {
-            const data = response || [];
+    this.StateDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getStateData().subscribe({
+            next: (response: any) => {
+              const data = response || [];
 
-            this.stateArray = data;     // local usage if needed
-            this.stateCount = data.length;
+              this.stateArray = data; // local usage if needed
+              this.stateCount = data.length;
 
-            resolve(data);              // 🔑 stops grid loader
-          },
-          error: () => {
-            this.stateArray = [];
-            this.stateCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(data); // 🔑 stops grid loader
+            },
+            error: () => {
+              this.stateArray = [];
+              this.stateCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
@@ -342,8 +341,8 @@ export class StateListComponent {
   }
 
   onExporting(event: any) {
-      const fileName = 'states-list';
-      this.dataservice.exportDataGrid(event, fileName);
+    const fileName = 'states-list';
+    this.dataservice.exportDataGrid(event, fileName);
   }
 }
 @NgModule({

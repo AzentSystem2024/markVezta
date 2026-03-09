@@ -11,7 +11,6 @@ import { DxDataGridComponent, DxDataGridModule } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
 
-
 @Component({
   selector: 'app-article-stock-view',
   templateUrl: './article-stock-view.component.html',
@@ -26,9 +25,9 @@ export class ArticleStockViewComponent {
   showHeaderFilter: true;
   showFilterRow = true;
   isFilterOpened = false;
-  ArticleStockDataSource: DataSource;  // ONLY for dx-data-grid
-articleStockArray: any[] = [];       // ONLY for logic / summary
-articleStockCount = 0;
+  ArticleStockDataSource: DataSource; // ONLY for dx-data-grid
+  articleStockArray: any[] = []; // ONLY for logic / summary
+  articleStockCount = 0;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   addPackingPopupVisible: boolean = false;
@@ -37,7 +36,6 @@ articleStockCount = 0;
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
@@ -64,30 +62,30 @@ articleStockCount = 0;
   }
 
   get_ArticleStock_List() {
-  const payload = { USER_ID: 0 };
+    const payload = { USER_ID: 0 };
 
-  this.ArticleStockDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.get_ArticleStock_Api(payload).subscribe({
-          next: (res: any) => {
-            const list = res?.Data || [];
+    this.ArticleStockDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.get_ArticleStock_Api(payload).subscribe({
+            next: (res: any) => {
+              const list = res?.Data || [];
 
-            //  cache for summary / logic
-            this.articleStockArray = list;
-            this.articleStockCount = list.length;
+              //  cache for summary / logic
+              this.articleStockArray = list;
+              this.articleStockCount = list.length;
 
-            resolve(list); //  grid gets data
-          },
-          error: () => {
-            this.articleStockArray = [];
-            this.articleStockCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(list); //  grid gets data
+            },
+            error: () => {
+              this.articleStockArray = [];
+              this.articleStockCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onExporting(event: any) {
     const fileName = 'Article Stock';
@@ -115,7 +113,7 @@ articleStockCount = 0;
         column: 'QTY_AVAILABLE',
         summaryType: 'sum',
         displayFormat: '{0}',
-        
+
         showInColumn: 'QTY_AVAILABLE',
         alignment: 'Right',
       },
@@ -123,7 +121,7 @@ articleStockCount = 0;
         column: 'QTY_MULTIBOX',
         summaryType: 'sum',
         displayFormat: '{0}',
-        
+
         showInColumn: 'QTY_MULTIBOX',
         alignment: 'right',
       },
@@ -131,34 +129,34 @@ articleStockCount = 0;
         column: 'QTY_TOTAL',
         summaryType: 'sum',
         displayFormat: '{0}',
-        
+
         showInColumn: 'QTY_TOTAL',
         alignment: 'right',
       },
     ],
     groupItems: [
-    {
-      column: 'QTY_AVAILABLE',
-      summaryType: 'sum',
-      displayFormat: '{0}',
-      
-      alignByColumn: true,
-    },
-    {
-      column: 'QTY_MULTIBOX',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      
-      alignByColumn: true,
-    },
-    {
-      column: 'QTY_TOTAL',
-      summaryType: 'sum',
-      displayFormat: '{0}',
-      
-      alignByColumn: true,
-    },
-  ],
+      {
+        column: 'QTY_AVAILABLE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+
+        alignByColumn: true,
+      },
+      {
+        column: 'QTY_MULTIBOX',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+
+        alignByColumn: true,
+      },
+      {
+        column: 'QTY_TOTAL',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+
+        alignByColumn: true,
+      },
+    ],
     calculateCustomSummary: (options) => {
       if (options.name === 'summaryRow') {
         // Custom logic if needed

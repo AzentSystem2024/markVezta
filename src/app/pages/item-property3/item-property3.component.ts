@@ -23,7 +23,6 @@ import {
 import { AuthService, DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
 
-
 @Component({
   selector: 'app-item-property3',
   templateUrl: './item-property3.component.html',
@@ -68,6 +67,13 @@ export class ItemProperty3Component {
 
     this.sesstion_Details();
   }
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -131,8 +137,6 @@ export class ItemProperty3Component {
   };
 
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
@@ -143,6 +147,27 @@ export class ItemProperty3Component {
     },
 
     elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refresh());
+    },
+    text: '',
   };
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -168,32 +193,31 @@ export class ItemProperty3Component {
   }
 
   listItemProperty3() {
-  const payload = {
-    COMPANY_ID: this.companyID,
-  };
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
 
-  this.ItemProperty3DataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getItemProperty3Data(payload).subscribe({
-          next: (response: any[]) => {
-            const list = response || [];
+    this.ItemProperty3DataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getItemProperty3Data(payload).subscribe({
+            next: (response: any[]) => {
+              const list = response || [];
 
-            this.itemProperty3Array = list;   // 🔑 cache for logic
-            this.itemProperty3Count = list.length;
+              this.itemProperty3Array = list; // 🔑 cache for logic
+              this.itemProperty3Count = list.length;
 
-            resolve(list);                    // 🔑 stops grid loader
-          },
-          error: () => {
-            this.itemProperty3Array = [];
-            this.itemProperty3Count = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
+              resolve(list); // 🔑 stops grid loader
+            },
+            error: () => {
+              this.itemProperty3Array = [];
+              this.itemProperty3Count = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onClickSaveItemProperty3() {
     const { CODE, DESCRIPTION, COMPANY_ID } =

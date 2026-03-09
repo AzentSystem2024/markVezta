@@ -179,6 +179,23 @@
                   <!-- Date box pushed to right end -->
                 </div>
 
+                <dx-date-box
+                  label="Date"
+                  labelMode="floating"
+                  [width]="200"
+                  displayFormat="dd-MM-yyyy"
+                  [readOnly]="false"
+                  [(value)]="productionJVFormData.PRODUCTION_DATE"
+                ></dx-date-box>
+              </div>
+            </dxi-item>
+
+            <dxi-item location="after" locateInMenu="auto">
+              <div
+                class="stacked-toolbar-group"
+                style="display: flex; flex-direction: column; gap: 6px"
+              >
+                <!-- Date Field (Top) -->
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-select-box
                     label="Product *"
@@ -192,27 +209,9 @@
                     (onValueChanged)="onProductChange($event)"
                   ></dx-select-box>
                 </div>
-              </div>
-            </dxi-item>
-
-            <dxi-item location="after" locateInMenu="auto">
-              <div
-                class="stacked-toolbar-group"
-                style="display: flex; flex-direction: column; gap: 6px"
-              >
-                <!-- Date Field (Top) -->
-                <dx-date-box
-                  label="Date"
-                  labelMode="floating"
-                  [width]="120"
-                  displayFormat="dd-MM-yyyy"
-                  [readOnly]="false"
-                  style="margin-left: auto"
-                  [(value)]="productionJVFormData.PRODUCTION_DATE"
-                ></dx-date-box>
 
                 <!-- Qty + Button Row -->
-                <div style="display: flex; align-items: flex-end; gap: 8px">
+                <div style="display: flex; gap: 8px; justify-content: end">
                   <dx-number-box
                     label="Production Qty *"
                     labelMode="floating"
@@ -226,7 +225,7 @@
                     text="Fill Component"
                     stylingMode="contained"
                     type="default"
-                    style="height: 32px"
+                    style="height: 32px; margin-top: 5px"
                     (onClick)="fillComponents()"
                   ></dx-button>
                 </div>
