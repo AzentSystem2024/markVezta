@@ -1,0 +1,404 @@
+<dx-validation-group #journalVoucherGroup>
+  <div class="salary-grid-wrapper" style="padding: 0 10px">
+    <div class="grid-container">
+      <dx-data-grid
+        #itemsGridRef
+        [dataSource]="noteDetails"
+        [showBorders]="true"
+        [showRowLines]="true"
+        [showColumnLines]="true"
+        [wordWrapEnabled]="false"
+        [rowAlternationEnabled]="true"
+        [headerFilter]="{ visible: true }"
+        [allowColumnReordering]="true"
+        [showColumnHeaders]="true"
+        [columnAutoWidth]="false"
+        [allowColumnResizing]="true"
+        [height]="'70vh'"
+        [columnResizingMode]="'nextColumn'"
+        [headerFilter]="{ visible: true }"
+        [scrolling]="{ mode: 'virtual' }"
+        rowAlternationInterval="2"
+        [selection]="{ mode: 'single' }"
+        [editing]="{
+          mode: 'cell',
+          allowUpdating: true,
+          allowDeleting: true,
+          allowAdding: true,
+          useIcons: true,
+        }"
+        (onEditorPreparing)="onEditorPreparing($event)"
+        (onCalculateCustomSummary)="onSummaryCalculated($event)"
+      >
+        <dxo-load-panel [showPane]="false"></dxo-load-panel>
+        <dxo-filter-builder [allowHierarchicalFields]="true">
+        </dxo-filter-builder>
+        <dxo-toolbar>
+          <div
+            class="stacked-toolbar-group"
+            style="display: flex; flex-direction: column; gap: 2px"
+          ></div>
+          <dxi-item location="before" locateInMenu="auto">
+            <div
+              class="stacked-toolbar-group"
+              style="display: flex; flex-direction: column; gap: 5px"
+            >
+              <div style="display: flex; gap: 5px">
+                <dx-text-box
+                  label="Doc No"
+                  [(value)]="docNo"
+                  labelMode="floating"
+                  [width]="200"
+                  [readOnly]="true"
+                ></dx-text-box>
+                <dx-text-box
+                  label="Doc No"
+                  [value]="debitFormData[0].SUB_TYPE_NAME"
+                  labelMode="floating"
+                  [width]="200"
+                  [readOnly]="true"
+                ></dx-text-box>
+                <!--  -->
+              </div>
+              <div style="display: flex; gap: 5px">
+                <dx-select-box
+                  #distributorRef
+                  [(value)]="debitFormData[0].SUPP_ID"
+                  [dataSource]="distributorList"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [width]="405"
+                  [searchEnabled]="true"
+                  label="Supplier"
+                  labelMode="floating"
+                  (onValueChanged)="onSupplierChanged($event)"
+                  [readOnly]="true"
+                ></dx-select-box>
+
+                <dx-select-box
+                  [(value)]="invoiceNo"
+                  [items]="pendingInvoicelist"
+                  displayExpr="INVOICE_NO"
+                  valueExpr="INVOICE_NO"
+                  label="Select Invoice"
+                  labelMode="floating"
+                  placeholder="Select Invoice No."
+                  [width]="200"
+                  (onFocusIn)="openInvoicePopup()"
+                ></dx-select-box>
+              </div>
+            </div>
+          </dxi-item>
+
+          <dxi-item location="after" locateInMenu="auto">
+            <div class="stacked-toolbar-group"></div>
+          </dxi-item>
+          <dxi-item location="after" locateInMenu="auto">
+            <div
+              class="stacked-toolbar-group"
+              style="display: flex; flex-direction: column; gap: 5px"
+            >
+              <!-- Row 1: Date only -->
+              <div style="display: flex; gap: 5px; justify-content: flex-end">
+                <dx-text-box
+                  label="Date"
+                  [(value)]="formattedTransDate"
+                  labelMode="floating"
+                  [width]="200"
+                ></dx-text-box>
+              </div>
+              <div style="display: flex; gap: 5px">
+                <dx-number-box
+                  #dueAmountRef
+                  label="Due Amount"
+                  labelMode="floating"
+                  [(value)]="debitFormData[0].DUE_AMOUNT"
+                  [format]="{ type: 'fixedPoint', precision: 2 }"
+                  [width]="150"
+                  [showSpinButtons]="true"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  (onKeyDown)="onDueAmountKeyDown($event)"
+                  [readOnly]="true"
+                ></dx-number-box>
+                <dx-button
+                  icon="plus"
+                  stylingMode="outlined"
+                  type="default"
+                  (onClick)="onAddNewRow()"
+                  style="margin-top: 10px"
+                ></dx-button>
+              </div>
+            </div>
+          </dxi-item>
+        </dxo-toolbar>
+        <dxi-column
+          dataField="SL_NO"
+          caption="Sl No"
+          width="100"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="ledgerCode"
+          caption="Ledger Code"
+          [editorType]="'dxSelectBox'"
+          [lookup]="{
+            dataSource: ledgerList,
+            valueExpr: 'HEAD_CODE',
+            displayExpr: 'HEAD_CODE',
+            searchEnabled: true,
+          }"
+        ></dxi-column>
+
+        <dxi-column
+          dataField="ledgerName"
+          caption="Ledger Name"
+          [width]="'auto'"
+          [editorType]="'dxSelectBox'"
+          [lookup]="{
+            dataSource: ledgerList,
+            valueExpr: 'HEAD_NAME',
+            displayExpr: 'HEAD_NAME',
+            searchEnabled: true,
+          }"
+        ></dxi-column>
+
+        <dxi-column
+          dataField="particulars"
+          caption="Particulars"
+          [editorOptions]="{ maxLength: 250 }"
+        >
+          <dxi-validation-rule
+            type="stringLength"
+            [max]="250"
+            message="Max 250 characters allowed"
+          ></dxi-validation-rule>
+        </dxi-column>
+        <dxi-column
+          dataField="HSN_CODE"
+          caption="HSN Code"
+          dataType="string"
+        ></dxi-column>
+        <dxi-column
+          dataField="Amount"
+          caption="Amount"
+          dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+        >
+        </dxi-column>
+        <dxi-column
+          dataField="GST_PERC"
+          [caption]="
+            selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+              ? ' VAT %'
+              : ' IGST %'
+          "
+          dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+          [allowEditing]="false"
+          [visible]="showGST"
+        >
+        </dxi-column>
+
+        <dxi-column
+          dataField="CGST"
+          caption="CGST"
+          dataType="number"
+          [visible]="showCGST"
+          [allowEditing]="false"
+        ></dxi-column>
+
+        <dxi-column
+          dataField="SGST"
+          caption="SGST"
+          dataType="number"
+          [visible]="showSGST"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="gstAmount"
+          [caption]="
+            selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+              ? 'VAT Amount'
+              : ' GST Amount'
+          "
+          dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+          [calculateCellValue]="calculateTaxAmount"
+          [allowEditing]="true"
+        >
+        </dxi-column>
+
+        <dxi-column
+          dataField="Total"
+          caption="Total"
+          dataType="number"
+          [allowEditing]="false"
+          [calculateCellValue]="calculateTotal"
+        ></dxi-column>
+
+        <dxi-column type="buttons">
+          <dxi-button name="edit"></dxi-button>
+          <dxi-button name="delete"></dxi-button>
+        </dxi-column>
+
+        <dxo-summary>
+          <dxi-total-item
+            column="Amount"
+            summaryType="sum"
+            valueFormat="#,##0.00"
+            displayFormat="Total: {0}"
+            alignment="right"
+          >
+          </dxi-total-item>
+
+          <dxi-total-item
+            column="gstAmount"
+            summaryType="sum"
+            valueFormat="#,##0.00"
+            displayFormat="Total: {0}"
+            alignment="right"
+          >
+          </dxi-total-item>
+
+          <dxi-total-item
+            column="Total"
+            summaryType="sum"
+            valueFormat="#,##0.00"
+            displayFormat="Total: {0}"
+            alignment="right"
+          >
+          </dxi-total-item>
+        </dxo-summary>
+      </dx-data-grid>
+
+      <div
+        style="
+          margin-top: 1px;
+          padding: 0 0px 0 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          width: 100%;
+        "
+      >
+        <!-- Left: Narration -->
+        <dx-text-box
+          #narrationRef
+          [(value)]="debitFormData[0].NARRATION"
+          label="Narration"
+          labelMode="floating"
+          [width]="400"
+          (onKeyDown)="onNarrationKeyDown($event)"
+        ></dx-text-box>
+
+        <dx-text-box
+          label="Vehicle No"
+          labelMode="floating"
+          [(value)]="debitFormData[0].VEHICLE_NO"
+          [width]="200"
+        ></dx-text-box>
+
+        <!-- Middle: Round Off Checkbox -->
+        <dx-check-box
+          text="Round Off"
+          [(value)]="debitFormData[0].ROUND_OFF"
+          (onValueChanged)="onRoundOffChange()"
+          style="margin-top: 18px"
+        ></dx-check-box>
+
+        <!-- Right: Net Amount + Approve checkbox -->
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+          "
+        >
+          <dx-text-box
+            [value]="netAmountString | number: '1.2-2'"
+            label="Net Amount"
+            labelMode="floating"
+            [width]="200"
+            [readOnly]="true"
+            [inputAttr]="{ style: 'text-align: right;' }"
+          ></dx-text-box>
+
+          <dx-check-box
+            [(value)]="debitFormData[0].IS_APPROVED"
+            text="Approve"
+            (onValueChanged)="onApprovedChanged($event)"
+          >
+          </dx-check-box>
+        </div>
+      </div>
+    </div>
+  </div>
+</dx-validation-group>
+
+<div class="form-popup-buttons-container">
+  <div class="popup-footer">
+    <dx-button
+      text="Cancel"
+      (onClick)="cancel()"
+      stylingMode="outlined"
+      type="normal"
+    ></dx-button>
+    <dx-button
+      #saveButtonRef
+      [text]="
+        isUpdating
+          ? debitFormData.IS_APPROVED
+            ? 'Committing…'
+            : 'Updating…'
+          : debitFormData.IS_APPROVED
+            ? 'Commit'
+            : 'Update'
+      "
+      [disabled]="isUpdating"
+      (onClick)="updateDebitNote()"
+      stylingMode="contained"
+      type="default"
+    >
+    </dx-button>
+  </div>
+</div>
+
+<dx-popup
+  [(visible)]="invoicePopupVisible"
+  [width]="600"
+  [height]="400"
+  title="Select Invoice"
+>
+  <dx-data-grid
+    [dataSource]="pendingInvoicelist"
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [height]="'40vh'"
+    [hoverStateEnabled]="true"
+    [selection]="{ mode: 'single' }"
+    (onRowClick)="selectInvoice($event)"
+  >
+    <dxo-editing mode="popup"></dxo-editing>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="standard"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="'auto'"
+    ></dxo-filter-row>
+    <dxo-toolbar> </dxo-toolbar>
+    <dxi-column dataField="INVOICE_NO" caption="Doc No"></dxi-column>
+    <dxi-column dataField="PURCH_DATE" caption="Date"></dxi-column>
+    <dxi-column dataField="NET_AMOUNT" caption="Net Amount"></dxi-column>
+    <dxi-column dataField="PENDING_AMOUNT" caption="Balance"></dxi-column>
+  </dx-data-grid>
+</dx-popup>
