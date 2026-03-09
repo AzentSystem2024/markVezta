@@ -1,0 +1,269 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'82vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true,
+      }"
+      class="grid theme-dependent"
+      [dataSource]="filteredInvoiceList"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onExporting)="onExporting($event)"
+      (onEditingStart)="onEditCreditNote($event)"
+      (onRowRemoving)="onDeleteCreditNote($event)"
+      (onCellPrepared)="onCellPrepared($event)"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">Miscellaneous Purchase</div>
+        </dxi-item>
+        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          *ngIf="canAdd"
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+      <div *dxTemplate="let data of 'dateFilterTemplate'">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="220"
+        >
+          <!-- This controls the dropdown list rendering -->
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
+        </dx-select-box>
+      </div>
+      <dxi-column dataField="DOC_NO" caption="Doc No"></dxi-column>
+      <dxi-column dataField="INVOICE_NO" caption="Invoice No"></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
+      <dxi-column
+        dataField="GROSS_AMOUNT"
+        caption="Gross Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="GST_AMOUNT"
+        [caption]="
+          selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
+            ? ' VAT Amount'
+            : ' GST Amount'
+        "
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="NET_AMOUNT"
+        caption="NET Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
+      <dxi-column
+        dataField="TRANS_DATE"
+        caption="Date"
+        dataType="date"
+        [allowEditing]="false"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+      <dxi-column
+        caption="Status"
+        dataField="STATUS"
+        [width]="80"
+        [cellTemplate]="statusCellRender"
+        [allowHeaderFiltering]="true"
+        [headerFilter]="{
+          dataSource: getStatusFilterData,
+          encodeHtml: false,
+        }"
+        [fixed]="true"
+        fixedPosition="right"
+      >
+      </dxi-column>
+    </dx-data-grid>
+  </div>
+</div>
+
+<dx-popup
+  [(visible)]="isAddMiscPurchase"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="New Miscellaneous Purchase"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isAddMiscPurchase">
+    <app-miscellaneous-purchase-add
+      (popupClosed)="handleClose()"
+    ></app-miscellaneous-purchase-add>
+  </ng-container>
+</dx-popup>
+
+<!-- <dx-popup
+  [(visible)]="isEditCreditNote"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Update Credit Note"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditCreditNote && selectedCreditNote">
+    <app-edit-credit-note
+      [creditFormData]="selectedCreditNote"
+      (popupClosed)="handleClose()"
+    ></app-edit-credit-note>
+  </ng-container>
+</dx-popup> -->
+<dx-popup
+  [(visible)]="isEditMiscPurchase"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Edit Credit Note"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditMiscPurchase">
+    <app-miscellaneous-purchase-edit
+      [creditFormData]="selectedCreditNoteForEdit"
+      (popupClosed)="handleClose()"
+    ></app-miscellaneous-purchase-edit>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isViewCreditNote"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="View Credit Note"
+  (onHiding)="handleClose()"
+>
+  <app-view-credit-note
+    [creditFormData]="selectedCreditNote"
+    (popupClosed)="handleClose()"
+    [CreditNoteid]="selectedCredit"
+  ></app-view-credit-note>
+</dx-popup>
+
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>
+
+<!-- <dx-popup
+  [(visible)]="showCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="170"
+  [dragEnabled]="false"
+>
+  <div>
+    <div class="date-range-container">
+      <dx-date-box
+        [(value)]="customStartDate"
+        type="date"
+        width="300"
+        placeholder="From Date"
+      >
+      </dx-date-box>
+
+      <dx-date-box
+        [(value)]="customEndDate"
+        type="date"
+        placeholder="To Date"
+        width="300"
+      >
+      </dx-date-box>
+    </div>
+
+    <div class="button-container">
+      <dx-button
+        text="Apply"
+        type="default"
+        (onClick)="applyCustomDateFilter()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup> -->

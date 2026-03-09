@@ -224,10 +224,10 @@ export class SupplierListComponent implements OnInit {
               }),
             );
 
-            this.supplierList = data;         // ✅ cache array
+            this.supplierList = data;         // cache array
             this.supplierRowCount = data.length;
 
-            resolve(data);                    // 🔑 stop loader
+            resolve(data);                    //  stop loader
           },
           error: () => {
             this.supplierList = [];
@@ -331,7 +331,7 @@ export class SupplierListComponent implements OnInit {
         this.formClosed.emit(); // tell parent to close
         this.showSupplier();
 
-        // ✅ Call child form reset
+        //  Call child form reset
         this.supplierForm.resetPartialForm();
       }
     });

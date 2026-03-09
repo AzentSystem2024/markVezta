@@ -1015,6 +1015,15 @@ import {
   CustomDatePopupComponent,
   CustomDatePopupModule,
 } from './custom-date-popup/custom-date-popup.component';
+import {
+  MiscellaneousInvoiceComponent,
+  MiscellaneousInvoiceModule,
+} from './pages/miscellaneous-invoice/miscellaneous-invoice.component';
+import { MiscellaneousInvoiceAddComponent, MiscellaneousInvoiceAddModule } from './pages/miscellaneous-invoice-add/miscellaneous-invoice-add.component';
+import { MiscellaneousInvoiceEditComponent, MiscellaneousInvoiceEditModule } from './pages/miscellaneous-invoice-edit/miscellaneous-invoice-edit.component';
+import { MiscellaneousPurchaseComponent, MiscellaneousPurchaseModule } from './pages/miscellaneous-purchase/miscellaneous-purchase.component';
+import { MiscellaneousPurchaseAddComponent, MiscellaneousPurchaseAddModule } from './pages/miscellaneous-purchase-add/miscellaneous-purchase-add.component';
+import { MiscellaneousPurchaseEditComponent, MiscellaneousPurchaseEditModule } from './pages/miscellaneous-purchase-edit/miscellaneous-purchase-edit.component';
 // import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
 
 // import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -1022,7 +1031,7 @@ import {
 // import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1383,6 +1392,13 @@ import {
     SaleReturnModule,
     SaleReturnFormModule,
     CustomDatePopupModule,
+    MiscellaneousInvoiceModule,
+    MiscellaneousInvoiceAddModule,
+    MiscellaneousInvoiceEditModule,
+    MiscellaneousPurchaseModule,
+    MiscellaneousPurchaseAddModule,
+    MiscellaneousPurchaseEditModule,
+
   ],
   providers: [
     AuthService,

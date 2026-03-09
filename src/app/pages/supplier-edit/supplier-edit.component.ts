@@ -352,17 +352,17 @@ console.log(this.selecte_countyId,'selected country id++++++++++')
     (country: any) => country.ID === this.selecte_countyId
   );
 
-  // 4️⃣ If found, set code & name
+  // 4️ If found, set code & name
   if (selectedCountry) {
     this.countryCode = selectedCountry.CODE;                // e.g., '+971'
     this.DEFAULT_COUNTRY_CODE = this.countryCode;           // bind to textbox
     console.log('Selected Country:', selectedCountry.DESCRIPTION);
     console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
   } else {
-    // 5️⃣ Fallback if no country found
+    // 5️ Fallback if no country found
     this.countryCode = '';
     this.DEFAULT_COUNTRY_CODE = '';
-    console.warn('⚠️ No matching country found for ID:', this.selecte_countyId);
+    console.warn(' No matching country found for ID:', this.selecte_countyId);
   }
 
   }
