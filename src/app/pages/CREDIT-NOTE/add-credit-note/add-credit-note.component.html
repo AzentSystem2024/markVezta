@@ -132,14 +132,19 @@
           <dxi-item location="after" locateInMenu="auto">
             <div
               class="stacked-toolbar-group"
-              style="display: flex; flex-direction: column; gap: 8px"
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                justify-content: flex-end;
+              "
             >
               <!-- Row 1: Date Field -->
               <dx-text-box
                 [(value)]="creditFormData.TRANS_DATE"
                 label="Date"
                 labelMode="floating"
-                [width]="252"
+                style="align-items: end; width: 200px"
                 displayFormat="dd-MM-yyyy"
               ></dx-text-box>
 
@@ -161,7 +166,7 @@
 
                 <dx-button
                   type="default"
-                  stylingMode="outlined"
+                  stylingMode="contained"
                   hint="Add Row"
                   style="margin-top: 4px"
                   (onClick)="addNewManualRow()"
@@ -375,6 +380,7 @@
       <dx-check-box
         text="Approve"
         [(value)]="creditFormData.IS_APPROVED"
+        style="margin-left: 20px"
       ></dx-check-box>
     </div>
     <dx-button
