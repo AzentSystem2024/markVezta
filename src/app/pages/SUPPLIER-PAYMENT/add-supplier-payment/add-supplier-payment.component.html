@@ -88,7 +88,7 @@
               <div class="stacked-toolbar-group"></div>
             </dxi-item>
             <dxi-item location="after" locateInMenu="auto">
-              <div style="position: relative; top: 35px">
+              <div>
                 <!-- push it down -->
                 <dx-date-box
                   label="Date"
@@ -187,7 +187,6 @@
             hint="Fill Amount"
             icon="plus"
             type="normal"
-            stylingMode="outlined"
             class="blue-outline-btn"
             [disabled]="selectedRowsCount === 0"
             (onClick)="onFillAmountClick()"

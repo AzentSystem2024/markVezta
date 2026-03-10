@@ -121,7 +121,12 @@
           >
           </dx-button>
         </dxi-item>
-
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
         <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
@@ -143,6 +148,8 @@
         caption="Category"
         dataType="string"
         [groupIndex]="0"
+        sortOrder="asc"
+        [sortingMethod]="typeSorting"
       ></dxi-column>
       <dxi-column
         dataField="MAIN_GROUP_NAME"

@@ -203,8 +203,8 @@
     <dx-popup
       *ngIf="addEmployeePopupOpened"
       [(visible)]="addEmployeePopupOpened"
-      [width]="'90vw'"
-      [height]="'100vh'"
+      [width]="'80vw'"
+      [height]="'auto'"
       title="Add Employee"
     >
       <app-employee-add-form
@@ -216,8 +216,8 @@
 </div>
 <dx-popup
   [(visible)]="editEmployeePopupOpened"
-  [width]="'90vw'"
-  [height]="'100vh'"
+  [width]="'80vw'"
+  [height]="'auto'"
   title="Edit Employee"
   (onHiding)="handleEditClose()"
 >

@@ -183,7 +183,7 @@ dx-text-box {
 }
 
 .custom-card {
-  border: 1px solid #838181;
+  // border: 1px solid #838181;
   opacity: 0.7;
   border-radius: 8px;
 
@@ -210,7 +210,7 @@ dx-text-box {
 }
 
 .custom-card-passport-2 {
-  border: 1px solid #838181;
+  // border: 1px solid #838181;
   opacity: 0.7;
   border-radius: 8px;
   padding: 20px;
@@ -325,20 +325,6 @@ dx-text-box {
   margin-top: 5px; /* Add space between file upload and remarks */
 }
 
-// .fixed-footer {
-//   position: fixed;
-//   bottom: 0;
-//   left: 0;
-//   right: 0;
-//   padding: 12px 20px;
-//   display: flex;
-//   justify-content: flex-end;
-//   z-index: 1000;
-//   // background-color: #494848; /* Add background to avoid transparency */
-//   // border-top: 1px solid #616060; /* Optional: adds a nice top border */
-//   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05); /* Optional: soft shadow */
-// }
-
 .button-container {
   position: fixed;
   bottom: 20px; /* distance from bottom */
@@ -371,16 +357,6 @@ dx-text-box {
   justify-content: center;
   align-items: center;
 }
-
-// .custom-card-address {
-//   border: 1px solid #838181;
-//   border-radius: 8px;
-//   padding: 20px;
-//   // background-color: #2c2c2c; /* Dark card background */
-//   width: 100%;
-//   margin-top: 50px;
-//   max-width: 600px;
-// }
 
 .custom-card-address {
   border: 1px solid #838181;
@@ -498,4 +474,29 @@ dx-text-box {
   margin-top: 20px;
   margin-bottom: 20px;
   padding-right: 20px;
+}
+
+.custom-card-personal {
+  border: 1px solid #838181;
+  opacity: 0.7;
+  border-radius: 8px;
+  padding: 8px;
+  width: 98%;
+
+  margin-left: 10px;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  margin-top: 8px;
+  grid-gap: 8px; /* spacing between items */
+}
+.custom-card-bank-details {
+  border: 1px solid #838181;
+  opacity: 0.7;
+  border-radius: 8px;
+  padding: 8px;
+  width: 98%;
+
+  margin-left: 10px;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  margin-top: 8px;
+  grid-gap: 8px; /* spacing between items */
 }

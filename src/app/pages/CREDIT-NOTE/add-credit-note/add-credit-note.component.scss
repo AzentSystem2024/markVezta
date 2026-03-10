@@ -7,46 +7,42 @@
 
   width: 100%;
   display: contents;
-  overflow: auto; 
+  overflow: auto;
 }
 
 .view-wrapper {
-  
-    .grid {
-      .name-template {
-        .position {
-          font-size: 12px;
-          color: var(--texteditor-label-color);
-        }
-      }
-  
-      ::ng-deep & {
-        .dx-datagrid-header-panel {
-          padding: 0 var(--content-padding);
-        }
-  
-        .dx-toolbar {
-          margin-bottom: 0;
-          padding: var(--toolbar-margin-bottom) 0;
-        }
-  
-        .dx-datagrid-content .dx-row {
-          cursor: pointer;
-        }
-      }
-  
-      .grid-header {
-        @include header();
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
       }
     }
-  
-    user-panel {
-      display: inherit;
+
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
+
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+    }
+
+    .grid-header {
+      @include header();
     }
   }
 
-  
-
+  user-panel {
+    display: inherit;
+  }
+}
 
 .invoice-wrapper {
   height: 100vh;
@@ -61,7 +57,11 @@
   // background-color: white; /* Prevent overlap visual issues */
 }
 
-::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar .dx-toolbar-items-container {
+::ng-deep
+  .salary-grid-wrapper
+  .dx-datagrid
+  .dx-toolbar
+  .dx-toolbar-items-container {
   height: 100%;
   padding: 0 20px;
 }
@@ -76,7 +76,11 @@
   gap: 8px; /* space between the two date pickers */
   margin-bottom: 50px;
 }
-::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar .dx-toolbar-items-container {
+::ng-deep
+  .salary-grid-wrapper
+  .dx-datagrid
+  .dx-toolbar
+  .dx-toolbar-items-container {
   padding: 0px !important;
 }
 
@@ -89,7 +93,7 @@
 
 .popup-footer {
   display: flex;
-  gap: 10px;
+  gap: 25px;
 }
 ::ng-deep .dx-data-grid .dx-row > td,
 ::ng-deep .dx-data-grid .dx-header-row > td {
@@ -101,7 +105,7 @@
   background-color: #f9f9f9;
 }
 ::ng-deep .dx-data-grid .dx-row > td:empty::after {
-  content: '\00a0'; /* non-breaking space */
+  content: "\00a0"; /* non-breaking space */
   display: block;
 }
 ::ng-deep .align-select .dx-texteditor {
@@ -115,4 +119,11 @@
   padding-top: 4px !important;
   padding-bottom: 4px !important;
   font-size: 13px;
+}
+
+.stacked-toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
 }
