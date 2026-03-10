@@ -149,6 +149,7 @@ export class PackingAddComponent {
       this.getLastOrderNo();
     }
     this.getAliasNo();
+    this.getPartNo();
     this.getItems();
     this.getPackingList();
     this.PackingData.ART_SERIAL = 1;
@@ -167,6 +168,14 @@ export class PackingAddComponent {
       console.log(response);
       this.PackingData.ALIAS_NO = response.GetAliasNo;
       console.log(this.PackingData.ALIAS_NO, 'ALIASNO');
+    });
+  }
+
+    getPartNo() {
+    this.dataService.getPackingLastPartNo().subscribe((response: any) => {
+      console.log(response);
+      this.PackingData.PART_NO = response.GetPartNo;
+      console.log(this.PackingData.PART_NO, 'ALIASNO');
     });
   }
 
@@ -1220,6 +1229,7 @@ if (mrp <= stdPrice) {
 
     // async alias LAST
     this.getAliasNo();
+    this.getPartNo();
   }
 
   closePopup() {

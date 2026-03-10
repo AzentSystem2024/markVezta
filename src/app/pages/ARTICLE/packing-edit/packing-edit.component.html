@@ -322,13 +322,15 @@
         </div>
       </div>
 
-      <!-- <div class="form-field">
-    <dx-text-box
-      label="Alias"
-      labelMode="floating"
-      placeholder="Alias"
-    ></dx-text-box>
-  </div> -->
+      <div class="form-field">
+        <dx-text-box
+          class="center-numberbox"
+          labelMode="floating"
+          label="Pair Quantity"
+          [(value)]="totalQuantity"
+          [readOnly]="true"
+        ></dx-text-box>
+      </div>
 
       <!-- <div class="form-field mt-2">
     
