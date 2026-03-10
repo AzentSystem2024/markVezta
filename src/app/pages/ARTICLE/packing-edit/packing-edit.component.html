@@ -297,6 +297,21 @@
         ></dx-date-box>
       </div>
 
+      <!-- <div class="form-field">
+        <dx-number-box
+          class="center-numberbox"
+          labelMode="floating"
+          label="Pair Quantity"
+          [(value)]="totalQuantity"
+          [readOnly]="true"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-number-box>
+      </div> -->
+
       <!-- Change Button -->
       <dx-button
         text="Change"
@@ -518,7 +533,7 @@
               mode="cell"
               [allowUpdating]="true"
               [allowAdding]="false"
-              [allowDeleting]="true"
+              [allowDeleting]="false"
             >
             </dxo-editing>
 
