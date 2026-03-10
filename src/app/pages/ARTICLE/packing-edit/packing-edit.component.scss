@@ -299,3 +299,29 @@
 .standard-pack-row {
   grid-column: 1 / span 2; /* take full form width, not image column */
 }
+.reset-btn {
+  color: #ff2c2c;
+  border-color: #ffc3c3 !important;
+}
+
+::ng-deep.reset-btn:hover {
+  color: #ff2c2c !important;
+  background-color: #ffc3c3 !important;
+}
+::ng-deep .dx-button .dx-icon-eyeopen {
+  color: #0073d8 !important;
+}
+::ng-deep.reset-btn:hover {
+  color: #ff2c2c !important;
+  background-color: #ffc3c3 !important;
+}
+::ng-deep .view-btn.dx-button {
+  color: #0073d8 !important;
+  border-color: #0073d8 !important;
+}
+
+::ng-deep .view-btn.dx-button.dx-state-hover {
+  color: #0073d8 !important;
+  border-color: #0073d8 !important;
+  background-color: #d9eaf9 !important;
+}

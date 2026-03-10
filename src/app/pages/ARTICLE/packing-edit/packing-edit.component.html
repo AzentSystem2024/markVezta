@@ -281,39 +281,46 @@
       </div>
 
       <div class="form-field">
-        <dx-date-box
-          label="Effect From"
-          [displayFormat]="'dd/MM/yyyy'"
-          labelMode="floating"
-          placeholder="Effect From"
-          [(value)]="PackingData.STD_PRICE_EFFECT_FROM"
-          [showSpinButtons]="true"
-          [readOnly]="true"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-date-box>
+        <div class="d-flex" style="justify-content: space-between">
+          <dx-date-box
+            label="Effect From"
+            [displayFormat]="'dd/MM/yyyy'"
+            labelMode="floating"
+            placeholder="Effect From"
+            [(value)]="PackingData.STD_PRICE_EFFECT_FROM"
+            [showSpinButtons]="true"
+            [readOnly]="true"
+            class="me-2"
+            ><dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="This field is required"
+              ></dxi-validation-rule> </dx-validator
+          ></dx-date-box>
+
+          <div class="d-flex" style="gap: 5px">
+            <!-- Change Button -->
+            <dx-button
+              text="Update"
+              stylingMode="contained"
+              type="default"
+              (onClick)="onChangePrice()"
+            >
+            </dx-button>
+
+            <!-- View Button -->
+            <dx-button
+              text="View"
+              stylingMode="outlined"
+              type="normal"
+              icon="eyeopen"
+              class="view-btn"
+              (onClick)="onViewPriceHistory()"
+            >
+            </dx-button>
+          </div>
+        </div>
       </div>
-
-      <!-- Change Button -->
-      <dx-button
-        text="Change"
-        stylingMode="outlined"
-        type="default"
-        (onClick)="onChangePrice()"
-      >
-      </dx-button>
-
-      <!-- View Button -->
-      <dx-button
-        text="View"
-        stylingMode="outlined"
-        type="normal"
-        (onClick)="onViewPriceHistory()"
-      >
-      </dx-button>
 
       <!-- <div class="form-field">
     <dx-text-box
@@ -382,7 +389,7 @@
             hind="Reset form"
             stylingMode="outlined"
             (onClick)="clearForm()"
-            style="border-color: #ffc3c3 !important; color: #ff2c2c"
+            class="reset-btn"
           ></dx-button>
           <dx-button
             text="Load Article"

@@ -233,3 +233,13 @@
 .standard-pack-row {
   grid-column-start: 1; /* start new row */
 }
+
+.reset-btn {
+  color: #ff2c2c;
+  border-color: #ffc3c3 !important;
+}
+
+::ng-deep.reset-btn:hover {
+  color: #ff2c2c !important;
+  background-color: #ffc3c3 !important;
+}
