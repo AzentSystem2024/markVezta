@@ -38,7 +38,7 @@ export class SupplierFormComponent implements OnInit {
   validationGroup: DxValidationGroupComponent;
 
   @ViewChild('landedCostGrid', { static: false })
-  landedCostGrid!: DxDataGridComponent; // ✅ reference to dx-data-grid
+  landedCostGrid!: DxDataGridComponent; // reference to dx-data-grid
 
   CountryDropdownData: any[] = [];
   VATRuleDropdownData: any[] = [];
@@ -142,7 +142,7 @@ export class SupplierFormComponent implements OnInit {
     this.newSupplier.ADDRESS3 = '';
     this.newSupplier.NOTES = '';
     this.newSupplier.PHONE = '';
-    // ✅ Clear Supplier_cost
+    // Clear Supplier_cost
     this.formSupplierData.Supplier_cost = [];
 
     if (this.landedCostGrid) {
@@ -271,18 +271,18 @@ export class SupplierFormComponent implements OnInit {
       (country: any) => country.ID === this.selecte_countyId
     );
     console.log('Selected Country Object:', selectedCountry);
-    // 4️⃣ If found, set code & name
+    // 4️ If found, set code & name
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE; // e.g., '+971'
       this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
       console.log('Selected Country:', selectedCountry.DESCRIPTION);
       console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
     } else {
-      // 5️⃣ Fallback if no country found
+      // 5️ Fallback if no country found
       this.countryCode = '';
       this.DEFAULT_COUNTRY_CODE = '';
       console.warn(
-        '⚠️ No matching country found for ID:',
+        ' No matching country found for ID:',
         this.selecte_countyId
       );
     }

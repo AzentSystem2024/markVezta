@@ -145,16 +145,16 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
 
         <dxi-item
           name="exportButton"
           location="after"
           cssClass="export-btn"
         ></dxi-item>
-        <!-- Divider -->
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
 
         <dxi-item
           location="after"
@@ -170,7 +170,6 @@
               icon="todo"
               stylingMode="contained"
               type="default"
-              [width]="100"
               class="mt-2"
               (onClick)="load_JournalBook_data()"
             >

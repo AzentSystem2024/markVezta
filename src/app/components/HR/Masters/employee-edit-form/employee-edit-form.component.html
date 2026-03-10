@@ -8,7 +8,7 @@
     <!-- GENERAL TAB -->
     <dxi-item title="General">
       <!-- Two Column Container -->
-      <div class="container">
+      <div class="container custom-card-personal">
         <!-- Left Column: dx-card with Form -->
         <div class="left-column">
           <div class="dx-card custom-card">
@@ -228,7 +228,7 @@
           />
         </div>
       </div>
-      <div class="custom-card-address">
+      <div class="container custom-card-address">
         <!-- Row 1: Address fields -->
         <div>
           <dx-text-box
@@ -303,7 +303,7 @@
           <div *ngIf="emailError" class="error-message">{{ emailError }}</div>
         </div>
       </div>
-      <div class="dx-card custom-card-passport">
+      <!-- <div class="dx-card custom-card-passport">
         <span class="card-label">-- Visa Details --</span>
         <div class="four-column-layout">
           <div>
@@ -417,9 +417,9 @@
             </dx-text-box>
           </div>
         </div>
-      </div>
+      </div> -->
 
-      <div class="container">
+      <div class="container custom-card-bank-details">
         <div class="left-column">
           <div class="custom-card-passport-2">
             <span class="card-label">-- Bank Details --</span>
@@ -477,7 +477,7 @@
         </div>
       </div>
 
-      <div class="form-status-row">
+      <div class="form-status-row container">
         <dx-check-box
           [(value)]="employeeFormData.IS_SALESMAN"
           text="Salesman"
@@ -570,11 +570,15 @@
     </dxi-item> -->
   </dx-tab-panel>
 
-  <div class="fixed-footer">
+  <div
+    class="container"
+    style="display: flex; justify-content: flex-end; gap: 10px"
+  >
     <dx-button
       text="Cancel"
       type="normal"
       class="mr-2"
+      stylingMode="outlined"
       (onClick)="cancel()"
     ></dx-button>
     <dx-button text="Update" type="default" (onClick)="update()"></dx-button>
@@ -621,19 +625,17 @@
     </div>
 
     <!-- Footer Buttons -->
-    <div class="fixed-footer">
+    <div style="display: flex; justify-content: flex-end; gap: 10px">
       <dx-button
         text="Cancel"
-        stylingMode="outlined"
         type="normal"
-        class="action-btn"
+        stylingMode="outlined"
         (onClick)="showPopup = false"
       ></dx-button>
       <dx-button
         text="Save"
         stylingMode="contained"
         type="default"
-        class="action-btn"
         (onClick)="saveFileDetails()"
       ></dx-button>
     </div>

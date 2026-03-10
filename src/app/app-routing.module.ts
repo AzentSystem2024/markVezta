@@ -217,6 +217,7 @@ import { ArticleproductionJvListComponent } from './articleproduction-jv-list/ar
 import { StockViewComponent } from './stock-view/stock-view.component';
 import { SaleReturnComponent } from './sale-return/sale-return.component';
 import { MiscellaneousInvoiceComponent } from './pages/miscellaneous-invoice/miscellaneous-invoice.component';
+import { MiscellaneousPurchaseComponent } from './pages/miscellaneous-purchase/miscellaneous-purchase.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -236,6 +237,7 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
+  
 
   {
     path: 'auth',
@@ -957,6 +959,11 @@ const routes: Routes = [
         component: MiscellaneousInvoiceComponent,
         canActivate: [AuthGuardService],
       },
+      {
+    path: 'misc-purchase',
+    component: MiscellaneousPurchaseComponent,
+    canActivate: [AuthGuardService],
+  },
       {
         path: '**',
         redirectTo: 'login',

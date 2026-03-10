@@ -42,6 +42,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
 import notify from 'devextreme/ui/notify';
+import { MiscellaneousInvoiceAddModule } from '../miscellaneous-invoice-add/miscellaneous-invoice-add.component';
 
 @Component({
   selector: 'app-miscellaneous-invoice',
@@ -81,6 +82,7 @@ export class MiscellaneousInvoiceComponent {
   showCustomDatePopup = false;
   filteredJournalVoucherList: any;
   isEmptyDatagrid: boolean = false;
+  isAddMiscInvoice:boolean = false;
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -405,7 +407,13 @@ export class MiscellaneousInvoiceComponent {
       : '';
   }
 
-  addMiscInvoice() {}
+  addMiscInvoice() {
+    this.isAddMiscInvoice = true;
+  }
+
+  handleClose(){
+    this.isAddMiscInvoice=false;
+  }
 }
 
 @NgModule({
@@ -439,6 +447,8 @@ export class MiscellaneousInvoiceComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
+    MiscellaneousInvoiceAddModule,
+    
   ],
   providers: [],
   declarations: [MiscellaneousInvoiceComponent],

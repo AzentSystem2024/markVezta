@@ -3,7 +3,7 @@
     <div class="grid-container">
       <dx-data-grid
         #itemsGridRef
-        [dataSource]="creditFormData.NOTE_DETAIL"
+        [dataSource]="noteDetails"
         [showBorders]="true"
         [showColumnLines]="true"
         [columnAutoWidth]="false"
@@ -27,57 +27,30 @@
           useIcons: true,
         }"
         (onEditorPreparing)="onEditorPreparing($event)"
-        (onRowRemoving)="onRowRemoving($event)"
+        (onInitNewRow)="onInitNewRow($event)"
+        (onRowRemoved)="onRowRemoved($event)"
       >
         <dxo-load-panel [showPane]="false"></dxo-load-panel>
-        <dxo-filter-builder [allowHierarchicalFields]="true">
-        </dxo-filter-builder>
         <dxo-toolbar>
-          <div
-            class="stacked-toolbar-group"
-            style="display: flex; flex-direction: column; gap: 2px"
-          ></div>
-          <dxi-item location="before" locateInMenu="auto">
-            <div
-              class="stacked-toolbar-group"
-              style="display: flex; flex-direction: column; gap: 5px"
-            >
+          <dxi-item location="before">
+            <div style="display: flex; flex-direction: column; gap: 5px">
               <div style="display: flex; align-items: baseline; gap: 5px">
                 <dx-text-box
-                  [(value)]="docNo"
                   label="Doc No"
+                  [value]="creditFormData[0]?.DOC_NO"
                   labelMode="floating"
                   [width]="200"
                   [readOnly]="true"
                 ></dx-text-box>
 
-                <dx-select-box
-                  *ngIf="subType"
-                  [dataSource]="subTypeList"
-                  displayExpr="SUB_TYPE_NAME"
-                  valueExpr="SUB_TYPE_ID"
-                  label="Select Subtype"
+                <dx-text-box
+                  label="Sub Type"
+                  [value]="creditFormData[0]?.SUB_TYPE_NAME"
                   labelMode="floating"
-                  placeholder="Select Subtype"
                   [width]="405"
-                  (onValueChanged)="onSubTypeChange($event)"
-                >
-                </dx-select-box>
-                <!-- <dx-select-box
-                  #distributorRef
-                  [(value)]="selectedDistributorId"
-                  [dataSource]="distributorList"
-                  displayExpr="DESCRIPTION"
-                  valueExpr="ID"
-                  [width]="405"
-                  [searchEnabled]="true"
-                  label="Customer"
-                  labelMode="floating"
-                  (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
-                  (onValueChanged)="onDistributorSelected($event)"
-                ></dx-select-box> -->
+                  [readOnly]="true"
+                ></dx-text-box>
               </div>
-
               <div style="display: flex; align-items: baseline; gap: 5px">
                 <dx-select-box
                   #distributorRef
@@ -91,73 +64,52 @@
                   labelMode="floating"
                   (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
                   (onValueChanged)="onDistributorSelected($event)"
-                ></dx-select-box>
-                <dx-select-box
-                  [value]="creditFormData.INVOICE_NO"
-                  [items]="pendingInvoices"
-                  displayExpr="INVOICE_NO"
-                  valueExpr="INVOICE_NO"
-                  label="Select Invoice"
-                  labelMode="floating"
-                  placeholder="Select Invoice No."
-                  [width]="200"
-                  (onFocusIn)="openInvoicePopup()"
-                ></dx-select-box>
-                <!-- <dx-text-box
-                  [(value)]="docNo"
-                  label="Doc No"
-                  labelMode="floating"
-                  [width]="200"
                   [readOnly]="true"
-                ></dx-text-box>
-
+                ></dx-select-box>
                 <dx-select-box
-                  [value]="creditFormData.INVOICE_NO"
+                  [(value)]="invoiceNo"
                   [items]="pendingInvoices"
-                  displayExpr="INVOICE_NO"
-                  valueExpr="INVOICE_NO"
                   label="Select Invoice"
                   labelMode="floating"
+                  displayExpr="INVOICE_NO"
+                  valueExpr="INVOICE_NO"
                   placeholder="Select Invoice No."
                   [width]="200"
                   (onFocusIn)="openInvoicePopup()"
-                ></dx-select-box> -->
+                ></dx-select-box>
               </div>
             </div>
           </dxi-item>
 
-          <dxi-item location="after" locateInMenu="auto">
-            <div class="stacked-toolbar-group"></div>
-          </dxi-item>
-          <dxi-item location="after" locateInMenu="auto">
+          <dxi-item location="after">
             <div
-              class="stacked-toolbar-group"
               style="
                 display: flex;
                 flex-direction: column;
                 gap: 8px;
-                justify-content: flex-end;
+                align-items: flex-start;
               "
             >
-              <!-- Row 1: Date Field -->
-              <dx-text-box
-                [(value)]="creditFormData.TRANS_DATE"
+              <!-- Date Field -->
+              <dx-date-box
                 label="Date"
+                [(value)]="transDate"
                 labelMode="floating"
-                style="align-items: end; width: 200px"
+                [width]="200"
                 displayFormat="dd-MM-yyyy"
-              ></dx-text-box>
+                [readOnly]="true"
+              ></dx-date-box>
 
-              <!-- Row 2: Due Amount + Plus Button -->
+              <!-- Due Amount + Plus Button -->
               <div style="display: flex; align-items: center; gap: 5px">
                 <dx-number-box
                   #dueAmountRef
                   label="Due Amount"
                   labelMode="floating"
-                  [(value)]="creditFormData.DUE_AMOUNT"
                   [format]="{ type: 'fixedPoint', precision: 2 }"
-                  [width]="200"
+                  [width]="168"
                   [showSpinButtons]="true"
+                  [(value)]="creditFormData[0].DUE_AMOUNT"
                   [inputAttr]="{ style: 'text-align: right;' }"
                   style="margin-top: 4px"
                   (onKeyDown)="onDueAmountKeyDown($event)"
@@ -165,36 +117,27 @@
                 ></dx-number-box>
 
                 <dx-button
+                  icon="plus"
                   type="default"
-                  stylingMode="contained"
+                  stylingMode="outlined"
                   hint="Add Row"
+                  [width]="32"
+                  [height]="30"
                   style="margin-top: 4px"
                   (onClick)="addNewManualRow()"
-                >
-                  <div
-                    *dxTemplate="let data of 'content'"
-                    class="add-btn-content"
-                  >
-                    <span
-                      class="iconify"
-                      data-icon="formkit:add"
-                      data-width="20"
-                      data-height="20"
-                    ></span>
-
-                    <span class="add-text">Add Row</span>
-                  </div></dx-button
-                >
+                ></dx-button>
               </div>
             </div>
           </dxi-item>
         </dxo-toolbar>
+
         <dxi-column
           dataField="SL_NO"
           caption="Sl No"
           width="80"
-          [allowEditing]="false"
+          [allowEditing]="true"
         ></dxi-column>
+
         <dxi-column
           dataField="ledgerCode"
           caption="Ledger Code"
@@ -240,14 +183,13 @@
           caption="Amount"
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
-        >
-        </dxi-column>
+        ></dxi-column>
         <dxi-column
           dataField="GST_PERC"
           [caption]="
             selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
               ? ' VAT %'
-              : ' IGST %'
+              : ' GST %'
           "
           dataType="number"
           [visible]="showGST"
@@ -278,9 +220,7 @@
           "
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
-          [calculateCellValue]="calculateTaxAmount"
-        >
-        </dxi-column>
+        ></dxi-column>
         <dxi-column
           dataField="TOTAL"
           caption="Total"
@@ -290,7 +230,8 @@
           [calculateCellValue]="calculateTotalAmount"
         ></dxi-column>
         <dxi-column type="buttons">
-          <dxi-button name="delete" width="80"></dxi-button>
+          <dxi-button name="edit"></dxi-button>
+          <dxi-button name="delete"></dxi-button>
         </dxi-column>
 
         <dxo-summary>
@@ -300,17 +241,14 @@
             valueFormat="#,##0.00"
             displayFormat="Total: {0}"
             alignment="right"
-          >
-          </dxi-total-item>
-
+          ></dxi-total-item>
           <dxi-total-item
             column="gstAmount"
             summaryType="sum"
             valueFormat="#,##0.00"
             displayFormat="Total: {0}"
             alignment="right"
-          >
-          </dxi-total-item>
+          ></dxi-total-item>
           <dxi-total-item
             column="TOTAL"
             summaryType="sum"
@@ -321,66 +259,80 @@
           </dxi-total-item>
         </dxo-summary>
       </dx-data-grid>
-      <!-- Narration Box Below the Grid -->
+
+      <!-- Narration Below Grid -->
+      <!-- Narration Below Grid -->
+      <!-- Narration + Vehicle No Below Grid -->
       <div
         style="
+          margin-top: 1px;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           width: 100%;
         "
       >
-        <!--  LEFT SIDE: Vehicle Number + Narration -->
+        <!-- LEFT SIDE: Narration + Vehicle No -->
         <div style="display: flex; gap: 10px; width: 750px">
           <!-- Narration -->
+
           <dx-text-box
+            #narrationRef
+            [(value)]="creditFormData[0].NARRATION"
             label="Narration"
             labelMode="floating"
-            [(value)]="creditFormData.NARRATION"
             [width]="400"
+            (onKeyDown)="onNarrationKeyDown($event)"
           ></dx-text-box>
 
-          <!-- Vehicle Number -->
+          <!-- Vehicle Number below narration -->
           <dx-text-box
             label="Vehicle Number"
             labelMode="floating"
-            [(value)]="creditFormData.VEHICLE_NO"
+            [(value)]="creditFormData[0].VEHICLE_NO"
             [width]="200"
           ></dx-text-box>
         </div>
 
-        <!--  RIGHT SIDE: Round Off + Net Amount -->
-        <div style="display: flex; align-items: center; gap: 15px">
-          <dx-check-box
-            text="Round Off"
-            [(value)]="creditFormData.ROUND_OFF"
-            (onValueChanged)="onRoundOffChange()"
-          ></dx-check-box>
-
-          <dx-text-box
-            [value]="netAmountString"
-            label="Net Amount"
-            labelMode="floating"
-            [width]="200"
-            [readOnly]="true"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-            [inputAttr]="{ style: 'text-align: right;' }"
-          ></dx-text-box>
+        <!-- RIGHT SIDE: Net Amount + Approve -->
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 15px">
+            <dx-check-box
+              text="Round Off"
+              [(value)]="creditFormData[0].ROUND_OFF"
+              (onValueChanged)="onRoundOffChange()"
+            ></dx-check-box>
+            <dx-text-box
+              [value]="calculatedNetAmount"
+              label="Net Amount"
+              labelMode="floating"
+              [width]="200"
+              [readOnly]="true"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
+              [inputAttr]="{ style: 'text-align: right;' }"
+            ></dx-text-box>
+          </div>
         </div>
       </div>
-
-      <div style="margin-top: 15px; padding: 0 0 0 5px"></div>
     </div>
   </div>
 </dx-validation-group>
 
+<!-- Footer Buttons -->
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
     <div>
       <dx-check-box
-        text="Approve"
         [(value)]="creditFormData.IS_APPROVED"
-        style="margin-left: 20px"
+        text="Approve"
+        (onValueChanged)="onApprovedChanged($event)"
       ></dx-check-box>
     </div>
     <dx-button
@@ -390,22 +342,21 @@
       type="normal"
     ></dx-button>
     <dx-button
-      #saveButtonRef
-      id="saveBtn"
       [text]="
-        isSaving
+        isUpdating
           ? creditFormData.IS_APPROVED
             ? 'Committing…'
-            : 'Saving…'
+            : 'Updating…'
           : creditFormData.IS_APPROVED
             ? 'Commit'
-            : 'Save'
+            : 'Update'
       "
-      [disabled]="isSaving"
-      (onClick)="saveCreditNote()"
+      [disabled]="isUpdating"
+      (onClick)="updateCreditNote()"
       stylingMode="contained"
       type="default"
-    ></dx-button>
+    >
+    </dx-button>
   </div>
 </div>
 
@@ -418,29 +369,10 @@
   <dx-data-grid
     [dataSource]="pendingInvoices"
     [showBorders]="true"
-    [showColumnLines]="true"
-    [height]="'40vh'"
     [hoverStateEnabled]="true"
     [selection]="{ mode: 'single' }"
     (onRowClick)="selectInvoice($event)"
   >
-    <dxo-editing mode="popup"></dxo-editing>
-    <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-pager
-      [visible]="true"
-      [allowedPageSizes]="allowedPageSizes"
-      [displayMode]="displayMode"
-      [showPageSizeSelector]="showPageSizeSelector"
-      [showInfo]="true"
-      [showNavigationButtons]="true"
-    ></dxo-pager>
-    <dxo-load-panel [showPane]="false"></dxo-load-panel>
-    <dxo-scrolling mode="standard"></dxo-scrolling>
-    <dxo-filter-row
-      [visible]="isFilterRowVisible"
-      [applyFilter]="auto"
-    ></dxo-filter-row>
-    <dxo-toolbar> </dxo-toolbar>
     <dxi-column dataField="INVOICE_NO" caption="Invoice No"></dxi-column>
     <dxi-column dataField="ITEM_NAME" caption="Item"></dxi-column>
     <dxi-column dataField="DATE" caption="Date"></dxi-column>

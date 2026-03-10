@@ -1,21 +1,21 @@
-<dx-validation-group #creditNoteGroup>
+<dx-validation-group #journalVoucherGroup>
   <div class="salary-grid-wrapper" style="padding: 0 10px">
     <div class="grid-container">
       <dx-data-grid
         #itemsGridRef
-        [dataSource]="creditFormData.NOTE_DETAIL"
+        [dataSource]="debitFormData.NOTE_DETAIL"
         [showBorders]="true"
+        [showRowLines]="true"
         [showColumnLines]="true"
         [columnAutoWidth]="false"
         [wordWrapEnabled]="false"
         [rowAlternationEnabled]="true"
-        [headerFilter]="{ visible: true }"
+        [headerFilter]="{ visible: true, allowSearch: true }"
         [allowColumnReordering]="true"
         [showColumnHeaders]="true"
         [allowColumnResizing]="true"
         [height]="'70vh'"
         [columnResizingMode]="'nextColumn'"
-        [headerFilter]="{ visible: true }"
         [scrolling]="{ mode: 'virtual' }"
         rowAlternationInterval="2"
         [selection]="{ mode: 'single' }"
@@ -23,10 +23,12 @@
           mode: 'cell',
           allowUpdating: true,
           allowDeleting: true,
-          allowAdding: true,
+          allowAdding: false,
           useIcons: true,
         }"
         (onEditorPreparing)="onEditorPreparing($event)"
+        (onSummaryCalculated)="onSummaryCalculated($event)"
+        (onRowInserted)="onRowInserted($event)"
         (onRowRemoving)="onRowRemoving($event)"
       >
         <dxo-load-panel [showPane]="false"></dxo-load-panel>
@@ -42,15 +44,14 @@
               class="stacked-toolbar-group"
               style="display: flex; flex-direction: column; gap: 5px"
             >
-              <div style="display: flex; align-items: baseline; gap: 5px">
+              <div style="display: flex; gap: 5px">
                 <dx-text-box
-                  [(value)]="docNo"
                   label="Doc No"
+                  [(value)]="debitFormData.DOC_NO"
                   labelMode="floating"
                   [width]="200"
                   [readOnly]="true"
                 ></dx-text-box>
-
                 <dx-select-box
                   *ngIf="subType"
                   [dataSource]="subTypeList"
@@ -59,61 +60,29 @@
                   label="Select Subtype"
                   labelMode="floating"
                   placeholder="Select Subtype"
-                  [width]="405"
+                  [width]="200"
                   (onValueChanged)="onSubTypeChange($event)"
                 >
                 </dx-select-box>
-                <!-- <dx-select-box
-                  #distributorRef
-                  [(value)]="selectedDistributorId"
-                  [dataSource]="distributorList"
-                  displayExpr="DESCRIPTION"
-                  valueExpr="ID"
-                  [width]="405"
-                  [searchEnabled]="true"
-                  label="Customer"
-                  labelMode="floating"
-                  (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
-                  (onValueChanged)="onDistributorSelected($event)"
-                ></dx-select-box> -->
+                <!--  -->
               </div>
-
-              <div style="display: flex; align-items: baseline; gap: 5px">
+              <div style="display: flex; gap: 5px">
                 <dx-select-box
                   #distributorRef
-                  [(value)]="selectedDistributorId"
+                  [(value)]="debitFormData.SUPP_ID"
                   [dataSource]="distributorList"
                   displayExpr="DESCRIPTION"
                   valueExpr="ID"
                   [width]="405"
                   [searchEnabled]="true"
-                  label="Customer"
+                  label="Supplier"
                   labelMode="floating"
-                  (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
-                  (onValueChanged)="onDistributorSelected($event)"
+                  (onValueChanged)="onSupplierChanged($event)"
                 ></dx-select-box>
-                <dx-select-box
-                  [value]="creditFormData.INVOICE_NO"
-                  [items]="pendingInvoices"
-                  displayExpr="INVOICE_NO"
-                  valueExpr="INVOICE_NO"
-                  label="Select Invoice"
-                  labelMode="floating"
-                  placeholder="Select Invoice No."
-                  [width]="200"
-                  (onFocusIn)="openInvoicePopup()"
-                ></dx-select-box>
-                <!-- <dx-text-box
-                  [(value)]="docNo"
-                  label="Doc No"
-                  labelMode="floating"
-                  [width]="200"
-                  [readOnly]="true"
-                ></dx-text-box>
 
-                <dx-select-box
-                  [value]="creditFormData.INVOICE_NO"
-                  [items]="pendingInvoices"
+                <!-- <dx-select-box
+                  [(value)]="debitFormData.INVOICE_NO"
+                  [items]="pendingInvoicelist"
                   displayExpr="INVOICE_NO"
                   valueExpr="INVOICE_NO"
                   label="Select Invoice"
@@ -132,44 +101,39 @@
           <dxi-item location="after" locateInMenu="auto">
             <div
               class="stacked-toolbar-group"
-              style="
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-                justify-content: flex-end;
-              "
+              style="display: flex; flex-direction: column; gap: 5px"
             >
-              <!-- Row 1: Date Field -->
-              <dx-text-box
-                [(value)]="creditFormData.TRANS_DATE"
-                label="Date"
-                labelMode="floating"
-                style="align-items: end; width: 200px"
-                displayFormat="dd-MM-yyyy"
-              ></dx-text-box>
-
-              <!-- Row 2: Due Amount + Plus Button -->
-              <div style="display: flex; align-items: center; gap: 5px">
+              <!-- Row 1: Date only -->
+              <div style="display: flex; gap: 5px; justify-content: flex-end">
+                <dx-date-box
+                  [(value)]="debitFormData.TRANS_DATE"
+                  displayFormat="dd-MM-yyyy"
+                  type="date"
+                  label="Date"
+                  labelMode="floating"
+                  [width]="200"
+                  [readOnly]="true"
+                ></dx-date-box>
+              </div>
+              <div style="display: flex; gap: 5px">
                 <dx-number-box
                   #dueAmountRef
                   label="Due Amount"
                   labelMode="floating"
-                  [(value)]="creditFormData.DUE_AMOUNT"
+                  [(value)]="this.debitFormData.DUE_AMOUNT"
                   [format]="{ type: 'fixedPoint', precision: 2 }"
                   [width]="200"
                   [showSpinButtons]="true"
                   [inputAttr]="{ style: 'text-align: right;' }"
-                  style="margin-top: 4px"
                   (onKeyDown)="onDueAmountKeyDown($event)"
                   [readOnly]="true"
                 ></dx-number-box>
-
                 <dx-button
-                  type="default"
                   stylingMode="contained"
-                  hint="Add Row"
-                  style="margin-top: 4px"
-                  (onClick)="addNewManualRow()"
+                  hint="Add New Row"
+                  type="default"
+                  (onClick)="onAddNewRow()"
+                  style="margin-top: 10px"
                 >
                   <div
                     *dxTemplate="let data of 'content'"
@@ -192,7 +156,7 @@
         <dxi-column
           dataField="SL_NO"
           caption="Sl No"
-          width="80"
+          width="100"
           [allowEditing]="false"
         ></dxi-column>
         <dxi-column
@@ -205,11 +169,13 @@
             displayExpr: 'HEAD_CODE',
             searchEnabled: true,
           }"
+          (onEditorPreparing)="onEditorPreparing($event)"
         ></dxi-column>
 
         <dxi-column
           dataField="ledgerName"
           caption="Ledger Name"
+          [width]="'auto'"
           [editorType]="'dxSelectBox'"
           [lookup]="{
             dataSource: ledgerList,
@@ -231,11 +197,6 @@
           ></dxi-validation-rule>
         </dxi-column>
         <dxi-column
-          dataField="HSN_CODE"
-          caption="HSN Code"
-          dataType="string"
-        ></dxi-column>
-        <dxi-column
           dataField="Amount"
           caption="Amount"
           dataType="number"
@@ -250,10 +211,12 @@
               : ' IGST %'
           "
           dataType="number"
-          [visible]="showGST"
           [format]="{ type: 'fixedPoint', precision: 2 }"
+          [allowEditing]="false"
+          [visible]="showGST"
         >
         </dxi-column>
+
         <dxi-column
           dataField="CGST"
           caption="CGST"
@@ -269,11 +232,12 @@
           [visible]="showSGST"
           [allowEditing]="false"
         ></dxi-column>
+
         <dxi-column
           dataField="gstAmount"
           [caption]="
             selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-              ? ' VAT Amount'
+              ? 'VAT Amount'
               : ' GST Amount'
           "
           dataType="number"
@@ -281,16 +245,21 @@
           [calculateCellValue]="calculateTaxAmount"
         >
         </dxi-column>
+
+        <dxi-column dataField="HSN_CODE" caption="HSN Code" dataType="string">
+        </dxi-column>
+
         <dxi-column
-          dataField="TOTAL"
+          dataField="Total"
           caption="Total"
           dataType="number"
-          [visible]="true"
           [allowEditing]="false"
-          [calculateCellValue]="calculateTotalAmount"
+          [calculateCellValue]="calculateTotal"
         ></dxi-column>
+
         <dxi-column type="buttons">
-          <dxi-button name="delete" width="80"></dxi-button>
+          <dxi-button name="edit"></dxi-button>
+          <dxi-button name="delete"></dxi-button>
         </dxi-column>
 
         <dxo-summary>
@@ -311,8 +280,9 @@
             alignment="right"
           >
           </dxi-total-item>
+
           <dxi-total-item
-            column="TOTAL"
+            column="Total"
             summaryType="sum"
             valueFormat="#,##0.00"
             displayFormat="Total: {0}"
@@ -321,42 +291,51 @@
           </dxi-total-item>
         </dxo-summary>
       </dx-data-grid>
-      <!-- Narration Box Below the Grid -->
+
       <div
         style="
+          margin-top: 1px;
+          padding: 0 10px 0 0;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           width: 100%;
         "
       >
-        <!--  LEFT SIDE: Vehicle Number + Narration -->
-        <div style="display: flex; gap: 10px; width: 750px">
-          <!-- Narration -->
-          <dx-text-box
-            label="Narration"
-            labelMode="floating"
-            [(value)]="creditFormData.NARRATION"
-            [width]="400"
-          ></dx-text-box>
+        <!-- Left: Narration -->
+        <dx-text-box
+          #narrationRef
+          [(value)]="debitFormData.NARRATION"
+          label="Narration"
+          labelMode="floating"
+          [width]="400"
+          (onKeyDown)="onNarrationKeyDown($event)"
+        ></dx-text-box>
 
-          <!-- Vehicle Number -->
-          <dx-text-box
-            label="Vehicle Number"
-            labelMode="floating"
-            [(value)]="creditFormData.VEHICLE_NO"
-            [width]="200"
-          ></dx-text-box>
-        </div>
+        <dx-text-box
+          label="Vehicle No"
+          labelMode="floating"
+          [(value)]="debitFormData.VEHICLE_NO"
+          [width]="200"
+        ></dx-text-box>
 
-        <!--  RIGHT SIDE: Round Off + Net Amount -->
-        <div style="display: flex; align-items: center; gap: 15px">
-          <dx-check-box
-            text="Round Off"
-            [(value)]="creditFormData.ROUND_OFF"
-            (onValueChanged)="onRoundOffChange()"
-          ></dx-check-box>
+        <!-- Middle: Round Off Checkbox -->
+        <dx-check-box
+          text="Round Off"
+          [(value)]="debitFormData.ROUND_OFF"
+          (onValueChanged)="onRoundOffChange()"
+          style="margin-top: 18px"
+        ></dx-check-box>
 
+        <!-- Right: Net Amount + Approve checkbox -->
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+          "
+        >
           <dx-text-box
             [value]="netAmountString"
             label="Net Amount"
@@ -366,23 +345,28 @@
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [inputAttr]="{ style: 'text-align: right;' }"
           ></dx-text-box>
+          <!-- <dx-text-box
+              [value]="netAmountDisplay | number : '1.2-2'"
+              label="Net Amount"
+              labelMode="floating"
+              [width]="200"
+              [readOnly]="true"
+              [calculateCellValue]="calculateAmount"
+              [inputAttr]="{ style: 'text-align: right;' }"
+            ></dx-text-box> -->
         </div>
       </div>
-
-      <div style="margin-top: 15px; padding: 0 0 0 5px"></div>
     </div>
   </div>
 </dx-validation-group>
 
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
-    <div>
-      <dx-check-box
-        text="Approve"
-        [(value)]="creditFormData.IS_APPROVED"
-        style="margin-left: 20px"
-      ></dx-check-box>
-    </div>
+    <dx-check-box
+      text="Approve"
+      [(value)]="debitFormData.IS_APPROVED"
+    ></dx-check-box>
+
     <dx-button
       text="Cancel"
       (onClick)="cancel()"
@@ -391,18 +375,17 @@
     ></dx-button>
     <dx-button
       #saveButtonRef
-      id="saveBtn"
       [text]="
         isSaving
-          ? creditFormData.IS_APPROVED
+          ? debitFormData.IS_APPROVED
             ? 'Committing…'
             : 'Saving…'
-          : creditFormData.IS_APPROVED
+          : debitFormData.IS_APPROVED
             ? 'Commit'
             : 'Save'
       "
       [disabled]="isSaving"
-      (onClick)="saveCreditNote()"
+      (onClick)="saveDebitNote()"
       stylingMode="contained"
       type="default"
     ></dx-button>
@@ -416,11 +399,12 @@
   title="Select Invoice"
 >
   <dx-data-grid
-    [dataSource]="pendingInvoices"
+    [dataSource]="pendingInvoicelist"
     [showBorders]="true"
     [showColumnLines]="true"
     [height]="'40vh'"
     [hoverStateEnabled]="true"
+    [scrolling]="{ mode: 'virtual' }"
     [selection]="{ mode: 'single' }"
     (onRowClick)="selectInvoice($event)"
   >
@@ -441,10 +425,9 @@
       [applyFilter]="auto"
     ></dxo-filter-row>
     <dxo-toolbar> </dxo-toolbar>
-    <dxi-column dataField="INVOICE_NO" caption="Invoice No"></dxi-column>
-    <dxi-column dataField="ITEM_NAME" caption="Item"></dxi-column>
-    <dxi-column dataField="DATE" caption="Date"></dxi-column>
+    <dxi-column dataField="INVOICE_NO" caption="Doc No"></dxi-column>
+    <dxi-column dataField="PURCH_DATE" caption="Date"></dxi-column>
     <dxi-column dataField="NET_AMOUNT" caption="Net Amount"></dxi-column>
-    <dxi-column dataField="BALANCE_AMOUNT" caption="Balance"></dxi-column>
+    <dxi-column dataField="PENDING_AMOUNT" caption="Balance"></dxi-column>
   </dx-data-grid>
 </dx-popup>
