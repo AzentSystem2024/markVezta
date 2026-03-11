@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule, ViewChild } from '@angular/core';
+import { Component, NgModule, NgZone, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DxButtonModule, DxCheckBoxModule, DxDataGridComponent, DxDataGridModule, DxFormModule, DxPopupModule, DxTextBoxModule } from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
@@ -20,9 +20,14 @@ export class LeaveSalaryComponent {
     formsource: FormGroup;
   selectedData: any=[];
 leavesalaryComponent: any;
+ readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+   showHeaderFilter = true;
+  isFilterRowVisible: boolean = false;
   
   
-  constructor(private fb: FormBuilder, private dataservice: DataService) {
+  constructor(private fb: FormBuilder, private dataservice: DataService,private ngZone: NgZone) {
     this.formsource = this.fb.group({
       CODE: ['',Validators.required],
       DESCRIPTION: ['',Validators.required],
@@ -32,21 +37,89 @@ leavesalaryComponent: any;
     this.get_LeaveTypeList();
   }
   
+   getStatusFlagClass(status: string): string {
+  return status === 'Inactive' ? 'flag-red' : 'flag-green';
+}
+
     AddLSPopup=false;
     UpdateLSPopup=false;
     Status : boolean = false
   showFilterRow: boolean = true;
 currentFilter: string = 'auto';
+isFilterOpened = false;
 editingRowData: any = {}; // To store the selected row's data
   isLoading: boolean;
 
   addLeaveSalary(){
+     this.formsource.reset({
+    CODE: '',
+    DESCRIPTION: '',
+    LEAVE_SALARY_PAYABLE: false
+  });
     this.AddLSPopup=true;
   }
   
   updateLeaveSalary(){
     this.UpdateLSPopup=true;
   }
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+   toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+   refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_LeaveTypeList();
+  }
+
+   addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.addLeaveSalary());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
 
 onEditingStart(event:any){
   event.cancel = true;
@@ -118,7 +191,7 @@ Add_LeaveType(){
   console.log(CODE,"code")
   const DESCRIPTION = this.formsource.value.DESCRIPTION;
   const LEAVE_SALARY_PAYABLE = this.formsource.value.LEAVE_SALARY_PAYABLE;
-  const IS_INACTIVE = this.formsource.value.STATUS;
+  const IS_INACTIVE = this.formsource.value.IS_INACTIVE;
 
   const isDuplicate = this.LeaveType.some((data: any) => {
     return (

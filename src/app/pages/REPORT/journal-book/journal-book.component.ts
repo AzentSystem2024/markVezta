@@ -45,6 +45,7 @@ import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
+import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
 
 @Component({
   selector: 'app-journal-book',
@@ -132,6 +133,8 @@ export class JournalBookComponent {
     },
     text: '',
   };
+  selectedProduction: any;
+  isViewProduction: boolean;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -583,6 +586,36 @@ export class JournalBookComponent {
             'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
           );
         });
+    } else if (TransType === 103) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService.selectProduction(trans_id).subscribe((response: any) => {
+        console.log(response);
+        this.selectedProduction = response;
+        console.log(this.selectedmiscellaneousData);
+        this.isViewProduction = true;
+
+        this.cdr.detectChanges();
+        console.log(
+          this.selectedmiscellaneousData,
+          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
+        );
+      });
+    } else if (TransType === 104) {
+      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+      this.dataService
+        .selectBoxProduction(trans_id)
+        .subscribe((response: any) => {
+          console.log(response);
+          this.selectedProduction = response;
+          console.log(this.selectedmiscellaneousData);
+          this.isViewProduction = true;
+
+          this.cdr.detectChanges();
+          console.log(
+            this.selectedmiscellaneousData,
+            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
+          );
+        });
     }
     //else {
     //   console.log(Unknown TRANS_TYPE_ID: ${TransType});
@@ -703,6 +736,7 @@ export class JournalBookComponent {
     TransferInInventoryFormModule,
     EditCustomerReceiptModule,
     SaleReturnFormModule,
+    ProductionJvViewModule,
   ],
   providers: [],
   exports: [],

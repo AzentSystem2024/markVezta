@@ -170,6 +170,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}packing/Lastaliasno`, {});
   }
 
+    getPackingLastPartNo(): Observable<any> {
+    return this.http.post(`${this.apiUrl}packing/Lastpartno`, {});
+  }
+
   insertArticle(items: any) {
     const data = items;
     // console.log(data,"insert service")
@@ -4776,6 +4780,10 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
+      get_EmployeeDetailsFor_Leave_Api(payload) {
+    const getEndpoint = this.apiUrl + 'EmployeeVacation/emplist';
+    return this.http.post(getEndpoint, payload);
+  }
   //=========================staff end off service select=========================
 
   select_Api_eos(id: any) {

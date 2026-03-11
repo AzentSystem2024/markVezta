@@ -289,6 +289,22 @@
 </dx-popup> -->
 
 <dx-popup
+  [(visible)]="isViewProduction"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="View Production"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewProduction">
+    <app-production-jv-view
+      [isEditing]="true"
+      [EditingResponseData]="selectedProduction"
+      (popupClosed)="handleClose()"
+    ></app-production-jv-view>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
   [(visible)]="isViewJournalVoucher"
   [width]="'100vw'"
   [deferRendering]="false"

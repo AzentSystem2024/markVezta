@@ -211,6 +211,7 @@
 </dx-popup> -->
 
 <dx-popup
+  *ngIf="addSupllierPayment"
   [(visible)]="addSupllierPayment"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -225,6 +226,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditReceipt"
   [(visible)]="isEditReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
