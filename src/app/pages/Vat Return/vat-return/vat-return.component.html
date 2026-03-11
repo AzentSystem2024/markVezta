@@ -21,7 +21,7 @@
       [headerFilter]="{ visible: false }"
       [columnFixing]="{
         enabled: true,
-        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
     >
       <!-- (onEditingStart)="onEditLedger($event)" -->
@@ -128,7 +128,6 @@
             icon="todo"
             stylingMode="contained"
             type="default"
-            [width]="100"
             class="mt-2"
             (onClick)="Vat_Return_Data()"
           >

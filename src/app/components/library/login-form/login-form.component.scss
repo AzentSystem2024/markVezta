@@ -39,7 +39,7 @@
   text-align: center;
   margin-bottom: 20px;
 }
-.brand-logo{
+.brand-logo {
   margin-bottom: 25px;
 }
 // .username-input{
@@ -71,7 +71,7 @@
   max-width: 340px;
   width: 100%;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  
+
   // Center horizontally & vertically
   position: absolute;
   top: 50%;
@@ -168,6 +168,25 @@
 
   a {
     cursor: pointer;
-    color:#3B82F6;
+    color: #3b82f6;
   }
+}
+
+.dx-button-mode-text {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--toolbar-icon) !important;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.no-bg-btn .dx-button-content {
+  background: transparent !important;
+}
+.username-input {
+  background-image: url(".././../../../assets/icons/dock-off.svg");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  padding-left: 35px;
 }

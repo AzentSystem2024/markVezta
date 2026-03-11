@@ -73,17 +73,17 @@
       ></dxi-item>
 
       <!-- Search -->
-
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
       <!-- Export (built-in, kept) -->
       <dxi-item
         name="exportButton"
         location="after"
         cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
+
       <!-- Add -->
       <dxi-item
         location="after"
@@ -183,7 +183,7 @@
     class="formPopupClass"
     [(visible)]="isAddFormPopupOpened"
     titleText="New User"
-    [height]="'95vh'"
+    [height]="'auto'"
     [width]="popupwidth"
     (save)="onClickSaveNewData()"
     (clear)="onClearData()"
@@ -194,7 +194,7 @@
   <dx-popup
     [(visible)]="isEditPopupOpened"
     title="Edit User"
-    [height]="'95vh'"
+    [height]="'auto'"
     [width]="popupwidth"
     (onHiding)="CloseEditForm()"
   >

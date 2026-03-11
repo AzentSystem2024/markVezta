@@ -290,10 +290,10 @@
       "
     >
       <dx-button
-        type="default"
+        type="normal"
         text="Cancel"
         (onClick)="Closepop()"
-        [elementAttr]="{ class: 'transparent-cancel-button' }"
+        stylingMode="outlined"
       >
       </dx-button>
 
@@ -301,7 +301,7 @@
         type="default"
         text="Save"
         (onClick)="Update_data()"
-        [elementAttr]="{ class: 'blue-save-button' }"
+        stylingMode="contained"
       >
       </dx-button>
     </div>

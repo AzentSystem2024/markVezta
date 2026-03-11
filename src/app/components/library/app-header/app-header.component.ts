@@ -67,6 +67,7 @@ export class AppHeaderComponent implements OnInit {
     this.authService.getUser().then((e) => (this.user = e.data));
     this.sesstion_Details();
     this.version = this.dataservice.get_version();
+    this.isDarkTheme();
   }
 
   private getInitials(name: string): string {
@@ -105,6 +106,9 @@ export class AppHeaderComponent implements OnInit {
   toggleMenu = () => {
     this.menuToggle.emit();
   };
+  isDarkTheme() {
+    return document.body.classList.contains('dx-theme-fluent-dark');
+  }
 }
 
 @NgModule({

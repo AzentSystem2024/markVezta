@@ -89,16 +89,16 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item
           name="exportButton"
           location="after"
           cssClass="export-btn"
         ></dxi-item>
-        <!-- Divider -->
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
+
         <dxi-item
           *ngIf="canAdd"
           location="after"

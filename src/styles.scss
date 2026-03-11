@@ -268,7 +268,7 @@ body {
   app-footer {
     // background-color: var(--base-bg);
     background-color: var(--bg-side-panel);
-    border-radius: 8px;
+    // border-radius: 8px;s
   }
   // .layout-body .menu-container.theme-dependent :hover{
   //   background-color: var(--bg-side-panel);
@@ -1088,4 +1088,24 @@ body {
 .login-form .dx-button-mode-text .dx-icon::hover {
   color: rgb(0 0 0) !important;
   background-color: white;
+}
+
+.dx-treeview-item {
+  gap: 8px;
+  padding: 0 0 !important;
+  margin: 1px 0;
+}
+
+.dx-button.dx-button-default .dx-icon {
+  color: white !important;
+}
+
+//=================seatch box in menu====================s
+.dx-treeview-search {
+  margin-bottom: 5px;
+  margin-top: 13px;
+  margin-right: 10px;
+  margin-left: 10px;
+  border-radius: 32px !important;
+  background-color: var(--selected-menu-bg-color) !important;
 }
