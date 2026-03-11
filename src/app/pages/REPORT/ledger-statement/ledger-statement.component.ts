@@ -64,6 +64,7 @@ import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
+import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
 
 // import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 // import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
@@ -138,6 +139,9 @@ export class LedgerStatementComponent {
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
   transtypeId: any;
+  isViewBoxProduction: boolean;
+  selectedProduction: any;
+  isViewProduction: boolean;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -637,6 +641,24 @@ export class LedgerStatementComponent {
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
+    } else if (TRANS_TYPE_ID === 104) {
+      console.log('=====navigate =====');
+      this.dataService
+        .selectBoxProduction(trans_id)
+        .subscribe((response: any) => {
+          this.selectedProduction = response;
+          this.isViewProduction = true;
+          this.cdr.detectChanges();
+          console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+        });
+    } else if (TRANS_TYPE_ID === 103) {
+      console.log('=====navigate =====');
+      this.dataService.selectProduction(trans_id).subscribe((response: any) => {
+        this.selectedProduction = response;
+        this.isViewProduction = true;
+        this.cdr.detectChanges();
+        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+      });
     } else {
       console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
     }
@@ -841,6 +863,7 @@ export class LedgerStatementComponent {
     TransferOutInventoryAddModule,
     TransferInInventoryFormModule,
     SaleReturnFormModule,
+    ProductionJvViewModule,
   ],
   providers: [],
   declarations: [LedgerStatementComponent],

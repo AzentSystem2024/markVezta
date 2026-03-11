@@ -263,7 +263,22 @@
 </div>
 
 <!-- ==========================Journal Voucher   ======== =========== -->
-
+<dx-popup
+  *ngIf="isViewProduction"
+  [(visible)]="isViewProduction"
+  [width]="'90vw'"
+  [height]="'90vh'"
+  title="Production"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewProduction">
+    <app-production-jv-view
+      [isEditing]="true"
+      [EditingResponseData]="selectedProduction"
+      (popupClosed)="handleClose()"
+    ></app-production-jv-view>
+  </ng-container>
+</dx-popup>
 <dx-popup
   *ngIf="isViewJournalVoucher"
   [(visible)]="isViewJournalVoucher"

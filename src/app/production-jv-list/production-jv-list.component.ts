@@ -735,7 +735,7 @@ export class ProductionJvListComponent {
   onEditProduction(event: any) {
     event.cancel = true;
 
-    const productionId = event.data.PRODUCTION_ID;
+    const productionId = event.data.TRANS_ID;
     const status = event.data.STATUS;
 
     const isArticle = this.selectedProductionType === 'ARTICLE';
