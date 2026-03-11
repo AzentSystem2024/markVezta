@@ -942,16 +942,16 @@
   [(visible)]="isEditProductionPopupVisible"
   [width]="1200"
   [height]="'100vh'"
-  title="Article Production"
+  title="Production"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditProductionPopupVisible">
-    <app-production-jv-add
+    <app-production-jv-view
       [isEditing]="true"
       [EditingResponseData]="selectedProduction"
       [productionType]="selectedProductionType"
       (formClosed)="handleClose()"
-    ></app-production-jv-add>
+    ></app-production-jv-view>
   </ng-container>
 </dx-popup>
 

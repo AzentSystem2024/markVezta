@@ -175,6 +175,7 @@
 </div>
 
 <dx-popup
+  *ngIf="isAddInvoice"
   [(visible)]="isAddInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
@@ -187,6 +188,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditInvoice"
   [(visible)]="isEditInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
@@ -202,6 +204,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isViewInvoice"
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
