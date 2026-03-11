@@ -1059,3 +1059,33 @@ body {
 .dx-tabs-styling-mode-primary .dx-tab.dx-state-hover {
   background-color: none !important;
 }
+
+//==============login form=======
+.login-form .dx-texteditor-container {
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background-color: none;
+  height: 40px;
+  border-radius: 8px;
+}
+.login-form .dx-texteditor.dx-editor-filled .dx-placeholder::before,
+.dx-texteditor.dx-editor-filled .dx-texteditor-input {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: black;
+  background-color: white;
+}
+.login-form .dx-texteditor.dx-editor-filled {
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid #cbd5e1;
+}
+.login-form .dx-button-mode-text .dx-icon {
+  color: rgb(0 0 0) !important;
+}
+.login-form .dx-button-mode-text .dx-icon::hover {
+  color: rgb(0 0 0) !important;
+  background-color: white;
+}

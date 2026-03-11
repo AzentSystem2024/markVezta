@@ -71,15 +71,16 @@
       ></dxi-item>
 
       <!-- Export (built-in, kept) -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
       <dxi-item
         name="exportButton"
         location="after"
         cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
       <!-- Search -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
 
       <!-- Divider -->
 
@@ -112,7 +113,7 @@
     class="formPopupClass m-2"
     [(visible)]="isAddFormVisible"
     titleText="New User Role"
-    [height]="'100vh'"
+    [height]="'auto'"
     [width]="popup_width"
     (save)="onClickSaveNewData()"
     (onHiding)="onPopupClose()"
@@ -128,7 +129,7 @@
     class="formPopupClass m-2"
     [(visible)]="iseditFormVisible"
     titleText="Edit User Role"
-    [height]="'100vh'"
+    [height]="'auto'"
     [width]="popup_width"
     (save)="onRowUpdating()"
     (onHiding)="onEditPopupClose()"

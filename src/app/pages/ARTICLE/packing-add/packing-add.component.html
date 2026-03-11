@@ -307,6 +307,22 @@
         ></dx-date-box>
       </div>
 
+      <div class="form-field">
+        <dx-number-box
+          label=" Pair Quantity "
+          class="center-numberbox"
+          labelMode="floating"
+          [(value)]="totalQuantity"
+          placeholder="Pair Quantity"
+          [readOnly]="true"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
+        ></dx-number-box>
+      </div>
+
       <!-- <div class="form-field">
     <dx-select-box
     visible=""
@@ -377,7 +393,7 @@
             id="clearButton"
             text="Reset"
             stylingMode="outlined"
-            style="border-color: #ffc3c3 !important; color: #ff2c2c"
+            class="reset-btn"
             hint="Reset Form"
             (onClick)="clearForm()"
           >
@@ -518,7 +534,7 @@
               mode="cell"
               [allowUpdating]="true"
               [allowAdding]="false"
-              [allowDeleting]="true"
+              [allowDeleting]="false"
             >
             </dxo-editing>
 
