@@ -964,6 +964,27 @@ const routes: Routes = [
     component: MiscellaneousPurchaseComponent,
     canActivate: [AuthGuardService],
   },
+  {
+        path: 'end-of-service',
+        component: EOSComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'staff-end-of-service',
+        component: StaffEOSComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'employee-leave',
+        component: EmployeeLeaveComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'leave-salary',
+        component: LeaveSalaryComponent,
+        canActivate: [AuthGuardService],
+      },
+
       {
         path: '**',
         redirectTo: 'login',

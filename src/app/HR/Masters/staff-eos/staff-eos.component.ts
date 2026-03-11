@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, NgModule, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+  NgZone,
+  ViewChild,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -30,10 +37,9 @@ import notify from 'devextreme/ui/notify';
 })
 export class StaffEOSComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  
   dataGrid!: DxDataGridComponent;
   isHeaderFilterVisible: boolean = false;
-  
+
   selected_data: any = [];
   reson_data: any;
   id_value: any;
@@ -56,9 +62,9 @@ export class StaffEOSComponent {
   EMPLOYEE_ID: any;
   isLoading: boolean;
   selecte_Data_VA: any;
-  get_Details_Data:any=[]
+  get_Details_Data: any = [];
   editpopup: boolean = false;
-  all_workingdays:any;
+  all_workingdays: any;
   staffEosSource: any = [];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -71,10 +77,32 @@ export class StaffEOSComponent {
   employee_ID: any;
   formSubmitted = false;
   isFormSubmitted = false;
-  less_service_days:number=0
+  less_service_days: number = 0;
+  selected_Company_id: any;
+  selected_fin_id: any;
 
   //data box
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.add_popup());
+    },
+    elementAttr: { class: 'add-button' },
 
+    template: () => {
+      return `
+       <div class="add-btn-content">
+         <span class="iconify"
+               data-icon="formkit:add"
+               data-width="20"
+               data-height="20"></span>
+         <span class="add-text">New</span>
+       </div>
+     `;
+    },
+  };
   dateRanges = [
     { label: 'All', value: 'all' },
     { label: 'Today', value: 'today' },
@@ -101,7 +129,6 @@ export class StaffEOSComponent {
       icon: 'edit',
 
       text: 'Edit',
-
     },
 
     {
@@ -149,48 +176,59 @@ export class StaffEOSComponent {
     },
   ];
   //====================Header filter=========================
- 
+
   isFilterVisible = false;
 
   toggle() {
-    if(this.isFilterVisible) {
-      
+    if (this.isFilterVisible) {
       this.isFilterVisible = false;
-    }
-    else {  
+    } else {
       this.isFilterVisible = true;
     }
   }
-  
 
-
-
- 
   filterddata: any;
   trans_id: any;
-  payment_Detilas: any=[]
-  constructor(private fb: FormBuilder, private dataService: DataService,
-    private cdRef: ChangeDetectorRef
+  payment_Detilas: any = [];
+  constructor(
+    private fb: FormBuilder,
+    private dataService: DataService,
+    private ngZone: NgZone,
+    private cdRef: ChangeDetectorRef,
   ) {
     this.formSource = this.fb.group({
       id: [null],
       Date: [new Date()],
       employee_ID: [''],
       Join_Date: [''],
-      days_Worked: ['',],
+      days_Worked: [''],
       reason_ID: [''],
       Remarks: [''],
     });
     this.get_reson_dropdown();
+    this.sesstion_Details();
     this.getStaffEosData();
     this.dropdown_employee();
-     this.get_employes_details_value() 
-     
+    this.get_employes_details_value();
   }
 
+  //--------------Session storage----------------
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    console.log(
+      this.selected_fin_id,
+      '===========selected fin id===================',
+    );
+  }
   //=======================Refresh=========================
-  refreshGrid(){
-    
+  refreshGrid() {
     this.dataGrid.instance.refresh();
   }
 
@@ -290,18 +328,17 @@ export class StaffEOSComponent {
     try {
       const parts = dateStr.split('/');
       if (parts.length !== 3) return null;
-  
+
       const day = parseInt(parts[0], 10);
       const month = parseInt(parts[1], 10) - 1; // JavaScript months are 0-based
       const year = parseInt(parts[2], 10); // Assumes full year like 2025
-  
+
       const date = new Date(year, month, day);
       return isNaN(date.getTime()) ? null : date;
     } catch (e) {
       return null;
     }
   }
-  
 
   onDateRangeChange(event: any) {
     const selected = event.value;
@@ -344,21 +381,18 @@ export class StaffEOSComponent {
 
     this.select_Data_EOS(event);
   }
-//   add_popup() {
-  
-    
-//     this.isAddPopUp = true;
+  //   add_popup() {
 
-//   }
-add_popup() {
+  //     this.isAddPopUp = true;
 
-  // Also reset any additional variables if needed
-  this.join_date_value = '';
-  this.days_worked_value = '';
-  this.all_workingdays = '';
-  this.isAddPopUp = true;
-}
-
+  //   }
+  add_popup() {
+    // Also reset any additional variables if needed
+    this.join_date_value = '';
+    this.days_worked_value = '';
+    this.all_workingdays = '';
+    this.isAddPopUp = true;
+  }
 
   close() {
     console.log('close=======Buttomn clicked');
@@ -368,27 +402,23 @@ add_popup() {
     this.verifypopup = false;
     this.Approvepopup = false;
     this.isCustomDatePopupVisible = false;
-    
-    this.isFormSubmitted = false; 
+
+    this.isFormSubmitted = false;
     this.formSubmitted = false;
     this.isFormSubmitted = false;
+  }
 
-}
-
-closeButton(){
-  console.log('close=======Button onHiding clicked');
-  this.formSource.reset({
-    Date: new Date(),
-    employee_ID: 0,
-    reason_ID:0,
-  
-   
-  })   
-  // this.employee_ID=0
-  this.reason_ID=0
-  this.employee_ID
-  
-}
+  closeButton() {
+    console.log('close=======Button onHiding clicked');
+    this.formSource.reset({
+      Date: new Date(),
+      employee_ID: 0,
+      reason_ID: 0,
+    });
+    // this.employee_ID=0
+    this.reason_ID = 0;
+    this.employee_ID;
+  }
 
   // =========dropdown data reson=========================
 
@@ -400,28 +430,28 @@ closeButton(){
   }
 
   dropdown_employee() {
-    this.dataService.Dropdown_eos_employee(name).subscribe((res: any) => {
+    const payload = { NAME: 'EMPLOYEE', COMPANY_ID: this.selected_Company_id };
+    console.log(payload);
+    this.dataService.Dropdown_eos_employee(payload).subscribe((res: any) => {
       console.log(res);
       this.EMPLOYEE_ID = res;
     });
   }
 
-
-
-
-
   //===================Status flag=========================
   getStatusFlagClass(status: string): string {
     switch (status) {
-      case 'Open': return 'flag-open';       // White or gray
-      case 'Verified': return 'flag-verified'; // Orange
-      case 'Left Service': return 'flag-approved'; // Green
-      default: return '';
-    }
-  }
+      case 'Open':
+        return 'flag-open'; // White or gray
+      case 'Verified':
+        return 'flag-verified'; // Orange
+      case 'Left Service':
+        return 'flag-approved'; // Green
+      default:
+        return '';
+    }
+  }
 
-
-  
   Add_EOS() {
     this.formSubmitted = true;
     console.log(this.formSource.value);
@@ -433,12 +463,12 @@ closeButton(){
     const days_worked = this.formSource.value.days_Worked;
     const reason_id = this.formSource.value.reason_ID;
     const remarks = this.formSource.value.Remarks;
-  
+
     // 🔍 Check for duplicate entry based on employee ID
-    const duplicate = this.staffEosSource.find((item: any) => 
-        item.EMP_ID === emp_id
+    const duplicate = this.staffEosSource.find(
+      (item: any) => item.EMP_ID === emp_id,
     );
-  
+
     if (duplicate) {
       notify(
         {
@@ -446,11 +476,11 @@ closeButton(){
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'error'
+        'error',
       );
       return;
     }
-  
+
     this.dataService
       .add_Staff_EOS(user_id, store_id, date, emp_id, reason_id, remarks)
       .subscribe((res: any) => {
@@ -461,12 +491,12 @@ closeButton(){
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
         this.getStaffEosData();
         this.isAddPopUp = false;
       });
-}
+  }
   //s===========================select EOS ==========================
 
   select_Data_EOS(event: any) {
@@ -493,8 +523,8 @@ closeButton(){
       this.Add_Amount = this.selected_data.DED_AMOUNT;
       this.Add_Remarks = this.selected_data.ADD_REMARKS;
       this.ded_Remarks = this.selected_data.DED_REMARKS;
-      this.trans_id=this.selected_data.TRANS_ID
-    this.payment_functionality() 
+      this.trans_id = this.selected_data.TRANS_ID;
+      this.payment_functionality();
     });
   }
   onEmployee_Change(event: any) {
@@ -539,123 +569,114 @@ closeButton(){
       Add_Amount,
       ded_Amount,
       Add_Remarks,
-      ded_Remarks
+      ded_Remarks,
     );
-    const duplicate = this.staffEosSource.find((item: any) => 
-      item.EMP_ID === emp_id && item.ID !== id  
-  );
-
-  if (duplicate) {
-    notify(
-      {
-        message: 'This employee already .',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 500,
-      },
-      'error'
+    const duplicate = this.staffEosSource.find(
+      (item: any) => item.EMP_ID === emp_id && item.ID !== id,
     );
-    return;
-  }
 
-  else{
-    this.dataService
-      .Update_Staff_EOS_api(
-        id,
-        user_id,
-        store_id,
-        date,
-        emp_id,
-        reason_id,
-        remarks
-      )
-      .subscribe((res: any) => {
-        console.log(res);
-        notify(
-          {
-            message: 'Staff EOS Updated successfully',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success'
-        );
-        this.getStaffEosData();
-        this.editpopup = false;
-        this.isFormSubmitted = false;
-    
-      });
+    if (duplicate) {
+      notify(
+        {
+          message: 'This employee already .',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'error',
+      );
+      return;
+    } else {
+      this.dataService
+        .Update_Staff_EOS_api(
+          id,
+          user_id,
+          store_id,
+          date,
+          emp_id,
+          reason_id,
+          remarks,
+        )
+        .subscribe((res: any) => {
+          console.log(res);
+          notify(
+            {
+              message: 'Staff EOS Updated successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+          this.getStaffEosData();
+          this.editpopup = false;
+          this.isFormSubmitted = false;
+        });
     }
   }
   get_employes_details_value() {
     console.log('get_employes_details_value CALLED');
     const id = this.employee_ID;
-  console.log(id);
-  
+    console.log(id);
+
     if (!id) return;
-  
+
     this.dataService.get_employeeDetails(id).subscribe((res: any) => {
       console.log(res, 'API Response');
-      this.get_Details_Data=res
-      this.less_service_days=res.LESS_SERVICE_DAYS
+      this.get_Details_Data = res;
+      this.less_service_days = res.LESS_SERVICE_DAYS;
       console.log(this.less_service_days, 'less service days');
       this.join_date_value = this.get_Details_Data.JOIN_DATE;
       console.log(this.join_date_value, 'join date');
-          // Convert join date string to Date object
-    const joinDate: Date | null = this.parseApiDate(res.JOIN_DATE);
-    const today: Date = new Date();
+      // Convert join date string to Date object
+      const joinDate: Date | null = this.parseApiDate(res.JOIN_DATE);
+      const today: Date = new Date();
 
-    if (joinDate) {
-      const timeDiff = today.getTime() - joinDate.getTime();
-      const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
-      this.days_worked_value = dayDiff + 1;
+      if (joinDate) {
+        const timeDiff = today.getTime() - joinDate.getTime();
+        const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
+        this.days_worked_value = dayDiff + 1;
 
+        this.all_workingdays = this.days_worked_value - this.less_service_days;
+        this.cdRef.detectChanges();
+        console.log(this.all_workingdays, 'all working days');
+      } else {
+        this.days_worked_value = 0;
+      }
 
-      this.all_workingdays=this.days_worked_value - this.less_service_days
-      this.cdRef.detectChanges();
-      console.log(this.all_workingdays, 'all working days');
-      
-    } else {
-      this.days_worked_value = 0;
-    }
-
-    console.log(this.days_worked_value, 'days worked');
-  });
-  
+      console.log(this.days_worked_value, 'days worked');
+    });
   }
   get_employes_details_value_select() {
     console.log('get_employes_details_value CALLED  Verified');
     const id = this.selected_data.EMP_ID;
-  console.log(id);
-  
+    console.log(id);
+
     if (!id) return;
-  
+
     this.dataService.get_employeeDetails(id).subscribe((res: any) => {
       console.log(res, 'API Response');
-      this.get_Details_Data=res
-      this.less_service_days=res.LESS_SERVICE_DAYS
+      this.get_Details_Data = res;
+      this.less_service_days = res.LESS_SERVICE_DAYS;
       console.log(this.less_service_days, 'less service days');
       this.join_date_value = this.get_Details_Data.JOIN_DATE;
       console.log(this.join_date_value, 'join date');
-          // Convert join date string to Date object
-    const joinDate: Date | null = this.parseApiDate(res.JOIN_DATE);
-    const today: Date = new Date();
+      // Convert join date string to Date object
+      const joinDate: Date | null = this.parseApiDate(res.JOIN_DATE);
+      const today: Date = new Date();
 
-    if (joinDate) {
-      const timeDiff = today.getTime() - joinDate.getTime();
-      const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
-      this.days_worked_value = dayDiff + 1;
+      if (joinDate) {
+        const timeDiff = today.getTime() - joinDate.getTime();
+        const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
+        this.days_worked_value = dayDiff + 1;
 
+        this.all_workingdays = this.days_worked_value - this.less_service_days;
+        this.cdRef.detectChanges();
+        console.log(this.all_workingdays, 'all working days');
+      } else {
+        this.days_worked_value = 0;
+      }
 
-      this.all_workingdays=this.days_worked_value - this.less_service_days
-      this.cdRef.detectChanges();
-      console.log(this.all_workingdays, 'all working days');
-      
-    } else {
-      this.days_worked_value = 0;
-    }
-
-    console.log(this.days_worked_value, 'days worked');
-  });
-  
+      console.log(this.days_worked_value, 'days worked');
+    });
   }
   // ============================Delete Popup function=========================================
   deleteData(e: any) {
@@ -670,29 +691,24 @@ closeButton(){
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'success'
+        'success',
       );
       this.getStaffEosData();
     });
   }
   // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
-
     this.verifypopup = true;
     e.cancel = true;
-   
+
     const id = e.row?.data?.ID;
     console.log(id, '===================id');
     this.dataService.select_Api_eos(id).subscribe((res: any) => {
       console.log(res);
       this.selected_data = res;
       console.log(this.selected_data, '==============select data====verify');
-      this.get_employes_details_value_select()
- 
-      
+      this.get_employes_details_value_select();
     });
-
-   
   }
 
   Verify_EOS() {
@@ -715,7 +731,7 @@ closeButton(){
         date,
         emp_id,
         reason_id,
-        remarks
+        remarks,
       )
       .subscribe((res: any) => {
         console.log(res, '===================verify data');
@@ -725,11 +741,10 @@ closeButton(){
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
         this.getStaffEosData();
         this.verifypopup = false;
-       
       });
   }
   // ============================Approve Popup function=========================================
@@ -744,9 +759,6 @@ closeButton(){
       console.log(this.selected_data, '==============select data====verify');
       this.get_employes_details_value_select();
     });
-    
-   
-   
   }
   Approve_EOS() {
     const id = this.selected_data.ID;
@@ -766,7 +778,7 @@ closeButton(){
         date,
         emp_id,
         reason_id,
-        remarks
+        remarks,
       )
       .subscribe((res: any) => {
         console.log(res, '===================verify data');
@@ -776,7 +788,7 @@ closeButton(){
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
         this.getStaffEosData();
         this.Approvepopup = false;
@@ -784,18 +796,16 @@ closeButton(){
   }
   //==========================Payment functionality===================
   payment_functionality() {
-    const id=this.trans_id
+    const id = this.trans_id;
     console.log(id, '=================id====================');
-    
+
     console.log('payment functionality');
     this.dataService.get_paymentDetails(id).subscribe((res: any) => {
       console.log(res);
 
-      this.payment_Detilas=res
+      this.payment_Detilas = res;
     });
-      
   }
-
 }
 
 @NgModule({
@@ -814,7 +824,7 @@ closeButton(){
     DxSelectBoxModule,
     DxDateBoxModule,
     DxValidatorModule,
-    CommonModule
+    CommonModule,
   ],
   providers: [],
   exports: [],

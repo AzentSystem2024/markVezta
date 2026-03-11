@@ -4780,6 +4780,10 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
+      get_EmployeeDetailsFor_Leave_Api(payload) {
+    const getEndpoint = this.apiUrl + 'EmployeeVacation/emplist';
+    return this.http.post(getEndpoint, payload);
+  }
   //=========================staff end off service select=========================
 
   select_Api_eos(id: any) {

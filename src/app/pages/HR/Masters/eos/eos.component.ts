@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule, ViewChild } from '@angular/core';
+import { Component, NgModule, NgZone, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { DxButtonModule, DxCheckBoxModule, DxDataGridComponent, DxDataGridModule, DxFormModule, DxPopupModule, DxTextBoxModule } from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
@@ -20,25 +20,35 @@ export class EOSComponent {
  EosComponent :any;
  formData = {IS_INACTIVE:false};
   formsource: FormGroup;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+   showFilterRow = true;
+  showHeaderFilter = true;
+  isFilterRowVisible: boolean = false;
+  sessionData: any;
+  COMPANY_ID: any;
 
-constructor(private fb:FormBuilder, private dataservice :DataService,  private exportService: ExportService){
+constructor(private fb:FormBuilder, private dataservice :DataService, private ngZone: NgZone, private exportService: ExportService){
   this.formsource = this.fb.group({
       CODE : ['',Validators.required],
       DESCRIPTION : ['',Validators.required],
       IS_INACTIVE : [false]
     })
+    this.sesstion_Details();
    this.get_EOS_List()
 }
  
   
 selectedData:any;
-showFilterRow: boolean = true;
 currentFilter: string = 'auto';
 AddEOSPopup = false;
 UpdateEOSPopup = false;
 editingRowData: any = {}; // To store the selected row's data
 Status : boolean = false
 Eos:any;
+  isFilterOpened = false;
+
 addEOS(){
  this.AddEOSPopup=true;
 }
@@ -46,6 +56,64 @@ addEOS(){
 UpdateEOS(){
   this.UpdateEOSPopup = true;
 }
+
+   searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+    toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+    refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+    refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_EOS_List();
+  }
+
+   addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.addEOS());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
 
 onEditingStart(event:any){
   event.cancel = true;
@@ -88,6 +156,21 @@ cellElement.innerHTML = `
 </span>`;
 };
 
+  getStatusFlagClass(IS_INACTIVE: boolean): string {
+    return IS_INACTIVE ? 'flag-red' : 'flag-green';
+  }
+
+sesstion_Details() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+
+    this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
+    console.log(
+      this.COMPANY_ID,
+      '============selected_Company_id==============',
+    );
+  }
+
 //===================get data list========================
  get_EOS_List() {
   this.dataservice.get_EOS_List().subscribe((res: any) => {
@@ -110,7 +193,7 @@ Add_EOS(){
   console.log(CODE,"code")
   const DESCRIPTION = this.formsource.value.DESCRIPTION;
   const IS_INACTIVE = this.formsource.value.IS_INACTIVE;
-  const COMPANY_ID = 1
+  const COMPANY_ID = this.COMPANY_ID;
 
   this.formsource.reset()
   const isDuplicate = this.EOS.some((data: any) => {

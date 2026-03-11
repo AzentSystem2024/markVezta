@@ -1,7 +1,13 @@
 @use "../../../../../variables.scss" as *;
 @use "sass:math";
 
+.flag-red {
+  color: red;
+}
 
+.flag-green {
+  color: green;
+}
 
 :host {
     --side-panel-toolbar-height: 76px;

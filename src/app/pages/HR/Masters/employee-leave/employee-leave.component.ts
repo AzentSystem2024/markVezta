@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule, ViewChild } from '@angular/core';
+import { Component, NgModule, NgZone, ViewChild } from '@angular/core';
 import { DxButtonModule, DxCheckBoxModule, DxDataGridComponent, DxDataGridModule, DxDateBoxModule, DxFormModule, DxNumberBoxModule, DxPopupModule, DxRadioGroupModule, DxSelectBoxModule, DxTextBoxModule, DxValidatorModule } from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
 import { FormBuilder , ReactiveFormsModule,FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
@@ -28,6 +28,11 @@ Is_ticket: any;
 RejoinPopup: boolean;
 selectedStatusType: string = '';
   selectedData1: number;
+   readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+   showHeaderFilter = true;
+  isFilterRowVisible: boolean = false;
 isTravelled: boolean = false; // or use true/false based on your data
 StatusType = ['Rejoined', 'Left Service'];
 EmployeeDetails:any =[]
@@ -35,6 +40,10 @@ EmployeeDetails:any =[]
   existingLeave:any =[]
   ExisitngDeparture: any;
   ExistingReturn: any;
+  sessionData: any;
+  COMPANY_ID: any;
+  StoreId: any;
+  UserId: any;
 
       //========================STATUS====================
 
@@ -122,10 +131,10 @@ EmployeeDetails:any =[]
   Leave_type: any;
   Employee_no: any;
   formsource: FormGroup;
+  isFilterOpened = false;
   EmployeeLeaveDatasource : any[] ;
-  displayMode: any = 'full';
 
-  constructor(private fb: FormBuilder, private dataservice: DataService) {
+  constructor(private fb: FormBuilder, private dataservice: DataService,private ngZone: NgZone,) {
     this.formsource = this.fb.group({
       Doc_no: ['', Validators.required],
       Date: [new Date, Validators.required],
@@ -140,7 +149,7 @@ EmployeeDetails:any =[]
       Leave_salary_payable: ['', Validators.required],
     // }, 
     });
-  
+  this.sesstion_Details();
     this.get_EmployeeLeaveList();
   this.get_Employee_Details();
   this.get_ExistingLeaveByEmployee();
@@ -164,7 +173,62 @@ EmployeeDetails:any =[]
      
 }
 
+ searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
 
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+   refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_EmployeeLeaveList();
+  }
+   addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.Add_EmployeeLeave());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
  
 //============================ICONS=================
 
@@ -180,7 +244,7 @@ EmployeeDetails:any =[]
 
       text: 'Edit',
 
-  
+   visible: (e) => e.row.data.STATUS !== 'Verified' 
 
     },
 
@@ -318,8 +382,11 @@ calculateLeaveDaysTaken(): void {
 
   if (departure && rejoin && rejoin >= departure) {
     const diffTime = rejoin.getTime() - departure.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    this.selectedData.ACTUAL_DAYS = diffDays;
+    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    diffDays = diffDays - 1; // reduce one day
+
+    this.selectedData.ACTUAL_DAYS = diffDays >= 0 ? diffDays : 0;
   } else {
     this.selectedData.ACTUAL_DAYS = null;
   }
@@ -349,6 +416,7 @@ isDateDisabled = (data: { date: Date }) => {
 //=============================  
 
   onEditingStart(event: any) {
+    console.log(event.data)
     event.cancel = true;
     const statusValue=event.data.STATUS 
     const ID = event.data.ID;
@@ -445,13 +513,16 @@ get_Employee_Details(){
   const Id =  this.Employee_no
  console.log(Id , "Get Employee details ID");
  
-  this.dataservice.get_EmployeeDetails_Api().subscribe((res:any)=>{
+ const payload = {
+  EMP_ID : this.Employee_no
+ }
+  this.dataservice.get_EmployeeDetailsFor_Leave_Api(payload).subscribe((res:any)=>{
     console.log(res,'Details');
 
-    this.AllEmployeeDetails = res
+    this.AllEmployeeDetails = res.data
     console.log(this.AllEmployeeDetails,"Emp Details");
 
-    const selectedEmployee = this.AllEmployeeDetails.find(item => item.ID === Id);
+    const selectedEmployee = this.AllEmployeeDetails.find(item => item.EMP_ID === Id);
     console.log(selectedEmployee, "Filtered Employee");
 
     this.EmployeeDetails = selectedEmployee
@@ -492,9 +563,10 @@ console.log(this.ExisitngDeparture,this.ExistingReturn);
   
 
  })
- 
- 
 }
+
+
+
 minSelectableDate: Date = new Date(); // Or any logic
 
 isDateDisabledvalue = (data: { date: Date }) => {
@@ -612,7 +684,10 @@ getStatusFlagClass(status: string): string {
   }
 }
 
-
+fixDate(date: any) {
+  const d = new Date(date);
+  return new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
+}
 
 //==================Add Employee Leave========================
   Add_Data(){
@@ -626,14 +701,14 @@ getStatusFlagClass(status: string): string {
     
     // Get the selected date from the form safely
     const formDate = this.formsource.get('Date')?.value; // <-- Renamed from "Date"
-    const Dept_date = this.formsource.get('Dept_date')?.value;
-    const Expected_rejoin_date = this.formsource.get('Expected_rejoin_date')?.value;
+    const Dept_date = this.fixDate(this.formsource.get('Dept_date')?.value);
+    const Expected_rejoin_date = this.fixDate(this.formsource.get('Expected_rejoin_date')?.value);
     
 
  console.log("Add Data function working");
  
-    const User_Id = sessionStorage.getItem('UserId');
-    const Store_Id = sessionStorage.getItem('StoreId');
+    const User_Id = this.UserId;
+    const Store_Id = this.StoreId;
     // const DateControl = this.formsource.get('Date')?.value;
     // const Date = DateControl ? this.formatDate(DateControl) : null;
   //  const Date = this.formsource.get('Date')?.value;
@@ -646,10 +721,20 @@ getStatusFlagClass(status: string): string {
     // const Dept_date = this.formsource.get('Dept_date')?.value;
     // const Expected_rejoin_date = this.formsource.get('Expected_rejoin_date')?.value;
     const Remarks = this.formsource.get('Remarks')?.value;
-    const Leave_salary_payable = this.formsource.get('Leave_salary_payable')?.value;
+    const Leave_salary_payable = this.formsource.get('Leave_salary_payable')?.value === true;
 console.log(User_Id,Store_Id,selectedDate,Employee_no,Leave_type,Leave_days,Leave_credit,Dept_date,Expected_rejoin_date,Remarks,Leave_salary_payable)   
 
-
+if (Leave_salary_payable && Leave_days > Leave_credit) {
+  notify(
+    {
+      message: 'Leave days required cannot exceed leave days available',
+      position: { at: 'top right', my: 'top right' },
+      displayTime: 500,
+    },
+    'error'
+  );
+  return; // stop saving
+}
     if(Employee_no && Leave_type && Leave_days  && Dept_date && Expected_rejoin_date){
     this.dataservice.Insert_EmployeeLeave_Api(User_Id,Store_Id,formDate,Employee_no,Leave_type,Leave_days,Leave_credit,Dept_date,Expected_rejoin_date,Remarks,Leave_salary_payable).subscribe((res: any) => {
       notify(
@@ -863,8 +948,10 @@ this.dataservice.Update_EmployeeLeave_Api(User_Id,Store_Id,ID,Date,Employee_ID,L
   //===============get Dropdown List=======================
   get_LeaveType_Dropdown_List() {
     console.log('function working');
-    
-    this.dataservice.get_LeaveType_Dropdown_Api(name).subscribe((response: any) => {
+    const payload ={
+      NAME : 'LEAVE_TYPES'
+    }
+    this.dataservice.get_LeaveType_Dropdown_Api(payload).subscribe((response: any) => {
       console.log(response, 'response++++++++++');
       this.LeaveType = response;
       console.log(this.LeaveType, 'LeaveType++++++++++');
@@ -873,12 +960,28 @@ this.dataservice.Update_EmployeeLeave_Api(User_Id,Store_Id,ID,Date,Employee_ID,L
     });
   }
 
+  
+sesstion_Details() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+
+    this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
+    console.log(
+      this.COMPANY_ID,
+      '============selected_Company_id==============',
+    );
+    this.UserId = this.sessionData.USER_ID;
+    this.StoreId = this.sessionData.Configuration[0].STORE_ID;
+  }
 
   //=================get Employee dropdown list=================
   get_Employee_Dropdown_List() {
     console.log('function working');
-    
-    this.dataservice.get_Employee_Dropdown_Api('EMPLOYEES').subscribe((response: any) => {
+    const payload = {
+      NAME : 'EMPLOYEE',
+      COMPANY_ID : this.COMPANY_ID
+    }
+    this.dataservice.Dropdown_eos_employee(payload).subscribe((response: any) => {
       console.log(response, 'response++++++++++');
       this.Employee = response;
       console.log(this.Employee, 'Employee++++++++++');
@@ -891,8 +994,10 @@ this.dataservice.Update_EmployeeLeave_Api(User_Id,Store_Id,ID,Date,Employee_ID,L
   //=====================get EOS dropdown list===================
   get_EOS_Dropdown_List() {
     console.log('function working');
-    
-    this.dataservice.get_EOS_Dropdown_Api(name).subscribe((response: any) => {
+    const payload = {
+      NAME :'EOS_REASON'
+    }
+    this.dataservice.get_EOS_Dropdown_Api(payload).subscribe((response: any) => {
       console.log(response, 'response++++++++++');
       this.Left_service = response;
       console.log(this.Left_service, 'Is_ticket++++++++++');
@@ -989,15 +1094,15 @@ this.dataservice.Update_EmployeeLeave_Api(User_Id,Store_Id,ID,Date,Employee_ID,L
 
   Rejoin_Data(){
 
-    // this.selectedData.STATUS = this.selectedStatusType;
-    // if (this.selectedStatusType == 'Rejoined') {
-    //   this.formsource.value.REJOIN_DATE = true;
-    //   this.formsource.value.LEFT_REASON = false;
-    // }
-    // if (this.selectedStatusType == 'Left Service') {
-    //   this.formsource.value.REJOIN_DATE = false;
-    //   this.formsource.value.LEFT_REASON = true;
-    // }
+    this.selectedData.STATUS = this.selectedStatusType;
+    if (this.selectedStatusType == 'Rejoined') {
+      this.formsource.value.REJOIN_DATE = true;
+      this.formsource.value.LEFT_REASON = false;
+    }
+    if (this.selectedStatusType == 'Left Service') {
+      this.formsource.value.REJOIN_DATE = false;
+      this.formsource.value.LEFT_REASON = true;
+    }
 
     
     
@@ -1028,6 +1133,18 @@ this.dataservice.Update_EmployeeLeave_Api(User_Id,Store_Id,ID,Date,Employee_ID,L
 
 this.dataservice.Update_EmployeeLeave_Api(User_Id,Store_Id,ID,CurrentDate,Employee_ID,Leave_type,Leave_days,Leave_credit,Dept_date,Expected_rejoin_date,Remarks,Leave_salary_payable,Is_ticket,Last_rejoin_date,Travelled_date,Rejoin_date,Actual_days,Deduct_days,Left_reason).subscribe((res:any)=>{
     console.log(res);
+    if (this.selectedStatusType === 'Left Service' && !this.selectedData.LEFT_REASON) {
+  notify(
+    {
+      message: 'Please select a reason',
+      position: { at: 'top right', my: 'top right' },
+      displayTime: 500,
+    },
+    'error'
+  );
+  return;
+}
+else{
       notify(
                 {
                   message: 'Data updated successfully',
@@ -1040,18 +1157,22 @@ this.dataservice.Update_EmployeeLeave_Api(User_Id,Store_Id,ID,CurrentDate,Employ
               this.RejoinPopup=false
     this.get_EmployeeLeaveList()
     this.autofillExpectedRejoinDate();
-            
+            }        
   })
 }
 
 
-onStatusChange(status : string) {
+onStatusChange(status: string) {
   this.selectedStatusType = status;
+  console.log(this.selectedStatusType);
 
   if (status === 'Rejoined') {
-    this.selectedData.REJOIN_DATE = new Date(); // Auto-fill current date
+    // Only set today's date if REJOIN_DATE is empty
+    if (!this.selectedData.REJOIN_DATE) {
+      this.selectedData.REJOIN_DATE = new Date();
+    }
   } else {
-    this.selectedData.REJOIN_DATE = null; // Clear it otherwise
+    this.selectedData.REJOIN_DATE = null;
   }
 }
 
