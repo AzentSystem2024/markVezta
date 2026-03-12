@@ -1,15 +1,81 @@
 <dx-validation-group #journalVoucherGroup>
-  <div
-    class="invoice-wrapper"
-    style="
-      height: 70vh;
-      display: flex;
-      flex-direction: column;
+  <div class="invoice-wrapper">
+    <div
+      class="stacked-toolbar-group"
+      style="
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 6px;
+      "
+    >
+      <!-- Row 1 -->
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 10px;
+        "
+      >
+        <div style="display: flex; gap: 4px">
+          <dx-text-box
+            label="Doc No"
+            labelMode="floating"
+            [(value)]="productionFormData.VOUCHER_NO"
+            [width]="200"
+            [readOnly]="true"
+          ></dx-text-box>
 
-      box-sizing: border-box;
-    "
-  >
-    <div class="salary-grid-wrapper" style="padding: 0 10px">
+          <dx-text-box
+            label="Reference No"
+            labelMode="floating"
+            [(value)]="productionFormData.REF_NO"
+            [width]="200"
+            [readOnly]="true"
+          ></dx-text-box>
+        </div>
+
+        <dx-date-box
+          label="Production Date"
+          labelMode="floating"
+          [(value)]="productionFormData.PROD_DATE"
+          [width]="200"
+          type="date"
+          displayFormat="dd-MM-yyyy"
+          [readOnly]="true"
+        ></dx-date-box>
+      </div>
+
+      <!-- Row 2 -->
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 10px;
+        "
+      >
+        <div style="display: flex; gap: 4px">
+          <dx-text-box
+            label="Product"
+            labelMode="floating"
+            [(value)]="productionFormData.DESCRIPTION"
+            [width]="405"
+            [readOnly]="true"
+          ></dx-text-box>
+        </div>
+
+        <dx-number-box
+          label="Production Qty"
+          labelMode="floating"
+          [(value)]="productionFormData.PRODUCED_QTY"
+          [width]="200"
+          [readOnly]="true"
+        ></dx-number-box>
+      </div>
+    </div>
+    <div class="salary-grid-wrapper">
       <div class="grid-container">
         <dx-data-grid
           #itemsGridRef
@@ -25,7 +91,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'60vh'"
+          [height]="'50vh'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
@@ -50,93 +116,7 @@
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
-          <dxo-toolbar>
-            <div
-              class="stacked-toolbar-group"
-              style="display: flex; flex-direction: column; gap: 2px"
-            ></div>
-            <dxi-item location="before" locateInMenu="auto">
-              <div
-                class="stacked-toolbar-group"
-                style="display: flex; flex-direction: column; gap: 0px"
-              >
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    margin-top: 6px;
-                    width: 100%;
-                  "
-                >
-                  <dx-text-box
-                    label="Doc No"
-                    labelMode="floating"
-                    [(value)]="productionFormData.VOUCHER_NO"
-                    [width]="200"
-                    [readOnly]="true"
-                  ></dx-text-box>
 
-                  <dx-text-box
-                    label="Reference No"
-                    labelMode="floating"
-                    [(value)]="productionFormData.REF_NO"
-                    [width]="200"
-                    [readOnly]="true"
-                  ></dx-text-box>
-
-                  <!-- Date box pushed to right end -->
-                </div>
-
-                <div style="display: flex; align-items: baseline; gap: 2px">
-                  <dx-text-box
-                    label="Product"
-                    labelMode="floating"
-                    [(value)]="productionFormData.DESCRIPTION"
-                    [width]="406"
-                    [readOnly]="true"
-                  ></dx-text-box>
-                </div>
-              </div>
-            </dxi-item>
-
-            <dxi-item location="after" locateInMenu="auto">
-              <div
-                class="stacked-toolbar-group"
-                style="display: flex; flex-direction: column; gap: 6px"
-              >
-                <!-- Date Field (Top) -->
-                <dx-date-box
-                  label="Production Date"
-                  labelMode="floating"
-                  [(value)]="productionFormData.PROD_DATE"
-                  [width]="300"
-                  type="date"
-                  displayFormat="dd-MM-yyyy"
-                  [readOnly]="true"
-                ></dx-date-box>
-
-                <!-- Qty + Button Row -->
-                <div style="display: flex; align-items: flex-end; gap: 8px">
-                  <dx-number-box
-                    label="Production Qty"
-                    labelMode="floating"
-                    [(value)]="productionFormData.PRODUCED_QTY"
-                    [width]="300"
-                    [readOnly]="true"
-                  ></dx-number-box>
-
-                  <!-- <dx-button
-                    text="Fill Component"
-                    stylingMode="contained"
-                    type="default"
-                    [width]="150"
-                    style="height: 32px"
-                  ></dx-button> -->
-                </div>
-              </div>
-            </dxi-item>
-          </dxo-toolbar>
           <dxi-column
             dataField="ITEM_CODE"
             caption="Item Code"
@@ -269,12 +249,12 @@
 
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
-    <dx-button
+    <!-- <dx-button
       text="Cancel"
       stylingMode="outlined"
       (onClick)="Cancel()"
       type="normal"
-    ></dx-button>
+    ></dx-button> -->
   </div>
 </div>
 

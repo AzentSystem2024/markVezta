@@ -848,7 +848,7 @@ export class StockMovementReportComponent {
     this.isEditProductionPopupVisible = false;
 
     let api$;
-
+    const productionId = row.TRANS_ID;
     switch (type) {
       // SAME logic for Production & Consumption
       case 'production':
@@ -856,8 +856,8 @@ export class StockMovementReportComponent {
         // TYPE: 1 = Article, 2 = Box
         api$ =
           row.PRODUCTION_TYPE === 1
-            ? this.dataService.selectProduction(id)
-            : this.dataService.selectBoxProduction(id);
+            ? this.dataService.selectProduction(productionId)
+            : this.dataService.selectBoxProduction(productionId);
         break;
       }
 

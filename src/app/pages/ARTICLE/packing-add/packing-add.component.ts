@@ -114,7 +114,7 @@ export class PackingAddComponent {
     SUPP_ID: 0,
     COMPANY_ID: 0,
     STD_PRICE: 0,
-    ITEM_DESCRIPTION:'',
+    ITEM_DESCRIPTION: '',
     STD_PRICE_EFFECT_FROM: new Date(),
     PackingEntries: [
       {
@@ -171,7 +171,7 @@ export class PackingAddComponent {
     });
   }
 
-    getPartNo() {
+  getPartNo() {
     this.dataService.getPackingLastPartNo().subscribe((response: any) => {
       console.log(response);
       this.PackingData.PART_NO = response.GetPartNo;
@@ -328,7 +328,7 @@ export class PackingAddComponent {
     if (
       !ArtvalidationResult.isValid ||
       !ColorvalidationResult.isValid ||
-      !CatgoryvalidationResult.isValid 
+      !CatgoryvalidationResult.isValid
       // !UnitvalidationResult.isValid
     ) {
       return; //  Prevent saving if form is invalid
@@ -336,7 +336,7 @@ export class PackingAddComponent {
     if (
       !payload.artNo ||
       !payload.color ||
-      !payload.categoryID 
+      !payload.categoryID
       // !payload.unitID
     ) {
       notify(
@@ -535,11 +535,11 @@ export class PackingAddComponent {
   }
 
   onSelectionChanged(e: any) {
-  this.selectedRowKeys = e.selectedRowKeys;
-}
+    this.selectedRowKeys = e.selectedRowKeys;
+  }
 
   // onEditorPreparing(e: any) {
-    
+
   //   console.log(e, 'EDITOR PREPARING EVENT');
   //   const rowData = e.row?.data;
   //   console.log(rowData, 'ROW DATA IN EDITOR PREPARING');
@@ -562,39 +562,38 @@ export class PackingAddComponent {
   //   console.log(this.combinationString, 'COMBINATION STRING');
   // }
 
- onEditorPreparing(e: any) {
+  onEditorPreparing(e: any) {
+    //  Run only for data rows & Quantity column
+    if (e.parentType !== 'dataRow' || e.dataField !== 'QUANTITY') {
+      return;
+    }
 
-  //  Run only for data rows & Quantity column
-  if (e.parentType !== 'dataRow' || e.dataField !== 'QUANTITY') {
-    return;
+    const rowData = e.row?.data;
+    if (!rowData) {
+      return;
+    }
+
+    // ===============================
+    //  Allow edit only if row is selected
+    const isRowSelected = this.selectedRowKeys.includes(e.row.key);
+    e.editorOptions.readOnly = !isRowSelected;
+    // OR use disabled instead:
+    // e.editorOptions.disabled = !isRowSelected;
+
+    // ===============================
+    //  Your existing logic (safe now)
+    const sizeQtyString = `${rowData.Size}x${rowData.QUANTITY}`;
+
+    if (!this.combination_value.includes(sizeQtyString)) {
+      this.combination_value.push(sizeQtyString);
+    }
+
+    const validData = this.combination_value.filter(
+      (item) => !item.includes('undefined'),
+    );
+
+    this.combinationString = validData.join(', ');
   }
-
-  const rowData = e.row?.data;
-  if (!rowData) {
-    return;
-  }
-
-  // ===============================
-  //  Allow edit only if row is selected
-  const isRowSelected = this.selectedRowKeys.includes(e.row.key);
-  e.editorOptions.readOnly = !isRowSelected;
-  // OR use disabled instead:
-  // e.editorOptions.disabled = !isRowSelected;
-
-  // ===============================
-  //  Your existing logic (safe now)
-  const sizeQtyString = `${rowData.Size}x${rowData.QUANTITY}`;
-
-  if (!this.combination_value.includes(sizeQtyString)) {
-    this.combination_value.push(sizeQtyString);
-  }
-
-  const validData = this.combination_value.filter(
-    (item) => !item.includes('undefined')
-  );
-
-  this.combinationString = validData.join(', ');
-}
 
   totalQuantity: number = 0;
 
@@ -869,22 +868,22 @@ export class PackingAddComponent {
     this.art_Serial_no = String(this.PackingData.ART_SERIAL ?? '');
 
     // ===============================
-//  PRICE VALIDATION
-// ===============================
-const mrp = Number(this.PackingData.PACK_PRICE);
-const stdPrice = Number(this.PackingData.STD_PRICE);
+    //  PRICE VALIDATION
+    // ===============================
+    const mrp = Number(this.PackingData.PACK_PRICE);
+    const stdPrice = Number(this.PackingData.STD_PRICE);
 
-if (mrp <= stdPrice) {
-  notify(
-    {
-      message: 'MRP must be greater than Standard Price',
-      position: { at: 'top right', my: 'top right' },
-      displayTime: 1200,
-    },
-    'error'
-  );
-  return; //  STOP SAVE
-}
+    if (mrp <= stdPrice) {
+      notify(
+        {
+          message: 'MRP must be greater than Standard Price',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1200,
+        },
+        'error',
+      );
+      return; //  STOP SAVE
+    }
 
     // =====================================================
     //  BUILD BOM PAYLOAD
@@ -1049,17 +1048,17 @@ if (mrp <= stdPrice) {
           return; //  stop further execution
         }
 
-         if (res?.flag === 0) {
-                        notify(
-                          {
-                            message: res.Message || 'A similar record already exists.',
-                            position: { at: 'top right', my: 'top right' },
-                            displayTime: 2000,
-                          },
-                          'error',
-                        );
-                        return; //  stop further execution
-                      }
+        if (res?.flag === 0) {
+          notify(
+            {
+              message: res.Message || 'A similar record already exists.',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 2000,
+            },
+            'error',
+          );
+          return; //  stop further execution
+        }
 
         //  SUCCESS
         notify(
@@ -1136,6 +1135,7 @@ if (mrp <= stdPrice) {
     this.PackingData.IS_PURCHASABLE = false;
     this.PackingData.IS_EXPORT = false;
     this.PackingData.IS_ANY_COMB = false;
+    this.getAliasNo();
   }
 
   // resetForm() {

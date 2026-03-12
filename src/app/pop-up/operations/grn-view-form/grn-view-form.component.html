@@ -43,7 +43,15 @@
     </div>
 
     <div class="right-section" style="flex: 1; margin-left: 10px">
-      <dx-select-box
+      <dx-text-box
+        label="Store"
+        labelMode="floating"
+        [(value)]="newGrnData.STORE_NAME"
+        [readOnly]="true"
+        [elementAttr]="{ class: 'grntextbox' }"
+      >
+      </dx-text-box>
+      <!-- <dx-select-box
         label="Store"
         labelMode="floating"
         [dataSource]="storeList"
@@ -56,7 +64,7 @@
         [elementAttr]="{ class: 'grndropdown' }"
         (onValueChanged)="onStoreValueChanged($event)"
       >
-      </dx-select-box>
+      </dx-select-box> -->
     </div>
   </div>
 

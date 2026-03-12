@@ -108,7 +108,7 @@
             labelMode="floating"
             labelLocation="left"
             label="Year"
-            [width]="150"
+            [width]="90"
             [(value)]="selectedYear"
             [dataSource]="years"
             (onValueChanged)="onYearChanged($event)"
@@ -184,7 +184,6 @@
             icon="todo"
             stylingMode="contained"
             type="default"
-            [width]="100"
             class="mt-2"
             (onClick)="load_Ledgre_data()"
           >
@@ -296,6 +295,7 @@
 <!-- ==========================Debit View   ======== =========== -->
 
 <dx-popup
+  *ngIf="isViewDebitNote"
   [(visible)]="isViewDebitNote"
   [width]="'90vw'"
   [height]="'90vh'"
@@ -313,6 +313,7 @@
 <!-- =========================view of credit note============================== -->
 
 <dx-popup
+  *ngIf="isViewCreditNote"
   [(visible)]="isViewCreditNote"
   [width]="'90vw'"
   [height]="'90vh'"
@@ -328,6 +329,7 @@
 <!-- =====================invoice view screen=========================== -->
 
 <dx-popup
+  *ngIf="isViewInvoice"
   [(visible)]="isViewInvoice"
   [width]="'90vw'"
   [height]="'100vh'"
@@ -346,6 +348,7 @@
 <!-- //======================= coustom receipt=================== -->
 
 <dx-popup
+  *ngIf="isEditCustomerReceipt"
   [(visible)]="isEditCustomerReceipt"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -363,6 +366,7 @@
 
 <!-- ==============================suplier payment================================ -->
 <dx-popup
+  *ngIf="isEditReceipt"
   [(visible)]="isEditReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -381,6 +385,7 @@
 <!-- //=======================salary payment=================== -->
 
 <dx-popup
+  *ngIf="editSalaryPopup"
   [(visible)]="editSalaryPopup"
   [width]="'60vw'"
   [height]="'100vh'"
@@ -417,6 +422,7 @@
 <!-- //=======================Pre payment=================== -->
 
 <dx-popup
+  *ngIf="editPrePaymentPopupOpened"
   [(visible)]="editPrePaymentPopupOpened"
   [width]="'90vw'"
   [height]="'100vh'"
@@ -435,6 +441,7 @@
 <!-- //=======================  Depreciation=================== -->
 
 <dx-popup
+  *ngIf="EditDepreciationPopupVisible"
   [(visible)]="EditDepreciationPopupVisible"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -450,6 +457,7 @@
 <!-- //======================= mis_payment=================== -->
 
 <dx-popup
+  *ngIf="editMiscPopupOpened"
   [(visible)]="editMiscPopupOpened"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -468,6 +476,7 @@
 <!-- ====================Salary Advance(LOANS)================================================ -->
 
 <dx-popup
+  *ngIf="isEditPopUp"
   [(visible)]="isEditPopUp"
   title=" View Advance "
   [height]="640"
@@ -480,6 +489,7 @@
 <!-- ====================Misc Receipt=========================== -->
 
 <dx-popup
+  *ngIf="editMiscPopup"
   [(visible)]="editMiscPopup"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -507,6 +517,7 @@
 
 <!-- ==========================Purchase Invoice =============================== -->
 <dx-popup
+  *ngIf="isEditInvoice"
   [(visible)]="isEditInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -525,6 +536,7 @@
 
 <!-- =================================Pucrhase Return============================= -->
 <dx-popup
+  *ngIf="isEditPurchaseReturn"
   [(visible)]="isEditPurchaseReturn"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -543,6 +555,7 @@
 
 <!-- ===============================TransferOut================================== -->
 <dx-popup
+  *ngIf="isEditTransferOut"
   [(visible)]="isEditTransferOut"
   [width]="'75vw'"
   [height]="'90vh'"
@@ -562,6 +575,7 @@
 <!-- ======================================TransferIn============================= -->
 
 <dx-popup
+  *ngIf="isEditTransferIn"
   [(visible)]="isEditTransferIn"
   [width]="'70vw'"
   [height]="'90vh'"
@@ -579,6 +593,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditSaleReturn"
   [(visible)]="isEditSaleReturn"
   [width]="'90vw'"
   [height]="'100vh'"

@@ -237,7 +237,6 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
-  
 
   {
     path: 'auth',
@@ -959,11 +958,16 @@ const routes: Routes = [
         component: MiscellaneousInvoiceComponent,
         canActivate: [AuthGuardService],
       },
+      // {
+      //   path: 'import-chart-of-accounts',
+      //   component: ,
+      //   canActivate: [AuthGuardService],
+      // },
       {
-    path: 'misc-purchase',
-    component: MiscellaneousPurchaseComponent,
-    canActivate: [AuthGuardService],
-  },
+        path: 'misc-purchase',
+        component: MiscellaneousPurchaseComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: '**',
         redirectTo: 'login',

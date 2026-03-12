@@ -289,6 +289,7 @@
 </dx-popup> -->
 
 <dx-popup
+  *ngIf="isViewProduction"
   [(visible)]="isViewProduction"
   [width]="'90vw'"
   [height]="'100vh'"
@@ -305,6 +306,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isViewJournalVoucher"
   [(visible)]="isViewJournalVoucher"
   [width]="'100vw'"
   [deferRendering]="false"
@@ -319,6 +321,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isViewDebitNote"
   [(visible)]="isViewDebitNote"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -335,6 +338,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isViewCreditNote"
   [(visible)]="isViewCreditNote"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -349,6 +353,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isViewInvoice"
   [(visible)]="isViewInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -365,6 +370,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditCustomerReceipt"
   [(visible)]="isEditCustomerReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -382,6 +388,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditInvoice"
   [(visible)]="isEditInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -399,6 +406,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="editMiscPopup"
   [(visible)]="editMiscPopup"
   [width]="'100vw'"
   [height]="'100vh'"
