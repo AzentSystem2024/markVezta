@@ -939,7 +939,8 @@ body {
 .grid .dx-button-mode-text {
   color: #ffffff;
   border-radius: 25px;
-  background-color: var(--btn-bg-color);
+  background-color: var(--toolbar-icon);
+  // border: 2px solid var(--border-color);
 }
 
 .toolbar-icon-btn.dx-button {
@@ -1117,4 +1118,9 @@ body {
   margin-left: 10px;
   border-radius: 32px !important;
   background-color: var(--selected-menu-bg-color) !important;
+}
+
+.dx-dropdownbutton-action.dx-button-has-icon:not(.dx-button-has-text)
+  .dx-button-content {
+  padding-inline: 0px;
 }
