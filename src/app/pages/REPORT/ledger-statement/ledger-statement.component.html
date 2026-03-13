@@ -32,14 +32,14 @@
     >
       <!-- (onEditingStart)="onEditLedger($event)" -->
       <!-- <dxo-editing
-        mode="popup"
+        mode="popup"s
         [allowUpdating]="true"
       ></dxo-editing> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export
         [enabled]="true"
         [formats]="['xlsx', 'pdf']"
-        style="padding-right: 15px"
+        style="margin-top: 5px"
       >
       </dxo-export>
       <!-- <dxo-pager
@@ -50,12 +50,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager> -->
-      <dxo-export
-        [enabled]="true"
-        [formats]="['xlsx', 'pdf']"
-        style="padding-right: 15px"
-      >
-      </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
           <div
@@ -181,7 +176,6 @@
         <dxi-item>
           <dx-button
             text="Apply"
-            icon="todo"
             stylingMode="contained"
             type="default"
             class="mt-2"
@@ -189,7 +183,7 @@
           >
           </dx-button>
         </dxi-item>
-        <dxi-item name="exportButton"></dxi-item>
+        <dxi-item name="exportButton" class="export-btn"></dxi-item>
       </dxo-toolbar>
 
       <dxo-sorting mode="none"></dxo-sorting>

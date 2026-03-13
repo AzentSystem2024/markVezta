@@ -128,15 +128,12 @@
           >
           </dx-date-box>
         </dxi-item>
-        <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
 
         <dxi-item>
           <dx-button
             text="Apply"
             type="default"
-            icon="todo"
             stylingMode="contained"
-            [width]="100"
             class="mt-2"
             (onClick)="GET_CUSTOMER_LIST()"
           >
@@ -156,7 +153,7 @@
           elementAttr: { class: 'commonButtons' }
         }"
       ></dxi-item> -->
-        <dxi-item name="exportButton"></dxi-item>
+        <dxi-item name="exportButton" style="margin-top: 6px"></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping

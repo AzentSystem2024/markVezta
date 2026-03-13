@@ -20,7 +20,7 @@
       [headerFilter]="{ visible: false }"
       [columnFixing]="{
         enabled: true,
-        texts: { fix: 'Freeze', unfix: 'Unfreeze' }
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
       [(selectedRowKeys)]="selectedRows"
@@ -36,12 +36,7 @@
         [allowUpdating]="true"
       ></dxo-editing> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export
-        [enabled]="true"
-        [formats]="['xlsx', 'pdf']"
-        style="padding-right: 15px"
-      >
-      </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <!-- <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -50,12 +45,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager> -->
-      <dxo-export
-        [enabled]="true"
-        [formats]="['xlsx', 'pdf']"
-        style="padding-right: 15px"
-      >
-      </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
           <div
@@ -120,7 +110,6 @@
             text="Show"
             stylingMode="contained"
             type="default"
-           
             class="mt-2"
             (onClick)="Getdata()"
           >
@@ -142,7 +131,6 @@
             text="Save"
             stylingMode="contained"
             type="default"
-           
             class="mt-2"
             (onClick)="Savedata()"
           >

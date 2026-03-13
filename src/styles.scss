@@ -760,13 +760,6 @@ body {
   border-radius: 6px;
   padding: 4px 8px;
 }
-// .dx-treeview-node[aria-level="2"][aria-expanded="true"]
-//   > .dx-item
-//   .dx-item-content {
-//   font-weight: 500 !important;
-//   height: auto !important;
-
-// }
 
 .dx-treeview-node[aria-level="1"][aria-expanded="true"]
   > .dx-item
@@ -780,15 +773,6 @@ body {
   margin-top: 0px !important;
   background-color: white !important;
 }
-
-// .dx-treeview-search {
-//   margin-bottom: 5px;
-//   margin-top: 13px;
-//   margin-right: 10px;
-//   margin-left: 10px;
-//   border-radius: 32px !important;
-//   background-color: white !important;
-// }
 
 .dx-theme-fluent .dx-datagrid-headers.dx-datagrid-nowrap.dx-bordered-top-view {
   border-radius: 8px 8px 0 0;
@@ -953,10 +937,10 @@ body {
 }
 
 .grid .dx-button-mode-text {
-  color: #ffffff;
-  border-radius: 25px;
-  background-color: var(--btn-bg-color);
-  // border: 2px solid var(--border-color);
+  border-radius: 8px !important;
+  background-color: var(--toolbar-icon);
+  height: 32px;
+  width: 32px;
 }
 
 .toolbar-icon-btn.dx-button {
@@ -1059,34 +1043,60 @@ body {
 .dx-tabs-styling-mode-primary .dx-tab.dx-state-hover {
   background-color: none !important;
 }
+/* ========== LOGIN FORM ========== */
 
-//==============login form=======
-.login-form .dx-texteditor-container {
-  display: flex;
+.login-form .dx-texteditor.dx-editor-outlined {
   position: relative;
   overflow: hidden;
   width: 100%;
-  background-color: none;
+  background-color: white;
   height: 40px;
   border-radius: 8px;
 }
+
+/* Hover state */
+.login-form .dx-texteditor.dx-editor-outlined.dx-state-hover {
+  background-color: white;
+  // border-color: #757575;
+}
+
+/* Focus state */
+.login-form .dx-texteditor.dx-editor-outlined.dx-state-focused {
+  background-color: white;
+  border-color: #757575;
+}
+
+/* Input & placeholder */
 .login-form .dx-texteditor.dx-editor-filled .dx-placeholder::before,
-.dx-texteditor.dx-editor-filled .dx-texteditor-input {
+.login-form .dx-texteditor.dx-editor-filled .dx-texteditor-input {
   padding-top: 5px;
   padding-bottom: 5px;
   color: black;
   background-color: white;
 }
+
+.login-form .dx-texteditor-input {
+  margin: 0;
+  background-color: transparent;
+  color: rgb(49 15 15);
+  font-size: 14px;
+  line-height: 1.428571;
+}
+/* Filled editor style */
 .login-form .dx-texteditor.dx-editor-filled {
   border-radius: 6px;
-  background: rgba(255, 255, 255, 1);
+  background: white;
   border: 1px solid #cbd5e1;
 }
+
+/* Icon color */
 .login-form .dx-button-mode-text .dx-icon {
-  color: rgb(0 0 0) !important;
+  color: black !important;
 }
-.login-form .dx-button-mode-text .dx-icon::hover {
-  color: rgb(0 0 0) !important;
+
+/* Icon hover */
+.login-form .dx-button-mode-text .dx-icon:hover {
+  color: black !important;
   background-color: white;
 }
 
