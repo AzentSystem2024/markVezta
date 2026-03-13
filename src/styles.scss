@@ -937,10 +937,9 @@ body {
 }
 
 .grid .dx-button-mode-text {
-  border-radius: 8px !important;
-  background-color: var(--toolbar-icon);
-  height: 32px;
-  width: 32px;
+  color: #ffffff;
+  border-radius: 25px;
+  background-color: var(--btn-bg-color);
 }
 
 .toolbar-icon-btn.dx-button {
