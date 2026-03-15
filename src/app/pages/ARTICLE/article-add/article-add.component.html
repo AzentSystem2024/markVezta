@@ -89,7 +89,8 @@
           <dx-number-box
             label="MRP *"
             [(value)]="articleData.PRICE"
-            [format]="'#,##0.##'"
+            [format]="'#,##0.00'"
+            [inputAttr]="{ style: 'text-align: right;' }"
             labelMode="floating"
             placeholder="Price"
             [min]="0"

@@ -31,7 +31,7 @@
       <div>
         <dx-number-box
           [(value)]="SalaryHeadData.HEAD_ORDER"
-          label="Order in Pay slip"
+          label="Order in PaySlip"
           [width]="400"
           [labelMode]="'floating'"
           style="margin-left: 10px"
@@ -137,7 +137,7 @@
             [width]="150"
             [format]="{
               type: 'fixedPoint',
-              precision: 2
+              precision: 2,
             }"
             [disabled]="selectedType !== 'fixed'"
           ></dx-number-box>
@@ -146,7 +146,7 @@
             [disabled]="!isEnabled || ApplicableWorkingDay"
             [(value)]="SalaryHeadData.AFFECT_LEAVE"
             [ngStyle]="{
-              color: !isEnabled || ApplicableWorkingDay ? '#aaa' : 'inherit'
+              color: !isEnabled || ApplicableWorkingDay ? '#aaa' : 'inherit',
             }"
             text="Applicable to working days only"
           ></dx-check-box>
@@ -174,13 +174,13 @@
           <span
             style="margin-top: 10px"
             [ngStyle]="{
-              color: !isEnabled || head_percent ? '#aaa' : 'inherit'
+              color: !isEnabled || head_percent ? '#aaa' : 'inherit',
             }"
             >% of selected Heads</span
           >
           <dx-check-box
             [ngStyle]="{
-              color: !isEnabled || head_percent ? '#aaa' : 'inherit'
+              color: !isEnabled || head_percent ? '#aaa' : 'inherit',
             }"
             [disabled]="!isEnabled || ApplicableWithBasicRange"
             [(value)]="SalaryHeadData.RANGE_EXISTS"
@@ -195,7 +195,7 @@
           <span
             style="margin-top: 10px"
             [ngStyle]="{
-              color: !isEnabled || head_percent ? '#aaa' : 'inherit'
+              color: !isEnabled || head_percent ? '#aaa' : 'inherit',
             }"
             >to</span
           >
@@ -229,7 +229,7 @@
       400"
           [editing]="{
             mode: 'cell',
-            allowUpdating: true
+            allowUpdating: true,
           }"
           [showBorders]="true"
           [selection]="{ mode: 'multiple' }"
@@ -239,7 +239,7 @@
           (onSelectionChanged)="onSelectionChanged($event)"
           [editing]="{
             mode: 'cell',
-            allowUpdating: true
+            allowUpdating: true,
           }"
         >
           <dxi-column

@@ -245,6 +245,8 @@
           (onValueChanged)="updateItemDescription()"
           [min]="0"
           [showSpinButtons]="true"
+          [format]="'#,##0.00'"
+          [inputAttr]="{ style: 'text-align: right;' }"
           ><dx-validator>
             <dxi-validation-rule
               type="required"
@@ -272,6 +274,8 @@
           [showSpinButtons]="true"
           [(value)]="PackingData.STD_PRICE"
           [readOnly]="true"
+          [format]="'#,##0.00'"
+          [inputAttr]="{ style: 'text-align: right;' }"
           ><dx-validator>
             <dxi-validation-rule
               type="required"

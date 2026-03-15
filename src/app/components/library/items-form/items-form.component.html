@@ -569,7 +569,8 @@
                   [(value)]="newItems.SALE_PRICE"
                   [width]="200"
                   labelMode="floating"
-                  [format]="{ type: 'fixedPoint', precision: 2 }"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
                 ></dx-number-box>
               </div>
               <div class="inventory-item">
@@ -577,7 +578,8 @@
                 <dx-number-box
                   [(value)]="newItems.COST"
                   [width]="200"
-                  [format]="{ type: 'fixedPoint', precision: 2 }"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
                 ></dx-number-box>
               </div>
               <div class="inventory-item">
@@ -585,7 +587,8 @@
                 <dx-number-box
                   [value]="calculateProfitMargin()"
                   [width]="200"
-                  [format]="{ type: 'fixedPoint', precision: 2 }"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
                 ></dx-number-box>
               </div>
 
@@ -594,7 +597,8 @@
                 <dx-number-box
                   [(value)]="newItems.SALE_PRICE1"
                   [width]="200"
-                  [format]="{ type: 'fixedPoint', precision: 2 }"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
                 ></dx-number-box>
               </div>
               <div class="inventory-item">
@@ -602,7 +606,8 @@
                 <dx-number-box
                   [(value)]="newItems.SALE_PRICE2"
                   [width]="200"
-                  [format]="{ type: 'fixedPoint', precision: 2 }"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
                 ></dx-number-box>
               </div>
               <div class="inventory-item">
@@ -610,7 +615,8 @@
                 <dx-number-box
                   [(value)]="newItems.SALE_PRICE3"
                   [width]="200"
-                  [format]="{ type: 'fixedPoint', precision: 2 }"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
                 ></dx-number-box>
               </div>
               <div class="inventory-item">
@@ -618,7 +624,8 @@
                 <dx-number-box
                   [(value)]="newItems.SALE_PRICE4"
                   [width]="200"
-                  [format]="{ type: 'fixedPoint', precision: 2 }"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
                 ></dx-number-box>
               </div>
               <div class="inventory-item">
@@ -626,7 +633,8 @@
                 <dx-number-box
                   [(value)]="newItems.SALE_PRICE5"
                   [width]="200"
-                  [format]="{ type: 'fixedPoint', precision: 2 }"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
                 ></dx-number-box>
               </div>
               <div class="inventory-item">
@@ -647,6 +655,8 @@
                 <dx-number-box
                   [(value)]="newItems.PURCH_PRICE"
                   [width]="200"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
                 ></dx-number-box>
               </div>
             </div>
@@ -781,36 +791,55 @@
             dataField="SALE_PRICE"
             [allowEditing]="false"
             caption="Price"
+            format="#,##0.00"
+            alignment="right"
           ></dxi-column>
           <dxi-column
             dataField="SALE_PRICE1"
             caption="Price Level 1"
             [allowEditing]="false"
+            format="#,##0.00"
+            alignment="right"
           ></dxi-column>
           <dxi-column
             dataField="SALE_PRICE2"
             caption="Price Level 2"
             [allowEditing]="false"
+            format="#,##0.00"
+            alignment="right"
           ></dxi-column>
           <dxi-column
             dataField="SALE_PRICE3"
             caption="Price Level 3"
             [allowEditing]="false"
+            format="#,##0.00"
+            alignment="right"
           ></dxi-column>
           <dxi-column
             dataField="SALE_PRICE4"
             caption="Price Level 4"
             [allowEditing]="false"
+            format="#,##0.00"
+            alignment="right"
           ></dxi-column>
           <dxi-column
             dataField="SALE_PRICE5"
             caption="Price Level 5"
             [allowEditing]="false"
+            format="#,##0.00"
+            alignment="right"
           ></dxi-column>
-          <dxi-column dataField="COST" caption="Cost"></dxi-column>
+          <dxi-column
+            dataField="COST"
+            caption="Cost"
+            format="#,##0.00"
+            alignment="right"
+          ></dxi-column>
           <dxi-column
             dataField="LAST_MODIFIED_DATE"
             caption="Added Date"
+            format="#,##0.00"
+            alignment="right"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
@@ -1116,7 +1145,13 @@
             caption="Reorder No"
             dataType="number"
           ></dxi-column>
-          <dxi-column dataField="COST" caption="Cost" dataType="number">
+          <dxi-column
+            dataField="COST"
+            caption="Cost"
+            dataType="number"
+            format="#,##0.00"
+            alignment="right"
+          >
             <!-- <dxi-validation-rule type="required"></dxi-validation-rule> -->
           </dxi-column>
           <dxi-column

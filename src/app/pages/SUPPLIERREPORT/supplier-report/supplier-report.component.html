@@ -121,14 +121,14 @@
             (onValueChanged)="onSupplierChanged($event)"
           ></dx-select-box>
         </dxi-item>
-
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item>
           <dx-button
             text="Apply"
             type="default"
-            icon="todo"
             stylingMode="contained"
-            [width]="100"
             class="mt-2"
             (onClick)="get_DataSource()"
           >

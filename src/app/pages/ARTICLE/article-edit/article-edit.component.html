@@ -94,6 +94,8 @@
             [min]="0"
             [showSpinButtons]="true"
             (onValueChanged)="updateItemDescription()"
+            [format]="'#,##0.00'"
+            [inputAttr]="{ style: 'text-align: right;' }"
           ></dx-number-box>
         </div>
         <div class="form-field">

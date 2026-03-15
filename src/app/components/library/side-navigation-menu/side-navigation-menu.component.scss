@@ -87,6 +87,15 @@
   }
 }
 .dx-treeview
+  .dx-treeview-node[aria-level="1"]
+  > .dx-treeview-item.dx-state-selected {
+  background-color: var(--sub-menu-bg-color) !important;
+  color: var(--sub-menu-color) !important;
+  border-radius: 8px;
+  height: 46px;
+}
+
+.dx-treeview
   .dx-treeview-node[aria-level="2"]
   > .dx-treeview-item.dx-state-selected {
   background-color: var(--sub-menu-bg-color) !important;
@@ -102,20 +111,30 @@
   font-family: "Roboto", sans-serif;
 }
 
-/* Right-align only Reports submenu */
-
-/* Accounts > Reports is the 10th child in your staticMenu */
-// ::ng-deep .dx-treeview-node[aria-level="2"]:nth-of-type(10)
-//   .dx-treeview-node-container {
-//   left: auto !important;
-//   right: 0 !important;
-// }
-
 ::ng-deep
   .dx-treeview
   .dx-treeview-node[aria-level="2"]
   > .dx-treeview-item.dx-state-hover {
   color: var(--select-menu-text-color);
+  background-color: var(--select-menu-bg-color) !important;
+  border-radius: 8px;
+  height: 46px;
+  // margin-left: 50px;
+}
+
+::ng-deep
+  .dx-treeview
+  .dx-treeview-node[aria-level="1"]
+  > .dx-treeview-item.dx-state-hover
+  .dx-treeview-toggle-item-visibility {
+  color: blue;
+}
+
+::ng-deep
+  .dx-treeview
+  .dx-treeview-node[aria-level="1"]
+  > .dx-treeview-item.dx-state-hover {
+  color: #0073d8;
   background-color: var(--select-menu-bg-color) !important;
   border-radius: 8px;
   height: 46px;
@@ -139,4 +158,10 @@
     background-color: var(--select-menu-bg-color) !important;
     height: 46px;
   }
+}
+
+::ng-deep .dx-treeview-toggle-item-visibility .dx-state-hover {
+  right: 10px;
+  left: auto;
+  color: #0073d8;
 }

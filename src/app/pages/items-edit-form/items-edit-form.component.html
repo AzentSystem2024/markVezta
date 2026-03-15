@@ -591,7 +591,8 @@
 
                   <dx-number-box
                     [(value)]="salePrice"
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [format]="'#,##0.00'"
+                    [inputAttr]="{ style: 'text-align: right;' }"
                     [labelMode]="'floating'"
                     [width]="200"
                   ></dx-number-box>
@@ -599,7 +600,8 @@
                 <div class="inventory-item">
                   <label>Cost:</label>
                   <dx-number-box
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [format]="'#,##0.00'"
+                    [inputAttr]="{ style: 'text-align: right;' }"
                     [(value)]="itemData.COST"
                     [labelMode]="'floating'"
                     [width]="200"
@@ -611,7 +613,8 @@
                     [value]="calculateProfitMargin()"
                     (onValueChanged)="onProfitmarginChange($event)"
                     [labelMode]="'floating'"
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [format]="'#,##0.00'"
+                    [inputAttr]="{ style: 'text-align: right;' }"
                     [width]="200"
                   ></dx-number-box>
                 </div>
@@ -623,7 +626,8 @@
                     (onValueChanged)="onSalesPrice1Change($event)"
                     (onValueChanged)="onSalesPrice1Change($event)"
                     [labelMode]="'floating'"
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [format]="'#,##0.00'"
+                    [inputAttr]="{ style: 'text-align: right;' }"
                     [width]="200"
                   ></dx-number-box>
                 </div>
@@ -632,7 +636,8 @@
                   <dx-number-box
                     [(value)]="itemData.SALE_PRICE2"
                     (onValueChanged)="onSalesPrice2Change($event)"
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [format]="'#,##0.00'"
+                    [inputAttr]="{ style: 'text-align: right;' }"
                     [labelMode]="'floating'"
                     [width]="200"
                   ></dx-number-box>
@@ -642,7 +647,8 @@
                   <dx-number-box
                     [(value)]="itemData.SALE_PRICE3"
                     (onValueChanged)="onSalesPrice3Change($event)"
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [format]="'#,##0.00'"
+                    [inputAttr]="{ style: 'text-align: right;' }"
                     [labelMode]="'floating'"
                     [width]="200"
                   ></dx-number-box>
@@ -652,7 +658,8 @@
                   <dx-number-box
                     [(value)]="itemData.SALE_PRICE4"
                     (onValueChanged)="onSalesPrice4Change($event)"
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [format]="'#,##0.00'"
+                    [inputAttr]="{ style: 'text-align: right;' }"
                     [labelMode]="'floating'"
                     [width]="200"
                   ></dx-number-box>
@@ -662,7 +669,8 @@
                   <dx-number-box
                     [(value)]="itemData.SALE_PRICE5"
                     (onValueChanged)="onSalesPrice5Change($event)"
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [format]="'#,##0.00'"
+                    [inputAttr]="{ style: 'text-align: right;' }"
                     [labelMode]="'floating'"
                     [width]="200"
                   ></dx-number-box>
@@ -684,7 +692,8 @@
                   <label>Last Purchase Price:</label>
                   <dx-number-box
                     [(value)]="itemData.PURCH_PRICE"
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [format]="'#,##0.00'"
+                    [inputAttr]="{ style: 'text-align: right;' }"
                     [readOnly]="false"
                     [labelMode]="'floating'"
                     [width]="200"
@@ -820,27 +829,42 @@
               dataField="STORE_NAME"
               caption="Store Name"
             ></dxi-column>
-            <dxi-column dataField="SALE_PRICE" caption="Price"></dxi-column>
+            <dxi-column
+              dataField="SALE_PRICE"
+              format="#,##0.00"
+              alignment="right"
+              caption="Price"
+            ></dxi-column>
 
             <dxi-column
               dataField="SALE_PRICE1"
               caption="Price Level 1"
+              format="#,##0.00"
+              alignment="right"
             ></dxi-column>
             <dxi-column
               dataField="SALE_PRICE2"
               caption="Price Level 2"
+              format="#,##0.00"
+              alignment="right"
             ></dxi-column>
             <dxi-column
               dataField="SALE_PRICE3"
               caption="Price Level 3"
+              format="#,##0.00"
+              alignment="right"
             ></dxi-column>
             <dxi-column
               dataField="SALE_PRICE4"
+              format="#,##0.00"
+              alignment="right"
               caption="Price Level 4"
             ></dxi-column>
             <dxi-column
               dataField="SALE_PRICE5"
               caption="Price Level 5"
+              format="#,##0.00"
+              alignment="right"
             ></dxi-column>
             <dxi-column
               dataField="LAST_MODIFIED_DATE"

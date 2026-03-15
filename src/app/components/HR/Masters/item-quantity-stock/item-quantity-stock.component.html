@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="ItemQuantityDatasource"
@@ -30,25 +30,19 @@
       focusStateEnabled="false"
       [groupPanel]="{ visible: true }"
       [grouping]="{ autoExpandAll: false }"
-      [summary]="summaryColumnsData" 
+      [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
     >
-      
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
-       
         [displayMode]="displayMode"
         [showPageSizeSelector]="showPageSizeSelector"
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
 
-      <dxo-export
-      [enabled]="true"
-      [formats]="['xlsx', 'pdf']"
-    >
-    </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <!-- <dxo-filter-row
@@ -57,10 +51,21 @@
       ></dxo-filter-row> -->
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header"style="font-weight: 600 ;font-size: 20px; margin-left: 12px; padding: -3px; margin-right: 3px;">Item Quantity</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right:  3px;
+            "
+          >
+            Item Quantity
+          </div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
- <!-- <dxi-item location="after" locateInMenu="auto">   
+        <!-- <dxi-item location="after" locateInMenu="auto">   
         <dx-date-box
           [width]="200"
           label="Date From"
@@ -70,11 +75,9 @@
         ></dx-date-box>
   </dxi-item> -->
 
-  
-   <!-- <dxi-item>
+        <!-- <dxi-item>
           <dx-button
             text="Apply"
-            icon="todo"
             stylingMode="contained"
             type="default"
             [width]="100"
@@ -82,25 +85,28 @@
           ></dx-button>
         </dxi-item> -->
 
-      
-    
-      <dxi-item name="exportButton"></dxi-item>
+        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
-   
-       <dxo-grouping
+
+      <dxo-grouping
         [autoExpandAll]="false"
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-<!-- <dxi-column dataField="ARTICLE_ID" caption="Id"></dxi-column> -->
-<dxi-column dataField="ITEMCODE" caption="Item Code" ></dxi-column>
-<dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-<dxi-column dataField="DEPARTMENT" caption="Department"></dxi-column>
-<dxi-column dataField="CATEGORY" caption="Category"></dxi-column>
-<dxi-column dataField="SUBCATEGORY" caption="Subcategory"></dxi-column>
-<dxi-column dataField="BRAND" caption="Brand"></dxi-column>
-<dxi-column dataField="QUANTITY_AVAILABLE" dataType="number" format="#,##0.00" alignment="right" caption="Quantity"></dxi-column>
-
+      <!-- <dxi-column dataField="ARTICLE_ID" caption="Id"></dxi-column> -->
+      <dxi-column dataField="ITEMCODE" caption="Item Code"></dxi-column>
+      <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+      <dxi-column dataField="DEPARTMENT" caption="Department"></dxi-column>
+      <dxi-column dataField="CATEGORY" caption="Category"></dxi-column>
+      <dxi-column dataField="SUBCATEGORY" caption="Subcategory"></dxi-column>
+      <dxi-column dataField="BRAND" caption="Brand"></dxi-column>
+      <dxi-column
+        dataField="QUANTITY_AVAILABLE"
+        dataType="number"
+        format="#,##0.00"
+        alignment="right"
+        caption="Quantity"
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </div>
