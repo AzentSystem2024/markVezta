@@ -789,15 +789,11 @@ body {
   font-weight: bold !important;
 }
 
-/* =============================== */
-/* EXPORT BUTTON – ICON ONLY */
-/* =============================== */
-
 .export-btn .dx-dropdownbutton {
-  width: 36px;
+  // width: 36px;
   height: 36px;
   border-radius: 8px !important;
-  background-color: rgba(230, 230, 230, 1);
+  // background-color: rgba(230, 230, 230, 1);
   padding: 0;
 }
 
@@ -920,6 +916,7 @@ body {
   color: #ffff !important;
   padding-left: 8px;
   padding-right: 10px;
+  height: 32px;
 }
 .dx-button.dx-button-default.dx-state-hover {
   border-radius: 8px !important;
@@ -938,8 +935,9 @@ body {
 
 .grid .dx-button-mode-text {
   color: #ffffff;
-  border-radius: 25px;
+  border-radius: 8px;
   background-color: var(--toolbar-icon);
+  // margin-top: 6px;s
   // border: 2px solid var(--border-color);
 }
 
@@ -1100,6 +1098,9 @@ body {
   background-color: white;
 }
 
+.login-form .dx-button-mode-text.dx-state-hover {
+  background-color: white;
+}
 .dx-treeview-item {
   gap: 8px;
   padding: 0 0 !important;

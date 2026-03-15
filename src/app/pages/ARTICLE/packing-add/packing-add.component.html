@@ -246,11 +246,12 @@
         <dx-number-box
           label="MRP *"
           [(value)]="PackingData.PACK_PRICE"
-          [format]="'#,##0.##'"
+          [format]="'#,##0.00'"
           labelMode="floating"
           placeholder="MRP"
           [min]="0"
           [showSpinButtons]="true"
+          [inputAttr]="{ style: 'text-align: right;' }"
           (onValueChanged)="updateItemDescription()"
           ><dx-validator>
             <dxi-validation-rule
@@ -277,12 +278,13 @@
       <div class="form-field">
         <dx-number-box
           label="Standard Price"
-          [format]="'#,##0.##'"
+          [format]="'#,##0.00'"
           labelMode="floating"
           placeholder="Standard Price"
           [(value)]="PackingData.STD_PRICE"
           [min]="0"
           [showSpinButtons]="true"
+          [inputAttr]="{ style: 'text-align: right;' }"
           ><dx-validator>
             <dxi-validation-rule
               type="required"
