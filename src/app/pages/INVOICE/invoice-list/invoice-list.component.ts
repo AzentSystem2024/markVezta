@@ -78,7 +78,7 @@ export class InvoiceListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -159,14 +159,14 @@ export class InvoiceListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+    // console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
+    // console.log('Parsed ObjectData:', menuResponse);
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+    // console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/invoice');
@@ -180,78 +180,10 @@ export class InvoiceListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
+    // console.log('packingRights', packingRights);
+    // console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getInvoiceList();
   }
-
-  // getInvoiceList() {
-  //   const payload = {
-  //     COMPANY_ID: this.companyID,
-  //   };
-  //   this.dataService.getInvoiceMainList(payload).subscribe((response: any) => {
-  //     this.invoiceList = response.Data.map((item: any) => {
-  //       let dateValue: Date;
-
-  //       // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-  //       if (
-  //         typeof item.SALE_DATE === 'string' &&
-  //         item.SALE_DATE.includes('-')
-  //       ) {
-  //         const [day, month, year] = item.SALE_DATE.split('-').map(Number);
-  //         dateValue = new Date(year, month - 1, day);
-  //       } else {
-  //         dateValue = new Date(item.SALE_DATE);
-  //       }
-
-  //       return {
-  //         ...item,
-  //         SALE_DATE: dateValue,
-  //       };
-  //     }).sort((a: any, b: any) => {
-  //       const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
-  //       const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
-  //       return numB - numA; // descending
-  //     });
-
-  //     this.applyDateFilter();
-  //   });
-  // }
-
-  // getInvoiceList(dateRange: string = this.selectedDateRange) {
-  //   const datePayload = this.getDateRangePayload(dateRange);
-
-  //   const payload = {
-  //     COMPANY_ID: this.companyID,
-  //     DATE_FROM: datePayload.DATE_FROM,
-  //     DATE_TO: datePayload.DATE_TO,
-  //   };
-
-  //   this.dataService.getInvoiceMainList(payload).subscribe((response: any) => {
-  //     this.invoiceList = response.Data.map((item: any) => {
-  //       let dateValue: Date;
-
-  //       if (
-  //         typeof item.SALE_DATE === 'string' &&
-  //         item.SALE_DATE.includes('-')
-  //       ) {
-  //         const [day, month, year] = item.SALE_DATE.split('-').map(Number);
-  //         dateValue = new Date(year, month - 1, day);
-  //       } else {
-  //         dateValue = new Date(item.SALE_DATE);
-  //       }
-
-  //       return {
-  //         ...item,
-  //         SALE_DATE: dateValue,
-  //       };
-  //     }).sort((a: any, b: any) => {
-  //       const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
-  //       const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
-  //       return numB - numA;
-  //     });
-  //   });
-  // }
 
   getInvoiceList(dateRange: string = this.selectedDateRange) {
     const datePayload = this.getDateRangePayload(dateRange);
@@ -293,11 +225,11 @@ export class InvoiceListComponent {
                   return numB - numA; // descending
                 });
 
-              // 🔑 cache for logic
+              //  cache for logic
               this.invoiceArray = list;
               this.invoiceCount = list.length;
 
-              resolve(list); // 🔑 grid data
+              resolve(list); //  grid data
             },
             error: () => {
               this.invoiceArray = [];
@@ -410,23 +342,6 @@ export class InvoiceListComponent {
     }
   }
 
-  // onDateRangeChanged(e: any) {
-  //   this.selectedDateRange = e.value;
-
-  //   if (e.value === 'custom') {
-  //     this.customStartDate = null;
-  //     this.customEndDate = null;
-  //     this.showCustomDatePopup = true;
-  //   } else {
-  //     // Reset the custom label
-  //     const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-  //     if (customOpt) {
-  //       customOpt.label = 'Custom';
-  //     }
-  //     this.applyDateFilter();
-  //   }
-  // }
-
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
 
@@ -448,27 +363,27 @@ export class InvoiceListComponent {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
+    // console.log(this.sessionData, '=================session data==========');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+    // console.log(
+    //   this.selected_Company_id,
+    //   '============selected_Company_id==============',
+    // );
 
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
+    // console.log(
+    //   this.selected_fin_id,
+    //   '===========selected fin id===================',
+    // );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
-    console.log(sessionYear, '==================session year==========');
+    // console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-    console.log(
-      this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
-    );
+    // console.log(
+    //   this.financialYeaDate,
+    //   '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
+    // );
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_vat_id = this.sessionData.VAT_ID;
@@ -518,58 +433,6 @@ export class InvoiceListComponent {
     });
   }
 
-  // applyCustomDateFilter() {
-  //   if (!(this.customStartDate && this.customEndDate)) return;
-
-  //   const payload = {
-  //     COMPANY_ID: this.companyID,
-  //     DATE_FROM: this.formatAsYYYYMMDD(new Date(this.customStartDate)),
-  //     DATE_TO: this.formatAsYYYYMMDD(new Date(this.customEndDate)),
-  //   };
-
-  //   this.dataService.getInvoiceMainList(payload).subscribe((response: any) => {
-  //     this.invoiceList = response.Data;
-  //   });
-
-  //   // Update dropdown label
-  //   const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
-  //   const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
-
-  //   this.dateRanges = this.dateRanges.map((option) =>
-  //     option.value === 'custom'
-  //       ? { ...option, label: `${fromLabel} to ${toLabel}` }
-  //       : option,
-  //   );
-
-  //   this.showCustomDatePopup = false;
-  // }
-
-  // applyCustomDateFilter() {
-  //   if (!(this.customStartDate && this.customEndDate)) return;
-
-  //   const start = new Date(this.customStartDate);
-  //   start.setHours(0, 0, 0, 0);
-
-  //   const end = new Date(this.customEndDate);
-  //   end.setHours(23, 59, 59, 999);
-
-  //   this.filteredInvoiceList = this.invoiceList.filter((item: any) => {
-  //     const invoiceDate = item.SALE_DATE;
-  //     return invoiceDate >= start && invoiceDate <= end;
-  //   });
-
-  //   const fromLabel = this.formatAsDDMMYYYY(start);
-  //   const toLabel = this.formatAsDDMMYYYY(end);
-
-  //   this.dateRanges = this.dateRanges.map((option) =>
-  //     option.value === 'custom'
-  //       ? { ...option, label: `${fromLabel} to ${toLabel}` }
-  //       : option,
-  //   );
-
-  //   this.showCustomDatePopup = false;
-  // }
-
   applyCustomDateFilter() {
     if (!this.customStartDate || !this.customEndDate) return;
 
@@ -581,7 +444,7 @@ export class InvoiceListComponent {
     const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
     const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
-    // 🔑 THIS IS THE MAGIC (same as Credit Note)
+    //  THIS IS THE MAGIC (same as Credit Note)
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} - ${toLabel}` }
@@ -656,6 +519,7 @@ export class InvoiceListComponent {
     }, 0);
   }
 
+  //status flag color
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 

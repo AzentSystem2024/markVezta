@@ -1,0 +1,318 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    #dataGrid
+    class="grid theme-dependent"
+    [dataSource]="datasource"
+    [height]="'83vh'"
+    [loadPanel]="{
+      enabled: true,
+      text: 'Loading...',
+      showIndicator: true,
+      showPane: true,
+    }"
+    class="grid theme-dependent"
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
+    [columnResizingMode]="'nextColumn'"
+    [filterRow]="{ visible: false }"
+    [headerFilter]="{ visible: false }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    focusStateEnabled="false"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div class="grid-header">Import Chart Of Accounts</div>
+      </dxi-item>
+
+      <!-- <dxi-item location="after">
+        <dx-select-box
+          placeholder="Select Date Range"
+          displayExpr="label"
+          [items]="dateRanges"
+          valueExpr="value"
+          stylingMode="filled"
+          [(value)]="defaultDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+        ></dx-select-box>
+        <dx-popup
+          [(visible)]="isDateRangePopupVisible"
+          title="Select Date Range"
+          [width]="400"
+          [height]="230"
+          (onHiding)="applyDateRange()"
+        >
+          <div>
+            <dx-date-box
+              [elementAttr]="{ class: 'dateBoxClass' }"
+              [(value)]="selectedRange.from"
+              placeholder="From Date"
+            ></dx-date-box>
+            <dx-date-box
+              [elementAttr]="{ class: 'dateBoxClass' }"
+              [(value)]="selectedRange.to"
+              placeholder="To Date"
+            ></dx-date-box>
+          </div>
+          <dx-button
+            text="Apply"
+            type="default"
+            [elementAttr]="{ class: 'apply-button' }"
+            (onClick)="applyDateRange()"
+          ></dx-button>
+          <dx-button
+            text="Clear"
+            (onClick)="clearDateRange()"
+            [elementAttr]="{ class: 'clear-button' }"
+          ></dx-button>
+        </dx-popup>
+      </dxi-item> -->
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
+
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="downloadTemplateOptions"
+    ></dxi-item>
+
+      <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="importButtonOptions"
+    ></dxi-item>
+    </dxo-toolbar>
+
+    <dxi-column
+      dataField="DocNo"
+      caption="Doc No"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="ImportedBy"
+      caption="Imported By"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="ImportedTime"
+      caption="Imported Time"
+      dataType="date"
+      [calculateCellValue]="convertUtcToLocal"
+      format="dd/MM/yyyy hh:mm a"
+    ></dxi-column>
+
+    <dxi-column type="buttons" [width]="110" caption=" ">
+      <dxi-button
+        class="button-info"
+        text="Details"
+        icon="info"
+        [onClick]="viewDetails"
+      >
+      </dxi-button>
+    </dxi-column>
+  </dx-data-grid>
+
+  <dx-popup
+  [(visible)]="openImportItemsPopup"
+  title="Import Chart Of Accounts"
+  [width]="'90vw'"
+  [height]="'90vh'"
+  [showCloseButton]="true"
+>
+
+  <div class="import-popup-wrapper">
+
+    <dx-data-grid
+      [dataSource]="rawData"
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+      [rowAlternationEnabled]="true"
+      [allowColumnResizing]="true"
+      [allowColumnReordering]="true"
+      height="65vh"
+    >
+
+      <!-- ✅ Virtual Scroll -->
+      <dxo-scrolling
+        mode="virtual"
+        rowRenderingMode="virtual">
+      </dxo-scrolling>
+
+      <!-- ✅ Pagination -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+
+      <dxo-pager
+        [visible]="true"
+        [showPageSizeSelector]="true"
+        [allowedPageSizes]="[10,20,50]"
+        [showInfo]="true"
+        [showNavigationButtons]="true">
+      </dxo-pager>
+
+
+      <!-- ✅ Header Filter -->
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+    
+      <!-- Columns -->
+      <dxi-column dataField="MainGroup"></dxi-column>
+      <dxi-column dataField="SubGroup"></dxi-column>
+      <dxi-column dataField="Category"></dxi-column>
+      <dxi-column dataField="LedgerCode"></dxi-column>
+      <dxi-column dataField="LedgerName"></dxi-column>
+      <dxi-column dataField="CostType"></dxi-column>
+
+    </dx-data-grid>
+
+
+    <!-- Footer Buttons -->
+    <div class="popup-footer">
+
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        (onClick)="openImportItemsPopup=false">
+      </dx-button>
+
+      <dx-button
+        text="Import"
+        type="default"
+        (onClick)="saveImportedData()"
+       >
+      </dx-button>
+
+    </div>
+
+  </div>
+
+</dx-popup>
+  
+  <!-- <dx-popup
+    [(visible)]="ViewImportItemsPopup"
+    title="View Imported Items"
+    [width]="1000"
+    [height]="650"
+    (onShown)="onPopupShown()"
+  >
+    <app-view-imported-items
+      [formdata]="selectedId"
+      *ngIf="popupReady"
+    ></app-view-imported-items>
+  </dx-popup> -->
+
+  <dx-popup
+  [(visible)]="ViewImportItemsPopup"
+  title="View Imported Accounts"
+  [width]="'90vw'"
+  [height]="'90vh'"
+  [showCloseButton]="true"
+>
+
+  <!-- ✅ Loading -->
+  <dx-load-panel
+    [visible]="isDetailsLoading"
+    message="Loading..."
+    [showIndicator]="true"
+    [shading]="true">
+  </dx-load-panel>
+
+  <dx-data-grid
+    [dataSource]="importedAccounts"
+    [showBorders]="true"
+    height="72vh"
+    [columnAutoWidth]="true"
+    [rowAlternationEnabled]="true"
+  >
+
+    <!-- Virtual Scroll -->
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+
+    <!-- Paging -->
+    <dxo-paging [pageSize]="10"></dxo-paging>
+
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="[10,20,50]"
+      [showPageSizeSelector]="true"
+      [showInfo]="true">
+    </dxo-pager>
+
+    <!-- Filters -->
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+
+    <!-- Columns -->
+    <dxi-column dataField="MainGroup"></dxi-column>
+    <dxi-column dataField="SubGroup"></dxi-column>
+    <dxi-column dataField="Category"></dxi-column>
+    <dxi-column dataField="LedgerCode"></dxi-column>
+    <dxi-column dataField="LedgerName"></dxi-column>
+    <dxi-column dataField="CostType"></dxi-column>
+
+  </dx-data-grid>
+
+</dx-popup>
+</div>
+
+
+<dx-load-panel
+  [visible]="isSaving"
+  message="Saving..."
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  shadingColor="rgba(0,0,0,0.2)">
+</dx-load-panel>
+
+
+<input
+  type="file"
+  id="fileInput"
+  accept=".xlsx,.xls"
+  style="display:none"
+  (change)="onFileChange($event)"
+/>

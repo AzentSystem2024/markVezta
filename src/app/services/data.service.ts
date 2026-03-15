@@ -170,7 +170,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}packing/Lastaliasno`, {});
   }
 
-    getPackingLastPartNo(): Observable<any> {
+  getPackingLastPartNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}packing/Lastpartno`, {});
   }
 
@@ -4780,7 +4780,7 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
-      get_EmployeeDetailsFor_Leave_Api(payload) {
+  get_EmployeeDetailsFor_Leave_Api(payload) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/emplist';
     return this.http.post(getEndpoint, payload);
   }
@@ -6312,9 +6312,23 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post<{ data: any[] }>(getEndpoint, payload);
   }
 
+  public getImportChartOfAccountsLog(data: any): Observable<any> {
+    const payload = {
+      CompanyID: data,
+    };
+    return this.http.post(`${this.apiUrl}ImportChartOfAccounts/list`, payload);
+  }
+
+  public saveimportedAccounts(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}ImportChartOfAccounts/import`, data);
+  }
+
+  public viewImportedAccounts(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}ImportChartOfAccounts/view`, data);
+  }
 
   //--------------------------MISCELLANEOUS-INVOICE----------------------------------//
-    getMiscInvoiceMainList(data: any): Observable<any> {
+  getMiscInvoiceMainList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseReturn/list`, data);
   }
 }

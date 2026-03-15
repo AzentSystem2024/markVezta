@@ -72,37 +72,6 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   transID: any;
   selected_Company_id: any;
 
-  constructor(private service: DataService, private router: Router) {
-    const userRights = sessionStorage.getItem('menuUserRightsResponse');
-    this.userRights = userRights ? JSON.parse(userRights) : [];
-    console.log(this.userRights, 'userRights');
-    if (this.userRights.length > 0) {
-      this.fileDetails.DOC_TYPE = this.userRights[0].DOC_TYPE;
-    }
-    console.log(this.fileDetails.DOC_TYPE, 'doctype');
-    const settingsData = sessionStorage.getItem('settings');
-    this.settingsData = settingsData ? JSON.parse(settingsData) : null;
-    // Access CURRENCY_ID
-    this.localCurrencyId = this.settingsData
-      ? this.settingsData.CURRENCY_ID
-      : null;
-    console.log(this.localCurrencyId, 'CURRENCY_ID');
-    this.localCurrencyCode = this.settingsData
-      ? this.settingsData.CURRENCY_CODE
-      : null;
-
-    const userDataString = localStorage.getItem('userData');
-    console.log(userDataString, 'USERDATASTRING');
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
-
-      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-      this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, 'HSNCODE===================');
-      this.hsnLoaded = true; // ADD THIS
-    }
-  }
-
   userRights: any;
   fileData: string = '';
   width = '97vw';
@@ -207,6 +176,196 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   newPoData = this.poData;
   getNewPoData = () => ({ ...this.newPoData });
 
+  constructor(
+    private service: DataService,
+    private router: Router,
+  ) {
+    const userRights = sessionStorage.getItem('menuUserRightsResponse');
+    this.userRights = userRights ? JSON.parse(userRights) : [];
+    console.log(this.userRights, 'userRights');
+    if (this.userRights.length > 0) {
+      this.fileDetails.DOC_TYPE = this.userRights[0].DOC_TYPE;
+    }
+    console.log(this.fileDetails.DOC_TYPE, 'doctype');
+    const settingsData = sessionStorage.getItem('settings');
+    this.settingsData = settingsData ? JSON.parse(settingsData) : null;
+    // Access CURRENCY_ID
+    this.localCurrencyId = this.settingsData
+      ? this.settingsData.CURRENCY_ID
+      : null;
+    console.log(this.localCurrencyId, 'CURRENCY_ID');
+    this.localCurrencyCode = this.settingsData
+      ? this.settingsData.CURRENCY_CODE
+      : null;
+
+    const userDataString = localStorage.getItem('userData');
+    console.log(userDataString, 'USERDATASTRING');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      console.log(this.HSNCODE, 'HSNCODE===================');
+      this.hsnLoaded = true; // ADD THIS
+    }
+  }
+  ngOnInit() {
+    this.sessionDetails();
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    this.menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log(
+      'Parsed ObjectData:',
+      this.menuResponse.GeneralSettings.STORE_TITLE,
+    );
+    if (this.menuResponse?.GeneralSettings?.STORE_TITLE === 'STORE') {
+      this.storeLabel = 'Store';
+    } else {
+      this.storeLabel = 'Location';
+    }
+    // this.sessionData_tax()
+    const menuGroups = this.menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      const selectedCompany = userData?.SELECTED_COMPANY;
+
+      if (selectedCompany?.COMPANY_ID) {
+        this.selectedCompanyId = selectedCompany.COMPANY_ID;
+        this.companyList = [selectedCompany]; // ✅ Show only selected company
+      }
+
+      if (userData.USER_ID) {
+        this.userId = userData.USER_ID;
+      }
+
+      const firstFinYear = userData.FINANCIAL_YEARS?.[0];
+      if (firstFinYear?.FIN_ID) {
+        this.finId = firstFinYear.FIN_ID;
+      }
+    }
+    this.currentDate = new Date();
+    this.GetSupplierList();
+    this.GetStoresList();
+    this.GetDeliveryTermsList();
+    this.GetPaymentTermsList();
+    this.GetEmployeeList();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['formdata'] && this.formdata) {
+      this.transID = this.formdata.TRANS_ID;
+      this.fileDetails.DOC_ID = this.formdata.ID;
+
+      this.newPoData = { ...this.formdata };
+      this.newPoData.PoDetails = this.formdata.PoDetails || [];
+
+      //  STEP 1: DETERMINE GST MODE FROM EXISTING DATA
+      const firstDetail = this.newPoData.PoDetails?.[0];
+
+      if (firstDetail) {
+        const cgst = Number(firstDetail.CGST || 0);
+        const sgst = Number(firstDetail.SGST || 0);
+
+        if (cgst === 0 && sgst === 0) {
+          // ✅ INTER-STATE → IGST
+          this.isInterState = true;
+          this.isIntraState = false;
+        } else {
+          // ✅ INTRA-STATE → CGST + SGST
+          this.isInterState = false;
+          this.isIntraState = true;
+        }
+      }
+
+      // 🔥 STEP 2: MAP SAVED ITEMS (UNCHANGED)
+      this.savedItems = this.newPoData.PoDetails.map((item, index) => {
+        const baseAmount = item.QUANTITY * item.SUPP_PRICE;
+        const supplierAmount = item.QUANTITY * item.SUPP_PRICE;
+
+        const discountAmount = (baseAmount * (item.DISC_PERCENT || 0)) / 100;
+        const supplierDiscAmount =
+          (supplierAmount * (item.DISC_PERCENT || 0)) / 100;
+
+        const taxableSupplier = supplierAmount - supplierDiscAmount;
+        const taxable = baseAmount - discountAmount;
+
+        let vatAmount = 0;
+        vatAmount = (taxable * (item.VAT_PERC || 0)) / 100;
+        // if (item.VAT_PERC && item.VAT_PERC > 0) {
+        //   vatAmount = (taxable * item.VAT_PERC) / 100;
+        // } else {
+        //   const cgst = item.CGST || 0;
+        //   const sgst = item.SGST || 0;
+        //   vatAmount = (taxable * (cgst + sgst)) / 100;
+        // }
+
+        return {
+          ITEM_ID: item.ITEM_ID,
+          slNo: index + 1,
+          ITEM_CODE: item.ITEM_CODE || '',
+          DESCRIPTION: item.ITEM_DESC,
+          UOM: item.UOM,
+          PACKING_NAME: item.PACKING,
+          SUPP_PRICE: +item.SUPP_PRICE,
+          PURCH_PRICE: +item.PRICE || 0,
+          qtyOrdered: +item.QUANTITY,
+          Amount: +baseAmount.toFixed(2),
+          discountPercentage: item.DISC_PERCENT,
+          discountAmount: +discountAmount.toFixed(2),
+          taxable_Supplier: +taxableSupplier.toFixed(2),
+          taxable: +taxable.toFixed(2),
+          VAT_PERC: item.VAT_PERC || 0,
+          TAX_PERC: item.TAX_PERC,
+          CGST: item.CGST || 0,
+          SGST: item.SGST || 0,
+          vatAmount: +vatAmount.toFixed(2),
+          total_Supplier: +taxableSupplier.toFixed(2),
+          total: +(taxable + vatAmount).toFixed(2),
+          HSN_CODE: item.HSN_CODE,
+          GST_PERC: item.VAT_PERC || 0,
+        };
+      });
+
+      // 🔥 STEP 3: remember supplier & mark load complete
+      this.previousSupplierId = this.newPoData.SUPP_ID;
+      this.isInitialLoad = false;
+
+      // 🔥 STEP 4: FORCE GRID TO UPDATE COLUMN VISIBILITY
+      setTimeout(() => {
+        this.itemsGridRef?.instance?.repaint();
+      }, 0);
+
+      // EXISTING CALLS (UNCHANGED)
+      this.getAttachmentList();
+      this.getPoHistoryList();
+      if (this.isInitialLoad) {
+        this.getSupplierByid();
+      }
+
+      this.selectedRowKeys = this.savedItems.map((i) => i.ITEM_CODE);
+
+      this.calculateTotalQuantity();
+      this.calculateTotalIncludingTax();
+    }
+  }
+
   highlightEditableColumns(event: any) {
     if (event.rowType === 'data' && event.column.allowEditing) {
       // Apply a custom style for editable cells
@@ -224,11 +383,15 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       RATE: item.PURCH_PRICE || 0,
       AMOUNT: item.Amount,
       DISC_PERCENT: item.discountPercentage || 0,
-      TAX_PERC: this.isInterState ? item.VAT_PERC : 0,
-      //GST MODE HANDLING
-      VAT_PERC: this.isInterState ? item.VAT_PERC : 0,
-      CGST: this.isInterState ? 0 : item.CGST,
-      SGST: this.isInterState ? 0 : item.SGST,
+      TAX_PERC: item.VAT_PERC,
+      VAT_PERC: item.VAT_PERC,
+      CGST: 0,
+      SGST: 0,
+      // TAX_PERC: this.isInterState ? item.VAT_PERC : 0,
+      // //GST MODE HANDLING
+      // VAT_PERC: this.isInterState ? item.VAT_PERC : 0,
+      // CGST: this.isInterState ? 0 : item.CGST,
+      // SGST: this.isInterState ? 0 : item.SGST,
 
       TAX_AMOUNT: item.vatAmount,
       TOTAL_AMOUNT: item.total,
@@ -268,10 +431,10 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       return;
     }
 
-    // ❌ Do NOT let ngOnChanges interfere
+    // Do NOT let ngOnChanges interfere
     this.newPoData.SUPP_ID = newSupplierId;
 
-    // 🔥 CLEAR SUPPLIER DEPENDENT FIELDS
+    //CLEAR SUPPLIER DEPENDENT FIELDS
     this.SupplierCurrency = null;
     this.SupplierCurrencyCode = null;
     this.SupplierCurrencySymbol = null;
@@ -343,19 +506,27 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       }, 0);
       // 🔄 UPDATE GST FOR ALL EXISTING ROWS
       this.savedItems.forEach((item) => {
-        const itemGst = Number(item.GST_PERC || item.VAT_PERC || 0);
-        const halfGst = +(itemGst / 2).toFixed(2);
+        const itemGst = Number(item.GST_PERC ?? item.VAT_PERC ?? 0);
 
-        if (this.isInterState) {
-          item.VAT_PERC = itemGst;
-          item.CGST = 0;
-          item.SGST = 0;
-        } else {
-          item.VAT_PERC = 0;
-          item.CGST = halfGst;
-          item.SGST = halfGst;
-        }
+        item.GST_PERC = itemGst;
+        item.VAT_PERC = itemGst;
+        item.CGST = 0;
+        item.SGST = 0;
       });
+      // this.savedItems.forEach((item) => {
+      //   const itemGst = Number(item.GST_PERC || item.VAT_PERC || 0);
+      //   const halfGst = +(itemGst / 2).toFixed(2);
+
+      //   if (this.isInterState) {
+      //     item.VAT_PERC = itemGst;
+      //     item.CGST = 0;
+      //     item.SGST = 0;
+      //   } else {
+      //     item.VAT_PERC = 0;
+      //     item.CGST = halfGst;
+      //     item.SGST = halfGst;
+      //   }
+      // });
 
       // this.savedItems.forEach((item) => {
       //   if (this.isInterState) {
@@ -374,7 +545,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
       //  FORCE RECALCULATION
       this.savedItems.forEach((item) =>
-        this.updateAmount({ key: item, data: item })
+        this.updateAmount({ key: item, data: item }),
       );
 
       //  REFRESH GRID
@@ -435,72 +606,57 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   }
 
   saveSelectedData() {
-    // Map over selectedItems to create new items with updated values
-    const newItems = this.selectedItems.map((item, index) => {
-      // Determine if supplier currency differs from local currency
-      const useSupplierPrice =
-        this.SupplierCurrencyCode !== this.localCurrencyCode;
-      console.log(useSupplierPrice, 'useSupplierPrice');
+    const newItems = this.selectedItems
+      .filter(
+        (item) =>
+          !this.savedItems.some((saved) => saved.ITEM_ID === item.ITEM_ID),
+      )
+      .map((item, index) => {
+        const itemGst = Number(item.GST_PERC || item.VAT_PERC || this.GST || 0);
 
-      // Supplier price logic: Use PURCH_PRICE if currencies differ
-      const supplierPrice = useSupplierPrice ? item.PURCH_PRICE : 0;
-      console.log(supplierPrice, 'supplierPrice');
+        const useSupplierPrice =
+          this.SupplierCurrencyCode !== this.localCurrencyCode;
 
-      // Calculate PURCHASE price when currencies differ
-      const purchPrice = useSupplierPrice
-        ? (supplierPrice / this.currencyExchangeRate).toFixed(2)
-        : item.PURCH_PRICE;
+        const supplierPrice = useSupplierPrice
+          ? item.PURCH_PRICE
+          : item.PURCH_PRICE;
 
-      const itemGst = Number(item.GST_PERC || item.VAT_PERC || 0);
-      const halfGst = +(itemGst / 2).toFixed(2);
-      // Parse numeric fields and fallback to 0 if undefined or NaN
-      const taxable = parseFloat(item.taxable) || 0;
-      const vatAmount = parseFloat(item.vatAmount) || 0;
-      const total = parseFloat(item.total) || 0;
-      const supplierAmount = parseFloat(item.supplierAmount) || 0;
+        const purchPrice = useSupplierPrice
+          ? supplierPrice / this.currencyExchangeRate
+          : item.PURCH_PRICE;
 
-      return {
-        ...item,
-        slNo: this.savedItems.length + index + 1, // Serial number starting from existing items
-        SUPP_PRICE: supplierPrice, // Update SUPP_PRICE based on currency check
-        PURCH_PRICE: parseFloat(purchPrice), // Ensure consistent numeric value
+        return {
+          ...item,
+          slNo: this.savedItems.length + index + 1,
 
-        // Bind session data
-        // HSN_CODE: this.HSN_CODE,
+          SUPP_PRICE: supplierPrice,
+          PURCH_PRICE: +purchPrice.toFixed(2),
 
-        HSN_CODE: item.HSN_CODE,
-        // GST_PERC: this.GST_PERC,
-        GST_PERC: itemGst,
-        VAT_PERC: this.isInterState ? itemGst : 0,
-        CGST: this.isInterState ? 0 : halfGst,
-        SGST: this.isInterState ? 0 : halfGst,
-        // VAT_PERC: this.isInterState ? this.GST_PERC : 0,
-        // CGST: this.isInterState ? 0 : this.GST_PERC / 2,
-        // SGST: this.isInterState ? 0 : this.GST_PERC / 2,
-        supplierAmount,
-        taxable,
-        vatAmount,
-        total,
-      };
-    });
+          HSN_CODE: item.HSN_CODE,
+          GST_PERC: itemGst,
 
-    // Filter out items that already exist in savedItems based on ITEM_ID or another unique identifier
-    const filteredNewItems = newItems.filter((newItem) => {
-      // Check if item already exists in savedItems by ITEM_ID or another unique identifier
-      return !this.savedItems.some(
-        (savedItem) => savedItem.ITEM_ID === newItem.ITEM_ID
-      );
-    });
+          // 🔑 Always preserve GST
+          VAT_PERC: itemGst,
+          CGST: 0,
+          SGST: 0,
 
-    // Merge existing items (from ngOnChanges) with non-duplicate new items
-    this.savedItems = [...this.savedItems, ...filteredNewItems];
+          qtyOrdered: 0,
+          Amount: 0,
+          discountPercentage: 0,
+          discountAmount: 0,
+          taxable: 0,
+          vatAmount: 0,
+          total: 0,
+        };
+      });
 
-    // Log the updated savedItems array for debugging
-    console.log(this.savedItems, 'savedItems');
+    // 🔑 Append only new items
+    this.savedItems = [...this.savedItems, ...newItems];
 
-    // Update the UI state
-    this.selectedTabIndex = 1; // Switch to the tab showing saved items
-    this.showAddItemPopup = false; // Close the "Add Item" popup
+    this.selectedTabIndex = 1;
+    this.showAddItemPopup = false;
+
+    this.itemsGridRef?.instance?.refresh();
   }
 
   sessionDetails() {
@@ -508,80 +664,21 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
       this.HSN_CODE,
-      '===========selected HSN CODE==================='
+      '===========selected HSN CODE===================',
     );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     console.log(
       this.GST_PERC,
-      '===========selected GST PERC==================='
+      '===========selected GST PERC===================',
     );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
   }
 
-  ngOnInit() {
-    this.sessionDetails();
-    const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
-    this.menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
-    );
-    console.log(
-      'Parsed ObjectData:',
-      this.menuResponse.GeneralSettings.STORE_TITLE
-    );
-    if (this.menuResponse?.GeneralSettings?.STORE_TITLE === 'STORE') {
-      this.storeLabel = 'Store';
-    } else {
-      this.storeLabel = 'Location';
-    }
-    // this.sessionData_tax()
-    const menuGroups = this.menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
-
-    const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
-
-    if (packingRights) {
-      this.canAdd = packingRights.CanAdd;
-      this.canEdit = packingRights.CanEdit;
-      this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
-    }
-    const userDataString = localStorage.getItem('userData');
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
-      const selectedCompany = userData?.SELECTED_COMPANY;
-
-      if (selectedCompany?.COMPANY_ID) {
-        this.selectedCompanyId = selectedCompany.COMPANY_ID;
-        this.companyList = [selectedCompany]; // ✅ Show only selected company
-      }
-
-      if (userData.USER_ID) {
-        this.userId = userData.USER_ID;
-      }
-
-      const firstFinYear = userData.FINANCIAL_YEARS?.[0];
-      if (firstFinYear?.FIN_ID) {
-        this.finId = firstFinYear.FIN_ID;
-      }
-    }
-    this.currentDate = new Date();
-    this.GetSupplierList();
-    this.GetStoresList();
-    this.GetDeliveryTermsList();
-    this.GetPaymentTermsList();
-    this.GetEmployeeList();
-  }
-
   calculateTotalQuantity() {
     this.totalQuantity = this.savedItems.reduce(
       (sum, item) => sum + Number(item.qtyOrdered || 0),
-      0
+      0,
     );
     this.netEditQuantityChange.emit(this.totalQuantity);
   }
@@ -653,7 +750,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         // Only recalculate PURCH_PRICE if the currencies are different
         if (this.SupplierCurrencyCode !== this.localCurrencyCode) {
           item.PURCH_PRICE = parseFloat(
-            (item.SUPP_PRICE / this.newPoData.EXCHANGE_PRICE).toFixed(2)
+            (item.SUPP_PRICE / this.newPoData.EXCHANGE_PRICE).toFixed(2),
           );
         } else {
           // Use the manually updated PURCH_PRICE directly
@@ -666,7 +763,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         // Calculate Amount based on qtyOrdered and Cost (PURCH_PRICE)
         item.Amount = Number((qtyOrdered * updatedRow.SUPP_PRICE).toFixed(2));
         item.SUPP_AMOUNT = Number(
-          (qtyOrdered * updatedRow.SUPP_PRICE).toFixed(2)
+          (qtyOrdered * updatedRow.SUPP_PRICE).toFixed(2),
         );
         console.log(item.Amount, 'AMOUNTINEDIT');
         // Calculate Discount Amount only if discountPercentage is valid
@@ -676,7 +773,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
           updatedRow.discountPercentage > 0
         ) {
           item.discountAmount = parseFloat(
-            (item.Amount * (updatedRow.discountPercentage / 100)).toFixed(2)
+            (item.Amount * (updatedRow.discountPercentage / 100)).toFixed(2),
           );
           console.log(item.discountAmount, 'discountAmount');
         } else {
@@ -685,7 +782,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
         // Calculate Taxable Amount as Amount - Discount Amount
         item.taxable = parseFloat(
-          (item.Amount - item.discountAmount).toFixed(2)
+          (item.Amount - item.discountAmount).toFixed(2),
         );
         console.log(item.taxable, 'taxable');
         let discSupplierAmount = 0; // Initialize discount amount
@@ -699,7 +796,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
               qtyOrdered *
               item.SUPP_PRICE *
               (updatedRow.discountPercentage / 100)
-            ).toFixed(2)
+            ).toFixed(2),
           );
         } else {
           discSupplierAmount = 0; // Set to 0 if no valid discount percentage
@@ -707,28 +804,35 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
         // Calculate Taxable Supplier based on SUPP_PRICE in the supplier's currency
         item.taxable_Supplier = parseFloat(
-          (qtyOrdered * item.SUPP_PRICE - discSupplierAmount).toFixed(2)
+          (qtyOrdered * item.SUPP_PRICE - discSupplierAmount).toFixed(2),
         );
 
         // Calculate VAT Amount if VAT percentage is provided
-        const itemGst = Number(item.GST_PERC || 0);
-        let totalTaxPerc = 0;
+        const itemGst = Number(item.GST_PERC || item.VAT_PERC || 0);
 
-        if (this.isInterState) {
-          item.VAT_PERC = itemGst;
-          item.CGST = 0;
-          item.SGST = 0;
-          totalTaxPerc = itemGst;
-        } else {
-          const halfGst = +(itemGst / 2).toFixed(2);
-          item.VAT_PERC = 0;
-          item.CGST = halfGst;
-          item.SGST = halfGst;
-          totalTaxPerc = halfGst * 2;
-        }
+        item.VAT_PERC = itemGst;
+        item.CGST = 0;
+        item.SGST = 0;
+
+        const totalTaxPerc = item.VAT_PERC;
+        // const itemGst = Number(item.GST_PERC || 0);
+        // let totalTaxPerc = 0;
+
+        // if (this.isInterState) {
+        //   item.VAT_PERC = itemGst;
+        //   item.CGST = 0;
+        //   item.SGST = 0;
+        //   totalTaxPerc = itemGst;
+        // } else {
+        //   const halfGst = +(itemGst / 2).toFixed(2);
+        //   item.VAT_PERC = 0;
+        //   item.CGST = halfGst;
+        //   item.SGST = halfGst;
+        //   totalTaxPerc = halfGst * 2;
+        // }
 
         item.vatAmount = parseFloat(
-          (item.taxable * (totalTaxPerc / 100)).toFixed(2)
+          (item.taxable * (totalTaxPerc / 100)).toFixed(2),
         );
 
         console.log(item.taxable, item.vatAmount, 'TAXABLE,VATAMOUNT');
@@ -777,7 +881,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
       // Check if the item already exists in PoDetails
       const detailItemIndex = this.poData.PoDetails.findIndex(
-        (detailItem: any) => detailItem.ITEM_ID === item.ITEM_ID
+        (detailItem: any) => detailItem.ITEM_ID === item.ITEM_ID,
       );
       console.log(detailItem, 'ITEMSVALUESINPO');
       if (detailItemIndex !== -1) {
@@ -941,7 +1045,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -1014,7 +1118,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   }
 
   customSum(
-    options: Parameters<DxDataGridTypes.Summary['calculateCustomSummary']>[0]
+    options: Parameters<DxDataGridTypes.Summary['calculateCustomSummary']>[0],
   ) {
     console.log('options:', options); // Log the entire options object
     // Start each column's calculation
@@ -1042,103 +1146,6 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     if (options.summaryProcess === 'finalize') {
       options.totalValue = parseFloat(options.totalValue.toFixed(2));
       console.log(options.totalValue, 'finalize total value');
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['formdata'] && this.formdata) {
-      this.transID = this.formdata.TRANS_ID;
-      this.fileDetails.DOC_ID = this.formdata.ID;
-
-      this.newPoData = { ...this.formdata };
-      this.newPoData.PoDetails = this.formdata.PoDetails || [];
-
-      // 🔥 STEP 1: DETERMINE GST MODE FROM EXISTING DATA
-      const firstDetail = this.newPoData.PoDetails?.[0];
-
-      if (firstDetail) {
-        const cgst = Number(firstDetail.CGST || 0);
-        const sgst = Number(firstDetail.SGST || 0);
-
-        if (cgst === 0 && sgst === 0) {
-          // ✅ INTER-STATE → IGST
-          this.isInterState = true;
-          this.isIntraState = false;
-        } else {
-          // ✅ INTRA-STATE → CGST + SGST
-          this.isInterState = false;
-          this.isIntraState = true;
-        }
-      }
-
-      // 🔥 STEP 2: MAP SAVED ITEMS (UNCHANGED)
-      this.savedItems = this.newPoData.PoDetails.map((item, index) => {
-        const baseAmount = item.QUANTITY * item.SUPP_PRICE;
-        const supplierAmount = item.QUANTITY * item.SUPP_PRICE;
-
-        const discountAmount = (baseAmount * (item.DISC_PERCENT || 0)) / 100;
-        const supplierDiscAmount =
-          (supplierAmount * (item.DISC_PERCENT || 0)) / 100;
-
-        const taxableSupplier = supplierAmount - supplierDiscAmount;
-        const taxable = baseAmount - discountAmount;
-
-        let vatAmount = 0;
-
-        if (item.VAT_PERC && item.VAT_PERC > 0) {
-          vatAmount = (taxable * item.VAT_PERC) / 100;
-        } else {
-          const cgst = item.CGST || 0;
-          const sgst = item.SGST || 0;
-          vatAmount = (taxable * (cgst + sgst)) / 100;
-        }
-
-        return {
-          ITEM_ID: item.ITEM_ID,
-          slNo: index + 1,
-          ITEM_CODE: item.ITEM_CODE || '',
-          DESCRIPTION: item.ITEM_DESC,
-          UOM: item.UOM,
-          PACKING_NAME: item.PACKING,
-          SUPP_PRICE: +item.SUPP_PRICE,
-          PURCH_PRICE: +item.PRICE || 0,
-          qtyOrdered: +item.QUANTITY,
-          Amount: +baseAmount.toFixed(2),
-          discountPercentage: item.DISC_PERCENT,
-          discountAmount: +discountAmount.toFixed(2),
-          taxable_Supplier: +taxableSupplier.toFixed(2),
-          taxable: +taxable.toFixed(2),
-          VAT_PERC: item.VAT_PERC || 0,
-          TAX_PERC: item.TAX_PERC,
-          CGST: item.CGST || 0,
-          SGST: item.SGST || 0,
-          vatAmount: +vatAmount.toFixed(2),
-          total_Supplier: +taxableSupplier.toFixed(2),
-          total: +(taxable + vatAmount).toFixed(2),
-          HSN_CODE: this.HSNCODE,
-        };
-      });
-
-      // 🔥 STEP 3: remember supplier & mark load complete
-      this.previousSupplierId = this.newPoData.SUPP_ID;
-      this.isInitialLoad = false;
-
-      // 🔥 STEP 4: FORCE GRID TO UPDATE COLUMN VISIBILITY
-      setTimeout(() => {
-        this.itemsGridRef?.instance?.repaint();
-      }, 0);
-
-      // EXISTING CALLS (UNCHANGED)
-      this.getAttachmentList();
-      this.getPoHistoryList();
-      if (this.isInitialLoad) {
-        this.getSupplierByid();
-      }
-
-      this.selectedRowKeys = this.savedItems.map((i) => i.ITEM_CODE);
-
-      this.calculateTotalQuantity();
-      this.calculateTotalIncludingTax();
     }
   }
 
@@ -1243,6 +1250,54 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     this.service.getAttachmentList(docId, docType).subscribe((res: any) => {
       this.uploadedFiles = res.data || res;
     });
+  }
+
+  //selecting item from the add-item popup. disabled the already-selected items.
+  onSupplierRowPrepared(e: any) {
+    if (e.rowType !== 'data') return;
+
+    const itemCode = e.data.ITEM_CODE;
+
+    const alreadyAdded = this.savedItems.some(
+      (item) => item.ITEM_CODE === itemCode,
+    );
+
+    if (alreadyAdded) {
+      // Disable row selection
+      e.rowElement.style.pointerEvents = 'none';
+      e.rowElement.style.opacity = '0.5';
+
+      // Optional: grey background
+      e.rowElement.style.backgroundColor = '#f5f5f5';
+    }
+  }
+
+  //cancel add-item popup
+  onCancelNewData() {
+    this.showAddItemPopup = false;
+  }
+
+  //remove the added items
+  onRowRemoving(e: any) {
+    const index = this.savedItems.findIndex(
+      (item) => item.slNo === e.data.slNo,
+    );
+
+    if (index > -1) {
+      this.savedItems.splice(index, 1);
+    }
+
+    // Reorder Sl No
+    this.savedItems.forEach((item, i) => {
+      item.slNo = i + 1;
+    });
+
+    this.calculateTotalQuantity();
+    this.calculateTotalExcludingTax();
+    this.calculateTotalVATAmount();
+    this.calculateTotalIncludingTax();
+
+    this.itemsGridRef?.instance?.refresh();
   }
 }
 

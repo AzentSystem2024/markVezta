@@ -289,6 +289,7 @@
 </dx-popup> -->
 
 <dx-popup
+  *ngIf="isViewProduction"
   [(visible)]="isViewProduction"
   [width]="'90vw'"
   [height]="'100vh'"
@@ -305,6 +306,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isViewJournalVoucher"
   [(visible)]="isViewJournalVoucher"
   [width]="'100vw'"
   [deferRendering]="false"
@@ -319,6 +321,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isViewDebitNote"
   [(visible)]="isViewDebitNote"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -335,6 +338,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isViewCreditNote"
   [(visible)]="isViewCreditNote"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -349,6 +353,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isViewInvoice"
   [(visible)]="isViewInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -365,6 +370,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditCustomerReceipt"
   [(visible)]="isEditCustomerReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -382,6 +388,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditInvoice"
   [(visible)]="isEditInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -399,6 +406,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="editMiscPopup"
   [(visible)]="editMiscPopup"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -426,6 +434,7 @@
 
 <!-- Prepayment -->
 <dx-popup
+  *ngIf="editPrePaymentPopupOpened"
   [(visible)]="editPrePaymentPopupOpened"
   [width]="'90vw'"
   [height]="'100vh'"
@@ -475,6 +484,7 @@
 
 <!-- purchase return -->
 <dx-popup
+  *ngIf="isEditPurchaseReturn"
   [(visible)]="isEditPurchaseReturn"
   [width]="'100vw'"
   [height]="'100vh'"
@@ -493,6 +503,7 @@
 
 <!-- Misc payment -->
 <dx-popup
+  *ngIf="editMiscPopupOpened"
   [(visible)]="editMiscPopupOpened"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -512,6 +523,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditPopupPrepaymentPosting"
   [(visible)]="isEditPopupPrepaymentPosting"
   [width]="'95vw'"
   [height]="'100vh'"
@@ -527,6 +539,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditTransferOut"
   [(visible)]="isEditTransferOut"
   [width]="'75vw'"
   [height]="'90vh'"
@@ -544,6 +557,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditTransferIn"
   [(visible)]="isEditTransferIn"
   [width]="'70vw'"
   [height]="'90vh'"
@@ -561,6 +575,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditSaleReturn"
   [(visible)]="isEditSaleReturn"
   [width]="'90vw'"
   [height]="'100vh'"

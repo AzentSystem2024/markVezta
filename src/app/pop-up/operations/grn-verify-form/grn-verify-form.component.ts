@@ -123,7 +123,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         ITEM_CODE: '',
         PO_QUANTITY: 0,
         GRN_QUANTITY: 0,
-        RECEIVED_QTY: 0,
+        // QUANTITY: 0,
       },
     ],
     GRN_Item_Cost: [
@@ -235,7 +235,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   //       SL_NO: index + 1, // Add SL_NO property dynamically
   //       QTY_TO_RECEIVE: item.PO_QUANTITY - item.RETURN_QTY_QTY,
   //       SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
-  //       RECEIVED_QTY: item.RECEIVED_QTY || 0,
+  //       QUANTITY: item.QUANTITY || 0,
   //     }));
   //     console.log(this.poDetails, 'Updated poDetails with SL_NO');
   //   });
@@ -300,9 +300,8 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       ...updatedData,
       ITEM_NAME: updatedRow.DESCRIPTION || updatedData.DESCRIPTION || '', // or whatever the field is
       STORE_NAME: updatedRow.STORE_NAME || updatedData.STORE_NAME || '',
-      AMOUNT: (updatedRow.RECEIVED_QTY || 0) * (updatedRow.PRICE || 0),
-      SUPP_AMOUNT:
-        (updatedRow.RECEIVED_QTY || 0) * (updatedRow.SUPP_PRICE || 0),
+      AMOUNT: (updatedRow.QUANTITY || 0) * (updatedRow.PRICE || 0),
+      SUPP_AMOUNT: (updatedRow.QUANTITY || 0) * (updatedRow.SUPP_PRICE || 0),
     };
     console.log(enrichedData, 'enrichedData');
 
@@ -311,10 +310,10 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     //   ITEM_NAME: updatedRow.DESCRIPTION ?? '',
     //   STORE_NAME: updatedRow.STORE_NAME ?? '',
     //   AMOUNT:
-    //     (Number(updatedRow.RECEIVED_QTY) || 0) *
+    //     (Number(updatedRow.QUANTITY) || 0) *
     //     (Number(updatedRow.PRICE) || 0),
     //   SUPP_AMOUNT:
-    //     (Number(updatedRow.RECEIVED_QTY) || 0) *
+    //     (Number(updatedRow.QUANTITY) || 0) *
     //     (Number(updatedRow.SUPP_PRICE) || 0),
     // };
 
@@ -330,8 +329,8 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     console.log(this.demoArray, ' demoArray (stored updated rows)');
     // this.GRNDetails
 
-    if ('RECEIVED_QTY' in updatedData) {
-      const receivedQty = Number(updatedData.RECEIVED_QTY);
+    if ('QUANTITY' in updatedData) {
+      const receivedQty = Number(updatedData.QUANTITY);
       console.log(receivedQty, 'receivedQty');
       const uomMultiple = Number(updatedRow.UOM_MULTIPLE);
       const price = Number(updatedRow.SUPP_PRICE);
@@ -351,8 +350,8 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
           2000,
         );
 
-        // Optionally reset the RECEIVED_QTY field or prevent further processing
-        updatedRow.RECEIVED_QTY = ''; // Reset to QTY_TO_RECEIVE value
+        // Optionally reset the QUANTITY field or prevent further processing
+        updatedRow.QUANTITY = ''; // Reset to QTY_TO_RECEIVE value
 
         return; // Exit the function to prevent further processing
       }
@@ -383,7 +382,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       console.log(this.poDetails[idx], '✅ Updated row now bound to grid');
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
-        return sum + Number(item.RECEIVED_QTY || 0);
+        return sum + Number(item.QUANTITY || 0);
       }, 0);
       console.log(this.poDetails, 'poDetails');
 
@@ -441,13 +440,13 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         // Add the total cost (sumCost + AMOUNT) to the item
         const totalCost = (Number(item.AMOUNT) + sumCost).toFixed(2);
         console.log(totalCost, 'totalCost');
-        // Ensure RECEIVED_QTY is greater than zero to avoid division by zero
-        if (Number(item.RECEIVED_QTY) > 0) {
-          item.UNIT_COST = (
-            Number(totalCost) / Number(item.RECEIVED_QTY)
-          ).toFixed(2);
+        // Ensure QUANTITY is greater than zero to avoid division by zero
+        if (Number(item.QUANTITY) > 0) {
+          item.UNIT_COST = (Number(totalCost) / Number(item.QUANTITY)).toFixed(
+            2,
+          );
         } else {
-          item.UNIT_COST = '0.00'; // Default value if RECEIVED_QTY is zero or undefined
+          item.UNIT_COST = '0.00'; // Default value if QUANTITY is zero or undefined
         }
 
         return item;
@@ -475,14 +474,14 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         STORE_ID: this.newGrnData.STORE_ID,
         PO_DETAIL_ID: item.PO_DETAIL_ID,
         ITEM_ID: item.ITEM_ID,
-        QUANTITY: Number(item.RECEIVED_QTY),
+        QUANTITY: Number(item.QUANTITY),
         RATE: Number(item.PRICE),
         // SUPP_AMOUNT: Number(item.LOCAL_AMOUNT),
-        AMOUNT: Number(item.PRICE * item.RECEIVED_QTY),
+        AMOUNT: Number(item.PRICE * item.QUANTITY),
         DISC_PERCENT: Number(item.DISC_PERCENT),
 
         SUPP_PRICE: Number(item.SUPP_PRICE),
-        SUPP_AMOUNT: Number(item.RECEIVED_QTY * item.SUPP_PRICE),
+        SUPP_AMOUNT: Number(item.QUANTITY * item.SUPP_PRICE),
         UOM_PURCH: item.UOM_PURCH,
         UOM: item.UOM,
         COST: item.UNIT_COST,
@@ -567,7 +566,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       PO_DETAIL_ID: updatedData.PO_DETAIL_ID || 0,
       GRN_ID: 0,
       ITEM_ID: updatedData.ITEM_ID || 0,
-      QUANTITY: Number(updatedData.RECEIVED_QTY || 0),
+      QUANTITY: Number(updatedData.QUANTITY || 0),
       RATE: Number(updatedData.PRICE || 0),
       // LOCAL_AMOUNT: Number(updatedData.LOCAL_AMOUNT || 0),
       AMOUNT: Number(updatedData.AMOUNT || 0),
@@ -733,9 +732,9 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
           console.log(updatedItem.TOTAL_COST, 'totalcost');
 
           // Ensure QTY_RECEIVED is greater than zero to avoid division by zero
-          if (Number(item.RECEIVED_QTY) > 0) {
+          if (Number(item.QUANTITY) > 0) {
             updatedItem.COST = (
-              Number(updatedItem.TOTAL_COST) / Number(item.RECEIVED_QTY)
+              Number(updatedItem.TOTAL_COST) / Number(item.QUANTITY)
             ).toFixed(2);
           } else {
             updatedItem.COST = '0.00'; // Default value if QTY_RECEIVED is zero or undefined
@@ -847,13 +846,13 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       PO_DETAIL_ID: item.PO_DETAIL_ID,
       GRN_ID: this.newGrnData.ID || 0,
       ITEM_ID: item.ITEM_ID,
-      QUANTITY: Number(item.PO_QUANTITY),
+      // QUANTITY: Number(item.PO_QUANTITY),
       RATE: Number(item.RATE),
-      AMOUNT: Number(item.RECEIVED_QTY * item.PRICE),
+      AMOUNT: Number(item.QUANTITY * item.PRICE),
       INVOICE_QTY: 0,
       DISC_PERCENT: Number(item.DISC_PERCENT),
       COST: Number(item.COST || 0),
-      SUPP_PRICE: Number(item.RECEIVED_QTY * item.SUPP_PRICE),
+      SUPP_PRICE: Number(item.QUANTITY * item.SUPP_PRICE),
       PRICE: Number(item.PRICE),
       SUPP_AMOUNT: Number(item.SUPP_AMOUNT || 0),
       RETURN_QTY: 0,
@@ -865,8 +864,8 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       ITEM_NAME: item.ITEM_NAME,
       ITEM_CODE: item.ITEM_CODE,
       PO_QUANTITY: Number(item.PO_QUANTITY),
-      GRN_QUANTITY: Number(item.RECEIVED_QTY || 0),
-      RECEIVED_QTY: Number(item.RECEIVED_QTY || 0),
+      GRN_QUANTITY: Number(item.QUANTITY || 0),
+      QUANTITY: Number(item.QUANTITY || 0),
     }));
 
     // Refresh costs
@@ -891,11 +890,11 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     return {
       ...prepared,
       GRNDetails: mergedDetails, //  full list with edits merged
-      GRN_DATE: new Date(),  //  override with current date
+      GRN_DATE: new Date(), //  override with current date
     };
   };
   onEditorPreparing(e: any) {
-    if (e.dataField === 'RECEIVED_QTY') {
+    if (e.dataField === 'QUANTITY') {
       e.editorOptions = e.editorOptions || {};
 
       // Let the editor inherit row height naturally (no fixed height)
@@ -983,7 +982,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
   getTotalQuantity(): any {
     return this.poDetails.reduce(
-      (total, item) => total + (item.RECEIVED_QTY || 0),
+      (total, item) => total + (item.QUANTITY || 0),
       0,
     );
   }
@@ -1009,11 +1008,30 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       this.newGrnData = { ...this.formdata };
 
+      if (this.newGrnData.STORE_ID) {
+        this.service
+          .getPendingPo(
+            this.newGrnData.STORE_ID,
+            this.newGrnData.SUPP_ID,
+            this.selected_Company_id,
+          )
+          .subscribe((res: any) => {
+            this.poList = res.data;
+            this.filteredPOList = [...this.poList];
+
+            // Bind selected PO after datasource loads
+            this.selectedPONo = this.newGrnData.PO_NO;
+
+            this.ref.detectChanges();
+          });
+      }
+
       this.newGrnData.GRNDetails = this.formdata.GRNDetails;
 
       this.newGrnData.GRN_Item_Cost = this.formdata.GRN_Item_Cost;
 
       this.newGrnData.GRN_Cost = this.formdata.GRN_Cost;
+      this.selectedPONo = this.newGrnData.PO_NO;
 
       this.service.getLandedcostData().subscribe((res) => {
         this.landedCostList = res;
@@ -1027,7 +1045,13 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       this.formattedNetAmount = `${this.newGrnData.SUPP_NET_AMOUNT}`;
 
-      this.formattedLocalNetAmount = `${this.newGrnData.NET_AMOUNT}`;
+      // this.formattedLocalNetAmount = `${this.newGrnData.NET_AMOUNT}`;
+      this.formattedLocalNetAmount = Number(
+        this.newGrnData.NET_AMOUNT,
+      ).toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
       this.costingMethodDataGrid = this.formdata.GRN_Cost.map((cost) => ({
         ...cost,
@@ -1052,7 +1076,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         SL_NO: index + 1, // Add SL_NO starting from 1
         QTY_TO_RECEIVE: item.PO_QUANTITY - item.GRN_QUANTITY,
         SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
-        QTY_BASE_UNIT: `${item.RECEIVED_QTY / item.UOM_MULTIPLE} ${item.UOM}`,
+        QTY_BASE_UNIT: `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`,
         DESCRIPTION: item.ITEM_NAME,
       }));
 
@@ -1064,7 +1088,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       );
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
-        return sum + Number(item.RECEIVED_QTY || 0);
+        return sum + Number(item.QUANTITY || 0);
       }, 0);
 
       this.newGrnData.NET_AMOUNT = this.poDetails
@@ -1073,37 +1097,13 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         }, 0)
         .toFixed(2);
 
-      // this.selectedPONo = '2';
-      // console.log(this.selectedPONo, '+++++++');
-
-      // this.newGrnData.GRNDetails= this.poDetails.map((item) => ({
-      //   ID:item.ID,
-      //   COMPANY_ID: 1, // Static value or dynamically set if needed
-      //   STORE_ID: this.newGrnData.STORE_ID,
-      //   PO_DETAIL_ID: item.PO_DETAIL_ID,
-      //   ITEM_ID: item.ITEM_ID,
-      //   QUANTITY: Number(item.QUANTITY),
-      //   RATE: Number(item.RATE),
-      //   AMOUNT: parseFloat(item.AMOUNT),
-
-      //   DISC_PERCENT: Number(item.DISC_PERCENT),
-
-      //   SUPP_PRICE: Number(item.SUPP_PRICE),
-      //   SUPP_AMOUNT: Number(item.SUPP_AMOUNT),
-
-      //   UOM_PURCH: item.UOM_PURCH,
-      //   UOM: item.UOM,
-      //   COST: item.COST
-
-      // }));
-
       this.newGrnData.GRNDetails = this.poDetails.map((item) => ({
         ID: item.ID,
         COMPANY_ID: this.selected_Company_id, // Static
         STORE_ID: this.newGrnData.STORE_ID,
         PO_DETAIL_ID: item.PO_DETAIL_ID,
         ITEM_ID: item.ITEM_ID,
-        QUANTITY: Number(item.RECEIVED_QTY),
+        QUANTITY: Number(item.QUANTITY),
         RATE: Number(item.RATE),
         AMOUNT: parseFloat(item.AMOUNT),
 
@@ -1232,9 +1232,9 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       console.log(updatedItem.TOTAL_COST, 'totalcost');
 
       // Ensure QTY_RECEIVED is greater than zero to avoid division by zero
-      if (Number(item.RECEIVED_QTY) > 0) {
+      if (Number(item.QUANTITY) > 0) {
         updatedItem.COST = (
-          Number(updatedItem.TOTAL_COST) / Number(item.RECEIVED_QTY)
+          Number(updatedItem.TOTAL_COST) / Number(item.QUANTITY)
         ).toFixed(2);
       } else {
         updatedItem.COST = '0.00'; // Default value if QTY_RECEIVED is zero or undefined

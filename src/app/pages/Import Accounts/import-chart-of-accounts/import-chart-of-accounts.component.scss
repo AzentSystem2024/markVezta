@@ -1,0 +1,12 @@
+.import-popup-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 12px;
+}

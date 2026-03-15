@@ -96,7 +96,7 @@ export class ViewInvoiceComponent {
   selectedCompanyId: any;
   selectedDistributorId: any;
   isViewInvoice: boolean;
-   logoBase64: string;
+  logoBase64: string;
 
   pdfSrc: SafeResourceUrl | null = null;
   selectedInvoice: any;
@@ -146,8 +146,8 @@ export class ViewInvoiceComponent {
 
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
-        this.invoiceFormData.UNIT_ID = selectedCompany.COMPANY_ID; // ✅ Set UNIT_ID
-        this.companyList = [selectedCompany]; // ✅ Show only selected company
+        this.invoiceFormData.UNIT_ID = selectedCompany.COMPANY_ID; // Set UNIT_ID
+        this.companyList = [selectedCompany]; // Show only selected company
       }
 
       console.log(this.selectedCompanyId, '+++++++++++++++++++++++');
@@ -165,7 +165,7 @@ export class ViewInvoiceComponent {
     this.getInvoiceListForGrid();
 
     this.invoiceFormData.IS_APPROVED = true;
-     const imagePath = 'assets/markLogo.jpg';
+    const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
       console.log('Logo Base64 Loaded');
@@ -220,10 +220,10 @@ export class ViewInvoiceComponent {
 
       console.log(this.HSNCODE, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
 
-      // 💡 ORIGINAL LINE (replaced below)
+      // ORIGINAL LINE (replaced below)
       // this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
 
-      // ---------- 🔥 ONLY THIS BLOCK IS MODIFIED ----------
+      // ----------ONLY THIS BLOCK IS MODIFIED ----------
       // Load saved GST from the API for edit mode
       this.mainInvoiceGridList = (firstInvoice.SALE_DETAILS || []).map(
         (row: any) => {
@@ -248,7 +248,7 @@ export class ViewInvoiceComponent {
 
       console.log(this.mainInvoiceGridList, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
 
-      // ⭐ Keep your original mapping block untouched
+      // Keep your original mapping block untouched
       this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
         return {
           ...row,
@@ -469,7 +469,7 @@ export class ViewInvoiceComponent {
       // if (response) {
       //   this.pdfSrc = this.get_pdf(response.Data); // Update iframe source
       // }
-      this.get_pdf(response.Data)
+      this.get_pdf(response.Data);
     });
   }
 
@@ -514,7 +514,7 @@ export class ViewInvoiceComponent {
     });
   }
 
-   numberToWords(amount: number): string {
+  numberToWords(amount: number): string {
     if (amount === 0) return 'Zero Rupees Only';
 
     const words = [
@@ -593,7 +593,7 @@ export class ViewInvoiceComponent {
     const pageHeight = doc.internal.pageSize.height;
     let y = 10;
 
-   // ======================================================
+    // ======================================================
     // LOGO LEFT TOP
     // ======================================================
     const logoX = 18,
@@ -800,126 +800,119 @@ export class ViewInvoiceComponent {
     });
 
     y = (doc as any).lastAutoTable.finalY + 12;
-    
 
-   // ============================================================
-// FOOTER – GST SUMMARY + TOTALS (LIKE generatePDF)
-// ============================================================
+    // ============================================================
+    // FOOTER – GST SUMMARY + TOTALS (LIKE generatePDF)
+    // ============================================================
 
-const footStartY = y + 3;
+    const footStartY = y + 3;
 
-// ---------------- LEFT GST SUMMARY ----------------
-let lx = 15;
-let ly = footStartY;
+    // ---------------- LEFT GST SUMMARY ----------------
+    let lx = 15;
+    let ly = footStartY;
 
-doc.setFont('helvetica', 'bold');
-doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
 
-// Header
-doc.text('GST %', lx, ly);
-doc.text('Taxable Value', lx + 22, ly);
-doc.text('Integrated Tax', lx + 55, ly);
-doc.text('Total Tax Amount', lx + 95, ly);
+    // Header
+    doc.text('GST %', lx, ly);
+    doc.text('Taxable Value', lx + 22, ly);
+    doc.text('Integrated Tax', lx + 55, ly);
+    doc.text('Total Tax Amount', lx + 95, ly);
 
-// Sub headers
-doc.setFontSize(8);
-doc.text('Rate', lx + 55, ly + 5);
-doc.text('Amount', lx + 72, ly + 5);
+    // Sub headers
+    doc.setFontSize(8);
+    doc.text('Rate', lx + 55, ly + 5);
+    doc.text('Amount', lx + 72, ly + 5);
 
-// Values
-ly += 12;
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(10);
+    // Values
+    ly += 12;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
 
-const taxable = Number(data[0].GROSS_AMOUNT || 0);
-const gstAmount = Number(data[0].TAX_AMOUNT || 0);
-const gstPerc =
-  Number(data[0].SALE_DETAILS[0]?.CGST || 0) +
-  Number(data[0].SALE_DETAILS[0]?.SGST || 0);
+    const taxable = Number(data[0].GROSS_AMOUNT || 0);
+    const gstAmount = Number(data[0].TAX_AMOUNT || 0);
+    const gstPerc =
+      Number(data[0].SALE_DETAILS[0]?.CGST || 0) +
+      Number(data[0].SALE_DETAILS[0]?.SGST || 0);
 
-doc.text(gstPerc.toFixed(2) + '%', lx, ly);
-doc.text(taxable.toFixed(2), lx + 22, ly);
-doc.text(gstPerc.toFixed(2) + '%', lx + 55, ly);
-doc.text(gstAmount.toFixed(2), lx + 72, ly);
-doc.text(gstAmount.toFixed(2), lx + 95, ly);
+    doc.text(gstPerc.toFixed(2) + '%', lx, ly);
+    doc.text(taxable.toFixed(2), lx + 22, ly);
+    doc.text(gstPerc.toFixed(2) + '%', lx + 55, ly);
+    doc.text(gstAmount.toFixed(2), lx + 72, ly);
+    doc.text(gstAmount.toFixed(2), lx + 95, ly);
 
-// Total row
-ly += 10;
-doc.setFont('helvetica', 'bold');
-doc.text(taxable.toFixed(2), lx + 22, ly);
-doc.text(gstAmount.toFixed(2), lx + 72, ly);
-doc.text(gstAmount.toFixed(2), lx + 95, ly);
+    // Total row
+    ly += 10;
+    doc.setFont('helvetica', 'bold');
+    doc.text(taxable.toFixed(2), lx + 22, ly);
+    doc.text(gstAmount.toFixed(2), lx + 72, ly);
+    doc.text(gstAmount.toFixed(2), lx + 95, ly);
 
-// ---------------- RIGHT TOTAL SUMMARY ----------------
-let rx = pageWidth - 65;
-let ry = footStartY;
+    // ---------------- RIGHT TOTAL SUMMARY ----------------
+    let rx = pageWidth - 65;
+    let ry = footStartY;
 
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
 
-const labelX = rx;
-const colonX = rx + 30;
-const valueX = rx + 40;
+    const labelX = rx;
+    const colonX = rx + 30;
+    const valueX = rx + 40;
 
-doc.text('Taxable Value', labelX, ry);
-doc.text(':', colonX, ry);
-doc.text(taxable.toFixed(2), valueX, ry);
+    doc.text('Taxable Value', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(taxable.toFixed(2), valueX, ry);
 
-ry += 6;
-doc.text('Total Tax', labelX, ry);
-doc.text(':', colonX, ry);
-doc.text(gstAmount.toFixed(2), valueX, ry);
+    ry += 6;
+    doc.text('Total Tax', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(gstAmount.toFixed(2), valueX, ry);
 
-ry += 6;
-doc.text('Round Off', labelX, ry);
-doc.text(':', colonX, ry);
-doc.text('0.00', valueX, ry);
+    ry += 6;
+    doc.text('Round Off', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text('0.00', valueX, ry);
 
-ry += 8;
-doc.setFont('helvetica', 'bold');
-doc.text('Invoice Total', labelX, ry);
-doc.text(':', colonX, ry);
-doc.text(Number(data[0].NET_AMOUNT).toFixed(2), valueX, ry);
+    ry += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Invoice Total', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(Number(data[0].NET_AMOUNT).toFixed(2), valueX, ry);
 
-// ---------------- REVERSE CHARGE ----------------
-let wordsY = ry + 15;
+    // ---------------- REVERSE CHARGE ----------------
+    let wordsY = ry + 15;
 
-doc.setFont('helvetica', 'bold');
-doc.text(
-  'Whether the tax is payable on Reverse charge basis:',
-  15,
-  wordsY
-);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Whether the tax is payable on Reverse charge basis:', 15, wordsY);
 
-doc.setFont('helvetica', 'normal');
-doc.text('No', 150, wordsY);
+    doc.setFont('helvetica', 'normal');
+    doc.text('No', 150, wordsY);
 
-// ---------------- AMOUNT IN WORDS ----------------
-wordsY += 10;
+    // ---------------- AMOUNT IN WORDS ----------------
+    wordsY += 10;
 
-doc.setFont('helvetica', 'bold');
-doc.text('Amount in words :', 15, wordsY);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Amount in words :', 15, wordsY);
 
-doc.setFont('helvetica', 'normal');
-doc.text(
-  `INR ${numberToWordsIndianNumber(Math.floor(data[0].NET_AMOUNT))} Rupees Only`,
-  60,
-  wordsY
-);
+    doc.setFont('helvetica', 'normal');
+    doc.text(
+      `INR ${numberToWordsIndianNumber(Math.floor(data[0].NET_AMOUNT))} Rupees Only`,
+      60,
+      wordsY,
+    );
 
+    // ---------------- DECLARATION & REMARK ----------------
+    let blockY = wordsY + 15;
 
-// ---------------- DECLARATION & REMARK ----------------
-let blockY = wordsY + 15;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Declaration :', 15, blockY);
 
-doc.setFont('helvetica', 'bold');
-doc.text('Declaration :', 15, blockY);
+    blockY += 10;
+    doc.text('Remark :', 15, blockY);
 
-blockY += 10;
-doc.text('Remark :', 15, blockY);
-
-doc.setFont('helvetica', 'normal');
-doc.text(data[0].REF_NO || '', 40, blockY);
-
+    doc.setFont('helvetica', 'normal');
+    doc.text(data[0].REF_NO || '', 40, blockY);
 
     // ======================================================
     // RETURN PDF

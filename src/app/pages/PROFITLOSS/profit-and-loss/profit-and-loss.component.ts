@@ -122,13 +122,13 @@ export class ProfitAndLossComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+    // console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+    // console.log(
+    //   this.selected_Company_id,
+    //   '============selected_Company_id==============',
+    // );
   }
 
   //================ Year value change ===================
@@ -179,7 +179,7 @@ export class ProfitAndLossComponent {
 
   get_sessionstorage_data() {
     this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.savedUserData);
+    // console.log(this.savedUserData);
     this.company_list = this.savedUserData.Companies;
   }
 
@@ -188,25 +188,25 @@ export class ProfitAndLossComponent {
     if (this.fin_id.length) {
       this.finID = this.fin_id[0].FIN_ID;
     }
-    console.log(this.fin_id, '========financial year');
+    // console.log(this.fin_id, '========financial year');
   }
 
   onCompanyChange(event: any) {
     console.log(event);
     this.company_id = event.value;
-    console.log(this.company_id, '=====company id');
+    // console.log(this.company_id, '=====company id');
   }
 
   onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
-    console.log('Formatted Date:', this.formatted_from_date); // example: "2025-04-01"
+    // console.log('Formatted Date:', this.formatted_from_date); // example: "2025-04-01"
   }
 
   onToDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
-    console.log('Formatted Date:', this.formatted_To_date); // example: "2025-04-01"
+    // console.log('Formatted Date:', this.formatted_To_date); // example: "2025-04-01"
   }
 
   formatDate(date: Date): string {
@@ -237,13 +237,13 @@ export class ProfitAndLossComponent {
     sessionStorage.removeItem('viewclickvalue');
     sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
 
-    console.log(JSON.parse(sessionStorage.getItem('viewclickvalue')));
-    console.log(payload, '==========payload================');
+    // console.log(JSON.parse(sessionStorage.getItem('viewclickvalue')));
+    // console.log(payload, '==========payload================');
 
     this.dataservice.Profit_Loss_Api(payload).subscribe({
       next: (res: any) => {
         this.isEmptyDatagrid = false;
-        console.log(res, '----------list --------------------------');
+        // console.log(res, '----------list --------------------------');
 
         this.ProfitLossReport = res.data;
 
@@ -257,56 +257,23 @@ export class ProfitAndLossComponent {
       },
     });
   }
-typeSorting = (a: string, b: string) => {
-  const order = {
-    REVENUES: 1,
-    EXPENSES: 2,
+  typeSorting = (a: string, b: string) => {
+    const order = {
+      REVENUES: 1,
+      EXPENSES: 2,
+    };
+
+    return (order[a] || 99) - (order[b] || 99);
   };
 
-  return (order[a] || 99) - (order[b] || 99);
-};
-  // get_DataSource() {
-  //   let payload = {
-  //     COMPANY_ID: this.selected_Company_id,
-  //     FIN_ID: this.finID,
-  //     DATE_FROM: this.formatted_from_date,
-  //     DATE_TO: this.formatted_To_date,
-  //   };
-
-  //   const payloadData = {
-  //     companyId: payload.COMPANY_ID,
-  //     finId: payload.FIN_ID,
-  //     dateFrom: payload.DATE_FROM,
-  //     dateTo: payload.DATE_TO,
-  //   };
-
-  //   sessionStorage.removeItem('viewclickvalue');
-  //   sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
-  //   // sessionStorage.removeItem('HEADID')
-  //   // sessionStorage.setItem('HEADID', JSON.stringify(this.HeadId));
-  //   console.log(JSON.parse(sessionStorage.getItem('viewclickvalue')));
-
-  //   console.log(payload, '==========payload================');
-  //   this.dataservice.Profit_Loss_Api(payload).subscribe((res: any) => {
-  //     this.isEmptyDatagrid = false;
-  //     console.log(res, '----------list --------------------------');
-
-  //     this.ProfitLossReport = res.data;
-
-  //     this.calculateNetProfit();
-
-  //     this.grid.instance.refresh(); // force grid to recalc summaries
-  //   });
-  // }
-
   onViewClick(e: any) {
-    console.log(e, 'event');
+    // console.log(e, 'event');
     this.HeadId = e.row.data.HEAD_ID;
-    console.log(this.HeadId);
+    // console.log(this.HeadId);
     sessionStorage.removeItem('HEADID');
 
     sessionStorage.setItem('HEADID', this.HeadId);
-    console.log(sessionStorage.getItem('HEADID'));
+    // console.log(sessionStorage.getItem('HEADID'));
 
     // Navigate to ledger-statement route
     this.router.navigate(['/ledger-statement']);
