@@ -1120,8 +1120,74 @@ body {
   border-radius: 32px !important;
   background-color: var(--selected-menu-bg-color) !important;
 }
+/* =============================== */
+/* PURCHASE ORDER TABS STYLE */
+/* =============================== */
 
-.dx-dropdownbutton-action.dx-button-has-icon:not(.dx-button-has-text)
-  .dx-button-content {
-  padding-inline: 0px;
+.dx-theme-fluent .po-tabs .dx-tabs-wrapper {
+  justify-content: flex-start;
+  width: auto;
+  gap: 28px;
+}
+
+/* remove devextreme long underline */
+.dx-theme-fluent .po-tabs .dx-tabs::after {
+  display: none !important;
+}
+
+// /* remove hover underline */
+// .dx-theme-fluent .po-tabs .dx-tab::after {
+//   display: none !important;
+// }
+
+/* tab style */
+.dx-theme-fluent .po-tabs .dx-tab {
+  padding: 8px 0;
+  background: transparent;
+}
+
+/* active tab */
+.dx-theme-fluent .po-tabs .dx-tab.dx-tab-selected {
+  border-bottom: 2px solid #0073d8;
+  color: #0073d8;
+  font-weight: 600;
+}
+
+.dx-theme-fluent .po-tabs .dx-tab.dx-state-hover {
+  background-color: transparent !important; /* remove grey hover box */
+  color: #0073d8 !important; /* same color as active */
+}
+
+/* remove devextreme hover underline */
+.dx-theme-fluent .po-tabs .dx-tab.dx-state-hover::after {
+  display: none !important;
+}
+
+/* smooth effect */
+.dx-theme-fluent .po-tabs .dx-tab {
+  transition: color 0.2s ease;
+}
+
+.tab-content {
+  transition: opacity 0.15s ease;
+}
+
+/* Remove focus background on tabs */
+.dx-theme-fluent .po-tabs .dx-tab.dx-state-focused {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Keep selected style consistent */
+.dx-theme-fluent .po-tabs .dx-tab.dx-tab-selected,
+.dx-theme-fluent .po-tabs .dx-tab.dx-state-hover {
+  border-bottom: 2px solid #0073d8;
+  color: #0073d8;
+  font-weight: 600;
+  background: transparent !important;
+
+  .dx-dropdownbutton-action.dx-button-has-icon:not(.dx-button-has-text)
+    .dx-button-content {
+    padding-inline: 0px;
+  }
 }

@@ -208,6 +208,7 @@ export class ItemsFormComponent implements OnInit {
   isParentItemDropdownOpen: boolean;
   selectedStoresMap: any;
   selected_Company_id: any;
+  companyId: any;
 
   constructor(
     private dataservice: DataService,
@@ -527,6 +528,11 @@ export class ItemsFormComponent implements OnInit {
   };
 
   ngOnInit() {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.companyId = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    console.log(this.companyId, 'COMPANYIDINITEMMMMMMMMMMMMMM');
     this.showItems();
     this.sesstion_Details();
 
@@ -1081,6 +1087,7 @@ export class ItemsFormComponent implements OnInit {
 
     this.newItems = {
       ...this.formItemsData, // Copy existing form data
+      COMPANY_ID: this.companyId,
       ITEM_COMPONENTS: this.gridData.map((item) => ({
         COMPONENT_ITEM_ID: item.COMPONENT_ITEM_ID, // Map ITEM_CODE to COMPONENT_ITEM_ID
         QUANTITY: item.QTY_AVAILABLE, // Map QTY_AVAILABLE to QUANTITY

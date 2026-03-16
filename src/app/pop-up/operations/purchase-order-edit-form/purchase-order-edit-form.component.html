@@ -37,7 +37,7 @@
     <dx-select-box
       label="Supplier"
       labelMode="floating"
-      [width]="300"
+      [width]="320"
       placeholder="Select Supplier"
       [items]="SupplierList"
       displayExpr="DESCRIPTION"
@@ -55,7 +55,7 @@
     <dx-select-box
       [label]="storeLabel"
       labelMode="floating"
-      [width]="300"
+      [width]="320"
       [placeholder]="'Select ' + storeLabel"
       [items]="StoreList"
       displayExpr="DESCRIPTION"
@@ -70,7 +70,7 @@
   [(selectedIndex)]="selectedTabIndex"
   [dataSource]="tabs"
   (onItemClick)="onTabClick($event)"
-  [elementAttr]="{ class: 'custom-tabs' }"
+  [elementAttr]="{ class: 'po-tabs' }"
   [orientation]="orientations"
   [stylingMode]="stylingMode"
 >
@@ -307,8 +307,13 @@
     class="custom-data-grid"
     (onContentReady)="onContentReady($event)"
     (onEditorPreparing)="onEditorPreparing($event)"
+    (onRowRemoving)="onRowRemoving($event)"
   >
-    <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
+    <dxo-editing
+      mode="cell"
+      [allowUpdating]="true"
+      [allowDeleting]="true"
+    ></dxo-editing>
     <dxi-column
       caption="Item Id"
       dataField="ITEM_ID"
@@ -412,17 +417,15 @@
     >
     </dxi-column>
 
-    <!-- <dxi-column
+    <dxi-column
       caption="Tax (%)"
       dataField="VAT_PERC"
       alignment="center"
-      width="70"
+      width="80"
       [allowEditing]="false"
-      [editorOptions]="{ format: '#0', mode: 'number' }"
-    ></dxi-column> -->
-    <!-- IGST -->
-    <!-- IGST -->
-    <dxi-column
+    ></dxi-column>
+
+    <!-- <dxi-column
       caption="IGST %"
       dataField="VAT_PERC"
       alignment="center"
@@ -431,7 +434,6 @@
       [visible]="isInterState"
     ></dxi-column>
 
-    <!-- CGST -->
     <dxi-column
       caption="CGST %"
       dataField="CGST"
@@ -441,7 +443,6 @@
       [visible]="isIntraState"
     ></dxi-column>
 
-    <!-- SGST -->
     <dxi-column
       caption="SGST %"
       dataField="SGST"
@@ -449,7 +450,7 @@
       width="70"
       [allowEditing]="false"
       [visible]="isIntraState"
-    ></dxi-column>
+    ></dxi-column> -->
 
     <dxi-column
       caption="Tax Amount"
@@ -468,6 +469,10 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
 
+    <dxi-column type="buttons" width="70">
+      <dxi-button name="delete"></dxi-button>
+    </dxi-column>
+
     <dxo-summary>
       <dxi-total-item column="ITEM_CODE" displayFormat="Total"></dxi-total-item>
 
@@ -478,45 +483,45 @@
         column="taxable_Supplier"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+        <!-- <dxo-format [precision]="2" type="fixedPoint"></dxo-format> -->
       </dxi-total-item>
 
       <dxi-total-item
         column="taxable"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+        <!-- <dxo-format [precision]="2" type="fixedPoint"></dxo-format> -->
       </dxi-total-item>
 
       <dxi-total-item
         column="vatAmount"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+        <!-- <dxo-format [precision]="2" type="fixedPoint"></dxo-format> -->
       </dxi-total-item>
 
       <dxi-total-item
         column="total_Supplier"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+        <!-- <dxo-format [precision]="2" type="fixedPoint"></dxo-format> -->
       </dxi-total-item>
 
       <dxi-total-item
         column="total"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+        <!-- <dxo-format [precision]="2" type="fixedPoint"></dxo-format> -->
       </dxi-total-item>
     </dxo-summary>
 
@@ -576,6 +581,7 @@
         [selectedRowKeys]="selectedRowKeys"
         [keyExpr]="'ITEM_CODE'"
         (onSelectionChanged)="onSelectionChanged($event)"
+        (onRowPrepared)="onSupplierRowPrepared($event)"
       >
         <dxo-pager
           [visible]="true"
@@ -606,6 +612,7 @@
           text="Cancel"
           stylingMode="outlined"
           type="normal"
+          (onClick)="onCancelNewData()"
         ></dx-button>
         <dx-button
           text="Save"

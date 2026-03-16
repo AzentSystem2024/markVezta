@@ -58,9 +58,12 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   selected_Company_id: any;
   isInterState: boolean;
   isIntraState: boolean;
-    logoBase64: string;
+  logoBase64: string;
 
-  constructor(private service: DataService, private sanitizer: DomSanitizer) {
+  constructor(
+    private service: DataService,
+    private sanitizer: DomSanitizer,
+  ) {
     const settingsData = sessionStorage.getItem('settings');
     this.settingsData = settingsData ? JSON.parse(settingsData) : null;
     // Access CURRENCY_ID
@@ -285,7 +288,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     const filteredNewItems = newItems.filter((newItem) => {
       // Check if item already exists in savedItems by ITEM_ID or another unique identifier
       return !this.savedItems.some(
-        (savedItem) => savedItem.ITEM_ID === newItem.ITEM_ID
+        (savedItem) => savedItem.ITEM_ID === newItem.ITEM_ID,
       );
     });
 
@@ -307,14 +310,14 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     this.GetDeliveryTermsList();
     this.GetPaymentTermsList();
     this.GetEmployeeList();
-     const imagePath = 'assets/markLogo.jpg';
+    const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
       console.log('Logo Base64 Loaded');
     });
   }
 
-    private async convertToBase64(path: string): Promise<string> {
+  private async convertToBase64(path: string): Promise<string> {
     const response = await fetch(path);
     const blob = await response.blob();
 
@@ -328,7 +331,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   calculateTotalQuantity() {
     this.totalQuantity = this.savedItems.reduce(
       (sum, item) => sum + Number(item.qtyOrdered || 0),
-      0
+      0,
     );
     this.netViewQuantityChange.emit(this.totalQuantity);
   }
@@ -390,7 +393,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
         // Only recalculate PURCH_PRICE if the currencies are different
         if (this.SupplierCurrencyCode !== this.localCurrencyCode) {
           item.PURCH_PRICE = parseFloat(
-            (item.SUPP_PRICE / this.currencyExchangeRate).toFixed(2)
+            (item.SUPP_PRICE / this.currencyExchangeRate).toFixed(2),
           );
         } else {
           // Use the manually updated PURCH_PRICE directly
@@ -409,7 +412,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
           updatedRow.discountPercentage > 0
         ) {
           item.discountAmount = parseFloat(
-            (item.Amount * (updatedRow.discountPercentage / 100)).toFixed(2)
+            (item.Amount * (updatedRow.discountPercentage / 100)).toFixed(2),
           );
         } else {
           item.discountAmount = 0; // Set to 0 if no valid discount percentage
@@ -417,7 +420,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
         // Calculate Taxable Amount as Amount - Discount Amount
         item.taxable = parseFloat(
-          (item.Amount - item.discountAmount).toFixed(2)
+          (item.Amount - item.discountAmount).toFixed(2),
         );
 
         let discSupplierAmount = 0; // Initialize discount amount
@@ -431,7 +434,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
               qtyOrdered *
               item.SUPP_PRICE *
               (updatedRow.discountPercentage / 100)
-            ).toFixed(2)
+            ).toFixed(2),
           );
         } else {
           discSupplierAmount = 0; // Set to 0 if no valid discount percentage
@@ -439,13 +442,13 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
         // Calculate Taxable Supplier based on SUPP_PRICE in the supplier's currency
         item.taxable_Supplier = parseFloat(
-          (qtyOrdered * item.SUPP_PRICE - discSupplierAmount).toFixed(2)
+          (qtyOrdered * item.SUPP_PRICE - discSupplierAmount).toFixed(2),
         );
 
         // Calculate VAT Amount if VAT percentage is provided
         if (updatedRow.VAT_PERC && updatedRow.VAT_PERC > 0) {
           item.vatAmount = parseFloat(
-            (item.taxable * (updatedRow.VAT_PERC / 100)).toFixed(2)
+            (item.taxable * (updatedRow.VAT_PERC / 100)).toFixed(2),
           );
         } else {
           item.vatAmount = 0; // Set to 0 if no valid VAT percentage
@@ -487,7 +490,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
       // Check if the item already exists in PoDetails
       const detailItemIndex = this.poData.PoDetails.findIndex(
-        (detailItem: any) => detailItem.ITEM_ID === item.ITEM_ID
+        (detailItem: any) => detailItem.ITEM_ID === item.ITEM_ID,
       );
 
       if (detailItemIndex !== -1) {
@@ -561,18 +564,18 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
       this.HSN_CODE,
-      '===========selected HSN CODE==================='
+      '===========selected HSN CODE===================',
     );
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     console.log(
       this.GST_PERC,
-      '===========selected GST PERC==================='
+      '===========selected GST PERC===================',
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -662,64 +665,41 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
         }
       }
 
-      // 🔥 STEP 2: MAP ITEMS (GST LOGIC FIXED)
+      // STEP 2: MAP ITEMS (GST LOGIC FIXED)
+      // STEP 2: MAP ITEMS (USE SUPP_AMOUNT AS TAXABLE)
       this.savedItems = this.newPoData.PoDetails.map((item, index) => {
-        const baseAmount = item.QUANTITY * item.PRICE;
-        const supplierAmount = item.QUANTITY * item.SUPP_PRICE;
+        const taxable = Number(item.SUPP_AMOUNT || 0); // 🔥 Use SUPP_AMOUNT directly
+        const vatPerc = Number(item.VAT_PERC || 0);
 
-        const discountAmount = (baseAmount * (item.DISC_PERCENT || 0)) / 100;
-        const supplierDiscAmount =
-          (supplierAmount * (item.DISC_PERCENT || 0)) / 100;
-
-        const taxableSupplier = supplierAmount - supplierDiscAmount;
-        const taxable = baseAmount - discountAmount;
-
-        let vatAmount = 0;
-        let igst = 0;
-        let cgst = 0;
-        let sgst = 0;
-
-        if (this.isInterState) {
-          // ✅ IGST
-          igst = Number(item.TAX_PERCENT) || 0;
-          vatAmount = (taxable * igst) / 100;
-        } else {
-          // ✅ CGST + SGST
-          cgst = Number(item.CGST) || 0;
-          sgst = Number(item.SGST) || 0;
-          vatAmount = (taxable * (cgst + sgst)) / 100;
-        }
+        const vatAmount = Number(item.TAX_AMOUNT || 0);
 
         return {
           ITEM_ID: item.ITEM_ID,
           slNo: index + 1,
+
           ITEM_CODE: item.ITEM_CODE,
           DESCRIPTION: item.ITEM_DESC,
           UOM: item.UOM,
           PACKING_NAME: item.PACKING,
 
-          SUPP_PRICE: item.SUPP_PRICE,
-          PURCH_PRICE: item.PRICE,
-          qtyOrdered: item.QUANTITY,
+          SUPP_PRICE: Number(item.SUPP_PRICE || 0),
+          PURCH_PRICE: Number(item.PRICE || 0),
 
-          Amount: +baseAmount.toFixed(2),
-          discountPercentage: item.DISC_PERCENT,
-          discountAmount: +discountAmount.toFixed(2),
-          taxable_Supplier: +taxableSupplier.toFixed(2),
-          taxable: +taxable.toFixed(2),
+          qtyOrdered: Number(item.QUANTITY || 0),
 
-          // 🔥 NORMALIZED GST FIELDS
-          VAT_PERC: this.isInterState ? igst : 0,
-          CGST: this.isInterState ? 0 : cgst,
-          SGST: this.isInterState ? 0 : sgst,
+          discountPercentage: Number(item.DISC_PERCENT || 0),
 
-          vatAmount: +vatAmount.toFixed(2),
-          total_Supplier: +taxableSupplier.toFixed(2),
-          total: +(taxable + vatAmount).toFixed(2),
+          taxable: taxable, // Bind SUPP_AMOUNT
+          VAT_PERC: vatPerc,
+
+          vatAmount: vatAmount,
+
+          total: Number(item.TOTAL_AMOUNT || 0),
+          HSN_CODE: item.HSN_CODE,
         };
       });
 
-      // 🔥 STEP 3: FORCE GRID TO REPAINT
+      // STEP 3: FORCE GRID TO REPAINT
       setTimeout(() => {
         this.dataGrid?.instance?.repaint();
       }, 0);
@@ -806,141 +786,140 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       // if (res) {
       //   this.pdfSrc = this.get_pdf(res);
       // }
-      this.get_pdf(res)
+      this.get_pdf(res);
     });
   }
 
   get_pdf(data: any) {
     const doc = new jsPDF('p', 'mm', 'a4');
-       const pageWidth = doc.internal.pageSize.width;
-       const pageHeight = doc.internal.pageSize.height;
-       let y = 10;
-   
-      // ======================================================
-       // LOGO LEFT TOP
-       // ======================================================
-       const logoX = 18,
-         logoY = 12,
-         logoW = 30,
-         logoH = 30;
-       doc.setFillColor(225, 225, 225);
-       doc.rect(logoX, logoY, logoW, logoH, 'F');
-       doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
-   
-       // ===============================================
-       // SALES INVOICE HEADING (Centered between logo & reference block)
-       // ===============================================
-       doc.setFont('helvetica', 'bold');
-       doc.setFontSize(16);
-   
-       // compute a centered X between left logo and right reference area
-       const leftEdge = 10 + logoW; // end of logo box
-       const rightEdge = pageWidth - 80; // start of reference block
-       const centerX = (leftEdge + rightEdge) / 2;
-   
-       doc.text('PURCHASE ORDER', centerX, y + 25, { align: 'center' });
-   
-       // ======================================================
-       // RIGHT-TOP HEADER (Debit Note Info)
-       // ======================================================
-       doc.setFont('helvetica', 'bold');
-       doc.setFontSize(10);
-   
-       const refX = pageWidth - 65; // moved 15mm right
-   
-       doc.text(`Invoice No : ${data.DISTRIBUTOR_ID || ''}`, refX, y + 5);
-       doc.text(`Reference No : ${data.REF_NO || ''}`, refX, y + 11);
-       doc.text(`Date: ${data.PO_DATE || ''}`, refX, y + 17);
-   
-       // doc.text(`Dated : ${data[0].SALE_DATE || ""}`, pageWidth - 80, y + 23);
-   
-       y += 33;
-   
-       // ===============================================
-       // HORIZONTAL LINE ABOVE SELLER + CUSTOMER BLOCKS
-       // ===============================================
-       doc.setDrawColor(0);
-       doc.setLineWidth(0.5);
-       doc.line(10, y, pageWidth - 10, y); // full width line
-   
-       y += 5; // small spacing
-   
-       // ======================================================
-       // BLUE SELLER BOX (LEFT)
-       // ======================================================
-       const blueX = 10;
-       const blueY = y;
-       const blueW = 100;
-       const blueH = 38;
-   
-       doc.setFillColor(204, 229, 255);
-       doc.rect(blueX, blueY, blueW, blueH, 'F');
-   
-       doc.setFont('helvetica', 'bold');
-       doc.setFontSize(10);
-       doc.text(data.COMPANY_NAME || '', blueX + 3, blueY + 7);
-   
-       doc.setFont('helvetica', 'normal');
-       doc.setFontSize(9);
-       doc.text(data.ADDRESS1 || '', blueX + 3, blueY + 13);
-       doc.text(data.ADDRESS2 || '', blueX + 3, blueY + 18);
-       doc.text(data.ADDRESS3 || '', blueX + 3, blueY + 23);
-       doc.text(`GSTIN/UIN: ${data.GST_NO || ''}`, blueX + 3, blueY + 28);
-       doc.text(
-         `State : ${data.STATE || ''}, Code : ${data.STATE_CODE || ''}`,
-         blueX + 3,
-         blueY + 33,
-       );
-       doc.text(`E-Mail : ${data.EMAIL || ''}`, blueX + 3, blueY + 38);
-   
-       // ======================================================
-       // CONSIGNEE (RIGHT SIDE)
-       // ======================================================
-       const shipX = 115;
-       const shipY = y;
-   
-       doc.setFont('helvetica', 'bold');
-       doc.text('Consignee (Ship to)', shipX, shipY + 5);
-   
-       doc.setFont('helvetica', 'normal');
-       doc.text(data.SUPP_NAME || '', shipX, shipY + 11);
-       doc.text(data.SUPP_ADDRESS1 || '', shipX, shipY + 16);
-       doc.text(data.SUPP_ADDRESS2 || '', shipX, shipY + 21);
-       doc.text(data.SUPP_ADDRESS3 || '', shipX, shipY + 26);
-       doc.text(`GSTIN/UIN : ${data.CIN || ''}`, shipX, shipY + 31);
-       doc.text(
-         `State : ${data.CUST_STATE || ''}, Code : ${data.STATE_CODE || ''}`,
-         shipX,
-         shipY + 36,
-       );
-   
-       y += 48;
-   
-       // ======================================================
-       // BUYER (BILL TO)
-       // ======================================================
-       const billX = 115;
-       const billY = y;
-   
-       doc.setFont('helvetica', 'bold');
-       doc.text('Buyer (Bill to)', billX, billY + 5);
-   
-       doc.setFont('helvetica', 'normal');
-       doc.text(data.SUPP_NAME || '', billX, billY + 11);
-       doc.text(data.SUPP_ADDRESS1 || '', billX, billY + 16);
-       doc.text(data.SUPP_ADDRESS2 || '', billX, billY + 21);
-       doc.text(data.SUPP_ADDRESS3 || '', billX, billY + 26);
-       doc.text(`GSTIN/UIN : ${data.CIN || ''}`, billX, billY + 31);
-       doc.text(
-         `State : ${data.CUST_STATE || ''}, Code : ${data.STATE_CODE || ''}`,
-         billX,
-         billY + 36,
-       );
-   
-       y += 50;
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    let y = 10;
 
+    // ======================================================
+    // LOGO LEFT TOP
+    // ======================================================
+    const logoX = 18,
+      logoY = 12,
+      logoW = 30,
+      logoH = 30;
+    doc.setFillColor(225, 225, 225);
+    doc.rect(logoX, logoY, logoW, logoH, 'F');
+    doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
 
-        // ======================================================
+    // ===============================================
+    // SALES INVOICE HEADING (Centered between logo & reference block)
+    // ===============================================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+
+    // compute a centered X between left logo and right reference area
+    const leftEdge = 10 + logoW; // end of logo box
+    const rightEdge = pageWidth - 80; // start of reference block
+    const centerX = (leftEdge + rightEdge) / 2;
+
+    doc.text('PURCHASE ORDER', centerX, y + 25, { align: 'center' });
+
+    // ======================================================
+    // RIGHT-TOP HEADER (Debit Note Info)
+    // ======================================================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+
+    const refX = pageWidth - 65; // moved 15mm right
+
+    doc.text(`Invoice No : ${data.DISTRIBUTOR_ID || ''}`, refX, y + 5);
+    doc.text(`Reference No : ${data.REF_NO || ''}`, refX, y + 11);
+    doc.text(`Date: ${data.PO_DATE || ''}`, refX, y + 17);
+
+    // doc.text(`Dated : ${data[0].SALE_DATE || ""}`, pageWidth - 80, y + 23);
+
+    y += 33;
+
+    // ===============================================
+    // HORIZONTAL LINE ABOVE SELLER + CUSTOMER BLOCKS
+    // ===============================================
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(10, y, pageWidth - 10, y); // full width line
+
+    y += 5; // small spacing
+
+    // ======================================================
+    // BLUE SELLER BOX (LEFT)
+    // ======================================================
+    const blueX = 10;
+    const blueY = y;
+    const blueW = 100;
+    const blueH = 38;
+
+    doc.setFillColor(204, 229, 255);
+    doc.rect(blueX, blueY, blueW, blueH, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(data.COMPANY_NAME || '', blueX + 3, blueY + 7);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text(data.ADDRESS1 || '', blueX + 3, blueY + 13);
+    doc.text(data.ADDRESS2 || '', blueX + 3, blueY + 18);
+    doc.text(data.ADDRESS3 || '', blueX + 3, blueY + 23);
+    doc.text(`GSTIN/UIN: ${data.GST_NO || ''}`, blueX + 3, blueY + 28);
+    doc.text(
+      `State : ${data.STATE || ''}, Code : ${data.STATE_CODE || ''}`,
+      blueX + 3,
+      blueY + 33,
+    );
+    doc.text(`E-Mail : ${data.EMAIL || ''}`, blueX + 3, blueY + 38);
+
+    // ======================================================
+    // CONSIGNEE (RIGHT SIDE)
+    // ======================================================
+    const shipX = 115;
+    const shipY = y;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Consignee (Ship to)', shipX, shipY + 5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(data.SUPP_NAME || '', shipX, shipY + 11);
+    doc.text(data.SUPP_ADDRESS1 || '', shipX, shipY + 16);
+    doc.text(data.SUPP_ADDRESS2 || '', shipX, shipY + 21);
+    doc.text(data.SUPP_ADDRESS3 || '', shipX, shipY + 26);
+    doc.text(`GSTIN/UIN : ${data.CIN || ''}`, shipX, shipY + 31);
+    doc.text(
+      `State : ${data.CUST_STATE || ''}, Code : ${data.STATE_CODE || ''}`,
+      shipX,
+      shipY + 36,
+    );
+
+    y += 48;
+
+    // ======================================================
+    // BUYER (BILL TO)
+    // ======================================================
+    const billX = 115;
+    const billY = y;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Buyer (Bill to)', billX, billY + 5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(data.SUPP_NAME || '', billX, billY + 11);
+    doc.text(data.SUPP_ADDRESS1 || '', billX, billY + 16);
+    doc.text(data.SUPP_ADDRESS2 || '', billX, billY + 21);
+    doc.text(data.SUPP_ADDRESS3 || '', billX, billY + 26);
+    doc.text(`GSTIN/UIN : ${data.CIN || ''}`, billX, billY + 31);
+    doc.text(
+      `State : ${data.CUST_STATE || ''}, Code : ${data.STATE_CODE || ''}`,
+      billX,
+      billY + 36,
+    );
+
+    y += 50;
+
+    // ======================================================
     // TABLE — SAME FORMAT AS IMAGE
     // ======================================================
     const tableColumns = [
@@ -1018,124 +997,118 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     });
 
     y = (doc as any).lastAutoTable.finalY + 12;
-   
-  // ============================================================
-// FOOTER – GST SUMMARY + TOTALS (LIKE generatePDF)
-// ============================================================
 
-const footStartY = y + 3;
+    // ============================================================
+    // FOOTER – GST SUMMARY + TOTALS (LIKE generatePDF)
+    // ============================================================
 
-// ---------------- LEFT GST SUMMARY ----------------
-let lx = 15;
-let ly = footStartY;
+    const footStartY = y + 3;
 
-doc.setFont('helvetica', 'bold');
-doc.setFontSize(10);
+    // ---------------- LEFT GST SUMMARY ----------------
+    let lx = 15;
+    let ly = footStartY;
 
-// Header
-doc.text('GST %', lx, ly);
-doc.text('Taxable Value', lx + 22, ly);
-doc.text('Integrated Tax', lx + 55, ly);
-doc.text('Total Tax Amount', lx + 95, ly);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
 
-// Sub headers
-doc.setFontSize(8);
-doc.text('Rate', lx + 55, ly + 5);
-doc.text('Amount', lx + 72, ly + 5);
+    // Header
+    doc.text('GST %', lx, ly);
+    doc.text('Taxable Value', lx + 22, ly);
+    doc.text('Integrated Tax', lx + 55, ly);
+    doc.text('Total Tax Amount', lx + 95, ly);
 
-// Values
-ly += 12;
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(10);
+    // Sub headers
+    doc.setFontSize(8);
+    doc.text('Rate', lx + 55, ly + 5);
+    doc.text('Amount', lx + 72, ly + 5);
 
-const taxable = Number(data.GROSS_AMOUNT || 0);
-const gstAmount = Number(data.TAX_AMOUNT || 0);
-const gstPerc =
-  Number(data.PoDetails?.CGST || 0) +
-  Number(data.PoDetails?.SGST || 0);
+    // Values
+    ly += 12;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
 
-doc.text(gstPerc.toFixed(2) + '%', lx, ly);
-doc.text(taxable.toFixed(2), lx + 22, ly);
-doc.text(gstPerc.toFixed(2) + '%', lx + 55, ly);
-doc.text(gstAmount.toFixed(2), lx + 72, ly);
-doc.text(gstAmount.toFixed(2), lx + 95, ly);
+    const taxable = Number(data.GROSS_AMOUNT || 0);
+    const gstAmount = Number(data.TAX_AMOUNT || 0);
+    const gstPerc =
+      Number(data.PoDetails?.CGST || 0) + Number(data.PoDetails?.SGST || 0);
 
-// Total row
-ly += 10;
-doc.setFont('helvetica', 'bold');
-doc.text(taxable.toFixed(2), lx + 22, ly);
-doc.text(gstAmount.toFixed(2), lx + 72, ly);
-doc.text(gstAmount.toFixed(2), lx + 95, ly);
+    doc.text(gstPerc.toFixed(2) + '%', lx, ly);
+    doc.text(taxable.toFixed(2), lx + 22, ly);
+    doc.text(gstPerc.toFixed(2) + '%', lx + 55, ly);
+    doc.text(gstAmount.toFixed(2), lx + 72, ly);
+    doc.text(gstAmount.toFixed(2), lx + 95, ly);
 
-// ---------------- RIGHT TOTAL SUMMARY ----------------
-let rx = pageWidth - 65;
-let ry = footStartY;
+    // Total row
+    ly += 10;
+    doc.setFont('helvetica', 'bold');
+    doc.text(taxable.toFixed(2), lx + 22, ly);
+    doc.text(gstAmount.toFixed(2), lx + 72, ly);
+    doc.text(gstAmount.toFixed(2), lx + 95, ly);
 
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(10);
+    // ---------------- RIGHT TOTAL SUMMARY ----------------
+    let rx = pageWidth - 65;
+    let ry = footStartY;
 
-const labelX = rx;
-const colonX = rx + 30;
-const valueX = rx + 40;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
 
-doc.text('Taxable Value', labelX, ry);
-doc.text(':', colonX, ry);
-doc.text(taxable.toFixed(2), valueX, ry);
+    const labelX = rx;
+    const colonX = rx + 30;
+    const valueX = rx + 40;
 
-ry += 6;
-doc.text('Total Tax', labelX, ry);
-doc.text(':', colonX, ry);
-doc.text(gstAmount.toFixed(2), valueX, ry);
+    doc.text('Taxable Value', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(taxable.toFixed(2), valueX, ry);
 
-ry += 6;
-doc.text('Round Off', labelX, ry);
-doc.text(':', colonX, ry);
-doc.text('0.00', valueX, ry);
+    ry += 6;
+    doc.text('Total Tax', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(gstAmount.toFixed(2), valueX, ry);
 
-ry += 8;
-doc.setFont('helvetica', 'bold');
-doc.text('Invoice Total', labelX, ry);
-doc.text(':', colonX, ry);
-doc.text(Number(data.NET_AMOUNT).toFixed(2), valueX, ry);
+    ry += 6;
+    doc.text('Round Off', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text('0.00', valueX, ry);
 
-// ---------------- REVERSE CHARGE ----------------
-let wordsY = ry + 15;
+    ry += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Invoice Total', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(Number(data.NET_AMOUNT).toFixed(2), valueX, ry);
 
-doc.setFont('helvetica', 'bold');
-doc.text(
-  'Whether the tax is payable on Reverse charge basis:',
-  15,
-  wordsY
-);
+    // ---------------- REVERSE CHARGE ----------------
+    let wordsY = ry + 15;
 
-doc.setFont('helvetica', 'normal');
-doc.text('No', 150, wordsY);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Whether the tax is payable on Reverse charge basis:', 15, wordsY);
 
-// ---------------- AMOUNT IN WORDS ----------------
-wordsY += 10;
+    doc.setFont('helvetica', 'normal');
+    doc.text('No', 150, wordsY);
 
-doc.setFont('helvetica', 'bold');
-doc.text('Amount in words :', 15, wordsY);
+    // ---------------- AMOUNT IN WORDS ----------------
+    wordsY += 10;
 
-doc.setFont('helvetica', 'normal');
-doc.text(
-  `INR ${numberToWordsIndianNumber(Math.floor(data.NET_AMOUNT))} Rupees Only`,
-  60,
-  wordsY
-);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Amount in words :', 15, wordsY);
 
+    doc.setFont('helvetica', 'normal');
+    doc.text(
+      `INR ${numberToWordsIndianNumber(Math.floor(data.NET_AMOUNT))} Rupees Only`,
+      60,
+      wordsY,
+    );
 
-// ---------------- DECLARATION & REMARK ----------------
-let blockY = wordsY + 15;
+    // ---------------- DECLARATION & REMARK ----------------
+    let blockY = wordsY + 15;
 
-doc.setFont('helvetica', 'bold');
-doc.text('Declaration :', 15, blockY);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Declaration :', 15, blockY);
 
-blockY += 10;
-doc.text('Remark :', 15, blockY);
+    blockY += 10;
+    doc.text('Remark :', 15, blockY);
 
-doc.setFont('helvetica', 'normal');
-doc.text(data.REF_NO || '', 40, blockY);
+    doc.setFont('helvetica', 'normal');
+    doc.text(data.REF_NO || '', 40, blockY);
     // ===========================
     //  RETURN PDF
     // ===========================

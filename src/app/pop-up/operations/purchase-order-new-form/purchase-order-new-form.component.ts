@@ -78,25 +78,6 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   companyStateID: any;
   previousSupplierId: any;
 
-  constructor(
-    private service: DataService,
-    private router: Router,
-  ) {
-    const settingsData = sessionStorage.getItem('settings');
-    this.settingsData = settingsData ? JSON.parse(settingsData) : null;
-  }
-
-  getDocNo() {
-    const payload = {
-      TRANS_TYPE: 17,
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.service.getDocNo(payload).subscribe((response: any) => {
-      this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
-    });
-  }
-
   width = '97vw';
   height = '420px';
   tabs = [{ text: 'Header' }, { text: 'Detail' }];
@@ -182,6 +163,65 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   };
   newPoData = this.poData;
   getNewPoData = () => ({ ...this.newPoData });
+  constructor(
+    private service: DataService,
+    private router: Router,
+  ) {
+    const settingsData = sessionStorage.getItem('settings');
+    this.settingsData = settingsData ? JSON.parse(settingsData) : null;
+  }
+
+  ngOnInit() {
+    this.selectedTabIndex = 0;
+
+    this.getPoNumber();
+    this.sessionDetails();
+    this.getDocNo();
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    this.menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log(
+      'Parsed ObjectData:',
+      this.menuResponse.GeneralSettings.STORE_TITLE,
+    );
+    this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
+    // this.sessionData_tax()
+    const menuGroups = this.menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+    this.currentDate = new Date();
+    this.GetSupplierList();
+    this.GetStoresList();
+    this.GetDeliveryTermsList();
+    this.GetPaymentTermsList();
+    this.GetEmployeeList();
+    // this.getPoHistoryList();
+  }
+
+  getDocNo() {
+    const payload = {
+      TRANS_TYPE: 17,
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDocNo(payload).subscribe((response: any) => {
+      this.docNo = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
+  }
 
   highlightEditableColumns(event: any) {
     if (event.rowType === 'data' && event.column.allowEditing) {
@@ -246,29 +286,44 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.itemsGridRef?.instance?.refresh();
     }, 0);
   }
-  applyGstModeToItems() {
-    const gstPerc = Number(this.GST_PERC) || 0;
-    const halfGst = +(gstPerc / 2).toFixed(2);
 
+  applyGstModeToItems() {
     this.savedItems.forEach((item) => {
-      if (this.isInterState) {
-        // ✅ IGST
-        item.VAT_PERC = gstPerc;
-        item.CGST = 0;
-        item.SGST = 0;
-      } else {
-        // ✅ CGST + SGST
-        item.VAT_PERC = 0;
-        item.CGST = halfGst;
-        item.SGST = halfGst;
-      }
+      const itemGst = Number(item.GST_PERC || 0);
+
+      // Always keep full GST in VAT_PERC
+      item.VAT_PERC = itemGst;
+      item.CGST = 0;
+      item.SGST = 0;
     });
 
-    // 🔁 refresh grid
     setTimeout(() => {
       this.itemsGridRef?.instance?.refresh();
     }, 0);
   }
+
+  // applyGstModeToItems() {
+  //   this.savedItems.forEach((item) => {
+  //     const itemGst = Number(item.GST_PERC || 0);
+  //     const halfGst = +(itemGst / 2).toFixed(2);
+
+  //     if (this.isInterState) {
+  //       // IGST
+  //       item.VAT_PERC = itemGst;
+  //       item.CGST = 0;
+  //       item.SGST = 0;
+  //     } else {
+  //       // CGST + SGST
+  //       item.VAT_PERC = 0;
+  //       item.CGST = halfGst;
+  //       item.SGST = halfGst;
+  //     }
+  //   });
+
+  //   setTimeout(() => {
+  //     this.itemsGridRef?.instance?.refresh();
+  //   }, 0);
+  // }
 
   // Handler for Add Item button
   onAddItemClick() {
@@ -367,74 +422,11 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.selectedItems = event.selectedRowsData;
   }
 
-  // saveSelectedData() {
-  //   console.log('SAVE CALLINGGGGGGGGGGGGGGG');
-  //   // Map over selectedItems to create new items with updated values
-  //   const newItems = this.selectedItems.map((item, index) => {
-  //     // Determine if supplier currency differs from local currency
-  //     const useSupplierPrice =
-  //       this.SupplierCurrencyCode !== this.localCurrencyCode;
-  //     console.log(useSupplierPrice, 'useSupplierPrice');
-
-  //     // Supplier price logic: Use PURCH_PRICE if currencies differ
-  //     const supplierPrice = useSupplierPrice ? item.PURCH_PRICE : 0;
-  //     console.log(supplierPrice, 'supplierPrice');
-
-  //     // Calculate PURCHASE price when currencies differ
-  //     const purchPrice = useSupplierPrice
-  //       ? (supplierPrice / this.newPoData.EXCHANGE_PRICE).toFixed(2)
-  //       : item.PURCH_PRICE;
-
-  //     console.log(purchPrice, 'PurchPrice');
-
-  //     // Parse numeric fields and fallback to 0 if undefined or NaN
-  //     const taxable = parseFloat(item.taxable) || 0;
-  //     const vatAmount = parseFloat(item.vatAmount) || 0;
-  //     const total = parseFloat(item.total) || 0;
-  //     const supplierAmount = parseFloat(item.supplierAmount) || 0;
-
-  //     return {
-  //       ...item,
-  //       slNo: this.savedItems.length + index + 1, // Serial number starting from existing items
-  //       SUPP_PRICE: parseFloat(supplierPrice), // Update SUPP_PRICE based on currency check
-  //       PURCH_PRICE: parseFloat(purchPrice), // Ensure consistent numeric value
-
-  //       // Bind session data
-  //       HSN_CODE: this.HSN_CODE,
-  //       GST_PERC: this.GST_PERC,
-
-  //       supplierAmount,
-  //       taxable,
-  //       vatAmount,
-  //       total,
-  //     };
-  //   });
-
-  //   // Filter out items that already exist in savedItems based on ITEM_ID or another unique identifier
-  //   const filteredNewItems = newItems.filter((newItem) => {
-  //     // Check if item already exists in savedItems by ITEM_ID or another unique identifier
-  //     return !this.savedItems.some(
-  //       (savedItem) => savedItem.ITEM_ID === newItem.ITEM_ID
-  //     );
-  //   });
-
-  //   // Merge existing items (from ngOnChanges) with non-duplicate new items
-  //   this.savedItems = [...this.savedItems, ...filteredNewItems];
-
-  //   // Log the updated savedItems array for debugging
-  //   console.log(this.savedItems, 'savedItems');
-
-  //   // Update the UI state
-  //   this.selectedTabIndex = 1; // Switch to the tab showing saved items
-  //   this.showAddItemPopup = false; // Close the "Add Item" popup
-  // }
-
   saveSelectedData() {
     const newItems = this.selectedItems.map((item, index) => {
-      // ✅ TAKE GST FROM ITEM
       const itemGst = Number(item.GST_PERC || item.VAT_PERC || 0);
-      const halfGst = +(itemGst / 2).toFixed(2);
       const suppPrice = Number(item.PURCH_PRICE || 0);
+
       return {
         ...item,
         slNo: this.savedItems.length + index + 1,
@@ -442,13 +434,13 @@ export class PurchaseOrderNewFormComponent implements OnInit {
         PURCH_PRICE: suppPrice,
         HSN_CODE: item.HSN_CODE || item.HSNCODE || item.HSN || '',
 
-        // ✅ STORE ORIGINAL GST
+        // store GST
         GST_PERC: itemGst,
 
-        // ✅ DISTRIBUTE BASED ON STATE
-        VAT_PERC: this.isInterState ? itemGst : 0,
-        CGST: this.isInterState ? 0 : halfGst,
-        SGST: this.isInterState ? 0 : halfGst,
+        // ✅ DO NOT SPLIT GST
+        VAT_PERC: itemGst,
+        CGST: 0,
+        SGST: 0,
 
         qtyOrdered: 0,
         discountPercentage: 0,
@@ -469,6 +461,47 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.itemsGridRef?.instance?.refresh();
     this.showAddItemPopup = false;
   }
+
+  // saveSelectedData() {
+  //   const newItems = this.selectedItems.map((item, index) => {
+  //     // ✅ TAKE GST FROM ITEM
+  //     const itemGst = Number(item.GST_PERC || item.VAT_PERC || 0);
+  //     const halfGst = +(itemGst / 2).toFixed(2);
+  //     const suppPrice = Number(item.PURCH_PRICE || 0);
+  //     return {
+  //       ...item,
+  //       slNo: this.savedItems.length + index + 1,
+  //       SUPP_PRICE: suppPrice,
+  //       PURCH_PRICE: suppPrice,
+  //       HSN_CODE: item.HSN_CODE || item.HSNCODE || item.HSN || '',
+
+  //       // ✅ STORE ORIGINAL GST
+  //       GST_PERC: itemGst,
+
+  //       // ✅ DISTRIBUTE BASED ON STATE
+  //       VAT_PERC: this.isInterState ? itemGst : 0,
+  //       CGST: this.isInterState ? 0 : halfGst,
+  //       SGST: this.isInterState ? 0 : halfGst,
+
+  //       qtyOrdered: 0,
+  //       discountPercentage: 0,
+  //       Amount: 0,
+  //       taxable: 0,
+  //       vatAmount: 0,
+  //       total: 0,
+  //     };
+  //   });
+
+  //   this.savedItems = [
+  //     ...this.savedItems,
+  //     ...newItems.filter(
+  //       (n) => !this.savedItems.some((s) => s.ITEM_ID === n.ITEM_ID),
+  //     ),
+  //   ];
+
+  //   this.itemsGridRef?.instance?.refresh();
+  //   this.showAddItemPopup = false;
+  // }
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -492,45 +525,6 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     );
   }
 
-  ngOnInit() {
-    this.selectedTabIndex = 0;
-    this.getPoNumber();
-    this.sessionDetails();
-    this.getDocNo();
-    const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
-    this.menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
-    console.log(
-      'Parsed ObjectData:',
-      this.menuResponse.GeneralSettings.STORE_TITLE,
-    );
-    this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
-    // this.sessionData_tax()
-    const menuGroups = this.menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
-
-    const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
-
-    if (packingRights) {
-      this.canAdd = packingRights.CanAdd;
-      this.canEdit = packingRights.CanEdit;
-      this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
-    }
-    this.currentDate = new Date();
-    this.GetSupplierList();
-    this.GetStoresList();
-    this.GetDeliveryTermsList();
-    this.GetPaymentTermsList();
-    this.GetEmployeeList();
-    // this.getPoHistoryList();
-  }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -644,18 +638,11 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
     let totalTaxPerc = 0;
 
-    if (this.isInterState) {
-      item.VAT_PERC = itemGst;
-      item.CGST = 0;
-      item.SGST = 0;
-      totalTaxPerc = itemGst;
-    } else {
-      const halfGst = +(itemGst / 2).toFixed(2);
-      item.VAT_PERC = 0;
-      item.CGST = halfGst;
-      item.SGST = halfGst;
-      totalTaxPerc = item.CGST + item.SGST;
-    }
+    item.VAT_PERC = itemGst;
+    item.CGST = 0;
+    item.SGST = 0;
+
+    totalTaxPerc = itemGst;
 
     /* ---------------- VAT AMOUNT ---------------- */
 
@@ -684,9 +671,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       DISC_PERCENT: discPerc,
 
       // ✅ IMPORTANT
-      VAT_PERC: this.isInterState ? item.VAT_PERC : 0,
-      CGST: this.isInterState ? 0 : item.CGST,
-      SGST: this.isInterState ? 0 : item.SGST,
+      VAT_PERC: item.VAT_PERC,
+      CGST: 0,
+      SGST: 0,
 
       TAX_AMOUNT: item.vatAmount,
       TOTAL_AMOUNT: item.total,
@@ -849,6 +836,22 @@ export class PurchaseOrderNewFormComponent implements OnInit {
           }));
         console.log(this.purchaseOrders, 'last5poorder');
       });
+  }
+
+  //Disable the already-selected items from the popup
+  onSupplierRowPrepared(e: any) {
+    if (e.rowType !== 'data') return;
+
+    const itemId = e.data.ITEM_ID;
+
+    const alreadyAdded = this.savedItems.some(
+      (item) => item.ITEM_ID === itemId,
+    );
+
+    if (alreadyAdded) {
+      e.rowElement.style.pointerEvents = 'none';
+      e.rowElement.style.opacity = '0.5';
+    }
   }
 
   onEditorPreparing(e: any) {
@@ -1031,15 +1034,15 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
   onCancelNewData() {
     console.log('================================================');
-    this.resetForm();
-    // reset validation state
-    this.newPoData = {}; // or a default object with empty values
-    this.savedItems = [];
-    this.isSupplierTouched = false;
-    this.isSupplierValid = true;
-    this.supplierItemsGrid?.instance?.clearSelection();
+    // this.resetForm();
+    // // reset validation state
+    // this.newPoData = {}; // or a default object with empty values
+    // this.savedItems = [];
+    // this.isSupplierTouched = false;
+    // this.isSupplierValid = true;
+    // this.supplierItemsGrid?.instance?.clearSelection();
     // this.resetForm();        // optional: clear form data
-    this.showAddItemPopup = false; // 🔥 close popup
+    this.showAddItemPopup = false; //  close popup
   }
 
   onPopupClosing() {

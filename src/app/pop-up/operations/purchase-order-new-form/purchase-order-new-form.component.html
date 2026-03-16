@@ -50,7 +50,7 @@
       <dx-select-box
         label="Supplier"
         labelMode="floating"
-        [width]="250"
+        [width]="320"
         placeholder="Select Supplier"
         [items]="SupplierList"
         displayExpr="DESCRIPTION"
@@ -71,7 +71,7 @@
             : 'Location'
         "
         labelMode="floating"
-        [width]="250"
+        [width]="320"
         [placeholder]="
           menuResponse?.GeneralSettings?.STORE_TITLE === 'STORE'
             ? 'Store'
@@ -92,9 +92,9 @@
   [(selectedIndex)]="selectedTabIndex"
   [dataSource]="tabs"
   (onItemClick)="onTabClick($event)"
-  [elementAttr]="{ class: 'custom-tabs' }"
   [orientation]="orientations"
   [stylingMode]="stylingMode"
+  [elementAttr]="{ class: 'po-tabs' }"
 >
 </dx-tabs>
 
@@ -165,9 +165,9 @@
         </dx-text-box> -->
 
         <dx-text-box
-          label="VAT Rule"
+          label="Tax Rule"
           labelMode="floating"
-          placeholder="VAT Rule"
+          placeholder="Tax Rule"
           [(value)]="vatRule"
           [readOnly]="true"
         >
@@ -484,8 +484,14 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     >
     </dxi-column>
-
     <dxi-column
+      caption="GST (%)"
+      dataField="VAT_PERC"
+      alignment="center"
+      width="90"
+    ></dxi-column>
+
+    <!-- <dxi-column
       *ngIf="isInterState"
       caption="IGST (%)"
       dataField="VAT_PERC"
@@ -513,7 +519,7 @@
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     >
-    </dxi-column>
+    </dxi-column> -->
 
     <dxi-column
       caption="Tax Amount"
@@ -544,45 +550,41 @@
         column="taxable_Supplier"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
-      >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
-      </dxi-total-item>
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-total-item>
 
       <dxi-total-item
         column="taxable"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
-      >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
-      </dxi-total-item>
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-total-item>
 
       <dxi-total-item
         column="vatAmount"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+        <!-- <dxo-format [precision]="2" type="fixedPoint"></dxo-format> -->
       </dxi-total-item>
 
       <dxi-total-item
         column="total_Supplier"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+        <!-- <dxo-format [precision]="2" type="fixedPoint"></dxo-format> -->
       </dxi-total-item>
 
       <dxi-total-item
         column="total"
         summaryType="sum"
         displayFormat="{0}"
-        valueFormat="##0.00"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >
-        <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
+        <!-- <dxo-format [precision]="2" type="fixedPoint"></dxo-format> -->
       </dxi-total-item>
     </dxo-summary>
 
@@ -627,7 +629,7 @@
   <dx-popup
     [(visible)]="showAddItemPopup"
     [width]="'90vw'"
-    [height]="600"
+    [height]="'90vh'"
     [showTitle]="true"
     [title]="'Add Item'"
     [closeOnOutsideClick]="true"
@@ -653,6 +655,7 @@
         [dataSource]="supplierItems"
         [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
         (onSelectionChanged)="onSelectionChanged($event)"
+        (onRowPrepared)="onSupplierRowPrepared($event)"
       >
         <dxo-pager
           [visible]="true"
@@ -668,10 +671,10 @@
         <dxo-header-filter [visible]="true">
           <dxo-search [enabled]="true"></dxo-search>
         </dxo-header-filter>
-        <dxo-search-panel
+        <!-- <dxo-search-panel
           [visible]="true"
           placeholder=" Search"
-        ></dxo-search-panel>
+        ></dxo-search-panel> -->
 
         <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
         <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>

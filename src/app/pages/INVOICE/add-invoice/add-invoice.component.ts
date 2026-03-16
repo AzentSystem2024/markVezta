@@ -153,7 +153,7 @@ export class AddInvoiceComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
+    // console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -171,13 +171,13 @@ export class AddInvoiceComponent {
       this.selectedCompany = userData?.SELECTED_COMPANY;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.GST, 'HSNCODE');
+      // console.log(this.GST, 'HSNCODE');
       if (this.selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
-        console.log(this.selectedCompanyId, 'SELECTEDCOMPANYIDDDDDDDDDDDDD');
+        // console.log(this.selectedCompanyId, 'SELECTEDCOMPANYIDDDDDDDDDDDDD');
         this.invoiceFormData.COMPANY_ID = this.selectedCompanyId;
         this.companyState = this.selectedCompany.STATE_NAME;
-        console.log(this.companyState, 'COMPANYSTATE');
+        // console.log(this.companyState, 'COMPANYSTATE');
         this.companyList = [this.selectedCompany]; //  Show only selected company
       }
 
@@ -213,7 +213,7 @@ export class AddInvoiceComponent {
   }
 
   getCustomerOrUnitLst() {
-    console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
+    // console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
     };
@@ -221,7 +221,7 @@ export class AddInvoiceComponent {
       .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
+        // console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
 
@@ -248,7 +248,7 @@ export class AddInvoiceComponent {
     this.selectedCustomer = selectedCustomer;
     this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
 
-    // 🔥 ONLY CHANGE
+    // ONLY CHANGE
     this.applyGstMode();
 
     if (this.selectedCustomerType) {
@@ -443,7 +443,7 @@ export class AddInvoiceComponent {
       (row: any) => !existingTransferIds.includes(row.DN_DETAIL_ID),
     );
     newRows.forEach((row: any) => {
-      // ✅ HSN from API
+      // HSN from API
       row.HSN_CODE = row.HSN_CODE || row.HSN || row.HSNCODE;
 
       const rowGst = Number(row.GST_PERC || 0); // ✅ GST FROM API

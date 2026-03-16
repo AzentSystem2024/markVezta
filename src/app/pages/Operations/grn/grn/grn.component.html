@@ -81,9 +81,6 @@
         widget="dxButton"
         [options]="addButtonOptions"
       ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
 
       <!-- <dxi-item location="after" locateInMenu="auto">
             <div class="separator"></div>
@@ -223,7 +220,7 @@
 <dx-popup
   [(visible)]="isViewPopupOpened"
   title="View Goods Receipt Note"
-  [height]="'95vh'"
+  [height]="'100vh'"
   [width]="width"
 >
   <app-grn-view-form
