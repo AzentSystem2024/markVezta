@@ -834,7 +834,7 @@ export class ItemsEditFormComponent implements OnInit {
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
-      // COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: this.selected_Company_id,
     };
     console.log(payload, 'PAYLOAD');
     // Call the service to update the items

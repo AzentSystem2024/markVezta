@@ -69,6 +69,7 @@ export class PackingEditComponent {
 
   @ViewChild('sizeGrid', { static: false })
 sizeGrid!: DxDataGridComponent;
+@ViewChild('bomGridRef', { static: false }) bomGridRef: any;
 
   selectedTabIndex = 0;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -107,6 +108,10 @@ sizeGrid!: DxDataGridComponent;
   stdPrice:any;
   priceHistoryList:any[]=[]
  selectedRowKeys: any[] = [];
+  selectedItem: any;
+  ItempopupVisible :boolean = false;
+  selectedItems: any[] = [];
+  ItemListDataSource:any[] = [];
 
   constructor(private dataService: DataService) {
     this.sesstion_Details();
@@ -149,32 +154,7 @@ sizeGrid!: DxDataGridComponent;
     // Add any custom logic here if needed
   }
 
-  addNewRow() {
-    const grid = this.itemsGridRef.instance; // reference to your dx-data-grid
-    const rows = grid.getVisibleRows();
-
-    // Check if any existing row is incomplete
-    const hasIncompleteRow = rows.some(
-      (r: any) => !r.data.ITEM || !r.data.QUANTITY
-    );
-
-    if (hasIncompleteRow) {
-      // Optionally, show a message
-      return; // Stop adding new row
-    }
-
-    // Add new row at the bottom
-    this.items.push({ ITEM: null, DESCRIPTION: '', UOM: '', QUANTITY: null });
-
-    setTimeout(() => {
-      const updatedRows = grid.getVisibleRows();
-      const newRowIndex = updatedRows.length - 1;
-      if (newRowIndex >= 0) {
-        grid.editCell(newRowIndex, 'ITEM'); // Focus ITEM of new row
-      }
-    }, 100);
-  }
-
+ 
   onGridInitialized(e: any) {
     const grid = e.component;
     const store = grid.getDataSource().store();
@@ -256,6 +236,16 @@ sizeGrid!: DxDataGridComponent;
 
 
   onEditorPreparings(e: any) {
+if (e.parentType !== 'dataRow') return;
+
+  const rowData = e.row?.data;
+
+  if (this.isSameArticle(rowData)) {
+
+    console.log("Locked Row:", rowData.DESCRIPTION);
+
+    e.editorOptions.readOnly = true; // Disable editing
+  }
     if (
       e.dataField === 'ITEM' ||
       e.dataField === 'DESCRIPTION' ||
@@ -394,6 +384,7 @@ sizeGrid!: DxDataGridComponent;
   ngOnChanges(changes: SimpleChanges) {
     if (changes['PackingData'] && changes['PackingData'].currentValue) {
       console.log('Received PackingData:', changes['PackingData'].currentValue);
+      //  console.log("Main Description:", this.getMainDescription());
       const incomingData = changes['PackingData'].currentValue;
       this.PackingData = {
         ...this.PackingData,
@@ -418,7 +409,7 @@ this.isArticleFieldsDisabled = true;
     // }
 
     if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
-  this.PackingData.UNIT_ID = incomingData.Units[0].UNIT_ID; // ✅ SINGLE VALUE
+  this.PackingData.UNIT_ID = incomingData.Units[0].UNIT_ID; //  SINGLE VALUE
 } else if (incomingData.UNIT_ID) {
   this.PackingData.UNIT_ID = incomingData.UNIT_ID;
 } else {
@@ -443,13 +434,13 @@ this.isArticleFieldsDisabled = true;
       );
 
      return {
-  Size: Number(size),   // 🔥 ensure number
+  Size: Number(size),   //  ensure number
   Qty: Number(qty),
   ArticleID: articleEntry ? articleEntry.ARTICLE_ID : null,
 };
 
     })
-    // 🔥 SORT SIZE ASCENDING (NUMERIC)
+    //  SORT SIZE ASCENDING (NUMERIC)
     .sort((a, b) => a.Size - b.Size);
 }
 
@@ -467,7 +458,7 @@ console.log(this.articleSizeData);
     }
 
     // ===============================
-    // 3️⃣ 🔥 BIND BOM (MAIN PART)
+    // 3️ BIND BOM (MAIN PART)
     // ===============================
     //     if (Array.isArray(this.PackingData.BOM)) {
 
@@ -481,7 +472,7 @@ console.log(this.articleSizeData);
     //     BOM_ID: bom.BOM_ID,
     //     ITEM_ID: bom.ITEM_ID,
 
-    //     // ✅ Bind SelectBox value using DESCRIPTION from getItems()
+    //     //  Bind SelectBox value using DESCRIPTION from getItems()
     //     ITEM: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
 
     //     DESCRIPTION: matchedItem ? matchedItem.DESCRIPTION : bom.DESCRIPTION,
@@ -533,13 +524,13 @@ setTimeout(() => {
     .map((row: any) => ({
       ...row,
       QUANTITY: Number(row.QUANTITY || 0),
-      rowKey: `${row.ARTICLE_ID}_${row.SIZE}` // 🔥 MUST EXIST
+      rowKey: `${row.ARTICLE_ID}_${row.SIZE}` //  MUST EXIST
     }));
 
-  // 🔄 Force grid refresh
+  //  Force grid refresh
   this.sizeGrid?.instance?.refresh();
 
-  // ✅ Auto-select rows with quantity
+  //  Auto-select rows with quantity
   const keysToSelect = this.PackingEntriesData
     .filter((r: any) => r.QUANTITY > 0)
     .map((r: any) => r.rowKey);
@@ -602,7 +593,7 @@ setTimeout(() => {
                 ? [this.PackingData.UNIT_ID]
                 : [];
         
-            // 🚨 hard validation
+            //  hard validation
             if (!selectedUnits.length) {
               notify(
                 {
@@ -615,10 +606,10 @@ setTimeout(() => {
               return;
             }
         
-            // ✅ Header UNIT_ID (single)
+            //  Header UNIT_ID (single)
             const mainUnitId = Number(selectedUnits[0]);
         
-            // ✅ Units array (multi)
+            //  Units array (multi)
             const unitsPayload = selectedUnits.map((id) => ({
               UNIT_ID: Number(id),
             }));
@@ -713,7 +704,7 @@ setTimeout(() => {
       '====================='
     );
 
-    //  🔍 Check for duplicate entry based on employee ID
+    //   Check for duplicate entry based on employee ID
     const duplicate = this.packing_list.find(
       (item: any) =>
         item.PackingName === packname &&
@@ -721,7 +712,7 @@ setTimeout(() => {
         item.Color === color &&
         item.Category === categoryID &&
         item.Unit === unitID &&
-        item.ID !== id // ✅ ID must be different for true duplication
+        item.ID !== id //  ID must be different for true duplication
     );
 
     console.log(duplicate, 'DUPLICATE CHECK');
@@ -762,7 +753,7 @@ setTimeout(() => {
     //     },
     //     'error'
     //   );
-    //   return; // ⛔ Stop if form is invalid
+    //   return; //  Stop if form is invalid
     // }
 
     this.dataService.Update_packages_listapi(payload).subscribe((res: any) => {
@@ -865,7 +856,7 @@ onQuantityChanged() {
     //     },
     //     'error'
     //   );
-    //   // 👈 prevent grid from showing
+    //   //  prevent grid from showing
     //   this.shouldShowGrid = false;
     //   return;
     // }
@@ -881,7 +872,7 @@ onQuantityChanged() {
 
     //  if (!ArtvalidationResult.isValid || !ColorvalidationResult.isValid || !CatgoryvalidationResult.isValid || !UnitvalidationResult.isValid) {
 
-    //   return; // ❌ Prevent saving if form is invalid
+    //   return; //  Prevent saving if form is invalid
     // }
     // if(!payload.artNo || !payload.color || !payload.categoryID || !payload.unitID) {
     //   notify(
@@ -936,7 +927,7 @@ onQuantityChanged() {
       SUPP_ID: null,
     };
 
-    // ✅ Resets values and clears all validation UI
+    //  Resets values and clears all validation UI
     // this.formValidationGroup?.instance?.resetValues();
  this.isArticleFieldsDisabled = false;
     this.articleSizeData = [];
@@ -993,10 +984,10 @@ onQuantityChanged() {
 //     e.editorOptions.onValueChanged = (args: any) => {
 //       const newQty = Number(args.value) || 0;
 
-//       // ✅ 1. Update the grid row object
+//       //  1. Update the grid row object
 //       e.row.data.QUANTITY = newQty;
 
-//       // ✅ 2. Ensure main datasource array is updated
+//       //  2. Ensure main datasource array is updated
 //       const index = this.PackingEntriesData.findIndex(
 //         (i: any) =>
 //           i.ARTICLE_ID === e.row.data.ARTICLE_ID &&
@@ -1007,7 +998,7 @@ onQuantityChanged() {
 //         this.PackingEntriesData[index].QUANTITY = newQty;
 //       }
 
-//       // ✅ 3. Recalculate total
+//       //  3. Recalculate total
 //       this.onQuantityChanged();
 
 //       console.log(
@@ -1026,7 +1017,7 @@ onQuantityChanged() {
 
 onEditorPreparing(e: any) {
 
-  // ✅ Only for Quantity column in data rows
+  //  Only for Quantity column in data rows
   if (e.parentType !== 'dataRow' || e.dataField !== 'QUANTITY') {
     return;
   }
@@ -1034,25 +1025,25 @@ onEditorPreparing(e: any) {
   const rowKey = e.row.key;
   const isRowSelected = this.selectedRowKeys.includes(rowKey);
 
-  // 🔒 Allow editing ONLY if row is selected
+  //  Allow editing ONLY if row is selected
   e.editorOptions.readOnly = !isRowSelected;
   // OR if you want it fully disabled:
   // e.editorOptions.disabled = !isRowSelected;
 
-  // ❌ Do not attach onValueChanged if row is not selected
+  //  Do not attach onValueChanged if row is not selected
   if (!isRowSelected) {
     return;
   }
 
   // ===============================
-  // ✅ Your existing edit logic
+  //  Your existing edit logic
   e.editorOptions.onValueChanged = (args: any) => {
     const newQty = Number(args.value) || 0;
 
-    // 1️⃣ Update grid row
+    // 1️ Update grid row
     e.row.data.QUANTITY = newQty;
 
-    // 2️⃣ Update main datasource
+    // 2️ Update main datasource
     const index = this.PackingEntriesData.findIndex(
       (i: any) =>
         i.ARTICLE_ID === e.row.data.ARTICLE_ID &&
@@ -1063,10 +1054,10 @@ onEditorPreparing(e: any) {
       this.PackingEntriesData[index].QUANTITY = newQty;
     }
 
-    // 3️⃣ Recalculate total
+    // 3️ Recalculate total
     this.onQuantityChanged();
 
-    // 4️⃣ Update combination string
+    // 4️ Update combination string
     this.combinationString = this.PackingEntriesData
       .map((i: any) => `${i.SIZE}x${i.QUANTITY}`)
       .join(', ');
@@ -1149,7 +1140,7 @@ savePriceChange() {
     return;
   }
 
-  // ✅ Build payload exactly as backend expects
+  //  Build payload exactly as backend expects
   const payload = {
     ID: Number(this.PackingData.ID),                // from packing select response
     STD_PRICE: this.PackingData.STD_PRICE,               // user input
@@ -1159,7 +1150,7 @@ savePriceChange() {
 
   console.log('Price Change Payload:', payload);
 
-  // 🚀 Call API
+  //  Call API
   this.dataService.Insert_PackingPrice_Change_Api(payload).subscribe({
     next: (res: any) => {
       console.log('Price change saved:', res);
@@ -1180,6 +1171,125 @@ savePriceChange() {
       notify('Failed to update price', 'error', 800);
     },
   });
+}
+
+isSameArticle(rowData: any): boolean {
+
+  const artNo = this.PackingData.ART_NO;
+  const color = this.PackingData.COLOR;
+  const category = this.PackingData.CATEGORY_NAME;
+
+  const desc = rowData?.DESCRIPTION || '';
+
+  return (
+    desc.includes(artNo) &&
+    desc.includes(color) &&
+    desc.includes(category)
+  );
+
+}
+
+deleteButtonVisible = (e: any) => {
+
+  return !this.isSameArticle(e.row.data);
+
+};
+ addNewRow() {
+
+  this.dataService.getItemsListForArticle().subscribe((res: any) => {
+      console.log(res);
+      console.log(
+        'PrePaymentListDataSource=============================:',
+        res.DataList,
+      );
+      this.ItemListDataSource = res.DataList;
+      this.ItempopupVisible = true; // Open popup
+    });
+  setTimeout(() => {
+
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
+
+    const rows = grid.getVisibleRows();
+
+    const hasIncompleteRow = rows.some(
+      (r: any) => !r.data?.ITEM || !r.data?.QUANTITY
+    );
+
+    if (hasIncompleteRow) {
+      return;
+    }
+
+    this.items.push({
+      ITEM: null,
+      DESCRIPTION: '',
+      UOM: '',
+      QUANTITY: null
+    });
+
+    setTimeout(() => {
+      const updatedRows = grid.getVisibleRows();
+      const newRowIndex = updatedRows.length - 1;
+
+      if (newRowIndex >= 0) {
+        grid.editCell(newRowIndex, 'ITEM');
+      }
+    }, 100);
+
+  }, 200);
+}
+
+onItemSelect(e: any) {
+
+  const selectedItem = e.data;
+
+  console.log("Selected Item:", selectedItem);
+
+  // Example: store selected item
+  this.selectedItem = selectedItem;
+
+  // Close popup after selection
+  this.ItempopupVisible = false;
+}
+
+saveSelectedItems() {
+
+  const popupGrid = this.bomGridRef.instance;   // popup grid
+
+  const selectedRows = popupGrid.getSelectedRowsData();
+
+  if (!selectedRows.length) {
+    return;
+  }
+
+  //  Remove empty row if exists
+  this.items = this.items.filter(
+    row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
+  );
+
+  selectedRows.forEach((item: any) => {
+
+    const exists = this.items.some(
+      x => x.ITEM === item.ITEM_CODE
+    );
+
+    if (!exists) {
+      this.items.push({
+        ITEM: item.ITEM_CODE,
+        DESCRIPTION: item.DESCRIPTION,
+        UOM: item.UOM,
+        QUANTITY: null,
+        ITEM_ID: item.ID
+      });
+    }
+
+  });
+
+  // refresh BOM grid
+  this.itemsGridRef.instance.refresh();
+
+  this.ItempopupVisible = false;
+
 }
 
 }
