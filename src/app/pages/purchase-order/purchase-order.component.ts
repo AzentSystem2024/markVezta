@@ -203,6 +203,7 @@ export class PurchaseOrderComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   filteredPOList: any;
+  isSaving = false;
 
   constructor(
     private service: DataService,
@@ -769,6 +770,11 @@ export class PurchaseOrderComponent {
   }
 
   onClickSaveNewData() {
+    //  Prevent double click
+    if (this.isSaving) {
+      return;
+    }
+    this.isSaving = true;
     // debugger;
     const data = this.poNewForm.getNewPoData();
     console.log(data, 'DATA FOR SAVE');
@@ -848,48 +854,66 @@ export class PurchaseOrderComponent {
     });
     data.PoDetails = poDetails;
     // savePoToServer(data: any) {
-    this.service.savePoData(data).subscribe((res) => {
-      console.log(res, 'saved data');
+    this.service.savePoData(data).subscribe({
+      next: (res: any) => {
+        console.log(res, 'saved data');
 
-      if (res.message === 'Success' && res.flag === 1) {
-        if (data.IS_APPROVED === true) {
-          notify(
-            {
-              message: 'Data Saved & Approved Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
+        if (res.message === 'Success' && res.flag === 1) {
+          if (data.IS_APPROVED === true) {
+            notify(
+              {
+                message: 'Data Saved & Approved Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+          } else {
+            notify(
+              {
+                message: 'Data Saved Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+          }
+
+          this.refreshPo = true;
+          setTimeout(() => (this.refreshPo = false), 0);
+
+          this.dataGrid.instance.refresh();
+          this.isAddPopupOpened = false;
+
+          if (this.PurchaseOrderNewFormComponent?.resetForm) {
+            this.PurchaseOrderNewFormComponent.resetForm();
+          }
+
+          this.getPurchaseOrderList();
         } else {
           notify(
             {
-              message: 'Data Saved Successfully',
-              position: { at: 'top center', my: 'top center' },
+              message: 'Your Data Not Saved',
+              position: { at: 'top right', my: 'top right' },
             },
-            'success',
+            'error',
           );
         }
 
-        this.refreshPo = true;
-        setTimeout(() => (this.refreshPo = false), 0);
+        this.isSaving = false;
+      },
 
-        this.dataGrid.instance.refresh();
-        this.isAddPopupOpened = false;
+      error: (err: any) => {
+        console.error(err);
 
-        if (this.PurchaseOrderNewFormComponent?.resetForm) {
-          this.PurchaseOrderNewFormComponent.resetForm();
-        }
-
-        this.getPurchaseOrderList();
-      } else {
         notify(
           {
-            message: 'Your Data Not Saved',
+            message: 'Server error while saving data',
             position: { at: 'top right', my: 'top right' },
           },
           'error',
         );
-      }
+
+        this.isSaving = false;
+      },
     });
   }
 

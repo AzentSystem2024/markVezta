@@ -218,6 +218,7 @@ import { StockViewComponent } from './stock-view/stock-view.component';
 import { SaleReturnComponent } from './sale-return/sale-return.component';
 import { MiscellaneousInvoiceComponent } from './pages/miscellaneous-invoice/miscellaneous-invoice.component';
 import { MiscellaneousPurchaseComponent } from './pages/miscellaneous-purchase/miscellaneous-purchase.component';
+import { ImportChartOfAccountsComponent } from './pages/Import Accounts/import-chart-of-accounts/import-chart-of-accounts.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 
@@ -237,7 +238,6 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
-  
 
   {
     path: 'auth',
@@ -960,11 +960,16 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-    path: 'misc-purchase',
-    component: MiscellaneousPurchaseComponent,
-    canActivate: [AuthGuardService],
-  },
-  {
+        path: 'import-chart-of-accounts',
+        component: ImportChartOfAccountsComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'misc-purchase',
+        component: MiscellaneousPurchaseComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'end-of-service',
         component: EOSComponent,
         canActivate: [AuthGuardService],

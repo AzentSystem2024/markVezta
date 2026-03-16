@@ -90,7 +90,17 @@
                   </dx-select-box> -->
 
                   <!-- Distributor Select -->
-                  <dx-select-box
+
+                  <dx-text-box
+                    #invoiceBoxRef
+                    label="Customer"
+                    labelMode="floating"
+                    [(value)]="invoiceFormData.CUST_NAME"
+                    [width]="375"
+                    style="margin-top: -1px"
+                    [readOnly]="true"
+                  ></dx-text-box>
+                  <!-- <dx-select-box
                     [(value)]="invoiceFormData.DISTRIBUTOR_ID"
                     [dataSource]="distributorList"
                     displayExpr="DESCRIPTION"
@@ -101,7 +111,7 @@
                     style="margin-top: -1px"
                     [readOnly]="true"
                   >
-                  </dx-select-box>
+                  </dx-select-box> -->
                 </div>
               </div>
             </dxi-item>

@@ -149,9 +149,6 @@ export class LedgerStatementComponent {
     private ngZone: NgZone,
   ) {
     // this.resetPopups();
-    this.get_sessionstorage_data();
-    this.get_fin_id();
-    this.sesstion_Details();
 
     // Detect when component is revisited
     this.router.events
@@ -173,22 +170,30 @@ export class LedgerStatementComponent {
   }
 
   ngOnInit() {
-    // this.resetPopups();
-    // Prevent stale popup rendering
+    this.get_sessionstorage_data();
+    this.get_fin_id();
+    this.sesstion_Details();
+
+    const userDataString = localStorage.getItem('userData');
+
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      const selectedCompany = userData?.SELECTED_COMPANY;
+
+      this.selected_Company_id = selectedCompany?.COMPANY_ID;
+
+      console.log(this.selected_Company_id, 'SELECTED COMPANY ID');
+
+      // ✅ CALL API HERE AFTER VALUE IS SET
+      this.loadHeadList();
+    }
+
     setTimeout(() => {
       this.popupReady = false;
       this.cdr.detectChanges();
     });
 
     this.loadLedgerData();
-
-    this.ledgerSummaryData = this.Ledger_statement_datasource;
-    this.dataService
-      .HeadId_Dropdown_api(this.selected_Company_id)
-      .subscribe((res: any) => {
-        this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
-        console.log(this.HEAD_ID_LIST);
-      });
 
     const today = new Date();
     const SystemDate =
@@ -201,6 +206,60 @@ export class LedgerStatementComponent {
     this.selected_from_date = SystemDate;
     this.selected_To_date = SystemDate;
   }
+
+  loadHeadList() {
+    this.dataService
+      .HeadId_Dropdown_api(this.selected_Company_id)
+      .subscribe((res: any) => {
+        console.log('HEAD API RESPONSE', res);
+
+        this.HEAD_ID_LIST = res?.LEDGER_HEADS || [];
+      });
+  }
+
+  // ngOnInit() {
+  //   this.get_sessionstorage_data();
+  //   this.get_fin_id();
+  //   this.sesstion_Details();
+  //   const userDataString = localStorage.getItem('userData');
+  //   const userData = JSON.parse(
+  //     sessionStorage.getItem('savedUserData') || '{}',
+  //   );
+  //   if (userDataString) {
+  //     const userData = JSON.parse(userDataString);
+  //     const selectedCompany = userData?.SELECTED_COMPANY;
+  //     this.selected_Company_id = selectedCompany.COMPANY_ID;
+  //     console.log(this.selected_Company_id, 'SELECTEDDDDDDDDDDDDDDDDDDDD---');
+  //   }
+  //   console.log('ledgerstatementttttttttttttttttttttt');
+  //   // this.resetPopups();
+  //   // Prevent stale popup rendering
+  //   setTimeout(() => {
+  //     this.popupReady = false;
+  //     this.cdr.detectChanges();
+  //   });
+
+  //   this.loadLedgerData();
+
+  //   this.ledgerSummaryData = this.Ledger_statement_datasource;
+  //   this.dataService
+  //     .HeadId_Dropdown_api(this.selected_Company_id)
+  //     .subscribe((res: any) => {
+  //       this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
+  //       console.log(this.HEAD_ID_LIST, 'HEADLISTTTTTTTTTTTTTT');
+  //     });
+
+  //   const today = new Date();
+  //   const SystemDate =
+  //     today.getFullYear() +
+  //     '-' +
+  //     String(today.getMonth() + 1).padStart(2, '0') +
+  //     '-' +
+  //     String(today.getDate()).padStart(2, '0');
+
+  //   this.selected_from_date = SystemDate;
+  //   this.selected_To_date = SystemDate;
+  // }
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -290,17 +349,9 @@ export class LedgerStatementComponent {
     });
   }
 
-  async loadLedgerData() {
-    // this.ledgerSummaryData=this.Ledger_statement_datasource
+  loadLedgerData() {
     const sessiondata = this.getSessionData('viewclickvalue');
     const headid = this.getSessionData('HEADID');
-
-    console.log(sessiondata);
-
-    // if (!sessiondata) {
-    //   console.log('No session data found!');
-    //   return;
-    // }
 
     const payload = {
       COMPANY_ID: Number(sessiondata.companyId),
@@ -317,12 +368,10 @@ export class LedgerStatementComponent {
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
 
-    await this.dataService
-      .get_ladger_statement_api(payload)
-      .subscribe((res: any) => {
-        this.Ledger_statement_datasource = res.data || [];
-        this.ledgerSummaryData = this.Ledger_statement_datasource;
-      });
+    // use your existing datasource creator
+    this.createLedgerDataSource(payload);
+
+    this.cdr.detectChanges();
   }
 
   get_sessionstorage_data() {
@@ -420,6 +469,7 @@ export class LedgerStatementComponent {
     this.isViewCreditNote = false;
     this.isViewInvoice = false;
     this.isViewReceipt = false;
+    this.isViewProduction = false;
   }
 
   onViewClick(e: any) {

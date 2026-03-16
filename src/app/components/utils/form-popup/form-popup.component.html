@@ -8,32 +8,37 @@
   [height]="height"
   [shading]="false"
 >
-  <dxi-toolbar-item toolbar="bottom" location="center">
+  <dxi-toolbar-item toolbar="bottom" location="after">
     <div
-      class="form-popup-buttons-container"
-      [class.flex-buttons]="width <= 360"
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+        width: 100%;
+      "
     >
-      <div style="display: flex; align-items: center">
-        <!-- <div
-          style="display: flex; align-items: center"
-          *ngIf="showNetAmount && isEditMode"
-        > -->
-        <div *ngIf="showApprove" style="display: flex; align-items: center">
-          <label style="margin-right: 8px">Approve</label>
-          <dx-check-box
-            [value]="isApproved"
-            (onValueChanged)="isApprovedChange.emit($event.value)"
-          >
-          </dx-check-box>
-        </div>
+      <!-- Approve -->
+      <div
+        *ngIf="showApprove"
+        style="display: flex; align-items: center; gap: 6px"
+      >
+        <label>Approve</label>
+        <dx-check-box
+          [value]="isApproved"
+          (onValueChanged)="isApprovedChange.emit($event.value)"
+        ></dx-check-box>
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px">
+
+      <!-- Buttons -->
+      <div style="display: flex; gap: 10px">
         <dx-button
           text="Cancel"
           stylingMode="outlined"
           type="normal"
           (onClick)="close()"
         ></dx-button>
+
         <dx-button
           text="Save"
           stylingMode="contained"

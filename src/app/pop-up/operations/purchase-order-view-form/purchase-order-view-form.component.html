@@ -59,7 +59,7 @@
   [(selectedIndex)]="selectedTabIndex"
   [dataSource]="tabs"
   (onItemClick)="onTabClick($event)"
-  [elementAttr]="{ class: 'custom-tabs' }"
+  [elementAttr]="{ class: 'po-tabs' }"
   [orientation]="orientations"
   [stylingMode]="stylingMode"
 >
@@ -308,6 +308,12 @@
       width="auto"
       [allowEditing]="false"
     ></dxi-column>
+    <dxi-column
+      dataField="HSN_CODE"
+      caption="HSN Code"
+      dataType="string"
+      [allowEditing]="false"
+    ></dxi-column>
     <!-- Conditionally add local currency column -->
     <dxi-column
       *ngIf="showLocalCurrencyColumn"
@@ -321,7 +327,7 @@
     </dxi-column>
     <dxi-column
       caption="Price"
-      dataField="PURCH_PRICE"
+      dataField="SUPP_PRICE"
       width="100"
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -379,9 +385,18 @@
       width="100"
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
-    ></dxi-column>
+    >
+    </dxi-column>
     <!-- IGST -->
+
     <dxi-column
+      caption="Tax (%)"
+      dataField="VAT_PERC"
+      alignment="center"
+      width="80"
+      [allowEditing]="false"
+    ></dxi-column>
+    <!-- <dxi-column
       caption="IGST %"
       dataField="VAT_PERC"
       alignment="center"
@@ -390,7 +405,6 @@
       [allowEditing]="false"
     ></dxi-column>
 
-    <!-- CGST -->
     <dxi-column
       caption="CGST %"
       dataField="CGST"
@@ -400,7 +414,6 @@
       [allowEditing]="false"
     ></dxi-column>
 
-    <!-- SGST -->
     <dxi-column
       caption="SGST %"
       dataField="SGST"
@@ -408,7 +421,7 @@
       width="70"
       [visible]="isIntraState"
       [allowEditing]="false"
-    ></dxi-column>
+    ></dxi-column> -->
 
     <!-- <dxi-column
       caption="Tax (%)"

@@ -73,6 +73,7 @@ export class ItemsEditFormComponent implements OnInit {
   edit_Suplier: any;
   Edit_Store: any;
   selected_Company_id: any;
+  companyId: any;
 
   get buttonContainerHtml() {
     return `
@@ -207,7 +208,7 @@ export class ItemsEditFormComponent implements OnInit {
   newAlias: any;
   selectedRowKeys: number[] = [];
   checkedStoreIDs: number[] = [];
-  salePrice : any
+  salePrice: any;
 
   formItemsData: any = {
     ID: '',
@@ -344,7 +345,7 @@ export class ItemsEditFormComponent implements OnInit {
     authservice: AuthService,
     private countryFlagService: CountryServiceService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
   ) {
     this.sesstion_Details();
     this.selectedPriority = 1;
@@ -375,7 +376,6 @@ export class ItemsEditFormComponent implements OnInit {
       this.itemtype = data;
     });
     const brand = {
-    
       NAME: 'BRAND',
     };
     dataservice.getDropdownData(brand).subscribe((data) => {
@@ -392,7 +392,7 @@ export class ItemsEditFormComponent implements OnInit {
     dataservice.getDropdownData(store).subscribe((data) => {
       this.store = data;
       this.selectedStoreIds = this.itemData.item_stores.map(
-        (store) => store.ID
+        (store) => store.ID,
       );
       // console.log('Selected store IDs:', this.selectedStoreIds);
     });
@@ -479,7 +479,6 @@ export class ItemsEditFormComponent implements OnInit {
       // console.log(this.costingMethodOptions,"COSTINGMETHOD")
     });
     const packing = {
-     
       NAME: 'PACKING',
     };
     dataservice.getDropdownData(packing).subscribe((data) => {
@@ -494,8 +493,8 @@ export class ItemsEditFormComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['itemData'] && this.itemData) {
       console.log(JSON.parse(JSON.stringify(this.itemData)), 'IN NGONCHANGES');
-     
-      console.log(this.itemData.SALE_PRICE,'sale price')
+
+      console.log(this.itemData.SALE_PRICE, 'sale price');
       this.salePrice = this.itemData.SALE_PRICE;
       this.formItemsData = this.itemData;
       if (this.itemData.IMAGE_NAME) {
@@ -540,7 +539,7 @@ export class ItemsEditFormComponent implements OnInit {
       console.log(this.edit_Suplier, '][][][[][[][][][');
       if (this.itemData && this.itemData.item_stores) {
         this.selectedStoreIds = this.itemData.item_stores.map(
-          (store) => store.ID
+          (store) => store.ID,
         );
       } else {
       }
@@ -557,7 +556,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.itemData.SALE_PRICE = newPrice;
     console.log(
       this.itemData.SALE_PRICE,
-      '=================event data=========================='
+      '=================event data==========================',
     );
     this.Edit_Store.forEach((s) => (s.SALE_PRICE = newPrice));
   }
@@ -612,6 +611,10 @@ export class ItemsEditFormComponent implements OnInit {
     this.Edit_Store.forEach((s) => (s.SALE_PRICE5 = newPrice));
   }
   ngOnInit() {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.companyId = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
     const navigation = this.router.getCurrentNavigation();
     const state = navigation?.extras.state as { data: any };
     if (state?.data) {
@@ -631,31 +634,31 @@ export class ItemsEditFormComponent implements OnInit {
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
     console.log(
       this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1=============='
+      '============ITEM_PROPERTY1==============',
     );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
     console.log(
       this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2=============='
+      '============ITEM_PROPERTY2==============',
     );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
     console.log(
       this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3=============='
+      '============ITEM_PROPERTY3==============',
     );
 
     this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
     console.log(
       this.ITEM_PROPERTY4,
-      '============ITEM_PROPERTY4=============='
+      '============ITEM_PROPERTY4==============',
     );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
     console.log(
       this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5=============='
+      '============ITEM_PROPERTY5==============',
     );
 
     this.ENABLE_Matrix_Code =
@@ -690,7 +693,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.uom = data;
       console.log(this.uom, 'UOMMMMMMMMMMMMMM');
       this.filteredUOMs = this.uom.filter(
-        (option) => option.ID !== this.itemData.UNIT_ID
+        (option) => option.ID !== this.itemData.UNIT_ID,
       );
       console.log(this.filteredUOMs, 'UOMMMMMMMMMMMMMMFILTERED');
       this.filterDropdownOptions();
@@ -699,14 +702,14 @@ export class ItemsEditFormComponent implements OnInit {
 
   filteredUom() {
     this.filteredUOM = this.uom.filter(
-      (option) => option.ID !== this.itemData.UNIT_ID
+      (option) => option.ID !== this.itemData.UNIT_ID,
     );
     console.log(this.filteredUOM, 'FILTEREDUOM');
   }
 
   filterDropdownOptions() {
     this.filteredDropdownOptions = this.uom.filter(
-      (option) => option.ID !== this.selectedUom
+      (option) => option.ID !== this.selectedUom,
     );
     console.log(this.filteredDropdownOptions, 'FILTERED');
   }
@@ -844,7 +847,7 @@ export class ItemsEditFormComponent implements OnInit {
               message: 'Item updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.closeForm();
           this.dataGrid.instance.refresh();
@@ -855,14 +858,14 @@ export class ItemsEditFormComponent implements OnInit {
               message: 'Your Data Not Updated',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       },
       (error) => {
         console.error('Update failed:', error);
         // Handle the error if needed, e.g., show an error message
-      }
+      },
     );
   }
 
@@ -913,7 +916,7 @@ export class ItemsEditFormComponent implements OnInit {
         const allowedFileExtensions = component.option('allowedFileExtensions');
         const draggedFileExtension = `.${items[0].type.replace(
           /^image\//,
-          ''
+          '',
         )}`;
 
         const isSingleFileDragged = items.length === 1;
@@ -941,7 +944,7 @@ export class ItemsEditFormComponent implements OnInit {
       },
       (error) => {
         console.error('Failed to refresh items:', error);
-      }
+      },
     );
   }
 
@@ -994,7 +997,7 @@ export class ItemsEditFormComponent implements OnInit {
       (error) => {
         console.error('Error fetching items:', error);
         this.isLoading = false;
-      }
+      },
     );
   }
 
@@ -1011,7 +1014,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.selectedItemCode = selectedItem.ITEM_CODE; // Optionally capture the ITEM_CODE
       // Optionally, bind them to your form data or use them in your application
       const selectedItemDetails = this.newItemList.find(
-        (item) => item.ID === this.selectedItemId
+        (item) => item.ID === this.selectedItemId,
       );
       this.newItemList.forEach((item) => {
         item.displayValue = `${item.ITEM_CODE} - ${item.DESCRIPTION}`;
@@ -1036,10 +1039,11 @@ export class ItemsEditFormComponent implements OnInit {
 
     // Get the description for the selected item
     const selectedItem = this.newItemList.find(
-      (item) => item.ID === this.selectedItemId
+      (item) => item.ID === this.selectedItemId,
     );
     console.log(selectedItem, 'SELECTEDITEMMMMMMMMM');
     const newComponent = {
+      COMPANY_ID: this.companyId,
       COMPONENT_ITEM_ID: this.selectedItemId,
       ITEM_CODE: this.formData.ITEM_CODE,
       DESCRIPTION: this.formData.DESCRIPTION,

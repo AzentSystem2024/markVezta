@@ -163,12 +163,47 @@ export class GrnNewFormComponent implements OnInit {
   };
 
   newGrnData = this.grnData;
-  getNewGrnData = () => ({
-    ...this.newGrnData,
-    GRNDetails: this.demoArray,
+  getNewGrnData = () => {
+    // Check if there are items
+    if (!this.poDetails || this.poDetails.length === 0) {
+      notify(
+        {
+          message: 'No items available to save.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'warning',
+        2000,
+      );
+      return null;
+    }
 
-    GRN_DATE: new Date(),
-  });
+    // Validate RECEIVED_QTY
+    const invalidRow = this.poDetails.find(
+      (item: any) =>
+        item.RECEIVED_QTY === null ||
+        item.RECEIVED_QTY === undefined ||
+        item.RECEIVED_QTY === '' ||
+        Number(item.RECEIVED_QTY) <= 0,
+    );
+
+    if (invalidRow) {
+      notify(
+        {
+          message: 'Please enter Received Qty for all items before saving.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+        2000,
+      );
+      return null;
+    }
+
+    return {
+      ...this.newGrnData,
+      GRNDetails: this.demoArray,
+      GRN_DATE: new Date(),
+    };
+  };
   docNo: any;
 
   // add.component.ts
