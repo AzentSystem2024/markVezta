@@ -70,7 +70,7 @@
         <div *ngIf="supplierData">
           <div *dxTemplate style="display: flex">
             <dx-text-box
-              label=" "
+              label="Code"
               [(value)]="countryCode"
               class="country-code-input"
               [(value)]="DEFAULT_COUNTRY_CODE"
@@ -185,12 +185,12 @@
           <div *ngIf="supplierData">
             <div *dxTemplate>
               <dx-select-box
-                label="VAT Rule"
+                label="GST Rule"
                 [items]="VATRuleDropdownData"
                 displayExpr="DESCRIPTION"
                 valueExpr="ID"
                 [(value)]="supplierData.VAT_RULE_ID"
-                placeholder="Select VAT Rule"
+                placeholder="Select GST Rule"
                 labelMode="floating"
               >
                 <dx-validator>

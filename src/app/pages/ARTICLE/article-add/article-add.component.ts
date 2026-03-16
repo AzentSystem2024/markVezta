@@ -100,6 +100,7 @@ export class ArticleAddComponent {
     PACK_QTY: '',
     PART_NO: '',
     ALIAS_NO: '',
+    NEXT_SERIAL: '',
     UNIT_ID: '',
     ARTICLE_TYPE: '',
     CATEGORY_ID: '',
@@ -149,11 +150,21 @@ export class ArticleAddComponent {
     this.getLastOrderNo();
     // }
     this.getAliasNo();
+     this.getPartNo();
     this.getDropdownLists();
     this.getItems();
+    this.articleData.NEXT_SERIAL = 1;
+    // this.items = [
+    //   { ITEM: null, COLOR: '', CATEGORY_NAME: '', ARTICLE_TYPE_NAME: '' },
+    // ];
     this.items = [
-      { ITEM: null, COLOR: '', CATEGORY_NAME: '', ARTICLE_TYPE_NAME: '' },
-    ];
+  {
+    ITEM: null,
+    DESCRIPTION: '',
+    UOM: '',
+    QUANTITY: null,
+  },
+];
   }
 
   onImageSelected(event: Event) {
@@ -166,6 +177,14 @@ export class ArticleAddComponent {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+   getPartNo() {
+    this.dataService.getArticleLastPartNo().subscribe((response: any) => {
+      console.log(response);
+      this.articleData.PART_NO = response.GetPartNo;
+      console.log(this.articleData.PART_NO, 'ALIASNO');
+    });
   }
 
   openZoom() {
@@ -403,19 +422,19 @@ export class ArticleAddComponent {
     }
   }
 
-  onGridInitialized(e: any) {
-    const grid = e.component;
-    const store = grid.getDataSource().store();
+  // onGridInitialized(e: any) {
+  //   const grid = e.component;
+  //   const store = grid.getDataSource().store();
 
-    // Remove empty row at start if present
-    setTimeout(() => {
-      const rows = grid.getVisibleRows();
-      if (rows.length === 1 && !rows[0].data.ITEM && !rows[0].data.QUANTITY) {
-        store.remove(rows[0].key);
-        grid.refresh();
-      }
-    });
-  }
+  //   // Remove empty row at start if present
+  //   setTimeout(() => {
+  //     const rows = grid.getVisibleRows();
+  //     if (rows.length === 1 && !rows[0].data.ITEM && !rows[0].data.QUANTITY) {
+  //       store.remove(rows[0].key);
+  //       grid.refresh();
+  //     }
+  //   });
+  // }
 
   onInitNewRow(e: any) {
     const grid = e.component;
@@ -1102,11 +1121,22 @@ export class ArticleAddComponent {
     this.selectedComponentArtNo = '';
     this.selectedAttachRow = null;
     this.selectedAttachRowKeys = [];
+    this.articleData.NEXT_SERIAL = 1;
     //RESET BOM DATA
-    this.items = []; // clears grid datasource
+    // this.items = []; // clears grid datasource
+    this.items = [
+  {
+    ITEM: null,
+    DESCRIPTION: '',
+    UOM: '',
+    QUANTITY: null,
+  },
+];
+
     this.selectedSizeRowData = []; // clears size-based BOM input
 
     this.getAliasNo();
+     this.getPartNo();
     // if (this.itemsGridRef?.instance) {
     //   this.itemsGridRef.instance.option('dataSource', []);
     // }
