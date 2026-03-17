@@ -71,6 +71,7 @@ export class PackingAddComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
+   @ViewChild('bomGridRef', { static: false }) bomGridRef: any;
   popupVisible = false;
   articleData: any;
   colorList: any;
@@ -134,6 +135,10 @@ export class PackingAddComponent {
   selected_Company_id: any;
   selected_fin_id: any;
   selectedItemID: any;
+  selectedItem: any;
+  ItempopupVisible : boolean = false;
+  selectedItems: any[] = [];
+  ItemListDataSource:any[]=[];
 
   //===================dummy datasource of =========================
   constructor(private dataService: DataService) {
@@ -153,6 +158,15 @@ export class PackingAddComponent {
     this.getItems();
     this.getPackingList();
     this.PackingData.ART_SERIAL = 1;
+
+    this.items = [
+  {
+    ITEM: null,
+    DESCRIPTION: '',
+    UOM: '',
+    QUANTITY: null,
+  },
+];
   }
   getPackingList() {
     this.dataService.get_packages_list_api().subscribe((res: any) => {
@@ -179,31 +193,7 @@ export class PackingAddComponent {
     });
   }
 
-  addNewRow() {
-    const grid = this.itemsGridRef.instance; // reference to your dx-data-grid
-    const rows = grid.getVisibleRows();
-
-    // Check if any existing row is incomplete
-    const hasIncompleteRow = rows.some(
-      (r: any) => !r.data.ITEM || !r.data.QUANTITY,
-    );
-
-    if (hasIncompleteRow) {
-      // Optionally, show a message
-      return; // Stop adding new row
-    }
-
-    // Add new row at the bottom
-    this.items.push({ ITEM: null, DESCRIPTION: '', UOM: '', QUANTITY: null });
-
-    setTimeout(() => {
-      const updatedRows = grid.getVisibleRows();
-      const newRowIndex = updatedRows.length - 1;
-      if (newRowIndex >= 0) {
-        grid.editCell(newRowIndex, 'ITEM'); // Focus ITEM of new row
-      }
-    }, 100);
-  }
+ 
 
   getDropdownLists() {
     const payload = {
@@ -925,7 +915,7 @@ if (mrp <= stdPrice) {
     const packingEntriesPayload = (this.articleSizeData || []).map((item) => ({
       ARTICLE_ID: Number(item.ArticleID),
       SIZE: String(item.Size),
-      QUANTITY: Number(item.QUANTITY) || 0, // 👈 force 0 if empty
+      QUANTITY: Number(item.QUANTITY) || 0, //  force 0 if empty
     }));
 
     console.log('PackingEntries Payload:', packingEntriesPayload);
@@ -1214,14 +1204,21 @@ if (mrp <= stdPrice) {
     this.PackingData.IS_ANY_COMB = false;
     this.PackingData.SUPP_ID = null;
 
-    // ✅ NOW assign defaults (AFTER validation reset)
+    //  NOW assign defaults (AFTER validation reset)
     this.PackingData.STD_PRICE_EFFECT_FROM = new Date();
 
     setTimeout(() => {
       this.PackingData.STD_PRICE = 0;
     });
-    this.items = [];
-
+    
+this.items = [
+  {
+    ITEM: null,
+    DESCRIPTION: '',
+    UOM: '',
+    QUANTITY: null,
+  },
+];
     this.isArticleFieldsDisabled = false;
     this.articleSizeData = [];
     this.combination_value = [];
@@ -1338,6 +1335,105 @@ if (mrp <= stdPrice) {
 
     this.PackingData.ITEM_DESCRIPTION = parts.join('-');
   }
+
+ addNewRow() {
+
+  this.dataService.getItemsListForArticle().subscribe((res: any) => {
+      console.log(res);
+      console.log(
+        'PrePaymentListDataSource=============================:',
+        res.DataList,
+      );
+      this.ItemListDataSource = res.DataList;
+      this.ItempopupVisible = true; // Open popup
+    });
+  setTimeout(() => {
+
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
+
+    const rows = grid.getVisibleRows();
+
+    const hasIncompleteRow = rows.some(
+      (r: any) => !r.data?.ITEM || !r.data?.QUANTITY
+    );
+
+    if (hasIncompleteRow) {
+      return;
+    }
+
+    this.items.push({
+      ITEM: null,
+      DESCRIPTION: '',
+      UOM: '',
+      QUANTITY: null
+    });
+
+    setTimeout(() => {
+      const updatedRows = grid.getVisibleRows();
+      const newRowIndex = updatedRows.length - 1;
+
+      if (newRowIndex >= 0) {
+        grid.editCell(newRowIndex, 'ITEM');
+      }
+    }, 100);
+
+  }, 200);
+}
+
+onItemSelect(e: any) {
+
+  const selectedItem = e.data;
+
+  console.log("Selected Item:", selectedItem);
+
+  // Example: store selected item
+  this.selectedItem = selectedItem;
+
+  // Close popup after selection
+  this.ItempopupVisible = false;
+}
+
+saveSelectedItems() {
+
+  const popupGrid = this.bomGridRef.instance;   // popup grid
+
+  const selectedRows = popupGrid.getSelectedRowsData();
+
+  if (!selectedRows.length) {
+    return;
+  }
+
+  //  Remove empty row if exists
+  this.items = this.items.filter(
+    row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
+  );
+
+  selectedRows.forEach((item: any) => {
+
+    const exists = this.items.some(
+      x => x.ITEM === item.ITEM_CODE
+    );
+
+    if (!exists) {
+      this.items.push({
+        ITEM: item.ITEM_CODE,
+        DESCRIPTION: item.DESCRIPTION,
+        UOM: item.UOM,
+        QUANTITY: null,
+        ITEM_ID: item.ID
+      });
+    }
+
+  });
+
+  // refresh BOM grid
+  this.itemsGridRef.instance.refresh();
+
+  this.ItempopupVisible = false;
+
+}
+
 }
 
 @NgModule({

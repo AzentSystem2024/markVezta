@@ -52,20 +52,20 @@ import CountryList from 'country-list-with-dial-code-and-flag';
 @Component({
   selector: 'app-user-edit-form',
   templateUrl: './user-edit-form.component.html',
-  styleUrls: ['./user-edit-form.component.scss']
+  styleUrls: ['./user-edit-form.component.scss'],
 })
 export class UserEditFormComponent {
   @ViewChild('fileUploader', { static: false })
   fileUploader!: DxFileUploaderComponent; // Update the type here
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('currencySelectBox') currencySelectBox: ElementRef;
-@Input() selectedRowData: any;
-@Output() closeForm = new EventEmitter<void>();
+  @Input() selectedRowData: any;
+  @Output() closeForm = new EventEmitter<void>();
 
-    @Input() formdata: any;
+  @Input() formdata: any;
 
   userData: any = {
-    ID : '',
+    ID: '',
     UserName: '',
     Password: '',
     DateofBirth: '',
@@ -80,15 +80,15 @@ export class UserEditFormComponent {
     InactiveReason: '',
     changePasswordOnLogin: false,
     CompanyList: [],
-    Date_Format:'',
-    Time_Format:'',
+    Date_Format: '',
+    Time_Format: '',
     // Decimal_Points:'',
     // Currency_Symbol:'',
   };
-  newUserData :any={}
+  newUserData: any = {};
   // newUserData :any;
 
-   CompanyList: any[] ;
+  CompanyList: any[];
   selectedRows: any[] = [];
   userForm: FormGroup;
   images: string[] = [];
@@ -101,13 +101,13 @@ export class UserEditFormComponent {
   securityPolicyData: any;
   countryCodes: any[] = [];
 
-passwordMode: 'password' | 'text' = 'password';
-    togglePasswordVisibility = () => {
+  passwordMode: 'password' | 'text' = 'password';
+  togglePasswordVisibility = () => {
     this.passwordMode = this.passwordMode === 'password' ? 'text' : 'password';
-     this.cdr.detectChanges(); // Ensure the UI reflects the change immediately
+    this.cdr.detectChanges(); // Ensure the UI reflects the change immediately
   };
 
-   isEditPopupOpened: boolean = false;
+  isEditPopupOpened: boolean = false;
   isDropZoneActive = false;
   imageSource = '';
   textVisible = true;
@@ -122,8 +122,6 @@ passwordMode: 'password' | 'text' = 'password';
   selectedRowCount: number = 0;
   totalRowCount: number = 0;
   userList: any;
- 
-
 
   // Radio button options
   userTypes = ['Normal User', 'Clinician'];
@@ -141,7 +139,7 @@ passwordMode: 'password' | 'text' = 'password';
   selectedDropdownOption: string;
   //thousandseparator
   thousandSeparatorValue: number;
-  decimal:number;
+  decimal: number;
 
   public isDropdownOpen: boolean = false;
   dateFormat: any;
@@ -149,69 +147,75 @@ passwordMode: 'password' | 'text' = 'password';
   currencySymbol: any;
   exampleDateFormat: any;
   exampleTimeFormat: any;
-  CompanyList_data:any={}
-CompanyData:any
-countryCode:any
-   getEditUserData = () => ({ ...this.newUserData });
+  CompanyList_data: any = {};
+  CompanyData: any;
+  countryCode: any;
+  // Use this function to display based on dropdown state
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
+  }
+  getEditUserData = () => ({ ...this.newUserData });
   user_name_value: any;
   phonenumber: string;
   phoneNoCode: string;
 
-constructor(private fb: FormBuilder, private dataservice: DataService,private cdr: ChangeDetectorRef) {
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef,
+  ) {
+    this.dataservice.getCountryWithFlags().subscribe((data) => {
+      this.countryCodes = data;
+      console.log(this.countryCodes, 'COUNTRY;;;;;;;;;;');
+    });
+  }
 
+  get_userlist() {
+    this.dataservice.get_User_data().subscribe((res: any) => {
+      console.log(res);
+    });
+  }
 
-}
-
-get_userlist(){
-  this.dataservice.get_User_data().subscribe((res:any)=>{
-    console.log(res);
-    
-  })
-}
-
-ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedRowData'] && changes['selectedRowData'].currentValue) {
       console.log(
         'Received selectedRowData:',
-        changes['selectedRowData'].currentValue
+        changes['selectedRowData'].currentValue,
       );
       this.newUserData = {
         ...this.selectedRowData,
         ...changes['selectedRowData'].currentValue,
       };
     }
-    console.log(this.newUserData ,'DATA');
-    this.user_role_dropdown()
-    this.getCountryCodeList()
-this.get_Company_details()
-this.updateMobileNumber()
+    console.log(this.newUserData, 'DATA');
+    this.user_role_dropdown();
+    this.get_Company_details();
+    this.updateMobileNumber();
+  }
 
-}
+  Closepop() {
+    this.isEditPopupOpened = false;
+    this.closeForm.emit(); // Emit the close event to parent component
+  }
+  get_Company_details() {
+    this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
+      console.log(res);
+      this.CompanyList_data = res.Data;
+      console.log(this.CompanyList_data);
 
-Closepop(){
-  this.isEditPopupOpened = false;
-  this.closeForm.emit(); // Emit the close event to parent component
+      const company_id = this.newUserData.COMPANY_ID;
+      this.CompanyData = this.CompanyList_data.filter((item) =>
+        company_id.includes(item.ID),
+      );
 
-
-}
-get_Company_details(){
-
-  this.dataservice.get_CompanyList_Api().subscribe((res:any)=>{
-    console.log(res);
-    this.CompanyList_data=res.Data
-    console.log(this.CompanyList_data);
-
-    const company_id=this.newUserData.COMPANY_ID
-    this.CompanyData = this.CompanyList_data.filter(item => company_id.includes(item.ID));
-    
-    console.log(this.CompanyData);
+      console.log(this.CompanyData);
       this.selectedRows = company_id; // This will auto-check rows in the grid
 
-    console.log('Preselected Companies:', this.selectedRows);
-    
-  })
-}
-  onTimeFormatChange(event:any){
+      console.log('Preselected Companies:', this.selectedRows);
+    });
+  }
+  onTimeFormatChange(event: any) {
     // const selectedTimeFormat = this.timeFormat.find(format => format.DESCRIPTION === event.value)?.DESCRIPTION;
     // if(selectedTimeFormat){
     //   this.newUserData.Time_Format = event.value;
@@ -222,32 +226,31 @@ get_Company_details(){
   }
 
   onSelectionChanged(e: any) {
-  this.selectedRows = e.selectedRowKeys;
-  console.log('User selected:', this.selectedRows);
-}
-
-  user_role_dropdown(){
-
-    this.dataservice.get_userLevels_Dropdown_Api().subscribe((res:any)=>{
-      console.log(res,'==========datedrp=======');
-      this.userRole=res
-      
-    })
+    this.selectedRows = e.selectedRowKeys;
+    console.log('User selected:', this.selectedRows);
   }
-  
 
-   onLoginExpiryDateChange(event: any) {
+  user_role_dropdown() {
+    this.dataservice.get_userLevels_Dropdown_Api().subscribe((res: any) => {
+      console.log(res, '==========datedrp=======');
+      this.userRole = res;
+    });
+  }
+
+  onLoginExpiryDateChange(event: any) {
     this.newUserData.LoginExpiryDate = event.value; // Update the model with the selected date
   }
- onLockDateToChange(event: any) {
+  onLockDateToChange(event: any) {
     this.newUserData.LockDateTo = event.value; // Update the model with the selected date
   }
   onLockDateFromChange(event: any) {
     this.newUserData.LockDateFrom = event.value; // Update the model with the selected date
   }
-    onDateFormatChange(event: any): void {
+  onDateFormatChange(event: any): void {
     // Directly set the value from the event
-    const selectedFormat = this.dateFormat.find(format => format.DESCRIPTION === event.value)?.DESCRIPTION;
+    const selectedFormat = this.dateFormat.find(
+      (format) => format.DESCRIPTION === event.value,
+    )?.DESCRIPTION;
     if (selectedFormat) {
       this.newUserData.Date_Format = event.value; // Ensure the correct value is set
       this.exampleDateFormat = this.getFormattedDate(selectedFormat); // Generate the example format
@@ -256,22 +259,18 @@ get_Company_details(){
     }
   }
 
-
-
-  selected_Data(){
-    this.user_name_value=this.newUserData.USER_NAME
+  selected_Data() {
+    this.user_name_value = this.newUserData.USER_NAME;
     console.log(this.user_name_value);
-    
   }
 
-
-    // Method to handle tab click and set selected index
+  // Method to handle tab click and set selected index
   // onTabClick(event: any) {
   //   console.log(event);
   //   this.selectedIndex = event.itemIndex;
   // }
 
-    WhatsappValidate = (e: any): boolean => {
+  WhatsappValidate = (e: any): boolean => {
     const whatsappNumber = e.value;
 
     // Remove all non-digit characters
@@ -284,20 +283,20 @@ get_Company_details(){
     return false; // Invalid
   };
 
-    autoBindWhatsapp() {
+  autoBindWhatsapp() {
     console.log('WhatsApp field focused.');
     setTimeout(() => {
       if (!this.newUserData.Whatsapp && this.newUserData.Mobile) {
         console.log(
           'Populating WhatsApp with Mobile:',
-          this.newUserData.Mobile
+          this.newUserData.Mobile,
         );
         this.newUserData.Whatsapp = this.newUserData.Mobile;
       }
     }, 0);
   }
 
-   validateWhatsapp(event: any) {
+  validateWhatsapp(event: any) {
     const target = event.target as HTMLInputElement;
 
     // Allow only input that starts with '+' and contains only digits
@@ -314,9 +313,9 @@ get_Company_details(){
     this.newUserData.Whatsapp = target.value;
   }
 
-   getFormattedDate(format: string): string {
+  getFormattedDate(format: string): string {
     const currentDate = new Date();
-  
+
     // Replace placeholders in the selected format with actual date values
     return format
       .replace('YYYY', currentDate.getFullYear().toString())
@@ -328,17 +327,14 @@ get_Company_details(){
       .replace('Month', currentDate.toLocaleString('en-US', { month: 'long' }))
       .replace('Day', currentDate.toLocaleString('en-US', { weekday: 'long' }));
   }
-  
 
-   preventTyping(event: any): void {
+  preventTyping(event: any): void {
     if (event.event) {
       event.event.preventDefault(); // Prevent keypress
     }
   }
 
-
-
-    handleFileInputChange(event: Event) {
+  handleFileInputChange(event: Event) {
     const input = event.target as HTMLInputElement;
     // if (input.files && input.files[0]) {
     //   const file = input.files[0];
@@ -347,7 +343,7 @@ get_Company_details(){
     // }
   }
 
-   handleDrop(event: DragEvent) {
+  handleDrop(event: DragEvent) {
     // this.preventDefaults(event);
     // if (event.dataTransfer && event.dataTransfer.files) {
     //   const file = event.dataTransfer.files[0];
@@ -355,23 +351,23 @@ get_Company_details(){
     // }
   }
 
-    handleDragLeave(e: Event) {
+  handleDragLeave(e: Event) {
     // this.preventDefaults(e);
     // (e.target as HTMLElement).classList.remove('highlight');
   }
 
-   preventDefaults(e: Event) {
+  preventDefaults(e: Event) {
     e.preventDefault();
     e.stopPropagation();
   }
 
-   // This function checks if the email already exists in the user list
+  // This function checks if the email already exists in the user list
   checkEmailExists = (e: any): boolean => {
     const email = e.value;
 
     // Check if the email already exists in the user list
     const exists = this.userList.some(
-      (user) => user.Email.toLowerCase() === email.toLowerCase()
+      (user) => user.Email.toLowerCase() === email.toLowerCase(),
     );
 
     // Return true if it does NOT exist, false if it DOES exist
@@ -394,7 +390,7 @@ get_Company_details(){
     return e.valid;
   };
 
-   // This function removes spaces from the email input and updates the Email property
+  // This function removes spaces from the email input and updates the Email property
   onEmailInput(event: Event): void {
     const target = event.target as HTMLInputElement;
 
@@ -407,11 +403,11 @@ get_Company_details(){
     this.checkEmailExists({ value: sanitizedValue });
   }
 
-   onDateOfBirthChange(event: any) {
+  onDateOfBirthChange(event: any) {
     this.newUserData.DateofBirth = event.value; // Update the model with the selected date
   }
 
-    checkLoginNameExists = (e: any): boolean => {
+  checkLoginNameExists = (e: any): boolean => {
     const loginName = e.value;
     const exists = this.userList.some((user) => user.LoginName === loginName);
 
@@ -443,7 +439,6 @@ get_Company_details(){
     }
   }
 
-  
   MobileNumberValidate = (e: any): boolean => {
     const mobileNumber = e.value;
 
@@ -457,93 +452,41 @@ get_Company_details(){
     return false; // Invalid
   };
 
-    getCountryCodeList() {
-    const codes = CountryList.getAll(); // Get all country codes
-    this.countryCodes = codes.map((country: any) => ({
-      data: country.data,
-    }));
-    console.log(this.countryCodes, 'country code'); 
-    
-    const fullMobile = this.newUserData.MOBILE || '';
-    this.countryCode = fullMobile.split(' ')[0]; // Gets "+93"
-// Optional: For debugging
+  onMobileInputChange(event: any) {
+    const input = event.target.value || '';
+
+    if (!this.phoneNoCode) return;
+
+    // Remove code if user tries to delete or change it
+    const numberOnly = input.replace(/^\+\d+\s*/, '');
+
+    // Reapply correct format
+    this.phonenumber = `${this.phoneNoCode.trim()}`;
+    console.log(this.phonenumber);
+    console.log(this.newUserData.MOBILE);
   }
 
-  //   onMobileInputChange(event: any) {
-  //   const target = event.target as HTMLInputElement;
-
-  //   // Get the input value and allow only '+' at the start and digits after that
-  //   let newValue = target.value.replace(/[^0-9+]/g, '');
-
-  //   // Ensure the input starts with '+' and not '0'
-  //   if (!newValue.startsWith('+')) {
-  //     newValue = '+' + newValue;
-  //   }
-
-  //   // Remove any leading '0' after '+'
-  //   newValue = newValue.replace(/\+0/g, '+');
-
-  //   // Set the cleaned value back to the input
-  //   target.value = newValue;
-
-  //   // Find the selected country code
-  //   const selectedCountry = this.countryCodes.find(
-  //     (code) => code.data.dial_code === this.newUserData.countryCode
-  //   );
-
-  //   if (selectedCountry) {
-  //     const dialCode = selectedCountry.data.dial_code;
-
-  //     // If the user tries to backspace to remove the dial code, reset the input
-  //     if (!newValue.startsWith(dialCode)) {
-  //       this.newUserData.Mobile = dialCode; // Reset mobile number to only show dial code
-  //       return;
-  //     }
-
-  //     // Extract the mobile number part
-  //     const mobileNumberPart = newValue.replace(dialCode, '').trim();
-  //     const validMobileNumber = this.validateMobileNumber(mobileNumberPart);
-
-  //     // Update the mobile field, keeping the dial code intact
-  //     this.newUserData.Mobile = `${dialCode} ${validMobileNumber}`;
-  //   }
-  // }
-onMobileInputChange(event: any) {
-  const input = event.target.value || '';
- 
-
-  if (!this.phoneNoCode) return;
-
-  // Remove code if user tries to delete or change it
-  const numberOnly = input.replace(/^\+\d+\s*/, '');
-
-  // Reapply correct format
-  this.phonenumber = `${this.phoneNoCode.trim()}`;
-  console.log(this.phonenumber);
-console.log(this.newUserData.MOBILE);
-}
-
-    validateMobileNumber(mobileNumber: string): string {
+  validateMobileNumber(mobileNumber: string): string {
     // Remove any non-digit characters
     const digitsOnly = mobileNumber.replace(/\D/g, '');
     // Ensure the number does not start with zero and return valid number or empty string if invalid
     return digitsOnly.startsWith('0') ? '' : digitsOnly;
   }
 
-   // Triggered when the dropdown is opened
+  // Triggered when the dropdown is opened
   onDropdownOpened() {
     this.isDropdownOpen = true; // Mark dropdown as open
   }
-    // Triggered when the dropdown is closed
+  // Triggered when the dropdown is closed
   onDropdownClosed() {
     this.isDropdownOpen = false; // Mark dropdown as closed
   }
 
-   refreshPassword(): void {
+  refreshPassword(): void {
     this.generatedPassword = this.generateRandomPassword(); // Call your existing method to generate a random password
   }
 
-    generateRandomPassword(): string {
+  generateRandomPassword(): string {
     // Fetch the minimum length from security policy; default to 8 if not provided
     const minLength = Math.max(this.securityPolicyData.MinimumLength || 8, 8); // Ensure a minimum length of at least 8
 
@@ -568,32 +511,32 @@ console.log(this.newUserData.MOBILE);
     if (this.securityPolicyData.Numbers) {
       characters.push(numbers);
       requiredCharacters.push(
-        numbers.charAt(Math.floor(Math.random() * numbers.length))
+        numbers.charAt(Math.floor(Math.random() * numbers.length)),
       );
     }
     if (this.securityPolicyData.UppercaseCharacters) {
       characters.push(upperCase);
       requiredCharacters.push(
-        upperCase.charAt(Math.floor(Math.random() * upperCase.length))
+        upperCase.charAt(Math.floor(Math.random() * upperCase.length)),
       );
     }
     if (this.securityPolicyData.LowercaseCharacters) {
       characters.push(lowerCase);
       requiredCharacters.push(
-        lowerCase.charAt(Math.floor(Math.random() * lowerCase.length))
+        lowerCase.charAt(Math.floor(Math.random() * lowerCase.length)),
       );
     }
     if (this.securityPolicyData.SpecialCharacters) {
       characters.push(specialChars);
       requiredCharacters.push(
-        specialChars.charAt(Math.floor(Math.random() * specialChars.length))
+        specialChars.charAt(Math.floor(Math.random() * specialChars.length)),
       );
     }
 
     // Ensure there are character sets to choose from
     if (characters.length === 0) {
       throw new Error(
-        'No character sets selected based on the security policy.'
+        'No character sets selected based on the security policy.',
       );
     }
 
@@ -618,8 +561,7 @@ console.log(this.newUserData.MOBILE);
     return password;
   }
 
-
-    onUserNameInput(event: Event): void {
+  onUserNameInput(event: Event): void {
     const target = event.target as HTMLInputElement;
 
     // Regular expression to allow only alphabets with a single space between words
@@ -633,15 +575,13 @@ console.log(this.newUserData.MOBILE);
     this.newUserData.UserName = sanitizedValue; // Update the UserName value
   }
 
-    toggleUserDetails(): void {
+  toggleUserDetails(): void {
     this.showUserDetails = !this.showUserDetails;
   }
-
 
   // updateMobileNumber() {
   //   // Find the selected country code
 
-    
   //   console.log('=======country change function call.............')
   //   const selectedCountry = this.countryCodes.find(
   //     (code) => code.data.dial_code === this.newUserData.countryCode
@@ -660,27 +600,24 @@ console.log(this.newUserData.MOBILE);
   //     console.log('Updated Mobile:', this.newUserData.MOBILE); // For debugging
   //   }
   // }
-updateMobileNumber() {
-  const code = this.countryCode; // E.g., "+91"
-  // const existingNumber = this.newUserData.MOBILE || '';
+  updateMobileNumber() {
+    const code = this.countryCode; // E.g., "+91"
+    // const existingNumber = this.newUserData.MOBILE || '';
 
-  // Remove existing dial code (before space)
-  // const numberOnly = existingNumber.includes(' ')
-  //   ? existingNumber.split(' ').slice(1).join(' ')
-  //   : existingNumber;
+    // Remove existing dial code (before space)
+    // const numberOnly = existingNumber.includes(' ')
+    //   ? existingNumber.split(' ').slice(1).join(' ')
+    //   : existingNumber;
 
-  // // Update with new country code
-  //  this.phoneNoCode= `${code} `;
-  //  console.log(this.phoneNoCode,'===========code========');
-   
-  
-   
-}
+    // // Update with new country code
+    //  this.phoneNoCode= `${code} `;
+    //  console.log(this.phoneNoCode,'===========code========');
+  }
 
-    getOnlyMobileNumber(fullPhoneNumber: string): string {
+  getOnlyMobileNumber(fullPhoneNumber: string): string {
     // Extract mobile number by removing the dial code part
     const selectedCountry = this.countryCodes.find((code) =>
-      fullPhoneNumber.startsWith(code.data.dial_code)
+      fullPhoneNumber.startsWith(code.data.dial_code),
     );
 
     if (selectedCountry) {
@@ -690,7 +627,7 @@ updateMobileNumber() {
     return fullPhoneNumber; // Return as is if no match found
   }
 
-    // Use this function to display based on dropdown state
+  // Use this function to display based on dropdown state
   countryCodeDisplay = (item: any) => {
     return item
       ? this.isDropdownOpen
@@ -699,10 +636,10 @@ updateMobileNumber() {
       : ''; // Display only country flag before dropdown is opened
   };
 
-   copyToClipboard(): void {
+  copyToClipboard(): void {
     if (!navigator.clipboard) {
       console.warn(
-        'Clipboard API not available. Make sure you are running the application over HTTPS.'
+        'Clipboard API not available. Make sure you are running the application over HTTPS.',
       );
       // Optionally show a user-friendly message or fallback logic
       this.tooltipVisible = false;
@@ -721,27 +658,21 @@ updateMobileNumber() {
       });
   }
 
+  Update_data() {
+    console.log('Update button clicked');
 
-  Update_data(){
-
-    console.log("Update button clicked")
-
-
-    const payload={
+    const payload = {
       ...this.newUserData,
-      COMPANY_ID:this.selectedRows,
-    }
-    console.log(payload)
+      COMPANY_ID: this.selectedRows,
+    };
+    console.log(payload);
 
-    this.dataservice.Update_user_data(payload).subscribe((res:any)=>{
-      console.log(res)
-        this.isEditPopupOpened=false
-        this.closeForm.emit(); 
-        this.get_userlist()
-        
-    })
-  
-    
+    this.dataservice.Update_user_data(payload).subscribe((res: any) => {
+      console.log(res);
+      this.isEditPopupOpened = false;
+      this.closeForm.emit();
+      this.get_userlist();
+    });
   }
 }
 
@@ -769,7 +700,7 @@ updateMobileNumber() {
     DxValidationGroupModule,
     DxNumberBoxModule,
     DxDropDownBoxModule,
-    DxListModule
+    DxListModule,
   ],
   providers: [],
   declarations: [UserEditFormComponent],

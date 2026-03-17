@@ -59,6 +59,7 @@ export class ArticleEditComponent {
   @Input() articleData: any;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+   @ViewChild('bomGridRef', { static: false }) bomGridRef: any;
   popupVisible = false;
   imagePreview: string | ArrayBuffer | null = null;
   produCtionUnits: any;
@@ -107,6 +108,10 @@ export class ArticleEditComponent {
   selected_Company_id: any;
   ItemCode: any;
   isSaving = false;
+  ItempopupVisible: boolean = false;
+  selectedItem: any;
+  selectedItems: any[] = [];
+  ItemListDataSource:any[] = [];
 
   constructor(private dataService: DataService) {}
 
@@ -772,6 +777,18 @@ export class ArticleEditComponent {
       }));
 
     console.log('BOM Data:', bomGridData);
+
+    //  BOM Validation
+if (!bomGridData.length) {
+  notify({
+    message: 'Please enter BOM.',
+    type: 'warning',
+    displayTime: 3000,
+    position: { at: 'top right', my: 'top right' },
+  });
+  return;
+}
+
     // Step 2: Prepare the full payload
     const payload = {
       ID: this.articleData.ID || 0,
@@ -886,31 +903,7 @@ export class ArticleEditComponent {
     });
   }
 
-  addNewRow() {
-    const grid = this.itemsGridRef.instance; // reference to your dx-data-grid
-    const rows = grid.getVisibleRows();
-
-    // Check if any existing row is incomplete
-    const hasIncompleteRow = rows.some(
-      (r: any) => !r.data.ITEM || !r.data.QUANTITY,
-    );
-
-    if (hasIncompleteRow) {
-      // Optionally, show a message
-      return; // Stop adding new row
-    }
-
-    // Add new row at the bottom
-    this.items.push({ ITEM: null, DESCRIPTION: '', UOM: '', QUANTITY: null });
-
-    setTimeout(() => {
-      const updatedRows = grid.getVisibleRows();
-      const newRowIndex = updatedRows.length - 1;
-      if (newRowIndex >= 0) {
-        grid.editCell(newRowIndex, 'ITEM'); // Focus ITEM of new row
-      }
-    }, 100);
-  }
+ 
   onSupplierChanged(e: any) {
     const selected = this.materialUnits.find((s: any) => s.ID === e.value);
     this.articleData.SupplierName = selected ? selected.DESCRIPTION : '';
@@ -963,6 +956,106 @@ export class ArticleEditComponent {
 
   this.articleData.DESCRIPTION = parts.join('-');
 }
+
+addNewRow() {
+
+  this.dataService.getItemsListForArticle().subscribe((res: any) => {
+      console.log(res);
+      console.log(
+        'PrePaymentListDataSource=============================:',
+        res.DataList,
+      );
+      this.ItemListDataSource = res.DataList;
+      this.ItempopupVisible = true; // Open popup
+    });
+  setTimeout(() => {
+
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
+
+    const rows = grid.getVisibleRows();
+
+    const hasIncompleteRow = rows.some(
+      (r: any) => !r.data?.ITEM || !r.data?.QUANTITY
+    );
+
+    if (hasIncompleteRow) {
+      return;
+    }
+
+    this.items.push({
+      ITEM: null,
+      DESCRIPTION: '',
+      UOM: '',
+      QUANTITY: null
+    });
+
+    setTimeout(() => {
+      const updatedRows = grid.getVisibleRows();
+      const newRowIndex = updatedRows.length - 1;
+
+      if (newRowIndex >= 0) {
+        grid.editCell(newRowIndex, 'ITEM');
+      }
+    }, 100);
+
+  }, 200);
+}
+
+
+onItemSelect(e: any) {
+
+  const selectedItem = e.data;
+
+  console.log("Selected Item:", selectedItem);
+
+  // Example: store selected item
+  this.selectedItem = selectedItem;
+
+  // Close popup after selection
+  this.ItempopupVisible = false;
+}
+
+saveSelectedItems() {
+
+  const popupGrid = this.bomGridRef.instance;   // popup grid
+
+  const selectedRows = popupGrid.getSelectedRowsData();
+
+  if (!selectedRows.length) {
+    return;
+  }
+
+  //  Remove empty row if exists
+  this.items = this.items.filter(
+    row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
+  );
+
+  selectedRows.forEach((item: any) => {
+
+    const exists = this.items.some(
+      x => x.ITEM === item.ITEM_CODE
+    );
+
+    if (!exists) {
+      this.items.push({
+        ITEM: item.ITEM_CODE,
+        DESCRIPTION: item.DESCRIPTION,
+        UOM: item.UOM,
+        QUANTITY: null,
+        ITEM_ID: item.ID
+      });
+    }
+
+  });
+
+  // refresh BOM grid
+  this.itemsGridRef.instance.refresh();
+
+  this.ItempopupVisible = false;
+
+}
+
 }
 
 @NgModule({

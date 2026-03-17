@@ -74,13 +74,13 @@
 
           <div style="display: flex">
             <dx-select-box
-              label="Mobile *"
+              label="Country Code *"
               [searchEnabled]="true"
               [acceptCustomValue]="false"
               [(value)]="countryCode"
               [items]="countryCodes"
-              [displayExpr]="countryCodeDisplay"
-              valueExpr="data.dial_code"
+              valueExpr="CODE"
+              [displayExpr]="countryDisplay"
               [width]="200"
               placeholder="+1"
               labelMode="floating"
@@ -91,10 +91,13 @@
               (onClosed)="onDropdownClosed()"
             >
               <!-- Custom template for the dropdown list items -->
-              <div *dxTemplate="let item of 'item'">
-                <span>{{ item.data.flag }} </span>
-                <span>{{ item.data.dial_code }} </span>
-                <span>{{ item.data.name }}</span>
+              <div *dxTemplate="let data of 'item'">
+                <img
+                  [src]="data.FLAG_URL"
+                  width="20"
+                  style="margin-right: 8px"
+                />
+                {{ data.CODE }} {{ data.COUNTRY_NAME }}
               </div>
 
               <dx-validator>
@@ -106,7 +109,7 @@
             </dx-select-box>
 
             <dx-text-box
-              label="No. *"
+              label=" Mobile No. *"
               [(value)]="newUserData.MOBILE"
               labelMode="floating"
               [width]="'100%'"
