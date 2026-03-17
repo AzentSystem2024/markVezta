@@ -108,33 +108,43 @@ export class CustomerFormComponent {
   deliveryAddress1: any;
   deliveryAddress2: any;
   deliveryAddress3: any;
-
-  //   countryCodeMap: { [key: string]: string } = {
-  //   India: '+91',
-  //   'United States': '+1',
-  //   'United Kingdom': '+44',
-  //   Canada: '+1',
-  //   Australia: '+61',
-  //   Germany: '+49',
-  //   France: '+33',
-  //   Singapore: '+65',
-
-  //   // add as many as needed
-  // };
-
-  constructor(private service: DataService, authservice: AuthService) {
-    this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
-    console.log(
-      this.countryCode,
-      '===========================country Code============'
-    );
+  mobileNumber: any;
+  PhonenumberCode: any;
+  countryCodes: any;
+  mobile_limit: any;
+  MobilecountryCode: any;
+  constructor(
+    private service: DataService,
+    authservice: AuthService,
+  ) {
     this.sesstion_Details();
     this.sessionData_tax();
     service.getCountryWithFlags().subscribe((data) => {
-      this.CountryDropdownData = data;
-      console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
+      this.countryCodes = data;
+      console.log(this.countryCodes, 'COUNTRY;;;;;;;;;;');
     });
     this.getStateDropDown();
+  }
+  onCountrycodeChange(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      console.log(res);
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
+  }
+
+  onCountrycodeChangePhoneNocode(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      console.log(res);
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
   }
   newCustomer = this.formCustomerData;
 
@@ -181,24 +191,17 @@ export class CustomerFormComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     console.log(
       this.selected_fin_id,
-      '===========selected fin id==================='
+      '===========selected fin id===================',
     );
     this.DEFAULT_COUNTRY_CODE =
       sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
   }
-
-  // showCountry() {
-  //   this.service.getCountryDataAPi().subscribe((response) => {
-  //     this.CountryDropdownData = response;
-  //     console.log(this.CountryDropdownData);
-  //   });
-  // }
 
   onDealerTypeChange(e: any) {
     console.log(e.value, 'Dealer Type Changed');
@@ -296,7 +299,7 @@ export class CustomerFormComponent {
     console.log(this.selecte_countyId, '======county id============');
     this.getStateDropDown();
     const selectedCountry = this.CountryDropdownData.find(
-      (country: any) => country.ID === this.selecte_countyId
+      (country: any) => country.ID === this.selecte_countyId,
     );
 
     // 4️⃣ If found, set code & name
@@ -311,7 +314,7 @@ export class CustomerFormComponent {
       this.DEFAULT_COUNTRY_CODE = '';
       console.warn(
         '⚠️ No matching country found for ID:',
-        this.selecte_countyId
+        this.selecte_countyId,
       );
     }
   }
@@ -400,35 +403,10 @@ export class CustomerFormComponent {
     }
   }
 
-  // saveDeliveryAddress() {
-  //   if (
-  //     this.newCustomer.DeliveryAddresses[0].ADDRESS1 ||
-  //     this.newCustomer.DeliveryAddresses[0].ADDRESS2 ||
-  //     this.newCustomer.DeliveryAddresses[0].LOCATION ||
-  //     this.newCustomer.DeliveryAddresses[0].PHONE
-  //   ) {
-  //     const newAddress = {
-  //       ADDRESS1: this.newCustomer.DeliveryAddresses[0].ADDRESS1,
-  //       MOBILE: this.newCustomer.DeliveryAddresses[0].MOBILE,
-  //       LOCATION: this.newCustomer.DeliveryAddresses[0].LOCATION,
-  //       PHONE: this.newCustomer.DeliveryAddresses[0].PHONE
-  //     };
-
-  //     this.savedAddresses.push(newAddress);
-  //   console.log(this.savedAddresses, 'Saved Addresses:');
-
-  //     // Optional: clear form after saving
-  //     this.newCustomer.DeliveryAddresses[0].ADDRESS1 = '';
-  //     this.newCustomer.DeliveryAddresses[0].MOBILE = '';
-  //     this.newCustomer.DeliveryAddresses[0].LOCATION = '';
-  //     this.newCustomer.DeliveryAddresses[0].PHONE = '';
-  //   }
-  // }
-
   removeAddress(index: number) {
     const result = confirm(
       'Are you sure you want to delete this address?',
-      'Confirm Deletion'
+      'Confirm Deletion',
     );
 
     result.then((dialogResult) => {
@@ -449,6 +427,24 @@ export class CustomerFormComponent {
 
     // ✅ Remember which card is being edited
     this.editingIndex = i;
+  }
+
+  onDropdownClosed() {}
+  onDropdownOpened() {}
+  updateMobileNumber() {}
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}${item.COUNTRY_NAME}`;
+  }
+  onCountrycodeChangeDeliveryAddressmobile(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      console.log(res);
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
   }
 }
 @NgModule({

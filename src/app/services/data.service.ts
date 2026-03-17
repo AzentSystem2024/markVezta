@@ -6331,4 +6331,9 @@ The result can be exported to HTML or Markdown.`;
   getMiscInvoiceMainList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseReturn/list`, data);
   }
+  //===========mobile number length based on country==================
+
+  get_mobile_no_length(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Company/getdigit`, data);
+  }
 }

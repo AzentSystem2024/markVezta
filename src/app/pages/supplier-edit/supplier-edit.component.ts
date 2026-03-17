@@ -48,7 +48,7 @@ export class SupplierEditComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild('landedCostGrid', { static: false })
-  landedCostGrid!: DxDataGridComponent; 
+  landedCostGrid!: DxDataGridComponent;
   @ViewChild(SupplierFormComponent) itemsComponent: SupplierFormComponent;
   popupVisible: boolean = true;
   CountryDropdownData: any[] = [];
@@ -60,8 +60,8 @@ export class SupplierEditComponent {
   stateLabel: any;
   isCurrencyAccepted: boolean = true;
   selectedLandedCosts: { COST_ID: number }[] = [];
-  selectedSupp : {SUPP_ID:number}[] = [];
-  selecte_countyId:any;
+  selectedSupp: { SUPP_ID: number }[] = [];
+  selecte_countyId: any;
   formSupplierData = {
     ID: '',
     HQID: 1,
@@ -85,7 +85,7 @@ export class SupplierEditComponent {
     CURRENCY_ID: '', // Check if number or string is expected
     PAY_TERM_ID: '', // Same here: ensure it's a number if necessary
     VAT_RULE_ID: '',
-    
+
     Supplier_cost: [],
   };
 
@@ -97,25 +97,28 @@ export class SupplierEditComponent {
   selectedSupplier: any;
   isPopupVisible: boolean = true;
   selectedLandedCostKeys: any;
-  Country:any;
-  CountryId:any;
-   State:any[]=[];
-    selectedStateId: any[] = [];
-    SupplierCategory:any[] =[];
-     PaymentId:any;
- StateId :any;
-   PaymentTerms:any;
-    selected_Company_id: any;
+  Country: any;
+  CountryId: any;
+  State: any[] = [];
+  selectedStateId: any[] = [];
+  SupplierCategory: any[] = [];
+  PaymentId: any;
+  StateId: any;
+  PaymentTerms: any;
+  selected_Company_id: any;
   selected_fin_id: any;
-   sessionData: any;
+  sessionData: any;
   selected_vat_id: any;
   DEFAULT_COUNTRY_CODE: any;
   Supplier_Category: any;
-purchType: number = 0;
-    purchaseTypeOptions = [
-  { text: 'Local Purchase', value: 1 },
-  { text: 'Interstate Purchase', value: 2 }
-];
+  purchType: number = 0;
+  countryCodes: any;
+  mobile_limit: any;
+  Supplier_mobile: any;
+  purchaseTypeOptions = [
+    { text: 'Local Purchase', value: 1 },
+    { text: 'Interstate Purchase', value: 2 },
+  ];
 
   constructor(
     private dataservice: DataService,
@@ -123,7 +126,7 @@ purchType: number = 0;
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    authservice: AuthService
+    authservice: AuthService,
   ) {
     dataservice.getCurrencyData().subscribe((data) => {
       this.currency = data;
@@ -136,82 +139,89 @@ purchType: number = 0;
     this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
     console.log(
       this.countryCode,
-      '===========================country Code============'
+      '===========================country Code============',
     );
+    dataservice.getCountryWithFlags().subscribe((data) => {
+      this.countryCodes = data;
+      console.log(this.countryCodes, 'COUNTRY;;;;;;;;;;');
+    });
     //  this.get_Country_Dropdown_List();
-     this.get_State_Dropdown_List();
+    this.get_State_Dropdown_List();
     this.get_PaymentTerms_Dropdown_List();
-     this.sesstion_Details()
-    this.sessionData_tax()
+    this.sesstion_Details();
+    this.sessionData_tax();
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.CountryDropdownData = data;
       console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
     });
-  
   }
 
   newSupplier = { ...this.formSupplierData };
 
   getNewSupplierData = () => ({ ...this.newSupplier });
 
-      sessionData_tax(){
-        // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'" 
-        this.sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-        console.log(this.sessionData,'=================session data==========')
-        this.selected_vat_id=this.sessionData.VAT_ID
-        this.DEFAULT_COUNTRY_CODE=this.sessionData.DEFAULT_COUNTRY_CODE
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+    this.DEFAULT_COUNTRY_CODE = this.sessionData.DEFAULT_COUNTRY_CODE;
   }
 
-//   showCountry(){
-//     this.dataservice.getCountryData().subscribe(
-//      (response)=>{
-//            this.CountryDropdownData=response;
-//            console.log('count',this.CountryDropdownData);
-//      }
-//     )
-//  }
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')
-    this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
-    console.log(this.selected_fin_id,'===========selected fin id===================')
-     this.DEFAULT_COUNTRY_CODE = sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
-     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
-  }
+  //   showCountry(){
+  //     this.dataservice.getCountryData().subscribe(
+  //      (response)=>{
+  //            this.CountryDropdownData=response;
+  //            console.log('count',this.CountryDropdownData);
+  //      }
+  //     )
+  //  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(sessionData, '=================session data==========');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    console.log(
+      this.selected_fin_id,
+      '===========selected fin id===================',
+    );
+    this.DEFAULT_COUNTRY_CODE =
+      sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+    console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
+  }
 
   toggleCurrencyDropdown(checked: boolean) {
     this.isCurrencyAccepted = checked;
   }
 
-      ngOnChanges(changes: SimpleChanges): void {
-        if (changes['supplierData'] && changes['supplierData'].currentValue) {
-          console.log('SupplierData:', this.supplierData);
-      this.Supplier_Category = this.supplierData.SUPP_CAT_ID
-     setTimeout(() => {
-      this.purchType = Number(this.supplierData.PURCH_TYPE);
-      console.log('Radio value:', this.purchType);
-      this.cdr.detectChanges();
-    });
-          //  this.get_Country_Dropdown_List()
-            this.get_State_Dropdown_List()
-            
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['supplierData'] && changes['supplierData'].currentValue) {
+      console.log('SupplierData:', this.supplierData);
+      this.Supplier_Category = this.supplierData.SUPP_CAT_ID;
+      setTimeout(() => {
+        this.purchType = Number(this.supplierData.PURCH_TYPE);
+        console.log('Radio value:', this.purchType);
+        this.cdr.detectChanges();
+      });
+      //  this.get_Country_Dropdown_List()
+      this.get_State_Dropdown_List();
 
-          const savedCostIDs = (this.supplierData.Supplier_cost || []).map(
-            (cost: any) => cost.COST_ID
-          );
-          console.log('Saved Cost IDs:', savedCostIDs);
-          const selectedCosts = (this.landedcost || []).filter((cost: any) =>
-            savedCostIDs.includes(cost.ID)
-          );
-          this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
+      const savedCostIDs = (this.supplierData.Supplier_cost || []).map(
+        (cost: any) => cost.COST_ID,
+      );
+      console.log('Saved Cost IDs:', savedCostIDs);
+      const selectedCosts = (this.landedcost || []).filter((cost: any) =>
+        savedCostIDs.includes(cost.ID),
+      );
+      this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
 
-          console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
-        
-        }
-      
-      }
+      console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
+    }
+  }
 
   ngOnInit() {
     console.log('EDIT COMPONENT111');
@@ -223,7 +233,7 @@ purchType: number = 0;
     this.loadDropdownData();
     this.listSupplier();
     this.getVATRuleDropDown();
-    this.getSuppliercategoryDropDown()
+    this.getSuppliercategoryDropDown();
     this.get_State_Dropdown_List();
     // this.listCountry();
     this.listState();
@@ -244,7 +254,7 @@ purchType: number = 0;
     });
   }
 
-      getSuppliercategoryDropDown() {
+  getSuppliercategoryDropDown() {
     const payload = {
       NAME: 'SUPPLIER_CATEGORY',
       // COMPANY_ID: this.selected_Company_id,
@@ -258,8 +268,8 @@ purchType: number = 0;
 
   listSupplier() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getSupplierData(payload).subscribe((response) => {
       this.supplier = response;
       console.log(response);
@@ -292,15 +302,15 @@ purchType: number = 0;
     });
   }
 
-  onPayTermSelectionChanged(event:any){
-  this.PaymentId = event.value
-}
+  onPayTermSelectionChanged(event: any) {
+    this.PaymentId = event.value;
+  }
 
-    get_PaymentTerms_Dropdown_List() {
+  get_PaymentTerms_Dropdown_List() {
     this.dataservice.PaymentTerms_Dropdown_Api().subscribe((response: any) => {
       // console.log(response, 'response++++++++++');
       this.PaymentTerms = response;
-      console.log(this.PaymentTerms,'Country dropdown')
+      console.log(this.PaymentTerms, 'Country dropdown');
     });
   }
 
@@ -310,7 +320,7 @@ purchType: number = 0;
 
     // Map the selected rows to only include the COST_IDs
     this.formSupplierData.Supplier_cost = selectedRows.map((row: any) => {
-      return { COST_ID: row.ID , SUPP_ID : 0};
+      return { COST_ID: row.ID, SUPP_ID: 0 };
     });
 
     // Debug log to verify the binding
@@ -337,8 +347,8 @@ purchType: number = 0;
   }
 
   onCountrySelectionChanged(event: any) {
-     this.selecte_countyId = event.value
-console.log(this.selecte_countyId,'selected country id++++++++++')
+    this.selecte_countyId = event.value;
+    console.log(this.selecte_countyId, 'selected country id++++++++++');
     // const selectedCountry = this.CountryDropdownData.find(
     // //   (country) => country.ID === event.value
     // // );
@@ -347,66 +357,63 @@ console.log(this.selecte_countyId,'selected country id++++++++++')
     //   this.countryCode = selectedCountry.CODE;
     // }
     // this.get_Country_Dropdown_List();
-     this.get_State_Dropdown_List();
-      const selectedCountry = this.CountryDropdownData.find(
-    (country: any) => country.ID === this.selecte_countyId
-  );
+    this.get_State_Dropdown_List();
+    const selectedCountry = this.CountryDropdownData.find(
+      (country: any) => country.ID === this.selecte_countyId,
+    );
 
-  // 4️ If found, set code & name
-  if (selectedCountry) {
-    this.countryCode = selectedCountry.CODE;                // e.g., '+971'
-    this.DEFAULT_COUNTRY_CODE = this.countryCode;           // bind to textbox
-    console.log('Selected Country:', selectedCountry.DESCRIPTION);
-    console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
-  } else {
-    // 5️ Fallback if no country found
-    this.countryCode = '';
-    this.DEFAULT_COUNTRY_CODE = '';
-    console.warn(' No matching country found for ID:', this.selecte_countyId);
+    // 4️ If found, set code & name
+    if (selectedCountry) {
+      this.countryCode = selectedCountry.CODE; // e.g., '+971'
+      this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
+      console.log('Selected Country:', selectedCountry.DESCRIPTION);
+      console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
+    } else {
+      // 5️ Fallback if no country found
+      this.countryCode = '';
+      this.DEFAULT_COUNTRY_CODE = '';
+      console.warn(' No matching country found for ID:', this.selecte_countyId);
+    }
   }
 
-  }
-
-   get_State_Dropdown_List() {
+  get_State_Dropdown_List() {
     // console.log('function working');
-const CountryId = this.supplierData?.COUNTRY_ID;
-console.log(CountryId, 'country id of selected state id')
+    const CountryId = this.supplierData?.COUNTRY_ID;
+    console.log(CountryId, 'country id of selected state id');
     this.dataservice
       .get_State_Dropdown_Api('STATE_NAME', CountryId)
       .subscribe((response: any) => {
         console.log(response, 'response++++++++++');
         this.State = response;
-        
-      }); 
+      });
   }
 
-// get_State_Dropdown_List() {
-//   if (!this.supplierData?.COUNTRY_ID) {
-//     console.warn('COUNTRY_ID is not ready');
-//     return; // Skip until COUNTRY_ID is set
-//   }
+  // get_State_Dropdown_List() {
+  //   if (!this.supplierData?.COUNTRY_ID) {
+  //     console.warn('COUNTRY_ID is not ready');
+  //     return; // Skip until COUNTRY_ID is set
+  //   }
 
-//   const payload = {
-//     NAME: 'STATE_NAME',
-//     COUNTRY_ID: this.supplierData.COUNTRY_ID
-//   };
+  //   const payload = {
+  //     NAME: 'STATE_NAME',
+  //     COUNTRY_ID: this.supplierData.COUNTRY_ID
+  //   };
 
-//   this.dataservice.get_State_Dropdown_Api(payload).subscribe((response: any) => {
-//     this.State = response;
+  //   this.dataservice.get_State_Dropdown_Api(payload).subscribe((response: any) => {
+  //     this.State = response;
 
-//     // Optional: set default or patch if needed
-//     this.cdr.detectChanges();
-//   });
-// }
+  //     // Optional: set default or patch if needed
+  //     this.cdr.detectChanges();
+  //   });
+  // }
 
-
-    onStateValue(event: any) {
+  onStateValue(event: any) {
     this.selectedStateId = event.value;
-    
-    console.log(this.selectedStateId,'seleted state')
+
+    console.log(this.selectedStateId, 'seleted state');
     this.StateId = event.value;
     this.get_State_Dropdown_List();
-  
+
     // console.log(this.selectedStateId, 'selectedStateId++++++++++');
   }
 
@@ -420,7 +427,7 @@ console.log(CountryId, 'country id of selected state id')
       .map((cost: any) => ({
         COST_ID: cost.ID,
         DESCRIPTION: cost.DESCRIPTION,
-        SUPP_ID:0,
+        SUPP_ID: 0,
       }));
 
     console.log('Updated Supplier_cost:', this.supplierData.Supplier_cost);
@@ -445,13 +452,14 @@ console.log(CountryId, 'country id of selected state id')
 
   updateSupplier() {
     const payload = {
-    ...this.supplierData,
-    SUPP_CAT_ID: this.Supplier_Category,
-    PURCH_TYPE : this.purchType
-  };
+      ...this.supplierData,
+      SUPP_CAT_ID: this.Supplier_Category,
+      PURCH_TYPE: this.purchType,
+      MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
+    };
     console.log(payload, 'PAYLOADINEDIT');
     this.dataservice
-      .updateSuppliers(payload.ID, payload,)
+      .updateSuppliers(payload.ID, payload)
       .subscribe((response: any) => {
         try {
           notify(
@@ -459,7 +467,7 @@ console.log(CountryId, 'country id of selected state id')
               message: 'Supplier updatedddd successfully',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
         } catch (error) {
@@ -468,7 +476,7 @@ console.log(CountryId, 'country id of selected state id')
               message: 'Add operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         console.log(response, 'RESPONSE IN UPDATE');
@@ -480,14 +488,29 @@ console.log(CountryId, 'country id of selected state id')
     this.formClosed.emit();
   }
 
-    getCurrency_Dropdown(){
-  this.dataservice.getCurrencyDropdown().subscribe(
-   (response)=>{
-         this.CurrencyDropdownData=response;
-         console.log('count==================================',this.CurrencyDropdownData);
-   }
-  )
-}
+  getCurrency_Dropdown() {
+    this.dataservice.getCurrencyDropdown().subscribe((response) => {
+      this.CurrencyDropdownData = response;
+      console.log(
+        'count==================================',
+        this.CurrencyDropdownData,
+      );
+    });
+  }
+  onCountrycodeChange(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      console.log(res);
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
+  }
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
+  }
 }
 
 @NgModule({
