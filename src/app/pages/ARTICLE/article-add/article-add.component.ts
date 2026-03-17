@@ -53,6 +53,7 @@ import { confirm } from 'devextreme/ui/dialog';
 })
 export class ArticleAddComponent {
   @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
+  @ViewChild('bomGridRef', { static: false }) bomGridRef: any;
 
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild(DxDataGridComponent, { static: true })
@@ -100,6 +101,7 @@ export class ArticleAddComponent {
     PACK_QTY: '',
     PART_NO: '',
     ALIAS_NO: '',
+    NEXT_SERIAL: '',
     UNIT_ID: '',
     ARTICLE_TYPE: '',
     CATEGORY_ID: '',
@@ -124,6 +126,7 @@ export class ArticleAddComponent {
   selectedComponentDescription: any;
   selectedTabIndex = 0;
   items: any[] = []; // grid data → BoM components
+  ItemListDataSource:any[] =[];
   itemsList: any[] = []; // dropdown source → item master list
   data: any;
   selectedItemId: any;
@@ -135,7 +138,9 @@ export class ArticleAddComponent {
   selected_Company_id: any;
   selectedAttachRowKeys: number[] = [];
   isSaving = false;
-
+ItempopupVisible: boolean = false;
+  selectedItem: any;
+  selectedItems: any[] = [];
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
@@ -149,11 +154,21 @@ export class ArticleAddComponent {
     this.getLastOrderNo();
     // }
     this.getAliasNo();
+     this.getPartNo();
     this.getDropdownLists();
     this.getItems();
+    this.articleData.NEXT_SERIAL = 1;
+    // this.items = [
+    //   { ITEM: null, COLOR: '', CATEGORY_NAME: '', ARTICLE_TYPE_NAME: '' },
+    // ];
     this.items = [
-      { ITEM: null, COLOR: '', CATEGORY_NAME: '', ARTICLE_TYPE_NAME: '' },
-    ];
+  {
+    ITEM: null,
+    DESCRIPTION: '',
+    UOM: '',
+    QUANTITY: null,
+  },
+];
   }
 
   onImageSelected(event: Event) {
@@ -166,6 +181,14 @@ export class ArticleAddComponent {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+   getPartNo() {
+    this.dataService.getArticleLastPartNo().subscribe((response: any) => {
+      console.log(response);
+      this.articleData.PART_NO = response.GetPartNo;
+      console.log(this.articleData.PART_NO, 'ALIASNO');
+    });
   }
 
   openZoom() {
@@ -403,19 +426,19 @@ export class ArticleAddComponent {
     }
   }
 
-  onGridInitialized(e: any) {
-    const grid = e.component;
-    const store = grid.getDataSource().store();
+  // onGridInitialized(e: any) {
+  //   const grid = e.component;
+  //   const store = grid.getDataSource().store();
 
-    // Remove empty row at start if present
-    setTimeout(() => {
-      const rows = grid.getVisibleRows();
-      if (rows.length === 1 && !rows[0].data.ITEM && !rows[0].data.QUANTITY) {
-        store.remove(rows[0].key);
-        grid.refresh();
-      }
-    });
-  }
+  //   // Remove empty row at start if present
+  //   setTimeout(() => {
+  //     const rows = grid.getVisibleRows();
+  //     if (rows.length === 1 && !rows[0].data.ITEM && !rows[0].data.QUANTITY) {
+  //       store.remove(rows[0].key);
+  //       grid.refresh();
+  //     }
+  //   });
+  // }
 
   onInitNewRow(e: any) {
     const grid = e.component;
@@ -430,31 +453,7 @@ export class ArticleAddComponent {
     }
   }
 
-  addNewRow() {
-    const grid = this.itemsGridRef.instance; // reference to your dx-data-grid
-    const rows = grid.getVisibleRows();
 
-    // Check if any existing row is incomplete
-    const hasIncompleteRow = rows.some(
-      (r: any) => !r.data.ITEM || !r.data.QUANTITY,
-    );
-
-    if (hasIncompleteRow) {
-      // Optionally, show a message
-      return; // Stop adding new row
-    }
-
-    // Add new row at the bottom
-    this.items.push({ ITEM: null, DESCRIPTION: '', UOM: '', QUANTITY: null });
-
-    setTimeout(() => {
-      const updatedRows = grid.getVisibleRows();
-      const newRowIndex = updatedRows.length - 1;
-      if (newRowIndex >= 0) {
-        grid.editCell(newRowIndex, 'ITEM'); // Focus ITEM of new row
-      }
-    }, 100);
-  }
 
   getArticles() {
     // const payload = { COMPANY_ID: this.selected_Company_id };
@@ -799,7 +798,7 @@ export class ArticleAddComponent {
   //     const hasSizeConflict = selectedSizes.some((s) => savedSizes.includes(s));
 
   //     if (hasSizeConflict) {
-  //       console.warn('🚨 DUPLICATE SIZE FOUND', {
+  //       console.warn(' DUPLICATE SIZE FOUND', {
   //         articleArtNo: article.ART_NO,
   //         savedSizes,
   //         selectedSizes,
@@ -880,7 +879,7 @@ export class ArticleAddComponent {
       });
       return;
     }
-    // ✅ SUPPLIER VALIDATION
+    //  SUPPLIER VALIDATION
     if (!this.selectedMaterialUnitId) {
       notify({
         message: 'Please select a Supplier.',
@@ -914,6 +913,27 @@ export class ArticleAddComponent {
       });
       return;
     }
+
+    const bomGridData =
+  this.itemsGridRef?.instance
+    .getVisibleRows()
+    .map((r) => r.data)
+    .filter((row) => row.ITEM_ID && row.QUANTITY > 0)
+    .map((row) => ({
+      ITEM_CODE: String(row.ITEM_ID),
+      QUANTITY: row.QUANTITY,
+    })) || [];
+
+//  BOM Validation
+if (!bomGridData.length) {
+  notify({
+    message: 'Please enter BOM.',
+    type: 'warning',
+    displayTime: 3000,
+    position: { at: 'top right', my: 'top right' },
+  });
+  return;
+}
 
     if (!this.articleData.HSN_CODE) {
       notify({
@@ -1102,11 +1122,22 @@ export class ArticleAddComponent {
     this.selectedComponentArtNo = '';
     this.selectedAttachRow = null;
     this.selectedAttachRowKeys = [];
+    this.articleData.NEXT_SERIAL = 1;
     //RESET BOM DATA
-    this.items = []; // clears grid datasource
+    // this.items = []; // clears grid datasource
+    this.items = [
+  {
+    ITEM: null,
+    DESCRIPTION: '',
+    UOM: '',
+    QUANTITY: null,
+  },
+];
+
     this.selectedSizeRowData = []; // clears size-based BOM input
 
     this.getAliasNo();
+     this.getPartNo();
     // if (this.itemsGridRef?.instance) {
     //   this.itemsGridRef.instance.option('dataSource', []);
     // }
@@ -1138,6 +1169,105 @@ export class ArticleAddComponent {
 
     this.articleData.DESCRIPTION = parts.join('-');
   }
+
+ addNewRow() {
+
+  this.dataService.getItemsListForArticle().subscribe((res: any) => {
+      console.log(res);
+      console.log(
+        'PrePaymentListDataSource=============================:',
+        res.DataList,
+      );
+      this.ItemListDataSource = res.DataList;
+      this.ItempopupVisible = true; // Open popup
+    });
+  setTimeout(() => {
+
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
+
+    const rows = grid.getVisibleRows();
+
+    const hasIncompleteRow = rows.some(
+      (r: any) => !r.data?.ITEM || !r.data?.QUANTITY
+    );
+
+    if (hasIncompleteRow) {
+      return;
+    }
+
+    this.items.push({
+      ITEM: null,
+      DESCRIPTION: '',
+      UOM: '',
+      QUANTITY: null
+    });
+
+    setTimeout(() => {
+      const updatedRows = grid.getVisibleRows();
+      const newRowIndex = updatedRows.length - 1;
+
+      if (newRowIndex >= 0) {
+        grid.editCell(newRowIndex, 'ITEM');
+      }
+    }, 100);
+
+  }, 200);
+}
+
+onItemSelect(e: any) {
+
+  const selectedItem = e.data;
+
+  console.log("Selected Item:", selectedItem);
+
+  // Example: store selected item
+  this.selectedItem = selectedItem;
+
+  // Close popup after selection
+  this.ItempopupVisible = false;
+}
+
+saveSelectedItems() {
+
+  const popupGrid = this.bomGridRef.instance;   // popup grid
+
+  const selectedRows = popupGrid.getSelectedRowsData();
+
+  if (!selectedRows.length) {
+    return;
+  }
+
+  //  Remove empty row if exists
+  this.items = this.items.filter(
+    row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
+  );
+
+  selectedRows.forEach((item: any) => {
+
+    const exists = this.items.some(
+      x => x.ITEM === item.ITEM_CODE
+    );
+
+    if (!exists) {
+      this.items.push({
+        ITEM: item.ITEM_CODE,
+        DESCRIPTION: item.DESCRIPTION,
+        UOM: item.UOM,
+        QUANTITY: null,
+        ITEM_ID: item.ID
+      });
+    }
+
+  });
+
+  // refresh BOM grid
+  this.itemsGridRef.instance.refresh();
+
+  this.ItempopupVisible = false;
+
+}
+
 }
 
 @NgModule({

@@ -162,6 +162,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
+   getItemsListForArticle(): Observable<any> {
+    return this.http.post(`${this.apiUrl}article/getItems`, {});
+  }
+
   getLastAliasNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
   }
@@ -172,6 +176,14 @@ export class DataService {
 
   getPackingLastPartNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}packing/Lastpartno`, {});
+  }
+
+   getItemsListForPacking(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Packing/getItems`, {});
+  }
+
+    getArticleLastPartNo(): Observable<any> {
+    return this.http.post(`${this.apiUrl}article/Lastpartno`, {});
   }
 
   insertArticle(items: any) {
