@@ -23,18 +23,24 @@
 .shipping-details {
   flex: 1;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: var(--base-bg);
+  // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  // background-color: var(--base-bg);
+  border: 1px solid var(--border-color);
   padding: 10px;
   margin-left: 0;
+}
+
+.shipping-details {
+  margin-left: 10px; /* For the second column */
 }
 
 /* Add grid ONLY to supplier-details */
 .supplier-details {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  column-gap: 15px; /* space between columns */
-  row-gap: 1px; /* reduce vertical space */
+  column-gap: 15px;
+  row-gap: 1px;
+  align-items: start; /* prevents field stretching */
 }
 
 /* Make title span full width in supplier */
@@ -57,6 +63,13 @@
   display: block;
   margin-bottom: 1px;
 }
+
+.section-sub-title {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
 .po-title {
   font-size: 14px;
   margin-bottom: 10px;
@@ -67,8 +80,9 @@
   margin-top: 10px;
   margin-bottom: 10px;
   border-radius: 8px;
-  background-color: var(--base-bg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  // background-color: var(--base-bg);
+  // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
   padding: 10px;
   margin-left: 0; /* Default for the first item */
 }

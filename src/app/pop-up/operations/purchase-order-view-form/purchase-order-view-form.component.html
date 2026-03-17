@@ -74,7 +74,7 @@
       <div class="supplier-details">
         <span class="section-title">Supplier Details</span>
 
-        <dx-text-box
+        <!-- <dx-text-box
           label="Currency"
           labelMode="floating"
           placeholder="Currency"
@@ -90,26 +90,16 @@
           [(value)]="newPoData.EXCHANGE_RATE"
           [readOnly]="true"
         >
-        </dx-text-box>
+        </dx-text-box> -->
 
         <dx-text-box
-          label="VAT Rule"
+          label="Tax Rule"
           labelMode="floating"
-          placeholder="VAT Rule"
-          [(value)]="vatRule"
+          placeholder="Tax Rule"
+          [(value)]="newPoData.VAT_RULE_NAME"
           [readOnly]="true"
         >
         </dx-text-box>
-
-        <dx-text-box
-          label="Address"
-          labelMode="floating"
-          placeholder="Supplier Address"
-          [(value)]="newPoData.SUPP_ADDRESS"
-          [readOnly]="true"
-        >
-        </dx-text-box>
-
         <dx-text-box
           label="Contact Person"
           labelMode="floating"
@@ -118,21 +108,50 @@
           [readOnly]="true"
         >
         </dx-text-box>
-
         <dx-text-box
           label="Email"
           labelMode="floating"
           placeholder="Email"
-          [(value)]="supplierMail"
+          [(value)]="newPoData.SUPPLIER_EMAIL"
           [readOnly]="true"
         >
         </dx-text-box>
+        <div style="display: flex">
+          <dx-select-box
+            label="Code"
+            labelMode="floating"
+            [width]="100"
+            [(value)]="supplierCountryCode"
+            [items]="countryCodes"
+            displayExpr="data.dial_code"
+            valueExpr="data.dial_code"
+            [dropDownOptions]="{ width: '370px' }"
+            [readOnly]="true"
+          >
+            <div *dxTemplate="let item of 'item'">
+              <span>{{ item.data.flag }}</span>
+              <span>{{ item.data.dial_code }}</span>
+              <span>{{ item.data.name }}</span>
+            </div>
+          </dx-select-box>
+
+          <dx-text-box
+            label="Contact No"
+            labelMode="floating"
+            [(value)]="newPoData.SUPP_MOBILE"
+            style="margin-left: 10px"
+            valueChangeEvent="input"
+            [readOnly]="true"
+          >
+          </dx-text-box>
+        </div>
 
         <dx-text-box
-          label="Contact No"
+          class="address-field"
+          label="Address"
           labelMode="floating"
-          placeholder="Contact No"
-          [(value)]="newPoData.SUPP_MOBILE"
+          placeholder="Supplier Address"
+          [(value)]="newPoData.SUPP_ADDRESS"
           [readOnly]="true"
         >
         </dx-text-box>
@@ -168,14 +187,35 @@
         >
         </dx-text-box>
 
-        <dx-text-box
-          label="Mobile"
-          labelMode="floating"
-          placeholder="Mobile"
-          [(value)]="newPoData.CONTACT_MOBILE"
-          [readOnly]="true"
-        >
-        </dx-text-box>
+        <div style="display: flex">
+          <dx-select-box
+            label="Code"
+            labelMode="floating"
+            [items]="countryCodes"
+            [(value)]="shippingCountryCode"
+            displayExpr="data.dial_code"
+            valueExpr="data.dial_code"
+            [width]="110"
+            [readOnly]="true"
+          >
+            <div *dxTemplate="let item of 'item'">
+              <span>{{ item.data.flag }}</span>
+              <span>{{ item.data.dial_code }}</span>
+              <span>{{ item.data.name }}</span>
+            </div>
+          </dx-select-box>
+
+          <dx-text-box
+            width="100%"
+            label="Mobile"
+            labelMode="floating"
+            [(value)]="newPoData.CONTACT_MOBILE"
+            style="margin-left: 10px"
+            [valueChangeEvent]="'input'"
+            [readOnly]="true"
+          >
+          </dx-text-box>
+        </div>
       </div>
     </div>
     <div class="termsncondition-container">
@@ -252,7 +292,7 @@
   <div
     style="display: flex; justify-content: space-between; margin-bottom: 10px"
   >
-    <span class="section-title">Items</span>
+    <span class="section-sub-title">Items</span>
   </div>
   <dx-data-grid
     [columnAutoWidth]="true"

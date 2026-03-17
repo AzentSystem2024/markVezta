@@ -104,22 +104,13 @@
         </dx-text-box> -->
 
         <dx-text-box
-          label="VAT Rule"
+          label="Tax Rule"
           labelMode="floating"
-          placeholder="VAT Rule"
+          placeholder="Tax Rule"
           [(value)]="vatRule"
-          [readOnly]="true"
+          [readOnly]="newPoData.VAT_RULE_NAME"
         >
         </dx-text-box>
-
-        <dx-text-box
-          label="Address"
-          labelMode="floating"
-          placeholder="Supplier Address"
-          [(value)]="newPoData.SUPP_ADDRESS"
-        >
-        </dx-text-box>
-
         <dx-text-box
           label="Contact Person"
           labelMode="floating"
@@ -127,26 +118,87 @@
           [(value)]="newPoData.SUPP_CONTACT"
         >
         </dx-text-box>
+        <dx-text-box
+          label="Email"
+          labelMode="floating"
+          placeholder="Email"
+          [(value)]="newPoData.SUPPLIER_EMAIL"
+        >
+        </dx-text-box>
+        <div style="display: flex">
+          <dx-drop-down-box
+            label="Code"
+            labelMode="floating"
+            [(value)]="supplierCountryCode"
+            valueExpr="data.dial_code"
+            displayExpr="display"
+            [(opened)]="isCountryDropdownOpen"
+            [dataSource]="countryCodes"
+            [width]="100"
+            [dropDownOptions]="{ width: 350 }"
+          >
+            <div *dxTemplate="let data of 'content'">
+              <dx-list
+                [dataSource]="countryCodes"
+                selectionMode="single"
+                [searchEnabled]="true"
+                [searchExpr]="['data.name', 'data.dial_code']"
+                [focusStateEnabled]="false"
+                (onItemClick)="onCountrySelected($event)"
+              >
+                <div
+                  *dxTemplate="let item of 'item'"
+                  style="display: flex; align-items: center; gap: 8px"
+                >
+                  <img
+                    [src]="item.flagUrl"
+                    width="20"
+                    height="14"
+                    style="border-radius: 2px"
+                  />
+
+                  <span style="min-width: 55px">
+                    {{ item.data.dial_code }}
+                  </span>
+
+                  <span>
+                    {{ item.data.name }}
+                  </span>
+                </div>
+              </dx-list>
+            </div>
+          </dx-drop-down-box>
+
+          <dx-text-box
+            label="Contact No"
+            labelMode="floating"
+            [(value)]="newPoData.SUPP_MOBILE"
+            style="margin-left: 10px"
+            valueChangeEvent="input"
+            (input)="onSupplierMobileInput($event)"
+            (onKeyDown)="preventDialCodeDelete($event)"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Contact number is required"
+              ></dxi-validation-rule>
+
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="SupplierMobileValidate"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
 
         <dx-text-box
-          label="Contact No *"
+          class="address-field"
+          label="Address"
           labelMode="floating"
-          placeholder="Contact No"
-          [(value)]="newPoData.SUPP_MOBILE"
-          valueChangeEvent="keyup"
+          placeholder="Supplier Address"
+          [(value)]="newPoData.SUPP_ADDRESS"
         >
-          <dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="Contact number is required"
-            ></dxi-validation-rule>
-
-            <dxi-validation-rule
-              type="pattern"
-              pattern="^(\+91[- ]?|91[- ]?|0)?[6-9]\d{9}$"
-              message="Enter a valid mobile number"
-            ></dxi-validation-rule>
-          </dx-validator>
         </dx-text-box>
       </div>
 
@@ -177,26 +229,75 @@
         >
         </dx-text-box>
 
-        <dx-text-box
-          label="Mobile *"
-          labelMode="floating"
-          placeholder="Mobile"
-          [(value)]="newPoData.CONTACT_MOBILE"
-          valueChangeEvent="keyup"
-        >
-          <dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="Contact number is required"
-            ></dxi-validation-rule>
+        <div style="display: flex">
+          <dx-drop-down-box
+            label="Code"
+            labelMode="floating"
+            [(value)]="shippingCountryCode"
+            [(opened)]="isShipCountryDropdownOpen"
+            valueExpr="data.dial_code"
+            displayExpr="display"
+            [dataSource]="countryCodes"
+            [width]="120"
+            [dropDownOptions]="{ width: 350 }"
+          >
+            <div *dxTemplate="let data of 'content'">
+              <dx-list
+                [dataSource]="countryCodes"
+                selectionMode="single"
+                [searchEnabled]="true"
+                [searchExpr]="['data.name', 'data.dial_code']"
+                [focusStateEnabled]="false"
+                (onItemClick)="onShippingCountrySelected($event)"
+              >
+                <div
+                  *dxTemplate="let item of 'item'"
+                  style="display: flex; align-items: center; gap: 8px"
+                >
+                  <img
+                    [src]="item.flagUrl"
+                    width="20"
+                    height="14"
+                    style="border-radius: 2px"
+                  />
 
-            <dxi-validation-rule
-              type="pattern"
-              pattern="^(\+91[- ]?|91[- ]?|0)?[6-9]\d{9}$"
-              message="Enter a valid mobile number"
-            ></dxi-validation-rule>
-          </dx-validator>
-        </dx-text-box>
+                  <span style="min-width: 55px">
+                    {{ item.data.dial_code }}
+                  </span>
+
+                  <span>
+                    {{ item.data.name }}
+                  </span>
+                </div>
+              </dx-list>
+            </div>
+          </dx-drop-down-box>
+
+          <dx-text-box
+            width="100%"
+            label="Mobile"
+            labelMode="floating"
+            [(value)]="newPoData.CONTACT_MOBILE"
+            style="margin-left: 10px"
+            [valueChangeEvent]="'input'"
+            (input)="onContactMobileInput($event)"
+            (onKeyDown)="preventShipementDialCodeDelete($event)"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Contact number is required"
+              >
+              </dxi-validation-rule>
+
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateContactMobile"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
       </div>
     </div>
     <div class="termsncondition-container">
@@ -308,6 +409,7 @@
     (onContentReady)="onContentReady($event)"
     (onEditorPreparing)="onEditorPreparing($event)"
     (onRowRemoving)="onRowRemoving($event)"
+    (onRowRemoved)="onRowRemoved($event)"
   >
     <dxo-editing
       mode="cell"

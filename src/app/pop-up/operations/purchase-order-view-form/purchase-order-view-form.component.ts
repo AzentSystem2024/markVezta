@@ -36,6 +36,7 @@ import { PurchaseOrderVerifyFormComponent } from '../purchase-order-verify-form/
 import { DataService } from 'src/app/services';
 import jsPDF from 'jspdf';
 import autoTable, { ThemeType, UserOptions } from 'jspdf-autotable';
+import CountryList from 'country-list-with-dial-code-and-flag';
 
 @Component({
   selector: 'app-purchase-order-view-form',
@@ -60,17 +61,10 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   isIntraState: boolean;
   logoBase64: string;
 
-  constructor(
-    private service: DataService,
-    private sanitizer: DomSanitizer,
-  ) {
-    const settingsData = sessionStorage.getItem('settings');
-    this.settingsData = settingsData ? JSON.parse(settingsData) : null;
-    // Access CURRENCY_ID
-    // this.localCurrencyId = this.settingsData ? this.settingsData.CURRENCY_ID : null;
-    // console.log(this.localCurrencyId, "CURRENCY_ID");
-    // this.localCurrencyCode= this.settingsData ? this.settingsData.CURRENCY_SYMBOL : null;
-  }
+  supplierCountryCode: string = '';
+  shippingCountryCode: string = '';
+  countryCodes: any[] = [];
+  isDropdownOpen: boolean = false;
 
   width = '97vw';
   height = '420px';
@@ -173,7 +167,58 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     PoDetails: [],
   };
   newPoData = this.poData;
+
+  constructor(
+    private service: DataService,
+    private sanitizer: DomSanitizer,
+  ) {
+    const settingsData = sessionStorage.getItem('settings');
+    this.settingsData = settingsData ? JSON.parse(settingsData) : null;
+    // Access CURRENCY_ID
+    // this.localCurrencyId = this.settingsData ? this.settingsData.CURRENCY_ID : null;
+    // console.log(this.localCurrencyId, "CURRENCY_ID");
+    // this.localCurrencyCode= this.settingsData ? this.settingsData.CURRENCY_SYMBOL : null;
+  }
+
   getNewPoData = () => ({ ...this.newPoData });
+
+  getCountryCodeList() {
+    const codes = CountryList.getAll();
+
+    this.countryCodes = codes.map((country: any) => ({
+      data: country.data,
+    }));
+  }
+
+  countryCodeDisplay = (item: any) => {
+    return item
+      ? this.isDropdownOpen
+        ? `${item.data.flag} ${item.data.dial_code} - ${item.data.name}`
+        : `${item.data.flag}`
+      : '';
+  };
+
+  extractSupplierCountryCode() {
+    if (!this.newPoData.SUPP_MOBILE) return;
+
+    const parts = this.newPoData.SUPP_MOBILE.split('-');
+
+    if (parts.length === 2) {
+      this.supplierCountryCode = '+' + parts[0];
+      this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
+    }
+  }
+
+  extractShippingCountryCode() {
+    if (!this.newPoData.CONTACT_MOBILE) return;
+
+    const parts = this.newPoData.CONTACT_MOBILE.split('-');
+
+    if (parts.length === 2) {
+      this.shippingCountryCode = '+' + parts[0];
+      this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
+    }
+  }
 
   highlightEditableColumns(event: any) {
     if (event.rowType === 'data' && event.column.allowEditing) {
@@ -315,6 +360,8 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.logoBase64 = base64;
       console.log('Logo Base64 Loaded');
     });
+
+    this.getCountryCodeList();
   }
 
   private async convertToBase64(path: string): Promise<string> {
@@ -650,7 +697,10 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.newPoData = { ...this.formdata };
       this.newPoData.PoDetails = this.formdata.PoDetails || [];
 
-      // 🔥 STEP 1: DETERMINE GST MODE FROM FIRST ROW
+      this.extractSupplierCountryCode();
+      this.extractShippingCountryCode();
+
+      // STEP 1: DETERMINE GST MODE FROM FIRST ROW
       const firstDetail = this.newPoData.PoDetails[0];
 
       if (firstDetail) {
@@ -689,7 +739,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
           discountPercentage: Number(item.DISC_PERCENT || 0),
 
-          taxable: taxable, // Bind SUPP_AMOUNT
+          taxable: taxable, // 🔥 Bind SUPP_AMOUNT
           VAT_PERC: vatPerc,
 
           vatAmount: vatAmount,

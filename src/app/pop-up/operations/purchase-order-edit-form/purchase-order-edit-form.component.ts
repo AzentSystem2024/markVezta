@@ -16,8 +16,10 @@ import {
   DxCheckBoxModule,
   DxDataGridModule,
   DxDateBoxModule,
+  DxDropDownBoxModule,
   DxFileUploaderModule,
   DxFormModule,
+  DxListModule,
   DxPopupModule,
   DxProgressBarModule,
   DxRadioGroupModule,
@@ -34,6 +36,7 @@ import {
 } from 'devextreme-angular/ui/data-grid';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
+import CountryList from 'country-list-with-dial-code-and-flag';
 
 @Component({
   selector: 'app-purchase-order-edit-form',
@@ -142,6 +145,13 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   isIntraState = false;
   previousSupplierId: number | null = null;
   isInitialLoad = true;
+
+  countryCodes: any[] = [];
+  supplierCountryCode: string = '';
+  shippingCountryCode: string = '';
+  isDropdownOpen: boolean = false;
+  isShipCountryDropdownOpen: boolean = false;
+  isCountryDropdownOpen: boolean = false;
 
   poData: any = {
     COMPANY_ID: 1,
@@ -266,6 +276,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     this.GetDeliveryTermsList();
     this.GetPaymentTermsList();
     this.GetEmployeeList();
+    this.getCountryCodeList();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -275,6 +286,9 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
       this.newPoData = { ...this.formdata };
       this.newPoData.PoDetails = this.formdata.PoDetails || [];
+
+      this.extractSupplierCountryCode();
+      this.extractShippingCountryCode();
 
       //  STEP 1: DETERMINE GST MODE FROM EXISTING DATA
       const firstDetail = this.newPoData.PoDetails?.[0];
@@ -1299,6 +1313,279 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
     this.itemsGridRef?.instance?.refresh();
   }
+
+  getCountryCodeList() {
+    const codes = CountryList.getAll();
+
+    this.countryCodes = codes.map((country: any) => ({
+      ...country,
+      flagUrl: `https://flagcdn.com/w20/${country.code.toLowerCase()}.png`,
+      display: `${country.dial_code}`,
+    }));
+  }
+
+  extractSupplierCountryCode() {
+    if (!this.newPoData.SUPP_MOBILE) return;
+
+    const parts = this.newPoData.SUPP_MOBILE.split('-');
+
+    if (parts.length === 2) {
+      this.supplierCountryCode = '+' + parts[0];
+      this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
+    }
+  }
+
+  extractShippingCountryCode() {
+    if (!this.newPoData.CONTACT_MOBILE) return;
+
+    const parts = this.newPoData.CONTACT_MOBILE.split('-');
+
+    if (parts.length === 2) {
+      this.shippingCountryCode = '+' + parts[0];
+      this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
+    }
+  }
+
+  updateSupplierMobileNumber() {
+    const cleanDialCode = this.supplierCountryCode?.replace('+', '');
+
+    this.newPoData.SUPP_MOBILE = `${cleanDialCode}-`;
+  }
+
+  getOnlyMobileNumber(fullPhoneNumber: string): string {
+    if (!fullPhoneNumber) return '';
+
+    const dialCode = this.supplierCountryCode;
+
+    return fullPhoneNumber.replace(dialCode, '').replace(/\D/g, '').trim();
+  }
+
+  onSupplierMobileInput(event: any) {
+    const target = event.event.target as HTMLInputElement;
+
+    const dialCode = this.supplierCountryCode || '+91';
+
+    const cleanDialCode = dialCode.replace('+', '');
+
+    // get digits only
+    let digits = target.value.replace(/\D/g, '');
+
+    const dialDigits = cleanDialCode;
+
+    // remove dial code digits
+    if (digits.startsWith(dialDigits)) {
+      digits = digits.slice(dialDigits.length);
+    }
+
+    // prevent starting with 0
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+
+    // allow empty digits (important fix)
+    this.newPoData.SUPP_MOBILE = digits
+      ? `${cleanDialCode}-${digits}`
+      : `${cleanDialCode}-`;
+  }
+
+  SupplierMobileValidate = (e: any): boolean => {
+    const dialCode = this.supplierCountryCode || '';
+
+    const mobileValue = e.value ? e.value.toString().trim() : '';
+
+    // remove country code and non digits
+    const mobileNumber = mobileValue
+      .replace(dialCode.replace('+', ''), '')
+      .replace(/\D/g, '');
+
+    let requiredLength = 10;
+
+    switch (dialCode) {
+      case '+971': // UAE
+        requiredLength = 9;
+        break;
+
+      case '+91': // India
+        requiredLength = 10;
+        break;
+
+      case '+1': // USA
+        requiredLength = 10;
+        break;
+
+      case '+44': // UK
+        requiredLength = 10;
+        break;
+
+      case '+61': // Australia
+        requiredLength = 9;
+        break;
+
+      case '+86': // China
+        requiredLength = 11;
+        break;
+
+      default:
+        requiredLength = 10;
+    }
+
+    const isValid =
+      mobileNumber.length === requiredLength &&
+      !/^0/.test(mobileNumber) &&
+      !/^0+$/.test(mobileNumber);
+
+    if (!isValid) {
+      e.rule.message = `Mobile number must be exactly ${requiredLength} digits`;
+    }
+
+    return isValid;
+  };
+
+  preventDialCodeDelete(event: any) {
+    const dialLength = this.supplierCountryCode.replace('+', '').length + 1;
+
+    if (
+      event.event.key === 'Backspace' &&
+      event.event.target.selectionStart <= dialLength
+    ) {
+      event.event.preventDefault();
+    }
+  }
+
+  preventShipementDialCodeDelete(event: any) {
+    const dialLength = this.shippingCountryCode.replace('+', '').length + 1;
+
+    if (
+      event.event.key === 'Backspace' &&
+      event.event.target.selectionStart <= dialLength
+    ) {
+      event.event.preventDefault();
+    }
+  }
+
+  updateContactMobile() {
+    const cleanDialCode = this.shippingCountryCode?.replace('+', '');
+
+    this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-`;
+  }
+
+  onContactMobileInput(event: any) {
+    const target = event.target as HTMLInputElement;
+
+    const dialCode = this.shippingCountryCode || '+91';
+
+    let digits = target.value.replace(/\D/g, '');
+
+    const dialDigits = dialCode.replace('+', '');
+
+    if (digits.startsWith(dialDigits)) {
+      digits = digits.slice(dialDigits.length);
+    }
+
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+
+    const cleanDialCode = dialCode.replace('+', '');
+    this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-${digits}`;
+  }
+
+  validateContactMobile = (e: any): boolean => {
+    const dialCode = this.shippingCountryCode || '';
+
+    const mobileValue = e.value ? e.value.toString().trim() : '';
+
+    // remove country code and non digits
+    const mobileNumber = mobileValue
+      .replace(dialCode.replace('+', ''), '')
+      .replace(/\D/g, '');
+
+    let requiredLength = 10;
+
+    switch (dialCode) {
+      case '+971': // UAE
+        requiredLength = 9;
+        break;
+
+      case '+91': // India
+        requiredLength = 10;
+        break;
+
+      case '+1': // USA
+        requiredLength = 10;
+        break;
+
+      case '+44': // UK
+        requiredLength = 10;
+        break;
+
+      case '+61': // Australia
+        requiredLength = 9;
+        break;
+
+      case '+86': // China
+        requiredLength = 11;
+        break;
+
+      default:
+        requiredLength = 10;
+    }
+
+    const isValid =
+      mobileNumber.length === requiredLength &&
+      !/^0/.test(mobileNumber) &&
+      !/^0+$/.test(mobileNumber);
+
+    if (!isValid) {
+      e.rule.message = `Mobile number must be exactly ${requiredLength} digits`;
+    }
+
+    return isValid;
+  };
+
+  countryCodeDisplay = (item: any) => {
+    return item
+      ? this.isDropdownOpen
+        ? `${item.data.flag} ${item.data.dial_code} - ${item.data.name}`
+        : `${item.data.flag}`
+      : '';
+  };
+
+  onDropdownOpened() {
+    this.isDropdownOpen = true;
+  }
+
+  onDropdownClosed() {
+    this.isDropdownOpen = false;
+  }
+
+  onCountrySelected(e: any) {
+    this.supplierCountryCode = e.itemData.data.dial_code;
+
+    this.isCountryDropdownOpen = false;
+
+    this.updateSupplierMobileNumber();
+  }
+
+  onShippingCountrySelected(e: any) {
+    this.shippingCountryCode = e.itemData.data.dial_code;
+
+    // update mobile field with new code
+    this.updateContactMobile();
+
+    // close dropdown
+    this.isShipCountryDropdownOpen = false;
+  }
+
+  onRowRemoved(e: any) {
+    // Recalculate totals if needed
+    this.updateAmount(null);
+
+    // Reset serial numbers
+    this.savedItems.forEach((item, index) => {
+      item.slNo = index + 1;
+    });
+  }
 }
 
 @NgModule({
@@ -1321,6 +1608,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     DxTabPanelModule,
     DxPopupModule,
     DxButtonModule,
+    DxDropDownBoxModule,
+    DxListModule,
   ],
   providers: [],
   declarations: [PurchaseOrderEditFormComponent],
