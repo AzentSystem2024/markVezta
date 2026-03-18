@@ -859,6 +859,27 @@ export class PurchaseOrderComponent {
       return;
     }
 
+    // ✅ PRICE VALIDATION
+    const invalidPriceItem = data.PoDetails.find(
+      (item: any) =>
+        item.SUPP_PRICE === null ||
+        item.SUPP_PRICE === undefined ||
+        item.SUPP_PRICE === '' ||
+        Number(item.SUPP_PRICE) <= 0,
+    );
+
+    if (invalidPriceItem) {
+      notify(
+        {
+          message: 'Please enter price for all items',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+      );
+      this.isSaving = false;
+      return;
+    }
+
     // 🔁 EXISTING LOGIC (unchanged)
     const poDetails = this.poNewForm.poData.PoDetails.map((item: any) => {
       if (this.poNewForm.isInterState) {
