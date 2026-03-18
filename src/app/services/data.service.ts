@@ -162,9 +162,9 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
-  getArticleLastPartNo(): Observable<any> {
-    return this.http.post(`${this.apiUrl}article/Lastpartno`, {});
-  }
+  //  getItemsListForArticle(): Observable<any> {
+  //   return this.http.post(`${this.apiUrl}article/getItems`, {});
+  // }
 
   getLastAliasNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
@@ -176,6 +176,14 @@ export class DataService {
 
   getPackingLastPartNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}packing/Lastpartno`, {});
+  }
+
+  //  getItemsListForPacking(): Observable<any> {
+  //   return this.http.post(`${this.apiUrl}Packing/getItems`, {});
+  // }
+
+    getArticleLastPartNo(): Observable<any> {
+    return this.http.post(`${this.apiUrl}article/Lastpartno`, {});
   }
 
   insertArticle(items: any) {
@@ -6342,5 +6350,10 @@ The result can be exported to HTML or Markdown.`;
   //--------------------------MISCELLANEOUS-INVOICE----------------------------------//
   getMiscInvoiceMainList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseReturn/list`, data);
+  }
+  //===========mobile number length based on country==================
+
+  get_mobile_no_length(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Company/getdigit`, data);
   }
 }

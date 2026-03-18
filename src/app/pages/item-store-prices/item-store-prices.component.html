@@ -216,6 +216,7 @@
           dataField="PRICE_NEW"
           caption="New"
           [width]="100"
+          dataType="number"
           [allowEditing]="true"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -229,9 +230,11 @@
         [visible]="isVisible('PRICE1')"
         [width]="120"
         alignment="center"
+        dataType="number"
       >
         <dxi-column
           dataField="SALE_PRICE1"
+          dataType="number"
           caption="Present"
           [width]="130"
           [allowEditing]="false"
@@ -242,6 +245,7 @@
           caption="New"
           [width]="100"
           alignment="right"
+          dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="!isVerified"
         >
@@ -252,11 +256,13 @@
         caption="Price 2"
         [width]="120"
         [visible]="isVisible('PRICE2')"
+        dataType="number"
         alignment="center"
       >
         <dxi-column
           dataField="SALE_PRICE2"
           caption="Present"
+          dataType="number"
           [width]="130"
           [allowEditing]="false"
           [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -265,6 +271,7 @@
           dataField="PRICE_LEVEL2_NEW"
           caption="New"
           [width]="100"
+          dataType="number"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="!isVerified"
@@ -275,6 +282,7 @@
       <dxi-column
         caption="Price 3"
         [width]="120"
+        dataType="number"
         [visible]="isVisible('PRICE3')"
         alignment="center"
       >
@@ -283,12 +291,14 @@
           caption="Present"
           [width]="130"
           [allowEditing]="false"
+          dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         ></dxi-column>
         <dxi-column
           dataField="PRICE_LEVEL3_NEW"
           caption="New"
           [width]="100"
+          dataType="number"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="!isVerified"
@@ -307,12 +317,14 @@
           caption="Present"
           [width]="130"
           [allowEditing]="false"
+          dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         ></dxi-column>
         <dxi-column
           dataField="PRICE_LEVEL4_NEW"
           caption="New"
           [width]="100"
+          dataType="number"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="!isVerified"
@@ -331,6 +343,7 @@
           caption="Present"
           [width]="130"
           [allowEditing]="false"
+          dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         ></dxi-column>
         <dxi-column
@@ -340,6 +353,7 @@
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="!isVerified"
+          dataType="number"
         >
         </dxi-column>
       </dxi-column>

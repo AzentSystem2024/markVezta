@@ -1334,7 +1334,7 @@ export class PackingAddComponent {
   }
 
   addNewRow() {
-    this.dataService.getItemsListForPacking().subscribe((res: any) => {
+    this.dataService.getItemsListForArticle().subscribe((res: any) => {
       console.log(res);
       console.log(
         'PrePaymentListDataSource=============================:',

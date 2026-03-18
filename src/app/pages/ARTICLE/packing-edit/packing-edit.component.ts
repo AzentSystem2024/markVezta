@@ -1217,22 +1217,65 @@ export class PackingEditComponent {
     this.ItempopupVisible = false;
   }
 
-  saveSelectedItems() {
-    const popupGrid = this.bomGridRef.instance; // popup grid
+  // saveSelectedItems() {
 
+  //   const popupGrid = this.bomGridRef.instance;   // popup grid
+
+  //   const selectedRows = popupGrid.getSelectedRowsData();
+
+  //   if (!selectedRows.length) {
+  //     return;
+  //   }
+
+  //   //  Remove empty row if exists
+  //   this.items = this.items.filter(
+  //     row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
+  //   );
+
+  //   selectedRows.forEach((item: any) => {
+
+  //     const exists = this.items.some(
+  //       x => x.ITEM === item.ITEM_CODE
+  //     );
+
+  //     if (!exists) {
+  //       this.items.push({
+  //         ITEM: item.ITEM_CODE,
+  //         DESCRIPTION: item.DESCRIPTION,
+  //         UOM: item.UOM,
+  //         QUANTITY: null,
+  //         ITEM_ID: item.ID
+  //       });
+  //     }
+
+  //   });
+
+  //   // refresh BOM grid
+  //   this.itemsGridRef.instance.refresh();
+
+  //   this.ItempopupVisible = false;
+
+  // }
+
+  saveSelectedItems() {
+    const popupGrid = this.bomGridRef.instance;
     const selectedRows = popupGrid.getSelectedRowsData();
 
-    if (!selectedRows.length) {
-      return;
-    }
+    // selected item IDs from popup
+    const selectedIds = selectedRows.map((item: any) => item.ID);
 
-    //  Remove empty row if exists
+    // 1️ Remove BOM items that are not selected anymore
+    this.items = this.items.filter(
+      (row) => !row.ITEM_ID || selectedIds.includes(row.ITEM_ID),
+    );
+
     this.items = this.items.filter(
       (row) => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY,
     );
 
+    // 2️ Add newly selected items
     selectedRows.forEach((item: any) => {
-      const exists = this.items.some((x) => x.ITEM === item.ITEM_CODE);
+      const exists = this.items.some((x) => x.ITEM_ID === item.ID);
 
       if (!exists) {
         this.items.push({

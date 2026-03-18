@@ -47,12 +47,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import CountryList from 'country-list-with-dial-code-and-flag';
 import { DataService } from 'src/app/services';
 
-
-
 @Component({
   selector: 'app-user-new-form',
   templateUrl: './user-new-form.component.html',
-  styleUrls: ['./user-new-form.component.scss']
+  styleUrls: ['./user-new-form.component.scss'],
 })
 export class UserNewFormComponent {
   @ViewChild('fileUploader', { static: false })
@@ -74,15 +72,12 @@ export class UserNewFormComponent {
     InactiveReason: '',
     changePasswordOnLogin: false,
     COMPANY_ID: [],
-    Date_Format:'',
-    Time_Format:'',
+    Date_Format: '',
+    Time_Format: '',
     // Decimal_Points:'',
     // Currency_Symbol:'',
   };
   newUserData = this.userData;
-
-
-
 
   // newUserData :any;
   selectedRows: any[] = [];
@@ -96,11 +91,16 @@ export class UserNewFormComponent {
   isPasswordVisible = false;
   securityPolicyData: any;
   // facilityList;
- CompanyList: any[] ;
+  CompanyList: any[];
   isAddFormPopupOpened: boolean;
   clearData: any;
+  mobile_limit: any;
 
-constructor(private fb: FormBuilder, private dataservice: DataService,private cdr: ChangeDetectorRef) {}
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   countryCodes: any[] = [];
 
@@ -117,8 +117,8 @@ constructor(private fb: FormBuilder, private dataservice: DataService,private cd
   onHideEvent = 'click';
   selectedRowCount: number = 0;
   totalRowCount: number = 0;
-  userList_Data: any[]=[]
-userList:any
+  userList_Data: any[] = [];
+  userList: any;
   UserListdataSource: any;
   userRoles: any;
 
@@ -134,16 +134,16 @@ userList:any
   selectedUserType: string = this.userTypes[0]; // Default to 'Normal User'
 
   passwordMode: 'password' | 'text' = 'password';
-    togglePasswordVisibility = () => {
+  togglePasswordVisibility = () => {
     this.passwordMode = this.passwordMode === 'password' ? 'text' : 'password';
-     this.cdr.detectChanges(); // Ensure the UI reflects the change immediately
+    this.cdr.detectChanges(); // Ensure the UI reflects the change immediately
   };
   //dateformat options
 
   selectedDropdownOption: string;
   //thousandseparator
   thousandSeparatorValue: number;
-  decimal:number;
+  decimal: number;
 
   public isDropdownOpen: boolean = false;
   dateFormat: any;
@@ -151,83 +151,63 @@ userList:any
   currencySymbol: any;
   exampleDateFormat: any;
   exampleTimeFormat: any;
-  CompanyList_data:any
-  CompanyData:any
+  CompanyList_data: any;
+  CompanyData: any;
 
-// Use this function to display based on dropdown state
-  countryCodeDisplay = (item: any) => {
-    return item
-      ? this.isDropdownOpen
-        ? `${item.data.flag} ${item.data.dial_code} - ${item.data.name}`
-        : `${item.data.flag}`
-      : ''; // Display only country flag before dropdown is opened
-  };
-
-    getCountryCodeList() {
-    const codes = CountryList.getAll(); // Get all country codes
-    this.countryCodes = codes.map((country: any) => ({
-      data: country.data,
-    }));
-    console.log(this.countryCodes, 'country code'); // Optional: For debugging
+  // Use this function to display based on dropdown state
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
   }
 
+  ngOnInit(): void {
+    // this.getCountryCodeList();
+    this.getUSerData();
 
-ngOnInit(): void {
-    
-    // this.getDropDownData('GENDER_DATA');
-    // this.getDropDownData('USER_ROLE');
-    // this.getDropDownData('DATE_FORMAT');
-    // this.getDropDownData('TIME_FORMAT');
-    // this.getDropDownData('CURRENCY_SYMBOL');
-    // this.getUserSecurityPolicyData();
-    // this.getFacilityData();
-    this.getCountryCodeList();
-    this.getUSerData()
-    // this.fetch_all_UserLevel_list();
-    // this.setDefaultCountryCode();
     this.updateMobileNumber(); // Update mobile field with the default country code
-    this.get_Company_details()
-    this.user_role_dropdown()
+    this.get_Company_details();
+    this.user_role_dropdown();
   }
   getUSerData() {
     this.dataservice.get_User_data().subscribe((data) => {
       this.userList = data;
       console.log('datasource', this.userList);
     });
+
+    this.dataservice.getCountryWithFlags().subscribe((data) => {
+      this.countryCodes = data;
+      console.log(this.countryCodes, 'COUNTRY;;;;;;;;;;');
+    });
   }
 
+  get_Company_details() {
+    this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
+      console.log(res);
+      this.CompanyList_data = res.Data;
+      console.log(this.CompanyList_data);
 
-  get_Company_details(){
+      const company_id = this.newUserData.COMPANY_ID;
+      this.CompanyData = this.CompanyList_data.filter((item) =>
+        company_id.includes(item.ID),
+      );
 
-  this.dataservice.get_CompanyList_Api().subscribe((res:any)=>{
-    console.log(res);
-    this.CompanyList_data=res.Data
-    console.log(this.CompanyList_data);
-
-    const company_id=this.newUserData.COMPANY_ID
-    this.CompanyData = this.CompanyList_data.filter(item => company_id.includes(item.ID));
-    
-    console.log(this.CompanyData);
+      console.log(this.CompanyData);
       this.selectedRows = company_id; // This will auto-check rows in the grid
 
-    console.log('Preselected Companies:', this.selectedRows);
-    this.isAddFormPopupOpened =false
-
-  })
-}
+      console.log('Preselected Companies:', this.selectedRows);
+      this.isAddFormPopupOpened = false;
+    });
+  }
   // Triggered when the dropdown is opened
   onDropdownOpened() {
     this.isDropdownOpen = true; // Mark dropdown as open
   }
-    // Triggered when the dropdown is closed
+  // Triggered when the dropdown is closed
   onDropdownClosed() {
     this.isDropdownOpen = false; // Mark dropdown as closed
   }
 
-
-
-  
-  onTimeFormatChange(event:any){
+  onTimeFormatChange(event: any) {
     // const selectedTimeFormat = this.timeFormat.find(format => format.DESCRIPTION === event.value)?.DESCRIPTION;
     // if(selectedTimeFormat){
     //   this.newUserData.Time_Format = event.value;
@@ -237,20 +217,20 @@ ngOnInit(): void {
     // }
   }
 
-  
-
-   onLoginExpiryDateChange(event: any) {
+  onLoginExpiryDateChange(event: any) {
     this.newUserData.LoginExpiryDate = event.value; // Update the model with the selected date
   }
- onLockDateToChange(event: any) {
+  onLockDateToChange(event: any) {
     this.newUserData.LockDateTo = event.value; // Update the model with the selected date
   }
   onLockDateFromChange(event: any) {
     this.newUserData.LockDateFrom = event.value; // Update the model with the selected date
   }
-    onDateFormatChange(event: any): void {
+  onDateFormatChange(event: any): void {
     // Directly set the value from the event
-    const selectedFormat = this.dateFormat.find(format => format.DESCRIPTION === event.value)?.DESCRIPTION;
+    const selectedFormat = this.dateFormat.find(
+      (format) => format.DESCRIPTION === event.value,
+    )?.DESCRIPTION;
     if (selectedFormat) {
       this.newUserData.Date_Format = event.value; // Ensure the correct value is set
       this.exampleDateFormat = this.getFormattedDate(selectedFormat); // Generate the example format
@@ -260,9 +240,9 @@ ngOnInit(): void {
   }
 
   onSelectionChanged(e: any) {
-  this.selectedRows = e.selectedRowKeys;
-  console.log('User selected:', this.selectedRows);
-}
+    this.selectedRows = e.selectedRowKeys;
+    console.log('User selected:', this.selectedRows);
+  }
 
   //   // Method to handle tab click and set selected index
   // onTabClick(event: any) {
@@ -270,7 +250,7 @@ ngOnInit(): void {
   //   this.selectedIndex = event.itemIndex;
   // }
 
-    WhatsappValidate = (e: any): boolean => {
+  WhatsappValidate = (e: any): boolean => {
     const whatsappNumber = e.value;
 
     // Remove all non-digit characters
@@ -283,20 +263,20 @@ ngOnInit(): void {
     return false; // Invalid
   };
 
-    autoBindWhatsapp() {
+  autoBindWhatsapp() {
     console.log('WhatsApp field focused.');
     setTimeout(() => {
       if (!this.newUserData.Whatsapp && this.newUserData.Mobile) {
         console.log(
           'Populating WhatsApp with Mobile:',
-          this.newUserData.Mobile
+          this.newUserData.Mobile,
         );
         this.newUserData.Whatsapp = this.newUserData.Mobile;
       }
     }, 0);
   }
 
-   validateWhatsapp(event: any) {
+  validateWhatsapp(event: any) {
     const target = event.target as HTMLInputElement;
 
     // Allow only input that starts with '+' and contains only digits
@@ -313,9 +293,9 @@ ngOnInit(): void {
     this.newUserData.Whatsapp = target.value;
   }
 
-   getFormattedDate(format: string): string {
+  getFormattedDate(format: string): string {
     const currentDate = new Date();
-  
+
     // Replace placeholders in the selected format with actual date values
     return format
       .replace('YYYY', currentDate.getFullYear().toString())
@@ -327,17 +307,14 @@ ngOnInit(): void {
       .replace('Month', currentDate.toLocaleString('en-US', { month: 'long' }))
       .replace('Day', currentDate.toLocaleString('en-US', { weekday: 'long' }));
   }
-  
 
-   preventTyping(event: any): void {
+  preventTyping(event: any): void {
     if (event.event) {
       event.event.preventDefault(); // Prevent keypress
     }
   }
 
-
-
-    handleFileInputChange(event: Event) {
+  handleFileInputChange(event: Event) {
     const input = event.target as HTMLInputElement;
     // if (input.files && input.files[0]) {
     //   const file = input.files[0];
@@ -346,7 +323,7 @@ ngOnInit(): void {
     // }
   }
 
-   handleDrop(event: DragEvent) {
+  handleDrop(event: DragEvent) {
     // this.preventDefaults(event);
     // if (event.dataTransfer && event.dataTransfer.files) {
     //   const file = event.dataTransfer.files[0];
@@ -354,23 +331,23 @@ ngOnInit(): void {
     // }
   }
 
-    handleDragLeave(e: Event) {
+  handleDragLeave(e: Event) {
     // this.preventDefaults(e);
     // (e.target as HTMLElement).classList.remove('highlight');
   }
 
-   preventDefaults(e: Event) {
+  preventDefaults(e: Event) {
     e.preventDefault();
     e.stopPropagation();
   }
 
-   // This function checks if the email already exists in the user list
+  // This function checks if the email already exists in the user list
   checkEmailExists = (e: any): boolean => {
     const email = e.value;
 
     // Check if the email already exists in the user list
     const exists = this.userList.some(
-      (user) => user.Email.toLowerCase() === email.toLowerCase()
+      (user) => user.Email.toLowerCase() === email.toLowerCase(),
     );
 
     // Return true if it does NOT exist, false if it DOES exist
@@ -393,7 +370,7 @@ ngOnInit(): void {
     return e.valid;
   };
 
-   // This function removes spaces from the email input and updates the Email property
+  // This function removes spaces from the email input and updates the Email property
   onEmailInput(event: Event): void {
     const target = event.target as HTMLInputElement;
 
@@ -406,28 +383,25 @@ ngOnInit(): void {
     this.checkEmailExists({ value: sanitizedValue });
   }
 
-   onDateOfBirthChange(event: any) {
+  onDateOfBirthChange(event: any) {
     this.newUserData.DateofBirth = event.value; // Update the model with the selected date
   }
 
-
-
   checkLoginNameExists = (e: any): boolean => {
-  const loginName = e.value?.trim();
+    const loginName = e.value?.trim();
 
-  if (!Array.isArray(this.userList)) {
-    console.warn('userList is not loaded yet');
-    e.valid = true; // allow validation to pass, or set false to block
-    return true;
-  }
+    if (!Array.isArray(this.userList)) {
+      console.warn('userList is not loaded yet');
+      e.valid = true; // allow validation to pass, or set false to block
+      return true;
+    }
 
-  const exists = this.userList.some((user) => user.LoginName === loginName);
+    const exists = this.userList.some((user) => user.LoginName === loginName);
 
-  // Return true if it does NOT exist, false if it DOES exist
-  e.valid = !exists;
-  return e.valid;
-};
-
+    // Return true if it does NOT exist, false if it DOES exist
+    e.valid = !exists;
+    return e.valid;
+  };
 
   onLoginNameInput(event: Event): void {
     const target = event.target as HTMLInputElement;
@@ -452,61 +426,70 @@ ngOnInit(): void {
     }
   }
 
-  
-  MobileNumberValidate = (e: any): boolean => {
-    const mobileNumber = e.value;
+  // MobileNumberValidate = (e: any): boolean => {
+  //   const mobileNumber = e.value || '';
 
-    // Remove all non-digit characters
-    const sanitizedNumber = mobileNumber.replace(/\D/g, '');
+  //   // Find selected country
+  //   const selectedCountry = this.countryCodes.find(
+  //     (code) => code.CODE === this.newUserData.countryCode,
+  //   );
 
-    // Check if the sanitized number has at least 10 digits
-    if (sanitizedNumber.length >= 10) {
-      return true; // Valid
-    }
-    return false; // Invalid
-  };
+  //   if (!selectedCountry) return false;
 
-    onMobileInputChange(event: any) {
-    const target = event.target as HTMLInputElement;
+  //   const dialCode = selectedCountry.CODE;
 
-    // Get the input value and allow only '+' at the start and digits after that
-    let newValue = target.value.replace(/[^0-9+]/g, '');
+  //   // Remove dial code
+  //   const numberPart = mobileNumber.replace(dialCode, '').trim();
 
-    // Ensure the input starts with '+' and not '0'
-    if (!newValue.startsWith('+')) {
-      newValue = '+' + newValue;
-    }
+  //   // Keep digits only
+  //   const sanitizedNumber = numberPart.replace(/\D/g, '');
 
-    // Remove any leading '0' after '+'
-    newValue = newValue.replace(/\+0/g, '+');
+  //   console.log('Mobile digits:', sanitizedNumber.length);
 
-    // Set the cleaned value back to the input
-    target.value = newValue;
+  //   // Check exact length
+  //   return sanitizedNumber.length === this.mobile_limit;
+  // };
+  // onMobileInputChange(event: any) {
+  //   const target = event.target as HTMLInputElement;
 
-    // Find the selected country code
-    const selectedCountry = this.countryCodes.find(
-      (code) => code.data.dial_code === this.newUserData.countryCode
-    );
+  //   // Allow only '+' and numbers
+  //   let newValue = target.value.replace(/[^0-9+]/g, '');
 
-    if (selectedCountry) {
-      const dialCode = selectedCountry.data.dial_code;
+  //   // Ensure number starts with '+'
+  //   if (!newValue.startsWith('+')) {
+  //     newValue = '+' + newValue;
+  //   }
 
-      // If the user tries to backspace to remove the dial code, reset the input
-      if (!newValue.startsWith(dialCode)) {
-        this.newUserData.Mobile = dialCode; // Reset mobile number to only show dial code
-        return;
-      }
+  //   // Prevent +0
+  //   newValue = newValue.replace(/\+0/g, '+');
 
-      // Extract the mobile number part
-      const mobileNumberPart = newValue.replace(dialCode, '').trim();
-      const validMobileNumber = this.validateMobileNumber(mobileNumberPart);
+  //   target.value = newValue;
 
-      // Update the mobile field, keeping the dial code intact
-      this.newUserData.Mobile = `${dialCode} ${validMobileNumber}`;
-    }
-  }
+  //   // Find selected country
+  //   const selectedCountry = this.countryCodes.find(
+  //     (code) => code.CODE === this.newUserData.countryCode,
+  //   );
 
-    validateMobileNumber(mobileNumber: string): string {
+  //   if (selectedCountry) {
+  //     const dialCode = selectedCountry.CODE;
+
+  //     // Prevent deleting dial code
+  //     if (!newValue.startsWith(dialCode)) {
+  //       this.newUserData.Mobile = dialCode;
+  //       return;
+  //     }
+
+  //     // Get mobile number after dial code
+  //     const mobileNumberPart = newValue.replace(dialCode, '').trim();
+
+  //     const validMobileNumber = this.validateMobileNumber(mobileNumberPart);
+
+  //     // Update mobile with dial code
+  //     this.newUserData.Mobile = `${dialCode} ${validMobileNumber}`;
+  //   }
+  // }
+
+  validateMobileNumber(mobileNumber: string): string {
     // Remove any non-digit characters
     const digitsOnly = mobileNumber.replace(/\D/g, '');
 
@@ -514,13 +497,69 @@ ngOnInit(): void {
     return digitsOnly.startsWith('0') ? '' : digitsOnly;
   }
 
-   
+  // 1. Ensure mobile_limit is defined (e.g., 9 or 10)
 
-   refreshPassword(): void {
+  // 2. Use arrow function to preserve 'this' context
+  MobileNumberValidate = (e: any): boolean => {
+    const fullValue = e.value || '';
+    const countryCode = this.newUserData.countryCode || '';
+
+    // If no country code is selected, fail validation
+    if (!countryCode) return false;
+
+    // Remove the country code from the beginning of the string
+    // and remove all non-digit characters (spaces, dashes, etc.)
+    let pureNumber = '';
+    if (fullValue.startsWith(countryCode)) {
+      pureNumber = fullValue.substring(countryCode.length).replace(/\D/g, '');
+    } else {
+      pureNumber = fullValue.replace(/\D/g, '');
+    }
+
+    console.log(
+      'Validating digits:',
+      pureNumber.length,
+      'against limit:',
+      this.mobile_limit,
+    );
+
+    // Return true only if length matches exactly
+    return pureNumber.length === this.mobile_limit;
+  };
+
+  onMobileInputChange(event: any) {
+    const target = event.event.target as HTMLInputElement; // Get the raw input
+    let inputValue = target.value;
+    const dialCode = this.newUserData.countryCode || '';
+
+    // 1. Force the dial code to be at the start
+    if (!inputValue.startsWith(dialCode)) {
+      inputValue = dialCode;
+    }
+
+    // 2. Get the part after the dial code
+    let numberPart = inputValue.substring(dialCode.length);
+
+    // 3. Clean the number part: remove non-digits and prevent leading zero
+    numberPart = numberPart.replace(/\D/g, '');
+    if (numberPart.startsWith('0')) {
+      numberPart = numberPart.substring(1);
+    }
+
+    // 4. Update the model and the UI
+    const finalValue = dialCode + numberPart;
+
+    // Use setTimeout to ensure the validation triggers AFTER the value is updated
+    setTimeout(() => {
+      this.newUserData.Mobile = finalValue;
+    }, 0);
+  }
+
+  refreshPassword(): void {
     this.generatedPassword = this.generateRandomPassword(); // Call your existing method to generate a random password
   }
 
-    generateRandomPassword(): string {
+  generateRandomPassword(): string {
     // Fetch the minimum length from security policy; default to 8 if not provided
     const minLength = Math.max(this.securityPolicyData.MinimumLength || 8, 8); // Ensure a minimum length of at least 8
 
@@ -545,32 +584,32 @@ ngOnInit(): void {
     if (this.securityPolicyData.Numbers) {
       characters.push(numbers);
       requiredCharacters.push(
-        numbers.charAt(Math.floor(Math.random() * numbers.length))
+        numbers.charAt(Math.floor(Math.random() * numbers.length)),
       );
     }
     if (this.securityPolicyData.UppercaseCharacters) {
       characters.push(upperCase);
       requiredCharacters.push(
-        upperCase.charAt(Math.floor(Math.random() * upperCase.length))
+        upperCase.charAt(Math.floor(Math.random() * upperCase.length)),
       );
     }
     if (this.securityPolicyData.LowercaseCharacters) {
       characters.push(lowerCase);
       requiredCharacters.push(
-        lowerCase.charAt(Math.floor(Math.random() * lowerCase.length))
+        lowerCase.charAt(Math.floor(Math.random() * lowerCase.length)),
       );
     }
     if (this.securityPolicyData.SpecialCharacters) {
       characters.push(specialChars);
       requiredCharacters.push(
-        specialChars.charAt(Math.floor(Math.random() * specialChars.length))
+        specialChars.charAt(Math.floor(Math.random() * specialChars.length)),
       );
     }
 
     // Ensure there are character sets to choose from
     if (characters.length === 0) {
       throw new Error(
-        'No character sets selected based on the security policy.'
+        'No character sets selected based on the security policy.',
       );
     }
 
@@ -595,8 +634,7 @@ ngOnInit(): void {
     return password;
   }
 
-
-    onUserNameInput(event: Event): void {
+  onUserNameInput(event: Event): void {
     const target = event.target as HTMLInputElement;
 
     // Regular expression to allow only alphabets with a single space between words
@@ -610,15 +648,14 @@ ngOnInit(): void {
     this.newUserData.UserName = sanitizedValue; // Update the UserName value
   }
 
-    toggleUserDetails(): void {
+  toggleUserDetails(): void {
     this.showUserDetails = !this.showUserDetails;
   }
-
 
   updateMobileNumber() {
     // Find the selected country code
     const selectedCountry = this.countryCodes.find(
-      (code) => code.data.dial_code === this.newUserData.countryCode
+      (code) => code.data.dial_code === this.newUserData.countryCode,
     );
 
     if (selectedCountry) {
@@ -634,11 +671,21 @@ ngOnInit(): void {
       console.log('Updated Mobile:', this.newUserData.Mobile); // For debugging
     }
   }
+  onCountrycodeChange(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      console.log(res);
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
+  }
 
-    getOnlyMobileNumber(fullPhoneNumber: string): string {
+  getOnlyMobileNumber(fullPhoneNumber: string): string {
     // Extract mobile number by removing the dial code part
     const selectedCountry = this.countryCodes.find((code) =>
-      fullPhoneNumber.startsWith(code.data.dial_code)
+      fullPhoneNumber.startsWith(code.data.dial_code),
     );
 
     if (selectedCountry) {
@@ -648,12 +695,10 @@ ngOnInit(): void {
     return fullPhoneNumber; // Return as is if no match found
   }
 
-
-
-   copyToClipboard(): void {
+  copyToClipboard(): void {
     if (!navigator.clipboard) {
       console.warn(
-        'Clipboard API not available. Make sure you are running the application over HTTPS.'
+        'Clipboard API not available. Make sure you are running the application over HTTPS.',
       );
       // Optionally show a user-friendly message or fallback logic
       this.tooltipVisible = false;
@@ -672,20 +717,17 @@ ngOnInit(): void {
       });
   }
 
-  
-  user_role_dropdown(){
-
-    this.dataservice.get_userLevels_Dropdown_Api().subscribe((res:any)=>{
-      console.log(res,'==========datedrp=======');
-      this.userRole=res
-    })
+  user_role_dropdown() {
+    this.dataservice.get_userLevels_Dropdown_Api().subscribe((res: any) => {
+      console.log(res, '==========datedrp=======');
+      this.userRole = res;
+    });
   }
 
-  getNewUserData = () => ({ 
+  getNewUserData = () => ({
     ...this.newUserData,
-    COMPANY_ID: this.selectedRows
-   });
-  
+    COMPANY_ID: this.selectedRows,
+  });
 }
 
 @NgModule({
@@ -712,7 +754,7 @@ ngOnInit(): void {
     DxValidationGroupModule,
     DxNumberBoxModule,
     DxDropDownBoxModule,
-    DxListModule
+    DxListModule,
   ],
   providers: [],
   declarations: [UserNewFormComponent],
