@@ -173,8 +173,21 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
   isCountryDropdownOpen: boolean = false;
   isShipCountryDropdownOpen: boolean = false;
+  showHeaderFilter: true;
+  showFilterRow = true;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
+  isFilterOpened: boolean = false;
 
   getNewPoData = () => ({ ...this.newPoData });
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+  vatTitle: any;
   constructor(
     private service: DataService,
     private router: Router,
@@ -198,6 +211,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       'Parsed ObjectData:',
       this.menuResponse.GeneralSettings.STORE_TITLE,
     );
+    this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
     // this.sessionData_tax()
     const menuGroups = this.menuResponse.MenuGroups || [];
@@ -224,6 +238,17 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     // this.getPoHistoryList();
     this.getCountryCodeList();
     this.setDefaultCountryCode();
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.supplierItemsGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
 
   getDocNo() {
@@ -370,24 +395,6 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       // ✅ Decide GST type
       this.isInterState = this.companyStateID !== this.supplierStateID;
       this.applyGstModeToItems();
-      // ✅ Ensure GST is numeric
-      // const gstPerc = Number(this.GST_PERC) || 0;
-      // const halfGst = +(gstPerc / 2).toFixed(2);
-
-      // ✅ Apply GST ONLY to relevant fields
-      // this.savedItems.forEach((item) => {
-      //   if (this.isInterState) {
-      //     // INTER-STATE → IGST
-      //     item.VAT_PERC = gstPerc;
-      //     item.CGST = 0;
-      //     item.SGST = 0;
-      //   } else {
-      //     // INTRA-STATE → CGST + SGST
-      //     item.VAT_PERC = 0;
-      //     item.CGST = halfGst;
-      //     item.SGST = halfGst;
-      //   }
-      // });
 
       // 🔁 Refresh grid so columns + values update
       setTimeout(() => {
@@ -399,7 +406,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       // ⬇️ 🔒 KEEPING ALL YOUR EXISTING CODE AS-IS
       this.newPoData.CURRENCY_ID = this.supplierItems[0].CURRENCY_ID;
       this.newPoData.SUPP_CONTACT = this.supplierItems[0].SUPP_NAME;
-      this.newPoData.SUPP_MOBILE = this.supplierItems[0].PHONE;
+
       this.newPoData.SUPP_ADDRESS = this.supplierItems[0].SUPP_ADDRESS;
       this.SupplierCurrency = this.supplierItems[0].CURRENCY_NAME;
       this.SupplierCurrencyCode = this.supplierItems[0].CURRENCY_CODE;
@@ -414,8 +421,19 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.newPoData.SHIP_TO = this.supplierItems[0].COMPANY_ADDRESS;
       this.newPoData.CONTACT_NAME = this.supplierItems[0].COMPANY_CONTACT;
       this.newPoData.CONTACT_MOBILE = this.supplierItems[0].COMPANY_MOBILE;
+      const suppMobile = this.supplierItems[0].PHONE;
 
-      this.extractSupplierCountryCode();
+      if (!suppMobile) return;
+
+      const parts = suppMobile.split('-');
+
+      if (parts.length === 2) {
+        this.supplierCountryCode = '+' + parts[0];
+        // this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
+        this.newPoData.SUPP_MOBILE = parts[1];
+      }
+
+      // this.extractSupplierCountryCode();
       this.extractShippingCountryCode();
 
       console.log(this.supplierItems, 'supplier items');
@@ -440,7 +458,11 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
     if (parts.length === 2) {
       this.shippingCountryCode = '+' + parts[0];
-      this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
+
+      //  ONLY number (same as SUPP_MOBILE)
+      this.newPoData.CONTACT_MOBILE = parts[1];
+      // this.shippingCountryCode = '+' + parts[0];
+      // this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
     }
   }
 
@@ -1075,28 +1097,40 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   onCancelNewData() {
-    console.log('================================================');
-    // this.resetForm();
-    // // reset validation state
-    // this.newPoData = {}; // or a default object with empty values
-    // this.savedItems = [];
-    // this.isSupplierTouched = false;
-    // this.isSupplierValid = true;
-    // this.supplierItemsGrid?.instance?.clearSelection();
-    // this.resetForm();        // optional: clear form data
-    this.showAddItemPopup = false; //  close popup
+    this.showAddItemPopup = false;
+
+    const grid = this.supplierItemsGrid?.instance;
+
+    if (grid) {
+      //  Clear all filters
+      grid.clearFilter();
+
+      // Hide filter UI
+      grid.option('filterRow.visible', false);
+      grid.option('headerFilter.visible', false);
+    }
+
+    // Reset your toggle state
+    this.isFilterOpened = false;
   }
 
   onPopupClosing() {
-    // clear grid selection
-    this.supplierItemsGrid?.instance?.clearSelection();
+    const grid = this.supplierItemsGrid?.instance;
 
-    // optional: reset form
-    // this.resetForm();
-    // this.newPoData = {};
-    // this.savedItems = [];
-    // this.isSupplierTouched = false;
-    // this.isSupplierValid = true;
+    if (grid) {
+      // Clear filters
+      grid.clearFilter();
+
+      // Reset filter UI
+      grid.option('filterRow.visible', false);
+      grid.option('headerFilter.visible', false);
+    }
+
+    // Reset toggle state
+    this.isFilterOpened = false;
+
+    // (Optional) clear selection
+    this.supplierItemsGrid?.instance?.clearSelection();
   }
 
   // Parent component
@@ -1221,9 +1255,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   updateSupplierMobileNumber() {
-    const cleanDialCode = this.supplierCountryCode?.replace('+', '');
+    this.newPoData.SUPP_MOBILE = '';
+    // const cleanDialCode = this.supplierCountryCode?.replace('+', '');
 
-    this.newPoData.SUPP_MOBILE = `${cleanDialCode}-`;
+    // this.newPoData.SUPP_MOBILE = `${cleanDialCode}-`;
   }
 
   getOnlyMobileNumber(fullPhoneNumber: string): string {
@@ -1257,9 +1292,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     }
 
     // allow empty digits (important fix)
-    this.newPoData.SUPP_MOBILE = digits
-      ? `${cleanDialCode}-${digits}`
-      : `${cleanDialCode}-`;
+    this.newPoData.SUPP_MOBILE = digits;
+    // this.newPoData.SUPP_MOBILE = digits
+    //   ? `${cleanDialCode}-${digits}`
+    //   : `${cleanDialCode}-`;
   }
 
   SupplierMobileValidate = (e: any): boolean => {
@@ -1268,9 +1304,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     const mobileValue = e.value ? e.value.toString().trim() : '';
 
     // remove country code and non digits
-    const mobileNumber = mobileValue
-      .replace(dialCode.replace('+', ''), '')
-      .replace(/\D/g, '');
+    const mobileNumber = mobileValue.replace(/\D/g, '');
+    // const mobileNumber = mobileValue
+    //   .replace(dialCode.replace('+', ''), '')
+    //   .replace(/\D/g, '');
 
     let requiredLength = 10;
 
@@ -1338,31 +1375,45 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   updateContactMobile() {
-    const cleanDialCode = this.shippingCountryCode?.replace('+', '');
+    this.newPoData.CONTACT_MOBILE = '';
+    // const cleanDialCode = this.shippingCountryCode?.replace('+', '');
 
-    this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-`;
+    // this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-`;
   }
 
   onContactMobileInput(event: any) {
     const target = event.target as HTMLInputElement;
 
-    const dialCode = this.shippingCountryCode || '+91';
-
     let digits = target.value.replace(/\D/g, '');
-
-    const dialDigits = dialCode.replace('+', '');
-
-    if (digits.startsWith(dialDigits)) {
-      digits = digits.slice(dialDigits.length);
-    }
 
     if (digits.startsWith('0')) {
       digits = digits.substring(1);
     }
 
-    const cleanDialCode = dialCode.replace('+', '');
-    this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-${digits}`;
+    this.newPoData.CONTACT_MOBILE = digits;
   }
+
+  // onContactMobileInput(event: any) {
+  //   const target = event.target as HTMLInputElement;
+
+  //   const dialCode = this.shippingCountryCode || '+91';
+
+  //   let digits = target.value.replace(/\D/g, '');
+
+  //   const dialDigits = dialCode.replace('+', '');
+
+  //   if (digits.startsWith(dialDigits)) {
+  //     digits = digits.slice(dialDigits.length);
+  //   }
+
+  //   if (digits.startsWith('0')) {
+  //     digits = digits.substring(1);
+  //   }
+
+  //   const cleanDialCode = dialCode.replace('+', '');
+  //   // this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-${digits}`;
+  //   this.newPoData.CONTACT_MOBILE = digits;
+  // }
 
   validateContactMobile = (e: any): boolean => {
     const dialCode = this.shippingCountryCode || '';
@@ -1370,9 +1421,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     const mobileValue = e.value ? e.value.toString().trim() : '';
 
     // remove country code and non digits
-    const mobileNumber = mobileValue
-      .replace(dialCode.replace('+', ''), '')
-      .replace(/\D/g, '');
+    const mobileNumber = mobileValue.replace(/\D/g, '');
+    // const mobileNumber = mobileValue
+    //   .replace(dialCode.replace('+', ''), '')
+    //   .replace(/\D/g, '');
 
     let requiredLength = 10;
 

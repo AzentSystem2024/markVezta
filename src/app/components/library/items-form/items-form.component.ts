@@ -509,7 +509,7 @@ export class ItemsFormComponent implements OnInit {
 
     return {
       ...this.newItems,
-
+      COMPANY_ID: this.selected_Company_id,
       UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
 
       ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,

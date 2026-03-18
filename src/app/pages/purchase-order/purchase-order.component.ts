@@ -49,6 +49,7 @@ import { DataService } from 'src/app/services';
 import { EditPurchaseInvoiceModule } from '../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
 import { confirm } from 'devextreme/ui/dialog';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { finalize } from 'rxjs/operators';
 @Component({
   selector: 'app-purchase-order',
   templateUrl: './purchase-order.component.html',
@@ -735,6 +736,7 @@ export class PurchaseOrderComponent {
   }
 
   openPurchaseOrderForm() {
+    this.isApproved = false;
     this.isAddPopupOpened = true;
     this.getDocNo();
   }
@@ -770,15 +772,30 @@ export class PurchaseOrderComponent {
   }
 
   onClickSaveNewData() {
-    //  Prevent double click
+    // Prevent double click
     if (this.isSaving) {
       return;
     }
+
     this.isSaving = true;
-    // debugger;
+
     const data = this.poNewForm.getNewPoData();
-    console.log(data, 'DATA FOR SAVE');
+    // ✅ Combine country code + mobile before save
+
+    const suppCode = this.poNewForm.supplierCountryCode?.replace('+', '');
+    const contactCode = this.poNewForm.shippingCountryCode?.replace('+', '');
+
+    // SUPPLIER MOBILE
+    if (data.SUPP_MOBILE && !data.SUPP_MOBILE.includes('-')) {
+      data.SUPP_MOBILE = `${suppCode}-${data.SUPP_MOBILE}`;
+    }
+
+    if (data.CONTACT_MOBILE && !data.CONTACT_MOBILE.includes('-')) {
+      data.CONTACT_MOBILE = `${contactCode}-${data.CONTACT_MOBILE}`;
+    }
     data.IS_APPROVED = this.isApproved;
+
+    // ✅ VALIDATIONS (ONLY FIX: added isSaving reset)
     if (!data.STORE_ID) {
       notify(
         {
@@ -787,8 +804,10 @@ export class PurchaseOrderComponent {
         },
         'error',
       );
-      return false;
+      this.isSaving = false; // ✅ FIX
+      return;
     }
+
     if (!data.SUPP_ID) {
       notify(
         {
@@ -797,8 +816,10 @@ export class PurchaseOrderComponent {
         },
         'error',
       );
-      return false;
+      this.isSaving = false; // ✅ FIX
+      return;
     }
+
     if (!data.PO_DATE) {
       notify(
         {
@@ -807,8 +828,10 @@ export class PurchaseOrderComponent {
         },
         'error',
       );
-      return false;
+      this.isSaving = false; // ✅ FIX
+      return;
     }
+
     if (!data.DELIVERY_DATE) {
       notify(
         {
@@ -817,7 +840,8 @@ export class PurchaseOrderComponent {
         },
         'error',
       );
-      return false;
+      this.isSaving = false; // ✅ FIX
+      return;
     }
 
     if (
@@ -826,25 +850,26 @@ export class PurchaseOrderComponent {
     ) {
       notify(
         {
-          message: 'Please add at least one item',
+          message: 'Please add quantity',
           position: { at: 'top center', my: 'top center' },
         },
         'error',
       );
-      return false;
+      this.isSaving = false; // ✅ FIX
+      return;
     }
+
+    // 🔁 EXISTING LOGIC (unchanged)
     const poDetails = this.poNewForm.poData.PoDetails.map((item: any) => {
-      // Inter-state → IGST
       if (this.poNewForm.isInterState) {
         return {
           ...item,
-          TAX_PERCENT: item.VAT_PERC, // IGST %
+          TAX_PERCENT: item.VAT_PERC,
           CGST: 0,
           SGST: 0,
         };
       }
 
-      // Intra-state → CGST + SGST
       return {
         ...item,
         TAX_PERCENT: 0,
@@ -852,75 +877,72 @@ export class PurchaseOrderComponent {
         SGST: item.SGST,
       };
     });
+
     data.PoDetails = poDetails;
-    // savePoToServer(data: any) {
-    this.service.savePoData(data).subscribe({
-      next: (res: any) => {
-        console.log(res, 'saved data');
 
-        if (res.message === 'Success' && res.flag === 1) {
-          if (data.IS_APPROVED === true) {
+    // ✅ API CALL (already correct with finalize)
+    this.service
+      .savePoData(data)
+      .pipe(
+        finalize(() => {
+          this.isSaving = false; // ✅ ALWAYS RESET
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.message === 'Success' && res.flag === 1) {
             notify(
               {
-                message: 'Data Saved & Approved Successfully',
-                position: { at: 'top center', my: 'top center' },
+                message: data.IS_APPROVED
+                  ? 'Data Saved & Approved Successfully'
+                  : 'Data Saved Successfully',
               },
               'success',
             );
+
+            this.refreshPo = true;
+            setTimeout(() => (this.refreshPo = false), 0);
+
+            this.dataGrid.instance.refresh();
+            this.isAddPopupOpened = false;
+
+            this.poNewForm?.resetForm();
+            this.getPurchaseOrderList();
           } else {
-            notify(
-              {
-                message: 'Data Saved Successfully',
-                position: { at: 'top center', my: 'top center' },
-              },
-              'success',
-            );
+            notify({ message: 'Your Data Not Saved' }, 'error');
           }
-
-          this.refreshPo = true;
-          setTimeout(() => (this.refreshPo = false), 0);
-
-          this.dataGrid.instance.refresh();
-          this.isAddPopupOpened = false;
-
-          if (this.PurchaseOrderNewFormComponent?.resetForm) {
-            this.PurchaseOrderNewFormComponent.resetForm();
-          }
-
-          this.getPurchaseOrderList();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not Saved',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-
-        this.isSaving = false;
-      },
-
-      error: (err: any) => {
-        console.error(err);
-
-        notify(
-          {
-            message: 'Server error while saving data',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-
-        this.isSaving = false;
-      },
-    });
+        },
+        error: () => {
+          notify({ message: 'Server error while saving data' }, 'error');
+        },
+      });
   }
 
   UpdatePurchaseOrder() {
     console.log('UPDATEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
     const data = this.poEditForm.getNewPoData();
+    // Combine country code + mobile (EDIT)
+    // convert mobile before API
     this.poEditForm.preparePoDetailsForSubmit();
+    const suppCode = (this.poEditForm.supplierCountryCode || '+91').replace(
+      '+',
+      '',
+    );
+    const contactCode = (this.poEditForm.shippingCountryCode || '+91').replace(
+      '+',
+      '',
+    );
+
+    // SUPPLIER MOBILE
+    if (data.SUPP_MOBILE && !data.SUPP_MOBILE.includes('-')) {
+      data.SUPP_MOBILE = `${suppCode}-${data.SUPP_MOBILE}`;
+    }
+
+    // CONTACT MOBILE
+    if (data.CONTACT_MOBILE && !data.CONTACT_MOBILE.includes('-')) {
+      data.CONTACT_MOBILE = `${contactCode}-${data.CONTACT_MOBILE}`;
+    }
+
     data.PoDetails = [...this.poEditForm.poData.PoDetails];
     console.log(data, 'PODETAILAAAAAAAAAAAAAAAAAAAAAAAA');
 

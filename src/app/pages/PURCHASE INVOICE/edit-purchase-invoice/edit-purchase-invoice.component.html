@@ -31,7 +31,7 @@
       >
         <div style="display: flex; gap: 4px">
           <dx-date-box
-            label="Supplier Invoice Date"
+            label="Date"
             type="date"
             [(value)]="purchaseInvoiceFormData.SUPP_INV_DATE"
             labelMode="floating"
@@ -42,7 +42,7 @@
           </dx-date-box>
 
           <dx-text-box
-            label="Supplier Invoice No."
+            label="Reference No."
             labelMode="floating"
             [(value)]="purchaseInvoiceFormData.DOC_NO"
             [width]="200"
@@ -175,6 +175,7 @@
             dataField="HSN_CODE"
             caption="HSN Code"
             dataType="string"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="RATE"
@@ -186,7 +187,7 @@
           ></dxi-column>
           <dxi-column
             dataField="PENDING_QTY"
-            caption="Pending Qty"
+            caption="Invoice Pending GRN"
             dataType="number"
             [allowEditing]="false"
           ></dxi-column>
@@ -266,7 +267,6 @@
             <dxi-total-item
               column="QUANTITY"
               summaryType="sum"
-              valueFormat="#,##0.00"
               displayFormat="{0}"
               alignment="right"
             ></dxi-total-item>
@@ -285,6 +285,13 @@
               displayFormat="{0}"
               alignment="right"
             ></dxi-total-item>
+            <dxi-total-item
+              column="AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+              alignment="right"
+            ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
 
@@ -296,6 +303,7 @@
             <dx-check-box
               text="Round Off"
               [(value)]="purchaseInvoiceFormData.ROUND_OFF"
+              [readOnly]="readOnly"
               (onValueChanged)="onRoundOffChange()"
             ></dx-check-box>
 
@@ -303,7 +311,7 @@
             <dx-text-box
               label="Net Amount"
               labelMode="floating"
-              [value]="netAmount"
+              [value]="formattedNetAmount"
               [width]="150"
               [readOnly]="true"
             ></dx-text-box>
@@ -317,6 +325,7 @@
               label="Vehicle No"
               labelMode="floating"
               [(value)]="purchaseInvoiceFormData.VEHICLE_NO"
+              [readOnly]="readOnly"
               [width]="200"
             ></dx-text-box>
           </div>
@@ -375,7 +384,7 @@
   [showTitle]="true"
   title="Pending GRN"
   [dragEnabled]="true"
-  [closeOnOutsideClick]="true"
+  (onHiding)="onPopupClose()"
 >
   <div *dxTemplate="let data of 'content'">
     <dx-data-grid

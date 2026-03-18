@@ -654,14 +654,14 @@ export class EditPurchaseInvoiceComponent {
       netAmount.toFixed(2),
     );
 
-     const today = new Date();
+    const today = new Date();
     const invoiceDate =
       today.getFullYear() +
       '-' +
       String(today.getMonth() + 1).padStart(2, '0') +
       '-' +
       String(today.getDate()).padStart(2, '0');
-   
+
     this.purchaseInvoiceFormData.PURCH_DATE = invoiceDate;
     this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
     this.purchaseInvoiceFormData.USER_ID = this.user_id;
@@ -735,6 +735,14 @@ export class EditPurchaseInvoiceComponent {
       console.warn('Summary values not ready yet.');
     }
   }
+
+  get formattedNetAmount(): string {
+    const value = Number(this.grandTotal || 0);
+    return value.toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
   onContentReady(e: any): void {
     this.logGridSummaries();
   }
@@ -768,6 +776,17 @@ export class EditPurchaseInvoiceComponent {
     return `${date.getDate().toString().padStart(2, '0')}-${
       months[date.getMonth()]
     }-${date.getFullYear().toString().slice(-2)}`;
+  }
+
+  onPopupClose() {
+    const grid = this.popupGridRef?.instance;
+
+    if (grid) {
+      grid.clearFilter(); // ✅ clears filter row
+      grid.clearSorting(); // optional
+      grid.clearGrouping(); // optional
+      grid.clearSelection(); // optional (if you want reset selection)
+    }
   }
 
   openPDF() {

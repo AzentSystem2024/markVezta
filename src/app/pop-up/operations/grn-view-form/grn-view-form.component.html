@@ -190,13 +190,13 @@
       [width]="'auto'"
       [allowEditing]="false"
       alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
     <dxi-column
       dataField="PO_QUANTITY"
       caption="QTY IN PO"
       [width]="87"
       [allowEditing]="false"
-      alignment="center"
     ></dxi-column>
     <dxi-column
       dataField="UOM"
@@ -216,14 +216,12 @@
       [width]="cwidth"
       caption="QTY TO RECEIVE"
       [allowEditing]="false"
-      alignment="center"
     ></dxi-column>
     <dxi-column
       dataField="QUANTITY"
       [width]="cwidth"
       caption="QTY RECEIVED"
       [editorOptions]="{ readOnly: true }"
-      alignment="center"
     ></dxi-column>
     <dxi-column
       dataField="QTY_BASE_UNIT"

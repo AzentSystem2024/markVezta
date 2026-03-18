@@ -507,12 +507,12 @@
       width="76"
       [allowEditing]="false"
     ></dxi-column>
-    <dxi-column
+    <!-- <dxi-column
       caption="Packing"
       dataField="PACKING_NAME"
       width="auto"
       [allowEditing]="false"
-    ></dxi-column>
+    ></dxi-column> -->
     <dxi-column
       dataField="HSN_CODE"
       caption="HSN Code"
@@ -526,9 +526,9 @@
       dataField="SUPP_PRICE"
       alignment="right"
       width="100"
-      [allowEditing]="false"
+      [allowEditing]="true"
       [format]="{ type: 'fixedPoint', precision: 2 }"
-      [editorOptions]="{ format: '#0' }"
+      [editorOptions]="{ format: '#0.00' }"
     >
     </dxi-column>
 
@@ -582,7 +582,7 @@
     >
     </dxi-column>
     <dxi-column
-      caption="GST (%)"
+      [caption]="vatTitle + ' (%)'"
       dataField="VAT_PERC"
       alignment="center"
       width="90"
@@ -764,16 +764,35 @@
           [showNavigationButtons]="true"
         ></dxo-pager>
 
-        <dxo-sorting mode="multiple"></dxo-sorting>
-        <dxo-header-filter [visible]="true"></dxo-header-filter>
-        <dxo-header-filter [visible]="true">
+        <dxo-paging [pageSize]="10"></dxo-paging>
+        <dxo-pager
+          [visible]="true"
+          [allowedPageSizes]="allowedPageSizes"
+          [displayMode]="displayMode"
+          [showPageSizeSelector]="showPageSizeSelector"
+          [showInfo]="true"
+          [showNavigationButtons]="true"
+        ></dxo-pager>
+        <dxo-load-panel [showPane]="false"></dxo-load-panel>
+        <dxo-scrolling mode="virtual"></dxo-scrolling>
+        <dxo-filter-row
+          [visible]="isFilterRowVisible"
+          [applyFilter]="auto"
+        ></dxo-filter-row>
+        <dxo-header-filter [visible]="isFilterOpened">
           <dxo-search [enabled]="true"></dxo-search>
         </dxo-header-filter>
-        <!-- <dxo-search-panel
-          [visible]="true"
-          placeholder=" Search"
-        ></dxo-search-panel> -->
-
+        <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+        <dxo-filter-builder [allowHierarchicalFields]="true">
+        </dxo-filter-builder>
+        <dxo-toolbar>
+          <dxi-item
+            location="after"
+            locateInMenu="auto"
+            widget="dxButton"
+            [options]="searchButtonOptions"
+          ></dxi-item>
+        </dxo-toolbar>
         <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
         <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
         <dxi-column dataField="UOM" caption="UOM"></dxi-column>
@@ -795,140 +814,4 @@
       </div>
     </div>
   </dx-popup>
-
-  <!-- <div class="total-container">
-
-    <div class="total-field">
-      <label>Total Quantity:</label>
-      <dx-text-box
-        placeholder="0"
-        [width]="90"
-        [readOnly]="true"
-        [(value)]="totalQuantity"
-        [rtlEnabled]="true"
-      ></dx-text-box>
-    </div>
-  
-    <div class="total-field">
-      <label>Total (Excluding Tax):</label>
-      <dx-text-box
-        *ngIf="showLocalCurrencyColumn"
-        placeholder="0.00"
-        [width]="150"
-        [readOnly]="true"
-        [(value)]="newPoData.SUPP_GROSS_AMOUNT"
-        [rtlEnabled]="true"
-      ></dx-text-box>&nbsp;
-      <dx-text-box
-        placeholder="0.00"
-        [width]="150"
-        [readOnly]="true"
-        [(value)]="newPoData.GROSS_AMOUNT"
-        [rtlEnabled]="true"
-      ></dx-text-box>
-    </div>
-  </div>
-  <div class="vat-container">
-    <div class="vat-field">
-      <label>Tax Amount:</label>
-      <dx-text-box
-        placeholder="0.00"
-        [width]="150"
-        [readOnly]="true"
-        [(value)]="newPoData.TAX_AMOUNT"
-        [rtlEnabled]="true"
-      ></dx-text-box>
-    </div>
-  </div>
-  <div class="vat-container">
-    <div class="vat-field">
-    <label>Total (Including Tax):</label>
-    <dx-text-box
-      *ngIf="showLocalCurrencyColumn"
-      placeholder="0.00"
-      [width]="150"
-      [readOnly]="true"
-      [(value)]="newPoData.SUPP_NET_AMOUNT"
-      [rtlEnabled]="true"
-    ></dx-text-box>&nbsp;
-    <dx-text-box
-      placeholder="0.00"
-      [width]="150"
-      [readOnly]="true"
-      [(value)]="newPoData.NET_AMOUNT"
-      [rtlEnabled]="true"
-    ></dx-text-box>
-    </div>
-  </div> -->
 </div>
-
-<!-- <div *ngIf="selectedTabIndex === 2">
-  <label for="file-upload">
-    <dx-button icon="upload" text="Upload Files"></dx-button>
-  </label>
-  <input
-    id="file-upload"
-    type="file"
-    (change)="onFilesSelected($event)"
-    accept="image/*, application/pdf"
-    multiple
-    class="file-input"
-  />
-
-  <div *ngIf="uploadedFiles.length > 0" class="file-list">
-    <div *ngFor="let file of uploadedFiles; let i = index" class="file-item">
-
-      <a [href]="fileUrls[i]" target="_blank" rel="noopener noreferrer">
-        {{ file.name }}
-      </a>
-      <dx-button
-        icon="close"
-        type="default"
-        stylingMode="text"
-        (onClick)="removeFile(i)"
-        class="remove-button"
-      ></dx-button>
-    </div>
-  </div>
-</div> -->
-
-<!-- <div *ngIf="selectedTabIndex === 2">
-  <dx-data-grid
-    [showBorders]="true"
-    [columnAutoWidth]="true"
-    [dataSource]="poHistoryList"
-    height="55vh"
-    [showBorders]="true"
-    [showColumnLines]="true"
-    [showBorders]="true"
-    [columnAutoWidth]="false"
-    [wordWrapEnabled]="false"
-    [rowAlternationEnabled]="true"
-    [allowColumnReordering]="true"
-    [showColumnHeaders]="true"
-    [columnAutoWidth]="true"
-    [allowColumnResizing]="true"
-    [columnResizingMode]="'nextColumn'"
-  >
-    <dxo-pager
-      [visible]="true"
-      [allowedPageSizes]="allowedPageSizes"
-      [displayMode]="displayMode"
-      [showPageSizeSelector]="showPageSizeSelector"
-      [showInfo]="true"
-      [showNavigationButtons]="true"
-    ></dxo-pager>
-    <dxi-column
-      dataField="slNo"
-      caption="Sl No"
-      alignment="center"
-    ></dxi-column>
-    <dxi-column
-      dataField="TIME"
-      [calculateCellValue]="formatDateTime"
-      caption="Date & Time"
-    ></dxi-column>
-    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-    <dxi-column dataField="USER_NAME" caption="User"></dxi-column>
-  </dx-data-grid>
-</div> -->

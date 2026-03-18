@@ -200,41 +200,6 @@ export class ArticleproductionJvListComponent {
     console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
-  // getProductionList() {
-  //   const payload = {
-  //     COMPANY_ID: this.selected_Company_id,
-  //   };
-  //   console.log(payload, 'PAYLOADDDDDDDDDDDD');
-  //   this.dataService.getArticleProductionJVList(payload).subscribe((response: any) => {
-  //     this.productionList = response.Data.map((item: any) => {
-  //       // ---- Date normalization (unchanged) ----
-  //       let saleDate = item.PROD_DATE;
-  //       let dateValue: Date;
-
-  //       if (/^\d{2}-\d{2}-\d{4}$/.test(saleDate)) {
-  //         const [day, month, year] = saleDate.split('-').map(Number);
-  //         dateValue = new Date(year, month - 1, day);
-  //       } else {
-  //         dateValue = new Date(saleDate);
-  //       }
-
-  //       // ---- Extract numeric part of DOC_NO safely ----
-  //       const match = item.DOC_NO?.match(/\d+$/); // last number
-  //       const docNoNumber = match ? Number(match[0]) : 0;
-
-  //       return {
-  //         ...item,
-  //         PROD_DATE: dateValue,
-  //         _docNoNumber: docNoNumber, // helper field
-  //       };
-  //     })
-  //       // ✅ DESCENDING → latest first
-  //       .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
-
-  //     this.applyDateFilter();
-  //   });
-  // }
-
   onEditingStart(event: any) {
     console.log('Editing started for row:', event.data);
     event.cancel = true;

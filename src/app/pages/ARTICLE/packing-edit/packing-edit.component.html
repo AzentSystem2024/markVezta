@@ -531,7 +531,7 @@
               mode="cell"
               [allowUpdating]="true"
               [allowAdding]="false"
-              [allowDeleting]="false"
+              [allowDeleting]="deleteButtonVisible"
             >
             </dxo-editing>
 
@@ -731,5 +731,49 @@
       (onClick)="ViewpricePopupVisible = false"
     >
     </dx-button>
+  </div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="ItempopupVisible"
+  [width]="800"
+  [height]="500"
+  title="Items"
+  [showCloseButton]="true"
+  (onRowClick)="onItemSelect($event)"
+>
+  <dx-data-grid
+    #bomGridRef
+    [dataSource]="ItemListDataSource"
+    [showBorders]="true"
+    keyExpr="ID"
+  >
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
+    <dxo-selection mode="multiple"></dxo-selection>
+    <dxi-column dataField="ITEM_CODE" caption="Item"></dxi-column>
+    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+    <dxi-column dataField="UOM" caption="UOM"></dxi-column>
+  </dx-data-grid>
+
+  <!-- Buttons -->
+  <div
+    style="
+      margin-top: 10px;
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    "
+  >
+    <dx-button text="Cancel" (onClick)="ItempopupVisible = false"></dx-button>
+
+    <dx-button
+      text="Save"
+      (onClick)="saveSelectedItems()"
+      style="margin-right: 10px"
+    ></dx-button>
   </div>
 </dx-popup>

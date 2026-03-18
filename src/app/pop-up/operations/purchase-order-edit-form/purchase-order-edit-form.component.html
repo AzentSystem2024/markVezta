@@ -466,7 +466,7 @@
       width="100"
       [allowEditing]="true"
       [format]="{ type: 'fixedPoint', precision: 2 }"
-      [editorOptions]="{ format: '#0' }"
+      [editorOptions]="{ format: '#0.00' }"
     >
     </dxi-column>
 
@@ -520,7 +520,7 @@
     </dxi-column>
 
     <dxi-column
-      caption="Tax (%)"
+      [caption]="vatTitle + ' (%)'"
       dataField="VAT_PERC"
       alignment="center"
       width="80"
@@ -672,9 +672,11 @@
     [showTitle]="true"
     [title]="'Add Item'"
     [closeOnOutsideClick]="true"
+    (onHiding)="onPopupClosing()"
   >
     <div *dxTemplate="let data of 'content'">
       <dx-data-grid
+        #supplierItemsGrid
         [columnAutoWidth]="true"
         [showBorders]="true"
         [height]="'60vh'"
@@ -685,6 +687,7 @@
         (onSelectionChanged)="onSelectionChanged($event)"
         (onRowPrepared)="onSupplierRowPrepared($event)"
       >
+        <dxo-paging [pageSize]="10"></dxo-paging>
         <dxo-pager
           [visible]="true"
           [allowedPageSizes]="allowedPageSizes"
@@ -693,16 +696,26 @@
           [showInfo]="true"
           [showNavigationButtons]="true"
         ></dxo-pager>
-
-        <dxo-sorting mode="multiple"></dxo-sorting>
-        <dxo-header-filter [visible]="true"></dxo-header-filter>
-        <dxo-header-filter [visible]="true">
+        <dxo-load-panel [showPane]="false"></dxo-load-panel>
+        <dxo-scrolling mode="virtual"></dxo-scrolling>
+        <dxo-filter-row
+          [visible]="isFilterRowVisible"
+          [applyFilter]="auto"
+        ></dxo-filter-row>
+        <dxo-header-filter [visible]="isFilterOpened">
           <dxo-search [enabled]="true"></dxo-search>
         </dxo-header-filter>
-        <dxo-search-panel
-          [visible]="true"
-          placeholder=" Search"
-        ></dxo-search-panel>
+        <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+        <dxo-filter-builder [allowHierarchicalFields]="true">
+        </dxo-filter-builder>
+        <dxo-toolbar>
+          <dxi-item
+            location="after"
+            locateInMenu="auto"
+            widget="dxButton"
+            [options]="searchButtonOptions"
+          ></dxi-item>
+        </dxo-toolbar>
 
         <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
         <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
@@ -848,42 +861,44 @@
 </div>
 
 <div *ngIf="selectedTabIndex === 3">
-  <dx-data-grid
-    [showBorders]="true"
-    [columnAutoWidth]="true"
-    [dataSource]="poHistoryList"
-    height="55vh"
-    [showBorders]="true"
-    [showColumnLines]="true"
-    [showBorders]="true"
-    [columnAutoWidth]="false"
-    [wordWrapEnabled]="false"
-    [rowAlternationEnabled]="true"
-    [allowColumnReordering]="true"
-    [showColumnHeaders]="true"
-    [columnAutoWidth]="true"
-    [allowColumnResizing]="true"
-    [columnResizingMode]="'nextColumn'"
-  >
-    <dxo-pager
+  <div class="history-grid-container">
+    <dx-data-grid
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+      [dataSource]="poHistoryList"
+      height="60vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+    >
+      <!-- <dxo-pager
       [visible]="true"
       [allowedPageSizes]="allowedPageSizes"
       [displayMode]="displayMode"
       [showPageSizeSelector]="showPageSizeSelector"
       [showInfo]="true"
       [showNavigationButtons]="true"
-    ></dxo-pager>
-    <dxi-column
-      dataField="slNo"
-      caption="Sl No"
-      alignment="center"
-    ></dxi-column>
-    <dxi-column
-      dataField="TIME"
-      [calculateCellValue]="formatDateTime"
-      caption="Date & Time"
-    ></dxi-column>
-    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-    <dxi-column dataField="USER_NAME" caption="User"></dxi-column>
-  </dx-data-grid>
+    ></dxo-pager> -->
+      <dxi-column
+        dataField="slNo"
+        caption="Sl No"
+        alignment="center"
+      ></dxi-column>
+      <dxi-column
+        dataField="TIME"
+        [calculateCellValue]="formatDateTime"
+        caption="Date & Time"
+      ></dxi-column>
+      <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+      <dxi-column dataField="USER_NAME" caption="User"></dxi-column>
+    </dx-data-grid>
+  </div>
 </div>

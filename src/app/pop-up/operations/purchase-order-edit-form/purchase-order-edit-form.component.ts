@@ -52,7 +52,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   dataGrid: DxDataGridComponent;
   @Output() closeForm = new EventEmitter<void>();
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
-
+  @ViewChild('supplierItemsGrid') supplierItemsGrid: DxDataGridComponent;
   @Input() formdata: any;
   poHistoryList: any;
   selectedCompanyId: any;
@@ -185,6 +185,19 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   };
   newPoData = this.poData;
   getNewPoData = () => ({ ...this.newPoData });
+  showHeaderFilter: true;
+  showFilterRow = true;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+  isFilterOpened: boolean;
+  vatTitle: any;
 
   constructor(
     private service: DataService,
@@ -228,8 +241,9 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     );
     console.log(
       'Parsed ObjectData:',
-      this.menuResponse.GeneralSettings.STORE_TITLE,
+      this.menuResponse.GeneralSettings.VAT_TITLE,
     );
+    this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
     if (this.menuResponse?.GeneralSettings?.STORE_TITLE === 'STORE') {
       this.storeLabel = 'Store';
     } else {
@@ -377,6 +391,17 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
       this.calculateTotalQuantity();
       this.calculateTotalIncludingTax();
+    }
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.supplierItemsGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
 
@@ -1289,6 +1314,39 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   //cancel add-item popup
   onCancelNewData() {
     this.showAddItemPopup = false;
+
+    const grid = this.supplierItemsGrid?.instance;
+
+    if (grid) {
+      //  Clear all filters
+      grid.clearFilter();
+
+      // Hide filter UI
+      grid.option('filterRow.visible', false);
+      grid.option('headerFilter.visible', false);
+    }
+
+    // Reset your toggle state
+    this.isFilterOpened = false;
+  }
+
+  onPopupClosing() {
+    const grid = this.supplierItemsGrid?.instance;
+
+    if (grid) {
+      // Clear filters
+      grid.clearFilter();
+
+      // Reset filter UI
+      grid.option('filterRow.visible', false);
+      grid.option('headerFilter.visible', false);
+    }
+
+    // Reset toggle state
+    this.isFilterOpened = false;
+
+    // (Optional) clear selection
+    this.supplierItemsGrid?.instance?.clearSelection();
   }
 
   //remove the added items
@@ -1331,7 +1389,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
     if (parts.length === 2) {
       this.supplierCountryCode = '+' + parts[0];
-      this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
+      this.newPoData.SUPP_MOBILE = parts[1];
+      // this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
     }
   }
 
@@ -1342,14 +1401,15 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
     if (parts.length === 2) {
       this.shippingCountryCode = '+' + parts[0];
-      this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
+      this.newPoData.CONTACT_MOBILE = parts[1];
+      // this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
     }
   }
 
   updateSupplierMobileNumber() {
-    const cleanDialCode = this.supplierCountryCode?.replace('+', '');
-
-    this.newPoData.SUPP_MOBILE = `${cleanDialCode}-`;
+    // const cleanDialCode = this.supplierCountryCode?.replace('+', '');
+    this.newPoData.SUPP_MOBILE = '';
+    // this.newPoData.SUPP_MOBILE = `${cleanDialCode}-`;
   }
 
   getOnlyMobileNumber(fullPhoneNumber: string): string {
@@ -1383,9 +1443,10 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     }
 
     // allow empty digits (important fix)
-    this.newPoData.SUPP_MOBILE = digits
-      ? `${cleanDialCode}-${digits}`
-      : `${cleanDialCode}-`;
+    this.newPoData.SUPP_MOBILE = digits;
+    // this.newPoData.SUPP_MOBILE = digits
+    //   ? `${cleanDialCode}-${digits}`
+    //   : `${cleanDialCode}-`;
   }
 
   SupplierMobileValidate = (e: any): boolean => {
@@ -1394,9 +1455,10 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     const mobileValue = e.value ? e.value.toString().trim() : '';
 
     // remove country code and non digits
-    const mobileNumber = mobileValue
-      .replace(dialCode.replace('+', ''), '')
-      .replace(/\D/g, '');
+    const mobileNumber = mobileValue.replace(/\D/g, '');
+    // const mobileNumber = mobileValue
+    //   .replace(dialCode.replace('+', ''), '')
+    //   .replace(/\D/g, '');
 
     let requiredLength = 10;
 
@@ -1464,9 +1526,10 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   }
 
   updateContactMobile() {
-    const cleanDialCode = this.shippingCountryCode?.replace('+', '');
+    this.newPoData.CONTACT_MOBILE = '';
+    // const cleanDialCode = this.shippingCountryCode?.replace('+', '');
 
-    this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-`;
+    // this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-`;
   }
 
   onContactMobileInput(event: any) {
@@ -1487,7 +1550,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     }
 
     const cleanDialCode = dialCode.replace('+', '');
-    this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-${digits}`;
+    // this.newPoData.CONTACT_MOBILE = `${cleanDialCode}-${digits}`;
+    this.newPoData.CONTACT_MOBILE = digits;
   }
 
   validateContactMobile = (e: any): boolean => {
@@ -1496,9 +1560,10 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     const mobileValue = e.value ? e.value.toString().trim() : '';
 
     // remove country code and non digits
-    const mobileNumber = mobileValue
-      .replace(dialCode.replace('+', ''), '')
-      .replace(/\D/g, '');
+    const mobileNumber = mobileValue.replace(/\D/g, '');
+    // const mobileNumber = mobileValue
+    //   .replace(dialCode.replace('+', ''), '')
+    //   .replace(/\D/g, '');
 
     let requiredLength = 10;
 

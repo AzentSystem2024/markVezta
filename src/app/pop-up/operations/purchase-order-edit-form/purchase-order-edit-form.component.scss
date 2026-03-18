@@ -250,6 +250,9 @@
 .dx-popup-content {
   overflow-x: hidden; /* hide horizontal overflow */
 }
+.history-grid-container {
+  margin-top: 15px; /* adjust as needed */
+}
 // :host ::ng-deep .dx-tabs .dx-tab {
 //   background-color: transparent !important; /* unselected tabs */
 //   color: inherit;

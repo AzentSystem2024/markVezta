@@ -37,6 +37,7 @@ import { DataService } from 'src/app/services';
 import jsPDF from 'jspdf';
 import autoTable, { ThemeType, UserOptions } from 'jspdf-autotable';
 import CountryList from 'country-list-with-dial-code-and-flag';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-purchase-order-view-form',
@@ -167,10 +168,14 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     PoDetails: [],
   };
   newPoData = this.poData;
+  menuResponse: any;
+  vatTitle: any;
+  storeOrLocation: any;
 
   constructor(
     private service: DataService,
     private sanitizer: DomSanitizer,
+    private router: Router,
   ) {
     const settingsData = sessionStorage.getItem('settings');
     this.settingsData = settingsData ? JSON.parse(settingsData) : null;
@@ -348,6 +353,19 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     this.showAddItemPopup = false; // Close the "Add Item" popup
   }
   ngOnInit() {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    this.menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log(
+      'Parsed ObjectData:',
+      this.menuResponse.GeneralSettings.STORE_TITLE,
+    );
+    this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
+    this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
+    // this.sessionData_tax()
+    const menuGroups = this.menuResponse.MenuGroups || [];
     this.currentDate = new Date();
     this.sessionDetails();
     this.GetSupplierList();
@@ -818,13 +836,23 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     });
   }
 
+  // get formattedDate(): string {
+  //   if (this.newPoData.PO_DATE) {
+  //     return this.newPoData.PO_DATE.split('T')[0]; // Extract the date part
+  //   }
+  //   return '';
+  // }
   get formattedDate(): string {
-    if (this.newPoData.PO_DATE) {
-      return this.newPoData.PO_DATE.split('T')[0]; // Extract the date part
-    }
-    return '';
-  }
+    if (!this.newPoData.PO_DATE) return '';
 
+    const date = new Date(this.newPoData.PO_DATE);
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
   viewPdf(): void {
     console.log(this.poId, 'ID received in viewPdf()');
 

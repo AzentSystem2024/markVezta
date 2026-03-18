@@ -651,7 +651,13 @@ export class GrnViewFormComponent {
 
       this.formattedNetAmount = `${this.newGrnData.SUPP_NET_AMOUNT}`;
 
-      this.formattedLocalNetAmount = `${this.newGrnData.NET_AMOUNT}`;
+      // this.formattedLocalNetAmount = `${this.newGrnData.NET_AMOUNT}`;
+      this.formattedLocalNetAmount = Number(
+        this.newGrnData.NET_AMOUNT,
+      ).toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
       this.costingMethodDataGrid = this.formdata.GRN_Cost.map((cost) => ({
         ...cost,
