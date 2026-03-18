@@ -658,7 +658,7 @@
           [labelMode]="'floating'"
           [(value)]="selected_Cheque_No"
           [readOnly]="isEditReadOnly"
-          [visible]="selectedPaymentMode == '14'"
+          [visible]="selectedPaymentMode === '14'"
         ></dx-text-box>
       </dxi-item>
       <dxi-item>
@@ -668,7 +668,7 @@
           [(value)]="selected_Cheque_Date"
           labelMode="floating"
           displayFormat="dd/MM/yyyy"
-          [visible]="selectedPaymentMode == '14'"
+          [visible]="selectedPaymentMode === '14'"
         ></dx-date-box>
       </dxi-item>
     </dxi-item>
