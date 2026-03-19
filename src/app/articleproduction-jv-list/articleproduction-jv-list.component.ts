@@ -50,7 +50,7 @@ import {
   InvoiceTrOutAddComponent,
   InvoiceTrOutAddModule,
 } from '../pages/INVOICE/invoice-tr-out-add/invoice-tr-out-add.component';
-import { InvoiceTrOutComponent } from '../pages/INVOICE/invoice-tr-out/invoice-tr-out.component';
+import { InvoiceTrOutComponent } from '../pages/Operations/invoice-tr-out/invoice-tr-out.component';
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 import { Router } from '@angular/router';

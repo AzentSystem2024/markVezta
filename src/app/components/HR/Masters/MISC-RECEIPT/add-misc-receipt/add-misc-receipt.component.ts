@@ -49,7 +49,7 @@ import { ApproveMiscellaneousPaymentModule } from '../../approve-miscellaneous-p
 import { EditMiscellaneousPaymentModule } from '../../edit-miscellaneous-payment/edit-miscellaneous-payment.component';
 import { VerifyMiscellaneousPaymentModule } from '../../verify-miscellaneous-payment/verify-miscellaneous-payment.component';
 import { ViewMiscellaneousPaymentModule } from '../../view-miscellaneous-payment/view-miscellaneous-payment.component';
-import { ListMiscReceiptComponent } from '../list-misc-receipt/list-misc-receipt.component';
+import { ListMiscReceiptComponent } from '../../../../../pages/ACCOUNTS/list-misc-receipt/list-misc-receipt.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';

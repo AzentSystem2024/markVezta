@@ -36,7 +36,7 @@ import {
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
 import { AddMiscReceiptModule } from '../../MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
 import { EditMiscReceiptModule } from '../../MISC-RECEIPT/edit-misc-receipt/edit-misc-receipt.component';
-import { ListSalaryPaymentComponent } from '../list-salary-payment/list-salary-payment.component';
+import { ListSalaryPaymentComponent } from '../../../../../pages/HR/Masters/list-salary-payment/list-salary-payment.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 

@@ -44,7 +44,7 @@ import { CountryServiceService } from 'src/app/services/country-service.service'
 import {
   ItemsListComponent,
   ItemsListModule,
-} from '../items-list/items-list.component';
+} from '../MASTER/items-list/items-list.component';
 import {
   DxoFormItemModule,
   DxoItemModule,

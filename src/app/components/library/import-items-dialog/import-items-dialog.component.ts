@@ -31,7 +31,7 @@ import {
   TooltipCellComponent,
 } from 'src/app/components/utils/tooltip-cell/tooltip-cell.component';
 import { NonNullableFormBuilder } from '@angular/forms';
-import { ImportItemsComponent } from 'src/app/operations/import-items/import-items.component';
+import { ImportItemsComponent } from 'src/app/pages/MASTER/import-items/import-items.component';
 
 @Component({
   selector: 'app-import-items-dialog',
