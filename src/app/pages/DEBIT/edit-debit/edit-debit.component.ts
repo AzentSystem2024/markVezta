@@ -127,15 +127,12 @@ export class EditDebitComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
-    console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
 
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, 'HSNCODE===================');
       this.hsnLoaded = true; // ADD THIS
     }
     this.sessionData_tax();
@@ -143,24 +140,16 @@ export class EditDebitComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     // this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
   }
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   ngOnInit() {
@@ -369,17 +358,12 @@ export class EditDebitComponent {
   getCompanyListDropdown() {
     // this.dataService.getDropdownData('COMPANY_LIST').subscribe((response: any) => {
     //   this.companyList = response
-    //   console.log(this.companyList,"COMPANYLIST")
     // })
   }
 
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
       this.supplierList = response;
-      console.log(
-        this.supplierList,
-        'distributorList==============================',
-      );
     });
   }
 
@@ -391,29 +375,21 @@ export class EditDebitComponent {
       .getSupplierWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
 
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
-    console.log(this.selectedSupplierId);
 
     const selectedSupplier = this.distributorList.find(
       (supplier: any) => supplier.ID === this.selectedSupplierId,
     );
 
-    console.log(selectedSupplier);
     const company = this.companyState?.trim().toLowerCase();
-    console.log(company);
     const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
-    console.log(supplier);
     const sessionGst = parseFloat(this.GST) || 0; // main GST%
-    console.log(sessionGst);
 
     if (company === supplier) {
-      console.log('Both states SAME → CGST + SGST apply');
-
       this.showCGST = true;
       this.showSGST = true;
       this.showGST = false;
@@ -428,8 +404,6 @@ export class EditDebitComponent {
         row.GST = 0; // GST becomes zero in same-state case
       });
     } else {
-      console.log('States DIFFERENT → GST applies');
-
       this.showGST = true;
       this.showCGST = false;
       this.showSGST = false;
@@ -445,39 +419,23 @@ export class EditDebitComponent {
 
     if (this.selectedSupplierId) {
       this.debitFormData.PARTY_NAME = this.selectedSupplier.DESCRIPTION;
-      console.log(this.selectedSupplier.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
     }
 
     if (this.selectedSupplierId) {
       this.debitFormData.SUPP_ID = this.selectedSupplierId;
-      console.log(
-        this.selectedSupplierId,
-        'SELECTEDSUPPLIERIDDDDDDDDDDDDDDDDDD',
-      );
+
       this.getPendingInvoices(); // Pass supplier ID here
     } else {
       // this.pendingInvoicelist = [];
     }
   }
 
-  //   onSupplierChanged(event: any) {
-  //   console.log(event, 'eventttttttttttttttttttttttttttttttttt');
-  //   const selectedSupplierId = event.value;
-
-  // }
-
   selectInvoice(e: any) {
-    console.log('Invoice selected:', e);
     const selected = e.data;
     this.debitFormData.INVOICE_NO = String(selected.INVOICE_NO);
     this.debitFormData.DUE_AMOUNT = selected.PENDING_AMOUNT;
     this.debitFormData.INVOICE_ID = selected.BILL_ID;
-    console.log(
-      this.debitFormData.INVOICE_NO,
-      this.debitFormData.DUE_AMOUNT,
-      this.debitFormData.INVOICE_ID,
-      '=============+++++++++++++++++++++++++++++++++++++',
-    );
+
     this.invoicePopupVisible = false;
   }
 
@@ -534,7 +492,6 @@ export class EditDebitComponent {
   // }
 
   openInvoicePopup() {
-    console.log('EVENT ');
     this.getPendingInvoices(); // Ensure you load fresh data
     this.invoicePopupVisible = true;
   }
@@ -582,7 +539,7 @@ export class EditDebitComponent {
   // getLedgerCodeDropdown() {
   //   this.dataService.getAccountHeadList().subscribe((response: any) => {
   //     this.ledgerList = response.Data;
-  //     console.log('Ledger List Loaded:', this.ledgerList);
+  //     console. ('Ledger List Loaded:', this.ledgerList);
   //   });
   // }
 
@@ -591,7 +548,6 @@ export class EditDebitComponent {
       this.dataService.getActiveLedger().subscribe({
         next: (response: any) => {
           this.ledgerList = response.Data;
-          console.log('Ledger List Loaded:', this.ledgerList);
           resolve(this.ledgerList);
         },
         error: (err) => reject(err),
@@ -651,7 +607,6 @@ export class EditDebitComponent {
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
 
     // ➤ SL_NO: Move to ledgerCode on Enter
     if (e.dataField === 'SL_NO') {
@@ -662,10 +617,6 @@ export class EditDebitComponent {
 
           const rowIndex = visibleRows.findIndex(
             (r) => r?.data === e.row?.data,
-          );
-          console.log(
-            'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex,
           );
 
           setTimeout(() => {
@@ -1020,7 +971,7 @@ export class EditDebitComponent {
   //   this.dataService.getDocNo().subscribe((response: any) => {
   //     this.docNo = response.DOC_NO;
 
-  //     console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+  //     console. (response.DOC_NO, 'DOCNOOOOOOOOO');
   //   });
   // }
 
@@ -1052,7 +1003,6 @@ export class EditDebitComponent {
   }
 
   onApprovedChanged(e: any) {
-    console.log('Checkbox value changed:', e.value);
     this.debitFormData.IS_APPROVED = e.value;
   }
 
@@ -1075,7 +1025,6 @@ export class EditDebitComponent {
       totalGST += (amount * gstPerc) / 100; // Recalculate GST live
     });
     this.net = (totalAmount + totalGST).toFixed(2);
-    console.log('Net Amount (from getter):', this.net);
     return (totalAmount + totalGST).toFixed(2);
   }
 
@@ -1107,16 +1056,13 @@ export class EditDebitComponent {
 
     const netAmount = totalAmount + totalGST;
     const dueAmount = Number(this.debitFormData[0]?.DUE_AMOUNT) || 0;
-    console.log(this.net, dueAmount, 'NOTIFY');
 
     // ✅ Validation check
     if (Number(this.net) > dueAmount) {
-      console.log(netAmount, dueAmount, 'NOTIFYNETAMOUNT');
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
       return;
     }
     if (this.debitFormData.IS_APPROVED) {
-      console.log('approved???????????????????????????????????');
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -1256,8 +1202,6 @@ export class EditDebitComponent {
           }),
       };
 
-      console.log('Update Payload:', payload);
-
       // ✅ FINAL TAX CLEANUP (UPDATE)
       payload.NOTE_DETAIL.forEach((row: any) => {
         if (row.CGST > 0 || row.SGST > 0) {
@@ -1310,7 +1254,6 @@ export class EditDebitComponent {
   }
 
   calculateTotal = (row: any) => {
-    console.log(row);
     const amount = Number(row.Amount) || 0;
     const gst = this.calculateTaxAmount(row) || 0;
     return amount + gst;

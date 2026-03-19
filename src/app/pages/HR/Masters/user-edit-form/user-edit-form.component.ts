@@ -167,28 +167,20 @@ export class UserEditFormComponent {
   ) {
     this.dataservice.getCountryWithFlags().subscribe((data) => {
       this.countryCodes = data;
-      console.log(this.countryCodes, 'COUNTRY;;;;;;;;;;');
     });
   }
 
   get_userlist() {
-    this.dataservice.get_User_data().subscribe((res: any) => {
-      console.log(res);
-    });
+    this.dataservice.get_User_data().subscribe((res: any) => {});
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedRowData'] && changes['selectedRowData'].currentValue) {
-      console.log(
-        'Received selectedRowData:',
-        changes['selectedRowData'].currentValue,
-      );
       this.newUserData = {
         ...this.selectedRowData,
         ...changes['selectedRowData'].currentValue,
       };
     }
-    console.log(this.newUserData, 'DATA');
     this.user_role_dropdown();
     this.get_Company_details();
     this.updateMobileNumber();
@@ -200,19 +192,14 @@ export class UserEditFormComponent {
   }
   get_Company_details() {
     this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
-      console.log(res);
       this.CompanyList_data = res.Data;
-      console.log(this.CompanyList_data);
 
       const company_id = this.newUserData.COMPANY_ID;
       this.CompanyData = this.CompanyList_data.filter((item) =>
         company_id.includes(item.ID),
       );
 
-      console.log(this.CompanyData);
       this.selectedRows = company_id; // This will auto-check rows in the grid
-
-      console.log('Preselected Companies:', this.selectedRows);
     });
   }
   onTimeFormatChange(event: any) {
@@ -227,12 +214,10 @@ export class UserEditFormComponent {
 
   onSelectionChanged(e: any) {
     this.selectedRows = e.selectedRowKeys;
-    console.log('User selected:', this.selectedRows);
   }
 
   user_role_dropdown() {
     this.dataservice.get_userLevels_Dropdown_Api().subscribe((res: any) => {
-      console.log(res, '==========datedrp=======');
       this.userRole = res;
     });
   }
@@ -261,12 +246,11 @@ export class UserEditFormComponent {
 
   selected_Data() {
     this.user_name_value = this.newUserData.USER_NAME;
-    console.log(this.user_name_value);
   }
 
   // Method to handle tab click and set selected index
   // onTabClick(event: any) {
-  //   console.log(event);
+  //     ;
   //   this.selectedIndex = event.itemIndex;
   // }
 
@@ -284,13 +268,8 @@ export class UserEditFormComponent {
   };
 
   autoBindWhatsapp() {
-    console.log('WhatsApp field focused.');
     setTimeout(() => {
       if (!this.newUserData.Whatsapp && this.newUserData.Mobile) {
-        console.log(
-          'Populating WhatsApp with Mobile:',
-          this.newUserData.Mobile,
-        );
         this.newUserData.Whatsapp = this.newUserData.Mobile;
       }
     }, 0);
@@ -462,8 +441,6 @@ export class UserEditFormComponent {
 
     // Reapply correct format
     this.phonenumber = `${this.phoneNoCode.trim()}`;
-    console.log(this.phonenumber);
-    console.log(this.newUserData.MOBILE);
   }
 
   validateMobileNumber(mobileNumber: string): string {
@@ -582,7 +559,6 @@ export class UserEditFormComponent {
   // updateMobileNumber() {
   //   // Find the selected country code
 
-  //   console.log('=======country change function call.............')
   //   const selectedCountry = this.countryCodes.find(
   //     (code) => code.data.dial_code === this.newUserData.countryCode
   //   );
@@ -597,7 +573,6 @@ export class UserEditFormComponent {
   //     // Update the mobile field with valid country code and mobile number
   //     this.newUserData.Mobile = `${dialCode} ${validMobileNumber}`;
 
-  //     console.log('Updated Mobile:', this.newUserData.MOBILE); // For debugging
   //   }
   // }
   updateMobileNumber() {
@@ -611,7 +586,6 @@ export class UserEditFormComponent {
 
     // // Update with new country code
     //  this.phoneNoCode= `${code} `;
-    //  console.log(this.phoneNoCode,'===========code========');
   }
 
   getOnlyMobileNumber(fullPhoneNumber: string): string {
@@ -650,7 +624,6 @@ export class UserEditFormComponent {
       .writeText(this.generatedPassword)
       .then(() => {
         this.tooltipVisible = true;
-        console.log('Password copied to clipboard');
       })
       .catch((err) => {
         console.error('Error copying password to clipboard', err);
@@ -659,16 +632,12 @@ export class UserEditFormComponent {
   }
 
   Update_data() {
-    console.log('Update button clicked');
-
     const payload = {
       ...this.newUserData,
       COMPANY_ID: this.selectedRows,
     };
-    console.log(payload);
 
     this.dataservice.Update_user_data(payload).subscribe((res: any) => {
-      console.log(res);
       this.isEditPopupOpened = false;
       this.closeForm.emit();
       this.get_userlist();

@@ -159,14 +159,13 @@ export class PrePaymentListComponent {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/pre-payment');
@@ -180,20 +179,14 @@ export class PrePaymentListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sesstion_Details();
     this.get_PrePaymentList();
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   get_PrePaymentList() {
@@ -204,7 +197,6 @@ export class PrePaymentListComponent {
       DATE_TO: datePayload.DATE_TO,
     };
     this.dataservice.get_PrePayment_List(payload).subscribe((res: any) => {
-      console.log(res);
       console.log(
         'PrePaymentListDataSource=============================:',
         res.Data,
@@ -230,10 +222,10 @@ export class PrePaymentListComponent {
   }
 
   // selectPrePayment(event:any){
-  // console.log(event);
+  //   ;
   // const id = event.data.TRANS_ID;
   //    this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
-  //     console.log(res);
+  //
   //     this.selectedPrePayment = res.Data
 
   //    })
@@ -262,13 +254,10 @@ export class PrePaymentListComponent {
   }
 
   selectPrePayment(event: any) {
-    console.log(event);
     const id = event.data.TRANS_ID;
     this.PrepaymentId = event.data.TRANS_ID;
     this.selectprepayment = id;
     this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
-      console.log(res);
-
       // Store original string if needed
       this.selectedPrePayment = {
         ...res.Data,
@@ -278,7 +267,6 @@ export class PrePaymentListComponent {
   }
 
   DeletePrePayment(event: any) {
-    console.log(event);
     const id = event.data.TRANS_ID;
     this.dataservice.Delete_PrePayment(id).subscribe((res: any) => {
       console.log('response from delete api:', res);

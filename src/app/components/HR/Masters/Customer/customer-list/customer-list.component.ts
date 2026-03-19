@@ -250,13 +250,8 @@ export class CustomerListComponent {
     this.isEditCustomerPopupOpened = true;
     const ID = e.data.ID;
     this.dataservice.Select_Customer_Api(ID).subscribe((res: any) => {
-      console.log(res);
       this.Selected_Customer_Data = res;
     });
-    console.log(
-      this.Selected_Customer_Data,
-      '==================================================',
-    );
   }
   showCustomer() {
     const payload = {
@@ -292,24 +287,15 @@ export class CustomerListComponent {
   //    this.dataservice.getCustomerData().subscribe(
   //     (response)=>{
   //           this.customer=response;
-  //           console.log(response);
   //     }
   //    )
   // }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
   }
   onClickSaveCustomer() {
     const {
@@ -354,7 +340,6 @@ export class CustomerListComponent {
       COMPANY_ID: this.selected_Company_id,
     };
 
-    console.log(payload);
     this.dataservice.insert_customer_Data(payload).subscribe((res: any) => {
       notify(
         {
@@ -370,8 +355,6 @@ export class CustomerListComponent {
   }
 
   onCustomerUpdated(updatedCustomer: any) {
-    console.log('Received updated customer in list:', updatedCustomer);
-
     // Option A: Reload full list
     this.showCustomer();
 
@@ -388,12 +371,10 @@ export class CustomerListComponent {
 
   onClickUpdateCustomer() {
     const updatedData = { ...this.changed_Customer_Data };
-    console.log('update funtion called');
 
     this.dataservice
       .UpdateCustomerApi(this.Selected_Customer_Data)
       .subscribe((res: any) => {
-        console.log(updatedData, 'updateddddd');
         try {
           notify(
             {
@@ -498,14 +479,11 @@ export class CustomerListComponent {
   }
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/user');
@@ -519,8 +497,6 @@ export class CustomerListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.showCustomer();
     this.getPaymentTerms();
 
@@ -532,7 +508,6 @@ export class CustomerListComponent {
   showCountry() {
     this.dataservice.getCountryDataAPi().subscribe((response) => {
       this.CountryDropdownData = response;
-      console.log(this.CountryDropdownData);
     });
   }
   getPriceLevelDropDown() {
@@ -556,7 +531,6 @@ export class CustomerListComponent {
   getPaymentTerms() {
     this.dataservice.getpayment_term_Api().subscribe((response) => {
       this.PaymentTermsDropdownData = response;
-      console.log('count', this.PaymentTermsDropdownData);
     });
   }
 
@@ -569,17 +543,13 @@ export class CustomerListComponent {
     this.dataservice.getStateData_Api(payload).subscribe((data: any) => {
       this.StateDropdownData = data;
     });
-    console.log(this.StateDropdownData, '========state data====');
-    console.log(this.selecte_countyId, '======county id============');
     // this.service.getStateData().subscribe((data: any) => {
     //   this.StateDropdownData = data;
     // });
   }
   onStateSelectionChanged(event: any) {}
   onCountrySelectionChanged(event: any) {
-    console.log(event);
     this.selecte_countyId = event.value;
-    console.log(this.selecte_countyId, '======county id============');
     this.getStateDropDown();
     const selectedCountry = this.CountryDropdownData.find(
       (country) => country.ID === event.value,
@@ -607,12 +577,7 @@ export class CustomerListComponent {
   }
 
   UpdateData() {
-    console.log('Update functionsssss calledd');
-
-    console.log(this.Selected_Customer_Data);
-
     // this.dataservice.UpdateCustomerApi(this.Selected_Customer_Data).subscribe((res:any)=>{
-    //   console.log(res)
     //   // this.updateCompleted.emit(res);
     // })
   }

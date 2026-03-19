@@ -338,6 +338,7 @@
                 [(value)]="paymentFormData.AMOUNT"
                 label="Amount"
                 labelMode="floating"
+                [format]="{ type: 'fixedPoint', precision: 2 }"
                 [width]="'100%'"
               ></dx-number-box>
             </div>

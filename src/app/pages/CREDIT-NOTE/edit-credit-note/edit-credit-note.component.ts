@@ -163,15 +163,12 @@ export class EditCreditNoteComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
-      console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
       this.companyState = selectedCompany.STATE_NAME;
       this.companyStateID = selectedCompany.STATE_ID;
-      console.log(this.companyStateID, 'USERDATASTRINGGGGGGGGGGGGGG');
       if (selectedCompany?.COMPANY_ID) {
         this.companyList = [selectedCompany]; // Show only selected company
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
@@ -182,7 +179,6 @@ export class EditCreditNoteComponent {
       this.userId = userData.USER_ID;
       this.finId = userData.FINANCIAL_YEARS?.[0]?.FIN_ID;
     }
-    console.log(this.creditFormData, 'NGONINIT');
     this.getCompanyListDropdown();
     this.getLedgerCodeDropdown();
     // this.getPendingInvoices();
@@ -193,16 +189,11 @@ export class EditCreditNoteComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['creditFormData'] && this.creditFormData?.length) {
       const data = this.creditFormData[0];
-      console.log(this.creditFormData, 'CREDITFORMDATAAAAAAAAAAAAAA=====');
 
       setTimeout(() => {
         this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
@@ -212,19 +203,12 @@ export class EditCreditNoteComponent {
       this.invoiceNo = String(data.INVOICE_NO);
       this.transDate = new Date(data.TRANS_DATE);
 
-      console.log('EDIT → DISTRIBUTOR_ID:', data.DISTRIBUTOR_ID);
-      console.log('EDIT → COMPANY_STATE_ID:', this.companyStateID);
-
-      console.log('+++++++++______', data.NOTE_DETAIL);
-
       /* ---------------- Customer dropdown ---------------- */
       this.getCompanyListDropdown(data.DISTRIBUTOR_ID);
 
       /* ---------------- Grid binding ---------------- */
       this.getLedgerCodeDropdown()
         .then(() => {
-          console.log('SELECT NOTE_DETAIL:', data.NOTE_DETAIL);
-
           this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
             const ledger = this.ledgerList.find(
               (l: any) => l.HEAD_ID === item.HEAD_ID,
@@ -245,7 +229,6 @@ export class EditCreditNoteComponent {
               _isExisting: true,
             };
           });
-          console.log(this.noteDetails, 'NOTE DETAILS');
           this.cdr.detectChanges();
         })
         .finally(() => {
@@ -273,23 +256,16 @@ export class EditCreditNoteComponent {
           const distributorStateId = distributor.STATE_ID;
           const companyStateId = this.companyStateID;
 
-          console.log('Distributor STATE_ID:', distributorStateId);
-          console.log('Company STATE_ID:', companyStateId);
-
           if (companyStateId === distributorStateId) {
             // ✅ SAME STATE → CGST + SGST
             this.showCGST = true;
             this.showSGST = true;
             this.showGST = false;
-
-            console.log('GST MODE → CGST + SGST');
           } else {
             // ✅ DIFFERENT STATE → IGST
             this.showGST = true;
             this.showCGST = false;
             this.showSGST = false;
-
-            console.log('GST MODE → IGST');
           }
 
           // Refresh grid to apply column visibility
@@ -323,11 +299,9 @@ export class EditCreditNoteComponent {
       .getCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response || [];
-        console.log('Distributor list:', this.distributorList);
 
         if (selectedDistributorId) {
           this.selectedDistributorId = selectedDistributorId;
-          console.log('Distributor bound:', this.selectedDistributorId);
 
           // ✅ FIND SELECTED DISTRIBUTOR
           const selectedDistributor = this.distributorList.find(
@@ -337,14 +311,6 @@ export class EditCreditNoteComponent {
             this.selectedCustomer = selectedDistributor; // ✅ IMPORTANT
           }
           if (selectedDistributor) {
-            console.log(
-              'Selected Distributor State ID:',
-              selectedDistributor.STATE_ID,
-            );
-            console.log(
-              'Selected Distributor State Name:',
-              selectedDistributor.STATE_NAME,
-            );
           } else {
             console.warn('Selected distributor not found in distributorList');
           }
@@ -362,13 +328,11 @@ export class EditCreditNoteComponent {
       .getCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -583,7 +547,6 @@ export class EditCreditNoteComponent {
     return new Promise((resolve) => {
       this.dataService.getActiveLedger().subscribe((response: any) => {
         this.ledgerList = response.Data;
-        console.log('Ledger List Loaded:', this.ledgerList);
         resolve();
       });
     });
@@ -640,7 +603,6 @@ export class EditCreditNoteComponent {
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
 
     // ➤ SL_NO: Move to ledgerCode on Enter
     // if (e.dataField === 'SL_NO') {
@@ -652,10 +614,7 @@ export class EditCreditNoteComponent {
     //       const rowIndex = visibleRows.findIndex(
     //         (r) => r?.data === e.row?.data
     //       );
-    //       console.log(
-    //         'SL_NO → Enter → move to ledgerCode, rowIndex:',
-    //         rowIndex
-    //       );
+    //
 
     //       setTimeout(() => {
     //         grid.focus(grid.getCellElement(rowIndex, 'ledgerCode'));
@@ -816,8 +775,6 @@ export class EditCreditNoteComponent {
         const gstValue = +gst.toFixed(2);
 
         grid.cellValue(rowIndex, 'gstAmount', gstValue);
-
-        console.log('GST Amount:', gstValue);
       };
     }
 
@@ -1047,7 +1004,6 @@ export class EditCreditNoteComponent {
     }
 
     this.selectedDistributorId = event.value;
-    console.log(this.selectedDistributorId, 'SELECTEDDISTRIBUTORIDDDDDDDDD');
   }
 
   onNarrationKeyDown(event: any) {}
@@ -1058,7 +1014,6 @@ export class EditCreditNoteComponent {
   // onCompanySelected(event: any){}
 
   openInvoicePopup() {
-    console.log('EVENT ');
     this.getPendingInvoices(); // Ensure you load fresh data
     this.invoicePopupVisible = true;
   }
@@ -1101,17 +1056,14 @@ export class EditCreditNoteComponent {
   }
 
   selectInvoice(e: any) {
-    console.log('Invoice selected:', e);
     const selected = e.data;
     this.creditFormData[0].INVOICE_NO = selected.INVOICE_NO;
     this.creditFormData[0].DUE_AMOUNT = selected.BALANCE_AMOUNT;
     this.creditFormData[0].INVOICE_ID = selected.INVOICE_ID;
-    console.log(this.creditFormData.INVOICE_ID, 'INVOICEIDDDDDDDDDDDDDDDD');
     this.invoicePopupVisible = false;
   }
 
   onApprovedChanged(e: any) {
-    console.log('Checkbox value changed:', e.value);
     this.creditFormData[0].IS_APPROVED = e.value;
   }
 
@@ -1153,7 +1105,6 @@ export class EditCreditNoteComponent {
 
     const netAmount = totalAmount + totalGST;
     const dueAmount = Number(this.creditFormData[0]?.DUE_AMOUNT) || 0;
-    console.log(netAmount, dueAmount, 'NETAMOUNT,DUEAMOUNT');
     // ✅ Validation check
     if (netAmount > dueAmount) {
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
@@ -1280,8 +1231,6 @@ export class EditCreditNoteComponent {
       VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
     };
 
-    console.log('Update Payload:', payload);
-    console.log(this.transDate, 'TRANSDATEEEEEEEEEEEEE');
     this.dataService.updateCreditNote(payload).subscribe((response) => {
       if (response) {
         notify(

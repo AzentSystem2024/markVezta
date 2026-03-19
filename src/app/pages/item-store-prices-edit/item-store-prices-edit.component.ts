@@ -205,14 +205,11 @@ export class ItemStorePricesEditComponent {
     this.userId = sessionStorage.getItem('UserId');
     this.dateFormat = sessionStorage.getItem('dateFormat');
     this.currencyFormt = sessionStorage.getItem('currencyFormat');
-    console.log(this.currencyFormt, 'CURRENCYFORMAT');
     this.sesstion_Details();
     this.getWorksheetData();
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        console.log('Route refreshed');
-      });
+      .subscribe(() => {});
     if (this.selectedStoreId.length > 1) {
       const defaultStoreId = this.selectedStoreId.join(',');
       // this.listItemsByMultipleStoreIds(defaultStoreId);
@@ -224,14 +221,11 @@ export class ItemStorePricesEditComponent {
   getWorksheetData(): void {
     this.dataservice.worksheetData$.subscribe((data) => {
       this.worksheetData = data;
-      console.log(this.worksheetData, 'IN EDITTTT');
 
       this.worksheetItems = this.worksheetData.worksheet_item_price || [];
-      console.log(this.worksheetItems, '+++++++++=');
       this.narrationText = this.worksheetData.NARRATION;
 
       this.itemIds = this.worksheetItems.map((item) => +item.ITEM_ID);
-      console.log(this.itemIds, 'Extracted ITEM_IDs as numbers');
 
       // Select rows that have Selected === true
       this.selectedItems = this.worksheetItems.filter(
@@ -240,7 +234,6 @@ export class ItemStorePricesEditComponent {
 
       // Now set selectedRowKeys after selecting items
       this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
-      console.log(this.selectedRowKeys, 'Selected Row Keys');
 
       this.statusOfWorksheet = data.status;
       this.isApplyButtonDisabled = this.statusOfWorksheet === 'Approved';
@@ -276,7 +269,6 @@ export class ItemStorePricesEditComponent {
   }
 
   isVisible(code: string): boolean {
-    // console.log(this.selectedPriceColumns, 'SELECTEDPRICECOLUMNSSSSSSSSSS');
     return this.selectedPriceColumns.includes(code);
   }
 
@@ -326,12 +318,8 @@ export class ItemStorePricesEditComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   loadStores() {
@@ -359,7 +347,6 @@ export class ItemStorePricesEditComponent {
   }
 
   listItemsByMultipleStoreIds(storeIds: string) {
-    console.log(storeIds, 'STOREIDSSSSSSSSSSSSSSS');
     storeIds = storeIds.toString();
     storeIds = storeIds.toString();
 
@@ -383,7 +370,6 @@ export class ItemStorePricesEditComponent {
   }
 
   // onRowUpdated(event: any) {
-  //   console.log('on RowUpdated event data:', event);
   //   const updatedData = event.data;
   //   const rowId = updatedData.ID;
   //   const eventRowdata = event.data;
@@ -442,17 +428,10 @@ export class ItemStorePricesEditComponent {
       PRICE_LEVEL4_NEW: updatedRow.PRICE_LEVEL4_NEW || '',
       PRICE_LEVEL5_NEW: updatedRow.PRICE_LEVEL5_NEW || '',
     };
-
-    console.log('Updated selected_data:', this.selected_data);
   }
 
   onSelectionChanged(event: any) {
     const totalItemsCount = event.component.getDataSource().items().length;
-
-    console.log(
-      event,
-      '==================SELECTION CHANGED EVENT===================',
-    );
 
     this.selected_data = [...event.selectedRowsData];
 
@@ -574,8 +553,6 @@ export class ItemStorePricesEditComponent {
       worksheet_item_price: this.selected_data || this.worksheetItems,
     };
 
-    console.log(payload, 'PAYLOAD TO SAVE');
-
     const invalidItems = payload.worksheet_item_price.filter((item: any) => {
       const priceToCheck =
         Number(item.PRICE_NEW) === 0
@@ -651,8 +628,6 @@ export class ItemStorePricesEditComponent {
         );
       });
     } else {
-      console.log(payload, 'PAYLOAD TO SAVE');
-
       this.dataservice.updateworksheetItemPrice(payload).subscribe(
         (response) => {
           this.isSaving = false; // ✅ stop loading
@@ -726,7 +701,6 @@ export class ItemStorePricesEditComponent {
         NARRATION: narration,
         worksheet_item_price: worksheetItemPrice,
       };
-      console.log(verificationPayload, 'VERIFICATIONPAYLOAD');
       this.verifyItemStorePrices(verificationPayload);
     }
   }
@@ -736,7 +710,6 @@ export class ItemStorePricesEditComponent {
       this.dataservice
         .verifyItemStorePrices(this.payloadForVerify)
         .subscribe((verifyResponse) => {
-          console.log(verifyResponse, 'VERIFYRESPONSE');
           if (verifyResponse) {
             notify(
               {
@@ -755,7 +728,6 @@ export class ItemStorePricesEditComponent {
               'error',
             );
           }
-          console.log('Verification successful:', verifyResponse);
           // this.isVerified = true;
         });
     }
@@ -771,7 +743,6 @@ export class ItemStorePricesEditComponent {
           .approveworksheetItemPrices(this.payloadForVerify)
           .subscribe(
             (response) => {
-              console.log('APPROVED');
               this.selectedRowKeys = [];
             },
             (error) => {
@@ -864,14 +835,11 @@ export class ItemStorePricesEditComponent {
       return;
     }
     this.percentage = percentageValue;
-    console.log(`Percentage change set to: ${percentageValue}%`);
   }
 
   handleSalePriceChange(event) {
     const selectedOptions = event.value; // This will now be an array of selected options
     this.selectedSalePrice = selectedOptions;
-
-    console.log(`Selected sale price options: ${selectedOptions}`);
   }
 
   applyFormula(event) {
@@ -951,11 +919,6 @@ export class ItemStorePricesEditComponent {
 
             // Optionally trigger an event to notify that the row has been updated
             this.onRowUpdated({ data: selectedRow });
-
-            console.log(
-              `Updated ${selectedOption} for row ID ${selectedRow.ID}:`,
-              finalPrice,
-            );
           });
         } else {
           console.error('Selected row not found in the data source.');
@@ -990,11 +953,6 @@ export class ItemStorePricesEditComponent {
 
             this.newPrice = this.roundValue(processedPrice); // Apply rounding
             selectedRow[selectedOption] = this.newPrice; // This updates the displayed value
-
-            console.log(
-              `Rounded price for ${selectedOption}, row ID ${selectedRowId}:`,
-              this.newPrice,
-            );
           });
         } else {
           console.error(`Selected row with ID ${selectedRowId} not found.`);
@@ -1008,21 +966,16 @@ export class ItemStorePricesEditComponent {
   onPriceAdjustmentChanged(event: any) {
     this.isIncrease = event.value; // True for increase, false for decrease
 
-    console.log(this.isIncrease ? 'Increase selected' : 'Decrease selected');
-
     // This does not apply the change yet, it only sets the mode (increase or decrease)
   }
 
   adjustPercentage(amount: number) {
     this.percentage += amount;
     if (this.percentage < 0) this.percentage = 0; // Ensure percentage doesn't go below 0
-
-    console.log(`Adjusted percentage: ${this.percentage}%`);
   }
 
   toggleAdjustment() {
     this.isIncrease = !this.isIncrease; // Toggle between increase and decrease
-    console.log(this.isIncrease ? 'Increase selected' : 'Decrease selected');
   }
 
   areRowsSelected(): boolean {

@@ -84,16 +84,13 @@ export class PdcEditFormComponent {
     AC_TRANS_ID: '',
   };
   onBeneficiaryTypeChanged(e: any) {
-    // console.log(e,'event')
     //  this.selectedBeneficiaryType = e.value
-    //  console.log(this.selectedBeneficiaryType,'selected beneficiary type')
 
     const selectedId = e.value;
     this.selectedBeneficiaryTypeID = selectedId;
     this.selectedBeneficiaryType = this.BeneficiaryType.find(
       (b) => b.id === selectedId,
     );
-    console.log(this.selectedBeneficiaryType, 'selected beneficiary type');
   }
 
   onPriorityChanged(e: any) {
@@ -138,13 +135,9 @@ export class PdcEditFormComponent {
     this.sesstion_Details();
   }
 
-  onSupplierChanged(event: any) {
-    console.log(event.value, 'event');
-  }
+  onSupplierChanged(event: any) {}
 
-  onCustomerChanged(event: any) {
-    console.log(event.value, 'event');
-  }
+  onCustomerChanged(event: any) {}
 
   cancel() {
     this.formClosed.emit();
@@ -164,13 +157,8 @@ export class PdcEditFormComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   savePDC() {
@@ -206,10 +194,7 @@ export class PdcEditFormComponent {
       AC_TRANS_ID: this.PDCFormData.AC_TRANS_ID || 0,
     };
 
-    console.log(payload, 'Formatted payload to insert PDC');
-
     this.dataservice.Update_PDC(payload).subscribe((res: any) => {
-      console.log(res, 'response of insert PDC');
       if (res.Message === 'Success') {
         notify(
           {
@@ -230,7 +215,6 @@ export class PdcEditFormComponent {
       NAME: 'SUPPLIER',
     };
     this.dataservice.Supplier_Dropdown(payload).subscribe((res: any) => {
-      console.log('supplier dropdown', res);
       this.Supplier = res;
     });
   }
@@ -239,7 +223,6 @@ export class PdcEditFormComponent {
     this.dataservice
       .Bank_Dropdown(this.selected_Company_id)
       .subscribe((res: any) => {
-        console.log('bank dropdown', res);
         this.Bank = res;
       });
   }
@@ -250,7 +233,6 @@ export class PdcEditFormComponent {
       COMPANY_ID: this.selected_Company_id,
     };
     this.dataservice.Customer_Dropdown(payload).subscribe((res: any) => {
-      console.log('customer dropdown', res);
       this.Customer = res;
     });
   }
@@ -262,11 +244,7 @@ export class PdcEditFormComponent {
       this.selectedBeneficiaryType = this.BeneficiaryType[0];
       this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
     }
-    console.log(
-      this.selectedBeneficiaryType,
-      'selectedBeneficiaryType=================',
-    );
-    console.log(this.selectedBeneficiaryTypeID, 'selectedBeneficiaryID=======');
+
     this.get_Supplier_dropdown();
     this.get_Bank_dropdown();
   }
@@ -274,7 +252,6 @@ export class PdcEditFormComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedPDC'] && changes['selectedPDC'].currentValue) {
       const data = changes['selectedPDC'].currentValue;
-      console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa');
       this.PDCFormData = {
         ID: data.ID,
         BANK_HEAD_ID: data.BANK_HEAD_ID,
@@ -294,10 +271,7 @@ export class PdcEditFormComponent {
         ENTRY_STATUS: data.ENTRY_STATUS,
         AC_TRANS_ID: data.AC_TRANS_ID,
       };
-      console.log(
-        this.PDCFormData,
-        'PDCFORMDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      );
+
       this.selectedType = this.PDCFormData.IS_PAYMENT;
       this.selectedBeneficiaryType = this.BeneficiaryType.find(
         (b) => b.id === data.BENEFICIARY_TYPE,
@@ -314,10 +288,7 @@ export class PdcEditFormComponent {
         );
         this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType?.id;
       }
-      console.log(
-        this.selectedBeneficiaryTypeID,
-        'SELECTEDBENNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
-      );
+
       this.get_Supplier_dropdown();
     }
 
@@ -328,8 +299,6 @@ export class PdcEditFormComponent {
     //   this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
 
     // }
-    // console.log(this.selectedBeneficiaryType,'selectedBeneficiaryType=================')
-    //  console.log(this.selectedBeneficiaryTypeID,'selectedBeneficiaryID=======')
 
     if (!this.selectedPDC) {
       setTimeout(() => {

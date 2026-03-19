@@ -34,10 +34,10 @@ import { DataService } from 'src/app/services';
 @Component({
   selector: 'app-prepayment-gst-edit',
   templateUrl: './prepayment-gst-edit.component.html',
-  styleUrls: ['./prepayment-gst-edit.component.scss']
+  styleUrls: ['./prepayment-gst-edit.component.scss'],
 })
 export class PrepaymentGstEditComponent {
-    @ViewChild('formValidationGroup', { static: false })
+  @ViewChild('formValidationGroup', { static: false })
   formValidationGroup: DxValidationGroupComponent;
 
   @Output() formClosed = new EventEmitter<void>();
@@ -103,7 +103,10 @@ export class PrepaymentGstEditComponent {
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
 
-  constructor(private dataservice: DataService, private ngZone: NgZone) {
+  constructor(
+    private dataservice: DataService,
+    private ngZone: NgZone,
+  ) {
     this.get_Supplier_dropdown();
     this.get_ExpenseLedger_dropdown();
     this.sesstion_Details();
@@ -142,7 +145,6 @@ export class PrepaymentGstEditComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -186,7 +188,7 @@ export class PrepaymentGstEditComponent {
 
       if (this.PrePaymentFormData.NO_OF_MONTHS) {
         newDate.setMonth(
-          newDate.getMonth() + this.PrePaymentFormData.NO_OF_MONTHS
+          newDate.getMonth() + this.PrePaymentFormData.NO_OF_MONTHS,
         );
       }
 
@@ -229,7 +231,7 @@ export class PrepaymentGstEditComponent {
       endDateFinal = new Date(
         endDateFinal.getFullYear(),
         endDateFinal.getMonth(),
-        0
+        0,
       );
     }
     const totalDays = this.daysBetween(startDate, endDateFinal);
@@ -243,7 +245,7 @@ export class PrepaymentGstEditComponent {
       let periodEnd = new Date(
         current.getFullYear(),
         current.getMonth() + 1,
-        0
+        0,
       );
 
       // Keep end date within overall DATE_TO
@@ -319,18 +321,17 @@ export class PrepaymentGstEditComponent {
   }
 
   onSupplierChanged(event: any) {
-    console.log(event, 'event');
     this.selectedSupplierId = event.value;
   }
 
   get_Supplier_dropdown() {
-    const payload  = {
-      NAME :'SUPPLIER',
-      COMPANY_ID : this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.Supplier_Dropdown(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
-      this.Supplier = res;  
+      this.Supplier = res;
     });
   }
 
@@ -416,31 +417,17 @@ export class PrepaymentGstEditComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id==================='
-    );
 
     this.selected_user_id = sessionData.USER_ID;
     console.log(
       this.selected_user_id,
-      '===========selected user id==================='
+      '===========selected user id===================',
     );
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id==================='
-    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -462,7 +449,7 @@ export class PrepaymentGstEditComponent {
     }
     console.log(
       this.ExpenseAmountDetails,
-      '=================ExpenseAmountDetails=========='
+      '=================ExpenseAmountDetails==========',
     );
   }
 

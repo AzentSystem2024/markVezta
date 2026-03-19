@@ -131,14 +131,11 @@ export class EmployeeSalarySettingsComponent {
   };
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/employee-salary-settings');
@@ -152,8 +149,6 @@ export class EmployeeSalarySettingsComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sesstion_Details();
     this.getEmployeeSalarySettingsList(); // call API on load with default filter
   }
@@ -237,11 +232,9 @@ export class EmployeeSalarySettingsComponent {
 
   onEditEmployee(e: any) {
     e.cancel = true;
-    console.log(e, '=============event================================');
     const employeeId = e.data.ID;
     const EffectFrom = e.data.EFFECT_FROM;
     const BatchId = e.data.BATCH_ID;
-    console.log(employeeId, 'Selected Employee ID for Edit');
     this.editEmployeePopupOpened = true;
     //  Format EFFECT_FROM to 'yyyy-MM-dd'
     const formattedEffectFrom = formatDate(EffectFrom, 'yyyy-MM-dd', 'en-US');
@@ -250,21 +243,15 @@ export class EmployeeSalarySettingsComponent {
       EFFECT_FROM: formattedEffectFrom,
       BATCH_ID: BatchId,
     };
-    console.log(
-      payload,
-      'payload===================================================================',
-    );
+
     this.dataservice
       .Select_EmployeeSalarySettings_Api(payload)
       .subscribe((response: any) => {
         this.selectedEmployee = response.Data[0];
-        console.log(this.selectedEmployee, 'selected response');
 
         this.effectFromRaw = this.selectedEmployee.EFFECT_FROM;
-        console.log(this.effectFromRaw, 'selected effect from');
 
         this.previousEffectFrom = this.selectedEmployee.PREVIOUS_EFFECT_FROM;
-        console.log(this.previousEffectFrom, 'previous effect from');
       });
   }
 
@@ -295,12 +282,7 @@ export class EmployeeSalarySettingsComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   getEmployeeSalarySettingsList() {
@@ -308,11 +290,9 @@ export class EmployeeSalarySettingsComponent {
       CompanyId: this.selected_Company_id,
       FilterAction: Number(this.selectedFilterAction), // Ensure it's a number
     };
-    console.log(payload, 'payload');
     this.dataservice
       .getEmployeeSalarySettingsList(payload)
       .subscribe((response: any) => {
-        console.log(response, 'response');
         this.EmployeeSalarySettingsDatasource = response.Data || [];
       });
   }
@@ -326,10 +306,7 @@ export class EmployeeSalarySettingsComponent {
   }
 
   DeleteEmployeeSalarySettings(event: any) {
-    console.log(event.data, 'event=========');
-
     const BatchId = event.data.BATCH_ID;
-    console.log(BatchId, 'Batch Id');
     //   const id=event.data.ID
     // const EffectFrom = event.data.EFFECT_FROM
     // const formattedEffectFrom = formatDate(EffectFrom, 'yyyy-MM-dd', 'en-US');
@@ -337,11 +314,9 @@ export class EmployeeSalarySettingsComponent {
     //     EMP_ID : id,
     //     EFFECT_FROM : formattedEffectFrom
     //   }
-    // console.log(payload,'payload')
     this.dataservice
       .Delete_EmployeeSalarySettings_Api(BatchId)
       .subscribe((res: any) => {
-        console.log('response from delete packing api:', res);
         this.getEmployeeSalarySettingsList();
         // this.dataGrid.instance.refresh();
         notify(

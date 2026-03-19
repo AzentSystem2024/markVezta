@@ -147,14 +147,13 @@ export class ArticleTypeComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/article-type');
@@ -167,9 +166,6 @@ export class ArticleTypeComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
   onEditingStart(event: any) {
@@ -194,12 +190,8 @@ export class ArticleTypeComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
   //===================get data list========================
   get_ArticleType_List() {
@@ -233,7 +225,6 @@ export class ArticleTypeComponent {
   addData() {
     const validationResult = this.formValidationGroup?.instance?.validate();
     const Description = this.formsource.get('Description')?.value;
-    console.log(Description);
 
     const payload = {
       DESCRIPTION: Description,
@@ -282,7 +273,6 @@ export class ArticleTypeComponent {
     const ID = event.data.ID;
 
     this.dataservice.Select_ArticleType_Api(ID).subscribe((response: any) => {
-      console.log(response, 'select Api');
       this.selectedData = response;
     });
   }
@@ -292,7 +282,6 @@ export class ArticleTypeComponent {
     const Id = this.editingRowData.ID;
     const Description = this.editingRowData.DESCRIPTION;
     // const COMPANY_ID = this.selected_Company_id;
-    console.log(Id, Description);
 
     // Optional: Check for duplicate login name
     const isDuplicate = this.articleTypeList?.some((data: any) => {
@@ -345,7 +334,6 @@ export class ArticleTypeComponent {
         },
         'success',
       );
-      console.log(response, 'deleted');
     });
   }
 

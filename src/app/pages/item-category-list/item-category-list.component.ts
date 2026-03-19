@@ -147,7 +147,6 @@ export class ItemCategoryListComponent implements OnInit {
     const id = event.data.ID;
 
     this.dataservice.select_category(id).subscribe((res: any) => {
-      console.log(res);
       this.selected_data = res;
     });
   }
@@ -155,14 +154,7 @@ export class ItemCategoryListComponent implements OnInit {
   onClickSaveCategory() {
     const { CODE, CAT_NAME, LOYALTY_POINT, COST_HEAD_ID, DEPT_ID } =
       this.categoryComponent.getNewCategoryData();
-    console.log(
-      'inserted data',
-      CODE,
-      CAT_NAME,
-      LOYALTY_POINT,
-      COST_HEAD_ID,
-      DEPT_ID,
-    );
+
     const COMPANY_ID = this.COMPANY_ID;
     // Check for duplicates in CategoryList
     const isCodeDuplicate = this.categoryArray.some(
@@ -281,12 +273,8 @@ export class ItemCategoryListComponent implements OnInit {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.COMPANY_ID = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.COMPANY_ID,
-      '============selected_Company_id==============',
-    );
   }
 
   showCategory() {
@@ -322,19 +310,17 @@ export class ItemCategoryListComponent implements OnInit {
       .getDropdownData(dropdowndepartment)
       .subscribe((data: any) => {
         this.DepartmentDropdownData = data;
-        console.log('dropdown', this.DepartmentDropdownData);
       });
   }
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/user');
@@ -348,8 +334,6 @@ export class ItemCategoryListComponent implements OnInit {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sesstion_Details();
     this.showCategory();
     this.getDepartmentDropDown();

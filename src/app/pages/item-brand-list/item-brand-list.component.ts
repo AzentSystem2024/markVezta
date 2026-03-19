@@ -18,24 +18,27 @@ import { ExportService } from 'src/app/services/export.service';
 })
 export class ItemBrandListComponent implements OnInit {
   @ViewChild(ItmBrandFormComponent) itembrandComponent: ItmBrandFormComponent;
-  @ViewChild(DxDataGridComponent,{ static: true }) dataGrid: DxDataGridComponent;
-  
-  brand:any;
-  isAddBrandPopupOpened=false;
-  showFilterRow=true;
-  showHeaderFilter=true;
-  constructor(private dataservice:DataService,private exportService: ExportService){}
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+
+  brand: any;
+  isAddBrandPopupOpened = false;
+  showFilterRow = true;
+  showHeaderFilter = true;
+  constructor(
+    private dataservice: DataService,
+    private exportService: ExportService,
+  ) {}
   onExporting(event: any) {
-    this.exportService.onExporting(event,'Brand-list');
+    this.exportService.onExporting(event, 'Brand-list');
   }
-  addBrand(){
-    this.isAddBrandPopupOpened=true;
+  addBrand() {
+    this.isAddBrandPopupOpened = true;
   }
 
   showBrand() {
     this.dataservice.getBrandData().subscribe((response) => {
       this.brand = response;
-      console.log(response);
     });
   }
   onRowRemoving(event) {
@@ -52,7 +55,7 @@ export class ItemBrandListComponent implements OnInit {
               message: 'Delete operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.showBrand();
@@ -62,7 +65,7 @@ export class ItemBrandListComponent implements OnInit {
               message: 'Delete operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -71,7 +74,6 @@ export class ItemBrandListComponent implements OnInit {
   onClickSaveBrand() {
     const { CODE, BRAND_NAME, COMPANY_ID } =
       this.itembrandComponent.getNewBrandData();
-    console.log('inserted data', CODE, BRAND_NAME, COMPANY_ID);
     this.dataservice
       .postBrandData(CODE, BRAND_NAME, COMPANY_ID)
       .subscribe((response) => {
@@ -98,7 +100,7 @@ export class ItemBrandListComponent implements OnInit {
               message: 'Item Brand updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.showBrand();
@@ -108,13 +110,10 @@ export class ItemBrandListComponent implements OnInit {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
-    console.log('old data:', oldData);
-    console.log('new data:', updataDate);
-    console.log('modified data:', combinedData);
 
     event.cancel = true; // Prevent the default update operation
   }

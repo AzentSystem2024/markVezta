@@ -248,12 +248,8 @@ export class ItemStorePriceApproveComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   loadStores() {
@@ -283,14 +279,12 @@ export class ItemStorePriceApproveComponent {
   listItemsByMultipleStoreIds(storeIds: string) {
     this.dataservice.getItemListByStoreId().subscribe(
       (response) => {
-        console.log(response);
         this.worksheetItems = response.PriceWizardData;
         this.selectedItems = this.worksheetItems.filter(
           (item) => item.Selected === true,
         );
         if (this.selectedItems.length > 0) {
           this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
-          console.log(this.selectedRowKeys, 'Updated Selected Row Keys');
         } else {
           this.selectedRowKeys = [];
         }
@@ -470,9 +464,7 @@ export class ItemStorePriceApproveComponent {
       if (this.payloadForVerify) {
         this.dataservice
           .verifyItemStorePrices(this.payloadForVerify)
-          .subscribe((response) => {
-            // console.log('verified');
-          });
+          .subscribe((response) => {});
       }
       const companyId = 1; // Example: this.companyId = 1
       const userId = 1; // Example: this.userId = 1
@@ -535,9 +527,7 @@ export class ItemStorePriceApproveComponent {
     if (this.payloadForVerify) {
       this.dataservice
         .approveworksheetItemPrices(this.payloadForVerify)
-        .subscribe((response) => {
-          console.log('APPROVED');
-        });
+        .subscribe((response) => {});
     }
     const companyId = 1; // Example: this.companyId = 1
     const userId = 1; // Example: this.userId = 1
@@ -600,13 +590,11 @@ export class ItemStorePriceApproveComponent {
       return;
     }
     this.percentage = percentageValue;
-    console.log(`Percentage change set to: ${percentageValue}%`);
   }
 
   handleSalePriceChange(event) {
     const selectedOptions = event.value; // This will now be an array of selected options
     this.selectedSalePrice = selectedOptions;
-    // console.log(`Selected sale price options: ${selectedOptions}`);
   }
 
   applyFormula(event) {
@@ -681,11 +669,6 @@ export class ItemStorePriceApproveComponent {
               selectedRow.PRICE_LEVEL5_NEW = finalPrice; // Update PRICE_LEVEL5_NEW
             }
             this.onRowUpdated({ data: selectedRow });
-
-            // console.log(
-            //   `Updated ${selectedOption} for row ID ${selectedRow.ID}:`,
-            //   finalPrice
-            // );
           });
         } else {
           console.error('Selected row not found in the data source.');
@@ -717,10 +700,6 @@ export class ItemStorePriceApproveComponent {
 
             this.newPrice = this.roundValue(processedPrice); // Apply rounding
             selectedRow[selectedOption] = this.newPrice;
-            // console.log(
-            //   `Rounded price for ${selectedOption}, row ID ${selectedRowId}:`,
-            //   this.newPrice
-            // );
           });
         } else {
           console.error(`Selected row with ID ${selectedRowId} not found.`);
@@ -733,19 +712,15 @@ export class ItemStorePriceApproveComponent {
 
   onPriceAdjustmentChanged(event: any) {
     this.isIncrease = event.value;
-    console.log(this.isIncrease ? 'Increase selected' : 'Decrease selected');
   }
 
   adjustPercentage(amount: number) {
     this.percentage += amount;
     if (this.percentage < 0) this.percentage = 0; // Ensure percentage doesn't go below 0
-
-    console.log(`Adjusted percentage: ${this.percentage}%`);
   }
 
   toggleAdjustment() {
     this.isIncrease = !this.isIncrease; // Toggle between increase and decrease
-    console.log(this.isIncrease ? 'Increase selected' : 'Decrease selected');
   }
 
   areRowsSelected(): boolean {

@@ -106,15 +106,11 @@ export class ProductionJvViewComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
     this.productionFormData.FIN_ID = this.sessionData.FINANCIAL_YEARS.FIN_ID;
     this.productionFormData.COMPANY_ID =
       this.sessionData.SELECTED_COMPANY.COMPANY_ID;

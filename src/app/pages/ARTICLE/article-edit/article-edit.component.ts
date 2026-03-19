@@ -55,11 +55,12 @@ import { selected } from '@devexpress/analytics-core/queryBuilder-metadata';
 })
 export class ArticleEditComponent {
   @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
+  @ViewChild('componentGridRef', { static: false }) componentGridRef: any;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() articleData: any;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-  @ViewChild('bomGridRef', { static: false }) bomGridRef: any;
+   @ViewChild('bomGridRef', { static: false }) bomGridRef: any;
   popupVisible = false;
   imagePreview: string | ArrayBuffer | null = null;
   produCtionUnits: any;
@@ -88,6 +89,7 @@ export class ArticleEditComponent {
   selectedSizeValues: string[] = [];
   sizeGridSelectedKeys: any;
   selectedAttachRowKeys: number[];
+  ComponentpopupVisible :boolean = false;
   isFilterRowVisible: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -111,7 +113,9 @@ export class ArticleEditComponent {
   ItempopupVisible: boolean = false;
   selectedItem: any;
   selectedItems: any[] = [];
-  ItemListDataSource: any[] = [];
+  ItemListDataSource:any[] = [];
+  selectedComponentDescription: any;
+  selectedComponentArticles:any[]=[]
 
   constructor(private dataService: DataService) {}
 
@@ -132,6 +136,33 @@ export class ArticleEditComponent {
       }
       console.log('Incoming articleData:', incomingData);
 
+      if (incomingData.Components && Array.isArray(incomingData.Components)) {
+
+  this.selectedComponentArticles = incomingData.Components.map((c: any) => ({
+    ID: c.COMPONENT_ARTICLE_ID,
+    ART_NO: c.COMPONENT_ART_NO,
+    DESCRIPTION: c.COMPONENT_NAME,
+    CATEGORY_NAME: c.CATEGORY,
+    ARTICLE_TYPE_NAME: c.ARTICLE_TYPE,
+    COLOR: this.articleData.COLOR   // optional fallback
+  }));
+
+  // bind to grid
+  this.attachGridData = [...this.selectedComponentArticles];
+
+  // description display
+  this.selectedComponentDescription = this.selectedComponentArticles
+    .map((c: any) => c.DESCRIPTION)
+    .join(', ');
+
+  //  VERY IMPORTANT (pre-select rows in popup)
+  this.selectedAttachRowKeys = this.selectedComponentArticles.map(
+    (c: any) => c.ID
+  );
+
+  console.log('Mapped Components:', this.selectedComponentArticles);
+}
+
       this.getDropdownLists().then(() => {
         this.articleData = {
           ...this.articleData,
@@ -147,7 +178,7 @@ export class ArticleEditComponent {
           );
         }
 
-        // ✅ CASE 2: When backend sends array of objects
+        // CASE 2: When backend sends array of objects
         if (incomingData.Units && Array.isArray(incomingData.Units)) {
           this.articleData.UNIT_ID = incomingData.Units.map(
             (u: any) => u.UNIT_ID,
@@ -158,11 +189,11 @@ export class ArticleEditComponent {
         // Set basic fields
         this.lastOrderNo = this.articleData.LAST_ORDER_NO || '';
         this.imagePreview = this.articleData.IMAGE_NAME;
-        this.selectedAttachRowKey =
-          this.articleData.COMPONENT_ARTICLE_ID || null;
-        this.selectedAttachRowKeys = this.selectedAttachRowKey
-          ? [this.selectedAttachRowKey]
-          : [];
+        // this.selectedAttachRowKey =
+        //   this.articleData.COMPONENT_ARTICLE_ID || null;
+        // this.selectedAttachRowKeys = this.selectedAttachRowKey
+        //   ? [this.selectedAttachRowKey]
+        //   : [];
         if (this.articleData.COMPONENT_ARTICLE_ID && this.articleList?.length) {
           const selectedComponent = this.articleList.find(
             (item: any) => item.ID === this.articleData.COMPONENT_ARTICLE_ID,
@@ -242,12 +273,12 @@ export class ArticleEditComponent {
   //   });
   // }
 
-  getItems() {
+    getItems() {
     const payload = {
-      NAME: 'ITEMS',
+      NAME: "ITEMS"
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      console.log(response);
+      console.log(response)
       this.itemsList = response;
     });
   }
@@ -407,41 +438,112 @@ export class ArticleEditComponent {
   getArticles() {
     this.dataService.getArticleList().subscribe((response: any) => {
       if (response?.Data && Array.isArray(response.Data)) {
-        this.attachGridData = response.Data.filter(
-          (a: any) => a.IS_COMPONENT === true,
-        );
+        // this.attachGridData = response.Data.filter(
+        //   (a: any) => a.IS_COMPONENT === true,
+        // );
 
-        // 🔥 EDIT MODE SELECTION
-        if (this.articleData?.COMPONENT_ARTICLE_ID) {
-          this.selectedAttachRowKeys = [this.articleData.COMPONENT_ARTICLE_ID];
+        // // EDIT MODE SELECTION
+        // if (this.articleData?.COMPONENT_ARTICLE_ID) {
+        //   this.selectedAttachRowKeys = [this.articleData.COMPONENT_ARTICLE_ID];
 
-          this.selectedAttachRow = this.attachGridData.find(
-            (row: any) => row.ID === this.articleData.COMPONENT_ARTICLE_ID,
-          );
-        }
+        //   this.selectedAttachRow = this.attachGridData.find(
+        //     (row: any) => row.ID === this.articleData.COMPONENT_ARTICLE_ID,
+        //   );
+        // }
       }
     });
   }
 
-  // getArticles() {
-  //   // const payload = {
-  //   //   COMPANY_ID: this.selected_Company_id,
-  //   // };
-  //   this.dataService.getArticleList().subscribe((response: any) => {
-  //     console.log(response, 'ARTICLELIST');
-  //     if (response?.Data && Array.isArray(response.Data)) {
-  //       // Store full list (reversed) in articleList
-  //       this.articleList = response.Data.reverse();
+addComponent() {
 
-  //       // Store only items with IsComponent === true in componentArticles
-  //       this.componentArticles = this.articleList.filter(
-  //         (article: any) => article.IS_COMPONENT === true
-  //       );
-  //       this.attachGridData = this.componentArticles;
-  //       console.log(this.attachGridData, 'COMPONENTARTICLE');
-  //     }
-  //   });
-  // }
+  this.ComponentpopupVisible = true;
+
+  this.dataService.getArticleList().subscribe((response: any) => {
+
+    if (response?.Data && Array.isArray(response.Data)) {
+
+      this.articleList = response.Data.reverse();
+
+      const selectedColor = this.articleData.COLOR;
+      const selectedCategoryId = this.selectedCategoryId;
+
+      // filter components
+      this.componentArticles = this.articleList.filter((article: any) => {
+
+        const isComponent = article.IS_COMPONENT === true;
+
+        const colorMatch = !selectedColor || article.COLOR === selectedColor;
+
+        const categoryMatch =
+          !selectedCategoryId || article.CATEGORY_ID === selectedCategoryId;
+
+        return isComponent && colorMatch && categoryMatch;
+
+      });
+
+      // this.attachGridData = this.componentArticles;
+      this.attachGridData = [...this.selectedComponentArticles];
+      setTimeout(() => {
+  this.componentGridRef?.instance?.selectRows(
+    this.selectedAttachRowKeys,
+    true
+  );
+}, 300);
+
+      console.log(this.componentArticles, 'FILTERED COMPONENTS');
+    }
+
+  });
+}
+
+saveSelectedComponent() {
+
+  const grid = this.componentGridRef.instance;
+  const selectedRows = grid.getSelectedRowsData();
+
+  if (!selectedRows.length) {
+    notify({
+      message: 'Please select at least one component.',
+      type: 'warning',
+      displayTime: 3000,
+      position: { at: 'top right', my: 'top right' },
+    });
+    return;
+  }
+
+  // UPDATE MAIN ARRAY (THIS WAS MISSING )
+  this.selectedComponentArticles = selectedRows.map((c: any) => ({
+    ID: c.ID,
+    ART_NO: c.ART_NO,
+    DESCRIPTION: c.DESCRIPTION,
+    CATEGORY_NAME: c.CATEGORY_NAME,
+    ARTICLE_TYPE_NAME: c.ARTICLE_TYPE_NAME,
+    COLOR: c.COLOR
+  }));
+
+  //  Update description
+  this.selectedComponentDescription = this.selectedComponentArticles
+    .map((c: any) => c.DESCRIPTION)
+    .join(', ');
+
+  //  Show in UI grid
+  this.attachGridData = [...this.selectedComponentArticles];
+
+  //  Maintain selected keys
+  this.selectedAttachRowKeys = this.selectedComponentArticles.map(
+    (c: any) => c.ID
+  );
+
+  this.ComponentpopupVisible = false;
+
+  console.log('Updated Components:', this.selectedComponentArticles);
+}
+
+closecomponent(){
+  this.ComponentpopupVisible=false
+  this.attachGridData = [...this.selectedComponentArticles];
+}
+
   clearComponentArticleId() {
     this.articleData.COMPONENT_ARTICLE_ID = '';
   }
@@ -748,14 +850,35 @@ export class ArticleEditComponent {
     }
 
     if (!this.articleData.HSN_CODE) {
-      notify({
-        message: 'Please enter the HSN Code.',
-        type: 'warning',
-        displayTime: 3000,
-        position: { at: 'top right', my: 'top right' },
-      });
-      return;
-    }
+          notify({
+            message: 'Please enter the HSN Code.',
+            type: 'warning',
+            displayTime: 3000,
+            position: { at: 'top right', my: 'top right' },
+          });
+          return;
+        }
+
+
+         const rows = this.itemsGridRef?.instance
+          ?.getVisibleRows()
+          .map((r: any) => r.data) || [];
+        
+        // Check if any selected item has empty quantity
+        const invalidQty = rows.some(
+          (row: any) => row.ITEM_ID && (!row.QUANTITY || row.QUANTITY <= 0)
+        );
+        
+        if (invalidQty) {
+          notify({
+            message: 'Please enter quantity for all selected BOM items.',
+            type: 'warning',
+            displayTime: 3000,
+            position: { at: 'top right', my: 'top right' },
+          });
+          return;
+        }
+
 
     // Step 1: Collect selected sizes
     const selectedSizes =
@@ -777,15 +900,15 @@ export class ArticleEditComponent {
     console.log('BOM Data:', bomGridData);
 
     //  BOM Validation
-    if (!bomGridData.length) {
-      notify({
-        message: 'Please enter BOM.',
-        type: 'warning',
-        displayTime: 3000,
-        position: { at: 'top right', my: 'top right' },
-      });
-      return;
-    }
+if (!bomGridData.length) {
+  notify({
+    message: 'Please enter BOM.',
+    type: 'warning',
+    displayTime: 3000,
+    position: { at: 'top right', my: 'top right' },
+  });
+  return;
+}
 
     // Step 2: Prepare the full payload
     const payload = {
@@ -817,10 +940,12 @@ export class ArticleEditComponent {
       SupplierName: this.articleData.SupplierName || '',
       IS_COMPONENT: this.articleData.IS_COMPONENT ?? false,
       // COMPONENT_ARTICLE_ID: this.articleData.COMPONENT_ARTICLE_ID || 0,
-      COMPONENT_ARTICLE_ID: this.articleData.IS_COMPONENT
-        ? 0
-        : this.articleData.COMPONENT_ARTICLE_ID || 0,
-
+      // COMPONENT_ARTICLE_ID: this.articleData.IS_COMPONENT
+      //   ? 0
+      //   : this.articleData.COMPONENT_ARTICLE_ID || 0,
+       Components: this.selectedComponentArticles.map((item: any) => ({
+  COMPONENT_ARTICLE_ID: item.ID,
+})),
       ComponentArticleNo: this.articleData.ComponentArticleNo || '',
       ComponentArticleName: this.articleData.ComponentArticleName || '',
       CreatedDate: this.articleData.CreatedDate || new Date().toISOString(),
@@ -901,6 +1026,7 @@ export class ArticleEditComponent {
     });
   }
 
+ 
   onSupplierChanged(e: any) {
     const selected = this.materialUnits.find((s: any) => s.ID === e.value);
     this.articleData.SupplierName = selected ? selected.DESCRIPTION : '';
@@ -917,40 +1043,46 @@ export class ArticleEditComponent {
   }
 
   onArtNoChanged(e: any) {
-    let value = e.value || '';
+  let value = e.value || '';
 
-    // Enforce max length
-    if (value.length > 6) {
-      value = value.slice(0, 6);
-      e.component.option('value', value);
-    }
-
-    this.articleData.ART_NO = value;
-
-    // 🔥 Update description AFTER value is set
-    this.updateItemDescription();
+  // Enforce max length
+  if (value.length > 6) {
+    value = value.slice(0, 6);
+    e.component.option('value', value);
   }
 
-  updateItemDescription() {
-    const artNo = this.articleData.ART_NO || '';
-    const color = this.articleData.COLOR || '';
-    const packing = this.articleData.STANDARD_PACKING || '';
-    const price = this.articleData.PRICE ?? '';
+  this.articleData.ART_NO = value;
 
-    const categoryName =
-      this.categoryList?.find((c) => c.ID === this.selectedCategoryId)
-        ?.DESCRIPTION || '';
+  // 🔥 Update description AFTER value is set
+  this.updateItemDescription();
+}
 
-    // Build exact format
-    const parts = ['SF', artNo, color, packing, categoryName, price].filter(
-      (p) => p !== '' && p !== null && p !== undefined,
-    );
+    updateItemDescription() {
+  const artNo = this.articleData.ART_NO || '';
+  const color = this.articleData.COLOR || '';
+  const packing = this.articleData.STANDARD_PACKING || '';
+  const price = this.articleData.PRICE ?? '';
 
-    this.articleData.DESCRIPTION = parts.join('-');
-  }
+  const categoryName =
+    this.categoryList?.find(c => c.ID === this.selectedCategoryId)
+      ?.DESCRIPTION || '';
 
-  addNewRow() {
-    this.dataService.getItemsListForArticle().subscribe((res: any) => {
+  // Build exact format
+  const parts = [
+    'SF',
+    artNo,
+    color,
+    packing,
+    categoryName,
+    price
+  ].filter(p => p !== '' && p !== null && p !== undefined);
+
+  this.articleData.DESCRIPTION = parts.join('-');
+}
+
+addNewRow() {
+
+  this.dataService.getItemsListForArticle().subscribe((res: any) => {
       console.log(res);
       console.log(
         'PrePaymentListDataSource=============================:',
@@ -959,83 +1091,136 @@ export class ArticleEditComponent {
       this.ItemListDataSource = res.DataList;
       this.ItempopupVisible = true; // Open popup
     });
-    setTimeout(() => {
-      const grid = this.itemsGridRef?.instance;
-      if (!grid) return;
+  setTimeout(() => {
 
-      const rows = grid.getVisibleRows();
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
 
-      const hasIncompleteRow = rows.some(
-        (r: any) => !r.data?.ITEM || !r.data?.QUANTITY,
-      );
+    const rows = grid.getVisibleRows();
 
-      if (hasIncompleteRow) {
-        return;
-      }
+    const hasIncompleteRow = rows.some(
+      (r: any) => !r.data?.ITEM || !r.data?.QUANTITY
+    );
 
-      this.items.push({
-        ITEM: null,
-        DESCRIPTION: '',
-        UOM: '',
-        QUANTITY: null,
-      });
-
-      setTimeout(() => {
-        const updatedRows = grid.getVisibleRows();
-        const newRowIndex = updatedRows.length - 1;
-
-        if (newRowIndex >= 0) {
-          grid.editCell(newRowIndex, 'ITEM');
-        }
-      }, 100);
-    }, 200);
-  }
-
-  onItemSelect(e: any) {
-    const selectedItem = e.data;
-
-    console.log('Selected Item:', selectedItem);
-
-    // Example: store selected item
-    this.selectedItem = selectedItem;
-
-    // Close popup after selection
-    this.ItempopupVisible = false;
-  }
-
-  saveSelectedItems() {
-    const popupGrid = this.bomGridRef.instance; // popup grid
-
-    const selectedRows = popupGrid.getSelectedRowsData();
-
-    if (!selectedRows.length) {
+    if (hasIncompleteRow) {
       return;
     }
 
-    //  Remove empty row if exists
-    this.items = this.items.filter(
-      (row) => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY,
-    );
-
-    selectedRows.forEach((item: any) => {
-      const exists = this.items.some((x) => x.ITEM === item.ITEM_CODE);
-
-      if (!exists) {
-        this.items.push({
-          ITEM: item.ITEM_CODE,
-          DESCRIPTION: item.DESCRIPTION,
-          UOM: item.UOM,
-          QUANTITY: null,
-          ITEM_ID: item.ID,
-        });
-      }
+    this.items.push({
+      ITEM: null,
+      DESCRIPTION: '',
+      UOM: '',
+      QUANTITY: null
     });
 
-    // refresh BOM grid
-    this.itemsGridRef.instance.refresh();
+    setTimeout(() => {
+      const updatedRows = grid.getVisibleRows();
+      const newRowIndex = updatedRows.length - 1;
 
-    this.ItempopupVisible = false;
-  }
+      if (newRowIndex >= 0) {
+        grid.editCell(newRowIndex, 'ITEM');
+      }
+    }, 100);
+
+  }, 200);
+}
+
+
+onItemSelect(e: any) {
+
+  const selectedItem = e.data;
+
+  console.log("Selected Item:", selectedItem);
+
+  // Example: store selected item
+  this.selectedItem = selectedItem;
+
+  // Close popup after selection
+  this.ItempopupVisible = false;
+}
+
+// saveSelectedItems() {
+
+//   const popupGrid = this.bomGridRef.instance;   // popup grid
+
+//   const selectedRows = popupGrid.getSelectedRowsData();
+
+//   if (!selectedRows.length) {
+//     return;
+//   }
+
+//   //  Remove empty row if exists
+//   this.items = this.items.filter(
+//     row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
+//   );
+
+//   selectedRows.forEach((item: any) => {
+
+//     const exists = this.items.some(
+//       x => x.ITEM === item.ITEM_CODE
+//     );
+
+//     if (!exists) {
+//       this.items.push({
+//         ITEM: item.ITEM_CODE,
+//         DESCRIPTION: item.DESCRIPTION,
+//         UOM: item.UOM,
+//         QUANTITY: null,
+//         ITEM_ID: item.ID
+//       });
+//     }
+
+//   });
+
+//   // refresh BOM grid
+//   this.itemsGridRef.instance.refresh();
+
+//   this.ItempopupVisible = false;
+
+// }
+
+saveSelectedItems() {
+
+  const popupGrid = this.bomGridRef.instance;
+  const selectedRows = popupGrid.getSelectedRowsData();
+
+  // selected item IDs from popup
+  const selectedIds = selectedRows.map((item:any) => item.ID);
+
+  // 1️ Remove BOM items that are not selected anymore
+  this.items = this.items.filter(
+    row => !row.ITEM_ID || selectedIds.includes(row.ITEM_ID)
+  );
+
+    this.items = this.items.filter(
+    row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
+  );
+
+  // 2️ Add newly selected items
+  selectedRows.forEach((item:any) => {
+
+    const exists = this.items.some(
+      x => x.ITEM_ID === item.ID
+    );
+
+    if (!exists) {
+      this.items.push({
+        ITEM: item.ITEM_CODE,
+        DESCRIPTION: item.DESCRIPTION,
+        UOM: item.UOM,
+        QUANTITY: null,
+        ITEM_ID: item.ID
+      });
+    }
+
+  });
+
+  // refresh BOM grid
+  this.itemsGridRef.instance.refresh();
+
+  this.ItempopupVisible = false;
+}
+
 }
 
 @NgModule({

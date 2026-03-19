@@ -44,8 +44,6 @@ export class CustomReuseStrategy implements RouteReuseStrategy {
 
     delete this.handlers[key];
     this.destroyedRoutes.add(key);
-
-    console.log('Removed cached route:', key);
   }
   clearStoredData(): void {
     this.handlers = {};

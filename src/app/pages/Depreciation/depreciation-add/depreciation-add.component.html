@@ -103,6 +103,7 @@
       caption="Purchase Value"
       alignment="right"
       [width]="'140'"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="true"
     >
       <dxo-header-filter [allowSelectAll]="false">
@@ -114,6 +115,7 @@
       dataField="RESIDUAL_VALUE"
       caption="Residual Value"
       alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="true"
     >
       <dxo-header-filter [allowSelectAll]="false">
@@ -136,6 +138,7 @@
       dataField="CURRENT_VALUE"
       caption="Current Value"
       alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="true"
     >
       <dxo-header-filter [allowSelectAll]="false">
@@ -170,6 +173,7 @@
       caption="Depreciation Amount"
       alignment="right"
       [width]="170"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="false"
     >
       <dxo-header-filter [allowSelectAll]="false">
@@ -207,6 +211,7 @@
       style="margin-left: 700px"
       [(value)]="grandTotal"
       label="Grand Total"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
     >
     </dx-number-box>
   </div>

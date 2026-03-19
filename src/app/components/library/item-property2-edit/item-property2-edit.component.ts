@@ -51,9 +51,7 @@ export class ItemProperty2EditComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
       const data = changes['selectedData'].currentValue;
-      console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa');
       this.formItemProperty2Data = data;
-      console.log(this.formItemProperty2Data);
     }
   }
   sessionDetails() {
@@ -61,21 +59,12 @@ export class ItemProperty2EditComponent {
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
-    console.log(sessionData, '===========selected HSN CODE===================');
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC==================='
-    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     // THIS IS THE MISSING LINK
     this.poData.COMPANY_ID = this.companyID;
     this.poData.USER_ID = sessionData.USER_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
   }
   showItemProperty2() {
     const payload = {
@@ -83,7 +72,6 @@ export class ItemProperty2EditComponent {
     };
     this.service.getItemProperty2Data(payload).subscribe((response) => {
       this.itemproperty2 = response;
-      console.log(response);
     });
   }
   UpdateData() {
@@ -100,14 +88,14 @@ export class ItemProperty2EditComponent {
     const isCodeDuplicate = this.itemproperty2.some(
       (item: any) =>
         item.ID !== payload.ID &&
-        item.CODE?.toLowerCase().trim() === payload.CODE?.toLowerCase().trim()
+        item.CODE?.toLowerCase().trim() === payload.CODE?.toLowerCase().trim(),
     );
 
     const isDescriptionDuplicate = this.itemproperty2.some(
       (item: any) =>
         item.ID !== payload.ID &&
         item.DESCRIPTION?.toLowerCase().trim() ===
-          payload.DESCRIPTION?.toLowerCase().trim()
+          payload.DESCRIPTION?.toLowerCase().trim(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -117,7 +105,7 @@ export class ItemProperty2EditComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -127,7 +115,7 @@ export class ItemProperty2EditComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -137,13 +125,12 @@ export class ItemProperty2EditComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
 
     this.service.updateItemProperty2(payload).subscribe((res: any) => {
-      console.log(res);
       this.formClosed.emit();
       notify(
         {
@@ -151,7 +138,7 @@ export class ItemProperty2EditComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'success'
+        'success',
       );
     });
   }

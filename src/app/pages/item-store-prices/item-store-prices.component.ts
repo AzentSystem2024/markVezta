@@ -253,20 +253,17 @@ export class ItemStorePricesComponent {
     dataservice.getDropdownData(payload).subscribe((data) => {
       this.itemtype = data;
     });
-    console.log('constructor called');
   }
 
   ngOnInit() {
-    console.log('Item Store Prices Component Initialized');
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/credit-note');
@@ -289,8 +286,6 @@ export class ItemStorePricesComponent {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
-        console.log('Route refreshed');
-
         // Call your load functions again
         this.loadStores();
         this.listItemsByMultipleStoreIds(this.selectedStoreId);
@@ -411,12 +406,10 @@ export class ItemStorePricesComponent {
     });
     this.dataservice.getDropdownData('BRAND').subscribe((data) => {
       this.brand = data;
-      console.log(this.brand, 'BRAND');
     });
   }
 
   listItemsByMultipleStoreIds(storeIds: string) {
-    console.log('item price wizard api call');
     this.dataservice.getItemListByStoreId().subscribe(
       (response) => {
         this.itemStoresList = response.PriceWizardData;
@@ -448,12 +441,8 @@ export class ItemStorePricesComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   loadStores() {
@@ -487,7 +476,6 @@ export class ItemStorePricesComponent {
   }
 
   onCellValueChanged(event: any) {
-    console.log(event, 'CELL VALUE CHANGED');
     const updatedData = event.data;
     const changedField = event.column.dataField;
     const newValue = event.value;
@@ -498,9 +486,7 @@ export class ItemStorePricesComponent {
     this.updatedItems[rowId][changedField] = newValue;
   }
 
-  onSaved(event: any) {
-    // console.log('Rows saved', event);
-  }
+  onSaved(event: any) {}
 
   // Save() {
   //   if (this.selectedRowKeys.length === 0) {
@@ -674,22 +660,15 @@ export class ItemStorePricesComponent {
       worksheet_item_price: worksheetItemPrice,
     };
 
-    console.log(
-      this.selectedPriceColumns,
-      '===========selectedPriceColumns=======',
-    );
-
     const invalidItems = payload.worksheet_item_price.filter((item: any) => {
       const priceToCheck =
         Number(item.PRICE_NEW) === 0
           ? Number(item.SALE_PRICE)
           : Number(item.PRICE_NEW);
-      console.log(priceToCheck, 'PRICE TO CHECK');
       return priceToCheck <= Number(item.PRICE_LEVEL1_NEW);
     });
 
     if (invalidItems.length > 0) {
-      console.log(invalidItems, 'INVALID ITEMS');
       const itemCodes = invalidItems
         .map((item: any) => item.PRICE_LEVEL1_NEW)
         .join(', ');
@@ -706,7 +685,6 @@ export class ItemStorePricesComponent {
 
     this.selectedPriceColumns.forEach((column: any) => {
       const config = this.priceValidationMap[column];
-      console.log(config, '========CONFIG========');
 
       if (!config) return;
 
@@ -715,16 +693,10 @@ export class ItemStorePricesComponent {
       );
 
       if (hasZero) {
-        console.log(hasZero, '========HAS ZERO========');
         this.zeroColumns.push(config.message);
-        console.log(this.zeroColumns, '========ZERO COLUMNS========');
       }
     });
     if (this.zeroColumns.length > 0) {
-      console.log(
-        this.zeroColumns,
-        '========ZERO COLUMNS BEFORE CONFIRM========',
-      );
       notify({
         message: 'selected column value must be update',
         type: 'error',
@@ -833,7 +805,6 @@ export class ItemStorePricesComponent {
       this.dataservice
         .verifyItemStorePrices(payload)
         .subscribe((verifyResponse) => {
-          console.log(verifyResponse, 'VERIFYRESPONSE');
           if (verifyResponse) {
             notify(
               {
@@ -843,7 +814,6 @@ export class ItemStorePricesComponent {
               'success',
             );
             this.isVerified = true;
-            console.log(this.isVerified, 'ISVERIFIED');
           } else {
             notify(
               {
@@ -853,13 +823,11 @@ export class ItemStorePricesComponent {
               'error',
             );
           }
-          console.log('Verification successful:', verifyResponse);
         });
     }
   }
 
   onSelectionChanged(event: any) {
-    console.log(event, 'SELECTION CHANGED EVENT');
     this.selectedRowCount = event.selectedRowKeys.length;
     this.selectedRowKeys = event.selectedRowKeys;
     this.isButtonDisabled = this.selectedRowCount === 0;
@@ -887,7 +855,6 @@ export class ItemStorePricesComponent {
         PRICE_LEVEL5_NEW: selectedRow.PRICE_LEVEL5_NEW,
       };
       this.salepriceoldValue = this.oldValues[this.selectedRowId]['SALE_PRICE'];
-      console.log(this.saleprice1odValue, 'SALEPRICEOLDVALE');
       this.saleprice1oldValue =
         this.oldValues[this.selectedRowId]['SALE_PRICE1'];
       this.saleprice2oldValue =
@@ -1031,12 +998,7 @@ export class ItemStorePricesComponent {
               SALE_PRICE4: selectedRow.SALE_PRICE4,
               SALE_PRICE5: selectedRow.SALE_PRICE5,
             };
-            console.log(this.oldValues[this.selectedRowId], '=========');
           } else {
-            console.log(
-              'Old values already stored:',
-              this.oldValues[this.selectedRowId],
-            );
           }
         } else {
           console.error(
@@ -1044,7 +1006,6 @@ export class ItemStorePricesComponent {
           );
         }
       });
-      console.log('All Selected Rows Data:', selectedRowsData);
     } else {
       console.warn('No rows selected.');
     }
@@ -1073,7 +1034,6 @@ export class ItemStorePricesComponent {
             newPrice = originalPrice - originalPrice * (percentageValue / 100); // Decrease
           }
           newPrice = this.roundValue(newPrice); // Apply rounding
-          console.log(`New price for ${selectedOption}: ${newPrice}`);
         });
       } else {
         console.error(`Row ID ${rowId} not found in the data source.`);
@@ -1092,10 +1052,6 @@ export class ItemStorePricesComponent {
           // Loop through each selected option
           selectedOptions.forEach((option) => {
             const salePriceValue = selectedRow[option]; // Accessing the property dynamically
-            console.log(
-              `Selected SALE_PRICE option '${option}' for row ID ${selectedRowId}:`,
-              salePriceValue,
-            );
           });
         } else {
           console.error(
@@ -1128,10 +1084,6 @@ export class ItemStorePricesComponent {
           // Apply rounding only to the processed price, not to the original sale price
           this.newPrice = this.roundValue(processedPrice);
           // selectedRow[selectedOption] = this.newPrice; // Only update the new price field
-          console.log(
-            `Processed ${selectedOption} for row ID ${selectedRowId}:`,
-            this.newPrice,
-          );
         } else {
           console.error(`Selected row with ID ${selectedRowId} not found.`);
         }
@@ -1180,10 +1132,6 @@ export class ItemStorePricesComponent {
             }
 
             this.onRowUpdated({ data: selectedRow });
-            console.log(
-              `Updated ${selectedOption} for row ID ${selectedRow.ID}:`,
-              finalPrice,
-            );
           });
         } else {
           console.error('Selected row not found in the data source.');
@@ -1202,7 +1150,6 @@ export class ItemStorePricesComponent {
 
   onPriceAdjustmentChanged(event: any) {
     this.isIncrease = event.value; // Update the value based on the switch state
-    console.log(this.isIncrease ? 'Increase selected' : 'Decrease selected');
   }
 
   adjustPercentage(amount: number) {
@@ -1212,7 +1159,6 @@ export class ItemStorePricesComponent {
 
   toggleAdjustment() {
     this.isIncrease = !this.isIncrease; // Toggle the value
-    console.log(this.isIncrease ? 'Increase selected' : 'Decrease selected');
     this.handlePercentageChange({ value: this.percentageString });
   }
   roundValue(value: number): number {

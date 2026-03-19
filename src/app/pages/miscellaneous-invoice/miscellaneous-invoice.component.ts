@@ -82,7 +82,7 @@ export class MiscellaneousInvoiceComponent {
   showCustomDatePopup = false;
   filteredJournalVoucherList: any;
   isEmptyDatagrid: boolean = false;
-  isAddMiscInvoice:boolean = false;
+  isAddMiscInvoice: boolean = false;
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -132,7 +132,7 @@ export class MiscellaneousInvoiceComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -140,7 +140,7 @@ export class MiscellaneousInvoiceComponent {
     console.log('Parsed ObjectData:', this.companyID);
     // this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/debit');
@@ -154,8 +154,6 @@ export class MiscellaneousInvoiceComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.geMiscInvoiceList();
     // this.sessionData_tax();
   }
@@ -411,8 +409,8 @@ export class MiscellaneousInvoiceComponent {
     this.isAddMiscInvoice = true;
   }
 
-  handleClose(){
-    this.isAddMiscInvoice=false;
+  handleClose() {
+    this.isAddMiscInvoice = false;
   }
 }
 
@@ -448,7 +446,6 @@ export class MiscellaneousInvoiceComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     MiscellaneousInvoiceAddModule,
-    
   ],
   providers: [],
   declarations: [MiscellaneousInvoiceComponent],

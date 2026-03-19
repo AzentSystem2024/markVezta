@@ -135,7 +135,6 @@ export class ArticleProductionViewComponent {
   onDateRangeChanged(e: any) {
     const today = new Date();
     this.selectedDateRange = e.value;
-    console.log('selected data=======', this.selectedDateRange);
     if (this.selectedDateRange === 'today') {
       this.startDate = new Date();
       this.EndDate = this.startDate;
@@ -151,7 +150,6 @@ export class ArticleProductionViewComponent {
       this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
       this.EndDate = new Date(today);
     } else if (this.selectedDateRange === 'custom') {
-      console.log('Custom date range selected');
       this.showCustomDatePopup = true;
       return;
     }
@@ -169,7 +167,6 @@ export class ArticleProductionViewComponent {
   }
 
   applyDateFilter() {
-    console.log('apply filter button called===========');
     if (!this.selectedDateRange || !this.listofArticlesView) {
       this.ArticleProductionDataSource = this.listofArticlesView;
       return;
@@ -268,7 +265,6 @@ export class ArticleProductionViewComponent {
   //       value: 'custom',
   //     };
 
-  //     console.log(this.selectedDateRange,'selected date ranges')
   //     setTimeout(() => {
   //   this.showCustomDatePopup = false;
   // }, 100);
@@ -320,10 +316,7 @@ export class ArticleProductionViewComponent {
   //   // const CompanyDetails=sessionStorage.getItem('savedUserData');
   // const LoginDetails = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
 
-  //   console.log(LoginDetails,'========Company Details=========')
-
   //   this.CompanyDetails = LoginDetails.Companies;
-  //   console.log(this.CompanyDetails,'Company Details')
   // }
 
   FilteringDetails() {
@@ -336,9 +329,6 @@ export class ArticleProductionViewComponent {
       // Set all COMPANY_IDs as selected by default
       this.company_id = this.CompanyDetails.map((comp: any) => comp.COMPANY_ID);
     }
-
-    console.log(this.CompanyDetails, 'Company Details');
-    console.log(this.company_id, 'Selected company IDs');
   }
 
   get_DataSource() {

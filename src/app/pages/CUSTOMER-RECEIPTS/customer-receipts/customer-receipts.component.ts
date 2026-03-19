@@ -156,21 +156,19 @@ export class CustomerReceiptsComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/customer-receipt');
@@ -184,8 +182,7 @@ export class CustomerReceiptsComponent {
       this.canApprove = packingRights.canApprove;
     }
     this.sessionData_tax();
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
+
     this.getCustomerReceipts();
   }
 
@@ -532,7 +529,6 @@ export class CustomerReceiptsComponent {
       .selectCustomerReceipt(receiptId)
       .subscribe((response: any) => {
         this.selectedReceipt = response.Data;
-        console.log(this.selectedReceipt, 'SELECTEDTROUT');
         this.isEditReceipt = true;
         this.isReadOnlyReceipt = transStatus === 5;
       });
@@ -542,7 +538,6 @@ export class CustomerReceiptsComponent {
   //   event.cancel = true; // Prevent default popup editing
   //   const receiptId = event.data.TRANS_ID;
   //   const transStatus = event.data.TRANS_STATUS;
-  //   console.log(event, 'transstatus');
 
   //   this.dataService
   //     .selectCustomerReceipt(receiptId)
@@ -555,7 +550,6 @@ export class CustomerReceiptsComponent {
   //         // Open edit popup
   //         this.isEditReceipt = true;
   //       }
-  //       console.log(this.selectedReceipt, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
   //     });
   // }
 

@@ -236,7 +236,6 @@ export class GrnNewFormComponent implements OnInit {
     };
     this.service.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -494,42 +493,27 @@ export class GrnNewFormComponent implements OnInit {
     };
     this.service.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
-      console.log(res);
     });
   }
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+
     this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
-    console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-    console.log(
-      this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
-    );
+
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   updateCell(event: any) {
-    console.log(event, 'event');
     const updatedRow = { ...event.oldData, ...event.data };
-    console.log(updatedRow, 'updatedRow');
     // const updatedRow = event.key; // Get the updated row
     const updatedData = event.data; // Get the updated data
     console.log(updatedData, 'updateddata');

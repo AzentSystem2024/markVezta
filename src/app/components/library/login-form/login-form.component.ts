@@ -114,7 +114,6 @@ export class LoginFormComponent implements OnInit {
 
     // Load navigation from localStorage
     this.navigation = JSON.parse(localStorage.getItem('sidemenuItems') || '[]');
-    console.log(this.navigation, 'NAVIGATIONNNNNN');
   }
 
   ///=========================NEW CHANGES =====================
@@ -122,10 +121,7 @@ export class LoginFormComponent implements OnInit {
 
   get_financial_year_dropdown() {
     this.dataservice.financial_year_api().subscribe((res: any) => {
-      console.log(res);
       this.finacialYearList = res || []; // Ensure fallback to empty array
-      console.log('Dropdown Financial Years:', this.finacialYearList);
-      console.log(this.finacialYearList);
       const currentYear = this.finacialYearList.find((year: any) => {
         return year.DESCRIPTION.includes(new Date().getFullYear().toString());
       });
@@ -139,15 +135,11 @@ export class LoginFormComponent implements OnInit {
     const typedUsername = e.value?.trim();
 
     if (typedUsername && typedUsername.length >= 3) {
-      console.log('User typed:', typedUsername);
-
       const payload = {
         LOGIN_NAME: typedUsername,
       };
 
       this.dataservice.Company_api(payload).subscribe((res: any) => {
-        console.log('Company API Response:', res);
-
         // Optionally store or use the company list
         this.CompanyList = res.Companies || [];
         if (this.CompanyList.length > 0) {
@@ -314,7 +306,6 @@ export class LoginFormComponent implements OnInit {
   //     this.getLocalIP(),
   //   ]);
 
-  //   console.log('Attempting login with:', this.formData);
   //   const payload = {
   //     LOGIN_NAME: this.formData.LOGIN_NAME,
   //     PASSWORD: this.formData.PASSWORD,
@@ -328,7 +319,6 @@ export class LoginFormComponent implements OnInit {
   //   };
   //   this.dataservice.login_function_api(payload).subscribe({
   //     next: (res: any) => {
-  //       console.log('Login API response:', res);
 
   //       if (res.flag === 1) {
   //         // ✅ Successful login

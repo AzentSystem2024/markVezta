@@ -1,11 +1,11 @@
-@use '../../../../../variables.scss' as *;
+@use "../../../../../variables.scss" as *;
 @use "sass:math";
 
 :host {
   --side-panel-toolbar-height: 76px;
   width: 100%;
   display: contents;
-  overflow: auto; 
+  overflow: auto;
 }
 
 .loading-overlay {
@@ -67,7 +67,7 @@
   right: 0;
   padding: 12px 20px;
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   z-index: 1000;
 }
 

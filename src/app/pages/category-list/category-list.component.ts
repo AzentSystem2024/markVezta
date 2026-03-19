@@ -1,77 +1,107 @@
-import { Component,OnInit,NgModule,ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import { DataService } from 'src/app/services';
 import { FormPopupModule } from 'src/app/components';
-import { CategoryFormComponent, CategoryFormModule } from 'src/app/components/library/category-form/category-form.component';
+import {
+  CategoryFormComponent,
+  CategoryFormModule,
+} from 'src/app/components/library/category-form/category-form.component';
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
-
 
 @Component({
   selector: 'app-category-list',
   templateUrl: './category-list.component.html',
-  styleUrls: ['./category-list.component.scss']
+  styleUrls: ['./category-list.component.scss'],
 })
 export class CategoryListComponent implements OnInit {
-  
   @ViewChild(CategoryFormComponent) categoryComponent: CategoryFormComponent;
-  @ViewChild(DxDataGridComponent,{ static: true }) dataGrid: DxDataGridComponent;
-  category:any;
-  DepartmentDropdownData:any;
-  isAddCategoryPopupOpened=false;
-  showFilterRow=true;
-  showHeaderFilter=true;c
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+  category: any;
+  DepartmentDropdownData: any;
+  isAddCategoryPopupOpened = false;
+  showFilterRow = true;
+  showHeaderFilter = true;
+  c;
   selected_Company_id: any;
-  constructor(private dataservice:DataService,private exportService: ExportService
-    ){}
+  constructor(
+    private dataservice: DataService,
+    private exportService: ExportService,
+  ) {}
   onExporting(event: any) {
-    this.exportService.onExporting(event,'Catagory-list');
+    this.exportService.onExporting(event, 'Catagory-list');
   }
-  addCategory(){
-    this.isAddCategoryPopupOpened=true;
+  addCategory() {
+    this.isAddCategoryPopupOpened = true;
   }
-  
-  onClickSaveCategory(){
-    const { CODE, CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID } =this.categoryComponent.getNewCategoryData();
-    console.log('inserted data',CODE,CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID );
-    this.dataservice.postCategoryData(CODE,CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID).subscribe(
-      (response)=>{
-        if(response){
+
+  onClickSaveCategory() {
+    const { CODE, CAT_NAME, LOYALTY_POINT, COST_HEAD_ID, DEPT_ID, COMPANY_ID } =
+      this.categoryComponent.getNewCategoryData();
+
+    this.dataservice
+      .postCategoryData(
+        CODE,
+        CAT_NAME,
+        LOYALTY_POINT,
+        COST_HEAD_ID,
+        DEPT_ID,
+        COMPANY_ID,
+      )
+      .subscribe((response) => {
+        if (response) {
           this.showCategory();
         }
-      }
-    )
-
+      });
   }
-  
+
   onRowRemoving(event) {
     const selectedRow = event.data;
-    const { ID, CODE, CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID } = selectedRow;
-    
-    this.dataservice.removeCategory(ID, CODE, CAT_NAME,LOYALTY_POINT,COST_HEAD_ID,DEPT_ID,COMPANY_ID ).subscribe(() => {
-      try {
-        // Your delete logic here
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success'
-        );
-        this.dataGrid.instance.refresh();
-        this.showCategory();
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error'
-        );
-      }
-    });
+    const {
+      ID,
+      CODE,
+      CAT_NAME,
+      LOYALTY_POINT,
+      COST_HEAD_ID,
+      DEPT_ID,
+      COMPANY_ID,
+    } = selectedRow;
+
+    this.dataservice
+      .removeCategory(
+        ID,
+        CODE,
+        CAT_NAME,
+        LOYALTY_POINT,
+        COST_HEAD_ID,
+        DEPT_ID,
+        COMPANY_ID,
+      )
+      .subscribe(() => {
+        try {
+          // Your delete logic here
+          notify(
+            {
+              message: 'Delete operation successful',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+          this.dataGrid.instance.refresh();
+          this.showCategory();
+        } catch (error) {
+          notify(
+            {
+              message: 'Delete operation failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+        }
+      });
   }
   onRowUpdating(event) {
     const updataDate = event.newData;
@@ -81,58 +111,49 @@ export class CategoryListComponent implements OnInit {
     let code = combinedData.CODE;
     let catname = combinedData.CAT_NAME;
     let loyaltypoint = combinedData.LOYALTY_POINT;
-    let cost_head_id=combinedData.COST_HEAD_ID;
-    let dept_id=combinedData.DEPT_ID;
+    let cost_head_id = combinedData.COST_HEAD_ID;
+    let dept_id = combinedData.DEPT_ID;
     let company_id = combinedData.COMPANY_ID;
-   
 
-    this.dataservice
-      // .updateCategory(id, code, catname,loyaltypoint,cost_head_id,dept_id,company_id)
-      // .subscribe((data: any) => {
-      //   if (data) {
-      //     notify(
-      //       {
-      //         message: 'Item Category updated Successfully',
-      //         position: { at: 'top center', my: 'top center' },
-      //       },
-      //       'success'
-      //     );
-      //     this.dataGrid.instance.refresh();
-      //     this.showCategory();
-      //   } else {
-      //     notify(
-      //       {
-      //         message: 'Your Data Not Saved',
-      //         position: { at: 'top right', my: 'top right' },
-      //       },
-      //       'error'
-      //     );
-      //   }
-      // });
-    console.log('old data:', oldData);
-    console.log('new data:', updataDate);
-    console.log('modified data:', combinedData);
+    this.dataservice;
+    // .updateCategory(id, code, catname,loyaltypoint,cost_head_id,dept_id,company_id)
+    // .subscribe((data: any) => {
+    //   if (data) {
+    //     notify(
+    //       {
+    //         message: 'Item Category updated Successfully',
+    //         position: { at: 'top center', my: 'top center' },
+    //       },
+    //       'success'
+    //     );
+    //     this.dataGrid.instance.refresh();
+    //     this.showCategory();
+    //   } else {
+    //     notify(
+    //       {
+    //         message: 'Your Data Not Saved',
+    //         position: { at: 'top right', my: 'top right' },
+    //       },
+    //       'error'
+    //     );
+    //   }
+    // });
 
     event.cancel = true; // Prevent the default update operation
   }
-  
-   sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
 
-  showCategory(){
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+
+  showCategory() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
-     this.dataservice.getCategoryData(payload).subscribe(
-      (response)=>{
-            this.category=response;
-            console.log(response);
-      }
-     )
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.getCategoryData(payload).subscribe((response) => {
+      this.category = response;
+    });
   }
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
@@ -140,7 +161,6 @@ export class CategoryListComponent implements OnInit {
       .getDropdownData(dropdowndepartment)
       .subscribe((data: any) => {
         this.DepartmentDropdownData = data;
-        console.log('dropdown',this.DepartmentDropdownData);
       });
   }
   ngOnInit(): void {
@@ -154,11 +174,13 @@ export class CategoryListComponent implements OnInit {
 }
 @NgModule({
   imports: [
-    DxDataGridModule,DxButtonModule,FormPopupModule,CategoryFormModule
+    DxDataGridModule,
+    DxButtonModule,
+    FormPopupModule,
+    CategoryFormModule,
   ],
   providers: [],
   exports: [],
   declarations: [CategoryListComponent],
 })
-export class CategoryListModule{}
-
+export class CategoryListModule {}

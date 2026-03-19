@@ -170,7 +170,7 @@ export class QuotationFormComponent {
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
@@ -183,9 +183,9 @@ export class QuotationFormComponent {
     this.getTermsAndConditionsList();
 
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
 
@@ -212,8 +212,7 @@ export class QuotationFormComponent {
       // this.getItemsList();
     }
     // this.getStoreDropdown();
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
+
     // this.items = [];
     // this.addEmptyRow();
     this.getItems().subscribe(() => {
@@ -224,7 +223,7 @@ export class QuotationFormComponent {
 
   calculateSerialNumber = (rowData: any) => {
     const index = this.quotationFormData.Details.findIndex(
-      (item) => item.ID === rowData.ID
+      (item) => item.ID === rowData.ID,
     );
     return index + 1;
   };
@@ -393,11 +392,11 @@ export class QuotationFormComponent {
   }
   updateCombinedTerms() {
     const normalizedMasterTerms = (this.termsAndConditions || []).map(
-      (t: any) => (typeof t === 'string' ? { TERMS: t } : t)
+      (t: any) => (typeof t === 'string' ? { TERMS: t } : t),
     );
 
     const normalizedNewTerms = (this.newTerms || []).map((t: any) =>
-      typeof t === 'string' ? { TERMS: t } : t
+      typeof t === 'string' ? { TERMS: t } : t,
     );
 
     // Merge without duplication by TERM content
@@ -424,7 +423,6 @@ export class QuotationFormComponent {
       this.salesman = response;
     });
   }
-
 
   getCustomerDropdown() {
     this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
@@ -479,7 +477,7 @@ export class QuotationFormComponent {
     return this.dataService.getItemsForQuotation(payload).pipe(
       tap((response: any) => {
         this.items = response.Data;
-      })
+      }),
     );
   }
 
@@ -497,7 +495,7 @@ export class QuotationFormComponent {
 
         if (e.dataField === 'ITEM_CODE') {
           const selectedItem = this.items.find(
-            (item) => item.ITEM_ID === args.value
+            (item) => item.ITEM_ID === args.value,
           );
           if (selectedItem) {
             rowData.ITEM_CODE = selectedItem.ITEM_ID;
@@ -539,7 +537,7 @@ export class QuotationFormComponent {
             this.quotationFormData.Details.splice(
               currentRowIndex + 1,
               0,
-              newRow
+              newRow,
             );
 
             // Refresh grid
@@ -581,7 +579,7 @@ export class QuotationFormComponent {
       },
       (err) => {
         console.error('API error:', err);
-      }
+      },
     );
   }
 
@@ -644,7 +642,7 @@ export class QuotationFormComponent {
     if (this.isRoundOff) {
       // Round to nearest integer
       this.quotationFormData.NET_AMOUNT = Math.round(
-        this.quotationFormData.NET_AMOUNT
+        this.quotationFormData.NET_AMOUNT,
       );
     } else {
       // Reset to actual total from grid
@@ -679,14 +677,14 @@ export class QuotationFormComponent {
 
     // 2. Filter out empty rows (no ITEM_ID or no QUANTITY)
     const validDetails = this.quotationFormData.Details.filter(
-      (row: any) => row.ITEM_ID && (row.STOCK_QTY || row.QUANTITY)
+      (row: any) => row.ITEM_ID && (row.STOCK_QTY || row.QUANTITY),
     );
 
     if (validDetails.length === 0) {
       notify(
         'Please add at least one valid item to the quotation.',
         'error',
-        3000
+        3000,
       );
       return;
     }
@@ -745,7 +743,7 @@ export class QuotationFormComponent {
           notify(
             response.Message || 'Quotation saved successfully',
             'success',
-            2000
+            2000,
           );
           this.popupClosed.emit();
           this.getQuotationNo();
@@ -759,7 +757,7 @@ export class QuotationFormComponent {
     if (this.isEditing && this.isApproved) {
       confirm(
         'Are you sure you want to approve this quotation?',
-        'Confirm Approval'
+        'Confirm Approval',
       ).then((dialogResult) => {
         if (dialogResult) {
           proceedWithSave();
@@ -776,7 +774,6 @@ export class QuotationFormComponent {
 
   printQuotation() {
     const data = this.quotationFormData;
-    console.log(data);
 
     const formatDate = (dateStr: string) => {
       if (!dateStr) return '';
@@ -900,7 +897,7 @@ export class QuotationFormComponent {
               item.TOTAL_AMOUNT?.toFixed(2) || ''
             }</td>
           </tr>
-        `
+        `,
         ).join('')}
       </tbody>
     </table>
@@ -918,7 +915,7 @@ export class QuotationFormComponent {
           ${data.TERMS.map(
             (term: any, index: number) => `
             <li>${term.TERMS}</li>
-          `
+          `,
           ).join('')}
         </ol>
       </div>
@@ -931,7 +928,7 @@ export class QuotationFormComponent {
     const printWindow = window.open(
       '',
       '_blank',
-      'width=1200,height=900,scrollbars=yes'
+      'width=1200,height=900,scrollbars=yes',
     );
     if (printWindow) {
       printWindow.document.write(`

@@ -137,7 +137,6 @@ export class VatClassListComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData?.Configuration?.[0]?.SUB_TYPE_ID || 0;
     console.log(this.subType, 'SUBTYPEEEEEEEEE');
     if (userDataString) {

@@ -55,7 +55,7 @@ export class SubcategoryEditComponent {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
       console.log(
         'Received selectedData:',
-        changes['selectedData'].currentValue
+        changes['selectedData'].currentValue,
       );
       this.newSubCategory = {
         ...this.selectedData,
@@ -74,12 +74,8 @@ export class SubcategoryEditComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
   }
 
   // getCategoryDropdown(){
@@ -125,13 +121,14 @@ export class SubcategoryEditComponent {
       const isCodeDuplicate = this.subCategory.some(
         (item: any) =>
           item.ID !== payload.ID &&
-          item.CODE?.toLowerCase().trim() === payload.CODE?.toLowerCase().trim()
+          item.CODE?.toLowerCase().trim() ===
+            payload.CODE?.toLowerCase().trim(),
       );
 
       const isDescriptionDuplicate = this.subCategory.some(
         (item: any) =>
           item.ID !== payload.ID &&
-          item.SUBCAT_NAME.toLowerCase() === payload.SUBCAT_NAME.toLowerCase()
+          item.SUBCAT_NAME.toLowerCase() === payload.SUBCAT_NAME.toLowerCase(),
       );
 
       if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -141,7 +138,7 @@ export class SubcategoryEditComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          'error'
+          'error',
         );
         return;
       } else if (isCodeDuplicate) {
@@ -151,7 +148,7 @@ export class SubcategoryEditComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          'error'
+          'error',
         );
         return;
       } else if (isDescriptionDuplicate) {
@@ -161,20 +158,19 @@ export class SubcategoryEditComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          'error'
+          'error',
         );
         return;
       }
 
       this.dataService.Update_subcategory_api(payload).subscribe((res: any) => {
-        console.log(res);
         this.popupClosed.emit();
         notify(
           {
             message: ' update operation successfull',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
       });
     });

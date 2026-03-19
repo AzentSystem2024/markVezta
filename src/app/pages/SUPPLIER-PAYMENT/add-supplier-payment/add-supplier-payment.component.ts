@@ -168,13 +168,8 @@ export class AddSupplierPaymentComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
   getDocNo() {
     const payload = {
@@ -183,7 +178,6 @@ export class AddSupplierPaymentComponent {
     };
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -233,10 +227,6 @@ export class AddSupplierPaymentComponent {
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.supplierList = response;
-      console.log(
-        this.supplierList,
-        'distributorList==============================',
-      );
     });
   }
 
@@ -306,8 +296,7 @@ export class AddSupplierPaymentComponent {
     //   .getDropdownData('COMPANY_LIST')
     //   .subscribe((response: any) => {
     //     this.companyList = response;
-    //     console.log(this.companyList, 'COMPANYLIST');
-    //   });
+    //            //   });
     this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
       this.distributorList = response;
       console.log(this.distributorList, 'distributorList');

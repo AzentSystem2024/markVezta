@@ -128,14 +128,13 @@ export class ArticleBrandComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/article-brand');
@@ -148,9 +147,6 @@ export class ArticleBrandComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
   statusCellTemplate = (cellElement: any, cellInfo: any) => {
@@ -199,12 +195,8 @@ export class ArticleBrandComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
   //===================get data list========================
   get_ArticleBrand_List() {
@@ -240,7 +232,6 @@ export class ArticleBrandComponent {
     const Code = this.formsource.get('Code')?.value;
     const Description = this.formsource.get('Description')?.value;
     const Is_Inactive = this.formsource.get('Inactive')?.value;
-    console.log(Code, Description);
 
     const payload = {
       CODE: Code,
@@ -317,7 +308,6 @@ export class ArticleBrandComponent {
     const ID = event.data.ID;
 
     this.dataservice.Select_ArticleBrand_Api(ID).subscribe((response: any) => {
-      console.log(response, 'select Api');
       this.selectedData = response;
     });
   }
@@ -327,7 +317,6 @@ export class ArticleBrandComponent {
     const Code = this.editingRowData.CODE;
     const Description = this.editingRowData.DESCRIPTION;
     const Is_Inactive = this.editingRowData.IS_INACTIVE;
-    console.log(Code, Description, Is_Inactive);
 
     // Optional: Check for duplicate code or description (excluding current ID)
     const trimmedCode = Code.trim().toLowerCase();
@@ -409,7 +398,6 @@ export class ArticleBrandComponent {
         },
         'success',
       );
-      console.log(response, 'deleted');
     });
   }
 

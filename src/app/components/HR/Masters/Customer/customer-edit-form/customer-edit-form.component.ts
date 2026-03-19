@@ -48,24 +48,23 @@ export class CustomerEditFormComponent {
   selecte_countyId: any;
   Warehouse: any[] = [];
   selectedWarehouseId: any[] = [];
-   WarehouseId: any;
-   DeliveryAddressId:any
-   DeliveryAddress:any[]=[];
-selected_fin_id: any;
+  WarehouseId: any;
+  DeliveryAddressId: any;
+  DeliveryAddress: any[] = [];
+  selected_fin_id: any;
   sessionData: any;
   selected_vat_id: any;
   selected_Company_id: any = null; // or ''
   dob: string | number | Date = new Date();
-   Address1Value :any;
-  MobileValue:any;
-  locationValue:any;
-  phoneValue:any;
+  Address1Value: any;
+  MobileValue: any;
+  locationValue: any;
+  phoneValue: any;
   editingIndex: number | null = null;
 
-
   formCustomerData = {
-    WAREHOUSE_ID:'',
-    DELIVERY_ADDRESS_ID:'',
+    WAREHOUSE_ID: '',
+    DELIVERY_ADDRESS_ID: '',
     COMPANY_ID: this.selected_Company_id,
     CUST_CODE: '',
     FIRST_NAME: '',
@@ -96,12 +95,11 @@ selected_fin_id: any;
     DELIVERY_ADDRESS: [],
     DEALER_TYPE: 0,
     DEALER_ID: 0,
-      DeliveryAddresses: [
-  ]
+    DeliveryAddresses: [],
   };
 
-DEFAULT_COUNTRY_CODE: string = '';
-selectedTabIndex = 0;
+  DEFAULT_COUNTRY_CODE: string = '';
+  selectedTabIndex = 0;
   //  newCustomer = this.formCustomerData;
   customerTypeOptions = [
     { text: 'Unit of Company', value: 1 },
@@ -111,7 +109,7 @@ selectedTabIndex = 0;
   dealerTypeOptions = [
     { text: 'Dealer', value: 1 },
     { text: 'Sub-Dealer', value: 2 },
-    { text: 'CompanyBranch', value: 3 }
+    { text: 'CompanyBranch', value: 3 },
   ];
   isDealerVisible: boolean;
   deliveryAddress1: any;
@@ -120,29 +118,30 @@ selectedTabIndex = 0;
   isSubDealerPopupVisible: boolean;
   dealerList: any;
 
-//   countryCodeMap: { [key: string]: string } = {
-//   India: '+91',
-//   'United States': '+1',
-//   'United Kingdom': '+44',
-//   Canada: '+1',
-//   Australia: '+61',
-//   Germany: '+49',
-//   France: '+33',
-//   Singapore: '+65',
-//   // add as many as needed
-// };
+  //   countryCodeMap: { [key: string]: string } = {
+  //   India: '+91',
+  //   'United States': '+1',
+  //   'United Kingdom': '+44',
+  //   Canada: '+1',
+  //   Australia: '+61',
+  //   Germany: '+49',
+  //   France: '+33',
+  //   Singapore: '+65',
+  //   // add as many as needed
+  // };
 
-
-  constructor(private service: DataService, authservice: AuthService) {
+  constructor(
+    private service: DataService,
+    authservice: AuthService,
+  ) {
     // this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
     this.getStateDropDown();
     this.showCountry();
     this.sessionData_tax();
     this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
 
-     service.getCountryWithFlags().subscribe((data) => {
+    service.getCountryWithFlags().subscribe((data) => {
       this.CountryDropdownData = data;
-      console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
     });
   }
 
@@ -153,9 +152,6 @@ selectedTabIndex = 0;
     ) {
       this.formCustomerData = this.selectedCustomerData;
 
-      console.log('Salary Head Data:', this.formCustomerData);
-
-      
       this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
       this.ChangedCustomerData = this.formCustomerData;
       if (this.formCustomerData.DELIVERY_ADDRESS?.length) {
@@ -172,27 +168,26 @@ selectedTabIndex = 0;
         this.deliveryAddress3 = '';
       }
 
-     // ✅ Handle DeliveryAddresses (array of detailed addresses)
-    if (this.formCustomerData.DeliveryAddresses?.length > 0) {
-      const firstAddress = this.formCustomerData.DeliveryAddresses[0];
+      // ✅ Handle DeliveryAddresses (array of detailed addresses)
+      if (this.formCustomerData.DeliveryAddresses?.length > 0) {
+        const firstAddress = this.formCustomerData.DeliveryAddresses[0];
 
-      // Fill form input values
-      this.Address1Value = firstAddress.ADDRESS1 || '';
-      this.MobileValue = firstAddress.MOBILE || '';
-      this.locationValue = firstAddress.LOCATION || '';
-      this.phoneValue = firstAddress.PHONE || '';
+        // Fill form input values
+        this.Address1Value = firstAddress.ADDRESS1 || '';
+        this.MobileValue = firstAddress.MOBILE || '';
+        this.locationValue = firstAddress.LOCATION || '';
+        this.phoneValue = firstAddress.PHONE || '';
 
-      // ✅ Populate savedAddresses array to show cards
-      this.savedAddresses = [...this.formCustomerData.DeliveryAddresses];
-    } else {
-      // Reset all when no data found
-      this.Address1Value = '';
-      this.MobileValue = '';
-      this.locationValue = '';
-      this.phoneValue = '';
-      this.savedAddresses = [];
-    }
-
+        // ✅ Populate savedAddresses array to show cards
+        this.savedAddresses = [...this.formCustomerData.DeliveryAddresses];
+      } else {
+        // Reset all when no data found
+        this.Address1Value = '';
+        this.MobileValue = '';
+        this.locationValue = '';
+        this.phoneValue = '';
+        this.savedAddresses = [];
+      }
 
       // ✅ Show dealer dropdown automatically if Dealer Type = 2
       if (this.formCustomerData.CUST_TYPE === 2) {
@@ -217,8 +212,6 @@ selectedTabIndex = 0;
   }
 
   onDealerTypeChange(e: any) {
-    console.log(e.value, 'Dealer Type Changed');
-
     if (e.value === 2) {
       // 2 = Sub Dealer
       this.isDealerVisible = true; // show dropdown
@@ -238,10 +231,10 @@ selectedTabIndex = 0;
   }
 
   getDealerDropDown() {
-    const payload ={
-      NAME : 'DEALER',
-      COMPANY_ID : this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'DEALER',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.service.getDropdownData(payload).subscribe((response: any) => {
       this.dealerList = response;
     });
@@ -250,49 +243,39 @@ selectedTabIndex = 0;
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
-   
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
+
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id==================='
-    );
-     this.DEFAULT_COUNTRY_CODE = sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
-     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
+
+    this.DEFAULT_COUNTRY_CODE =
+      sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
   }
 
   showCountry() {
     this.service.getCountryDataAPi().subscribe((response) => {
       this.CountryDropdownData = response;
-      console.log(this.CountryDropdownData);
     });
   }
   getPriceLevelDropDown() {
-    const payload ={
-      NAME : 'PRICECLASS',
-      COMPANY_ID : this.selected_Company_id
-    }
-    
+    const payload = {
+      NAME: 'PRICECLASS',
+      COMPANY_ID: this.selected_Company_id,
+    };
+
     this.service.getDropdownData(payload).subscribe((data: any) => {
       this.PriceLevelDropdownData = data;
     });
   }
   getVATRuleDropDown() {
-    const payload ={
-      NAME : 'VATRULE',
-      COMPANY_ID : this.selected_Company_id
-    }
+    const payload = {
+      NAME: 'VATRULE',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.service.getDropdownData(payload).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
     });
@@ -300,28 +283,28 @@ selectedTabIndex = 0;
   getPaymentTerms() {
     this.service.getpayment_term_Api().subscribe((response) => {
       this.PaymentTermsDropdownData = response;
-      console.log('count', this.PaymentTermsDropdownData);
     });
   }
 
-     get_Warehouse_Dropdown_List() {
+  get_Warehouse_Dropdown_List() {
     this.service.get_Warehouse_Dropdown_Api().subscribe((response: any) => {
       this.Warehouse = response;
     });
   }
-    onWarehouseValue(event: any) {
+  onWarehouseValue(event: any) {
     this.selectedWarehouseId = event.value;
     this.WarehouseId = event.value;
     this.get_Warehouse_Dropdown_List();
   }
 
   get_DeliveryAddress_Dropdown_List() {
-    this.service.get_DeliveryAddress_Dropdown_Api().subscribe((response: any) => {
-      this.DeliveryAddress = response;
-    });
+    this.service
+      .get_DeliveryAddress_Dropdown_Api()
+      .subscribe((response: any) => {
+        this.DeliveryAddress = response;
+      });
   }
-    onDeliveryAddressValue(event: any) {
-    
+  onDeliveryAddressValue(event: any) {
     this.DeliveryAddressId = event.value;
     this.get_DeliveryAddress_Dropdown_List();
   }
@@ -334,34 +317,31 @@ selectedTabIndex = 0;
     this.service.getStateData_Api(payload).subscribe((data: any) => {
       this.StateDropdownData = data;
     });
-    console.log(this.StateDropdownData, '========state data====');
-    console.log(this.selecte_countyId, '======county id============');
     // this.service.getStateData().subscribe((data: any) => {
     //   this.StateDropdownData = data;
     // });
   }
   onStateSelectionChanged(event: any) {}
   onCountrySelectionChanged(event: any) {
-    console.log(event);
     this.selecte_countyId = event.value;
-    console.log(this.selecte_countyId, '======county id============');
     this.getStateDropDown();
     const selectedCountry = this.CountryDropdownData.find(
-    (country: any) => country.ID === this.selecte_countyId
-  );
+      (country: any) => country.ID === this.selecte_countyId,
+    );
 
-  // 4️⃣ If found, set code & name
-  if (selectedCountry) {
-    this.countryCode = selectedCountry.CODE;                // e.g., '+971'
-    this.DEFAULT_COUNTRY_CODE = this.countryCode;           // bind to textbox
-    console.log('Selected Country:', selectedCountry.DESCRIPTION);
-    console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
-  } else {
-    // 5️⃣ Fallback if no country found
-    this.countryCode = '';
-    this.DEFAULT_COUNTRY_CODE = '';
-    console.warn('⚠️ No matching country found for ID:', this.selecte_countyId);
-  }
+    // 4️⃣ If found, set code & name
+    if (selectedCountry) {
+      this.countryCode = selectedCountry.CODE; // e.g., '+971'
+      this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
+    } else {
+      // 5️⃣ Fallback if no country found
+      this.countryCode = '';
+      this.DEFAULT_COUNTRY_CODE = '';
+      console.warn(
+        '⚠️ No matching country found for ID:',
+        this.selecte_countyId,
+      );
+    }
   }
 
   ngOnInit(): void {
@@ -392,14 +372,9 @@ selectedTabIndex = 0;
   }
 
   UpdateData() {
-    console.log('Update functionsssss calledd');
-
-    console.log(this.selectedCustomerData);
-
     this.service
       .UpdateCustomerApi(this.selectedCustomerData)
       .subscribe((res: any) => {
-        console.log(res);
         // this.updateCompleted.emit(res);
       });
   }
@@ -407,77 +382,77 @@ selectedTabIndex = 0;
 
   savedAddresses: any[] = [];
 
-    saveDeliveryAddress() {
-  // Validate that at least one field is filled
-  if (this.Address1Value || this.MobileValue || this.locationValue || this.phoneValue) {
-    const newAddress = {
-      ADDRESS1: this.Address1Value,
-      MOBILE: this.MobileValue,
-      LOCATION: this.locationValue,
-      PHONE: this.phoneValue
-    };
+  saveDeliveryAddress() {
+    // Validate that at least one field is filled
+    if (
+      this.Address1Value ||
+      this.MobileValue ||
+      this.locationValue ||
+      this.phoneValue
+    ) {
+      const newAddress = {
+        ADDRESS1: this.Address1Value,
+        MOBILE: this.MobileValue,
+        LOCATION: this.locationValue,
+        PHONE: this.phoneValue,
+      };
 
-     if (this.editingIndex !== null && this.editingIndex >= 0) {
-      // ✅ Update existing card (do not push)
-      this.savedAddresses[this.editingIndex] = { ...newAddress };
-      this.editingIndex = null; // Exit edit mode
-    } else {
-      // ✅ Add as a new card
-    //  Push into savedAddresses array
-    this.savedAddresses.push(newAddress);
-    }
-    console.log(this.savedAddresses, 'Saved Addresses:');
+      if (this.editingIndex !== null && this.editingIndex >= 0) {
+        // ✅ Update existing card (do not push)
+        this.savedAddresses[this.editingIndex] = { ...newAddress };
+        this.editingIndex = null; // Exit edit mode
+      } else {
+        // ✅ Add as a new card
+        //  Push into savedAddresses array
+        this.savedAddresses.push(newAddress);
+      }
 
-    //  Optionally link with formCustomerData for payload
-    this.formCustomerData.DeliveryAddresses = [...this.savedAddresses];
-    console.log(this.formCustomerData, 'Updated formCustomerData payload');
-
-    //  Clear the input fields
-    this.Address1Value = '';
-    this.MobileValue = '';
-    this.locationValue = '';
-    this.phoneValue = '';
-  }
-}
-  
-removeAddress(index: number) {
-  const result = confirm(
-    "Are you sure you want to delete this address?",
-    "Confirm Deletion"
-  );
-
-  result.then((dialogResult) => {
-    if (dialogResult) {
-      // ✅ Remove from UI list
-      this.savedAddresses.splice(index, 1);
-
-      // ✅ Sync payload with updated list
+      //  Optionally link with formCustomerData for payload
       this.formCustomerData.DeliveryAddresses = [...this.savedAddresses];
 
-      // ✅ Optional: reset edit mode if currently editing
-      if (this.editingIndex === index) {
-        // this.resetPartialForm();
-        this.editingIndex = null;
-      }
+      //  Clear the input fields
+      this.Address1Value = '';
+      this.MobileValue = '';
+      this.locationValue = '';
+      this.phoneValue = '';
     }
-  });
-}
+  }
 
-  
-editAddress(i: number) {
-  const addr = this.savedAddresses[i];
+  removeAddress(index: number) {
+    const result = confirm(
+      'Are you sure you want to delete this address?',
+      'Confirm Deletion',
+    );
 
-  // Fill form fields
-  this.Address1Value = addr.ADDRESS1;
-  this.MobileValue = addr.MOBILE;
-  this.locationValue = addr.LOCATION;
-  this.phoneValue = addr.PHONE;
+    result.then((dialogResult) => {
+      if (dialogResult) {
+        // ✅ Remove from UI list
+        this.savedAddresses.splice(index, 1);
 
-  // ✅ Remember which card is being edited
-  this.editingIndex = i;
-}
+        // ✅ Sync payload with updated list
+        this.formCustomerData.DeliveryAddresses = [...this.savedAddresses];
 
+        // ✅ Optional: reset edit mode if currently editing
+        if (this.editingIndex === index) {
+          // this.resetPartialForm();
+          this.editingIndex = null;
+        }
+      }
+    });
+  }
 
+  editAddress(i: number) {
+    const addr = this.savedAddresses[i];
+
+    // Fill form fields
+    this.Address1Value = addr.ADDRESS1;
+    this.MobileValue = addr.MOBILE;
+    this.locationValue = addr.LOCATION;
+    this.phoneValue = addr.PHONE;
+
+    // ✅ Remember which card is being edited
+    this.editingIndex = i;
+  }
 }
 
 @NgModule({

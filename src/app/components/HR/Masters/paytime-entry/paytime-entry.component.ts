@@ -77,7 +77,7 @@ export class PaytimeEntryComponent {
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,
-    private router: Router
+    private router: Router,
   ) {
     this.get_SalaryHead_Dropdown();
   }
@@ -164,7 +164,7 @@ export class PaytimeEntryComponent {
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
       1,
-      12
+      12,
     );
 
     this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString('en-US', {
@@ -183,7 +183,6 @@ export class PaytimeEntryComponent {
 
   onSelectionChanged(e: any) {
     this.selectedRows = e.selectedRowKeys;
-    console.log('User selected:', this.selectedRows);
   }
 
   onAddPopupClose() {}
@@ -192,16 +191,13 @@ export class PaytimeEntryComponent {
   }
 
   onSalaryHeadChanged(event: any) {
-    console.log(event, 'event');
     this.selectedSalaryHeadType = event.value;
-    console.log(this.selectedSalaryHeadType, 'selected salary head id');
     this.get_SalaryHead_Dropdown();
     this.ApplyBulkRows();
   }
 
   get_SalaryHead_Dropdown() {
     this.dataservice.SalaryHead_Dropdown().subscribe((res: any) => {
-      console.log('ac head dropdown', res);
       this.SalaryHead = res;
     });
   }
@@ -212,7 +208,7 @@ export class PaytimeEntryComponent {
       (e.dataField === 'DAYS' || e.dataField === 'AMOUNT')
     ) {
       const isRowSelected = this.selectedRows?.some(
-        (selected) => selected.EMP_ID === e.row?.data?.EMP_ID
+        (selected) => selected.EMP_ID === e.row?.data?.EMP_ID,
       );
 
       e.editorOptions.disabled = !isRowSelected;
@@ -224,29 +220,22 @@ export class PaytimeEntryComponent {
 
     const amount = this.amountForm.value.amount;
     const mode = this.amountForm.get('mode')?.value;
-    console.log(mode, 'mode');
 
     const selectedEmpIds = this.selectedRows.map((row) => row.EMP_ID);
 
     if (mode.value === 'copy') {
-      console.log(mode.value, 'mode');
       this.selectedRows.forEach((row) => {
         const entry = this.PayEntryList.find((e) => e.EMP_ID === row.EMP_ID);
-        console.log(entry, 'entry');
         if (entry) {
           entry.AMOUNT = amount;
         }
       });
     } else if (mode.value === 'divide') {
-      console.log(mode.value, 'divide mode');
-
       // Step 1: Get total working days of all selected employees
       const totalWorkingDays = this.selectedRows.reduce((sum, row) => {
         const entry = this.PayEntryList.find((e) => e.EMP_ID === row.EMP_ID);
         return sum + Number(entry?.DAYS || 0);
       }, 0);
-
-      console.log(totalWorkingDays, 'total working days');
 
       if (totalWorkingDays === 0) {
         notify('Total working days is zero. Cannot divide.', 'error', 3000);
@@ -255,16 +244,12 @@ export class PaytimeEntryComponent {
 
       // Step 2: Calculate amount per working day
       const perDayAmount = amount / totalWorkingDays;
-      console.log(perDayAmount, 'amount per day');
 
       // Step 3: Assign amount to each selected employee
       this.selectedRows.forEach((row) => {
         const entry = this.PayEntryList.find((e) => e.EMP_ID === row.EMP_ID);
         if (entry && entry.DAYS) {
           entry.AMOUNT = Math.round(perDayAmount * entry.DAYS);
-          console.log(
-            `EMP_NO: ${entry.EMP_ID}, DAYS: ${entry.DAYS}, AMOUNT: ${entry.AMOUNT}`
-          );
         }
       });
     }
@@ -298,32 +283,30 @@ export class PaytimeEntryComponent {
         .padStart(2, '0')}-01`,
       HEAD_ID: this.selectedSalaryHeadType,
     };
-    console.log(payload, 'payload');
     this.dataservice
       .get_PaytimeEntry_list(payload)
       .subscribe((response: any) => {
-        console.log(response, 'response');
         this.PayEntryList = response.data || [];
       });
   }
 
   Save() {
     // Validate Salary Head selection
-  if (
-    this.selectedSalaryHeadType == null ||
-    this.selectedSalaryHeadType === '' ||
-    this.selectedSalaryHeadType === 0
-  ) {
-    notify(
-      {
-        message: 'Please select a salary head',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 2000,
-      },
-      'warning'
-    );
-    return; // stop save
-  }
+    if (
+      this.selectedSalaryHeadType == null ||
+      this.selectedSalaryHeadType === '' ||
+      this.selectedSalaryHeadType === 0
+    ) {
+      notify(
+        {
+          message: 'Please select a salary head',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 2000,
+        },
+        'warning',
+      );
+      return; // stop save
+    }
     //  Check: If no rows are selected, stop save
     if (!this.selectedRows || this.selectedRows.length === 0) {
       notify(
@@ -332,7 +315,7 @@ export class PaytimeEntryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 2000,
         },
-        'warning'
+        'warning',
       );
       return;
     }
@@ -355,7 +338,7 @@ export class PaytimeEntryComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
       return; // Stop save
     }
@@ -375,10 +358,8 @@ export class PaytimeEntryComponent {
         DAYS: Number(row.DAYS),
       })),
     };
-    console.log(payload, 'payload for saving');
 
     this.dataservice.Insert_PaytimeEntry(payload).subscribe((res: any) => {
-      console.log(res, 'response from saveEmployee');
       if (res.message === 'Success') {
         notify(
           {
@@ -386,7 +367,7 @@ export class PaytimeEntryComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'success'
+          'success',
         );
 
         //  Update the local data source manually
@@ -404,7 +385,7 @@ export class PaytimeEntryComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'error'
+          'error',
         );
       }
     });

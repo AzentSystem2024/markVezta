@@ -70,10 +70,9 @@ export class ProductionJvAddComponent {
   @ViewChild('itemsGridRef', { static: false })
   itemsGrid!: DxDataGridComponent;
   @Output() formClosed = new EventEmitter<void>();
-     @Input() isEditing: boolean = false;
-     @Input() EditingResponseData: any;
-     @Input() selectedProductionType: 'ARTICLE' | 'BOX' = 'ARTICLE';
-
+  @Input() isEditing: boolean = false;
+  @Input() EditingResponseData: any;
+  @Input() selectedProductionType: 'ARTICLE' | 'BOX' = 'ARTICLE';
 
   Article: any;
   gridData: any[] = [];
@@ -81,10 +80,10 @@ export class ProductionJvAddComponent {
   finalCost: number = 0;
   // additionalCost: number = 0;
   unitProductCost: number = 0;
-    isApproved: boolean = false;
+  isApproved: boolean = false;
 
   productionJVFormData: any = {
-    ID:0,
+    ID: 0,
     DOC_NO: '',
     COMPANY_ID: '',
     FIN_ID: '',
@@ -118,51 +117,54 @@ export class ProductionJvAddComponent {
   selected_fin_id: any;
   user_id: any;
 
-  constructor(private dataservice: DataService, private ngZone: NgZone) {}
+  constructor(
+    private dataservice: DataService,
+    private ngZone: NgZone,
+  ) {}
 
   ngOnInit() {
     this.sesstion_Details();
     this.get_ProductDropdown();
     // this.getPendingNo();
-     if (!this.isEditing) {
-    this.initAddForm();
-  }
     if (!this.isEditing) {
-    this.productionJVFormData.PRODUCTION_DATE = new Date();
-  }
+      this.initAddForm();
+    }
+    if (!this.isEditing) {
+      this.productionJVFormData.PRODUCTION_DATE = new Date();
+    }
 
     this.isEditDataAvailable();
   }
 
   initAddForm() {
-  this.productionJVFormData = {
-    ID: 0,
-    DOC_NO: '',
-    COMPANY_ID: this.selected_Company_id,
-    FIN_ID: this.selected_fin_id,
-    USER_ID: this.user_id,
-    REF_NO: '',
-    PRODUCTION_DATE: new Date(),   // ✅ ALWAYS SET
-    REMARKS: '',
-    TOTAL_ITEM_COST: 0,
-    ADDL_COST: 0,
-    COST_OF_PRODUCTION: 0,
-    PRODUCT_ID: 0,
-    UNIT_PRODUCT_COST: 0,
-    PROD_QTY: 0,
-    STATUS: 1,
-    PRODUCTION_TYPE: 1,
-    RawMaterials: [],
-  };
+    this.productionJVFormData = {
+      ID: 0,
+      DOC_NO: '',
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.selected_fin_id,
+      USER_ID: this.user_id,
+      REF_NO: '',
+      PRODUCTION_DATE: new Date(), // ✅ ALWAYS SET
+      REMARKS: '',
+      TOTAL_ITEM_COST: 0,
+      ADDL_COST: 0,
+      COST_OF_PRODUCTION: 0,
+      PRODUCT_ID: 0,
+      UNIT_PRODUCT_COST: 0,
+      PROD_QTY: 0,
+      STATUS: 1,
+      PRODUCTION_TYPE: 1,
+      RawMaterials: [],
+    };
 
-  this.gridData = [];
-  this.totalAmount = 0;
-  // this.additionalCost = 0;
-  this.finalCost = 0;
-  this.unitProductCost = 0;
+    this.gridData = [];
+    this.totalAmount = 0;
+    // this.additionalCost = 0;
+    this.finalCost = 0;
+    this.unitProductCost = 0;
 
-  this.getPendingNo(); // ✅ ALWAYS FETCH NEW DOC NO
-}
+    this.getPendingNo(); // ✅ ALWAYS FETCH NEW DOC NO
+  }
 
   //==================== Production Qty Change Handler ===================//
   onProductionQtyChange() {}
@@ -183,17 +185,11 @@ export class ProductionJvAddComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
+
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id==================='
-    );
+
     this.user_id = sessionData.USER_ID;
     console.log(this.user_id, '============user id==================');
     //
@@ -288,32 +284,31 @@ export class ProductionJvAddComponent {
   fillComponents() {
     const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
 
-
     //  VALIDATION: Product required
-  if (!this.productionJVFormData.PRODUCT_ID) {
-    notify(
-      {
-        message: 'Please select a Product',
-        position: { at: 'top right', my: 'top right' },
-      },
-      'warning',
-      3000
-    );
-    return;
-  }
+    if (!this.productionJVFormData.PRODUCT_ID) {
+      notify(
+        {
+          message: 'Please select a Product',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        3000,
+      );
+      return;
+    }
 
-  //  VALIDATION: Production Qty required
-  if (!prodQty || prodQty <= 0) {
-    notify(
-      {
-        message: 'Please enter Production Quantity',
-        position: { at: 'top right', my: 'top right' },
-      },
-      'warning',
-      3000
-    );
-    return; //  STOP execution
-  }
+    //  VALIDATION: Production Qty required
+    if (!prodQty || prodQty <= 0) {
+      notify(
+        {
+          message: 'Please enter Production Quantity',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        3000,
+      );
+      return; //  STOP execution
+    }
 
     const payload = {
       ARTICLE_ID: this.productionJVFormData.PRODUCT_ID,
@@ -345,8 +340,6 @@ export class ProductionJvAddComponent {
       });
   }
 
-  
-
   onCellValueChanged(e: any) {
     console.log('Cell Value Changed Event:', e);
     const field = e?.column?.dataField;
@@ -369,13 +362,12 @@ export class ProductionJvAddComponent {
   // }
 
   calculateFinalCost() {
-  this.finalCost =
-    (Number(this.totalAmount) || 0) +
-    (Number(this.productionJVFormData.ADDL_COST) || 0);
+    this.finalCost =
+      (Number(this.totalAmount) || 0) +
+      (Number(this.productionJVFormData.ADDL_COST) || 0);
 
-  this.calculateUnitProductCost();
-}
-
+    this.calculateUnitProductCost();
+  }
 
   calculateTotalAmount() {
     this.totalAmount = this.gridData.reduce((sum, row) => {
@@ -387,18 +379,20 @@ export class ProductionJvAddComponent {
   }
 
   // onAdditionalCostChange(e: any) {
-    
+
   //   this.additionalCost = Number(e.value) || 0;
   //   console.log('Additional Cost Changed:', this.additionalCost);
   //   this.calculateFinalCost();
-  // } 
+  // }
 
   onAdditionalCostChange(e: any) {
-  this.productionJVFormData.ADDL_COST = Number(e.value) || 0;
-  console.log('Additional Cost Changed:', this.productionJVFormData.ADDL_COST);
-  this.calculateFinalCost();
-}
-
+    this.productionJVFormData.ADDL_COST = Number(e.value) || 0;
+    console.log(
+      'Additional Cost Changed:',
+      this.productionJVFormData.ADDL_COST,
+    );
+    this.calculateFinalCost();
+  }
 
   //==================== Calculate Unit Product Cost ===================//
   calculateUnitProductCost() {
@@ -414,107 +408,102 @@ export class ProductionJvAddComponent {
     console.log('Unit Product Cost:', this.unitProductCost);
   }
 
+  private formatDateForApi(date: Date | string): string {
+    if (!date) return '';
 
-private formatDateForApi(date: Date | string): string {
-  if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
 
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-
-  return `${year}-${month}-${day}`; // yyyy-MM-dd
-}
-
-
-  isEditDataAvailable() {
-  if (!this.isEditing || !this.EditingResponseData) {
-    return; // Not edit mode → nothing to load
+    return `${year}-${month}-${day}`; // yyyy-MM-dd
   }
 
-  const header = this.EditingResponseData.Header;
-  const rawMaterials = this.EditingResponseData.RawMaterials || [];
+  isEditDataAvailable() {
+    if (!this.isEditing || !this.EditingResponseData) {
+      return; // Not edit mode → nothing to load
+    }
 
-  console.log('EDIT HEADER:', header);
-  console.log('EDIT RAW MATERIALS:', rawMaterials);
+    const header = this.EditingResponseData.Header;
+    const rawMaterials = this.EditingResponseData.RawMaterials || [];
 
-  // ================= DATE PARSE =================
-  const productionDate = header.PROD_DATE
-    ? new Date(header.PROD_DATE)
-    : new Date();
+    console.log('EDIT HEADER:', header);
+    console.log('EDIT RAW MATERIALS:', rawMaterials);
 
-  // ================= HEADER BINDING =================
-  this.productionJVFormData = {
-    ID: header.PRODUCTION_ID,
-    DOC_NO: header.PROD_NO,
-    COMPANY_ID: this.selected_Company_id,
-    FIN_ID: this.selected_fin_id,
-    USER_ID: this.user_id,
+    // ================= DATE PARSE =================
+    const productionDate = header.PROD_DATE
+      ? new Date(header.PROD_DATE)
+      : new Date();
 
-    REF_NO: header.REF_NO,
-    PRODUCTION_DATE: productionDate,
-    REMARKS: header.REMARKS || '',
-    TOTAL_ITEM_COST: header.TOTAL_COST || 0,
-    ADDL_COST: header.ADDL_COST || 0,
-    COST_OF_PRODUCTION: header.COST_PRODUCTION || 0,
-     STATUS: header.STATUS,
-    PRODUCT_ID: header.PRODUCT_ID,
-    PROD_QTY: header.PRODUCED_QTY || 0,
-    UNIT_PRODUCT_COST: header.UNIT_COST || 0,
+    // ================= HEADER BINDING =================
+    this.productionJVFormData = {
+      ID: header.PRODUCTION_ID,
+      DOC_NO: header.PROD_NO,
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.selected_fin_id,
+      USER_ID: this.user_id,
 
-  PRODUCTION_TYPE: header.PRODUCTION_TYPE ?? 1,
+      REF_NO: header.REF_NO,
+      PRODUCTION_DATE: productionDate,
+      REMARKS: header.REMARKS || '',
+      TOTAL_ITEM_COST: header.TOTAL_COST || 0,
+      ADDL_COST: header.ADDL_COST || 0,
+      COST_OF_PRODUCTION: header.COST_PRODUCTION || 0,
+      STATUS: header.STATUS,
+      PRODUCT_ID: header.PRODUCT_ID,
+      PROD_QTY: header.PRODUCED_QTY || 0,
+      UNIT_PRODUCT_COST: header.UNIT_COST || 0,
 
-    RawMaterials: [], // will be set below
-  };
+      PRODUCTION_TYPE: header.PRODUCTION_TYPE ?? 1,
 
-  // ================= GRID DATA =================
-  this.gridData = rawMaterials.map((item: any) => ({
-    ID: item.ITEM_ID,
-    // ITEM_ID: item.ITEM_ID,
-    ITEM_CODE: item.ITEM_CODE,
-    DESCRIPTION: item.DESCRIPTION,
-    UOM: item.UOM,
+      RawMaterials: [], // will be set below
+    };
 
-    // BOM_QTY: Number(item.BOM_QTY) || 0,
-    REQUIRED_QTY: Number(item.REQUIRED_QTY) || 0,
-    USED_QTY: Number(item.USED_QTY) || 0,
+    // ================= GRID DATA =================
+    this.gridData = rawMaterials.map((item: any) => ({
+      ID: item.ITEM_ID,
+      // ITEM_ID: item.ITEM_ID,
+      ITEM_CODE: item.ITEM_CODE,
+      DESCRIPTION: item.DESCRIPTION,
+      UOM: item.UOM,
 
-    UNIT_COST: Number(item.UNIT_COST) || 0,
-    // TOTAL_COST: Number(item.TOTAL_COST) || 0,
-    QTY_AVAILABLE: Number(item.QTY_AVAILABLE) || 0,
-    // derived / editable fields
-    QUANTITY: Number(item.USED_QTY) || 0,
-    COST: Number(item.UNIT_COST) || 0,
-    AMOUNT:
-      (Number(item.USED_QTY) || 0) *
-      (Number(item.UNIT_COST) || 0),
-  }));
+      // BOM_QTY: Number(item.BOM_QTY) || 0,
+      REQUIRED_QTY: Number(item.REQUIRED_QTY) || 0,
+      USED_QTY: Number(item.USED_QTY) || 0,
 
-  // ================= RECALCULATE TOTALS =================
-  this.totalAmount = this.gridData.reduce(
-    (sum: number, row: any) => sum + (row.AMOUNT || 0),
-    0,
-  );
+      UNIT_COST: Number(item.UNIT_COST) || 0,
+      // TOTAL_COST: Number(item.TOTAL_COST) || 0,
+      QTY_AVAILABLE: Number(item.QTY_AVAILABLE) || 0,
+      // derived / editable fields
+      QUANTITY: Number(item.USED_QTY) || 0,
+      COST: Number(item.UNIT_COST) || 0,
+      AMOUNT: (Number(item.USED_QTY) || 0) * (Number(item.UNIT_COST) || 0),
+    }));
 
-  this.finalCost =
-    this.totalAmount + (Number(this.productionJVFormData.ADDL_COST) || 0);
+    // ================= RECALCULATE TOTALS =================
+    this.totalAmount = this.gridData.reduce(
+      (sum: number, row: any) => sum + (row.AMOUNT || 0),
+      0,
+    );
 
-  this.unitProductCost =
-    this.productionJVFormData.PROD_QTY > 0
-      ? this.finalCost / this.productionJVFormData.PROD_QTY
-      : 0;
+    this.finalCost =
+      this.totalAmount + (Number(this.productionJVFormData.ADDL_COST) || 0);
 
-  // ================= GRID REFRESH =================
-  // setTimeout(() => {
-  //   if (this.itemsGridRef?.instance) {
-  //     this.itemsGridRef.instance.refresh();
-  //   }
-  // }, 200);
+    this.unitProductCost =
+      this.productionJVFormData.PROD_QTY > 0
+        ? this.finalCost / this.productionJVFormData.PROD_QTY
+        : 0;
 
-  console.log('EDIT MODE FORM DATA:', this.productionJVFormData);
-  console.log('EDIT MODE GRID DATA:', this.gridData);
-}
+    // ================= GRID REFRESH =================
+    // setTimeout(() => {
+    //   if (this.itemsGridRef?.instance) {
+    //     this.itemsGridRef.instance.refresh();
+    //   }
+    // }, 200);
 
+    console.log('EDIT MODE FORM DATA:', this.productionJVFormData);
+    console.log('EDIT MODE GRID DATA:', this.gridData);
+  }
 
   getPendingNo() {
     const payload = {
@@ -531,12 +520,13 @@ private formatDateForApi(date: Date | string): string {
   }
 
   get_ProductDropdown() {
-    this.dataservice.getDropdownDataforProduct('ARTICLE').subscribe((response: any) => {
-      console.log('Article Dropdown Data:', response);
-      this.Article = response;
-    });
+    this.dataservice
+      .getDropdownDataforProduct('ARTICLE')
+      .subscribe((response: any) => {
+        console.log('Article Dropdown Data:', response);
+        this.Article = response;
+      });
   }
-
 
   get_Product_In_Article_Production() {
     const payload = {
@@ -552,7 +542,6 @@ private formatDateForApi(date: Date | string): string {
   }
 
   // onSave() {
-
 
   //   // =====================================================
   // //  VALIDATION 1: PRODUCT MUST BE SELECTED
@@ -632,152 +621,143 @@ private formatDateForApi(date: Date | string): string {
   // }
 
   onSave() {
+    // =====================================================
+    // VALIDATION 1: PRODUCT MUST BE SELECTED
+    // =====================================================
+    if (!this.productionJVFormData.PRODUCT_ID) {
+      notify('Please select a product', 'error', 3000);
+      return;
+    }
 
-  // =====================================================
-  // VALIDATION 1: PRODUCT MUST BE SELECTED
-  // =====================================================
-  if (!this.productionJVFormData.PRODUCT_ID) {
-    notify('Please select a product', 'error', 3000);
-    return;
-  }
+    // =====================================================
+    // VALIDATION 2: PRODUCT QUANTITY
+    // =====================================================
+    const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+    if (prodQty <= 0) {
+      notify('Please enter a product quantity', 'error', 3000);
+      return;
+    }
 
-  // =====================================================
-  // VALIDATION 2: PRODUCT QUANTITY
-  // =====================================================
-  const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
-  if (prodQty <= 0) {
-    notify('Please enter a product quantity', 'error', 3000);
-    return;
-  }
+    // =====================================================
+    // VALIDATION 3: USED_QTY <= AVAILABLE_QTY
+    // =====================================================
+    const invalidRow = this.gridData.find((item: any) => {
+      const usedQty = Number(item.USED_QTY) || 0;
+      const availableQty = Number(item.QTY_AVAILABLE) || 0;
+      return usedQty > availableQty;
+    });
 
-  // =====================================================
-  // VALIDATION 3: USED_QTY <= AVAILABLE_QTY
-  // =====================================================
-  const invalidRow = this.gridData.find((item: any) => {
-    const usedQty = Number(item.USED_QTY) || 0;
-    const availableQty = Number(item.QTY_AVAILABLE) || 0;
-    return usedQty > availableQty;
-  });
+    if (invalidRow) {
+      notify(
+        'Used Quantity cannot be greater than Available Quantity',
+        'error',
+        4000,
+      );
+      return;
+    }
 
-  if (invalidRow) {
-    notify(
-      'Used Quantity cannot be greater than Available Quantity',
-      'error',
-      4000
-    );
-    return;
-  }
+    // =====================================================
+    // PREPARE PAYLOAD
+    // =====================================================
+    const payload: any = {
+      ID: this.isEditing ? this.productionJVFormData.ID : 0,
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.selected_fin_id,
+      USER_ID: this.user_id,
+      REMARKS: this.productionJVFormData.REMARKS,
+      PRODUCTION_DATE: this.formatDateForApi(
+        this.productionJVFormData.PRODUCTION_DATE,
+      ),
+      TOTAL_ITEM_COST: this.totalAmount,
+      COST_OF_PRODUCTION: this.finalCost,
+      UNIT_PRODUCT_COST: this.unitProductCost,
+      REF_NO: this.productionJVFormData.REF_NO,
+      ADDL_COST: this.productionJVFormData.ADDL_COST,
+      PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
+      PROD_QTY: this.productionJVFormData.PROD_QTY,
+      STATUS: this.productionJVFormData.STATUS ?? 1,
+      PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE,
 
-  // =====================================================
-  // PREPARE PAYLOAD
-  // =====================================================
-  const payload: any = {
-     ID: this.isEditing ? this.productionJVFormData.ID : 0,
-    COMPANY_ID: this.selected_Company_id,
-    FIN_ID: this.selected_fin_id,
-    USER_ID: this.user_id,
-    REMARKS: this.productionJVFormData.REMARKS,
-    PRODUCTION_DATE: this.formatDateForApi(this.productionJVFormData.PRODUCTION_DATE),
-    TOTAL_ITEM_COST: this.totalAmount,
-    COST_OF_PRODUCTION: this.finalCost,
-    UNIT_PRODUCT_COST: this.unitProductCost,
-    REF_NO: this.productionJVFormData.REF_NO,
-    ADDL_COST: this.productionJVFormData.ADDL_COST,
-    PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
-    PROD_QTY: this.productionJVFormData.PROD_QTY,
-    STATUS: this.productionJVFormData.STATUS ?? 1,
-   PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE,
+      RawMaterials: this.gridData,
+      // IS_APPROVED: this.isApproved,
+    };
 
-    RawMaterials: this.gridData,
-    // IS_APPROVED: this.isApproved,
-  };
+    console.log('Final Payload:', payload);
 
-  console.log('Final Payload:', payload);
-
-  // =====================================================
-  // API CALL HELPERS
-  // =====================================================
-  const callInsertAPI = () => {
-    this.dataservice
-      .Insert_Article_Production_Api(payload)
-      .subscribe(() => {
+    // =====================================================
+    // API CALL HELPERS
+    // =====================================================
+    const callInsertAPI = () => {
+      this.dataservice.Insert_Article_Production_Api(payload).subscribe(() => {
         notify('Production saved successfully', 'success', 3000);
         this.resetForm();
         this.formClosed.emit();
       });
-  };
+    };
 
-  const callUpdateAPI = () => {
-    this.dataservice
-      .Update_Article_Production_Api(payload)
-      .subscribe(() => {
+    const callUpdateAPI = () => {
+      this.dataservice.Update_Article_Production_Api(payload).subscribe(() => {
         notify('Production updated successfully', 'success', 3000);
-         this.resetForm();
+        this.resetForm();
         this.formClosed.emit();
       });
-  };
+    };
 
-  const callCommitAPI = () => {
-    const result = confirm(
-      'Are you sure you want to APPROVE this production?',
-      'Confirmation'
-    );
+    const callCommitAPI = () => {
+      const result = confirm(
+        'Are you sure you want to APPROVE this production?',
+        'Confirmation',
+      );
 
-    result.then((confirmed) => {
-      if (confirmed) {
-        this.dataservice
-          .Commit_Article_Production_Api(payload)
-          .subscribe(() => {
-            notify('Production approved successfully', 'success', 3000);
-            this.formClosed.emit();
-          });
-      }
-    });
-  };
+      result.then((confirmed) => {
+        if (confirmed) {
+          this.dataservice
+            .Commit_Article_Production_Api(payload)
+            .subscribe(() => {
+              notify('Production approved successfully', 'success', 3000);
+              this.formClosed.emit();
+            });
+        }
+      });
+    };
 
-  // =====================================================
-// FINAL DECISION LOGIC (STATUS DRIVEN)
-// =====================================================
+    // =====================================================
+    // FINAL DECISION LOGIC (STATUS DRIVEN)
+    // =====================================================
 
-if (!this.isEditing) {
-  callInsertAPI();
-  return;
-}
+    if (!this.isEditing) {
+      callInsertAPI();
+      return;
+    }
 
-if (payload.STATUS === 5) {
-  callCommitAPI();
-} 
-else {
-  // ✅ Any other status → UPDATE
-  callUpdateAPI();
-}
-
-
-}
-
-onApproveChanged(e: any) {
-  this.isApproved = e.value;
-
-  // STATUS logic
-  this.productionJVFormData.STATUS = this.isApproved ? 5 : 1;
-
-  console.log('Approve checked:', this.isApproved);
-  console.log('Current STATUS:', this.productionJVFormData.STATUS);
-}
-
-
-
-resetForm() {
-  this.initAddForm();
-
-  if (this.itemsGrid) {
-    this.itemsGrid.instance.cancelEditData();
-    this.itemsGrid.instance.refresh();
+    if (payload.STATUS === 5) {
+      callCommitAPI();
+    } else {
+      // ✅ Any other status → UPDATE
+      callUpdateAPI();
+    }
   }
 
-  console.log('Form reset + reinitialized');
-}
+  onApproveChanged(e: any) {
+    this.isApproved = e.value;
 
+    // STATUS logic
+    this.productionJVFormData.STATUS = this.isApproved ? 5 : 1;
+
+    console.log('Approve checked:', this.isApproved);
+    console.log('Current STATUS:', this.productionJVFormData.STATUS);
+  }
+
+  resetForm() {
+    this.initAddForm();
+
+    if (this.itemsGrid) {
+      this.itemsGrid.instance.cancelEditData();
+      this.itemsGrid.instance.refresh();
+    }
+
+    console.log('Form reset + reinitialized');
+  }
 }
 
 @NgModule({

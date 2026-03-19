@@ -89,7 +89,7 @@ export class DeliveryNoteFormComponent {
   storeFromSession: any;
   stores: any;
   reasons: any;
-   logoBase64: string;
+  logoBase64: string;
   deliveryFormData: any = {
     COMPANY_ID: 0,
     STORE_ID: 0,
@@ -151,7 +151,7 @@ export class DeliveryNoteFormComponent {
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
@@ -161,17 +161,14 @@ export class DeliveryNoteFormComponent {
     this.getDeliveryNo();
     this.isEditDataAvailable();
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData==================:', menuResponse);
-    console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -191,19 +188,16 @@ export class DeliveryNoteFormComponent {
       // this.getItemsList();
     }
     this.getStoreDropdown();
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
 
-     const imagePath = 'assets/markLogo.jpg';
+    const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
     // this.items = [];
     // this.addEmptyRow();
   }
 
-   private async convertToBase64(path: string): Promise<string> {
+  private async convertToBase64(path: string): Promise<string> {
     const response = await fetch(path);
     const blob = await response.blob();
 
@@ -225,7 +219,6 @@ export class DeliveryNoteFormComponent {
 
     // ✅ EditingResponseData IS ALREADY DATA
     const data = this.EditingResponseData;
-    console.log(data, 'DATA IN DELIVERY EDIT');
 
     this.deliveryFormData = {
       ID: data.ID,
@@ -258,8 +251,6 @@ export class DeliveryNoteFormComponent {
     this.selectedCustomerId = this.deliveryFormData.CUST_ID;
 
     this.updateTotalQty();
-
-    console.log('Edit Mode: deliveryFormData loaded:', this.deliveryFormData);
   }
 
   reindexDetails() {}
@@ -304,9 +295,9 @@ export class DeliveryNoteFormComponent {
       .getDropdownData('INSIDE_CUSTOMER')
       .subscribe((response: any) => {
         this.customerList = response;
-  });
+      });
   }
-                 
+
   getOutsideCustomerList() {
     this.dataService
       .getDropdownData('OUTSIDE_CUSTOMER')
@@ -318,7 +309,7 @@ export class DeliveryNoteFormComponent {
   getStoreDropdown() {
     this.dataService.getDropdownData('STORE').subscribe((response: any) => {
       this.stores = response.filter(
-        (store: any) => store.ID !== this.storeFromSession
+        (store: any) => store.ID !== this.storeFromSession,
       );
     });
   }
@@ -366,7 +357,6 @@ export class DeliveryNoteFormComponent {
       next: (res: any) => {
         if (res && res.TRANSFER_NO) {
           this.deliveryFormData.TRANSFER_NO = res.TRANSFER_NO;
-          console.log('New Transfer No:', res.TRANSFER_NO);
         }
       },
       error: (err) => {
@@ -412,9 +402,6 @@ export class DeliveryNoteFormComponent {
 
     // Close popup
     this.salesOrderPopupOpened = false;
-
-    console.log('Selected SO_DETAIL_IDs:', this.deliveryFormData.SO_DETAIL_IDs);
-    console.log('Updated DETAILS:', this.deliveryFormData.Details);
   }
 
   getItemsList() {
@@ -425,13 +412,11 @@ export class DeliveryNoteFormComponent {
       .getItemDetailsForTrInInventory(payload)
       .subscribe((response: any) => {
         this.items = response.data;
-        console.log(response, 'RESPONSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
       });
   }
 
   onStoreChange(e: any) {
     this.selectedStoreId = e.value;
-    console.log('Selected Store ID:', this.selectedStoreId);
     this.getItemsList();
   }
 
@@ -469,7 +454,7 @@ export class DeliveryNoteFormComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -487,7 +472,6 @@ export class DeliveryNoteFormComponent {
     return received <= issued;
   };
   onRowUpdated(e: any) {
-    console.log('Row updated', e);
     this.updateTotalQty();
   }
 
@@ -515,9 +499,8 @@ export class DeliveryNoteFormComponent {
   updateTotalQty() {
     this.deliveryFormData.TOTAL_QTY = this.deliveryFormData.Details.reduce(
       (sum: number, item: any) => sum + (Number(item.DELIVERED_QUANTITY) || 0),
-      0
+      0,
     );
-    console.log('Updated TOTAL_QTY:', this.deliveryFormData.TOTAL_QTY);
   }
 
   handleClose() {}
@@ -557,7 +540,7 @@ export class DeliveryNoteFormComponent {
             index + 1
           }: Delivered Quantity cannot exceed Ordered Quantity (${
             item.QUANTITY
-          }).`
+          }).`,
         );
         isValid = false;
         return;
@@ -597,7 +580,6 @@ export class DeliveryNoteFormComponent {
       })),
     };
 
-    console.log('Final Payload:', payload);
     if (this.isEditing && this.deliveryFormData.ID) {
       payload.ID = this.deliveryFormData.ID;
     }
@@ -609,7 +591,7 @@ export class DeliveryNoteFormComponent {
         // ✔️ APPROVE existing DN
         const result = confirm(
           'Are you sure you want to approve this Delivery Note?',
-          'Confirm Approval'
+          'Confirm Approval',
         );
 
         result.then((dialogResult: boolean) => {
@@ -639,7 +621,7 @@ export class DeliveryNoteFormComponent {
         // ✔️ Confirm before saving as Approved
         const result = confirm(
           'Are you sure you want to save this Delivery Note as Approved?',
-          'Confirm Save'
+          'Confirm Save',
         );
 
         result.then((dialogResult: boolean) => {
@@ -668,64 +650,61 @@ export class DeliveryNoteFormComponent {
     }
   }
 
-   openPDF() {
+  openPDF() {
     // Call your PDF API or open a URL
-    console.log('Open PDF clicked');  
     const returnId = this.EditingResponseData.ID;
-    console.log(returnId)
     this.dataService.selectDeliveryNote(returnId).subscribe((res: any) => {
-      console.log(res,'res-----')
       this.generatePDF(res.Data);
     });
-  } 
+  }
 
   generatePDF(data: any) {
- const doc = new jsPDF('p', 'mm', 'a4');
-     const pageWidth = doc.internal.pageSize.width;
-     const pageHeight = doc.internal.pageSize.height;
-     let y = 10;
- 
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    let y = 10;
+
     // ======================================================
-     // LOGO LEFT TOP
-     // ======================================================
-     const logoX = 18,
-       logoY = 12,
-       logoW = 30,
-       logoH = 30;
-     doc.setFillColor(225, 225, 225);
-     doc.rect(logoX, logoY, logoW, logoH, 'F');
-     doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
- 
-     // ===============================================
-     // SALES INVOICE HEADING (Centered between logo & reference block)
-     // ===============================================
-     doc.setFont('helvetica', 'bold');
-     doc.setFontSize(16);
- 
-     // compute a centered X between left logo and right reference area
-     const leftEdge = 10 + logoW; // end of logo box
-     const rightEdge = pageWidth - 80; // start of reference block
-     const centerX = (leftEdge + rightEdge) / 2;
- 
-     doc.text('DELIVERY NOTE', centerX, y + 25, { align: 'center' });
- 
-     // ======================================================
-     // RIGHT-TOP HEADER (Debit Note Info)
-     // ======================================================
-     doc.setFont('helvetica', 'bold');
-     doc.setFontSize(10);
- 
-     const refX = pageWidth - 65; // moved 15mm right
- 
-     doc.text(`Invoice No : ${''}`, refX, y + 5);
-     doc.text(`Reference No : ${data.REF_NO || ''}`, refX, y + 11);
-     doc.text(`Date: ${data.DN_DATE || ''}`, refX, y + 17);
- 
-     // doc.text(`Dated : ${data[0].SALE_DATE || ""}`, pageWidth - 80, y + 23);
- 
-     y += 33;
- 
-     // ===============================================
+    // LOGO LEFT TOP
+    // ======================================================
+    const logoX = 18,
+      logoY = 12,
+      logoW = 30,
+      logoH = 30;
+    doc.setFillColor(225, 225, 225);
+    doc.rect(logoX, logoY, logoW, logoH, 'F');
+    doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
+
+    // ===============================================
+    // SALES INVOICE HEADING (Centered between logo & reference block)
+    // ===============================================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+
+    // compute a centered X between left logo and right reference area
+    const leftEdge = 10 + logoW; // end of logo box
+    const rightEdge = pageWidth - 80; // start of reference block
+    const centerX = (leftEdge + rightEdge) / 2;
+
+    doc.text('DELIVERY NOTE', centerX, y + 25, { align: 'center' });
+
+    // ======================================================
+    // RIGHT-TOP HEADER (Debit Note Info)
+    // ======================================================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+
+    const refX = pageWidth - 65; // moved 15mm right
+
+    doc.text(`Invoice No : ${''}`, refX, y + 5);
+    doc.text(`Reference No : ${data.REF_NO || ''}`, refX, y + 11);
+    doc.text(`Date: ${data.DN_DATE || ''}`, refX, y + 17);
+
+    // doc.text(`Dated : ${data[0].SALE_DATE || ""}`, pageWidth - 80, y + 23);
+
+    y += 33;
+
+    // ===============================================
     // HORIZONTAL LINE ABOVE SELLER + CUSTOMER BLOCKS
     // ===============================================
     doc.setDrawColor(0);
@@ -761,8 +740,8 @@ export class DeliveryNoteFormComponent {
       blueY + 33,
     );
     doc.text(`E-Mail : ${data.EMAIL || ''}`, blueX + 3, blueY + 38);
- 
-  // ======================================================
+
+    // ======================================================
     // CONSIGNEE (RIGHT SIDE)
     // ======================================================
     const shipX = 115;
@@ -808,205 +787,185 @@ export class DeliveryNoteFormComponent {
 
     y += 50;
 
+    // ======================================================
+    // TABLE — SAME FORMAT AS IMAGE
+    // ======================================================
+    const tableColumns = ['Item Code', 'Description', 'UOM', 'Quantity'];
 
-  // ======================================================
-     // TABLE — SAME FORMAT AS IMAGE
-     // ======================================================
-     const tableColumns = [
-       'Item Code',
-       'Description',
-       'UOM',
-       'Quantity',
-     ];
- 
-     const totalQty = data.Details.reduce(
-  (sum: number, item: any) => sum + Number(item.QUANTITY || 0),
-  0
-);
+    const totalQty = data.Details.reduce(
+      (sum: number, item: any) => sum + Number(item.QUANTITY || 0),
+      0,
+    );
 
-     const tableRows: any[] = [];
-     const footerRow = [
-       '',
-       '',
-       '', 
-       '₹ ' + totalQty.toFixed(2)
+    const tableRows: any[] = [];
+    const footerRow = ['', '', '', '₹ ' + totalQty.toFixed(2)];
 
-     ];
- 
-     data.Details.forEach((item: any, index: number) => {
-       tableRows.push([
-         // index + 1,
-         item.ITEM_CODE || '',
-         item.DESCRIPTION || '',
-         item.UOM || '',
-         item.QUANTITY?.toFixed(2) || ''
-       ]);
-     });
-     // Move y to bottom of Bill-to block
-     y = y + 2;
- 
-     // ===============================
-     // HORIZONTAL LINE LIKE THE FIGURE
-     // ===============================
-     doc.setDrawColor(0);
-     doc.setLineWidth(0.5);
-     doc.line(10, y, pageWidth - 10, y); // Full width horizontal line
- 
-     y += 5; // small gap before table
-     (doc as any).autoTable({
-       startY: y,
-       head: [tableColumns],
-       body: tableRows,
-       foot: [footerRow],
-       theme: 'grid',
-       margin: { left: 10, right: 10 },
-       styles: { fontSize: 9, cellPadding: 2 },
-       headStyles: {
-         fillColor: [230, 230, 230],
-         textColor: 0,
-         halign: 'center',
-       },
-       footStyles: {
-         fillColor: [230, 230, 230], // same color as header
-         textColor: 0,
-         fontStyle: 'bold',
-         halign: 'right',
-       },
-       columnStyles: {
-         5: { halign: 'right' }, // Amount column
-         9: { halign: 'right' }, // Total column
-       },
-     });
- 
-     y = (doc as any).lastAutoTable.finalY + 12;
-     
- 
+    data.Details.forEach((item: any, index: number) => {
+      tableRows.push([
+        // index + 1,
+        item.ITEM_CODE || '',
+        item.DESCRIPTION || '',
+        item.UOM || '',
+        item.QUANTITY?.toFixed(2) || '',
+      ]);
+    });
+    // Move y to bottom of Bill-to block
+    y = y + 2;
+
+    // ===============================
+    // HORIZONTAL LINE LIKE THE FIGURE
+    // ===============================
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(10, y, pageWidth - 10, y); // Full width horizontal line
+
+    y += 5; // small gap before table
+    (doc as any).autoTable({
+      startY: y,
+      head: [tableColumns],
+      body: tableRows,
+      foot: [footerRow],
+      theme: 'grid',
+      margin: { left: 10, right: 10 },
+      styles: { fontSize: 9, cellPadding: 2 },
+      headStyles: {
+        fillColor: [230, 230, 230],
+        textColor: 0,
+        halign: 'center',
+      },
+      footStyles: {
+        fillColor: [230, 230, 230], // same color as header
+        textColor: 0,
+        fontStyle: 'bold',
+        halign: 'right',
+      },
+      columnStyles: {
+        5: { halign: 'right' }, // Amount column
+        9: { halign: 'right' }, // Total column
+      },
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 12;
+
     // ============================================================
- // FOOTER – GST SUMMARY + TOTALS (LIKE generatePDF)
- // ============================================================
- 
- const footStartY = y + 3;
- 
- // ---------------- LEFT GST SUMMARY ----------------
- let lx = 15;
- let ly = footStartY;
- 
- doc.setFont('helvetica', 'bold');
- doc.setFontSize(10);
- 
- // Header
- doc.text('GST %', lx, ly);
- doc.text('Taxable Value', lx + 22, ly);
- doc.text('Integrated Tax', lx + 55, ly);
- doc.text('Total Tax Amount', lx + 95, ly);
- 
- // Sub headers
- doc.setFontSize(8);
- doc.text('Rate', lx + 55, ly + 5);
- doc.text('Amount', lx + 72, ly + 5);
- 
- // Values
- ly += 12;
- doc.setFont('helvetica', 'normal');
- doc.setFontSize(10);
- 
- const taxable = Number(data.GROSS_AMOUNT || 0);
- const gstAmount = Number(data.TAX_AMOUNT || 0);
- const gstPerc =
-   Number(data.Details?.CGST || 0) +
-   Number(data.Details?.SGST || 0);
- 
- doc.text(gstPerc.toFixed(2) + '%', lx, ly);
- doc.text(taxable.toFixed(2), lx + 22, ly);
- doc.text(gstPerc.toFixed(2) + '%', lx + 55, ly);
- doc.text(gstAmount.toFixed(2), lx + 72, ly);
- doc.text(gstAmount.toFixed(2), lx + 95, ly);
- 
- // Total row
- ly += 10;
- doc.setFont('helvetica', 'bold');
- doc.text(taxable.toFixed(2), lx + 22, ly);
- doc.text(gstAmount.toFixed(2), lx + 72, ly);
- doc.text(gstAmount.toFixed(2), lx + 95, ly);
- 
- // ---------------- RIGHT TOTAL SUMMARY ----------------
- let rx = pageWidth - 65;
- let ry = footStartY;
- 
- doc.setFont('helvetica', 'normal');
- doc.setFontSize(10);
- 
- const labelX = rx;
- const colonX = rx + 30;
- const valueX = rx + 40;
- 
- doc.text('Taxable Value', labelX, ry);
- doc.text(':', colonX, ry);
- doc.text(taxable.toFixed(2), valueX, ry);
- 
- ry += 6;
- doc.text('Total Tax', labelX, ry);
- doc.text(':', colonX, ry);
- doc.text(gstAmount.toFixed(2), valueX, ry);
- 
- ry += 6;
- doc.text('Round Off', labelX, ry);
- doc.text(':', colonX, ry);
- doc.text('0.00', valueX, ry);
- 
- ry += 8;
- doc.setFont('helvetica', 'bold');
- doc.text('Invoice Total', labelX, ry);
- doc.text(':', colonX, ry);
- doc.text(Number(data.NET_AMOUNT).toFixed(2), valueX, ry);
- 
- // ---------------- REVERSE CHARGE ----------------
- let wordsY = ry + 15;
- 
- doc.setFont('helvetica', 'bold');
- doc.text(
-   'Whether the tax is payable on Reverse charge basis:',
-   15,
-   wordsY
- );
- 
- doc.setFont('helvetica', 'normal');
- doc.text('No', 150, wordsY);
- 
- // ---------------- AMOUNT IN WORDS ----------------
- wordsY += 10;
- 
- doc.setFont('helvetica', 'bold');
- doc.text('Amount in words :', 15, wordsY);
- 
- doc.setFont('helvetica', 'normal');
- doc.text(
-   `INR ${numberToWordsIndianNumber(Math.floor(data.NET_AMOUNT))} Rupees Only`,
-   60,
-   wordsY
- );
- 
- 
- // ---------------- DECLARATION & REMARK ----------------
- let blockY = wordsY + 15;
- 
- doc.setFont('helvetica', 'bold');
- doc.text('Declaration :', 15, blockY);
- 
- blockY += 10;
- doc.text('Remark :', 15, blockY);
- 
- doc.setFont('helvetica', 'normal');
- doc.text(data.REF_NO || '', 40, blockY);
-     // ======================================================
-     // RETURN PDF
-     // ======================================================
-     // const pdfBlob = doc.output('blob');
-     // const pdfUrl = URL.createObjectURL(pdfBlob);
-     // return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
-     doc.output('dataurlnewwindow');
-}
+    // FOOTER – GST SUMMARY + TOTALS (LIKE generatePDF)
+    // ============================================================
 
+    const footStartY = y + 3;
+
+    // ---------------- LEFT GST SUMMARY ----------------
+    let lx = 15;
+    let ly = footStartY;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+
+    // Header
+    doc.text('GST %', lx, ly);
+    doc.text('Taxable Value', lx + 22, ly);
+    doc.text('Integrated Tax', lx + 55, ly);
+    doc.text('Total Tax Amount', lx + 95, ly);
+
+    // Sub headers
+    doc.setFontSize(8);
+    doc.text('Rate', lx + 55, ly + 5);
+    doc.text('Amount', lx + 72, ly + 5);
+
+    // Values
+    ly += 12;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    const taxable = Number(data.GROSS_AMOUNT || 0);
+    const gstAmount = Number(data.TAX_AMOUNT || 0);
+    const gstPerc =
+      Number(data.Details?.CGST || 0) + Number(data.Details?.SGST || 0);
+
+    doc.text(gstPerc.toFixed(2) + '%', lx, ly);
+    doc.text(taxable.toFixed(2), lx + 22, ly);
+    doc.text(gstPerc.toFixed(2) + '%', lx + 55, ly);
+    doc.text(gstAmount.toFixed(2), lx + 72, ly);
+    doc.text(gstAmount.toFixed(2), lx + 95, ly);
+
+    // Total row
+    ly += 10;
+    doc.setFont('helvetica', 'bold');
+    doc.text(taxable.toFixed(2), lx + 22, ly);
+    doc.text(gstAmount.toFixed(2), lx + 72, ly);
+    doc.text(gstAmount.toFixed(2), lx + 95, ly);
+
+    // ---------------- RIGHT TOTAL SUMMARY ----------------
+    let rx = pageWidth - 65;
+    let ry = footStartY;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    const labelX = rx;
+    const colonX = rx + 30;
+    const valueX = rx + 40;
+
+    doc.text('Taxable Value', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(taxable.toFixed(2), valueX, ry);
+
+    ry += 6;
+    doc.text('Total Tax', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(gstAmount.toFixed(2), valueX, ry);
+
+    ry += 6;
+    doc.text('Round Off', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text('0.00', valueX, ry);
+
+    ry += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Invoice Total', labelX, ry);
+    doc.text(':', colonX, ry);
+    doc.text(Number(data.NET_AMOUNT).toFixed(2), valueX, ry);
+
+    // ---------------- REVERSE CHARGE ----------------
+    let wordsY = ry + 15;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Whether the tax is payable on Reverse charge basis:', 15, wordsY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text('No', 150, wordsY);
+
+    // ---------------- AMOUNT IN WORDS ----------------
+    wordsY += 10;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Amount in words :', 15, wordsY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(
+      `INR ${numberToWordsIndianNumber(Math.floor(data.NET_AMOUNT))} Rupees Only`,
+      60,
+      wordsY,
+    );
+
+    // ---------------- DECLARATION & REMARK ----------------
+    let blockY = wordsY + 15;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Declaration :', 15, blockY);
+
+    blockY += 10;
+    doc.text('Remark :', 15, blockY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(data.REF_NO || '', 40, blockY);
+    // ======================================================
+    // RETURN PDF
+    // ======================================================
+    // const pdfBlob = doc.output('blob');
+    // const pdfUrl = URL.createObjectURL(pdfBlob);
+    // return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+    doc.output('dataurlnewwindow');
+  }
 }
 
 function numberToWordsIndianNumber(num: number) {

@@ -177,7 +177,6 @@ export class SaleReturnFormComponent {
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
   }
 
@@ -284,7 +283,6 @@ export class SaleReturnFormComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -327,7 +325,6 @@ export class SaleReturnFormComponent {
       .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
         this.customerList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
 

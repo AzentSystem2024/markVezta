@@ -98,7 +98,6 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
   // refreshMenu() {
   //   // Use static menu for now
   //   this.internalItems = this.staticMenu;
-  //   console.log('✅ Sidebar Items (static):', this.internalItems);
   // }
 
   refreshMenu() {
@@ -132,8 +131,6 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
         items: children,
       });
     }
-
-    console.log('✅ Sidebar Items:', this.internalItems);
   }
 
   getIconForMainMenu(menu: string): string {
@@ -203,7 +200,6 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
 
   // async onItemClick(event: DxTreeViewTypes.ItemClickEvent) {
   //   const selectedItem = event.itemData;
-  //   console.log(selectedItem, 'selecteditem');
 
   //   // Extract userLevel and componentName
   //   const componentName = selectedItem.path;
@@ -216,7 +212,6 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
   //         .getUserRightList(userLevelId, componentName)
   //         .subscribe((res: any) => {
   //           const response = res.UserRight;
-  //           console.log(response, 'response');
   //           // Save response in session
   //           sessionStorage.setItem(
   //             'menuUserRightsResponse',

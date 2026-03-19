@@ -115,7 +115,7 @@ export class StoreItemsAddFormComponent {
 
   constructor(
     private dataservice: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -142,7 +142,7 @@ export class StoreItemsAddFormComponent {
       }
 
       const hasDefaultStore = this.filteredStores.some(
-        (store) => store.IS_DEFAULT_STORE
+        (store) => store.IS_DEFAULT_STORE,
       );
       console.log(hasDefaultStore, 'HASDEFAULTSTORE');
       if (hasDefaultStore) {
@@ -151,7 +151,7 @@ export class StoreItemsAddFormComponent {
       } else {
         this.store = this.filteredStores;
         this.selectedStoreId = this.filteredStores.map(
-          (store: any) => store.ID
+          (store: any) => store.ID,
         );
         this.cdr.detectChanges();
       }
@@ -165,17 +165,15 @@ export class StoreItemsAddFormComponent {
   //   });
   // }
 
-   sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
 
   getStore() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       // Filter the stores to exclude the store with ID 1
       this.store = response.filter((store: any) => store.ID !== 1);
@@ -214,7 +212,7 @@ export class StoreItemsAddFormComponent {
       },
       (error) => {
         console.error('Error fetching items:', error);
-      }
+      },
     );
   }
 
@@ -223,25 +221,25 @@ export class StoreItemsAddFormComponent {
       // Log the filteredStores array
       console.log(
         this.filteredStores,
-        'FILTEREDSTORESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'
+        'FILTEREDSTORESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
       );
 
       // Check if any store has IS_DEFAULT_STORE set to true
       const isDefaultStore = this.filteredStores.some(
-        (store) => store.IS_DEFAULT_STORE
+        (store) => store.IS_DEFAULT_STORE,
       );
 
       if (isDefaultStore) {
         // If there's a store with IS_DEFAULT_STORE true, set filteredItemsList to allItems
         this.filteredItemsList = this.allItems;
         console.log(
-          'IS_DEFAULT_STORE is true for at least one store. Showing all items.'
+          'IS_DEFAULT_STORE is true for at least one store. Showing all items.',
         );
       } else {
         // Filter items based on itemsList if no store with IS_DEFAULT_STORE true
         this.filteredItemsList = this.allItems.filter(
           (item) =>
-            !this.itemsList.some((excludeItem) => excludeItem.ID === item.ID)
+            !this.itemsList.some((excludeItem) => excludeItem.ID === item.ID),
         );
         console.log('Filtering items based on itemsList.');
       }
@@ -260,7 +258,7 @@ export class StoreItemsAddFormComponent {
       },
       (error) => {
         console.error('Error fetching items by store ID:', error);
-      }
+      },
     );
   }
 
@@ -315,7 +313,7 @@ export class StoreItemsAddFormComponent {
                       message: 'Item is added successfully',
                       position: { at: 'top right', my: 'top right' },
                     },
-                    'success'
+                    'success',
                   );
                 } catch {}
                 console.log('Data inserted successfully', response);
@@ -326,7 +324,7 @@ export class StoreItemsAddFormComponent {
               },
               (error) => {
                 console.error('Error inserting data', error);
-              }
+              },
             );
           });
         });
@@ -365,7 +363,7 @@ export class StoreItemsAddFormComponent {
                     message: 'Item is added successfully',
                     position: { at: 'top right', my: 'top right' },
                   },
-                  'success'
+                  'success',
                 );
                 this.dataGrid.instance.refresh();
                 this.refreshDataGrid();
@@ -376,7 +374,7 @@ export class StoreItemsAddFormComponent {
             },
             (error) => {
               console.error('Error inserting data', error);
-            }
+            },
           );
         });
       });

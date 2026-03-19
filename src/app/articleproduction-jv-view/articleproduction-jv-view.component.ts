@@ -51,14 +51,13 @@ import { InvoiceTrOutAddModule } from '../pages/INVOICE/invoice-tr-out-add/invoi
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 
-
 @Component({
   selector: 'app-articleproduction-jv-view',
   templateUrl: './articleproduction-jv-view.component.html',
-  styleUrls: ['./articleproduction-jv-view.component.scss']
+  styleUrls: ['./articleproduction-jv-view.component.scss'],
 })
 export class ArticleproductionJvViewComponent {
- @Input() isEditing: boolean = false;
+  @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
@@ -106,15 +105,11 @@ export class ArticleproductionJvViewComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
     this.productionFormData.FIN_ID = this.sessionData.FINANCIAL_YEARS.FIN_ID;
     this.productionFormData.COMPANY_ID =
       this.sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -124,8 +119,6 @@ export class ArticleproductionJvViewComponent {
     if (!this.isEditing || !this.EditingResponseData) {
       return;
     }
-
-    console.log('FULL RESPONSE:', this.EditingResponseData);
 
     // Header is OBJECT
     const header = this.EditingResponseData.Header;
@@ -152,9 +145,6 @@ export class ArticleproductionJvViewComponent {
 
     // Bind grid data
     this.items = this.EditingResponseData.RawMaterials || [];
-
-    console.log('FORM DATA:', this.productionFormData);
-    console.log('GRID DATA:', this.items);
   }
 
   onRowRemoved(event: any) {}

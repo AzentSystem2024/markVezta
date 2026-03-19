@@ -150,10 +150,6 @@ export class AddMiscReceiptComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
   ngOnInit() {
     this.sessionDetails();
@@ -163,10 +159,6 @@ export class AddMiscReceiptComponent {
       this.userId = userData?.USER_ID;
       this.companyId = userData?.SELECTED_COMPANY?.COMPANY_ID;
       this.finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
-
-      console.log('User ID:', this.userId);
-      console.log('Company ID:', this.companyId);
-      console.log('Financial ID:', this.finId);
 
       if (userData.USER_ID) {
         this.miscFormData.USER_ID = userData.USER_ID;
@@ -178,7 +170,6 @@ export class AddMiscReceiptComponent {
       }
     }
     // this.getVoucherNo();
-    console.log('EditingResponseData on init:', this.EditingResponseData);
     if (this.isEditing) {
       this.isEditDataAvailable(); // load edit data
     } else {
@@ -188,7 +179,6 @@ export class AddMiscReceiptComponent {
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
   }
   private async convertToBase64(path: string): Promise<string> {
@@ -221,7 +211,6 @@ export class AddMiscReceiptComponent {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const data = this.EditingResponseData;
-    console.log(data, 'dataforedit');
     const payTypeReverseMapping: any = {
       1: 'Cash',
       2: 'Bank',
@@ -377,7 +366,6 @@ export class AddMiscReceiptComponent {
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
     const grid = this.itemsGridRef?.instance;
     e.editorOptions.onKeyDown = (event: any) => {
       if (event.event.key === 'Tab') {
@@ -581,7 +569,6 @@ export class AddMiscReceiptComponent {
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
-        console.log('API Response:', response); // <== LOG FULL RESPONSE
         this.ledgerList = response?.Data || []; // Fallback to empty array
         this.onReceiptModeChange({ value: this.receiptMode });
       },
@@ -592,11 +579,6 @@ export class AddMiscReceiptComponent {
   }
   Deparment_Drop_down() {
     this.dataService.Department_Dropdown().subscribe((res: any) => {
-      console.log(
-        res,
-        '========================department data=========================',
-      );
-
       this.Company_list = res;
     });
   }
@@ -644,7 +626,6 @@ export class AddMiscReceiptComponent {
     this.dataService.insertMiscReceipt(finalPayload).subscribe(
       (response: any) => {
         this.isSaving = false;
-        console.log(response, 'SAVED SUCCESSFULLY');
 
         notify(
           {
@@ -802,8 +783,6 @@ export class AddMiscReceiptComponent {
       DETAILS: details,
     };
 
-    console.log('Save Payload:', payload);
-
     if (this.miscFormData.IS_APPROVED) {
       const result = confirm(
         'A new Payment will be created and approved. Do you want to continue?',
@@ -942,8 +921,6 @@ export class AddMiscReceiptComponent {
       STORE_ID: this.selectedstoreId,
       DETAILS: details,
     };
-
-    console.log('Save Payload:', payload);
 
     const apiCall = this.isApproved
       ? this.dataService.approveMiscReceipt(payload)

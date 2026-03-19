@@ -98,20 +98,17 @@ export class LedgerSettingsListComponent {
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/debit');
@@ -130,7 +127,6 @@ export class LedgerSettingsListComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
   refreshGrid() {
@@ -192,7 +188,7 @@ export class LedgerSettingsListComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -208,7 +204,7 @@ export class LedgerSettingsListComponent {
     const fieldMap: any = {
       'Sales Account': 'AC_SALE_ID',
       'Purchase Account': 'AC_PURCHASE_ID',
-      'Inventory': 'AC_INVENTORY_ID',
+      Inventory: 'AC_INVENTORY_ID',
       'Input GST': 'AC_INPUT_VAT',
       'Output GST': 'AC_OUTPUT_VAT',
       'Depreciation Expense': 'AC_DEPRECIATION_EXPENSE_ID',
@@ -225,17 +221,16 @@ export class LedgerSettingsListComponent {
     });
     this.dataService.insertLedgerSettings(payload).subscribe({
       next: (res: any) => {
-        console.log('Save success', res);
-         notify(
-      {
-        message: 'Ledger settings added successfully!',
-        type: 'success',
-        displayTime: 3000,
-        position: { at: 'top center', my: 'top center' },
-      },
-      'success',
-      3000
-    );
+        notify(
+          {
+            message: 'Ledger settings added successfully!',
+            type: 'success',
+            displayTime: 3000,
+            position: { at: 'top center', my: 'top center' },
+          },
+          'success',
+          3000,
+        );
         // Optional: reload grid
         this.getLedgerSettingsList();
       },

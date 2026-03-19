@@ -171,16 +171,11 @@ export class AddMiscellaneousPaymentComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   ngOnInit() {
     this.sessionDetails();
     if (this.EditingResponseData) {
-      console.log('EditingResponseData on init:', this.EditingResponseData);
     }
 
     const userDataString = localStorage.getItem('userData');
@@ -191,9 +186,6 @@ export class AddMiscellaneousPaymentComponent {
       this.finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log('HSNCODE:', this.HSNCODE);
-      console.log('GST:', this.GST);
-      console.log('Financial ID:', this.finId);
 
       if (userData.USER_ID) {
         this.miscFormData.USER_ID = userData.USER_ID;
@@ -234,7 +226,6 @@ export class AddMiscellaneousPaymentComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -255,7 +246,6 @@ export class AddMiscellaneousPaymentComponent {
     // Map form fields
     this.miscFormData.PARTY_NAME = data.PARTY_NAME || '';
     this.miscFormData.DOC_NO = data.DOC_NO || '';
-    console.log(this.miscFormData.DOC_NO, 'VOUCHERNOOOOOOO');
     // this.miscFormData.TRANS_DATE = data.TRANS_DATE
     //   ? new Date(data.TRANS_DATE)
     //   : new Date();
@@ -368,7 +358,6 @@ export class AddMiscellaneousPaymentComponent {
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
     const grid = this.itemsGridRef?.instance;
     e.editorOptions.onKeyDown = (event: any) => {
       if (event.event.key === 'Tab') {
@@ -669,13 +658,8 @@ export class AddMiscellaneousPaymentComponent {
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
-        console.log('API Response:', response); // <== LOG FULL RESPONSE
         this.ledgerList = response?.Data || []; // Fallback to empty array
         this.onReceiptModeChange({ value: this.receiptMode });
-        console.log(
-          'Ledger List Loaded=============================:',
-          this.ledgerList,
-        );
       },
       error: (err) => {
         console.error('Ledger API Error:', err); // <== CATCH ERRORS
@@ -730,7 +714,6 @@ export class AddMiscellaneousPaymentComponent {
     this.dataService.insertMiscPayment(finalPayload).subscribe(
       (response: any) => {
         this.isSaving = false;
-        console.log(response, 'SAVED SUCCESSFULLY');
 
         notify(
           {
@@ -948,7 +931,6 @@ export class AddMiscellaneousPaymentComponent {
       }),
     };
 
-    console.log(payload, 'PAYLOADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD');
     // 5. Submit via API - Conditional: Approve or Update
     // 5. Submit via API - Conditional: Approve or Update
     if (this.isApproved) {
@@ -1039,7 +1021,6 @@ export class AddMiscellaneousPaymentComponent {
 
   get_Department_dropdown() {
     this.dataService.Department_Dropdown().subscribe((res: any) => {
-      console.log('supplier dropdown', res);
       this.Department = res;
     });
   }

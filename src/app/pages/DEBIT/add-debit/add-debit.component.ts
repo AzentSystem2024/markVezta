@@ -153,33 +153,19 @@ export class AddDebitComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
+
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-    console.log(
-      this.HSN_CODE,
-      '===========selected HSN CODE===================',
-    );
+
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
   }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
   }
 
   ngOnInit() {
@@ -189,7 +175,6 @@ export class AddDebitComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -272,25 +257,18 @@ export class AddDebitComponent {
     this.selectedSubTypeId = e.value;
     this.debitFormData.SUB_TYPE_ID = e.value;
 
-    console.log('Selected Subtype:', this.selectedSubTypeId);
-
     this.getDocNo();
   }
 
   getCompanyListDropdown() {
     // this.dataService.getDropdownData('COMPANY_LIST').subscribe((response: any) => {
     //   this.companyList = response
-    //   console.log(this.companyList,"COMPANYLIST")
     // })
   }
 
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
       this.supplierList = response;
-      console.log(
-        this.supplierList,
-        'distributorList==============================',
-      );
     });
   }
 
@@ -302,74 +280,9 @@ export class AddDebitComponent {
       .getSupplierWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
 
-  // onSupplierChanged(event: any) {
-  //   this.selectedSupplierId = event.value;
-  //   console.log(this.selectedSupplierId);
-
-  //   const selectedSupplier = this.distributorList.find(
-  //     (supplier: any) => supplier.ID === this.selectedSupplierId
-  //   );
-
-  //   console.log(selectedSupplier);
-  //   const company = this.companyState?.trim().toLowerCase();
-  //   console.log(company);
-  //   const supplier = selectedSupplier.STATE_NAME?.trim().toLowerCase();
-  //   console.log(supplier);
-  //   const sessionGst = parseFloat(this.GST) || 0; // main GST%
-  //   console.log(sessionGst);
-
-  //   if (company === supplier) {
-  //     console.log('Both states SAME → CGST + SGST apply');
-
-  //     this.showCGST = true;
-  //     this.showSGST = true;
-  //     this.showGST = false;
-
-  //     //  Split GST into CGST + SGST
-  //     const half = sessionGst / 2;
-
-  //     // Update all grid rows
-  //     this.debitFormData.NOTE_DETAIL?.forEach((row: any) => {
-  //       row.CGST = half;
-  //       row.SGST = half;
-  //       row.GST = 0; // GST becomes zero in same-state case
-  //     });
-  //   } else {
-  //     console.log('States DIFFERENT → GST applies');
-
-  //     this.showGST = true;
-  //     this.showCGST = false;
-  //     this.showSGST = false;
-
-  //     // ⭐ GST only
-  //     this.debitFormData.NOTE_DETAIL?.forEach((row: any) => {
-  //       row.GST = sessionGst;
-  //       row.CGST = 0;
-  //       row.SGST = 0;
-  //     });
-  //   }
-  //   this.selectedSupplier = selectedSupplier;
-
-  //   if (this.selectedSupplierId) {
-  //     this.debitFormData.PARTY_NAME = this.selectedSupplier.DESCRIPTION;
-  //     console.log(this.selectedSupplier.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
-  //   }
-
-  //   if (this.selectedSupplierId) {
-  //     this.debitFormData.SUPP_ID = this.selectedSupplierId;
-  //     console.log(
-  //       this.selectedSupplierId,
-  //       'SELECTEDSUPPLIERIDDDDDDDDDDDDDDDDDD'
-  //     );
-  //     this.getPendingInvoices(); // Pass supplier ID here
-  //   } else {
-  //     // this.pendingInvoicelist = [];
-  //   }
-  // }
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
 
@@ -470,7 +383,6 @@ export class AddDebitComponent {
   }
 
   openInvoicePopup() {
-    console.log('EVENT ');
     this.getPendingInvoices(); // Ensure you load fresh data
     this.invoicePopupVisible = true;
   }
@@ -518,7 +430,6 @@ export class AddDebitComponent {
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
-      console.log('Ledger List Loaded:', this.ledgerList);
     });
   }
 
@@ -547,7 +458,6 @@ export class AddDebitComponent {
   };
 
   onEditorPreparing(e: any) {
-    console.log(e, 'editor preparing event');
     if (
       e.dataField === 'SL_NO' ||
       e.dataField === 'ledgerCode' ||
@@ -600,7 +510,6 @@ export class AddDebitComponent {
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
 
     // ➤ SL_NO: Move to ledgerCode on Enter
     if (e.dataField === 'SL_NO') {
@@ -611,10 +520,6 @@ export class AddDebitComponent {
 
           const rowIndex = visibleRows.findIndex(
             (r) => r?.data === e.row?.data,
-          );
-          console.log(
-            'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex,
           );
 
           setTimeout(() => {
@@ -830,7 +735,6 @@ export class AddDebitComponent {
   }
 
   validateGstAmount(e: any) {
-    console.log(e, 'sasas');
     const row = e.data;
     // If Amount is null or undefined, allow editing
     if (row.Amount == null) return true;
@@ -856,7 +760,6 @@ export class AddDebitComponent {
     this.dataService.getDocNoForDebit(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
       this.debitFormData.DOC_NO = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -884,15 +787,6 @@ export class AddDebitComponent {
     const gstTotal = totalItems?.[1]?.value || 0;
 
     this.netAmountDisplay = amountTotal + gstTotal;
-
-    console.log(
-      'Amount:',
-      amountTotal,
-      'GST:',
-      gstTotal,
-      'Net Total:',
-      this.netAmountDisplay,
-    );
   }
 
   calculateAmount = (rowData: any): number => {
@@ -934,7 +828,6 @@ export class AddDebitComponent {
     if (this.debitFormData.ROUND_OFF) {
       this.netTotal = Math.round(this.netTotal);
     }
-    // console.log(this.netTotal, 'NETTOTALLLLLLLL');
     return this.netTotal.toFixed(2);
   }
 
@@ -960,7 +853,6 @@ export class AddDebitComponent {
         SALE_DATE: this.formatDate(new Date()),
       }),
     );
-    console.log('FRONTEND FINAL PAYLOAD:', JSON.stringify(payload, null, 2));
 
     this.dataService.insertDebitNote(payload).subscribe(
       (response: any) => {
@@ -1002,10 +894,8 @@ export class AddDebitComponent {
 
     const netAmount = totalAmount + totalGST;
     const dueAmount = Number(this.debitFormData?.DUE_AMOUNT) || 0;
-    console.log(netAmount, dueAmount, 'netadmount,dueamount');
 
     if (Number(netAmount) > dueAmount) {
-      console.log(netAmount, dueAmount, 'NOTIFYNETAMOUNT');
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
       return;
     }
@@ -1108,7 +998,6 @@ export class AddDebitComponent {
       this.debitFormData.SALE_DATE,
     );
     this.debitFormData.COMPANY_ID = this.selectedCompany;
-    console.log(this.debitFormData.NET_AMOUNT, 'NETAMOUNT');
 
     //  NEW LOGIC HERE
     if (this.debitFormData.IS_APPROVED) {

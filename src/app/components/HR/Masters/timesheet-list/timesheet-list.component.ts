@@ -198,16 +198,12 @@ export class TimesheetListComponent {
   ) {}
 
   ngOnInit() {
-    console.log(this.selectedMonth, 'SELECTEDMONTH===========');
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/credit-note');
@@ -243,13 +239,7 @@ export class TimesheetListComponent {
     // }).replace(/\s/g, ''), // removes the space → "July2025"
     //   }
     //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-    //     console.log(response, 'Timesheet List Response');
     //     this.timesheetList = response.data
-    //     // console.log(
-    //     //   this.timesheetList,
-    //     //   'Filtered Timesheet for',
-    //     //   selectedMonthStr
-    //     // );
     //   });
   }
 
@@ -413,7 +403,6 @@ export class TimesheetListComponent {
       month: 'long',
       year: 'numeric',
     }); // e.g. "Apr 2025"
-    // console.log('Selected month string:', selectedMonthStr);/
   }
 
   getStatusFlagClass(status: string): string {
@@ -451,13 +440,8 @@ export class TimesheetListComponent {
     // }).replace(/\s/g, ''), // removes the space → "July2025"
     //   }
     //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-    //     console.log(response, 'Timesheet List Response');
     //     this.timesheetList = response.data
-    //     // console.log(
-    //     //   this.timesheetList,
-    //     //   'Filtered Timesheet for',
-    //     //   selectedMonthStr
-    //     // );
+    //
     //   });
 
     this.fetchTimesheetList();
@@ -476,9 +460,7 @@ export class TimesheetListComponent {
     // }).replace(/\s/g, ''), // removes the space → "July2025"
     //   }
     //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-    //     console.log(response, 'Timesheet List Response');
     //     this.timesheetList = response.data
-    //     // console.log(
     //     //   this.timesheetList,
     //     //   'Filtered Timesheet for',
     //     //   selectedMonthStr
@@ -488,8 +470,6 @@ export class TimesheetListComponent {
   }
 
   onVerifyClick(e: any): void {
-    // console.log('Verify clicked:', e); // <-- Add this
-
     e.cancel = true;
     const timesheetId = e.row?.data?.ID;
 
@@ -500,8 +480,6 @@ export class TimesheetListComponent {
 
     this.dataService.selectTimesheet(timesheetId).subscribe({
       next: (response: any) => {
-        // console.log('Salary revision fetched:', response); // <-- Add this
-
         this.selectedTimesheet = response;
         this.verifyTimesheetPopupOpened = true;
       },
@@ -512,8 +490,6 @@ export class TimesheetListComponent {
   }
 
   onApproveClick(e: any): void {
-    // console.log('Verify clicked:', e); // <-- Add this
-    console.log(e, 'EVENTTTTTTTTTTT');
     e.cancel = true;
     const employeeId = e.row?.data?.ID;
 
@@ -524,8 +500,6 @@ export class TimesheetListComponent {
 
     this.dataService.selectTimesheet(employeeId).subscribe({
       next: (response: any) => {
-        // console.log('Salary revision fetched:', response); // <-- Add this
-
         this.selectedTimesheet = response;
         this.approveTimesheetPopupOpened = true;
       },
@@ -541,14 +515,12 @@ export class TimesheetListComponent {
 
     this.selectedMonthForAdd = `${year}-${month}`;
 
-    console.log(this.selectedMonthForAdd, 'SELECTEDMONTH');
     this.addTimesheetPopupOpened = true;
   }
 
   // addTimesheet() {
   //   const month = this.selectedMonth.toISOString().slice(0, 7);
   //   this.selectedMonthForAdd = month;
-  //   console.log(month, 'SELECTEDMONTHHHHHHHH');
   //   this.addTimesheetPopupOpened = true;
   // }
 
@@ -582,7 +554,6 @@ export class TimesheetListComponent {
 
   onDeleteTimesheet(e: any) {
     const timesheetIdId = e.data.ID;
-    console.log(timesheetIdId, 'delete');
     // Optionally prevent the default delete behavior
     e.cancel = true;
 
@@ -617,7 +588,6 @@ export class TimesheetListComponent {
   }
 
   handleClose() {
-    // console.log('Parent: popupClosed triggered');
     this.addTimesheetPopupOpened = false; // closes the popup
     this.editTimesheetPopupOpened = false;
     this.verifyTimesheetPopupOpened = false;
@@ -627,7 +597,6 @@ export class TimesheetListComponent {
 
   // onSelectionChanged(e: any) {
   //   this.selectedRowKeys = e.selectedRowKeys;
-  //   console.log('User selected:', this.selectedRowKeys);
   // }
 
   onSelectionChanged(e: any) {
@@ -657,27 +626,16 @@ export class TimesheetListComponent {
   //      IDs: this.selectedRowKeys[0]
   //   }
   //   this.dataService.Timesheet_Approval_Api(payload).subscribe((response: any) => {
-  //     console.log(response, 'Timesheet Approve   List Response');
   //     this.timesheetList = response.data
   //     this.selectedRowKeys = []; // clear selection after success
 
-  //     // console.log(
-  //     //   this.timesheetList,
-  //     //   'Filtered Timesheet for',
-  //     //   selectedMonthStr
-  //     // );
+  //
   //   });
 
   // }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
-    // this.CompanyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    // console.log(
-    //   this.CompanyID,
-    //   '============selected_Company_id==============',
-    // );
   }
 
   fetchTimesheetList() {
@@ -692,7 +650,6 @@ export class TimesheetListComponent {
     };
 
     this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-      console.log(response, 'Timesheet List Response');
       this.timesheetList = response.data;
       this.updateApproveButtonState();
     });
@@ -719,7 +676,6 @@ export class TimesheetListComponent {
   }
 
   ApproveBulkRows() {
-    console.log(this.selectedRowKeys, 'INAPPROVE');
     //  Check if nothing selected
     if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
       notify(
@@ -736,14 +692,10 @@ export class TimesheetListComponent {
       IDs: this.selectedRowKeys,
     };
 
-    console.log('Payload sent to API:', payload);
-
     this.dataService
       .Timesheet_Approval_Api(payload)
       .subscribe((response: any) => {
-        console.log(response, 'Timesheet Approve List Response');
         // this.timesheetList = response;
-        console.log(this.timesheetList, 'Filtered Timesheet for');
         this.selectedRowKeys = []; // Clear selection after success
         notify(
           {

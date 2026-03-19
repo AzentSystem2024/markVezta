@@ -44,7 +44,7 @@ export class DealerComponent {
   currentFilter: string = 'auto';
   selectedData: any;
   formsource: any;
-  districtformsource :any;
+  districtformsource: any;
   addPopup: boolean = false;
   editPopup: boolean = false;
   newPopupDistrict: boolean = false;
@@ -150,12 +150,15 @@ export class DealerComponent {
   canApprove = false;
   canPrint = false;
 
-  constructor(private fb: FormBuilder, private dataservice: DataService,private router : Router) {
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private router: Router,
+  ) {
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
-      console.log(this.countries, 'countries');
     });
-     dataservice.getCountryData().subscribe((response) => {
+    dataservice.getCountryData().subscribe((response) => {
       this.country = response;
     });
     this.formsource = this.fb.group({
@@ -199,7 +202,7 @@ export class DealerComponent {
     this.districtformsource = this.fb.group({
       District: [null, Validators.required],
       DistrictID: [null, Validators.required],
-});
+    });
 
     this.get_Country_Dropdown_List();
     this.get_State_Dropdown_List();
@@ -216,30 +219,27 @@ export class DealerComponent {
     this.passwordMode = this.passwordMode === 'password' ? 'text' : 'password';
   };
 
-     ngOnInit(){
-const currentUrl = this.router.url;
-  console.log('Current URL:', currentUrl);
-   const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
-  console.log('Parsed ObjectData:', menuResponse);
+  ngOnInit() {
+    const currentUrl = this.router.url;
 
-  const menuGroups = menuResponse.MenuGroups || [];
-  console.log('MenuGroups:', menuGroups);
-const packingRights = menuGroups
-  .flatMap(group => group.Menus)
-  .find(menu => menu.Path === '/dealer');
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
-if (packingRights) {
-  this.canAdd = packingRights.CanAdd;
-  this.canEdit = packingRights.CanEdit;
-  this.canDelete = packingRights.CanDelete;
-    this.canPrint = packingRights.CanEdit;
-  this.canView = packingRights.canView;
-   this.canApprove = packingRights.canApprove;
-}
+    const menuGroups = menuResponse.MenuGroups || [];
 
-console.log('packingRights',packingRights);
-console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/dealer');
 
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
   }
 
   statusCellTemplate = (cellElement: any, cellInfo: any) => {
@@ -265,8 +265,6 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
   };
 
   onExporting(event: any) {
-    console.log('Exporting event', event);
-
     const fileName = 'file-name';
     this.dataservice.exportDataGrid(event, fileName);
   }
@@ -356,7 +354,6 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     // });
   }
 
-
   addNewDisctrict() {
     this.newPopupDistrict = true;
     setTimeout(() => {
@@ -387,7 +384,6 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     }
   }
 
-
   CityData() {
     const validationResult = this.newformValidationGroup?.instance?.validate();
     const commenDetails = this.formsource.value;
@@ -407,7 +403,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'success'
+        'success',
       );
       this.newPopupCity = false;
       this.get_City_Dropdown_List();
@@ -416,18 +412,17 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
 
   DisctrictData() {
     const validationResult = this.formValidationGroup?.instance?.validate();
-   const districtName = this.districtformsource.get('District')?.value?.trim() || '';
+    const districtName =
+      this.districtformsource.get('District')?.value?.trim() || '';
 
- 
-  // const validationResult = this.formValidationGroup?.instance?.validate();
-//  const commenDetails = this.formsource.value;
+    // const validationResult = this.formValidationGroup?.instance?.validate();
+    //  const commenDetails = this.formsource.value;
 
-
-  const payload = {
-    DISTRICT_NAME: districtName,
-    COUNTRY_ID: Number(this.formsource.get('Country')?.value),
-    STATE_ID: Number(this.formsource.get('State')?.value),
-  };
+    const payload = {
+      DISTRICT_NAME: districtName,
+      COUNTRY_ID: Number(this.formsource.get('Country')?.value),
+      STATE_ID: Number(this.formsource.get('State')?.value),
+    };
     this.dataservice.Insert_NewDistrict_Api(payload).subscribe((res: any) => {
       notify(
         {
@@ -435,7 +430,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'success'
+        'success',
       );
       this.newPopupDistrict = false;
       this.get_District_Dropdown_List();
@@ -443,19 +438,14 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
   }
 
   onDealerTypeChange(event: any) {
-    // console.log(event, 'event++++++++++');
     this.SelectedDealer = event.value;
-    //  console.log(this.SelectedDealer, 'SelectedDealer++++++++++');
   }
-
 
   onDistributorValue(event: any) {
     this.selectedDistributorId = event.value;
     // this.DistributorId = event.value;
     this.get_Distributor_Dropdown_List();
-    console.log(this.selectedDistributorId, 'selectedDistributorId++++++++++');
   }
-
 
   onWarehouseValue(event: any) {
     this.selectedWarehouseId = event.value;
@@ -474,7 +464,6 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     this.CountryId = event.value;
     this.get_Country_Dropdown_List();
     this.get_State_Dropdown_List();
-    // console.log(this.selectedCountryId, 'selectedCountryId++++++++++');
   }
 
   onStateValue(event: any) {
@@ -482,66 +471,50 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     this.StateId = event.value;
     this.get_State_Dropdown_List();
     this.get_District_Dropdown_List();
-    // console.log(this.selectedStateId, 'selectedStateId++++++++++');
   }
 
   onDistrictValue(event: any) {
-    console.log(event, 'event');
     const selectedItem = event.component.option('selectedItem');
     const district = selectedItem?.DESCRIPTION;
-
-    console.log('Selected District Name:', selectedItem?.DESCRIPTION);
 
     this.formsource.patchValue({
       District: district,
     });
-    console.log(this.formsource.value);
 
     this.selectedDistrictId = event.value;
     this.DistrictID = event.value;
     this.get_District_Dropdown_List();
     this.get_City_Dropdown_List();
-    // console.log(this.selectedDistrictId, 'selectedDistrictId++++++++++');
   }
 
   //==============CITY DROPDOWN VALUE CHANGE EVENT==
   onCityValueChanged(event: any) {
-    console.log(event, 'event');
     const selectedItem = event.component.option('selectedItem');
     const city = selectedItem?.DESCRIPTION;
-
-    console.log('Selected District Name:', selectedItem?.DESCRIPTION);
 
     this.formsource.patchValue({
       City: city,
     });
-    console.log(this.formsource.value);
   }
 
   //===============get Dropdown List=======================
   get_Country_Dropdown_List() {
     this.dataservice.get_Country_Dropdown_Api().subscribe((response: any) => {
-      // console.log(response, 'response++++++++++');
       this.Country = response;
     });
   }
 
   //===============get Dropdown List=======================
   get_State_Dropdown_List() {
-    // console.log('function working');
-
     this.dataservice
       .get_State_Dropdown_Api(name, this.CountryId)
       .subscribe((response: any) => {
-        // console.log(response, 'response++++++++++');
         this.State = response;
       });
   }
 
   //===============get Dropdown List=======================
   get_District_Dropdown_List() {
-    // console.log('function working');
-
     this.dataservice
       .get_District_Dropdown_Api(name, this.StateId)
       .subscribe((response: any) => {
@@ -554,7 +527,6 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     this.dataservice
       .get_City_Dropdown_Api(name, this.DistrictID)
       .subscribe((response: any) => {
-        // console.log(response, 'response++++++++++');
         this.City = response;
       });
   }
@@ -582,13 +554,10 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
     });
   }
 
-   showCountry(){
-     this.dataservice.getCountryData().subscribe(
-      (response)=>{
-            this.country=response;
-            console.log(response);
-      }
-     )
+  showCountry() {
+    this.dataservice.getCountryData().subscribe((response) => {
+      this.country = response;
+    });
   }
 
   //===================get data list========================
@@ -605,7 +574,6 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
   }
 
   addData() {
-    console.log('working');
     // const validationResult = this.formValidationGroup?.instance?.validate();
     const commenDetails = this.formsource.value;
     const payload = {
@@ -667,7 +635,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return; // Stop execution if duplicate found
     }
@@ -684,7 +652,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -699,7 +667,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'success'
+        'success',
       );
 
       this.addPopup = false;
@@ -712,19 +680,16 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
   }
 
   Select_Dealer(event: any) {
-    this.ID = event.data.ID
+    this.ID = event.data.ID;
 
     this.dataservice.Select_Dealer_Api(this.ID).subscribe((response: any) => {
       // cons
       this.selectedData = response.Data;
       // this.SelectedDealer =this.selectedData.PARENT_ID
 
-      
       this.distric_id_value = this.selectedData.DISTRICT_ID;
       this.SelectedDealer = this.selectedData?.PARENT_ID === 0 ? 0 : 1;
-    this.distributerid = (this.selectedData.PARENT_ID);
-        console.log(this.selectedDistributorId, 'selcteddistributorId');
-      console.log(this.SelectedDealer, 'selecteddealer');
+      this.distributerid = this.selectedData.PARENT_ID;
       this.city_id_value = this.selectedData.CITY_ID;
       this.formsource.patchValue({
         ID: this.selectedData.ID,
@@ -824,7 +789,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return; // Stop execution if duplicate found
     }
@@ -843,7 +808,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -855,7 +820,7 @@ console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'success'
+        'success',
       );
 
       this.addPopup = false;

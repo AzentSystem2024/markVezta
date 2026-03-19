@@ -77,10 +77,6 @@ export class VerifyMiscellaneousPaymentComponent {
       changes['miscellaneousData'] &&
       changes['miscellaneousData'].currentValue
     ) {
-      // console.log(
-      //   'Received miscellaneousData:',
-      //   changes['miscellaneousData'].currentValue
-      // );
       // Deep copy to avoid reference issues
       this.miscFormData = {
         ...this.miscFormData,
@@ -90,12 +86,9 @@ export class VerifyMiscellaneousPaymentComponent {
   }
 
   getEmployeeDropdown() {
-    this.dataService
-      .getDropdownData('EMPLOYEE')
-      .subscribe((response: any) => {
-        this.employee = response;
-
-      });
+    this.dataService.getDropdownData('EMPLOYEE').subscribe((response: any) => {
+      this.employee = response;
+    });
   }
 
   getSalaryHead() {
@@ -103,7 +96,6 @@ export class VerifyMiscellaneousPaymentComponent {
       .getDropdownData('SALARY_HEAD')
       .subscribe((response: any) => {
         this.salaryHead = response;
-
       });
   }
 
@@ -128,7 +120,7 @@ export class VerifyMiscellaneousPaymentComponent {
                 message: 'Miscellaneous Payment Verified Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
-              'success'
+              'success',
             );
             this.popupClosed.emit();
           } else {
@@ -137,7 +129,7 @@ export class VerifyMiscellaneousPaymentComponent {
                 message: 'Your Data Not updated',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
         });
@@ -147,11 +139,6 @@ export class VerifyMiscellaneousPaymentComponent {
   handleClose() {
     this.popupClosed.emit();
   }
-
-
-
-
-  
 }
 
 @NgModule({
