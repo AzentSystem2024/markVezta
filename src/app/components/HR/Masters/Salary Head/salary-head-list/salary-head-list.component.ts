@@ -120,14 +120,11 @@ export class SalaryHeadListComponent {
     private router: Router,
   ) {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/salary-head');
@@ -141,8 +138,6 @@ export class SalaryHeadListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sesstion_Details();
     this.getSalaryHeadList();
   }
@@ -171,14 +166,8 @@ export class SalaryHeadListComponent {
   }
 
   getStatusFlagClass(IS_INACTIVE: string): string {
-    // console.log('Status:', IS_INACTIVE);
-
     return IS_INACTIVE ? 'flag-red' : 'flag-green';
   }
-  // onFormClosed(saved: boolean) {
-  //   this.addSalaryHeadPopupOpened = false;
-  //   // this.getEmployeeList(); // reload the data
-  // }
 
   handleEditClose() {
     this.EditSalaryHeadPopupOpened = false;
@@ -194,7 +183,6 @@ export class SalaryHeadListComponent {
   //=======================list data=============
   // getSalaryHeadList() {
   //   this.dataservice.get_salary_head_list().subscribe((res: any) => {
-  //     console.log('Salary Head List:', res);
 
   //     this.salaryHeadList=res.Data
   //   })
@@ -202,12 +190,7 @@ export class SalaryHeadListComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   getSalaryHeadList() {
@@ -215,8 +198,6 @@ export class SalaryHeadListComponent {
       COMPANY_ID: this.selected_Company_id,
     };
     this.dataservice.get_salary_head_list(payload).subscribe((res: any) => {
-      console.log('Salary Head List:', res);
-
       this.salaryHeadList = res.Data.map((item: any, index: number) => {
         return {
           ...item,
@@ -227,7 +208,6 @@ export class SalaryHeadListComponent {
   }
 
   addSalaryHead() {
-    console.log('Add Salary Head clicked');
     this.addSalaryHeadPopupOpened = true;
     if (this.SalaryHeadAddComponent) {
       this.SalaryHeadAddComponent.setDefaultValues();
@@ -239,22 +219,14 @@ export class SalaryHeadListComponent {
     // Logic to handle editing of salary head
     event.cancel = true;
 
-    console.log('Editing Salary Head:', event);
-
     const id = event.data.ID;
     this.dataservice.select_salary_head(id).subscribe((res: any) => {
-      console.log('Selected Salary Head Data:', res);
       this.Selected_salaryHead_Data = res;
-      console.log(
-        '==========selected data================',
-        this.Selected_salaryHead_Data,
-      );
     });
     this.EditSalaryHeadPopupOpened = true;
   }
   OnDeleteSalaryHead(event: any) {
     // Logic to handle deletion of salary head
-    console.log('Deleting Salary Head:', event);
     const id = event.data.ID;
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
@@ -262,7 +234,6 @@ export class SalaryHeadListComponent {
       return;
     }
     this.dataservice.delete_salary_Head(id).subscribe((res: any) => {
-      console.log(' res');
       notify(
         {
           message: 'Salary Head Deleted successfully ',

@@ -122,7 +122,7 @@ export class ProfitAndLossComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    // console.log(sessionData, '=================session data==========');
+    //
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     // console.log(
@@ -179,7 +179,7 @@ export class ProfitAndLossComponent {
 
   get_sessionstorage_data() {
     this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    // console.log(this.savedUserData);
+    //   ;
     this.company_list = this.savedUserData.Companies;
   }
 
@@ -192,7 +192,6 @@ export class ProfitAndLossComponent {
   }
 
   onCompanyChange(event: any) {
-    console.log(event);
     this.company_id = event.value;
     // console.log(this.company_id, '=====company id');
   }
@@ -200,13 +199,13 @@ export class ProfitAndLossComponent {
   onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
-    // console.log('Formatted Date:', this.formatted_from_date); // example: "2025-04-01"
+    //       // example: "2025-04-01"
   }
 
   onToDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
-    // console.log('Formatted Date:', this.formatted_To_date); // example: "2025-04-01"
+    //      // example: "2025-04-01"
   }
 
   formatDate(date: Date): string {
@@ -267,7 +266,7 @@ export class ProfitAndLossComponent {
   };
 
   onViewClick(e: any) {
-    // console.log(e, 'event');
+    //
     this.HeadId = e.row.data.HEAD_ID;
     // console.log(this.HeadId);
     sessionStorage.removeItem('HEADID');

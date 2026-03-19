@@ -46,10 +46,10 @@ import notify from 'devextreme/ui/notify';
 @Component({
   selector: 'app-stock-adjustment-list',
   templateUrl: './stock-adjustment-list.component.html',
-  styleUrls: ['./stock-adjustment-list.component.scss']
+  styleUrls: ['./stock-adjustment-list.component.scss'],
 })
 export class StockAdjustmentListComponent {
- @ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -71,9 +71,9 @@ export class StockAdjustmentListComponent {
   selected_vat_id: any;
   customStartDate: any = null;
   customEndDate: any = null;
-  startDate:Date
-  EndDate:Date
-    showCustomDatePopup = false;
+  startDate: Date;
+  EndDate: Date;
+  showCustomDatePopup = false;
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -95,62 +95,57 @@ export class StockAdjustmentListComponent {
     },
     elementAttr: { class: 'add-button' },
   };
-  isAddStock_adj: boolean=false
+  isAddStock_adj: boolean = false;
   Stock_adjustment_list: any;
   selected_Data: any;
   is_Edit_popup: boolean;
   selectedTrOut: any;
-  isReadOnlyMode:boolean=false
+  isReadOnlyMode: boolean = false;
 
-   dateRanges = [
+  dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'Last 7 Days', value: 'last7' },
     { label: 'Last 15 Days', value: 'last15' },
     { label: 'This Month', value: 'last30' },
-     { label: 'All', value: 'all' },
+    { label: 'All', value: 'all' },
     // { label: 'Custom', value: 'custom' },
-      { label: this.customLabel, value: 'custom' }
-
-
+    { label: this.customLabel, value: 'custom' },
   ];
-    gridButtons = [
-  'edit',
-  {
-    name: 'delete',
-    visible: (e: any) => e.row?.data?.TRANS_STATUS==1
-  }
-];
+  gridButtons = [
+    'edit',
+    {
+      name: 'delete',
+      visible: (e: any) => e.row?.data?.TRANS_STATUS == 1,
+    },
+  ];
   selectedDateRange: string = 'today';
- 
+
   filteredInvoiceList: any;
   filteredStockList: any;
   constructor(
     private dataService: DataService,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
   ) {
-    if(this.selectedDateRange==='today'){
-   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+    if (this.selectedDateRange === 'today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-   this.startDate=new Date(today)
-   this.EndDate=new Date(today)
-   console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
+      this.startDate = new Date(today);
+      this.EndDate = new Date(today);
+      console.log(this.startDate, '=======start date=====');
+      console.log(this.EndDate, '=======End date=====');
     }
-
   }
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax()
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -168,76 +163,72 @@ console.log(this.EndDate,'=======End date=====')
     }
     this.get_stock_adjustment_list();
   }
-applyCustomDateFilter() {
-  const start = new Date(this.customStartDate);  // keep as Date
-  const end = new Date(this.customEndDate);      // keep as Date
+  applyCustomDateFilter() {
+    const start = new Date(this.customStartDate); // keep as Date
+    const end = new Date(this.customEndDate); // keep as Date
 
-  // ✅ Use Date objects for filtering
-  this.dataService.List_Stock_Adjustment_Data().subscribe((res: any) => {
-    const allData = res.Data;
-    this.filteredStockList = allData.filter((item: any) => {
-      const itemDate = new Date(item.ADJ_DATE);
-      return itemDate >= start && itemDate <= end;
-    });
-  });
-
-  // // ✅ Format dates for label only
-  // const fromLabel = this.formatAsDDMMYYYY(start);
-  // const toLabel = this.formatAsDDMMYYYY(end);
-  // this.customLabel = `${fromLabel} to ${toLabel}`;
- // ✅ Update dateRanges array label
-  const customOption = this.dateRanges.find(dr => dr.value === 'custom');
-  if (customOption) {
-    customOption.label = this.customLabel;
-  }
-
-  // ✅ Mark selected
-  this.selectedDateRange = 'custom';
-
-  // ✅ Close popup
-  this.showCustomDatePopup = false;
-}
-
-// Example formatter (dd/MM/yyyy)
-// formatAsDDMMYYYY(date: Date): string {
-//   const day = date.getDate().toString().padStart(2, '0');
-//   const month = (date.getMonth() + 1).toString().padStart(2, '0');
-//   const year = date.getFullYear();
-//   return `${day}/${month}/${year}`;
-// }
-
-get_stock_adjustment_list(){
-
-  this.dataService.List_Stock_Adjustment_Data().subscribe((res:any)=>{
-    console.log(res)
-        const allData = res.Data;
-    const dateField = 'ADJ_DATE';
-
-    // If 'all' is selected, skip filtering
-    if (this.selectedDateRange === 'all') {
-      this.filteredStockList = allData;
-    } else {
-      const start = new Date(this.startDate);
-      const end = new Date(this.EndDate);
-      end.setHours(23, 59, 59, 999);
-
+    // ✅ Use Date objects for filtering
+    this.dataService.List_Stock_Adjustment_Data().subscribe((res: any) => {
+      const allData = res.Data;
       this.filteredStockList = allData.filter((item: any) => {
-        const itemDate = new Date(item[dateField]);
+        const itemDate = new Date(item.ADJ_DATE);
         return itemDate >= start && itemDate <= end;
       });
+    });
+
+    // // ✅ Format dates for label only
+    // const fromLabel = this.formatAsDDMMYYYY(start);
+    // const toLabel = this.formatAsDDMMYYYY(end);
+    // this.customLabel = `${fromLabel} to ${toLabel}`;
+    // ✅ Update dateRanges array label
+    const customOption = this.dateRanges.find((dr) => dr.value === 'custom');
+    if (customOption) {
+      customOption.label = this.customLabel;
     }
 
-    // this.filteredStockList=res.Data
-  })
+    // ✅ Mark selected
+    this.selectedDateRange = 'custom';
 
+    // ✅ Close popup
+    this.showCustomDatePopup = false;
+  }
 
-}
- formatDate(date: Date): string {
-  const month = date.getMonth() + 1; // Months are 0-based
-  const day = date.getDate();
-  const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
-}
+  // Example formatter (dd/MM/yyyy)
+  // formatAsDDMMYYYY(date: Date): string {
+  //   const day = date.getDate().toString().padStart(2, '0');
+  //   const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  //   const year = date.getFullYear();
+  //   return `${day}/${month}/${year}`;
+  // }
+
+  get_stock_adjustment_list() {
+    this.dataService.List_Stock_Adjustment_Data().subscribe((res: any) => {
+      const allData = res.Data;
+      const dateField = 'ADJ_DATE';
+
+      // If 'all' is selected, skip filtering
+      if (this.selectedDateRange === 'all') {
+        this.filteredStockList = allData;
+      } else {
+        const start = new Date(this.startDate);
+        const end = new Date(this.EndDate);
+        end.setHours(23, 59, 59, 999);
+
+        this.filteredStockList = allData.filter((item: any) => {
+          const itemDate = new Date(item[dateField]);
+          return itemDate >= start && itemDate <= end;
+        });
+      }
+
+      // this.filteredStockList=res.Data
+    });
+  }
+  formatDate(date: Date): string {
+    const month = date.getMonth() + 1; // Months are 0-based
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  }
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
@@ -255,30 +246,28 @@ get_stock_adjustment_list(){
     cellElement.appendChild(icon);
   }
 
-delete_Data(e:any){
-  const id=e.data.ID
-   this.dataService.Delete_Stock_Adjustment_Data(id).subscribe((res:any)=>{
-    console.log(res)
-        notify(
-                                         {
-                                    message: ' Stock Adjustment Deleted successfully',
-                                    position: { at: 'top right', my: 'top right' },
-                                    displayTime: 1000,
-                                  },
-                                  'success'
-                                );
+  delete_Data(e: any) {
+    const id = e.data.ID;
+    this.dataService.Delete_Stock_Adjustment_Data(id).subscribe((res: any) => {
+      notify(
+        {
+          message: ' Stock Adjustment Deleted successfully',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1000,
+        },
+        'success',
+      );
 
-                                this.get_stock_adjustment_list()
-
-   })
-}
-AddStock_adustment(){
-  this.isAddStock_adj=true
-}
-    refreshGrid() {
+      this.get_stock_adjustment_list();
+    });
+  }
+  AddStock_adustment() {
+    this.isAddStock_adj = true;
+  }
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
-      this.get_stock_adjustment_list()
+      this.get_stock_adjustment_list();
     }
   }
 
@@ -293,37 +282,36 @@ AddStock_adustment(){
     },
   ];
 
-//   onDateRangeChanged(e: any) {
-//     this.selectedDateRange = e.value;
-// console.log(e,'==========date=================')
-//     if (e.value === 'custom') {
-//       this.customStartDate = null;
-//       this.customEndDate = null;
-//       this.showCustomDatePopup = true;
-//     } else {
-//       // Reset the custom label
-//       const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-//       if (customOpt) {
-//         customOpt.label = 'Custom';
-//       }
-//       // this.applyDateFilter();
-//     }
-//   }
-onEditStock(event:any){
-  event.cancel=true
-this.is_Edit_popup=true
-const id=event.data.ID
-this.dataService.select_Stock_Adjustment_Data(id).subscribe((res:any)=>{
-  this.selected_Data=res.Data
-})
-
-}
- onToolbarPreparing(e: any) {
+  //   onDateRangeChanged(e: any) {
+  //     this.selectedDateRange = e.value;
+  // console.log(e,'==========date=================')
+  //     if (e.value === 'custom') {
+  //       this.customStartDate = null;
+  //       this.customEndDate = null;
+  //       this.showCustomDatePopup = true;
+  //     } else {
+  //       // Reset the custom label
+  //       const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
+  //       if (customOpt) {
+  //         customOpt.label = 'Custom';
+  //       }
+  //       // this.applyDateFilter();
+  //     }
+  //   }
+  onEditStock(event: any) {
+    event.cancel = true;
+    this.is_Edit_popup = true;
+    const id = event.data.ID;
+    this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
+      this.selected_Data = res.Data;
+    });
+  }
+  onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -338,7 +326,7 @@ this.dataService.select_Stock_Adjustment_Data(id).subscribe((res:any)=>{
       });
     }
   }
-   toggleFilters() {
+  toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
     const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
@@ -349,68 +337,56 @@ this.dataService.select_Stock_Adjustment_Data(id).subscribe((res:any)=>{
     }
   }
 
-      onDateRangeChanged(e: any) {
-        const today = new Date();
+  onDateRangeChanged(e: any) {
+    const today = new Date();
     this.selectedDateRange = e.value;
-console.log('selected data=======',this.selectedDateRange)
-if(this.selectedDateRange==='today'){
-   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+    console.log('selected data=======', this.selectedDateRange);
+    if (this.selectedDateRange === 'today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-   this.startDate=new Date(today)
-   this.EndDate=new Date(today)
-   console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-} 
-else if(this.selectedDateRange === 'all'){
-  // this.get_stock_adjustment_list()
-  
-  
-
-} else if (this.selectedDateRange === 'last7') {
-    this.startDate = new Date(today);
-    this.startDate.setDate(today.getDate() - 6);
-    this.EndDate = new Date(today);
-console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-  } else if (this.selectedDateRange === 'last15') {
-    this.startDate = new Date(today);
-    this.startDate.setDate(today.getDate() - 14);
-    this.EndDate = new Date(today);
-console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-  } else if (this.selectedDateRange === 'last30') {
-    this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    this.EndDate = new Date(today);
-console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-  } else if (this.selectedDateRange === 'lastMonth') {
-    const lastMonth = today.getMonth() - 1;
-    this.startDate = new Date(today.getFullYear(), lastMonth, 1);
-    this.EndDate = new Date(today.getFullYear(), today.getMonth(), 0);
-console.log(this.startDate,'=======start date=====')
-console.log(this.EndDate,'=======End date=====')
-  } else {
-this.showCustomDatePopup=true
-
-
-}
-
-
+      this.startDate = new Date(today);
+      this.EndDate = new Date(today);
+      console.log(this.startDate, '=======start date=====');
+      console.log(this.EndDate, '=======End date=====');
+    } else if (this.selectedDateRange === 'all') {
+      // this.get_stock_adjustment_list()
+    } else if (this.selectedDateRange === 'last7') {
+      this.startDate = new Date(today);
+      this.startDate.setDate(today.getDate() - 6);
+      this.EndDate = new Date(today);
+      console.log(this.startDate, '=======start date=====');
+      console.log(this.EndDate, '=======End date=====');
+    } else if (this.selectedDateRange === 'last15') {
+      this.startDate = new Date(today);
+      this.startDate.setDate(today.getDate() - 14);
+      this.EndDate = new Date(today);
+      console.log(this.startDate, '=======start date=====');
+      console.log(this.EndDate, '=======End date=====');
+    } else if (this.selectedDateRange === 'last30') {
+      this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      this.EndDate = new Date(today);
+      console.log(this.startDate, '=======start date=====');
+      console.log(this.EndDate, '=======End date=====');
+    } else if (this.selectedDateRange === 'lastMonth') {
+      const lastMonth = today.getMonth() - 1;
+      this.startDate = new Date(today.getFullYear(), lastMonth, 1);
+      this.EndDate = new Date(today.getFullYear(), today.getMonth(), 0);
+      console.log(this.startDate, '=======start date=====');
+      console.log(this.EndDate, '=======End date=====');
+    } else {
+      this.showCustomDatePopup = true;
+    }
 
     this.get_stock_adjustment_list();
   }
 
- 
-
-  handleClose(){
-    this.isAddStock_adj=false
-    this.is_Edit_popup=false
-    this.get_stock_adjustment_list()
+  handleClose() {
+    this.isAddStock_adj = false;
+    this.is_Edit_popup = false;
+    this.get_stock_adjustment_list();
   }
-
 }
-
 
 @NgModule({
   imports: [
@@ -444,8 +420,7 @@ this.showCustomDatePopup=true
     DxNumberBoxModule,
     DxoSummaryModule,
     StockAdjustmentEditModule,
-    StockAdjustmentAddModule
-
+    StockAdjustmentAddModule,
   ],
   providers: [],
   declarations: [StockAdjustmentListComponent],

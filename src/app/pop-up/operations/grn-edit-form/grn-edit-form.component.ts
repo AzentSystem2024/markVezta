@@ -195,14 +195,14 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
     if (changes.formdata && changes.formdata.currentValue) {
       console.log(
         this.formdata,
-        'formdata============================================'
+        'formdata============================================',
       );
       this.grnData = this.formdata;
       // this.newGrnData = JSON.parse(JSON.stringify(this.formdata));
       this.NetAMountValue = this.formdata.NET_AMOUNT;
       console.log(
         this.NetAMountValue,
-        '=========================net amount==================='
+        '=========================net amount===================',
       );
       console.log(this.grnData);
       this.newGrnData = this.formdata;
@@ -210,7 +210,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
       console.log(
         this.newGrnData,
-        'NEWGRNDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        'NEWGRNDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       );
       this.currencySymbol = this.formdata.CURRENCY_SYMBOL;
 
@@ -223,7 +223,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
       console.log(
         this.newGrnData,
-        'NEWGRNDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        'NEWGRNDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       );
       this.newGrnData.GRNDetails = this.formdata.GRNDetails;
 
@@ -276,7 +276,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
       this.poDetails = this.processPoDetails(
         this.poDetails,
-        this.newGrnData.GRN_Item_Cost
+        this.newGrnData.GRN_Item_Cost,
       );
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
@@ -350,9 +350,9 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
       const uniqueDescriptions = Array.from(
         new Set(
           this.newGrnData.GRN_Item_Cost.map((cost) =>
-            cost.DESCRIPTION.toUpperCase()
-          )
-        )
+            cost.DESCRIPTION.toUpperCase(),
+          ),
+        ),
       );
 
       // Step 2: Generate dynamic columns based on unique DESCRIPTION values
@@ -374,7 +374,10 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
     NET_AMOUNT: this.NetAMountValue,
   });
 
-  constructor(private service: DataService, private ref: ChangeDetectorRef) {
+  constructor(
+    private service: DataService,
+    private ref: ChangeDetectorRef,
+  ) {
     console.log(this.grnData);
     console.log(this.newGrnData);
     const settingsData = sessionStorage.getItem('settings');
@@ -503,7 +506,6 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
   // }
 
   updateCell(event: any) {
-    console.log(event, 'event');
     const updatedRow = event.key; // Get the updated row
     const updatedData = event.data; // Get the updated data
 
@@ -523,7 +525,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          2000
+          2000,
         );
 
         // Optionally reset the QTY_RECEIVED field or prevent further processing
@@ -552,7 +554,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
         .toFixed(2); // Ensure the total is also formatted with 2 decimal places
       console.log(
         this.poDetails,
-        '=================podetails==================='
+        '=================podetails===================',
       );
       console.log(this.newGrnData.NET_AMOUNT, 'net amount');
       this.newGrnData.SUPP_NET_AMOUNT = this.poDetails
@@ -572,7 +574,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
       this.costingMethodDataGrid = this.costingMethodDataGrid.map((row) => {
         if (row.CURRENCY.includes('%')) {
           row.TOTAL = ((this.newGrnData.NET_AMOUNT * row.RATE) / 100).toFixed(
-            2
+            2,
           );
         }
         return row;
@@ -615,7 +617,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
       // Add the updated row to the array of updated items
       const existingIndex = this.updatedItems.findIndex(
-        (item) => item.SL_NO === updatedRow.SL_NO
+        (item) => item.SL_NO === updatedRow.SL_NO,
       );
 
       if (existingIndex > -1) {
@@ -649,7 +651,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
       bindedData.forEach((item) => {
         const detailItemIndex = this.newGrnData.GRNDetails.findIndex(
-          (detailItem: any) => detailItem.ITEM_ID === item.ITEM_ID
+          (detailItem: any) => detailItem.ITEM_ID === item.ITEM_ID,
         );
 
         if (detailItemIndex !== -1) {
@@ -751,14 +753,14 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
       // Filter out COST_IDs that already exist in this.newGrnData.GRN_Cost
       const existingCostIds = this.newGrnData.GRN_Cost.map(
-        (cost: any) => cost.COST_ID
+        (cost: any) => cost.COST_ID,
       );
 
       console.log(existingCostIds, 'existingCostIds');
 
       // Filter the data from formdata.GRN_Cost excluding the COST_IDs already present in newGrnData.GRN_Cost
       const filteredGRNCost = landedCostDropDown.filter(
-        (cost: any) => !existingCostIds.includes(cost.ID)
+        (cost: any) => !existingCostIds.includes(cost.ID),
       );
 
       this.landedCostDropDown = filteredGRNCost;
@@ -808,7 +810,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
       // Check if the costData already exists in costingMethodDataGrid
       const isExistingCost = this.costingMethodDataGrid.some(
-        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION
+        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION,
       );
 
       if (isExistingCost) {
@@ -828,7 +830,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          2000
+          2000,
         );
         return; // Exit the function
       }
@@ -844,7 +846,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
       // Check if the description already exists in dynamicColumns
       const existingDescriptions = this.dynamicColumns.map(
-        (col: any) => col.dataField
+        (col: any) => col.dataField,
       );
 
       // Push only new descriptions to dynamicColumns
@@ -908,7 +910,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
       this.ref.detectChanges();
     } else {
       console.error(
-        'Invalid costData. Ensure all required fields are populated.'
+        'Invalid costData. Ensure all required fields are populated.',
       );
     }
   }
@@ -957,7 +959,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
     // Update this.newGrnData.GRN_Cost with grnCost
     grnCost.forEach((newCost: any) => {
       const existingIndex = this.newGrnData.GRN_Cost.findIndex(
-        (cost: any) => cost.COST_ID === newCost.COST_ID
+        (cost: any) => cost.COST_ID === newCost.COST_ID,
       );
 
       if (existingIndex > -1) {
@@ -975,7 +977,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
     this.newGrnData.GRNDetails.forEach((detail: any) => {
       // Find the matching entry in poDetails
       const matchingPoDetail = this.poDetails.find(
-        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID
+        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID,
       );
 
       if (matchingPoDetail) {
@@ -1003,7 +1005,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
         // Filter all matching rows in poDetails using the description
         const matchingRows = this.poDetails.filter((poRow: any) =>
-          Object.keys(poRow).some((key) => key.toUpperCase() === description)
+          Object.keys(poRow).some((key) => key.toUpperCase() === description),
         );
 
         console.log(matchingRows, 'Matching Rows');
@@ -1014,7 +1016,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
             const existingEntry = this.newGrnData.GRN_Item_Cost.find(
               (item: any) =>
                 item.DESCRIPTION.toUpperCase() === description &&
-                item.ITEM_ID === matchingRow.ITEM_ID // Match with the description heading
+                item.ITEM_ID === matchingRow.ITEM_ID, // Match with the description heading
             );
 
             if (existingEntry) {
@@ -1025,7 +1027,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
               existingEntry.AMOUNT = matchingRow[description]; // Update AMOUNT using the description key
             } else {
               console.warn(
-                `No existing entry found in GRN_Item_Cost for DESCRIPTION: ${description}`
+                `No existing entry found in GRN_Item_Cost for DESCRIPTION: ${description}`,
               );
 
               this.newGrnData.GRN_Item_Cost.push({
@@ -1041,7 +1043,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
           });
         } else {
           console.log(
-            `No matching rows found in poDetails for description: ${description}`
+            `No matching rows found in poDetails for description: ${description}`,
           );
         }
       });
@@ -1054,27 +1056,14 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
 
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id==================='
-    );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
-    console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-    console.log(
-      this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[['
-    );
+
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_vat_id = this.sessionData.VAT_ID;
@@ -1083,14 +1072,14 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
   getTotalQuantity(): any {
     return this.poDetails.reduce(
       (total, item) => total + (item.QUANTITY || 0),
-      0
+      0,
     );
   }
 
   getCostsForItem(itemId: string) {
     console.log(itemId, ':::::::::');
     const data = this.newGrnData.GRN_Item_Cost.filter(
-      (cost) => cost.ITEM_ID === itemId
+      (cost) => cost.ITEM_ID === itemId,
     );
     console.log(data, '11111111111111111111111111111111111111111');
     return data;
@@ -1105,7 +1094,7 @@ export class GrnEditFormComponent implements OnInit, OnChanges {
     const updatedPoDetails = poDetails.map((poDetail) => {
       // Find matching costs for the ITEM_ID
       const itemCosts = grnItemCost.filter(
-        (cost) => cost.ITEM_ID === poDetail.ITEM_ID
+        (cost) => cost.ITEM_ID === poDetail.ITEM_ID,
       );
 
       // Add cost fields dynamically

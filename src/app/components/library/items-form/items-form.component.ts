@@ -237,9 +237,7 @@ export class ItemsFormComponent implements OnInit {
       NAME: 'VAT_CLASS',
     };
     dataservice.Dropdown_ItemTax(Dropdown_ItemTaxPayload).subscribe((data) => {
-      console.log(data);
       this.VatClass = data;
-      console.log(this.VatClass, 'VAT_CLASS=======');
     });
     const parentItemPayload = {
       COMPANY_ID: this.selected_Company_id,
@@ -247,21 +245,17 @@ export class ItemsFormComponent implements OnInit {
     };
     dataservice.getDropdownData(parentItemPayload).subscribe((data) => {
       this.parentitem = data;
-      console.log(this.parentitem, 'PARENTITEM');
     });
     const itemTypePayload = {
       // COMPANY_ID: this.selected_Company_id,
       NAME: 'ITEMTYPE',
     };
     dataservice.getDropdownData(itemTypePayload).subscribe((data) => {
-      console.log(data, 'ITEMTYPEDATA');
       this.itemtype = data;
-      console.log(this.itemtype, 'ITEMTYPE');
     });
 
     dataservice.getDropdownData('COUNTRY').subscribe((data) => {
       this.country = data;
-      console.log(this.country, 'COUNTRY=======');
     });
     const storePayload = {
       COMPANY_ID: this.selected_Company_id,
@@ -275,12 +269,10 @@ export class ItemsFormComponent implements OnInit {
     };
     dataservice.getDropdownData(brandPayload).subscribe((data) => {
       this.brand = data;
-      console.log(this.brand, '=====================brand--------------------');
     });
 
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
-      console.log(this.countries, 'COUNTRY;;;;;;;;;;');
     });
     const itemProp1Payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -348,7 +340,6 @@ export class ItemsFormComponent implements OnInit {
     };
     dataservice.getDropdownData(uomPayload).subscribe((data) => {
       this.uom = data;
-      console.log(this.uom, 'UOMMMMMMMM');
       this.filterDropdownOptions();
     });
 
@@ -367,7 +358,6 @@ export class ItemsFormComponent implements OnInit {
     };
     dataservice.getDropdownData(packingPayload).subscribe((data) => {
       this.packing = data;
-      // console.log(this.packing,"packing")
     });
   }
   ALias_list: any;
@@ -509,7 +499,7 @@ export class ItemsFormComponent implements OnInit {
 
     return {
       ...this.newItems,
-      COMPANY_ID : this.selected_Company_id, 
+      COMPANY_ID: this.selected_Company_id,
       UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
 
       ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
@@ -532,7 +522,6 @@ export class ItemsFormComponent implements OnInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyId = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
-    console.log(this.companyId, 'COMPANYIDINITEMMMMMMMMMMMMMM');
     this.showItems();
     this.sesstion_Details();
 
@@ -541,43 +530,21 @@ export class ItemsFormComponent implements OnInit {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
-    console.log(
-      this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1==============',
-    );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
-    console.log(
-      this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2==============',
-    );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
-    console.log(
-      this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3==============',
-    );
 
     this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
-    console.log(
-      this.ITEM_PROPERTY4,
-      '============ITEM_PROPERTY4==============',
-    );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
-    console.log(
-      this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5==============',
-    );
+
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
-    console.log(this.ENABLE_Matrix_Code);
 
     this.selected_vat_id = this.sessionData.VAT_ID;
-    console.log(this.selected_vat_id, 'SELECTED_VAT_ID=========');
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -589,22 +556,16 @@ export class ItemsFormComponent implements OnInit {
     this.filteredDropdownOptions = this.uom.filter(
       (option) => option.ID !== this.selectedUom,
     );
-    console.log(this.filteredDropdownOptions, 'FILTERED');
   }
   onSelectPackAdd(event: any) {}
 
   onUOMChange(event: any) {
     this.selectedUom = this.newItems.UNIT_ID;
     this.formItemsData.UOM_PURCH = String(this.selectedUom);
-    console.log(
-      '===============UOM_PURCH==========',
-      this.formItemsData.UOM_PURCH,
-    );
+
     this.filterDropdownOptions(); // Filter the options when the selection changes
   }
-  onPriorityChange(event: any) {
-    console.log(event);
-  }
+  onPriorityChange(event: any) {}
 
   // onParentItemChanged(e: any) {
   //   if (e.selectedRowKeys.length > 0) {
@@ -620,7 +581,6 @@ export class ItemsFormComponent implements OnInit {
       this.isDropZoneActive = false;
       this.imageSource = fileReader.result as string;
       this.imageBase64 = fileReader.result as string; // Store the image as Base64
-      console.log(this.imageBase64, 'IMAGE');
       this.imageUploaded = true;
 
       // Save the image to IndexedDB
@@ -651,9 +611,7 @@ export class ItemsFormComponent implements OnInit {
       fileReader.onload = async () => {
         this.imageSource = fileReader.result as string;
         this.imageBase64 = this.imageSource;
-        console.log(this.imageBase64, 'IMAGEEEEEEE');
         this.newItems.IMAGE_NAME = this.imageBase64;
-        console.log(this.newItems.IMAGE_NAME, 'IMAGENAMEEEEEEEEEEE');
         this.textVisible = false;
         this.isDropZoneActive = false;
         this.imageUploaded = true;
@@ -714,7 +672,6 @@ export class ItemsFormComponent implements OnInit {
   // Save the image in localStorage (if needed)
   saveImageToLocalStorage() {
     if (this.imageBase64) {
-      console.log('Saving image to localStorage:', this.imageBase64); // Log the Base64 string
       localStorage.setItem('uploadedImage', this.imageBase64);
     }
   }
@@ -729,7 +686,6 @@ export class ItemsFormComponent implements OnInit {
   }
 
   onValueChangedConsignmnent(e) {
-    // console.log(e);
     if (e.value) {
       this.consignment = e.value;
       this.showSupplier = this.consignment;
@@ -751,10 +707,6 @@ export class ItemsFormComponent implements OnInit {
 
   updatePriceLevel(selectedRows: any[]) {
     if (selectedRows.length > 0) {
-      console.log(
-        selectedRows,
-        '=============selected row===========================',
-      );
       selectedRows.forEach((row) => {
         row.SALE_PRICE = this.formItemsData.SALE_PRICE;
         row.SALE_PRICE1 = this.formItemsData.SALE_PRICE1;
@@ -769,7 +721,6 @@ export class ItemsFormComponent implements OnInit {
         row.IS_NOT_DISCOUNTABLE = this.formItemsData.IS_NOT_SALE_RETURN;
         row.COST = this.formItemsData.COST;
 
-        console.log('pricelevel', selectedRows);
         this.formItemsData.ITEM_STORES.forEach((store, index) => {
           this.formItemsData.ITEM_STORES[index].STORE_ID = row.ID;
           this.formItemsData.ITEM_STORES[index].SALE_PRICE = row.SALE_PRICE;
@@ -790,7 +741,6 @@ export class ItemsFormComponent implements OnInit {
           this.formItemsData.ITEM_STORES[index].COST = row.COST;
         });
       });
-      console.log('Updated ITEM_STORES:', this.formItemsData.ITEM_STORES);
     } else {
       this.store.forEach((row) => {
         row.SALE_PRICE = '';
@@ -809,13 +759,8 @@ export class ItemsFormComponent implements OnInit {
     }
   }
   onRowUpdated(e: any) {
-    console.log('Row updated:', e.data); // The row where checkbox was changed
-    // console.log("Changed column:", e.column.dataField, "New value:", e.value);
     const storeId = e.data.ID;
-    console.log(
-      storeId,
-      '[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]][[][][][]',
-    );
+
     const createDummyItemStore = (storeData: any) => {
       return {
         STORE_ID: storeData.ID || 0,
@@ -855,8 +800,6 @@ export class ItemsFormComponent implements OnInit {
       // Add new mapped dummy object
       this.selectedStoresMap.push(createDummyItemStore(e.data));
     }
-
-    console.log('Updated Array:', this.selectedStoresMap);
   }
 
   clearFiles() {
@@ -866,7 +809,6 @@ export class ItemsFormComponent implements OnInit {
   onEditorPreparing(event: any) {
     if (event.parentType == 'dataRow' && event.dataField === 'SUPP_ID') {
       event.editorOptions.onValueChanged = (e: any) => {
-        // console.log('hellow', e);
         const selectedSupplierId = e.value;
         const selectedSupplier = this.supplier.find(
           (supplier) => supplier.ID === selectedSupplierId,
@@ -874,57 +816,27 @@ export class ItemsFormComponent implements OnInit {
         if (selectedSupplier) {
           // Update currency value based on selected supplier
           this.currencydata = selectedSupplier.CURRENCY_CODE; // Assuming currency property exists in supplier object
-          // console.log('code', this.currencydata);
           this.CURRENCY = this.currencydata;
-          // console.log(this.currencydata,"=====")
           event.component.cellValue(event.row.rowIndex, 'SUPP_ID', e.value);
           event.component.cellValue(
             event.row.rowIndex,
             'CURRENCY',
             this.CURRENCY,
           );
-
-          console.log(
-            event,
-            '===================event=========================',
-          );
-          console.log(
-            event.component.cellValue(
-              event.row.rowIndex,
-              'CURRENCY',
-              this.CURRENCY,
-            ),
-          );
         } else {
           // Reset currency value if no supplier is selected
           this.currencydata = null;
         }
-        // console.log('CURRENCY:', this.CURRENCY);
       };
     }
   }
-  onRowClick(e: any) {
-    console.log('Full row data:', e.data);
-
-    // Example: access each column
-    console.log('SUPP_ID:', e.data.SUPP_ID);
-    console.log('CURRENCY:', e.data.CURRENCY);
-    console.log('REORDER_NO:', e.data.REORDER_NO);
-    console.log('COST:', e.data.COST);
-    console.log('IS_PRIMARY:', e.data.IS_PRIMARY);
-    console.log('IS_CONSIGNMENT:', e.data.IS_CONSIGNMENT);
-  }
+  onRowClick(e: any) {}
 
   onRowInserted(event: any) {
-    console.log(
-      event,
-      '===========================test===========================',
-    );
     // const newRecordIsPrimary = event.data.IS_PRIMARY === true;
 
     // // If the inserted record is primary, set other records' IS_PRIMARY to false
     // if (newRecordIsPrimary) {
-    //   // console.log(event);
     //   this.formItemsData.ITEM_SUPPLIERS.forEach((record) => {
     //     record.IS_PRIMARY = false;
     //   });
@@ -946,8 +858,6 @@ export class ItemsFormComponent implements OnInit {
       IS_CONSIGNMENT: event.data.IS_CONSIGNMENT || false,
     });
 
-    // console.log('inserted supplier data', this.formItemsData.ITEM_SUPPLIERS);
-
     // After updating IS_PRIMARY property, trigger change detection
     this.cdr.detectChanges();
   }
@@ -961,11 +871,8 @@ export class ItemsFormComponent implements OnInit {
   // Push the new object into ITEM_ALIAS array with ALIAS value
   // this.formItemsData.ITEM_ALIAS.push({ ALIAS: event.data.ALIAS, ALIAS_TYPE_ID: this.selectedPriority   });
 
-  // console.log('inserted Alias data', this.formItemsData.ITEM_ALIAS);
   // }
-  onClickSaveSupplier() {
-    // console.log('currency');
-  }
+  onClickSaveSupplier() {}
 
   onRowUpdatedAlias(event: any) {
     // Find the index of the alias being updated
@@ -975,20 +882,15 @@ export class ItemsFormComponent implements OnInit {
     if (index !== -1) {
       // Update the alias value
       this.formItemsData.ITEM_ALIAS[index].ALIAS = event.data.ALIAS;
-      // console.log('updated Alias data', this.formItemsData.ITEM_ALIAS);
     }
   }
 
   onParentItemChanged(event: any) {
-    console.log(event, 'PARENT');
     const selectedParentItem = event.selectedRowsData[0]; // Access the first selected item
-    console.log(selectedParentItem, 'SELECTEDITEM');
     if (selectedParentItem) {
       // this.selectedParentItemId = selectedParentItem.ID;
       this.newItems.PARENT_ITEM_ID = selectedParentItem.ID;
-      console.log(this.selectedParentItemId, '===========----------');
       this.selectedParentItemDescription = selectedParentItem.DESCRIPTION;
-      console.log(this.selectedParentItemDescription, 'SELECTEDDESCRIPTION');
       this.isParentItemSelected = !!this.newItems.PARENT_ITEM_ID;
     }
     this.isParentItemDropdownOpen = false;
@@ -1011,9 +913,7 @@ export class ItemsFormComponent implements OnInit {
           };
         });
         this.isLoading = false;
-        // console.log(this.newItemList, 'New Item List');
 
-        // console.log(this.itemsList, "ITEMSLIST");
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -1025,21 +925,15 @@ export class ItemsFormComponent implements OnInit {
   }
 
   // onItemSelected(event: any): void {
-  //   console.log("Item selected:", event);
   // }
 
   onItemSelected(event: any): void {
-    console.log('ITEM SELECTED======', event);
-
     // Get the selected item from the event's selectedRowsData
     const selectedItem = event.selectedRowsData[0]; // Access the first selected item
-    console.log(selectedItem, 'SELECTEDITEM');
 
     if (selectedItem) {
       this.selectedUom = selectedItem.UNIT_ID;
-      console.log(this.selectedUom, 'SELECTEDUOM');
       this.selectedItemId = selectedItem.ID; // Bind the selected ID
-      console.log(this.selectedItemId, '================');
       this.selectedItemCode = selectedItem.ITEM_CODE; // Optionally capture the ITEM_CODE
       // Optionally, bind them to your form data or use them in your application
       const selectedItemDetails = this.newItemList.find(
@@ -1051,13 +945,10 @@ export class ItemsFormComponent implements OnInit {
       this.formData.ITEM_CODE = selectedItemDetails.ITEM_CODE;
       this.formData.DESCRIPTION = selectedItemDetails.DESCRIPTION;
       this.formData.UOM = selectedItemDetails.UOM;
-      console.log(this.formData.UOM, 'SELECTEDITEMDETAILSSSS');
     }
   }
 
   saveItem(): void {
-    console.log(this.selectedItemId, 'IN SAVEEEEEEEEEE');
-    console.log('Form data:', this.formData);
     if (
       !this.formData.ITEM_CODE ||
       !this.formData.UOM ||
@@ -1072,7 +963,6 @@ export class ItemsFormComponent implements OnInit {
       (item) => item.ID === this.selectedItemId,
     );
     // const selectedUom = this.newItemList.find(item => === this.)
-    console.log(selectedItem, 'SELECTEDITEMMMMMMMMM');
     const newComponent = {
       COMPONENT_ITEM_ID: this.selectedItemId,
       ITEM_CODE: this.formData.ITEM_CODE,
@@ -1083,7 +973,6 @@ export class ItemsFormComponent implements OnInit {
 
     // Add the component data to the components array
     this.gridData.push(newComponent);
-    console.log('Grid Data:', this.gridData);
 
     this.newItems = {
       ...this.formItemsData, // Copy existing form data
@@ -1094,7 +983,6 @@ export class ItemsFormComponent implements OnInit {
         UOM: item.UOM, // Map UOM to UOM
       })),
     };
-    console.log(this.newItems, 'FORMITEMSDATA');
     // Close the popup after saving
     this.isPopupVisible = false;
 
@@ -1110,10 +998,8 @@ export class ItemsFormComponent implements OnInit {
   }
 
   addComponent() {
-    console.log('popup opened');
     this.isPopupVisible = true;
     this.cdr.detectChanges();
-    console.log(this.isPopupVisible, 'POPUP');
   }
 
   cancelPopup() {

@@ -150,16 +150,16 @@ export class PhysicalInventoryFormComponent {
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
     this.isEditDataAvailable();
 
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     if (menuResponse.DEFAULT_COUNTRY_CODE) {
       this.countryCode = menuResponse.DEFAULT_COUNTRY_CODE.startsWith('+')
@@ -202,8 +202,7 @@ export class PhysicalInventoryFormComponent {
         this.loadFilteredItems(this.filterData);
       }
     }
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
+
     this.getInventoryHistoryList();
     this.getVoucherNo();
   }
@@ -215,7 +214,6 @@ export class PhysicalInventoryFormComponent {
     this.dataService
       .getItemsForInventory(payload)
       .subscribe((response: any) => {
-        console.log(response);
         if (response?.Data?.length) {
           this.inventoryFormData.Details = response.Data.map((item: any) => ({
             ITEM_ID: item.ITEM_ID,
@@ -286,7 +284,7 @@ export class PhysicalInventoryFormComponent {
 
         console.log(
           'Mapped Inventory Details:',
-          this.inventoryFormData.Details
+          this.inventoryFormData.Details,
         );
       },
       error: (err) => {
@@ -374,7 +372,7 @@ export class PhysicalInventoryFormComponent {
 
     // Remove it from the Details array manually
     this.inventoryFormData.Details = this.inventoryFormData.Details.filter(
-      (item: any) => item.ITEM_ID !== deletedItem.ITEM_ID
+      (item: any) => item.ITEM_ID !== deletedItem.ITEM_ID,
     );
 
     console.log('Row deleted:', deletedItem);
@@ -444,7 +442,7 @@ export class PhysicalInventoryFormComponent {
 
       console.log(
         '🟢 Inventory Form Data loaded for edit:',
-        this.inventoryFormData
+        this.inventoryFormData,
       );
     } else {
       // 🚀 Add Mode (initialize defaults)
@@ -646,8 +644,8 @@ export class PhysicalInventoryFormComponent {
             // --- Merge with existing grid items ---
             const existingCodes = new Set(
               this.inventoryFormData.Details.filter(
-                (d: any) => d.ITEM_CODE
-              ).map((d: any) => d.ITEM_CODE.trim())
+                (d: any) => d.ITEM_CODE,
+              ).map((d: any) => d.ITEM_CODE.trim()),
             );
 
             const duplicates: string[] = [];
@@ -655,7 +653,7 @@ export class PhysicalInventoryFormComponent {
 
             filteredResponse.forEach((item: any) => {
               const match = excelData.find(
-                (row) => String(row['Barcode']).trim() === item.Barcode
+                (row) => String(row['Barcode']).trim() === item.Barcode,
               );
 
               const itemCode = item.ItemCode || '';
@@ -680,7 +678,7 @@ export class PhysicalInventoryFormComponent {
               notify(
                 `Duplicate barcodes skipped: ${duplicates.join(', ')}`,
                 'warning',
-                5000
+                5000,
               );
             }
 
@@ -695,20 +693,20 @@ export class PhysicalInventoryFormComponent {
 
             console.log(
               '✅ Final merged items:',
-              this.inventoryFormData.Details
+              this.inventoryFormData.Details,
             );
           } else {
             notify(
               'No matching items found for given barcodes.',
               'warning',
-              5000
+              5000,
             );
           }
         },
         (error) => {
           console.error('Error fetching items:', error);
           alert('Failed to fetch items from the server.');
-        }
+        },
       );
     };
 
@@ -735,7 +733,7 @@ export class PhysicalInventoryFormComponent {
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     saveAs(
       new Blob([wbout], { type: 'application/octet-stream' }),
-      'EmptyTemplate.xlsx'
+      'EmptyTemplate.xlsx',
     );
   }
 
@@ -761,7 +759,7 @@ export class PhysicalInventoryFormComponent {
           type: 'error',
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -773,7 +771,7 @@ export class PhysicalInventoryFormComponent {
           type: 'error',
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -788,7 +786,7 @@ export class PhysicalInventoryFormComponent {
           type: 'error',
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -849,8 +847,8 @@ export class PhysicalInventoryFormComponent {
               (this.isApproved
                 ? 'Inventory approved successfully!'
                 : this.isEditing
-                ? 'Inventory updated successfully!'
-                : 'Inventory saved successfully!');
+                  ? 'Inventory updated successfully!'
+                  : 'Inventory saved successfully!');
 
             notify(message, 'success', 2000);
 
@@ -864,7 +862,7 @@ export class PhysicalInventoryFormComponent {
             notify(
               response.Message || 'Failed to save inventory',
               'error',
-              2000
+              2000,
             );
           }
         },
@@ -879,7 +877,7 @@ export class PhysicalInventoryFormComponent {
     if (this.isEditing && this.isApproved) {
       confirm(
         'Are you sure you want to approve this inventory?',
-        'Confirm Approval'
+        'Confirm Approval',
       ).then((dialogResult) => {
         if (dialogResult) {
           proceedWithSave();
@@ -917,7 +915,7 @@ export class PhysicalInventoryFormComponent {
           this.inventoryFormData.TRANS_ID = response.Data[0].TRANS_ID;
           console.log(
             'Voucher number updated:',
-            this.inventoryFormData.PHYSICAL_NO
+            this.inventoryFormData.PHYSICAL_NO,
           );
         } else {
           console.warn('No voucher number received.');

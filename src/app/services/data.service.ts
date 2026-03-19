@@ -79,20 +79,10 @@ export class DataService {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
   }
 
   getAccountGroupHeadList(data: any): Observable<any> {
@@ -162,7 +152,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
-   getItemsListForArticle(): Observable<any> {
+  getItemsListForArticle(): Observable<any> {
     return this.http.post(`${this.apiUrl}article/getItems`, {});
   }
 
@@ -178,11 +168,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}packing/Lastpartno`, {});
   }
 
-   getItemsListForPacking(): Observable<any> {
+  getItemsListForPacking(): Observable<any> {
     return this.http.post(`${this.apiUrl}Packing/getItems`, {});
   }
 
-    getArticleLastPartNo(): Observable<any> {
+  getArticleLastPartNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}article/Lastpartno`, {});
   }
 

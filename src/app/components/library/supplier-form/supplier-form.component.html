@@ -60,17 +60,35 @@
     <dxi-item itemType="group" [colCount]="1">
       <dxi-item>
         <div *dxTemplate style="display: flex">
-          <dx-text-box
-            label="Address"
+          <dx-select-box
+            label="Country code *"
+            [searchEnabled]="true"
             labelMode="floating"
-            [(value)]="DEFAULT_COUNTRY_CODE"
-            class="country-code-input"
-          ></dx-text-box>
+            [(value)]="countryCode"
+            [items]="countryCodes"
+            valueExpr="CODE"
+            [displayExpr]="countryDisplay"
+            placeholder="+1"
+            [dropDownOptions]="{ width: '370px' }"
+            hint="Country Code"
+            (onValueChanged)="onCountrycodeChange($event)"
+          >
+            <div *dxTemplate="let data of 'item'">
+              <img [src]="data.FLAG_URL" width="20" style="margin-right: 8px" />
+              {{ data.CODE }} {{ data.COUNTRY_NAME }}
+            </div>
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Country code is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
           <dx-text-box
             label="Mobile *"
             labelMode="floating"
             class="phone-style"
-            [(value)]="newSupplier.MOBILE_NO"
+            [(value)]="Supplier_mobile"
             (keypress)="keyPressNumbers($event)"
             [style]="{ width: '300px' }"
           >
@@ -125,24 +143,6 @@
           </div>
         </dxi-item>
       </dxi-item>
-
-      <!-- <dxi-item>
-        <div *dxTemplate style="display: flex">
-          <dx-text-box
-            label=" "
-            [(value)]="countryCode"
-            class="country-code-input"
-            stylingMode="filled"
-          ></dx-text-box>
-          <dx-text-box
-            label="Phone"
-            class="phone-style"
-            [(value)]="newSupplier.PHONE"
-            stylingMode="filled"
-            (keypress)="keyPressNumbers($event)"
-          ></dx-text-box>
-        </div>
-      </dxi-item> -->
     </dxi-item>
     <dxi-item itemType="group" [colCount]="2">
       <dxi-item>
@@ -188,6 +188,7 @@
             [(value)]="newSupplier.VAT_RULE_ID"
             placeholder="Select GST Rule"
             labelMode="floating"
+            [searchEnabled]="true"
           >
             <dx-validator>
               <dxi-validation-rule type="required" message="Select VAT rule">
@@ -354,16 +355,34 @@
     <dxi-item itemType="group" [colCount]="1">
       <dxi-item>
         <div *dxTemplate style="display: flex">
-          <dx-text-box
-            label=" "
-            [(value)]="DEFAULT_COUNTRY_CODE"
-            class="country-code-input"
+          <dx-select-box
+            label="Country code *"
+            [searchEnabled]="true"
             labelMode="floating"
-          ></dx-text-box>
+            [(value)]="countryCodePhone"
+            [items]="countryCodes"
+            valueExpr="CODE"
+            [displayExpr]="countryDisplay"
+            placeholder="+1"
+            [dropDownOptions]="{ width: '370px' }"
+            hint="Country Code"
+            (onValueChanged)="onCountrycodeChangePhone($event)"
+          >
+            <div *dxTemplate="let data of 'item'">
+              <img [src]="data.FLAG_URL" width="20" style="margin-right: 8px" />
+              {{ data.CODE }} {{ data.COUNTRY_NAME }}
+            </div>
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Country code is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
           <dx-text-box
             label="Phone"
             class="phone-style"
-            [(value)]="newSupplier.PHONE"
+            [(value)]="PhoneNumber"
             labelMode="floating"
             (keypress)="keyPressNumbers($event)"
             [style]="{ width: '300px' }"

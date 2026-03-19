@@ -313,7 +313,6 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
   }
 
@@ -562,21 +561,10 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-    console.log(
-      this.HSN_CODE,
-      '===========selected HSN CODE===================',
-    );
+
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   loadPurchaseOrders(itemId: string) {

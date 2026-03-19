@@ -106,16 +106,12 @@ export class TimesheetAddComponent {
   ) {}
 
   ngOnInit() {
-    console.log(this.selectedMonth, 'SELECTEDMONTH===========');
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/credit-note');
@@ -137,7 +133,6 @@ export class TimesheetAddComponent {
     // this.tsMonthDate = new Date(this.timesheetFormData.TS_MONTH + '-01');
     // Ensure the format of the selectedMonth is "Apr 2025"
     if (this.selectedMonth) {
-      console.log(this.selectedMonth, 'SELECTEDMONTH');
       const [year, month] = this.selectedMonth.split('-').map(Number);
       const formattedDate = new Date(year, month - 1).toLocaleDateString(
         'en-US',
@@ -149,11 +144,6 @@ export class TimesheetAddComponent {
 
       this.timesheetFormData.TS_MONTH = formattedDate;
     }
-    console.log(
-      'Selected Month for Add Page: ',
-      this.timesheetFormData.TS_MONTH,
-    );
-    console.log(this.existingTimesheets, 'EXISTING TIMESHEET');
   }
 
   ngOnChanges() {}
@@ -171,7 +161,6 @@ export class TimesheetAddComponent {
       NAME: 'PAYTIME_ENTRY',
     };
     this.dataService.getDropdownData(payload).subscribe((data: any) => {
-      console.log(data, 'PAYTIME');
       this.salaryHead = data;
       this.salaryDataSource = this.salaryHead.map((item) => ({
         SALARY_HEAD_ID: item.ID,
@@ -189,8 +178,6 @@ export class TimesheetAddComponent {
         SALARY_HEAD_ID: item.ID,
         AMOUNT: null, // Let user enter this
       }));
-
-      console.log(this.salaryDataSource, 'Salary DataSource');
     });
   }
 
@@ -246,7 +233,6 @@ export class TimesheetAddComponent {
     }
   }
   onTimesheetDetailsUpdated(e: any) {
-    console.log('Row updated!', e);
     const updatedStore = e.data.STORE;
     const rowIndex = e.component.getRowIndexByKey(e.key);
     if (e.data.NORMAL_OT > 12 || e.data.HOLIDAY_OT > 12) {
@@ -269,17 +255,12 @@ export class TimesheetAddComponent {
       setTimeout(() => {
         this.calculateTotalWorkedDays();
       }, 0);
-      console.log(
-        'Updated TIMESHEET_DETAIL:',
-        this.timesheetFormData.TIMESHEET_DETAIL,
-      );
     }
   }
 
   getTimesheet() {
     this.dataService.getTimesheetList().subscribe((response: any) => {
       this.timesheetList = response.data;
-      console.log(response, 'TIMESHEETLISTTTTTTTTT');
     });
   }
 
@@ -304,21 +285,11 @@ export class TimesheetAddComponent {
       this.timesheetFormData.TIMESHEET_SALARY.filter(
         (item) => item.SALARY_HEAD_ID !== '' && item.AMOUNT !== '',
       );
-
-    console.log(
-      'Updated TIMESHEET_SALARY:',
-      this.timesheetFormData.TIMESHEET_SALARY,
-    );
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   loadStores() {
@@ -377,7 +348,6 @@ export class TimesheetAddComponent {
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.employee = response;
-      console.log(response, 'EMPLOYEEEEE');
     });
   }
 
@@ -457,7 +427,6 @@ export class TimesheetAddComponent {
       return; // stops the save function
     }
 
-    console.log(this.selectedEmployeeId, 'EMPLOYEEID');
     const selectedMonth = this.timesheetFormData.TS_MONTH;
     const alreadyExists = this.existingTimesheets.some(
       (item) =>
@@ -549,8 +518,6 @@ export class TimesheetAddComponent {
   }
 
   handleClose() {
-    // console.log('CLOSED');
-
     this.popupClosed.emit();
   }
 }

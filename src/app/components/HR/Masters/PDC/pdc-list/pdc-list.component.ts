@@ -174,14 +174,11 @@ export class PdcListComponent {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/pdc');
@@ -194,9 +191,6 @@ export class PdcListComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
 
     this.sesstion_Details();
 
@@ -299,7 +293,6 @@ export class PdcListComponent {
         COMPANY_ID: this.selected_Company_id,
       };
       this.dataservice.get_PDC_List(payload).subscribe((res: any) => {
-        console.log(res, 'response of PDC list');
         this.PDCListDataSource = res.Data;
 
         //       this.onDateRangeChanged({ value: this.selectedDateRange });
@@ -343,7 +336,6 @@ export class PdcListComponent {
         COMPANY_ID: this.selected_Company_id,
       };
       this.dataservice.get_PDC_List(payload).subscribe((res: any) => {
-        console.log(res, 'response of PDC list');
         this.PDCListDataSource = res.Data;
 
         //       this.onDateRangeChanged({ value: this.selectedDateRange });
@@ -559,7 +551,6 @@ export class PdcListComponent {
 
       return typeMatch && statusMatch;
     });
-    console.log('Filtered List:', this.PDCListDataSource);
   }
 
   parseDDMMYYYY(dateStr: string): Date {
@@ -595,7 +586,6 @@ export class PdcListComponent {
       if (dueStart && dueEnd && item.CHEQUE_DATE) {
         const chequeDate = this.parseDDMMYYYY(item.CHEQUE_DATE);
         chequeDateValid = chequeDate >= dueStart && chequeDate <= dueEnd;
-        console.log(chequeDate, 'chequeDate---');
       }
 
       let entryDateValid = true;
@@ -606,8 +596,6 @@ export class PdcListComponent {
 
       return typeMatch && statusMatch && chequeDateValid && entryDateValid;
     });
-
-    console.log('All filters applied:', this.PDCListDataSource);
   }
 
   gridButtons = [
@@ -620,7 +608,6 @@ export class PdcListComponent {
 
   onEditPDC(event: any) {
     event.cancel = true;
-    console.log(event, 'event');
     const status = event.data?.ENTRY_STATUS?.trim();
     this.isEditReadOnly = status === 'Approved';
     this.editPDCPopupOpened = true;
@@ -628,15 +615,11 @@ export class PdcListComponent {
   }
 
   selected_PDC(event: any) {
-    console.log(event, ' event of select');
     const id = event.data.ID;
     this.PDCid = event.data.ID;
     this.selectPDC = id;
-    console.log(id, 'id');
     this.dataservice.Select_PDC(id).subscribe((res: any) => {
-      console.log('response from select packing api:', res);
       this.selectedPDC = res.Data[0];
-      console.log(this.selectedPDC);
       //  Trim and compare status to handle trailing spaces
       const status = (this.selectedPDC.ENTRY_STATUS || '').trim();
 
@@ -653,7 +636,6 @@ export class PdcListComponent {
   DeletePDC(event: any) {
     const id = event.data.ID;
     this.dataservice.Delete_PDC(id).subscribe((res: any) => {
-      console.log('response from select packing api:', res);
       if (res.Message === 'Success') {
         notify(
           {
@@ -670,12 +652,7 @@ export class PdcListComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   onCustomDateApplied(e: any) {
@@ -728,7 +705,6 @@ export class PdcListComponent {
       ...entryDatePayload,
     };
     this.dataservice.get_PDC_List(payload).subscribe((res: any) => {
-      console.log(res, 'response of PDC list');
       this.fullPDCList = res.Data;
 
       // this.onDateRangeChanged({ value: this.selectedDateRange });

@@ -238,22 +238,15 @@ export class CategoryComponent {
     this.get_list_data_category();
   }
 
-  // calculateTotal(e) {
-  //   //  console.log('Cell value changed:', e);
-  //   console.log('Cell changed:', e);
-
-  // }
-
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
 
@@ -267,9 +260,6 @@ export class CategoryComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
   toggleFilterRow = () => {
@@ -279,8 +269,6 @@ export class CategoryComponent {
 
   //===========================Calculate total pair Quantity=========================
   calculateTotal() {
-    console.log(this.packData, 'latest data of size list');
-
     if (this.packData?.SIZEDETAILS?.length) {
       this.totalPairQty = this.packData.SIZEDETAILS.reduce((acc, item) => {
         const qty = parseFloat(item.pairQty) || 0;
@@ -289,15 +277,11 @@ export class CategoryComponent {
     } else {
       this.totalPairQty = 0;
     }
-
-    console.log('Total pairQty:', this.totalPairQty);
   }
 
   //==================================Calculate total pair Quantity=========================
   //===========================Calculate total pair Quantity=========================
   calculateTotalUpdate() {
-    console.log(this.packData_values, 'latest data of size list');
-
     if (this.packData_values) {
       this.Pair_quantity_value = this.packData_values.reduce((acc, item) => {
         const qty = parseFloat(item.pairQty) || 0;
@@ -306,8 +290,6 @@ export class CategoryComponent {
     } else {
       this.Pair_quantity_value = 0;
     }
-
-    console.log('Total pairQty:', this.Pair_quantity_value);
   }
 
   sortSelectedSizes(event: any) {
@@ -439,8 +421,6 @@ export class CategoryComponent {
     this.editIndex = this.packingData.findIndex(
       (p) => p.PACK_NAME === selectedData.PACK_NAME,
     );
-
-    console.log('Selected Pack for Editing:', selectedData);
   }
 
   // ✅ Reset form after add/update
@@ -456,8 +436,6 @@ export class CategoryComponent {
   }
 
   Add_packagesUpdate() {
-    console.log('Update/Add package function call');
-
     const packName = this.packNameValue?.trim();
     const total_qty = this.Pair_quantity_value;
 
@@ -507,10 +485,9 @@ export class CategoryComponent {
       }
 
       this.packing_values[this.selectedPackIndex] = newPack;
-      console.log('✅ Updated pack at index', this.selectedPackIndex);
     }
 
-    // 🟢 ADDING MODE
+    //  ADDING MODE
     else {
       // Only block if an existing pack has the same name
       if (existingIndex !== -1) {
@@ -526,12 +503,9 @@ export class CategoryComponent {
       }
 
       this.packing_values.push(newPack);
-      console.log('✅ Added new pack');
     }
 
-    console.log('✅ packing_values:', this.packing_values);
-
-    // 🧹 Reset form fields
+    //  Reset form fields
     this.packNameValue = null;
     this.isExport_value = false;
     this.anyCombination_value = false;
@@ -546,12 +520,8 @@ export class CategoryComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   //===============list of data================
@@ -586,9 +556,8 @@ export class CategoryComponent {
   //=============================ADD DATA========================
   AddData() {
     const validationResult = this.formValidationGroup?.instance?.validate();
-    console.log(this.formsource);
+
     const commonDetails = this.formsource.value;
-    console.log(commonDetails);
 
     // First check if form is valid
     if (!this.formsource.valid) {
@@ -658,7 +627,6 @@ export class CategoryComponent {
       // COMPANY_ID: this.selected_Company_id,
     };
 
-    console.log(payload);
     if (!validationResult.isValid) {
       // Optional: show a DevExtreme notify message
       // notify('Please correct the validation errors before saving.', 'error', 3000);
@@ -668,7 +636,7 @@ export class CategoryComponent {
     this.dataservice.Add_category_list(payload).subscribe(
       (res: any) => {
         this.isSaving = false;
-        console.log(res);
+
         notify(
           {
             message: 'Category added successfully',
@@ -701,7 +669,6 @@ export class CategoryComponent {
 
     setTimeout(() => {
       this.PackformValidationGroup?.instance?.reset();
-      console.log('===================');
     }, 0);
     // Reset DevExtreme validator state
     setTimeout(() => {
@@ -722,8 +689,6 @@ export class CategoryComponent {
       PACKING: this.packing_values,
       // COMPANY_ID: this.selected_Company_id,
     };
-
-    console.log('Update Payload:', updatedPayload);
 
     // Check for duplicates in CategoryList (excluding current item)
     const isCodeDuplicate = this.CategoryList.some(
@@ -774,7 +739,7 @@ export class CategoryComponent {
     this.dataservice.update_category_details(updatedPayload).subscribe(
       (res: any) => {
         this.isSaving = false;
-        console.log(res);
+
         notify(
           {
             message: 'Category updated successfully',
@@ -805,8 +770,6 @@ export class CategoryComponent {
     const id = event.data.ID;
 
     this.dataservice.Delete_Category_Data(id).subscribe((res: any) => {
-      console.log(res);
-
       notify(
         {
           message: 'Category deleted successfully',
@@ -861,8 +824,6 @@ export class CategoryComponent {
       (p) => p.NAME === selectedPack.NAME,
     );
     this.selectedPackIndex = index !== -1 ? index : null;
-
-    console.log('Selected index for editing:', this.selectedPackIndex);
 
     if (selectedPack?.PACKCOMBINATIONS) {
       this.packData_values = selectedPack.PACKCOMBINATIONS.map((x) => ({

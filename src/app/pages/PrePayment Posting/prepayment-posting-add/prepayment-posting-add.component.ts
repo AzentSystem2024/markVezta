@@ -77,7 +77,6 @@ export class PrepaymentPostingAddComponent {
   }
 
   DateChange(e: any) {
-    console.log(e);
     const myDate = new Date(e.value);
 
     const year = myDate.getFullYear();
@@ -116,33 +115,19 @@ export class PrepaymentPostingAddComponent {
       COMPANY_ID: this.selected_Company_id,
     };
     this.dataservice.Prepayment_pending_list(payload).subscribe((res: any) => {
-      console.log(res);
       this.PrepaymentList = res.Data;
     });
   }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
     this.session_user_id = sessionData.USER_ID;
 
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   onSelectionChanged(event: any) {
@@ -171,12 +156,12 @@ export class PrepaymentPostingAddComponent {
       PREPAY_DETAIL: this.PREPAY_DETAIL,
       STORE_ID: this.selectedstoreId,
     };
-    console.log(payload);
+
     this.isSaving = true;
     this.dataservice.Insert_prepayment_data(payload).subscribe(
       (res: any) => {
         this.isSaving = false;
-        console.log(res);
+
         notify(
           {
             message: 'Prepayment posting Added successfully',

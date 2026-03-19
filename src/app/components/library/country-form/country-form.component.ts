@@ -21,13 +21,12 @@ import { DataService } from 'src/app/services';
 })
 export class CountryFormComponent {
   country: any;
-  isEditing:boolean
+  isEditing: boolean;
   formCountryData = {
     CODE: '',
     COUNTRY_NAME: '',
- 
-  COMPANY_ID:0
 
+    COMPANY_ID: 0,
   };
   userID: any;
   companyID: any;
@@ -39,12 +38,10 @@ export class CountryFormComponent {
     });
   }
 
-    session_Data(){
-        const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+  session_Data() {
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData==================:', menuResponse);
-    console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
@@ -52,8 +49,9 @@ export class CountryFormComponent {
 
   newCountry = this.formCountryData;
 
-  getNewCountryData = () => ({ ...this.newCountry ,
-    COMPANY_ID:this.companyID
+  getNewCountryData = () => ({
+    ...this.newCountry,
+    COMPANY_ID: this.companyID,
   });
 
   keyPressNumbers(event: any) {
@@ -92,7 +90,7 @@ export class CountryFormComponent {
   checkCountryCode(e) {
     return new Promise((resolve, reject) => {
       const codeExists = this.country.some(
-        (country) => country.CODE === e.value
+        (country) => country.CODE === e.value,
       );
       if (codeExists) {
         resolve(false); // Validation failed
@@ -113,7 +111,6 @@ export class CountryFormComponent {
     ReactiveFormsModule,
     DxSelectBoxModule,
     DxValidationGroupModule,
-    
   ],
   declarations: [CountryFormComponent],
   exports: [CountryFormComponent],

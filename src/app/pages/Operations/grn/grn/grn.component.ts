@@ -259,7 +259,6 @@ export class GrnComponent implements OnInit {
     };
     this.service.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -483,7 +482,6 @@ export class GrnComponent implements OnInit {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -658,14 +656,13 @@ export class GrnComponent implements OnInit {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/accounts');
@@ -679,15 +676,13 @@ export class GrnComponent implements OnInit {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sessionData_tax();
     this.getGrnLogData();
     this.getTemplateList();
     this.getDocNo();
   }
   // onEditingRow(event): void {
-  //   console.log(event, 'event');
+  //
   //   event.cancel = true;
   //   this.grnId = event.data.ID;
   //   const Id = event.data.ID;
@@ -729,7 +724,7 @@ export class GrnComponent implements OnInit {
   }
 
   // onVerifyClick = (e: any) => {
-  //   console.log(e);
+  //
   //   e.cancel = true;
   //   const id = e.row.data.ID;
   //   this.isVerifyPopupOpened = true;
@@ -741,7 +736,6 @@ export class GrnComponent implements OnInit {
   // };
 
   onApproveClick = (e) => {
-    console.log(e);
     e.cancel = true;
     const id = e.row.data.ID;
     this.isApprovePopupOpened = true;
@@ -753,7 +747,6 @@ export class GrnComponent implements OnInit {
   };
 
   onViewClick = (e) => {
-    console.log(e);
     e.cancel = true;
     const id = e.row.data.ID;
     this.selectedGrnId = id;
@@ -767,9 +760,7 @@ export class GrnComponent implements OnInit {
 
   deleteGrnData(event: any) {
     const ID = event.data.ID;
-    this.service.deleteGrnData(ID).subscribe((response: any) => {
-      console.log(response, 'deleted');
-    });
+    this.service.deleteGrnData(ID).subscribe((response: any) => {});
   }
 
   formatGrnDate(rowData: any): string {
@@ -844,7 +835,6 @@ export class GrnComponent implements OnInit {
   }
 
   OnParametersInitialized(event: any) {
-    console.log(event, 'event');
     var invisibleIntParamValue = 42;
     var intParam = event.args.ActualParametersInfo.filter(
       (x: any) => x.parameterDescriptor.name == 'intParam',

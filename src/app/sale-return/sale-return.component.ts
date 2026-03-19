@@ -153,21 +153,19 @@ export class SaleReturnComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/debit');
@@ -181,8 +179,6 @@ export class SaleReturnComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getSaleReturnList();
     this.sessionData_tax();
   }
@@ -522,11 +518,9 @@ export class SaleReturnComponent {
   }
 
   onDeletePurchaseReturn(event: any) {
-    console.log(event);
     const returnId = event.data.TRANS_ID;
     console.log(returnId);
     const status = event.data.TRANS_STATUS;
-    console.log(status);
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
       notify('This cannot be deleted.', 'error', 2000);

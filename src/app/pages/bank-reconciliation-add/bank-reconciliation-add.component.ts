@@ -116,7 +116,7 @@ export class BankReconciliationAddComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.sesstion_Details();
     this.get_Bank_dropdown();
@@ -133,12 +133,8 @@ export class BankReconciliationAddComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
   }
 
   onToDateChange(event: any) {
@@ -150,7 +146,6 @@ export class BankReconciliationAddComponent {
     this.dataService
       .Bank_Dropdown(this.selected_Company_id)
       .subscribe((res: any) => {
-        console.log('bank dropdown', res);
         this.Bank = res;
       });
   }
@@ -158,38 +153,30 @@ export class BankReconciliationAddComponent {
   calculateTotals() {
     this.totalDebit = this.BankReconciliationdatasource.reduce(
       (sum, item) => sum + (Number(item.DR_AMOUNT) || 0),
-      0
+      0,
     );
     this.totalCredit = this.BankReconciliationdatasource.reduce(
       (sum, item) => sum + (Number(item.CR_AMOUNT) || 0),
-      0
+      0,
     );
-    console.log(this.totalCredit, this.totalDebit);
     //  this.closingBalance = this.runningbalance -(this.remainingDebit + this.remainingCredit);
-    console.log(this.closingBalance);
   }
 
   onSelectionChanged(e: any) {
-    console.log(e, 'event');
     this.selectedRows = e.selectedRowKeys;
-    console.log('User selected:', this.selectedRows);
 
     const selectedDebitSum = this.selectedRows.reduce(
       (s: number, r: any) => s + (Number(r.DR_AMOUNT) || 0),
-      0
+      0,
     );
     const selectedCreditSum = this.selectedRows.reduce(
       (s: number, r: any) => s + (Number(r.CR_AMOUNT) || 0),
-      0
+      0,
     );
-
-    console.log(selectedCreditSum, selectedDebitSum);
 
     // remaining = original totals - selected sums
     this.remainingDebit = this.totalDebit - selectedDebitSum;
     this.remainingCredit = this.totalCredit - selectedCreditSum;
-    console.log(this.remainingCredit, 'remaining credit');
-    console.log(this.remainingDebit, 'remaining debit');
 
     this.closingBalance =
       this.runningbalance - (this.remainingDebit + this.remainingCredit);
@@ -203,7 +190,7 @@ export class BankReconciliationAddComponent {
           const val = parseFloat(
             String(item?.DR_AMOUNT || '0')
               .replace(/,/g, '')
-              .trim()
+              .trim(),
           );
           return sum + (isNaN(val) ? 0 : val);
         }, 0);
@@ -212,14 +199,13 @@ export class BankReconciliationAddComponent {
           const val = parseFloat(
             String(item?.CR_AMOUNT || '0')
               .replace(/,/g, '')
-              .trim()
+              .trim(),
           );
           return sum + (isNaN(val) ? 0 : val);
         }, 0);
 
         this.closingBalance =
           this.runningbalance - (this.remainingDebit + this.remainingCredit);
-        console.log(this.closingBalance);
       }
     },
   };
@@ -235,9 +221,6 @@ export class BankReconciliationAddComponent {
     const selectedBank = e.value; // selected 'ID' value (because of valueExpr)
     const selectedBankDetails = e.component.option('selectedItem'); // full object
 
-    console.log('Selected Bank ID:', selectedBank);
-    console.log('Selected Bank Details:', selectedBankDetails);
-
     // Example: You can store or use the selected bank
     this.selectedBankId = selectedBank;
     this.selectedBankName = selectedBankDetails?.DESCRIPTION;
@@ -250,10 +233,8 @@ export class BankReconciliationAddComponent {
       COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.BankReconciliation_List(payload).subscribe((res: any) => {
-      console.log(res);
       this.BankReconciliationdatasource = res.Data;
       this.runningbalance = res.Data[0].RUNNING_BALANCE;
-      console.log(this.runningbalance);
       this.calculateTotals();
 
       this.remainingDebit = this.totalDebit;
@@ -272,7 +253,7 @@ export class BankReconciliationAddComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -283,11 +264,10 @@ export class BankReconciliationAddComponent {
         TRANS_ID: row.TRANS_ID,
       })),
     };
-    console.log(payload);
+
     this.dataService
       .Insert_BankReconciliation(payload)
       .subscribe((res: any) => {
-        console.log(res);
         if (res.message === 'Bank reconciliation saved successfully.') {
           notify(
             {
@@ -295,7 +275,7 @@ export class BankReconciliationAddComponent {
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'success'
+            'success',
           );
           this.resetPage();
         }

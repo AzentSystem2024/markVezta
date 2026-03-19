@@ -100,9 +100,9 @@ export class EmployeeEditFormComponent {
     MOBILE: '',
     EMAIL: '',
     IS_MALE: 1,
-    PF_AC_NO:'',
-    ESI_NO:'',
-    ESI_PERCENT:0,
+    PF_AC_NO: '',
+    ESI_NO: '',
+    ESI_PERCENT: 0,
     DEPT_ID: '',
     DESG_ID: '',
     DOJ: null,
@@ -139,7 +139,7 @@ export class EmployeeEditFormComponent {
     STATE_NAME: '',
     IS_INACTIVE: '',
     PAYMENT_TYPE: '',
-    Company_Id:0,
+    Company_Id: 0,
     LEAVE_DAY_BALANCE: '',
     DAYS_DEDUCTED: '',
     Attachment: [],
@@ -155,33 +155,33 @@ export class EmployeeEditFormComponent {
   selected_Company_id: any;
   constructor(
     public dataservice: DataService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
     });
 
     const payload = {
-      NAME:'EMPLOYEE DEPARTMENT'
-    }
+      NAME: 'EMPLOYEE DEPARTMENT',
+    };
     dataservice.getDropdownData(payload).subscribe((data) => {
       this.departments = data;
     });
     const designation_payload = {
-      NAME :'DESIGNATION'
-    }
+      NAME: 'DESIGNATION',
+    };
     dataservice.getDropdownData(designation_payload).subscribe((data) => {
       this.designations = data;
     });
     const PaymentType_payload = {
-      NAME : 'SALARY PAYMENT TYPE'
-    }
+      NAME: 'SALARY PAYMENT TYPE',
+    };
     dataservice.getDropdownData(PaymentType_payload).subscribe((data) => {
       this.paymentType = data;
     });
     const state_payload = {
-      NAME : 'STATE'
-    }
+      NAME: 'STATE',
+    };
     dataservice.getDropdownData(state_payload).subscribe((data) => {
       this.states = data;
     });
@@ -192,18 +192,17 @@ export class EmployeeEditFormComponent {
     this.eighteenYearsAgo = new Date(
       today.getFullYear() - 18,
       today.getMonth(),
-      today.getDate()
+      today.getDate(),
     );
     this.sesstion_Details();
     this.getEmployeeList();
 
-          const  SELECTED_COMPANY=JSON.parse(sessionStorage.getItem('savedUserData'))
-    const companyid=SELECTED_COMPANY.SELECTED_COMPANY
+    const SELECTED_COMPANY = JSON.parse(
+      sessionStorage.getItem('savedUserData'),
+    );
+    const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
 
-    console.log(SELECTED_COMPANY)
-    
-    console.log(companyid);
-    this.COMPANY_ID=companyid.COMPANY_ID
+    this.COMPANY_ID = companyid.COMPANY_ID;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -225,14 +224,14 @@ export class EmployeeEditFormComponent {
           fileName: att.FILE_NAME,
           remarks: att.REMARKS,
           base64: att.FILE_DATA,
-        })
+        }),
       );
     }
   }
 
   mergeSalaryData() {
     const salaryMap = new Map<number, any>(
-      this.employeeFormData.EmployeeSalary.map((s: any) => [s.HEAD_ID, s])
+      this.employeeFormData.EmployeeSalary.map((s: any) => [s.HEAD_ID, s]),
     );
 
     const updatedSalaryHead = this.salaryHead.map((head: any) => {
@@ -250,9 +249,7 @@ export class EmployeeEditFormComponent {
     this.salaryHead = [...updatedSalaryHead]; // New reference for DevExtreme
   }
 
-  logGridData(e: any) {
-    console.log('Grid DataSource Items:', e.component.getDataSource().items());
-  }
+  logGridData(e: any) {}
 
   triggerFileUpload() {
     if (this.fileInput) {
@@ -267,7 +264,7 @@ export class EmployeeEditFormComponent {
 
     if (headId !== undefined && amount !== undefined) {
       const existingIndex = this.employeeFormData.EmployeeSalary.findIndex(
-        (item) => item.HEAD_ID === headId
+        (item) => item.HEAD_ID === headId,
       );
 
       if (existingIndex > -1) {
@@ -280,8 +277,6 @@ export class EmployeeEditFormComponent {
           AMOUNT: amount,
         });
       }
-
-      // console.log('Updated EMPLOYEESALARY:', this.employeeFormData.EmployeeSalary);
     } else {
       console.warn('Missing HEAD_ID or amount in updated row:', updatedRow);
     }
@@ -373,7 +368,7 @@ export class EmployeeEditFormComponent {
     const fileName = file.FILE_NAME || file.fileName;
 
     const actualFile = this.employeeFormData.Attachment.find(
-      (f: any) => f.FILE_NAME === fileName
+      (f: any) => f.FILE_NAME === fileName,
     );
 
     if (!actualFile || !actualFile.FILE_DATA) {
@@ -481,7 +476,6 @@ export class EmployeeEditFormComponent {
   }
 
   openAttachmentPopup() {
-    console.log('Opening attachment popup...'); // Debugging log
     this.showPopup = true;
   }
 
@@ -496,47 +490,39 @@ export class EmployeeEditFormComponent {
     }
   };
 
-  
-       sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
 
   getEmployeeList() {
-    const payload={
-      "CompanyId": this.selected_Company_id
-    }
+    const payload = {
+      CompanyId: this.selected_Company_id,
+    };
     this.dataservice.employeeList(payload).subscribe((response: any) => {
       this.employeeList = response.reverse();
     });
   }
 
   update() {
-    
     const enteredEmpCode = this.employeeFormData.EMP_CODE?.trim().toUpperCase();
     const currentEmpId = this.employeeFormData.ID;
     const enteredEmpName = this.employeeFormData.EMP_NAME?.trim();
-      if (!enteredEmpCode || !enteredEmpName) {
-    notify(
-      {
-        message: 'Employee Code and Employee Name are required.',
-        position: { at: 'top center', my: 'top center' }
-      },
-      'error',
-      2000
-    );
-    return; 
-  }
+    if (!enteredEmpCode || !enteredEmpName) {
+      notify(
+        {
+          message: 'Employee Code and Employee Name are required.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+        2000,
+      );
+      return;
+    }
     const isDuplicate = this.employeeList.some((emp) => {
       const empCode = emp.EMP_CODE?.trim().toUpperCase();
       const isSameCode = empCode === enteredEmpCode;
       const isDifferentId = emp.ID !== currentEmpId;
-
-      console.log(
-        `Comparing ${empCode} with ${enteredEmpCode} | isSameCode: ${isSameCode} | isDifferentId: ${isDifferentId}`
-      );
 
       return isSameCode && isDifferentId;
     });
@@ -547,7 +533,7 @@ export class EmployeeEditFormComponent {
           message: 'Employee Code already exists. Please enter a unique code.',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -575,14 +561,10 @@ export class EmployeeEditFormComponent {
 
     this.employeeFormData.Attachment = formattedAttachments;
 
-       const payload = { ...this.employeeFormData ,
-      Company_Id:  this.COMPANY_ID
-    };
-console.log(payload);
+    const payload = { ...this.employeeFormData, Company_Id: this.COMPANY_ID };
 
     this.dataservice.updateEmployee(payload).subscribe({
       next: (res) => {
-        // console.log('Employee updated successfully:', res);
         this.salaryGrid?.instance.refresh();
         if (res) {
           notify(
@@ -590,7 +572,7 @@ console.log(payload);
               message: 'Employee updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.formClosed.emit(true);
           this.selectedTabIndex = 0;
@@ -600,7 +582,7 @@ console.log(payload);
               message: 'Your Data Not updated',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         this.formClosed.emit(true); // To close popup
@@ -611,8 +593,7 @@ console.log(payload);
     });
   }
 
-
-    onStateChange(e: any) {
+  onStateChange(e: any) {
     const selected = this.states.find((d) => d.ID === e.value);
     this.employeeFormData.STATE_NAME = selected ? selected.DESCRIPTION : '';
   }
@@ -647,7 +628,7 @@ console.log(payload);
     DxTabsModule,
     DxiGroupModule,
     FormsModule,
-    DxNumberBoxModule
+    DxNumberBoxModule,
   ],
   providers: [],
   declarations: [EmployeeEditFormComponent],

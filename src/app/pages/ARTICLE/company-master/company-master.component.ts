@@ -170,24 +170,19 @@ export class CompanyMasterComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/company');
@@ -202,8 +197,6 @@ export class CompanyMasterComponent {
     }
     this.sesstion_Details();
     this.getCompanyList();
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
   onAddPopupClose() {
@@ -242,7 +235,6 @@ export class CompanyMasterComponent {
   //===============get Dropdown List=======================
   get_Company_Dropdown_List() {
     this.dataservice.CompanyDropdown_Api().subscribe((response: any) => {
-      console.log(response, 'response++++++++++');
       this.CompanyTypeDropdown = response;
     });
   }
@@ -298,7 +290,6 @@ export class CompanyMasterComponent {
   addData() {
     const validationResult = this.formValidationGroup.instance.validate();
     if (!validationResult.isValid) {
-      console.log('Validation failed');
       return;
     }
 
@@ -411,13 +402,10 @@ export class CompanyMasterComponent {
   }
 
   selectData(event: any) {
-    console.log('Select Event:', event); // Add this for debugging
-
     const ID = event?.data?.ID; // use lowercase `data`, not `Data`
 
     if (ID !== undefined) {
       this.dataservice.Select_CompanyList_Api(ID).subscribe((response: any) => {
-        console.log(response, 'select Api');
         this.selectedData = response;
         this.formsource.patchValue({
           CompanyTypeName: response.Data.COMPANY_TYPE || 0,
@@ -448,12 +436,8 @@ export class CompanyMasterComponent {
     const GSTNo = this.editingRowData.GST_NO;
     const CIN = this.editingRowData.CIN;
 
-    console.log(STATE_ID, 'stateID');
-
     // const Company_type = this.editingRowData.COMPANY_TYPE;
     const Is_Inactive = this.editingRowData.IS_INACTIVE;
-
-    console.log(Id, Company_code, Company_name);
 
     const payload = {
       ID: Id,

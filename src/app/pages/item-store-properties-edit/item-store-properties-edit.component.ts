@@ -108,7 +108,7 @@ export class ItemStorePropertiesEditComponent {
   constructor(
     private dataservice: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
       this.department = data;
@@ -143,35 +143,27 @@ export class ItemStorePropertiesEditComponent {
         this.itemStoresList = this.worksheetData.worksheet_item_property;
         this.selectedStoreId =
           this.worksheetData.worksheet_item_store?.[0]?.STORE_ID;
-        console.log(
-          'All worksheet items:',
-          this.worksheetData.worksheet_item_property
-        );
+
         this.selectedItems = this.worksheetData.worksheet_item_property.filter(
-          (item) => item.Selected === true
+          (item) => item.Selected === true,
         );
         this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
         this.cdr.detectChanges();
-        console.log('Selected Items:', this.selectedItems);
-        console.log('Selected Row Keys:', this.selectedRowKeys);
       } else {
-        console.log('No worksheet data, fetching from service');
         // this.listStoreItemProperty();
       }
     });
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
 
   loadStore() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
     });
@@ -197,7 +189,6 @@ export class ItemStorePropertiesEditComponent {
       (items: any) => {
         this.items = items;
         this.itemStoresList = items.data;
-        console.log(this.itemStoresList, 'ITEMSTORESLIST');
         this.itemStoresList.forEach((item: any) => {
           this.fetchSelectedItem(item.ID);
         });
@@ -205,7 +196,7 @@ export class ItemStorePropertiesEditComponent {
       },
       (error) => {
         console.error('Error fetching items:', error);
-      }
+      },
     );
   }
 
@@ -244,23 +235,23 @@ export class ItemStorePropertiesEditComponent {
           if (item.item_stores.length > 0) {
             item.IS_NOT_SALE_ITEM = this.aggregateProperty(
               item.item_stores,
-              'IS_NOT_SALE_ITEM'
+              'IS_NOT_SALE_ITEM',
             );
             item.IS_NOT_SALE_RETURN = this.aggregateProperty(
               item.item_stores,
-              'IS_NOT_SALE_RETURN'
+              'IS_NOT_SALE_RETURN',
             );
             item.IS_PRICE_REQUIRED = this.aggregateProperty(
               item.item_stores,
-              'IS_PRICE_REQUIRED'
+              'IS_PRICE_REQUIRED',
             );
             item.IS_NOT_DISCOUNTABLE = this.aggregateProperty(
               item.item_stores,
-              'IS_NOT_DISCOUNTABLE'
+              'IS_NOT_DISCOUNTABLE',
             );
             item.IS_INACTIVE = this.aggregateProperty(
               item.item_stores,
-              'IS_INACTIVE'
+              'IS_INACTIVE',
             );
           } else {
             item.STORE_NAME = 'No Store';
@@ -271,7 +262,7 @@ export class ItemStorePropertiesEditComponent {
       },
       (error) => {
         console.error('Error fetching selected item:', error);
-      }
+      },
     );
   }
 
@@ -284,7 +275,6 @@ export class ItemStorePropertiesEditComponent {
     this.showIsPriceRequired =
       this.selectedProperties.includes('Price Required');
     this.showIsInactive = this.selectedProperties.includes('Inactive');
-    console.log(this.selectedProperties, 'SELECTEDPROPERTYYYYYYYYYYYYYYYYYY');
     // this.dataGrid.instance.refresh();
   }
 
@@ -303,7 +293,6 @@ export class ItemStorePropertiesEditComponent {
     properties.forEach((property) => {
       if (!this.storeProperties.find((prop) => prop.name === property.name)) {
         this.storeProperties.push(property);
-        console.log(this.storeProperties, 'STOREPROPERTIES');
       }
     });
   }
@@ -328,16 +317,13 @@ export class ItemStorePropertiesEditComponent {
         }
       }
     });
-
-    console.log(this.selectedProperties, 'SELECTED PROPERTIES');
-    console.log(this.storeProperties, 'STORE PROPERTIES');
   }
 
   addProperty(name: string, value: any) {
     if (!this.selectedProperties.includes(name)) {
       this.selectedProperties.push(name);
       const existingProperty = this.storeProperties.find(
-        (item) => item.name === name
+        (item) => item.name === name,
       );
       if (!existingProperty) {
         this.storeProperties.push({ name, value });
@@ -363,15 +349,13 @@ export class ItemStorePropertiesEditComponent {
   handleCheckboxChange(e: any, property: string) {
     const newValue = e.value; // The new value from the checkbox
     const rowData = e.component.option('value'); // Get the corresponding row data
-    console.log(newValue, 'NEWVALUE');
-    console.log(rowData, 'ROWDATA');
+
     this.updateEditedItems(property, newValue, rowData); // Update the edited items with new value
   }
 
   saveChanges() {
     if (this.editedItems.length > 0) {
       const payload = this.editedItems;
-      console.log(payload, 'PAYLOAD IN EDIT');
       this.dataservice.updateworksheetItemProperty(payload).subscribe(
         (response: any) => {
           this.savedWorksheet = response;
@@ -381,7 +365,7 @@ export class ItemStorePropertiesEditComponent {
                 message: 'Data Updated Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
-              'success'
+              'success',
             );
             // this.dataGrid.instance.refresh();
             this.editedItems = [];
@@ -391,7 +375,7 @@ export class ItemStorePropertiesEditComponent {
                 message: 'Your Data Not Saved',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
           // Clear edited items after successful save
@@ -400,15 +384,14 @@ export class ItemStorePropertiesEditComponent {
         },
         (error) => {
           // console.error('Error saving items:', error);
-        }
+        },
       );
     }
   }
 
   updateEditedItems(property: string, newValue: boolean, rowData: any) {
-    console.log(rowData, '{{{{{');
     let editedItem = this.editedItems.find(
-      (item) => item.STORE_ID === String(this.selectedStoreId) // Ensure STORE_ID is a string
+      (item) => item.STORE_ID === String(this.selectedStoreId), // Ensure STORE_ID is a string
     );
     // If no existing edited item found, create a new one
     if (!editedItem) {
@@ -424,7 +407,7 @@ export class ItemStorePropertiesEditComponent {
 
     this.selectedRowKeys.forEach((selectedId: number) => {
       let worksheetItem = editedItem.worksheet_item_property.find(
-        (prop) => prop.ITEM_ID === selectedId
+        (prop) => prop.ITEM_ID === selectedId,
       );
 
       if (!worksheetItem) {
@@ -508,7 +491,7 @@ export class ItemStorePropertiesEditComponent {
               message: 'Worksheet Verified Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           // this.dataGrid.instance.refresh();
         } else {
@@ -517,15 +500,14 @@ export class ItemStorePropertiesEditComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
-        console.log('Verification successful:', verifyResponse);
         this.isVerified = true;
       },
       (error) => {
         console.error('Verification failed:', error);
-      }
+      },
     );
   }
 
@@ -562,7 +544,7 @@ export class ItemStorePropertiesEditComponent {
               message: 'Worksheet Approved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
         } else {
@@ -571,14 +553,13 @@ export class ItemStorePropertiesEditComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
   }
 
   onPropertiesChange(event: any) {
-    console.log('Selected Properties======:', event.value);
     this.selectedProperties = event.value;
     this.columns.forEach((column) => {
       column.visible = this.selectedProperties.includes(column.caption); // Match caption with selected properties
@@ -598,12 +579,12 @@ export class ItemStorePropertiesEditComponent {
   }
 
   getStoresById(storeId: any) {
-    const payload ={
-      COMPANY_ID : this.selected_Company_id
-    }
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.filteredStores = response.filter(
-        (store: any) => store.ID === storeId
+        (store: any) => store.ID === storeId,
       );
       if (this.filteredStores.length > 0) {
         this.listItemsByStoreId(storeId);

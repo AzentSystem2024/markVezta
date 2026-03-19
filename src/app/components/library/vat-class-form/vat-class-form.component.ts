@@ -74,15 +74,11 @@ export class VatClassFormComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      console.log(userData.Configuration, 'CONFIGURATIONNNNNNNNNNN');
       const selectedCompany = userData?.SELECTED_COMPANY;
-      console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
       this.companyState = selectedCompany.STATE_NAME;
       this.companyStateID = selectedCompany.STATE_ID;
-      console.log(this.companyStateID, 'COMPANYSTATE');
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
       this.formVatclassData.COMPANY_ID = selectedCompany.COMPANY_ID;
@@ -96,7 +92,6 @@ export class VatClassFormComponent {
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
-      console.log('Ledger List Loaded:', this.ledgerList);
     });
   }
 
@@ -134,7 +129,6 @@ export class VatClassFormComponent {
     }
   }
   keyPressVatname(event: any) {
-    console.log('key pressed');
     var charCode = event.which ? event.which : event.keyCode;
     var inputValue = event.target.value;
 

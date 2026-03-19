@@ -111,10 +111,7 @@ export class ViewCustomerReceiptComponent {
         this.selectedCompanyId = this.companyList[1].COMPANY_ID;
         this.onCustomerChanged({ value: this.selectedCompanyId });
       }
-
-      console.log('Loaded Companies:', this.companyList);
     } else {
-      console.warn('No userData found in localStorage');
     }
     this.getInvoiceList();
     this.getLedgerCodeDropdown();
@@ -124,7 +121,6 @@ export class ViewCustomerReceiptComponent {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['receiprtFormData'] && this.receiprtFormData) {
-      console.log('INVOICEFORMDATA:', this.receiprtFormData);
       const firstReceipt = this.receiprtFormData[0];
       if (firstReceipt.REC_DATE && typeof firstReceipt.REC_DATE === 'string') {
         const [day, month, year] = firstReceipt.REC_DATE.split('-').map(Number);
@@ -133,27 +129,21 @@ export class ViewCustomerReceiptComponent {
       this.receiprtFormData = firstReceipt; // assign for form binding
       this.selectedDistributorId = Number(firstReceipt.DISTRIBUTOR_ID);
       this.getCompanyListDropdown(firstReceipt.ID);
-      console.log(
-        this.selectedDistributorId,
-        'SELECTEDDISTRIIIIIIIIIIIIIIIIIIIII'
-      );
+
       if (!this.ledgerList?.length) {
         this.getLedgerCodeDropdown();
       } else if (this.receiptMode) {
         this.onReceiptModeChange({ value: this.receiptMode });
       }
       this.selectedCompanyId = firstReceipt.UNIT_ID;
-      console.log(
-        this.receiprtFormData.PAY_TYPE_ID,
-        'PAYTYPEIDDDDDDDDDDDDDD+++++++++++++++++++'
-      );
+
       // ✅ Filter only the selected company
       const userDataString = localStorage.getItem('userData');
       if (userDataString) {
         const userData = JSON.parse(userDataString);
         const allCompanies = userData.Companies || [];
         this.companyList = allCompanies.filter(
-          (company: any) => company.COMPANY_ID === this.selectedCompanyId
+          (company: any) => company.COMPANY_ID === this.selectedCompanyId,
         );
       }
       this.mainInvoiceGridList = firstReceipt.REC_DETAIL || []; // ✅ Store REC_DETAIL separately
@@ -161,8 +151,6 @@ export class ViewCustomerReceiptComponent {
       this.selectedRowsKeys = this.pendingInvoiceList
         .filter((row) => row.AMOUNT > 0) // or use your own condition
         .map((row) => row.BILL_ID);
-      console.log(this.receiprtFormData.PAY_TYPE_ID, 'PAYTYPEIDDDDDDDDDDDDDDD');
-      console.log('mainInvoiceGridList:', this.mainInvoiceGridList);
       switch (this.receiprtFormData.PAY_TYPE_ID) {
         case 1:
           this.selectedPaymentMode = 'Cash';
@@ -191,13 +179,6 @@ export class ViewCustomerReceiptComponent {
         this.onReceiptModeChange({ value: this.receiptMode });
       }
 
-      console.log(
-        'PAY_TYPE_ID:',
-        firstReceipt.PAY_TYPE_ID,
-        'Mapped receiptMode:',
-        this.receiptMode
-      );
-      console.log('receiptMode:', this.receiptMode);
       this.customerType = firstReceipt.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
 
       this.getCompanyListDropdown();
@@ -227,7 +208,7 @@ export class ViewCustomerReceiptComponent {
           const billId = +detail.BILL_ID;
 
           const matchedInvoice = allInvoices.find(
-            (invoice: any) => +invoice.BILL_ID === billId
+            (invoice: any) => +invoice.BILL_ID === billId,
           );
 
           if (matchedInvoice) {
@@ -238,24 +219,19 @@ export class ViewCustomerReceiptComponent {
 
         this.pendingInvoiceList = allInvoices;
         this.selectedRowsKeys = selectedKeys;
-
-        console.log('Matched Invoices:', this.pendingInvoiceList);
-        console.log('Selected Row Keys:', this.selectedRowsKeys);
       });
   }
 
   getCompanyListDropdown(id?: number) {
-        const payload = {
+    const payload = {
       NAME: 'CUSTOMER',
       COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.distributorList = response;
-      console.log(this.distributorList, 'distributorList');
 
       // Use id if needed
       if (id) {
-        console.log('Called with ID:', id);
         // You can filter distributorList based on id if required
       }
 
@@ -272,7 +248,6 @@ export class ViewCustomerReceiptComponent {
   // getCompanyListDropdown() {
   //   this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
   //     this.distributorList = response;
-  //     console.log(this.distributorList, 'distributorList');
 
   //     // Set selectedDistributorId only after distributorList is loaded
   //     if (
@@ -287,7 +262,6 @@ export class ViewCustomerReceiptComponent {
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
-        console.log('API Response:', response);
         this.ledgerList = response?.Data || [];
 
         // ✅ Only apply filter if receiptMode already has a value
@@ -296,8 +270,6 @@ export class ViewCustomerReceiptComponent {
         } else {
           this.filteredLedgerList = [...this.ledgerList]; // default full list
         }
-
-        console.log('Ledger List Loaded:', this.ledgerList);
       },
       error: (err) => {
         console.error('Ledger API Error:', err);
@@ -308,7 +280,6 @@ export class ViewCustomerReceiptComponent {
   onLedgerChanged(e: any) {
     // This gives full object
     this.selectedLedger = e.value;
-    console.log('Selected PAY_HEAD_ID:', this.selectedLedger);
     if (this.receiptMode === 'PDC' && this.selectedDistributorId) {
       this.getPdcofSelectedSupplier();
     }
@@ -336,22 +307,16 @@ export class ViewCustomerReceiptComponent {
     }
 
     this.applyReceiptModeFilter();
-
-    console.log('Updated PAY_TYPE_ID:', this.receiprtFormData.PAY_TYPE_ID);
   }
 
   applyReceiptModeFilter() {
-    console.log(
-      this.filteredLedgerList,
-      '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{'
-    );
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13
+        (item: any) => item.GROUP_ID === 13,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
@@ -359,13 +324,12 @@ export class ViewCustomerReceiptComponent {
           item.GROUP_ID !== 13 &&
           item.GROUP_ID !== 14 &&
           item.GROUP_ID !== 15 &&
-          item.GROUP_ID !== 41
+          item.GROUP_ID !== 41,
       );
     } else if (this.receiptMode === 'PDC') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
-      console.log(this.filteredLedgerList, 'FILTEREDLEDGERLIST');
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
     }
@@ -386,10 +350,6 @@ export class ViewCustomerReceiptComponent {
     };
     this.dataService.getPdcListByCustomer(payload).subscribe({
       next: (response: any) => {
-        console.log(
-          response,
-          'PDC List Response=============================-----------'
-        );
         this.pdcList = response?.Data || []; // store it in a variable
       },
       error: (err) => {
@@ -400,7 +360,6 @@ export class ViewCustomerReceiptComponent {
 
   onPdcSelected(e: any) {
     const selectedCheque = e.data;
-    console.log('Selected Cheque:', selectedCheque);
 
     // Example: assign selected cheque to form
     this.receiprtFormData.CHEQUE_NO = selectedCheque.CHEQUE_NO;
@@ -410,7 +369,7 @@ export class ViewCustomerReceiptComponent {
       this.receiprtFormData.CHEQUE_DATE = new Date(
         Number(parts[2]), // year
         Number(parts[1]) - 1, // month is 0-based
-        Number(parts[0]) // day
+        Number(parts[0]), // day
       );
     } else {
       this.receiprtFormData.CHEQUE_DATE = null;
@@ -425,7 +384,6 @@ export class ViewCustomerReceiptComponent {
     if (e.component) {
       this.totalPendingAmount =
         e.component.getTotalSummaryValue('PENDING_AMOUNT');
-      console.log('Total Pending Amount:', this.totalPendingAmount);
     }
   }
 
@@ -436,7 +394,6 @@ export class ViewCustomerReceiptComponent {
   getReceiptNo() {
     this.dataService.getReceiptNo().subscribe((response: any) => {
       this.receiptNo = response.RECEIPT_NO;
-      console.log(this.receiptNo, 'RECEIPTNOOOOO ');
     });
   }
 
@@ -458,12 +415,10 @@ export class ViewCustomerReceiptComponent {
     this.receiprtFormData.NET_AMOUNT =
       Number(this.receiprtFormData.NET_AMOUNT || 0) - deduction;
 
-    console.log('Updated NET_AMOUNT:', this.receiprtFormData.NET_AMOUNT);
-
     // ✅ Calculate total of selected RECEIVED_AMOUNT
     const selectedTotal = e.selectedRowsData.reduce(
       (sum: number, row: any) => sum + Number(row.AMOUNT || 0),
-      0
+      0,
     );
 
     // ✅ Update the summary footer dynamically
@@ -473,7 +428,7 @@ export class ViewCustomerReceiptComponent {
         if (item.name === 'selectedTotal') {
           e.component.option(
             `summary.totalItems[${index}].value`,
-            selectedTotal
+            selectedTotal,
           );
         }
       });
@@ -483,9 +438,7 @@ export class ViewCustomerReceiptComponent {
   }
 
   onCustomerChanged(event: any): void {
-    console.log('===================');
     const selectedId = event.value;
-    console.log(selectedId, 'SELECTEDID');
     if (selectedId) {
       this.getInvoiceList();
     }
@@ -498,7 +451,7 @@ export class ViewCustomerReceiptComponent {
       notify(
         'Please select at least one row before proceeding.',
         'warning',
-        3000
+        3000,
       );
       return;
     }
@@ -506,7 +459,7 @@ export class ViewCustomerReceiptComponent {
     // Calculate total pending of selected rows
     this.totalPending = selectedRows.reduce(
       (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-      0
+      0,
     );
 
     this.showFillAmountPopup = true;
@@ -641,7 +594,7 @@ export class ViewCustomerReceiptComponent {
     if (this.receiprtFormData.IS_APPROVED) {
       const result = confirm(
         'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit'
+        'Confirm Commit',
       );
 
       result.then((dialogResult) => {
@@ -672,7 +625,7 @@ export class ViewCustomerReceiptComponent {
       }));
     const netAmount = validDetails.reduce(
       (sum: number, row: any) => sum + row.AMOUNT,
-      0
+      0,
     );
     this.receiprtFormData.PAY_TYPE_ID = this.receiprtFormData.PAY_TYPE_ID;
     this.receiprtFormData.NET_AMOUNT = netAmount;
@@ -685,7 +638,6 @@ export class ViewCustomerReceiptComponent {
       TRANS_ID: this.receiprtFormData.TRANS_ID,
       IS_APPROVED: true,
     };
-    console.log(commitPayload, 'COMMITPAYLOADDDDDDDDDDDDDDDDDDDDDDDD');
     this.dataService.commitCustomerReceipt(commitPayload).subscribe({
       next: () => {
         notify('Receipt committed successfully!', 'success', 2000);
@@ -722,14 +674,14 @@ export class ViewCustomerReceiptComponent {
       notify(
         'Please enter a valid Received Amount for at least one selected row',
         'warning',
-        3000
+        3000,
       );
       return;
     }
 
     const netAmount = validDetails.reduce(
       (sum: number, row: any) => sum + row.AMOUNT,
-      0
+      0,
     );
     // this.receiprtFormData.PAY_TYPE_ID = 1;
     this.receiprtFormData.PAY_TYPE_ID = this.receiprtFormData.PAY_TYPE_ID;
@@ -742,7 +694,6 @@ export class ViewCustomerReceiptComponent {
       REC_DETAIL: validDetails,
     };
 
-    console.log('Sending payload:', payload); // For debugging
     // Call API
     this.dataService.updateReceipt(payload).subscribe({
       next: (response: any) => {

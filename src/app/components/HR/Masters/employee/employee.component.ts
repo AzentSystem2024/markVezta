@@ -135,21 +135,16 @@ export class EmployeeComponent {
   }
 
   getStatusFlagClass(IS_INACTIVE: string): string {
-    // console.log('Status:', Status);
-
     return IS_INACTIVE ? 'flag-red' : 'flag-green';
   }
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/employee');
@@ -163,20 +158,13 @@ export class EmployeeComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sesstion_Details();
     this.getEmployeeList();
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
@@ -194,8 +182,6 @@ export class EmployeeComponent {
       sessionStorage.getItem('savedUserData'),
     );
     const companyid = SELECTED_COMPANY;
-    console.log(SELECTED_COMPANY);
-    console.log(companyid);
 
     const payload = {
       CompanyId: this.selected_Company_id,
@@ -225,12 +211,10 @@ export class EmployeeComponent {
 
   onEditEmployee(e: any) {
     e.cancel = true;
-    console.log(e, '=============event================================');
     const employeeId = e.data.ID;
     this.editEmployeePopupOpened = true;
     this.dataservice.selectEmployee(employeeId).subscribe((response: any) => {
       this.selectedEmployee = response;
-      console.log(this.selectedEmployee, 'selected response');
     });
   }
 

@@ -45,10 +45,10 @@ import { MiscPaymentGstEditModule } from '../misc-payment-gst-edit/misc-payment-
 @Component({
   selector: 'app-misc-payment-gst-list',
   templateUrl: './misc-payment-gst-list.component.html',
-  styleUrls: ['./misc-payment-gst-list.component.scss']
+  styleUrls: ['./misc-payment-gst-list.component.scss'],
 })
 export class MiscPaymentGstListComponent {
-@ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -74,7 +74,7 @@ export class MiscPaymentGstListComponent {
   canPrint = false;
   selectedCompanyId: any;
 
-   //========================Export data ==========================
+  //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'Micellaneous_Payments';
     this.dataService.exportDataGrid(event, fileName);
@@ -124,7 +124,7 @@ export class MiscPaymentGstListComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private router: Router
+    private router: Router,
   ) {
     this.sessionData_tax();
   }
@@ -133,13 +133,10 @@ export class MiscPaymentGstListComponent {
     this.userId = sessionStorage.getItem('UserId');
 
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/miscellaneous-payment');
@@ -153,15 +150,12 @@ export class MiscPaymentGstListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getMiscPaymentList();
     this.sessionData_tax();
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -178,7 +172,7 @@ export class MiscPaymentGstListComponent {
   getMiscPaymentList() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
-    }
+    };
     this.dataService.getMiscpaymentList(payload).subscribe((response: any) => {
       this.miscPaymentsList = response.Data.map((item: any) => {
         let dateValue: Date;
@@ -221,7 +215,7 @@ export class MiscPaymentGstListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -350,7 +344,7 @@ export class MiscPaymentGstListComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -449,7 +443,6 @@ export class MiscPaymentGstListComponent {
     }
 
     const miscId = e.data.TRANS_ID;
-    // console.log("delete")
     // Optionally prevent the default delete behavior
     e.cancel = true;
 
@@ -462,7 +455,7 @@ export class MiscPaymentGstListComponent {
               message: 'Miscellaneous Payment Log Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getMiscPaymentList();
           // this.dataGrid.instance.refresh();
@@ -472,14 +465,14 @@ export class MiscPaymentGstListComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 
@@ -491,7 +484,6 @@ export class MiscPaymentGstListComponent {
   };
 
   handleClose() {
-    // console.log('Parent: popupClosed triggered');
     this.addMiscPaymentPopup = false;
     this.editMiscPopupOpened = false;
     this.getMiscPaymentList();

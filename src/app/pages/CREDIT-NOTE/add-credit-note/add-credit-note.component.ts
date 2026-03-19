@@ -436,11 +436,8 @@ export class AddCreditNoteComponent {
   //       (s: any) => s.ID === this.selectedCustomerId
   //     );
   //     this.creditFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
-  //     console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
-  //     console.log(this.selectedCustomer.STATE_ID, 'SELECTED CUSTOMER STATE ID');
   //     const sessionGst = parseFloat(this.GST) || 0;
   //     if (this.companyStateID === this.selectedCustomer.STATE_ID) {
-  //       console.log('Both states SAME → CGST + SGST apply');
 
   //       this.showCGST = true;
   //       this.showSGST = true;
@@ -454,7 +451,6 @@ export class AddCreditNoteComponent {
   //         this.applyGstForRow(row);
   //       });
   //     } else {
-  //       console.log('States DIFFERENT → GST applies');
 
   //       this.showGST = true;
   //       this.showCGST = false;
@@ -918,7 +914,6 @@ export class AddCreditNoteComponent {
   // getCompanyListDropdown() {
   //   this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
   //     this.distributorList = response;
-  //     console.log(this.distributorList, 'distributorList');
   //   });
   // }
 
@@ -953,12 +948,10 @@ export class AddCreditNoteComponent {
   }
 
   // selectInvoice(e: any) {
-  //   console.log('Invoice selected:', e);
   //   const selected = e.data;
   //   this.creditFormData.INVOICE_NO = selected.INVOICE_NO;
   //   this.creditFormData.DUE_AMOUNT = selected.BALANCE_AMOUNT;
   //   this.creditFormData.INVOICE_ID = selected.INVOICE_ID;
-  //   console.log(this.creditFormData.INVOICE_ID, 'INVOICEIDDDDDDDDDDDDDDDD');
   //   this.invoicePopupVisible = false;
   // }
 

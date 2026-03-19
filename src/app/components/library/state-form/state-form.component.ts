@@ -6,7 +6,11 @@ import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.compone
 import { FormPhotoUploaderModule } from '../../utils/form-photo-uploader/form-photo-uploader.component';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { DxPopupModule, DxSelectBoxModule, DxValidationGroupModule } from 'devextreme-angular';
+import {
+  DxPopupModule,
+  DxSelectBoxModule,
+  DxValidationGroupModule,
+} from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 
 @Component({
@@ -15,7 +19,7 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./state-form.component.scss'],
 })
 export class StateFormComponent implements OnInit {
-  isAddStatePopupOpened:boolean=false;
+  isAddStatePopupOpened: boolean = false;
   CountryDropdownData: any;
   formStateData = {
     STATE_CODE: '',
@@ -30,7 +34,6 @@ export class StateFormComponent implements OnInit {
   getCountryDropDown() {
     this.service.getCountryData().subscribe((data: any) => {
       this.CountryDropdownData = data;
-      console.log('dropdown', this.CountryDropdownData);
     });
   }
   ngOnInit(): void {

@@ -359,7 +359,6 @@ export class ItemsEditFormComponent implements OnInit {
     this.itemlabel3 = authservice.getsettingsData().ITEM_PROPERTY3;
     this.itemlabel4 = authservice.getsettingsData().ITEM_PROPERTY4;
     this.itemlabel5 = authservice.getsettingsData().ITEM_PROPERTY5;
-    // console.log('ItemsEditFormComponent constructor');
     const parentItemPayload = {
       COMPANY_ID: 0,
       NAME: 'PARENTITEM',
@@ -383,7 +382,6 @@ export class ItemsEditFormComponent implements OnInit {
     });
     dataservice.getDropdownData('COUNTRY').subscribe((data) => {
       this.country = data;
-      // console.log(this.country, 'COUNTRY');
     });
     const store = {
       COMPANY_ID: 0,
@@ -394,7 +392,6 @@ export class ItemsEditFormComponent implements OnInit {
       this.selectedStoreIds = this.itemData.item_stores.map(
         (store) => store.ID,
       );
-      // console.log('Selected store IDs:', this.selectedStoreIds);
     });
     const itemProp1Payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -413,7 +410,6 @@ export class ItemsEditFormComponent implements OnInit {
     };
     dataservice.getItemProperty3Data(itemProp3Payload).subscribe((data) => {
       this.itemprop3 = data;
-      // console.log(this.itemprop3,"itemprop3")
     });
     const itemProp4Payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -430,7 +426,6 @@ export class ItemsEditFormComponent implements OnInit {
 
     // dataservice.getDepartmentData().subscribe((data) => {
     //   this.department = data;
-    //   console.log(this.department,"DEP IN EDIT")
     // });
     const department = {
       COMPANY_ID: this.selected_Company_id,
@@ -438,7 +433,6 @@ export class ItemsEditFormComponent implements OnInit {
     };
     dataservice.getDropdownData(department).subscribe((data) => {
       this.department = data;
-      console.log(this.department, 'DEPARTMENTTTTTTTTTTTT');
     });
     const subcategory = {
       COMPANY_ID: this.selected_Company_id,
@@ -476,14 +470,12 @@ export class ItemsEditFormComponent implements OnInit {
     };
     dataservice.getDropdownData(costiingmethod).subscribe((data) => {
       this.costingMethodOptions = data;
-      // console.log(this.costingMethodOptions,"COSTINGMETHOD")
     });
     const packing = {
       NAME: 'PACKING',
     };
     dataservice.getDropdownData(packing).subscribe((data) => {
       this.packing = data;
-      // console.log(this.packing,"packing")
     });
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
@@ -492,9 +484,6 @@ export class ItemsEditFormComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['itemData'] && this.itemData) {
-      console.log(JSON.parse(JSON.stringify(this.itemData)), 'IN NGONCHANGES');
-
-      console.log(this.itemData.SALE_PRICE, 'sale price');
       this.salePrice = this.itemData.SALE_PRICE;
       this.formItemsData = this.itemData;
       if (this.itemData.IMAGE_NAME) {
@@ -508,13 +497,9 @@ export class ItemsEditFormComponent implements OnInit {
       }
       this.showComponentTab = this.itemData.TYPE_ID === 8; // Show the Component tab if TYPE_ID is 8
       this.showSupplierTab = this.itemData.TYPE_ID !== 8;
-      console.log(this.itemData.UOM, 'ITEMCOMPONENTSSSS');
       const data = this.uom;
-      console.log(this.uom, 'DATAAAAAAAAAAAA');
       this.filteredUOM = this.uom;
-      console.log(this.filteredUOM, 'FILTEREDUOM');
       this.selectedData = this.itemData.UOM_PURCH;
-      console.log(this.selectedData, 'UOMPURCH');
       if (
         this.itemData.item_components &&
         this.itemData.item_components.length > 0
@@ -525,18 +510,14 @@ export class ItemsEditFormComponent implements OnInit {
           UOM: component.UOM,
           QUANTITY: component.QUANTITY,
         }));
-        console.log(this.gridData, 'GRIDDATAAAAA');
       } else {
         this.gridData = []; // Reset if no components
       }
-      console.log(this.gridData, 'GRIDDATA');
     }
-    console.log(this.itemData.item_stores, 'Stores');
     if (changes['itemData'] && this.itemData) {
       this.formData = { ...this.itemData }; // Bind itemData to formData
 
       this.edit_Suplier = this.itemData.item_suppliers;
-      console.log(this.edit_Suplier, '][][][[][[][][][');
       if (this.itemData && this.itemData.item_stores) {
         this.selectedStoreIds = this.itemData.item_stores.map(
           (store) => store.ID,
@@ -545,8 +526,6 @@ export class ItemsEditFormComponent implements OnInit {
       }
 
       this.Edit_Store = JSON.parse(JSON.stringify(this.itemData)).item_stores;
-
-      console.log(this.Edit_Store, '[]][[]][][][][][][=======][[][][]][][][[]');
     }
     this.loadStores();
     this.sesstion_Details();
@@ -554,59 +533,42 @@ export class ItemsEditFormComponent implements OnInit {
   onPriceChange(event: any) {
     const newPrice = event.value;
     this.itemData.SALE_PRICE = newPrice;
-    console.log(
-      this.itemData.SALE_PRICE,
-      '=================event data==========================',
-    );
+
     this.Edit_Store.forEach((s) => (s.SALE_PRICE = newPrice));
   }
 
   onCostChange(event: any) {
     const newPrice = event.value;
-    console.log(event, '=================event data==========================');
-    console.log('New Price:', newPrice);
     this.itemData.COST_PRICE = newPrice;
     this.Edit_Store.forEach((s) => (s.COST_PRICE = newPrice));
   }
   onProfitmarginChange(event: any) {
     const newPrice = event.value;
-    console.log(event, '=================event data==========================');
-    console.log('New Price:', newPrice);
     // this.itemData.SALE_PRICE = newPrice;
     // this.Edit_Store.forEach(s => s.SALE_PRICE = newPrice);
   }
   onSalesPrice1Change(event: any) {
     const newPrice = event.value;
-    console.log(event, '=================event data==========================');
-    console.log('New Price:', newPrice);
     this.itemData.SALE_PRICE = newPrice;
     this.Edit_Store.forEach((s) => (s.SALE_PRICE1 = newPrice));
   }
   onSalesPrice2Change(event: any) {
     const newPrice = event.value;
-    console.log(event, '=================event data==========================');
-    console.log('New Price:', newPrice);
     this.itemData.SALE_PRICE = newPrice;
     this.Edit_Store.forEach((s) => (s.SALE_PRICE2 = newPrice));
   }
   onSalesPrice3Change(event: any) {
     const newPrice = event.value;
-    console.log(event, '=================event data==========================');
-    console.log('New Price:', newPrice);
     this.itemData.SALE_PRICE = newPrice;
     this.Edit_Store.forEach((s) => (s.SALE_PRICE3 = newPrice));
   }
   onSalesPrice4Change(event: any) {
     const newPrice = event.value;
-    console.log(event, '=================event data==========================');
-    console.log('New Price:', newPrice);
     this.itemData.SALE_PRICE = newPrice;
     this.Edit_Store.forEach((s) => (s.SALE_PRICE4 = newPrice));
   }
   onSalesPrice5Change(event: any) {
     const newPrice = event.value;
-    console.log(event, '=================event data==========================');
-    console.log('New Price:', newPrice);
     this.itemData.SALE_PRICE = newPrice;
     this.Edit_Store.forEach((s) => (s.SALE_PRICE5 = newPrice));
   }
@@ -619,7 +581,6 @@ export class ItemsEditFormComponent implements OnInit {
     const state = navigation?.extras.state as { data: any };
     if (state?.data) {
       this.itemData = state.data;
-      console.log(this.itemData.IMAGE_NAME, 'IMAGE_NAME in Edit Component'); // Verify IMAGE_NAME here
     }
     this.getUOM();
     this.refreshItems();
@@ -629,57 +590,29 @@ export class ItemsEditFormComponent implements OnInit {
   }
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
-    console.log(
-      this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1==============',
-    );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
-    console.log(
-      this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2==============',
-    );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
-    console.log(
-      this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3==============',
-    );
 
     this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
-    console.log(
-      this.ITEM_PROPERTY4,
-      '============ITEM_PROPERTY4==============',
-    );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
-    console.log(
-      this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5==============',
-    );
 
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
-    console.log(this.ENABLE_Matrix_Code);
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
-  onRowUpdated(e: any) {
-    console.log(e);
-  }
+  onRowUpdated(e: any) {}
 
   onParentItemChanged(event: any) {
-    console.log(event, 'PARENT');
     const selectedParentItem = event.selectedRowsData[0]; // Access the first selected item
-    console.log(selectedParentItem, 'SELECTEDITEM');
     if (selectedParentItem) {
       // this.selectedParentItemId = selectedParentItem.ID;
       this.itemData.PARENT_ITEM_ID = selectedParentItem.ID;
-      console.log(this.itemData.PARENT_ITEM_ID, '===========----------');
       this.selectedParentItemDescription = selectedParentItem.DESCRIPTION;
-      console.log(this.selectedParentItemDescription, 'SELECTEDDESCRIPTION');
       this.isParentItemSelected = this.itemData.PARENT_ITEM_ID;
     }
   }
@@ -691,11 +624,9 @@ export class ItemsEditFormComponent implements OnInit {
     };
     this.dataservice.getDropdownData(uom).subscribe((data) => {
       this.uom = data;
-      console.log(this.uom, 'UOMMMMMMMMMMMMMM');
       this.filteredUOMs = this.uom.filter(
         (option) => option.ID !== this.itemData.UNIT_ID,
       );
-      console.log(this.filteredUOMs, 'UOMMMMMMMMMMMMMMFILTERED');
       this.filterDropdownOptions();
     });
   }
@@ -704,14 +635,12 @@ export class ItemsEditFormComponent implements OnInit {
     this.filteredUOM = this.uom.filter(
       (option) => option.ID !== this.itemData.UNIT_ID,
     );
-    console.log(this.filteredUOM, 'FILTEREDUOM');
   }
 
   filterDropdownOptions() {
     this.filteredDropdownOptions = this.uom.filter(
       (option) => option.ID !== this.selectedUom,
     );
-    console.log(this.filteredDropdownOptions, 'FILTERED');
   }
 
   onUOMChange(event: any) {
@@ -727,7 +656,6 @@ export class ItemsEditFormComponent implements OnInit {
   loadStores() {
     this.dataservice.getDropdownData('STORE').subscribe((data) => {
       this.store = data;
-      // console.log(this.store, 'STORE000000');
       this.loadItemStores();
     });
   }
@@ -744,7 +672,6 @@ export class ItemsEditFormComponent implements OnInit {
 
   onSelectionChanged(event: any) {
     this.selectedStoreIds = event.selectedRowKeys;
-    console.log('Selected Store IDs:', this.selectedStoreIds);
     this.updatePriceLevel(event.selectedRowsData);
   }
 
@@ -783,16 +710,10 @@ export class ItemsEditFormComponent implements OnInit {
         store.IS_SELECTED = true; // Ensure that the row is unchecked if not selected
       });
     }
-    // console.log('Updated ITEM_STORES:', this.itemData.ITEM_STORES);
   }
 
   saveData() {
-    console.log('SAVEDATACALLED');
-
-    console.log(this.Edit_Store, 'EDITTTTTTTTTTTTTTTTTTTTTTTTTTTTTT');
-
     const select_supplier = this.itemData.item_suppliers;
-    console.log(select_supplier);
 
     const convertedData: any[] = [];
 
@@ -811,7 +732,6 @@ export class ItemsEditFormComponent implements OnInit {
         IS_CONSIGNMENT: item.IS_CONSIGNMENT || true,
       });
     });
-    console.log(convertedData, '====[[=====[[===[[==');
 
     const itemAliasDAta = this.itemData.item_alias;
     const convertedAliasData: any[] = [];
@@ -825,9 +745,7 @@ export class ItemsEditFormComponent implements OnInit {
       });
     });
 
-    console.log(convertedAliasData);
     const items = this.itemData; // Adjust if needed based on your form structure
-    console.log(items, 'in update function!');
     const payload = {
       ...this.itemData,
       item_stores: this.Edit_Store || this.itemData.item_stores,
@@ -836,11 +754,9 @@ export class ItemsEditFormComponent implements OnInit {
       UOM_PURCH: this.selectedData,
       COMPANY_ID: this.selected_Company_id,
     };
-    console.log(payload, 'PAYLOAD');
     // Call the service to update the items
     this.dataservice.updateItems(payload.ID, payload).subscribe(
       (response) => {
-        console.log('Update successful:', response);
         if (response) {
           notify(
             {
@@ -940,7 +856,6 @@ export class ItemsEditFormComponent implements OnInit {
     this.dataservice.getItemsData().subscribe(
       (data) => {
         this.items = data; // Assuming 'items' is the data source for your grid
-        console.log(this.items, 'after refresh');
       },
       (error) => {
         console.error('Failed to refresh items:', error);
@@ -988,9 +903,7 @@ export class ItemsEditFormComponent implements OnInit {
           };
         });
         this.isLoading = false;
-        console.log(this.newItemList, 'New Item List');
 
-        // console.log(this.itemsList, "ITEMSLIST");
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -1002,15 +915,11 @@ export class ItemsEditFormComponent implements OnInit {
   }
 
   onItemSelected(event: any): void {
-    console.log('ITEM SELECTED======', event);
-
     // Get the selected item from the event's selectedRowsData
     const selectedItem = event.selectedRowsData[0]; // Access the first selected item
-    console.log(selectedItem, 'SELECTEDITEM');
 
     if (selectedItem) {
       this.selectedItemId = selectedItem.ID; // Bind the selected ID
-      console.log(this.selectedItemId, 'SELECTEDITEMIDDDDDDDDDD');
       this.selectedItemCode = selectedItem.ITEM_CODE; // Optionally capture the ITEM_CODE
       // Optionally, bind them to your form data or use them in your application
       const selectedItemDetails = this.newItemList.find(
@@ -1026,8 +935,6 @@ export class ItemsEditFormComponent implements OnInit {
   }
 
   saveItem(): void {
-    console.log(this.selectedItemId, 'IN SAVEEEEEEEEEE');
-    console.log('Form data:', this.formData);
     if (
       !this.formData.ITEM_CODE ||
       !this.formData.UOM ||
@@ -1041,7 +948,6 @@ export class ItemsEditFormComponent implements OnInit {
     const selectedItem = this.newItemList.find(
       (item) => item.ID === this.selectedItemId,
     );
-    console.log(selectedItem, 'SELECTEDITEMMMMMMMMM');
     const newComponent = {
       COMPANY_ID: this.companyId,
       COMPONENT_ITEM_ID: this.selectedItemId,
@@ -1053,17 +959,14 @@ export class ItemsEditFormComponent implements OnInit {
 
     // Add the component data to the components array
     this.gridData.push(newComponent);
-    console.log('Grid Data:', this.gridData);
 
     if (this.itemData && Array.isArray(this.itemData.item_components)) {
       this.itemData.item_components = [
         ...this.itemData.item_components,
         newComponent,
       ]; // Merging arrays
-      console.log('Item Data after merge:', this.itemData);
     }
 
-    console.log(this.itemData, 'FORMITEMSDATA');
     // Close the popup after saving
     this.isPopupVisible = false;
 
@@ -1079,14 +982,11 @@ export class ItemsEditFormComponent implements OnInit {
 
   editComponent(rowData: any) {
     // Implement the edit logic here, using the rowData to populate the form or open an edit modal
-    console.log(rowData); // Example: you can open a modal or navigate to an edit form with this data
   }
 
   addComponent() {
-    console.log('popup opened');
     this.isPopupVisible = true;
     this.cdr.detectChanges();
-    console.log(this.isPopupVisible, 'POPUP');
   }
 
   cancelPopup() {

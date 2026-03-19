@@ -59,7 +59,7 @@ export class ArticleEditComponent {
   @Input() articleData: any;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-   @ViewChild('bomGridRef', { static: false }) bomGridRef: any;
+  @ViewChild('bomGridRef', { static: false }) bomGridRef: any;
   popupVisible = false;
   imagePreview: string | ArrayBuffer | null = null;
   produCtionUnits: any;
@@ -111,7 +111,7 @@ export class ArticleEditComponent {
   ItempopupVisible: boolean = false;
   selectedItem: any;
   selectedItems: any[] = [];
-  ItemListDataSource:any[] = [];
+  ItemListDataSource: any[] = [];
 
   constructor(private dataService: DataService) {}
 
@@ -130,7 +130,6 @@ export class ArticleEditComponent {
       if (!this.selected_Company_id) {
         this.sesstion_Details();
       }
-      console.log('Incoming articleData:', incomingData);
 
       this.getDropdownLists().then(() => {
         this.articleData = {
@@ -178,13 +177,11 @@ export class ArticleEditComponent {
         // Handle Sizes only after articleSizeData is ready
         this.setSelectedSizes();
         if (this.articleData.BOM && Array.isArray(this.articleData.BOM)) {
-          console.log(this.articleData, 'BOMMMMMMMMMMM');
           this.items = this.articleData.BOM.map((bom: any) => {
             // find the matching item from dropdown list
             const matchedItem = this.itemsList?.find(
               (i: any) => i.ID === bom.ITEM_ID,
             );
-            console.log(matchedItem, 'MATCHEDITEMSINEDIT');
             return {
               ITEM: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
               // ITEM:bom.ITEM_CODE,
@@ -197,8 +194,6 @@ export class ArticleEditComponent {
               ITEM_CODE: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
             };
           });
-
-          console.log('Mapped BOM items:', this.items);
         } else {
           this.items = [];
         }
@@ -207,10 +202,7 @@ export class ArticleEditComponent {
   }
 
   setSelectedSizes() {
-    console.log('====================================================');
     if (this.articleData.SIZES && Array.isArray(this.articleData.SIZES)) {
-      console.log('articleData.SIZES:', this.articleData.SIZES);
-
       this.savedSizes = this.articleData.SIZES;
 
       const sizeStrings: string[] = this.savedSizes.map((s: any) =>
@@ -221,12 +213,9 @@ export class ArticleEditComponent {
         ?.filter((row: any) => sizeStrings.includes(row.SizeValue?.toString()))
         .map((row: any) => row.SizeValue);
 
-      console.log('Mapped selectedKeys:', selectedKeys);
-
       this.sizeGridSelectedKeys = selectedKeys;
       this.selectedSizeRows = selectedKeys;
     } else {
-      console.warn('SIZES not found or not an array');
     }
   }
 
@@ -236,18 +225,15 @@ export class ArticleEditComponent {
   //   // };
   //   this.dataService.listItemsForArticle().subscribe((response: any) => {
   //     this.itemsList = response.DataList;
-  //     console.log(this.itemsList);
   //     this.ItemCode = this.itemsList[0].DESCRIPTION;
-  //     console.log(this.ItemCode);
   //   });
   // }
 
-    getItems() {
+  getItems() {
     const payload = {
-      NAME: "ITEMS"
+      NAME: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      console.log(response)
       this.itemsList = response;
     });
   }
@@ -324,7 +310,6 @@ export class ArticleEditComponent {
     if (e.dataField === 'ITEM' && e.editorName === 'dxSelectBox') {
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedDescription = args.value;
-        console.log('Selected Item Description:', selectedDescription);
 
         const grid = e.component;
         const rowIndex = e.row.rowIndex;
@@ -342,7 +327,6 @@ export class ArticleEditComponent {
         }
 
         this.selectedItemId = matchedItem ? matchedItem.ID : null;
-        console.log(this.selectedItemId, 'SELECTEDITEMID');
         let itemCode = null;
         if (selectedDescription) {
           itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
@@ -352,8 +336,6 @@ export class ArticleEditComponent {
 
         this.dataService.getItemsForArticle(payload).subscribe({
           next: (response: any) => {
-            console.log('API Response:', response);
-
             if (response?.flag === 1 && response?.Data) {
               const data = response.Data;
 
@@ -428,7 +410,6 @@ export class ArticleEditComponent {
   //   //   COMPANY_ID: this.selected_Company_id,
   //   // };
   //   this.dataService.getArticleList().subscribe((response: any) => {
-  //     console.log(response, 'ARTICLELIST');
   //     if (response?.Data && Array.isArray(response.Data)) {
   //       // Store full list (reversed) in articleList
   //       this.articleList = response.Data.reverse();
@@ -438,7 +419,6 @@ export class ArticleEditComponent {
   //         (article: any) => article.IS_COMPONENT === true
   //       );
   //       this.attachGridData = this.componentArticles;
-  //       console.log(this.attachGridData, 'COMPONENTARTICLE');
   //     }
   //   });
   // }
@@ -464,7 +444,6 @@ export class ArticleEditComponent {
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
-        // console.log('Base64 Image String:', this.imagePreview);
       };
       reader.readAsDataURL(file);
     }
@@ -558,7 +537,6 @@ export class ArticleEditComponent {
     this.dataService
       .getLastOrderNoForArticle(payload)
       .subscribe((response: any) => {
-        console.log(response, 'LASTORDERNO');
         this.lastOrderNo = response?.LastOrderNo ?? '';
       });
   }
@@ -633,9 +611,7 @@ export class ArticleEditComponent {
     });
   }
 
-  onColorChanged(event: any) {
-    console.log('Selected Color:', event.value);
-  }
+  onColorChanged(event: any) {}
 
   openAttachPopup() {
     this.getArticles();
@@ -644,7 +620,6 @@ export class ArticleEditComponent {
 
   // onAttachRowSelected(event: any) {
   //   this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
-  //   console.log('Selected row:', this.selectedAttachRow);
   // }
 
   // onAttachRowSelected(event: any) {
@@ -702,10 +677,6 @@ export class ArticleEditComponent {
       // Optionally close popup
       this.isAttachPopupVisible = false;
       // this.selectedTabIndex = 0;
-      console.log(
-        'Assigned ComponentArticleID:',
-        this.articleData.COMPONENT_ARTICLE_ID,
-      );
     }
   }
   onSizeSelectionChanged(e: any) {
@@ -716,18 +687,12 @@ export class ArticleEditComponent {
         SIZES: row.SizeValue,
         OrderNo: row.OrderNo,
       }));
-
-    console.log('Selected rows:', this.selectedSizeRows);
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   updateArticle() {
@@ -748,16 +713,14 @@ export class ArticleEditComponent {
     }
 
     if (!this.articleData.HSN_CODE) {
-          notify({
-            message: 'Please enter the HSN Code.',
-            type: 'warning',
-            displayTime: 3000,
-            position: { at: 'top right', my: 'top right' },
-          });
-          return;
-        }
-
-
+      notify({
+        message: 'Please enter the HSN Code.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
 
     // Step 1: Collect selected sizes
     const selectedSizes =
@@ -776,18 +739,16 @@ export class ArticleEditComponent {
         QUANTITY: r.QUANTITY,
       }));
 
-    console.log('BOM Data:', bomGridData);
-
     //  BOM Validation
-if (!bomGridData.length) {
-  notify({
-    message: 'Please enter BOM.',
-    type: 'warning',
-    displayTime: 3000,
-    position: { at: 'top right', my: 'top right' },
-  });
-  return;
-}
+    if (!bomGridData.length) {
+      notify({
+        message: 'Please enter BOM.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
 
     // Step 2: Prepare the full payload
     const payload = {
@@ -833,7 +794,6 @@ if (!bomGridData.length) {
       STANDARD_PACKING: this.articleData.STANDARD_PACKING,
     };
 
-    console.log('Sending update payload:', payload);
     this.isSaving = true;
     // Step 3: Send update request
     this.dataService.updateArticle(payload).subscribe(
@@ -903,16 +863,9 @@ if (!bomGridData.length) {
     });
   }
 
- 
   onSupplierChanged(e: any) {
     const selected = this.materialUnits.find((s: any) => s.ID === e.value);
     this.articleData.SupplierName = selected ? selected.DESCRIPTION : '';
-    console.log(
-      'Selected Supplier ID:',
-      e.value,
-      'Name:',
-      this.articleData.SupplierName,
-    );
   }
 
   closePopup() {
@@ -920,142 +873,118 @@ if (!bomGridData.length) {
   }
 
   onArtNoChanged(e: any) {
-  let value = e.value || '';
+    let value = e.value || '';
 
-  // Enforce max length
-  if (value.length > 6) {
-    value = value.slice(0, 6);
-    e.component.option('value', value);
+    // Enforce max length
+    if (value.length > 6) {
+      value = value.slice(0, 6);
+      e.component.option('value', value);
+    }
+
+    this.articleData.ART_NO = value;
+
+    // 🔥 Update description AFTER value is set
+    this.updateItemDescription();
   }
 
-  this.articleData.ART_NO = value;
+  updateItemDescription() {
+    const artNo = this.articleData.ART_NO || '';
+    const color = this.articleData.COLOR || '';
+    const packing = this.articleData.STANDARD_PACKING || '';
+    const price = this.articleData.PRICE ?? '';
 
-  // 🔥 Update description AFTER value is set
-  this.updateItemDescription();
-}
+    const categoryName =
+      this.categoryList?.find((c) => c.ID === this.selectedCategoryId)
+        ?.DESCRIPTION || '';
 
-    updateItemDescription() {
-  const artNo = this.articleData.ART_NO || '';
-  const color = this.articleData.COLOR || '';
-  const packing = this.articleData.STANDARD_PACKING || '';
-  const price = this.articleData.PRICE ?? '';
+    // Build exact format
+    const parts = ['SF', artNo, color, packing, categoryName, price].filter(
+      (p) => p !== '' && p !== null && p !== undefined,
+    );
 
-  const categoryName =
-    this.categoryList?.find(c => c.ID === this.selectedCategoryId)
-      ?.DESCRIPTION || '';
+    this.articleData.DESCRIPTION = parts.join('-');
+  }
 
-  // Build exact format
-  const parts = [
-    'SF',
-    artNo,
-    color,
-    packing,
-    categoryName,
-    price
-  ].filter(p => p !== '' && p !== null && p !== undefined);
-
-  this.articleData.DESCRIPTION = parts.join('-');
-}
-
-addNewRow() {
-
-  this.dataService.getItemsListForArticle().subscribe((res: any) => {
-      console.log(res);
-      console.log(
-        'PrePaymentListDataSource=============================:',
-        res.DataList,
-      );
+  addNewRow() {
+    this.dataService.getItemsListForArticle().subscribe((res: any) => {
       this.ItemListDataSource = res.DataList;
       this.ItempopupVisible = true; // Open popup
     });
-  setTimeout(() => {
+    setTimeout(() => {
+      const grid = this.itemsGridRef?.instance;
+      if (!grid) return;
 
-    const grid = this.itemsGridRef?.instance;
-    if (!grid) return;
+      const rows = grid.getVisibleRows();
 
-    const rows = grid.getVisibleRows();
+      const hasIncompleteRow = rows.some(
+        (r: any) => !r.data?.ITEM || !r.data?.QUANTITY,
+      );
 
-    const hasIncompleteRow = rows.some(
-      (r: any) => !r.data?.ITEM || !r.data?.QUANTITY
-    );
+      if (hasIncompleteRow) {
+        return;
+      }
 
-    if (hasIncompleteRow) {
+      this.items.push({
+        ITEM: null,
+        DESCRIPTION: '',
+        UOM: '',
+        QUANTITY: null,
+      });
+
+      setTimeout(() => {
+        const updatedRows = grid.getVisibleRows();
+        const newRowIndex = updatedRows.length - 1;
+
+        if (newRowIndex >= 0) {
+          grid.editCell(newRowIndex, 'ITEM');
+        }
+      }, 100);
+    }, 200);
+  }
+
+  onItemSelect(e: any) {
+    const selectedItem = e.data;
+
+    // Example: store selected item
+    this.selectedItem = selectedItem;
+
+    // Close popup after selection
+    this.ItempopupVisible = false;
+  }
+
+  saveSelectedItems() {
+    const popupGrid = this.bomGridRef.instance; // popup grid
+
+    const selectedRows = popupGrid.getSelectedRowsData();
+
+    if (!selectedRows.length) {
       return;
     }
 
-    this.items.push({
-      ITEM: null,
-      DESCRIPTION: '',
-      UOM: '',
-      QUANTITY: null
-    });
-
-    setTimeout(() => {
-      const updatedRows = grid.getVisibleRows();
-      const newRowIndex = updatedRows.length - 1;
-
-      if (newRowIndex >= 0) {
-        grid.editCell(newRowIndex, 'ITEM');
-      }
-    }, 100);
-
-  }, 200);
-}
-
-
-onItemSelect(e: any) {
-
-  const selectedItem = e.data;
-
-  console.log("Selected Item:", selectedItem);
-
-  // Example: store selected item
-  this.selectedItem = selectedItem;
-
-  // Close popup after selection
-  this.ItempopupVisible = false;
-}
-
-saveSelectedItems() {
-
-  const popupGrid = this.bomGridRef.instance;   // popup grid
-
-  const selectedRows = popupGrid.getSelectedRowsData();
-
-  if (!selectedRows.length) {
-    return;
-  }
-
-  //  Remove empty row if exists
-  this.items = this.items.filter(
-    row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
-  );
-
-  selectedRows.forEach((item: any) => {
-
-    const exists = this.items.some(
-      x => x.ITEM === item.ITEM_CODE
+    //  Remove empty row if exists
+    this.items = this.items.filter(
+      (row) => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY,
     );
 
-    if (!exists) {
-      this.items.push({
-        ITEM: item.ITEM_CODE,
-        DESCRIPTION: item.DESCRIPTION,
-        UOM: item.UOM,
-        QUANTITY: null,
-        ITEM_ID: item.ID
-      });
-    }
+    selectedRows.forEach((item: any) => {
+      const exists = this.items.some((x) => x.ITEM === item.ITEM_CODE);
 
-  });
+      if (!exists) {
+        this.items.push({
+          ITEM: item.ITEM_CODE,
+          DESCRIPTION: item.DESCRIPTION,
+          UOM: item.UOM,
+          QUANTITY: null,
+          ITEM_ID: item.ID,
+        });
+      }
+    });
 
-  // refresh BOM grid
-  this.itemsGridRef.instance.refresh();
+    // refresh BOM grid
+    this.itemsGridRef.instance.refresh();
 
-  this.ItempopupVisible = false;
-
-}
-
+    this.ItempopupVisible = false;
+  }
 }
 
 @NgModule({

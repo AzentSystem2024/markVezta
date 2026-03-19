@@ -75,7 +75,6 @@ export class ItemProperty1ListComponent {
     private cdr: ChangeDetectorRef,
   ) {
     this.itemlabel = authservice.getsettingsData().ITEM_PROPERTY1;
-    console.log(this.itemlabel, 'ITEMLABELLLLLLLLLLLLLLLLLL');
     this.sesstion_Details();
   }
 
@@ -123,40 +122,16 @@ export class ItemProperty1ListComponent {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(
-      this.sessionData,
-      '=================session data==========1111',
-    );
 
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
-    console.log(
-      this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1==============',
-    );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
-    console.log(
-      this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2==============',
-    );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
-    console.log(
-      this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3==============',
-    );
 
     this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
-    console.log(
-      this.ITEM_PROPERTY4,
-      '============ITEM_PROPERTY4==============',
-    );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
-    console.log(
-      this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5==============',
-    );
   }
 
   toggleFilterRow = () => {
@@ -190,19 +165,10 @@ export class ItemProperty1ListComponent {
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
-    console.log(sessionData, '===========selected HSN CODE===================');
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     // THIS IS THE MISSING LINK
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   showItemProperty1() {
@@ -235,7 +201,6 @@ export class ItemProperty1ListComponent {
   onClickSaveItemProperty1() {
     const { CODE, DESCRIPTION, COMPANY_ID } =
       this.itemproperty1Component.getNewItemProperty1Data();
-    console.log('inserted data', CODE, DESCRIPTION, COMPANY_ID);
 
     // Check for duplicates in CategoryList
 
@@ -338,14 +303,13 @@ export class ItemProperty1ListComponent {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/user');
@@ -359,8 +323,6 @@ export class ItemProperty1ListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sessionDetails();
     this.showItemProperty1();
   }

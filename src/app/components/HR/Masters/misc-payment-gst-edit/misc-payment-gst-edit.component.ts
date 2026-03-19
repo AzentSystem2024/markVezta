@@ -52,10 +52,10 @@ import notify from 'devextreme/ui/notify';
 @Component({
   selector: 'app-misc-payment-gst-edit',
   templateUrl: './misc-payment-gst-edit.component.html',
-  styleUrls: ['./misc-payment-gst-edit.component.scss']
+  styleUrls: ['./misc-payment-gst-edit.component.scss'],
 })
 export class MiscPaymentGstEditComponent {
-    @Output() popupClosed = new EventEmitter<void>();
+  @Output() popupClosed = new EventEmitter<void>();
   @Input() miscellaneousData: any;
   @Input() isReadOnlyMode: boolean = false;
   @ViewChild('miscFormGroup') miscFormGroup: DxValidationGroupComponent;
@@ -119,10 +119,6 @@ export class MiscPaymentGstEditComponent {
       this.companyId = userData?.SELECTED_COMPANY?.COMPANY_ID;
       this.finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
 
-      console.log('User ID:', this.userId);
-      console.log('Company ID:', this.companyId);
-      console.log('Financial ID:', this.finId);
-
       if (userData.USER_ID) {
         this.miscFormData.USER_ID = userData.USER_ID;
       }
@@ -143,8 +139,6 @@ export class MiscPaymentGstEditComponent {
     ) {
       const data = changes['miscellaneousData'].currentValue.Data;
 
-      console.log('Received miscellaneousData:', data);
-
       // Assign main data to miscFormData
       this.miscFormData = {
         ...this.miscFormData,
@@ -153,40 +147,34 @@ export class MiscPaymentGstEditComponent {
 
       // Assign DetailList to pendingInvoiceList
       this.pendingInvoicelist = data.DetailList || [];
-      console.log(
-        this.miscFormData.LEDGER_NAME,
-        'MISCDETAILSSSSSSSSSSSSSSSSSSSSSSS'
-      );
+
       this.pendingInvoicelist = (data.DetailList || []).map((item: any) => {
         const ledger = this.ledgerList.find(
-          (l: any) => l.HEAD_CODE === item.HEAD_ID
+          (l: any) => l.HEAD_CODE === item.HEAD_ID,
         );
-        console.log(ledger, 'LEDGERRRRRRRRRRRRRRRRRRRR');
         return {
           ...item,
           ledgerCode: item.LEDGER_CODE,
           ledgerName: ledger?.LEDGER_NAME || '',
         };
       });
-      console.log(this.ledgerList, 'INNGONCHANGES');
       const matchedLedger = this.ledgerList.find(
-        (ledger: any) => ledger.HEAD_CODE === this.miscFormData.LEDGER_CODE
+        (ledger: any) => ledger.HEAD_CODE === this.miscFormData.LEDGER_CODE,
       );
 
       if (matchedLedger) {
         this.miscFormData.HEAD_ID = matchedLedger.HEAD_ID;
-        console.log('Found HEAD_ID:', matchedLedger.HEAD_ID);
       } else {
         console.warn(
           'No matching HEAD_ID found for LEDGER_CODE:',
-          this.miscFormData.LEDGER_CODE
+          this.miscFormData.LEDGER_CODE,
         );
       }
       const lastRow =
         this.miscFormData.MISC_DETAIL[this.miscFormData.MISC_DETAIL.length - 1];
       this.pendingInvoicelist = (data.DetailList || []).map((item: any) => {
         const ledger = this.ledgerList.find(
-          (l: any) => l.HEAD_CODE === item.HEAD_ID
+          (l: any) => l.HEAD_CODE === item.HEAD_ID,
         );
         return {
           ...item,
@@ -212,8 +200,6 @@ export class MiscPaymentGstEditComponent {
       }
 
       // this.receiptMode = this.getReceiptModeFromPayTypeId(data.PAY_TYPE_ID);
-      console.log(this.miscFormData, 'Updated miscFormData');
-      console.log(this.pendingInvoicelist[0].VAT_REGN, 'Pending Invoice List');
     }
   }
 
@@ -239,7 +225,6 @@ export class MiscPaymentGstEditComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
   ngAfterViewInit() {
@@ -268,7 +253,6 @@ export class MiscPaymentGstEditComponent {
   onEditorPreparing(e: any) {
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
     const grid = this.itemsGridRef?.instance;
     e.editorOptions.onKeyDown = (event: any) => {
       if (event.event.key === 'Tab') {
@@ -288,7 +272,7 @@ export class MiscPaymentGstEditComponent {
         if (isLastCell) {
           setTimeout(() => {
             const ledgerSelect = document.querySelector(
-              '#payHeadIdField input'
+              '#payHeadIdField input',
             ) as HTMLElement;
             if (ledgerSelect) {
               ledgerSelect.focus();
@@ -323,14 +307,14 @@ export class MiscPaymentGstEditComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'DESCRIPTION');
@@ -352,14 +336,14 @@ export class MiscPaymentGstEditComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -487,7 +471,7 @@ export class MiscPaymentGstEditComponent {
         this.ledgerList = response?.Data || [];
 
         this.receiptMode = this.getReceiptModeFromPayTypeId(
-          this.miscFormData.PAY_TYPE_ID
+          this.miscFormData.PAY_TYPE_ID,
         );
         this.onReceiptModeChange({ value: this.receiptMode }); // trigger ledger filter update
       },
@@ -500,16 +484,15 @@ export class MiscPaymentGstEditComponent {
   setHeadIdFromLedgerCode() {
     if (this.miscFormData?.LEDGER_CODE && this.ledgerList?.length) {
       const matchedLedger = this.ledgerList.find(
-        (ledger: any) => ledger.HEAD_CODE === this.miscFormData.LEDGER_CODE
+        (ledger: any) => ledger.HEAD_CODE === this.miscFormData.LEDGER_CODE,
       );
 
       if (matchedLedger) {
         this.miscFormData.HEAD_ID = matchedLedger.HEAD_ID;
-        console.log('Found HEAD_ID:', matchedLedger.HEAD_ID);
       } else {
         console.warn(
           'No matching HEAD_ID found for LEDGER_CODE:',
-          this.miscFormData.LEDGER_CODE
+          this.miscFormData.LEDGER_CODE,
         );
       }
     }
@@ -520,15 +503,15 @@ export class MiscPaymentGstEditComponent {
 
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13
+        (item: any) => item.GROUP_ID === 13,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14
+        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
@@ -578,7 +561,7 @@ export class MiscPaymentGstEditComponent {
           message: 'Please add at least one line item.',
           position: 'top center',
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -614,7 +597,7 @@ export class MiscPaymentGstEditComponent {
                 : 'Miscellaneous Payment Updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.popupClosed.emit(); // Or reset form if needed
         } else {
@@ -623,7 +606,7 @@ export class MiscPaymentGstEditComponent {
               message: response?.Message || 'Failed to save data.',
               position: { at: 'top center', my: 'top center' },
             },
-            'error'
+            'error',
           );
         }
       },
@@ -634,7 +617,7 @@ export class MiscPaymentGstEditComponent {
             message: 'Something went wrong while saving.',
             position: { at: 'top center', my: 'top center' },
           },
-          'error'
+          'error',
         );
       },
     });
@@ -642,7 +625,6 @@ export class MiscPaymentGstEditComponent {
 
   //     get_Department_dropdown(){
   //   this.dataService.Department_Dropdown().subscribe((res: any) => {
-  //     console.log('supplier dropdown', res);
   //     this.Department = res;
   //   });
   // }

@@ -276,7 +276,6 @@ export class EditSupplierPaymentComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -350,10 +349,6 @@ export class EditSupplierPaymentComponent {
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.supplierList = response;
-      console.log(
-        this.supplierList,
-        'distributorList==============================',
-      );
 
       if (this.paymentFormData && this.paymentFormData.SUPP_ID) {
         this.selectedSupplierId = this.paymentFormData.SUPP_ID;

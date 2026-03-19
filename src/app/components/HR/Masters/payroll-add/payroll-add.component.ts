@@ -74,7 +74,6 @@ export class PayrollAddComponent {
   constructor(private dataSerivice: DataService) {}
 
   ngOnInit() {
-    console.log(this.selectedMonth, 'SELECTEDMONTH');
     // this.payRollData.SAL_MONTH = this.selectedMonth;
     this.getTimesheetList();
   }
@@ -110,7 +109,6 @@ export class PayrollAddComponent {
     this.dataSerivice
       .getTimesheetListForPayroll(payload)
       .subscribe((response: any) => {
-        console.log(response, 'Timesheet List Response');
         this.timesheetList = response.data;
       });
   }
@@ -124,7 +122,7 @@ export class PayrollAddComponent {
           message: 'Please select at least one row to generate payroll.',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -158,7 +156,7 @@ export class PayrollAddComponent {
                     'Payroll generated successfully for selected employees.',
                   position: { at: 'top center', my: 'top center' },
                 },
-                'success'
+                'success',
               );
               this.popupClosed.emit();
             } else {
@@ -167,7 +165,7 @@ export class PayrollAddComponent {
                   message: `Payroll generated for ${successCount} rows. Failed for ${errorCount} rows.`,
                   position: { at: 'top center', my: 'top center' },
                 },
-                'warning'
+                'warning',
               );
             }
           }
@@ -201,7 +199,6 @@ export class PayrollAddComponent {
   //       USER_ID: userId, // Use the userId from sessionStorage
   //     };
   // this.dataSerivice.generatePayroll(payload).subscribe((response: any) => {
-  //   console.log('Payroll Generation Response:', response);
   //   if (response.flag == "1") {
   //     notify(
   //       {
@@ -221,7 +218,6 @@ export class PayrollAddComponent {
   //     );
   //   }
   // })
-  //     console.log('Payload to save:', payload);
   //   }
 }
 

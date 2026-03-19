@@ -21,10 +21,9 @@ import { DataService } from 'src/app/services';
 @Component({
   selector: 'app-security-policy',
   templateUrl: './security-policy.component.html',
-  styleUrls: ['./security-policy.component.scss']
+  styleUrls: ['./security-policy.component.scss'],
 })
 export class SecurityPolicyComponent {
-
   validationRequired: boolean = false;
   readOnlyValue: boolean = true;
 
@@ -86,11 +85,10 @@ export class SecurityPolicyComponent {
     private router: Router,
     private dataService: DataService,
     private dataservice: DataService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {}
 
-
-   ngOnInit(): void {
+  ngOnInit(): void {
     this.userId = sessionStorage.getItem('UserID');
     this.get_Present_Security_Policy();
     this.sesstion_Details();
@@ -102,14 +100,14 @@ export class SecurityPolicyComponent {
     });
   }
 
-    sesstion_Details() {
+  sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.UserID = sessionData.USER_ID;
     console.log(this.UserID, 'UserID');
   }
 
-   //========== only allow select one check box under the MFA ========
+  //========== only allow select one check box under the MFA ========
   onCheckboxChanged(authType: string, isChecked: boolean): void {
     if (!isChecked) return; // do nothing when unchecking
     this.isGoogleAuthenticator = authType === 'google';
@@ -124,18 +122,17 @@ export class SecurityPolicyComponent {
     }
   }
 
-    //========== Change validation enable or not ====================
+  //========== Change validation enable or not ====================
   onValidationEnableChange(newValue: boolean): void {
     this.validationRequired = newValue;
     this.readOnlyValue = !this.readOnlyValue;
   }
 
-  
   format_minutes(value: number): string {
     return `${value} minutes`;
   }
 
-    onPasswordLengthChange(e: any) {
+  onPasswordLengthChange(e: any) {
     if (e.value < this.minAllowedLength) {
       this.minPasswordLength = this.minAllowedLength;
     } else {
@@ -143,7 +140,7 @@ export class SecurityPolicyComponent {
     }
   }
 
-    onClickCancel() {
+  onClickCancel() {
     // Password policy
     this.validationRequired = false;
     this.minPasswordLength = null;
@@ -183,58 +180,52 @@ export class SecurityPolicyComponent {
     this.customSingleToken = null;
   }
 
-    get_Present_Security_Policy() {
+  get_Present_Security_Policy() {
     this.isLoading = true;
-    this.dataService
-      .get_securityPolicy_List()
-      .subscribe((response: any) => {
-        if (response) {
-          this.presentSecurityData = response.data[0];
-          console.log(this.presentSecurityData);
-          this.tooltipData = response.Tooltip;
-          this.validationRequired =
-            this.presentSecurityData.PasswordValidationRequired;
-          this.minPasswordLength = this.presentSecurityData.MinimumLength;
-          this.isNumberChecked = this.presentSecurityData.Numbers;
-          this.isUppercaseChecked =
-            this.presentSecurityData.UppercaseCharacters;
-          this.isLowercaseChecked =
-            this.presentSecurityData.LowercaseCharacters;
-          this.isSpecialCharactersChecked =
-            this.presentSecurityData.SpecialCharacters;
-          this.sessionTimeOut = this.presentSecurityData.SessionTimeoutMinutes;
-          this.LoginAttempts = this.presentSecurityData.AccountLockAttempt;
-          this.resetDuration = this.presentSecurityData.AccountLockDuration;
-          this.failedLoginDuration =
-            this.presentSecurityData.AccountLockFailedLogin;
-          this.changePasswordOnLogin =
-            this.presentSecurityData.UserMustChangePasswordOnLogin;
-          this.passwordExpiryDaysCount = this.presentSecurityData.PasswordAge;
-          this.passwordRepeatCycle =
-            this.presentSecurityData.PasswordRepeatCycle;
-          this.unautherizedMessage =
-            this.presentSecurityData.UnauthorizedBannerMessage;
-          this.disableUserOn =
-            this.presentSecurityData.DisableUserOnInactiveDays;
-          this.MFAvalidationRequired = this.presentSecurityData.EnableMFA;
-          this.isGoogleAuthenticator = this.presentSecurityData.MFAGoogle;
-          this.isMicrosoftAuthenticator = this.presentSecurityData.MFAMicrosoft;
-          this.isCustomAuthenticator = this.presentSecurityData.MFACustom;
+    this.dataService.get_securityPolicy_List().subscribe((response: any) => {
+      if (response) {
+        this.presentSecurityData = response.data[0];
+        console.log(this.presentSecurityData);
+        this.tooltipData = response.Tooltip;
+        this.validationRequired =
+          this.presentSecurityData.PasswordValidationRequired;
+        this.minPasswordLength = this.presentSecurityData.MinimumLength;
+        this.isNumberChecked = this.presentSecurityData.Numbers;
+        this.isUppercaseChecked = this.presentSecurityData.UppercaseCharacters;
+        this.isLowercaseChecked = this.presentSecurityData.LowercaseCharacters;
+        this.isSpecialCharactersChecked =
+          this.presentSecurityData.SpecialCharacters;
+        this.sessionTimeOut = this.presentSecurityData.SessionTimeoutMinutes;
+        this.LoginAttempts = this.presentSecurityData.AccountLockAttempt;
+        this.resetDuration = this.presentSecurityData.AccountLockDuration;
+        this.failedLoginDuration =
+          this.presentSecurityData.AccountLockFailedLogin;
+        this.changePasswordOnLogin =
+          this.presentSecurityData.UserMustChangePasswordOnLogin;
+        this.passwordExpiryDaysCount = this.presentSecurityData.PasswordAge;
+        this.passwordRepeatCycle = this.presentSecurityData.PasswordRepeatCycle;
+        this.unautherizedMessage =
+          this.presentSecurityData.UnauthorizedBannerMessage;
+        this.disableUserOn = this.presentSecurityData.DisableUserOnInactiveDays;
+        this.MFAvalidationRequired = this.presentSecurityData.EnableMFA;
+        this.isGoogleAuthenticator = this.presentSecurityData.MFAGoogle;
+        this.isMicrosoftAuthenticator = this.presentSecurityData.MFAMicrosoft;
+        this.isCustomAuthenticator = this.presentSecurityData.MFACustom;
 
-          this.customSMS = this.presentSecurityData.MFASMS;
-          this.customEmail = this.presentSecurityData.MFAEmail;
-          this.customWhatsapp = this.presentSecurityData.MFAWhatsapp;
-          this.customSingleToken = this.presentSecurityData.MFASingleToken;
-          this.appliesToLogin = this.presentSecurityData.MFAOnLogin;
-          this.appliesToPasswordChange =
-            this.presentSecurityData.MFAOnPasswordChange;
+        this.customSMS = this.presentSecurityData.MFASMS;
+        this.customEmail = this.presentSecurityData.MFAEmail;
+        this.customWhatsapp = this.presentSecurityData.MFAWhatsapp;
+        this.customSingleToken = this.presentSecurityData.MFASingleToken;
+        this.appliesToLogin = this.presentSecurityData.MFAOnLogin;
+        this.appliesToPasswordChange =
+          this.presentSecurityData.MFAOnPasswordChange;
 
-          this.isLoading = false;
-        }
-      });
+        this.isLoading = false;
+      }
+    });
   }
 
-    onClickSave() {
+  onClickSave() {
     const formData = {
       AccountLockAttempt: this.LoginAttempts,
       AccountLockDuration: this.resetDuration,
@@ -274,7 +265,7 @@ export class SecurityPolicyComponent {
               message: `Security Policy saved Successfully`,
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.get_Present_Security_Policy();
         } else {
@@ -283,7 +274,7 @@ export class SecurityPolicyComponent {
               message: `Your Data Not Saved`,
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
           this.isLoading = false;
         }

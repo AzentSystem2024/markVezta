@@ -123,7 +123,6 @@ export class PackingComponent {
     this.getPackingList();
 
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
   }
 
   refreshButtonOptions = {
@@ -138,14 +137,13 @@ export class PackingComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/packing');
@@ -158,34 +156,6 @@ export class PackingComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
-
-    //  this.userData=sessionStorage.getItem('savedUserData')
-    //  console.log(this.userData,'-------------user details');
-    //  let menuGroups: any[] = [];
-
-    //  console.log(this.userData.MenuGroups);
-
-    //  menuGroups = this.userData.MenuGroups || [];
-    // console.log(menuGroups)
-
-    // let matchedMenu = null;
-    // for (const group of menuGroups) {
-    //   matchedMenu = group.Menus.find((menu: any) => menu.Path === currentUrl);
-    //   if (matchedMenu) break;
-    // }
-
-    // if (matchedMenu) {
-    //   this.canAdd = matchedMenu.CanAdd;
-    //   this.canEdit = matchedMenu.CanEdit;
-    //   this.canView = matchedMenu.CanView;
-    //   this.canDelete = matchedMenu.CanDelete;
-    //   this.canApprove = matchedMenu.CanApprove;
-    //   this.canPrint = matchedMenu.CanPrint;
-    // }
-    // console.log(matchedMenu,'====================Matched Menu======================')
   }
 
   refreshGrid() {
@@ -205,29 +175,9 @@ export class PackingComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
-  onToolbarPreparing(e: any) {
-    // const toolbarItems = e.toolbarOptions.items;
-    // // Avoid adding the button more than once
-    // const alreadyAdded = toolbarItems.some(
-    //   (item: any) => item.name === 'toggleFilterButton',
-    // );
-    // if (!alreadyAdded) {
-    //   toolbarItems.splice(toolbarItems.length - 1, 0, {
-    //     widget: 'dxButton',
-    //     name: 'toggleFilterButton', // custom name to avoid duplicates
-    //     location: 'after',
-    //     options: {
-    //       icon: 'search',
-    //       hint: 'Search Column',
-    //       onClick: () => this.toggleFilters(),
-    //     },
-    //   });
-    // }
-  }
+  onToolbarPreparing(e: any) {}
 
   getStatusFlagClass(Status: string): string {
-    // console.log('Status:', Status);
-
     return Status === 'Active' ? 'flag-green' : 'flag-red';
   }
 
@@ -249,28 +199,12 @@ export class PackingComponent {
       this.PackingAddComponent.resetForm();
     }
     this.getPackingList();
-
-    console.log('close packing popup called');
   }
-
-  //=============================get api for packing list========================================
-  // getPackingList() {
-  //   this.dataService.get_packages_list_api().subscribe((res:any)=>{
-  //     console.log('response from get packing list api:', res);
-
-  //     this.packingList=res.Data
-
-  //   })
-  // }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   getPackingList() {
@@ -303,12 +237,9 @@ export class PackingComponent {
   }
 
   delete_Packing_Data(event: any) {
-    console.log(event);
     const id = event.data.ID;
     event.cancel = true;
     this.dataService.Delete_Package_Api(id).subscribe((res: any) => {
-      console.log('response from delete packing api:', res);
-
       // this.dataGrid.instance.refresh();
       notify(
         {
@@ -327,7 +258,6 @@ export class PackingComponent {
   selected_data(event: any) {
     const id = event.data.ID;
     this.dataService.select_api_packing(id).subscribe((res: any) => {
-      console.log('response from select packing api:', res);
       this.selectedPacking = res.Data;
     });
   }

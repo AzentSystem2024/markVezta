@@ -62,7 +62,7 @@ export class StoresFormComponent implements OnInit {
   selectedCountryId: any;
   constructor(
     private service: DataService,
-    private countryService: CountryServiceService
+    private countryService: CountryServiceService,
   ) {}
   newStores = this.formStoresData;
 
@@ -114,26 +114,22 @@ export class StoresFormComponent implements OnInit {
   showCountry() {
     this.service.getCountryData().subscribe((response) => {
       this.CountryDropdownData = response;
-      console.log('count', this.CountryDropdownData);
     });
   }
   getGroupDropDown() {
     const dropdowngroup = 'STOREGROUP';
     this.service.getDropdownData(dropdowngroup).subscribe((data: any) => {
       this.GroupDropdownData = data;
-      console.log('dropdown', this.GroupDropdownData);
     });
   }
 
   onCountrySelected(e: any) {
-    console.log('Selected country ID:', e.value);
     this.selectedCountryId = e.value;
     this.newStores.COUNTRY_ID = e.value;
     this.getStateDropDown();
   }
 
   getStateDropDown() {
-    console.log('stateeeeeeeeeeeee');
     const payload = {
       NAME: 'STATE_NAME',
       COUNTRY_ID: this.selectedCountryId,
@@ -141,15 +137,13 @@ export class StoresFormComponent implements OnInit {
 
     this.service.getStateDropdownData(payload).subscribe((data: any) => {
       this.StateDropdownData = data;
-      console.log('dropdownstateeeeeeeeee', this.StateDropdownData);
     });
   }
 
   onCountrySelectionChanged(event: any) {
     const selectedCountry = this.CountryDropdownData.find(
-      (country) => country.ID === event.value
+      (country) => country.ID === event.value,
     );
-    console.log('selected country', selectedCountry);
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE;
     }

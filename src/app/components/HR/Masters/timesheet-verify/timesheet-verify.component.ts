@@ -89,16 +89,12 @@ export class TimesheetVerifyComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['timesheet'] && changes['timesheet'].currentValue) {
-      console.log('Received timesheet:', changes['timesheet'].currentValue);
-
       // Deep copy to avoid reference issues
       this.timesheetFormData = {
         ...this.timesheetFormData,
         ...changes['timesheet'].currentValue,
       };
-      console.log(this.timesheetFormData, 'TIMESHEETFORMDATA');
       this.salaryDataSource = this.timesheetFormData.TIMESHEET_SALARY;
-      console.log(this.salaryDataSource, 'SALARYDATASOURCE');
       // this.getSalaryHead();
       this.timesheetDetails = (
         this.timesheetFormData.TIMESHEET_DETAIL || []
@@ -121,7 +117,7 @@ export class TimesheetVerifyComponent {
           ...this.timesheetDetails,
           ...this.storeData.filter(
             (storeRow) =>
-              !this.timesheetDetails.some((ts) => ts.STORE === storeRow.STORE)
+              !this.timesheetDetails.some((ts) => ts.STORE === storeRow.STORE),
           ),
         ];
       }
@@ -132,7 +128,7 @@ export class TimesheetVerifyComponent {
     this.sesstion_Details();
     this.loadStores();
     // this.getSalaryHead();
-    this.getPayTimeEntries()
+    this.getPayTimeEntries();
     this.getEmployeeDropdown();
   }
 
@@ -141,16 +137,13 @@ export class TimesheetVerifyComponent {
       .getDropdownData('EMPLOYEE_REVISION')
       .subscribe((response: any) => {
         this.employee = response;
-        console.log(response, 'EMPLOYEEEEE');
         this.setEmployeeName(); // <-- MOVE setEmployeeName here
       });
   }
-  
-  getPayTimeEntries(){
+
+  getPayTimeEntries() {
     this.dataService.getDropdownData('PAYTIME_ENTRY').subscribe((data: any) => {
-      console.log(data, "PAYTIME")
       this.salaryHead = data;
-      console.log(this.salaryHead, 'SALARYHEADDDDDDDDDDD');
       // Pre-fill the data grid's rows with SALARY_HEAD_ID
       this.salaryHeadList = this.salaryHead.map((item) => ({
         SALARY_HEAD_ID: '',
@@ -160,20 +153,13 @@ export class TimesheetVerifyComponent {
         ...(this.salaryDataSource || []),
         ...this.salaryHeadList,
       ];
-
-      console.log(
-        this.salaryDataSource,
-        ' Final salaryDataSource after adding salaryHeadList'
-      );
-
-      console.log(this.salaryHeadList, 'Salary DataSource');
     });
   }
 
   setEmployeeName() {
     if (this.timesheetFormData.EMP_ID && this.employee?.length) {
       const matchedEmployee = this.employee.find(
-        (emp) => emp.ID == this.timesheetFormData.EMP_ID
+        (emp) => emp.ID == this.timesheetFormData.EMP_ID,
       );
       if (matchedEmployee) {
         this.timesheetFormData.EMP_NAME = matchedEmployee.ID; // For value binding
@@ -183,21 +169,19 @@ export class TimesheetVerifyComponent {
     }
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
 
   loadStores() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.getStoresData(payload).subscribe((response) => {
       // Filter out "CENTRAL STORE" and populate the stores array
       this.stores = response.filter(
-        (store: any) => store.STORE_NAME !== 'CENTRAL STORE'
+        (store: any) => store.STORE_NAME !== 'CENTRAL STORE',
       );
       this.storeData = this.stores.map((store) => ({
         STORE: '', // Store ID to be shown in the grid
@@ -210,13 +194,11 @@ export class TimesheetVerifyComponent {
         ...this.timesheetDetails,
         ...this.storeData.filter(
           (storeRow) =>
-            !this.timesheetDetails.some((ts) => ts.STORE === storeRow.STORE)
+            !this.timesheetDetails.some((ts) => ts.STORE === storeRow.STORE),
         ),
       ];
     });
   }
-
-
 
   onMonthChanged(event: any) {
     this.tsMonthDate = new Date(event.value);
@@ -226,7 +208,6 @@ export class TimesheetVerifyComponent {
   }
 
   onTimesheetDetailsUpdated(e: any) {
-    console.log('Row updated!', e);
     // this.calculateTotalWorkedDays()
     const rowIndex = e.component.getRowIndexByKey(e.key);
 
@@ -240,27 +221,23 @@ export class TimesheetVerifyComponent {
       setTimeout(() => {
         this.calculateTotalWorkedDays();
       }, 0);
-      console.log(
-        'Updated TIMESHEET_DETAIL:',
-        this.timesheetFormData.TIMESHEET_DETAIL
-      );
     }
   }
 
   calculateTotalWorkedDays() {
     if (this.timesheetFormData && this.timesheetFormData.TIMESHEET_DETAIL) {
       const totalDays = this.timesheetFormData.TIMESHEET_DETAIL.map(
-        (detail) => Number(detail.DAYS) || 0
+        (detail) => Number(detail.DAYS) || 0,
       ).reduce((sum, val) => sum + val, 0);
       this.timesheetFormData.WORKED_DAYS = totalDays;
 
       const totalOTHours = this.timesheetFormData.TIMESHEET_DETAIL.map(
-        (detail) => Number(detail.NORMAL_OT) || 0
+        (detail) => Number(detail.NORMAL_OT) || 0,
       ).reduce((sum, val) => sum + val, 0);
       this.timesheetFormData.NORMAL_OT = totalOTHours;
 
       const totalHolidayOT = this.timesheetFormData.TIMESHEET_DETAIL.map(
-        (detail) => Number(detail.HOLIDAY_OT) || 0
+        (detail) => Number(detail.HOLIDAY_OT) || 0,
       ).reduce((sum, val) => sum + val, 0);
       this.timesheetFormData.HOLIDAY_OT = totalHolidayOT;
 
@@ -273,7 +250,7 @@ export class TimesheetVerifyComponent {
     const updatedRow = e.data;
 
     const index = this.timesheetFormData.TIMESHEET_SALARY.findIndex(
-      (item: any) => item.SALARY_HEAD_ID === updatedRow.SALARY_HEAD_ID
+      (item: any) => item.SALARY_HEAD_ID === updatedRow.SALARY_HEAD_ID,
     );
 
     if (index > -1) {
@@ -288,13 +265,8 @@ export class TimesheetVerifyComponent {
     // Clean up empty entries
     this.timesheetFormData.TIMESHEET_SALARY =
       this.timesheetFormData.TIMESHEET_SALARY.filter(
-        (item) => item.SALARY_HEAD_ID !== '' && item.AMOUNT !== ''
+        (item) => item.SALARY_HEAD_ID !== '' && item.AMOUNT !== '',
       );
-
-    console.log(
-      'Updated TIMESHEET_SALARY:',
-      this.timesheetFormData.TIMESHEET_SALARY
-    );
   }
 
   updateTimesheet() {
@@ -304,7 +276,7 @@ export class TimesheetVerifyComponent {
     //   );
     //   const storeIds = this.timesheetFormData.TIMESHEET_DETAIL.map(row => row.STORE_ID);
     //   const duplicates = storeIds.filter((id, index) => storeIds.indexOf(id) !== index);
-    
+
     //   if (duplicates.length > 0) {
     //     notify({
     //       message: 'Duplicate store(s) found in timesheet. Please ensure each store is unique.',
@@ -314,49 +286,51 @@ export class TimesheetVerifyComponent {
     //     return;
     //   }
 
-      this.timesheetFormData.TIMESHEET_DETAIL = this.timesheetFormData.TIMESHEET_DETAIL.filter(
-    (row) =>
-      row.STORE_ID &&
-      (row.DAYS || row.NORMAL_OT || row.HOLIDAY_OT)
-  );
+    this.timesheetFormData.TIMESHEET_DETAIL =
+      this.timesheetFormData.TIMESHEET_DETAIL.filter(
+        (row) => row.STORE_ID && (row.DAYS || row.NORMAL_OT || row.HOLIDAY_OT),
+      );
 
-  // Normalize STORE_IDs to strings and trim whitespace
-  const storeIds = this.timesheetFormData.TIMESHEET_DETAIL.map(row =>
-    String(row.STORE_ID).trim()
-  );
-
-  // Check for duplicates
-  const seen = new Set();
-  const duplicates = storeIds.filter(id => {
-    if (seen.has(id)) return true;
-    seen.add(id);
-    return false;
-  });
-
-  if (duplicates.length > 0) {
-    notify(
-      {
-        message: 'Duplicate store(s) found in timesheet. Please ensure each store is unique.',
-        position: { at: 'top center', my: 'top center' },
-      },
-      'error'
+    // Normalize STORE_IDs to strings and trim whitespace
+    const storeIds = this.timesheetFormData.TIMESHEET_DETAIL.map((row) =>
+      String(row.STORE_ID).trim(),
     );
-    return;
-  }
 
+    // Check for duplicates
+    const seen = new Set();
+    const duplicates = storeIds.filter((id) => {
+      if (seen.has(id)) return true;
+      seen.add(id);
+      return false;
+    });
 
-      if (
-  !this.timesheetFormData.TIMESHEET_SALARY ||
-  this.timesheetFormData.TIMESHEET_SALARY.length === 0
-) {
-  this.timesheetFormData.TIMESHEET_SALARY = [{ SALARY_HEAD_ID: 0, AMOUNT: 0 }];
-} else {
-  // Force conversion to number (in case bound as strings in UI)
-  this.timesheetFormData.TIMESHEET_SALARY = this.timesheetFormData.TIMESHEET_SALARY.map(salary => ({
-    SALARY_HEAD_ID: Number(salary.SALARY_HEAD_ID) || 0,
-    AMOUNT: Number(salary.AMOUNT) || 0
-  }));
-}
+    if (duplicates.length > 0) {
+      notify(
+        {
+          message:
+            'Duplicate store(s) found in timesheet. Please ensure each store is unique.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+      );
+      return;
+    }
+
+    if (
+      !this.timesheetFormData.TIMESHEET_SALARY ||
+      this.timesheetFormData.TIMESHEET_SALARY.length === 0
+    ) {
+      this.timesheetFormData.TIMESHEET_SALARY = [
+        { SALARY_HEAD_ID: 0, AMOUNT: 0 },
+      ];
+    } else {
+      // Force conversion to number (in case bound as strings in UI)
+      this.timesheetFormData.TIMESHEET_SALARY =
+        this.timesheetFormData.TIMESHEET_SALARY.map((salary) => ({
+          SALARY_HEAD_ID: Number(salary.SALARY_HEAD_ID) || 0,
+          AMOUNT: Number(salary.AMOUNT) || 0,
+        }));
+    }
     this.dataService
       .verifyTimesheet(this.timesheetFormData)
       .subscribe((response: any) => {
@@ -366,7 +340,7 @@ export class TimesheetVerifyComponent {
               message: 'Timesheet Verified Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.popupClosed.emit();
         } else {
@@ -375,15 +349,13 @@ export class TimesheetVerifyComponent {
               message: 'Your Data Not updated',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
   }
 
   handleClose() {
-    // console.log('CLOSED');
-
     this.popupClosed.emit();
   }
 }

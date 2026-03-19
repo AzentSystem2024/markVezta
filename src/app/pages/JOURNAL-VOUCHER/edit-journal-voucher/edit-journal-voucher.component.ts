@@ -110,14 +110,13 @@ export class EditJournalVoucherComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/journal-voucher');
@@ -131,8 +130,6 @@ export class EditJournalVoucherComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getLedgerCodeDropdown();
     this.Deparment_Drop_down();
   }
@@ -352,10 +349,6 @@ export class EditJournalVoucherComponent {
 
           const rowIndex = visibleRows.findIndex(
             (r) => r?.data === e.row?.data,
-          );
-          console.log(
-            'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex,
           );
 
           setTimeout(() => {

@@ -123,13 +123,11 @@ export class ViewInvoiceComponent {
     private sanitizer: DomSanitizer,
   ) {
     const userDataString = localStorage.getItem('userData');
-    console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
       // this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, 'HSNCODE===================');
     }
   }
 
@@ -142,15 +140,11 @@ export class ViewInvoiceComponent {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
 
-      console.log(selectedCompany, '++++++++++++++[[[[[[[[[[[[[[[[[[');
-
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         this.invoiceFormData.UNIT_ID = selectedCompany.COMPANY_ID; // Set UNIT_ID
         this.companyList = [selectedCompany]; // Show only selected company
       }
-
-      console.log(this.selectedCompanyId, '+++++++++++++++++++++++');
 
       if (userData.USER_ID) {
         this.invoiceFormData.USER_ID = userData.USER_ID;
@@ -168,14 +162,12 @@ export class ViewInvoiceComponent {
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
   }
 
   // ngOnChanges(changes: SimpleChanges): void {
   //   if (changes['invoiceFormData'] && this.invoiceFormData?.length > 0) {
   //     const firstInvoice = this.invoiceFormData[0];
-  //     console.log(this.invoiceFormData, 'RECEIVED INVOICE FORM DATA');
   //     if (
   //       firstInvoice.SALE_DATE &&
   //       typeof firstInvoice.SALE_DATE === 'string'
@@ -218,8 +210,6 @@ export class ViewInvoiceComponent {
         firstInvoice.SALE_DATE = date;
       }
 
-      console.log(this.HSNCODE, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
-
       // ORIGINAL LINE (replaced below)
       // this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
 
@@ -246,8 +236,6 @@ export class ViewInvoiceComponent {
 
       // -----------------------------------------------------
 
-      console.log(this.mainInvoiceGridList, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
-
       // Keep your original mapping block untouched
       this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
         return {
@@ -257,7 +245,6 @@ export class ViewInvoiceComponent {
       });
 
       this.invoiceFormData = firstInvoice;
-      console.log(this.mainInvoiceGridList, 'MAINGRIDINVOICELIST');
 
       this.customerType = firstInvoice.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
       if (this.customerType === 'Unit') {
@@ -266,10 +253,6 @@ export class ViewInvoiceComponent {
 
       // this.getCompanyListDropdown();
       this.getCustomerOrUnitLst();
-      console.log(
-        firstInvoice.DISTRIBUTOR_ID,
-        'DISTRIBUTORIDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
-      );
     }
   }
   populateCompanyFromSession() {
@@ -277,12 +260,10 @@ export class ViewInvoiceComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
-      console.log(selectedCompany, '++++++++++++++[[[[[[[[[[[[[[[[[[');
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         this.companyList = [selectedCompany]; // ✅ Show only selected company
       }
-      console.log(this.selectedCompanyId, '+++++++++++++++++++++++');
       if (userData.USER_ID) {
         this.invoiceFormData.USER_ID = userData.USER_ID;
       }
@@ -325,14 +306,11 @@ export class ViewInvoiceComponent {
       .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
 
         if (this.invoiceFormData && this.invoiceFormData.DISTRIBUTOR_ID) {
           this.selectedCustomer = this.distributorList.find(
             (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID,
           );
-
-          console.log('EDIT MODE — Selected Customer:', this.selectedCustomer);
 
           // ⭐ NOW CHECK STATES
           if (this.selectedCustomer && this.companyState) {
@@ -341,14 +319,10 @@ export class ViewInvoiceComponent {
             const compState = this.companyState.trim().toLowerCase();
 
             if (custState === compState) {
-              console.log('EDIT MODE — SAME STATE → CGST + SGST');
-
               this.showCGST = true;
               this.showSGST = true;
               this.showGST = false;
             } else {
-              console.log('EDIT MODE — DIFFERENT STATE → IGST');
-
               this.showCGST = false;
               this.showSGST = false;
               this.showGST = true;
@@ -359,22 +333,16 @@ export class ViewInvoiceComponent {
   }
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
   onDistributorChanged(e: any) {
     if (e && e.value) {
       this.selectedDistributorId = e.value; // ✅ this is the selected ID
-      console.log('Selected Distributor ID:', this.selectedDistributorId);
       if (this.selectedDistributorId) {
         this.selectedSupplierName = this.distributorList.find(
           (s: any) => s.ID === this.selectedDistributorId,
         );
         this.invoiceFormData.PARTY_NAME = this.selectedSupplierName.DESCRIPTION;
-        console.log(
-          this.selectedSupplierName.DESCRIPTION,
-          'PARTYNAMEEEEEEEEEEEEEE',
-        );
       }
       this.invoiceFormData.DISTRIBUTOR_ID = this.selectedDistributorId;
       this.invoiceFormData.UNIT_ID = 0;
@@ -386,7 +354,6 @@ export class ViewInvoiceComponent {
     };
     this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
       this.staticTransfers = response.Data; // Save the original full list
-      console.log(this.staticTransfers, 'STATISCTRANSFERS');
       this.invoiceGridList = [...this.staticTransfers]; // Initial value
     });
   }
@@ -394,7 +361,6 @@ export class ViewInvoiceComponent {
   getDistributorListAfterInput() {
     this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
       this.distributorList = response;
-      console.log(this.distributorList, 'DISTRIBUTORLISTTTT');
 
       // ✅ Ensure ID is correctly matched
       const matched = response.find(
@@ -413,7 +379,6 @@ export class ViewInvoiceComponent {
   getCompanyListDropdown() {
     this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
       this.distributorList = response;
-      console.log(this.distributorList, 'DISTRIBUTORLISTTTT');
       // Optional: Ensure selected value is set after data arrives
       if (!this.invoiceFormData.DISTRIBUTOR_ID && response.length) {
         const matched = response.find(
@@ -460,12 +425,7 @@ export class ViewInvoiceComponent {
   viewPdf(): void {
     this.isPdfPopupVisible = true;
     const invoiceId = this.invoiceFormData.TRANS_ID;
-    console.log(invoiceId, '=================invoiceId===================');
     this.dataService.selectInvoice(invoiceId).subscribe((response: any) => {
-      console.log(
-        response,
-        '=================invoice response===================',
-      );
       // if (response) {
       //   this.pdfSrc = this.get_pdf(response.Data); // Update iframe source
       // }
@@ -492,9 +452,6 @@ export class ViewInvoiceComponent {
       this.grandTotal = this.summaryValues('TOTAL_AMOUNT');
       this.netAmount = Number(this.grandTotal).toFixed(2);
       // this.onRoundOffChange();
-      console.log('GROSS AMOUNT Summary:', this.totalAmount);
-      console.log('TAX_AMOUNT Summary:', this.taxAmount);
-      console.log('NET AMOUNT Summary:', this.grandTotal);
     } else {
       console.warn('Summary values not ready yet.');
     }

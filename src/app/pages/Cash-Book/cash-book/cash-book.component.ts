@@ -170,8 +170,6 @@ export class CashBookComponent {
       });
   }
   ngOnInit() {
-    console.log('ngOnInit CALLED ');
-
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -181,9 +179,7 @@ export class CashBookComponent {
       String(today.getDate()).padStart(2, '0');
 
     this.selected_from_date = new Date();
-    console.log(this.selected_from_date);
     this.selected_To_date = SystemDate;
-    console.log(this.selected_To_date);
     this.Cash_book_data();
   }
 
@@ -241,20 +237,10 @@ export class CashBookComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
   }
 
   Cash_book_data() {
@@ -265,10 +251,7 @@ export class CashBookComponent {
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
     };
 
-    console.log(payload, '==========manual payload===========');
-
     this.dataService.Cash_book_api(payload).subscribe((res: any) => {
-      console.log(res);
       this.Cash_book_datasource = res.data;
     });
     this.Cash_book_Data_Values = this.Cash_book_datasource;
@@ -306,18 +289,9 @@ export class CashBookComponent {
     this.dataService.exportDataGridReport(event, fileName);
   }
   onViewClick(e: any) {
-    console.log(e, '=======event==========');
-
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE;
-    console.log(
-      TRANS_TYPE_ID,
-      ']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]',
-    );
+
     const trans_id = e.row.data.TRANS_ID;
-    console.log(
-      trans_id,
-      '=============================================================================',
-    );
 
     if (TRANS_TYPE_ID == 4) {
       this.dataService
@@ -326,46 +300,34 @@ export class CashBookComponent {
           this.selectedJournalVoucher = response.Data;
           this.isViewJournalVoucher = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedJournalVoucher,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TRANS_TYPE_ID === 36) {
       this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
         this.selectedDebitNote = response.Data;
         this.isViewDebitNote = true;
         this.cdr.detectChanges();
-        console.log(this.selectedDebitNote, 'selected debit note');
       });
     } else if (TRANS_TYPE_ID === 37) {
-      console.log('=====navigate to 37-CREDIT NOTE=====');
       this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
         this.selectedCreditNote = response.Data;
         this.isViewCreditNote = true;
         this.cdr.detectChanges();
-        console.log(this.selectedCreditNote, 'selected credit note');
       });
     } else if (TRANS_TYPE_ID === 25) {
-      console.log('=====navigate to 25-SALES INVOICE=====');
       this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
         this.isViewInvoice = true;
         this.cdr.detectChanges();
-        console.log(this.selectedInvoice, 'SELECTE SALES INVOICE');
       });
     } else if (TRANS_TYPE_ID === 27) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
           this.selectedReceipt = response.Data;
           this.isViewReceipt = true;
           this.cdr.detectChanges();
-          console.log(this.selectedReceipt, 'Custom receipts=====');
         });
     } else if (TRANS_TYPE_ID === 3) {
-      console.log('=====navigate to 2 mis payament=====');
       this.dataService
         .selectMiscPayment(trans_id)
         .subscribe((response: any) => {
@@ -374,7 +336,6 @@ export class CashBookComponent {
           this.cdr.detectChanges();
         });
     } else if (TRANS_TYPE_ID === 2) {
-      console.log('=====navigate to 2 mis payament=====');
       this.dataService
         .selectMiscReceipt(trans_id)
         .subscribe((response: any) => {
@@ -383,59 +344,38 @@ export class CashBookComponent {
           this.cdr.detectChanges();
         });
     } else if (TRANS_TYPE_ID === 9) {
-      console.log('=====navigate to 2 mis payament=====');
       this.dataService
         .select_Depreciation_Asset(trans_id)
         .subscribe((response: any) => {
           this.Selected_Depreciation_data = response.Data;
           this.EditDepreciationPopupVisible = true;
           this.cdr.detectChanges();
-          console.log(
-            this.Selected_Depreciation_data,
-            'Selected_Depreciation_data=====',
-          );
         });
     } else if (TRANS_TYPE_ID === 38) {
-      console.log('=====navigate to 2 mis payament=====');
       this.dataService
         .Select_PrePayment(trans_id)
         .subscribe((response: any) => {
           this.selectedPrePayment = response.Data;
           this.editPrePaymentPopupOpened = true;
           this.cdr.detectChanges();
-          console.log(
-            this.Selected_Depreciation_data,
-            'Selected_Depreciation_data=====',
-          );
         });
     } else if (TRANS_TYPE_ID === 30) {
-      console.log('=====navigate =====');
       this.dataService
         .selectSalaryPayment(trans_id)
         .subscribe((response: any) => {
           this.selectedSalaryData = response.Data;
           this.editSalaryPopup = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedSalaryData,
-            'Selected_Depreciation_data=====',
-          );
         });
     } else if (TRANS_TYPE_ID === 21) {
-      console.log('=====navigate =====');
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
           this.selectedReceipt = response.Data;
           this.isEditReceipt = true;
           this.cdr.detectChanges();
-          console.log(
-            this.Selected_Depreciation_data,
-            'Selected_Depreciation_data=====',
-          );
         });
     } else {
-      console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
     }
   }
 

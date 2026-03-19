@@ -130,14 +130,13 @@ export class AccountsListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/accounts');
@@ -151,8 +150,6 @@ export class AccountsListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getAccountsGroupList();
   }
 
@@ -289,7 +286,6 @@ export class AccountsListComponent {
   //           sno: index + 1,
   //         })
   //       );
-  //       console.log(this.accountsGroupList, 'accountsGroupList with Serial No');
   //     } else {
   //       this.accountsGroupList = [];
   //       console.warn('No data found in response');
@@ -298,14 +294,11 @@ export class AccountsListComponent {
   // }
 
   onEditAccount(event: any) {
-    console.log(event, 'EVENT');
     event.cancel = true;
     const accHeadId = event.data.ID;
-    console.log(accHeadId, 'ACCOUNTHEADID');
     this.dataService.selectAccountHead(accHeadId).subscribe((response: any) => {
       this.selectedAccountHead = response.Data;
       this.editAccountPopupOpened = true;
-      console.log(response, 'RESPONSE');
     });
   }
 
@@ -315,7 +308,6 @@ export class AccountsListComponent {
 
   onDeleteAccountHead(e: any) {
     const accHeadId = e.data.ID;
-    // console.log("delete")
     // Optionally prevent the default delete behavior
     e.cancel = true;
 

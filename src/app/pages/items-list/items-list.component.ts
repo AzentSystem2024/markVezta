@@ -276,14 +276,13 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/packing');
@@ -298,7 +297,6 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     }
 
     console.log('packingRights----', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
 
     this.sesstion_Details();
     this.showItems();
@@ -308,44 +306,22 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
-    console.log(
-      this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1==============',
-    );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
-    console.log(
-      this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2==============',
-    );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
-    console.log(
-      this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3==============',
-    );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
-    console.log(
-      this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5==============',
-    );
 
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
-    console.log(this.ENABLE_Matrix_Code);
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
-    console.log(
-      this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5==============',
-    );
+
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
-    console.log(this.ENABLE_Matrix_Code);
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -374,7 +350,6 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       //   COMPANY_ID: this.selected_Company_id,
       // };
       this.dataservice.getItemsData().subscribe((res: any) => {
-        console.log(res);
         this.itemsArray = res.data;
       });
     } else if (this.selectedDateRange === 'last7') {

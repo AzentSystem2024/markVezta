@@ -22,23 +22,33 @@ import { ExportService } from 'src/app/services/export.service';
   styleUrls: ['./landed-cost-list.component.scss'],
 })
 export class LandedCostListComponent implements OnInit {
-  @ViewChild(LandedCostFormComponent) landedcostComponent: LandedCostFormComponent;
-  @ViewChild(DxDataGridComponent,{ static: true }) dataGrid: DxDataGridComponent;
-  currencyOptions= [{ text: 'Local', value: true }, { text: 'Supplier', value: false }];
-  amountOptions:any[]=[{ text: 'Fixed Amount', value: true }, { text: 'Percentage', value: false }];
-  isLocalCurrency:boolean=true;
-  isFixedAmount:boolean=true;
-  landedcost:any;
-  isAddLandedcostPopupOpened=false;
-  showFilterRow=true;
-  showHeaderFilter=true;
-  constructor(private dataservice:DataService,private exportService: ExportService
-    ){}
-    onExporting(event: any) {
-      this.exportService.onExporting(event,'Landed_cost-list');
-    }
-  addLandedcost(){
-    this.isAddLandedcostPopupOpened=true;
+  @ViewChild(LandedCostFormComponent)
+  landedcostComponent: LandedCostFormComponent;
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+  currencyOptions = [
+    { text: 'Local', value: true },
+    { text: 'Supplier', value: false },
+  ];
+  amountOptions: any[] = [
+    { text: 'Fixed Amount', value: true },
+    { text: 'Percentage', value: false },
+  ];
+  isLocalCurrency: boolean = true;
+  isFixedAmount: boolean = true;
+  landedcost: any;
+  isAddLandedcostPopupOpened = false;
+  showFilterRow = true;
+  showHeaderFilter = true;
+  constructor(
+    private dataservice: DataService,
+    private exportService: ExportService,
+  ) {}
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Landed_cost-list');
+  }
+  addLandedcost() {
+    this.isAddLandedcostPopupOpened = true;
   }
   IS_INACTIVE: boolean = false;
 
@@ -49,7 +59,7 @@ export class LandedCostListComponent implements OnInit {
   private loadDropdownData(): void {
     this.dataservice.getDropdownData('LANDED_COST').subscribe((data) => {
       this.landedcost = data;
-      console.log(this.landedcost,"LANDEDCOST")
+      console.log(this.landedcost, 'LANDEDCOST');
     });
   }
 
@@ -75,7 +85,7 @@ export class LandedCostListComponent implements OnInit {
       IS_FIXED_AMOUNT,
       VALUE,
       COMPANY_ID,
-      IS_INACTIVE
+      IS_INACTIVE,
     );
     this.dataservice
       .postLandedcostData(
@@ -84,7 +94,7 @@ export class LandedCostListComponent implements OnInit {
         IS_FIXED_AMOUNT,
         VALUE,
         COMPANY_ID,
-        IS_INACTIVE
+        IS_INACTIVE,
       )
       .subscribe((response) => {
         if (response) {
@@ -111,7 +121,7 @@ export class LandedCostListComponent implements OnInit {
       IS_FIXED_AMOUNT,
       VALUE,
       COMPANY_ID,
-      IS_INACTIVE
+      IS_INACTIVE,
     );
     this.dataservice
       .updateLandedcostData(
@@ -121,7 +131,7 @@ export class LandedCostListComponent implements OnInit {
         IS_FIXED_AMOUNT,
         VALUE,
         COMPANY_ID,
-        IS_INACTIVE
+        IS_INACTIVE,
       )
       .subscribe((response) => {
         if (response) {
@@ -149,7 +159,7 @@ export class LandedCostListComponent implements OnInit {
         IS_FIXED_AMOUNT,
         VALUE,
         COMPANY_ID,
-        IS_INACTIVE
+        IS_INACTIVE,
       )
       .subscribe(() => {
         try {
@@ -159,7 +169,7 @@ export class LandedCostListComponent implements OnInit {
               message: 'Delete operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.showLandedcost();
@@ -169,16 +179,14 @@ export class LandedCostListComponent implements OnInit {
               message: 'Delete operation failed',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
   }
 
-  selectLandedCostData(id:any){
-    this.dataservice.selectLandedCost(id).subscribe((response:any) => {
-      console.log(response)
-    })
+  selectLandedCostData(id: any) {
+    this.dataservice.selectLandedCost(id).subscribe((response: any) => {});
   }
   ngOnInit(): void {
     this.loadDropdownData();
@@ -194,7 +202,6 @@ export class LandedCostListComponent implements OnInit {
     return rowData.IS_FIXED_AMOUNT ? 'Fixed Amount' : 'Percentage';
   }
 }
-
 
 @NgModule({
   imports: [

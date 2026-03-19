@@ -146,7 +146,6 @@ export class DebitComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -160,14 +159,13 @@ export class DebitComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/debit');
@@ -181,8 +179,6 @@ export class DebitComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getDebitNoteList();
     this.sessionData_tax();
   }
@@ -534,7 +530,6 @@ export class DebitComponent {
     this.DNid = event.data.TRANS_ID;
     this.selectedDN = debitId;
     const transStatus = event.data.TRANS_STATUS;
-    console.log(event, 'transstatus');
 
     this.dataService.selectDebitNote(debitId).subscribe((response: any) => {
       this.selectedDebitNote = response.Data;
@@ -545,7 +540,6 @@ export class DebitComponent {
         // Open edit popup
         this.isEditDebitNote = true;
       }
-      console.log(this.selectedDebitNote, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
     });
   }
 

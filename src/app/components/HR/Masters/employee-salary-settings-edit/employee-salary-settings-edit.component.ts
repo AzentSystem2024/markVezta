@@ -123,10 +123,6 @@ export class EmployeeSalarySettingsEditComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   EmployeeListDropDown() {
@@ -135,7 +131,6 @@ export class EmployeeSalarySettingsEditComponent {
       NAME: 'Employee',
     };
     this.dataservice.getEmployeeDropDown(payload).subscribe((response: any) => {
-      console.log(response, 'response++++++++++');
       this.EmployeeDropdown = response;
     });
   }
@@ -151,18 +146,14 @@ export class EmployeeSalarySettingsEditComponent {
       COMPANY_ID: this.selected_Company_id,
     };
 
-    console.log(payload, 'payload for SalaryHeadList');
-
     this.dataservice.get_SalaryHeadList_Api(1).subscribe((res: any) => {
       this.salaryGridData = res.Data[0];
       this.selectedRows = [];
-      console.log(this.salaryGridData.Details, 'SalaryHeadList');
 
       const selecteddata = this.salaryGridData.Details;
       this.selectedRows = selecteddata
         .filter((item) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0)
         .map((item) => item.HEAD_ID); // or your row's unique identifier
-      console.log(this.selectedRows, 'Selected Rows after filtering');
 
       this.SalaryDetails = this.salaryGridData.Details || [];
       this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
@@ -192,9 +183,7 @@ export class EmployeeSalarySettingsEditComponent {
   //     FilterAction: Number(this.selectedFilterAction) // Ensure it's a number
   //   }
   //   this.dataservice.getEmployeeSalarySettingsList(payload).subscribe((response:any)=>{
-  //     console.log(response,'response');
   //     this.EmployeeSalarySettingsDatasource = response.Data || []
-  //     console.log(this.EmployeeSalarySettingsDatasource, 'EmployeeSalarySettingsDatasource');
   //   })
   // }
 
@@ -204,8 +193,6 @@ export class EmployeeSalarySettingsEditComponent {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('ngOnChanges triggered', changes);
-
     if (
       changes['employeeData'] &&
       changes['employeeData'].currentValue &&
@@ -214,15 +201,7 @@ export class EmployeeSalarySettingsEditComponent {
       this.selectedEmployee = changes['employeeData'].currentValue;
       this.selectedEmployeeId = this.selectedEmployee.ID;
 
-      console.log(
-        this.selectedEmployee,
-        '========selected employeee dataa===========================',
-      );
       this.selected_Batch_id = this.selectedEmployee.BATCH_ID;
-      console.log(
-        this.selected_Batch_id,
-        '==========batch id===================',
-      );
 
       this.employeeFormData = {
         EMP_CODE: this.selectedEmployee.EMP_CODE || '',
@@ -242,13 +221,7 @@ export class EmployeeSalarySettingsEditComponent {
       this.SalaryDetails = Array.isArray(this.selectedEmployee.Details)
         ? [...this.selectedEmployee.Details]
         : [];
-      console.log(this.SalaryDetails, 'salary details');
-      console.log(this.employeeFormData);
-      console.log(
-        this.employeeFormData.EFFECT_FROM,
-        "================='''''''''''''/////////////////////",
-      );
-      console.log(this.employeeFormData.PREVIOUS_EFFECT_FROM);
+
       this.cdr.detectChanges(); // Ensure grid gets new data
 
       setTimeout(() => {
@@ -266,18 +239,11 @@ export class EmployeeSalarySettingsEditComponent {
 
   onSelectionChanged(e: any) {
     this.selectedRows = e.selectedRowKeys;
-    console.log('User selected:', this.selectedRows);
   }
 
   onEditorPreparing(e: any) {
-    // console.log(e, 'Editor Preparing Event');
-
-    console.log(e, 'Editor Preparing Event');
     //  this.selectedRows = e.row?.data
-    //   console.log(this.selectedRows, 'isDataRow in Editor Preparing Event');
     const headNature = e.row?.data.HEAD_NATURE;
-    console.log(headNature, '=======error===============');
-    console.log(headNature, 'HEAD_NATURE in Editor Preparing Event');
 
     const headId = e.row?.data.HEAD_ID;
 
@@ -318,9 +284,6 @@ export class EmployeeSalarySettingsEditComponent {
     // Convert to yyyy-mm-dd for clean comparison
     // const effectStr = this.stripToDateOnly(effectFrom);
     // const prevStr = this.stripToDateOnly(previousRevision);
-
-    // console.log(effectStr,'effectstr');
-    // console.log(prevStr,'prevstr')
 
     if (effectFrom <= previousRevision) {
       notify(
@@ -364,12 +327,9 @@ export class EmployeeSalarySettingsEditComponent {
         })),
     };
 
-    console.log(payload, 'payload from saveEmployee');
-
     this.dataservice
       .Update_EmployeeSalarySettings_Api(payload)
       .subscribe((res: any) => {
-        console.log(res, 'response from saveEmployee');
         if (res.message === 'Success') {
           notify(
             {

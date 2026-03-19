@@ -132,7 +132,7 @@ export class AddJournalVoucharComponent {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -141,7 +141,6 @@ export class AddJournalVoucharComponent {
     this.journalVoucherFormData.STORE_ID =
       menuResponse?.Configuration[0].STORE_ID;
     console.log('Company ID:', menuResponse?.Configuration[0].STORE_ID);
-    console.log('Parsed ObjectData:', menuResponse);
     this.selectedCompanyId = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || null;
     console.log('Selected Company ID:', this.selectedCompanyId);
     this.selectedFinId = menuResponse?.FINANCIAL_YEARS?.FIN_ID || null;
@@ -184,7 +183,7 @@ export class AddJournalVoucharComponent {
     ];
   }
 
-   addButtonOptions = {
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new row',
@@ -402,10 +401,6 @@ export class AddJournalVoucharComponent {
 
           const rowIndex = visibleRows.findIndex(
             (r) => r?.data === e.row?.data,
-          );
-          console.log(
-            'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex,
           );
 
           setTimeout(() => {

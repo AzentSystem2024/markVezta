@@ -181,7 +181,7 @@ export class PayrollListComponent {
     private dataService: DataService,
     private zone: NgZone,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -206,14 +206,11 @@ export class PayrollListComponent {
     this.selectedYear = this.selectedMonth.getFullYear();
 
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/payroll');
@@ -227,8 +224,6 @@ export class PayrollListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getPayrollList();
     this.generateYears();
   }
@@ -258,7 +253,7 @@ export class PayrollListComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -283,7 +278,7 @@ export class PayrollListComponent {
 
     const result = confirm(
       'This will approve the salary. Are you sure?',
-      'Confirm Approval'
+      'Confirm Approval',
     );
 
     result.then((dialogResult) => {
@@ -293,8 +288,6 @@ export class PayrollListComponent {
           USER_ID: this.userId,
           PAYDETAIL_ID: selectedRows.map((row: any) => row.SALARY_BILL_NO),
         };
-
-        console.log('Approval Payload:', payload);
 
         this.dataService.approvePayroll(payload).subscribe((response: any) => {
           notify('Payroll approved successfully.', 'success', 3000);
@@ -308,7 +301,7 @@ export class PayrollListComponent {
     const selectedRows = e.selectedRowsData || [];
 
     const hasApproved = selectedRows.some(
-      (row: any) => row.STATUS === 'Approved'
+      (row: any) => row.STATUS === 'Approved',
     );
 
     this.approveDisabled = selectedRows.length === 0 || hasApproved;
@@ -377,11 +370,11 @@ export class PayrollListComponent {
       this.selectedMonth = new Date(
         updatedMonth.getFullYear(),
         updatedMonth.getMonth() - 1,
-        1
+        1,
       );
       this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString(
         'en-US',
-        { month: 'long', year: 'numeric' }
+        { month: 'long', year: 'numeric' },
       );
     }
   }
@@ -436,7 +429,7 @@ export class PayrollListComponent {
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
       1,
-      12
+      12,
     );
 
     this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString('en-US', {
@@ -521,8 +514,6 @@ export class PayrollListComponent {
     };
 
     this.dataService.getPayrollList(payload).subscribe((response: any) => {
-      console.log('Payroll List Response:', response);
-
       const selectedMonth = this.selectedMonth.getMonth();
       const selectedYear = this.selectedMonth.getFullYear();
 
@@ -533,8 +524,6 @@ export class PayrollListComponent {
           salMonth.getFullYear() === selectedYear
         );
       });
-
-      console.log(this.payrollList, 'Filtered payrollList for selected month');
     });
   }
 
@@ -567,14 +556,12 @@ export class PayrollListComponent {
   onEditOrViewPayroll(e: any) {
     e.cancel = true;
     const payrollId = e.data.SALARY_BILL_NO;
-    console.log(payrollId, e, 'selectedpayloadid');
     const payload = { PAYDETAIL_ID: payrollId };
     this.dataService.viewSelectedPayroll(payload).subscribe({
       next: (response: any) => {
         this.selectedPayroll = response;
-        console.log(this.selectedPayroll, 'SELECTEDPAYROLL');
         const actionButton = this.allActionButtons.find(
-          (btn) => btn.name === 'edit'
+          (btn) => btn.name === 'edit',
         );
         if (actionButton) {
           let hintText = 'Edit'; // default
@@ -590,7 +577,6 @@ export class PayrollListComponent {
         if (this.selectedPayroll.STATUS === 'Approved') {
           this.viewPayrollPopupOpened = true;
         } else {
-          console.log('editpopup');
           this.editPayrollPopupOpened = true;
         }
       },
@@ -601,8 +587,6 @@ export class PayrollListComponent {
   }
 
   onVerifyClick(e: any): void {
-    // console.log('Verify clicked:', e); // <-- Add this
-
     e.cancel = true;
     const payrollId = e.row?.data?.ID;
 
@@ -613,8 +597,6 @@ export class PayrollListComponent {
 
     this.dataService.selectPayroll(payrollId).subscribe({
       next: (response: any) => {
-        // console.log('Salary revision fetched:', response); // <-- Add this
-
         this.selectedPayroll = response;
         this.verifyPayrollPopupOpened = true;
       },
@@ -625,8 +607,6 @@ export class PayrollListComponent {
   }
 
   onApproveClick(e: any): void {
-    // console.log('Verify clicked:', e); // <-- Add this
-
     e.cancel = true;
     const payrollId = e.row?.data?.ID;
 
@@ -637,8 +617,6 @@ export class PayrollListComponent {
 
     this.dataService.selectPayroll(payrollId).subscribe({
       next: (response: any) => {
-        // console.log('Salary revision fetched:', response); // <-- Add this
-
         this.selectedPayroll = response;
         this.approvePayrollPopupOpened = true;
       },
@@ -649,7 +627,6 @@ export class PayrollListComponent {
   }
 
   onDeletePayroll(e: any) {
-    console.log(e);
     const TS_ID = e.data.TS_ID;
     e.cancel = true;
 
@@ -661,7 +638,7 @@ export class PayrollListComponent {
               message: 'Payroll Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getPayrollList();
         } else {
@@ -670,7 +647,7 @@ export class PayrollListComponent {
               message: 'Your data was not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       },
@@ -681,9 +658,9 @@ export class PayrollListComponent {
             message: 'Error deleting payroll',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
-      }
+      },
     );
   }
 

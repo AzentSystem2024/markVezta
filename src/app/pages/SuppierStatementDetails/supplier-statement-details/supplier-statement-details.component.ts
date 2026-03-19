@@ -1,7 +1,37 @@
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { DxAutocompleteModule, DxButtonModule, DxCheckBoxModule, DxDataGridModule, DxDateBoxModule, DxDropDownBoxModule, DxFormModule, DxNumberBoxModule, DxPopupModule, DxProgressBarModule, DxRadioGroupModule, DxSelectBoxModule, DxTabPanelModule, DxTabsModule, DxTagBoxModule, DxTextAreaModule, DxTextBoxModule, DxToolbarModule, DxValidationGroupModule, DxValidatorModule } from 'devextreme-angular';
-import { DxoFormItemModule, DxoItemModule, DxoLookupModule } from 'devextreme-angular/ui/nested';
+import {
+  DxAutocompleteModule,
+  DxButtonModule,
+  DxCheckBoxModule,
+  DxDataGridModule,
+  DxDateBoxModule,
+  DxDropDownBoxModule,
+  DxFormModule,
+  DxNumberBoxModule,
+  DxPopupModule,
+  DxProgressBarModule,
+  DxRadioGroupModule,
+  DxSelectBoxModule,
+  DxTabPanelModule,
+  DxTabsModule,
+  DxTagBoxModule,
+  DxTextAreaModule,
+  DxTextBoxModule,
+  DxToolbarModule,
+  DxValidationGroupModule,
+  DxValidatorModule,
+} from 'devextreme-angular';
+import {
+  DxoFormItemModule,
+  DxoItemModule,
+  DxoLookupModule,
+} from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
@@ -20,69 +50,65 @@ import { EditSupplierPaymentModule } from '../../SUPPLIER-PAYMENT/edit-supplier-
 @Component({
   selector: 'app-supplier-statement-details',
   templateUrl: './supplier-statement-details.component.html',
-  styleUrls: ['./supplier-statement-details.component.scss']
+  styleUrls: ['./supplier-statement-details.component.scss'],
 })
 export class SupplierStatementDetailsComponent {
-           SupplierStatementDetailsDataSource:any [] = [];
-           selected_Head_Id: any;
-           selected_Suppier_id: any;
-           HEAD_ID_LIST: any[] = [];
-           formatted_from_date: string;
-           formatted_To_date: string;
-           selected_from_date: any;
-           selected_To_date: any;
-           savedUserData: any;
-           selectedDebitNote: any;
-           isViewDebitNote: boolean;
-           company_list: any[] = [];
-           selectedCompanyId:any
-           company_id: any;
-           fin_id: any[] = [];
-           selected_fin_id: any;
-           selected_Company_id: any;
-           selected_Purch_id: any;
-           isEditInvoiceReadOnly: boolean = true;
-           isReadOnlyReceipt:boolean = true;
-           isEditReadOnly: boolean = true;
-           ledgerSummaryData: any = [];
-           readonly allowedPageSizes: any = [ 5,10, 'all'];
-           displayMode: any = 'full';
-            Supplier:any;
-          selectedSupplierId: any;
-          SuppID: any
-          selectedInvoice: any;
-          selectedReceipt:any;
-          selectedPrePayment:any;
-           isEditInvoice: boolean = false;
-           isEditReceipt: boolean = false;
-           editPrePaymentPopupOpened: boolean = false;
-          loadingInvoice = false;
-          popupReady = false;
+  SupplierStatementDetailsDataSource: any[] = [];
+  selected_Head_Id: any;
+  selected_Suppier_id: any;
+  HEAD_ID_LIST: any[] = [];
+  formatted_from_date: string;
+  formatted_To_date: string;
+  selected_from_date: any;
+  selected_To_date: any;
+  savedUserData: any;
+  selectedDebitNote: any;
+  isViewDebitNote: boolean;
+  company_list: any[] = [];
+  selectedCompanyId: any;
+  company_id: any;
+  fin_id: any[] = [];
+  selected_fin_id: any;
+  selected_Company_id: any;
+  selected_Purch_id: any;
+  isEditInvoiceReadOnly: boolean = true;
+  isReadOnlyReceipt: boolean = true;
+  isEditReadOnly: boolean = true;
+  ledgerSummaryData: any = [];
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  Supplier: any;
+  selectedSupplierId: any;
+  SuppID: any;
+  selectedInvoice: any;
+  selectedReceipt: any;
+  selectedPrePayment: any;
+  isEditInvoice: boolean = false;
+  isEditReceipt: boolean = false;
+  editPrePaymentPopupOpened: boolean = false;
+  loadingInvoice = false;
+  popupReady = false;
 
-           constructor(
-               private dataService: DataService,
-               private router: Router,
-               private cdr: ChangeDetectorRef
-             ) {
-               this.get_sessionstorage_data();
-               this.get_fin_id();
-               this.sesstion_Details()
-           
-               // Detect when component is revisited
-               this.router.events
-                 .pipe(filter((event) => event instanceof NavigationEnd))
-                 .subscribe((event) => {
-                   if (this.router.url.includes('supplier-statement-details')) {
-                     this.loadLedgerData();
-                    
-                   }
-                 });
-             }
-           
+  constructor(
+    private dataService: DataService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+  ) {
+    this.get_sessionstorage_data();
+    this.get_fin_id();
+    this.sesstion_Details();
 
-               ngOnInit() {
+    // Detect when component is revisited
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        if (this.router.url.includes('supplier-statement-details')) {
+          this.loadLedgerData();
+        }
+      });
+  }
 
-
+  ngOnInit() {
     this.loadLedgerData();
 
     this.ledgerSummaryData = this.SupplierStatementDetailsDataSource;
@@ -93,27 +119,27 @@ export class SupplierStatementDetailsComponent {
     //     console.log(this.HEAD_ID_LIST);
     //   });
     const payload = {
-      COMPANY_ID : this.selected_Company_id,
-      NAME: ' SUPPLIER'
-    }
+      COMPANY_ID: this.selected_Company_id,
+      NAME: ' SUPPLIER',
+    };
     this.dataService.Supplier_Dropdown(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
       this.Supplier = res;
     });
   }
 
-            onExporting(event: any) {
+  onExporting(event: any) {
     const fileName = 'Supplier Statement Details Report';
     this.dataService.exportDataGridReport(event, fileName);
   }
 
-    
-  onSupplierChanged(event:any){
-    console.log(event,'event')
-    this.selectedSupplierId = event.value
+  onSupplierChanged(event: any) {
+    this.selectedSupplierId = event.value;
 
-      // Find and log the selected supplier's DESCRIPTION
-    const selectedSupplier = this.Supplier.find((item: any) => item.ID === this.selectedSupplierId);
+    // Find and log the selected supplier's DESCRIPTION
+    const selectedSupplier = this.Supplier.find(
+      (item: any) => item.ID === this.selectedSupplierId,
+    );
     if (selectedSupplier) {
       console.log('Selected ID:', selectedSupplier.ID);
       console.log('Selected Description:', selectedSupplier.DESCRIPTION);
@@ -121,21 +147,20 @@ export class SupplierStatementDetailsComponent {
 
     // this.selectedBeneficiaryCommonName = selectedSupplier.DESCRIPTION;
     // console.log(this.selectedSupplierName,'======supplier name========')
-
   }
 
-  handleClose(){
+  handleClose() {
     this.isEditInvoice = false;
     this.isEditReceipt = false;
     this.editPrePaymentPopupOpened = false;
   }
 
-    getSessionData(key: string) {
+  getSessionData(key: string) {
     const data = sessionStorage.getItem(key);
     return data ? JSON.parse(data) : null;
   }
 
-    get_sessionstorage_data() {
+  get_sessionstorage_data() {
     this.savedUserData = this.getSessionData('savedUserData');
     if (this.savedUserData) {
       this.company_list = this.savedUserData.Companies || [];
@@ -149,23 +174,18 @@ export class SupplierStatementDetailsComponent {
     }
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     // this.selected_Purch_id=sessionData.SELECTED_PURCH_ID
     // console.log(this.selected_Purch_id,'============selected_Purch_id==============')
 
-    this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+  }
 
-    console.log(this.selected_fin_id,'===========selected fin id===================')
-    
-  }
-
-    onFromDateChange(event: any) {
+  onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
   }
@@ -182,7 +202,7 @@ export class SupplierStatementDetailsComponent {
     return `${year}-${month}-${day}`;
   }
 
-    formatDates(cellData: any): string {
+  formatDates(cellData: any): string {
     const date = new Date(cellData);
     if (isNaN(date.getTime())) return '';
 
@@ -193,11 +213,7 @@ export class SupplierStatementDetailsComponent {
     return `${day}-${month}-${year}`;
   }
 
-
-
-
-
-    async loadLedgerData() {
+  async loadLedgerData() {
     // this.ledgerSummaryData=this.Ledger_statement_datasource
     const sessiondata = this.getSessionData('supplierViewClick');
     const suppid = this.getSessionData('SUPPID');
@@ -205,8 +221,8 @@ export class SupplierStatementDetailsComponent {
     console.log(suppid, '========suppid=========');
     console.log(purchid, '========purchid=========');
 
-    console.log(sessiondata)
-     
+    console.log(sessiondata);
+
     // if (!sessiondata) {
     //   console.log('No session data found!');
     //   return;
@@ -215,24 +231,26 @@ export class SupplierStatementDetailsComponent {
     const payload = {
       COMPANY_ID: Number(sessiondata.COMPANY_ID),
       SUPP_ID: suppid,
-      PURCH_ID : purchid,
+      PURCH_ID: purchid,
       DATE_FROM: sessiondata.DATE_FROM,
       DATE_TO: sessiondata.DATE_TO,
     };
 
     console.log(payload, '=========payload=========');
 
-     this.selectedCompanyId = payload.COMPANY_ID;
+    this.selectedCompanyId = payload.COMPANY_ID;
     this.selectedSupplierId = payload.SUPP_ID;
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
- 
-   await this.dataService.SupplierDetails_Report_Api(payload).subscribe((res: any) => {
-    console.log(res, '========Supplier Statement Details Data=========');
-      this.SupplierStatementDetailsDataSource = res.data || [];
-      this.ledgerSummaryData = this.SupplierStatementDetailsDataSource;
-      this.cdr.detectChanges();
-    });
+
+    await this.dataService
+      .SupplierDetails_Report_Api(payload)
+      .subscribe((res: any) => {
+        console.log(res, '========Supplier Statement Details Data=========');
+        this.SupplierStatementDetailsDataSource = res.data || [];
+        this.ledgerSummaryData = this.SupplierStatementDetailsDataSource;
+        this.cdr.detectChanges();
+      });
   }
 
   load_Ledgre_data() {
@@ -247,142 +265,128 @@ export class SupplierStatementDetailsComponent {
 
     console.log(payload, '==========manual payload===========');
 
-    this.dataService.SupplierDetails_Report_Api(payload).subscribe((res: any) => {
-      this.SupplierStatementDetailsDataSource = res.data || [];
-      this.ledgerSummaryData = this.SupplierStatementDetailsDataSource;
-    });
+    this.dataService
+      .SupplierDetails_Report_Api(payload)
+      .subscribe((res: any) => {
+        this.SupplierStatementDetailsDataSource = res.data || [];
+        this.ledgerSummaryData = this.SupplierStatementDetailsDataSource;
+      });
   }
 
-    onViewClick(e: any) {
-    console.log(e, '=======event==========');
+  onViewClick(e: any) {
     const trans_id = e.row.data.TRANS_ID;
-const TRANS_TYPE = e.row.data.TRANS_TYPE
-  
-  this.selectedInvoice = null;
+    const TRANS_TYPE = e.row.data.TRANS_TYPE;
+
+    this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
-    
 
-     if(TRANS_TYPE == 19){
+    if (TRANS_TYPE == 19) {
       this.dataService
         .selectPurchaseInvoice(trans_id)
         .subscribe((response: any) => {
           this.selectedInvoice = response.Data;
- this.loadingInvoice = false;
-
+          this.loadingInvoice = false;
 
           this.isEditInvoice = true;
           this.cdr.detectChanges();
-         
         });
-      }
-      else if(TRANS_TYPE == 38){
-        this.dataService.Select_PrePayment(trans_id).subscribe((res: any) => {
-    console.log(res);
+    } else if (TRANS_TYPE == 38) {
+      this.dataService.Select_PrePayment(trans_id).subscribe((res: any) => {
+        // Store original string if needed
+        this.selectedPrePayment = res.Data;
+        this.editPrePaymentPopupOpened = true;
+        this.cdr.detectChanges();
+        // {
+        //   ...res.Data,
+        //   TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved' // ✅ boolean for checkbox
+        // };
+      });
+    } else if (TRANS_TYPE == 21) {
+      this.dataService
+        .selectSupplierPayment(trans_id)
+        .subscribe((response: any) => {
+          this.selectedReceipt = response.Data;
 
-    // Store original string if needed
-    this.selectedPrePayment = res.Data;
-    this.editPrePaymentPopupOpened = true;
-    this.cdr.detectChanges();
-    // {
-    //   ...res.Data,
-    //   TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved' // ✅ boolean for checkbox
-    // };
+          // Set a flag to determine if the form should be read-only
+          this.isEditReceipt = true;
+          this.cdr.detectChanges();
 
-  });
-      }
-      else if(TRANS_TYPE == 21){
-             this.dataService.selectSupplierPayment(trans_id).subscribe((response: any) => {
-    this.selectedReceipt = response.Data;
+          // Navigate to form component or open the form popup (depending on your app)
+          console.log(this.selectedReceipt, 'SELECTED RECEIPT');
+        });
+    } else if (TRANS_TYPE == 36) {
+      this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
+        this.selectedDebitNote = response.Data;
 
-    // Set a flag to determine if the form should be read-only
-    this.isEditReceipt = true;
-    this.cdr.detectChanges();
-
-    // Navigate to form component or open the form popup (depending on your app)
-    console.log(this.selectedReceipt, 'SELECTED RECEIPT');
-  });
-      }
-      else if(TRANS_TYPE == 36){
-          this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
-    this.selectedDebitNote = response.Data;
-    
-      // Open view popup
-      this.isViewDebitNote = true;
-      this.cdr.detectChanges();
-    
-    console.log(this.selectedDebitNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
-  });
-      }
-      else {
-      console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE}`);
+        // Open view popup
+        this.isViewDebitNote = true;
+        this.cdr.detectChanges();
+      });
+    } else {
     }
-    }
-   
-    // const trans_id = e.row.data.TRANS_ID;
+  }
 
-    // if (TRANS_TYPE_ID == 4) {
-    //   this.dataService
-    //     .selectJournalVoucher(trans_id)
-    //     .subscribe((response: any) => {
-    //       this.selectedJournalVoucher = response.Data;
+  // const trans_id = e.row.data.TRANS_ID;
 
-    //       this.isViewJournalVoucher = true;
-    //       this.cdr.detectChanges();
-    //       console.log(
-    //         this.selectedJournalVoucher,
-    //         'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-    //       );
-    //     });
-    // } else if (TRANS_TYPE_ID === 36) {
-    //   this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
-    //     this.selectedDebitNote = response.Data;
-    //     this.isViewDebitNote = true;
-    //     this.cdr.detectChanges();
-    //     console.log(this.selectedDebitNote, 'selected debit note');
-    //   });
-    // } else if (TRANS_TYPE_ID === 37) {
-    //   console.log('=====navigate to 37-CREDIT NOTE=====');
-    //   this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-    //     this.selectedCreditNote = response.Data;
-    //     this.cdr.detectChanges();
-    //     console.log(this.selectedCreditNote, 'selected credit note');
-    //   });
-    // } else if (TRANS_TYPE_ID === 25) {
-    //   console.log('=====navigate to 25-SALES INVOICE=====');
-    //   this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
-    //     this.selectedInvoice = response.Data;
-    //     this.isViewInvoice = true;
-    //     this.cdr.detectChanges();
-    //     console.log(this.selectedInvoice, 'SELECTE SALES INVOICE');
-    //   });
-    // } else if (TRANS_TYPE_ID === 27) {
-    //   console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
-    //   this.dataService
-    //     .selectCustomerReceipt(trans_id)
-    //     .subscribe((response: any) => {
-    //       this.selectedReceipt = response.Data;
-    //       this.isViewReceipt = true;
-    //       this.cdr.detectChanges();
-    //       console.log(this.selectedReceipt, 'Custom receipts=====');
-    //     });
-    // } else {
-    //   console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
-    // }
+  // if (TRANS_TYPE_ID == 4) {
+  //   this.dataService
+  //     .selectJournalVoucher(trans_id)
+  //     .subscribe((response: any) => {
+  //       this.selectedJournalVoucher = response.Data;
 
+  //       this.isViewJournalVoucher = true;
+  //       this.cdr.detectChanges();
+  //       console.log(
+  //         this.selectedJournalVoucher,
+  //         'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
+  //       );
+  //     });
+  // } else if (TRANS_TYPE_ID === 36) {
+  //   this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
+  //     this.selectedDebitNote = response.Data;
+  //     this.isViewDebitNote = true;
+  //     this.cdr.detectChanges();
+  //     console.log(this.selectedDebitNote, 'selected debit note');
+  //   });
+  // } else if (TRANS_TYPE_ID === 37) {
+  //
+  //   this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
+  //     this.selectedCreditNote = response.Data;
+  //     this.cdr.detectChanges();
+  //          //   });
+  // } else if (TRANS_TYPE_ID === 25) {
+  //   console.log('=====navigate to 25-SALES INVOICE=====');
+  //   this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
+  //     this.selectedInvoice = response.Data;
+  //     this.isViewInvoice = true;
+  //     this.cdr.detectChanges();
+  //     console.log(this.selectedInvoice, 'SELECTE SALES INVOICE');
+  //   });
+  // } else if (TRANS_TYPE_ID === 27) {
+  //   console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
+  //   this.dataService
+  //     .selectCustomerReceipt(trans_id)
+  //     .subscribe((response: any) => {
+  //       this.selectedReceipt = response.Data;
+  //       this.isViewReceipt = true;
+  //       this.cdr.detectChanges();
+  //       console.log(this.selectedReceipt, 'Custom receipts=====');
+  //     });
+  // } else {
+  //   console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
+  // }
 
-
-      // POPUP shown → allow child to render
+  // POPUP shown → allow child to render
   onPopupShown() {
     this.popupReady = true;
     this.cdr.detectChanges();
   }
 
-             summaryColumnsData = {
+  summaryColumnsData = {
     totalItems: [
       // 1. Total Debitṅ
-                       {
-
+      {
         column: 'NARRATION',
         summaryType: '',
         displayFormat: ' Total',
@@ -390,8 +394,7 @@ const TRANS_TYPE = e.row.data.TRANS_TYPE
         showInColumn: 'NARRATION',
         alignment: 'right',
       },
-                 {
-
+      {
         column: 'NARRATION',
         summaryType: '',
         displayFormat: ' Closing Balance',
@@ -399,8 +402,7 @@ const TRANS_TYPE = e.row.data.TRANS_TYPE
         showInColumn: 'NARRATION',
         alignment: 'right',
       },
-                 {
-
+      {
         column: 'NARRATION',
         summaryType: '',
         displayFormat: ' Grand Total',
@@ -462,50 +464,56 @@ const TRANS_TYPE = e.row.data.TRANS_TYPE
         alignment: 'right',
       },
     ],
-    
-   calculateCustomSummary: (options: any) => {
-  if (options.summaryProcess === 'finalize') {
-    const items = this.ledgerSummaryData || [];
 
-    const totalDr = items.reduce((sum, item) => {
-      const val = parseFloat(
-        String(item?.DR_AMOUNT || '0').replace(/,/g, '').trim()
-      );
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
+    calculateCustomSummary: (options: any) => {
+      if (options.summaryProcess === 'finalize') {
+        const items = this.ledgerSummaryData || [];
 
-    const totalCr = items.reduce((sum, item) => {
-      const val = parseFloat(
-        String(item?.CR_AMOUNT || '0').replace(/,/g, '').trim()
-      );
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
+        const totalDr = items.reduce((sum, item) => {
+          const val = parseFloat(
+            String(item?.DR_AMOUNT || '0')
+              .replace(/,/g, '')
+              .trim(),
+          );
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
 
-    const closingBalance = totalDr - totalCr;
+        const totalCr = items.reduce((sum, item) => {
+          const val = parseFloat(
+            String(item?.CR_AMOUNT || '0')
+              .replace(/,/g, '')
+              .trim(),
+          );
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
 
-    // Closing Balance Cr
-    if (options.name === 'closingBalanceCr') {
-      options.totalValue = closingBalance > 0 ? closingBalance : 0;
-    }
+        const closingBalance = totalDr - totalCr;
 
-    // Closing Balance Dr
-    if (options.name === 'closingBalanceDr') {
-      options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : 0;
-    }
+        // Closing Balance Cr
+        if (options.name === 'closingBalanceCr') {
+          options.totalValue = closingBalance > 0 ? closingBalance : 0;
+        }
 
-    // Grand Total Cr
-    if (options.name === 'grandTotalCr') {
-      options.totalValue = totalCr + (closingBalance > 0 ? closingBalance : 0);
-    }
+        // Closing Balance Dr
+        if (options.name === 'closingBalanceDr') {
+          options.totalValue =
+            closingBalance < 0 ? Math.abs(closingBalance) : 0;
+        }
 
-    // Grand Total Dr
-    if (options.name === 'grandTotalDr') {
-      options.totalValue = totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-    }
-  }
-},
+        // Grand Total Cr
+        if (options.name === 'grandTotalCr') {
+          options.totalValue =
+            totalCr + (closingBalance > 0 ? closingBalance : 0);
+        }
+
+        // Grand Total Dr
+        if (options.name === 'grandTotalDr') {
+          options.totalValue =
+            totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
+        }
+      }
+    },
   };
-
 }
 
 @NgModule({

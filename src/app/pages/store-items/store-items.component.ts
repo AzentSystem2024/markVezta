@@ -133,12 +133,8 @@ export class StoreItemsComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
   }
 
   ngOnInit() {
@@ -151,7 +147,7 @@ export class StoreItemsComponent {
   ngOnChanges(changes: SimpleChanges): void {
     console.log(this.storeData.item_stores, 'Stores1');
     const validStore = this.storeData.item_stores.find(
-      (store: any) => store.ID > 0
+      (store: any) => store.ID > 0,
     );
 
     if (validStore) {

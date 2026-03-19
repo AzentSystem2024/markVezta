@@ -96,7 +96,7 @@ export class AddSalaryPaymentComponent {
   salaryPaymentData: any = {
     COMPANY_ID: '',
     FIN_ID: '',
-    STORE_ID :0,
+    STORE_ID: 0,
     TRANS_DATE: new Date(),
     PAY_TYPE_ID: '',
     PAY_HEAD_ID: '',
@@ -119,7 +119,7 @@ export class AddSalaryPaymentComponent {
   companyId: any;
   finId: any;
   selectedRows: any;
-  selectedstoreId:any;
+  selectedstoreId: any;
   selected_Company_id: any;
   docNo: any;
 
@@ -133,31 +133,21 @@ export class AddSalaryPaymentComponent {
     this.getDocNo();
   }
 
-
-      getDocNo() {
+  getDocNo() {
     const payload = {
       TRANS_TYPE: 30,
       COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
-    sessionDetails(){
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-      this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id==================='
-    );
+  sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -190,8 +180,6 @@ export class AddSalaryPaymentComponent {
       ? this.EditingResponseData[0]
       : this.EditingResponseData;
 
-    console.log(data, 'DATA=============================================');
-
     const payTypeReverseMapping: any = {
       1: 'Cash',
       2: 'Bank',
@@ -204,7 +192,7 @@ export class AddSalaryPaymentComponent {
     // this.salaryPaymentData.TRANS_DATE = data.TRANS_DATE
     //   ? new Date(data.TRANS_DATE)
     //   : new Date();
-this.salaryPaymentData.TRANS_DATE = new Date();
+    this.salaryPaymentData.TRANS_DATE = new Date();
     if (data.SAL_MONTH) {
       const [month, year] = data.SAL_MONTH.split('-').map(Number);
       this.selectedMonth = new Date(year, month - 1, 1);
@@ -239,8 +227,6 @@ this.salaryPaymentData.TRANS_DATE = new Date();
     this.selectedRows = e.selectedRowsData;
     // Add mode → ID
     this.selectedIds = e.selectedRowsData.map((row: any) => row.ID);
-console.log(this.selectedRows)
-    console.log('Selected IDs:', this.selectedIds);
   }
 
   getVoucherNo() {
@@ -262,7 +248,6 @@ console.log(this.selectedRows)
       .getPendingSalaryPayments(payload)
       .subscribe((response: any) => {
         this.salaryPendingList = response.data;
-     
       });
   }
 
@@ -291,11 +276,11 @@ console.log(this.selectedRows)
       this.selectedMonth = new Date(
         updatedMonth.getFullYear(),
         updatedMonth.getMonth() - 1,
-        1
+        1,
       );
       this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString(
         'en-US',
-        { month: 'long', year: 'numeric' }
+        { month: 'long', year: 'numeric' },
       );
     }
   }
@@ -350,7 +335,7 @@ console.log(this.selectedRows)
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
       1,
-      12
+      12,
     );
 
     this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString('en-US', {
@@ -399,13 +384,10 @@ console.log(this.selectedRows)
   getLedgerCodeDropdown() {
     this.dataService.getAccountHeadList().subscribe({
       next: (response: any) => {
-        console.log('API Response:', response); // <== LOG FULL RESPONSE
         this.ledgerList = response?.Data || []; // Fallback to empty array
         this.onReceiptModeChange({ value: this.receiptMode });
       },
-      error: (err) => {
-        console.error('Ledger API Error:', err); // <== CATCH ERRORS
-      },
+      error: (err) => {},
     });
   }
 
@@ -414,15 +396,15 @@ console.log(this.selectedRows)
 
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13
+        (item: any) => item.GROUP_ID === 13,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14
+        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
@@ -457,7 +439,7 @@ console.log(this.selectedRows)
         notify(
           'Please enter Cheque No, Cheque Date, and Bank Name before saving.',
           'warning',
-          2000
+          2000,
         );
         return;
       }
@@ -479,8 +461,6 @@ console.log(this.selectedRows)
       NET_AMOUNT: row.NET_AMOUNT,
     }));
 
-    console.log('Payload to send:', this.salaryPaymentData);
-
     // Call API
     this.dataService
       .insertSalaryPayment(this.salaryPaymentData)
@@ -494,90 +474,86 @@ console.log(this.selectedRows)
       });
   }
 
-onUpdateSalaryPayment() {
-  console.log('update triggered');
-  if (!this.selectedRows || this.selectedRows.length === 0) {
-    notify('Please select at least one row before saving.', 'warning', 2000);
-    return;
-  }
-  if (!this.salaryPaymentData?.PAY_HEAD_ID) {
-    notify('Please select a ledger before saving.', 'warning', 2000);
-    return;
-  }
-
-  const payTypeMapping: any = {
-    Cash: 1,
-    Bank: 2,
-    PDC: 3,
-    Adjustments: 4,
-  };
-
-  this.salaryPaymentData.PAY_TYPE_ID =
-    payTypeMapping[this.receiptMode] || null;
-
-  if (this.salaryPaymentData.PAY_TYPE_ID === 2) {
-    if (
-      !this.salaryPaymentData.CHEQUE_NO ||
-      !this.salaryPaymentData.CHEQUE_DATE ||
-      !this.salaryPaymentData.BANK_NAME
-    ) {
-      notify(
-        'Please enter Cheque No, Cheque Date, and Bank Name before saving.',
-        'warning',
-        2000
-      );
+  onUpdateSalaryPayment() {
+    if (!this.selectedRows || this.selectedRows.length === 0) {
+      notify('Please select at least one row before saving.', 'warning', 2000);
       return;
+    }
+    if (!this.salaryPaymentData?.PAY_HEAD_ID) {
+      notify('Please select a ledger before saving.', 'warning', 2000);
+      return;
+    }
+
+    const payTypeMapping: any = {
+      Cash: 1,
+      Bank: 2,
+      PDC: 3,
+      Adjustments: 4,
+    };
+
+    this.salaryPaymentData.PAY_TYPE_ID =
+      payTypeMapping[this.receiptMode] || null;
+
+    if (this.salaryPaymentData.PAY_TYPE_ID === 2) {
+      if (
+        !this.salaryPaymentData.CHEQUE_NO ||
+        !this.salaryPaymentData.CHEQUE_DATE ||
+        !this.salaryPaymentData.BANK_NAME
+      ) {
+        notify(
+          'Please enter Cheque No, Cheque Date, and Bank Name before saving.',
+          'warning',
+          2000,
+        );
+        return;
+      }
+    }
+
+    // Commit any pending cell edits in grid
+    this.itemsGridRef.instance.closeEditCell();
+
+    // Populate the IDs from ngOnInit data
+    this.salaryPaymentData.COMPANY_ID = this.companyId;
+    this.salaryPaymentData.CREATE_USER_ID = this.userId;
+    this.salaryPaymentData.FIN_ID = this.finId;
+    this.salaryPaymentData.STORE_ID = this.selectedstoreId;
+
+    // Update salary pay details with selected rows
+    this.salaryPaymentData.SALARY_PAY_DETAIL = this.selectedRows.map((row) => ({
+      PAYDETAIL_ID: row.ID,
+      NET_AMOUNT: row.NET_AMOUNT,
+    }));
+
+    if (this.isApproved === true) {
+      // Call approve API if isApproved is true
+      this.dataService
+        .approveSalaryPayment(this.salaryPaymentData)
+        .subscribe((response: any) => {
+          if (response.flag === 1) {
+            notify('Salary Payment approved successfully', 'success', 2000);
+            this.popupClosed.emit();
+          } else {
+            notify('Failed to approve Salary Payment', 'error', 2000);
+          }
+        });
+    } else {
+      // Otherwise call update API
+      this.dataService
+        .updateSalaryPayment(this.salaryPaymentData)
+        .subscribe((response: any) => {
+          if (response.flag === 1) {
+            notify('Salary Payment updated successfully', 'success', 2000);
+            this.popupClosed.emit();
+          } else {
+            notify('Failed to save Salary Payment', 'error', 2000);
+          }
+        });
     }
   }
 
-  // Commit any pending cell edits in grid
-  this.itemsGridRef.instance.closeEditCell();
-
-  // Populate the IDs from ngOnInit data
-  this.salaryPaymentData.COMPANY_ID = this.companyId;
-  this.salaryPaymentData.CREATE_USER_ID = this.userId;
-  this.salaryPaymentData.FIN_ID = this.finId;
-  this.salaryPaymentData.STORE_ID = this.selectedstoreId;
-
-  // Update salary pay details with selected rows
-  this.salaryPaymentData.SALARY_PAY_DETAIL = this.selectedRows.map((row) => ({
-    PAYDETAIL_ID: row.ID,
-    NET_AMOUNT: row.NET_AMOUNT,
-  }));
-
-  console.log('Payload to send:', this.salaryPaymentData);
-
-  if (this.isApproved === true) {
-    // Call approve API if isApproved is true
-    this.dataService
-      .approveSalaryPayment(this.salaryPaymentData)
-      .subscribe((response: any) => {
-        if (response.flag === 1) {
-          notify('Salary Payment approved successfully', 'success', 2000);
-          this.popupClosed.emit();
-        } else {
-          notify('Failed to approve Salary Payment', 'error', 2000);
-        }
-      });
-  } else {
-    // Otherwise call update API
-    this.dataService
-      .updateSalaryPayment(this.salaryPaymentData)
-      .subscribe((response: any) => {
-        if (response.flag === 1) {
-          notify('Salary Payment updated successfully', 'success', 2000);
-          this.popupClosed.emit();
-        } else {
-          notify('Failed to save Salary Payment', 'error', 2000);
-        }
-      });
+  cancel() {
+    this.popupClosed.emit();
   }
-}
-
-cancel(){
- this.popupClosed.emit();
-}
-
 }
 
 @NgModule({

@@ -81,11 +81,6 @@ export class ApproveMiscellaneousPaymentComponent {
       changes['miscellaneousData'] &&
       changes['miscellaneousData'].currentValue
     ) {
-      // console.log(
-      //   'Received miscellaneousData:',
-      //   changes['miscellaneousData'].currentValue
-      // );
-
       // Deep copy to avoid reference issues
       this.miscFormData = {
         ...this.miscFormData,
@@ -95,12 +90,9 @@ export class ApproveMiscellaneousPaymentComponent {
   }
 
   getEmployeeDropdown() {
-    this.dataService
-      .getDropdownData('EMPLOYEE')
-      .subscribe((response: any) => {
-        this.employee = response;
-
-      });
+    this.dataService.getDropdownData('EMPLOYEE').subscribe((response: any) => {
+      this.employee = response;
+    });
   }
 
   getSalaryHead() {
@@ -108,7 +100,6 @@ export class ApproveMiscellaneousPaymentComponent {
       .getDropdownData('SALARY_HEAD')
       .subscribe((response: any) => {
         this.salaryHead = response;
-
       });
   }
 
@@ -134,7 +125,7 @@ export class ApproveMiscellaneousPaymentComponent {
                   message: 'Miscellaneous Payment Approved Successfully',
                   position: { at: 'top center', my: 'top center' },
                 },
-                'success'
+                'success',
               );
               this.popupClosed.emit();
             } else {
@@ -143,7 +134,7 @@ export class ApproveMiscellaneousPaymentComponent {
                   message: 'Your Data Not updated',
                   position: { at: 'top right', my: 'top right' },
                 },
-                'error'
+                'error',
               );
             }
           });

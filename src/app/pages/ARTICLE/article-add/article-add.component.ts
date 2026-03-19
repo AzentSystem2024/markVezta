@@ -126,7 +126,7 @@ export class ArticleAddComponent {
   selectedComponentDescription: any;
   selectedTabIndex = 0;
   items: any[] = []; // grid data → BoM components
-  ItemListDataSource:any[] =[];
+  ItemListDataSource: any[] = [];
   itemsList: any[] = []; // dropdown source → item master list
   data: any;
   selectedItemId: any;
@@ -138,7 +138,7 @@ export class ArticleAddComponent {
   selected_Company_id: any;
   selectedAttachRowKeys: number[] = [];
   isSaving = false;
-ItempopupVisible: boolean = false;
+  ItempopupVisible: boolean = false;
   selectedItem: any;
   selectedItems: any[] = [];
   constructor(private dataService: DataService) {}
@@ -154,7 +154,7 @@ ItempopupVisible: boolean = false;
     this.getLastOrderNo();
     // }
     this.getAliasNo();
-     this.getPartNo();
+    this.getPartNo();
     this.getDropdownLists();
     this.getItems();
     this.articleData.NEXT_SERIAL = 1;
@@ -162,13 +162,13 @@ ItempopupVisible: boolean = false;
     //   { ITEM: null, COLOR: '', CATEGORY_NAME: '', ARTICLE_TYPE_NAME: '' },
     // ];
     this.items = [
-  {
-    ITEM: null,
-    DESCRIPTION: '',
-    UOM: '',
-    QUANTITY: null,
-  },
-];
+      {
+        ITEM: null,
+        DESCRIPTION: '',
+        UOM: '',
+        QUANTITY: null,
+      },
+    ];
   }
 
   onImageSelected(event: Event) {
@@ -177,17 +177,14 @@ ItempopupVisible: boolean = false;
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
-        // console.log('Base64 Image String:', this.imagePreview);
       };
       reader.readAsDataURL(file);
     }
   }
 
-   getPartNo() {
+  getPartNo() {
     this.dataService.getArticleLastPartNo().subscribe((response: any) => {
-      console.log(response);
       this.articleData.PART_NO = response.GetPartNo;
-      console.log(this.articleData.PART_NO, 'ALIASNO');
     });
   }
 
@@ -252,7 +249,6 @@ ItempopupVisible: boolean = false;
       NAME: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      console.log(response);
       this.itemsList = response;
     });
   }
@@ -313,7 +309,6 @@ ItempopupVisible: boolean = false;
         const selectedDescription = args.value;
         const grid = e.component;
         const rowIndex = e.row.rowIndex;
-        console.log(args, 'ARGSSSSSSSSSSSSSS');
         // Keep the selected value in the grid
         grid.cellValue(rowIndex, 'ITEM', selectedDescription);
 
@@ -321,10 +316,8 @@ ItempopupVisible: boolean = false;
         const matchedItem = this.itemsList.find(
           (p: any) => p.DESCRIPTION === selectedDescription,
         );
-        console.log(matchedItem.ID, 'MATCHEDITEMMMMMMMMMMMMMMMMMMM');
         grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
 
-        console.log(this.selectedItemID, 'ID');
         // Save ID separately
         grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
 
@@ -453,12 +446,9 @@ ItempopupVisible: boolean = false;
     }
   }
 
-
-
   getArticles() {
     // const payload = { COMPANY_ID: this.selected_Company_id };
     this.dataService.getArticleList().subscribe((response: any) => {
-      console.log(response, 'ARTICLELIST');
       if (response?.Data && Array.isArray(response.Data)) {
         // Store full list (reversed) in articleList
         this.articleList = response.Data.reverse();
@@ -468,7 +458,6 @@ ItempopupVisible: boolean = false;
           (article: any) => article.IS_COMPONENT === true,
         );
         this.attachGridData = this.componentArticles;
-        console.log(this.componentArticles, 'COMPONENTARTICLE');
       }
     });
   }
@@ -478,7 +467,6 @@ ItempopupVisible: boolean = false;
       this.dataService
         .getCategoryList(this.selectedCategoryId)
         .subscribe((response: any) => {
-          console.log(response, 'CATEGORYLIST');
           if (response?.flag === 1 && Array.isArray(response?.Data)) {
             this.articleSizeData = response.Data;
             // if (this.selectedProductionUnitId) {
@@ -492,14 +480,11 @@ ItempopupVisible: boolean = false;
   }
 
   getDropdownLists() {
-    console.log('Company ID before dropdown:', this.selected_Company_id);
-
     const payload = {
       COMPANY_ID: 0,
       NAME: 'PRODUCTION_UNITS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      console.log(response, 'PRODUCTION UNIT');
       this.produCtionUnits = response;
     });
     const payload1 = {
@@ -507,7 +492,6 @@ ItempopupVisible: boolean = false;
       NAME: 'MATERIAL_UNITS',
     };
     this.dataService.getDropdownData(payload1).subscribe((response: any) => {
-      console.log(response, 'MATERIALUNIT');
       this.materialUnits = response;
     });
     const payload2 = {
@@ -535,9 +519,7 @@ ItempopupVisible: boolean = false;
       this.colorList = response;
     });
   }
-  onColorChanged(event: any) {
-    console.log('Selected Color:', event.value);
-  }
+  onColorChanged(event: any) {}
   assignOrderNumbersToSizes() {
     const last = Number(this.lastOrderNo ?? 0);
     let nextOrderNo = last + 1;
@@ -563,7 +545,6 @@ ItempopupVisible: boolean = false;
   }
   getLastOrderNo() {
     // if (!this.selectedProductionUnitId) return;
-    console.log(this.selectedProductionUnitId, 'SELECTEDPRODUCTIONUNITID');
     // const ids = this.selectedProductionUnitId.join(',');
     const payload = { COMPANY_ID: 0 };
     this.dataService
@@ -615,12 +596,10 @@ ItempopupVisible: boolean = false;
   getAliasNo() {
     this.dataService.getLastAliasNo().subscribe((response: any) => {
       this.articleData.ALIAS_NO = response.GetAliasNo;
-      console.log(this.articleData.ALIAS_NO, 'ALIASNO');
     });
   }
   // onAttachRowSelected(event: any) {
   //   this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
-  //   console.log('Selected row:', this.selectedAttachRow);
   // }
   onAttachRowSelected(event: any) {
     const selectedKeys = event.selectedRowKeys || [];
@@ -667,17 +646,11 @@ ItempopupVisible: boolean = false;
       // Close popup / switch tab if required
       this.isAttachPopupVisible = false;
       // this.selectedTabIndex = 0;
-
-      console.log(
-        'Assigned ComponentArticleID:',
-        this.articleData.COMPONENT_ARTICLE_ID,
-      );
     }
   }
 
   // attachComponent() {
   //   if (this.selectedAttachRow) {
-  //     console.log(this.selectedAttachRow, 'SELECTEDATTACHROW');
   //     // Assign the selected article's ID to articleData.ComponentArticleID
   //     this.articleData.COMPONENT_ARTICLE_ID = this.selectedAttachRow.ID;
   //     this.selectedComponentDescription =
@@ -686,17 +659,13 @@ ItempopupVisible: boolean = false;
   //     // Optionally close popup
   //     this.isAttachPopupVisible = false;
   //     // this.selectedTabIndex = 0;
-  //     console.log(
-  //       'Assigned ComponentArticleID:',
-  //       this.articleData.COMPONENT_ARTICLE_ID
-  //     );
+
   //   }
   // }
 
   onSizeSelectionChanged(e: any) {
     this.selectedSizeRows = e.selectedRowKeys;
     this.selectedSizeRowData = e.selectedRowsData || [];
-    console.log('Selected rows:', this.selectedSizeRows);
   }
 
   enforceArtNoLimit(e: any) {
@@ -728,12 +697,8 @@ ItempopupVisible: boolean = false;
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   // private getSelectedSizes(): number[] {
@@ -762,15 +727,6 @@ ItempopupVisible: boolean = false;
 
   //   // 🔹 Selected sizes from UI
   //   const selectedSizes = this.getSelectedSizes();
-
-  //   console.log(
-  //     artNo,
-  //     color,
-  //     categoryName,
-  //     price,
-  //     selectedSizes,
-  //     'FORM VALUES'
-  //   );
 
   //   return this.articleList.some((article: any) => {
   //     const baseMatch =
@@ -915,25 +871,25 @@ ItempopupVisible: boolean = false;
     }
 
     const bomGridData =
-  this.itemsGridRef?.instance
-    .getVisibleRows()
-    .map((r) => r.data)
-    .filter((row) => row.ITEM_ID && row.QUANTITY > 0)
-    .map((row) => ({
-      ITEM_CODE: String(row.ITEM_ID),
-      QUANTITY: row.QUANTITY,
-    })) || [];
+      this.itemsGridRef?.instance
+        .getVisibleRows()
+        .map((r) => r.data)
+        .filter((row) => row.ITEM_ID && row.QUANTITY > 0)
+        .map((row) => ({
+          ITEM_CODE: String(row.ITEM_ID),
+          QUANTITY: row.QUANTITY,
+        })) || [];
 
-//  BOM Validation
-if (!bomGridData.length) {
-  notify({
-    message: 'Please enter BOM.',
-    type: 'warning',
-    displayTime: 3000,
-    position: { at: 'top right', my: 'top right' },
-  });
-  return;
-}
+    //  BOM Validation
+    if (!bomGridData.length) {
+      notify({
+        message: 'Please enter BOM.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
 
     if (!this.articleData.HSN_CODE) {
       notify({
@@ -1016,7 +972,6 @@ if (!bomGridData.length) {
               QUANTITY: row.QUANTITY,
             })) || [];
 
-        console.log('BOM Data:', bomGridData);
         const payload = {
           ...this.articleData,
           CREATED_DATE: formatDate(this.articleData.CREATED_DATE),
@@ -1041,7 +996,6 @@ if (!bomGridData.length) {
           BOM: bomGridData,
         };
 
-        console.log('Saving article with payload:', payload);
         this.isSaving = true;
         this.dataService.insertArticle(payload).subscribe({
           next: (response: any) => {
@@ -1126,18 +1080,18 @@ if (!bomGridData.length) {
     //RESET BOM DATA
     // this.items = []; // clears grid datasource
     this.items = [
-  {
-    ITEM: null,
-    DESCRIPTION: '',
-    UOM: '',
-    QUANTITY: null,
-  },
-];
+      {
+        ITEM: null,
+        DESCRIPTION: '',
+        UOM: '',
+        QUANTITY: null,
+      },
+    ];
 
     this.selectedSizeRowData = []; // clears size-based BOM input
 
     this.getAliasNo();
-     this.getPartNo();
+    this.getPartNo();
     // if (this.itemsGridRef?.instance) {
     //   this.itemsGridRef.instance.option('dataSource', []);
     // }
@@ -1170,104 +1124,86 @@ if (!bomGridData.length) {
     this.articleData.DESCRIPTION = parts.join('-');
   }
 
- addNewRow() {
-
-  this.dataService.getItemsListForArticle().subscribe((res: any) => {
-      console.log(res);
-      console.log(
-        'PrePaymentListDataSource=============================:',
-        res.DataList,
-      );
+  addNewRow() {
+    this.dataService.getItemsListForArticle().subscribe((res: any) => {
       this.ItemListDataSource = res.DataList;
       this.ItempopupVisible = true; // Open popup
     });
-  setTimeout(() => {
+    setTimeout(() => {
+      const grid = this.itemsGridRef?.instance;
+      if (!grid) return;
 
-    const grid = this.itemsGridRef?.instance;
-    if (!grid) return;
+      const rows = grid.getVisibleRows();
 
-    const rows = grid.getVisibleRows();
+      const hasIncompleteRow = rows.some(
+        (r: any) => !r.data?.ITEM || !r.data?.QUANTITY,
+      );
 
-    const hasIncompleteRow = rows.some(
-      (r: any) => !r.data?.ITEM || !r.data?.QUANTITY
-    );
+      if (hasIncompleteRow) {
+        return;
+      }
 
-    if (hasIncompleteRow) {
+      this.items.push({
+        ITEM: null,
+        DESCRIPTION: '',
+        UOM: '',
+        QUANTITY: null,
+      });
+
+      setTimeout(() => {
+        const updatedRows = grid.getVisibleRows();
+        const newRowIndex = updatedRows.length - 1;
+
+        if (newRowIndex >= 0) {
+          grid.editCell(newRowIndex, 'ITEM');
+        }
+      }, 100);
+    }, 200);
+  }
+
+  onItemSelect(e: any) {
+    const selectedItem = e.data;
+
+    // Example: store selected item
+    this.selectedItem = selectedItem;
+
+    // Close popup after selection
+    this.ItempopupVisible = false;
+  }
+
+  saveSelectedItems() {
+    const popupGrid = this.bomGridRef.instance; // popup grid
+
+    const selectedRows = popupGrid.getSelectedRowsData();
+
+    if (!selectedRows.length) {
       return;
     }
 
-    this.items.push({
-      ITEM: null,
-      DESCRIPTION: '',
-      UOM: '',
-      QUANTITY: null
-    });
-
-    setTimeout(() => {
-      const updatedRows = grid.getVisibleRows();
-      const newRowIndex = updatedRows.length - 1;
-
-      if (newRowIndex >= 0) {
-        grid.editCell(newRowIndex, 'ITEM');
-      }
-    }, 100);
-
-  }, 200);
-}
-
-onItemSelect(e: any) {
-
-  const selectedItem = e.data;
-
-  console.log("Selected Item:", selectedItem);
-
-  // Example: store selected item
-  this.selectedItem = selectedItem;
-
-  // Close popup after selection
-  this.ItempopupVisible = false;
-}
-
-saveSelectedItems() {
-
-  const popupGrid = this.bomGridRef.instance;   // popup grid
-
-  const selectedRows = popupGrid.getSelectedRowsData();
-
-  if (!selectedRows.length) {
-    return;
-  }
-
-  //  Remove empty row if exists
-  this.items = this.items.filter(
-    row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
-  );
-
-  selectedRows.forEach((item: any) => {
-
-    const exists = this.items.some(
-      x => x.ITEM === item.ITEM_CODE
+    //  Remove empty row if exists
+    this.items = this.items.filter(
+      (row) => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY,
     );
 
-    if (!exists) {
-      this.items.push({
-        ITEM: item.ITEM_CODE,
-        DESCRIPTION: item.DESCRIPTION,
-        UOM: item.UOM,
-        QUANTITY: null,
-        ITEM_ID: item.ID
-      });
-    }
+    selectedRows.forEach((item: any) => {
+      const exists = this.items.some((x) => x.ITEM === item.ITEM_CODE);
 
-  });
+      if (!exists) {
+        this.items.push({
+          ITEM: item.ITEM_CODE,
+          DESCRIPTION: item.DESCRIPTION,
+          UOM: item.UOM,
+          QUANTITY: null,
+          ITEM_ID: item.ID,
+        });
+      }
+    });
 
-  // refresh BOM grid
-  this.itemsGridRef.instance.refresh();
+    // refresh BOM grid
+    this.itemsGridRef.instance.refresh();
 
-  this.ItempopupVisible = false;
-
-}
-
+    this.ItempopupVisible = false;
+  }
 }
 
 @NgModule({

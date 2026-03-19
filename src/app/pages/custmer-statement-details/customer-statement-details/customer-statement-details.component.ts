@@ -51,17 +51,17 @@ import { ViewCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/view-customer
 @Component({
   selector: 'app-customer-statement-details',
   templateUrl: './customer-statement-details.component.html',
-  styleUrls: ['./customer-statement-details.component.scss']
+  styleUrls: ['./customer-statement-details.component.scss'],
 })
 export class CustomerStatementDetailsComponent {
   @Input() CustomerDetilsData: any = {};
-  
-  CustomerListDataSource:any[]=[]
+
+  CustomerListDataSource: any[] = [];
   isEditJournalVoucher: boolean = false;
   isViewJournalVoucher: boolean = false;
   isViewDebitNote: boolean = false;
   company_list: any[] = [];
-  selectedCompanyId:any
+  selectedCompanyId: any;
   company_id: any;
   HEAD_ID_LIST: any[] = [];
   fin_id: any[] = [];
@@ -83,24 +83,24 @@ export class CustomerStatementDetailsComponent {
   isViewReceipt: boolean = false;
   selectedReceipt: any;
   selected_Company_id: any;
-  isReadOnlyReceipt:boolean=true
-  isEditReceipt:boolean=false
-select_customer_id:any
-customer_list:any
-loadingInvoice = false;
-  popupReady = false;
-selectedYear: number | null = null;
-   years: number[] = [];
-   monthDataSource: { name: string; value: any }[];
-   selectedmonth: any = '';
+  isReadOnlyReceipt: boolean = true;
+  isEditReceipt: boolean = false;
+  select_customer_id: any;
+  customer_list: any;
+  loadingInvoice = false;
+  popupReady = false;
+  selectedYear: number | null = null;
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[];
+  selectedmonth: any = '';
   constructor(
     private dataService: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.get_sessionstorage_data();
     this.get_fin_id();
-    this.sesstion_Details()
+    this.sesstion_Details();
 
     // Detect when component is revisited
     this.router.events
@@ -111,19 +111,18 @@ selectedYear: number | null = null;
         }
       });
 
-      this.get_customer_list()
-      const currentYear = new Date().getFullYear();
+    this.get_customer_list();
+    const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
     this.selectedYear = currentYear;
-      //============Month field dataSource===============
-     this.monthDataSource = this.dataService.getMonths();
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataService.getMonths();
   }
 
   ngOnInit() {
-
-this.get_customer_list()
+    this.get_customer_list();
 
     this.loadLedgerData();
 
@@ -132,10 +131,9 @@ this.get_customer_list()
       .HeadId_Dropdown_api(this.selected_Company_id)
       .subscribe((res: any) => {
         this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
-        console.log(this.HEAD_ID_LIST);
       });
 
-      const today = new Date();
+    const today = new Date();
     const SystemDate =
       today.getFullYear() +
       '-' +
@@ -143,8 +141,8 @@ this.get_customer_list()
       '-' +
       String(today.getDate()).padStart(2, '0');
 
-      this.formatted_from_date = SystemDate;
-      this.formatted_To_date = SystemDate;
+    this.formatted_from_date = SystemDate;
+    this.formatted_To_date = SystemDate;
   }
 
   //================ Year value change ===================
@@ -163,19 +161,22 @@ this.get_customer_list()
     }
   }
 
-
-   //================Month value change ===================
+  //================Month value change ===================
   onMonthValueChanged(e: any) {
     this.selectedmonth = e.value ?? '';
     if (this.selectedmonth === '') {
       this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
       this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
     } else {
-      this.formatted_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.formatted_from_date = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
       this.formatted_To_date = new Date(
         this.selectedYear,
         this.selectedmonth + 1,
-        0
+        0,
       );
     }
   }
@@ -186,52 +187,40 @@ this.get_customer_list()
   // }
 
   async loadLedgerData() {
-
-
-    
     // this.customerSummaryData=this.Ledger_statement_datasource
     // const sessiondata = this.getSessionData('customerDetails');
     // const headid = this.getSessionData('HEADID');
-    const session=JSON.parse(sessionStorage.getItem('customerDetails'))
+    const session = JSON.parse(sessionStorage.getItem('customerDetails'));
 
-    console.log(session)
-
-    this.select_customer_id=session.CUSTOMER_ID
+    this.select_customer_id = session.CUSTOMER_ID;
     // this.selected_from_date=session.DATE_FROM
     // this.selected_To_date=session.DATE_TO
-    this.selected_from_date = this.formatted_from_date,
-    this.selected_To_date=this.formatted_To_date
-     
-   await this.dataService.Customer_statement_Details_Api(session).subscribe((res: any) => {
-      this.CustomerListDataSource = res.Data || [];
-      this.cdr.detectChanges();
-      this.customerSummaryData = this.CustomerListDataSource;
-      
-    });
+    ((this.selected_from_date = this.formatted_from_date),
+      (this.selected_To_date = this.formatted_To_date));
+
+    await this.dataService
+      .Customer_statement_Details_Api(session)
+      .subscribe((res: any) => {
+        this.CustomerListDataSource = res.Data || [];
+        this.cdr.detectChanges();
+        this.customerSummaryData = this.CustomerListDataSource;
+      });
   }
 
-        get_customer_list(){
-          const payload = {
-            COMPANY_ID : this.selected_Company_id,
-            NAME:'CUSTOMER'
-          }
-          this.dataService.Customer_Dropdown(payload).subscribe((res:any)=>{
-            console.log(res)
-            this.customer_list=res
-            console.log(this.customer_list)
-          })
-        }
-
-
+  get_customer_list() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'CUSTOMER',
+    };
+    this.dataService.Customer_Dropdown(payload).subscribe((res: any) => {
+      this.customer_list = res;
+    });
+  }
 
   getSessionData(key: string) {
     const data = sessionStorage.getItem(key);
     return data ? JSON.parse(data) : null;
   }
-
-
-
-
 
   get_sessionstorage_data() {
     this.savedUserData = this.getSessionData('savedUserData');
@@ -249,13 +238,11 @@ this.get_customer_list()
 
   onCompanyChange(event: any) {
     this.company_id = event.value;
-    console.log(this.company_id, 'COMPANYOD');
+
     this.dataService
       .HeadId_Dropdown_api(this.selected_Company_id)
       .subscribe((res: any) => {
-        this.HEAD_ID_LIST = res
-        console.log('===============ledger=========',res);
-        
+        this.HEAD_ID_LIST = res;
       });
   }
 
@@ -280,20 +267,13 @@ this.get_customer_list()
     // Optional: Update sessionStorage if needed
   }
 
-  sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
-
-    this.selected_fin_id=sessionData.FINANCIAL_YEARS[0].FIN_ID
-
-    console.log(this.selected_fin_id,'===========selected fin id===================')
-    
-  }
-
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+  }
 
   formatDates(cellData: any): string {
     const date = new Date(cellData);
@@ -314,16 +294,14 @@ this.get_customer_list()
     this.isViewCreditNote = false;
     this.isViewInvoice = false;
     this.isViewReceipt = false;
-    this.isViewCreditNote=false
+    this.isViewCreditNote = false;
   }
-
 
   onViewClick(e: any) {
     this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
     //  this.isViewInvoice= true;
-    console.log(e, '=======event==========');
 
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE;
     const trans_id = e.row.data.TRANS_ID;
@@ -336,77 +314,55 @@ this.get_customer_list()
 
           this.isViewJournalVoucher = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedJournalVoucher,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-          );
         });
     } else if (TRANS_TYPE_ID === 36) {
       this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
         this.selectedDebitNote = response.Data;
         this.isViewDebitNote = true;
         this.cdr.detectChanges();
-        console.log(this.selectedDebitNote, 'selected debit note');
       });
     } else if (TRANS_TYPE_ID === 37) {
-      console.log('=====navigate to 37-CREDIT NOTE=====');
       this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
         this.selectedCreditNote = response.Data;
-        this.isViewCreditNote=true
+        this.isViewCreditNote = true;
         this.cdr.detectChanges();
-        console.log(this.selectedCreditNote, 'selected credit note');
       });
     } else if (TRANS_TYPE_ID === 25) {
-      console.log('=====navigate to 25-SALES INVOICE=====');
       this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
         this.loadingInvoice = false;
         this.isViewInvoice = true;
         this.cdr.detectChanges();
-        console.log(this.selectedInvoice, 'SELECTE SALES INVOICE');
       });
     } else if (TRANS_TYPE_ID === 27) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
           this.selectedReceipt = response.Data;
           this.isViewReceipt = true;
           this.cdr.detectChanges();
-          console.log(this.selectedReceipt, 'Custom receipts=====');
         });
-    }         else if (TRANS_TYPE_ID === 21) {
-      console.log('=====navigate =====');
+    } else if (TRANS_TYPE_ID === 21) {
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
           this.selectedReceipt = response.Data;
           this.isEditReceipt = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedReceipt,
-            'Selected_Depreciation_data====='
-          );
         });
+    } else {
     }
-    
-    else {
-      console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
-    }
-
-    
   }
   // POPUP shown → allow child to render
   onPopupShown() {
     this.popupReady = true;
     this.cdr.detectChanges();
-  }
+  }
 
   summaryColumnsData = {
     totalItems: [
       // 1. Total Debitṅ
-                       {
-
+      {
         column: 'NARRATION',
         summaryType: '',
         displayFormat: ' Total',
@@ -414,8 +370,7 @@ this.get_customer_list()
         showInColumn: 'NARRATION',
         alignment: 'right',
       },
-                 {
-
+      {
         column: 'NARRATION',
         summaryType: '',
         displayFormat: ' Closing Balance',
@@ -423,8 +378,7 @@ this.get_customer_list()
         showInColumn: 'NARRATION',
         alignment: 'right',
       },
-                 {
-
+      {
         column: 'NARRATION',
         summaryType: '',
         displayFormat: ' Grand Total',
@@ -487,50 +441,54 @@ this.get_customer_list()
       },
     ],
 
-calculateCustomSummary: (options: any) => {
-  if (options.summaryProcess === 'finalize') {
-    const items = this.customerSummaryData || [];
+    calculateCustomSummary: (options: any) => {
+      if (options.summaryProcess === 'finalize') {
+        const items = this.customerSummaryData || [];
 
-    const totalDr = items.reduce((sum, item) => {
-      const val = parseFloat(
-        String(item?.DR_AMOUNT || '0').replace(/,/g, '').trim()
-      );
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
+        const totalDr = items.reduce((sum, item) => {
+          const val = parseFloat(
+            String(item?.DR_AMOUNT || '0')
+              .replace(/,/g, '')
+              .trim(),
+          );
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
 
-    const totalCr = items.reduce((sum, item) => {
-      const val = parseFloat(
-        String(item?.CR_AMOUNT || '0').replace(/,/g, '').trim()
-      );
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
+        const totalCr = items.reduce((sum, item) => {
+          const val = parseFloat(
+            String(item?.CR_AMOUNT || '0')
+              .replace(/,/g, '')
+              .trim(),
+          );
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
 
-    const closingBalance = totalDr - totalCr;
+        const closingBalance = totalDr - totalCr;
 
-    // Closing Balance Cr
-    if (options.name === 'closingBalanceCr') {
-      options.totalValue = closingBalance > 0 ? closingBalance : 0;
-    }
+        // Closing Balance Cr
+        if (options.name === 'closingBalanceCr') {
+          options.totalValue = closingBalance > 0 ? closingBalance : 0;
+        }
 
-    // Closing Balance Dr
-    if (options.name === 'closingBalanceDr') {
-      options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : 0;
-    }
+        // Closing Balance Dr
+        if (options.name === 'closingBalanceDr') {
+          options.totalValue =
+            closingBalance < 0 ? Math.abs(closingBalance) : 0;
+        }
 
-    // Grand Total Cr
-    if (options.name === 'grandTotalCr') {
-      options.totalValue = totalCr + (closingBalance > 0 ? closingBalance : 0);
-    }
+        // Grand Total Cr
+        if (options.name === 'grandTotalCr') {
+          options.totalValue =
+            totalCr + (closingBalance > 0 ? closingBalance : 0);
+        }
 
-    // Grand Total Dr
-    if (options.name === 'grandTotalDr') {
-      options.totalValue = totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-    }
-  }
-}
-
-
-
+        // Grand Total Dr
+        if (options.name === 'grandTotalDr') {
+          options.totalValue =
+            totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
+        }
+      }
+    },
   };
 
   onExporting(event: any) {
@@ -541,7 +499,6 @@ calculateCustomSummary: (options: any) => {
   // handleClose(){
   // }
 }
-
 
 @NgModule({
   imports: [
@@ -577,7 +534,7 @@ calculateCustomSummary: (options: any) => {
     DxAutocompleteModule,
     DxTagBoxModule,
     ViewInvoiceModule,
-    ViewCreditNoteModule
+    ViewCreditNoteModule,
   ],
   providers: [],
   declarations: [CustomerStatementDetailsComponent],

@@ -178,7 +178,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.sessionDetails();
     this.getDocNo();
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     this.menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -189,7 +189,6 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
     // this.sessionData_tax()
     const menuGroups = this.menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -219,7 +218,6 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     };
     this.service.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -508,27 +506,17 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
-    console.log(sessionData, '===========selected HSN CODE===================');
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     // THIS IS THE MISSING LINK
     this.poData.COMPANY_ID = this.companyID;
     this.poData.USER_ID = sessionData.USER_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
   calculateTotalQuantity() {
@@ -812,7 +800,6 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   onRowClick(event: any) {
-    console.log(event, 'event');
     const itemId = event.key.ITEM_ID;
     this.loadPurchaseOrders(itemId);
 

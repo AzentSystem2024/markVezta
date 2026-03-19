@@ -100,29 +100,24 @@ export class AddAccountComponent {
   ngOnInit() {
     this.getGroupingList();
     this.getAccountHeadList();
-    console.log('addaccount');
   }
 
   getGroupingList() {
     this.dataService.getGroupingList().subscribe((response: any) => {
       if (response?.flag === 1 && Array.isArray(response.Data)) {
         this.groupingList = response.Data;
-        console.log(this.groupingList, 'GROUPINGLIST');
         this.mainGroupList = this.groupingList.filter(
           (item) => item.GROUP_SUPER_ID === 0,
         );
-        console.log(this.mainGroupList, 'Filtered Main Groups');
       }
     });
   }
 
   onMainGroupChange(event: any) {
     this.selectedMainGroupId = event.value;
-    console.log('Selected Main Group ID:', event.value);
     this.subGroupList = this.groupingList.filter(
       (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId,
     );
-    console.log(this.subGroupList, 'SUBGROUPLIST');
   }
 
   get selectedMainGroupName(): string {
@@ -141,25 +136,18 @@ export class AddAccountComponent {
 
   onSubGroupChange(event: any) {
     this.selectedSubGroupId = event.value;
-    console.log('selected sub group', this.selectedSubGroupId);
     this.categoryList = this.groupingList.filter(
       (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId,
     );
-    console.log(this.categoryList, 'CATEGORYLIST');
   }
 
   onCategoryChange(event: any) {
     this.selectedCategoryId = event.value;
-    console.log(this.selectedCategoryId, 'SELECTEDCATEGORYID');
   }
 
   getAccountHeadList() {
     this.dataService.getAccountHeadList().subscribe((response: any) => {
       this.ledgerList = response.Data;
-      console.log(
-        this.ledgerList,
-        '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}',
-      );
     });
   }
 
@@ -232,7 +220,6 @@ export class AddAccountComponent {
     this.dataService.insertAccountHead(payload).subscribe({
       next: (response) => {
         this.isSaving = false;
-        console.log('Account Head inserted successfully', response);
         notify(
           {
             message: 'Account Head Saved Successfully',
@@ -310,8 +297,6 @@ export class AddAccountComponent {
     };
 
     this.dataService.insertAccountGroup(payload).subscribe((response: any) => {
-      console.log(response, 'NEW GROUP RESPONSE');
-
       const newGroupId = response?.Data?.GROUP_ID;
       if (!newGroupId) return;
 

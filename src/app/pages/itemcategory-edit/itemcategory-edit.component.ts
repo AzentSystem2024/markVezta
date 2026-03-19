@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, NgModule, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  NgModule,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
@@ -6,7 +15,12 @@ import { DxValidatorModule } from 'devextreme-angular/ui/validator';
 // import { FormPhotoUploaderModule } from '../../utils/form-photo-uploader/form-photo-uploader.component';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { DxButtonModule, DxSelectBoxModule, DxValidationGroupComponent, DxValidationGroupModule } from 'devextreme-angular';
+import {
+  DxButtonModule,
+  DxSelectBoxModule,
+  DxValidationGroupComponent,
+  DxValidationGroupModule,
+} from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 // import { EventEmitter } from 'node:stream';
@@ -14,74 +28,64 @@ import notify from 'devextreme/ui/notify';
 @Component({
   selector: 'app-itemcategory-edit',
   templateUrl: './itemcategory-edit.component.html',
-  styleUrls: ['./itemcategory-edit.component.scss']
+  styleUrls: ['./itemcategory-edit.component.scss'],
 })
 export class ItemcategoryEditComponent {
-  @Input() selectedData: any;  
+  @Input() selectedData: any;
   DepartmentDropdownData: any;
-  @Output() popupClosed= new EventEmitter<void>
-      @ViewChild('departmentValidationGroup', { static: false })
-    validationGroup!: DxValidationGroupComponent;
+  @Output() popupClosed = new EventEmitter<void>();
+  @ViewChild('departmentValidationGroup', { static: false })
+  validationGroup!: DxValidationGroupComponent;
   formCategoryData = {
-    ID:'',
+    ID: '',
     CODE: '',
     CAT_NAME: '',
-    LOYALTY_POINT:0,
+    LOYALTY_POINT: 0,
     COST_HEAD_ID: '5',
     DEPT_ID: '',
     COMPANY_ID: '1',
   };
-    newCategory:any
-  category: any=[]
+  newCategory: any;
+  category: any = [];
   selected_Company_id: any;
 
   constructor(private service: DataService) {}
 
   getNewCategoryData = () => ({ ...this.newCategory });
 
-
-  
   ngOnChanges(changes: SimpleChanges) {
-  if (changes['selectedData'] && changes['selectedData'].currentValue) {
-    console.log('Received selectedData:', changes['selectedData'].currentValue);
+    if (changes['selectedData'] && changes['selectedData'].currentValue) {
+      // Merge selectedData into formCategoryData
+      this.formCategoryData = {
+        ...this.formCategoryData, // keep defaults
+        ...changes['selectedData'].currentValue, // override with incoming
+      };
 
-    // Merge selectedData into formCategoryData
-    this.formCategoryData = {
-      ...this.formCategoryData, // keep defaults
-      ...changes['selectedData'].currentValue, // override with incoming
-    };
-
-    // Keep newCategory in sync too (if you need it elsewhere)
-    // this.newCategory = { ...this.formCategoryData };
-  }
-}
-
-  
-  sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
-
-
-  showCategory(){
-    const payload = {
-      COMPANY_ID : this.selected_Company_id
+      // Keep newCategory in sync too (if you need it elsewhere)
+      // this.newCategory = { ...this.formCategoryData };
     }
-     this.service.getCategoryData(payload).subscribe(
-      (response)=>{
-            this.category=response;
-            console.log(response);
-      }
-     )
+  }
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+
+  showCategory() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getCategoryData(payload).subscribe((response) => {
+      this.category = response;
+    });
   }
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
-     const payload = {
-    NAME: dropdowndepartment,
-    COMPANY_ID: this.selected_Company_id
-  };
+    const payload = {
+      NAME: dropdowndepartment,
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.service.getDropdownData(payload).subscribe((data: any) => {
       this.DepartmentDropdownData = data;
     });
@@ -91,93 +95,85 @@ export class ItemcategoryEditComponent {
     this.getDepartmentDropDown();
   }
 
-  closePopup(){
-     this.popupClosed.emit()
+  closePopup() {
+    this.popupClosed.emit();
   }
-  UpdateData(){
-    
-          const result = this.validationGroup.instance.validate();
-  if (!result.isValid) {
-    return;
-  }
-console.log('edit category')
-const payload = {
-  COMPANY_ID : this.selected_Company_id
-}
- this.service.getCategoryData(payload).subscribe(
-      (response)=>{
-            this.category=response;
-            console.log(response);
-
-    const payload={
-      ...this.formCategoryData
+  UpdateData() {
+    const result = this.validationGroup.instance.validate();
+    if (!result.isValid) {
+      return;
     }
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getCategoryData(payload).subscribe((response) => {
+      this.category = response;
+
+      const payload = {
+        ...this.formCategoryData,
+      };
 
       // Exclude the current record (by ID) from duplicate check
       const isCodeDuplicate = this.category.some(
         (item: any) =>
           item.ID !== payload.ID &&
-          item.CODE?.toLowerCase().trim() === payload.CODE?.toLowerCase().trim()
+          item.CODE?.toLowerCase().trim() ===
+            payload.CODE?.toLowerCase().trim(),
       );
-    
+
       const isDescriptionDuplicate = this.category.some(
         (item: any) =>
           item.ID !== payload.ID &&
-          item.CAT_NAME?.toLowerCase().trim() === payload.CAT_NAME?.toLowerCase().trim()
+          item.CAT_NAME?.toLowerCase().trim() ===
+            payload.CAT_NAME?.toLowerCase().trim(),
       );
-    
+
       if (isCodeDuplicate && isDescriptionDuplicate) {
         notify(
           {
-            message: "Both Code and Category already exist",
-            position: { at: "top right", my: "top right" },
+            message: 'Both Code and Category already exist',
+            position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          "error"
+          'error',
         );
         return;
       } else if (isCodeDuplicate) {
         notify(
           {
-            message: "This Code already exists",
-            position: { at: "top right", my: "top right" },
+            message: 'This Code already exists',
+            position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          "error"
+          'error',
         );
         return;
       } else if (isDescriptionDuplicate) {
         notify(
           {
-            message: "This Category already exists",
-            position: { at: "top right", my: "top right" },
+            message: 'This Category already exists',
+            position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          "error"
+          'error',
         );
         return;
-      
       }
-    
-    this.service.updateCategory(payload).subscribe((res:any)=>{
-      console.log(res)
-        this.popupClosed.emit()
-       notify(
+
+      this.service.updateCategory(payload).subscribe((res: any) => {
+        this.popupClosed.emit();
+        notify(
           {
-            message: "This Item Category Updated successfully",
-            position: { at: "top right", my: "top right" },
+            message: 'This Item Category Updated successfully',
+            position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
-          "success"
+          'success',
         );
         return;
-        
-    })
-     }
-     )
-
+      });
+    });
   }
-  
 }
 
 @NgModule({
@@ -189,8 +185,7 @@ const payload = {
     CommonModule,
     ReactiveFormsModule,
     DxSelectBoxModule,
-    DxValidationGroupModule
-
+    DxValidationGroupModule,
   ],
   declarations: [ItemcategoryEditComponent],
   exports: [ItemcategoryEditComponent],

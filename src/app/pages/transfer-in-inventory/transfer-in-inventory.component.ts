@@ -124,19 +124,17 @@ export class TransferInInventoryComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -157,16 +155,15 @@ export class TransferInInventoryComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
-    this.selected_Company_id= this.sessionData.SELECTED_COMPANY.COMPANY_ID
+    this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   getTransferInList(dateRange: string = this.selectedDateRange) {
     // const datePayload = this.getDateRangePayload(dateRange);
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-    }
+    };
     this.dataService
       .getTransferInForInventoryMainList(payload)
       .subscribe((response: any) => {
@@ -188,7 +185,7 @@ export class TransferInInventoryComponent {
             };
           })
           .sort(
-            (a: any, b: any) => Number(b.TRANSFER_NO) - Number(a.TRANSFER_NO)
+            (a: any, b: any) => Number(b.TRANSFER_NO) - Number(a.TRANSFER_NO),
           );
 
         this.applyDateFilter();
@@ -308,7 +305,7 @@ export class TransferInInventoryComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -401,7 +398,7 @@ export class TransferInInventoryComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -465,7 +462,7 @@ export class TransferInInventoryComponent {
               message: 'Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getTransferInList();
           // this.dataGrid.instance.refresh();
@@ -475,14 +472,14 @@ export class TransferInInventoryComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 
@@ -494,13 +491,12 @@ export class TransferInInventoryComponent {
     this.getTransferInList();
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
     this.applyCustomDateFilter(); // your existing function
   }
-
 }
 
 @NgModule({
@@ -539,7 +535,7 @@ export class TransferInInventoryComponent {
     ViewCreditNoteModule,
     TransferOutInventoryAddModule,
     TransferInInventoryFormModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [TransferInInventoryComponent],
