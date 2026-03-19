@@ -154,7 +154,6 @@ export class SalaryHeadAddComponent {
 
   //================disbled================
   //  isAdvanceSelected(): boolean {
-  //   console.log(this.selectedPriority, "selectedType");
   //   return this.selectedPriority.id === 3;
 
   // }
@@ -162,26 +161,16 @@ export class SalaryHeadAddComponent {
 
   get_headnameGrid() {
     this.dataservice.Dropdown_advance_types(name).subscribe((res: any) => {
-      console.log('head name dropdown', res);
       this.selectedHeads = res;
     });
   }
 
   //===================grid value=====================
   onSelectionChanged(event: SelectionChangedEvent) {
-    console.log(event, '===========event=================');
     const selectedRowsData = event.selectedRowsData;
-    console.log(
-      selectedRowsData,
-      '===========selectedRowsData================='
-    );
 
     this.SalaryHeadData.PERCENT_HEAD_ID = selectedRowsData.map(
-      (row: any) => row.ID
-    );
-    console.log(
-      this.SalaryHeadData.PERCENT_HEAD_ID,
-      '===========this.SalaryHeadData'
+      (row: any) => row.ID,
     );
   }
   //================auto fill payslip title=====================
@@ -196,12 +185,7 @@ export class SalaryHeadAddComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
   }
 
   //=======================list data=============
@@ -210,8 +194,6 @@ export class SalaryHeadAddComponent {
       COMPANY_ID: this.selected_Company_id,
     };
     this.dataservice.get_salary_head_list(payload).subscribe((res: any) => {
-      // console.log('Salary Head List:', res);
-
       this.salaryHeadList = res.Data;
       this.setNextHeadOrder();
     });
@@ -220,29 +202,22 @@ export class SalaryHeadAddComponent {
     // this.getSalaryHeadList()
     if (this.salaryHeadList && this.salaryHeadList.length > 0) {
       const maxOrder = Math.max(
-        ...this.salaryHeadList.map((item) => item.HEAD_ORDER || 0)
+        ...this.salaryHeadList.map((item) => item.HEAD_ORDER || 0),
       );
       this.SalaryHeadData.HEAD_ORDER = maxOrder + 1;
-      // console.log('Next Head Order:', this.SalaryHeadData.HEAD_ORDER);
     } else {
       this.SalaryHeadData.HEAD_ORDER = 1; // Default if list is empty
     }
   }
 
   // onTypeChangedd(e:any){
-  //   console.log('===============data added============');
 
   // }
 
   onPriorityChanged(e: any) {
     this.selectedPriority = e.value;
-    console.log(e.value, '=========event=====================');
     this.HeadType_value = e.value.id || 1;
 
-    console.log(
-      this.HeadType_value,
-      '=========HeadType_value====================='
-    );
     this.isEnabled = this.HeadType_value === 1 || this.HeadType_value === 2;
 
     if (this.HeadType_value == 3) {
@@ -269,7 +244,6 @@ export class SalaryHeadAddComponent {
 
     // Set selectedType based on numeric default
     this.selectedType = defaultTypeMap[defaultNumericValue];
-    console.log(this.selectedType, '========selected typeee=========');
     if (this.selectedType == 'fixed') {
       this.selecteNatureTypeTwo = true;
       this.head_percent = true;
@@ -285,7 +259,6 @@ export class SalaryHeadAddComponent {
 
   // validateAcLedger(e: any) {
   //   if (this.HeadType_value === 3) {
-  //     console.log('head tyope', this.HeadType_value);
   //     return e.value !== null && e.value !== undefined && e.value !== '';
   //   }
   //   return true; // valid for other HeadType values
@@ -298,17 +271,13 @@ export class SalaryHeadAddComponent {
   };
 
   onTypeChange() {
-    console.log(' on type  function called==================');
-    console.log(this.selectedType, 'selectedType');
     const headNatureMap: { [key: string]: number } = {
       fixed: 1,
       percentage: 2,
       others: 3,
     };
 
-    console.log('selectedType', headNatureMap);
     this.selectedNatureId = headNatureMap[this.selectedType];
-    console.log('Selected Type ID:', this.selectedNatureId);
 
     if (this.selectedNatureId === 1) {
       this.selecteNatureTypeTwo = false;
@@ -343,10 +312,6 @@ export class SalaryHeadAddComponent {
   //=============save salary head data========================
   saveSalaryHeadData() {
     if (!this.isValid()) return;
-    console.log(this.selectedPriority, 'selectedType');
-
-    console.log(this.selectedType, 'selectedType');
-    console.log('Saving Salary Head Data:', this.SalaryHeadData);
 
     //   const headNatureMap: { [key: string]: number } = {
     //     fixed: 1,
@@ -364,16 +329,11 @@ export class SalaryHeadAddComponent {
 
     const natureId = headNatureMap[this.selectedType?.value]; // assuming selectedType is like { value: 'fixed' }
 
-    console.log(
-      this.affective_value,
-      '====Applicable for working days only================'
-    );
-
     if (this.SalaryHeadData.HEAD_NAME) {
       const isDuplicate = this.salaryHeadList.some(
         (head: any) =>
           head.HEAD_NAME.trim().toLowerCase() ===
-          this.SalaryHeadData.HEAD_NAME.trim().toLowerCase()
+          this.SalaryHeadData.HEAD_NAME.trim().toLowerCase(),
       );
 
       if (isDuplicate) {
@@ -382,7 +342,7 @@ export class SalaryHeadAddComponent {
             message: 'Salary Head already exist',
             position: { at: 'top center', my: 'top center' },
           },
-          'error'
+          'error',
         );
         return;
       }
@@ -404,7 +364,7 @@ export class SalaryHeadAddComponent {
             message: 'Please select Account Ledger',
             position: { at: 'top center', my: 'top center' },
           },
-          'error'
+          'error',
         );
         return;
       }
@@ -419,12 +379,11 @@ export class SalaryHeadAddComponent {
             message: 'Please select Atleast one Head Name',
             position: { at: 'top center', my: 'top center' },
           },
-          'error'
+          'error',
         );
         return;
       }
 
-      console.log(this.SalaryHeadData.HEAD_NATURE, '=====================');
       if (this.SalaryHeadData.HEAD_NATURE === 3) {
         this.payload = {
           ...this.SalaryHeadData,
@@ -441,19 +400,16 @@ export class SalaryHeadAddComponent {
           HEAD_TYPE: this.HeadType_value || 1,
         };
       }
-      console.log(this.payload, 'payload');
       this.dataservice
         .Add_salary_Head_api(this.payload)
         .subscribe((res: any) => {
-          console.log(res, '==========res====================');
-
           this.getSalaryHeadList();
           notify(
             {
               message: 'Salary Head added successfully ',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
 
           this.formClosed.emit();
@@ -551,13 +507,11 @@ export class SalaryHeadAddComponent {
 
   cancel() {
     this.formClosed.emit();
-    console.log('this cancel close popup');
     this.resetForm();
     setTimeout(() => {
       this.SalaryHeadValidation?.instance?.reset();
     });
     this.selectedRows = [];
-    console.log(this.selectedPriority, 'selectedType');
   }
 }
 

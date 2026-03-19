@@ -1,8 +1,41 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, NgModule, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  EventEmitter,
+  Input,
+  NgModule,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { DxSelectBoxModule, DxTextAreaModule, DxDateBoxModule, DxFormModule, DxTextBoxModule, DxCheckBoxModule, DxRadioGroupModule, DxFileUploaderModule, DxDataGridModule, DxButtonModule, DxValidatorModule, DxProgressBarModule, DxPopupModule, DxDropDownBoxModule, DxToolbarModule, DxTabPanelModule, DxTabsModule, DxNumberBoxModule } from 'devextreme-angular';
-import { DxoItemModule, DxoFormItemModule, DxoLookupModule, DxiItemModule, DxiGroupModule } from 'devextreme-angular/ui/nested';
+import {
+  DxSelectBoxModule,
+  DxTextAreaModule,
+  DxDateBoxModule,
+  DxFormModule,
+  DxTextBoxModule,
+  DxCheckBoxModule,
+  DxRadioGroupModule,
+  DxFileUploaderModule,
+  DxDataGridModule,
+  DxButtonModule,
+  DxValidatorModule,
+  DxProgressBarModule,
+  DxPopupModule,
+  DxDropDownBoxModule,
+  DxToolbarModule,
+  DxTabPanelModule,
+  DxTabsModule,
+  DxNumberBoxModule,
+} from 'devextreme-angular';
+import {
+  DxoItemModule,
+  DxoFormItemModule,
+  DxoLookupModule,
+  DxiItemModule,
+  DxiGroupModule,
+} from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
 import { DataService } from 'src/app/services';
 import { TimesheetVerifyComponent } from '../timesheet-verify/timesheet-verify.component';
@@ -10,10 +43,10 @@ import { TimesheetVerifyComponent } from '../timesheet-verify/timesheet-verify.c
 @Component({
   selector: 'app-timesheet-view',
   templateUrl: './timesheet-view.component.html',
-  styleUrls: ['./timesheet-view.component.scss']
+  styleUrls: ['./timesheet-view.component.scss'],
 })
 export class TimesheetViewComponent {
-@Output() popupClosed = new EventEmitter<void>();
+  @Output() popupClosed = new EventEmitter<void>();
   @Input() timesheet: any;
   salaryHead: any[] = [];
   salaryDataSource: any;
@@ -55,16 +88,12 @@ export class TimesheetViewComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['timesheet'] && changes['timesheet'].currentValue) {
-      console.log('Received timesheet:', changes['timesheet'].currentValue);
-
       // Deep copy to avoid reference issues
       this.timesheetFormData = {
         ...this.timesheetFormData,
         ...changes['timesheet'].currentValue,
       };
-      console.log(this.timesheetFormData, 'TIMESHEETFORMDATA');
       this.salaryDataSource = this.timesheetFormData.TIMESHEET_SALARY;
-      console.log(this.salaryDataSource, 'SALARYDATASOURCE');
       // this.getSalaryHead();
       this.timesheetDetails = (
         this.timesheetFormData.TIMESHEET_DETAIL || []
@@ -87,7 +116,7 @@ export class TimesheetViewComponent {
           ...this.timesheetDetails,
           ...this.storeData.filter(
             (storeRow) =>
-              !this.timesheetDetails.some((ts) => ts.STORE === storeRow.STORE)
+              !this.timesheetDetails.some((ts) => ts.STORE === storeRow.STORE),
           ),
         ];
       }
@@ -106,16 +135,14 @@ export class TimesheetViewComponent {
       .getDropdownData('EMPLOYEE_REVISION')
       .subscribe((response: any) => {
         this.employee = response;
-        console.log(response, 'EMPLOYEEEEE');
         this.setEmployeeName(); // <-- MOVE setEmployeeName here
       });
   }
-  
 
   setEmployeeName() {
     if (this.timesheetFormData.EMP_ID && this.employee?.length) {
       const matchedEmployee = this.employee.find(
-        (emp) => emp.ID == this.timesheetFormData.EMP_ID
+        (emp) => emp.ID == this.timesheetFormData.EMP_ID,
       );
       if (matchedEmployee) {
         this.timesheetFormData.EMP_NAME = matchedEmployee.ID; // For value binding
@@ -125,21 +152,19 @@ export class TimesheetViewComponent {
     }
   }
 
-    sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
 
   loadStores() {
     const payload = {
-      COMPANY_ID :this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.getStoresData(payload).subscribe((response) => {
       // Filter out "CENTRAL STORE" and populate the stores array
       this.stores = response.filter(
-        (store: any) => store.STORE_NAME !== 'CENTRAL STORE'
+        (store: any) => store.STORE_NAME !== 'CENTRAL STORE',
       );
       this.storeData = this.stores.map((store) => ({
         STORE: '', // Store ID to be shown in the grid
@@ -152,17 +177,15 @@ export class TimesheetViewComponent {
         ...this.timesheetDetails,
         ...this.storeData.filter(
           (storeRow) =>
-            !this.timesheetDetails.some((ts) => ts.STORE === storeRow.STORE)
+            !this.timesheetDetails.some((ts) => ts.STORE === storeRow.STORE),
         ),
       ];
     });
   }
 
-  getPayTimeEntries(){
+  getPayTimeEntries() {
     this.dataService.getDropdownData('PAYTIME_ENTRY').subscribe((data: any) => {
-      console.log(data, "PAYTIME")
       this.salaryHead = data;
-      console.log(this.salaryHead, 'SALARYHEADDDDDDDDDDD');
       // Pre-fill the data grid's rows with SALARY_HEAD_ID
       this.salaryHeadList = this.salaryHead.map((item) => ({
         SALARY_HEAD_ID: '',
@@ -172,16 +195,8 @@ export class TimesheetViewComponent {
         ...(this.salaryDataSource || []),
         ...this.salaryHeadList,
       ];
-
-      console.log(
-        this.salaryDataSource,
-        ' Final salaryDataSource after adding salaryHeadList'
-      );
-
-      console.log(this.salaryHeadList, 'Salary DataSource');
     });
   }
-
 }
 
 @NgModule({

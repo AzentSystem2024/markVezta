@@ -153,7 +153,6 @@ export class AddInvoiceComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    // console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -171,13 +170,10 @@ export class AddInvoiceComponent {
       this.selectedCompany = userData?.SELECTED_COMPANY;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      // console.log(this.GST, 'HSNCODE');
       if (this.selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
-        // console.log(this.selectedCompanyId, 'SELECTEDCOMPANYIDDDDDDDDDDDDD');
         this.invoiceFormData.COMPANY_ID = this.selectedCompanyId;
         this.companyState = this.selectedCompany.STATE_NAME;
-        // console.log(this.companyState, 'COMPANYSTATE');
         this.companyList = [this.selectedCompany]; //  Show only selected company
       }
 
@@ -213,7 +209,6 @@ export class AddInvoiceComponent {
   }
 
   getCustomerOrUnitLst() {
-    // console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
     };
@@ -221,7 +216,6 @@ export class AddInvoiceComponent {
       .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        // console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
 
@@ -265,16 +259,13 @@ export class AddInvoiceComponent {
   }
 
   getInvoiceListForGrid() {
-    console.log(this.invoiceFormData.DISTRIBUTOR_ID, 'INVOICELISTFORGRID');
     const payload = {
       CUST_ID: this.invoiceFormData.DISTRIBUTOR_ID,
       COMPANY_ID: this.selectedCompanyId,
     };
-    console.log(payload, 'PAYLOADDDDDDDDDDD');
     this.dataService.getInvoiceGridList(payload).subscribe(
       (response: any) => {
         this.staticTransfers = response.Data; // Save the original full list
-        console.log(this.staticTransfers, 'STATISCTRANSFERS');
         this.invoiceGridList = [...this.staticTransfers]; // Initial value
         this.isTransfersLoading = false;
       },
@@ -293,7 +284,6 @@ export class AddInvoiceComponent {
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.invoiceNo = response.DOC_NO;
       this.invoiceFormData.DOC_NO = response.DOC_NO;
-      console.log(response.INVOICE_NO, 'INVOICENO');
     });
   }
 
@@ -374,7 +364,6 @@ export class AddInvoiceComponent {
     }
     const selectedTransferNos =
       this.mainInvoiceGridList?.map((t) => t.DN_DETAIL_ID) || [];
-    console.log(this.selectedTransfers, 'SELECTEDTRANSFERSSSSSSSS');
     // Filter the full list before showing in popup
     this.invoiceGridList = this.staticTransfers.filter(
       (item: any) => !selectedTransferNos.includes(item.DN_DETAIL_ID),
@@ -423,11 +412,7 @@ export class AddInvoiceComponent {
       });
       return;
     }
-    console.log(selectedRows, 'SELECTEDROWSSSSSSSSSSSSSSSS');
-    console.log(
-      'Selected DN_DETAIL_IDs:',
-      selectedRows.map((x: any) => x.DN_DETAIL_ID),
-    );
+
     // Initialize mainInvoiceGridList if null
     if (!this.mainInvoiceGridList) {
       this.mainInvoiceGridList = [];
@@ -574,9 +559,6 @@ export class AddInvoiceComponent {
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
       this.netAmount = Number(this.grandTotal).toFixed(2);
       this.onRoundOffChange();
-      console.log('GROSS AMOUNT Summary:', this.totalAmount);
-      console.log('TAX_AMOUNT Summary:', this.taxAmount);
-      console.log('NET AMOUNT Summary:', this.grandTotal);
     } else {
       console.warn('Summary values not ready yet.');
     }
@@ -586,7 +568,6 @@ export class AddInvoiceComponent {
   }
 
   saveInvoice() {
-    console.log('save clicked');
     if (!this.invoiceFormData.DISTRIBUTOR_ID) {
       notify({
         message: 'Please select Customer',
@@ -601,7 +582,6 @@ export class AddInvoiceComponent {
 
       return;
     }
-    console.log(this.mainInvoiceGridList, 'MAINGRID');
     // 2. Validation checks
     if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
       notify({
@@ -637,7 +617,6 @@ export class AddInvoiceComponent {
         },
       });
     }
-    console.log(this.mainInvoiceGridList.length, 'MAINGRIDDDDDDDDDDDDDDDDD');
     // 2. Validation checks
     if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
       notify(
@@ -710,7 +689,6 @@ export class AddInvoiceComponent {
       this.dataService.insertInvoice(this.invoiceFormData).subscribe(
         (response) => {
           this.isSaving = false;
-          console.log('Invoice saved successfully:', response);
           notify(
             {
               message: 'Invoice saved successfully',

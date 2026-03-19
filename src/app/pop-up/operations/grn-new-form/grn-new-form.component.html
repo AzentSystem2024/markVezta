@@ -163,6 +163,7 @@
       dataField="SUPP_PRICE"
       caption="PRICE {{ currencySymbol }}"
       [width]="'auto'"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="false"
       alignment="right"
     ></dxi-column>
@@ -173,6 +174,7 @@
       dataField="PRICE"
       caption="PRICE {{ localCurrencySymbol }}"
       [width]="'auto'"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="false"
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -225,6 +227,7 @@
       *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2"
       dataField="SUPP_AMOUNT"
       [width]="cwidth"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       caption="AMOUNT {{ currencySymbol }}"
       [allowEditing]="false"
       alignment="right"
@@ -237,6 +240,7 @@
       [width]="cwidth"
       caption="AMOUNT {{ localCurrencySymbol }}"
       [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       alignment="right"
     ></dxi-column>
 

@@ -121,8 +121,6 @@ export class PackingEditComponent {
     //   COMPANY_ID: this.selected_Company_id,
     // };
     this.dataService.get_packages_list_api().subscribe((res: any) => {
-      console.log('response from get packing list api:', res);
-
       this.packing_list = res.Data;
     });
   }
@@ -133,7 +131,7 @@ export class PackingEditComponent {
   }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
@@ -150,7 +148,6 @@ export class PackingEditComponent {
     this.popupClosed.emit();
   }
   onPurchasableChanged(e: any) {
-    console.log('Purchasable changed:', e.value);
     // Add any custom logic here if needed
   }
 
@@ -196,7 +193,6 @@ export class PackingEditComponent {
       NAME: 'PRODUCTION_UNITS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      console.log(response, 'PRODUCTION UNIT');
       this.produCtionUnits = response;
     });
     const payload1 = {
@@ -204,7 +200,6 @@ export class PackingEditComponent {
       NAME: 'MATERIAL_UNITS',
     };
     this.dataService.getDropdownData(payload1).subscribe((response: any) => {
-      console.log(response, 'MATERIALUNIT');
       this.materialUnits = response;
     });
     const payload2 = {
@@ -296,7 +291,6 @@ export class PackingEditComponent {
     if (e.dataField === 'ITEM' && e.editorName === 'dxSelectBox') {
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedDescription = args.value;
-        console.log('Selected Item Description:', selectedDescription);
 
         const grid = e.component;
         const rowIndex = e.row.rowIndex;
@@ -314,7 +308,6 @@ export class PackingEditComponent {
         }
 
         this.selectedItemId = matchedItem ? matchedItem.ID : null;
-        console.log(this.selectedItemId, 'SELECTEDITEMID');
         let itemCode = null;
         if (selectedDescription) {
           itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
@@ -324,8 +317,6 @@ export class PackingEditComponent {
 
         this.dataService.getItemsForArticle(payload).subscribe({
           next: (response: any) => {
-            console.log('API Response:', response);
-
             if (response?.flag === 1 && response?.Data) {
               const data = response.Data;
 
@@ -378,8 +369,6 @@ export class PackingEditComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['PackingData'] && changes['PackingData'].currentValue) {
-      console.log('Received PackingData:', changes['PackingData'].currentValue);
-      //  console.log("Main Description:", this.getMainDescription());
       const incomingData = changes['PackingData'].currentValue;
       this.PackingData = {
         ...this.PackingData,
@@ -447,7 +436,6 @@ export class PackingEditComponent {
       //   },
       //   0
       // );
-      // console.log(this.totalQuantity)
     }
 
     // ===============================
@@ -459,7 +447,6 @@ export class PackingEditComponent {
     //   const matchedItem = this.itemsList?.find(
     //     (i: any) => i.ID === bom.ITEM_ID
     //   );
-    // console.log(this.items)
 
     //   return {
     //     BOM_ID: bom.BOM_ID,
@@ -481,14 +468,11 @@ export class PackingEditComponent {
     // this.getItems();
 
     if (this.PackingData.BOM && Array.isArray(this.PackingData.BOM)) {
-      console.log(this.PackingData, 'BOMMMMMMMMMMM');
-      console.log(this.itemsList, 'ITEMS LIST----');
       this.items = this.PackingData.BOM.map((bom: any) => {
         // find the matching item from dropdown list
         const matchedItem = this.itemsList?.find(
           (i: any) => i.ID === bom.ITEM_ID,
         );
-        console.log(matchedItem, 'MATCHEDITEMSINEDIT');
         return {
           ITEM: bom.ITEM_CODE,
           // ITEM:bom.ITEM_CODE,
@@ -501,13 +485,10 @@ export class PackingEditComponent {
           ITEM_CODE: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
         };
       });
-
-      console.log('Mapped BOM items:', this.items);
     } else {
       this.items = [];
     }
 
-    console.log(this.PackingData, 'MAINGROUPID');
     // this.PackingEntriesData = this.PackingData.PackingEntries;
     this.PackingEntriesData = [];
 
@@ -565,7 +546,6 @@ export class PackingEditComponent {
     // const payload = this.PackingData;
     const validationResult = this.formValidationGroup?.instance?.validate();
 
-    console.log(this.combinationString, 'COMBINATION STRING');
     const combinationToUse =
       this.combinationString === undefined
         ? this.PackingData.COMBINATION
@@ -642,7 +622,6 @@ export class PackingEditComponent {
         QUANTITY: Number(item.QUANTITY),
       }));
 
-    console.log(combinationToUse, 'COMBINATION TO USE');
     const payload = {
       ...this.PackingData,
       COMBINATION: combinationToUse,
@@ -660,15 +639,12 @@ export class PackingEditComponent {
         QUANTITY: Number(item.QUANTITY),
       })),
     };
-    console.log(this.articleSizeData, '========article size data=========');
     const unitName = this.produCtionUnits.find(
       (u) => u.ID === payload.UNIT_ID,
     )?.DESCRIPTION;
-    console.log(unitName, '=============');
     const CategoryId = this.categoryList.find(
       (u) => u.ID === payload.CATEGORY_ID,
     )?.DESCRIPTION;
-    console.log(CategoryId, '=============');
 
     const artno = payload.ART_NO;
     const color = payload.COLOR;
@@ -697,7 +673,6 @@ export class PackingEditComponent {
         item.ID !== id, //  ID must be different for true duplication
     );
 
-    console.log(duplicate, 'DUPLICATE CHECK');
     if (duplicate) {
       notify(
         {
@@ -739,7 +714,6 @@ export class PackingEditComponent {
     // }
 
     this.dataService.Update_packages_listapi(payload).subscribe((res: any) => {
-      console.log('response from update packing api:', res);
       this.closePopup();
       if (res?.flag === -1) {
         notify(
@@ -810,10 +784,7 @@ export class PackingEditComponent {
   }
 
   loadArticle() {
-    console.log('button clicked');
     // this.updateQtyFromCombination(this.PackingData.COMBINATION);
-
-    console.log('Loading article data with PackingData:', this.PackingData);
 
     const payload = {
       artNo: this.PackingData.ART_NO,
@@ -822,8 +793,6 @@ export class PackingEditComponent {
       // unitID: this.PackingData.UNIT_ID,
       // COMPANY_ID: this.selected_Company_id,
     };
-
-    console.log('Payload for article data:', payload);
 
     // const isValid =
     //   payload.artNo && payload.color && payload.categoryID && payload.unitID;
@@ -868,13 +837,10 @@ export class PackingEditComponent {
     // }
     this.isArticleFieldsDisabled = true;
 
-    console.log(payload, 'PAYLOAD FOR COLLECTION LIST');
     this.dataService
       .get_combinbation_list_api(payload)
       .subscribe((response: any) => {
-        console.log(response, 'COMBINATION LIST RESPONSE');
         this.articleSizeData = response;
-        console.log(this.articleSizeData);
         this.PackingData.COMBINATION = '';
       });
   }
@@ -882,7 +848,6 @@ export class PackingEditComponent {
 
   onSizeSelectionChanged(e: any) {
     this.selectedRows = e.selectedRowKeys;
-    console.log('Selected Rows:', this.selectedSizeRows);
   }
 
   clearForm() {
@@ -917,44 +882,6 @@ export class PackingEditComponent {
 
   close() {}
 
-  // onEditorPreparing(e: any) {
-  // console.log(e, "EDITOR PREPARING EVENT");
-  //   const rowData = e.row?.data;
-
-  // console.log(rowData, "ROW DATA IN EDITOR PREPARING");
-
-  // const sizeQtyString = `${rowData.Size}x${rowData.Qty}`;
-  // console.log(sizeQtyString, "SIZE QUANTITY STRING");
-
-  // this.combination_value.push(sizeQtyString); // Add the size and quantity to the combination_value array
-  // if (!this.combination_value.includes(sizeQtyString)) {
-  //   this.combination_value.push(sizeQtyString);
-  // }
-  // console.log(this.combination_value, "COMBINATION VALUE ARRAY");
-
-  // const validData = this.combination_value.filter(item => !item.includes('undefined'));
-
-  // console.log(validData, "VALID DATA AFTER FILTERING");
-
-  // const combvalue= this.PackingData.COMBINATION
-  // console.log(combvalue, "COMBINATION VALUE FROM PACKING DATA");
-  // const combinationString = validData.join(', ');
-  // // Join the array into a string
-  // console.log(this.combinationString, "COMBINATION STRING");
-
-  // console.log(' changed Data', this.articleSizeData);
-
-  // //=======take combination of all sizes and quantities==========
-  // const firstcombinationString = this.articleSizeData
-  //   .filter(item => item.Qty !== undefined && item.Qty !== null && item.Qty > 0)
-  //   .map(item => `${item.Size}x${item.Qty}`)
-  //   .join(', ');
-
-  // this.combinationString = firstcombinationString;
-
-  // console.log("Combination String:", this.combinationString);
-
-  // }
   onSelectionChanged(e: any) {
     this.selectedRowKeys = e.selectedRowKeys;
   }

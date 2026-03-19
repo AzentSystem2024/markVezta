@@ -1,7 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, NgModule, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DxButtonModule, DxDataGridModule, DxTextBoxModule, DxValidationGroupComponent, DxValidationGroupModule, DxValidatorModule } from 'devextreme-angular';
+import {
+  DxButtonModule,
+  DxDataGridModule,
+  DxTextBoxModule,
+  DxValidationGroupComponent,
+  DxValidationGroupModule,
+  DxValidatorModule,
+} from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
 import { FormPopupModule } from 'src/app/components/utils/form-popup/form-popup.component';
 import { CustomReuseStrategy } from 'src/app/custome-reuse-strategy';
@@ -10,10 +17,9 @@ import { AuthService, DataService } from 'src/app/services';
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.scss']
+  styleUrls: ['./change-password.component.scss'],
 })
 export class ChangePasswordComponent {
-
   @ViewChild('validationGroup', { static: true })
   validationGroup: DxValidationGroupComponent;
 
@@ -31,27 +37,22 @@ export class ChangePasswordComponent {
   isPasswordVisible: boolean = false;
   isOldPasswordVisible: boolean = false;
   isSaving: boolean = false; // Property to track saving state
-  
 
   constructor(
     // private service: MasterReportService,
     private authService: AuthService,
     private route: Router,
-    private dataService : DataService
+    private dataService: DataService,
     // private reuseStrategy: CustomReuseStrategy
   ) {
     // this.UserID = sessionStorage.getItem('USER_ID');
-    // console.log(this.UserID, 'UserID');
-     this.sesstion_Details();
+    this.sesstion_Details();
   }
-    onOldPasswordValueChanged(event: any): void {
-      console.log(event,'old password event');
+  onOldPasswordValueChanged(event: any): void {
     this.oldPassword = event.value;
-    console.log(this.oldPassword, 'old password value');
   }
 
-
-    ngOnInit(): void {
+  ngOnInit(): void {
     this.getSecurityPolicyData();
     this.getUserPassword();
     this.sesstion_Details();
@@ -59,24 +60,18 @@ export class ChangePasswordComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.UserID = sessionData.USER_ID;
-    console.log(this.UserID, 'UserID');
   }
 
-    getSecurityPolicyData() {
+  getSecurityPolicyData() {
     this.dataService.getUserSecurityPolicityData().subscribe((res: any) => {
       this.securityPolicyData = res.data[0];
-      console.log(res, 'secpolicy');
-      console.log('hhh');
-      console.log('user security policy data', this.securityPolicyData);
     });
   }
 
-    getUserPassword() {
+  getUserPassword() {
     this.dataService.get_User_Data_By_Id(this.UserID).subscribe((res: any) => {
       this.getOldPassword = res.Password;
-      console.log(this.oldPassword, 'old password');
     });
   }
 
@@ -95,7 +90,7 @@ export class ChangePasswordComponent {
   //   return true; // Validation passes
   // };
 
-   checkPasswordStrength(): boolean {
+  checkPasswordStrength(): boolean {
     // Skip password validation if not required
     if (
       !this.securityPolicyData ||
@@ -113,7 +108,7 @@ export class ChangePasswordComponent {
     );
   }
 
-    onPasswordInput(event: Event): void {
+  onPasswordInput(event: Event): void {
     const target = event.target as HTMLInputElement;
 
     // Remove spaces from the current value
@@ -126,7 +121,7 @@ export class ChangePasswordComponent {
     this.checkPasswordStrength(); // Call the function to check the strength of the password
   }
 
-    onConfirmPasswordKeyDown(event: KeyboardEvent): void {
+  onConfirmPasswordKeyDown(event: KeyboardEvent): void {
     // Capture current input value
     const target = event.target as HTMLInputElement;
     setTimeout(() => {
@@ -135,7 +130,7 @@ export class ChangePasswordComponent {
     }, 0);
   }
 
-   validateConfirmPassword(): void {
+  validateConfirmPassword(): void {
     // Validate if confirmPassword matches newPassword
     if (this.confirmPassword === this.newPassword) {
       this.confirmPasswordBorderColor = '2px solid green'; // Set border color to green
@@ -144,7 +139,7 @@ export class ChangePasswordComponent {
     }
   }
 
-      validatePasswordMatch = (): boolean => {
+  validatePasswordMatch = (): boolean => {
     return this.newPassword === this.confirmPassword;
   };
 
@@ -155,7 +150,7 @@ export class ChangePasswordComponent {
     this.isOldPasswordVisible = !this.isOldPasswordVisible; // Toggle the visibility
   }
 
-   checkNumbers(): boolean {
+  checkNumbers(): boolean {
     return this.securityPolicyData.Numbers ? /\d/.test(this.newPassword) : true;
   }
 
@@ -181,12 +176,11 @@ export class ChangePasswordComponent {
     return this.newPassword.length >= this.securityPolicyData.MinimumLength;
   }
 
-    closeChangePassword() {
+  closeChangePassword() {
     this.route.navigateByUrl('/analytics-dashboard');
   }
 
-    saveNewPassword() {
-      console.log('Save New Password called');
+  saveNewPassword() {
     // this.isSaving = true;
 
     // // Validate the entire validation group
@@ -219,10 +213,8 @@ export class ChangePasswordComponent {
       // ChangePasswordOnLogin: false,
       // ModifiedFrom: this.UserID,
     };
-    console.log(PasswordData, 'password form data');
 
     this.dataService.reset_Password(PasswordData).subscribe((res) => {
-      console.log(res, 'password reset response');
       try {
         if (res) {
           notify(
@@ -231,7 +223,7 @@ export class ChangePasswordComponent {
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'success'
+            'success',
           );
           // Navigate to login page after notification
           // setTimeout(() => {
@@ -254,7 +246,7 @@ export class ChangePasswordComponent {
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'error'
+            'error',
           );
         }
       } catch (error) {
@@ -265,7 +257,7 @@ export class ChangePasswordComponent {
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           },
-          'error'
+          'error',
         );
       }
     });

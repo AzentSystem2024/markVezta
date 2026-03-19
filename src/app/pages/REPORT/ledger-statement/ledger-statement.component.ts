@@ -390,7 +390,7 @@ export class LedgerStatementComponent {
 
   onCompanyChange(event: any) {
     this.company_id = event.value;
-    console.log(this.company_id, 'COMPANYOD');
+
     this.dataService
       .HeadId_Dropdown_api(this.selected_Company_id)
       .subscribe((res: any) => {
@@ -422,20 +422,10 @@ export class LedgerStatementComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
   }
 
   load_Ledgre_data() {
@@ -473,8 +463,6 @@ export class LedgerStatementComponent {
   }
 
   onViewClick(e: any) {
-    console.log(e, '=======event==========');
-
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
 
     const trans_id = e.row.data.TRANS_ID;
@@ -491,10 +479,6 @@ export class LedgerStatementComponent {
 
           this.isViewJournalVoucher = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedJournalVoucher,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TRANS_TYPE_ID === 36) {
       this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
@@ -504,15 +488,12 @@ export class LedgerStatementComponent {
         console.log(this.selectedDebitNote, 'selected debit note');
       });
     } else if (TRANS_TYPE_ID === 37) {
-      console.log('=====navigate to 37-CREDIT NOTE=====');
       this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
         this.selectedCreditNote = response.Data;
         this.isViewCreditNote = true;
         this.cdr.detectChanges();
-        console.log(this.selectedCreditNote, 'selected credit note');
       });
     } else if (TRANS_TYPE_ID === 25) {
-      console.log('=====navigate to 25-SALES INVOICE=====');
       this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
         this.loadingInvoice = false;
@@ -521,7 +502,6 @@ export class LedgerStatementComponent {
 
         this.isViewInvoice = true;
         this.cdr.detectChanges();
-        console.log(this.selectedInvoice, 'SELECTE SALES INVOICE');
       });
     } else if (TRANS_TYPE_ID == 19) {
       this.dataService
@@ -534,11 +514,9 @@ export class LedgerStatementComponent {
           this.cdr.detectChanges();
         });
     } else if (TRANS_TYPE_ID === 20) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectPurchaseReturn(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedPurchaseReturn = response;
           this.isEditPurchaseReturn = true;
 
@@ -549,11 +527,9 @@ export class LedgerStatementComponent {
           );
         });
     } else if (TRANS_TYPE_ID === 14) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectTransferOutForInventory(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedTrOut = response;
           console.log(this.selectedTrOut);
           this.isEditTransferOut = true;
@@ -562,7 +538,6 @@ export class LedgerStatementComponent {
           console.log(this.selectedTrOut, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
     } else if (TRANS_TYPE_ID === 15) {
-      console.log('=====navigate to 25-SALES INVOICE=====');
       this.dataService
         .selectTransferInForInventory(trans_id)
         .subscribe((response: any) => {
@@ -574,14 +549,12 @@ export class LedgerStatementComponent {
           console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
     } else if (TRANS_TYPE_ID === 27) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
           this.selectedReceipt = response.Data;
           this.isEditCustomerReceipt = true;
           this.cdr.detectChanges();
-          console.log(this.selectedReceipt, 'Custom receipts=====');
         });
     } else if (TRANS_TYPE_ID === 3) {
       console.log('=====navigate to 2 mis payament=====');
@@ -619,7 +592,6 @@ export class LedgerStatementComponent {
           );
         });
     } else if (TRANS_TYPE_ID === 30) {
-      console.log('=====navigate =====');
       this.dataService
         .selectSalaryPayment(trans_id)
         .subscribe((response: any) => {
@@ -645,11 +617,9 @@ export class LedgerStatementComponent {
           this.cdr.detectChanges();
         });
     } else if (TRANS_TYPE_ID === 2) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectMiscReceipt(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedmiscellaneousData = response.Data;
           this.editMiscPopup = true;
           this.cdr.detectChanges();
@@ -659,15 +629,12 @@ export class LedgerStatementComponent {
           );
         });
     } else if (TRANS_TYPE_ID === 28) {
-      console.log('=====navigate =====');
       this.dataService.select_Advance(trans_id).subscribe((response: any) => {
         this.selected_Data = response;
         this.isEditPopUp = true;
         this.cdr.detectChanges();
       });
     } else if (TRANS_TYPE_ID === 1) {
-      console.log('=====navigate =====');
-
       this.dataService
         .selectOpeningBalance(trans_id)
         .subscribe((response: any) => {
@@ -676,7 +643,6 @@ export class LedgerStatementComponent {
           this.cdr.detectChanges();
         });
     } else if (TRANS_TYPE_ID === 28) {
-      console.log('=====navigate =====');
       this.dataService.select_Advance(trans_id).subscribe((response: any) => {
         this.selected_Data = response;
         this.isEditPopUp = true;
@@ -684,7 +650,6 @@ export class LedgerStatementComponent {
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
     } else if (TRANS_TYPE_ID === 26) {
-      console.log('=====navigate =====');
       this.dataService.selectSaleReturn(trans_id).subscribe((response: any) => {
         this.selectedSaleReturn = response;
         this.isEditSaleReturn = true;
@@ -692,17 +657,14 @@ export class LedgerStatementComponent {
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
     } else if (TRANS_TYPE_ID === 104) {
-      console.log('=====navigate =====');
       this.dataService
         .selectBoxProduction(trans_id)
         .subscribe((response: any) => {
           this.selectedProduction = response;
           this.isViewProduction = true;
           this.cdr.detectChanges();
-          console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
         });
     } else if (TRANS_TYPE_ID === 103) {
-      console.log('=====navigate =====');
       this.dataService.selectProduction(trans_id).subscribe((response: any) => {
         this.selectedProduction = response;
         this.isViewProduction = true;
@@ -710,7 +672,6 @@ export class LedgerStatementComponent {
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
     } else {
-      console.log(`Unknown TRANS_TYPE_ID: ${TRANS_TYPE_ID}`);
     }
   }
 

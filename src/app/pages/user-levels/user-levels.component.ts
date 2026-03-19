@@ -111,14 +111,13 @@ export class UserLevelsComponent implements OnInit {
   ngOnInit(): void {
     console.log('=======================================================');
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/user');
@@ -132,13 +131,10 @@ export class UserLevelsComponent implements OnInit {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getUserLevelData();
   }
 
   onEditingRow(event): void {
-    console.log(event, 'event');
     event.cancel = true;
     const Id = event.data.ID;
     console.log(Id, 'id');

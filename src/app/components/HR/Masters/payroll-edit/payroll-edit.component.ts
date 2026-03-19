@@ -73,7 +73,7 @@ export class PayrollEditComponent {
   selected_Company_id: any;
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -85,8 +85,6 @@ export class PayrollEditComponent {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['payroll'] && changes['payroll'].currentValue) {
       const incomingPayroll = changes['payroll'].currentValue;
-      console.log('Received payroll:', incomingPayroll);
-      console.log('NET_AMOUNT:', incomingPayroll.NET_AMOUNT); // Ensure this is available
 
       // Update the payRollData object with the incoming payroll
       this.payRollData = {
@@ -98,9 +96,7 @@ export class PayrollEditComponent {
           DEDUCTION_AMOUNT: parseFloat(detail.DEDUCTION_AMOUNT) || 0,
         })),
       };
-      console.log(this.payRollData, 'PAYROLLDATAAAAAAA');
       this.calculateGross();
-      console.log(this.payRollData.NET_AMOUNT, 'PAYROLLDATA');
     }
   }
 
@@ -109,14 +105,11 @@ export class PayrollEditComponent {
   //     .getDropdownData('SALARY_HEAD')
   //     .subscribe((response: any) => {
   //       this.salaryHeadList = response;
-  //       console.log(this.salaryHeadList, 'SALARYHEADLIST');
   //     });
   // }
 
   onRowUpdating(event: any) {
     // Log old and new data
-    console.log('Old Data:', event.oldData);
-    console.log('New Data:', event.newData);
 
     // Access the updated GROSS value
     const updatedGross = event.newData.GROSS_AMOUNT;
@@ -124,7 +117,6 @@ export class PayrollEditComponent {
       return sum + parseFloat(detail.GROSS_AMOUNT);
     }, 0);
 
-    console.log(totalGross, 'totalGross');
     // Force a refresh of the data grid to update the summary
     this.dataGrid.instance.refresh(); // This ensures that the total is recalculated
   }
@@ -140,7 +132,6 @@ export class PayrollEditComponent {
     }, 0);
     this.payRollData.GROSS_AMOUNT = totalGross;
     this.payRollData.DEDUCTION_AMOUNT = totalDeduct;
-    console.log(totalGross, 'totalGrosssssssssssssssss');
     this.payRollData.DEDUCTIONS = totalDeduct;
 
     this.payRollData.NET_AMOUNT = totalGross - totalDeduct;
@@ -156,15 +147,13 @@ export class PayrollEditComponent {
       (sum, detail) => {
         return sum + parseFloat(detail.NET_AMOUNT);
       },
-      0
+      0,
     );
 
     // Now assign the calculated GROSS to the payRollData object
     this.payRollData.GROSS_AMOUNT = totalGross.toFixed(2);
 
     // Log the calculated values
-    console.log(this.payRollData.GROSS_AMOUNT, 'NEW GROSS');
-    console.log(totalNetAmount, 'TOTAL NET_AMOUNT');
 
     // Trigger change detection manually if the grid isn't updating
     this.cdr.detectChanges(); // Inject ChangeDetectorRef in the constructor
@@ -207,19 +196,17 @@ export class PayrollEditComponent {
   }
 
   onRowInserted(e: any) {
-    console.log('Row inserted:', e.data);
     // Add your logic here for handling inserted rows
   }
 
   onRowRemoved(e: any) {
-    console.log('Row removed:', e.data);
     // Add your logic here for handling removed rows
   }
 
   addNewRow() {
     const hasEmptyRow = this.payRollData.PAY_DETAILS.some(
       (row) =>
-        !row.HEAD_NAME && row.GROSS_AMOUNT === 0 && row.DEDUCTION_AMOUNT === 0
+        !row.HEAD_NAME && row.GROSS_AMOUNT === 0 && row.DEDUCTION_AMOUNT === 0,
     );
 
     if (hasEmptyRow) return;
@@ -235,12 +222,7 @@ export class PayrollEditComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
   }
 
   getSalaryHeadList() {
@@ -256,7 +238,6 @@ export class PayrollEditComponent {
       .subscribe((response: any) => {
         this.salaryHeadList = response.Data;
       });
-    console.log(this.salaryHeadList, 'SALARYYYYYYYYYYYYYYYYYYYY');
   }
   update() {
     const details = this.payRollData?.PAY_DETAILS || [];
@@ -267,15 +248,14 @@ export class PayrollEditComponent {
           message: 'Please enter at least one payroll row before updating.',
           position: { at: 'top center', my: 'top center' },
         },
-        'warning'
+        'warning',
       );
       return;
     }
-    console.log(this.salaryHeadList, 'SALARYHEADLISTTTTTTTTTTTTTTTTT');
     // Check if all relevant amount fields are empty or zero
     const hasValidAmount = details.some((detail: any) => {
       const head = this.salaryHeadList.find(
-        (h: any) => h.ID === detail.HEAD_ID
+        (h: any) => h.ID === detail.HEAD_ID,
       );
       if (!head) return false;
 
@@ -283,8 +263,8 @@ export class PayrollEditComponent {
         head.HEAD_TYPE === 1
           ? detail.GROSS_AMOUNT
           : head.HEAD_TYPE === 2 || head.HEAD_TYPE === 3
-          ? detail.DEDUCTION_AMOUNT
-          : 0;
+            ? detail.DEDUCTION_AMOUNT
+            : 0;
 
       const amount =
         typeof rawAmount === 'string'
@@ -301,7 +281,7 @@ export class PayrollEditComponent {
             'Please enter a valid amount in at least one row before updating.',
           position: { at: 'top center', my: 'top center' },
         },
-        'warning'
+        'warning',
       );
       return;
     }
@@ -319,7 +299,7 @@ export class PayrollEditComponent {
       NET_AMOUNT: this.payRollData.NET_AMOUNT,
       SALARY: this.payRollData.PAY_DETAILS.map((detail: any) => {
         const head = this.salaryHeadList.find(
-          (h: any) => h.ID === detail.HEAD_ID
+          (h: any) => h.ID === detail.HEAD_ID,
         );
         let amount = 0;
 
@@ -338,10 +318,6 @@ export class PayrollEditComponent {
       }),
     };
 
-    console.log(payload);
-
-    console.log(payload, 'FORMATTED PAYROLL UPDATE PAYLOAD');
-
     this.dataService.updatePayroll(payload).subscribe((response: any) => {
       if (response.flag == '1') {
         notify(
@@ -349,7 +325,7 @@ export class PayrollEditComponent {
             message: 'Payroll Updated Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
         this.popupClosed.emit();
       } else {
@@ -358,15 +334,13 @@ export class PayrollEditComponent {
             message: 'Payroll Not Updated',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
   }
 
   handleClose() {
-    // console.log('CLOSED');
-
     this.popupClosed.emit();
   }
 
@@ -377,7 +351,7 @@ export class PayrollEditComponent {
     ) {
       const headId = e.row?.data?.HEAD_ID;
       const selectedHead = this.salaryHeadList.find(
-        (head: any) => head.ID === headId
+        (head: any) => head.ID === headId,
       );
 
       if (selectedHead) {

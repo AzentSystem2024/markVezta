@@ -156,8 +156,6 @@ export class DepreciationListComponent {
 
       this.startDate = new Date(today);
       this.EndDate = new Date(today);
-      console.log(this.startDate, '=======start date=====');
-      console.log(this.EndDate, '=======End date=====');
 
       //   this.dataService.list_Depreciation_api().subscribe((res:any)=>{
       //     this.allDepreciationLid=res.Data
@@ -171,13 +169,12 @@ export class DepreciationListComponent {
     }
 
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/depreciation');
@@ -191,8 +188,6 @@ export class DepreciationListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.get_Depreciation_list();
   }
 
@@ -215,8 +210,6 @@ export class DepreciationListComponent {
   }
 
   getStatusFlagClass(Status: string): string {
-    // console.log('Status:', Status);
-
     return Status == '1' ? 'flag-oranged' : 'flag-green';
   }
   //=========================Depreciation======================
@@ -227,17 +220,13 @@ export class DepreciationListComponent {
     const id = event.data.TRANS_ID;
     this.DepreciationId = event.data.ID;
     this.selectedDepreciation = id;
-    console.log(event.data);
     this.dataService.select_Depreciation_Asset(id).subscribe((res: any) => {
-      console.log(res);
-
       this.Selected_Depreciation_data = res.Data;
     });
   }
   delete_Depreciation_Data(event: any) {
     const id = event.data.ID;
     this.dataService.Delete_Depreciation_Asset(id).subscribe((res: any) => {
-      console.log(res);
       notify(
         {
           message: ' Dpreciation Deleted succssfully         .',
@@ -260,40 +249,29 @@ export class DepreciationListComponent {
   onDateRangeChanged(e: any) {
     const today = new Date();
     this.selectedDateRange = e.value;
-    console.log('selected data=======', this.selectedDateRange);
     if (this.selectedDateRange === 'today') {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       this.startDate = new Date(today);
       this.EndDate = new Date(today);
-      console.log(this.startDate, '=======start date=====');
-      console.log(this.EndDate, '=======End date=====');
     } else if (this.selectedDateRange === 'all') {
       this.get_Depreciation_list();
     } else if (this.selectedDateRange === 'last7') {
       this.startDate = new Date(today);
       this.startDate.setDate(today.getDate() - 6);
       this.EndDate = new Date(today);
-      console.log(this.startDate, '=======start date=====');
-      console.log(this.EndDate, '=======End date=====');
     } else if (this.selectedDateRange === 'last15') {
       this.startDate = new Date(today);
       this.startDate.setDate(today.getDate() - 14);
       this.EndDate = new Date(today);
-      console.log(this.startDate, '=======start date=====');
-      console.log(this.EndDate, '=======End date=====');
     } else if (this.selectedDateRange === 'last30') {
       this.startDate = new Date(today.getFullYear(), today.getMonth(), 1);
       this.EndDate = new Date(today);
-      console.log(this.startDate, '=======start date=====');
-      console.log(this.EndDate, '=======End date=====');
     } else if (this.selectedDateRange === 'lastMonth') {
       const lastMonth = today.getMonth() - 1;
       this.startDate = new Date(today.getFullYear(), lastMonth, 1);
       this.EndDate = new Date(today.getFullYear(), today.getMonth(), 0);
-      console.log(this.startDate, '=======start date=====');
-      console.log(this.EndDate, '=======End date=====');
     } else {
       this.showCustomDatePopup = true;
     }
@@ -303,13 +281,8 @@ export class DepreciationListComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   ngOnInit() {
@@ -337,8 +310,6 @@ export class DepreciationListComponent {
           return itemDate >= start && itemDate <= end;
         });
       }
-
-      console.log(this.Depreciation_List, 'Filtered Depreciation List');
     });
   }
   applyCustomDateFilter() {

@@ -141,14 +141,13 @@ export class PrepaymentPostingListComponent {
   }
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/accounts');
@@ -162,27 +161,18 @@ export class PrepaymentPostingListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     // this.getAccountsGroupList();
   }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
   get_prepayment_posting_list() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
     this.dataservice.Prepayment_posting_list(payload).subscribe((res: any) => {
-      console.log(res);
-
       this.prepaymentList = res.Data
         // filter by selectedMonth
         .filter((item: any) =>
@@ -212,7 +202,7 @@ export class PrepaymentPostingListComponent {
 
   // get_prepayment_posting_list(){
   //   this.dataservice.Prepayment_posting_list().subscribe((res:any)=>{
-  //     console.log(res)
+  //
   //     // this.prepaymentList=res.Data
   //         // Add serial number
   //   this.prepaymentList = res.Data.map((item: any, index: number) => ({
@@ -240,7 +230,6 @@ export class PrepaymentPostingListComponent {
     this.prepaymentpostingId = e.data.TRANS_ID;
     this.selectedprepaymentposting = id;
     this.dataservice.select_Prepayment_Posting(id).subscribe((Res: any) => {
-      console.log(Res);
       this.selecte_prepayment_Data = Res.Data;
     });
   }
@@ -254,7 +243,6 @@ export class PrepaymentPostingListComponent {
     this.isEditPopupPrepaymentPosting = false;
   }
   onDeletePrepayment(event: any) {
-    console.log(event);
     event.cancel = true;
 
     if (event.data.TRANS_STATUS === 'Approved') {
@@ -264,7 +252,6 @@ export class PrepaymentPostingListComponent {
     }
     const id = event.data.TRANS_ID;
     this.dataservice.Delete_Prepayment_Posting(id).subscribe((res: any) => {
-      console.log(res);
       notify(
         {
           message: 'Prepayment Deleted successfully',

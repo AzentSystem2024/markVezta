@@ -133,12 +133,11 @@ export class InvoiceDeliveryFormComponent {
   voucherNo: any;
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
   ngOnInit() {
     this.isEditDataAvailable();
     const userDataString = localStorage.getItem('userData');
-    // console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
@@ -163,7 +162,6 @@ export class InvoiceDeliveryFormComponent {
   }
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
-    console.log(this.isReadOnlyMode, 'ISREADONLYMODE');
     const data = this.EditingResponseData.Data[0];
 
     this.invoiceFormData = {
@@ -238,7 +236,7 @@ export class InvoiceDeliveryFormComponent {
           type: 'warning',
           displayTime: 2000,
         },
-        'warning'
+        'warning',
       );
       return;
     }
@@ -246,7 +244,7 @@ export class InvoiceDeliveryFormComponent {
     // Push selected rows into main grid data source
     selectedRows.forEach((row: any) => {
       const exists = this.invoiceFormData.SALE_DETAILS.some(
-        (item: any) => item.ITEM_CODE === row.ITEM_CODE
+        (item: any) => item.ITEM_CODE === row.ITEM_CODE,
       );
 
       if (!exists) {
@@ -273,15 +271,10 @@ export class InvoiceDeliveryFormComponent {
   onPopupHiding() {
     // this.popupClosed.emit();
   }
-  getInvoiceNo() {
-    console.log('Method not implemented.');
-  }
+  getInvoiceNo() {}
   sessionData_tax() {
-    console.log('===========================================================');
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
-    console.log(this.selected_vat_id, 'SELECTEDVATID');
   }
 
   calculateAmount(rowData: any) {
@@ -292,16 +285,8 @@ export class InvoiceDeliveryFormComponent {
 
   calculateTaxAmount(rowData: any) {
     const amount = rowData?.QUANTITY * (rowData?.PRICE || 0);
-    console.log(amount, 'AMOUNT');
     const gstPercent = rowData?.GST || 0;
-    console.log(
-      'Amount:',
-      amount,
-      'GST %:',
-      gstPercent,
-      'Tax:',
-      (amount * gstPercent) / 100
-    );
+
     return (amount * gstPercent) / 100;
   }
 
@@ -320,7 +305,7 @@ export class InvoiceDeliveryFormComponent {
           type: 'error',
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
     }
 
@@ -331,7 +316,7 @@ export class InvoiceDeliveryFormComponent {
           type: 'error',
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
     }
 
@@ -362,16 +347,16 @@ export class InvoiceDeliveryFormComponent {
           type: 'error',
           displayTime: 2000,
         },
-        'error'
+        'error',
       );
     }
     const transDate = new Date(this.invoiceFormData.TRANS_DATE);
     const formattedDate = `${String(transDate.getDate()).padStart(
       2,
-      '0'
+      '0',
     )}-${String(transDate.getMonth() + 1).padStart(
       2,
-      '0'
+      '0',
     )}-${transDate.getFullYear()}`;
 
     const payload = {
@@ -406,7 +391,7 @@ export class InvoiceDeliveryFormComponent {
     if (this.isApproved) {
       const result = confirm(
         'Are you sure you want to approve this invoice?',
-        'Confirm Approval'
+        'Confirm Approval',
       );
       result.then((dialogResult) => {
         if (dialogResult) {
@@ -443,7 +428,7 @@ export class InvoiceDeliveryFormComponent {
               type: 'success',
               displayTime: 2000,
             },
-            'success'
+            'success',
           );
           if (successAction === 'saved') {
             this.getVoucherNo();
@@ -457,7 +442,7 @@ export class InvoiceDeliveryFormComponent {
               type: 'error',
               displayTime: 2000,
             },
-            'error'
+            'error',
           );
         }
       },
@@ -469,7 +454,7 @@ export class InvoiceDeliveryFormComponent {
             type: 'error',
             displayTime: 2000,
           },
-          'error'
+          'error',
         );
       },
     });
@@ -479,7 +464,6 @@ export class InvoiceDeliveryFormComponent {
     this.dataService.getInvoiceNoDelivery().subscribe((response: any) => {
       if (response?.Flag === 1 && response.Data?.length) {
         this.voucherNo = response.Data[0].VOCHERNO;
-        console.log('Voucher No:', this.voucherNo);
       } else {
         console.error('Failed to get voucher number', response);
       }
@@ -517,7 +501,7 @@ export class InvoiceDeliveryFormComponent {
 
     notify(
       // { message: 'Form has been reset.', type: 'info', displayTime: 1500 },
-      'info'
+      'info',
     );
 
     // trigger view update if needed

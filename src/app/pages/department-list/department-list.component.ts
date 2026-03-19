@@ -136,11 +136,9 @@ export class DepartmentListComponent implements OnInit {
   }
 
   SelectDepartment(event: any) {
-    console.log(event);
     const id = event.data.ID;
 
     this.dataservice.selectDepartment(id).subscribe((res: any) => {
-      console.log(res);
       this.selectedDepartment_data = res;
     });
   }
@@ -156,7 +154,6 @@ export class DepartmentListComponent implements OnInit {
     };
     this.dataservice.getDepartmentData(payload).subscribe((response) => {
       this.department = response;
-      console.log(response, 'department');
     });
   }
 
@@ -177,23 +174,16 @@ export class DepartmentListComponent implements OnInit {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
-    console.log(
-      this.COMPANY_ID,
-      '============selected_Company_id==============',
-    );
 
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
-    console.log(this.COMPANY_NAME, '=======selected company name=====');
   }
 
   onClickSaveDepartment() {
     const { CODE, DEPT_NAME, COMPANY_NAME } =
       this.departmentComponent.getNewDepartmentData();
     const COMPANY_ID = this.COMPANY_ID;
-    console.log('inserted data', CODE, DEPT_NAME, COMPANY_ID, COMPANY_NAME);
 
     // Check for duplicates in CategoryList
     const isCodeDuplicate = this.department.some(
@@ -259,9 +249,8 @@ export class DepartmentListComponent implements OnInit {
   }
   onRowRemoving(event: any) {
     var SelectedRow = event.key;
-    console.log('selected row', SelectedRow);
     const id = SelectedRow.ID;
-    console.log(id);
+
     this.dataservice.removeDepartment(id).subscribe(() => {
       try {
         // Your delete logic here
@@ -298,14 +287,13 @@ export class DepartmentListComponent implements OnInit {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/user');
@@ -319,8 +307,6 @@ export class DepartmentListComponent implements OnInit {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.showDepartment();
   }
   refresh = () => {

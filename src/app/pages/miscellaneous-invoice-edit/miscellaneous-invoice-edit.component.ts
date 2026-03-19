@@ -57,10 +57,10 @@ import { confirm } from 'devextreme/ui/dialog';
 @Component({
   selector: 'app-miscellaneous-invoice-edit',
   templateUrl: './miscellaneous-invoice-edit.component.html',
-  styleUrls: ['./miscellaneous-invoice-edit.component.scss']
+  styleUrls: ['./miscellaneous-invoice-edit.component.scss'],
 })
 export class MiscellaneousInvoiceEditComponent {
- @Output() popupClosed = new EventEmitter<void>();
+  @Output() popupClosed = new EventEmitter<void>();
   @Input() debitFormData: any;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -128,15 +128,12 @@ export class MiscellaneousInvoiceEditComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
-    console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
 
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, 'HSNCODE===================');
       this.hsnLoaded = true; // ADD THIS
     }
     this.sessionData_tax();
@@ -144,24 +141,16 @@ export class MiscellaneousInvoiceEditComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     // this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
   }
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   ngOnInit() {
@@ -377,10 +366,6 @@ export class MiscellaneousInvoiceEditComponent {
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
       this.supplierList = response;
-      console.log(
-        this.supplierList,
-        'distributorList==============================',
-      );
     });
   }
 
@@ -392,7 +377,6 @@ export class MiscellaneousInvoiceEditComponent {
       .getSupplierWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
 
@@ -451,10 +435,7 @@ export class MiscellaneousInvoiceEditComponent {
 
     if (this.selectedSupplierId) {
       this.debitFormData.SUPP_ID = this.selectedSupplierId;
-      console.log(
-        this.selectedSupplierId,
-        'SELECTEDSUPPLIERIDDDDDDDDDDDDDDDDDD',
-      );
+
       this.getPendingInvoices(); // Pass supplier ID here
     } else {
       // this.pendingInvoicelist = [];
@@ -473,12 +454,7 @@ export class MiscellaneousInvoiceEditComponent {
     this.debitFormData.INVOICE_NO = String(selected.INVOICE_NO);
     this.debitFormData.DUE_AMOUNT = selected.PENDING_AMOUNT;
     this.debitFormData.INVOICE_ID = selected.BILL_ID;
-    console.log(
-      this.debitFormData.INVOICE_NO,
-      this.debitFormData.DUE_AMOUNT,
-      this.debitFormData.INVOICE_ID,
-      '=============+++++++++++++++++++++++++++++++++++++',
-    );
+
     this.invoicePopupVisible = false;
   }
 
@@ -535,7 +511,6 @@ export class MiscellaneousInvoiceEditComponent {
   // }
 
   openInvoicePopup() {
-    console.log('EVENT ');
     this.getPendingInvoices(); // Ensure you load fresh data
     this.invoicePopupVisible = true;
   }
@@ -583,8 +558,7 @@ export class MiscellaneousInvoiceEditComponent {
   // getLedgerCodeDropdown() {
   //   this.dataService.getAccountHeadList().subscribe((response: any) => {
   //     this.ledgerList = response.Data;
-  //     console.log('Ledger List Loaded:', this.ledgerList);
-  //   });
+  //          //   });
   // }
 
   getLedgerCodeDropdown(): Promise<any> {
@@ -592,7 +566,6 @@ export class MiscellaneousInvoiceEditComponent {
       this.dataService.getActiveLedger().subscribe({
         next: (response: any) => {
           this.ledgerList = response.Data;
-          console.log('Ledger List Loaded:', this.ledgerList);
           resolve(this.ledgerList);
         },
         error: (err) => reject(err),
@@ -663,10 +636,6 @@ export class MiscellaneousInvoiceEditComponent {
 
           const rowIndex = visibleRows.findIndex(
             (r) => r?.data === e.row?.data,
-          );
-          console.log(
-            'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex,
           );
 
           setTimeout(() => {
@@ -1319,7 +1288,6 @@ export class MiscellaneousInvoiceEditComponent {
 
   onRoundOffChange() {}
 }
-
 
 @NgModule({
   imports: [

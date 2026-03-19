@@ -147,19 +147,11 @@ export class BoxproductionJvAddComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
+
     this.user_id = sessionData.USER_ID;
-    console.log(this.user_id, '============user id==================');
     //
   }
 
@@ -261,13 +253,9 @@ export class BoxproductionJvAddComponent {
       ITEM_ID: this.productionJVFormData.PRODUCT_ID,
     };
 
-    console.log('Payload for Product In Article Production:', payload);
-
     this.dataservice
       .get_Product_In_Bom_Production_Api(payload)
       .subscribe((response: any) => {
-        console.log('Product In Article Production Data:', response);
-
         //  Set grid data ONLY here
         this.gridData = response.Data;
 
@@ -288,10 +276,7 @@ export class BoxproductionJvAddComponent {
   }
 
   onCellValueChanged(e: any) {
-    console.log('Cell Value Changed Event:', e);
     const field = e?.column?.dataField;
-
-    console.log('Changed field:', field, 'Row:', e.data);
 
     if (field === 'USED_QTY' || field === 'COST') {
       this.calculateAmount(e.data);
@@ -312,16 +297,12 @@ export class BoxproductionJvAddComponent {
       return sum + (Number(row.AMOUNT) || 0);
     }, 0);
 
-    console.log('Total Amount:', this.totalAmount);
     this.calculateFinalCost();
   }
 
   onAdditionalCostChange(e: any) {
     this.productionJVFormData.ADDL_COST = Number(e.value) || 0;
-    console.log(
-      'Additional Cost Changed:',
-      this.productionJVFormData.ADDL_COST,
-    );
+
     this.calculateFinalCost();
   }
 
@@ -335,8 +316,6 @@ export class BoxproductionJvAddComponent {
     } else {
       this.unitProductCost = 0; // avoid divide-by-zero
     }
-
-    console.log('Unit Product Cost:', this.unitProductCost);
   }
 
   private formatDateForApi(date: Date | string): string {
@@ -357,9 +336,6 @@ export class BoxproductionJvAddComponent {
 
     const header = this.EditingResponseData.Header;
     const rawMaterials = this.EditingResponseData.RawMaterials || [];
-
-    console.log('EDIT HEADER:', header);
-    console.log('EDIT RAW MATERIALS:', rawMaterials);
 
     // ================= DATE PARSE =================
     const productionDate = header.PROD_DATE
@@ -431,9 +407,6 @@ export class BoxproductionJvAddComponent {
     //     this.itemsGridRef.instance.refresh();
     //   }
     // }, 200);
-
-    console.log('EDIT MODE FORM DATA:', this.productionJVFormData);
-    console.log('EDIT MODE GRID DATA:', this.gridData);
   }
 
   getPendingNo() {
@@ -441,12 +414,9 @@ export class BoxproductionJvAddComponent {
       TRANS_TYPE: 104,
       COMPANY_ID: this.selected_Company_id,
     };
-    console.log('Payload for Doc No:', payload);
     this.dataservice.getDocNo(payload).subscribe((response: any) => {
-      console.log('Doc No Response Data:', response);
       // this.pendingNo = response.PAYMENT_NO;
       this.productionJVFormData.DOC_NO = response.DOC_NO;
-      console.log('Assigned DOC_NO:', this.productionJVFormData.DOC_NO);
     });
   }
 
@@ -454,7 +424,6 @@ export class BoxproductionJvAddComponent {
     this.dataservice
       .getDropdownDataforBoxProduct('PACKINGLIST')
       .subscribe((response: any) => {
-        console.log('Article Dropdown Data:', response);
         this.Article = response;
       });
   }
@@ -463,11 +432,9 @@ export class BoxproductionJvAddComponent {
     const payload = {
       ITEM_ID: this.productionJVFormData.PRODUCT_ID,
     };
-    console.log('Payload for Product In Article Production:', payload);
     this.dataservice
       .get_Product_In_Bom_Production_Api(payload)
       .subscribe((response: any) => {
-        console.log('Product In Article Production Data:', response);
         this.gridData = response.Data;
       });
   }
@@ -545,7 +512,6 @@ export class BoxproductionJvAddComponent {
 
       RawMaterials: this.gridData,
     };
-    console.log('Payload being sent:', payload);
     // =====================================================
     // API CALL HELPERS
     // =====================================================
@@ -622,11 +588,8 @@ export class BoxproductionJvAddComponent {
   //     DETAILS: this.gridData
   //   };
 
-  //   console.log('Payload being sent:', payload);
-
   //   this.dataservice.Insert_Article_Production_Api(payload).subscribe({
   //     next: (res: any) => {
-  //       console.log('Insert success:', res);
 
   //       // reset + close only AFTER success
   //       this.resetForm();
@@ -643,9 +606,6 @@ export class BoxproductionJvAddComponent {
 
     // STATUS logic
     this.productionJVFormData.STATUS = this.isApproved ? 5 : 1;
-
-    console.log('Approve checked:', this.isApproved);
-    console.log('Current STATUS:', this.productionJVFormData.STATUS);
   }
 
   resetForm() {
@@ -676,8 +636,6 @@ export class BoxproductionJvAddComponent {
       this.itemsGrid.instance.cancelEditData();
       this.itemsGrid.instance.refresh();
     }
-
-    console.log('Form reset completed');
   }
 }
 @NgModule({

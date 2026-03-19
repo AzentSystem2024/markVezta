@@ -163,6 +163,7 @@
         label="Residual Value"
         [(value)]="FixedAssetsData.RESIDUAL_VALUE"
         labelMode="floating"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dx-number-box>
 
       <!-- <dx-text-box

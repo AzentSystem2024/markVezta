@@ -145,23 +145,18 @@ export class DeliveryNoteComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax()
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === currentUrl);
-    console.log(packingRights, 'PACKINGRIGHTSSSSSSSSSSSSSSSSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
-      console.log('packingRights.CanAdd:', packingRights.CanAdd);
-      console.log('this.canAdd after assign:', this.canAdd);
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
@@ -174,7 +169,6 @@ export class DeliveryNoteComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -611,7 +605,6 @@ export class DeliveryNoteComponent {
       .selectDeliveryNote(deliveryId)
       .subscribe((response: any) => {
         this.selectedDelivery = response.Data; // ✅ FIX
-        console.log(this.selectedDelivery, 'SELECTED DELIVERY');
 
         this.isEditDelivery = true;
         this.isReadOnlyDelivery = status === 'APPROVED';
@@ -627,7 +620,6 @@ export class DeliveryNoteComponent {
       return;
     }
     event.cancel = true;
-    console.log(deliveryId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
     // Call your delete API
     this.dataService.deleteDeliveryNote(deliveryId).subscribe(
       (response: any) => {

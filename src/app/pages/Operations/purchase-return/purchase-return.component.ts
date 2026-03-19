@@ -1,32 +1,65 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  NgModule,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { DevexpressReportingModule, DxReportViewerModule } from 'devexpress-reporting-angular';
-import { DxDataGridModule, DxButtonModule, DxTabsModule, DxPopupModule, DxTextBoxModule, DxDraggableModule, DxSortableModule, DxSelectBoxModule } from 'devextreme-angular';
+import {
+  DevexpressReportingModule,
+  DxReportViewerModule,
+} from 'devexpress-reporting-angular';
+import {
+  DxDataGridModule,
+  DxButtonModule,
+  DxTabsModule,
+  DxPopupModule,
+  DxTextBoxModule,
+  DxDraggableModule,
+  DxSortableModule,
+  DxSelectBoxModule,
+} from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
-import { PurchaseReturnNewFormComponent,PurchaseReturnNewFormModule } from 'src/app/pop-up/operations/purchase-return-new-form/purchase-return-new-form.component';
+import {
+  PurchaseReturnNewFormComponent,
+  PurchaseReturnNewFormModule,
+} from 'src/app/pop-up/operations/purchase-return-new-form/purchase-return-new-form.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
-import { PurchaseReturnEditFormComponent,PurchaseReturnEditFormModule } from 'src/app/pop-up/operations/purchase-return-edit-form/purchase-return-edit-form.component';
-import { PurchaseReturnVerifyFormComponent,PurchaseReturnVerifyFormModule } from 'src/app/pop-up/operations/purchase-return-verify-form/purchase-return-verify-form.component';
-import { PurchaseReturnApproveFormComponent,PurchaseReturnApproveFormModule } from 'src/app/pop-up/operations/purchase-return-approve-form/purchase-return-approve-form.component';
-import { PurchaseReturnViewFormComponent,PurchaseReturnViewFormModule } from 'src/app/pop-up/operations/purchase-return-view-form/purchase-return-view-form.component';
+import {
+  PurchaseReturnEditFormComponent,
+  PurchaseReturnEditFormModule,
+} from 'src/app/pop-up/operations/purchase-return-edit-form/purchase-return-edit-form.component';
+import {
+  PurchaseReturnVerifyFormComponent,
+  PurchaseReturnVerifyFormModule,
+} from 'src/app/pop-up/operations/purchase-return-verify-form/purchase-return-verify-form.component';
+import {
+  PurchaseReturnApproveFormComponent,
+  PurchaseReturnApproveFormModule,
+} from 'src/app/pop-up/operations/purchase-return-approve-form/purchase-return-approve-form.component';
+import {
+  PurchaseReturnViewFormComponent,
+  PurchaseReturnViewFormModule,
+} from 'src/app/pop-up/operations/purchase-return-view-form/purchase-return-view-form.component';
 @Component({
   selector: 'app-purchase-return',
   templateUrl: './purchase-return.component.html',
-  styleUrls: ['./purchase-return.component.scss']
+  styleUrls: ['./purchase-return.component.scss'],
 })
 export class PurchaseReturnComponent implements OnInit {
-  width:any= '100vw';
-  height:any = '100vh';
-  grnDataSource:any;
-  selectedRowData:any;
-  isReturnVerifyPopupVisible:boolean=false;
-  isReturnPopupVisible:boolean=false;
-  isReturnEditPopupVisible:boolean=false;
-  isReturnApprovePopupVisible:boolean=false;
-  isReturnViewPopupVisible:boolean=false;
+  width: any = '100vw';
+  height: any = '100vh';
+  grnDataSource: any;
+  selectedRowData: any;
+  isReturnVerifyPopupVisible: boolean = false;
+  isReturnPopupVisible: boolean = false;
+  isReturnEditPopupVisible: boolean = false;
+  isReturnApprovePopupVisible: boolean = false;
+  isReturnViewPopupVisible: boolean = false;
 
   @ViewChild(PurchaseReturnNewFormComponent, { static: false })
   returnNewForm: PurchaseReturnNewFormComponent;
@@ -45,18 +78,20 @@ export class PurchaseReturnComponent implements OnInit {
       icon: 'check',
       text: 'Verify',
       onClick: (e) => this.onVerifyClick(e),
-      visible: (e) => e.row.data.STATUS!=='Verified' && e.row.data.STATUS!=='Approved',
+      visible: (e) =>
+        e.row.data.STATUS !== 'Verified' && e.row.data.STATUS !== 'Approved',
     },
     {
       hint: 'Approve',
       icon: 'check',
       text: 'Approve',
       onClick: (e) => this.onApproveClick(e),
-      visible: (e) => e.row.data.STATUS=='Verified' && e.row.data.STATUS!=='Approved',
+      visible: (e) =>
+        e.row.data.STATUS == 'Verified' && e.row.data.STATUS !== 'Approved',
     },
     {
       hint: 'View',
-      icon: 'detailslayout',// You can change this to an appropriate icon
+      icon: 'detailslayout', // You can change this to an appropriate icon
       text: 'View',
       onClick: (e) => this.onViewClick(e),
       visible: (e) => e.row.data.STATUS === 'Approved',
@@ -66,136 +101,132 @@ export class PurchaseReturnComponent implements OnInit {
   allButtonsEditDelete = [
     {
       name: 'edit',
-      visible: (e) => e.row.data.STATUS!=='Approved' ,
+      visible: (e) => e.row.data.STATUS !== 'Approved',
     },
     {
       name: 'delete',
-      visible: (e) => e.row.data.STATUS!=='Approved'&&e.row.data.STATUS!=='Verified' , 
+      visible: (e) =>
+        e.row.data.STATUS !== 'Approved' && e.row.data.STATUS !== 'Verified',
     },
   ];
 
-  constructor(private service:DataService,private change:ChangeDetectorRef){}
+  constructor(
+    private service: DataService,
+    private change: ChangeDetectorRef,
+  ) {}
 
-  openReturnForm(){
-    this.isReturnPopupVisible=true;
+  openReturnForm() {
+    this.isReturnPopupVisible = true;
   }
 
-  onClickSaveData(){
-    const data=this.returnNewForm.getNewReturnData();
-    console.log(data,"saveData");
+  onClickSaveData() {
+    const data = this.returnNewForm.getNewReturnData();
+    console.log(data, 'saveData');
 
-    this.service.saveReturnData(data).subscribe(res=>{
-      if(res.Message="Success"){
+    this.service.saveReturnData(data).subscribe((res) => {
+      if ((res.Message = 'Success')) {
         notify(
           {
             message: 'Data Saved Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
         this.getReturnLogData();
-      }
-      else {
+      } else {
         notify(
           {
             message: 'Your Data Not Saved',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
-    })
+    });
   }
 
-  updateReturnData(){
-    const data=this.returnEditForm.getNewReturnData();
-    console.log(data,"return updated data");
+  updateReturnData() {
+    const data = this.returnEditForm.getNewReturnData();
 
-    this.service.updateReturnData(data).subscribe(res=>{
-      console.log("data updated",res);
-      if(res.Message="Success"){
+    this.service.updateReturnData(data).subscribe((res) => {
+      console.log('data updated', res);
+      if ((res.Message = 'Success')) {
         notify(
           {
             message: 'Data Updated Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
-        this.isReturnEditPopupVisible=false;
+        this.isReturnEditPopupVisible = false;
         this.getReturnLogData();
-      }
-      else {
+      } else {
         notify(
           {
             message: 'Your Data Not Updated',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
-    })
+    });
   }
 
-  verifyReturnData(){
-    const data=this.returnVerifyForm.getNewReturnData();
-    console.log(data,"return updated data");
+  verifyReturnData() {
+    const data = this.returnVerifyForm.getNewReturnData();
 
-    this.service.verifyReturnData(data).subscribe(res=>{
-      console.log("data verified",res);
-      if(res.Message="Success"){
+    this.service.verifyReturnData(data).subscribe((res) => {
+      console.log('data verified', res);
+      if ((res.Message = 'Success')) {
         notify(
           {
             message: 'Data Verified Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
-        this.isReturnVerifyPopupVisible=false;
+        this.isReturnVerifyPopupVisible = false;
         this.getReturnLogData();
-      }
-      else {
+      } else {
         notify(
           {
             message: 'Your Data Not Verified',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
-    })
+    });
   }
 
-  approveReturnData(){
-    const data=this.returnApproveForm.getNewReturnData();
-    console.log(data,"return updated data");
+  approveReturnData() {
+    const data = this.returnApproveForm.getNewReturnData();
 
-    this.service.approveReturnData(data).subscribe(res=>{
-      console.log("data appproved",res);
-      if(res.Message="Success"){
+    this.service.approveReturnData(data).subscribe((res) => {
+      console.log('data appproved', res);
+      if ((res.Message = 'Success')) {
         notify(
           {
             message: 'Data Approved Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
-        this.isReturnApprovePopupVisible=false;
+        this.isReturnApprovePopupVisible = false;
         this.getReturnLogData();
-      }
-      else {
+      } else {
         notify(
           {
             message: 'Your Data Not Approved',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
-    })
+    });
   }
 
   onEditingRow(event): void {
-    console.log(event, 'event');
     event.cancel = true;
     // this.grnId = event.data.ID;
     const Id = event.data.ID;
@@ -203,72 +234,68 @@ export class PurchaseReturnComponent implements OnInit {
     this.isReturnEditPopupVisible = true;
     this.service.selectReturnData(Id).subscribe((res) => {
       this.selectedRowData = res;
-      console.log(this.selectedRowData,"select row data")
+      console.log(this.selectedRowData, 'select row data');
     });
   }
 
-  onVerifyClick=(e)=>{
-    console.log(e);
+  onVerifyClick = (e) => {
     e.cancel = true;
-    const id=e.row.data.ID;
-    this.isReturnVerifyPopupVisible=true;
+    const id = e.row.data.ID;
+    this.isReturnVerifyPopupVisible = true;
     this.change.detectChanges();
     this.service.selectReturnData(id).subscribe((res) => {
       this.selectedRowData = res;
-      console.log(this.selectedRowData,"select row data")
+      console.log(this.selectedRowData, 'select row data');
     });
-  }
+  };
 
-  onApproveClick=(e)=>{
-    console.log(e);
+  onApproveClick = (e) => {
     e.cancel = true;
-    const id=e.row.data.ID;
-    this.isReturnApprovePopupVisible=true;
+    const id = e.row.data.ID;
+    this.isReturnApprovePopupVisible = true;
     this.change.detectChanges();
     this.service.selectReturnData(id).subscribe((res) => {
       this.selectedRowData = res;
-      console.log(this.selectedRowData,"select row data")
+      console.log(this.selectedRowData, 'select row data');
     });
-  }
+  };
 
-  onViewClick=(e)=>{
-    console.log(e);
+  onViewClick = (e) => {
     e.cancel = true;
-    const id=e.row.data.ID;
-    this.isReturnViewPopupVisible=true;
+    const id = e.row.data.ID;
+    this.isReturnViewPopupVisible = true;
     this.change.detectChanges();
     this.service.selectReturnData(id).subscribe((res) => {
       this.selectedRowData = res;
-      console.log(this.selectedRowData,"select row data")
+      console.log(this.selectedRowData, 'select row data');
     });
-  }
+  };
 
-  getReturnLogData(){
-    this.service.getReturnLogData().subscribe(res=>{
-      this.grnDataSource=res.data;
-    })
+  getReturnLogData() {
+    this.service.getReturnLogData().subscribe((res) => {
+      this.grnDataSource = res.data;
+    });
   }
 
   ngOnInit(): void {
     this.getReturnLogData();
   }
 
-  ClearFormData(){
+  ClearFormData() {
     this.returnNewForm.clearForm();
   }
 
-  formatRetDate(rowData: any): string { 
+  formatRetDate(rowData: any): string {
     const celldate = rowData.RET_DATE;
     if (!celldate) return '';
-  
+
     const date = new Date(celldate);
-  
+
     // Format the date using the user's system locale
     const formattedDate = date.toLocaleDateString(); // Formats according to the user's system date format
-  
+
     return formattedDate; // Return only the date part
   }
-  
 }
 
 @NgModule({
@@ -291,10 +318,10 @@ export class PurchaseReturnComponent implements OnInit {
     PurchaseReturnEditFormModule,
     PurchaseReturnVerifyFormModule,
     PurchaseReturnApproveFormModule,
-    PurchaseReturnViewFormModule
+    PurchaseReturnViewFormModule,
   ],
   providers: [],
   exports: [],
-  declarations: [ PurchaseReturnComponent],
+  declarations: [PurchaseReturnComponent],
 })
 export class PurchaseReturnModule {}

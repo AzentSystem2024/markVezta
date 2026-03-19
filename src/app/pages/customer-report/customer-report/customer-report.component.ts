@@ -48,12 +48,9 @@ import { CustomerStatementDetailsModule } from '../../custmer-statement-details/
   styleUrls: ['./customer-report.component.scss'],
 })
 export class CustomerReportComponent {
-
-
-  
-  CustomerListDataSource: any[]=[]
+  CustomerListDataSource: any[] = [];
   isFilterRowVisible: boolean = false;
-  isViewInvoice:boolean=false
+  isViewInvoice: boolean = false;
   BalanceSheetReport: any = [];
   auto: string = 'auto';
   isEmptyDatagrid: boolean = true;
@@ -76,43 +73,46 @@ export class CustomerReportComponent {
   formatted_To_date: any;
   HeadId: any;
   selected_fin_id: any;
-customer_list:any[]=[]
-  select_customer_id:any
+  customer_list: any[] = [];
+  select_customer_id: any;
   selectedInvoice: any;
   // customer_details: {};
-defaultDate: Date = new Date();
-financialYeaDate: string 
-selectedYear: number | null = null;
-   years: number[] = [];
-   monthDataSource: { name: string; value: any }[];
-   selectedmonth: any = '';
-customer_details:any={
-    CUSTOMER_ID:0,
-    SALE_ID:0,
-    DATE_FROM:'',
-    DATE_TO:'',
-    COMPANY_ID:0
-  }
-  constructor(private dataservice: DataService,private cdr: ChangeDetectorRef ,private router:Router)
-  {
-    this.sesstion_Details()
-    this.get_customer_list()
-     //============Year field dataSource===============
+  defaultDate: Date = new Date();
+  financialYeaDate: string;
+  selectedYear: number | null = null;
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[];
+  selectedmonth: any = '';
+  customer_details: any = {
+    CUSTOMER_ID: 0,
+    SALE_ID: 0,
+    DATE_FROM: '',
+    DATE_TO: '',
+    COMPANY_ID: 0,
+  };
+  constructor(
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {
+    this.sesstion_Details();
+    this.get_customer_list();
+    //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
     this.selectedYear = currentYear;
-      //============Month field dataSource===============
-     this.monthDataSource = this.dataservice.getMonths();
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataservice.getMonths();
   }
   ngOnInit() {
-  // initialize with today's date
-  // this.onToDateChange({ value: this.defaultDate });
-  //   this.onFromDateChange({ value: this.financialYeaDate });
-   //get datasource======== function call==========
+    // initialize with today's date
+    // this.onToDateChange({ value: this.defaultDate });
+    //   this.onFromDateChange({ value: this.financialYeaDate });
+    //get datasource======== function call==========
 
-   const today = new Date();
+    const today = new Date();
     const SystemDate =
       today.getFullYear() +
       '-' +
@@ -120,12 +120,12 @@ customer_details:any={
       '-' +
       String(today.getDate()).padStart(2, '0');
 
-      this.formatted_from_date = SystemDate;
-      this.formatted_To_date = SystemDate;
-     setTimeout(() => {
-    this.GET_CUSTOMER_LIST();
-  }, 0);
-}
+    this.formatted_from_date = SystemDate;
+    this.formatted_To_date = SystemDate;
+    setTimeout(() => {
+      this.GET_CUSTOMER_LIST();
+    }, 0);
+  }
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -143,267 +143,234 @@ customer_details:any={
     }
   }
 
-
-   //================Month value change ===================
+  //================Month value change ===================
   onMonthValueChanged(e: any) {
     this.selectedmonth = e.value ?? '';
     if (this.selectedmonth === '') {
       this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
       this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
     } else {
-      this.formatted_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.formatted_from_date = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
       this.formatted_To_date = new Date(
         this.selectedYear,
         this.selectedmonth + 1,
-        0
+        0,
       );
     }
   }
 
-           sesstion_Details(){
-        const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-        console.log(sessionData,'=================session data==========')
-    
-        this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-        console.log(this.selected_Company_id,'============selected_Company_id==============')
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
-            this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-            const sessionYear=sessionData.FINANCIAL_YEARS
-            console.log(sessionYear,'==================session year==========')
- this.financialYeaDate=sessionYear[0].DATE_FROM
-console.log(this.financialYeaDate,'=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[')
-this.formatted_from_date=this.financialYeaDate
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id==================='
-    );
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    const sessionYear = sessionData.FINANCIAL_YEARS;
+    this.financialYeaDate = sessionYear[0].DATE_FROM;
 
-        
-      }
-        
-            toggleFilterRow = () => {
-            this.isFilterRowVisible = !this.isFilterRowVisible;
-             this.cdr.detectChanges();
-          };
-        get_customer_list(){
-          const payload = {
-            NAME : 'CUSTOMER',
-            COMPANY_ID : this.selected_Company_id
-          }
-          this.dataservice.Customer_Dropdown(payload).subscribe((res:any)=>{
-            console.log(res)
-            this.customer_list=res
-            console.log(this.customer_list)
-          })
-        }
-        
-        
-        
-             onExporting(event: any) {
-              const fileName = 'BalanceSheetReport';
-              this.dataservice.exportDataGridReport(event, fileName);
-            }
-        
-            get_sessionstorage_data(){
-        this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
-         console.log(this.savedUserData)
-        this.company_list=this.savedUserData.Companies
-        
-        }
-        
-        get_fin_id(){
-          this.fin_id=this.savedUserData.FINANCIAL_YEARS
-           if (this.fin_id.length) {
-              this.finID = this.fin_id[0].FIN_ID;
-            }
-        console.log(this.fin_id,'========financial year')
-        }
-        
-        onCompanyChange(event:any){
-          console.log(event);
-          this.company_id=event.value
-          console.log( this.company_id,'=====company id');
-        }
-        
-        
-        onFromDateChange(event: any) {
-          const rawDate: Date = new Date(event.value);
-          this.formatted_from_date = this.formatDate(rawDate);
-          console.log('Formatted Date:', this.formatted_from_date); // example: "2025-04-01"
-        }
-         
-         
-        onToDateChange(event: any) {
-          const rawDate: Date = new Date(event.value);
-          this.formatted_To_date = this.formatDate(rawDate);
-          console.log('Formatted Date:', this.formatted_To_date); // example: "2025-04-01"
-        }
-        
-        formatDate(date: Date): string {
-          const year = date.getFullYear();
-          const month = ('0' + (date.getMonth() + 1)).slice(-2);
-          const day = ('0' + date.getDate()).slice(-2);
-          return `${year}-${month}-${day}`;
-        }
-        
-  GET_CUSTOMER_LIST() {
+    this.formatted_from_date = this.financialYeaDate;
+  }
 
-        const payload = {
+  toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
+  get_customer_list() {
+    const payload = {
+      NAME: 'CUSTOMER',
       COMPANY_ID: this.selected_Company_id,
-      CUSTOMER_ID:this.select_customer_id||0,
-      DATE_FROM: this.formatted_from_date ,
-      DATE_TO: this.formatted_To_date 
+    };
+    this.dataservice.Customer_Dropdown(payload).subscribe((res: any) => {
+      this.customer_list = res;
+    });
+  }
+
+  onExporting(event: any) {
+    const fileName = 'BalanceSheetReport';
+    this.dataservice.exportDataGridReport(event, fileName);
+  }
+
+  get_sessionstorage_data() {
+    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.company_list = this.savedUserData.Companies;
+  }
+
+  get_fin_id() {
+    this.fin_id = this.savedUserData.FINANCIAL_YEARS;
+    if (this.fin_id.length) {
+      this.finID = this.fin_id[0].FIN_ID;
+    }
+  }
+
+  onCompanyChange(event: any) {
+    this.company_id = event.value;
+  }
+
+  onFromDateChange(event: any) {
+    const rawDate: Date = new Date(event.value);
+    this.formatted_from_date = this.formatDate(rawDate);
+    // example: "2025-04-01"
+  }
+
+  onToDateChange(event: any) {
+    const rawDate: Date = new Date(event.value);
+    this.formatted_To_date = this.formatDate(rawDate);
+    // example: "2025-04-01"
+  }
+
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+
+  GET_CUSTOMER_LIST() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      CUSTOMER_ID: this.select_customer_id || 0,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
     };
 
-
-    console.log(payload,'=====================payload========================================')
-    this.dataservice.customer_report_Api(payload).subscribe((res:any)=>{
-      console.log(res)
-     this.CustomerListDataSource=res. Data
-    })
+    this.dataservice.customer_report_Api(payload).subscribe((res: any) => {
+      this.CustomerListDataSource = res.Data;
+    });
   }
-    onViewClick(e: any) {
-    console.log(e, '=======event==========');
-     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
+  onViewClick(e: any) {
+    const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
     const trans_id = e.row.data.TRANS_ID;
 
-const customer_id= e.row.data.CUSTOMER_ID
-const invoice_id= e.row.data.INVOICE_ID
+    const customer_id = e.row.data.CUSTOMER_ID;
+    const invoice_id = e.row.data.INVOICE_ID;
 
-if(customer_id){
+    if (customer_id) {
+      this.customer_details = {
+        CUSTOMER_ID: customer_id,
+        SALE_ID: invoice_id,
+        DATE_FROM: this.formatted_from_date,
+        DATE_TO: this.formatted_To_date,
+        COMPANY_ID: this.selected_Company_id,
+      };
+      sessionStorage.setItem(
+        'customerDetails',
+        JSON.stringify(this.customer_details),
+      );
 
-  this.customer_details={
-    CUSTOMER_ID:customer_id,
-    SALE_ID:invoice_id,
-    DATE_FROM:this.formatted_from_date,
-    DATE_TO:this.formatted_To_date,
-    COMPANY_ID: this.selected_Company_id
-  }
-  sessionStorage.setItem('customerDetails', JSON.stringify(this.customer_details));
+      // ✅ Retrieve and parse back into object
+      const storedData = sessionStorage.getItem('customerDetails');
+      if (storedData) {
+        this.customer_details = JSON.parse(storedData);
+      }
 
-  // ✅ Retrieve and parse back into object
-  const storedData = sessionStorage.getItem('customerDetails');
-  if (storedData) {
-    this.customer_details = JSON.parse(storedData);
-  }
-
-    this.router.navigate(['/customer-statement-details']);
-    // this.router.navigate(['/customer-statement-details'], { state: { data: this.customer_details } });
-}
-
-    
-
-
-      // this.dataservice
-      //   .selectInvoice(trans_id)
-      //   .subscribe((response: any) => {
-      //     this.selectedInvoice = response.Data;
-
-      //     this.isViewInvoice = true;
-      //     this.cdr.detectChanges();
-      //     console.log(
-      //       this.selectedInvoice,
-      //       'SELECTEDJOURNALVOUCHERRRRRRRRRRRR'
-      //     );
-      //   });
-  
-
-    
+      this.router.navigate(['/customer-statement-details']);
+      // this.router.navigate(['/customer-statement-details'], { state: { data: this.customer_details } });
     }
 
-    handleClose(){
-  this.isViewInvoice = false
-    }
-      summaryColumnsData = {
-      totalItems: [
+    // this.dataservice
+    //   .selectInvoice(trans_id)
+    //   .subscribe((response: any) => {
+    //     this.selectedInvoice = response.Data;
 
-        {
-          column: 'NET_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'NET_AMOUNT',
-          alignment: 'right',
-        },
-        {
-          column: 'RECEIVED_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'RECEIVED_AMOUNT',
-          alignment: 'right',
-        },
-        {
-          column: 'RETURN_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'RETURN_AMOUNT',
-          alignment: 'right',
-        },
-        {
-          column: 'ADJUSTED_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'ADJUSTED_AMOUNT',
-          alignment: 'right',
-        },
-        {
-          column: 'BALANCE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'BALANCE',
-          alignment: 'right',
-        },
-       
-      ],
-      groupItems: [
-    {
-      column: 'NET_AMOUNT',
-      summaryType: 'sum',
-      displayFormat: '{0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'RECEIVED_AMOUNT',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'RETURN_AMOUNT',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'ADJUSTED_AMOUNT',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'BALANCE',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-  ],
-      calculateCustomSummary: (options) => {
-        if (options.name === 'summaryRow') {
-          // Custom logic if needed
-        }
+    //     this.isViewInvoice = true;
+    //     this.cdr.detectChanges();
+
+    //   });
+  }
+
+  handleClose() {
+    this.isViewInvoice = false;
+  }
+  summaryColumnsData = {
+    totalItems: [
+      {
+        column: 'NET_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'NET_AMOUNT',
+        alignment: 'right',
       },
-    };
-
+      {
+        column: 'RECEIVED_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'RECEIVED_AMOUNT',
+        alignment: 'right',
+      },
+      {
+        column: 'RETURN_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'RETURN_AMOUNT',
+        alignment: 'right',
+      },
+      {
+        column: 'ADJUSTED_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'ADJUSTED_AMOUNT',
+        alignment: 'right',
+      },
+      {
+        column: 'BALANCE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'BALANCE',
+        alignment: 'right',
+      },
+    ],
+    groupItems: [
+      {
+        column: 'NET_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'RECEIVED_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'RETURN_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'ADJUSTED_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'BALANCE',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+    ],
+    calculateCustomSummary: (options) => {
+      if (options.name === 'summaryRow') {
+        // Custom logic if needed
+      }
+    },
+  };
 }
 
 @NgModule({
@@ -440,7 +407,7 @@ if(customer_id){
     DxAutocompleteModule,
     DxTagBoxModule,
     ViewInvoiceModule,
-    CustomerStatementDetailsModule
+    CustomerStatementDetailsModule,
   ],
   providers: [],
   declarations: [CustomerReportComponent],

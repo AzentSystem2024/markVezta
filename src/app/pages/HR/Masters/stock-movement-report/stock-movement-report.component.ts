@@ -245,36 +245,18 @@ export class StockMovementReportComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+
     this.selected_Company_name = sessionData.SELECTED_COMPANY.COMPANY_NAME;
     const sessionYear = sessionData.FINANCIAL_YEARS;
-    console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-    console.log(
-      this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
-    );
 
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
-
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   refreshGrid() {
@@ -306,13 +288,8 @@ export class StockMovementReportComponent {
   // };
 
   onItemIdChange(event: any) {
-    console.log(event, '=================item id===================');
     this.selected_item_Id = event.value;
     this.triggerStockReload();
-    console.log(
-      this.selected_item_Id,
-      '=================selected item id===================',
-    );
   }
 
   get_Item_Dropdown() {
@@ -320,7 +297,6 @@ export class StockMovementReportComponent {
       NAME: 'ITEMTYPE',
     };
     this.dataService.Item_Dropdown(payload).subscribe((res: any) => {
-      console.log('Item dropdown', res);
       this.ItemList = res;
     });
   }
@@ -329,13 +305,13 @@ export class StockMovementReportComponent {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
     this.triggerStockReload();
-    console.log('Formatted Date:', this.formatted_from_date); // example: "2025-04-01"
+    // example: "2025-04-01"
   }
 
   onToDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
-    console.log('Formatted Date:', this.formatted_To_date); // example: "2025-04-01"
+    // example: "2025-04-01"
     this.triggerStockReload();
   }
 
@@ -362,7 +338,6 @@ export class StockMovementReportComponent {
       DATE_TO: this.selected_To_date,
       ITEM_TYPE: this.selected_item_Id || 0,
     };
-    console.log(payload, 'PAYLOADDDDDDDDDDDDDDDDDDDD');
     this.dataService.StockMovement_Api(payload).subscribe({
       next: (res: any) => {
         this.StockMovementDatasource = res.data || [];
@@ -387,17 +362,10 @@ export class StockMovementReportComponent {
   //     // STORE_ID: this.selectedstoreId,
   //     ITEM_TYPE: this.selected_item_Id || 0,
   //   };
-  //   console.log(payload, '================payload===================');
   //   this.dataService.StockMovement_Api(payload).subscribe((res: any) => {
-  //     console.log(
-  //       res,
-  //       '=================Stock Movement Report===================',
-  //     );
+  //
   //     this.StockMovementDatasource = res.data;
-  //     console.log(
-  //       this.StockMovementDatasource,
-  //       '=================Stock Movement Report DataSource===================',
-  //     );
+
   //   });
   // }
 
@@ -613,7 +581,6 @@ export class StockMovementReportComponent {
 
     const field = e.column?.dataField;
     const itemId = e.data.ITEM_ID;
-    console.log(field);
     if (!itemId) return;
 
     this.selectedRowData = e.data;
@@ -677,9 +644,7 @@ export class StockMovementReportComponent {
     };
     // API CALL HERE
     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
-      console.log(res, 'res');
       this.productionDetails = res.data || [];
-      console.log(this.productionDetails);
     });
   }
 
@@ -693,7 +658,6 @@ export class StockMovementReportComponent {
     };
 
     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
-      console.log(res, 'res');
       this.consumptionDetails = res.data || [];
     });
   }
@@ -721,8 +685,6 @@ export class StockMovementReportComponent {
       TRANS_TYPE: 'DELIVERY_RETURN',
     };
 
-    console.log(payload, 'PRODUCTION DETAIL PAYLOAD');
-
     // API CALL HERE
     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
       this.deliveryReturnDetails = res.data || [];
@@ -737,8 +699,6 @@ export class StockMovementReportComponent {
       COMPANY_ID: this.selected_Company_id,
       TRANS_TYPE: 'GRN',
     };
-
-    console.log(payload, 'GRN DETAIL PAYLOAD');
 
     // API CALL HERE
     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
@@ -755,8 +715,6 @@ export class StockMovementReportComponent {
       TRANS_TYPE: 'PURCHASE_RETURN',
     };
 
-    console.log(payload, 'GRN DETAIL PAYLOAD');
-
     // API CALL HERE
     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
       this.PurchReturnDetails = res.data || [];
@@ -770,8 +728,6 @@ export class StockMovementReportComponent {
       COMPANY_ID: this.selected_Company_id,
       TRANS_TYPE: 'SALE_RETURN_QTY',
     };
-
-    console.log(payload, 'GRN DETAIL PAYLOAD');
 
     // API CALL HERE
     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
@@ -788,8 +744,6 @@ export class StockMovementReportComponent {
       TRANS_TYPE: 'SALE_QTY',
     };
 
-    console.log(payload, 'GRN DETAIL PAYLOAD');
-
     // API CALL HERE
     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {
       this.salesInvoiceDetails = res.data || [];
@@ -804,8 +758,6 @@ export class StockMovementReportComponent {
       COMPANY_ID: this.selected_Company_id,
       TRANS_TYPE: 'ADJUSTMENT',
     };
-
-    console.log(payload, 'GRN DETAIL PAYLOAD');
 
     // API CALL HERE
     this.dataService.Fetch_StockMovement_Details(payload).subscribe((res) => {

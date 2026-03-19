@@ -93,16 +93,11 @@ export class EditAccountComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['accountHeadData'] && changes['accountHeadData'].currentValue) {
-      console.log(
-        'Received accountHeadData:',
-        changes['accountHeadData'].currentValue,
-      );
       this.accountHeadData = {
         ...this.accountHeadData,
         ...changes['accountHeadData'].currentValue,
       };
     }
-    console.log(this.accountHeadData.MainGroupId, 'MAINGROUPID');
   }
 
   getGroupingList() {
@@ -148,11 +143,9 @@ export class EditAccountComponent implements OnChanges {
 
   onMainGroupChange(event: any) {
     this.selectedMainGroupId = event.value;
-    console.log('Selected Main Group ID:', event.value);
     this.subGroupList = this.groupingList.filter(
       (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId,
     );
-    console.log(this.subGroupList, 'SUBGROUPLIST');
   }
 
   get selectedMainGroupName(): string {
@@ -171,11 +164,9 @@ export class EditAccountComponent implements OnChanges {
 
   onSubGroupChange(event: any) {
     this.selectedSubGroupId = event.value;
-    console.log('selected sub group', this.selectedSubGroupId);
     this.categoryList = this.groupingList.filter(
       (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId,
     );
-    console.log(this.categoryList, 'CATEGORYLIST');
   }
 
   onCategoryChange(event: any) {
@@ -186,10 +177,6 @@ export class EditAccountComponent implements OnChanges {
   getAccountHeadList() {
     this.dataService.getAccountHeadList().subscribe((response: any) => {
       this.ledgerList = response.Data;
-      console.log(
-        this.ledgerList,
-        '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}',
-      );
     });
   }
 
@@ -220,8 +207,6 @@ export class EditAccountComponent implements OnChanges {
       const sameRecord = String(item?.HEAD_ID ?? '') === currentHeadId;
       return sameName && !sameRecord;
     });
-
-    console.log(duplicate, 'DUPLICATEEEEEEEEEE');
 
     if (duplicate) {
       notify(
@@ -299,8 +284,6 @@ export class EditAccountComponent implements OnChanges {
     };
 
     this.dataService.insertAccountGroup(payload).subscribe((response: any) => {
-      console.log(response, 'NEW GROUP RESPONSE');
-
       const newGroupId = response?.Data?.GROUP_ID;
       if (!newGroupId) return;
 

@@ -113,13 +113,11 @@ export class EditInvoiceComponent {
     private cdr: ChangeDetectorRef,
   ) {
     const userDataString = localStorage.getItem('userData');
-    console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
       // this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, 'HSNCODE===================');
       this.hsnLoaded = true; // ADD THIS
     }
   }
@@ -134,11 +132,9 @@ export class EditInvoiceComponent {
       this.selectedCompany = userData?.SELECTED_COMPANY;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.GST, 'HSNCODE');
       if (this.selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
         this.companyState = this.selectedCompany.STATE_NAME;
-        console.log(this.companyState, 'COMPANYSTATE');
         this.companyList = [this.selectedCompany]; //  Show only selected company
       }
 
@@ -170,8 +166,6 @@ export class EditInvoiceComponent {
         firstInvoice.SALE_DATE = date;
       }
 
-      console.log(this.HSNCODE, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
-
       // 💡 ORIGINAL LINE (replaced below)
       // this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
 
@@ -197,8 +191,6 @@ export class EditInvoiceComponent {
       );
       // -----------------------------------------------------
 
-      console.log(this.mainInvoiceGridList, 'HSNCODEEEEEEEEEEEEEEEEEEEE');
-
       // ⭐ Keep your original mapping block untouched
       this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
         return {
@@ -208,7 +200,6 @@ export class EditInvoiceComponent {
       });
 
       this.invoiceFormData = firstInvoice;
-      console.log(this.mainInvoiceGridList, 'MAINGRIDINVOICELIST');
 
       this.customerType = firstInvoice.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
       if (this.customerType === 'Unit') {
@@ -217,10 +208,6 @@ export class EditInvoiceComponent {
 
       // this.getCompanyListDropdown();
       this.getCustomerOrUnitLst();
-      console.log(
-        firstInvoice.DISTRIBUTOR_ID,
-        'DISTRIBUTORIDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
-      );
     }
   }
 
@@ -242,11 +229,9 @@ export class EditInvoiceComponent {
   //       this.itemsGridRef.instance.refresh();
   //     }
 
-  //     console.log('Cleared main grid due to customer change');
   //   }
   //   this.selectedCustomerName = selectedCustomer.DESCRIPTION;
   //   this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
-  //   console.log(selectedCustomer.STATE_NAME, 'SELECTEDCUSTOMERRRRRRRRRR');
   //   const company = this.companyState?.trim().toLowerCase();
   //   const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
   //   const sessionGst = parseFloat(this.GST) || 0; // main GST%
@@ -265,7 +250,6 @@ export class EditInvoiceComponent {
   //       row.GST = 0; // GST becomes zero in same-state case
   //     });
   //   } else {
-  //     console.log('States DIFFERENT → GST applies');
 
   //     this.showGST = true;
   //     this.showCGST = false;
@@ -282,11 +266,7 @@ export class EditInvoiceComponent {
   //   this.selectedCustomer = selectedCustomer;
   //   this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
   //   if (this.selectedCustomerType) {
-  //     console.log(
-  //       'Selected Customer Type:',
-  //       this.selectedCustomerType.CUST_TYPE
-  //     );
-  //     console.log('Selected Customer :', this.selectedCustomerType);
+
   //     // optional — store it if you need it later
   //     this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
   //   }
@@ -344,10 +324,7 @@ export class EditInvoiceComponent {
     };
     this.dataService.getInvoiceGridList(payload).subscribe((response: any) => {
       this.staticTransfers = response.Data; // Save the original full list
-      console.log(
-        this.staticTransfers,
-        'STATISCTRANSFERS==============================',
-      );
+
       this.invoiceGridList = [...this.staticTransfers]; // Initial value
     });
   }
@@ -357,12 +334,10 @@ export class EditInvoiceComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
-      console.log(selectedCompany, '++++++++++++++[[[[[[[[[[[[[[[[[[');
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         this.companyList = [selectedCompany]; // ✅ Show only selected company
       }
-      console.log(this.selectedCompanyId, '+++++++++++++++++++++++');
       if (userData.USER_ID) {
         this.invoiceFormData.USER_ID = userData.USER_ID;
       }
@@ -375,23 +350,18 @@ export class EditInvoiceComponent {
   }
 
   getCustomerOrUnitLst() {
-    console.log(this.selectedCompanyId, 'COMPANYIDDDDDDDDDDDDD');
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
     };
-    console.log(payload, 'PAYLOAD');
     this.dataService
       .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
 
         if (this.invoiceFormData && this.invoiceFormData.DISTRIBUTOR_ID) {
           this.selectedCustomer = this.distributorList.find(
             (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID,
           );
-
-          console.log('EDIT MODE — Selected Customer:', this.selectedCustomer);
 
           // ⭐ NOW CHECK STATES
           if (this.selectedCustomer && this.companyState) {
@@ -400,14 +370,10 @@ export class EditInvoiceComponent {
             const compState = this.companyState.trim().toLowerCase();
 
             if (custState === compState) {
-              console.log('EDIT MODE — SAME STATE → CGST + SGST');
-
               this.showCGST = true;
               this.showSGST = true;
               this.showGST = false;
             } else {
-              console.log('EDIT MODE — DIFFERENT STATE → IGST');
-
               this.showCGST = false;
               this.showSGST = false;
               this.showGST = true;
@@ -419,7 +385,6 @@ export class EditInvoiceComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -479,7 +444,6 @@ export class EditInvoiceComponent {
       });
       return; // stop execution here
     }
-    console.log('staticTransfers:', this.staticTransfers);
 
     const selectedTransferNos =
       this.mainInvoiceGridList?.map((t) => t.DN_DETAIL_ID) || [];
@@ -616,9 +580,6 @@ export class EditInvoiceComponent {
       this.grandTotal = this.summaryValues('TOTAL_AMOUNT');
       this.netAmount = Number(this.grandTotal).toFixed(2);
       this.onRoundOffChange();
-      console.log('GROSS AMOUNT Summary:', this.totalAmount);
-      console.log('TAX_AMOUNT Summary:', this.taxAmount);
-      console.log('NET AMOUNT Summary:', this.grandTotal);
     } else {
       console.warn('Summary values not ready yet.');
     }
@@ -704,7 +665,6 @@ export class EditInvoiceComponent {
 
       return;
     }
-    console.log(this.mainInvoiceGridList, 'MAINGRID');
     // 2. Validation checks
     if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
       // notify('No items in the grid to save.', 'error', 3000);
@@ -740,7 +700,6 @@ export class EditInvoiceComponent {
         3000,
       );
     }
-    console.log(this.mainInvoiceGridList.length, 'MAINGRIDDDDDDDDDDDDDDDDD');
     // 2. Validation checks
     if (!this.mainInvoiceGridList || this.mainInvoiceGridList.length === 0) {
       notify(
@@ -810,11 +769,8 @@ export class EditInvoiceComponent {
             })),
           };
 
-          console.log('Sending commit payload:', commitPayload);
-
           this.dataService.commitInvoice(commitPayload).subscribe({
             next: (response) => {
-              console.log('Invoice committed successfully:', response);
               notify(
                 {
                   message: 'Invoice committed successfully',
@@ -832,7 +788,6 @@ export class EditInvoiceComponent {
             },
           });
         } else {
-          console.log('Commit canceled by user');
         }
       });
     } else {
@@ -869,11 +824,9 @@ export class EditInvoiceComponent {
         })),
       };
 
-      console.log('Sending update payload:', updatePayload);
       this.isUpdating = true;
       this.dataService.updateInvoice(updatePayload).subscribe({
         next: (response) => {
-          console.log('Invoice updated successfully:', response);
           notify(
             {
               message: 'Invoice updated successfully',

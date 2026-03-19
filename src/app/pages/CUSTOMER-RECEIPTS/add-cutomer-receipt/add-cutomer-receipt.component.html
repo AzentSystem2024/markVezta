@@ -130,6 +130,7 @@
           <dxi-column
             dataField="NET_AMOUNT"
             caption="Inv Amount"
+            alignment="right"
             [allowEditing]="false"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [width]="120"
@@ -143,6 +144,7 @@
           <dxi-column
             dataField="PENDING_AMOUNT"
             caption="Balance"
+            alignment="right"
             [allowEditing]="false"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
@@ -352,6 +354,9 @@
                 label="Amount"
                 labelMode="floating"
                 [width]="'100%'"
+                alignment="right"
+                [format]="{ type: 'fixedPoint', precision: 2 }"
+                
               ></dx-number-box>
             </div>
           </div>

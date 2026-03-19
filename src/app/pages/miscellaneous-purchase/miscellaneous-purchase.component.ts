@@ -44,15 +44,15 @@ import { Router } from '@angular/router';
 import { selected } from '@devexpress/analytics-core/queryBuilder-metadata';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { MiscellaneousPurchaseAddModule } from '../miscellaneous-purchase-add/miscellaneous-purchase-add.component';
-import { MiscellaneousInvoiceEditModule } from "../miscellaneous-invoice-edit/miscellaneous-invoice-edit.component";
+import { MiscellaneousInvoiceEditModule } from '../miscellaneous-invoice-edit/miscellaneous-invoice-edit.component';
 
 @Component({
   selector: 'app-miscellaneous-purchase',
   templateUrl: './miscellaneous-purchase.component.html',
-  styleUrls: ['./miscellaneous-purchase.component.scss']
+  styleUrls: ['./miscellaneous-purchase.component.scss'],
 })
 export class MiscellaneousPurchaseComponent {
-@ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -146,14 +146,13 @@ export class MiscellaneousPurchaseComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/credit-note');
@@ -167,8 +166,6 @@ export class MiscellaneousPurchaseComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getCreditNotes();
   }
 
@@ -380,7 +377,6 @@ export class MiscellaneousPurchaseComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -657,8 +653,8 @@ export class MiscellaneousPurchaseComponent {
     DxoSummaryModule,
     CustomDatePopupModule,
     MiscellaneousPurchaseAddModule,
-    MiscellaneousInvoiceEditModule
-],
+    MiscellaneousInvoiceEditModule,
+  ],
   providers: [],
   declarations: [MiscellaneousPurchaseComponent],
   exports: [MiscellaneousPurchaseComponent],

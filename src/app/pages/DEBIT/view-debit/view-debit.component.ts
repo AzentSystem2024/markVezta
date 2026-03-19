@@ -125,13 +125,11 @@ export class ViewDebitComponent {
     private sanitizer: DomSanitizer,
   ) {
     const userDataString = localStorage.getItem('userData');
-    console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
 
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, 'HSNCODE===================');
       this.hsnLoaded = true; // ADD THIS
     }
     this.sessionData_tax();
@@ -139,15 +137,11 @@ export class ViewDebitComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
   }
 
   ngOnInit() {
@@ -156,11 +150,9 @@ export class ViewDebitComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      console.log(userData, 'USERDATAAAAAA');
       // ✅ Assign Companies array to companyList
       this.companyList = userData.Companies || [];
 
@@ -170,7 +162,6 @@ export class ViewDebitComponent {
       }
 
       // Log for debugging
-      console.log('Loaded Companies:', this.companyList);
     } else {
       console.warn('No userData found in localStorage');
     }
@@ -183,7 +174,6 @@ export class ViewDebitComponent {
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
   }
 
@@ -375,7 +365,6 @@ export class ViewDebitComponent {
       .getDropdownData('COMPANY_LIST')
       .subscribe((response: any) => {
         this.companyList = response;
-        console.log(this.companyList, 'COMPANYLIST');
       });
   }
 
@@ -383,7 +372,6 @@ export class ViewDebitComponent {
     return new Promise((resolve) => {
       this.dataService.getActiveLedger().subscribe((response: any) => {
         this.ledgerList = response.Data;
-        console.log('Ledger List Loaded:', this.ledgerList);
         resolve();
       });
     });
@@ -437,7 +425,6 @@ export class ViewDebitComponent {
   onEditorPreparing(e: any) {
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
 
     // ➤ SL_NO: Move to ledgerCode on Enter
     if (e.dataField === 'SL_NO') {
@@ -448,10 +435,6 @@ export class ViewDebitComponent {
 
           const rowIndex = visibleRows.findIndex(
             (r) => r?.data === e.row?.data,
-          );
-          console.log(
-            'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex,
           );
 
           setTimeout(() => {
@@ -576,7 +559,6 @@ export class ViewDebitComponent {
               netTotal += amount + gst;
             }
             this.netAmountDisplay = netTotal;
-            console.log('Net Amount Updated:', this.netAmountDisplay);
             // ✅ Add new row manually
             const newRow = {
               SL_NO: '',
@@ -624,7 +606,6 @@ export class ViewDebitComponent {
               netTotal += amount + gst;
             }
             this.netAmountDisplay = netTotal;
-            console.log('Net Amount Updated:', this.netAmountDisplay);
             setTimeout(() => {
               this.narrationRef?.instance?.focus();
             }, 50);
@@ -639,13 +620,11 @@ export class ViewDebitComponent {
   }
 
   onApprovedChanged(e: any) {
-    console.log('Checkbox value changed:', e.value);
     this.debitFormData.IS_APPROVED = e.value;
   }
 
   updateDebitNote() {
     if (this.debitFormData.IS_APPROVED) {
-      console.log('approved???????????????????????????????????');
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -717,8 +696,6 @@ export class ViewDebitComponent {
           }),
       };
 
-      console.log('Update Payload:', payload);
-
       this.dataService.updateDebitNote(payload).subscribe((response) => {
         if (response) {
           notify(
@@ -760,7 +737,6 @@ export class ViewDebitComponent {
   }
 
   calculateTotal = (row: any) => {
-    console.log(row);
     const amount = Number(row.Amount) || 0;
     const gst = this.calculateTaxAmount(row) || 0;
     return amount + gst;
@@ -805,11 +781,9 @@ export class ViewDebitComponent {
   }
 
   viewPdf(): void {
-    console.log(this.DNid, 'ID received in viewPdf()');
     // this.isPdfPopupVisible = true;
 
     this.dataService.selectDebitNote(this.DNid).subscribe((response: any) => {
-      console.log(response, '=================DN response===================');
       if (response) {
         this.pdfSrc = this.get_pdf(response.Data[0]); // Update iframe source
       }

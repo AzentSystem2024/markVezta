@@ -180,6 +180,7 @@
       [width]="'auto'"
       [allowEditing]="false"
       alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
     <dxi-column
       *ngIf="
@@ -189,6 +190,7 @@
       caption="PRICE {{ localCurrencySymbol }}"
       [width]="'auto'"
       [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
@@ -323,7 +325,8 @@
         <dx-text-box
           placeholder="0.00"
           [width]="150"
-          [readOnly]="true"
+          format="#,##0.00"
+          [readOnly]="true" 
           [value]="formattedLocalNetAmount"
           [rtlEnabled]="true"
         ></dx-text-box>

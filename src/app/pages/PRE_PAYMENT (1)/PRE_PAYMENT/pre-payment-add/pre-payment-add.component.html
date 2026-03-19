@@ -46,6 +46,7 @@
       <dx-number-box
         label="Amount"
         labelMode="floating"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
         [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
       >
         <dx-validator>
@@ -215,6 +216,7 @@
         <dxi-column
           dataField="DUE_AMOUNT"
           caption="Expense Amount"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
           [editorOptions]="{ showSpinButtons: true }"
           [allowEditing]="true"
         >
@@ -241,6 +243,7 @@
       <dx-number-box
         label="Total Expense"
         width="200px"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
         labelMode="floating"
         [(value)]="totalExpense"
       ></dx-number-box>

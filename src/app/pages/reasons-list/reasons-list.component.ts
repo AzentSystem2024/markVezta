@@ -102,7 +102,7 @@ export class ReasonsListComponent {
   showReasons() {
     this.dataservice.getReasonsData().subscribe((response) => {
       this.reasons = response;
-      console.log(response);
+
       console.log('type', this.reasontype);
     });
   }

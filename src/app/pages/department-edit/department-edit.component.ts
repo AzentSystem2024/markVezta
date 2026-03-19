@@ -59,7 +59,6 @@ export class DepartmentEditComponent {
 
     this.dataservice.getDepartmentData(payload).subscribe((response) => {
       this.department = response;
-      console.log(response, 'department');
     });
   }
 
@@ -69,9 +68,7 @@ export class DepartmentEditComponent {
       changes['selectedDepartment'].currentValue
     ) {
       const data = changes['selectedDepartment'].currentValue;
-      console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa');
       this.formDepartmentData = data;
-      console.log(this.formDepartmentData);
     }
   }
 
@@ -89,7 +86,6 @@ export class DepartmentEditComponent {
   //         COMPANY_ID : "1",
   //         COMPANY_NAME : this.COMPANY_NAME
   //       }
-  //       console.log(payload)
 
   //           // Check for duplicates in CategoryList
   // const isCodeDuplicate = this.department.some(
@@ -136,7 +132,6 @@ export class DepartmentEditComponent {
   // }
 
   //       this.dataservice.UpdateDepartment(payload).subscribe((res)=>{
-  //         console.log(res,'res============')
   //          this.formClosed.emit();
   //           // this.isEditDepartmentPopupOpened = false
   //       })
@@ -156,20 +151,19 @@ export class DepartmentEditComponent {
       COMPANY_ID: this.COMPANY_ID,
       COMPANY_NAME: this.COMPANY_NAME,
     };
-    console.log(payload);
 
     // Exclude the current record (by ID) from duplicate check
     const isCodeDuplicate = this.department.some(
       (item: any) =>
         item.ID !== payload.ID &&
-        item.CODE?.toLowerCase().trim() === payload.CODE?.toLowerCase().trim()
+        item.CODE?.toLowerCase().trim() === payload.CODE?.toLowerCase().trim(),
     );
 
     const isDescriptionDuplicate = this.department.some(
       (item: any) =>
         item.ID !== payload.ID &&
         item.DEPT_NAME?.toLowerCase().trim() ===
-          payload.DEPT_NAME?.toLowerCase().trim()
+          payload.DEPT_NAME?.toLowerCase().trim(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -179,7 +173,7 @@ export class DepartmentEditComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isCodeDuplicate) {
@@ -189,7 +183,7 @@ export class DepartmentEditComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     } else if (isDescriptionDuplicate) {
@@ -199,14 +193,13 @@ export class DepartmentEditComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
 
     // Update API call
     this.dataservice.UpdateDepartment(payload).subscribe((res) => {
-      console.log(res, 'res============');
       this.formClosed.emit();
       // this.isEditDepartmentPopupOpened = false;
       notify(
@@ -215,26 +208,19 @@ export class DepartmentEditComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'success'
+        'success',
       );
     });
   }
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
-    console.log(
-      this.COMPANY_ID,
-      '============selected_Company_id=============='
-    );
 
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
-    console.log(this.COMPANY_NAME, '=======selected company name=====');
     //       const sessionYear=this.sessionData.FINANCIAL_YEARS
     //  this.financialYeaDate=sessionYear[0].DATE_FROM
-    // console.log(this.financialYeaDate,'=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[')
     // this.formatted_from_date=this.financialYeaDate
 
     // this.selected_vat_id=this.sessionData.VAT_ID
@@ -257,7 +243,6 @@ export class DepartmentEditComponent {
     }
   }
   keyPressDepartment(event: any) {
-    console.log('key pressed');
     var charCode = event.which ? event.which : event.keyCode;
     var inputValue = event.target.value;
 

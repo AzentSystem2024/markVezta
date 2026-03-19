@@ -149,13 +149,10 @@ export class ListMiscReceiptComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/misc-receipt');
@@ -169,8 +166,6 @@ export class ListMiscReceiptComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getMiscReceipts();
   }
 
@@ -544,7 +539,6 @@ export class ListMiscReceiptComponent {
 
   onDeleteMiscPayment(e: any) {
     const miscId = e.data.TRANS_ID;
-    // console.log("delete")
     // Optionally prevent the default delete behavior
     e.cancel = true;
     if (e.data.TRANS_STATUS === 5) {
@@ -591,7 +585,6 @@ export class ListMiscReceiptComponent {
   };
 
   handleClose() {
-    // console.log('Parent: popupClosed triggered');
     this.addMiscPopup = false;
     this.editMiscPopup = false;
     this.getMiscReceipts();

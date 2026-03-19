@@ -159,14 +159,13 @@ export class ItemStorePricesLogComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/credit-note');
@@ -180,8 +179,6 @@ export class ItemStorePricesLogComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
@@ -190,10 +187,8 @@ export class ItemStorePricesLogComponent {
         }
       });
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
-    // console.log(this.AllowCommitWithSave,"ALLOW")
     this.dateFormat = sessionStorage.getItem('dateFormat');
     this.currencyFormt = sessionStorage.getItem('currencyFormat');
-    // console.log(this.dateFormat,"DATE")
     this.getLoglist();
   }
   refreshGrid() {
@@ -204,8 +199,6 @@ export class ItemStorePricesLogComponent {
   }
 
   getStatusFlagClass(Status: string): string {
-    // console.log('Status:', Status);
-
     return Status === 'Open' ? 'flag-red' : 'flag-green';
   }
 
@@ -233,16 +226,12 @@ export class ItemStorePricesLogComponent {
             };
           })
           .sort((a, b) => b.WS_NO - a.WS_NO);
-        console.log(this.logList, 'LOGLIST');
         this.logList.forEach((item) => {
           if (item.isVerified) {
           } else if (item.isApproved) {
-            // console.log(`Record ${item.WS_NO} is Approved.`);
           } else {
-            // console.log(`Record ${item.WS_NO} is Open.`);
           }
         });
-        // console.log(this.logList, 'LOGLIST');
       });
   }
 
@@ -260,9 +249,7 @@ export class ItemStorePricesLogComponent {
         this.status = ws.Status;
         this.selectedWorksheetData = { ...response, status: this.status };
         this.dataservice.setWorksheetData(this.selectedWorksheetData);
-        console.log('Navigating to edit page with:', {
-          worksheetData: this.selectedWorksheetData,
-        });
+
         if (this.status == 'Approved') {
           this.goToView(worksheetId);
         }
@@ -272,7 +259,6 @@ export class ItemStorePricesLogComponent {
               worksheetData: this.selectedWorksheetData,
             },
           });
-          console.log(this.selectedWorksheetData, 'SELECTEDWORKSHEETDATA');
         }
         this.router.navigate(['/change-price-edit'], {
           state: {
@@ -296,9 +282,7 @@ export class ItemStorePricesLogComponent {
         this.status = ws.Status;
         this.selectedWorksheetData = { ...response, status: this.status };
         this.dataservice.setWorksheetData(this.selectedWorksheetData);
-        console.log('Navigating to view page with:', {
-          worksheetData: this.selectedWorksheetData,
-        });
+
         this.router.navigate(['/change-price-view'], {
           state: {
             worksheetData: this.selectedWorksheetData,
@@ -326,7 +310,6 @@ export class ItemStorePricesLogComponent {
   }
 
   onAddClick() {
-    console.log('add called');
     this.isFormVisible = true;
     this.router.navigate(['/change-price-add']);
     this.listItemsByMultipleStoreIds();
@@ -355,16 +338,11 @@ export class ItemStorePricesLogComponent {
           (worksheet) => worksheet.ID == response.ID,
         );
         this.status = ws.Status;
-        console.log(this.status, 'STATUS IN APPROVE');
-        console.log(response.worksheet_item_price, 'WORKSHEETRESPONSE');
 
         this.selectedWorksheetData = { ...response, status: this.status };
         this.dataservice.setWorksheetData(this.selectedWorksheetData);
-        console.log('Navigating to edit page with:', {
-          worksheetData: this.selectedWorksheetData,
-        });
+
         if (this.status == 'Approved') {
-          console.log(this.status, 'STATUSSSSSSSSSSS');
           this.goToView(worksheetId);
         }
         this.router.navigate(['/item-store-prices-approve'], {
@@ -412,10 +390,8 @@ export class ItemStorePricesLogComponent {
       NARRATION: '',
       worksheet_item_price: updatedPrices, // Update worksheet_item_price with updated data
     };
-    console.log('Approval payload:', payload);
     this.dataservice.approveworksheetItemPrices(payload).subscribe(
       (response) => {
-        console.log(response, 'RESPONSE IN APPROVE FN.');
         if (response) {
           this.isApproved = true;
           const rowIndex = this.logList.findIndex(
@@ -449,11 +425,9 @@ export class ItemStorePricesLogComponent {
 
   onVerifyClick(e: any) {
     if (this.AllowCommitWithSave) {
-      console.log('Verify Button clicked');
       const rowData = e.row.data; // Access the row data
       e.row.data.isVerified = true;
       const worksheetId = rowData?.ID;
-      console.log('Row ID:', worksheetId);
       if (worksheetId) {
         this.verifyWorksheetById(worksheetId, e);
       } else {
@@ -471,16 +445,12 @@ export class ItemStorePricesLogComponent {
     this.dataservice.selectWorksheetForPrice(worksheetId).subscribe(
       (response) => {
         const selectedWorksheetData = response;
-        console.log(
-          'Fetched Worksheet Data for Verification:',
-          selectedWorksheetData,
-        );
+
         // if (
         //   response.worksheet_item_price &&
         //   response.worksheet_item_price.length > 0
         // ) {
         //   response.worksheet_item_price.forEach((item: any) => {
-        //     // console.log('Original Item:', item);
         //     item.SALE_PRICE = item.PRICE_NEW;
         //     item.SALE_PRICE1 = item.PRICE_LEVEL1_NEW; // Optional, if needed
         //     item.SALE_PRICE2 = item.PRICE_LEVEL2_NEW; // Optional, if needed
@@ -491,12 +461,7 @@ export class ItemStorePricesLogComponent {
         // }
         this.selectedWorksheetData = response;
 
-        console.log(this.selectedWorksheetData, 'SELECTEDWORKSHEETDATA');
         this.dataservice.setWorksheetData(this.selectedWorksheetData);
-        console.log('Navigating to edit page with:', {
-          worksheetData: this.selectedWorksheetData,
-          status: status,
-        });
 
         this.router.navigate(['/item-store-prices-verify-approve'], {
           state: {
@@ -554,15 +519,12 @@ export class ItemStorePricesLogComponent {
       NARRATION: '',
       worksheet_item_price: updatedPrices, // Update worksheet_item_price with updated data
     };
-
-    console.log(payload, 'PAYLOAD IN VERIFY');
   }
 
   onSelectionChanged(event: any) {}
   openEditingStart(event: any) {
     event.cancel = true; // Prevent the default editing action
     const selectedId = event.data.ID; // Get the selected row ID
-    console.log('Edit row triggered for ID:', selectedId);
     if (selectedId) {
       this.selectWorksheetById(selectedId);
       // this.router.navigate(['/item-store-properties']);
@@ -573,7 +535,6 @@ export class ItemStorePricesLogComponent {
   onRowRemoving(event: any) {
     const selectedRow = event.data; // Get the data of the selected row
     const id = selectedRow.ID;
-    console.log('Delete button clicked for ID:', id);
     if (id) {
       this.dataservice.deleteWorksheetOfStorePrices(id).subscribe(
         (response) => {
@@ -595,7 +556,6 @@ export class ItemStorePricesLogComponent {
               'error',
             );
           }
-          console.log('Worksheet deleted successfully:', response);
           const index = this.logList.findIndex((item) => item.ID === id);
           if (index !== -1) {
             this.logList.splice(index, 1); // Remove item from the array

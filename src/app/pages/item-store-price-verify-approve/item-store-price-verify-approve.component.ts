@@ -252,12 +252,8 @@ export class ItemStorePriceVerifyApproveComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   loadStores() {
@@ -287,7 +283,6 @@ export class ItemStorePriceVerifyApproveComponent {
   listItemsByMultipleStoreIds(storeIds: string) {
     this.dataservice.getItemListByStoreId().subscribe(
       (response) => {
-        console.log(response);
         this.worksheetItems = response.PriceWizardData;
         this.selectedItems = this.worksheetItems.filter(
           (item) => item.Selected === true,
@@ -481,9 +476,7 @@ export class ItemStorePriceVerifyApproveComponent {
       if (this.payloadForVerify) {
         this.dataservice
           .verifyItemStorePrices(this.payloadForVerify)
-          .subscribe((response) => {
-            console.log('verified');
-          });
+          .subscribe((response) => {});
       }
       const companyId = 1; // Example: this.companyId = 1
       const userId = 1; // Example: this.userId = 1
@@ -538,7 +531,6 @@ export class ItemStorePriceVerifyApproveComponent {
             'error',
           );
         }
-        console.log('Verification successful:', verifyResponse);
         this.isVerified = true;
       });
   }
@@ -547,9 +539,7 @@ export class ItemStorePriceVerifyApproveComponent {
     if (this.payloadForVerify) {
       this.dataservice
         .approveworksheetItemPrices(this.payloadForVerify)
-        .subscribe((response) => {
-          console.log('APPROVED');
-        });
+        .subscribe((response) => {});
     }
     const companyId = 1; // Example: this.companyId = 1
     const userId = 1; // Example: this.userId = 1
@@ -613,13 +603,11 @@ export class ItemStorePriceVerifyApproveComponent {
     }
     // This stores the percentage but does not apply the price change until the button is clicked
     this.percentage = percentageValue;
-    console.log(`Percentage change set to: ${percentageValue}%`);
   }
 
   handleSalePriceChange(event) {
     const selectedOptions = event.value; // This will now be an array of selected options
     this.selectedSalePrice = selectedOptions;
-    console.log(`Selected sale price options: ${selectedOptions}`);
   }
 
   applyFormula(event) {
@@ -698,11 +686,6 @@ export class ItemStorePriceVerifyApproveComponent {
 
             // Optionally trigger an event to notify that the row has been updated
             this.onRowUpdated({ data: selectedRow });
-
-            // console.log(
-            //   `Updated ${selectedOption} for row ID ${selectedRow.ID}:`,
-            //   finalPrice
-            // );
           });
         } else {
           console.error('Selected row not found in the data source.');
@@ -747,20 +730,16 @@ export class ItemStorePriceVerifyApproveComponent {
   onPriceAdjustmentChanged(event: any) {
     this.isIncrease = event.value; // True for increase, false for decrease
 
-    console.log(this.isIncrease ? 'Increase selected' : 'Decrease selected');
-
     // This does not apply the change yet, it only sets the mode (increase or decrease)
   }
 
   adjustPercentage(amount: number) {
     this.percentage += amount;
     if (this.percentage < 0) this.percentage = 0;
-    console.log(`Adjusted percentage: ${this.percentage}%`);
   }
 
   toggleAdjustment() {
     this.isIncrease = !this.isIncrease; // Toggle between increase and decrease
-    console.log(this.isIncrease ? 'Increase selected' : 'Decrease selected');
   }
 
   areRowsSelected(): boolean {

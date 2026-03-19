@@ -115,6 +115,8 @@ export class SupplierEditComponent {
   countryCodes: any;
   mobile_limit: any;
   Supplier_mobile: any;
+  countryCodePhone: any;
+  PhoneNumber: any;
   purchaseTypeOptions = [
     { text: 'Local Purchase', value: 1 },
     { text: 'Interstate Purchase', value: 2 },
@@ -163,7 +165,6 @@ export class SupplierEditComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.DEFAULT_COUNTRY_CODE = this.sessionData.DEFAULT_COUNTRY_CODE;
   }
@@ -178,17 +179,11 @@ export class SupplierEditComponent {
   //  }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
+
     this.DEFAULT_COUNTRY_CODE =
       sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
@@ -220,6 +215,15 @@ export class SupplierEditComponent {
       this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
 
       console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
+      const MobileNo = this.supplierData.MOBILE_NO;
+      const [countryCode, number] = MobileNo.split('-');
+      this.countryCode = countryCode;
+      this.Supplier_mobile = number;
+      const phoneNo = this.supplierData.PHONE;
+      const [countryCodePhone, phonenumber] = phoneNo.split('-');
+      this.countryCodePhone = countryCodePhone;
+      this.PhoneNumber = phonenumber;
+      console.log(this.countryCodePhone, this.PhoneNumber);
     }
   }
 
@@ -272,23 +276,8 @@ export class SupplierEditComponent {
     };
     this.dataservice.getSupplierData(payload).subscribe((response) => {
       this.supplier = response;
-      console.log(response);
     });
   }
-
-  // listCountry() {
-  //   this.dataservice.getCountryData().subscribe((response) => {
-  //     this.CountryDropdownData = response;
-  //   });
-  // }
-
-  //   get_Country_Dropdown_List() {
-  //   this.dataservice.get_Country_Dropdown_Api().subscribe((response: any) => {
-  //     // console.log(response, 'response++++++++++');
-  //     this.CountryDropdownData = response;
-  //     console.log(this.CountryDropdownData,'Country dropdown')
-  //   });
-  // }
 
   listState() {
     this.dataservice.getStateData().subscribe((data: any) => {
@@ -456,6 +445,7 @@ export class SupplierEditComponent {
       SUPP_CAT_ID: this.Supplier_Category,
       PURCH_TYPE: this.purchType,
       MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
+      PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
     };
     console.log(payload, 'PAYLOADINEDIT');
     this.dataservice
@@ -503,13 +493,21 @@ export class SupplierEditComponent {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      console.log(res);
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }
   countryDisplay(item: any) {
     if (!item) return '';
     return `${item.CODE}`;
+  }
+  onCountrycodeChangePhone(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
   }
 }
 

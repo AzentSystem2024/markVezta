@@ -180,7 +180,6 @@ export class ArticleAddComponent {
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
-        // console.log('Base64 Image String:', this.imagePreview);
       };
       reader.readAsDataURL(file);
     }
@@ -188,9 +187,7 @@ export class ArticleAddComponent {
 
   getPartNo() {
     this.dataService.getArticleLastPartNo().subscribe((response: any) => {
-      console.log(response);
       this.articleData.PART_NO = response.GetPartNo;
-      console.log(this.articleData.PART_NO, 'ALIASNO');
     });
   }
 
@@ -255,7 +252,6 @@ export class ArticleAddComponent {
       NAME: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      console.log(response);
       this.itemsList = response;
     });
   }
@@ -316,7 +312,6 @@ export class ArticleAddComponent {
         const selectedDescription = args.value;
         const grid = e.component;
         const rowIndex = e.row.rowIndex;
-        console.log(args, 'ARGSSSSSSSSSSSSSS');
         // Keep the selected value in the grid
         grid.cellValue(rowIndex, 'ITEM', selectedDescription);
 
@@ -324,10 +319,8 @@ export class ArticleAddComponent {
         const matchedItem = this.itemsList.find(
           (p: any) => p.DESCRIPTION === selectedDescription,
         );
-        console.log(matchedItem.ID, 'MATCHEDITEMMMMMMMMMMMMMMMMMMM');
         grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
 
-        console.log(this.selectedItemID, 'ID');
         // Save ID separately
         grid.cellValue(rowIndex, 'ITEM_ID', matchedItem?.ID ?? null);
 
@@ -459,7 +452,6 @@ export class ArticleAddComponent {
   getArticles() {
     // const payload = { COMPANY_ID: this.selected_Company_id };
     this.dataService.getArticleList().subscribe((response: any) => {
-      console.log(response, 'ARTICLELIST');
       if (response?.Data && Array.isArray(response.Data)) {
         // Store full list (reversed) in articleList
         // this.articleList = response.Data.reverse();
@@ -546,7 +538,6 @@ export class ArticleAddComponent {
       this.dataService
         .getCategoryList(this.selectedCategoryId)
         .subscribe((response: any) => {
-          console.log(response, 'CATEGORYLIST');
           if (response?.flag === 1 && Array.isArray(response?.Data)) {
             this.articleSizeData = response.Data;
             // if (this.selectedProductionUnitId) {
@@ -560,14 +551,11 @@ export class ArticleAddComponent {
   }
 
   getDropdownLists() {
-    console.log('Company ID before dropdown:', this.selected_Company_id);
-
     const payload = {
       COMPANY_ID: 0,
       NAME: 'PRODUCTION_UNITS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      console.log(response, 'PRODUCTION UNIT');
       this.produCtionUnits = response;
     });
     const payload1 = {
@@ -575,7 +563,6 @@ export class ArticleAddComponent {
       NAME: 'MATERIAL_UNITS',
     };
     this.dataService.getDropdownData(payload1).subscribe((response: any) => {
-      console.log(response, 'MATERIALUNIT');
       this.materialUnits = response;
     });
     const payload2 = {
@@ -603,9 +590,7 @@ export class ArticleAddComponent {
       this.colorList = response;
     });
   }
-  onColorChanged(event: any) {
-    console.log('Selected Color:', event.value);
-  }
+  onColorChanged(event: any) {}
   assignOrderNumbersToSizes() {
     const last = Number(this.lastOrderNo ?? 0);
     let nextOrderNo = last + 1;
@@ -631,7 +616,6 @@ export class ArticleAddComponent {
   }
   getLastOrderNo() {
     // if (!this.selectedProductionUnitId) return;
-    console.log(this.selectedProductionUnitId, 'SELECTEDPRODUCTIONUNITID');
     // const ids = this.selectedProductionUnitId.join(',');
     const payload = { COMPANY_ID: 0 };
     this.dataService
@@ -683,12 +667,10 @@ export class ArticleAddComponent {
   getAliasNo() {
     this.dataService.getLastAliasNo().subscribe((response: any) => {
       this.articleData.ALIAS_NO = response.GetAliasNo;
-      console.log(this.articleData.ALIAS_NO, 'ALIASNO');
     });
   }
   // onAttachRowSelected(event: any) {
   //   this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
-  //   console.log('Selected row:', this.selectedAttachRow);
   // }
   onAttachRowSelected(event: any) {
     const selectedKeys = event.selectedRowKeys || [];
@@ -735,17 +717,11 @@ export class ArticleAddComponent {
       // Close popup / switch tab if required
       this.isAttachPopupVisible = false;
       // this.selectedTabIndex = 0;
-
-      console.log(
-        'Assigned ComponentArticleID:',
-        this.articleData.COMPONENT_ARTICLE_ID,
-      );
     }
   }
 
   // attachComponent() {
   //   if (this.selectedAttachRow) {
-  //     console.log(this.selectedAttachRow, 'SELECTEDATTACHROW');
   //     // Assign the selected article's ID to articleData.ComponentArticleID
   //     this.articleData.COMPONENT_ARTICLE_ID = this.selectedAttachRow.ID;
   //     this.selectedComponentDescription =
@@ -754,17 +730,13 @@ export class ArticleAddComponent {
   //     // Optionally close popup
   //     this.isAttachPopupVisible = false;
   //     // this.selectedTabIndex = 0;
-  //     console.log(
-  //       'Assigned ComponentArticleID:',
-  //       this.articleData.COMPONENT_ARTICLE_ID
-  //     );
+
   //   }
   // }
 
   onSizeSelectionChanged(e: any) {
     this.selectedSizeRows = e.selectedRowKeys;
     this.selectedSizeRowData = e.selectedRowsData || [];
-    console.log('Selected rows:', this.selectedSizeRows);
   }
 
   enforceArtNoLimit(e: any) {
@@ -796,12 +768,8 @@ export class ArticleAddComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   // private getSelectedSizes(): number[] {
@@ -830,15 +798,6 @@ export class ArticleAddComponent {
 
   //   // 🔹 Selected sizes from UI
   //   const selectedSizes = this.getSelectedSizes();
-
-  //   console.log(
-  //     artNo,
-  //     color,
-  //     categoryName,
-  //     price,
-  //     selectedSizes,
-  //     'FORM VALUES'
-  //   );
 
   //   return this.articleList.some((article: any) => {
   //     const baseMatch =
@@ -1103,7 +1062,6 @@ export class ArticleAddComponent {
               QUANTITY: row.QUANTITY,
             })) || [];
 
-        console.log('BOM Data:', bomGridData);
         const payload = {
           ...this.articleData,
           CREATED_DATE: formatDate(this.articleData.CREATED_DATE),
@@ -1131,7 +1089,6 @@ export class ArticleAddComponent {
           BOM: bomGridData,
         };
 
-        console.log('Saving article with payload:', payload);
         this.isSaving = true;
         this.dataService.insertArticle(payload).subscribe({
           next: (response: any) => {

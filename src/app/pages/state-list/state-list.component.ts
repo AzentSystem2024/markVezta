@@ -283,14 +283,13 @@ export class StateListComponent {
   //   }
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/credit-note');
@@ -304,8 +303,6 @@ export class StateListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.showState();
     this.getCountryDropDown();
   }
@@ -318,7 +315,6 @@ export class StateListComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -326,16 +322,13 @@ export class StateListComponent {
   onEditingRow(event: any) {
     event.cancel = true;
     this.isEditPopupOpened = true;
-    console.log(event);
     this.selectedState = event.data;
     this.selectState(event);
   }
 
   selectState(event: any) {
-    console.log(event);
     const id = event.data.ID;
     this.dataservice.SelectState(id).subscribe((res: any) => {
-      console.log(res);
       this.selectedState = res;
     });
   }

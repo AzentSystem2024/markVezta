@@ -67,19 +67,17 @@ export class ItemStorePropertiesLogComponent implements OnInit {
       onClick: (e) => this.onApproveClick(e),
     },
   ];
-  allButtons = [
-    'edit',
-    'delete',
-    ...this.customButtons
-  ];
+  allButtons = ['edit', 'delete', ...this.customButtons];
   totalRecords: any;
 
-  constructor(private dataservice: DataService, private router: Router) {}
+  constructor(
+    private dataservice: DataService,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
     this.listWorkisheetItemProperty();
     this.userId = sessionStorage.getItem('UserId');
-    console.log(this.userId, 'USERID');
   }
 
   listWorkisheetItemProperty() {
@@ -88,9 +86,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
       .subscribe((response: any) => {
         this.logList = response.dataworksheet;
         this.dataGrid.instance.getDataSource = this.logList;
-        console.log(this.logList, 'RESPONSE');
         this.totalRecords = this.logList.length;
-        console.log('Total Records:', this.totalRecords);
       });
   }
 
@@ -122,12 +118,10 @@ export class ItemStorePropertiesLogComponent implements OnInit {
         })),
     };
     this.dataservice.updateworksheetItemProperty(payload).subscribe(
-      (response: any) => {
-        console.log('Worksheet updated successfully:', response);
-      },
+      (response: any) => {},
       (error) => {
         console.error('Error updating worksheet:', error);
-      }
+      },
     );
   }
 
@@ -139,7 +133,6 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     this.dataservice.selectWorksheet(worksheetId).subscribe(
       (response) => {
         this.selectedWorksheetData = response;
-        console.log(this.selectedWorksheetData,"SELECTED WORKSHEET DATA IN LOG LIST")
         this.dataservice.setWorksheetData(this.selectedWorksheetData);
         this.router.navigate(['/item-store-properties-edit'], {
           state: { worksheetData: this.selectedWorksheetData },
@@ -148,25 +141,21 @@ export class ItemStorePropertiesLogComponent implements OnInit {
       },
       (error) => {
         console.error('Error selecting worksheet:', error);
-      }
+      },
     );
   }
 
   onRowSelected(event: any) {
-    console.log('Row selection event:', event);
     if (event.selectedRowsData.length > 0) {
       this.selectedWorksheetData = event.selectedRowsData[0];
-      console.log('Selected Worksheet Data:', this.selectedWorksheetData);
     } else {
       this.selectedWorksheetData = null;
-      console.log('No row selected');
     }
   }
 
   openEditingStart(event: any) {
     event.cancel = true; // Prevent the default editing action
     const selectedId = event.data.ID; // Get the selected row ID
-    console.log('Edit row triggered for ID:', selectedId);
     if (selectedId) {
       this.selectWorksheetById(selectedId);
       // this.router.navigate(['/item-store-properties']);
@@ -178,7 +167,6 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   onSelectionChanged(event: any) {
     if (event.selectedRowsData.length > 0) {
       this.selectedRowData = event.selectedRowsData[0]; // Store the selected row data
-      console.log('Row Selected:', this.selectedRowData); // Check row selection in the console
     } else {
       this.selectedRowData = null; // No row selected
     }
@@ -187,7 +175,6 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   onApproveClick(e: any) {
     const rowData = e.row.data; // Access the row data
     const worksheetId = rowData?.ID;
-    console.log(worksheetId, 'APPROVE');
     if (worksheetId) {
       this.approveWorksheetById(worksheetId);
     } else {
@@ -199,8 +186,8 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     const payload = {
       COMPANY_ID: selectedWorksheetData.COMPANY_ID || 1,
       USER_ID: selectedWorksheetData.USER_ID || 1,
-      STORE_ID: selectedWorksheetData.STORE_ID  ,
-      ID: selectedWorksheetData.ID, 
+      STORE_ID: selectedWorksheetData.STORE_ID,
+      ID: selectedWorksheetData.ID,
       worksheet_item_property: [
         {
           ITEM_ID: selectedWorksheetData.ITEM_ID,
@@ -219,17 +206,15 @@ export class ItemStorePropertiesLogComponent implements OnInit {
       ],
     };
 
-    console.log('Approval payload:', payload); 
     this.dataservice.approveworksheetItemProperty(payload).subscribe(
       (response) => {
-        console.log(response,"RESPONSE IN APPROVE FN.")
         if (response) {
           notify(
             {
               message: 'Worksheet Approved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
         } else {
@@ -238,11 +223,11 @@ export class ItemStorePropertiesLogComponent implements OnInit {
               message: 'Your Data Not Approved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       },
-      (error) => {}
+      (error) => {},
     );
   }
 
@@ -254,23 +239,18 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     this.dataservice.selectWorksheet(worksheetId).subscribe(
       (response) => {
         const selectedWorksheetData = response;
-        console.log(
-          'Fetched Worksheet Data for Approval:',
-          selectedWorksheetData
-        );
+
         this.approveItemStore(selectedWorksheetData);
       },
       (error) => {
         console.error('Error fetching worksheet for verification:', error);
-      }
+      },
     );
   }
 
   onVerifyClick(e: any) {
-    console.log('Verify Button clicked');
     const rowData = e.row.data; // Access the row data
     const worksheetId = rowData?.ID;
-    console.log('Row ID:', worksheetId); 
     if (worksheetId) {
       this.verifyWorksheetById(worksheetId);
     } else {
@@ -287,26 +267,22 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     this.dataservice.selectWorksheet(worksheetId).subscribe(
       (response) => {
         const selectedWorksheetData = response;
-        console.log(
-          'Fetched Worksheet Data for Verification:',
-          selectedWorksheetData
-        );
+
         this.verifyItemStore(selectedWorksheetData);
         this.dataGrid.instance.refresh();
       },
       (error) => {
         console.error('Error fetching worksheet for verification:', error);
-      }
+      },
     );
   }
 
   verifyItemStore(selectedWorksheetData: any) {
-    console.log(selectedWorksheetData,"INVERIFY+++++++++++++")
     const payload = {
       COMPANY_ID: selectedWorksheetData.COMPANY_ID || 1,
       USER_ID: selectedWorksheetData.USER_ID || 1,
-      STORE_ID: selectedWorksheetData.STORE_ID  ,
-      ID: selectedWorksheetData.ID, 
+      STORE_ID: selectedWorksheetData.STORE_ID,
+      ID: selectedWorksheetData.ID,
       worksheet_item_property: [
         {
           ITEM_ID: selectedWorksheetData.ITEM_ID,
@@ -325,7 +301,6 @@ export class ItemStorePropertiesLogComponent implements OnInit {
       ],
     };
 
-    console.log('Verification payload:', payload.COMPANY_ID); 
     this.dataservice.verifyItemStoreProperties(payload).subscribe(
       (response) => {
         this.dataGrid.instance.refresh();
@@ -335,7 +310,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
               message: 'Worksheet Verified Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
         } else {
@@ -344,22 +319,20 @@ export class ItemStorePropertiesLogComponent implements OnInit {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       },
-      (error) => {}
+      (error) => {},
     );
   }
 
   onRowRemoving(event: any) {
     const selectedRow = event.data; // Get the data of the selected row
     const id = selectedRow.ID;
-    console.log('Delete button clicked for ID:', id);
     if (id) {
       this.dataservice.deleteWorksheet(id).subscribe(
         (response) => {
-          console.log('Worksheet deleted successfully:', response);
           const index = this.logList.findIndex((item) => item.ID === id);
           if (index !== -1) {
             this.logList.splice(index, 1); // Remove item from the array
@@ -369,7 +342,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
         (error) => {
           console.error('Error deleting worksheet:', error);
           event.cancel = true; // Prevent row removal if there's an error
-        }
+        },
       );
     } else {
       console.warn('No valid row data to delete');

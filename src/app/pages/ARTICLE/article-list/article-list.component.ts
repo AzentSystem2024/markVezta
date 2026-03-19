@@ -164,14 +164,13 @@ export class ArticleListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/article');
@@ -185,20 +184,14 @@ export class ArticleListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.sesstion_Details();
     this.getArticles();
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   getArticles() {
@@ -226,10 +219,6 @@ export class ArticleListComponent {
                 );
 
                 resolve(formattedData); // Return formatted data
-                console.log(
-                  ' Sorted Article List (latest first):',
-                  formattedData,
-                );
               } else {
                 resolve([]); // Handle empty or invalid response
                 console.warn(
@@ -352,7 +341,6 @@ export class ArticleListComponent {
   }
 
   onEditArticle(event: any) {
-    console.log(event, 'EVENT');
     event.cancel = true;
 
     const articleId = event.data.ID;
@@ -366,18 +354,13 @@ export class ArticleListComponent {
       ID: articleId,
     };
 
-    console.log(payload, 'PAYLOADDDDDDDDDDDDDDDDDDDDDD');
-    console.log(payload, 'PAYLOAD');
-
     this.dataService.selectArticle(articleId).subscribe((response: any) => {
       this.selectedArticle = response.Data;
       this.editArticlePopupOpened = true;
-      console.log(response, 'RESPONSE');
     });
   }
 
   onDeleteArticle(event: any) {
-    console.log(event.data);
     const articleArtNo = event.data.ART_NO;
     const color = event.data.COLOR;
     const categoryId = event.data.CATEGORY_ID;
@@ -391,7 +374,6 @@ export class ArticleListComponent {
     };
 
     event.cancel = true;
-    console.log(articleArtNo);
     // Call your delete API
     this.dataService.deleteArticle(payload).subscribe(
       (response: any) => {

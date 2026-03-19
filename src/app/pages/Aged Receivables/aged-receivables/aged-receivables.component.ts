@@ -44,14 +44,12 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-aged-receivables',
   templateUrl: './aged-receivables.component.html',
-  styleUrls: ['./aged-receivables.component.scss']
+  styleUrls: ['./aged-receivables.component.scss'],
 })
 export class AgedReceivablesComponent {
-
-  
-  AgedList_Datasource: any[]=[]
+  AgedList_Datasource: any[] = [];
   isFilterRowVisible: boolean = false;
-  isViewInvoice:boolean=false
+  isViewInvoice: boolean = false;
   BalanceSheetReport: any = [];
   auto: string = 'auto';
   isEmptyDatagrid: boolean = true;
@@ -74,35 +72,44 @@ export class AgedReceivablesComponent {
   formatted_To_date: any;
   HeadId: any;
   selected_fin_id: any;
-customer_list:any[]=[]
-  select_customer_id:any
+  customer_list: any[] = [];
+  select_customer_id: any;
   selectedInvoice: any;
-  defaultDate: Date = new Date();   
+  defaultDate: Date = new Date();
   selectedYear: number | null = null;
-   years: number[] = [];
-   monthDataSource: { name: string; value: any }[];
-   selectedmonth: any = '';
-  customer_details: { CUSTOMER_ID: any; SALE_ID: any; DATE_FROM: any; DATE_TO: string; COMPANY_ID: any; };
-  constructor(private dataservice: DataService,private cdr: ChangeDetectorRef,private router:Router)
-  {
-    this.sesstion_Details()
-    this.get_customer_list()
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[];
+  selectedmonth: any = '';
+  customer_details: {
+    CUSTOMER_ID: any;
+    SALE_ID: any;
+    DATE_FROM: any;
+    DATE_TO: string;
+    COMPANY_ID: any;
+  };
+  constructor(
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {
+    this.sesstion_Details();
+    this.get_customer_list();
     this.onToDateChange({ value: this.defaultDate });
 
-     //============Year field dataSource===============
+    //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
     this.selectedYear = currentYear;
-      //============Month field dataSource===============
-     this.monthDataSource = this.dataservice.getMonths();
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataservice.getMonths();
   }
   ngOnInit() {
-  // initialize with today's date
-  // this.onToDateChange({ value: this.defaultDate });
-   //get datasource======== function call==========
-   const today = new Date();
+    // initialize with today's date
+    // this.onToDateChange({ value: this.defaultDate });
+    //get datasource======== function call==========
+    const today = new Date();
     const SystemDate =
       today.getFullYear() +
       '-' +
@@ -110,12 +117,12 @@ customer_list:any[]=[]
       '-' +
       String(today.getDate()).padStart(2, '0');
 
-      this.formatted_from_date = SystemDate;
-      this.formatted_To_date = SystemDate;
-this.GET_CUSTOMER_LIST()
-}
+    this.formatted_from_date = SystemDate;
+    this.formatted_To_date = SystemDate;
+    this.GET_CUSTOMER_LIST();
+  }
 
- //================ Year value change ===================
+  //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
     this.selectedmonth = '';
@@ -131,156 +138,135 @@ this.GET_CUSTOMER_LIST()
     }
   }
 
-
-   //================Month value change ===================
+  //================Month value change ===================
   onMonthValueChanged(e: any) {
     this.selectedmonth = e.value ?? '';
     if (this.selectedmonth === '') {
       this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
       this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
     } else {
-      this.formatted_from_date = new Date(this.selectedYear, this.selectedmonth, 1);
+      this.formatted_from_date = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
       this.formatted_To_date = new Date(
         this.selectedYear,
         this.selectedmonth + 1,
-        0
+        0,
       );
     }
   }
-           sesstion_Details(){
-        const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-        console.log(sessionData,'=================session data==========')
-    
-        this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-        console.log(this.selected_Company_id,'============selected_Company_id==============')
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
-            this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-            const sessionYear=sessionData.FINANCIAL_YEARS
-            console.log(sessionYear,'==================session year==========')
-const financialYeaDate=sessionYear[0].DATE_FROM
-console.log(financialYeaDate,'=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[')
-this.formatted_from_date=financialYeaDate
+    const sessionYear = sessionData.FINANCIAL_YEARS;
+    const financialYeaDate = sessionYear[0].DATE_FROM;
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id==================='
-    );
+    this.formatted_from_date = financialYeaDate;
+  }
 
-        
-      }
-        
-            toggleFilterRow = () => {
-            this.isFilterRowVisible = !this.isFilterRowVisible;
-             this.cdr.detectChanges();
-          };
-        get_customer_list(){
-          const payload = {
-            NAME:'CUSTOMER',
-            COMPANY_ID : this.selected_Company_id
-          }
-          this.dataservice.Customer_Dropdown(payload).subscribe((res:any)=>{
-            console.log(res)
-            this.customer_list=res
-            console.log(this.customer_list)
-          })
-        }
-        
-        
-        
-             onExporting(event: any) {
-              const fileName = 'BalanceSheetReport';
-              this.dataservice.exportDataGridReport(event, fileName);
-            }
-        
-            get_sessionstorage_data(){
-        this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
-         console.log(this.savedUserData)
-        this.company_list=this.savedUserData.Companies
-        
-        }
-        
-        get_fin_id(){
-          this.fin_id=this.savedUserData.FINANCIAL_YEARS
-           if (this.fin_id.length) {
-              this.finID = this.fin_id[0].FIN_ID;
-            }
-        console.log(this.fin_id,'========financial year')
-        }
-        
-        onCompanyChange(event:any){
-          console.log(event);
-          this.company_id=event.value
-          console.log( this.company_id,'=====company id');
-        }
-        
-        
-        onFromDateChange(event: any) {
-          const rawDate: Date = new Date(event.value);
-          this.formatted_from_date = this.formatDate(rawDate);
-          console.log('Formatted Date:', this.formatted_from_date); // example: "2025-04-01"
-        }
-         
-         
-        onToDateChange(event: any) {
-          const rawDate: Date = new Date(event.value);
-          this.formatted_To_date = this.formatDate(rawDate);
-          console.log('Formatted Date:', this.formatted_To_date); // example: "2025-04-01"
-        }
-        
-        formatDate(date: Date): string {
-          const year = date.getFullYear();
-          const month = ('0' + (date.getMonth() + 1)).slice(-2);
-          const day = ('0' + date.getDate()).slice(-2);
-          return `${year}-${month}-${day}`;
-        }
-        
-  GET_CUSTOMER_LIST() {
-
-        const payload = {
+  toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
+  get_customer_list() {
+    const payload = {
+      NAME: 'CUSTOMER',
       COMPANY_ID: this.selected_Company_id,
-      CUSTOMER_ID:this.select_customer_id||0,
-      DATE_FROM: this.formatted_from_date ,
-      DATE_TO: this.formatted_To_date 
     };
-
-
-    console.log(payload,'=====================payload========================================')
-    this.dataservice.Aged_receivable_report_Api(payload).subscribe((res:any)=>{
-      console.log(res)
-     this.AgedList_Datasource=res. Data
-    })
-  }
-    onViewClick(e: any) {
-    console.log(e, '=======event==========');
-     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
-    const trans_id = e.row.data.TRANS_ID;    
-const customer_id= e.row.data.CUSTOMER_ID
-const invoice_id= e.row.data.BILL_ID
-
-if(customer_id){
-
-  this.customer_details={
-    CUSTOMER_ID:customer_id,
-    SALE_ID:invoice_id,
-    DATE_FROM:this.formatted_from_date,
-    DATE_TO:this.formatted_To_date,
-    COMPANY_ID: this.selected_Company_id
-  }
-  sessionStorage.setItem('customerDetails', JSON.stringify(this.customer_details));
-
-  // ✅ Retrieve and parse back into object
-  const storedData = sessionStorage.getItem('customerDetails');
-  if (storedData) {
-    this.customer_details = JSON.parse(storedData);
+    this.dataservice.Customer_Dropdown(payload).subscribe((res: any) => {
+      this.customer_list = res;
+    });
   }
 
-    this.router.navigate(['/aged-receivable-details']);
-   
+  onExporting(event: any) {
+    const fileName = 'BalanceSheetReport';
+    this.dataservice.exportDataGridReport(event, fileName);
+  }
+
+  get_sessionstorage_data() {
+    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.company_list = this.savedUserData.Companies;
+  }
+
+  get_fin_id() {
+    this.fin_id = this.savedUserData.FINANCIAL_YEARS;
+    if (this.fin_id.length) {
+      this.finID = this.fin_id[0].FIN_ID;
     }
   }
-      formatDates(cellData: any): string {
+
+  onCompanyChange(event: any) {
+    this.company_id = event.value;
+  }
+
+  onFromDateChange(event: any) {
+    const rawDate: Date = new Date(event.value);
+    this.formatted_from_date = this.formatDate(rawDate);
+    // example: "2025-04-01"
+  }
+
+  onToDateChange(event: any) {
+    const rawDate: Date = new Date(event.value);
+    this.formatted_To_date = this.formatDate(rawDate);
+    // example: "2025-04-01"
+  }
+
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+
+  GET_CUSTOMER_LIST() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      CUSTOMER_ID: this.select_customer_id || 0,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+    };
+
+    this.dataservice
+      .Aged_receivable_report_Api(payload)
+      .subscribe((res: any) => {
+        this.AgedList_Datasource = res.Data;
+      });
+  }
+  onViewClick(e: any) {
+    const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
+    const trans_id = e.row.data.TRANS_ID;
+    const customer_id = e.row.data.CUSTOMER_ID;
+    const invoice_id = e.row.data.BILL_ID;
+
+    if (customer_id) {
+      this.customer_details = {
+        CUSTOMER_ID: customer_id,
+        SALE_ID: invoice_id,
+        DATE_FROM: this.formatted_from_date,
+        DATE_TO: this.formatted_To_date,
+        COMPANY_ID: this.selected_Company_id,
+      };
+      sessionStorage.setItem(
+        'customerDetails',
+        JSON.stringify(this.customer_details),
+      );
+
+      // ✅ Retrieve and parse back into object
+      const storedData = sessionStorage.getItem('customerDetails');
+      if (storedData) {
+        this.customer_details = JSON.parse(storedData);
+      }
+
+      this.router.navigate(['/aged-receivable-details']);
+    }
+  }
+  formatDates(cellData: any): string {
     const date = new Date(cellData);
     if (isNaN(date.getTime())) return '';
 
@@ -291,137 +277,134 @@ if(customer_id){
     return `${day}-${month}-${year}`;
   }
 
-    handleClose(){
-  this.isViewInvoice = false
-    }
-      summaryColumnsData = {
-        groupItems: [
-    {
-      column: 'AGE_0_30',
-      summaryType: 'sum',
-      displayFormat: '{0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'AGE_31_60',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'AGE_61_90',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'AGE_91_120',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'AGE_121_150',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'AGE_151_180',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'AGE_ABOVE_180',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-    {
-      column: 'BALANCE',
-      summaryType: 'sum',
-      displayFormat: ' {0}',
-      valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      alignByColumn: true,
-    },
-  ],
-      totalItems: [
-
-            {
-          column: 'AGE_0_30',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'AGE_0_30',
-          alignment: 'right',
-        },
-        
-        {
-          column: 'AGE_31_60',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'AGE_31_60',
-          alignment: 'right',
-        },
-            {
-          column: 'AGE_61_90',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'AGE_61_90',
-          alignment: 'right',
-        },
-            {
-          column: 'AGE_91_120',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'AGE_91_120',
-          alignment: 'right',
-        },
-                    {
-          column: 'AGE_151_180',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'AGE_151_180',
-          alignment: 'right',
-        },
-                    {
-          column: 'AGE_ABOVE_180',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'AGE_91_120',
-          alignment: 'right',
-        },
-            {
-          column: 'TOTAL_BALANCE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'TOTAL_BALANCE',
-          alignment: 'right',
-        },
-     
-      ],
-      calculateCustomSummary: (options) => {
-        if (options.name === 'summaryRow') {
-          // Custom logic if needed
-        }
+  handleClose() {
+    this.isViewInvoice = false;
+  }
+  summaryColumnsData = {
+    groupItems: [
+      {
+        column: 'AGE_0_30',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
       },
-    };
-}
+      {
+        column: 'AGE_31_60',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'AGE_61_90',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'AGE_91_120',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'AGE_121_150',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'AGE_151_180',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'AGE_ABOVE_180',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'BALANCE',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+    ],
+    totalItems: [
+      {
+        column: 'AGE_0_30',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'AGE_0_30',
+        alignment: 'right',
+      },
 
+      {
+        column: 'AGE_31_60',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'AGE_31_60',
+        alignment: 'right',
+      },
+      {
+        column: 'AGE_61_90',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'AGE_61_90',
+        alignment: 'right',
+      },
+      {
+        column: 'AGE_91_120',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'AGE_91_120',
+        alignment: 'right',
+      },
+      {
+        column: 'AGE_151_180',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'AGE_151_180',
+        alignment: 'right',
+      },
+      {
+        column: 'AGE_ABOVE_180',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'AGE_91_120',
+        alignment: 'right',
+      },
+      {
+        column: 'TOTAL_BALANCE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'TOTAL_BALANCE',
+        alignment: 'right',
+      },
+    ],
+    calculateCustomSummary: (options) => {
+      if (options.name === 'summaryRow') {
+        // Custom logic if needed
+      }
+    },
+  };
+}
 
 @NgModule({
   imports: [
@@ -456,8 +439,7 @@ if(customer_id){
     DxValidationGroupModule,
     DxAutocompleteModule,
     DxTagBoxModule,
-    ViewInvoiceModule
-    
+    ViewInvoiceModule,
   ],
   providers: [],
   declarations: [AgedReceivablesComponent],

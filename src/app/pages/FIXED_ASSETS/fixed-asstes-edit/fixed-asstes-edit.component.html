@@ -181,6 +181,7 @@ icon="plus"
         label="Net Depreciation"
         [(value)]="FixedAssetsData.NET_DEPRECIATION"
         labelMode="floating"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
         [readOnly]="true"
       ></dx-number-box>
     </div>
@@ -191,6 +192,7 @@ icon="plus"
         label="Residual Value"
         [(value)]="FixedAssetsData.RESIDUAL_VALUE"
         labelMode="floating"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dx-number-box>
 
       <dx-text-box
@@ -205,6 +207,7 @@ icon="plus"
         [(value)]="FixedAssetsData.CURRENT_VALUE"
         format="#,##0.00"
         labelMode="floating"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
         [readOnly]="true"
       ></dx-number-box>
     </div>

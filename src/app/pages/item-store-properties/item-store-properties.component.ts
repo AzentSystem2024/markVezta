@@ -108,7 +108,7 @@ export class ItemStorePropertiesComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private route: ActivatedRoute,
-    private worksheetservice: WorksheetService
+    private worksheetservice: WorksheetService,
   ) {
     dataservice.getDropdownData('DEPARTMENT').subscribe((data) => {
       this.department = data;
@@ -118,55 +118,43 @@ export class ItemStorePropertiesComponent {
     });
     dataservice.getDropdownData('BRAND').subscribe((data) => {
       this.brand = data;
-      // console.log(this.brand, 'BRAND');
     });
   }
 
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
-    console.log(this.AllowCommitWithSave, 'Allowcommit');
     this.sesstion_Details();
     this.listStoreItemProperty();
     this.loadStore();
     this.updateColumnVisibility();
     this.userId = sessionStorage.getItem('UserId');
-    console.log(this.userId, 'USERID');
     this.extractStoreProperties(this.store);
   }
 
   listStoreItemProperty() {
-    console.log('HELLO - No valid worksheetData found, fetching from service.');
-
     this.dataservice.getStoreItemPropertyList().subscribe((response) => {
       this.itemStoresList = response.data;
-      console.log(
-        'Using service data for itemStoresList:',
-        this.itemStoresList
-      );
 
       // Find items with matching ITEM_IDs from selectedItems
       const matchingItems = this.itemStoresList.filter((itemStore) => {
         return this.selectedItems.some(
-          (selectedItem) => selectedItem.ITEM_ID === itemStore.ITEM_ID
+          (selectedItem) => selectedItem.ITEM_ID === itemStore.ITEM_ID,
         );
       });
 
       // Log the matching items
-      console.log('Matching items with same ITEM_ID:', matchingItems);
     });
   }
 
-   sesstion_Details(){
-    const sessionData= JSON.parse(sessionStorage.getItem('savedUserData'))
-    console.log(sessionData,'=================session data==========')
-    this.selected_Company_id=sessionData.SELECTED_COMPANY.COMPANY_ID
-    console.log(this.selected_Company_id,'============selected_Company_id==============')    
-  }
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
 
   loadStore() {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.store = response;
     });
@@ -192,7 +180,6 @@ export class ItemStorePropertiesComponent {
       (items: any) => {
         this.items = items;
         this.itemStoresList = items.data;
-        console.log(this.itemStoresList, 'ITEMSTORESLIST');
         this.itemStoresList.forEach((item: any) => {
           this.fetchSelectedItem(item.ID);
         });
@@ -200,14 +187,13 @@ export class ItemStorePropertiesComponent {
       },
       (error) => {
         console.error('Error fetching items:', error);
-      }
+      },
     );
   }
 
   onSelectionChanged(event: any) {
     this.selectedRowCount = event.selectedRowKeys.length;
     this.selectedRowKeys = event.selectedRowKeys;
-    console.log(this.selectedRowKeys, 'IN ONSELECTIONCHANGED');
     const selectedItems = event.selectedRowsData;
     if (selectedItems.length > 0) {
       const selectedRow = selectedItems[0];
@@ -239,23 +225,23 @@ export class ItemStorePropertiesComponent {
           if (item.item_stores.length > 0) {
             item.IS_NOT_SALE_ITEM = this.aggregateProperty(
               item.item_stores,
-              'IS_NOT_SALE_ITEM'
+              'IS_NOT_SALE_ITEM',
             );
             item.IS_NOT_SALE_RETURN = this.aggregateProperty(
               item.item_stores,
-              'IS_NOT_SALE_RETURN'
+              'IS_NOT_SALE_RETURN',
             );
             item.IS_PRICE_REQUIRED = this.aggregateProperty(
               item.item_stores,
-              'IS_PRICE_REQUIRED'
+              'IS_PRICE_REQUIRED',
             );
             item.IS_NOT_DISCOUNTABLE = this.aggregateProperty(
               item.item_stores,
-              'IS_NOT_DISCOUNTABLE'
+              'IS_NOT_DISCOUNTABLE',
             );
             item.IS_INACTIVE = this.aggregateProperty(
               item.item_stores,
-              'IS_INACTIVE'
+              'IS_INACTIVE',
             );
           } else {
             item.STORE_NAME = 'No Store';
@@ -268,7 +254,7 @@ export class ItemStorePropertiesComponent {
       },
       (error) => {
         // console.error('Error fetching selected item:', error);
-      }
+      },
     );
   }
 
@@ -298,7 +284,6 @@ export class ItemStorePropertiesComponent {
     properties.forEach((property) => {
       if (!this.storeProperties.find((prop) => prop.name === property.name)) {
         this.storeProperties.push(property);
-        console.log(this.storeProperties, 'STOREPROPERTIES');
       }
     });
   }
@@ -306,7 +291,7 @@ export class ItemStorePropertiesComponent {
   updateEditedItems(property: string, newValue: boolean, rowData: any) {
     // Check if an edited item already exists for the selected store
     let editedItem = this.editedItems.find(
-      (item) => item.STORE_ID === this.selectedStoreId
+      (item) => item.STORE_ID === this.selectedStoreId,
     );
     if (!editedItem) {
       editedItem = {
@@ -322,9 +307,8 @@ export class ItemStorePropertiesComponent {
     // Iterate over selected row keys to update each corresponding worksheet item
     this.selectedRowKeys.forEach((selectedItem: any) => {
       const selectedId = selectedItem.ID;
-      console.log('Processing ITEM_ID:', selectedId);
       let worksheetItem = editedItem.worksheet_item_property.find(
-        (prop) => prop.ID === selectedId
+        (prop) => prop.ID === selectedId,
       );
 
       if (!worksheetItem) {
@@ -359,11 +343,7 @@ export class ItemStorePropertiesComponent {
       ) {
         worksheetItem[property] = rowData[property]; // Use current (old) value
       }
-
-      console.log('Updated worksheet item:', worksheetItem);
     });
-
-    console.log('Updated editedItems:', this.editedItems);
   }
 
   // Checkbox event handlers
@@ -381,8 +361,7 @@ export class ItemStorePropertiesComponent {
   handleCheckboxChange(e: any, property: string) {
     const newValue = e.value; // The new value from the checkbox
     const rowData = e.component.option('value'); // Get the corresponding row data
-    // console.log(newValue, 'NEWVALUE');
-    // console.log(rowData, 'ROWDATA');
+
     this.updateEditedItems(property, newValue, rowData); // Update the edited items with new value
   }
 
@@ -392,7 +371,6 @@ export class ItemStorePropertiesComponent {
       this.dataservice.saveWorksheetItemPropertyData(payload[0]).subscribe(
         (response: any) => {
           this.savedWorksheet = response;
-          console.log(response, 'RESPONSEEEEEEEEEEEEE');
           this.editedItems = []; // Clear edited items after successful save
           // this.dataGrid.instance.refresh(); // Refresh grid if needed
           if (response) {
@@ -401,7 +379,7 @@ export class ItemStorePropertiesComponent {
                 message: 'Worksheet Added Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
-              'success'
+              'success',
             );
             // this.dataGrid.instance.refresh();
           } else {
@@ -410,13 +388,13 @@ export class ItemStorePropertiesComponent {
                 message: 'Your Data Not Saved',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error'
+              'error',
             );
           }
         },
         (error) => {
           // console.error('Error saving items:', error);
-        }
+        },
       );
     }
   }
@@ -431,7 +409,6 @@ export class ItemStorePropertiesComponent {
       console.error('No saved worksheet to verify. Please save first.');
       return; // Prevent verifying if nothing is saved
     }
-    console.log(this.savedWorksheet, 'SAVEDWORKSHEETTTT');
     // Prepare the verification payload based on the saved worksheet
     const verificationPayload = {
       ID: this.savedWorksheet.ID, // Use appropriate fields from the savedWorksheet
@@ -466,7 +443,7 @@ export class ItemStorePropertiesComponent {
               message: 'Worksheet Verified Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           // this.dataGrid.instance.refresh();
         } else {
@@ -475,16 +452,15 @@ export class ItemStorePropertiesComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
-        console.log('Verification successful:', verifyResponse);
         this.isVerified = true;
       },
       (error) => {
         // Handle error
         console.error('Verification failed:', error);
-      }
+      },
     );
   }
   onApprove() {
@@ -520,7 +496,7 @@ export class ItemStorePropertiesComponent {
               message: 'Worksheet Approved Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.router.navigate(['/item-store-properties-log']);
           this.dataGrid.instance.refresh();
@@ -530,7 +506,7 @@ export class ItemStorePropertiesComponent {
               message: 'Your Data Not Saved',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -538,13 +514,11 @@ export class ItemStorePropertiesComponent {
 
   onPropertiesChange(event: any) {
     this.selectedProperties = event.value;
-    console.log(this.selectedProperties, 'IN ONPROPERTIESCHANGED');
     this.updateColumnVisibility();
   }
 
   onDropdownValueChanged(event: any) {
     this.storeId = event.value; // Get the selected store ID
-    // console.log(this.storeId, 'SELECTED STORE ID');
     if (!this.storeId || this.storeId === null) {
       this.selectedStoreId = null;
       this.itemStoresList = [];
@@ -556,11 +530,11 @@ export class ItemStorePropertiesComponent {
 
   getStoresById(storeId: any) {
     const payload = {
-      COMPANY_ID : this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.getStoresData(payload).subscribe((response) => {
       this.filteredStores = response.filter(
-        (store: any) => store.ID === storeId
+        (store: any) => store.ID === storeId,
       );
       if (this.filteredStores.length > 0) {
         this.listItemsByStoreId(storeId);

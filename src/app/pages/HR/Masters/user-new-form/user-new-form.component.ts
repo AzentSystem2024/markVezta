@@ -171,30 +171,24 @@ export class UserNewFormComponent {
   getUSerData() {
     this.dataservice.get_User_data().subscribe((data) => {
       this.userList = data;
-      console.log('datasource', this.userList);
     });
 
     this.dataservice.getCountryWithFlags().subscribe((data) => {
       this.countryCodes = data;
-      console.log(this.countryCodes, 'COUNTRY;;;;;;;;;;');
     });
   }
 
   get_Company_details() {
     this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
-      console.log(res);
       this.CompanyList_data = res.Data;
-      console.log(this.CompanyList_data);
 
       const company_id = this.newUserData.COMPANY_ID;
       this.CompanyData = this.CompanyList_data.filter((item) =>
         company_id.includes(item.ID),
       );
 
-      console.log(this.CompanyData);
       this.selectedRows = company_id; // This will auto-check rows in the grid
 
-      console.log('Preselected Companies:', this.selectedRows);
       this.isAddFormPopupOpened = false;
     });
   }
@@ -241,12 +235,11 @@ export class UserNewFormComponent {
 
   onSelectionChanged(e: any) {
     this.selectedRows = e.selectedRowKeys;
-    console.log('User selected:', this.selectedRows);
   }
 
   //   // Method to handle tab click and set selected index
   // onTabClick(event: any) {
-  //   console.log(event);
+  //     ;
   //   this.selectedIndex = event.itemIndex;
   // }
 
@@ -264,13 +257,8 @@ export class UserNewFormComponent {
   };
 
   autoBindWhatsapp() {
-    console.log('WhatsApp field focused.');
     setTimeout(() => {
       if (!this.newUserData.Whatsapp && this.newUserData.Mobile) {
-        console.log(
-          'Populating WhatsApp with Mobile:',
-          this.newUserData.Mobile,
-        );
         this.newUserData.Whatsapp = this.newUserData.Mobile;
       }
     }, 0);
@@ -444,8 +432,6 @@ export class UserNewFormComponent {
   //   // Keep digits only
   //   const sanitizedNumber = numberPart.replace(/\D/g, '');
 
-  //   console.log('Mobile digits:', sanitizedNumber.length);
-
   //   // Check exact length
   //   return sanitizedNumber.length === this.mobile_limit;
   // };
@@ -515,13 +501,6 @@ export class UserNewFormComponent {
     } else {
       pureNumber = fullValue.replace(/\D/g, '');
     }
-
-    console.log(
-      'Validating digits:',
-      pureNumber.length,
-      'against limit:',
-      this.mobile_limit,
-    );
 
     // Return true only if length matches exactly
     return pureNumber.length === this.mobile_limit;
@@ -667,17 +646,13 @@ export class UserNewFormComponent {
 
       // Update the mobile field with valid country code and mobile number
       this.newUserData.Mobile = `${dialCode} ${validMobileNumber}`;
-
-      console.log('Updated Mobile:', this.newUserData.Mobile); // For debugging
     }
   }
   onCountrycodeChange(e: any) {
-    console.log(e, '========event==============');
     const payload = {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      console.log(res);
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }
@@ -709,7 +684,6 @@ export class UserNewFormComponent {
       .writeText(this.generatedPassword)
       .then(() => {
         this.tooltipVisible = true;
-        console.log('Password copied to clipboard');
       })
       .catch((err) => {
         console.error('Error copying password to clipboard', err);
@@ -719,7 +693,6 @@ export class UserNewFormComponent {
 
   user_role_dropdown() {
     this.dataservice.get_userLevels_Dropdown_Api().subscribe((res: any) => {
-      console.log(res, '==========datedrp=======');
       this.userRole = res;
     });
   }

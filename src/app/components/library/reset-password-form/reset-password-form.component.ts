@@ -27,7 +27,6 @@ import notify from 'devextreme/ui/notify';
 import { AuthService, IResponse } from 'src/app/services';
 // import { UserService } from 'src/app/services/user.service';
 
-
 const notificationText =
   "We've sent a link to reset your password. Check your inbox.";
 
@@ -92,7 +91,7 @@ export class ResetPasswordFormComponent implements OnInit {
   onEmailOrPhoneInput(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
     this.isGetOtpButtonDisabled = !this.validateEmailOrPhone(
-      inputElement.value
+      inputElement.value,
     );
   }
 
@@ -132,7 +131,7 @@ export class ResetPasswordFormComponent implements OnInit {
               position: { at: 'top center', my: 'top center' },
               delay: 4000,
             },
-            'error'
+            'error',
           );
           this.isGetOtpButtonDisabled = false;
           this.otpSent = false;
@@ -190,7 +189,7 @@ export class ResetPasswordFormComponent implements OnInit {
           position: { at: 'top center', my: 'top center' },
           delay: 4000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -202,7 +201,6 @@ export class ResetPasswordFormComponent implements OnInit {
     this.validationGroup.instance.reset(); // Reset validation
     // // Generate a 6-digit OTP
     // this.generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    // console.log('Generated OTP:', this.generatedOtp);
 
     const data = {
       MobileNo: '',
@@ -210,11 +208,9 @@ export class ResetPasswordFormComponent implements OnInit {
     };
 
     // this.userservice.getOtp(data).subscribe((res) => {
-    //   // console.log(res,"result");
     //   if (res.Flag === 1) {
     //     this.UserID = res.UserID;
     //     const maskedContact = this.maskEmailOrPhone(res.EmailID);
-    //     // console.log(maskedContact,"maskedcontact")
     //     notify(
     //       {
     //         message: `OTP has been sent to ${maskedContact}`,
@@ -225,7 +221,6 @@ export class ResetPasswordFormComponent implements OnInit {
     //     );
     //     this.otpMessage = `OTP has been sent to ${maskedContact}`;
     //     this.generatedOtp = res.EmailOTP;
-    //     // console.log(this.generatedOtp, 'generated otp');
     //     // // Hide email/phone input and show OTP input
     //     this.loading = false;
     //     this.otpSent = true;
@@ -279,8 +274,6 @@ export class ResetPasswordFormComponent implements OnInit {
   verifyOtp() {
     this.Verifyloading = true;
     const otp = this.otpDigits.join('');
-    // console.log('Entered OTP:', otp);
-    // console.log('Generated OTP:', this.generatedOtp);
     if (otp === this.generatedOtp) {
       this.isVerifyOtpButtonDisabled = true;
       clearInterval(this.interval);
@@ -291,7 +284,7 @@ export class ResetPasswordFormComponent implements OnInit {
           position: { at: 'top center', my: 'top center' },
           delay: 4000,
         },
-        'success'
+        'success',
       );
       this.otpSent = false;
       this.otpVerified = true; // Show new password form
@@ -305,7 +298,7 @@ export class ResetPasswordFormComponent implements OnInit {
           position: { at: 'top center', my: 'top center' },
           delay: 4000,
         },
-        'error'
+        'error',
       );
     }
   }
@@ -328,7 +321,7 @@ export class ResetPasswordFormComponent implements OnInit {
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'error'
+        'error',
       );
       return; // Stop execution if the password does not meet the policy
     }
@@ -339,8 +332,6 @@ export class ResetPasswordFormComponent implements OnInit {
       ChangePasswordOnLogin: false,
       ModifiedFrom: this.UserID,
     };
-
-    // console.log(data, 'postdata');
 
     // this.userservice.reset_Password(data).subscribe((res) => {
     //   if (res.flag === '1') {
@@ -373,7 +364,6 @@ export class ResetPasswordFormComponent implements OnInit {
   getSecurityPolicyData() {
     // this.userservice.getUserSecurityPolicityData().subscribe((res: any) => {
     //   this.securityPolicyData = res.data[0];
-    //   // console.log('user security policy data', this.securityPolicyData);
     // });
   }
   checkNumbers(): boolean {
@@ -474,8 +464,8 @@ export class ResetPasswordFormComponent implements OnInit {
   }
 
   redirectToLogin() {
-     this.router.navigate(['/auth/login']);
-}
+    this.router.navigate(['/auth/login']);
+  }
 }
 @NgModule({
   imports: [
@@ -491,4 +481,4 @@ export class ResetPasswordFormComponent implements OnInit {
   declarations: [ResetPasswordFormComponent],
   exports: [ResetPasswordFormComponent],
 })
-export class ResetPasswordFormModule{}
+export class ResetPasswordFormModule {}

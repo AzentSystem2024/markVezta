@@ -50,6 +50,7 @@
         label="Amount"
         labelMode="floating"
         [readOnly]="isReadOnly"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
         [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
       >
         <dx-validator>
@@ -233,6 +234,7 @@
           dataField="DUE_AMOUNT"
           caption="Expense Amount"
           [readOnly]="isReadOnly"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
           [editorOptions]="{ showSpinButtons: true }"
           [allowEditing]="!isReadOnly"
         >
@@ -268,6 +270,7 @@
         width="200px"
         [readOnly]="isReadOnly"
         labelMode="floating"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
         [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
       ></dx-number-box>
     </div>

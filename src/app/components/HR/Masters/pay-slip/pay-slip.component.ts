@@ -69,7 +69,7 @@ export class PaySlipComponent {
 
   constructor(
     private dataService: DataService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {
     this.sesstion_Details();
   }
@@ -89,7 +89,7 @@ export class PaySlipComponent {
         const now = new Date();
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
           2,
-          '0'
+          '0',
         )}`;
       })();
     // Determine the month to display in PDF
@@ -103,7 +103,6 @@ export class PaySlipComponent {
     };
 
     this.dataService.getPaySlip(payload).subscribe((response: any) => {
-      console.log(response, 'payslip response');
       if (!response?.PaySlipDetails?.length) return;
 
       const doc = new jsPDF();
@@ -122,7 +121,7 @@ export class PaySlipComponent {
           })}`,
           105,
           25,
-          { align: 'center' }
+          { align: 'center' },
         );
         doc.line(10, 30, 200, 30);
         // --- Employee Info ---
@@ -140,15 +139,15 @@ export class PaySlipComponent {
         // --- Earnings and Deductions Table ---
         const earnings = emp.SalaryHeads.filter((h: any) => h.HEAD_TYPE === 1);
         const deductions = emp.SalaryHeads.filter(
-          (h: any) => h.HEAD_TYPE === 2
+          (h: any) => h.HEAD_TYPE === 2,
         );
         const totalEarnings = earnings.reduce(
           (sum, e) => sum + e.HEAD_AMOUNT,
-          0
+          0,
         );
         const totalDeductions = deductions.reduce(
           (sum, d) => sum + d.HEAD_AMOUNT,
-          0
+          0,
         );
         const netPay = totalEarnings - totalDeductions;
         autoTable(doc, {
@@ -210,7 +209,7 @@ export class PaySlipComponent {
           `RUPEES ${this.numberToWords(netPay)} ONLY`,
           (tableStartX + tableEndX) / 2,
           finalY + 20,
-          { align: 'center' }
+          { align: 'center' },
         );
 
         // Line below
@@ -290,20 +289,15 @@ export class PaySlipComponent {
     const [year, month] = e.value.split('-');
     this.selectedMonth = `${year}-${month}`;
     this.payloadDate = `${year}-${month}-09`;
-
-    console.log('Dropdown Value:', this.selectedMonth);
-    console.log('Payload Date:', this.payloadDate);
   }
 
   onEmployeeChange(e: any) {
     this.selectedEmployee = e.value;
-    console.log(this.selectedEmployee, 'SELECTED EMPLOYEE');
   }
 
   GetEmployeeList() {
     this.dataService.getDropdownData('EMPLOYEE').subscribe((res) => {
       this.employeeList = res;
-      console.log(this.employeeList, 'EMPLOYEELISTTTTTTTTTTTTTTT');
     });
   }
 
@@ -323,30 +317,16 @@ export class PaySlipComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
+
     this.selected_Company_name = sessionData.SELECTED_COMPANY.COMPANY_NAME;
     const sessionYear = sessionData.FINANCIAL_YEARS;
-    console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-    console.log(
-      this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[['
-    );
 
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id==================='
-    );
   }
 }
 

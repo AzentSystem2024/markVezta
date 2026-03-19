@@ -156,11 +156,14 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
 
   newGrnData = this.grnData;
   // demoArray: any;
-   demoArray: any[] = [];
+  demoArray: any[] = [];
 
   // getNewGrnData = () => ({ ...this.newGrnData });
 
-  constructor(private service: DataService, private ref: ChangeDetectorRef) {
+  constructor(
+    private service: DataService,
+    private ref: ChangeDetectorRef,
+  ) {
     const settingsData = sessionStorage.getItem('settings');
     const data = settingsData ? JSON.parse(settingsData) : null;
     // Access CURRENCY_ID
@@ -210,7 +213,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
     // Merge edits from demoArray into prepared.GRNDetails
     const mergedDetails = prepared.GRNDetails.map((row: any) => {
       const editedRow = this.demoArray?.find(
-        (demo: any) => demo.ITEM_ID === row.ITEM_ID
+        (demo: any) => demo.ITEM_ID === row.ITEM_ID,
       );
       return editedRow ? { ...row, ...editedRow } : row; // overwrite if edited
     });
@@ -218,7 +221,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
     return {
       ...prepared,
       GRNDetails: mergedDetails, //  full list with edits merged
-      GRN_DATE: new Date(),  //  override with current date
+      GRN_DATE: new Date(), //  override with current date
     };
   };
 
@@ -233,27 +236,15 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
-this.newGrnData.COMPANY_ID = this.selected_Company_id;
+
+    this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id==================='
-    );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
-    console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-    console.log(
-      this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[['
-    );
+
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_vat_id = this.sessionData.VAT_ID;
@@ -301,16 +292,18 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
   // }
 
   getPODetails(poId: any) {
-    this.service.getGrnPoDetails(poId, this.selected_Company_id).subscribe((res: any) => {
-      console.log(res, 'res');
-      this.poDetails = res.Podetails.map((item: any, index: number) => ({
-        ...item,
-        SL_NO: index + 1, // Add SL_NO property dynamically
-        QTY_TO_RECEIVE: item.PO_QUANTITY - item.RETURN_QTY_QTY,
-        SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
-      }));
-      console.log(this.poDetails, 'Updated poDetails with SL_NO');
-    });
+    this.service
+      .getGrnPoDetails(poId, this.selected_Company_id)
+      .subscribe((res: any) => {
+        console.log(res, 'res');
+        this.poDetails = res.Podetails.map((item: any, index: number) => ({
+          ...item,
+          SL_NO: index + 1, // Add SL_NO property dynamically
+          QTY_TO_RECEIVE: item.PO_QUANTITY - item.RETURN_QTY_QTY,
+          SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
+        }));
+        console.log(this.poDetails, 'Updated poDetails with SL_NO');
+      });
     this.newGrnData.SUPP_GROSS_AMOUNT = this.poDetails[0].SUPP_GROSS_AMOUNT;
     this.newGrnData.SUPP_NET_AMOUNT = this.poDetails[0].SUPP_NET_AMOUNT;
   }
@@ -318,7 +311,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
   onStoreValueChanged(e: any) {
     const storeid = e.value;
     this.service
-      .getPendingPo(storeid, this.supplierId,this.selected_Company_id)
+      .getPendingPo(storeid, this.supplierId, this.selected_Company_id)
       .subscribe((res: any) => {
         this.poList = res.data;
         this.filteredPOList = [...this.poList];
@@ -356,9 +349,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
   // }
 
   updateCell(event: any) {
-    console.log(event, 'event');
     const updatedRow = { ...event.oldData, ...event.data };
-    console.log(updatedRow, 'updatedRow');
     // const updatedRow = event.key; // Get the updated row
     const updatedData = event.data; // Get the updated data
     console.log(updatedData, 'updateddata');
@@ -375,7 +366,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
     const index = this.demoArray.findIndex(
       (item) =>
         item.ITEM_ID === updatedData.ITEM_ID &&
-        item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID
+        item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID,
     );
     const enrichedData = {
       ...updatedData,
@@ -429,7 +420,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          2000
+          2000,
         );
 
         // Optionally reset the RECEIVED_QTY field or prevent further processing
@@ -453,7 +444,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
       const idx = this.poDetails.findIndex(
         (r) =>
           r.PO_DETAIL_ID === updatedRow.PO_DETAIL_ID &&
-          r.ITEM_ID === updatedRow.ITEM_ID
+          r.ITEM_ID === updatedRow.ITEM_ID,
       );
 
       if (idx > -1) {
@@ -538,7 +529,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
 
       // Add the updated row to the array of updated items
       const existingIndex = this.updatedItems.findIndex(
-        (item) => item.SL_NO === updatedRow.SL_NO
+        (item) => item.SL_NO === updatedRow.SL_NO,
       );
 
       if (existingIndex > -1) {
@@ -581,7 +572,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
         const isDuplicate = this.newGrnData.GRNDetails.some(
           (existingItem) =>
             existingItem.PO_DETAIL_ID === item.PO_DETAIL_ID &&
-            existingItem.ITEM_ID === item.ITEM_ID
+            existingItem.ITEM_ID === item.ITEM_ID,
         );
 
         if (!isDuplicate) {
@@ -627,7 +618,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
           (existingCost) =>
             existingCost.STORE_ID === costData.STORE_ID &&
             existingCost.COST_ID === costData.COST_ID &&
-            existingCost.ITEM_ID === costData.ITEM_ID
+            existingCost.ITEM_ID === costData.ITEM_ID,
         );
 
         if (!isDuplicate) {
@@ -637,7 +628,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
 
       console.log(
         this.newGrnData.GRN_Item_Cost,
-        'Updated GRN_Item_Cost with Proportional Values'
+        'Updated GRN_Item_Cost with Proportional Values',
       );
     }
 
@@ -678,14 +669,14 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
 
       // Filter out COST_IDs that already exist in this.newGrnData.GRN_Cost
       const existingCostIds = this.newGrnData.GRN_Cost.map(
-        (cost: any) => cost.COST_ID
+        (cost: any) => cost.COST_ID,
       );
 
       console.log(existingCostIds, 'existingCostIds');
 
       // Filter the data from formdata.GRN_Cost excluding the COST_IDs already present in newGrnData.GRN_Cost
       const filteredGRNCost = landedCostDropDown.filter(
-        (cost: any) => !existingCostIds.includes(cost.ID)
+        (cost: any) => !existingCostIds.includes(cost.ID),
       );
 
       this.landedCostDropDown = filteredGRNCost;
@@ -735,7 +726,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
 
       // Check if the costData already exists in costingMethodDataGrid
       const isExistingCost = this.costingMethodDataGrid.some(
-        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION
+        (cost: any) => cost.DESCRIPTION === this.costData.DESCRIPTION,
       );
 
       if (isExistingCost) {
@@ -755,7 +746,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
             position: { at: 'top right', my: 'top right' },
           },
           'error',
-          2000
+          2000,
         );
         return; // Exit the function
       }
@@ -771,7 +762,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
 
       // Check if the description already exists in dynamicColumns
       const existingDescriptions = this.dynamicColumns.map(
-        (col: any) => col.dataField
+        (col: any) => col.dataField,
       );
 
       // Push only new descriptions to dynamicColumns
@@ -835,7 +826,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
       this.ref.detectChanges();
     } else {
       console.error(
-        'Invalid costData. Ensure all required fields are populated.'
+        'Invalid costData. Ensure all required fields are populated.',
       );
     }
   }
@@ -884,7 +875,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
     // Update this.newGrnData.GRN_Cost with grnCost
     grnCost.forEach((newCost: any) => {
       const existingIndex = this.newGrnData.GRN_Cost.findIndex(
-        (cost: any) => cost.COST_ID === newCost.COST_ID
+        (cost: any) => cost.COST_ID === newCost.COST_ID,
       );
 
       if (existingIndex > -1) {
@@ -902,7 +893,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
     this.newGrnData.GRNDetails.forEach((detail: any) => {
       // Find the matching entry in poDetails
       const matchingPoDetail = this.poDetails.find(
-        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID
+        (poDetail: any) => poDetail.ITEM_ID === detail.ITEM_ID,
       );
 
       if (matchingPoDetail) {
@@ -930,7 +921,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
 
         // Filter all matching rows in poDetails using the description
         const matchingRows = this.poDetails.filter((poRow: any) =>
-          Object.keys(poRow).some((key) => key.toUpperCase() === description)
+          Object.keys(poRow).some((key) => key.toUpperCase() === description),
         );
 
         console.log(matchingRows, 'Matching Rows');
@@ -941,7 +932,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
             const existingEntry = this.newGrnData.GRN_Item_Cost.find(
               (item: any) =>
                 item.DESCRIPTION.toUpperCase() === description &&
-                item.ITEM_ID === matchingRow.ITEM_ID // Match with the description heading
+                item.ITEM_ID === matchingRow.ITEM_ID, // Match with the description heading
             );
 
             if (existingEntry) {
@@ -952,7 +943,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
               existingEntry.AMOUNT = matchingRow[description]; // Update AMOUNT using the description key
             } else {
               console.warn(
-                `No existing entry found in GRN_Item_Cost for DESCRIPTION: ${description}`
+                `No existing entry found in GRN_Item_Cost for DESCRIPTION: ${description}`,
               );
 
               this.newGrnData.GRN_Item_Cost.push({
@@ -968,7 +959,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
           });
         } else {
           console.log(
-            `No matching rows found in poDetails for description: ${description}`
+            `No matching rows found in poDetails for description: ${description}`,
           );
         }
       });
@@ -982,7 +973,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
   getTotalQuantity(): any {
     return this.poDetails.reduce(
       (total, item) => total + (item.QUANTITY || 0),
-      0
+      0,
     );
   }
 
@@ -1056,7 +1047,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
 
       this.poDetails = this.processPoDetails(
         this.poDetails,
-        this.newGrnData.GRN_Item_Cost
+        this.newGrnData.GRN_Item_Cost,
       );
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
@@ -1068,7 +1059,6 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
           return sum + Number(item.AMOUNT || 0);
         }, 0)
         .toFixed(2);
-
 
       this.newGrnData.GRNDetails = this.poDetails.map((item) => ({
         ID: item.ID,
@@ -1127,9 +1117,9 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
       const uniqueDescriptions = Array.from(
         new Set(
           this.newGrnData.GRN_Item_Cost.map((cost) =>
-            cost.DESCRIPTION.toUpperCase()
-          )
-        )
+            cost.DESCRIPTION.toUpperCase(),
+          ),
+        ),
       );
 
       // Step 2: Generate dynamic columns based on unique DESCRIPTION values
@@ -1148,7 +1138,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
   getCostsForItem(itemId: string) {
     console.log(itemId, ':::::::::');
     const data = this.newGrnData.GRN_Item_Cost.filter(
-      (cost) => cost.ITEM_ID === itemId
+      (cost) => cost.ITEM_ID === itemId,
     );
     console.log(data, '11111111111111111111111111111111111111111');
     return data;
@@ -1163,7 +1153,7 @@ this.newGrnData.COMPANY_ID = this.selected_Company_id;
     const updatedPoDetails = poDetails.map((poDetail) => {
       // Find matching costs for the ITEM_ID
       const itemCosts = grnItemCost.filter(
-        (cost) => cost.ITEM_ID === poDetail.ITEM_ID
+        (cost) => cost.ITEM_ID === poDetail.ITEM_ID,
       );
 
       // Add cost fields dynamically
