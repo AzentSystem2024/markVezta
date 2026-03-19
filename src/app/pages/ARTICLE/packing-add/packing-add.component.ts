@@ -506,6 +506,30 @@ export class PackingAddComponent {
     this.selectedRowKeys = e.selectedRowKeys;
   }
 
+  // onEditorPreparing(e: any) {
+
+  //   console.log(e, 'EDITOR PREPARING EVENT');
+  //   const rowData = e.row?.data;
+  //   console.log(rowData, 'ROW DATA IN EDITOR PREPARING');
+
+  //   const sizeQtyString = `${rowData.Size}x${rowData.QUANTITY}`;
+  //   console.log(sizeQtyString, 'SIZE QUANTITY STRING');
+
+  //   // this.combination_value.push(sizeQtyString); // Add the size and quantity to the combination_value array
+  //   if (!this.combination_value.includes(sizeQtyString)) {
+  //     this.combination_value.push(sizeQtyString);
+  //   }
+  //   console.log(this.combination_value, 'COMBINATION VALUE ARRAY');
+  //   const validData = this.combination_value.filter(
+  //     (item) => !item.includes('undefined'),
+  //   );
+
+  //   console.log(validData, 'VALID DATA AFTER FILTERING');
+
+  //   this.combinationString = validData.join(', '); // Join the array into a string
+  //   console.log(this.combinationString, 'COMBINATION STRING');
+  // }
+
   onEditorPreparing(e: any) {
     //  Run only for data rows & Quantity column
     if (e.parentType !== 'dataRow' || e.dataField !== 'QUANTITY') {
@@ -1057,6 +1081,11 @@ export class PackingAddComponent {
 
   addNewRow() {
     this.dataService.getItemsListForArticle().subscribe((res: any) => {
+      console.log(res);
+      console.log(
+        'PrePaymentListDataSource=============================:',
+        res.DataList,
+      );
       this.ItemListDataSource = res.DataList;
       this.ItempopupVisible = true; // Open popup
     });
@@ -1094,6 +1123,8 @@ export class PackingAddComponent {
 
   onItemSelect(e: any) {
     const selectedItem = e.data;
+
+    console.log('Selected Item:', selectedItem);
 
     // Example: store selected item
     this.selectedItem = selectedItem;

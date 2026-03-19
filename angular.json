@@ -48,7 +48,11 @@
               "raf",
               "rgbcolor",
               "jszip",
-              "jquery"
+              "jquery",
+              "ace-builds",
+              "file-saver",
+              "html2canvas",
+              "country-list-with-dial-code-and-flag"
             ],
             "outputPath": "build",
             "index": "src/index.html",

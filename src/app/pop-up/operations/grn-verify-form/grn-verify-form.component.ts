@@ -1245,6 +1245,91 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     this.costData = [];
     this.isCostPopUpOpened = false;
   }
+
+  onRowRemoved(e: any) {
+    const removed = e.data;
+    console.log('Removed row:', removed);
+
+    // 1. Remove from poDetails
+    this.poDetails = this.poDetails.filter(
+      (item) =>
+        !(
+          item.ITEM_ID === removed.ITEM_ID &&
+          item.PO_DETAIL_ID === removed.PO_DETAIL_ID
+        ),
+    );
+
+    // 2. Remove from demoArray
+    this.demoArray = this.demoArray.filter(
+      (item) =>
+        !(
+          item.ITEM_ID === removed.ITEM_ID &&
+          item.PO_DETAIL_ID === removed.PO_DETAIL_ID
+        ),
+    );
+
+    // 3. Remove from updatedItems
+    this.updatedItems = this.updatedItems.filter(
+      (item) =>
+        !(
+          item.ITEM_ID === removed.ITEM_ID &&
+          item.PO_DETAIL_ID === removed.PO_DETAIL_ID
+        ),
+    );
+
+    // 4. Remove from GRNDetails
+    if (Array.isArray(this.newGrnData.GRNDetails)) {
+      this.newGrnData.GRNDetails = this.newGrnData.GRNDetails.filter(
+        (item) =>
+          !(
+            item.ITEM_ID === removed.ITEM_ID &&
+            item.PO_DETAIL_ID === removed.PO_DETAIL_ID
+          ),
+      );
+    }
+
+    // 5. Remove related GRN_Item_Cost
+    if (Array.isArray(this.newGrnData.GRN_Item_Cost)) {
+      this.newGrnData.GRN_Item_Cost = this.newGrnData.GRN_Item_Cost.filter(
+        (cost) => cost.ITEM_ID !== removed.ITEM_ID,
+      );
+    }
+
+    // 6. Recalculate totals
+    this.totalQuantity = this.poDetails.reduce(
+      (sum, item) => sum + Number(item.RECEIVED_QTY || 0),
+      0,
+    );
+
+    this.newGrnData.NET_AMOUNT = this.poDetails
+      .reduce((sum, item) => sum + Number(item.AMOUNT || 0), 0)
+      .toFixed(2);
+
+    this.newGrnData.SUPP_NET_AMOUNT = this.poDetails
+      .reduce((sum, item) => sum + Number(item.SUPP_AMOUNT || 0), 0)
+      .toFixed(2);
+
+    this.LocalNetAmount = this.newGrnData.NET_AMOUNT;
+
+    this.formattedLocalNetAmount = `${this.newGrnData.NET_AMOUNT}`;
+    this.formattedNetAmount = `${this.newGrnData.SUPP_NET_AMOUNT}`;
+
+    // 7. Recalculate costing (IMPORTANT)
+    this.costingMethodDataGrid = this.costingMethodDataGrid.map((row) => {
+      if (row.CURRENCY.includes('%')) {
+        row.TOTAL = (
+          (Number(this.LocalNetAmount || 0) * Number(row.RATE || 0)) /
+          100
+        ).toFixed(2);
+      }
+      return row;
+    });
+
+    // 8. Force UI refresh
+    this.poDetails = [...this.poDetails];
+
+    console.log('After delete → poDetails:', this.poDetails);
+  }
 }
 @NgModule({
   imports: [

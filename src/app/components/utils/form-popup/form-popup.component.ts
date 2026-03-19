@@ -58,7 +58,7 @@ export class FormPopupComponent {
 
   @Input() visible = false;
 
-  @Input() isSaveDisabled = false;
+  @Input() isSaveDisabled: boolean = false;
 
   @Output() save = new EventEmitter();
 

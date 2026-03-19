@@ -314,9 +314,9 @@ import {
   EmployeeEditFormComponent,
   EmployeeEditFormFormModule,
 } from './components/HR/Masters/employee-edit-form/employee-edit-form.component';
-import { SalaryHeadsModule } from './HR/Masters/salary-heads/salary-heads.component';
-import { AdvanceTypesModule } from './HR/Masters/advance-types/advance-types.component';
-import { AdvanceModule } from './HR/Masters/advance/advance.component';
+import { SalaryHeadsModule } from './components/HR/Masters/salary-heads/salary-heads.component';
+import { AdvanceTypesModule } from './components/HR/Masters/advance-types/advance-types.component';
+import { AdvanceModule } from './components/HR/Masters/advance/advance.component';
 import { PayRevisionModule } from './components/HR/Masters/pay-revision/pay-revision.component';
 import { PayRevisionEditModule } from './components/HR/Masters/pay-revision-edit/pay-revision-edit.component';
 import {
@@ -344,7 +344,7 @@ import {
   TimesheetAddModule,
 } from './components/HR/Masters/timesheet-add/timesheet-add.component';
 import { TimesheetEditModule } from './components/HR/Masters/timesheet-edit/timesheet-edit.component';
-import { StaffEOSModule } from './HR/Masters/staff-eos/staff-eos.component';
+import { StaffEOSModule } from './components/HR/Masters/staff-eos/staff-eos.component';
 import {
   TimesheetVerifyComponent,
   TimesheetVerifyModule,
@@ -705,7 +705,7 @@ import {
 import {
   ViewSalaryAdvanceComponent,
   ViewSalaryAdvanceModule,
-} from './HR/Masters/view-salary-advance/view-salary-advance.component';
+} from './components/HR/Masters/view-salary-advance/view-salary-advance.component';
 import {
   InputVatComponent,
   InputVatModule,
@@ -881,7 +881,7 @@ import {
 import {
   DeliveryAddressComponent,
   DeliveryAddressModule,
-} from './HR/Masters/delivery-address/delivery-address.component';
+} from './components/HR/Masters/delivery-address/delivery-address.component';
 import {
   ChangePasswordComponent,
   ChangePasswordModule,

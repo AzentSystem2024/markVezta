@@ -234,6 +234,7 @@ export class ArticleEditComponent {
       NAME: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      console.log(response);
       this.itemsList = response;
     });
   }
@@ -907,6 +908,11 @@ export class ArticleEditComponent {
 
   addNewRow() {
     this.dataService.getItemsListForArticle().subscribe((res: any) => {
+      console.log(res);
+      console.log(
+        'PrePaymentListDataSource=============================:',
+        res.DataList,
+      );
       this.ItemListDataSource = res.DataList;
       this.ItempopupVisible = true; // Open popup
     });
@@ -944,6 +950,8 @@ export class ArticleEditComponent {
 
   onItemSelect(e: any) {
     const selectedItem = e.data;
+
+    console.log('Selected Item:', selectedItem);
 
     // Example: store selected item
     this.selectedItem = selectedItem;

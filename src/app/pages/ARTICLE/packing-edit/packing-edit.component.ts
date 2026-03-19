@@ -133,9 +133,15 @@ export class PackingEditComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
 
     this.company_code = sessionData.SELECTED_COMPANY.COMPANY_CODE;
+    console.log(this.company_code, '============company code==============');
     this.user_id = sessionData.USER_ID;
+    console.log(this.user_id, '============user id==================');
   }
 
   closePopup() {
@@ -176,6 +182,7 @@ export class PackingEditComponent {
       NAME: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      console.log(response);
       this.itemsList = response;
     });
   }
@@ -227,6 +234,8 @@ export class PackingEditComponent {
     const rowData = e.row?.data;
 
     if (this.isSameArticle(rowData)) {
+      console.log('Locked Row:', rowData.DESCRIPTION);
+
       e.editorOptions.readOnly = true; // Disable editing
     }
     if (
@@ -366,13 +375,16 @@ export class PackingEditComponent {
         ...changes['PackingData'].currentValue,
         ...incomingData,
       };
+      console.log(this.PackingData, 'UPDATED PACKING DATA');
       this.totalQuantity = this.PackingData.PAIR_QTY;
+      console.log(this.totalQuantity);
       this.isArticleFieldsDisabled = true;
       //    if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
       //   // Backend → UI
       //   this.PackingData.UNIT_ID = incomingData.Units.map(
       //     (u: any) => u.UNIT_ID
       //   );
+      //   console.log(this.PackingData.UNIT_ID, 'UNIT_ID in ngOnChanges');
       // } else if (incomingData.UNIT_ID) {
       //   // Backward compatibility
       //   this.PackingData.UNIT_ID = [incomingData.UNIT_ID];
@@ -387,6 +399,8 @@ export class PackingEditComponent {
       } else {
         this.PackingData.UNIT_ID = null;
       }
+
+      console.log('UNIT_ID after bind:', this.PackingData.UNIT_ID);
 
       if (
         this.PackingData.ART_NO &&
@@ -412,6 +426,9 @@ export class PackingEditComponent {
           .sort((a, b) => a.Size - b.Size);
       }
 
+      console.log(this.articleSizeData);
+
+      console.log(this.articleSizeData);
       // this.totalQuantity = this.articleSizeData.reduce(
       //   (sum: number, item: any) => {
       //     const qty = parseInt(item.Qty, 10);
@@ -494,7 +511,14 @@ export class PackingEditComponent {
 
       this.sizeGrid?.instance?.selectRows(keysToSelect, false);
       this.selectedRowKeys = keysToSelect;
+
+      console.log('Auto-selected:', keysToSelect);
     });
+
+    console.log(
+      this.PackingEntriesData,
+      '========packing entries data=========',
+    );
 
     this.getDropdownLists();
   }
@@ -629,6 +653,14 @@ export class PackingEditComponent {
     const packname = payload.DESCRIPTION;
     const packqty = payload.PAIR_QTY;
     const id = payload.ID;
+    console.log(
+      artno,
+      color,
+      categoryID,
+      unitID,
+      packname,
+      '=====================',
+    );
 
     //   Check for duplicate entry based on employee ID
     const duplicate = this.packing_list.find(
@@ -718,7 +750,28 @@ export class PackingEditComponent {
     });
   }
 
+  // updateQtyFromCombination(combination: string) {
+  //   console.log('Updating quantity from combination:', combination);
+
+  //   const sizeQtyMap = combination.split(',').reduce((map, entry) => {
+  //     const [size, qty] = entry.split('x');
+  //     map[size.trim()] = +qty.trim();
+  //     return map;
+  //   }, {} as { [key: string]: number });
+
+  //   console.log('Size Quantity Map:', sizeQtyMap);
+
+  //   console.log(' 2Updated articleSizeData:', this.articleSizeData);
+  //   this.articleSizeData = Object.entries(sizeQtyMap).map(([size, qty]) => ({
+  //     Size: size,
+  //     Qty: qty,
+  //   }));
+  //   console.log(' 3Updated articleSizeData:', this.articleSizeData);
+  // }
+
   onQuantityChanged() {
+    console.log('Row updated:', this.PackingEntriesData);
+
     this.totalQuantity = (this.PackingEntriesData || []).reduce(
       (sum: number, item: any) => {
         const qty = Number(item.QUANTITY || 0);
@@ -726,6 +779,8 @@ export class PackingEditComponent {
       },
       0,
     );
+
+    console.log('Total Quantity:', this.totalQuantity);
   }
 
   loadArticle() {
@@ -831,6 +886,41 @@ export class PackingEditComponent {
     this.selectedRowKeys = e.selectedRowKeys;
   }
 
+  // onEditorPreparing(e: any) {
+  //   if (e.dataField === 'QUANTITY' && e.row?.data) {
+  //     e.editorOptions.onValueChanged = (args: any) => {
+  //       const newQty = Number(args.value) || 0;
+
+  //       //  1. Update the grid row object
+  //       e.row.data.QUANTITY = newQty;
+
+  //       //  2. Ensure main datasource array is updated
+  //       const index = this.PackingEntriesData.findIndex(
+  //         (i: any) =>
+  //           i.ARTICLE_ID === e.row.data.ARTICLE_ID &&
+  //           i.SIZE === e.row.data.SIZE
+  //       );
+
+  //       if (index !== -1) {
+  //         this.PackingEntriesData[index].QUANTITY = newQty;
+  //       }
+
+  //       //  3. Recalculate total
+  //       this.onQuantityChanged();
+
+  //       console.log(
+  //         'Updated PackingEntriesData:',
+  //         this.PackingEntriesData.map(
+  //           (i: any) => `${i.SIZE}x${i.QUANTITY}`
+  //         )
+  //       );
+  //     this.combinationString = String(this.PackingEntriesData.map(
+  //           (i: any) => `${i.SIZE}x${i.QUANTITY}`
+  //         ))
+  //     };
+  //   }
+  // }
+
   onEditorPreparing(e: any) {
     //  Only for Quantity column in data rows
     if (e.parentType !== 'dataRow' || e.dataField !== 'QUANTITY') {
@@ -875,6 +965,8 @@ export class PackingEditComponent {
       this.combinationString = this.PackingEntriesData.map(
         (i: any) => `${i.SIZE}x${i.QUANTITY}`,
       ).join(', ');
+
+      console.log('Updated PackingEntriesData:', this.combinationString);
     };
   }
 
@@ -928,6 +1020,7 @@ export class PackingEditComponent {
     };
     this.dataService.View_PackingPrice_Change_Api(payload).subscribe({
       next: (res: any) => {
+        console.log(res, 'responseeeeeeeeeee');
         this.priceHistoryList = res.Data;
       },
     });
@@ -957,9 +1050,13 @@ export class PackingEditComponent {
       CHANGE_USER_ID: Number(this.user_id), // from session
     };
 
+    console.log('Price Change Payload:', payload);
+
     //  Call API
     this.dataService.Insert_PackingPrice_Change_Api(payload).subscribe({
       next: (res: any) => {
+        console.log('Price change saved:', res);
+
         notify(
           {
             message: 'Price updated successfully',
@@ -994,7 +1091,12 @@ export class PackingEditComponent {
     return !this.isSameArticle(e.row.data);
   };
   addNewRow() {
-    this.dataService.getItemsListForArticle().subscribe((res: any) => {
+    this.dataService.getItemsListForPacking().subscribe((res: any) => {
+      console.log(res);
+      console.log(
+        'PrePaymentListDataSource=============================:',
+        res.DataList,
+      );
       this.ItemListDataSource = res.DataList;
       this.ItempopupVisible = true; // Open popup
     });
@@ -1033,6 +1135,8 @@ export class PackingEditComponent {
   onItemSelect(e: any) {
     const selectedItem = e.data;
 
+    console.log('Selected Item:', selectedItem);
+
     // Example: store selected item
     this.selectedItem = selectedItem;
 
@@ -1040,22 +1144,65 @@ export class PackingEditComponent {
     this.ItempopupVisible = false;
   }
 
-  saveSelectedItems() {
-    const popupGrid = this.bomGridRef.instance; // popup grid
+  // saveSelectedItems() {
 
+  //   const popupGrid = this.bomGridRef.instance;   // popup grid
+
+  //   const selectedRows = popupGrid.getSelectedRowsData();
+
+  //   if (!selectedRows.length) {
+  //     return;
+  //   }
+
+  //   //  Remove empty row if exists
+  //   this.items = this.items.filter(
+  //     row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
+  //   );
+
+  //   selectedRows.forEach((item: any) => {
+
+  //     const exists = this.items.some(
+  //       x => x.ITEM === item.ITEM_CODE
+  //     );
+
+  //     if (!exists) {
+  //       this.items.push({
+  //         ITEM: item.ITEM_CODE,
+  //         DESCRIPTION: item.DESCRIPTION,
+  //         UOM: item.UOM,
+  //         QUANTITY: null,
+  //         ITEM_ID: item.ID
+  //       });
+  //     }
+
+  //   });
+
+  //   // refresh BOM grid
+  //   this.itemsGridRef.instance.refresh();
+
+  //   this.ItempopupVisible = false;
+
+  // }
+
+  saveSelectedItems() {
+    const popupGrid = this.bomGridRef.instance;
     const selectedRows = popupGrid.getSelectedRowsData();
 
-    if (!selectedRows.length) {
-      return;
-    }
+    // selected item IDs from popup
+    const selectedIds = selectedRows.map((item: any) => item.ID);
 
-    //  Remove empty row if exists
+    // 1️ Remove BOM items that are not selected anymore
+    this.items = this.items.filter(
+      (row) => !row.ITEM_ID || selectedIds.includes(row.ITEM_ID),
+    );
+
     this.items = this.items.filter(
       (row) => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY,
     );
 
+    // 2️ Add newly selected items
     selectedRows.forEach((item: any) => {
-      const exists = this.items.some((x) => x.ITEM === item.ITEM_CODE);
+      const exists = this.items.some((x) => x.ITEM_ID === item.ID);
 
       if (!exists) {
         this.items.push({

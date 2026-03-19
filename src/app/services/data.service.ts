@@ -152,9 +152,9 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
-  getItemsListForArticle(): Observable<any> {
-    return this.http.post(`${this.apiUrl}article/getItems`, {});
-  }
+  //  getItemsListForArticle(): Observable<any> {
+  //   return this.http.post(`${this.apiUrl}article/getItems`, {});
+  // }
 
   getLastAliasNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
@@ -168,9 +168,9 @@ export class DataService {
     return this.http.post(`${this.apiUrl}packing/Lastpartno`, {});
   }
 
-  getItemsListForPacking(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Packing/getItems`, {});
-  }
+  //  getItemsListForPacking(): Observable<any> {
+  //   return this.http.post(`${this.apiUrl}Packing/getItems`, {});
+  // }
 
   getArticleLastPartNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}article/Lastpartno`, {});
@@ -196,6 +196,10 @@ export class DataService {
       `${this.apiUrl}article/select/` + id,
       {}, // removed /${id}
     );
+  }
+
+  getItemsListForArticle(): Observable<any> {
+    return this.http.post(`${this.apiUrl}article/getItems`, {});
   }
 
   getLastOrderNo(item: any) {
@@ -3103,6 +3107,10 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}/packing/list`, body, {
       headers,
     });
+  }
+
+  getItemsListForPacking(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Packing/getItems`, {});
   }
 
   postPacking(DESCRIPTION: any, NO_OF_UNITS: any): Observable<any> {

@@ -184,9 +184,24 @@
         [expandMode]="'rowClick'"
       ></dxo-grouping>
 
-      <dxi-column dataField="ITEM_CODE" caption="Code"></dxi-column>
-      <dxi-column dataField="ITEM_NAME" caption="Description"></dxi-column>
-      <dxi-column dataField="UOM" caption="UOM"></dxi-column>
+      <dxi-column
+        dataField="ITEM_CODE"
+        caption="Code"
+        [fixed]="true"
+        fixedPosition="left"
+      ></dxi-column>
+      <dxi-column
+        dataField="ITEM_NAME"
+        caption="Description"
+        [fixed]="true"
+        fixedPosition="left"
+      ></dxi-column>
+      <dxi-column
+        dataField="UOM"
+        caption="UOM"
+        [fixed]="true"
+        fixedPosition="left"
+      ></dxi-column>
       <dxi-column
         dataField="OPENING_QTY"
         dataType="number"

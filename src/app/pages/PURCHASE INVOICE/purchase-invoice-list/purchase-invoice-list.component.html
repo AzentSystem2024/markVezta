@@ -129,8 +129,13 @@
         dataField="SUPPPLIER_NAME"
         caption="Supplier Name"
       ></dxi-column>
-      <dxi-column dataField="NET_AMOUNT" caption="NET Amount"></dxi-column>
-      <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
+      <dxi-column
+        dataField="NET_AMOUNT"
+        caption="NET Amount"
+        dataType="number"
+        format="#,##0.00"
+      ></dxi-column>
+      <dxi-column dataField="NARRATION" caption="Remark"></dxi-column>
       <dxi-column
         dataField="PURCH_DATE"
         caption="Date"

@@ -341,49 +341,6 @@ export class GrnComponent implements OnInit {
       }
     });
   }
-  // verifyGrnData() {
-  //   const data = this.grnVerifyForm.getNewGrnData();
-  //   console.log(data, 'grn verified data===============================');
-  //   this.service.updateGrnData(data).subscribe((res) => {
-  //     console.log('data verified', res);
-  //     if (res.Message === 'Success') {
-  //       notify(
-  //         {
-  //           message: 'Data Updated Successfully',
-  //           position: { at: 'top center', my: 'top center' },
-  //         },
-  //         'success',
-  //       );
-  //       this.getGrnLogData();
-  //       this.isVerifyPopupOpened = false;
-  //     }
-  //     else if (data.IS_APPROVED === true){
-  //        this.service.approveGrnData(data).subscribe((res) => {
-  //     console.log('data approved', res);
-  //     if ((res.Message = 'Success')) {
-  //       notify(
-  //         {
-  //           message: 'Data Approved Successfully',
-  //           position: { at: 'top center', my: 'top center' },
-  //         },
-  //         'success',
-  //       );
-  //       this.getGrnLogData();
-  //       this.isApprovePopupOpened = false;
-  //     }
-  //   })
-  //     }
-  //     else {
-  //       notify(
-  //         {
-  //           message: 'Your Data Not Verified',
-  //           position: { at: 'top right', my: 'top right' },
-  //         },
-  //         'error',
-  //       );
-  //     }
-  //   });
-  // }
 
   verifyGrnData() {
     const data = this.grnVerifyForm.getNewGrnData();

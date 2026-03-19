@@ -31,7 +31,7 @@
       >
         <div style="display: flex; gap: 4px">
           <dx-text-box
-            label="Supplier Invoice No."
+            label="Reference No."
             labelMode="floating"
             [(value)]="purchaseInvoiceFormData.DOC_NO"
             [width]="200"
@@ -39,7 +39,7 @@
           >
           </dx-text-box>
           <dx-date-box
-            label="Supplier Invoice Date"
+            label="Date"
             type="date"
             [(value)]="purchaseInvoiceFormData.SUPP_INV_DATE"
             labelMode="floating"
@@ -171,6 +171,7 @@
             dataField="HSN_CODE"
             caption="HSN Code"
             dataType="string"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="PRICE"
@@ -182,7 +183,7 @@
           ></dxi-column>
           <dxi-column
             dataField="PENDING_QTY"
-            caption="Pending Qty"
+            caption="Invoice Pending GRN"
             dataType="number"
             [allowEditing]="false"
           ></dxi-column>
@@ -262,7 +263,6 @@
             <dxi-total-item
               column="QUANTITY"
               summaryType="sum"
-              valueFormat="#,##0.00"
               displayFormat="{0}"
               alignment="right"
             ></dxi-total-item>
@@ -276,6 +276,13 @@
 
             <dxi-total-item
               column="TAX_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+              alignment="right"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="AMOUNT"
               summaryType="sum"
               valueFormat="#,##0.00"
               displayFormat="{0}"
@@ -299,7 +306,7 @@
             <dx-text-box
               label="Net Amount"
               labelMode="floating"
-              [value]="netAmount"
+              [value]="formattedNetAmount"
               [width]="150"
               [readOnly]="true"
             ></dx-text-box>
@@ -315,7 +322,7 @@
               [width]="200"
             ></dx-text-box>
             <dx-text-box
-              label="Narration"
+              label="Remark"
               labelMode="floating"
               [(value)]="purchaseInvoiceFormData.NARRATION"
               [width]="400"
@@ -375,7 +382,7 @@
   [showTitle]="true"
   title="Pending GRN"
   [dragEnabled]="true"
-  [closeOnOutsideClick]="true"
+  (onHiding)="onPopupClose()"
 >
   <div *dxTemplate="let data of 'content'">
     <dx-data-grid
