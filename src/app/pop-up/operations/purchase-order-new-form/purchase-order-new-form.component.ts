@@ -584,7 +584,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.poData.COMPANY_ID = this.companyID;
     this.poData.USER_ID = sessionData.USER_ID;
     console.log(
-      this.selected_Company_id,
+      this.poData.USER_ID,
       '============selected_Company_id==============',
     );
   }

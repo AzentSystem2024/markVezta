@@ -698,7 +698,7 @@ export class GrnViewFormComponent {
       );
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
-        return sum + Number(item.RECEIVED_QTY || 0);
+        return sum + Number(item.QUANTITY || 0);
       }, 0);
 
       this.newGrnData.NET_AMOUNT = this.poDetails

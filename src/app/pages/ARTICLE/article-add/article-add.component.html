@@ -606,7 +606,7 @@
 >
   <dx-data-grid
     #componentGridRef
-    [dataSource]="attachGridData"
+    [dataSource]="componentArticles"
     [showBorders]="true"
     keyExpr="ID"
     [headerFilter]="{ visible: true }"
@@ -638,10 +638,7 @@
       gap: 15px;
     "
   >
-    <dx-button
-      text="Cancel"
-      (onClick)="ComponentpopupVisible = false"
-    ></dx-button>
+    <dx-button text="Cancel" (onClick)="closecomponent()"></dx-button>
 
     <dx-button
       text="Save"

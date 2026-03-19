@@ -356,12 +356,12 @@
       width="76"
       [allowEditing]="false"
     ></dxi-column>
-    <dxi-column
+    <!-- <dxi-column
       caption="Packing"
       dataField="PACKING_NAME"
       width="auto"
       [allowEditing]="false"
-    ></dxi-column>
+    ></dxi-column> -->
     <!-- Conditionally add local currency column -->
     <dxi-column
       *ngIf="showLocalCurrencyColumn"
@@ -384,7 +384,7 @@
         showSpinButtons: true,
         min: 0,
         format: '#0',
-        mode: 'number'
+        mode: 'number',
       }"
     ></dxi-column>
     <dxi-column

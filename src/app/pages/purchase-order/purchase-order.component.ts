@@ -867,6 +867,7 @@ export class PurchaseOrderComponent {
           TAX_PERCENT: item.VAT_PERC,
           CGST: 0,
           SGST: 0,
+          PRICE: item.SUPP_PRICE,
         };
       }
 
@@ -877,7 +878,26 @@ export class PurchaseOrderComponent {
         SGST: item.SGST,
       };
     });
+    // PRICE VALIDATION
+    const invalidPriceItem = data.PoDetails.find(
+      (item: any) =>
+        item.SUPP_PRICE === null ||
+        item.SUPP_PRICE === undefined ||
+        item.SUPP_PRICE === '' ||
+        Number(item.SUPP_PRICE) <= 0,
+    );
 
+    if (invalidPriceItem) {
+      notify(
+        {
+          message: 'Please enter price for all items',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+      );
+      this.isSaving = false;
+      return;
+    }
     data.PoDetails = poDetails;
 
     // ✅ API CALL (already correct with finalize)
@@ -944,8 +964,30 @@ export class PurchaseOrderComponent {
     }
 
     data.PoDetails = [...this.poEditForm.poData.PoDetails];
+    data.PoDetails = data.PoDetails.map((item: any) => ({
+      ...item,
+      PRICE: item.SUPP_PRICE, // ✅ IMPORTANT
+    }));
     console.log(data, 'PODETAILAAAAAAAAAAAAAAAAAAAAAAAA');
+    const invalidPriceItem = data.PoDetails.find(
+      (item: any) =>
+        item.SUPP_PRICE === null ||
+        item.SUPP_PRICE === undefined ||
+        item.SUPP_PRICE === '' ||
+        Number(item.SUPP_PRICE) <= 0,
+    );
 
+    if (invalidPriceItem) {
+      notify(
+        {
+          message: 'Please enter price for all items',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+      );
+      this.isSaving = false;
+      return;
+    }
     if (this.isApproved) {
       // 🔹 Show confirmation dialog before approving
       confirm(

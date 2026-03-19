@@ -210,7 +210,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
     if (parts.length === 2) {
       this.supplierCountryCode = '+' + parts[0];
-      this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
+      this.newPoData.SUPP_MOBILE = parts[1];
     }
   }
 
@@ -221,7 +221,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
     if (parts.length === 2) {
       this.shippingCountryCode = '+' + parts[0];
-      this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
+      this.newPoData.CONTACT_MOBILE = parts[1];
     }
   }
 

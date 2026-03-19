@@ -77,6 +77,7 @@ export class ArticleAddComponent {
   unitList: any;
   articleSizeData: any;
   materialUnits: any[] = [];
+  selectedComponentArticles: any[] = [];
   selectedMaterialUnitId: any;
   selectedProductionUnitId: any;
   produCtionUnits: any;
@@ -494,11 +495,16 @@ export class ArticleAddComponent {
           return isComponent && colorMatch && categoryMatch;
         });
 
-        this.attachGridData = this.componentArticles;
+        // this.attachGridData = this.componentArticles;
 
         console.log(this.componentArticles, 'FILTERED COMPONENTS');
       }
     });
+  }
+
+  closecomponent() {
+    this.ComponentpopupVisible = false;
+    this.attachGridData = [...this.selectedComponentArticles];
   }
 
   saveSelectedComponent() {
@@ -515,22 +521,24 @@ export class ArticleAddComponent {
       return;
     }
 
-    // Bind first component ID to article (if needed)
+    //  STORE FULL LIST
+    this.selectedComponentArticles = selectedRows;
+
+    // optional (keep if needed)
     this.articleData.COMPONENT_ARTICLE_ID = selectedRows[0].ID;
+
     this.selectedComponentDescription = selectedRows
       .map((c: any) => c.DESCRIPTION)
       .join(', ');
 
-    // Show all selected components in the main grid
-    this.attachGridData = [...selectedRows];
-
-    // refresh grid if needed
-    if (this.itemsGridRef?.instance) {
-      this.itemsGridRef.instance.refresh();
-    }
-
-    // close popup
+    // this.attachGridData = [...selectedRows];
+    this.attachGridData = [...this.selectedComponentArticles];
+    this.selectedAttachRowKeys = this.selectedComponentArticles.map(
+      (c: any) => c.ID,
+    );
     this.ComponentpopupVisible = false;
+
+    console.log('Selected Components:', this.selectedComponentArticles);
   }
 
   getCategory() {
@@ -715,7 +723,7 @@ export class ArticleAddComponent {
   //     return;
   //   }
   //   this.selectedAttachRow = selectedRow;
-  //   // 🔥 AUTO SAVE ON SELECT
+  //   //  AUTO SAVE ON SELECT
   //   this.attachComponent();
   // }
   attachComponent() {
@@ -848,7 +856,7 @@ export class ArticleAddComponent {
 
   //     if (!baseMatch) return false;
 
-  //     // ✅ CORRECT SIZE EXTRACTION
+  //     //  CORRECT SIZE EXTRACTION
   //     const savedSizes: number[] = Array.isArray(article.SIZES)
   //       ? article.SIZES.map((s: any) => Number(s.SizeValue)).filter(
   //           (s) => !isNaN(s)
@@ -1104,9 +1112,12 @@ export class ArticleAddComponent {
           BRAND_ID: this.selectedBrandId,
           // COMPANY_ID: this.selected_Company_id,
           // UNIT_ID: this.selectedProductionUnitId,
-          COMPONENT_ARTICLE_ID: this.articleData.IS_COMPONENT
-            ? 0
-            : this.articleData.COMPONENT_ARTICLE_ID,
+          // COMPONENT_ARTICLE_ID: this.articleData.IS_COMPONENT
+          //   ? 0
+          //   : this.articleData.COMPONENT_ARTICLE_ID,
+          Components: this.selectedComponentArticles.map((item: any) => ({
+            COMPONENT_ARTICLE_ID: item.ID,
+          })),
           Units: Array.isArray(this.selectedProductionUnitId)
             ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))
             : [{ UNIT_ID: this.selectedProductionUnitId }],
