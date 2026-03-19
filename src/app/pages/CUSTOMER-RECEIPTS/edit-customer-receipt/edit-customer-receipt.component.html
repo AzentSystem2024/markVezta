@@ -356,6 +356,7 @@
                 [(value)]="receiprtFormData.NET_AMOUNT"
                 label="Amount"
                 labelMode="floating"
+                [format]="{ type: 'fixedPoint', precision: 2 }"
                 [width]="'100%'"
                 [readOnly]="isReadOnlyMode"
               ></dx-text-box>

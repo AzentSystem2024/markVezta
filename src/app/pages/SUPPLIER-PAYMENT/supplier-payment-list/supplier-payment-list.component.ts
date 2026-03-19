@@ -227,7 +227,7 @@ export class SupplierPaymentListComponent {
       },
 
       error: (err) => {
-        // ✅ ONLY ADDITION
+        //  ONLY ADDITION
         const message =
           err?.status === 0
             ? 'Network connection lost. Please check your internet.'

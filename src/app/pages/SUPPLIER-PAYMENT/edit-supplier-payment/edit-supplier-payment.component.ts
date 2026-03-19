@@ -173,10 +173,6 @@ export class EditSupplierPaymentComponent {
       this.mainGridData = this.paymentFormData.PAY_DETAIL || [];
       // this.mainGridData = [...(this.paymentFormData.PAY_DETAIL || [])];
 
-      console.log(
-        this.mainGridData,
-        'MAINGRIDDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      );
       if (this.paymentFormData.PAY_DATE) {
         this.paymentDate = this.formatDateToYMD(this.paymentFormData.PAY_DATE);
       }

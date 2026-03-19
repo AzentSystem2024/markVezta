@@ -305,13 +305,15 @@
               (onValueChanged)="onRoundOffChange()"
             ></dx-check-box>
 
-            <dx-text-box
+            <dx-number-box
               label="Net Amount"
               labelMode="floating"
+              [format]="'#,##0.00'"
+              [inputAttr]="{ style: 'text-align: right;' }"
               [value]="netAmount"
               [width]="120"
               [readOnly]="true"
-            ></dx-text-box>
+            ></dx-number-box>
           </div>
         </div>
 

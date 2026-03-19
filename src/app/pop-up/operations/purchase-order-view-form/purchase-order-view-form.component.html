@@ -468,11 +468,11 @@
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
 
-      <dxi-total-item column="taxable" summaryType="sum" displayFormat="{0}">
+      <dxi-total-item column="taxable" summaryType="sum" displayFormat="{0}" [valueFormat]="{ type: 'fixedPoint', precision: 2 }">
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
 
-      <dxi-total-item column="vatAmount" summaryType="sum" displayFormat="{0}">
+      <dxi-total-item column="vatAmount" summaryType="sum" displayFormat="{0}" [valueFormat]="{ type: 'fixedPoint', precision: 2 }">
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
 
@@ -484,7 +484,7 @@
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
 
-      <dxi-total-item column="total" summaryType="sum" displayFormat="{0}">
+      <dxi-total-item column="total" summaryType="sum" displayFormat="{0}" [valueFormat]="{ type: 'fixedPoint', precision: 2 }">
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
     </dxo-summary>

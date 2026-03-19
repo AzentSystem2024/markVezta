@@ -922,39 +922,7 @@
                 ></dxi-validation-rule>
               </dx-validator>
             </dx-select-box>
-            <dx-select-box
-              label="Country code *"
-              [searchEnabled]="true"
-              labelMode="floating"
-              [(value)]="countryCode"
-              [items]="countryCodes"
-              valueExpr="CODE"
-              [displayExpr]="countryDisplay"
-              placeholder="+1"
-              [dropDownOptions]="{ width: '370px' }"
-              hint="Country Code"
-              (valueChange)="updateMobileNumber()"
-              (onOpened)="onDropdownOpened()"
-              (onClosed)="onDropdownClosed()"
-              (onValueChanged)="
-                onCountrycodeChangeDeliveryAddressmobile($event)
-              "
-            >
-              <div *dxTemplate="let data of 'item'">
-                <img
-                  [src]="data.FLAG_URL"
-                  width="20"
-                  style="margin-right: 8px"
-                />
-                {{ data.CODE }} {{ data.COUNTRY_NAME }}
-              </div>
-              <dx-validator>
-                <dxi-validation-rule
-                  type="required"
-                  message="Country code is required"
-                ></dxi-validation-rule>
-              </dx-validator>
-            </dx-select-box>
+           
           </dxi-item>
 
           <!-- Mobile (9/12) -->

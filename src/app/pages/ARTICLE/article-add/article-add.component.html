@@ -77,12 +77,12 @@
           </dx-select-box>
         </div>
         <div class="form-field">
-          <dx-text-box
+          <dx-number-box
             label="Packing Qty *"
             [(value)]="articleData.PACK_QTY"
             labelMode="floating"
             placeholder="Packing Qty"
-          ></dx-text-box>
+          ></dx-number-box>
         </div>
 
         <div class="form-field">
@@ -108,12 +108,12 @@
           ></dx-text-box>
         </div>
         <div class="form-field">
-          <dx-text-box
+          <dx-number-box
             label="Next Serial No."
             [(value)]="articleData.NEXT_SERIAL"
             labelMode="floating"
             placeholder="Next Serial No."
-          ></dx-text-box>
+          ></dx-number-box>
         </div>
 
         <div class="form-field">
@@ -121,6 +121,7 @@
             label="Part No."
             [(value)]="articleData.PART_NO"
             labelMode="floating"
+            [readOnly]="true"
             placeholder="Part No."
           ></dx-text-box>
         </div>
@@ -138,6 +139,7 @@
             label="Item Description"
             [(value)]="articleData.DESCRIPTION"
             labelMode="floating"
+            [readOnly]="true"
             placeholder="Item Description"
           ></dx-text-box>
         </div>
@@ -205,12 +207,12 @@
           ></dx-text-box>
         </div> -->
         <div class="form-field">
-          <dx-text-box
+          <dx-number-box
             label="GST%"
             labelMode="floating"
             placeholder="GST%"
             [(value)]="articleData.GST_PERC"
-          ></dx-text-box>
+          ></dx-number-box>
         </div>
         <div class="form-field">
           <dx-text-box
@@ -331,6 +333,27 @@
         class="popup-content"
         style="height: 100%; display: flex; flex-direction: column"
       >
+
+        <div style="display: flex; justify-content: flex-end; margin: 10px 0">
+          <dx-button
+            (onClick)="addComponent()"
+            stylingMode="contained"
+            type="default"
+            hint="New Row"
+            style="padding: 8px 8px"
+            ><div *dxTemplate="let data of 'content'">
+              <div class="add-btn-content">
+                <span
+                  class="iconify"
+                  data-icon="formkit:add"
+                  data-width="20"
+                  data-height="20"
+                ></span>
+                <span class="add-text">Add</span>
+              </div>
+            </div></dx-button
+          >
+        </div>
         <!-- Data Grid -->
         <div style="flex: 1; overflow: hidden">
           <dx-data-grid
@@ -344,9 +367,13 @@
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
             [height]="'69vh'"
-            [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
             (onSelectionChanged)="onAttachRowSelected($event)"
           >
+          <dxo-editing
+        mode="popup"
+        [allowUpdating]="false"
+        [allowDeleting]="true"
+      ></dxo-editing>
             <dxo-paging [enabled]="true" [pageSize]="10"></dxo-paging>
             <dxo-pager
               [visible]="true"
@@ -427,7 +454,7 @@
             [rowAlternationEnabled]="true"
             [height]="'63vh'"
             [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
-           
+            (onRowRemoved)="onBomRowRemoved($event)"
             (onInitNewRow)="onInitNewRow($event)"
             (onEditorPreparing)="onEditorPreparing($event)"
           >
@@ -534,8 +561,11 @@
     [showBorders]="true"
     keyExpr="ID"
     [headerFilter]="{ visible: true }"
-  >
    
+  >
+   <dxo-filter-row
+        [visible]="true"
+      ></dxo-filter-row>
   <dxo-header-filter [visible]="true" [allowSearch]="true"></dxo-header-filter>
 <dxo-selection mode="multiple"></dxo-selection>
 
@@ -555,6 +585,56 @@
       <dx-button
         text="Save"
         (onClick)="saveSelectedItems()"
+        style="margin-right:10px"
+      ></dx-button>
+
+    </div>
+    
+</dx-popup>
+
+<dx-popup
+  [(visible)]="ComponentpopupVisible"
+  [width]="800"
+  [height]="500"
+  title="Component"
+  [showCloseButton]="true"
+   (onRowClick)="onItemSelect($event)"
+>
+
+  <dx-data-grid
+    #componentGridRef
+    [dataSource]="componentArticles"
+    [showBorders]="true"
+    keyExpr="ID"
+    [headerFilter]="{ visible: true }"
+   
+  >
+   <dxo-filter-row
+        [visible]="true"
+      ></dxo-filter-row>
+  <dxo-header-filter [visible]="true" [allowSearch]="true"></dxo-header-filter>
+<dxo-selection mode="multiple"></dxo-selection>
+
+    <dxi-column dataField="ART_NO" caption="Art No" [allowHeaderFiltering]="true"></dxi-column>
+    <dxi-column dataField="COLOR" caption="Color"></dxi-column>
+    <dxi-column dataField="CATEGORY_NAME" caption="category"></dxi-column>
+     <dxi-column
+              dataField="ARTICLE_TYPE_NAME"
+              caption="Type"
+            ></dxi-column>
+  </dx-data-grid>
+
+  <!-- Buttons -->
+    <div style="margin-top:10px; text-align:right; display:flex; justify-content:flex-end; gap:15px;">
+
+       <dx-button
+        text="Cancel"
+        (onClick)="closecomponent()"
+      ></dx-button>
+
+      <dx-button
+        text="Save"
+        (onClick)="saveSelectedComponent()"
         style="margin-right:10px"
       ></dx-button>
 

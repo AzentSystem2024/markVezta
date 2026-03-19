@@ -122,7 +122,7 @@
       </div>
 
       <div class="form-field">
-        <dx-text-box
+        <dx-number-box
           label="Serial No."
           labelMode="floating"
           [(value)]="PackingData.ART_SERIAL"
@@ -132,7 +132,7 @@
               type="required"
               message="This field is required"
             ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
+        ></dx-number-box>
       </div>
 
       <div class="form-field">
@@ -622,10 +622,11 @@
     <dx-number-box
       label="Standered Price"
       labelMode="floating"
-      [format]="'#,##0.##'"
+      [format]="'#,##0.00'"
       [min]="0"
       [showSpinButtons]="true"
       [(value)]="PackingData.STD_PRICE"
+      [inputAttr]="{ style: 'text-align: right;' }"
     >
       <dx-validator>
         <dxi-validation-rule
@@ -750,6 +751,9 @@
     keyExpr="ID"
   >
    <dxo-header-filter [visible]="true" [allowSearch]="true"></dxo-header-filter>
+    <dxo-filter-row
+        [visible]="true"
+      ></dxo-filter-row>
 <dxo-selection mode="multiple"></dxo-selection>
     <dxi-column dataField="ITEM_CODE" caption="Item"></dxi-column>
     <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>

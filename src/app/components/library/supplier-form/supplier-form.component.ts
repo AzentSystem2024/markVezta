@@ -42,7 +42,7 @@ export class SupplierFormComponent implements OnInit {
 
   CountryDropdownData: any[] = [];
   VATRuleDropdownData: any[] = [];
-  SupplierCategory:any[] = [];
+  SupplierCategory: any[] = [];
   PaymentTermsDropdownData: any[] = [];
   CurrencyDropdownData: any[] = [];
   StateDropdownData: any[] = [];
@@ -82,8 +82,8 @@ export class SupplierFormComponent implements OnInit {
     CURRENCY_ID: '',
     PAY_TERM_ID: '',
     VAT_RULE_ID: '',
-    SUPP_CAT_ID:'',
-    PURCH_TYPE:0,
+    SUPP_CAT_ID: '',
+    PURCH_TYPE: 0,
     IS_COMPANY_BRANCH: false,
     // Supplier_cost:''
     Supplier_cost: [] as { COST_ID: number; SUPP_ID: number }[],
@@ -93,33 +93,45 @@ export class SupplierFormComponent implements OnInit {
   CountryId: any;
   PaymentTerms: any;
   PaymentId: any;
+  Supplier_mobile: any;
+  mobile_limit: any;
 
+  countryCodePhone: any;
+  PhoneNumber: any;
+  countryCodes: any;
   purchaseTypeOptions = [
-  { text: 'Local Purchase', value: 1 },
-  { text: 'Interstate Purchase', value: 2 }
-];
+    { text: 'Local Purchase', value: 1 },
+    { text: 'Interstate Purchase', value: 2 },
+  ];
 
-  constructor(private service: DataService, authservice: AuthService) {
+  constructor(
+    private service: DataService,
+    authservice: AuthService,
+  ) {
     this.stateLabel = authservice.getsettingsData().STATE_LABEL;
     this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
     this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
     console.log(
       this.countryCode,
-      '===========================country Code============'
+      '===========================country Code============',
     );
     this.get_Country_Dropdown_List();
     this.get_State_Dropdown_List();
     this.get_PaymentTerms_Dropdown_List();
     this.sesstion_Details();
     this.sessionData_tax();
-    // service.getCountryWithFlags().subscribe((data) => {
-    //   this.CountryDropdownData = data;
-    //   console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
-    // });
+    service.getCountryWithFlags().subscribe((data) => {
+      this.countryCodes = data;
+      console.log(this.countryCodes, 'COUNTRY;;;;;;;;;;');
+    });
   }
   newSupplier = this.formSupplierData;
 
-  getNewSupplierData = () => ({ ...this.newSupplier });
+  getNewSupplierData = () => ({
+    ...this.newSupplier,
+    MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
+    PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
+  });
 
   toggleCurrencyDropdown(checked: boolean) {
     this.isCurrencyAccepted = checked;
@@ -141,7 +153,7 @@ export class SupplierFormComponent implements OnInit {
     this.newSupplier.ADDRESS2 = '';
     this.newSupplier.ADDRESS3 = '';
     this.newSupplier.NOTES = '';
-    this.newSupplier.PHONE = '';
+     this.PhoneNumber = '';
     // Clear Supplier_cost
     this.formSupplierData.Supplier_cost = [];
 
@@ -210,7 +222,7 @@ export class SupplierFormComponent implements OnInit {
     });
   }
 
-    getSuppliercategoryDropDown() {
+  getSuppliercategoryDropDown() {
     const payload = {
       NAME: 'SUPPLIER_CATEGORY',
       // COMPANY_ID: this.selected_Company_id,
@@ -227,7 +239,7 @@ export class SupplierFormComponent implements OnInit {
       this.PaymentTermsDropdownData = response;
       console.log(
         'count==================================',
-        this.PaymentTermsDropdownData
+        this.PaymentTermsDropdownData,
       );
     });
   }
@@ -243,7 +255,7 @@ export class SupplierFormComponent implements OnInit {
       this.CurrencyDropdownData = response;
       console.log(
         'count==================================',
-        this.CurrencyDropdownData
+        this.CurrencyDropdownData,
       );
     });
   }
@@ -268,7 +280,7 @@ export class SupplierFormComponent implements OnInit {
     this.get_State_Dropdown_List();
 
     const selectedCountry = this.CountryDropdownData.find(
-      (country: any) => country.ID === this.selecte_countyId
+      (country: any) => country.ID === this.selecte_countyId,
     );
     console.log('Selected Country Object:', selectedCountry);
     // 4️ If found, set code & name
@@ -281,10 +293,7 @@ export class SupplierFormComponent implements OnInit {
       // 5️ Fallback if no country found
       this.countryCode = '';
       this.DEFAULT_COUNTRY_CODE = '';
-      console.warn(
-        ' No matching country found for ID:',
-        this.selecte_countyId
-      );
+      console.warn(' No matching country found for ID:', this.selecte_countyId);
     }
   }
 
@@ -343,7 +352,7 @@ export class SupplierFormComponent implements OnInit {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
 
     this.DEFAULT_COUNTRY_CODE =
@@ -358,6 +367,30 @@ export class SupplierFormComponent implements OnInit {
     //  this.financialYeaDate=sessionYear[0].DATE_FROM
     // console.log(this.financialYeaDate,'=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[')
     // this.formatted_from_date=this.financialYeaDate
+  }
+  onCountrycodeChange(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      console.log(res);
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
+  }
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
+  }
+  onCountrycodeChangePhone(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      console.log(res);
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
   }
 }
 @NgModule({

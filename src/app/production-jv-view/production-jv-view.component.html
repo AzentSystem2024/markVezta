@@ -195,6 +195,7 @@
               labelMode="floating"
               [(value)]="productionFormData.ADDL_COST"
               style="flex: 2"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
               [readOnly]="true"
             ></dx-text-box>
 

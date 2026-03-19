@@ -459,10 +459,6 @@ export class JournalBookComponent {
           this.selectedReceipt = response.Data;
           this.isEditCustomerReceipt = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedReceipt,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TransType === 2) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
@@ -487,28 +483,16 @@ export class JournalBookComponent {
           this.selectedPrePayment = response.Data;
           this.editPrePaymentPopupOpened = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedPrePayment,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TransType === 21) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
-          this.selectedSupplierPayment = response.Data;
-          console.log(this.selectedSupplierPayment);
+          this.selectedReceipt =response.Data || null;
           this.isEditReceipt = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedPrePayment,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TransType === 20) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectPurchaseReturn(trans_id)
         .subscribe((response: any) => {
@@ -517,10 +501,7 @@ export class JournalBookComponent {
           this.isEditPurchaseReturn = true;
 
           this.cdr.detectChanges();
-          console.log(
-            this.selectedPurchaseReturn,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
+          
         });
     } else if (TransType === 14) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
@@ -568,7 +549,7 @@ export class JournalBookComponent {
         this.selectedSaleReturn = response;
         this.isEditSaleReturn = true;
         this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+       
       });
     } else if (TransType === 3) {
       console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');

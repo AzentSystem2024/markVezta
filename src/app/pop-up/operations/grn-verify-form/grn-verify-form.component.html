@@ -166,6 +166,7 @@
       dataField="SUPP_PRICE"
       caption="PRICE {{ currencySymbol }}"
       [width]="'auto'"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="false"
       alignment="right"
     ></dxi-column>
@@ -176,6 +177,7 @@
       dataField="PRICE"
       caption="PRICE {{ localCurrencySymbol }}"
       [width]="'auto'"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="false"
       alignment="right"
     ></dxi-column>
