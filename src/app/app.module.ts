@@ -25,7 +25,6 @@ import {
 import { UnauthenticatedContentModule } from './layouts/unauthenticated-content/unauthenticated-content';
 import { AppRoutingModule } from './app-routing.module';
 import { DenialListModule } from './pages/Denial-list/denial-list.component';
-import { CrmContactDetailsModule } from './pages/crm-contact-details/crm-contact-details.component';
 import { AnalyticsDashboardModule } from './pages/analytics-dashboard/analytics-dashboard.component';
 import { ThemeService } from './services';
 import { DxFormModule } from 'devextreme-angular';
@@ -166,7 +165,7 @@ import { PurchaseOrderViewFormModule } from './pop-up/operations/purchase-order-
 import { DocumentTemplatesListModule } from './settings/document-templates/document-templates-list/document-templates-list.component';
 import { RouteReuseStrategy } from '@angular/router';
 import { CustomReuseStrategy } from './custome-reuse-strategy';
-import { GrnModule } from './pages/Operations/grn/grn/grn.component';
+import { GrnModule } from './pages/OPERATIONS/grn/grn/grn.component';
 import { GrnNewFormModule } from './pop-up/operations/grn-new-form/grn-new-form.component';
 import { GrnEditFormModule } from './pop-up/operations/grn-edit-form/grn-edit-form.component';
 import { GrnVerifyFormModule } from './pop-up/operations/grn-verify-form/grn-verify-form.component';
@@ -178,7 +177,7 @@ import { PurchaseReturnEditFormModule } from './pop-up/operations/purchase-retur
 import { PurchaseReturnVerifyFormModule } from './pop-up/operations/purchase-return-verify-form/purchase-return-verify-form.component';
 import { PurchaseReturnApproveFormModule } from './pop-up/operations/purchase-return-approve-form/purchase-return-approve-form.component';
 import { PurchaseReturnViewFormModule } from './pop-up/operations/purchase-return-view-form/purchase-return-view-form.component';
-import { TransferOutModule } from './pages/Operations/transfer-out/transfer-out.component';
+import { TransferOutModule } from './pages/OPERATIONS/transfer-out/transfer-out.component';
 import { TransferOutNewFormModule } from './pop-up/operations/transfer-out-new-form/transfer-out-new-form.component';
 import { TransferOutEditFormModule } from './pop-up/operations/transfer-out-edit-form/transfer-out-edit-form.component';
 import {
@@ -187,7 +186,7 @@ import {
 } from './pop-up/operations/transfer-out-verify-form/transfer-out-verify-form.component';
 import { TransferOutApproveFormModule } from './pop-up/operations/transfer-out-approve-form/transfer-out-approve-form.component';
 import { TransferOutViewFormModule } from './pop-up/operations/transfer-out-view-form/transfer-out-view-form.component';
-import { TransferInModule } from './pages/Operations/transfer-in/transfer-in.component';
+import { TransferInModule } from './pages/OPERATIONS/transfer-in/transfer-in.component';
 import {
   TransferInNewFormComponent,
   TransferInNewFormModule,
@@ -211,11 +210,11 @@ import {
 import {
   ItemStorePricesComponent,
   ItemStorePricesModule,
-} from './pages/Operations/item-store-prices/item-store-prices.component';
-import {
-  ItemStorePricesLogComponent,
-  ItemStorePricesLogModule,
-} from './pages/item-store-prices-log/item-store-prices-log.component';
+} from './pages/OPERATIONS/item-store-prices/item-store-prices.component';
+// import {
+//   ItemStorePricesLogComponent,
+//   ItemStorePricesLogModule,
+// } from './pages/OPERATIONS/item-store-prices-log/item-store-prices-log.component';
 import {
   ItemStorePricesEditComponent,
   ItemStorePricesEditModule,
@@ -270,7 +269,7 @@ import {
   PromotionViewComponent,
   PromotionViewModule,
 } from './pages/promotion-view/promotion-view.component';
-import { StockViewListModule } from './pages/Operations/stock-view-list/stock-view-list.component';
+import { StockViewListModule } from './pages/OPERATIONS/stock-view-list/stock-view-list.component';
 import {
   SupplierEditComponent,
   SupplierEditModule,
@@ -279,7 +278,7 @@ import { LandedCostEditModule } from './pages/landed-cost-edit/landed-cost-edit.
 import {
   InterStoreTransferListComponent,
   InterStoreTransferListModule,
-} from './pages/Operations/inter-store-transfer-list/inter-store-transfer-list.component';
+} from './pages/OPERATIONS/inter-store-transfer-list/inter-store-transfer-list.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './services/auth.interceptor';
 import { DepartmentModule } from './pages/HR/Masters/department/department.component';
@@ -718,7 +717,7 @@ import {
 import {
   PurchaseOrderComponent,
   PurchaseOrderModule,
-} from './pages/Operations/purchase-order/purchase-order.component';
+} from './pages/OPERATIONS/purchase-order/purchase-order.component';
 // import { PrepaymentPostingListModule } from './pages/PrePayment Posting/prepayment-posting-list/prepayment-posting-list.component';
 // import { PrepaymentPostingAddModule } from './pages/PrePayment Posting/prepayment-posting-add/prepayment-posting-add.component';
 // import { PrepaymentPostingEditModule } from './pages/PrePayment Posting/prepayment-posting-edit/prepayment-posting-edit.component';
@@ -820,14 +819,14 @@ import {
 import {
   DeliveryNoteComponent,
   DeliveryNoteModule,
-} from './pages/Operations/delivery-note/delivery-note.component';
+} from './pages/OPERATIONS/delivery-note/delivery-note.component';
 import { DeliveryNoteFormComponent } from './pages/delivery-note-form/delivery-note-form.component';
 // import { StockMovementReportComponent, StockMovementReportModule } from './pages/HR/Masters/stock-movement-report/stock-movement-report.component';
 
 import {
   QuotationComponent,
   QuotationModule,
-} from './pages/quotation/quotation.component';
+} from './pages/OPERATIONS/quotation/quotation.component';
 import {
   QuotationFormComponent,
   QuotationFormModule,
@@ -894,10 +893,10 @@ import {
 } from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
 import { InvoicePdfComponent } from './pages/INVOICE/invoice-pdf/invoice-pdf.component';
 import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoice-pdf-view.component';
-import {
-  PurchaseReturnDebitComponent,
-  PurchaseReturnDebitModule,
-} from './pages/Operations/purchase-return-debit/purchase-return-debit.component';
+// import {
+//   PurchaseReturnDebitComponent,
+//   PurchaseReturnDebitModule,
+// } from './pages/Operations/purchase-return-debit/purchase-return-debit.component';
 import {
   PurchaseReturnDebitFormComponent,
   PurchaseReturnDebitFormModule,
@@ -968,10 +967,10 @@ import {
   UomEditComponent,
   UomEditModule,
 } from './pages/uom-edit/uom-edit.component';
-import {
-  ProductionJvListComponent,
-  ProductionJvListModule,
-} from './pages/Operations/production-jv-list/production-jv-list.component';
+// import {
+//   ProductionJvListComponent,
+//   ProductionJvListModule,
+// } from './pages/Operations/production-jv-list/production-jv-list.component';
 import { ProductionJvAddModule } from './production-jv-add/production-jv-add.component';
 import {
   ProductionJvViewComponent,
@@ -997,10 +996,10 @@ import {
   StockViewComponent,
   StockViewModule,
 } from './pages/REPORT/stock-view/stock-view.component';
-import {
-  SaleReturnComponent,
-  SaleReturnModule,
-} from './pages/Operations/sale-return/sale-return.component';
+// import {
+//   SaleReturnComponent,
+//   SaleReturnModule,
+// } from './pages/Operations/sale-return/sale-return.component';
 import {
   SaleReturnFormComponent,
   SaleReturnFormModule,
@@ -1009,10 +1008,10 @@ import {
   CustomDatePopupComponent,
   CustomDatePopupModule,
 } from './custom-date-popup/custom-date-popup.component';
-import {
-  MiscellaneousInvoiceComponent,
-  MiscellaneousInvoiceModule,
-} from './pages/Operations/miscellaneous-invoice/miscellaneous-invoice.component';
+// import {
+//   MiscellaneousInvoiceComponent,
+//   MiscellaneousInvoiceModule,
+// } from './pages/Operations/miscellaneous-invoice/miscellaneous-invoice.component';
 import {
   MiscellaneousInvoiceAddComponent,
   MiscellaneousInvoiceAddModule,
@@ -1024,7 +1023,7 @@ import {
 import {
   MiscellaneousPurchaseComponent,
   MiscellaneousPurchaseModule,
-} from './pages/Operations/miscellaneous-purchase/miscellaneous-purchase.component';
+} from './pages/OPERATIONS/miscellaneous-purchase/miscellaneous-purchase.component';
 import {
   MiscellaneousPurchaseAddComponent,
   MiscellaneousPurchaseAddModule,
@@ -1036,14 +1035,16 @@ import {
 import { ImportChartOfAccountsModule } from './pages/ACCOUNTS/import-chart-of-accounts/import-chart-of-accounts.component';
 import { SalaryHeadListModule } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
 import { TransferOutInventoryModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
-// import { AddTransferOutInventoryComponent } from './pages/add-transfer-out-inventory/add-transfer-out-inventory.component';
+import { SalesOrderFinancePopupFormComponent, SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
+import { ItemStorePricesLogModule } from './pages/item-store-prices-log/item-store-prices-log.component';
+import { PurchaseReturnDebitModule } from './pages/OPERATIONS/purchase-return-debit/purchase-return-debit.component';
+import { ProductionJvListModule } from './pages/OPERATIONS/production-jv-list/production-jv-list.component';
+import { SaleReturnModule } from './pages/OPERATIONS/sale-return/sale-return.component';
+import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-invoice/miscellaneous-invoice.component';
 
-// import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings.component';
-// import { EmployeeSalarySettingsEditModule } from './components/HR/Masters/employee-salary-settings-edit/employee-salary-settings-edit.component';
-// import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1059,7 +1060,6 @@ import { TransferOutInventoryModule } from './pages/INVENTORY MANAGEMENT/transfe
     UnauthenticatedContentModule,
     DxSelectBoxModule,
     DenialListModule,
-    CrmContactDetailsModule,
     AnalyticsDashboardModule,
     DxFormModule,
     ReactiveFormsModule,
@@ -1410,6 +1410,7 @@ import { TransferOutInventoryModule } from './pages/INVENTORY MANAGEMENT/transfe
     MiscellaneousPurchaseAddModule,
     MiscellaneousPurchaseEditModule,
     ImportChartOfAccountsModule,
+    SalesOrderFinancePopupFormModule
   ],
   providers: [
     AuthService,

@@ -4,15 +4,15 @@
       #dataGrid
       noDataText="No data available"
       [width]="'100%'"
-      [height]="'75vh'"
+      [height]="'82vh'"
       [loadPanel]="{
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
-      [dataSource]="filteredQuotationInList"
+      [dataSource]="filteredSalesOrderList"
       [showBorders]="true"
       [showColumnLines]="true"
       [showBorders]="true"
@@ -30,16 +30,21 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
-      (onToolbarPreparing)="onToolbarPreparing($event)"
-      (onEditingStart)="onEditQuotation($event)"
+      (onEditingStart)="onEditSalesOrder($event)"
       (onCellPrepared)="onCellPrepared($event)"
-      (onRowRemoving)="onDeleteQuotation($event)"
+      (onRowRemoving)="onDeleteSalesOrder($event)"
     >
       <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -63,21 +68,37 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Sales Quotation</div>
+          <div class="grid-header">Sales Order</div>
         </dxi-item>
-
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
         <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
-          [visible]="canAdd"
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
@@ -89,7 +110,7 @@
           [(value)]="selectedDateRange"
           (onValueChanged)="onDateRangeChanged($event)"
           (onOpened)="attachItemClickHandler($event)"
-          width="180"
+          width="220"
         >
           <div *dxTemplate="let item of 'item'">
             {{ item.value === "custom" ? "Custom" : item.label }}
@@ -97,14 +118,14 @@
         </dx-select-box>
       </div>
       <dxi-column
-        dataField="QTN_NO"
-        caption="Quotation No."
+        dataField="SO_NO"
+        caption="Sales Order No."
         [allowEditing]="false"
         width="120"
       ></dxi-column>
       <dxi-column
-        dataField="QTN_DATE"
-        caption="Quotation Date"
+        dataField="SO_DATE"
+        caption="Date"
         [allowEditing]="false"
         dataType="date"
         width="120"
@@ -113,19 +134,27 @@
       </dxi-column>
 
       <dxi-column
-        dataField="STORE_NAME"
-        caption="Store"
+        dataField="CUSTOMER_NAME"
+        caption="Customer"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="DELIVERY_ADDRESS"
+        caption="Delivery Address"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="TOTAL_QTY"
+        caption="Quantity"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
         dataField="NET_AMOUNT"
-        caption="Net amount"
+        caption="Net Amount"
         [allowEditing]="false"
-        format="#,##0.00"
-        width="120"
       ></dxi-column>
       <dxi-column
-        dataField="NARRATION"
+        dataField="REMARKS"
         caption="Narration"
         [allowEditing]="false"
       ></dxi-column>
@@ -137,39 +166,53 @@
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
+        [fixed]="true"
+        fixedPosition="right"
       >
       </dxi-column>
     </dx-data-grid>
   </div>
 </div>
 
+<!-- ========== sales order adding form ========== -->
 <dx-popup
-  [(visible)]="isAddQuotation"
-  [width]="'90vw'"
-  [height]="'100vh'"
-  title="Quotation"
+  [(visible)]="isAddSalesOrder"
+  [width]="'85vw'"
+  [height]="'95vh'"
+  title="Sales Order"
   (onHiding)="handleClose()"
 >
-  <ng-container *ngIf="isAddQuotation">
-    <app-quotation-form (popupClosed)="handleClose()"></app-quotation-form>
+  <ng-container *ngIf="isAddSalesOrder">
+    <app-sales-order-finance-popup-form
+      (popupClosed)="handleClose()"
+    ></app-sales-order-finance-popup-form>
   </ng-container>
 </dx-popup>
 
+<!-- ========== sales order modifying form ========== -->
 <dx-popup
-  [(visible)]="isEditQuotation"
+  [(visible)]="isEditSalesOrder"
   [width]="'90vw'"
-  [height]="'100vh'"
-  title="Sales Quotation"
+  [height]="'95vh'"
+  title="Sales Order"
   (onHiding)="handleClose()"
 >
-  <ng-container *ngIf="isEditQuotation">
-    <app-quotation-form
+  <ng-container *ngIf="isEditSalesOrder">
+    <app-sales-order-finance-popup-form
       [isEditing]="true"
-      [EditingResponseData]="selectedQuotation"
-      [isReadOnlyMode]="isReadOnlyQuotation"
+      [EditingResponseData]="selectedSalesOrder"
+      [isReadOnlyMode]="isReadOnlySalesOrder"
       (popupClosed)="handleClose()"
-    ></app-quotation-form>
+    ></app-sales-order-finance-popup-form>
   </ng-container>
 </dx-popup>
+
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>

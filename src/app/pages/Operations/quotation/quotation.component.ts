@@ -39,8 +39,9 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
-import { QuotationFormModule } from '../quotation-form/quotation-form.component';
+
 import notify from 'devextreme/ui/notify';
+import { QuotationFormModule } from '../../quotation-form/quotation-form.component';
 
 @Component({
   selector: 'app-quotation',
@@ -67,27 +68,70 @@ export class QuotationComponent {
   canPrint = false;
   sessionData: any;
   selected_vat_id: any;
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
+
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
-      this.zone.run(() => {
-        this.addQuotation();
-      });
+      this.zone.run(() => this.addQuotation());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+  matrixCode: any;
+  userID: any;
+  finID: any;
+  companyID: any;
+  storeFromSession: any;
+  selectedCompanyId: any;
+  onExporting(event: any) {
+    const fileName = 'Credit_Note';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+  // addButtonOptions = {
+  //   text: 'New',
+  //   icon: 'bi bi-file-earmark-plus',
+  //   // icon: 'add',
+  //   type: 'default',
+  //   stylingMode: 'contained',
+  //   hint: 'Add new entry',
+  //   // onClick: () => this.addCreditNote(),
+  //   onClick: () => {
+  //     this.zone.run(() => {
+  //       this.addQuotation();
+  //     });
+  //   },
+  //   elementAttr: { class: 'add-button' },
+  // };
 
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -116,55 +160,124 @@ export class QuotationComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-
+    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.sessionData_tax();
-    const menuGroups = menuResponse.MenuGroups || [];
+    this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
 
+    this.userID = menuResponse.USER_ID;
+    this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    console.log(this.companyID, 'COMPANYIDDDDDDDDDDDDDDDDDDDDDDDDDDD');
+    const menuGroups = menuResponse.MenuGroups || [];
+    this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
-    console.log(packingRights, 'PACKINGRIGHTSSSSSSSSSSSSSSSSSSSSSSS');
+      .find((menu) => menu.Path === '/quotation');
+
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
-      console.log('packingRights.CanAdd:', packingRights.CanAdd);
-      console.log('this.canAdd after assign:', this.canAdd);
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanPrint;
-      this.canView = packingRights.CanView;
-      this.canApprove = packingRights.CanApprove;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+    if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
+      // this.getItemsList();
+    } else {
+      // this.getItemsList();
     }
     this.getQuotationList();
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
   getQuotationList() {
-    this.dataService.getQuotationMainList().subscribe((response: any) => {
-      this.quotationList = response.Data.map((item: any) => {
-        let dateValue: Date;
+    const payload = this.buildDatePayload();
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.QTN_DATE))) {
-          dateValue = new Date(item.QTN_DATE);
-        } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.QTN_DATE);
-        }
+    this.dataService
+      .getQuotationMainList(payload)
+      .subscribe((response: any) => {
+        this.quotationList = response.Data.map((item: any) => {
+          let dateValue: Date;
 
-        return {
-          ...item,
-          QTN_DATE: dateValue,
-        };
+          if (!isNaN(Date.parse(item.QTN_DATE))) {
+            dateValue = new Date(item.QTN_DATE);
+          } else {
+            dateValue = this.parseDateString(item.QTN_DATE);
+          }
+
+          return {
+            ...item,
+            QTN_DATE: dateValue,
+          };
+        });
+
+        //  Backend already filtered
+        this.filteredQuotationInList = this.quotationList;
       });
+  }
 
-      this.applyDateFilter();
-    });
+  private toDateOnly(d: Date | null): string | null {
+    if (!d) return null;
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`; // yyyy-MM-dd
+  }
+
+  private buildDatePayload() {
+    const today = new Date();
+    let from: Date | null = null;
+    let to: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        from = new Date();
+        to = new Date();
+        break;
+
+      case 'last7':
+        from = new Date();
+        from.setDate(today.getDate() - 6);
+        to = new Date();
+        break;
+
+      case 'last15':
+        from = new Date();
+        from.setDate(today.getDate() - 14);
+        to = new Date();
+        break;
+
+      case 'last30':
+        from = new Date();
+        from.setDate(today.getDate() - 29);
+        to = new Date();
+        break;
+
+      case 'custom':
+        from = this.customStartDate ? new Date(this.customStartDate) : null;
+        to = this.customEndDate ? new Date(this.customEndDate) : null;
+        break;
+
+      case 'all':
+      default:
+        from = null;
+        to = null;
+    }
+
+    return {
+      COMPANY_ID: this.companyID,
+      DATE_FROM: this.toDateOnly(from),
+      DATE_TO: this.toDateOnly(to),
+    };
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
@@ -202,15 +315,18 @@ export class QuotationComponent {
       this.customEndDate = null;
       this.showCustomDatePopup = true;
     } else {
-      // Reset the custom label
-      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-      if (customOpt) {
-        customOpt.label = 'Custom';
-      }
-      this.applyDateFilter();
+      this.getQuotationList(); // 🔥 API call
     }
   }
+  onCustomDateApplied(event: any) {
+    this.customStartDate = event.startDate;
+    this.customEndDate = event.endDate;
 
+    this.selectedDateRange = 'custom';
+    this.showCustomDatePopup = false;
+
+    this.getQuotationList(); // 🔥 API call with custom dates
+  }
   applyDateFilter() {
     if (!this.selectedDateRange || !this.quotationList) {
       this.filteredQuotationInList = this.quotationList;
@@ -375,6 +491,7 @@ export class QuotationComponent {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.getQuotationList();
   }
 
   onToolbarPreparing(e: any) {
