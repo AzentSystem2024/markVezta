@@ -146,13 +146,11 @@ export class ViewCreditNoteComponent {
     private sanitizer: DomSanitizer,
   ) {
     const userDataString = localStorage.getItem('userData');
-    console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
 
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, 'HSNCODE===================');
       this.hsnLoaded = true; // ADD THIS
     }
 
@@ -165,7 +163,6 @@ export class ViewCreditNoteComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -180,7 +177,6 @@ export class ViewCreditNoteComponent {
       this.userId = userData.USER_ID;
       this.finId = userData.FINANCIAL_YEARS?.[0]?.FIN_ID;
     }
-    console.log(this.creditFormData, 'NGONINIT');
     this.getCompanyListDropdown();
     this.getLedgerCodeDropdown();
     // this.getPendingInvoices();
@@ -189,14 +185,12 @@ export class ViewCreditNoteComponent {
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['creditFormData'] && this.creditFormData?.length) {
       const data = this.creditFormData[0];
-      console.log(data, 'INEDITTTTTTTTTTT');
 
       setTimeout(() => {
         this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
@@ -228,14 +222,10 @@ export class ViewCreditNoteComponent {
       const companyState = this.companyState?.trim().toLowerCase();
       // const sessionGST = parseFloat(this.GST) || 0;
 
-      console.log('Company:', companyState);
-      console.log('Customer:', customerState);
-
       // -----------------------------
       //  STEP 2: APPLY GST
       // -----------------------------
       // if (companyState === customerState) {
-      //   console.log('Same State → Apply CGST + SGST');
 
       //   this.showCGST = true;
       //   this.showSGST = true;
@@ -249,7 +239,6 @@ export class ViewCreditNoteComponent {
       //     row.GST = 0;
       //   });
       // } else {
-      //   console.log('Different State → Apply IGST');
 
       //   this.showGST = true;
       //   this.showCGST = false;
@@ -270,8 +259,6 @@ export class ViewCreditNoteComponent {
         } else {
           this.creditFormData[0].NET_AMOUNT = rawNet;
         }
-
-        console.log('FINAL NET AMOUNT:', this.creditFormData[0].NET_AMOUNT);
       });
 
       // -----------------------------
@@ -305,8 +292,6 @@ export class ViewCreditNoteComponent {
           // 🟢 STOP GRID LOADING
           this.itemsGridRef?.instance?.endCustomLoading();
         });
-
-      console.log(this.noteDetails, 'NOTDETAILSSSSSSSSSS');
 
       // Load companies depending on Distributor
       // this.getCompanyListDropdown(data.DISTRIBUTOR_ID);
@@ -378,11 +363,9 @@ export class ViewCreditNoteComponent {
       .getCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response || [];
-        console.log('Distributor list:', this.distributorList);
 
         if (selectedDistributorId) {
           this.selectedDistributorId = selectedDistributorId;
-          console.log('Distributor bound:', this.selectedDistributorId);
 
           // ✅ FIND SELECTED DISTRIBUTOR
           const selectedDistributor = this.distributorList.find(
@@ -392,14 +375,6 @@ export class ViewCreditNoteComponent {
             // this.selectedCustomer = selectedDistributor; // ✅ IMPORTANT
           }
           if (selectedDistributor) {
-            console.log(
-              'Selected Distributor State ID:',
-              selectedDistributor.STATE_ID,
-            );
-            console.log(
-              'Selected Distributor State Name:',
-              selectedDistributor.STATE_NAME,
-            );
           } else {
             console.warn('Selected distributor not found in distributorList');
           }
@@ -411,15 +386,11 @@ export class ViewCreditNoteComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
   }
 
   addNewManualRow() {
@@ -552,7 +523,6 @@ export class ViewCreditNoteComponent {
     return new Promise((resolve) => {
       this.dataService.getActiveLedger().subscribe((response: any) => {
         this.ledgerList = response.Data;
-        console.log('Ledger List Loaded:', this.ledgerList);
         resolve();
       });
     });
@@ -608,7 +578,6 @@ export class ViewCreditNoteComponent {
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
 
     // ➤ SL_NO: Move to ledgerCode on Enter
     // if (e.dataField === 'SL_NO') {
@@ -620,10 +589,7 @@ export class ViewCreditNoteComponent {
     //       const rowIndex = visibleRows.findIndex(
     //         (r) => r?.data === e.row?.data
     //       );
-    //       console.log(
-    //         'SL_NO → Enter → move to ledgerCode, rowIndex:',
-    //         rowIndex
-    //       );
+    //
 
     //       setTimeout(() => {
     //         grid.focus(grid.getCellElement(rowIndex, 'ledgerCode'));
@@ -826,7 +792,6 @@ export class ViewCreditNoteComponent {
     }
 
     this.selectedDistributorId = event.value;
-    console.log(this.selectedDistributorId, 'SELECTEDDISTRIBUTORIDDDDDDDDD');
   }
 
   onNarrationKeyDown(event: any) {}
@@ -837,7 +802,6 @@ export class ViewCreditNoteComponent {
   // onCompanySelected(event: any){}
 
   openInvoicePopup() {
-    console.log('EVENT ');
     this.getPendingInvoices(); // Ensure you load fresh data
     this.invoicePopupVisible = true;
   }
@@ -887,7 +851,6 @@ export class ViewCreditNoteComponent {
   //     .getPendingInvoiceList(payload)
   //     .subscribe((response: any) => {
   //       this.pendingInvoices = response.Data;
-  //       console.log(this.pendingInvoices, 'PENDINGINVOICES');
   //       if (this.creditFormData?.length) {
   //         const data = this.creditFormData[0];
   //         this.invoiceNo = String(data.INVOICE_NO);
@@ -896,17 +859,14 @@ export class ViewCreditNoteComponent {
   // }
 
   selectInvoice(e: any) {
-    console.log('Invoice selected:', e);
     const selected = e.data;
     this.creditFormData.INVOICE_NO = selected.INVOICE_NO;
     this.creditFormData.DUE_AMOUNT = selected.BALANCE_AMOUNT;
     this.creditFormData.INVOICE_ID = selected.INVOICE_ID;
-    console.log(this.creditFormData.INVOICE_ID, 'INVOICEIDDDDDDDDDDDDDDDD');
     this.invoicePopupVisible = false;
   }
 
   onApprovedChanged(e: any) {
-    console.log('Checkbox value changed:', e.value);
     this.creditFormData.IS_APPROVED = e.value;
   }
 
@@ -939,7 +899,6 @@ export class ViewCreditNoteComponent {
   }
 
   calculateTotal = (row: any) => {
-    console.log(row);
     const amount = Number(row.Amount) || 0;
     const gst = this.calculateTaxAmount(row) || 0;
     return amount + gst;
@@ -984,15 +943,10 @@ export class ViewCreditNoteComponent {
   }
 
   viewPdf(): void {
-    console.log(this.CreditNoteid, 'ID received in viewPdf()');
     // this.isPdfPopupVisible = true;
     this.dataService
       .selectCreditNote(this.CreditNoteid)
       .subscribe((response: any) => {
-        console.log(
-          response,
-          '=================DN response===================',
-        );
         if (response) {
           this.pdfSrc = this.get_pdf(response.Data[0]); // Update iframe source
         }

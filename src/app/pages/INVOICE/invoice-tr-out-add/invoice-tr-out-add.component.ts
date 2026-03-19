@@ -179,15 +179,11 @@ export class InvoiceTrOutAddComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
     this.invoiceFormData.FIN_ID = this.sessionData.FINANCIAL_YEARS.FIN_ID;
     this.invoiceFormData.COMPANY_ID =
       this.sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -207,7 +203,6 @@ export class InvoiceTrOutAddComponent {
       const selectedCompany = userData?.SELECTED_COMPANY;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(userData.GeneralSettings.HSN_CODE, 'HSNCODE');
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         this.companyList = [selectedCompany]; // ✅ Show only selected company
@@ -252,7 +247,6 @@ export class InvoiceTrOutAddComponent {
     }
 
     const data = this.EditingResponseData.Data[0];
-    console.log('EDIT RESPONSE:', data);
 
     // Track previous customer (used to clear grid on change)
     this.previousCustomerId = data.CUST_ID;
@@ -315,8 +309,6 @@ export class InvoiceTrOutAddComponent {
         this.itemsGridRef.instance.refresh();
       }
     }, 200);
-
-    console.log('EDIT MODE GRID DATA:', this.mainInvoiceGridList);
   }
 
   private setGstVisibilityFromRows(rows: any[]) {
@@ -388,7 +380,6 @@ export class InvoiceTrOutAddComponent {
   //     .getCustomerStateTrout_Invoice(payload)
   //     .subscribe((response: any) => {
   //       this.distributorList = response;
-  //       console.log(this.distributorList, 'DISTLISTPOPUP');
   //     });
   // }
   onDistributorChanged(e: any) {
@@ -409,14 +400,10 @@ export class InvoiceTrOutAddComponent {
     );
     this.selectedCustomerName = selectedCustomer.DESCRIPTION;
     this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
-    console.log(selectedCustomer.DESCRIPTION, 'SELECTEDCUSTOMERRRRRRRRRR');
 
     const company = this.companyState?.trim().toLowerCase();
-    console.log(company);
     const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
-    console.log(customer);
     const sessionGst = parseFloat(this.GST) || 0; // main GST%
-    console.log(sessionGst);
     if (company === customer) {
       this.showCGST = true;
       this.showSGST = true;
@@ -434,15 +421,9 @@ export class InvoiceTrOutAddComponent {
         (s: any) => s.ID === this.selectedCustomerId,
       );
       this.invoiceFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
-      console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
     }
     this.invoiceFormData.CUST_ID = selectedCustomer.ID;
     if (this.selectedCustomerType) {
-      console.log(
-        'Selected Customer Type:',
-        this.selectedCustomerType.CUST_TYPE,
-      );
-      console.log('Selected Customer :', this.selectedCustomerType);
       // optional — store it if you need it later
       this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
     }
@@ -473,7 +454,6 @@ export class InvoiceTrOutAddComponent {
   }
 
   getInvoiceListForGrid() {
-    console.log(this.invoiceFormData.CUST_ID, 'INVOICELISTFORGRID');
     const payload = {
       CUST_ID: this.invoiceFormData.CUST_ID,
       COMPANY_ID: this.selectedCompanyId,
@@ -482,7 +462,6 @@ export class InvoiceTrOutAddComponent {
       .getInvoiceGridListTrOut(payload)
       .subscribe((response: any) => {
         this.staticTransfers = response.Data; // Save the original full list
-        console.log(this.staticTransfers, 'STATISCTRANSFERS');
         this.invoiceGridList = [...this.staticTransfers]; // Initial value
       });
   }
@@ -498,8 +477,6 @@ export class InvoiceTrOutAddComponent {
         ...this.invoiceFormData,
         DOC_NO: response.DOC_NO,
       };
-
-      console.log(response.DOC_NO, 'DOC NO BOUND');
     });
   }
 
@@ -541,7 +518,6 @@ export class InvoiceTrOutAddComponent {
     }
     const selectedTransferNos =
       this.mainInvoiceGridList?.map((t) => t.DN_DETAIL_ID) || [];
-    console.log(this.selectedTransfers, 'SELECTEDTRANSFERSSSSSSSS');
     // Filter the full list before showing in popup
     this.invoiceGridList = this.staticTransfers.filter(
       (item: any) => !selectedTransferNos.includes(item.DN_DETAIL_ID),
@@ -702,9 +678,6 @@ export class InvoiceTrOutAddComponent {
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
       this.netAmount = Number(this.grandTotal).toFixed(2);
       this.onRoundOffChange();
-      console.log('GROSS AMOUNT Summary:', this.totalAmount);
-      console.log('TAX_AMOUNT Summary:', this.taxAmount);
-      console.log('NET AMOUNT Summary:', this.grandTotal);
     } else {
       console.warn('Summary values not ready yet.');
     }
@@ -715,8 +688,6 @@ export class InvoiceTrOutAddComponent {
   }
 
   saveInvoice() {
-    console.log('save clicked');
-
     // ----------------------- VALIDATIONS -----------------------
     if (!this.invoiceFormData.CUST_ID) {
       notify('Please select Customer', 'error', 3000);
@@ -774,8 +745,6 @@ export class InvoiceTrOutAddComponent {
     this.invoiceFormData.TAX_AMOUNT = this.taxAmount;
     this.invoiceFormData.NET_AMOUNT = this.grandTotal;
     this.invoiceFormData.TRANS_TYPE = 25;
-
-    console.log('Final Payload Before API:', this.invoiceFormData);
 
     // ----------------------- API CALLS -----------------------
 

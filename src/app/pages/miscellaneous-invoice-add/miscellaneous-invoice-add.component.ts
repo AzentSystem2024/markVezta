@@ -55,10 +55,10 @@ import { confirm } from 'devextreme/ui/dialog';
 @Component({
   selector: 'app-miscellaneous-invoice-add',
   templateUrl: './miscellaneous-invoice-add.component.html',
-  styleUrls: ['./miscellaneous-invoice-add.component.scss']
+  styleUrls: ['./miscellaneous-invoice-add.component.scss'],
 })
 export class MiscellaneousInvoiceAddComponent {
-@ViewChild('companyRef', { static: false }) companyRef!: DxSelectBoxComponent;
+  @ViewChild('companyRef', { static: false }) companyRef!: DxSelectBoxComponent;
   @ViewChild('invoiceBoxRef', { static: false })
   invoiceBoxRef!: DxTextBoxComponent;
   @ViewChild('companySelectBoxRef', { static: false })
@@ -154,33 +154,19 @@ export class MiscellaneousInvoiceAddComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
+
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-    console.log(
-      this.HSN_CODE,
-      '===========selected HSN CODE===================',
-    );
+
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
   }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    console.log(this.companyState);
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
-    console.log(this.GST, 'GST');
   }
 
   ngOnInit() {
@@ -190,7 +176,6 @@ export class MiscellaneousInvoiceAddComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -273,8 +258,6 @@ export class MiscellaneousInvoiceAddComponent {
     this.selectedSubTypeId = e.value;
     this.debitFormData.SUB_TYPE_ID = e.value;
 
-    console.log('Selected Subtype:', this.selectedSubTypeId);
-
     this.getDocNo();
   }
 
@@ -288,10 +271,6 @@ export class MiscellaneousInvoiceAddComponent {
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
       this.supplierList = response;
-      console.log(
-        this.supplierList,
-        'distributorList==============================',
-      );
     });
   }
 
@@ -303,7 +282,6 @@ export class MiscellaneousInvoiceAddComponent {
       .getSupplierWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
 
@@ -471,7 +449,6 @@ export class MiscellaneousInvoiceAddComponent {
   }
 
   openInvoicePopup() {
-    console.log('EVENT ');
     this.getPendingInvoices(); // Ensure you load fresh data
     this.invoicePopupVisible = true;
   }
@@ -519,7 +496,6 @@ export class MiscellaneousInvoiceAddComponent {
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
-      console.log('Ledger List Loaded:', this.ledgerList);
     });
   }
 
@@ -612,10 +588,6 @@ export class MiscellaneousInvoiceAddComponent {
 
           const rowIndex = visibleRows.findIndex(
             (r) => r?.data === e.row?.data,
-          );
-          console.log(
-            'SL_NO → Enter → move to ledgerCode, rowIndex:',
-            rowIndex,
           );
 
           setTimeout(() => {
@@ -857,7 +829,6 @@ export class MiscellaneousInvoiceAddComponent {
     this.dataService.getDocNoForDebit(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
       this.debitFormData.DOC_NO = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -885,15 +856,6 @@ export class MiscellaneousInvoiceAddComponent {
     const gstTotal = totalItems?.[1]?.value || 0;
 
     this.netAmountDisplay = amountTotal + gstTotal;
-
-    console.log(
-      'Amount:',
-      amountTotal,
-      'GST:',
-      gstTotal,
-      'Net Total:',
-      this.netAmountDisplay,
-    );
   }
 
   calculateAmount = (rowData: any): number => {

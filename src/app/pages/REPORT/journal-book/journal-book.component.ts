@@ -382,8 +382,6 @@ export class JournalBookComponent {
   }
 
   onViewClick(e: any) {
-    console.log(e, '=======event==========');
-
     const TransType = e.row.data.TransType;
     const trans_id = e.row.data.TransID;
 
@@ -395,16 +393,11 @@ export class JournalBookComponent {
       this.dataService
         .selectJournalVoucher(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedJournalVoucher = response.Data;
           this.loadingInvoice = false;
 
           this.isViewJournalVoucher = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedJournalVoucher,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TransType === 36) {
       this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
@@ -413,13 +406,8 @@ export class JournalBookComponent {
 
         this.isViewDebitNote = true;
         this.cdr.detectChanges();
-        console.log(
-          this.selectedDebitNote,
-          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-        );
       });
     } else if (TransType === 37) {
-      console.log('=====navigate to 37-CREDIT NOTE=====');
       this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
         this.selectedCreditNote = response.Data;
         this.loadingInvoice = false;
@@ -432,7 +420,6 @@ export class JournalBookComponent {
         );
       });
     } else if (TransType === 25) {
-      console.log('=====navigate to 25-SALES INVOICE=====');
       this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
         this.loadingInvoice = false;
@@ -452,7 +439,6 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
         });
     } else if (TransType === 27) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
@@ -461,11 +447,9 @@ export class JournalBookComponent {
           this.cdr.detectChanges();
         });
     } else if (TransType === 2) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectMiscReceipt(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedmiscellaneousData = response.Data;
           this.editMiscPopup = true;
           this.cdr.detectChanges();
@@ -475,11 +459,9 @@ export class JournalBookComponent {
           );
         });
     } else if (TransType === 38) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .Select_PrePayment(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedPrePayment = response.Data;
           this.editPrePaymentPopupOpened = true;
           this.cdr.detectChanges();
@@ -496,7 +478,6 @@ export class JournalBookComponent {
       this.dataService
         .selectPurchaseReturn(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedPurchaseReturn = response.Data;
           this.isEditPurchaseReturn = true;
 
@@ -504,11 +485,9 @@ export class JournalBookComponent {
           
         });
     } else if (TransType === 14) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectTransferOutForInventory(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedTrOut = response;
           console.log(this.selectedTrOut);
           this.isEditTransferOut = true;
@@ -517,7 +496,6 @@ export class JournalBookComponent {
           console.log(this.selectedTrOut, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
     } else if (TransType === 15) {
-      console.log('=====navigate to 25-SALES INVOICE=====');
       this.dataService
         .selectTransferInForInventory(trans_id)
         .subscribe((response: any) => {
@@ -529,11 +507,9 @@ export class JournalBookComponent {
           console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
     } else if (TransType === 39) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .select_Prepayment_Posting(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selecte_prepayment_Data = response.Data;
           this.isEditPopupPrepaymentPosting = true;
 
@@ -544,7 +520,6 @@ export class JournalBookComponent {
           );
         });
     } else if (TransType === 26) {
-      console.log('=====navigate =====');
       this.dataService.selectSaleReturn(trans_id).subscribe((response: any) => {
         this.selectedSaleReturn = response;
         this.isEditSaleReturn = true;
@@ -552,11 +527,9 @@ export class JournalBookComponent {
        
       });
     } else if (TransType === 3) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectMiscPayment(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedmiscellaneousData = response;
           console.log(this.selectedmiscellaneousData);
           this.editMiscPopupOpened = true;
@@ -568,9 +541,7 @@ export class JournalBookComponent {
           );
         });
     } else if (TransType === 103) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService.selectProduction(trans_id).subscribe((response: any) => {
-        console.log(response);
         this.selectedProduction = response;
         console.log(this.selectedmiscellaneousData);
         this.isViewProduction = true;
@@ -582,11 +553,9 @@ export class JournalBookComponent {
         );
       });
     } else if (TransType === 104) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectBoxProduction(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedProduction = response;
           console.log(this.selectedmiscellaneousData);
           this.isViewProduction = true;

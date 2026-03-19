@@ -170,9 +170,9 @@ export class SupplierListComponent implements OnInit {
   // }
 
   onExporting(event: any) {
-      const fileName = 'supplier-list';
-      this.dataservice.exportDataGrid(event, fileName);
-    }
+    const fileName = 'supplier-list';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
 
   private loadDropdownData(): void {
     this.dataservice.getDropdownData('LANDED_COST').subscribe((data) => {
@@ -208,59 +208,34 @@ export class SupplierListComponent implements OnInit {
   }
 
   showSupplier() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id,
-  };
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
 
-  this.SupplierDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getSupplierData(payload).subscribe({
-          next: (response: any[]) => {
-            const data = (response || []).map(
-              (item: any, index: number) => ({
+    this.SupplierDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getSupplierData(payload).subscribe({
+            next: (response: any[]) => {
+              const data = (response || []).map((item: any, index: number) => ({
                 ...item,
                 SNO: index + 1,
-              }),
-            );
+              }));
 
-            this.supplierList = data;         // cache array
-            this.supplierRowCount = data.length;
+              this.supplierList = data; // cache array
+              this.supplierRowCount = data.length;
 
-            resolve(data);                    //  stop loader
-          },
-          error: () => {
-            this.supplierList = [];
-            this.supplierRowCount = 0;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
-
-
-  // showSupplier() {
-  //   this.dataservice.getSupplierData().subscribe((response) => {
-  //     this.supplier = response;
-  //     console.log(response, 'SUPPLIERRRRRRRRR');
-  //   });
-  // }
-  // onClickSaveSupplier(){
-
-  //   const {HQID, SUPP_CODE, SUPP_NAME,CONTACT_NAME,ADDRESS1,ADDRESS2,ADDRESS3,ZIP,STATE_ID,CITY,COUNTRY_ID,PHONE,EMAIL,IS_INACTIVE,MOBILE_NO,
-  //     NOTES,FAX_NO,VAT_REGNO,CURRENCY_ID,PAY_TERM_ID,VAT_RULE_ID } =this.supplierComponent.getNewSupplierData();
-
-  //   this.dataservice.postSupplierData(HQID, SUPP_CODE, SUPP_NAME,CONTACT_NAME,ADDRESS1,ADDRESS2,ADDRESS3,ZIP,STATE_ID,
-  //     CITY,COUNTRY_ID,PHONE,EMAIL,IS_INACTIVE,MOBILE_NO,NOTES,FAX_NO,VAT_REGNO,CURRENCY_ID,PAY_TERM_ID,VAT_RULE_ID).subscribe(
-  //     (response)=>{
-  //       if(response){
-  //         this.showSupplier();
-  //       }
-  //     }
-  //   )
-
-  // }
+              resolve(data); //  stop loader
+            },
+            error: () => {
+              this.supplierList = [];
+              this.supplierRowCount = 0;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onSelectionChanged(event: any): void {
     console.log('Selection Event:', event);
@@ -333,6 +308,14 @@ export class SupplierListComponent implements OnInit {
 
         //  Call child form reset
         this.supplierForm.resetPartialForm();
+      } else {
+        notify(
+          {
+            message: 'Insert functionality Faild',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
       }
     });
   }
@@ -400,23 +383,18 @@ export class SupplierListComponent implements OnInit {
   //   });
 
   onRowRemoving(event) {
-    console.log(event)
-    const id = event.data.ID
-    this.dataservice
-      .removeSupplier(id)
-      .subscribe(() => {
-
-          notify(
-            {
-              message: 'Delete operation successful',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.dataGrid.instance.refresh();
-          this.showSupplier();
-    
-      });
+    const id = event.data.ID;
+    this.dataservice.removeSupplier(id).subscribe(() => {
+      notify(
+        {
+          message: 'Delete operation successful',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'success',
+      );
+      this.dataGrid.instance.refresh();
+      this.showSupplier();
+    });
   }
 
   onRowUpdating(event) {
@@ -445,9 +423,6 @@ export class SupplierListComponent implements OnInit {
         );
       }
     });
-    console.log('old data:', oldData);
-    console.log('new data:', updataDate);
-    console.log('modified data:', combinedData);
 
     event.cancel = true; // Prevent the default update operation
   }
@@ -495,7 +470,7 @@ export class SupplierListComponent implements OnInit {
     this.dataservice.selectSupplier(ID).subscribe((response: any) => {
       console.log('Supplier selected successfully:', response);
       this.selectedSupplier = response;
-      console.log(response)
+
       this.cdr.detectChanges();
 
       // Open the popup
@@ -521,14 +496,13 @@ export class SupplierListComponent implements OnInit {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/supplier');
@@ -542,9 +516,6 @@ export class SupplierListComponent implements OnInit {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
-
     this.loadDropdownData();
     this.showSupplier();
     this.showCountry();
@@ -554,19 +525,13 @@ export class SupplierListComponent implements OnInit {
 
   get_sessionstorage_data() {
     this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.savedUserData);
     this.company_list = this.savedUserData.Companies;
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 }
 

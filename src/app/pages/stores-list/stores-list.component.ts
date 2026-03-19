@@ -297,12 +297,8 @@ export class StoresListComponent implements OnInit {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   showStores() {
@@ -569,14 +565,12 @@ export class StoresListComponent implements OnInit {
   // }
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax()
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)

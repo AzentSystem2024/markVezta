@@ -88,7 +88,6 @@ export class DepreciationAddComponent {
     };
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -100,20 +99,12 @@ export class DepreciationAddComponent {
     this.dataService
       .Active_list_Fixed_Asset_api(payload)
       .subscribe((res: any) => {
-        console.log(res);
-
         this.Active_fixed_asset_list = res.Data;
       });
   }
 
   onSelectionChanged(event: any) {
-    console.log(event, '======selectd data============');
-
     this.selectedData_in_Fixed_asset = event.selectedRowsData;
-    console.log(
-      this.selectedData_in_Fixed_asset,
-      '========selectedData_in_Fixed_asset===========',
-    );
 
     this.recordsCount = this.selectedData_in_Fixed_asset.length;
     this.calculateDepreciationDays();
@@ -126,7 +117,6 @@ export class DepreciationAddComponent {
       }),
     );
 
-    console.log(this.DepreciationPayload.ASSET_IDS);
     //======================Date calculation============================
   }
   onSelectAllChange(event: any) {}
@@ -138,21 +128,15 @@ export class DepreciationAddComponent {
   }
 
   onDateValueChanged(event: any) {
-    console.log(event);
     const date = event.value;
     this.depreciationDate = date;
-    console.log(this.depreciationDate);
   }
   onEditorPreparing(event: any) {}
   calculateDepreciationDays() {
     const currentDate = this.depreciationDate;
 
-    console.log(currentDate, '===============curent currentDate============');
     const lastDeprDateStr = this.selectedData_in_Fixed_asset.LAST_DEPR_DATE;
     const purchaseDateStr = this.selectedData_in_Fixed_asset.PURCH_DATE;
-
-    console.log(lastDeprDateStr, '========last depreciation date');
-    console.log(purchaseDateStr, '======== purchaseDate date');
   }
   parseDateString(dateStr: string): Date | null {
     if (!dateStr) return null;
@@ -165,9 +149,7 @@ export class DepreciationAddComponent {
     return new Date(year, month, day);
   }
 
-  onCellValueChanged(event: any) {
-    console.log(event, '=========on cell value changed================');
-  }
+  onCellValueChanged(event: any) {}
   onDepreciationDateChange(newDate: Date) {
     this.depreciationDate = newDate;
     this.calculateDepreciationDays();
@@ -196,8 +178,6 @@ export class DepreciationAddComponent {
       //       return itemDate >= start && itemDate <= end;
       //     });
       //   }
-
-      //   console.log(this.Depreciation_List, 'Filtered Depreciation List');
     });
   }
 
@@ -252,7 +232,6 @@ export class DepreciationAddComponent {
     // ✅ Trigger grid refresh
     this.Active_fixed_asset_list = [...this.Active_fixed_asset_list];
 
-    console.log(this.Active_fixed_asset_list);
     this.formattedAssets = this.Active_fixed_asset_list.filter(
       (item) => item.Days > 0 && item.Depreciation_amount > 0,
     ).map((item) => ({
@@ -260,8 +239,6 @@ export class DepreciationAddComponent {
       Days: item.Days,
       Depr_Amount: item.Depreciation_amount,
     }));
-
-    console.log(this.formattedAssets);
 
     this.processd_Date = this.depreciationDate;
   }
@@ -272,21 +249,11 @@ export class DepreciationAddComponent {
   AddData() {
     const validationResult = this.formValidationGroup?.instance?.validate();
     if (!validationResult?.isValid) {
-      console.log('Validation failed');
       return;
     }
 
-    console.log(this.processd_Date, '=========prcossed date========');
-    console.log(this.depreciationDate, '==========depreciationDate========');
-    console.log(
-      this.DepreciationPayload,
-      '====================payload==========',
-    );
-    console.log(this.formattedAssets);
     const date = this.DepreciationPayload.DEPR_DATE;
 
-    console.log('Date=================', date);
-    console.log(this.formatDateToDMY(date));
     const today = new Date();
     const deprDate =
       today.getFullYear() +
@@ -303,7 +270,6 @@ export class DepreciationAddComponent {
       DEPR_DATE: deprDate,
     };
 
-    console.log(payload, '===============payload=====');
     if (this.selectedRowsInGrid.length === 0) {
       // Show error and return
       notify(
@@ -329,11 +295,7 @@ export class DepreciationAddComponent {
       );
       return;
     }
-    console.log(this.processd_Date, '============this.processd_Date==========');
-    console.log(
-      this.depreciationDate,
-      '============this.processd_Date==========',
-    );
+
     if (this.processd_Date !== this.depreciationDate) {
       // Show error and return
       notify(
@@ -349,7 +311,7 @@ export class DepreciationAddComponent {
     }
 
     //   this.dataService.Add_Depreciation_api(payload).subscribe((res:any)=>{
-    //     console.log(res)
+    //
     // if(res.Flag==1){
 
     //        this.popupClosed.emit()
@@ -373,7 +335,6 @@ export class DepreciationAddComponent {
     this.dataService.Add_Depreciation_api(payload).subscribe(
       (res: any) => {
         this.isSaving = false;
-        console.log(res);
 
         if (res.success == true) {
           this.popupClosed.emit();
@@ -415,17 +376,10 @@ export class DepreciationAddComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
   }
 }
 

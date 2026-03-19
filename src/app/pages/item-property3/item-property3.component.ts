@@ -77,37 +77,16 @@ export class ItemProperty3Component {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
-    console.log(
-      this.ITEM_PROPERTY1,
-      '============ITEM_PROPERTY1==============',
-    );
 
     this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
-    console.log(
-      this.ITEM_PROPERTY2,
-      '============ITEM_PROPERTY2==============',
-    );
 
     this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
-    console.log(
-      this.ITEM_PROPERTY3,
-      '============ITEM_PROPERTY3==============',
-    );
 
     this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
-    console.log(
-      this.ITEM_PROPERTY4,
-      '============ITEM_PROPERTY4==============',
-    );
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
-    console.log(
-      this.ITEM_PROPERTY5,
-      '============ITEM_PROPERTY5==============',
-    );
   }
   OnEditingStartItem(e: any) {
     e.cancel = true;
@@ -174,22 +153,13 @@ export class ItemProperty3Component {
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
-    console.log(sessionData, '===========selected HSN CODE===================');
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     // THIS IS THE MISSING LINK
     // this.poData.COMPANY_ID = this.companyID;
     // this.poData.USER_ID = sessionData.USER_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   listItemProperty3() {
@@ -222,8 +192,6 @@ export class ItemProperty3Component {
   onClickSaveItemProperty3() {
     const { CODE, DESCRIPTION, COMPANY_ID } =
       this.ItemProperty3FormComponent.getNewItemProperty3Data();
-
-    console.log('inserted data', CODE, DESCRIPTION, COMPANY_ID);
 
     // 🔐 Safety guards
     const list = this.itemProperty3Array || [];
@@ -279,7 +247,6 @@ export class ItemProperty3Component {
       .insertItemProperty3Data(CODE, DESCRIPTION, COMPANY_ID)
       .subscribe({
         next: (response) => {
-          console.log('Insert response:', response);
           this.listItemProperty3();
           notify(
             {

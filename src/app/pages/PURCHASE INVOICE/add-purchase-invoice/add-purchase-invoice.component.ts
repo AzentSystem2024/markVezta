@@ -235,7 +235,6 @@ export class AddPurchaseInvoiceComponent {
     this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
     console.log(this.fin_id);
     this.store_id = this.sessionData.Configuration?.[0]?.STORE_ID;
-    console.log(this.store_id);
     this.user_id = this.sessionData.USER_ID;
     console.log(this.user_id);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;

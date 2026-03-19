@@ -165,7 +165,6 @@ export class SupplierEditComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.DEFAULT_COUNTRY_CODE = this.sessionData.DEFAULT_COUNTRY_CODE;
   }
@@ -180,17 +179,11 @@ export class SupplierEditComponent {
   //  }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
+
     this.DEFAULT_COUNTRY_CODE =
       sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
@@ -283,7 +276,6 @@ export class SupplierEditComponent {
     };
     this.dataservice.getSupplierData(payload).subscribe((response) => {
       this.supplier = response;
-      console.log(response);
     });
   }
 
@@ -501,7 +493,6 @@ export class SupplierEditComponent {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      console.log(res);
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }
@@ -515,7 +506,6 @@ export class SupplierEditComponent {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      console.log(res);
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }

@@ -89,7 +89,7 @@ export class PurchaseReturnDebitFormComponent {
   supplierList: any;
   mainGridData: any[] = [];
   isApproved: boolean = false;
-    logoBase64: string;
+  logoBase64: string;
   purchaseReturnFormData: any = {
     COMPANY_ID: 0,
     STORE_ID: 0,
@@ -198,10 +198,9 @@ export class PurchaseReturnDebitFormComponent {
 
     this.sessionData_tax();
     this.getSupplierLstWithState();
-     const imagePath = 'assets/markLogo.jpg';
+    const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
   }
 
@@ -216,10 +215,8 @@ export class PurchaseReturnDebitFormComponent {
     });
   }
 
-
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -519,9 +516,6 @@ export class PurchaseReturnDebitFormComponent {
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
       this.netAmount = Number(this.grandTotal).toFixed(2);
       this.onRoundOffChange();
-      console.log('GROSS AMOUNT Summary:', this.totalAmount);
-      console.log('TAX_AMOUNT Summary:', this.taxAmount);
-      console.log('NET AMOUNT Summary:', this.grandTotal);
     } else {
       console.warn('Summary values not ready yet.');
     }
@@ -940,160 +934,170 @@ export class PurchaseReturnDebitFormComponent {
 
   openPDF() {
     // Call your PDF API or open a URL
-    console.log('Open PDF clicked');  
+    console.log('Open PDF clicked');
     const returnId = this.EditingResponseData.TRANS_ID;
-    console.log(returnId)
+    console.log(returnId);
     this.dataService.selectPurchaseReturn(returnId).subscribe((res: any) => {
-      console.log(res,'res-----')
+      console.log(res, 'res-----');
       this.generatePDF(res);
     });
-  } 
-
- generatePDF(data: any) {
-  // Normalize API response
-  if (Array.isArray(data)) {
-    data = data[0];
   }
 
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 10;
-  let y = 10;
+  generatePDF(data: any) {
+    // Normalize API response
+    if (Array.isArray(data)) {
+      data = data[0];
+    }
 
-  // ======================================================
-  // LOGO
-  // ======================================================
-  const logoX = 18;
-  const logoY = 12;
-  const logoW = 30;
-  const logoH = 30;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
+    let y = 10;
 
-  doc.setFillColor(225, 225, 225);
-  doc.rect(logoX, logoY, logoW, logoH, 'F');
-  doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
+    // ======================================================
+    // LOGO
+    // ======================================================
+    const logoX = 18;
+    const logoY = 12;
+    const logoW = 30;
+    const logoH = 30;
 
-  // ======================================================
-  // TITLE
-  // ======================================================
-  y = logoY + logoH + 10;
+    doc.setFillColor(225, 225, 225);
+    doc.rect(logoX, logoY, logoW, logoH, 'F');
+    doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.text('DEBIT NOTE', pageWidth / 2, y, { align: 'center' });
+    // ======================================================
+    // TITLE
+    // ======================================================
+    y = logoY + logoH + 10;
 
-  // ======================================================
-  // RIGHT HEADER DETAILS
-  // ======================================================
-  doc.setFontSize(10);
-  const rightX = pageWidth - 65;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text('DEBIT NOTE', pageWidth / 2, y, { align: 'center' });
 
-  doc.text(`GST IN : ${data.GST_NO}`, rightX, logoY + 5);
-  doc.text(`CIN : ${data.CIN}`, rightX, logoY + 11);
-  doc.text(`PAN : ${data.PAN_NO}`, rightX, logoY + 17);
+    // ======================================================
+    // RIGHT HEADER DETAILS
+    // ======================================================
+    doc.setFontSize(10);
+    const rightX = pageWidth - 65;
 
-  // ======================================================
-  // HORIZONTAL LINE
-  // ======================================================
-  y += 8;
-  doc.setDrawColor(0);
-  doc.line(margin, y, pageWidth - margin, y);
-  y += 5;
+    doc.text(`GST IN : ${data.GST_NO}`, rightX, logoY + 5);
+    doc.text(`CIN : ${data.CIN}`, rightX, logoY + 11);
+    doc.text(`PAN : ${data.PAN_NO}`, rightX, logoY + 17);
 
-  // ======================================================
-  // SELLER BLUE BOX
-  // ======================================================
-  const blueX = margin;
-  const blueY = y;
-  const blueW = 100;
-  const blueH = 38;
+    // ======================================================
+    // HORIZONTAL LINE
+    // ======================================================
+    y += 8;
+    doc.setDrawColor(0);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 5;
 
-  doc.setFillColor(204, 229, 255);
-  doc.rect(blueX, blueY, blueW, blueH, 'F');
+    // ======================================================
+    // SELLER BLUE BOX
+    // ======================================================
+    const blueX = margin;
+    const blueY = y;
+    const blueW = 100;
+    const blueH = 38;
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.text(data.COMPANY_NAME, blueX + 3, blueY + 7);
+    doc.setFillColor(204, 229, 255);
+    doc.rect(blueX, blueY, blueW, blueH, 'F');
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.text(data.ADDRESS1, blueX + 3, blueY + 13);
-  doc.text(data.ADDRESS2, blueX + 3, blueY + 18);
-  doc.text(data.ADDRESS3, blueX + 3, blueY + 23);
-  doc.text(`GSTIN/UIN : ${data.GST_NO}`, blueX + 3, blueY + 28);
-  doc.text(
-    `State : ${data.SUPP_STATE_NAME}, Code : 32`,
-    blueX + 3,
-    blueY + 33
-  );
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(data.COMPANY_NAME, blueX + 3, blueY + 7);
 
-  // ======================================================
-  // CONSIGNEE / BUYER (RIGHT SIDE)
-  // ======================================================
-  const rightBlockX = 125;
-  let rightY = blueY + 5;
-  const gap = 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text(data.ADDRESS1, blueX + 3, blueY + 13);
+    doc.text(data.ADDRESS2, blueX + 3, blueY + 18);
+    doc.text(data.ADDRESS3, blueX + 3, blueY + 23);
+    doc.text(`GSTIN/UIN : ${data.GST_NO}`, blueX + 3, blueY + 28);
+    doc.text(
+      `State : ${data.SUPP_STATE_NAME}, Code : 32`,
+      blueX + 3,
+      blueY + 33,
+    );
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.text('Consignee (Ship to)', rightBlockX, rightY);
+    // ======================================================
+    // CONSIGNEE / BUYER (RIGHT SIDE)
+    // ======================================================
+    const rightBlockX = 125;
+    let rightY = blueY + 5;
+    const gap = 7;
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(11);
-  rightY += gap;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Consignee (Ship to)', rightBlockX, rightY);
 
-  doc.text(data.SUPP_NAME || '', rightBlockX, rightY);
-  doc.text(data.SUPP_ADDRESS1 || '', rightBlockX, rightY + gap);
-  doc.text(data.SUPP_ADDRESS2 || '', rightBlockX, rightY + gap * 2);
-  doc.text(data.SUPP_ADDRESS3 || '', rightBlockX, rightY + gap * 3);
-  doc.text(`GSTIN/UIN : ${data.SUPP_CODE}`, rightBlockX, rightY + gap * 4);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    rightY += gap;
 
-  // ======================================================
-  // TABLE
-  // ======================================================
-  y = Math.max(blueY + blueH + 12, rightY + gap * 6);
+    doc.text(data.SUPP_NAME || '', rightBlockX, rightY);
+    doc.text(data.SUPP_ADDRESS1 || '', rightBlockX, rightY + gap);
+    doc.text(data.SUPP_ADDRESS2 || '', rightBlockX, rightY + gap * 2);
+    doc.text(data.SUPP_ADDRESS3 || '', rightBlockX, rightY + gap * 3);
+    doc.text(`GSTIN/UIN : ${data.SUPP_CODE}`, rightBlockX, rightY + gap * 4);
 
- const rows = (data.PurchDetail || []).map((item: any) => [
-  item.DOC_NO || '-',                                   // Transfer No.
-  (item.PURCH_DATE || '').split('T')[0],               // Date
-  item.ITEM_NAME || '-',                               // Item Name
-  item.HSN_CODE || '-',                                // HSN Code
-  Number(item.RATE || 0).toFixed(2),                    // Price
-  Number(item.PENDING_QTY || 0),                        // Pending Qty
-  Number(item.QUANTITY || 0),                           // Quantity
-  Number(item.AMOUNT || 0).toFixed(2),                  // Amount
-  Number(item.VAT_PERC || 0).toFixed(2),                // IGST(%)
-  Number(item.VAT_AMOUNT || 0).toFixed(2),              // GST Amount
-  Number(item.TOTAL_AMOUNT || 0).toFixed(2)             // Total
-]);
+    // ======================================================
+    // TABLE
+    // ======================================================
+    y = Math.max(blueY + blueH + 12, rightY + gap * 6);
 
+    const rows = (data.PurchDetail || []).map((item: any) => [
+      item.DOC_NO || '-', // Transfer No.
+      (item.PURCH_DATE || '').split('T')[0], // Date
+      item.ITEM_NAME || '-', // Item Name
+      item.HSN_CODE || '-', // HSN Code
+      Number(item.RATE || 0).toFixed(2), // Price
+      Number(item.PENDING_QTY || 0), // Pending Qty
+      Number(item.QUANTITY || 0), // Quantity
+      Number(item.AMOUNT || 0).toFixed(2), // Amount
+      Number(item.VAT_PERC || 0).toFixed(2), // IGST(%)
+      Number(item.VAT_AMOUNT || 0).toFixed(2), // GST Amount
+      Number(item.TOTAL_AMOUNT || 0).toFixed(2), // Total
+    ]);
 
-  autoTable(doc, {
-    startY: y,
-    head: [[
-      'Transfer No.',
-      'Date',
-      'Item Name',
-      'HSN Code',
-      'Price',
-      'Pending Qty',
-      'Quantiti',
-      'Amount',
-      'IGST(%)',
-      'GST Amount',
-      'total'
-    ]],
-    body: rows,
-    theme: 'grid',
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [230, 230, 230] },
-    columnStyles: { 8: { halign: 'right' } },
-    foot: [[
-      { content: 'Total', colSpan: 8, styles: { halign: 'right', fontStyle: 'bold' } },
-      { content: data.NET_AMOUNT.toFixed(2), styles: { fontStyle: 'bold' } }
-    ]]
-  });
+    autoTable(doc, {
+      startY: y,
+      head: [
+        [
+          'Transfer No.',
+          'Date',
+          'Item Name',
+          'HSN Code',
+          'Price',
+          'Pending Qty',
+          'Quantiti',
+          'Amount',
+          'IGST(%)',
+          'GST Amount',
+          'total',
+        ],
+      ],
+      body: rows,
+      theme: 'grid',
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [230, 230, 230] },
+      columnStyles: { 8: { halign: 'right' } },
+      foot: [
+        [
+          {
+            content: 'Total',
+            colSpan: 8,
+            styles: { halign: 'right', fontStyle: 'bold' },
+          },
+          {
+            content: data.NET_AMOUNT.toFixed(2),
+            styles: { fontStyle: 'bold' },
+          },
+        ],
+      ],
+    });
 
-   // ============================================================
+    // ============================================================
     // FOOTER - EXACTLY LIKE THE PROVIDED SCREENSHOT
     // ============================================================
 
@@ -1193,7 +1197,7 @@ export class PurchaseReturnDebitFormComponent {
     doc.text(
       'Whether the tax is payable on Reverse charge basis: ',
       15,
-      wordsY
+      wordsY,
     );
 
     doc.setFont('helvetica', 'normal');
@@ -1229,12 +1233,11 @@ export class PurchaseReturnDebitFormComponent {
     sigY += 18;
     doc.setFont('helvetica', 'normal');
     doc.text('Authorised Signatory', pageWidth - 75, sigY);
-  // ======================================================
-  // OPEN PDF
-  // ======================================================
-  doc.output('dataurlnewwindow');
-}
-
+    // ======================================================
+    // OPEN PDF
+    // ======================================================
+    doc.output('dataurlnewwindow');
+  }
 
   cancel() {
     this.popupClosed.emit();
@@ -1285,7 +1288,7 @@ export class PurchaseReturnDebitFormComponent {
     }
   }
 
-    numberToWords(amount: number): string {
+  numberToWords(amount: number): string {
     if (amount === 0) return 'Zero Rupees Only';
 
     const words = [
@@ -1358,8 +1361,6 @@ export class PurchaseReturnDebitFormComponent {
     return convert(Math.floor(amount)) + ' Rupees Only';
   }
 }
-
-
 
 @NgModule({
   imports: [

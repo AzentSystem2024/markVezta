@@ -155,7 +155,6 @@ export class EmployeeAddFormComponent {
   constructor(public dataservice: DataService) {
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
-      console.log(this.countries, 'COUNTRY;;;;;;;;;;');
     });
     // dataservice.get_Country_Dropdown_Api().subscribe((data) => {
     //   this.countries = data;
@@ -169,8 +168,8 @@ export class EmployeeAddFormComponent {
     });
 
     const dept_payload = {
-      NAME : 'EMPLOYEE DEPARTMENT'
-    }
+      NAME: 'EMPLOYEE DEPARTMENT',
+    };
     dataservice.getDropdownData(dept_payload).subscribe((data) => {
       this.departments = data;
     });
@@ -181,14 +180,14 @@ export class EmployeeAddFormComponent {
       this.designations = data;
     });
     const paymentType_payload = {
-      NAME : 'SALARY PAYMENT TYPE'
-    }
+      NAME: 'SALARY PAYMENT TYPE',
+    };
     dataservice.getDropdownData(paymentType_payload).subscribe((data) => {
       this.paymentType = data;
     });
     const state_payload = {
-      NAME : 'STATE'
-    }
+      NAME: 'STATE',
+    };
     dataservice.getDropdownData(state_payload).subscribe((data) => {
       this.states = data;
     });
@@ -211,9 +210,7 @@ export class EmployeeAddFormComponent {
     );
     const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
 
-    console.log(SELECTED_COMPANY);
     this.COMPANY_ID = companyid.COMPANY_ID;
-    console.log(companyid);
   }
 
   onImageUpload(event: any): void {
@@ -311,7 +308,6 @@ export class EmployeeAddFormComponent {
   }
 
   openAttachmentPopup() {
-    console.log('Opening attachment popup...'); // Debugging log
     this.showPopup = true;
   }
 
@@ -331,12 +327,7 @@ export class EmployeeAddFormComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   getEmployeeList() {
@@ -445,7 +436,6 @@ export class EmployeeAddFormComponent {
     // }));
 
     const payload = { ...this.employeeFormData, Company_Id: this.COMPANY_ID };
-    console.log(payload);
 
     this.dataservice.saveEmployeeData(payload).subscribe({
       next: (response: any) => {

@@ -85,7 +85,7 @@ export class ViewJournalVoucherComponent {
   ledgerNameEditorOptions: any = {};
   isReadOnly = false;
   Company_list: any = [];
-   logoBase64: string;
+  logoBase64: string;
 
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
@@ -101,14 +101,13 @@ export class ViewJournalVoucherComponent {
     this.getLedgerCodeDropdown();
     this.Deparment_Drop_down();
 
-     const imagePath = 'assets/markLogo.jpg';
+    const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
   }
 
-   private async convertToBase64(path: string): Promise<string> {
+  private async convertToBase64(path: string): Promise<string> {
     const response = await fetch(path);
     const blob = await response.blob();
 
@@ -118,7 +117,6 @@ export class ViewJournalVoucherComponent {
       reader.readAsDataURL(blob);
     });
   }
-
 
   Deparment_Drop_down() {
     this.dataService.Department_Dropdown().subscribe((res: any) => {
@@ -262,39 +260,38 @@ export class ViewJournalVoucherComponent {
         // if (response) {
         //   this.pdfSrc = this.get_pdf(response);
         // }
-        this.get_pdf(response)
+        this.get_pdf(response);
       });
   }
 
   get_pdf(data: any) {
     // ============================
-       // NORMALIZE API RESPONSE
-       // ============================
-       const header = data;              // whole object is header
-       const details = data.DETAILS || [];  // correct property name
+    // NORMALIZE API RESPONSE
+    // ============================
+    const header = data; // whole object is header
+    const details = data.DETAILS || []; // correct property name
 
-   
-       const doc = new jsPDF('p', 'mm', 'a4');
-       const pageWidth = doc.internal.pageSize.getWidth();
-       const margin = 10;
-       let y = 10;
-   
-       // ============================
-       // LOGO
-       // ============================
-       const logoX = 18;
-       const logoY = 12;
-       const logoW = 30;
-       const logoH = 30;
-   
-       doc.setFillColor(225, 225, 225);
-       doc.rect(logoX, logoY, logoW, logoH, 'F');
-   
-       if (this.logoBase64) {
-         doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
-       }
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
+    let y = 10;
 
-        // ============================
+    // ============================
+    // LOGO
+    // ============================
+    const logoX = 18;
+    const logoY = 12;
+    const logoW = 30;
+    const logoH = 30;
+
+    doc.setFillColor(225, 225, 225);
+    doc.rect(logoX, logoY, logoW, logoH, 'F');
+
+    if (this.logoBase64) {
+      doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
+    }
+
+    // ============================
     // TITLE
     // ============================
     y = logoY + logoH + 10;
@@ -302,7 +299,7 @@ export class ViewJournalVoucherComponent {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
     doc.text('JOURNAL VOUCHER', pageWidth / 2, y, { align: 'center' });
-   
+
     // ============================
     // RIGHT HEADER DETAILS
     // ============================
@@ -310,10 +307,10 @@ export class ViewJournalVoucherComponent {
     const rightX = pageWidth - 70;
 
     doc.text(`Return No : ${data.REF_NO}`, rightX, logoY + 5);
-   doc.text(`Return Date : ${data.TRANS_DATE || '-'}`, rightX, logoY + 11);
+    doc.text(`Return Date : ${data.TRANS_DATE || '-'}`, rightX, logoY + 11);
     doc.text(`Sale No : ${data.REF_NO}`, rightX, logoY + 17);
 
-     // ============================
+    // ============================
     // HORIZONTAL LINE
     // ============================
     y += 8;
@@ -342,9 +339,13 @@ export class ViewJournalVoucherComponent {
     doc.text(String(data.NARRATION) || 'Kozhikode', leftX + 3, blockY + 22);
     doc.text(`GSTIN/UIN : ${String(data.NARRATION)}`, leftX + 3, blockY + 27);
     doc.text(`State : KERALA, Code : 32`, leftX + 3, blockY + 32);
-    doc.text(`E-Mail : ${String(data.NARRATION) || '-'}`, leftX + 3, blockY + 37);
+    doc.text(
+      `E-Mail : ${String(data.NARRATION) || '-'}`,
+      leftX + 3,
+      blockY + 37,
+    );
 
-     // ============================
+    // ============================
     // CONSIGNEE (SHIP TO) - RIGHT
     // ============================
     const rightBlockX = 120;
@@ -381,7 +382,7 @@ export class ViewJournalVoucherComponent {
     doc.text(String(header.NARRATION) || 'Kozhikode', leftX, dispatchY + 15);
     doc.text(`GSTIN/UIN : ${String(header.NARRATION)}`, leftX, dispatchY + 20);
 
-     // ============================
+    // ============================
     // BUYER (BILL TO) - RIGHT BELOW
     // ============================
     let buyerY = dispatchY;
@@ -395,7 +396,11 @@ export class ViewJournalVoucherComponent {
     doc.text(String(header.NARRATION) || 'Kozhikode', rightBlockX, buyerY + 5);
     doc.text(String(header.NARRATION) || 'Kozhikode', rightBlockX, buyerY + 10);
     doc.text(String(header.NARRATION) || 'Kozhikode', rightBlockX, buyerY + 15);
-    doc.text(`GSTIN/UIN : ${String(header.NARRATION)}`, rightBlockX, buyerY + 20);
+    doc.text(
+      `GSTIN/UIN : ${String(header.NARRATION)}`,
+      rightBlockX,
+      buyerY + 20,
+    );
     // doc.text(`State : KERALA, Code : 32`, rightBlockX, buyerY + 25);
 
     // ============================
@@ -475,8 +480,7 @@ export class ViewJournalVoucherComponent {
       footY = 20; // reset top margin for footer
     }
 
-
-     // ============================
+    // ============================
     // FOOTER (EXACT SCREENSHOT)
     // ============================
     // const footY = (doc as any).lastAutoTable.finalY + 15;
@@ -485,8 +489,7 @@ export class ViewJournalVoucherComponent {
     const totalTax = Number(header.REF_NO || 0);
     const invoiceTotal = taxableValue + totalTax;
 
-    const gstPerc =
-      Number(details || 0) + Number(details || 0);
+    const gstPerc = Number(details || 0) + Number(details || 0);
 
     // // ---------- LEFT GST SUMMARY ----------
     let lx = 15;
@@ -574,13 +577,13 @@ export class ViewJournalVoucherComponent {
     doc.setFont('helvetica', 'normal');
     doc.text(header.NARRATION || '-', 40, ry);
 
-     // ============================
+    // ============================
     // OPEN PDF
     // ============================
     doc.output('dataurlnewwindow');
   }
 
-    numberToWords(amount: number): string {
+  numberToWords(amount: number): string {
     if (amount === 0) return 'Zero Rupees Only';
 
     const words = [

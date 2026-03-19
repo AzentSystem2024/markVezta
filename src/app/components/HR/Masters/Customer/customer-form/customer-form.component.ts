@@ -121,28 +121,23 @@ export class CustomerFormComponent {
     this.sessionData_tax();
     service.getCountryWithFlags().subscribe((data) => {
       this.countryCodes = data;
-      console.log(this.countryCodes, 'COUNTRY;;;;;;;;;;');
     });
     this.getStateDropDown();
   }
   onCountrycodeChange(e: any) {
-    console.log(e, '========event==============');
     const payload = {
       COUNTRY_CODE: e.value,
     };
     this.service.get_mobile_no_length(payload).subscribe((res: any) => {
-      console.log(res);
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }
 
   onCountrycodeChangePhoneNocode(e: any) {
-    console.log(e, '========event==============');
     const payload = {
       COUNTRY_CODE: e.value,
     };
     this.service.get_mobile_no_length(payload).subscribe((res: any) => {
-      console.log(res);
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }
@@ -181,31 +176,20 @@ export class CustomerFormComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
+
     this.DEFAULT_COUNTRY_CODE =
       sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
-    console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
   }
 
   onDealerTypeChange(e: any) {
-    console.log(e.value, 'Dealer Type Changed');
-
     if (e.value === 2) {
       // 2 = Sub Dealer
       this.isDealerVisible = true; // show dropdown
@@ -254,7 +238,6 @@ export class CustomerFormComponent {
   getPaymentTerms() {
     this.service.getpayment_term_Api().subscribe((response) => {
       this.PaymentTermsDropdownData = response;
-      console.log('count', this.PaymentTermsDropdownData);
     });
   }
 
@@ -290,13 +273,9 @@ export class CustomerFormComponent {
     this.service.getStateData_Api(payload).subscribe((data: any) => {
       this.StateDropdownData = data;
     });
-    console.log(this.StateDropdownData, '========state data====');
-    console.log(this.selecte_countyId, '======county id============');
   }
   onCountrySelectionChanged(event: any) {
-    console.log(event);
     this.selecte_countyId = event.value;
-    console.log(this.selecte_countyId, '======county id============');
     this.getStateDropDown();
     const selectedCountry = this.CountryDropdownData.find(
       (country: any) => country.ID === this.selecte_countyId,
@@ -306,8 +285,6 @@ export class CustomerFormComponent {
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE; // e.g., '+971'
       this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
-      console.log('Selected Country:', selectedCountry.DESCRIPTION);
-      console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
     } else {
       // 5️⃣ Fallback if no country found
       this.countryCode = '';
@@ -330,7 +307,6 @@ export class CustomerFormComponent {
     this.get_Warehouse_Dropdown_List();
     this.get_DeliveryAddress_Dropdown_List();
     this.sesstion_Details();
-    console.log('selected company id', this.selected_Company_id);
   }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;
@@ -389,11 +365,9 @@ export class CustomerFormComponent {
         //  Push into savedAddresses array
         this.savedAddresses.push(newAddress);
       }
-      console.log(this.savedAddresses, 'Saved Addresses:');
 
       //  Optionally link with formCustomerData for payload
       this.formCustomerData.DeliveryAddresses = [...this.savedAddresses];
-      console.log(this.formCustomerData, 'Updated formCustomerData payload');
 
       //  Clear the input fields
       this.Address1Value = '';
@@ -437,12 +411,10 @@ export class CustomerFormComponent {
     return `${item.CODE}${item.COUNTRY_NAME}`;
   }
   onCountrycodeChangeDeliveryAddressmobile(e: any) {
-    console.log(e, '========event==============');
     const payload = {
       COUNTRY_CODE: e.value,
     };
     this.service.get_mobile_no_length(payload).subscribe((res: any) => {
-      console.log(res);
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }

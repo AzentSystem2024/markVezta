@@ -159,14 +159,13 @@ export class InvoiceListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    // console.log('Current URL:', currentUrl);
+    //
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    // console.log('Parsed ObjectData:', menuResponse);
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
-    // console.log('MenuGroups:', menuGroups);
+    //
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/invoice');
@@ -180,8 +179,8 @@ export class InvoiceListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    // console.log('packingRights', packingRights);
-    // console.log(this.canAdd, this.canEdit, this.canDelete);
+    //
+    //
     this.getInvoiceList();
   }
 
@@ -363,27 +362,14 @@ export class InvoiceListComponent {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    // console.log(this.sessionData, '=================session data==========');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    // console.log(
-    //   this.selected_Company_id,
-    //   '============selected_Company_id==============',
-    // );
 
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    // console.log(
-    //   this.selected_fin_id,
-    //   '===========selected fin id===================',
-    // );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
-    // console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-    // console.log(
-    //   this.financialYeaDate,
-    //   '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
-    // );
+
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_vat_id = this.sessionData.VAT_ID;
@@ -562,7 +548,6 @@ export class InvoiceListComponent {
     event.cancel = true; // Prevent default popup editing
     const invoiceId = event.data.TRANS_ID;
     const transStatus = event.data.TRANS_STATUS;
-    console.log(transStatus, 'transstatus');
 
     this.dataService.selectInvoice(invoiceId).subscribe((response: any) => {
       this.selectedInvoice = response.Data;
@@ -573,7 +558,6 @@ export class InvoiceListComponent {
         // Open edit popup
         this.isEditInvoice = true;
       }
-      console.log(this.selectedInvoice, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
     });
   }
 

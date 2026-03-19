@@ -167,14 +167,13 @@ export class JournalVoucherListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/journal-voucher');
@@ -188,9 +187,6 @@ export class JournalVoucherListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
-
     this.sessionData_tax();
     this.getJournalVouchers();
   }
@@ -198,7 +194,6 @@ export class JournalVoucherListComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }

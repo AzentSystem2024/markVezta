@@ -9,7 +9,11 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  DomSanitizer,
+  SafeResourceUrl,
+} from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -108,10 +112,13 @@ export class EditMiscellaneousPaymentComponent {
   HSNCODE: any;
   GST: any;
 
-   pdfSrc: SafeResourceUrl | null = null;
-          isPdfPopupVisible: boolean = false;
+  pdfSrc: SafeResourceUrl | null = null;
+  isPdfPopupVisible: boolean = false;
 
-  constructor(private dataService: DataService,private sanitizer: DomSanitizer) {
+  constructor(
+    private dataService: DataService,
+    private sanitizer: DomSanitizer,
+  ) {
     this.getLedgerCodeDropdown();
     // this.get_Department_dropdown();
   }
@@ -127,9 +134,6 @@ export class EditMiscellaneousPaymentComponent {
       this.finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log('User ID:', this.HSNCODE);
-      console.log('Company ID:', this.GST);
-      console.log('Financial ID:', this.finId);
 
       if (userData.USER_ID) {
         this.miscFormData.USER_ID = userData.USER_ID;
@@ -151,8 +155,6 @@ export class EditMiscellaneousPaymentComponent {
     ) {
       const data = changes['miscellaneousData'].currentValue.Data;
 
-      console.log('Received miscellaneousData:', data);
-
       // Assign main data to miscFormData
       this.miscFormData = {
         ...this.miscFormData,
@@ -161,15 +163,11 @@ export class EditMiscellaneousPaymentComponent {
 
       // Assign DetailList to pendingInvoiceList
       this.pendingInvoicelist = data.DetailList || [];
-      console.log(
-        this.miscFormData.LEDGER_NAME,
-        'MISCDETAILSSSSSSSSSSSSSSSSSSSSSSS'
-      );
+
       this.pendingInvoicelist = (data.DetailList || []).map((item: any) => {
         const ledger = this.ledgerList.find(
-          (l: any) => l.HEAD_CODE === item.HEAD_ID
+          (l: any) => l.HEAD_CODE === item.HEAD_ID,
         );
-        console.log(ledger, 'LEDGERRRRRRRRRRRRRRRRRRRR');
         return {
           ...item,
           ledgerCode: item.LEDGER_CODE,
@@ -177,25 +175,23 @@ export class EditMiscellaneousPaymentComponent {
           HSN_CODE: this.HSNCODE,
         };
       });
-      console.log(this.pendingInvoicelist, 'INNGONCHANGES');
       const matchedLedger = this.ledgerList.find(
-        (ledger: any) => ledger.HEAD_CODE === this.miscFormData.LEDGER_CODE
+        (ledger: any) => ledger.HEAD_CODE === this.miscFormData.LEDGER_CODE,
       );
 
       if (matchedLedger) {
         this.miscFormData.HEAD_ID = matchedLedger.HEAD_ID;
-        console.log('Found HEAD_ID:', matchedLedger.HEAD_ID);
       } else {
         console.warn(
           'No matching HEAD_ID found for LEDGER_CODE:',
-          this.miscFormData.LEDGER_CODE
+          this.miscFormData.LEDGER_CODE,
         );
       }
       const lastRow =
         this.miscFormData.MISC_DETAIL[this.miscFormData.MISC_DETAIL.length - 1];
       this.pendingInvoicelist = (data.DetailList || []).map((item: any) => {
         const ledger = this.ledgerList.find(
-          (l: any) => l.HEAD_CODE === item.HEAD_ID
+          (l: any) => l.HEAD_CODE === item.HEAD_ID,
         );
         return {
           ...item,
@@ -203,7 +199,6 @@ export class EditMiscellaneousPaymentComponent {
           ledgerName: ledger?.LEDGER_NAME || '',
         };
       });
-      console.log(this.pendingInvoicelist, 'PENDINGINVOICELIST');
       // Ensure empty row exists
       if (
         this.pendingInvoicelist.length === 0 ||
@@ -221,8 +216,6 @@ export class EditMiscellaneousPaymentComponent {
       }
 
       // this.receiptMode = this.getReceiptModeFromPayTypeId(data.PAY_TYPE_ID);
-      console.log(this.miscFormData, 'Updated miscFormData');
-      console.log(this.pendingInvoicelist[0].VAT_REGN, 'Pending Invoice List');
     }
   }
 
@@ -248,7 +241,6 @@ export class EditMiscellaneousPaymentComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
   ngAfterViewInit() {
@@ -277,7 +269,6 @@ export class EditMiscellaneousPaymentComponent {
   onEditorPreparing(e: any) {
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
     const grid = this.itemsGridRef?.instance;
     e.editorOptions.onKeyDown = (event: any) => {
       if (event.event.key === 'Tab') {
@@ -297,7 +288,7 @@ export class EditMiscellaneousPaymentComponent {
         if (isLastCell) {
           setTimeout(() => {
             const ledgerSelect = document.querySelector(
-              '#payHeadIdField input'
+              '#payHeadIdField input',
             ) as HTMLElement;
             if (ledgerSelect) {
               ledgerSelect.focus();
@@ -332,14 +323,14 @@ export class EditMiscellaneousPaymentComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value
+          (item: any) => item.HEAD_CODE === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerName',
-            selectedLedger.HEAD_NAME
+            selectedLedger.HEAD_NAME,
           );
           setTimeout(() => {
             this.itemsGridRef?.instance?.editCell(rowIndex, 'DESCRIPTION');
@@ -361,14 +352,14 @@ export class EditMiscellaneousPaymentComponent {
 
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_NAME === args.value
+          (item: any) => item.HEAD_NAME === args.value,
         );
         e.setValue(args.value);
         if (selectedLedger) {
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
-            selectedLedger.HEAD_CODE
+            selectedLedger.HEAD_CODE,
           );
         }
       };
@@ -496,7 +487,7 @@ export class EditMiscellaneousPaymentComponent {
         this.ledgerList = response?.Data || [];
 
         this.receiptMode = this.getReceiptModeFromPayTypeId(
-          this.miscFormData.PAY_TYPE_ID
+          this.miscFormData.PAY_TYPE_ID,
         );
         this.onReceiptModeChange({ value: this.receiptMode }); // trigger ledger filter update
       },
@@ -509,17 +500,12 @@ export class EditMiscellaneousPaymentComponent {
   setHeadIdFromLedgerCode() {
     if (this.miscFormData?.LEDGER_CODE && this.ledgerList?.length) {
       const matchedLedger = this.ledgerList.find(
-        (ledger: any) => ledger.HEAD_CODE === this.miscFormData.LEDGER_CODE
+        (ledger: any) => ledger.HEAD_CODE === this.miscFormData.LEDGER_CODE,
       );
 
       if (matchedLedger) {
         this.miscFormData.HEAD_ID = matchedLedger.HEAD_ID;
-        console.log('Found HEAD_ID:', matchedLedger.HEAD_ID);
       } else {
-        console.warn(
-          'No matching HEAD_ID found for LEDGER_CODE:',
-          this.miscFormData.LEDGER_CODE
-        );
       }
     }
   }
@@ -529,15 +515,15 @@ export class EditMiscellaneousPaymentComponent {
 
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13
+        (item: any) => item.GROUP_ID === 13,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14
+        (item: any) => item.GROUP_ID === 14,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14
+        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
@@ -587,7 +573,7 @@ export class EditMiscellaneousPaymentComponent {
           message: 'Please add at least one line item.',
           position: 'top center',
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -623,7 +609,7 @@ export class EditMiscellaneousPaymentComponent {
                 : 'Miscellaneous Payment Updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.popupClosed.emit(); // Or reset form if needed
         } else {
@@ -632,7 +618,7 @@ export class EditMiscellaneousPaymentComponent {
               message: response?.Message || 'Failed to save data.',
               position: { at: 'top center', my: 'top center' },
             },
-            'error'
+            'error',
           );
         }
       },
@@ -643,7 +629,7 @@ export class EditMiscellaneousPaymentComponent {
             message: 'Something went wrong while saving.',
             position: { at: 'top center', my: 'top center' },
           },
-          'error'
+          'error',
         );
       },
     });
@@ -651,7 +637,6 @@ export class EditMiscellaneousPaymentComponent {
 
   //     get_Department_dropdown(){
   //   this.dataService.Department_Dropdown().subscribe((res: any) => {
-  //     console.log('supplier dropdown', res);
   //     this.Department = res;
   //   });
   // }
@@ -665,28 +650,29 @@ export class EditMiscellaneousPaymentComponent {
   }
 
   viewPdf(): void {
-             this.isPdfPopupVisible = true;
-             this.dataService.selectMiscPayment(this.MiscPaymentId).subscribe((response: any) => {
-              if(response){
-              this.pdfSrc = this.get_pdf(response);
-            }
-             })
+    this.isPdfPopupVisible = true;
+    this.dataService
+      .selectMiscPayment(this.MiscPaymentId)
+      .subscribe((response: any) => {
+        if (response) {
+          this.pdfSrc = this.get_pdf(response);
+        }
+      });
   }
 
-    get_pdf(data: any): SafeResourceUrl {
-     
-       const doc = new jsPDF("p", "mm", "a4");
-       const pageWidth = doc.internal.pageSize.width;
-       const margin = 12;
-       let y = 12;
-  
-       // ===========================
+  get_pdf(data: any): SafeResourceUrl {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 12;
+    let y = 12;
+
+    // ===========================
     //  RETURN PDF
     // ===========================
-    const blob = doc.output("blob");
+    const blob = doc.output('blob');
     const url = URL.createObjectURL(blob);
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-     }
+  }
 }
 
 @NgModule({

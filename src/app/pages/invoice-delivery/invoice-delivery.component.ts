@@ -123,18 +123,17 @@ export class InvoiceDeliveryComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/invoice');
@@ -148,8 +147,6 @@ export class InvoiceDeliveryComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getInvoiceList();
   }
   getInvoiceList() {
@@ -196,7 +193,7 @@ export class InvoiceDeliveryComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -258,7 +255,6 @@ export class InvoiceDeliveryComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -321,7 +317,6 @@ export class InvoiceDeliveryComponent {
       return invoiceDate >= startDate && invoiceDate <= endDate;
     });
 
-    console.log('Filtered:', this.filteredInvoiceList);
     this.cdr.detectChanges();
   }
 
@@ -345,7 +340,7 @@ export class InvoiceDeliveryComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
@@ -429,7 +424,6 @@ export class InvoiceDeliveryComponent {
       .selectInvoiceDelivery(invoiceId)
       .subscribe((response: any) => {
         this.selectedInvoice = response;
-        console.log(this.selectedInvoice, 'SELECTEDTROUT');
         this.isEditInvoice = true;
         this.isReadOnlyInvoice = status === 5;
       });
@@ -452,7 +446,7 @@ export class InvoiceDeliveryComponent {
               message: 'Invoice Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getInvoiceList();
           // this.dataGrid.instance.refresh();
@@ -462,14 +456,14 @@ export class InvoiceDeliveryComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 

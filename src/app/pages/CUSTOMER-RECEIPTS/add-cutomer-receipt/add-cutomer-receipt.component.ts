@@ -137,13 +137,11 @@ export class AddCutomerReceiptComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.companyList = userData.Companies || [];
-      console.log(userData.SELECTED_COMPANY.COMPANY_ID, 'userData');
       this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
     } else {
       console.warn('No userData found in localStorage');
     }
     Object.freeze(this.selectedCompanyId);
-    console.log('Loaded Companies:', this.selectedCompanyId);
     this.getReceiptNo();
     this.getLedgerCodeDropdown();
     this.getCompanyListDropdown(); // only fetches distributor list
@@ -153,10 +151,6 @@ export class AddCutomerReceiptComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   getSlNo = (rowData: any, index?: number): number => {
@@ -236,12 +230,10 @@ export class AddCutomerReceiptComponent {
     if (e.component) {
       this.totalPendingAmount =
         e.component.getTotalSummaryValue('PENDING_AMOUNT');
-      console.log('Total Pending Amount:', this.totalPendingAmount);
     }
   }
 
   onCustomerChanged(event: any): void {
-    console.log(event, "==============='''");
     const selectedId = event.value;
     this.selectedDistributorId = event.value;
     this.receiprtFormData.DISTRIBUTOR_ID = selectedId;
@@ -252,9 +244,7 @@ export class AddCutomerReceiptComponent {
         (s: any) => s.ID === selectedId,
       );
       this.receiprtFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
-      console.log(this.selectedCustomer.DESCRIPTION, 'PARTYNAMEEEEEEEEEEEEEE');
     }
-    console.log(selectedId, "==============='''");
     if (selectedId) {
       this.getInvoiceList();
     }
@@ -265,28 +255,18 @@ export class AddCutomerReceiptComponent {
       // NAME: 'CUSTOMER',
       COMPANY_ID: this.selectedCompanyId,
     };
-    console.log('CUSTOMERDROPDOWN');
     this.dataService
       .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(
-          this.distributorList,
-          'distributorList==============================',
-        );
       });
   }
 
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
-        console.log('API Response:', response); // <== LOG FULL RESPONSE
         this.ledgerList = response?.Data || []; // Fallback to empty array
         this.onReceiptModeChange({ value: this.receiptMode });
-        console.log(
-          'Ledger List Loaded=============================:',
-          this.ledgerList,
-        );
       },
       error: (err) => {
         console.error('Ledger API Error:', err); // <== CATCH ERRORS
@@ -315,15 +295,9 @@ export class AddCutomerReceiptComponent {
       default:
         this.receiprtFormData.PAY_TYPE_ID = 1;
     }
-
-    console.log('PAY_TYPE_ID set to:', this.receiprtFormData.PAY_TYPE_ID);
   }
 
   applyReceiptModeFilter() {
-    console.log(
-      this.filteredLedgerList,
-      '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{',
-    );
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
         (item: any) => item.GROUP_ID === 13,
@@ -344,7 +318,6 @@ export class AddCutomerReceiptComponent {
       this.filteredLedgerList = this.ledgerList.filter(
         (item: any) => item.GROUP_ID === 14,
       );
-      console.log(this.filteredLedgerList, 'FILTEREDLEDGERLIST');
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
     }
@@ -357,10 +330,6 @@ export class AddCutomerReceiptComponent {
     };
     this.dataService.getPdcListByCustomer(payload).subscribe({
       next: (response: any) => {
-        console.log(
-          response,
-          'PDC List Response=============================-----------',
-        );
         this.pdcList = response?.Data || []; // store it in a variable
       },
       error: (err) => {
@@ -372,7 +341,6 @@ export class AddCutomerReceiptComponent {
   onLedgerChanged(e: any) {
     // This gives full object
     this.selectedLedger = e.value;
-    console.log('Selected PAY_HEAD_ID:', this.selectedLedger);
     if (this.receiptMode === 'PDC' && this.selectedDistributorId) {
       this.getPdcofSelectedSupplier();
     }
@@ -388,7 +356,6 @@ export class AddCutomerReceiptComponent {
 
   onPdcSelected(e: any) {
     const selectedCheque = e.data;
-    console.log('Selected Cheque:', selectedCheque);
 
     // Example: assign selected cheque to form
     this.receiprtFormData.CHEQUE_NO = selectedCheque.CHEQUE_NO;
@@ -533,14 +500,12 @@ export class AddCutomerReceiptComponent {
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.receiptNo = response.RECEIPT_NO;
       this.receiprtFormData.DOC_NO = response.DOC_NO;
-      console.log(response.RECEIPT_NO, 'INVOICENO');
     });
   }
 
   callAPI(finalPayload: any) {
     this.dataService.insertCustomerReceipt(finalPayload).subscribe(
       (response: any) => {
-        console.log(response, 'SAVED SUCCESSFULLY');
         this.isSaving = false;
         notify(
           {
@@ -670,8 +635,6 @@ export class AddCutomerReceiptComponent {
       PARTY_NAME: this.receiprtFormData.PARTY_NAME,
       COMPANY_ID: this.selectedCompanyId,
     };
-
-    console.log('Sending payload:', payload); // For debugging
 
     // --- Save data ---
     if (this.receiprtFormData.IS_APPROVED) {

@@ -142,14 +142,13 @@ export class UserRoleComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/user-role');
@@ -162,9 +161,6 @@ export class UserRoleComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
   // addButtonOptions = {
@@ -208,8 +204,6 @@ export class UserRoleComponent {
   onEditingStart(event: any) {
     event.cancel = true; // Cancel the editing if a certain condition is met
 
-    console.log(event.data);
-
     this.clickedRowData = event.data;
     this.selectData(event);
     event.cancel = true;
@@ -235,12 +229,8 @@ export class UserRoleComponent {
   onClickSaveNewData() {
     this.isSaving = true;
     const menuData = this.userlevelNewForm.getNewUSerLevelData();
-    console.log('menuData', menuData);
-    console.log(this.userlevelNewForm, 'userlevelnewform');
     const userlevelvalues = this.userlevelNewForm.UserLevelValue;
-    console.log(userlevelvalues);
     const userlistdata = this.userlevelNewForm.UserListdataSource;
-    console.log(userlistdata);
 
     const isDuplicate = userlistdata?.some((data: any) => {
       const existingName = data.UserRoles?.toString().trim().toLowerCase();
@@ -260,7 +250,6 @@ export class UserRoleComponent {
       return;
     }
 
-    console.log('menu insert data :>>', menuData);
     this.dataservice
       .Insert_UserLevelList_Api(menuData)
       .pipe(
@@ -313,13 +302,10 @@ export class UserRoleComponent {
 
   //=================Select row Data====================
   selectData(event: any) {
-    console.log('Select Event:', event); // Add this for debugging
-
     const ID = event?.data?.ID; // use lowercase `data`, not `Data`
 
     if (ID !== undefined) {
       this.dataservice.Select_UserLevel_Api(ID).subscribe((response: any) => {
-        console.log(response, 'select Api');
         this.selectedData = response;
       });
     } else {
@@ -329,7 +315,6 @@ export class UserRoleComponent {
 
   //=======================row data update=======================
   onRowUpdating() {
-    console.log('working');
     this.isUpdating = true;
 
     const editedData: any = this.userlevelEditForm.getNewUSerLevelEditedData();

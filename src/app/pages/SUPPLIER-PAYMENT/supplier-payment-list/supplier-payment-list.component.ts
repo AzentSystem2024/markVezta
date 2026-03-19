@@ -149,14 +149,13 @@ export class SupplierPaymentListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/accounts');
@@ -170,15 +169,12 @@ export class SupplierPaymentListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getSupplierPayments();
     this.sessionData_tax();
   }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }

@@ -139,7 +139,6 @@ export class UserComponent {
 
             resolve(dataWithSlNo);
             // resolve(data.Data);
-            // console.log(data.Data);
           },
           error: (error) => reject(error.message),
         });
@@ -161,21 +160,19 @@ export class UserComponent {
     this.isEditPopupOpened = true;
     this.dataservice.get_User_Data_By_Id(ID).subscribe((res: any) => {
       this.selectedRowData = res.Data[0];
-      console.log(this.selectedRowData, 'selectedrowdata');
       this.cdr.detectChanges(); // Ensure Angular picks up the change
     });
   }
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/user');
@@ -188,14 +185,10 @@ export class UserComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
   onClickSaveNewData() {
     const data = this.userNewForm.getNewUserData();
-    console.log(data, 'PAYLOAD IN SAVE');
 
     // const loginName = data.LOGIN_NAME?.toString().trim().toLowerCase();
 
@@ -242,9 +235,7 @@ export class UserComponent {
 
   onRowUpdating() {
     //   const data = this.userEditForm.getEditUserData();
-    //   console.log(data,"PAYLOAD IN SAVE")
     //   this.dataservice.update_User_Data(data).subscribe((res: any) => {
-    //     console.log(data,'data');
     //     try {
     //       if (res.message === 'Success') {
     //         notify(
@@ -274,23 +265,23 @@ export class UserComponent {
   }
 
   //=========Reload the datasource after inserting data
-loadUserDataSource() {
-  this.datasource = new DataSource<any>({
-    load: () =>
-      new Promise((resolve, reject) => {
-        this.dataservice.get_User_data().subscribe({
-          next: (data: any) => {
-            const dataWithSlNo = data.Data.map((item, index) => ({
-              ...item,
-              SlNo: index + 1,
-            }));
-            resolve(dataWithSlNo);
-          },
-          error: (error) => reject(error.message),
-        });
-      }),
-  });
-}
+  loadUserDataSource() {
+    this.datasource = new DataSource<any>({
+      load: () =>
+        new Promise((resolve, reject) => {
+          this.dataservice.get_User_data().subscribe({
+            next: (data: any) => {
+              const dataWithSlNo = data.Data.map((item, index) => ({
+                ...item,
+                SlNo: index + 1,
+              }));
+              resolve(dataWithSlNo);
+            },
+            error: (error) => reject(error.message),
+          });
+        }),
+    });
+  }
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -360,9 +351,7 @@ loadUserDataSource() {
   }
 
   get_userlist() {
-    this.dataservice.get_User_data().subscribe((res: any) => {
-      console.log(res);
-    });
+    this.dataservice.get_User_data().subscribe((res: any) => {});
   }
 
   CloseEditForm() {

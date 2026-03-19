@@ -38,9 +38,12 @@ export class DenialNewFormComponent {
   Denial_Category_DropDownData: dropdownData[];
   getSizeQualifier = getSizeQualifier;
 
-  constructor(private fb: FormBuilder, private service: DataService) {
+  constructor(
+    private fb: FormBuilder,
+    private service: DataService,
+  ) {
     this.getDenial_Type_DropDown();
-    this.getDenial_Category_DropDown()
+    this.getDenial_Category_DropDown();
   }
 
   // ngOnInit(): void {
@@ -56,7 +59,6 @@ export class DenialNewFormComponent {
       .get_Denial_Dropdown_Data(dropdownType)
       .subscribe((data: any) => {
         this.Denial_Type_DropDownData = data;
-        // console.log('drop down dataaaaaaaaa', this.Denial_Type_DropDownData);
       });
   }
 
@@ -67,10 +69,6 @@ export class DenialNewFormComponent {
       .get_Denial_Dropdown_Data(dropdowncategory)
       .subscribe((data: any) => {
         this.Denial_Category_DropDownData = data;
-        // console.log(
-        //   'drop down category dataaaaaaaaa',
-        //   this.Denial_Category_DropDownData
-        // );
       });
   }
 }

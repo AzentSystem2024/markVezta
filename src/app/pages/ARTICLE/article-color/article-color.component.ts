@@ -123,12 +123,11 @@ export class ArticleColorComponent {
   };
   //   ngOnInit(){
   // const currentUrl = this.router.url;
-  //   console.log('Current URL:', currentUrl);
+  //
   //    const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
-  //   console.log('Parsed ObjectData:', menuResponse);
 
   //   const menuGroups = menuResponse.MenuGroups || [];
-  //   console.log('MenuGroups:', menuGroups);
+  //
   // const packingRights = menuGroups
   //   .flatMap(group => group.Menus)
   //   .find(menu => menu.Path === '/packing');
@@ -141,9 +140,6 @@ export class ArticleColorComponent {
   //   this.canView = packingRights.canView;
   //    this.canApprove = packingRights.canApprove;
   // }
-
-  // console.log('packingRights',packingRights);
-  // console.log(  this.canAdd ,  this.canEdit ,  this.canDelete );
 
   //   }
 
@@ -163,14 +159,13 @@ export class ArticleColorComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/article-color');
@@ -183,19 +178,12 @@ export class ArticleColorComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   //===================get data list========================
@@ -241,7 +229,6 @@ export class ArticleColorComponent {
     const Code = this.formsource.get('Code')?.value;
     const Color_English = this.formsource.get('ColorEnglish')?.value;
     const Color_Arabic = this.formsource.get('ColorArabic')?.value;
-    console.log(Code, Color_English, Color_Arabic);
 
     const payload = {
       CODE: Code,
@@ -336,7 +323,6 @@ export class ArticleColorComponent {
     const ID = event.data.ID;
 
     this.dataservice.Select_ArticleColor_Api(ID).subscribe((response: any) => {
-      console.log(response, 'select Api');
       this.selectedData = response;
     });
   }
@@ -347,7 +333,6 @@ export class ArticleColorComponent {
     const Color_English = this.editingRowData.COLOR_ENGLISH;
     // const Color_Arabic = this.editingRowData.COLOR_ARABIC;
     // const COMPANY_ID = this.selected_Company_id
-    // console.log(Code, Color_English, Color_Arabic);
 
     const trimmedCode = Code?.trim().toLowerCase();
     const trimmedColorEnglish = Color_English?.trim().toLowerCase();
@@ -445,7 +430,6 @@ export class ArticleColorComponent {
         },
         'success',
       );
-      console.log(response, 'deleted');
     });
   }
 

@@ -189,7 +189,6 @@ export class SalaryHeadsComponent {
     const payload = {};
     this.isLoading = true;
     this.service.get_salary_head_list(payload).subscribe((res: any) => {
-      console.log(res);
       this.isLoading = false;
       if (res) {
         // this.dataSource = response.Data;
@@ -205,7 +204,6 @@ export class SalaryHeadsComponent {
             SlNo: index + 1,
           }),
         );
-        console.log(this.salarySource);
       }
     });
   }
@@ -227,8 +225,6 @@ export class SalaryHeadsComponent {
     // Reset component-level variables if needed
     this.Head_type_Value = ''; // or any default value like 'Gross' if desired
     this.Sal_Value = ''; // or default as needed
-
-    console.log('button clicked');
   }
 
   OnDescInput(e: any) {
@@ -239,7 +235,6 @@ export class SalaryHeadsComponent {
   //============================Add Salary Head==================================
 
   Add_Salary_Head() {
-    console.log(this.formsource.value);
     const description = this.formsource.value.description;
     const print_Description = this.formsource.value.print_Description;
     const code = this.formsource.value.code;
@@ -272,22 +267,9 @@ export class SalaryHeadsComponent {
     let head_type = this.Head_type_Value === 'Gross' ? 1 : 2;
     let is_Fixed = this.Sal_Value === 'Regular Salary';
 
-    console.log(
-      description,
-      print_Description,
-      orderSlip,
-      code,
-      isWorkingday,
-      isInactive,
-      salary_Exp,
-      head_type,
-      is_Fixed,
-    );
-
     const payload = {};
     this.service.get_salary_head_list(payload).subscribe((res: any) => {
       this.list_for_duplication = res.datas;
-      console.log(this.list_for_duplication, 'dupli check');
     });
 
     const isDuplicate = this.list_for_duplication?.some((item: any) => {
@@ -305,7 +287,6 @@ export class SalaryHeadsComponent {
     });
 
     if (isDuplicate) {
-      console.log('Duplication Checking Triggered');
       notify(
         {
           message: 'Salary Head already exists!',
@@ -349,8 +330,6 @@ export class SalaryHeadsComponent {
           is_Fixed,
         )
         .subscribe((res: any) => {
-          console.log(res);
-
           notify(
             {
               message: 'Salary Head Added successfully',
@@ -360,7 +339,7 @@ export class SalaryHeadsComponent {
             'success',
           );
           this.isAddPopup = false;
-          console.log(this.formsource);
+
           this.formsource.reset();
           this.formsource.reset({
             HEAD_TYPE: null,
@@ -380,7 +359,6 @@ export class SalaryHeadsComponent {
   }
 
   close() {
-    console.log('close button is working');
     this.formsource.reset();
     this.formsource.reset({
       IS_WORKING_DAY: false,
@@ -402,18 +380,7 @@ export class SalaryHeadsComponent {
     const head_type = this.Head_type_Value === 'Gross' ? 1 : 2;
     const is_Fixed = this.Sal_Value === 'Regular Salary';
     const is_System = this.is_System;
-    console.log(
-      description,
-      print_Description,
-      orderSlip,
-      code,
-      isWorkingday,
-      isInactive,
-      salary_Exp,
-      head_type,
-      is_Fixed,
-      is_System,
-    );
+
     const isDuplicate = this.salarySource?.some((item: any) => {
       if (item.ID === id) return false; // Skip current item (being edited)
 
@@ -428,7 +395,6 @@ export class SalaryHeadsComponent {
     });
 
     if (isDuplicate) {
-      console.log('Duplication Checking Triggered');
       notify(
         {
           message: 'Salary Head already exists!',
@@ -481,7 +447,6 @@ export class SalaryHeadsComponent {
           is_System,
         )
         .subscribe((res: any) => {
-          console.log(res);
           notify(
             {
               message: 'Salary Head Updated successfully',
@@ -499,7 +464,6 @@ export class SalaryHeadsComponent {
 
   //============================Delete Data ====================
   deleteData(e: any) {
-    console.log(e);
     const id = e.data.ID;
 
     this.service.delete_salary_Head(id).subscribe((res: any) => {
@@ -525,7 +489,6 @@ export class SalaryHeadsComponent {
   onEditingStart(e: any) {
     e.cancel = true; // Prevents default editing behavior
     this.edit_Salary_Head = e.data; // Store the selected Salary Head details
-    console.log(this.edit_Salary_Head);
     this.isEditPopup = true; // Show the edit popup
     this.isSystem = e.data.IS_SYSTEM; // Save IS_SYSTEM status
     this.selected_item(e);
@@ -533,12 +496,10 @@ export class SalaryHeadsComponent {
 
   //===================================select function============================
   selected_item(e: any) {
-    console.log(e, 'event');
     const id = e.data.ID;
     this.service.select_salary_head(id).subscribe((res: any) => {
-      console.log(res, 'SELECTRESPONSEEE');
       this.selected_Data = res;
-      console.log(this.selected_Data);
+
       this.id_value = this.selected_Data.ID;
       this.code_value = this.selected_Data.CODE;
       this.description_value = this.selected_Data.HEAD_NAME;
@@ -547,31 +508,14 @@ export class SalaryHeadsComponent {
       this.is_inactive_value = this.selected_Data.IS_INACTIVE;
       this.is_working_Day_value = this.selected_Data.IS_WORKING_DAY;
       this.selected_salary_EXP = this.selected_Data.AC_HEAD_ID;
-      console.log(this.selected_salary_EXP, 'selaary ac head id');
       this.Head_type_Value = this.selected_Data.HEAD_TYPE;
       this.is_System = this.selected_Data.IS_SYSTEM;
       this.Sal_Value = this.selected_Data.IS_FIXED;
-      console.log(this.Sal_Value); // Now stores true/false
-
-      console.log(
-        this.id_value,
-        this.code_value,
-        this.description_value,
-        this.print_description,
-        this.salary_Exp_value,
-        this.head_order_value,
-        this.is_inactive_value,
-        this.is_working_Day_value,
-        this.Sal_Value,
-        this.Head_type_Value,
-      );
 
       if (this.selected_Data.IS_FIXED === true) {
         this.Sal_Value = 'Regular Salary';
-        console.log(this.salarySource, 'salary');
       } else {
         this.Sal_Value = 'Timesheet Entry';
-        console.log(this.Sal_Value, 'salary false');
       }
 
       // this.is_fixed_value = this.selected_Data.IS_FIXED; //  This is a boolean
@@ -589,9 +533,7 @@ export class SalaryHeadsComponent {
 
   get_salary_expence_drp() {
     this.service.Dropdown_salary_exp(name).subscribe((res: any) => {
-      console.log(res, '=====================================');
       this.AC_HEAD_VALUE = res;
-      console.log(this.AC_HEAD_VALUE, '===========================');
     });
   }
   onValueChangedSalary(e: any) {
@@ -601,8 +543,6 @@ export class SalaryHeadsComponent {
 
   onSalary_ExpChange(event: any) {
     this.selected_salary_EXP = event.value;
-
-    console.log(this.selected_salary_EXP, 'Selected Item');
   }
 
   onCellPrepared(e: any) {

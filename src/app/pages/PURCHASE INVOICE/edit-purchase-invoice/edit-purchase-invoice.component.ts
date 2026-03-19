@@ -125,7 +125,6 @@ export class EditPurchaseInvoiceComponent {
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
 
     this.sessionData_tax();
@@ -138,7 +137,6 @@ export class EditPurchaseInvoiceComponent {
     this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
     console.log(this.fin_id);
     this.store_id = this.sessionData.Configuration?.[0]?.STORE_ID;
-    console.log(this.store_id);
     this.user_id = this.sessionData.USER_ID;
     console.log(this.user_id);
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
@@ -206,10 +204,6 @@ export class EditPurchaseInvoiceComponent {
   getSupplierDropdown() {
     this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
       this.supplierList = response;
-      console.log(
-        this.supplierList,
-        'distributorList==============================',
-      );
     });
   }
 
@@ -221,7 +215,6 @@ export class EditPurchaseInvoiceComponent {
       .getSupplierWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
 

@@ -114,21 +114,12 @@ export class ItemProperty4ListComponent {
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
-    console.log(sessionData, '===========selected HSN CODE===================');
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     // THIS IS THE MISSING LINK
     this.poData.COMPANY_ID = this.companyID;
     this.poData.USER_ID = sessionData.USER_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
   listItemProperty4() {
     const payload = {
@@ -246,7 +237,6 @@ export class ItemProperty4ListComponent {
     const id = e.data.ID;
     this.dataservice.select_item_property4(id).subscribe((response: any) => {
       this.selected_data = response;
-      console.log(this.selected_data, 'SELECTEDTROUT');
     });
   }
   onRowRemoving(event) {

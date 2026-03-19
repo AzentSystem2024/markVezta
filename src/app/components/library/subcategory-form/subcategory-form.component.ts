@@ -36,12 +36,7 @@ export class SubcategoryFormComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
   }
 
   ngOnInit() {
@@ -55,7 +50,6 @@ export class SubcategoryFormComponent {
 
   //   this.dataService.getCategoryData().subscribe((response:any) => {
   //     this.categories = response
-  //     console.log(response,"categories------------------------")
   //   })
   // }
 
@@ -67,7 +61,6 @@ export class SubcategoryFormComponent {
     };
     this.dataService.getDropdownData(payload).subscribe((data: any) => {
       // this.categoryList = data;
-      console.log(data, '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}');
       this.categories = data;
       // this.refresh();
     });
@@ -81,7 +74,6 @@ export class SubcategoryFormComponent {
     };
     this.dataService.getDropdownData(payload).subscribe((data: any) => {
       this.departmetDropdownData = data;
-      console.log('dropdownnnnnnn', this.departmetDropdownData);
     });
   }
 
@@ -92,14 +84,12 @@ export class SubcategoryFormComponent {
     };
     this.dataService.getDepartmentData(payload).subscribe((data: any) => {
       departmentdata = data;
-      console.log('depttttttttt', data);
       let departmentNames = departmentdata.map((department) => {
         return {
           ID: department.ID,
           DESCRIPTION: department.DEPT_NAME,
         };
       });
-      console.log(departmentNames, 'namessssssssssssssssssssssssssssssss');
     });
   }
 }

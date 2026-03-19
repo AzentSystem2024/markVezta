@@ -220,7 +220,6 @@ export class AdvanceComponent {
     };
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -302,9 +301,6 @@ export class AdvanceComponent {
     });
   }
   onApprovedChanged(event: any) {
-    console.log(event, '======function chngeeeeeee===');
-    console.log(this.approveValue, '======function chngeeeeeee===');
-
     // const isChecked = event.value;
     // if (isChecked) {
     //   this.approveAdvancePopUp = true;
@@ -325,7 +321,6 @@ export class AdvanceComponent {
 
     this.dataService.Get_Api_advance(payload).subscribe((res: any) => {
       let data = res.data;
-      console.log(data);
 
       // On first load, show all data without filtering
       if (this.initialLoad) {
@@ -466,17 +461,13 @@ export class AdvanceComponent {
     const status = e.data?.STATUS?.trim();
     // this.isEditReadOnly = (status === 'Approved');
     if (status === 'Approved') {
-      console.log(status);
       this.isEditReadOnly = true;
-      console.log(this.isEditReadOnly);
     } else {
       this.isEditReadOnly = false;
     }
 
     this.select_api_Advance(e);
     this.ledgerlist();
-    console.log(statusValue, '===========satus value============');
-    console.log(this.selectedPaymentMode, '------pyment mode------');
 
     // Set a flag to determine if the form should be read-only
     // this.isEditReceipt = true;
@@ -497,14 +488,11 @@ export class AdvanceComponent {
     this.minDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse.SELECTED_COMPANY.COMPANY_ID);
     this.companyId = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/salary-advance');
@@ -518,8 +506,6 @@ export class AdvanceComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.get_Employee_dropdown();
     this.get_advance_list();
     this.setPaymentMode();
@@ -534,10 +520,7 @@ export class AdvanceComponent {
     this.dataService
       .Dropdown_advance_employee(payload)
       .subscribe((res: any) => {
-        console.log(res);
         this.EMPLOYEE_VALUE = res;
-
-        console.log(this.EMPLOYEE_VALUE);
       });
   }
 
@@ -565,18 +548,14 @@ export class AdvanceComponent {
   // ==========================Employeee drpdown========================
   get_advanceType_dropdown() {
     this.dataService.Dropdown_AdvanceTypes(name).subscribe((res: any) => {
-      console.log(res);
       this.ADVANCETYPE_VALUE = res;
-      console.log(this.ADVANCETYPE_VALUE);
     });
   }
   onEmployee_Change(event: any) {
     this.emp_id = event.value;
-    console.log(this.emp_id);
   }
   onAdvance_type_Change(event: any) {
     this.adv_type_id_value = event.value;
-    console.log(this.adv_type_id_value, 'IN EVENT');
   }
   onRecoveryDateChanged(event: any): void {
     if (event?.value) {
@@ -619,23 +598,15 @@ export class AdvanceComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
+
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
+
     //
   }
   //  =====================================Add advance========================
   Add_Advace() {
-    console.log('Add button clicked');
-    console.log(this.formSource);
     const emp_id = this.formSource.value.employee_ID;
     const date = this.formSource.value.Date;
     const adv_type_id = this.formSource.value.Advance_types_ID;
@@ -660,7 +631,6 @@ export class AdvanceComponent {
     // } else {
     //       const validationResult = this.formValidationGroup?.instance?.validate();
     // if (!validationResult?.isValid) {
-    //   console.log('Validation failed');
     //   return;
     // }
 
@@ -679,8 +649,6 @@ export class AdvanceComponent {
         fin_id,
       )
       .subscribe((res: any) => {
-        console.log(res);
-
         notify(
           {
             message: 'Advance added successfully',
@@ -703,18 +671,10 @@ export class AdvanceComponent {
   }
 
   select_api_Advance(event: any) {
-    console.log(event);
-
     const id = event.data.TRANS_ID;
 
     this.dataService.select_Advance(id).subscribe((res: any) => {
-      console.log(res);
-
       this.selected_Data = res;
-      console.log(
-        this.selected_Data,
-        'SELECTEDDTA============================= ',
-      );
 
       this.id = this.selected_Data.ID;
 
@@ -722,11 +682,8 @@ export class AdvanceComponent {
       this.adv_no_value = this.selected_Data.ADV_NO;
       this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID;
       this.adv_type_name = this.selected_Data.ADV_TYPE_NAME;
-      console.log(this.adv_type_name, 'ADVANCENAME');
-      console.log(this.selected_Data.DATE);
       this.date_value = this.selected_Data.DATE;
       this.Payment_Head = this.selected_Data.PAY_HEAD_ID;
-      console.log(this.Payment_Head, 'Payment Head ID');
       this.selectTransId = this.selected_Data.TRANS_ID;
       this.selected_Cheque_No = this.selected_Data.CHEQUE_NO;
       this.selected_Cheque_Date = this.selected_Data.CHEQUE_DATE;
@@ -738,7 +695,6 @@ export class AdvanceComponent {
         this.selectedPaymentMode = '14'; // Bank
       }
 
-      // console.log(this.selectTransId, 'Transaction ID');
       //       if (this.selected_Data?.DATE) {
       //   const parts = this.selected_Data.DATE.split('/');
       //   if (parts.length === 3) {
@@ -754,8 +710,6 @@ export class AdvanceComponent {
       //   this.date_value = null;
       // }
 
-      console.log(this.date_value); // Outputs: 2025-05-10T13:00:00.000Z (depending on timezone)
-
       // if (this.selected_Data.DATE) {
       //   const parts = this.selected_Data.DATE.split('/');
       //   if (parts.length === 3) {
@@ -770,8 +724,6 @@ export class AdvanceComponent {
       //   }
       // } else {
       //   this.date_value = null;
-      // }
-      // console.log(this.date_value, 'this.date_value');
       this.emp_id = this.selected_Data.EMP_ID;
       this.emp_name_value = this.selected_Data.EMP_NAME;
       this.reco_Amount_value = this.selected_Data.REC_AMOUNT;
@@ -781,57 +733,29 @@ export class AdvanceComponent {
       this.remark_value = this.selected_Data.REMARKS;
       this.trans_id = this.selected_Data.TRANS_ID;
       this.selectedpayid = this.selected_Data.PAY_TYPE_ID;
-      console.log(this.remark_value, ' this.remark_value');
       this.approveValue = this.selected_Data.STATUS === 'Approved';
 
       this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
 
-      console.log(
-        this.selected_Data.PAY_TYPE_ID,
-        '=======PAY TYPE ID===========',
-      );
-      console.log(
-        this.Advance_Amount_value,
-        this.adv_no_value,
-        this.adv_type_id_value,
-        this.date_value,
-        this.emp_id,
-        this.emp_name_value,
-        this.reco_Amount_value,
-        this.reco_install_Amount_value,
-        this.reco_inst_count_value,
-        this.reco_stat_month,
-        this.remark_value,
-      );
       // this.payment_functionality()
     });
   }
   paymentModesValue(event: any) {
-    console.log(event.value);
-    console.log(this.selectedPaymentMode);
     this.ledgerlist();
   }
 
   ledgerlist() {
     this.dataService.listledgerlist().subscribe((res: any) => {
-      console.log(res);
       // this.payment_Detilas = res;
 
       const filterdledgerlist = res.Data;
-      console.log(
-        filterdledgerlist.filter(
-          (item) => item.GROUP_ID == this.selectedPaymentMode,
-        ),
-      );
 
       this.payment_Detilas = filterdledgerlist.filter(
         (item) => item.GROUP_ID == this.selectedPaymentMode,
       );
-      console.log(this.payment_Detilas, 'Payment Details');
     });
 
     //    const filtered = this.payment_Detilas.filter(item => allowedGroupIds.includes(item.GROUP_ID));
-    // console.log('Filtered Items:', filtered);
   }
   //  =======================Update Advance=================================
   // ======================Delete data in advance===========================
@@ -860,13 +784,8 @@ export class AdvanceComponent {
         : this.selectedPaymentMode === '14'
           ? 2
           : this.selected_pay_type_id;
-    console.log(
-      this.selected_pay_type_id,
-      '=====================selected pay type id============',
-    );
+
     const pay_Type_id = this.selected_pay_type_id;
-    console.log(this.selectTransId, 'Transaction ID');
-    console.log;
     if (!emp_id || !date || !adv_type_id || !advance_Amount) {
       notify(
         {
@@ -905,7 +824,6 @@ export class AdvanceComponent {
               pay_Type_id,
             )
             .subscribe((res: any) => {
-              console.log('Approved & Committed:', res);
               notify(
                 {
                   message: 'Advance approved and committed successfully',
@@ -923,24 +841,6 @@ export class AdvanceComponent {
         }
       });
     } else {
-      console.log(
-        id,
-        emp_id,
-        date,
-        adv_type_id,
-        advance_Amount,
-        rec_amount,
-        rec_start_month,
-        rec_install_count,
-        rec_install_amount,
-        remarks,
-        pay_head_id,
-        trans_id,
-        cheque_no,
-        cheque_date,
-        '=============Update Advance Data=============',
-      );
-
       this.dataService
         .Api_Update_advance(
           id,
@@ -960,7 +860,6 @@ export class AdvanceComponent {
           pay_Type_id,
         )
         .subscribe((res: any) => {
-          console.log('Updated:', res);
           notify(
             {
               message: 'Advance updated successfully',
@@ -978,7 +877,6 @@ export class AdvanceComponent {
   deleteData(event: any) {
     const id = event.data.ID;
     this.dataService.Api_Delete_advance(id).subscribe((res: any) => {
-      console.log(res);
       notify(
         {
           message: 'Advance Deleted successfully',
@@ -997,7 +895,6 @@ export class AdvanceComponent {
     this.verifiedAdvancePopUp = false;
     this.approveAdvancePopUp = false;
     this.isEditPopUp = false;
-    console.log('close buttom clicked======================');
     this.isFormSubmitted = false;
     this.isAddPopUp = false;
     this.formSource.reset({
@@ -1013,8 +910,6 @@ export class AdvanceComponent {
   }
 
   closeButton() {
-    console.log('on Hiding close buttom clicked======================');
-
     this.formSource.reset({
       Date: new Date(),
       Recovery_Date: '',
@@ -1041,43 +936,7 @@ export class AdvanceComponent {
     }
   }
 
-  // ====================Verify============================
-
-  // onVerifyClick(e: any): void {
-  //   console.log('Verify clicked:', e); // <-- Add this
-
-  //   e.cancel = true;
-  //   const id = e.row?.data?.ID;
-
-  //   this.dataService.select_Advance(id).subscribe((res: any) => {
-  //     // console.log('Salary revision fetched:', response); // <-- Add this
-  //     console.log(res, '=============Response of Data for verify====');
-
-  //     this.selected_Data = res;
-  //     console.log(this.selected_Data, 'Selected Data');
-  //     if (this.selected_Data.DATE) {
-  //       const parts = this.selected_Data.DATE.split('/');
-  //       if (parts.length === 3) {
-  //         const day = +parts[0];
-  //         const month = +parts[1] - 1; // JavaScript months are 0-based
-  //         let year = +parts[2];
-  //         // Fix 2-digit year like 24 → 2024
-  //         year += year < 100 ? 2000 : 0;
-  //         this.date_value = new Date(year, month, day);
-  //       } else {
-  //         this.date_value = null;
-  //       }
-  //     } else {
-  //       this.date_value = null;
-  //     }
-  //     this.verifiedAdvancePopUp = true;
-  //   });
-  // }
-
-  // ===================Approved functionality===========================
   Verify_advance() {
-    console.log('===========Form verify advance=======');
-
     const id = this.selected_Data.ID;
     const emp_id = this.selected_Data.EMP_ID;
     const date = this.date_value;
@@ -1088,7 +947,6 @@ export class AdvanceComponent {
     const rec_install_count = this.selected_Data.REC_INSTALL_COUNT;
     const rec_install_amount = this.selected_Data.REC_INSTALL_AMOUNT;
     const remarks = this.selected_Data.REMARKS;
-    console.log(id, emp_id);
 
     this.dataService
       .api_Verify_Advance(
@@ -1104,7 +962,6 @@ export class AdvanceComponent {
         remarks,
       )
       .subscribe((res: any) => {
-        console.log(res);
         this.get_advance_list();
         notify(
           {
@@ -1121,40 +978,7 @@ export class AdvanceComponent {
       });
   }
 
-  // ======================Aproverd===========================
-  // onApproveClick(e: any) {
-  //   console.log('Approve clicked:', e); // <-- Add this
-
-  //   e.cancel = true;
-  //   const id = e.row?.data?.ID;
-
-  //   this.dataService.select_Advance(id).subscribe((res: any) => {
-  //     // console.log('Salary revision fetched:', response); // <-- Add this
-  //     console.log(res, '=============Response of Data for Approved====');
-
-  //     this.selected_Data = res;
-  //     console.log(this.selected_Data, 'Selected Data');
-  //     if (this.selected_Data.DATE) {
-  //       const parts = this.selected_Data.DATE.split('/');
-  //       if (parts.length === 3) {
-  //         const day = +parts[0];
-  //         const month = +parts[1] - 1; // JavaScript months are 0-based
-  //         let year = +parts[2];
-  //         // Fix 2-digit year like 24 → 2024
-  //         year += year < 100 ? 2000 : 0;
-  //         this.date_value = new Date(year, month, day);
-  //       } else {
-  //         this.date_value = null;
-  //       }
-  //     } else {
-  //       this.date_value = null;
-  //     }
-  //     this.approveAdvancePopUp = true;
-  //   });
-  // }
   Approve_advance() {
-    console.log('===========Form verify advance=======');
-
     const id = this.selected_Data.ID;
     const emp_id = this.selected_Data.EMP_ID;
     const date = this.date_value;
@@ -1165,7 +989,6 @@ export class AdvanceComponent {
     const rec_install_count = this.selected_Data.REC_INSTALL_COUNT;
     const rec_install_amount = this.selected_Data.REC_INSTALL_AMOUNT;
     const remarks = this.selected_Data.REMARKS;
-    console.log(id, emp_id);
 
     this.dataService
       .api_Approve_Advance(
@@ -1181,7 +1004,6 @@ export class AdvanceComponent {
         remarks,
       )
       .subscribe((res: any) => {
-        console.log(res);
         notify(
           {
             message: 'Advance approved successfully',
@@ -1198,11 +1020,9 @@ export class AdvanceComponent {
   //=====================payemt functionality=========================
   // payment_functionality() {
   //   const id=this.trans_id
-  //   console.log(id, '=================id====================');
 
-  //   console.log('payment functionality');
   //   this.dataService.get_paymentDetails(id).subscribe((res: any) => {
-  //     console.log(res);
+  //
 
   //     this.payment_Detilas=res
   //   });

@@ -158,50 +158,6 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
 
     this.cdr.detectChanges();
   }
-
-  // navigationChanged(event: DxTreeViewTypes.ItemClickEvent) {
-  //   console.log('SIDENAVMENUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU');
-  //   console.log('Menu clicked:', event);
-
-  //   const path = (event.itemData as any).path;
-  //   const title = (event.itemData as any).text;
-
-  //   const pointerEvent = event.event;
-
-  //   if (path) {
-  //     const tabExists = this.tabs.some((tab) => tab.path === path);
-  //     console.log('Tab exists?', tabExists);
-
-  //     if (!tabExists) {
-  //       this.tabs.push({ title, path });
-  //       console.log('Tab added:', { title, path });
-  //     }
-
-  //     this.selectedIndex = this.tabs.findIndex((tab) => tab.path === path);
-  //     console.log('Selected index:', this.selectedIndex);
-
-  //     this.router.navigate([path]);
-  //     if (this.menuOpened) {
-  //       pointerEvent?.preventDefault();
-  //     }
-
-  //     this.cdr.detectChanges();
-  //   } else {
-  //     pointerEvent?.preventDefault();
-  //   }
-
-  //   if (this.showMenuAfterClick) {
-  //     this.temporaryMenuOpened = true;
-  //   }
-
-  //   // close ONLY on mobile (overlap mode)
-  //   if (path && this.menuMode === 'overlap') {
-  //     this.menuOpened = false;
-  //     pointerEvent?.stopPropagation();
-  //     this.cdr.detectChanges();
-  //   }
-  // }
-
   onTabChanged(index: number) {
     this.selectedIndex = index;
     const selectedTab = this.tabs[index];

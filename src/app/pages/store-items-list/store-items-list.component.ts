@@ -69,7 +69,7 @@ export class StoreItemsListComponent {
     private dataservice: DataService,
     authservice: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     dataservice.getDropdownData('STORE').subscribe((data) => {
       this.store = data;
@@ -114,7 +114,7 @@ export class StoreItemsListComponent {
       },
       (error) => {
         console.error('Error fetching departments:', error);
-      }
+      },
     );
   }
 
@@ -132,7 +132,7 @@ export class StoreItemsListComponent {
       },
       (error) => {
         console.error('Error fetching items:', error);
-      }
+      },
     );
   }
 
@@ -179,7 +179,7 @@ export class StoreItemsListComponent {
     this.dataservice.getStoresData(payload).subscribe((response) => {
       console.log(response, '=====================');
       this.filteredStores = response.filter(
-        (store: any) => store.ID === storeId
+        (store: any) => store.ID === storeId,
       ); // Filter stores by ID
       console.log(this.filteredStores, 'FILTERED STORES WITH SAME ID');
       if (this.filteredStores && this.filteredStores.length > 0) {
@@ -210,12 +210,8 @@ export class StoreItemsListComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
   }
 
   listItemsByStoreId(storeId: number) {
@@ -238,7 +234,7 @@ export class StoreItemsListComponent {
         },
         (error) => {
           console.error('Error fetching items:', error);
-        }
+        },
       );
     }
   }

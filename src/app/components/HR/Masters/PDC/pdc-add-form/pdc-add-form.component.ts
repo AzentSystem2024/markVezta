@@ -89,7 +89,6 @@ export class PdcAddFormComponent {
     this.dataservice.getPdcDocNo().subscribe((response: any) => {
       this.docNo = response.DOC_NO;
       this.PDCFormData.ENTRY_NO = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -114,10 +113,7 @@ export class PdcAddFormComponent {
     this.selectedBeneficiaryType = e.value;
 
     this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
-    console.log(
-      this.selectedBeneficiaryTypeID,
-      'selected beneficiary type ========',
-    );
+
     //  this.selectedBeneficiaryType = this.BeneficiaryType.find(b => b.id === data.BENEFICIARY_TYPE);
   }
 
@@ -162,7 +158,6 @@ export class PdcAddFormComponent {
   }
 
   onSupplierChanged(event: any) {
-    console.log(event, 'event');
     this.selectedSupplierId = event.value;
 
     // Find and log the selected supplier's DESCRIPTION
@@ -170,17 +165,12 @@ export class PdcAddFormComponent {
       (item: any) => item.ID === this.selectedSupplierId,
     );
     if (selectedSupplier) {
-      console.log('Selected ID:', selectedSupplier.ID);
-      console.log('Selected Description:', selectedSupplier.DESCRIPTION);
     }
 
     this.selectedBeneficiaryCommonName = selectedSupplier.DESCRIPTION;
-    console.log(this.selectedSupplierName, '======supplier name========');
   }
 
   onCustomerChanged(event: any) {
-    console.log(event.value, 'event');
-
     this.selectedCustomerId = event.value;
 
     // Find and log the selected supplier's DESCRIPTION
@@ -188,12 +178,9 @@ export class PdcAddFormComponent {
       (item: any) => item.ID === this.selectedCustomerId,
     );
     if (selectedCustomer) {
-      console.log('Selected ID:', selectedCustomer.ID);
-      console.log('Selected Description:', selectedCustomer.DESCRIPTION);
     }
 
     this.selectedBeneficiaryCommonName = selectedCustomer.DESCRIPTION;
-    console.log(this.selectedCustomerName, '==========customer name====');
   }
 
   cancel() {
@@ -250,13 +237,8 @@ export class PdcAddFormComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   savePDC() {
@@ -297,10 +279,7 @@ export class PdcAddFormComponent {
       AC_TRANS_ID: this.PDCFormData.AC_TRANS_ID || 0,
     };
 
-    console.log(payload, 'Formatted payload to insert PDC');
-
     this.dataservice.Insert_PDC(payload).subscribe((res: any) => {
-      console.log(res, 'response of insert PDC');
       if (res.Message === 'Success') {
         notify(
           {
@@ -338,7 +317,6 @@ export class PdcAddFormComponent {
       COMPANY_ID: this.selected_Company_id,
     };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
-      console.log('supplier dropdown', res);
       this.Supplier = res;
     });
   }
@@ -347,7 +325,6 @@ export class PdcAddFormComponent {
     this.dataservice
       .Bank_Dropdown(this.selected_Company_id)
       .subscribe((res: any) => {
-        console.log('bank dropdown', res);
         this.Bank = res;
       });
   }
@@ -358,7 +335,6 @@ export class PdcAddFormComponent {
       COMPANY_ID: this.selected_Company_id,
     };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
-      console.log('customer dropdown', res);
       this.Customer = res;
     });
   }

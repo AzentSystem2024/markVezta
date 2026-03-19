@@ -132,15 +132,13 @@ export class SalesOrderComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -162,7 +160,6 @@ export class SalesOrderComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 

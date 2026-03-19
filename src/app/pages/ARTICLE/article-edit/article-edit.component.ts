@@ -134,7 +134,6 @@ export class ArticleEditComponent {
       if (!this.selected_Company_id) {
         this.sesstion_Details();
       }
-      console.log('Incoming articleData:', incomingData);
 
       if (incomingData.Components && Array.isArray(incomingData.Components)) {
 
@@ -209,13 +208,11 @@ export class ArticleEditComponent {
         // Handle Sizes only after articleSizeData is ready
         this.setSelectedSizes();
         if (this.articleData.BOM && Array.isArray(this.articleData.BOM)) {
-          console.log(this.articleData, 'BOMMMMMMMMMMM');
           this.items = this.articleData.BOM.map((bom: any) => {
             // find the matching item from dropdown list
             const matchedItem = this.itemsList?.find(
               (i: any) => i.ID === bom.ITEM_ID,
             );
-            console.log(matchedItem, 'MATCHEDITEMSINEDIT');
             return {
               ITEM: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
               // ITEM:bom.ITEM_CODE,
@@ -228,8 +225,6 @@ export class ArticleEditComponent {
               ITEM_CODE: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
             };
           });
-
-          console.log('Mapped BOM items:', this.items);
         } else {
           this.items = [];
         }
@@ -238,10 +233,7 @@ export class ArticleEditComponent {
   }
 
   setSelectedSizes() {
-    console.log('====================================================');
     if (this.articleData.SIZES && Array.isArray(this.articleData.SIZES)) {
-      console.log('articleData.SIZES:', this.articleData.SIZES);
-
       this.savedSizes = this.articleData.SIZES;
 
       const sizeStrings: string[] = this.savedSizes.map((s: any) =>
@@ -252,12 +244,9 @@ export class ArticleEditComponent {
         ?.filter((row: any) => sizeStrings.includes(row.SizeValue?.toString()))
         .map((row: any) => row.SizeValue);
 
-      console.log('Mapped selectedKeys:', selectedKeys);
-
       this.sizeGridSelectedKeys = selectedKeys;
       this.selectedSizeRows = selectedKeys;
     } else {
-      console.warn('SIZES not found or not an array');
     }
   }
 
@@ -267,9 +256,7 @@ export class ArticleEditComponent {
   //   // };
   //   this.dataService.listItemsForArticle().subscribe((response: any) => {
   //     this.itemsList = response.DataList;
-  //     console.log(this.itemsList);
   //     this.ItemCode = this.itemsList[0].DESCRIPTION;
-  //     console.log(this.ItemCode);
   //   });
   // }
 
@@ -355,7 +342,6 @@ export class ArticleEditComponent {
     if (e.dataField === 'ITEM' && e.editorName === 'dxSelectBox') {
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedDescription = args.value;
-        console.log('Selected Item Description:', selectedDescription);
 
         const grid = e.component;
         const rowIndex = e.row.rowIndex;
@@ -373,7 +359,6 @@ export class ArticleEditComponent {
         }
 
         this.selectedItemId = matchedItem ? matchedItem.ID : null;
-        console.log(this.selectedItemId, 'SELECTEDITEMID');
         let itemCode = null;
         if (selectedDescription) {
           itemCode = selectedDescription.split('-')[0]; // gets "078257588206"
@@ -383,8 +368,6 @@ export class ArticleEditComponent {
 
         this.dataService.getItemsForArticle(payload).subscribe({
           next: (response: any) => {
-            console.log('API Response:', response);
-
             if (response?.flag === 1 && response?.Data) {
               const data = response.Data;
 
@@ -566,7 +549,6 @@ closecomponent(){
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
-        // console.log('Base64 Image String:', this.imagePreview);
       };
       reader.readAsDataURL(file);
     }
@@ -660,7 +642,6 @@ closecomponent(){
     this.dataService
       .getLastOrderNoForArticle(payload)
       .subscribe((response: any) => {
-        console.log(response, 'LASTORDERNO');
         this.lastOrderNo = response?.LastOrderNo ?? '';
       });
   }
@@ -735,9 +716,7 @@ closecomponent(){
     });
   }
 
-  onColorChanged(event: any) {
-    console.log('Selected Color:', event.value);
-  }
+  onColorChanged(event: any) {}
 
   openAttachPopup() {
     this.getArticles();
@@ -746,7 +725,6 @@ closecomponent(){
 
   // onAttachRowSelected(event: any) {
   //   this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
-  //   console.log('Selected row:', this.selectedAttachRow);
   // }
 
   // onAttachRowSelected(event: any) {
@@ -804,10 +782,6 @@ closecomponent(){
       // Optionally close popup
       this.isAttachPopupVisible = false;
       // this.selectedTabIndex = 0;
-      console.log(
-        'Assigned ComponentArticleID:',
-        this.articleData.COMPONENT_ARTICLE_ID,
-      );
     }
   }
   onSizeSelectionChanged(e: any) {
@@ -818,18 +792,12 @@ closecomponent(){
         SIZES: row.SizeValue,
         OrderNo: row.OrderNo,
       }));
-
-    console.log('Selected rows:', this.selectedSizeRows);
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   updateArticle() {
@@ -897,8 +865,6 @@ closecomponent(){
         QUANTITY: r.QUANTITY,
       }));
 
-    console.log('BOM Data:', bomGridData);
-
     //  BOM Validation
 if (!bomGridData.length) {
   notify({
@@ -956,7 +922,6 @@ if (!bomGridData.length) {
       STANDARD_PACKING: this.articleData.STANDARD_PACKING,
     };
 
-    console.log('Sending update payload:', payload);
     this.isSaving = true;
     // Step 3: Send update request
     this.dataService.updateArticle(payload).subscribe(
@@ -1030,12 +995,6 @@ if (!bomGridData.length) {
   onSupplierChanged(e: any) {
     const selected = this.materialUnits.find((s: any) => s.ID === e.value);
     this.articleData.SupplierName = selected ? selected.DESCRIPTION : '';
-    console.log(
-      'Selected Supplier ID:',
-      e.value,
-      'Name:',
-      this.articleData.SupplierName,
-    );
   }
 
   closePopup() {

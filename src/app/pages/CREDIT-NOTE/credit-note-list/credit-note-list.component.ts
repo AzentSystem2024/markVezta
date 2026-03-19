@@ -153,14 +153,13 @@ export class CreditNoteListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/credit-note');
@@ -174,8 +173,6 @@ export class CreditNoteListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getCreditNotes();
   }
 
@@ -387,7 +384,6 @@ export class CreditNoteListComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -543,23 +539,16 @@ export class CreditNoteListComponent {
   }
 
   onEditCreditNote(event: any) {
-    console.log(event, 'eventtttttttttttttt');
     event.cancel = true; // Prevent default popup editing
     const creditId = event.data.TRANS_ID;
     this.CreditNoteid = event.data.TRANS_ID;
     this.selectedCredit = creditId;
     const transStatus = event.data.TRANS_STATUS;
-    console.log(event, 'transstatus');
 
     this.dataService
       .selectCreditNote(this.CreditNoteid)
       .subscribe((response: any) => {
-        console.log(structuredClone(response), 'FINAL RESPONSE');
         this.selectedCreditNote = structuredClone(response.Data);
-        console.log(
-          structuredClone(this.selectedCreditNote),
-          'SELECTEDCREDITNOTEINLIST (SNAPSHOT)',
-        );
 
         if (transStatus === 5) {
           // Open view popup
@@ -568,10 +557,6 @@ export class CreditNoteListComponent {
           // Open edit popup
           this.isEditCreditNote = true;
         }
-        console.log(
-          this.selectedCreditNote,
-          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-        );
 
         this.selectedCreditNoteForEdit = JSON.parse(
           JSON.stringify(this.selectedCreditNote),
@@ -587,7 +572,6 @@ export class CreditNoteListComponent {
     }
     const creditNoteId = event.data.TRANS_ID;
     event.cancel = true;
-    console.log(creditNoteId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
     // Call your delete API
     this.dataService.deleteCreditNote(creditNoteId).subscribe(
       (response: any) => {

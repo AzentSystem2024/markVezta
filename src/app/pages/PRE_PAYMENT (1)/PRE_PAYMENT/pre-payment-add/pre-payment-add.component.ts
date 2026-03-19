@@ -123,7 +123,6 @@ export class PrePaymentAddComponent {
     };
     this.dataservice.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -291,7 +290,6 @@ export class PrePaymentAddComponent {
   }
 
   onSupplierChanged(event: any) {
-    console.log(event, 'event');
     this.selectedSupplierId = event.value;
   }
 
@@ -429,26 +427,15 @@ export class PrePaymentAddComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
 
     this.selected_user_id = sessionData.USER_ID;
     console.log(
@@ -456,10 +443,6 @@ export class PrePaymentAddComponent {
       '===========selected user id===================',
     );
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   savePrePayment() {

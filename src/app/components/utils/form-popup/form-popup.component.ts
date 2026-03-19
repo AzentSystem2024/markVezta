@@ -77,7 +77,6 @@ export class FormPopupComponent {
     if (!this.isValid()) {
       return;
     }
-    console.log('Save button clicked');
     this.save.emit();
     // this.close();
   }

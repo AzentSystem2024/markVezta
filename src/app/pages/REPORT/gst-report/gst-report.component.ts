@@ -138,20 +138,10 @@ export class GstReportComponent {
   }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
   }
 
   //================ Year value change ===================
@@ -306,15 +296,12 @@ export class GstReportComponent {
     console.log(payload, '==========manual payload===========');
 
     this.dataService.GST_Report_Api(payload).subscribe((res: any) => {
-      console.log(res);
       this.GST_datasource = res.DATA || [];
       this.ledgerSummaryData = this.GST_datasource;
     });
   }
 
   onViewClick(e: any) {
-    console.log(e, '=======event==========');
-
     const TransType = e.row.data.DOC_TYPE;
     const trans_id = e.row.data.TRANS_ID;
 
@@ -326,36 +313,26 @@ export class GstReportComponent {
       this.dataService
         .selectJournalVoucher(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedJournalVoucher = response.Data;
           this.loadingInvoice = false;
 
           this.isViewJournalVoucher = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedJournalVoucher,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TransType == 36) {
       this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
-        console.log(response);
         this.selectedDebitNote = response.Data;
         this.loadingInvoice = false;
 
         this.isViewDebitNote = true;
         this.cdr.detectChanges();
-        console.log(
-          this.selectedDebitNote,
-          'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-        );
       });
     }
     //   else if (TransType == 37) {
 
-    //   console.log('=====navigate to 37-CREDIT NOTE=====');
+    //
     //     this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-    //       console.log(response)
+    //
     //     this.selectedCreditNote = response.Data;
     //      this.loadingInvoice = false;
 
@@ -365,11 +342,7 @@ export class GstReportComponent {
     //   });
     // }
     else if (TransType == 37) {
-      console.log('=====navigate to 37-CREDIT NOTE=====');
-
       this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-        console.log(response);
-
         if (response?.Data?.length > 0) {
           this.selectedCreditNote = response.Data[0];
           this.isViewCreditNote = true;
@@ -379,11 +352,8 @@ export class GstReportComponent {
 
         this.loadingInvoice = false;
         this.cdr.detectChanges();
-
-        console.log(this.selectedCreditNote, 'SELECTED CREDIT NOTE');
       });
     } else if (TransType == 25) {
-      console.log('=====navigate to 25-SALES INVOICE=====');
       this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
         this.loadingInvoice = false;
@@ -403,7 +373,6 @@ export class GstReportComponent {
           this.cdr.detectChanges();
         });
     } else if (TransType == 27) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
@@ -416,11 +385,9 @@ export class GstReportComponent {
           );
         });
     } else if (TransType == 2) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectMiscReceipt(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedmiscellaneousData = response.Data;
           this.editMiscPopup = true;
           this.cdr.detectChanges();
@@ -430,11 +397,9 @@ export class GstReportComponent {
           );
         });
     } else if (TransType == 38) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .Select_PrePayment(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedPrePayment = response.Data;
           this.editPrePaymentPopupOpened = true;
           this.cdr.detectChanges();
@@ -444,11 +409,9 @@ export class GstReportComponent {
           );
         });
     } else if (TransType == 21) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedSupplierPayment = response.Data;
           console.log(this.selectedSupplierPayment);
           this.isEditReceipt = true;
@@ -459,11 +422,9 @@ export class GstReportComponent {
           );
         });
     } else if (TransType == 20) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectPurchaseReturn(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedPurchaseReturn = response;
           this.isEditPurchaseReturn = true;
 
@@ -474,11 +435,9 @@ export class GstReportComponent {
           );
         });
     } else if (TransType == 14) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectTransferOutForInventory(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedTrOut = response;
           console.log(this.selectedTrOut);
           this.isEditTransferOut = true;
@@ -487,7 +446,6 @@ export class GstReportComponent {
           console.log(this.selectedTrOut, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
     } else if (TransType == 15) {
-      console.log('=====navigate to 25-SALES INVOICE=====');
       this.dataService
         .selectTransferInForInventory(trans_id)
         .subscribe((response: any) => {
@@ -499,11 +457,9 @@ export class GstReportComponent {
           console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
     } else if (TransType == 39) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .select_Prepayment_Posting(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selecte_prepayment_Data = response.Data;
           this.isEditPopupPrepaymentPosting = true;
 
@@ -514,11 +470,9 @@ export class GstReportComponent {
           );
         });
     } else if (TransType == 3) {
-      console.log('=====navigate to 27-CUSTOMER RECEIPTS=====');
       this.dataService
         .selectMiscPayment(trans_id)
         .subscribe((response: any) => {
-          console.log(response);
           this.selectedmiscellaneousData = response;
           console.log(this.selectedmiscellaneousData);
           this.editMiscPopupOpened = true;

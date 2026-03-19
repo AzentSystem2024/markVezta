@@ -54,10 +54,10 @@ import { confirm } from 'devextreme/ui/dialog';
 @Component({
   selector: 'app-miscellaneous-purchase-edit',
   templateUrl: './miscellaneous-purchase-edit.component.html',
-  styleUrls: ['./miscellaneous-purchase-edit.component.scss']
+  styleUrls: ['./miscellaneous-purchase-edit.component.scss'],
 })
 export class MiscellaneousPurchaseEditComponent {
-@Output() popupClosed = new EventEmitter<void>();
+  @Output() popupClosed = new EventEmitter<void>();
   // @Input() creditFormData: any;
   private _creditFormData: any;
   creditHeader!: any;
@@ -157,7 +157,6 @@ export class MiscellaneousPurchaseEditComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -187,10 +186,6 @@ export class MiscellaneousPurchaseEditComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -356,13 +351,11 @@ export class MiscellaneousPurchaseEditComponent {
       .getCustomerWithState(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
-        console.log(this.distributorList, 'DISTLISTPOPUP');
       });
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -577,7 +570,6 @@ export class MiscellaneousPurchaseEditComponent {
     return new Promise((resolve) => {
       this.dataService.getActiveLedger().subscribe((response: any) => {
         this.ledgerList = response.Data;
-        console.log('Ledger List Loaded:', this.ledgerList);
         resolve();
       });
     });
@@ -1052,7 +1044,6 @@ export class MiscellaneousPurchaseEditComponent {
   // onCompanySelected(event: any){}
 
   openInvoicePopup() {
-    console.log('EVENT ');
     this.getPendingInvoices(); // Ensure you load fresh data
     this.invoicePopupVisible = true;
   }
@@ -1334,7 +1325,6 @@ export class MiscellaneousPurchaseEditComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
-
   ],
   providers: [],
   declarations: [MiscellaneousPurchaseEditComponent],

@@ -139,13 +139,12 @@ export class FixedAsstesListComponent {
     private router: Router,
   ) {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/fixed-assets');
@@ -159,8 +158,6 @@ export class FixedAsstesListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.list_fixed_assets();
   }
   toggleFilters() {
@@ -287,13 +284,8 @@ export class FixedAsstesListComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   ngOnInit() {
@@ -350,12 +342,10 @@ export class FixedAsstesListComponent {
   onEditFixedAssets(event: any) {
     event.cancel = true;
     this.EditFixedAssetsPopupVisible = true;
-    console.log(event);
     const id = event.data.ID;
     this.fixedAssetId = event.data.ID;
     this.selectedFA = id;
     this.dataService.select_Fixed_Asset(id).subscribe((res: any) => {
-      console.log(res);
       this.Selected_fixedAssets_data = res.Data;
     });
   }
@@ -376,8 +366,6 @@ export class FixedAsstesListComponent {
   }
 
   getStatusFlagClass(Status: string): string {
-    // console.log('Status:', Status);
-
     return Status ? 'flag-red' : 'flag-green';
   }
 

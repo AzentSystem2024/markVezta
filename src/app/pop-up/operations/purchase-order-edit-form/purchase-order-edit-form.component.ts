@@ -222,20 +222,18 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       : null;
 
     const userDataString = localStorage.getItem('userData');
-    console.log(userDataString, 'USERDATASTRING');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
 
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
-      console.log(this.HSNCODE, 'HSNCODE===================');
       this.hsnLoaded = true; // ADD THIS
     }
   }
   ngOnInit() {
     this.sessionDetails();
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     this.menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -251,7 +249,6 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     }
     // this.sessionData_tax()
     const menuGroups = this.menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -701,15 +698,9 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-    console.log(
-      this.HSN_CODE,
-      '===========selected HSN CODE===================',
-    );
+
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
+
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
   }

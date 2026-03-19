@@ -102,14 +102,14 @@ export class DenialListComponent {
         workbook.xlsx.writeBuffer().then((buffer) => {
           saveAs(
             new Blob([buffer], { type: 'application/octet-stream' }),
-            'Denials.xlsx'
+            'Denials.xlsx',
           );
         });
       });
       e.cancel = true;
     }
   }
-  
+
   onSelectionChanged(data: any) {
     this.selectedItemKeys = data.selectedRowKeys;
   }
@@ -119,7 +119,6 @@ export class DenialListComponent {
   onClickSaveNewContact = () => {
     const { CODE, DESCRIPTION, TYPE_ID, CATEGORY_ID } =
       this.denialComponent.getNewDenialData();
-    console.log('data kittiiiiiii', CODE, DESCRIPTION, TYPE_ID, CATEGORY_ID);
     this.service
       .addDenial(CODE, DESCRIPTION, TYPE_ID, CATEGORY_ID)
       .subscribe((result: any) => {
@@ -130,7 +129,7 @@ export class DenialListComponent {
               message: `New Denial "${CODE} ${DESCRIPTION} ${TYPE_ID} ${CATEGORY_ID}" saved Successfully`,
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -138,7 +137,7 @@ export class DenialListComponent {
               message: `Your Data Not Saved`,
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
       });
@@ -148,8 +147,7 @@ export class DenialListComponent {
 
   onRowUpdating(event) {
     var id = event.key.ID;
-    const updataDate = event.newData
-    console.log("event",updataDate);
+    const updataDate = event.newData;
 
     event.cancel = true; // Prevent the default update operation
   }
@@ -157,7 +155,6 @@ export class DenialListComponent {
   // =================Remove Denial=========================
   onRowRemoving(event: any) {
     var SelectedRow = event.key;
-    console.log('selected row data :', SelectedRow);
     this.service.removeDenial(SelectedRow.ID).subscribe(() => {
       try {
         // Your delete logic here
@@ -166,7 +163,7 @@ export class DenialListComponent {
             message: 'Delete operation successful',
             position: { at: 'top right', my: 'top right' },
           },
-          'success'
+          'success',
         );
         this.dataGrid.instance.refresh();
         window.location.reload();
@@ -176,7 +173,7 @@ export class DenialListComponent {
             message: 'Delete operation failed',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
@@ -189,7 +186,6 @@ export class DenialListComponent {
       .get_Denial_Dropdown_Data(dropdownType)
       .subscribe((data: any) => {
         this.Denial_Type_DropDownData = data;
-        console.log('drop down dataaaaaaaaa', this.Denial_Type_DropDownData);
       });
   }
 
@@ -200,10 +196,6 @@ export class DenialListComponent {
       .get_Denial_Dropdown_Data(dropdownType)
       .subscribe((data: any) => {
         this.Denial_category_DropDownData = data;
-        console.log(
-          'drop down dataaaaaaaaa',
-          this.Denial_category_DropDownData
-        );
       });
   }
 }

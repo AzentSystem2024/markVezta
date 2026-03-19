@@ -43,7 +43,7 @@ export class SupplierListComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   @Output()
   editingStart = new EventEmitter<any>();
-@Output() formClosed = new EventEmitter<void>();
+  @Output() formClosed = new EventEmitter<void>();
   dataGrid: DxDataGridComponent;
   width = '100vw';
   height = '100vh';
@@ -86,7 +86,7 @@ export class SupplierListComponent implements OnInit {
     private exportService: ExportService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {
     dataservice.getCurrencyData().subscribe((data) => {
       this.currency = data;
@@ -102,28 +102,23 @@ export class SupplierListComponent implements OnInit {
   private loadDropdownData(): void {
     this.dataservice.getDropdownData('LANDED_COST').subscribe((data) => {
       this.landedcost = data;
-      console.log(this.landedcost, 'LANDEDCOST');
     });
   }
 
-    addButtonOptions = {
+  addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-  
+
     onClick: () => {
       // Run inside Angular's zone
       this.ngZone.run(() => this.addSupplier());
     },
-    
-    elementAttr: { class: 'add-button' },
-    
-    
-  };
 
-
+    elementAttr: { class: 'add-button' },
+  };
 
   addSupplier() {
     this.isAddSupplierPopupOpened = true;
@@ -132,7 +127,6 @@ export class SupplierListComponent implements OnInit {
   showSupplier() {
     this.dataservice.getSupplierData().subscribe((response) => {
       this.supplier = response;
-      console.log(response, 'SUPPLIERRRRRRRRR');
     });
   }
   // onClickSaveSupplier(){
@@ -152,19 +146,14 @@ export class SupplierListComponent implements OnInit {
   // }
 
   onSelectionChanged(event: any): void {
-    console.log('Selection Event:', event);
     const selectedRows = event.selectedRowsData; // Get selected rows from grid
-    console.log('Selected Rows:', selectedRows);
 
     this.selectedLandedCosts = selectedRows.map((row: any) => ({
       COST_ID: row.ID,
     })); // Format the selected costs
-    console.log('Mapped Selected Costs:', this.selectedLandedCosts);
   }
 
   onClickSaveSupplier(): void {
-    console.log('Selected Landed Costs Before Save:', this.selectedLandedCosts);
-
     const {
       HQID,
       SUPP_CODE,
@@ -190,8 +179,8 @@ export class SupplierListComponent implements OnInit {
       Supplier_cost,
     } = this.supplierComponent.getNewSupplierData();
 
-     const isInactiveBoolean = IS_INACTIVE === 1 ? true : false;
-     const currencyIdNumber = parseInt(CURRENCY_ID); // or use Number(CURRENCY_ID);
+    const isInactiveBoolean = IS_INACTIVE === 1 ? true : false;
+    const currencyIdNumber = parseInt(CURRENCY_ID); // or use Number(CURRENCY_ID);
     const StateID = parseInt(STATE_ID);
 
     this.dataservice
@@ -219,10 +208,9 @@ export class SupplierListComponent implements OnInit {
         currencyIdNumber,
         PAY_TERM_ID,
         VAT_RULE_ID,
-        Supplier_cost
+        Supplier_cost,
       )
       .subscribe((response) => {
-        console.log('API Response:', response);
         if (response) {
           try {
             if (response.flag == 1) {
@@ -231,13 +219,12 @@ export class SupplierListComponent implements OnInit {
                   message: 'Supplier added successfully',
                   position: { at: 'top right', my: 'top right' },
                 },
-                'success'
+                'success',
               );
-               this.isAddSupplierPopupOpened = false
-                this.formClosed.emit(); // tell parent to close
+              this.isAddSupplierPopupOpened = false;
+              this.formClosed.emit(); // tell parent to close
               this.showSupplier();
               this.dataGrid.instance.refresh();
-             
             }
           } catch (error) {
             // notify(
@@ -300,7 +287,7 @@ export class SupplierListComponent implements OnInit {
         VAT_REGNO,
         CURRENCY_ID,
         PAY_TERM_ID,
-        VAT_RULE_ID
+        VAT_RULE_ID,
       )
       .subscribe(() => {
         try {
@@ -310,7 +297,7 @@ export class SupplierListComponent implements OnInit {
               message: 'Delete operation successful',
               position: { at: 'top right', my: 'top right' },
             },
-            'success'
+            'success',
           );
           this.dataGrid.instance.refresh();
           this.showSupplier();
@@ -338,7 +325,7 @@ export class SupplierListComponent implements OnInit {
             message: 'Supplier Updated Successfully',
             position: { at: 'top center', my: 'top center' },
           },
-          'success'
+          'success',
         );
         this.dataGrid.instance.refresh();
         this.showSupplier();
@@ -348,13 +335,10 @@ export class SupplierListComponent implements OnInit {
             message: 'Your Data Not Saved',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
       }
     });
-    console.log('old data:', oldData);
-    console.log('new data:', updataDate);
-    console.log('modified data:', combinedData);
 
     event.cancel = true; // Prevent the default update operation
   }
@@ -385,7 +369,6 @@ export class SupplierListComponent implements OnInit {
 
     // Fetch the item data
     this.dataservice.selectSupplier(ID).subscribe((response: any) => {
-      // console.log(response, "select!!!");
       this.selectedSupplier = response;
       this.isEditSupplierPopupOpened = true;
       this.selectSupplier(response);
@@ -399,7 +382,6 @@ export class SupplierListComponent implements OnInit {
     }
     this.isEditSupplierPopupOpened = true;
     this.dataservice.selectSupplier(ID).subscribe((response: any) => {
-      console.log('Supplier selected successfully:', response);
       this.selectedSupplier = response;
       this.cdr.detectChanges();
 

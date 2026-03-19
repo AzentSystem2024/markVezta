@@ -135,8 +135,6 @@ export class DeliveryReturnComponent {
   };
 
   getStatusFlagClass(Status: string): string {
-    // console.log('Status:', Status);
-
     return Status == 'OPEN' ? 'flag-oranged' : 'flag-green';
   }
 
@@ -155,7 +153,6 @@ export class DeliveryReturnComponent {
   onEditingStart(event: any) {
     event.cancel = true;
     this.editDeliveryReturnPopupOpened = true;
-    console.log('Edit Data', event.data);
     this.select_DeliveryReturn_Data(event);
   }
 
@@ -164,16 +161,13 @@ export class DeliveryReturnComponent {
     this.dataservice
       .select_DeliveryRteurn_Data(id)
       .subscribe((response: any) => {
-        console.log('Selected Delivery Return Data', response);
         this.DeliveryReturnData = response.Data;
-        console.log(this.DeliveryReturnData);
       });
   }
 
   get_DeliveryReturnList() {
     this.dataservice.get_DeliveryRteurn_Data().subscribe((response: any) => {
       this.DeliveryReturnDatasource = response.Data;
-      console.log('Delivery Return List', this.DeliveryReturnDatasource);
     });
   }
 

@@ -35,9 +35,12 @@ export class PaySettingsComponent {
   formsource: FormGroup;
   PaySettings: any;
   Ledger: any;
-  isLoading: boolean=false;
+  isLoading: boolean = false;
 
-  constructor(private fb: FormBuilder, private dataservice: DataService) {
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+  ) {
     this.formsource = this.fb.group({
       DAILY_HOURS: ['', Validators.required],
       BANK_AC_NO: ['', Validators.required],
@@ -63,9 +66,7 @@ export class PaySettingsComponent {
   //===============get Dropdown List=======================
   get_DropDown_List() {
     this.dataservice.get_Ledger_Api(name).subscribe((response: any) => {
-      console.log(response, 'response++++++++++');
       this.Ledger = response;
-      console.log(this.Ledger, 'Ledger++++++++++');
 
       // this.Ledger = response.Hospitals;
     });
@@ -74,12 +75,8 @@ export class PaySettingsComponent {
   //===================get data list========================
   get_PaySettingsList() {
     this.isLoading = true;
-    console.log('function working');
     this.dataservice.get_PaySettingsList().subscribe((res: any) => {
-      console.log(res, 'response================');
       this.PaySettings = res.data;
-      console.log(this.PaySettings, 'PaySettings');
-      console.log(res, 'response================');
     });
   }
 
@@ -106,10 +103,13 @@ export class PaySettingsComponent {
     const Sal_Payable_Head_ID = this.PaySettings.SAL_PAYABLE_HEAD_ID;
     const UQ_Labour_ID = this.PaySettings.UQ_LABOUR_ID;
 
-    if (Daily_Hours && Max_OT_MTS && Normal_OT_Rate &&
+    if (
+      Daily_Hours &&
+      Max_OT_MTS &&
+      Normal_OT_Rate &&
       Holiday_OT_Rate &&
-      Leave_Sal_Days&&
-      UQ_Labour_ID&&
+      Leave_Sal_Days &&
+      UQ_Labour_ID &&
       Bank_Acc_No &&
       Bank_Code &&
       Sal_Expense_Head_ID &&
@@ -117,7 +117,8 @@ export class PaySettingsComponent {
       LS_Expense_Head_ID &&
       LS_Payable_Head_ID &&
       EOS_Expense_Head_ID &&
-      EOS_Payable_Head_ID) {
+      EOS_Payable_Head_ID
+    ) {
       this.dataservice
         .Update_PaySettings_Api(
           Daily_Hours,
@@ -133,7 +134,7 @@ export class PaySettingsComponent {
           LS_Expense_Head_ID,
           LS_Payable_Head_ID,
           EOS_Expense_Head_ID,
-          EOS_Payable_Head_ID
+          EOS_Payable_Head_ID,
         )
         .subscribe((res: any) => {
           notify(
@@ -142,23 +143,21 @@ export class PaySettingsComponent {
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'success'
+            'success',
           );
-          console.log(res, 'UPDATERESPONSEEEEEEEEEEEEE');
           this.get_PaySettingsList();
         });
-    }
-    else{
+    } else {
       notify(
         {
           message: 'Please fill the fields',
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
-        'error'
+        'error',
       );
-      }  
-      this.get_PaySettingsList()
+    }
+    this.get_PaySettingsList();
   }
 }
 @NgModule({

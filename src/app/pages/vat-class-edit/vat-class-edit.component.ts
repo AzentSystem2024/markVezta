@@ -69,7 +69,6 @@ export class VatClassEditComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       console.log(userData.Configuration, 'CONFIGURATIONNNNNNNNNNN');
@@ -99,7 +98,6 @@ export class VatClassEditComponent {
   getLedgerCodeDropdown() {
     this.dataservice.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
-      console.log('Ledger List Loaded:', this.ledgerList);
     });
   }
 

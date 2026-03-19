@@ -63,14 +63,12 @@ export class PayRevisionComponent {
   viewPayRevisionPopupOpened: boolean = false;
   selectedRevisionData: any = null;
 
-
   allActionButtons = [
     {
       name: 'edit',
       hint: 'Edit',
       icon: 'edit',
       text: 'Edit',
-      
     },
     {
       name: 'delete',
@@ -78,7 +76,7 @@ export class PayRevisionComponent {
       icon: 'trash',
       text: 'Delete',
       // onClick: (e) => this.onDeleteClick(e),
-      visible: (e) => e.row.data.STATUS !== 'Approved'
+      visible: (e) => e.row.data.STATUS !== 'Approved',
     },
     {
       hint: 'Verify',
@@ -87,7 +85,8 @@ export class PayRevisionComponent {
       onClick: (e) => {
         setTimeout(() => this.onVerifyClick(e));
       },
-      visible: (e) => e.row.data.STATUS !== 'Approved' && e.row.data.STATUS !== 'Verified'
+      visible: (e) =>
+        e.row.data.STATUS !== 'Approved' && e.row.data.STATUS !== 'Verified',
     },
     {
       hint: 'Approve',
@@ -96,14 +95,13 @@ export class PayRevisionComponent {
       onClick: (e) => {
         setTimeout(() => this.onApproveClick(e));
       },
-      visible: (e) => e.row.data.STATUS === 'Verified'
-    }
+      visible: (e) => e.row.data.STATUS === 'Verified',
+    },
   ];
-  
-  
+
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -120,13 +118,16 @@ export class PayRevisionComponent {
 
   getStatusFlagClass(status: string): string {
     switch (status) {
-      case 'Open': return 'flag-open';       // White or gray
-      case 'Verified': return 'flag-verified'; // Orange
-      case 'Approved': return 'flag-approved'; // Green
-      default: return '';
+      case 'Open':
+        return 'flag-open'; // White or gray
+      case 'Verified':
+        return 'flag-verified'; // Orange
+      case 'Approved':
+        return 'flag-approved'; // Green
+      default:
+        return '';
     }
   }
-  
 
   formatDateColumn = (rowData: any): string => {
     const value = rowData.DATE;
@@ -177,11 +178,11 @@ export class PayRevisionComponent {
     e.cancel = true;
     const employeeId = e.data.ID;
     const status = e.data.STATUS;
-  
+
     this.dataService.selectSalaryRevision(employeeId).subscribe({
       next: (response: any) => {
         this.selectedRevisionData = response;
-  
+
         if (status === 'Approved') {
           this.viewPayRevisionPopupOpened = true;
         } else {
@@ -190,69 +191,54 @@ export class PayRevisionComponent {
       },
       error: (err) => {
         console.error('Failed to fetch salary revision:', err);
-      }
+      },
     });
   }
 
-  
-  
-
   onVerifyClick(e: any): void {
-    // console.log('Verify clicked:', e); // <-- Add this
-  
     e.cancel = true;
     const employeeId = e.row?.data?.ID;
-  
+
     if (!employeeId) {
       console.warn('No Employee ID found in row data');
       return;
     }
-  
+
     this.dataService.selectSalaryRevision(employeeId).subscribe({
       next: (response: any) => {
-        // console.log('Salary revision fetched:', response); // <-- Add this
-  
-        this.selectedRevisionData = response; 
+        this.selectedRevisionData = response;
         this.verifyPayRevisionPopupOpened = true;
       },
       error: (err) => {
         console.error('Failed to fetch salary revision:', err);
-      }
+      },
     });
   }
-  
-  
 
   onApproveClick(e: any): void {
-    // console.log('Verify clicked:', e); // <-- Add this
-  
     e.cancel = true;
     const employeeId = e.row?.data?.ID;
-  
+
     if (!employeeId) {
       console.warn('No Employee ID found in row data');
       return;
     }
-  
+
     this.dataService.selectSalaryRevision(employeeId).subscribe({
       next: (response: any) => {
-        // console.log('Salary revision fetched:', response); // <-- Add this
-  
-        this.selectedRevisionData = response; 
+        this.selectedRevisionData = response;
         this.approvePayRevisionPopupOpened = true;
       },
       error: (err) => {
         console.error('Failed to fetch salary revision:', err);
-      }
+      },
     });
   }
-  
 
   handleEditClose() {
-    // console.log('Parent: popupClosed triggered');
     this.addPayRevisionPopupOpened = false; // closes the popup
-    this.editPayRevisionPopupOpened = false; 
-    this.verifyPayRevisionPopupOpened = false; 
+    this.editPayRevisionPopupOpened = false;
+    this.verifyPayRevisionPopupOpened = false;
     this.approvePayRevisionPopupOpened = false;
     this.selectedRevisionData = null;
     this.getSalaryRevisionList();
@@ -260,7 +246,6 @@ export class PayRevisionComponent {
 
   onDeleteSalaryRevision(e: any) {
     const salaryRevisionId = e.data.ID;
-// console.log("delete")
     // Optionally prevent the default delete behavior
     e.cancel = true;
 
@@ -273,7 +258,7 @@ export class PayRevisionComponent {
               message: 'Salary Revision Log Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getSalaryRevisionList();
           // this.dataGrid.instance.refresh();
@@ -283,14 +268,14 @@ export class PayRevisionComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 }
@@ -324,7 +309,7 @@ export class PayRevisionComponent {
     PayRevisionAddModule,
     PayRevisionVerifyModule,
     PayRevisionApproveModule,
-    PayRevisionViewModule
+    PayRevisionViewModule,
   ],
   providers: [],
   declarations: [PayRevisionComponent],

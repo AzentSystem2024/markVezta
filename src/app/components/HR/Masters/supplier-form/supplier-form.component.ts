@@ -79,14 +79,16 @@ export class SupplierFormComponent implements OnInit {
   PaymentTerms: any;
   PaymentId: any;
 
-  constructor(private service: DataService, authservice: AuthService) {
+  constructor(
+    private service: DataService,
+    authservice: AuthService,
+  ) {
     this.stateLabel = authservice.getsettingsData().STATE_LABEL;
     this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
     // this.get_Country_Dropdown_List()
     // ;
     service.getCountryWithFlags().subscribe((data) => {
       this.CountryDropdownData = data;
-      console.log(this.CountryDropdownData, 'COUNTRY;;;;;;;;;;');
     });
 
     this.get_State_Dropdown_List();
@@ -103,7 +105,6 @@ export class SupplierFormComponent implements OnInit {
   private loadDropdownData(): void {
     this.service.getDropdownData('LANDED_COST').subscribe((data) => {
       this.landedcost = data;
-      console.log(this.landedcost, 'LANDEDCOST');
     });
   }
 
@@ -117,32 +118,25 @@ export class SupplierFormComponent implements OnInit {
     });
 
     // Debug log to verify the binding
-    console.log('Updated Supplier_cost:', this.formSupplierData.Supplier_cost);
   }
 
   // get_Country_Dropdown_List() {
   //   this.service.CountryDropdown_Api().subscribe((response: any) => {
-  //     // console.log(response, 'response++++++++++');
   //     this.Country = response;
-  //     console.log(this.Country,'Country dropdown')
   //   });
   // }
 
   get_PaymentTerms_Dropdown_List() {
     this.service.PaymentTerms_Dropdown_Api().subscribe((response: any) => {
-      // console.log(response, 'response++++++++++');
       this.PaymentTerms = response;
-      console.log(this.PaymentTerms, 'Country dropdown');
     });
   }
 
   get_State_Dropdown_List() {
-    // console.log('function working');
     const CountryId = this.formSupplierData?.COUNTRY_ID;
     this.service
       .get_State_Dropdown_Api('STATE_NAME', this.CountryId)
       .subscribe((response: any) => {
-        console.log(response, 'response++++++++++');
         this.State = response;
       });
   }
@@ -150,45 +144,35 @@ export class SupplierFormComponent implements OnInit {
   showCountry() {
     this.service.getCountryData().subscribe((response) => {
       this.CountryDropdownData = response;
-      console.log('count', this.CountryDropdownData);
     });
   }
   getVATRuleDropDown() {
     const dropdownvat = 'VATRULE';
     this.service.getDropdownData(dropdownvat).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
-      console.log('dropdown', this.VATRuleDropdownData);
     });
   }
   getPaymentTerms() {
     this.service.getPaymentTermsData().subscribe((response) => {
       this.PaymentTermsDropdownData = response;
-      console.log(
-        'count==================================',
-        this.PaymentTermsDropdownData
-      );
     });
   }
   getCurrency() {
     this.service.getCurrencyData().subscribe((response) => {
       this.CurrencyDropdownData = response;
-      console.log('count', this.CurrencyDropdownData);
     });
   }
 
   getStateDropDown() {
     this.service.getStateData().subscribe((data: any) => {
       this.StateDropdownData = data;
-      console.log('dropdown', this.StateDropdownData);
     });
   }
   onCountrySelectionChanged(event: any) {
     this.CountryId = event.value;
-    console.log(this.CountryId, 'country selection change ');
     const selectedCountry = this.CountryDropdownData.find(
-      (country) => country.ID === event.value
+      (country) => country.ID === event.value,
     );
-    console.log('selected country', selectedCountry);
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE;
     }
@@ -202,11 +186,8 @@ export class SupplierFormComponent implements OnInit {
 
   onStateValue(event: any) {
     this.selectedStateId = event.value;
-    console.log(this.selectedStateId, 'seleted state');
     this.StateId = event.value;
     this.get_State_Dropdown_List();
-
-    // console.log(this.selectedStateId, 'selectedStateId++++++++++');
   }
 
   ngOnInit(): void {

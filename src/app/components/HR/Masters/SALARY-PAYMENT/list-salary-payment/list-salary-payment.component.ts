@@ -117,19 +117,16 @@ export class ListSalaryPaymentComponent {
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
 
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/salary-payment');
@@ -143,29 +140,26 @@ export class ListSalaryPaymentComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getSalaryPaymentList();
     this.sessionData_tax();
   }
 
-    sessionData_tax() {
+  sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
-
   getSalaryPaymentList(dateRange: string = this.selectedDateRange) {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
-    }
-    this.dataService.getSalaryPaymentList(payload).subscribe((response: any) => {
-      console.log(response);
-      this.salaryPaymentList = response.Data;
-      this.applyDateFilter();
-    });
+    };
+    this.dataService
+      .getSalaryPaymentList(payload)
+      .subscribe((response: any) => {
+        this.salaryPaymentList = response.Data;
+        this.applyDateFilter();
+      });
   }
 
   onEditOrViewSalaryPayment(e: any) {
@@ -176,7 +170,6 @@ export class ListSalaryPaymentComponent {
     this.dataService.selectSalaryPayment(miscId).subscribe({
       next: (response: any) => {
         this.selectedSalaryData = response.Data;
-        console.log(this.selectedSalaryData, 'SELECTEDSALARYDATAAAAAAAAAAA');
         this.editSalaryPopup = true;
         this.isReadOnlyPayment = status === 5;
       },
@@ -188,7 +181,6 @@ export class ListSalaryPaymentComponent {
 
   onDeleteSalaryPayment(e: any) {
     const miscId = e.data.TRANS_ID;
-    // console.log("delete")
     // Optionally prevent the default delete behavior
     e.cancel = true;
 
@@ -201,7 +193,7 @@ export class ListSalaryPaymentComponent {
               message: 'Miscellaneous Receipt Log Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.getSalaryPaymentList();
           // this.dataGrid.instance.refresh();
@@ -211,14 +203,14 @@ export class ListSalaryPaymentComponent {
               message: 'Your Data Not deleted',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting employee:', error);
-      }
+      },
     );
   }
 
@@ -243,7 +235,7 @@ export class ListSalaryPaymentComponent {
 
     // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton'
+      (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
@@ -373,11 +365,11 @@ export class ListSalaryPaymentComponent {
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option
+        : option,
     );
 
     this.showCustomDatePopup = false;
-    this.getSalaryPaymentList('custom')
+    this.getSalaryPaymentList('custom');
   }
 
   private parseDateString(dateStr: string): Date {
@@ -453,7 +445,7 @@ export class ListSalaryPaymentComponent {
     this.getSalaryPaymentList();
   }
 
-    onCustomDateApplied(e: any) {
+  onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
@@ -487,7 +479,7 @@ export class ListSalaryPaymentComponent {
     DxiItemModule,
     DxoItemModule,
     AddSalaryPaymentModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   declarations: [ListSalaryPaymentComponent],

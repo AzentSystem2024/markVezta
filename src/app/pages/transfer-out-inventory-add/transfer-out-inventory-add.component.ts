@@ -117,7 +117,7 @@ export class TransferOutInventoryAddComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit() {
@@ -127,18 +127,15 @@ export class TransferOutInventoryAddComponent {
     // always fetch fresh number when popup opens
 
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData==================:', menuResponse);
-    console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     console.log(this.companyID, 'COMPANYIDDDDDDDDDD');
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -162,8 +159,7 @@ export class TransferOutInventoryAddComponent {
     }
     this.getStoreDropdown();
     this.getReasonsDropdown();
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
+
     // this.items = [];
     // this.addEmptyRow();
   }
@@ -182,7 +178,7 @@ export class TransferOutInventoryAddComponent {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const data = this.EditingResponseData;
-    console.log(data);
+
     this.transferOutFormData = {
       TRANS_ID: data.TRANS_ID,
       // ID: data.ID,
@@ -220,7 +216,7 @@ export class TransferOutInventoryAddComponent {
   getStoreDropdown() {
     this.dataService.getDropdownData('STORE').subscribe((response: any) => {
       this.stores = response.filter(
-        (store: any) => store.ID !== this.storeFromSession
+        (store: any) => store.ID !== this.storeFromSession,
       );
     });
   }
@@ -256,12 +252,12 @@ export class TransferOutInventoryAddComponent {
       // remove any empty placeholder rows
       this.transferOutFormData.DETAILS =
         this.transferOutFormData.DETAILS.filter(
-          (item) => item.BARCODE !== '' && item.DESCRIPTION !== ''
+          (item) => item.BARCODE !== '' && item.DESCRIPTION !== '',
         );
 
       selectedRows.forEach((row) => {
         const exists = this.transferOutFormData.DETAILS.some(
-          (item) => item.BARCODE === row.BARCODE
+          (item) => item.BARCODE === row.BARCODE,
         );
         if (!exists) {
           this.transferOutFormData.DETAILS.push({
@@ -317,7 +313,7 @@ export class TransferOutInventoryAddComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data
+            (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -360,7 +356,7 @@ export class TransferOutInventoryAddComponent {
               : Number(item.QUANTITY) || 0;
           return sum + (Number(item.COST) || 0) * qty;
         },
-        0
+        0,
       );
   }
 
@@ -547,14 +543,14 @@ export class TransferOutInventoryAddComponent {
       this.transferOutFormData.DETAILS.reduce(
         (sum: number, item: any) =>
           sum + (Number(item.COST) || 0) * (Number(item.QUANTITY) || 0),
-        0
+        0,
       );
 
     // 3. Create payload (unchanged)
     const payload = {
       ...this.transferOutFormData,
       TRANSFER_DATE: this.formatDateLocal(
-        this.transferOutFormData.TRANSFER_DATE
+        this.transferOutFormData.TRANSFER_DATE,
       ),
       USER_ID: this.userID,
       COMPANY_ID: this.companyID,
@@ -574,7 +570,7 @@ export class TransferOutInventoryAddComponent {
         // APPROVE API
         confirm(
           'Are you sure you want to approve this transfer?',
-          'Confirm Approval'
+          'Confirm Approval',
         ).then((result) => {
           if (result) {
             this.dataService.approveTransferOutForInventory(payload).subscribe({
@@ -588,7 +584,7 @@ export class TransferOutInventoryAddComponent {
                   notify(
                     'Error approving transfer: ' + res.message,
                     'error',
-                    3000
+                    3000,
                   );
                 }
               },
@@ -626,7 +622,7 @@ export class TransferOutInventoryAddComponent {
         // CONFIRM → INSERT API
         confirm(
           'Do you want to approve & save this transfer?',
-          'Confirm Save'
+          'Confirm Save',
         ).then((result) => {
           if (result) {
             this.dataService.insertTransferOutForInventory(payload).subscribe({
@@ -635,7 +631,7 @@ export class TransferOutInventoryAddComponent {
                   notify(
                     'Transfer saved and approved successfully!',
                     'success',
-                    3000
+                    3000,
                   );
                   this.getTransferNo();
                   this.ngZone.run(() => {
@@ -645,7 +641,7 @@ export class TransferOutInventoryAddComponent {
                   notify(
                     'Error saving transfer: ' + res.message,
                     'error',
-                    3000
+                    3000,
                   );
                 }
               },
@@ -705,7 +701,6 @@ export class TransferOutInventoryAddComponent {
     this.dataService
       .selectTransferOutForInventory(returnId)
       .subscribe((res: any) => {
-        console.log(res, 'RESPONSE');
         this.generatePDF(res);
       });
   }
@@ -818,7 +813,7 @@ export class TransferOutInventoryAddComponent {
         infoX,
         infoBlockY + rowH * i,
         infoX + infoW,
-        infoBlockY + rowH * i
+        infoBlockY + rowH * i,
       );
     }
 
@@ -997,7 +992,7 @@ export class TransferOutInventoryAddComponent {
     doc.text(
       `INR ${this.convertNumberToWords(data.NET_AMOUNT)} Only`,
       rightColX,
-      footerY + 6
+      footerY + 6,
     );
 
     const boxY = footerY + 15;
@@ -1019,7 +1014,7 @@ export class TransferOutInventoryAddComponent {
     doc.text(
       'Authorised Signatory',
       rightColX + boxWidth - 45,
-      boxY + boxHeight - 6
+      boxY + boxHeight - 6,
     );
 
     doc.output('dataurlnewwindow');

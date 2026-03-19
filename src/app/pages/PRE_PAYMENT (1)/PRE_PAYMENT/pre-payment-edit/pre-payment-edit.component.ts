@@ -139,7 +139,6 @@ export class PrePaymentEditComponent {
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
   }
 
@@ -179,7 +178,6 @@ export class PrePaymentEditComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -356,7 +354,6 @@ export class PrePaymentEditComponent {
   }
 
   onSupplierChanged(event: any) {
-    console.log(event, 'event');
     this.selectedSupplierId = event.value;
   }
 
@@ -453,20 +450,10 @@ export class PrePaymentEditComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
 
     this.selected_user_id = sessionData.USER_ID;
     console.log(
@@ -474,10 +461,6 @@ export class PrePaymentEditComponent {
       '===========selected user id===================',
     );
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    console.log(
-      this.selectedstoreId,
-      '===========selected store id===================',
-    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -581,7 +564,6 @@ export class PrePaymentEditComponent {
     this.isPdfPopupVisible = true;
     const id = this.PrePaymentFormData.TRANS_ID;
     this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
-      console.log(res);
       if (res?.flag === 1 && res?.Data) {
         this.pdfSrc = this.get_pdf(res.Data);
       }

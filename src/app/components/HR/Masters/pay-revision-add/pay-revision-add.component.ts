@@ -82,14 +82,12 @@ export class PayRevisionAddComponent {
   getSalaryHead() {
     this.dataService.getDropdownData('SALARY_HEAD').subscribe((data) => {
       this.salaryHead = data;
-      // console.log(this.salaryHead, 'SALARYHEAD');
     });
   }
   getEmployeeDropdown() {
     this.dataService
       .getDropdownData('EMPLOYEE_REVISION')
       .subscribe((response: any) => {
-        console.log(response, '++++++++++++++++++');
         this.employee = response;
         //   this.employee = response.map((emp: any) => {
         //     const match = emp.DESCRIPTION.match(/^([^-]+)-(.*)$/); // match anything before and after the first hyphen
@@ -105,8 +103,6 @@ export class PayRevisionAddComponent {
         //   };
         // });
 
-        console.log(this.employee, 'EMPLOYEE DROPDOWN WITH CODES');
-
         this.getSalaryRevisionList();
       });
   }
@@ -114,30 +110,25 @@ export class PayRevisionAddComponent {
   getSalaryRevisionList() {
     this.dataService.getSalaryRevisionLog().subscribe((response: any) => {
       this.employeeList = response.data.reverse();
-      // console.log(this.employeeList, 'EMPLOYEELIST==========');
 
       // Get the approved employees from the revision log
       const approvedEmployees = this.employeeList.filter(
-        (emp: any) => emp.STATUS === 'Approved'
+        (emp: any) => emp.STATUS === 'Approved',
       );
-      // console.log(approvedEmployees, 'APPROVED EMPLOYEES ==========');
 
       // Get EMP_NO values from the salary revision list
       const existingEmpNos = new Set(
-        this.employeeList.map((emp: any) => emp.EMP_NO)
+        this.employeeList.map((emp: any) => emp.EMP_NO),
       );
-      console.log(existingEmpNos, 'EXIST');
       // Remove EMP_NO of approved employees from the set so they are not filtered out
       approvedEmployees.forEach((emp: any) =>
-        existingEmpNos.delete(emp.EMP_NO)
+        existingEmpNos.delete(emp.EMP_NO),
       );
 
       // Filter out only employees who are in the revision log *and* not approved
       this.employee = this.employee.filter(
-        (emp: any) => !existingEmpNos.has(emp.EMP_NO)
+        (emp: any) => !existingEmpNos.has(emp.EMP_NO),
       );
-
-      console.log(this.employee, 'EMPLOYEE DROPDOWN AFTER FILTERING');
     });
   }
 
@@ -158,14 +149,12 @@ export class PayRevisionAddComponent {
             this.employeeSalaryDetails.PREV_REVISION_DATE = `${day}-${month}-${year}`;
           }
 
-          // console.log(this.employeeSalaryDetails, 'SALARYDETAILSSSSSSS');
-
           this.salaryDetails = this.employeeSalaryDetails.SALARY_HEAD.map(
             (item: any) => ({
               code: item.HEAD_ID,
               description: item.DESCRIPTION,
               presentAmount: Number(item.PRESENT_AMOUNT),
-            })
+            }),
           );
         }
       });
@@ -193,7 +182,7 @@ export class PayRevisionAddComponent {
           message: 'Please select an employee',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -204,12 +193,12 @@ export class PayRevisionAddComponent {
           message: 'Please select an "Effective From Date" before saving.',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
     const hasZeroPresent = this.salaryDetails.every(
-      (item: any) => item.presentAmount === 0
+      (item: any) => item.presentAmount === 0,
     );
 
     if (hasZeroPresent) {
@@ -219,7 +208,7 @@ export class PayRevisionAddComponent {
             'All components have 0 as Present Amount. Please enter at least one non-zero value before saving.',
           position: { at: 'top center', my: 'top center' },
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -232,7 +221,7 @@ export class PayRevisionAddComponent {
     if (this.revisionFormData.REV_DATE) {
       const revDate = this.revisionFormData.REV_DATE;
       this.revisionFormData.REV_DATE = new Date(
-        Date.UTC(revDate.getFullYear(), revDate.getMonth(), revDate.getDate())
+        Date.UTC(revDate.getFullYear(), revDate.getMonth(), revDate.getDate()),
       );
     }
 
@@ -242,8 +231,8 @@ export class PayRevisionAddComponent {
         Date.UTC(
           effectDate.getFullYear(),
           effectDate.getMonth(),
-          effectDate.getDate()
-        )
+          effectDate.getDate(),
+        ),
       );
     }
     // Update the revisionFormData object to match your desired payload structure
@@ -252,19 +241,17 @@ export class PayRevisionAddComponent {
     this.revisionFormData.REV_DETAIL = revisedDetails;
 
     // Log final payload before sending
-    // console.log('Final Payload:', this.revisionFormData);
 
     // Make the API call
     this.dataService.saveRevisionData(this.revisionFormData).subscribe(
       (response) => {
-        // console.log('Successfully updated:', response);
         if (response) {
           notify(
             {
               message: 'Salary Revised Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
           this.popupClosed.emit();
         } else {
@@ -273,7 +260,7 @@ export class PayRevisionAddComponent {
               message: 'Your Data Not updated',
               position: { at: 'top right', my: 'top right' },
             },
-            'error'
+            'error',
           );
         }
         // To close the popup
@@ -281,13 +268,11 @@ export class PayRevisionAddComponent {
       (error) => {
         // console.error('Update failed:', error);
         alert('Failed to update pay revision.');
-      }
+      },
     );
   }
 
   handleEditClose() {
-    // console.log('CLOSED');
-
     this.popupClosed.emit();
   }
 

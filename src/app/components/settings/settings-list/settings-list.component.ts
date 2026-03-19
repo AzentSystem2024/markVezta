@@ -86,11 +86,8 @@ export class SettingsListComponent {
   }
   //=================session data================
   sessionData_tax() {
-    console.log('working');
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.selectedCompany);
     this.finId = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
     this.user_id = this.sessionData.USER_ID;
     this.getlist();
@@ -102,9 +99,7 @@ export class SettingsListComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(userData.Configuration, 'CONFIGURATION');
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
-    console.log(this.subType, 'SUBTYPEEEEEEEEE');
 
     // if (packingRights) {
     //   this.canAdd = packingRights.CanAdd;
@@ -115,8 +110,6 @@ export class SettingsListComponent {
     //   this.canApprove = packingRights.canApprove;
     // }
 
-    // console.log('packingRights', packingRights);
-    // console.log(this.canAdd, this.canEdit, this.canDelete);
     // this.getCreditNotes();
   }
 
@@ -127,9 +120,7 @@ export class SettingsListComponent {
       COMPANY_ID: this.selectedCompany,
       TRANS_TYPE: this.trans_id,
     };
-    this.service.Doc_Last_SNo(payload).subscribe((res: any) => {
-      console.log(res);
-    });
+    this.service.Doc_Last_SNo(payload).subscribe((res: any) => {});
   }
 
   //========================list for doc settings========================
@@ -139,7 +130,6 @@ export class SettingsListComponent {
     };
 
     this.service.List_setting(payload).subscribe((res: any) => {
-      console.log(res);
       this.DOcList = res.Data;
       // let data = res.Data;
       // if (this.subType) {
@@ -149,8 +139,6 @@ export class SettingsListComponent {
       // }
 
       // this.DOcList = data;
-
-      // console.log(this.DOcList, 'Filtered Doc List');
     });
   }
   //=========================grid refresh with call list==========================
@@ -195,7 +183,6 @@ export class SettingsListComponent {
 
   //=====================Save function======================================
   Savedata() {
-    console.log(this.DOcList);
     const docValues = this.DOcList.map((item) => ({
       TRANS_TYPE: item.ID,
       GROUP_CODE: item.CODE,
@@ -213,8 +200,6 @@ export class SettingsListComponent {
       DOC_SETTINGS: docValues,
     };
     this.service.Add_setting(payload).subscribe((res: any) => {
-      console.log(res);
-
       this.getlist();
 
       notify(

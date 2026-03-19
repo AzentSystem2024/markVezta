@@ -221,15 +221,8 @@ export class PurchaseOrderComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-    console.log(
-      this.HSN_CODE,
-      '===========selected HSN CODE===================',
-    );
+
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    console.log(
-      this.GST_PERC,
-      '===========selected GST PERC===================',
-    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -237,14 +230,13 @@ export class PurchaseOrderComponent {
   ngOnInit(): void {
     this.sessionDetails();
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/credit-note');
@@ -258,8 +250,6 @@ export class PurchaseOrderComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     console.log('PURCHASEORDER');
     this.getPurchaseOrderList();
     this.initializePrintTemplateData();
@@ -270,7 +260,6 @@ export class PurchaseOrderComponent {
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -496,7 +485,6 @@ export class PurchaseOrderComponent {
   }
 
   onEditingRow(event): void {
-    console.log(event, 'event');
     event.cancel = true;
     this.poId = event.data.ID;
     const Id = event.data.ID;
@@ -748,7 +736,6 @@ export class PurchaseOrderComponent {
     };
     this.service.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
-      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
   }
 
@@ -1007,7 +994,6 @@ export class PurchaseOrderComponent {
 
   VerifyPurchaseOrder() {
     const data = this.poVerifyForm.getNewPoData();
-    console.log(data);
 
     this.service.verifyPoData(data).subscribe((res) => {
       console.log('saved data');
@@ -1035,7 +1021,6 @@ export class PurchaseOrderComponent {
 
   ApprovePurchaseOrder() {
     const data = this.poApproveForm.getNewPoData();
-    console.log(data);
 
     this.service.ApprovePoData(data).subscribe((res) => {
       console.log('saved data');
@@ -1063,9 +1048,7 @@ export class PurchaseOrderComponent {
 
   deletePOData(event: any) {
     const ID = event.data.ID;
-    this.service.DeletePoData(ID).subscribe((response: any) => {
-      console.log(response, 'deleted');
-    });
+    this.service.DeletePoData(ID).subscribe((response: any) => {});
   }
 
   CloseEditForm() {
@@ -1120,7 +1103,6 @@ export class PurchaseOrderComponent {
   }
 
   OnParametersInitialized(event: any) {
-    console.log(event, 'event');
     var invisibleIntParamValue = 42;
     var intParam = event.args.ActualParametersInfo.filter(
       (x: any) => x.parameterDescriptor.name == 'intParam',

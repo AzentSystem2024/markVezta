@@ -220,27 +220,14 @@ export class GrnViewFormComponent {
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(this.sessionData, '=================session data==========');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
 
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    console.log(
-      this.selected_fin_id,
-      '===========selected fin id===================',
-    );
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
-    console.log(sessionYear, '==================session year==========');
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-    console.log(
-      this.financialYeaDate,
-      '=========================date=[[[[[[[[[[[[[[[[[[[[[[[[[[',
-    );
+
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_vat_id = this.sessionData.VAT_ID;
@@ -604,7 +591,6 @@ export class GrnViewFormComponent {
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
-      console.log('Logo Base64 Loaded');
     });
     // this.getPurchaseOrderList();
   }
