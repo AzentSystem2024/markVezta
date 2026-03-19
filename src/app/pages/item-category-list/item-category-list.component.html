@@ -99,23 +99,10 @@
         </dxi-validation-rule>
       </dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
-      <!-- <dxi-column dataField="LOYALTY_POINT" caption="LOYALTY POINT"></dxi-column> -->
-      <!-- <dxi-column dataField="COST_HEAD_ID" caption="COST HEAD"></dxi-column> -->
-      <!-- <dxi-column dataField="DEPT_NAME" caption="Department">
-    <dxo-lookup
-      [dataSource]="DepartmentDropdownData"
-      displayExpr="DESCRIPTION"
-      valueExpr="ID"
-    >
-    </dxo-lookup>
-    <dxi-validation-rule type="required" message="Department is required">
-      <dxi-validation-rule type="required" message="Department is required">
-      </dxi-validation-rule>
-    </dxi-validation-rule>
-  </dxi-column> -->
     </dx-data-grid>
   </div>
 </div>
+
 <form-popup
   height="300px"
   [(visible)]="isAddCategoryPopupOpened"

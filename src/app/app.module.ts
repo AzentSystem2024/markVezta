@@ -810,7 +810,7 @@ import {
   ItemStockValueComponent,
   ItemStockValueModule,
 } from './components/HR/Masters/item-stock-value/item-stock-value.component';
-import { ItemCategoryListComponent } from './pages/item-category-list/item-category-list/item-category-list.component';
+import { ItemCategoryListComponent } from './pages/item-category-list/item-category-list.component';
 import {
   StockAdjustmentListComponent,
   StockAdjustmentListModule,
@@ -1184,7 +1184,7 @@ import { ImportChartOfAccountsModule } from './pages/Import Accounts/import-char
     LandedCostEditModule,
     InterStoreTransferListModule,
     TransferInViewFormModule,
-    DepartmentModule,
+    // DepartmentModule,
     DesignationModule,
     EOSModule,
     PaySettingsModule,

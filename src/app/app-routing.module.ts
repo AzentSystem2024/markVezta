@@ -188,7 +188,7 @@ import { TransferInInventoryComponent } from './pages/transfer-in-inventory/tran
 import { AttendanceSheetComponent } from './components/HR/Masters/attendance-sheet/attendance-sheet.component';
 import { ItemQuantityStockComponent } from './components/HR/Masters/item-quantity-stock/item-quantity-stock.component';
 import { ItemStockValueComponent } from './components/HR/Masters/item-stock-value/item-stock-value.component';
-import { ItemCategoryListComponent } from './pages/item-category-list/item-category-list/item-category-list.component';
+import { ItemCategoryListComponent } from './pages/item-category-list/item-category-list.component';
 import { StockAdjustmentListComponent } from './pages/Stock_Adjustment/stock-adjustment-list/stock-adjustment-list.component';
 import { DeliveryNoteComponent } from './pages/delivery-note/delivery-note.component';
 import { StockMovementReportComponent } from './pages/HR/Masters/stock-movement-report/stock-movement-report.component';
@@ -220,8 +220,7 @@ import { MiscellaneousInvoiceComponent } from './pages/miscellaneous-invoice/mis
 import { MiscellaneousPurchaseComponent } from './pages/miscellaneous-purchase/miscellaneous-purchase.component';
 import { ImportChartOfAccountsComponent } from './pages/Import Accounts/import-chart-of-accounts/import-chart-of-accounts.component';
 import { AdvanceComponent } from './components/HR/Masters/advance/advance.component';
-
-// import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
+import { SubDepartmentComponent } from './pages/HR/Masters/sub-department/sub-department.component';
 
 const routes: Routes = [
   {
@@ -644,7 +643,11 @@ const routes: Routes = [
         component: ItemCategoryListComponent,
         canActivate: [AuthGuardService],
       },
-
+      {
+        path: 'sub-department',
+        component: SubDepartmentComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: 'sub-category',
         component: SubcategoryListComponent,

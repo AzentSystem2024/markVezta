@@ -1,47 +1,45 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnInit,
   ViewChild,
 } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import {
-  DxButtonModule,
-  DxCheckBoxModule,
   DxDataGridComponent,
   DxDataGridModule,
-  DxFormModule,
-  DxPopupModule,
-  DxSelectBoxModule,
-  DxTextBoxModule,
   DxToolbarModule,
+  DxButtonModule,
+  DxPopupModule,
+  DxFormModule,
+  DxTextBoxModule,
+  DxSelectBoxModule,
+  DxCheckBoxModule,
 } from 'devextreme-angular';
-import { FormPopupModule } from 'src/app/components';
-import { DataService } from 'src/app/services';
-import notify from 'devextreme/ui/notify';
-import {
-  CategoryFormComponent,
-  CategoryFormModule,
-} from 'src/app/components/library/category-form/category-form.component';
-import { ExportService } from 'src/app/services/export.service';
-import { ItemcategoryEditModule } from 'src/app/pages/itemcategory-edit/itemcategory-edit.component';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
+import { FormPopupModule } from 'src/app/components';
+// import { CategoryFormComponent, CategoryFormModule } from 'src/app/components/library/category-form/category-form.component';
+// import { ItemcategoryEditModule } from 'src/app/pages/itemcategory-edit/itemcategory-edit.component';
+import { DataService } from 'src/app/services';
+import { ExportService } from 'src/app/services/export.service';
+import {
+  SubDepartmentAddFormComponent,
+  SubDepartmentAddFormModule,
+} from '../../POPUP pages/sub-department-add-form/sub-department-add-form.component';
+import { SubDepartmentEditFormModule } from '../../POPUP pages/sub-department-edit-form/sub-department-edit-form.component';
 
 @Component({
-  selector: 'app-item-category-list',
-  templateUrl: './item-category-list.component.html',
-  styleUrls: ['./item-category-list.component.scss'],
+  selector: 'app-sub-department',
+  templateUrl: './sub-department.component.html',
+  styleUrls: ['./sub-department.component.scss'],
 })
-export class ItemCategoryListComponent {
-  @ViewChild(CategoryFormComponent) categoryComponent: CategoryFormComponent;
+export class SubDepartmentComponent implements OnInit {
+  @ViewChild(SubDepartmentAddFormComponent) categoryComponent: SubDepartmentAddFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
 
@@ -91,6 +89,23 @@ export class ItemCategoryListComponent {
     `;
     },
   };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
+    onClick: () => this.toggleFilters(),
+  };
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -100,13 +115,6 @@ export class ItemCategoryListComponent {
     this.sesstion_Details();
     this.showCategory();
   }
-
-  searchButtonOptions = {
-    icon: 'search',
-    hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
-    onClick: () => this.toggleFilters(),
-  };
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
@@ -119,41 +127,16 @@ export class ItemCategoryListComponent {
     }
   }
 
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => {
-      this.ngZone.run(() => this.refreshGrid());
-    },
-    text: '',
-  };
-
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
     this.showCategory();
   }
-  // onExporting(event: any) {
-  //   this.exportService.onExporting(event, 'Catagory-list');
-  // }
+
   addCategory() {
     this.isAddCategoryPopupOpened = true;
   }
-
-  //           addButtonOptions = {
-  //   text: 'New',
-  //   icon: 'bi bi-file-earmark-plus',
-  //   type: 'default',
-  //   stylingMode: 'contained',
-  //   hint: 'Add new entry',
-  //   onClick: () => {
-  //     // Run inside Angular's zone
-  //     this.ngZone.run(() => this.addCategory());
-  //   },
-  //   elementAttr: { class: 'add-button' }
-  // };
 
   onEditStart(event: any) {
     event.cancel = true;
@@ -400,13 +383,13 @@ export class ItemCategoryListComponent {
     DxSelectBoxModule,
     DxCheckBoxModule,
     ReactiveFormsModule,
-    CategoryFormModule,
-    ItemcategoryEditModule,
+    SubDepartmentAddFormModule,
+    SubDepartmentEditFormModule,
     CommonModule,
   ],
   providers: [],
-  exports: [ItemCategoryListComponent],
-  declarations: [ItemCategoryListComponent],
+  exports: [SubDepartmentComponent],
+  declarations: [SubDepartmentComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemCategoryModule {}
+export class SubDepartmentModule {}

@@ -93,63 +93,6 @@
       ></dxi-item>
     </dxo-toolbar>
 
-    <!-- <dxo-toolbar>
-      <dxi-item location="before">
-        <div
-          class="grid-header"
-          style="
-            font-weight: 600;
-            font-size: 20px;
-            margin-left: 12px;
-            padding: -3px;
-            margin-right: 3px;
-          "
-        >
-          User
-        </div>
-      </dxi-item>
-
-      <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          text: 'Refresh',
-          icon: 'refresh',
-          onClick: refresh,
-          stylingMode: 'text',
-          hint: 'refresh',
-        }"
-      ></dxi-item>
-
-      <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'search' : 'search',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' },
-        }"
-      ></dxi-item>
-
-      <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="custom-export-button"
-      ></dxi-item>
-      <dxi-item
-        location="after"
-        widget="dxButton"
-        *ngIf="canAdd"
-        [options]="addButtonOptions"
-      ></dxi-item>
-    </dxo-toolbar> -->
-
     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
@@ -179,6 +122,7 @@
       ></i>
     </div>
   </dx-data-grid>
+
   <form-popup
     class="formPopupClass"
     [(visible)]="isAddFormPopupOpened"
@@ -191,6 +135,7 @@
   >
     <app-user-new-form></app-user-new-form>
   </form-popup>
+
   <dx-popup
     [(visible)]="isEditPopupOpened"
     title="Edit User"

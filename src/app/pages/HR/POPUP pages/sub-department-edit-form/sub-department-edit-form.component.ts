@@ -1,37 +1,34 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   EventEmitter,
   Input,
   NgModule,
+  OnChanges,
   OnInit,
   Output,
   SimpleChanges,
   ViewChild,
-  OnChanges,
 } from '@angular/core';
-import { DxFormModule } from 'devextreme-angular/ui/form';
-import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
-import { DxValidatorModule } from 'devextreme-angular/ui/validator';
-// import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.component';
-// import { FormPhotoUploaderModule } from '../../utils/form-photo-uploader/form-photo-uploader.component';
-import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
+  DxValidationGroupComponent,
+  DxTextBoxModule,
+  DxFormModule,
+  DxValidatorModule,
   DxButtonModule,
   DxSelectBoxModule,
-  DxValidationGroupComponent,
   DxValidationGroupModule,
 } from 'devextreme-angular';
-import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
-// import { EventEmitter } from 'node:stream';
+import { DataService } from 'src/app/services';
 
 @Component({
-  selector: 'app-itemcategory-edit',
-  templateUrl: './itemcategory-edit.component.html',
-  styleUrls: ['./itemcategory-edit.component.scss'],
+  selector: 'app-sub-department-edit-form',
+  templateUrl: './sub-department-edit-form.component.html',
+  styleUrls: ['./sub-department-edit-form.component.scss'],
 })
-export class ItemcategoryEditComponent implements OnInit, OnChanges {
+export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
   @Input() selectedData: any;
 
   @Output() popupClosed = new EventEmitter<void>();
@@ -67,8 +64,6 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
         ...this.formCategoryData, // keep defaults
         ...changes['selectedData'].currentValue, // override with incoming
       };
-
-     
     }
   }
 
@@ -91,7 +86,7 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
       console.log(response);
     });
   }
-  
+
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
     const payload = {
@@ -202,7 +197,7 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
     DxSelectBoxModule,
     DxValidationGroupModule,
   ],
-  declarations: [ItemcategoryEditComponent],
-  exports: [ItemcategoryEditComponent],
+  declarations: [SubDepartmentEditFormComponent],
+  exports: [SubDepartmentEditFormComponent],
 })
-export class ItemcategoryEditModule {}
+export class SubDepartmentEditFormModule {}
