@@ -18,8 +18,8 @@
       placeholder="Select Date"
       [width]="200"
       [readOnly]="true"
-      [(value)]="newPoData.PO_DATE"
-      displayFormat="yyyy-MM-dd"
+      [value]="formattedDate"
+      displayFormat="dd-MM-yyyy"
     >
     </dx-text-box>
   </div>
@@ -74,7 +74,7 @@
       <div class="supplier-details">
         <span class="section-title">Supplier Details</span>
 
-        <dx-text-box
+        <!-- <dx-text-box
           label="Currency"
           labelMode="floating"
           placeholder="Currency"
@@ -90,26 +90,16 @@
           [(value)]="newPoData.EXCHANGE_RATE"
           [readOnly]="true"
         >
-        </dx-text-box>
+        </dx-text-box> -->
 
         <dx-text-box
-          label="VAT Rule"
+          label="Tax Rule"
           labelMode="floating"
-          placeholder="VAT Rule"
-          [(value)]="vatRule"
+          placeholder="Tax Rule"
+          [(value)]="newPoData.VAT_RULE_NAME"
           [readOnly]="true"
         >
         </dx-text-box>
-
-        <dx-text-box
-          label="Address"
-          labelMode="floating"
-          placeholder="Supplier Address"
-          [(value)]="newPoData.SUPP_ADDRESS"
-          [readOnly]="true"
-        >
-        </dx-text-box>
-
         <dx-text-box
           label="Contact Person"
           labelMode="floating"
@@ -118,21 +108,50 @@
           [readOnly]="true"
         >
         </dx-text-box>
-
         <dx-text-box
           label="Email"
           labelMode="floating"
           placeholder="Email"
-          [(value)]="supplierMail"
+          [(value)]="newPoData.SUPPLIER_EMAIL"
           [readOnly]="true"
         >
         </dx-text-box>
+        <div style="display: flex">
+          <dx-select-box
+            label="Code"
+            labelMode="floating"
+            [width]="100"
+            [(value)]="supplierCountryCode"
+            [items]="countryCodes"
+            displayExpr="data.dial_code"
+            valueExpr="data.dial_code"
+            [dropDownOptions]="{ width: '370px' }"
+            [readOnly]="true"
+          >
+            <div *dxTemplate="let item of 'item'">
+              <span>{{ item.data.flag }}</span>
+              <span>{{ item.data.dial_code }}</span>
+              <span>{{ item.data.name }}</span>
+            </div>
+          </dx-select-box>
+
+          <dx-text-box
+            label="Contact No"
+            labelMode="floating"
+            [(value)]="newPoData.SUPP_MOBILE"
+            style="margin-left: 10px"
+            valueChangeEvent="input"
+            [readOnly]="true"
+          >
+          </dx-text-box>
+        </div>
 
         <dx-text-box
-          label="Contact No"
+          class="address-field"
+          label="Address"
           labelMode="floating"
-          placeholder="Contact No"
-          [(value)]="newPoData.SUPP_MOBILE"
+          placeholder="Supplier Address"
+          [(value)]="newPoData.SUPP_ADDRESS"
           [readOnly]="true"
         >
         </dx-text-box>
@@ -168,14 +187,35 @@
         >
         </dx-text-box>
 
-        <dx-text-box
-          label="Mobile"
-          labelMode="floating"
-          placeholder="Mobile"
-          [(value)]="newPoData.CONTACT_MOBILE"
-          [readOnly]="true"
-        >
-        </dx-text-box>
+        <div style="display: flex">
+          <dx-select-box
+            label="Code"
+            labelMode="floating"
+            [items]="countryCodes"
+            [(value)]="shippingCountryCode"
+            displayExpr="data.dial_code"
+            valueExpr="data.dial_code"
+            [width]="110"
+            [readOnly]="true"
+          >
+            <div *dxTemplate="let item of 'item'">
+              <span>{{ item.data.flag }}</span>
+              <span>{{ item.data.dial_code }}</span>
+              <span>{{ item.data.name }}</span>
+            </div>
+          </dx-select-box>
+
+          <dx-text-box
+            width="100%"
+            label="Mobile"
+            labelMode="floating"
+            [(value)]="newPoData.CONTACT_MOBILE"
+            style="margin-left: 10px"
+            [valueChangeEvent]="'input'"
+            [readOnly]="true"
+          >
+          </dx-text-box>
+        </div>
       </div>
     </div>
     <div class="termsncondition-container">
@@ -252,7 +292,7 @@
   <div
     style="display: flex; justify-content: space-between; margin-bottom: 10px"
   >
-    <span class="section-title">Items</span>
+    <span class="section-sub-title">Items</span>
   </div>
   <dx-data-grid
     [columnAutoWidth]="true"
@@ -302,12 +342,12 @@
       width="76"
       [allowEditing]="false"
     ></dxi-column>
-    <dxi-column
+    <!-- <dxi-column
       caption="Packing"
       dataField="PACKING_NAME"
       width="auto"
       [allowEditing]="false"
-    ></dxi-column>
+    ></dxi-column> -->
     <dxi-column
       dataField="HSN_CODE"
       caption="HSN Code"
@@ -390,7 +430,7 @@
     <!-- IGST -->
 
     <dxi-column
-      caption="Tax (%)"
+      [caption]="vatTitle + ' (%)'"
       dataField="VAT_PERC"
       alignment="center"
       width="80"
@@ -594,109 +634,99 @@
   <!-- Add button to open the popup for file details input -->
 
   <!-- DataGrid to display uploaded files -->
-  <dx-data-grid
-    [dataSource]="uploadedFiles"
-    [showBorders]="true"
-    class="file-data-grid"
-  >
-    <dxo-editing
-      mode="cell"
-      [allowUpdating]="true"
-      [allowDeleting]="true"
-    ></dxo-editing>
+  <div class="history-grid-container">
+    <dx-data-grid
+      [dataSource]="uploadedFiles"
+      [showBorders]="true"
+      [height]="'60vh'"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      class="file-data-grid"
+    >
+      <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
 
-    <dxi-column
-      dataField="FILE_NAME"
-      caption="File Name"
-      [allowEditing]="false"
-      [cellTemplate]="'fileNameTemplate'"
-    ></dxi-column>
-    <!-- <div *dxTemplate="let cell of 'fileNameTemplate'">
+      <dxi-column
+        dataField="FILE_NAME"
+        caption="File Name"
+        [allowEditing]="false"
+        [cellTemplate]="'fileNameTemplate'"
+      ></dxi-column>
+      <!-- <div *dxTemplate="let cell of 'fileNameTemplate'">
         <a [href]="cell.data.fileUrl" target="_blank" rel="noopener noreferrer">{{ cell.data.fileName }}</a>cellTemplate="fileNameTemplate"
       </div> -->
-    <dxi-column
-      dataField="REMARKS"
-      caption="Remarks"
-      [allowEditing]="false"
-    ></dxi-column>
+      <dxi-column
+        dataField="REMARKS"
+        caption="Remarks"
+        [allowEditing]="false"
+      ></dxi-column>
 
-    <!-- File Name Cell Template -->
-    <div *dxTemplate="let data of 'fileNameTemplate'">
-      <a
-        href="javascript:void(0);"
-        (click)="openFile(data.data.FILE_DATA, data.data.FILE_NAME)"
-      >
-        {{ data.data.FILE_NAME }}
-      </a>
-    </div>
-  </dx-data-grid>
-
+      <!-- File Name Cell Template -->
+      <div *dxTemplate="let data of 'fileNameTemplate'">
+        <a
+          href="javascript:void(0);"
+          (click)="openFile(data.data.FILE_DATA, data.data.FILE_NAME)"
+        >
+          {{ data.data.FILE_NAME }}
+        </a>
+      </div>
+    </dx-data-grid>
+  </div>
   <!-- Popup for adding file details -->
 </div>
 
-<!-- <div *ngIf="selectedTabIndex === 3" class="file-upload-container">
-  <dx-data-grid
-    [showBorders]="true"
-    [columnAutoWidth]="true"
-    [dataSource]="poHistoryList"
-    height="60vh"
-  >
-    <dxi-column
-      dataField="slNo"
-      caption="Sl no"
-      alignment="center"
-    ></dxi-column>
-    <dxi-column
-      dataField="Time"
-      [calculateCellValue]="formatDateTime"
-      caption="Date & Time"
-    ></dxi-column>
-    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-    <dxi-column dataField="USER_NAME" caption="By User"></dxi-column>
-  </dx-data-grid>
-</div> -->
 <div *ngIf="selectedTabIndex === 3">
-  <dx-data-grid
-    [showBorders]="true"
-    [columnAutoWidth]="true"
-    [dataSource]="poHistoryList"
-    height="55vh"
-    [showBorders]="true"
-    [showColumnLines]="true"
-    [showBorders]="true"
-    [columnAutoWidth]="false"
-    [wordWrapEnabled]="false"
-    [rowAlternationEnabled]="true"
-    [allowColumnReordering]="true"
-    [showColumnHeaders]="true"
-    [columnAutoWidth]="true"
-    [allowColumnResizing]="true"
-    [columnResizingMode]="'nextColumn'"
-  >
-    <dxo-pager
-      [visible]="true"
-      [allowedPageSizes]="allowedPageSizes"
-      [displayMode]="displayMode"
-      [showPageSizeSelector]="showPageSizeSelector"
-      [showInfo]="true"
-      [showNavigationButtons]="true"
-    ></dxo-pager>
-    <dxi-column
-      dataField="slNo"
-      caption="Sl No"
-      alignment="center"
-    ></dxi-column>
-    <dxi-column
-      dataField="TIME"
-      [calculateCellValue]="formatDateTime"
-      caption="Date & Time"
-    ></dxi-column>
-    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-    <dxi-column dataField="USER_NAME" caption="User"></dxi-column>
-  </dx-data-grid>
+  <div class="history-grid-container">
+    <dx-data-grid
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+      [dataSource]="poHistoryList"
+      height="60vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+    >
+      <!-- <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager> -->
+      <dxi-column
+        dataField="slNo"
+        caption="Sl No"
+        alignment="center"
+      ></dxi-column>
+      <dxi-column
+        dataField="TIME"
+        [calculateCellValue]="formatDateTime"
+        caption="Date & Time"
+      ></dxi-column>
+      <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+      <dxi-column dataField="USER_NAME" caption="User"></dxi-column>
+    </dx-data-grid>
+  </div>
 </div>
 
-<div class="form-popup-buttons-container">
+<!-- <div class="form-popup-buttons-container">
   <div class="popup-footer">
     <dx-button
       icon="fas fa-file-pdf"
@@ -709,24 +739,4 @@
     >
     </dx-button>
   </div>
-</div>
-
-<!-- <dx-popup
-  [(visible)]="isPdfPopupVisible"
-  [width]="900"
-  [height]="700"
-  [showTitle]="true"
-  title="PO PDF Preview"
-  [dragEnabled]="true"
-  [closeOnOutsideClick]="true"
->
-  <div class="pdf-container" style="margin-top: 10px">
-    <iframe
-      *ngIf="pdfSrc"
-      [src]="pdfSrc"
-      width="100%"
-      height="600"
-      style="border: 1px solid #ccc; border-radius: 4px"
-    ></iframe>
-  </div>
-</dx-popup> -->
+</div> -->

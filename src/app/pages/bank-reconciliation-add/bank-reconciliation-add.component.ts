@@ -46,7 +46,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
 import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
-import { ViewSalaryAdvanceModule } from 'src/app/HR/Masters/view-salary-advance/view-salary-advance.component';
+import { ViewSalaryAdvanceModule } from 'src/app/components/HR/Masters/view-salary-advance/view-salary-advance.component';
 import notify from 'devextreme/ui/notify';
 
 @Component({
@@ -116,7 +116,7 @@ export class BankReconciliationAddComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.sesstion_Details();
     this.get_Bank_dropdown();
@@ -137,7 +137,7 @@ export class BankReconciliationAddComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
       this.selected_Company_id,
-      '============selected_Company_id=============='
+      '============selected_Company_id==============',
     );
   }
 
@@ -158,11 +158,11 @@ export class BankReconciliationAddComponent {
   calculateTotals() {
     this.totalDebit = this.BankReconciliationdatasource.reduce(
       (sum, item) => sum + (Number(item.DR_AMOUNT) || 0),
-      0
+      0,
     );
     this.totalCredit = this.BankReconciliationdatasource.reduce(
       (sum, item) => sum + (Number(item.CR_AMOUNT) || 0),
-      0
+      0,
     );
     console.log(this.totalCredit, this.totalDebit);
     //  this.closingBalance = this.runningbalance -(this.remainingDebit + this.remainingCredit);
@@ -176,11 +176,11 @@ export class BankReconciliationAddComponent {
 
     const selectedDebitSum = this.selectedRows.reduce(
       (s: number, r: any) => s + (Number(r.DR_AMOUNT) || 0),
-      0
+      0,
     );
     const selectedCreditSum = this.selectedRows.reduce(
       (s: number, r: any) => s + (Number(r.CR_AMOUNT) || 0),
-      0
+      0,
     );
 
     console.log(selectedCreditSum, selectedDebitSum);
@@ -203,7 +203,7 @@ export class BankReconciliationAddComponent {
           const val = parseFloat(
             String(item?.DR_AMOUNT || '0')
               .replace(/,/g, '')
-              .trim()
+              .trim(),
           );
           return sum + (isNaN(val) ? 0 : val);
         }, 0);
@@ -212,7 +212,7 @@ export class BankReconciliationAddComponent {
           const val = parseFloat(
             String(item?.CR_AMOUNT || '0')
               .replace(/,/g, '')
-              .trim()
+              .trim(),
           );
           return sum + (isNaN(val) ? 0 : val);
         }, 0);
@@ -272,7 +272,7 @@ export class BankReconciliationAddComponent {
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
-        'error'
+        'error',
       );
       return;
     }
@@ -295,7 +295,7 @@ export class BankReconciliationAddComponent {
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
-            'success'
+            'success',
           );
           this.resetPage();
         }

@@ -196,12 +196,13 @@
       <dxi-column
         *ngIf="BalanceSheetReport.length > 0"
         type="buttons"
-        [width]="100"
+        [width]="80"
       >
         <dxi-button
           hint="View"
           icon="eyeopen"
           text="View"
+          width="80"
           [onClick]="onViewClick.bind(this)"
         ></dxi-button>
       </dxi-column>

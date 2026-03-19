@@ -622,7 +622,7 @@ export class AddPurchaseInvoiceComponent {
     this.purchaseInvoiceFormData.PURCH_DATE =
       this.purchaseInvoiceFormData.PURCH_DATE;
 
-      const today = new Date();
+    const today = new Date();
     const invoiceDate =
       today.getFullYear() +
       '-' +
@@ -689,8 +689,11 @@ export class AddPurchaseInvoiceComponent {
       SUPPLIER_ID: null,
       INVOICE_NO: '',
       PURCH_DATE: new Date(),
+      SUPP_INV_DATE: new Date(),
       REMARKS: '',
+      ROUND_OFF: false,
       PurchDetails: [], // reset line items
+      isApproved: false,
     };
 
     this.mainGridData = []; // clear grid rows
@@ -711,11 +714,23 @@ export class AddPurchaseInvoiceComponent {
         this.itemsGridRef?.instance?.getTotalSummaryValue('VAT_AMOUNT') || 0;
       this.grandTotal =
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
-      this.netAmount = Number(this.grandTotal).toFixed(2);
+      // this.netAmount = Number(this.grandTotal).toFixed(2);
+      this.netAmount = Number(this.grandTotal).toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
       this.onRoundOffChange();
     } else {
       console.warn('Summary values not ready yet.');
     }
+  }
+
+  get formattedNetAmount(): string {
+    const value = Number(this.grandTotal || 0);
+    return value.toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   }
   onContentReady(e: any): void {
     this.logGridSummaries();
@@ -728,6 +743,16 @@ export class AddPurchaseInvoiceComponent {
     } else {
       // Round Off Disabled → return to original value
       this.netAmount = Number(this.grandTotal).toFixed(2);
+    }
+  }
+  onPopupClose() {
+    const grid = this.popupGridRef?.instance;
+
+    if (grid) {
+      grid.clearFilter(); // ✅ clears filter row
+      grid.clearSorting(); // optional
+      grid.clearGrouping(); // optional
+      grid.clearSelection(); // optional (if you want reset selection)
     }
   }
 }

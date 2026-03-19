@@ -101,13 +101,13 @@ import { EmployeeLeaveComponent } from './pages/HR/Masters/employee-leave/employ
 import { EmployeeComponent } from './components/HR/Masters/employee/employee.component';
 import { EmployeeAddFormComponent } from './components/HR/Masters/employee-add-form/employee-add-form.component';
 
-import { SalaryHeadsComponent } from './HR/Masters/salary-heads/salary-heads.component';
-import { AdvanceTypesComponent } from './HR/Masters/advance-types/advance-types.component';
-import { AdvanceComponent } from './HR/Masters/advance/advance.component';
+import { SalaryHeadsComponent } from './components/HR/Masters/salary-heads/salary-heads.component';
+import { AdvanceTypesComponent } from './components/HR/Masters/advance-types/advance-types.component';
+
 import { PayRevisionComponent } from './components/HR/Masters/pay-revision/pay-revision.component';
 
 import { TimesheetListComponent } from './components/HR/Masters/timesheet-list/timesheet-list.component';
-import { StaffEOSComponent } from './HR/Masters/staff-eos/staff-eos.component';
+import { StaffEOSComponent } from './components/HR/Masters/staff-eos/staff-eos.component';
 import { ListMiscellaneousPaymentsComponent } from './components/HR/Masters/list-miscellaneous-payments/list-miscellaneous-payments.component';
 import { PayrollListComponent } from './components/HR/Masters/payroll-list/payroll-list.component';
 import { AccountsListComponent } from './pages/ACCOUNTS/accounts-list/accounts-list.component';
@@ -198,7 +198,7 @@ import { InvoiceDeliveryComponent } from './pages/invoice-delivery/invoice-deliv
 import { PhysicalInventoryComponent } from './pages/physical-inventory/physical-inventory.component';
 import { DeliveryReturnComponent } from './pages/delivery-return/delivery-return.component';
 import { ArticleProductionViewModule } from './components/HR/Masters/article-production-view/article-production-view.component';
-import { DeliveryAddressComponent } from './HR/Masters/delivery-address/delivery-address.component';
+import { DeliveryAddressComponent } from './components/HR/Masters/delivery-address/delivery-address.component';
 import { ChangePasswordComponent } from './components/library/PROFILEPAGE/change-password/change-password.component';
 import { SecurityPolicyComponent } from './pages/SYSTEMPAGES/security-policy/security-policy.component';
 import { BankReconciliationAddComponent } from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
@@ -219,6 +219,7 @@ import { SaleReturnComponent } from './sale-return/sale-return.component';
 import { MiscellaneousInvoiceComponent } from './pages/miscellaneous-invoice/miscellaneous-invoice.component';
 import { MiscellaneousPurchaseComponent } from './pages/miscellaneous-purchase/miscellaneous-purchase.component';
 import { ImportChartOfAccountsComponent } from './pages/Import Accounts/import-chart-of-accounts/import-chart-of-accounts.component';
+import { AdvanceComponent } from './components/HR/Masters/advance/advance.component';
 
 // import { ItemCategoryComponent } from './HR/Masters/item-category/item-category.component';
 

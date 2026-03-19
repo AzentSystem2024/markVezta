@@ -13,39 +13,45 @@
       style="
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
-        gap: 6px;
+        align-items: flex-end; /* keep right aligned */
+        gap: 15px;
         width: 100%;
       "
     >
-      <!-- Approve -->
+      <!-- Wrapper to align checkbox with buttons -->
       <div
-        *ngIf="showApprove"
-        style="display: flex; align-items: center; gap: 6px"
+        style="display: flex; flex-direction: column; align-items: flex-start"
       >
-        <label>Approve</label>
-        <dx-check-box
-          [value]="isApproved"
-          (onValueChanged)="isApprovedChange.emit($event.value)"
-        ></dx-check-box>
-      </div>
+        <!-- Approve -->
+        <div
+          *ngIf="showApprove"
+          style="display: flex; align-items: center; gap: 6px"
+        >
+          <dx-check-box
+            [value]="isApproved"
+            (onValueChanged)="isApprovedChange.emit($event.value)"
+          ></dx-check-box>
+          <label>Approve</label>
+        </div>
 
-      <!-- Buttons -->
-      <div style="display: flex; gap: 10px">
-        <dx-button
-          text="Cancel"
-          stylingMode="outlined"
-          type="normal"
-          (onClick)="close()"
-        ></dx-button>
+        <!-- Buttons -->
+        <div style="display: flex; gap: 10px; margin-top: 4px">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            type="normal"
+            (onClick)="close()"
+          ></dx-button>
 
-        <dx-button
-          text="Save"
-          stylingMode="contained"
-          type="default"
-          [disabled]="isSaveDisabled"
-          (onClick)="onSaveClick()"
-        ></dx-button>
+          <dx-button
+            [text]="isSaveDisabled ? 'Saving...' : 'Save'"
+            stylingMode="contained"
+            type="default"
+            [disabled]="isSaveDisabled"
+            [icon]="isSaveDisabled ? 'spin' : ''"
+            (onClick)="onSaveClick()"
+          ></dx-button>
+        </div>
       </div>
     </div>
   </dxi-toolbar-item>

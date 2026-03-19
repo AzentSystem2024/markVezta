@@ -7,14 +7,33 @@
 .supplier-details,
 .shipping-details {
   flex: 1;
-  border: 1px solid #ccc;
   border-radius: 8px;
+  // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  // background-color: var(--base-bg);
+  border: 1px solid var(--border-color);
   padding: 10px;
-  margin-left: 0; /* Default for the first item */
+  margin-left: 0;
 }
 
 .shipping-details {
   margin-left: 10px; /* For the second column */
+}
+
+/* Add grid ONLY to supplier-details */
+.supplier-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 15px;
+  row-gap: 1px;
+  align-items: start; /* prevents field stretching */
+}
+
+.supplier-details .section-title {
+  grid-column: span 2;
+}
+
+.supplier-details .address-field {
+  grid-column: span 2;
 }
 
 .section-title {
@@ -22,6 +41,13 @@
   margin-bottom: 10px;
   display: block;
 }
+
+.section-sub-title {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
 .po-title {
   font-size: 14px;
   margin-bottom: 10px;
@@ -223,22 +249,25 @@
 .dx-popup-content {
   overflow-x: hidden; /* hide horizontal overflow */
 }
-:host ::ng-deep .dx-tabs .dx-tab {
-  background-color: transparent !important; /* unselected tabs */
-  color: inherit;
-  box-shadow: none !important;
+.history-grid-container {
+  margin-top: 15px; /* adjust as needed */
 }
+// :host ::ng-deep .dx-tabs .dx-tab {
+//   background-color: transparent !important; /* unselected tabs */
+//   color: inherit;
+//   box-shadow: none !important;
+// }
 
-/* selected tab → light blue */
-:host ::ng-deep .dx-tabs .dx-tab.dx-tab-selected {
-  background-color: #e8f3ff !important; /* very light blue */
-  color: #1f4e79 !important;
-}
+// /* selected tab → light blue */
+// :host ::ng-deep .dx-tabs .dx-tab.dx-tab-selected {
+//   background-color: #e8f3ff !important; /* very light blue */
+//   color: #1f4e79 !important;
+// }
 
-/* remove dark hover / focus / active effects */
-:host ::ng-deep .dx-tabs .dx-tab.dx-state-hover,
-:host ::ng-deep .dx-tabs .dx-tab.dx-state-focused,
-:host ::ng-deep .dx-tabs .dx-tab.dx-state-active {
-  background-color: #e8f3ff !important;
-  box-shadow: none !important;
-}
+// /* remove dark hover / focus / active effects */
+// :host ::ng-deep .dx-tabs .dx-tab.dx-state-hover,
+// :host ::ng-deep .dx-tabs .dx-tab.dx-state-focused,
+// :host ::ng-deep .dx-tabs .dx-tab.dx-state-active {
+//   background-color: #e8f3ff !important;
+//   box-shadow: none !important;
+// }

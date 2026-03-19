@@ -131,7 +131,10 @@
     [columnAutoWidth]="true"
     [showColumnLines]="true"
     (onEditorPreparing)="onEditorPreparing($event)"
+    (onRowRemoved)="onRowRemoved($event)"
   >
+    <dxo-editing mode="cell" [allowUpdating]="true" [allowDeleting]="true">
+    </dxo-editing>
     <dxo-scrolling mode="virtual" columnRenderingMode="virtual"></dxo-scrolling>
 
     <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
@@ -174,13 +177,13 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="false"
       alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
     <dxi-column
       dataField="PO_QUANTITY"
       caption="QTY IN PO"
       [width]="87"
       [allowEditing]="false"
-      alignment="center"
     ></dxi-column>
     <dxi-column
       dataField="UOM"
@@ -200,14 +203,13 @@
       [width]="cwidth"
       caption="QTY TO RECEIVE"
       [allowEditing]="false"
-      alignment="center"
     ></dxi-column>
     <dxi-column
       dataField="RECEIVED_QTY"
       [width]="cwidth"
       caption="QTY RECEIVED"
       [allowEditing]="true"
-      alignment="center"
+      alignment="right"
       [editorOptions]="{
         showSpinButtons: true,
         min: 0,
