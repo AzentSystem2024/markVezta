@@ -215,6 +215,7 @@ import { SalesOrderFinanceComponent } from './pages/OPERATIONS/sales-order-finan
 import { StockAdjustmentListComponent } from './pages/INVENTORY MANAGEMENT/stock-adjustment-list/stock-adjustment-list.component';
 import { SalesOrderComponent } from './pages/OPERATIONS/sales-order/sales-order.component';
 import { VatClassFinanceComponent } from './pages/MASTER/vat-class-finance/vat-class-finance.component';
+import { DeliveryNoteFinanceComponent } from './pages/OPERATIONS/delivery-note-finance/delivery-note-finance.component';
 
 const routes: Routes = [
   {
@@ -634,6 +635,11 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'item-department',
+        component: DepartmentListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'sub-department',
         component: SubDepartmentComponent,
         canActivate: [AuthGuardService],
@@ -815,6 +821,11 @@ const routes: Routes = [
       {
         path: 'delivery-note',
         component: DeliveryNoteComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'delivery-note-finance',
+        component: DeliveryNoteFinanceComponent,
         canActivate: [AuthGuardService],
       },
       {
