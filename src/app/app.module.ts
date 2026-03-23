@@ -967,10 +967,6 @@ import {
   UomEditComponent,
   UomEditModule,
 } from './pages/uom-edit/uom-edit.component';
-// import {
-//   ProductionJvListComponent,
-//   ProductionJvListModule,
-// } from './pages/Operations/production-jv-list/production-jv-list.component';
 import { ProductionJvAddModule } from './production-jv-add/production-jv-add.component';
 import {
   ProductionJvViewComponent,
@@ -996,10 +992,6 @@ import {
   StockViewComponent,
   StockViewModule,
 } from './pages/REPORT/stock-view/stock-view.component';
-// import {
-//   SaleReturnComponent,
-//   SaleReturnModule,
-// } from './pages/Operations/sale-return/sale-return.component';
 import {
   SaleReturnFormComponent,
   SaleReturnFormModule,
@@ -1008,10 +1000,6 @@ import {
   CustomDatePopupComponent,
   CustomDatePopupModule,
 } from './custom-date-popup/custom-date-popup.component';
-// import {
-//   MiscellaneousInvoiceComponent,
-//   MiscellaneousInvoiceModule,
-// } from './pages/Operations/miscellaneous-invoice/miscellaneous-invoice.component';
 import {
   MiscellaneousInvoiceAddComponent,
   MiscellaneousInvoiceAddModule,
@@ -1035,16 +1023,18 @@ import {
 import { ImportChartOfAccountsModule } from './pages/ACCOUNTS/import-chart-of-accounts/import-chart-of-accounts.component';
 import { SalaryHeadListModule } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
 import { TransferOutInventoryModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
-import { SalesOrderFinancePopupFormComponent, SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
+import {
+  SalesOrderFinancePopupFormComponent,
+  SalesOrderFinancePopupFormModule,
+} from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
 import { ItemStorePricesLogModule } from './pages/item-store-prices-log/item-store-prices-log.component';
 import { PurchaseReturnDebitModule } from './pages/OPERATIONS/purchase-return-debit/purchase-return-debit.component';
 import { ProductionJvListModule } from './pages/OPERATIONS/production-jv-list/production-jv-list.component';
 import { SaleReturnModule } from './pages/OPERATIONS/sale-return/sale-return.component';
 import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-invoice/miscellaneous-invoice.component';
 
-
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1410,7 +1400,7 @@ import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-inv
     MiscellaneousPurchaseAddModule,
     MiscellaneousPurchaseEditModule,
     ImportChartOfAccountsModule,
-    SalesOrderFinancePopupFormModule
+    SalesOrderFinancePopupFormModule,
   ],
   providers: [
     AuthService,

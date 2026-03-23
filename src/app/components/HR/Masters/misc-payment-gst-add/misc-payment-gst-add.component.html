@@ -37,7 +37,7 @@
             allowDeleting: true,
             allowAdding: true,
             newRowPosition: 'last',
-            useIcons: true
+            useIcons: true,
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onRowRemoved)="onRowRemoved($event)"
@@ -64,20 +64,6 @@
                     [width]="200"
                     [readOnly]="true"
                   ></dx-text-box>
-
-                  <!-- <dx-select-box
-                    *ngIf="isEditing"
-                    id="payHeadIdField"
-                    [(value)]="miscFormData.DEPT_ID"
-                    [dataSource]="Department"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    label="Department"
-                    labelMode="floating"
-                    [searchEnabled]="true"
-                    [width]="230"
-                    [readOnly]="isReadOnlyMode || !isApproved"
-                  ></dx-select-box> -->
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 2px">
                   <dx-text-box
@@ -116,8 +102,8 @@
                     #taxRegnRef
                     [(value)]="miscFormData.VAT_REGN"
                     [label]="
-                      selected_vat_id == sessionData.VAT_ID &&
-                      sessionData.VAT_ID == 2
+                      selected_vat_id === sessionData.VAT_ID &&
+                      sessionData.VAT_ID === 2
                         ? ' VAT Regtn No'
                         : ' GST Regtn No'
                     "
@@ -126,16 +112,6 @@
                     [readOnly]="isReadOnlyMode"
                     (onEnterKey)="focusGridFirstCell()"
                   ></dx-text-box>
-                  <!-- <dx-button
-                    icon="plus"
-                    type="default"
-                    stylingMode="outlined"
-                    hint="Add Row"
-                    [width]="32"
-                    [height]="30"
-                    style="margin-top: 4px"
-                    (onClick)="addNewManualRow()"
-                  ></dx-button> -->
                 </div>
                 <!--  -->
               </div>
@@ -150,7 +126,7 @@
               dataSource: ledgerList,
               valueExpr: 'HEAD_CODE',
               displayExpr: 'HEAD_CODE',
-              searchEnabled: true
+              searchEnabled: true,
             }"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
@@ -164,7 +140,7 @@
               dataSource: ledgerList,
               valueExpr: 'HEAD_NAME',
               displayExpr: 'HEAD_NAME',
-              searchEnabled: true
+              searchEnabled: true,
             }"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
@@ -182,30 +158,6 @@
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
-
-          <!-- <dxi-column
-            dataField="TAX"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? ' VAT %'
-                : 'GST %'
-            "
-            [allowEditing]="!isReadOnlyMode"
-            alignment="right"
-            [width]="120"
-          ></dxi-column>
-          <dxi-column
-            dataField="TAX_AMOUNT"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? ' VAT Amount '
-                : 'GST Amount '
-            "
-            [allowEditing]="true"
-            [calculateCellValue]="calculateTaxAmount"
-            dataType="number"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dxi-column> -->
 
           <dxi-column type="buttons">
             <dxi-button name="edit"></dxi-button>
@@ -285,7 +237,7 @@
               <div
                 class="section-label"
                 [ngStyle]="{
-                  color: receiptMode === 'Bank' ? 'inherit' : '#888'
+                  color: receiptMode === 'Bank' ? 'inherit' : '#888',
                 }"
               >
                 Bank Remittance Details
@@ -369,4 +321,3 @@
     ></dx-button>
   </div>
 </div>
-

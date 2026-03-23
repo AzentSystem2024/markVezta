@@ -286,12 +286,6 @@ const routes: Routes = [
         component: DenialListComponent,
         canActivate: [AuthGuardService],
       },
-
-      {
-        path: 'department',
-        component: DepartmentListComponent,
-        canActivate: [AuthGuardService],
-      },
       {
         path: 'article-color',
         component: ArticleColorComponent,
@@ -632,6 +626,11 @@ const routes: Routes = [
       {
         path: 'item-category',
         component: ItemCategoryListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'department',
+        component: DepartmentComponent,
         canActivate: [AuthGuardService],
       },
       {
