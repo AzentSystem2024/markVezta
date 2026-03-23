@@ -804,24 +804,12 @@ import {
   ItemStockValueModule,
 } from './components/HR/Masters/item-stock-value/item-stock-value.component';
 import { ItemCategoryListComponent } from './pages/MASTER/item-category-list/item-category-list.component';
-import {
-  StockAdjustmentListComponent,
-  StockAdjustmentListModule,
-} from './pages/Stock_Adjustment/stock-adjustment-list/stock-adjustment-list.component';
-import {
-  StockAdjustmentAddComponent,
-  StockAdjustmentAddModule,
-} from './pages/Stock_Adjustment/stock-adjustment-add/stock-adjustment-add.component';
-import {
-  StockAdjustmentEditComponent,
-  StockAdjustmentEditModule,
-} from './pages/Stock_Adjustment/stock-adjustment-edit/stock-adjustment-edit.component';
+
 import {
   DeliveryNoteComponent,
   DeliveryNoteModule,
 } from './pages/OPERATIONS/delivery-note/delivery-note.component';
 import { DeliveryNoteFormComponent } from './pages/delivery-note-form/delivery-note-form.component';
-// import { StockMovementReportComponent, StockMovementReportModule } from './pages/HR/Masters/stock-movement-report/stock-movement-report.component';
 
 import {
   QuotationComponent,
@@ -835,10 +823,7 @@ import {
   StockMovementReportComponent,
   StockMovementReportModule,
 } from './pages/REPORT/stock-movement-report/stock-movement-report.component';
-import {
-  SalesOrderComponent,
-  SalesOrderModule,
-} from './pages/Operations/sales-order/sales-order.component';
+
 import {
   SalesOrderFormComponent,
   SalesOrderFormModule,
@@ -854,11 +839,11 @@ import {
 import {
   PhysicalInventoryComponent,
   PhysicalInventoryModule,
-} from './pages/physical-inventory/physical-inventory.component';
+} from './pages/INVENTORY MANAGEMENT/physical-inventory/physical-inventory.component';
 import {
   PhysicalInventoryFormComponent,
   PhysicalInventoryFormModule,
-} from './pages/physical-inventory-form/physical-inventory-form.component';
+} from './pages/INVENTORY MANAGEMENT/POPUP PAGES/physical-inventory-form/physical-inventory-form.component';
 import {
   DeliveryReturnComponent,
   DeliveryReturnModule,
@@ -1032,6 +1017,7 @@ import { PurchaseReturnDebitModule } from './pages/OPERATIONS/purchase-return-de
 import { ProductionJvListModule } from './pages/OPERATIONS/production-jv-list/production-jv-list.component';
 import { SaleReturnModule } from './pages/OPERATIONS/sale-return/sale-return.component';
 import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-invoice/miscellaneous-invoice.component';
+import { SalesOrderModule } from './pages/OPERATIONS/sales-order/sales-order.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -1343,9 +1329,6 @@ import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-inv
     ESIModule,
     TransferInInventoryModule,
     TransferInInventoryFormModule,
-    StockAdjustmentListModule,
-    StockAdjustmentAddModule,
-    StockAdjustmentEditModule,
     AttendanceSheetModule,
     ItemQuantityStockModule,
     ItemStockValueModule,

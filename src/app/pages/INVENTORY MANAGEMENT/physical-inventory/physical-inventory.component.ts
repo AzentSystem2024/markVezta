@@ -38,12 +38,10 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { SalesOrderFormModule } from '../sales-order-form/sales-order-form.component';
-import { SalesOrderComponent } from '../Operations/sales-order/sales-order.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
-import { PhysicalInventoryFormModule } from '../physical-inventory-form/physical-inventory-form.component';
 import notify from 'devextreme/ui/notify';
+import { PhysicalInventoryFormModule } from '../POPUP PAGES/physical-inventory-form/physical-inventory-form.component';
 
 @Component({
   selector: 'app-physical-inventory',
@@ -88,7 +86,7 @@ export class PhysicalInventoryComponent {
     DEPT_ID: [],
     ALL_ITEMS: false,
   };
-
+  stores: any[] = [];
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -132,6 +130,8 @@ export class PhysicalInventoryComponent {
   isEditInventory: boolean;
   isReadOnlyInventory: boolean;
   store: any;
+  companyID: any;
+  StoreIDData: any;
 
   constructor(
     private dataService: DataService,
@@ -140,12 +140,14 @@ export class PhysicalInventoryComponent {
   ) {}
   ngOnInit() {
     const currentUrl = this.router.url;
-
+    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    console.log('Parsed ObjectData:', menuResponse);
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -161,61 +163,91 @@ export class PhysicalInventoryComponent {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
     }
+    this.getStoreDropdown();
     this.getInventoryList();
     this.getDropdownList();
+    this.getStoreDropdown();
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
+    this.companyID = this.sessionData.Companies[0].COMPANY_ID;
   }
   getDropdownList() {
-    this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
-      this.supplier = response;
-    });
-
+    const payloadsupplier = {
+      COMPANY_ID: this.companyID,
+      NAME: 'SUPPLIER',
+    };
     this.dataService
-      .getDropdownData('DEPARTMENT')
+      .getDropdownData(payloadsupplier)
+      .subscribe((response: any) => {
+        this.supplier = response;
+      });
+    const payloaddepartment = {
+      COMPANY_ID: this.companyID,
+      NAME: 'DEPARTMENT',
+    };
+    this.dataService
+      .getDropdownData(payloaddepartment)
       .subscribe((response: any) => {
         this.department = response;
       });
-
-    this.dataService.getDropdownData('BRAND').subscribe((response: any) => {
-      this.brand = response;
-    });
-
-    this.dataService.getDropdownData('STORE').subscribe((response: any) => {
-      this.store = response;
-    });
-
+    const payloadbrand = {
+      NAME: 'BRAND',
+    };
     this.dataService
-      .getDropdownData('ITEMCATEGORY')
+      .getDropdownData(payloadbrand)
+      .subscribe((response: any) => {
+        this.brand = response;
+      });
+    const payloadstore = {
+      COMPANY_ID: this.companyID,
+      NAME: 'STORE',
+    };
+    this.dataService
+      .getDropdownData(payloadstore)
+      .subscribe((response: any) => {
+        this.store = response;
+      });
+    const payloaditemcategory = {
+      COMPANY_ID: this.companyID,
+      NAME: 'ITEMCATEGORY',
+    };
+    this.dataService
+      .getDropdownData(payloaditemcategory)
       .subscribe((response: any) => {
         this.category = response;
       });
   }
 
   getInventoryList() {
-    this.dataService.getPhysicalInventoryList().subscribe((response: any) => {
-      this.inventoryList = response.Data.map((item: any) => {
-        let dateValue: Date;
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService
+      .getPhysicalInventoryListFinance(payload)
+      .subscribe((response: any) => {
+        this.inventoryList = response.Data.map((item: any) => {
+          let dateValue: Date;
 
-        // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
-        if (!isNaN(Date.parse(item.PHYSICAL_DATE))) {
-          dateValue = new Date(item.PHYSICAL_DATE);
-        } else {
-          // Case 2: If backend gives dd-MM-yyyy format
-          dateValue = this.parseDateString(item.PHYSICAL_DATE);
-        }
+          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
+          if (!isNaN(Date.parse(item.PHYSICAL_DATE))) {
+            dateValue = new Date(item.PHYSICAL_DATE);
+          } else {
+            // Case 2: If backend gives dd-MM-yyyy format
+            dateValue = this.parseDateString(item.PHYSICAL_DATE);
+          }
 
-        return {
-          ...item,
-          PHYSICAL_DATE: dateValue,
-        };
+          return {
+            ...item,
+            PHYSICAL_DATE: dateValue,
+          };
+        });
+
+        this.applyDateFilter();
       });
-
-      this.applyDateFilter();
-    });
   }
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
@@ -460,6 +492,7 @@ export class PhysicalInventoryComponent {
   }
 
   onEditInventory(event: any) {
+    console.log(event, 'eventttttttttttttt');
     event.cancel = true;
     const orderId = event.data.ID;
     const status = event.data.TRANS_STATUS;
@@ -564,6 +597,12 @@ export class PhysicalInventoryComponent {
     this.isPrePopupVisible = false;
   }
   applyPrePopup() {
+    if (this.prePopupData.ALL_ITEMS) {
+      if (!this.StoreIDData) {
+        notify('Please select a store.', 'error', 2000);
+        return;
+      }
+    }
     // const noFiltersSelected =
     //   !this.prePopupData.CAT_ID.length &&
     //   !this.prePopupData.SUPP_ID.length &&
@@ -586,6 +625,16 @@ export class PhysicalInventoryComponent {
     this.isAddInventory = false;
     this.isEditInventory = false;
     this.getInventoryList();
+  }
+
+  getStoreDropdown() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'STORE',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.stores = response;
+    });
   }
 }
 @NgModule({

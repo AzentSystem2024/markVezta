@@ -254,15 +254,13 @@
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddInventory">
-    <app-physical-inventory-finance-add-edit
+    <app-physical-inventory-form
       [filterData]="prePopupData"
       [StoreIDData]="StoreIDData"
       (popupClosed)="handleClose()"
-    ></app-physical-inventory-finance-add-edit>
+    ></app-physical-inventory-form>
   </ng-container>
 </dx-popup>
-
-
 <dx-popup
   [(visible)]="isEditInventory"
   [width]="'75vw'"
@@ -271,11 +269,11 @@
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditInventory">
-    <app-physical-inventory-finance-add-edit
+    <app-physical-inventory-form
       [isEditing]="true"
       [EditingResponseData]="selectedInventory"
       [isReadOnlyMode]="isReadOnlyInventory"
       (popupClosed)="handleClose()"
-    ></app-physical-inventory-finance-add-edit>
+    ></app-physical-inventory-form>
   </ng-container>
 </dx-popup>

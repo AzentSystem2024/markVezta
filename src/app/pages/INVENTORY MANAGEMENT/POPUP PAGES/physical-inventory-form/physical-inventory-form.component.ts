@@ -43,14 +43,13 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { SalesOrderFormComponent } from '../sales-order-form/sales-order-form.component';
-import { AddInvoiceComponent } from '../INVOICE/add-invoice/add-invoice.component';
 import { DataService } from 'src/app/services/data.service';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
+import { AddInvoiceComponent } from 'src/app/pages/INVOICE/add-invoice/add-invoice.component';
 
 @Component({
   selector: 'app-physical-inventory-form',
@@ -71,6 +70,7 @@ export class PhysicalInventoryFormComponent {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
+  @Input() StoreIDData: any;
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
   @ViewChild(DxDataGridComponent, { static: true })
@@ -157,7 +157,7 @@ export class PhysicalInventoryFormComponent {
     this.isEditDataAvailable();
 
     const currentUrl = this.router.url;
-
+    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -202,18 +202,20 @@ export class PhysicalInventoryFormComponent {
         this.loadFilteredItems(this.filterData);
       }
     }
-
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getInventoryHistoryList();
     this.getVoucherNo();
   }
 
   loadAllItems() {
     const payload = {
-      STORE_ID: this.storeFromSession,
+      STORE_ID: this.StoreIDData,
     };
     this.dataService
       .getItemsForInventory(payload)
       .subscribe((response: any) => {
+        console.log(response);
         if (response?.Data?.length) {
           this.inventoryFormData.Details = response.Data.map((item: any) => ({
             ITEM_ID: item.ITEM_ID,
@@ -416,6 +418,7 @@ export class PhysicalInventoryFormComponent {
 
       // 🧾 If the response already includes details (items list)
       if (editData.Details && Array.isArray(editData.Details)) {
+        this.isApproved = editData.STATUS == 5; // Assuming STATUS 2 means approved
         this.inventoryFormData.Details = editData.Details.map((d: any) => ({
           ID: d.ID || 0,
           COMPANY_ID: d.COMPANY_ID || this.companyID,
@@ -486,108 +489,7 @@ export class PhysicalInventoryFormComponent {
   onImportExcel() {
     this.fileInput.nativeElement.click();
   }
-  // onFileSelected(event: any) {
-  //   const file = event.target.files[0];
-  //   if (!file) return;
-
-  //   const reader = new FileReader();
-  //   reader.onload = (e: any) => {
-  //     const data = new Uint8Array(e.target.result);
-  //     const workbook = XLSX.read(data, { type: 'array' });
-  //     const firstSheetName = workbook.SheetNames[0];
-  //     const worksheet = workbook.Sheets[firstSheetName];
-
-  //     // Convert Excel to JSON
-  //     const excelData: any[] = XLSX.utils.sheet_to_json(worksheet, {
-  //       defval: '',
-  //     });
-
-  //     const barcodes = excelData
-  //       .map((row) => String(row['Barcode']).trim())
-  //       .filter((b) => b && b !== 'undefined' && b !== 'null');
-
-  //     if (barcodes.length === 0) {
-  //       alert('No barcodes found in the Excel file.');
-  //       return;
-  //     }
-
-  //     const payload = { BarCodes: barcodes };
-
-  //     this.dataService.getItemsForInventoryExcelUpload(payload).subscribe(
-  //       (response: any) => {
-  //         if (response?.Data?.length) {
-  //           // Existing barcode set
-  //           const existingCodes = new Set(
-  //             this.inventoryFormData.Details.filter(
-  //               (d: any) => d.ITEM_CODE
-  //             ).map((d: any) => d.ITEM_CODE.trim())
-  //           );
-
-  //           const duplicates: string[] = [];
-  //           const newItems: any[] = [];
-
-  //           response.Data.forEach((item: any) => {
-  //             const match = excelData.find(
-  //               (row) => String(row['Barcode']).trim() === item.Barcode
-  //             );
-
-  //             const itemCode = item.ItemCode || '';
-  //             if (existingCodes.has(itemCode.trim())) {
-  //               duplicates.push(itemCode);
-  //             } else {
-  //               newItems.push({
-  //                 ITEM_ID: item.ItemId || 0,
-  //                 ITEM_CODE: itemCode,
-  //                 DESCRIPTION: item.ItemName || '',
-  //                 MATRIX_CODE: item.MatrixCode || '',
-  //                 STOCK_QTY: item.QtyStock || 0,
-  //                 QTY_COUNTED: match ? match['Quantity'] || 0 : 0,
-  //                 COUNT_TIME: this.getCurrentDateTime(),
-  //               });
-  //               existingCodes.add(itemCode.trim()); // mark as added
-  //             }
-  //           });
-
-  //           // Notify if duplicates found
-  //           if (duplicates.length) {
-  //             notify(
-  //               `Duplicate barcodes skipped: ${duplicates.join(', ')}`,
-  //               'warning',
-  //               5000
-  //             );
-  //           }
-
-  //           // Add new items to grid
-  //           this.inventoryFormData.Details.push(...newItems);
-
-  //           // Refresh grid
-  //           this.itemsGridRef.instance.option('dataSource', [
-  //             ...this.inventoryFormData.Details,
-  //           ]);
-  //           this.itemsGridRef.instance.refresh();
-
-  //           console.log(
-  //             '✅ Final merged items:',
-  //             this.inventoryFormData.Details
-  //           );
-  //         } else {
-  //           notify(
-  //             'No matching items found for given barcodes.',
-  //             'warning',
-  //             5000
-  //           );
-  //         }
-  //       },
-  //       (error) => {
-  //         console.error('Error fetching items:', error);
-  //         alert('Failed to fetch items from the server.');
-  //       }
-  //     );
-  //   };
-
-  //   reader.readAsArrayBuffer(file);
-  //   event.target.value = ''; // reset file input
-  // }
+ 
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
