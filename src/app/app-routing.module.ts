@@ -214,6 +214,7 @@ import { SaleReturnComponent } from './pages/OPERATIONS/sale-return/sale-return.
 import { SalesOrderFinanceComponent } from './pages/OPERATIONS/sales-order-finance/sales-order-finance.component';
 import { StockAdjustmentListComponent } from './pages/INVENTORY MANAGEMENT/stock-adjustment-list/stock-adjustment-list.component';
 import { SalesOrderComponent } from './pages/OPERATIONS/sales-order/sales-order.component';
+import { VatClassFinanceComponent } from './pages/MASTER/vat-class-finance/vat-class-finance.component';
 
 const routes: Routes = [
   {
@@ -686,6 +687,11 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'vat-class-finance',
+        component: VatClassFinanceComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'prepayment-posting',
         component: PrepaymentPostingListComponent,
         canActivate: [AuthGuardService],
@@ -873,7 +879,7 @@ const routes: Routes = [
       },
       {
         path: 'security-policy',
-        component: SecurityPolicyComponent,
+        component: VatClassFinanceComponent,
         canActivate: [AuthGuardService],
       },
       {
