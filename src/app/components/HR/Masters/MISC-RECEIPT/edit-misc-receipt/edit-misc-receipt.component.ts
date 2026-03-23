@@ -41,7 +41,7 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
 import { AddMiscReceiptModule } from '../add-misc-receipt/add-misc-receipt.component';
-import { ListMiscReceiptComponent } from '../list-misc-receipt/list-misc-receipt.component';
+import { ListMiscReceiptComponent } from '../../../../../pages/ACCOUNTS/list-misc-receipt/list-misc-receipt.component';
 import { DataService } from 'src/app/services';
 
 @Component({

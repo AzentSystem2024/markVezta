@@ -39,7 +39,7 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
 import { SalesOrderFormModule } from '../sales-order-form/sales-order-form.component';
-import { SalesOrderComponent } from '../sales-order/sales-order.component';
+import { SalesOrderComponent } from '../Operations/sales-order/sales-order.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { PhysicalInventoryFormModule } from '../physical-inventory-form/physical-inventory-form.component';

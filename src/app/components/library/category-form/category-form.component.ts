@@ -14,7 +14,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DxSelectBoxModule } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
-// import { EventEmitter } from 'node:stream';
 
 @Component({
   selector: 'app-category-form',
@@ -34,8 +33,14 @@ export class CategoryFormComponent implements OnInit {
     COMPANY_ID: '',
   };
   COMPANY_ID: string;
-  constructor(private service: DataService) {}
   newCategory = this.formCategoryData;
+  
+  constructor(private service: DataService) {}
+
+  ngOnInit(): void {
+    this.session_Details();
+    this.getDepartmentDropDown();
+  }
 
   getNewCategoryData = () => ({ ...this.newCategory });
 
@@ -55,10 +60,6 @@ export class CategoryFormComponent implements OnInit {
       this.DepartmentDropdownData = data;
       this.popupClosed.emit();
     });
-  }
-  ngOnInit(): void {
-    this.session_Details();
-    this.getDepartmentDropDown();
   }
 }
 @NgModule({

@@ -40,7 +40,7 @@ import {
 import { SelectionChangedEvent } from 'devextreme/ui/data_grid';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
 import { DataService } from 'src/app/services';
-import { SalaryHeadListModule } from '../salary-head-list/salary-head-list.component';
+
 import notify from 'devextreme/ui/notify';
 
 @Component({

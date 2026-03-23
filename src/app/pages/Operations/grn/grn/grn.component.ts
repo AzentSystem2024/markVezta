@@ -638,21 +638,6 @@ export class GrnComponent implements OnInit {
     this.getTemplateList();
     this.getDocNo();
   }
-  // onEditingRow(event): void {
-  //
-  //   event.cancel = true;
-  //   this.grnId = event.data.ID;
-  //   const Id = event.data.ID;
-
-  //   console.log(Id, 'id');
-  //   this.isVerifyPopupOpened = true;
-  //   this.service.selectGrnData(Id).subscribe((res) => {
-  //     this.selectedRowData = res;
-  //     this.cdr.detectChanges();
-  //     this.selectedGrnId = Id;
-  //     console.log(this.selectedRowData, 'select row data');
-  //   });
-  // }
 
   onEditingRow(event): void {
     event.cancel = true; // stop default grid edit
@@ -669,28 +654,16 @@ export class GrnComponent implements OnInit {
       this.selectedRowData = res;
       this.cdr.detectChanges();
 
-      // ✅ If Approved → View only
+      // If Approved → View only
       if (status === 'Approved') {
         this.isViewPopupOpened = true;
       }
-      // ✅ Else → Verify
+      // Else → Verify
       else {
         this.isVerifyPopupOpened = true;
       }
     });
   }
-
-  // onVerifyClick = (e: any) => {
-  //
-  //   e.cancel = true;
-  //   const id = e.row.data.ID;
-  //   this.isVerifyPopupOpened = true;
-  //   this.change.detectChanges();
-  //   this.service.selectGrnData(id).subscribe((res) => {
-  //     this.selectedRowData = res;
-  //     console.log(this.selectedRowData, 'select row data');
-  //   });
-  // };
 
   onApproveClick = (e) => {
     e.cancel = true;

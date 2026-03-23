@@ -45,7 +45,7 @@ import { EditDebitModule } from '../pages/DEBIT/edit-debit/edit-debit.component'
 import { ViewDebitModule } from '../pages/DEBIT/view-debit/view-debit.component';
 import { AddInvoiceModule } from '../pages/INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.component';
-import { InvoiceListComponent } from '../pages/INVOICE/invoice-list/invoice-list.component';
+import { InvoiceListComponent } from '../pages/Operations/invoice-list/invoice-list.component';
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 
@@ -66,10 +66,10 @@ export class CustomDatePopupComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
-  selected_from_date :any;
-  selected_To_date:any;
+  selected_from_date: any;
+  selected_To_date: any;
 
-  constructor(private dataService: DataService,){
+  constructor(private dataService: DataService) {
     //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
@@ -80,7 +80,7 @@ export class CustomDatePopupComponent {
     this.monthDataSource = this.dataService.getMonths();
   }
 
-  ngOnInit(){
+  ngOnInit() {
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -144,7 +144,6 @@ export class CustomDatePopupComponent {
       );
     }
   }
-
 }
 
 @NgModule({

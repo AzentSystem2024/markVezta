@@ -1,0 +1,135 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [showColumnLines]="true"
+      [dataSource]="CategoryDataSource"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      (onRowRemoving)="onRowRemoving($event)"
+      [showBorders]="true"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      (onExporting)="onExporting($event)"
+      (onEditingStart)="onEditStart($event)"
+      [showColumnLines]="true"
+      [scrolling]="{ mode: 'virtual' }"
+      [height]="'82vh'"
+    >
+      <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+      <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+        <dxo-popup
+          title="Edit Category"
+          [showTitle]="true"
+          [width]="600"
+          [height]="300"
+        >
+        </dxo-popup>
+      </dxo-editing>
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Sub Department
+          </div>
+        </dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <!-- Add -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [visible]="canAdd"
+          [options]="addButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column dataField="CODE" caption="Code">
+        <dxi-validation-rule type="required" message="Code is required">
+          <dxi-validation-rule type="required" message="Code is required">
+          </dxi-validation-rule>
+        </dxi-validation-rule>
+      </dxi-column>
+
+      <dxi-column dataField="CAT_NAME" caption="Category">
+        <dxi-validation-rule type="required" message="Category is required">
+          <dxi-validation-rule type="required" message="Category is required">
+          </dxi-validation-rule>
+        </dxi-validation-rule>
+      </dxi-column>
+
+      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
+    </dx-data-grid>
+  </div>
+</div>
+<!-- ====== new sub department popup ======== -->
+<form-popup
+  height="300px"
+  [(visible)]="isAddCategoryPopupOpened"
+  (save)="onClickSaveCategory()"
+  titleText="New Sub Department"
+  [showApprove]="false"
+>
+  <app-sub-department-add-form
+    (popupClosed)="handleClose()"
+  ></app-sub-department-add-form>
+</form-popup>
+
+<!-- ====== edit form popups ======== -->
+
+<dx-popup
+  [(visible)]="editItemCategory"
+  [width]="'35vw'"
+  [height]="'40vh'"
+  title="Update Sub Department"
+  (onHiding)="handleClose()"
+>
+  <app-sub-department-edit-form
+    *ngIf="editItemCategory"
+    [selectedData]="selected_data"
+    (popupClosed)="handleClose()"
+  ></app-sub-department-edit-form>
+</dx-popup>

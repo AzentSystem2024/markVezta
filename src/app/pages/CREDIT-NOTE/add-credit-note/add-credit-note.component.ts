@@ -49,7 +49,7 @@ import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.componen
 import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
 import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { JournalVoucherListComponent } from '../../JOURNAL-VOUCHER/journal-voucher-list/journal-voucher-list.component';
+import { JournalVoucherListComponent } from '../../ACCOUNTS/journal-voucher-list/journal-voucher-list.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { DataService } from 'src/app/services';
 import DevExpress from 'devextreme';

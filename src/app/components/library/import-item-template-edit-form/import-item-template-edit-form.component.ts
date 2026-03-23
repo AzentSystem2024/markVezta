@@ -25,7 +25,7 @@ import { DxoRowDraggingModule } from 'devextreme-angular/ui/nested';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
-import { ImportItemsTemplateComponent } from 'src/app/pages/import-items-template/import-items-template.component';
+import { ImportItemsTemplateComponent } from 'src/app/pages/MASTER/import-items-template/import-items-template.component';
 import * as XLSX from 'xlsx';
 
 @Component({

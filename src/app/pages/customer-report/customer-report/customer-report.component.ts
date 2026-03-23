@@ -40,7 +40,7 @@ import {
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
-import { CustomerStatementDetailsModule } from '../../custmer-statement-details/customer-statement-details/customer-statement-details.component';
+import { CustomerStatementDetailsModule } from '../../REPORT/customer-statement-details/customer-statement-details.component';
 
 @Component({
   selector: 'app-customer-report',

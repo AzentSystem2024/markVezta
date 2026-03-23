@@ -181,6 +181,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     SUPP_NET_AMOUNT: '',
     EXCHANGE_RATE: '',
     ISSUED_EMP_ID: '',
+    USER_ID: 0,
     PoDetails: [],
   };
   newPoData = this.poData;
@@ -274,6 +275,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
       if (userData.USER_ID) {
         this.userId = userData.USER_ID;
+        this.newPoData.USER_ID = userData.USER_ID;
       }
 
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];

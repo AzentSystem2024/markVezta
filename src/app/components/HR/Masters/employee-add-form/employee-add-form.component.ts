@@ -41,7 +41,7 @@ import {
   DxiGroupModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
-import { EmployeeComponent } from '../employee/employee.component';
+import { EmployeeComponent } from '../../../../pages/HR/Masters/employee/employee.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import dxValidationGroup from 'devextreme/ui/validation_group';

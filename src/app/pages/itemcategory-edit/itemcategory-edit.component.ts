@@ -7,6 +7,7 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  OnChanges,
 } from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
@@ -30,9 +31,9 @@ import notify from 'devextreme/ui/notify';
   templateUrl: './itemcategory-edit.component.html',
   styleUrls: ['./itemcategory-edit.component.scss'],
 })
-export class ItemcategoryEditComponent {
+export class ItemcategoryEditComponent implements OnInit, OnChanges {
   @Input() selectedData: any;
-  DepartmentDropdownData: any;
+
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild('departmentValidationGroup', { static: false })
   validationGroup!: DxValidationGroupComponent;
@@ -45,6 +46,7 @@ export class ItemcategoryEditComponent {
     DEPT_ID: '',
     COMPANY_ID: '1',
   };
+  DepartmentDropdownData: any;
   newCategory: any;
   category: any = [];
   selected_Company_id: any;
@@ -55,21 +57,29 @@ export class ItemcategoryEditComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
+      console.log(
+        'Received selectedData:',
+        changes['selectedData'].currentValue,
+      );
+
       // Merge selectedData into formCategoryData
       this.formCategoryData = {
         ...this.formCategoryData, // keep defaults
         ...changes['selectedData'].currentValue, // override with incoming
       };
 
-      // Keep newCategory in sync too (if you need it elsewhere)
-      // this.newCategory = { ...this.formCategoryData };
+     
     }
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
+    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
   }
 
   showCategory() {
@@ -78,8 +88,10 @@ export class ItemcategoryEditComponent {
     };
     this.service.getCategoryData(payload).subscribe((response) => {
       this.category = response;
+      console.log(response);
     });
   }
+  
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
     const payload = {
@@ -103,11 +115,13 @@ export class ItemcategoryEditComponent {
     if (!result.isValid) {
       return;
     }
+    console.log('edit category');
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
     this.service.getCategoryData(payload).subscribe((response) => {
       this.category = response;
+      console.log(response);
 
       const payload = {
         ...this.formCategoryData,
@@ -161,6 +175,7 @@ export class ItemcategoryEditComponent {
       }
 
       this.service.updateCategory(payload).subscribe((res: any) => {
+        console.log(res);
         this.popupClosed.emit();
         notify(
           {

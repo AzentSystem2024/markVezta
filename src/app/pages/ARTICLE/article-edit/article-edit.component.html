@@ -352,8 +352,7 @@
         class="popup-content"
         style="height: 100%; display: flex; flex-direction: column"
       >
-
-       <div style="display: flex; justify-content: flex-end; margin: 10px 0">
+        <div style="display: flex; justify-content: flex-end; margin: 10px 0">
           <dx-button
             (onClick)="addComponent()"
             stylingMode="contained"
@@ -388,12 +387,11 @@
             [focusedRowKey]="selectedAttachRowKeys[0]"
             (onSelectionChanged)="onAttachRowSelected($event)"
           >
-
-          <dxo-editing
-        mode="popup"
-        [allowUpdating]="false"
-        [allowDeleting]="true"
-      ></dxo-editing>
+            <dxo-editing
+              mode="popup"
+              [allowUpdating]="false"
+              [allowDeleting]="true"
+            ></dxo-editing>
 
             <dxo-paging [enabled]="true" [pageSize]="10"></dxo-paging>
             <dxo-pager
@@ -426,8 +424,7 @@
         <!-- Button aligned to bottom right -->
         <div
           style="display: flex; justify-content: flex-end; padding: 10px 0 0 0"
-        >
-        </div>
+        ></div>
       </div>
     </div>
   </dxi-item>
@@ -549,7 +546,6 @@
     type="default"
     (onClick)="updateArticle()"
   ></dx-button>
-
 </div>
 
 <dx-popup
@@ -558,41 +554,43 @@
   [height]="500"
   title="Items"
   [showCloseButton]="true"
-   (onRowClick)="onItemSelect($event)"
+  (onRowClick)="onItemSelect($event)"
 >
-
   <dx-data-grid
     #bomGridRef
     [dataSource]="ItemListDataSource"
     [showBorders]="true"
     keyExpr="ID"
   >
-   <dxo-header-filter [visible]="true" [allowSearch]="true"></dxo-header-filter>
-    <dxo-filter-row
-        [visible]="true"
-      ></dxo-filter-row>
-<dxo-selection mode="multiple"></dxo-selection>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
+    <dxo-filter-row [visible]="true"></dxo-filter-row>
+    <dxo-selection mode="multiple"></dxo-selection>
     <dxi-column dataField="ITEM_CODE" caption="Item"></dxi-column>
     <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
     <dxi-column dataField="UOM" caption="UOM"></dxi-column>
   </dx-data-grid>
 
   <!-- Buttons -->
-    <div style="margin-top:10px; text-align:right; display:flex; justify-content:flex-end; gap:15px;">
+  <div
+    style="
+      margin-top: 10px;
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    "
+  >
+    <dx-button text="Cancel" (onClick)="ItempopupVisible = false"></dx-button>
 
-       <dx-button
-        text="Cancel"
-        (onClick)="ItempopupVisible=false"
-      ></dx-button>
-
-      <dx-button
-        text="Save"
-        (onClick)="saveSelectedItems()"
-        style="margin-right:10px"
-      ></dx-button>
-
-    </div>
-    
+    <dx-button
+      text="Save"
+      (onClick)="saveSelectedItems()"
+      style="margin-right: 10px"
+    ></dx-button>
+  </div>
 </dx-popup>
 
 <dx-popup
@@ -601,9 +599,8 @@
   [height]="500"
   title="Component"
   [showCloseButton]="true"
-   (onRowClick)="onItemSelect($event)"
+  (onRowClick)="onItemSelect($event)"
 >
-
   <dx-data-grid
     #componentGridRef
     [dataSource]="componentArticles"
@@ -612,35 +609,39 @@
     [headerFilter]="{ visible: true }"
     [selectedRowKeys]="selectedAttachRowKeys"
   >
-   <dxo-filter-row
-        [visible]="true"
-      ></dxo-filter-row>
-  <dxo-header-filter [visible]="true" [allowSearch]="true"></dxo-header-filter>
-<dxo-selection mode="multiple" showCheckBoxesMode="always"></dxo-selection>
+    <dxo-filter-row [visible]="true"></dxo-filter-row>
+    <dxo-header-filter
+      [visible]="true"
+      [allowSearch]="true"
+    ></dxo-header-filter>
+    <dxo-selection mode="multiple" showCheckBoxesMode="always"></dxo-selection>
 
-    <dxi-column dataField="ART_NO" caption="Art No" [allowHeaderFiltering]="true"></dxi-column>
+    <dxi-column
+      dataField="ART_NO"
+      caption="Art No"
+      [allowHeaderFiltering]="true"
+    ></dxi-column>
     <dxi-column dataField="COLOR" caption="Color"></dxi-column>
     <dxi-column dataField="CATEGORY_NAME" caption="category"></dxi-column>
-     <dxi-column
-              dataField="ARTICLE_TYPE_NAME"
-              caption="Type"
-            ></dxi-column>
+    <dxi-column dataField="ARTICLE_TYPE_NAME" caption="Type"></dxi-column>
   </dx-data-grid>
 
   <!-- Buttons -->
-    <div style="margin-top:10px; text-align:right; display:flex; justify-content:flex-end; gap:15px;">
+  <div
+    style="
+      margin-top: 10px;
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    "
+  >
+    <dx-button text="Cancel" (onClick)="closecomponent()"></dx-button>
 
-       <dx-button
-        text="Cancel"
-        (onClick)="closecomponent()"
-      ></dx-button>
-
-      <dx-button
-        text="Save"
-        (onClick)="saveSelectedComponent()"
-        style="margin-right:10px"
-      ></dx-button>
-
-    </div>
-    
+    <dx-button
+      text="Save"
+      (onClick)="saveSelectedComponent()"
+      style="margin-right: 10px"
+    ></dx-button>
+  </div>
 </dx-popup>

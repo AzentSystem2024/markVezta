@@ -30,11 +30,36 @@ export class DepartmentComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
 
+  formsource: FormGroup;
+  showFilterRow: boolean = true;
+  currentFilter: string = 'auto';
+  Status: boolean = false;
+  department: any;
+  selectCode: any;
+  AddDepartmentPopup = false;
+  UpdateDepartmentPopup = false;
+  editingRowData: any = {}; // To store the selected row's data
+  selectedData: any;
+  list_of_duplication: any;
   Department: any[];
   departmentComponent: any;
   formData = { IS_ACTIVE: false }; // DevExtreme expects an object
   editingIndex: number;
   isLoading: boolean;
+  addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+
+    onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.addDepartment());
+    },
+
+    elementAttr: { class: 'add-button' },
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -49,21 +74,10 @@ export class DepartmentComponent {
     this.get_Department_List();
   }
 
-  formsource: FormGroup;
-  showFilterRow: boolean = true;
-  currentFilter: string = 'auto';
-  Status: boolean = false;
-  department: any;
-  selectCode: any;
-  AddDepartmentPopup = false;
-  UpdateDepartmentPopup = false;
-  editingRowData: any = {}; // To store the selected row's data
-  selectedData: any;
-  list_of_duplication: any;
-
   addDepartment() {
     this.AddDepartmentPopup = true;
   }
+  
   UpdateDepartment() {
     this.UpdateDepartmentPopup = true;
   }
@@ -106,21 +120,6 @@ export class DepartmentComponent {
 </span>`;
   };
 
-  addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
-
-    onClick: () => {
-      // Run inside Angular's zone
-      this.ngZone.run(() => this.addDepartment());
-    },
-
-    elementAttr: { class: 'add-button' },
-  };
-
   onPopupCancel() {
     this.formsource.reset({
       CODE: '',
@@ -139,12 +138,15 @@ export class DepartmentComponent {
           SlNo: index + 1, // Assign serial number
         }));
       }
+      console.log(res, 'response');
     });
   }
 
   //============Add data============
   Add_Department() {
+    console.log('function working');
     const CODE = this.formsource.value.CODE?.trim();
+    console.log(CODE, 'code');
     const DEPT_NAME = this.formsource.value.DEPT_NAME;
     const IS_ACTIVE = this.formsource.value.IS_ACTIVE;
 
@@ -204,10 +206,15 @@ export class DepartmentComponent {
 
   //==================edit data=======================
   Edit_Department() {
+    console.log('edit function is working');
+    console.log(this.editingRowData, 'editing row data');
     const CODE = this.editingRowData.CODE;
     const DEPT_NAME = this.editingRowData.DEPT_NAME;
     const IS_ACTIVE = this.editingRowData.IS_ACTIVE;
     const ID = this.editingRowData.ID;
+
+    console.log(CODE, DEPT_NAME, IS_ACTIVE, 'code deptname');
+    console.log(ID, 'id');
 
     this.get_Department_List();
 
@@ -223,6 +230,8 @@ export class DepartmentComponent {
     });
 
     if (isDuplicate) {
+      console.log(isDuplicate, 'duplicate triggered');
+
       notify(
         {
           message: 'Data already exists',
@@ -234,6 +243,7 @@ export class DepartmentComponent {
       return;
     }
     this.formsource.reset();
+    console.log(CODE, DEPT_NAME, IS_ACTIVE, '++++++++++code deptname');
 
     if (CODE && DEPT_NAME) {
       this.dataservice
@@ -248,6 +258,7 @@ export class DepartmentComponent {
             'success',
           );
           this.get_Department_List();
+          console.log(response);
         });
       this.UpdateDepartmentPopup = false;
       this.get_Department_List();
@@ -272,6 +283,7 @@ export class DepartmentComponent {
     const ID = event.data.ID;
 
     this.dataservice.Select_Department_Api(ID).subscribe((response: any) => {
+      console.log(response, 'select Api');
       this.selectedData = response;
     });
   }
@@ -279,7 +291,9 @@ export class DepartmentComponent {
   //==========delete data================
   delete_Department(event: any) {
     const ID = event.data.ID;
-    this.dataservice.Delete_Department_Api(ID).subscribe((response: any) => {});
+    this.dataservice.Delete_Department_Api(ID).subscribe((response: any) => {
+      console.log(response, 'deleted');
+    });
   }
 }
 @NgModule({

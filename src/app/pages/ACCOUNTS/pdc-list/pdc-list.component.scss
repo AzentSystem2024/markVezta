@@ -1,0 +1,21 @@
+
+
+.date-range-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px;
+}
+
+.date-row {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+

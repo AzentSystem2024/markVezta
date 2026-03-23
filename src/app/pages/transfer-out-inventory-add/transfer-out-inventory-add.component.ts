@@ -6,7 +6,6 @@ import {
   NgModule,
   NgZone,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -44,11 +43,9 @@ import { FormTextboxModule } from 'src/app/components';
 import { AddCreditNoteModule } from '../CREDIT-NOTE/add-credit-note/add-credit-note.component';
 import { EditCreditNoteModule } from '../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
 import { ViewCreditNoteModule } from '../CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { TransferOutInventoryComponent } from '../transfer-out-inventory/transfer-out-inventory.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import CustomStore from 'devextreme/data/custom_store';
-import DataSource from 'devextreme/data/data_source';
 import { AddInvoiceComponent } from '../INVOICE/add-invoice/add-invoice.component';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';

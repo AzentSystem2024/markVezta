@@ -715,8 +715,8 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}TransferIn/delete/` + id, {});
   }
   //........................................QUOTATION............................................//
-  getQuotationMainList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}Quotation/list`, {});
+ getQuotationMainList(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Quotation/list`, data);
   }
 
   getItemsForQuotation(payload: any): Observable<any> {
@@ -756,6 +756,11 @@ export class DataService {
 
   getVoucherNoForQuotation(): Observable<any> {
     return this.http.post(`${this.apiUrl}Quotation/GetLatestVoucherNumber`, {});
+  }
+
+// ============== finance ========================
+   public getCustomerItemsData(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salesorder/getitem`, data);
   }
 
   //........................................SALES-ORDER............................................//
