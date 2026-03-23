@@ -879,7 +879,7 @@ const routes: Routes = [
       },
       {
         path: 'security-policy',
-        component: VatClassFinanceComponent,
+        component: SecurityPolicyComponent,
         canActivate: [AuthGuardService],
       },
       {
