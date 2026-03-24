@@ -1041,6 +1041,8 @@ import { PurchaseReturnDebitModule } from './pages/OPERATIONS/purchase-return-de
 import { ProductionJvListModule } from './pages/OPERATIONS/production-jv-list/production-jv-list.component';
 import { SaleReturnModule } from './pages/OPERATIONS/sale-return/sale-return.component';
 import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-invoice/miscellaneous-invoice.component';
+import { FixedAssetRegisterComponent, FixedAssetRegisterModule } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
+import { DepreciationReportComponent, DepreciationReportModule } from './pages/Depreciation/depreciation-report/depreciation-report.component';
 
 
 @NgModule({
@@ -1410,7 +1412,9 @@ import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-inv
     MiscellaneousPurchaseAddModule,
     MiscellaneousPurchaseEditModule,
     ImportChartOfAccountsModule,
-    SalesOrderFinancePopupFormModule
+    SalesOrderFinancePopupFormModule,
+    FixedAssetRegisterModule,
+    DepreciationReportModule,
   ],
   providers: [
     AuthService,

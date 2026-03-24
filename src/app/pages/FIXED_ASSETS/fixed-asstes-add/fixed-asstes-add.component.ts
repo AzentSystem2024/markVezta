@@ -72,11 +72,15 @@ export class FixedAsstesAddComponent {
     PURCH_DATE: '',
     IS_INACTIVE: false,
     IS_DELETED: false,
+    DEPT_ID:0,
+    SUB_DEPT_ID :0
   };
   asset_ledgerData: any;
   FixedAssets: any;
   purchaseDate: any;
   New_Asset_type: any;
+  Department: any;
+  SubDepartment: any;
 
   // calculateDepreciation(e: any) {
   //   const life = Number(e.value);
@@ -91,8 +95,9 @@ export class FixedAsstesAddComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
   ) {
+     this.sesstion_Details();
     this.Get_dropdowns();
-    this.sesstion_Details();
+   
   }
 
   sesstion_Details() {
@@ -124,7 +129,38 @@ export class FixedAsstesAddComponent {
     this.dataService.Asset_Leger_Dropdown().subscribe((res: any) => {
       this.asset_ledgerData = res;
     });
+
+    const payload = {
+      NAME : 'DEPT',
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Department = res;
+    });
+
+    // const subdepartment = {
+    //   NAME : 'SUB_DEPT',
+    //   DEPT_ID :
+    // }
+    // this.dataService.Get_SubDepartment_Dropdown(subdepartment).subscribe((res: any) => {
+    //   this.SubDepartment = res;
+    // });
   }
+
+  onDepartmentChange(e: any) {
+  const selectedDeptId = e.value;
+
+  const subdepartment = {
+    NAME: 'SUB_DEPT',
+    DEPT_ID: selectedDeptId
+  };
+
+  this.dataService.Get_SubDepartment_Dropdown(subdepartment)
+    .subscribe((res: any) => {
+      this.SubDepartment = res;
+    });
+}
+
 
   list_fixed_assets() {
     const payload = {
@@ -148,7 +184,7 @@ export class FixedAsstesAddComponent {
   }
 
   async AddData() {
-    // ✅ Await the asset list before proceeding
+    //  Await the asset list before proceeding
     try {
       const payload = {
         COMPANY_ID: this.selected_Company_id,
@@ -162,13 +198,13 @@ export class FixedAsstesAddComponent {
       return;
     }
 
-    // ✅ Form validation
+    //  Form validation
     const validationResult = this.formValidationGroup?.instance?.validate();
     if (!validationResult?.isValid) {
       return;
     }
 
-    // ✅ Check for duplicates
+    //  Check for duplicates
     const duplicateItems = this.FixedAssets?.filter((item: any) => {
       const codeMatch =
         (item.CODE?.trim().toLowerCase() || '') ===
@@ -214,14 +250,14 @@ export class FixedAsstesAddComponent {
       return;
     }
 
-    // ✅ Build payload
+    //  Build payload
     const payload = {
       ...this.FixedAssetsData,
       COMPANY_ID: this.selected_Company_id,
       PURCH_DATE: this.purchaseDate, // or use this.purchaseDate if needed
     };
 
-    // ✅ Send API request
+    //  Send API request
     this.dataService.Add_Fixed_Asset_api(payload).subscribe((res: any) => {
       notify(
         {

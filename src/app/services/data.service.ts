@@ -1303,6 +1303,16 @@ export class DataService {
     return this.http.post(getEndpoint, payload);
   }
 
+   Common_Dropdown(payload) {
+    const getEndpoint = `${this.apiUrl}dropdown`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+   Get_SubDepartment_Dropdown(payload) {
+    const getEndpoint = `${this.apiUrl}Employee/getsubdept`;
+    return this.http.post(getEndpoint, payload);
+  }
+
   Bank_Dropdown(companyId: any) {
     const reqbody = { NAME: 'BANK_AC', COMPANY_ID: companyId };
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
@@ -6350,5 +6360,15 @@ The result can be exported to HTML or Markdown.`;
 
   get_mobile_no_length(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Company/getdigit`, data);
+  }
+
+  FixedAssetRegister_List(payload){
+     const getEndpoint = this.apiUrl + 'FixedAssetRegReport/fixedassetreport';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  Depreciation_Report(payload){
+     const getEndpoint = this.apiUrl + 'DepreciationReport/depreciationreport';
+    return this.http.post(getEndpoint, payload);
   }
 }

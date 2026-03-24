@@ -215,6 +215,8 @@ import { PurchaseReturnDebitComponent } from './pages/OPERATIONS/purchase-return
 import { SaleReturnComponent } from './pages/OPERATIONS/sale-return/sale-return.component';
 import { SalesOrderComponent } from './pages/Operations/sales-order/sales-order.component';
 import { SalesOrderFinanceComponent } from './pages/OPERATIONS/sales-order-finance/sales-order-finance.component';
+import { FixedAssetRegisterComponent } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
+import { DepreciationReportComponent } from './pages/Depreciation/depreciation-report/depreciation-report.component';
 
 const routes: Routes = [
   {
@@ -232,6 +234,8 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
+  
+      
 
   {
     path: 'auth',
@@ -264,6 +268,7 @@ const routes: Routes = [
         component: InvoicePdfViewComponent,
         canActivate: [AuthGuardService],
       },
+      
       {
         path: '**',
         redirectTo: 'login',
@@ -989,7 +994,16 @@ const routes: Routes = [
         component: LeaveSalaryComponent,
         canActivate: [AuthGuardService],
       },
-
+       {
+        path: 'depreciation-report',
+        component: DepreciationReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'fixed-asset-register',
+        component: FixedAssetRegisterComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: '**',
         redirectTo: 'login',

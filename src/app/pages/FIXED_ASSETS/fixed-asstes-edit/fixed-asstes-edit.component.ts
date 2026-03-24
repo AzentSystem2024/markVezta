@@ -70,6 +70,8 @@ export class FixedAsstesEditComponent {
     DEPR_PERCENT: null,
     PURCH_DATE: '',
     IS_INACTIVE: false,
+    DEPT_ID :0,
+    SUB_DEPT_ID:0,
   };
   asset_ledgerData: any;
   FixedAssets: any;
@@ -93,6 +95,8 @@ export class FixedAsstesEditComponent {
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
   selected_Company_id: any;
+  Department: any;
+  SubDepartment: any;
 
   constructor(
     private dataService: DataService,
@@ -138,6 +142,7 @@ export class FixedAsstesEditComponent {
 
   ngOnInit() {
     this.sesstion_Details();
+    this.Get_dropdowns();
   }
 
   list_fixed_assets() {
@@ -166,10 +171,34 @@ export class FixedAsstesEditComponent {
     this.dataService.Asset_Leger_Dropdown().subscribe((res: any) => {
       this.asset_ledgerData = res;
     });
+
+     const payload = {
+      NAME : 'DEPT',
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Department = res;
+    });
+
   }
 
+   onDepartmentChange(e: any) {
+  const selectedDeptId = e.value;
+
+  const subdepartment = {
+    NAME: 'SUB_DEPT',
+    DEPT_ID: selectedDeptId
+  };
+
+  this.dataService.Get_SubDepartment_Dropdown(subdepartment)
+    .subscribe((res: any) => {
+      this.SubDepartment = res;
+    });
+}
+
+
   async UpdateData() {
-    // ✅ Await the asset list before proceeding
+    // Await the asset list before proceeding
     try {
       const payload = {
         COMPANY_ID: this.selected_Company_id,
@@ -183,13 +212,13 @@ export class FixedAsstesEditComponent {
       return;
     }
 
-    // ✅ Form validation
+    //  Form validation
     const validationResult = this.formValidationGroup?.instance?.validate();
     if (!validationResult?.isValid) {
       return;
     }
 
-    // ✅ Check for duplicates
+    //  Check for duplicates
     const duplicateItems = this.FixedAssets?.filter((item: any) => {
       if (item.ID === this.FixedAssetsData.ID) return false;
       const codeMatch =
@@ -236,13 +265,13 @@ export class FixedAsstesEditComponent {
       return;
     }
 
-    // ✅ Build payload
+    //  Build payload
     const payload = {
       ...this.FixedAssetsData,
       PURCH_DATE: this.purchaseDate, // or use this.purchaseDate if needed
     };
 
-    // ✅ Send API request
+    //  Send API request
     this.dataService.Update_Fixed_Asset_api(payload).subscribe((res: any) => {
       notify(
         {
