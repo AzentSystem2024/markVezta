@@ -66,10 +66,10 @@ import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-l
 import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
 import { UserLevelsComponent } from './pages/MASTER/user-levels/user-levels.component';
 import { DocumentTemplatesListComponent } from './settings/document-templates/document-templates-list/document-templates-list.component';
-import { GrnComponent } from './pages/OPERATIONS/grn/grn/grn.component';
-import { TransferOutComponent } from './pages/OPERATIONS/transfer-out/transfer-out.component';
-import { TransferInComponent } from './pages/OPERATIONS/transfer-in/transfer-in.component';
-import { ItemStorePricesComponent } from './pages/OPERATIONS/item-store-prices/item-store-prices.component';
+import { GrnComponent } from './pages/Operations/grn/grn/grn.component';
+import { TransferOutComponent } from './pages/Operations/transfer-out/transfer-out.component';
+import { TransferInComponent } from './pages/Operations/transfer-in/transfer-in.component';
+import { ItemStorePricesComponent } from './pages/Operations/item-store-prices/item-store-prices.component';
 import { ItemStorePricesLogComponent } from './pages/item-store-prices-log/item-store-prices-log.component';
 import { ItemStorePricesEditComponent } from './pages/item-store-prices-edit/item-store-prices-edit.component';
 import { ItemStorePriceVerifyApproveComponent } from './pages/item-store-price-verify-approve/item-store-price-verify-approve.component';
@@ -84,10 +84,10 @@ import { PromotionEditComponent } from './pages/promotion-edit/promotion-edit.co
 import { PromotionVerifyComponent } from './pages/promotion-verify/promotion-verify.component';
 import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
 import { PromotionViewComponent } from './pages/promotion-view/promotion-view.component';
-import { StockViewListComponent } from './pages/OPERATIONS/stock-view-list/stock-view-list.component';
+import { StockViewListComponent } from './pages/Operations/stock-view-list/stock-view-list.component';
 import { SupplierEditComponent } from './pages/supplier-edit/supplier-edit.component';
 import { LandedCostEditComponent } from './pages/landed-cost-edit/landed-cost-edit.component';
-import { InterStoreTransferListComponent } from './pages/OPERATIONS/inter-store-transfer-list/inter-store-transfer-list.component';
+import { InterStoreTransferListComponent } from './pages/Operations/inter-store-transfer-list/inter-store-transfer-list.component';
 import { DepartmentComponent } from './pages/HR/Masters/department/department.component';
 import { DesignationComponent } from './pages/HR/Masters/designation/designation.component';
 import { EOSComponent } from './pages/HR/Masters/eos/eos.component';
@@ -180,7 +180,7 @@ import { ItemStockValueComponent } from './components/HR/Masters/item-stock-valu
 import { ItemCategoryListComponent } from './pages/MASTER/item-category-list/item-category-list.component';
 import { StockAdjustmentListComponent } from './pages/Stock_Adjustment/stock-adjustment-list/stock-adjustment-list.component';
 import { StockMovementReportComponent } from './pages/REPORT/stock-movement-report/stock-movement-report.component';
-import { QuotationComponent } from './pages/OPERATIONS/quotation/quotation.component';
+import { QuotationComponent } from './pages/Operations/quotation/quotation.component';
 import { InvoiceDeliveryComponent } from './pages/invoice-delivery/invoice-delivery.component';
 import { PhysicalInventoryComponent } from './pages/physical-inventory/physical-inventory.component';
 import { DeliveryReturnComponent } from './pages/delivery-return/delivery-return.component';
@@ -206,15 +206,15 @@ import { SubDepartmentComponent } from './pages/HR/Masters/sub-department/sub-de
 import { SalaryHeadListComponent } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
 import { TransferOutInventoryComponent } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
 import { CustomerReceiptsComponent } from './pages/Operations/customer-receipts/customer-receipts.component';
-import { DeliveryNoteComponent } from './pages/OPERATIONS/delivery-note/delivery-note.component';
-import { MiscellaneousInvoiceComponent } from './pages/OPERATIONS/miscellaneous-invoice/miscellaneous-invoice.component';
-import { MiscellaneousPurchaseComponent } from './pages/OPERATIONS/miscellaneous-purchase/miscellaneous-purchase.component';
-import { ProductionJvListComponent } from './pages/OPERATIONS/production-jv-list/production-jv-list.component';
-import { PurchaseOrderComponent } from './pages/OPERATIONS/purchase-order/purchase-order.component';
-import { PurchaseReturnDebitComponent } from './pages/OPERATIONS/purchase-return-debit/purchase-return-debit.component';
-import { SaleReturnComponent } from './pages/OPERATIONS/sale-return/sale-return.component';
+import { DeliveryNoteComponent } from './pages/Operations/delivery-note/delivery-note.component';
+import { MiscellaneousInvoiceComponent } from './pages/Operations/miscellaneous-invoice/miscellaneous-invoice.component';
+import { MiscellaneousPurchaseComponent } from './pages/Operations/miscellaneous-purchase/miscellaneous-purchase.component';
+import { ProductionJvListComponent } from './pages/Operations/production-jv-list/production-jv-list.component';
+import { PurchaseOrderComponent } from './pages/Operations/purchase-order/purchase-order.component';
+import { PurchaseReturnDebitComponent } from './pages/Operations/purchase-return-debit/purchase-return-debit.component';
+import { SaleReturnComponent } from './pages/Operations/sale-return/sale-return.component';
 import { SalesOrderComponent } from './pages/Operations/sales-order/sales-order.component';
-import { SalesOrderFinanceComponent } from './pages/OPERATIONS/sales-order-finance/sales-order-finance.component';
+import { SalesOrderFinanceComponent } from './pages/Operations/sales-order-finance/sales-order-finance.component';
 
 const routes: Routes = [
   {

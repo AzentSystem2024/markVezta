@@ -162,6 +162,7 @@ export class AddCreditNoteComponent {
   isSaving = false;
   subType: boolean = false;
   selectedSubTypeId: any;
+  vatTitle: any;
 
   constructor(
     private dataService: DataService,
@@ -183,6 +184,7 @@ export class AddCreditNoteComponent {
       this.companyStateID = selectedCompany.STATE_ID;
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
+      this.vatTitle = userData.GeneralSettings.VAT_TITLE;
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
 
@@ -348,21 +350,12 @@ export class AddCreditNoteComponent {
   applyGstForRow(row: any) {
     const gstPerc = Number(this.selectedInvoiceGst) || 0;
 
-    // SAME STATE → CGST + SGST
-    if (this.companyStateID === this.selectedCustomer?.STATE_ID) {
-      const half = gstPerc / 2;
+    row.GST_PERC = gstPerc;
 
-      row.CGST = half;
-      row.SGST = half;
-      row.GST = 0;
-      row.GST_PERC = 0; // IGST not used
-    } else {
-      // DIFFERENT STATE → IGST
-      row.GST = gstPerc;
-      row.GST_PERC = gstPerc;
-      row.CGST = 0;
-      row.SGST = 0;
-    }
+    // Remove split fields
+    row.CGST = 0;
+    row.SGST = 0;
+    row.GST = gstPerc; // optional (if used in UI)
   }
 
   onCompanySelected(event: any): void {
@@ -394,17 +387,9 @@ export class AddCreditNoteComponent {
       this.creditFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
 
       // SHOW OR HIDE GST COLUMNS
-      if (this.companyStateID === this.selectedCustomer.STATE_ID) {
-        // Same state → CGST + SGST
-        this.showCGST = true;
-        this.showSGST = true;
-        this.showGST = false;
-      } else {
-        // Different state → GST only
-        this.showGST = true;
-        this.showCGST = false;
-        this.showSGST = false;
-      }
+      this.showGST = true;
+      this.showCGST = false;
+      this.showSGST = false;
 
       // ⭐ APPLY GST LOGIC TO ALL EXISTING ROWS
       this.creditFormData.NOTE_DETAIL?.forEach((row: any) => {
@@ -551,20 +536,8 @@ export class AddCreditNoteComponent {
 
   calculateTaxAmount = (row: any) => {
     const amount = Number(row.Amount) || 0;
-
-    // SAME STATE → CGST + SGST applies
-    if (this.companyStateID === this.selectedCustomer?.STATE_ID) {
-      const cgst = Number(row.CGST) || 0;
-      const sgst = Number(row.SGST) || 0;
-
-      // Total GST% = CGST% + SGST%
-      const totalGstPerc = cgst + sgst;
-
-      return +((amount * totalGstPerc) / 100).toFixed(2);
-    }
-
-    // DIFFERENT STATE → IGST applies
     const gstPerc = Number(row.GST_PERC) || 0;
+
     return +((amount * gstPerc) / 100).toFixed(2);
   };
 
@@ -625,66 +598,6 @@ export class AddCreditNoteComponent {
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-
-    // ➤ ledgerCode: open dropdown on Enter, move to ledgerName on second Enter
-    // if (e.dataField === 'ledgerCode') {
-    //   let enterPressedOnce = false;
-
-    //   e.editorOptions.onKeyDown = (event: any) => {
-    //     if (event.event.key === 'Enter') {
-    //       event.event.preventDefault();
-
-    //       if (!enterPressedOnce) {
-    //         enterPressedOnce = true;
-    //         setTimeout(() => {
-    //           if (event.component?.open) {
-    //             event.component.open(); // open dropdown
-    //           }
-    //         }, 50);
-    //       } else {
-    //         enterPressedOnce = false;
-    //         setTimeout(() => {
-    //           this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-    //         }, 50);
-    //       }
-    //     }
-    //   };
-
-    //   e.editorOptions.onValueChanged = (args: any) => {
-    //     const selectedLedger = this.ledgerList.find(
-    //       (item: any) => item.HEAD_CODE === args.value
-    //     );
-
-    //     e.setValue(args.value);
-
-    //     if (selectedLedger) {
-    //       // 1️⃣ Set ledger name
-    //       e.component.cellValue(
-    //         rowIndex,
-    //         'ledgerName',
-    //         selectedLedger.HEAD_NAME
-    //       );
-
-    //       // 2️⃣ Get HSN & GST from session
-    //       const sessionData = JSON.parse(
-    //         sessionStorage.getItem('savedUserData')
-    //       );
-    //       const hsnCode = sessionData?.GeneralSettings?.HSN_CODE;
-    //       const gstPerc = sessionData?.GeneralSettings?.GST_PERC;
-
-    //       // 3️⃣ Set HSN_CODE
-    //       e.component.cellValue(rowIndex, 'HSN_CODE', hsnCode);
-
-    //       // 4️⃣ Set GST_PERC
-    //       e.component.cellValue(rowIndex, 'GST_PERC', gstPerc);
-
-    //       // 5️⃣ Move to next field
-    //       setTimeout(() => {
-    //         this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-    //       }, 50);
-    //     }
-    //   };
-    // }
 
     if (e.dataField === 'ledgerCode') {
       e.editorOptions.onValueChanged = (args: any) => {
@@ -1107,7 +1020,7 @@ export class AddCreditNoteComponent {
           row.ledgerCode ||
           row.ledgerName ||
           row.Amount ||
-          row.GGST_PERC ||
+          row.GST_PERC || // ✅ fixed typo
           row.particulars,
       )
       .map((row: any, index: number) => {
@@ -1116,41 +1029,24 @@ export class AddCreditNoteComponent {
         );
 
         const amount = Number(row.Amount) || 0;
-        const isSameState =
-          this.companyStateID === this.selectedCustomer?.STATE_ID;
 
-        let gstPerc = 0;
-        let gstAmount = 0;
-        let cgst = 0;
-        let sgst = 0;
-
-        if (isSameState) {
-          //  CGST + SGST mode
-          cgst = Number(row.CGST) || 0;
-          sgst = Number(row.SGST) || 0;
-
-          const totalGstPerc = cgst + sgst;
-          gstPerc = 0; // IGST not applicable
-          gstAmount = Number(((amount * totalGstPerc) / 100).toFixed(2));
-        } else {
-          //  IGST mode
-          gstPerc = Number(row.GST_PERC) || 0;
-          gstAmount = Number(((amount * gstPerc) / 100).toFixed(2)); // FIXED
-          cgst = 0;
-          sgst = 0;
-        }
+        // ✅ ONLY GST_PERC (NO SPLITTING)
+        const gstPerc = Number(row.GST_PERC) || 0;
+        const gstAmount = Number(((amount * gstPerc) / 100).toFixed(2));
 
         return {
           SL_NO: row.SL_NO || index + 1,
           HEAD_ID: ledger?.HEAD_ID || null,
           AMOUNT: amount,
 
-          // Passing GST breakup
-          GST_PERC: gstPerc, // Only IGST or 0
-          CGST: cgst, // Only in same-state
-          SGST: sgst, // Only in same-state
+          // ✅ Always pass only GST_PERC
+          GST_PERC: gstPerc,
 
-          GST_AMOUNT: gstAmount, // ALWAYS combined amount
+          // ❌ No split
+          CGST: 0,
+          SGST: 0,
+
+          GST_AMOUNT: gstAmount,
 
           REMARKS: row.particulars || '',
         };
@@ -1295,6 +1191,7 @@ export class AddCreditNoteComponent {
       NARRATION: '',
       INVOICE_ID: '',
       INVOICE_NO: '',
+      IS_APPROVED: false,
       NOTE_DETAIL: [
         {
           SL_NO: '',

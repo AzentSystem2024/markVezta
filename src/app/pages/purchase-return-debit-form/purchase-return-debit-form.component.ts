@@ -161,6 +161,7 @@ export class PurchaseReturnDebitFormComponent {
   userID: any;
   finID: any;
   isSaving = false;
+  vatTitle: any;
 
   constructor(
     private dataService: DataService,
@@ -175,7 +176,7 @@ export class PurchaseReturnDebitFormComponent {
 
     const userData = JSON.parse(userDataString);
     const selectedCompany = userData.SELECTED_COMPANY;
-    console.log(userData, 'USERDATAAAAAAAAAAAAAAA');
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     // SINGLE SOURCE OF TRUTH
     this.selectedCompanyId = selectedCompany.COMPANY_ID;
     this.companyStateId = selectedCompany.STATE_ID;
@@ -220,12 +221,6 @@ export class PurchaseReturnDebitFormComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
-  // ngAfterViewInit() {
-  //   setTimeout(() => {
-  //     this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
-  //   });
-  // }
-
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
 
@@ -250,30 +245,47 @@ export class PurchaseReturnDebitFormComponent {
     this.cdr.detectChanges();
 
     // Map grid rows
-    this.mainGridData = (data.PurchDetail || []).map((item) => ({
-      DETAIL_ID: item.PURCH_DET_ID,
-      ITEM_ID: item.ITEM_ID,
-      GRN_DET_ID: item.GRN_DET_ID,
-      TRANSFER_NO: item.DOC_NO,
-      TRANSFER_DATE: item.PURCH_DATE,
-      ITEM_NAME: item.ITEM_NAME,
-      PENDING_QTY: item.PENDING_QTY,
-      RATE: item.RATE,
-      QUANTITY: item.QUANTITY,
-      AMOUNT: item.AMOUNT,
-      VAT_AMOUNT: item.VAT_AMOUNT,
-      TOTAL_AMOUNT: item.TOTAL_AMOUNT,
-      UOM: item.UOM,
-      UOM_PURCH: item.UOM_PURCH,
-      UOM_MULTIPLE: item.UOM_MULTIPLE,
-      BARCODE: item.BAR_CODE,
-      HSN_CODE: item.HSN_CODE,
-      CGST: this.sameState ? (item.CGST ?? 0) : 0,
-      SGST: this.sameState ? (item.SGST ?? 0) : 0,
+    this.mainGridData = (data.PurchDetail || []).map((item) => {
+      // COMBINE GST FOR UI (EDIT MODE)
+      let vatPerc = 0;
 
-      VAT_PERC: this.sameState ? 0 : (item.VAT_PERC ?? 0),
-      DOC_NO: item.DOC_NO,
-    }));
+      if (item.VAT_PERC && item.VAT_PERC > 0) {
+        // IGST case
+        vatPerc = item.VAT_PERC;
+      } else {
+        // CGST + SGST case → combine
+        vatPerc = (Number(item.CGST) || 0) + (Number(item.SGST) || 0);
+      }
+
+      return {
+        DETAIL_ID: item.PURCH_DET_ID,
+        ITEM_ID: item.ITEM_ID,
+        GRN_DET_ID: item.GRN_DET_ID,
+        TRANSFER_NO: item.DOC_NO,
+        TRANSFER_DATE: item.PURCH_DATE,
+        ITEM_NAME: item.ITEM_NAME,
+        PENDING_QTY: item.PENDING_QTY,
+        RATE: item.RATE,
+        QUANTITY: item.QUANTITY,
+        AMOUNT: item.AMOUNT,
+        VAT_AMOUNT: item.VAT_AMOUNT,
+        TOTAL_AMOUNT: item.TOTAL_AMOUNT,
+        UOM: item.UOM,
+        UOM_PURCH: item.UOM_PURCH,
+        UOM_MULTIPLE: item.UOM_MULTIPLE,
+        BARCODE: item.BAR_CODE,
+        HSN_CODE: item.HSN_CODE,
+
+        // UI ALWAYS USES VAT_PERC
+        VAT_PERC: vatPerc,
+
+        // KEEP THESE ZERO IN UI
+        CGST: 0,
+        SGST: 0,
+
+        DOC_NO: item.DOC_NO,
+      };
+    });
 
     // Force grid refresh
     setTimeout(() => {
@@ -292,6 +304,7 @@ export class PurchaseReturnDebitFormComponent {
     const payload = {
       TRANS_TYPE: 20,
       COMPANY_ID: this.selectedCompanyId,
+      SUB_TYPE_ID: 0,
     };
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.retNo = response.PURCHASE_NO;
@@ -310,7 +323,7 @@ export class PurchaseReturnDebitFormComponent {
         this.supplierList = response;
         console.log(this.supplierList, 'SUPPLIER LIST LOADED');
 
-        // ⭐ FIX: NOW load edit data only AFTER supplierList has data
+        // FIX: NOW load edit data only AFTER supplierList has data
         if (this.isEditing) {
           this.isEditDataAvailable();
         } else {
@@ -334,16 +347,7 @@ export class PurchaseReturnDebitFormComponent {
     if (selectedSupplier) {
       this.purchaseReturnFormData.SUPPPLIER_NAME = selectedSupplier.DESCRIPTION;
       this.sameState = this.selectedSupplierStateId === this.companyStateId;
-      // 👇 TAX IS CALCULATED HERE
-      // if (this.sameState) {
-      //   this.CGST = this.GST / 2;
-      //   this.SGST = this.GST / 2;
-      //   this.IGST = 0;
-      // } else {
-      //   this.CGST = 0;
-      //   this.SGST = 0;
-      //   this.IGST = this.GST;
-      // }
+
       this.showCGST = this.sameState;
       this.showSGST = this.sameState;
       this.showGST = !this.sameState;
@@ -396,13 +400,13 @@ export class PurchaseReturnDebitFormComponent {
           let sgst = 0;
           let igst = 0;
 
-          // ✅ SAME STATE → Split GST
+          //  SAME STATE → Split GST
           if (this.sameState) {
             cgst = gstPerc / 2;
             sgst = gstPerc / 2;
             igst = 0;
           }
-          // ✅ DIFFERENT STATE → IGST
+          //  DIFFERENT STATE → IGST
           else {
             cgst = 0;
             sgst = 0;
@@ -427,8 +431,8 @@ export class PurchaseReturnDebitFormComponent {
             BARCODE: row.BARCODE,
             HSN_CODE: row.HSN_CODE,
 
-            // ⭐ GST FROM PENDING LIST
-            VAT_PERC: igst, // IGST only
+            //GST FROM PENDING LIST
+            VAT_PERC: gstPerc, // IGST only
             CGST: cgst,
             SGST: sgst,
             VAT_AMOUNT: 0,
@@ -448,62 +452,6 @@ export class PurchaseReturnDebitFormComponent {
     }, 200);
   }
 
-  // onTransferSelectClick() {
-  //   const selectedRows =
-  //     this.popupGridRef?.instance.getSelectedRowsData() || [];
-
-  //   if (selectedRows.length > 0) {
-  //     selectedRows.forEach((row) => {
-  //       const exists = this.mainGridData.some(
-  //         (item) => item.DETAIL_ID === row.DETAIL_ID
-  //       );
-
-  //       if (!exists) {
-  //         console.log(this.CGST, 'CGST');
-  //         this.mainGridData.push({
-  //           DETAIL_ID: row.DETAIL_ID,
-  //           ITEM_ID: row.ITEM_ID,
-  //           GRN_DET_ID: row.GRN_DET_ID,
-  //           TRANSFER_NO: row.DOC_NO,
-  //           TRANSFER_DATE: row.PURCH_DATE,
-  //           ITEM_NAME: row.ITEM_NAME,
-  //           PENDING_QTY: row.PENDING_QTY,
-  //           RATE: row.RATE,
-  //           QUANTITY: 0,
-  //           AMOUNT: row.AMOUNT,
-  //           // VAT_PERC: row.VAT_PERC,
-  //           // VAT_AMOUNT: row.TAX_AMOUNT,
-  //           TOTAL_AMOUNT: 0,
-  //           UOM: row.UOM,
-  //           UOM_PURCH: row.UOM_PURCH,
-  //           UOM_MULTIPLE: row.UOM_MULTIPLE,
-  //           BARCODE: row.BARCODE,
-  //           HSN_CODE: this.HSNCODE,
-  //           VAT_PERC: this.GST,
-  //           CGST: this.CGST,
-  //           SGST: this.SGST,
-  //           VAT_AMOUNT: row.TAX_AMOUNT,
-  //         });
-  //       }
-  //     });
-
-  //     //  Force grid to detect changes
-  //     this.mainGridData = [...this.mainGridData];
-
-  //     // Refresh both grids
-  //     this.itemsGridRef.instance.refresh();
-  //     this.popupGridRef.instance.clearSelection();
-  //   }
-
-  //   // Close popup
-  //   this.isTrOutPopupVisible = false;
-
-  //   // Focus the Qty cell
-  //   setTimeout(() => {
-  //     this.itemsGridRef.instance.editCell(0, 'QUANTITY');
-  //   }, 200);
-  // }
-
   onContentReady(e: any): void {
     this.logGridSummaries();
   }
@@ -522,7 +470,11 @@ export class PurchaseReturnDebitFormComponent {
   }
 
   onEditorPreparing(e: any) {
-    if (e.dataField === 'QUANTITY' || e.dataField === 'VAT_PERC') {
+    if (
+      e.dataField === 'QUANTITY' ||
+      e.dataField === 'VAT_PERC' ||
+      e.dataField === 'RATE'
+    ) {
       e.editorOptions = e.editorOptions || {};
 
       // Let the editor inherit row height naturally (no fixed height)
@@ -596,27 +548,19 @@ export class PurchaseReturnDebitFormComponent {
 
     const amount = Number(rowData.AMOUNT) || 0;
 
-    if (this.sameState) {
-      const cgst = Number(rowData.CGST) || 0;
-      const sgst = Number(rowData.SGST) || 0;
+    // if (this.sameState) {
+    //   const cgst = Number(rowData.CGST) || 0;
+    //   const sgst = Number(rowData.SGST) || 0;
 
-      return (amount * (cgst + sgst)) / 100;
-    } else {
-      const igst = Number(rowData.VAT_PERC);
-      return (amount * igst) / 100;
-    }
+    //   return (amount * (cgst + sgst)) / 100;
+    // } else {
+    const GST = Number(rowData.VAT_PERC);
+    return (amount * GST) / 100;
+    // }
   };
 
   calculateTotalAmount = (rowData) => {
     return this.calculateAmount(rowData) + this.calculateVATAmount(rowData);
-    // const amount = Number(rowData.AMOUNT) || 0;
-    // const vat = Number(rowData.VAT_AMOUNT) || 0;
-    // console.log(amount, vat, 'AMOUNT AND VAT');
-    // const total = amount + vat;
-    // console.log(total, 'total');
-    // rowData.TOTAL_AMOUNT = total;
-
-    // return total;
   };
   private toDateOnlyString(value: any): string {
     if (!value) return '';
@@ -663,6 +607,25 @@ export class PurchaseReturnDebitFormComponent {
         totalAmount += amount;
         totalVAT += vat;
         totalNet += amount + vat;
+        // GST FIX START
+        const gstPerc =
+          Number(row.VAT_PERC) || Number(row.CGST) + Number(row.SGST) || 0;
+
+        let VAT_PERC = 0;
+        let CGST = 0;
+        let SGST = 0;
+
+        if (this.sameState) {
+          // SAME STATE → split
+          CGST = gstPerc / 2;
+          SGST = gstPerc / 2;
+          VAT_PERC = 0;
+        } else {
+          // DIFFERENT STATE → IGST
+          VAT_PERC = gstPerc;
+          CGST = 0;
+          SGST = 0;
+        }
         return {
           COMPANY_ID: this.purchaseReturnFormData.COMPANY_ID,
           STORE_ID: this.purchaseReturnFormData.STORE_ID,
@@ -676,9 +639,9 @@ export class PurchaseReturnDebitFormComponent {
           QUANTITY: row.QUANTITY ?? 0,
           RATE: row.RATE ?? 0,
           AMOUNT: row.AMOUNT ?? 0,
-          VAT_PERC: row.VAT_PERC ?? 0,
-          CGST: row.CGST || 0,
-          SGST: row.SGST || 0,
+          VAT_PERC: VAT_PERC,
+          CGST: CGST,
+          SGST: SGST,
           VAT_AMOUNT: row.VAT_AMOUNT ?? 0,
           TOTAL_AMOUNT: totalAmount,
           UOM: row.UOM ?? '',
@@ -1261,6 +1224,8 @@ export class PurchaseReturnDebitFormComponent {
       PurchDetail: [], // ✔ empty detail list
       SUPPPLIER_NAME: '',
       RETURN_AMOUNT: 0,
+      IS_APPROVED: false,
+      ROUND_OFF: false,
     };
 
     this.selectedSupplierId = null;

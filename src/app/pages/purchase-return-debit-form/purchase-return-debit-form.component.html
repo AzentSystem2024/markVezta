@@ -42,7 +42,7 @@
           </dx-date-box>
 
           <dx-text-box
-            label="Supplier Invoice No."
+            label="Voucher No."
             labelMode="floating"
             [(value)]="purchaseReturnFormData.DOC_NO"
             [width]="200"
@@ -177,7 +177,7 @@
           <dxi-column
             dataField="ITEM_NAME"
             caption="Item Name"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="HSN_CODE"
@@ -222,15 +222,10 @@
           <dxi-column
             dataField="VAT_PERC"
             dataType="number"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? ' VAT %'
-                : ' IGST %'
-            "
-            [visible]="showGST"
+            [caption]="vatTitle + '%'"
             [allowEditing]="false"
           ></dxi-column>
-          <dxi-column
+          <!-- <dxi-column
             dataField="CGST"
             caption="CGST"
             dataType="number"
@@ -244,7 +239,7 @@
             dataType="number"
             [visible]="showSGST"
             [allowEditing]="false"
-          ></dxi-column>
+          ></dxi-column> -->
           <dxi-column
             dataField="VAT_AMOUNT"
             dataType="number"
@@ -303,25 +298,35 @@
           </div>
 
           <!-- RIGHT SIDE → Round Off + Net Amount -->
-          <div style="display: flex; align-items: center; gap: 16px">
-            <dx-check-box
-              style="margin-right: 24px"
-              text="Round Off"
-              [(value)]="purchaseReturnFormData.ROUND_OFF"
-              (onValueChanged)="onRoundOffChange()"
-              [readOnly]="isReadOnlyMode"
-            ></dx-check-box>
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              margin: 10px 0;
+              justify-content: flex-end;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 16px">
+              <dx-check-box
+                style="margin-right: 18px"
+                text="Round Off"
+                [(value)]="purchaseReturnFormData.ROUND_OFF"
+                (onValueChanged)="onRoundOffChange()"
+                [readOnly]="isReadOnlyMode"
+              ></dx-check-box>
 
-            <dx-text-box
-              label="Net Amount"
-              labelMode="floating"
-              [value]="netAmount"
-              [width]="120"
-              [readOnly]="true"
-            ></dx-text-box>
+              <dx-text-box
+                label="Net Amount"
+                labelMode="floating"
+                [value]="netAmount"
+                [width]="120"
+                [readOnly]="true"
+              ></dx-text-box>
+            </div>
           </div>
         </div>
         <div class="form-popup-buttons-container">
+          <!-- Approve -->
           <div class="approve-container">
             <dx-check-box
               [value]="
@@ -334,17 +339,13 @@
               "
               [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
               [readOnly]="isReadOnlyMode"
-              stylingMode="outlined"
-            >
-            </dx-check-box>
+            ></dx-check-box>
           </div>
+
+          <!-- Buttons -->
           <div class="popup-footer">
-            <dx-button
-              text="Cancel"
-              stylingMode="outlined"
-              type="normal"
-              (onClick)="cancel()"
-            ></dx-button>
+            <dx-button text="Cancel" (onClick)="cancel()"></dx-button>
+
             <dx-button
               #saveButtonRef
               [text]="
@@ -365,20 +366,6 @@
               stylingMode="contained"
               type="default"
             ></dx-button>
-
-            <!-- <dx-button
-              #saveButtonRef
-              [text]="
-                isReadOnlyMode
-                  ? 'PDF'
-                  : purchaseReturnFormData.IS_APPROVED
-                    ? 'Commit'
-                    : 'Save'
-              "
-              (onClick)="isReadOnlyMode ? openPDF() : savePurchaseReturn()"
-              stylingMode="contained"
-              type="default"
-            ></dx-button> -->
           </div>
         </div>
       </div>
@@ -461,12 +448,7 @@
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column
-        dataField="ITEM_NAME"
-        caption="Item Name"
-        dataType="date"
-        format="dd-MM-yyyy"
-      ></dxi-column>
+      <dxi-column dataField="ITEM_NAME" caption="Item Name"></dxi-column>
       <dxi-column
         dataField="BARCODE"
         caption="Barcode"

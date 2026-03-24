@@ -233,6 +233,7 @@ export class GrnNewFormComponent implements OnInit {
     const payload = {
       TRANS_TYPE: 18,
       COMPANY_ID: this.selected_Company_id,
+      SUB_TYPE_ID: 0,
     };
     this.service.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
