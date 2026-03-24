@@ -6,6 +6,8 @@ import {
   Input,
   NgModule,
   NgZone,
+  OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -56,7 +58,7 @@ import { confirm } from 'devextreme/ui/dialog';
   templateUrl: './delivery-return-edit.component.html',
   styleUrls: ['./delivery-return-edit.component.scss'],
 })
-export class DeliveryReturnEditComponent {
+export class DeliveryReturnEditComponent implements OnInit, OnChanges {
   @Input() SelectDeliveryReturnData: any = {};
   @Output() formClosed = new EventEmitter<void>();
   readOnlyMode: boolean = false;
@@ -115,15 +117,12 @@ export class DeliveryReturnEditComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
     this.store_id = sessionData.Configuration[0].STORE_ID;
     this.fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     const sessionYear = sessionData.FINANCIAL_YEARS;
     const financialYeaDate = sessionYear[0].DATE_FROM;
-
     this.formatted_from_date = financialYeaDate;
 
     this.ENABLE_Matrix_Code = sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
@@ -143,7 +142,7 @@ export class DeliveryReturnEditComponent {
       this.get_DN_Data();
       this.approveValue = this.SelectDeliveryReturnData.STATUS == 'APPROVED';
 
-      // ✅ Set read-only mode based on status
+      // Set read-only mode based on status
       if (this.SelectDeliveryReturnData.STATUS === 'APPROVED') {
         this.readOnlyMode = true;
       } else {
@@ -153,7 +152,11 @@ export class DeliveryReturnEditComponent {
   }
 
   getSalesmanDropdown() {
-    this.dataService.getDropdownData('SALESMAN').subscribe((response: any) => {
+    const payload = {
+      NAME: 'SALESMAN',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.salesman = response;
     });
   }
@@ -161,6 +164,8 @@ export class DeliveryReturnEditComponent {
   ngOnInit() {
     this.get_DN_Data();
     this.sesstion_Details();
+    this.getCustomerDropdown();
+    this.getSalesmanDropdown();
   }
 
   onCustomerChange(e: any) {
@@ -173,7 +178,11 @@ export class DeliveryReturnEditComponent {
   onApprovedChanged(e: any) {}
 
   getCustomerDropdown() {
-    this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
+    const payload = {
+      NAME: 'CUSTOMER',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.customer = response;
     });
   }
@@ -186,11 +195,9 @@ export class DeliveryReturnEditComponent {
     const payload = {
       CUST_ID: this.customerID,
     };
-
     this.dataService.get_DNList_Data(payload).subscribe((response: any) => {
       this.DNDatasource = response.Data;
-
-      // ✅ Now merge QUANTITY from the selected response
+      // Now merge QUANTITY from the selected response
       if (
         this.DeliveryReturnFormData &&
         this.DeliveryReturnFormData.DETAILS?.length
@@ -273,7 +280,6 @@ export class DeliveryReturnEditComponent {
     }
 
     const totalQty = Number(this.DeliveryReturnFormData.TOTAL_QTY);
-
     const payload = {
       ...this.DeliveryReturnFormData,
       COMPANY_ID: this.selected_Company_id,
@@ -290,7 +296,6 @@ export class DeliveryReturnEditComponent {
         QUANTITY: d.QUANTITY || 0,
       })),
     };
-
     if (this.approveValue === true) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',

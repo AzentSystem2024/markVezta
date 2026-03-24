@@ -56,6 +56,52 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
     this.refreshMenu();
   }
 
+  buildMenuTree(menus: any[], parentKey: string = ''): any[] {
+    return menus
+      .filter((menu) => menu.Selected)
+      .map((menu, index) => {
+        const uniqueKey = `${parentKey}${menu.MenuID}-${index}`;
+
+        // IMPORTANT: only REAL routes are leaves
+        const isLeaf =
+          menu.Path !== null &&
+          menu.Path !== undefined &&
+          menu.Path !== '' &&
+          menu.Path !== '#';
+
+        const node: any = {
+          id: uniqueKey, // ✅ unique across tree
+          text: menu.MenuName,
+          path: isLeaf ? menu.Path : null, //NEVER '#'
+          selectable: isLeaf, //parents NOT selectable
+          expanded: false,
+        };
+
+        if (menu.Children && menu.Children.length > 0) {
+          node.items = this.buildMenuTree(menu.Children, uniqueKey + '-');
+        }
+
+        return node;
+      });
+  }
+
+  // buildMenuTree(menus: any[]): any[] {
+  //   return menus
+  //     .filter((menu) => menu.Selected)
+  //     .map((menu) => {
+  //       const node: any = {
+  //         text: menu.MenuName,
+  //         path: menu.Path || '',
+  //       };
+
+  //       if (menu.Children && menu.Children.length > 0) {
+  //         node.items = this.buildMenuTree(menu.Children); // s recursion
+  //       }
+
+  //       return node;
+  //     });
+  // }
+
   public selectByPath(path: string) {
     const find = (items: any[]): any => {
       for (const item of items) {
@@ -82,10 +128,10 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
       );
 
       if (parent) {
-        // 🔥 expand correct group
+        //  expand correct group
         this.menu.instance.expandItem(parent);
 
-        // 🔥 collapse all others
+        // collapse all others
         this.internalItems.forEach((group) => {
           if (group !== parent) {
             this.menu.instance.collapseItem(group);
@@ -98,6 +144,7 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
   // refreshMenu() {
   //   // Use static menu for now
   //   this.internalItems = this.staticMenu;
+  //   console.log(' Sidebar Items (static):', this.internalItems);
   // }
 
   refreshMenu() {
@@ -108,31 +155,18 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
     this.internalItems = [];
 
     for (const group of menuGroups) {
-      const menus = group.Menus || [];
-
-      if (menus.length === 0) continue; // Skip empty groups
-
-      // Remove duplicate menus based on MenuID (in case of repeated Timesheet)
-      const uniqueMenus = Array.from(
-        new Map(menus.map((item) => [item.MenuID, item])).values(),
-      );
-
-      const children = uniqueMenus
-        .filter((menu: any) => menu.Selected)
-        .map((submenu: any) => ({
-          text: submenu.MenuName,
-          path: submenu.Path || this.getRouteForMenu(submenu.MenuName),
-        }));
+      if (!group.Menus || group.Menus.length === 0) continue;
 
       this.internalItems.push({
-        text: group.Text || 'Main',
-        icon: group.Icon || this.getIconForMainMenu(group.Text),
-        path: '',
-        items: children,
+        text: group.Text,
+        icon: group.Icon || 'folder',
+        expanded: false,
+        items: this.buildMenuTree(group.Menus), //  recursive
       });
     }
-  }
 
+    console.log(' Sidebar Tree:', this.internalItems);
+  }
   getIconForMainMenu(menu: string): string {
     switch (menu.toLowerCase()) {
       case 'Accounts':
@@ -141,53 +175,6 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
         return 'fa fa-file-alt';
       default:
         return 'folder';
-    }
-  }
-
-  getRouteForMenu(menuName: string): string {
-    switch (menuName) {
-      case 'Dashboard':
-        return '/analytics-dashboard';
-      case 'User Level':
-        return '/user-role';
-      case 'User':
-        return '/user';
-      case 'Chart Of Accounts':
-        return '/accounts';
-      case 'Journal Voucher':
-        return '/journal-voucher';
-      case 'Credit Note':
-        return '/credit-note';
-      case 'Debit Note':
-        return '/debit';
-      case 'Invoice':
-        return '/invoice';
-
-      case 'Company':
-        return '/company';
-      case 'Category':
-        return '/Category';
-      case 'Article Stock View':
-        return '/article-stock-view';
-      case 'Cartoon Stock View':
-        return '/carton-stock-view';
-      case 'Transfer in View':
-        return '/Transfer-in-view';
-      case 'Article Production View':
-        return '/article-production-view';
-      case 'Pack Production View':
-        return '/pack-production-view';
-      case 'Stock Movement View':
-        return '/stock-movement-view';
-      case 'Transfer Out View':
-        return '/transfer-out-view';
-      case 'Trial Balance':
-        return '/trial-balance-report';
-      case 'Journal Book':
-        return '/journal-book';
-
-      default:
-        return '';
     }
   }
 
@@ -200,6 +187,7 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
 
   // async onItemClick(event: DxTreeViewTypes.ItemClickEvent) {
   //   const selectedItem = event.itemData;
+  //   console.log(selectedItem, 'selecteditem');
 
   //   // Extract userLevel and componentName
   //   const componentName = selectedItem.path;
@@ -212,6 +200,7 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
   //         .getUserRightList(userLevelId, componentName)
   //         .subscribe((res: any) => {
   //           const response = res.UserRight;
+  //           console.log(response, 'response');
   //           // Save response in session
   //           sessionStorage.setItem(
   //             'menuUserRightsResponse',
@@ -228,27 +217,30 @@ export class SideNavigationMenuComponent implements AfterViewInit, OnDestroy {
   // }
 
   onItemClick(e: any) {
-    e.event?.stopPropagation(); // prevent sidebar collapse
+    e.event?.stopPropagation();
 
     const item = e.itemData;
 
-    if (item?.path) {
-      this.menu.instance.selectItem(item); // ✅ highlight menu
-      this.router.navigate([item.path]); // ✅ routing
+    // 🚫 Parent menu → do nothing (DevExtreme will expand)
+    if (!item?.path) {
+      return;
     }
 
-    this.selectedItemChanged.emit(e); // ✅ tabs / parent logic
+    // ✅ Leaf menu → navigate
+    this.menu.instance.selectItem(item);
+    this.router.navigate([item.path]);
+    this.selectedItemChanged.emit(e);
   }
 
   onItemExpanded(e: any) {
-    const expandedItem = e.itemData;
+    const node = e.node;
 
-    // Only act on MAIN menus (level 1)
-    if (!expandedItem?.items) return;
+    if (!node || !node.parent) return;
 
-    this.internalItems.forEach((item) => {
-      if (item !== expandedItem) {
-        this.menu.instance.collapseItem(item);
+    // collapse only siblings under the same parent
+    node.parent.children.forEach((sibling: any) => {
+      if (sibling !== node) {
+        this.menu.instance.collapseItem(sibling.itemData);
       }
     });
   }

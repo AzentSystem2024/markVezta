@@ -4,15 +4,15 @@
       #dataGrid
       noDataText="No data available"
       [width]="'100%'"
-      [height]="'75vh'"
+      [height]="'82vh'"
       [loadPanel]="{
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
-      [dataSource]="filteredInventoryList"
+      [dataSource]="filteredDeliveryList"
       [showBorders]="true"
       [showColumnLines]="true"
       [showBorders]="true"
@@ -30,14 +30,21 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
-      (onEditingStart)="onEditInventory($event)"
-      (onRowRemoving)="onDeleteInventory($event)"
+      (onEditingStart)="onEditDelivery($event)"
+      (onCellPrepared)="onCellPrepared($event)"
+      (onRowRemoving)="onDeleteDelivery($event)"
     >
       <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -61,20 +68,39 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Physical Inventory</div>
+          <div class="grid-header">Delivery Note</div>
         </dxi-item>
+
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
         <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
-          [visible]="canAdd"
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
@@ -86,7 +112,7 @@
           [(value)]="selectedDateRange"
           (onValueChanged)="onDateRangeChanged($event)"
           (onOpened)="attachItemClickHandler($event)"
-          width="180"
+          width="220"
         >
           <div *dxTemplate="let item of 'item'">
             {{ item.value === "custom" ? "Custom" : item.label }}
@@ -94,171 +120,146 @@
         </dx-select-box>
       </div>
       <dxi-column
-        dataField="PHYSICAL_NO"
-        caption="Inventory No."
+        dataField="DN_NO"
+        caption="Delivery No."
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
-        dataField="PHYSICAL_DATE"
+        dataField="REF_NO"
+        caption="Reference No."
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="DN_DATE"
         caption="Date"
         dataType="date"
-        [width]="'auto'"
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
+      <!-- <dxi-column
+        dataField="DN_DATE"
+        caption="Delivery Date"
+        [allowEditing]="false"
+        dataType="date"
+        [format]="{ type: 'custom', formatter: formatDate }"
+      >
+      </dxi-column> -->
+
       <dxi-column
-        dataField="STORE_NAME"
-        caption="Store."
+        dataField="COMPANY_NAME"
+        caption="Company"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
-        dataField="REASON_DESCRIPTION"
-        caption="Reason"
+        dataField="CUSTOMER_NAME"
+        caption="Customer"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
-        dataField="NARRATION"
-        caption="Narration"
+        dataField="TOTAL_QTY"
+        caption="Total Qty"
+        dataType="number"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
         caption="Status"
-        dataField="TRANS_STATUS"
+        dataField="STATUS"
+        [width]="80"
         [cellTemplate]="statusCellRender"
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
       >
       </dxi-column>
+      <dxo-summary>
+        <dxi-total-item
+          column="TOTAL_QTY"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          alignment="right"
+        >
+        </dxi-total-item>
+      </dxo-summary>
     </dx-data-grid>
   </div>
 </div>
 
-<dx-popup
-  [(visible)]="isPrePopupVisible"
-  [width]="'40vw'"
-  [height]="'auto'"
-  title="Select Data"
-  [showCloseButton]="true"
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
 >
-  <div style="padding: 20px">
-    <dx-form [formData]="prePopupData" [colCount]="1">
-      <dxi-item>
-        <dx-tag-box
-          [dataSource]="department"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="prePopupData.DEPT_ID"
-          [width]="'100%'"
-          [showSelectionControls]="true"
-          label="Department"
-          labelMode="floating"
-          [searchEnabled]="true"
-          [multiline]="false"
-          [title]="getTagBoxTooltip()"
-        ></dx-tag-box>
-      </dxi-item>
+</app-custom-date-popup>
 
-      <dxi-item>
-        <dx-tag-box
-          [dataSource]="brand"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="prePopupData.BRAND_ID"
-          [width]="'100%'"
-          [showSelectionControls]="true"
-          label="Brand"
-          labelMode="floating"
-          [multiline]="false"
-          [searchEnabled]="true"
-          [title]="getTagBoxTooltipForBrand()"
-        ></dx-tag-box>
-      </dxi-item>
+<!-- <dx-popup
+  [(visible)]="showCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="170"
+  [dragEnabled]="false"
+>
+  <div>
+    <div class="date-range-container">
+      <dx-date-box
+        [(value)]="customStartDate"
+        type="date"
+        width="300"
+        placeholder="From Date"
+        displayFormat="dd-MM-yyyy"
+      >
+      </dx-date-box>
 
-      <dxi-item>
-        <dx-tag-box
-          [dataSource]="supplier"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="prePopupData.SUPP_ID"
-          [width]="'100%'"
-          label="Supplier"
-          labelMode="floating"
-          [searchEnabled]="true"
-          [multiline]="false"
-          [showSelectionControls]="true"
-          [title]="getTagBoxTooltipForSupplier()"
-        ></dx-tag-box>
-      </dxi-item>
+      <dx-date-box
+        [(value)]="customEndDate"
+        type="date"
+        displayFormat="dd-MM-yyyy"
+        placeholder="To Date"
+        width="300"
+      >
+      </dx-date-box>
+    </div>
 
-      <dxi-item>
-        <dx-tag-box
-          [dataSource]="category"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="prePopupData.CAT_ID"
-          [width]="'100%'"
-          label="Category"
-          labelMode="floating"
-          [searchEnabled]="true"
-          [multiline]="false"
-          [showSelectionControls]="true"
-          [title]="getTagBoxTooltipForCategory()"
-        ></dx-tag-box>
-      </dxi-item>
-      <dxi-item>
-        <dx-check-box
-          [(value)]="prePopupData.ALL_ITEMS"
-          text="All Items"
-        ></dx-check-box>
-      </dxi-item>
-    </dx-form>
-
-    <div style="text-align: right; margin-top: 20px">
-      <dx-button
-        text="Cancel"
-        type="normal"
-        (onClick)="closePrePopup()"
-        style="margin-right: 10px"
-      ></dx-button>
+    <div class="button-container">
       <dx-button
         text="Apply"
         type="default"
-        (onClick)="applyPrePopup()"
+        (onClick)="applyCustomDateFilter()"
       ></dx-button>
     </div>
   </div>
+</dx-popup> -->
+
+<dx-popup
+  [(visible)]="isAddDelivery"
+  [width]="'80vw'"
+  [height]="'95vh'"
+  title="Delivery Note"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isAddDelivery">
+    <app-delivery-note-form-finance
+      (popupClosed)="handleClose()"
+    ></app-delivery-note-form-finance>
+  </ng-container>
 </dx-popup>
 
 <dx-popup
-  [(visible)]="isAddInventory"
-  [width]="'75vw'"
-  [height]="'100vh'"
-  title="Physical Inventory"
+  [(visible)]="isEditDelivery"
+  [width]="'80vw'"
+  [height]="'90vh'"
+  title="Delivery Note"
   (onHiding)="handleClose()"
 >
-  <ng-container *ngIf="isAddInventory">
-    <app-physical-inventory-form
-      [filterData]="prePopupData"
-      (popupClosed)="handleClose()"
-    ></app-physical-inventory-form>
-  </ng-container>
-</dx-popup>
-<dx-popup
-  [(visible)]="isEditInventory"
-  [width]="'75vw'"
-  [height]="'100vh'"
-  title="Physical Inventory"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditInventory">
-    <app-physical-inventory-form
+  <ng-container *ngIf="isEditDelivery">
+    <app-delivery-note-form-finance
       [isEditing]="true"
-      [EditingResponseData]="selectedInventory"
-      [isReadOnlyMode]="isReadOnlyInventory"
+      [EditingResponseData]="selectedDelivery"
+      [isReadOnlyMode]="isReadOnlyDelivery"
       (popupClosed)="handleClose()"
-    ></app-physical-inventory-form>
+    ></app-delivery-note-form-finance>
   </ng-container>
 </dx-popup>

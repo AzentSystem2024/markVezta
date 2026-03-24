@@ -575,7 +575,7 @@ export class SalesOrderFinanceComponent {
   addSalesOrder() {
     this.isAddSalesOrder = true;
   }
-  
+
   handleClose() {
     this.isAddSalesOrder = false;
     this.isEditSalesOrder = false;

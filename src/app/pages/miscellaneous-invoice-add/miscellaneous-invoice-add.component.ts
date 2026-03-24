@@ -391,7 +391,7 @@ export class MiscellaneousInvoiceAddComponent {
     this.debitFormData.DUE_AMOUNT = selected.PENDING_AMOUNT;
     this.debitFormData.INVOICE_ID = selected.BILL_ID;
 
-    // ✅ STORE GST & HSN FROM INVOICE
+    // ✅  STORE GST & HSN FROM INVOICE
     this.selectedInvoiceGST = Number(selected.GST_PERC) || 0;
     this.selectedInvoiceHSN = selected.HSN_CODE || '';
 

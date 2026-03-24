@@ -138,15 +138,11 @@ export class VatClassListComponent {
     );
 
     this.subType = userData?.Configuration?.[0]?.SUB_TYPE_ID || 0;
-    console.log(this.subType, 'SUBTYPEEEEEEEEE');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      console.log(userData.Configuration, 'CONFIGURATIONNNNNNNNNNN');
       const selectedCompany = userData?.SELECTED_COMPANY;
-      console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
       this.companyState = selectedCompany.STATE_NAME;
       this.companyStateID = selectedCompany.STATE_ID;
-      console.log(this.companyStateID, 'COMPANYSTATE');
       this.HSNCODE = userData.GeneralSettings.HSN_CODE;
       this.GST = userData.GeneralSettings.GST_PERC;
       if (selectedCompany?.COMPANY_ID) {
@@ -240,8 +236,6 @@ export class VatClassListComponent {
 
     const payload = this.vatclassComponent.getNewVatclassData();
     payload.COMPANY_ID = this.selectedCompanyId;
-    console.log('Inserted Data:', payload);
-
     this.dataservice.postVatclassData(payload).subscribe((response) => {
       if (response) {
         this.formClosed.emit();
@@ -251,57 +245,6 @@ export class VatClassListComponent {
     });
   }
 
-  // onClickSaveVatclass() {
-  //   const {
-  //     COMPANY_ID,
-  //     CODE,
-  //     VAT_NAME,
-  //     CGST_PERC,
-  //     CGST_INPUT_HEAD_ID,
-  //     CGST_OUTPUT_HEAD_ID,
-  //     SGST_PERC,
-  //     SGST_INPUT_HEAD_ID,
-  //     SGST_OUTPUT_HEAD_ID,
-  //     IGST_PERC,
-  //     IGST_INPUT_HEAD_ID,
-  //     IGST_OUTPUT_HEAD_ID,
-  //   } = this.vatclassComponent.getNewVatclassData();
-  //   console.log(
-  //     'inserted data',
-  //     CODE,
-  //     VAT_NAME,
-  //     CGST_PERC,
-  //     CGST_INPUT_HEAD_ID,
-  //     CGST_OUTPUT_HEAD_ID,
-  //     SGST_PERC,
-  //     SGST_INPUT_HEAD_ID,
-  //     SGST_OUTPUT_HEAD_ID,
-  //     IGST_PERC,
-  //     IGST_INPUT_HEAD_ID,
-  //     IGST_OUTPUT_HEAD_ID,
-  //   );
-  //   this.dataservice
-  //     .postVatclassData(
-  //       CODE,
-  //       VAT_NAME,
-  //       CGST_PERC,
-  //       CGST_INPUT_HEAD_ID,
-  //       CGST_OUTPUT_HEAD_ID,
-  //       SGST_PERC,
-  //       SGST_INPUT_HEAD_ID,
-  //       SGST_OUTPUT_HEAD_ID,
-  //       IGST_PERC,
-  //       IGST_INPUT_HEAD_ID,
-  //       IGST_OUTPUT_HEAD_ID,
-  //     )
-  //     .subscribe((response) => {
-  //       if (response) {
-  //         this.formClosed.emit();
-  //         this.isAddVatclassPopupOpened = false;
-  //         this.showVatclass();
-  //       }
-  //     });
-  // }
   onRowRemoving(event) {
     event.cancel = true;
     const selectedRow = event.data;
@@ -337,7 +280,6 @@ export class VatClassListComponent {
     event.cancel = true; // Prevent the default editing behavior
     const id = event.data.ID;
     this.dataservice.select_Vatclass_Data(id).subscribe((response) => {
-      console.log(response, 'selected data');
       this.selected_data = response;
       this.isEditVatclassPopupOpened = true;
     });

@@ -145,6 +145,7 @@ export class AddDebitComponent {
   subType: boolean = false;
   subTypeList: any;
   selectedSubTypeId: any;
+  vatTitle: any;
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -174,7 +175,7 @@ export class AddDebitComponent {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -344,28 +345,30 @@ export class AddDebitComponent {
     this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
       // ✅ Set HSN from invoice
       row.HSN_CODE = this.selectedInvoiceHSN;
+      row.GST_PERC = this.selectedInvoiceGST;
+      row.CGST = 0;
+      row.SGST = 0;
+      // if (isSameState) {
+      //   // SAME STATE → CGST + SGST
+      //   const half = this.selectedInvoiceGST / 2;
 
-      if (isSameState) {
-        // SAME STATE → CGST + SGST
-        const half = this.selectedInvoiceGST / 2;
+      //   row.CGST = half;
+      //   row.SGST = half;
+      //   row.GST_PERC = 0;
 
-        row.CGST = half;
-        row.SGST = half;
-        row.GST_PERC = 0;
+      //   this.showCGST = true;
+      //   this.showSGST = true;
+      //   this.showGST = false;
+      // } else {
+      //   // DIFFERENT STATE → IGST
+      //   row.GST_PERC = this.selectedInvoiceGST;
+      //   row.CGST = 0;
+      //   row.SGST = 0;
 
-        this.showCGST = true;
-        this.showSGST = true;
-        this.showGST = false;
-      } else {
-        // DIFFERENT STATE → IGST
-        row.GST_PERC = this.selectedInvoiceGST;
-        row.CGST = 0;
-        row.SGST = 0;
-
-        this.showGST = true;
-        this.showCGST = false;
-        this.showSGST = false;
-      }
+      //   this.showGST = true;
+      //   this.showCGST = false;
+      //   this.showSGST = false;
+      // }
     });
   }
 
@@ -435,27 +438,34 @@ export class AddDebitComponent {
 
   calculateTaxAmount = (rowData: any) => {
     const amount = Number(rowData.Amount) || 0;
-
-    const companyState = this.companyState?.trim().toLowerCase();
-    const supplierState =
-      this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
-
-    const isSameState = companyState === supplierState;
-
-    let gstPerc = 0;
-
-    if (isSameState) {
-      // ✅ SAME STATE → CGST + SGST
-      const cgst = Number(rowData.CGST) || 0;
-      const sgst = Number(rowData.SGST) || 0;
-      gstPerc = cgst + sgst;
-    } else {
-      // ✅ DIFFERENT STATE → IGST
-      gstPerc = Number(rowData.GST_PERC) || 0;
-    }
+    const gstPerc = Number(rowData.GST_PERC) || 0;
 
     return +((amount * gstPerc) / 100).toFixed(2);
   };
+
+  // calculateTaxAmount = (rowData: any) => {
+  //   const amount = Number(rowData.Amount) || 0;
+
+  //   const companyState = this.companyState?.trim().toLowerCase();
+  //   const supplierState =
+  //     this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+  //   const isSameState = companyState === supplierState;
+
+  //   let gstPerc = 0;
+
+  //   if (isSameState) {
+  //     // ✅ SAME STATE → CGST + SGST
+  //     const cgst = Number(rowData.CGST) || 0;
+  //     const sgst = Number(rowData.SGST) || 0;
+  //     gstPerc = cgst + sgst;
+  //   } else {
+  //     // ✅ DIFFERENT STATE → IGST
+  //     gstPerc = Number(rowData.GST_PERC) || 0;
+  //   }
+
+  //   return +((amount * gstPerc) / 100).toFixed(2);
+  // };
 
   onEditorPreparing(e: any) {
     if (
@@ -655,15 +665,14 @@ export class AddDebitComponent {
               SGST: 0,
             };
 
-            // ⭐ APPLY GST
+            //  APPLY GST
             if (this.selectedInvoiceGST) {
-              if (isSameState) {
-                const half = this.selectedInvoiceGST / 2;
-                newRow.CGST = half;
-                newRow.SGST = half;
-              } else {
-                newRow.GST_PERC = this.selectedInvoiceGST;
-              }
+              //  ALWAYS SET GST_PERC FOR UI
+              newRow.GST_PERC = this.selectedInvoiceGST;
+
+              // Keep split hidden in UI
+              newRow.CGST = 0;
+              newRow.SGST = 0;
             }
 
             this.debitFormData.NOTE_DETAIL.push(newRow);
@@ -973,14 +982,33 @@ export class AddDebitComponent {
     );
 
     //  FINAL TAX CLEANUP (VERY IMPORTANT)
+    // ✅ FINAL TAX LOGIC (BASED ON STATE)
+    // const companyState = this.companyState?.trim().toLowerCase();
+    // const supplierState =
+    //   this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+    // const isSameState = companyState === supplierState;
+
+    // ✅ FINAL TAX LOGIC (BASED ON STATE)
+    const companyState = this.companyState?.trim().toLowerCase();
+    const supplierState =
+      this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+    const isSameState = companyState === supplierState;
+
     this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
-      if (row.CGST > 0 || row.SGST > 0) {
-        // CGST / SGST present → clear IGST
+      const gstPerc = Number(row.GST_PERC) || 0;
+
+      if (isSameState) {
+        // SAME STATE → split into CGST + SGST
+        row.CGST = gstPerc / 2;
+        row.SGST = gstPerc / 2;
         row.GST_PERC = 0;
-      } else if (row.GST_PERC > 0) {
-        // IGST present → clear CGST & SGST
+      } else {
+        // DIFFERENT STATE → keep GST_PERC (IGST)
         row.CGST = 0;
         row.SGST = 0;
+        row.GST_PERC = gstPerc;
       }
     });
 
@@ -1098,17 +1126,9 @@ export class AddDebitComponent {
     };
 
     if (this.selectedInvoiceGST) {
-      if (isSameState) {
-        const half = this.selectedInvoiceGST / 2;
-
-        newRow.CGST = half;
-        newRow.SGST = half;
-        newRow.GST_PERC = 0;
-      } else {
-        newRow.GST_PERC = this.selectedInvoiceGST;
-        newRow.CGST = 0;
-        newRow.SGST = 0;
-      }
+      newRow.GST_PERC = this.selectedInvoiceGST;
+      newRow.CGST = 0;
+      newRow.SGST = 0;
     }
 
     // push row

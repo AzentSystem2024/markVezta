@@ -105,6 +105,7 @@ export class EditPurchaseInvoiceComponent {
   user_id: any;
   store_id: any;
   isSaving = false;
+  vatTilte: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -118,6 +119,14 @@ export class EditPurchaseInvoiceComponent {
   }
 
   ngOnInit() {
+    const userDataString = localStorage.getItem('userData');
+    if (!userDataString) return;
+
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData.SELECTED_COMPANY;
+    this.vatTilte = userData.GeneralSettings.VAT_TITLE;
+    console.log(this.vatTilte, 'VATTITLE');
+
     // this.getSupplierDropdown();
     this.getSupplierOrUnitLst();
     // this.getPendingGRNList();
@@ -173,19 +182,6 @@ export class EditPurchaseInvoiceComponent {
       // ---------------------------------------------------------
       // CONDITION: SAME STATE → CGST + SGST, DIFFERENT → GST ONLY
       // ---------------------------------------------------------
-      if (companyState === supplierState) {
-        console.log('Same state → Apply CGST + SGST');
-
-        this.showCGST = true;
-        this.showSGST = true;
-        this.showGST = false;
-      } else {
-        console.log('Different state → Apply GST only');
-
-        this.showCGST = false;
-        this.showSGST = false;
-        this.showGST = true;
-      }
 
       // ---------------------------------------------------------
       // Supplier ID assignment
@@ -263,7 +259,8 @@ export class EditPurchaseInvoiceComponent {
       this.mainGridData?.forEach((row: any) => {
         row.CGST = half;
         row.SGST = half;
-        row.VAT_PERC = 0; // GST becomes zero in same-state case
+        row.VAT_PERC = parseFloat(row.VAT_PERC) || 0;
+        // row.VAT_PERC = 0; // GST becomes zero in same-state case
       });
     } else {
       console.log('States DIFFERENT → GST applies');
@@ -439,16 +436,16 @@ export class EditPurchaseInvoiceComponent {
       const supplierState =
         this.purchaseInvoiceFormData?.SUPP_STATE_NAME?.trim().toLowerCase();
 
-      let igst = 0,
-        cgst = 0,
-        sgst = 0;
+      // let igst = 0,
+      //   cgst = 0,
+      //   sgst = 0;
 
-      if (companyState === supplierState) {
-        cgst = gstPerc / 2;
-        sgst = gstPerc / 2;
-      } else {
-        igst = gstPerc;
-      }
+      // if (companyState === supplierState) {
+      //   cgst = gstPerc / 2;
+      //   sgst = gstPerc / 2;
+      // } else {
+      //   igst = gstPerc;
+      // }
 
       const newRow: any = {
         GRN_ID: row.GRN_ID,
@@ -466,9 +463,9 @@ export class EditPurchaseInvoiceComponent {
         HSN_CODE: row.HSN_CODE,
 
         // ✅ GST FROM GRN
-        VAT_PERC: igst,
-        CGST: cgst,
-        SGST: sgst,
+        VAT_PERC: gstPerc,
+        // CGST: cgst,
+        // SGST: sgst,
 
         AMOUNT: 0,
         VAT_AMOUNT: 0,
@@ -635,8 +632,8 @@ export class EditPurchaseInvoiceComponent {
           PENDING_QTY: 0,
           GRN_QUANTITY: 0,
           NARRATION: this.purchaseInvoiceFormData.NARRATION,
-          SGST: item.SGST,
-          CGST: item.CGST,
+          // SGST: item.SGST,
+          // CGST: item.CGST,
           // GST: item.GST ?? 0,
         };
       },
@@ -737,7 +734,7 @@ export class EditPurchaseInvoiceComponent {
   }
 
   get formattedNetAmount(): string {
-    const value = Number(this.grandTotal || 0);
+    const value = Number(this.netAmount || this.grandTotal || 0);
     return value.toLocaleString('en-IN', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -748,12 +745,12 @@ export class EditPurchaseInvoiceComponent {
   }
 
   onRoundOffChange() {
+    const total = Number(this.grandTotal) || 0;
+
     if (this.purchaseInvoiceFormData.ROUND_OFF) {
-      // Round Off Enabled
-      this.netAmount = Math.round(this.grandTotal).toFixed(2);
+      this.netAmount = Math.round(total).toFixed(2);
     } else {
-      // Round Off Disabled → return to original value
-      this.netAmount = Number(this.grandTotal).toFixed(2);
+      this.netAmount = total.toFixed(2);
     }
   }
 

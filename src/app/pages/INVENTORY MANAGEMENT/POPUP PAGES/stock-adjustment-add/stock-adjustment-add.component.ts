@@ -5,7 +5,6 @@ import {
   Input,
   NgModule,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -44,10 +43,7 @@ import { FormTextboxModule } from 'src/app/components';
 
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
-import CustomStore from 'devextreme/data/custom_store';
-import DataSource from 'devextreme/data/data_source';
 import notify from 'devextreme/ui/notify';
-import { Console } from 'console';
 
 @Component({
   selector: 'app-stock-adjustment-add',
@@ -117,14 +113,17 @@ export class StockAdjustmentAddComponent {
     // this.getTransferNo(); // always fetch fresh number when popup opens
 
     const currentUrl = this.router.url;
-
+    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    console.log('Parsed ObjectData==================:', menuResponse);
+    console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     console.log(this.storeFromSession);
     console.log(menuResponse.MenuGroups);
@@ -148,11 +147,12 @@ export class StockAdjustmentAddComponent {
     }
     this.getStoreDropdown();
     this.getReasonsDropdown();
-
+    console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete, this.canApprove);
     // this.items = [];
     // this.addEmptyRow();
     this.ENABLE_Matrix_Code = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
+    console.log(this.ENABLE_Matrix_Code);
   }
   onSelectItems() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
@@ -206,14 +206,23 @@ export class StockAdjustmentAddComponent {
   }
 
   getReasonsDropdown() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'REASON',
+    };
+    console.log(payload);
     this.dataService
-      .getrReasonDropdownData('REASONS')
+      .getrReasonDropdownData(payload)
       .subscribe((response: any) => {
         this.reasons = response;
       });
   }
   getStoreDropdown() {
-    this.dataService.getDropdownData('STORE').subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'STORE',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.stores = response;
     });
   }
@@ -221,30 +230,40 @@ export class StockAdjustmentAddComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    console.log('Parsed ObjectData==================:', menuResponse);
+    console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     console.log(this.storeFromSession);
-
-    const payload = {
-      STORE_ID: this.storeFromSession,
-    };
-
-    this.dataService.Get_item_list(payload).subscribe((res: any) => {
-      this.items = res.Data;
-    });
   }
   cancel() {
     this.popupClosed.emit();
   }
   d;
   onAddItems() {
+    if (!this.adjustmentFormData.STORE_ID) {
+      notify('Please select a store to add items', 'error');
+      return;
+    }
     this.isPopupVisible = true;
+    const payload = {
+      STORE_ID: this.adjustmentFormData.STORE_ID,
+    };
+
+    console.log(payload);
+    this.dataService.Get_item_list(payload).subscribe((res: any) => {
+      console.log(res);
+      this.items = res.Data;
+    });
   }
   onPopupHiding() {}
+
   updateNetAmount(event: any) {}
+
   SaveStockAdjustment() {
     console.log(this.adjustmentFormData);
     const ITEM_Details = this.adjustmentFormData.Details;
@@ -278,6 +297,7 @@ export class StockAdjustmentAddComponent {
       NET_AMOUNT: this.totalAmount,
       Details: transformed,
     };
+    console.log(payload);
 
     if (!this.adjustmentFormData.STORE_ID) {
       notify('Please select a store ', 'error');
@@ -298,15 +318,27 @@ export class StockAdjustmentAddComponent {
     this.dataService
       .Insert_Stock_Adjustment_Data(payload)
       .subscribe((res: any) => {
-        notify(
-          {
-            message: ' Stock Adjustment Inserted successfully',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 1000,
-          },
-          'success',
-        );
-        this.popupClosed.emit();
+        if (res.Flag === '1') {
+          console.log(res);
+          notify(
+            {
+              message: ' Stock Adjustment Inserted successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 1000,
+            },
+            'success',
+          );
+          this.popupClosed.emit();
+        } else {
+          notify(
+            {
+              message: res.Message || 'Failed to insert Stock Adjustment',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 1000,
+            },
+            'error',
+          );
+        }
       });
   }
   formatDate(date: Date): string {
@@ -319,6 +351,7 @@ export class StockAdjustmentAddComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
     const data = this.EditingResponseData;
+    console.log(data);
 
     this.adjustmentFormData = {
       ID: data.ID,
@@ -348,7 +381,9 @@ export class StockAdjustmentAddComponent {
     console.log('Total Amount:', this.totalAmount);
     this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
   }
+
   onSelectPackAdd(e: any) {}
+
   onEditPackUpdate(e: any) {}
 
   onCellValueChanged(e: any) {

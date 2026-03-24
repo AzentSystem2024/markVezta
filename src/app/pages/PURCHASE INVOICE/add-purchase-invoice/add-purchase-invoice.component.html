@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 85vh;
+      height: 88vh;
       display: flex;
       flex-direction: column;
 
@@ -211,18 +211,13 @@
           ></dxi-column>
           <dxi-column
             dataField="VAT_PERC"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? 'VAT %'
-                : ' IGST %'
-            "
+            [caption]="vatTilte + ' %'"
             dataType="number"
             [width]="80"
-            [visible]="showGST"
             [allowEditing]="true"
           ></dxi-column>
 
-          <dxi-column
+          <!-- <dxi-column
             dataField="CGST"
             caption="CGST"
             dataType="number"
@@ -236,7 +231,7 @@
             dataType="number"
             [visible]="showSGST"
             [allowEditing]="false"
-          ></dxi-column>
+          ></dxi-column> -->
           <dxi-column
             dataField="TAX_AMOUNT"
             [caption]="
@@ -292,7 +287,12 @@
         </dx-data-grid>
 
         <div
-          style="display: flex; justify-content: flex-end; margin: 10px 20px"
+          style="
+            display: flex;
+            justify-content: flex-end;
+            margin: 10px 0;
+            justify-content: flex-end;
+          "
         >
           <div style="display: flex; align-items: center; gap: 16px">
             <!-- Round Off Checkbox -->
@@ -330,43 +330,55 @@
             </dx-text-box>
           </div>
 
-          <div class="form-popup-buttons-container">
-            <div class="popup-footer">
+          <div
+            style="
+              display: flex;
+              gap: 8px;
+              width: 100%;
+              justify-content: flex-end;
+            "
+          >
+            <div
+              class="popup-footer"
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+              "
+            >
+              <!-- Approve checkbox (TOP) -->
               <dx-check-box
                 text="Approve"
                 [(value)]="purchaseInvoiceFormData.IS_APPROVED"
               ></dx-check-box>
 
-              <dx-button
-                text="Cancel"
-                (onClick)="cancel()"
-                stylingMode="outlined"
-                type="normal"
-              ></dx-button>
-              <dx-button
-                #saveButtonRef
-                [text]="
-                  isSaving
-                    ? purchaseInvoiceFormData.IS_APPROVED
-                      ? 'Committing...'
-                      : 'Saving...'
-                    : purchaseInvoiceFormData.IS_APPROVED
-                      ? 'Commit'
-                      : 'Save'
-                "
-                [disabled]="isSaving"
-                stylingMode="contained"
-                type="default"
-                (onClick)="savePurchaseInvoice()"
-              ></dx-button>
+              <!-- Buttons row -->
+              <div style="display: flex; gap: 8px">
+                <dx-button
+                  text="Cancel"
+                  (onClick)="cancel()"
+                  stylingMode="outlined"
+                  type="normal"
+                ></dx-button>
 
-              <!-- <dx-button
-                #saveButtonRef
-                [text]="purchaseInvoiceFormData.IS_APPROVED ? 'Commit' : 'Save'"
-                stylingMode="contained"
-                type="default"
-                (onClick)="savePurchaseInvoice()"
-              ></dx-button> -->
+                <dx-button
+                  #saveButtonRef
+                  [text]="
+                    isSaving
+                      ? purchaseInvoiceFormData.IS_APPROVED
+                        ? 'Committing...'
+                        : 'Saving...'
+                      : purchaseInvoiceFormData.IS_APPROVED
+                        ? 'Commit'
+                        : 'Save'
+                  "
+                  [disabled]="isSaving"
+                  stylingMode="contained"
+                  type="default"
+                  (onClick)="savePurchaseInvoice()"
+                ></dx-button>
+              </div>
             </div>
           </div>
         </div>

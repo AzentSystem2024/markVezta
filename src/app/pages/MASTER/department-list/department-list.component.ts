@@ -76,16 +76,6 @@ export class DepartmentListComponent implements OnInit {
     `;
     },
   };
-  constructor(
-    private dataservice: DataService,
-    private exportService: ExportService,
-    private ngZone: NgZone,
-    private cdr: ChangeDetectorRef,
-    private router: Router,
-  ) {
-    this.sesstion_Details();
-    this.showDepartment();
-  }
 
   searchButtonOptions = {
     icon: 'search',
@@ -104,12 +94,24 @@ export class DepartmentListComponent implements OnInit {
     text: '',
   };
 
+  constructor(
+    private dataservice: DataService,
+    private exportService: ExportService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {
+    this.sesstion_Details();
+    this.showDepartment();
+  }
+
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
     this.showDepartment();
   }
+
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
@@ -125,6 +127,7 @@ export class DepartmentListComponent implements OnInit {
     this.isAddDepartmentPopupOpened = true;
     this.departmentComponent.resetButton();
   }
+  
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Department-list');
   }
@@ -156,21 +159,6 @@ export class DepartmentListComponent implements OnInit {
       this.department = response;
     });
   }
-
-  // addButtonOptions = {
-  //   text: 'New',
-  //   icon: 'bi bi-file-earmark-plus',
-  //   type: 'default',
-  //   stylingMode: 'contained',
-  //   hint: 'Add new entry',
-
-  //   onClick: () => {
-  //     // Run inside Angular's zone
-  //     this.ngZone.run(() => this.addDepartment());
-  //   },
-
-  //   elementAttr: { class: 'add-button' },
-  // };
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
