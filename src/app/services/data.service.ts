@@ -38,22 +38,24 @@ export interface ItemStorePayload {
 export class DataService {
   selected_Company_id: any;
   selected_fin_id: any;
-  getLeavesByEmployee(empId: number) {
-    throw new Error('Method not implemented.');
-  }
-  getDepartments() {
-    throw new Error('Method not implemented.');
-  }
-
-  get_version() {
-    return version;
-  }
+  private months: { name: string; value: any }[] = [
+    { name: 'All', value: '' },
+    { name: 'January', value: 0 },
+    { name: 'February', value: 1 },
+    { name: 'March', value: 2 },
+    { name: 'April', value: 3 },
+    { name: 'May', value: 4 },
+    { name: 'June', value: 5 },
+    { name: 'July', value: 6 },
+    { name: 'August', value: 7 },
+    { name: 'September', value: 8 },
+    { name: 'October', value: 9 },
+    { name: 'November', value: 10 },
+    { name: 'December', value: 11 },
+  ];
 
   private worksheetDataSubject = new BehaviorSubject<any>(null); // Initialize with null
   worksheetData$ = this.worksheetDataSubject.asObservable();
-  constructor(private http: HttpClient) {
-    // this.sesstion_Details();
-  }
 
   // private apiUrl = 'http://103.180.120.134/veztaretail/api';http://veztaapi.diligenzit.com/api/
   private apiUrl = environment.apiUrl;
@@ -76,6 +78,20 @@ export class DataService {
     'http://veztaapi.diligenzit.com/api/worksheetitemproperty';
   private apiUrlForStorePrices =
     'http://103.180.120.134/veztaretail/api/itemvizard';
+
+  constructor(private http: HttpClient) {
+    // this.sesstion_Details();
+  }
+  getLeavesByEmployee(empId: number) {
+    throw new Error('Method not implemented.');
+  }
+  getDepartments() {
+    throw new Error('Method not implemented.');
+  }
+
+  get_version() {
+    return version;
+  }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -274,24 +290,6 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}AC_CreditNote/select/` + id, {});
   }
 
-  // selectCreditNote(id: number) {
-  //   return this.http
-  //     .post<any>(`${this.apiUrl}AC_CreditNote/select/${id}`, {})
-  //     .pipe(
-  //       // ✅ CLONE RESPONSE TO PREVENT MUTATION ISSUES
-  //       map((res) => structuredClone(res))
-  //     );
-  // }
-
-  // selectCreditNote(id: number) {
-  //   return this.http
-  //     .post<any>(`${this.apiUrl}AC_CreditNote/select/${id}`, {})
-  //     .pipe(
-  //       // ✅ CLONE RESPONSE TO PREVENT MUTATION ISSUES
-  //       map((res) => structuredClone(res))
-  //     );
-  // }
-
   updateCreditNote(items: any) {
     const data = items;
     // console.log(data,"insert service")
@@ -386,22 +384,6 @@ export class DataService {
   getCustomerStateTrout_Invoice(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Trout_Invoice/cust`, data);
   }
-
-  private months: { name: string; value: any }[] = [
-    { name: 'All', value: '' },
-    { name: 'January', value: 0 },
-    { name: 'February', value: 1 },
-    { name: 'March', value: 2 },
-    { name: 'April', value: 3 },
-    { name: 'May', value: 4 },
-    { name: 'June', value: 5 },
-    { name: 'July', value: 6 },
-    { name: 'August', value: 7 },
-    { name: 'September', value: 8 },
-    { name: 'October', value: 9 },
-    { name: 'November', value: 10 },
-    { name: 'December', value: 11 },
-  ];
 
   getMonths(): { name: string; value: number }[] {
     return this.months;
@@ -715,7 +697,7 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}TransferIn/delete/` + id, {});
   }
   //........................................QUOTATION............................................//
- getQuotationMainList(data: any): Observable<any> {
+  getQuotationMainList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Quotation/list`, data);
   }
 
@@ -758,8 +740,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Quotation/GetLatestVoucherNumber`, {});
   }
 
-// ============== finance ========================
-   public getCustomerItemsData(data: any): Observable<any> {
+  // ============== finance ========================
+  public getCustomerItemsData(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Salesorder/getitem`, data);
   }
 
@@ -876,6 +858,10 @@ export class DataService {
   //----------------------------------------PHYSICAL-INVENTORY-------------------------------------------------//
   getPhysicalInventoryList(): Observable<any> {
     return this.http.post(`${this.apiUrl}PhysicalStock/list`, {});
+  }
+
+  getPhysicalInventoryListFinance(item: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}PhysicalStock/list`, item);
   }
 
   getItemsForInventory(data: any): Observable<any> {
@@ -1803,41 +1789,18 @@ export class DataService {
   postVatclassData(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
-  // public postVatclassData(
-  //   CODE: string,
-  //   VAT_NAME: string,
 
-  //   CGST_PERC: string | null,
-  //   CGST_INPUT_HEAD_ID: number | null,
-  //   CGST_OUTPUT_HEAD_ID: number | null,
+  postVatclassData_Finance(
+    CODE: any,
+    VAT_NAME: any,
+    VAT_PERC: any,
+    COMPANY_ID: AnyARecord,
+  ): Observable<any> {
+    const data = { CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
 
-  //   SGST_PERC: string | null,
-  //   SGST_INPUT_HEAD_ID: number | null,
-  //   SGST_OUTPUT_HEAD_ID: number | null,
+    return this.http.post(`${this.apiUrl}vatclass/save`, data);
+  }
 
-  //   IGST_PERC: string | null,
-  //   IGST_INPUT_HEAD_ID: number | null,
-  //   IGST_OUTPUT_HEAD_ID: number | null,
-  // ): Observable<any> {
-  //   const data = {
-  //     CODE,
-  //     VAT_NAME,
-
-  //     CGST_PERC,
-  //     CGST_INPUT_HEAD_ID,
-  //     CGST_OUTPUT_HEAD_ID,
-
-  //     SGST_PERC,
-  //     SGST_INPUT_HEAD_ID,
-  //     SGST_OUTPUT_HEAD_ID,
-
-  //     IGST_PERC,
-  //     IGST_INPUT_HEAD_ID,
-  //     IGST_OUTPUT_HEAD_ID,
-  //   };
-
-  //   return this.http.post(`${this.apiUrl}vatclass/save`, data);
-  // }
   select_Vatclass_Data(id: any) {
     return this.http.post(`${this.apiUrl}vatclass/select/${id}`, {});
   }
@@ -1845,6 +1808,19 @@ export class DataService {
   updateVatclass(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
+
+  updateVatclass_Finance(
+    ID: any,
+    CODE: any,
+    VAT_NAME: any,
+    VAT_PERC: any,
+    COMPANY_ID: any,
+  ): Observable<any> {
+    const data = { ID, CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
+
+    return this.http.post(`${this.apiUrl}vatclass/save`, data);
+  }
+
   removeVatclass(id: any, code: any, vatname: any, vatperc: any) {
     const requestBody = {
       CODE: code,
@@ -6189,12 +6165,6 @@ The result can be exported to HTML or Markdown.`;
     };
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
-
-  //===================================Security Policy===================================
-  // get_securityPolicy_List() {
-  //   const getEndpoint = `${this.apiUrl}UserSecurity/usersecuritylist`;
-  //   return this.http.post(getEndpoint, {});
-  // }
 
   //===============GET PASSOWRD POLITY IN CHANGE PASSWORD=================
   getUserSecurityPolicityData() {

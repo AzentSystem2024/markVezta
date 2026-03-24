@@ -67,6 +67,7 @@ export class EditCreditNoteComponent {
   // @Input() creditFormData: any;
   private _creditFormData: any;
   creditHeader!: any;
+  vatTitle: any;
 
   @Input()
   set creditFormData(value: any) {
@@ -162,7 +163,7 @@ export class EditCreditNoteComponent {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -866,20 +867,9 @@ export class EditCreditNoteComponent {
 
   private calculateGstFromRow(row: any): number {
     const amount = Number(row.Amount) || 0;
+    const gstPerc = Number(row.GST_PERC) || 0;
 
-    const cgst = Number(row.CGST) || 0;
-    const sgst = Number(row.SGST) || 0;
-    const igst = Number(row.GST_PERC) || 0;
-
-    if (cgst > 0 || sgst > 0) {
-      return +((amount * (cgst + sgst)) / 100).toFixed(2);
-    }
-
-    if (igst > 0) {
-      return +((amount * igst) / 100).toFixed(2);
-    }
-
-    return 0;
+    return +((amount * gstPerc) / 100).toFixed(2);
   }
 
   // calculateTaxAmount = (row: any) => {

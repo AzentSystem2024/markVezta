@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 85vh;
+      height: 88vh;
       display: flex;
       flex-direction: column;
 
@@ -215,18 +215,13 @@
           ></dxi-column>
           <dxi-column
             dataField="VAT_PERC"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? 'VAT %'
-                : ' IGST %'
-            "
+            [caption]="vatTilte + ' %'"
             dataType="number"
-            [visible]="showGST"
             [width]="80"
-            [allowEditing]="!readOnly"
+            [allowEditing]="false"
           ></dxi-column>
 
-          <dxi-column
+          <!-- <dxi-column
             dataField="CGST"
             caption="CGST"
             dataType="number"
@@ -240,7 +235,7 @@
             dataType="number"
             [visible]="showSGST"
             [allowEditing]="false"
-          ></dxi-column>
+          ></dxi-column> -->
           <dxi-column
             dataField="TAX_AMOUNT"
             [caption]="
@@ -295,9 +290,7 @@
           </dxo-summary>
         </dx-data-grid>
 
-        <div
-          style="display: flex; justify-content: flex-end; margin: 10px 20px"
-        >
+        <div style="display: flex; justify-content: flex-end; margin: 10px 0px">
           <div style="display: flex; align-items: center; gap: 16px">
             <!-- Round Off Checkbox -->
             <dx-check-box
@@ -330,38 +323,54 @@
             ></dx-text-box>
           </div>
 
-          <div class="form-popup-buttons-container">
-            <div class="popup-footer">
+          <div
+            style="
+              display: flex;
+              gap: 8px;
+              width: 100%;
+              justify-content: flex-end;
+            "
+          >
+            <div
+              class="popup-footer"
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 6px;
+              "
+            >
               <dx-check-box
                 *ngIf="!readOnly"
                 text="Approve"
                 [(value)]="isApproved"
                 [readOnly]="readOnly"
               ></dx-check-box>
-
-              <dx-button
-                text="Cancel"
-                (onClick)="cancel()"
-                stylingMode="outlined"
-                type="normal"
-              ></dx-button>
-              <dx-button
-                #saveButtonRef
-                [text]="
-                  isSaving
-                    ? readOnly
-                      ? 'Opening...'
-                      : 'Saving...'
-                    : readOnly
-                      ? 'PDF'
-                      : 'Save'
-                "
-                [disabled]="isSaving"
-                stylingMode="contained"
-                type="default"
-                (onClick)="readOnly ? openPDF() : savePurchaseInvoice()"
-              ></dx-button>
-
+              <div style="display: flex; gap: 8px">
+                <dx-button
+                  text="Cancel"
+                  (onClick)="cancel()"
+                  stylingMode="outlined"
+                  type="normal"
+                ></dx-button>
+                <dx-button
+                  *ngIf="!readOnly"
+                  #saveButtonRef
+                  [text]="
+                    isSaving
+                      ? readOnly
+                        ? 'Opening...'
+                        : 'Saving...'
+                      : readOnly
+                        ? 'PDF'
+                        : 'Save'
+                  "
+                  [disabled]="isSaving"
+                  stylingMode="contained"
+                  type="default"
+                  (onClick)="savePurchaseInvoice()"
+                ></dx-button>
+              </div>
               <!-- <dx-button
                 #saveButtonRef
                 [text]="readOnly ? 'PDF' : 'Save'"

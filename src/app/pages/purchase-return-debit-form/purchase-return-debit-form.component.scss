@@ -101,31 +101,16 @@
   display: block;
 }
 
-// .form-popup-buttons-container {
-//   display: flex;
-//   justify-content: flex-end;
-
-//   //   padding: 4px 10px 0 10px;
-//   //   margin-top: -10px; /* ⬅ increased from -6px to -10px */
-// }
-// .form-popup-buttons-container {
-//   display: flex;
-//   justify-content: flex-end;
-//   padding: 10px 0 0 0; // no side padding since parent already has it
-//   margin-right: 12px;
-//   margin-top: 20px;
-// }
-
 .form-popup-buttons-container {
   display: flex;
-  align-items: center;
+  align-items: column;
   justify-content: flex-end; /* buttons on the right */
-  gap: 15px; /* space between approve and buttons */
+  gap: 6px; /* space between approve and buttons */
 }
 
-.approve-container {
-  margin-left: auto; /* pushes approve checkbox to left */
-}
+// .approve-container {
+//   margin-left: auto; /* pushes approve checkbox to left */
+// }
 
 .popup-footer {
   display: flex;

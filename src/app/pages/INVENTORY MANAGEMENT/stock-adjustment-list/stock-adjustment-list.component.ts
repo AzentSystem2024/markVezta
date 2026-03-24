@@ -40,9 +40,9 @@ import { FormTextboxModule } from 'src/app/components';
 
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
-import { StockAdjustmentEditModule } from '../stock-adjustment-edit/stock-adjustment-edit.component';
-import { StockAdjustmentAddModule } from '../stock-adjustment-add/stock-adjustment-add.component';
+import { StockAdjustmentEditModule } from '../POPUP PAGES/stock-adjustment-edit/stock-adjustment-edit.component';
 import notify from 'devextreme/ui/notify';
+import { StockAdjustmentAddModule } from '../POPUP PAGES/stock-adjustment-add/stock-adjustment-add.component';
 @Component({
   selector: 'app-stock-adjustment-list',
   templateUrl: './stock-adjustment-list.component.html',
@@ -140,12 +140,14 @@ export class StockAdjustmentListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-
+    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    console.log('Parsed ObjectData:', menuResponse);
     // this.sessionData_tax()
     const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -163,11 +165,12 @@ export class StockAdjustmentListComponent {
     }
     this.get_stock_adjustment_list();
   }
+
   applyCustomDateFilter() {
     const start = new Date(this.customStartDate); // keep as Date
     const end = new Date(this.customEndDate); // keep as Date
 
-    // ✅ Use Date objects for filtering
+    // Use Date objects for filtering
     this.dataService.List_Stock_Adjustment_Data().subscribe((res: any) => {
       const allData = res.Data;
       this.filteredStockList = allData.filter((item: any) => {
@@ -176,33 +179,21 @@ export class StockAdjustmentListComponent {
       });
     });
 
-    // // ✅ Format dates for label only
-    // const fromLabel = this.formatAsDDMMYYYY(start);
-    // const toLabel = this.formatAsDDMMYYYY(end);
-    // this.customLabel = `${fromLabel} to ${toLabel}`;
-    // ✅ Update dateRanges array label
     const customOption = this.dateRanges.find((dr) => dr.value === 'custom');
     if (customOption) {
       customOption.label = this.customLabel;
     }
 
-    // ✅ Mark selected
+    // Mark selected
     this.selectedDateRange = 'custom';
 
-    // ✅ Close popup
+    // Close popup
     this.showCustomDatePopup = false;
   }
 
-  // Example formatter (dd/MM/yyyy)
-  // formatAsDDMMYYYY(date: Date): string {
-  //   const day = date.getDate().toString().padStart(2, '0');
-  //   const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  //   const year = date.getFullYear();
-  //   return `${day}/${month}/${year}`;
-  // }
-
   get_stock_adjustment_list() {
     this.dataService.List_Stock_Adjustment_Data().subscribe((res: any) => {
+      console.log(res);
       const allData = res.Data;
       const dateField = 'ADJ_DATE';
 
@@ -223,6 +214,7 @@ export class StockAdjustmentListComponent {
       // this.filteredStockList=res.Data
     });
   }
+
   formatDate(date: Date): string {
     const month = date.getMonth() + 1; // Months are 0-based
     const day = date.getDate();
@@ -249,6 +241,7 @@ export class StockAdjustmentListComponent {
   delete_Data(e: any) {
     const id = e.data.ID;
     this.dataService.Delete_Stock_Adjustment_Data(id).subscribe((res: any) => {
+      console.log(res);
       notify(
         {
           message: ' Stock Adjustment Deleted successfully',
@@ -261,9 +254,11 @@ export class StockAdjustmentListComponent {
       this.get_stock_adjustment_list();
     });
   }
+
   AddStock_adustment() {
     this.isAddStock_adj = true;
   }
+
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
@@ -282,22 +277,6 @@ export class StockAdjustmentListComponent {
     },
   ];
 
-  //   onDateRangeChanged(e: any) {
-  //     this.selectedDateRange = e.value;
-  // console.log(e,'==========date=================')
-  //     if (e.value === 'custom') {
-  //       this.customStartDate = null;
-  //       this.customEndDate = null;
-  //       this.showCustomDatePopup = true;
-  //     } else {
-  //       // Reset the custom label
-  //       const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
-  //       if (customOpt) {
-  //         customOpt.label = 'Custom';
-  //       }
-  //       // this.applyDateFilter();
-  //     }
-  //   }
   onEditStock(event: any) {
     event.cancel = true;
     this.is_Edit_popup = true;
@@ -306,6 +285,7 @@ export class StockAdjustmentListComponent {
       this.selected_Data = res.Data;
     });
   }
+
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 
@@ -326,6 +306,7 @@ export class StockAdjustmentListComponent {
       });
     }
   }
+
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 

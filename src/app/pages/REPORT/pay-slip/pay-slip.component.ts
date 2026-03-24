@@ -317,13 +317,10 @@ export class PaySlipComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
     this.selected_Company_name = sessionData.SELECTED_COMPANY.COMPANY_NAME;
     const sessionYear = sessionData.FINANCIAL_YEARS;
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;

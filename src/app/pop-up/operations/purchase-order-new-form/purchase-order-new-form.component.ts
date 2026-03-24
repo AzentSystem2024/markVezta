@@ -254,6 +254,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     const payload = {
       TRANS_TYPE: 17,
       COMPANY_ID: this.selected_Company_id,
+      SUB_TYPE_ID: 0,
     };
     this.service.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;

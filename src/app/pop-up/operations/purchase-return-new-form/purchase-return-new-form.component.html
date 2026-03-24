@@ -38,18 +38,7 @@
       </dx-date-box>
     </div>
 
-    <div class="right-section" style="flex: 1; margin-left: 10px">
-      <!-- <dx-select-box
-              label="Store"
-              labelMode="floating"
-              displayExpr="DESCRIPTION"
-              valueExpr="ID"
-              placeholder="Select Store"
-              [searchEnabled]="true"
-              [elementAttr]="{ class: 'grndropdown' }"
-              >
-            </dx-select-box> -->
-    </div>
+    <div class="right-section" style="flex: 1; margin-left: 10px"></div>
   </div>
 
   <!-- Second Row -->
@@ -92,10 +81,10 @@
                 dataField: 'GRN_DATE',
                 caption: 'GRN DATE',
                 dataType: 'date',
-                format: 'MM/dd/yyyy'
+                format: 'MM/dd/yyyy',
               },
               { dataField: 'SUPP_NAME', caption: 'SUPPLIER' },
-              { dataField: 'ID', caption: 'ID', visible: false }
+              { dataField: 'ID', caption: 'ID', visible: false },
             ]"
             [selection]="{ mode: 'single' }"
             [hoverStateEnabled]="true"
@@ -191,7 +180,7 @@
         showSpinButtons: true,
         min: 0,
         format: '#0',
-        mode: 'number'
+        mode: 'number',
       }"
     ></dxi-column>
     <dxi-column

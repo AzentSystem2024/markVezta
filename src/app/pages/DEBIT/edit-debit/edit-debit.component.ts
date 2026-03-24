@@ -120,6 +120,7 @@ export class EditDebitComponent {
   isUpdating = false;
   subType: boolean = false;
   subTypeList: any;
+  vatTitle: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -158,7 +159,7 @@ export class EditDebitComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
-
+      this.vatTitle = userData.GeneralSettings.VAT_TITLE;
       if (selectedCompany?.COMPANY_ID) {
         this.companyList = [selectedCompany]; // Show only selected company
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
@@ -228,6 +229,13 @@ export class EditDebitComponent {
               const match = this.ledgerList.find(
                 (l: any) => l.HEAD_ID === item.HEAD_ID,
               );
+              let gstPerc = 0;
+
+              if (item.GST_PERC && item.GST_PERC > 0) {
+                gstPerc = item.GST_PERC;
+              } else {
+                gstPerc = (Number(item.CGST) || 0) + (Number(item.SGST) || 0);
+              }
               return {
                 SL_NO: index + 1,
                 ...item,
@@ -237,9 +245,9 @@ export class EditDebitComponent {
                 Amount: item.AMOUNT || '',
                 gstAmount: item.GST_AMOUNT || '',
                 HSN_CODE: item.HSN_CODE || this.HSNCODE,
-                GST_PERC: item.GST_PERC || 0,
-                CGST: item.CGST || 0,
-                SGST: item.SGST || 0,
+                GST_PERC: gstPerc,
+                CGST: 0,
+                SGST: 0,
               };
             },
           );
@@ -293,30 +301,16 @@ export class EditDebitComponent {
     };
 
     // ---------- GST / CGST+SGST FROM SAVED DATA ----------
-    const baseRow = this.noteDetails[0]; // 🔑 source of truth
+    const baseRow = this.noteDetails[0]; // source of truth
 
     if (baseRow) {
-      if ((baseRow.CGST || 0) > 0 || (baseRow.SGST || 0) > 0) {
-        // ✅ SAME STATE → CGST + SGST
-        this.showCGST = true;
-        this.showSGST = true;
-        this.showGST = false;
+      //ALWAYS USE GST_PERC FOR UI
+      newRow.GST_PERC = baseRow.GST_PERC || 0;
 
-        newRow.CGST = baseRow.CGST || 0;
-        newRow.SGST = baseRow.SGST || 0;
-        newRow.GST_PERC = 0;
-      } else {
-        // ✅ DIFFERENT STATE → IGST
-        this.showGST = true;
-        this.showCGST = false;
-        this.showSGST = false;
+      //keep split hidden
+      newRow.CGST = 0;
+      newRow.SGST = 0;
 
-        newRow.GST_PERC = baseRow.GST_PERC || 0;
-        newRow.CGST = 0;
-        newRow.SGST = 0;
-      }
-
-      // ✅ Copy HSN from saved data
       newRow.HSN_CODE = baseRow.HSN_CODE || '';
     }
 
@@ -763,21 +757,25 @@ export class EditDebitComponent {
           const baseRow = this.noteDetails[0];
 
           if (baseRow) {
-            if ((baseRow.CGST || 0) > 0 || (baseRow.SGST || 0) > 0) {
-              this.showCGST = true;
-              this.showSGST = true;
-              this.showGST = false;
+            // ALWAYS USE GST_PERC FOR UI
 
-              newRow.CGST = baseRow.CGST || 0;
-              newRow.SGST = baseRow.SGST || 0;
+            let gstPerc = 0;
+
+            if (baseRow.GST_PERC && baseRow.GST_PERC > 0) {
+              gstPerc = baseRow.GST_PERC;
             } else {
-              this.showGST = true;
-              this.showCGST = false;
-              this.showSGST = false;
-
-              newRow.GST_PERC = baseRow.GST_PERC || 0;
+              // if old data had CGST + SGST → combine
+              gstPerc =
+                (Number(baseRow.CGST) || 0) + (Number(baseRow.SGST) || 0);
             }
 
+            newRow.GST_PERC = gstPerc;
+
+            //  DO NOT USE SPLIT IN UI
+            newRow.CGST = 0;
+            newRow.SGST = 0;
+
+            //Keep HSN
             newRow.HSN_CODE = baseRow.HSN_CODE || '';
           }
 

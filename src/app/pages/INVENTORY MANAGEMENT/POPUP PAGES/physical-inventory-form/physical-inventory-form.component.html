@@ -25,7 +25,7 @@
                     mode: 'cell',
                     allowAdding: true,
                     allowUpdating: true,
-                    allowDeleting: !isReadOnlyMode
+                    allowDeleting: !isReadOnlyMode,
                   }"
                   (onEditorPreparing)="onEditorPreparing($event)"
                   (onRowRemoving)="onRowRemoving($event)"
@@ -117,7 +117,6 @@
                   <dxi-column
                     dataField="STOCK_QTY"
                     caption="Qty Available"
-                    [format]="{ type: 'fixedPoint', precision: 2 }"
                   ></dxi-column>
                   <dxi-column
                     dataField="QTY_COUNTED"
@@ -262,7 +261,7 @@
                   [editing]="{
                     mode: 'cell',
 
-                    allowDeleting: !isReadOnlyMode
+                    allowDeleting: !isReadOnlyMode,
                   }"
                 >
                   <dxo-paging [pageSize]="10"></dxo-paging>

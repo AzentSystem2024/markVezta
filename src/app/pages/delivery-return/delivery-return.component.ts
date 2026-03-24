@@ -4,6 +4,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -53,7 +54,7 @@ import notify from 'devextreme/ui/notify';
   templateUrl: './delivery-return.component.html',
   styleUrls: ['./delivery-return.component.scss'],
 })
-export class DeliveryReturnComponent {
+export class DeliveryReturnComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   DeliveryReturnDatasource: any[] = [];
@@ -72,6 +73,25 @@ export class DeliveryReturnComponent {
   canApprove = false;
   canPrint = false;
 
+  addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.addDeliveryReturn());
+    },
+    elementAttr: { class: 'add-button' },
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -89,38 +109,6 @@ export class DeliveryReturnComponent {
     this.addDeliveryReturnPopupOpened = true;
   }
 
-  addButtonOptions = {
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
-
-    onClick: () => {
-      // Run inside Angular's zone
-      this.ngZone.run(() => this.addDeliveryReturn());
-    },
-
-    elementAttr: { class: 'add-button' },
-    template: () => {
-      return `
-      <div class="add-btn-content">
-        <span class="iconify"
-              data-icon="formkit:add"
-              data-width="20"
-              data-height="20"></span>
-        <span class="add-text">New</span>
-      </div>
-    `;
-    },
-  };
-
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
-
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
@@ -134,8 +122,8 @@ export class DeliveryReturnComponent {
     this.cdr.detectChanges();
   };
 
-  getStatusFlagClass(Status: string): string {
-    return Status == 'OPEN' ? 'flag-oranged' : 'flag-green';
+  getStatusFlagClass(Status: string): any {
+    // return Status == 'OPEN' ? 'flag-oranged' : 'flag-green';
   }
 
   onCellPrepared(e: any) {
@@ -162,13 +150,13 @@ export class DeliveryReturnComponent {
       .select_DeliveryRteurn_Data(id)
       .subscribe((response: any) => {
         this.DeliveryReturnData = response.Data;
-      });
+        });
   }
 
   get_DeliveryReturnList() {
     this.dataservice.get_DeliveryRteurn_Data().subscribe((response: any) => {
       this.DeliveryReturnDatasource = response.Data;
-    });
+      });
   }
 
   handleClose() {
