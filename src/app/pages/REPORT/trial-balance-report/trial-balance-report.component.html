@@ -174,11 +174,11 @@
       <dxi-column dataField="Category" caption="Category"></dxi-column>
       <dxi-column dataField="LedgerCode" caption="Ledger Code"></dxi-column>
       <dxi-column dataField="LedgerName" caption="Ledger Name"></dxi-column>
-      <dxi-column caption="Opening Balance" [width]="120" alignment="center">
+      <dxi-column caption="Opening Balance" cssClass="opening-header">
         <dxi-column
           dataField="OpeningBalanceDebit"
           caption="Debit"
-          [width]="130"
+          cssClass="opening-sub-header"
           [allowEditing]="false"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
@@ -187,7 +187,7 @@
         <dxi-column
           dataField="OpeningBalanceCredit"
           caption="Credit"
-          [width]="100"
+          cssClass="opening-sub-header"
           alignment="center"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
@@ -196,12 +196,12 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="During the Period" [width]="120" alignment="center">
+      <dxi-column caption="During the Period" cssClass="DuringPeriod-header">
         <dxi-column
           dataField="DuringThePeriodDebit"
           caption="Debit"
           alignment="right"
-          [width]="130"
+          cssClass="DuringPeriod-sub-header"
           [allowEditing]="false"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
@@ -210,7 +210,7 @@
           dataField="DuringThePeriodCredit"
           caption="Credit"
           alignment="center"
-          [width]="100"
+          cssClass="DuringPeriod-sub-header"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
@@ -218,12 +218,13 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Closing Balance" [width]="120" alignment="center">
+      <dxi-column caption="Closing Balance" cssClass="closing-header">
         <dxi-column
           dataField="ClosingBalanceDebit"
           caption="Debit"
           alignment="right"
           [width]="130"
+          cssClass="closing-sub-header"
           [allowEditing]="false"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
@@ -231,7 +232,7 @@
         <dxi-column
           dataField="ClosingBalanceCredit"
           caption="Credit"
-          [width]="100"
+          cssClass="closing-sub-header"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
