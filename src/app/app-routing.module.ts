@@ -218,6 +218,8 @@ import { StockAdjustmentListComponent } from './pages/INVENTORY MANAGEMENT/stock
 import { DeliveryNoteFinanceComponent } from './pages/Operations/delivery-note-finance/delivery-note-finance.component';
 import { DepreciationReportComponent } from './pages/Depreciation/depreciation-report/depreciation-report.component';
 import { FixedAssetRegisterComponent } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
+import { PDCReportComponent } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
+import { PrepaymentPostingReportComponent } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 
 const routes: Routes = [
   {
@@ -236,7 +238,7 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   
-      
+    
 
   {
     path: 'auth',
@@ -1012,6 +1014,16 @@ const routes: Routes = [
       {
         path: 'fixed-asset-register',
         component: FixedAssetRegisterComponent,
+        canActivate: [AuthGuardService],
+      },
+        {
+        path: 'pdc-report',
+        component: PDCReportComponent,
+        canActivate: [AuthGuardService],
+      },
+       {
+        path: 'prepayment-posting-report',
+        component: PrepaymentPostingReportComponent,
         canActivate: [AuthGuardService],
       },
       {

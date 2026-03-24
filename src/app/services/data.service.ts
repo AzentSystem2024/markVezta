@@ -6333,12 +6333,22 @@ The result can be exported to HTML or Markdown.`;
   }
 
   FixedAssetRegister_List(payload){
-     const getEndpoint = this.apiUrl + 'FixedAssetRegReport/fixedassetreport';
+     const getEndpoint = this.apiUrl + 'Report/fixedassetreport';
     return this.http.post(getEndpoint, payload);
   }
 
   Depreciation_Report(payload){
-     const getEndpoint = this.apiUrl + 'DepreciationReport/depreciationreport';
+     const getEndpoint = this.apiUrl + 'Report/depreciationreport';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  PDC_Report(payload){
+     const getEndpoint = this.apiUrl + 'Report/pdclist';
+    return this.http.post(getEndpoint, payload);
+  }
+
+   Prepayment_posting_Report(payload){
+     const getEndpoint = this.apiUrl + 'Report/prepaymentreport';
     return this.http.post(getEndpoint, payload);
   }
 }
