@@ -8,11 +8,7 @@ import {
   EventEmitter,
   Output,
 } from '@angular/core';
-import {
-  DxButtonModule,
-  DxPopupModule,
-  DxValidationGroupModule,
-} from 'devextreme-angular';
+import { DxButtonModule, DxPopupModule } from 'devextreme-angular';
 import {
   DxDataGridComponent,
   DxDataGridModule,
@@ -23,16 +19,17 @@ import { VatClassFormModule } from 'src/app/components/library/vat-class-form/va
 import { VatClassFormComponent } from 'src/app/components/library/vat-class-form/vat-class-form.component';
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
-import { VatClassEditModule } from '../../vat-class-edit/vat-class-edit.component';
 import { CommonModule } from '@angular/common';
 import DataSource from 'devextreme/data/data_source';
+import { VatCalssFinanceFormModule } from '../POPUP PAGES/vat-calss-finance-form/vat-calss-finance-form.component';
+import { VatCalssFinanceEditModule } from '../POPUP PAGES/vat-calss-finance-edit/vat-calss-finance-edit.component';
 
 @Component({
-  selector: 'app-vat-class-list',
-  templateUrl: './vat-class-list.component.html',
-  styleUrls: ['./vat-class-list.component.scss'],
+  selector: 'app-vat-class-finance',
+  templateUrl: './vat-class-finance.component.html',
+  styleUrls: ['./vat-class-finance.component.scss'],
 })
-export class VatClassListComponent {
+export class VatClassFinanceComponent implements OnInit {
   @ViewChild(VatClassFormComponent) vatclassComponent: VatClassFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
@@ -59,57 +56,21 @@ export class VatClassListComponent {
   companyStateID: any;
   GST_PERC: any;
   poData: any;
-  isFilterOpened = false;
+
   addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
+
     onClick: () => {
+      // Run inside Angular's zone
       this.ngZone.run(() => this.addVatclass());
     },
-    elementAttr: { class: 'add-button' },
 
-    template: () => {
-      return `
-      <div class="add-btn-content">
-        <span class="iconify"
-              data-icon="formkit:add"
-              data-width="20"
-              data-height="20"></span>
-        <span class="add-text">New</span>
-      </div>
-    `;
-    },
+    elementAttr: { class: 'add-button' },
   };
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    // onClick: () => this.refreshGrid(),
-    onClick: () => {
-      this.ngZone.run(() => this.refreshGrid());
-    },
-    text: '',
-  };
-  searchButtonOptions = {
-    icon: 'search',
-    hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
-    onClick: () => this.toggleFilters(),
-  };
-  router: any;
-  canAdd: any;
-  canEdit: any;
-  canDelete: any;
-  canPrint: any;
-  canView: any;
-  canApprove: any;
-  subType: any;
-  companyState: any;
-  HSNCODE: any;
-  GST: any;
-  selectedCompanyId: any;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -119,50 +80,14 @@ export class VatClassListComponent {
   onExporting(event: any) {
     this.exportService.onExporting(event, 'VAT_class-list');
   }
-  // addVatclass() {
-  //   this.isAddVatclassPopupOpened = true;
-  // }
-
   addVatclass() {
-    if (this.vatclassComponent) {
-      this.vatclassComponent.resetForm();
-    }
-
     this.isAddVatclassPopupOpened = true;
   }
 
-  ngOnInit() {
-    const userDataString = localStorage.getItem('userData');
-    const userData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
-
-    this.subType = userData?.Configuration?.[0]?.SUB_TYPE_ID || 0;
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
-      const selectedCompany = userData?.SELECTED_COMPANY;
-      this.companyState = selectedCompany.STATE_NAME;
-      this.companyStateID = selectedCompany.STATE_ID;
-      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-      this.GST = userData.GeneralSettings.GST_PERC;
-      if (selectedCompany?.COMPANY_ID) {
-        this.selectedCompanyId = selectedCompany.COMPANY_ID;
-
-        // this.companyList = [selectedCompany]; // Show only selected company
-      }
-      this.showVatclass();
-    }
+  ngOnInit(): void {
+    this.sessionDetails();
+    this.showVatclass();
   }
-  sessionData_tax() {
-    throw new Error('Method not implemented.');
-  }
-  getCreditNotes() {
-    throw new Error('Method not implemented.');
-  }
-  // ngOnInit(): void {
-  //   this.sessionDetails();
-  //   this.showVatclass();
-  // }
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -180,25 +105,9 @@ export class VatClassListComponent {
     };
   }
 
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
-  }
-  refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-    this.showVatclass();
-  }
   showVatclass() {
     const payload = {
-      COMPANY_ID: this.selectedCompanyId,
+      COMPANY_ID: this.selected_Company_id,
     };
 
     this.VatClassDataSource = new DataSource({
@@ -227,26 +136,28 @@ export class VatClassListComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+
   onClickSaveVatclass() {
-    const result = this.vatclassComponent.validationGroup.instance.validate();
-
-    if (!result.isValid) {
-      return;
-    }
-
-    const payload = this.vatclassComponent.getNewVatclassData();
-    payload.COMPANY_ID = this.selectedCompanyId;
-    this.dataservice.postVatclassData(payload).subscribe((response) => {
-      if (response) {
-        this.formClosed.emit();
-        this.isAddVatclassPopupOpened = false;
-        this.showVatclass();
-      }
-    });
+    const { CODE, VAT_NAME, VAT_PERC } =
+      this.vatclassComponent.getNewVatclassData();
+    console.log('inserted data', CODE, VAT_NAME, VAT_PERC);
+    this.dataservice
+      .postVatclassData_Finance(
+        CODE,
+        VAT_NAME,
+        VAT_PERC,
+        this.selected_Company_id,
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.formClosed.emit();
+          this.isAddVatclassPopupOpened = false;
+          this.showVatclass();
+        }
+      });
   }
 
   onRowRemoving(event) {
-    event.cancel = true;
     const selectedRow = event.data;
     const { ID, CODE, VAT_NAME, VAT_PERC } = selectedRow;
 
@@ -262,8 +173,8 @@ export class VatClassListComponent {
             },
             'success',
           );
-          this.showVatclass();
           this.dataGrid.instance.refresh();
+          this.showVatclass();
         } catch (error) {
           notify(
             {
@@ -280,50 +191,26 @@ export class VatClassListComponent {
     event.cancel = true; // Prevent the default editing behavior
     const id = event.data.ID;
     this.dataservice.select_Vatclass_Data(id).subscribe((response) => {
+      console.log(response, 'selected data');
       this.selected_data = response;
       this.isEditVatclassPopupOpened = true;
     });
   }
+
   refresh() {
     this.dataGrid.instance.refresh();
     this.showVatclass();
   }
 
-  onPopupShown() {
-    if (this.vatclassComponent) {
-      this.vatclassComponent.resetForm();
-    }
-  }
-  // handleClose() {
-  //   this.isAddVatclassPopupOpened = false;
-  //   this.isEditVatclassPopupOpened = false;
-  //   this.vatclassComponent.formVatclassData = {
-  //     CODE: '',
-  //     VAT_NAME: '',
-  //     // VAT_PERC: '',
-  //     CGST_PERC: '',
-  //     CGST_INPUT_HEAD_ID: '',
-  //     CGST_OUTPUT_HEAD_ID: '',
-
-  //     SGST_PERC: '',
-  //     SGST_INPUT_HEAD_ID: '',
-  //     SGST_OUTPUT_HEAD_ID: '',
-
-  //     IGST_PERC: '',
-  //     IGST_INPUT_HEAD_ID: '',
-  //     IGST_OUTPUT_HEAD_ID: '',
-  //   };
-  //   this.dataGrid.instance.refresh();
-  //   this.showVatclass();
-  // }
   handleClose() {
     this.isAddVatclassPopupOpened = false;
     this.isEditVatclassPopupOpened = false;
-
-    if (this.vatclassComponent) {
-      this.vatclassComponent.resetForm(); // 🔑 clear form
-    }
-
+    this.vatclassComponent.formVatclassData = {
+      CODE: '',
+      VAT_NAME: '',
+      VAT_PERC: '',
+    };
+    this.dataGrid.instance.refresh();
     this.showVatclass();
   }
 }
@@ -332,14 +219,13 @@ export class VatClassListComponent {
     DxDataGridModule,
     DxButtonModule,
     FormPopupModule,
-    VatClassFormModule,
-    VatClassEditModule,
+    VatCalssFinanceFormModule,
+    VatCalssFinanceEditModule,
     CommonModule,
     DxPopupModule,
-    DxValidationGroupModule,
   ],
   providers: [],
   exports: [],
-  declarations: [VatClassListComponent],
+  declarations: [VatClassFinanceComponent],
 })
-export class VatClassListModule {}
+export class VatClassFinanceModule {}

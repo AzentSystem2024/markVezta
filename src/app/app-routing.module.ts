@@ -178,13 +178,11 @@ import { AttendanceSheetComponent } from './pages/REPORT/attendance-sheet/attend
 import { ItemQuantityStockComponent } from './components/HR/Masters/item-quantity-stock/item-quantity-stock.component';
 import { ItemStockValueComponent } from './components/HR/Masters/item-stock-value/item-stock-value.component';
 import { ItemCategoryListComponent } from './pages/MASTER/item-category-list/item-category-list.component';
-import { StockAdjustmentListComponent } from './pages/Stock_Adjustment/stock-adjustment-list/stock-adjustment-list.component';
 import { StockMovementReportComponent } from './pages/REPORT/stock-movement-report/stock-movement-report.component';
 import { QuotationComponent } from './pages/Operations/quotation/quotation.component';
 import { InvoiceDeliveryComponent } from './pages/invoice-delivery/invoice-delivery.component';
-import { PhysicalInventoryComponent } from './pages/physical-inventory/physical-inventory.component';
+import { PhysicalInventoryComponent } from './pages/INVENTORY MANAGEMENT/physical-inventory/physical-inventory.component';
 import { DeliveryReturnComponent } from './pages/delivery-return/delivery-return.component';
-import { ArticleProductionViewModule } from './components/HR/Masters/article-production-view/article-production-view.component';
 import { DeliveryAddressComponent } from './components/HR/Masters/delivery-address/delivery-address.component';
 import { ChangePasswordComponent } from './components/library/PROFILEPAGE/change-password/change-password.component';
 import { SecurityPolicyComponent } from './pages/MASTER/security-policy/security-policy.component';
@@ -215,6 +213,9 @@ import { PurchaseReturnDebitComponent } from './pages/Operations/purchase-return
 import { SaleReturnComponent } from './pages/Operations/sale-return/sale-return.component';
 import { SalesOrderComponent } from './pages/Operations/sales-order/sales-order.component';
 import { SalesOrderFinanceComponent } from './pages/Operations/sales-order-finance/sales-order-finance.component';
+import { VatClassFinanceComponent } from './pages/MASTER/vat-class-finance/vat-class-finance.component';
+import { StockAdjustmentListComponent } from './pages/INVENTORY MANAGEMENT/stock-adjustment-list/stock-adjustment-list.component';
+import { DeliveryNoteFinanceComponent } from './pages/Operations/delivery-note-finance/delivery-note-finance.component';
 
 const routes: Routes = [
   {
@@ -284,12 +285,6 @@ const routes: Routes = [
       {
         path: 'denial-list-page',
         component: DenialListComponent,
-        canActivate: [AuthGuardService],
-      },
-
-      {
-        path: 'department',
-        component: DepartmentListComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -635,21 +630,26 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'department',
+        component: DepartmentComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'item-department',
+        component: DepartmentListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'sub-department',
         component: SubDepartmentComponent,
         canActivate: [AuthGuardService],
       },
+
       {
         path: 'sub-category',
         component: SubcategoryListComponent,
         canActivate: [AuthGuardService],
       },
-
-      // {
-      //   path: 'purchase-order',
-      //   component: PurchaseOrderComponent,
-      //   canActivate: [AuthGuardService],
-      // },
       {
         path: 'aged-receivable-details',
         component: AgedReceivableDetailsComponent,
@@ -690,6 +690,11 @@ const routes: Routes = [
       {
         path: 'vat-class',
         component: VatClassListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'vat-class-finance',
+        component: VatClassFinanceComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -816,6 +821,11 @@ const routes: Routes = [
       {
         path: 'delivery-note',
         component: DeliveryNoteComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'delivery-note-finance',
+        component: DeliveryNoteFinanceComponent,
         canActivate: [AuthGuardService],
       },
       {

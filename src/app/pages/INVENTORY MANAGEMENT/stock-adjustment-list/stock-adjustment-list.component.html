@@ -1,4 +1,3 @@
-
 <div class="view-wrapper list-page">
   <div class="grid-container">
     <dx-data-grid
@@ -10,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="filteredStockList"
@@ -63,7 +62,12 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header"style="font-weight: 600; font-size: 20px; margin-left: 12px;">Stock Adjustment</div>
+          <div
+            class="grid-header"
+            style="font-weight: 600; font-size: 20px; margin-left:  12px"
+          >
+            Stock Adjustment
+          </div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item
@@ -124,7 +128,7 @@
         caption="Narration"
         [allowEditing]="false"
       ></dxi-column>
-            <dxi-column
+      <dxi-column
         caption="Status"
         dataField="STATUS"
         [width]="80"
@@ -132,15 +136,11 @@
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
-          encodeHtml: false
+          encodeHtml: false,
         }"
       >
       </dxi-column>
-      <dxi-column
-  type="buttons"
-  [buttons]="gridButtons">
-</dxi-column>
-
+      <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column>
     </dx-data-grid>
   </div>
 </div>
@@ -154,50 +154,33 @@
   [dragEnabled]="false"
 >
   <div>
-    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
-  <dx-date-box
-    [(value)]="customStartDate"
-    type="date"
-    width="250"
-    displayFormat="dd/MM/yyyy"
-    placeholder="From Date"
-    label="From Date"
-    labelMode="floating">
-  </dx-date-box>
-
-  <dx-date-box
-    [(value)]="customEndDate"
-    type="date"
-    width="250"
-    displayFormat="dd/MM/yyyy"
-    placeholder="To Date"
-    label="To Date"
-    labelMode="floating">
-  </dx-date-box>
-</div>
-
-    <!-- <div class="date-range-container">
+    <div
+      style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px"
+    >
       <dx-date-box
         [(value)]="customStartDate"
         type="date"
-        width="300"
-     
+        width="250"
         displayFormat="dd/MM/yyyy"
         placeholder="From Date"
+        label="From Date"
+        labelMode="floating"
       >
       </dx-date-box>
 
       <dx-date-box
         [(value)]="customEndDate"
         type="date"
+        width="250"
+        displayFormat="dd/MM/yyyy"
         placeholder="To Date"
-        width="300"
-         displayFormat="dd/MM/yyyy"
+        label="To Date"
+        labelMode="floating"
       >
       </dx-date-box>
-    </div> -->
+    </div>
 
-    <div class="button-container" >
+    <div class="button-container">
       <dx-button
         text="Apply"
         type="default"
@@ -206,7 +189,6 @@
     </div>
   </div>
 </dx-popup>
-
 
 <dx-popup
   [(visible)]="isAddStock_adj"
@@ -230,18 +212,10 @@
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="is_Edit_popup">
-        <!-- <app-stock-adjustment-add
-      [isEditing]="true"
-      [EditingResponseData]="selected_Data"
-      [isReadOnlyMode]="isReadOnlyMode"
-      (popupClosed)="handleClose()"
-    ></app-stock-adjustment-add> -->
-
     <app-stock-adjustment-edit
       [isEditing]="true"
       [EditingResponseData]="selected_Data"
       (popupClosed)="handleClose()"
     ></app-stock-adjustment-edit>
-      </ng-container>
- 
+  </ng-container>
 </dx-popup>
