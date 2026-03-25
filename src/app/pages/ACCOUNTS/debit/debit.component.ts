@@ -217,8 +217,8 @@ export class DebitComponent {
             };
           })
           .sort((a: any, b: any) => {
-            const aNo = parseInt(a.DOC_NO.split('/').pop(), 10);
-            const bNo = parseInt(b.DOC_NO.split('/').pop(), 10);
+            const aNo = a.DOC_NO ? parseInt(a.DOC_NO.split('/').pop(), 10) : 0;
+            const bNo = b.DOC_NO ? parseInt(b.DOC_NO.split('/').pop(), 10) : 0;
             return bNo - aNo;
           });
 

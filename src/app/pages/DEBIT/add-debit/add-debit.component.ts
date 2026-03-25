@@ -198,7 +198,7 @@ export class AddDebitComponent {
     // this.debitFormData.TRANS_DATE = this.formatAsDDMMYYYY(new Date());
     this.debitFormData.TRANS_DATE = new Date();
     this.getSupTypeList();
-    this.getDocNo();
+    // this.getDocNo();
     this.getLedgerCodeDropdown();
     this.getCompanyListDropdown();
     // this.getSupplierDropdown();
@@ -244,13 +244,19 @@ export class AddDebitComponent {
   }
 
   getSupTypeList() {
-    const payload = {
-      TRANS_TYPE: 36,
-    };
     this.dataService
-      .getSubTypeCreditNote(payload)
+      .getSubTypeCreditNote({ TRANS_TYPE: 36 })
       .subscribe((response: any) => {
         this.subTypeList = response.Data;
+
+        if (this.subTypeList?.length) {
+          const first = this.subTypeList[0];
+
+          this.debitFormData.SUB_TYPE_ID = first.SUB_TYPE_ID;
+          this.selectedSubTypeId = first.SUB_TYPE_ID;
+
+          this.getDocNo(); // auto load doc no
+        }
       });
   }
 
@@ -887,7 +893,10 @@ export class AddDebitComponent {
 
   saveDebitNote(): void {
     this.itemsGridRef?.instance?.saveEditData();
-
+    if (!this.debitFormData.SUB_TYPE_ID) {
+      notify('Please select a Sub type before saving.', 'error', 2000);
+      return;
+    }
     const gridData =
       this.itemsGridRef?.instance?.getVisibleRows().map((r) => r.data) || [];
     const details = this.debitFormData.NOTE_DETAIL || [];
@@ -1052,7 +1061,7 @@ export class AddDebitComponent {
       TRANS_TYPE: 36,
       COMPANY_ID: 0,
       STORE_ID: 0,
-      DOC_NO: this.getDocNo(),
+      DOC_NO: null,
       TRANS_DATE: new Date(),
       TRANS_STATUS: 1,
       SUPP_ID: '',
@@ -1061,6 +1070,7 @@ export class AddDebitComponent {
       INVOICE_NO: '',
       UNIT_ID: '',
       DUE_AMOUNT: '',
+      SUB_TYPE_ID: null,
       NOTE_DETAIL: [
         {
           SL_NO: 1,
@@ -1071,6 +1081,7 @@ export class AddDebitComponent {
         },
       ],
     };
+    this.selectedSubTypeId = null;
   }
 
   cancel() {
