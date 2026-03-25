@@ -1018,9 +1018,13 @@ import { ProductionJvListModule } from './pages/OPERATIONS/production-jv-list/pr
 import { SaleReturnModule } from './pages/OPERATIONS/sale-return/sale-return.component';
 import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-invoice/miscellaneous-invoice.component';
 import { SalesOrderModule } from './pages/OPERATIONS/sales-order/sales-order.component';
+import { FixedAssetRegisterModule } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
+import { DepreciationReportModule } from './pages/Depreciation/depreciation-report/depreciation-report.component';
+import { PDCReportComponent, PDCReportModule } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
+import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1384,6 +1388,10 @@ import { SalesOrderModule } from './pages/OPERATIONS/sales-order/sales-order.com
     MiscellaneousPurchaseEditModule,
     ImportChartOfAccountsModule,
     SalesOrderFinancePopupFormModule,
+    FixedAssetRegisterModule,
+    DepreciationReportModule,
+    PDCReportModule,
+    PrepaymentPostingReportModule,
   ],
   providers: [
     AuthService,

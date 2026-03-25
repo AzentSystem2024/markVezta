@@ -216,6 +216,10 @@ import { SalesOrderFinanceComponent } from './pages/Operations/sales-order-finan
 import { VatClassFinanceComponent } from './pages/MASTER/vat-class-finance/vat-class-finance.component';
 import { StockAdjustmentListComponent } from './pages/INVENTORY MANAGEMENT/stock-adjustment-list/stock-adjustment-list.component';
 import { DeliveryNoteFinanceComponent } from './pages/Operations/delivery-note-finance/delivery-note-finance.component';
+import { DepreciationReportComponent } from './pages/Depreciation/depreciation-report/depreciation-report.component';
+import { FixedAssetRegisterComponent } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
+import { PDCReportComponent } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
+import { PrepaymentPostingReportComponent } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 
 const routes: Routes = [
   {
@@ -233,6 +237,8 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
+  
+    
 
   {
     path: 'auth',
@@ -265,6 +271,7 @@ const routes: Routes = [
         component: InvoicePdfViewComponent,
         canActivate: [AuthGuardService],
       },
+      
       {
         path: '**',
         redirectTo: 'login',
@@ -999,7 +1006,26 @@ const routes: Routes = [
         component: LeaveSalaryComponent,
         canActivate: [AuthGuardService],
       },
-
+       {
+        path: 'depreciation-report',
+        component: DepreciationReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'fixed-asset-register',
+        component: FixedAssetRegisterComponent,
+        canActivate: [AuthGuardService],
+      },
+        {
+        path: 'pdc-report',
+        component: PDCReportComponent,
+        canActivate: [AuthGuardService],
+      },
+       {
+        path: 'prepayment-posting-report',
+        component: PrepaymentPostingReportComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: '**',
         redirectTo: 'login',

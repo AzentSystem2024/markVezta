@@ -1,0 +1,181 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="FixedAssetRegister"
+      width="100%"
+      noDataText=""
+      height="82vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading...' }"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <!-- <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="font-weight: 600; font-size: 20px; margin-left: 12px"
+          >
+            Trial Balance
+          </div>
+        </dxi-item>
+      </dxo-toolbar> -->
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Fixed Asset Register
+          </div>
+        </dxi-item>
+        <dxi-item>
+          <dx-select-box
+            [width]="200"
+            label="Location"
+            labelMode="floating"
+            [items]="Department"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="select_department_id"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
+
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <dxi-item>
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            class="mt-2"
+            (onClick)="Fixed_Asset_register()"
+          >
+          </dx-button>
+        </dxi-item>
+
+       
+        <dxi-item name="exportButton" style="margin-top: 6px"></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+
+      <!-- <dxi-column dataField="DEPARTMENT_NAME" caption="Department Name" dataType="string"></dxi-column> -->
+      <!-- Customer ID -->
+      <!-- <dxi-column dataField="CUSTOMER_ID" caption="Customer ID" dataType="number"></dxi-column> -->
+
+      <!-- Customer Name -->
+      <dxi-column
+        dataField="ASSET_NAME"
+        caption="Asset Name"
+        dataType="string"
+      ></dxi-column>
+
+     
+     
+      <!-- Invoice Date -->
+      <dxi-column
+        dataField="STORE_CODE"
+        caption="Store Code"
+         dataType="string"
+      ></dxi-column>
+
+       <!-- Age -->
+ <dxi-column dataField="LOCATION" caption="Location" dataType="string"></dxi-column>
+
+      <!-- Invoice No -->
+      <dxi-column
+        dataField="TRANS_DATE"
+        caption="Trans Date"
+        dataType="date"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+
+      <!-- Reference No -->
+      <dxi-column
+        dataField="PURCH_VALUE"
+        caption="Purch Value"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" 
+      ></dxi-column>
+
+      <!-- Narration -->
+      <dxi-column
+        dataField="USEFUL_LIFE"
+        caption="Useful Life"
+        dataType="string"
+      ></dxi-column>
+
+      <!-- Net Amount -->
+      <dxi-column
+        dataField="NET_DEPRECIATION"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        caption="Net Appreciation"
+        dataType="number"
+        format="currency"
+      ></dxi-column>
+
+      <!-- Received Amount -->
+      <dxi-column
+        dataField="CURRENT_ASSETVALUE"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        caption="Current Asset Value"
+        dataType="number"
+        format="currency"
+      ></dxi-column>  
+
+    </dx-data-grid>
+  </div>
+</div>
+
+
