@@ -78,29 +78,7 @@ export class TimesheetListComponent {
   approveTimesheetPopupOpened: boolean = false;
   viewTimesheetPopupOpened: boolean = false;
   selectedTimesheet: any = null;
-  timesheetList = [
-    {
-      employeeNo: 'EMP001',
-      employeeName: 'John Doe',
-      workedDays: 22,
-      otHours: 5,
-      status: 'Approved',
-    },
-    {
-      employeeNo: 'EMP002',
-      employeeName: 'Jane Smith',
-      workedDays: 20,
-      otHours: 3,
-      status: 'Open',
-    },
-    {
-      employeeNo: 'EMP003',
-      employeeName: 'Alice Johnson',
-      workedDays: 18,
-      otHours: 7,
-      status: 'Verified',
-    },
-  ];
+  timesheetList: any[] = [];
   allActionButtons = [
     {
       name: 'edit',
@@ -623,6 +601,7 @@ export class TimesheetListComponent {
   }
 
   fetchTimesheetList() {
+    this.timesheetList = [];
     const payload = {
       CompanyId: this.companyID,
       Month: this.selectedMonth
@@ -634,7 +613,7 @@ export class TimesheetListComponent {
     };
 
     this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-      this.timesheetList = response.data;
+      this.timesheetList = response?.data || [];
       this.updateApproveButtonState();
     });
   }

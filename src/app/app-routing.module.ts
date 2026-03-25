@@ -150,6 +150,8 @@ import { ProductionJvListComponent } from './pages/OPERATIONS/production-jv-list
 import { SaleReturnComponent } from './pages/OPERATIONS/sale-return/sale-return.component';
 import { MiscellaneousInvoiceComponent } from './pages/OPERATIONS/miscellaneous-invoice/miscellaneous-invoice.component';
 import { MiscellaneousPurchaseComponent } from './pages/OPERATIONS/miscellaneous-purchase/miscellaneous-purchase.component';
+import { PDCReportComponent } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
+import { PrepaymentPostingReportComponent } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 
 const routes: Routes = [
   {
@@ -167,7 +169,6 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
-
   {
     path: 'auth',
     component: UnauthenticatedContentComponent,
@@ -941,6 +942,16 @@ const routes: Routes = [
       {
         path: 'fixed-asset-register',
         component: FixedAssetRegisterComponent,
+        canActivate: [AuthGuardService],
+      },
+        {
+        path: 'pdc-report',
+        component: PDCReportComponent,
+        canActivate: [AuthGuardService],
+      },
+       {
+        path: 'prepayment-posting-report',
+        component: PrepaymentPostingReportComponent,
         canActivate: [AuthGuardService],
       },
       {

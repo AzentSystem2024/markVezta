@@ -145,6 +145,7 @@ export class AddInvoiceComponent {
   netAmount: any;
   isSaving: boolean;
   isTransfersLoading: boolean;
+  vatTitle: any;
 
   constructor(
     private dataService: DataService,
@@ -168,8 +169,7 @@ export class AddInvoiceComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.selectedCompany = userData?.SELECTED_COMPANY;
-      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-      this.GST = userData.GeneralSettings.GST_PERC;
+      this.vatTitle = userData.GeneralSettings.VAT_TITLE;
       if (this.selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
         this.invoiceFormData.COMPANY_ID = this.selectedCompanyId;
@@ -243,7 +243,7 @@ export class AddInvoiceComponent {
     this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
 
     // ONLY CHANGE
-    this.applyGstMode();
+    // this.applyGstMode();
 
     if (this.selectedCustomerType) {
       this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
@@ -293,23 +293,9 @@ export class AddInvoiceComponent {
 
   calculateGstAmount = (row: any) => {
     const amt = this.calculateAmount(row);
+    const gstPerc = parseFloat(row.GST) || 0;
 
-    const igst = parseFloat(row.GST) || 0; // GST column = GST
-    const cgst = parseFloat(row.CGST) || 0;
-    const sgst = parseFloat(row.SGST) || 0;
-
-    let totalGstPercent = 0;
-
-    // GST case
-    if (igst > 0) {
-      totalGstPercent = igst;
-    }
-    // CGST + SGST case
-    else {
-      totalGstPercent = cgst + sgst;
-    }
-
-    return amt * (totalGstPercent / 100);
+    return amt * (gstPerc / 100);
   };
 
   calculateTotal = (row: any) => {
@@ -435,16 +421,9 @@ export class AddInvoiceComponent {
       const company = this.companyState?.trim().toLowerCase();
       const customer = this.selectedCustomer?.STATE_NAME?.trim().toLowerCase();
 
-      if (company === customer) {
-        const half = rowGst / 2;
-        row.CGST = half;
-        row.SGST = half;
-        row.GST = 0;
-      } else {
-        row.GST = rowGst;
-        row.CGST = 0;
-        row.SGST = 0;
-      }
+      row.GST = Number(row.GST_PERC || 0);
+      row.CGST = 0;
+      row.SGST = 0;
     });
 
     //  Mutate the existing array (DON'T reassign!)
@@ -473,16 +452,16 @@ export class AddInvoiceComponent {
     if (this.popupGridRef?.instance) {
       const grid = this.popupGridRef.instance;
 
-      // ✅ Clears filter row AND header filter
+      // Clears filter row AND header filter
       grid.clearFilter();
 
-      // ✅ Clear row selections
+      //Clear row selections
       grid.clearSelection();
 
-      // ✅ Reset paging
+      // Reset paging
       grid.pageIndex(0);
 
-      // ✅ Refresh grid
+      // Refresh grid
       grid.refresh();
     }
   }
@@ -649,10 +628,10 @@ export class AddInvoiceComponent {
     // 3. Prepare the SALE_DETAILS array
     this.invoiceFormData.SALE_DETAILS = this.mainInvoiceGridList.map(
       (row: any) => {
-        const igst = parseFloat(row.GST) || 0; // GST
-        const cgst = parseFloat(row.CGST) || 0; // CGST
-        const sgst = parseFloat(row.SGST) || 0; // SGST
-
+        // const igst = parseFloat(row.GST) || 0; // GST
+        // const cgst = parseFloat(row.CGST) || 0; // CGST
+        // const sgst = parseFloat(row.SGST) || 0; // SGST
+        const gstPerc = parseFloat(row.GST) || 0;
         // Build final object to send
         return {
           DN_DETAIL_ID: row.DN_DETAIL_ID || '',
@@ -660,9 +639,9 @@ export class AddInvoiceComponent {
           PRICE: row.PRICE || 0,
 
           // *** Required Output ***
-          GST: igst > 0 ? igst : 0,
-          CGST: igst > 0 ? 0 : cgst,
-          SGST: igst > 0 ? 0 : sgst,
+          GST: gstPerc,
+          CGST: 0,
+          SGST: 0,
 
           // base amounts
           AMOUNT: this.calculateAmount(row),

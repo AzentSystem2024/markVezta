@@ -143,7 +143,7 @@ export class LoginFormComponent implements OnInit {
     }
   }
 
-  // 🌐 Internet IP (public)
+  // Internet IP (public)
   async getInternetIP(): Promise<string> {
     try {
       const res = await fetch('https://api.ipify.org?format=json');
@@ -154,7 +154,7 @@ export class LoginFormComponent implements OnInit {
     }
   }
 
-  // 🖥 Local IP (best effort – browser dependent)
+  // Local IP (best effort – browser dependent)
   getLocalIP(): Promise<string> {
     return new Promise((resolve) => {
       const timeout = setTimeout(() => {
@@ -205,9 +205,19 @@ export class LoginFormComponent implements OnInit {
       this.loading = false;
       return;
     }
+    if (!this.formData.FINANCIAL_YEAR_ID) {
+      notify({
+        message: 'Please select financial year',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      this.loading = false;
+      return;
+    }
 
     const COMPUTER_NAME = 'AZENT-1';
-    const COMPUTER_USER = 'Vismaya';
+    const COMPUTER_USER = 'Indu';
     const DOMAIN_NAME = window.location.hostname || '';
 
     // ✅ SAFE async calls

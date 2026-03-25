@@ -365,9 +365,11 @@ import { DepreciationReportModule } from './pages/Depreciation/depreciation-repo
 import { ChartOfAccountsFinanceAddFormModule } from './pages/MASTER/Chart Of Accounts/chart-of-accounts-finance-add-form/chart-of-accounts-finance-add-form.component';
 import { ChartOfAccountsFinanceEditFormModule } from './pages/MASTER/Chart Of Accounts/chart-of-accounts-finance-edit-form/chart-of-accounts-finance-edit-form.component';
 import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
+import { PDCReportComponent, PDCReportModule } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
+import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -730,9 +732,7 @@ import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order
     SalesOrderFinancePopupFormModule,
     FixedAssetRegisterModule,
     DepreciationReportModule,
-    ChartOfAccountsFinanceAddFormModule,
-    ChartOfAccountsFinanceEditFormModule,
-  ],
+],
   providers: [
     AuthService,
     ScreenService,

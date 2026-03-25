@@ -109,6 +109,7 @@
                     [width]="375"
                     label="Customer *"
                     labelMode="floating"
+                    [searchEnabled]="true"
                     (onValueChanged)="onDistributorChanged($event)"
                   >
                   </dx-select-box>
@@ -204,16 +205,11 @@
           ></dxi-column>
           <dxi-column
             dataField="GST"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? 'VAT %'
-                : ' IGST %'
-            "
+            [caption]="vatTitle + '%'"
             dataType="number"
-            [visible]="showGST"
             [allowEditing]="false"
           ></dxi-column>
-          <dxi-column
+          <!-- <dxi-column
             dataField="CGST"
             caption="CGST"
             dataType="number"
@@ -227,7 +223,7 @@
             dataType="number"
             [visible]="showSGST"
             [allowEditing]="false"
-          ></dxi-column>
+          ></dxi-column> -->
 
           <dxi-column
             dataField="TAX_AMOUNT"
