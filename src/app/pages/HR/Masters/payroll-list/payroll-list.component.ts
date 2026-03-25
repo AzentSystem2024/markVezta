@@ -174,6 +174,12 @@ export class PayrollListComponent {
       class: 'year-button',
     },
   };
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   selectedRows: any;
   approveDisabled = true;
 
@@ -240,33 +246,26 @@ export class PayrollListComponent {
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
+    this.isFilterRowVisible = this.isFilterOpened; // ✅ IMPORTANT
   }
   onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton',
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'search',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
+    // const toolbarItems = e.toolbarOptions.items;
+    // // Avoid adding the button more than once
+    // const alreadyAdded = toolbarItems.some(
+    //   (item: any) => item.name === 'toggleFilterButton',
+    // );
+    // if (!alreadyAdded) {
+    //   toolbarItems.splice(toolbarItems.length - 1, 0, {
+    //     widget: 'dxButton',
+    //     name: 'toggleFilterButton', // custom name to avoid duplicates
+    //     location: 'after',
+    //     options: {
+    //       icon: 'search',
+    //       hint: 'Search Column',
+    //       onClick: () => this.toggleFilters(),
+    //     },
+    //   });
+    // }
   }
   approveSelectedPayroll() {
     const selectedRows = this.dataGrid.instance.getSelectedRowsData();
@@ -627,9 +626,9 @@ export class PayrollListComponent {
   }
 
   onDeletePayroll(e: any) {
-    const TS_ID = e.data.TS_ID;
+    const TS_ID = e.data.TIMESHEET_ID;
     e.cancel = true;
-
+    console.log(e.data, 'PAYROLLID');
     this.dataService.deletePayroll(TS_ID).subscribe(
       (response: any) => {
         if (response) {

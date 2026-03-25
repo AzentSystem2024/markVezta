@@ -15,18 +15,20 @@
       [dataSource]="payrollList"
       [showBorders]="true"
       [showColumnLines]="true"
+      [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
       [allowColumnReordering]="true"
-      [filterRow]="{ visible: false }"
-      [headerFilter]="{ visible: false }"
       [showColumnHeaders]="true"
       [columnAutoWidth]="true"
       [allowColumnResizing]="true"
       [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: false }"
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
       [selection]="{
         mode: 'multiple',
         showCheckBoxesMode: 'always',
@@ -35,7 +37,6 @@
       (onEditingStart)="onEditOrViewPayroll($event)"
       (onRowRemoving)="onDeletePayroll($event)"
       (onSelectionChanged)="onSelectionChanged($event)"
-      (onToolbarPreparing)="onToolbarPreparing($event)"
       (onCellPrepared)="onCellPrepared($event)"
       (onEditorPreparing)="onEditorPreparing($event)"
     >
@@ -54,21 +55,18 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <dxo-scrolling mode="standard"></dxo-scrolling>
-      <dxo-filter-row
-        [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
-      ></dxo-filter-row>
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
+      <dxo-filter-row [visible]="isFilterOpened"></dxo-filter-row>
       <dxo-header-filter [visible]="isFilterOpened">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
       <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
-      <dxo-search-panel
+      <!-- <dxo-search-panel
         [visible]="true"
         [highlightCaseSensitive]="false"
-      ></dxo-search-panel>
+      ></dxo-search-panel> -->
       <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
       <dxo-export
         [enabled]="true"
@@ -147,20 +145,29 @@
             </div>
           </div>
         </dxi-item>
-        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-        <dxi-item
-          location="after"
-          locateInMenu="auto"
-          widget="dxButton"
-          [options]="refreshButtonOptions"
-        ></dxi-item>
-        <dxi-item
-          *ngIf="canAdd"
-          location="after"
-          locateInMenu="auto"
-          widget="dxButton"
-          [options]="addButtonOptions"
-        ></dxi-item>
+        <dxi-item location="after">
+          <dx-button
+            icon="refresh"
+            hint="Refresh"
+            (onClick)="refreshGrid()"
+          ></dx-button>
+        </dxi-item>
+        <dxi-item location="after">
+          <dx-button
+            icon="search"
+            hint="Show / Hide Filters"
+            (onClick)="toggleFilters()"
+          ></dx-button>
+        </dxi-item>
+        <dxi-item location="after" *ngIf="canAdd">
+          <dx-button
+            text="New"
+            icon="add"
+            type="default"
+            stylingMode="contained"
+            (onClick)="addPayroll()"
+          ></dx-button>
+        </dxi-item>
         <!-- <dxi-item
           name="approveButton"
           location="after"
@@ -173,7 +180,6 @@
             text="Approve"
             type="default"
             stylingMode="outlined"
-            hint="Approve Selected Payroll"
             [disabled]="approveDisabled"
             (onClick)="approveSelectedPayroll()"
           ></dx-button>

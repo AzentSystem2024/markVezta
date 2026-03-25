@@ -347,6 +347,7 @@
             <dx-button text="Cancel" (onClick)="cancel()"></dx-button>
 
             <dx-button
+              *ngIf="!isReadOnlyMode"
               #saveButtonRef
               [text]="
                 isSaving
@@ -362,7 +363,7 @@
                       : 'Save'
               "
               [disabled]="isSaving"
-              (onClick)="isReadOnlyMode ? openPDF() : savePurchaseReturn()"
+              (onClick)="savePurchaseReturn()"
               stylingMode="contained"
               type="default"
             ></dx-button>

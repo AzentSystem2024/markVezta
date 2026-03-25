@@ -107,6 +107,7 @@ export class EditInvoiceComponent {
   selectedCustomerName: any;
   selectedCustomerType: any;
   isUpdating = false;
+  vatTitle: any;
 
   constructor(
     private dataService: DataService,
@@ -123,15 +124,14 @@ export class EditInvoiceComponent {
   }
 
   ngOnInit() {
-    this.populateCompanyFromSession(); // ✅ Add this
+    this.populateCompanyFromSession(); //  Add this
     this.getInvoiceListForGrid();
     this.sessionData_tax();
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.selectedCompany = userData?.SELECTED_COMPANY;
-      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-      this.GST = userData.GeneralSettings.GST_PERC;
+      this.vatTitle = userData.GeneralSettings.VAT_TITLE;
       if (this.selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
         this.companyState = this.selectedCompany.STATE_NAME;
@@ -166,10 +166,10 @@ export class EditInvoiceComponent {
         firstInvoice.SALE_DATE = date;
       }
 
-      // 💡 ORIGINAL LINE (replaced below)
+      // ORIGINAL LINE (replaced below)
       // this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
 
-      // ---------- 🔥 ONLY THIS BLOCK IS MODIFIED ----------
+      // ----------  ONLY THIS BLOCK IS MODIFIED ----------
       // Load saved GST from the API for edit mode
       this.mainInvoiceGridList = (firstInvoice.SALE_DETAILS || []).map(
         (row: any) => {
@@ -191,7 +191,7 @@ export class EditInvoiceComponent {
       );
       // -----------------------------------------------------
 
-      // ⭐ Keep your original mapping block untouched
+      // Keep your original mapping block untouched
       this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => {
         return {
           ...row,
@@ -210,68 +210,6 @@ export class EditInvoiceComponent {
       this.getCustomerOrUnitLst();
     }
   }
-
-  // onDistributorChanged(e: any) {
-  //   // Find the selected customer from the distributorList
-  //   const selectedCustomer = this.distributorList.find(
-  //     (cust: any) => cust.ID === e.value
-  //   );
-  //   // If customer changed → clear previously added rows
-  //   if (this.mainInvoiceGridList && this.mainInvoiceGridList.length > 0) {
-  //     this.mainInvoiceGridList = []; // Clear the grid completely
-  //     this.totalAmount = 0;
-  //     this.taxAmount = 0;
-  //     this.grandTotal = 0;
-  //     this.netAmount = 0;
-
-  //     // Refresh grid UI
-  //     if (this.itemsGridRef?.instance) {
-  //       this.itemsGridRef.instance.refresh();
-  //     }
-
-  //   }
-  //   this.selectedCustomerName = selectedCustomer.DESCRIPTION;
-  //   this.invoiceFormData.PARTY_NAME = this.selectedCustomerName;
-  //   const company = this.companyState?.trim().toLowerCase();
-  //   const customer = selectedCustomer.STATE_NAME?.trim().toLowerCase();
-  //   const sessionGst = parseFloat(this.GST) || 0; // main GST%
-  //   if (company === customer) {
-  //     this.showCGST = true;
-  //     this.showSGST = true;
-  //     this.showGST = false;
-
-  //     //  Split GST into CGST + SGST
-  //     const half = sessionGst / 2;
-
-  //     // Update all grid rows
-  //     this.mainInvoiceGridList?.forEach((row: any) => {
-  //       row.CGST = half;
-  //       row.SGST = half;
-  //       row.GST = 0; // GST becomes zero in same-state case
-  //     });
-  //   } else {
-
-  //     this.showGST = true;
-  //     this.showCGST = false;
-  //     this.showSGST = false;
-
-  //     // ⭐ GST only
-  //     this.mainInvoiceGridList?.forEach((row: any) => {
-  //       row.GST = sessionGst;
-  //       row.CGST = 0;
-  //       row.SGST = 0;
-  //     });
-  //   }
-
-  //   this.selectedCustomer = selectedCustomer;
-  //   this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
-  //   if (this.selectedCustomerType) {
-
-  //     // optional — store it if you need it later
-  //     this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
-  //   }
-  //   this.getInvoiceListForGrid();
-  // }
 
   onDistributorChanged(e: any) {
     const selectedCustomer = this.distributorList.find(
