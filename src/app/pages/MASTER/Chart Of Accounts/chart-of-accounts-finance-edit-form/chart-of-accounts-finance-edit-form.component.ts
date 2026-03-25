@@ -5,6 +5,7 @@ import {
   Input,
   NgModule,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -42,16 +43,17 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddAccountComponent } from '../add-account/add-account.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 
 @Component({
-  selector: 'app-edit-account',
-  templateUrl: './edit-account.component.html',
-  styleUrls: ['./edit-account.component.scss'],
+  selector: 'app-chart-of-accounts-finance-edit-form',
+  templateUrl: './chart-of-accounts-finance-edit-form.component.html',
+  styleUrls: ['./chart-of-accounts-finance-edit-form.component.scss'],
 })
-export class EditAccountComponent implements OnChanges {
+export class ChartOfAccountsFinanceEditFormComponent
+  implements OnInit, OnChanges
+{
   @Output() popupClosed = new EventEmitter<void>();
   @Input() accountHeadData: any;
   @ViewChild(DxDataGridComponent, { static: true })
@@ -84,11 +86,24 @@ export class EditAccountComponent implements OnChanges {
   ledgerList: any;
   isSaving = false;
 
+  selectedCostTypeId: number | null = null;
+
+  costTypeList: any;
+
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
     this.getGroupingList();
     this.getAccountHeadList();
+    this.getCostType_DropDown();
+  }
+
+  getCostType_DropDown() {
+    this.dataService
+      .getCostBucketDropdownData('COST_TYPE')
+      .subscribe((data: any) => {
+        this.costTypeList = data;
+      });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -245,6 +260,7 @@ export class EditAccountComponent implements OnChanges {
       GROUP_ORDER: this.accountHeadData.GROUP_ORDER || 0,
       GROUP_LEVEL: this.accountHeadData.GROUP_LEVEL || 0,
       IS_INACTIVE: !!this.accountHeadData.IS_INACTIVE,
+      CostTypeID: this.accountHeadData.CostTypeID || 0,
     };
     this.isSaving = true;
     this.dataService.updateAccountHead(payload).subscribe((response: any) => {
@@ -447,8 +463,8 @@ export class EditAccountComponent implements OnChanges {
     DxBoxModule,
   ],
   providers: [],
-  declarations: [EditAccountComponent],
-  exports: [EditAccountComponent],
+  declarations: [ChartOfAccountsFinanceEditFormComponent],
+  exports: [ChartOfAccountsFinanceEditFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditAccountModule {}
+export class ChartOfAccountsFinanceEditFormModule {}

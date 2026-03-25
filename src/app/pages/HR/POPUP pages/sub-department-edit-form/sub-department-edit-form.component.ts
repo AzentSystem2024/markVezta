@@ -37,12 +37,10 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
   formCategoryData = {
     ID: '',
     CODE: '',
-    CAT_NAME: '',
-    LOYALTY_POINT: 0,
-    COST_HEAD_ID: '5',
-    DEPT_ID: '',
-    COMPANY_ID: '1',
+    DESCRIPTION: '',
+    DEPARTMENT_ID: '',
   };
+
   DepartmentDropdownData: any;
   newCategory: any;
   category: any = [];
@@ -54,11 +52,6 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
-      console.log(
-        'Received selectedData:',
-        changes['selectedData'].currentValue,
-      );
-
       // Merge selectedData into formCategoryData
       this.formCategoryData = {
         ...this.formCategoryData, // keep defaults
@@ -69,12 +62,7 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
-    );
   }
 
   showCategory() {
@@ -83,7 +71,6 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
     };
     this.service.getCategoryData(payload).subscribe((response) => {
       this.category = response;
-      console.log(response);
     });
   }
 
@@ -110,18 +97,14 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
     if (!result.isValid) {
       return;
     }
-    console.log('edit category');
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
-    this.service.getCategoryData(payload).subscribe((response) => {
+    this.service.get_SubDepartment_Data().subscribe((response) => {
       this.category = response;
-      console.log(response);
-
       const payload = {
         ...this.formCategoryData,
       };
-
       // Exclude the current record (by ID) from duplicate check
       const isCodeDuplicate = this.category.some(
         (item: any) =>
@@ -133,14 +116,14 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
       const isDescriptionDuplicate = this.category.some(
         (item: any) =>
           item.ID !== payload.ID &&
-          item.CAT_NAME?.toLowerCase().trim() ===
-            payload.CAT_NAME?.toLowerCase().trim(),
+          item.DESCRIPTION?.toLowerCase().trim() ===
+            payload.DESCRIPTION?.toLowerCase().trim(),
       );
 
       if (isCodeDuplicate && isDescriptionDuplicate) {
         notify(
           {
-            message: 'Both Code and Category already exist',
+            message: 'Both Code and description already exist',
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
@@ -160,7 +143,7 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
       } else if (isDescriptionDuplicate) {
         notify(
           {
-            message: 'This Category already exists',
+            message: 'This Description already exists',
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
@@ -169,12 +152,11 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
         return;
       }
 
-      this.service.updateCategory(payload).subscribe((res: any) => {
-        console.log(res);
+      this.service.Update_SubDepartment_Data(payload).subscribe((res: any) => {
         this.popupClosed.emit();
         notify(
           {
-            message: 'This Item Category Updated successfully',
+            message: 'This Sub department Updated successfully',
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
