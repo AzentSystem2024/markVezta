@@ -10,7 +10,7 @@ import {
 import { DxPopupModule } from 'devextreme-angular';
 import { CommonModule } from '@angular/common';
 import { FormPopupModule } from 'src/app/components';
-import { DepartmentFormModule } from '../../../../components/library/department-form/department-form.component';
+import { DepartmentFormModule } from '../../../components/library/department-form/department-form.component';
 import { DxDataGridComponent } from 'devextreme-angular';
 import {
   FormBuilder,
@@ -38,14 +38,15 @@ export class DepartmentComponent {
   selectCode: any;
   AddDepartmentPopup = false;
   UpdateDepartmentPopup = false;
-  editingRowData: any = {}; // To store the selected row's data
+  editingRowData: any = {};
   selectedData: any;
   list_of_duplication: any;
   Department: any[];
   departmentComponent: any;
-  formData = { IS_ACTIVE: false }; // DevExtreme expects an object
+  formData = { IS_ACTIVE: false };
   editingIndex: number;
   isLoading: boolean;
+
   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
@@ -61,6 +62,25 @@ export class DepartmentComponent {
     elementAttr: { class: 'add-button' },
   };
 
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.get_Department_List());
+    },
+    text: '',
+  };
+  isFilterOpened: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,
@@ -74,10 +94,28 @@ export class DepartmentComponent {
     this.get_Department_List();
   }
 
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+    }
+    this.get_Department_List();
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
   addDepartment() {
     this.AddDepartmentPopup = true;
   }
-  
+
   UpdateDepartment() {
     this.UpdateDepartmentPopup = true;
   }

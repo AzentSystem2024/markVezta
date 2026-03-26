@@ -66,16 +66,9 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Chart Of Accounts</div>
+          <div class="grid-header">Chart Of Accounts finance</div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-        <!-- <dxi-item
-  location="after"
-  locateInMenu="auto"
-  showText="inMenu"
-  widget="dxButton"
-  [options]="getFilterButtonOptions()"
-></dxi-item> -->
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -109,6 +102,7 @@
       <dxi-column dataField="Category" caption="Category"></dxi-column>
       <dxi-column dataField="HeadCode" caption="Code"></dxi-column>
       <dxi-column dataField="HeadName" caption="Head Name"></dxi-column>
+      <dxi-column dataField="CostType" caption="Cost Type"></dxi-column>
       <dxi-column
         caption="Status"
         dataField="IS_INACTIVE"
@@ -130,26 +124,26 @@
 <dx-popup
   [(visible)]="addAccountPopupOpened"
   [width]="'30vw'"
-  [height]="auto"
+  [height]="'50vh'"
   title="New Account"
   (onHiding)="handleClose()"
 >
-  <app-add-account
+  <app-chart-of-accounts-finance-add-form
     *ngIf="addAccountPopupOpened"
     (popupClosed)="handleClose()"
-  ></app-add-account>
+  ></app-chart-of-accounts-finance-add-form>
 </dx-popup>
 
 <dx-popup
   [(visible)]="editAccountPopupOpened"
   [width]="'30vw'"
-  [height]="auto"
+  [height]="'55vh'"
   title="Update Account"
   (onHiding)="handleClose()"
 >
-  <app-edit-account
+  <app-chart-of-accounts-finance-edit-form
     *ngIf="editAccountPopupOpened"
     [accountHeadData]="selectedAccountHead"
     (popupClosed)="handleClose()"
-  ></app-edit-account>
+  ></app-chart-of-accounts-finance-edit-form>
 </dx-popup>

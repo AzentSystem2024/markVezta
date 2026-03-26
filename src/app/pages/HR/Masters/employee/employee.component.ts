@@ -4,6 +4,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -46,7 +47,7 @@ import { Router } from '@angular/router';
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.scss'],
 })
-export class EmployeeComponent {
+export class EmployeeComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -100,10 +101,7 @@ export class EmployeeComponent {
     onClick: () => this.toggleFilters(),
   };
 
-  onExporting(event: any) {
-    const fileName = 'Credit_Note';
-    this.dataservice.exportDataGrid(event, fileName);
-  }
+
 
   refreshButtonOptions = {
     icon: 'refresh',
@@ -120,6 +118,11 @@ export class EmployeeComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
   ) {}
+
+  onExporting(event: any) {
+    const fileName = 'Credit_Note';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
 
   formatDates(cellData: any): string {
     if (!cellData) return '';

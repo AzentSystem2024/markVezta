@@ -3,6 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -38,21 +39,18 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
-import { AddAccountModule } from '../add-account/add-account.component';
-import {
-  EditAccountModule,
-  EditAccountComponent,
-} from '../edit-account/edit-account.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
+import { ChartOfAccountsFinanceAddFormModule } from '../chart-of-accounts-finance-add-form/chart-of-accounts-finance-add-form.component';
+import { ChartOfAccountsFinanceEditFormModule } from '../chart-of-accounts-finance-edit-form/chart-of-accounts-finance-edit-form.component';
 
 @Component({
-  selector: 'app-accounts-list',
-  templateUrl: './accounts-list.component.html',
-  styleUrls: ['./accounts-list.component.scss'],
+  selector: 'app-chart-of-accounts-finance',
+  templateUrl: './chart-of-accounts-finance.component.html',
+  styleUrls: ['./chart-of-accounts-finance.component.scss'],
 })
-export class AccountsListComponent {
+export class ChartOfAccountsFinanceComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -85,6 +83,7 @@ export class AccountsListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
@@ -118,10 +117,17 @@ export class AccountsListComponent {
     text: '',
   };
   companyID: any;
-  onExporting(event: any) {
-    const fileName = 'ChartOfAccounts';
-    this.dataService.exportDataGrid(event, fileName);
-  }
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+  ];
+
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
@@ -130,14 +136,11 @@ export class AccountsListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    console.log('Parsed ObjectData:', menuResponse);
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/accounts');
@@ -151,8 +154,6 @@ export class AccountsListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
     this.getAccountsGroupList();
   }
 
@@ -270,42 +271,12 @@ export class AccountsListComponent {
     cellElement.appendChild(icon);
   }
 
-  getStatusFilterData = [
-    {
-      text: 'Approved',
-      value: 'Approved',
-    },
-    {
-      text: 'Open',
-      value: 'Open',
-    },
-  ];
-  // getAccountsGroupList() {
-  //   this.dataService.getAccountGroupHeadList().subscribe((response: any) => {
-  //     if (response?.Data && Array.isArray(response.Data)) {
-  //       this.accountsGroupList = response.Data.map(
-  //         (item: any, index: number) => ({
-  //           ...item,
-  //           sno: index + 1,
-  //         })
-  //       );
-  //       console.log(this.accountsGroupList, 'accountsGroupList with Serial No');
-  //     } else {
-  //       this.accountsGroupList = [];
-  //       console.warn('No data found in response');
-  //     }
-  //   });
-  // }
-
   onEditAccount(event: any) {
-    console.log(event, 'EVENT');
     event.cancel = true;
     const accHeadId = event.data.ID;
-    console.log(accHeadId, 'ACCOUNTHEADID');
     this.dataService.selectAccountHead(accHeadId).subscribe((response: any) => {
       this.selectedAccountHead = response.Data;
       this.editAccountPopupOpened = true;
-      console.log(response, 'RESPONSE');
     });
   }
 
@@ -315,8 +286,7 @@ export class AccountsListComponent {
 
   onDeleteAccountHead(e: any) {
     const accHeadId = e.data.ID;
-    // console.log("delete")
-    // Optionally prevent the default delete behavior
+    // // Optionally prevent the default delete behavior
     e.cancel = true;
 
     // Call your delete API
@@ -354,6 +324,11 @@ export class AccountsListComponent {
     this.editAccountPopupOpened = false;
     this.getAccountsGroupList();
   }
+
+  onExporting(event: any) {
+    const fileName = 'ChartOfAccounts';
+    this.dataService.exportDataGrid(event, fileName);
+  }
 }
 
 @NgModule({
@@ -387,12 +362,12 @@ export class AccountsListComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
-    AddAccountModule,
-    EditAccountModule,
+    ChartOfAccountsFinanceAddFormModule,
+    ChartOfAccountsFinanceEditFormModule,
   ],
   providers: [],
-  declarations: [AccountsListComponent],
-  exports: [AccountsListComponent],
+  declarations: [ChartOfAccountsFinanceComponent],
+  exports: [ChartOfAccountsFinanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AccountsListModule {}
+export class ChartOfAccountsFinanceModule {}

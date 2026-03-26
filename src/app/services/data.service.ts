@@ -57,9 +57,7 @@ export class DataService {
   private worksheetDataSubject = new BehaviorSubject<any>(null); // Initialize with null
   worksheetData$ = this.worksheetDataSubject.asObservable();
 
-  // private apiUrl = 'http://103.180.120.134/veztaretail/api';http://veztaapi.diligenzit.com/api/
   private apiUrl = environment.apiUrl;
-  // private apiUrl = 'http://veztaapi.diligenzit.com/api';
   private apiUrlList =
     'http://veztaapi.diligenzit.com/api/worksheetitemproperty/itempropertylist';
   private apiUrlForStoreProperties =
@@ -153,6 +151,11 @@ export class DataService {
   public Dropdown_ItemTax(type: any): Observable<any> {
     const reqBodyData = { name: type };
     return this.http.post(`${this.apiUrl}dropdown/`, type);
+  }
+
+  public getCostBucketDropdownData(type: any): Observable<any> {
+    const reqBodyData = { name: type };
+    return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
   // --------------------------------------ARTICLE------------------------------------------------------------//
   getItemsForArticle(items: any) {
@@ -1289,12 +1292,12 @@ export class DataService {
     return this.http.post(getEndpoint, payload);
   }
 
-   Common_Dropdown(payload) {
+  Common_Dropdown(payload) {
     const getEndpoint = `${this.apiUrl}dropdown`;
     return this.http.post(getEndpoint, payload);
   }
 
-   Get_SubDepartment_Dropdown(payload) {
+  Get_SubDepartment_Dropdown(payload) {
     const getEndpoint = `${this.apiUrl}Employee/getsubdept`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1502,6 +1505,19 @@ export class DataService {
 
     return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
   }
+// ======= save middle east department data =======
+   public save_ME_Department_Data(
+    CODE: any,
+    DEPT_NAME: any,
+    COMPANY_ID: any,
+    COMPANY_NAME: any,
+    COST_BUCKET_ID: any,
+  ): Observable<any> {
+    const data = { CODE, DEPT_NAME, COMPANY_ID, COMPANY_NAME, COST_BUCKET_ID };
+    return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
+  }
+
+  
   removeDepartment(id: any) {
     return this.http.post(`${this.apiUrl}itemdepartment/delete/${id}`, {});
   }
@@ -1659,6 +1675,7 @@ export class DataService {
   select_subcategory(id: any) {
     return this.http.post(`${this.apiUrl}ItemSubCategory/select/${id}`, {});
   }
+
   public postCategoryData(
     CODE: any,
     CAT_NAME: any,
@@ -1678,6 +1695,39 @@ export class DataService {
 
     return this.http.post(`${this.apiUrl}ItemCategory/save`, data);
   }
+
+  get_SubDepartment_Data(): Observable<any> {
+    return this.http.post(`${this.apiUrl}SubDepartment/list`, {});
+  }
+
+  Save_SubDepartment_Data(
+    CODE: any,
+    DESCRIPTION: any,
+    DEPARTMENT_ID: any,
+  ): Observable<any> {
+    const data = {
+      CODE,
+      DESCRIPTION,
+      DEPARTMENT_ID,
+    };
+
+    return this.http.post(`${this.apiUrl}SubDepartment/save`, data);
+  }
+
+  Update_SubDepartment_Data(payload: any): Observable<any> {
+    const data = {
+      ID: payload.ID,
+      CODE: payload.CODE,
+      DESCRIPTION: payload.DESCRIPTION,
+      DEPARTMENT_ID: payload.DEPARTMENT_ID,
+    };
+    return this.http.post(`${this.apiUrl}SubDepartment/update`, data);
+  }
+
+  removeSubdepartment(id: any) {
+    return this.http.post<any>(`${this.apiUrl}SubDepartment/delete/` + id, {});
+  }
+
   removeCategory(
     id: any,
     code: any,
@@ -1700,27 +1750,6 @@ export class DataService {
       requestBody,
     );
   }
-  // updateCategory(
-  //   ID: any,
-  //   CODE: any,
-  //   CAT_NAME: any,
-  //   LOYALTY_POINT: any,
-  //   COST_HEAD_ID: any,
-  //   DEPT_ID: any,
-  //   COMPANY_ID: any
-  // ): Observable<any> {
-  //   const data = {
-  //     ID,
-  //     CODE,
-  //     CAT_NAME,
-  //     LOYALTY_POINT,
-  //     COST_HEAD_ID,
-  //     DEPT_ID,
-  //     COMPANY_ID,
-  //   };
-
-  //   return this.http.post(`${this.apiUrl}/itemcategory/save`, data);
-  // }
 
   updateCategory(item: any) {
     const payload = item;
@@ -3129,11 +3158,11 @@ export class DataService {
     );
   }
 
-  //dropdown
-  // public getDropdownData(type: any): Observable<any> {
-  //   const reqBodyData = { name: type };
-  //   return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
-  // }
+
+   get_Sub_Dept_DropdownData(DeptID: any): Observable<any> {
+    const reqBodyData = { DEPT_ID: DeptID };
+    return this.http.post(`${this.apiUrl}Employee/getsubdept`, reqBodyData);
+  }
 
   public getDropdownData(data: any): Observable<any> {
     const reqBodyData = data;
@@ -3959,13 +3988,13 @@ The result can be exported to HTML or Markdown.`;
   //---------------HR Masters-----------------
 
   get_Department_List() {
-    const getEndpoint = this.apiUrl + '/Department/list';
+    const getEndpoint = this.apiUrl + 'Department/list';
     return this.http.post(getEndpoint, {});
   }
 
   //===============Add Api=========================
   Insert_Department_Api(CODE: any, DEPT_NAME: any, IS_ACTIVE: boolean) {
-    const getEndpoint = this.apiUrl + '/Department/save';
+    const getEndpoint = this.apiUrl + 'Department/save';
     const reqBody = {
       CODE: CODE,
       DEPT_NAME: DEPT_NAME,
@@ -3976,7 +4005,7 @@ The result can be exported to HTML or Markdown.`;
 
   //==============Update Api==============================
   Update_Department_Api(ID: any, CODE: any, DEPT_NAME: any, IS_ACTIVE: any) {
-    const getEndpoint = this.apiUrl + '/Department/edit';
+    const getEndpoint = this.apiUrl + 'Department/edit';
     const reqBody = {
       ID: ID,
       CODE: CODE,
@@ -3988,12 +4017,12 @@ The result can be exported to HTML or Markdown.`;
   }
 
   Select_Department_Api(ID: any) {
-    const getEndpoint = this.apiUrl + `/Department/select/${ID}`;
+    const getEndpoint = this.apiUrl + `Department/select/${ID}`;
     return this.http.post(getEndpoint, {});
   }
 
   Delete_Department_Api(ID: any) {
-    const getEndpoint = this.apiUrl + `/Department/delete/${ID}`;
+    const getEndpoint = this.apiUrl + `Department/delete/${ID}`;
     return this.http.post(getEndpoint, {});
   }
 
@@ -6298,10 +6327,6 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // ===================stock movement drilldown==================
-  // Fetch_StockMovement_Details(payload){
-  //   const getEndpoint = this.apiUrl + 'StockMovementRpt/stockDrilldown';
-  //   return this.http.post(getEndpoint, payload);
-  // }
   Fetch_StockMovement_Details(payload: any) {
     const getEndpoint = this.apiUrl + 'StockMovementRpt/stockDrilldown';
     return this.http.post<{ data: any[] }>(getEndpoint, payload);
@@ -6332,23 +6357,23 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}Company/getdigit`, data);
   }
 
-  FixedAssetRegister_List(payload){
-     const getEndpoint = this.apiUrl + 'Report/fixedassetreport';
+  FixedAssetRegister_List(payload) {
+    const getEndpoint = this.apiUrl + 'Report/fixedassetreport';
     return this.http.post(getEndpoint, payload);
   }
 
-  Depreciation_Report(payload){
-     const getEndpoint = this.apiUrl + 'Report/depreciationreport';
+  Depreciation_Report(payload) {
+    const getEndpoint = this.apiUrl + 'Report/depreciationreport';
     return this.http.post(getEndpoint, payload);
   }
 
-  PDC_Report(payload){
-     const getEndpoint = this.apiUrl + 'Report/pdclist';
+  PDC_Report(payload) {
+    const getEndpoint = this.apiUrl + 'Report/pdclist';
     return this.http.post(getEndpoint, payload);
   }
 
-   Prepayment_posting_Report(payload){
-     const getEndpoint = this.apiUrl + 'Report/prepaymentreport';
+  Prepayment_posting_Report(payload) {
+    const getEndpoint = this.apiUrl + 'Report/prepaymentreport';
     return this.http.post(getEndpoint, payload);
   }
 }

@@ -1,11 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import {
-  DxDataGridComponent,
-  DxDataGridModule,
-  DxSelectBoxModule,
-  DxTemplateModule,
-} from 'devextreme-angular';
+import { DxSelectBoxModule, DxTemplateModule } from 'devextreme-angular';
 import { AppComponent } from './app.component';
 import { SideNavOuterToolbarModule, SingleCardModule } from './layouts';
 import {
@@ -30,7 +25,7 @@ import { ThemeService } from './services';
 import { DxFormModule } from 'devextreme-angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TaskListModule } from 'src/app/components/library/task-list-grid/task-list-grid.component';
-import { DepartmentListModule } from './pages/MASTER/department-list/department-list.component';
+import { DepartmentListModule } from './pages/MASTER/item-department-list/department-list.component';
 import { DepartmentFormModule } from './components/library/department-form/department-form.component';
 import { CountryListModule } from './pages/country-list/country-list.component';
 import { CountryFormModule } from './components/library/country-form/country-form.component';
@@ -40,12 +35,7 @@ import { CurrencyListModule } from './pages/currency-list/currency-list.componen
 import { CurrencyFormModule } from './components/library/currency-form/currency-form.component';
 // import { CustomerListModule } from './pages/customer-list/customer-list.component';
 import { CategoryListModule } from './pages/MASTER/category-list/category-list.component';
-import { CategoryFormComponent } from './components/library/category-form/category-form.component';
 import { CategoryFormModule } from './components/library/category-form/category-form.component';
-// import { SubCategoryListComponent } from './pages/sub-category-list/sub-category-list.component';
-// import { SubCategoryListModule } from './pages/sub-category-list/sub-category-list.component';
-// import { SubCategoryFormModule } from './components/library/subcategory-form/subcategory-form.component';
-import { VatClassListComponent } from './pages/MASTER/vat-class-list/vat-class-list.component';
 import { VatClassListModule } from './pages/MASTER/vat-class-list/vat-class-list.component';
 import { VatClassFormModule } from './components/library/vat-class-form/vat-class-form.component';
 import { PaymentTermsListModule } from './pages/payment-terms-list/payment-terms-list.component';
@@ -78,86 +68,34 @@ import { ItemsFormModule } from './components/library/items-form/items-form.comp
 //   SubcategoryFormComponent,
 //   SubCategoryFormModule,
 // } from './components/library/subcategory-form/subcategory-form.component';
-import {
-  SubcategoryListComponent,
-  SubCategoryListModule,
-} from './pages/MASTER/subcategory-list/subcategory-list.component';
-import {
-  SubcategoryFormComponent,
-  SubCategoryFormModule,
-} from './components/library/subcategory-form/subcategory-form.component';
-import { DxButtonModule } from 'devextreme-angular';
-import { CountryServiceService } from './services/country-service.service';
-import { UomAddFormComponent } from './components/library/uom-add-form/uom-add-form.component';
+import { SubCategoryListModule } from './pages/MASTER/subcategory-list/subcategory-list.component';
+import { SubCategoryFormModule } from './components/library/subcategory-form/subcategory-form.component';
 import { UomListModule } from './pages/MASTER/uom-list/uom-list.component';
 import { UomAddFormModule } from './components/library/uom-add-form/uom-add-form.component';
 import { PackingFormModule } from './components/library/packing-add-form/packing-add-form.component';
 import { PackingListModule } from './pages/packing-list/packing-list.component';
-import {
-  ItemsEditFormComponent,
-  ItemsEditFormModule,
-} from './pages/items-edit-form/items-edit-form.component';
-import {
-  StoreItemsComponent,
-  StoreItemsModule,
-} from './pages/store-items/store-items.component';
-import {
-  StoreItemsListComponent,
-  StoreItemsListModule,
-} from './pages/store-items-list/store-items-list.component';
-import {
-  ItemProperty3Component,
-  ItemProperty3Module,
-} from './pages/MASTER/item-property3/item-property3.component';
-import { ItemProperty3FormComponent } from './components/library/item-property3-form/item-property3-form.component';
-import { StoreItemsDetailsComponent } from './pages/store-items-details/store-items-details.component';
-import {
-  ItemProperty4ListComponent,
-  ItemProperty4ListModule,
-} from './pages/MASTER/item-property4-list/item-property4-list.component';
-import { ItemProperty4FormComponent } from './components/library/item-property4-form/item-property4-form.component';
-import {
-  ItemProperty5ListComponent,
-  ItemProperty5ListModule,
-} from './pages/MASTER/item-property5-list/item-property5-list.component';
-import { ItemProperty5FormComponent } from './components/library/item-property5-form/item-property5-form.component';
-import {
-  HashLocationStrategy,
-  LocationStrategy,
-  PathLocationStrategy,
-} from '@angular/common';
-import { ImportItemsComponent } from './pages/MASTER/import-items/import-items.component';
+import { ItemsEditFormModule } from './pages/items-edit-form/items-edit-form.component';
+import { StoreItemsModule } from './pages/store-items/store-items.component';
+import { StoreItemsListModule } from './pages/store-items-list/store-items-list.component';
+import { ItemProperty3Module } from './pages/MASTER/item-property3/item-property3.component';
+import { ItemProperty4ListModule } from './pages/MASTER/item-property4-list/item-property4-list.component';
+import { ItemProperty5ListModule } from './pages/MASTER/item-property5-list/item-property5-list.component';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { ImportItemsModule } from './pages/MASTER/import-items/import-items.component';
 import { ImportItemsTemplateModule } from './pages/MASTER/import-items-template/import-items-template.component';
 import { ImportItemTemplateFormModule } from './components/library/import-item-template-form/import-item-template-form.component';
 import { ImportItemTemplateEditFormModule } from './components/library/import-item-template-edit-form/import-item-template-edit-form.component';
-import {
-  TooltipCellComponent,
-  TooltipCellModule,
-} from './components/utils/tooltip-cell/tooltip-cell.component';
+import { TooltipCellModule } from './components/utils/tooltip-cell/tooltip-cell.component';
 import { ImportItemsDialogModule } from './components/library/import-items-dialog/import-items-dialog.component';
 import { ViewImportedItemsModule } from './components/library/view-imported-items/view-imported-items.component';
-import {
-  StoreItemsAddFormComponent,
-  StoreItemsAddFormModule,
-} from './pages/store-items-add-form/store-items-add-form.component';
-import { ItemStorePropertiesComponent } from './pages/item-store-properties/item-store-properties.component';
-import {
-  ItemStorePropertiesLogComponent,
-  ItemStorePropertiesLogModule,
-} from './pages/item-store-properties-log/item-store-properties-log.component';
-import {
-  ItemStorePropertiesEditComponent,
-  ItemStorePropertiesEditModule,
-} from './pages/item-store-properties-edit/item-store-properties-edit.component';
+import { StoreItemsAddFormModule } from './pages/store-items-add-form/store-items-add-form.component';
+import { ItemStorePropertiesLogModule } from './pages/item-store-properties-log/item-store-properties-log.component';
+import { ItemStorePropertiesEditModule } from './pages/item-store-properties-edit/item-store-properties-edit.component';
 import { UserLevelsModule } from './pages/MASTER/user-levels/user-levels.component';
 import { UserLevelsFormModule } from './components/library/user-levels-form/user-levels-form.component';
 import { UserLevelsEditFormModule } from './components/library/user-levels-edit-form/user-levels-edit-form.component';
 
-import {
-  PurchaseOrderNewFormComponent,
-  PurchaseOrderNewFormModule,
-} from './pop-up/operations/purchase-order-new-form/purchase-order-new-form.component';
+import { PurchaseOrderNewFormModule } from './pop-up/operations/purchase-order-new-form/purchase-order-new-form.component';
 import { PurchaseOrderEditFormModule } from './pop-up/operations/purchase-order-edit-form/purchase-order-edit-form.component';
 import { PurchaseOrderVerifyFormModule } from './pop-up/operations/purchase-order-verify-form/purchase-order-verify-form.component';
 import { PurchaseOrderApproveFormModule } from './pop-up/operations/purchase-order-approve-form/purchase-order-approve-form.component';
@@ -175,843 +113,247 @@ import { GrnViewFormModule } from './pop-up/operations/grn-view-form/grn-view-fo
 import { PurchaseReturnNewFormModule } from './pop-up/operations/purchase-return-new-form/purchase-return-new-form.component';
 import { PurchaseReturnEditFormModule } from './pop-up/operations/purchase-return-edit-form/purchase-return-edit-form.component';
 import { PurchaseReturnVerifyFormModule } from './pop-up/operations/purchase-return-verify-form/purchase-return-verify-form.component';
-import { PurchaseReturnApproveFormModule } from './pop-up/operations/purchase-return-approve-form/purchase-return-approve-form.component';
 import { PurchaseReturnViewFormModule } from './pop-up/operations/purchase-return-view-form/purchase-return-view-form.component';
 import { TransferOutModule } from './pages/OPERATIONS/transfer-out/transfer-out.component';
 import { TransferOutNewFormModule } from './pop-up/operations/transfer-out-new-form/transfer-out-new-form.component';
 import { TransferOutEditFormModule } from './pop-up/operations/transfer-out-edit-form/transfer-out-edit-form.component';
-import {
-  TransferOutVerifyFormComponent,
-  TransferOutVerifyFormModule,
-} from './pop-up/operations/transfer-out-verify-form/transfer-out-verify-form.component';
+import { TransferOutVerifyFormModule } from './pop-up/operations/transfer-out-verify-form/transfer-out-verify-form.component';
 import { TransferOutApproveFormModule } from './pop-up/operations/transfer-out-approve-form/transfer-out-approve-form.component';
 import { TransferOutViewFormModule } from './pop-up/operations/transfer-out-view-form/transfer-out-view-form.component';
 import { TransferInModule } from './pages/OPERATIONS/transfer-in/transfer-in.component';
-import {
-  TransferInNewFormComponent,
-  TransferInNewFormModule,
-} from './pop-up/operations/transfer-in-new-form/transfer-in-new-form.component';
-import {
-  TransferInEditFormComponent,
-  TransferInEditFormModule,
-} from './pop-up/operations/transfer-in-edit-form/transfer-in-edit-form.component';
-import {
-  TransferInVerifyFormComponent,
-  TransferInVerifyFormModule,
-} from './pop-up/operations/transfer-in-verify-form/transfer-in-verify-form.component';
-import {
-  TransferInApproveFormComponent,
-  TransferInApproveFormModule,
-} from './pop-up/operations/transfer-in-approve-form/transfer-in-approve-form.component';
-import {
-  TransferInViewFormComponent,
-  TransferInViewFormModule,
-} from './pop-up/operations/transfer-in-view-form/transfer-in-view-form.component';
-import {
-  ItemStorePricesComponent,
-  ItemStorePricesModule,
-} from './pages/OPERATIONS/item-store-prices/item-store-prices.component';
+import { TransferInNewFormModule } from './pop-up/operations/transfer-in-new-form/transfer-in-new-form.component';
+import { TransferInEditFormModule } from './pop-up/operations/transfer-in-edit-form/transfer-in-edit-form.component';
+import { TransferInViewFormModule } from './pop-up/operations/transfer-in-view-form/transfer-in-view-form.component';
+import { ItemStorePricesModule } from './pages/OPERATIONS/item-store-prices/item-store-prices.component';
 // import {
 //   ItemStorePricesLogComponent,
 //   ItemStorePricesLogModule,
 // } from './pages/OPERATIONS/item-store-prices-log/item-store-prices-log.component';
-import {
-  ItemStorePricesEditComponent,
-  ItemStorePricesEditModule,
-} from './pages/item-store-prices-edit/item-store-prices-edit.component';
-import { PriceVerifyApproveComponent } from './pages/price-verify-approve/price-verify-approve.component';
-import {
-  ItemStorePriceVerifyApproveComponent,
-  ItemStorePriceVerifyApproveModule,
-} from './pages/item-store-price-verify-approve/item-store-price-verify-approve.component';
-import {
-  ItemStorePriceViewComponent,
-  ItemStorePriceViewModule,
-} from './pages/item-store-price-view/item-store-price-view.component';
-
-import {
-  ItemStorePriceApproveComponent,
-  ItemStorePriceApproveModule,
-} from './pages/item-store-price-approve/item-store-price-approve.component';
-import {
-  PromotionSchemaLogComponent,
-  PromotionSchemaLogModule,
-} from './pages/promotion-schema-log/promotion-schema-log.component';
-import {
-  PromotionSchemaEditComponent,
-  PromotionSchemaEditModule,
-} from './pages/promotion-schema-edit/promotion-schema-edit.component';
-import {
-  PromotionComponent,
-  PromotionModule,
-} from './pages/promotion/promotion.component';
-import {
-  PromotionPopupComponent,
-  PromotionPopupModule,
-} from './pages/promotion-popup/promotion-popup.component';
-import {
-  PromotionLogComponent,
-  PromotionLogModule,
-} from './pages/promotion-log/promotion-log.component';
-import {
-  PromotionEditComponent,
-  PromotionEditModule,
-} from './pages/promotion-edit/promotion-edit.component';
-import {
-  PromotionVerifyComponent,
-  PromotionVerifyModule,
-} from './pages/promotion-verify/promotion-verify.component';
-import {
-  PromotionApproveComponent,
-  PromotionApproveModule,
-} from './pages/promotion-approve/promotion-approve.component';
-import {
-  PromotionViewComponent,
-  PromotionViewModule,
-} from './pages/promotion-view/promotion-view.component';
+import { ItemStorePricesEditModule } from './pages/item-store-prices-edit/item-store-prices-edit.component';
+import { ItemStorePriceVerifyApproveModule } from './pages/item-store-price-verify-approve/item-store-price-verify-approve.component';
+import { ItemStorePriceViewModule } from './pages/item-store-price-view/item-store-price-view.component';
+import { ItemStorePriceApproveModule } from './pages/item-store-price-approve/item-store-price-approve.component';
+import { PromotionSchemaLogModule } from './pages/promotion-schema-log/promotion-schema-log.component';
+import { PromotionSchemaEditModule } from './pages/promotion-schema-edit/promotion-schema-edit.component';
+import { PromotionModule } from './pages/promotion/promotion.component';
+import { PromotionPopupModule } from './pages/promotion-popup/promotion-popup.component';
+import { PromotionLogModule } from './pages/promotion-log/promotion-log.component';
+import { PromotionEditModule } from './pages/promotion-edit/promotion-edit.component';
+import { PromotionVerifyModule } from './pages/promotion-verify/promotion-verify.component';
+import { PromotionApproveModule } from './pages/promotion-approve/promotion-approve.component';
+import { PromotionViewModule } from './pages/promotion-view/promotion-view.component';
 import { StockViewListModule } from './pages/OPERATIONS/stock-view-list/stock-view-list.component';
-import {
-  SupplierEditComponent,
-  SupplierEditModule,
-} from './pages/supplier-edit/supplier-edit.component';
+import { SupplierEditModule } from './pages/supplier-edit/supplier-edit.component';
 import { LandedCostEditModule } from './pages/landed-cost-edit/landed-cost-edit.component';
-import {
-  InterStoreTransferListComponent,
-  InterStoreTransferListModule,
-} from './pages/OPERATIONS/inter-store-transfer-list/inter-store-transfer-list.component';
+import { InterStoreTransferListModule } from './pages/OPERATIONS/inter-store-transfer-list/inter-store-transfer-list.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './services/auth.interceptor';
-import { DepartmentModule } from './pages/HR/Masters/department/department.component';
-import {
-  DesignationComponent,
-  DesignationModule,
-} from './pages/HR/Masters/designation/designation.component';
-import { EOSComponent, EOSModule } from './pages/HR/Masters/eos/eos.component';
-import {
-  PaySettingsComponent,
-  PaySettingsModule,
-} from './pages/HR/Masters/pay-settings/pay-settings.component';
-import {
-  LeaveSalaryComponent,
-  LeaveSalaryModule,
-} from './pages/HR/Masters/leave-salary/leave-salary.component';
-import {
-  EmployeeLeaveComponent,
-  EmployeeLeaveModule,
-} from './pages/HR/Masters/employee-leave/employee-leave.component';
-// import { AdvanceTypesModule } from './pages/HR/Masters/advance-types/advance-types.component';
-
-import {
-  EmployeeComponent,
-  EmployeeModule,
-} from './pages/HR/Masters/employee/employee.component';
-import {
-  EmployeeAddFormComponent,
-  EmployeeAddFormModule,
-} from './components/HR/Masters/employee-add-form/employee-add-form.component';
-import {
-  EmployeeEditFormComponent,
-  EmployeeEditFormFormModule,
-} from './components/HR/Masters/employee-edit-form/employee-edit-form.component';
+import { DesignationModule } from './pages/HR/Masters/designation/designation.component';
+import { EOSModule } from './pages/HR/Masters/eos/eos.component';
+import { PaySettingsModule } from './pages/HR/Masters/pay-settings/pay-settings.component';
+import { LeaveSalaryModule } from './pages/HR/Masters/leave-salary/leave-salary.component';
+import { EmployeeLeaveModule } from './pages/HR/Masters/employee-leave/employee-leave.component';
+import { EmployeeModule } from './pages/HR/Masters/employee/employee.component';
+import { EmployeeAddFormModule } from './components/HR/Masters/employee-add-form/employee-add-form.component';
+import { EmployeeEditFormFormModule } from './components/HR/Masters/employee-edit-form/employee-edit-form.component';
 import { SalaryHeadsModule } from './components/HR/Masters/salary-heads/salary-heads.component';
 import { AdvanceTypesModule } from './components/HR/Masters/advance-types/advance-types.component';
-import { AdvanceModule } from './pages/HR/Masters/advance/advance.component';
 import { PayRevisionModule } from './components/HR/Masters/pay-revision/pay-revision.component';
 import { PayRevisionEditModule } from './components/HR/Masters/pay-revision-edit/pay-revision-edit.component';
-import {
-  PayRevisionAddComponent,
-  PayRevisionAddModule,
-} from './components/HR/Masters/pay-revision-add/pay-revision-add.component';
-import {
-  PayRevisionVerifyComponent,
-  PayRevisionVerifyModule,
-} from './components/HR/Masters/pay-revision-verify/pay-revision-verify.component';
-import {
-  PayRevisionApproveComponent,
-  PayRevisionApproveModule,
-} from './components/HR/Masters/pay-revision-approve/pay-revision-approve.component';
-import {
-  PayRevisionViewComponent,
-  PayRevisionViewModule,
-} from './components/HR/Masters/pay-revision-view/pay-revision-view.component';
-import {
-  TimesheetListComponent,
-  TimesheetListModule,
-} from './pages/HR/Masters/timesheet-list/timesheet-list.component';
-import {
-  TimesheetAddComponent,
-  TimesheetAddModule,
-} from './components/HR/Masters/timesheet-add/timesheet-add.component';
+import { PayRevisionAddModule } from './components/HR/Masters/pay-revision-add/pay-revision-add.component';
+import { PayRevisionVerifyModule } from './components/HR/Masters/pay-revision-verify/pay-revision-verify.component';
+import { PayRevisionApproveModule } from './components/HR/Masters/pay-revision-approve/pay-revision-approve.component';
+import { PayRevisionViewModule } from './components/HR/Masters/pay-revision-view/pay-revision-view.component';
+import { TimesheetListModule } from './pages/HR/Masters/timesheet-list/timesheet-list.component';
+import { TimesheetAddModule } from './components/HR/Masters/timesheet-add/timesheet-add.component';
 import { TimesheetEditModule } from './components/HR/Masters/timesheet-edit/timesheet-edit.component';
 import { StaffEOSModule } from './components/HR/Masters/staff-eos/staff-eos.component';
-import {
-  TimesheetVerifyComponent,
-  TimesheetVerifyModule,
-} from './components/HR/Masters/timesheet-verify/timesheet-verify.component';
-import {
-  TimesheetApproveComponent,
-  TimesheetApproveModule,
-} from './components/HR/Masters/timesheet-approve/timesheet-approve.component';
-import {
-  TimesheetViewComponent,
-  TimesheetViewModule,
-} from './components/HR/Masters/timesheet-view/timesheet-view.component';
-import {
-  ListMiscellaneousPaymentsComponent,
-  MiscellaneousPaymentsModule,
-} from './pages/ACCOUNTS/list-miscellaneous-payments/list-miscellaneous-payments.component';
-import {
-  AddMiscellaneousPaymentComponent,
-  AddMiscellaneousPaymentModule,
-} from './components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
-import {
-  EditMiscellaneousPaymentComponent,
-  EditMiscellaneousPaymentModule,
-} from './components/HR/Masters/edit-miscellaneous-payment/edit-miscellaneous-payment.component';
-import {
-  VerifyMiscellaneousPaymentComponent,
-  VerifyMiscellaneousPaymentModule,
-} from './components/HR/Masters/verify-miscellaneous-payment/verify-miscellaneous-payment.component';
-import {
-  ApproveMiscellaneousPaymentComponent,
-  ApproveMiscellaneousPaymentModule,
-} from './components/HR/Masters/approve-miscellaneous-payment/approve-miscellaneous-payment.component';
-import {
-  ViewMiscellaneousPaymentComponent,
-  ViewMiscellaneousPaymentModule,
-} from './components/HR/Masters/view-miscellaneous-payment/view-miscellaneous-payment.component';
+import { TimesheetVerifyModule } from './components/HR/Masters/timesheet-verify/timesheet-verify.component';
+import { TimesheetApproveModule } from './components/HR/Masters/timesheet-approve/timesheet-approve.component';
+import { TimesheetViewModule } from './components/HR/Masters/timesheet-view/timesheet-view.component';
+import { MiscellaneousPaymentsModule } from './pages/ACCOUNTS/list-miscellaneous-payments/list-miscellaneous-payments.component';
+import { AddMiscellaneousPaymentModule } from './components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
+import { EditMiscellaneousPaymentModule } from './components/HR/Masters/edit-miscellaneous-payment/edit-miscellaneous-payment.component';
+import { VerifyMiscellaneousPaymentModule } from './components/HR/Masters/verify-miscellaneous-payment/verify-miscellaneous-payment.component';
+import { ApproveMiscellaneousPaymentModule } from './components/HR/Masters/approve-miscellaneous-payment/approve-miscellaneous-payment.component';
+import { ViewMiscellaneousPaymentModule } from './components/HR/Masters/view-miscellaneous-payment/view-miscellaneous-payment.component';
 import { PayrollListModule } from './pages/HR/Masters/payroll-list/payroll-list.component';
 import { PayrollAddModule } from './components/HR/Masters/payroll-add/payroll-add.component';
 import { PayrollVerifyModule } from './components/HR/Masters/payroll-verify/payroll-verify.component';
 import { PayrollApproveModule } from './components/HR/Masters/payroll-approve/payroll-approve.component';
-import {
-  PayrollViewComponent,
-  PayrollViewModule,
-} from './components/HR/Masters/payroll-view/payroll-view.component';
-import { AccountsListComponent } from './pages/ACCOUNTS/Chart of Account/accounts-list.component';
-import {
-  AddAccountComponent,
-  AddAccountModule,
-} from './pages/ACCOUNTS/add-account/add-account.component';
-import {
-  EditAccountComponent,
-  EditAccountModule,
-} from './pages/ACCOUNTS/edit-account/edit-account.component';
-import {
-  ArticleListComponent,
-  ArticleListModule,
-} from './pages/MASTER/article-list/article-list.component';
-import {
-  ArticleAddComponent,
-  ArticleAddModule,
-} from './pages/ARTICLE/article-add/article-add.component';
-
-import {
-  ArticleBrandComponent,
-  ArticleBrandModule,
-} from './pages/MASTER/article-brand/article-brand.component';
+import { PayrollViewModule } from './components/HR/Masters/payroll-view/payroll-view.component';
+import { AddAccountModule } from './pages/ACCOUNTS/add-account/add-account.component';
+import { EditAccountModule } from './pages/ACCOUNTS/edit-account/edit-account.component';
+import { ArticleListModule } from './pages/MASTER/article-list/article-list.component';
+import { ArticleAddModule } from './pages/ARTICLE/article-add/article-add.component';
+import { ArticleBrandModule } from './pages/MASTER/article-brand/article-brand.component';
 import { ArticleColorModule } from './pages/MASTER/article-color/article-color.component';
 import { ArticleTypeModule } from './pages/MASTER/article-type/article-type.component';
-import {
-  DealerComponent,
-  DealerModule,
-} from './pages/ARTICLE/dealer/dealer.component';
-import {
-  CompanyMasterComponent,
-  CompanyMasterModule,
-} from './pages/MASTER/company-master/company-master.component';
-
-import {
-  ArticleEditComponent,
-  ArticleEditModule,
-} from './pages/ARTICLE/article-edit/article-edit.component';
-
-import {
-  CategoryComponent,
-  CategoryModule,
-} from './pages/ARTICLE/category/category/category.component';
-import {
-  PackingComponent,
-  PackingModule,
-} from './pages/MASTER/packing/packing.component';
-import {
-  PackingAddComponent,
-  PackingAddModule,
-} from './pages/ARTICLE/packing-add/packing-add.component';
-
-import {
-  ArticleProductionViewComponent,
-  ArticleProductionViewModule,
-} from './components/HR/Masters/article-production-view/article-production-view.component';
-import {
-  PackProductionViewComponent,
-  PackProductionViewModule,
-} from './pages/ARTICLE/pack-production-view/pack-production-view.component';
-import {
-  StockMovementViewComponent,
-  StockMovementViewModule,
-} from './pages/ARTICLE/stock-movement-view/stock-movement-view.component';
-import { TransferOutViewComponent } from './pages/ARTICLE/transfer-out-view/transfer-out-view.component';
-import {
-  PackingEditComponent,
-  PackingEditModule,
-} from './pages/ARTICLE/packing-edit/packing-edit.component';
-import {
-  ArticleStockViewComponent,
-  ArticleStockViewModule,
-} from './pages/ARTICLE/article-stock-view/article-stock-view.component';
-import {
-  CartonStockViewComponent,
-  CartonStockViewModule,
-} from './pages/ARTICLE/carton-stock-view/carton-stock-view.component';
-import {
-  TransferInViewComponent,
-  TransferInViewModule,
-} from './pages/ARTICLE/transfer-in-view/transfer-in-view.component';
-
-import { UserLevelNewFormComponent } from './pages/HR/Masters/user-level-new-form/user-level-new-form.component';
-import { UserLevelEditFormComponent } from './pages/HR/Masters/user-level-edit-form/user-level-edit-form.component';
-import { UserNewFormComponent } from './pages/HR/Masters/user-new-form/user-new-form.component';
-import { UserEditFormComponent } from './pages/HR/Masters/user-edit-form/user-edit-form.component';
-import { UserRoleComponent } from './pages/MASTER/user-role/user-role.component';
-import { UserComponent } from './pages/HR/Masters/user/user.component';
+import { DealerModule } from './pages/ARTICLE/dealer/dealer.component';
+import { CompanyMasterModule } from './pages/MASTER/company-master/company-master.component';
+import { ArticleEditModule } from './pages/ARTICLE/article-edit/article-edit.component';
+import { CategoryModule } from './pages/ARTICLE/category/category/category.component';
+import { PackingModule } from './pages/MASTER/packing/packing.component';
+import { PackingAddModule } from './pages/ARTICLE/packing-add/packing-add.component';
+import { ArticleProductionViewModule } from './components/HR/Masters/article-production-view/article-production-view.component';
+import { PackProductionViewModule } from './pages/ARTICLE/pack-production-view/pack-production-view.component';
+import { StockMovementViewModule } from './pages/ARTICLE/stock-movement-view/stock-movement-view.component';
+import { PackingEditModule } from './pages/ARTICLE/packing-edit/packing-edit.component';
+import { ArticleStockViewModule } from './pages/ARTICLE/article-stock-view/article-stock-view.component';
+import { CartonStockViewModule } from './pages/ARTICLE/carton-stock-view/carton-stock-view.component';
+import { TransferInViewModule } from './pages/ARTICLE/transfer-in-view/transfer-in-view.component';
 import { UserRoleModule } from './pages/MASTER/user-role/user-role.component';
 import { UserLevelNewFormModule } from './pages/HR/Masters/user-level-new-form/user-level-new-form.component';
 import { UserLevelEditFormModule } from './pages/HR/Masters/user-level-edit-form/user-level-edit-form.component';
 import { UserModule } from './pages/HR/Masters/user/user.component';
 import { UserNewFormModule } from './pages/HR/Masters/user-new-form/user-new-form.component';
 import { UserEditFormModule } from './pages/HR/Masters/user-edit-form/user-edit-form.component';
-
-import {
-  JournalVoucherListComponent,
-  JournalVoucherModule,
-} from './pages/ACCOUNTS/journal-voucher-list/journal-voucher-list.component';
-import {
-  AddJournalVoucharComponent,
-  AddJournalVoucharModule,
-} from './pages/JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import {
-  EditJournalVoucherComponent,
-  EditJournalVoucherModule,
-} from './pages/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { CommitJournalVoucherComponent } from './pages/JOURNAL-VOUCHER/commit-journal-voucher/commit-journal-voucher.component';
-import {
-  ViewJournalVoucherComponent,
-  ViewJournalVoucherModule,
-} from './pages/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import {
-  CreditNoteListComponent,
-  CreditNoteListModule,
-} from './pages/ACCOUNTS/credit-note-list/credit-note-list.component';
-import { AddCreditNoteComponent } from './pages/CREDIT-NOTE/add-credit-note/add-credit-note.component';
-// import { EditCreditNoteComponent, EditCreditNoteModule } from './pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import {
-  MonthlyPlanComponent,
-  MonthlyPlanModule,
-} from './pages/ARTICLE/monthly-plan/monthly-plan.component';
-import {
-  LedgerStatementComponent,
-  LedgerStatementModule,
-} from './pages/REPORT/ledger-statement/ledger-statement.component';
-
-// @NgModule({
-//   declarations: [AppComponent,],
-
-import {
-  EditCreditNoteComponent,
-  EditCreditNoteModule,
-} from './pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-// import {
-//   MonthlyPlanComponent,
-//   MonthlyPlanModule,
-// } from './pages/ARTICLE/monthly-plan/monthly-plan.component';
-// import {
-//   ViewCreditNoteComponent,
-//   ViewCreditNoteModule,
-// } from './pages/CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import {
-  DebitComponent,
-  DebitModule,
-} from './pages/ACCOUNTS/debit/debit.component';
-import {
-  AddDebitComponent,
-  AddDebitModule,
-} from './pages/DEBIT/add-debit/add-debit.component';
-import {
-  EditDebitComponent,
-  EditDebitModule,
-} from './pages/DEBIT/edit-debit/edit-debit.component';
-import {
-  ViewDebitComponent,
-  ViewDebitModule,
-} from './pages/DEBIT/view-debit/view-debit.component';
-import {
-  InvoiceListComponent,
-  InvoiceListModule,
-} from './pages/Operations/invoice-list/invoice-list.component';
-import {
-  AddInvoiceComponent,
-  AddInvoiceModule,
-} from './pages/INVOICE/add-invoice/add-invoice.component';
-import {
-  EditInvoiceComponent,
-  EditInvoiceModule,
-} from './pages/INVOICE/edit-invoice/edit-invoice.component';
-import {
-  ViewInvoiceComponent,
-  ViewInvoiceModule,
-} from './pages/INVOICE/view-invoice/view-invoice.component';
-import {
-  CustomerReceiptsComponent,
-  CustomerReceiptsModule,
-} from './pages/Operations/customer-receipts/customer-receipts.component';
-import {
-  AddCutomerReceiptComponent,
-  AddCutomerReceiptModule,
-} from './pages/CUSTOMER-RECEIPTS/add-cutomer-receipt/add-cutomer-receipt.component';
-import {
-  EditCustomerReceiptComponent,
-  EditCustomerReceiptModule,
-} from './pages/CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
-import {
-  ViewCustomerReceiptComponent,
-  ViewCustomerReceiptModule,
-} from './pages/CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
-import {
-  TrialBalanceReportComponent,
-  TrialBalanceReportModule,
-} from './pages/REPORT/trial-balance-report/trial-balance-report.component';
+import { JournalVoucherModule } from './pages/ACCOUNTS/journal-voucher-list/journal-voucher-list.component';
+import { AddJournalVoucharModule } from './pages/JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
+import { EditJournalVoucherModule } from './pages/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
+import { ViewJournalVoucherModule } from './pages/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
+import { CreditNoteListModule } from './pages/ACCOUNTS/credit-note-list/credit-note-list.component';
+import { LedgerStatementModule } from './pages/REPORT/ledger-statement/ledger-statement.component';
+import { EditCreditNoteModule } from './pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
+import { DebitModule } from './pages/ACCOUNTS/debit/debit.component';
+import { AddDebitModule } from './pages/DEBIT/add-debit/add-debit.component';
+import { EditDebitModule } from './pages/DEBIT/edit-debit/edit-debit.component';
+import { ViewDebitModule } from './pages/DEBIT/view-debit/view-debit.component';
+import { InvoiceListModule } from './pages/Operations/invoice-list/invoice-list.component';
+import { AddInvoiceModule } from './pages/INVOICE/add-invoice/add-invoice.component';
+import { EditInvoiceModule } from './pages/INVOICE/edit-invoice/edit-invoice.component';
+import { ViewInvoiceModule } from './pages/INVOICE/view-invoice/view-invoice.component';
+import { CustomerReceiptsModule } from './pages/Operations/customer-receipts/customer-receipts.component';
+import { AddCutomerReceiptModule } from './pages/CUSTOMER-RECEIPTS/add-cutomer-receipt/add-cutomer-receipt.component';
+import { EditCustomerReceiptModule } from './pages/CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
+import { ViewCustomerReceiptModule } from './pages/CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
+import { TrialBalanceReportModule } from './pages/REPORT/trial-balance-report/trial-balance-report.component';
 import { JournalBookModule } from './pages/ACCOUNTS/journal-book/journal-book.component';
 import { PayrollEditModule } from './components/HR/Masters/payroll-edit/payroll-edit.component';
-// import { EmployeeSalarySettingsEditModule } from './components/HR/Masters/employee-salary-settings-edit/employee-salary-settings-edit/employee-salary-settings-edit.component';
-// import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add/employee-salary-settings-add.component';
-// import { EmployeeSalarySettingsModule } from './components/HR/Masters/employee-salary-settings/employee-salary-settings/employee-salary-settings.component';
-// import { SalaryHeadListModule } from './components/HR/Masters/Salary Head/salary-head-list/salary-head-list.component';
 import { SalaryHeadAddModule } from './components/HR/Masters/Salary Head/salary-head-add/salary-head-add.component';
 import { SalaryHeadEditModule } from './components/HR/Masters/Salary Head/salary-head-edit/salary-head-edit.component';
-import {
-  CustomerEditFormComponent,
-  CustomerEditFormModule,
-} from './components/HR/Masters/Customer/customer-edit-form/customer-edit-form.component';
+import { CustomerEditFormModule } from './components/HR/Masters/Customer/customer-edit-form/customer-edit-form.component';
 import { CustomerListModule } from './pages/MASTER/customer-list/customer-list.component';
 import { CustomerFormModule } from './components/HR/Masters/Customer/customer-form/customer-form.component';
 import { FixedAsstesListModule } from './pages/ACCOUNTS/fixed-asstes-list/fixed-asstes-list.component';
 import { FixedAsstesAddModule } from './pages/FIXED_ASSETS/fixed-asstes-add/fixed-asstes-add.component';
 import { FixedAsstesEditModule } from './pages/FIXED_ASSETS/fixed-asstes-edit/fixed-asstes-edit.component';
 import { DepreciationListModule } from './pages/ACCOUNTS/depreciation-list/depreciation-list.component';
-import {
-  DepreciationAddComponent,
-  DepreciationAddModule,
-} from './pages/Depreciation/depreciation-add/depreciation-add.component';
+import { DepreciationAddModule } from './pages/Depreciation/depreciation-add/depreciation-add.component';
 import { DepreciationEditModule } from './pages/Depreciation/depreciation-edit/depreciation-edit.component';
-import {
-  SupplierPaymentListComponent,
-  SupplierPaymentListModule,
-} from './pages/ACCOUNTS/supplier-payment-list/supplier-payment-list.component';
-import {
-  OpeningBalanceComponent,
-  OpeningBalanceModule,
-} from './pages/ACCOUNTS/opening-balance/opening-balance.component';
-import {
-  AddSupplierPaymentComponent,
-  AddSupplierPaymentModule,
-} from './pages/SUPPLIER-PAYMENT/add-supplier-payment/add-supplier-payment.component';
-import {
-  PurchaseInvoiceListComponent,
-  PurchaseInvoiceListModule,
-} from './pages/Operations/purchase-invoice-list/purchase-invoice-list.component';
-import {
-  AddPurchaseInvoiceComponent,
-  AddPurchaseInvoiceModule,
-} from './pages/PURCHASE INVOICE/add-purchase-invoice/add-purchase-invoice.component';
-import {
-  EditPurchaseInvoiceComponent,
-  EditPurchaseInvoiceModule,
-} from './pages/PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
-import {
-  EditSupplierPaymentComponent,
-  EditSupplierPaymentModule,
-} from './pages/SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
-import {
-  ListMiscReceiptComponent,
-  ListMiscReceiptModule,
-} from './pages/ACCOUNTS/list-misc-receipt/list-misc-receipt.component';
-import {
-  AddMiscReceiptComponent,
-  AddMiscReceiptModule,
-} from './components/HR/Masters/MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
-import { EditMiscReceiptComponent } from './components/HR/Masters/MISC-RECEIPT/edit-misc-receipt/edit-misc-receipt.component';
-import {
-  AddSalaryPaymentComponent,
-  AddSalaryPaymentModule,
-} from './components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
-import {
-  ListSalaryPaymentComponent,
-  ListSalaryPaymentModule,
-} from './pages/HR/Masters/list-salary-payment/list-salary-payment.component';
+import { SupplierPaymentListModule } from './pages/ACCOUNTS/supplier-payment-list/supplier-payment-list.component';
+import { OpeningBalanceModule } from './pages/ACCOUNTS/opening-balance/opening-balance.component';
+import { AddSupplierPaymentModule } from './pages/SUPPLIER-PAYMENT/add-supplier-payment/add-supplier-payment.component';
+import { PurchaseInvoiceListModule } from './pages/Operations/purchase-invoice-list/purchase-invoice-list.component';
+import { AddPurchaseInvoiceModule } from './pages/PURCHASE INVOICE/add-purchase-invoice/add-purchase-invoice.component';
+import { EditPurchaseInvoiceModule } from './pages/PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
+import { EditSupplierPaymentModule } from './pages/SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
+import { ListMiscReceiptModule } from './pages/ACCOUNTS/list-misc-receipt/list-misc-receipt.component';
+import { AddMiscReceiptModule } from './components/HR/Masters/MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
+import { AddSalaryPaymentModule } from './components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
+import { ListSalaryPaymentModule } from './pages/HR/Masters/list-salary-payment/list-salary-payment.component';
 import { BoxProductionViewModule } from './components/HR/Masters/box-production-view/box-production-view.component';
 import { PaytimeEntryModule } from './pages/HR/Masters/paytime-entry/paytime-entry.component';
 import { PdcAddFormModule } from './components/HR/Masters/PDC/pdc-add-form/pdc-add-form.component';
 import { PdcEditFormModule } from './components/HR/Masters/PDC/pdc-edit-form/pdc-edit-form.component';
 import { PdcListModule } from './pages/ACCOUNTS/pdc-list/pdc-list.component';
-// import { PrePaymentAddModule } from './components/HR/Masters/pre-payment-add/pre-payment-add.component';
-// import { PrePaymentListModule } from './components/HR/Masters/pre-payment-list/pre-payment-list.component';
 import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 import { EmployeeSalarySettingsEditModule } from './components/HR/Masters/employee-salary-settings-edit/employee-salary-settings-edit.component';
 import { EmployeeSalarySettingsModule } from './pages/HR/Masters/employee-salary-settings/employee-salary-settings.component';
 import { PrePaymentEditModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-edit/pre-payment-edit.component';
 import { CashBookModule } from './pages/REPORT/cash-book/cash-book.component';
-// import { ProfitAndLossModule } from './pages/PROFITLOSS/profit-and-loss/profit-and-loss.component';
-import {
-  BalanceSheetComponent,
-  BalanceSheetModule,
-} from './pages/REPORT/balance-sheet/balance-sheet.component';
+import { BalanceSheetModule } from './pages/REPORT/balance-sheet/balance-sheet.component';
 import { PrePaymentAddModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-add/pre-payment-add.component';
 import { PrePaymentListModule } from './pages/ACCOUNTS/pre-payment-list/pre-payment-list.component';
 import { ProfitAndLossModule } from './pages/REPORT/profit-and-loss/profit-and-loss.component';
-
 import { SupplierReportModule } from './pages/SUPPLIERREPORT/supplier-report/supplier-report.component';
-import {
-  CustomerReportComponent,
-  CustomerReportModule,
-} from './pages/customer-report/customer-report/customer-report.component';
-import {
-  AgedPayablesComponent,
-  AgedPayablesModule,
-} from './pages/REPORT/aged-payables/aged-payables.component';
-import {
-  AgedReceivablesComponent,
-  AgedReceivablesModule,
-} from './pages/Aged Receivables/aged-receivables/aged-receivables.component';
-import {
-  SupplierStatementDetailsComponent,
-  SupplierStatementDetailsModule,
-} from './pages/REPORT/supplier-statement-details/supplier-statement-details.component';
-import {
-  CustomerStatementDetailsComponent,
-  CustomerStatementDetailsModule,
-} from './pages/REPORT/customer-statement-details/customer-statement-details.component';
-
-import {
-  AgedReceivableDetailsComponent,
-  AgedReceivableDetailsModule,
-} from './pages/REPORT/aged-receivable-details/aged-receivable-details.component';
-
-import {
-  AgedPayableDetailsComponent,
-  AgedPayableDetailsModule,
-} from './pages/aged-payable-details/aged-payable-details.component';
-import {
-  ViewSalaryAdvanceComponent,
-  ViewSalaryAdvanceModule,
-} from './components/HR/Masters/view-salary-advance/view-salary-advance.component';
-import {
-  InputVatComponent,
-  InputVatModule,
-} from './pages/input-vat/input-vat.component';
+import { CustomerReportModule } from './pages/customer-report/customer-report/customer-report.component';
+import { AgedPayablesModule } from './pages/REPORT/aged-payables/aged-payables.component';
+import { AgedReceivablesModule } from './pages/Aged Receivables/aged-receivables/aged-receivables.component';
+import { SupplierStatementDetailsModule } from './pages/REPORT/supplier-statement-details/supplier-statement-details.component';
+import { CustomerStatementDetailsModule } from './pages/REPORT/customer-statement-details/customer-statement-details.component';
+import { AgedReceivableDetailsModule } from './pages/REPORT/aged-receivable-details/aged-receivable-details.component';
+import { AgedPayableDetailsModule } from './pages/aged-payable-details/aged-payable-details.component';
+import { ViewSalaryAdvanceModule } from './components/HR/Masters/view-salary-advance/view-salary-advance.component';
+import { InputVatModule } from './pages/input-vat/input-vat.component';
 import { OutputVatModule } from './pages/OutPutVat/output-vat/output-vat.component';
-import {
-  VatReturnComponent,
-  VatReturnModule,
-} from './pages/Vat Return/vat-return/vat-return.component';
-import {
-  PurchaseOrderComponent,
-  PurchaseOrderModule,
-} from './pages/OPERATIONS/purchase-order/purchase-order.component';
-// import { PrepaymentPostingListModule } from './pages/PrePayment Posting/prepayment-posting-list/prepayment-posting-list.component';
-// import { PrepaymentPostingAddModule } from './pages/PrePayment Posting/prepayment-posting-add/prepayment-posting-add.component';
-// import { PrepaymentPostingEditModule } from './pages/PrePayment Posting/prepayment-posting-edit/prepayment-posting-edit.component';
-// import { DepartmentEditModule } from './pages/department-edit/department-edit.component';
-// import { VatClassEditModule } from './pages/vat-class-edit/vat-class-edit.component';
-
-// import { SubcategoryEditModule } from './pages/subcategory-edit/subcategory-edit.component';
-// import { ItemcategoryEditModule } from './pages/itemcategory-edit/itemcategory-edit.component';
-// import { VatReturnComponent, VatReturnModule } from './pages/Vat Return/vat-return/vat-return.component';
+import { VatReturnModule } from './pages/Vat Return/vat-return/vat-return.component';
+import { PurchaseOrderModule } from './pages/OPERATIONS/purchase-order/purchase-order.component';
 import { PrepaymentPostingListModule } from './pages/ACCOUNTS/prepayment-posting-list/prepayment-posting-list.component';
 import { PrepaymentPostingAddModule } from './pages/PrePayment Posting/prepayment-posting-add/prepayment-posting-add.component';
 import { PrepaymentPostingEditModule } from './pages/PrePayment Posting/prepayment-posting-edit/prepayment-posting-edit.component';
-import {
-  DepartmentEditComponent,
-  DepartmentEditModule,
-} from './pages/department-edit/department-edit.component';
-import {
-  VatClassEditComponent,
-  VatClassEditModule,
-} from './pages/vat-class-edit/vat-class-edit.component';
-// import { ItemCategoryModule } from './HR/Masters/item-category/item-category.component';
-import {
-  SubcategoryEditComponent,
-  SubcategoryEditModule,
-} from './pages/subcategory-edit/subcategory-edit.component';
-import {
-  ItemcategoryEditComponent,
-  ItemcategoryEditModule,
-} from './pages/itemcategory-edit/itemcategory-edit.component';
+import { DepartmentEditModule } from './pages/department-edit/department-edit.component';
+import { VatClassEditModule } from './pages/vat-class-edit/vat-class-edit.component';
+import { SubcategoryEditModule } from './pages/subcategory-edit/subcategory-edit.component';
+import { ItemcategoryEditModule } from './pages/itemcategory-edit/itemcategory-edit.component';
 import { ItemProperty1EditModule } from './components/library/item-property1-edit/item-property1-edit.component';
 import { ItemProperty2EditModule } from './components/library/item-property2-edit/item-property2-edit.component';
 import { ItemProperty3EditModule } from './components/library/item-property3-edit/item-property3-edit.component';
 import { ItemProperty4EditModule } from './components/library/item-property4-edit/item-property4-edit.component';
 import { ItemProperty5EditModule } from './components/library/item-property5-edit/item-property5-edit.component';
-// import {
-//   ItemCategoryComponent,
-//   ItemCategoryModule,
-// } from './HR/Masters/item-category/item-category.component';
-// import { ItemCategoryComponent, ItemCategoryModule } from './HR/Masters/item-category/item-category.component';
-import {
-  PaySlipComponent,
-  PaySlipModule,
-} from './pages/REPORT/pay-slip/pay-slip.component';
-
-import {
-  TransferOutInventoryAddComponent,
-  TransferOutInventoryAddModule,
-} from './pages/transfer-out-inventory-add/transfer-out-inventory-add.component';
-// import { ReasonEditModule } from './components/library/reason-edit/reason-edit/reason-edit.component';
-// import { EPFRegisterReportModule } from './pages/EPF Report/epf-register-report/epf-register-report.component';
-// import {
-//   WageRegisterComponent,
-//   WageRegisterModule,
-// } from './components/HR/Masters/wage-register/wage-register.component';
-// import {
-//   ESIComponent,
-//   ESIModule,
-// } from './components/HR/Masters/esi/esi.component';
-import {
-  TransferInInventoryComponent,
-  TransferInInventoryModule,
-} from './pages/INVENTORY MANAGEMENT/transfer-in-inventory/transfer-in-inventory.component';
-import {
-  TransferInInventoryFormComponent,
-  TransferInInventoryFormModule,
-} from './pages/transfer-in-inventory-form/transfer-in-inventory-form.component';
+import { PaySlipModule } from './pages/REPORT/pay-slip/pay-slip.component';
+import { TransferOutInventoryAddModule } from './pages/transfer-out-inventory-add/transfer-out-inventory-add.component';
+import { TransferInInventoryModule } from './pages/INVENTORY MANAGEMENT/transfer-in-inventory/transfer-in-inventory.component';
+import { TransferInInventoryFormModule } from './pages/transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { ReasonEditModule } from './components/library/reason-edit/reason-edit/reason-edit.component';
 import { EPFRegisterReportModule } from './pages/REPORT/epf-register-report/epf-register-report.component';
-import {
-  WageRegisterComponent,
-  WageRegisterModule,
-} from './pages/REPORT/wage-register/wage-register.component';
-import { ESIComponent, ESIModule } from './pages/REPORT/esi/esi.component';
-import {
-  AttendanceSheetComponent,
-  AttendanceSheetModule,
-} from './pages/REPORT/attendance-sheet/attendance-sheet.component';
-import {
-  ItemQuantityStockComponent,
-  ItemQuantityStockModule,
-} from './components/HR/Masters/item-quantity-stock/item-quantity-stock.component';
-import {
-  ItemStockValueComponent,
-  ItemStockValueModule,
-} from './components/HR/Masters/item-stock-value/item-stock-value.component';
-import { ItemCategoryListComponent } from './pages/MASTER/item-category-list/item-category-list.component';
-
-import {
-  DeliveryNoteComponent,
-  DeliveryNoteModule,
-} from './pages/OPERATIONS/delivery-note/delivery-note.component';
-import { DeliveryNoteFormComponent } from './pages/delivery-note-form/delivery-note-form.component';
-
-import {
-  QuotationComponent,
-  QuotationModule,
-} from './pages/OPERATIONS/quotation/quotation.component';
-import {
-  QuotationFormComponent,
-  QuotationFormModule,
-} from './pages/quotation-form/quotation-form.component';
-import {
-  StockMovementReportComponent,
-  StockMovementReportModule,
-} from './pages/REPORT/stock-movement-report/stock-movement-report.component';
-
-import {
-  SalesOrderFormComponent,
-  SalesOrderFormModule,
-} from './pages/sales-order-form/sales-order-form.component';
-import {
-  InvoiceDeliveryComponent,
-  InvoiceDeliveryModule,
-} from './pages/invoice-delivery/invoice-delivery.component';
-import {
-  InvoiceDeliveryFormComponent,
-  InvoiceDeliveryFormModule,
-} from './pages/invoice-delivery-form/invoice-delivery-form.component';
-import {
-  PhysicalInventoryComponent,
-  PhysicalInventoryModule,
-} from './pages/INVENTORY MANAGEMENT/physical-inventory/physical-inventory.component';
-import {
-  PhysicalInventoryFormComponent,
-  PhysicalInventoryFormModule,
-} from './pages/INVENTORY MANAGEMENT/POPUP PAGES/physical-inventory-form/physical-inventory-form.component';
-import {
-  DeliveryReturnComponent,
-  DeliveryReturnModule,
-} from './pages/delivery-return/delivery-return.component';
-import {
-  DeliveryReturnAddComponent,
-  DeliveryReturnAddModule,
-} from './pages/delivery-return-add/delivery-return-add.component';
-import {
-  DeliveryReturnEditComponent,
-  DeliveryReturnEditModule,
-} from './pages/delivery-return-edit/delivery-return-edit.component';
-import {
-  DeliveryAddressComponent,
-  DeliveryAddressModule,
-} from './components/HR/Masters/delivery-address/delivery-address.component';
-import {
-  ChangePasswordComponent,
-  ChangePasswordModule,
-} from './components/library/PROFILEPAGE/change-password/change-password.component';
-import {
-  SecurityPolicyComponent,
-  SecurityPolicyModule,
-} from './pages/MASTER/security-policy/security-policy.component';
-import {
-  ResetPasswordComponent,
-  ResetPasswordModule,
-} from './pages/reset-password/reset-password.component';
-import {
-  BankReconciliationAddComponent,
-  BankReconciliationAddModule,
-} from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
-import { InvoicePdfComponent } from './pages/INVOICE/invoice-pdf/invoice-pdf.component';
-import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoice-pdf-view.component';
-// import {
-//   PurchaseReturnDebitComponent,
-//   PurchaseReturnDebitModule,
-// } from './pages/Operations/purchase-return-debit/purchase-return-debit.component';
-import {
-  PurchaseReturnDebitFormComponent,
-  PurchaseReturnDebitFormModule,
-} from './pages/purchase-return-debit-form/purchase-return-debit-form.component';
-import {
-  MiscPaymentGstListComponent,
-  MiscPaymentGstListModule,
-} from './components/HR/Masters/misc-payment-gst-list/misc-payment-gst-list.component';
-import {
-  MiscPaymentGstAddComponent,
-  MiscPaymentGstAddModule,
-} from './components/HR/Masters/misc-payment-gst-add/misc-payment-gst-add.component';
-import {
-  MiscPaymentGstEditComponent,
-  MiscPaymentGstEditModule,
-} from './components/HR/Masters/misc-payment-gst-edit/misc-payment-gst-edit.component';
-import {
-  PrepaymentGstListComponent,
-  PrePaymentGstListModule,
-} from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
-import {
-  PrepaymentGstAddComponent,
-  PrePaymentGstAddModule,
-} from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-add/prepayment-gst-add.component';
-import {
-  PrepaymentGstEditComponent,
-  PrePaymentGstEditModule,
-} from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-edit/prepayment-gst-edit.component';
-import {
-  InvoiceTrOutComponent,
-  InvoiceTrOutModule,
-} from './pages/Operations/invoice-tr-out/invoice-tr-out.component';
-import {
-  InvoiceTrOutAddComponent,
-  InvoiceTrOutAddModule,
-} from './pages/INVOICE/invoice-tr-out-add/invoice-tr-out-add.component';
-import {
-  EditInvoiceTrOutComponent,
-  EditInvoiceTrOutModule,
-} from './pages/INVOICE/edit-invoice-tr-out/edit-invoice-tr-out.component';
-import {
-  ViewInvoiceTrOutComponent,
-  ViewInvoiceTrOutModule,
-} from './pages/INVOICE/view-invoice-tr-out/view-invoice-tr-out.component';
-import {
-  StateEditComponent,
-  StateEditModule,
-} from './state-edit/state-edit.component';
+import { WageRegisterModule } from './pages/REPORT/wage-register/wage-register.component';
+import { ESIModule } from './pages/REPORT/esi/esi.component';
+import { AttendanceSheetModule } from './pages/REPORT/attendance-sheet/attendance-sheet.component';
+import { ItemQuantityStockModule } from './components/HR/Masters/item-quantity-stock/item-quantity-stock.component';
+import { ItemStockValueModule } from './components/HR/Masters/item-stock-value/item-stock-value.component';
+import { DeliveryNoteModule } from './pages/OPERATIONS/delivery-note/delivery-note.component';
+import { QuotationModule } from './pages/OPERATIONS/quotation/quotation.component';
+import { QuotationFormModule } from './pages/quotation-form/quotation-form.component';
+import { StockMovementReportModule } from './pages/REPORT/stock-movement-report/stock-movement-report.component';
+import { SalesOrderFormModule } from './pages/sales-order-form/sales-order-form.component';
+import { InvoiceDeliveryModule } from './pages/invoice-delivery/invoice-delivery.component';
+import { InvoiceDeliveryFormModule } from './pages/invoice-delivery-form/invoice-delivery-form.component';
+import { PhysicalInventoryModule } from './pages/INVENTORY MANAGEMENT/physical-inventory/physical-inventory.component';
+import { PhysicalInventoryFormModule } from './pages/INVENTORY MANAGEMENT/POPUP PAGES/physical-inventory-form/physical-inventory-form.component';
+import { DeliveryReturnModule } from './pages/delivery-return/delivery-return.component';
+import { DeliveryReturnAddModule } from './pages/delivery-return-add/delivery-return-add.component';
+import { DeliveryReturnEditModule } from './pages/delivery-return-edit/delivery-return-edit.component';
+import { DeliveryAddressModule } from './components/HR/Masters/delivery-address/delivery-address.component';
+import { ChangePasswordModule } from './components/library/PROFILEPAGE/change-password/change-password.component';
+import { SecurityPolicyModule } from './pages/MASTER/security-policy/security-policy.component';
+import { ResetPasswordModule } from './pages/reset-password/reset-password.component';
+import { BankReconciliationAddModule } from './pages/bank-reconciliation-add/bank-reconciliation-add.component';
+import { PurchaseReturnDebitFormModule } from './pages/purchase-return-debit-form/purchase-return-debit-form.component';
+import { MiscPaymentGstListModule } from './components/HR/Masters/misc-payment-gst-list/misc-payment-gst-list.component';
+import { MiscPaymentGstAddModule } from './components/HR/Masters/misc-payment-gst-add/misc-payment-gst-add.component';
+import { MiscPaymentGstEditModule } from './components/HR/Masters/misc-payment-gst-edit/misc-payment-gst-edit.component';
+import { PrePaymentGstListModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
+import { PrePaymentGstAddModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-add/prepayment-gst-add.component';
+import { PrePaymentGstEditModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-edit/prepayment-gst-edit.component';
+import { InvoiceTrOutModule } from './pages/Operations/invoice-tr-out/invoice-tr-out.component';
+import { InvoiceTrOutAddModule } from './pages/INVOICE/invoice-tr-out-add/invoice-tr-out-add.component';
+import { EditInvoiceTrOutModule } from './pages/INVOICE/edit-invoice-tr-out/edit-invoice-tr-out.component';
+import { ViewInvoiceTrOutModule } from './pages/INVOICE/view-invoice-tr-out/view-invoice-tr-out.component';
+import { StateEditModule } from './state-edit/state-edit.component';
 import { SettingsListModule } from './pages/SETTINGS/settings-list/settings-list.component';
-
-import {
-  LedgerSettingsListComponent,
-  LedgerSettingsListModule,
-} from './pages/SETTINGS/ledger-settings-list/ledger-settings-list.component';
-import {
-  GstReportComponent,
-  GstReportModule,
-} from './pages/REPORT/gst-report/gst-report.component';
-import {
-  GstReportB2CLComponent,
-  GstReportB2CLModule,
-} from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
-import {
-  GstReportCDNRComponent,
-  GstReportCDNRModule,
-} from './pages/REPORT/gst-report-cdnr/gst-report-cdnr.component';
-import {
-  UomEditComponent,
-  UomEditModule,
-} from './pages/uom-edit/uom-edit.component';
+import { LedgerSettingsListModule } from './pages/SETTINGS/ledger-settings-list/ledger-settings-list.component';
+import { GstReportModule } from './pages/REPORT/gst-report/gst-report.component';
+import { GstReportB2CLModule } from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
+import { GstReportCDNRModule } from './pages/REPORT/gst-report-cdnr/gst-report-cdnr.component';
+import { UomEditModule } from './pages/uom-edit/uom-edit.component';
 import { ProductionJvAddModule } from './production-jv-add/production-jv-add.component';
-import {
-  ProductionJvViewComponent,
-  ProductionJvViewModule,
-} from './production-jv-view/production-jv-view.component';
-import {
-  BoxproductionJvAddComponent,
-  BoxproductionJvAddModule,
-} from './boxproduction-jv-add/boxproduction-jv-add.component';
-import {
-  ArticleproductionJvListComponent,
-  ArticleproductionJvListModule,
-} from './articleproduction-jv-list/articleproduction-jv-list.component';
-import {
-  ArticleproductionJvViewComponent,
-  ArticleproductionJvViewModule,
-} from './articleproduction-jv-view/articleproduction-jv-view.component';
-import {
-  BoxproductionJvViewComponent,
-  BoxproductionJvViewModule,
-} from './boxproduction-jv-view/boxproduction-jv-view.component';
-import {
-  StockViewComponent,
-  StockViewModule,
-} from './pages/REPORT/stock-view/stock-view.component';
-import {
-  SaleReturnFormComponent,
-  SaleReturnFormModule,
-} from './sale-return-form/sale-return-form.component';
-import {
-  CustomDatePopupComponent,
-  CustomDatePopupModule,
-} from './custom-date-popup/custom-date-popup.component';
-import {
-  MiscellaneousInvoiceAddComponent,
-  MiscellaneousInvoiceAddModule,
-} from './pages/miscellaneous-invoice-add/miscellaneous-invoice-add.component';
-import {
-  MiscellaneousInvoiceEditComponent,
-  MiscellaneousInvoiceEditModule,
-} from './pages/miscellaneous-invoice-edit/miscellaneous-invoice-edit.component';
-import {
-  MiscellaneousPurchaseComponent,
-  MiscellaneousPurchaseModule,
-} from './pages/OPERATIONS/miscellaneous-purchase/miscellaneous-purchase.component';
-import {
-  MiscellaneousPurchaseAddComponent,
-  MiscellaneousPurchaseAddModule,
-} from './pages/miscellaneous-purchase-add/miscellaneous-purchase-add.component';
-import {
-  MiscellaneousPurchaseEditComponent,
-  MiscellaneousPurchaseEditModule,
-} from './pages/miscellaneous-purchase-edit/miscellaneous-purchase-edit.component';
+import { ProductionJvViewModule } from './production-jv-view/production-jv-view.component';
+import { BoxproductionJvAddModule } from './boxproduction-jv-add/boxproduction-jv-add.component';
+import { ArticleproductionJvListModule } from './articleproduction-jv-list/articleproduction-jv-list.component';
+import { ArticleproductionJvViewModule } from './articleproduction-jv-view/articleproduction-jv-view.component';
+import { BoxproductionJvViewModule } from './boxproduction-jv-view/boxproduction-jv-view.component';
+import { StockViewModule } from './pages/REPORT/stock-view/stock-view.component';
+import { SaleReturnFormModule } from './sale-return-form/sale-return-form.component';
+import { CustomDatePopupModule } from './custom-date-popup/custom-date-popup.component';
+import { MiscellaneousInvoiceAddModule } from './pages/miscellaneous-invoice-add/miscellaneous-invoice-add.component';
+import { MiscellaneousInvoiceEditModule } from './pages/miscellaneous-invoice-edit/miscellaneous-invoice-edit.component';
+import { MiscellaneousPurchaseModule } from './pages/OPERATIONS/miscellaneous-purchase/miscellaneous-purchase.component';
+import { MiscellaneousPurchaseAddModule } from './pages/miscellaneous-purchase-add/miscellaneous-purchase-add.component';
+import { MiscellaneousPurchaseEditModule } from './pages/miscellaneous-purchase-edit/miscellaneous-purchase-edit.component';
 import { ImportChartOfAccountsModule } from './pages/ACCOUNTS/import-chart-of-accounts/import-chart-of-accounts.component';
 import { SalaryHeadListModule } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
 import { TransferOutInventoryModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
-import {
-  SalesOrderFinancePopupFormComponent,
-  SalesOrderFinancePopupFormModule,
-} from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
 import { ItemStorePricesLogModule } from './pages/item-store-prices-log/item-store-prices-log.component';
 import { PurchaseReturnDebitModule } from './pages/OPERATIONS/purchase-return-debit/purchase-return-debit.component';
 import { ProductionJvListModule } from './pages/OPERATIONS/production-jv-list/production-jv-list.component';
@@ -1020,11 +362,10 @@ import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-inv
 import { SalesOrderModule } from './pages/OPERATIONS/sales-order/sales-order.component';
 import { FixedAssetRegisterModule } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
 import { DepreciationReportModule } from './pages/Depreciation/depreciation-report/depreciation-report.component';
-import { PDCReportComponent, PDCReportModule } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
-import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
+import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
 
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -1055,7 +396,6 @@ import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from 
     CustomerListModule,
     CategoryListModule,
     CategoryFormModule,
-    // SubcategoryListComponent,
     SubCategoryFormModule,
     VatClassListModule,
     VatClassFormModule,
@@ -1108,7 +448,6 @@ import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from 
     UserLevelsModule,
     UserLevelsFormModule,
     UserLevelsEditFormModule,
-    // PurchaseOrderModule,
     PurchaseOrderNewFormModule,
     PurchaseOrderEditFormModule,
     PurchaseOrderVerifyFormModule,
@@ -1159,7 +498,6 @@ import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from 
     LandedCostEditModule,
     InterStoreTransferListModule,
     TransferInViewFormModule,
-    // DepartmentModule,
     DesignationModule,
     EOSModule,
     PaySettingsModule,
@@ -1390,9 +728,7 @@ import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from 
     SalesOrderFinancePopupFormModule,
     FixedAssetRegisterModule,
     DepreciationReportModule,
-    PDCReportModule,
-    PrepaymentPostingReportModule,
-  ],
+],
   providers: [
     AuthService,
     ScreenService,

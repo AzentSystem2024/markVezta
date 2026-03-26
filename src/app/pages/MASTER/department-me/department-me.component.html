@@ -1,24 +1,45 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
     <dx-data-grid
-      class="grid theme-dependent"
-      [showColumnLines]="true"
-      [dataSource]="CategoryDataSource"
-      [rowAlternationEnabled]="true"
-      rowAlternationInterval="2"
-      (onRowRemoving)="onRowRemoving($event)"
-      [showBorders]="true"
-      [allowColumnReordering]="true"
-      [allowColumnResizing]="true"
-      (onExporting)="onExporting($event)"
-      (onEditingStart)="onEditStart($event)"
-      [showColumnLines]="true"
-      [scrolling]="{ mode: 'virtual' }"
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
       [height]="'82vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true,
+      }"
+      class="grid theme-dependent"
+      [dataSource]="department"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onRowRemoving)="onRowRemoving($event)"
+      (onExporting)="onExporting($event)"
+      (onEditingStart)="OnEditingStart($event)"
     >
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+
       <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
 
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -28,15 +49,13 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-
       <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
         <dxo-popup
-          title="Edit Category"
+          title="Edit Department"
           [showTitle]="true"
           [width]="600"
           [height]="300"
-        >
-        </dxo-popup>
+        ></dxo-popup>
       </dxo-editing>
 
       <dxo-toolbar>
@@ -51,27 +70,29 @@
               margin-right: 3px;
             "
           >
-            Sub Department
+            Department
           </div>
         </dxi-item>
 
         <dxi-item
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
           [options]="searchButtonOptions"
         ></dxi-item>
 
+        <!-- Refresh -->
         <dxi-item
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
         <!-- Divider -->
         <dxi-item location="after">
           <div class="toolbar-divider"></div>
         </dxi-item>
+
+        <!-- Export (built-in, kept) -->
         <dxi-item
           name="exportButton"
           location="after"
@@ -87,50 +108,35 @@
         ></dxi-item>
       </dxo-toolbar>
 
-      <dxi-column dataField="CODE" caption="Code">
-        <dxi-validation-rule type="required" message="Code is required">
-          <dxi-validation-rule type="required" message="Code is required">
-          </dxi-validation-rule>
-        </dxi-validation-rule>
-      </dxi-column>
-
-      <dxi-column dataField="DESCRIPTION" caption="Description">
-        <dxi-validation-rule type="required" message="Description is required">
-          <dxi-validation-rule type="required" message="Description is required">
-          </dxi-validation-rule>
-        </dxi-validation-rule>
-      </dxi-column>
-
-      <dxi-column dataField="DEPARTMENT_NAME" caption="Department"></dxi-column>
+      <dxi-column dataField="CODE" caption="Code"> </dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department Name"> </dxi-column>
+      <dxi-column
+        dataField="COST_BUCKET_NAME"
+        caption="Cost Bucket"
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </div>
 
-<!-- ====== new sub department popup ======== -->
 <form-popup
-  height="300px"
-  [(visible)]="isAddCategoryPopupOpened"
-  (save)="onClickSaveCategory()"
-  titleText="New Sub Department"
+  [height]="300"
+  [(visible)]="isAddDepartmentPopupOpened"
+  (save)="onClickSaveDepartment()"
+  titleText="New Department"
   [showApprove]="false"
 >
-  <app-sub-department-add-form
-    (popupClosed)="handleClose()"
-  ></app-sub-department-add-form>
+  <app-department-me-add-form></app-department-me-add-form>
 </form-popup>
 
-
-<!-- ====== edit form popups ======== -->
 <dx-popup
-  [(visible)]="editItemCategory"
-  [width]="'35vw'"
-  [height]="'40vh'"
-  title="Update Sub Department"
-  (onHiding)="handleClose()"
+  [height]="300"
+  [(visible)]="isEditDepartmentPopupOpened"
+  [width]="500"
+  title="Edit Department"
+  (formClosed)="handleClose()"
 >
-  <app-sub-department-edit-form
-    *ngIf="editItemCategory"
-    [selectedData]="selected_data"
-    (popupClosed)="handleClose()"
-  ></app-sub-department-edit-form>
+  <app-department-me-edit-form
+    (formClosed)="handleClose()"
+    [selectedDepartment]="selectedDepartment_data"
+  ></app-department-me-edit-form>
 </dx-popup>

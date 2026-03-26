@@ -3,6 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -48,7 +49,7 @@ import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-pop
   templateUrl: './sales-order.component.html',
   styleUrls: ['./sales-order.component.scss'],
 })
-export class SalesOrderComponent {
+export class SalesOrderComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -71,7 +72,7 @@ export class SalesOrderComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, 
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -103,6 +104,17 @@ export class SalesOrderComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 5,
+    },
+    {
+      text: 'Open',
+      value: 1,
+    },
+  ];
 
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -281,17 +293,6 @@ export class SalesOrderComponent {
 
     cellElement.appendChild(icon);
   }
-
-  getStatusFilterData = [
-    {
-      text: 'Approved',
-      value: 5,
-    },
-    {
-      text: 'Open',
-      value: 1,
-    },
-  ];
 
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;

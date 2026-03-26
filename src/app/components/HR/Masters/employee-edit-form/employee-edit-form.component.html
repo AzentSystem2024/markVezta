@@ -77,18 +77,10 @@
                   layout="horizontal"
                 >
                 </dx-radio-group>
-
-                <!-- <dx-text-box
-                  [(value)]="employeeFormData.MOBILE"
-                  [placeholder]="'Enter Mobile No.'"
-                  label="Mobile"
-                  [labelMode]="'floating'"
-                >
-                </dx-text-box> -->
               </div>
             </div>
 
-            <div class="two-column-layout">
+            <div class="three-column-layout">
               <div>
                 <dx-select-box
                   [(value)]="employeeFormData.DESG_ID"
@@ -102,6 +94,7 @@
                 >
                 </dx-select-box>
               </div>
+
               <div>
                 <dx-select-box
                   [(value)]="employeeFormData.DEPT_ID"
@@ -116,7 +109,24 @@
                 >
                 </dx-select-box>
               </div>
+
+              <div>
+                <dx-select-box
+                  [(value)]="employeeFormData.SUB_DEPT_ID"
+                  [items]="SubDepartmentDataSource"
+                  [valueExpr]="'ID'"
+                  [displayExpr]="'DESCRIPTION'"
+                  [placeholder]="'Select Sub-Department'"
+                  label="Sub-Department"
+                  [labelMode]="'floating'"
+                  [searchEnabled]="true"
+                  [disabled]="!SubDepartmentDataSource"
+                  (onValueChanged)="onDepartmentChange($event)"
+                >
+                </dx-select-box>
+              </div>
             </div>
+
             <div class="two-column-layout">
               <div>
                 <dx-date-box
@@ -128,6 +138,7 @@
                 >
                 </dx-date-box>
               </div>
+
               <div>
                 <dx-select-box
                   label="Nationality"
@@ -170,6 +181,7 @@
                 </dx-select-box>
               </div>
             </div>
+
             <div class="three-column-layout">
               <div>
                 <dx-text-box
@@ -228,6 +240,8 @@
           />
         </div>
       </div>
+
+      <!-- =========== address details div =========== -->
       <div class="container custom-card-address">
         <!-- Row 1: Address fields -->
         <div>
@@ -303,7 +317,8 @@
           <div *ngIf="emailError" class="error-message">{{ emailError }}</div>
         </div>
       </div>
-      <!-- <div class="dx-card custom-card-passport">
+      <!-- =============== visa details ============== -->
+      <div class="dx-card custom-card-passport">
         <span class="card-label">-- Visa Details --</span>
         <div class="four-column-layout">
           <div>
@@ -321,7 +336,7 @@
               [placeholder]="'Passport Expiry'"
               label="Passport Expiry"
               labelMode="floating"
-              displayFormat="dd-MM-yyyy"
+              displayFormat="dd/MM/yyyy"
             >
             </dx-date-box>
           </div>
@@ -341,7 +356,7 @@
               [placeholder]="'Visa Expiry'"
               label="Visa Expiry"
               labelMode="floating"
-              displayFormat="dd-MM-yyyy"
+              displayFormat="dd/MM/yyyy"
             >
             </dx-date-box>
           </div>
@@ -362,7 +377,7 @@
               [placeholder]="'Work Permit Expiry'"
               label="Work Permit Expiry"
               labelMode="floating"
-              displayFormat="dd-MM-yyyy"
+              displayFormat="dd/MM/yyyy"
             >
             </dx-date-box>
           </div>
@@ -382,7 +397,7 @@
               [placeholder]="'Driving License Expiry'"
               label="Driving License Expiry"
               labelMode="floating"
-              displayFormat="dd-MM-yyyy"
+              displayFormat="dd/MM/yyyy"
             >
             </dx-date-box>
           </div>
@@ -417,8 +432,8 @@
             </dx-text-box>
           </div>
         </div>
-      </div> -->
-
+      </div>
+      <!-- =============== bank details ============== -->
       <div class="container custom-card-bank-details">
         <div class="left-column">
           <div class="custom-card-passport-2">
@@ -496,6 +511,7 @@
           [dataSource]="attachments"
           [showBorders]="true"
           [columnAutoWidth]="true"
+          [height]="'80vh'"
         >
           <dxo-toolbar>
             <dxi-item location="after" locateInMenu="auto">
@@ -538,40 +554,10 @@
         </dx-data-grid>
       </div>
     </dxi-item>
-
-    <!-- <dxi-item title="Attachments">
-      <div class="attachments-container">
-        <dx-data-grid
-          [dataSource]="attachments"
-          [showBorders]="true"
-          [columnAutoWidth]="true"
-        >
-          <dxo-toolbar>
-            <dxi-item location="after" locateInMenu="auto">
-              <dx-button
-                icon="plus"
-                type="default"
-                stylingMode="contained"
-                (onClick)="openAttachmentPopup()"
-              ></dx-button>
-            </dxi-item>
-          </dxo-toolbar>
-
-          <dxi-column dataField="fileName" caption="File Name" ></dxi-column>
-          <dxi-column dataField="remarks" caption="Remarks">
-            <dxo-editing
-              mode="cell"
-              [allowUpdating]="true"
-              [allowAdding]="true"
-            ></dxo-editing>
-          </dxi-column>
-        </dx-data-grid>
-      </div>
-    </dxi-item> -->
   </dx-tab-panel>
 
   <div
-    class="container"
+    class="container mt-2"
     style="display: flex; justify-content: flex-end; gap: 10px"
   >
     <dx-button
