@@ -162,19 +162,13 @@
 
         <dxi-column
           dataField="GST_PERC"
-          [caption]="
-            selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-              ? ' VAT %'
-              : ' IGST %'
-          "
+          [caption]="vatTitle + '%'"
           dataType="number"
-          [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="false"
-          [visible]="showGST"
         >
         </dxi-column>
 
-        <dxi-column
+        <!-- <dxi-column
           dataField="CGST"
           caption="CGST"
           dataType="number"
@@ -188,7 +182,7 @@
           dataType="number"
           [visible]="showSGST"
           [allowEditing]="false"
-        ></dxi-column>
+        ></dxi-column> -->
         <dxi-column
           dataField="gstAmount"
           [caption]="
@@ -254,7 +248,7 @@
         <dx-text-box
           #narrationRef
           [(value)]="debitFormData[0].NARRATION"
-          label="Narration"
+          label="Remark"
           labelMode="floating"
           [width]="400"
           [readOnly]="true"
@@ -325,7 +319,7 @@
 
     <div class="form-popup-buttons-container">
       <div class="popup-footer">
-        <dx-button
+        <!-- <dx-button
           icon="fas fa-file-pdf"
           text="PDF"
           type="normal"
@@ -334,7 +328,7 @@
           (onClick)="viewPdf()"
           hint="View PDF"
         >
-        </dx-button>
+        </dx-button> -->
       </div>
     </div>
     <dx-button

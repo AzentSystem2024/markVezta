@@ -240,14 +240,15 @@
           </dx-text-box>
         </div>
         <div class="Delivery-details" style="flex: 1; margin-left: 30px">
-          <dx-text-box
+          <dx-date-box
             label="Delivery Date"
             labelMode="floating"
             placeholder="Select Delivery Date"
             [readOnly]="true"
             [(value)]="newPoData.DELIVERY_DATE"
+            displayFormat="dd-MM-yyyy"
           >
-          </dx-text-box>
+          </dx-date-box>
           <dx-text-box
             label="Reference"
             labelMode="floating"
@@ -508,11 +509,21 @@
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
 
-      <dxi-total-item column="taxable" summaryType="sum" displayFormat="{0}" [valueFormat]="{ type: 'fixedPoint', precision: 2 }">
+      <dxi-total-item
+        column="taxable"
+        summaryType="sum"
+        displayFormat="{0}"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
+      >
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
 
-      <dxi-total-item column="vatAmount" summaryType="sum" displayFormat="{0}" [valueFormat]="{ type: 'fixedPoint', precision: 2 }">
+      <dxi-total-item
+        column="vatAmount"
+        summaryType="sum"
+        displayFormat="{0}"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
+      >
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
 
@@ -524,7 +535,12 @@
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
 
-      <dxi-total-item column="total" summaryType="sum" displayFormat="{0}" [valueFormat]="{ type: 'fixedPoint', precision: 2 }">
+      <dxi-total-item
+        column="total"
+        summaryType="sum"
+        displayFormat="{0}"
+        [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
+      >
         <dxo-format [precision]="2" type="fixedPoint"></dxo-format>
       </dxi-total-item>
     </dxo-summary>

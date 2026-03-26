@@ -189,7 +189,6 @@
           dataField="GST_PERC"
           [caption]="vatTitle + '%'"
           dataType="number"
-          [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="false"
         >
         </dxi-column>
@@ -280,7 +279,7 @@
         <dx-text-box
           #narrationRef
           [(value)]="debitFormData[0].NARRATION"
-          label="Narration"
+          label="Remark"
           labelMode="floating"
           [width]="400"
           (onKeyDown)="onNarrationKeyDown($event)"
