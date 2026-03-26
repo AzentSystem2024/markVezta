@@ -4099,57 +4099,63 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //========================Pay settings============================
-  get_PaySettingsList() {
-    const getEndpoint = this.apiUrl + '/PaySettings/get';
-    return this.http.post(getEndpoint, {});
+  get_PaySettingsList(payload) {
+    const getEndpoint = this.apiUrl + 'PaySettings/list';
+    return this.http.post(getEndpoint, payload);
   }
 
   //=================get Leadger Dropdown ===================
-  get_Ledger_Api(ACCOUNT_HEAD: any) {
-    const getEndpoint = this.apiUrl + '/DropDown';
-    const reqBody = {
-      NAME: 'ACCOUNT_HEAD',
-      // "ACCOUNT_HEAD": ACCOUNT_HEAD
-    };
-    return this.http.post(getEndpoint, reqBody);
+  get_Ledger_Api(payload) {
+    const getEndpoint = this.apiUrl + 'DropDown';
+    return this.http.post(getEndpoint, payload);
   }
 
-  //================Api for Update PaySettings=================
-  Update_PaySettings_Api(
-    Daily_Hours: any,
-    Max_OT_MTS: any,
-    Normal_OT_Rate: any,
-    Holiday_OT_Rate: any,
-    Leave_Sal_Days: any,
-    UQ_Labour_ID: any,
-    Bank_Acc_No: any,
-    Bank_Code: any,
-    Sal_Expense_Head_ID: any,
-    Sal_Payable_Head_ID: any,
-    LS_Expense_Head_ID: any,
-    LS_Payable_Head_ID: any,
-    EOS_Expense_Head_ID: any,
-    EOS_Payable_Head_ID: any,
-  ) {
-    const getEndpoint = this.apiUrl + '/PaySettings/save';
-    const reqBody = {
-      DAILY_HOURS: Daily_Hours,
-      MAX_OT_MTS: Max_OT_MTS,
-      NORMAL_OT_RATE: Normal_OT_Rate,
-      HOLIDAY_OT_RATE: Holiday_OT_Rate,
-      LEAVE_SAL_DAYS: Leave_Sal_Days,
-      UQ_LABOUR_ID: UQ_Labour_ID,
-      BANK_AC_NO: Bank_Acc_No,
-      BANK_CODE: Bank_Code,
-      SAL_EXPENSE_HEAD_ID: Sal_Expense_Head_ID,
-      SAL_PAYABLE_HEAD_ID: Sal_Payable_Head_ID,
-      LS_EXPENSE_HEAD_ID: LS_Expense_Head_ID,
-      LS_PAYABLE_HEAD_ID: LS_Payable_Head_ID,
-      EOS_EXPENSE_HEAD_ID: EOS_Expense_Head_ID,
-      EOS_PAYABLE_HEAD_ID: EOS_Payable_Head_ID,
-    };
-    return this.http.post(getEndpoint, reqBody);
+   Update_PaySettings_Api(payload) {
+    const getEndpoint = this.apiUrl + 'PaySettings/save';
+    return this.http.post(getEndpoint, payload);
   }
+
+
+  //================Api for Update PaySettings=================
+  // Update_PaySettings_Api(
+  //   // Daily_Hours: any,
+  //   // Max_OT_MTS: any,
+  //   // Normal_OT_Rate: any,
+  //   // Holiday_OT_Rate: any,
+  //   // Leave_Sal_Days: any,
+  //   // UQ_Labour_ID: any,
+  //   // Bank_Acc_No: any,
+  //   // Bank_Code: any,
+  //   // Sal_Expense_Head_ID: any,
+  //   // Sal_Payable_Head_ID: any,
+  //   // LS_Expense_Head_ID: any,
+  //   // LS_Payable_Head_ID: any,
+  //   // EOS_Expense_Head_ID: any,
+  //   // EOS_Payable_Head_ID: any,
+  //   // COMPANY_ID : any,
+  //   item:any
+  // ) {
+  //   const getEndpoint = this.apiUrl + 'PaySettings/save';
+  //   const reqBody = {
+  //     DAILY_HOURS: Daily_Hours,
+  //     MAX_OT_MTS: Max_OT_MTS,
+  //     NORMAL_OT_RATE: Normal_OT_Rate,
+  //     HOLIDAY_OT_RATE: Holiday_OT_Rate,
+  //     LEAVE_SAL_DAYS: Leave_Sal_Days,
+  //     UQ_LABOUR_ID: UQ_Labour_ID,
+  //     BANK_AC_NO: Bank_Acc_No,
+  //     BANK_CODE: Bank_Code,
+  //     SAL_EXPENSE_HEAD_ID: Sal_Expense_Head_ID,
+  //     SAL_PAYABLE_HEAD_ID: Sal_Payable_Head_ID,
+  //     LS_EXPENSE_HEAD_ID: LS_Expense_Head_ID,
+  //     LS_PAYABLE_HEAD_ID: LS_Payable_Head_ID,
+  //     EOS_EXPENSE_HEAD_ID: EOS_Expense_Head_ID,
+  //     EOS_PAYABLE_HEAD_ID: EOS_Payable_Head_ID,
+  //     COMPANY_ID : COMPANY_ID
+  //   };
+  //   return this.http.post(getEndpoint, reqBody);
+  // }
+  
 
   // ===============Leave Type======================
   //=================get Leave Type===================
@@ -6349,6 +6355,11 @@ The result can be exported to HTML or Markdown.`;
 
    Prepayment_posting_Report(payload){
      const getEndpoint = this.apiUrl + 'Report/prepaymentreport';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  SalaryWPSFile(payload){
+     const getEndpoint = this.apiUrl + 'SalaryWPS/wps';
     return this.http.post(getEndpoint, payload);
   }
 }

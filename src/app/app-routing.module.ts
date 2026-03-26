@@ -220,6 +220,7 @@ import { DepreciationReportComponent } from './pages/Depreciation/depreciation-r
 import { FixedAssetRegisterComponent } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
 import { PDCReportComponent } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
 import { PrepaymentPostingReportComponent } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
+import { SalaryWPSComponent } from './pages/salary-wps/salary-wps.component';
 
 const routes: Routes = [
   {
@@ -238,7 +239,7 @@ const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   
-    
+     
 
   {
     path: 'auth',
@@ -1026,6 +1027,18 @@ const routes: Routes = [
         component: PrepaymentPostingReportComponent,
         canActivate: [AuthGuardService],
       },
+      {
+        path: 'pay-settings',
+        component: PaySettingsComponent,
+        canActivate: [AuthGuardService],
+      },
+
+      {
+        path: 'salary-wps',
+        component: SalaryWPSComponent,
+        canActivate: [AuthGuardService],
+      },
+      
       {
         path: '**',
         redirectTo: 'login',

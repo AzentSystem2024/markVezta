@@ -1022,6 +1022,7 @@ import { FixedAssetRegisterModule } from './pages/FIXED_ASSETS/fixed-asset-regis
 import { DepreciationReportModule } from './pages/Depreciation/depreciation-report/depreciation-report.component';
 import { PDCReportComponent, PDCReportModule } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
 import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
+import { SalaryWPSComponent, SalaryWPSModule } from './pages/salary-wps/salary-wps.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -1392,6 +1393,7 @@ import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from 
     DepreciationReportModule,
     PDCReportModule,
     PrepaymentPostingReportModule,
+    SalaryWPSModule,
   ],
   providers: [
     AuthService,
