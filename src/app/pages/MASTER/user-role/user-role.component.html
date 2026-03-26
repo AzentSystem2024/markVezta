@@ -38,16 +38,19 @@
     <dxo-load-panel [showPane]="false"></dxo-load-panel>
     <dxo-scrolling mode="virtual"></dxo-scrolling>
     <dxo-sorting mode="multiple"></dxo-sorting>
-    <dxo-header-filter [visible]="true"></dxo-header-filter>
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
     <dxo-column-chooser [enabled]="true" [height]="400"></dxo-column-chooser>
     <dxo-search-panel [visible]="true" placeholder=" Search"></dxo-search-panel>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
     <dxo-export
       [enabled]="true"
       [allowExportSelectedData]="false"
       [formats]="['xlsx']"
     >
     </dxo-export>
+
     <dxo-toolbar>
       <dxi-item location="before">
         <div class="grid-header">User Role</div>
@@ -93,9 +96,6 @@
       ></dxi-item>
     </dxo-toolbar>
 
-    <dxo-header-filter [visible]="true">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
     <dxi-column
       caption="S.No"
       dataField="SlNo"
@@ -109,6 +109,7 @@
       [calculateCellValue]="formatLastModifiedTime"
     ></dxi-column>
   </dx-data-grid>
+
   <form-popup
     class="formPopupClass m-2"
     [(visible)]="isAddFormVisible"
@@ -119,7 +120,7 @@
     (onHiding)="onPopupClose()"
     [showApprove]="false"
   >
-    <app-user-level-new-form
+    <app-user-level-new-form *ngIf="isAddFormVisible"
       #userLevelNewForm
       [sharedValue]="isAddFormVisible"
     ></app-user-level-new-form>
