@@ -22,9 +22,6 @@ import {
 } from 'devextreme-angular';
 import DataSource from 'devextreme/data/data_source';
 import notify from 'devextreme/ui/notify';
-import { FormPopupModule } from 'src/app/components';
-// import { CategoryFormComponent, CategoryFormModule } from 'src/app/components/library/category-form/category-form.component';
-// import { ItemcategoryEditModule } from 'src/app/pages/itemcategory-edit/itemcategory-edit.component';
 import { DataService } from 'src/app/services';
 import { ExportService } from 'src/app/services/export.service';
 import {
@@ -32,14 +29,16 @@ import {
   SubDepartmentAddFormModule,
 } from '../../POPUP pages/sub-department-add-form/sub-department-add-form.component';
 import { SubDepartmentEditFormModule } from '../../POPUP pages/sub-department-edit-form/sub-department-edit-form.component';
-
+import { FormPopupModule } from 'src/app/components';
 @Component({
   selector: 'app-sub-department',
   templateUrl: './sub-department.component.html',
   styleUrls: ['./sub-department.component.scss'],
 })
 export class SubDepartmentComponent implements OnInit {
-  @ViewChild(SubDepartmentAddFormComponent) categoryComponent: SubDepartmentAddFormComponent;
+  @ViewChild(SubDepartmentAddFormComponent)
+  categoryComponent: SubDepartmentAddFormComponent;
+
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
 
@@ -106,6 +105,7 @@ export class SubDepartmentComponent implements OnInit {
     elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -113,7 +113,47 @@ export class SubDepartmentComponent implements OnInit {
     private router: Router,
   ) {
     this.sesstion_Details();
-    this.showCategory();
+    this.fetch_subdepartment_data_list();
+  }
+
+  ngOnInit(): void {
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/user');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    this.sesstion_Details();
+
+    this.getDepartmentDropDown();
+  }
+
+  fetch_subdepartment_data_list() {
+    this.dataservice.get_SubDepartment_Data().subscribe((res: any) => {
+      if (res && res.flag === '1') {
+        this.CategoryDataSource = res.datas;
+      } else {
+        notify(
+          {
+            message: 'data failing failed..',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+      }
+    });
   }
 
   toggleFilters() {
@@ -131,7 +171,6 @@ export class SubDepartmentComponent implements OnInit {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
-    this.showCategory();
   }
 
   addCategory() {
@@ -144,23 +183,13 @@ export class SubDepartmentComponent implements OnInit {
     const id = event.data.ID;
 
     this.dataservice.select_category(id).subscribe((res: any) => {
-      console.log(res);
       this.selected_data = res;
     });
   }
 
   onClickSaveCategory() {
-    const { CODE, CAT_NAME, LOYALTY_POINT, COST_HEAD_ID, DEPT_ID } =
+    const { CODE, DESCRIPTION, DEPARTMENT_ID } =
       this.categoryComponent.getNewCategoryData();
-    console.log(
-      'inserted data',
-      CODE,
-      CAT_NAME,
-      LOYALTY_POINT,
-      COST_HEAD_ID,
-      DEPT_ID,
-    );
-    const COMPANY_ID = this.COMPANY_ID;
     // Check for duplicates in CategoryList
     const isCodeDuplicate = this.categoryArray.some(
       // (item: any) => item.CODE === commonDetails.code
@@ -169,13 +198,14 @@ export class SubDepartmentComponent implements OnInit {
 
     const isDescriptionDuplicate = this.categoryArray.some(
       // (item: any) => item.DESCRIPTION === commonDetails.category
-      (item: any) => item.CAT_NAME.toLowerCase() === CAT_NAME.toLowerCase(),
+      (item: any) =>
+        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
       notify(
         {
-          message: 'Both Code and category already exist',
+          message: 'Both Code and description already exist',
           position: { at: 'top right', my: 'top right' },
           displayTime: 1000,
         },
@@ -205,17 +235,9 @@ export class SubDepartmentComponent implements OnInit {
     }
 
     this.dataservice
-      .postCategoryData(
-        CODE,
-        CAT_NAME,
-        LOYALTY_POINT,
-        COST_HEAD_ID,
-        DEPT_ID,
-        COMPANY_ID,
-      )
+      .Save_SubDepartment_Data(CODE, DESCRIPTION, DEPARTMENT_ID)
       .subscribe((response) => {
         if (response) {
-          this.showCategory();
           this.isAddCategoryPopupOpened = false;
           notify(
             {
@@ -232,85 +254,34 @@ export class SubDepartmentComponent implements OnInit {
 
   onRowRemoving(event) {
     const selectedRow = event.data;
-    const {
-      ID,
-      CODE,
-      CAT_NAME,
-      LOYALTY_POINT,
-      COST_HEAD_ID,
-      DEPT_ID,
-      COMPANY_ID,
-    } = selectedRow;
+    const ID = selectedRow.ID;
 
-    this.dataservice
-      .removeCategory(
-        ID,
-        CODE,
-        CAT_NAME,
-        LOYALTY_POINT,
-        COST_HEAD_ID,
-        DEPT_ID,
-        COMPANY_ID,
-      )
-      .subscribe(() => {
-        try {
-          // Your delete logic here
-          notify(
-            {
-              message: 'Delete operation successful',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.dataGrid.instance.refresh();
-          this.showCategory();
-        } catch (error) {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+    this.dataservice.removeSubdepartment(ID).subscribe(() => {
+      try {
+        // Your delete logic here
+        notify(
+          {
+            message: 'Delete operation successful',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success',
+        );
+        this.dataGrid.instance.refresh();
+      } catch (error) {
+        notify(
+          {
+            message: 'Delete operation failed',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+      }
+    });
   }
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
     this.COMPANY_ID = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.COMPANY_ID,
-      '============selected_Company_id==============',
-    );
-  }
-
-  showCategory() {
-    const payload = {
-      COMPANY_ID: this.COMPANY_ID,
-    };
-
-    this.CategoryDataSource = new DataSource({
-      load: () =>
-        new Promise((resolve) => {
-          this.dataservice.getCategoryData(payload).subscribe({
-            next: (response: any[]) => {
-              const list = response || [];
-
-              this.categoryArray = list; // local cache
-              this.categoryCount = list.length;
-
-              resolve(list); // 🔑 stops dx loader
-            },
-            error: () => {
-              this.categoryArray = [];
-              this.categoryCount = 0;
-              resolve([]);
-            },
-          });
-        }),
-    });
   }
 
   getDepartmentDropDown() {
@@ -319,54 +290,24 @@ export class SubDepartmentComponent implements OnInit {
       .getDropdownData(dropdowndepartment)
       .subscribe((data: any) => {
         this.DepartmentDropdownData = data;
-        console.log('dropdown', this.DepartmentDropdownData);
       });
   }
-  ngOnInit(): void {
-    const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
-    const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
-    console.log('Parsed ObjectData:', menuResponse);
 
-    const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuGroups);
-    const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/user');
-
-    if (packingRights) {
-      this.canAdd = packingRights.CanAdd;
-      this.canEdit = packingRights.CanEdit;
-      this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
-    }
-
-    console.log('packingRights', packingRights);
-    console.log(this.canAdd, this.canEdit, this.canDelete);
-    this.sesstion_Details();
-    this.showCategory();
-    this.getDepartmentDropDown();
-  }
   refresh = () => {
-    this.dataGrid.instance.refresh();
-    this.showCategory();
+    this.fetch_subdepartment_data_list();
   };
+
   toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
-    // this.cdr.detectChanges();
   };
+
   handleClose() {
     this.isAddCategoryPopupOpened = false;
     this.editItemCategory = false;
-    this.showCategory();
   }
 
   onExporting(event: any) {
-    const fileName = 'item-category-list';
+    const fileName = 'sub department list';
     this.dataservice.exportDataGrid(event, fileName);
   }
 }

@@ -10,7 +10,7 @@ import {
   SubcategoryFormComponent,
 } from 'src/app/components/library/subcategory-form/subcategory-form.component';
 import { DataService } from 'src/app/services';
-import { DepartmentListComponent } from '../department-list/department-list.component';
+import { DepartmentListComponent } from '../item-department-list/department-list.component';
 import { FormPopupModule } from 'src/app/components';
 import { CategoryFormModule } from 'src/app/components/library/category-form/category-form.component';
 import notify from 'devextreme/ui/notify';

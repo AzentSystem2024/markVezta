@@ -1,9 +1,7 @@
 <div class="content-wrapper">
   <dx-validation-group #employeeFormGroup>
     <dxi-item>
-      <!-- Two Column Container -->
       <div class="container custom-card-personal">
-        <!-- Left Column: dx-card with Form -->
         <div class="left-column">
           <div class="dx-card custom-card">
             <span class="card-label">-- Personal Details --</span>
@@ -40,6 +38,7 @@
                 </dx-text-box>
               </div>
             </div>
+
             <div class="two-column-layout">
               <!-- <div class="dob-gender-row"> -->
               <div class="dob-field">
@@ -71,7 +70,7 @@
               </div>
             </div>
 
-            <div class="two-column-layout">
+            <div class="three-column-layout">
               <div>
                 <dx-select-box
                   [(value)]="employeeFormData.DESG_ID"
@@ -86,6 +85,7 @@
                 >
                 </dx-select-box>
               </div>
+
               <div>
                 <dx-select-box
                   [(value)]="employeeFormData.DEPT_ID"
@@ -100,7 +100,24 @@
                 >
                 </dx-select-box>
               </div>
+
+              <div>
+                <dx-select-box
+                  [(value)]="employeeFormData.SUB_DEPT_ID"
+                  [items]="SubDepartmentDataSource"
+                  [valueExpr]="'ID'"
+                  [displayExpr]="'DESCRIPTION'"
+                  [placeholder]="'Select Sub-Department'"
+                  label="Sub-Department"
+                  [labelMode]="'floating'"
+                  [searchEnabled]="true"
+                  [disabled]="!SubDepartmentDataSource"
+                  (onValueChanged)="onDepartmentChange($event)"
+                >
+                </dx-select-box>
+              </div>
             </div>
+
             <div class="two-column-layout">
               <div>
                 <dx-date-box
@@ -154,6 +171,7 @@
                 </dx-select-box>
               </div>
             </div>
+
             <div class="three-column-layout">
               <div>
                 <dx-text-box
@@ -186,8 +204,6 @@
                 </dx-number-box>
               </div>
             </div>
-
-            <!-- </dx-form> -->
           </div>
         </div>
 
@@ -216,6 +232,7 @@
           />
         </div>
       </div>
+      <!-- =============== address ============= -->
       <div class="container custom-card-address">
         <!-- Row 1: Address fields -->
         <div>
@@ -294,7 +311,7 @@
         </div>
       </div>
 
-      <!-- <div class="dx-card custom-card-passport">
+      <div class="dx-card custom-card-passport">
         <span class="card-label">-- Visa Details --</span>
         <div class="four-column-layout">
           <div>
@@ -408,7 +425,7 @@
             </dx-text-box>
           </div>
         </div>
-      </div> -->
+      </div>
 
       <div class="container custom-card-bank-details">
         <div class="left-column">

@@ -95,16 +95,7 @@ export class TimesheetListComponent {
       // onClick: (e) => this.onDeleteTimesheet(e),
       visible: (e) => e.row.data.STATUS !== 'Approved',
     },
-    // {
-    //   hint: 'Verify',
-    //   icon: 'check',
-    //   text: 'Verify',
-    //   onClick: (e) => {
-    //     setTimeout(() => this.onVerifyClick(e));
-    //   },
-    //   visible: (e) =>
-    //     e.row.data.STATUS !== 'Approved' && e.row.data.STATUS !== 'Verified',
-    // },
+
     {
       hint: 'Approve',
       icon: 'check',
@@ -158,17 +149,25 @@ export class TimesheetListComponent {
   canPrint: any;
   canView: any;
   canApprove: any;
-  onExporting(event: any) {
-    const fileName = 'Timesheet';
-    this.dataService.exportDataGrid(event, fileName);
-  }
-  // searchButtonOptions = {
-  //   icon: 'search',
-  //   hint: 'Show / Hide Filters',
-  //   stylingMode: 'contained',
-  //   elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
-  //   onClick: () => this.toggleFilters(),
-  // };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
+    onClick: () => this.toggleFilters(),
+  };
   constructor(
     private dataService: DataService,
     private zone: NgZone,
@@ -231,25 +230,10 @@ export class TimesheetListComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
-
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    // onClick: () => this.refreshGrid(),
-    onClick: () => {
-      this.zone.run(() => this.refreshGrid());
-    },
-    text: '',
-  };
-
-  searchButtonOptions = {
-    icon: 'search',
-    hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
-    onClick: () => this.toggleFilters(),
-  };
+  onExporting(event: any) {
+    const fileName = 'Timesheet';
+    this.dataService.exportDataGrid(event, fileName);
+  }
 
   generateYears() {
     const currentYear = new Date().getFullYear();

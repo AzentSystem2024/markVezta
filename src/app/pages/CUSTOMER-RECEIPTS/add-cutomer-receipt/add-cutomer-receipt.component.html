@@ -356,7 +356,6 @@
                 [width]="'100%'"
                 alignment="right"
                 [format]="{ type: 'fixedPoint', precision: 2 }"
-                
               ></dx-number-box>
             </div>
           </div>
@@ -379,44 +378,32 @@
   <!-- Checkbox right above buttons -->
 
   <!-- Buttons row -->
-  <div style="display: flex; gap: 13px">
-    <dx-check-box
-      [(value)]="receiprtFormData.IS_APPROVED"
-      text="Approve"
-      [width]="120"
-    ></dx-check-box>
-    <dx-button
-      text="Cancel"
-      stylingMode="outlined"
-      type="normal"
-      (onClick)="cancel()"
-    ></dx-button>
+  <div style="display: flex; gap: 2px; align-items: flex-end">
+    <!-- Wrap Cancel + Approve -->
+    <div style="display: flex; flex-direction: column; align-items: center">
+      <dx-check-box
+        [(value)]="receiprtFormData.IS_APPROVED"
+        text="Approve"
+        style="margin-bottom: 5px; margin-left: 20px"
+      ></dx-check-box>
 
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        (onClick)="cancel()"
+      ></dx-button>
+    </div>
+
+    <!-- ✅ Save stays exactly same -->
     <dx-button
       #saveButtonRef
-      [text]="
-        isSaving
-          ? receiprtFormData.IS_APPROVED
-            ? 'Committing...'
-            : 'Saving...'
-          : receiprtFormData.IS_APPROVED
-            ? 'Commit'
-            : 'Save'
-      "
+      [text]="isSaving ? 'Saving...' : 'Save'"
       stylingMode="contained"
       type="default"
       [disabled]="isSaving"
       (onClick)="saveReceipt()"
-    >
-    </dx-button>
-
-    <!-- <dx-button
-      #saveButtonRef
-      [text]="receiprtFormData.IS_APPROVED ? 'Commit' : 'Save'"
-      stylingMode="contained"
-      type="default"
-      (onClick)="saveReceipt()"
-    ></dx-button> -->
+    ></dx-button>
   </div>
 </div>
 

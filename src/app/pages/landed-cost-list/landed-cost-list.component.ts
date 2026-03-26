@@ -40,6 +40,8 @@ export class LandedCostListComponent implements OnInit {
   isAddLandedcostPopupOpened = false;
   showFilterRow = true;
   showHeaderFilter = true;
+  IS_INACTIVE: boolean = false;
+  
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -50,7 +52,6 @@ export class LandedCostListComponent implements OnInit {
   addLandedcost() {
     this.isAddLandedcostPopupOpened = true;
   }
-  IS_INACTIVE: boolean = false;
 
   getStatus(): string {
     return this.IS_INACTIVE ? 'Inactive' : 'Active';

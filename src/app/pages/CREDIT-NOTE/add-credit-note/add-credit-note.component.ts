@@ -955,9 +955,8 @@ export class AddCreditNoteComponent {
   saveCreditNote(): void {
     this.itemsGridRef?.instance?.saveEditData();
 
-    const gridData = this.itemsGridRef?.instance
-      ?.getVisibleRows()
-      .map((r) => r.data);
+    const gridData =
+      this.itemsGridRef?.instance?.getVisibleRows().map((r) => r.data) || [];
     const details = this.creditFormData.NOTE_DETAIL || [];
     let totalAmount = 0;
     let totalGST = 0;
@@ -1012,17 +1011,30 @@ export class AddCreditNoteComponent {
       );
       return;
     }
+    const invalidRow = gridData.find((row: any) => {
+      return (row.ledgerCode || row.ledgerName) && !(Number(row.Amount) > 0);
+    });
 
+    if (invalidRow) {
+      notify(
+        'Please enter a valid Amount for the selected ledger.',
+        'error',
+        3000,
+      );
+
+      const rowIndex = gridData.indexOf(invalidRow);
+
+      setTimeout(() => {
+        this.itemsGridRef?.instance?.editCell(rowIndex, 'Amount');
+      }, 100);
+
+      return;
+    }
     // --- Build NOTE_DETAIL array ---
     this.creditFormData.NOTE_DETAIL = gridData
-      .filter(
-        (row: any) =>
-          row.ledgerCode ||
-          row.ledgerName ||
-          row.Amount ||
-          row.GST_PERC || // ✅ fixed typo
-          row.particulars,
-      )
+      .filter((row: any) => {
+        return (row.ledgerCode || row.ledgerName) && Number(row.Amount) > 0;
+      })
       .map((row: any, index: number) => {
         const ledger = this.ledgerList.find(
           (item: any) => item.HEAD_CODE === row.ledgerCode,

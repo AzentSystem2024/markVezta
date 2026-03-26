@@ -1,0 +1,169 @@
+@use "../../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+  width: 100%;
+  display: contents;
+  overflow: auto;
+}
+
+.view-wrapper {
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
+      }
+    }
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
+
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
+  }
+
+  user-panel {
+    display: inherit;
+  }
+}
+
+.date-range-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+::ng-deep .toolbar-icon-btn.dx-button {
+  width: 40px;
+  height: 35px;
+  border-radius: 8px;
+  background-color: rgba(230, 230, 230, 1);
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+::ng-deep .toolbar-icon-btn .dx-button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+::ng-deep .toolbar-icon-btn .dx-icon {
+  font-size: 18px;
+  color: rgba(52, 52, 52, 1);
+}
+
+/* EXPORT BUTTON – ICON ONLY */
+::ng-deep .export-btn .dx-dropdownbutton {
+  width: 40px;
+  height: 35px;
+  border-radius: 8px;
+  background-color: rgba(230, 230, 230, 1);
+  padding: 0;
+}
+
+/* Remove dropdown caret */
+::ng-deep .export-btn .dx-dropdowneditor-button {
+  display: none !important;
+}
+
+/* Remove default DevExtreme icons & text */
+::ng-deep .export-btn .dx-icon,
+::ng-deep .export-btn .dx-button-text,
+::ng-deep .export-btn .dx-icon-export,
+::ng-deep .export-btn .dx-icon-xlsx,
+::ng-deep .export-btn .dx-icon-xlsxfile,
+::ng-deep .export-btn .dx-icon-exportxlsx {
+  display: none !important;
+}
+
+/* Center content */
+::ng-deep .export-btn .dx-button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Excel icon (ONLY icon visible) */
+::ng-deep .export-btn .dx-button-content::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: no-repeat center / contain
+    url("https://api.iconify.design/vscode-icons/file-type-excel.svg");
+  display: inline-block;
+}
+
+/* HEADER */
+.grid-header {
+  font-weight: 600;
+  font-size: 20px;
+  margin-left: 12px;
+}
+
+/* + NEW BUTTON */
+::ng-deep .add-button {
+  background-color: #1e88e5;
+  border-radius: 8px;
+  height: 35px;
+  padding: 0 16px;
+  border: none;
+}
+
+::ng-deep .add-button .dx-button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.add-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+}
+
+.add-btn-content .iconify {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+.add-text {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+/* TOOLBAR DIVIDER */
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background-color: rgba(0, 0, 0, 0.15);
+  margin: 0 4px;
+}

@@ -52,7 +52,14 @@
                 ></dx-text-box>
               </div>
               <div style="display: flex; align-items: baseline; gap: 5px">
-                <dx-select-box
+                <dx-text-box
+                  label="Customer"
+                  [value]="creditFormData[0]?.CUST_NAME"
+                  labelMode="floating"
+                  [width]="405"
+                  [readOnly]="true"
+                ></dx-text-box>
+                <!-- <dx-select-box
                   #distributorRef
                   [(value)]="selectedDistributorId"
                   [dataSource]="distributorList"
@@ -65,7 +72,7 @@
                   (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
                   (onValueChanged)="onDistributorSelected($event)"
                   [readOnly]="true"
-                ></dx-select-box>
+                ></dx-select-box> -->
                 <dx-select-box
                   [(value)]="invoiceNo"
                   [items]="pendingInvoices"
@@ -75,6 +82,7 @@
                   valueExpr="INVOICE_NO"
                   placeholder="Select Invoice No."
                   [width]="200"
+                  [readOnly]="true"
                   (onFocusIn)="openInvoicePopup()"
                 ></dx-select-box>
               </div>
@@ -314,6 +322,11 @@
               [inputAttr]="{ style: 'text-align: right;' }"
             ></dx-text-box>
           </div>
+          <dx-check-box
+            [(value)]="creditFormData.IS_APPROVED"
+            text="Approve"
+            (onValueChanged)="onApprovedChanged($event)"
+          ></dx-check-box>
         </div>
       </div>
     </div>
@@ -323,13 +336,13 @@
 <!-- Footer Buttons -->
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
-    <div>
+    <!-- <div>
       <dx-check-box
         [(value)]="creditFormData.IS_APPROVED"
         text="Approve"
         (onValueChanged)="onApprovedChanged($event)"
       ></dx-check-box>
-    </div>
+    </div> -->
     <dx-button
       text="Cancel"
       (onClick)="cancel()"

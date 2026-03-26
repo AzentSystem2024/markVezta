@@ -25,13 +25,13 @@
     <!-- Category Name -->
     <dxi-item>
       <dx-text-box
-        [(value)]="newCategory.CAT_NAME"
-        label="Category Name *"
+        [(value)]="newCategory.DESCRIPTION"
+        label="Description *"
         labelMode="floating"
         ><dx-validator>
           <dxi-validation-rule
             type="required"
-            message="Category name is required"
+            message="Description is required"
           ></dxi-validation-rule>
         </dx-validator>
       </dx-text-box>
@@ -44,7 +44,7 @@
         displayExpr="DESCRIPTION"
         valueExpr="ID"
         placeholder="Select Department"
-        [(value)]="newCategory.DEPT_ID"
+        [(value)]="newCategory.DEPARTMENT_ID"
         label="Department *"
         labelMode="floating"
         ><dx-validator>

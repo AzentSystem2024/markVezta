@@ -5,6 +5,8 @@ import {
   EventEmitter,
   Input,
   NgModule,
+  OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -50,21 +52,16 @@ import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.compo
 import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import { EditInvoiceComponent } from '../edit-invoice/edit-invoice.component';
-import notify from 'devextreme/ui/notify';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import autoTable from 'jspdf-autotable';
-// import logo from 'src/assets/images/logo.png';
 
 @Component({
   selector: 'app-view-invoice',
   templateUrl: './view-invoice.component.html',
   styleUrls: ['./view-invoice.component.scss'],
 })
-export class ViewInvoiceComponent {
+export class ViewInvoiceComponent implements OnInit, OnChanges {
   @ViewChild('itemsGridRef', { static: false }) itemsGridRef: any;
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
@@ -165,41 +162,12 @@ export class ViewInvoiceComponent {
     });
   }
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   if (changes['invoiceFormData'] && this.invoiceFormData?.length > 0) {
-  //     const firstInvoice = this.invoiceFormData[0];
-  //     if (
-  //       firstInvoice.SALE_DATE &&
-  //       typeof firstInvoice.SALE_DATE === 'string'
-  //     ) {
-  //       const [day, month, year] =
-  //         firstInvoice.SALE_DATE.split('-').map(Number);
-  //       const localDate = new Date(year, month - 1, day);
-
-  //       // Ensure no timezone offset by setting time to noon (safe time)
-  //       localDate.setHours(12, 0, 0, 0);
-
-  //       firstInvoice.SALE_DATE = localDate;
-  //     }
-
-  //     this.mainInvoiceGridList = firstInvoice.SALE_DETAILS || [];
-  //     this.mainInvoiceGridList = this.mainInvoiceGridList.map((row: any) => ({
-  //       HSN_CODE: this.HSNCODE, // force-create
-  //       GST: row.GST || this.GST, // already showing
-  //       ...row, // merge original row at the end
-  //     }));
-  //     this.invoiceFormData = firstInvoice;
-  //     this.getDistributorListAfterInput();
-  //   }
-  // }
-
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['invoiceFormData'] && this.invoiceFormData?.length > 0) {
       const firstInvoice = this.invoiceFormData[0];
       this.invoiceFormData.PARTY_NAME = firstInvoice.PARTY_NAME;
       console.table(this.mainInvoiceGridList);
 
-      // Convert SALE_DATE (do NOT change)
       if (
         firstInvoice.SALE_DATE &&
         typeof firstInvoice.SALE_DATE === 'string'
@@ -255,6 +223,7 @@ export class ViewInvoiceComponent {
       this.getCustomerOrUnitLst();
     }
   }
+
   populateCompanyFromSession() {
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
@@ -262,7 +231,7 @@ export class ViewInvoiceComponent {
       const selectedCompany = userData?.SELECTED_COMPANY;
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
-        this.companyList = [selectedCompany]; // ✅ Show only selected company
+        this.companyList = [selectedCompany]; // Show only selected company
       }
       if (userData.USER_ID) {
         this.invoiceFormData.USER_ID = userData.USER_ID;
@@ -285,12 +254,12 @@ export class ViewInvoiceComponent {
     const hasIGST = rows.some((r) => Number(r.GST) > 0);
 
     if (hasIGST) {
-      // ✅ IGST case
+      //  IGST case
       this.showGST = true;
       this.showCGST = false;
       this.showSGST = false;
     } else {
-      // ✅ CGST + SGST case
+      //  CGST + SGST case
       this.showGST = false;
       this.showCGST = true;
       this.showSGST = true;
@@ -312,7 +281,7 @@ export class ViewInvoiceComponent {
             (cust: any) => cust.ID === this.invoiceFormData.DISTRIBUTOR_ID,
           );
 
-          // ⭐ NOW CHECK STATES
+          //  NOW CHECK STATES
           if (this.selectedCustomer && this.companyState) {
             const custState =
               this.selectedCustomer.STATE_NAME.trim().toLowerCase();
@@ -337,7 +306,7 @@ export class ViewInvoiceComponent {
   }
   onDistributorChanged(e: any) {
     if (e && e.value) {
-      this.selectedDistributorId = e.value; // ✅ this is the selected ID
+      this.selectedDistributorId = e.value; // this is the selected ID
       if (this.selectedDistributorId) {
         this.selectedSupplierName = this.distributorList.find(
           (s: any) => s.ID === this.selectedDistributorId,
@@ -362,7 +331,7 @@ export class ViewInvoiceComponent {
     this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
       this.distributorList = response;
 
-      // ✅ Ensure ID is correctly matched
+      //  Ensure ID is correctly matched
       const matched = response.find(
         (d) => d.ID === this.invoiceFormData?.DISTRIBUTOR_ID,
       );

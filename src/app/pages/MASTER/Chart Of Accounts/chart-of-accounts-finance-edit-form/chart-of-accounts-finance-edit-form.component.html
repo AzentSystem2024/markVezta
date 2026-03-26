@@ -89,23 +89,20 @@
       </div>
     </div>
 
-    <!-- <div class="form-group">
-    <dx-text-box
-[(value)]="accountHeadData.HEAD_NAME"
-      label="Ledger"
-      labelMode="floating"
-      placeholder="Ledger"
-    ></dx-text-box>
-  </div> -->
-
-    <!-- <div class="form-group">
-    <dx-text-box
-
-      label="Arabic Description"
-      labelMode="floating"
-      placeholder="Arabic Description"
-    ></dx-text-box>
-  </div> -->
+    <div class="form-group">
+      <dx-select-box
+        style="margin-top: 10px"
+        [(value)]="accountHeadData.CostTypeID"
+        [dataSource]="costTypeList"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        placeholder="Cost Type (Optional)"
+        stylingMode="outlined"
+        [searchEnabled]="true"
+        class="form-field"
+      >
+      </dx-select-box>
+    </div>
   </div>
 
   <div class="checkbox-container">

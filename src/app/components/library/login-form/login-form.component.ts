@@ -52,18 +52,8 @@ export class LoginFormComponent implements OnInit {
 
   validUsernames: string[] = [];
   isPasswordVisible: boolean = false;
-
+  passwordVisible = false;
   passwordMode: 'password' | 'text' = 'password';
-  togglePasswordVisibility = () => {
-    this.passwordMode = this.passwordMode === 'password' ? 'text' : 'password';
-    this.cdr.detectChanges(); // Ensure the UI reflects the change immediately
-  };
-
-  // togglePasswordVisibility = () => {
-  //   this.isPasswordVisible = !this.isPasswordVisible;
-  //   this.cdr.detectChanges();
-  // };
-
   loading = false;
   finacialYearList: any = [];
   CompanyList: any = [];
@@ -96,9 +86,12 @@ export class LoginFormComponent implements OnInit {
     this.themeService.isDark.subscribe((value: boolean) => {
       this.btnStylingMode = value ? 'outlined' : 'contained';
     });
-
-    // this.get_Company_list_dropdown()
   }
+
+  togglePasswordVisibility = () => {
+    this.passwordMode = this.passwordMode === 'password' ? 'text' : 'password';
+    this.cdr.detectChanges(); // Ensure the UI reflects the change immediately
+  };
 
   changePasswordMode() {
     this.passwordMode = this.passwordMode === 'text' ? 'password' : 'text';
@@ -117,7 +110,6 @@ export class LoginFormComponent implements OnInit {
   }
 
   ///=========================NEW CHANGES =====================
-  passwordVisible = false;
 
   get_financial_year_dropdown() {
     this.dataservice.financial_year_api().subscribe((res: any) => {
@@ -292,83 +284,7 @@ export class LoginFormComponent implements OnInit {
     });
   }
 
-  // async onSubmit(event: Event) {
-  //   event.preventDefault();
-  //   this.loading = true;
 
-  //   if (!this.formData.LOGIN_NAME || !this.formData.PASSWORD) {
-  //     notify({
-  //       message: 'Please enter login name and password',
-  //       type: 'warning',
-  //       displayTime: 3000,
-  //       position: { at: 'top right', my: 'top right' },
-  //     });
-  //     this.loading = false;
-  //     return;
-  //   }
-  //   // 🔒 Static values (as requested)
-  //   const COMPUTER_NAME = 'AZENT-1';
-  //   const COMPUTER_USER = 'Vismaya';
-  //   // 🌐 System-derived values
-  //   const DOMAIN_NAME = window.location.hostname || '';
-  //   const [INTERNET_IP, LOCAL_IP] = await Promise.all([
-  //     this.getInternetIP(),
-  //     this.getLocalIP(),
-  //   ]);
-
-  //   const payload = {
-  //     LOGIN_NAME: this.formData.LOGIN_NAME,
-  //     PASSWORD: this.formData.PASSWORD,
-  //     COMPANY_ID: this.formData.COMPANY_ID,
-  //     FINANCIAL_YEAR_ID: this.formData.FINANCIAL_YEAR_ID,
-  //     COMPUTER_NAME,
-  //     COMPUTER_USER,
-  //     DOMAIN_NAME,
-  //     LOCAL_IP,
-  //     INTERNET_IP,
-  //   };
-  //   this.dataservice.login_function_api(payload).subscribe({
-  //     next: (res: any) => {
-
-  //       if (res.flag === 1) {
-  //         // ✅ Successful login
-  //         localStorage.setItem('userData', JSON.stringify(res));
-  //         sessionStorage.setItem('savedUserData', JSON.stringify(res));
-  //         localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
-  //         // this.sessionService.startSessionTimer();
-  //         this.router.navigate(['/analytics-dashboard']);
-
-  //         notify({
-  //           message: 'Login successful!',
-  //           type: 'success',
-  //           displayTime: 2000,
-  //           position: { at: 'top right', my: 'top right' },
-  //         });
-  //       } else {
-  //         // ❌ Incorrect username or password
-  //         notify({
-  //           message: 'Username or password is incorrect',
-  //           type: 'error',
-  //           displayTime: 3000,
-  //           position: { at: 'top right', my: 'top right' },
-  //         });
-  //       }
-
-  //       this.loading = false;
-  //     },
-  //     error: (err) => {
-  //       this.loading = false;
-  //       console.error('Login Error:', err);
-
-  //       notify({
-  //         message: 'Something went wrong. Please try again.',
-  //         type: 'error',
-  //         displayTime: 3000,
-  //         position: { at: 'top right', my: 'top right' },
-  //       });
-  //     },
-  //   });
-  // }
 }
 
 @NgModule({
