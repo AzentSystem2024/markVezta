@@ -33,10 +33,27 @@ export class PaySettingsComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   formsource: FormGroup;
-  PaySettings: any;
   Ledger: any;
   isLoading: boolean = false;
-
+  PaySettings: any = {
+    COMPANY_ID :0,
+    DAILY_HOURS:0,
+    MAX_OT_MTS:0,
+    NORMAL_OT_RATE:0,
+    HOLIDAY_OT_RATE:0,
+    LEAVE_SAL_DAYS:0,
+    UQ_LABOUR_ID:'',
+    BANK_AC_NO:'',
+    BANK_CODE:'',
+    SAL_EXPENSE_HEAD_ID:0,
+    SAL_PAYABLE_HEAD_ID:0,
+    LS_EXPENSE_HEAD_ID:0,
+    LS_PAYABLE_HEAD_ID:0,
+    EOS_EXPENSE_HEAD_ID:0,
+    EOS_PAYABLE_HEAD_ID:0
+  }
+  selected_Company_id: any;
+  
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,
@@ -57,25 +74,38 @@ export class PaySettingsComponent {
       SAL_PAYABLE_HEAD_ID: ['', Validators.required],
       UQ_LABOUR_ID: ['', Validators.required],
     });
+    this.sesstion_Details();
     this.get_PaySettingsList();
     this.get_DropDown_List();
+
   }
 
   formData = {};
 
   //===============get Dropdown List=======================
   get_DropDown_List() {
-    this.dataservice.get_Ledger_Api(name).subscribe((response: any) => {
+    const payload = {
+      NAME : 'ACCOUNT_HEAD'
+    }
+    this.dataservice.get_Ledger_Api(payload).subscribe((response: any) => {
       this.Ledger = response;
-
+      console.log(this.Ledger)
       // this.Ledger = response.Hospitals;
     });
   }
 
+    sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
   //===================get data list========================
   get_PaySettingsList() {
+    const payload ={
+      COMPANY_ID : this.selected_Company_id
+    }
     this.isLoading = true;
-    this.dataservice.get_PaySettingsList().subscribe((res: any) => {
+    this.dataservice.get_PaySettingsList(payload).subscribe((res: any) => {
       this.PaySettings = res.data;
     });
   }
@@ -87,78 +117,43 @@ export class PaySettingsComponent {
     this.dataGrid.instance.refresh();
   };
 
-  editData() {
-    const Daily_Hours = this.PaySettings.DAILY_HOURS;
-    const Bank_Acc_No = this.PaySettings.BANK_AC_NO;
-    const Bank_Code = this.PaySettings.BANK_CODE;
-    const EOS_Expense_Head_ID = this.PaySettings.EOS_EXPENSE_HEAD_ID;
-    const EOS_Payable_Head_ID = this.PaySettings.EOS_PAYABLE_HEAD_ID;
-    const Holiday_OT_Rate = this.PaySettings.HOLIDAY_OT_RATE;
-    const Leave_Sal_Days = this.PaySettings.LEAVE_SAL_DAYS;
-    const LS_Expense_Head_ID = this.PaySettings.LS_EXPENSE_HEAD_ID;
-    const LS_Payable_Head_ID = this.PaySettings.LS_PAYABLE_HEAD_ID;
-    const Max_OT_MTS = this.PaySettings.MAX_OT_MTS;
-    const Normal_OT_Rate = this.PaySettings.NORMAL_OT_RATE;
-    const Sal_Expense_Head_ID = this.PaySettings.SAL_EXPENSE_HEAD_ID;
-    const Sal_Payable_Head_ID = this.PaySettings.SAL_PAYABLE_HEAD_ID;
-    const UQ_Labour_ID = this.PaySettings.UQ_LABOUR_ID;
+editData() {
+  console.log("Button clicked");
 
-    if (
-      Daily_Hours &&
-      Max_OT_MTS &&
-      Normal_OT_Rate &&
-      Holiday_OT_Rate &&
-      Leave_Sal_Days &&
-      UQ_Labour_ID &&
-      Bank_Acc_No &&
-      Bank_Code &&
-      Sal_Expense_Head_ID &&
-      Sal_Payable_Head_ID &&
-      LS_Expense_Head_ID &&
-      LS_Payable_Head_ID &&
-      EOS_Expense_Head_ID &&
-      EOS_Payable_Head_ID
-    ) {
-      this.dataservice
-        .Update_PaySettings_Api(
-          Daily_Hours,
-          Max_OT_MTS,
-          Normal_OT_Rate,
-          Holiday_OT_Rate,
-          Leave_Sal_Days,
-          UQ_Labour_ID,
-          Bank_Acc_No,
-          Bank_Code,
-          Sal_Expense_Head_ID,
-          Sal_Payable_Head_ID,
-          LS_Expense_Head_ID,
-          LS_Payable_Head_ID,
-          EOS_Expense_Head_ID,
-          EOS_Payable_Head_ID,
-        )
-        .subscribe((res: any) => {
-          notify(
-            {
-              message: 'Data succesfully added',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success',
-          );
-          this.get_PaySettingsList();
-        });
-    } else {
-      notify(
-        {
-          message: 'Please fill the fields',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'error',
-      );
-    }
-    this.get_PaySettingsList();
-  }
+  console.log("Payload:", this.PaySettings);
+const payload = {
+  ...this.PaySettings,
+  COMPANY_ID: this.selected_Company_id,
+
+  SAL_EXPENSE_HEAD_ID: this.PaySettings.SAL_EXPENSE_HEAD_ID || 0,
+  SAL_PAYABLE_HEAD_ID: this.PaySettings.SAL_PAYABLE_HEAD_ID || 0,
+  LS_EXPENSE_HEAD_ID: this.PaySettings.LS_EXPENSE_HEAD_ID || 0,
+  LS_PAYABLE_HEAD_ID: this.PaySettings.LS_PAYABLE_HEAD_ID || 0,
+  EOS_EXPENSE_HEAD_ID: this.PaySettings.EOS_EXPENSE_HEAD_ID || 0,
+  EOS_PAYABLE_HEAD_ID: this.PaySettings.EOS_PAYABLE_HEAD_ID || 0
+};
+  this.dataservice
+    .Update_PaySettings_Api(
+      payload
+    )
+    .subscribe({
+      next: (res: any) => {
+        console.log("Success:", res);
+
+        notify(
+          {
+            message: res.message,
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
+        this.get_PaySettingsList();
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+}
 }
 @NgModule({
   imports: [
