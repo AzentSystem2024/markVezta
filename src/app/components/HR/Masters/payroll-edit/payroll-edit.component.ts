@@ -52,6 +52,7 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./payroll-edit.component.scss'],
 })
 export class PayrollEditComponent {
+  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() payroll: any;
   @Input() readOnly: boolean = false;
@@ -345,6 +346,54 @@ export class PayrollEditComponent {
   }
 
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'HEAD_ID' ||
+      e.dataField === 'GROSS_AMOUNT' ||
+      e.dataField === 'DEDUCTION_AMOUNT' ||
+      e.dataField === 'Amount' ||
+      e.dataField === 'GST_PERC' ||
+      e.dataField === 'gstAmount'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data,
+          );
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
+        }
+      };
+    }
     if (
       e.parentType === 'dataRow' &&
       (e.dataField === 'GROSS_AMOUNT' || e.dataField === 'DEDUCTION_AMOUNT')

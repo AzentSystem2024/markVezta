@@ -922,13 +922,8 @@ export class AddDebitComponent {
     const validRows = gridData.filter((row: any) => {
       const hasLedger = !!(row.ledgerCode || row.ledgerName);
       const hasAmount = Number(row.Amount) > 0;
-      const hasTax =
-        Number(row.GST_PERC) > 0 ||
-        Number(row.CGST) > 0 ||
-        Number(row.SGST) > 0;
-      const hasRemarks = !!row.particulars;
 
-      return hasLedger || hasAmount || hasTax || hasRemarks;
+      return hasLedger && hasAmount; // ✅ STRICT CHECK
     });
     // const validRows = gridData.filter(
     //   (row: any) =>
@@ -964,10 +959,21 @@ export class AddDebitComponent {
     );
 
     if (invalidAmountRow) {
-      notify('Please enter a valid Amount', 'error', 3000);
+      notify(
+        'Please enter a valid Amount for the selected ledger.',
+        'error',
+        3000,
+      );
       return;
     }
-
+    if (invalidAmountRow) {
+      notify(
+        'Please enter a valid Amount for the selected ledger.',
+        'error',
+        3000,
+      );
+      return;
+    }
     // ✅ 3. Build NOTE_DETAIL for backend
     this.debitFormData.NOTE_DETAIL = validRows.map(
       (row: any, index: number) => {
