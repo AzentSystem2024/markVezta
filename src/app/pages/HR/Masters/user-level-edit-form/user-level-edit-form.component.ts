@@ -109,7 +109,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
 
       this.combineSelectedRows();
 
-      // ✅ Step 3: Build allSelectedRows using selected menu IDs
+      // Step 3: Build allSelectedRows using selected menu IDs
       const selectedMenuIds = new Set<number>();
       Object.values(this.selectedRows).forEach((menuIdList: number[]) => {
         menuIdList.forEach((menuId) => selectedMenuIds.add(menuId));
@@ -149,32 +149,12 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
     this.combineSelectedRows(); // Rebuild the latest data from updated grid values
   }
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //     if (changes['editValue'] && this.editValue) {
-  //       this.allSelectedRows = [];
-  //       this.UserLevelValue = this.editValue.UserRoles;
-  //       // Process the editData to match the new format
-  //       const selectedMenuIds = this.editValue.usermenulist.map(
-  //         (menu: any) => menu.MenuId
-  //       );
-  //       // Update selectedRows for each tab based on selectedMenuIds
-  //       this.MenuDatasource.forEach((tab, index) => {
-  //         this.selectedRows[index] = tab.Menus.filter((menu: any) =>
-  //           selectedMenuIds.includes(menu.MenuId)
-  //         ).map((menu: any) => menu.MenuId);
-  //       });
-  //       // Set the data for the initial tab
-  //       this.selectedTab = 0;
-  //       this.selectedTabData = this.MenuDatasource[this.selectedTab].Menus;
-  //     }
-  //   }
-
   onTabClick(event: any): void {
     this.selectedTab = event.itemIndex;
     this.selectedTabData = this.MenuDatasource[this.selectedTab].Menus;
   }
 
-  //   //==============All Menu List========================
+  //======== All Menu List ==============
   get_All_MenuList() {
     this.dataservice.get_usermenu_Api().subscribe((response: any) => {
       this.MenuDatasource = response.Data;
@@ -234,8 +214,6 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
       Menus: enrichedMenus,
     });
   }
-
-  // getNewUSerLevelEditedData = () => ({ ...this.allSelectedRows });
 
   getNewUSerLevelEditedData = () => {
     this.combineSelectedRows(); // Ensure this reflects latest grid changes

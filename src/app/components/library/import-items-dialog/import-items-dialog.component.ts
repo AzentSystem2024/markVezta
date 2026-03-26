@@ -31,6 +31,9 @@ import {
   TooltipCellComponent,
 } from 'src/app/components/utils/tooltip-cell/tooltip-cell.component';
 import { NonNullableFormBuilder } from '@angular/forms';
+
+import { Router } from '@angular/router';
+import { DxLoadPanelModule } from 'devextreme-angular';
 import { ImportItemsComponent } from 'src/app/pages/MASTER/import-items/import-items.component';
 
 @Component({
@@ -41,6 +44,18 @@ import { ImportItemsComponent } from 'src/app/pages/MASTER/import-items/import-i
 export class ImportItemsDialogComponent implements AfterViewInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  @Output() closeForm = new EventEmitter();
+  @ViewChild(ImportItemsComponent) importitem: ImportItemsComponent;
+
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showHeaderFilter: true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
   datasource: any[] = [];
   itemTemplateData: any;
   selectedData: any;
@@ -54,36 +69,109 @@ export class ImportItemsDialogComponent implements AfterViewInit {
   remarks: string | null = null;
   userid: number = 0;
   templateid: number = 0;
-  @Output() closeForm = new EventEmitter();
-  @ViewChild(ImportItemsComponent) importitem: ImportItemsComponent;
-  constructor(
-    private service: DataService,
-    private cd: ChangeDetectorRef,
-  ) {
-    service.getDropdownData('STORE').subscribe((data) => {
-      this.stores = data;
-    });
-  }
 
-  ngAfterViewInit() {
-    // This will ensure that importitem is available after the view has initialized
-  }
+  matrixCode: any;
+  userID: any;
+  finID: any;
+  companyID: any;
+  storeFromSession: any;
+  canAdd: any;
+  canEdit: any;
+  canDelete: any;
+  canPrint: any;
+  canView: any;
+  canApprove: any;
 
+  isSaving = false;
   importButtonOptions = {
-    icon: 'download',
+    icon: 'import',
+
+    stylingMode: 'contained',
     hint: 'Import',
     onClick: () => this.triggerFileInput(),
   };
   saveButtonOptions = {
     text: 'Save',
-    hint: 'Save',
-    elementAttr: {
-      class: 'custom-button',
-    },
-    onClick: () => {
-      this.saveData();
-    },
+    icon: 'save',
+    stylingMode: 'contained',
+    type: 'default',
+    disabled: true,
+    onClick: () => this.saveData(),
   };
+  constructor(
+    private service: DataService,
+    private cd: ChangeDetectorRef,
+    private router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
+
+    this.userID = menuResponse.USER_ID;
+    console.log(this.userID, 'USERIDDDDDDDDDDDDDDDDDD========');
+    this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    console.log(
+      this.companyID,
+      menuResponse,
+      'COMPANYIDDDDDDDDDDDDDDDDDDDDDDDDDDD',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/quotation');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+    if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
+      // this.getItemsList();
+    } else {
+      // this.getItemsList();
+    }
+    this.getStore();
+    this.getItemTemplateName();
+  }
+  ngAfterViewInit() {
+    // This will ensure that importitem is available after the view has initialized
+    console.log(this.importitem.getItemImportLog(), 'import item');
+  }
+  getStore() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'STORE',
+    };
+    this.service.getDropdownData(payload).subscribe((data) => {
+      this.stores = data;
+      console.log(
+        this.stores,
+        'storessssssssssssssssssssssssssssssssssssssssss',
+      );
+    });
+  }
+
+  updateSaveButtonState() {
+    this.saveButtonOptions = {
+      ...this.saveButtonOptions,
+      disabled: this.isSaveDisabled,
+    };
+  }
+
+  get isSaveDisabled(): boolean {
+    return this.isSaving || !this.datasource || this.datasource.length === 0;
+  }
+
   saveData() {
     // Reset the validation flag before checking
     let hasErrors = false;
@@ -100,6 +188,7 @@ export class ImportItemsDialogComponent implements AfterViewInit {
         // Check for mandatory fields
         if (col.isMandatory && !value) {
           hasErrors = true; // Set flag to indicate error
+          console.log(`Error: ${col.dataField} is mandatory but empty`);
           this.dataGrid.instance.columnOption(
             col.dataField,
             'cssClass',
@@ -109,6 +198,9 @@ export class ImportItemsDialogComponent implements AfterViewInit {
         // Check for max length
         if (value && value.length > col.maxLength) {
           hasErrors = true; // Set flag to indicate error
+          console.log(
+            `Error: Value for ${col.dataField} exceeds max length of ${col.maxLength}`,
+          );
           this.dataGrid.instance.columnOption(
             col.dataField,
             'cssClass',
@@ -161,15 +253,19 @@ export class ImportItemsDialogComponent implements AfterViewInit {
     const dataToSave = {
       TEMPLATE_ID: this.templateid, // Replace with actual template ID
       STORE_ID: this.storeid, // Replace with actual store ID
-      USER_ID: 1, // Replace with actual user ID
+      USER_ID: this.userID, // Replace with actual user ID
       REMARKS: this.remarks,
       importitem_logentry: transformedData,
     };
 
     // Now you can send transformedData to your API or wherever needed
+    console.log(dataToSave);
+
+    this.isSaving = true;
 
     this.service.saveImportedData(dataToSave).subscribe(
       (response) => {
+        this.isSaving = false;
         if (response.message == 'Success') {
           notify(
             {
@@ -182,7 +278,9 @@ export class ImportItemsDialogComponent implements AfterViewInit {
           // Insert logic here if needed after successful save
           // this.clearDataGrid();
           this.close();
+          this.updateSaveButtonState();
         } else {
+          this.isSaving = false;
           notify(
             {
               message: 'Unexpected error occurred!',
@@ -193,6 +291,7 @@ export class ImportItemsDialogComponent implements AfterViewInit {
         }
       },
       (error) => {
+        this.isSaving = false;
         notify(
           {
             message: 'Error saving data! ',
@@ -209,6 +308,7 @@ export class ImportItemsDialogComponent implements AfterViewInit {
   }
 
   onCellPrepared(e) {
+    console.log(e);
     const column = this.columns.find(
       (col) => col.dataField === e.column.dataField,
     );
@@ -293,6 +393,8 @@ export class ImportItemsDialogComponent implements AfterViewInit {
         const headerData: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1 });
         const rowData: any[] = XLSX.utils.sheet_to_json(ws);
 
+        console.log('Row Data Length:', rowData.length);
+
         if (!Array.isArray(headerData[0])) {
           notify(
             {
@@ -307,12 +409,16 @@ export class ImportItemsDialogComponent implements AfterViewInit {
         }
 
         const excelColumnCount = headerData[0].length;
+        console.log('Excel Column Count:', excelColumnCount);
 
         const gridColumnCount = this.columns.length;
+        console.log('DataGrid Column Count:', gridColumnCount);
 
         const excelHeaders = headerData[0];
+        console.log('Excel Headers:', excelHeaders);
 
         const gridColumnHeaders = this.columns.map((col) => col.dataField);
+        console.log('DataGrid Headers:', gridColumnHeaders);
         if (
           excelColumnCount == gridColumnCount &&
           this.arraysMatch(excelHeaders, gridColumnHeaders)
@@ -363,6 +469,7 @@ export class ImportItemsDialogComponent implements AfterViewInit {
         }
 
         if (excelColumnCount !== gridColumnCount) {
+          console.log('Column counts do not match.');
           notify(
             {
               message:
@@ -381,6 +488,9 @@ export class ImportItemsDialogComponent implements AfterViewInit {
         this.dataGrid.instance.refresh();
         this.datasource = rowData;
         this.loadData();
+        this.updateSaveButtonState();
+
+        console.log('Datasource loaded:', this.datasource);
       } catch (error) {
         notify(
           {
@@ -399,6 +509,7 @@ export class ImportItemsDialogComponent implements AfterViewInit {
   }
   loadData() {
     this.isDatasourceLoaded = true;
+    console.log(this.isDatasourceLoaded, 'boolean value');
     this.cd.detectChanges();
   }
   arraysMatch(arr1: any[], arr2: any[]): boolean {
@@ -416,6 +527,7 @@ export class ImportItemsDialogComponent implements AfterViewInit {
   }
 
   onTemplateValueChanged(event) {
+    console.log('event', event);
     // Clear the current data grid data
     this.clearDataGrid();
     this.resetFileInput();
@@ -423,8 +535,11 @@ export class ImportItemsDialogComponent implements AfterViewInit {
     const value = event.value;
     this.templateid = event.value;
 
+    console.log(value, 'id value');
+
     this.service.selectImportTemplateData(value).subscribe((res) => {
       this.selectedData = res.data[0];
+      console.log(this.selectedData, 'selected data in update columns');
       this.columns = this.selectedData.import_entry
         .filter((entry) => entry.SELECTED)
         .map((entry) => ({
@@ -432,11 +547,14 @@ export class ImportItemsDialogComponent implements AfterViewInit {
           maxLength: entry.MAX_LENGTH,
           isMandatory: entry.IS_MANDATORY,
         }));
+      console.log(this.columns, 'COLUMNSSSSS');
     });
   }
 
   clearDataGrid() {
     this.datasource = [];
+    this.updateSaveButtonState();
+
     this.isDatasourceLoaded = false;
     this.cd.detectChanges();
   }
@@ -449,15 +567,47 @@ export class ImportItemsDialogComponent implements AfterViewInit {
   onStoreSelectionChanged(event: any) {
     this.selectedStoreIds = event.value;
     this.storeid = this.selectedStoreIds.join(','); // Join them into a comma-separated string
+    console.log('Selected Store IDs:', this.storeid); // Output: "1,2,3"
 
     this.remarks = this.stores
       .filter((store) => this.selectedStoreIds.includes(store.ID))
       .map((store) => store.DESCRIPTION)
       .join(', ');
+
+    console.log('Remarks:', this.remarks);
   }
 
-  ngOnInit(): void {
-    this.getItemTemplateName();
+  downloadTemplate() {
+    if (!this.columns || this.columns.length === 0) {
+      notify(
+        {
+          message: 'Please select a template first',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+      );
+      return;
+    }
+
+    // Extract column headers from template
+    const headers = this.columns.map((col) => col.dataField);
+
+    // Create worksheet with only headers
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([headers]);
+
+    // Auto column width
+    ws['!cols'] = headers.map((h) => ({
+      wch: Math.max(h.length + 4, 15),
+    }));
+
+    // Create workbook
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Import Template');
+
+    // File name
+    const templateName = this.selectedData?.TEMPLATE_NAME || 'Import_Template';
+
+    XLSX.writeFile(wb, `${templateName}.xlsx`);
   }
 }
 
@@ -471,6 +621,7 @@ export class ImportItemsDialogComponent implements AfterViewInit {
     TooltipCellModule,
     DxTooltipModule,
     DxTagBoxModule,
+    DxLoadPanelModule,
   ],
   providers: [],
   exports: [ImportItemsDialogComponent],

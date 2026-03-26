@@ -1505,8 +1505,8 @@ export class DataService {
 
     return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
   }
-// ======= save middle east department data =======
-   public save_ME_Department_Data(
+  // ======= save middle east department data =======
+  public save_ME_Department_Data(
     CODE: any,
     DEPT_NAME: any,
     COMPANY_ID: any,
@@ -1517,7 +1517,6 @@ export class DataService {
     return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
   }
 
-  
   removeDepartment(id: any) {
     return this.http.post(`${this.apiUrl}itemdepartment/delete/${id}`, {});
   }
@@ -3158,8 +3157,7 @@ export class DataService {
     );
   }
 
-
-   get_Sub_Dept_DropdownData(DeptID: any): Observable<any> {
+  get_Sub_Dept_DropdownData(DeptID: any): Observable<any> {
     const reqBodyData = { DEPT_ID: DeptID };
     return this.http.post(`${this.apiUrl}Employee/getsubdept`, reqBodyData);
   }
@@ -3506,25 +3504,6 @@ The result can be exported to HTML or Markdown.`;
           second: 0,
           millisecond: 0,
         });
-        // const uniqueTasks = tasks.slice(0, 11);
-
-        // return uniqueTasks.map((task, index) => {
-        //   const { weekDay, weekIndex, defaultTime } =
-        //     this.getAppointmentsDefaultTime(index);
-        //   const taskStart = mondayMidnight
-        //     .plus({
-        //       weeks: weekIndex,
-        //       days: weekDay,
-        //     })
-        //     .plus(defaultTime);
-        //   return {
-        //     ...task,
-        //     startDate: taskStart.toJSDate(),
-        //     endDate: taskStart.plus({ hours: 3 }).toJSDate(),
-        //     description: promptDescription,
-        //     calendarId: weekDay,
-        //   };
-        // });
       }),
     );
   };
@@ -3575,15 +3554,18 @@ The result can be exported to HTML or Markdown.`;
   public getImportTemplateData(): Observable<any> {
     return this.http.post(`${this.apiUrl}/importtemplate/list`, {});
   }
+
   public viewImportedData(data: any): Observable<any> {
     return this.http.post(
-      `${this.apiUrl}/importitemlog/ItemLogEntryList/`,
+      `${this.apiUrl}importitemlog/ItemLogEntryList/`,
       data,
     );
   }
+
   public getImportLogData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/importitemlog/list`, {});
+    return this.http.post(`${this.apiUrl}importitemlog/list`, {});
   }
+  
   public postImportTemplate(items: Object): Observable<any> {
     const data = items;
 
