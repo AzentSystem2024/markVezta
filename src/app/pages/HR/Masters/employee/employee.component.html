@@ -196,7 +196,6 @@
           [attr.title]="cellData.value ? 'Inactive ' : 'Active '"
           style="margin-left: 10px; cursor: default"
         ></i>
-              
       </div>
     </dx-data-grid>
 
@@ -204,7 +203,7 @@
       *ngIf="addEmployeePopupOpened"
       [(visible)]="addEmployeePopupOpened"
       [width]="'80vw'"
-      [height]="'auto'"
+      [height]="'100vh'"
       title="Add Employee"
     >
       <app-employee-add-form
@@ -217,7 +216,7 @@
 <dx-popup
   [(visible)]="editEmployeePopupOpened"
   [width]="'80vw'"
-  [height]="'auto'"
+  [height]="'100vh'"
   title="Edit Employee"
   (onHiding)="handleEditClose()"
 >

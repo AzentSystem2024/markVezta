@@ -3,9 +3,9 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  OnInit,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -29,7 +29,6 @@ import {
   DxAutocompleteModule,
   DxTagBoxModule,
 } from 'devextreme-angular';
-
 import {
   DxoItemModule,
   DxoFormItemModule,
@@ -44,18 +43,16 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-depreciation-report',
   templateUrl: './depreciation-report.component.html',
-  styleUrls: ['./depreciation-report.component.scss']
+  styleUrls: ['./depreciation-report.component.scss'],
 })
-export class DepreciationReportComponent {
-
-   DepreciationReport: any[] = [];
+export class DepreciationReportComponent implements OnInit {
+  DepreciationReport: any[] = [];
   isFilterRowVisible: boolean = false;
   isViewInvoice: boolean = false;
   BalanceSheetReport: any = [];
   auto: string = 'auto';
   isEmptyDatagrid: boolean = true;
   expandedOnce = false;
-
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   company_list: any = [];
@@ -76,7 +73,6 @@ export class DepreciationReportComponent {
   customer_list: any[] = [];
   select_customer_id: any;
   selectedInvoice: any;
-  // customer_details: {};
   defaultDate: Date = new Date();
   financialYeaDate: string;
   selectedYear: number | null = null;
@@ -92,171 +88,6 @@ export class DepreciationReportComponent {
   };
   Department: any;
   select_department_id: number;
-  constructor(
-    private dataservice: DataService,
-    private cdr: ChangeDetectorRef,
-    private router: Router,
-  ) {
-    this.sesstion_Details();
-    
-    //============Year field dataSource===============
-    const currentYear = new Date().getFullYear();
-    for (let year = currentYear; year >= 2015; year--) {
-      this.years.push(year);
-    }
-    this.selectedYear = currentYear;
-    //============Month field dataSource===============
-    this.monthDataSource = this.dataservice.getMonths();
-  }
-  ngOnInit() {
-    // initialize with today's date
-    // this.onToDateChange({ value: this.defaultDate });
-    //   this.onFromDateChange({ value: this.financialYeaDate });
-    //get datasource======== function call==========
-
-    const today = new Date();
-    const SystemDate =
-      today.getFullYear() +
-      '-' +
-      String(today.getMonth() + 1).padStart(2, '0') +
-      '-' +
-      String(today.getDate()).padStart(2, '0');
-
-    this.formatted_from_date = SystemDate;
-    this.formatted_To_date = SystemDate;
-    setTimeout(() => {
-      this.Depreciation_Report();
-    }, 0);
-
-    this.sesstion_Details();
-    this.Department_dropdown();
-  }
-
-  //================ Year value change ===================
-  onYearChanged(e: any): void {
-    this.selectedYear = e.value;
-    this.selectedmonth = '';
-    const currentYear = new Date().getFullYear();
-    const today = new Date();
-    if (this.selectedYear === currentYear) {
-      // Set from date to the start of the year and to date to today
-      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
-      this.formatted_To_date = today; // Today's date
-    } else {
-      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1
-      this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31
-    }
-  }
-
-  //================Month value change ===================
-  onMonthValueChanged(e: any) {
-    this.selectedmonth = e.value ?? '';
-    if (this.selectedmonth === '') {
-      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
-      this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
-    } else {
-      this.formatted_from_date = new Date(
-        this.selectedYear,
-        this.selectedmonth,
-        1,
-      );
-      this.formatted_To_date = new Date(
-        this.selectedYear,
-        this.selectedmonth + 1,
-        0,
-      );
-    }
-  }
-
-  sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    const sessionYear = sessionData.FINANCIAL_YEARS;
-    this.financialYeaDate = sessionYear[0].DATE_FROM;
-
-    this.formatted_from_date = this.financialYeaDate;
-  }
-
-  toggleFilterRow = () => {
-    this.isFilterRowVisible = !this.isFilterRowVisible;
-    this.cdr.detectChanges();
-  };
- 
-
-  onExporting(event: any) {
-    const fileName = 'BalanceSheetReport';
-    this.dataservice.exportDataGridReport(event, fileName);
-  }
-
-  get_sessionstorage_data() {
-    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.company_list = this.savedUserData.Companies;
-  }
-
-  get_fin_id() {
-    this.fin_id = this.savedUserData.FINANCIAL_YEARS;
-    if (this.fin_id.length) {
-      this.finID = this.fin_id[0].FIN_ID;
-    }
-  }
-
-  onCompanyChange(event: any) {
-    this.company_id = event.value;
-  }
-
-  onFromDateChange(event: any) {
-    const rawDate: Date = new Date(event.value);
-    this.formatted_from_date = this.formatDate(rawDate);
-    // example: "2025-04-01"
-  }
-
-  onToDateChange(event: any) {
-    const rawDate: Date = new Date(event.value);
-    this.formatted_To_date = this.formatDate(rawDate);
-    // example: "2025-04-01"
-  }
-
-  formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const day = ('0' + date.getDate()).slice(-2);
-    return `${year}-${month}-${day}`;
-  }
-
-  formatUsefulLife(cellInfo: any) {
-  return cellInfo.value ? `${cellInfo.value} Years` : '';
-}
-
-    Department_dropdown(){
- const payload = {
-      NAME : 'DEPT',
-      COMPANY_ID : this.selected_Company_id
-    }
-    this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
-      this.Department = res;
-    });
-  }
-
-  Depreciation_Report() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      DEPARTMENT_ID: this.select_department_id || 0,
-      DATE_FROM: this.formatted_from_date,
-      DATE_TO: this.formatted_To_date,
-    };
-
-    this.dataservice.Depreciation_Report(payload).subscribe((res: any) => {
-      this.DepreciationReport = res.DepreciationDetails;
-    });
-  }
-
-
-  handleClose() {
-    this.isViewInvoice = false;
-  }
   summaryColumnsData = {
     totalItems: [
       {
@@ -344,6 +175,162 @@ export class DepreciationReportComponent {
     },
   };
 
+  constructor(
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {
+    this.sesstion_Details();
+
+    //============Year field dataSource===============
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2015; year--) {
+      this.years.push(year);
+    }
+    this.selectedYear = currentYear;
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataservice.getMonths();
+  }
+
+  ngOnInit() {
+    const today = new Date();
+    const SystemDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
+    this.formatted_from_date = SystemDate;
+    this.formatted_To_date = SystemDate;
+    setTimeout(() => {
+      this.Depreciation_Report();
+    }, 0);
+
+    this.sesstion_Details();
+    this.Department_dropdown();
+  }
+
+  //====== Year value change =======
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      // Set from date to the start of the year and to date to today
+      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
+      this.formatted_To_date = today; // Today's date
+    } else {
+      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1
+      this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31
+    }
+  }
+
+  //===== Month value change =======
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.formatted_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
+      this.formatted_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
+    } else {
+      this.formatted_from_date = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
+      this.formatted_To_date = new Date(
+        this.selectedYear,
+        this.selectedmonth + 1,
+        0,
+      );
+    }
+  }
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    const sessionYear = sessionData.FINANCIAL_YEARS;
+    this.financialYeaDate = sessionYear[0].DATE_FROM;
+    this.formatted_from_date = this.financialYeaDate;
+  }
+
+  toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
+
+  onExporting(event: any) {
+    const fileName = 'BalanceSheetReport';
+    this.dataservice.exportDataGridReport(event, fileName);
+  }
+
+  get_sessionstorage_data() {
+    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.company_list = this.savedUserData.Companies;
+  }
+
+  get_fin_id() {
+    this.fin_id = this.savedUserData.FINANCIAL_YEARS;
+    if (this.fin_id.length) {
+      this.finID = this.fin_id[0].FIN_ID;
+    }
+  }
+
+  onCompanyChange(event: any) {
+    this.company_id = event.value;
+  }
+
+  onFromDateChange(event: any) {
+    const rawDate: Date = new Date(event.value);
+    this.formatted_from_date = this.formatDate(rawDate);
+    // example: "2025-04-01"
+  }
+
+  onToDateChange(event: any) {
+    const rawDate: Date = new Date(event.value);
+    this.formatted_To_date = this.formatDate(rawDate);
+    // example: "2025-04-01"
+  }
+
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+
+  formatUsefulLife(cellInfo: any) {
+    return cellInfo.value ? `${cellInfo.value} Years` : '';
+  }
+
+  Department_dropdown() {
+    const payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Department = res;
+    });
+  }
+
+  Depreciation_Report() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      DEPARTMENT_ID: this.select_department_id || 0,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+    };
+
+    this.dataservice.Depreciation_Report(payload).subscribe((res: any) => {
+      this.DepreciationReport = res.DepreciationDetails;
+    });
+  }
+
+  handleClose() {
+    this.isViewInvoice = false;
+  }
 }
 
 @NgModule({

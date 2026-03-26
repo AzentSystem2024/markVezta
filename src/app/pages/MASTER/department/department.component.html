@@ -17,8 +17,6 @@
     }"
     (onEditingStart)="onEditingStart($event)"
   >
-    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
-
     <dxo-filter-row
       [visible]="showFilterRow"
       [applyFilter]="currentFilter"
@@ -57,23 +55,33 @@
       <dxi-item
         location="after"
         widget="dxButton"
-        [options]="addButtonOptions"
+        [options]="searchButtonOptions"
+      ></dxi-item>
+
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
       ></dxi-item>
 
       <dxi-item
         location="after"
-        locateInMenu="never"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          text: 'Refresh',
-          icon: 'refresh',
-          stylingMode: 'text',
-          onClick: refresh,
-        }"
+        [options]="addButtonOptions"
       ></dxi-item>
-
-      <dxi-item name="searchPanel" locateInMenu="never"></dxi-item>
     </dxo-toolbar>
 
     <!-- This field ID optional .Used for displaying data temp -->
@@ -112,6 +120,7 @@
 
 <form-popup
   [(visible)]="AddDepartmentPopup"
+  [showApprove]="false"
   (save)="Add_Department()"
   (onHidden)="onPopupCancel()"
   titleText="New Department"
@@ -132,6 +141,7 @@
   [(visible)]="UpdateDepartmentPopup"
   titleText="Update Department"
   (save)="Edit_Department()"
+  [showApprove]="false"
 >
   <dx-form class="plain-styled-form">
     <dxi-item>

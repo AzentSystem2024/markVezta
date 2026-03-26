@@ -35,7 +35,7 @@ import { ItemStorePricesLogComponent } from './pages/item-store-prices-log/item-
 import { ItemStorePricesEditComponent } from './pages/item-store-prices-edit/item-store-prices-edit.component';
 import { ItemStorePriceVerifyApproveComponent } from './pages/item-store-price-verify-approve/item-store-price-verify-approve.component';
 import { ItemStorePriceViewComponent } from './pages/item-store-price-view/item-store-price-view.component';
-import { DepartmentComponent } from './pages/HR/Masters/department/department.component';
+import { DepartmentComponent } from './pages/MASTER/department/department.component';
 import { EOSComponent } from './pages/HR/Masters/eos/eos.component';
 import { LeaveSalaryComponent } from './pages/HR/Masters/leave-salary/leave-salary.component';
 import { EmployeeLeaveComponent } from './pages/HR/Masters/employee-leave/employee-leave.component';
@@ -152,6 +152,7 @@ import { MiscellaneousInvoiceComponent } from './pages/OPERATIONS/miscellaneous-
 import { MiscellaneousPurchaseComponent } from './pages/OPERATIONS/miscellaneous-purchase/miscellaneous-purchase.component';
 import { PDCReportComponent } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
 import { PrepaymentPostingReportComponent } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
+import { DepartmentMeComponent } from './pages/MASTER/department-me/department-me.component';
 
 const routes: Routes = [
   {
@@ -570,6 +571,11 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'department-me',
+        component: DepartmentMeComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'item-department',
         component: DepartmentListComponent,
         canActivate: [AuthGuardService],
@@ -944,12 +950,12 @@ const routes: Routes = [
         component: FixedAssetRegisterComponent,
         canActivate: [AuthGuardService],
       },
-        {
+      {
         path: 'pdc-report',
         component: PDCReportComponent,
         canActivate: [AuthGuardService],
       },
-       {
+      {
         path: 'prepayment-posting-report',
         component: PrepaymentPostingReportComponent,
         canActivate: [AuthGuardService],

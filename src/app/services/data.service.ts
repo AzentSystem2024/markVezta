@@ -1505,6 +1505,19 @@ export class DataService {
 
     return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
   }
+// ======= save middle east department data =======
+   public save_ME_Department_Data(
+    CODE: any,
+    DEPT_NAME: any,
+    COMPANY_ID: any,
+    COMPANY_NAME: any,
+    COST_BUCKET_ID: any,
+  ): Observable<any> {
+    const data = { CODE, DEPT_NAME, COMPANY_ID, COMPANY_NAME, COST_BUCKET_ID };
+    return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
+  }
+
+  
   removeDepartment(id: any) {
     return this.http.post(`${this.apiUrl}itemdepartment/delete/${id}`, {});
   }
@@ -3145,11 +3158,11 @@ export class DataService {
     );
   }
 
-  //dropdown
-  // public getDropdownData(type: any): Observable<any> {
-  //   const reqBodyData = { name: type };
-  //   return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
-  // }
+
+   get_Sub_Dept_DropdownData(DeptID: any): Observable<any> {
+    const reqBodyData = { DEPT_ID: DeptID };
+    return this.http.post(`${this.apiUrl}Employee/getsubdept`, reqBodyData);
+  }
 
   public getDropdownData(data: any): Observable<any> {
     const reqBodyData = data;
@@ -6344,23 +6357,23 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}Company/getdigit`, data);
   }
 
-  FixedAssetRegister_List(payload){
-     const getEndpoint = this.apiUrl + 'Report/fixedassetreport';
+  FixedAssetRegister_List(payload) {
+    const getEndpoint = this.apiUrl + 'Report/fixedassetreport';
     return this.http.post(getEndpoint, payload);
   }
 
-  Depreciation_Report(payload){
-     const getEndpoint = this.apiUrl + 'Report/depreciationreport';
+  Depreciation_Report(payload) {
+    const getEndpoint = this.apiUrl + 'Report/depreciationreport';
     return this.http.post(getEndpoint, payload);
   }
 
-  PDC_Report(payload){
-     const getEndpoint = this.apiUrl + 'Report/pdclist';
+  PDC_Report(payload) {
+    const getEndpoint = this.apiUrl + 'Report/pdclist';
     return this.http.post(getEndpoint, payload);
   }
 
-   Prepayment_posting_Report(payload){
-     const getEndpoint = this.apiUrl + 'Report/prepaymentreport';
+  Prepayment_posting_Report(payload) {
+    const getEndpoint = this.apiUrl + 'Report/prepaymentreport';
     return this.http.post(getEndpoint, payload);
   }
 }
