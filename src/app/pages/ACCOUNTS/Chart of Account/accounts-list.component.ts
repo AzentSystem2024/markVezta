@@ -3,6 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -52,7 +53,7 @@ import DataSource from 'devextreme/data/data_source';
   templateUrl: './accounts-list.component.html',
   styleUrls: ['./accounts-list.component.scss'],
 })
-export class AccountsListComponent {
+export class AccountsListComponent implements OnInit{
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -80,14 +81,18 @@ export class AccountsListComponent {
     stylingMode: 'text',
     elementAttr: { class: 'commonButtons' },
   };
+
   auto: string = 'auto';
+  
   selectedAccountHead: any;
+
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, // global style
     onClick: () => this.toggleFilters(),
   };
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -117,11 +122,20 @@ export class AccountsListComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
+   getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+  ];
+
   companyID: any;
-  onExporting(event: any) {
-    const fileName = 'ChartOfAccounts';
-    this.dataService.exportDataGrid(event, fileName);
-  }
+
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
@@ -153,6 +167,11 @@ export class AccountsListComponent {
     this.getAccountsGroupList();
   }
 
+  onExporting(event: any) {
+    const fileName = 'ChartOfAccounts';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+
   getFilterButtonOptions() {
     return {
       icon: 'filter',
@@ -180,6 +199,7 @@ export class AccountsListComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 
@@ -251,6 +271,7 @@ export class AccountsListComponent {
         }),
     });
   }
+
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.IS_INACTIVE;
 
@@ -266,32 +287,6 @@ export class AccountsListComponent {
 
     cellElement.appendChild(icon);
   }
-
-  getStatusFilterData = [
-    {
-      text: 'Approved',
-      value: 'Approved',
-    },
-    {
-      text: 'Open',
-      value: 'Open',
-    },
-  ];
-  // getAccountsGroupList() {
-  //   this.dataService.getAccountGroupHeadList().subscribe((response: any) => {
-  //     if (response?.Data && Array.isArray(response.Data)) {
-  //       this.accountsGroupList = response.Data.map(
-  //         (item: any, index: number) => ({
-  //           ...item,
-  //           sno: index + 1,
-  //         })
-  //       );
-  //     } else {
-  //       this.accountsGroupList = [];
-  //       console.warn('No data found in response');
-  //     }
-  //   });
-  // }
 
   onEditAccount(event: any) {
     event.cancel = true;

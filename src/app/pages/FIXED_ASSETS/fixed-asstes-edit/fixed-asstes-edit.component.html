@@ -150,6 +150,45 @@ icon="plus"
     </dx-select-box>
   </div>
 
+  <!-- ===== Location Section ===== -->
+<div style="margin-top: 20px; font-weight: 600; font-size: 16px">
+  Location
+</div>
+
+<div style="display: flex; gap: 20px; margin-top: 10px">
+  <!-- Department -->
+  <dx-select-box
+    label="Department"
+    labelMode="floating"
+    [(value)]="FixedAssetsData.DEPT_ID"
+    valueExpr="ID"
+    displayExpr="DESCRIPTION"
+    [items]="Department"
+    [searchEnabled]="true"
+    style="width: 450px"
+    (onValueChanged)="onDepartmentChange($event)"
+  >
+    <dx-validator>
+      <dxi-validation-rule
+        type="required"
+        message="Department is required"
+      ></dxi-validation-rule>
+    </dx-validator>
+  </dx-select-box>
+
+  <!-- Sub Department -->
+  <dx-select-box
+    label="Sub Department"
+    labelMode="floating"
+    [(value)]="FixedAssetsData.SUB_DEPT_ID"
+    valueExpr="ID"
+    displayExpr="DESCRIPTION"
+    [items]="SubDepartment"
+    style="width: 450px"
+  >
+  </dx-select-box>
+</div>
+
   <div style="display: flex; gap: 40px">
     <!-- Left Column -->
     <div style="display: flex; flex-direction: column; gap: 20px; width: 350px">

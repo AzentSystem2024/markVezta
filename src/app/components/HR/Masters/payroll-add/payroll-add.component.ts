@@ -176,49 +176,6 @@ export class PayrollAddComponent {
       });
     });
   }
-
-  // generatePayroll() {
-
-  //     const selectedRows = this.dataGrid.instance.getSelectedRowsData();
-  //     if (!selectedRows || selectedRows.length === 0) {
-  //       notify(
-  //         {
-  //           message: 'Please select at least one row to generate payroll.',
-  //           position: { at: 'top center', my: 'top center' },
-  //         },
-  //         'error'
-  //       );
-  //       return;
-  //     }
-
-  //     const userId = Number(sessionStorage.getItem('USER_ID'));
-  // const row = selectedRows[0]; // Only take first row (or loop if needed)
-  //     const payload = {
-  //       COMPANY_ID: this.CompanyID, // already available
-  //       TS_ID: row.ID,
-  //       USER_ID: userId, // Use the userId from sessionStorage
-  //     };
-  // this.dataSerivice.generatePayroll(payload).subscribe((response: any) => {
-  //   if (response.flag == "1") {
-  //     notify(
-  //       {
-  //         message: 'Payroll Generated Successfully',
-  //         position: { at: 'top center', my: 'top center' },
-  //       },
-  //       'success'
-  //     );
-  //     this.popupClosed.emit();
-  //   } else {
-  //     notify(
-  //       {
-  //         message: 'Payroll Not Generated',
-  //         position: { at: 'top right', my: 'top right' },
-  //       },
-  //       'error'
-  //     );
-  //   }
-  // })
-  //   }
 }
 
 @NgModule({

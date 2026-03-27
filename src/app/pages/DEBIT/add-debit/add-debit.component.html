@@ -57,6 +57,7 @@
                   [dataSource]="subTypeList"
                   displayExpr="SUB_TYPE_NAME"
                   valueExpr="SUB_TYPE_ID"
+                  [(value)]="debitFormData.SUB_TYPE_ID"
                   label="Select Subtype"
                   labelMode="floating"
                   placeholder="Select Subtype"
@@ -207,7 +208,6 @@
           dataField="GST_PERC"
           [caption]="vatTitle + '%'"
           dataType="number"
-          [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="false"
         >
         </dxi-column>

@@ -533,6 +533,8 @@ export class ArticleAddComponent {
     console.log('Selected Components:', this.selectedComponentArticles);
   }
 
+
+
   getCategory() {
     if (this.selectedCategoryId) {
       this.dataService
@@ -1288,26 +1290,29 @@ export class ArticleAddComponent {
     popupGrid.selectRows(selectedKeys, false);
   }
 
+ 
+
   // saveSelectedItems() {
-
-  //   const popupGrid = this.bomGridRef.instance;   // popup grid
-
+  //   const popupGrid = this.bomGridRef.instance;
   //   const selectedRows = popupGrid.getSelectedRowsData();
-  // const selectedIds = selectedRows.map((item:any) => item.ID);
-  //   if (!selectedRows.length) {
-  //     return;
-  //   }
 
-  //   //  Remove empty row if exists
-  //   this.items = this.items.filter(
-  //     row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
-  //   );
+  //   // selected item IDs from popup
+  //   const selectedIds = selectedRows.map((item: any) => item.ID);
 
+  //  // 🔹 Keep ALL manually entered rows (even without ITEM_ID)
+  // const manualRows = this.items.filter((row) => !row.ITEM_ID);
+
+  // // 🔹 Keep only selected existing rows
+  // const existingRows = this.items.filter(
+  //   (row) => row.ITEM_ID && selectedIds.includes(row.ITEM_ID)
+  // );
+
+  // // 🔹 Merge both
+  // this.items = [...manualRows, ...existingRows];
+
+  //   // 2️ Add newly selected items
   //   selectedRows.forEach((item: any) => {
-
-  //     const exists = this.items.some(
-  //       x => x.ITEM === item.ITEM_CODE
-  //     );
+  //     const exists = this.items.some((x) => x.ITEM_ID === item.ID);
 
   //     if (!exists) {
   //       this.items.push({
@@ -1315,56 +1320,85 @@ export class ArticleAddComponent {
   //         DESCRIPTION: item.DESCRIPTION,
   //         UOM: item.UOM,
   //         QUANTITY: null,
-  //         ITEM_ID: item.ID
+  //         ITEM_ID: item.ID,
   //       });
   //     }
-
   //   });
+
+  //    // 🔹 Ensure at least one empty row exists
+  // const hasEmptyRow = this.items.some(
+  //   (r) => !r.ITEM && !r.DESCRIPTION && !r.UOM && !r.QUANTITY
+  // );
+
+  // if (!hasEmptyRow) {
+  //   this.items.push({
+  //     ITEM: null,
+  //     DESCRIPTION: '',
+  //     UOM: '',
+  //     QUANTITY: null,
+  //   });
+  // }
 
   //   // refresh BOM grid
   //   this.itemsGridRef.instance.refresh();
-  //   // popupGrid.clearSelection();
 
   //   this.ItempopupVisible = false;
-
   // }
 
-  saveSelectedItems() {
-    const popupGrid = this.bomGridRef.instance;
-    const selectedRows = popupGrid.getSelectedRowsData();
+    saveSelectedItems() {
 
-    // selected item IDs from popup
-    const selectedIds = selectedRows.map((item: any) => item.ID);
+  const grid = this.itemsGridRef?.instance;
+  const popupGrid = this.bomGridRef.instance;
 
-    // 1️ Remove BOM items that are not selected anymore
-    this.items = this.items.filter(
-      (row) => !row.ITEM_ID || selectedIds.includes(row.ITEM_ID),
-    );
-
-    this.items = this.items.filter(
-      (row) => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY,
-    );
-
-    // 2️ Add newly selected items
-    selectedRows.forEach((item: any) => {
-      const exists = this.items.some((x) => x.ITEM_ID === item.ID);
-
-      if (!exists) {
-        this.items.push({
-          ITEM: item.ITEM_CODE,
-          DESCRIPTION: item.DESCRIPTION,
-          UOM: item.UOM,
-          QUANTITY: null,
-          ITEM_ID: item.ID,
-        });
-      }
-    });
-
-    // refresh BOM grid
-    this.itemsGridRef.instance.refresh();
-
-    this.ItempopupVisible = false;
+  //  VERY IMPORTANT: commit editing row
+  if (grid) {
+    grid.saveEditData();
   }
+
+  const selectedRows = popupGrid.getSelectedRowsData();
+
+  //  Always get latest grid data
+  let currentRows =
+    grid.getVisibleRows().map((r: any) => r.data) || [];
+
+  //  STEP 1: Remove ONLY empty rows
+  const isEmptyRow = (r: any) =>
+    !r.ITEM && !r.DESCRIPTION && !r.UOM && !r.QUANTITY;
+
+  currentRows = currentRows.filter(r => !isEmptyRow(r));
+
+  //  STEP 2: ADD new items (NO removal logic at all)
+  selectedRows.forEach((item: any) => {
+
+    const exists = currentRows.some(
+      (x) => x.ITEM_ID === item.ID
+    );
+
+    if (!exists) {
+      currentRows.push({
+        ITEM: item.ITEM_CODE,
+        DESCRIPTION: item.DESCRIPTION,
+        UOM: item.UOM,
+        QUANTITY: null,
+        ITEM_ID: item.ID,
+      });
+    }
+
+  });
+
+  //  STEP 3: Always add ONE empty row at end
+  currentRows.push({
+    ITEM: null,
+    DESCRIPTION: '',
+    UOM: '',
+    QUANTITY: null,
+  });
+
+  //  update grid
+  this.items = [...currentRows];
+
+  this.ItempopupVisible = false;
+}
 }
 
 @NgModule({

@@ -1,0 +1,137 @@
+
+
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+     class="grid theme-dependent"
+      width="100%"
+      noDataText=""
+      height="82vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [loadPanel]="{ enabled: true, text: 'Loading...' }"
+    >
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Salary WPS
+          </div>
+        </dxi-item>
+
+    
+
+          <dxi-item location="after">
+          <div
+            class="month-selector"
+            style="display: flex; align-items: center; gap: 8px"
+          >
+            <dx-button
+              icon="chevronleft"
+              (onClick)="goToPreviousMonth()"
+            ></dx-button>
+            <span class="month-label" (click)="toggleCalendar()">
+              {{ selectedMonth | date: "MMMM yyyy" }}
+            </span>
+            <dx-button
+              icon="chevronright"
+              (onClick)="goToNextMonth()"
+            ></dx-button>
+          </div>
+          <div *ngIf="calendarVisible" class="calendar-popup">
+            <div class="calendar-header">
+              <button class="year-button" (click)="previousYear()">&lt;</button>
+
+              <span class="year-clickable" (click)="toggleYearSelector()">{{
+                selectedYear
+              }}</span>
+
+              <button class="year-button" (click)="nextYear()">&gt;</button>
+            </div>
+
+            <div
+              class="year-selector-popup"
+              *ngIf="yearSelectorVisible"
+              (click)="$event.stopPropagation()"
+            >
+              <!-- <div class="year-popup-header">
+                <button class="close-btn" (click)="yearSelectorVisible = false; $event.stopPropagation()">
+                  ✕
+                </button>
+              </div> -->
+              <div class="year-grid">
+                <div
+                  class="year-option"
+                  *ngFor="let year of years"
+                  (click)="selectYear(year, $event)"
+                >
+                  {{ year }}
+                </div>
+              </div>
+            </div>
+
+            <div class="calendar-body">
+              <!-- <div
+                *ngFor="let monthName of monthNames; let idx = index"
+                class="month-cell"
+                [class.selected]="
+                  idx === selectedMonth.getMonth() &&
+                  selectedYear === selectedMonth.getFullYear()
+                "
+                (click)="selectMonthByIndex(idx)"
+              >
+                {{ monthName }}
+              </div> -->
+            </div>
+          </div>
+        </dxi-item>
+
+         <dxi-item>
+          <dx-select-box
+            [width]="200"
+            label="Location"
+            labelMode="floating"
+            [items]="Department"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="select_department_id"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
+
+        <dxi-item>
+       <dx-button
+  text="Download WPS File"
+  type="success"
+  (onClick)="onShowClick()">
+</dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+
+    </dx-data-grid>
+  </div>

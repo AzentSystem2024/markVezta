@@ -5,6 +5,8 @@ import {
   EventEmitter,
   Input,
   NgModule,
+  OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -43,7 +45,6 @@ import {
   DxiGroupModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
-import { EmployeeAddFormComponent } from '../employee-add-form/employee-add-form.component';
 import { DataService } from 'src/app/services';
 import { FormsModule } from '@angular/forms';
 import notify from 'devextreme/ui/notify';
@@ -53,7 +54,7 @@ import notify from 'devextreme/ui/notify';
   templateUrl: './employee-edit-form.component.html',
   styleUrls: ['./employee-edit-form.component.scss'],
 })
-export class EmployeeEditFormComponent {
+export class EmployeeEditFormComponent implements OnInit, OnChanges {
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('fileUploader') fileUploader!: ElementRef;
   @ViewChild('salaryGrid', { static: false }) salaryGrid: DxDataGridComponent;
@@ -104,6 +105,7 @@ export class EmployeeEditFormComponent {
     ESI_NO: '',
     ESI_PERCENT: 0,
     DEPT_ID: '',
+    SUB_DEPT_ID: '',
     DESG_ID: '',
     DOJ: null,
     BANK_NAME: '',
@@ -153,6 +155,7 @@ export class EmployeeEditFormComponent {
   employeeList: any;
   COMPANY_ID: any;
   selected_Company_id: any;
+  SubDepartmentDataSource: any=null;
   constructor(
     public dataservice: DataService,
     private sanitizer: DomSanitizer,
@@ -473,6 +476,11 @@ export class EmployeeEditFormComponent {
   onDepartmentChange(e: any) {
     const selectedDept = this.departments.find((dept) => dept.ID === e.value);
     this.employeeData.DEPT_NAME = selectedDept ? selectedDept.DESCRIPTION : '';
+    this.dataservice.get_Sub_Dept_DropdownData(e.value).subscribe((res:any)=>{
+      if(res){
+        this.SubDepartmentDataSource=res
+      }
+    })
   }
 
   openAttachmentPopup() {
@@ -537,13 +545,6 @@ export class EmployeeEditFormComponent {
       );
       return;
     }
-
-    // this.employeeFormData.EmployeeSalary = this.salaryHead.map((item) => ({
-    //   ID: item.ID || 0, // If you're editing existing salary records, keep their original IDs
-    //   EMP_ID: this.employeeFormData.EMP_ID || 0,
-    //   HEAD_ID: item.HEAD_ID,
-    //   AMOUNT: item.amount || 0,
-    // }));
     const userId = 1; // Replace with your method
     const docId = this.employeeFormData.ID || 0;
     const docType = 1;

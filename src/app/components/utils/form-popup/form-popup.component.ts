@@ -26,7 +26,7 @@ import { ApplyPipeModule } from 'src/app/pipes/apply.pipe';
   styleUrls: ['./form-popup.component.scss'],
 })
 export class FormPopupComponent {
-  dataGrid: DxDataGridComponent;
+
 
   @Output() closeAndRefresh: EventEmitter<void> = new EventEmitter<void>();
 
@@ -66,7 +66,7 @@ export class FormPopupComponent {
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Input() showApprove: boolean = true; // default: visible
-
+  dataGrid: DxDataGridComponent;
   constructor(protected screen: ScreenService) {}
 
   isValid() {

@@ -78,29 +78,7 @@ export class TimesheetListComponent {
   approveTimesheetPopupOpened: boolean = false;
   viewTimesheetPopupOpened: boolean = false;
   selectedTimesheet: any = null;
-  timesheetList = [
-    {
-      employeeNo: 'EMP001',
-      employeeName: 'John Doe',
-      workedDays: 22,
-      otHours: 5,
-      status: 'Approved',
-    },
-    {
-      employeeNo: 'EMP002',
-      employeeName: 'Jane Smith',
-      workedDays: 20,
-      otHours: 3,
-      status: 'Open',
-    },
-    {
-      employeeNo: 'EMP003',
-      employeeName: 'Alice Johnson',
-      workedDays: 18,
-      otHours: 7,
-      status: 'Verified',
-    },
-  ];
+  timesheetList: any[] = [];
   allActionButtons = [
     {
       name: 'edit',
@@ -117,16 +95,7 @@ export class TimesheetListComponent {
       // onClick: (e) => this.onDeleteTimesheet(e),
       visible: (e) => e.row.data.STATUS !== 'Approved',
     },
-    // {
-    //   hint: 'Verify',
-    //   icon: 'check',
-    //   text: 'Verify',
-    //   onClick: (e) => {
-    //     setTimeout(() => this.onVerifyClick(e));
-    //   },
-    //   visible: (e) =>
-    //     e.row.data.STATUS !== 'Approved' && e.row.data.STATUS !== 'Verified',
-    // },
+
     {
       hint: 'Approve',
       icon: 'check',
@@ -179,10 +148,10 @@ export class TimesheetListComponent {
   canPrint: any;
   canView: any;
   canApprove: any;
-  onExporting(event: any) {
-    const fileName = 'Timesheet';
-    this.dataService.exportDataGrid(event, fileName);
-  }
+  // onExporting(event: any) {
+  //   const fileName = 'Timesheet';
+  //   this.dataService.exportDataGrid(event, fileName);
+  // }
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -274,25 +243,10 @@ export class TimesheetListComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
-
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    // onClick: () => this.refreshGrid(),
-    onClick: () => {
-      this.zone.run(() => this.refreshGrid());
-    },
-    text: '',
-  };
-
-  searchButtonOptions = {
-    icon: 'search',
-    hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
-    onClick: () => this.toggleFilters(),
-  };
+  onExporting(event: any) {
+    const fileName = 'Timesheet';
+    this.dataService.exportDataGrid(event, fileName);
+  }
 
   generateYears() {
     const currentYear = new Date().getFullYear();
@@ -676,6 +630,7 @@ export class TimesheetListComponent {
   }
 
   fetchTimesheetList() {
+    this.timesheetList = [];
     const payload = {
       COMPANY_ID: this.CompanyID,
       MONTH: this.selectedMonth

@@ -380,47 +380,42 @@
   <!-- Checkbox right above buttons -->
 
   <!-- Buttons row -->
-  <div style="display: flex; gap: 10px">
-    <dx-check-box
-      *ngIf="!isReadOnlyMode"
-      [(value)]="receiprtFormData.IS_APPROVED"
-      text="Approve"
-      [width]="120"
-    ></dx-check-box>
+  <div style="display: flex; gap: 4px; align-items: flex-end">
+    <div style="display: flex; flex-direction: column; align-items: center">
+      <dx-check-box
+        *ngIf="!isReadOnlyMode"
+        [(value)]="receiprtFormData.IS_APPROVED"
+        text="Approve"
+        [width]="120"
+        style="margin-bottom: 5px; margin-left: 20px"
+      ></dx-check-box>
 
-    <dx-button
-      text="Cancel"
-      stylingMode="outlined"
-      type="normal"
-      (onClick)="cancel()"
-    ></dx-button>
-
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        (onClick)="cancel()"
+        class="no-gap-btn"
+      ></dx-button>
+    </div>
     <dx-button
       *ngIf="!isReadOnlyMode"
       #saveButtonRef
       [text]="
         isSaving
           ? receiprtFormData.IS_APPROVED
-            ? 'Updating & Committing...'
+            ? 'Saving...'
             : 'Updating...'
           : receiprtFormData.IS_APPROVED
-            ? 'Update & Commit'
-            : 'Update'
+            ? 'Save'
+            : 'Save'
       "
       stylingMode="contained"
       type="default"
       [disabled]="isSaving"
       (onClick)="onSaveClick()"
+      class="no-gap-btn"
     ></dx-button>
-
-    <!-- <dx-button
-      *ngIf="!isReadOnlyMode"
-      #saveButtonRef
-      [text]="receiprtFormData.IS_APPROVED ? 'Update & Commit' : 'Update'"
-      stylingMode="contained"
-      type="default"
-      (onClick)="onSaveClick()"
-    ></dx-button> -->
   </div>
 </div>
 

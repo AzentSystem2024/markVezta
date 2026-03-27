@@ -208,11 +208,10 @@
           <dxi-column
             dataField="VAT_PERC"
             dataType="number"
-            caption="IGST"
-            [visible]="showGST"
+            [caption]="vatTitle + '%'"
             [allowEditing]="false"
           ></dxi-column>
-          <dxi-column
+          <!-- <dxi-column
             dataField="CGST"
             caption="CGST"
             dataType="number"
@@ -225,7 +224,7 @@
             dataType="number"
             [visible]="showSGST"
             [allowEditing]="false"
-          ></dxi-column>
+          ></dxi-column> -->
           <dxi-column
             dataField="VAT_AMOUNT"
             dataType="number"
@@ -323,22 +322,19 @@
               (onClick)="cancel()"
             ></dx-button>
             <dx-button
+              *ngIf="!isReadOnlyMode"
               #saveButtonRef
               [text]="
                 isSaving
-                  ? isReadOnlyMode
-                    ? 'Opening...'
-                    : salesReturnFormData.IS_APPROVED
-                      ? 'Committing...'
-                      : 'Saving...'
-                  : isReadOnlyMode
-                    ? 'PDF'
-                    : salesReturnFormData.IS_APPROVED
-                      ? 'Commit'
-                      : 'Save'
+                  ? salesReturnFormData.IS_APPROVED
+                    ? 'Saving...'
+                    : 'Saving...'
+                  : salesReturnFormData.IS_APPROVED
+                    ? 'Save'
+                    : 'Save'
               "
               [disabled]="isSaving"
-              (onClick)="isReadOnlyMode ? openPDF() : saveSaleReturn()"
+              (onClick)="saveSaleReturn()"
               stylingMode="contained"
               type="default"
             ></dx-button>

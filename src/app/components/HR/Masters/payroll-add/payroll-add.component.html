@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="timesheetList"
@@ -27,7 +27,6 @@
       [scrolling]="{ mode: 'standard' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
-
       focusStateEnabled="false"
     >
       <!-- <dxo-editing
@@ -63,7 +62,6 @@
 
         <dxi-item location="after" locateInMenu="auto">
           <dx-button
-            
             hint="Generate Payroll"
             text="Generate Payroll"
             type="default"
@@ -73,7 +71,11 @@
         </dxi-item>
       </dxo-toolbar>
 
-      <dxi-column dataField="EMP_NO" caption="Employee No." width="120"></dxi-column>
+      <dxi-column
+        dataField="EMP_NO"
+        caption="Employee No."
+        width="120"
+      ></dxi-column>
       <dxi-column
         dataField="EMP_NAME"
         caption="Employee Name"
@@ -111,7 +113,6 @@
           style="margin-left: 10px; cursor: default"
         ></i>
       </div>
-      
     </dx-data-grid>
   </div>
 </div>

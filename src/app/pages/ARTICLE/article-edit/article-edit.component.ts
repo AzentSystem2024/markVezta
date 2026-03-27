@@ -116,6 +116,7 @@ export class ArticleEditComponent {
   ItemListDataSource:any[] = [];
   selectedComponentDescription: any;
   selectedComponentArticles:any[]=[]
+  selectedBomRowKeys: any[] = [];
 
   constructor(private dataService: DataService) {}
 
@@ -208,35 +209,51 @@ export class ArticleEditComponent {
 
         // Handle Sizes only after articleSizeData is ready
         this.setSelectedSizes();
-        if (this.articleData.BOM && Array.isArray(this.articleData.BOM)) {
-          console.log(this.articleData, 'BOMMMMMMMMMMM');
-          this.items = this.articleData.BOM.map((bom: any) => {
-            // find the matching item from dropdown list
-            const matchedItem = this.itemsList?.find(
-              (i: any) => i.ID === bom.ITEM_ID,
-            );
-            console.log(matchedItem, 'MATCHEDITEMSINEDIT');
-            return {
-              ITEM: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
-              // ITEM:bom.ITEM_CODE,
-              DESCRIPTION: bom.DESCRIPTION,
-              UOM: bom.UOM,
-              QUANTITY: bom.QUANTITY,
-              ARTICLE_ID: bom.ARTICLE_ID,
-              BOM_ID: bom.BOM_ID,
-              ITEM_ID: bom.ITEM_ID,
-              ITEM_CODE: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
-            };
-          });
+       if (this.articleData.BOM && Array.isArray(this.articleData.BOM)) {
 
-          console.log('Mapped BOM items:', this.items);
-        } else {
-          this.items = [];
-        }
+  this.items = this.articleData.BOM.map((bom: any) => {
+    const matchedItem = this.itemsList?.find(
+      (i: any) => i.ID === bom.ITEM_ID,
+    );
+
+    return {
+      ITEM: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
+      DESCRIPTION: bom.DESCRIPTION,
+      UOM: bom.UOM,
+      QUANTITY: bom.QUANTITY,
+      ARTICLE_ID: bom.ARTICLE_ID,
+      BOM_ID: bom.BOM_ID,
+      ITEM_ID: bom.ITEM_ID,
+      ITEM_CODE: matchedItem?.ITEM_CODE || bom.ITEM_CODE,
+    };
+  });
+
+} else {
+  this.items = [];
+}
+
+//  ALWAYS add empty row at end
+this.ensureEmptyRow();
       });
     }
   }
 
+  ensureEmptyRow() {
+
+  const hasEmptyRow = this.items.some(
+    (r) => !r.ITEM && !r.DESCRIPTION && !r.UOM && !r.QUANTITY
+  );
+
+  if (!hasEmptyRow) {
+    this.items.push({
+      ITEM: null,
+      DESCRIPTION: '',
+      UOM: '',
+      QUANTITY: null,
+    });
+  }
+
+}
   setSelectedSizes() {
     console.log('====================================================');
     if (this.articleData.SIZES && Array.isArray(this.articleData.SIZES)) {
@@ -482,13 +499,13 @@ addComponent() {
       });
 
       // this.attachGridData = this.componentArticles;
-      this.attachGridData = [...this.selectedComponentArticles];
-      setTimeout(() => {
-  this.componentGridRef?.instance?.selectRows(
-    this.selectedAttachRowKeys,
-    true
-  );
-}, 300);
+      // this.attachGridData = [...this.selectedComponentArticles];
+//       setTimeout(() => {
+//   this.componentGridRef?.instance?.selectRows(
+//     this.selectedAttachRowKeys,
+//     true
+//   );
+// }, 300);
 
       console.log(this.componentArticles, 'FILTERED COMPONENTS');
     }
@@ -744,55 +761,28 @@ closecomponent(){
     this.isAttachPopupVisible = true;
   }
 
-  // onAttachRowSelected(event: any) {
-  //   this.selectedAttachRow = event.selectedRowsData[0]; // For single selection
-  //   console.log('Selected row:', this.selectedAttachRow);
-  // }
 
-  // onAttachRowSelected(event: any) {
-  //   const row = event.selectedRowsData[0];
-  //   if (!row) return;
+ onAttachRowSelected(event: any) {
 
-  //   this.selectedAttachRow = row;
-  //   this.selectedAttachRowKeys = [row.ID];
+  const selectedRows = event.selectedRowsData || [];
 
-  //   // 🔥 Auto-apply on click
-  //   this.attachComponent();
-  // }
+  //  keep ALL selected rows
+  this.selectedComponentArticles = selectedRows.map((row: any) => ({
+    ID: row.ID,
+    ART_NO: row.ART_NO,
+    DESCRIPTION: row.DESCRIPTION,
+    CATEGORY_NAME: row.CATEGORY_NAME,
+    ARTICLE_TYPE_NAME: row.ARTICLE_TYPE_NAME,
+    COLOR: row.COLOR
+  }));
 
-  onAttachRowSelected(event: any) {
-    const selectedKeys = event.selectedRowKeys || [];
-    const selectedRows = event.selectedRowsData || [];
+  // update keys properly
+  this.selectedAttachRowKeys = selectedRows.map((row: any) => row.ID);
 
-    // 🔴 Nothing selected → clear state
-    if (selectedKeys.length === 0) {
-      this.selectedAttachRow = null;
-      this.selectedAttachRowKeys = [];
-      return;
-    }
+  // optional (if you still need single reference)
+  this.selectedAttachRow = selectedRows[selectedRows.length - 1] || null;
+}
 
-    // 🟢 Keep ONLY the last selected row
-    const lastKey = selectedKeys[selectedKeys.length - 1];
-    const lastRow = selectedRows.find((row: any) => row.ID === lastKey);
-
-    if (!lastRow) return;
-
-    // 🔥 Enforce single selection
-    this.selectedAttachRow = lastRow;
-    this.selectedAttachRowKeys = [lastKey];
-
-    // Apply component (unchanged behavior)
-    this.attachComponent();
-  }
-
-  // onAttachRowSelected(event: any) {
-  //   const row = event.selectedRowsData[0];
-  //   if (!row) return;
-
-  //   this.selectedAttachRow = row;
-  //   this.selectedAttachRowKeys = [row.ID];
-  //   this.articleData.COMPONENT_ARTICLE_ID = row.ID;
-  // }
 
   attachComponent() {
     if (this.selectedAttachRow) {
@@ -1080,51 +1070,81 @@ if (!bomGridData.length) {
   this.articleData.DESCRIPTION = parts.join('-');
 }
 
+// addNewRow() {
+
+//   this.dataService.getItemsListForArticle().subscribe((res: any) => {
+//       console.log(res);
+//       console.log(
+//         'PrePaymentListDataSource=============================:',
+//         res.DataList,
+//       );
+//       this.ItemListDataSource = res.DataList;
+//       this.ItempopupVisible = true; // Open popup
+//     });
+//   setTimeout(() => {
+
+//     const grid = this.itemsGridRef?.instance;
+//     if (!grid) return;
+
+//     const rows = grid.getVisibleRows();
+
+//     const hasIncompleteRow = rows.some(
+//       (r: any) => !r.data?.ITEM || !r.data?.QUANTITY
+//     );
+
+//     if (hasIncompleteRow) {
+//       return;
+//     }
+
+//     this.items.push({
+//       ITEM: null,
+//       DESCRIPTION: '',
+//       UOM: '',
+//       QUANTITY: null
+//     });
+
+//     setTimeout(() => {
+//       const updatedRows = grid.getVisibleRows();
+//       const newRowIndex = updatedRows.length - 1;
+
+//       if (newRowIndex >= 0) {
+//         grid.editCell(newRowIndex, 'ITEM');
+//       }
+//     }, 100);
+
+//   }, 200);
+// }
+
+
 addNewRow() {
 
+  const grid = this.itemsGridRef?.instance;
+
+  if (grid) {
+    grid.saveEditData(); // 🔥 important
+  }
+
+  // ✅ Extract selected BOM items
+  this.selectedBomRowKeys = this.items
+    .filter((row) => row.ITEM_ID)
+    .map((row) => row.ITEM_ID);
+
+  console.log('Preselected BOM IDs:', this.selectedBomRowKeys);
+
+  // Open popup
   this.dataService.getItemsListForArticle().subscribe((res: any) => {
-      console.log(res);
-      console.log(
-        'PrePaymentListDataSource=============================:',
-        res.DataList,
-      );
-      this.ItemListDataSource = res.DataList;
-      this.ItempopupVisible = true; // Open popup
-    });
-  setTimeout(() => {
+    this.ItemListDataSource = res.DataList;
+    this.ItempopupVisible = true;
 
-    const grid = this.itemsGridRef?.instance;
-    if (!grid) return;
-
-    const rows = grid.getVisibleRows();
-
-    const hasIncompleteRow = rows.some(
-      (r: any) => !r.data?.ITEM || !r.data?.QUANTITY
-    );
-
-    if (hasIncompleteRow) {
-      return;
-    }
-
-    this.items.push({
-      ITEM: null,
-      DESCRIPTION: '',
-      UOM: '',
-      QUANTITY: null
-    });
-
+    //  Apply selection after popup renders
     setTimeout(() => {
-      const updatedRows = grid.getVisibleRows();
-      const newRowIndex = updatedRows.length - 1;
-
-      if (newRowIndex >= 0) {
-        grid.editCell(newRowIndex, 'ITEM');
-      }
-    }, 100);
-
-  }, 200);
+      this.bomGridRef?.instance?.selectRows(
+        this.selectedBomRowKeys,
+        true
+      );
+    }, 200);
+  });
 }
-
 
 onItemSelect(e: any) {
 
@@ -1139,25 +1159,30 @@ onItemSelect(e: any) {
   this.ItempopupVisible = false;
 }
 
+
+
 // saveSelectedItems() {
 
-//   const popupGrid = this.bomGridRef.instance;   // popup grid
-
+//   const popupGrid = this.bomGridRef.instance;
 //   const selectedRows = popupGrid.getSelectedRowsData();
 
-//   if (!selectedRows.length) {
-//     return;
-//   }
+//   // selected item IDs from popup
+//   const selectedIds = selectedRows.map((item:any) => item.ID);
 
-//   //  Remove empty row if exists
+//   // 1️ Remove BOM items that are not selected anymore
 //   this.items = this.items.filter(
+//     row => !row.ITEM_ID || selectedIds.includes(row.ITEM_ID)
+//   );
+
+//     this.items = this.items.filter(
 //     row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
 //   );
 
-//   selectedRows.forEach((item: any) => {
+//   // 2️ Add newly selected items
+//   selectedRows.forEach((item:any) => {
 
 //     const exists = this.items.some(
-//       x => x.ITEM === item.ITEM_CODE
+//       x => x.ITEM_ID === item.ID
 //     );
 
 //     if (!exists) {
@@ -1176,47 +1201,60 @@ onItemSelect(e: any) {
 //   this.itemsGridRef.instance.refresh();
 
 //   this.ItempopupVisible = false;
-
 // }
 
 saveSelectedItems() {
 
+  const grid = this.itemsGridRef?.instance;
   const popupGrid = this.bomGridRef.instance;
+
+  //  commit editing
+  if (grid) {
+    grid.saveEditData();
+  }
+
   const selectedRows = popupGrid.getSelectedRowsData();
+  const selectedIds = selectedRows.map((item: any) => item.ID);
 
-  // selected item IDs from popup
-  const selectedIds = selectedRows.map((item:any) => item.ID);
+  //  always take latest grid data
+  let currentRows =
+    grid.getVisibleRows().map((r: any) => r.data) || [];
 
-  // 1️ Remove BOM items that are not selected anymore
-  this.items = this.items.filter(
-    row => !row.ITEM_ID || selectedIds.includes(row.ITEM_ID)
-  );
+  //  STEP 1: remove all empty rows first
+const isEmptyRow = (r: any) =>
+  !r.ITEM && !r.DESCRIPTION && !r.UOM && !r.QUANTITY;
 
-    this.items = this.items.filter(
-    row => row.ITEM || row.DESCRIPTION || row.UOM || row.QUANTITY
-  );
+currentRows = currentRows.filter(r => !isEmptyRow(r));
 
-  // 2️ Add newly selected items
-  selectedRows.forEach((item:any) => {
+  // 🔹 Add new selected items
+  selectedRows.forEach((item: any) => {
 
-    const exists = this.items.some(
-      x => x.ITEM_ID === item.ID
+    const exists = currentRows.some(
+      (x) => x.ITEM_ID === item.ID
     );
 
     if (!exists) {
-      this.items.push({
+      currentRows.push({
         ITEM: item.ITEM_CODE,
         DESCRIPTION: item.DESCRIPTION,
         UOM: item.UOM,
         QUANTITY: null,
-        ITEM_ID: item.ID
+        ITEM_ID: item.ID,
+        _fromPopup: true //  mark source
       });
     }
 
   });
 
-  // refresh BOM grid
-  this.itemsGridRef.instance.refresh();
+  currentRows.push({
+  ITEM: null,
+  DESCRIPTION: '',
+  UOM: '',
+  QUANTITY: null,
+});
+
+  //  assign back
+  this.items = [...currentRows];
 
   this.ItempopupVisible = false;
 }

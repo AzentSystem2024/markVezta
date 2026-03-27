@@ -51,14 +51,6 @@ export class UserRoleComponent {
   selectedData: any;
   popupGrid: any;
 
-  constructor(
-    private fb: FormBuilder,
-    private dataservice: DataService,
-    private cdr: ChangeDetectorRef,
-    private ngZone: NgZone,
-    private router: Router,
-  ) {}
-
   popup_width: any = '60%';
   isAddFormVisible: boolean = false;
 
@@ -105,6 +97,7 @@ export class UserRoleComponent {
     `;
     },
   };
+  
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -119,6 +112,7 @@ export class UserRoleComponent {
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.refresh(),
   };
+
   dataSource = new DataSource<any>({
     load: () =>
       new Promise((resolve, reject) => {
@@ -139,6 +133,14 @@ export class UserRoleComponent {
         });
       }),
   });
+
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -162,20 +164,6 @@ export class UserRoleComponent {
       this.canApprove = packingRights.canApprove;
     }
   }
-
-  // addButtonOptions = {
-  //   text: 'New',
-  //   icon: 'bi bi-file-earmark-plus',
-  //   type: 'default',
-  //   stylingMode: 'contained',
-  //   hint: 'Add new entry',
-  //       onClick: () => {
-  //     // Run inside Angular's zone
-  //     this.ngZone.run(() => this.show_new_Form());
-  //   },
-  //   elementAttr: { class: 'add-button' }
-
-  // };
 
   //========================Export data ==========================
   onExporting(event: any) {

@@ -5,6 +5,8 @@ import {
   EventEmitter,
   Input,
   NgModule,
+  OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -51,7 +53,7 @@ import dxValidationGroup from 'devextreme/ui/validation_group';
   templateUrl: './employee-add-form.component.html',
   styleUrls: ['./employee-add-form.component.scss'],
 })
-export class EmployeeAddFormComponent {
+export class EmployeeAddFormComponent implements OnInit, OnChanges {
   @ViewChild('employeeFormGroup', { static: false })
   employeeFormGroup: DxValidationGroupComponent;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
@@ -82,6 +84,7 @@ export class EmployeeAddFormComponent {
     EMAIL: '',
     IS_MALE: true,
     DEPT_ID: 0,
+    SUB_DEPT_ID: '',
     DESG_ID: 0,
     DOJ: null,
     BANK_NAME: '',
@@ -152,19 +155,11 @@ export class EmployeeAddFormComponent {
   employeeList: any;
   COMPANY_ID: any;
   selected_Company_id: any;
+  SubDepartmentDataSource: any = null;
+
   constructor(public dataservice: DataService) {
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
-    });
-    // dataservice.get_Country_Dropdown_Api().subscribe((data) => {
-    //   this.countries = data;
-    // });
-    this.dataservice.getDropdownData('SALARY_HEAD').subscribe((data) => {
-      this.salaryHead = data.map((item: any) => ({
-        ...item,
-        HEAD_ID: item.ID,
-        amount: null,
-      }));
     });
 
     const dept_payload = {
@@ -361,6 +356,13 @@ export class EmployeeAddFormComponent {
     this.employeeFormData.DEPT_NAME = selectedDept
       ? selectedDept.DESCRIPTION
       : '';
+    this.dataservice
+      .get_Sub_Dept_DropdownData(e.value)
+      .subscribe((res: any) => {
+        if (res) {
+          this.SubDepartmentDataSource = res;
+        }
+      });
   }
 
   onDesignationChange(e: any) {
@@ -427,13 +429,6 @@ export class EmployeeAddFormComponent {
     }
 
     this.isSaving = true; // start loading
-
-    // this.employeeFormData.EmployeeSalary = this.salaryHead.map((item) => ({
-    //   ID: 0,
-    //   EMP_ID: this.employeeFormData.EMP_ID || 0,
-    //   HEAD_ID: item.HEAD_ID,
-    //   AMOUNT: item.amount || 0,
-    // }));
 
     const payload = { ...this.employeeFormData, Company_Id: this.COMPANY_ID };
 

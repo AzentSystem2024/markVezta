@@ -679,6 +679,7 @@ export class AddCutomerReceiptComponent {
       ADD_TIME: '',
       NET_AMOUNT: '',
       REC_DETAIL: [{}],
+      IS_APPROVED: false,
     };
     this.customerType = 'Unit';
     this.receiptMode = '';

@@ -463,6 +463,7 @@ export class LedgerStatementComponent {
   }
 
   onViewClick(e: any) {
+    console.log(e)
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
 
     const trans_id = e.row.data.TRANS_ID;

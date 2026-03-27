@@ -322,7 +322,7 @@
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          width: 100%;
+          gap: 5px;
         "
       >
         <!--  LEFT SIDE: Vehicle Number + Narration -->
@@ -362,6 +362,11 @@
             [inputAttr]="{ style: 'text-align: right;' }"
           ></dx-text-box>
         </div>
+        <dx-check-box
+          text="Approve"
+          [(value)]="creditFormData.IS_APPROVED"
+          style="margin-top: 18px"
+        ></dx-check-box>
       </div>
 
       <div style="margin-top: 15px; padding: 0 0 0 5px"></div>
@@ -371,13 +376,13 @@
 
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
-    <div>
+    <!-- <div>
       <dx-check-box
         text="Approve"
         [(value)]="creditFormData.IS_APPROVED"
         style="margin-left: 20px"
       ></dx-check-box>
-    </div>
+    </div> -->
     <dx-button
       text="Cancel"
       (onClick)="cancel()"

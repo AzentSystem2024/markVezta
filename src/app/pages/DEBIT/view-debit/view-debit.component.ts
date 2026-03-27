@@ -119,6 +119,8 @@ export class ViewDebitComponent {
   roundedNetAmount: number = 0;
   subType: boolean = false;
   subTypeList: any;
+  vatTilte: any;
+  vatTitle: any;
 
   constructor(
     private dataService: DataService,
@@ -149,7 +151,7 @@ export class ViewDebitComponent {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -205,19 +207,19 @@ export class ViewDebitComponent {
 
     const firstRow = data.NOTE_DETAIL?.[0];
 
-    if (firstRow) {
-      if ((firstRow.CGST || 0) > 0 || (firstRow.SGST || 0) > 0) {
-        // SAME STATE (Saved)
-        this.showCGST = true;
-        this.showSGST = true;
-        this.showGST = false;
-      } else if ((firstRow.GST_PERC || 0) > 0) {
-        // DIFFERENT STATE (Saved)
-        this.showGST = true;
-        this.showCGST = false;
-        this.showSGST = false;
-      }
-    }
+    // if (firstRow) {
+    //   if ((firstRow.CGST || 0) > 0 || (firstRow.SGST || 0) > 0) {
+    //     // SAME STATE (Saved)
+    //     this.showCGST = true;
+    //     this.showSGST = true;
+    //     this.showGST = false;
+    //   } else if ((firstRow.GST_PERC || 0) > 0) {
+    //     // DIFFERENT STATE (Saved)
+    //     this.showGST = true;
+    //     this.showCGST = false;
+    //     this.showSGST = false;
+    //   }
+    // }
 
     // -----------------------------
     // BUILD GRID ROWS (READ ONLY)

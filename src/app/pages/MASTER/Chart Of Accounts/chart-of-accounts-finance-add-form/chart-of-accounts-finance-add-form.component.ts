@@ -4,6 +4,7 @@ import {
   EventEmitter,
   Input,
   NgModule,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -44,11 +45,11 @@ import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 
 @Component({
-  selector: 'app-add-account',
-  templateUrl: './add-account.component.html',
-  styleUrls: ['./add-account.component.scss'],
+  selector: 'app-chart-of-accounts-finance-add-form',
+  templateUrl: './chart-of-accounts-finance-add-form.component.html',
+  styleUrls: ['./chart-of-accounts-finance-add-form.component.scss'],
 })
-export class AddAccountComponent {
+export class ChartOfAccountsFinanceAddFormComponent implements OnInit {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() payroll: any;
   @ViewChild(DxDataGridComponent, { static: true })
@@ -95,34 +96,34 @@ export class AddAccountComponent {
   ledgerList: any;
   isSaving = false;
 
+  selectedCostTypeId: number | null = null;
+
+  costTypeList: any;
+
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
     this.getGroupingList();
     this.getAccountHeadList();
-    console.log('addaccount');
+    this.getCostType_DropDown();
   }
 
   getGroupingList() {
     this.dataService.getGroupingList().subscribe((response: any) => {
       if (response?.flag === 1 && Array.isArray(response.Data)) {
         this.groupingList = response.Data;
-        console.log(this.groupingList, 'GROUPINGLIST');
         this.mainGroupList = this.groupingList.filter(
           (item) => item.GROUP_SUPER_ID === 0,
         );
-        console.log(this.mainGroupList, 'Filtered Main Groups');
       }
     });
   }
 
   onMainGroupChange(event: any) {
     this.selectedMainGroupId = event.value;
-    console.log('Selected Main Group ID:', event.value);
     this.subGroupList = this.groupingList.filter(
       (item) => item.GROUP_SUPER_ID === this.selectedMainGroupId,
     );
-    console.log(this.subGroupList, 'SUBGROUPLIST');
   }
 
   get selectedMainGroupName(): string {
@@ -141,26 +142,27 @@ export class AddAccountComponent {
 
   onSubGroupChange(event: any) {
     this.selectedSubGroupId = event.value;
-    console.log('selected sub group', this.selectedSubGroupId);
     this.categoryList = this.groupingList.filter(
       (item) => item.GROUP_SUPER_ID === this.selectedSubGroupId,
     );
-    console.log(this.categoryList, 'CATEGORYLIST');
   }
 
   onCategoryChange(event: any) {
     this.selectedCategoryId = event.value;
-    console.log(this.selectedCategoryId, 'SELECTEDCATEGORYID');
   }
 
   getAccountHeadList() {
     this.dataService.getAccountHeadList().subscribe((response: any) => {
       this.ledgerList = response.Data;
-      console.log(
-        this.ledgerList,
-        '}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}',
-      );
     });
+  }
+
+  getCostType_DropDown() {
+    this.dataService
+      .getCostBucketDropdownData('COST_TYPE')
+      .subscribe((data: any) => {
+        this.costTypeList = data;
+      });
   }
 
   saveAccountHead() {
@@ -227,12 +229,12 @@ export class AddAccountComponent {
       ARABIC_NAME: this.accountHeadData.ARABIC_NAME,
       IS_ACTIVE: this.accountHeadData.IS_ACTIVE,
       SERIAL_NO: this.accountHeadData.SERIAL_NO,
+      CostTypeID: this.selectedCostTypeId || 0, // ✅ optional
     };
     this.isSaving = true;
     this.dataService.insertAccountHead(payload).subscribe({
       next: (response) => {
         this.isSaving = false;
-        console.log('Account Head inserted successfully', response);
         notify(
           {
             message: 'Account Head Saved Successfully',
@@ -310,8 +312,6 @@ export class AddAccountComponent {
     };
 
     this.dataService.insertAccountGroup(payload).subscribe((response: any) => {
-      console.log(response, 'NEW GROUP RESPONSE');
-
       const newGroupId = response?.Data?.GROUP_ID;
       if (!newGroupId) return;
 
@@ -416,8 +416,8 @@ export class AddAccountComponent {
     DxBoxModule,
   ],
   providers: [],
-  declarations: [AddAccountComponent],
-  exports: [AddAccountComponent],
+  declarations: [ChartOfAccountsFinanceAddFormComponent],
+  exports: [ChartOfAccountsFinanceAddFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddAccountModule {}
+export class ChartOfAccountsFinanceAddFormModule {}

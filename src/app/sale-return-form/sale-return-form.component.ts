@@ -137,6 +137,7 @@ export class SaleReturnFormComponent {
   companyStateId: any;
   retNo: any;
   summaryValues: (summaryItemName: string) => any;
+  vatTitle: any;
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
@@ -145,7 +146,7 @@ export class SaleReturnFormComponent {
 
     const userData = JSON.parse(userDataString);
     const selectedCompany = userData.SELECTED_COMPANY;
-    console.log(userData, 'USERDATAAAAAAAAAAAAAAA');
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     // SINGLE SOURCE OF TRUTH
     this.selectedCompanyId = selectedCompany.COMPANY_ID;
     this.companyStateId = selectedCompany.STATE_ID;
@@ -265,9 +266,9 @@ export class SaleReturnFormComponent {
         BARCODE: item.BARCODE,
         HSN_CODE: item.HSN_CODE,
 
-        CGST: this.sameState ? item.CGST : 0,
-        SGST: this.sameState ? item.SGST : 0,
-        VAT_PERC: this.sameState ? 0 : item.VAT_PERC,
+        CGST: 0,
+        SGST: 0,
+        VAT_PERC: item.VAT_PERC || item.CGST + item.SGST,
       }));
 
       setTimeout(() => {
@@ -406,22 +407,22 @@ export class SaleReturnFormComponent {
         if (!exists) {
           const gstPerc = Number(row.GST_PERC) || 0;
 
-          let cgst = 0;
-          let sgst = 0;
-          let igst = 0;
+          // let cgst = 0;
+          // let sgst = 0;
+          // let igst = 0;
 
-          // ✅ SAME STATE → Split GST
-          if (this.sameState) {
-            cgst = Number(row.CGST);
-            sgst = Number(row.SGST);
-            igst = 0;
-          }
-          // ✅ DIFFERENT STATE → IGST
-          else {
-            cgst = 0;
-            sgst = 0;
-            igst = gstPerc;
-          }
+          // // ✅ SAME STATE → Split GST
+          // if (this.sameState) {
+          //   cgst = Number(row.CGST);
+          //   sgst = Number(row.SGST);
+          //   igst = 0;
+          // }
+          // // ✅ DIFFERENT STATE → IGST
+          // else {
+          //   cgst = 0;
+          //   sgst = 0;
+          //   igst = gstPerc;
+          // }
 
           this.mainGridData.push({
             SALE_DET_ID: row.SALE_DET_ID,
@@ -444,9 +445,9 @@ export class SaleReturnFormComponent {
             HSN_CODE: row.HSN_CODE,
 
             // GST FROM PENDING LIST
-            VAT_PERC: igst, // IGST only
-            CGST: cgst,
-            SGST: sgst,
+            VAT_PERC: gstPerc,
+            CGST: 0,
+            SGST: 0,
             VAT_AMOUNT: 0,
           });
         }
@@ -495,16 +496,8 @@ export class SaleReturnFormComponent {
     if (!rowData) return 0;
 
     const amount = Number(rowData.AMOUNT) || 0;
-
-    if (this.sameState) {
-      const cgst = Number(rowData.CGST) || 0;
-      const sgst = Number(rowData.SGST) || 0;
-
-      return (amount * (cgst + sgst)) / 100;
-    } else {
-      const igst = Number(rowData.VAT_PERC);
-      return (amount * igst) / 100;
-    }
+    const gstPerc = Number(rowData.VAT_PERC) || 0;
+    return (amount * gstPerc) / 100;
   };
 
   calculateTotalAmount = (rowData) => {
@@ -624,9 +617,9 @@ export class SaleReturnFormComponent {
         AMOUNT: amount,
 
         // GST HANDLING
-        VAT_PERC: this.sameState ? 0 : row.VAT_PERC,
-        CGST: this.sameState ? row.CGST : 0,
-        SGST: this.sameState ? row.SGST : 0,
+        VAT_PERC: Number(row.VAT_PERC) || 0,
+        CGST: 0,
+        SGST: 0,
         VAT_AMOUNT: vatAmount,
         TOTAL_AMOUNT: totalAmount,
 

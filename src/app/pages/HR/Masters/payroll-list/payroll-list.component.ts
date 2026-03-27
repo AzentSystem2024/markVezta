@@ -93,7 +93,7 @@ export class PayrollListComponent {
     type: 'default',
     stylingMode: 'outlined',
     hint: 'Approve selected payrolls',
-    disabled: true, // Initially disabled
+    disabled: false, // Initially disabled
     onClick: () => {
       this.approveSelectedPayroll();
     },
@@ -174,6 +174,12 @@ export class PayrollListComponent {
       class: 'year-button',
     },
   };
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   selectedRows: any;
   approveDisabled = true;
 
@@ -239,40 +245,27 @@ export class PayrollListComponent {
   }
 
   toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
+    this.zone.run(() => {
+      const grid = this.dataGrid?.instance;
 
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
+      if (grid) {
+        const current = grid.option('filterRow.visible');
+        grid.option('filterRow.visible', !current);
+      }
+    });
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    });
   }
-  onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton',
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'search',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
-  }
+  onToolbarPreparing(e: any) {}
   approveSelectedPayroll() {
+    console.log('PAYROLLAPPROVE');
     const selectedRows = this.dataGrid.instance.getSelectedRowsData();
-
-    if (selectedRows.length === 0) {
-      alert('Please select at least one row to approve.');
+    const validRows = selectedRows.filter(
+      (row: any) => row.STATUS !== 'Approved',
+    );
+    if (validRows.length === 0) {
+      notify('Please select at least one non-approved row.', 'warning', 3000);
       return;
     }
 
@@ -307,29 +300,13 @@ export class PayrollListComponent {
     this.approveDisabled = selectedRows.length === 0 || hasApproved;
   }
 
-  // onSelectionChanged(e: any) {
-  //   const selectedRows = e.selectedRowsData || [];
-
-  //   const hasApproved = selectedRows.some(
-  //     (row: any) => row.STATUS === 'Approved'
-  //   );
-
-  //   const enableApprove =
-  //     selectedRows.length > 0 && !hasApproved;
-
-  //   // ✅ update disabled flag
-  //   this.approveButtonOptions.disabled = !enableApprove;
-
-  //    this.cdr.detectChanges();
-  // }
-
   onEditorPreparing(e: any) {
     if (
       e.parentType === 'dataRow' &&
       e.command === 'select' &&
       e.row?.data?.STATUS === 'Approved'
     ) {
-      e.editorOptions.disabled = true; // 🚫 hard block
+      e.editorOptions.disabled = true; // hard block
     }
   }
 
@@ -343,7 +320,7 @@ export class PayrollListComponent {
     const currentYear = new Date().getFullYear();
     this.years = [];
 
-    for (let i = currentYear - 10; i <= currentYear + 1; i++) {
+    for (let i = currentYear - 10; i <= currentYear + 4; i++) {
       this.years.push(i);
     }
   }
@@ -627,9 +604,9 @@ export class PayrollListComponent {
   }
 
   onDeletePayroll(e: any) {
-    const TS_ID = e.data.TS_ID;
+    const TS_ID = e.data.TIMESHEET_ID;
     e.cancel = true;
-
+    console.log(e.data, 'PAYROLLID');
     this.dataService.deletePayroll(TS_ID).subscribe(
       (response: any) => {
         if (response) {

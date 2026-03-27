@@ -77,7 +77,7 @@
       >
         <div style="display: flex; gap: 2px; justify-content: flex-end">
           <dx-text-box
-            label="Narration"
+            label="Remark"
             [(value)]="purchaseReturnFormData.NARRATION"
             labelMode="floating"
             [readOnly]="isReadOnlyMode"
@@ -347,6 +347,7 @@
             <dx-button text="Cancel" (onClick)="cancel()"></dx-button>
 
             <dx-button
+              *ngIf="!isReadOnlyMode"
               #saveButtonRef
               [text]="
                 isSaving
@@ -362,7 +363,7 @@
                       : 'Save'
               "
               [disabled]="isSaving"
-              (onClick)="isReadOnlyMode ? openPDF() : savePurchaseReturn()"
+              (onClick)="savePurchaseReturn()"
               stylingMode="contained"
               type="default"
             ></dx-button>
