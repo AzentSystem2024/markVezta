@@ -8,6 +8,7 @@ import {
   SimpleChanges,
   Output,
   EventEmitter,
+  ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -38,6 +39,8 @@ export class CustomerEditFormComponent {
   @Input() selectedCustomerData: any;
   @Output() ChangedCustomerData: any;
   @Output() updateCompleted = new EventEmitter<any>();
+  @ViewChild('mobileBoxRef', { static: false }) mobileBoxRef: any;
+
   CountryDropdownData: any;
   VATRuleDropdownData: any[] = [];
   PaymentTermsDropdownData: any;
@@ -117,7 +120,14 @@ export class CustomerEditFormComponent {
   deliveryAddress3: any;
   isSubDealerPopupVisible: boolean;
   dealerList: any;
-
+  PhonenumberCode: any;
+  mobileNumber: any;
+  countryCodes: any;
+  mobile_limit: any;
+  MobilecountryCode: any;
+  countryCodeDeliveryaddress: any;
+  Phone_limit: number;
+  mobile_limit_Delivery_Address: number = 0;
   //   countryCodeMap: { [key: string]: string } = {
   //   India: '+91',
   //   'United States': '+1',
@@ -141,7 +151,7 @@ export class CustomerEditFormComponent {
     this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
 
     service.getCountryWithFlags().subscribe((data) => {
-      this.CountryDropdownData = data;
+      this.countryCodes = data;
     });
   }
 
@@ -171,10 +181,13 @@ export class CustomerEditFormComponent {
       // ✅ Handle DeliveryAddresses (array of detailed addresses)
       if (this.formCustomerData.DeliveryAddresses?.length > 0) {
         const firstAddress = this.formCustomerData.DeliveryAddresses[0];
+        const deliveyMobile = firstAddress.MOBILE;
+        const [countryCode, number] = deliveyMobile.split('-');
 
         // Fill form input values
         this.Address1Value = firstAddress.ADDRESS1 || '';
-        this.MobileValue = firstAddress.MOBILE || '';
+        this.countryCodeDeliveryaddress = countryCode || '';
+        this.MobileValue = number || '';
         this.locationValue = firstAddress.LOCATION || '';
         this.phoneValue = firstAddress.PHONE || '';
 
@@ -201,6 +214,38 @@ export class CustomerEditFormComponent {
         this.isDealerVisible = false;
       }
     }
+
+    const MobileNo = this.selectedCustomerData.MOBILE_NO;
+
+    const [countryCode, number] = MobileNo.split('-');
+    this.countryCode = countryCode;
+    this.formCustomerData.MOBILE_NO = number;
+    const PhoneNo = this.selectedCustomerData.PHONE;
+
+    const [countryCodephone, phonenumber] = PhoneNo.split('-');
+    this.PhonenumberCode = countryCodephone;
+    this.formCustomerData.PHONE = phonenumber;
+  }
+
+  onCountrycodeChange(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+
+  onCountrycodeChangeDeliveryAddress(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit_Delivery_Address = Number(res.Data[0].MOBILE_DIGITS);
+    });
+    setTimeout(() => {
+      this.mobileBoxRef?.instance?.validate();
+    });
   }
 
   addDeliveryAddress(address: string) {
@@ -331,11 +376,11 @@ export class CustomerEditFormComponent {
 
     // 4️⃣ If found, set code & name
     if (selectedCountry) {
-      this.countryCode = selectedCountry.CODE; // e.g., '+971'
+      // this.countryCode = selectedCountry.CODE; // e.g., '+971'
       this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
     } else {
       // 5️⃣ Fallback if no country found
-      this.countryCode = '';
+      // this.countryCode = '';
       this.DEFAULT_COUNTRY_CODE = '';
       console.warn(
         '⚠️ No matching country found for ID:',
@@ -372,11 +417,12 @@ export class CustomerEditFormComponent {
   }
 
   UpdateData() {
-    this.service
-      .UpdateCustomerApi(this.selectedCustomerData)
-      .subscribe((res: any) => {
-        // this.updateCompleted.emit(res);
-      });
+    console.log(this.selectedCustomerData);
+    return {
+      ...this.selectedCustomerData,
+      MOBILE_NO: this.countryCode + '-' + this.formCustomerData.MOBILE_NO,
+      PHONE: this.PhonenumberCode + '-' + this.formCustomerData.PHONE,
+    };
   }
   closePopup() {}
 
@@ -392,7 +438,7 @@ export class CustomerEditFormComponent {
     ) {
       const newAddress = {
         ADDRESS1: this.Address1Value,
-        MOBILE: this.MobileValue,
+        MOBILE: this.countryCodeDeliveryaddress + '-' + this.MobileValue,
         LOCATION: this.locationValue,
         PHONE: this.phoneValue,
       };
@@ -415,6 +461,7 @@ export class CustomerEditFormComponent {
       this.MobileValue = '';
       this.locationValue = '';
       this.phoneValue = '';
+      this.countryCodeDeliveryaddress = '';
     }
   }
 
@@ -443,16 +490,64 @@ export class CustomerEditFormComponent {
 
   editAddress(i: number) {
     const addr = this.savedAddresses[i];
+    const [countryCodephone, phonenumber] = addr.MOBILE.split('-');
 
     // Fill form fields
     this.Address1Value = addr.ADDRESS1;
-    this.MobileValue = addr.MOBILE;
+    this.MobileValue = phonenumber;
+    this.countryCodeDeliveryaddress = countryCodephone;
     this.locationValue = addr.LOCATION;
     this.phoneValue = addr.PHONE;
 
     // ✅ Remember which card is being edited
     this.editingIndex = i;
   }
+  onDropdownClosed() {}
+  onDropdownOpened() {}
+  updateMobileNumber() {}
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}${item.COUNTRY_NAME}`;
+  }
+  onCountrycodeChangeDeliveryAddressmobile(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
+  }
+  validateMobileLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.mobile_limit) return false;
+
+    return value.length === this.mobile_limit;
+  };
+  validatePhoneLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.Phone_limit) return false;
+
+    return value.length === this.Phone_limit;
+  };
+
+  onCountrycodeChangePhoneNocode(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+  validateMobileLengthdeliveryaddress = (e: any): boolean => {
+    const value = (e.value || '').trim();
+    if (!value) return true;
+
+    if (!this.mobile_limit_Delivery_Address) return false;
+
+    return value.length === this.mobile_limit_Delivery_Address;
+  };
 }
 
 @NgModule({

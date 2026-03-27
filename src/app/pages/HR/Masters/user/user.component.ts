@@ -50,7 +50,7 @@ export class UserComponent {
   @ViewChild(UserEditFormComponent, { static: false })
   userEditForm: UserEditFormComponent;
   DataSource: any;
-  userList: any;
+  user_list: any = [];
 
   constructor(
     private fb: FormBuilder,
@@ -131,10 +131,13 @@ export class UserComponent {
       new Promise((resolve, reject) => {
         this.dataservice.get_User_data().subscribe({
           next: (data: any) => {
+            this.user_list = data.Data;
             // add serial number before resolving
             const dataWithSlNo = data.Data.map((item: any, index: number) => ({
               ...item,
-              SlNo: index + 1, // serial number
+              SlNo: index + 1,
+
+              // serial number
             }));
 
             resolve(dataWithSlNo);
@@ -189,22 +192,25 @@ export class UserComponent {
 
   onClickSaveNewData() {
     const data = this.userNewForm.getNewUserData();
+    console.log(data);
+    console.log(this.user_list);
 
-    // const loginName = data.LOGIN_NAME?.toString().trim().toLowerCase();
+    const isDuplicate = this.user_list.some(
+      (head: any) =>
+        (head.LOGIN_NAME || '').trim().toLowerCase() ===
+        (data.LoginName || '').trim().toLowerCase(),
+    );
 
-    //   // ✅ Defensive check
-    //   if (!loginName) {
-    //     notify(
-    //       {
-    //         message: 'Login Name is required',
-    //         position: { at: 'top right', my: 'top right' },
-    //         displayTime: 1000,
-    //       },
-    //       'error'
-    //     );
-    //     return;
-    //   }
-
+    if (isDuplicate) {
+      notify(
+        {
+          message: 'Login Name already exist',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+      );
+      return;
+    }
     this.dataservice.insert_User_Data(data).subscribe((res: any) => {
       try {
         if (res.message === 'Success') {

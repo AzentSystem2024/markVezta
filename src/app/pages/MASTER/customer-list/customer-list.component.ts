@@ -31,7 +31,10 @@ import {
   CustomerFormComponent,
   CustomerFormModule,
 } from '../../../components/HR/Masters/Customer/customer-form/customer-form.component';
-import { CustomerEditFormModule } from '../../../components/HR/Masters/Customer/customer-edit-form/customer-edit-form.component';
+import {
+  CustomerEditFormComponent,
+  CustomerEditFormModule,
+} from '../../../components/HR/Masters/Customer/customer-edit-form/customer-edit-form.component';
 import { FormTextboxModule } from '../../../components/utils/form-textbox/form-textbox.component';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
@@ -42,6 +45,10 @@ import DataSource from 'devextreme/data/data_source';
 })
 export class CustomerListComponent {
   @ViewChild(CustomerFormComponent) customerComponent: CustomerFormComponent;
+
+  @ViewChild(CustomerEditFormComponent)
+  selectedCustomerData: CustomerEditFormComponent;
+
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   // @ViewChild(SFormComponent) supplierForm!: SupplierFormComponent;
@@ -334,7 +341,8 @@ export class CustomerListComponent {
     //   (response)=>{
 
     const newCustomerData = this.customerComponent.getNewCustomerData();
-
+    console.log(newCustomerData);
+    // if(newCustomerData.DeliveryAddresses==[])
     const payload = {
       ...newCustomerData,
       COMPANY_ID: this.selected_Company_id,
@@ -370,32 +378,31 @@ export class CustomerListComponent {
   }
 
   onClickUpdateCustomer() {
-    const updatedData = { ...this.changed_Customer_Data };
+    const updatedData = this.selectedCustomerData.UpdateData();
+    console.log(updatedData, '==============form edit=============');
 
-    this.dataservice
-      .UpdateCustomerApi(this.Selected_Customer_Data)
-      .subscribe((res: any) => {
-        try {
-          notify(
-            {
-              message: 'Customer data updated successfully',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.isEditCustomerPopupOpened = false;
-          this.dataGrid.instance.refresh();
-          this.showCustomer();
-        } catch (error) {
-          notify(
-            {
-              message: 'Edit operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+    this.dataservice.UpdateCustomerApi(updatedData).subscribe((res: any) => {
+      try {
+        notify(
+          {
+            message: 'Customerssssssssss data updated successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success',
+        );
+        this.isEditCustomerPopupOpened = false;
+        this.dataGrid.instance.refresh();
+        this.showCustomer();
+      } catch (error) {
+        notify(
+          {
+            message: 'Edit operation failed',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+      }
+    });
   }
 
   onRowRemoving(event) {

@@ -676,17 +676,13 @@
           <!-- Mobile (9/12) -->
           <dxi-item [colSpan]="4">
             <dx-text-box
+              #mobileBoxRef
               style="width: 230px; margin-left: 35px"
               label="Mobile"
               labelMode="floating"
               [(value)]="MobileValue"
             >
               <dx-validator>
-                <dxi-validation-rule
-                  type="required"
-                  message="Mobile number is required"
-                >
-                </dxi-validation-rule>
                 <dxi-validation-rule
                   type="custom"
                   [validationCallback]="validateMobileLengthdeliveryaddress"
@@ -717,14 +713,15 @@
             [(value)]="phoneValue"
             stylingMode="outlined"
           >
-            <!-- <dx-validator>
-        <dxi-validation-rule
-      type="stringLength"
-      [min]="10"
-      [max]="10"
-      message="Mobile number must be exactly 10 digits"
-    ></dxi-validation-rule>
-       </dx-validator> -->
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateMobileLengthdeliveryaddress"
+              [message]="
+                'Mobile no. must be  ' +
+                mobile_limit_Delivery_Address +
+                ' digits long'
+              "
+            ></dxi-validation-rule>
           </dx-text-box>
         </dxi-item>
       </dx-form>
