@@ -4712,11 +4712,11 @@ The result can be exported to HTML or Markdown.`;
   }
 
   Timesheet_List_Api(payload) {
-    const getEndpoint = `${this.apiUrl}TimeSheet/ListTimesheet`;
+    const getEndpoint = `${this.apiUrl}TimeSheet/List`;
     return this.http.post(getEndpoint, payload);
   }
   getTimesheetList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/TimeSheet/list`, {});
+    return this.http.post(`${this.apiUrl}TimeSheet/list`, {});
   }
 
   saveTimesheetData(payload: any): Observable<any> {
@@ -4760,15 +4760,12 @@ The result can be exported to HTML or Markdown.`;
   //=============================employee dropdown============
   Dropdown_eos_employee(type: any) {
     const reqbody = { NAME: 'EMPLOYEE' };
-    return this.http.post(`${this.apiUrl}/DropDown`, reqbody);
+    return this.http.post(`${this.apiUrl}DropDown`, reqbody);
   }
 
   get_employeeDetails(id: any) {
     const reqbody = { EMP_ID: id };
-    return this.http.post(
-      `${this.apiUrl}/EmployeeEOS/getEmployeeData`,
-      reqbody,
-    );
+    return this.http.post(`${this.apiUrl}EmployeeEOS/getEmployeeData`, reqbody);
   }
 
   get_EmployeeDetailsFor_Leave_Api(payload) {
@@ -4778,7 +4775,7 @@ The result can be exported to HTML or Markdown.`;
   //=========================staff end off service select=========================
 
   select_Api_eos(id: any) {
-    return this.http.post(`${this.apiUrl}/EmployeeEOS/select/${id}`, {});
+    return this.http.post(`${this.apiUrl}EmployeeEOS/select/${id}`, {});
   }
 
   Update_Staff_EOS_api(
@@ -4882,23 +4879,23 @@ The result can be exported to HTML or Markdown.`;
   // }
 
   selectTimesheet(id: number) {
-    return this.http.post<any>(`${this.apiUrl}/TimeSheet/select/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}TimeSheet/select/` + id, {});
   }
 
   updateTimesheet(data: Object): Observable<any> {
-    return this.http.post(`${this.apiUrl}/TimeSheet/update`, data);
+    return this.http.post(`${this.apiUrl}TimeSheet/update`, data);
   }
 
   verifyTimesheet(data: Object): Observable<any> {
-    return this.http.post(`${this.apiUrl}/TimeSheet/verify`, data);
+    return this.http.post(`${this.apiUrl}TimeSheet/verify`, data);
   }
 
   approveTimesheet(data: Object): Observable<any> {
-    return this.http.post(`${this.apiUrl}/TimeSheet/approve`, data);
+    return this.http.post(`${this.apiUrl}TimeSheet/approve`, data);
   }
 
   deleteTimesheet(id: number) {
-    return this.http.post<any>(`${this.apiUrl}/TimeSheet/delete/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}TimeSheet/delete/` + id, {});
   }
 
   //MISCELLANEOUS PAYMENTS
@@ -6320,5 +6317,8 @@ The result can be exported to HTML or Markdown.`;
 
   get_mobile_no_length(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Company/getdigit`, data);
+  }
+  Employee_leave_period() {
+    return this.http.post(`${this.apiUrl}TimeSheet/employee-vacation`, {});
   }
 }

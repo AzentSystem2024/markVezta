@@ -281,38 +281,150 @@
 
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
             <dxi-item>
-              <dx-text-box
-                #telephoneBoxRef
-                type="text"
-                formControlName="Telephone"
-                class="form-control mt-1"
-                label="Phone"
-                labelMode="floating"
-              ></dx-text-box>
+              <div *dxTemplate style="display: flex">
+                <dx-select-box
+                  label="Country code *"
+                  [searchEnabled]="true"
+                  labelMode="floating"
+                  [(value)]="countryCodephone"
+                  [items]="countryCodes"
+                  valueExpr="CODE"
+                  [displayExpr]="countryDisplay"
+                  placeholder="+1"
+                  [dropDownOptions]="{ width: '370px' }"
+                  hint="Country Code"
+                  (onValueChanged)="onCountrycodeChangePhone($event)"
+                >
+                  <div *dxTemplate="let data of 'item'">
+                    <img
+                      [src]="data.FLAG_URL"
+                      width="20"
+                      style="margin-right: 8px"
+                    />
+                    {{ data.CODE }} {{ data.COUNTRY_NAME }}
+                  </div>
+                </dx-select-box>
+                <dx-text-box
+                  #telephoneBoxRef
+                  type="text"
+                  formControlName="Telephone"
+                  class="form-control mt-1"
+                  label="Phone"
+                  labelMode="floating"
+                >
+                  <dx-validator>
+                    <!-- <dxi-validation-rule
+                  type="required"
+                  message="Mobile No is required"
+                ></dxi-validation-rule> -->
+                    <dxi-validation-rule
+                      type="custom"
+                      [validationCallback]="validatePhoneLength"
+                      [message]="
+                        'Mobile no. must be  ' + Phone_limit + ' digits long'
+                      "
+                    ></dxi-validation-rule> </dx-validator
+                ></dx-text-box>
+              </div>
             </dxi-item>
 
             <dxi-item>
-              <dx-text-box
-                #telephoneBoxRef
-                type="text"
-                formControlName="Mobile"
-                class="form-control mt-1"
-                label="Mobile"
-                labelMode="floating"
-              ></dx-text-box>
+              <div *dxTemplate style="display: flex">
+                <dx-select-box
+                  label="Country code *"
+                  [searchEnabled]="true"
+                  labelMode="floating"
+                  [(value)]="countryCodemobile"
+                  [items]="countryCodes"
+                  valueExpr="CODE"
+                  [displayExpr]="countryDisplay"
+                  placeholder="+1"
+                  [dropDownOptions]="{ width: '370px' }"
+                  hint="Country Code"
+                  (onValueChanged)="onCountrycodeChangeMobile($event)"
+                >
+                  <div *dxTemplate="let data of 'item'">
+                    <img
+                      [src]="data.FLAG_URL"
+                      width="20"
+                      style="margin-right: 8px"
+                    />
+                    {{ data.CODE }} {{ data.COUNTRY_NAME }}
+                  </div>
+                </dx-select-box>
+                <dx-text-box
+                  #telephoneBoxRef
+                  type="text"
+                  formControlName="Mobile"
+                  class="form-control mt-1"
+                  label="Mobile"
+                  labelMode="floating"
+                  valueChangeEvent="keyup"
+                >
+                  <dx-validator>
+                    <!-- <dxi-validation-rule
+                  type="required"
+                  message="Mobile No is required"
+                ></dxi-validation-rule> -->
+                    <dxi-validation-rule
+                      type="custom"
+                      [validationCallback]="validateMobileLength"
+                      [message]="
+                        'Mobile no. must be  ' + mobile_limit + ' digits long'
+                      "
+                    ></dxi-validation-rule> </dx-validator
+                ></dx-text-box>
+              </div>
             </dxi-item>
           </dxi-item>
 
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
             <dxi-item>
-              <dx-text-box
-                #whatsAppBoxRef
-                type="text"
-                formControlName="WhatsApp"
-                class="form-control mt-1"
-                label="Whatsapp No"
-                labelMode="floating"
-              ></dx-text-box>
+              <div *dxTemplate style="display: flex">
+                <dx-select-box
+                  label="Country code *"
+                  [searchEnabled]="true"
+                  labelMode="floating"
+                  [(value)]="countryCodewhatsapp"
+                  [items]="countryCodes"
+                  valueExpr="CODE"
+                  [displayExpr]="countryDisplay"
+                  placeholder="+1"
+                  [dropDownOptions]="{ width: '370px' }"
+                  hint="Country Code"
+                  (onValueChanged)="onCountrycodeChangeWhatsapp($event)"
+                >
+                  <div *dxTemplate="let data of 'item'">
+                    <img
+                      [src]="data.FLAG_URL"
+                      width="20"
+                      style="margin-right: 8px"
+                    />
+                    {{ data.CODE }} {{ data.COUNTRY_NAME }}
+                  </div>
+                </dx-select-box>
+                <dx-text-box
+                  #whatsAppBoxRef
+                  type="text"
+                  formControlName="WhatsApp"
+                  class="form-control mt-1"
+                  label="Whatsapp No"
+                  labelMode="floating"
+                >
+                  <dx-validator>
+                    <!-- <dxi-validation-rule
+                  type="required"
+                  message="Mobile No is required"
+                ></dxi-validation-rule> -->
+                    <dxi-validation-rule
+                      type="custom"
+                      [validationCallback]="validateWhatsAppLength"
+                      [message]="
+                        'Mobile no. must be  ' + whatsapp_limit + ' digits long'
+                      "
+                    ></dxi-validation-rule> </dx-validator
+                ></dx-text-box>
+              </div>
             </dxi-item>
 
             <dxi-item>
@@ -537,38 +649,135 @@
 
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
             <dxi-item>
-              <dx-text-box
-                #telephoneBoxRef
-                type="text"
-                [(value)]="editingRowData.PHONE"
-                class="form-control mt-1"
-                label="Phone"
-                labelMode="floating"
-              ></dx-text-box>
+              <div *dxTemplate style="display: flex">
+                <dx-select-box
+                  label="Country code *"
+                  [searchEnabled]="true"
+                  labelMode="floating"
+                  [(value)]="countryCodephone"
+                  [items]="countryCodes"
+                  valueExpr="CODE"
+                  [displayExpr]="countryDisplay"
+                  placeholder="+1"
+                  [dropDownOptions]="{ width: '370px' }"
+                  hint="Country Code"
+                  (onValueChanged)="onCountrycodeChangePhone($event)"
+                >
+                  <div *dxTemplate="let data of 'item'">
+                    <img
+                      [src]="data.FLAG_URL"
+                      width="20"
+                      style="margin-right: 8px"
+                    />
+                    {{ data.CODE }} {{ data.COUNTRY_NAME }}
+                  </div>
+                </dx-select-box>
+                <dx-text-box
+                  #telephoneBoxRef
+                  type="text"
+                  [(value)]="editingRowData.PHONE"
+                  class="form-control mt-1"
+                  label="Phone"
+                  labelMode="floating"
+                ></dx-text-box>
+              </div>
             </dxi-item>
 
             <dxi-item>
-              <dx-text-box
-                #telephoneBoxRef
-                type="text"
-                [(value)]="editingRowData.MOBILE"
-                class="form-control mt-1"
-                label="Mobile"
-                labelMode="floating"
-              ></dx-text-box>
+              <div *dxTemplate style="display: flex">
+                <dx-select-box
+                  label="Country code *"
+                  [searchEnabled]="true"
+                  labelMode="floating"
+                  [(value)]="countryCodemobile"
+                  [items]="countryCodes"
+                  valueExpr="CODE"
+                  [displayExpr]="countryDisplay"
+                  placeholder="+1"
+                  [dropDownOptions]="{ width: '370px' }"
+                  hint="Country Code"
+                  (onValueChanged)="onCountrycodeChangeMobile($event)"
+                >
+                  <div *dxTemplate="let data of 'item'">
+                    <img
+                      [src]="data.FLAG_URL"
+                      width="20"
+                      style="margin-right: 8px"
+                    />
+                    {{ data.CODE }} {{ data.COUNTRY_NAME }}
+                  </div>
+                </dx-select-box>
+                <dx-text-box
+                  #telephoneBoxRef
+                  type="text"
+                  [(value)]="editingRowData.MOBILE"
+                  class="form-control mt-1"
+                  label="Mobile"
+                  labelMode="floating"
+                  ><dx-validator>
+                    <!-- <dxi-validation-rule
+                  type="required"
+                  message="Mobile No is required"
+                ></dxi-validation-rule> -->
+                    <dxi-validation-rule
+                      type="custom"
+                      [validationCallback]="validateMobileLength"
+                      [message]="
+                        'Mobile no. must be  ' + mobile_limit + ' digits long'
+                      "
+                    ></dxi-validation-rule> </dx-validator
+                ></dx-text-box>
+              </div>
             </dxi-item>
           </dxi-item>
 
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
             <dxi-item>
-              <dx-text-box
-                #whatsAppBoxRef
-                type="text"
-                [(value)]="editingRowData.WHATSAPP"
-                class="form-control mt-1"
-                label="Whatsapp No"
-                labelMode="floating"
-              ></dx-text-box>
+              <div *dxTemplate style="display: flex">
+                <dx-select-box
+                  label="Country code *"
+                  [searchEnabled]="true"
+                  labelMode="floating"
+                  [(value)]="countryCodewhatsapp"
+                  [items]="countryCodes"
+                  valueExpr="CODE"
+                  [displayExpr]="countryDisplay"
+                  placeholder="+1"
+                  [dropDownOptions]="{ width: '370px' }"
+                  hint="Country Code"
+                  (onValueChanged)="onCountrycodeChangeWhatsapp($event)"
+                >
+                  <div *dxTemplate="let data of 'item'">
+                    <img
+                      [src]="data.FLAG_URL"
+                      width="20"
+                      style="margin-right: 8px"
+                    />
+                    {{ data.CODE }} {{ data.COUNTRY_NAME }}
+                  </div>
+                </dx-select-box>
+                <dx-text-box
+                  #whatsAppBoxRef
+                  type="text"
+                  [(value)]="editingRowData.WHATSAPP"
+                  class="form-control mt-1"
+                  label="Whatsapp No"
+                  labelMode="floating"
+                >
+                  <dx-validator>
+                    <!-- <dxi-validation-rule
+                  type="required"
+                  message="Mobile No is required"
+                ></dxi-validation-rule> -->
+                    <dxi-validation-rule
+                      type="custom"
+                      [validationCallback]="validateWhatsAppLength"
+                      [message]="
+                        'Mobile no. must be  ' + whatsapp_limit + ' digits long'
+                      "
+                    ></dxi-validation-rule> </dx-validator
+                ></dx-text-box>
+              </div>
             </dxi-item>
 
             <dxi-item>

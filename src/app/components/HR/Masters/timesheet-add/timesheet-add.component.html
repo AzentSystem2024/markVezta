@@ -91,6 +91,7 @@
         displayFormat="dd-MM-yyyy"
         placeholder="Select From Date"
         style="flex: 1 1 30%"
+        [readOnly]="true"
       ></dx-date-box>
 
       <!-- Total Days Worked -->
@@ -98,12 +99,13 @@
       <!-- Upto Date -->
       <dx-date-box
         [(value)]="timesheetFormData.LEAVE_TO"
-        label="From"
+        label="To "
         [labelMode]="'floating'"
         type="date"
         displayFormat="dd-MM-yyyy"
         placeholder="Select Upto Date"
         style="flex: 1 1 30%"
+        [readOnly]="true"
       ></dx-date-box>
       <!-- <dx-text-box
         [(value)]="timesheetFormData.LEAVE_TO"
@@ -120,6 +122,7 @@
         [min]="0"
         placeholder="Enter Total Days"
         style="flex: 1 1 30%"
+        [readOnly]="true"
       ></dx-number-box>
     </div>
   </div>
@@ -142,7 +145,7 @@
           #dataGrid
           noDataText=" "
           [width]="'100%'"
-          [height]="'20vh'"
+          [height]="'30vh'"
           [loadPanel]="{
             enabled: true,
             text: 'Loading...',
@@ -165,30 +168,75 @@
           focusStateEnabled="false"
           [editing]="{ mode: 'cell', allowUpdating: true }"
           (onRowUpdated)="onTimesheetDetailsUpdated($event)"
-          (onEditorPreparing)="onEditorPreparing($event)"
+          (onEditorPreparing)="onEditorPreparingTImesheetdetails($event)"
         >
-          <dxi-column dataField="STORE" caption="Store">
+          <dxi-column dataField="DEPT_ID" caption="Department">
             <dxo-lookup
-              [dataSource]="stores"
-              displayExpr="STORE_NAME"
+              [dataSource]="Departments"
+              displayExpr="DESCRIPTION"
               valueExpr="ID"
               [allowClearing]="false"
             ></dxo-lookup>
           </dxi-column>
 
-          <dxi-column dataField="DAYS" caption="Worked Days"></dxi-column>
+          <dxi-column dataField="DAYS" caption="Worked Days">
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateDays"
+              message="Worked days cannot exceed total allowed days"
+            ></dxi-validation-rule
+          ></dxi-column>
           <dxi-column
             dataField="NORMAL_OT"
             caption="OT Hours"
             dataType="number"
             [editorOptions]="{ max: 12 }"
+            ><dxi-validation-rule
+              type="custom"
+              [validationCallback]="validTime"
+              message="Maximum allowed OT time is 12 hours"
+            ></dxi-validation-rule
           ></dxi-column>
           <dxi-column
             dataField="HOLIDAY_OT"
             caption="Holiday OT"
             dataType="number"
             [editorOptions]="{ max: 12 }"
+            ><dxi-validation-rule
+              type="custom"
+              [validationCallback]="validTime"
+              message="Maximum allowed OT is 12 hours"
+            ></dxi-validation-rule
           ></dxi-column>
+          <dxo-summary>
+            <!-- Footer Summary with custom alignment -->
+
+            <!-- Count summary -->
+            <dxi-total-item
+              column="DEPARTMENT"
+              summaryType="count"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'DEPARTMENT'"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="DAYS"
+              summaryType="sum"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'DAYS'"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="NORMAL_OT"
+              summaryType="sum"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'NORMAL_OT'"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="HOLIDAY_OT"
+              summaryType="sum"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'HOLIDAY_OT'"
+            ></dxi-total-item>
+          </dxo-summary>
         </dx-data-grid>
       </div>
     </div>
@@ -210,7 +258,7 @@
           #dataGrid
           noDataText=" "
           [width]="'100%'"
-          [height]="'20vh'"
+          [height]="'30vh'"
           [loadPanel]="{
             enabled: true,
             text: 'Loading...',
@@ -250,6 +298,7 @@
             caption="Amount"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [customizeText]="formatAmount"
+            alignment="right"
           ></dxi-column>
         </dx-data-grid>
       </div>
@@ -258,67 +307,6 @@
     </div>
   </div>
 
-  <!-- <div style="display: flex; gap: 20px; width: 100%; margin-top: 10px">
-
-    <div
-      class="timesheet-extra-container"
-      style="
-        flex: 1 1 35%;
-        border: 1px solid #ccc;
-        padding: 16px;
-        border-radius: 8px;
-        box-sizing: border-box;
-      "
-    >
-      <p style="margin: 0 0 10px"><strong>Summary</strong></p>
-
-  
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          gap: 10px;
-          flex-wrap: wrap;
-        "
-      >
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Total Days Worked"
-            [(value)]="timesheetFormData.WORKED_DAYS"
-            label="Total Days Worked"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Normal OT"
-            [(value)]="timesheetFormData.NORMAL_OT"
-            label="Normal OT"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Holiday OT"
-            [(value)]="timesheetFormData.HOLIDAY_OT"
-            label="Holiday OT"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Deduction of Days"
-            [(value)]="timesheetFormData.DAYS_DEDUCTED"
-            label="Deduction of Days"
-            [labelMode]="'floating'"
-          ></dx-text-box>
-        </div>
-      </div>
-    </div>
-  </div> -->
   <div style="display: flex; gap: 20px; width: 100%; margin-top: 10px">
     <!-- Summary Container (First Column) -->
     <div
@@ -333,56 +321,26 @@
     >
       <!-- <p style="margin: 0 0 10px"><strong>Summary</strong></p> -->
 
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          gap: 10px;
-          flex-wrap: wrap;
-        "
-      >
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Total Days Worked"
-            [(value)]="timesheetFormData.WORKED_DAYS"
-            label="Total Days Worked"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Normal OT"
-            [(value)]="timesheetFormData.NORMAL_OT"
-            label="Normal OT"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Holiday OT"
-            [(value)]="timesheetFormData.HOLIDAY_OT"
-            label="Holiday OT"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Deduction of Days"
-            [(value)]="timesheetFormData.DAYS_DEDUCTED"
-            label="Deduction of Days"
-            [labelMode]="'floating'"
-          ></dx-text-box>
-        </div>
-
-        <div style="flex: 1 1 22%">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <!-- Remarks (80%) -->
+        <div style="flex: 8">
           <dx-text-box
             placeholder="Remarks"
             [(value)]="timesheetFormData.REMARKS"
             label="Remarks"
             [labelMode]="'floating'"
+            width="100%"
+          ></dx-text-box>
+        </div>
+
+        <!-- Deduction of Days (20%) -->
+        <div style="flex: 2">
+          <dx-text-box
+            placeholder="Deduction of Days"
+            [(value)]="timesheetFormData.DAYS_DEDUCTED"
+            label="Deduction of Days"
+            [labelMode]="'floating'"
+            width="100%"
           ></dx-text-box>
         </div>
       </div>

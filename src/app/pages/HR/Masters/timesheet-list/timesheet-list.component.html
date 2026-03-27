@@ -36,6 +36,7 @@
       [selectedRowKeys]="selectedRowKeys"
       (onSelectionChanged)="onSelectionChanged($event)"
       (onCellPrepared)="onCellPrepared($event)"
+      (onEditingStart)="onEditingStart($event)"
     >
       <dxo-column-chooser
         [height]="500"
@@ -53,7 +54,7 @@
       <dxo-editing
         mode="popup"
         [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowDeleting]="isDeleteVisible"
       ></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -83,7 +84,18 @@
       ></dxo-filter-row>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Time Sheet</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Time Sheet
+          </div>
         </dxi-item>
 
         <!-- Buttons -->
@@ -152,14 +164,12 @@
           </div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-          <dx-button
-            icon="plus"
-            hint="add"
-            type="default"
-            stylingMode="contained"
-            (onClick)="addTimesheet()"
-          ></dx-button>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          [options]="addButtonOptions"
+          widget="dxButton"
+        >
         </dxi-item>
 
         <dxi-item
@@ -181,6 +191,9 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item
           name="exportButton"
           location="after"

@@ -48,10 +48,11 @@
           [dataSource]="employee"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
-          [(value)]="timesheetFormData.EMP_NAME"
+          [(value)]="timesheetFormData.EMP_ID"
           placeholder="Select Employee"
           width="100%"
-          [readOnly]="true"
+          (onValueChanged)="onEmployeeSelected($event)"
+          [readOnly]="is_approve"
         >
         </dx-select-box>
       </div>
@@ -76,26 +77,28 @@
     <!-- Single row for all 3 fields -->
     <div style="display: flex; gap: 20px; flex-wrap: wrap">
       <!-- From Date -->
-      <dx-text-box
+      <dx-date-box
         [(value)]="timesheetFormData.LEAVE_FROM"
         label="From"
         [labelMode]="'floating'"
+        displayFormat="dd-MM-yyyy"
         type="date"
-        placeholder="Select From Date"
+        [readOnly]="true"
         style="flex: 1 1 30%"
-      ></dx-text-box>
+      ></dx-date-box>
 
       <!-- Total Days Worked -->
 
-      <!-- Upto Date -->
-      <dx-text-box
+      <dx-date-box
         [(value)]="timesheetFormData.LEAVE_TO"
         label="To"
         [labelMode]="'floating'"
+        displayFormat="dd-MM-yyyy"
         type="date"
         placeholder="Select Upto Date"
         style="flex: 1 1 30%"
-      ></dx-text-box>
+        [readOnly]="true"
+      ></dx-date-box>
       <dx-number-box
         [(value)]="timesheetFormData.DAYS"
         label="Total Days Worked"
@@ -103,6 +106,7 @@
         [min]="0"
         placeholder="Enter Total Days"
         style="flex: 1 1 30%"
+        [readOnly]="true"
       ></dx-number-box>
     </div>
   </div>
@@ -130,7 +134,7 @@
             enabled: true,
             text: 'Loading...',
             showIndicator: true,
-            showPane: true
+            showPane: true,
           }"
           class="grid theme-dependent"
           [dataSource]="timesheetDetails"
@@ -147,22 +151,68 @@
           [selection]="{ mode: 'single' }"
           focusStateEnabled="false"
           [autoNavigateToFocusedRow]="false"
-          [editing]="{ mode: 'cell', allowUpdating: true }"
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: timesheetFormData.STATUS !== 'Approved',
+          }"
           (onRowUpdated)="onTimesheetDetailsUpdated($event)"
+          (onEditorPreparing)="onEditorPreparingTImesheetdetails($event)"
         >
-          <dxi-column dataField="STORE" caption="Store">
+          <dxi-column dataField="DEPT_ID" caption="Department">
             <dxo-lookup
-              [dataSource]="stores"
-              displayExpr="STORE_NAME"
+              [dataSource]="Departments"
+              displayExpr="DESCRIPTION"
               valueExpr="ID"
               [allowClearing]="false"
-              [value]="timesheetDetails.STORE"
             ></dxo-lookup>
           </dxi-column>
 
-          <dxi-column dataField="DAYS" caption="Worked Days"></dxi-column>
-          <dxi-column dataField="NORMAL_OT" caption="OT Hours" [editorOptions]="{ max: 12 }"></dxi-column>
-          <dxi-column dataField="HOLIDAY_OT" caption="Holiday OT" [editorOptions]="{ max: 12 }"></dxi-column>
+          <dxi-column dataField="DAYS" caption="Worked Days">
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateDays"
+              message="Worked days cannot exceed total allowed days"
+            ></dxi-validation-rule>
+          </dxi-column>
+          <dxi-column
+            dataField="NORMAL_OT"
+            caption="OT Hours"
+            [editorOptions]="{ max: 12 }"
+          ></dxi-column>
+          <dxi-column
+            dataField="HOLIDAY_OT"
+            caption="Holiday OT"
+            [editorOptions]="{ max: 12 }"
+          ></dxi-column>
+          <dxo-summary>
+            <!-- Footer Summary with custom alignment -->
+
+            <!-- Count summary -->
+            <dxi-total-item
+              column="DEPARTMENT"
+              summaryType="count"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'DEPARTMENT'"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="DAYS"
+              summaryType="sum"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'DAYS'"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="NORMAL_OT"
+              summaryType="sum"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'NORMAL_OT'"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="HOLIDAY_OT"
+              summaryType="sum"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'HOLIDAY_OT'"
+            ></dxi-total-item>
+          </dxo-summary>
         </dx-data-grid>
       </div>
     </div>
@@ -189,7 +239,7 @@
             enabled: true,
             text: 'Loading...',
             showIndicator: true,
-            showPane: true
+            showPane: true,
           }"
           class="grid theme-dependent"
           [dataSource]="salaryDataSource"
@@ -206,7 +256,10 @@
           [selection]="{ mode: 'single' }"
           focusStateEnabled="false"
           [autoNavigateToFocusedRow]="false"
-          [editing]="{ mode: 'cell', allowUpdating: true }"
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: timesheetFormData.STATUS !== 'Approved',
+          }"
           (onRowUpdated)="onSalaryHeadUpdated($event)"
         >
           <dxi-column dataField="SALARY_HEAD_ID" caption="Salary Head">
@@ -219,7 +272,12 @@
             </dxo-lookup>
           </dxi-column>
 
-          <dxi-column dataField="AMOUNT" caption="Amount"></dxi-column>
+          <dxi-column
+            dataField="AMOUNT"
+            caption="Amount"
+            alignment="right"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          ></dxi-column>
         </dx-data-grid>
       </div>
 
@@ -238,57 +296,23 @@
         box-sizing: border-box;
       "
     >
-      <p style="margin: 0 0 10px"><strong>Summary</strong></p>
-
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          gap: 10px;
-          flex-wrap: wrap;
-        "
-      >
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Total Days Worked"
-            [(value)]="timesheetFormData.WORKED_DAYS"
-            label="Total Days Worked"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Normal OT"
-            [(value)]="timesheetFormData.NORMAL_OT"
-            label="Normal OT"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Holiday OT"
-            [(value)]="timesheetFormData.HOLIDAY_OT"
-            label="Holiday OT"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Deduction of Days"
-            [(value)]="timesheetFormData.DAYS_DEDUCTED"
-            label="Deduction of Days"
-            [labelMode]="'floating'"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <div style="flex: 8">
           <dx-text-box
             placeholder="Remarks"
             [(value)]="timesheetFormData.REMARKS"
             label="Remarks"
             [labelMode]="'floating'"
+            [readOnly]="is_approve"
+          ></dx-text-box>
+        </div>
+        <div style="flex: 2">
+          <dx-text-box
+            placeholder="Deduction of Days"
+            [(value)]="timesheetFormData.DAYS_DEDUCTED"
+            label="Deduction of Days"
+            [labelMode]="'floating'"
+            [readOnly]="is_approve"
           ></dx-text-box>
         </div>
       </div>

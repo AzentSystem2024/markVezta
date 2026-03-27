@@ -34,7 +34,18 @@
 
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">Staff End of Reason</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Staff End of Reason
+        </div>
       </dxi-item>
 
       <dxi-item>
@@ -45,23 +56,33 @@
           valueExpr="value"
           (onValueChanged)="onDateRangeChange($event)"
           placeholder="Date Range"
-          class="mb-3"
         ></dx-select-box>
       </dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
+
       <dxi-item
         location="after"
         locateInMenu="auto"
         widget="dxButton"
         [options]="addButtonOptions"
       ></dxi-item>
-
-      <dxi-item location="after" locateInMenu="never">
-        <dx-button icon="refresh" (onClick)="refreshGrid()"></dx-button>
-      </dxi-item>
-
-      <dxi-item location="after" locateInMenu="never">
-        <dx-button icon="search" (onClick)="toggle()"> </dx-button>
-      </dxi-item>
     </dxo-toolbar>
 
     <!-- <dxo-filter-row [visible]="isFilterVisible"></dxo-filter-row> -->

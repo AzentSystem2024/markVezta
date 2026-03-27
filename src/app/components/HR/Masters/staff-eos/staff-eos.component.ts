@@ -211,7 +211,15 @@ export class StaffEOSComponent {
     this.dropdown_employee();
     this.get_employes_details_value();
   }
-
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
   //--------------Session storage----------------
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));

@@ -749,10 +749,13 @@ body {
 .dx-icon-edit:before {
   content: "\f023" !important;
   color: #0073d8 !important;
+  font-size: 18px;
 }
 .dx-icon-trash:before {
   content: "\f03e";
   color: #d62a1e !important;
+  font-size: 18px;
+  padding-left: 10px;
 }
 .dx-treeview-node[aria-expanded="true"] > .dx-item .dx-item-content {
   height: auto;
