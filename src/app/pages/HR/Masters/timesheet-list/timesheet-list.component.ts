@@ -173,13 +173,15 @@ export class TimesheetListComponent {
     `;
     },
   };
-  // searchButtonOptions = {
-  //   icon: 'search',
-  //   hint: 'Show / Hide Filters',
-  //   stylingMode: 'contained',
-  //   elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
-  //   onClick: () => this.toggleFilters(),
-  // };
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+  popupTitle: string;
+  isViewMode: boolean;
   constructor(
     private dataService: DataService,
     private zone: NgZone,
@@ -501,6 +503,14 @@ export class TimesheetListComponent {
 
   onEditingStart(e: any) {
     e.cancel = true;
+
+    if (e.row?.data?.STATUS == 'Approved') {
+      this.popupTitle = 'Edit Timesheet';
+      this.isViewMode = true;
+    } else {
+      this.popupTitle = 'View Timesheet';
+      this.isViewMode = false;
+    }
     this.editTimesheetPopupOpened = true;
     const timesheetId = e.data.ID;
     const status = e.data.STATUS;
@@ -701,6 +711,13 @@ export class TimesheetListComponent {
         this.fetchTimesheetList();
       });
   }
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
 }
 
 @NgModule({
