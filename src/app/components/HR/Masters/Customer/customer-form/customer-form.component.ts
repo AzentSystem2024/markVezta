@@ -161,7 +161,8 @@ export class CustomerFormComponent {
     // Return the full customer data with the delivery address array included
     return {
       ...this.newCustomer,
-      DELIVERY_ADDRESS: deliveryAddressArray,
+      DeliveryAddresses: this.savedAddresses,
+      // DELIVERY_ADDRESS: deliveryAddressArray,
     };
   };
 
@@ -274,6 +275,11 @@ export class CustomerFormComponent {
       this.StateDropdownData = data;
     });
   }
+  get_Country_Dropdown_List() {
+    this.service.getCountryWithFlags().subscribe((response: any) => {
+      this.CountryDropdownData = response;
+    });
+  }
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
@@ -298,6 +304,7 @@ export class CustomerFormComponent {
 
   onStateSelectionChanged(event: any) {}
   ngOnInit(): void {
+    this.get_Country_Dropdown_List();
     this.getDealerDropDown();
     this.getPaymentTerms();
     // this.showCountry();
