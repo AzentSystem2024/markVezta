@@ -249,7 +249,7 @@ export class ArticleAddComponent {
 
   getItems() {
     const payload = {
-      NAME: 'ITEMS',
+      NAME: 'GETITEM',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.itemsList = response;

@@ -292,7 +292,7 @@ this.ensureEmptyRow();
 
     getItems() {
     const payload = {
-      NAME: "ITEMS"
+      NAME: "GETITEM"
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       console.log(response)
