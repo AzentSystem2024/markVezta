@@ -173,13 +173,13 @@ export class TimesheetListComponent {
     `;
     },
   };
-  // searchButtonOptions = {
-  //   icon: 'search',
-  //   hint: 'Show / Hide Filters',
-  //   stylingMode: 'contained',
-  //   elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
-  //   onClick: () => this.toggleFilters(),
-  // };
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
   constructor(
     private dataService: DataService,
     private zone: NgZone,
@@ -701,6 +701,13 @@ export class TimesheetListComponent {
         this.fetchTimesheetList();
       });
   }
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
 }
 
 @NgModule({
