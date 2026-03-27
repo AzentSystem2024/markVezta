@@ -48,6 +48,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { BrowserModule } from '@angular/platform-browser';
 import { DataService } from 'src/app/services';
 import CountryList from 'country-list-with-dial-code-and-flag';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-user-edit-form',
@@ -160,6 +161,7 @@ export class UserEditFormComponent {
   user_name_value: any;
   phonenumber: string;
   phoneNoCode: string;
+  user_list: any = [];
 
   constructor(
     private fb: FormBuilder,
@@ -172,7 +174,9 @@ export class UserEditFormComponent {
   }
 
   get_userlist() {
-    this.dataservice.get_User_data().subscribe((res: any) => {});
+    this.dataservice.get_User_data().subscribe((res: any) => {
+      this.user_list = res.Data;
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -645,6 +649,23 @@ export class UserEditFormComponent {
     });
   }
   Update_data() {
+    // const isDuplicate = this.user_list.some(
+    //   (head: any) =>
+    //     (head.LOGIN_NAME || '').trim().toLowerCase() ===
+    //       (this.newUserData.LOGIN_NAME || '').trim().toLowerCase() &&
+    //     head.ID !== this.newUserData.ID,
+    // );
+
+    // if (isDuplicate) {
+    //   notify(
+    //     {
+    //       message: 'Salary Head already exists',
+    //       position: { at: 'top center', my: 'top center' },
+    //     },
+    //     'error',
+    //   );
+    //   return;
+    // }
     const payload = {
       ...this.newUserData,
       COMPANY_ID: this.selectedRows,
