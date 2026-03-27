@@ -643,6 +643,7 @@ export class PayrollListComponent {
   }
 
   handleClose() {
+    console.log('PARENT HANDLE CLOSE CALLED');
     this.addPayrollPopupOpened = false; // closes the popup
     this.editPayrollPopupOpened = false;
     this.verifyPayrollPopupOpened = false;

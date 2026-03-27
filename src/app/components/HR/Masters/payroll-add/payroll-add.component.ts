@@ -4,6 +4,7 @@ import {
   EventEmitter,
   Input,
   NgModule,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -42,13 +43,15 @@ import { PayRevisionAddComponent } from '../pay-revision-add/pay-revision-add.co
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { OnChanges, SimpleChanges } from '@angular/core';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-payroll-add',
   templateUrl: './payroll-add.component.html',
   styleUrls: ['./payroll-add.component.scss'],
 })
-export class PayrollAddComponent {
+export class PayrollAddComponent implements OnInit, OnChanges {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() selectedMonth: string;
   @ViewChild(DxDataGridComponent, { static: true })
@@ -84,6 +87,12 @@ export class PayrollAddComponent {
     private dataSerivice: DataService,
     private router: Router,
   ) {}
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedMonth'] && this.selectedMonth) {
+      this.setSessionData();
+      this.getTimesheetList();
+    }
+  }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -91,6 +100,7 @@ export class PayrollAddComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    console.log(this.companyID, 'COMPANYIDPAYROLLLLLLLLLLLLLLLLLLLLLLL');
     this.userID = menuResponse.USER_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
@@ -106,7 +116,18 @@ export class PayrollAddComponent {
       this.canApprove = packingRights.canApprove;
     }
     // this.payRollData.SAL_MONTH = this.selectedMonth;
-    this.getTimesheetList();
+    // this.getTimesheetList();
+  }
+
+  setSessionData() {
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.userID = menuResponse.USER_ID;
+
+    console.log(this.companyID, 'COMPANY ID SET');
   }
 
   getStatusFlagClass(status: string): string {
@@ -127,6 +148,7 @@ export class PayrollAddComponent {
       console.warn('No month selected.');
       return;
     }
+    console.log(this.companyID, '======COMPANYID====');
     const payload = {
       CompanyId: this.companyID,
       Month: new Date(this.selectedMonth)
@@ -136,7 +158,7 @@ export class PayrollAddComponent {
         })
         .replace(/\s/g, ''),
     };
-
+    console.log(payload, 'payloadddddddddddddddddddd');
     this.dataSerivice
       .getTimesheetListForPayroll(payload)
       .subscribe((response: any) => {
@@ -172,34 +194,39 @@ export class PayrollAddComponent {
 
       this.dataSerivice.generatePayroll(payload).subscribe({
         next: (response: any) => {
-          if (response.flag === '1') {
-            successCount++;
-          } else {
-            errorCount++;
+          // console.log('API RESPONSE:', response);
+          if (response.flag === 1) {
+            notify(
+              {
+                message:
+                  'Payroll generated successfully for selected employees.',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+            this.popupClosed.emit();
+
+            // successCount++;
           }
+          // else {
+          //   errorCount++;
+          // }
 
           // Show message only after last API call
-          if (successCount + errorCount === selectedRows.length) {
-            if (errorCount === 0) {
-              notify(
-                {
-                  message:
-                    'Payroll generated successfully for selected employees.',
-                  position: { at: 'top center', my: 'top center' },
-                },
-                'success',
-              );
-              this.popupClosed.emit();
-            } else {
-              notify(
-                {
-                  message: `Payroll generated for ${successCount} rows. Failed for ${errorCount} rows.`,
-                  position: { at: 'top center', my: 'top center' },
-                },
-                'warning',
-              );
-            }
-          }
+          // if (successCount + errorCount === selectedRows.length) {
+          //   if (errorCount === 0) {
+
+          //   }
+          //   // else {
+          //   //   notify(
+          //   //     {
+          //   //       message: `Payroll generated for ${successCount} rows. Failed for ${errorCount} rows.`,
+          //   //       position: { at: 'top center', my: 'top center' },
+          //   //     },
+          //   //     'warning',
+          //   //   );
+          //   // }
+          // }
         },
         error: () => {
           errorCount++;

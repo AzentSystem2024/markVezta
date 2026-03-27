@@ -217,6 +217,7 @@
 </div>
 
 <dx-popup
+  *ngIf="addPayrollPopupOpened"
   [(visible)]="addPayrollPopupOpened"
   [width]="'60vw'"
   [height]="'80vh'"
@@ -224,7 +225,6 @@
   (onHiding)="handleClose()"
 >
   <app-payroll-add
-    *ngIf="addPayrollPopupOpened"
     [selectedMonth]="selectedMonthForAdd"
     (popupClosed)="handleClose()"
   ></app-payroll-add>

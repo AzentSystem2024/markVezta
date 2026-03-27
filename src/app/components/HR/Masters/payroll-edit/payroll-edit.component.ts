@@ -72,6 +72,8 @@ export class PayrollEditComponent {
 
   salaryHeadList: any;
   selected_Company_id: any;
+  incomingPayroll: any;
+  incomingPayrollData: any;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -85,19 +87,19 @@ export class PayrollEditComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['payroll'] && changes['payroll'].currentValue) {
-      const incomingPayroll = changes['payroll'].currentValue;
-
+      this.incomingPayrollData = changes['payroll'].currentValue;
+      console.log(this.incomingPayrollData, 'INCOMINGPAYROLLDATA');
       // Update the payRollData object with the incoming payroll
       this.payRollData = {
-        ...incomingPayroll,
-        PAY_DETAILS: incomingPayroll.DATA.map((detail, index) => ({
+        ...this.incomingPayrollData,
+        PAY_DETAILS: this.incomingPayrollData.DATA.map((detail, index) => ({
           ...detail,
           SNO: index + 1,
           GROSS_AMOUNT: parseFloat(detail.GROSS_AMOUNT) || 0,
           DEDUCTION_AMOUNT: parseFloat(detail.DEDUCTION_AMOUNT) || 0,
         })),
       };
-      this.calculateGross();
+      // this.calculateGross();
     }
   }
 
@@ -227,17 +229,32 @@ export class PayrollEditComponent {
   }
 
   getSalaryHeadList() {
-    if (!this.selected_Company_id) {
-      console.warn('Company ID not available');
-      return;
-    }
+    if (!this.selected_Company_id) return;
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
     };
+
     this.dataService
       .get_salary_head_list(payload)
       .subscribe((response: any) => {
         this.salaryHeadList = response.Data;
+
+        //  NOW bind data AFTER lookup is ready
+        if (this.incomingPayrollData) {
+          this.payRollData = {
+            ...this.incomingPayrollData,
+            PAY_DETAILS: this.incomingPayrollData.DATA.map((detail, index) => ({
+              ...detail,
+              HEAD_ID: detail.HEAD_ID, // ensure explicit
+              SNO: index + 1,
+              GROSS_AMOUNT: parseFloat(detail.GROSS_AMOUNT) || 0,
+              DEDUCTION_AMOUNT: parseFloat(detail.DEDUCTION_AMOUNT) || 0,
+            })),
+          };
+
+          this.calculateGross();
+        }
       });
   }
   update() {
