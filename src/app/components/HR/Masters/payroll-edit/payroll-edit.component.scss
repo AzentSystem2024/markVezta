@@ -1,8 +1,16 @@
-::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar {
-  min-height: 91px;
-  align-items: center;
-}
+// ::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar {
+//   min-height: 91px;
+//   align-items: center;
+// }
 
+::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar {
+  height: auto !important;
+  min-height: 100px; /* increase */
+  align-items: flex-start;
+}
+.ot-hours-container {
+  margin-top: 50px; /* adjust as needed */
+}
 ::ng-deep
   .salary-grid-wrapper
   .dx-datagrid
@@ -14,7 +22,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px; /* space between the two date pickers */
-  margin-bottom: 50px;
+  // margin-bottom: 50px;
 }
 
 .form-popup-buttons-container {

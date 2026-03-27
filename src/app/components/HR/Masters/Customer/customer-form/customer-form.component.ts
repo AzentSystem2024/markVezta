@@ -1,4 +1,10 @@
-import { Component, NgModule, enableProdMode, OnInit } from '@angular/core';
+import {
+  Component,
+  NgModule,
+  enableProdMode,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.component';
@@ -29,6 +35,7 @@ import { AuthService, DataService } from 'src/app/services';
   styleUrls: ['./customer-form.component.scss'],
 })
 export class CustomerFormComponent {
+  @ViewChild('mobileBoxRef', { static: false }) mobileBoxRef: any;
   CountryDropdownData: any;
   VATRuleDropdownData: any[] = [];
   Warehouse: any[] = [];
@@ -84,7 +91,6 @@ export class CustomerFormComponent {
     CUSTOMER_TYPE: 0,
     WAREHOUSE_ID: 0,
     CUST_TYPE: 0,
-
     DEALER_TYPE: 0,
     DEALER_ID: 0,
     DeliveryAddresses: [],
@@ -146,6 +152,9 @@ export class CustomerFormComponent {
     this.service.get_mobile_no_length(payload).subscribe((res: any) => {
       this.mobile_limit_Delivery_Address = Number(res.Data[0].MOBILE_DIGITS);
     });
+    setTimeout(() => {
+      this.mobileBoxRef?.instance?.validate();
+    });
   }
   newCustomer = this.formCustomerData;
 
@@ -168,6 +177,9 @@ export class CustomerFormComponent {
     return {
       ...this.newCustomer,
       DeliveryAddresses: this.savedAddresses,
+      MOBILE_NO: this.countryCode + '-' + this.mobileNumber,
+      PHONE: this.PhonenumberCode + '-' + this.newCustomer.PHONE,
+
       // DELIVERY_ADDRESS: deliveryAddressArray,
     };
   };
@@ -371,6 +383,7 @@ export class CustomerFormComponent {
       this.MobileValue = '';
       this.locationValue = '';
       this.phoneValue = '';
+      this.countryCodeDeliveryaddress = '';
     }
   }
 
@@ -390,9 +403,12 @@ export class CustomerFormComponent {
   editAddress(i: number) {
     const addr = this.savedAddresses[i];
 
+    const [countryCodephone, phonenumber] = addr.MOBILE.split('-');
+
     // Fill form fields
     this.Address1Value = addr.ADDRESS1;
-    this.MobileValue = addr.MOBILE;
+    this.MobileValue = phonenumber;
+    this.countryCodeDeliveryaddress = countryCodephone;
     this.locationValue = addr.LOCATION;
     this.phoneValue = addr.PHONE;
 
@@ -440,10 +456,11 @@ export class CustomerFormComponent {
   }
   validateMobileLengthdeliveryaddress = (e: any): boolean => {
     const value = (e.value || '').trim();
+    if (!value) return true;
 
-    if (!this.mobile_limit) return false;
+    if (!this.mobile_limit_Delivery_Address) return false;
 
-    return value.length === this.mobile_limit;
+    return value.length === this.mobile_limit_Delivery_Address;
   };
 }
 @NgModule({
