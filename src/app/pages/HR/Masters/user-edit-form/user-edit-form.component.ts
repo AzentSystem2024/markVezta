@@ -133,6 +133,7 @@ export class UserEditFormComponent {
   showUserDetails: boolean = true; // Show User Details by default
   showOptions: boolean = true; // Show Options by default
   selectedUserType: string = this.userTypes[0]; // Default to 'Normal User'
+  mobile_limit: any;
 
   //dateformat options
 
@@ -181,6 +182,11 @@ export class UserEditFormComponent {
         ...changes['selectedRowData'].currentValue,
       };
     }
+    const MobileNo = this.selectedRowData.MOBILE;
+
+    const [countryCode, number] = MobileNo.split('-');
+    this.countryCode = countryCode;
+    this.newUserData.MOBILE = number;
     this.user_role_dropdown();
     this.get_Company_details();
     this.updateMobileNumber();
@@ -630,11 +636,19 @@ export class UserEditFormComponent {
         // You can show an error message to the user here
       });
   }
-
+  onCountrycodeChange(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
   Update_data() {
     const payload = {
       ...this.newUserData,
       COMPANY_ID: this.selectedRows,
+      MOBILE: this.countryCode + '-' + this.newUserData.MOBILE,
     };
 
     this.dataservice.Update_user_data(payload).subscribe((res: any) => {
@@ -643,6 +657,14 @@ export class UserEditFormComponent {
       this.get_userlist();
     });
   }
+  validateMobileLength = (e: any): boolean => {
+    const value = e.value || '';
+
+    // Allow only digits
+    const digitsOnly = value.replace(/\D/g, '');
+
+    return digitsOnly.length === this.mobile_limit;
+  };
 }
 
 @NgModule({

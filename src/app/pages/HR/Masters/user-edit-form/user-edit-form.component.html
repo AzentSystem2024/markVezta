@@ -89,6 +89,7 @@
               (onValueChanged)="updateMobileNumber()"
               (onOpened)="onDropdownOpened()"
               (onClosed)="onDropdownClosed()"
+              (onValueChanged)="onCountrycodeChange($event)"
             >
               <!-- Custom template for the dropdown list items -->
               <div *dxTemplate="let data of 'item'">
@@ -126,8 +127,10 @@
                 ></dxi-validation-rule>
                 <dxi-validation-rule
                   type="custom"
-                  message="Mobile no. must be at least 10 digits long"
-                  [validationCallback]="MobileNumberValidate"
+                  [validationCallback]="validateMobileLength"
+                  [message]="
+                    'Mobile no. must be  ' + mobile_limit + ' digits long'
+                  "
                 ></dxi-validation-rule>
               </dx-validator>
             </dx-text-box>
@@ -149,8 +152,10 @@
               ></dxi-validation-rule>
               <dxi-validation-rule
                 type="custom"
-                message="Mobile no. must be at least 10 digits long"
-                [validationCallback]="WhatsappValidate"
+                [validationCallback]="validateMobileLength"
+                [message]="
+                  'Mobile no. must be  ' + mobile_limit + ' digits long'
+                "
               ></dxi-validation-rule>
             </dx-validator>
           </dx-text-box>

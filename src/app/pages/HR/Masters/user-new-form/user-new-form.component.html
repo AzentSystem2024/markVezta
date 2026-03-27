@@ -114,7 +114,7 @@
               labelMode="floating"
               [valueChangeEvent]="'input'"
               (input)="onMobileInputChange($event)"
-              [maxLength]="mobile_limit + newUserData.countryCode.length"
+              [maxLength]="mobile_limit"
             >
               <dx-validator>
                 <dxi-validation-rule
@@ -123,12 +123,10 @@
                 ></dxi-validation-rule>
                 <dxi-validation-rule
                   type="custom"
+                  [validationCallback]="validateMobileLength"
                   [message]="
-                    'Mobile no. must be at least ' +
-                    mobile_limit +
-                    ' digits long'
+                    'Mobile no. must be  ' + mobile_limit + ' digits long'
                   "
-                  [validationCallback]="MobileNumberValidate"
                 ></dxi-validation-rule>
               </dx-validator>
             </dx-text-box>
@@ -150,8 +148,10 @@
               ></dxi-validation-rule>
               <dxi-validation-rule
                 type="custom"
-                message="Mobile no. must be at least 10 digits long"
-                [validationCallback]="WhatsappValidate"
+                [validationCallback]="validateMobileLength"
+                [message]="
+                  'Mobile no. must be  ' + mobile_limit + ' digits long'
+                "
               ></dxi-validation-rule>
             </dx-validator>
           </dx-text-box>

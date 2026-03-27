@@ -157,7 +157,7 @@ export class UserNewFormComponent {
   // Use this function to display based on dropdown state
   countryDisplay(item: any) {
     if (!item) return '';
-    return `${item.CODE}`;
+    return `${item.CODE}${item.COUNTRY_NAME}`;
   }
 
   ngOnInit(): void {
@@ -653,10 +653,18 @@ export class UserNewFormComponent {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
 
+  validateMobileLength = (e: any): boolean => {
+    const value = e.value || '';
+
+    // Allow only digits
+    const digitsOnly = value.replace(/\D/g, '');
+
+    return digitsOnly.length === this.mobile_limit;
+  };
   getOnlyMobileNumber(fullPhoneNumber: string): string {
     // Extract mobile number by removing the dial code part
     const selectedCountry = this.countryCodes.find((code) =>
@@ -700,6 +708,7 @@ export class UserNewFormComponent {
   getNewUserData = () => ({
     ...this.newUserData,
     COMPANY_ID: this.selectedRows,
+    Mobile: this.newUserData.countryCode + '-' + this.newUserData.Mobile,
   });
 }
 

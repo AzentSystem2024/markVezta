@@ -214,34 +214,41 @@ export class StateListComponent {
         }
       });
   }
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
     const { ID, STATE_CODE, STATE_NAME, COUNTRY_ID } = selectedRow;
 
-    this.dataservice
-      .removeState(ID, STATE_CODE, STATE_NAME, COUNTRY_ID)
-      .subscribe(() => {
-        try {
-          // Your delete logic here
-          notify(
-            {
-              message: 'Delete operation successful',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.dataGrid.instance.refresh();
-          this.showState();
-        } catch (error) {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice
+        .removeState(ID, STATE_CODE, STATE_NAME, COUNTRY_ID)
+        .subscribe({
+          next: () => {
+            notify(
+              {
+                message: 'Delete operation successful',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+            );
+
+            this.dataGrid.instance.refresh();
+            this.showState();
+
+            resolve(false); // ✅ allow delete → popup closes
+          },
+          error: () => {
+            notify(
+              {
+                message: 'Delete operation failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+
+            resolve(true); // ❌ cancel delete → popup stays
+          },
+        });
+    });
   }
   //  onRowUpdating (event) {
   //     const updataDate = event.newData;
