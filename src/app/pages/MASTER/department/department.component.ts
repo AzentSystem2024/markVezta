@@ -80,6 +80,9 @@ export class DepartmentComponent {
     text: '',
   };
   isFilterOpened: boolean = false;
+  sessionData: any;
+  COMPANY_ID: string;
+  COMPANY_NAME: any;
 
   constructor(
     private fb: FormBuilder,
@@ -90,7 +93,9 @@ export class DepartmentComponent {
       CODE: ['', Validators.required],
       DEPT_NAME: ['', Validators.required],
       IS_ACTIVE: [false],
+      COMPANY_ID: ['',Validators.required]
     });
+    this.sesstion_Details();
     this.get_Department_List();
   }
 
@@ -166,10 +171,20 @@ export class DepartmentComponent {
     });
   }
 
+   sesstion_Details() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
+    this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
+    }
+
+    
   //===================get data list========================
   get_Department_List() {
+    const payload = {
+      COMPANY_ID : this.COMPANY_ID
+    }
     this.isLoading = true;
-    this.dataservice.get_Department_List().subscribe((res: any) => {
+    this.dataservice.get_Department_List(payload).subscribe((res: any) => {
       if (res) {
         this.Department = res.datas.map((item: any, index: any) => ({
           ...item,
@@ -187,6 +202,7 @@ export class DepartmentComponent {
     console.log(CODE, 'code');
     const DEPT_NAME = this.formsource.value.DEPT_NAME;
     const IS_ACTIVE = this.formsource.value.IS_ACTIVE;
+    const COMPANY_ID = this.COMPANY_ID
 
     this.formsource.reset();
 
@@ -214,7 +230,7 @@ export class DepartmentComponent {
 
     if (CODE && DEPT_NAME) {
       this.dataservice
-        .Insert_Department_Api(CODE, DEPT_NAME, IS_ACTIVE)
+        .Insert_Department_Api(CODE, DEPT_NAME, IS_ACTIVE,COMPANY_ID)
         .subscribe((response) => {
           notify(
             {
@@ -250,6 +266,7 @@ export class DepartmentComponent {
     const DEPT_NAME = this.editingRowData.DEPT_NAME;
     const IS_ACTIVE = this.editingRowData.IS_ACTIVE;
     const ID = this.editingRowData.ID;
+    const COMPANY_ID = this.COMPANY_ID
 
     console.log(CODE, DEPT_NAME, IS_ACTIVE, 'code deptname');
     console.log(ID, 'id');
@@ -285,7 +302,7 @@ export class DepartmentComponent {
 
     if (CODE && DEPT_NAME) {
       this.dataservice
-        .Update_Department_Api(ID, CODE, DEPT_NAME, IS_ACTIVE)
+        .Update_Department_Api(ID, CODE, DEPT_NAME, IS_ACTIVE,COMPANY_ID)
         .subscribe((response: any) => {
           notify(
             {

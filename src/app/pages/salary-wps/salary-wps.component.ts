@@ -64,7 +64,6 @@ export class SalaryWPSComponent {
 
   employees: any[] = [];
   auto: string = 'auto';
-  currency: string = 'AED';
   Department: any;
 select_department_id: any;
  isFilterRowVisible: boolean = false;
@@ -90,8 +89,11 @@ years: number[] = [];
   ];
   labour_id: string;
   bankCode: string;
+  currencyname: any;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) {
+    
+  }
 
   // 🔹 Button click
   onShowClick() {
@@ -99,6 +101,7 @@ years: number[] = [];
   }
 
   ngOnInit(){
+    console.log('calling')
 
     const today = new Date();
     this.selectedMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); // Previous month
@@ -109,6 +112,37 @@ years: number[] = [];
     });
     this.selectedYear = this.selectedMonth.getFullYear();
 
+     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+
+    const payload = {
+    NAME : 'DEPT',
+    COMPANY_ID : this.selected_Company_id
+  };
+
+  console.log('Payload:', payload);
+
+  this.dataService.Common_Dropdown(payload).subscribe(
+    (res: any) => {
+      console.log(' API Response:', res);
+      this.Department = res.data || res;
+    },
+    (err) => {
+      console.error(' API Error:', err);
+    }
+  );
+
+
+  const payload1 ={
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.get_PaySettingsList(payload1).subscribe((res: any) => {
+      this.PaySettings = res.data;
+      this.labour_id = String(this.PaySettings.UQ_LABOUR_ID);
+      this.bankCode = String(this.PaySettings.BANK_CODE)
+      console.log(this.PaySettings)
+    });
     this.sesstion_Details();
     this.Department_dropdown();
     this.get_PaySettingsList();
@@ -130,6 +164,7 @@ years: number[] = [];
   }
 
   sesstion_Details() {
+    console.log('session calling')
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -137,6 +172,7 @@ years: number[] = [];
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     const sessionYear = sessionData.FINANCIAL_YEARS;
     this.financialYeaDate = sessionYear[0].DATE_FROM;
+    this.currencyname = sessionData.GeneralSettings.CURRENCY_NAME
 
     this.formatted_from_date = this.financialYeaDate;
   }
@@ -258,15 +294,26 @@ years: number[] = [];
     this.calendarVisible = false;
   }
 
-    Department_dropdown(){
- const payload = {
-      NAME : 'DEPT',
-      COMPANY_ID : this.selected_Company_id
+   Department_dropdown(){
+  console.log('🔥 Department dropdown triggered');
+
+  const payload = {
+    NAME : 'DEPT',
+    COMPANY_ID : this.selected_Company_id
+  };
+
+  console.log('Payload:', payload);
+
+  this.dataService.Common_Dropdown(payload).subscribe(
+    (res: any) => {
+      console.log(' API Response:', res);
+      this.Department = res.data || res;
+    },
+    (err) => {
+      console.error(' API Error:', err);
     }
-    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-      this.Department = res;
-    });
-  }
+  );
+}
 
   
   // 🔹 Load employees from API (example)
@@ -386,7 +433,7 @@ console.log('File content:', rows);
       fileTime,
       totalEmployees,
       Math.round(totalSalary),
-      this.currency
+      this.currencyname
     ].join(',');
 
     rows.push(scrRow);

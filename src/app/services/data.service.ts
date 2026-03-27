@@ -3969,30 +3969,32 @@ The result can be exported to HTML or Markdown.`;
 
   //---------------HR Masters-----------------
 
-  get_Department_List() {
+  get_Department_List(payload) {
     const getEndpoint = this.apiUrl + 'Department/list';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, payload);
   }
 
   //===============Add Api=========================
-  Insert_Department_Api(CODE: any, DEPT_NAME: any, IS_ACTIVE: boolean) {
+  Insert_Department_Api(CODE: any, DEPT_NAME: any, IS_ACTIVE: boolean,COMPANY_ID:any) {
     const getEndpoint = this.apiUrl + 'Department/save';
     const reqBody = {
       CODE: CODE,
       DEPT_NAME: DEPT_NAME,
       IS_ACTIVE: IS_ACTIVE,
+      COMPANY_ID : COMPANY_ID
     };
     return this.http.post(getEndpoint, reqBody);
   }
 
   //==============Update Api==============================
-  Update_Department_Api(ID: any, CODE: any, DEPT_NAME: any, IS_ACTIVE: any) {
+  Update_Department_Api(ID: any, CODE: any, DEPT_NAME: any, IS_ACTIVE: any,COMPANY_ID:any) {
     const getEndpoint = this.apiUrl + 'Department/edit';
     const reqBody = {
       ID: ID,
       CODE: CODE,
       DEPT_NAME: DEPT_NAME,
       IS_ACTIVE: IS_ACTIVE,
+      COMPANY_ID : COMPANY_ID
     };
 
     return this.http.post(getEndpoint, reqBody);

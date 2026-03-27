@@ -427,7 +427,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       const parts = suppMobile.split('-');
 
       if (parts.length === 2) {
-        this.supplierCountryCode = '+' + parts[0];
+        this.supplierCountryCode = parts[0];
         // this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
         this.newPoData.SUPP_MOBILE = parts[1];
       }

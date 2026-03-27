@@ -64,7 +64,7 @@ export class PayrollListComponent {
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
   payrollList: any;
-  CompanyID = 1;
+  // CompanyID = 1;
   canAdd = false;
   canEdit = false;
   canView = false;
@@ -242,6 +242,7 @@ export class PayrollListComponent {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
+    this.getPayrollList();
   }
 
   toggleFilters() {
@@ -487,7 +488,7 @@ export class PayrollListComponent {
 
   getPayrollList() {
     const payload = {
-      COMPANY_ID: this.CompanyID,
+      COMPANY_ID: this.selectedCompanyId,
     };
 
     this.dataService.getPayrollList(payload).subscribe((response: any) => {
