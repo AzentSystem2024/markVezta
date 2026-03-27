@@ -41,7 +41,7 @@
           *ngIf="selectedTabData"
           class="grid theme-dependent mt-3"
           noDataText=""
-          [height]="'58vh'"
+          [height]="'65vh'"
           [dataSource]="selectedTabData"
           keyExpr="MenuId"
           [allowColumnResizing]="true"
@@ -75,7 +75,7 @@
           >
           </dxi-column>
 
-          <dxi-column
+          <!-- <dxi-column
             dataField="CanView"
             caption="View"
             [width]="80"
@@ -84,7 +84,7 @@
             [allowSorting]="false"
             [showEditorAlways]="true"
           >
-          </dxi-column>
+          </dxi-column> -->
 
           <dxi-column
             dataField="CanEdit"

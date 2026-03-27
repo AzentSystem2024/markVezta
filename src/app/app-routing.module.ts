@@ -152,6 +152,8 @@ import { MiscellaneousInvoiceComponent } from './pages/OPERATIONS/miscellaneous-
 import { MiscellaneousPurchaseComponent } from './pages/OPERATIONS/miscellaneous-purchase/miscellaneous-purchase.component';
 import { PDCReportComponent } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
 import { PrepaymentPostingReportComponent } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
+import { SalaryWPSComponent } from './pages/salary-wps/salary-wps.component';
+import { PaySettingsComponent } from './pages/HR/Masters/pay-settings/pay-settings.component';
 import { DepartmentMeComponent } from './pages/MASTER/department-me/department-me.component';
 
 const routes: Routes = [
@@ -170,6 +172,9 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
+  
+     
+
   {
     path: 'auth',
     component: UnauthenticatedContentComponent,
@@ -960,6 +965,18 @@ const routes: Routes = [
         component: PrepaymentPostingReportComponent,
         canActivate: [AuthGuardService],
       },
+      {
+        path: 'pay-settings',
+        component: PaySettingsComponent,
+        canActivate: [AuthGuardService],
+      },
+
+      {
+        path: 'salary-wps',
+        component: SalaryWPSComponent,
+        canActivate: [AuthGuardService],
+      },
+      
       {
         path: '**',
         redirectTo: 'login',

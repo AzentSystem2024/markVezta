@@ -113,15 +113,21 @@ export class CustomerFormComponent {
   countryCodes: any;
   mobile_limit: any;
   MobilecountryCode: any;
+  countryCodeDeliveryaddress: any;
+  Phone_limit: number;
+  mobile_limit_Delivery_Address: number;
+
   constructor(
     private service: DataService,
     authservice: AuthService,
   ) {
     this.sesstion_Details();
+
     this.sessionData_tax();
     service.getCountryWithFlags().subscribe((data) => {
       this.countryCodes = data;
     });
+
     this.getStateDropDown();
   }
   onCountrycodeChange(e: any) {
@@ -129,16 +135,16 @@ export class CustomerFormComponent {
       COUNTRY_CODE: e.value,
     };
     this.service.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
 
-  onCountrycodeChangePhoneNocode(e: any) {
+  onCountrycodeChangeDeliveryAddress(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,
     };
     this.service.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+      this.mobile_limit_Delivery_Address = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
   newCustomer = this.formCustomerData;
@@ -166,14 +172,12 @@ export class CustomerFormComponent {
     };
   };
 
-  // addDeliveryAddress(address: string) {
-  //   if (address && address.trim() !== '') {
-  //     this.formCustomerData.DELIVERY_ADDRESS.push({
-  //       DELIVERY_ADDRESS: address,
-  //     });
-  //   }
-  // }
-
+  showCountry() {
+    this.service.getCountryDataAPi().subscribe((response) => {
+      this.CountryDropdownData = response;
+      console;
+    });
+  }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -286,20 +290,6 @@ export class CustomerFormComponent {
     const selectedCountry = this.CountryDropdownData.find(
       (country: any) => country.ID === this.selecte_countyId,
     );
-
-    // 4️⃣ If found, set code & name
-    if (selectedCountry) {
-      this.countryCode = selectedCountry.CODE; // e.g., '+971'
-      this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
-    } else {
-      // 5️⃣ Fallback if no country found
-      this.countryCode = '';
-      this.DEFAULT_COUNTRY_CODE = '';
-      console.warn(
-        '⚠️ No matching country found for ID:',
-        this.selecte_countyId,
-      );
-    }
   }
 
   onStateSelectionChanged(event: any) {}
@@ -307,7 +297,7 @@ export class CustomerFormComponent {
     this.get_Country_Dropdown_List();
     this.getDealerDropDown();
     this.getPaymentTerms();
-    // this.showCountry();
+    this.showCountry();
     this.getVATRuleDropDown();
     this.getStateDropDown();
     this.getPriceLevelDropDown();
@@ -358,7 +348,7 @@ export class CustomerFormComponent {
     ) {
       const newAddress = {
         ADDRESS1: this.Address1Value,
-        MOBILE: this.MobileValue,
+        MOBILE: this.countryCodeDeliveryaddress + '-' + this.MobileValue,
         LOCATION: this.locationValue,
         PHONE: this.phoneValue,
       };
@@ -425,6 +415,36 @@ export class CustomerFormComponent {
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }
+  validateMobileLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.mobile_limit) return false;
+
+    return value.length === this.mobile_limit;
+  };
+  validatePhoneLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.Phone_limit) return false;
+
+    return value.length === this.Phone_limit;
+  };
+
+  onCountrycodeChangePhoneNocode(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+  validateMobileLengthdeliveryaddress = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.mobile_limit) return false;
+
+    return value.length === this.mobile_limit;
+  };
 }
 @NgModule({
   imports: [

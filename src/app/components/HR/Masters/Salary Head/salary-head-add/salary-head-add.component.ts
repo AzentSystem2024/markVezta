@@ -85,17 +85,23 @@ export class SalaryHeadAddComponent {
     RANGE_EXISTS: false,
     RANGE_FROM: 0,
     RANGE_TO: 0,
+    IS_TIMESHEET_ENTRY: false,
   };
+  is_time_entry: boolean = false;
 
   priorities = [
     { id: 1, name: 'Allowance' },
     { id: 2, name: 'Deduction' },
     { id: 3, name: 'Advance' },
   ];
+  RequlerOrpaytime = [
+    { name: 'Regular Salary', value: 1 },
+    { name: 'Paytime Entry', value: 2 },
+  ];
   // selectedPriority  = this.priorities[0];
   // // or set by id
   selectedPriority = this.priorities.find((p) => p.id === 1);
-
+  selectedPaytime = this.RequlerOrpaytime.find((p) => p.value === 1);
   salaryHeadTypes = [{ label: 'Fixed Amount', value: 'fixed' }];
   salaryHeadTypes2 = [{ label: '', value: 'percentage' }];
   salaryHeadTypes3 = [{ label: 'Others', value: 'others' }];
@@ -105,7 +111,7 @@ export class SalaryHeadAddComponent {
   // selectedType:any
   selectedType: any;
   selectedRows: any[];
-  salaryHeadList: any;
+  salaryHeadList: any = [];
   payload: {
     COMPANY_ID: any;
     HEAD_NATURE: any;
@@ -125,6 +131,7 @@ export class SalaryHeadAddComponent {
     RANGE_EXISTS: boolean;
     RANGE_FROM: number;
     RANGE_TO: number;
+    IS_TIMESHEET_ENTRY: boolean;
   };
   selected_Company_id: any;
 
@@ -391,6 +398,7 @@ export class SalaryHeadAddComponent {
           HEAD_NATURE: this.selectedNatureId,
           FIXED_AMOUNT: 0,
           HEAD_TYPE: this.HeadType_value || 1,
+          IS_TIMESHEET_ENTRY: this.is_time_entry,
         };
       } else {
         this.payload = {
@@ -398,30 +406,32 @@ export class SalaryHeadAddComponent {
           COMPANY_ID: this.selected_Company_id,
           HEAD_NATURE: this.selectedNatureId,
           HEAD_TYPE: this.HeadType_value || 1,
+          IS_TIMESHEET_ENTRY: this.is_time_entry,
         };
       }
-      this.dataservice
-        .Add_salary_Head_api(this.payload)
-        .subscribe((res: any) => {
-          this.getSalaryHeadList();
-          notify(
-            {
-              message: 'Salary Head added successfully ',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
+      console.log(this.payload, '---------save payload------------------');
+      const data = this.payload;
 
-          this.formClosed.emit();
-          setTimeout(() => {
-            this.SalaryHeadValidation?.instance?.reset();
-          });
-          this.selectedRows = [];
-          this.selectedNatureId = null;
-          // this.selectedPriority = this.priorities.find(p => p.id === 1)
-          this.selectedPriority;
-          this.resetForm();
+      this.dataservice.Add_salary_Head_api(data).subscribe((res: any) => {
+        this.getSalaryHeadList();
+        notify(
+          {
+            message: 'Salary Head added successfully ',
+            position: { at: 'top center', my: 'top center' },
+          },
+          'success',
+        );
+
+        this.formClosed.emit();
+        setTimeout(() => {
+          this.SalaryHeadValidation?.instance?.reset();
         });
+        this.selectedRows = [];
+        this.selectedNatureId = null;
+        // this.selectedPriority = this.priorities.find(p => p.id === 1)
+        this.selectedPriority;
+        this.resetForm();
+      });
     }
   }
 
@@ -444,6 +454,7 @@ export class SalaryHeadAddComponent {
       RANGE_EXISTS: false,
       RANGE_FROM: 0,
       RANGE_TO: 0,
+      IS_TIMESHEET_ENTRY: false,
     };
 
     // Reset to default priority (Allowance)
@@ -471,35 +482,6 @@ export class SalaryHeadAddComponent {
     this.selectedPriority = this.priorities.find((p) => p.id === 1); // Reset to Allowance
     this.HeadType_value = 1;
   }
-  // resetForm(){
-  //    this.SalaryHeadData={
-  //       HEAD_NAME: "",
-  //       PAYSLIP_TITLE: "",
-  //       HEAD_ACTIVE: true,
-  //       HEAD_TYPE: 1,
-  //       INSTALLMENT_RECOVERY:false,
-  //       HEAD_PERCENT_INCLUDE_OT: true,
-  //       IS_INACTIVE: false,
-  //       AFFECT_LEAVE: false,
-  //       AC_HEAD_ID:0,
-  //       HEAD_ORDER:0,
-  //       HEAD_NATURE:0,
-  //       FIXED_AMOUNT:0,
-  //       HEAD_PERCENT:0,
-  //       PERCENT_HEAD_ID:[],
-  //       RANGE_EXISTS:false,
-  //       RANGE_FROM:0,
-  //       RANGE_TO:0,
-  //      }
-  //          setTimeout(() => {
-  //       this.SalaryHeadValidation?.instance?.reset();
-  //     });
-  //   this.selectedRows = [];
-  //   this.selectedNatureId = null;
-  //   // this.selectedPriority = this.priorities.find(p => p.id === 1);
-
-  // }
-  //==================ac head dropdown========================
   onChangeAc_head(event: any) {}
 
   //=====cancel==============================
@@ -512,6 +494,11 @@ export class SalaryHeadAddComponent {
       this.SalaryHeadValidation?.instance?.reset();
     });
     this.selectedRows = [];
+  }
+  onRequlerOrpaytimeChanged(e: any) {
+    console.log(e.value); // true or false
+
+    this.is_time_entry = e.value === 2;
   }
 }
 

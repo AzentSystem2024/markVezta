@@ -67,6 +67,13 @@ export class CompanyMasterComponent {
   state: any;
   selected_Company_id: any;
   isSaving = false;
+  mobile_limit: any;
+  countryCodes: any;
+  countryCodephone: any;
+  countryCodemobile: any;
+  countryCodewhatsapp: any;
+  Phone_limit: number;
+  whatsapp_limit: number;
 
   constructor(
     private fb: FormBuilder,
@@ -97,6 +104,10 @@ export class CompanyMasterComponent {
     });
     this.get_Company_List();
     this.get_Company_Dropdown_List();
+
+    this.dataservice.getCountryWithFlags().subscribe((data) => {
+      this.countryCodes = data;
+    });
   }
 
   // getStatusFlagClass(IS_INACTIVE: boolean): string {
@@ -459,27 +470,6 @@ export class CompanyMasterComponent {
       CIN: CIN,
     };
 
-    //   const isDuplicate = this.Datasource?.some((data: any) => {
-    //     const existingId = data.ID;
-
-    //   const existingCode = data.COMPANY_CODE?.toString().trim().toLowerCase();
-    //   const existingName = data.COMPANY_NAME?.toString().trim().toLowerCase();
-    //   return existingCode === Company_code || existingName === Company_name &&
-    //     existingId !== Id;
-    // });
-
-    // if (isDuplicate) {
-    //   notify(
-    //     {
-    //       message: 'Data already exists',
-    //       position: { at: 'top right', my: 'top right' },
-    //       displayTime: 1000,
-    //     },
-    //     'error'
-    //   );
-    //   return;
-    // }
-
     if (Company_code && Company_name && Company_type) {
       this.isSaving = true;
       this.dataservice.Update_CompanyList_Api(payload).subscribe(
@@ -554,6 +544,59 @@ export class CompanyMasterComponent {
   onExporting(event: any) {
     const fileName = 'company';
     this.dataservice.exportDataGrid(event, fileName);
+  }
+
+  onCountrycodeChangePhone(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+  onCountrycodeChangeWhatsapp(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.whatsapp_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+  onCountrycodeChangeMobile(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+  validateMobileLength = (e: any): boolean => {
+    const value = e.value;
+
+    // ✅ Skip validation if empty
+    if (!value) return true;
+
+    return value.length === this.mobile_limit;
+  };
+  validatePhoneLength = (e: any): boolean => {
+    const value = e.value;
+
+    // ✅ Skip validation if empty
+    if (!value) return true;
+
+    return value.length === this.Phone_limit;
+  };
+  validateWhatsAppLength = (e: any): boolean => {
+    const value = e.value;
+
+    // ✅ Skip validation if empty
+    if (!value) return true;
+
+    return value.length === this.whatsapp_limit;
+  };
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}${item.COUNTRY_NAME}`;
   }
 }
 

@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   NgModule,
+  NgZone,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -40,6 +41,9 @@ import {
   ViewImportedItemsComponent,
   ViewImportedItemsModule,
 } from 'src/app/components/library/view-imported-items/view-imported-items.component';
+import { ImportItemTemplateFormComponent } from 'src/app/components/library/import-item-template-form/import-item-template-form.component';
+import DataSource from 'devextreme/data/data_source';
+import { DxLoadPanelModule } from 'devextreme-angular';
 @Component({
   selector: 'app-import-items',
   templateUrl: './import-items.component.html',
@@ -53,7 +57,19 @@ import {
 export class ImportItemsComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-  datasource: any[] = [];
+  @ViewChild(ImportItemTemplateFormComponent)
+  itemComponent!: ImportItemTemplateFormComponent;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showHeaderFilter: true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
+  datasource!: DataSource;
+  rawData: any[] = [];
   itemTemplateData: any;
   selectedData: any;
   columns: any[];
@@ -66,10 +82,72 @@ export class ImportItemsComponent implements OnInit {
   selectedRange: { from: any; to: any } = { from: null, to: null };
   isDateRangePopupVisible: boolean = false;
   selectedId: any;
-  constructor(
-    private service: DataService,
-    private cd: ChangeDetectorRef,
-  ) {}
+  companyState: any;
+  companyStateID: any;
+  GST: any;
+  HSNCODE: any;
+  selectedCompanyId: any;
+  companyList: any[];
+  userID: any;
+  finID: any;
+  popupReady = false;
+  isSaving = false;
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new template',
+    onClick: () => {
+      this.ngZone.run(() => this.openImportItems());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  importButtonOptions = {
+    icon: 'download',
+    hint: 'Import',
+    onClick: () => this.triggerFileInput(),
+  };
+  saveButtonOptions = {
+    text: 'Save',
+    hint: 'Save',
+    elementAttr: {
+      class: 'custom-button',
+    },
+    onClick: () => {
+      this.saveData();
+    },
+  };
 
   dateRanges = [
     { label: 'Yesterday', value: 'yesterday' },
@@ -81,6 +159,29 @@ export class ImportItemsComponent implements OnInit {
   ];
 
   defaultDateRange = 'currentMonth';
+
+  constructor(
+    private service: DataService,
+    private cd: ChangeDetectorRef,
+    private ngZone: NgZone,
+  ) {}
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+  }
 
   onDateRangeChanged(event: any) {
     if (event.value === 'range') {
@@ -146,6 +247,7 @@ export class ImportItemsComponent implements OnInit {
       this.isDateRangePopupVisible = false;
     }
   }
+
   clearDateRange() {
     this.selectedRange.from = null;
     this.selectedRange.to = null;
@@ -159,21 +261,6 @@ export class ImportItemsComponent implements OnInit {
     this.getItemImportLog();
   }
 
-  importButtonOptions = {
-    icon: 'download',
-    hint: 'Import',
-    onClick: () => this.triggerFileInput(),
-  };
-  saveButtonOptions = {
-    text: 'Save',
-    hint: 'Save',
-    elementAttr: {
-      class: 'custom-button',
-    },
-    onClick: () => {
-      this.saveData();
-    },
-  };
   saveData() {
     // Reset the validation flag before checking
     let hasErrors = false;
@@ -182,14 +269,14 @@ export class ImportItemsComponent implements OnInit {
     this.columns.forEach((col) => {
       this.dataGrid.instance.columnOption(col.dataField, 'cssClass', null);
     });
-
     // Check each item for validation errors
-    this.datasource.forEach((item) => {
+    this.rawData.forEach((item) => {
       this.columns.forEach((col) => {
         const value = item[col.dataField];
         // Check for mandatory fields
         if (col.isMandatory && !value) {
           hasErrors = true; // Set flag to indicate error
+          console.log(`Error: ${col.dataField} is mandatory but empty`);
           this.dataGrid.instance.columnOption(
             col.dataField,
             'cssClass',
@@ -199,6 +286,9 @@ export class ImportItemsComponent implements OnInit {
         // Check for max length
         if (value && value.length > col.maxLength) {
           hasErrors = true; // Set flag to indicate error
+          console.log(
+            `Error: Value for ${col.dataField} exceeds max length of ${col.maxLength}`,
+          );
           this.dataGrid.instance.columnOption(
             col.dataField,
             'cssClass',
@@ -220,7 +310,7 @@ export class ImportItemsComponent implements OnInit {
     }
 
     // Proceed with data transformation if no errors
-    const transformedData = this.datasource.map((item) => ({
+    const transformedData = this.rawData.map((item) => ({
       ITEM_CODE: item.ItemCode,
       BARCODE: item.Barcode,
       DESCRIPTION: item.Description,
@@ -247,6 +337,7 @@ export class ImportItemsComponent implements OnInit {
     }));
 
     // Now you can send transformedData to your API or wherever needed
+    console.log(transformedData);
 
     this.service.saveImportedData(transformedData).subscribe(
       (response) => {
@@ -283,39 +374,8 @@ export class ImportItemsComponent implements OnInit {
       },
     );
   }
+  
   close() {}
-
-  //   onCellPrepared(e) {
-  //     const column = this.columns.find(col => col.dataField === e.column.dataField);
-
-  //     if (column) {
-  //         const value = e.data[column.dataField];
-
-  //         // Reset styles for all cells first
-  //         e.cellElement.style.color = "";
-  //         e.cellElement.style.border = "";
-  //         e.cellElement.setAttribute("title",""); // Clear the title attribute
-
-  //         // Check for mandatory field first
-  //         if (column.isMandatory && !value) {
-  //             this.flag = 1; // Set flag to indicate error
-  //             e.cellElement.style.border = "2px solid #FFC1C3"; // Style for mandatory error
-  //             e.cellElement.style.color = "red"; // Color for mandatory error
-
-  //             // Create a tooltip for mandatory fields
-  //             this.createTooltip(e.cellElement, `Error: This field is required`);
-  //         }
-
-  //         // Check if the value exceeds the maximum length
-  //         if (value && value.length > column.maxLength) {
-  //             this.flag = 1; // Set flag to indicate error
-  //             e.cellElement.style.border = "2px solid #FFC1C3"; // Style for max length error
-
-  //             // Create a tooltip for max length
-  //             this.createTooltip(e.cellElement, `Error: Value exceeds maximum length of ${column.maxLength}`);
-  //         }
-  //     }
-  // }
 
   // Helper method to create and show tooltips
   private createTooltip(cellElement: HTMLElement, message: string) {
@@ -365,6 +425,8 @@ export class ImportItemsComponent implements OnInit {
         const headerData: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1 });
         const rowData: any[] = XLSX.utils.sheet_to_json(ws);
 
+        console.log('Row Data Length:', rowData.length);
+
         if (!Array.isArray(headerData[0])) {
           notify(
             {
@@ -379,12 +441,16 @@ export class ImportItemsComponent implements OnInit {
         }
 
         const excelColumnCount = headerData[0].length;
+        console.log('Excel Column Count:', excelColumnCount);
 
         const gridColumnCount = this.columns.length;
+        console.log('DataGrid Column Count:', gridColumnCount);
 
         const excelHeaders = headerData[0];
+        console.log('Excel Headers:', excelHeaders);
 
         const gridColumnHeaders = this.columns.map((col) => col.dataField);
+        console.log('DataGrid Headers:', gridColumnHeaders);
         if (
           excelColumnCount == gridColumnCount &&
           this.arraysMatch(excelHeaders, gridColumnHeaders)
@@ -435,6 +501,7 @@ export class ImportItemsComponent implements OnInit {
         }
 
         if (excelColumnCount !== gridColumnCount) {
+          console.log('Column counts do not match.');
           notify(
             {
               message:
@@ -451,8 +518,10 @@ export class ImportItemsComponent implements OnInit {
 
         // Set the parsed data as the DataGrid's data source
         this.dataGrid.instance.refresh();
-        this.datasource = rowData;
+        this.rawData = rowData;
         this.loadData();
+
+        console.log('Datasource loaded:', this.datasource);
       } catch (error) {
         notify(
           {
@@ -471,6 +540,7 @@ export class ImportItemsComponent implements OnInit {
   }
   loadData() {
     this.isDatasourceLoaded = true;
+    console.log(this.isDatasourceLoaded, 'boolean value');
     this.cd.detectChanges();
   }
   arraysMatch(arr1: any[], arr2: any[]): boolean {
@@ -488,12 +558,14 @@ export class ImportItemsComponent implements OnInit {
   }
 
   onTemplateValueChanged(event) {
+    console.log('event', event);
     // Clear the current data grid data
     this.clearDataGrid();
     this.resetFileInput();
 
     this.service.selectImportTemplateData(event.value).subscribe((res) => {
       this.selectedData = res.data[0];
+      console.log(this.selectedData, 'selected data in update columns');
       this.columns = this.selectedData.import_entry
         .filter((entry) => entry.SELECTED)
         .map((entry) => ({
@@ -501,11 +573,12 @@ export class ImportItemsComponent implements OnInit {
           maxLength: entry.MAX_LENGTH,
           isMandatory: entry.IS_MANDATORY,
         }));
+      console.log(this.columns, 'COLUMNSSSSS');
     });
   }
 
   clearDataGrid() {
-    this.datasource = [];
+    this.rawData = [];
     this.isDatasourceLoaded = false;
     this.cd.detectChanges();
   }
@@ -516,16 +589,63 @@ export class ImportItemsComponent implements OnInit {
     });
   }
   getItemImportLog() {
-    this.service.getImportLogData().subscribe((data) => {
-      this.datasource = data;
+    this.datasource = new DataSource({
+      load: () =>
+        new Promise((resolve, reject) => {
+          this.service.getImportLogData().subscribe({
+            next: (data: any[]) => {
+              this.rawData = data || []; // 🔥 keep array copy
+              resolve(this.rawData);
+            },
+            error: (err) => {
+              console.error('Error loading import log', err);
+              reject('Failed to load import log');
+            },
+          });
+        }),
     });
   }
-  viewDetails = (e) => {
-    this.selectedId = e.row.key.ID;
-    this.ViewImportItemsPopup = true;
+
+  viewDetails = (e: any) => {
+    this.ngZone.run(() => {
+      this.selectedId = e.row.data.ID;
+      this.popupReady = false;
+      this.ViewImportItemsPopup = true;
+    });
   };
 
+  onPopupShown() {
+    setTimeout(() => {
+      this.popupReady = true;
+    }, 0);
+  }
+
   ngOnInit(): void {
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      const selectedCompany = userData?.SELECTED_COMPANY;
+      console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
+      this.companyState = selectedCompany.STATE_NAME;
+      this.companyStateID = selectedCompany.STATE_ID;
+      console.log(this.companyStateID, 'COMPANYSTATE');
+      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
+      this.GST = userData.GeneralSettings.GST_PERC;
+      if (selectedCompany?.COMPANY_ID) {
+        this.selectedCompanyId = selectedCompany.COMPANY_ID;
+
+        this.companyList = [selectedCompany]; // Show only selected company
+      }
+
+      if (userData.USER_ID) {
+        this.userID = userData.USER_ID;
+      }
+
+      const firstFinYear = userData.FINANCIAL_YEARS?.[0];
+      if (firstFinYear?.FIN_ID) {
+        this.finID = firstFinYear.FIN_ID;
+      }
+    }
     this.getItemTemplateName();
     this.getItemImportLog();
     this.filterDataGrid('currentMonth');
@@ -547,6 +667,7 @@ export class ImportItemsComponent implements OnInit {
     DxDateBoxModule,
     DxiButtonModule,
     ViewImportedItemsModule,
+    DxLoadPanelModule,
   ],
   providers: [],
   exports: [],

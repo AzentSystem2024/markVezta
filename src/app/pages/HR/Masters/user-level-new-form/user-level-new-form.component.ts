@@ -8,7 +8,6 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import {
   DxTabPanelModule,
   DxCheckBoxModule,
@@ -20,8 +19,7 @@ import {
   DxDataGridModule,
   DxTreeViewModule,
   DxValidatorModule,
-  DxValidatorComponent,
-  DxValidationSummaryModule,
+  DxLoadPanelModule,
 } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 
@@ -30,7 +28,7 @@ import { DataService } from 'src/app/services';
   templateUrl: './user-level-new-form.component.html',
   styleUrls: ['./user-level-new-form.component.scss'],
 })
-export class UserLevelNewFormComponent {
+export class UserLevelNewFormComponent implements OnInit, OnChanges {
   @Input() sharedValue: any | false;
   width: any = '100%';
   rtlEnabled: boolean = false;
@@ -52,20 +50,22 @@ export class UserLevelNewFormComponent {
   CopiedUserLevelValue: any;
   clearData: any;
 
+  isLoading: boolean = false;
+
   constructor(
-    private fb: FormBuilder,
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.selectedTab = 0;
-      this.selectedTabData = this.MenuDatasource[0]?.Menus || [];
-      this.cdr.detectChanges(); // Force refresh for DevExtreme
-    }, 100);
+    // setTimeout(() => {
+    //   this.selectedTab = 0;
+    //   this.selectedTabData = this.MenuDatasource[0]?.Menus || [];
+    //   this.cdr.detectChanges();
+    // }, 100);
 
     this.UserLevelValue = '';
+    this.isLoading = true;
 
     this.get_All_MenuList();
     this.fetch_all_UserLevel_list();
@@ -78,38 +78,55 @@ export class UserLevelNewFormComponent {
       this.selectedTabData = [];
       this.CopiedUserLevelValue = '';
 
-      // ✅ Loop through each tab and reset selectedRows + permission fields
+      // Loop through each tab and reset selectedRows + permission fields
       this.MenuDatasource.forEach((tab, index) => {
         this.selectedRows[index] = [];
 
         if (Array.isArray(tab.Menus)) {
           tab.Menus.forEach((menu: any) => {
-            menu.canAdd = false;
-            menu.canPrint = false;
-            menu.canEdit = false;
-            menu.canView = true;
-            menu.canDelete = false;
-            menu.canApprove = false;
+            menu.CanAdd = false;
+            menu.CanPrint = false;
+            menu.CanEdit = false;
+            menu.CanView = true;
+            menu.CanDelete = false;
+            menu.CanApprove = false;
             // Reset any other permission fields as needed
           });
         }
       });
 
-      // ✅ Set the initial tab data
+      // Set the initial tab data
       this.selectedTabData = this.MenuDatasource[this.selectedTab]?.Menus || [];
       this.cdr.detectChanges();
     }
   }
 
-  //   //==============All Menu List========================
+  //==============All Menu List========================
   get_All_MenuList() {
     this.dataservice.get_usermenu_Api().subscribe((response: any) => {
-      this.MenuDatasource = response.Data;
-      setTimeout(() => {
+      this.MenuDatasource = response.Data || [];
+
+      // Set default permissions
+      this.MenuDatasource.forEach((tab: any, index: number) => {
+        this.selectedRows[index] = [];
+
+        (tab.Menus || []).forEach((menu: any) => {
+          menu.CanAdd = false;
+          menu.CanPrint = false;
+          menu.CanEdit = false;
+          menu.CanView = true;
+          menu.CanDelete = false;
+          menu.CanApprove = false;
+        });
+      });
+
+      // Load first tab
+      if (this.MenuDatasource.length > 0) {
         this.selectedTab = 0;
-        this.selectedTabData = this.MenuDatasource[0]?.Menus || [];
-        this.cdr.detectChanges(); // Force refresh for DevExtreme
-      }, 100); // 100ms delay is enough
+        this.selectedTabData = this.MenuDatasource[0].Menus || [];
+        this.isLoading = false;
+      }
+      this.cdr.detectChanges();
     });
   }
 
@@ -137,8 +154,35 @@ export class UserLevelNewFormComponent {
     this.combineSelectedRows();
   }
 
-  //============== copy data from already exis user ==========
+  //   onSelectionChanged(event: any): void {
+  //   if (this.UserLevelValue == '') {
+  //     this.isErrorVisible = true;
+  //   }
 
+  //   const selectedKeys = new Set(event.selectedRowKeys);
+
+  //   this.selectedRows[this.selectedTab] = event.selectedRowKeys;
+
+  //   // Loop through current tab menus
+  //   this.selectedTabData.forEach((menu: any) => {
+  //     if (selectedKeys.has(menu.MenuId)) {
+  //       // Row selected → enable view
+  //       menu.CanView = true;
+  //     } else {
+  //       // Row unselected → disable everything
+  //       menu.CanAdd = false;
+  //       menu.CanView = false;
+  //       menu.CanEdit = false;
+  //       menu.CanApprove = false;
+  //       menu.CanDelete = false;
+  //       menu.CanPrint = false;
+  //     }
+  //   });
+
+  //   this.combineSelectedRows();
+  // }
+
+  //============== copy data from already exis user ==========
   onUserRoleCopySelectionChange(event: any) {
     if (event.value) {
       const copiedUser = this.UserListdataSource.find(
@@ -169,13 +213,12 @@ export class UserLevelNewFormComponent {
               menu.CanPrint = match.CanPrint ?? false;
 
               // Also copy lowercase flags for checkbox binding
-              menu.canAdd = match.CanAdd ?? false;
-              menu.canView = match.CanView ?? true;
-              menu.canEdit = match.CanEdit ?? false;
-              menu.canApprove = match.CanApprove ?? false;
-              menu.canDelete = match.CanDelete ?? false;
-              menu.canPrint = match.CanPrint ?? false;
-
+              menu.CanAdd = match.CanAdd ?? false;
+              menu.CanView = match.CanView ?? true;
+              menu.CanEdit = match.CanEdit ?? false;
+              menu.CanApprove = match.CanApprove ?? false;
+              menu.CanDelete = match.CanDelete ?? false;
+              menu.CanPrint = match.CanPrint ?? false;
               menu.Selected = match.Selected ?? false;
 
               this.selectedRows[tabIndex].push(menu.MenuId);
@@ -188,12 +231,12 @@ export class UserLevelNewFormComponent {
               menu.CanDelete = false;
               menu.CanPrint = false;
 
-              menu.canAdd = false;
-              menu.canView = true;
-              menu.canEdit = false;
-              menu.canApprove = false;
-              menu.canDelete = false;
-              menu.canPrint = false;
+              menu.CanAdd = false;
+              menu.CanView = true;
+              menu.CanEdit = false;
+              menu.CanApprove = false;
+              menu.CanDelete = false;
+              menu.CanPrint = false;
 
               menu.Selected = false;
             }
@@ -210,47 +253,6 @@ export class UserLevelNewFormComponent {
       this.selectedTabData = [];
     }
   }
-
-  //    combineSelectedRows(): void {
-  //   this.allSelectedRows = [];
-
-  //   // ✅ Step 1: Collect all selected MenuIds
-  // const selectedMenuIds = new Set<number>();
-  // Object.values(this.selectedRows).forEach((menuList: any[]) => {
-  //   menuList.forEach(menu => selectedMenuIds.add(menu.MenuId));
-  // });
-
-  // // ✅ Step 2: Collect ONLY selected and enriched menus
-  // const enrichedMenus: any[] = [];
-
-  // (this.MenuDatasource || []).forEach((group: any) => {
-  //   (group.Menus || []).forEach((menu: any) => {
-  //     if (selectedMenuIds.has(menu.MenuId)) {
-  //       enrichedMenus.push({
-  //         MenuId: menu.MenuId,
-  //         MenuName: menu.MenuName,
-  //         MenuOrder: menu.MenuOrder,
-  //         Selected: true,
-
-  //         CanAdd: menu.canAdd ?? false,
-  //         CanView: menu.canView ?? true,
-  //          CanEdit: menu.canEdit ?? false,
-  //           CanApprove: menu.canApprove ?? false,
-  //          CanDelete: menu.canDelete ?? false,
-  //         CanPrint: menu.canPrint ?? false,
-
-  //       });
-  //     }
-  //   });
-  // });
-
-  //   // Step 3: Store userLevelname and real enriched menus
-  //   this.allSelectedRows.push({
-  //     userLevelname: this.UserLevelValue,
-  //     Menus: enrichedMenus,
-
-  //   });
-  // }
 
   onPermissionCheckboxChanged(e: any): void {
     this.combineSelectedRows(); // Rebuild the latest data from updated grid values
@@ -276,12 +278,12 @@ export class UserLevelNewFormComponent {
             MenuOrder: menu.MenuOrder,
             Selected: true,
 
-            CanAdd: menu.canAdd ?? false,
-            CanView: menu.canView ?? true,
-            CanEdit: menu.canEdit ?? false,
-            CanApprove: menu.canApprove ?? false,
-            CanDelete: menu.canDelete ?? false,
-            CanPrint: menu.canPrint ?? false,
+            CanAdd: menu.CanAdd ?? false,
+            CanView: menu.CanView ?? true,
+            CanEdit: menu.CanEdit ?? false,
+            CanApprove: menu.CanApprove ?? false,
+            CanDelete: menu.CanDelete ?? false,
+            CanPrint: menu.CanPrint ?? false,
           });
         }
       });
@@ -309,6 +311,7 @@ export class UserLevelNewFormComponent {
     DxDataGridModule,
     DxTreeViewModule,
     DxValidatorModule,
+    DxLoadPanelModule,
   ],
   providers: [],
   declarations: [UserLevelNewFormComponent],

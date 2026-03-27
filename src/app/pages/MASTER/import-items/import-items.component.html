@@ -1,26 +1,59 @@
 <div class="view-wrapper list-page">
   <dx-data-grid
+    #dataGrid
     class="grid theme-dependent"
     [dataSource]="datasource"
-    [allowColumnReordering]="true"
-    [allowColumnResizing]="true"
-    [width]="'100%'"
-    [columnAutoWidth]="true"
-    [columns]="columns"
+    [height]="'83vh'"
+    [loadPanel]="{
+      enabled: true,
+      text: 'Loading...',
+      showIndicator: true,
+      showPane: true,
+    }"
+    class="grid theme-dependent"
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
     [rowAlternationEnabled]="true"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
+    [columnResizingMode]="'nextColumn'"
+    [filterRow]="{ visible: false }"
+    [headerFilter]="{ visible: false }"
+    [scrolling]="{ mode: 'virtual' }"
     rowAlternationInterval="2"
-    >
+    focusStateEnabled="false"
   >
-  <dxo-scrolling mode="virtual"></dxo-scrolling>
-  <dxo-editing
-    [allowUpdating]="true">
-</dxo-editing>
-  <dxo-toolbar>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxo-toolbar>
       <dxi-item location="before">
         <div class="grid-header">Import Items</div>
       </dxi-item>
 
-      <dxi-item location="after">
+      <!-- <dxi-item location="after">
         <dx-select-box
           placeholder="Select Date Range"
           displayExpr="label"
@@ -28,85 +61,128 @@
           valueExpr="value"
           stylingMode="filled"
           [(value)]="defaultDateRange"
-
           (onValueChanged)="onDateRangeChanged($event)"
         ></dx-select-box>
         <dx-popup
-        [(visible)]="isDateRangePopupVisible"
-        title="Select Date Range"
-        [width]="400"
-        [height]="230"
-        (onHiding)="applyDateRange()"
+          [(visible)]="isDateRangePopupVisible"
+          title="Select Date Range"
+          [width]="400"
+          [height]="230"
+          (onHiding)="applyDateRange()"
         >
-  <div >
-    <dx-date-box [elementAttr]="{ class: 'dateBoxClass' }" [(value)]="selectedRange.from" placeholder="From Date"></dx-date-box>
-    <dx-date-box [elementAttr]="{ class: 'dateBoxClass' }" [(value)]="selectedRange.to" placeholder="To Date"></dx-date-box>
-  </div>
-  <dx-button text="Apply" type="default"  [elementAttr]="{ class: 'apply-button' }" (onClick)="applyDateRange()"></dx-button>
-  <dx-button text="Clear" (onClick)="clearDateRange()" [elementAttr]="{ class: 'clear-button' }"></dx-button>
-</dx-popup>
+          <div>
+            <dx-date-box
+              [elementAttr]="{ class: 'dateBoxClass' }"
+              [(value)]="selectedRange.from"
+              placeholder="From Date"
+            ></dx-date-box>
+            <dx-date-box
+              [elementAttr]="{ class: 'dateBoxClass' }"
+              [(value)]="selectedRange.to"
+              placeholder="To Date"
+            ></dx-date-box>
+          </div>
+          <dx-button
+            text="Apply"
+            type="default"
+            [elementAttr]="{ class: 'apply-button' }"
+            (onClick)="applyDateRange()"
+          ></dx-button>
+          <dx-button
+            text="Clear"
+            (onClick)="clearDateRange()"
+            [elementAttr]="{ class: 'clear-button' }"
+          ></dx-button>
+        </dx-popup>
+      </dxi-item> -->
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
+
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
       </dxi-item>
-      
-      
-      <dxi-item location="after" locateInMenu="auto">
+
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="toolbar-icon-btn export-btn"
+      ></dxi-item>
+
+      <!-- <dxi-item location="after" locateInMenu="auto">
         <dx-button
-          icon="plus"
           type="default"
+          class="add-button"
           stylingMode="contained"
           (onClick)="openImportItems()"
-          
         ></dx-button>
-      </dxi-item>
-      <!-- <dxi-item location="after">
-        <dx-select-box
-          placeholder="Select Template"
-          displayExpr="TEMPLATE_NAME"
-          [items]="itemTemplateData"
-          valueExpr="ID"
-          stylingMode="filled"
-          (onValueChanged)="onTemplateValueChanged($event)"
-          [elementAttr]="{ class: 'dropdownClass' }"
-          
-        ></dx-select-box>
-
       </dxi-item> -->
-      <!-- <dxi-item location="after" widget="dxButton" [options]="importButtonOptions"></dxi-item>
-      <dxi-item location="after" >
-        <dx-button [visible]="isDatasourceLoaded" [text]="saveButtonOptions.text" [elementAttr]="saveButtonOptions.elementAttr" (onClick)="saveButtonOptions.onClick()"></dx-button>
-      </dxi-item> -->
-  </dxo-toolbar>
 
-  <dxi-column dataField="BATCH_NO" caption="Sl No." [width]="100"></dxi-column>
-  <dxi-column dataField="IMPORT_DATE" caption="Date" dataType="date" [format]="'dd/MM/yyyy'"></dxi-column>
-  <dxi-column dataField="USER_NAME" caption="User Name"></dxi-column>
-  <dxi-column dataField="STORE_NAME" caption="Stores" [width]="700"></dxi-column>
-  <dxi-column type="buttons" [width]="110" caption=" ">
-    <dxi-button
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
+    </dxo-toolbar>
+
+    <dxi-column
+      dataField="BATCH_NO"
+      caption="Sl No."
+      [width]="100"
+    ></dxi-column>
+    <dxi-column
+      dataField="IMPORT_DATE"
+      caption="Date"
+      dataType="date"
+      [format]="'dd/MM/yyyy'"
+    ></dxi-column>
+    <dxi-column dataField="USER_NAME" caption="User Name"></dxi-column>
+    <dxi-column
+      dataField="STORE_NAME"
+      caption="Stores"
+      [width]="700"
+    ></dxi-column>
+    <dxi-column type="buttons" [width]="110" caption=" ">
+      <dxi-button
         class="button-info"
         text="Details"
         icon="info"
         [onClick]="viewDetails"
-    >
-    </dxi-button>
-  </dxi-column>
-  </dx-data-grid> 
+      >
+      </dxi-button>
+    </dxi-column>
+  </dx-data-grid>
   <dx-popup
-        [(visible)]="openImportItemsPopup"
-        title="Import Items"
-        [width]="1000"
-        [height]="750"
-      >
-      <app-import-items-dialog (closeForm)="handleClose()"></app-import-items-dialog>
-      </dx-popup>
+    [(visible)]="openImportItemsPopup"
+    title="Import Items"
+    [width]="'90vw'"
+    [height]="'100vh'"
+  >
+    <app-import-items-dialog
+      (closeForm)="handleClose()"
+    ></app-import-items-dialog>
+  </dx-popup>
 
-      <dx-popup
-        [(visible)]="ViewImportItemsPopup"
-        title="View Imported Items"
-        [width]="1000"
-        [height]="650"
-      >
-      <app-view-imported-items [formdata]="selectedId"></app-view-imported-items>
-      </dx-popup>
-  
-  </div>
-  
+  <dx-popup
+    [(visible)]="ViewImportItemsPopup"
+    title="View Imported Items"
+    [width]="1000"
+    [height]="650"
+    (onShown)="onPopupShown()"
+  >
+    <app-view-imported-items
+      [formdata]="selectedId"
+      *ngIf="popupReady"
+    ></app-view-imported-items>
+  </dx-popup>
+</div>

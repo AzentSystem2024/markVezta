@@ -1,21 +1,58 @@
 <div class="view-wrapper list-page">
   <dx-data-grid
+    noDataText="No data available"
+    [width]="'100%'"
+    [height]="'82vh'"
+    [loadPanel]="{
+      enabled: true,
+      text: 'Loading...',
+      showIndicator: true,
+      showPane: true,
+    }"
     class="grid theme-dependent"
     [dataSource]="datasource"
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
-    [width]="'100%'"
     [columnAutoWidth]="true"
     [columns]="columns"
     [rowAlternationEnabled]="true"
     rowAlternationInterval="2"
-    (onCellPrepared)="onCellPrepared($event)">
-  
-  <dxo-scrolling mode="virtual"></dxo-scrolling>
-  <dxo-toolbar>
-
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [showBorders]="true"
+    [wordWrapEnabled]="false"
+    [showColumnHeaders]="true"
+    [columnResizingMode]="'nextColumn'"
+    [filterRow]="{ visible: false }"
+    [headerFilter]="{ visible: false }"
+    [scrolling]="{ mode: 'virtual' }"
+    [selection]="{ mode: 'single' }"
+    focusStateEnabled="false"
+    (onCellPrepared)="onCellPrepared($event)"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+    <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
+    <dxo-toolbar>
       <dxi-item location="before">
-          <dx-tag-box
+        <dx-tag-box
           [items]="stores"
           [showSelectionControls]="true"
           displayExpr="DESCRIPTION"
@@ -28,9 +65,8 @@
           (onValueChanged)="onStoreSelectionChanged($event)"
         >
         </dx-tag-box>
-          
-        </dxi-item>
-      
+      </dxi-item>
+
       <dxi-item location="after">
         <dx-select-box
           placeholder="Select Template"
@@ -41,19 +77,50 @@
           [searchEnabled]="true"
           (onValueChanged)="onTemplateValueChanged($event)"
           [elementAttr]="{ class: 'dropdownClass' }"
-          
         ></dx-select-box>
-
       </dxi-item>
+
       <dxi-item location="after"></dxi-item>
-      <dxi-item location="after" widget="dxButton" [options]="importButtonOptions"></dxi-item>
-      <dxi-item location="after" >
-        <dx-button [visible]="isDatasourceLoaded" [text]="saveButtonOptions.text" [elementAttr]="saveButtonOptions.elementAttr" (onClick)="saveButtonOptions.onClick()"></dx-button>
+      <dxi-item location="after">
+        <dx-button
+          icon="download"
+          stylingMode="text"
+          hint="Download Template"
+          [disabled]="!columns || columns.length === 0"
+          (onClick)="downloadTemplate()"
+        ></dx-button>
       </dxi-item>
-  </dxo-toolbar>
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="importButtonOptions"
+      >
+      </dxi-item>
 
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="saveButtonOptions"
+      >
+      </dxi-item>
+    </dxo-toolbar>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
   </dx-data-grid>
 
-  <input type="file" id="fileInput" style="display: none;" (change)="onFileChange($event)" />
-  
-  </div>
+  <input
+    type="file"
+    id="fileInput"
+    style="display: none"
+    (change)="onFileChange($event)"
+  />
+
+  <dx-load-panel
+    [visible]="isSaving"
+    [shading]="true"
+    shadingColor="rgba(0, 0, 0, 0.3)"
+    message="Saving..."
+    [showIndicator]="true"
+    [showPane]="true"
+  >
+  </dx-load-panel>
+</div>

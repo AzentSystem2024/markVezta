@@ -174,7 +174,7 @@
           </dxi-item>
         </dxi-item>
 
-        <dxi-item itemType="group" [colCount]="2">
+        <dxi-item itemType="group" [colCount]="1">
           <dxi-item>
             <div *dxTemplate style="display: flex">
               <dx-select-box
@@ -223,10 +223,11 @@
                   >
                   </dxi-validation-rule>
                   <dxi-validation-rule
-                    type="stringLength"
-                    [min]="10"
-                    [max]="10"
-                    message="Mobile number must be exactly 10 digits"
+                    type="custom"
+                    [validationCallback]="validateMobileLength"
+                    [message]="
+                      'Mobile no. must be  ' + mobile_limit + ' digits long'
+                    "
                   ></dxi-validation-rule>
                 </dx-validator>
               </dx-text-box>
@@ -281,12 +282,13 @@
                   >
                   </dxi-validation-rule>
                   <dxi-validation-rule
-                    type="stringLength"
-                    [min]="10"
-                    [max]="10"
-                    message="Mobile number must be exactly 10 digits"
-                  ></dxi-validation-rule>
-                </dx-validator>
+                    type="custom"
+                    [validationCallback]="validatePhoneLength"
+                    [message]="
+                      'Phone no. must be  ' + Phone_limit + ' digits long'
+                    "
+                  ></dxi-validation-rule
+                ></dx-validator>
               </dx-text-box>
             </div>
           </dxi-item>
@@ -335,7 +337,7 @@
               <dx-select-box
                 label="Country *"
                 [items]="CountryDropdownData"
-                displayExpr="COUNTRY_NAME"
+                displayExpr="DESCRIPTION"
                 valueExpr="ID"
                 [(value)]="newCustomer.COUNTRY_ID"
                 placeholder="Select Country"
@@ -364,6 +366,7 @@
                 valueExpr="ID"
                 (onValueChanged)="onStateSelectionChanged($event)"
                 [(value)]="newCustomer.STATE_ID"
+                [searchEnabled]="true"
               >
                 <dx-validator>
                   <dxi-validation-rule
@@ -411,41 +414,10 @@
               </dx-text-box>
             </div>
           </dxi-item>
-          <!-- <dxi-item>
-        <div *dxTemplate>
-          <dx-select-box
-            label="Delivery Address"
-            labelMode="floating"
-            displayExpr="DESCRIPTION"
-            [items]="DeliveryAddress"
-            valueExpr="ID"
-            (onValueChanged)="onDeliveryAddressValue($event)"
-            [(value)]="newCustomer.DELIVERY_ADDRESS_ID"
-          >
-            <dx-validator>
-              <dxi-validation-rule type="required" message="State is required">
-              </dxi-validation-rule> </dx-validator>
-        </dx-select-box>
-        </div>
-      </dxi-item> -->
         </dxi-item>
       </dxi-item>
 
       <dxi-item itemType="group">
-        <!-- <dxi-item [colSpan]="2">
-      <div *dxTemplate>
-        <dx-radio-group
-          [(value)]="formCustomerData.CUST_TYPE"
-          [items]="customerTypeOptions"
-          layout="horizontal"
-          displayExpr="text"
-          valueExpr="value"
-          label="Customer Type"
-          labelMode="floating"
-        ></dx-radio-group>
-      </div>
-    </dxi-item> -->
-
         <dxi-item [colSpan]="2">
           <div *dxTemplate>
             <dx-radio-group
@@ -669,48 +641,62 @@
         </dxi-item>
 
         <!-- Country + Mobile in same row -->
-        <dxi-item itemType="group" [colCount]="10">
-          <!-- Country Code (2/10) -->
-          <dxi-item [colSpan]="2">
+        <dxi-item itemType="group" [colCount]="12" [colSpan]="2">
+          <!-- Country Code (3/12) -->
+          <dxi-item [colSpan]="2" class="me-2">
             <dx-select-box
-              label="Country code *"
+              style="width: 100px; margin-right: 10px"
+              label="Country Code *"
               [searchEnabled]="true"
-              labelMode="floating"
-              [(value)]="MobilecountryCode"
+              [acceptCustomValue]="false"
+              [(value)]="countryCodeDeliveryaddress"
               [items]="countryCodes"
               valueExpr="CODE"
               [displayExpr]="countryDisplay"
               placeholder="+1"
+              labelMode="floating"
               [dropDownOptions]="{ width: '370px' }"
-              (onValueChanged)="
-                onCountrycodeChangeDeliveryAddressmobile($event)
-              "
+              hint="Country Code"
+              (onValueChanged)="updateMobileNumber()"
+              (onOpened)="onDropdownOpened()"
+              (onClosed)="onDropdownClosed()"
+              (onValueChanged)="onCountrycodeChangeDeliveryAddress($event)"
             >
               <div *dxTemplate="let data of 'item'">
                 <img
                   [src]="data.FLAG_URL"
                   width="20"
-                  style="margin-right: 8px; margin-left: 10px"
+                  style="margin-right: 8px"
                 />
                 {{ data.CODE }} {{ data.COUNTRY_NAME }}
               </div>
-
-              <dx-validator>
-                <dxi-validation-rule
-                  type="required"
-                  message="Country code is required"
-                ></dxi-validation-rule>
-              </dx-validator>
             </dx-select-box>
           </dxi-item>
 
-          <!-- Mobile (8/10) -->
-          <dxi-item [colSpan]="8">
+          <!-- Mobile (9/12) -->
+          <dxi-item [colSpan]="4">
             <dx-text-box
+              style="width: 230px; margin-left: 35px"
               label="Mobile"
               labelMode="floating"
               [(value)]="MobileValue"
             >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Mobile number is required"
+                >
+                </dxi-validation-rule>
+                <dxi-validation-rule
+                  type="custom"
+                  [validationCallback]="validateMobileLengthdeliveryaddress"
+                  [message]="
+                    'Mobile no. must be  ' +
+                    mobile_limit_Delivery_Address +
+                    ' digits long'
+                  "
+                ></dxi-validation-rule>
+              </dx-validator>
             </dx-text-box>
           </dxi-item>
         </dxi-item>

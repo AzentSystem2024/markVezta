@@ -1505,8 +1505,8 @@ export class DataService {
 
     return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
   }
-// ======= save middle east department data =======
-   public save_ME_Department_Data(
+  // ======= save middle east department data =======
+  public save_ME_Department_Data(
     CODE: any,
     DEPT_NAME: any,
     COMPANY_ID: any,
@@ -1517,7 +1517,6 @@ export class DataService {
     return this.http.post(`${this.apiUrl}ItemDepartment/save`, data);
   }
 
-  
   removeDepartment(id: any) {
     return this.http.post(`${this.apiUrl}itemdepartment/delete/${id}`, {});
   }
@@ -3158,8 +3157,7 @@ export class DataService {
     );
   }
 
-
-   get_Sub_Dept_DropdownData(DeptID: any): Observable<any> {
+  get_Sub_Dept_DropdownData(DeptID: any): Observable<any> {
     const reqBodyData = { DEPT_ID: DeptID };
     return this.http.post(`${this.apiUrl}Employee/getsubdept`, reqBodyData);
   }
@@ -3506,25 +3504,6 @@ The result can be exported to HTML or Markdown.`;
           second: 0,
           millisecond: 0,
         });
-        // const uniqueTasks = tasks.slice(0, 11);
-
-        // return uniqueTasks.map((task, index) => {
-        //   const { weekDay, weekIndex, defaultTime } =
-        //     this.getAppointmentsDefaultTime(index);
-        //   const taskStart = mondayMidnight
-        //     .plus({
-        //       weeks: weekIndex,
-        //       days: weekDay,
-        //     })
-        //     .plus(defaultTime);
-        //   return {
-        //     ...task,
-        //     startDate: taskStart.toJSDate(),
-        //     endDate: taskStart.plus({ hours: 3 }).toJSDate(),
-        //     description: promptDescription,
-        //     calendarId: weekDay,
-        //   };
-        // });
       }),
     );
   };
@@ -3575,15 +3554,18 @@ The result can be exported to HTML or Markdown.`;
   public getImportTemplateData(): Observable<any> {
     return this.http.post(`${this.apiUrl}/importtemplate/list`, {});
   }
+
   public viewImportedData(data: any): Observable<any> {
     return this.http.post(
-      `${this.apiUrl}/importitemlog/ItemLogEntryList/`,
+      `${this.apiUrl}importitemlog/ItemLogEntryList/`,
       data,
     );
   }
+
   public getImportLogData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/importitemlog/list`, {});
+    return this.http.post(`${this.apiUrl}importitemlog/list`, {});
   }
+
   public postImportTemplate(items: Object): Observable<any> {
     const data = items;
 
@@ -4128,57 +4110,61 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //========================Pay settings============================
-  get_PaySettingsList() {
-    const getEndpoint = this.apiUrl + '/PaySettings/get';
-    return this.http.post(getEndpoint, {});
+  get_PaySettingsList(payload) {
+    const getEndpoint = this.apiUrl + 'PaySettings/list';
+    return this.http.post(getEndpoint, payload);
   }
 
   //=================get Leadger Dropdown ===================
-  get_Ledger_Api(ACCOUNT_HEAD: any) {
-    const getEndpoint = this.apiUrl + '/DropDown';
-    const reqBody = {
-      NAME: 'ACCOUNT_HEAD',
-      // "ACCOUNT_HEAD": ACCOUNT_HEAD
-    };
-    return this.http.post(getEndpoint, reqBody);
+  get_Ledger_Api(payload) {
+    const getEndpoint = this.apiUrl + 'DropDown';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  Update_PaySettings_Api(payload) {
+    const getEndpoint = this.apiUrl + 'PaySettings/save';
+    return this.http.post(getEndpoint, payload);
   }
 
   //================Api for Update PaySettings=================
-  Update_PaySettings_Api(
-    Daily_Hours: any,
-    Max_OT_MTS: any,
-    Normal_OT_Rate: any,
-    Holiday_OT_Rate: any,
-    Leave_Sal_Days: any,
-    UQ_Labour_ID: any,
-    Bank_Acc_No: any,
-    Bank_Code: any,
-    Sal_Expense_Head_ID: any,
-    Sal_Payable_Head_ID: any,
-    LS_Expense_Head_ID: any,
-    LS_Payable_Head_ID: any,
-    EOS_Expense_Head_ID: any,
-    EOS_Payable_Head_ID: any,
-  ) {
-    const getEndpoint = this.apiUrl + '/PaySettings/save';
-    const reqBody = {
-      DAILY_HOURS: Daily_Hours,
-      MAX_OT_MTS: Max_OT_MTS,
-      NORMAL_OT_RATE: Normal_OT_Rate,
-      HOLIDAY_OT_RATE: Holiday_OT_Rate,
-      LEAVE_SAL_DAYS: Leave_Sal_Days,
-      UQ_LABOUR_ID: UQ_Labour_ID,
-      BANK_AC_NO: Bank_Acc_No,
-      BANK_CODE: Bank_Code,
-      SAL_EXPENSE_HEAD_ID: Sal_Expense_Head_ID,
-      SAL_PAYABLE_HEAD_ID: Sal_Payable_Head_ID,
-      LS_EXPENSE_HEAD_ID: LS_Expense_Head_ID,
-      LS_PAYABLE_HEAD_ID: LS_Payable_Head_ID,
-      EOS_EXPENSE_HEAD_ID: EOS_Expense_Head_ID,
-      EOS_PAYABLE_HEAD_ID: EOS_Payable_Head_ID,
-    };
-    return this.http.post(getEndpoint, reqBody);
-  }
+  // Update_PaySettings_Api(
+  //   // Daily_Hours: any,
+  //   // Max_OT_MTS: any,
+  //   // Normal_OT_Rate: any,
+  //   // Holiday_OT_Rate: any,
+  //   // Leave_Sal_Days: any,
+  //   // UQ_Labour_ID: any,
+  //   // Bank_Acc_No: any,
+  //   // Bank_Code: any,
+  //   // Sal_Expense_Head_ID: any,
+  //   // Sal_Payable_Head_ID: any,
+  //   // LS_Expense_Head_ID: any,
+  //   // LS_Payable_Head_ID: any,
+  //   // EOS_Expense_Head_ID: any,
+  //   // EOS_Payable_Head_ID: any,
+  //   // COMPANY_ID : any,
+  //   item:any
+  // ) {
+  //   const getEndpoint = this.apiUrl + 'PaySettings/save';
+  //   const reqBody = {
+  //     DAILY_HOURS: Daily_Hours,
+  //     MAX_OT_MTS: Max_OT_MTS,
+  //     NORMAL_OT_RATE: Normal_OT_Rate,
+  //     HOLIDAY_OT_RATE: Holiday_OT_Rate,
+  //     LEAVE_SAL_DAYS: Leave_Sal_Days,
+  //     UQ_LABOUR_ID: UQ_Labour_ID,
+  //     BANK_AC_NO: Bank_Acc_No,
+  //     BANK_CODE: Bank_Code,
+  //     SAL_EXPENSE_HEAD_ID: Sal_Expense_Head_ID,
+  //     SAL_PAYABLE_HEAD_ID: Sal_Payable_Head_ID,
+  //     LS_EXPENSE_HEAD_ID: LS_Expense_Head_ID,
+  //     LS_PAYABLE_HEAD_ID: LS_Payable_Head_ID,
+  //     EOS_EXPENSE_HEAD_ID: EOS_Expense_Head_ID,
+  //     EOS_PAYABLE_HEAD_ID: EOS_Payable_Head_ID,
+  //     COMPANY_ID : COMPANY_ID
+  //   };
+  //   return this.http.post(getEndpoint, reqBody);
+  // }
 
   // ===============Leave Type======================
   //=================get Leave Type===================
@@ -4751,11 +4737,11 @@ The result can be exported to HTML or Markdown.`;
   }
 
   Timesheet_List_Api(payload) {
-    const getEndpoint = `${this.apiUrl}TimeSheet/ListTimesheet`;
+    const getEndpoint = `${this.apiUrl}TimeSheet/List`;
     return this.http.post(getEndpoint, payload);
   }
   getTimesheetList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/TimeSheet/list`, {});
+    return this.http.post(`${this.apiUrl}TimeSheet/list`, {});
   }
 
   saveTimesheetData(payload: any): Observable<any> {
@@ -4799,15 +4785,12 @@ The result can be exported to HTML or Markdown.`;
   //=============================employee dropdown============
   Dropdown_eos_employee(type: any) {
     const reqbody = { NAME: 'EMPLOYEE' };
-    return this.http.post(`${this.apiUrl}/DropDown`, reqbody);
+    return this.http.post(`${this.apiUrl}DropDown`, reqbody);
   }
 
   get_employeeDetails(id: any) {
     const reqbody = { EMP_ID: id };
-    return this.http.post(
-      `${this.apiUrl}/EmployeeEOS/getEmployeeData`,
-      reqbody,
-    );
+    return this.http.post(`${this.apiUrl}EmployeeEOS/getEmployeeData`, reqbody);
   }
 
   get_EmployeeDetailsFor_Leave_Api(payload) {
@@ -4817,7 +4800,7 @@ The result can be exported to HTML or Markdown.`;
   //=========================staff end off service select=========================
 
   select_Api_eos(id: any) {
-    return this.http.post(`${this.apiUrl}/EmployeeEOS/select/${id}`, {});
+    return this.http.post(`${this.apiUrl}EmployeeEOS/select/${id}`, {});
   }
 
   Update_Staff_EOS_api(
@@ -4921,23 +4904,23 @@ The result can be exported to HTML or Markdown.`;
   // }
 
   selectTimesheet(id: number) {
-    return this.http.post<any>(`${this.apiUrl}/TimeSheet/select/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}TimeSheet/select/` + id, {});
   }
 
   updateTimesheet(data: Object): Observable<any> {
-    return this.http.post(`${this.apiUrl}/TimeSheet/update`, data);
+    return this.http.post(`${this.apiUrl}TimeSheet/update`, data);
   }
 
   verifyTimesheet(data: Object): Observable<any> {
-    return this.http.post(`${this.apiUrl}/TimeSheet/verify`, data);
+    return this.http.post(`${this.apiUrl}TimeSheet/verify`, data);
   }
 
   approveTimesheet(data: Object): Observable<any> {
-    return this.http.post(`${this.apiUrl}/TimeSheet/approve`, data);
+    return this.http.post(`${this.apiUrl}TimeSheet/approve`, data);
   }
 
   deleteTimesheet(id: number) {
-    return this.http.post<any>(`${this.apiUrl}/TimeSheet/delete/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}TimeSheet/delete/` + id, {});
   }
 
   //MISCELLANEOUS PAYMENTS
@@ -6356,6 +6339,9 @@ The result can be exported to HTML or Markdown.`;
   get_mobile_no_length(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Company/getdigit`, data);
   }
+  Employee_leave_period() {
+    return this.http.post(`${this.apiUrl}TimeSheet/employee-vacation`, {});
+  }
 
   FixedAssetRegister_List(payload) {
     const getEndpoint = this.apiUrl + 'Report/fixedassetreport';
@@ -6374,6 +6360,11 @@ The result can be exported to HTML or Markdown.`;
 
   Prepayment_posting_Report(payload) {
     const getEndpoint = this.apiUrl + 'Report/prepaymentreport';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  SalaryWPSFile(payload) {
+    const getEndpoint = this.apiUrl + 'SalaryWPS/wps';
     return this.http.post(getEndpoint, payload);
   }
 }

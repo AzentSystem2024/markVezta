@@ -69,6 +69,21 @@
           ></dxi-validation-rule>
         </dx-validator>
       </dx-radio-group>
+      <dx-radio-group
+        [items]="RequlerOrpaytime"
+        [(value)]="selectedPaytime"
+        displayExpr="name"
+        valueExpr="value"
+        layout="horizontal"
+        (onValueChanged)="onRequlerOrpaytimeChanged($event)"
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-radio-group>
       <dx-check-box
         [(value)]="SalaryHeadData.IS_INACTIVE"
         text="Inactive"

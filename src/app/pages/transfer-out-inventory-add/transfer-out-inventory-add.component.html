@@ -20,7 +20,7 @@
             mode: 'cell',
             allowAdding: true,
             allowUpdating: true,
-            allowDeleting: !isReadOnlyMode
+            allowDeleting: !isReadOnlyMode,
           }"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onRowInserted)="onRowInserted($event)"
@@ -80,16 +80,22 @@
                 ></dx-select-box>
                 <div style="margin-top: 2px; text-align: left">
                   <dx-button
-                    text="Add Items"
-                    icon="event"
-                    type="default"
                     [width]="200"
-                    stylingMode="outlined"
-                    class="blue-outline-btn"
+                    stylingMode="contained"
+                    class="blue-contained-btn"
                     (onClick)="onAddItems()"
                     [disabled]="!transferOutFormData.DEST_STORE_ID"
                     [disabled]="isReadOnlyMode"
                   >
+                    <div *dxTemplate="let data of 'content'">
+                      <span
+                        class="iconify me-2"
+                        data-icon="formkit:add"
+                        data-width="20"
+                        data-height="20"
+                      ></span>
+                      <span class="add-text">Add Items</span>
+                    </div>
                   </dx-button>
                 </div>
               </div>
@@ -131,8 +137,8 @@
               {
                 type: 'custom',
                 validationCallback: validateQtyIssued,
-                message: 'Qty cannot be greater than Qty Available'
-              }
+                message: 'Qty cannot be greater than Qty Available',
+              },
             ]"
           ></dxi-column>
 
@@ -177,7 +183,7 @@
           <div class="footer-right">
             <dx-text-box
               class="right-align-textbox"
-              [value]="transferOutFormData.NET_AMOUNT | number : '1.2-2'"
+              [value]="transferOutFormData.NET_AMOUNT | number: '1.2-2'"
               label="Net Amount"
               labelMode="floating"
               [readOnly]="true"
@@ -213,8 +219,8 @@
                   isReadOnlyMode
                     ? 'PDF'
                     : transferOutFormData.IS_APPROVED
-                    ? 'Commit'
-                    : 'Save'
+                      ? 'Commit'
+                      : 'Save'
                 "
                 (onClick)="isReadOnlyMode ? openPDF() : saveTransferOut()"
                 stylingMode="contained"
@@ -287,10 +293,8 @@
             <dx-button
               text="Select Items"
               icon="check"
-              type="default"
-              stylingMode="contained"
               (onClick)="onSelectItems()"
-              class="blue-outline-btn"
+              class="select-item-btn"
             ></dx-button>
           </div>
         </dxi-item>
