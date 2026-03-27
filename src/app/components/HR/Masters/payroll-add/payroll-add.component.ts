@@ -41,6 +41,7 @@ import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-te
 import { PayRevisionAddComponent } from '../pay-revision-add/pay-revision-add.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-payroll-add',
@@ -60,7 +61,7 @@ export class PayrollAddComponent {
   isFilterOpened = false;
   filterRowVisible: boolean = false;
   timesheetList: any;
-  CompanyID = 1;
+
   payRollData: {
     COMPANY_ID: string;
     TS_ID: string;
@@ -70,10 +71,40 @@ export class PayrollAddComponent {
     TS_ID: '',
     USER_ID: 0,
   };
+  companyID: any;
+  canAdd: any;
+  canEdit: any;
+  canDelete: any;
+  canPrint: any;
+  canView: any;
+  canApprove: any;
+  userID: any;
 
-  constructor(private dataSerivice: DataService) {}
+  constructor(
+    private dataSerivice: DataService,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.userID = menuResponse.USER_ID;
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/credit-note');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
     // this.payRollData.SAL_MONTH = this.selectedMonth;
     this.getTimesheetList();
   }
@@ -97,7 +128,7 @@ export class PayrollAddComponent {
       return;
     }
     const payload = {
-      CompanyId: this.CompanyID,
+      CompanyId: this.companyID,
       Month: new Date(this.selectedMonth)
         .toLocaleDateString('en-US', {
           month: 'long',
@@ -127,16 +158,16 @@ export class PayrollAddComponent {
       return;
     }
 
-    const userId = Number(sessionStorage.getItem('USER_ID'));
+    // const userId = Number(sessionStorage.getItem('USER_ID'));
 
     let successCount = 0;
     let errorCount = 0;
 
     selectedRows.forEach((row) => {
       const payload = {
-        COMPANY_ID: this.CompanyID,
+        COMPANY_ID: this.companyID,
         TS_ID: row.ID,
-        USER_ID: userId,
+        USER_ID: this.userID,
       };
 
       this.dataSerivice.generatePayroll(payload).subscribe({
