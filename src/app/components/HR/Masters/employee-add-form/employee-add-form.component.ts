@@ -84,7 +84,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     EMAIL: '',
     IS_MALE: true,
     DEPT_ID: 0,
-    SUB_DEPT_ID: '',
+    SUB_DEPT_ID: 0,
     DESG_ID: 0,
     DOJ: null,
     BANK_NAME: '',
