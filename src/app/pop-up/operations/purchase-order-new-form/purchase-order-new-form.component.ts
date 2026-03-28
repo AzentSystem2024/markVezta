@@ -427,7 +427,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       const parts = suppMobile.split('-');
 
       if (parts.length === 2) {
-        this.supplierCountryCode = parts[0];
+        this.supplierCountryCode = '+' + parts[0];
         // this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
         this.newPoData.SUPP_MOBILE = parts[1];
       }
@@ -446,7 +446,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
     if (parts.length === 2) {
       this.supplierCountryCode = '+' + parts[0];
-      this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
+      this.newPoData.SUPP_MOBILE = parts[1];
     }
   }
 
@@ -1243,7 +1243,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   updateSupplierMobileNumber() {
-    this.newPoData.SUPP_MOBILE = '';
+    // this.newPoData.SUPP_MOBILE = '';
+    if (!this.newPoData.SUPP_MOBILE) {
+      this.newPoData.SUPP_MOBILE = '';
+    }
     // const cleanDialCode = this.supplierCountryCode?.replace('+', '');
 
     // this.newPoData.SUPP_MOBILE = `${cleanDialCode}-`;
