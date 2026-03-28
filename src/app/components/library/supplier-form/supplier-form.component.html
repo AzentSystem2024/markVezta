@@ -39,7 +39,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label=" "
+            label="Address *"
             labelMode="floating"
             [(value)]="newSupplier.ADDRESS2"
           ></dx-text-box>
@@ -98,6 +98,13 @@
                 message="Mobile number is required"
               >
               </dxi-validation-rule>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateMobileLength"
+                [message]="
+                  'Mobile no. must be  ' + mobile_limit + ' digits long'
+                "
+              ></dxi-validation-rule>
             </dx-validator>
           </dx-text-box>
         </div>
@@ -387,7 +394,15 @@
             labelMode="floating"
             (keypress)="keyPressNumbers($event)"
             [style]="{ width: '300px' }"
-          ></dx-text-box>
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validatePhoneLength"
+                [message]="'Phone no. must be  ' + Phone_limit + ' digits long'"
+              ></dxi-validation-rule
+            ></dx-validator>
+          </dx-text-box>
         </div>
       </dxi-item>
       <!-- <dxi-item>

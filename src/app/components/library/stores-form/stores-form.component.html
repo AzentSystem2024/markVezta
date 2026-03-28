@@ -1,12 +1,5 @@
 <dx-form class="plain-styled-form">
   <dxi-item itemType="group" [colCount]="2">
-    <!-- <dxo-col-count-by-screen
-      [xs]="1"
-      [sm]="1"
-      [md]="1"
-      [lg]="1"
-    ></dxo-col-count-by-screen> -->
-
     <dxi-item>
       <div *dxTemplate>
         <dx-text-box
@@ -180,12 +173,31 @@
   <dxi-item itemType="group" [colCount]="2">
     <dxi-item>
       <div *dxTemplate style="display: flex">
-        <dx-text-box
-          label=" "
+        <dx-select-box
+          label="Country code *"
+          [searchEnabled]="true"
           labelMode="floating"
-          [(value)]="countryCode"
-          class="country-code-input"
-        ></dx-text-box>
+          [(value)]="countryCodePhone"
+          [items]="countryCodes"
+          valueExpr="CODE"
+          [displayExpr]="countryDisplay"
+          placeholder="+1"
+          [dropDownOptions]="{ width: '370px' }"
+          hint="Country Code"
+          (onValueChanged)="onCountrycodeChangePhone($event)"
+        >
+          <div *dxTemplate="let data of 'item'">
+            <img [src]="data.FLAG_URL" width="20" style="margin-right: 8px" />
+            {{ data.CODE }} {{ data.COUNTRY_NAME }}
+          </div>
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Country code is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-select-box>
+
         <dx-text-box
           label="Phone *"
           labelMode="floating"
@@ -202,9 +214,9 @@
               <dxi-validation-rule type="numeric"> </dxi-validation-rule>
             </dxi-validation-rule>
             <dxi-validation-rule
-              type="pattern"
-              [pattern]="'^[1-9][0-9]{9}$'"
-              message="Enter a valid 10-digit phone number"
+              type="custom"
+              [validationCallback]="validatePhoneLength"
+              [message]="'Phone no. must be  ' + Phone_limit + ' digits long'"
             ></dxi-validation-rule> </dx-validator
         ></dx-text-box>
       </div>

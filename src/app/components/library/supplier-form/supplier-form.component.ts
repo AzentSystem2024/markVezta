@@ -103,6 +103,7 @@ export class SupplierFormComponent implements OnInit {
     { text: 'Local Purchase', value: 1 },
     { text: 'Interstate Purchase', value: 2 },
   ];
+  Phone_limit: any;
 
   constructor(
     private service: DataService,
@@ -329,7 +330,7 @@ export class SupplierFormComponent implements OnInit {
       COUNTRY_CODE: e.value,
     };
     this.service.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
   countryDisplay(item: any) {
@@ -341,9 +342,23 @@ export class SupplierFormComponent implements OnInit {
       COUNTRY_CODE: e.value,
     };
     this.service.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
+  validateMobileLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.mobile_limit) return false;
+
+    return value.length === this.mobile_limit;
+  };
+  validatePhoneLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.Phone_limit) return false;
+
+    return value.length === this.Phone_limit;
+  };
 }
 @NgModule({
   imports: [
