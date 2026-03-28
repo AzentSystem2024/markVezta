@@ -1,82 +1,46 @@
-@use "../../../../../variables.scss" as *;
-
-
-.form-container  {
- height: 550px;
-  width: 850px;
-  margin: 30px auto;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;  
+.FullBody {
+  padding: 20px;
 }
 
-
-
-.erp-form {
-  width: 800px;
-  margin: 20px auto;
-  background: #f3f3f3;
-  border: 1px solid #cfcfcf;
-  padding: 12px;
+.topDiv {
+  margin-bottom: 20px;
 }
 
-/* LABELS (left aligned like desktop app) */
-::ng-deep .dx-field-item-label {
-  width: 170px;
-  font-size: 12px;
+.headingText {
+  font-size: 18px;
   font-weight: 600;
-  color: #000;
 }
 
-.section-heading {
+
+
+.BorderBox {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.modern-form .dx-field-item {
+  margin-bottom: 16px;
+}
+
+.modern-form .dx-textbox,
+.modern-form .dx-selectbox {
+  width: 100% !important;
+}
+
+.card-heading {
+  font-size: 14px;
   font-weight: 600;
-  font-size: 13px;
-  margin: 10px 0 5px 0;
-  color: #333;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 4px;
-}
-
-
-/* GROUP BOX (like grey bordered sections) */
-::ng-deep .dx-form-group-with-caption {
-  border: 1px solid #c5c5c5;
-  background: #efefef;
-  padding: 10px;
-  margin-top: 10px;
-}
-
-/* GROUP TITLE */
-::ng-deep .dx-form-group-caption {
-  font-size: 12px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 6px;
-}
-
-/* REMOVE EXTRA SPACE */
-::ng-deep .dx-layout-manager .dx-field-item-content {
-  padding-top: 2px;
-}
-
-.center-selectbox {
-  display: flex;
-  justify-content: center;
+  margin: 20px 0 10px;
+  color: #374151;
 }
 
 .button-container {
-  display: flex;
-  justify-content: flex-end; /* Moves content to the right */
-  gap: 10px; /* Optional: adds space between buttons */
-  margin-right: 30px;
+  margin-top: 20px;
+  text-align: right;
 }
 
-
-
-
-
-.custom-form .dx-form-group-with-caption,
-.custom-form .dx-form-group {
-  margin-bottom: 8px; /* Default is often 20px+ */
+.dx-texteditor {
+  border-radius: 8px !important;
 }

@@ -179,7 +179,7 @@ export class PackingEditComponent {
   }
   getItems() {
     const payload = {
-      NAME: 'ITEMS',
+      NAME: 'GETITEM',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       console.log(response);
@@ -367,6 +367,24 @@ export class PackingEditComponent {
     }
   }
 
+  ensureEmptyRow() {
+
+  const hasEmptyRow = this.items.some(
+    (r) => !r.ITEM && !r.DESCRIPTION && !r.UOM && !r.QUANTITY
+  );
+
+  if (!hasEmptyRow) {
+    this.items.push({
+      ITEM: null,
+      DESCRIPTION: '',
+      UOM: '',
+      QUANTITY: null,
+      ITEM_ID: null
+    });
+  }
+
+}
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['PackingData'] && changes['PackingData'].currentValue) {
       const incomingData = changes['PackingData'].currentValue;
@@ -489,6 +507,7 @@ export class PackingEditComponent {
       this.items = [];
     }
 
+    this.ensureEmptyRow(); // IMPORTANT
     // this.PackingEntriesData = this.PackingData.PackingEntries;
     this.PackingEntriesData = [];
 
@@ -1217,7 +1236,7 @@ export class PackingEditComponent {
 
     // refresh BOM grid
     this.itemsGridRef.instance.refresh();
-
+    this.ensureEmptyRow(); //  IMPORTANT
     this.ItempopupVisible = false;
   }
 }
