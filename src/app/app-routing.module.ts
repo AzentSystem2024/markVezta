@@ -575,7 +575,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'department-me',
+        path: 'department-finance',
         component: DepartmentMeComponent,
         canActivate: [AuthGuardService],
       },
@@ -839,7 +839,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'finance-sales-order',
+        path: 'sales-order-finance',
         component: SalesOrderFinanceComponent,
         canActivate: [AuthGuardService],
       },
