@@ -121,6 +121,7 @@ export class SupplierEditComponent {
     { text: 'Local Purchase', value: 1 },
     { text: 'Interstate Purchase', value: 2 },
   ];
+  Phone_limit: any;
 
   constructor(
     private dataservice: DataService,
@@ -224,6 +225,8 @@ export class SupplierEditComponent {
       this.countryCodePhone = countryCodePhone;
       this.PhoneNumber = phonenumber;
       console.log(this.countryCodePhone, this.PhoneNumber);
+      this.onCountrycodeChange({ value: this.countryCode });
+      this.onCountrycodeChangePhone({ value: this.countryCodePhone });
     }
   }
 
@@ -243,8 +246,6 @@ export class SupplierEditComponent {
     this.listState();
     this.getPaymentTerms();
     this.getCurrency_Dropdown();
-    // this.showCountry();
-    // this.get_Country_Dropdown_List();
   }
 
   private loadDropdownData(): void {
@@ -338,14 +339,7 @@ export class SupplierEditComponent {
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     console.log(this.selecte_countyId, 'selected country id++++++++++');
-    // const selectedCountry = this.CountryDropdownData.find(
-    // //   (country) => country.ID === event.value
-    // // );
-    // console.log('selected country', selectedCountry);
-    // if (selectedCountry) {
-    //   this.countryCode = selectedCountry.CODE;
-    // }
-    // this.get_Country_Dropdown_List();
+
     this.get_State_Dropdown_List();
     const selectedCountry = this.CountryDropdownData.find(
       (country: any) => country.ID === this.selecte_countyId,
@@ -376,25 +370,6 @@ export class SupplierEditComponent {
         this.State = response;
       });
   }
-
-  // get_State_Dropdown_List() {
-  //   if (!this.supplierData?.COUNTRY_ID) {
-  //     console.warn('COUNTRY_ID is not ready');
-  //     return; // Skip until COUNTRY_ID is set
-  //   }
-
-  //   const payload = {
-  //     NAME: 'STATE_NAME',
-  //     COUNTRY_ID: this.supplierData.COUNTRY_ID
-  //   };
-
-  //   this.dataservice.get_State_Dropdown_Api(payload).subscribe((response: any) => {
-  //     this.State = response;
-
-  //     // Optional: set default or patch if needed
-  //     this.cdr.detectChanges();
-  //   });
-  // }
 
   onStateValue(event: any) {
     this.selectedStateId = event.value;
@@ -487,13 +462,14 @@ export class SupplierEditComponent {
       );
     });
   }
+
   onCountrycodeChange(e: any) {
     console.log(e, '========event==============');
     const payload = {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
   countryDisplay(item: any) {
@@ -506,9 +482,28 @@ export class SupplierEditComponent {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
+
+  validateMobileLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.mobile_limit) return false;
+
+    return value.length === this.mobile_limit;
+  };
+  validatePhoneLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    // ✅ Allow empty (optional field)
+    if (!value) return true;
+
+    // ✅ Wait until limit is loaded
+    if (!this.Phone_limit) return true;
+
+    return value.length === this.Phone_limit;
+  };
 }
 
 @NgModule({
