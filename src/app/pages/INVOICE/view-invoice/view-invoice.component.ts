@@ -112,6 +112,7 @@ export class ViewInvoiceComponent implements OnInit, OnChanges {
   showGST: boolean;
   selectedCustomer: any;
   companyState: any;
+  vatTitle: any;
 
   constructor(
     private dataService: DataService,
@@ -136,7 +137,7 @@ export class ViewInvoiceComponent implements OnInit, OnChanges {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
-
+      this.vatTitle = userData.GeneralSettings.VAT_TITLE;
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         this.invoiceFormData.UNIT_ID = selectedCompany.COMPANY_ID; // Set UNIT_ID
@@ -194,13 +195,13 @@ export class ViewInvoiceComponent implements OnInit, OnChanges {
 
             // GST binding for grid
             GST: igst > 0 ? igst : 0, // IGST → GST column
-            CGST: igst > 0 ? 0 : cgst, // Same-state
-            SGST: igst > 0 ? 0 : sgst, // Same-state
+            // CGST: igst > 0 ? 0 : cgst, // Same-state
+            // SGST: igst > 0 ? 0 : sgst, // Same-state
             HSN_CODE: row.HSN_CODE, // keep your HSN logic
           };
         },
       );
-      this.setGstColumnVisibilityFromData(this.mainInvoiceGridList);
+      // this.setGstColumnVisibilityFromData(this.mainInvoiceGridList);
 
       // -----------------------------------------------------
 

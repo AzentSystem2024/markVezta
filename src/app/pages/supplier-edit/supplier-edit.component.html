@@ -110,6 +110,13 @@
                   message="Mobile number is required"
                 >
                 </dxi-validation-rule>
+                <dxi-validation-rule
+                  type="custom"
+                  [validationCallback]="validateMobileLength"
+                  [message]="
+                    'Mobile no. must be  ' + mobile_limit + ' digits long'
+                  "
+                ></dxi-validation-rule>
               </dx-validator>
             </dx-text-box>
           </div>
@@ -429,11 +436,24 @@
             </dx-validator>
           </dx-select-box>
           <dx-text-box
+            #phoneBoxRefss
             label="Phone"
             class="phone-style"
             [(value)]="PhoneNumber"
             labelMode="floating"
             (keypress)="keyPressNumbers($event)"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Phones number is required"
+              >
+              </dxi-validation-rule>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validatePhoneLength"
+                [message]="'Phone no. must be  ' + Phone_limit + ' digits long'"
+              ></dxi-validation-rule></dx-validator
           ></dx-text-box>
         </div>
       </div>
