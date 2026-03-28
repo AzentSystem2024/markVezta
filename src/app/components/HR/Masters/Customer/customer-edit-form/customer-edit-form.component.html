@@ -598,8 +598,8 @@
             <div *dxTemplate>
               <dx-text-box
                 [label]="
-                  selected_vat_id == sessionData.VAT_ID &&
-                  sessionData.VAT_ID == 2
+                  selected_vat_id === sessionData.VAT_ID &&
+                  sessionData.VAT_ID === 2
                     ? '  VAT Registration Number *'
                     : ' GST Registration Number *'
                 "
@@ -610,8 +610,8 @@
                   <dxi-validation-rule
                     type="required"
                     [message]="
-                      selected_vat_id == sessionData.VAT_ID &&
-                      sessionData.VAT_ID == 2
+                      selected_vat_id === sessionData.VAT_ID &&
+                      sessionData.VAT_ID === 2
                         ? '  VAT  Registration number is required'
                         : ' GST  Registration number is required'
                     "

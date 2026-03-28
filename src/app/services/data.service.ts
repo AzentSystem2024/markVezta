@@ -3563,7 +3563,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   public getImportLogData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}importitemlog/list`, {});
+    return this.http.post(`${this.apiUrl}importitemlog`, {});
   }
 
   public postImportTemplate(items: Object): Observable<any> {

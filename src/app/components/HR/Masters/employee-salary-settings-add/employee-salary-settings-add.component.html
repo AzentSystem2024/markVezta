@@ -28,6 +28,7 @@
         label="Basic Salary"
         [(value)]="employeeFormData.BASIC_SALARY"
         [labelMode]="'floating'"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dx-number-box>
     </div>
@@ -114,6 +115,7 @@
     caption="Amount"
     [editorOptions]="{ showSpinButtons: true }"
     [allowEditing]="true"
+    [format]="{ type: 'fixedPoint', precision: 2 }"
   >
     <dxo-header-filter [allowSelectAll]="false">
       <dxo-search [enabled]="true"></dxo-search>
