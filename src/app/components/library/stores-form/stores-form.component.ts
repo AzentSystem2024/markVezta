@@ -60,13 +60,23 @@ export class StoresFormComponent implements OnInit {
   countryList: any;
   countries: any[];
   selectedCountryId: any;
+  Phone_limit: number;
+  countryCodes: any;
+  countryCodePhone: any;
   constructor(
     private service: DataService,
     private countryService: CountryServiceService,
-  ) {}
+  ) {
+    service.getCountryWithFlags().subscribe((data) => {
+      this.countryCodes = data;
+    });
+  }
   newStores = this.formStoresData;
 
-  getNewStoresData = () => ({ ...this.newStores });
+  getNewStoresData = () => ({
+    ...this.newStores,
+    PHONE: this.countryCodePhone + '-' + this.newStores.PHONE,
+  });
   ngOnChanges(changes: SimpleChanges): void {
     // EDIT MODE
     if (
@@ -74,10 +84,16 @@ export class StoresFormComponent implements OnInit {
       this.storeData &&
       Object.keys(this.storeData).length
     ) {
+      const phoneNo = this.storeData.PHONE;
+      const [countryCodePhone, phonenumber] = phoneNo.split('-');
+      this.countryCodePhone = countryCodePhone;
+
+      // this.onCountrycodeChangePhone({ value: this.countryCodePhone });
       this.newStores = {
         ...this.formStoresData,
         ...this.storeData,
       };
+      this.newStores.PHONE = phonenumber;
     }
 
     // ADD MODE → ALWAYS set companyId when received
@@ -184,6 +200,26 @@ export class StoresFormComponent implements OnInit {
     } else {
       return true;
     }
+  }
+  onCountrycodeChangePhone(e: any) {
+    console.log('call this functin=================');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+  validatePhoneLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.Phone_limit) return false;
+
+    return value.length === this.Phone_limit;
+  };
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
   }
 }
 @NgModule({
