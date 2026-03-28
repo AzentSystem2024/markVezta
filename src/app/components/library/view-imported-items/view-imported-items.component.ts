@@ -1,11 +1,9 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
   Component,
   Input,
   NgModule,
   OnChanges,
-  OnInit,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -52,7 +50,7 @@ export class ViewImportedItemsComponent implements OnChanges {
   
   constructor(private service: DataService) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(changes: SimpleChanges): void { 
     if (!changes['formdata']) return;
 
     const currentId = changes['formdata'].currentValue;

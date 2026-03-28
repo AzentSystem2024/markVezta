@@ -75,7 +75,11 @@
             mode="multiple"
             showCheckBoxesMode="always"
           ></dxo-selection>
-          <dxi-column dataField="MenuName" caption="Menu List"></dxi-column>
+          <dxi-column
+            dataField="MenuName"
+            caption="Menu List"
+            [allowEditing]="false"
+          ></dxi-column>
 
           <dxi-column
             dataField="CanAdd"

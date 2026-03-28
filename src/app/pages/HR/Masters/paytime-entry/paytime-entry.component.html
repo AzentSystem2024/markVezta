@@ -266,6 +266,7 @@
         label="Amount to Fill"
         formControlName="amount"
         [min]="0"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
         [showSpinButtons]="true"
         labelMode="floating"
       ></dx-number-box>
