@@ -98,10 +98,11 @@ export class SalaryHeadAddComponent {
     { name: 'Regular Salary', value: 1 },
     { name: 'Paytime Entry', value: 2 },
   ];
+
+  selectedPaytime = 1;
   // selectedPriority  = this.priorities[0];
   // // or set by id
   selectedPriority = this.priorities.find((p) => p.id === 1);
-  selectedPaytime = this.RequlerOrpaytime.find((p) => p.value === 1);
   salaryHeadTypes = [{ label: 'Fixed Amount', value: 'fixed' }];
   salaryHeadTypes2 = [{ label: '', value: 'percentage' }];
   salaryHeadTypes3 = [{ label: 'Others', value: 'others' }];
@@ -153,6 +154,7 @@ export class SalaryHeadAddComponent {
     this.get_headnameGrid();
     this.sesstion_Details();
     this.getSalaryHeadList();
+    this.selectedPaytime = 1;
 
     this.dataservice.Dropdown_ac_head(name).subscribe((res: any) => {
       this.Ac_head_values = res;

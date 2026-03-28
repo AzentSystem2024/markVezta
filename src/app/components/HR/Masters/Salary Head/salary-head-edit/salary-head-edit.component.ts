@@ -83,6 +83,7 @@ export class SalaryHeadEditComponent {
     RANGE_EXISTS: false,
     RANGE_FROM: 0,
     RANGE_TO: 0,
+    IS_TIMESHEET_ENTRY: false,
   };
   priorities = [
     { id: 1, name: 'Allowance' },
@@ -104,6 +105,13 @@ export class SalaryHeadEditComponent {
   isEnabled: boolean = false;
   HeadType_value: any;
   selected_Company_id: any;
+  is_time_entry: boolean = false;
+  RequlerOrpaytime = [
+    { name: 'Regular Salary', value: 1 },
+    { name: 'Paytime Entry', value: 2 },
+  ];
+
+  selectedPaytime = 1;
   constructor(private dataservice: DataService) {
     this.sesstion_Details();
     this.get_headnameGrid();
@@ -141,10 +149,17 @@ export class SalaryHeadEditComponent {
       this.priorities.find((p) => p.id === this.SalaryHeadData.HEAD_TYPE) ||
       this.priorities[0];
     this.selectedPriority = headtype.id;
+
+    this.selectedPaytime = this.SalaryHeadData.IS_TIMESHEET_ENTRY ? 2 : 1;
   }
 
   onPriorityChanged(e: any) {
+    console.log('==========function call====================');
     this.selectedPriority = e.value;
+    console.log(
+      this.selectedPriority,
+      '=============selectedPriority=====================',
+    );
     this.HeadType_value = e.value;
     this.isEnabled = this.HeadType_value === 1 || this.HeadType_value === 2;
 
@@ -359,10 +374,12 @@ export class SalaryHeadEditComponent {
         ...this.SalaryHeadData,
 
         // HEAD_TYPE: this.selectedPriority,
-        HEAD_TYPE: this.selectedPriority?.id ?? this.SalaryHeadData.HEAD_TYPE,
+        HEAD_TYPE: this.selectedPriority,
         COMPANY_ID: this.selected_Company_id,
         HEAD_NATURE: selectedTypeId,
+        IS_TIMESHEET_ENTRY: this.is_time_entry,
       };
+      console.log(payload);
 
       this.dataservice.Update_salary_Head_api(payload).subscribe((res: any) => {
         this.formClosed.emit();
@@ -377,12 +394,11 @@ export class SalaryHeadEditComponent {
     }
     // });
   }
+  onRequlerOrpaytimeChanged(e: any) {
+    console.log(e.value); // true or false
 
-  // Your API call
-  // getSalaryHeadList() {
-  //   return this.dataservice.Get_salary_Head_List();
-  // }
-
+    this.is_time_entry = e.value === 2;
+  }
   onChangeAc_head(e: any) {}
 }
 
