@@ -286,7 +286,6 @@ const routes: Routes = [
         component: CountryListComponent,
         canActivate: [AuthGuardService],
       },
-
       {
         path: 'accounts',
         component: AccountsListComponent,

@@ -1,13 +1,9 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  EventEmitter,
-  Input,
   NgModule,
-  OnDestroy,
   OnInit,
   ViewChild,
-  OnChanges,
   ChangeDetectorRef,
   NgZone,
 } from '@angular/core';
@@ -41,7 +37,7 @@ import { finalize, timeout } from 'rxjs/operators';
   templateUrl: './user-role.component.html',
   styleUrls: ['./user-role.component.scss'],
 })
-export class UserRoleComponent {
+export class UserRoleComponent implements OnInit{
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild(UserLevelNewFormComponent, { static: false })

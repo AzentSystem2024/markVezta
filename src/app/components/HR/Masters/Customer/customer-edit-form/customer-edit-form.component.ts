@@ -2,16 +2,15 @@
 import {
   Component,
   NgModule,
-  enableProdMode,
-  OnInit,
   Input,
   SimpleChanges,
   Output,
   EventEmitter,
   ViewChild,
+  OnChanges,
+  OnInit,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.component';
 import {
   DxButtonModule,
@@ -35,7 +34,7 @@ import { AuthService, DataService } from 'src/app/services';
   templateUrl: './customer-edit-form.component.html',
   styleUrls: ['./customer-edit-form.component.scss'],
 })
-export class CustomerEditFormComponent {
+export class CustomerEditFormComponent implements OnInit, OnChanges {
   @Input() selectedCustomerData: any;
   @Output() ChangedCustomerData: any;
   @Output() updateCompleted = new EventEmitter<any>();
@@ -103,7 +102,6 @@ export class CustomerEditFormComponent {
 
   DEFAULT_COUNTRY_CODE: string = '';
   selectedTabIndex = 0;
-  //  newCustomer = this.formCustomerData;
   customerTypeOptions = [
     { text: 'Unit of Company', value: 1 },
     { text: 'Outside Customer', value: 2 },
@@ -114,6 +112,7 @@ export class CustomerEditFormComponent {
     { text: 'Sub-Dealer', value: 2 },
     { text: 'CompanyBranch', value: 3 },
   ];
+
   isDealerVisible: boolean;
   deliveryAddress1: any;
   deliveryAddress2: any;
@@ -128,23 +127,11 @@ export class CustomerEditFormComponent {
   countryCodeDeliveryaddress: any;
   Phone_limit: number;
   mobile_limit_Delivery_Address: number = 0;
-  //   countryCodeMap: { [key: string]: string } = {
-  //   India: '+91',
-  //   'United States': '+1',
-  //   'United Kingdom': '+44',
-  //   Canada: '+1',
-  //   Australia: '+61',
-  //   Germany: '+49',
-  //   France: '+33',
-  //   Singapore: '+65',
-  //   // add as many as needed
-  // };
+  savedAddresses: any[] = [];
 
   constructor(
     private service: DataService,
-    authservice: AuthService,
   ) {
-    // this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
     this.getStateDropDown();
     this.showCountry();
     this.sessionData_tax();
@@ -178,7 +165,7 @@ export class CustomerEditFormComponent {
         this.deliveryAddress3 = '';
       }
 
-      // ✅ Handle DeliveryAddresses (array of detailed addresses)
+      // Handle DeliveryAddresses (array of detailed addresses)
       if (this.formCustomerData.DeliveryAddresses?.length > 0) {
         const firstAddress = this.formCustomerData.DeliveryAddresses[0];
         const deliveyMobile = firstAddress.MOBILE;
@@ -191,7 +178,7 @@ export class CustomerEditFormComponent {
         this.locationValue = firstAddress.LOCATION || '';
         this.phoneValue = firstAddress.PHONE || '';
 
-        // ✅ Populate savedAddresses array to show cards
+        // Populate savedAddresses array to show cards
         this.savedAddresses = [...this.formCustomerData.DeliveryAddresses];
       } else {
         // Reset all when no data found
@@ -202,7 +189,7 @@ export class CustomerEditFormComponent {
         this.savedAddresses = [];
       }
 
-      // ✅ Show dealer dropdown automatically if Dealer Type = 2
+      // Show dealer dropdown automatically if Dealer Type = 2
       if (this.formCustomerData.CUST_TYPE === 2) {
         if (this.formCustomerData.DEALER_TYPE === 2) {
           this.isDealerVisible = true;
@@ -284,7 +271,7 @@ export class CustomerEditFormComponent {
       this.dealerList = response;
     });
   }
-  // getNewCustomerData = () => ({ ...this.newCustomer });
+
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -306,6 +293,7 @@ export class CustomerEditFormComponent {
       this.CountryDropdownData = response;
     });
   }
+
   getPriceLevelDropDown() {
     const payload = {
       NAME: 'PRICECLASS',
@@ -316,6 +304,7 @@ export class CustomerEditFormComponent {
       this.PriceLevelDropdownData = data;
     });
   }
+
   getVATRuleDropDown() {
     const payload = {
       NAME: 'VATRULE',
@@ -325,6 +314,7 @@ export class CustomerEditFormComponent {
       this.VATRuleDropdownData = data;
     });
   }
+
   getPaymentTerms() {
     this.service.getpayment_term_Api().subscribe((response) => {
       this.PaymentTermsDropdownData = response;
@@ -336,6 +326,7 @@ export class CustomerEditFormComponent {
       this.Warehouse = response;
     });
   }
+
   onWarehouseValue(event: any) {
     this.selectedWarehouseId = event.value;
     this.WarehouseId = event.value;
@@ -349,10 +340,12 @@ export class CustomerEditFormComponent {
         this.DeliveryAddress = response;
       });
   }
+
   onDeliveryAddressValue(event: any) {
     this.DeliveryAddressId = event.value;
     this.get_DeliveryAddress_Dropdown_List();
   }
+
   getStateDropDown() {
     const id = this.selecte_countyId;
     const payload = {
@@ -362,11 +355,10 @@ export class CustomerEditFormComponent {
     this.service.getStateData_Api(payload).subscribe((data: any) => {
       this.StateDropdownData = data;
     });
-    // this.service.getStateData().subscribe((data: any) => {
-    //   this.StateDropdownData = data;
-    // });
   }
+
   onStateSelectionChanged(event: any) {}
+
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
@@ -374,12 +366,12 @@ export class CustomerEditFormComponent {
       (country: any) => country.ID === this.selecte_countyId,
     );
 
-    // 4️⃣ If found, set code & name
+    // If found, set code & name
     if (selectedCountry) {
       // this.countryCode = selectedCountry.CODE; // e.g., '+971'
       this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
     } else {
-      // 5️⃣ Fallback if no country found
+      // Fallback if no country found
       // this.countryCode = '';
       this.DEFAULT_COUNTRY_CODE = '';
       console.warn(
@@ -424,9 +416,8 @@ export class CustomerEditFormComponent {
       PHONE: this.PhonenumberCode + '-' + this.formCustomerData.PHONE,
     };
   }
-  closePopup() {}
 
-  savedAddresses: any[] = [];
+  closePopup() {}
 
   saveDeliveryAddress() {
     // Validate that at least one field is filled
@@ -505,10 +496,12 @@ export class CustomerEditFormComponent {
   onDropdownClosed() {}
   onDropdownOpened() {}
   updateMobileNumber() {}
+  
   countryDisplay(item: any) {
     if (!item) return '';
     return `${item.CODE}${item.COUNTRY_NAME}`;
   }
+
   onCountrycodeChangeDeliveryAddressmobile(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,
@@ -517,6 +510,7 @@ export class CustomerEditFormComponent {
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }
+
   validateMobileLength = (e: any): boolean => {
     const value = (e.value || '').trim();
 
@@ -524,6 +518,7 @@ export class CustomerEditFormComponent {
 
     return value.length === this.mobile_limit;
   };
+
   validatePhoneLength = (e: any): boolean => {
     const value = (e.value || '').trim();
 
@@ -540,6 +535,7 @@ export class CustomerEditFormComponent {
       this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
+
   validateMobileLengthdeliveryaddress = (e: any): boolean => {
     const value = (e.value || '').trim();
     if (!value) return true;

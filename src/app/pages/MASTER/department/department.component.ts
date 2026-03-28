@@ -146,21 +146,20 @@ export class DepartmentComponent {
   };
 
   statusCellTemplate = (cellElement: any, cellInfo: any) => {
-    const status = cellInfo.value; // Get the value from `calculateCellValue`
-    const text = status; // Use the calculated value ("Inactive" or "Active")
+    const status = cellInfo.value; 
+    const text = status; 
 
     // Apply the dynamic styles and content
     cellElement.innerHTML = `
-<span style="
-  color: white;
-  padding: 2px 3px;
-  border-radius: 5px;
-  display: inline-block;
-  text-align: center;
-  min-width: 60px;"
->
-  ${text}
-</span>`;
+      <span style="
+        padding: 2px 3px;
+        border-radius: 5px;
+        display: inline-block;
+        text-align: center;
+        min-width: 60px;"
+      >
+        ${text}
+      </span>`;
   };
 
   onPopupCancel() {
