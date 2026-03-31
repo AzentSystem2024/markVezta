@@ -137,6 +137,7 @@
     (onCellPrepared)="highlightEditableColumns($event)"
     class="custom-data-grid"
     [columnAutoWidth]="true"
+    [showColumnLines]="true"
     (onContentReady)="onGrnContentReady($event)"
     (onEditorPreparing)="onEditorPreparing($event)"
     (onRowRemoved)="onRowRemoved($event)"
@@ -181,8 +182,14 @@
       "
       dataField="PRICE"
       caption="PRICE {{ localCurrencySymbol }}"
-      [width]="'auto'"
       [format]="{ type: 'fixedPoint', precision: 2 }"
+      [allowEditing]="false"
+      alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+    <dxi-column
+      dataField="PRICE"
+      caption="UNIT COST"
       [allowEditing]="false"
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -190,12 +197,10 @@
     <dxi-column
       dataField="PO_QUANTITY"
       caption="QTY IN PO"
-      [width]="87"
       [allowEditing]="false"
     ></dxi-column>
     <dxi-column
       dataField="UOM"
-      [width]="87"
       caption="PURCH UOM"
       [allowEditing]="false"
     ></dxi-column>
@@ -208,13 +213,11 @@
     ></dxi-column> -->
     <dxi-column
       dataField="QTY_TO_RECEIVE"
-      [width]="cwidth"
       caption="QTY TO RECEIVE"
       [allowEditing]="false"
     ></dxi-column>
     <dxi-column
       dataField="QUANTITY"
-      [width]="cwidth"
       caption="QTY RECEIVED"
       [allowEditing]="true"
       [editorOptions]="{
@@ -226,14 +229,12 @@
     ></dxi-column>
     <dxi-column
       dataField="QTY_BASE_UNIT"
-      [width]="cwidth"
       caption="QTY IN STOCK UNIT"
       [allowEditing]="false"
     ></dxi-column>
     <dxi-column
       *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2"
       dataField="SUPP_AMOUNT"
-      [width]="cwidth"
       caption="AMOUNT {{ currencySymbol }}"
       [allowEditing]="false"
       alignment="right"
@@ -244,7 +245,6 @@
         !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
       "
       dataField="AMOUNT"
-      [width]="cwidth"
       caption="AMOUNT {{ localCurrencySymbol }}"
       [allowEditing]="false"
       alignment="right"
@@ -253,13 +253,6 @@
 
     <!-- <dxi-column *ngFor="let col of dynamicColumns" [dataField]="col.dataField" [caption]="col.caption" [allowEditing]="col.allowEditing" [width]="col.width" [alignment]="col.alignment" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column> -->
 
-    <dxi-column
-      dataField="PRICE"
-      caption="UNIT COST"
-      [allowEditing]="false"
-      alignment="right"
-      [format]="{ type: 'fixedPoint', precision: 2 }"
-    ></dxi-column>
     <dxo-summary>
       <dxi-total-item
         column="AMOUNT"
