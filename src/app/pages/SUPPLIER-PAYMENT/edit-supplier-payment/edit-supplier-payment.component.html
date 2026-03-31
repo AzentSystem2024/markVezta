@@ -312,6 +312,11 @@
                 [width]="'100%'"
                 [disabled]="!(receiptMode === 'PDC')"
                 [readOnly]="isReadOnlyMode"
+                [inputAttr]="{ style: 'text-align: right' }"
+                [format]="{
+                  type: 'fixedPoint',
+                  precision: 2,
+                }"
               ></dx-number-box>
             </div>
           </div>

@@ -96,6 +96,7 @@ export class TimesheetEditComponent {
   employee_leaveperiopd_Data: any;
   timesheetList: any = [];
   is_approve: boolean = false;
+  Stores_List: any = [];
   constructor(private dataService: DataService) {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -136,6 +137,9 @@ export class TimesheetEditComponent {
           ),
         ];
       }
+
+      this.Timesheetlistdata();
+      this.employeeid = this.timesheetFormData.EMP_ID;
     }
   }
 
@@ -143,10 +147,20 @@ export class TimesheetEditComponent {
     this.sesstion_Details();
     this.loadDepartment();
     this.getSalaryHead();
-    // this.getPayTimeEntries();
+    this.getStoreDropdown();
     this.getEmployeeDropdown();
+    this.Timesheetlistdata();
   }
 
+  getStoreDropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.Stores_List = response;
+    });
+  }
   getPayTimeEntries() {
     this.dataService.getDropdownData('PAYTIME_ENTRY').subscribe((data: any) => {
       this.salaryHead = data;
@@ -220,6 +234,7 @@ export class TimesheetEditComponent {
           DAYS: 0,
           NORMAL_OT: 0,
           HOLIDAY_OT: 0,
+          STORE_ID: 0,
         }));
       }
     });
@@ -360,7 +375,40 @@ export class TimesheetEditComponent {
         EMP_ID: this.employeeid,
         EMP_NAME: '',
       };
+      console.log(this.timesheetList, '=======timesheetList===========');
+      console.log(this.employeeid, '=======employeeid===========');
 
+      const isEmployeeExists = this.timesheetList?.some(
+        (item) =>
+          Number(item.EMP_ID) === Number(this.employeeid) &&
+          item.ID !== this.timesheetFormData.ID, // exclude current editing row
+      );
+
+      if (isEmployeeExists) {
+        notify(
+          {
+            message: 'Employee already exists in this timesheet',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+        return;
+      }
+
+      const invalidStore = this.timesheetDetails.some(
+        (item) => !item.STORE_ID || Number(item.STORE_ID) === 0,
+      );
+
+      if (invalidStore) {
+        notify(
+          {
+            message: 'Store is mandatory in Timesheet Details',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+        return;
+      }
       this.dataService.updateTimesheet(payload).subscribe((response: any) => {
         if (response) {
           notify(
@@ -416,6 +464,7 @@ export class TimesheetEditComponent {
       DEPT_ID: null,
       DAYS: null,
       NORMAL_OT: 0,
+      STORE_ID: 0,
       HOLIDAY_OT: 0,
     });
 
@@ -492,25 +541,24 @@ export class TimesheetEditComponent {
   //====================LIST OF TIMESHEET=================
 
   //
-  // () {
-  //   const dateObj = new Date(this.timesheetFormData.TS_MONTH);
+  Timesheetlistdata() {
+    const dateObj = new Date(this.timesheetFormData.TS_MONTH);
 
-  //   const payload = {
-  //     COMPANY_ID: this.selected_Company_id,
-  //     MONTH: dateObj
-  //       .toLocaleDateString('en-US', {
-  //         month: 'long',
-  //         year: 'numeric',
-  //       })
-  //       .replace(/\s/g, ''),
-  //   };
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      MONTH: dateObj
+        .toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        })
+        .replace(/\s/g, ''),
+    };
 
-  //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-  //     this.timesheetList = response.data;
-  //     console.log(this.timesheetList, 'time sheeet list');
-  //   });
-  //   this.getEmployeeDropdown();
-  // }
+    this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
+      this.timesheetList = response.data;
+      console.log(this.timesheetList, 'time sheeet list');
+    });
+  }
 }
 
 @NgModule({
