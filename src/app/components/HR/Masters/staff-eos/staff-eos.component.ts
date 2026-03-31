@@ -231,6 +231,7 @@ export class StaffEOSComponent {
   //=======================Refresh=========================
   refreshGrid() {
     this.dataGrid.instance.refresh();
+    this.getStaffEosData();
   }
 
   initialLoad: boolean = true;
@@ -394,9 +395,17 @@ export class StaffEOSComponent {
     this.days_worked_value = '';
     this.all_workingdays = '';
     this.isAddPopUp = true;
+    this.selected_data.EOS_DATE = new Date();
     this.selected_data.RELIEVING_DATE = new Date();
     this.get_employes_details_value();
   }
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
 
   close() {
     console.log('close=======Buttomn clicked');

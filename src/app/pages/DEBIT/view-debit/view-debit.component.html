@@ -200,6 +200,7 @@
           dataField="Total"
           caption="Total"
           dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="false"
           [calculateCellValue]="calculateTotal"
         ></dxi-column>
@@ -259,6 +260,7 @@
           labelMode="floating"
           [(value)]="debitFormData[0].VEHICLE_NO"
           [width]="200"
+          [readOnly]="true"
         ></dx-text-box>
 
         <dx-check-box
@@ -288,7 +290,7 @@
           ></dx-text-box>
 
           <dx-check-box
-            [(value)]="debitFormData[0].IS_APPROVED"
+            [value]="debitFormData[0].TRANS_STATUS === 5"
             text="Approved"
             [readOnly]="true"
           >
