@@ -1712,6 +1712,9 @@ export class DataService {
 
     return this.http.post(`${this.apiUrl}SubDepartment/save`, data);
   }
+  select_subdepartment(id: any) {
+    return this.http.post(`${this.apiUrl}subdepartment/select/${id}`, {});
+  }
 
   Update_SubDepartment_Data(payload: any): Observable<any> {
     const data = {

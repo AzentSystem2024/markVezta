@@ -96,7 +96,10 @@
 
       <dxi-column dataField="DESCRIPTION" caption="Description">
         <dxi-validation-rule type="required" message="Description is required">
-          <dxi-validation-rule type="required" message="Description is required">
+          <dxi-validation-rule
+            type="required"
+            message="Description is required"
+          >
           </dxi-validation-rule>
         </dxi-validation-rule>
       </dxi-column>
@@ -119,17 +122,15 @@
   ></app-sub-department-add-form>
 </form-popup>
 
-
 <!-- ====== edit form popups ======== -->
 <dx-popup
   [(visible)]="editItemCategory"
   [width]="'35vw'"
   [height]="'40vh'"
-  title="Update Sub Department"
+  title="Update Sub Departmentsssss"
   (onHiding)="handleClose()"
 >
   <app-sub-department-edit-form
-    *ngIf="editItemCategory"
     [selectedData]="selected_data"
     (popupClosed)="handleClose()"
   ></app-sub-department-edit-form>
