@@ -158,12 +158,18 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   SubDepartmentDataSource: any = null;
 
   constructor(public dataservice: DataService) {
+    const SELECTED_COMPANY = JSON.parse(
+      sessionStorage.getItem('savedUserData'),
+    );
+    const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
+    this.COMPANY_ID = companyid.COMPANY_ID;
+
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
     });
-
     const dept_payload = {
-      NAME: 'EMPLOYEE DEPARTMENT',
+      NAME: 'DEPT',
+      COMPANY_ID: this.COMPANY_ID || 1,
     };
     dataservice.getDropdownData(dept_payload).subscribe((data) => {
       this.departments = data;
@@ -188,6 +194,11 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     });
   }
 
+  ngOnInit() {
+    this.sesstion_Details();
+    this.getEmployeeList();
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     const today = new Date();
     this.eighteenYearsAgo = new Date(
@@ -195,17 +206,6 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
       today.getMonth(),
       today.getDate(),
     );
-  }
-
-  ngOnInit() {
-    this.sesstion_Details();
-    this.getEmployeeList();
-    const SELECTED_COMPANY = JSON.parse(
-      sessionStorage.getItem('savedUserData'),
-    );
-    const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
-
-    this.COMPANY_ID = companyid.COMPANY_ID;
   }
 
   onImageUpload(event: any): void {

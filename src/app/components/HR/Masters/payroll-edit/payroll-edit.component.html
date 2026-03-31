@@ -60,7 +60,7 @@
         </dxi-item>
         <dxi-item location="before" locateInMenu="auto">
           <div class="stacked-toolbar-group basic-salary-container">
-            <dx-text-box
+            <dx-number-box
               class="basic-salary-box"
               [showClearButton]="true"
               label="Basic Salary"
@@ -68,7 +68,9 @@
               [(value)]="payRollData.BASIC_SALARY"
               [width]="180"
               [readOnly]="true"
-            ></dx-text-box>
+              format="#,##0.00"
+              [inputAttr]="{ style: 'text-align: right;' }"
+            ></dx-number-box>
           </div>
         </dxi-item>
 

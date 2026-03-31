@@ -64,7 +64,7 @@
             Fixed Asset Register
           </div>
         </dxi-item>
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-select-box
             [width]="200"
             label="Location"
@@ -87,13 +87,11 @@
             text="Apply"
             type="default"
             stylingMode="contained"
-            class="mt-2"
             (onClick)="Fixed_Asset_register()"
           >
           </dx-button>
         </dxi-item>
 
-       
         <dxi-item name="exportButton" style="margin-top: 6px"></dxi-item>
       </dxo-toolbar>
 
@@ -121,17 +119,19 @@
         dataType="string"
       ></dxi-column>
 
-     
-     
       <!-- Invoice Date -->
       <dxi-column
         dataField="STORE_CODE"
         caption="Store Code"
-         dataType="string"
+        dataType="string"
       ></dxi-column>
 
-       <!-- Age -->
- <dxi-column dataField="LOCATION" caption="Location" dataType="string"></dxi-column>
+      <!-- Age -->
+      <dxi-column
+        dataField="LOCATION"
+        caption="Location"
+        dataType="string"
+      ></dxi-column>
 
       <!-- Invoice No -->
       <dxi-column
@@ -146,7 +146,7 @@
         dataField="PURCH_VALUE"
         caption="Purch Value"
         dataType="number"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" 
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
       ></dxi-column>
 
       <!-- Narration -->
@@ -172,10 +172,7 @@
         caption="Current Asset Value"
         dataType="number"
         format="currency"
-      ></dxi-column>  
-
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </div>
-
-

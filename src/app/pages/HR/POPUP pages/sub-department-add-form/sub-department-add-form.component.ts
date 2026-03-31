@@ -27,7 +27,7 @@ export class SubDepartmentAddFormComponent implements OnInit {
   DepartmentDropdownData: any;
   formCategoryData = {
     CODE: '',
-    DESCRIPTION:'',
+    DESCRIPTION: '',
     DEPARTMENT_ID: '',
   };
   COMPANY_ID: string;
@@ -36,25 +36,20 @@ export class SubDepartmentAddFormComponent implements OnInit {
   constructor(private service: DataService) {}
 
   ngOnInit(): void {
-    this.session_Details();
     this.getDepartmentDropDown();
   }
 
   getNewCategoryData = () => ({ ...this.newCategory });
 
-  session_Details() {
+  getDepartmentDropDown() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.COMPANY_ID = String(sessionData.SELECTED_COMPANY.COMPANY_ID);
-  }
-
-  getDepartmentDropDown() {
-    const dropdowndepartment = 'DEPARTMENT';
-    const payload = {
-      NAME: dropdowndepartment,
+    const dept_payload = {
+      NAME: 'DEPT',
       COMPANY_ID: this.COMPANY_ID,
     };
 
-    this.service.getDropdownData(payload).subscribe((data: any) => {
+    this.service.getDropdownData(dept_payload).subscribe((data: any) => {
       this.DepartmentDropdownData = data;
       this.popupClosed.emit();
     });

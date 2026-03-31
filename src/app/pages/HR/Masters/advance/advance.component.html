@@ -59,20 +59,8 @@
       <dxi-item location="before">
         <div class="grid-header">Salary Advance</div>
       </dxi-item>
-      <!-- <dx-lookup [items]="Advance_Options" displayExpr="employeeName" valueExpr="employeeId"></dx-lookup> -->
 
-      <dxi-item>
-        <!-- <dx-select-box
-  [(value)]="selectedRange"
-  [dataSource]="dateRanges"
-  displayExpr="label"
-  valueExpr="value"
-  (onValueChanged)="onDateRangeChange($event)"
-  placeholder="Date Range"
-  class="mb-3"
->
-</dx-select-box> -->
-      </dxi-item>
+      <dxi-item> </dxi-item>
       <dxi-item
         location="after"
         locateInMenu="auto"
@@ -221,11 +209,9 @@
           <dx-number-box
             label="Amount"
             [labelMode]="'floating'"
-            [format]="'currency'"
-            [readOnly]="isEditReadOnly"
             formControlName="Amount"
             valueChangeEvent="input"
-            [format]="'#,##0.##'"
+            format="#,##0.00"
             (onValueChanged)="onAmountInput($event)"
             [inputAttr]="{ style: 'text-align: right;' }"
           >
@@ -279,8 +265,7 @@
             label="Net amount to be recovered"
             [labelMode]="'floating'"
             formControlName="Net_Amount_recoverd"
-            [format]="'currency'"
-            [format]="'#,##0.##'"
+            format="#,##0.00"
             valueChangeEvent="input"
           ></dx-number-box>
         </dxi-item>
@@ -311,8 +296,7 @@
             label="Installment Amount"
             valueChangeEvent="input"
             [labelMode]="'floating'"
-            [format]="'currency'"
-            [format]="'#,##0.##'"
+            format="#,##0.00"
             formControlName="installmen_amt"
             [inputAttr]="{ style: 'text-align: right;' }"
           ></dx-number-box
@@ -343,82 +327,6 @@
           formControlName="Remarks"
         ></dx-text-box
       ></dxi-item>
-      <!--     
-    <dxi-item style="text-align: center">
-      <label>Payment Details</label>
-    </dxi-item>
-    
-    
-<dxi-item>
-<label for="paymentModeRadio">Payment Mode</label>
-<dx-radio-group
- id="paymentModeRadio"
-  [items]="paymentModes"
-  [(value)]="selectedPaymentMode"
-  displayExpr="label"
-  valueExpr="value"
-  layout="horizontal"
-  label="Payment Mode"
-  [width]="300"
->
-</dx-radio-group>
-
-
-</dxi-item>
-    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
-      <dxi-item>
-        <dx-text-box
-          label="Voucher No"
-          [labelMode]="'floating'"
-          [(value)]="payment_Detilas.VOUCHER_NO"
-   
-        ></dx-text-box>
-      </dxi-item>
-
-      <dxi-item>
-        <dx-date-box
-        label="Voucher Date"
-        [(value)]="payment_Detilas.TRANS_DATE"
-  
-        labelMode="floating"
-        displayFormat="dd/MM/yyyy"
-      ></dx-date-box>
-    </dxi-item>
-      </dxi-item>
-   
-<dxi-item>
-        <dx-select-box
-          label=" Payment Ac"
-          [labelMode]="'floating'"
-          [inputAttr]="{ style: 'text-align: right;' }"
-          [(value)]="payment_Detilas.AMOUNT_PAID"
-
-          placeholder="0"
-        ></dx-select-box>
-      </dxi-item>
-      <label style="text-decoration: underline; text-underline-offset: 4px;">
-      Bank remittance Details
-      </label>
-    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
-      
-  
-      <dxi-item>
-        <dx-text-box
-          label="Cheque No"
-          [labelMode]="'floating'"
-          [(value)]="payment_Detilas.PAYMENT_REFERENCE"
-       
-        ></dx-text-box>
-      </dxi-item>
-         <dxi-item>
-        <dx-date-box
-        label="Due Date"
-        [(value)]="payment_Detilas.TRANS_DATE"
-        labelMode="floating"
-        displayFormat="dd/MM/yyyy"
-      ></dx-date-box>
-    </dxi-item>
-    </dxi-item> -->
     </dx-form>
   </dx-validation-group>
 </form-popup>
@@ -434,16 +342,6 @@
 >
   <dx-form id="form">
     <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
-      <!-- Document No -->
-      <!-- <dxi-item>
-        <dx-text-box
-          label="Document No"
-          [readOnly]="true"
-          [(value)]="docNo"
-          [labelMode]="'floating'"
-        ></dx-text-box>
-      </dxi-item> -->
-
       <!-- Date Picker -->
       <dxi-item>
         <dx-date-box
@@ -498,8 +396,7 @@
       <dxi-item>
         <dx-number-box
           label="Amount"
-          [format]="'currency'"
-          [format]="'#,##0.##'"
+          format="#,##0.00"
           valueChangeEvent="input"
           [readOnly]="isEditReadOnly"
           [(value)]="Advance_Amount_value"
@@ -519,8 +416,7 @@
       <dxi-item>
         <dx-number-box
           label="Net amount to be recovered"
-          [format]="'currency'"
-          [format]="'#,##0.##'"
+          format="#,##0.00"
           [readOnly]="isEditReadOnly"
           valueChangeEvent="input"
           [(value)]="reco_Amount_value"
@@ -531,14 +427,15 @@
       </dxi-item>
 
       <dxi-item>
-        <dx-text-box
+        <dx-number-box
           label="Amt. Recovered through Salary"
           [inputAttr]="{ style: 'text-align: right;' }"
           valueChangeEvent="input"
           [(value)]="recoverd_Amt_value"
           [readOnly]="true"
           [labelMode]="'floating'"
-        ></dx-text-box>
+          format="#,##0.00"
+        ></dx-number-box>
       </dxi-item>
     </dxi-item>
 
@@ -547,7 +444,6 @@
         <dx-number-box
           label="No of installments"
           valueChangeEvent="input"
-          [format]="'currency'"
           [format]="'#,##0.##'"
           [readOnly]="isEditReadOnly"
           [(value)]="reco_inst_count_value"
@@ -560,7 +456,7 @@
       <dxi-item>
         <dx-number-box
           label="Installment Amount"
-          [format]="'#,##0.##'"
+          format="#,##0.00"
           valueChangeEvent="input"
           [readOnly]="isEditReadOnly"
           [(value)]="reco_install_Amount_value"
@@ -586,7 +482,8 @@
           }"
           labelMode="floating"
           style="border: 1px"
-        ></dx-date-box>
+        >
+        </dx-date-box>
       </dxi-item>
     </dxi-item>
 
@@ -599,7 +496,15 @@
       ></dx-text-box>
     </dxi-item>
     <dxi-item style="text-align: center">
-      <label>Payment Details</label>
+      <label
+        style="
+          display: block;
+          text-align: left;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+        "
+        >Payment Details</label
+      >
     </dxi-item>
     <dxi-item>
       <dx-radio-group
@@ -692,7 +597,6 @@
         <dx-button text="Cancel" (onClick)="close()"></dx-button>
         <dx-button
           [visible]="!isEditReadOnly"
-          class="saveBtn"
           [text]="approveValue ? 'Update & Commit' : 'Update'"
           stylingMode="contained"
           (onClick)="Update_advance()"

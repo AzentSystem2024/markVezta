@@ -30,10 +30,10 @@ import { DataService } from 'src/app/services';
 })
 export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
   @Input() selectedData: any;
-
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild('departmentValidationGroup', { static: false })
   validationGroup!: DxValidationGroupComponent;
+
   formCategoryData = {
     ID: '',
     CODE: '',
@@ -48,21 +48,34 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
 
   constructor(private service: DataService) {}
 
+  ngOnInit(): void {
+    this.getDepartmentDropDown();
+  }
+
   getNewCategoryData = () => ({ ...this.newCategory });
+
+  getDepartmentDropDown() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = String(sessionData.SELECTED_COMPANY.COMPANY_ID);
+    const dept_payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    this.service.getDropdownData(dept_payload).subscribe((data: any) => {
+      this.DepartmentDropdownData = data;
+      this.popupClosed.emit();
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
       // Merge selectedData into formCategoryData
       this.formCategoryData = {
-        ...this.formCategoryData, // keep defaults
-        ...changes['selectedData'].currentValue, // override with incoming
+        ...this.formCategoryData,
+        ...changes['selectedData'].currentValue,
       };
     }
-  }
-
-  sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   showCategory() {
@@ -74,24 +87,10 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
     });
   }
 
-  getDepartmentDropDown() {
-    const dropdowndepartment = 'DEPARTMENT';
-    const payload = {
-      NAME: dropdowndepartment,
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.service.getDropdownData(payload).subscribe((data: any) => {
-      this.DepartmentDropdownData = data;
-    });
-  }
-  ngOnInit(): void {
-    this.sesstion_Details();
-    this.getDepartmentDropDown();
-  }
-
   closePopup() {
     this.popupClosed.emit();
   }
+
   UpdateData() {
     const result = this.validationGroup.instance.validate();
     if (!result.isValid) {
@@ -101,7 +100,7 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
       COMPANY_ID: this.selected_Company_id,
     };
     this.service.get_SubDepartment_Data().subscribe((response) => {
-      this.category = response;
+      this.category = response.data;
       const payload = {
         ...this.formCategoryData,
       };

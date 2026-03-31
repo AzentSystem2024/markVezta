@@ -64,7 +64,7 @@
             Depreciation Report
           </div>
         </dxi-item>
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-select-box
             [width]="200"
             label="Location"
@@ -78,7 +78,7 @@
           </dx-select-box>
         </dxi-item>
 
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-select-box
             labelMode="floating"
             labelLocation="left"
@@ -91,7 +91,7 @@
           ></dx-select-box>
         </dxi-item>
 
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-select-box
             labelMode="floating"
             labelLocation="left"
@@ -106,7 +106,7 @@
           </dx-select-box>
         </dxi-item>
 
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-date-box
             [width]="150"
             label="Date From"
@@ -116,7 +116,7 @@
             (onValueChanged)="onFromDateChange($event)"
           ></dx-date-box>
         </dxi-item>
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-date-box
             [width]="150"
             label="Date To"
@@ -127,7 +127,7 @@
           >
           </dx-date-box>
         </dxi-item>
-        <dxi-item location="after">
+        <dxi-item location="after" style="margin-bottom: 3px">
           <div class="toolbar-divider"></div>
         </dxi-item>
 
@@ -136,13 +136,12 @@
             text="Apply"
             type="default"
             stylingMode="contained"
-            class="mt-2"
             (onClick)="Depreciation_Report()"
           >
           </dx-button>
         </dxi-item>
 
-        <dxi-item name="exportButton" style="margin-top: 6px"></dxi-item>
+        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping
@@ -166,16 +165,20 @@
       ></dxi-column>
 
       <!-- Age -->
-      <dxi-column dataField="DESCRIPTION" caption="Description" dataType="string"></dxi-column>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Description"
+        dataType="string"
+      ></dxi-column>
 
-       <!-- Invoice No -->
+      <!-- Invoice No -->
       <dxi-column
         dataField="ASSET_TYPE"
         caption="Asset Type"
         dataType="string"
       ></dxi-column>
 
-       <!-- Reference No -->
+      <!-- Reference No -->
       <dxi-column
         dataField="LOCATION"
         caption="Location"
@@ -245,9 +248,6 @@
         dataType="number"
         format="currency"
       ></dxi-column>
-
     </dx-data-grid>
   </div>
 </div>
-
-

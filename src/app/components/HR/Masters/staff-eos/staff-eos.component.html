@@ -34,18 +34,7 @@
 
     <dxo-toolbar>
       <dxi-item location="before">
-        <div
-          class="grid-header"
-          style="
-            font-weight: 600;
-            font-size: 20px;
-            margin-left: 12px;
-            padding: -3px;
-            margin-right: 3px;
-          "
-        >
-          Staff End of Reason
-        </div>
+        <div class="grid-header">Staff End of Reason</div>
       </dxi-item>
 
       <dxi-item>
@@ -58,31 +47,24 @@
           placeholder="Date Range"
         ></dx-select-box>
       </dxi-item>
-
-      <dxi-item
-        location="after"
-        widget="dxButton"
-        [options]="refreshButtonOptions"
-      ></dxi-item>
-
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
-
-      <!-- Export (built-in, kept) -->
-      <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="export-btn"
-      ></dxi-item>
-
       <dxi-item
         location="after"
         locateInMenu="auto"
         widget="dxButton"
         [options]="addButtonOptions"
       ></dxi-item>
+
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      >
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="never">
+        <dx-button icon="search" (onClick)="toggle()"> </dx-button>
+      </dxi-item>
     </dxo-toolbar>
 
     <!-- <dxo-filter-row [visible]="isFilterVisible"></dxo-filter-row> -->
@@ -176,6 +158,7 @@
             [showClearButton]="true"
             [useMaskBehavior]="true"
             [displayFormat]="'dd/MM/yyyy'"
+            [(value)]="selected_data.EOS_DATE"
             type="date"
             [inputAttr]="{ 'aria-label': 'Date' }"
             formControlName="Date"
@@ -217,16 +200,29 @@
           ></dx-text-box>
         </dxi-item>
         <dxi-item>
-          <dx-text-box
-            label="Days Worked"
-            [readOnly]="true"
-            [(value)]="all_workingdays"
-            [inputAttr]="{ style: 'text-align: right;' }"
+          <dx-date-box
+            label="Relieving Date"
+            placeholder="dd/mm/yyyy"
+            [showClearButton]="true"
+            [useMaskBehavior]="true"
+            [displayFormat]="'dd/MM/yyyy'"
+            type="date"
+            [inputAttr]="{ 'aria-label': 'Date' }"
+            [(value)]="selected_data.RELIEVING_DATE"
             labelMode="floating"
-          ></dx-text-box>
+            (onValueChanged)="calculateWorkingDays($event)"
+          ></dx-date-box>
         </dxi-item>
       </dxi-item>
-
+      <dxi-item>
+        <dx-text-box
+          label="Days Worked"
+          [readOnly]="true"
+          [(value)]="all_workingdays"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          labelMode="floating"
+        ></dx-text-box>
+      </dxi-item>
       <dxi-item class="select-box">
         <dx-select-box
           [items]="reson_data"
@@ -285,7 +281,7 @@
 
         <dxi-item>
           <dx-date-box
-            label="EOS Date"
+            label="Doc Date"
             placeholder="dd/mm/yyyy"
             [showClearButton]="true"
             [useMaskBehavior]="true"
@@ -328,16 +324,30 @@
             labelMode="floating"
           ></dx-text-box>
         </dxi-item>
-
         <dxi-item>
-          <dx-text-box
-            label="Days Worked"
-            [readOnly]="true"
-            [(value)]="all_workingdays"
-            [inputAttr]="{ style: 'text-align: right;' }"
+          <dx-date-box
+            label="Relieving Date"
+            placeholder="dd/mm/yyyy"
+            [showClearButton]="true"
+            [useMaskBehavior]="true"
+            [displayFormat]="'dd/MM/yyyy'"
+            type="date"
+            [inputAttr]="{ 'aria-label': 'Date' }"
+            [(value)]="selected_data.RELIEVING_DATE"
             labelMode="floating"
-          ></dx-text-box>
+            (onValueChanged)="calculateWorkingDaysEdit($event)"
+          ></dx-date-box>
         </dxi-item>
+      </dxi-item>
+      <dxi-item>
+        <dx-text-box
+          label="Days Worked"
+          [readOnly]="true"
+          [(value)]="all_workingdays"
+          [inputAttr]="{ style: 'text-align: left;' }"
+          labelMode="floating"
+          width="150"
+        ></dx-text-box>
       </dxi-item>
 
       <dxi-item class="select-box">
@@ -377,11 +387,7 @@
         [colSpan]="2"
       >
         <div class="fixed-footer">
-          <dx-button
-            text="Cancel"
-            (onClick)="close()"
-            style="color: white; border: rgb(97, 97, 97)"
-          ></dx-button>
+          <dx-button text="Cancel" (onClick)="close()"></dx-button>
           <dx-button
             class="saveBtn"
             text="Update"
@@ -427,6 +433,7 @@
             [inputAttr]="{ 'aria-label': 'Date' }"
             [(value)]="selected_data.EOS_DATE"
             labelMode="floating"
+            [items]="reson_data"
           ></dx-date-box>
         </dxi-item>
       </dxi-item>
@@ -470,8 +477,9 @@
             [displayFormat]="'dd/MM/yyyy'"
             type="date"
             [inputAttr]="{ 'aria-label': 'Date' }"
-            [(value)]="selected_data.EOS_DATE"
+            [(value)]="selected_data.RELIEVING_DATE"
             labelMode="floating"
+            (onValueChanged)="calculateWorkingDaysEdit($event)"
           ></dx-date-box>
         </dxi-item>
       </dxi-item>
@@ -513,11 +521,7 @@
         [colSpan]="2"
       >
         <div class="fixed-footer">
-          <dx-button
-            text="Cancel"
-            (onClick)="close()"
-            style="color: white; border: rgb(97, 97, 97)"
-          ></dx-button>
+          <dx-button text="Cancel" (onClick)="close()"></dx-button>
           <dx-button
             class="saveBtn"
             text="Verify"
@@ -555,12 +559,13 @@
 
         <dxi-item>
           <dx-date-box
-            label="EOS Date"
+            label="Doc Date"
             placeholder="dd/mm/yyyy"
             [showClearButton]="true"
             [useMaskBehavior]="true"
             [displayFormat]="'dd/MM/yyyy'"
             type="date"
+            [readOnly]="true"
             [inputAttr]="{ 'aria-label': 'Date' }"
             [(value)]="selected_data.EOS_DATE"
             labelMode="floating"
@@ -576,6 +581,7 @@
           valueExpr="ID"
           label="Employee"
           [searchEnabled]="true"
+          [readOnly]="true"
           placeholder="Select.."
           labelMode="floating"
           (onValueChanged)="onEmployee_Change($event)"
@@ -596,17 +602,32 @@
             [readOnly]="true"
             [(value)]="join_date_value"
             labelMode="floating"
+            [readOnly]="true"
           ></dx-text-box>
         </dxi-item>
         <dxi-item>
-          <dx-text-box
-            label="Days Worked"
+          <dx-date-box
+            label="Relieving Date"
+            placeholder="dd/mm/yyyy"
+            [showClearButton]="true"
+            [useMaskBehavior]="true"
+            [displayFormat]="'dd/MM/yyyy'"
             [readOnly]="true"
-            [(value)]="all_workingdays"
-            [inputAttr]="{ style: 'text-align: right;' }"
+            type="date"
+            [inputAttr]="{ 'aria-label': 'Date' }"
+            [(value)]="selected_data.RELIEVING_DATE"
             labelMode="floating"
-          ></dx-text-box>
+          ></dx-date-box>
         </dxi-item>
+      </dxi-item>
+      <dxi-item>
+        <dx-text-box
+          label="Days Worked"
+          [readOnly]="true"
+          [(value)]="all_workingdays"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          labelMode="floating"
+        ></dx-text-box>
       </dxi-item>
 
       <dxi-item class="select-box">
@@ -619,6 +640,7 @@
           [searchEnabled]="true"
           placeholder="Select.."
           labelMode="floating"
+          [readOnly]="true"
         >
         </dx-select-box>
       </dxi-item>
@@ -629,6 +651,7 @@
           valueChangeEvent="input"
           [(value)]="selected_data.REMARKS"
           labelMode="floating"
+          [readOnly]="true"
         ></dx-text-area>
       </dxi-item>
 
@@ -639,11 +662,7 @@
         [colSpan]="2"
       >
         <div class="fixed-footer">
-          <dx-button
-            text="Cancel"
-            (onClick)="close()"
-            style="color: white; border: rgb(97, 97, 97)"
-          ></dx-button>
+          <dx-button text="Cancel" (onClick)="close()"></dx-button>
           <dx-button
             class="saveBtn"
             text="Approve"
@@ -677,7 +696,7 @@
 
         <dxi-item>
           <dx-date-box
-            label="EOS Date"
+            label="Doc Date"
             placeholder="dd/mm/yyyy"
             [showClearButton]="true"
             [useMaskBehavior]="true"
@@ -721,28 +740,42 @@
           ></dx-text-box>
         </dxi-item>
         <dxi-item>
-          <dx-number-box
-            [inputAttr]="{ style: 'text-align: right;' }"
-            label="Days Worked"
-            [(value)]="all_workingdays"
-            [readOnly]="true"
+          <dx-date-box
+            label="Relieving Date"
+            placeholder="dd/mm/yyyy"
+            [showClearButton]="true"
+            [useMaskBehavior]="true"
+            [displayFormat]="'dd/MM/yyyy'"
+            type="date"
+            [inputAttr]="{ 'aria-label': 'Date' }"
+            [(value)]="selected_data.RELIEVING_DATE"
             labelMode="floating"
-          ></dx-number-box>
+            [readOnly]="true"
+          ></dx-date-box>
         </dxi-item>
       </dxi-item>
-
+      <dxi-item>
+        <dx-number-box
+          [inputAttr]="{ style: 'text-align: right;' }"
+          label="Days Worked"
+          [(value)]="all_workingdays"
+          [readOnly]="true"
+          labelMode="floating"
+        ></dx-number-box>
+      </dxi-item>
       <dxi-item class="select-box">
-        <dx-text-box
+        <dx-select-box
           displayExpr="DESCRIPTION"
           valueExpr="ID"
+          [items]="reson_data"
           label="Reason"
           [searchEnabled]="true"
           placeholder="Select.."
-          [readOnly]="true"
+          [items]="reson_data"
           [(value)]="selected_data.REASON_ID"
           labelMode="floating"
         >
-        </dx-text-box>
+        </dx-select-box>
       </dxi-item>
 
       <dxi-item>

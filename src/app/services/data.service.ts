@@ -1712,6 +1712,9 @@ export class DataService {
 
     return this.http.post(`${this.apiUrl}SubDepartment/save`, data);
   }
+  select_subdepartment(id: any) {
+    return this.http.post(`${this.apiUrl}subdepartment/select/${id}`, {});
+  }
 
   Update_SubDepartment_Data(payload: any): Observable<any> {
     const data = {
@@ -4029,7 +4032,7 @@ The result can be exported to HTML or Markdown.`;
   //==========EOS==============
   //=======================get APi================
   get_EOS_List() {
-    const getEndpoint = this.apiUrl + '/EOS/list';
+    const getEndpoint = this.apiUrl + 'EOS/list';
     return this.http.post(getEndpoint, {});
   }
 
@@ -4040,7 +4043,7 @@ The result can be exported to HTML or Markdown.`;
     IS_INACTIVE: boolean,
     COMPANY_ID: number,
   ) {
-    const getEndpoint = this.apiUrl + '/EOS/save';
+    const getEndpoint = this.apiUrl + 'EOS/save';
     const reqBody = {
       CODE: CODE,
       DESCRIPTION: DESCRIPTION,
@@ -4059,7 +4062,7 @@ The result can be exported to HTML or Markdown.`;
     ID: any,
     COMPANY_ID: number,
   ) {
-    const getEndpoint = this.apiUrl + '/EOS/edit';
+    const getEndpoint = this.apiUrl + 'EOS/edit';
     const reqBody = {
       CODE: CODE,
       DESCRIPTION: DESCRIPTION,
@@ -4074,13 +4077,13 @@ The result can be exported to HTML or Markdown.`;
   //===========Select Api=================
 
   Select_EOS_Api(ID: any) {
-    const getEndpoint = this.apiUrl + `/EOS/select/${ID}`;
+    const getEndpoint = this.apiUrl + `EOS/select/${ID}`;
     return this.http.post(getEndpoint, {});
   }
 
   //===========delete Api==================
   Delete_EOS_Api(ID: any) {
-    const getEndpoint = this.apiUrl + `/EOS/delete/${ID}`;
+    const getEndpoint = this.apiUrl + `EOS/delete/${ID}`;
     return this.http.post(getEndpoint, {});
   }
 
@@ -4144,7 +4147,7 @@ The result can be exported to HTML or Markdown.`;
   // ===============Leave Type======================
   //=================get Leave Type===================
   get_LeaveType_Api() {
-    const getEndpoint = this.apiUrl + '/LeaveType/list';
+    const getEndpoint = this.apiUrl + 'LeaveType/list';
     return this.http.post(getEndpoint, {});
   }
 
@@ -4155,7 +4158,7 @@ The result can be exported to HTML or Markdown.`;
     LEAVE_SALARY_PAYABLE: any,
     IS_INACTIVE: boolean,
   ) {
-    const getEndpoint = this.apiUrl + '/LeaveType/save';
+    const getEndpoint = this.apiUrl + 'LeaveType/save';
     const reqBody = {
       CODE: CODE,
       DESCRIPTION: DESCRIPTION,
@@ -4174,7 +4177,7 @@ The result can be exported to HTML or Markdown.`;
     LEAVE_SALARY_PAYABLE: any,
     ID: any,
   ) {
-    const getEndpoint = this.apiUrl + '/LeaveType/update';
+    const getEndpoint = this.apiUrl + 'LeaveType/update';
     const reqBody = {
       CODE: CODE,
       DESCRIPTION: DESCRIPTION,
@@ -4189,13 +4192,13 @@ The result can be exported to HTML or Markdown.`;
   //===========Select Api=================
 
   Select_LeaveType_Api(ID: any) {
-    const getEndpoint = this.apiUrl + `/LeaveType/select/${ID}`;
+    const getEndpoint = this.apiUrl + `LeaveType/select/${ID}`;
     return this.http.post(getEndpoint, {});
   }
 
   //===========delete Api==================
   Delete_LeaveType_Api(ID: any) {
-    return this.http.post(`${this.apiUrl}/LeaveType/delete/${ID}`, {});
+    return this.http.post(`${this.apiUrl}LeaveType/delete/${ID}`, {});
     // return this.http.post(
     //   `${this.apiUrl}/tranferout/transferreport`,
     //   reqBodyData
@@ -4730,7 +4733,7 @@ The result can be exported to HTML or Markdown.`;
 
   // ========================Staff End of Service List =========================
   get_Staff_EOS_List() {
-    return this.http.post(`${this.apiUrl}/EmployeeEOS/list`, {});
+    return this.http.post(`${this.apiUrl}EmployeeEOS/list`, {});
   }
   //========================staff end of service add========================
   add_Staff_EOS(
@@ -4740,6 +4743,8 @@ The result can be exported to HTML or Markdown.`;
     emp_id: any,
     reason_id: any,
     remarks: any,
+    relieving_date: any,
+    days: any,
   ) {
     const reqBody = {
       USER_ID: user_id,
@@ -4748,19 +4753,20 @@ The result can be exported to HTML or Markdown.`;
       EMP_ID: emp_id,
       REASON_ID: reason_id,
       REMARKS: remarks,
+      RELIEVING_DATE: relieving_date,
+      DAYS: days,
     };
-    return this.http.post(`${this.apiUrl}/EmployeeEOS/save`, reqBody);
+    return this.http.post(`${this.apiUrl}EmployeeEOS/save`, reqBody);
   }
   //=========================staff end off service select=========================
   Dropdown_EOS_reason(type: any) {
     const reqbody = { NAME: 'EOS_REASON' };
-    return this.http.post(`${this.apiUrl}/DropDown`, reqbody);
+    return this.http.post(`${this.apiUrl}DropDown`, reqbody);
   }
 
   //=============================employee dropdown============
-  Dropdown_eos_employee(type: any) {
-    const reqbody = { NAME: 'EMPLOYEE' };
-    return this.http.post(`${this.apiUrl}DropDown`, reqbody);
+  Dropdown_eos_employee(item: any) {
+    return this.http.post(`${this.apiUrl}DropDown`, item);
   }
 
   get_employeeDetails(id: any) {
@@ -4786,6 +4792,8 @@ The result can be exported to HTML or Markdown.`;
     emp_id: any,
     reason_id: any,
     remarks: any,
+    relieving_date: any,
+    days: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4796,6 +4804,8 @@ The result can be exported to HTML or Markdown.`;
       REASON_ID: reason_id,
       REMARKS: remarks,
       EOS_AMOUNT: '',
+      RELIEVING_DATE: relieving_date,
+      DAYS: days,
       LEAVE_AMOUNT: '',
       PENDING_SALARY: '',
       ADD_AMOUNT: '',
@@ -4803,11 +4813,11 @@ The result can be exported to HTML or Markdown.`;
       ADD_REMARKS: '',
       DED_REMARKS: '',
     };
-    return this.http.post(`${this.apiUrl}/EmployeeEOS/update`, reqBody);
+    return this.http.post(`${this.apiUrl}EmployeeEOS/update`, reqBody);
   }
   //=========================staff end off service Delete=========================
   delete_Eos_data(id: any) {
-    return this.http.post(`${this.apiUrl}/EmployeeEOS/delete/${id}`, {});
+    return this.http.post(`${this.apiUrl}EmployeeEOS/delete/${id}`, {});
   }
   //=========================staff end off service Verify=========================
 
@@ -4819,6 +4829,8 @@ The result can be exported to HTML or Markdown.`;
     emp_id: any,
     reason_id: any,
     remarks: any,
+    relieving_date: any,
+    days: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4835,8 +4847,10 @@ The result can be exported to HTML or Markdown.`;
       DED_AMOUNT: '',
       ADD_REMARKS: '',
       DED_REMARKS: '',
+      RELIEVING_DATE: relieving_date,
+      DAYS: days,
     };
-    return this.http.post(`${this.apiUrl}/EmployeeEOS/verify`, reqBody);
+    return this.http.post(`${this.apiUrl}EmployeeEOS/verify`, reqBody);
   }
 
   //==================================Aprove Staff End of Service=========================
@@ -4848,6 +4862,8 @@ The result can be exported to HTML or Markdown.`;
     emp_id: any,
     reason_id: any,
     remarks: any,
+    relieving_date: any,
+    days: any,
   ) {
     const reqBody = {
       ID: id,
@@ -4864,8 +4880,10 @@ The result can be exported to HTML or Markdown.`;
       DED_AMOUNT: '',
       ADD_REMARKS: '',
       DED_REMARKS: '',
+      RELIEVING_DATE: relieving_date,
+      DAYS: days,
     };
-    return this.http.post(`${this.apiUrl}/EmployeeEOS/approve`, reqBody);
+    return this.http.post(`${this.apiUrl}EmployeeEOS/approve`, reqBody);
   }
 
   //=====================payement details==  ============
@@ -4974,7 +4992,7 @@ The result can be exported to HTML or Markdown.`;
   //===================Employee Leave========================
   //=================get Leave Type===================
   get_EmployeeLeave_Api() {
-    const getEndpoint = this.apiUrl + '/EmployeeVacation/list';
+    const getEndpoint = this.apiUrl + 'EmployeeVacation/list';
     return this.http.post(getEndpoint, {});
   }
 
@@ -5011,7 +5029,7 @@ The result can be exported to HTML or Markdown.`;
 
   //=================get LeaveType Dropdown ===================
   get_LeaveType_Dropdown_Api(LEAVE_TYPES: any) {
-    const getEndpoint = this.apiUrl + '/DropDown';
+    const getEndpoint = this.apiUrl + 'DropDown';
     const reqBody = {
       NAME: 'LEAVE_TYPES',
     };
@@ -5037,7 +5055,7 @@ The result can be exported to HTML or Markdown.`;
 
   //====================Select Api========================
   Select_EmployeeLeave_Api(ID: any) {
-    const getEndpoint = this.apiUrl + `/EmployeeVacation/select/${ID}`;
+    const getEndpoint = this.apiUrl + `EmployeeVacation/select/${ID}`;
     return this.http.post(getEndpoint, {});
   }
 
@@ -5063,7 +5081,7 @@ The result can be exported to HTML or Markdown.`;
     Deduct_days: any,
     Left_reason: any,
   ) {
-    const getEndpoint = this.apiUrl + '/EmployeeVacation/update';
+    const getEndpoint = this.apiUrl + 'EmployeeVacation/update';
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5111,7 +5129,7 @@ The result can be exported to HTML or Markdown.`;
     Deduct_days: any,
     Left_reason: any,
   ) {
-    const getEndpoint = this.apiUrl + '/EmployeeVacation/verify';
+    const getEndpoint = this.apiUrl + 'EmployeeVacation/verify';
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5159,7 +5177,7 @@ The result can be exported to HTML or Markdown.`;
     Deduct_days: any,
     Left_reason: any,
   ) {
-    const getEndpoint = this.apiUrl + '/EmployeeVacation/approve';
+    const getEndpoint = this.apiUrl + 'EmployeeVacation/approve';
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5187,7 +5205,7 @@ The result can be exported to HTML or Markdown.`;
 
   //===========delete Api==================
   Delete_EmployeeLeave_Api(ID: any) {
-    return this.http.post(`${this.apiUrl}/EmployeeVacation/delete/${ID}`, {});
+    return this.http.post(`${this.apiUrl}EmployeeVacation/delete/${ID}`, {});
     // return this.http.post(
     //   `${this.apiUrl}/tranferout/transferreport`,
     //   reqBodyData
