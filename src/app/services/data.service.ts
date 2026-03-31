@@ -1928,48 +1928,8 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}stores/list`, data);
   }
-  public postStoresData(
-    COMPANY_ID: any,
-    CODE: any,
-    STORE_NAME: any,
-    IS_PRODUCTION: any,
-    ADDRESS1: any,
-    ADDRESS2: any,
-    ADDRESS3: any,
-    ZIP_CODE: any,
-    STATE_ID: any,
-    CITY: any,
-    COUNTRY_ID: any,
-    IS_DEFAULT_STORE: any,
-    PHONE: any,
-    EMAIL: any,
-    VAT_REGNO: any,
-    GROUP_ID: any,
-    STORE_NO,
-    IS_ACTIVE: any,
-  ): Observable<any> {
-    const data = {
-      COMPANY_ID,
-      CODE,
-      STORE_NAME,
-      IS_PRODUCTION,
-      ADDRESS1,
-      ADDRESS2,
-      ADDRESS3,
-      ZIP_CODE,
-      STATE_ID,
-      CITY,
-      COUNTRY_ID,
-      IS_DEFAULT_STORE,
-      PHONE,
-      EMAIL,
-      VAT_REGNO,
-      GROUP_ID,
-      STORE_NO,
-      IS_ACTIVE,
-    };
-
-    return this.http.post(`${this.apiUrl}stores/save`, data);
+  postStoresData(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Stores/save`, payload);
   }
   removeStores(
     id: any,
@@ -2032,6 +1992,7 @@ export class DataService {
     GROUP_ID: any,
     STORE_NO: any,
     IS_ACTIVE: any,
+    DEPT_IDS: null,
   ): Observable<any> {
     const data = {
       ID,
@@ -2053,6 +2014,7 @@ export class DataService {
       GROUP_ID,
       STORE_NO,
       IS_ACTIVE,
+      DEPT_IDS,
     };
 
     return this.http.post(`${this.apiUrl}stores/save`, data);
@@ -3975,26 +3937,37 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //===============Add Api=========================
-  Insert_Department_Api(CODE: any, DEPT_NAME: any, IS_ACTIVE: boolean,COMPANY_ID:any) {
+  Insert_Department_Api(
+    CODE: any,
+    DEPT_NAME: any,
+    IS_ACTIVE: boolean,
+    COMPANY_ID: any,
+  ) {
     const getEndpoint = this.apiUrl + 'Department/save';
     const reqBody = {
       CODE: CODE,
       DEPT_NAME: DEPT_NAME,
       IS_ACTIVE: IS_ACTIVE,
-      COMPANY_ID : COMPANY_ID
+      COMPANY_ID: COMPANY_ID,
     };
     return this.http.post(getEndpoint, reqBody);
   }
 
   //==============Update Api==============================
-  Update_Department_Api(ID: any, CODE: any, DEPT_NAME: any, IS_ACTIVE: any,COMPANY_ID:any) {
+  Update_Department_Api(
+    ID: any,
+    CODE: any,
+    DEPT_NAME: any,
+    IS_ACTIVE: any,
+    COMPANY_ID: any,
+  ) {
     const getEndpoint = this.apiUrl + 'Department/edit';
     const reqBody = {
       ID: ID,
       CODE: CODE,
       DEPT_NAME: DEPT_NAME,
       IS_ACTIVE: IS_ACTIVE,
-      COMPANY_ID : COMPANY_ID
+      COMPANY_ID: COMPANY_ID,
     };
 
     return this.http.post(getEndpoint, reqBody);
