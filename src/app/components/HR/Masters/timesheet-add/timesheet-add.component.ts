@@ -100,6 +100,7 @@ export class TimesheetAddComponent {
   canPrint: any;
   canView: any;
   canApprove: any;
+  Stores_List: any;
   employee_leaveperiopd_Data: any;
 
   constructor(
@@ -130,7 +131,7 @@ export class TimesheetAddComponent {
 
     this.sesstion_Details();
     // this.getEmployeeDropdown();
-    // this.getSalaryHead();
+    this.getStoreDropdown();
     this.loadDepartment();
     this.getPayTimeEntries();
     // this.tsMonthDate = new Date(this.timesheetFormData.TS_MONTH + '-01');
@@ -148,6 +149,16 @@ export class TimesheetAddComponent {
       this.timesheetFormData.TS_MONTH = formattedDate;
     }
     this.fetchTimesheetList();
+  }
+  getStoreDropdown() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+
+      NAME: 'STORE',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.Stores_List = response;
+    });
   }
 
   formatAmount = (cellInfo: any) => {
@@ -248,6 +259,7 @@ export class TimesheetAddComponent {
       DAYS: 0,
       NORMAL_OT: 0,
       HOLIDAY_OT: 0,
+      STORE_ID: 0,
     });
 
     // refresh grid if needed
@@ -321,6 +333,7 @@ export class TimesheetAddComponent {
           DAYS: 0,
           NORMAL_OT: 0,
           HOLIDAY_OT: 0,
+          STORE_ID: 0,
         },
       ];
     });
@@ -588,7 +601,6 @@ export class TimesheetAddComponent {
     this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
       this.timesheetList = response.data;
     });
-    this.getEmployeeDropdown();
   }
   //============employee--leave-period========
   Employee_leaveperiod() {

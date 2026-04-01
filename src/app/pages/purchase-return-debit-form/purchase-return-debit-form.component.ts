@@ -90,6 +90,8 @@ export class PurchaseReturnDebitFormComponent {
   mainGridData: any[] = [];
   isApproved: boolean = false;
   logoBase64: string;
+  departmentList: any;
+  storeList: any;
   purchaseReturnFormData: any = {
     COMPANY_ID: 0,
     STORE_ID: 0,
@@ -203,6 +205,8 @@ export class PurchaseReturnDebitFormComponent {
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
     });
+    this.getStoreData();
+    this.getDepartments();
   }
 
   private async convertToBase64(path: string): Promise<string> {
@@ -284,6 +288,11 @@ export class PurchaseReturnDebitFormComponent {
         SGST: 0,
 
         DOC_NO: item.DOC_NO,
+        STORE_ID: data.STORE_ID,
+        DEPT_ID: data.DEPT_ID,
+        // STORE_ID: item.STORE_ID ?? this.purchaseReturnFormData.STORE_ID ?? null,
+
+        // DEPT_ID: item.DEPT_ID ?? this.purchaseReturnFormData.DEPT_ID ?? null,
       };
     });
 
@@ -298,6 +307,26 @@ export class PurchaseReturnDebitFormComponent {
         this.itemsGridRef?.instance?.endCustomLoading();
       }
     }, 50);
+  }
+
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+    });
+  }
+
+  getDepartments() {
+    const payload = {
+      NAME: 'DEPARTMENTS',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.departmentList = res;
+    });
   }
 
   getDocNo() {
@@ -473,7 +502,9 @@ export class PurchaseReturnDebitFormComponent {
     if (
       e.dataField === 'QUANTITY' ||
       e.dataField === 'VAT_PERC' ||
-      e.dataField === 'RATE'
+      e.dataField === 'RATE' ||
+      e.dataField === 'STORE_ID' ||
+      e.dataField === 'DEPT_ID'
     ) {
       e.editorOptions = e.editorOptions || {};
 
@@ -587,7 +618,15 @@ export class PurchaseReturnDebitFormComponent {
       notify('Please add at least one item.', 'warning', 2000);
       return;
     }
+    // ✅ Get Store & Department from grid
+    this.itemsGridRef.instance.saveEditData();
 
+    const selectedStoreId = this.mainGridData[0]?.STORE_ID || null;
+    const selectedDeptId = this.mainGridData[0]?.DEPT_ID || null;
+
+    // ✅ Assign to header
+    this.purchaseReturnFormData.STORE_ID = selectedStoreId;
+    this.purchaseReturnFormData.DEPT_ID = selectedDeptId;
     // Validate quantity
     const invalidQtyRow = this.mainGridData.find(
       (row) => !row.QUANTITY || row.QUANTITY <= 0,
@@ -628,7 +667,9 @@ export class PurchaseReturnDebitFormComponent {
         }
         return {
           COMPANY_ID: this.purchaseReturnFormData.COMPANY_ID,
-          STORE_ID: this.purchaseReturnFormData.STORE_ID,
+          // STORE_ID: this.purchaseReturnFormData.STORE_ID,
+          STORE_ID: selectedStoreId,
+          DEPT_ID: selectedDeptId,
           BAR_CODE: row.BARCODE ?? '',
           GRN_DET_ID: row.GRN_DET_ID ?? 0,
           ITEM_ID: row.ITEM_ID ?? 0,

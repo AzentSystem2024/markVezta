@@ -1931,48 +1931,8 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}stores/list`, data);
   }
-  public postStoresData(
-    COMPANY_ID: any,
-    CODE: any,
-    STORE_NAME: any,
-    IS_PRODUCTION: any,
-    ADDRESS1: any,
-    ADDRESS2: any,
-    ADDRESS3: any,
-    ZIP_CODE: any,
-    STATE_ID: any,
-    CITY: any,
-    COUNTRY_ID: any,
-    IS_DEFAULT_STORE: any,
-    PHONE: any,
-    EMAIL: any,
-    VAT_REGNO: any,
-    GROUP_ID: any,
-    STORE_NO,
-    IS_ACTIVE: any,
-  ): Observable<any> {
-    const data = {
-      COMPANY_ID,
-      CODE,
-      STORE_NAME,
-      IS_PRODUCTION,
-      ADDRESS1,
-      ADDRESS2,
-      ADDRESS3,
-      ZIP_CODE,
-      STATE_ID,
-      CITY,
-      COUNTRY_ID,
-      IS_DEFAULT_STORE,
-      PHONE,
-      EMAIL,
-      VAT_REGNO,
-      GROUP_ID,
-      STORE_NO,
-      IS_ACTIVE,
-    };
-
-    return this.http.post(`${this.apiUrl}stores/save`, data);
+  postStoresData(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Stores/save`, payload);
   }
   removeStores(
     id: any,
@@ -2035,6 +1995,7 @@ export class DataService {
     GROUP_ID: any,
     STORE_NO: any,
     IS_ACTIVE: any,
+    DEPT_IDS: null,
   ): Observable<any> {
     const data = {
       ID,
@@ -2056,6 +2017,7 @@ export class DataService {
       GROUP_ID,
       STORE_NO,
       IS_ACTIVE,
+      DEPT_IDS,
     };
 
     return this.http.post(`${this.apiUrl}stores/save`, data);
@@ -6389,6 +6351,11 @@ The result can be exported to HTML or Markdown.`;
 
   SalaryWPSFile(payload) {
     const getEndpoint = this.apiUrl + 'SalaryWPS/wps';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  profitLoss_Branch_Report(payload) {
+    const getEndpoint = this.apiUrl + 'Report/profitlossbranch';
     return this.http.post(getEndpoint, payload);
   }
 }

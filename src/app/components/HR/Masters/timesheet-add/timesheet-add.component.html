@@ -171,6 +171,17 @@
           (onRowUpdated)="onTimesheetDetailsUpdated($event)"
           (onEditorPreparing)="onEditorPreparingTImesheetdetails($event)"
         >
+          <dxi-column dataField="STORE_ID" caption="Store">
+            <dxo-lookup
+              [dataSource]="Stores_List"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              [allowClearing]="false"
+            >
+              <dxi-validation-rule type="required" message="Store is required">
+              </dxi-validation-rule>
+            </dxo-lookup>
+          </dxi-column>
           <dxi-column dataField="DEPT_ID" caption="Department">
             <dxo-lookup
               [dataSource]="Departments"

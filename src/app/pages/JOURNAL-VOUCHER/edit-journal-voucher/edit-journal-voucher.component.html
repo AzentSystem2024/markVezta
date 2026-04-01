@@ -178,6 +178,20 @@
               searchEnabled: true,
             }"
           ></dxi-column>
+          <dxi-column dataField="STORE_ID" caption="Store">
+            <dxo-lookup
+              [dataSource]="storeList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+            ></dxo-lookup>
+          </dxi-column>
+          <dxi-column dataField="DEPT_ID" caption="Department">
+            <dxo-lookup
+              [dataSource]="departmentList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+            ></dxo-lookup>
+          </dxi-column>
           <dxi-column
             dataField="particulars"
             caption="Particulars"

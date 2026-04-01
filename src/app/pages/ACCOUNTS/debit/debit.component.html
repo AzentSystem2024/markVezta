@@ -74,7 +74,18 @@
       ></dxo-filter-row>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Debit Note</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Debit Note
+          </div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <!-- <dxi-item widget="dxButton" [options]="filterButtonOptions"></dxi-item> -->
@@ -91,6 +102,9 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+        <dxi-item location="after" style="margin-top: 3px">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item
           name="exportButton"
           location="after"

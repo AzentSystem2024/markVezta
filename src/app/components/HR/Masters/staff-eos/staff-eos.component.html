@@ -45,7 +45,6 @@
           valueExpr="value"
           (onValueChanged)="onDateRangeChange($event)"
           placeholder="Date Range"
-          class="mb-3"
         ></dx-select-box>
       </dxi-item>
       <dxi-item
@@ -55,8 +54,12 @@
         [options]="addButtonOptions"
       ></dxi-item>
 
-      <dxi-item location="after" locateInMenu="never">
-        <dx-button icon="refresh" (onClick)="refreshGrid()"></dx-button>
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      >
       </dxi-item>
 
       <dxi-item location="after" locateInMenu="never">

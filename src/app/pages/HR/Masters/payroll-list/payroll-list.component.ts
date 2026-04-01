@@ -88,10 +88,9 @@ export class PayrollListComponent {
   };
 
   approveButtonOptions = {
-    icon: 'check',
     text: 'Apprrove',
     type: 'default',
-    stylingMode: 'outlined',
+    stylingMode: 'contained',
     hint: 'Approve selected payrolls',
     disabled: false, // Initially disabled
     onClick: () => {

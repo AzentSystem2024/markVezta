@@ -101,6 +101,9 @@ export class EditJournalVoucherComponent {
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
   isSaving = false;
+  selectedCompanyId: any;
+  storeList: any;
+  departmentList: any;
 
   constructor(
     private dataService: DataService,
@@ -114,7 +117,7 @@ export class EditJournalVoucherComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-
+    this.selectedCompanyId = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || null;
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
@@ -129,7 +132,8 @@ export class EditJournalVoucherComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
+    this.getDepartments();
+    this.getStoreData();
     this.getLedgerCodeDropdown();
     this.Deparment_Drop_down();
   }
@@ -157,6 +161,8 @@ export class EditJournalVoucherComponent {
             particulars: item.PARTICULARS ?? '',
             debitAmount: item.DEBIT_AMOUNT ?? '',
             creditAmount: item.CREDIT_AMOUNT ?? '',
+            DEPT_ID: item.DEPT_ID ?? incomingData.DEPT_ID ?? null,
+            STORE_ID: item.STORE_ID ?? null,
           };
         },
       );
@@ -186,6 +192,26 @@ export class EditJournalVoucherComponent {
         this.dataGrid.instance.refresh();
       }
     }
+  }
+
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+    });
+  }
+
+  getDepartments() {
+    const payload = {
+      NAME: 'DEPARTMENTS',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.departmentList = res;
+    });
   }
 
   Deparment_Drop_down() {

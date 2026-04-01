@@ -236,7 +236,8 @@
           [readOnly]="isReadOnly"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [editorOptions]="{ showSpinButtons: true }"
-          [allowEditing]="!isReadOnly"
+          [allowEditing]="false"
+          [readOnly]="true"
         >
           <dxo-header-filter [allowSelectAll]="false">
             <dxo-search [enabled]="true"></dxo-search>
@@ -268,7 +269,7 @@
       <dx-number-box
         label="Total Expense"
         width="200px"
-        [readOnly]="isReadOnly"
+        [readOnly]="true"
         labelMode="floating"
         [format]="{ type: 'fixedPoint', precision: 2 }"
         [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"

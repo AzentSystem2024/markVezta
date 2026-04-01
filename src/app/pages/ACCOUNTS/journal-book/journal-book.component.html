@@ -153,15 +153,10 @@
         <dxi-item
           name="exportButton"
           location="after"
-          cssClass="export-btn"
+          cssClass="export-btn mt-1"
         ></dxi-item>
 
-        <dxi-item
-          location="after"
-          template="ApplyButton"
-          cssClass="bottom-toolbar-buttons"
-        >
-        </dxi-item>
+        <dxi-item location="after" template="ApplyButton"> </dxi-item>
 
         <div *dxTemplate="let data of 'ApplyButton'">
           <dxi-item itemType="simple" verticalAlignment="center">
@@ -169,7 +164,6 @@
               text="Apply"
               stylingMode="contained"
               type="default"
-              class="mt-2"
               (onClick)="load_JournalBook_data()"
             >
             </dx-button>
