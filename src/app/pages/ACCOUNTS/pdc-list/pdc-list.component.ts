@@ -721,9 +721,7 @@ export class PdcListComponent {
 
   handleClose() {
     this.addPDCPopupOpened = false;
-    this.editPDCPopupOpened = false;
-    this.selectedDateRange = 'today';
-    this.selectedEntryDateRange = 'today';
+    this.editPDCPopupOpened = false; 
     this.get_PDC_list();
   }
 }

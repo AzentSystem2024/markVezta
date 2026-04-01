@@ -18,7 +18,6 @@
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
-     
       (onEditorPreparing)="onEditorPreparing($event)"
       (onContentReady)="onContentReady($event)"
       (onRowInserted)="onRowInserted($event)"
@@ -60,6 +59,8 @@
               [labelMode]="'floating'"
               [(value)]="payRollData.BASIC_SALARY"
               [width]="180"
+              format="#,##0.00"
+              [inputAttr]="{ style: 'text-align: right;' }"
               [readOnly]="true"
             ></dx-text-box>
           </div>
@@ -101,8 +102,6 @@
                 [max]="12"
                 [readOnly]="true"
               ></dx-number-box>
-
-              
             </div>
           </div>
         </dxi-item>
@@ -121,7 +120,7 @@
         [lookup]="{
           dataSource: salaryHeadList,
           valueExpr: 'ID',
-          displayExpr: 'HEAD_NAME'
+          displayExpr: 'HEAD_NAME',
         }"
       >
       </dxi-column>
@@ -145,7 +144,7 @@
         [allowEditing]="false"
         [editorOptions]="{ format: '#,##0.00' }"
       ></dxi-column>
-      
+
       <dxo-summary>
         <dxi-total-item
           column="GROSS_AMOUNT"
@@ -209,6 +208,5 @@
       type="normal"
       (onClick)="handleClose()"
     ></dx-button>
-
   </div>
 </div>
