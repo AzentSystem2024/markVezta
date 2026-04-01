@@ -121,6 +121,8 @@ export class AddJournalVoucharComponent {
   selectedCompanyId: any;
   selectedFinId: any;
   isSaving = false;
+  storeList: any;
+  departmentList: any;
 
   constructor(
     private dataService: DataService,
@@ -181,6 +183,9 @@ export class AddJournalVoucharComponent {
         creditAmount: '',
       },
     ];
+
+    this.getStoreData();
+    this.getDepartments();
   }
 
   addButtonOptions = {
@@ -204,6 +209,26 @@ export class AddJournalVoucharComponent {
     `;
     },
   };
+
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+    });
+  }
+
+  getDepartments() {
+    const payload = {
+      NAME: 'DEPARTMENTS',
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.departmentList = res;
+    });
+  }
 
   Deparment_Drop_down() {
     this.dataService.Department_Dropdown().subscribe((res: any) => {
@@ -346,7 +371,9 @@ export class AddJournalVoucharComponent {
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
       e.dataField === 'debitAmount' ||
-      e.dataField === 'creditAmount'
+      e.dataField === 'creditAmount' ||
+      e.dataField === 'STORE_ID' ||
+      e.dataField === 'DEPT_ID'
     ) {
       e.editorOptions = e.editorOptions || {};
 
@@ -794,7 +821,7 @@ export class AddJournalVoucharComponent {
           'success',
         );
 
-        // // ⭐ DO NOT REMOVE — Needed for auto-setting voucher number
+        // // DO NOT REMOVE — Needed for auto-setting voucher number
         // if (response?.VoucherNo) {
         //   this.journalVoucherFormData.VOUCHER_NO = response.VoucherNo;
         // }
@@ -904,6 +931,8 @@ export class AddJournalVoucharComponent {
         PARTICULARS: item.particulars,
         DEBIT_AMOUNT: item.debitAmount ? parseFloat(item.debitAmount) : 0.0,
         CREDIT_AMOUNT: item.creditAmount ? parseFloat(item.creditAmount) : 0.0,
+        STORE_ID: item.STORE_ID || this.journalVoucherFormData.STORE_ID,
+        DEPT_ID: item.DEPT_ID || this.journalVoucherFormData.DEPT_ID,
       };
     });
     const today = new Date();

@@ -767,7 +767,7 @@ export class PurchaseOrderComponent {
     this.isSaving = true;
 
     const data = this.poNewForm.getNewPoData();
-    // ✅ Combine country code + mobile before save
+    // Combine country code + mobile before save
 
     const suppCode = this.poNewForm.supplierCountryCode?.replace('+', '');
     const contactCode = this.poNewForm.shippingCountryCode?.replace('+', '');

@@ -77,6 +77,8 @@ export class AddPurchaseInvoiceComponent {
   pendingGRNs: any;
   selectedGRNs: any[] = [];
   mainGridData: any[] = [];
+  departmentList: any;
+  storeList: any;
   purchaseInvoiceFormData: any = {
     COMPANY_ID: 0,
     USER_ID: 0,
@@ -141,6 +143,7 @@ export class AddPurchaseInvoiceComponent {
         GRN_QUANTITY: '',
         SGST: 0,
         CGST: 0,
+        DEPT_ID: '',
       },
     ],
   };
@@ -199,8 +202,30 @@ export class AddPurchaseInvoiceComponent {
     this.getSupplierOrUnitLst();
     this.getPendingGRNList();
 
-    // ⭐ CALL DOC NO ONLY AFTER COMPANY_ID IS READY
+    // CALL DOC NO ONLY AFTER COMPANY_ID IS READY
     this.getSuppInvNo();
+    this.getStoreData();
+    this.getDepartments();
+  }
+
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+    });
+  }
+
+  getDepartments() {
+    const payload = {
+      NAME: 'DEPARTMENTS',
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.departmentList = res;
+    });
   }
 
   getSupplierDropdown() {
@@ -348,7 +373,12 @@ export class AddPurchaseInvoiceComponent {
   };
 
   onEditorPreparing(e: any) {
-    if (e.dataField === 'QUANTITY' || e.dataField === 'VAT_PERC') {
+    if (
+      e.dataField === 'QUANTITY' ||
+      e.dataField === 'VAT_PERC' ||
+      e.dataField === 'STORE_ID' ||
+      e.dataField === 'DEPT_ID'
+    ) {
       e.editorOptions = e.editorOptions || {};
 
       // Let the editor inherit row height naturally (no fixed height)
@@ -550,6 +580,12 @@ export class AddPurchaseInvoiceComponent {
     let grossAmount = 0;
     let vatAmount = 0;
     let netAmount = 0;
+    // Ensure latest edited values are saved
+    this.itemsGridRef.instance.saveEditData();
+
+    // Take from first row (since it's common for all)
+    const selectedStoreId = this.mainGridData[0]?.STORE_ID || 0;
+    const selectedDeptId = this.mainGridData[0]?.DEPT_ID || 0;
     this.purchaseInvoiceFormData.PurchDetails = this.mainGridData.map(
       (item: any) => {
         const amount = this.calculateAmount(item);
@@ -562,7 +598,9 @@ export class AddPurchaseInvoiceComponent {
         return {
           COMPANY_ID: this.selectedCompany,
           USER_ID: this.user_id,
-          STORE_ID: this.store_id,
+          // STORE_ID: this.store_id,
+          STORE_ID: selectedStoreId || this.store_id,
+          DEPT_ID: selectedDeptId || 0,
           FIN_ID: this.fin_id,
           PURCH_ID: 0, // or a real ID if updating
           GRN_DET_ID: item.GRN_DET_ID || '', // populate based on GRN data
@@ -620,7 +658,8 @@ export class AddPurchaseInvoiceComponent {
 
     this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
     this.purchaseInvoiceFormData.USER_ID = this.user_id;
-    this.purchaseInvoiceFormData.STORE_ID = this.store_id;
+    this.purchaseInvoiceFormData.STORE_ID = selectedStoreId || 0;
+    this.purchaseInvoiceFormData.DEPT_ID = selectedDeptId || 0;
     this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
     this.purchaseInvoiceFormData.PURCH_DATE = invoiceDate;
 

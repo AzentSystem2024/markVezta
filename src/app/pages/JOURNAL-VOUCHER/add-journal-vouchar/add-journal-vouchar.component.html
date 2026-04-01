@@ -122,7 +122,7 @@
                 <div style="display: flex; gap: 5px">
                   <dx-text-box
                     #narrationRefBox
-                    label="Narration"
+                    label="Remark"
                     labelMode="floating"
                     [(value)]="journalVoucherFormData.NARRATION"
                     [width]="365"
@@ -192,7 +192,20 @@
               searchEnabled: true,
             }"
           ></dxi-column>
-
+          <dxi-column dataField="STORE_ID" caption="Store">
+            <dxo-lookup
+              [dataSource]="storeList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+            ></dxo-lookup>
+          </dxi-column>
+          <dxi-column dataField="DEPT_ID" caption="Department">
+            <dxo-lookup
+              [dataSource]="departmentList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+            ></dxo-lookup>
+          </dxi-column>
           <dxi-column
             dataField="particulars"
             caption="Particulars"

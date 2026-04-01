@@ -100,7 +100,6 @@ export class PayrollAddComponent implements OnInit, OnChanges {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    console.log(this.companyID, 'COMPANYIDPAYROLLLLLLLLLLLLLLLLLLLLLLL');
     this.userID = menuResponse.USER_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
@@ -158,7 +157,6 @@ export class PayrollAddComponent implements OnInit, OnChanges {
         })
         .replace(/\s/g, ''),
     };
-    console.log(payload, 'payloadddddddddddddddddddd');
     this.dataSerivice
       .getTimesheetListForPayroll(payload)
       .subscribe((response: any) => {
