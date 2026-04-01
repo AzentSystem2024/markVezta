@@ -60,12 +60,11 @@
         [formats]="['xlsx']"
       >
       </dxo-export>
-      <!-- <dxo-header-filter [visible]="isFilterOpened">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter> -->
+     
 
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
+
       <dxo-toolbar>
         <dxi-item location="before">
           <div class="grid-header">Packing</div>
@@ -105,20 +104,12 @@
       </dxo-toolbar>
 
       <dxi-column dataField="SNO" caption="S.No." alignment="left"></dxi-column>
-
       <dxi-column dataField="ArtNo" caption="Art No."></dxi-column>
       <dxi-column dataField="Color" caption="Color"></dxi-column>
-
       <dxi-column dataField="Category" caption="Category"></dxi-column>
       <dxi-column dataField="PackingName" caption="Description"></dxi-column>
       <dxi-column dataField="Type" caption="Type"></dxi-column>
       <dxi-column dataField="Brand" caption="Brand"></dxi-column>
-      <!-- <dxi-column dataField="ID" caption="ID"></dxi-column> -->
-      <!-- <dxi-column
-        dataField="UnitId"
-        alignment="Left"
-        caption="Unit"
-      ></dxi-column> -->
       <dxi-column dataField="AliasNo" caption="Item Code"></dxi-column>
       <dxi-column dataField="PartNo" caption="Part No."></dxi-column>
       <dxi-column dataField="PairQty" caption="Pair Qty"></dxi-column>
@@ -128,7 +119,6 @@
         alignment="center"
         cellTemplate="statusCellTemplate"
       ></dxi-column>
-      <!-- <dxi-column dataField="Unit" caption="Unit"></dxi-column> -->
 
       <div *dxTemplate="let cellData of 'statusCellTemplate'">
         <i
@@ -137,7 +127,6 @@
           [attr.title]="cellData.value == 'Active' ? 'Active ' : 'Inactive '"
           style="cursor: default; align-items: center"
         ></i>
-              
       </div>
     </dx-data-grid>
   </div>
@@ -146,7 +135,7 @@
 <dx-popup
   [(visible)]="addPackingPopupVisible"
   [width]="'80vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="New Packing"
   (onHiding)="handleClose()"
 >
@@ -156,7 +145,7 @@
 <dx-popup
   [(visible)]="editPackPopupOpened"
   [width]="'80vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="Update Packing"
   (onHiding)="handleClose()"
 >
@@ -166,22 +155,3 @@
     (popupClosed)="handleClose()"
   ></app-packing-edit>
 </dx-popup>
-<!-- <dx-popup
-
-
- *ngIf="editArticlePopupOpened"
-    
-
-[articleData]="selectedArticle"======================Update data==========
-  [(visible)]="editArticlePopupOpened"
-  [width]="'70vw'"
-  [height]="'95vh'"
-  title="Update Article"
-  (onHiding)="handleClose()"
->
-  <app-article-edit
-    *ngIf="editArticlePopupOpened"
-      [articleData]="selectedArticle"
-    (popupClosed)="handleClose()"
-  ></app-article-edit>
-</dx-popup> -->

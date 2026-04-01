@@ -362,10 +362,11 @@ import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-inv
 import { SalesOrderModule } from './pages/OPERATIONS/sales-order/sales-order.component';
 import { FixedAssetRegisterModule } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
 import { DepreciationReportModule } from './pages/Depreciation/depreciation-report/depreciation-report.component';
-import { PDCReportComponent, PDCReportModule } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
-import { PrepaymentPostingReportComponent, PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
-import { SalaryWPSComponent, SalaryWPSModule } from './pages/salary-wps/salary-wps.component';
+import {  PDCReportModule } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
+import {  SalaryWPSModule } from './pages/salary-wps/salary-wps.component';
 import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
+import { PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
+import { ProfitAndLossBranchModule } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -734,6 +735,7 @@ import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order
     PDCReportModule,
     PrepaymentPostingReportModule,
     SalaryWPSModule,
+    ProfitAndLossBranchModule,
   ],
 
   providers: [

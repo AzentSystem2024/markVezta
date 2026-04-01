@@ -25,6 +25,7 @@ import {
   DxDropDownBoxModule,
   DxToolbarModule,
   DxDataGridComponent,
+  DxLoadPanelModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -50,7 +51,7 @@ import { Router } from '@angular/router';
 export class EmployeeComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-  readonly allowedPageSizes: any = [5, 10, 'all'];
+  readonly allowedPageSizes: any = [10, 15, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter: true;
@@ -97,11 +98,9 @@ export class EmployeeComponent implements OnInit {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
-
-
 
   refreshButtonOptions = {
     icon: 'refresh',
@@ -110,6 +109,7 @@ export class EmployeeComponent implements OnInit {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
   selected_Company_id: any;
 
   constructor(
@@ -150,7 +150,7 @@ export class EmployeeComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/employee');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -160,7 +160,7 @@ export class EmployeeComponent implements OnInit {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
+    // this.isLoading = true;
     this.sesstion_Details();
     this.getEmployeeList();
   }
@@ -169,6 +169,7 @@ export class EmployeeComponent implements OnInit {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
+
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
@@ -179,21 +180,31 @@ export class EmployeeComponent implements OnInit {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
   getEmployeeList() {
     this.isLoading = true;
-    const SELECTED_COMPANY = JSON.parse(
-      sessionStorage.getItem('savedUserData'),
-    );
-    const companyid = SELECTED_COMPANY;
-
     const payload = {
       CompanyId: this.selected_Company_id,
     };
-    this.dataservice.employeeList(payload).subscribe((response: any) => {
-      this.employeeList = response.reverse();
-      this.isLoading = false;
+
+    this.dataservice.employeeList(payload).subscribe({
+      next: (response: any) => {
+        this.employeeList = Array.isArray(response)
+          ? [...response].reverse()
+          : [];
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Error fetching employee list:', error);
+        this.employeeList = [];
+        this.isLoading = false;
+      },
+      complete: () => {
+        this.isLoading = false;
+      },
     });
   }
+
   applyFilter() {
     this.GridSource.filter();
   }
@@ -308,6 +319,7 @@ export class EmployeeComponent implements OnInit {
     DxoItemModule,
     EmployeeAddFormModule,
     EmployeeEditFormFormModule,
+    DxLoadPanelModule
   ],
   providers: [],
   declarations: [EmployeeComponent],

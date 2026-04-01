@@ -56,7 +56,7 @@ export class SalaryHeadListComponent {
   @ViewChild('SalaryHeadValidation', { static: false })
   SalaryHeadValidation: DxValidationGroupComponent;
   salaryHeadList: any = [];
-  readonly allowedPageSizes: any = [5, 10, 'all'];
+  readonly allowedPageSizes: any = [10, 15, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter: true;

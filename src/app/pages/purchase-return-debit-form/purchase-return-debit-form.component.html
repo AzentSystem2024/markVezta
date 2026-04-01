@@ -155,6 +155,7 @@
             [allowEditing]="!isReadOnlyMode"
             [visible]="false"
           ></dxi-column>
+
           <dxi-column
             dataField="ITEM_ID"
             caption="Item ID"
@@ -174,6 +175,28 @@
             format="dd-MM-yyyy"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
+          <dxi-column
+            dataField="STORE_ID"
+            caption="Store"
+            [allowEditing]="!isReadOnlyMode"
+          >
+            <dxo-lookup
+              [dataSource]="storeList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+            ></dxo-lookup>
+          </dxi-column>
+          <dxi-column
+            dataField="DEPT_ID"
+            caption="Department"
+            [allowEditing]="!isReadOnlyMode"
+          >
+            <dxo-lookup
+              [dataSource]="departmentList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+            ></dxo-lookup>
+          </dxi-column>
           <dxi-column
             dataField="ITEM_NAME"
             caption="Item Name"
@@ -376,8 +399,8 @@
 
 <dx-popup
   [(visible)]="isTrOutPopupVisible"
-  [width]="800"
-  [height]="500"
+  [width]="'70vw'"
+  [height]="'auto'"
   [showTitle]="true"
   title="Pending Invoice"
   [dragEnabled]="true"
