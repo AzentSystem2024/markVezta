@@ -38,14 +38,6 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
-import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import { AddPurchaseInvoiceModule } from '../../PURCHASE INVOICE/add-purchase-invoice/add-purchase-invoice.component';
-import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
-import { PurchaseInvoiceListComponent } from '../purchase-invoice-list/purchase-invoice-list.component';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
@@ -66,6 +58,7 @@ export class PurchaseReturnDebitComponent {
   PurchaseReturnDebitFormComponent!: PurchaseReturnDebitFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -87,9 +80,10 @@ export class PurchaseReturnDebitComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -121,6 +115,7 @@ export class PurchaseReturnDebitComponent {
     },
     text: '',
   };
+
   isAddDebitNote: boolean = false;
   isEditDebitNote: boolean = false;
   isViewCreditNote: boolean = false;
@@ -134,6 +129,7 @@ export class PurchaseReturnDebitComponent {
     { label: 'Last 30 Days', value: 'last30' },
     { label: 'Custom', value: 'custom' },
   ];
+  
   selectedDateRange: string = 'today';
   customStartDate: any = null;
   customEndDate: any = null;
@@ -143,12 +139,6 @@ export class PurchaseReturnDebitComponent {
   sessionData: any;
   selected_vat_id: any;
 
-  // refreshButtonOptions = {
-  //   icon: 'refresh',
-  //   hint: 'Refresh',
-  //   onClick: () => this.refreshGrid(),
-  //   text: '',
-  // };
   isAddPurchaseReturn: boolean;
   isEditPurchaseReturn: boolean;
   isViewPurchaseReturn: boolean;
@@ -183,7 +173,7 @@ export class PurchaseReturnDebitComponent {
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/debit');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -333,7 +323,6 @@ export class PurchaseReturnDebitComponent {
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
-
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
@@ -357,6 +346,7 @@ export class PurchaseReturnDebitComponent {
       value: 'Open',
     },
   ];
+
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
 
@@ -380,17 +370,16 @@ export class PurchaseReturnDebitComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
       (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
         widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
+        name: 'toggleFilterButton',
         location: 'after',
         options: {
           icon: 'search',
@@ -456,7 +445,7 @@ export class PurchaseReturnDebitComponent {
     const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
     const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
-    // 🔑 SAME AS CREDIT NOTE
+    // SAME AS CREDIT NOTE
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} - ${toLabel}` }
@@ -546,6 +535,7 @@ export class PurchaseReturnDebitComponent {
         this.isReadOnlyPurchaseReturn = status === 5;
       });
   }
+
   onDeletePurchaseReturn(event: any) {
     const returnId = event.data.TRANS_ID;
     console.log(returnId);
@@ -597,6 +587,7 @@ export class PurchaseReturnDebitComponent {
       }
     }
   }
+
   addPurchaseReturn() {
     this.isAddPurchaseReturn = true;
   }
@@ -610,6 +601,7 @@ export class PurchaseReturnDebitComponent {
     }
     this.getpurchaseReturnList();
   }
+
   onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;

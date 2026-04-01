@@ -75,7 +75,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   departments: any;
   allowedFileExtensions = ['.jpg', '.png', '.jpeg'];
   displayMode: any = 'full';
-  readonly allowedPageSizes: any = [5, 10, 'all'];
+  readonly allowedPageSizes: any = [10, 15, 'all'];
   countries: any;
   salaryHead: any[] = [];
   designations: any;

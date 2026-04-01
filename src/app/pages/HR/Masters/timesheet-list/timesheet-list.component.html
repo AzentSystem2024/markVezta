@@ -132,11 +132,6 @@
               *ngIf="yearSelectorVisible"
               (click)="$event.stopPropagation()"
             >
-              <!-- <div class="year-popup-header">
-                <button class="close-btn" (click)="yearSelectorVisible = false; $event.stopPropagation()">
-                  ✕
-                </button>
-              </div> -->
               <div class="year-grid">
                 <div
                   class="year-option"
@@ -148,19 +143,7 @@
               </div>
             </div>
 
-            <div class="calendar-body">
-              <!-- <div
-                *ngFor="let monthName of monthNames; let idx = index"
-                class="month-cell"
-                [class.selected]="
-                  idx === selectedMonth.getMonth() &&
-                  selectedYear === selectedMonth.getFullYear()
-                "
-                (click)="selectMonthByIndex(idx)"
-              >
-                {{ monthName }}
-              </div> -->
-            </div>
+            <div class="calendar-body"></div>
           </div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
@@ -199,18 +182,6 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
-
-        <!-- <dxi-item
-          location="after"
-          locateInMenu="auto"
-          widget="dxButton"
-          [options]="refreshButtonOptions"
-        ></dxi-item>
-        <dxi-item
-          name="exportButton"
-          location="after"
-          cssClass="export-btn"
-        ></dxi-item> -->
       </dxo-toolbar>
 
       <dxi-column dataField="EMP_NO" caption="Employee No."></dxi-column>
@@ -218,7 +189,7 @@
       <dxi-column dataField="WORKED_DAYS" caption="Worked Days"></dxi-column>
       <dxi-column dataField="OT_HOURS" caption="OT Hours"></dxi-column>
       <dxi-column dataField="LESS_HOURS" caption="Less Hours"></dxi-column>
-      <!-- <dxi-column dataField="STATUS" caption="Status"></dxi-column> -->
+
       <dxi-column
         dataField="STATUS"
         caption="Status"
@@ -235,16 +206,10 @@
           style="margin-left: 10px; cursor: default"
         ></i>
       </div>
-      <!-- <dxi-column
-        type="buttons"
-        [buttons]="allActionButtons"
-        width="100"
-        fixed="true"
-        fixedPosition="right"
-      ></dxi-column> -->
     </dx-data-grid>
   </div>
 </div>
+
 <dx-popup
   [(visible)]="addTimesheetPopupOpened"
   [width]="'95vw'"

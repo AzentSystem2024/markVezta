@@ -58,7 +58,20 @@ import { finalize } from 'rxjs/operators';
 export class PurchaseOrderComponent {
   @ViewChild('PurchaseOrderNewFormComponent')
   PurchaseOrderNewFormComponent!: PurchaseOrderNewFormComponent;
-
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+  @ViewChild(PurchaseOrderNewFormComponent, { static: false })
+  poNewForm: PurchaseOrderNewFormComponent;
+  @ViewChild(PurchaseOrderEditFormComponent, { static: false })
+  poEditForm: PurchaseOrderEditFormComponent;
+  @ViewChild(PurchaseOrderVerifyFormComponent, { static: false })
+  poVerifyForm: PurchaseOrderVerifyFormComponent;
+  @ViewChild(PurchaseOrderApproveFormComponent, { static: false })
+  poApproveForm: PurchaseOrderApproveFormComponent;
+  @ViewChild(PurchaseOrderViewFormComponent, { static: false })
+  poViewForm: PurchaseOrderViewFormComponent;
+  @ViewChild('paramValue', { static: false })
+  public paramValue!: ElementRef;
   isAddPopupOpened: boolean = false;
   isEditPopupOpened: boolean = false;
   isVerifyPopupOpened: boolean = false;
@@ -117,23 +130,6 @@ export class PurchaseOrderComponent {
   // The backend application URL.
   // host = 'http://localhost:49834/';
   showReportDesigner: boolean = false;
-
-  @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
-  @ViewChild(PurchaseOrderNewFormComponent, { static: false })
-  poNewForm: PurchaseOrderNewFormComponent;
-  @ViewChild(PurchaseOrderEditFormComponent, { static: false })
-  poEditForm: PurchaseOrderEditFormComponent;
-  @ViewChild(PurchaseOrderVerifyFormComponent, { static: false })
-  poVerifyForm: PurchaseOrderVerifyFormComponent;
-  @ViewChild(PurchaseOrderApproveFormComponent, { static: false })
-  poApproveForm: PurchaseOrderApproveFormComponent;
-  @ViewChild(PurchaseOrderViewFormComponent, { static: false })
-  poViewForm: PurchaseOrderViewFormComponent;
-  // @ViewChild(DxReportViewerComponent, { static: false })
-  // viewer!: DxReportViewerComponent;
-  @ViewChild('paramValue', { static: false })
-  public paramValue!: ElementRef;
 
   showHeaderFilter: true;
   showFilterRow = true;
@@ -210,20 +206,11 @@ export class PurchaseOrderComponent {
     private service: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {
-    // const userRights = sessionStorage.getItem('menuUserRightsResponse');
-    // this.userRights = JSON.parse(userRights);
-    // console.log(this.userRights, 'userRights');
-    // const docType = this.userRights[0].DOC_TYPE;
-    // console.log(docType, 'doctype');
-  }
-
+  ) {}
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -239,7 +226,7 @@ export class PurchaseOrderComponent {
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/credit-note');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -250,15 +237,12 @@ export class PurchaseOrderComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    console.log('PURCHASEORDER');
     this.getPurchaseOrderList();
     this.initializePrintTemplateData();
-    this.getTemplateList();
     this.getDocNo();
   }
 
   sessionData_tax() {
-    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
@@ -398,21 +382,6 @@ export class PurchaseOrderComponent {
     },
   ];
 
-  getTemplateList() {
-    this.service.getTemplateList(this.doc).subscribe((res: any) => {
-      this.templateList = res.data;
-      const defaultTemplate = this.templateList.find(
-        (item: any) => item.IS_DEFAULT === true,
-      );
-      if (defaultTemplate) {
-        this.selectedTemplate = defaultTemplate.TEMPLATE_NAME;
-      } else {
-        // Handle the case where no default template is found
-        this.selectedTemplate = null;
-      }
-    });
-  }
-
   customButtons = [
     {
       hint: 'Verify',
@@ -462,14 +431,11 @@ export class PurchaseOrderComponent {
   }
 
   onApproveClick = (e) => {
-    console.log(e, 'EDITCLICKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK');
     const id = e.row.data.ID;
     const status = e.row.data.STATUS;
-    console.log(id, 'STATUSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
     this.isApprovePopupOpened = true;
     this.service.selectPoData(id).subscribe((res) => {
       this.selectedRowData = res;
-      console.log(this.selectedRowData, 'select row data');
     });
   };
 
@@ -490,7 +456,6 @@ export class PurchaseOrderComponent {
     const Id = event.data.ID;
     this.selectedPoId = Id;
     const status = event.data.STATUS;
-    console.log(Id, 'id');
     this.sessionDetails();
     // this.isEditPopupOpened = true;
     this.service.selectPoData(Id).subscribe((res) => {
@@ -750,7 +715,6 @@ export class PurchaseOrderComponent {
   }
 
   onCancelNewData() {
-    console.log('RESET CALLED');
     if (this.poNewForm) {
       this.poNewForm.resetForm();
     } else {
@@ -926,7 +890,6 @@ export class PurchaseOrderComponent {
   }
 
   UpdatePurchaseOrder() {
-    console.log('UPDATEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
     const data = this.poEditForm.getNewPoData();
     // Combine country code + mobile (EDIT)
     // convert mobile before API
@@ -955,7 +918,6 @@ export class PurchaseOrderComponent {
       ...item,
       PRICE: item.SUPP_PRICE, // ✅ IMPORTANT
     }));
-    console.log(data, 'PODETAILAAAAAAAAAAAAAAAAAAAAAAAA');
     const invalidPriceItem = data.PoDetails.find(
       (item: any) =>
         item.SUPP_PRICE === null ||
@@ -1005,7 +967,6 @@ export class PurchaseOrderComponent {
             }
           });
         } else {
-          console.log('Approval cancelled');
         }
       });
     } else {
@@ -1038,7 +999,6 @@ export class PurchaseOrderComponent {
     const data = this.poVerifyForm.getNewPoData();
 
     this.service.verifyPoData(data).subscribe((res) => {
-      console.log('saved data');
       if (res) {
         notify(
           {
@@ -1065,7 +1025,6 @@ export class PurchaseOrderComponent {
     const data = this.poApproveForm.getNewPoData();
 
     this.service.ApprovePoData(data).subscribe((res) => {
-      console.log('saved data');
       if (res) {
         notify(
           {
@@ -1121,8 +1080,6 @@ export class PurchaseOrderComponent {
     this.flag = false;
     if (this.selectedTemplate) {
       this.flag = true;
-      console.log('Selected Template:', this.selectedTemplate);
-
       // this.reportName = this.selectedTemplate;
       // this.viewer.bindingSender.OpenReport(
       //   this.reportName + '&parameter1=' + this.poId
@@ -1137,11 +1094,9 @@ export class PurchaseOrderComponent {
   //   OnParametersInitialized(event: any) {
   //     var parameterValue = 12345;
   //     event.args.Parameters.filter(function (p: any) { return p.Key == "parameter4"; })[0].Value = parameterValue;
-  //     console.log(parameterValue,"parameter value")
-  // }
+  //     // }
   clearData() {
     this.poNewForm.close();
-    console.log('form closed');
   }
 
   OnParametersInitialized(event: any) {
@@ -1150,7 +1105,6 @@ export class PurchaseOrderComponent {
       (x: any) => x.parameterDescriptor.name == 'intParam',
     )[0];
     intParam.value = invisibleIntParamValue;
-    console.log(intParam, 'intparam');
   }
 
   viewPdf(log: any) {}

@@ -4199,18 +4199,11 @@ The result can be exported to HTML or Markdown.`;
   //===========delete Api==================
   Delete_LeaveType_Api(ID: any) {
     return this.http.post(`${this.apiUrl}LeaveType/delete/${ID}`, {});
-    // return this.http.post(
-    //   `${this.apiUrl}/tranferout/transferreport`,
-    //   reqBodyData
-    // );
+  
   }
 
   //EMPLOYEE
   employeeList(item: any) {
-    // const headers = new HttpHeaders({
-    //   'Content-Type': 'application/json',
-    //   Authorization: `Bearer ${localStorage.getItem('token')}`,
-    // });
     const payload = item;
     return this.http.post(`${this.apiUrl}Employee/list`, payload);
   }
