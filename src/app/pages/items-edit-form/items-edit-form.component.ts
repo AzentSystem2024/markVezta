@@ -384,7 +384,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.country = data;
     });
     const store = {
-      COMPANY_ID: 0,
+      COMPANY_ID: this.selected_Company_id,
       NAME: 'STORE',
     };
     dataservice.getDropdownData(store).subscribe((data) => {
@@ -526,6 +526,21 @@ export class ItemsEditFormComponent implements OnInit {
       }
 
       this.Edit_Store = JSON.parse(JSON.stringify(this.itemData)).item_stores;
+      this.selectedRowKeys = this.Edit_Store.map((x: any) => x.STORE_ID);
+      this.store = this.store.map((storeItem: any) => {
+        const matched = this.Edit_Store.find(
+          (x: any) => x.STORE_ID === storeItem.STORE_ID,
+        );
+
+        if (matched) {
+          return {
+            ...storeItem,
+            ...matched, // bind saved values like IS_PRICE_REQUIRED
+          };
+        }
+
+        return storeItem;
+      });
     }
     this.loadStores();
     this.sesstion_Details();
