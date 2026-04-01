@@ -202,6 +202,8 @@ export class OpeningBalanceComponent {
           debitAmount: item.DEBIT_AMOUNT,
           creditAmount: item.CREDIT_AMOUNT,
           headId: item.HEAD_ID,
+          DEPT_ID: item.DEPT_ID,
+          STORE_ID: item.STORE_ID,
         }));
 
         this.openingBalance = transformedData;
@@ -693,8 +695,8 @@ export class OpeningBalanceComponent {
             HEAD_ID: ledger?.HEAD_ID || null, // Ensure it comes from ledgerList
             DR_AMOUNT: item.debitAmount || 0,
             CR_AMOUNT: item.creditAmount || 0,
-            DEPT_ID: item.DEPT_ID || null,
-            STORE_ID: item.STORE_ID || null,
+            DEPT_ID: item.DEPT_ID || 0,
+            STORE_ID: item.STORE_ID || 0,
           };
         })
         .filter((detail) => detail.HEAD_ID),
