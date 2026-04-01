@@ -106,6 +106,8 @@ export class EditPurchaseInvoiceComponent {
   store_id: any;
   isSaving = false;
   vatTilte: any;
+  storeList: any;
+  departmentList: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -138,6 +140,11 @@ export class EditPurchaseInvoiceComponent {
     });
 
     this.sessionData_tax();
+    this.getStoreData();
+    this.getDepartments();
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.refresh();
+    }, 100);
   }
 
   sessionData_tax() {
@@ -165,6 +172,8 @@ export class EditPurchaseInvoiceComponent {
       this.mainGridData = (this.purchaseInvoiceFormData.PurchDetails || []).map(
         (row: any) => ({
           ...row,
+          STORE_ID: row.STORE_ID || this.purchaseInvoiceFormData.STORE_ID,
+          DEPT_ID: row.DEPT_ID || this.purchaseInvoiceFormData.DEPT_ID,
           GRN_DATE: row.GRN_DATE ? new Date(row.GRN_DATE) : null,
         }),
       );
@@ -197,6 +206,26 @@ export class EditPurchaseInvoiceComponent {
 
       console.log('SUPP_ID:', this.purchaseInvoiceFormData.SUPP_ID);
     }
+  }
+
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+    });
+  }
+
+  getDepartments() {
+    const payload = {
+      NAME: 'DEPARTMENTS',
+      COMPANY_ID: this.selectedCompany,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.departmentList = res;
+    });
   }
 
   getSupplierDropdown() {
@@ -322,7 +351,12 @@ export class EditPurchaseInvoiceComponent {
   };
 
   onEditorPreparing(e: any) {
-    if (e.dataField === 'QUANTITY' || e.dataField === 'VAT_PERC') {
+    if (
+      e.dataField === 'QUANTITY' ||
+      e.dataField === 'VAT_PERC' ||
+      e.dataField === 'STORE_ID' ||
+      e.dataField === 'DEPT_ID'
+    ) {
       e.editorOptions = e.editorOptions || {};
 
       // Let the editor inherit row height naturally (no fixed height)
@@ -591,7 +625,13 @@ export class EditPurchaseInvoiceComponent {
     let grossAmount = 0;
     let vatAmount = 0;
     let netAmount = 0;
+    // get selected values from grid
+    this.itemsGridRef.instance.saveEditData();
 
+    const selectedStoreId = this.mainGridData[0]?.STORE_ID || null;
+    const selectedDeptId = this.mainGridData[0]?.DEPT_ID || null;
+    this.purchaseInvoiceFormData.STORE_ID = selectedStoreId;
+    this.purchaseInvoiceFormData.DEPT_ID = selectedDeptId;
     this.purchaseInvoiceFormData.PurchDetails = this.mainGridData.map(
       (item: any) => {
         const amount = this.calculateAmount(item);
@@ -606,7 +646,8 @@ export class EditPurchaseInvoiceComponent {
           COMPANY_ID: this.selectedCompany,
           USER_ID: this.user_id,
           FIN_ID: this.fin_id,
-          STORE_ID: this.store_id,
+          STORE_ID: selectedStoreId || 0,
+          DEPT_ID: selectedDeptId || 0,
           PURCH_ID: 0,
           GRN_DET_ID: item.GRN_DET_ID || '',
           ITEM_ID: item.ITEM_ID,
@@ -662,7 +703,7 @@ export class EditPurchaseInvoiceComponent {
     this.purchaseInvoiceFormData.PURCH_DATE = invoiceDate;
     this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
     this.purchaseInvoiceFormData.USER_ID = this.user_id;
-    this.purchaseInvoiceFormData.STORE_ID = this.store_id;
+    // this.purchaseInvoiceFormData.STORE_ID = this.store_id;
     this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
 
     if (this.isApproved) {

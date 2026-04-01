@@ -101,6 +101,9 @@ export class OpeningBalanceComponent {
   isReadOnlyBalance: boolean;
   addButtonOptions: any;
   isApproveDisabled = true;
+  selected_Company_id: any;
+  Departments: any = [];
+  Stores_List: any = [];
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -139,8 +142,12 @@ export class OpeningBalanceComponent {
         'COMPANYID FINID===========================',
       );
 
+      this.selected_Company_id = companyId;
+
       if (companyId && finId) {
         const payload = { COMPANY_ID: companyId, FIN_ID: finId };
+        this.loadDepartment();
+        this.getStoreDropdown();
 
         if (companyId && finId) {
           this.loadOpeningBalance(companyId, finId);
@@ -307,6 +314,12 @@ export class OpeningBalanceComponent {
     if (debit > 0 && credit > 0) {
       e.isValid = false;
       e.errorText = 'Only one of Debit or Credit should be entered.';
+    }
+    const store = e.newData.STORE_ID ?? e.oldData.STORE_ID;
+
+    if (!store) {
+      e.isValid = false;
+      // e.errorText = 'Branch/Store is required';
     }
   }
 
@@ -618,6 +631,9 @@ export class OpeningBalanceComponent {
 
   saveOpeningBalance() {
     console.log('SAVE CALLED');
+
+    // ✅ Trigger DevExtreme validation
+
     const userDataString = localStorage.getItem('userData');
     if (!userDataString) return;
 
@@ -677,11 +693,13 @@ export class OpeningBalanceComponent {
             HEAD_ID: ledger?.HEAD_ID || null, // Ensure it comes from ledgerList
             DR_AMOUNT: item.debitAmount || 0,
             CR_AMOUNT: item.creditAmount || 0,
+            DEPT_ID: item.DEPT_ID || null,
+            STORE_ID: item.STORE_ID || null,
           };
         })
         .filter((detail) => detail.HEAD_ID),
     };
-
+    console.log(payload, '=============payload=============');
     // Optional validation
     const missingHeadIds = payload.Details.some((detail) => !detail.HEAD_ID);
     if (missingHeadIds) {
@@ -783,6 +801,29 @@ export class OpeningBalanceComponent {
     const blob = doc.output('blob');
     const url = URL.createObjectURL(blob);
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  //=================STORE DROP DOWN ======================
+  getStoreDropdown() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+
+      NAME: 'STORE',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.Stores_List = response;
+    });
+  }
+
+  loadDepartment() {
+    const payload = {
+      NAME: 'DEPARTMENT',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getDropdownData(payload).subscribe((response) => {
+      // Filter out "CENTRAL STORE" and populate the Departments array
+      this.Departments = response;
+    });
   }
 }
 

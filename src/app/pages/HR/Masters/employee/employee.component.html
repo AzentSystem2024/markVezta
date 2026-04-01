@@ -88,12 +88,7 @@
           <div class="grid-header">Employee</div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto">
-          <!-- <dx-button
-            icon="plus"
-            type="default"
-            stylingMode="contained"
-            (onClick)="addEmployee()"
-          ></dx-button> -->
+         
         </dxi-item>
 
         <dxi-item
@@ -129,18 +124,9 @@
       <dxi-column dataField="CITY" caption="City"></dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column dataField="DESG_NAME" caption="Designation"></dxi-column>
-      <!-- <dxi-column dataField="COUNTRY_NAME" caption="Country"></dxi-column> -->
+     
       <dxi-column dataField="STATE_NAME" caption="State"></dxi-column>
-      <!-- <dxi-column
-        dataField="INCENTIVE_PERCENT"
-        caption="Incentive Percent"
-      ></dxi-column> -->
-      <!-- <dxi-column
-        dataField="IQAMA_NO"
-        caption="Iqama No."
-        alignment="right"
-      ></dxi-column> -->
-      <!-- <dxi-column dataField="IQAMA_EXPIRY" caption="IQAMA Expiry"></dxi-column> -->
+    
 
       <dxi-column
         dataField="DAMAN_CATEGORY"
@@ -225,3 +211,14 @@
     (formClosed)="handleEditClose()"
   ></app-employee-edit-form>
 </dx-popup>
+<dx-load-panel
+  [visible]="isLoading"
+  [showPane]="true"
+  [showIndicator]="true"
+  shadingColor="rgba(0,0,0,0.4)"
+  [closeOnOutsideClick]="false"
+  message="Loading ..."
+  [width]="250"
+  [height]="90"
+>
+</dx-load-panel>

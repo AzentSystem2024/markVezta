@@ -71,7 +71,7 @@
         "
       >
         <div style="display: flex; gap: 4px">
-          <dx-date-box
+          <!-- <dx-date-box
             label="Transaction Date"
             type="date"
             [(value)]="purchaseInvoiceFormData.PURCH_DATE"
@@ -80,7 +80,7 @@
             [displayFormat]="'dd-MM-yyyy'"
             [readOnly]="true"
           >
-          </dx-date-box>
+          </dx-date-box> -->
         </div>
 
         <div
@@ -162,6 +162,20 @@
             [width]="120"
             [allowEditing]="false"
           ></dxi-column>
+          <dxi-column dataField="STORE_ID" caption="Store">
+            <dxo-lookup
+              [dataSource]="storeList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+            ></dxo-lookup>
+          </dxi-column>
+          <dxi-column dataField="DEPT_ID" caption="Department">
+            <dxo-lookup
+              [dataSource]="departmentList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+            ></dxo-lookup>
+          </dxi-column>
           <dxi-column
             dataField="ITEM_NAME"
             caption="Item Name"

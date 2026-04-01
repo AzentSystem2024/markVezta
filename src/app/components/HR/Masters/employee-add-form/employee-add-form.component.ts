@@ -133,7 +133,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   lastRejoinDate: any;
   leaveDaysBalance: any;
   daysDeducted: any;
-  readonly allowedPageSizes: any = [5, 10, 'all'];
+  readonly allowedPageSizes: any = [10, 15, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   IsAttachmentPopupVisible: boolean = false;

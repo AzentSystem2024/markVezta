@@ -49,10 +49,6 @@
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
-      <!-- <dxo-filter-row
-        [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
-      ></dxo-filter-row> -->
       <dxo-toolbar>
         <!-- TITLE -->
         <dxi-item location="before" text="Employee Salary Settings"> </dxi-item>
@@ -120,8 +116,8 @@
 
     <dx-popup
       [(visible)]="addEmployeePopupOpened"
-      [width]="'44vw'"
-      [height]="'90vh'"
+      [width]="'60vw'"
+      [height]="'100vh'"
       title="Add employee salary settings"
       (onHiding)="handleClose()"
     >
@@ -133,11 +129,10 @@
   </div>
 </div>
 
-
 <dx-popup
   [(visible)]="editEmployeePopupOpened"
-  [width]="'44vw'"
-  [height]="'90vh'"
+  [width]="'60vw'"
+  [height]="'100vh'"
   title="Edit employee salary settings"
 >
   <app-employee-salary-settings-edit

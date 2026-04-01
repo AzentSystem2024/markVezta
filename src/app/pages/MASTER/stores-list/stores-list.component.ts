@@ -98,6 +98,7 @@ export class StoresListComponent implements OnInit {
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
+      this.showStores();
     }
   }
   toggleFilters() {
@@ -238,7 +239,6 @@ export class StoresListComponent implements OnInit {
 
       this.dataservice.postStoresData(payload).subscribe((res) => {
         this.isAddStoresPopupOpened = false;
-        this.showStores();
 
         if (this.storesComponent) {
           this.storesComponent.resetForm();
@@ -254,6 +254,8 @@ export class StoresListComponent implements OnInit {
           'success',
           3000,
         );
+
+        this.showStores();
       });
     }
   }

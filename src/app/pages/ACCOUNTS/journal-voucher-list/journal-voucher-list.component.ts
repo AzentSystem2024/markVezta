@@ -167,16 +167,13 @@ export class JournalVoucherListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-
     const menuGroups = menuResponse.MenuGroups || [];
-
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/journal-voucher');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -192,9 +189,7 @@ export class JournalVoucherListComponent {
   }
 
   sessionData_tax() {
-    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -233,11 +228,11 @@ export class JournalVoucherListComponent {
             return bNo - aNo;
           });
 
-        // ✅ single binding source
+        // single binding source
         this.filteredJournalVoucherList = this.journalVoucherList;
       },
       error: (err) => {
-        // ✅ ONLY ADDITION
+        // ONLY ADDITION
         const message =
           err?.status === 0
             ? 'Network connection lost. Please check your internet.'
@@ -346,6 +341,7 @@ export class JournalVoucherListComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 
@@ -686,4 +682,5 @@ export class JournalVoucherListComponent {
   exports: [JournalVoucherListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
+
 export class JournalVoucherModule {}
