@@ -180,6 +180,13 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
     <dxi-column
+      dataField="PRICE"
+      caption="UNIT COST"
+      [allowEditing]="false"
+      alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+    <dxi-column
       dataField="PO_QUANTITY"
       caption="QTY IN PO"
       [width]="87"
@@ -254,13 +261,6 @@
       </dxi-column>
     </ng-container>
 
-    <dxi-column
-      dataField="PRICE"
-      caption="UNIT COST"
-      [allowEditing]="false"
-      alignment="right"
-      [format]="{ type: 'fixedPoint', precision: 2 }"
-    ></dxi-column>
     <dxo-summary>
       <dxi-total-item
         column="AMOUNT"

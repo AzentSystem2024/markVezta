@@ -34,6 +34,31 @@
       </div>
     </dxi-item>
   </dxi-item>
+  <dxi-item itemType="group" [colCount]="1">
+    <dxi-item>
+      <div *dxTemplate>
+        <dx-tag-box
+          label="Department"
+          labelMode="floating"
+          placeholder="Select Units"
+          [dataSource]="departments"
+          valueExpr="ID"
+          displayExpr="DESCRIPTION"
+          [searchEnabled]="true"
+          [showSelectionControls]="true"
+          [(value)]="selectedDepartments"
+          (onValueChanged)="onDepartmentChanged($event)"
+        >
+          <!-- <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This Field is required"
+            ></dxi-validation-rule>
+          </dx-validator> -->
+        </dx-tag-box>
+      </div>
+    </dxi-item>
+  </dxi-item>
   <dxi-item itemType="group">
     <dxi-item>
       <div *dxTemplate>
@@ -110,24 +135,20 @@
   <dxi-item itemType="group" [colCount]="3">
     <dxi-item>
       <dx-select-box
-        label="Country"
-        labelMode="floating"
-        [dataSource]="countries"
-        displayExpr="COUNTRY_NAME"
+        label="Country *"
+        [items]="Country"
+        displayExpr="DESCRIPTION"
         valueExpr="ID"
         [(value)]="newStores.COUNTRY_ID"
+        placeholder="Select Country"
         (onValueChanged)="onCountrySelected($event)"
         [searchEnabled]="true"
+        labelMode="floating"
       >
-        <div *dxTemplate="let data of 'item'">
-          <img
-            [src]="data.FLAG_URL"
-            width="20"
-            height="15"
-            style="margin-right: 8px"
-          />
-          <span>{{ data.COUNTRY_NAME }}</span>
-        </div>
+        <dx-validator>
+          <dxi-validation-rule type="required" message="Country is required">
+          </dxi-validation-rule>
+        </dx-validator>
       </dx-select-box>
 
       <!-- </div> -->
@@ -136,21 +157,22 @@
     <dxi-item>
       <div *dxTemplate>
         <dx-select-box
-          label="State *"
-          labelMode="floating"
-          [items]="StateDropdownData"
+          label="State"
+          [items]="State"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
+          [items]="State"
           [(value)]="newStores.STATE_ID"
-          placeholder="Select State"
+          placeholder="Select State State *"
           [searchEnabled]="true"
+          labelMode="floating"
+          (onValueChanged)="onStateValue($event)"
         >
           <dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This Field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-select-box>
+            <dxi-validation-rule type="required" message="Select state">
+            </dxi-validation-rule>
+          </dx-validator>
+        </dx-select-box>
       </div>
     </dxi-item>
 
@@ -238,29 +260,4 @@
       </div>
     </dxi-item>
   </dxi-item>
-
-  <!-- <dxi-item itemType="group" [colCount]="2">
-    <dxi-item>
-      <div *dxTemplate>
-        <dx-select-box
-          label="Group"
-          labelMode="floating"
-          [items]="GroupDropdownData"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="newStores.GROUP_ID"
-          placeholder="Select Group"
-          [searchEnabled]="true"
-        >
-          <dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This Field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-select-box>
-      </div>
-    </dxi-item>
-
-    
-  </dxi-item> -->
 </dx-form>

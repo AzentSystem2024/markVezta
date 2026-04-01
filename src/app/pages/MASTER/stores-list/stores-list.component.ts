@@ -187,6 +187,7 @@ export class StoresListComponent implements OnInit {
           storeData.GROUP_ID,
           storeData.STORE_NO,
           storeData.IS_ACTIVE,
+          storeData.DEPT_IDS,
         )
         .subscribe((res) => {
           this.isAddStoresPopupOpened = false;
@@ -229,45 +230,31 @@ export class StoresListComponent implements OnInit {
       }
 
       // 🔹 Add new store
-      this.dataservice
-        .postStoresData(
-          storeData.COMPANY_ID,
-          storeData.CODE,
-          storeData.STORE_NAME,
-          storeData.IS_PRODUCTION,
-          storeData.ADDRESS1,
-          storeData.ADDRESS2,
-          storeData.ADDRESS3,
-          storeData.ZIP_CODE,
-          storeData.STATE_ID,
-          storeData.CITY,
-          storeData.COUNTRY_ID,
-          storeData.IS_DEFAULT_STORE,
-          storeData.PHONE,
-          storeData.EMAIL,
-          storeData.VAT_REGNO,
-          storeData.GROUP_ID,
-          storeData.STORE_NO,
-          storeData.IS_ACTIVE,
-        )
-        .subscribe((res) => {
-          this.isAddStoresPopupOpened = false;
-          this.showStores();
-          if (this.storesComponent) {
-            this.storesComponent.resetForm();
-          }
+      // 🔹 Add new store
+      const payload = {
+        ...storeData,
+        DEPT_IDS: this.storesComponent.selectedDepartments, // ✅ add this
+      };
 
-          notify(
-            {
-              message: 'Store added successfully!',
-              type: 'success',
-              displayTime: 3000,
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-            3000,
-          );
-        });
+      this.dataservice.postStoresData(payload).subscribe((res) => {
+        this.isAddStoresPopupOpened = false;
+        this.showStores();
+
+        if (this.storesComponent) {
+          this.storesComponent.resetForm();
+        }
+
+        notify(
+          {
+            message: 'Store added successfully!',
+            type: 'success',
+            displayTime: 3000,
+            position: { at: 'top center', my: 'top center' },
+          },
+          'success',
+          3000,
+        );
+      });
     }
   }
 
@@ -329,53 +316,22 @@ export class StoresListComponent implements OnInit {
   }
 
   onClickSaveStores() {
-    const {
-      CODE,
-      STORE_NAME,
-      IS_PRODUCTION,
-      ADDRESS1,
-      ADDRESS2,
-      ADDRESS3,
-      ZIP_CODE,
-      STATE_ID,
-      CITY,
-      COUNTRY_ID,
-      IS_DEFAULT_STORE,
-      PHONE,
-      EMAIL,
-      VAT_REGNO,
-      GROUP_ID,
-      STORE_NO,
-      IS_ACTIVE,
-      COMPANY_ID,
-    } = this.storesComponent.getNewStoresData();
-    console.log(
-      'inserted data',
+    const formData = this.storesComponent.getNewStoresData();
 
-      CODE,
-      STORE_NAME,
-      IS_PRODUCTION,
-      ADDRESS1,
-      ADDRESS2,
-      ADDRESS3,
-      ZIP_CODE,
-      STATE_ID,
-      CITY,
-      COUNTRY_ID,
-      IS_DEFAULT_STORE,
-      PHONE,
-      EMAIL,
-      VAT_REGNO,
-      GROUP_ID,
-      STORE_NO,
-      IS_ACTIVE,
-      COMPANY_ID,
-    );
+    const payload = {
+      ...formData,
+      COMPANY_ID: this.selected_Company_id,
+      DEPT_IDS: this.storesComponent.selectedDepartments || [],
+    };
+
+    console.log('Final Payload:', payload);
+
     // --- Duplicate check ---
     const duplicate = this.storesArray.some(
       (store: any) =>
-        store.CODE.toLowerCase() === CODE.toLowerCase().trim() ||
-        store.STORE_NAME.toLowerCase() === STORE_NAME.toLowerCase().trim(),
+        store.CODE.toLowerCase() === payload.CODE.toLowerCase().trim() ||
+        store.STORE_NAME.toLowerCase() ===
+          payload.STORE_NAME.toLowerCase().trim(),
     );
 
     if (duplicate) {
@@ -384,42 +340,26 @@ export class StoresListComponent implements OnInit {
           message:
             'Duplicate Store: Store with same CODE or NAME already exists.',
           type: 'error',
-          displayTime: 3000, // 3 seconds
+          displayTime: 3000,
           position: { at: 'top center', my: 'top center' },
         },
         'error',
         3000,
       );
-      return; // stop saving
+      return;
     }
 
-    this.dataservice
-      .postStoresData(
-        this.selected_Company_id,
-        CODE,
-        STORE_NAME,
-        IS_PRODUCTION,
-        ADDRESS1,
-        ADDRESS2,
-        ADDRESS3,
-        ZIP_CODE,
-        STATE_ID,
-        CITY,
-        COUNTRY_ID,
-        IS_DEFAULT_STORE,
-        PHONE,
-        EMAIL,
-        VAT_REGNO,
-        GROUP_ID,
-        STORE_NO,
-        IS_ACTIVE,
-      )
-      .subscribe((response) => {
-        if (response) {
-          this.isAddStoresPopupOpened = false;
-          this.showStores();
+    // ✅ API call with payload
+    this.dataservice.postStoresData(payload).subscribe((response) => {
+      if (response) {
+        this.isAddStoresPopupOpened = false;
+        this.showStores();
+
+        if (this.storesComponent) {
+          this.storesComponent.resetForm();
         }
-      });
+      }
+    });
   }
   onRowRemoving(event) {
     const selectedRow = event.data;

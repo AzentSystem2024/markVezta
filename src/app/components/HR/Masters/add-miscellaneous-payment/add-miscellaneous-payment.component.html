@@ -382,6 +382,7 @@
       (onClick)="cancel()"
     ></dx-button>
     <dx-button
+      *ngIf="!isReadOnlyMode"
       #saveButtonRef
       [text]="
         isSaving

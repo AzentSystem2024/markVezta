@@ -186,6 +186,7 @@ export class AdvanceComponent {
   docNo: any;
   selected_fin_id: any;
   companyId: any;
+  Recovery_Date: any;
   constructor(
     private fb: FormBuilder,
     private dataService: DataService,
@@ -565,6 +566,7 @@ export class AdvanceComponent {
       const normalizedDate = new Date(
         Date.UTC(selected.getFullYear(), selected.getMonth(), 1),
       );
+      this.Recovery_Date = normalizedDate;
 
       // Set it to the form
       this.formSource.get('Recovery_Date')?.setValue(normalizedDate);
@@ -612,27 +614,16 @@ export class AdvanceComponent {
     const adv_type_id = this.formSource.value.Advance_types_ID;
     const advance_Amount = this.formSource.value.Amount;
     const rec_amount = this.formSource.value.Net_Amount_recoverd;
-    const rec_start_month = this.formSource.value.Recovery_Date;
-    const rec_install_count = this.formSource.value.No_installments;
+    const rec_start_month = this.formSource.value.Recovery_Date
+      ? this.formSource.value.Recovery_Date
+      : null;
+    const rec_install_count = this.formSource.value.No_installments
+      ? this.formSource.value.No_installments
+      : null;
     const rec_install_amount = this.formSource.value.installmen_amt;
     const remarks = this.formSource.value.Remarks;
     const company_id = this.selected_Company_id;
     const fin_id = this.selected_fin_id;
-    // if (!emp_id || !date || !adv_type_id || !advance_Amount) {
-    //   // Handle validation error here
-    //   notify(
-    //     {
-    //       message: 'Please fill all the fields',
-    //       position: { at: 'top right', my: 'top right' },
-    //       displayTime: 500,
-    //     },
-    //     'error'
-    //   );
-    // } else {
-    //       const validationResult = this.formValidationGroup?.instance?.validate();
-    // if (!validationResult?.isValid) {
-    //   return;
-    // }
 
     this.dataService
       .Api_Add_advance(

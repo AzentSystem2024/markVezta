@@ -199,7 +199,6 @@ dx-text-box {
   border: 1px solid #838181;
   border-radius: 8px;
   padding: 20px;
-  // margin: 20px;
   margin-top: 8px;
   width: 98%;
   overflow-y: auto;
@@ -207,12 +206,10 @@ dx-text-box {
 }
 
 .custom-card-passport-2 {
-  // border: 1px solid #838181;
   border-radius: 8px;
   padding: 20px;
   margin-top: 8px;
   overflow-y: auto;
-
   width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -359,8 +356,6 @@ dx-text-box {
   border-radius: 8px;
   padding: 8px;
   width: 98%;
-  // margin-top: 50px;
-  // max-width: 800px; /* Increased for better 3-column layout */
   display: grid;
   margin-left: 10px;
   grid-template-columns: repeat(3, 1fr); /* 3 equal columns */

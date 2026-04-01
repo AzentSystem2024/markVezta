@@ -250,6 +250,7 @@
           dataType="number"
           [allowEditing]="false"
           [calculateCellValue]="calculateTotal"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
         ></dxi-column>
 
         <dxi-column type="buttons">
@@ -376,7 +377,7 @@
             ? 'Committing…'
             : 'Saving…'
           : debitFormData.IS_APPROVED
-            ? 'Commit'
+            ? 'Save'
             : 'Save'
       "
       [disabled]="isSaving"

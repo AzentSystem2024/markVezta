@@ -1,7 +1,5 @@
-// ::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar {
-//   min-height: 91px;
-//   align-items: center;
-// }
+@use "../../../../../variables.scss" as *;
+@use "sass:math";
 
 ::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar {
   height: auto !important;

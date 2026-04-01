@@ -332,7 +332,7 @@
           <!-- Update / Update & Commit -->
           <dx-button
             #saveButtonRef
-            [text]="invoiceFormData.IS_APPROVED ? 'Update & Commit' : 'Update'"
+            [text]="invoiceFormData.IS_APPROVED ? 'Save' : 'Save'"
             [disabled]="isUpdating"
             (onClick)="updateInvoice()"
             stylingMode="contained"

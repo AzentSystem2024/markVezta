@@ -121,12 +121,25 @@
                   [readOnly]="true"
                 ></dx-number-box>
                 <dx-button
-                  icon="plus"
-                  stylingMode="outlined"
+                  stylingMode="contained"
+                  hint="Add New Row"
                   type="default"
                   (onClick)="onAddNewRow()"
                   style="margin-top: 10px"
-                ></dx-button>
+                  ><div
+                    *dxTemplate="let data of 'content'"
+                    class="add-btn-content"
+                  >
+                    <span
+                      class="iconify"
+                      data-icon="formkit:add"
+                      data-width="20"
+                      data-height="20"
+                    ></span>
+
+                    <span class="add-text">Add Row</span>
+                  </div>
+                </dx-button>
               </div>
             </div>
           </dxi-item>
@@ -228,6 +241,7 @@
           dataType="number"
           [allowEditing]="false"
           [calculateCellValue]="calculateTotal"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
         ></dxi-column>
 
         <dxi-column type="buttons">
@@ -321,6 +335,7 @@
           <dx-check-box
             [(value)]="debitFormData[0].IS_APPROVED"
             text="Approve"
+            [focusStateEnabled]="debitFormData[0].IS_APPROVED"
             (onValueChanged)="onApprovedChanged($event)"
           >
           </dx-check-box>
@@ -346,8 +361,8 @@
             ? 'Committing…'
             : 'Updating…'
           : debitFormData.IS_APPROVED
-            ? 'Commit'
-            : 'Update'
+            ? 'Save'
+            : 'Save'
       "
       [disabled]="isUpdating"
       (onClick)="updateDebitNote()"

@@ -463,7 +463,7 @@ export class LedgerStatementComponent {
   }
 
   onViewClick(e: any) {
-    console.log(e)
+    console.log(e);
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
 
     const trans_id = e.row.data.TRANS_ID;
@@ -610,9 +610,7 @@ export class LedgerStatementComponent {
       this.dataService
         .selectSupplierPayment(trans_id)
         .subscribe((response: any) => {
-          this.selectedReceipt = Array.isArray(response)
-            ? response[0]
-            : response.Data[0];
+          this.selectedReceipt = response.Data;
           console.log(this.selectedReceipt, 'Selected data');
 
           this.cdr.detectChanges();

@@ -80,7 +80,7 @@ export class StaffEOSComponent {
   less_service_days: number = 0;
   selected_Company_id: any;
   selected_fin_id: any;
-
+  all_workingdaysView: any;
   //data box
   addButtonOptions = {
     type: 'default',
@@ -129,6 +129,7 @@ export class StaffEOSComponent {
       icon: 'edit',
 
       text: 'Edit',
+      visible: (e) => e.row.data.STATUS !== 'Verified',
     },
 
     {
@@ -203,34 +204,34 @@ export class StaffEOSComponent {
       Join_Date: [''],
       days_Worked: [''],
       reason_ID: [''],
+      RELIEVING_DATE: [new Date()],
       Remarks: [''],
     });
     this.get_reson_dropdown();
     this.sesstion_Details();
     this.getStaffEosData();
     this.dropdown_employee();
-    this.get_employes_details_value();
   }
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => {
-      this.ngZone.run(() => this.refreshGrid());
-    },
-    text: '',
-  };
+
   //--------------Session storage----------------
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
+    console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
+    console.log(
+      this.selected_Company_id,
+      '============selected_Company_id==============',
+    );
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    console.log(
+      this.selected_fin_id,
+      '===========selected fin id===================',
+    );
   }
   //=======================Refresh=========================
   refreshGrid() {
     this.dataGrid.instance.refresh();
+    this.getStaffEosData();
   }
 
   initialLoad: boolean = true;
@@ -239,6 +240,7 @@ export class StaffEOSComponent {
     this.isLoading = true;
     this.dataService.get_Staff_EOS_List().subscribe((res: any) => {
       let data = res.data;
+      console.log(data);
 
       // On first load or when 'all' is selected, show all data without filtering
       if (this.initialLoad) {
@@ -368,6 +370,7 @@ export class StaffEOSComponent {
   // =======================onEdit====================================
 
   onEditingStart(event: any) {
+    this.all_workingdays = 0;
     event.cancel = true;
     const statusValue = event.data.STATUS;
     const id = event.data.ID;
@@ -392,9 +395,20 @@ export class StaffEOSComponent {
     this.days_worked_value = '';
     this.all_workingdays = '';
     this.isAddPopUp = true;
+    this.selected_data.EOS_DATE = new Date();
+    this.selected_data.RELIEVING_DATE = new Date();
+    this.get_employes_details_value();
   }
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
 
   close() {
+    console.log('close=======Buttomn clicked');
     this.isAddPopUp = false;
     this.isviewpopup = false;
     this.editpopup = false;
@@ -408,6 +422,7 @@ export class StaffEOSComponent {
   }
 
   closeButton() {
+    console.log('close=======Button onHiding clicked');
     this.formSource.reset({
       Date: new Date(),
       employee_ID: 0,
@@ -422,14 +437,16 @@ export class StaffEOSComponent {
 
   get_reson_dropdown() {
     this.dataService.Dropdown_EOS_reason(name).subscribe((res: any) => {
+      console.log(res);
       this.reson_data = res;
     });
   }
 
   dropdown_employee() {
     const payload = { NAME: 'EMPLOYEE', COMPANY_ID: this.selected_Company_id };
-
+    console.log(payload);
     this.dataService.Dropdown_eos_employee(payload).subscribe((res: any) => {
+      console.log(res);
       this.EMPLOYEE_ID = res;
     });
   }
@@ -450,6 +467,7 @@ export class StaffEOSComponent {
 
   Add_EOS() {
     this.formSubmitted = true;
+    console.log(this.formSource.value);
     const user_id = sessionStorage.getItem('UserId');
     const store_id = sessionStorage.getItem('StoreId');
     const date = this.formSource.value.Date;
@@ -458,8 +476,11 @@ export class StaffEOSComponent {
     const days_worked = this.formSource.value.days_Worked;
     const reason_id = this.formSource.value.reason_ID;
     const remarks = this.formSource.value.Remarks;
+    const relieving_date = this.formSource.value.RELIEVING_DATE;
+    const days = this.all_workingdays.toString();
+    console.log(relieving_date, '========relvieing data s payload');
 
-    // 🔍 Check for duplicate entry based on employee ID
+    //  Check for duplicate entry based on employee ID
     const duplicate = this.staffEosSource.find(
       (item: any) => item.EMP_ID === emp_id,
     );
@@ -477,8 +498,18 @@ export class StaffEOSComponent {
     }
 
     this.dataService
-      .add_Staff_EOS(user_id, store_id, date, emp_id, reason_id, remarks)
+      .add_Staff_EOS(
+        user_id,
+        store_id,
+        date,
+        emp_id,
+        reason_id,
+        remarks,
+        relieving_date,
+        days,
+      )
       .subscribe((res: any) => {
+        console.log(res);
         notify(
           {
             message: 'Staff EOS Added successfully',
@@ -494,11 +525,14 @@ export class StaffEOSComponent {
   //s===========================select EOS ==========================
 
   select_Data_EOS(event: any) {
+    console.log(event);
     const id = event.data.ID;
+    console.log(id);
 
     this.dataService.select_Api_eos(id).subscribe((res: any) => {
+      console.log(res);
       this.selected_data = res;
-
+      console.log(this.selected_data);
       this.id_value = this.selected_data.ID;
       this.UserId_value = this.selected_data.USER_ID;
       this.store_id_value = this.selected_data.STORE_ID;
@@ -515,6 +549,8 @@ export class StaffEOSComponent {
       this.Add_Remarks = this.selected_data.ADD_REMARKS;
       this.ded_Remarks = this.selected_data.DED_REMARKS;
       this.trans_id = this.selected_data.TRANS_ID;
+      this.all_workingdays = this.selected_data.DAYS;
+      this.all_workingdaysView = this.selected_data.DAYS;
       this.payment_functionality();
     });
   }
@@ -522,9 +558,11 @@ export class StaffEOSComponent {
     this.employee_ID = event.value; // assign selected value
     this.get_employes_details_value();
     this.employee_value = event.value;
+    console.log(this.employee_value);
   }
   onReason_Change(event: any) {
     this.reason_id_value = event.value;
+    console.log(this.reason_id_value);
   }
   // ============================Edit Popup function=========================================
   Edit_EOS() {
@@ -543,7 +581,27 @@ export class StaffEOSComponent {
     const ded_Amount = this.Add_Amount;
     const Add_Remarks = this.Add_Remarks;
     const ded_Remarks = this.ded_Remarks;
+    const relieving_date = this.selected_data.RELIEVING_DATE;
+    const days = this.all_workingdays.toString();
 
+    console.log(
+      id,
+      user_id,
+      store_id,
+      emp_id,
+      reason_id,
+      remarks,
+      date,
+      eos_Amount,
+      leave_Amount,
+      pending_salary,
+      Add_Amount,
+      ded_Amount,
+      Add_Remarks,
+      ded_Remarks,
+      relieving_date,
+      days,
+    );
     const duplicate = this.staffEosSource.find(
       (item: any) => item.EMP_ID === emp_id && item.ID !== id,
     );
@@ -568,8 +626,11 @@ export class StaffEOSComponent {
           emp_id,
           reason_id,
           remarks,
+          relieving_date,
+          days,
         )
         .subscribe((res: any) => {
+          console.log(res);
           notify(
             {
               message: 'Staff EOS Updated successfully',
@@ -585,18 +646,26 @@ export class StaffEOSComponent {
     }
   }
   get_employes_details_value() {
+    console.log('get_employes_details_value CALLED');
     const id = this.employee_ID;
+    console.log(id);
 
     if (!id) return;
 
     this.dataService.get_employeeDetails(id).subscribe((res: any) => {
+      console.log(res, 'API Response');
       this.get_Details_Data = res;
       this.less_service_days = res.LESS_SERVICE_DAYS;
+      console.log(this.less_service_days, 'less service days');
       this.join_date_value = this.get_Details_Data.JOIN_DATE;
+      console.log(this.join_date_value, 'join date');
       // Convert join date string to Date object
       const joinDate: Date | null = this.parseApiDate(res.JOIN_DATE);
-      const today: Date = new Date();
-
+      const today = new Date(
+        this.selected_data.RELIEVING_DATE
+          ? this.selected_data.RELIEVING_DATE
+          : this.selected_data.EOS_DATE,
+      );
       if (joinDate) {
         const timeDiff = today.getTime() - joinDate.getTime();
         const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
@@ -604,41 +673,64 @@ export class StaffEOSComponent {
 
         this.all_workingdays = this.days_worked_value - this.less_service_days;
         this.cdRef.detectChanges();
+        console.log(this.all_workingdays, 'all working days');
       } else {
         this.days_worked_value = 0;
       }
+
+      console.log(this.days_worked_value, 'days worked');
     });
   }
   get_employes_details_value_select() {
+    console.log('get_employes_details_value CALLED  Verified');
     const id = this.selected_data.EMP_ID;
+    console.log(id);
 
     if (!id) return;
 
     this.dataService.get_employeeDetails(id).subscribe((res: any) => {
+      console.log(res, 'API Response');
       this.get_Details_Data = res;
       this.less_service_days = res.LESS_SERVICE_DAYS;
+      console.log(this.less_service_days, 'less service days');
       this.join_date_value = this.get_Details_Data.JOIN_DATE;
+      console.log(this.join_date_value, 'join date');
       // Convert join date string to Date object
       const joinDate: Date | null = this.parseApiDate(res.JOIN_DATE);
-      const today: Date = new Date();
+      const today = this.selected_data.RELIEVING_DATE;
 
       if (joinDate) {
+        console.log(today, '=================today====================');
+        console.log(joinDate, '=================join date====================');
+        console.log(
+          today.getTime(),
+          '=================today time====================',
+        );
+        console.log(
+          this.less_service_days,
+          '=================less service days====================',
+        );
         const timeDiff = today.getTime() - joinDate.getTime();
         const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
         this.days_worked_value = dayDiff + 1;
 
         this.all_workingdays = this.days_worked_value - this.less_service_days;
         this.cdRef.detectChanges();
+        console.log(this.all_workingdays, 'all working days');
       } else {
         this.days_worked_value = 0;
       }
+
+      console.log(this.days_worked_value, 'days worked');
     });
   }
   // ============================Delete Popup function=========================================
   deleteData(e: any) {
     const id = e.data.ID;
 
+    console.log(id);
     this.dataService.delete_Eos_data(id).subscribe((res: any) => {
+      console.log(res);
       notify(
         {
           message: 'Salary EOS Deleted successfully',
@@ -656,9 +748,12 @@ export class StaffEOSComponent {
     e.cancel = true;
 
     const id = e.row?.data?.ID;
+    console.log(id, '===================id');
     this.dataService.select_Api_eos(id).subscribe((res: any) => {
+      console.log(res);
       this.selected_data = res;
-      this.get_employes_details_value_select();
+      console.log(this.selected_data, '==============select data====verify');
+      // this.get_employes_details_value_select();
     });
   }
 
@@ -670,6 +765,11 @@ export class StaffEOSComponent {
     const reason_id = this.selected_data.REASON_ID;
     const remarks = this.selected_data.REMARKS;
     const date = this.selected_data.EOS_DATE;
+    const relieving_date = this.selected_data.RELIEVING_DATE;
+    const days = this.all_workingdays.toString();
+
+    console.log(id, user_id, store_id, emp_id, reason_id, remarks, date);
+    console.log('===================verify data');
 
     this.dataService
       .Verify_Staff_EOS_api(
@@ -680,8 +780,11 @@ export class StaffEOSComponent {
         emp_id,
         reason_id,
         remarks,
+        relieving_date,
+        days,
       )
       .subscribe((res: any) => {
+        console.log(res, '===================verify data');
         notify(
           {
             message: 'Staff EOS Verified successfully',
@@ -699,9 +802,12 @@ export class StaffEOSComponent {
     this.Approvepopup = true;
     e.cancel = true;
     const id = e.row?.data?.ID;
+    console.log(id, '===================id');
     this.dataService.select_Api_eos(id).subscribe((res: any) => {
+      console.log(res);
       this.selected_data = res;
-      this.get_employes_details_value_select();
+      console.log(this.selected_data, '==============select data====verify');
+      // this.get_employes_details_value_select();
     });
   }
   Approve_EOS() {
@@ -712,6 +818,9 @@ export class StaffEOSComponent {
     const reason_id = this.selected_data.REASON_ID;
     const remarks = this.selected_data.REMARKS;
     const date = this.selected_data.EOS_DATE;
+    console.log(id, user_id, store_id, emp_id, reason_id, remarks, date);
+    const relieving_date = this.selected_data.RELIEVING_DATE;
+    const days = this.all_workingdays.toString();
 
     this.dataService
       .Approve_Staff_EOS_api(
@@ -722,8 +831,11 @@ export class StaffEOSComponent {
         emp_id,
         reason_id,
         remarks,
+        relieving_date,
+        days,
       )
       .subscribe((res: any) => {
+        console.log(res, '===================verify data');
         notify(
           {
             message: 'Staff EOS Approved successfully',
@@ -739,10 +851,48 @@ export class StaffEOSComponent {
   //==========================Payment functionality===================
   payment_functionality() {
     const id = this.trans_id;
+    console.log(id, '=================id====================');
 
+    console.log('payment functionality');
     this.dataService.get_paymentDetails(id).subscribe((res: any) => {
+      console.log(res);
+
       this.payment_Detilas = res;
     });
+  }
+
+  //==========================calculate working days===================
+  calculateWorkingDays(event: any) {
+    console.log(event, '=================event value====================');
+    const joinDate = this.parseApiDate(this.join_date_value); // Parse the join date value
+    const today = event.value; // Assuming this is the relieving date selected in the date box
+    if (joinDate) {
+      const timeDiff = today.getTime() - joinDate.getTime();
+      const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
+      this.days_worked_value = dayDiff + 1;
+
+      this.all_workingdays = this.days_worked_value - this.less_service_days;
+      this.cdRef.detectChanges();
+      console.log(this.all_workingdays, 'all working days');
+    } else {
+      this.days_worked_value = 0;
+    }
+  }
+  calculateWorkingDaysEdit(event: any) {
+    console.log(event, '=================event value====================');
+    const joinDate = this.parseApiDate(this.join_date_value); // Parse the join date value
+    const today = new Date(event.value); // Assuming this is the relieving date selected in the date box
+    if (joinDate) {
+      const timeDiff = today.getTime() - joinDate.getTime();
+      const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
+      this.days_worked_value = dayDiff + 1;
+
+      this.all_workingdays = this.days_worked_value - this.less_service_days;
+      this.cdRef.detectChanges();
+      console.log(this.all_workingdays, 'all working days');
+    } else {
+      this.days_worked_value = 0;
+    }
   }
 }
 
@@ -770,16 +920,3 @@ export class StaffEOSComponent {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class StaffEOSModule {}
-// ,
-//     DxButtonModule,
-//     FormPopupModule,
-//     DxPopupModule,
-//     DxFormModule,
-//     FormTextboxModule,
-//     DxRadioGroupModule,
-//     DxTextBoxModule,
-//     ,
-//     DxSelectBoxModule,
-//     DxCheckBoxModule,
-//     DxValidatorModule,
-//     ReactiveFormsModule,

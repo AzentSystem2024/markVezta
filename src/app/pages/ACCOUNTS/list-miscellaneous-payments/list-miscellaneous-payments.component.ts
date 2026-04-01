@@ -190,7 +190,9 @@ export class ListMiscellaneousPaymentsComponent {
   }
   refreshGrid() {
     if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+      this.dataGrid.instance.refresh();
+      this.getMiscPaymentList();
+      // Or reload data from API if needed
     }
   }
 
@@ -350,7 +352,7 @@ export class ListMiscellaneousPaymentsComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+    icon.style.color = status === 5 ? '#6EFF46' : '#F53434';
     icon.title = status === 5 ? 'Approved' : 'Open';
 
     icon.style.display = 'flex';

@@ -124,7 +124,7 @@ export class SubDepartmentComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/user');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -147,7 +147,7 @@ export class SubDepartmentComponent implements OnInit {
       } else {
         notify(
           {
-            message: 'data failing failed..',
+            message: 'data fetching failed..no data available',
             position: { at: 'top right', my: 'top right' },
           },
           'error',
@@ -178,13 +178,17 @@ export class SubDepartmentComponent implements OnInit {
   }
 
   onEditStart(event: any) {
-    event.cancel = true;
-    this.editItemCategory = true;
     const id = event.data.ID;
-
-    this.dataservice.select_category(id).subscribe((res: any) => {
-      this.selected_data = res;
+    event.cancel = true;
+    this.dataservice.select_subdepartment(id).subscribe((res: any) => {
+      if (res.flag === '1') {
+        this.selected_data = res.data;
+        this.editItemCategory = true;
+      } else {
+        this.editItemCategory = true;
+      }
     });
+    this.editItemCategory = true;
   }
 
   onClickSaveCategory() {
@@ -285,12 +289,13 @@ export class SubDepartmentComponent implements OnInit {
   }
 
   getDepartmentDropDown() {
-    const dropdowndepartment = 'DEPARTMENT';
-    this.dataservice
-      .getDropdownData(dropdowndepartment)
-      .subscribe((data: any) => {
-        this.DepartmentDropdownData = data;
-      });
+    const dept_payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.COMPANY_ID,
+    };
+    this.dataservice.getDropdownData(dept_payload).subscribe((data) => {
+      this.DepartmentDropdownData = data;
+    });
   }
 
   refresh = () => {
@@ -304,6 +309,7 @@ export class SubDepartmentComponent implements OnInit {
   handleClose() {
     this.isAddCategoryPopupOpened = false;
     this.editItemCategory = false;
+    this.refresh();
   }
 
   onExporting(event: any) {
