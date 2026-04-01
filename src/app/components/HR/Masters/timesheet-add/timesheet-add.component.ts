@@ -163,7 +163,6 @@ export class TimesheetAddComponent {
     };
     this.dataService.getDropdownData(payload).subscribe((data: any) => {
       this.salaryHead = data;
-      console.log(this.salaryHead, '============  this.salaryHead ========');
       this.salaryDataSource = this.salaryHead.map((item) => ({
         SALARY_HEAD_ID: item.ID,
         AMOUNT: null, // Let user enter this
@@ -253,10 +252,6 @@ export class TimesheetAddComponent {
 
     // refresh grid if needed
     this.timesheetDetails = [...this.timesheetDetails];
-    console.log(
-      this.timesheetDetails,
-      '============time sheet details=========',
-    );
   }
   onTimesheetDetailsUpdated(e: any) {
     const updatedStore = e.data.STORE;
@@ -320,8 +315,6 @@ export class TimesheetAddComponent {
     this.dataService.getDropdownData(payload).subscribe((response) => {
       // Filter out "CENTRAL STORE" and populate the Departments array
       this.Departments = response;
-      console.log(this.Departments, '========departments===========');
-
       this.timesheetDetails = [
         {
           DEPT_ID: null,
@@ -331,10 +324,6 @@ export class TimesheetAddComponent {
         },
       ];
     });
-    console.log(
-      this.timesheetDetails,
-      '============time sheet details=========',
-    );
   }
 
   calculateTotalWorkedDays() {
@@ -373,9 +362,6 @@ export class TimesheetAddComponent {
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       const employee_res = response;
-      console.log(employee_res);
-      console.log(this.timesheetList);
-
       if (employee_res) {
         this.employee = employee_res.filter(
           (emp) =>
@@ -383,7 +369,6 @@ export class TimesheetAddComponent {
         );
       }
     });
-    console.log(this.employee, 'empployeeeeeeeeeee');
   }
 
   onEmployeeSelected(e: any) {
@@ -532,8 +517,6 @@ export class TimesheetAddComponent {
       (sum, item) => sum + (Number(item.DAYS) || 0),
       0,
     );
-    console.log(totalworkdays, '=======totalworkdays===========');
-
     if (Number(this.timesheetFormData.DAYS) == totalworkdays) {
       const payload = {
         ...this.timesheetFormData,
@@ -604,7 +587,6 @@ export class TimesheetAddComponent {
 
     this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
       this.timesheetList = response.data;
-      console.log(this.timesheetList, 'time sheeet list');
     });
     this.getEmployeeDropdown();
   }
@@ -612,10 +594,6 @@ export class TimesheetAddComponent {
   Employee_leaveperiod() {
     this.dataService.Employee_leave_period().subscribe((res: any) => {
       this.employee_leaveperiopd_Data = res.data[0];
-      console.log(
-        this.employee_leaveperiopd_Data,
-        '=======leve================',
-      );
       this.timesheetFormData.LEAVE_FROM =
         this.employee_leaveperiopd_Data.LEAVE_FROM || '';
       this.timesheetFormData.LEAVE_TO =

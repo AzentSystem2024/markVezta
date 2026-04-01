@@ -145,7 +145,7 @@
               dataSource: ledgerList,
               valueExpr: 'HEAD_CODE',
               displayExpr: 'HEAD_CODE',
-              searchEnabled: true
+              searchEnabled: true,
             }"
           ></dxi-column>
           <dxi-column
@@ -155,7 +155,7 @@
               dataSource: ledgerList,
               valueExpr: 'HEAD_NAME',
               displayExpr: 'HEAD_NAME',
-              searchEnabled: true
+              searchEnabled: true,
             }"
           ></dxi-column>
           <dxi-column
@@ -183,10 +183,7 @@
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
           </dxi-column>
-          <!-- <dxi-column type="buttons">
-              <dxi-button name="edit"></dxi-button>
-              <dxi-button name="delete"></dxi-button>
-            </dxi-column> -->
+
           <dxo-summary>
             <dxi-total-item
               column="debitAmount"
@@ -205,19 +202,7 @@
             ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
-        <div style="margin-top: 15px; padding: 0 0 0 5px">
-          <!-- <div *ngIf="journalVoucherFormData">
-            <dx-text-box
-              label="Narration"
-              labelMode="floating"
-              [(value)]="journalVoucherFormData.NARRATION"
-              [width]="400"
-              [readOnly]="true"
-              [allowEditing]="false"
-              [showClearButton]="true"
-            ></dx-text-box>
-          </div> -->
-        </div>
+        <div style="margin-top: 15px; padding: 0 0 0 5px"></div>
         <div *ngIf="journalVoucherFormData" style="margin-top: 10px">
           <div
             style="display: flex; justify-content: flex-end; padding-right: 0px"

@@ -66,9 +66,57 @@ export class EmployeeSalarySettingsEditComponent {
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
   ) {
-    // this.getEmployeeSalarySettingsList();
-    // this.EmployeeListDropDown();
     this.get_SalaryHead_List();
+  }
+
+  ngOnInit() {
+    this.sessionDetails();
+    this.EmployeeListDropDown();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (
+      changes['employeeData'] &&
+      changes['employeeData'].currentValue &&
+      changes['employeeData'].currentValue.ID
+    ) {
+      this.selectedEmployee = changes['employeeData'].currentValue;
+      this.selectedEmployeeId = this.selectedEmployee.ID;
+
+      this.selected_Batch_id = this.selectedEmployee.BATCH_ID;
+
+      this.employeeFormData = {
+        EMP_CODE: this.selectedEmployee.EMP_CODE || '',
+        EMP_NAME: this.selectedEmployee.EMP_NAME || '',
+        DESIGNATION: this.selectedEmployee.DESG_NAME || '',
+        BASIC_SALARY: Number(this.selectedEmployee.SALARY) || 0,
+
+        // EFFECT_FROM: new Date(),
+        EFFECT_FROM: this.selectedEmployee.EFFECT_FROM,
+        PREVIOUS_EFFECT_FROM: this.selectedEmployee.PREVIOUS_EFFECT_FROM,
+
+        IS_INACTIVE: this.selectedEmployee.IS_INACTIVE || false,
+      };
+
+      this.get_SalaryHead_List();
+
+      this.SalaryDetails = Array.isArray(this.selectedEmployee.Details)
+        ? [...this.selectedEmployee.Details]
+        : [];
+
+      this.cdr.detectChanges(); // Ensure grid gets new data
+
+      setTimeout(() => {
+        this.selectedRows = this.SalaryDetails.filter(
+          (item) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0,
+        ).map((item) => item.HEAD_ID);
+
+        // Optional: manually refresh selection
+        if (this.salaryGridRef?.instance) {
+          this.salaryGridRef.instance.selectRows(this.selectedRows, false);
+        }
+      }, 100); // Slight delay ensures grid is ready
+    }
   }
 
   onEmployeeChanged(event: any) {
@@ -146,14 +194,14 @@ export class EmployeeSalarySettingsEditComponent {
       COMPANY_ID: this.selected_Company_id,
     };
 
-    this.dataservice.get_SalaryHeadList_Api(1).subscribe((res: any) => {
+    this.dataservice.get_SalaryHeadList_Api(payload).subscribe((res: any) => {
       this.salaryGridData = res.Data[0];
       this.selectedRows = [];
 
       const selecteddata = this.salaryGridData.Details;
       this.selectedRows = selecteddata
         .filter((item) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0)
-        .map((item) => item.HEAD_ID); // or your row's unique identifier
+        .map((item) => item.HEAD_ID);
 
       this.SalaryDetails = this.salaryGridData.Details || [];
       this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
@@ -176,65 +224,6 @@ export class EmployeeSalarySettingsEditComponent {
     this.salaryGridData = [];
     this.SalaryDetails = [];
     this.formClosed.emit(true);
-  }
-
-  //  getEmployeeSalarySettingsList() {
-  //   const payload = {
-  //     FilterAction: Number(this.selectedFilterAction) // Ensure it's a number
-  //   }
-  //   this.dataservice.getEmployeeSalarySettingsList(payload).subscribe((response:any)=>{
-  //     this.EmployeeSalarySettingsDatasource = response.Data || []
-  //   })
-  // }
-
-  ngOnInit() {
-    this.sessionDetails();
-    this.EmployeeListDropDown();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (
-      changes['employeeData'] &&
-      changes['employeeData'].currentValue &&
-      changes['employeeData'].currentValue.ID
-    ) {
-      this.selectedEmployee = changes['employeeData'].currentValue;
-      this.selectedEmployeeId = this.selectedEmployee.ID;
-
-      this.selected_Batch_id = this.selectedEmployee.BATCH_ID;
-
-      this.employeeFormData = {
-        EMP_CODE: this.selectedEmployee.EMP_CODE || '',
-        EMP_NAME: this.selectedEmployee.EMP_NAME || '',
-        DESIGNATION: this.selectedEmployee.DESG_NAME || '',
-        BASIC_SALARY: Number(this.selectedEmployee.SALARY) || 0,
-
-        // EFFECT_FROM: new Date(),
-        EFFECT_FROM: this.selectedEmployee.EFFECT_FROM,
-        PREVIOUS_EFFECT_FROM: this.selectedEmployee.PREVIOUS_EFFECT_FROM,
-
-        IS_INACTIVE: this.selectedEmployee.IS_INACTIVE || false,
-      };
-
-      this.get_SalaryHead_List();
-
-      this.SalaryDetails = Array.isArray(this.selectedEmployee.Details)
-        ? [...this.selectedEmployee.Details]
-        : [];
-
-      this.cdr.detectChanges(); // Ensure grid gets new data
-
-      setTimeout(() => {
-        this.selectedRows = this.SalaryDetails.filter(
-          (item) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0,
-        ).map((item) => item.HEAD_ID);
-
-        // Optional: manually refresh selection
-        if (this.salaryGridRef?.instance) {
-          this.salaryGridRef.instance.selectRows(this.selectedRows, false);
-        }
-      }, 100); // Slight delay ensures grid is ready
-    }
   }
 
   onSelectionChanged(e: any) {

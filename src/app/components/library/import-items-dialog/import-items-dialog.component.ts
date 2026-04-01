@@ -47,7 +47,7 @@ export class ImportItemsDialogComponent implements AfterViewInit {
   @Output() closeForm = new EventEmitter();
   @ViewChild(ImportItemsComponent) importitem: ImportItemsComponent;
 
-  readonly allowedPageSizes: any = [5, 10, 'all'];
+  readonly allowedPageSizes: any = [10, 15, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter: true;

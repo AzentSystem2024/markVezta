@@ -184,10 +184,11 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, // global style
     onClick: () => this.toggleFilters(),
   };
   vatTitle: any;
+
   constructor(
     private service: DataService,
     private router: Router,
@@ -207,13 +208,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log(
-      'Parsed ObjectData:',
-      this.menuResponse.GeneralSettings.STORE_TITLE,
-    );
+   
     this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
-    // this.sessionData_tax()
     const menuGroups = this.menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
