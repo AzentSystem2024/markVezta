@@ -6369,4 +6369,9 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'SalaryWPS/wps';
     return this.http.post(getEndpoint, payload);
   }
+
+  profitLoss_Branch_Report(payload) {
+    const getEndpoint = this.apiUrl + 'Report/profitlossbranch';
+    return this.http.post(getEndpoint, payload);
+  }
 }

@@ -218,7 +218,8 @@
           caption="Expense Amount"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [editorOptions]="{ showSpinButtons: true }"
-          [allowEditing]="true"
+          [allowEditing]="false"
+          [readOnly]="true"
         >
           <dxo-header-filter [allowSelectAll]="false">
             <dxo-search [enabled]="true"></dxo-search>
@@ -243,6 +244,7 @@
       <dx-number-box
         label="Total Expense"
         width="200px"
+        [readOnly]="true"
         [format]="{ type: 'fixedPoint', precision: 2 }"
         labelMode="floating"
         [(value)]="totalExpense"
