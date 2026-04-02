@@ -49,7 +49,6 @@ import { Router } from '@angular/router';
   templateUrl: './timesheet-add.component.html',
   styleUrls: ['./timesheet-add.component.scss'],
 })
-
 export class TimesheetAddComponent {
   @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
