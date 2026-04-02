@@ -110,7 +110,6 @@ export class AddMiscellaneousPaymentComponent {
     CREATE_USER_ID: '',
     PAY_TYPE_ID: '',
     PAY_HEAD_ID: '',
-    DEPT_ID: 0,
     IS_APPROVED: false,
     MISC_DETAIL: [
       {
@@ -161,6 +160,8 @@ export class AddMiscellaneousPaymentComponent {
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
   isSaving: boolean;
+  selected_Company_id: any;
+  Store: any;
 
   constructor(
     private dataService: DataService,
@@ -171,10 +172,13 @@ export class AddMiscellaneousPaymentComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   ngOnInit() {
     this.sessionDetails();
+    this.Department_dropdown();
+    this.store_dropdown();
     if (this.EditingResponseData) {
     }
 
@@ -202,7 +206,6 @@ export class AddMiscellaneousPaymentComponent {
       this.getPendingNo(); // only fetch new number in add mode
     }
     this.getLedgerCodeDropdown();
-    this.get_Department_dropdown();
     this.sessionData_tax();
   }
 
@@ -261,6 +264,7 @@ export class AddMiscellaneousPaymentComponent {
     this.miscFormData.COMPANY_ID = data.COMPANY_ID || '';
     this.miscFormData.FIN_ID = data.FIN_ID || '';
     this.miscFormData.VAT_REGN = data.VAT_REGN || '';
+    
 
     this.miscFormData.DEPT_ID = data.DEPT_ID ? Number(data.DEPT_ID) : null;
     // Populate pendingInvoicelist from DetailList
@@ -270,6 +274,8 @@ export class AddMiscellaneousPaymentComponent {
         ledgerName: data.LEDGER_NAME ?? '',
         DESCRIPTION: item.REMARKS ?? '',
         AMOUNT: item.AMOUNT ?? null,
+        STORE_ID : item.STORE_ID ?? null,
+        DEPT_ID : item.DEPT_ID ?? null,
         TAX: item.VAT_PERCENT ?? null,
         TAX_AMOUNT: item.VAT_AMOUNT ?? null,
         HSN_CODE: this.HSNCODE,
@@ -281,6 +287,8 @@ export class AddMiscellaneousPaymentComponent {
           ledgerCode: '',
           ledgerName: '',
           DESCRIPTION: '',
+          DEPT_ID :'',
+          STORE_ID : '',
           AMOUNT: null,
           TAX: null,
           TAX_AMOUNT: null,
@@ -575,13 +583,13 @@ export class AddMiscellaneousPaymentComponent {
       TAX_AMOUNT: null,
     };
 
-    // ✅ Replace array reference (triggers Angular + DevExtreme change detection)
+    //  Replace array reference (triggers Angular + DevExtreme change detection)
     this.pendingInvoicelist = [...this.pendingInvoicelist, newRow];
 
-    // ✅ Just refresh grid (no rebind)
+    //  Just refresh grid (no rebind)
     grid.refresh();
 
-    // ✅ Focus new row
+    //  Focus new row
     setTimeout(() => {
       const lastRowIndex = this.pendingInvoicelist.length - 1;
       grid.editCell(lastRowIndex, 'ledgerCode');
@@ -783,7 +791,7 @@ export class AddMiscellaneousPaymentComponent {
       (row) => row.ledgerCode || row.amount != null || row.taxPercent != null,
     );
 
-    // ✅ Department validation (only when Approve is checked)
+    //  Department validation (only when Approve is checked)
     if (this.isApproved && !this.miscFormData.DEPT_ID) {
       notify(
         {
@@ -807,7 +815,6 @@ export class AddMiscellaneousPaymentComponent {
       ...miscDataWithoutVat,
       // TRANS_DATE: this.formatDateOnly(this.miscFormData.TRANS_DATE),
       TRANS_DATE: paymentDate,
-      STORE_ID: this.selectedstoreId,
       MISC_DETAIL: cleanedList.map((item: any, index: number) => {
         const amount = Number(item.AMOUNT) || 0;
         const tax = Number(item.TAX) || 0;
@@ -827,6 +834,8 @@ export class AddMiscellaneousPaymentComponent {
           VAT_AMOUNT: taxAmount,
           VAT_REGN: this.miscFormData.VAT_REGN || 0,
           VAT_PERCENT: tax,
+          DEPT_ID: item.DEPT_ID,
+          STORE_ID: item.STORE_ID, 
         };
       }),
     };
@@ -908,7 +917,6 @@ export class AddMiscellaneousPaymentComponent {
     );
     const payload = {
       ...this.miscFormData,
-      STORE_ID: this.selectedstoreId,
       MISC_DETAIL: cleanedList.map((item: any, index: number) => {
         const amount = Number(item.AMOUNT) || 0;
         const tax = Number(item.TAX) || 0;
@@ -921,8 +929,10 @@ export class AddMiscellaneousPaymentComponent {
 
         return {
           SL_NO: index + 1,
-          HEAD_ID: matchedLedger?.HEAD_ID || '', // ✅ Use actual HEAD_ID
+          HEAD_ID: matchedLedger?.HEAD_ID || '', // Use actual HEAD_ID
           REMARKS: item.DESCRIPTION || '',
+          STORE_ID :item.STORE_ID,
+          DEPT_ID:item.DEPT_ID,
           AMOUNT: amount,
           VAT_AMOUNT: taxAmount,
           VAT_REGN: this.miscFormData.VAT_REGN || 0,
@@ -1019,9 +1029,23 @@ export class AddMiscellaneousPaymentComponent {
     });
   }
 
-  get_Department_dropdown() {
-    this.dataService.Department_Dropdown().subscribe((res: any) => {
+  Department_dropdown() {
+    const payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Department = res;
+    });
+  }
+
+      store_dropdown(){
+    const payload = {
+      NAME :'STORE',
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
     });
   }
 

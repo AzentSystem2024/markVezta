@@ -126,14 +126,6 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     return this.menuMode === 'overlap' || this.temporaryMenuOpened;
   }
 
-  // get showMenuAfterClick() {
-  //   return !this.menuOpened;
-  // }
-
-  //   get showMenuAfterClick() {
-  //   return !this.menuOpened;
-  // }
-
   navigationChanged(event: DxTreeViewTypes.ItemClickEvent) {
     const path = (event.itemData as any)?.path;
     const title = (event.itemData as any)?.text;
@@ -148,7 +140,7 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     this.selectedIndex = this.tabs.findIndex((tab) => tab.path === path);
     this.router.navigate([path]);
 
-    // 🔥 IMPORTANT FIX
+    // IMPORTANT FIX
     this.temporaryMenuOpened = false;
 
     // close ONLY on mobile overlap
@@ -158,13 +150,14 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
 
     this.cdr.detectChanges();
   }
+
   onTabChanged(index: number) {
     this.selectedIndex = index;
     const selectedTab = this.tabs[index];
     if (selectedTab) {
       this.router.navigate([selectedTab.path]);
 
-      // 🔥 FORCE SIDEBAR SELECTION
+      // FORCE SIDEBAR SELECTION
       this.sideMenu.selectByPath(selectedTab.path);
     }
   }
@@ -177,19 +170,6 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
 
     this.cdr.detectChanges();
   }
-
-  // navigationClick() {
-  //   if (this.showMenuAfterClick) {
-  //     this.temporaryMenuOpened = true;
-  //   }
-
-  //   const previousState = this.menuOpened;
-  //   this.menuOpened = !this.menuOpened;
-
-  //   if (previousState !== this.menuOpened) {
-  //     this.cdr.detectChanges();
-  //   }
-  // }
 
   TabItemClick(tab: any) {
     const path = tab.path;
@@ -212,22 +192,27 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
   }
 
   closeButtonHandler(tab: any) {
+    // Prevent closing "analytics-dashboard"
+    if (tab.path === 'analytics-dashboard') {
+      return;
+    }
+
+    // Prevent closing last remaining tab
+    if (this.tabs.length === 1) {
+      return;
+    }
     const index = this.tabs.indexOf(tab);
     if (index === -1) return;
-
     const isCurrent = this.router.url.replace(/^\/+/, '') === tab.path;
-
     // remove tab first from UI list
     this.tabs.splice(index, 1);
-
-    if (this.tabs.length === 0) return;
 
     // select last tab
     this.selectedIndex = this.tabs.length - 1;
     const nextPath = this.tabs[this.selectedIndex].path;
 
     if (isCurrent) {
-      // 🔥 navigate to real remaining tab (forces detach/store)
+      // navigate to real remaining tab (forces detach/store)
       this.router.navigate([nextPath]).then(() => {
         (this.reuseStrategy as CustomReuseStrategy).removeStoredComponent(
           tab.path,

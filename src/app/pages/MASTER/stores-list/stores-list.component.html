@@ -51,16 +51,7 @@
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
-      <!-- <dxo-filter-row
-        [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
-      ></dxo-filter-row>
-      <dxo-header-filter [visible]="isFilterOpened">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter>
-      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
-      <dxo-filter-builder [allowHierarchicalFields]="true">
-      </dxo-filter-builder> -->
+
       <dxo-toolbar>
         <dxi-item location="before">
           <div class="grid-header">Store/Branch</div>
@@ -95,21 +86,7 @@
           [visible]="canAdd"
         ></dxi-item>
       </dxo-toolbar>
-      <!-- <div *dxTemplate="let data of 'dateFilterTemplate'">
-        <dx-select-box
-          [dataSource]="dateRanges"
-          [displayExpr]="displayExpr"
-          valueExpr="value"
-          [(value)]="selectedDateRange"
-          (onValueChanged)="onDateRangeChanged($event)"
-          (onOpened)="attachItemClickHandler($event)"
-          width="250"
-        >
-          <div *dxTemplate="let item of 'item'">
-            {{ item.value === "custom" ? "Custom" : item.label }}
-          </div>
-        </dx-select-box>
-      </div> -->
+      
       <dxi-column dataField="CODE" caption="Code"></dxi-column>
       <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column dataField="CITY" caption="City"></dxi-column>
@@ -134,16 +111,3 @@
     (formSubmit)="handleFormSubmit($event)"
   ></app-stores-form>
 </form-popup>
-
-<!-- <form-popup
-  [(visible)]="isAddStoresPopupOpened"
-  [width]="700"
-  [height]="'80vh'"
-  [titleText]="selectedStore ? 'Edit Store' : 'New Store'"
-  (save)="onClickSaveStores()"
->
-  <app-stores-form
-    [storeData]="selectedStore"
-    (formSubmit)="handleFormSubmit($event)"
-  ></app-stores-form>
-</form-popup> -->

@@ -52,6 +52,7 @@ export class LedgerSettingsListComponent {
   sessionData: any;
   selected_vat_id: any;
   ledgerDropdown: any;
+  selected_Company_id: any;
   addPurchaseReturn() {
     throw new Error('Method not implemented.');
   }
@@ -239,6 +240,54 @@ export class LedgerSettingsListComponent {
       },
     });
   }
+
+
+    sessionDetails() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+
+  clearLedger = (e: any) => {
+  const rowIndex = e.row.rowIndex;
+  const headId = e.row.data.HEAD_ID;
+
+  if (!headId) {
+    // Nothing to delete, just clear UI
+    e.component.cellValue(rowIndex, 'HEAD_ID', null);
+    return;
+  }
+
+  const payload = {
+    COMPANY_ID: this.companyID,
+    HEAD_ID: headId,
+  };
+
+  this.dataService.DeletetLedgerSettings(payload).subscribe({
+    next: (res: any) => {
+      notify(
+        {
+          message: 'Ledger removed successfully',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'success'
+      );
+
+      //  Clear UI after success
+      e.component.cellValue(rowIndex, 'HEAD_ID', null);
+      e.component.refresh();
+    },
+    error: (err: any) => {
+      console.error(err);
+      notify(
+        {
+          message: 'Failed to delete ledger',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error'
+      );
+    },
+  });
+};
 }
 @NgModule({
   imports: [

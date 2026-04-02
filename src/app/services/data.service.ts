@@ -588,6 +588,10 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}ACDefaults/Insert`, data);
   }
+   DeletetLedgerSettings(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ACDefaults/delete`, data);
+  }
   //--------------------------INVOICE-DELIVERY-------------------------------------//
 
   getInvoiceMainListDelivery(): Observable<any> {
@@ -1723,7 +1727,7 @@ export class DataService {
       DESCRIPTION: payload.DESCRIPTION,
       DEPARTMENT_ID: payload.DEPARTMENT_ID,
     };
-    return this.http.post(`${this.apiUrl}SubDepartment/update`, data);
+    return this.http.post(`${this.apiUrl}SubDepartment/save`, data);
   }
 
   removeSubdepartment(id: any) {

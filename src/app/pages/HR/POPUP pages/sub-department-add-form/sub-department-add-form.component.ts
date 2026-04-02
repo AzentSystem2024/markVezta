@@ -25,13 +25,13 @@ export class SubDepartmentAddFormComponent implements OnInit {
   @Output() popupClosed = new EventEmitter<void>();
 
   DepartmentDropdownData: any;
-  formCategoryData = {
+  formSubDepartmentData = {
     CODE: '',
     DESCRIPTION: '',
     DEPARTMENT_ID: '',
   };
   COMPANY_ID: string;
-  newCategory = this.formCategoryData;
+  newSubDepartment = this.formSubDepartmentData;
 
   constructor(private service: DataService) {}
 
@@ -39,7 +39,7 @@ export class SubDepartmentAddFormComponent implements OnInit {
     this.getDepartmentDropDown();
   }
 
-  getNewCategoryData = () => ({ ...this.newCategory });
+  getNewSubDepartmentData = () => ({ ...this.newSubDepartment });
 
   getDepartmentDropDown() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
