@@ -30,7 +30,6 @@ import {
 } from '../../POPUP pages/sub-department-add-form/sub-department-add-form.component';
 import { SubDepartmentEditFormModule } from '../../POPUP pages/sub-department-edit-form/sub-department-edit-form.component';
 import { FormPopupModule } from 'src/app/components';
-import { FontTextColorHistoryItem } from 'devexpress-richedit/lib/core/model/history/items/character-properties-history-items';
 @Component({
   selector: 'app-sub-department',
   templateUrl: './sub-department.component.html',
