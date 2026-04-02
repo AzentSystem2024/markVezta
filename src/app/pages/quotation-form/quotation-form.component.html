@@ -25,7 +25,7 @@
                     mode: 'cell',
                     allowAdding: true,
                     allowUpdating: true,
-                    allowDeleting: !isReadOnlyMode
+                    allowDeleting: !isReadOnlyMode,
                   }"
                   (onEditorPreparing)="onEditorPreparing($event)"
                   (onContentReady)="onGridReady($event)"
@@ -73,7 +73,7 @@
                             labelMode="floating"
                             [(value)]="quotationFormData.CONTACT_NAME"
                             [width]="405"
-                            [readOnly]="isReadOnlyMode"
+                            [readOnly]="true"
                           ></dx-text-box>
                         </div>
                       </div>
@@ -90,6 +90,13 @@
                             label="Reference No"
                             labelMode="floating"
                             [(value)]="quotationFormData.REF_NO"
+                            [width]="200"
+                            [readOnly]="isReadOnlyMode"
+                          ></dx-text-box>
+                          <dx-text-box
+                            label="Subject"
+                            labelMode="floating"
+                            [(value)]="quotationFormData.SUBJECT"
                             [width]="200"
                             [readOnly]="isReadOnlyMode"
                           ></dx-text-box>
@@ -111,7 +118,7 @@
                             [dataSource]="salesman"
                             displayExpr="DESCRIPTION"
                             valueExpr="ID"
-                            [width]="405"
+                            [width]="440"
                             [searchEnabled]="true"
                             label="Salesman"
                             labelMode="floating"
@@ -119,13 +126,18 @@
                           ></dx-select-box>
                         </div>
                         <div style="margin-top: -6px; text-align: left">
-                          <dx-text-box
-                            label="Subject"
+                          <dx-select-box
+                            [(value)]="quotationFormData.STORE_ID"
+                            [dataSource]="stores"
+                            displayExpr="DESCRIPTION"
+                            valueExpr="ID"
+                            [width]="440"
+                            [searchEnabled]="true"
+                            label="Store"
                             labelMode="floating"
-                            [(value)]="quotationFormData.SUBJECT"
-                            [width]="405"
                             [readOnly]="isReadOnlyMode"
-                          ></dx-text-box>
+                            (onValueChanged)="onStoreChanged($event)"
+                          ></dx-select-box>
                         </div>
                       </div>
                     </dxi-item>
@@ -134,12 +146,14 @@
                   <!-- Grid Columns -->
                   <dxi-column
                     caption="Sl No"
-                    [allowEditing]="false"
                     width="70"
-                    [calculateCellValue]="calculateSerialNumber"
-                  >
-                  </dxi-column>
+                    cellTemplate="slNoTemplate"
+                    [allowEditing]="false"
+                  ></dxi-column>
 
+                  <div *dxTemplate="let data of 'slNoTemplate'">
+                    {{ data.rowIndex + 1 }}
+                  </div>
                   <dxi-column
                     dataField="ITEM_ID"
                     [visible]="false"
@@ -150,17 +164,26 @@
                     [lookup]="{
                       dataSource: items,
                       valueExpr: 'ITEM_ID',
-                      displayExpr: 'ITEM_CODE'
+                      displayExpr: 'ITEM_CODE',
                     }"
                     [width]="250"
                   >
                   </dxi-column>
-
                   <dxi-column
                     dataField="DESCRIPTION"
                     caption="Description"
-                    [allowEditing]="true"
+                    [lookup]="{
+                      dataSource: items,
+                      valueExpr: 'ITEM_ID',
+                      displayExpr: 'DESCRIPTION',
+                    }"
+                    [width]="300"
                   ></dxi-column>
+                  <!-- <dxi-column
+                    dataField="DESCRIPTION"
+                    caption="Description"
+                    [allowEditing]="true"
+                  ></dxi-column> -->
                   <dxi-column
                     dataField="MATRIX_CODE"
                     caption="Matrix Code"
@@ -182,13 +205,14 @@
                       selected_vat_id == sessionData.VAT_ID &&
                       sessionData.VAT_ID == 2
                         ? ' VAT %'
-                        : ' GST %'
+                        : ' VAT %'
                     "
                     dataType="number"
                   ></dxi-column>
                   <dxi-column
                     dataField="STOCK_QTY"
                     caption="Quantity"
+                    dataType="number"
                     [allowEditing]="false"
                   ></dxi-column>
                   <dxi-column
@@ -224,7 +248,7 @@
                       selected_vat_id == sessionData.VAT_ID &&
                       sessionData.VAT_ID == 2
                         ? ' VAT Amount'
-                        : ' GST Amount'
+                        : ' VAT Amount'
                     "
                     [allowEditing]="true"
                     [calculateCellValue]="calculateVatAmount"
@@ -242,33 +266,32 @@
 
                   <dxo-summary>
                     <dxi-total-item
-                      column="GROSS_AMOUNT"
-                      summaryType="sum"
-                      displayFormat="Gross: {0}"
-                      [valueFormat]="'#.00'"
-                    ></dxi-total-item>
-                    <dxi-total-item
                       column="STOCK_QTY"
                       summaryType="sum"
-                      displayFormat="Total Qty: {0}"
+                      displayFormat="{0}"
+                    ></dxi-total-item>
+                    <dxi-total-item
+                      column="GROSS_AMOUNT"
+                      summaryType="sum"
+                      displayFormat="{0}"
                       [valueFormat]="'#.00'"
                     ></dxi-total-item>
                     <dxi-total-item
                       column="AMOUNT"
                       summaryType="sum"
-                      displayFormat="Total Amount: {0}"
+                      displayFormat="{0}"
                       [valueFormat]="'#.00'"
                     ></dxi-total-item>
                     <dxi-total-item
                       column="TAX_AMOUNT"
                       summaryType="sum"
-                      [displayFormat]="taxSummaryLabel"
+                      [valueFormat]="'#.00'"
                       [valueFormat]="'#.00'"
                     ></dxi-total-item>
                     <dxi-total-item
                       column="TOTAL_AMOUNT"
                       summaryType="sum"
-                      displayFormat="Grand Total: {0}"
+                      displayFormat="{0}"
                       [valueFormat]="'#.00'"
                     ></dxi-total-item>
                   </dxo-summary>
@@ -376,6 +399,7 @@
               rowAlternationInterval="2"
               [selection]="{ mode: 'single' }"
               [rowDragging]="rowDraggingOptions"
+              (onEditorPreparing)="onTermsEditorPreparing($event)"
             >
               <dxo-editing
                 mode="cell"
@@ -449,7 +473,17 @@
         ></dx-button>
         <dx-button
           *ngIf="!isReadOnlyMode"
-          [text]="isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'"
+          [text]="
+            isSaving
+              ? 'Please wait...'
+              : isApproved
+                ? 'Approve'
+                : isEditing
+                  ? 'Update'
+                  : 'Save'
+          "
+          [icon]="isSaving ? 'spin spinner' : ''"
+          [disabled]="isSaving"
           (onClick)="saveQuotation()"
           stylingMode="contained"
           type="default"
@@ -469,26 +503,60 @@
   [(visible)]="popupVisible"
   [showTitle]="true"
   title="Quotation History"
-  [width]="600"
-  [height]="400"
+  [width]="'75vw'"
+  [height]="'65vh'"
   [dragEnabled]="true"
   [closeOnOutsideClick]="true"
 >
-  <div *ngIf="quotationHistory?.length > 0">
+  <div>
     <dx-data-grid
       [dataSource]="quotationHistory"
       [showBorders]="true"
+      [showColumnLines]="true"
       [columnAutoWidth]="true"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      [height]="'50vh'"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
     >
-      <dxi-column dataField="SL_NO" caption="Sl No"></dxi-column>
-      <dxi-column dataField="ITEM_CODE" caption="Quotation No"></dxi-column>
-      <dxi-column dataField="DESCRIPTION" caption="Date"></dxi-column>
-      <dxi-column dataField="Quantity" caption="Customer Name"></dxi-column>
-      <dxi-column dataField="Price" caption="Ref no"></dxi-column>
-      <dxi-column dataField="Total" caption="Quantity"></dxi-column>
-      <dxi-column dataField="Total" caption="UOM"></dxi-column>
-      <dxi-column dataField="Total" caption="Unit Price"></dxi-column>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
+      <dxi-column caption="Sl No" cellTemplate="slNoTpl"></dxi-column>
+
+      <dxi-column dataField="QTN_NO" caption="Quotation No"></dxi-column>
+      <dxi-column
+        dataField="QTN_DATE"
+        caption="Date"
+        dataType="date"
+      ></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer Name"></dxi-column>
+      <dxi-column dataField="REF_NO" caption="Ref No"></dxi-column>
+      <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
+      <dxi-column dataField="UOM" caption="UOM"></dxi-column>
+      <dxi-column
+        dataField="UNIT_PRICE"
+        caption="Unit Price"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column
+        dataField="AMOUNT"
+        caption="Amount"
+        dataType="number"
+      ></dxi-column>
     </dx-data-grid>
   </div>
-  <div *ngIf="!quotationHistory?.length">No history found.</div>
+  <!-- <div *ngIf="!quotationHistory?.length">No history found.</div> -->
 </dx-popup>

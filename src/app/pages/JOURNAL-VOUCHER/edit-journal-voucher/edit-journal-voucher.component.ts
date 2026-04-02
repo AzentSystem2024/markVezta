@@ -307,6 +307,8 @@ export class EditJournalVoucherComponent {
               particulars: item.PARTICULARS ?? '',
               debitAmount: item.DEBIT_AMOUNT ?? '',
               creditAmount: item.CREDIT_AMOUNT ?? '',
+              DEPT_ID: item.DEPT_ID || this.journalVoucherFormData.DEPT_ID,
+              STORE_ID: item.STORE_ID || this.journalVoucherFormData.STORE_ID,
             };
           });
       }
@@ -320,7 +322,9 @@ export class EditJournalVoucherComponent {
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
       e.dataField === 'debitAmount' ||
-      e.dataField === 'creditAmount'
+      e.dataField === 'creditAmount' ||
+      e.dataField === 'STORE_ID' ||
+      e.dataField === 'DEPT_ID'
     ) {
       e.editorOptions = e.editorOptions || {};
 
@@ -402,7 +406,7 @@ export class EditJournalVoucherComponent {
           } else {
             enterPressedOnce = false;
             setTimeout(() => {
-              this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+              this.itemsGridRef?.instance?.editCell(rowIndex, 'STORE_ID');
             }, 50);
           }
         }
@@ -420,7 +424,7 @@ export class EditJournalVoucherComponent {
             selectedLedger.HEAD_NAME,
           );
           setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+            this.itemsGridRef?.instance?.editCell(rowIndex, 'STORE_ID');
           }, 50);
         }
       };
@@ -448,6 +452,67 @@ export class EditJournalVoucherComponent {
             'ledgerCode',
             selectedLedger.HEAD_CODE,
           );
+        }
+      };
+    }
+
+    if (e.dataField === 'STORE_ID') {
+      let enterPressedOnce = false;
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          event.event.preventDefault();
+
+          if (!enterPressedOnce) {
+            enterPressedOnce = true;
+
+            // ✅ Open dropdown
+            setTimeout(() => {
+              if (event.component?.open) {
+                event.component.open();
+              }
+            }, 50);
+          } else {
+            enterPressedOnce = false;
+
+            // ✅ Move to DEPT_ID
+            const grid = e.component;
+            const rowIndex = e.row.rowIndex;
+
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'DEPT_ID');
+            }, 50);
+          }
+        }
+      };
+    }
+    if (e.dataField === 'DEPT_ID') {
+      let enterPressedOnce = false;
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          event.event.preventDefault();
+
+          if (!enterPressedOnce) {
+            enterPressedOnce = true;
+
+            // ✅ Open dropdown
+            setTimeout(() => {
+              if (event.component?.open) {
+                event.component.open();
+              }
+            }, 50);
+          } else {
+            enterPressedOnce = false;
+
+            // ✅ Move to particulars
+            const grid = e.component;
+            const rowIndex = e.row.rowIndex;
+
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'particulars');
+            }, 50);
+          }
         }
       };
     }
@@ -759,7 +824,7 @@ export class EditJournalVoucherComponent {
   }
 
   update() {
-    // ✅ Step 1: build transformedDetails once, at the top
+    //  Step 1: build transformedDetails once, at the top
     const transformedDetails = (this.journalVoucherFormData.DETAILS || [])
       .filter((item: any) => {
         const hasOtherValues =
@@ -784,6 +849,8 @@ export class EditJournalVoucherComponent {
           PARTICULARS: item.particulars,
           DEBIT_AMOUNT: item.debitAmount ? Number(item.debitAmount) : 0,
           CREDIT_AMOUNT: item.creditAmount ? Number(item.creditAmount) : 0,
+          DEPT_ID: item.DEPT_ID || this.journalVoucherFormData.DEPT_ID,
+          STORE_ID: item.STORE_ID || this.journalVoucherFormData.STORE_ID,
         };
       });
 
@@ -796,7 +863,7 @@ export class EditJournalVoucherComponent {
       0,
     );
 
-    // ✅ Step 2: common validation for both approve + update
+    // Step 2: common validation for both approve + update
     if (debitTotal !== creditTotal) {
       notify(
         'Debit and Credit totals must be equal before saving!',
@@ -806,7 +873,7 @@ export class EditJournalVoucherComponent {
       return;
     }
 
-    // ✅ Step 3: handle APPROVED flow
+    // Step 3: handle APPROVED flow
     if (this.journalVoucherFormData.IS_APPROVED) {
       console.log('approved???????????????????????????????????');
 
