@@ -91,9 +91,6 @@ export class StoresListComponent implements OnInit {
     private ngZone: NgZone,
     private router: Router,
   ) {}
-  // onExporting(event: any) {
-  //   this.exportService.onExporting(event, 'Stores-list');
-  // }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -101,6 +98,7 @@ export class StoresListComponent implements OnInit {
       this.showStores();
     }
   }
+
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
@@ -111,6 +109,7 @@ export class StoresListComponent implements OnInit {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 
@@ -136,7 +135,7 @@ export class StoresListComponent implements OnInit {
     const status = cellInfo.data.TRANS_STATUS;
 
     const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.className = 'fas fa-flag';
     icon.style.fontSize = '18px';
     icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
     icon.title = status === 5 ? 'Approved' : 'Open';
@@ -166,7 +165,7 @@ export class StoresListComponent implements OnInit {
 
   handleFormSubmit(storeData: any) {
     if (this.selectedStore) {
-      // 🔹 Update existing store
+      // Update existing store
       this.dataservice
         .updateStores(
           this.selectedStore.ID, // ID of the store to update
@@ -206,7 +205,7 @@ export class StoresListComponent implements OnInit {
           );
         });
     } else {
-      // 🔹 Duplicate check before inserting
+      // Duplicate check before inserting
       const duplicate = this.storesArray.some(
         (store: any) =>
           store.CODE.toLowerCase().trim() ===
@@ -230,11 +229,9 @@ export class StoresListComponent implements OnInit {
         return; // stop saving
       }
 
-      // 🔹 Add new store
-      // 🔹 Add new store
       const payload = {
         ...storeData,
-        DEPT_IDS: this.storesComponent.selectedDepartments, // ✅ add this
+        DEPT_IDS: this.storesComponent.selectedDepartments, // add this
       };
 
       this.dataservice.postStoresData(payload).subscribe((res) => {
@@ -260,27 +257,24 @@ export class StoresListComponent implements OnInit {
     }
   }
 
-  // stores-form.component.ts
-
   getCountryDropDown() {
     const dropdowncountry = 'COUNTRY';
     this.dataservice.getDropdownData(dropdowncountry).subscribe((data: any) => {
       this.country = data;
-      console.log('dropdown country', this.country);
     });
   }
+  
   getGroupDropDown() {
     const dropdowngroup = 'STOREGROUP';
     this.dataservice.getDropdownData(dropdowngroup).subscribe((data: any) => {
       this.group = data;
-      console.log('dropdown group', this.country);
     });
   }
+
   getStateDropDown() {
     const dropdownstate = 'STATE';
     this.dataservice.getDropdownData(dropdownstate).subscribe((data: any) => {
       this.state = data;
-      console.log('dropdown group', this.state);
     });
   }
 
@@ -326,8 +320,6 @@ export class StoresListComponent implements OnInit {
       DEPT_IDS: this.storesComponent.selectedDepartments || [],
     };
 
-    console.log('Final Payload:', payload);
-
     // --- Duplicate check ---
     const duplicate = this.storesArray.some(
       (store: any) =>
@@ -363,6 +355,7 @@ export class StoresListComponent implements OnInit {
       }
     });
   }
+
   onRowRemoving(event) {
     const selectedRow = event.data;
     const {
@@ -435,76 +428,6 @@ export class StoresListComponent implements OnInit {
     this.isAddStoresPopupOpened = true; // open the same popup
   }
 
-  // onRowUpdating(event) {
-  //   event.cancel = true;
-  //   const updataDate = event.newData;
-  //   const oldData = event.oldData;
-  //   const combinedData = { ...oldData, ...updataDate };
-  //   let id = combinedData.ID;
-  //   let company_id = combinedData.COMPANY_ID;
-  //   let code = combinedData.CODE;
-  //   let store_name = combinedData.STORE_NAME;
-  //   let is_production = combinedData.IS_PRODUCTION;
-  //   let address1 = combinedData.ADDRESS1;
-  //   let address2 = combinedData.ADDRESS2;
-  //   let address3 = combinedData.ADDRESS3;
-  //   let zip_code = combinedData.ZIP_CODE;
-  //   let state_id = combinedData.STATE_ID;
-  //   let city = combinedData.CITY;
-  //   let country_id = combinedData.COUNTRY_ID;
-  //   let is_default = combinedData.IS_DEFAULT_STORE;
-  //   let phone = combinedData.PHONE;
-  //   let email = combinedData.EMAIL;
-  //   let vat_regno = combinedData.VAT_REGNO;
-  //   let group_id = combinedData.GROUP_ID;
-
-  //   this.dataservice
-  //     .updateStores(
-  //       id,
-  //       company_id,
-  //       code,
-  //       store_name,
-  //       is_production,
-  //       address1,
-  //       address2,
-  //       address3,
-  //       zip_code,
-  //       state_id,
-  //       city,
-  //       country_id,
-  //       is_default,
-  //       phone,
-  //       email,
-  //       vat_regno,
-  //       group_id
-  //     )
-  //     .subscribe((data: any) => {
-  //       if (data) {
-  //         notify(
-  //           {
-  //             message: 'Stores updated Successfully',
-  //             position: { at: 'top center', my: 'top center' },
-  //           },
-  //           'success'
-  //         );
-  //         this.dataGrid.instance.refresh();
-  //         this.showStores();
-  //       } else {
-  //         notify(
-  //           {
-  //             message: 'Your Data Not Saved',
-  //             position: { at: 'top right', my: 'top right' },
-  //           },
-  //           'error'
-  //         );
-  //       }
-  //     });
-  //   console.log('old data:', oldData);
-  //   console.log('new data:', updataDate);
-  //   console.log('modified data:', combinedData);
-
-  //   // Prevent the default update operation
-  // }
   ngOnInit(): void {
     const currentUrl = this.router.url;
 
@@ -517,11 +440,8 @@ export class StoresListComponent implements OnInit {
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === currentUrl);
-    console.log(packingRights, 'PACKINGRIGHTSSSSSSSSSSSSSSSSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
-      console.log('packingRights.CanAdd:', packingRights.CanAdd);
-      console.log('this.canAdd after assign:', this.canAdd);
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;

@@ -34,7 +34,7 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
   @ViewChild('departmentValidationGroup', { static: false })
   validationGroup!: DxValidationGroupComponent;
 
-  formCategoryData = {
+  formSubDepartmentData = {
     ID: '',
     CODE: '',
     DESCRIPTION: '',
@@ -42,8 +42,8 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
   };
 
   DepartmentDropdownData: any;
-  newCategory: any;
-  category: any = [];
+  newSubDepartment: any;
+  SubDepartment: any = [];
   selected_Company_id: any;
 
   constructor(private service: DataService) {}
@@ -52,7 +52,7 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
     this.getDepartmentDropDown();
   }
 
-  getNewCategoryData = () => ({ ...this.newCategory });
+  getNewSubDepartmentData = () => ({ ...this.newSubDepartment });
 
   getDepartmentDropDown() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -70,21 +70,12 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
-      // Merge selectedData into formCategoryData
-      this.formCategoryData = {
-        ...this.formCategoryData,
+      // Merge selectedData into formSubDepartmentData
+      this.formSubDepartmentData = {
+        ...this.formSubDepartmentData,
         ...changes['selectedData'].currentValue,
       };
     }
-  }
-
-  showCategory() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.service.getCategoryData(payload).subscribe((response) => {
-      this.category = response;
-    });
   }
 
   closePopup() {
@@ -96,23 +87,20 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
     if (!result.isValid) {
       return;
     }
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
     this.service.get_SubDepartment_Data().subscribe((response) => {
-      this.category = response.data;
+      this.SubDepartment = response.datas;
       const payload = {
-        ...this.formCategoryData,
+        ...this.formSubDepartmentData,
       };
       // Exclude the current record (by ID) from duplicate check
-      const isCodeDuplicate = this.category.some(
+      const isCodeDuplicate = this.SubDepartment.some(
         (item: any) =>
           item.ID !== payload.ID &&
           item.CODE?.toLowerCase().trim() ===
             payload.CODE?.toLowerCase().trim(),
       );
 
-      const isDescriptionDuplicate = this.category.some(
+      const isDescriptionDuplicate = this.SubDepartment.some(
         (item: any) =>
           item.ID !== payload.ID &&
           item.DESCRIPTION?.toLowerCase().trim() ===

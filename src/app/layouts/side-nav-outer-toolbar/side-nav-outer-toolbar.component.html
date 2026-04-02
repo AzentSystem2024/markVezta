@@ -22,9 +22,6 @@
     *dxTemplate="let dataMenu of 'panel'"
     (selectedItemChanged)="navigationChanged($event)"
   >
-    <!-- <app-footer
-      >Copyright © {{ appInfo.currentYear }} <br />
-      Developer Express Inc.</app-footer -->
   </side-navigation-menu>
 
   <!-- Content Area -->
@@ -63,11 +60,6 @@
             (click)="closeButtonHandler(tab)"
           ></i>
         </div>
-        <!-- <div *dxTemplate="let tab of 'item'">
-          <ng-container>
-
-          </ng-container>
-        </div> -->
       </dx-tab-panel>
       <div>
         <router-outlet></router-outlet>

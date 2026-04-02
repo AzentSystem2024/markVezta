@@ -1723,7 +1723,7 @@ export class DataService {
       DESCRIPTION: payload.DESCRIPTION,
       DEPARTMENT_ID: payload.DEPARTMENT_ID,
     };
-    return this.http.post(`${this.apiUrl}SubDepartment/update`, data);
+    return this.http.post(`${this.apiUrl}SubDepartment/save`, data);
   }
 
   removeSubdepartment(id: any) {

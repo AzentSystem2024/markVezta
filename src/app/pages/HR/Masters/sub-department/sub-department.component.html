@@ -3,7 +3,7 @@
     <dx-data-grid
       class="grid theme-dependent"
       [showColumnLines]="true"
-      [dataSource]="CategoryDataSource"
+      [dataSource]="SubDepartmentDataSource"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       (onRowRemoving)="onRowRemoving($event)"
@@ -31,7 +31,7 @@
 
       <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
         <dxo-popup
-          title="Edit Category"
+          title="Edit SubDepartment"
           [showTitle]="true"
           [width]="600"
           [height]="300"
@@ -112,8 +112,8 @@
 <!-- ====== new sub department popup ======== -->
 <form-popup
   height="300px"
-  [(visible)]="isAddCategoryPopupOpened"
-  (save)="onClickSaveCategory()"
+  [(visible)]="isAddSubDepartmentPopupOpened"
+  (save)="onClickSaveSubDepartment()"
   titleText="New Sub Department"
   [showApprove]="false"
 >
@@ -124,10 +124,10 @@
 
 <!-- ====== edit form popups ======== -->
 <dx-popup
-  [(visible)]="editItemCategory"
+  [(visible)]="editItemSubDepartment"
   [width]="'35vw'"
   [height]="'40vh'"
-  title="Update Sub Departmentsssss"
+  title="Update Sub Department"
   (onHiding)="handleClose()"
 >
   <app-sub-department-edit-form
