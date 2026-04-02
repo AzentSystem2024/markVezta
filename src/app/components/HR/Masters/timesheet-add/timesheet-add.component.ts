@@ -118,7 +118,7 @@ export class TimesheetAddComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/credit-note');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -445,6 +445,7 @@ export class TimesheetAddComponent {
 
     return `${day}-${month}-${year}`;
   }
+  
   saveTimesheet() {
     if (
       this.timesheetFormData.EMP_ID === '' ||
@@ -569,6 +570,7 @@ export class TimesheetAddComponent {
       );
     }
   }
+
   validateDays = (e: any) => {
     const enteredDays = Number(e.value) || 0;
     const maxDays = Number(this.timesheetFormData.DAYS) || 0;

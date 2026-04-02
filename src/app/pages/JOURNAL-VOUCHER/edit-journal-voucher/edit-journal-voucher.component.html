@@ -312,11 +312,11 @@
       [text]="
         isSaving
           ? journalVoucherFormData?.IS_APPROVED
-            ? 'Updating & Committing...'
+            ? 'Saving...'
             : 'Updating...'
           : journalVoucherFormData?.IS_APPROVED
-            ? 'Update & Commit'
-            : 'Update'
+            ? 'Save'
+            : 'Save'
       "
       [visible]="canEdit"
       [disabled]="isSaving"

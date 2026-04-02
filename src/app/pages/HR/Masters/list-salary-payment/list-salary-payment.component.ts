@@ -81,12 +81,13 @@ export class ListSalaryPaymentComponent {
     hint: 'Add new entry',
     onClick: () => {
       this.ngZone.run(() => {
-        this.addSalaryPayment(); // show your popup here
+        this.addSalaryPayment(); 
       });
     },
     elementAttr: { class: 'add-button' },
   };
   addMiscPaymentPopup: boolean = false;
+  
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -95,6 +96,7 @@ export class ListSalaryPaymentComponent {
     { label: 'Last 30 Days', value: 'last30' },
     { label: 'Custom', value: 'custom' },
   ];
+
   selectedDateRange: string = 'today';
   customStartDate: any = null;
   customEndDate: any = null;
@@ -129,7 +131,7 @@ export class ListSalaryPaymentComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/salary-payment');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -230,6 +232,8 @@ export class ListSalaryPaymentComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
+
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 

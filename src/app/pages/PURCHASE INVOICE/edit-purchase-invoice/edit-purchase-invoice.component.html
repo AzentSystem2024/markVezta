@@ -166,7 +166,7 @@
             [width]="120"
             [allowEditing]="false"
           ></dxi-column>
-          <dxi-column dataField="STORE_ID" caption="Store">
+          <!-- <dxi-column dataField="STORE_ID" caption="Store">
             <dxo-lookup
               [dataSource]="storeList"
               displayExpr="DESCRIPTION"
@@ -179,7 +179,7 @@
               displayExpr="DESCRIPTION"
               valueExpr="ID"
             ></dxo-lookup>
-          </dxi-column>
+          </dxi-column> -->
           <dxi-column
             dataField="ITEM_NAME"
             caption="Item Name"
@@ -252,11 +252,7 @@
           ></dxi-column> -->
           <dxi-column
             dataField="TAX_AMOUNT"
-            [caption]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? 'VAT Amount'
-                : ' GST Amount'
-            "
+            [caption]="vatTilte + ' Amount'"
             dataType="number"
             format="#,##0.00"
             [width]="140"

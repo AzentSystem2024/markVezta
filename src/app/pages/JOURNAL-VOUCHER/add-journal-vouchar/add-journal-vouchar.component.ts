@@ -138,6 +138,7 @@ export class AddJournalVoucharComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.journalVoucherFormData.FIN_ID = menuResponse.FINANCIAL_YEARS.FIN_ID;
     this.journalVoucherFormData.COMPANY_ID =
       menuResponse?.Companies[0].COMPANY_ID;
     this.journalVoucherFormData.STORE_ID =
@@ -146,6 +147,7 @@ export class AddJournalVoucharComponent {
     this.selectedCompanyId = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || null;
     console.log('Selected Company ID:', this.selectedCompanyId);
     this.selectedFinId = menuResponse?.FINANCIAL_YEARS?.FIN_ID || null;
+    console.log(this.selectedFinId, 'SELECTEDFINIDDDDDDDDDDDDDDDDD');
     const userDataString = localStorage.getItem('userData');
     console.log(userDataString, 'USERDATASTRINGGGGGGGGG');
     if (userDataString) {
@@ -417,7 +419,7 @@ export class AddJournalVoucharComponent {
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
-    console.log(rowIndex);
+    // console.log(rowIndex);
 
     // ➤ SL_NO: Move to ledgerCode on Enter
     if (e.dataField === 'billNo') {
@@ -455,7 +457,7 @@ export class AddJournalVoucharComponent {
           } else {
             enterPressedOnce = false;
             setTimeout(() => {
-              this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+              this.itemsGridRef?.instance?.editCell(rowIndex, 'STORE_ID');
             }, 50);
           }
         }
@@ -473,7 +475,7 @@ export class AddJournalVoucharComponent {
             selectedLedger.HEAD_NAME,
           );
           setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+            this.itemsGridRef?.instance?.editCell(rowIndex, 'STORE_ID');
           }, 50);
         }
       };
@@ -501,6 +503,67 @@ export class AddJournalVoucharComponent {
             'ledgerCode',
             selectedLedger.HEAD_CODE,
           );
+        }
+      };
+    }
+
+    if (e.dataField === 'STORE_ID') {
+      let enterPressedOnce = false;
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          event.event.preventDefault();
+
+          if (!enterPressedOnce) {
+            enterPressedOnce = true;
+
+            // ✅ Open dropdown
+            setTimeout(() => {
+              if (event.component?.open) {
+                event.component.open();
+              }
+            }, 50);
+          } else {
+            enterPressedOnce = false;
+
+            // ✅ Move to DEPT_ID
+            const grid = e.component;
+            const rowIndex = e.row.rowIndex;
+
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'DEPT_ID');
+            }, 50);
+          }
+        }
+      };
+    }
+    if (e.dataField === 'DEPT_ID') {
+      let enterPressedOnce = false;
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          event.event.preventDefault();
+
+          if (!enterPressedOnce) {
+            enterPressedOnce = true;
+
+            // ✅ Open dropdown
+            setTimeout(() => {
+              if (event.component?.open) {
+                event.component.open();
+              }
+            }, 50);
+          } else {
+            enterPressedOnce = false;
+
+            // ✅ Move to particulars
+            const grid = e.component;
+            const rowIndex = e.row.rowIndex;
+
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'particulars');
+            }, 50);
+          }
         }
       };
     }
@@ -858,6 +921,21 @@ export class AddJournalVoucharComponent {
     //   finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? '';
     // }
 
+    // Step -1: Validate Beneficiary Name
+    if (
+      !this.journalVoucherFormData.PARTY_NAME ||
+      this.journalVoucherFormData.PARTY_NAME.trim() === ''
+    ) {
+      notify('Beneficiary Name is required.', 'error', 3000);
+
+      // 👉 Focus the textbox
+      setTimeout(() => {
+        this.partyNameRef?.instance?.focus();
+      }, 100);
+
+      return;
+    }
+
     // 🔹 Step 1: Filter out completely empty rows (ignore billNo-only rows)
     const cleanedDetails = this.journalVoucherFormData.DETAILS.filter(
       (item) => {
@@ -878,6 +956,31 @@ export class AddJournalVoucharComponent {
     // 🔹 Step 2: Ensure at least one valid row exists
     if (!cleanedDetails || cleanedDetails.length === 0) {
       notify('Please enter at least one valid entry.', 'error', 3000);
+      return;
+    }
+    //  Validate each row has Debit or Credit
+    const hasAmountMissing = cleanedDetails.some(
+      (item) =>
+        (!item.debitAmount || item.debitAmount == 0) &&
+        (!item.creditAmount || item.creditAmount == 0),
+    );
+
+    if (hasAmountMissing) {
+      notify(
+        'Each row must have either Debit or Credit amount.',
+        'error',
+        3000,
+      );
+      return;
+    }
+
+    //  Prevent both Debit & Credit
+    const hasBothAmounts = cleanedDetails.some(
+      (item) => item.debitAmount > 0 && item.creditAmount > 0,
+    );
+
+    if (hasBothAmounts) {
+      notify('A row cannot have both Debit and Credit amount.', 'error', 3000);
       return;
     }
 
@@ -947,7 +1050,7 @@ export class AddJournalVoucharComponent {
       ...this.journalVoucherFormData,
       TRANS_DATE: jvDate,
       COMPANY_ID: companyId,
-      FIN_ID: finId,
+      FIN_ID: this.journalVoucherFormData.FIN_ID,
       DETAILS: transformedDetails,
     };
 
@@ -980,6 +1083,7 @@ export class AddJournalVoucharComponent {
       TRANS_TYPE: 4,
       NARRATION: '',
       USER_ID: 1,
+      IS_APPROVED: false,
       DETAILS: [
         {
           billNo: 1,

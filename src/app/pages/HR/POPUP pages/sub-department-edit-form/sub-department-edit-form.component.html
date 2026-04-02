@@ -11,7 +11,7 @@
       <!-- Code -->
       <dxi-item>
         <dx-text-box
-          [(value)]="formCategoryData.CODE"
+          [(value)]="formSubDepartmentData.CODE"
           label="Code *"
           labelMode="floating"
           ><dx-validator>
@@ -23,10 +23,10 @@
         </dx-text-box>
       </dxi-item>
 
-      <!-- Category Name -->
+      <!-- SubDepartment Name -->
       <dxi-item>
         <dx-text-box
-          [(value)]="formCategoryData.DESCRIPTION"
+          [(value)]="formSubDepartmentData.DESCRIPTION"
           label="Description *"
           labelMode="floating"
           ><dx-validator>
@@ -45,7 +45,7 @@
           displayExpr="DESCRIPTION"
           valueExpr="ID"
           placeholder="Department"
-          [(value)]="formCategoryData.DEPARTMENT_ID"
+          [(value)]="formSubDepartmentData.DEPARTMENT_ID"
           label="Department *"
           labelMode="floating"
           ><dx-validator>

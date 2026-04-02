@@ -52,7 +52,7 @@ export class EmployeeLeaveComponent {
   showPageSizeSelector = true;
   showHeaderFilter = true;
   isFilterRowVisible: boolean = false;
-  isTravelled: boolean = false; // or use true/false based on your data
+  isTravelled: boolean = false;
   StatusType = ['Rejoined', 'Left Service'];
   EmployeeDetails: any = [];
   Leave_credit: any;
@@ -63,77 +63,6 @@ export class EmployeeLeaveComponent {
   COMPANY_ID: any;
   StoreId: any;
   UserId: any;
-
-  //========================STATUS====================
-
-  onVerifyClick(e: any): void {
-    e.cancel = true;
-    e.cancel = true;
-    const employeeId = e.row?.data?.ID;
-
-    if (!employeeId) {
-      console.warn('No Employee ID found in row data');
-      return;
-    }
-
-    this.dataservice
-      .Select_EmployeeLeave_Api(employeeId)
-      .subscribe((response: any) => {
-        this.selectedData = response;
-        this.VerifyPopup = true;
-      });
-  }
-
-  onApproveClick(e: any): void {
-    e.cancel = true;
-    const employeeId = e.row?.data?.ID;
-
-    if (!employeeId) {
-      console.warn('No Employee ID found in row data');
-      return;
-    }
-
-    this.dataservice
-      .Select_EmployeeLeave_Api(employeeId)
-      .subscribe((response: any) => {
-        this.selectedData = response;
-        this.ApprovePopup = true;
-      });
-  }
-
-  onTravelClick(e: any): void {
-    e.cancel = true;
-    const employeeId = e.row?.data?.ID;
-
-    if (!employeeId) {
-      console.warn('No Employee ID found in row data');
-      return;
-    }
-
-    this.dataservice
-      .Select_EmployeeLeave_Api(employeeId)
-      .subscribe((response: any) => {
-        this.selectedData = response;
-        this.TravelPopup = true;
-      });
-  }
-
-  onRejoinClick(e: any): void {
-    e.cancel = true;
-    const employeeId = e.row?.data?.ID;
-
-    if (!employeeId) {
-      console.warn('No Employee ID found in row data');
-      return;
-    }
-
-    this.dataservice
-      .Select_EmployeeLeave_Api(employeeId)
-      .subscribe((response: any) => {
-        this.selectedData = response;
-        this.RejoinPopup = true;
-      });
-  }
 
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
@@ -151,45 +80,8 @@ export class EmployeeLeaveComponent {
   isFilterOpened = false;
   EmployeeLeaveDatasource: any[];
 
-  constructor(
-    private fb: FormBuilder,
-    private dataservice: DataService,
-    private ngZone: NgZone,
-  ) {
-    this.formsource = this.fb.group({
-      Doc_no: ['', Validators.required],
-      Date: [new Date(), Validators.required],
-      Employee_no: ['', Validators.required],
-      Employee_name: ['', Validators.required],
-      Leave_type: ['', Validators.required],
-      Leave_days: ['', Validators.required],
-      Leave_credit: ['', Validators.required],
-      Dept_date: ['', Validators.required],
-      Expected_rejoin_date: ['', Validators.required],
-      Remarks: ['', Validators.required],
-      Leave_salary_payable: ['', Validators.required],
-      // },
-    });
-    this.sesstion_Details();
-    this.get_EmployeeLeaveList();
-    this.get_Employee_Details();
-    this.get_ExistingLeaveByEmployee();
-    const UserID = sessionStorage.getItem('UserId');
-
-    //=====================AUTO FILL===================================
-
-    this.formsource.get('Leave_days')?.valueChanges.subscribe((leaveDays) => {
-      this.autofillExpectedRejoinDate();
-    });
-
-    this.formsource.get('Dept_date')?.valueChanges.subscribe((deptDate) => {
-      this.autofillExpectedRejoinDate();
-    });
-
-    this.get_LeaveType_Dropdown_List();
-    this.get_Employee_Dropdown_List();
-    this.get_EOS_Dropdown_List();
-  }
+  minDate: Date;
+  today = new Date();
 
   searchButtonOptions = {
     icon: 'search',
@@ -209,12 +101,6 @@ export class EmployeeLeaveComponent {
     text: '',
   };
 
-  refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-    this.get_EmployeeLeaveList();
-  }
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -236,19 +122,6 @@ export class EmployeeLeaveComponent {
     `;
     },
   };
-
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
-  }
-
-  //============================ICONS=================
 
   allActionButtons = [
     {
@@ -335,8 +208,136 @@ export class EmployeeLeaveComponent {
     },
   ];
 
-  //====================AUTO FILL===================
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private ngZone: NgZone,
+  ) {
+    this.formsource = this.fb.group({
+      Doc_no: ['', Validators.required],
+      Date: [new Date(), Validators.required],
+      Employee_no: ['', Validators.required],
+      Employee_name: ['', Validators.required],
+      Leave_type: ['', Validators.required],
+      Leave_days: ['', Validators.required],
+      Leave_credit: ['', Validators.required],
+      Dept_date: ['', Validators.required],
+      Expected_rejoin_date: ['', Validators.required],
+      Remarks: ['', Validators.required],
+      Leave_salary_payable: ['', Validators.required],
+      // },
+    });
+    this.sesstion_Details();
+    this.get_EmployeeLeaveList();
+    this.get_Employee_Details();
+    this.get_ExistingLeaveByEmployee();
+    const UserID = sessionStorage.getItem('UserId');
 
+    //=====================AUTO FILL===================================
+
+    this.formsource.get('Leave_days')?.valueChanges.subscribe((leaveDays) => {
+      this.autofillExpectedRejoinDate();
+    });
+
+    this.formsource.get('Dept_date')?.valueChanges.subscribe((deptDate) => {
+      this.autofillExpectedRejoinDate();
+    });
+
+    this.get_LeaveType_Dropdown_List();
+    this.get_Employee_Dropdown_List();
+    this.get_EOS_Dropdown_List();
+  }
+  //========================STATUS====================
+  onVerifyClick(e: any): void {
+    e.cancel = true;
+    e.cancel = true;
+    const employeeId = e.row?.data?.ID;
+
+    if (!employeeId) {
+      console.warn('No Employee ID found in row data');
+      return;
+    }
+
+    this.dataservice
+      .Select_EmployeeLeave_Api(employeeId)
+      .subscribe((response: any) => {
+        this.selectedData = response;
+        this.VerifyPopup = true;
+      });
+  }
+
+  onApproveClick(e: any): void {
+    e.cancel = true;
+    const employeeId = e.row?.data?.ID;
+
+    if (!employeeId) {
+      console.warn('No Employee ID found in row data');
+      return;
+    }
+
+    this.dataservice
+      .Select_EmployeeLeave_Api(employeeId)
+      .subscribe((response: any) => {
+        this.selectedData = response;
+        this.ApprovePopup = true;
+      });
+  }
+
+  onTravelClick(e: any): void {
+    e.cancel = true;
+    const employeeId = e.row?.data?.ID;
+
+    if (!employeeId) {
+      console.warn('No Employee ID found in row data');
+      return;
+    }
+
+    this.dataservice
+      .Select_EmployeeLeave_Api(employeeId)
+      .subscribe((response: any) => {
+        // Set TRAVELLED_DATE same as DEPT_DATE if null
+        response.TRAVELLED_DATE = response.TRAVELLED_DATE || response.DEPT_DATE;
+        this.selectedData = response;
+        this.TravelPopup = true;
+      });
+  }
+
+  onRejoinClick(e: any): void {
+    e.cancel = true;
+    const employeeId = e.row?.data?.ID;
+
+    if (!employeeId) {
+      console.warn('No Employee ID found in row data');
+      return;
+    }
+
+    this.dataservice
+      .Select_EmployeeLeave_Api(employeeId)
+      .subscribe((response: any) => {
+        this.selectedData = response;
+        this.RejoinPopup = true;
+      });
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_EmployeeLeaveList();
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  //====================AUTO FILL===================
   autofillExpectedRejoinDate() {
     const deptDate = this.formsource.get('Dept_date')?.value;
     const leaveDays = this.formsource.get('Leave_days')?.value;
@@ -404,13 +405,6 @@ export class EmployeeLeaveComponent {
       this.selectedData.ACTUAL_DAYS = null;
     }
   }
-
-  //=======================================
-  minDate: Date;
-
-  //=====================================================================================================
-
-  today = new Date();
 
   // Function to disable past dates
   isDateDisabled = (data: { date: Date }) => {
@@ -620,38 +614,7 @@ export class EmployeeLeaveComponent {
     return isOverlapping ? { overlap: true } : null;
   };
 
-  // isExpectedRejoinDateDisabled = (data: { date: Date }) => {
-  //   const expectReturnRaw = this.ExistingEmployee[0]?.EXPECT_RETURN;
-
-  //   if (!expectReturnRaw) return false;
-
-  //   const expectReturnDate = new Date(expectReturnRaw);
-  //   const current = data.date;
-
-  //   // Disable all dates on or before EXPECT_RETURN
-  //   return current <= expectReturnDate;
-  // // };
-  // isDepartureDateDisabled = (data: { date: Date }) => {
-  //   const deptRaw = this.ExistingEmployee[0]?.DEPT_DATE;
-  //   const rejoinRaw = this.ExistingEmployee[0]?.REJOIN_DATE;
-
-  //   if (!deptRaw) return false;
-
-  //   const deptDate = new Date(deptRaw);
-  //   const rejoinDate = rejoinRaw ? new Date(rejoinRaw) : null;
-  //   const current = data.date;
-
-  //   // If employee has rejoined, disable dates before or on the rejoin date
-  //   if (rejoinDate) {
-  //     return current <= rejoinDate;
-  //   }
-
-  //   // If not yet rejoined, disable dates after departure
-  //   return current >= deptDate;
-  // };
-
   //===================STATUS FLAG========================
-
   getStatusFlagClass(status: string): string {
     switch (status) {
       case 'Open':
@@ -1098,7 +1061,7 @@ export class EmployeeLeaveComponent {
     const Leave_salary_payable = this.selectedData.LS_PAYABLE;
     const Is_ticket = this.selectedData.IS_TICKET;
     const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
-    const Travelled_date = this.selectedData.DEPT_DATE;
+    const Travelled_date = this.selectedData.TRAVELLED_DATE;
     const Rejoin_date = this.selectedData.REJOIN_DATE;
     const Actual_days = this.selectedData.ACTUAL_DAYS;
     const Deduct_days = this.selectedData.DEDUCT_DAYS;
@@ -1167,7 +1130,7 @@ export class EmployeeLeaveComponent {
     const Leave_salary_payable = this.selectedData.LS_PAYABLE;
     const Is_ticket = this.selectedData.IS_TICKET;
     const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
-    const Travelled_date = this.selectedData.DEPT_DATE;
+    const Travelled_date = this.selectedData.TRAVELLED_DATE;
     const Rejoin_date = this.selectedData.REJOIN_DATE;
     const Actual_days = this.selectedData.ACTUAL_DAYS;
     const Deduct_days = this.selectedData.DEDUCT_DAYS;
@@ -1262,10 +1225,3 @@ export class EmployeeLeaveComponent {
   declarations: [EmployeeLeaveComponent],
 })
 export class EmployeeLeaveModule {}
-
-function updateExpectedRejoinDate(daysTaken: any, number: any) {
-  throw new Error('Function not implemented.');
-}
-function onStatusChange(status: string, string: any) {
-  throw new Error('Function not implemented.');
-}

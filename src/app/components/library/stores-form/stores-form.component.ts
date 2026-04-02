@@ -74,6 +74,8 @@ export class StoresFormComponent implements OnInit {
   State: any;
   selectedStateId: any;
   StateId: any;
+  stateLabel: any;
+
   constructor(
     private service: DataService,
     private countryService: CountryServiceService,
@@ -88,8 +90,8 @@ export class StoresFormComponent implements OnInit {
     ...this.newStores,
     PHONE: this.countryCodePhone + '-' + this.newStores.PHONE,
   });
+
   ngOnChanges(changes: SimpleChanges): void {
-    // EDIT MODE
     if (
       changes['storeData'] &&
       this.storeData &&
@@ -98,8 +100,6 @@ export class StoresFormComponent implements OnInit {
       const phoneNo = this.storeData.PHONE;
       const [countryCodePhone, phonenumber] = phoneNo.split('-');
       this.countryCodePhone = countryCodePhone;
-
-      // this.onCountrycodeChangePhone({ value: this.countryCodePhone });
       this.newStores = {
         ...this.formStoresData,
         ...this.storeData,
@@ -135,16 +135,11 @@ export class StoresFormComponent implements OnInit {
       COMPANY_ID: this.companyId,
     };
   }
-  stateLabel: any;
+
   onDepartmentChanged(event: any) {}
 
   ngOnInit(): void {
-    console.log('==============================');
-    // this.countryService.getCountryList().subscribe((data) => {
-    //   this.countries = data;
-    // });
     this.showCountryList();
-    // this.getStateDropDown();
     const userDataString = localStorage.getItem('userData');
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
@@ -154,7 +149,6 @@ export class StoresFormComponent implements OnInit {
       const selectedCompany = userData?.SELECTED_COMPANY;
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
-        console.log(this.selectedCompanyId, 'SELECTEDCOMPANYID');
         this.companyList = [selectedCompany]; // Show only selected company
         this.getGroupDropDown();
       }
@@ -177,46 +171,38 @@ export class StoresFormComponent implements OnInit {
   showCountryList() {
     this.service.getCountryDataAPi().subscribe((response) => {
       this.Country = response;
-      console.log(this.Country, 'COUNTRYYYYYYYYYYYYYYYYY');
-    });
+      });
   }
 
   get_Country_Dropdown_List() {
-    console.log('Country API called');
     this.service.getCountryWithFlags().subscribe((response: any) => {
       this.Country = response;
-      console.log(this.Country, 'COUNTRYYYYYYYYYYYYYYYYYYYYYY');
-    });
+      });
   }
 
-  //   getStateDropDown() {
-  //   this.service.getStateData().subscribe((data: any) => {
-  //     this.StateDropdownData = data;
-  //   });
-  // }
+
   submitForm() {
     const payload = {
       ...this.getNewStoresData(),
-      DEPT_IDS: this.selectedDepartments, // ✅ correct key
+      DEPT_IDS: this.selectedDepartments, // correct key
     };
     this.formSubmit.emit(payload);
   }
+
   showCountry() {
     this.service.getCountryData().subscribe((response) => {
       this.CountryDropdownData = response;
     });
   }
-  getGroupDropDown() {
-    console.log('Function called'); // 👈 check this
-    console.log('Company ID:', this.selectedCompanyId);
 
+  getGroupDropDown() {
+    // check this
     const payload = {
       NAME: 'DEPARTMENTS',
       COMPANY_ID: this.selectedCompanyId,
     };
 
     this.service.getDropdownData(payload).subscribe((res: any) => {
-      console.log('API response:', res);
       this.departments = res;
     });
   }
@@ -242,13 +228,14 @@ export class StoresFormComponent implements OnInit {
 
     // Debug log to verify the binding
   }
+
   onStateValue(event: any) {
     this.selectedStateId = event.value;
     this.StateId = event.value;
     // this.getStateDropDown();
   }
+
   getStateDropDown() {
-    console.log('STATEDROPDOWNNNNNNNNNNNNNNNNNNNN');
     const countryId = this.newStores.COUNTRY_ID;
     this.service
       .get_State_Dropdown_Api('STATE_NAME', countryId)
@@ -300,8 +287,8 @@ export class StoresFormComponent implements OnInit {
       return true;
     }
   }
+  
   onCountrycodeChangePhone(e: any) {
-    console.log('call this functin=================');
     const payload = {
       COUNTRY_CODE: e.value,
     };
@@ -309,6 +296,7 @@ export class StoresFormComponent implements OnInit {
       this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
+
   validatePhoneLength = (e: any): boolean => {
     const value = (e.value || '').trim();
 
@@ -316,6 +304,7 @@ export class StoresFormComponent implements OnInit {
 
     return value.length === this.Phone_limit;
   };
+
   countryDisplay(item: any) {
     if (!item) return '';
     return `${item.CODE}`;

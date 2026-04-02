@@ -588,7 +588,7 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}ACDefaults/Insert`, data);
   }
-   DeletetLedgerSettings(items: any) {
+  DeletetLedgerSettings(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}ACDefaults/delete`, data);
   }
@@ -1727,7 +1727,7 @@ export class DataService {
       DESCRIPTION: payload.DESCRIPTION,
       DEPARTMENT_ID: payload.DEPARTMENT_ID,
     };
-    return this.http.post(`${this.apiUrl}SubDepartment/update`, data);
+    return this.http.post(`${this.apiUrl}SubDepartment/save`, data);
   }
 
   removeSubdepartment(id: any) {
@@ -4203,7 +4203,6 @@ The result can be exported to HTML or Markdown.`;
   //===========delete Api==================
   Delete_LeaveType_Api(ID: any) {
     return this.http.post(`${this.apiUrl}LeaveType/delete/${ID}`, {});
-  
   }
 
   //EMPLOYEE
@@ -5007,7 +5006,7 @@ The result can be exported to HTML or Markdown.`;
     Remarks: any,
     Leave_salary_payable: any,
   ) {
-    const getEndpoint = this.apiUrl + '/EmployeeVacation/save';
+    const getEndpoint = this.apiUrl + 'EmployeeVacation/save';
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,

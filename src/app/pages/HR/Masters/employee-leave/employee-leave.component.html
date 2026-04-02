@@ -140,7 +140,6 @@
 </div>
 
 <!-- ADD POPUP -->
-
 <form-popup
   AddVacationPopup="false;"
   [(visible)]="AddVacationPopup"
@@ -305,10 +304,11 @@
 <form-popup
   UpdateVacationPopup="false;"
   [(visible)]="UpdateVacationPopup"
-  titleText="Employee Vacation"
+  titleText="Edit Employee Vacation"
   [width]="550"
   height="530px"
   [showApprove]="false"
+  [saveButtonText]="'Update'"
   (save)="Edit_Data()"
 >
   <dx-form id="form">
@@ -444,10 +444,11 @@
 <form-popup
   UpdateVacationPopup="false;"
   [(visible)]="VerifyPopup"
-  titleText="Employee Vacation"
+  titleText="Verify Employee Vacation"
   [width]="550"
   height="530px"
   [showApprove]="false"
+  [saveButtonText]="'Verify'"
   (save)="Verify_Data()"
 >
   <dx-form id="form">
@@ -583,10 +584,11 @@
 <form-popup
   UpdateVacationPopup="false;"
   [(visible)]="ApprovePopup"
-  titleText="Employee Vacation"
+  titleText="Approve Employee Vacation"
   [width]="550"
   height="530px"
   [showApprove]="false"
+    [saveButtonText]="'Approve'"
   (save)="Approve_Data()"
 >
   <dx-form id="form">
@@ -887,7 +889,7 @@
           [showClearButton]="true"
           [useMaskBehavior]="true"
           displayFormat="dd/MM/yyyy"
-          [(value)]="selectedData.DEPT_DATE"
+          [(value)]="selectedData.TRAVELLED_DATE"
           type="date"
           [inputAttr]="{ 'aria-label': 'Date' }"
           [labelMode]="'floating'"
@@ -970,7 +972,7 @@
 <!-- REJOIN/LEFTSERVICE POPUP -->
 <form-popup
   [(visible)]="RejoinPopup"
-  titleText="Employee Vacation"
+  titleText="REJOIN/LEFT SERVICE Vacation"
   [width]="650"
   height="700px"
   [showApprove]="false"
