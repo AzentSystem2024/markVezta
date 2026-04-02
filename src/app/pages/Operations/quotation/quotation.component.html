@@ -118,7 +118,11 @@
         [format]="{ type: 'custom', formatter: formatDate }"
       >
       </dxi-column>
-
+      <dxi-column
+        dataField="CUSTOMER_NAME"
+        caption="Customer"
+        [allowEditing]="false"
+      ></dxi-column>
       <dxi-column
         dataField="STORE_NAME"
         caption="Store"

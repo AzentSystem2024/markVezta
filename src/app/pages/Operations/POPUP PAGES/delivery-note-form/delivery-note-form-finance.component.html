@@ -263,7 +263,8 @@
               [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
               [readOnly]="isReadOnlyMode"
               class="approve-checkbox"
-              style="margin-top: 15px"
+              stylingMode="text"
+              style="margin-top: 5px"
             ></dx-check-box>
 
             <!-- Buttons -->
@@ -278,7 +279,7 @@
               <dx-button
                 *ngIf="!isReadOnlyMode"
                 #saveButtonRef
-                [text]="deliveryFormData.IS_APPROVED ? 'Commit' : 'Save'"
+                [text]="deliveryFormData.IS_APPROVED ? 'Save' : 'Save'"
                 (onClick)="isReadOnlyMode ? openPDF() : saveDeliveryNote()"
                 stylingMode="contained"
                 type="default"
