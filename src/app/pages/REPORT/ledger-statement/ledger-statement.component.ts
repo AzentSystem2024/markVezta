@@ -677,7 +677,7 @@ export class LedgerStatementComponent {
   isViewVisible(e: any): boolean {
     console.log(e.row.data, 'event');
     this.transtypeId = e.row.data.TRANS_TYPE_ID;
-    return this.transtypeId !== 0;
+    return this.transtypeId !== 0 && this.transtypeId !== 1;
   }
 
   // POPUP shown → allow child to render
