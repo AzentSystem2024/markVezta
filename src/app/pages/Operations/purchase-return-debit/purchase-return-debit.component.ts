@@ -129,7 +129,7 @@ export class PurchaseReturnDebitComponent {
     { label: 'Last 30 Days', value: 'last30' },
     { label: 'Custom', value: 'custom' },
   ];
-  
+
   selectedDateRange: string = 'today';
   customStartDate: any = null;
   customEndDate: any = null;
@@ -148,6 +148,7 @@ export class PurchaseReturnDebitComponent {
   PurchaseReturnDataSource: any;
   purchaseReturnArray: any[] = [];
   purchaseReturnCount = 0;
+  vatTitle: any;
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -167,6 +168,10 @@ export class PurchaseReturnDebitComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData.SELECTED_COMPANY;
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];

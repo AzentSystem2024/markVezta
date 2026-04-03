@@ -668,8 +668,8 @@ export class PurchaseReturnDebitFormComponent {
         return {
           COMPANY_ID: this.purchaseReturnFormData.COMPANY_ID,
           // STORE_ID: this.purchaseReturnFormData.STORE_ID,
-          STORE_ID: selectedStoreId,
-          DEPT_ID: selectedDeptId,
+          STORE_ID: 0,
+          DEPT_ID: 0,
           BAR_CODE: row.BARCODE ?? '',
           GRN_DET_ID: row.GRN_DET_ID ?? 0,
           ITEM_ID: row.ITEM_ID ?? 0,

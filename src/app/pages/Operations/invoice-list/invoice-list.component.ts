@@ -147,6 +147,7 @@ export class InvoiceListComponent {
   canApprove = false;
   canPrint = false;
   companyID: any;
+  vatTitle: any;
 
   constructor(
     private dataService: DataService,
@@ -163,6 +164,9 @@ export class InvoiceListComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     //
