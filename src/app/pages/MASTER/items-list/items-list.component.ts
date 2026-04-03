@@ -664,27 +664,36 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       }
     });
     // console.log('selected row', selectedRow);
-    this.dataservice.removeItems(id, selectedRow).subscribe(() => {
-      try {
-        // Your delete logic here
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.dataGrid.instance.refresh();
-        this.showItems();
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-      }
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice.removeItems(id, selectedRow).subscribe({
+        next: () => {
+          try {
+            // Your delete logic here
+            notify(
+              {
+                message: 'Delete operation successful',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+            );
+            this.dataGrid.instance.refresh();
+            this.showItems();
+          } catch (error) {
+            notify(
+              {
+                message: 'Delete operation failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+          resolve(false); // ✅ allow delete → popup closes
+        },
+        error: () => {
+          notify('Delete failed', 'error', 3000);
+          reject(); // ❌ cancel delete
+        },
+      });
     });
   }
 

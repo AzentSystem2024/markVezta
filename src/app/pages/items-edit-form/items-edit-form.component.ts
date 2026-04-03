@@ -565,7 +565,7 @@ export class ItemsEditFormComponent implements OnInit {
   }
   onPriceChange(event: any) {
     const newPrice = event.value;
-    this.itemData.SALE_PRICE = newPrice;
+    this.salePrice = newPrice;
 
     this.Edit_Store.forEach((s) => (s.SALE_PRICE = newPrice));
   }
@@ -733,11 +733,11 @@ export class ItemsEditFormComponent implements OnInit {
           CREATED_DATE: this.itemData.CREATED_DATE || '',
           IS_SELECTED: true,
           COST: this.itemData.COST,
-          IS_INACTIVE: row.IS_INACTIVE,
-          IS_NOT_SALE_ITEM: row.IS_NOT_SALE_ITEM,
-          IS_NOT_SALE_RETURN: row.IS_NOT_SALE_RETURN,
-          IS_PRICE_REQUIRED: row.IS_PRICE_REQUIRED,
-          IS_NOT_DISCOUNTABLE: row.IS_NOT_DISCOUNTABLE,
+          IS_INACTIVE: row.IS_INACTIVE ?? false,
+          IS_NOT_SALE_ITEM: row.IS_NOT_SALE_ITEM ?? false,
+          IS_PRICE_REQUIRED: row.IS_PRICE_REQUIRED ?? false,
+          IS_NOT_DISCOUNTABLE: row.IS_NOT_DISCOUNTABLE ?? false,
+          IS_NOT_SALE_RETURN: row.IS_NOT_SALE_RETURN ?? false,
           LAST_MODIFIED_DATE: new Date().toISOString(),
           QTY_AVAILABLE: row.QTY_AVAILABLE,
         };
@@ -762,11 +762,12 @@ export class ItemsEditFormComponent implements OnInit {
       STORE_CODE: row.STORE_CODE,
       STORE_NAME: row.STORE_NAME,
       COST: row.COST,
-      IS_INACTIVE: row.IS_INACTIVE,
-      IS_NOT_SALE_ITEM: row.IS_NOT_SALE_ITEM,
-      IS_NOT_SALE_RETURN: row.IS_NOT_SALE_RETURN,
-      IS_PRICE_REQUIRED: row.IS_PRICE_REQUIRED,
-      IS_NOT_DISCOUNTABLE: row.IS_NOT_DISCOUNTABLE,
+      IS_INACTIVE: row.IS_INACTIVE ?? false,
+      IS_NOT_SALE_ITEM: row.IS_NOT_SALE_ITEM ?? false,
+      IS_PRICE_REQUIRED: row.IS_PRICE_REQUIRED ?? false,
+      IS_NOT_DISCOUNTABLE: row.IS_NOT_DISCOUNTABLE ?? false,
+      IS_NOT_SALE_RETURN: row.IS_NOT_SALE_RETURN ?? false,
+
       LAST_MODIFIED_DATE: new Date().toISOString(),
       QTY_AVAILABLE: row.QTY_AVAILABLE,
       IS_SELECTED: selectedIds.includes(row.ID),
@@ -794,11 +795,11 @@ export class ItemsEditFormComponent implements OnInit {
         STORE_CODE: s.STORE_CODE,
         STORE_NAME: s.STORE_NAME,
         COST: s.COST,
-        IS_INACTIVE: s.IS_INACTIVE,
-        IS_NOT_SALE_ITEM: s.IS_NOT_SALE_ITEM,
-        IS_NOT_SALE_RETURN: s.IS_NOT_SALE_RETURN,
-        IS_PRICE_REQUIRED: s.IS_PRICE_REQUIRED,
-        IS_NOT_DISCOUNTABLE: s.IS_NOT_DISCOUNTABLE,
+        IS_INACTIVE: s.IS_INACTIVE ?? false,
+        IS_NOT_SALE_ITEM: s.IS_NOT_SALE_ITEM ?? false,
+        IS_PRICE_REQUIRED: s.IS_PRICE_REQUIRED ?? false,
+        IS_NOT_DISCOUNTABLE: s.IS_NOT_DISCOUNTABLE ?? false,
+        IS_NOT_SALE_RETURN: s.IS_NOT_SALE_RETURN ?? false,
         LAST_MODIFIED_DATE: new Date().toISOString(),
         QTY_AVAILABLE: s.QTY_AVAILABLE,
         IS_SELECTED: true,
@@ -844,6 +845,7 @@ export class ItemsEditFormComponent implements OnInit {
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
       COMPANY_ID: this.selected_Company_id,
+      SALE_PRICE: this.salePrice,
     };
     // Call the service to update the items
     this.dataservice.updateItems(payload.ID, payload).subscribe(

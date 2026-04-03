@@ -595,6 +595,7 @@
                     [inputAttr]="{ style: 'text-align: right;' }"
                     [labelMode]="'floating'"
                     [width]="200"
+                    (onValueChanged)="onPriceChange($event)"
                   ></dx-number-box>
                 </div>
                 <div class="inventory-item">
