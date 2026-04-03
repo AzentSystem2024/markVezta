@@ -29,6 +29,7 @@
         </dx-text-box>
       </div>
     </dxi-item>
+
     <dxi-item>
       <div *dxTemplate>
         <dx-text-box
@@ -37,6 +38,48 @@
           labelMode="floating"
         >
         </dx-text-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div class="mt-2" *dxTemplate>
+        <dx-select-box
+          [dataSource]="ledgerList"
+          displayExpr="HEAD_NAME"
+          valueExpr="HEAD_ID"
+          [(value)]="newVatclass.VAT_INPUT_HEAD_ID"
+          label="Input Ledger"
+          labelMode="floating"
+          [searchEnabled]="true"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="vat Input Ledger is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-select-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item>
+      <div class="mt-2" *dxTemplate>
+        <dx-select-box
+          [dataSource]="ledgerList"
+          displayExpr="HEAD_NAME"
+          valueExpr="HEAD_ID"
+          [(value)]="newVatclass.VAT_OUTPUT_HEAD_ID"
+          label="Output Ledger"
+          labelMode="floating"
+          [searchEnabled]="true"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="vat Output Ledger is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-select-box>
       </div>
     </dxi-item>
   </dxi-item>

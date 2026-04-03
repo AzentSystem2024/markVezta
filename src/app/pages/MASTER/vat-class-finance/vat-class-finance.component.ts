@@ -15,13 +15,14 @@ import {
 } from 'devextreme-angular/ui/data-grid';
 import { DataService } from 'src/app/services';
 import { FormPopupModule } from 'src/app/components';
-import { VatClassFormModule } from 'src/app/components/library/vat-class-form/vat-class-form.component';
-import { VatClassFormComponent } from 'src/app/components/library/vat-class-form/vat-class-form.component';
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import { CommonModule } from '@angular/common';
 import DataSource from 'devextreme/data/data_source';
-import { VatCalssFinanceFormModule } from '../POPUP PAGES/vat-calss-finance-form/vat-calss-finance-form.component';
+import {
+  VatCalssFinanceFormComponent,
+  VatCalssFinanceFormModule,
+} from '../POPUP PAGES/vat-calss-finance-form/vat-calss-finance-form.component';
 import { VatCalssFinanceEditModule } from '../POPUP PAGES/vat-calss-finance-edit/vat-calss-finance-edit.component';
 
 @Component({
@@ -30,24 +31,26 @@ import { VatCalssFinanceEditModule } from '../POPUP PAGES/vat-calss-finance-edit
   styleUrls: ['./vat-class-finance.component.scss'],
 })
 export class VatClassFinanceComponent implements OnInit {
-  @ViewChild(VatClassFormComponent) vatclassComponent: VatClassFormComponent;
+  @ViewChild(VatCalssFinanceFormComponent) vatclassComponent:
+    | VatCalssFinanceFormComponent
+    | undefined;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
   @Output() formClosed = new EventEmitter<void>();
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  VatClassDataSource: DataSource;
+  VatClassDataSource: DataSource | undefined;
   vatClassArray: any[] = [];
   vatClassCount = 0;
   isAddVatclassPopupOpened = false;
   isFilterRowVisible: boolean = false;
   showFilterRow = true;
   showHeaderFilter = true;
-  select_Data: Object;
-  isEditVatclassPopupOpened: boolean;
-  selected_data: Object;
+  select_Data: Object | undefined;
+  isEditVatclassPopupOpened: boolean | undefined;
+  selected_data: Object | undefined;
   selected_vat_id: any;
   sessionData: any;
   selected_Company_id: any;
@@ -90,7 +93,9 @@ export class VatClassFinanceComponent implements OnInit {
   }
 
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -138,26 +143,35 @@ export class VatClassFinanceComponent implements OnInit {
   };
 
   onClickSaveVatclass() {
-    const { CODE, VAT_NAME, VAT_PERC } =
-      this.vatclassComponent.getNewVatclassData();
-    console.log('inserted data', CODE, VAT_NAME, VAT_PERC);
-    this.dataservice
-      .postVatclassData_Finance(
+    const data = this.vatclassComponent?.getNewVatclassData();
+    if (data) {
+      const {
         CODE,
         VAT_NAME,
         VAT_PERC,
-        this.selected_Company_id,
-      )
-      .subscribe((response) => {
-        if (response) {
-          this.formClosed.emit();
-          this.isAddVatclassPopupOpened = false;
-          this.showVatclass();
-        }
-      });
+        VAT_INPUT_HEAD_ID,
+        VAT_OUTPUT_HEAD_ID,
+      } = data;
+      this.dataservice
+        .postVatclassData_Finance(
+          CODE,
+          VAT_NAME,
+          VAT_PERC,
+          VAT_INPUT_HEAD_ID,
+          VAT_OUTPUT_HEAD_ID,
+          this.selected_Company_id,
+        )
+        .subscribe((response) => {
+          if (response) {
+            this.formClosed.emit();
+            this.isAddVatclassPopupOpened = false;
+            this.showVatclass();
+          }
+        });
+    }
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
     const { ID, CODE, VAT_NAME, VAT_PERC } = selectedRow;
 
@@ -173,7 +187,7 @@ export class VatClassFinanceComponent implements OnInit {
             },
             'success',
           );
-          this.dataGrid.instance.refresh();
+          this.dataGrid?.instance.refresh();
           this.showVatclass();
         } catch (error) {
           notify(
@@ -198,19 +212,23 @@ export class VatClassFinanceComponent implements OnInit {
   }
 
   refresh() {
-    this.dataGrid.instance.refresh();
+    this.dataGrid?.instance.refresh();
     this.showVatclass();
   }
 
   handleClose() {
     this.isAddVatclassPopupOpened = false;
     this.isEditVatclassPopupOpened = false;
-    this.vatclassComponent.formVatclassData = {
-      CODE: '',
-      VAT_NAME: '',
-      VAT_PERC: '',
-    };
-    this.dataGrid.instance.refresh();
+    if (this.vatclassComponent) {
+      this.vatclassComponent.formVatclassData = {
+        CODE: '',
+        VAT_NAME: '',
+        VAT_PERC: '',
+        VAT_INPUT_HEAD_ID: '',
+        VAT_OUTPUT_HEAD_ID: '',
+      };
+    }
+    this.dataGrid?.instance.refresh();
     this.showVatclass();
   }
 }

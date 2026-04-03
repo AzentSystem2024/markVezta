@@ -1,4 +1,4 @@
-import { Component,NgModule } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
@@ -6,47 +6,72 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DxSelectBoxModule } from 'devextreme-angular';
 import { FormPhotoUploaderModule, FormTextboxModule } from 'src/app/components';
+import { DataService } from 'src/app/services';
 
 @Component({
   selector: 'app-vat-calss-finance-form',
   templateUrl: './vat-calss-finance-form.component.html',
-  styleUrls: ['./vat-calss-finance-form.component.scss']
+  styleUrls: ['./vat-calss-finance-form.component.scss'],
 })
 export class VatCalssFinanceFormComponent {
   formVatclassData = {
     CODE: '',
     VAT_NAME: '',
-    VAT_PERC: ''
+    VAT_PERC: '',
+    VAT_INPUT_HEAD_ID: '',
+    VAT_OUTPUT_HEAD_ID: '',
   };
-  newVatclass=this.formVatclassData;
+
+  newVatclass = this.formVatclassData;
+  ledgerList: any[] = [];
+
+  constructor(private dataservice: DataService) {
+    this.getLedgerCodeDropdown();
+  }
+
+  getLedgerCodeDropdown() {
+    this.dataservice.getActiveLedger().subscribe((response: any) => {
+      this.ledgerList = response.Data;
+    });
+  }
 
   getNewVatclassData = () => ({ ...this.newVatclass });
 
   keyPressCode(event: any) {
-    const charCode = (event.which) ? event.which : event.keyCode;
-  
+    const charCode = event.which ? event.which : event.keyCode;
+
     // Allow alphanumeric characters (A-Z, a-z, 0-9)
-    if ((charCode >= 65 && charCode <= 90) || // A-Z
-        (charCode >= 97 && charCode <= 122) || // a-z
-        (charCode >= 48 && charCode <= 57)) { // 0-9
+    if (
+      (charCode >= 65 && charCode <= 90) || // A-Z
+      (charCode >= 97 && charCode <= 122) || // a-z
+      (charCode >= 48 && charCode <= 57)
+    ) {
+      // 0-9
       return true;
     } else {
       event.preventDefault();
       return false;
     }
   }
+
   keyPressVatname(event: any) {
     console.log('key pressed');
-    var charCode = (event.which) ? event.which : event.keyCode;
+    var charCode = event.which ? event.which : event.keyCode;
     var inputValue = event.target.value;
 
-  // Disallow white space at the start
+    // Disallow white space at the start
     if (inputValue.length === 0 && charCode === 32) {
-    event.preventDefault();
-    return false;
+      event.preventDefault();
+      return false;
     }
     // Disallow Numbers 0-9 and Special Characters
-    if ((charCode >= 48 && charCode <= 57) || (charCode >= 33 && charCode <= 47) || (charCode >= 58 && charCode <= 64) || (charCode >= 91 && charCode <= 96) || (charCode >= 123 && charCode <= 126)) {
+    if (
+      (charCode >= 48 && charCode <= 57) ||
+      (charCode >= 33 && charCode <= 47) ||
+      (charCode >= 58 && charCode <= 64) ||
+      (charCode >= 91 && charCode <= 96) ||
+      (charCode >= 123 && charCode <= 126)
+    ) {
       event.preventDefault();
       return false;
     } else {
