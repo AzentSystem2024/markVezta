@@ -223,6 +223,21 @@ export class ProfitAndLossBranchComponent {
     return `${year}-${month}-${day}`;
   }
 
+  storeHint: string = '';
+
+updateStoreHint() {
+  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+    this.storeHint = 'No store selected';
+    return;
+  }
+
+  const selectedNames = this.Store
+    .filter(x => this.selectedStoreid.includes(x.ID))
+    .map(x => x.DESCRIPTION);
+
+  this.storeHint = selectedNames.join(', ');
+}
+
     store_dropdown(){
     const payload = {
       NAME :'STORE',
@@ -232,13 +247,6 @@ export class ProfitAndLossBranchComponent {
       this.Store = res;
     });
   }
-
-  get storeHint(): string {
-  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-    return 'Select store';
-  }
-  return `${this.selectedStoreid.length} store(s) selected`;
-}
 
   get_DataSource() {
     const grid = this.dataGrid?.instance;
