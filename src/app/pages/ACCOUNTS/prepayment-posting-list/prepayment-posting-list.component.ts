@@ -150,7 +150,7 @@ export class PrepaymentPostingListComponent {
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/accounts');
+      .find((menu) => menu.Path === '/prepayment-posting');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
