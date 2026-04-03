@@ -507,7 +507,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     if (items.COSTING_METHOD == 0 || '') {
       notify(
         {
-          message: 'Please select a Costing Methos is Null ',
+          message: 'Please select a Costing Method is Null ',
           position: { at: 'top right', my: 'top right' },
         },
         'error',
