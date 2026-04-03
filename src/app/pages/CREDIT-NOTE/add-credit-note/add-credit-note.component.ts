@@ -163,6 +163,7 @@ export class AddCreditNoteComponent {
   subType: boolean = false;
   selectedSubTypeId: any;
   vatTitle: any;
+  showSubType: boolean;
 
   constructor(
     private dataService: DataService,
@@ -177,6 +178,7 @@ export class AddCreditNoteComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.subType = userData?.Configuration?.[0]?.SUB_TYPE_ID || 0;
+    this.showSubType = !!this.subType;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
@@ -977,7 +979,7 @@ export class AddCreditNoteComponent {
       return;
     }
     // --- Validations ---
-    if (!this.creditFormData.SUB_TYPE_ID) {
+    if (this.showSubType && !this.creditFormData.SUB_TYPE_ID) {
       notify(
         {
           message: 'Please select a sub type.',

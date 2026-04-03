@@ -582,7 +582,31 @@ export class AddPurchaseInvoiceComponent {
     let netAmount = 0;
     // Ensure latest edited values are saved
     this.itemsGridRef.instance.saveEditData();
+    let isValid = true;
 
+    this.mainGridData.forEach((row: any, index: number) => {
+      if (!row.QUANTITY || row.QUANTITY <= 0) {
+        notify(
+          `Row ${index + 1}: Quantity must be greater than 0`,
+          'warning',
+          3000,
+        );
+        isValid = false;
+      }
+
+      if (row.QUANTITY > row.PENDING_QTY) {
+        notify(
+          `Row ${index + 1}: Quantity exceeds pending qty`,
+          'warning',
+          3000,
+        );
+        isValid = false;
+      }
+    });
+
+    if (!isValid) {
+      return;
+    }
     // Take from first row (since it's common for all)
     const selectedStoreId = this.mainGridData[0]?.STORE_ID || 0;
     const selectedDeptId = this.mainGridData[0]?.DEPT_ID || 0;

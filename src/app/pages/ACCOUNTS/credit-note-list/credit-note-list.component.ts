@@ -100,6 +100,7 @@ export class CreditNoteListComponent {
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
+  vatTitle: any;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -153,7 +154,11 @@ export class CreditNoteListComponent {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );

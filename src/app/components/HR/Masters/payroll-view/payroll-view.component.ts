@@ -111,21 +111,16 @@ export class PayrollViewComponent {
         PAY_DETAILS: incomingPayroll.DATA.map((detail, index) => ({
           ...detail,
           SNO: index + 1,
+          HEAD_ID: detail.HEAD_ID, // must match lookup ID
+          HEAD_NAME: detail.HEAD_NAME,
           GROSS_AMOUNT: parseFloat(detail.GROSS_AMOUNT) || 0,
           DEDUCTION_AMOUNT: parseFloat(detail.DEDUCTION_AMOUNT) || 0,
         })),
       };
+      console.log(this.payRollData, 'PAYROLLDATAAAAAAAAAA');
       this.calculateGross();
     }
   }
-
-  // getSalaryHeadDropdown() {
-  //   this.dataService
-  //     .getDropdownData('SALARY_HEAD')
-  //     .subscribe((response: any) => {
-  //       this.salaryHeadList = response;
-  //     });
-  // }
 
   onRowUpdating(event: any) {
     // Log old and new data

@@ -139,6 +139,8 @@ export class ViewCreditNoteComponent {
   roundedNetAmount: number = 0;
   subType: boolean = false;
   subTypeList: any;
+  vatTitle: any;
+  showSubType: boolean;
 
   constructor(
     private dataService: DataService,
@@ -162,8 +164,10 @@ export class ViewCreditNoteComponent {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
 
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
+    this.showSubType = !!this.subType;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;

@@ -374,9 +374,10 @@ export class QuotationFormComponent {
       NAME: 'STORE',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.stores = response.filter(
-        (store: any) => store.ID !== this.storeFromSession,
-      );
+      this.stores = response;
+      // .filter(
+      //   (store: any) => store.ID !== this.storeFromSession,
+      // );
     });
   }
 
