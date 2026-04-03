@@ -34,19 +34,19 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./employee-leave.component.scss'],
 })
 export class EmployeeLeaveComponent {
-  VerifyPopup: boolean;
-  ApprovePopup: boolean;
+  VerifyPopup: boolean = false;
+  ApprovePopup: boolean = false;
   ExistingEmployee: any = [];
   selectedData: any = {};
   LeaveType: any;
   Employee: any;
-  ViewPopup: boolean;
+  ViewPopup: boolean = false;
   Is_ticket: any;
   Left_service: any;
-  TravelPopup: boolean;
-  RejoinPopup: boolean;
+  TravelPopup: boolean = false;
+  RejoinPopup: boolean = false;
   selectedStatusType: string = '';
-  selectedData1: number;
+  selectedData1: number | undefined;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -65,7 +65,7 @@ export class EmployeeLeaveComponent {
   UserId: any;
 
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
 
   AllEmployeeDetails: any = [];
   showFilterRow: boolean = true;
@@ -78,9 +78,9 @@ export class EmployeeLeaveComponent {
   Employee_no: any;
   formsource: FormGroup;
   isFilterOpened = false;
-  EmployeeLeaveDatasource: any[];
+  EmployeeLeaveDatasource: any[] | undefined;
 
-  minDate: Date;
+  minDate: Date | undefined;
   today = new Date();
 
   searchButtonOptions = {
@@ -133,7 +133,7 @@ export class EmployeeLeaveComponent {
 
       text: 'Edit',
 
-      visible: (e) => e.row.data.STATUS !== 'Verified',
+      visible: (e: any) => e.row.data.STATUS !== 'Verified',
     },
 
     {
@@ -145,9 +145,9 @@ export class EmployeeLeaveComponent {
 
       text: 'Delete',
 
-      // onClick: (e) => this.onDeleteClick(e),
+      // onClick: (e:any) => this.onDeleteClick(e),
 
-      visible: (e) =>
+      visible: (e: any) =>
         e.row.data.STATUS !== 'Approved' &&
         e.row.data.STATUS !== 'Travelled' &&
         e.row.data.STATUS !== 'Rejoined' &&
@@ -161,11 +161,11 @@ export class EmployeeLeaveComponent {
 
       text: 'Verify',
 
-      onClick: (e) => {
+      onClick: (e: any) => {
         setTimeout(() => this.onVerifyClick(e));
       },
 
-      visible: (e) =>
+      visible: (e: any) =>
         e.row.data.STATUS !== 'Approved' &&
         e.row.data.STATUS !== 'Verified' &&
         e.row.data.STATUS !== 'Travelled' &&
@@ -180,31 +180,31 @@ export class EmployeeLeaveComponent {
 
       text: 'Approve',
 
-      onClick: (e) => {
+      onClick: (e: any) => {
         setTimeout(() => this.onApproveClick(e));
       },
 
-      visible: (e) => e.row.data.STATUS === 'Verified',
+      visible: (e: any) => e.row.data.STATUS === 'Verified',
     },
 
     {
       hint: 'Travel',
       icon: 'check',
       text: 'Travel',
-      onClick: (e) => {
+      onClick: (e: any) => {
         setTimeout(() => this.onTravelClick(e));
       },
-      visible: (e) => e.row.data.STATUS === 'Approved',
+      visible: (e: any) => e.row.data.STATUS === 'Approved',
     },
 
     {
       hint: 'Rejoin',
       icon: 'check',
       text: 'Rejoin',
-      onClick: (e) => {
+      onClick: (e: any) => {
         setTimeout(() => this.onRejoinClick(e));
       },
-      visible: (e) => e.row.data.STATUS === 'Travelled',
+      visible: (e: any) => e.row.data.STATUS === 'Travelled',
     },
   ];
 
@@ -443,7 +443,7 @@ export class EmployeeLeaveComponent {
   }
 
   refresh = () => {
-    this.dataGrid.instance.refresh();
+    this.dataGrid?.instance.refresh();
   };
 
   closePopup() {
@@ -522,7 +522,7 @@ export class EmployeeLeaveComponent {
         this.AllEmployeeDetails = res.data;
 
         const selectedEmployee = this.AllEmployeeDetails.find(
-          (item) => item.EMP_ID === Id,
+          (item: any) => item.EMP_ID === Id,
         );
 
         this.EmployeeDetails = selectedEmployee;
@@ -540,7 +540,7 @@ export class EmployeeLeaveComponent {
     this.dataservice.get_EmployeeLeave_Api().subscribe((res: any) => {
       const datas = res.data;
 
-      this.ExistingEmployee = datas.filter((item) => item.EMP_ID == id);
+      this.ExistingEmployee = datas.filter((item: any) => item.EMP_ID == id);
       this.ExisitngDeparture = this.ExistingEmployee[0]?.DEPT_DATE;
       this.ExistingReturn = this.ExistingEmployee[0]?.EXPECT_RETURN;
     });
@@ -583,6 +583,7 @@ export class EmployeeLeaveComponent {
 
     this.formsource.get('Expected_rejoin_date')?.setValue(suggestedDate);
   }
+
   validateExpectedRejoin = (e: any) => {
     const value = e.value;
     const depRaw = this.ExistingEmployee[0]?.DEPT_DATE;
@@ -979,7 +980,16 @@ export class EmployeeLeaveComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const savedData = sessionStorage.getItem('savedUserData');
+    if (!savedData) {
+      this.sessionData = null;
+      this.COMPANY_ID = null;
+      this.UserId = null;
+      this.StoreId = null;
+      return;
+    }
+
+    this.sessionData = JSON.parse(savedData);
 
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
     this.UserId = this.sessionData.USER_ID;

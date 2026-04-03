@@ -38,7 +38,7 @@
             [(value)]="selectedEmployee"
             [width]="250"
             [showSelectionControls]="true"
-            [multiline]="!allSelected"
+            [multiline]="false"
             applyValueMode="useButtons"
             label="Select Employee"
             labelMode="floating"
@@ -47,7 +47,7 @@
         </dxi-item>
 
         <dxi-item>
-          <dx-button
+          <dx-button class="ms-4 mt-2"
             text="Apply"
             icon="todo"
             stylingMode="contained"
