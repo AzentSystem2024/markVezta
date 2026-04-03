@@ -175,6 +175,8 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
+  
+   
 
   {
     path: 'auth',
@@ -986,6 +988,12 @@ const routes: Routes = [
         component: ProfitAndLossBranchComponent,
         canActivate: [AuthGuardService],
       },  
+
+      {
+        path: 'misc-sales-invoice',
+        component: MiscSalesInvoiceListComponent,
+        canActivate: [AuthGuardService],
+      },
       
       {
         path: '**',
