@@ -507,7 +507,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     if (items.COSTING_METHOD == 0 || '') {
       notify(
         {
-          message: 'Please select a Costing Methos is Null ',
+          message: 'Please select a Costing Method is Null ',
           position: { at: 'top right', my: 'top right' },
         },
         'error',
@@ -654,6 +654,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   // }
 
   onRowRemoving(event: any) {
+    event.cancel = true;
     const selectedRow = event.data;
     const id = event.data.ID;
     delete selectedRow.ID;
@@ -664,6 +665,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
       }
     });
     // console.log('selected row', selectedRow);
+
     this.dataservice.removeItems(id, selectedRow).subscribe(() => {
       try {
         // Your delete logic here
@@ -675,6 +677,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
           'success',
         );
         this.dataGrid.instance.refresh();
+        event.cancel = true;
         this.showItems();
       } catch (error) {
         notify(

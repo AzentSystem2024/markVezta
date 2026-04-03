@@ -31,11 +31,11 @@ import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { AuthService, DataService } from 'src/app/services';
 
 @Component({
-  selector: 'app-customer-edit-form',
-  templateUrl: './customer-edit-form.component.html',
-  styleUrls: ['./customer-edit-form.component.scss'],
+  selector: 'app-customer-fin-edit-form',
+  templateUrl: './customer-fin-edit-form.component.html',
+  styleUrls: ['./customer-fin-edit-form.component.scss'],
 })
-export class CustomerEditFormComponent implements OnInit, OnChanges {
+export class CustomerFinEditFormComponent {
   @Input() selectedCustomerData: any;
   @Output() ChangedCustomerData: any;
   @Output() updateCompleted = new EventEmitter<any>();
@@ -99,8 +99,10 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     DEALER_TYPE: 0,
     DEALER_ID: 0,
     DeliveryAddresses: [],
+    IS_COMPANY_BRANCH_VALUE: 0,
   };
 
+  IS_COMPANY_BRANCH_VALUE: boolean = false;
   DEFAULT_COUNTRY_CODE: string = '';
   selectedTabIndex = 0;
   customerTypeOptions = [
@@ -149,6 +151,8 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       this.formCustomerData = this.selectedCustomerData;
 
       this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
+      this.IS_COMPANY_BRANCH_VALUE =
+        this.selectedCustomerData.IS_COMPANY_BRANCH === 1;
       this.ChangedCustomerData = this.formCustomerData;
       if (this.formCustomerData.DELIVERY_ADDRESS?.length) {
         this.deliveryAddress1 =
@@ -413,6 +417,8 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       ...this.selectedCustomerData,
       MOBILE_NO: this.countryCode + '-' + this.formCustomerData.MOBILE_NO,
       PHONE: this.PhonenumberCode + '-' + this.formCustomerData.PHONE,
+      CUST_TYPE: 1,
+      IS_COMPANY_BRANCH: this.IS_COMPANY_BRANCH_VALUE ? 1 : 0,
     };
   }
 
@@ -562,7 +568,7 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     DxTabPanelModule,
     DxButtonModule,
   ],
-  declarations: [CustomerEditFormComponent],
-  exports: [CustomerEditFormComponent],
+  declarations: [CustomerFinEditFormComponent],
+  exports: [CustomerFinEditFormComponent],
 })
-export class CustomerEditFormModule {}
+export class CustomerFinEditFormModule {}

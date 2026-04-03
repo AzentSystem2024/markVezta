@@ -74,6 +74,7 @@ export class ItemsEditFormComponent implements OnInit {
   Edit_Store: any;
   selected_Company_id: any;
   companyId: any;
+  selectedStoresMap: any;
 
   get buttonContainerHtml() {
     return `
@@ -268,6 +269,7 @@ export class ItemsEditFormComponent implements OnInit {
     UOM_MULTPLE: '',
     ITEM_STORES: [
       {
+        ID: 0,
         STORE_ID: '',
         SALE_PRICE: '',
         SALE_PRICE1: '',
@@ -389,9 +391,8 @@ export class ItemsEditFormComponent implements OnInit {
     };
     dataservice.getDropdownData(store).subscribe((data) => {
       this.store = data;
-      this.selectedStoreIds = this.itemData.item_stores.map(
-        (store) => store.ID,
-      );
+      console.log(this.store);
+      this.bindStoreData(); // ✅ call here also
     });
     const itemProp1Payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -443,10 +444,17 @@ export class ItemsEditFormComponent implements OnInit {
     // dataservice.getBrandData().subscribe((data) => {
     //   this.brand = data;
     // });
-    const vatClassPayload = {
+    // const vatClassPayload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    // dataservice.getVatclassData(vatClassPayload).subscribe((data) => {
+    //   this.vat = data;
+    // });
+    const Dropdown_ItemTaxPayload = {
       COMPANY_ID: this.selected_Company_id,
+      NAME: 'VAT_CLASS',
     };
-    dataservice.getVatclassData(vatClassPayload).subscribe((data) => {
+    dataservice.Dropdown_ItemTax(Dropdown_ItemTaxPayload).subscribe((data) => {
       this.vat = data;
     });
     const payload = { COMPANY_ID: this.selected_Company_id };
@@ -515,39 +523,49 @@ export class ItemsEditFormComponent implements OnInit {
       }
     }
     if (changes['itemData'] && this.itemData) {
-      this.formData = { ...this.itemData }; // Bind itemData to formData
+      this.formData = { ...this.itemData };
 
       this.edit_Suplier = this.itemData.item_suppliers;
-      if (this.itemData && this.itemData.item_stores) {
-        this.selectedStoreIds = this.itemData.item_stores.map(
-          (store) => store.ID,
-        );
-      } else {
-      }
 
-      this.Edit_Store = JSON.parse(JSON.stringify(this.itemData)).item_stores;
+      this.Edit_Store = this.itemData.item_stores || [];
+
+      // ✅ selection based on ID
       this.selectedRowKeys = this.Edit_Store.map((x: any) => x.STORE_ID);
-      this.store = this.store.map((storeItem: any) => {
-        const matched = this.Edit_Store.find(
-          (x: any) => x.STORE_ID === storeItem.STORE_ID,
-        );
 
-        if (matched) {
-          return {
-            ...storeItem,
-            ...matched, // bind saved values like IS_PRICE_REQUIRED
-          };
-        }
+      console.log(this.Edit_Store, '===========edit store================');
+      console.log(
+        this.selectedRowKeys,
+        '==================selecte key=================',
+      );
+      console.log('=========current store====', this.store);
+      this.bindStoreData(); // ✅ call here
 
-        return storeItem;
-      });
+      console.log(this.store, '=======afte bindg');
     }
-    this.loadStores();
     this.sesstion_Details();
+  }
+  bindStoreData() {
+    if (!this.store || !this.Edit_Store) return;
+
+    // 🔹 Merge store + edit data
+    this.store = this.store.map((storeItem: any) => {
+      const matched = this.Edit_Store.find(
+        (x: any) => x.STORE_ID === storeItem.ID,
+      );
+
+      return matched ? { ...storeItem, ...matched } : storeItem;
+    });
+
+    // 🔹 Set selected keys
+    this.selectedRowKeys = [...this.Edit_Store.map((x: any) => x.STORE_ID)];
+
+    // 🔹 Force UI refresh (important)
+    this.store = [...this.store];
+    this.selectedRowKeys = [...this.selectedRowKeys];
   }
   onPriceChange(event: any) {
     const newPrice = event.value;
-    this.itemData.SALE_PRICE = newPrice;
+    this.salePrice = newPrice;
 
     this.Edit_Store.forEach((s) => (s.SALE_PRICE = newPrice));
   }
@@ -602,6 +620,17 @@ export class ItemsEditFormComponent implements OnInit {
     this.showItems();
     this.filteredUom();
     this;
+  }
+  mapStoreData() {
+    this.selectedRowKeys = this.Edit_Store.map((x: any) => x.STORE_ID);
+
+    this.store = this.store.map((storeItem: any) => {
+      const matched = this.Edit_Store.find(
+        (x: any) => x.STORE_ID === storeItem.ID,
+      );
+
+      return matched ? { ...storeItem, ...matched } : storeItem;
+    });
   }
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -668,13 +697,6 @@ export class ItemsEditFormComponent implements OnInit {
     this.showComponentTab = event.value === 8; // Check if TYPE_ID is 8
   }
 
-  loadStores() {
-    this.dataservice.getDropdownData('STORE').subscribe((data) => {
-      this.store = data;
-      this.loadItemStores();
-    });
-  }
-
   loadItemStores() {
     // Extract STORE_IDs where IS_SELECTED is true
     this.selectedRowKeys = this.itemData.item_stores
@@ -689,45 +711,100 @@ export class ItemsEditFormComponent implements OnInit {
     this.selectedStoreIds = event.selectedRowKeys;
     this.updatePriceLevel(event.selectedRowsData);
   }
-
   updatePriceLevel(selectedRows: any[]) {
-    if (selectedRows.length > 0) {
-      // Iterate over each row to update based on the newly selected rows
-      this.itemData.item_stores.forEach((store) => {
-        if (selectedRows.some((row) => row.STORE_ID === store.STORE_ID)) {
-          store.SALE_PRICE = this.itemData.SALE_PRICE;
-          store.SALE_PRICE1 = this.itemData.SALE_PRICE1;
-          store.SALE_PRICE2 = this.itemData.SALE_PRICE2;
-          store.SALE_PRICE3 = this.itemData.SALE_PRICE3;
-          store.SALE_PRICE4 = this.itemData.SALE_PRICE4;
-          store.SALE_PRICE5 = this.itemData.SALE_PRICE5;
-          store.CREATED_DATE = this.itemData.CREATED_DATE;
-          store.IS_SELECTED = true; // Ensure that the newly selected rows are checked
-        } else {
-          store.IS_SELECTED = store.IS_SELECTED; // Retain the previous checked state for rows not selected
-        }
-      });
-    } else {
-      // Reset values if no rows are selected
-      this.itemData.item_stores.forEach((store) => {
-        store.SALE_PRICE = '';
-        store.SALE_PRICE1 = '';
-        store.SALE_PRICE2 = '';
-        store.SALE_PRICE3 = '';
-        store.SALE_PRICE4 = '';
-        store.SALE_PRICE5 = '';
-        store.IS_INACTIVE = '';
-        store.IS_NOT_SALE_ITEM = false;
-        store.IS_NOT_SALE_RETURN = false;
-        store.IS_PRICE_REQUIRED = false;
-        store.IS_NOT_DISCOUNTABLE = false;
-        store.CREATED_DATE = '';
-        store.IS_SELECTED = true; // Ensure that the row is unchecked if not selected
-      });
-    }
+    if (!this.store) return;
+
+    // 🔹 Get selected IDs from grid
+    const selectedIds = selectedRows.map((row: any) => row.ID);
+
+    // 🔹 Update store (MAIN SOURCE)
+    this.store = this.store.map((row: any) => {
+      const isSelected = selectedIds.includes(row.ID);
+
+      if (isSelected) {
+        return {
+          ...row,
+          SALE_PRICE: this.salePrice || '',
+          SALE_PRICE1: this.itemData.SALE_PRICE1 || '',
+          SALE_PRICE2: this.itemData.SALE_PRICE2 || '',
+          SALE_PRICE3: this.itemData.SALE_PRICE3 || '',
+          SALE_PRICE4: this.itemData.SALE_PRICE4 || '',
+          SALE_PRICE5: this.itemData.SALE_PRICE5 || '',
+          CREATED_DATE: this.itemData.CREATED_DATE || '',
+          IS_SELECTED: true,
+          COST: this.itemData.COST,
+          IS_INACTIVE: row.IS_INACTIVE ?? false,
+          IS_NOT_SALE_ITEM: row.IS_NOT_SALE_ITEM ?? false,
+          IS_PRICE_REQUIRED: row.IS_PRICE_REQUIRED ?? false,
+          IS_NOT_DISCOUNTABLE: row.IS_NOT_DISCOUNTABLE ?? false,
+          IS_NOT_SALE_RETURN: row.IS_NOT_SALE_RETURN ?? false,
+          LAST_MODIFIED_DATE: new Date().toISOString(),
+          QTY_AVAILABLE: row.QTY_AVAILABLE,
+        };
+      } else {
+        return {
+          ...row,
+          IS_SELECTED: false,
+        };
+      }
+    });
+
+    // 🔹 Sync with itemData.item_stores (optional but safe)
+    this.itemData.item_stores = this.store.map((row: any) => ({
+      ID: 0,
+      STORE_ID: row.ID,
+      SALE_PRICE: row.SALE_PRICE,
+      SALE_PRICE1: row.SALE_PRICE1,
+      SALE_PRICE2: row.SALE_PRICE2,
+      SALE_PRICE3: row.SALE_PRICE3,
+      SALE_PRICE4: row.SALE_PRICE4,
+      SALE_PRICE5: row.SALE_PRICE5,
+      STORE_CODE: row.STORE_CODE,
+      STORE_NAME: row.STORE_NAME,
+      COST: row.COST,
+      IS_INACTIVE: row.IS_INACTIVE ?? false,
+      IS_NOT_SALE_ITEM: row.IS_NOT_SALE_ITEM ?? false,
+      IS_PRICE_REQUIRED: row.IS_PRICE_REQUIRED ?? false,
+      IS_NOT_DISCOUNTABLE: row.IS_NOT_DISCOUNTABLE ?? false,
+      IS_NOT_SALE_RETURN: row.IS_NOT_SALE_RETURN ?? false,
+
+      LAST_MODIFIED_DATE: new Date().toISOString(),
+      QTY_AVAILABLE: row.QTY_AVAILABLE,
+      IS_SELECTED: selectedIds.includes(row.ID),
+    }));
+
+    // 🔹 Force UI refresh (VERY IMPORTANT for DevExtreme)
+    this.store = [...this.store];
+    this.selectedRowKeys = [...selectedIds];
   }
 
   saveData() {
+    console.log(this.selectedRowKeys, '==========selectedRowKeys============');
+
+    const storeData = this.store
+      .filter((s: any) => this.selectedRowKeys.includes(s.ID)) // ✅ only selected
+      .map((s: any) => ({
+        ID: 0,
+        STORE_ID: s.ID,
+        SALE_PRICE: s.SALE_PRICE,
+        SALE_PRICE1: s.SALE_PRICE1,
+        SALE_PRICE2: s.SALE_PRICE2,
+        SALE_PRICE3: s.SALE_PRICE3,
+        SALE_PRICE4: s.SALE_PRICE4,
+        SALE_PRICE5: s.SALE_PRICE5,
+        STORE_CODE: s.STORE_CODE,
+        STORE_NAME: s.STORE_NAME,
+        COST: s.COST,
+        IS_INACTIVE: s.IS_INACTIVE ?? false,
+        IS_NOT_SALE_ITEM: s.IS_NOT_SALE_ITEM ?? false,
+        IS_PRICE_REQUIRED: s.IS_PRICE_REQUIRED ?? false,
+        IS_NOT_DISCOUNTABLE: s.IS_NOT_DISCOUNTABLE ?? false,
+        IS_NOT_SALE_RETURN: s.IS_NOT_SALE_RETURN ?? false,
+        LAST_MODIFIED_DATE: new Date().toISOString(),
+        QTY_AVAILABLE: s.QTY_AVAILABLE,
+        IS_SELECTED: true,
+      }));
+
     const select_supplier = this.itemData.item_suppliers;
 
     const convertedData: any[] = [];
@@ -763,11 +840,12 @@ export class ItemsEditFormComponent implements OnInit {
     const items = this.itemData; // Adjust if needed based on your form structure
     const payload = {
       ...this.itemData,
-      item_stores: this.Edit_Store || this.itemData.item_stores,
+      item_stores: storeData || this.itemData.item_stores,
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
       COMPANY_ID: this.selected_Company_id,
+      SALE_PRICE: this.salePrice,
     };
     // Call the service to update the items
     this.dataservice.updateItems(payload.ID, payload).subscribe(
@@ -782,6 +860,8 @@ export class ItemsEditFormComponent implements OnInit {
           );
           this.closeForm();
           this.dataGrid.instance.refresh();
+          this.store = '';
+          this.Edit_Store = '';
           // this.getItemList();
         } else {
           notify(
@@ -892,10 +972,9 @@ export class ItemsEditFormComponent implements OnInit {
   }
 
   calculateProfitMargin(): any {
-    if (this.itemData.SALE_PRICE > 0 && this.itemData.COST > 0) {
+    if (this.salePrice > 0 && this.itemData.COST > 0) {
       return (this.itemData.PROFIT_MARGIN =
-        ((this.itemData.SALE_PRICE - this.itemData.COST) / this.itemData.COST) *
-        100);
+        ((this.salePrice - this.itemData.COST) / this.itemData.COST) * 100);
     } else {
       return 0;
     }
@@ -1015,6 +1094,74 @@ export class ItemsEditFormComponent implements OnInit {
     };
     this.selectedItemId = null;
   }
+
+  onRowUpdatedStore(e: any) {
+    const index = this.store.findIndex((item: any) => item.ID === e.data.ID);
+
+    if (index > -1) {
+      this.store[index] = {
+        ...this.store[index],
+        ...e.data,
+      };
+    }
+
+    // 🔥 IMPORTANT: sync with item_stores
+    const itemIndex = this.itemData.item_stores.findIndex(
+      (x: any) => x.STORE_ID === e.data.ID,
+    );
+
+    if (itemIndex > -1) {
+      this.itemData.item_stores[itemIndex] = {
+        ...this.itemData.item_stores[itemIndex],
+        ...e.data,
+      };
+    }
+  }
+
+  // onRowUpdatedStore(e: any) {
+  //   console.log('Row updated:', e.data);
+  //   const storeId = e.data.ID;
+
+  //   const createDummyItemStore = (storeData: any) => {
+  //     return {
+  //       STORE_ID: storeData.ID || 0,
+  //       SALE_PRICE: storeData.SALE_PRICE || 0,
+  //       SALE_PRICE1: storeData.SALE_PRICE1 || 0,
+  //       SALE_PRICE2: storeData.SALE_PRICE2 || 0,
+  //       SALE_PRICE3: storeData.SALE_PRICE3 || 0,
+  //       SALE_PRICE4: storeData.SALE_PRICE4 || 0,
+  //       SALE_PRICE5: storeData.SALE_PRICE5 || 0,
+  //       STORE_CODE: storeData.STORE_CODE || '',
+  //       STORE_NAME: storeData.DESCRIPTION || storeData.STORE_NAME || '',
+  //       COST: storeData.COST || 0,
+  //       IS_INACTIVE: storeData.IS_INACTIVE || false,
+  //       IS_NOT_SALE_ITEM: storeData.IS_NOT_SALE_ITEM || false,
+  //       IS_NOT_SALE_RETURN: storeData.IS_NOT_SALE_RETURN || false,
+  //       IS_PRICE_REQUIRED: storeData.IS_PRICE_REQUIRED || false,
+  //       IS_NOT_DISCOUNTABLE: storeData.IS_NOT_DISCOUNTABLE || false,
+  //       LAST_MODIFIED_DATE: new Date().toISOString(),
+  //       QTY_AVAILABLE: storeData.QTY_AVAILABLE || '',
+  //       IS_SELECTED: true,
+  //     };
+  //   };
+
+  //   // Initialize array if not yet created
+  //   // if (!this.selectedStoresMap) {
+  //   //   this.selectedStoresMap = [];
+  //   // }
+
+  //   // const existingIndex = this.selectedStoresMap.findIndex(
+  //   //   (item: any) => item.STORE_ID === e.data.ID,
+  //   // );
+
+  //   // if (existingIndex > -1) {
+  //   //   // Replace existing with mapped dummy object
+  //   //   this.selectedStoresMap[existingIndex] = createDummyItemStore(e.data);
+  //   // } else {
+  //   //   // Add new mapped dummy object
+  //   //   this.selectedStoresMap.push(createDummyItemStore(e.data));
+  //   // }
+  // }
 }
 
 @NgModule({
