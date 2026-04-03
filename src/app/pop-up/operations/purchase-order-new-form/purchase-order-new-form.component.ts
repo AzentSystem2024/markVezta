@@ -208,7 +208,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-   
+
     this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
     const menuGroups = this.menuResponse.MenuGroups || [];
@@ -289,11 +289,11 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   resetSupplierDependentData() {
-    // 🔥 CLEAR GRID
+    // CLEAR GRID
     this.savedItems = [];
     this.poData.PoDetails = [];
 
-    // 🔥 RESET TOTALS
+    // RESET TOTALS
     this.totalQuantity = 0;
     this.newPoData.GROSS_AMOUNT = 0;
     this.newPoData.TAX_AMOUNT = 0;
@@ -301,22 +301,22 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.newPoData.SUPP_GROSS_AMOUNT = 0;
     this.newPoData.SUPP_NET_AMOUNT = 0;
 
-    // 🔥 RESET SUPPLIER-SPECIFIC FIELDS
+    // RESET SUPPLIER-SPECIFIC FIELDS
     this.newPoData.SUPP_CONTACT = '';
     this.newPoData.SUPP_MOBILE = '';
     this.newPoData.SUPP_ADDRESS = '';
     this.supplierMail = '';
 
     this.SupplierCurrency = null;
-    this.SupplierCurrencyCode = null;
+    this.SupplierCurrencyCode = '+971';
     this.SupplierCurrencySymbol = null;
     this.currencyExchangeRate = null;
     this.vatRule = null;
 
-    // 🔥 RESET GST MODE
+    // RESET GST MODE
     this.isInterState = false;
 
-    // 🔁 Refresh grid UI
+    // Refresh grid UI
     setTimeout(() => {
       this.itemsGridRef?.instance?.refresh();
     }, 0);
@@ -419,15 +419,33 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.newPoData.CONTACT_MOBILE = this.supplierItems[0].COMPANY_MOBILE;
       const suppMobile = this.supplierItems[0].PHONE;
 
-      if (!suppMobile) return;
+      // ✅ ALWAYS SET DEFAULT FIRST
+      this.supplierCountryCode = '+971';
+      this.newPoData.SUPP_MOBILE = '';
 
-      const parts = suppMobile.split('-');
+      if (suppMobile) {
+        const cleanMobile = suppMobile.replace('+', '');
+        const parts = cleanMobile.split('-');
 
-      if (parts.length === 2) {
-        this.supplierCountryCode = '+' + parts[0];
-        // this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
-        this.newPoData.SUPP_MOBILE = parts[1];
+        if (parts.length === 2) {
+          // ✅ SET CODE
+          this.supplierCountryCode = '+' + parts[0];
+
+          // ✅ SET ONLY NUMBER
+          this.newPoData.SUPP_MOBILE = parts[1];
+        }
       }
+      // const suppMobile = this.supplierItems[0].PHONE;
+
+      // if (!suppMobile) return;
+
+      // const parts = suppMobile.split('-');
+
+      // if (parts.length === 2) {
+      //   this.supplierCountryCode = '+' + parts[0];
+      //   // this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
+      //   this.newPoData.SUPP_MOBILE = parts[1];
+      // }
 
       // this.extractSupplierCountryCode();
       this.extractShippingCountryCode();
@@ -1223,7 +1241,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   setDefaultCountryCode() {
-    const defaultCountryCode = '+91';
+    const defaultCountryCode = '+971';
 
     const defaultCountry = this.countryCodes.find(
       (code) => code.data.dial_code === defaultCountryCode,
@@ -1260,7 +1278,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   onSupplierMobileInput(event: any) {
     const target = event.event.target as HTMLInputElement;
 
-    const dialCode = this.supplierCountryCode || '+91';
+    const dialCode = this.supplierCountryCode || '+971';
 
     const cleanDialCode = dialCode.replace('+', '');
 
@@ -1418,7 +1436,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
     switch (dialCode) {
       case '+971': // UAE
-        requiredLength = 9;
+        requiredLength = 10;
         break;
 
       case '+91': // India
