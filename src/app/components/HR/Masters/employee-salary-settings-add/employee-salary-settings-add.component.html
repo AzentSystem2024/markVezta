@@ -1,4 +1,5 @@
 <div class="content-wrapper">
+  <dx-validation-group #SalaryHeadValidation>
   <div>
     <dx-select-box
       [placeholder]="'Employee Code'"
@@ -23,6 +24,12 @@
         [labelMode]="'floating'"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
+       <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule>
+          </dx-validator>
       </dx-number-box>
     </div>
 
@@ -73,6 +80,7 @@
     </dx-date-box>
     <!-- </dx-validation-group> -->
   </div>
+  </dx-validation-group>
 </div>
 
 <dx-data-grid

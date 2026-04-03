@@ -1,66 +1,68 @@
 <div class="content-wrapper">
-  <div>
-    <dx-select-box
-      [placeholder]="'Employee Code'"
-      label="Employee"
-      [items]="EmployeeDropdown"
-      valueExpr="ID"
-      displayExpr="DESCRIPTION"
-      [(value)]="selectedEmployeeId"
-      [searchEnabled]="true"
-      [showClearButton]="true"
-      [labelMode]="'floating'"
-      (onValueChanged)="onEmployeeChanged($event)"
-    >
-      <!-- <dx-validator>
-        <dxi-validation-rule
-          type="required"
-          message="This field is required"
-        ></dxi-validation-rule>
-      </dx-validator> -->
-    </dx-select-box>
-  </div>
-
-  <div style="display: flex; gap: 20px">
-    <div style="flex: 1">
-      <dx-number-box
-        label="Basic Salary"
-        [(value)]="employeeFormData.BASIC_SALARY"
+  <dx-validation-group #SalaryHeadValidation>
+    <div>
+      <dx-select-box
+        [placeholder]="'Employee Code'"
+        label="Employee"
+        [items]="EmployeeDropdown"
+        valueExpr="ID"
+        displayExpr="DESCRIPTION"
+        [(value)]="selectedEmployeeId"
+        [searchEnabled]="true"
+        [showClearButton]="true"
         [labelMode]="'floating'"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
+        (onValueChanged)="onEmployeeChanged($event)"
       >
-      </dx-number-box>
+      </dx-select-box>
     </div>
 
-    <div style="flex: 1">
+    <div style="display: flex; gap: 20px">
+      <div style="flex: 1">
+        <dx-number-box
+          label="Basic Salary"
+          [(value)]="employeeFormData.BASIC_SALARY"
+          [labelMode]="'floating'"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-number-box>
+      </div>
+
+      <div style="flex: 1">
+        <dx-date-box
+          label="Previous Revision"
+          [readOnly]="true"
+          [(value)]="employeeFormData.PREVIOUS_EFFECT_FROM"
+          [labelMode]="'floating'"
+          displayFormat="MMMM yyyy"
+        >
+        </dx-date-box>
+      </div>
+    </div>
+
+    <div>
       <dx-date-box
-        label="Previous Revision"
-        [readOnly]="true"
-        [(value)]="employeeFormData.PREVIOUS_EFFECT_FROM"
+        label="Effect From"
+        width="300px"
+        [(value)]="employeeFormData.EFFECT_FROM"
+        displayFormat="MMMM/yyyy"
+        [showClearButton]="true"
         [labelMode]="'floating'"
-        displayFormat="MMMM yyyy"
+        pickerType="calendar"
+        [calendarOptions]="{
+          maxZoomLevel: 'year',
+          minZoomLevel: 'century',
+        }"
+        (onValueChanged)="onEffectFromChanged($event)"
       >
       </dx-date-box>
     </div>
-  </div>
-
-  <div>
-    <dx-date-box
-      label="Effect From"
-      width="300px"
-      [(value)]="employeeFormData.EFFECT_FROM"
-      displayFormat="MMMM/yyyy"
-      [showClearButton]="true"
-      [labelMode]="'floating'"
-      pickerType="calendar"
-      [calendarOptions]="{
-        maxZoomLevel: 'year',
-        minZoomLevel: 'century',
-      }"
-      (onValueChanged)="onEffectFromChanged($event)"
-    >
-    </dx-date-box>
-  </div>
+  </dx-validation-group>
 </div>
 
 <dx-data-grid

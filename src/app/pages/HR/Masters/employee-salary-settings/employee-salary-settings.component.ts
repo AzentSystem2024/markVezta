@@ -36,12 +36,12 @@ import { Router } from '@angular/router';
 })
 export class EmployeeSalarySettingsComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
   @ViewChild(EmployeeSalarySettingsAddComponent)
   EmployeeSalarySettingsAddComponent!: EmployeeSalarySettingsAddComponent;
 
   @ViewChild('formValidationGroup', { static: false })
-  formValidationGroup: DxValidationGroupComponent;
+  formValidationGroup: DxValidationGroupComponent | undefined;
 
   @ViewChild(DxDataGridComponent, { static: true })
   EmployeeSalarySettingsDatasource: any[] = [];
@@ -61,7 +61,7 @@ export class EmployeeSalarySettingsComponent {
   selectedEmployee: any;
   PreviousRevision: any;
   employeeFormData: any;
-  selectedRows: any[];
+  selectedRows: any[] | undefined;
   salaryGridData: any;
   SalaryDetails: any[] = [];
   effectFromRaw: any;
@@ -73,6 +73,7 @@ export class EmployeeSalarySettingsComponent {
   canApprove = false;
   canPrint = false;
   selected_Company_id: any;
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -94,6 +95,7 @@ export class EmployeeSalarySettingsComponent {
      `;
     },
   };
+
   filterSelectBoxOptions = {
     items: this.filterOptions,
     displayExpr: 'text',
@@ -108,19 +110,13 @@ export class EmployeeSalarySettingsComponent {
       this.getEmployeeSalarySettingsList();
     },
   };
+
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilterRow(),
   };
-  isFilterRowVisible: boolean;
-  isFilterOpened: boolean;
-
-  onExporting(event: any) {
-    const fileName = 'Credit_Note';
-    this.dataservice.exportDataGrid(event, fileName);
-  }
 
   refreshButtonOptions = {
     icon: 'refresh',
@@ -129,6 +125,15 @@ export class EmployeeSalarySettingsComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
+  isFilterRowVisible: boolean = false;
+  isFilterOpened: boolean = false;
+
+  onExporting(event: any) {
+    const fileName = 'Credit_Note';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
+
   ngOnInit() {
     const currentUrl = this.router.url;
     const menuResponse = JSON.parse(
@@ -137,8 +142,8 @@ export class EmployeeSalarySettingsComponent {
 
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/employee-salary-settings');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/employee-salary-settings');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -152,19 +157,6 @@ export class EmployeeSalarySettingsComponent {
     this.sesstion_Details();
     this.getEmployeeSalarySettingsList(); // call API on load with default filter
   }
-
-  //     addButtonOptions = {
-  //   text: 'New',
-  //   icon: 'bi bi-file-earmark-plus',
-  //   type: 'default',
-  //   stylingMode: 'contained',
-  //   hint: 'Add new entry',
-  //   onClick: () => {
-  //     // Run inside Angular's zone
-  //     this.ngZone.run(() => this.addEmployee());
-  //   },
-  //   elementAttr: { class: 'add-button' }
-  // };
 
   constructor(
     private dataservice: DataService,
@@ -188,7 +180,7 @@ export class EmployeeSalarySettingsComponent {
       this.getEmployeeSalarySettingsList();
     }
   }
-  
+
   toggleFilterRow() {
     this.isFilterOpened = !this.isFilterOpened;
 
@@ -283,7 +275,9 @@ export class EmployeeSalarySettingsComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 

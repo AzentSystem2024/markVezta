@@ -36,23 +36,26 @@ export class EmployeeSalarySettingsAddComponent {
 
   @ViewChild('formValidationGroup', { static: true })
   formValidationGroup!: DxValidationGroupComponent;
-  @ViewChild(DxFormComponent, { static: false }) formRef: DxFormComponent;
+  @ViewChild(DxFormComponent, { static: false }) formRef:
+    | DxFormComponent
+    | undefined;
   @ViewChild('salaryGrid', { static: false })
-  salaryGridRef: DxDataGridComponent;
-  // @ViewChild('effectFromValidator', { static: false }) effectFromValidator: any;
+  salaryGridRef: DxDataGridComponent | undefined;
+  @ViewChild('SalaryHeadValidation', { static: false })
+  SalaryHeadValidation: DxValidationGroupComponent | undefined;
 
   EmployeeDropdown: any;
   selectedEmployee: any;
-  batchId: number;
+  batchId: number | undefined;
   SalaryHeadList: any;
   salaryGridData: any = {};
-  EmployeeSalarySettingsDatasource: any = {}; // ✅ not array
+  EmployeeSalarySettingsDatasource: any = {}; //  not array
 
   selectedFilterAction: number = 4; // default is "All"
-  selectedEmployeeId: number = null;
+  selectedEmployeeId: any = null;
   SalaryDetails: any[] = [];
   PreviousRevision: any;
-  minDate: Date;
+  minDate: Date | undefined;
 
   selected_Company_id: any;
   // CompanyID = 1;
@@ -76,13 +79,11 @@ export class EmployeeSalarySettingsAddComponent {
     this.sessionDetails();
     this.EmployeeListDropDown();
   }
-  // ngOnInit() {
-  //     // Default to current month if it's a new form
-  //     this.employeeFormData.EFFECT_FROM = new Date(); // today’s date, shown as current month/year
-  //   }
 
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -104,7 +105,7 @@ export class EmployeeSalarySettingsAddComponent {
       1,
       12,
       0,
-      0, // ✅ Set time to 12:00 noon
+      0, // Set time to 12:00 noon
     );
 
     const currentMonthFirstDate = new Date(
@@ -113,7 +114,7 @@ export class EmployeeSalarySettingsAddComponent {
       1,
       12,
       0,
-      0, // ✅ Also set this to noon
+      0, // Also set this to noon
     );
 
     if (selectedMonthFirstDate < currentMonthFirstDate) {
@@ -131,25 +132,6 @@ export class EmployeeSalarySettingsAddComponent {
     return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
   }
 
-  // onEffectFromChanged(e: any) {
-  //   if (!e.value) return;
-
-  //   // ✅ Force date to first day of selected month
-  //   const selectedMonthFirstDate = new Date(e.value.getFullYear(), e.value.getMonth(), 1);
-
-  //   // ✅ Get current month first date
-  //   const currentMonthFirstDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-
-  //   if (selectedMonthFirstDate < currentMonthFirstDate) {
-  //     // 🚫 Disallow past months — reset to current month first date
-  //     e.component.option('value', currentMonthFirstDate);
-  //   } else {
-  //     // ✅ Set to first day of selected month
-  //     e.component.option('value', selectedMonthFirstDate);
-  //   }
-
-  // }
-
   onEmployeeChanged(event: any) {
     this.selectedEmployeeId = event.value;
 
@@ -164,7 +146,7 @@ export class EmployeeSalarySettingsAddComponent {
       };
     }
 
-    this.get_SalaryHead_List(); // 👍 Move this here
+    this.get_SalaryHead_List(); //  Move this here
   }
 
   validateEffectFrom = (e: any): boolean => {
@@ -198,29 +180,23 @@ export class EmployeeSalarySettingsAddComponent {
     const payload = {
       EMP_ID: this.selectedEmployeeId,
       COMPANY_ID: this.selected_Company_id,
-      // EFFECT_FROM: this.getLocalDateString(this.employeeFormData.EFFECT_FROM),
     };
-
-    // this.batchId = this.EmployeeSalarySettingsDatasource?.BATCH_ID;
 
     this.dataservice.get_SalaryHeadList_Api(payload).subscribe((res: any) => {
       this.salaryGridData = res.Data[0];
-      //  this.selectedEmployee.BATCHID = this.salaryGridData.BATCH_ID; // ✅ Assign BATCH_ID if needed
       this.selectedRows = [];
 
       const selecteddata = this.salaryGridData.Details;
 
       this.selectedRows = selecteddata
-        .filter((item) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0)
-        .map((item) => item.HEAD_ID); // or your row's unique identifier
+        .filter((item: any) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0)
+        .map((item: any) => item.HEAD_ID); // or your row's unique identifier
 
       this.SalaryDetails = this.salaryGridData.Details || [];
       this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
-      // 🔁 Trigger revalidation
 
       this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY || 0;
       this.effectFromValidator?.instance?.validate(); // force revalidate
-      // this.effectFromValidator?.instance?.validate();
     });
   }
 
@@ -245,9 +221,7 @@ export class EmployeeSalarySettingsAddComponent {
     this.SalaryDetails = [];
     this.formClosed.emit(true);
 
-    this.formValidationGroup.instance.reset(); // ✅ Works
-    // this.formValidationGroup?.instance?.validate(); // Will pass since validator was reset
-    // this.effectFromValidator?.instance?.reset();
+    this.formValidationGroup.instance.reset(); // Works
   }
 
   onEditorPreparing(e: any) {
@@ -293,7 +267,7 @@ export class EmployeeSalarySettingsAddComponent {
       this.salaryGridRef.instance.clearSelection();
       this.salaryGridRef.instance.refresh();
     }
-    this.formValidationGroup.instance.reset(); // ✅ Works
+    this.formValidationGroup.instance.reset(); // Works
     this.formValidationGroup?.instance?.validate(); // Will pass since validator was reset
     this.effectFromValidator?.instance?.reset();
   }
@@ -320,13 +294,17 @@ export class EmployeeSalarySettingsAddComponent {
     const dd = date.getDate();
     return `${yyyy}-${mm.toString().padStart(2, '0')}-${dd.toString().padStart(2, '0')}`;
   }
+  isValid() {
+    return this.SalaryHeadValidation?.instance.validate().isValid;
+  }
 
   saveEmployee() {
+    if (!this.isValid()) return;
     const effectFrom = new Date(this.employeeFormData.EFFECT_FROM);
     const previousRevision = new Date(this.PreviousRevision);
 
     // Convert to yyyy-mm-dd for clean comparison
-    const effectStr = this.stripToDateOnly(effectFrom);
+    const effectStr: any = this.stripToDateOnly(effectFrom);
     const prevStr = this.stripToDateOnly(previousRevision);
 
     if (prevStr && effectStr <= prevStr) {
@@ -385,7 +363,7 @@ export class EmployeeSalarySettingsAddComponent {
           this.popupClosed?.emit();
           this.formClosed.emit(true);
 
-          // ✅ Reset data model
+          // Reset data model
           // this.employeeFormData = {
           //   FIN_ID: '',
           //   BASIC_SALARY: '',
@@ -398,12 +376,12 @@ export class EmployeeSalarySettingsAddComponent {
           this.selectedRows = [];
           this.salaryGridData = [];
 
-          //   // ✅ Reset DevExtreme Form
+          //   // Reset DevExtreme Form
           //   if (this.formRef?.instance) {
           //     this.formRef.instance.resetValues();
           //   }
 
-          //   // ✅ Clear Grid selection (optional)
+          //   // Clear Grid selection (optional)
           if (this.salaryGridRef?.instance) {
             this.salaryGridRef.instance.clearSelection();
             this.salaryGridRef.instance.refresh();

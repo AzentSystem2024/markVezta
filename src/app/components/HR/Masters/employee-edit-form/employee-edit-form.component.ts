@@ -57,13 +57,15 @@ import notify from 'devextreme/ui/notify';
 export class EmployeeEditFormComponent implements OnInit, OnChanges {
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('fileUploader') fileUploader!: ElementRef;
-  @ViewChild('salaryGrid', { static: false }) salaryGrid: DxDataGridComponent;
+  @ViewChild('salaryGrid', { static: false }) salaryGrid:
+    | DxDataGridComponent
+    | undefined;
 
   @Input() employeeData: any;
   @Output() formClosed = new EventEmitter<boolean>();
   // imageUrl: null;
-  emailError: string;
-  mobileError: string;
+  emailError: string | undefined;
+  mobileError: string | undefined;
   uploadedFileName: any;
   // fileDetails: any;
   fileDetails: { file: File | null; remarks: string } = {
@@ -71,7 +73,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     remarks: '',
   };
   attachments: any[] = [];
-  showPopup: boolean;
+  showPopup: boolean = false;
   departments: any;
   allowedFileExtensions = ['.jpg', '.png', '.jpeg'];
   displayMode: any = 'full';
@@ -140,7 +142,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     DESG_NAME: '',
     STATE_NAME: '',
     IS_INACTIVE: '',
-    PAYMENT_TYPE: '',
+    PAYMENT_TYPE: 1,
     Company_Id: 0,
     LEAVE_DAY_BALANCE: '',
     DAYS_DEDUCTED: '',
@@ -151,11 +153,11 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   previewUrl: SafeResourceUrl | null = null;
   imageUrl: string | null = null;
   downloadFileName: any;
-  eighteenYearsAgo: Date;
+  eighteenYearsAgo: Date | undefined;
   employeeList: any;
   COMPANY_ID: any;
   selected_Company_id: any;
-  SubDepartmentDataSource: any=null;
+  SubDepartmentDataSource: any = null;
   constructor(
     public dataservice: DataService,
     private sanitizer: DomSanitizer,
@@ -200,22 +202,19 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     this.sesstion_Details();
     this.getEmployeeList();
 
-    const SELECTED_COMPANY = JSON.parse(
-      sessionStorage.getItem('savedUserData'),
-    );
-    const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
-
-    this.COMPANY_ID = companyid.COMPANY_ID;
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      const SELECTED_COMPANY = JSON.parse(savedUserData);
+      const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
+      this.COMPANY_ID = companyid.COMPANY_ID;
+    } else {
+      this.COMPANY_ID = null;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['employeeData'] && changes['employeeData'].currentValue) {
       this.employeeFormData = this.employeeData;
-      // this.salaryHead=this.employeeFormData.EmployeeSalary
-      // this.salaryHead = this.employeeFormData.EmployeeSalary.map((s) => ({
-      //   ...s,
-      //   amount: s.AMOUNT ?? 0, // Convert AMOUNT to amount
-      // }));
 
       if (this.employeeFormData.IMAGE_NAME) {
         this.imageUrl = `${this.employeeFormData.IMAGE_NAME}`;
@@ -223,7 +222,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
         this.imageUrl = null;
       }
       this.attachments = (this.employeeFormData.Attachment || []).map(
-        (att) => ({
+        (att: any) => ({
           fileName: att.FILE_NAME,
           remarks: att.REMARKS,
           base64: att.FILE_DATA,
@@ -267,7 +266,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
 
     if (headId !== undefined && amount !== undefined) {
       const existingIndex = this.employeeFormData.EmployeeSalary.findIndex(
-        (item) => item.HEAD_ID === headId,
+        (item: any) => item.HEAD_ID === headId,
       );
 
       if (existingIndex > -1) {
@@ -474,13 +473,17 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   }
 
   onDepartmentChange(e: any) {
-    const selectedDept = this.departments.find((dept) => dept.ID === e.value);
+    const selectedDept = this.departments.find(
+      (dept: any) => dept.ID === e.value,
+    );
     this.employeeData.DEPT_NAME = selectedDept ? selectedDept.DESCRIPTION : '';
-    this.dataservice.get_Sub_Dept_DropdownData(e.value).subscribe((res:any)=>{
-      if(res){
-        this.SubDepartmentDataSource=res
-      }
-    })
+    this.dataservice
+      .get_Sub_Dept_DropdownData(e.value)
+      .subscribe((res: any) => {
+        if (res) {
+          this.SubDepartmentDataSource = res;
+        }
+      });
   }
 
   openAttachmentPopup() {
@@ -499,8 +502,13 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   };
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      const sessionData = JSON.parse(savedUserData);
+      this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    } else {
+      this.selected_Company_id = null;
+    }
   }
 
   getEmployeeList() {
@@ -527,7 +535,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
       );
       return;
     }
-    const isDuplicate = this.employeeList.some((emp) => {
+    const isDuplicate = this.employeeList.some((emp: any) => {
       const empCode = emp.EMP_CODE?.trim().toUpperCase();
       const isSameCode = empCode === enteredEmpCode;
       const isDifferentId = emp.ID !== currentEmpId;
@@ -595,7 +603,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   }
 
   onStateChange(e: any) {
-    const selected = this.states.find((d) => d.ID === e.value);
+    const selected = this.states.find((d: any) => d.ID === e.value);
     this.employeeFormData.STATE_NAME = selected ? selected.DESCRIPTION : '';
   }
 }

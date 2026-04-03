@@ -20,6 +20,7 @@ import {
   DxPopupModule,
   DxSelectBoxModule,
   DxTextBoxModule,
+  DxValidationGroupComponent,
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
@@ -35,9 +36,12 @@ import { formatDate } from '@angular/common';
 export class EmployeeSalarySettingsEditComponent {
   @Output() formClosed = new EventEmitter<boolean>();
   @Output() popupClosed = new EventEmitter<void>();
-  @ViewChild(DxFormComponent, { static: false }) formRef: DxFormComponent;
+  @ViewChild(DxFormComponent, { static: false }) formRef: DxFormComponent | undefined;
   @ViewChild('salaryGrid', { static: false })
-  salaryGridRef: DxDataGridComponent;
+  salaryGridRef: DxDataGridComponent | undefined;
+
+  @ViewChild('SalaryHeadValidation', { static: false })
+  SalaryHeadValidation: DxValidationGroupComponent | undefined;
 
   @Input() employeeData: any;
 
@@ -47,7 +51,7 @@ export class EmployeeSalarySettingsEditComponent {
   salaryGridData: any = {};
   EmployeeSalarySettingsDatasource: any;
   selectedFilterAction: number = 4; // default is "All"
-  selectedEmployeeId: number = null;
+  selectedEmployeeId: any = null;
   SalaryDetails: any[] = [];
   selected_Batch_id: any;
   selected_Company_id: any;
@@ -57,7 +61,7 @@ export class EmployeeSalarySettingsEditComponent {
   employeeFormData: any = {
     EMP_CODE: '',
     FIN_ID: '',
-    BASIC_SALARY: '',
+    BASIC_SALARY: null,
     PREV_REVISION: '',
     EFFECT_FROM: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // always 1st of current month
   };
@@ -89,7 +93,7 @@ export class EmployeeSalarySettingsEditComponent {
         EMP_CODE: this.selectedEmployee.EMP_CODE || '',
         EMP_NAME: this.selectedEmployee.EMP_NAME || '',
         DESIGNATION: this.selectedEmployee.DESG_NAME || '',
-        BASIC_SALARY: Number(this.selectedEmployee.SALARY) || 0,
+        BASIC_SALARY: Number(this.selectedEmployee.SALARY) || null,
 
         // EFFECT_FROM: new Date(),
         EFFECT_FROM: this.selectedEmployee.EFFECT_FROM,
@@ -134,7 +138,7 @@ export class EmployeeSalarySettingsEditComponent {
       // this.employeeFormData.BASIC_SALARY = selectedEmp.SALARY || 0;
     }
 
-    this.get_SalaryHead_List(); // 👍 Move this here
+    this.get_SalaryHead_List(); // Move this here
   }
 
   onEffectFromChanged(e: any) {
@@ -169,7 +173,7 @@ export class EmployeeSalarySettingsEditComponent {
   }
 
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -200,12 +204,12 @@ export class EmployeeSalarySettingsEditComponent {
 
       const selecteddata = this.salaryGridData.Details;
       this.selectedRows = selecteddata
-        .filter((item) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0)
-        .map((item) => item.HEAD_ID);
+        .filter((item:any) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0)
+        .map((item:any) => item.HEAD_ID);
 
       this.SalaryDetails = this.salaryGridData.Details || [];
       this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
-      this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY || 0;
+      this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY || null;
     });
   }
 
@@ -266,13 +270,14 @@ export class EmployeeSalarySettingsEditComponent {
     return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
   }
 
+  isValid() {
+    return this.SalaryHeadValidation?.instance.validate().isValid;
+  }
+
   saveEmployee() {
+    if (!this.isValid()) return;
     const effectFrom = new Date(this.employeeFormData.EFFECT_FROM);
     const previousRevision = new Date(this.PreviousRevision);
-
-    // Convert to yyyy-mm-dd for clean comparison
-    // const effectStr = this.stripToDateOnly(effectFrom);
-    // const prevStr = this.stripToDateOnly(previousRevision);
 
     if (effectFrom <= previousRevision) {
       notify(
@@ -294,7 +299,7 @@ export class EmployeeSalarySettingsEditComponent {
       FIN_ID: this.FinID,
       BATCH_ID: this.selected_Batch_id,
       // EMP_CODE: String(this.selectedEmployee.EMP_CODE),
-      SALARY: Number(this.employeeFormData.BASIC_SALARY) || 0,
+      SALARY: Number(this.employeeFormData.BASIC_SALARY) || null,
       EFFECT_FROM: formatDate(
         this.employeeFormData.EFFECT_FROM,
         'yyyy-MM-dd',
@@ -305,7 +310,7 @@ export class EmployeeSalarySettingsEditComponent {
         (item) =>
           this.selectedRows.includes(item.HEAD_ID) &&
           (Number(item.HEAD_AMOUNT) > 0 || Number(item.HEAD_PERCENT) > 0),
-      ) // 🔥
+      ) // 
         .map((item) => ({
           HEAD_ID: item.HEAD_ID,
           HEAD_NAME: item.HEAD_NAME,
