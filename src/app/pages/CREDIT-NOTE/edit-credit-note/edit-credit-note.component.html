@@ -44,6 +44,7 @@
                 ></dx-text-box>
 
                 <dx-text-box
+                  *ngIf="showSubType"
                   label="Sub Type"
                   [value]="creditFormData[0]?.SUB_TYPE_NAME"
                   labelMode="floating"
@@ -59,20 +60,7 @@
                   [width]="405"
                   [readOnly]="true"
                 ></dx-text-box>
-                <!-- <dx-select-box
-                  #distributorRef
-                  [(value)]="selectedDistributorId"
-                  [dataSource]="distributorList"
-                  displayExpr="DESCRIPTION"
-                  valueExpr="ID"
-                  [width]="405"
-                  [searchEnabled]="true"
-                  label="Customer"
-                  labelMode="floating"
-                  (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
-                  (onValueChanged)="onDistributorSelected($event)"
-                  [readOnly]="true"
-                ></dx-select-box> -->
+
                 <dx-select-box
                   [(value)]="invoiceNo"
                   [items]="pendingInvoices"
@@ -198,28 +186,10 @@
           dataType="number"
         >
         </dxi-column>
-        <!-- <dxi-column
-          dataField="CGST"
-          caption="CGST"
-          dataType="number"
-          [visible]="showCGST"
-          [allowEditing]="false"
-        ></dxi-column>
 
         <dxi-column
-          dataField="SGST"
-          caption="SGST"
-          dataType="number"
-          [visible]="showSGST"
-          [allowEditing]="false"
-        ></dxi-column> -->
-        <dxi-column
           dataField="gstAmount"
-          [caption]="
-            selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-              ? ' VAT Amount'
-              : ' GST Amount'
-          "
+          [caption]="vatTitle + ' Amount'"
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         ></dxi-column>

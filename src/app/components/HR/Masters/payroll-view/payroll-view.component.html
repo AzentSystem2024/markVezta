@@ -12,7 +12,7 @@
       [showColumnHeaders]="true"
       [columnAutoWidth]="true"
       [allowColumnResizing]="true"
-      [height]="'50vh'"
+      [height]="'55vh'"
       [columnResizingMode]="'nextColumn'"
       [headerFilter]="{ visible: true }"
       [scrolling]="{ mode: 'virtual' }"
@@ -114,14 +114,9 @@
       ></dxi-column>
 
       <dxi-column
-        dataField="HEAD_ID"
+        dataField="HEAD_NAME"
         caption="Salary Head"
         [allowEditing]="false"
-        [lookup]="{
-          dataSource: salaryHeadList,
-          valueExpr: 'ID',
-          displayExpr: 'HEAD_NAME',
-        }"
       >
       </dxi-column>
 

@@ -191,7 +191,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
       DATE_TO: toDate,
     };
 
-    this.dataService.getdeliveryNoteViewist(payload).subscribe({
+    this.dataService.getdeliveryNoteist(payload).subscribe({
       next: (response: any) => {
         this.deliveryNoteList = (response.Data || [])
           .map((item: any) => ({

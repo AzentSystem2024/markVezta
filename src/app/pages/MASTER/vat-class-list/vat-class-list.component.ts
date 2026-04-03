@@ -33,24 +33,26 @@ import DataSource from 'devextreme/data/data_source';
   styleUrls: ['./vat-class-list.component.scss'],
 })
 export class VatClassListComponent {
-  @ViewChild(VatClassFormComponent) vatclassComponent: VatClassFormComponent;
+  @ViewChild(VatClassFormComponent) vatclassComponent:
+    | VatClassFormComponent
+    | undefined;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
   @Output() formClosed = new EventEmitter<void>();
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  VatClassDataSource: DataSource;
+  VatClassDataSource: DataSource | undefined;
   vatClassArray: any[] = [];
   vatClassCount = 0;
   isAddVatclassPopupOpened = false;
   isFilterRowVisible: boolean = false;
   showFilterRow = true;
   showHeaderFilter = true;
-  select_Data: Object;
-  isEditVatclassPopupOpened: boolean;
-  selected_data: Object;
+  select_Data!: Object;
+  isEditVatclassPopupOpened!: boolean;
+  selected_data!: Object;
   selected_vat_id: any;
   sessionData: any;
   selected_Company_id: any;
@@ -165,7 +167,9 @@ export class VatClassListComponent {
   // }
 
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -228,13 +232,13 @@ export class VatClassListComponent {
     this.cdr.detectChanges();
   };
   onClickSaveVatclass() {
-    const result = this.vatclassComponent.validationGroup.instance.validate();
+    const result = this.vatclassComponent?.validationGroup.instance.validate();
 
-    if (!result.isValid) {
+    if (!result?.isValid) {
       return;
     }
 
-    const payload = this.vatclassComponent.getNewVatclassData();
+    const payload = this.vatclassComponent?.getNewVatclassData();
     payload.COMPANY_ID = this.selectedCompanyId;
     this.dataservice.postVatclassData(payload).subscribe((response) => {
       if (response) {
@@ -245,7 +249,7 @@ export class VatClassListComponent {
     });
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     event.cancel = true;
     const selectedRow = event.data;
     const { ID, CODE, VAT_NAME, VAT_PERC } = selectedRow;
@@ -263,7 +267,7 @@ export class VatClassListComponent {
             'success',
           );
           this.showVatclass();
-          this.dataGrid.instance.refresh();
+          this.dataGrid?.instance.refresh();
         } catch (error) {
           notify(
             {
@@ -285,7 +289,7 @@ export class VatClassListComponent {
     });
   }
   refresh() {
-    this.dataGrid.instance.refresh();
+    this.dataGrid?.instance.refresh();
     this.showVatclass();
   }
 
@@ -294,28 +298,7 @@ export class VatClassListComponent {
       this.vatclassComponent.resetForm();
     }
   }
-  // handleClose() {
-  //   this.isAddVatclassPopupOpened = false;
-  //   this.isEditVatclassPopupOpened = false;
-  //   this.vatclassComponent.formVatclassData = {
-  //     CODE: '',
-  //     VAT_NAME: '',
-  //     // VAT_PERC: '',
-  //     CGST_PERC: '',
-  //     CGST_INPUT_HEAD_ID: '',
-  //     CGST_OUTPUT_HEAD_ID: '',
 
-  //     SGST_PERC: '',
-  //     SGST_INPUT_HEAD_ID: '',
-  //     SGST_OUTPUT_HEAD_ID: '',
-
-  //     IGST_PERC: '',
-  //     IGST_INPUT_HEAD_ID: '',
-  //     IGST_OUTPUT_HEAD_ID: '',
-  //   };
-  //   this.dataGrid.instance.refresh();
-  //   this.showVatclass();
-  // }
   handleClose() {
     this.isAddVatclassPopupOpened = false;
     this.isEditVatclassPopupOpened = false;

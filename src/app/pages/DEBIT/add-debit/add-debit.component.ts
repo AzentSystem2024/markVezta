@@ -146,6 +146,7 @@ export class AddDebitComponent {
   subTypeList: any;
   selectedSubTypeId: any;
   vatTitle: any;
+  showSubType: boolean;
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -177,6 +178,7 @@ export class AddDebitComponent {
     );
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
+    this.showSubType = !!this.subType;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
@@ -198,6 +200,10 @@ export class AddDebitComponent {
     // this.debitFormData.TRANS_DATE = this.formatAsDDMMYYYY(new Date());
     this.debitFormData.TRANS_DATE = new Date();
     this.getSupTypeList();
+    if (!this.showSubType) {
+      this.selectedSubTypeId = 0; // important
+      this.getDocNo();
+    }
     // this.getDocNo();
     this.getLedgerCodeDropdown();
     this.getCompanyListDropdown();
@@ -893,7 +899,7 @@ export class AddDebitComponent {
 
   saveDebitNote(): void {
     this.itemsGridRef?.instance?.saveEditData();
-    if (!this.debitFormData.SUB_TYPE_ID) {
+    if (this.showSubType && !this.debitFormData.SUB_TYPE_ID) {
       notify('Please select a Sub type before saving.', 'error', 2000);
       return;
     }
@@ -1077,6 +1083,7 @@ export class AddDebitComponent {
       UNIT_ID: '',
       DUE_AMOUNT: '',
       SUB_TYPE_ID: null,
+      IS_APPROVED: false,
       NOTE_DETAIL: [
         {
           SL_NO: 1,
