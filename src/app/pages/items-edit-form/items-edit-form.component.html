@@ -182,7 +182,7 @@
                     label="Item Tax"
                     [searchEnabled]="true"
                     [items]="vat"
-                    displayExpr="VAT_NAME"
+                    displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     placeholder="Select Tax"
                     [labelMode]="'floating'"
@@ -595,6 +595,7 @@
                     [inputAttr]="{ style: 'text-align: right;' }"
                     [labelMode]="'floating'"
                     [width]="200"
+                    (onValueChanged)="onPriceChange($event)"
                   ></dx-number-box>
                 </div>
                 <div class="inventory-item">
@@ -810,14 +811,11 @@
           <dx-data-grid
             class="grid theme-dependent always-show-scrollbar"
             [dataSource]="store"
-            displayExpr="store"
-            [columnAutoWidth]="true"
-            [height]="'70vh'"
-            width="100%"
-            keyExpr="STORE_ID"
-            [showBorders]="true"
+            keyExpr="ID"
             [(selectedRowKeys)]="selectedRowKeys"
-            (onSelectionChanged)="onSelectionChanged($event)"
+            (onRowUpdated)="onRowUpdatedStore($event)"
+            (onSelectionChanged)="updatePriceLevel($event.selectedRowsData)"
+            [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
           >
             <dxo-scrolling
               mode="standard"
@@ -826,7 +824,7 @@
             <dxo-selection mode="multiple"> </dxo-selection>
             <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
             <dxi-column
-              dataField="STORE_NAME"
+              dataField="DESCRIPTION"
               caption="Store Name"
             ></dxi-column>
             <dxi-column
@@ -867,6 +865,12 @@
               alignment="right"
             ></dxi-column>
             <dxi-column
+              dataField="COST"
+              caption="Cost"
+              format="#,##0.00"
+              alignment="right"
+            ></dxi-column>
+            <dxi-column
               dataField="LAST_MODIFIED_DATE"
               caption="Added Date"
               format="dd/MM/yyyy"
@@ -890,12 +894,12 @@
               [editorOptions]="{ enableTwoStateBehavior: true }"
             >
             </dxi-column>
-            <dxi-column>
+            <!-- <dxi-column>
               <dx-check-box
                 text="Price On Transaction "
                 [(value)]="itemData.IS_PRICE_REQUIRED"
               ></dx-check-box>
-            </dxi-column>
+            </dxi-column> -->
 
             <dxi-column
               dataField="IS_PRICE_REQUIRED"
@@ -1186,7 +1190,13 @@
             ></dxi-column>
 
             <!-- Cost -->
-            <dxi-column dataField="COST" caption="Cost" dataType="number">
+            <dxi-column
+              dataField="COST"
+              caption="Cost"
+              format="#,##0.00"
+              alignment="right"
+              dataType="number"
+            >
               <dxi-validation-rule type="required"></dxi-validation-rule>
             </dxi-column>
 

@@ -778,6 +778,7 @@
           [showBorders]="true"
           (onRowUpdated)="onRowUpdated($event)"
           (onSelectionChanged)="updatePriceLevel($event.selectedRowsData)"
+          [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
         >
           <dxo-scrolling mode="standard" showScrollbar="always"></dxo-scrolling>
           <dxo-selection mode="multiple"> </dxo-selection>

@@ -151,7 +151,6 @@ export class AdvanceComponent {
   selectedPaymentMode: string; // default selection
   addButtonOptions = {
     text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
@@ -160,6 +159,17 @@ export class AdvanceComponent {
       this.ngZone.run(() => this.add_pop());
     },
     elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
   isEditReadOnly: boolean = false;
   selectedpayid: any;

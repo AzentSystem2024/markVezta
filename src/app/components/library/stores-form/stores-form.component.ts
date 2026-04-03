@@ -171,15 +171,14 @@ export class StoresFormComponent implements OnInit {
   showCountryList() {
     this.service.getCountryDataAPi().subscribe((response) => {
       this.Country = response;
-      });
+    });
   }
 
   get_Country_Dropdown_List() {
     this.service.getCountryWithFlags().subscribe((response: any) => {
       this.Country = response;
-      });
+    });
   }
-
 
   submitForm() {
     const payload = {
@@ -287,7 +286,7 @@ export class StoresFormComponent implements OnInit {
       return true;
     }
   }
-  
+
   onCountrycodeChangePhone(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,

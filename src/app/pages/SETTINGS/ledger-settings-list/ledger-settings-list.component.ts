@@ -204,10 +204,6 @@ export class LedgerSettingsListComponent {
     }
     const fieldMap: any = {
       'Sales Account': 'AC_SALE_ID',
-      'Purchase Account': 'AC_PURCHASE_ID',
-      Inventory: 'AC_INVENTORY_ID',
-      'Input GST': 'AC_INPUT_VAT',
-      'Output GST': 'AC_OUTPUT_VAT',
       'Depreciation Expense': 'AC_DEPRECIATION_EXPENSE_ID',
       'Goods in Transit': 'AC_GOODS_TRANSIT',
     };

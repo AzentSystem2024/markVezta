@@ -1,26 +1,26 @@
-// import { Component } from '@angular/core';
 import {
   Component,
   NgModule,
-  Input,
-  SimpleChanges,
-  Output,
-  EventEmitter,
-  ViewChild,
-  OnChanges,
+  enableProdMode,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.component';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridModule,
+  DxNumberBoxModule,
+  DxPopupModule,
   DxRadioGroupModule,
   DxTabPanelModule,
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
 import { confirm } from 'devextreme/ui/dialog';
+
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -29,36 +29,32 @@ import {
 } from 'devextreme-angular';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { AuthService, DataService } from 'src/app/services';
-
 @Component({
-  selector: 'app-customer-edit-form',
-  templateUrl: './customer-edit-form.component.html',
-  styleUrls: ['./customer-edit-form.component.scss'],
+  selector: 'app-customer-fin-form',
+  templateUrl: './customer-fin-form.component.html',
+  styleUrls: ['./customer-fin-form.component.scss'],
 })
-export class CustomerEditFormComponent implements OnInit, OnChanges {
-  @Input() selectedCustomerData: any;
-  @Output() ChangedCustomerData: any;
-  @Output() updateCompleted = new EventEmitter<any>();
+export class CustomerFinFormComponent {
   @ViewChild('mobileBoxRef', { static: false }) mobileBoxRef: any;
-
   CountryDropdownData: any;
   VATRuleDropdownData: any[] = [];
-  PaymentTermsDropdownData: any;
-  PriceLevelDropdownData: any[] = [];
-  StateDropdownData: any;
-  countryCode: any;
-  isCurrencyAccepted: boolean = true;
-  selecte_countyId: any;
   Warehouse: any[] = [];
   selectedWarehouseId: any[] = [];
   WarehouseId: any;
   DeliveryAddressId: any;
   DeliveryAddress: any[] = [];
-  selected_fin_id: any;
-  sessionData: any;
-  selected_vat_id: any;
+  PaymentTermsDropdownData: any;
+  PriceLevelDropdownData: any[] = [];
+  StateDropdownData: any[] = [];
+  countryCode: any;
+  isCurrencyAccepted: boolean = true;
+  selecte_countyId: any;
   selected_Company_id: any = null; // or ''
+  // dob=new Date();
   dob: string | number | Date = new Date();
+  isSubDealerPopupVisible: boolean = false;
+  dealerList: any;
+  selectedTabIndex = 0;
   Address1Value: any;
   MobileValue: any;
   locationValue: any;
@@ -66,8 +62,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   editingIndex: number | null = null;
 
   formCustomerData = {
-    WAREHOUSE_ID: '',
-    DELIVERY_ADDRESS_ID: '',
     COMPANY_ID: this.selected_Company_id,
     CUST_CODE: '',
     FIRST_NAME: '',
@@ -92,17 +86,21 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     NOTES: '',
     PRICE_CLASS_ID: '',
     DISCOUNT_PERCENT: '',
-    CUST_VAT_RULE_ID: '',
+    CUST_VAT_RULE_ID: 0,
     VAT_REGNO: '',
+    CUSTOMER_TYPE: 0,
+    WAREHOUSE_ID: 0,
     CUST_TYPE: 0,
-    DELIVERY_ADDRESS: [],
     DEALER_TYPE: 0,
     DEALER_ID: 0,
+    IS_COMPANY_BRANCH: 0,
     DeliveryAddresses: [],
   };
-
-  DEFAULT_COUNTRY_CODE: string = '';
-  selectedTabIndex = 0;
+  IS_COMPANY_BRANCH_VALUE: boolean = false;
+  selected_fin_id: any;
+  sessionData: any;
+  selected_vat_id: any;
+  DEFAULT_COUNTRY_CODE: any;
   customerTypeOptions = [
     { text: 'Unit of Company', value: 1 },
     { text: 'Outside Customer', value: 2 },
@@ -113,106 +111,33 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     { text: 'Sub-Dealer', value: 2 },
     { text: 'CompanyBranch', value: 3 },
   ];
-
   isDealerVisible: boolean;
   deliveryAddress1: any;
   deliveryAddress2: any;
   deliveryAddress3: any;
-  isSubDealerPopupVisible: boolean;
-  dealerList: any;
-  PhonenumberCode: any;
   mobileNumber: any;
+  PhonenumberCode: any;
   countryCodes: any;
   mobile_limit: any;
   MobilecountryCode: any;
   countryCodeDeliveryaddress: any;
   Phone_limit: number;
-  mobile_limit_Delivery_Address: number = 0;
-  savedAddresses: any[] = [];
+  mobile_limit_Delivery_Address: number;
+  CountryDropdownDataList: any = [];
 
-  constructor(private service: DataService) {
-    this.getStateDropDown();
-    this.showCountry();
+  constructor(
+    private service: DataService,
+    authservice: AuthService,
+  ) {
+    this.sesstion_Details();
+
     this.sessionData_tax();
-    this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
-
     service.getCountryWithFlags().subscribe((data) => {
       this.countryCodes = data;
     });
+
+    this.getStateDropDown();
   }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes['selectedCustomerData'] &&
-      changes['selectedCustomerData'].currentValue
-    ) {
-      this.formCustomerData = this.selectedCustomerData;
-
-      this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
-      this.ChangedCustomerData = this.formCustomerData;
-      if (this.formCustomerData.DELIVERY_ADDRESS?.length) {
-        this.deliveryAddress1 =
-          this.formCustomerData.DELIVERY_ADDRESS[0]?.DELIVERY_ADDRESS || '';
-        this.deliveryAddress2 =
-          this.formCustomerData.DELIVERY_ADDRESS[1]?.DELIVERY_ADDRESS || '';
-        this.deliveryAddress3 =
-          this.formCustomerData.DELIVERY_ADDRESS[2]?.DELIVERY_ADDRESS || '';
-      } else {
-        // In case no addresses exist yet
-        this.deliveryAddress1 = '';
-        this.deliveryAddress2 = '';
-        this.deliveryAddress3 = '';
-      }
-
-      // Handle DeliveryAddresses (array of detailed addresses)
-      if (this.formCustomerData.DeliveryAddresses?.length > 0) {
-        const firstAddress = this.formCustomerData.DeliveryAddresses[0];
-        const deliveyMobile = firstAddress.MOBILE;
-        const [countryCode, number] = deliveyMobile.split('-');
-
-        // Fill form input values
-        this.Address1Value = firstAddress.ADDRESS1 || '';
-        this.countryCodeDeliveryaddress = countryCode || '';
-        this.MobileValue = number || '';
-        this.locationValue = firstAddress.LOCATION || '';
-        this.phoneValue = firstAddress.PHONE || '';
-
-        // Populate savedAddresses array to show cards
-        this.savedAddresses = [...this.formCustomerData.DeliveryAddresses];
-      } else {
-        // Reset all when no data found
-        this.Address1Value = '';
-        this.MobileValue = '';
-        this.locationValue = '';
-        this.phoneValue = '';
-        this.savedAddresses = [];
-      }
-
-      // Show dealer dropdown automatically if Dealer Type = 2
-      if (this.formCustomerData.CUST_TYPE === 2) {
-        if (this.formCustomerData.DEALER_TYPE === 2) {
-          this.isDealerVisible = true;
-          this.getDealerDropDown(); // fetch dealer list for dropdown
-        } else {
-          this.isDealerVisible = false;
-        }
-      } else {
-        this.isDealerVisible = false;
-      }
-    }
-
-    const MobileNo = this.selectedCustomerData.MOBILE_NO;
-
-    const [countryCode, number] = MobileNo.split('-');
-    this.countryCode = countryCode;
-    this.formCustomerData.MOBILE_NO = number;
-    const PhoneNo = this.selectedCustomerData.PHONE;
-
-    const [countryCodephone, phonenumber] = PhoneNo.split('-');
-    this.PhonenumberCode = countryCodephone;
-    this.formCustomerData.PHONE = phonenumber;
-  }
-
   onCountrycodeChange(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,
@@ -233,13 +158,56 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       this.mobileBoxRef?.instance?.validate();
     });
   }
+  newCustomer = this.formCustomerData;
 
-  addDeliveryAddress(address: string) {
-    if (address && address.trim() !== '') {
-      this.formCustomerData.DELIVERY_ADDRESS.push({
-        DELIVERY_ADDRESS: address,
-      });
+  // getNewCustomerData = () => ({ ...this.newCustomer });
+  getNewCustomerData = () => {
+    // Create delivery address array from entered textboxes
+    const deliveryAddressArray = [];
+
+    if (this.deliveryAddress1?.trim()) {
+      deliveryAddressArray.push({ DELIVERY_ADDRESS: this.deliveryAddress1 });
     }
+    if (this.deliveryAddress2?.trim()) {
+      deliveryAddressArray.push({ DELIVERY_ADDRESS: this.deliveryAddress2 });
+    }
+    if (this.deliveryAddress3?.trim()) {
+      deliveryAddressArray.push({ DELIVERY_ADDRESS: this.deliveryAddress3 });
+    }
+
+    // Return the full customer data with the delivery address array included
+    return {
+      ...this.newCustomer,
+      DeliveryAddresses: this.savedAddresses,
+      MOBILE_NO: this.countryCode + '-' + this.mobileNumber,
+      PHONE: this.PhonenumberCode + '-' + this.newCustomer.PHONE,
+      CUST_TYPE: 1,
+      IS_COMPANY_BRANCH: this.IS_COMPANY_BRANCH_VALUE ? 1 : 0,
+
+      // DELIVERY_ADDRESS: deliveryAddressArray,
+    };
+  };
+
+  showCountry() {
+    this.service.getCountryDataAPi().subscribe((response) => {
+      this.CountryDropdownDataList = response;
+      console;
+    });
+  }
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_vat_id = this.sessionData.VAT_ID;
+  }
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+
+    this.DEFAULT_COUNTRY_CODE =
+      sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
   }
 
   onDealerTypeChange(e: any) {
@@ -270,40 +238,15 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       this.dealerList = response;
     });
   }
-
-  sessionData_tax() {
-    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_vat_id = this.sessionData.VAT_ID;
-  }
-
-  sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
-    this.DEFAULT_COUNTRY_CODE =
-      sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
-  }
-
-  showCountry() {
-    this.service.getCountryDataAPi().subscribe((response) => {
-      this.CountryDropdownData = response;
-    });
-  }
-
   getPriceLevelDropDown() {
     const payload = {
       NAME: 'PRICECLASS',
       COMPANY_ID: this.selected_Company_id,
     };
-
     this.service.getDropdownData(payload).subscribe((data: any) => {
       this.PriceLevelDropdownData = data;
     });
   }
-
   getVATRuleDropDown() {
     const payload = {
       NAME: 'VATRULE',
@@ -313,7 +256,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       this.VATRuleDropdownData = data;
     });
   }
-
   getPaymentTerms() {
     this.service.getpayment_term_Api().subscribe((response) => {
       this.PaymentTermsDropdownData = response;
@@ -325,7 +267,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       this.Warehouse = response;
     });
   }
-
   onWarehouseValue(event: any) {
     this.selectedWarehouseId = event.value;
     this.WarehouseId = event.value;
@@ -339,50 +280,40 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
         this.DeliveryAddress = response;
       });
   }
-
   onDeliveryAddressValue(event: any) {
     this.DeliveryAddressId = event.value;
     this.get_DeliveryAddress_Dropdown_List();
   }
-
   getStateDropDown() {
     const id = this.selecte_countyId;
     const payload = {
       NAME: 'STATE_NAME',
+      COMPANY_ID: this.selected_Company_id,
       COUNTRY_ID: this.selecte_countyId,
     };
     this.service.getStateData_Api(payload).subscribe((data: any) => {
       this.StateDropdownData = data;
     });
   }
-
-  onStateSelectionChanged(event: any) {}
-
+  get_Country_Dropdown_List() {
+    this.service.getCountryWithFlags().subscribe((response: any) => {
+      this.CountryDropdownData = response;
+    });
+  }
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
     const selectedCountry = this.CountryDropdownData.find(
       (country: any) => country.ID === this.selecte_countyId,
     );
-
-    // If found, set code & name
-    if (selectedCountry) {
-      // this.countryCode = selectedCountry.CODE; // e.g., '+971'
-      this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
-    } else {
-      // Fallback if no country found
-      // this.countryCode = '';
-      this.DEFAULT_COUNTRY_CODE = '';
-      console.warn(
-        '⚠️ No matching country found for ID:',
-        this.selecte_countyId,
-      );
-    }
   }
 
+  onStateSelectionChanged(event: any) {}
   ngOnInit(): void {
+    this.get_Country_Dropdown_List();
+    this.getDealerDropDown();
     this.getPaymentTerms();
-
+    this.showCountry();
     this.getVATRuleDropDown();
     this.getStateDropDown();
     this.getPriceLevelDropDown();
@@ -406,18 +337,23 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       return true;
     }
   }
+  resetPartialForm() {
+    this.newCustomer.ADDRESS2 = '';
+    this.newCustomer.ADDRESS3 = '';
+    this.Address1Value = '';
+    this.MobileValue = '';
+    this.locationValue = '';
+    this.phoneValue = '';
+    this.savedAddresses = [];
+    if (this.formCustomerData) {
+      this.formCustomerData.DEALER_ID = 0;
+      this.formCustomerData.CUST_TYPE = 0;
 
-  UpdateData() {
-    console.log(this.selectedCustomerData);
-    return {
-      ...this.selectedCustomerData,
-      MOBILE_NO: this.countryCode + '-' + this.formCustomerData.MOBILE_NO,
-      PHONE: this.PhonenumberCode + '-' + this.formCustomerData.PHONE,
-    };
+      this.formCustomerData.DEALER_TYPE = 0;
+    }
   }
 
-  closePopup() {}
-
+  savedAddresses: any[] = [];
   saveDeliveryAddress() {
     // Validate that at least one field is filled
     if (
@@ -463,23 +399,14 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
 
     result.then((dialogResult) => {
       if (dialogResult) {
-        // ✅ Remove from UI list
         this.savedAddresses.splice(index, 1);
-
-        // ✅ Sync payload with updated list
-        this.formCustomerData.DeliveryAddresses = [...this.savedAddresses];
-
-        // ✅ Optional: reset edit mode if currently editing
-        if (this.editingIndex === index) {
-          // this.resetPartialForm();
-          this.editingIndex = null;
-        }
       }
     });
   }
 
   editAddress(i: number) {
     const addr = this.savedAddresses[i];
+
     const [countryCodephone, phonenumber] = addr.MOBILE.split('-');
 
     // Fill form fields
@@ -492,15 +419,14 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     // ✅ Remember which card is being edited
     this.editingIndex = i;
   }
+
   onDropdownClosed() {}
   onDropdownOpened() {}
   updateMobileNumber() {}
-
   countryDisplay(item: any) {
     if (!item) return '';
     return `${item.CODE}${item.COUNTRY_NAME}`;
   }
-
   onCountrycodeChangeDeliveryAddressmobile(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,
@@ -509,7 +435,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       this.mobile_limit = res.Data[0].MOBILE_DIGITS;
     });
   }
-
   validateMobileLength = (e: any): boolean => {
     const value = (e.value || '').trim();
 
@@ -517,7 +442,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
 
     return value.length === this.mobile_limit;
   };
-
   validatePhoneLength = (e: any): boolean => {
     const value = (e.value || '').trim();
 
@@ -534,7 +458,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
-
   validateMobileLengthdeliveryaddress = (e: any): boolean => {
     const value = (e.value || '').trim();
     if (!value) return true;
@@ -557,12 +480,14 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     DxCheckBoxModule,
     DxValidatorModule,
     DxValidationGroupModule,
-    DxButtonModule,
+    DxNumberBoxModule,
     DxRadioGroupModule,
+    DxPopupModule,
+    DxDataGridModule,
     DxTabPanelModule,
     DxButtonModule,
   ],
-  declarations: [CustomerEditFormComponent],
-  exports: [CustomerEditFormComponent],
+  declarations: [CustomerFinFormComponent],
+  exports: [CustomerFinFormComponent],
 })
-export class CustomerEditFormModule {}
+export class CustomerFinFormModule {}
