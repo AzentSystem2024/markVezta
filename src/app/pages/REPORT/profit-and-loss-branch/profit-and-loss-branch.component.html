@@ -109,18 +109,22 @@
         </dxi-item>
 
         <dxi-item>
-        <dx-tag-box
-      label="Store"
-      labelMode="floating"
-      displayExpr="DESCRIPTION"
-      valueExpr="ID"
-      [items]="Store"
-      [searchEnabled]="true"
-      [(value)]="selectedStoreid"
-      [showSelectionControls]="true"
-      [selectAllMode]="'allPages'"
-      [hint]="storeHint"
-    ></dx-tag-box>
+      <dx-tag-box
+  label="Store"
+  labelMode="floating"
+  displayExpr="DESCRIPTION"
+  valueExpr="ID"
+  [items]="Store"
+  [searchEnabled]="true"
+  [(value)]="selectedStoreid"
+  [showSelectionControls]="true"
+  [maxDisplayedTags]="100"
+  [showMultiTagOnly]="true"
+  [multiline]="false"
+  [hint]="storeHint"
+  [width]="200"
+  (onValueChanged)="updateStoreHint()"
+></dx-tag-box>
     </dxi-item>
 
         <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
