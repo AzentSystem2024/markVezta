@@ -18,11 +18,8 @@
       (onEditingStart)="OnEditingStartVatReturn($event)"
     >
       <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
-
       <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
-
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
-
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -45,32 +42,32 @@
 
       <dxo-toolbar>
         <dxi-item location="before">
-          <div
-            class="grid-header"
-            style="
-              font-weight: 600;
-              font-size: 20px;
-              margin-left: 12px;
-              padding: -3px;
-              margin-right: 3px;
-            "
-          >
-            VAT Class
-          </div>
+          <div class="grid-header">VAT Class</div>
         </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
 
         <dxi-item
           location="after"
-          locateInMenu="auto"
-          showText="inMenu"
           widget="dxButton"
-          [options]="{
-            icon: isFilterRowVisible ? 'filter' : 'filter',
-            hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-            onClick: toggleFilterRow,
-            stylingMode: 'text',
-            elementAttr: { class: 'commonButtons' },
-          }"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <!-- Refresh -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="toolbar-icon-btn export-btn"
         ></dxi-item>
 
         <dxi-item
@@ -78,43 +75,14 @@
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>
-
-        <dxi-item
-          location="after"
-          locateInMenu="auto"
-          showText="inMenu"
-          widget="dxButton"
-          [options]="{
-            text: 'Refresh',
-            icon: 'refresh',
-            onClick: refresh,
-            stylingMode: 'text',
-          }"
-        ></dxi-item>
-
-        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
-      <dxi-column dataField="CODE" caption="Code">
-        <dxi-validation-rule type="required" message="Code is required">
-          <dxi-validation-rule type="pattern" message="Code is required">
-          </dxi-validation-rule>
-        </dxi-validation-rule>
-      </dxi-column>
-      <dxi-column dataField="VAT_NAME" [caption]="vatTitle + ' Name'">
-        <dxi-validation-rule type="required" message="VAT name is required">
-          <dxi-validation-rule type="pattern" message="VAT name is required">
-          </dxi-validation-rule>
-        </dxi-validation-rule>
-      </dxi-column>
+      <dxi-column dataField="CODE" caption="Code"> </dxi-column>
+      <dxi-column dataField="VAT_NAME" [caption]="'Name'"> </dxi-column>
       <dxi-column
         dataField="VAT_PERC"
-        [caption]="vatTitle + '%'"
+        [caption]="'Percentage'"
         alignment="left"
       >
-        <dxi-validation-rule type="required" message="GST percent is required">
-          <dxi-validation-rule type="pattern" message="GST percent is required">
-          </dxi-validation-rule>
-        </dxi-validation-rule>
       </dxi-column>
     </dx-data-grid>
   </div>
@@ -137,9 +105,11 @@
   height="40vh"
   width="35vw"
 >
-  <app-vat-calss-finance-edit
-    [selectedData]="selected_data"
-    (formClosed)="handleClose()"
-  >
-  </app-vat-calss-finance-edit>
+  <div >
+    <app-vat-calss-finance-edit
+      [selectedData]="selected_data"
+      (formClosed)="handleClose()"
+    >
+    </app-vat-calss-finance-edit>
+  </div>
 </dx-popup>

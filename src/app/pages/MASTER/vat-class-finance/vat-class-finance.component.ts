@@ -61,26 +61,51 @@ export class VatClassFinanceComponent implements OnInit {
   poData: any;
 
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addVatclass());
     },
-
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
-  vatTitle: any;
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refresh());
+    },
+    text: '',
+  };
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
   ) {}
+
   onExporting(event: any) {
     this.exportService.onExporting(event, 'VAT_class-list');
   }
@@ -147,16 +172,16 @@ export class VatClassFinanceComponent implements OnInit {
         CODE,
         VAT_NAME,
         VAT_PERC,
-        VAT_INPUT_HEAD_ID,
-        VAT_OUTPUT_HEAD_ID,
+        IGST_INPUT_HEAD_ID,
+        IGST_OUTPUT_HEAD_ID,
       } = data;
       this.dataservice
         .postVatclassData_Finance(
           CODE,
           VAT_NAME,
           VAT_PERC,
-          VAT_INPUT_HEAD_ID,
-          VAT_OUTPUT_HEAD_ID,
+          IGST_INPUT_HEAD_ID,
+          IGST_OUTPUT_HEAD_ID,
           this.selected_Company_id,
         )
         .subscribe((response) => {
@@ -171,46 +196,42 @@ export class VatClassFinanceComponent implements OnInit {
 
   onRowRemoving(event: any) {
     const selectedRow = event.data;
-    const { ID, CODE, VAT_NAME, VAT_PERC } = selectedRow;
+    const { ID } = selectedRow;
 
-    this.dataservice
-      .removeVatclass(ID, CODE, VAT_NAME, VAT_PERC)
-      .subscribe(() => {
-        try {
-          // Your delete logic here
-          notify(
-            {
-              message: 'Delete operation successful',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.dataGrid?.instance.refresh();
-          this.showVatclass();
-        } catch (error) {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+    this.dataservice.removeVatclass(ID).subscribe(() => {
+      try {
+        // Your delete logic here
+        notify(
+          {
+            message: 'Delete operation successful',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success',
+        );
+        this.dataGrid?.instance.refresh();
+        this.showVatclass();
+      } catch (error) {
+        notify(
+          {
+            message: 'Delete operation failed',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+      }
+    });
   }
 
   OnEditingStartVatReturn(event: any) {
     event.cancel = true; // Prevent the default editing behavior
     const id = event.data.ID;
     this.dataservice.select_Vatclass_Data(id).subscribe((response) => {
-      console.log(response, 'selected data');
       this.selected_data = response;
       this.isEditVatclassPopupOpened = true;
     });
   }
 
   refresh() {
-    this.dataGrid?.instance.refresh();
     this.showVatclass();
   }
 
@@ -222,8 +243,8 @@ export class VatClassFinanceComponent implements OnInit {
         CODE: '',
         VAT_NAME: '',
         VAT_PERC: '',
-        VAT_INPUT_HEAD_ID: '',
-        VAT_OUTPUT_HEAD_ID: '',
+        IGST_INPUT_HEAD_ID: '',
+        IGST_OUTPUT_HEAD_ID: '',
       };
     }
     this.dataGrid?.instance.refresh();

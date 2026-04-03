@@ -37,8 +37,8 @@ export class VatCalssFinanceEditComponent {
     CODE: '',
     VAT_NAME: '',
     VAT_PERC: '',
-    VAT_INPUT_HEAD_ID: '',
-    VAT_OUTPUT_HEAD_ID: '',
+    IGST_INPUT_HEAD_ID: '',
+    IGST_OUTPUT_HEAD_ID: '',
   };
 
   selected_Company_id: any;
@@ -48,23 +48,42 @@ export class VatCalssFinanceEditComponent {
 
   constructor(private dataservice: DataService) {
     this.sessionDetails();
-    this.getLedgerCodeDropdown()
   }
+
   getNewVatclassData = () => ({ ...this.newVatclass });
+
+  isLedgerLoaded = false;
+
+  ngOnInit(): void {
+    this.sessionDetails();
+    this.getLedgerCodeDropdown();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
-      const data = changes['selectedData'].currentValue;
-      this.formVatclassData = data;
+      this.selectedData = changes['selectedData'].currentValue;
+
+      this.tryBindData();
     }
   }
 
-   getLedgerCodeDropdown() {
+  // Load dropdown
+  getLedgerCodeDropdown() {
     this.dataservice.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
+      this.isLedgerLoaded = true;
+
+      this.tryBindData();
     });
   }
 
+  // Bind ONLY when both are ready
+  tryBindData() {
+    if (this.isLedgerLoaded && this.selectedData) {
+      this.formVatclassData = { ...this.selectedData };
+      console.log('Final Bound Data:', this.formVatclassData);
+    }
+  }
   keyPressCode(event: any) {
     const charCode = event.which ? event.which : event.keyCode;
     // Allow alphanumeric characters (A-Z, a-z, 0-9)
@@ -114,15 +133,22 @@ export class VatCalssFinanceEditComponent {
   }
 
   UpdateData() {
-    const { ID, CODE, VAT_NAME, VAT_PERC ,VAT_INPUT_HEAD_ID, VAT_OUTPUT_HEAD_ID} = this.formVatclassData;
+    const {
+      ID,
+      CODE,
+      VAT_NAME,
+      VAT_PERC,
+      IGST_INPUT_HEAD_ID,
+      IGST_OUTPUT_HEAD_ID,
+    } = this.formVatclassData;
     this.dataservice
       .updateVatclass_Finance(
         ID,
         CODE,
         VAT_NAME,
         VAT_PERC,
-        VAT_INPUT_HEAD_ID,
-        VAT_OUTPUT_HEAD_ID,
+        IGST_INPUT_HEAD_ID,
+        IGST_OUTPUT_HEAD_ID,
         this.selected_Company_id,
       )
       .subscribe((response) => {

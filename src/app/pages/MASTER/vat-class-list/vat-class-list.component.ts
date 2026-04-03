@@ -252,32 +252,30 @@ export class VatClassListComponent {
   onRowRemoving(event: any) {
     event.cancel = true;
     const selectedRow = event.data;
-    const { ID, CODE, VAT_NAME, VAT_PERC } = selectedRow;
+    const { ID } = selectedRow;
 
-    this.dataservice
-      .removeVatclass(ID, CODE, VAT_NAME, VAT_PERC)
-      .subscribe(() => {
-        try {
-          // Your delete logic here
-          notify(
-            {
-              message: 'Delete operation successful',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.showVatclass();
-          this.dataGrid?.instance.refresh();
-        } catch (error) {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+    this.dataservice.removeVatclass(ID).subscribe(() => {
+      try {
+        // Your delete logic here
+        notify(
+          {
+            message: 'Delete operation successful',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success',
+        );
+        this.showVatclass();
+        this.dataGrid?.instance.refresh();
+      } catch (error) {
+        notify(
+          {
+            message: 'Delete operation failed',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+      }
+    });
   }
 
   OnEditingStartVatReturn(event: any) {
