@@ -238,9 +238,8 @@
             style="margin-left: 10px"
             valueChangeEvent="input"
             (input)="onSupplierMobileInput($event)"
-            (onKeyDown)="preventDialCodeDelete($event)"
           >
-            <dx-validator>
+            <!-- <dx-validator>
               <dxi-validation-rule
                 type="required"
                 message="Contact number is required"
@@ -250,7 +249,7 @@
                 type="custom"
                 [validationCallback]="SupplierMobileValidate"
               ></dxi-validation-rule>
-            </dx-validator>
+            </dx-validator> -->
           </dx-text-box>
         </div>
 
