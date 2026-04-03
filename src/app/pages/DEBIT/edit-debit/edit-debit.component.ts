@@ -121,6 +121,7 @@ export class EditDebitComponent {
   subType: boolean = false;
   subTypeList: any;
   vatTitle: any;
+  showSubType: boolean;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -160,6 +161,8 @@ export class EditDebitComponent {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
       this.vatTitle = userData.GeneralSettings.VAT_TITLE;
+      this.subType = userData.Configuration[0].SUB_TYPE_ID;
+      this.showSubType = !!this.subType;
       if (selectedCompany?.COMPANY_ID) {
         this.companyList = [selectedCompany]; // Show only selected company
         this.selectedCompanyId = selectedCompany.COMPANY_ID;

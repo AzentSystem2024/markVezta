@@ -514,62 +514,6 @@ export class EditPurchaseInvoiceComponent {
     this.isTrOutPopupVisible = false;
   }
 
-  // onTransferSelectClick() {
-  //   const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
-
-  //   if (selectedRows && selectedRows.length > 0) {
-  //     selectedRows.forEach((row) => {
-  //       const exists = this.mainGridData.some(
-  //         (item) => item.GRN_DET_ID === row.GRN_DET_ID
-  //       );
-
-  //       if (!exists) {
-  //         const newRow: any = {
-  //           GRN_ID: row.GRN_ID,
-  //           ITEM_ID: row.ITEM_ID,
-  //           PO_DET_ID: row.PO_DET_ID,
-  //           COST: row.COST,
-  //           GRN_DET_ID: row.GRN_DET_ID,
-  //           UOM: row.UOM,
-  //           GRN_NO: row.GRN_NO,
-  //           GRN_DATE: row.GRN_DATE ? new Date(row.GRN_DATE) : null,
-  //           ITEM_NAME: row.ITEM_NAME,
-  //           PENDING_QTY: row.PENDING_QTY,
-  //           QUANTITY: 0,
-  //           RATE: row.RATE,
-  //           AMOUNT: 0,
-  //           TAX_AMOUNT: 0,
-  //           TOTAL_AMOUNT: 0,
-  //           HSN_CODE: this.HSNCODE,
-  //           VAT_PERC: this.GST,
-  //           CGST: 0,
-  //           SGST: 0,
-  //           // GST: 0,
-  //         };
-
-  //         // ✅ APPLY GST LOGIC HERE (THIS FIXES YOUR ISSUE)
-  //         this.applyGstLogic(newRow);
-
-  //         this.mainGridData.push(newRow);
-  //       }
-  //     });
-
-  //     // VERY IMPORTANT
-  //     this.itemsGridRef.instance.refresh(true);
-  //     this.logGridSummaries();
-  //   }
-
-  //   this.isTrOutPopupVisible = false;
-
-  //   // Auto-focus Qty
-  //   setTimeout(() => {
-  //     const lastIndex = this.mainGridData.length - 1;
-  //     if (lastIndex >= 0) {
-  //       this.itemsGridRef.instance.editCell(lastIndex, 'QUANTITY');
-  //     }
-  //   }, 100);
-  // }
-
   getPurchNo() {
     this.dataService.getPurchaseNo().subscribe((response: any) => {
       console.log(response.PURCHASE_NO, 'PURCHASENOOOOOOOOOOOOOOOOOOOO');

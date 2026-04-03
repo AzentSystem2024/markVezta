@@ -71,6 +71,7 @@ export class VatClassFinanceComponent implements OnInit {
 
     elementAttr: { class: 'add-button' },
   };
+  vatTitle: any;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -91,7 +92,11 @@ export class VatClassFinanceComponent implements OnInit {
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;

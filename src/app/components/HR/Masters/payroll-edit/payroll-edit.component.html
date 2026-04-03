@@ -131,10 +131,11 @@
         dataField="HEAD_ID"
         caption="Salary Head"
         [lookup]="{
-          dataSource: salaryHeadList,
+          dataSource: salaryHeadList || [],
           valueExpr: 'ID',
           displayExpr: 'HEAD_NAME',
         }"
+        [calculateDisplayValue]="getHeadName"
       >
       </dxi-column>
 

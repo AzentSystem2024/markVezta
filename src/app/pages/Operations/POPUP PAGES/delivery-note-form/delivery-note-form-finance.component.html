@@ -37,11 +37,10 @@
                     margin-top: -4px;
                     display: flex;
                     flex-direction: column;
-                    gap: 6px;
                   "
                 >
                   <!-- Row 1 : Date -->
-                  <div style="display: flex; gap: 10px">
+                  <div style="display: flex; gap: 1px">
                     <dx-date-box
                       [(value)]="deliveryFormData.DN_DATE"
                       label="Date"
@@ -61,7 +60,7 @@
                   </div>
 
                   <!-- Row 2 : DN No + New Field -->
-                  <div style="display: flex; gap: 10px">
+                  <div style="display: flex; gap: 1px">
                     <dx-select-box
                       [(value)]="deliveryFormData.SALESMAN_ID"
                       [dataSource]="salesman"
