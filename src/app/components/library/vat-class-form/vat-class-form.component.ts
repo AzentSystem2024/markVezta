@@ -22,12 +22,7 @@ import { DataService } from 'src/app/services';
 export class VatClassFormComponent {
   @ViewChild('vatValidationGroup', { static: false })
   validationGroup!: DxValidationGroupComponent;
-  // formVatclassData = {
-  //   CODE: '',
-  //   VAT_NAME: '',
-  //   VAT_PERC: ''
-  // };
-  // newVatclass=this.formVatclassData;
+
   formVatclassData: any = {
     COMPANY_ID: null,
     CODE: '',
@@ -60,7 +55,7 @@ export class VatClassFormComponent {
   HSNCODE: any;
   GST: any;
   selectedCompanyId: any;
-  companyList: any[];
+  companyList: any[] | undefined;
   creditFormData: any;
 
   constructor(
