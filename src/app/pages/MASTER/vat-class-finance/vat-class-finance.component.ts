@@ -68,7 +68,6 @@ export class VatClassFinanceComponent implements OnInit {
       this.ngZone.run(() => this.addVatclass());
     },
     elementAttr: { class: 'add-button' },
-
     template: () => {
       return `
       <div class="add-btn-content">

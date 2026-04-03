@@ -6293,4 +6293,26 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'Report/profitlossbranch';
     return this.http.post(getEndpoint, payload);
   }
+
+  //////////////////MiscSalesInvoice////////////////////////
+
+  getItems(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}MiscSalesInvoice/getItems`, data);
+  }
+
+  miscSalesInvoiceInsert(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSalesInvoice/insert`, data);
+  }
+
+  getMiscSalesInvoiceByID(ID: any) {
+    const getEndpoint = this.apiUrl + `MiscSalesInvoice/select/${ID}`;
+    return this.http.post(getEndpoint, {});
+  }
+
+  getMiscSalesInvoiceData(payload:any) {
+    const getEndpoint = this.apiUrl + 'MiscSalesInvoice/list';
+    return this.http.post(getEndpoint, payload);
+  }
+
 }

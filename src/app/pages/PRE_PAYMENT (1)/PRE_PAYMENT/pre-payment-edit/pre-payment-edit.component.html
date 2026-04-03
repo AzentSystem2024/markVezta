@@ -51,6 +51,7 @@
         labelMode="floating"
         [readOnly]="isReadOnly"
         [format]="{ type: 'fixedPoint', precision: 2 }"
+        [inputAttr]="{ style: 'text-align: right;' }"
         [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
       >
         <dx-validator>
@@ -273,6 +274,7 @@
         labelMode="floating"
         [format]="{ type: 'fixedPoint', precision: 2 }"
         [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
+        [inputAttr]="{ style: 'text-align: right;' }"
       ></dx-number-box>
     </div>
 

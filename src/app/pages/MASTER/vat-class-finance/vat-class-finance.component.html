@@ -53,21 +53,10 @@
           [options]="searchButtonOptions"
         ></dxi-item>
 
-        <!-- Refresh -->
         <dxi-item
           location="after"
           widget="dxButton"
-          [options]="refreshButtonOptions"
-        ></dxi-item>
-        <!-- Divider -->
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-        <!-- Export (built-in, kept) -->
-        <dxi-item
-          name="exportButton"
-          location="after"
-          cssClass="toolbar-icon-btn export-btn"
+          [options]="addButtonOptions"
         ></dxi-item>
 
         <dxi-item
@@ -75,6 +64,8 @@
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>
+
+        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
       <dxi-column dataField="CODE" caption="Code"> </dxi-column>
       <dxi-column dataField="VAT_NAME" [caption]="'Name'"> </dxi-column>

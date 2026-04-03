@@ -48,6 +48,7 @@
         labelMode="floating"
         [format]="{ type: 'fixedPoint', precision: 2 }"
         [(value)]="PrePaymentFormData.EXPENSE_AMOUNT"
+        [inputAttr]="{ style: 'text-align: right;' }"
       >
         <dx-validator>
           <dxi-validation-rule
@@ -248,6 +249,7 @@
         [format]="{ type: 'fixedPoint', precision: 2 }"
         labelMode="floating"
         [(value)]="totalExpense"
+        [inputAttr]="{ style: 'text-align: right;' }"
       ></dx-number-box>
     </div>
     <div
