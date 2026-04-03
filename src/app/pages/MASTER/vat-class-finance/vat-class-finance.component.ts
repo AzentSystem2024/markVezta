@@ -97,18 +97,11 @@ export class VatClassFinanceComponent implements OnInit {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    const userDataString = localStorage.getItem('userData');
-    const userData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
-    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-
     this.selected_Company_id = this.companyID;
-
     this.poData = {
       COMPANY_ID: this.companyID,
       USER_ID: sessionData.USER_ID,
