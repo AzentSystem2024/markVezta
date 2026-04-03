@@ -86,7 +86,7 @@ export class PdcAddFormComponent {
       TRANS_TYPE: 40,
       COMPANY_ID: this.selected_Company_id,
     };
-    this.dataservice.getPdcDocNo().subscribe((response: any) => {
+    this.dataservice.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
       this.PDCFormData.ENTRY_NO = response.DOC_NO;
     });

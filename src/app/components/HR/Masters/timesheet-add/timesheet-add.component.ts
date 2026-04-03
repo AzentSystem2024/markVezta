@@ -49,7 +49,6 @@ import { Router } from '@angular/router';
   templateUrl: './timesheet-add.component.html',
   styleUrls: ['./timesheet-add.component.scss'],
 })
-
 export class TimesheetAddComponent {
   @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
@@ -119,7 +118,7 @@ export class TimesheetAddComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/credit-note');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -131,7 +130,7 @@ export class TimesheetAddComponent {
     }
 
     this.sesstion_Details();
-    // this.getEmployeeDropdown();
+    this.getEmployeeDropdown();
     this.getStoreDropdown();
     this.loadDepartment();
     this.getPayTimeEntries();
@@ -446,6 +445,7 @@ export class TimesheetAddComponent {
 
     return `${day}-${month}-${year}`;
   }
+  
   saveTimesheet() {
     if (
       this.timesheetFormData.EMP_ID === '' ||
@@ -570,6 +570,7 @@ export class TimesheetAddComponent {
       );
     }
   }
+
   validateDays = (e: any) => {
     const enteredDays = Number(e.value) || 0;
     const maxDays = Number(this.timesheetFormData.DAYS) || 0;

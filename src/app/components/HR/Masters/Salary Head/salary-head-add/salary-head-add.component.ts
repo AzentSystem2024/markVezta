@@ -52,7 +52,7 @@ export class SalaryHeadAddComponent {
   @Output() formClosed = new EventEmitter<void>();
 
   @ViewChild('SalaryHeadValidation', { static: false })
-  SalaryHeadValidation: DxValidationGroupComponent;
+  SalaryHeadValidation: DxValidationGroupComponent | undefined;
   selectedHeads: any;
   Ac_head_values: any;
   affective_value: boolean = false;
@@ -76,12 +76,12 @@ export class SalaryHeadAddComponent {
     HEAD_PERCENT_INCLUDE_OT: true,
     IS_INACTIVE: false,
     AFFECT_LEAVE: false,
-    AC_HEAD_ID: 0,
+    AC_HEAD_ID: null,
     HEAD_ORDER: 0,
     HEAD_NATURE: 0,
     FIXED_AMOUNT: 0,
     HEAD_PERCENT: 0,
-    PERCENT_HEAD_ID: [],
+    PERCENT_HEAD_ID: [] as any[],
     RANGE_EXISTS: false,
     RANGE_FROM: 0,
     RANGE_TO: 0,
@@ -90,7 +90,7 @@ export class SalaryHeadAddComponent {
   is_time_entry: boolean = false;
 
   priorities = [
-    { id: 1, name: 'Allowance' },
+    { id: 1, name: 'Gross' },
     { id: 2, name: 'Deduction' },
     { id: 3, name: 'Advance' },
   ];
@@ -111,28 +111,28 @@ export class SalaryHeadAddComponent {
   //
   // selectedType:any
   selectedType: any;
-  selectedRows: any[];
+  selectedRows: any[] | undefined;
   salaryHeadList: any = [];
-  payload: {
-    COMPANY_ID: any;
-    HEAD_NATURE: any;
-    HEAD_TYPE: any;
-    HEAD_NAME: string;
-    PAYSLIP_TITLE: string;
-    HEAD_ACTIVE: boolean;
-    INSTALLMENT_RECOVERY: boolean;
-    HEAD_PERCENT_INCLUDE_OT: boolean;
-    IS_INACTIVE: boolean;
-    AFFECT_LEAVE: boolean;
-    AC_HEAD_ID: number;
-    HEAD_ORDER: number;
-    FIXED_AMOUNT: number;
-    HEAD_PERCENT: number;
-    PERCENT_HEAD_ID: any[];
-    RANGE_EXISTS: boolean;
-    RANGE_FROM: number;
-    RANGE_TO: number;
-    IS_TIMESHEET_ENTRY: boolean;
+  payload: any = {
+    COMPANY_ID: null,
+    HEAD_NATURE: null,
+    HEAD_TYPE: null,
+    HEAD_NAME: '',
+    PAYSLIP_TITLE: '',
+    HEAD_ACTIVE: true,
+    INSTALLMENT_RECOVERY: false,
+    HEAD_PERCENT_INCLUDE_OT: true,
+    IS_INACTIVE: false,
+    AFFECT_LEAVE: false,
+    AC_HEAD_ID: 0,
+    HEAD_ORDER: 0,
+    FIXED_AMOUNT: 0,
+    HEAD_PERCENT: 0,
+    PERCENT_HEAD_ID: [] as any[],
+    RANGE_EXISTS: false,
+    RANGE_FROM: 0,
+    RANGE_TO: 0,
+    IS_TIMESHEET_ENTRY: false,
   };
   selected_Company_id: any;
 
@@ -161,13 +161,8 @@ export class SalaryHeadAddComponent {
     });
   }
 
-  //================disbled================
-  //  isAdvanceSelected(): boolean {
-  //   return this.selectedPriority.id === 3;
-
-  // }
+ 
   //=============== head_name dropdown==========
-
   get_headnameGrid() {
     this.dataservice.Dropdown_advance_types(name).subscribe((res: any) => {
       this.selectedHeads = res;
@@ -193,7 +188,9 @@ export class SalaryHeadAddComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -211,7 +208,7 @@ export class SalaryHeadAddComponent {
     // this.getSalaryHeadList()
     if (this.salaryHeadList && this.salaryHeadList.length > 0) {
       const maxOrder = Math.max(
-        ...this.salaryHeadList.map((item) => item.HEAD_ORDER || 0),
+        ...this.salaryHeadList.map((item: any) => item.HEAD_ORDER || 0),
       );
       this.SalaryHeadData.HEAD_ORDER = maxOrder + 1;
     } else {
@@ -266,12 +263,7 @@ export class SalaryHeadAddComponent {
     this.isEnabled = true;
   }
 
-  // validateAcLedger(e: any) {
-  //   if (this.HeadType_value === 3) {
-  //     return e.value !== null && e.value !== undefined && e.value !== '';
-  //   }
-  //   return true; // valid for other HeadType values
-  // }
+
   validateAcLedger = (e: any): boolean => {
     if (this.HeadType_value === 3) {
       return e.value !== null && e.value !== undefined && e.value !== '';
@@ -315,29 +307,12 @@ export class SalaryHeadAddComponent {
   }
 
   isValid() {
-    return this.SalaryHeadValidation.instance.validate().isValid;
+    return this.SalaryHeadValidation?.instance.validate().isValid;
   }
 
   //=============save salary head data========================
   saveSalaryHeadData() {
     if (!this.isValid()) return;
-
-    //   const headNatureMap: { [key: string]: number } = {
-    //     fixed: 1,
-    //     percentage: 2,
-    //     others: 3
-    //   };
-
-    const priorityId = this.selectedPriority.id;
-
-    const headNatureMap: { [key: string]: number } = {
-      fixed: 1,
-      percentage: 2,
-      others: 3,
-    };
-
-    const natureId = headNatureMap[this.selectedType?.value]; // assuming selectedType is like { value: 'fixed' }
-
     if (this.SalaryHeadData.HEAD_NAME) {
       const isDuplicate = this.salaryHeadList.some(
         (head: any) =>
@@ -355,17 +330,7 @@ export class SalaryHeadAddComponent {
         );
         return;
       }
-      // if(this.selectedPriority.id===3 && this.SalaryHeadData.AC_HEAD_ID==0){
-      //   notify(
-      //             {
-      //               message: 'Please select ac head',
-      //               position: { at: 'top center', my: 'top center' },
-      //             },
-      //             'error'
-      //           );
-      //   return;
 
-      // }
       const priorityId = this.selectedPriority?.id || this.selectedPriority;
       if (priorityId === 3 && this.SalaryHeadData.AC_HEAD_ID == 0) {
         notify(
@@ -377,7 +342,7 @@ export class SalaryHeadAddComponent {
         );
         return;
       }
-      const selectedNatureId = this.selectedNatureId;
+
       if (
         this.selectedNatureId === 2 &&
         (!this.SalaryHeadData.PERCENT_HEAD_ID ||
@@ -411,7 +376,7 @@ export class SalaryHeadAddComponent {
           IS_TIMESHEET_ENTRY: this.is_time_entry,
         };
       }
-      console.log(this.payload, '---------save payload------------------');
+     
       const data = this.payload;
 
       this.dataservice.Add_salary_Head_api(data).subscribe((res: any) => {
@@ -429,8 +394,7 @@ export class SalaryHeadAddComponent {
           this.SalaryHeadValidation?.instance?.reset();
         });
         this.selectedRows = [];
-        this.selectedNatureId = null;
-        // this.selectedPriority = this.priorities.find(p => p.id === 1)
+        this.selectedNatureId = null; 
         this.selectedPriority;
         this.resetForm();
       });
@@ -447,7 +411,7 @@ export class SalaryHeadAddComponent {
       HEAD_PERCENT_INCLUDE_OT: true,
       IS_INACTIVE: false,
       AFFECT_LEAVE: false,
-      AC_HEAD_ID: 0,
+      AC_HEAD_ID: null,
       HEAD_ORDER: 0,
       HEAD_NATURE: 0,
       FIXED_AMOUNT: 0,
@@ -484,7 +448,7 @@ export class SalaryHeadAddComponent {
     this.selectedPriority = this.priorities.find((p) => p.id === 1); // Reset to Allowance
     this.HeadType_value = 1;
   }
-  onChangeAc_head(event: any) {}
+ 
 
   //=====cancel==============================
   //

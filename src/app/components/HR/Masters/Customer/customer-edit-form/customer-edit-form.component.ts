@@ -29,6 +29,7 @@ import {
 } from 'devextreme-angular';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { AuthService, DataService } from 'src/app/services';
+
 @Component({
   selector: 'app-customer-edit-form',
   templateUrl: './customer-edit-form.component.html',
@@ -129,9 +130,7 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   mobile_limit_Delivery_Address: number = 0;
   savedAddresses: any[] = [];
 
-  constructor(
-    private service: DataService,
-  ) {
+  constructor(private service: DataService) {
     this.getStateDropDown();
     this.showCountry();
     this.sessionData_tax();
@@ -496,7 +495,7 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   onDropdownClosed() {}
   onDropdownOpened() {}
   updateMobileNumber() {}
-  
+
   countryDisplay(item: any) {
     if (!item) return '';
     return `${item.CODE}${item.COUNTRY_NAME}`;

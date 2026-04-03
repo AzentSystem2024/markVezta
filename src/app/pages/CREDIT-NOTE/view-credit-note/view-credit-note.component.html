@@ -32,6 +32,7 @@
                 [readOnly]="true"
               ></dx-text-box>
               <dx-text-box
+                *ngIf="showSubType"
                 label="Sub Type"
                 [value]="creditFormData?.[0]?.SUB_TYPE_NAME"
                 labelMode="floating"

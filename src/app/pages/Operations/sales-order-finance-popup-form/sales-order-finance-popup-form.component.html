@@ -204,12 +204,6 @@
             [calculateCellValue]="calculateGrossAmount"
           ></dxi-column>
           <dxi-column
-            dataField="DISC_PERCENT"
-            caption="Discount%"
-            [allowEditing]="true"
-            dataType="number"
-          ></dxi-column>
-          <dxi-column
             dataField="AMOUNT"
             caption="Amount"
             [allowEditing]="true"
@@ -217,6 +211,13 @@
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
+          <dxi-column
+            dataField="DISC_PERCENT"
+            caption="Discount%"
+            [allowEditing]="true"
+            dataType="number"
+          ></dxi-column>
+
           <dxi-column
             dataField="TAX_AMOUNT"
             [caption]="' VAT Amount'"
@@ -243,7 +244,8 @@
             <dxi-total-item
               column="TOTAL_AMOUNT"
               summaryType="sum"
-              displayFormat="Total: {0}"
+              valueFormat="#,##0.00"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
             ></dxi-total-item>
           </dxo-summary>
 
@@ -315,10 +317,10 @@
                 [text]="
                   isSaving
                     ? salesOrderFormData.IS_APPROVED
-                      ? 'Committing...'
+                      ? 'Saving...'
                       : 'Saving...'
                     : salesOrderFormData.IS_APPROVED
-                      ? 'Commit'
+                      ? 'Save'
                       : 'Save'
                 "
                 [disabled]="isSaving"
@@ -440,7 +442,7 @@
 <dx-popup
   [(visible)]="quotationPopupOpened"
   [width]="'70vw'"
-  [height]="'75vh'"
+  [height]="'80vh'"
   [showTitle]="true"
   title="Add Quotation"
   (onHiding)="quotationPopupOpened = false"
@@ -519,7 +521,7 @@
 <dx-popup
   [(visible)]="showAddItemPopup"
   [width]="'90vw'"
-  [height]="600"
+  [height]="'85vh'"
   [showTitle]="true"
   [title]="'Add Item'"
   [closeOnOutsideClick]="true"
@@ -530,7 +532,7 @@
       #supplierItemsGrid
       [columnAutoWidth]="true"
       [showBorders]="true"
-      [height]="'70vh'"
+      [height]="'60vh'"
       [showBorders]="true"
       [showColumnLines]="true"
       [showBorders]="true"
@@ -545,6 +547,7 @@
       [dataSource]="supplierItems"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
       (onSelectionChanged)="onSelectionChanged($event)"
+      (onCellPrepared)="onPopupCellPrepared($event)"
     >
       <dxo-pager
         [visible]="true"

@@ -1,4 +1,3 @@
-// import { Component } from '@angular/core';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -30,6 +29,7 @@ import {
   DxDataGridComponent,
   DxValidationGroupModule,
   DxNumberBoxModule,
+  DxValidationGroupComponent,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -50,6 +50,9 @@ import notify from 'devextreme/ui/notify';
 export class SalaryHeadEditComponent {
   @Input() selectedSalaryHeadData: any;
   @Output() formClosed = new EventEmitter<void>();
+
+  @ViewChild('SalaryHeadValidation', { static: false })
+  SalaryHeadValidation: DxValidationGroupComponent | undefined;
 
   selectedHeads: any;
   Ac_head_values: any;
@@ -74,7 +77,7 @@ export class SalaryHeadEditComponent {
     HEAD_PERCENT_INCLUDE_OT: true,
     IS_INACTIVE: false,
     AFFECT_LEAVE: false,
-    AC_HEAD_ID: 0,
+    AC_HEAD_ID: null,
     HEAD_ORDER: 0,
     HEAD_NATURE: 0,
     FIXED_AMOUNT: 0,
@@ -86,7 +89,7 @@ export class SalaryHeadEditComponent {
     IS_TIMESHEET_ENTRY: false,
   };
   priorities = [
-    { id: 1, name: 'Allowance' },
+    { id: 1, name: 'gross' },
     { id: 2, name: 'Deduction' },
     { id: 3, name: 'Advance' },
   ];
@@ -95,10 +98,9 @@ export class SalaryHeadEditComponent {
   salaryHeadTypes = [{ label: 'Fixed Amount', value: 'fixed' }];
   salaryHeadTypes2 = [{ label: '', value: 'percentage' }];
   salaryHeadTypes3 = [{ label: 'Others', value: 'others' }];
-  //  , // Label not shown for second radio
-  //
+
   selectedType: any;
-  selectedRows: any[];
+  selectedRows: any[] | undefined;
   // salaryHeadList: any;
   salaryHeadList: any[] = [];
 
@@ -112,6 +114,7 @@ export class SalaryHeadEditComponent {
   ];
 
   selectedPaytime = 1;
+
   constructor(private dataservice: DataService) {
     this.sesstion_Details();
     this.get_headnameGrid();
@@ -175,6 +178,7 @@ export class SalaryHeadEditComponent {
       this.selectedHeads = res;
     });
   }
+
   onTypeChange() {
     const headNatureMap: { [key: string]: number } = {
       fixed: 1,
@@ -231,17 +235,6 @@ export class SalaryHeadEditComponent {
     this.SalaryHeadData.PERCENT_HEAD_ID = event.selectedRowKeys;
   }
 
-  // onSelectionChanged(event: any) {
-  //   this.SalaryHeadData.PERCENT_HEAD_ID = event.selectedRowKeys; // array of IDs
-  // }
-
-  // onSelectionChanged(event: any) {
-  // const selectedRowsData=event.selectedRowsData
-
-  // this.SalaryHeadData.PERCENT_HEAD_ID = selectedRowsData.map((row: any) => row.ID);
-
-  // }
-
   //=======================list data=============
   getSalaryHeadList() {
     const payload = {
@@ -253,96 +246,18 @@ export class SalaryHeadEditComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
-  // UpdateSalaryHeadData() {
-  //   this.getSalaryHeadList()
-
-  //   const headNatureMap: { [key: string]: number } = {
-  //     fixed: 1,
-  //     percentage: 2,
-  //     others: 3
-  //   };
-  //   const selectedTypeId = headNatureMap[this.selectedType];
-
-  // //  // Check for duplicate HEAD_NAME
-  // //     if (this.SalaryHeadData.HEAD_NAME) {
-  // //       const duplicateHead = this.salaryHeadList.find(
-  // //         (head: any) =>
-  // //           head.HEAD_NAME.trim().toLowerCase() === this.SalaryHeadData.HEAD_NAME.trim().toLowerCase() &&
-  // //           head.HEAD_ID !== this.SalaryHeadData.ID // Exclude current record from check
-  // //       );
-
-  // //       if (duplicateHead) {
-  // //         notify(
-  // //           {
-  // //             message: `Salary Head  name  already exists`,
-  // //             position: { at: 'top center', my: 'top center' },
-  // //           },
-  // //           'error'
-  // //         );
-  // //         return;
-  // //       }
-  // //     }
-
-  // // if (this.SalaryHeadData.HEAD_NAME) {
-  // //   const isDuplicate = this.salaryHeadList.some(
-  // //     (head: any) =>
-  // //       head.HEAD_NAME.trim().toLowerCase() === this.SalaryHeadData.HEAD_NAME.trim().toLowerCase()
-  // //   );
-
-  // //   if (isDuplicate) {
-  // //       notify(
-  // //                 {
-  // //                   message: 'Salary Head already exist',
-  // //                   position: { at: 'top center', my: 'top center' },
-  // //                 },
-  // //                 'error'
-  // //               );
-  // //     return;
-  // //   }
-
-  //     if (this.SalaryHeadData.HEAD_NAME) {
-  //   const isDuplicate = this.salaryHeadList.some((head: any) =>
-  //     head.HEAD_NAME.trim().toLowerCase() === this.SalaryHeadData.HEAD_NAME.trim().toLowerCase()
-  //     && head.ID !== this.SalaryHeadData.ID
-  //   );
-
-  //       if (isDuplicate) {
-  //         notify(
-  //           {
-  //             message: 'Salary Head already exist',
-  //             position: { at: 'top center', my: 'top center' },
-  //           },
-  //           'error'
-  //         );
-  //         return;
-  //       }
-  //     }
-
-  //   const payload={
-  //     ...this.SalaryHeadData,
-  //     HEAD_TYPE: this.selectedPriority,
-  //     HEAD_NATURE: selectedTypeId,
-  //   }
-  //        notify(
-  //                         {
-  //                           message: 'Salary Head updated successfully ',
-  //                           position: { at: 'top center', my: 'top center' },
-  //                         },
-  //                         'success'
-  //                       );
-
-  //  })
-
-  // }
+  isValid() {
+    return this.SalaryHeadValidation?.instance.validate().isValid;
+  }
 
   UpdateSalaryHeadData() {
-    //  this.dataservice.get_salary_head_list().subscribe((list: any) => {
-    //     this.salaryHeadList = list.Data;
-
+    if (!this.isValid()) return;
     const headNatureMap: { [key: string]: number } = {
       fixed: 1,
       percentage: 2,

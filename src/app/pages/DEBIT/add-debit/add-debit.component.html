@@ -53,7 +53,7 @@
                   [readOnly]="true"
                 ></dx-text-box>
                 <dx-select-box
-                  *ngIf="subType"
+                  *ngIf="showSubType"
                   [dataSource]="subTypeList"
                   displayExpr="SUB_TYPE_NAME"
                   valueExpr="SUB_TYPE_ID"
@@ -230,11 +230,7 @@
 
         <dxi-column
           dataField="gstAmount"
-          [caption]="
-            selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-              ? 'VAT Amount'
-              : ' GST Amount'
-          "
+          [caption]="vatTitle + ' Amount'"
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [calculateCellValue]="calculateTaxAmount"

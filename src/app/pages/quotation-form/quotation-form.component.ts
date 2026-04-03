@@ -165,6 +165,9 @@ export class QuotationFormComponent {
   savedTerms: any;
   manualAdd: boolean;
   selectedCustomerId: any;
+  isSaving = false;
+  itemDataCache: Map<string, any[]> = new Map();
+  storeId: any;
 
   constructor(
     private dataService: DataService,
@@ -173,27 +176,83 @@ export class QuotationFormComponent {
     private ngZone: NgZone,
   ) {}
 
-  ngOnInit() {
-    this.sessionData_tax();
-    this.getSalesmanDropdown();
-    this.getCustomerDropdown();
-    this.getPymentTermsDropdown();
-    this.getDeliveryTermsDropdown();
-    this.getQuotationNo(); // always fetch fresh number when popup opens
-    this.getTermsAndConditionsList();
+  // ngOnInit() {
+  //   const currentUrl = this.router.url;
+  //   console.log('Current URL:', currentUrl);
+  //   const menuResponse = JSON.parse(
+  //     sessionStorage.getItem('savedUserData') || '{}',
+  //   );
+  //   this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
 
+  //   this.userID = menuResponse.USER_ID;
+  //   this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
+  //   this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+  //   console.log(
+  //     this.companyID,
+  //     menuResponse,
+  //     'COMPANYIDDDDDDDDDDDDDDDDDDDDDDDDDDD',
+  //   );
+  //   const menuGroups = menuResponse.MenuGroups || [];
+  //   this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+  //   const packingRights = menuGroups
+  //     .flatMap((group) => group.Menus)
+  //     .find((menu) => menu.Path === '/quotation');
+
+  //   if (packingRights) {
+  //     this.canAdd = packingRights.CanAdd;
+  //     this.canEdit = packingRights.CanEdit;
+  //     this.canDelete = packingRights.CanDelete;
+  //     this.canPrint = packingRights.CanEdit;
+  //     this.canView = packingRights.canView;
+  //     this.canApprove = packingRights.canApprove;
+  //   }
+  //   if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
+  //     // this.getItemsList();
+  //   } else {
+  //     // this.getItemsList();
+  //   }
+  //   // this.getStoreDropdown();
+  //   console.log('packingRights', packingRights);
+  //   console.log(this.canAdd, this.canEdit, this.canDelete);
+  //   this.sessionData_tax();
+  //   this.getSalesmanDropdown();
+  //   this.getCustomerDropdown();
+  //   this.getPymentTermsDropdown();
+  //   this.getDeliveryTermsDropdown();
+  //   this.getQuotationNo(); // always fetch fresh number when popup opens
+  //   this.getTermsAndConditionsList();
+  //   this.getStoreDropdown();
+  //   // this.items = [];
+  //   // this.addEmptyRow();
+  //   this.getItems().subscribe(() => {
+  //     this.isEditDataAvailable();
+  //   });
+  //   this.setTaxSummaryLabel();
+  // }
+
+  ngOnInit() {
     const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
 
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+
     this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
 
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
-    this.companyID = menuResponse.Companies[0].COMPANY_ID;
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+
+    console.log(
+      this.companyID,
+      menuResponse,
+      'COMPANYIDDDDDDDDDDDDDDDDDDDDDDDDDDD',
+    );
+
     const menuGroups = menuResponse.MenuGroups || [];
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/quotation');
@@ -206,40 +265,57 @@ export class QuotationFormComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-    if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
-      // this.getItemsList();
-    } else {
-      // this.getItemsList();
-    }
-    // this.getStoreDropdown();
 
-    // this.items = [];
-    // this.addEmptyRow();
-    this.getItems().subscribe(() => {
+    console.log('packingRights', packingRights);
+    console.log(this.canAdd, this.canEdit, this.canDelete);
+
+    // Session + dropdowns
+    this.sessionData_tax();
+    this.getSalesmanDropdown();
+    this.getCustomerDropdown();
+    this.getPymentTermsDropdown();
+    this.getDeliveryTermsDropdown();
+    this.getTermsAndConditionsList();
+    this.getStoreDropdown();
+
+    // 🔥 IMPORTANT FIX FOR EDIT MODE
+    if (this.isEditing && this.EditingResponseData?.STORE_ID) {
+      this.storeId = this.EditingResponseData.STORE_ID;
+    }
+
+    // Fetch quotation number
+    this.getQuotationNo();
+
+    // SAFE CALL: getItems() may return undefined
+    const items$ = this.getItems();
+    if (items$) {
+      items$.subscribe(() => {
+        this.isEditDataAvailable();
+      });
+    } else {
+      // fallback when items are already cached or storeId missing
       this.isEditDataAvailable();
-    });
+    }
+
     this.setTaxSummaryLabel();
   }
 
   calculateSerialNumber = (rowData: any) => {
-    const index = this.quotationFormData.Details.findIndex(
-      (item) => item.ID === rowData.ID,
-    );
-    return index + 1;
+    return this.quotationFormData.Details.indexOf(rowData) + 1;
   };
 
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const data = this.EditingResponseData;
-
+    console.log(data, 'DATAINQUOTATION');
     this.combinedTerms = data.TERMS;
 
     // Map ITEM_NAME → DESCRIPTION for DevExtreme grid binding
     const mappedDetails = data.Details
       ? data.Details.map((item: any) => ({
           ...item,
-          DESCRIPTION: item.ITEM_NAME,
+          DESCRIPTION: item.ITEM_ID,
           ITEM_CODE: item.ITEM_ID,
           ITEM_ID: item.ITEM_ID,
           STOCK_QTY: item.QUANTITY,
@@ -290,6 +366,30 @@ export class QuotationFormComponent {
       }
     }
     this.reindexDetails();
+  }
+
+  getStoreDropdown() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'STORE',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.stores = response;
+      // .filter(
+      //   (store: any) => store.ID !== this.storeFromSession,
+      // );
+    });
+  }
+
+  onStoreChanged(event: any) {
+    this.storeId = event.value;
+    console.log(this.storeId, 'STORE_ID');
+
+    // Clear old items when store changes
+    this.items = [];
+
+    // Call API
+    this.getItems()?.subscribe();
   }
 
   private reindexDetails() {
@@ -419,13 +519,21 @@ export class QuotationFormComponent {
   }
 
   getSalesmanDropdown() {
-    this.dataService.getDropdownData('SALESMAN').subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'SALESMAN',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.salesman = response;
     });
   }
 
   getCustomerDropdown() {
-    this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'CUSTOMER',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.customer = response;
     });
   }
@@ -457,100 +565,167 @@ export class QuotationFormComponent {
   }
 
   getPymentTermsDropdown() {
-    this.dataService
-      .getDropdownData('PAYMENTTERMS')
-      .subscribe((response: any) => {
-        this.paymentTerms = response;
-      });
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'PAYMENTTERMS',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.paymentTerms = response;
+    });
   }
 
   getDeliveryTermsDropdown() {
-    this.dataService
-      .getDropdownData('PAYMENTTERMS')
-      .subscribe((response: any) => {
-        this.deliveryTerms = response;
-      });
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'DELIVERYTERMS',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.deliveryTerms = response;
+    });
   }
 
   getItems() {
-    const payload = { STORE_ID: this.storeFromSession };
+    const STORE_ID = this.storeId;
+    if (!STORE_ID) return;
+
+    const cacheKey = `${STORE_ID}`;
+
+    // Return from cache
+    if (this.itemDataCache.has(cacheKey)) {
+      this.items = [...this.itemDataCache.get(cacheKey)];
+      return;
+    }
+
+    const payload = { STORE_ID };
+
     return this.dataService.getItemsForQuotation(payload).pipe(
       tap((response: any) => {
-        this.items = response.Data;
+        this.items = response.Data || [];
+        this.itemDataCache.set(cacheKey, [...this.items]);
       }),
     );
   }
 
   onEditorPreparing(e: any) {
-    if (e.parentType === 'dataRow') {
-      e.editorOptions.height = 30; // fixed editor height
-      e.editorOptions.elementAttr = { style: 'height: 30px;' };
-    }
+    if (e.parentType !== 'dataRow') return;
+
+    const isLookup =
+      e.dataField === 'ITEM_CODE' || e.dataField === 'DESCRIPTION';
+
     if (
-      (e.dataField === 'ITEM_CODE' || e.dataField === 'DISC_PERCENT') &&
-      e.parentType === 'dataRow'
+      e.dataField === 'ITEM_CODE' ||
+      e.dataField === 'DESCRIPTION' ||
+      e.dataField === 'STOCK_QTY' ||
+      e.dataField === 'DISC_PERCENT' ||
+      e.dataField === 'PRICE' ||
+      e.dataField === 'UOM' ||
+      e.dataField === 'TAX_PERCENT' ||
+      e.dataField === 'AMOUNT' ||
+      e.dataField === 'TAX_AMOUNT' ||
+      e.dataField === 'REMARKS'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      //  your existing styles (UNCHANGED)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // ADD ONLY THIS BLOCK
+      if (isLookup) {
+        e.editorOptions.elementAttr = {
+          style: `
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        `,
+        };
+      }
+    }
+
+    if (
+      e.dataField === 'ITEM_CODE' ||
+      e.dataField === 'DESCRIPTION' ||
+      e.dataField === 'DISC_PERCENT'
     ) {
       e.editorOptions.onValueChanged = (args: any) => {
         const rowData = e.row.data;
 
-        if (e.dataField === 'ITEM_CODE') {
+        if (e.dataField === 'ITEM_CODE' || e.dataField === 'DESCRIPTION') {
           const selectedItem = this.items.find(
             (item) => item.ITEM_ID === args.value,
           );
+
           if (selectedItem) {
-            rowData.ITEM_CODE = selectedItem.ITEM_ID;
-            rowData.DESCRIPTION = selectedItem.DESCRIPTION;
-            rowData.STOCK_QTY = selectedItem.STOCK_QTY;
-            rowData.ITEM_ID = selectedItem.ITEM_ID;
+            const grid = e.component;
+            const rowIndex = e.row.rowIndex;
+
+            grid.cellValue(rowIndex, 'ITEM_ID', selectedItem.ITEM_ID);
+            grid.cellValue(rowIndex, 'ITEM_CODE', selectedItem.ITEM_ID);
+            grid.cellValue(rowIndex, 'DESCRIPTION', selectedItem.ITEM_ID);
+            grid.cellValue(
+              rowIndex,
+              'STOCK_QTY',
+              Number(selectedItem.STOCK_QTY || 0),
+            );
+            grid.cellValue(rowIndex, 'UOM', selectedItem.UOM);
+            grid.cellValue(
+              rowIndex,
+              'TAX_PERCENT',
+              Number(selectedItem.VAT_PERC || 0),
+            );
+            grid.cellValue(rowIndex, 'MATRIX_CODE', selectedItem.MATRIX_CODE);
+            grid.cellValue(rowIndex, 'PRICE', Number(selectedItem.COST || 0));
           }
         }
 
         if (e.dataField === 'DISC_PERCENT') {
-          rowData.DISC_PERCENT = args.value;
+          const grid = e.component;
+          const rowIndex = e.row.rowIndex;
+
+          grid.cellValue(rowIndex, 'DISC_PERCENT', Number(args.value || 0));
         }
 
-        // Save current row edits
-        e.component.saveEditData().then(() => {
-          const currentRowIndex = e.row.rowIndex;
+        e.component.saveEditData();
+      };
+    }
+  }
 
-          // Only add new row if DISC_PERCENT is not empty
-          if (
-            !this.manualAdd &&
-            e.dataField === 'DISC_PERCENT' &&
-            e.parentType === 'dataRow'
-          ) {
-            const newRow = {
-              ID: 0,
-              QTN_ID: 0,
-              ITEM_ID: 0,
-              UOM: '',
-              QUANTITY: 0,
-              PRICE: 0,
-              DISC_PERCENT: 0,
-              AMOUNT: 0,
-              TAX_PERCENT: 0,
-              TAX_AMOUNT: 0,
-              TOTAL_AMOUNT: 0,
-              REMARKS: '',
-            };
+  onTermsEditorPreparing(e: any) {
+    if (e.dataField === 'TERMS') {
+      e.editorOptions = e.editorOptions || {};
 
-            this.quotationFormData.Details.splice(
-              currentRowIndex + 1,
-              0,
-              newRow,
-            );
+      //  your existing styles (UNCHANGED)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
 
-            // Refresh grid
-            e.component.option('dataSource', [
-              ...this.quotationFormData.Details,
-            ]);
-
-            // Focus new row
-            setTimeout(() => {
-              e.component.editCell(currentRowIndex + 1, 'SL_NO');
-            }, 100);
-          }
-        });
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
       };
     }
   }
@@ -560,7 +735,10 @@ export class QuotationFormComponent {
     const itemId = rowData.ITEM_ID;
 
     this.dataService.getHistoryQuotation(itemId).subscribe((response: any) => {
-      this.quotationHistory = response.Data;
+      this.quotationHistory = Array.isArray(response)
+        ? response
+        : response.Data || [];
+      console.log(this.quotationHistory, 'QUOTATIONHISTORY');
       this.popupVisible = true;
 
       this.cdr.detectChanges(); // force Angular to update view immediately
@@ -568,19 +746,27 @@ export class QuotationFormComponent {
   };
 
   getQuotationNo() {
-    this.dataService.getVoucherNoForQuotation().subscribe(
-      (response: any) => {
-        if (response?.Flag === 1 && response?.Data?.length) {
-          this.quotationFormData.QTN_NO = response.Data[0].VOCHERNO;
-          console.log(this.quotationFormData.SO_NO, 'SONO');
-        } else {
-          console.error('No data returned for voucher number');
-        }
-      },
-      (err) => {
-        console.error('API error:', err);
-      },
-    );
+    const payload = {
+      TRANS_TYPE: 10,
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      this.quotationFormData.QTN_NO = response.DOC_NO;
+      console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
+    });
+    // this.dataService.getVoucherNoForQuotation().subscribe(
+    //   (response: any) => {
+    //     if (response?.Flag === 1 && response?.Data?.length) {
+    //       this.quotationFormData.QTN_NO = response.Data[0].VOCHERNO;
+    //       console.log(this.quotationFormData.SO_NO, 'SONO');
+    //     } else {
+    //       console.error('No data returned for voucher number');
+    //     }
+    //   },
+    //   (err) => {
+    //     console.error('API error:', err);
+    //   },
+    // );
   }
 
   calculateGrossAmount = (rowData: any) => {
@@ -628,14 +814,16 @@ export class QuotationFormComponent {
       (this.selected_vat_id === this.sessionData.VAT_ID &&
       this.sessionData.VAT_ID === 2
         ? 'VAT Amount'
-        : 'GST Amount') + ': {0}';
+        : 'VAT Amount') + ': {0}';
   }
   onGridReady(e: any) {
-    const total = this.dataGrid.instance.getTotalSummaryValue('TOTAL_AMOUNT');
-    const grossAmount =
-      this.dataGrid.instance.getTotalSummaryValue('GROSS_AMOUNT');
-    this.quotationFormData.NET_AMOUNT = total;
-    this.quotationFormData.GROSS_AMOUNT = grossAmount;
+    setTimeout(() => {
+      const total = e.component.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
+      const gross = e.component.getTotalSummaryValue('GROSS_AMOUNT') || 0;
+
+      this.quotationFormData.NET_AMOUNT = total;
+      this.quotationFormData.GROSS_AMOUNT = gross;
+    }, 0);
   }
 
   onRoundOffChange(e: any) {
@@ -664,6 +852,14 @@ export class QuotationFormComponent {
     // 1. Validation
     if (!this.quotationFormData.CUST_ID) {
       notify('Please select a customer.', 'error', 3000);
+      return;
+    }
+    if (!this.quotationFormData.REF_NO) {
+      notify('Please enter reference no.', 'error', 3000);
+      return;
+    }
+    if (!this.quotationFormData.STORE_ID) {
+      notify('Please select a store', 'error', 3000);
       return;
     }
 
@@ -700,7 +896,7 @@ export class QuotationFormComponent {
       ...this.quotationFormData, // spread header values first
       QTN_DATE: this.formatDate(this.quotationFormData.QTN_DATE),
       COMPANY_ID: this.companyID,
-      STORE_ID: this.storeFromSession,
+      STORE_ID: this.storeId,
       FIN_ID: this.finID,
       USER_ID: this.userID,
       ROUND_OFF: this.isRoundOff,
@@ -732,25 +928,37 @@ export class QuotationFormComponent {
     }
 
     const proceedWithSave = () => {
+      this.isSaving = true;
       const apiCall = this.isEditing
         ? this.isApproved
           ? this.dataService.approveSalesQuotation(payload) // Approve API
           : this.dataService.updateSalesQuotation(payload) // Update API
         : this.dataService.insertSalesQuotation(payload); // Save API
 
-      apiCall.subscribe((response: any) => {
-        if (response.Flag === '1') {
-          notify(
-            response.Message || 'Quotation saved successfully',
-            'success',
-            2000,
-          );
-          this.popupClosed.emit();
-          this.getQuotationNo();
-        } else {
-          notify(response.Message || 'Failed to save quotation', 'error', 2000);
-        }
-      });
+      apiCall.subscribe(
+        (response: any) => {
+          if (response.Flag === '1') {
+            this.isSaving = false;
+            notify(
+              response.Message || 'Quotation saved successfully',
+              'success',
+              2000,
+            );
+            this.popupClosed.emit();
+            this.getQuotationNo();
+          } else {
+            notify(
+              response.Message || 'Failed to save quotation',
+              'error',
+              2000,
+            );
+          }
+        },
+        () => {
+          this.isSaving = false; // ERROR → STOP LOADING
+          notify('Something went wrong. Please try again.', 'error', 2000);
+        },
+      );
     };
 
     // Confirmation before approving
@@ -774,6 +982,7 @@ export class QuotationFormComponent {
 
   printQuotation() {
     const data = this.quotationFormData;
+    console.log(data);
 
     const formatDate = (dateStr: string) => {
       if (!dateStr) return '';

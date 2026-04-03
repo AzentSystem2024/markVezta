@@ -12,7 +12,6 @@ import { saveAs } from 'file-saver-es';
 import { exportDataGrid as exportDataGridToPdf } from 'devextreme/pdf_exporter';
 import { exportDataGrid as exportDataGridToXLSX } from 'devextreme/excel_exporter';
 import { environment } from 'src/environments/environment';
-import { Verify } from 'crypto';
 import { AnyARecord } from 'dns';
 
 const API_URL = 'https://js.devexpress.com/Demos/RwaService/api';
@@ -72,10 +71,6 @@ export class DataService {
     'http://103.180.120.134/veztaretail/api/worksheetitemproperty/approval';
   private apiUrlForDelete =
     'http://103.180.120.134/veztaretail/api/worksheetitemproperty/delete';
-  private apiForWorksheet =
-    'http://veztaapi.diligenzit.com/api/worksheetitemproperty';
-  private apiUrlForStorePrices =
-    'http://103.180.120.134/veztaretail/api/itemvizard';
 
   constructor(private http: HttpClient) {
     // this.sesstion_Details();
@@ -92,11 +87,17 @@ export class DataService {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const storedData = sessionStorage.getItem('savedUserData');
+    if (storedData) {
+      const sessionData = JSON.parse(storedData);
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+      this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+      this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    } else {
+      // Handle the case where session data is not available, e.g., set defaults or throw an error
+      console.error('Session data not found');
+    }
   }
 
   getAccountGroupHeadList(data: any): Observable<any> {
@@ -236,7 +237,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/update`, data);
   }
 
-  deleteArticle(payload) {
+  deleteArticle(payload: any) {
     return this.http.post<any>(`${this.apiUrl}article/delete`, payload);
   }
 
@@ -587,6 +588,10 @@ export class DataService {
   insertLedgerSettings(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}ACDefaults/Insert`, data);
+  }
+  DeletetLedgerSettings(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ACDefaults/delete`, data);
   }
   //--------------------------INVOICE-DELIVERY-------------------------------------//
 
@@ -988,7 +993,7 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}Receipt/delete/` + id, {});
   }
 
-  getTimesheetListForPayroll(payload) {
+  getTimesheetListForPayroll(payload: any) {
     const getEndpoint = `${this.apiUrl}TimeSheet/payroll-pending`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1212,11 +1217,11 @@ export class DataService {
   }
 
   //  ===========ARTICLE PRODUCTION======================
-  get_ArticleProduction_view(payload) {
+  get_ArticleProduction_view(payload: any) {
     return this.http.post(`${this.apiUrl}AC_Report/articleproduction`, payload);
   }
 
-  get_BoxProduction_view(payload) {
+  get_BoxProduction_view(payload: any) {
     return this.http.post(`${this.apiUrl}AC_Report/Boxproduction`, payload);
   }
 
@@ -1227,12 +1232,12 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
 
-  get_PaytimeEntry_list(payload) {
+  get_PaytimeEntry_list(payload: any) {
     const getEndpoint = `${this.apiUrl}PayTimeEntry/select`;
     return this.http.post(getEndpoint, payload);
   }
 
-  Insert_PaytimeEntry(payload) {
+  Insert_PaytimeEntry(payload: any) {
     const getEndpoint = `${this.apiUrl}PayTimeEntry/save`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1260,7 +1265,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
 
-  Insert_PrePayment(payload) {
+  Insert_PrePayment(payload: any) {
     const getEndpoint = `${this.apiUrl}PrePayment/insert`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1269,7 +1274,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}PrePayment/select/${id}`, {});
   }
 
-  Update_PrePayment(payload) {
+  Update_PrePayment(payload: any) {
     const getEndpoint = `${this.apiUrl}PrePayment/update`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1278,7 +1283,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}PrePayment/delete/${id}`, {});
   }
 
-  Approve_PrePayment(payload) {
+  Approve_PrePayment(payload: any) {
     const getEndpoint = `${this.apiUrl}PrePayment/commit`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1287,17 +1292,17 @@ export class DataService {
   //   const reqbody = { NAME: 'SUPPLIER' };
   //   return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   // }
-  Supplier_Dropdown(payload) {
+  Supplier_Dropdown(payload: any) {
     const getEndpoint = `${this.apiUrl}dropdown`;
     return this.http.post(getEndpoint, payload);
   }
 
-  Common_Dropdown(payload) {
+  Common_Dropdown(payload: any) {
     const getEndpoint = `${this.apiUrl}dropdown`;
     return this.http.post(getEndpoint, payload);
   }
 
-  Get_SubDepartment_Dropdown(payload) {
+  Get_SubDepartment_Dropdown(payload: any) {
     const getEndpoint = `${this.apiUrl}Employee/getsubdept`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1312,7 +1317,7 @@ export class DataService {
   //   return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   // }
 
-  Customer_Dropdown(payload) {
+  Customer_Dropdown(payload: any) {
     const getEndpoint = `${this.apiUrl}dropdown`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1323,7 +1328,7 @@ export class DataService {
     return this.http.post(getEndpoint, data);
   }
 
-  Insert_PDC(payload) {
+  Insert_PDC(payload: any) {
     const getEndpoint = `${this.apiUrl}PDC/save`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1332,7 +1337,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}PDC/select/${id}`, {});
   }
 
-  Update_PDC(payload) {
+  Update_PDC(payload: any) {
     const getEndpoint = `${this.apiUrl}PDC/update`;
     return this.http.post(getEndpoint, payload);
   }
@@ -1723,7 +1728,7 @@ export class DataService {
       DESCRIPTION: payload.DESCRIPTION,
       DEPARTMENT_ID: payload.DEPARTMENT_ID,
     };
-    return this.http.post(`${this.apiUrl}SubDepartment/update`, data);
+    return this.http.post(`${this.apiUrl}SubDepartment/save`, data);
   }
 
   removeSubdepartment(id: any) {
@@ -1825,9 +1830,18 @@ export class DataService {
     CODE: any,
     VAT_NAME: any,
     VAT_PERC: any,
+    VAT_INPUT_HEAD_ID: any,
+    VAT_OUTPUT_HEAD_ID: any,
     COMPANY_ID: AnyARecord,
   ): Observable<any> {
-    const data = { CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
+    const data = {
+      CODE,
+      VAT_NAME,
+      VAT_PERC,
+      VAT_INPUT_HEAD_ID,
+      VAT_OUTPUT_HEAD_ID,
+      COMPANY_ID,
+    };
 
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
@@ -1845,9 +1859,19 @@ export class DataService {
     CODE: any,
     VAT_NAME: any,
     VAT_PERC: any,
+    VAT_INPUT_HEAD_ID: any,
+    VAT_OUTPUT_HEAD_ID: any,
     COMPANY_ID: any,
   ): Observable<any> {
-    const data = { ID, CODE, VAT_NAME, VAT_PERC, COMPANY_ID };
+    const data = {
+      ID,
+      CODE,
+      VAT_NAME,
+      VAT_PERC,
+      VAT_INPUT_HEAD_ID,
+      VAT_OUTPUT_HEAD_ID,
+      COMPANY_ID,
+    };
 
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
@@ -1988,7 +2012,7 @@ export class DataService {
     STATE_ID: any,
     CITY: any,
     COUNTRY_ID: any,
-    IS_DEFAULT_STORE,
+    IS_DEFAULT_STORE: any,
     PHONE: any,
     EMAIL: any,
     VAT_REGNO: any,
@@ -2602,65 +2626,7 @@ export class DataService {
     const getEndpoint = `${this.apiUrl}customer/select/${ID}`;
     return this.http.post(getEndpoint, {});
   }
-  //   public postCustomerData(
-  // COMPANY_ID:any,
-  //     CUST_CODE: any,
-  //     FIRST_NAME: any,
-  //     LAST_NAME: any,
-  //     DOB: any,
-  //     NATIONALITY: any,
-  //     CONTACT_NAME: any,
-  //     ADDRESS1: any,
-  //     ADDRESS2: any,
-  //     ADDRESS3: any,
-  //     ZIP: any,
-  //     STATE_ID: any,
-  //     CITY: any,
-  //     COUNTRY_ID: any,
-  //     PHONE: any,
-  //     MOBILE_NO: any,
-  //     EMAIL: any,
-  //     FAX_NO: any,
-  //     CREDIT_LIMIT: any,
-  //     CURRENT_CREDIT: any,
-  //     PAY_TERM_ID: any,
-  //     NOTES: any,
-  //     PRICE_CLASS_ID: any,
-  //     DISCOUNT_PERCENT: any,
-  //     CUST_VAT_RULE_ID: any,
-  //     VAT_REGNO: any
-  //   ): Observable<any> {
-  //     const data = {
-  //       CUST_CODE,
-  //       FIRST_NAME,
-  //       LAST_NAME,
-  //       DOB,
-  //       NATIONALITY,
-  //       CONTACT_NAME,
-  //       ADDRESS1,
-  //       ADDRESS2,
-  //       ADDRESS3,
-  //       ZIP,
-  //       STATE_ID,
-  //       CITY,
-  //       COUNTRY_ID,
-  //       PHONE,
-  //       MOBILE_NO,
-  //       EMAIL,
-  //       FAX_NO,
-  //       CREDIT_LIMIT,
-  //       CURRENT_CREDIT,
-  //       PAY_TERM_ID,
-  //       NOTES,
-  //       PRICE_CLASS_ID,
-  //       DISCOUNT_PERCENT,
-  //       CUST_VAT_RULE_ID,
-  //       VAT_REGNO,
-  //       COMPANY_ID
-  //     };
-
-  //     return this.http.post(`${this.apiUrl}customer/save`, data);
-  //   }
+ 
   insert_customer_Data(item: any) {
     const payload = item;
     return this.http.post(`${this.apiUrl}customer/save`, payload);
@@ -2876,7 +2842,7 @@ export class DataService {
     ARABIC_DESCRIPTION: any,
     TENDER_TYPE: any,
     DISPLAY_ORDER: any,
-    CURRENCY_ID,
+    CURRENCY_ID: any,
     ALLOW_OPENING: any,
     ALLOW_DECLARATION: any,
     ADDITIONAL_INFO_REQUIRED: any,
@@ -3033,10 +2999,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}country/list`, {});
   }
 
-  getData(rowCount, columnCount) {
+  getData(rowCount: any, columnCount: any) {
     const items = [];
     for (let i = 0; i < rowCount; i++) {
-      const item = {};
+      const item: { [key: string]: any } = {};
       for (let j = 0; j < columnCount; j++) {
         item[`field${j + 1}`] = `${i + 1}-${j + 1}`;
       }
@@ -3226,23 +3192,14 @@ export class DataService {
     this.getContactOpportunities(id, false);
 
   public getContactOpportunities = (id: number, isActive: boolean) =>
-    this.http
-      .get<any>(`${API_URL}/Users/Contacts/${id}/Opportunities`)
-      .pipe
-      // map((data) =>
-      //   // data.filter((_: any, index: number) => {
-      //   //   const isEven = index % 2 === 0;
-      //   //   return isActive ? isEven : !isEven;
-      //   // })
-      // );
-      ();
+    this.http.get<any>(`${API_URL}/Users/Contacts/${id}/Opportunities`).pipe();
 
   public getSalesByStateAndCity = (startDate: string, endDate: string) =>
     this.http.get(
       `${API_URL}/Analytics/SalesByStateAndCity/${startDate}/${endDate}`,
     );
 
-  public getSalesByState = (data) => {
+  public getSalesByState = (data: any) => {
     let dataByState;
     from(data)
       .pipe(
@@ -3366,7 +3323,7 @@ export class DataService {
       ],
     ]);
 
-  public getAppointmentsDefaultTime = (index) =>
+  public getAppointmentsDefaultTime = (index: any) =>
     [
       {
         weekDay: 0,
@@ -3488,10 +3445,6 @@ The result can be exported to HTML or Markdown.`;
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/items/list`, params);
   }
-
-  // pushItemToStore(payloads: any): Observable<any> {
-  //   return this.http.post(`${this.apiUrl}/itemvizard/insert`, payloads);
-  // }
 
   pushItemToStore(payloads: ItemStorePayload): Observable<any> {
     return this.http.post(`${this.apiUrl}/itemvizard/insert`, payloads);
@@ -3934,7 +3887,7 @@ The result can be exported to HTML or Markdown.`;
 
   //---------------HR Masters-----------------
 
-  get_Department_List(payload) {
+  get_Department_List(payload: any) {
     const getEndpoint = this.apiUrl + 'Department/list';
     return this.http.post(getEndpoint, payload);
   }
@@ -4088,18 +4041,18 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //========================Pay settings============================
-  get_PaySettingsList(payload) {
+  get_PaySettingsList(payload: any) {
     const getEndpoint = this.apiUrl + 'PaySettings/list';
     return this.http.post(getEndpoint, payload);
   }
 
   //=================get Leadger Dropdown ===================
-  get_Ledger_Api(payload) {
+  get_Ledger_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'DropDown';
     return this.http.post(getEndpoint, payload);
   }
 
-  Update_PaySettings_Api(payload) {
+  Update_PaySettings_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'PaySettings/save';
     return this.http.post(getEndpoint, payload);
   }
@@ -4199,7 +4152,6 @@ The result can be exported to HTML or Markdown.`;
   //===========delete Api==================
   Delete_LeaveType_Api(ID: any) {
     return this.http.post(`${this.apiUrl}LeaveType/delete/${ID}`, {});
-  
   }
 
   //EMPLOYEE
@@ -4665,34 +4617,34 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //SALARY SETTINGS
-  getEmployeeSalarySettingsList(payload) {
+  getEmployeeSalarySettingsList(payload: any) {
     const getEndpoint = `${this.apiUrl}EmployeeSalary/ListSalarySettings`;
     return this.http.post(getEndpoint, payload);
   }
 
   //==========Dropdown for Employee Salary Settings==========
-  getEmployeeDropDown(payload) {
+  getEmployeeDropDown(payload: any) {
     const getEndpoint = `${this.apiUrl}dropdown`;
     return this.http.post(getEndpoint, payload);
   }
   //=========List of SalaryHead============
-  get_SalaryHeadList_Api(payload) {
+  get_SalaryHeadList_Api(payload: any) {
     const getEndpoint = `${this.apiUrl}EmployeeSalary/list`;
     return this.http.post(getEndpoint, payload);
   }
 
   //============Insert Employee Salary Settings Api=========================
-  Insert_EmployeeSalarySettings_Api(payload) {
+  Insert_EmployeeSalarySettings_Api(payload: any) {
     const getEndpoint = `${this.apiUrl}EmployeeSalary/save`;
     return this.http.post(getEndpoint, payload);
   }
 
-  Select_EmployeeSalarySettings_Api(payload) {
+  Select_EmployeeSalarySettings_Api(payload: any) {
     const getEndpoint = `${this.apiUrl}EmployeeSalary/select`;
     return this.http.post(getEndpoint, payload);
   }
 
-  Update_EmployeeSalarySettings_Api(payload) {
+  Update_EmployeeSalarySettings_Api(payload: any) {
     const getEndpoint = `${this.apiUrl}EmployeeSalary/edit`;
     return this.http.post(getEndpoint, payload);
   }
@@ -4707,7 +4659,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post<any>('YOUR_API_ENDPOINT', { year, month });
   }
 
-  Timesheet_List_Api(payload) {
+  Timesheet_List_Api(payload: any) {
     const getEndpoint = `${this.apiUrl}TimeSheet/List`;
     return this.http.post(getEndpoint, payload);
   }
@@ -4718,7 +4670,7 @@ The result can be exported to HTML or Markdown.`;
   saveTimesheetData(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}TimeSheet/save`, payload);
   }
-  Timesheet_Approval_Api(payload) {
+  Timesheet_Approval_Api(payload: any) {
     const getEndpoint = `${this.apiUrl}TimeSheet/approvetimesheet`;
     return this.http.post(getEndpoint, payload);
   }
@@ -4767,7 +4719,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}EmployeeEOS/getEmployeeData`, reqbody);
   }
 
-  get_EmployeeDetailsFor_Leave_Api(payload) {
+  get_EmployeeDetailsFor_Leave_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/emplist';
     return this.http.post(getEndpoint, payload);
   }
@@ -5003,7 +4955,7 @@ The result can be exported to HTML or Markdown.`;
     Remarks: any,
     Leave_salary_payable: any,
   ) {
-    const getEndpoint = this.apiUrl + '/EmployeeVacation/save';
+    const getEndpoint = this.apiUrl + 'EmployeeVacation/save';
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5216,7 +5168,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Insert_ArticleColor_Api(payload) {
+  Insert_ArticleColor_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'ArticleColor/insert';
     return this.http.post(getEndpoint, payload);
   }
@@ -5254,7 +5206,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Insert_ArticleBrand_Api(payload) {
+  Insert_ArticleBrand_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'ArticleBrand/insert';
     return this.http.post(getEndpoint, payload);
   }
@@ -5291,7 +5243,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Insert_ArticleType_Api(payload) {
+  Insert_ArticleType_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'ArticleType/insert';
     return this.http.post(getEndpoint, payload);
   }
@@ -5380,7 +5332,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=================Insert Dealer Master Api=========================
-  Insert_Dealer_Api(payload) {
+  Insert_Dealer_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'Distributor/insert';
     return this.http.post(getEndpoint, payload);
   }
@@ -5392,7 +5344,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=================Update Dealer Master Api=========================
-  Update_Dealer_Api(payload) {
+  Update_Dealer_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'Distributor/update';
     return this.http.post(getEndpoint, payload);
   }
@@ -5403,12 +5355,12 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Insert_NewDistrict_Api(payload) {
+  Insert_NewDistrict_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'Distributor/savedistrict';
     return this.http.post(getEndpoint, payload);
   }
 
-  Insert_NewCity_Api(payload) {
+  Insert_NewCity_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'Distributor/savecity';
     return this.http.post(getEndpoint, payload);
   }
@@ -5466,13 +5418,13 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //============insert data==============
-  Insert_CompanyList_Api(payload) {
+  Insert_CompanyList_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'Company/insert';
     return this.http.post(getEndpoint, payload);
   }
 
   //============insert data==============
-  Update_CompanyList_Api(payload) {
+  Update_CompanyList_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'Company/update';
     return this.http.post(getEndpoint, payload);
   }
@@ -5496,12 +5448,12 @@ The result can be exported to HTML or Markdown.`;
 
   //====================VIEW===================
 
-  get_ArticleStock_Api(payload) {
+  get_ArticleStock_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'View/list';
     return this.http.post(getEndpoint, payload);
   }
 
-  // get_ArticleProduction_view(payload){
+  // get_ArticleProduction_view(payload:any){
 
   //     return this.http.post(`${this.apiUrl}AC_Report/articleproduction`, payload);
   // }
@@ -5562,7 +5514,7 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(`${this.apiUrl}UserRole/insert`, payload);
   }
-  //   Insert_UserLevelList_Api(payload) {
+  //   Insert_UserLevelList_Api(payload:any) {
   //   const getEndpoint = this.apiUrl+'UserRole/insert';
   //   return this.http.post(getEndpoint, payload);
   // }
@@ -5580,7 +5532,7 @@ The result can be exported to HTML or Markdown.`;
   //       return this.http.post(`${this.apiUrl}UserRole/insert`, payload);
 
   //   }
-  //   Insert_UserLevelList_Api(payload) {
+  //   Insert_UserLevelList_Api(payload:any) {
   //   const getEndpoint = this.apiUrl+'UserRole/insert';
   //   return this.http.post(getEndpoint, payload);
   // }
@@ -5675,18 +5627,6 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  // get_combinbation_list_api(payload: any) {
-  //   const params = payload;
-  //   // const params = new HttpParams()
-  //   //   .set('artNo', payload.artNo)
-  //   //   .set('color', payload.color)
-  //   //   .set('categoryID', payload.categoryID)
-  //   //   .set('unitID', payload.unitID)
-  //   //   .set('COMPANY_ID',payload.COMPANY_ID);
-  //   const getEndpoint = this.apiUrl + 'packing/sizes-for-combination';
-  //   return this.http.post(getEndpoint, {}, params );
-  // }
-
   get_combinbation_list_api(item: any) {
     const payload = item;
     return this.http.post(
@@ -5771,7 +5711,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}AC_Report/ledger`, payload);
   }
 
-  Journal_Booking_Api(payload) {
+  Journal_Booking_Api(payload: any) {
     const getEndpoint = `${this.apiUrl}JournalBook`;
     return this.http.post(getEndpoint, payload);
   }
@@ -5805,7 +5745,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // REPORT============
-  Trial_Balance_Api(payload) {
+  Trial_Balance_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AcReports/TrialBalance';
     return this.http.post(getEndpoint, payload);
   }
@@ -5916,57 +5856,57 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=================PROFIT & LOSS===================
-  Profit_Loss_Api(payload) {
+  Profit_Loss_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/profitloss';
     return this.http.post(getEndpoint, payload);
   }
 
   //===========Balance sheet======================
-  Balance_Sheet_Api(payload) {
+  Balance_Sheet_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheet';
     return this.http.post(getEndpoint, payload);
   }
 
   //===============SupplierStatemnt Report=====================
-  Supplier_Report_Api(payload) {
+  Supplier_Report_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/SupplierStatement';
     return this.http.post(getEndpoint, payload);
   }
   //===========Balance sheet======================
-  customer_report_Api(payload) {
+  customer_report_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/custrpt';
     return this.http.post(getEndpoint, payload);
   }
   //===========Aged receivable sheet======================
-  Aged_receivable_report_Api(payload) {
+  Aged_receivable_report_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/custaging';
     return this.http.post(getEndpoint, payload);
   }
 
   //======================custmer statment details=============================
 
-  Customer_statement_Details_Api(payload) {
+  Customer_statement_Details_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/customerdtl';
     return this.http.post(getEndpoint, payload);
   }
 
   //===========Aged Payable Report===============
-  AgedPayable_Report_Api(payload) {
+  AgedPayable_Report_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/AgedPayable';
     return this.http.post(getEndpoint, payload);
   }
 
-  SupplierDetails_Report_Api(payload) {
+  SupplierDetails_Report_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/SupplierStatementDetail';
     return this.http.post(getEndpoint, payload);
   }
 
-  InputVat_Report_Api(payload) {
+  InputVat_Report_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/inputvat';
     return this.http.post(getEndpoint, payload);
   }
 
-  Output_VAT_Report_Api(payload) {
+  Output_VAT_Report_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/outputvat';
     return this.http.post(getEndpoint, payload);
   }
@@ -5977,7 +5917,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
   //==============VAT Retrun==================
-  VAT_Return_Report_Api(payload) {
+  VAT_Return_Report_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/vatreturn';
     return this.http.post(getEndpoint, payload);
   }
@@ -6067,13 +6007,13 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //================= Stock Movement Report ===================
-  StockMovement_Api(payload) {
+  StockMovement_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'StockMovementRpt/stockrpt';
     return this.http.post(getEndpoint, payload);
   }
 
   //DROPDOWN ITEM
-  Item_Dropdown(payload) {
+  Item_Dropdown(payload: any) {
     // const reqbody = { NAME: 'PARENTITEM' };
     return this.http.post(`${this.apiUrl}dropdown`, payload);
   }
@@ -6087,17 +6027,17 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}Delivery_Return/select/${id}`, {});
   }
 
-  get_DNList_Data(payload) {
+  get_DNList_Data(payload: any) {
     const getEndpoint = this.apiUrl + 'Delivery_Return/getdn';
     return this.http.post(getEndpoint, payload);
   }
 
-  Insert_DeliveryReturn_Data(payload) {
+  Insert_DeliveryReturn_Data(payload: any) {
     const getEndpoint = this.apiUrl + 'Delivery_Return/insert';
     return this.http.post(getEndpoint, payload);
   }
 
-  Update_DeliveryReturn_Data(payload) {
+  Update_DeliveryReturn_Data(payload: any) {
     const getEndpoint = this.apiUrl + 'Delivery_Return/update';
     return this.http.post(getEndpoint, payload);
   }
@@ -6117,7 +6057,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Insert_DeliveryAddress_Api(payload) {
+  Insert_DeliveryAddress_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'CustomerAddress/save';
     return this.http.post(getEndpoint, payload);
   }
@@ -6189,65 +6129,65 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
-  BankReconciliation_List(payload) {
+  BankReconciliation_List(payload: any) {
     const getEndpoint = `${this.apiUrl}BankReconciliation/bankrecon`;
     return this.http.post(getEndpoint, payload);
   }
 
-  Insert_BankReconciliation(payload) {
+  Insert_BankReconciliation(payload: any) {
     const getEndpoint = `${this.apiUrl}BankReconciliation/save`;
     return this.http.post(getEndpoint, payload);
   }
 
-  List_setting(payload) {
+  List_setting(payload: any) {
     const getEndpoint = `${this.apiUrl}DocSettings/list`;
     return this.http.post(getEndpoint, payload);
   }
-  Add_setting(payload) {
+  Add_setting(payload: any) {
     const getEndpoint = `${this.apiUrl}DocSettings/insert`;
     return this.http.post(getEndpoint, payload);
   }
-  Doc_Last_SNo(payload) {
+  Doc_Last_SNo(payload: any) {
     const getEndpoint = `${this.apiUrl}DocSettings/nextvoucherno`;
     return this.http.post(getEndpoint, payload);
   }
 
   //======================GST REPORT(B2B)===========================
-  GST_Report_Api(payload) {
+  GST_Report_Api(payload: any) {
     const getEndpoint = `${this.apiUrl}GSTReport/Gstrpt`;
     return this.http.post(getEndpoint, payload);
   }
 
   //======================GST REPORT(B2CL)===========================
-  GST_Report_Api_B2CL(payload) {
+  GST_Report_Api_B2CL(payload: any) {
     const getEndpoint = `${this.apiUrl}GSTReport/Gstb2cl`;
     return this.http.post(getEndpoint, payload);
   }
 
   //======================GST REPORT(CDNR)===========================
-  GST_Report_Api_CDNR(payload) {
+  GST_Report_Api_CDNR(payload: any) {
     const getEndpoint = `${this.apiUrl}GSTReport/Gstcdnr`;
     return this.http.post(getEndpoint, payload);
   }
 
   //==============PRODUCT IN ARTICLE PRODUCTION=================
-  get_Product_In_Article_Production_Api(payload) {
+  get_Product_In_Article_Production_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'ArticleProduction/articlebomlist';
     return this.http.post(getEndpoint, payload);
   }
 
   //==============INSERT IN ARTICLE PRODUCTION=================
-  Insert_Article_Production_Api(payload) {
+  Insert_Article_Production_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'ArticleProduction/insert';
     return this.http.post(getEndpoint, payload);
   }
 
-  Update_Article_Production_Api(payload) {
+  Update_Article_Production_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'ArticleProduction/update';
     return this.http.post(getEndpoint, payload);
   }
 
-  Commit_Article_Production_Api(payload) {
+  Commit_Article_Production_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'ArticleProduction/commit';
     return this.http.post(getEndpoint, payload);
   }
@@ -6260,17 +6200,17 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //==============INSERT IN BOX PRODUCTION=================
-  Insert_Box_Production_Api(payload) {
+  Insert_Box_Production_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'BoxProduction/insert';
     return this.http.post(getEndpoint, payload);
   }
 
-  Update_Box_Production_Api(payload) {
+  Update_Box_Production_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'BoxProduction/update';
     return this.http.post(getEndpoint, payload);
   }
 
-  Commit_Box_Production_Api(payload) {
+  Commit_Box_Production_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'BoxProduction/commit';
     return this.http.post(getEndpoint, payload);
   }
@@ -6280,17 +6220,17 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //==============PRODUCT IN BOX PRODUCTION=================
-  get_Product_In_Bom_Production_Api(payload) {
+  get_Product_In_Bom_Production_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'BoxProduction/packingbomlist';
     return this.http.post(getEndpoint, payload);
   }
 
-  Insert_PackingPrice_Change_Api(payload) {
+  Insert_PackingPrice_Change_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'Packing/InsertPackingPriceLog';
     return this.http.post(getEndpoint, payload);
   }
 
-  View_PackingPrice_Change_Api(payload) {
+  View_PackingPrice_Change_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'Packing/GetPackingPriceLog';
     return this.http.post(getEndpoint, payload);
   }
@@ -6329,32 +6269,32 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}TimeSheet/employee-vacation`, {});
   }
 
-  FixedAssetRegister_List(payload) {
+  FixedAssetRegister_List(payload: any) {
     const getEndpoint = this.apiUrl + 'Report/fixedassetreport';
     return this.http.post(getEndpoint, payload);
   }
 
-  Depreciation_Report(payload) {
+  Depreciation_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'Report/depreciationreport';
     return this.http.post(getEndpoint, payload);
   }
 
-  PDC_Report(payload) {
+  PDC_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'Report/pdclist';
     return this.http.post(getEndpoint, payload);
   }
 
-  Prepayment_posting_Report(payload) {
+  Prepayment_posting_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'Report/prepaymentreport';
     return this.http.post(getEndpoint, payload);
   }
 
-  SalaryWPSFile(payload) {
+  SalaryWPSFile(payload: any) {
     const getEndpoint = this.apiUrl + 'SalaryWPS/wps';
     return this.http.post(getEndpoint, payload);
   }
 
-  profitLoss_Branch_Report(payload) {
+  profitLoss_Branch_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'Report/profitlossbranch';
     return this.http.post(getEndpoint, payload);
   }

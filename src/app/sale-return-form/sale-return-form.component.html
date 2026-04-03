@@ -228,7 +228,7 @@
           <dxi-column
             dataField="VAT_AMOUNT"
             dataType="number"
-            caption="GST Amount"
+            [caption]="vatTitle + ' Amount'"
             format="#,##0.00"
             [allowEditing]="false"
             [calculateCellValue]="calculateVATAmount"

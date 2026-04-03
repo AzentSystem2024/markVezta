@@ -13,7 +13,7 @@
       [showColumnHeaders]="true"
       [columnAutoWidth]="true"
       [allowColumnResizing]="true"
-      [height]="'65vh'"
+      [height]="'75vh'"
       [columnResizingMode]="'nextColumn'"
       [headerFilter]="{ visible: true }"
       [scrolling]="{ mode: 'virtual' }"
@@ -115,6 +115,35 @@
           dataSource: ledgerList,
           valueExpr: 'HEAD_NAME',
           displayExpr: 'HEAD_NAME',
+          searchEnabled: true,
+        }"
+      ></dxi-column>
+      <dxi-column
+        dataField="STORE_ID"
+        caption="Branch/Store"
+        [editorType]="'dxSelectBox'"
+        [allowEditing]="!isReadOnly"
+        [lookup]="{
+          dataSource: Stores_List,
+          valueExpr: 'ID',
+          displayExpr: 'DESCRIPTION',
+          searchEnabled: true,
+        }"
+      >
+        <dxi-validation-rule
+          type="required"
+          message="Branch/Store is required"
+        ></dxi-validation-rule>
+      </dxi-column>
+      <dxi-column
+        dataField="DEPT_ID"
+        caption="Department"
+        [editorType]="'dxSelectBox'"
+        [allowEditing]="!isReadOnly"
+        [lookup]="{
+          dataSource: Departments,
+          valueExpr: 'ID',
+          displayExpr: 'DESCRIPTION',
           searchEnabled: true,
         }"
       ></dxi-column>

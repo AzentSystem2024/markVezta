@@ -68,6 +68,7 @@ export class EditCreditNoteComponent {
   private _creditFormData: any;
   creditHeader!: any;
   vatTitle: any;
+  showSubType: boolean;
 
   @Input()
   set creditFormData(value: any) {
@@ -165,6 +166,7 @@ export class EditCreditNoteComponent {
     );
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
+    this.showSubType = !!this.subType;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;

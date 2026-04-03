@@ -758,7 +758,9 @@ export class ItemsFormComponent implements OnInit {
       });
     }
   }
+
   onRowUpdated(e: any) {
+    console.log('Row updated:', e.data);
     const storeId = e.data.ID;
 
     const createDummyItemStore = (storeData: any) => {

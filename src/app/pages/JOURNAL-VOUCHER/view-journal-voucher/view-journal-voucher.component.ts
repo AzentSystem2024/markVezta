@@ -89,6 +89,9 @@ export class ViewJournalVoucherComponent {
 
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
+  selectedCompanyId: any;
+  storeList: any;
+  departmentList: any;
 
   constructor(
     private dataService: DataService,
@@ -98,6 +101,10 @@ export class ViewJournalVoucherComponent {
   }
 
   ngOnInit() {
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.selectedCompanyId = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || null;
     this.getLedgerCodeDropdown();
     this.Deparment_Drop_down();
 
@@ -105,6 +112,8 @@ export class ViewJournalVoucherComponent {
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
     });
+    this.getStoreData();
+    this.getDepartments();
   }
 
   private async convertToBase64(path: string): Promise<string> {
@@ -151,6 +160,8 @@ export class ViewJournalVoucherComponent {
             particulars: item.PARTICULARS ?? '',
             debitAmount: item.DEBIT_AMOUNT ?? '',
             creditAmount: item.CREDIT_AMOUNT ?? '',
+            STORE_ID: item.STORE_ID ?? null,
+            DEPT_ID: item.DEPT_ID ?? null,
           };
         },
       );
@@ -181,36 +192,25 @@ export class ViewJournalVoucherComponent {
       }
     }
   }
-  // ngOnChanges(changes: SimpleChanges) {
-  //   if (changes['journalVoucherFormData'] && changes['journalVoucherFormData'].currentValue) {
-  //     const incomingData = changes['journalVoucherFormData'].currentValue;
-  // const transformedDetails = (incomingData.DETAILS || []).map((item: any) => {
-  //   const matchedLedger = this.ledgerList.find(
-  //     (l: any) =>
-  //       l.HEAD_CODE === item.LEDGER_CODE || l.HEAD_NAME === item.LEDGER_NAME
-  //   );
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+    });
+  }
 
-  //   return {
-  //     billNo: item.BILL_NO ?? '',
-  //     HEAD_CODE: matchedLedger?.HEAD_CODE ?? '',  // match column name
-  //     HEAD_NAME: matchedLedger?.HEAD_NAME ?? '',  // match column name
-  //     particulars: item.PARTICULARS ?? '',
-  //     debitAmount: item.DEBIT_AMOUNT ?? '',
-  //     creditAmount: item.CREDIT_AMOUNT ?? ''
-  //   };
-  // });
-
-  //     this.journalVoucherFormData = {
-  //       ...this.journalVoucherFormData, // default values
-  //       ...incomingData,
-  //       DETAILS: transformedDetails
-  //     };
-  // this.isReadOnly = !!this.journalVoucherFormData.IS_APPROVED;
-  //     if (this.dataGrid?.instance) {
-  //       this.dataGrid.instance.refresh();
-  //     }
-  //   }
-  // }
+  getDepartments() {
+    const payload = {
+      NAME: 'DEPARTMENTS',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.departmentList = res;
+    });
+  }
 
   formatDateToDDMMYYYY(date: any): string {
     const d = new Date(date);

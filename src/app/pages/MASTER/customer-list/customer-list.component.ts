@@ -38,6 +38,7 @@ import {
 import { FormTextboxModule } from '../../../components/utils/form-textbox/form-textbox.component';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
+
 @Component({
   selector: 'app-customer-list',
   templateUrl: './customer-list.component.html',
@@ -473,6 +474,7 @@ export class CustomerListComponent {
             },
             'success',
           );
+          this.showCustomer();
         } catch {
           notify(
             {
@@ -639,6 +641,7 @@ export class CustomerListComponent {
     this.isAddCustomerPopupOpened = false;
   }
 }
+
 @NgModule({
   imports: [
     DxDataGridModule,

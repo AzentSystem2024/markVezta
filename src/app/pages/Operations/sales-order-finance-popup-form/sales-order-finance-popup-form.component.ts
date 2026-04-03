@@ -49,6 +49,7 @@ import { PatternRule, RequiredRule } from 'devextreme/ui/validation_rules';
 import DevExpress from 'devextreme';
 import { confirm } from 'devextreme/ui/dialog';
 import { forkJoin } from 'rxjs';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-sales-order-finance-popup-form',
@@ -174,7 +175,11 @@ export class SalesOrderFinancePopupFormComponent {
   isSaving = false;
   supplierItems: any;
   apiVatPerc: number;
-
+  isItemAlreadySelected = (item: any): boolean => {
+    return this.salesOrderFormData.Details?.some(
+      (d: any) => d.ITEM_ID === item.ITEM_ID,
+    );
+  };
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -233,7 +238,19 @@ export class SalesOrderFinancePopupFormComponent {
   }
 
   onSelectionChanged(event: any) {
-    this.selectedItems = event.selectedRowsData;
+    const filtered = event.selectedRowsData.filter(
+      (item: any) => !this.isItemAlreadySelected(item),
+    );
+
+    if (filtered.length !== event.selectedRowsData.length) {
+      notify(
+        'Some items are already added and cannot be selected.',
+        'warning',
+        2000,
+      );
+    }
+
+    this.selectedItems = filtered;
   }
 
   isEditDataAvailable() {
@@ -419,7 +436,16 @@ export class SalesOrderFinancePopupFormComponent {
       },
     });
   }
+  onPopupCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'select') {
+      const isSelected = this.isItemAlreadySelected(e.data);
 
+      if (isSelected) {
+        e.cellElement.style.pointerEvents = 'none';
+        e.cellElement.style.opacity = '0.5'; // optional UI effect
+      }
+    }
+  }
   onTypeValueChanged(e: any, row: any) {
     this.selectedType = e.value;
     const brandId = row.data.ITEM;
@@ -653,23 +679,24 @@ export class SalesOrderFinancePopupFormComponent {
 
   // Calculate Amount after Discount
   calculateAmount = (rowData: any) => {
-    const gross = this.calculateGrossAmount(rowData);
-    const discountPercent = Number(rowData.DISC_PERCENT) || 0;
+    const gross = Number(this.calculateGrossAmount(rowData)) || 0;
+
+    const discountPercent = Number(rowData.DISC_PERCENT);
+
+    // ONLY apply discount if > 0
     if (discountPercent > 0) {
       const discountValue = (gross * discountPercent) / 100;
       return gross - discountValue;
     }
-
+    // Otherwise ignore discount completely
     return gross;
   };
-
   calculateVatAmount = (rowData: any) => {
     const amount = this.calculateAmount(rowData);
     const vatPercent = Number(rowData.TAX_PERCENT) || 0;
 
     return (amount * vatPercent) / 100;
   };
-
   calculateTotal = (rowData: any) => {
     const amount = this.calculateAmount(rowData);
     const taxAmount = this.calculateVatAmount(rowData);
@@ -677,186 +704,205 @@ export class SalesOrderFinancePopupFormComponent {
   };
 
   onEditorPreparing(e: any) {
-    const grid = e.component;
-    const row = e.row?.data;
-    const rowIndex = e.row?.rowIndex;
-    const field = e.dataField;
+    if (e.dataField === 'DISC_PERCENT') {
+      e.editorOptions = e.editorOptions || {};
 
-    if (e.parentType !== 'dataRow') return;
-
-    /** ---------------------- Common Style & Height ---------------------- */
-    const uniformFields = [
-      'ITEM',
-      'TYPE',
-      'CATEGORY',
-      'ARTNO',
-      'COLOR',
-      'PACKING',
-      'CONTENT',
-      'QTY',
-    ];
-    if (uniformFields.includes(field)) {
-      e.editorOptions = {
-        ...e.editorOptions,
-        elementAttr: {
-          style:
-            'height: 100%; display: flex; align-items: center; padding: 0;',
-        },
-        inputAttr: {
-          style: 'height: 100%; padding: 0 4px; box-sizing: border-box;',
-        },
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
       };
 
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
       if (e.editorName === 'dxNumberBox') {
         e.editorOptions.showSpinButtons = false;
       }
-    }
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
 
-    /** ---------------------- Auto-height Dropdowns ---------------------- */
-    const dropdownFields = [
-      'ITEM',
-      'TYPE',
-      'CATEGORY',
-      'COLOR',
-      'ARTNO',
-      'PACKING',
-    ];
-    if (dropdownFields.includes(field)) {
-      e.editorOptions.dropDownOptions = {
-        onContentReady: (args: any) => {
-          const content =
-            args.component?.contentElement?.() || args.component?.content();
-          const list = content?.querySelector('.dx-list');
-          if (!list) return;
-          const h = Math.min(list.scrollHeight, 180);
-          content.style.height = `${h}px`;
-          content.style.overflowY =
-            list.scrollHeight > 180 ? 'auto' : 'visible';
-        },
-      };
-    }
-
-    /** ---------------------- QTY Logic ---------------------- */
-    if (field === 'QTY') {
-      e.editorOptions.onValueChanged = (args: any) => {
-        e.setCellValue(e.row.data, args.value);
-
-        if (args.value > 0) {
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data,
+          );
           setTimeout(() => {
-            const rows = grid.getVisibleRows();
-            const hasEmpty = rows.some((r: any) => !r.data.ITEM);
-            if (!hasEmpty) {
-              const store = grid.getDataSource().store();
-              store.push([{ type: 'insert', data: {} }]);
-              grid.refresh().then(() => {
-                grid.editCell(rows.length, 'ITEM');
-              });
-            }
-          }, 100);
+            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+          }, 50);
         }
       };
     }
-
-    /** ---------------------- Dropdown Change Logic ---------------------- */
-    const fieldHandlers = {
-      ITEM: (args: any) => this.onItemValueChanged(args, e.row),
-      TYPE: (args: any) => this.onTypeValueChanged(args, e.row),
-      CATEGORY: (args: any) => this.onCategoryValueChanged(args, e),
-      ARTNO: (args: any) => this.onArtNoValueChanged(args, e.row),
-      COLOR: (args: any) => this.onColorValueChanged(args, e.row),
-      PACKING: (args: any) => this.onPackingValueChanged(args, e),
-    };
-
-    if (fieldHandlers[field]) {
-      e.editorOptions.value = row?.[field];
-      e.editorOptions.onValueChanged = (args: any) => {
-        e.setValue(args.value);
-        grid.cellValue(e.row.key, field, args.value);
-        fieldHandlers[field](args);
-      };
-    }
-
-    /** ---------------------- Lazy Dropdown Fetch ---------------------- */
-    const fetchMap: Record<string, any> = {
-      ARTNO: this.dataService.getArtNoList.bind(this.dataService),
-      COLOR: this.dataService.getCatColorList.bind(this.dataService),
-      PACKING: this.dataService.getPackings.bind(this.dataService),
-    };
-
-    if (fetchMap[field]) {
-      e.editorOptions.dataSource = row?.[`${field.toLowerCase()}List`] || [];
-
-      e.editorOptions.onOpened = (args: any) => {
-        const editor = args.component;
-        editor.option('dataSource', []); // Clear stale data
-
-        const payload = {
-          BRAND_ID: String(row.ITEM),
-          ARTICLE_TYPE: String(row.TYPE),
-          CATEGORY_ID: String(row.CATEGORY),
-          ARTNO_ID: String(row.ARTNO),
-          COLOR: String(row.COLOR),
-        };
-
-        fetchMap[field](payload).subscribe({
-          next: (res: any) => {
-            const list = res.Data || [];
-            row[`${field.toLowerCase()}List`] = list;
-            editor.option('dataSource', list);
-          },
-          error: (err: any) =>
-            console.error(`Error loading ${field} list:`, err),
-        });
-      };
-    }
-
-    /** ---------------------- CONTENT Focus-in Popup ---------------------- */
-    if (field === 'CONTENT') {
-      e.editorOptions.readOnly = true;
-
-      e.editorOptions.onFocusIn = () => {
-        const packing = e.row.data?.PACKING || '';
-
-        // only if PACKING has 'CUTSIZE'
-        if (packing?.toUpperCase().includes('CUTSIZE')) {
-          this.cutsizeRowIndex = e.row.rowIndex;
-          this.cutsizeRowKey = e.row.key;
-
-          console.log(this.packingList);
-          console.log(packing);
-
-          this.selectedPackingID = this.packingList.find(
-            (p) => p.DESCRIPTION === packing,
-          )?.ARTICLE_ID;
-          const selectedPackingId = {
-            PACKING_ID: this.selectedPackingID,
-          };
-
-          this.dataService
-            .getPairQty(selectedPackingId)
-            .subscribe((response: any) => {
-              this.totalRequiredQty = response.Data[0].PAIR_QTY;
-              console.log(' Total Required Qty:', this.totalRequiredQty);
-            });
-
-          // prepare the popup data again — same logic as in onPackingValueChanged
-          this.prepareCutsizeValues(packing);
-
-          // show popup
-          this.isCutsizePopupVisible = true;
-        }
-      };
-    }
-
-    /** ---------------------- SIZE Logic ---------------------- */
-    if (field === 'SIZE') {
-      e.editorOptions.onValueChanged = (args: any) => {
-        this.cutsizeRowIndex = rowIndex;
-        e.setValue(args.value);
-        grid.cellValue(e.row.key, 'SIZE', args.value);
-        this.onSizeValueChanged(args);
-      };
-    }
+    // const grid = e.component;
+    // const row = e.row?.data;
+    // const rowIndex = e.row?.rowIndex;
+    // const field = e.dataField;
+    // if (e.parentType !== 'dataRow') return;
+    // /** ---------------------- Common Style & Height ---------------------- */
+    // const uniformFields = [
+    //   'ITEM',
+    //   'TYPE',
+    //   'CATEGORY',
+    //   'ARTNO',
+    //   'COLOR',
+    //   'PACKING',
+    //   'CONTENT',
+    //   'QTY',
+    // ];
+    // if (uniformFields.includes(field)) {
+    //   e.editorOptions = {
+    //     ...e.editorOptions,
+    //     elementAttr: {
+    //       style:
+    //         'height: 100%; display: flex; align-items: center; padding: 0;',
+    //     },
+    //     inputAttr: {
+    //       style: 'height: 100%; padding: 0 4px; box-sizing: border-box;',
+    //     },
+    //   };
+    //   if (e.editorName === 'dxNumberBox') {
+    //     e.editorOptions.showSpinButtons = false;
+    //   }
+    // }
+    // /** ---------------------- Auto-height Dropdowns ---------------------- */
+    // const dropdownFields = [
+    //   'ITEM',
+    //   'TYPE',
+    //   'CATEGORY',
+    //   'COLOR',
+    //   'ARTNO',
+    //   'PACKING',
+    // ];
+    // if (dropdownFields.includes(field)) {
+    //   e.editorOptions.dropDownOptions = {
+    //     onContentReady: (args: any) => {
+    //       const content =
+    //         args.component?.contentElement?.() || args.component?.content();
+    //       const list = content?.querySelector('.dx-list');
+    //       if (!list) return;
+    //       const h = Math.min(list.scrollHeight, 180);
+    //       content.style.height = `${h}px`;
+    //       content.style.overflowY =
+    //         list.scrollHeight > 180 ? 'auto' : 'visible';
+    //     },
+    //   };
+    // }
+    // /** ---------------------- QTY Logic ---------------------- */
+    // if (field === 'QTY') {
+    //   e.editorOptions.onValueChanged = (args: any) => {
+    //     e.setCellValue(e.row.data, args.value);
+    //     if (args.value > 0) {
+    //       setTimeout(() => {
+    //         const rows = grid.getVisibleRows();
+    //         const hasEmpty = rows.some((r: any) => !r.data.ITEM);
+    //         if (!hasEmpty) {
+    //           const store = grid.getDataSource().store();
+    //           store.push([{ type: 'insert', data: {} }]);
+    //           grid.refresh().then(() => {
+    //             grid.editCell(rows.length, 'ITEM');
+    //           });
+    //         }
+    //       }, 100);
+    //     }
+    //   };
+    // }
+    // /** ---------------------- Dropdown Change Logic ---------------------- */
+    // const fieldHandlers = {
+    //   ITEM: (args: any) => this.onItemValueChanged(args, e.row),
+    //   TYPE: (args: any) => this.onTypeValueChanged(args, e.row),
+    //   CATEGORY: (args: any) => this.onCategoryValueChanged(args, e),
+    //   ARTNO: (args: any) => this.onArtNoValueChanged(args, e.row),
+    //   COLOR: (args: any) => this.onColorValueChanged(args, e.row),
+    //   PACKING: (args: any) => this.onPackingValueChanged(args, e),
+    // };
+    // if (fieldHandlers[field]) {
+    //   e.editorOptions.value = row?.[field];
+    //   e.editorOptions.onValueChanged = (args: any) => {
+    //     e.setValue(args.value);
+    //     grid.cellValue(e.row.key, field, args.value);
+    //     fieldHandlers[field](args);
+    //   };
+    // }
+    // /** ---------------------- Lazy Dropdown Fetch ---------------------- */
+    // const fetchMap: Record<string, any> = {
+    //   ARTNO: this.dataService.getArtNoList.bind(this.dataService),
+    //   COLOR: this.dataService.getCatColorList.bind(this.dataService),
+    //   PACKING: this.dataService.getPackings.bind(this.dataService),
+    // };
+    // if (fetchMap[field]) {
+    //   e.editorOptions.dataSource = row?.[`${field.toLowerCase()}List`] || [];
+    //   e.editorOptions.onOpened = (args: any) => {
+    //     const editor = args.component;
+    //     editor.option('dataSource', []); // Clear stale data
+    //     const payload = {
+    //       BRAND_ID: String(row.ITEM),
+    //       ARTICLE_TYPE: String(row.TYPE),
+    //       CATEGORY_ID: String(row.CATEGORY),
+    //       ARTNO_ID: String(row.ARTNO),
+    //       COLOR: String(row.COLOR),
+    //     };
+    //     fetchMap[field](payload).subscribe({
+    //       next: (res: any) => {
+    //         const list = res.Data || [];
+    //         row[`${field.toLowerCase()}List`] = list;
+    //         editor.option('dataSource', list);
+    //       },
+    //       error: (err: any) =>
+    //         console.error(`Error loading ${field} list:`, err),
+    //     });
+    //   };
+    // }
+    // /** ---------------------- CONTENT Focus-in Popup ---------------------- */
+    // if (field === 'CONTENT') {
+    //   e.editorOptions.readOnly = true;
+    //   e.editorOptions.onFocusIn = () => {
+    //     const packing = e.row.data?.PACKING || '';
+    //     // only if PACKING has 'CUTSIZE'
+    //     if (packing?.toUpperCase().includes('CUTSIZE')) {
+    //       this.cutsizeRowIndex = e.row.rowIndex;
+    //       this.cutsizeRowKey = e.row.key;
+    //       console.log(this.packingList);
+    //       console.log(packing);
+    //       this.selectedPackingID = this.packingList.find(
+    //         (p) => p.DESCRIPTION === packing,
+    //       )?.ARTICLE_ID;
+    //       const selectedPackingId = {
+    //         PACKING_ID: this.selectedPackingID,
+    //       };
+    //       this.dataService
+    //         .getPairQty(selectedPackingId)
+    //         .subscribe((response: any) => {
+    //           this.totalRequiredQty = response.Data[0].PAIR_QTY;
+    //           console.log(' Total Required Qty:', this.totalRequiredQty);
+    //         });
+    //       // prepare the popup data again — same logic as in onPackingValueChanged
+    //       this.prepareCutsizeValues(packing);
+    //       // show popup
+    //       this.isCutsizePopupVisible = true;
+    //     }
+    //   };
+    // }
+    // /** ---------------------- SIZE Logic ---------------------- */
+    // if (field === 'SIZE') {
+    //   e.editorOptions.onValueChanged = (args: any) => {
+    //     this.cutsizeRowIndex = rowIndex;
+    //     e.setValue(args.value);
+    //     grid.cellValue(e.row.key, 'SIZE', args.value);
+    //     this.onSizeValueChanged(args);
+    //   };
+    // }
   }
 
   itemCellTemplate = (container: any, options: any) => {
@@ -883,7 +929,7 @@ export class SalesOrderFinancePopupFormComponent {
     // Show the value from the data row
     container.textContent = options.data.COLOR || '';
   };
-  
+
   packingCellTemplate = (container: any, options: any) => {
     // Show the value from the data row
     container.textContent = options.data.PACKING || '';
@@ -1286,12 +1332,12 @@ export class SalesOrderFinancePopupFormComponent {
     );
   }
 
-  calculateTotalQuantity(): number {
-    return this.salesOrderFormData.Details.reduce(
-      (sum: number, item: any) => sum + (Number(item.QTY) || 0),
-      0,
-    );
-  }
+  // calculateTotalQuantity(): number {
+  //   return this.salesOrderFormData.Details.reduce(
+  //     (sum: number, item: any) => sum + (Number(item.QTY) || 0),
+  //     0,
+  //   );
+  // }
 
   cancel() {
     this.popupClosed.emit();
@@ -1356,7 +1402,8 @@ export class SalesOrderFinancePopupFormComponent {
       const day = ('0' + date.getDate()).slice(-2);
       return `${year}-${month}-${day}`;
     };
-
+    const netAmount =
+      this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
     // --- Build payload ---
     const payload: any = {
       COMPANY_ID: this.companyID,
@@ -1373,7 +1420,7 @@ export class SalesOrderFinancePopupFormComponent {
       TOTAL_QTY: totalQty,
       QTN_ID: this.salesOrderFormData.QTN_ID,
       SALESMAN_ID: this.salesOrderFormData.SALESMAN_ID,
-      NET_AMOUNT: this.salesOrderFormData.NET_AMOUNT,
+      NET_AMOUNT: netAmount,
       // Details: validDetails.map((d: any) => ({
       Details: validDetails.map((row: any, index: number) => {
         const grossAmount = this.calculateGrossAmount(row);
@@ -1387,7 +1434,7 @@ export class SalesOrderFinancePopupFormComponent {
           UOM: row.UOM || '',
           QUANTITY: row.STOCK_QTY || row.QUANTITY || 0,
           PRICE: row.PRICE || 0,
-          DISC_PERCENT: row.DISC_PERCENT || 0,
+          DISC_PERCENT: row.DISC_PERCENT ?? 0,
           AMOUNT: amount,
           TAX_PERCENT: row.TAX_PERCENT || 0,
           TAX_AMOUNT: taxAmount,

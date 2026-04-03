@@ -92,7 +92,12 @@ export class PayrollEditComponent {
       // Update the payRollData object with the incoming payroll
       this.payRollData = {
         ...this.incomingPayrollData,
-        PAY_DETAILS: this.incomingPayrollData.DATA.map((detail, index) => ({
+        PAY_DETAILS: this.incomingPayrollData.DATA.filter((detail: any) => {
+          const gross = parseFloat(detail.GROSS_AMOUNT) || 0;
+          const deduct = parseFloat(detail.DEDUCTION_AMOUNT) || 0;
+
+          return gross !== 0 || deduct !== 0; // ✅ keep only meaningful rows
+        }).map((detail: any, index: number) => ({
           ...detail,
           SNO: index + 1,
           GROSS_AMOUNT: parseFloat(detail.GROSS_AMOUNT) || 0,
@@ -215,6 +220,7 @@ export class PayrollEditComponent {
     if (hasEmptyRow) return;
 
     const newRow = {
+      SNO: this.payRollData.PAY_DETAILS.length + 1,
       HEAD_NAME: '',
       GROSS_AMOUNT: 0,
       DEDUCTION_AMOUNT: 0,
@@ -228,6 +234,14 @@ export class PayrollEditComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
+  getHeadName = (rowData: any) => {
+    const match = this.salaryHeadList?.find(
+      (h: any) => h.ID === rowData.HEAD_ID,
+    );
+
+    return match ? match.HEAD_NAME : rowData.HEAD_NAME;
+  };
+
   getSalaryHeadList() {
     if (!this.selected_Company_id) return;
 
@@ -240,18 +254,26 @@ export class PayrollEditComponent {
       .subscribe((response: any) => {
         this.salaryHeadList = response.Data;
 
-        //  NOW bind data AFTER lookup is ready
         if (this.incomingPayrollData) {
           this.payRollData = {
             ...this.incomingPayrollData,
-            PAY_DETAILS: this.incomingPayrollData.DATA.map((detail, index) => ({
+            PAY_DETAILS: this.incomingPayrollData.DATA.filter((detail: any) => {
+              const gross = parseFloat(detail.GROSS_AMOUNT) || 0;
+              const deduct = parseFloat(detail.DEDUCTION_AMOUNT) || 0;
+
+              return gross !== 0 || deduct !== 0; // ✅ keep only meaningful rows
+            }).map((detail: any, index: number) => ({
               ...detail,
-              HEAD_ID: detail.HEAD_ID, // ensure explicit
               SNO: index + 1,
               GROSS_AMOUNT: parseFloat(detail.GROSS_AMOUNT) || 0,
               DEDUCTION_AMOUNT: parseFloat(detail.DEDUCTION_AMOUNT) || 0,
             })),
           };
+
+          //  ADD THIS
+          setTimeout(() => {
+            this.dataGrid.instance.refresh();
+          });
 
           this.calculateGross();
         }

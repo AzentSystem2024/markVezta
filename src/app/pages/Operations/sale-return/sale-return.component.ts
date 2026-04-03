@@ -144,6 +144,7 @@ export class SaleReturnComponent {
   isEditSaleReturn: boolean;
   isReadOnlySaleReturn: boolean;
   isViewSaleReturn: boolean;
+  vatTitle: any;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -162,6 +163,9 @@ export class SaleReturnComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];

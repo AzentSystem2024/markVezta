@@ -37,11 +37,10 @@
                     margin-top: -4px;
                     display: flex;
                     flex-direction: column;
-                    gap: 6px;
                   "
                 >
                   <!-- Row 1 : Date -->
-                  <div style="display: flex; gap: 10px">
+                  <div style="display: flex; gap: 1px">
                     <dx-date-box
                       [(value)]="deliveryFormData.DN_DATE"
                       label="Date"
@@ -61,7 +60,7 @@
                   </div>
 
                   <!-- Row 2 : DN No + New Field -->
-                  <div style="display: flex; gap: 10px">
+                  <div style="display: flex; gap: 1px">
                     <dx-select-box
                       [(value)]="deliveryFormData.SALESMAN_ID"
                       [dataSource]="salesman"
@@ -263,7 +262,8 @@
               [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
               [readOnly]="isReadOnlyMode"
               class="approve-checkbox"
-              style="margin-top: 15px"
+              stylingMode="text"
+              style="margin-top: 5px"
             ></dx-check-box>
 
             <!-- Buttons -->
@@ -278,7 +278,7 @@
               <dx-button
                 *ngIf="!isReadOnlyMode"
                 #saveButtonRef
-                [text]="deliveryFormData.IS_APPROVED ? 'Commit' : 'Save'"
+                [text]="deliveryFormData.IS_APPROVED ? 'Save' : 'Save'"
                 (onClick)="isReadOnlyMode ? openPDF() : saveDeliveryNote()"
                 stylingMode="contained"
                 type="default"

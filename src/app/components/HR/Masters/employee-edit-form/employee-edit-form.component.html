@@ -12,15 +12,7 @@
         <!-- Left Column: dx-card with Form -->
         <div class="left-column">
           <div class="dx-card custom-card">
-            <!-- <dx-form
-              [formData]="employeeFormData"
-              [colCount]="2"
-              
-              [colCountByScreen]="{ xs: 1, sm: 1, md: 2, lg: 2 }"
-            > -->
-
             <span class="card-label">-- Personal Details --</span>
-
             <div class="two-column-layout">
               <div>
                 <dx-text-box
@@ -56,15 +48,6 @@
                 >
                 </dx-date-box>
               </div>
-              <!-- <div class="gender-field">
-                  <dx-radio-group
-                    [(value)]="employeeFormData.IS_MALE"
-                    [items]="['Male', 'Female']"
-                    layout="horizontal"
-                  >
-                  </dx-radio-group>
-                </div> -->
-              <!-- </div> -->
               <div>
                 <dx-radio-group
                   [(value)]="employeeFormData.IS_MALE"
@@ -219,7 +202,6 @@
         </div>
 
         <!-- Right Column: Image Upload Section -->
-
         <div class="right-column">
           <!-- Image Upload Container -->
           <div class="image-upload-container" (click)="triggerFileUpload()">
@@ -448,6 +430,7 @@
                 [placeholder]="'Select Payment'"
                 label="Type of Payment"
                 [labelMode]="'floating'"
+                [readOnly]="true"
               >
               </dx-select-box>
 

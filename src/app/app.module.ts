@@ -362,13 +362,25 @@ import { MiscellaneousInvoiceModule } from './pages/OPERATIONS/miscellaneous-inv
 import { SalesOrderModule } from './pages/OPERATIONS/sales-order/sales-order.component';
 import { FixedAssetRegisterModule } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
 import { DepreciationReportModule } from './pages/Depreciation/depreciation-report/depreciation-report.component';
-import {  PDCReportModule } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
-import {  SalaryWPSModule } from './pages/salary-wps/salary-wps.component';
+import { PDCReportModule } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
+import { SalaryWPSModule } from './pages/salary-wps/salary-wps.component';
 import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
 import { PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 import { ProfitAndLossBranchModule } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 import { MiscSalesInvoiceListModule } from './pages/Operations/misc-sales-invoice-list/misc-sales-invoice-list.component';
 import { MiscSalesInvoiceFormModule } from './pages/Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
+import {
+  CustomerFinListComponent,
+  CustomerFinListModule,
+} from './pages/MASTER/customer-fin-list/customer-fin-list.component';
+import {
+  CustomerFinFormComponent,
+  CustomerFinFormModule,
+} from './components/HR/Masters/Customer/customer-fin-form/customer-fin-form.component';
+import {
+  CustomerFinEditFormComponent,
+  CustomerFinEditFormModule,
+} from './components/HR/Masters/Customer/customer-fin-edit-form/customer-fin-edit-form.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -738,8 +750,6 @@ import { MiscSalesInvoiceFormModule } from './pages/Operations/POPUP PAGES/misc-
     PrepaymentPostingReportModule,
     SalaryWPSModule,
     ProfitAndLossBranchModule,
-    MiscSalesInvoiceListModule,
-    MiscSalesInvoiceFormModule
   ],
 
   providers: [

@@ -185,11 +185,7 @@
         ></dxi-column> -->
         <dxi-column
           dataField="gstAmount"
-          [caption]="
-            selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-              ? 'VAT Amount'
-              : ' GST Amount'
-          "
+          [caption]="vatTitle + ' Amount'"
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="true"

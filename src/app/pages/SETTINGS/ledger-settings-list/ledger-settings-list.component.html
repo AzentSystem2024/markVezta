@@ -35,8 +35,9 @@
       <dxo-editing
         mode="cell"
         [allowUpdating]="canEdit"
-        [allowDeleting]="canDelete"
       ></dxo-editing>
+
+      
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -64,7 +65,7 @@
       ></dxo-filter-row>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Ledger Settings</div>
+          <div class="grid-header">Ledger Mapping</div>
         </dxi-item>
         <dxi-item
           location="after"
@@ -89,6 +90,16 @@
           displayExpr="DESCRIPTION"
         ></dxo-lookup>
       </dxi-column>
+
+      <dxi-column type="buttons">
+  <dxi-button name="edit"></dxi-button>
+
+  <dxi-button
+    icon="trash"
+    hint="Clear Ledger"
+    [onClick]="clearLedger"
+  ></dxi-button>
+</dxi-column>
     </dx-data-grid>
   </div>
 </div>

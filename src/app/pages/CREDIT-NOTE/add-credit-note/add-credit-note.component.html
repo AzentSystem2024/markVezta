@@ -51,31 +51,20 @@
                   [readOnly]="true"
                 ></dx-text-box>
 
-                <dx-select-box
-                  *ngIf="subType"
-                  [dataSource]="subTypeList"
-                  displayExpr="SUB_TYPE_NAME"
-                  valueExpr="SUB_TYPE_ID"
-                  label="Select Subtype"
-                  labelMode="floating"
-                  placeholder="Select Subtype"
-                  [width]="405"
-                  (onValueChanged)="onSubTypeChange($event)"
-                >
-                </dx-select-box>
-                <!-- <dx-select-box
-                  #distributorRef
-                  [(value)]="selectedDistributorId"
-                  [dataSource]="distributorList"
-                  displayExpr="DESCRIPTION"
-                  valueExpr="ID"
-                  [width]="405"
-                  [searchEnabled]="true"
-                  label="Customer"
-                  labelMode="floating"
-                  (onKeyDown)="onCustomerKeyDown($event, 'Dealer')"
-                  (onValueChanged)="onDistributorSelected($event)"
-                ></dx-select-box> -->
+                <div style="width: 405px">
+                  <dx-select-box
+                    *ngIf="showSubType"
+                    [dataSource]="subTypeList"
+                    displayExpr="SUB_TYPE_NAME"
+                    valueExpr="SUB_TYPE_ID"
+                    label="Select Subtype"
+                    labelMode="floating"
+                    placeholder="Select Subtype"
+                    [width]="'100%'"
+                    (onValueChanged)="onSubTypeChange($event)"
+                  >
+                  </dx-select-box>
+                </div>
               </div>
 
               <div style="display: flex; align-items: baseline; gap: 5px">
@@ -265,11 +254,7 @@
         ></dxi-column> -->
         <dxi-column
           dataField="gstAmount"
-          [caption]="
-            selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-              ? ' VAT Amount'
-              : ' GST Amount'
-          "
+          [caption]="vatTitle + ' Amount'"
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [calculateCellValue]="calculateTaxAmount"

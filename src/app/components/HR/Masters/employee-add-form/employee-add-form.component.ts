@@ -55,7 +55,7 @@ import dxValidationGroup from 'devextreme/ui/validation_group';
 })
 export class EmployeeAddFormComponent implements OnInit, OnChanges {
   @ViewChild('employeeFormGroup', { static: false })
-  employeeFormGroup: DxValidationGroupComponent;
+  employeeFormGroup: DxValidationGroupComponent | undefined;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('fileUploader') fileUploader!: ElementRef;
   @Input() isOpen: boolean = false;
@@ -119,7 +119,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     STATE_NAME: '',
     STORE_NAME: '',
     IS_INACTIVE: false,
-    PAYMENT_TYPE: 0,
+    PAYMENT_TYPE: 1,
     LEAVE_DAY_BALANCE: 0,
     DAYS_DEDUCTED: 0,
   };
@@ -127,7 +127,6 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   uploadedFile: any;
   isSaving: boolean = false;
   damanCardCategories = ['Basic', 'Enhanced', 'Premier'];
-
   attachments: any[] = [];
   selectedFiles: File[] = [];
   lastRejoinDate: any;
@@ -137,8 +136,8 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   displayMode: any = 'full';
   showPageSizeSelector = true;
   IsAttachmentPopupVisible: boolean = false;
-  showPopup: boolean = false; // Controls popup visibility
-  uploadedFileName: string = ''; // Stores uploaded file name
+  showPopup: boolean = false; 
+  uploadedFileName: string = ''; 
   fileDetails: { file: File | null; remarks: string } = {
     file: null,
     remarks: '',
@@ -151,18 +150,19 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   departments: any;
   designations: any;
   states: any;
-  eighteenYearsAgo: Date;
+  eighteenYearsAgo: Date | undefined;
   employeeList: any;
   COMPANY_ID: any;
   selected_Company_id: any;
   SubDepartmentDataSource: any = null;
 
   constructor(public dataservice: DataService) {
-    const SELECTED_COMPANY = JSON.parse(
-      sessionStorage.getItem('savedUserData'),
-    );
-    const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
-    this.COMPANY_ID = companyid.COMPANY_ID;
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      const SELECTED_COMPANY = JSON.parse(savedUserData);
+      const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
+      this.COMPANY_ID = companyid.COMPANY_ID;
+    }
 
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
@@ -254,6 +254,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     modal.style.display = 'block';
     modalImage.src = this.imageSource!;
   }
+
   closeModal() {
     document.getElementById('imageModal')!.style.display = 'none';
   }
@@ -321,8 +322,11 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      const sessionData = JSON.parse(savedUserData);
+      this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    }
   }
 
   getEmployeeList() {
@@ -352,7 +356,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   }
 
   onDepartmentChange(e: any) {
-    const selectedDept = this.departments.find((dept) => dept.ID === e.value);
+    const selectedDept = this.departments.find((dept:any) => dept.ID === e.value);
     this.employeeFormData.DEPT_NAME = selectedDept
       ? selectedDept.DESCRIPTION
       : '';
@@ -366,12 +370,12 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   }
 
   onDesignationChange(e: any) {
-    const selected = this.designations.find((d) => d.ID === e.value);
+    const selected = this.designations.find((d:any) => d.ID === e.value);
     this.employeeFormData.DESG_NAME = selected ? selected.DESCRIPTION : '';
   }
 
   onStateChange(e: any) {
-    const selected = this.states.find((d) => d.ID === e.value);
+    const selected = this.states.find((d:any) => d.ID === e.value);
     this.employeeFormData.STATE_NAME = selected ? selected.DESCRIPTION : '';
   }
 
@@ -382,7 +386,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
 
     if (headId !== undefined && amount !== undefined) {
       const existingIndex = this.employeeFormData.EmployeeSalary.findIndex(
-        (item) => item.HEAD_ID === headId,
+        (item:any) => item.HEAD_ID === headId,
       );
 
       if (existingIndex > -1) {
@@ -401,7 +405,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   }
 
   isValid() {
-    return this.employeeFormGroup.instance.validate().isValid;
+    return this.employeeFormGroup?.instance.validate().isValid;
   }
 
   saveEmployee() {
@@ -411,7 +415,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     const enteredEmpCode = this.employeeFormData.EMP_CODE?.trim().toUpperCase();
 
     const isDuplicate = this.employeeList.some(
-      (emp) =>
+      (emp:any) =>
         emp.EMP_CODE?.trim().toUpperCase() === enteredEmpCode &&
         (!this.employeeFormData.EMP_ID ||
           emp.EMP_ID !== this.employeeFormData.EMP_ID),

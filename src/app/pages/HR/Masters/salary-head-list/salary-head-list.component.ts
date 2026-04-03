@@ -52,14 +52,14 @@ export class SalaryHeadListComponent {
   @ViewChild(SalaryHeadAddComponent)
   SalaryHeadAddComponent!: SalaryHeadAddComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent|undefined;
   @ViewChild('SalaryHeadValidation', { static: false })
-  SalaryHeadValidation: DxValidationGroupComponent;
+  SalaryHeadValidation: DxValidationGroupComponent|undefined;
   salaryHeadList: any = [];
   readonly allowedPageSizes: any = [10, 15, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter:boolean= true;
   addSalaryHeadPopupOpened: boolean = false;
   EditSalaryHeadPopupOpened: boolean = false;
   Selected_salaryHead_Data: any;
@@ -100,7 +100,7 @@ export class SalaryHeadListComponent {
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
-  isFilterOpened: boolean;
+  isFilterOpened:boolean= false;
 
   onExporting(event: any) {
     const fileName = 'Credit_Note';
@@ -115,6 +115,7 @@ export class SalaryHeadListComponent {
     text: '',
   };
   selected_Company_id: any;
+  
   constructor(
     private dataservice: DataService,
     private ngZone: NgZone,
@@ -128,8 +129,8 @@ export class SalaryHeadListComponent {
 
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/salary-head');
+      .flatMap((group:any) => group.Menus)
+      .find((menu:any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -182,16 +183,9 @@ export class SalaryHeadListComponent {
 
     this.getSalaryHeadList();
   }
-  //=======================list data=============
-  // getSalaryHeadList() {
-  //   this.dataservice.get_salary_head_list().subscribe((res: any) => {
-
-  //     this.salaryHeadList=res.Data
-  //   })
-  // }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -217,8 +211,8 @@ export class SalaryHeadListComponent {
       // this.SalaryHeadAddComponent.resetForm()
     }
   }
+
   OnEditSalary_Head(event: any) {
-    // Logic to handle editing of salary head
     event.cancel = true;
 
     const id = event.data.ID;
@@ -227,6 +221,7 @@ export class SalaryHeadListComponent {
     });
     this.EditSalaryHeadPopupOpened = true;
   }
+
   OnDeleteSalaryHead(event: any) {
     // Logic to handle deletion of salary head
     const id = event.data.ID;
@@ -251,10 +246,10 @@ export class SalaryHeadListComponent {
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
-      // Or reload data from API if needed
       this.getSalaryHeadList();
     }
   }
+
   toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();

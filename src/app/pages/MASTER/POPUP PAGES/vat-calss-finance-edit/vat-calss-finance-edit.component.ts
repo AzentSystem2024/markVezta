@@ -31,30 +31,42 @@ export class VatCalssFinanceEditComponent {
 
   @Input() selectedData: any = {};
   @Output() formClosed = new EventEmitter<void>();
+
   formVatclassData = {
     ID: 0,
     CODE: '',
     VAT_NAME: '',
     VAT_PERC: '',
+    VAT_INPUT_HEAD_ID: '',
+    VAT_OUTPUT_HEAD_ID: '',
   };
-  newVatclass = this.formVatclassData;
+
   selected_Company_id: any;
+  ledgerList: any[] = [];
+
+  newVatclass = this.formVatclassData;
+
   constructor(private dataservice: DataService) {
     this.sessionDetails();
+    this.getLedgerCodeDropdown()
   }
   getNewVatclassData = () => ({ ...this.newVatclass });
-  
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
       const data = changes['selectedData'].currentValue;
-      console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa');
       this.formVatclassData = data;
-      console.log(this.formVatclassData);
     }
   }
+
+   getLedgerCodeDropdown() {
+    this.dataservice.getActiveLedger().subscribe((response: any) => {
+      this.ledgerList = response.Data;
+    });
+  }
+
   keyPressCode(event: any) {
     const charCode = event.which ? event.which : event.keyCode;
-
     // Allow alphanumeric characters (A-Z, a-z, 0-9)
     if (
       (charCode >= 65 && charCode <= 90) || // A-Z
@@ -68,6 +80,7 @@ export class VatCalssFinanceEditComponent {
       return false;
     }
   }
+
   keyPressVatname(event: any) {
     console.log('key pressed');
     var charCode = event.which ? event.which : event.keyCode;
@@ -92,21 +105,31 @@ export class VatCalssFinanceEditComponent {
       return true;
     }
   }
+
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
+
   UpdateData() {
-    const { ID, CODE, VAT_NAME, VAT_PERC } = this.formVatclassData;
+    const { ID, CODE, VAT_NAME, VAT_PERC ,VAT_INPUT_HEAD_ID, VAT_OUTPUT_HEAD_ID} = this.formVatclassData;
     this.dataservice
-      .updateVatclass_Finance(ID, CODE, VAT_NAME, VAT_PERC, this.selected_Company_id)
+      .updateVatclass_Finance(
+        ID,
+        CODE,
+        VAT_NAME,
+        VAT_PERC,
+        VAT_INPUT_HEAD_ID,
+        VAT_OUTPUT_HEAD_ID,
+        this.selected_Company_id,
+      )
       .subscribe((response) => {
         console.log(response);
         this.formClosed.emit();
       });
   }
-
-  // this.updateVatclass()
 
   closePopup() {
     this.formClosed.emit();
