@@ -156,6 +156,7 @@ import { SalaryWPSComponent } from './pages/salary-wps/salary-wps.component';
 import { PaySettingsComponent } from './pages/HR/Masters/pay-settings/pay-settings.component';
 import { DepartmentMeComponent } from './pages/MASTER/department-me/department-me.component';
 import { ProfitAndLossBranchComponent } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
+import { MiscSalesInvoiceListComponent } from './pages/Operations/misc-sales-invoice-list/misc-sales-invoice-list.component';
 
 const routes: Routes = [
   {
@@ -986,6 +987,12 @@ const routes: Routes = [
         component: ProfitAndLossBranchComponent,
         canActivate: [AuthGuardService],
       },  
+
+      {
+        path: 'misc-sales-invoice',
+        component: MiscSalesInvoiceListComponent,
+        canActivate: [AuthGuardService],
+      },
       
       {
         path: '**',
