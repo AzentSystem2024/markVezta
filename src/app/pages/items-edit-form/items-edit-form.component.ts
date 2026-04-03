@@ -732,7 +732,7 @@ export class ItemsEditFormComponent implements OnInit {
           SALE_PRICE5: this.itemData.SALE_PRICE5 || '',
           CREATED_DATE: this.itemData.CREATED_DATE || '',
           IS_SELECTED: true,
-          COST: this.itemData.COST,
+          COST: this.itemData.COST ?? 0,
           IS_INACTIVE: row.IS_INACTIVE ?? false,
           IS_NOT_SALE_ITEM: row.IS_NOT_SALE_ITEM ?? false,
           IS_PRICE_REQUIRED: row.IS_PRICE_REQUIRED ?? false,
@@ -761,7 +761,7 @@ export class ItemsEditFormComponent implements OnInit {
       SALE_PRICE5: row.SALE_PRICE5,
       STORE_CODE: row.STORE_CODE,
       STORE_NAME: row.STORE_NAME,
-      COST: row.COST,
+      COST: row.COST ?? 0,
       IS_INACTIVE: row.IS_INACTIVE ?? false,
       IS_NOT_SALE_ITEM: row.IS_NOT_SALE_ITEM ?? false,
       IS_PRICE_REQUIRED: row.IS_PRICE_REQUIRED ?? false,
@@ -794,7 +794,7 @@ export class ItemsEditFormComponent implements OnInit {
         SALE_PRICE5: s.SALE_PRICE5,
         STORE_CODE: s.STORE_CODE,
         STORE_NAME: s.STORE_NAME,
-        COST: s.COST,
+        COST: s.COST ?? 0,
         IS_INACTIVE: s.IS_INACTIVE ?? false,
         IS_NOT_SALE_ITEM: s.IS_NOT_SALE_ITEM ?? false,
         IS_PRICE_REQUIRED: s.IS_PRICE_REQUIRED ?? false,
@@ -846,6 +846,7 @@ export class ItemsEditFormComponent implements OnInit {
       UOM_PURCH: this.selectedData,
       COMPANY_ID: this.selected_Company_id,
       SALE_PRICE: this.salePrice,
+      COST: this.itemData.COST ?? 0,
     };
     // Call the service to update the items
     this.dataservice.updateItems(payload.ID, payload).subscribe(
