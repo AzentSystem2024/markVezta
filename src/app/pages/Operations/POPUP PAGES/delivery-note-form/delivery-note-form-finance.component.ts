@@ -564,13 +564,17 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     let isValid = true;
 
     this.deliveryFormData.Details.forEach((item: any, index: number) => {
-      if (!item.SO_DETAIL_ID) {
+      if (!item.ITEM_ID && !item.SO_DETAIL_ID && !item.QUANTITY) {
         notify(`Row ${index + 1}: Item is required.`, 'warning', 3000);
         isValid = false;
         return;
       }
       if (!item.DELIVERED_QUANTITY || item.DELIVERED_QUANTITY <= 0) {
-        notify(`Row ${index + 1}: Delivered Quantity must be greater than 0.`);
+        notify(
+          `Row ${index + 1}: Delivered Quantity must be greater than 0.`,
+          'warning',
+          3000,
+        );
         isValid = false;
         return;
       }
@@ -683,6 +687,38 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
         });
       }
     }
+  }
+
+  resetForm() {
+    this.deliveryFormData = {
+      COMPANY_ID: this.companyID,
+      STORE_ID: this.storeFromSession,
+      DN_DATE: new Date(),
+      REF_NO: '',
+      CUST_ID: 0,
+      CONTACT_NAME: '',
+      CONTACT_PHONE: '',
+      CONTACT_FAX: '',
+      CONTACT_MOBILE: '',
+      SALESMAN_ID: 0,
+      FIN_ID: this.finID,
+      TOTAL_QTY: 0,
+      USER_ID: this.userID,
+      NARRATION: '',
+      DN_TYPE: 0,
+      IS_APPROVED: false,
+      DETAILS: [],
+    };
+
+    // Reset extra fields
+    this.selectedCustomerId = null;
+    this.customerDetails = null;
+
+    // Clear grid
+    this.itemsGridRef?.instance?.refresh();
+
+    // Optional: get new document number
+    this.getDocNo();
   }
 
   openPDF() {

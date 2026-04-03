@@ -92,11 +92,17 @@ export class DataService {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const storedData = sessionStorage.getItem('savedUserData');
+    if (storedData) {
+      const sessionData = JSON.parse(storedData);
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+      this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+      this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    } else {
+      // Handle the case where session data is not available, e.g., set defaults or throw an error
+      console.error('Session data not found');
+    }
   }
 
   getAccountGroupHeadList(data: any): Observable<any> {
@@ -236,7 +242,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/update`, data);
   }
 
-  deleteArticle(payload) {
+  deleteArticle(payload:any) {
     return this.http.post<any>(`${this.apiUrl}article/delete`, payload);
   }
 
@@ -588,7 +594,7 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}ACDefaults/Insert`, data);
   }
-   DeletetLedgerSettings(items: any) {
+  DeletetLedgerSettings(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}ACDefaults/delete`, data);
   }
@@ -1727,7 +1733,7 @@ export class DataService {
       DESCRIPTION: payload.DESCRIPTION,
       DEPARTMENT_ID: payload.DEPARTMENT_ID,
     };
-    return this.http.post(`${this.apiUrl}SubDepartment/update`, data);
+    return this.http.post(`${this.apiUrl}SubDepartment/save`, data);
   }
 
   removeSubdepartment(id: any) {
@@ -3037,10 +3043,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}country/list`, {});
   }
 
-  getData(rowCount, columnCount) {
+  getData(rowCount:any, columnCount:any) {
     const items = [];
     for (let i = 0; i < rowCount; i++) {
-      const item = {};
+      const item: { [key: string]: any } = {};
       for (let j = 0; j < columnCount; j++) {
         item[`field${j + 1}`] = `${i + 1}-${j + 1}`;
       }
@@ -4203,7 +4209,6 @@ The result can be exported to HTML or Markdown.`;
   //===========delete Api==================
   Delete_LeaveType_Api(ID: any) {
     return this.http.post(`${this.apiUrl}LeaveType/delete/${ID}`, {});
-  
   }
 
   //EMPLOYEE
@@ -5007,7 +5012,7 @@ The result can be exported to HTML or Markdown.`;
     Remarks: any,
     Leave_salary_payable: any,
   ) {
-    const getEndpoint = this.apiUrl + '/EmployeeVacation/save';
+    const getEndpoint = this.apiUrl + 'EmployeeVacation/save';
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5220,7 +5225,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Insert_ArticleColor_Api(payload) {
+  Insert_ArticleColor_Api(payload:any) {
     const getEndpoint = this.apiUrl + 'ArticleColor/insert';
     return this.http.post(getEndpoint, payload);
   }
@@ -5258,7 +5263,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Insert_ArticleBrand_Api(payload) {
+  Insert_ArticleBrand_Api(payload:any) {
     const getEndpoint = this.apiUrl + 'ArticleBrand/insert';
     return this.http.post(getEndpoint, payload);
   }
@@ -5295,7 +5300,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  Insert_ArticleType_Api(payload) {
+  Insert_ArticleType_Api(payload:any) {
     const getEndpoint = this.apiUrl + 'ArticleType/insert';
     return this.http.post(getEndpoint, payload);
   }
@@ -5500,7 +5505,7 @@ The result can be exported to HTML or Markdown.`;
 
   //====================VIEW===================
 
-  get_ArticleStock_Api(payload) {
+  get_ArticleStock_Api(payload:any) {
     const getEndpoint = this.apiUrl + 'View/list';
     return this.http.post(getEndpoint, payload);
   }
@@ -5679,17 +5684,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  // get_combinbation_list_api(payload: any) {
-  //   const params = payload;
-  //   // const params = new HttpParams()
-  //   //   .set('artNo', payload.artNo)
-  //   //   .set('color', payload.color)
-  //   //   .set('categoryID', payload.categoryID)
-  //   //   .set('unitID', payload.unitID)
-  //   //   .set('COMPANY_ID',payload.COMPANY_ID);
-  //   const getEndpoint = this.apiUrl + 'packing/sizes-for-combination';
-  //   return this.http.post(getEndpoint, {}, params );
-  // }
+ 
 
   get_combinbation_list_api(item: any) {
     const payload = item;
@@ -5775,7 +5770,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}AC_Report/ledger`, payload);
   }
 
-  Journal_Booking_Api(payload) {
+  Journal_Booking_Api(payload:any) {
     const getEndpoint = `${this.apiUrl}JournalBook`;
     return this.http.post(getEndpoint, payload);
   }
@@ -5809,7 +5804,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // REPORT============
-  Trial_Balance_Api(payload) {
+  Trial_Balance_Api(payload:any) {
     const getEndpoint = this.apiUrl + 'AcReports/TrialBalance';
     return this.http.post(getEndpoint, payload);
   }

@@ -166,27 +166,14 @@
     margin-bottom: 5px;
   }
 
-  ::ng-deep .blue-outline-btn.dx-button .dx-icon {
-    color: #ffa500 !important; /* blue icon */
-
-    border-radius: 8px;
-  }
   ::ng-deep .blue-outline-btn.dx-button {
-    border: none !important; /* blue border */
-    color: #ffa500 !important;
-    background-color: #fff2d9 !important; /* blue text */
-  }
-  .blue-outline-btn.dx-button .dx-icon :hover {
-    color: #ffffff !important; /* blue icon */
-
-    border-radius: 8px;
-  }
-  ::ng-deep .blue-outline-btn.dx-button:hover {
-    border: none !important; /* blue border */
-    color: #ffffff !important;
-    background-color: #ffa500 !important; /* blue text */
+    border: 1px solid #007bff !important; /* blue border */
+    // color: #007bff !important;           /* blue text */
   }
 
+  ::ng-deep .blue-outline-btn.dx-button .dx-icon {
+    color: #007bff !important; /* blue icon */
+  }
   .roundoff-checkbox .dx-checkbox-container {
     flex-direction: row-reverse; /* puts text before the checkbox */
   }

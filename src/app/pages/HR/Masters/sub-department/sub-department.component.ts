@@ -37,7 +37,7 @@ import { FormPopupModule } from 'src/app/components';
 })
 export class SubDepartmentComponent implements OnInit {
   @ViewChild(SubDepartmentAddFormComponent)
-  categoryComponent: SubDepartmentAddFormComponent;
+  SubDepartmentComponent: SubDepartmentAddFormComponent;
 
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
@@ -45,14 +45,14 @@ export class SubDepartmentComponent implements OnInit {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  CategoryDataSource: DataSource;
-  categoryArray: any[] = [];
-  categoryCount = 0;
+  SubDepartmentDataSource: DataSource;
+  SubDepartmentArray: any[] = [];
+  SubDepartmentCount = 0;
   DepartmentDropdownData: any;
-  isAddCategoryPopupOpened = false;
+  isAddSubDepartmentPopupOpened = false;
   showFilterRow = true;
   showHeaderFilter = true;
-  editItemCategory: boolean = false;
+  editItemSubDepartment: boolean = false;
   selectedData: any;
   selected_data: any;
   selected_Company_id: any;
@@ -72,7 +72,7 @@ export class SubDepartmentComponent implements OnInit {
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.ngZone.run(() => this.addCategory());
+      this.ngZone.run(() => this.addSubDepartment());
     },
     elementAttr: { class: 'add-button' },
 
@@ -94,7 +94,7 @@ export class SubDepartmentComponent implements OnInit {
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => {
-      this.ngZone.run(() => this.refreshGrid());
+      this.fetch_subdepartment_data_list();
     },
     text: '',
   };
@@ -143,7 +143,8 @@ export class SubDepartmentComponent implements OnInit {
   fetch_subdepartment_data_list() {
     this.dataservice.get_SubDepartment_Data().subscribe((res: any) => {
       if (res && res.flag === '1') {
-        this.CategoryDataSource = res.datas;
+        this.SubDepartmentDataSource = res.datas;
+        this.SubDepartmentArray = res.datas;
       } else {
         notify(
           {
@@ -167,14 +168,8 @@ export class SubDepartmentComponent implements OnInit {
     }
   }
 
-  refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-  }
-
-  addCategory() {
-    this.isAddCategoryPopupOpened = true;
+  addSubDepartment() {
+    this.isAddSubDepartmentPopupOpened = true;
   }
 
   onEditStart(event: any) {
@@ -183,27 +178,28 @@ export class SubDepartmentComponent implements OnInit {
     this.dataservice.select_subdepartment(id).subscribe((res: any) => {
       if (res.flag === '1') {
         this.selected_data = res.data;
-        this.editItemCategory = true;
+        this.editItemSubDepartment = true;
       } else {
-        this.editItemCategory = true;
+        this.editItemSubDepartment = true;
       }
     });
-    this.editItemCategory = true;
+    this.editItemSubDepartment = true;
   }
 
-  onClickSaveCategory() {
+  onClickSaveSubDepartment() {
     const { CODE, DESCRIPTION, DEPARTMENT_ID } =
-      this.categoryComponent.getNewCategoryData();
-    // Check for duplicates in CategoryList
-    const isCodeDuplicate = this.categoryArray.some(
-      // (item: any) => item.CODE === commonDetails.code
-      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
+      this.SubDepartmentComponent.getNewSubDepartmentData();
+
+    const normalizedCode = CODE?.trim().toLowerCase();
+    const normalizedDescription = DESCRIPTION?.trim().toLowerCase();
+
+    const isCodeDuplicate = this.SubDepartmentArray.some(
+      (item: any) => item.CODE?.trim().toLowerCase() === normalizedCode,
     );
 
-    const isDescriptionDuplicate = this.categoryArray.some(
-      // (item: any) => item.DESCRIPTION === commonDetails.category
+    const isDescriptionDuplicate = this.SubDepartmentArray.some(
       (item: any) =>
-        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase(),
+        item.DESCRIPTION?.trim().toLowerCase() === normalizedDescription,
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -216,7 +212,9 @@ export class SubDepartmentComponent implements OnInit {
         'error',
       );
       return;
-    } else if (isCodeDuplicate) {
+    }
+
+    if (isCodeDuplicate) {
       notify(
         {
           message: 'This Code already exists',
@@ -226,7 +224,9 @@ export class SubDepartmentComponent implements OnInit {
         'error',
       );
       return;
-    } else if (isDescriptionDuplicate) {
+    }
+
+    if (isDescriptionDuplicate) {
       notify(
         {
           message: 'This Description already exists',
@@ -242,16 +242,17 @@ export class SubDepartmentComponent implements OnInit {
       .Save_SubDepartment_Data(CODE, DESCRIPTION, DEPARTMENT_ID)
       .subscribe((response) => {
         if (response) {
-          this.isAddCategoryPopupOpened = false;
+          this.isAddSubDepartmentPopupOpened = false;
+          this.fetch_subdepartment_data_list();
+
           notify(
             {
-              message: 'This Item Category inserted successfully',
+              message: 'SubDepartment inserted successfully',
               position: { at: 'top right', my: 'top right' },
               displayTime: 1000,
             },
             'success',
           );
-          return;
         }
       });
   }
@@ -262,19 +263,18 @@ export class SubDepartmentComponent implements OnInit {
 
     this.dataservice.removeSubdepartment(ID).subscribe(() => {
       try {
-        // Your delete logic here
         notify(
           {
-            message: 'Delete operation successful',
+            message: 'Delete Sub Department successful',
             position: { at: 'top right', my: 'top right' },
           },
           'success',
         );
-        this.dataGrid.instance.refresh();
+        this.fetch_subdepartment_data_list();
       } catch (error) {
         notify(
           {
-            message: 'Delete operation failed',
+            message: 'Delete Sub Department failed',
             position: { at: 'top right', my: 'top right' },
           },
           'error',
@@ -298,18 +298,14 @@ export class SubDepartmentComponent implements OnInit {
     });
   }
 
-  refresh = () => {
-    this.fetch_subdepartment_data_list();
-  };
-
   toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
   };
 
   handleClose() {
-    this.isAddCategoryPopupOpened = false;
-    this.editItemCategory = false;
-    this.refresh();
+    this.isAddSubDepartmentPopupOpened = false;
+    this.editItemSubDepartment = false;
+    this.fetch_subdepartment_data_list();
   }
 
   onExporting(event: any) {

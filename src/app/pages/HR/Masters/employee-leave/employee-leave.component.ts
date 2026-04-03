@@ -34,25 +34,25 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./employee-leave.component.scss'],
 })
 export class EmployeeLeaveComponent {
-  VerifyPopup: boolean;
-  ApprovePopup: boolean;
+  VerifyPopup: boolean = false;
+  ApprovePopup: boolean = false;
   ExistingEmployee: any = [];
   selectedData: any = {};
   LeaveType: any;
   Employee: any;
-  ViewPopup: boolean;
+  ViewPopup: boolean = false;
   Is_ticket: any;
   Left_service: any;
-  TravelPopup: boolean;
-  RejoinPopup: boolean;
+  TravelPopup: boolean = false;
+  RejoinPopup: boolean = false;
   selectedStatusType: string = '';
-  selectedData1: number;
+  selectedData1: number | undefined;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter = true;
   isFilterRowVisible: boolean = false;
-  isTravelled: boolean = false; // or use true/false based on your data
+  isTravelled: boolean = false;
   StatusType = ['Rejoined', 'Left Service'];
   EmployeeDetails: any = [];
   Leave_credit: any;
@@ -64,8 +64,190 @@ export class EmployeeLeaveComponent {
   StoreId: any;
   UserId: any;
 
-  //========================STATUS====================
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent | undefined;
 
+  AllEmployeeDetails: any = [];
+  showFilterRow: boolean = true;
+  currentFilter: string = 'auto';
+  editingRowData: any = {}; // To store the selected row's data
+  AddVacationPopup = false;
+  UpdateVacationPopup = false;
+  formData: any;
+  Leave_type: any;
+  Employee_no: any;
+  formsource: FormGroup;
+  isFilterOpened = false;
+  EmployeeLeaveDatasource: any[] | undefined;
+
+  minDate: Date | undefined;
+  today = new Date();
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.Add_EmployeeLeave());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  allActionButtons = [
+    {
+      name: 'edit',
+
+      hint: 'Edit',
+
+      icon: 'edit',
+
+      text: 'Edit',
+
+      visible: (e: any) => e.row.data.STATUS !== 'Verified',
+    },
+
+    {
+      name: 'delete',
+
+      hint: 'Delete',
+
+      icon: 'trash',
+
+      text: 'Delete',
+
+      // onClick: (e:any) => this.onDeleteClick(e),
+
+      visible: (e: any) =>
+        e.row.data.STATUS !== 'Approved' &&
+        e.row.data.STATUS !== 'Travelled' &&
+        e.row.data.STATUS !== 'Rejoined' &&
+        e.row.data.STATUS !== 'Left Service',
+    },
+
+    {
+      hint: 'Verify',
+
+      icon: 'check',
+
+      text: 'Verify',
+
+      onClick: (e: any) => {
+        setTimeout(() => this.onVerifyClick(e));
+      },
+
+      visible: (e: any) =>
+        e.row.data.STATUS !== 'Approved' &&
+        e.row.data.STATUS !== 'Verified' &&
+        e.row.data.STATUS !== 'Travelled' &&
+        e.row.data.STATUS !== 'Rejoined' &&
+        e.row.data.STATUS !== 'Left Service',
+    },
+
+    {
+      hint: 'Approve',
+
+      icon: 'check',
+
+      text: 'Approve',
+
+      onClick: (e: any) => {
+        setTimeout(() => this.onApproveClick(e));
+      },
+
+      visible: (e: any) => e.row.data.STATUS === 'Verified',
+    },
+
+    {
+      hint: 'Travel',
+      icon: 'check',
+      text: 'Travel',
+      onClick: (e: any) => {
+        setTimeout(() => this.onTravelClick(e));
+      },
+      visible: (e: any) => e.row.data.STATUS === 'Approved',
+    },
+
+    {
+      hint: 'Rejoin',
+      icon: 'check',
+      text: 'Rejoin',
+      onClick: (e: any) => {
+        setTimeout(() => this.onRejoinClick(e));
+      },
+      visible: (e: any) => e.row.data.STATUS === 'Travelled',
+    },
+  ];
+
+  constructor(
+    private fb: FormBuilder,
+    private dataservice: DataService,
+    private ngZone: NgZone,
+  ) {
+    this.formsource = this.fb.group({
+      Doc_no: ['', Validators.required],
+      Date: [new Date(), Validators.required],
+      Employee_no: ['', Validators.required],
+      Employee_name: ['', Validators.required],
+      Leave_type: ['', Validators.required],
+      Leave_days: ['', Validators.required],
+      Leave_credit: ['', Validators.required],
+      Dept_date: ['', Validators.required],
+      Expected_rejoin_date: ['', Validators.required],
+      Remarks: ['', Validators.required],
+      Leave_salary_payable: ['', Validators.required],
+      // },
+    });
+    this.sesstion_Details();
+    this.get_EmployeeLeaveList();
+    this.get_Employee_Details();
+    this.get_ExistingLeaveByEmployee();
+    const UserID = sessionStorage.getItem('UserId');
+
+    //=====================AUTO FILL===================================
+
+    this.formsource.get('Leave_days')?.valueChanges.subscribe((leaveDays) => {
+      this.autofillExpectedRejoinDate();
+    });
+
+    this.formsource.get('Dept_date')?.valueChanges.subscribe((deptDate) => {
+      this.autofillExpectedRejoinDate();
+    });
+
+    this.get_LeaveType_Dropdown_List();
+    this.get_Employee_Dropdown_List();
+    this.get_EOS_Dropdown_List();
+  }
+  //========================STATUS====================
   onVerifyClick(e: any): void {
     e.cancel = true;
     e.cancel = true;
@@ -113,6 +295,8 @@ export class EmployeeLeaveComponent {
     this.dataservice
       .Select_EmployeeLeave_Api(employeeId)
       .subscribe((response: any) => {
+        // Set TRAVELLED_DATE same as DEPT_DATE if null
+        response.TRAVELLED_DATE = response.TRAVELLED_DATE || response.DEPT_DATE;
         this.selectedData = response;
         this.TravelPopup = true;
       });
@@ -135,107 +319,12 @@ export class EmployeeLeaveComponent {
       });
   }
 
-  @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
-
-  AllEmployeeDetails: any = [];
-  showFilterRow: boolean = true;
-  currentFilter: string = 'auto';
-  editingRowData: any = {}; // To store the selected row's data
-  AddVacationPopup = false;
-  UpdateVacationPopup = false;
-  formData: any;
-  Leave_type: any;
-  Employee_no: any;
-  formsource: FormGroup;
-  isFilterOpened = false;
-  EmployeeLeaveDatasource: any[];
-
-  constructor(
-    private fb: FormBuilder,
-    private dataservice: DataService,
-    private ngZone: NgZone,
-  ) {
-    this.formsource = this.fb.group({
-      Doc_no: ['', Validators.required],
-      Date: [new Date(), Validators.required],
-      Employee_no: ['', Validators.required],
-      Employee_name: ['', Validators.required],
-      Leave_type: ['', Validators.required],
-      Leave_days: ['', Validators.required],
-      Leave_credit: ['', Validators.required],
-      Dept_date: ['', Validators.required],
-      Expected_rejoin_date: ['', Validators.required],
-      Remarks: ['', Validators.required],
-      Leave_salary_payable: ['', Validators.required],
-      // },
-    });
-    this.sesstion_Details();
-    this.get_EmployeeLeaveList();
-    this.get_Employee_Details();
-    this.get_ExistingLeaveByEmployee();
-    const UserID = sessionStorage.getItem('UserId');
-
-    //=====================AUTO FILL===================================
-
-    this.formsource.get('Leave_days')?.valueChanges.subscribe((leaveDays) => {
-      this.autofillExpectedRejoinDate();
-    });
-
-    this.formsource.get('Dept_date')?.valueChanges.subscribe((deptDate) => {
-      this.autofillExpectedRejoinDate();
-    });
-
-    this.get_LeaveType_Dropdown_List();
-    this.get_Employee_Dropdown_List();
-    this.get_EOS_Dropdown_List();
-  }
-
-  searchButtonOptions = {
-    icon: 'search',
-    hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilters(),
-  };
-
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => {
-      this.ngZone.run(() => this.refreshGrid());
-    },
-    text: '',
-  };
-
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
     this.get_EmployeeLeaveList();
   }
-  addButtonOptions = {
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
-    onClick: () => {
-      this.ngZone.run(() => this.Add_EmployeeLeave());
-    },
-    elementAttr: { class: 'add-button' },
-
-    template: () => {
-      return `
-      <div class="add-btn-content">
-        <span class="iconify"
-              data-icon="formkit:add"
-              data-width="20"
-              data-height="20"></span>
-        <span class="add-text">New</span>
-      </div>
-    `;
-    },
-  };
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
@@ -248,95 +337,7 @@ export class EmployeeLeaveComponent {
     }
   }
 
-  //============================ICONS=================
-
-  allActionButtons = [
-    {
-      name: 'edit',
-
-      hint: 'Edit',
-
-      icon: 'edit',
-
-      text: 'Edit',
-
-      visible: (e) => e.row.data.STATUS !== 'Verified',
-    },
-
-    {
-      name: 'delete',
-
-      hint: 'Delete',
-
-      icon: 'trash',
-
-      text: 'Delete',
-
-      // onClick: (e) => this.onDeleteClick(e),
-
-      visible: (e) =>
-        e.row.data.STATUS !== 'Approved' &&
-        e.row.data.STATUS !== 'Travelled' &&
-        e.row.data.STATUS !== 'Rejoined' &&
-        e.row.data.STATUS !== 'Left Service',
-    },
-
-    {
-      hint: 'Verify',
-
-      icon: 'check',
-
-      text: 'Verify',
-
-      onClick: (e) => {
-        setTimeout(() => this.onVerifyClick(e));
-      },
-
-      visible: (e) =>
-        e.row.data.STATUS !== 'Approved' &&
-        e.row.data.STATUS !== 'Verified' &&
-        e.row.data.STATUS !== 'Travelled' &&
-        e.row.data.STATUS !== 'Rejoined' &&
-        e.row.data.STATUS !== 'Left Service',
-    },
-
-    {
-      hint: 'Approve',
-
-      icon: 'check',
-
-      text: 'Approve',
-
-      onClick: (e) => {
-        setTimeout(() => this.onApproveClick(e));
-      },
-
-      visible: (e) => e.row.data.STATUS === 'Verified',
-    },
-
-    {
-      hint: 'Travel',
-      icon: 'check',
-      text: 'Travel',
-      onClick: (e) => {
-        setTimeout(() => this.onTravelClick(e));
-      },
-      visible: (e) => e.row.data.STATUS === 'Approved',
-    },
-
-    {
-      hint: 'Rejoin',
-      icon: 'check',
-      text: 'Rejoin',
-      onClick: (e) => {
-        setTimeout(() => this.onRejoinClick(e));
-      },
-      visible: (e) => e.row.data.STATUS === 'Travelled',
-    },
-  ];
-
   //====================AUTO FILL===================
-
   autofillExpectedRejoinDate() {
     const deptDate = this.formsource.get('Dept_date')?.value;
     const leaveDays = this.formsource.get('Leave_days')?.value;
@@ -405,13 +406,6 @@ export class EmployeeLeaveComponent {
     }
   }
 
-  //=======================================
-  minDate: Date;
-
-  //=====================================================================================================
-
-  today = new Date();
-
   // Function to disable past dates
   isDateDisabled = (data: { date: Date }) => {
     const date = data.date;
@@ -449,7 +443,7 @@ export class EmployeeLeaveComponent {
   }
 
   refresh = () => {
-    this.dataGrid.instance.refresh();
+    this.dataGrid?.instance.refresh();
   };
 
   closePopup() {
@@ -528,7 +522,7 @@ export class EmployeeLeaveComponent {
         this.AllEmployeeDetails = res.data;
 
         const selectedEmployee = this.AllEmployeeDetails.find(
-          (item) => item.EMP_ID === Id,
+          (item: any) => item.EMP_ID === Id,
         );
 
         this.EmployeeDetails = selectedEmployee;
@@ -546,7 +540,7 @@ export class EmployeeLeaveComponent {
     this.dataservice.get_EmployeeLeave_Api().subscribe((res: any) => {
       const datas = res.data;
 
-      this.ExistingEmployee = datas.filter((item) => item.EMP_ID == id);
+      this.ExistingEmployee = datas.filter((item: any) => item.EMP_ID == id);
       this.ExisitngDeparture = this.ExistingEmployee[0]?.DEPT_DATE;
       this.ExistingReturn = this.ExistingEmployee[0]?.EXPECT_RETURN;
     });
@@ -589,6 +583,7 @@ export class EmployeeLeaveComponent {
 
     this.formsource.get('Expected_rejoin_date')?.setValue(suggestedDate);
   }
+
   validateExpectedRejoin = (e: any) => {
     const value = e.value;
     const depRaw = this.ExistingEmployee[0]?.DEPT_DATE;
@@ -620,38 +615,7 @@ export class EmployeeLeaveComponent {
     return isOverlapping ? { overlap: true } : null;
   };
 
-  // isExpectedRejoinDateDisabled = (data: { date: Date }) => {
-  //   const expectReturnRaw = this.ExistingEmployee[0]?.EXPECT_RETURN;
-
-  //   if (!expectReturnRaw) return false;
-
-  //   const expectReturnDate = new Date(expectReturnRaw);
-  //   const current = data.date;
-
-  //   // Disable all dates on or before EXPECT_RETURN
-  //   return current <= expectReturnDate;
-  // // };
-  // isDepartureDateDisabled = (data: { date: Date }) => {
-  //   const deptRaw = this.ExistingEmployee[0]?.DEPT_DATE;
-  //   const rejoinRaw = this.ExistingEmployee[0]?.REJOIN_DATE;
-
-  //   if (!deptRaw) return false;
-
-  //   const deptDate = new Date(deptRaw);
-  //   const rejoinDate = rejoinRaw ? new Date(rejoinRaw) : null;
-  //   const current = data.date;
-
-  //   // If employee has rejoined, disable dates before or on the rejoin date
-  //   if (rejoinDate) {
-  //     return current <= rejoinDate;
-  //   }
-
-  //   // If not yet rejoined, disable dates after departure
-  //   return current >= deptDate;
-  // };
-
   //===================STATUS FLAG========================
-
   getStatusFlagClass(status: string): string {
     switch (status) {
       case 'Open':
@@ -1016,7 +980,16 @@ export class EmployeeLeaveComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const savedData = sessionStorage.getItem('savedUserData');
+    if (!savedData) {
+      this.sessionData = null;
+      this.COMPANY_ID = null;
+      this.UserId = null;
+      this.StoreId = null;
+      return;
+    }
+
+    this.sessionData = JSON.parse(savedData);
 
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
     this.UserId = this.sessionData.USER_ID;
@@ -1098,7 +1071,7 @@ export class EmployeeLeaveComponent {
     const Leave_salary_payable = this.selectedData.LS_PAYABLE;
     const Is_ticket = this.selectedData.IS_TICKET;
     const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
-    const Travelled_date = this.selectedData.DEPT_DATE;
+    const Travelled_date = this.selectedData.TRAVELLED_DATE;
     const Rejoin_date = this.selectedData.REJOIN_DATE;
     const Actual_days = this.selectedData.ACTUAL_DAYS;
     const Deduct_days = this.selectedData.DEDUCT_DAYS;
@@ -1167,7 +1140,7 @@ export class EmployeeLeaveComponent {
     const Leave_salary_payable = this.selectedData.LS_PAYABLE;
     const Is_ticket = this.selectedData.IS_TICKET;
     const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
-    const Travelled_date = this.selectedData.DEPT_DATE;
+    const Travelled_date = this.selectedData.TRAVELLED_DATE;
     const Rejoin_date = this.selectedData.REJOIN_DATE;
     const Actual_days = this.selectedData.ACTUAL_DAYS;
     const Deduct_days = this.selectedData.DEDUCT_DAYS;
@@ -1262,10 +1235,3 @@ export class EmployeeLeaveComponent {
   declarations: [EmployeeLeaveComponent],
 })
 export class EmployeeLeaveModule {}
-
-function updateExpectedRejoinDate(daysTaken: any, number: any) {
-  throw new Error('Function not implemented.');
-}
-function onStatusChange(status: string, string: any) {
-  throw new Error('Function not implemented.');
-}

@@ -151,7 +151,8 @@
       <dxi-column
         dataField="NET_AMOUNT"
         caption="Net Amount"
-        [allowEditing]="false"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
       <dxi-column
         dataField="REMARKS"

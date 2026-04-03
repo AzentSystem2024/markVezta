@@ -48,21 +48,21 @@ interface jsPDFWithAutoTable extends jsPDF {
   styleUrls: ['./pay-slip.component.scss'],
 })
 export class PaySlipComponent {
-  formatted_To_date: string;
-  formatted_from_date: string;
+  formatted_To_date: string | undefined;
+  formatted_from_date: string | undefined;
   defaultDate: Date = new Date();
   selected_Company_id: any;
   selected_Company_name: any;
   financialYeaDate: any;
   selected_fin_id: any;
   months: any[] = [];
-  selectedMonth: string;
+  selectedMonth: string | undefined;
   employeeList: any;
   EmployeeID: any;
   selectedEmployee: number[] = [];
 
   pdfSrc: SafeResourceUrl | null = null;
-  payloadDate: string;
+  payloadDate: string | undefined;
   pdfData: any;
   gridData: any;
   allSelected = false;
@@ -142,11 +142,11 @@ export class PaySlipComponent {
           (h: any) => h.HEAD_TYPE === 2,
         );
         const totalEarnings = earnings.reduce(
-          (sum, e) => sum + e.HEAD_AMOUNT,
+          (sum:any, e:any) => sum + e.HEAD_AMOUNT,
           0,
         );
         const totalDeductions = deductions.reduce(
-          (sum, d) => sum + d.HEAD_AMOUNT,
+          (sum:any, d:any) => sum + d.HEAD_AMOUNT,
           0,
         );
         const netPay = totalEarnings - totalDeductions;
@@ -248,8 +248,6 @@ export class PaySlipComponent {
 
   // Helper to convert number to words (simple version)
   numberToWords(amount: number) {
-    // You can use any library or implement conversion
-    // For now, returning amount as string
     return amount.toLocaleString('en-IN', { style: 'decimal' });
   }
 
@@ -296,7 +294,11 @@ export class PaySlipComponent {
   }
 
   GetEmployeeList() {
-    this.dataService.getDropdownData('EMPLOYEE').subscribe((res) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      Name: 'EMPLOYEE',
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
       this.employeeList = res;
     });
   }
@@ -316,14 +318,17 @@ export class PaySlipComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.selected_Company_name = sessionData.SELECTED_COMPANY.COMPANY_NAME;
-    const sessionYear = sessionData.FINANCIAL_YEARS;
-    this.financialYeaDate = sessionYear[0].DATE_FROM;
-    this.formatted_from_date = this.financialYeaDate;
+    const savedData = sessionStorage.getItem('savedUserData');
+    if (savedData) {
+      const sessionData = JSON.parse(savedData);
+      this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+      this.selected_Company_name = sessionData.SELECTED_COMPANY.COMPANY_NAME;
+      const sessionYear = sessionData.FINANCIAL_YEARS;
+      this.financialYeaDate = sessionYear[0].DATE_FROM;
+      this.formatted_from_date = this.financialYeaDate;
 
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+      this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    }
   }
 }
 
