@@ -384,16 +384,25 @@ export class SupplierListComponent implements OnInit {
 
   onRowRemoving(event) {
     const id = event.data.ID;
-    this.dataservice.removeSupplier(id).subscribe(() => {
-      notify(
-        {
-          message: 'Delete operation successful',
-          position: { at: 'top right', my: 'top right' },
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice.removeSupplier(id).subscribe({
+        next: () => {
+          notify(
+            {
+              message: 'Delete operation successful',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+          this.showSupplier();
+
+          resolve(false); // ✅ allow delete → popup closes
         },
-        'success',
-      );
-      this.dataGrid.instance.refresh();
-      this.showSupplier();
+        error: () => {
+          notify('Delete failed', 'error', 3000);
+          reject(); // ❌ cancel delete
+        },
+      });
     });
   }
 

@@ -5,6 +5,7 @@ import {
   ViewChild,
   NgZone,
   ChangeDetectorRef,
+  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import {
   DxButtonModule,
@@ -28,27 +29,29 @@ import { FormPopupModule } from 'src/app/components';
 import { ExportService } from 'src/app/services/export.service';
 import notify from 'devextreme/ui/notify';
 import {
-  CustomerFormComponent,
-  CustomerFormModule,
-} from '../../../components/HR/Masters/Customer/customer-form/customer-form.component';
+  CustomerFinFormComponent,
+  CustomerFinFormModule,
+} from '../../../components/HR/Masters/Customer/customer-fin-form/customer-fin-form.component';
 import {
-  CustomerEditFormComponent,
-  CustomerEditFormModule,
-} from '../../../components/HR/Masters/Customer/customer-edit-form/customer-edit-form.component';
+  CustomerFinEditFormComponent,
+  CustomerFinEditFormModule,
+} from '../../../components/HR/Masters/Customer/customer-fin-edit-form/customer-fin-edit-form.component';
 import { FormTextboxModule } from '../../../components/utils/form-textbox/form-textbox.component';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
+import { CustomerFormModule } from 'src/app/components/HR/Masters/Customer/customer-form/customer-form.component';
 
 @Component({
-  selector: 'app-customer-list',
-  templateUrl: './customer-list.component.html',
-  styleUrls: ['./customer-list.component.scss'],
+  selector: 'app-customer-fin-list',
+  templateUrl: './customer-fin-list.component.html',
+  styleUrls: ['./customer-fin-list.component.scss'],
 })
-export class CustomerListComponent {
-  @ViewChild(CustomerFormComponent) customerComponent: CustomerFormComponent;
+export class CustomerFinListComponent {
+  @ViewChild(CustomerFinFormComponent)
+  customerComponent: CustomerFinFormComponent;
 
-  @ViewChild(CustomerEditFormComponent)
-  selectedCustomerData: CustomerEditFormComponent;
+  @ViewChild(CustomerFinEditFormComponent)
+  selectedCustomerData: CustomerFinEditFormComponent;
 
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
@@ -97,14 +100,14 @@ export class CustomerListComponent {
 
     template: () => {
       return `
-      <div class="add-btn-content">
-        <span class="iconify"
-              data-icon="formkit:add"
-              data-width="20"
-              data-height="20"></span>
-        <span class="add-text">New</span>
-      </div>
-    `;
+        <div class="add-btn-content">
+          <span class="iconify"
+                data-icon="formkit:add"
+                data-width="20"
+                data-height="20"></span>
+          <span class="add-text">New</span>
+        </div>
+      `;
     },
   };
   searchButtonOptions = {
@@ -152,6 +155,7 @@ export class CustomerListComponent {
     DISCOUNT_PERCENT: '',
     CUST_VAT_RULE_ID: '',
     VAT_REGNO: '',
+    IS_COMPANY_BRANCH: 0,
   };
 
   //==========================Dummy data===========================
@@ -251,6 +255,7 @@ export class CustomerListComponent {
       DISCOUNT_PERCENT: '',
       CUST_VAT_RULE_ID: '',
       VAT_REGNO: '',
+      IS_COMPANY_BRANCH: 0,
     };
   }
   OnEditCustomer(e: any) {
@@ -436,55 +441,63 @@ export class CustomerListComponent {
       CUST_VAT_RULE_ID,
       VAT_REGNO,
     } = selectedRow;
-    this.dataservice
-      .removeCustomerData(
-        ID,
-        CUST_CODE,
-        FIRST_NAME,
-        LAST_NAME,
-        DOB,
-        NATIONALITY,
-        CONTACT_NAME,
-        ADDRESS1,
-        ADDRESS2,
-        ADDRESS3,
-        ZIP,
-        STATE_ID,
-        CITY,
-        COUNTRY_ID,
-        PHONE,
-        MOBILE_NO,
-        EMAIL,
-        FAX_NO,
-        CREDIT_LIMIT,
-        CURRENT_CREDIT,
-        PAY_TERM_ID,
-        NOTES,
-        PRICE_CLASS_ID,
-        DISCOUNT_PERCENT,
-        CUST_VAT_RULE_ID,
-        VAT_REGNO,
-      )
-      .subscribe(() => {
-        try {
-          notify(
-            {
-              message: 'Customer data deleted successfully',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.showCustomer();
-        } catch {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice
+        .removeCustomerData(
+          ID,
+          CUST_CODE,
+          FIRST_NAME,
+          LAST_NAME,
+          DOB,
+          NATIONALITY,
+          CONTACT_NAME,
+          ADDRESS1,
+          ADDRESS2,
+          ADDRESS3,
+          ZIP,
+          STATE_ID,
+          CITY,
+          COUNTRY_ID,
+          PHONE,
+          MOBILE_NO,
+          EMAIL,
+          FAX_NO,
+          CREDIT_LIMIT,
+          CURRENT_CREDIT,
+          PAY_TERM_ID,
+          NOTES,
+          PRICE_CLASS_ID,
+          DISCOUNT_PERCENT,
+          CUST_VAT_RULE_ID,
+          VAT_REGNO,
+        )
+        .subscribe({
+          next: () => {
+            try {
+              notify(
+                {
+                  message: 'Customer data deleted successfully',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'success',
+              );
+            } catch {
+              notify(
+                {
+                  message: 'Delete operation failed',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error',
+              );
+            }
+            resolve(false); // ✅ allow delete → popup closes
+          },
+          error: () => {
+            notify('Delete failed', 'error', 3000);
+            reject(); // ❌ cancel delete
+          },
+        });
+    });
   }
   ngOnInit(): void {
     const currentUrl = this.router.url;
@@ -647,8 +660,8 @@ export class CustomerListComponent {
     DxDataGridModule,
     DxButtonModule,
     FormPopupModule,
-    CustomerFormModule,
-    CustomerEditFormModule,
+    CustomerFinFormModule,
+    CustomerFinEditFormModule,
     DxPopupModule,
     FormTextboxModule,
     DxCheckBoxModule,
@@ -662,6 +675,7 @@ export class CustomerListComponent {
   ],
   providers: [],
   exports: [],
-  declarations: [CustomerListComponent],
+  declarations: [CustomerFinListComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CustomerListModule {}
+export class CustomerFinListModule {}

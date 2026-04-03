@@ -50,11 +50,11 @@ import { Router } from '@angular/router';
 })
 export class EmployeeComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
   readonly allowedPageSizes: any = [10, 15, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter: boolean = true;
   addEmployeePopupOpened: boolean = false;
   showFilterRow = true;
   currency: any;
@@ -149,8 +149,8 @@ export class EmployeeComponent implements OnInit {
 
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -166,8 +166,14 @@ export class EmployeeComponent implements OnInit {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (!savedUserData) {
+      this.selected_Company_id = null;
+      return;
+    }
+
+    const sessionData = JSON.parse(savedUserData);
+    this.selected_Company_id = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
   }
 
   toggleFilters() {
@@ -208,6 +214,7 @@ export class EmployeeComponent implements OnInit {
   applyFilter() {
     this.GridSource.filter();
   }
+  
   onAddClick() {}
 
   addEmployee() {
@@ -319,7 +326,7 @@ export class EmployeeComponent implements OnInit {
     DxoItemModule,
     EmployeeAddFormModule,
     EmployeeEditFormFormModule,
-    DxLoadPanelModule
+    DxLoadPanelModule,
   ],
   providers: [],
   declarations: [EmployeeComponent],

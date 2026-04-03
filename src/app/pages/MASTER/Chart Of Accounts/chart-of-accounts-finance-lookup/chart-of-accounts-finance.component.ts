@@ -52,11 +52,11 @@ import { ChartOfAccountsFinanceEditFormModule } from '../chart-of-accounts-finan
 })
 export class ChartOfAccountsFinanceComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent| undefined;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter: true | undefined;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -143,8 +143,8 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/chart-of-accounts-finance');
+      .flatMap((group:any) => group.Menus)
+      .find((menu:any) => menu.Path === '/chart-of-accounts-finance');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

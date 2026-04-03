@@ -35,13 +35,6 @@
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
     >
-      <!-- <dxo-column-chooser
-        [height]="500"
-        hideOnOutsideClick="true"
-        [enabled]="true"
-        mode="select"
-      >
-      </dxo-column-chooser> -->
       <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
@@ -86,14 +79,7 @@
         <dxi-item location="before">
           <div class="grid-header" style="font-size: 20px">Salary Head</div>
         </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-          <!-- <dx-button
-            icon="plus"
-            type="default"
-            stylingMode="contained"
-            (onClick)="addEmployee()"
-          ></dx-button> -->
-        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
 
         <dxi-item
           location="after"
@@ -145,14 +131,13 @@
           [attr.title]="cellData.value ? true : false"
           style="margin-left: 10px; cursor: default"
         ></i>
-              
       </div>
     </dx-data-grid>
 
     <dx-popup
       [(visible)]="addSalaryHeadPopupOpened"
       [width]="'90vw'"
-      [height]="'80vh'"
+      [height]="'auto'"
       title="Add Salary Head"
       (onHiding)="handleEditClose()"
     >
@@ -166,7 +151,7 @@
 <dx-popup
   [(visible)]="EditSalaryHeadPopupOpened"
   [width]="'90vw'"
-  [height]="'80vh'"
+  [height]="'auto'"
   title="Edit Salary Head"
   (onHiding)="handleEditClose()"
 >
