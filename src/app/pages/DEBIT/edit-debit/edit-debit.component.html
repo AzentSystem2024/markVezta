@@ -202,8 +202,13 @@
         <dxi-column
           dataField="GST_PERC"
           [caption]="vatTitle + '%'"
-          dataType="number"
-          [allowEditing]="false"
+          alignment="right"
+          [format]="{ type: 'fixedPoint', precision: 0 }"
+          [lookup]="{
+            dataSource: VatClass,
+            valueExpr: 'VALUE',
+            displayExpr: 'DESCRIPTION',
+          }"
         >
         </dxi-column>
 

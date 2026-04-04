@@ -31,6 +31,7 @@ import notify from 'devextreme/ui/notify';
 })
 export class StateEditComponent {
   @Input() selectState: any;
+  @Input() stateDataList: any;
   @Output() formClosed = new EventEmitter<void>();
 
   CountryDropdownData: any;
@@ -55,16 +56,13 @@ export class StateEditComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectState'] && changes['selectState'].currentValue) {
       const data = changes['selectState'].currentValue;
-      console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa');
       this.formStateData = data;
-      console.log(this.formStateData);
     }
   }
 
   getCountryDropDown() {
     this.service.getCountryData().subscribe((data: any) => {
       this.CountryDropdownData = data;
-      console.log('dropdown', this.CountryDropdownData);
     });
   }
   ngOnInit(): void {
@@ -73,20 +71,55 @@ export class StateEditComponent {
   }
 
   onRowUpdating() {
-    //  const updataDate = event.newData;
-    //  const oldData = event.oldData;
-    //  const combinedData = { ...oldData, ...updataDate };
-    //  let id = combinedData.ID;
-    //  let stateCode = combinedData.STATE_CODE;
-    //  let statename = combinedData.STATE_NAME;
-    //  let country_id = combinedData.COUNTRY_ID;
     const payload = {
       ID: this.formStateData.ID,
       STATE_CODE: this.formStateData.STATE_CODE,
       STATE_NAME: this.formStateData.STATE_NAME,
       COUNTRY_ID: this.formStateData.COUNTRY_ID,
     };
-    console.log(payload, 'payload');
+    // SAFETY CHECK
+    if (!this.stateDataList || this.stateDataList.length === 0) {
+      notify(
+        {
+          message: 'State list not loaded. Please try again.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+      );
+      return;
+    }
+
+    const STATE_CODE = payload.STATE_CODE;
+    const STATE_NAME = payload.STATE_NAME;
+    const currentId = payload.ID;
+
+    // DUPLICATE CHECK (IGNORE CURRENT ID)
+    const isDuplicateCode = this.stateDataList.some(
+      (x: any) =>
+        x.ID !== currentId &&
+        x.STATE_CODE?.toLowerCase().trim() === STATE_CODE?.toLowerCase().trim(),
+    );
+
+    const isDuplicateName = this.stateDataList.some(
+      (x: any) =>
+        x.ID !== currentId &&
+        x.STATE_NAME?.toLowerCase().trim() === STATE_NAME?.toLowerCase().trim(),
+    );
+
+    if (isDuplicateCode || isDuplicateName) {
+      notify(
+        {
+          message: `${
+            isDuplicateCode ? 'State Code already exists. ' : ''
+          }${isDuplicateName ? 'State Name already exists.' : ''}`,
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+      );
+      return;
+    }
+
+    // API CALL
     this.service.UpdateState(payload).subscribe((data: any) => {
       if (data) {
         notify(
@@ -96,7 +129,7 @@ export class StateEditComponent {
           },
           'success',
         );
-        //  this.dataGrid.instance.refresh();
+
         this.formClosed.emit();
         this.showState();
       } else {

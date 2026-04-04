@@ -47,27 +47,27 @@ export class StoresFormComponent implements OnInit {
     ADDRESS2: '',
     ADDRESS3: '',
     ZIP_CODE: '',
-    STATE_ID: '',
+    STATE_ID: null,
     CITY: '',
-    COUNTRY_ID: '',
+    COUNTRY_ID: null,
     IS_DEFAULT_STORE: false,
     PHONE: '',
     EMAIL: '',
     VAT_REGNO: '',
-    GROUP_ID: 0,
+    GROUP_ID: null,
     STORE_NO: '0',
     IS_ACTIVE: false,
     COMPANY_ID: 0,
   };
   countryList: any;
-  countries: any[];
+  countries: any[] | undefined;
   selectedCountryId: any;
-  Phone_limit: number;
+  Phone_limit: number | undefined;
   countryCodes: any;
   countryCodePhone: any;
   departments: any;
   selectedCompanyId: any;
-  companyList: any[];
+  companyList: any[] | undefined;
   creditFormData: any;
   selectedDepartments: any[] = [];
   Country: any;
@@ -241,14 +241,7 @@ export class StoresFormComponent implements OnInit {
       .subscribe((response: any) => {
         this.State = response;
       });
-    // const payload = {
-    //   NAME: 'STATE_NAME',
-    //   COUNTRY_ID: this.selectedCountryId,
-    // };
-
-    // this.service.getStateDropdownData(payload).subscribe((data: any) => {
-    //   this.StateDropdownData = data;
-    // });
+   
   }
 
   onCountrySelectionChanged(event: any) {

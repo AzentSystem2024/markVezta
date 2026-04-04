@@ -1,6 +1,5 @@
 import {
   Component,
-  OnInit,
   NgModule,
   ViewChild,
   NgZone,
@@ -19,9 +18,6 @@ import {
   StateFormModule,
 } from 'src/app/components/library/state-form/state-form.component';
 import notify from 'devextreme/ui/notify';
-import { Workbook } from 'exceljs';
-import { saveAs } from 'file-saver-es';
-import { jsPDF } from 'jspdf';
 import { ExportService } from 'src/app/services/export.service';
 import { StateEditModule } from 'src/app/state-edit/state-edit.component';
 import { Router } from '@angular/router';
@@ -33,12 +29,14 @@ import DataSource from 'devextreme/data/data_source';
   styleUrls: ['./state-list.component.scss'],
 })
 export class StateListComponent {
-  @ViewChild(StateFormComponent) stateComponent: StateFormComponent;
+  @ViewChild(StateFormComponent) stateComponent: StateFormComponent | undefined;
+
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
+
   @Output() formClosed = new EventEmitter<void>();
 
-  StateDataSource: DataSource;
+  StateDataSource: DataSource | undefined;
   stateArray: any[] = [];
   stateCount = 0;
   CountryDropdownData: any;
@@ -86,9 +84,10 @@ export class StateListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, // global style
     onClick: () => this.toggleFilters(),
   };
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -109,9 +108,33 @@ export class StateListComponent {
     private zone: NgZone,
     private router: Router,
   ) {}
-  // onExporting(event: any) {
-  //   this.exportService.onExporting(event, 'state-list');
-  // }
+
+  ngOnInit(): void {
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.sessionData_tax();
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+    this.showState();
+    this.getCountryDropDown();
+  }
+
   addState() {
     this.isAddStatePopupOpened = true;
   }
@@ -130,10 +153,10 @@ export class StateListComponent {
             next: (response: any) => {
               const data = response || [];
 
-              this.stateArray = data; // local usage if needed
+              this.stateArray = data;
               this.stateCount = data.length;
 
-              resolve(data); // 🔑 stops grid loader
+              resolve(data);
             },
             error: () => {
               this.stateArray = [];
@@ -144,6 +167,7 @@ export class StateListComponent {
         }),
     });
   }
+
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
@@ -183,9 +207,55 @@ export class StateListComponent {
   }
 
   onClickSaveState() {
-    const { STATE_CODE, STATE_NAME, COUNTRY_ID } =
-      this.stateComponent.getNewStateData();
-    console.log('inserted data', STATE_NAME, COUNTRY_ID);
+    const newStateData = this.stateComponent?.getNewStateData();
+
+    if (!newStateData) {
+      notify(
+        {
+          message: 'Unable to save state: form is not initialized',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+      );
+      return;
+    }
+
+    const { STATE_CODE, STATE_NAME, COUNTRY_ID } = newStateData;
+
+    // DUPLICATE CHECK
+    const isDuplicateCode = this.stateArray.some(
+      (x: any) =>
+        x.STATE_CODE?.toLowerCase().trim() === STATE_CODE?.toLowerCase().trim(),
+    );
+
+    const isDuplicateName = this.stateArray.some(
+      (x: any) =>
+        x.STATE_NAME?.toLowerCase().trim() === STATE_NAME?.toLowerCase().trim(),
+    );
+
+    if (isDuplicateCode) {
+      notify(
+        {
+          message: 'State Code already exists',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+      );
+      return;
+    }
+
+    if (isDuplicateName) {
+      notify(
+        {
+          message: 'State Name already exists',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+      );
+      return;
+    }
+
+    // ✅ API CALL (only if no duplicates)
     this.dataservice
       .postStateData(STATE_CODE, STATE_NAME, COUNTRY_ID)
       .subscribe((response) => {
@@ -198,7 +268,7 @@ export class StateListComponent {
               },
               'success',
             );
-            // this.dataGrid.instance.refresh();
+
             this.formClosed.emit();
             this.isAddStatePopupOpened = false;
             this.showState();
@@ -214,6 +284,7 @@ export class StateListComponent {
         }
       });
   }
+
   onRowRemoving(event: any) {
     const selectedRow = event.data;
     const { ID, STATE_CODE, STATE_NAME, COUNTRY_ID } = selectedRow;
@@ -231,10 +302,10 @@ export class StateListComponent {
               'success',
             );
 
-            this.dataGrid.instance.refresh();
+            this.dataGrid?.instance.refresh();
             this.showState();
 
-            resolve(false); // ✅ allow delete → popup closes
+            resolve(false); // allow delete → popup closes
           },
           error: () => {
             notify(
@@ -245,83 +316,24 @@ export class StateListComponent {
               'error',
             );
 
-            resolve(true); // ❌ cancel delete → popup stays
+            resolve(true); // cancel delete → popup stays
           },
         });
     });
   }
-  //  onRowUpdating (event) {
-  //     const updataDate = event.newData;
-  //     const oldData = event.oldData;
-  //     const combinedData = { ...oldData, ...updataDate };
-  //     let id = combinedData.ID;
-  //     let stateCode = combinedData.STATE_CODE;
-  //     let statename = combinedData.STATE_NAME;
-  //     let country_id = combinedData.COUNTRY_ID;
 
-  //     this.dataservice
-  //       .updateState(id, stateCode, statename, country_id)
-  //       .subscribe((data: any) => {
-  //         if (data) {
-  //           notify(
-  //             {
-  //               message: 'State updated Successfully',
-  //               position: { at: 'top right', my: 'top right' },
-  //             },
-  //             'success'
-  //           );
-  //           this.dataGrid.instance.refresh();
-  //           this.showState();
-  //         } else {
-  //           notify(
-  //             {
-  //               message: 'Your Data Not Saved',
-  //               position: { at: 'top right', my: 'top right' },
-  //             },
-  //             'error'
-  //           );
-  //         }
-  //       });
-  //     console.log('old data:', oldData);
-  //     console.log('new data:', updataDate);
-  //     console.log('modified data:', combinedData);
-
-  //     event.cancel = true; // Prevent the default update operation
-  //   }
-  ngOnInit(): void {
-    const currentUrl = this.router.url;
-
-    const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
-    this.sessionData_tax();
-    const menuGroups = menuResponse.MenuGroups || [];
-
-    const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/credit-note');
-
-    if (packingRights) {
-      this.canAdd = packingRights.CanAdd;
-      this.canEdit = packingRights.CanEdit;
-      this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
-    }
-
-    this.showState();
-    this.getCountryDropDown();
-  }
   getCountryDropDown() {
     this.dataservice.getCountryData().subscribe((data: any) => {
       this.CountryDropdownData = data;
       console.log('dropdown', this.CountryDropdownData);
     });
   }
+
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }

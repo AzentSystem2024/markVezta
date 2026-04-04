@@ -34,7 +34,7 @@
     <dxo-header-filter [visible]="isFilterOpened">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
-    <!-- <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel> -->
+
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
 
     <dxo-filter-row
@@ -45,19 +45,9 @@
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
     <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
-      <!-- <dxo-popup
-        title="Edit State"
-        [showTitle]="true"
-        [width]="450"
-        [height]="400"
-      >
-      </dxo-popup> -->
       <dxo-form [colCount]="1"> </dxo-form>
     </dxo-editing>
-    <!-- <dxo-search-panel
-      [visible]="true"
-      placeholder="Data Search"
-    ></dxo-search-panel> -->
+
     <dxo-toolbar>
       <dxi-item location="before">
         <div
@@ -105,6 +95,7 @@
         [options]="addButtonOptions"
       ></dxi-item>
     </dxo-toolbar>
+
     <dxi-column dataField="STATE_CODE" caption="State Codes"></dxi-column>
     <dxi-column dataField="STATE_NAME" caption="State Name">
       <dxi-validation-rule type="required" message="State is required">
@@ -125,25 +116,32 @@
       </dxo-lookup>
     </dxi-column>
   </dx-data-grid>
+
   <form-popup
     [(visible)]="isAddStatePopupOpened"
     (save)="onClickSaveState()"
     titleText="New State"
     [showApprove]="false"
   >
-    <app-state-form (formClosed)="CloseEditForm()"></app-state-form>
+    <div ngIf="isAddStatePopupOpened">
+      <app-state-form (formClosed)="CloseEditForm()"></app-state-form>
+    </div>
   </form-popup>
 
   <dx-popup
     [(visible)]="isEditPopupOpened"
     title="Edit State"
-    [height]="'40vh'"
-    [width]="'40vw'"
+    [height]="400"
+    [width]="500"
     (onHiding)="CloseEditForm()"
   >
-    <app-state-edit
-      (formClosed)="CloseEditForm()"
-      [selectState]="selectedState"
-    ></app-state-edit>
+    <div>
+      <app-state-edit
+        (formClosed)="CloseEditForm()"
+        [selectState]="selectedState"
+        [stateDataList]="stateArray"
+      >
+      </app-state-edit>
+    </div>
   </dx-popup>
 </div>

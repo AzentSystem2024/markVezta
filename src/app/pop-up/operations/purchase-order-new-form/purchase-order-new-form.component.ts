@@ -208,7 +208,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-   
+
     this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
     const menuGroups = this.menuResponse.MenuGroups || [];
@@ -421,12 +421,20 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
       if (!suppMobile) return;
 
-      const parts = suppMobile.split('-');
+      // Extract country code and number
+      const match = suppMobile.match(/^(\+?\d+)[-\s]?(\d+)$/);
 
-      if (parts.length === 2) {
-        this.supplierCountryCode = '+' + parts[0];
-        // this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
-        this.newPoData.SUPP_MOBILE = parts[1];
+      if (match) {
+        let code = match[1];
+        let number = match[2];
+
+        // ensure + exists
+        if (!code.startsWith('+')) {
+          code = '+' + code;
+        }
+
+        this.supplierCountryCode = code;
+        this.newPoData.SUPP_MOBILE = number;
       }
 
       // this.extractSupplierCountryCode();
@@ -447,18 +455,44 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     }
   }
 
+  // extractShippingCountryCode() {
+  //   if (!this.newPoData.CONTACT_MOBILE) return;
+
+  //   const parts = this.newPoData.CONTACT_MOBILE.split('-');
+
+  //   if (parts.length === 2) {
+  //     this.shippingCountryCode = '+' + parts[0];
+
+  //     //  ONLY number (same as SUPP_MOBILE)
+  //     this.newPoData.CONTACT_MOBILE = parts[1];
+  //     // this.shippingCountryCode = '+' + parts[0];
+  //     // this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
+  //   }
+  // }
+
   extractShippingCountryCode() {
     if (!this.newPoData.CONTACT_MOBILE) return;
 
-    const parts = this.newPoData.CONTACT_MOBILE.split('-');
+    const value = this.newPoData.CONTACT_MOBILE;
+
+    const parts = value.split('-');
 
     if (parts.length === 2) {
-      this.shippingCountryCode = '+' + parts[0];
+      let code = parts[0];
 
-      //  ONLY number (same as SUPP_MOBILE)
+      // ✅ ensure + exists (but don't duplicate)
+      if (!code.startsWith('+')) {
+        code = '+' + code;
+      }
+
+      this.shippingCountryCode = code;
+
+      // ✅ only number
       this.newPoData.CONTACT_MOBILE = parts[1];
-      // this.shippingCountryCode = '+' + parts[0];
-      // this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
+    } else {
+      // ✅ No country code → default +91
+      this.shippingCountryCode = '+971';
+      this.newPoData.CONTACT_MOBILE = value;
     }
   }
 
@@ -1223,7 +1257,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   setDefaultCountryCode() {
-    const defaultCountryCode = '+91';
+    const defaultCountryCode = '+971';
 
     const defaultCountry = this.countryCodes.find(
       (code) => code.data.dial_code === defaultCountryCode,
@@ -1258,32 +1292,15 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   onSupplierMobileInput(event: any) {
-    const target = event.event.target as HTMLInputElement;
+    const target = event.target as HTMLInputElement;
 
-    const dialCode = this.supplierCountryCode || '+91';
-
-    const cleanDialCode = dialCode.replace('+', '');
-
-    // get digits only
     let digits = target.value.replace(/\D/g, '');
 
-    const dialDigits = cleanDialCode;
-
-    // remove dial code digits
-    if (digits.startsWith(dialDigits)) {
-      digits = digits.slice(dialDigits.length);
-    }
-
-    // prevent starting with 0
     if (digits.startsWith('0')) {
       digits = digits.substring(1);
     }
 
-    // allow empty digits (important fix)
     this.newPoData.SUPP_MOBILE = digits;
-    // this.newPoData.SUPP_MOBILE = digits
-    //   ? `${cleanDialCode}-${digits}`
-    //   : `${cleanDialCode}-`;
   }
 
   SupplierMobileValidate = (e: any): boolean => {

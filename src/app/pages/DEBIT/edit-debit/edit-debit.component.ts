@@ -122,6 +122,7 @@ export class EditDebitComponent {
   subTypeList: any;
   vatTitle: any;
   showSubType: boolean;
+  VatClass: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -172,6 +173,7 @@ export class EditDebitComponent {
       this.userId = userData.USER_ID;
       this.finId = userData.FINANCIAL_YEARS?.[0]?.FIN_ID;
     }
+    this.getVatPercentList();
     // this.getDocNo();
     this.getLedgerCodeDropdown();
     // this.getSupplierDropdown();
@@ -350,6 +352,21 @@ export class EditDebitComponent {
   preventDateChange(e: any) {
     // Revert to original value to prevent change
     e.component.option('value', this.debitFormData.TRANS_DATE);
+  }
+
+  getVatPercentList() {
+    console.log('VATPERCENTAGEEEEEEEEEEEEEEEE');
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+      NAME: 'VAT_PERC',
+    };
+
+    this.dataService.getDropdownData(payload).subscribe((data) => {
+      this.VatClass = data.map((item: any) => ({
+        ...item,
+        VALUE: Number(item.DESCRIPTION).toString(),
+      }));
+    });
   }
 
   getCompanyListDropdown() {

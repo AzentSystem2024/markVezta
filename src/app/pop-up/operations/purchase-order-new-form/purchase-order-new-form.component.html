@@ -238,7 +238,6 @@
             style="margin-left: 10px"
             valueChangeEvent="input"
             (input)="onSupplierMobileInput($event)"
-            (onKeyDown)="preventDialCodeDelete($event)"
           >
             <dx-validator>
               <dxi-validation-rule
@@ -342,7 +341,6 @@
             style="margin-left: 10px"
             [valueChangeEvent]="'input'"
             (input)="onContactMobileInput($event)"
-            (onKeyDown)="preventShipementDialCodeDelete($event)"
           >
             <dx-validator>
               <dxi-validation-rule

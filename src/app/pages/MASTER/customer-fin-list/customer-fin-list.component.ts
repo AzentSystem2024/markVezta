@@ -354,6 +354,30 @@ export class CustomerFinListComponent {
       COMPANY_ID: this.selected_Company_id,
     };
 
+    const codeExists = this.customerList?.some(
+      (cust: any) =>
+        cust.CUST_CODE?.trim().toLowerCase() ===
+        newCustomerData.CUST_CODE?.trim().toLowerCase(),
+    );
+
+    const nameExists = this.customerList?.some(
+      (cust: any) =>
+        cust.FIRST_NAME?.trim().toLowerCase() ===
+          newCustomerData.FIRST_NAME?.trim().toLowerCase() &&
+        cust.LAST_NAME?.trim().toLowerCase() ===
+          newCustomerData.LAST_NAME?.trim().toLowerCase(),
+    );
+
+    // 🔴 Show exact message
+    if (codeExists) {
+      notify('Customer code already exists!', 'error', 3000);
+      return;
+    }
+
+    if (nameExists) {
+      notify('Customer name already exists!', 'error', 3000);
+      return;
+    }
     this.dataservice.insert_customer_Data(payload).subscribe((res: any) => {
       notify(
         {
@@ -387,11 +411,29 @@ export class CustomerFinListComponent {
     const updatedData = this.selectedCustomerData.UpdateData();
     console.log(updatedData, '==============form edit=============');
 
+    //  Normalize values
+    const newFirst = updatedData.FIRST_NAME?.trim().toLowerCase();
+    const newLast = updatedData.LAST_NAME?.trim().toLowerCase();
+
+    // ✅ Check duplicate NAME (ignore current record)
+    const nameExists = this.customerList?.some(
+      (cust: any) =>
+        cust.ID !== updatedData.ID &&
+        cust.FIRST_NAME?.trim().toLowerCase() === newFirst &&
+        cust.LAST_NAME?.trim().toLowerCase() === newLast,
+    );
+
+    //  Validation
+    if (nameExists) {
+      notify('Customer name already exists!', 'error', 3000);
+      return;
+    }
+
     this.dataservice.UpdateCustomerApi(updatedData).subscribe((res: any) => {
       try {
         notify(
           {
-            message: 'Customerssssssssss data updated successfully',
+            message: 'Customer data updated successfully',
             position: { at: 'top right', my: 'top right' },
           },
           'success',

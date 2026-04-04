@@ -1830,16 +1830,16 @@ export class DataService {
     CODE: any,
     VAT_NAME: any,
     VAT_PERC: any,
-    VAT_INPUT_HEAD_ID: any,
-    VAT_OUTPUT_HEAD_ID: any,
+    IGST_INPUT_HEAD_ID: any,
+    IGST_OUTPUT_HEAD_ID: any,
     COMPANY_ID: AnyARecord,
   ): Observable<any> {
     const data = {
       CODE,
       VAT_NAME,
       VAT_PERC,
-      VAT_INPUT_HEAD_ID,
-      VAT_OUTPUT_HEAD_ID,
+      IGST_INPUT_HEAD_ID,
+      IGST_OUTPUT_HEAD_ID,
       COMPANY_ID,
     };
 
@@ -1859,8 +1859,8 @@ export class DataService {
     CODE: any,
     VAT_NAME: any,
     VAT_PERC: any,
-    VAT_INPUT_HEAD_ID: any,
-    VAT_OUTPUT_HEAD_ID: any,
+    IGST_INPUT_HEAD_ID: any,
+    IGST_OUTPUT_HEAD_ID: any,
     COMPANY_ID: any,
   ): Observable<any> {
     const data = {
@@ -1868,23 +1868,18 @@ export class DataService {
       CODE,
       VAT_NAME,
       VAT_PERC,
-      VAT_INPUT_HEAD_ID,
-      VAT_OUTPUT_HEAD_ID,
+      IGST_INPUT_HEAD_ID,
+      IGST_OUTPUT_HEAD_ID,
       COMPANY_ID,
     };
 
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
 
-  removeVatclass(id: any, code: any, vatname: any, vatperc: any) {
-    const requestBody = {
-      CODE: code,
-      VAT_NAME: vatname,
-      VAT_PERC: vatperc,
-    };
+  removeVatclass(id: any,) {
     return this.http.post<any>(
       `${this.apiUrl}vatclass/delete/` + id,
-      requestBody,
+      {},
     );
   }
 
@@ -2626,7 +2621,7 @@ export class DataService {
     const getEndpoint = `${this.apiUrl}customer/select/${ID}`;
     return this.http.post(getEndpoint, {});
   }
- 
+
   insert_customer_Data(item: any) {
     const payload = item;
     return this.http.post(`${this.apiUrl}customer/save`, payload);
