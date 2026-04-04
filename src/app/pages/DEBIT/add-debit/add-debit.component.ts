@@ -147,6 +147,7 @@ export class AddDebitComponent {
   selectedSubTypeId: any;
   vatTitle: any;
   showSubType: boolean;
+  VatClass: any;
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -204,6 +205,7 @@ export class AddDebitComponent {
       this.selectedSubTypeId = 0; // important
       this.getDocNo();
     }
+    this.getVatPercentList();
     // this.getDocNo();
     this.getLedgerCodeDropdown();
     this.getCompanyListDropdown();
@@ -236,7 +238,20 @@ export class AddDebitComponent {
       });
     }, 500); // Delay long enough for grid rendering to complete
   }
+  getVatPercentList() {
+    console.log('VATPERCENTAGEEEEEEEEEEEEEEEE');
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+      NAME: 'VAT_PERC',
+    };
 
+    this.dataService.getDropdownData(payload).subscribe((data) => {
+      this.VatClass = data.map((item: any) => ({
+        ...item,
+        VALUE: Number(item.DESCRIPTION).toString(),
+      }));
+    });
+  }
   formatAsDDMMYYYY(d: Date): string {
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -559,53 +574,26 @@ export class AddDebitComponent {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
 
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data,
+          );
+
           if (!enterPressedOnce) {
             enterPressedOnce = true;
+
             setTimeout(() => {
-              if (event.component?.open) {
-                event.component.open(); // open dropdown
-              }
+              event.component?.open?.(); // open dropdown
             }, 50);
           } else {
             enterPressedOnce = false;
+
             setTimeout(() => {
-              this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+              grid.editCell(rowIndex, 'particulars'); // ✅ correct index
             }, 50);
           }
-        }
-      };
-
-      e.editorOptions.onValueChanged = (args: any) => {
-        const selectedLedger = this.ledgerList.find(
-          (item: any) => item.HEAD_CODE === args.value,
-        );
-
-        e.setValue(args.value);
-
-        if (selectedLedger) {
-          // 1️⃣ Set ledger name
-          e.component.cellValue(
-            rowIndex,
-            'ledgerName',
-            selectedLedger.HEAD_NAME,
-          );
-
-          // 2️⃣ Set HSN from SELECTED INVOICE (NOT SESSION)
-          if (this.selectedInvoiceHSN) {
-            e.component.cellValue(
-              rowIndex,
-              'HSN_CODE',
-              this.selectedInvoiceHSN,
-            );
-          }
-
-          // 3️⃣ GST is already applied globally via applyInvoiceGSTToRows()
-          // ❌ DO NOT SET GST HERE
-
-          // 4️⃣ Move to next field
-          setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-          }, 50);
         }
       };
     }
@@ -706,23 +694,37 @@ export class AddDebitComponent {
         }
       };
     }
-
     if (e.dataField === 'GST_PERC') {
       const originalOnValueChanged = e.editorOptions.onValueChanged;
 
       e.editorOptions.onValueChanged = (args: any) => {
-        // keep existing behavior
         if (originalOnValueChanged) {
           originalOnValueChanged(args);
         }
 
         e.setValue(args.value);
 
-        // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
+        // same behavior
         e.row.data.CGST = 0;
         e.row.data.SGST = 0;
       };
     }
+    // if (e.dataField === 'GST_PERC') {
+    //   const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+    //   e.editorOptions.onValueChanged = (args: any) => {
+    //     // keep existing behavior
+    //     if (originalOnValueChanged) {
+    //       originalOnValueChanged(args);
+    //     }
+
+    //     e.setValue(args.value);
+
+    //     // CLEAR CGST & SGST WHEN IGST IS ENTERED
+    //     e.row.data.CGST = 0;
+    //     e.row.data.SGST = 0;
+    //   };
+    // }
 
     if (e.dataField === 'CGST' || e.dataField === 'SGST') {
       const originalOnValueChanged = e.editorOptions.onValueChanged;
@@ -734,7 +736,7 @@ export class AddDebitComponent {
 
         e.setValue(args.value);
 
-        // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
+        //  CLEAR IGST WHEN CGST / SGST IS ENTERED
         e.row.data.GST_PERC = 0;
       };
     }
@@ -792,12 +794,12 @@ export class AddDebitComponent {
       this.debitFormData.NOTE_DETAIL.splice(index, 1);
     }
 
-    // 🔥 Reassign datasource so DevExtreme refreshes properly
+    //  Reassign datasource so DevExtreme refreshes properly
     this.itemsGridRef.instance.option('dataSource', [
       ...this.debitFormData.NOTE_DETAIL,
     ]);
 
-    // 🔢 Fix SL_NO
+    //Fix SL_NO
     this.updateSerialNumbers();
   }
 
@@ -829,23 +831,23 @@ export class AddDebitComponent {
       totalAmount += amount;
 
       if (isSameState) {
-        // ⭐ SAME STATE → CGST + SGST
+        //  SAME STATE → CGST + SGST
         const cgst = Number(item.CGST) || 0;
         const sgst = Number(item.SGST) || 0;
         const totalGstPerc = cgst + sgst;
 
         totalGST += (amount * totalGstPerc) / 100;
       } else {
-        // ⭐ DIFFERENT STATE → IGST
+        // DIFFERENT STATE → IGST
         const gstPerc = Number(item.GST_PERC) || 0;
         totalGST += (amount * gstPerc) / 100;
       }
     });
 
-    // ⭐ Raw total (before round-off)
+    // Raw total (before round-off)
     this.netTotal = totalAmount + totalGST;
 
-    // ⭐ Apply round-off only if checkbox enabled
+    // Apply round-off only if checkbox enabled
     if (this.debitFormData.ROUND_OFF) {
       this.netTotal = Math.round(this.netTotal);
     }

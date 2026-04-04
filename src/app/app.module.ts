@@ -42,7 +42,6 @@ import { PaymentTermsListModule } from './pages/payment-terms-list/payment-terms
 import { PaymentTermsFormModule } from './components/library/payment-terms-form/payment-terms-form.component';
 import { DeliveryTermsListModule } from './pages/delivery-terms-list/delivery-terms-list.component';
 import { DeliveryTermsFormModule } from './components/library/delivery-terms-form/delivery-terms-form.component';
-import { StoresListModule } from './pages/MASTER/stores-list/stores-list.component';
 import { StoresFormModule } from './components/library/stores-form/stores-form.component';
 import { SupplierListModule } from './pages/MASTER/supplier-list/supplier-list.component';
 import { SupplierFormModule } from './components/library/supplier-form/supplier-form.component';
@@ -367,6 +366,7 @@ import { SalaryWPSModule } from './pages/salary-wps/salary-wps.component';
 import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
 import { PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 import { ProfitAndLossBranchModule } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
+import { StoresListModule } from './pages/MASTER/stores-list/stores-list.component';
 
 @NgModule({
   declarations: [AppComponent],

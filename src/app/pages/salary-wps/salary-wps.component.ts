@@ -34,6 +34,7 @@ import {
   DxoLookupModule,
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
+import notify from 'devextreme/ui/notify';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DataService } from 'src/app/services';
@@ -115,6 +116,8 @@ years: number[] = [];
      const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.currencyname = sessionData.GeneralSettings.CODE
+    console.log(this.currencyname)
 
     const payload = {
     NAME : 'DEPT',
@@ -172,7 +175,7 @@ years: number[] = [];
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     const sessionYear = sessionData.FINANCIAL_YEARS;
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-    this.currencyname = sessionData.GeneralSettings.CURRENCY_NAME
+    this.currencyname = sessionData.GeneralSettings.CODE
 
     this.formatted_from_date = this.financialYeaDate;
   }
@@ -295,7 +298,7 @@ years: number[] = [];
   }
 
    Department_dropdown(){
-  console.log('🔥 Department dropdown triggered');
+  console.log(' Department dropdown triggered');
 
   const payload = {
     NAME : 'DEPT',
@@ -329,7 +332,7 @@ years: number[] = [];
 );
     const payload = {
       SAL_MONTH :salMonth,
-      DEPARTMENT_ID : String(this.select_department_id),
+     DEPARTMENT_ID: this.select_department_id ? String(this.select_department_id) : '',
       COMPANY_ID : this.selected_Company_id
     }
     this.dataService.SalaryWPSFile(payload)
@@ -341,6 +344,12 @@ years: number[] = [];
 
   //  MAIN FUNCTION
   generateSIF() {
+
+    if (!this.employees || this.employees.length === 0) {
+    notify('No data available', 'warning', 3000);
+    return; //  stop execution
+  }
+
 
     if (!this.PaySettings || this.PaySettings.length === 0) {
   alert('PaySettings not loaded');
@@ -436,7 +445,9 @@ console.log('File content:', rows);
       this.currencyname
     ].join(',');
 
-    rows.push(scrRow);
+    if (this.employees && this.employees.length > 0) {
+  rows.push(scrRow);
+}
 
     const fileContent = rows.join('\n');
 
@@ -455,6 +466,7 @@ console.log('File content:', rows);
     const d = ('0' + date.getDate()).slice(-2);
     return `${y}-${m}-${d}`;
   }
+  
 
 downloadFile(content: string, fileName: string) {
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });

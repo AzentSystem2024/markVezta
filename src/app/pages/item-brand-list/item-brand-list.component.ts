@@ -17,21 +17,24 @@ import { ExportService } from 'src/app/services/export.service';
   styleUrls: ['./item-brand-list.component.scss'],
 })
 export class ItemBrandListComponent implements OnInit {
-  @ViewChild(ItmBrandFormComponent) itembrandComponent: ItmBrandFormComponent;
+  @ViewChild(ItmBrandFormComponent) itembrandComponent: ItmBrandFormComponent | undefined;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
 
   brand: any;
   isAddBrandPopupOpened = false;
   showFilterRow = true;
   showHeaderFilter = true;
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
   ) {}
+
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Brand-list');
   }
+  
   addBrand() {
     this.isAddBrandPopupOpened = true;
   }
@@ -41,7 +44,7 @@ export class ItemBrandListComponent implements OnInit {
       this.brand = response;
     });
   }
-  onRowRemoving(event) {
+  onRowRemoving(event:any) {
     const selectedRow = event.data;
     const { ID, CODE, BRAND_NAME, COMPANY_ID } = selectedRow;
 
@@ -57,7 +60,7 @@ export class ItemBrandListComponent implements OnInit {
             },
             'success',
           );
-          this.dataGrid.instance.refresh();
+          this.dataGrid?.instance.refresh();
           this.showBrand();
         } catch (error) {
           notify(
@@ -72,17 +75,19 @@ export class ItemBrandListComponent implements OnInit {
   }
 
   onClickSaveBrand() {
-    const { CODE, BRAND_NAME, COMPANY_ID } =
-      this.itembrandComponent.getNewBrandData();
-    this.dataservice
-      .postBrandData(CODE, BRAND_NAME, COMPANY_ID)
-      .subscribe((response) => {
-        if (response) {
-          this.showBrand();
-        }
-      });
+    const brandData = this.itembrandComponent?.getNewBrandData();
+    if (brandData) {
+      const { CODE, BRAND_NAME, COMPANY_ID } = brandData;
+      this.dataservice
+        .postBrandData(CODE, BRAND_NAME, COMPANY_ID)
+        .subscribe((response) => {
+          if (response) {
+            this.showBrand();
+          }
+        });
+    }
   }
-  onRowUpdating(event) {
+  onRowUpdating(event:any) {
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };
@@ -102,7 +107,7 @@ export class ItemBrandListComponent implements OnInit {
             },
             'success',
           );
-          this.dataGrid.instance.refresh();
+          this.dataGrid?.instance.refresh();
           this.showBrand();
         } else {
           notify(
@@ -122,7 +127,7 @@ export class ItemBrandListComponent implements OnInit {
     this.showBrand();
   }
   refresh = () => {
-    this.dataGrid.instance.refresh();
+    this.dataGrid?.instance.refresh();
   };
 }
 @NgModule({

@@ -180,10 +180,22 @@
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         ></dxi-column>
-        <dxi-column
+        <!-- <dxi-column
           dataField="GST_PERC"
           [caption]="vatTitle + '%'"
           dataType="number"
+        >
+        </dxi-column> -->
+        <dxi-column
+          dataField="GST_PERC"
+          [caption]="vatTitle + '%'"
+          alignment="right"
+          [format]="{ type: 'fixedPoint', precision: 0 }"
+          [lookup]="{
+            dataSource: VatClass,
+            valueExpr: 'VALUE',
+            displayExpr: 'DESCRIPTION',
+          }"
         >
         </dxi-column>
 
@@ -192,6 +204,7 @@
           [caption]="vatTitle + ' Amount'"
           dataType="number"
           [format]="{ type: 'fixedPoint', precision: 2 }"
+          [calculateCellValue]="calculateTaxAmount"
         ></dxi-column>
         <dxi-column
           dataField="TOTAL"

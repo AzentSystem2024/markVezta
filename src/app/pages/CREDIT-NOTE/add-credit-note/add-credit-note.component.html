@@ -92,25 +92,6 @@
                   [width]="200"
                   (onFocusIn)="openInvoicePopup()"
                 ></dx-select-box>
-                <!-- <dx-text-box
-                  [(value)]="docNo"
-                  label="Doc No"
-                  labelMode="floating"
-                  [width]="200"
-                  [readOnly]="true"
-                ></dx-text-box>
-
-                <dx-select-box
-                  [value]="creditFormData.INVOICE_NO"
-                  [items]="pendingInvoices"
-                  displayExpr="INVOICE_NO"
-                  valueExpr="INVOICE_NO"
-                  label="Select Invoice"
-                  labelMode="floating"
-                  placeholder="Select Invoice No."
-                  [width]="200"
-                  (onFocusIn)="openInvoicePopup()"
-                ></dx-select-box> -->
               </div>
             </div>
           </dxi-item>
@@ -231,10 +212,22 @@
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
-        <dxi-column
+        <!-- <dxi-column
           dataField="GST_PERC"
           [caption]="vatTitle + '%'"
           dataType="number"
+        >
+        </dxi-column> -->
+        <dxi-column
+          dataField="GST_PERC"
+          [caption]="vatTitle + '%'"
+          alignment="right"
+          [format]="{ type: 'fixedPoint', precision: 0 }"
+          [lookup]="{
+            dataSource: VatClass,
+            valueExpr: 'VALUE',
+            displayExpr: 'DESCRIPTION',
+          }"
         >
         </dxi-column>
         <!-- <dxi-column

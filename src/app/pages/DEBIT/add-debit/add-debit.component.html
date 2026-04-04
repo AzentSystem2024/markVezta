@@ -185,7 +185,8 @@
             searchEnabled: true,
           }"
         ></dxi-column>
-
+        <dxi-column dataField="HSN_CODE" caption="HSN Code" dataType="string">
+        </dxi-column>
         <dxi-column
           dataField="particulars"
           caption="Particulars"
@@ -204,11 +205,24 @@
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
-        <dxi-column
+        <!-- <dxi-column
           dataField="GST_PERC"
           [caption]="vatTitle + '%'"
           dataType="number"
           [allowEditing]="false"
+        >
+        </dxi-column> -->
+
+        <dxi-column
+          dataField="GST_PERC"
+          [caption]="vatTitle + '%'"
+          alignment="right"
+          [format]="{ type: 'fixedPoint', precision: 0 }"
+          [lookup]="{
+            dataSource: VatClass,
+            valueExpr: 'VALUE',
+            displayExpr: 'DESCRIPTION',
+          }"
         >
         </dxi-column>
 
@@ -235,9 +249,6 @@
           [format]="{ type: 'fixedPoint', precision: 2 }"
           [calculateCellValue]="calculateTaxAmount"
         >
-        </dxi-column>
-
-        <dxi-column dataField="HSN_CODE" caption="HSN Code" dataType="string">
         </dxi-column>
 
         <dxi-column

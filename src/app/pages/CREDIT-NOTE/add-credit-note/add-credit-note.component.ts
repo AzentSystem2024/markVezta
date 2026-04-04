@@ -164,6 +164,7 @@ export class AddCreditNoteComponent {
   selectedSubTypeId: any;
   vatTitle: any;
   showSubType: boolean;
+  VatClass: any;
 
   constructor(
     private dataService: DataService,
@@ -203,6 +204,7 @@ export class AddCreditNoteComponent {
       }
     }
     this.creditFormData.TRANS_DATE = this.formatAsDDMMYYYY(new Date());
+    this.getVatPercentList();
     this.getSupTypeList();
     this.getLedgerCodeDropdown();
     this.getCustomerOrUnitLst();
@@ -350,14 +352,12 @@ export class AddCreditNoteComponent {
   }
 
   applyGstForRow(row: any) {
-    const gstPerc = Number(this.selectedInvoiceGst) || 0;
-
-    row.GST_PERC = gstPerc;
-
-    // Remove split fields
-    row.CGST = 0;
-    row.SGST = 0;
-    row.GST = gstPerc; // optional (if used in UI)
+    // const gstPerc = Number(this.selectedInvoiceGst) || 0;
+    // row.GST_PERC = gstPerc;
+    // // Remove split fields
+    // row.CGST = 0;
+    // row.SGST = 0;
+    // row.GST = gstPerc; // optional (if used in UI)
   }
 
   onCompanySelected(event: any): void {
@@ -393,9 +393,9 @@ export class AddCreditNoteComponent {
       this.showCGST = false;
       this.showSGST = false;
 
-      // ⭐ APPLY GST LOGIC TO ALL EXISTING ROWS
+      //  APPLY GST LOGIC TO ALL EXISTING ROWS
       this.creditFormData.NOTE_DETAIL?.forEach((row: any) => {
-        this.applyGstForRow(row);
+        // this.applyGstForRow(row);
       });
     }
 
@@ -415,52 +415,19 @@ export class AddCreditNoteComponent {
     this.selectedDistributorId = event.value;
   }
 
-  // onDistributorSelected(event: any): void {
-  //   const grid = this.itemsGridRef?.instance;
-  //   this.selectedCustomerId = event.value;
-  //   if (this.selectedCustomerId) {
-  //     this.selectedCustomer = this.distributorList.find(
-  //       (s: any) => s.ID === this.selectedCustomerId
-  //     );
-  //     this.creditFormData.PARTY_NAME = this.selectedCustomer.DESCRIPTION;
-  //     const sessionGst = parseFloat(this.GST) || 0;
-  //     if (this.companyStateID === this.selectedCustomer.STATE_ID) {
+  getVatPercentList() {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+      NAME: 'VAT_PERC',
+    };
 
-  //       this.showCGST = true;
-  //       this.showSGST = true;
-  //       this.showGST = false;
-
-  //       //  Split GST into CGST + SGST
-  //       const half = sessionGst / 2;
-
-  //       // Update all grid rows
-  //       this.creditFormData.NOTE_DETAIL?.forEach((row: any) => {
-  //         this.applyGstForRow(row);
-  //       });
-  //     } else {
-
-  //       this.showGST = true;
-  //       this.showCGST = false;
-  //       this.showSGST = false;
-
-  //       // ⭐ GST only
-  //       this.creditFormData.NOTE_DETAIL?.forEach((row: any) => {
-  //         this.applyGstForRow(row);
-  //       });
-  //     }
-  //   }
-  //   this.creditFormData.DISTRIBUTOR_ID = this.selectedCustomerId;
-  //   if (grid) {
-  //     const editRowIndex = grid
-  //       .getVisibleRows()
-  //       .findIndex((row: any) => row.isEditing);
-  //     if (editRowIndex !== -1) {
-  //       grid.saveEditData(); // Save new row before changing distributor
-  //     }
-  //   }
-
-  //   this.selectedDistributorId = event.value;
-  // }
+    this.dataService.getDropdownData(payload).subscribe((data) => {
+      this.VatClass = data.map((item: any) => ({
+        ...item,
+        VALUE: Number(item.DESCRIPTION).toString(),
+      }));
+    });
+  }
 
   onInitNewRow(e: any): void {
     this.newRowIndex = e.component.getRowIndexByKey(e.key);
@@ -878,13 +845,13 @@ export class AddCreditNoteComponent {
     this.creditFormData.INVOICE_ID = selected.INVOICE_ID;
 
     // ✅ STORE GST & HSN FROM INVOICE
-    this.selectedInvoiceGst = Number(selected.GST_PERC) || 0;
+    // this.selectedInvoiceGst = Number(selected.GST_PERC) || 0;
     this.selectedInvoiceHsn = selected.HSN_CODE || '';
 
     // ✅ APPLY TO ALL EXISTING ROWS
     this.creditFormData.NOTE_DETAIL?.forEach((row: any) => {
       row.HSN_CODE = this.selectedInvoiceHsn;
-      this.applyGstForRow(row);
+      // this.applyGstForRow(row);
     });
 
     this.invoicePopupVisible = false;
