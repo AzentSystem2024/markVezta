@@ -7,7 +7,6 @@ import {
   Output,
   EventEmitter,
   NgZone,
-  Input,
 } from '@angular/core';
 import {
   DxButtonModule,
@@ -29,10 +28,7 @@ import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
-import {
-  SupplierEditComponent,
-  SupplierEditModule,
-} from '../../supplier-edit/supplier-edit.component';
+import { SupplierEditModule } from '../../supplier-edit/supplier-edit.component';
 import DataSource from 'devextreme/data/data_source';
 @Component({
   selector: 'app-supplier-list',
@@ -40,14 +36,16 @@ import DataSource from 'devextreme/data/data_source';
   styleUrls: ['./supplier-list.component.scss'],
 })
 export class SupplierListComponent implements OnInit {
-  @ViewChild(SupplierFormComponent) supplierComponent: SupplierFormComponent;
+  @ViewChild(SupplierFormComponent) supplierComponent:
+    | SupplierFormComponent
+    | undefined;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
   @ViewChild(SupplierFormComponent) supplierForm!: SupplierFormComponent;
   @Output()
   editingStart = new EventEmitter<any>();
   @Output() formClosed = new EventEmitter<void>();
-  selected_Company_id: number;
+  selected_Company_id!: number;
   savedUserData: any;
   company_list: any = [];
   isFilterRowVisible: boolean = false;
@@ -55,7 +53,7 @@ export class SupplierListComponent implements OnInit {
   // dataGrid: DxDataGridComponent;
   width = '100vw';
   height = '100vh';
-  SupplierDataSource: DataSource;
+  SupplierDataSource: DataSource | undefined;
   supplierList: any[] = [];
   supplierRowCount = 0;
   isAddSupplierPopupOpened = false;
@@ -152,6 +150,7 @@ export class SupplierListComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
   ) {
+    this.sesstion_Details();
     dataservice.getCurrencyData().subscribe((data) => {
       this.currency = data;
     });
@@ -162,8 +161,6 @@ export class SupplierListComponent implements OnInit {
     dataservice.getDropdownData(payload).subscribe((data) => {
       this.vatrule = data;
     });
-
-    this.sesstion_Details();
   }
   // onExporting(event: any) {
   //   this.exportService.onExporting(event, 'Supplier-list');
@@ -177,7 +174,6 @@ export class SupplierListComponent implements OnInit {
   private loadDropdownData(): void {
     this.dataservice.getDropdownData('LANDED_COST').subscribe((data) => {
       this.landedcost = data;
-      console.log(this.landedcost, 'LANDEDCOST');
     });
   }
 
@@ -238,50 +234,31 @@ export class SupplierListComponent implements OnInit {
   }
 
   onSelectionChanged(event: any): void {
-    console.log('Selection Event:', event);
     const selectedRows = event.selectedRowsData; // Get selected rows from grid
-    console.log('Selected Rows:', selectedRows);
-
     this.selectedLandedCosts = selectedRows.map((row: any) => ({
       COST_ID: row.ID,
     })); // Format the selected costs
-    console.log('Mapped Selected Costs:', this.selectedLandedCosts);
   }
 
   onClickSaveSupplier(): void {
-    console.log('Selected Landed Costs Before Save:', this.selectedLandedCosts);
+    const newSupplierData = this.supplierComponent?.getNewSupplierData();
 
-    const {
-      HQID,
-      SUPP_CODE,
-      SUPP_NAME,
-      CONTACT_NAME,
-      ADDRESS1,
-      ADDRESS2,
-      ADDRESS3,
-      ZIP,
-      STATE_ID,
-      CITY,
-      COUNTRY_ID,
-      PHONE,
-      EMAIL,
-      IS_INACTIVE,
-      MOBILE_NO,
-      NOTES,
-      FAX_NO,
-      VAT_REGNO,
-      CURRENCY_ID,
-      PAY_TERM_ID,
-      VAT_RULE_ID,
-      IS_COMPANY_BRANCH,
-      Supplier_cost,
-    } = this.supplierComponent.getNewSupplierData();
+    if (!newSupplierData) {
+      notify(
+        {
+          message: 'Supplier form not initialized',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+      );
+      return;
+    }
 
-    const newSupplierData = this.supplierComponent.getNewSupplierData();
+    const { STATE_ID, IS_INACTIVE, CURRENCY_ID } = newSupplierData;
 
     const isInactiveBoolean = IS_INACTIVE === 1 ? true : false;
-    const currencyIdNumber = parseInt(CURRENCY_ID); // or use Number(CURRENCY_ID);
-    const StateID = parseInt(STATE_ID);
+    const currencyIdNumber = parseInt(CURRENCY_ID ?? '0'); // or use Number(CURRENCY_ID);
+    const StateID = parseInt(STATE_ID ?? '0');
 
     const payload = {
       ...newSupplierData,
@@ -290,7 +267,6 @@ export class SupplierListComponent implements OnInit {
       STATE_ID: StateID,
       IS_INACTIVE: isInactiveBoolean,
     };
-    console.log(payload, '=======payload===========');
     this.dataservice.saveSupplierData(payload).subscribe((res: any) => {
       if (res.flag == 1) {
         notify(
@@ -301,7 +277,7 @@ export class SupplierListComponent implements OnInit {
           'success',
         );
 
-        this.dataGrid.instance.refresh();
+        this.dataGrid?.instance.refresh();
         this.isAddSupplierPopupOpened = false;
         this.formClosed.emit(); // tell parent to close
         this.showSupplier();
@@ -319,70 +295,8 @@ export class SupplierListComponent implements OnInit {
       }
     });
   }
-  // this.dataservice
-  //   .postSupplierData(
-  //     HQID,
-  //     SUPP_CODE,
-  //     SUPP_NAME,
-  //     CONTACT_NAME,
-  //     ADDRESS1,
-  //     ADDRESS2,
-  //     ADDRESS3,
-  //     ZIP,
-  //     StateID,
-  //     CITY,
-  //     COUNTRY_ID,
-  //     PHONE,
-  //     EMAIL,
-  //     // IS_INACTIVE,
-  //     isInactiveBoolean,
-  //     MOBILE_NO,
-  //     NOTES,
-  //     FAX_NO,
-  //     VAT_REGNO,
-  //     // CURRENCY_ID,
-  //     currencyIdNumber,
-  //     PAY_TERM_ID,
-  //     VAT_RULE_ID,
-  //     IS_COMPANY_BRANCH,
-  //     Supplier_cost
-  //   )
-  //   .subscribe((response) => {
-  //     console.log('API Response:', response);
-  //     if (response) {
-  //       try {
-  //         if (response.flag == 1) {
-  //           notify(
-  //             {
-  //               message: 'Supplier added successfully',
-  //               position: { at: 'top right', my: 'top right' },
-  //             },
-  //             'success'
-  //           );
 
-  //           this.dataGrid.instance.refresh();
-  //            this.isAddSupplierPopupOpened = false
-  //           this.formClosed.emit(); // tell parent to close
-  //            this.showSupplier();
-
-  //         }
-  //       } catch (error) {
-  //         // notify(
-  //         //   {
-  //         //     message: 'Add operation failed',
-  //         //     position: { at: 'top right', my: 'top right' },
-  //         //   },
-  //         //   'error'
-  //         // );
-  //       }
-  //     }
-
-  //     // if (response) {
-  //     //   this.showSupplier();
-  //     // }
-  //   });
-
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const id = event.data.ID;
     event.cancel = new Promise((resolve, reject) => {
       this.dataservice.removeSupplier(id).subscribe({
@@ -396,17 +310,17 @@ export class SupplierListComponent implements OnInit {
           );
           this.showSupplier();
 
-          resolve(false); // ✅ allow delete → popup closes
+          resolve(false); // allow delete → popup closes
         },
         error: () => {
           notify('Delete failed', 'error', 3000);
-          reject(); // ❌ cancel delete
+          reject(); // cancel delete
         },
       });
     });
   }
 
-  onRowUpdating(event) {
+  onRowUpdating(event: any) {
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };
@@ -420,7 +334,7 @@ export class SupplierListComponent implements OnInit {
           },
           'success',
         );
-        this.dataGrid.instance.refresh();
+        this.dataGrid?.instance.refresh();
         this.showSupplier();
       } else {
         notify(
@@ -435,16 +349,19 @@ export class SupplierListComponent implements OnInit {
 
     event.cancel = true; // Prevent the default update operation
   }
+
   showCountry() {
     this.dataservice.getCountryData().subscribe((response) => {
       this.CountryDropdownData = response;
     });
   }
+
   showState() {
     this.dataservice.getStateData().subscribe((data: any) => {
       this.StateDropdownData = data;
     });
   }
+
   getPaymentTerms() {
     this.dataservice.getPaymentTermsData().subscribe((response) => {
       this.PaymentTermsDropdownData = response;
@@ -462,9 +379,6 @@ export class SupplierListComponent implements OnInit {
 
     // Fetch the item data
     this.dataservice.selectSupplier(ID).subscribe((response: any) => {
-      // console.log(response, "select!!!");
-      // this.selectedSupplier = response;
-      // console.log(this.selectedSupplier)
       this.isEditSupplierPopupOpened = true;
       this.selectSupplier(response);
     });
@@ -477,7 +391,6 @@ export class SupplierListComponent implements OnInit {
     }
     this.isEditSupplierPopupOpened = true;
     this.dataservice.selectSupplier(ID).subscribe((response: any) => {
-      console.log('Supplier selected successfully:', response);
       this.selectedSupplier = response;
 
       this.cdr.detectChanges();
@@ -489,7 +402,7 @@ export class SupplierListComponent implements OnInit {
   handleFormClosed() {
     this.isEditSupplierPopupOpened = false;
     this.isAddSupplierPopupOpened = false;
-    this.dataGrid.instance.refresh();
+    this.dataGrid?.instance.refresh();
     this.showSupplier();
     if (this.supplierForm) {
       this.supplierForm.resetPartialForm(); // ✅ reset on close
@@ -513,8 +426,8 @@ export class SupplierListComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/supplier');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/supplier');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -533,12 +446,16 @@ export class SupplierListComponent implements OnInit {
   }
 
   get_sessionstorage_data() {
-    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.savedUserData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.company_list = this.savedUserData.Companies;
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
