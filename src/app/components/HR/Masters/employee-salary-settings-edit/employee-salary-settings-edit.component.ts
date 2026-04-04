@@ -96,7 +96,10 @@ export class EmployeeSalarySettingsEditComponent {
         BASIC_SALARY: Number(this.selectedEmployee.SALARY) || null,
 
         // EFFECT_FROM: new Date(),
-        EFFECT_FROM: this.selectedEmployee.EFFECT_FROM,
+        // EFFECT_FROM: this.selectedEmployee.EFFECT_FROM,
+        EFFECT_FROM: this.selectedEmployee.EFFECT_FROM
+  ? new Date(this.selectedEmployee.EFFECT_FROM)
+  : null,
         PREVIOUS_EFFECT_FROM: this.selectedEmployee.PREVIOUS_EFFECT_FROM,
 
         IS_INACTIVE: this.selectedEmployee.IS_INACTIVE || false,
@@ -208,11 +211,26 @@ export class EmployeeSalarySettingsEditComponent {
         .map((item:any) => item.HEAD_ID);
 
       this.SalaryDetails = this.salaryGridData.Details || [];
-      this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
+      // this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
+      this.PreviousRevision = this.salaryGridData.EFFECT_FROM
+  ? new Date(this.salaryGridData.EFFECT_FROM)
+  : null;
       this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY || null;
     });
   }
 
+    validateEffectFrom = (e: any): boolean => {
+    const effectFrom = e.value;
+    const prev = this.PreviousRevision;
+
+    if (!effectFrom || !prev) return true;
+
+    const eff = new Date(effectFrom.getFullYear(), effectFrom.getMonth(), 1);
+    const previous = new Date(prev.getFullYear(), prev.getMonth(), 1);
+
+    return eff > previous;
+  };
+  
   cancel() {
     this.employeeFormData = {
       EMP_CODE: '',
@@ -276,21 +294,38 @@ export class EmployeeSalarySettingsEditComponent {
 
   saveEmployee() {
     if (!this.isValid()) return;
-    const effectFrom = new Date(this.employeeFormData.EFFECT_FROM);
-    const previousRevision = new Date(this.PreviousRevision);
+  //  const effectFrom = new Date(this.employeeFormData.EFFECT_FROM);
 
-    if (effectFrom <= previousRevision) {
-      notify(
-        {
-          message:
-            'Effect From date must be greater than Previous Revision date.',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 3000,
-        },
-        'error',
-      );
-      return;
-    }
+const effectFrom = this.employeeFormData.EFFECT_FROM
+  ? new Date(this.employeeFormData.EFFECT_FROM)
+  : null;
+
+const previousRevision =
+  this.PreviousRevision &&
+  !isNaN(new Date(this.PreviousRevision).getTime())
+    ? new Date(this.PreviousRevision)
+    : null;
+
+//  ONLY validate when previous exists
+if (effectFrom && previousRevision) {
+  const eff = new Date(effectFrom.getFullYear(), effectFrom.getMonth(), 1);
+  const prev = new Date(previousRevision.getFullYear(), previousRevision.getMonth(), 1);
+
+  console.log('EFF:', eff);
+  console.log('PREV:', prev);
+
+  if (eff <= prev) {
+    notify(
+      {
+        message: 'Effect From date must be greater than Previous Revision date.',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 3000,
+      },
+      'error'
+    );
+    return;
+  }
+}
 
     const payload = {
       ID: 0,
