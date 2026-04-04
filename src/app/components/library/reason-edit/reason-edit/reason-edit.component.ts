@@ -4,6 +4,7 @@ import {
   Input,
   Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { DataService } from 'src/app/services';
 import { NgModule, enableProdMode, OnInit } from '@angular/core';
@@ -13,6 +14,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxValidationGroupComponent,
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
@@ -34,7 +36,8 @@ import notify from 'devextreme/ui/notify';
 export class ReasonEditComponent {
   @Input() selectedData: any = {};
   @Output() formClosed = new EventEmitter<void>();
-
+  @ViewChild('validationGroup', { static: false })
+  validationGroup!: DxValidationGroupComponent;
   stores: any;
   customer: any;
   now: Date = new Date();
@@ -94,6 +97,12 @@ export class ReasonEditComponent {
   }
 
   UpdateData() {
+    const result = this.validationGroup.instance.validate();
+
+    if (!result.isValid) {
+      notify('Please fill all required fields correctly', 'error', 3000);
+      return; // ❌ STOP SAVE
+    }
     this.showReasons();
 
     // Exclude the current record (by ID) from duplicate check
@@ -191,7 +200,7 @@ export class ReasonEditComponent {
     if (event.value === 1) {
       this.customer = true;
       this.Inv_man_Adj = false;
-    } else if (event.value === 2) {
+    } else if (event.value === 2 || event.value === 4) {
       this.Inv_man_Adj = true;
       this.customer = false;
     } else {
@@ -245,6 +254,18 @@ export class ReasonEditComponent {
   onValueChangedEDate(event: any) {
     this.formReasonsData.END_DATE = event.value;
   }
+
+  validateDiscountType = (e: any) => {
+    return e.value !== 0 && e.value !== null && e.value !== undefined;
+  };
+  validateAcHead = (e: any) => {
+    return e.value !== 0 && e.value !== null && e.value !== undefined;
+  };
+  validateDiscountpercentrage = (e: any) => {
+    const value = Number(e.value);
+
+    return !isNaN(value) && value > 0;
+  };
 }
 
 @NgModule({

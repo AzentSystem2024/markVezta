@@ -91,7 +91,7 @@ export class ReasonsListComponent {
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => {
-      // this.ngZone.run(() => this.refresh());
+      this.ngZone.run(() => this.refresh());
     },
     text: '',
   };
@@ -113,6 +113,12 @@ export class ReasonsListComponent {
   }
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Reasons-list');
+  }
+  refresh() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      this.showReasons();
+    }
   }
   addReasons() {
     this.isAddReasonsPopupOpened = true;
