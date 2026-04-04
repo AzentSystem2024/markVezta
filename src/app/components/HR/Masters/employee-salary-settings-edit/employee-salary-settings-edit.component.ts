@@ -61,7 +61,7 @@ export class EmployeeSalarySettingsEditComponent {
   employeeFormData: any = {
     EMP_CODE: '',
     FIN_ID: '',
-    BASIC_SALARY: null,
+    BASIC_SALARY: '',
     PREV_REVISION: '',
     EFFECT_FROM: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // always 1st of current month
   };

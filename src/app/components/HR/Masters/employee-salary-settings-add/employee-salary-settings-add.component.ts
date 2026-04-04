@@ -64,13 +64,12 @@ export class EmployeeSalarySettingsAddComponent {
   employeeFormData: any = {
     EMP_CODE: '',
     FIN_ID: '',
-    BASIC_SALARY: '',
+    BASIC_SALARY: null,
     PREV_REVISION: '',
     EFFECT_FROM: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // always 1st of current month
   };
 
   constructor(private dataservice: DataService) {
-    // this.getEmployeeSalarySettingsList();
     this.EmployeeListDropDown();
     this.get_SalaryHead_List();
   }
