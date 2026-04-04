@@ -1,85 +1,90 @@
 <div class="content-wrapper">
   <dx-validation-group #SalaryHeadValidation>
-  <div>
-    <dx-select-box
-      [placeholder]="'Employee Code'"
-      label="Employee"
-      [items]="EmployeeDropdown"
-      valueExpr="ID"
-      displayExpr="DESCRIPTION"
-      [(value)]="selectedEmployeeId"
-      [searchEnabled]="true"
-      [showClearButton]="true"
-      [labelMode]="'floating'"
-      (onValueChanged)="onEmployeeChanged($event)"
-    >
-    </dx-select-box>
-  </div>
-
-  <div style="display: flex; gap: 20px">
-    <div style="flex: 1">
-      <dx-number-box
-        label="Basic Salary"
-        [(value)]="employeeFormData.BASIC_SALARY"
+    <div>
+      <dx-select-box
+        [placeholder]="'Employee Code'"
+        label="Employee"
+        [items]="EmployeeDropdown"
+        valueExpr="ID"
+        displayExpr="DESCRIPTION"
+        [(value)]="selectedEmployeeId"
+        [searchEnabled]="true"
+        [showClearButton]="true"
         [labelMode]="'floating'"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
+        (onValueChanged)="onEmployeeChanged($event)"
       >
-       <dx-validator>
+      </dx-select-box>
+    </div>
+
+    <div style="display: flex; gap: 20px">
+      <div style="flex: 1">
+        <dx-number-box
+          label="Basic Salary"
+          [(value)]="employeeFormData.BASIC_SALARY"
+          [labelMode]="'floating'"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+        >
+          <dx-validator>
             <dxi-validation-rule
               type="required"
               message="This field is required"
             ></dxi-validation-rule>
+            <dxi-validation-rule
+              type="range"
+              [min]="1"
+              message="Basic Salary must be greater than 0"
+            ></dxi-validation-rule>
           </dx-validator>
-      </dx-number-box>
-    </div>
+        </dx-number-box>
+      </div>
 
-    <div style="flex: 1">
-      <!-- <dx-validation-group class="form-grid" #formValidationGroup> -->
-      <dx-date-box
-        label="Previous Revision"
-        [readOnly]="true"
-        [(value)]="PreviousRevision"
-        displayFormat="MMMM/yyyy"
-        [labelMode]="'floating'"
-      >
-        <!-- <dx-validator>
+      <div style="flex: 1">
+        <!-- <dx-validation-group class="form-grid" #formValidationGroup> -->
+        <dx-date-box
+          label="Previous Revision"
+          [readOnly]="true"
+          [(value)]="PreviousRevision"
+          displayFormat="MMMM/yyyy"
+          [labelMode]="'floating'"
+        >
+          <!-- <dx-validator>
       <dxi-validation-rule
         type="custom"
         [validationCallback]="validatePreviousRevision"
         message="Previous Revision must be earlier than Effect From"
       ></dxi-validation-rule>
     </dx-validator> -->
+        </dx-date-box>
+        <!-- </dx-validation-group> -->
+      </div>
+    </div>
+
+    <div>
+      <!-- <dx-validation-group class="form-grid" #formValidationGroup> -->
+      <dx-date-box
+        label="Effect From"
+        width="300px"
+        displayFormat="MMMM/yyyy"
+        [showClearButton]="true"
+        [(value)]="employeeFormData.EFFECT_FROM"
+        [labelMode]="'floating'"
+        pickerType="calendar"
+        [calendarOptions]="{
+          maxZoomLevel: 'year',
+          minZoomLevel: 'century',
+        }"
+        (onValueChanged)="onEffectFromChanged($event)"
+      >
+        <dx-validator #effectFromValidator>
+          <dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateEffectFrom"
+            message="Effect From must be after Previous Revision"
+          ></dxi-validation-rule>
+        </dx-validator>
       </dx-date-box>
       <!-- </dx-validation-group> -->
     </div>
-  </div>
-
-  <div>
-    <!-- <dx-validation-group class="form-grid" #formValidationGroup> -->
-    <dx-date-box
-      label="Effect From"
-      width="300px"
-      displayFormat="MMMM/yyyy"
-      [showClearButton]="true"
-      [(value)]="employeeFormData.EFFECT_FROM"
-      [labelMode]="'floating'"
-      pickerType="calendar"
-      [calendarOptions]="{
-        maxZoomLevel: 'year',
-        minZoomLevel: 'century',
-      }"
-      (onValueChanged)="onEffectFromChanged($event)"
-    >
-      <dx-validator #effectFromValidator>
-        <dxi-validation-rule
-          type="custom"
-          [validationCallback]="validateEffectFrom"
-          message="Effect From must be after Previous Revision"
-        ></dxi-validation-rule>
-      </dx-validator>
-    </dx-date-box>
-    <!-- </dx-validation-group> -->
-  </div>
   </dx-validation-group>
 </div>
 
