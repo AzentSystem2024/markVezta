@@ -4,7 +4,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="Code"
+            label="Code *"
             [(value)]="newReasons.CODE"
             width="100"
             labelMode="floating"
@@ -22,7 +22,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="Description"
+            label="Description *"
             [(value)]="newReasons.DESCRIPTION"
             labelMode="floating"
           >
@@ -45,7 +45,7 @@
             [(value)]="newReasons.ARABIC_DESCRIPTION"
             labelMode="floating"
             [rtlEnabled]="true"
-            label="Arabic Name"
+            label="Arabic Name *"
           >
             <dx-validator>
               <dxi-validation-rule
@@ -55,6 +55,98 @@
               </dxi-validation-rule>
             </dx-validator>
           </dx-text-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="1">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-select-box
+            label="Reason Type *"
+            [items]="ReasonTypeDropdownData"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+            [(value)]="newReasons.REASON_TYPE"
+            placeholder="Select Reason ype"
+            labelMode="floating"
+            (onValueChanged)="onValueChangedReason($event)"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Reason type is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="4" *ngIf="customer">
+      <dxi-item colSpan="3">
+        <div *dxTemplate>
+          <dx-select-box
+            label="Discount Type *"
+            [items]="DiscountTypeDropdownData"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="newReasons.DISCOUNT_TYPE"
+            placeholder="Select Discount type"
+            labelMode="floating"
+            [searchEnabled]="true"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateDiscountType"
+                message="Discount type is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </dxi-item>
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-number-box
+            label="Value % *"
+            [(value)]="newReasons.DISCOUNT_PERCENT"
+            labelMode="floating"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateDiscountpercentrage"
+                message="Discount percent must be greater than 0"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-number-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="1" *ngIf="Inv_man_Adj">
+      <dxi-item colSpan="3">
+        <div *dxTemplate>
+          <dx-select-box
+            label="Ac.Ledger *"
+            [items]="ac_ledger_Data"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="newReasons.AC_HEAD_ID"
+            placeholder="Select Discount type"
+            labelMode="floating"
+            [searchEnabled]="true"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateAcHead"
+                message="Ac.Ledger is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
         </div>
       </dxi-item>
     </dxi-item>
@@ -82,94 +174,6 @@
             [inputAttr]="{ 'aria-label': 'Date' }"
             labelMode="floating"
           ></dx-date-box>
-        </div>
-      </dxi-item>
-    </dxi-item>
-    <dxi-item itemType="group" [colCount]="1">
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-select-box
-            label="Reason Type"
-            [items]="ReasonTypeDropdownData"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [searchEnabled]="true"
-            [(value)]="newReasons.REASON_TYPE"
-            placeholder="Select Reason ype"
-            labelMode="floating"
-            (onValueChanged)="onValueChangedReason($event)"
-          >
-            <dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="Reason type is required"
-              >
-              </dxi-validation-rule>
-            </dx-validator>
-          </dx-select-box>
-        </div>
-      </dxi-item>
-    </dxi-item>
-    <dxi-item itemType="group" [colCount]="4" *ngIf="customer">
-      <dxi-item colSpan="3">
-        <div *dxTemplate>
-          <dx-select-box
-            label="Discount Type"
-            [items]="DiscountTypeDropdownData"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="newReasons.DISCOUNT_TYPE"
-            placeholder="Select Discount type"
-            labelMode="floating"
-            [searchEnabled]="true"
-          >
-            <!-- <dx-validator>
-                  <dxi-validation-rule
-                      type="required"
-                      message="Discount type is required">
-                  </dxi-validation-rule>
-              </dx-validator> -->
-          </dx-select-box>
-        </div>
-      </dxi-item>
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-number-box
-            label="Value"
-            [(value)]="newReasons.DISCOUNT_PERCENT"
-            labelMode="floating"
-          >
-            <!-- <dx-validator>
-                  <dxi-validation-rule
-                      type="required"
-                      message="Discount percent is required">
-                  </dxi-validation-rule>
-              </dx-validator> -->
-          </dx-number-box>
-        </div>
-      </dxi-item>
-    </dxi-item>
-
-    <dxi-item itemType="group" [colCount]="1" *ngIf="Inv_man_Adj">
-      <dxi-item colSpan="3">
-        <div *dxTemplate>
-          <dx-select-box
-            label="Ac.Ledger"
-            [items]="ac_ledger_Data"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="newReasons.AC_HEAD_ID"
-            placeholder="Select Discount type"
-            labelMode="floating"
-            [searchEnabled]="true"
-          >
-            <!-- <dx-validator>
-                  <dxi-validation-rule
-                      type="required"
-                      message="Discount type is required">
-                  </dxi-validation-rule>
-              </dx-validator> -->
-          </dx-select-box>
         </div>
       </dxi-item>
     </dxi-item>

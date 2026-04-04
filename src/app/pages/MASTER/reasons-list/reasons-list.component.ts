@@ -39,18 +39,27 @@ export class ReasonsListComponent {
   showHeaderFilter = true;
   isEditReasonsPopupOpened: boolean = false;
   selected_Data: any;
+  isFilterOpened = false;
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
   ) {
-    this.dataservice.getDropdownData('REASONTYPES').subscribe((data) => {
+    const payload = {
+      NAME: 'REASONTYPES',
+    };
+    this.dataservice.getDropdownData(payload).subscribe((data) => {
       this.reasontype = data;
     });
     this.dataservice.getDropdownData('DISCOUNTTYPE').subscribe((data) => {
       this.discounttype = data;
     });
-    dataservice.getDropdownData('STORE').subscribe((data) => {
+    const payloadstore = {
+      NAME: 'STORE',
+    };
+
+    dataservice.getDropdownData(payloadstore).subscribe((data) => {
       this.stores = data;
     });
   }
@@ -82,7 +91,7 @@ export class ReasonsListComponent {
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => {
-      // this.ngZone.run(() => this.refresh());
+      this.ngZone.run(() => this.refresh());
     },
     text: '',
   };
@@ -90,13 +99,30 @@ export class ReasonsListComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    // onClick: () => this.toggleFilters(),
+    onClick: () => this.toggleFilters(),
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Reasons-list');
   }
+  refresh() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      this.showReasons();
+    }
+  }
   addReasons() {
     this.isAddReasonsPopupOpened = true;
+    this.reasonComponent.resetForm();
   }
 
   showReasons() {
@@ -223,7 +249,7 @@ export class ReasonsListComponent {
                 position: { at: 'top right', my: 'top right' },
                 displayTime: 1000,
               },
-              'error',
+              'success',
             );
           }
         });

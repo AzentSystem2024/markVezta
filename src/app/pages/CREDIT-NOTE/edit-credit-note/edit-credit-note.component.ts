@@ -69,6 +69,7 @@ export class EditCreditNoteComponent {
   creditHeader!: any;
   vatTitle: any;
   showSubType: boolean;
+  VatClass: any;
 
   @Input()
   set creditFormData(value: any) {
@@ -182,6 +183,7 @@ export class EditCreditNoteComponent {
       this.userId = userData.USER_ID;
       this.finId = userData.FINANCIAL_YEARS?.[0]?.FIN_ID;
     }
+    this.getVatPercentList();
     this.getCompanyListDropdown();
     this.getLedgerCodeDropdown();
     // this.getPendingInvoices();
@@ -223,7 +225,7 @@ export class EditCreditNoteComponent {
               ledgerName: ledger?.HEAD_NAME || '',
               particulars: item.REMARKS || '',
               Amount: item.AMOUNT || '',
-              GST_PERC: item.GST_PERC ?? 0,
+              GST_PERC: Number(item.GST_PERC) || 0,
               CGST: item.CGST ?? 0,
               SGST: item.SGST ?? 0,
               gstAmount: item.GST_AMOUNT ?? 0,
@@ -235,7 +237,7 @@ export class EditCreditNoteComponent {
           this.cdr.detectChanges();
         })
         .finally(() => {
-          // 🟢 STOP GRID LOADING
+          // STOP GRID LOADING
           this.itemsGridRef?.instance?.endCustomLoading();
         });
 
@@ -321,6 +323,21 @@ export class EditCreditNoteComponent {
 
         this.cdr.detectChanges();
       });
+  }
+
+  getVatPercentList() {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+      NAME: 'VAT_PERC',
+    };
+
+    this.dataService.getDropdownData(payload).subscribe((data) => {
+      this.VatClass = data.map((item: any) => ({
+        ...item,
+        VALUE: Number(item.DESCRIPTION),
+        DESCRIPTION: Number(item.DESCRIPTION).toString(),
+      }));
+    });
   }
 
   getCustomerOrUnitLst() {
@@ -555,6 +572,13 @@ export class EditCreditNoteComponent {
     });
   }
 
+  calculateTaxAmount = (row: any) => {
+    const amount = Number(row.Amount) || 0;
+    const gstPerc = Number(row.GST_PERC) || 0;
+
+    return (amount * gstPerc) / 100;
+  };
+
   onEditorPreparing(e: any) {
     if (
       e.dataField === 'ledgerCode' ||
@@ -732,7 +756,7 @@ export class EditCreditNoteComponent {
     }
 
     if (e.dataField === 'Amount') {
-      // 👉 ENTER KEY HANDLING
+      //  ENTER KEY HANDLING
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
@@ -755,7 +779,27 @@ export class EditCreditNoteComponent {
         }
       };
 
-      // 👉 VALUE CHANGE HANDLING (🔥 GST CALCULATION GOES HERE 🔥)
+      if (e.dataField === 'GST_PERC') {
+        e.editorOptions.onValueChanged = (args: any) => {
+          e.setValue(args.value);
+
+          const row = e.row.data;
+          const amount = Number(row.Amount) || 0;
+          const gstPerc = Number(args.value) || 0;
+
+          const gst = (amount * gstPerc) / 100;
+
+          const grid = this.itemsGridRef.instance;
+          const rowIndex = e.row.rowIndex;
+
+          grid.cellValue(rowIndex, 'gstAmount', +gst.toFixed(2));
+
+          //  refresh total column
+          grid.refresh();
+        };
+      }
+
+      // VALUE CHANGE HANDLING (GST CALCULATION GOES HERE )
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
 
@@ -890,7 +934,7 @@ export class EditCreditNoteComponent {
   //     gst = (amount * (Number(row.GST_PERC) || 0)) / 100;
   //   }
 
-  //   // 🔥 THIS IS MANDATORY
+  //   //  THIS IS MANDATORY
   //   row.gstAmount = +gst.toFixed(2);
 
   //   return row.gstAmount;
@@ -898,7 +942,10 @@ export class EditCreditNoteComponent {
 
   calculateTotalAmount = (row: any) => {
     const amount = Number(row.Amount) || 0;
-    const gstAmount = Number(row.gstAmount) || 0;
+    const gstPerc = Number(row.GST_PERC) || 0;
+
+    const gstAmount = (amount * gstPerc) / 100;
+
     return +(amount + gstAmount).toFixed(2);
   };
 
