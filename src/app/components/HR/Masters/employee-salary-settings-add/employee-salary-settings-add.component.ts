@@ -117,13 +117,13 @@ export class EmployeeSalarySettingsAddComponent {
       0, // Also set this to noon
     );
 
-    if (selectedMonthFirstDate < currentMonthFirstDate) {
-      e.component.option('value', currentMonthFirstDate);
-      this.employeeFormData.EFFECT_FROM = currentMonthFirstDate;
-    } else {
-      e.component.option('value', selectedMonthFirstDate);
-      this.employeeFormData.EFFECT_FROM = selectedMonthFirstDate;
-    }
+    // if (selectedMonthFirstDate < currentMonthFirstDate) {
+    //   e.component.option('value', currentMonthFirstDate);
+    //   this.employeeFormData.EFFECT_FROM = currentMonthFirstDate;
+    // } else {
+    //   e.component.option('value', selectedMonthFirstDate);
+    //   this.employeeFormData.EFFECT_FROM = selectedMonthFirstDate;
+    // }
   }
   getLocalDateString(date: Date): string {
     const year = date.getFullYear();
