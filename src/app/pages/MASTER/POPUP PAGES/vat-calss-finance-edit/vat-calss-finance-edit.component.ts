@@ -62,7 +62,6 @@ export class VatCalssFinanceEditComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
       this.selectedData = changes['selectedData'].currentValue;
-
       this.tryBindData();
     }
   }
@@ -72,18 +71,23 @@ export class VatCalssFinanceEditComponent {
     this.dataservice.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
       this.isLedgerLoaded = true;
-
       this.tryBindData();
     });
   }
 
-  // Bind ONLY when both are ready
   tryBindData() {
-    if (this.isLedgerLoaded && this.selectedData) {
-      this.formVatclassData = { ...this.selectedData };
-      console.log('Final Bound Data:', this.formVatclassData);
-    }
+  if (this.isLedgerLoaded && this.selectedData) {
+    this.formVatclassData = {
+      ...this.selectedData,
+      IGST_INPUT_HEAD_ID: Number(this.selectedData.IGST_INPUT_HEAD_ID),
+      IGST_OUTPUT_HEAD_ID: Number(this.selectedData.IGST_OUTPUT_HEAD_ID),
+    };
+
+    //IMPORTANT FIX
+    this.newVatclass = this.formVatclassData;
   }
+}
+
   keyPressCode(event: any) {
     const charCode = event.which ? event.which : event.keyCode;
     // Allow alphanumeric characters (A-Z, a-z, 0-9)
