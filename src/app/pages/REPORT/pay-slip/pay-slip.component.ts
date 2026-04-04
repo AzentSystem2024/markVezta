@@ -99,6 +99,7 @@ export class PaySlipComponent {
     const payload = {
       Month: this.payloadDate || `${monthToUse}-01T00:00:00.000Z`,
       EmployeeIDs: this.selectedEmployee,
+      COMPANY_ID : this.selected_Company_id
     };
 
     this.dataService.getPaySlip(payload).subscribe((response: any) => {

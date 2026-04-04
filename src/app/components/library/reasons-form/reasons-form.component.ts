@@ -60,6 +60,8 @@ export class ReasonsFormComponent {
   getNewReasonsData = () => ({
     ...this.newReasons,
     COMPANY_ID: this.companyID,
+    DISCOUNT_TYPE: this.newReasons.DISCOUNT_TYPE ?? 0,
+    DISCOUNT_PERCENT: this.newReasons.DISCOUNT_PERCENT ?? 0,
   });
 
   sesstion_Details() {
@@ -111,7 +113,7 @@ export class ReasonsFormComponent {
     if (event.value === 1) {
       this.customer = true;
       this.Inv_man_Adj = false;
-    } else if (event.value === 2) {
+    } else if (event.value === 2 || event.value === 4) {
       this.Inv_man_Adj = true;
       this.customer = false;
     } else {
@@ -154,6 +156,17 @@ export class ReasonsFormComponent {
   resetForm() {
     this.selectedRows = [];
   }
+  validateDiscountType = (e: any) => {
+    return e.value !== 0 && e.value !== null && e.value !== undefined;
+  };
+  validateAcHead = (e: any) => {
+    return e.value !== 0 && e.value !== null && e.value !== undefined;
+  };
+  validateDiscountpercentrage = (e: any) => {
+    const value = Number(e.value);
+
+    return !isNaN(value) && value > 0;
+  };
 }
 @NgModule({
   imports: [

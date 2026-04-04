@@ -58,33 +58,6 @@
         </div>
       </dxi-item>
     </dxi-item>
-
-    <dxi-item itemType="group" [colCount]="2">
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-date-box
-            type="date"
-            label="Start Date"
-            [value]="now"
-            (onValueChanged)="onValueChangedSDate($event)"
-            [inputAttr]="{ 'aria-label': 'Date' }"
-            labelMode="floating"
-          ></dx-date-box>
-        </div>
-      </dxi-item>
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-date-box
-            type="date"
-            label="End Date"
-            [value]="now"
-            (onValueChanged)="onValueChangedEDate($event)"
-            [inputAttr]="{ 'aria-label': 'Date' }"
-            labelMode="floating"
-          ></dx-date-box>
-        </div>
-      </dxi-item>
-    </dxi-item>
     <dxi-item itemType="group" [colCount]="1">
       <dxi-item>
         <div *dxTemplate>
@@ -110,11 +83,12 @@
         </div>
       </dxi-item>
     </dxi-item>
+
     <dxi-item itemType="group" [colCount]="4" *ngIf="customer">
       <dxi-item colSpan="3">
         <div *dxTemplate>
           <dx-select-box
-            label="Discount Type"
+            label="Discount Type *"
             [items]="DiscountTypeDropdownData"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
@@ -123,28 +97,30 @@
             labelMode="floating"
             [searchEnabled]="true"
           >
-            <!-- <dx-validator>
-                  <dxi-validation-rule
-                      type="required"
-                      message="Discount type is required">
-                  </dxi-validation-rule>
-              </dx-validator> -->
+            <dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateDiscountType"
+                message="Discount type is required"
+              ></dxi-validation-rule>
+            </dx-validator>
           </dx-select-box>
         </div>
       </dxi-item>
       <dxi-item>
         <div *dxTemplate>
           <dx-number-box
-            label="Value"
+            label="Value % *"
             [(value)]="newReasons.DISCOUNT_PERCENT"
             labelMode="floating"
           >
-            <!-- <dx-validator>
-                  <dxi-validation-rule
-                      type="required"
-                      message="Discount percent is required">
-                  </dxi-validation-rule>
-              </dx-validator> -->
+            <dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateDiscountpercentrage"
+                message="Discount percent must be greater than 0"
+              ></dxi-validation-rule>
+            </dx-validator>
           </dx-number-box>
         </div>
       </dxi-item>
@@ -154,7 +130,7 @@
       <dxi-item colSpan="3">
         <div *dxTemplate>
           <dx-select-box
-            label="Ac.Ledger"
+            label="Ac.Ledger *"
             [items]="ac_ledger_Data"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
@@ -163,13 +139,41 @@
             labelMode="floating"
             [searchEnabled]="true"
           >
-            <!-- <dx-validator>
-                  <dxi-validation-rule
-                      type="required"
-                      message="Discount type is required">
-                  </dxi-validation-rule>
-              </dx-validator> -->
+            <dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateAcHead"
+                message="Ac.Ledger is required"
+              ></dxi-validation-rule>
+            </dx-validator>
           </dx-select-box>
+        </div>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2">
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-date-box
+            type="date"
+            label="Start Date"
+            [value]="now"
+            (onValueChanged)="onValueChangedSDate($event)"
+            [inputAttr]="{ 'aria-label': 'Date' }"
+            labelMode="floating"
+          ></dx-date-box>
+        </div>
+      </dxi-item>
+      <dxi-item>
+        <div *dxTemplate>
+          <dx-date-box
+            type="date"
+            label="End Date"
+            [value]="now"
+            (onValueChanged)="onValueChangedEDate($event)"
+            [inputAttr]="{ 'aria-label': 'Date' }"
+            labelMode="floating"
+          ></dx-date-box>
         </div>
       </dxi-item>
     </dxi-item>
