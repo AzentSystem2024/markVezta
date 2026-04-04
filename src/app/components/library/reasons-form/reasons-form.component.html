@@ -4,7 +4,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="Code"
+            label="Code *"
             [(value)]="newReasons.CODE"
             width="100"
             labelMode="floating"
@@ -22,7 +22,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-text-box
-            label="Description"
+            label="Description *"
             [(value)]="newReasons.DESCRIPTION"
             labelMode="floating"
           >
@@ -45,7 +45,7 @@
             [(value)]="newReasons.ARABIC_DESCRIPTION"
             labelMode="floating"
             [rtlEnabled]="true"
-            label="Arabic Name"
+            label="Arabic Name *"
           >
             <dx-validator>
               <dxi-validation-rule
@@ -89,7 +89,7 @@
       <dxi-item>
         <div *dxTemplate>
           <dx-select-box
-            label="Reason Type"
+            label="Reason Type *"
             [items]="ReasonTypeDropdownData"
             displayExpr="DESCRIPTION"
             valueExpr="ID"

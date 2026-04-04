@@ -165,14 +165,18 @@ export class ReasonEditComponent {
     });
   }
   getReasonTypeDropDown() {
-    const dropdownreason = 'REASONTYPES';
-    this.service.getDropdownData(dropdownreason).subscribe((data: any) => {
+    const payload = {
+      NAME: 'REASONTYPES',
+    };
+    this.service.getDropdownData(payload).subscribe((data: any) => {
       this.ReasonTypeDropdownData = data;
     });
   }
   getDiscountTypeDropDown() {
-    const dropdowndiscount = 'DISCOUNTTYPE';
-    this.service.getDropdownData(dropdowndiscount).subscribe((data: any) => {
+    const payload = {
+      NAME: 'DISCOUNTTYPE',
+    };
+    this.service.getDropdownData(payload).subscribe((data: any) => {
       this.DiscountTypeDropdownData = data;
     });
   }

@@ -47,9 +47,7 @@ export class ReasonsFormComponent {
     DISCOUNT_TYPE: 0,
     AC_HEAD_ID: 0,
     DISCOUNT_PERCENT: 0,
-    REASON_STORES: {
-      STORE_ID: '',
-    },
+    REASON_STORES: [],
   };
   ac_ledger_Data: any;
   finID: any;
@@ -66,6 +64,7 @@ export class ReasonsFormComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   showStores() {
@@ -74,6 +73,7 @@ export class ReasonsFormComponent {
     };
     this.service.getStoresData(payload).subscribe((response) => {
       this.stores = response;
+      console.log('Stores data:', this.stores);
     });
   }
 
@@ -83,14 +83,18 @@ export class ReasonsFormComponent {
     });
   }
   getReasonTypeDropDown() {
-    const dropdownreason = 'REASONTYPES';
-    this.service.getDropdownData(dropdownreason).subscribe((data: any) => {
+    const payload = {
+      NAME: 'REASONTYPES',
+    };
+    this.service.getDropdownData(payload).subscribe((data: any) => {
       this.ReasonTypeDropdownData = data;
     });
   }
   getDiscountTypeDropDown() {
-    const dropdowndiscount = 'DISCOUNTTYPE';
-    this.service.getDropdownData(dropdowndiscount).subscribe((data: any) => {
+    const payload = {
+      NAME: 'DISCOUNTTYPE',
+    };
+    this.service.getDropdownData(payload).subscribe((data: any) => {
       this.DiscountTypeDropdownData = data;
     });
   }
@@ -127,7 +131,7 @@ export class ReasonsFormComponent {
 
     const restored_Data = selected_valued.map((item) => ({
       ID: item.ID,
-      STORE_ID: item.STORE_NO, // 👈 taking STORE_NO as STORE_ID
+      STORE_ID: item.STORE_NO ?? 0, // 👈 taking STORE_NO as STORE_ID
     }));
 
     this.formReasonsData.REASON_STORES = restored_Data;
@@ -145,6 +149,10 @@ export class ReasonsFormComponent {
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
+  }
+
+  resetForm() {
+    this.selectedRows = [];
   }
 }
 @NgModule({
