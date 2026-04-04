@@ -1,0 +1,168 @@
+<div class="invoice-container">
+
+  <!-- 🔹 HEADER SECTION -->
+  <dx-form
+    [formData]="invoiceHeader"
+    [colCount]="4"
+    labelLocation="top"
+    labelMode="floating"
+  >
+
+    <dxi-item dataField="invoiceNo" editorType="dxTextBox" [editorOptions]="{ placeholder: 'Invoice No', readOnly: true  }" [label]="{ text: 'Invoice No' }"></dxi-item>
+
+    <dxi-item dataField="date" editorType="dxDateBox" [editorOptions]="{ type: 'date', readOnly: isReadOnly }" [label]="{ text: 'Invoice Date' }"></dxi-item>
+
+    <dxi-item dataField="referenceNo" editorType="dxTextBox" [label]="{ text: 'Reference No' }" [editorOptions]="{ readOnly: isReadOnly  }"></dxi-item>
+
+    <dxi-item dataField="referenceDate" editorType="dxDateBox" [editorOptions]="{ type: 'date', readOnly: isReadOnly }" [label]="{ text: 'Reference Date' }"></dxi-item>
+
+    <dxi-item dataField="customerId" editorType="dxSelectBox"
+      [editorOptions]="{
+        items: customer,
+        displayExpr: 'DESCRIPTION',
+        valueExpr: 'ID',
+        searchEnabled: true,
+        readOnly: isReadOnly
+      }"
+      [label]="{ text: 'Customer' }"
+      >
+    </dxi-item>
+
+    <dxi-item dataField="tpaId" editorType="dxSelectBox"
+      [editorOptions]="{
+        items: customer,
+        displayExpr: 'DESCRIPTION',
+        valueExpr: 'ID',
+        readOnly: isReadOnly
+      }"
+      [label]="{ text: 'TPA' }"
+      >
+    </dxi-item>
+
+    <dxi-item dataField="encounterType" editorType="dxSelectBox"
+      [editorOptions]="{
+        items: encounterTypes,
+        displayExpr: 'DESCRIPTION',
+        valueExpr: 'DESCRIPTION',
+        readOnly: isReadOnly
+      }"
+      [label]="{ text: 'Encounter Type' }"
+      >
+    </dxi-item>
+
+    <dxi-item dataField="patientId" editorType="dxTextBox" [label]="{ text: 'Patient ID' }" [editorOptions]="{ readOnly: isReadOnly  }"></dxi-item>
+
+    <dxi-item dataField="patientName" editorType="dxTextBox" [label]="{ text: 'Patient Name' }" [editorOptions]="{ readOnly: isReadOnly  }"></dxi-item>
+
+    <!-- <dxi-item dataField="transactionType" editorType="dxSelectBox"
+      [editorOptions]="{
+        items: transactionTypes
+      }"
+      [label]="{ text: 'Transaction Type' }"
+      >
+    </dxi-item> -->
+
+    <dxi-item dataField="storeId" editorType="dxSelectBox"
+      [editorOptions]="{
+        items: branch,
+        displayExpr: 'DESCRIPTION',
+        valueExpr: 'ID',
+        readOnly: isReadOnly
+      }"
+      [label]="{ text: 'Branch' }"
+      >
+    </dxi-item> 
+
+  </dx-form>
+
+  <!-- 🔹 DETAIL GRID -->
+  <dx-data-grid
+    [dataSource]="invoiceDetails"
+    [showBorders]="true"
+    [editing]="{ mode: 'cell', allowAdding: true, allowUpdating: true, allowDeleting: true }"
+    [columnAutoWidth]="true"
+    [height]="'60vh'"
+    (onEditorPreparing)="onEditorPreparing($event)"
+    (onRowUpdated)="updateCalculation($event)"
+    [hoverStateEnabled]="true"
+    [rowAlternationEnabled]="true"
+  >
+
+    <dxo-editing mode="cell" [allowAdding]="!isReadOnly" [allowUpdating]="!isReadOnly" [allowDeleting]="!isReadOnly"></dxo-editing>
+
+    <dxi-column dataField="itemCode" caption="Item Code">
+
+    <dxo-lookup
+        [searchEnabled]="true"
+        [dataSource]="items"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID">
+    </dxo-lookup>
+
+    </dxi-column>
+
+    <dxi-column dataField="itemDescription" caption="Description"></dxi-column>
+    <dxi-column dataField="orderingClinician"></dxi-column>
+    <dxi-column dataField="clinician"></dxi-column>
+    <dxi-column dataField="department">
+        <dxo-lookup
+        [searchEnabled]="true"
+        [dataSource]="department"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID">
+    </dxo-lookup>
+    </dxi-column>
+    <dxi-column dataField="subDepartment" caption="Sub Department">
+
+    <dxo-lookup
+        [dataSource]="getAllSubDepartments()"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID">
+    </dxo-lookup>
+
+    </dxi-column>
+
+    <dxi-column dataField="quantity" caption="qty" dataType="number"></dxi-column>
+    <dxi-column dataField="duration" dataType="number"></dxi-column>
+
+    <dxi-column dataField="grossAmount" caption="Gross Amt" dataType="number" format="#,##0.00"></dxi-column>
+    <dxi-column dataField="patientShare"  dataType="number" format="#,##0.00"></dxi-column>
+
+    <dxi-column dataField="vatCode"></dxi-column>
+    <dxi-column dataField="vatPercent" caption="Vat Perc" dataType="number"></dxi-column>
+    <dxi-column dataField="vatAmount" caption="Vat Amt" dataType="number" format="#,##0.00"></dxi-column>
+
+    <dxi-column dataField="netAmount" caption="Net Amt" dataType="number" format="#,##0.00" [allowEditing]="false"></dxi-column>
+
+  </dx-data-grid>
+
+
+  <!-- 🔹 ACTION BUTTONS -->
+<div class="action-buttons" *ngIf="!isReadOnly">
+
+  <dx-check-box
+    text="Approve"
+    [(value)]="isApproved">
+  </dx-check-box>
+
+  <dx-button
+    text="Cancel"
+    type="normal"
+    stylingMode="outlined"
+    (onClick)="onCancel()">
+  </dx-button>
+
+  <dx-button
+    [text]="isApproved ? 'Commit' : 'Save'"
+    type="default"
+    stylingMode="contained"
+    (onClick)="onSave()">
+  </dx-button>
+
+</div>
+
+<div *ngIf="isReadOnly" class="approved-label">
+  ✅ Approved 
+</div>
+
+</div>

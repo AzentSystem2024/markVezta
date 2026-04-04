@@ -18,8 +18,8 @@ export class VatCalssFinanceFormComponent {
     CODE: '',
     VAT_NAME: '',
     VAT_PERC: '',
-    VAT_INPUT_HEAD_ID: '',
-    VAT_OUTPUT_HEAD_ID: '',
+    IGST_INPUT_HEAD_ID: '',
+    IGST_OUTPUT_HEAD_ID: '',
   };
 
   newVatclass = this.formVatclassData;

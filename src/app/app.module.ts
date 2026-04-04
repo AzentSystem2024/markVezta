@@ -367,18 +367,6 @@ import { SalaryWPSModule } from './pages/salary-wps/salary-wps.component';
 import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
 import { PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 import { ProfitAndLossBranchModule } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
-import {
-  CustomerFinListComponent,
-  CustomerFinListModule,
-} from './pages/MASTER/customer-fin-list/customer-fin-list.component';
-import {
-  CustomerFinFormComponent,
-  CustomerFinFormModule,
-} from './components/HR/Masters/Customer/customer-fin-form/customer-fin-form.component';
-import {
-  CustomerFinEditFormComponent,
-  CustomerFinEditFormModule,
-} from './components/HR/Masters/Customer/customer-fin-edit-form/customer-fin-edit-form.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -748,9 +736,6 @@ import {
     PrepaymentPostingReportModule,
     SalaryWPSModule,
     ProfitAndLossBranchModule,
-    CustomerFinFormModule,
-    CustomerFinListModule,
-    CustomerFinEditFormModule,
   ],
 
   providers: [
