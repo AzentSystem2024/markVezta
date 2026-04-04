@@ -24,7 +24,6 @@
           label="VAT Name"
           [(value)]="formVatclassData.VAT_NAME"
           labelMode="floating"
-          (keypress)="keyPressVatname($event)"
         >
         </dx-text-box>
       </div>
@@ -47,7 +46,7 @@
           [dataSource]="ledgerList"
           displayExpr="HEAD_NAME"
           valueExpr="HEAD_ID"
-          [(value)]="newVatclass.IGST_INPUT_HEAD_ID"
+          [(value)]="formVatclassData.IGST_INPUT_HEAD_ID"
           label="Input Ledger"
           labelMode="floating"
           [searchEnabled]="true"
@@ -68,7 +67,7 @@
           [dataSource]="ledgerList"
           displayExpr="HEAD_NAME"
           valueExpr="HEAD_ID"
-          [(value)]="newVatclass.IGST_OUTPUT_HEAD_ID"
+          [(value)]="formVatclassData.IGST_OUTPUT_HEAD_ID"
           label="Output Ledger"
           labelMode="floating"
           [searchEnabled]="true"
