@@ -34,7 +34,6 @@ import {
   DxiGroupModule,
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
-import { VatReturnComponent } from 'src/app/pages/Vat Return/vat-return/vat-return.component';
 import { DataService } from 'src/app/services';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -296,7 +295,7 @@ export class PaySlipComponent {
   GetEmployeeList() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      Name: 'EMPLOYEE',
+      Name: 'EMP PAYSLIP',
     };
     this.dataService.getDropdownData(payload).subscribe((res) => {
       this.employeeList = res;

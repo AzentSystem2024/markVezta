@@ -15,6 +15,7 @@
   left: 0;
   right: 0;
   flex-direction: row;
+  margin-top: 20px;
 
   .grid {
     .name-template {
@@ -36,7 +37,6 @@
 
       .dx-datagrid-content .dx-row {
         cursor: pointer;
-      
       }
     }
 
@@ -52,7 +52,7 @@
 
 .edit-cell {
   position: relative;
-    
+
   contact-status {
     position: absolute;
     margin-top: 10px;

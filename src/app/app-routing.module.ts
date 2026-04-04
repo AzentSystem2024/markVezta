@@ -156,8 +156,8 @@ import { SalaryWPSComponent } from './pages/salary-wps/salary-wps.component';
 import { PaySettingsComponent } from './pages/HR/Masters/pay-settings/pay-settings.component';
 import { DepartmentMeComponent } from './pages/MASTER/department-me/department-me.component';
 import { ProfitAndLossBranchComponent } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
-import { MiscSalesInvoiceListComponent } from './pages/Operations/misc-sales-invoice-list/misc-sales-invoice-list.component';
 import { CustomerFinListComponent } from './pages/MASTER/customer-fin-list/customer-fin-list.component';
+import { MiscSalesInvoiceListComponent } from './pages/OPERATIONS/misc-sales-invoice-list/misc-sales-invoice-list.component';
 
 const routes: Routes = [
   {
@@ -267,6 +267,11 @@ const routes: Routes = [
       {
         path: 'customer-list',
         component: CustomerListComponent,
+        canActivate: [AuthGuardService],
+      },
+       {
+        path: 'customer--fin-list',
+        component: CustomerFinListComponent,
         canActivate: [AuthGuardService],
       },
       {

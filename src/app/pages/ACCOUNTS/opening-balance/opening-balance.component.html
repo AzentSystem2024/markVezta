@@ -167,6 +167,22 @@
         [allowEditing]="!isReadOnly"
       >
       </dxi-column>
+
+      <dxo-summary>
+  <dxi-total-item
+    column="debitAmount"
+    summaryType="sum"
+    valueFormat="#,##0.00"
+    displayFormat="Total: {0}"
+  ></dxi-total-item>
+
+  <dxi-total-item
+    column="creditAmount"
+    summaryType="sum"
+    valueFormat="#,##0.00"
+    displayFormat="Total: {0}"
+  ></dxi-total-item>
+</dxo-summary>
     </dx-data-grid>
   </div>
 </div>

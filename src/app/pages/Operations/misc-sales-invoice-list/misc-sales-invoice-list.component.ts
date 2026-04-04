@@ -66,11 +66,11 @@ import { MiscSalesInvoiceFormComponent, MiscSalesInvoiceFormModule } from '../PO
 export class MiscSalesInvoiceListComponent {
   @ViewChild(MiscSalesInvoiceFormComponent) addInvoiceComp!: MiscSalesInvoiceFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent|undefined;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter: true | undefined;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -127,12 +127,12 @@ export class MiscSalesInvoiceListComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   filteredInvoiceList: any;
-  InvoiceDataSource: DataSource;
+  InvoiceDataSource: DataSource | undefined;
   invoiceArray: any[] = [];
   invoiceCount = 0;
   isEditInvoice: boolean = false;
   selectedInvoice: any;
-  isViewInvoice: boolean;
+  isViewInvoice: boolean=false;
 
   sessionData: any;
   selected_Company_id: any;
@@ -168,8 +168,8 @@ export class MiscSalesInvoiceListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     //
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/invoice');
+      .flatMap((group:any) => group.Menus)
+      .find((menu:any) => menu.Path === '/invoice');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -364,7 +364,7 @@ export class MiscSalesInvoiceListComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
 

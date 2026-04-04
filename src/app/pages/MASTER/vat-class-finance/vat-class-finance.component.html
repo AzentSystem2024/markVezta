@@ -21,6 +21,7 @@
       <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
+
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -29,6 +30,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
+
       <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
         <dxo-popup
           title="Edit Vat Class"
@@ -55,8 +57,19 @@
 
         <dxi-item
           location="after"
+          locateInMenu="auto"
           widget="dxButton"
-          [options]="addButtonOptions"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
         ></dxi-item>
 
         <dxi-item
@@ -64,9 +77,8 @@
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>
-
-        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
+
       <dxi-column dataField="CODE" caption="Code"> </dxi-column>
       <dxi-column dataField="VAT_NAME" [caption]="'Name'"> </dxi-column>
       <dxi-column
@@ -96,7 +108,7 @@
   height="40vh"
   width="35vw"
 >
-  <div >
+  <div>
     <app-vat-calss-finance-edit
       [selectedData]="selected_data"
       (formClosed)="handleClose()"
