@@ -300,6 +300,7 @@ export class GrnComponent implements OnInit {
         this.ClearFormData();
         this.GrnNewFormComponent?.clearDemoArray();
         this.isGRNPopupVisible = false;
+        this.GrnNewFormComponent?.getDocNo();
         this.getGrnLogData();
       } else {
         notify(

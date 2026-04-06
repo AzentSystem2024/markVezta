@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 70vh;
+      height: 75vh;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
@@ -24,7 +24,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'55vh'"
+          [height]="'71vh'"
           [columnResizingMode]="'nextColumn'"
           [headerFilter]="{ visible: true }"
           [scrolling]="{ mode: 'virtual' }"
@@ -277,14 +277,6 @@
           ></dx-text-box> -->
 
           <!-- Approve Checkbox (right side) -->
-          <div *ngIf="journalVoucherFormData" style="margin-top: 10px">
-            <dx-check-box
-              [(value)]="journalVoucherFormData.IS_APPROVED"
-              text="Approve"
-              (onValueChanged)="onApprovedChanged($event)"
-            >
-            </dx-check-box>
-          </div>
         </div>
 
         <!-- <div *ngIf="journalVoucherFormData" style="margin-top: 10px">
@@ -301,30 +293,49 @@
 </dx-validation-group>
 
 <div class="form-popup-buttons-container">
-  <div class="popup-footer">
-    <dx-button
-      text="Cancel"
-      (onClick)="cancel()"
-      stylingMode="outlined"
-      type="normal"
-    ></dx-button>
-    <dx-button
-      [text]="
-        isSaving
-          ? journalVoucherFormData?.IS_APPROVED
-            ? 'Saving...'
-            : 'Updating...'
-          : journalVoucherFormData?.IS_APPROVED
-            ? 'Save'
-            : 'Save'
+  <div class="popup-footer" style="display: flex; justify-content: flex-end">
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
       "
-      [visible]="canEdit"
-      [disabled]="isSaving"
-      (onClick)="update()"
-      stylingMode="contained"
-      type="default"
     >
-    </dx-button>
+      <div *ngIf="journalVoucherFormData">
+        <dx-check-box
+          [(value)]="journalVoucherFormData.IS_APPROVED"
+          text="Approve"
+          (onValueChanged)="onApprovedChanged($event)"
+        >
+        </dx-check-box>
+      </div>
+      <div style="display: flex; gap: 10px">
+        <dx-button
+          text="Cancel"
+          (onClick)="cancel()"
+          stylingMode="outlined"
+          type="normal"
+        ></dx-button>
+        <dx-button
+          [text]="
+            isSaving
+              ? journalVoucherFormData?.IS_APPROVED
+                ? 'Saving...'
+                : 'Updating...'
+              : journalVoucherFormData?.IS_APPROVED
+                ? 'Save'
+                : 'Save'
+          "
+          [visible]="canEdit"
+          [disabled]="isSaving"
+          (onClick)="update()"
+          stylingMode="contained"
+          type="default"
+        >
+        </dx-button>
+      </div>
+    </div>
 
     <!-- <dx-button
       [text]="
