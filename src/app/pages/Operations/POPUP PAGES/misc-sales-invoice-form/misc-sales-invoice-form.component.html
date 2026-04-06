@@ -10,11 +10,20 @@
 
     <dxi-item dataField="invoiceNo" editorType="dxTextBox" [editorOptions]="{ placeholder: 'Invoice No', readOnly: true  }" [label]="{ text: 'Invoice No' }"></dxi-item>
 
-    <dxi-item dataField="date" editorType="dxDateBox" [editorOptions]="{ type: 'date', readOnly: isReadOnly }" [label]="{ text: 'Invoice Date' }"></dxi-item>
+    <dxi-item 
+    dataField="date" 
+    editorType="dxDateBox"
+    [editorOptions]="{
+      type: 'date',
+      displayFormat: 'dd-MM-yyyy',
+      readOnly: true
+    }"
+    [label]="{ text: 'Invoice Date' }">
+  </dxi-item>
 
     <dxi-item dataField="referenceNo" editorType="dxTextBox" [label]="{ text: 'Reference No' }" [editorOptions]="{ readOnly: isReadOnly  }"></dxi-item>
 
-    <dxi-item dataField="referenceDate" editorType="dxDateBox" [editorOptions]="{ type: 'date', readOnly: isReadOnly }" [label]="{ text: 'Reference Date' }"></dxi-item>
+    <dxi-item dataField="referenceDate" editorType="dxDateBox" [editorOptions]="{ type: 'date', displayFormat: 'dd-MM-yyyy', readOnly: isReadOnly }" [label]="{ text: 'Reference Date' }"></dxi-item>
 
     <dxi-item dataField="customerId" editorType="dxSelectBox"
       [editorOptions]="{
@@ -72,28 +81,11 @@
       [label]="{ text: 'Branch' }"
       >
     </dxi-item> 
+    <dxi-item></dxi-item>
 
-  </dx-form>
+    <dxi-item>
+    <div style="display:flex; justify-content:flex-end; align-items:flex-end; height:100%; width:100%;margin-top:10px;" *ngIf="!isReadOnly">
 
-  <!-- 🔹 DETAIL GRID -->
-  <dx-data-grid
-    #itemsGridRef
-    [dataSource]="invoiceDetails"
-    [showBorders]="true"
-    [editing]="{ mode: 'cell', allowAdding: true, allowUpdating: true, allowDeleting: true }"
-    [columnAutoWidth]="true"
-    [height]="'60vh'"
-    (onEditorPreparing)="onEditorPreparing($event)"
-    (onRowUpdated)="updateCalculation($event)"
-    [hoverStateEnabled]="true"
-    [rowAlternationEnabled]="true"
-  >
-
-    <dxo-editing mode="cell" [allowAdding]="!isReadOnly" [allowUpdating]="!isReadOnly" [allowDeleting]="!isReadOnly"></dxo-editing>
-
-    <dxo-toolbar>
-
-    <dxi-item location="after" *ngIf="!isReadOnly">
       <dx-button
         type="default"
         stylingMode="contained"
@@ -111,7 +103,51 @@
           <span class="add-text">Add Row</span>
         </div>
       </dx-button>
-    </dxi-item>
+
+    </div>
+  </dxi-item>
+
+  </dx-form>
+
+  <!-- 🔹 DETAIL GRID -->
+  <dx-data-grid
+    #itemsGridRef
+    [dataSource]="invoiceDetails"
+    [showBorders]="true"
+    [editing]="{ mode: 'cell', allowAdding: true, allowUpdating: true, allowDeleting: true }"
+    [columnAutoWidth]="true"
+    [height]="'60vh'"
+    (onEditorPreparing)="onEditorPreparing($event)"
+    (onRowUpdated)="updateCalculation($event)"
+    (onCellValueChanged)="onCellValueChanged($event)"
+    [hoverStateEnabled]="true"
+    [rowAlternationEnabled]="true"
+  >
+
+    <dxo-editing mode="cell" [allowAdding]="false" [allowUpdating]="!isReadOnly" [allowDeleting]="!isReadOnly"></dxo-editing>
+
+    <dxo-toolbar>
+
+    <!-- <dxi-item location="after" *ngIf="!isReadOnly">
+      <dx-button
+        style="margin: top -5px;"
+        type="default"
+        stylingMode="contained"
+        hint="Add Row"
+        (onClick)="addNewManualRow()"
+      >
+        <div *dxTemplate="let data of 'content'" class="add-btn-content">
+          <span
+            class="iconify"
+            data-icon="formkit:add"
+            data-width="20"
+            data-height="20"
+          ></span>
+
+          <span class="add-text">Add Row</span>
+        </div>
+      </dx-button>
+    </dxi-item> -->
 
   </dxo-toolbar>
 
@@ -153,17 +189,17 @@
 
     </dxi-column>
 
-    <dxi-column dataField="quantity" caption="qty" dataType="number"></dxi-column>
+    <dxi-column dataField="quantity" caption="Qty" dataType="number"></dxi-column>
     <dxi-column dataField="duration" dataType="number"></dxi-column>
 
     <dxi-column dataField="grossAmount" caption="Gross Amt" dataType="number" format="#,##0.00"></dxi-column>
     <dxi-column dataField="patientShare"  dataType="number" format="#,##0.00"></dxi-column>
 
-    <dxi-column dataField="vatCode"></dxi-column>
-    <dxi-column dataField="vatPercent" caption="Vat Perc" dataType="number"></dxi-column>
-    <dxi-column dataField="vatAmount" caption="Vat Amt" dataType="number" format="#,##0.00"></dxi-column>
+    <dxi-column dataField="vatCode" [allowEditing]="false"></dxi-column>
+    <dxi-column dataField="vatPercent" caption="Vat %" dataType="number" [allowEditing]="false"></dxi-column>
+    <dxi-column dataField="vatAmount" caption="Vat Amt" dataType="number" format="#,##0.00" [allowEditing]="false"  [calculateCellValue]="calculateVatAmount"></dxi-column>
 
-    <dxi-column dataField="netAmount" caption="Net Amt" dataType="number" format="#,##0.00" [allowEditing]="false"></dxi-column>
+    <dxi-column dataField="netAmount" caption="Net Amt" dataType="number" format="#,##0.00" [allowEditing]="false"  [calculateCellValue]="calculateNetAmount"></dxi-column>
 
 
     <dxo-summary>
