@@ -105,6 +105,7 @@ export class DeliveryTermsListComponent {
       .postDeliveryTermsData(CODE, DESCRIPTION)
       .subscribe((response) => {
         if (response) {
+          this.isAddDeliveryTermsPopupOpened = false;
           this.showDeliveryTerms();
         }
       });
