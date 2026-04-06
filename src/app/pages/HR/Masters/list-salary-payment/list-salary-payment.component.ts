@@ -150,9 +150,9 @@ export class ListSalaryPaymentComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
-    this.getSalaryPaymentList();
     this.sessionData_tax();
+    this.selectedDateRange = 'today';
+    this.getSalaryPaymentList();
   }
 
   sessionData_tax() {

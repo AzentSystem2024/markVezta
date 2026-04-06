@@ -374,7 +374,6 @@ export class CustomerFinEditFormComponent {
       (c: any) => c.ID === this.selecte_countyId,
     );
 
-  
     if (!selectedCountry) {
       this.countryCode = '';
       return;
@@ -537,7 +536,7 @@ export class CustomerFinEditFormComponent {
 
   countryDisplay(item: any) {
     if (!item) return '';
-    return `${item.CODE}${item.COUNTRY_NAME}`;
+    return `${item.CODE}`;
   }
 
   onCountrycodeChangeDeliveryAddressmobile(e: any) {

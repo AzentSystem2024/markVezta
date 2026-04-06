@@ -238,6 +238,7 @@
 
               <div style="display: flex; gap: 10px">
                 <dx-button
+                  *ngIf="!isReadOnlyMode"
                   icon="search"
                   stylingMode="outlined"
                   type="default"
@@ -312,7 +313,6 @@
                 [width]="'100%'"
                 [disabled]="!(receiptMode === 'PDC')"
                 [readOnly]="isReadOnlyMode"
-                [inputAttr]="{ style: 'text-align: right' }"
                 [format]="{
                   type: 'fixedPoint',
                   precision: 2,
@@ -349,16 +349,17 @@
   "
 >
   <!-- Checkbox right above buttons -->
+
   <dx-check-box
-    *ngIf="!isReadOnlyMode"
-    [(value)]="isApproved"
-    text="Approve"
-    [width]="120"
+    *ngIf="isReadOnlyMode"
+    [(value)]="isApprovedForView"
+    text="Approved"
+    [readOnly]="true"
   ></dx-check-box>
 
   <!-- Buttons row -->
   <div style="display: flex; gap: 10px">
-    <dx-button
+    <!-- <dx-button
       *ngIf="isReadOnlyMode"
       icon="fas fa-file-pdf"
       text="PDF"
@@ -368,7 +369,13 @@
       (onClick)="viewPdf()"
       hint="View PDF"
     >
-    </dx-button>
+    </dx-button> -->
+
+    <dx-check-box
+      *ngIf="!isReadOnlyMode"
+      [(value)]="isApproved"
+      text="Approve"
+    ></dx-check-box>
 
     <dx-button
       text="Cancel"

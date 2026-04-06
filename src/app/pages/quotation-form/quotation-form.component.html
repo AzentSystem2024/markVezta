@@ -285,6 +285,7 @@
                     <dxi-total-item
                       column="TAX_AMOUNT"
                       summaryType="sum"
+                      displayFormat="{0}"
                       [valueFormat]="'#.00'"
                       [valueFormat]="'#.00'"
                     ></dxi-total-item>
@@ -353,13 +354,14 @@
                         (onValueChanged)="onRoundOffChange($event)"
                         [readOnly]="isReadOnlyMode"
                       ></dx-check-box>
-                      <dx-text-box
+                      <dx-number-box
                         [(value)]="quotationFormData.NET_AMOUNT"
                         label="Net Amount"
                         labelMode="floating"
                         [readOnly]="true"
                         [width]="290"
-                      ></dx-text-box>
+                        [format]="'#,##0.00'"
+                      ></dx-number-box>
                     </div>
                     <div class="net-amount-wrapper">
                       <dx-text-box
@@ -403,9 +405,9 @@
             >
               <dxo-editing
                 mode="cell"
-                [allowUpdating]="true"
-                [allowAdding]="true"
-                [allowDeleting]="true"
+                [allowUpdating]="!isReadOnlyMode"
+                [allowAdding]="!isReadOnlyMode"
+                [allowDeleting]="!isReadOnlyMode"
               ></dxo-editing>
 
               <dxo-paging [pageSize]="10"></dxo-paging>
@@ -536,7 +538,12 @@
       <dxo-scrolling mode="virtual"></dxo-scrolling>
       <dxi-column caption="Sl No" cellTemplate="slNoTpl"></dxi-column>
 
+      <div *dxTemplate="let data of 'slNoTpl'">
+        {{ data.rowIndex + 1 }}
+      </div>
+
       <dxi-column dataField="QTN_NO" caption="Quotation No"></dxi-column>
+
       <dxi-column
         dataField="QTN_DATE"
         caption="Date"

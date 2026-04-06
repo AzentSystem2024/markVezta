@@ -549,7 +549,7 @@ export class MiscSalesInvoiceListComponent {
 
   onEditInvoice(event: any) {
     event.cancel = true; // Prevent default popup editing
-    const invoiceId = event.data.ID;
+    const invoiceId = event.data.TRANS_ID;
     const transStatus = event.data.TRANS_STATUS;
 
     this.dataService.getMiscSalesInvoiceByID(invoiceId).subscribe((response: any) => {
