@@ -29,11 +29,6 @@
               type="required"
               message="This field is required"
             ></dxi-validation-rule>
-            <dxi-validation-rule
-              type="range"
-              [min]="1"
-              message="Basic Salary must be greater than 0"
-            ></dxi-validation-rule>
           </dx-validator>
         </dx-number-box>
       </div>
@@ -46,15 +41,7 @@
           [labelMode]="'floating'"
           displayFormat="MMMM yyyy"
         >
-        <dx-validator #effectFromValidator>
-        <dxi-validation-rule
-          type="custom"
-          [validationCallback]="validateEffectFrom"
-          message="Effect From must be after Previous Revision"
-        ></dxi-validation-rule>
-      </dx-validator>
         </dx-date-box>
-
       </div>
     </div>
 

@@ -8,23 +8,23 @@
       ></dxo-col-count-by-screen>
       <dxi-item>
         <div *dxTemplate>
-          <form-textbox
+          <dx-text-box
             label="Code"
             [(value)]="newPaymentTerms.CODE"
-            [isEditing]="true"
+            labelMode="floating"
           >
-          </form-textbox>
+          </dx-text-box>
         </div>
       </dxi-item>
   
       <dxi-item>
         <div *dxTemplate>
-          <form-textbox
+          <dx-text-box
             label="Description"
             [(value)]="newPaymentTerms.DESCRIPTION"
-            [isEditing]="true"
+            labelMode="floating"
           >
-          </form-textbox>
+          </dx-text-box>
         </div>
       </dxi-item>
 

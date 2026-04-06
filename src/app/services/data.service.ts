@@ -1899,21 +1899,21 @@ export class DataService {
     };
     return this.http.post(`${this.apiUrl}dropdown`, reqBody);
   }
+  
   public postPaymentTermsData(CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { CODE, DESCRIPTION };
+    return this.http.post(`${this.apiUrl}paymentterm/save`, data);
+  }
 
-    return this.http.post(`${this.apiUrl}/paymentterm/save`, data);
+  selectPaymentTerms(id:number): Observable<any>{
+    return this.http.post(`${this.apiUrl}paymentterm/select/${id}`, {});
   }
-  removePaymentTerms(id: any, code: string, description: string) {
-    const requestBody = {
-      CODE: code,
-      DESCRIPTION: description,
-    };
-    return this.http.post<any>(
-      `${this.apiUrl}/paymentterm/delete/` + id,
-      requestBody,
-    );
+
+  
+  removePaymentTerms(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}paymentterm/delete/${id}`, {});
   }
+
   updatePaymentTerms(ID: any, CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { ID, CODE, DESCRIPTION };
 
