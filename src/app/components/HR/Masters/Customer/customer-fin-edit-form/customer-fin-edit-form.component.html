@@ -437,18 +437,18 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Current Credit *"
+                label="Current Credit"
                 [(value)]="formCustomerData.CURRENT_CREDIT"
                 labelMode="floating"
                 [readOnly]="true"
               >
-                <dx-validator>
+                <!-- <dx-validator>
                   <dxi-validation-rule
                     type="required"
                     message="Current credit is required"
                   >
                   </dxi-validation-rule>
-                </dx-validator>
+                </dx-validator> -->
               </dx-text-box>
             </div>
           </dxi-item>
@@ -531,7 +531,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                [label]="' VAT Registration Number *'"
+                [label]="'  VAT Registration Number *'"
                 [(value)]="formCustomerData.VAT_REGNO"
                 labelMode="floating"
               >

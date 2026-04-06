@@ -7,73 +7,101 @@
     (onRowRemoving)="onRowRemoving($event)"
     (onRowUpdating)="onRowUpdating($event)"
     [showBorders]="true"
-    [allowColumnReordering]="true"
-    [allowColumnResizing]="true"
-    (onExporting)="onExporting($event)"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      (onExporting)="onExporting($event)"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      [height]="'82vh'"
   >
-    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
-    <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
+     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
 
-    <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
 
-    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
-    <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
-      <dxo-popup
-        title="Edit Delivery Terms"
-        [showTitle]="true"
-        [width]="450"
-        [height]="300"
-      >
-      </dxo-popup>
-      <dxo-form [colCount]="1"> </dxo-form>
-    </dxo-editing>
-    <dxo-search-panel
+<dxo-export
+      [enabled]="true"
+      [formats]="['xlsx', 'pdf']"
+    >
+    </dxo-export>
+    
+     <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
       [visible]="true"
-      placeholder="Data Search"
-    ></dxo-search-panel>
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+  
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="true"
+      [allowDeleting]="true"
+      [allowAdding]="true"
+    >
+      <dxo-popup
+        title="Update delivery Terms"
+        [showTitle]="true"
+        [width]="600"
+        [height]="300"
+      ></dxo-popup>
+    </dxo-editing>
+
     <dxo-toolbar>
-      <dxi-item location="before">
-        <div class="grid-header">Delivery Terms</div>
-      </dxi-item>
-
-      <dxi-item
-        location="after"
-        locateInMenu="auto"
-        [template]="'addButtonTemplate'"
-      >
-      </dxi-item>
-
-      <ng-template #addButtonTemplate>
-        <div class="add-btn-content" (click)="addDeliveryTerms()">
-          <span
-            class="iconify"
-            data-icon="formkit:add"
-            data-width="20"
-            data-height="20"
-          ></span>
-          <span class="add-text">New</span>
+       <dxi-item location="before" locateInMenu="never">
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Delivery Terms
         </div>
-      </ng-template>
+      </dxi-item>
+
       <dxi-item
         location="after"
-        locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          text: 'Refresh',
-          icon: 'refresh',
-          stylingMode: 'text',
-        }"
+        [options]="searchButtonOptions"
       ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
+
+       <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
       </dxi-item>
-      <dxi-item name="exportButton"></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
-      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+   
+         <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
+     
     </dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code">
       <dxi-validation-rule type="required" message="Code is required">
@@ -92,6 +120,7 @@
     [(visible)]="isAddDeliveryTermsPopupOpened"
     (save)="onClickSaveDeliveryTerms()"
     titleText="New Delivery Terms"
+    [showApprove]="false"
   >
     <app-delivery-terms-form></app-delivery-terms-form>
   </form-popup>

@@ -456,10 +456,12 @@ export class AddSalaryPaymentComponent {
     // this.salaryPaymentData.SALARY_PAY_DETAIL = this.selectedIds.map((id) => ({
     //   PAYDETAIL_ID: id,
     // }));
-    this.salaryPaymentData.SALARY_PAY_DETAIL = this.selectedRows.map((row) => ({
-      PAYDETAIL_ID: row.ID,
-      NET_AMOUNT: row.NET_AMOUNT,
-    }));
+    this.salaryPaymentData.SALARY_PAY_DETAIL = this.selectedRows.map(
+      (row: any) => ({
+        PAYDETAIL_ID: row.ID,
+        NET_AMOUNT: row.NET_AMOUNT,
+      }),
+    );
 
     // Call API
     this.dataService

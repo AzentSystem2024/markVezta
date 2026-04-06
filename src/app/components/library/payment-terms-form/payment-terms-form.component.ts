@@ -1,4 +1,4 @@
-import { Component,NgModule } from '@angular/core';
+import { Component,Input,NgModule, SimpleChanges } from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
@@ -14,6 +14,10 @@ import { DxSelectBoxModule } from 'devextreme-angular';
   styleUrls: ['./payment-terms-form.component.scss']
 })
 export class PaymentTermsFormComponent {
+
+   @Input() EditingResponseData: any;
+  @Input() selectedpaymenttermId: any;
+  
   formPaymentTermsData = {
     CODE: '',
     DESCRIPTION: ''
@@ -21,6 +25,17 @@ export class PaymentTermsFormComponent {
   newPaymentTerms=this.formPaymentTermsData;
 
   getNewPaymentTerms = () => ({ ...this.newPaymentTerms });
+
+ngOnChanges(changes: SimpleChanges) {
+  if (changes['EditingResponseData'] && this.EditingResponseData) {
+    console.log('Received in child:', this.EditingResponseData);
+
+    this.newPaymentTerms = {
+      CODE: this.EditingResponseData.CODE,
+      DESCRIPTION: this.EditingResponseData.DESCRIPTION
+    };
+  }
+}
 }
 @NgModule({
   imports: [
