@@ -158,6 +158,7 @@ import { DepartmentMeComponent } from './pages/MASTER/department-me/department-m
 import { ProfitAndLossBranchComponent } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 import { CustomerFinListComponent } from './pages/MASTER/customer-fin-list/customer-fin-list.component';
 import { MiscSalesInvoiceListComponent } from './pages/OPERATIONS/misc-sales-invoice-list/misc-sales-invoice-list.component';
+import { ImportItemsTemplateComponent, ImportItemsTemplateModule } from './pages/MASTER/import-items-template/import-items-template.component';
 
 const routes: Routes = [
   {
@@ -920,6 +921,11 @@ const routes: Routes = [
       {
         path: 'import-items',
         component: ImportItemsComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'import-template',
+        component: ImportItemsTemplateComponent,
         canActivate: [AuthGuardService],
       },
       {
