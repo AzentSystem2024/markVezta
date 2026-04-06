@@ -1922,12 +1922,12 @@ export class DataService {
 
   //deliveryterms
   public getDeliveryTermsData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/deliveryterm/list`, {});
+    return this.http.post(`${this.apiUrl}deliveryterms/list`, {});
   }
   public postDeliveryTermsData(CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { CODE, DESCRIPTION };
 
-    return this.http.post(`${this.apiUrl}/deliveryterm/save`, data);
+    return this.http.post(`${this.apiUrl}deliveryterms/save`, data);
   }
   removeDeliveryTerms(id: any, code: string, description: string) {
     const requestBody = {
@@ -1935,14 +1935,14 @@ export class DataService {
       DESCRIPTION: description,
     };
     return this.http.post<any>(
-      `${this.apiUrl}/deliveryterm/delete/` + id,
+      `${this.apiUrl}deliveryterms/delete/` + id,
       requestBody,
     );
   }
   updateDeliveryTerms(ID: any, CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { ID, CODE, DESCRIPTION };
 
-    return this.http.post(`${this.apiUrl}/deliveryterm/save`, data);
+    return this.http.post(`${this.apiUrl}deliveryterms/save`, data);
   }
 
   //stores
