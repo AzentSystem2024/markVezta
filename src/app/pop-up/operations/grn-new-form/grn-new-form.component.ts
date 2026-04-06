@@ -608,7 +608,7 @@ export class GrnNewFormComponent implements OnInit {
         );
 
         // Optionally reset the RECEIVED_QTY field or prevent further processing
-        updatedRow.RECEIVED_QTY = ''; // Reset to QTY_TO_RECEIVE value
+        updatedData.RECEIVED_QTY = 0; // Reset to QTY_TO_RECEIVE value
 
         return; // Exit the function to prevent further processing
       }
@@ -1268,6 +1268,8 @@ export class GrnNewFormComponent implements OnInit {
 
     // Clear selected PO number
     this.selectedPONo = '';
+
+    this.newGrnData.IS_APPROVED = false;
 
     // Trigger change detection to update the UI
     this.ref.detectChanges();

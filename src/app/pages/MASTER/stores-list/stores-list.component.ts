@@ -21,13 +21,15 @@ import DataSource from 'devextreme/data/data_source';
   styleUrls: ['./stores-list.component.scss'],
 })
 export class StoresListComponent implements OnInit {
-  @ViewChild(StoresFormComponent) storesComponent: StoresFormComponent;
+  @ViewChild(StoresFormComponent) storesComponent:
+    | StoresFormComponent
+    | undefined;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -263,7 +265,7 @@ export class StoresListComponent implements OnInit {
       this.country = data;
     });
   }
-  
+
   getGroupDropDown() {
     const dropdowngroup = 'STOREGROUP';
     this.dataservice.getDropdownData(dropdowngroup).subscribe((data: any) => {
@@ -358,68 +360,55 @@ export class StoresListComponent implements OnInit {
 
   onRowRemoving(event) {
     const selectedRow = event.data;
-    const {
-      ID,
-      COMPANY_ID,
-      CODE,
-      STORE_NAME,
-      IS_PRODUCTION,
-      ADDRESS1,
-      ADDRESS2,
-      ADDRESS3,
-      ZIP_CODE,
-      STATE_ID,
-      CITY,
-      COUNTRY_ID,
-      IS_DEFAULT_STORE,
-      PHONE,
-      EMAIL,
-      VAT_REGNO,
-      GROUP_ID,
-    } = selectedRow;
 
-    this.dataservice
-      .removeStores(
-        ID,
-        COMPANY_ID,
-        CODE,
-        STORE_NAME,
-        IS_PRODUCTION,
-        ADDRESS1,
-        ADDRESS2,
-        ADDRESS3,
-        ZIP_CODE,
-        STATE_ID,
-        CITY,
-        COUNTRY_ID,
-        IS_DEFAULT_STORE,
-        PHONE,
-        EMAIL,
-        VAT_REGNO,
-        GROUP_ID,
-      )
-      .subscribe(() => {
-        try {
-          // Your delete logic here
-          notify(
-            {
-              message: 'Delete operation successful',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.dataGrid.instance.refresh();
-          this.showStores();
-        } catch (error) {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice
+        .removeStores(
+          selectedRow.ID,
+          selectedRow.COMPANY_ID,
+          selectedRow.CODE,
+          selectedRow.STORE_NAME,
+          selectedRow.IS_PRODUCTION,
+          selectedRow.ADDRESS1,
+          selectedRow.ADDRESS2,
+          selectedRow.ADDRESS3,
+          selectedRow.ZIP_CODE,
+          selectedRow.STATE_ID,
+          selectedRow.CITY,
+          selectedRow.COUNTRY_ID,
+          selectedRow.IS_DEFAULT_STORE,
+          selectedRow.PHONE,
+          selectedRow.EMAIL,
+          selectedRow.VAT_REGNO,
+          selectedRow.GROUP_ID,
+        )
+        .subscribe({
+          next: () => {
+            notify(
+              {
+                message: 'Delete operation successful',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+            );
+
+            this.showStores(); // reload data
+
+            resolve(true); // ✅ CLOSE popup
+          },
+          error: () => {
+            notify(
+              {
+                message: 'Delete operation failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+
+            reject(); // ❌ keep popup / cancel delete
+          },
+        });
+    });
   }
 
   onEditStore(event: any) {

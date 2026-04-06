@@ -161,6 +161,7 @@ import { MiscSalesInvoiceListComponent } from './pages/OPERATIONS/misc-sales-inv
 import { PaymentTermsListComponent } from './pages/payment-terms-list/payment-terms-list.component';
 import { DeliveryTermsListComponent } from './pages/delivery-terms-list/delivery-terms-list.component';
 import { SupplierFinListComponent } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
+import { ImportItemsTemplateComponent } from './pages/MASTER/import-items-template/import-items-template.component';
 
 const routes: Routes = [
   {
@@ -923,6 +924,11 @@ const routes: Routes = [
       {
         path: 'import-items',
         component: ImportItemsComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'import-template',
+        component: ImportItemsTemplateComponent,
         canActivate: [AuthGuardService],
       },
       {
