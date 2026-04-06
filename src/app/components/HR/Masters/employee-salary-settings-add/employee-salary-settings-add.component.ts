@@ -64,13 +64,12 @@ export class EmployeeSalarySettingsAddComponent {
   employeeFormData: any = {
     EMP_CODE: '',
     FIN_ID: '',
-    BASIC_SALARY: '',
+    BASIC_SALARY: null,
     PREV_REVISION: '',
     EFFECT_FROM: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // always 1st of current month
   };
 
   constructor(private dataservice: DataService) {
-    // this.getEmployeeSalarySettingsList();
     this.EmployeeListDropDown();
     this.get_SalaryHead_List();
   }
@@ -117,13 +116,13 @@ export class EmployeeSalarySettingsAddComponent {
       0, // Also set this to noon
     );
 
-    if (selectedMonthFirstDate < currentMonthFirstDate) {
-      e.component.option('value', currentMonthFirstDate);
-      this.employeeFormData.EFFECT_FROM = currentMonthFirstDate;
-    } else {
-      e.component.option('value', selectedMonthFirstDate);
-      this.employeeFormData.EFFECT_FROM = selectedMonthFirstDate;
-    }
+    // if (selectedMonthFirstDate < currentMonthFirstDate) {
+    //   e.component.option('value', currentMonthFirstDate);
+    //   this.employeeFormData.EFFECT_FROM = currentMonthFirstDate;
+    // } else {
+    //   e.component.option('value', selectedMonthFirstDate);
+    //   this.employeeFormData.EFFECT_FROM = selectedMonthFirstDate;
+    // }
   }
   getLocalDateString(date: Date): string {
     const year = date.getFullYear();
@@ -193,7 +192,10 @@ export class EmployeeSalarySettingsAddComponent {
         .map((item: any) => item.HEAD_ID); // or your row's unique identifier
 
       this.SalaryDetails = this.salaryGridData.Details || [];
-      this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
+      // this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
+      this.PreviousRevision = this.salaryGridData.EFFECT_FROM
+  ? new Date(this.salaryGridData.EFFECT_FROM)
+  : null;
 
       this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY || 0;
       this.effectFromValidator?.instance?.validate(); // force revalidate
