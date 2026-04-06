@@ -110,32 +110,33 @@ export class PaymentTermsListComponent {
       .postPaymentTermsData(CODE, DESCRIPTION)
       .subscribe((response) => {
         if (response) {
+          this.isAddPaymentTermsPopupOpened = false;
           this.showPaymentTerms();
         }
       });
   }
 
-  selectPaymentTerms(e:any){
-    console.log(e,'event  ')
-     e.cancel = true;
-    const paymenttermId = e.data.ID;
-    this.selectedpaymenttermId = e.data.ID;
-    this.selectedId = paymenttermId;
+  // selectPaymentTerms(e:any){
+  //   console.log(e,'event  ')
+  //    e.cancel = true;
+  //   const paymenttermId = e.data.ID;
+  //   this.selectedpaymenttermId = e.data.ID;
+  //   this.selectedId = paymenttermId;
     
-    this.dataservice.selectPaymentTerms(paymenttermId).subscribe({
-      next: (response: any) => {
-        console.log(response)
-        this.selectedPaymentTerms = response;
-        console.log(this.selectedPaymentTerms)
-        this.isEditPaymentTermsPopupOpened = true;
+  //   this.dataservice.selectPaymentTerms(paymenttermId).subscribe({
+  //     next: (response: any) => {
+  //       console.log(response)
+  //       this.selectedPaymentTerms = response;
+  //       console.log(this.selectedPaymentTerms)
+  //       this.isEditPaymentTermsPopupOpened = true;
 
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
-      },
-    });
-  }
+  //       this.cdr.detectChanges();
+  //     },
+  //     error: (err) => {
+  //       console.error('Failed to fetch salary revision:', err);
+  //     },
+  //   });
+  // }
   onRowRemoving(event:any) {
     const id = event.data.ID;
     this.dataservice.removePaymentTerms(id).subscribe(() => {
@@ -161,40 +162,45 @@ export class PaymentTermsListComponent {
       }
     });
   }
-  onRowUpdating(event:any) {
-    const updataDate = event.newData;
-    const oldData = event.oldData;
-    const combinedData = { ...oldData, ...updataDate };
-    let id = combinedData.ID;
-    let code = combinedData.CODE;
-    let description = combinedData.DESCRIPTION;
+  onRowUpdating(event: any) {
 
-    this.dataservice
-      .updatePaymentTerms(id, code, description)
-      .subscribe((data: any) => {
-        if (data) {
-          notify(
-            {
-              message: 'Payments Terms Updated Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.dataGrid.instance.refresh();
-          this.showPaymentTerms();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not Saved',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+  console.log("🔥 UPDATE TRIGGERED");
 
-    event.cancel = true; // Prevent the default update operation
-  }
+  const oldData = event.oldData;
+  const newData = event.newData;
+
+  const combinedData = { ...oldData, ...newData };
+
+  const id = combinedData.ID;
+  const code = combinedData.CODE;
+  const description = combinedData.DESCRIPTION;
+
+  this.dataservice
+    .updatePaymentTerms(id, code, description)
+    .subscribe((data: any) => {
+
+      if (data) {
+        notify(
+          {
+            message: 'Payments Terms Updated Successfully',
+            position: { at: 'top center', my: 'top center' },
+          },
+          'success',
+          2000
+        );
+        this.showPaymentTerms();
+      } else {
+        notify('Your Data Not Saved', 'error', 2000);
+      }
+
+      // 🔥 CRITICAL PART (from your reference)
+      event.component.cancelEditData(); // ✅ CLOSE POPUP
+
+      this.dataGrid.instance.refresh();
+    });
+
+  event.cancel = true; // keep this
+}
   ngOnInit(): void {
     this.showPaymentTerms();
   }
