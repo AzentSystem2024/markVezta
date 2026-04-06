@@ -16,7 +16,10 @@ import { DxPopupModule } from 'devextreme-angular';
 import { CommonModule } from '@angular/common';
 import { ExportService } from 'src/app/services/export.service';
 import { Router } from '@angular/router';
-import { DepartmentMeAddFormModule,DepartmentMeAddFormComponent } from '../POPUP PAGES/department-me-add-form/department-me-add-form.component';
+import {
+  DepartmentMeAddFormModule,
+  DepartmentMeAddFormComponent,
+} from '../POPUP PAGES/department-me-add-form/department-me-add-form.component';
 import { DepartmentMeEditFormModule } from '../POPUP PAGES/department-me-edit-form/department-me-edit-form.component';
 @Component({
   selector: 'app-department-me',
@@ -25,9 +28,9 @@ import { DepartmentMeEditFormModule } from '../POPUP PAGES/department-me-edit-fo
 })
 export class DepartmentMeComponent implements OnInit {
   @ViewChild(DepartmentMeAddFormComponent)
-  departmentComponent: DepartmentMeAddFormComponent;
+  departmentComponent: DepartmentMeAddFormComponent | undefined;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -123,7 +126,7 @@ export class DepartmentMeComponent implements OnInit {
 
   addDepartment() {
     this.isAddDepartmentPopupOpened = true;
-    this.departmentComponent.resetButton();
+    this.departmentComponent?.resetButton();
   }
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Department-list');
@@ -138,8 +141,8 @@ export class DepartmentMeComponent implements OnInit {
   SelectDepartment(event: any) {
     const id = event.data.ID;
 
-    this.dataservice.selectDepartment(id).subscribe((res: any) => {
-      this.selectedDepartment_data = res;
+    this.dataservice.Select_Department_Api(id).subscribe((res: any) => {
+      this.selectedDepartment_data = res.data;
     });
   }
 
@@ -152,20 +155,26 @@ export class DepartmentMeComponent implements OnInit {
     const payload = {
       COMPANY_ID: this.COMPANY_ID,
     };
-    this.dataservice.getDepartmentData(payload).subscribe((response) => {
-      this.department = response;
-      });
+    this.dataservice.get_Department_List(payload).subscribe((response: any) => {
+      this.department = response.datas;
+    });
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
-    }
+  }
 
   onClickSaveDepartment() {
-    const { CODE, DEPT_NAME, COMPANY_NAME, COST_BUCKET_ID } =
-      this.departmentComponent.getNewDepartmentData();
+    const newDeptData = this.departmentComponent?.getNewDepartmentData();
+
+    if (!newDeptData) return;
+
+    const { CODE = '', DEPT_NAME = '', COST_BUCKET_ID } = newDeptData;
+
     const COMPANY_ID = this.COMPANY_ID;
     // Check for duplicates in CategoryList
     const isCodeDuplicate = this.department.some(
@@ -211,18 +220,12 @@ export class DepartmentMeComponent implements OnInit {
     }
 
     this.dataservice
-      .save_ME_Department_Data(
-        CODE,
-        DEPT_NAME,
-        COMPANY_ID,
-        COMPANY_NAME,
-        COST_BUCKET_ID,
-      )
+      .Insert_Department_Me_Api(CODE, DEPT_NAME, COMPANY_ID, COST_BUCKET_ID)
       .subscribe((response) => {
         if (response) {
           this.showDepartment();
           this.isAddDepartmentPopupOpened = false;
-          // this.DepartmentFormComponent.resetButton()
+          this.departmentComponent?.resetButton();
           notify(
             {
               message: 'Department Updated successfully',
@@ -231,36 +234,57 @@ export class DepartmentMeComponent implements OnInit {
             },
             'success',
           );
-          this.departmentComponent.resetButton();
+          this.departmentComponent?.resetButton();
         }
       });
   }
 
   onRowRemoving(event: any) {
-    var SelectedRow = event.key;
+    const SelectedRow = event.key;
     const id = SelectedRow.ID;
-    this.dataservice.removeDepartment(id).subscribe(() => {
-      try {
-        // Your delete logic here
+
+    this.dataservice.Delete_Department_Api(id).subscribe(
+      (res: any) => {
+        if (res?.flag === '1') {
+          // Success
+          notify(
+            {
+              message: 'Deleted operation successful',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+
+          this.dataGrid?.instance.refresh();
+          this.showDepartment();
+        } else {
+          // API responded but failed
+          notify(
+            {
+              message: res?.message || 'Delete operation failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+
+          // Prevent row removal in UI
+          event.cancel = true;
+        }
+      },
+      (error) => {
+        // API error (network/server)
         notify(
           {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.dataGrid.instance.refresh();
-        this.showDepartment();
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operation failed',
+            message: 'Something went wrong while deleting',
             position: { at: 'top right', my: 'top right' },
           },
           'error',
         );
-      }
-    });
+
+        // Prevent row removal in UI
+        event.cancel = true;
+      },
+    );
   }
 
   handleClose() {
@@ -280,8 +304,8 @@ export class DepartmentMeComponent implements OnInit {
     );
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/user');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -296,7 +320,7 @@ export class DepartmentMeComponent implements OnInit {
   }
 
   refresh = () => {
-    this.dataGrid.instance.refresh();
+    this.dataGrid?.instance.refresh();
     this.showDepartment();
   };
 }

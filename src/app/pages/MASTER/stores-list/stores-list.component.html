@@ -54,8 +54,9 @@
 
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Branch/Store</div>
+          <div class="grid-header">Store/Branch</div>
         </dxi-item>
+        <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <dxi-item
           location="after"
           widget="dxButton"
@@ -85,7 +86,7 @@
           [visible]="canAdd"
         ></dxi-item>
       </dxo-toolbar>
-
+      
       <dxi-column dataField="CODE" caption="Code"></dxi-column>
       <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column dataField="CITY" caption="City"></dxi-column>
@@ -99,7 +100,7 @@
   [(visible)]="isAddStoresPopupOpened"
   [width]="700"
   [height]="'75vh'"
-  [titleText]="selectedStore ? 'Edit Branch/Store' : 'New Branch/Store'"
+  [titleText]="selectedStore ? 'Edit Store/Branch' : 'New Store/Branch'"
   (save)="storesComponent.submitForm()"
   [showApprove]="false"
 >

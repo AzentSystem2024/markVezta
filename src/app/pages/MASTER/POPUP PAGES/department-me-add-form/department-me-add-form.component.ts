@@ -19,11 +19,8 @@ export class DepartmentMeAddFormComponent {
   Cost_Bucket_DropDownData: any;
 
   formDepartmentData = {
-    ID: '',
     CODE: '',
     DEPT_NAME: '',
-    COMPANY_ID: '',
-    COMPANY_NAME: '',
     COST_BUCKET_ID: '',
   };
 
@@ -37,7 +34,9 @@ export class DepartmentMeAddFormComponent {
   getNewDepartmentData = () => ({ ...this.newDepartment });
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.COMPANY_ID = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
   }
@@ -92,11 +91,8 @@ export class DepartmentMeAddFormComponent {
 
   resetButton() {
     this.formDepartmentData = {
-      ID: '',
       CODE: '',
       DEPT_NAME: '',
-      COMPANY_ID: '',
-      COMPANY_NAME: '',
       COST_BUCKET_ID: '',
     };
     this.newDepartment = this.formDepartmentData;
