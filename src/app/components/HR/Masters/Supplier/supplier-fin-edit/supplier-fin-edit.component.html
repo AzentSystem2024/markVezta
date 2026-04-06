@@ -8,6 +8,7 @@
               label="Code *"
               [(value)]="supplierData.SUPP_CODE"
               labelMode="floating"
+              width="150px"
             >
               <dx-validator>
                 <dxi-validation-rule type="required" message="Code is required">
@@ -274,7 +275,7 @@
   </dxi-item>
 
   <dxi-item itemType="group">
-    <dxi-item itemType="group" [colCount]="2">
+    <dxi-item itemType="group" [colCount]="1">
       <dxi-item>
         <div *ngIf="supplierData">
           <div *dxTemplate>
