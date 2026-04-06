@@ -64,47 +64,7 @@
             </div>
           </dxi-item>
         </dxi-item>
-        <!-- <dxi-item itemType="group" [colCount]="1">
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-date-box
-            type="date"
-            [(value)]="formCustomerData.DOB"
-            label="Date of birth"
-            [inputAttr]="{ 'aria-label': 'Date' }"
-            labelMode="floating"
-            displayFormat="dd-MM-yyyy"
-          >
-            <dx-validator>
-              <dxi-validation-rule type="required" message="DOB is required">
-              </dxi-validation-rule>
-            </dx-validator>
-          </dx-date-box>
-        </div>
-      </dxi-item>
-    </dxi-item> -->
-        <!-- <dxi-item itemType="group" [colCount]="1">
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-select-box
-            label="Nationality"
-            [items]="CountryDropdownData"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="formCustomerData.NATIONALITY"
-            placeholder="Select Country"
-            (onValueChanged)="onCountrySelectionChanged($event)"
-            [searchEnabled]="true"
-            labelMode="floating"
-          >
-            <dx-validator>
-              <dxi-validation-rule type="required" message="Select country">
-              </dxi-validation-rule>
-            </dx-validator>
-          </dx-select-box>
-        </div>
-      </dxi-item>
-    </dxi-item> -->
+
         <dxi-item itemType="group" [colCount]="1">
           <dxi-item>
             <div *dxTemplate>
@@ -168,7 +128,7 @@
           </dxi-item>
         </dxi-item>
 
-         <dxi-item itemType="group" [colCount]="2">
+        <dxi-item itemType="group" [colCount]="2">
           <dxi-item>
             <div *dxTemplate>
               <dx-select-box
@@ -213,6 +173,7 @@
             </div>
           </dxi-item>
         </dxi-item>
+
         <dxi-item itemType="group" [colCount]="2">
           <dxi-item>
             <div *dxTemplate>
@@ -265,9 +226,6 @@
                 placeholder="+1"
                 [dropDownOptions]="{ width: '370px' }"
                 hint="Country Code"
-                (valueChange)="updateMobileNumber()"
-                (onOpened)="onDropdownOpened()"
-                (onClosed)="onDropdownClosed()"
                 (onValueChanged)="onCountrycodeChange($event)"
               >
                 <div *dxTemplate="let data of 'item'">
@@ -323,9 +281,6 @@
                 placeholder="+1"
                 [dropDownOptions]="{ width: '370px' }"
                 hint="Country Code"
-                (valueChange)="updateMobileNumber()"
-                (onOpened)="onDropdownOpened()"
-                (onClosed)="onDropdownClosed()"
                 (onValueChanged)="onCountrycodeChangePhoneNocode($event)"
               >
                 <div *dxTemplate="let data of 'item'">
@@ -394,19 +349,10 @@
                 [(value)]="formCustomerData.EMAIL"
                 labelMode="floating"
               >
-                <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Email is required"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator> -->
               </dx-text-box>
             </div>
           </dxi-item>
         </dxi-item>
-
-       
       </dxi-item>
 
       <dxi-item itemType="group">
@@ -655,9 +601,6 @@
               labelMode="floating"
               [dropDownOptions]="{ width: '370px' }"
               hint="Country Code"
-              (onValueChanged)="updateMobileNumber()"
-              (onOpened)="onDropdownOpened()"
-              (onClosed)="onDropdownClosed()"
               (onValueChanged)="onCountrycodeChangeDeliveryAddress($event)"
             >
               <div *dxTemplate="let data of 'item'">

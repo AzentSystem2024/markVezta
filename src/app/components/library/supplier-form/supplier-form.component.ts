@@ -35,7 +35,7 @@ import { AuthService, DataService } from 'src/app/services';
 })
 export class SupplierFormComponent implements OnInit {
   @ViewChild(DxValidationGroupComponent)
-  validationGroup: DxValidationGroupComponent;
+  validationGroup: DxValidationGroupComponent | undefined;
 
   @ViewChild('landedCostGrid', { static: false })
   landedCostGrid!: DxDataGridComponent; // reference to dx-data-grid
@@ -245,11 +245,7 @@ export class SupplierFormComponent implements OnInit {
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.CountryId = event.value;
-    // const selectedCountry = this.CountryDropdownData.find(country => country.ID === event.value);
-    // if (selectedCountry) {
-    //   this.countryCode = selectedCountry.CODE;
-    // }
-    // this.get_Country_Dropdown_List();
+   
     this.get_State_Dropdown_List();
 
     const selectedCountry = this.CountryDropdownData.find(
