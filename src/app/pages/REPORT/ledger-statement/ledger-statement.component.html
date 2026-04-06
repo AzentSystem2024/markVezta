@@ -563,3 +563,21 @@
     ></app-sale-return-form>
   </ng-container>
 </dx-popup>
+
+
+
+<dx-popup
+  *ngIf="isMiscViewInvoice"
+  [(visible)]="isMiscViewInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="View Misc Sales Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isMiscViewInvoice">
+    <app-misc-sales-invoice-form
+      [invoiceFormData]="selectedInvoice"
+      (popupClosed)="handleClose()"
+    ></app-misc-sales-invoice-form>
+  </ng-container>
+</dx-popup>

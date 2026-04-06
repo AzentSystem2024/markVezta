@@ -65,6 +65,7 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
+import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 
 // import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 // import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
@@ -142,6 +143,8 @@ export class LedgerStatementComponent {
   isViewBoxProduction: boolean;
   selectedProduction: any;
   isViewProduction: boolean;
+  isMiscViewInvoice : boolean = false;
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -670,6 +673,14 @@ export class LedgerStatementComponent {
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
+    } 
+    else if (TRANS_TYPE_ID === 105) {
+      this.dataService.getMiscSalesInvoiceByID(trans_id).subscribe((response: any) => {
+      this.selectedInvoice = response;
+        this.isMiscViewInvoice = true;
+        this.cdr.detectChanges();
+        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+      });
     } else {
     }
   }
@@ -874,6 +885,7 @@ export class LedgerStatementComponent {
     TransferInInventoryFormModule,
     SaleReturnFormModule,
     ProductionJvViewModule,
+    MiscSalesInvoiceFormModule,
   ],
   providers: [],
   declarations: [LedgerStatementComponent],
