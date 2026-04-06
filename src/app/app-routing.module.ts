@@ -158,6 +158,9 @@ import { DepartmentMeComponent } from './pages/MASTER/department-me/department-m
 import { ProfitAndLossBranchComponent } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 import { CustomerFinListComponent } from './pages/MASTER/customer-fin-list/customer-fin-list.component';
 import { MiscSalesInvoiceListComponent } from './pages/OPERATIONS/misc-sales-invoice-list/misc-sales-invoice-list.component';
+import { PaymentTermsListComponent } from './pages/payment-terms-list/payment-terms-list.component';
+import { DeliveryTermsListComponent } from './pages/delivery-terms-list/delivery-terms-list.component';
+import { SupplierFinListComponent } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
 
 const routes: Routes = [
   {
@@ -997,6 +1000,21 @@ const routes: Routes = [
       {
         path: 'misc-sales-invoice',
         component: MiscSalesInvoiceListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'payment-terms',
+        component:PaymentTermsListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'delivery-terms',
+        component:DeliveryTermsListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'supplier-me',
+        component:SupplierFinListComponent,
         canActivate: [AuthGuardService],
       },
       

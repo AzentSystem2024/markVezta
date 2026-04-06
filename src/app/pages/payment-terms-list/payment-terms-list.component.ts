@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import {
   DxDataGridComponent,
@@ -23,11 +23,22 @@ export class PaymentTermsListComponent {
   dataGrid: DxDataGridComponent;
   payment_terms: any;
   isAddPaymentTermsPopupOpened = false;
+  isEditPaymentTermsPopupOpened = false;
   showFilterRow = true;
   showHeaderFilter = true;
+  isFilterRowVisible: boolean = false;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  selectedPaymentTerms: any;
+  selectedId: any;
+  selectedpaymenttermId: any;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    
   ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Payment_terms-list');
@@ -35,6 +46,56 @@ export class PaymentTermsListComponent {
   addPaymentTerms() {
     this.isAddPaymentTermsPopupOpened = true;
   }
+
+   addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.addPaymentTerms());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+
+    searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+    //=================================refresh=============================
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+   refreshGrid() {
+    this.showPaymentTerms();
+  }
+
+    toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
+
+  
 
   showPaymentTerms() {
     this.dataservice.getPaymentTermsData().subscribe((response) => {
@@ -53,11 +114,31 @@ export class PaymentTermsListComponent {
         }
       });
   }
-  onRowRemoving(event) {
-    const selectedRow = event.data;
-    const { ID, CODE, DESCRIPTION } = selectedRow;
 
-    this.dataservice.removePaymentTerms(ID, CODE, DESCRIPTION).subscribe(() => {
+  selectPaymentTerms(e:any){
+    console.log(e,'event  ')
+     e.cancel = true;
+    const paymenttermId = e.data.ID;
+    this.selectedpaymenttermId = e.data.ID;
+    this.selectedId = paymenttermId;
+    
+    this.dataservice.selectPaymentTerms(paymenttermId).subscribe({
+      next: (response: any) => {
+        console.log(response)
+        this.selectedPaymentTerms = response;
+        console.log(this.selectedPaymentTerms)
+        this.isEditPaymentTermsPopupOpened = true;
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to fetch salary revision:', err);
+      },
+    });
+  }
+  onRowRemoving(event:any) {
+    const id = event.data.ID;
+    this.dataservice.removePaymentTerms(id).subscribe(() => {
       try {
         // Your delete logic here
         notify(
@@ -80,7 +161,7 @@ export class PaymentTermsListComponent {
       }
     });
   }
-  onRowUpdating(event) {
+  onRowUpdating(event:any) {
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };
@@ -115,6 +196,12 @@ export class PaymentTermsListComponent {
     event.cancel = true; // Prevent the default update operation
   }
   ngOnInit(): void {
+    this.showPaymentTerms();
+  }
+
+    handleClose() {
+    this.isAddPaymentTermsPopupOpened = false;
+    this.isEditPaymentTermsPopupOpened = false;
     this.showPaymentTerms();
   }
 }

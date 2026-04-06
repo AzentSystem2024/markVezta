@@ -35,7 +35,7 @@ export class StoresListComponent implements OnInit {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
-  StoresDataSource: DataSource | undefined;
+  StoresDataSource: DataSource;
   storesArray: any[] = [];
   storesCount = 0;
   country: any;
@@ -233,7 +233,7 @@ export class StoresListComponent implements OnInit {
 
       const payload = {
         ...storeData,
-        DEPT_IDS: this.storesComponent?.selectedDepartments, // add this
+        DEPT_IDS: this.storesComponent.selectedDepartments, // add this
       };
 
       this.dataservice.postStoresData(payload).subscribe((res) => {
@@ -281,9 +281,7 @@ export class StoresListComponent implements OnInit {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -316,20 +314,20 @@ export class StoresListComponent implements OnInit {
   }
 
   onClickSaveStores() {
-    const formData = this.storesComponent?.getNewStoresData();
+    const formData = this.storesComponent.getNewStoresData();
 
     const payload = {
       ...formData,
       COMPANY_ID: this.selected_Company_id,
-      DEPT_IDS: this.storesComponent?.selectedDepartments || [],
+      DEPT_IDS: this.storesComponent.selectedDepartments || [],
     };
 
     // --- Duplicate check ---
     const duplicate = this.storesArray.some(
       (store: any) =>
-        store.CODE.toLowerCase() === payload.CODE?.toLowerCase()?.trim() ||
+        store.CODE.toLowerCase() === payload.CODE.toLowerCase().trim() ||
         store.STORE_NAME.toLowerCase() ===
-          payload.STORE_NAME?.toLowerCase()?.trim(),
+          payload.STORE_NAME.toLowerCase().trim(),
     );
 
     if (duplicate) {
@@ -347,7 +345,7 @@ export class StoresListComponent implements OnInit {
       return;
     }
 
-    // API call with payload
+    // ✅ API call with payload
     this.dataservice.postStoresData(payload).subscribe((response) => {
       if (response) {
         this.isAddStoresPopupOpened = false;
@@ -360,7 +358,7 @@ export class StoresListComponent implements OnInit {
     });
   }
 
-  onRowRemoving(event: any) {
+  onRowRemoving(event) {
     const selectedRow = event.data;
 
     event.cancel = new Promise((resolve, reject) => {
@@ -429,8 +427,8 @@ export class StoresListComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === currentUrl);
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;

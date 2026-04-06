@@ -18,9 +18,7 @@
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-header-filter [visible]="true"></dxo-header-filter>
-    <!-- <dxo-header-filter [visible]="isFilterOpened">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter> -->
+
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
@@ -104,10 +102,7 @@
         </dxi-item>
       </dxo-form>
     </dxo-editing>
-    <!-- <dxo-search-panel
-      [visible]="true"
-      placeholder="Data Search"
-    ></dxo-search-panel> -->
+
     <dxo-toolbar>
       <dxi-item location="before">
         <div
@@ -186,14 +181,7 @@
         </dxi-validation-rule>
       </dxi-validation-rule>
     </dxi-column>
-    <!-- <dxi-column dataField="ADDRESS1" caption="Address">
-      <dxi-validation-rule type="required" message="Address is required">
-        <dxi-validation-rule type="pattern" message="Address is required">
-        </dxi-validation-rule>
-      </dxi-validation-rule>
-    </dxi-column>
-    <dxi-column dataField="ADDRESS2" > </dxi-column>
-    <dxi-column dataField="ADDRESS3" ></dxi-column> -->
+
     <dxi-column dataField="CITY" caption="City">
       <dxi-validation-rule type="required" message="City is required">
         <dxi-validation-rule type="pattern" message="City is required">
@@ -270,24 +258,8 @@
         </dxi-validation-rule>
       </dxi-validation-rule>
     </dxi-column>
-    <!-- <dxi-column dataField="STATE_NAME" caption="State">
-      <dxi-validation-rule type="required" message="State is required">
-        <dxi-validation-rule type="pattern" message="State is required">
-        </dxi-validation-rule>
-      </dxi-validation-rule>
-    </dxi-column> -->
-    <dxi-column dataField="COUNTRY_NAME" caption="Country">
-      <!-- <dxo-lookup
-      [dataSource]="country"
-      displayExpr="COUNTRY_NAME"
-      valueExpr="ID"
-    >
-    <dxi-validation-rule type="required" message="Country is required">
-      <dxi-validation-rule type="pattern" message="Country is required">
-      </dxi-validation-rule>
-    </dxi-validation-rule>
-  </dxo-lookup> -->
-    </dxi-column>
+
+    <dxi-column dataField="COUNTRY_NAME" caption="Country"> </dxi-column>
     <dxi-column dataField="PHONE" caption="Phone">
       <dxi-validation-rule type="required" message="Phone number is required">
         <dxi-validation-rule type="pattern" message="Phone number is required">
@@ -429,6 +401,7 @@
       </dxi-validation-rule>
     </dxi-column>
   </dx-data-grid>
+
   <form-popup
     [(visible)]="isAddCustomerPopupOpened"
     [showApprove]="false"
@@ -440,6 +413,7 @@
   >
     <app-customer-form></app-customer-form>
   </form-popup>
+
   <form-popup
     [(visible)]="isEditCustomerPopupOpened"
     [width]="950"
@@ -448,8 +422,6 @@
     [showApprove]="false"
     (save)="onClickUpdateCustomer()"
   >
-    <!-- <app-customer-form></app-customer-form> -->
-
     <app-customer-edit-form
       [selectedCustomerData]="Selected_Customer_Data"
       (customerUpdated)="onCustomerUpdated($event)"

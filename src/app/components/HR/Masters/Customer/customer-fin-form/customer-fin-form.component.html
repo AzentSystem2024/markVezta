@@ -63,49 +63,7 @@
             </div>
           </dxi-item>
         </dxi-item>
-        <!-- <dxi-item itemType="group" [colCount]="1">
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-date-box
-            type="date"
-            [(value)]="newCustomer.DOB"
-            label="Date of birth"
-            [inputAttr]="{ 'aria-label': 'Date' }"
-            labelMode="floating"
-            displayFormat="dd-MM-yyyy"
-          
-          >
-            <dx-validator>
-              <dxi-validation-rule type="required" message="DOB is required">
-              </dxi-validation-rule>
-            </dx-validator>
-          </dx-date-box>
-        </div>
-      </dxi-item>
-    </dxi-item> -->
-        <!-- <dxi-item itemType="group" [colCount]="1">
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-select-box
-            label="Nationality"
-            [items]="CountryDropdownData"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="newCustomer.NATIONALITY"
-            placeholder="Select Country"
-            (onValueChanged)="onCountrySelectionChanged($event)"
-            [searchEnabled]="true"
-            labelMode="floating"
-            width="400px"
-          >
-            <dx-validator>
-              <dxi-validation-rule type="required" message="Select country">
-              </dxi-validation-rule>
-            </dx-validator>
-          </dx-select-box>
-        </div>
-      </dxi-item>
-    </dxi-item> -->
+
         <dxi-item itemType="group" [colCount]="1">
           <dxi-item>
             <div *dxTemplate>
@@ -298,33 +256,21 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Fax *"
+                label="Fax "
                 [(value)]="newCustomer.FAX_NO"
                 labelMode="floating"
               >
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="FAX number is required"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator>
               </dx-text-box>
             </div>
           </dxi-item>
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
-                label="Email *"
+                label="Email"
                 [(value)]="newCustomer.EMAIL"
                 labelMode="floating"
               >
                 <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Email is required"
-                  >
-                  </dxi-validation-rule>
                   <dxi-validation-rule
                     type="email"
                     message="Enter a valid email address"
@@ -484,6 +430,7 @@
                 label="Current Credit *"
                 [(value)]="newCustomer.CURRENT_CREDIT"
                 labelMode="floating"
+                [readOnly]="true"
               >
                 <dx-validator>
                   <dxi-validation-rule

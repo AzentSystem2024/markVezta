@@ -61,7 +61,7 @@ export class EmployeeSalarySettingsEditComponent {
   employeeFormData: any = {
     EMP_CODE: '',
     FIN_ID: '',
-    BASIC_SALARY: '',
+    BASIC_SALARY: null,
     PREV_REVISION: '',
     EFFECT_FROM: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // always 1st of current month
   };
@@ -160,7 +160,7 @@ export class EmployeeSalarySettingsEditComponent {
       1,
       12,
       0,
-      0, //  Also set this to noon
+      0, // Also set this to noon
     );
 
     // if (selectedMonthFirstDate < currentMonthFirstDate) {

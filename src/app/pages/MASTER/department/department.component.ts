@@ -28,7 +28,7 @@ import notify from 'devextreme/ui/notify';
 })
 export class DepartmentComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
 
   formsource: FormGroup;
   showFilterRow: boolean = true;
@@ -41,11 +41,11 @@ export class DepartmentComponent {
   editingRowData: any = {};
   selectedData: any;
   list_of_duplication: any;
-  Department: any[];
+  Department: any[]= [];
   departmentComponent: any;
   formData = { IS_ACTIVE: false };
-  editingIndex: number;
-  isLoading: boolean;
+  editingIndex: number | undefined;
+  isLoading: boolean=false;
 
   addButtonOptions = {
     text: 'New',
@@ -81,7 +81,7 @@ export class DepartmentComponent {
   };
   isFilterOpened: boolean = false;
   sessionData: any;
-  COMPANY_ID: string;
+  COMPANY_ID: any;
   COMPANY_NAME: any;
 
   constructor(
@@ -134,7 +134,7 @@ export class DepartmentComponent {
   }
 
   refresh = () => {
-    this.dataGrid.instance.refresh();
+    this.dataGrid?.instance.refresh();
   };
 
   formatStatus(data: any) {
@@ -171,7 +171,7 @@ export class DepartmentComponent {
   }
 
    sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
     }
@@ -190,15 +190,12 @@ export class DepartmentComponent {
           SlNo: index + 1, // Assign serial number
         }));
       }
-      console.log(res, 'response');
-    });
+      });
   }
 
   //============Add data============
   Add_Department() {
-    console.log('function working');
     const CODE = this.formsource.value.CODE?.trim();
-    console.log(CODE, 'code');
     const DEPT_NAME = this.formsource.value.DEPT_NAME;
     const IS_ACTIVE = this.formsource.value.IS_ACTIVE;
     const COMPANY_ID = this.COMPANY_ID
@@ -259,16 +256,11 @@ export class DepartmentComponent {
 
   //==================edit data=======================
   Edit_Department() {
-    console.log('edit function is working');
-    console.log(this.editingRowData, 'editing row data');
     const CODE = this.editingRowData.CODE;
     const DEPT_NAME = this.editingRowData.DEPT_NAME;
     const IS_ACTIVE = this.editingRowData.IS_ACTIVE;
     const ID = this.editingRowData.ID;
     const COMPANY_ID = this.COMPANY_ID
-
-    console.log(CODE, DEPT_NAME, IS_ACTIVE, 'code deptname');
-    console.log(ID, 'id');
 
     this.get_Department_List();
 
@@ -284,8 +276,6 @@ export class DepartmentComponent {
     });
 
     if (isDuplicate) {
-      console.log(isDuplicate, 'duplicate triggered');
-
       notify(
         {
           message: 'Data already exists',
@@ -297,8 +287,6 @@ export class DepartmentComponent {
       return;
     }
     this.formsource.reset();
-    console.log(CODE, DEPT_NAME, IS_ACTIVE, '++++++++++code deptname');
-
     if (CODE && DEPT_NAME) {
       this.dataservice
         .Update_Department_Api(ID, CODE, DEPT_NAME, IS_ACTIVE,COMPANY_ID)
@@ -312,8 +300,7 @@ export class DepartmentComponent {
             'success',
           );
           this.get_Department_List();
-          console.log(response);
-        });
+          });
       this.UpdateDepartmentPopup = false;
       this.get_Department_List();
       this.formsource.reset();
@@ -337,7 +324,6 @@ export class DepartmentComponent {
     const ID = event.data.ID;
 
     this.dataservice.Select_Department_Api(ID).subscribe((response: any) => {
-      console.log(response, 'select Api');
       this.selectedData = response;
     });
   }
@@ -346,8 +332,7 @@ export class DepartmentComponent {
   delete_Department(event: any) {
     const ID = event.data.ID;
     this.dataservice.Delete_Department_Api(ID).subscribe((response: any) => {
-      console.log(response, 'deleted');
-    });
+      });
   }
 }
 @NgModule({
