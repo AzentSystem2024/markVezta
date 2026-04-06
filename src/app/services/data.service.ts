@@ -1922,12 +1922,12 @@ export class DataService {
 
   //deliveryterms
   public getDeliveryTermsData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/deliveryterm/list`, {});
+    return this.http.post(`${this.apiUrl}deliveryterms/list`, {});
   }
   public postDeliveryTermsData(CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { CODE, DESCRIPTION };
 
-    return this.http.post(`${this.apiUrl}/deliveryterm/save`, data);
+    return this.http.post(`${this.apiUrl}deliveryterms/save`, data);
   }
   removeDeliveryTerms(id: any, code: string, description: string) {
     const requestBody = {
@@ -1935,14 +1935,14 @@ export class DataService {
       DESCRIPTION: description,
     };
     return this.http.post<any>(
-      `${this.apiUrl}/deliveryterm/delete/` + id,
+      `${this.apiUrl}deliveryterms/delete/` + id,
       requestBody,
     );
   }
   updateDeliveryTerms(ID: any, CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { ID, CODE, DESCRIPTION };
 
-    return this.http.post(`${this.apiUrl}/deliveryterm/save`, data);
+    return this.http.post(`${this.apiUrl}deliveryterms/save`, data);
   }
 
   //stores
@@ -3448,15 +3448,15 @@ The result can be exported to HTML or Markdown.`;
   //import
 
   public getTemplateColumnData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/ImportTemplateColumn/list`, {});
+    return this.http.post(`${this.apiUrl}ImportTemplateColoumn/list`, {});
   }
   updateImportTemplateData(data: object): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/importtemplate/update`, data);
+    return this.http.post<any>(`${this.apiUrl}importtemplate/update`, data);
   }
   saveImportedData(items: Object): Observable<any> {
     const data = items;
 
-    return this.http.post(`${this.apiUrl}/importitemlog/insert`, data);
+    return this.http.post(`${this.apiUrl}importitemlog/insert`, data);
   }
   selectImportTemplateData(id: number) {
     return this.http.post<any>(
@@ -3465,7 +3465,7 @@ The result can be exported to HTML or Markdown.`;
     );
   }
   public getImportTemplateData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/importtemplate/list`, {});
+    return this.http.post(`${this.apiUrl}importtemplate/list`, {});
   }
 
   public viewImportedData(data: any): Observable<any> {
@@ -3482,11 +3482,11 @@ The result can be exported to HTML or Markdown.`;
   public postImportTemplate(items: Object): Observable<any> {
     const data = items;
 
-    return this.http.post(`${this.apiUrl}/importtemplate/insert`, data);
+    return this.http.post(`${this.apiUrl}importtemplate/insert`, data);
   }
   removeImportTemplateData(id: number, data: object) {
     return this.http.post<any>(
-      `${this.apiUrl}/importtemplate/delete/ + id`,
+      `${this.apiUrl}importtemplate/delete/ + id`,
       data,
     );
   }

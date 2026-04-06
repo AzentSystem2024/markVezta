@@ -29,22 +29,20 @@ import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
-import {
-  SupplierEditComponent,
-  SupplierEditModule,
-} from '../supplier-edit/supplier-edit.component';
+import { SupplierEditModule } from 'src/app/pages/supplier-edit/supplier-edit.component';
+
 @Component({
   selector: 'app-supplier-list',
   templateUrl: './supplier-list.component.html',
   styleUrls: ['./supplier-list.component.scss'],
 })
 export class SupplierListComponent implements OnInit {
-  @ViewChild(SupplierFormComponent) supplierComponent: SupplierFormComponent;
+  @ViewChild(SupplierFormComponent) supplierComponent: SupplierFormComponent | undefined;
   @ViewChild(DxDataGridComponent, { static: true })
   @Output()
   editingStart = new EventEmitter<any>();
   @Output() formClosed = new EventEmitter<void>();
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
   width = '100vw';
   height = '100vh';
   supplier: any;
@@ -243,7 +241,7 @@ export class SupplierListComponent implements OnInit {
       });
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event:any) {
     const selectedRow = event.data;
     const {
       ID,
@@ -313,7 +311,7 @@ export class SupplierListComponent implements OnInit {
       });
   }
 
-  onRowUpdating(event) {
+  onRowUpdating(event:any) {
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };
