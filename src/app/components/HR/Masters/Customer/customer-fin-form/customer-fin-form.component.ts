@@ -81,7 +81,7 @@ export class CustomerFinFormComponent {
     MOBILE_NO: '',
     FAX_NO: '',
     CREDIT_LIMIT: '',
-    CURRENT_CREDIT: '',
+    CURRENT_CREDIT: 0.0,
     PAY_TERM_ID: '',
     NOTES: '',
     PRICE_CLASS_ID: '',
@@ -189,6 +189,7 @@ export class CustomerFinFormComponent {
   };
 
   showCountry() {
+    console.log('======================================;;;;;;;;;');
     this.service.getCountryDataAPi().subscribe((response) => {
       this.CountryDropdownDataList = response;
       console;
@@ -307,13 +308,35 @@ export class CustomerFinFormComponent {
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
-    const selectedCountry = this.CountryDropdownData.find(
-      (country: any) => country.ID === this.selecte_countyId,
-    );
-    console.log('selected country code is :', selectedCountry);
 
-    this.countryCode = selectedCountry;
-    this.PhonenumberCode = selectedCountry;
+    const selectedCountry = this.CountryDropdownDataList.find(
+      (c: any) => c.ID === event.value,
+    );
+
+    if (!selectedCountry) return;
+
+    // 🔥 match by name (IMPORTANT)
+    const matchedCountry = this.countryCodes.find(
+      (c: any) =>
+        c.COUNTRY_NAME?.toLowerCase().trim() ===
+        selectedCountry.DESCRIPTION?.toLowerCase().trim(),
+    );
+
+    if (matchedCountry) {
+      // ✅ bind CODE correctly
+      this.countryCode = matchedCountry.CODE;
+      this.PhonenumberCode = matchedCountry.CODE;
+      this.countryCodeDeliveryaddress = matchedCountry.CODE;
+
+      // ✅ trigger validations
+      this.onCountrycodeChange({ value: matchedCountry.CODE });
+      this.onCountrycodeChangePhoneNocode({ value: matchedCountry.CODE });
+    } else {
+      console.warn(
+        'No matching country code found for:',
+        selectedCountry.DESCRIPTION,
+      );
+    }
   }
 
   ngOnInit(): void {
@@ -432,7 +455,7 @@ export class CustomerFinFormComponent {
   updateMobileNumber() {}
   countryDisplay(item: any) {
     if (!item) return '';
-    return `${item.CODE}${item.COUNTRY_NAME}`;
+    return `${item.CODE}`;
   }
   onCountrycodeChangeDeliveryAddressmobile(e: any) {
     const payload = {

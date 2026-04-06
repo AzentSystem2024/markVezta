@@ -494,7 +494,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     const status = event.data.STATUS;
 
     this.dataService
-      .selectDeliveryNote(deliveryId)
+      .selectDeliveryNoteFinance(deliveryId)
       .subscribe((response: any) => {
         this.selectedDelivery = response.Data; // ✅ FIX
         this.isEditDelivery = true;

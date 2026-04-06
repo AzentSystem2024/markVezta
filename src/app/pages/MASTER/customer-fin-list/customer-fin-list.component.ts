@@ -40,6 +40,7 @@ import { FormTextboxModule } from '../../../components/utils/form-textbox/form-t
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
 import { CustomerFormModule } from 'src/app/components/HR/Masters/Customer/customer-form/customer-form.component';
+import { AnyCnameRecord } from 'dns';
 
 @Component({
   selector: 'app-customer-fin-list',
@@ -453,93 +454,57 @@ export class CustomerFinListComponent {
     });
   }
 
-  onRowRemoving(event) {
-    const selectedRow = event.data;
-    const {
-      ID,
-      CUST_CODE,
-      FIRST_NAME,
-      LAST_NAME,
-      DOB,
-      NATIONALITY,
-      CONTACT_NAME,
-      ADDRESS1,
-      ADDRESS2,
-      ADDRESS3,
-      ZIP,
-      STATE_ID,
-      CITY,
-      COUNTRY_ID,
-      PHONE,
-      MOBILE_NO,
-      EMAIL,
-      FAX_NO,
-      CREDIT_LIMIT,
-      CURRENT_CREDIT,
-      PAY_TERM_ID,
-      NOTES,
-      PRICE_CLASS_ID,
-      DISCOUNT_PERCENT,
-      CUST_VAT_RULE_ID,
-      VAT_REGNO,
-    } = selectedRow;
-    event.cancel = new Promise((resolve, reject) => {
-      this.dataservice
-        .removeCustomerData(
-          ID,
-          CUST_CODE,
-          FIRST_NAME,
-          LAST_NAME,
-          DOB,
-          NATIONALITY,
-          CONTACT_NAME,
-          ADDRESS1,
-          ADDRESS2,
-          ADDRESS3,
-          ZIP,
-          STATE_ID,
-          CITY,
-          COUNTRY_ID,
-          PHONE,
-          MOBILE_NO,
-          EMAIL,
-          FAX_NO,
-          CREDIT_LIMIT,
-          CURRENT_CREDIT,
-          PAY_TERM_ID,
-          NOTES,
-          PRICE_CLASS_ID,
-          DISCOUNT_PERCENT,
-          CUST_VAT_RULE_ID,
-          VAT_REGNO,
-        )
-        .subscribe({
-          next: () => {
-            try {
-              notify(
-                {
-                  message: 'Customer data deleted successfully',
-                  position: { at: 'top right', my: 'top right' },
-                },
-                'success',
-              );
-            } catch {
-              notify(
-                {
-                  message: 'Delete operation failed',
-                  position: { at: 'top right', my: 'top right' },
-                },
-                'error',
-              );
-            }
-            resolve(false); // ✅ allow delete → popup closes
-          },
-          error: () => {
-            notify('Delete failed', 'error', 3000);
-            reject(); // ❌ cancel delete
-          },
-        });
-    });
+  onRowRemoving(event: any) {
+    event.cancel = true; //  STOP default delete
+
+    const row = event.data;
+
+    this.dataservice
+      .removeCustomerData(
+        row.ID,
+        row.CUST_CODE,
+        row.FIRST_NAME,
+        row.LAST_NAME,
+        row.DOB,
+        row.NATIONALITY,
+        row.CONTACT_NAME,
+        row.ADDRESS1,
+        row.ADDRESS2,
+        row.ADDRESS3,
+        row.ZIP,
+        row.STATE_ID,
+        row.CITY,
+        row.COUNTRY_ID,
+        row.PHONE,
+        row.MOBILE_NO,
+        row.EMAIL,
+        row.FAX_NO,
+        row.CREDIT_LIMIT,
+        row.CURRENT_CREDIT,
+        row.PAY_TERM_ID,
+        row.NOTES,
+        row.PRICE_CLASS_ID,
+        row.DISCOUNT_PERCENT,
+        row.CUST_VAT_RULE_ID,
+        row.VAT_REGNO,
+      )
+      .subscribe({
+        next: () => {
+          notify(
+            {
+              message: 'Customer data deleted successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+
+          // 🔥 RELOAD DATA ONLY (no refresh needed)
+          this.showCustomer();
+        },
+        error: () => {
+          notify('Delete failed', 'error', 3000);
+        },
+      });
   }
   ngOnInit(): void {
     const currentUrl = this.router.url;
@@ -549,8 +514,8 @@ export class CustomerFinListComponent {
 
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/user');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/user');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

@@ -851,6 +851,10 @@ export class DataService {
   selectDeliveryNote(id: number) {
     return this.http.post<any>(`${this.apiUrl}Sync/dnselect/` + id, {});
   }
+
+  selectDeliveryNoteFinance(id: number) {
+    return this.http.post<any>(`${this.apiUrl}delivery_note/select/` + id, {});
+  }
   updateDeliveryNote(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/update`, data);
@@ -1876,11 +1880,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
 
-  removeVatclass(id: any,) {
-    return this.http.post<any>(
-      `${this.apiUrl}vatclass/delete/` + id,
-      {},
-    );
+  removeVatclass(id: any) {
+    return this.http.post<any>(`${this.apiUrl}vatclass/delete/` + id, {});
   }
 
   //user
@@ -1899,17 +1900,16 @@ export class DataService {
     };
     return this.http.post(`${this.apiUrl}dropdown`, reqBody);
   }
-  
+
   public postPaymentTermsData(CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { CODE, DESCRIPTION };
     return this.http.post(`${this.apiUrl}paymentterm/save`, data);
   }
 
-  selectPaymentTerms(id:number): Observable<any>{
+  selectPaymentTerms(id: number): Observable<any> {
     return this.http.post(`${this.apiUrl}paymentterm/select/${id}`, {});
   }
 
-  
   removePaymentTerms(id: number): Observable<any> {
     return this.http.post(`${this.apiUrl}paymentterm/delete/${id}`, {});
   }
@@ -3903,19 +3903,19 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
-   //===============Add Api=========================
+  //===============Add Api=========================
   Insert_Department_Me_Api(
     CODE: any,
     DEPT_NAME: any,
     COMPANY_ID: any,
-    COST_BUCKET_ID:any
+    COST_BUCKET_ID: any,
   ) {
     const getEndpoint = this.apiUrl + 'Department/save';
     const reqBody = {
       CODE: CODE,
       DEPT_NAME: DEPT_NAME,
       COMPANY_ID: COMPANY_ID,
-      COST_BUCKET_ID:COST_BUCKET_ID
+      COST_BUCKET_ID: COST_BUCKET_ID,
     };
     return this.http.post(getEndpoint, reqBody);
   }
@@ -3940,12 +3940,12 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
-   Update_Department_Me_Api(
+  Update_Department_Me_Api(
     ID: any,
     CODE: any,
     DEPT_NAME: any,
     COMPANY_ID: any,
-    COST_BUCKET_ID:any
+    COST_BUCKET_ID: any,
   ) {
     const getEndpoint = this.apiUrl + 'Department/save';
     const reqBody = {
@@ -3953,7 +3953,7 @@ The result can be exported to HTML or Markdown.`;
       CODE: CODE,
       DEPT_NAME: DEPT_NAME,
       COMPANY_ID: COMPANY_ID,
-      COST_BUCKET_ID:COST_BUCKET_ID
+      COST_BUCKET_ID: COST_BUCKET_ID,
     };
 
     return this.http.post(getEndpoint, reqBody);
@@ -6345,9 +6345,8 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  getMiscSalesInvoiceData(payload:any) {
+  getMiscSalesInvoiceData(payload: any) {
     const getEndpoint = this.apiUrl + 'MiscSalesInvoice/list';
     return this.http.post(getEndpoint, payload);
   }
-
 }
