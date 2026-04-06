@@ -79,7 +79,7 @@ export class ListSalaryPaymentComponent {
     hint: 'Add new entry',
     onClick: () => {
       this.ngZone.run(() => {
-        this.addSalaryPayment(); 
+        this.addSalaryPayment();
       });
     },
     elementAttr: { class: 'add-button' },
@@ -96,7 +96,7 @@ export class ListSalaryPaymentComponent {
     },
   };
   addMiscPaymentPopup: boolean = false;
-  
+
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -162,8 +162,12 @@ export class ListSalaryPaymentComponent {
   }
 
   getSalaryPaymentList(dateRange: string = this.selectedDateRange) {
+    const datePayload = this.getDateRangePayload();
+
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
     };
     this.dataService
       .getSalaryPaymentList(payload)
@@ -171,6 +175,72 @@ export class ListSalaryPaymentComponent {
         this.salaryPaymentList = response.Data;
         this.applyDateFilter();
       });
+  }
+
+  private getDateRangePayload(): {
+    DATE_FROM: string | null;
+    DATE_TO: string | null;
+  } {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+    }
+
+    return {
+      DATE_FROM: fromDate ? this.formatDate(fromDate) : null,
+      DATE_TO: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+
+  private formatDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   onEditOrViewSalaryPayment(e: any) {
@@ -242,7 +312,6 @@ export class ListSalaryPaymentComponent {
     }
   }
 
-
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 
@@ -308,7 +377,7 @@ export class ListSalaryPaymentComponent {
       if (customOpt) {
         customOpt.label = 'Custom';
       }
-      this.applyDateFilter();
+      this.getSalaryPaymentList();
     }
   }
 
@@ -462,7 +531,7 @@ export class ListSalaryPaymentComponent {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
-    this.applyCustomDateFilter(); // your existing function
+    this.getSalaryPaymentList(); // your existing function
   }
 }
 

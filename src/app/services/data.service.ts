@@ -1917,7 +1917,7 @@ export class DataService {
   updatePaymentTerms(ID: any, CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { ID, CODE, DESCRIPTION };
 
-    return this.http.post(`${this.apiUrl}/paymentterm/save`, data);
+    return this.http.post(`${this.apiUrl}paymentterm/save`, data);
   }
 
   //deliveryterms

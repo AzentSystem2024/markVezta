@@ -9,7 +9,6 @@
       [showBorders]="true"
       [allowColumnReordering]="true"
       [allowColumnResizing]="true"
-      (onEditingStart)="selectPaymentTerms($event)"
       (onExporting)="onExporting($event)"
       [showBorders]="true"
       [columnAutoWidth]="false"
@@ -50,18 +49,23 @@
     ></dxo-pager>
   
     <dxo-editing
-      mode="popup"
-      [allowUpdating]="true"
-      [allowDeleting]="true"
-      [allowAdding]="true"
-    >
-      <dxo-popup
-        title="Update Payment Terms"
-        [showTitle]="true"
-        [width]="600"
-        [height]="300"
-      ></dxo-popup>
-    </dxo-editing>
+  mode="popup"
+  [allowUpdating]="true"
+  [allowDeleting]="true"
+  [allowAdding]="true"
+>
+  <dxo-popup
+    title="Edit Payment Terms"
+    [showTitle]="true"
+    [width]="500"
+    [height]="300"
+  ></dxo-popup>
+
+  <dxo-form [colCount]="1">
+    <dxi-item dataField="CODE"></dxi-item>
+    <dxi-item dataField="DESCRIPTION"></dxi-item>
+  </dxo-form>
+</dxo-editing>
    
     <dxo-toolbar>
        <dxi-item location="before" locateInMenu="never">
@@ -138,7 +142,7 @@
     ></app-payment-terms-form>
       </form-popup> 
 
-      <form-popup
+      <!-- <form-popup
         [(visible)]="isEditPaymentTermsPopupOpened"
         (save)="onClickSavePaymentTerms()"
         titleText="Edit Payment Terms"
@@ -150,6 +154,6 @@
       [EditingResponseData]="selectedPaymentTerms"
     (popupClosed)="handleClose()"
     ></app-payment-terms-form>
-      </form-popup> 
+      </form-popup>  -->
     </div>
    
