@@ -30,7 +30,7 @@ export class SubDepartmentAddFormComponent implements OnInit {
     DESCRIPTION: '',
     DEPARTMENT_ID: '',
   };
-  COMPANY_ID: string;
+  COMPANY_ID: any;
   newSubDepartment = this.formSubDepartmentData;
 
   constructor(private service: DataService) {}
@@ -42,7 +42,7 @@ export class SubDepartmentAddFormComponent implements OnInit {
   getNewSubDepartmentData = () => ({ ...this.newSubDepartment });
 
   getDepartmentDropDown() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData')|| '{}');
     this.COMPANY_ID = String(sessionData.SELECTED_COMPANY.COMPANY_ID);
     const dept_payload = {
       NAME: 'DEPT',

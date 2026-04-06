@@ -12,7 +12,7 @@ import { saveAs } from 'file-saver-es';
 import { exportDataGrid as exportDataGridToPdf } from 'devextreme/pdf_exporter';
 import { exportDataGrid as exportDataGridToXLSX } from 'devextreme/excel_exporter';
 import { environment } from 'src/environments/environment';
-import { AnyARecord } from 'dns';
+import { AnyARecord, AnyCnameRecord } from 'dns';
 
 const API_URL = 'https://js.devexpress.com/Demos/RwaService/api';
 const version = '1.0';
@@ -3881,7 +3881,6 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //---------------HR Masters-----------------
-
   get_Department_List(payload: any) {
     const getEndpoint = this.apiUrl + 'Department/list';
     return this.http.post(getEndpoint, payload);
@@ -3904,6 +3903,23 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
+   //===============Add Api=========================
+  Insert_Department_Me_Api(
+    CODE: any,
+    DEPT_NAME: any,
+    COMPANY_ID: any,
+    COST_BUCKET_ID:any
+  ) {
+    const getEndpoint = this.apiUrl + 'Department/save';
+    const reqBody = {
+      CODE: CODE,
+      DEPT_NAME: DEPT_NAME,
+      COMPANY_ID: COMPANY_ID,
+      COST_BUCKET_ID:COST_BUCKET_ID
+    };
+    return this.http.post(getEndpoint, reqBody);
+  }
+
   //==============Update Api==============================
   Update_Department_Api(
     ID: any,
@@ -3912,13 +3928,32 @@ The result can be exported to HTML or Markdown.`;
     IS_ACTIVE: any,
     COMPANY_ID: any,
   ) {
-    const getEndpoint = this.apiUrl + 'Department/edit';
+    const getEndpoint = this.apiUrl + 'Department/save';
     const reqBody = {
       ID: ID,
       CODE: CODE,
       DEPT_NAME: DEPT_NAME,
       IS_ACTIVE: IS_ACTIVE,
       COMPANY_ID: COMPANY_ID,
+    };
+
+    return this.http.post(getEndpoint, reqBody);
+  }
+
+   Update_Department_Me_Api(
+    ID: any,
+    CODE: any,
+    DEPT_NAME: any,
+    COMPANY_ID: any,
+    COST_BUCKET_ID:any
+  ) {
+    const getEndpoint = this.apiUrl + 'Department/save';
+    const reqBody = {
+      ID: ID,
+      CODE: CODE,
+      DEPT_NAME: DEPT_NAME,
+      COMPANY_ID: COMPANY_ID,
+      COST_BUCKET_ID:COST_BUCKET_ID
     };
 
     return this.http.post(getEndpoint, reqBody);
