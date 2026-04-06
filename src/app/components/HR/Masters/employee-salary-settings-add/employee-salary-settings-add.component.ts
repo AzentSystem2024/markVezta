@@ -192,7 +192,10 @@ export class EmployeeSalarySettingsAddComponent {
         .map((item: any) => item.HEAD_ID); // or your row's unique identifier
 
       this.SalaryDetails = this.salaryGridData.Details || [];
-      this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
+      // this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
+      this.PreviousRevision = this.salaryGridData.EFFECT_FROM
+  ? new Date(this.salaryGridData.EFFECT_FROM)
+  : null;
 
       this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY || 0;
       this.effectFromValidator?.instance?.validate(); // force revalidate

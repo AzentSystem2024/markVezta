@@ -46,7 +46,15 @@
           [labelMode]="'floating'"
           displayFormat="MMMM yyyy"
         >
+        <dx-validator #effectFromValidator>
+        <dxi-validation-rule
+          type="custom"
+          [validationCallback]="validateEffectFrom"
+          message="Effect From must be after Previous Revision"
+        ></dxi-validation-rule>
+      </dx-validator>
         </dx-date-box>
+
       </div>
     </div>
 
