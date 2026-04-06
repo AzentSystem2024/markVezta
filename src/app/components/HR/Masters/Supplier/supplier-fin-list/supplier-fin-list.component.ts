@@ -29,7 +29,7 @@ import { ExportService } from 'src/app/services/export.service';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import DataSource from 'devextreme/data/data_source';
-import { SupplierFinFormModule } from '../supplier-fin-form/supplier-fin-form.component';
+import { SupplierFinFormComponent, SupplierFinFormModule } from '../supplier-fin-form/supplier-fin-form.component';
 import { SupplierFinEditModule } from '../supplier-fin-edit/supplier-fin-edit.component';
 
 @Component({
@@ -39,12 +39,12 @@ import { SupplierFinEditModule } from '../supplier-fin-edit/supplier-fin-edit.co
 })
 export class SupplierFinListComponent {
 
-   @ViewChild(SupplierFormComponent) supplierComponent:
-      | SupplierFormComponent
+   @ViewChild(SupplierFinFormComponent) supplierComponent:
+      | SupplierFinFormComponent
       | undefined;
     @ViewChild(DxDataGridComponent, { static: true })
     dataGrid: DxDataGridComponent | undefined;
-    @ViewChild(SupplierFormComponent) supplierForm!: SupplierFormComponent;
+    @ViewChild(SupplierFinFormComponent) supplierForm!: SupplierFinFormComponent;
     @Output()
     editingStart = new EventEmitter<any>();
     @Output() formClosed = new EventEmitter<void>();
@@ -245,6 +245,7 @@ export class SupplierFinListComponent {
   
     onClickSaveSupplier(): void {
       const newSupplierData = this.supplierComponent?.getNewSupplierData();
+      console.log(newSupplierData)
   
       if (!newSupplierData) {
         notify(
@@ -300,7 +301,9 @@ export class SupplierFinListComponent {
     }
   
     onRowRemoving(event: any) {
+      console.log(event)
       const id = event.data.ID;
+      console.log(id)
       event.cancel = new Promise((resolve, reject) => {
         this.dataservice.removeSupplier(id).subscribe({
           next: () => {
