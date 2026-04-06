@@ -8,6 +8,7 @@ import {
   EventEmitter,
   SimpleChanges,
   CUSTOM_ELEMENTS_SCHEMA,
+  ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -32,7 +33,7 @@ import { CountryServiceService } from 'src/app/services/country-service.service'
 export class StoresFormComponent implements OnInit {
   @Input() storeData: any = {}; // for edit mode
   @Input() companyId!: number;
-
+  @ViewChild('dxFormRef', { static: false }) dxForm: any;
   @Output() formSubmit = new EventEmitter<any>();
   CountryDropdownData: any[] = [];
   GroupDropdownData: any[] = [];
@@ -181,10 +182,17 @@ export class StoresFormComponent implements OnInit {
   }
 
   submitForm() {
+    const validationResult = this.dxForm?.instance?.validate();
+
+    if (!validationResult?.isValid) {
+      return; //  STOP if validation fails
+    }
+
     const payload = {
       ...this.getNewStoresData(),
-      DEPT_IDS: this.selectedDepartments, // correct key
+      DEPT_IDS: this.selectedDepartments,
     };
+
     this.formSubmit.emit(payload);
   }
 
@@ -209,12 +217,17 @@ export class StoresFormComponent implements OnInit {
   onCountrySelected(e: any) {
     this.newStores.COUNTRY_ID = e.value;
 
-    // set country code
-    const selectedCountry = this.CountryDropdownData.find(
-      (country) => country.ID === e.value,
+    // find selected country from countryCodes (with CODE like +91, +971)
+    const selectedCountry = this.countryCodes.find(
+      (c: any) => c.ID === e.value,
     );
+
     if (selectedCountry) {
-      this.countryCode = selectedCountry.CODE;
+      // THIS is the important line
+      this.countryCodePhone = selectedCountry.CODE;
+
+      // optional: trigger phone validation length API
+      this.onCountrycodeChangePhone({ value: selectedCountry.CODE });
     }
 
     // load states
@@ -241,7 +254,6 @@ export class StoresFormComponent implements OnInit {
       .subscribe((response: any) => {
         this.State = response;
       });
-   
   }
 
   onCountrySelectionChanged(event: any) {
@@ -300,6 +312,11 @@ export class StoresFormComponent implements OnInit {
   countryDisplay(item: any) {
     if (!item) return '';
     return `${item.CODE}`;
+  }
+
+  clearValidation() {
+    this.dxForm?.instance?.resetValues(); // optional
+    this.dxForm?.instance?.resetValidation();
   }
 }
 @NgModule({

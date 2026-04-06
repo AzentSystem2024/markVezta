@@ -878,6 +878,7 @@ export class PurchaseOrderComponent {
             this.isAddPopupOpened = false;
 
             this.poNewForm?.resetForm();
+            this.poNewForm?.getDocNo();
             this.getPurchaseOrderList();
           } else {
             notify({ message: 'Your Data Not Saved' }, 'error');
