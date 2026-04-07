@@ -1010,6 +1010,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Salary/View`, payload);
   }
 
+   viewSelectedPayrollForReport(id: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salary/select/`+ id , {});
+  }
+
   updatePayroll(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Salary/edit`, data);

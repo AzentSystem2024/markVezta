@@ -370,6 +370,7 @@ import { StoresListModule } from './pages/MASTER/stores-list/stores-list.compone
 import { SupplierFinListComponent, SupplierFinListModule} from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
 import { SupplierFinFormComponent, SupplierFinFormModule } from './components/HR/Masters/Supplier/supplier-fin-form/supplier-fin-form.component';
 import { SupplierFinEditComponent, SupplierFinEditModule } from './components/HR/Masters/Supplier/supplier-fin-edit/supplier-fin-edit.component';
+import { PayrollViewReportComponent, PayrollViewReportModule } from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -741,7 +742,8 @@ import { SupplierFinEditComponent, SupplierFinEditModule } from './components/HR
     ProfitAndLossBranchModule,
     SupplierFinListModule,
     SupplierFinFormModule,
-    SupplierFinEditModule
+    SupplierFinEditModule,
+    PayrollViewReportModule,
   ],
 
   providers: [

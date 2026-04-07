@@ -206,7 +206,7 @@ export class EditJournalVoucherComponent {
 
   getDepartments() {
     const payload = {
-      NAME: 'DEPARTMENTS',
+      NAME: 'DEPT',
       COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getDropdownData(payload).subscribe((res) => {

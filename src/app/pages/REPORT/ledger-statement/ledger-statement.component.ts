@@ -66,6 +66,7 @@ import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
 import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
+import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
 
 // import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 // import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
@@ -110,6 +111,7 @@ export class LedgerStatementComponent {
   Selected_Depreciation_data: any;
   EditDepreciationPopupVisible: boolean = false;
   editPrePaymentPopupOpened: boolean = false;
+  viewPayrollPopupOpened : boolean = false;
   selectedSalaryData: any;
   editSalaryPopup: boolean = false;
   selectedPrePayment: any;
@@ -144,6 +146,9 @@ export class LedgerStatementComponent {
   selectedProduction: any;
   isViewProduction: boolean;
   isMiscViewInvoice : boolean = false;
+  selectedPayroll: any;
+  Store: any;
+  selectedStoreid: any;
 
   constructor(
     private dataService: DataService,
@@ -176,7 +181,7 @@ export class LedgerStatementComponent {
     this.get_sessionstorage_data();
     this.get_fin_id();
     this.sesstion_Details();
-
+    this.store_dropdown();
     const userDataString = localStorage.getItem('userData');
 
     if (userDataString) {
@@ -362,6 +367,9 @@ export class LedgerStatementComponent {
       HEAD_ID: headid,
       DATE_FROM: sessiondata.dateFrom,
       DATE_TO: sessiondata.dateTo,
+      STORE_ID: this.selectedStoreid?.length
+    ? this.selectedStoreid.join(',') // FINAL FIX
+    : ''
     };
 
     console.log(payload, '=========payload=========');
@@ -370,6 +378,7 @@ export class LedgerStatementComponent {
     this.selected_Head_Id = payload.HEAD_ID;
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
+    this.selectedStoreid = payload.STORE_ID;  
 
     // use your existing datasource creator
     this.createLedgerDataSource(payload);
@@ -438,6 +447,9 @@ export class LedgerStatementComponent {
       HEAD_ID: this.selected_Head_Id,
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
+       STORE_ID: this.selectedStoreid?.length
+    ? this.selectedStoreid.join(',') // ✅ FINAL FIX
+    : ''
     };
 
     this.createLedgerDataSource(payload);
@@ -681,6 +693,14 @@ export class LedgerStatementComponent {
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
+    } 
+    else if (TRANS_TYPE_ID === 29) {
+      this.dataService.viewSelectedPayroll(trans_id).subscribe((response: any) => {
+      this.selectedPayroll = response;
+        this.viewPayrollPopupOpened = true;
+        this.cdr.detectChanges();
+        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+      });
     } else {
     }
   }
@@ -689,6 +709,31 @@ export class LedgerStatementComponent {
     console.log(e.row.data, 'event');
     this.transtypeId = e.row.data.TRANS_TYPE_ID;
     return this.transtypeId !== 0 && this.transtypeId !== 1;
+  }
+
+   storeHint: string = '';
+
+updateStoreHint() {
+  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+    this.storeHint = 'No store selected';
+    return;
+  }
+
+  const selectedNames = this.Store
+    .filter(x => this.selectedStoreid.includes(x.ID))
+    .map(x => x.DESCRIPTION);
+
+  this.storeHint = selectedNames.join(', ');
+}
+
+    store_dropdown(){
+    const payload = {
+      NAME :'STORE',
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
   }
 
   // POPUP shown → allow child to render
@@ -886,6 +931,7 @@ export class LedgerStatementComponent {
     SaleReturnFormModule,
     ProductionJvViewModule,
     MiscSalesInvoiceFormModule,
+    
   ],
   providers: [],
   declarations: [LedgerStatementComponent],

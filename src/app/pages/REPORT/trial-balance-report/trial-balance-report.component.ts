@@ -11,6 +11,7 @@ import {
   DxLoadPanelModule,
   DxNumberBoxModule,
   DxSelectBoxModule,
+  DxTagBoxModule,
   DxTextBoxModule,
   DxValidationGroupModule,
   DxValidatorModule,
@@ -51,6 +52,8 @@ export class TrialBalanceReportComponent {
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
   selected_from_date: string;
+  Store: any;
+  selectedStoreid: any;
 
   constructor(
     private dataservice: DataService,
@@ -83,6 +86,7 @@ export class TrialBalanceReportComponent {
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
     this.get_DataSource();
+    this.store_dropdown();
   }
 
   //================ Year value change ===================
@@ -284,6 +288,9 @@ export class TrialBalanceReportComponent {
       finId: this.selected_fin_id,
       dateFrom: this.formatted_from_date,
       dateTo: this.formatted_To_date,
+       STORE_ID: this.selectedStoreid?.length
+    ? this.selectedStoreid.join(',')  
+    : ''
     };
 
     sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
@@ -295,6 +302,31 @@ export class TrialBalanceReportComponent {
 
       this.TrialBalanceReport = res.data;
       console.log(this.TrialBalanceReport);
+    });
+  }
+
+   storeHint: string = '';
+
+updateStoreHint() {
+  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+    this.storeHint = 'No store selected';
+    return;
+  }
+
+  const selectedNames = this.Store
+    .filter(x => this.selectedStoreid.includes(x.ID))
+    .map(x => x.DESCRIPTION);
+
+  this.storeHint = selectedNames.join(', ');
+}
+
+    store_dropdown(){
+    const payload = {
+      NAME :'STORE',
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
     });
   }
 
@@ -326,6 +358,7 @@ export class TrialBalanceReportComponent {
     DxDateBoxModule,
     DxSelectBoxModule,
     DxButtonModule,
+    DxTagBoxModule,
   ],
   providers: [],
   exports: [],

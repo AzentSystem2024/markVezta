@@ -85,7 +85,7 @@
 
         <dxi-item>
           <dx-date-box
-            [width]="200"
+            [width]="150"
             label="Date From"
             labelMode="floating"
             [displayFormat]="'dd-MM-yyyy'"
@@ -95,7 +95,7 @@
         </dxi-item>
         <dxi-item>
           <dx-date-box
-            [width]="200"
+            [width]="150"
             label="Date To"
             labelMode="floating"
             [displayFormat]="'dd-MM-yyyy'"
@@ -104,6 +104,25 @@
           >
           </dx-date-box>
         </dxi-item>
+
+        <dxi-item>
+      <dx-tag-box
+  label="Store"
+  labelMode="floating"
+  displayExpr="DESCRIPTION"
+  valueExpr="ID"
+  [items]="Store"
+  [searchEnabled]="true"
+  [(value)]="selectedStoreid"
+  [showSelectionControls]="true"
+  [maxDisplayedTags]="100"
+  [showMultiTagOnly]="true"
+  [multiline]="false"
+  [hint]="storeHint"
+  [width]="150"
+  (onValueChanged)="updateStoreHint()"
+></dx-tag-box>
+    </dxi-item>
         <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
         <dxi-item location="after" locateInMenu="auto">
           <dx-button
@@ -174,6 +193,8 @@
       <dxi-column dataField="Category" caption="Category"></dxi-column>
       <dxi-column dataField="LedgerCode" caption="Ledger Code"></dxi-column>
       <dxi-column dataField="LedgerName" caption="Ledger Name"></dxi-column>
+      <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column caption="Opening Balance" cssClass="opening-header">
         <dxi-column
           dataField="OpeningBalanceDebit"
