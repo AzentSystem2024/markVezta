@@ -1010,8 +1010,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Salary/View`, payload);
   }
 
-   viewSelectedPayrollForReport(id: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}Salary/select/`+ id , {});
+  viewSelectedPayrollForReport(id: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salary/select/` + id, {});
   }
 
   updatePayroll(items: any) {
@@ -3435,18 +3435,18 @@ The result can be exported to HTML or Markdown.`;
       STORE_ID: storeId,
     };
 
-    return this.http.post<any>(`${this.apiUrl}/itemvizard/list`, payload);
+    return this.http.post<any>(`${this.apiUrl}itemvizard/list`, payload);
   }
 
   getItemsList(params: {
     MASTER_TYPE: string;
     MASTER_VALUE: string;
   }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/items/list`, params);
+    return this.http.post(`${this.apiUrl}items/list`, params);
   }
 
   pushItemToStore(payloads: ItemStorePayload): Observable<any> {
-    return this.http.post(`${this.apiUrl}/itemvizard/insert`, payloads);
+    return this.http.post(`${this.apiUrl}itemvizard/insert`, payloads);
   }
 
   //import
@@ -3497,28 +3497,22 @@ The result can be exported to HTML or Markdown.`;
 
   //Promotion Schema
   getPromotionSchemaLog(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/promotionschema/list`, {});
+    return this.http.post<any>(`${this.apiUrl}promotionschema/list`, {});
   }
 
   savePromotionSchema(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}/promotionschema/insert`,
-      payload,
-    );
+    return this.http.post<any>(`${this.apiUrl}promotionschema/insert`, payload);
   }
 
   selectPromotionSchema(id: number): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/promotionschema/select/${id}`,
+      `${this.apiUrl}promotionschema/select/${id}`,
       {},
     );
   }
 
   updatePromotionSchema(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}/promotionschema/update`,
-      payload,
-    );
+    return this.http.post<any>(`${this.apiUrl}promotionschema/update`, payload);
   }
 
   // deleteWorksheet(id: number): Observable<any> {
@@ -3526,7 +3520,7 @@ The result can be exported to HTML or Markdown.`;
   // }
 
   deletePromotion(id: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/promotionschema/delete/${id}`, {});
+    return this.http.post(`${this.apiUrl}promotionschema/delete/${id}`, {});
   }
 
   //promotion log

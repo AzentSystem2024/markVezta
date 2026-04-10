@@ -49,7 +49,7 @@ import notify from 'devextreme/ui/notify';
 export class ItemStorePropertiesComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   // @Input() selectedWorksheetData: any;
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   @Input() selectedWorksheetData: any;
   items: any;
   itemsList: any;

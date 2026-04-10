@@ -79,8 +79,8 @@ export class PromotionLogComponent {
   isVerified: boolean = false;
   isApproved: boolean = false;
   promotionLogList: any;
-  selectedPromotion: { response: any };
-  AllowCommitWithSave: string;
+  selectedPromotion: any = {};
+  AllowCommitWithSave: any;
   logStatusMap: { [key: number]: string } = {};
   status: any;
 

@@ -169,6 +169,9 @@ import { PromotionSchemaLogComponent } from './pages/promotion-schema-log/promot
 import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 import { CurrencyListComponent } from './pages/currency-list/currency-list.component';
+import { PromotionEditComponent } from './pages/promotion-edit/promotion-edit.component';
+import { ItemStorePropertiesComponent } from './pages/item-store-properties/item-store-properties.component';
+import { PromotionViewComponent } from './pages/promotion-view/promotion-view.component';
 // import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 // import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 // import { PromotionComponent } from './pages/promotion/promotion.component';
@@ -1042,6 +1045,21 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'promotion-edit',
+        component: PromotionEditComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotion-view',
+        component: PromotionViewComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotion-vertify',
+        component: PromotionViewComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'promotion-schema',
         component: PromotionSchemaLogComponent,
         canActivate: [AuthGuardService],
@@ -1073,7 +1091,11 @@ const routes: Routes = [
         component: PromotionComponent,
         canActivate: [AuthGuardService],
       },
-
+      {
+        path: 'item-change-property',
+        component: ItemStorePropertiesComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: '**',
         redirectTo: 'login',
