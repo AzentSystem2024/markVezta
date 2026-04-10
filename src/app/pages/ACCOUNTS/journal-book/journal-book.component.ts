@@ -20,6 +20,7 @@ import {
   DxNumberBoxModule,
   DxPopupModule,
   DxSelectBoxModule,
+  DxTagBoxModule,
   DxTextBoxModule,
   DxValidationGroupModule,
   DxValidatorModule,
@@ -46,6 +47,9 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
+import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
+import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
+import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 
 @Component({
   selector: 'app-journal-book',
@@ -123,7 +127,9 @@ export class JournalBookComponent {
   selectedTrIn: any;
   isEditTransferIn: boolean = false;
   isReadOnlyTrIn: boolean = true;
+  isMiscViewInvoice : boolean = false;
   isEditCustomerReceipt: boolean = false;
+  viewPayrollPopupOpened : boolean = false;
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -135,6 +141,9 @@ export class JournalBookComponent {
   };
   selectedProduction: any;
   isViewProduction: boolean;
+  selectedPayroll: any;
+  Store: any;
+  selectedStoreid: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -195,6 +204,7 @@ export class JournalBookComponent {
     this.selected_To_date = SystemDate;
 
     this.load_JournalBook_data();
+    this.store_dropdown();
   }
 
   ngAfterViewInit() {
@@ -353,6 +363,9 @@ export class JournalBookComponent {
       FinId: this.selected_fin_id,
       DateFrom: this.formatted_from_date ?? this.selected_from_date,
       DateTo: this.formatted_To_date ?? this.selected_To_date,
+       STORE_ID: this.selectedStoreid?.length
+    ? this.selectedStoreid.join(',') // FINAL FIX
+    : ''
     };
 
     this.JournalBookDataSource = new DataSource({
@@ -550,7 +563,24 @@ export class JournalBookComponent {
           'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
         );
       });
-    } else if (TransType === 104) {
+    } 
+    else if (TransType === 105) {
+      this.dataService.getMiscSalesInvoiceByID(trans_id).subscribe((response: any) => {
+      this.selectedInvoice = response;
+        this.isMiscViewInvoice = true;
+        this.cdr.detectChanges();
+        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+      });
+    } 
+    else if (TransType === 29) {
+      this.dataService.viewSelectedPayrollForReport(trans_id).subscribe((response: any) => {
+      this.selectedPayroll = response;
+        this.viewPayrollPopupOpened = true;
+        this.cdr.detectChanges();
+        console.log(this.selectedPayroll, 'Selected_Depreciation_data=====');
+      });
+    }
+    else if (TransType === 104) {
       this.dataService
         .selectBoxProduction(trans_id)
         .subscribe((response: any) => {
@@ -632,6 +662,33 @@ export class JournalBookComponent {
     this.isViewReceipt = false;
     this.isEditInvoice = false;
     this.editMiscPopup = false;
+    this.isMiscViewInvoice = false;
+    this.viewPayrollPopupOpened = false;
+  }
+
+    storeHint: string = '';
+
+updateStoreHint() {
+  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+    this.storeHint = 'No store selected';
+    return;
+  }
+
+  const selectedNames = this.Store
+    .filter(x => this.selectedStoreid.includes(x.ID))
+    .map(x => x.DESCRIPTION);
+
+  this.storeHint = selectedNames.join(', ');
+}
+
+    store_dropdown(){
+    const payload = {
+      NAME :'STORE',
+      COMPANY_ID : this.selected_Company_id
+    }
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
   }
 
   formatDates(cellData: any): string {
@@ -685,6 +742,10 @@ export class JournalBookComponent {
     EditCustomerReceiptModule,
     SaleReturnFormModule,
     ProductionJvViewModule,
+    PayrollViewModule,
+    MiscSalesInvoiceFormModule,
+    PayrollViewReportModule,
+    DxTagBoxModule,
   ],
   providers: [],
   exports: [],

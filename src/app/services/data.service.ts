@@ -12,7 +12,7 @@ import { saveAs } from 'file-saver-es';
 import { exportDataGrid as exportDataGridToPdf } from 'devextreme/pdf_exporter';
 import { exportDataGrid as exportDataGridToXLSX } from 'devextreme/excel_exporter';
 import { environment } from 'src/environments/environment';
-import { AnyARecord } from 'dns';
+import { AnyARecord, AnyCnameRecord } from 'dns';
 
 const API_URL = 'https://js.devexpress.com/Demos/RwaService/api';
 const version = '1.0';
@@ -851,6 +851,10 @@ export class DataService {
   selectDeliveryNote(id: number) {
     return this.http.post<any>(`${this.apiUrl}Sync/dnselect/` + id, {});
   }
+
+  selectDeliveryNoteFinance(id: number) {
+    return this.http.post<any>(`${this.apiUrl}delivery_note/select/` + id, {});
+  }
   updateDeliveryNote(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/update`, data);
@@ -1004,6 +1008,10 @@ export class DataService {
 
   viewSelectedPayroll(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Salary/View`, payload);
+  }
+
+   viewSelectedPayrollForReport(id: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salary/select/`+ id , {});
   }
 
   updatePayroll(items: any) {
@@ -1876,11 +1884,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}vatclass/save`, data);
   }
 
-  removeVatclass(id: any,) {
-    return this.http.post<any>(
-      `${this.apiUrl}vatclass/delete/` + id,
-      {},
-    );
+  removeVatclass(id: any) {
+    return this.http.post<any>(`${this.apiUrl}vatclass/delete/` + id, {});
   }
 
   //user
@@ -1899,35 +1904,34 @@ export class DataService {
     };
     return this.http.post(`${this.apiUrl}dropdown`, reqBody);
   }
+
   public postPaymentTermsData(CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { CODE, DESCRIPTION };
+    return this.http.post(`${this.apiUrl}paymentterm/save`, data);
+  }
 
-    return this.http.post(`${this.apiUrl}/paymentterm/save`, data);
+  selectPaymentTerms(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}paymentterm/select/${id}`, {});
   }
-  removePaymentTerms(id: any, code: string, description: string) {
-    const requestBody = {
-      CODE: code,
-      DESCRIPTION: description,
-    };
-    return this.http.post<any>(
-      `${this.apiUrl}/paymentterm/delete/` + id,
-      requestBody,
-    );
+
+  removePaymentTerms(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}paymentterm/delete/${id}`, {});
   }
+
   updatePaymentTerms(ID: any, CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { ID, CODE, DESCRIPTION };
 
-    return this.http.post(`${this.apiUrl}/paymentterm/save`, data);
+    return this.http.post(`${this.apiUrl}paymentterm/save`, data);
   }
 
   //deliveryterms
   public getDeliveryTermsData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/deliveryterm/list`, {});
+    return this.http.post(`${this.apiUrl}deliveryterms/list`, {});
   }
   public postDeliveryTermsData(CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { CODE, DESCRIPTION };
 
-    return this.http.post(`${this.apiUrl}/deliveryterm/save`, data);
+    return this.http.post(`${this.apiUrl}deliveryterms/save`, data);
   }
   removeDeliveryTerms(id: any, code: string, description: string) {
     const requestBody = {
@@ -1935,14 +1939,14 @@ export class DataService {
       DESCRIPTION: description,
     };
     return this.http.post<any>(
-      `${this.apiUrl}/deliveryterm/delete/` + id,
+      `${this.apiUrl}deliveryterms/delete/` + id,
       requestBody,
     );
   }
   updateDeliveryTerms(ID: any, CODE: any, DESCRIPTION: any): Observable<any> {
     const data = { ID, CODE, DESCRIPTION };
 
-    return this.http.post(`${this.apiUrl}/deliveryterm/save`, data);
+    return this.http.post(`${this.apiUrl}deliveryterms/save`, data);
   }
 
   //stores
@@ -3448,15 +3452,15 @@ The result can be exported to HTML or Markdown.`;
   //import
 
   public getTemplateColumnData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/ImportTemplateColumn/list`, {});
+    return this.http.post(`${this.apiUrl}ImportTemplateColoumn/list`, {});
   }
   updateImportTemplateData(data: object): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/importtemplate/update`, data);
+    return this.http.post<any>(`${this.apiUrl}importtemplate/update`, data);
   }
   saveImportedData(items: Object): Observable<any> {
     const data = items;
 
-    return this.http.post(`${this.apiUrl}/importitemlog/insert`, data);
+    return this.http.post(`${this.apiUrl}importitemlog/insert`, data);
   }
   selectImportTemplateData(id: number) {
     return this.http.post<any>(
@@ -3465,7 +3469,7 @@ The result can be exported to HTML or Markdown.`;
     );
   }
   public getImportTemplateData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/importtemplate/list`, {});
+    return this.http.post(`${this.apiUrl}importtemplate/list`, {});
   }
 
   public viewImportedData(data: any): Observable<any> {
@@ -3482,11 +3486,11 @@ The result can be exported to HTML or Markdown.`;
   public postImportTemplate(items: Object): Observable<any> {
     const data = items;
 
-    return this.http.post(`${this.apiUrl}/importtemplate/insert`, data);
+    return this.http.post(`${this.apiUrl}importtemplate/insert`, data);
   }
   removeImportTemplateData(id: number, data: object) {
     return this.http.post<any>(
-      `${this.apiUrl}/importtemplate/delete/ + id`,
+      `${this.apiUrl}importtemplate/delete/ + id`,
       data,
     );
   }
@@ -3881,7 +3885,6 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //---------------HR Masters-----------------
-
   get_Department_List(payload: any) {
     const getEndpoint = this.apiUrl + 'Department/list';
     return this.http.post(getEndpoint, payload);
@@ -3904,6 +3907,23 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
+  //===============Add Api=========================
+  Insert_Department_Me_Api(
+    CODE: any,
+    DEPT_NAME: any,
+    COMPANY_ID: any,
+    COST_BUCKET_ID: any,
+  ) {
+    const getEndpoint = this.apiUrl + 'Department/save';
+    const reqBody = {
+      CODE: CODE,
+      DEPT_NAME: DEPT_NAME,
+      COMPANY_ID: COMPANY_ID,
+      COST_BUCKET_ID: COST_BUCKET_ID,
+    };
+    return this.http.post(getEndpoint, reqBody);
+  }
+
   //==============Update Api==============================
   Update_Department_Api(
     ID: any,
@@ -3912,13 +3932,32 @@ The result can be exported to HTML or Markdown.`;
     IS_ACTIVE: any,
     COMPANY_ID: any,
   ) {
-    const getEndpoint = this.apiUrl + 'Department/edit';
+    const getEndpoint = this.apiUrl + 'Department/save';
     const reqBody = {
       ID: ID,
       CODE: CODE,
       DEPT_NAME: DEPT_NAME,
       IS_ACTIVE: IS_ACTIVE,
       COMPANY_ID: COMPANY_ID,
+    };
+
+    return this.http.post(getEndpoint, reqBody);
+  }
+
+  Update_Department_Me_Api(
+    ID: any,
+    CODE: any,
+    DEPT_NAME: any,
+    COMPANY_ID: any,
+    COST_BUCKET_ID: any,
+  ) {
+    const getEndpoint = this.apiUrl + 'Department/save';
+    const reqBody = {
+      ID: ID,
+      CODE: CODE,
+      DEPT_NAME: DEPT_NAME,
+      COMPANY_ID: COMPANY_ID,
+      COST_BUCKET_ID: COST_BUCKET_ID,
     };
 
     return this.http.post(getEndpoint, reqBody);
@@ -6310,9 +6349,8 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, {});
   }
 
-  getMiscSalesInvoiceData(payload:any) {
+  getMiscSalesInvoiceData(payload: any) {
     const getEndpoint = this.apiUrl + 'MiscSalesInvoice/list';
     return this.http.post(getEndpoint, payload);
   }
-
 }

@@ -160,16 +160,16 @@ export class EmployeeSalarySettingsEditComponent {
       1,
       12,
       0,
-      0, // ✅ Also set this to noon
+      0, // Also set this to noon
     );
 
-    if (selectedMonthFirstDate < currentMonthFirstDate) {
-      e.component.option('value', currentMonthFirstDate);
-      this.employeeFormData.EFFECT_FROM = currentMonthFirstDate;
-    } else {
-      e.component.option('value', selectedMonthFirstDate);
-      this.employeeFormData.EFFECT_FROM = selectedMonthFirstDate;
-    }
+    // if (selectedMonthFirstDate < currentMonthFirstDate) {
+    //   e.component.option('value', currentMonthFirstDate);
+    //   this.employeeFormData.EFFECT_FROM = currentMonthFirstDate;
+    // } else {
+    //   e.component.option('value', selectedMonthFirstDate);
+    //   this.employeeFormData.EFFECT_FROM = selectedMonthFirstDate;
+    // }
   }
 
   sessionDetails() {

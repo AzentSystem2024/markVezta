@@ -99,6 +99,7 @@ export class PaySlipComponent {
     const payload = {
       Month: this.payloadDate || `${monthToUse}-01T00:00:00.000Z`,
       EmployeeIDs: this.selectedEmployee,
+      COMPANY_ID : this.selected_Company_id
     };
 
     this.dataService.getPaySlip(payload).subscribe((response: any) => {
@@ -138,7 +139,7 @@ export class PaySlipComponent {
         // --- Earnings and Deductions Table ---
         const earnings = emp.SalaryHeads.filter((h: any) => h.HEAD_TYPE === 1);
         const deductions = emp.SalaryHeads.filter(
-          (h: any) => h.HEAD_TYPE === 2,
+          (h: any) => h.HEAD_TYPE === 3,
         );
         const totalEarnings = earnings.reduce(
           (sum:any, e:any) => sum + e.HEAD_AMOUNT,

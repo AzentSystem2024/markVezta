@@ -92,10 +92,10 @@ export class CustomerFormComponent {
     WAREHOUSE_ID: 0,
     CUST_TYPE: 0,
     DEALER_TYPE: 0,
-    DEALER_ID: 0,
-    DeliveryAddresses: [],
+    DEALER_ID: null,
+    DeliveryAddresses: [] as any[],
   };
-  // selected_Company_id: any;
+
   selected_fin_id: any;
   sessionData: any;
   selected_vat_id: any;
@@ -110,7 +110,7 @@ export class CustomerFormComponent {
     { text: 'Sub-Dealer', value: 2 },
     { text: 'CompanyBranch', value: 3 },
   ];
-  isDealerVisible: boolean;
+  isDealerVisible: boolean = false;
   deliveryAddress1: any;
   deliveryAddress2: any;
   deliveryAddress3: any;
@@ -120,8 +120,8 @@ export class CustomerFormComponent {
   mobile_limit: any;
   MobilecountryCode: any;
   countryCodeDeliveryaddress: any;
-  Phone_limit: number;
-  mobile_limit_Delivery_Address: number;
+  Phone_limit: number | undefined;
+  mobile_limit_Delivery_Address: number | undefined;
 
   constructor(
     private service: DataService,
@@ -192,12 +192,16 @@ export class CustomerFormComponent {
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
@@ -342,7 +346,7 @@ export class CustomerFormComponent {
     this.phoneValue = '';
     this.savedAddresses = [];
     if (this.formCustomerData) {
-      this.formCustomerData.DEALER_ID = 0;
+      this.formCustomerData.DEALER_ID = null;
       this.formCustomerData.CUST_TYPE = 0;
 
       this.formCustomerData.DEALER_TYPE = 0;

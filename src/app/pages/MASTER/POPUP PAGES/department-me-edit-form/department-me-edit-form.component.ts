@@ -28,11 +28,13 @@ import { DataService } from 'src/app/services';
   templateUrl: './department-me-edit-form.component.html',
   styleUrls: ['./department-me-edit-form.component.scss'],
 })
-export class DepartmentMeEditFormComponent  implements OnChanges{
+export class DepartmentMeEditFormComponent implements OnChanges {
   @ViewChild('departmentValidationGroup', { static: false })
   validationGroup!: DxValidationGroupComponent;
+
   @Output() formClosed = new EventEmitter<void>();
   @Input() selectedDepartment: any;
+
   COMPANY_ID: any;
   COMPANY_NAME: any;
   sessionData: any;
@@ -47,6 +49,7 @@ export class DepartmentMeEditFormComponent  implements OnChanges{
     COMPANY_NAME: '',
     COST_BUCKET_ID: '',
   };
+
   editDepartment = this.formDepartmentData;
   department: any = [];
 
@@ -54,6 +57,7 @@ export class DepartmentMeEditFormComponent  implements OnChanges{
     this.sesstion_Details();
     this.getCostBucket_DropDown();
   }
+
   getNewDepartmentData = () => ({ ...this.editDepartment });
 
   showDepartment() {
@@ -97,27 +101,26 @@ export class DepartmentMeEditFormComponent  implements OnChanges{
     }
 
     this.showDepartment();
+
     const payload = {
       ID: this.formDepartmentData.ID,
       CODE: this.formDepartmentData.CODE,
       DEPT_NAME: this.formDepartmentData.DEPT_NAME,
       COMPANY_ID: this.COMPANY_ID,
-      COMPANY_NAME: this.COMPANY_NAME,
       COST_BUCKET_ID: this.formDepartmentData.COST_BUCKET_ID,
     };
 
-    // Exclude the current record (by ID) from duplicate check
+    const code = payload.CODE?.toLowerCase().trim();
+    const name = payload.DEPT_NAME?.toLowerCase().trim();
+
     const isCodeDuplicate = this.department.some(
       (item: any) =>
-        item.ID !== payload.ID &&
-        item.CODE?.toLowerCase().trim() === payload.CODE?.toLowerCase().trim(),
+        item.ID !== payload.ID && item.CODE?.toLowerCase().trim() === code,
     );
 
     const isDescriptionDuplicate = this.department.some(
       (item: any) =>
-        item.ID !== payload.ID &&
-        item.DEPT_NAME?.toLowerCase().trim() ===
-          payload.DEPT_NAME?.toLowerCase().trim(),
+        item.ID !== payload.ID && item.DEPT_NAME?.toLowerCase().trim() === name,
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -130,7 +133,9 @@ export class DepartmentMeEditFormComponent  implements OnChanges{
         'error',
       );
       return;
-    } else if (isCodeDuplicate) {
+    }
+
+    if (isCodeDuplicate) {
       notify(
         {
           message: 'This Code already exists',
@@ -140,7 +145,9 @@ export class DepartmentMeEditFormComponent  implements OnChanges{
         'error',
       );
       return;
-    } else if (isDescriptionDuplicate) {
+    }
+
+    if (isDescriptionDuplicate) {
       notify(
         {
           message: 'This Description already exists',
@@ -152,23 +159,59 @@ export class DepartmentMeEditFormComponent  implements OnChanges{
       return;
     }
 
-    // Update API call
-    this.dataservice.UpdateDepartment(payload).subscribe((res) => {
-      this.formClosed.emit();
-      // this.isEditDepartmentPopupOpened = false;
-      notify(
-        {
-          message: 'Department Updated successfully',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
+    // API Call with response check
+    this.dataservice
+      .Update_Department_Me_Api(
+        payload.ID,
+        payload.CODE,
+        payload.DEPT_NAME,
+        payload.COMPANY_ID,
+        payload.COST_BUCKET_ID,
+      )
+      .subscribe(
+        (res: any) => {
+          if (res?.flag === '1') {
+            // Success case
+            this.formClosed.emit();
+
+            notify(
+              {
+                message: 'Department Updated successfully',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 1000,
+              },
+              'success',
+            );
+          } else {
+            // Failure case
+            notify(
+              {
+                message: res?.message || 'Update failed',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 1000,
+              },
+              'error',
+            );
+          }
         },
-        'success',
+        (error) => {
+          // API error handling
+          notify(
+            {
+              message: 'Something went wrong while updating',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 1000,
+            },
+            'error',
+          );
+        },
       );
-    });
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
   }

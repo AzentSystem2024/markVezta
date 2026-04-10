@@ -81,7 +81,7 @@ export class CustomerFinFormComponent {
     MOBILE_NO: '',
     FAX_NO: '',
     CREDIT_LIMIT: '',
-    CURRENT_CREDIT: '',
+    CURRENT_CREDIT: 0.0,
     PAY_TERM_ID: '',
     NOTES: '',
     PRICE_CLASS_ID: '',
@@ -92,9 +92,9 @@ export class CustomerFinFormComponent {
     WAREHOUSE_ID: 0,
     CUST_TYPE: 0,
     DEALER_TYPE: 0,
-    DEALER_ID: 0,
+    DEALER_ID: null,
     IS_COMPANY_BRANCH: 0,
-    DeliveryAddresses: [],
+    DeliveryAddresses: [] as any[],
   };
   IS_COMPANY_BRANCH_VALUE: boolean = false;
   selected_fin_id: any;
@@ -111,7 +111,7 @@ export class CustomerFinFormComponent {
     { text: 'Sub-Dealer', value: 2 },
     { text: 'CompanyBranch', value: 3 },
   ];
-  isDealerVisible: boolean;
+  isDealerVisible: boolean = false;
   deliveryAddress1: any;
   deliveryAddress2: any;
   deliveryAddress3: any;
@@ -121,8 +121,8 @@ export class CustomerFinFormComponent {
   mobile_limit: any;
   MobilecountryCode: any;
   countryCodeDeliveryaddress: any;
-  Phone_limit: number;
-  mobile_limit_Delivery_Address: number;
+  Phone_limit: number | undefined;
+  mobile_limit_Delivery_Address: number | undefined;
   CountryDropdownDataList: any = [];
 
   constructor(
@@ -189,6 +189,7 @@ export class CustomerFinFormComponent {
   };
 
   showCountry() {
+    console.log('======================================;;;;;;;;;');
     this.service.getCountryDataAPi().subscribe((response) => {
       this.CountryDropdownDataList = response;
       console;
@@ -196,12 +197,16 @@ export class CustomerFinFormComponent {
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
@@ -303,12 +308,37 @@ export class CustomerFinFormComponent {
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
-    const selectedCountry = this.CountryDropdownData.find(
-      (country: any) => country.ID === this.selecte_countyId,
+
+    const selectedCountry = this.CountryDropdownDataList.find(
+      (c: any) => c.ID === event.value,
     );
+
+    if (!selectedCountry) return;
+
+    // 🔥 match by name (IMPORTANT)
+    const matchedCountry = this.countryCodes.find(
+      (c: any) =>
+        c.COUNTRY_NAME?.toLowerCase().trim() ===
+        selectedCountry.DESCRIPTION?.toLowerCase().trim(),
+    );
+
+    if (matchedCountry) {
+      // ✅ bind CODE correctly
+      this.countryCode = matchedCountry.CODE;
+      this.PhonenumberCode = matchedCountry.CODE;
+      this.countryCodeDeliveryaddress = matchedCountry.CODE;
+
+      // ✅ trigger validations
+      this.onCountrycodeChange({ value: matchedCountry.CODE });
+      this.onCountrycodeChangePhoneNocode({ value: matchedCountry.CODE });
+    } else {
+      console.warn(
+        'No matching country code found for:',
+        selectedCountry.DESCRIPTION,
+      );
+    }
   }
 
-  onStateSelectionChanged(event: any) {}
   ngOnInit(): void {
     this.get_Country_Dropdown_List();
     this.getDealerDropDown();
@@ -346,7 +376,7 @@ export class CustomerFinFormComponent {
     this.phoneValue = '';
     this.savedAddresses = [];
     if (this.formCustomerData) {
-      this.formCustomerData.DEALER_ID = 0;
+      this.formCustomerData.DEALER_ID = null;
       this.formCustomerData.CUST_TYPE = 0;
 
       this.formCustomerData.DEALER_TYPE = 0;
@@ -425,7 +455,7 @@ export class CustomerFinFormComponent {
   updateMobileNumber() {}
   countryDisplay(item: any) {
     if (!item) return '';
-    return `${item.CODE}${item.COUNTRY_NAME}`;
+    return `${item.CODE}`;
   }
   onCountrycodeChangeDeliveryAddressmobile(e: any) {
     const payload = {

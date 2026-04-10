@@ -80,6 +80,7 @@ export class EditSupplierPaymentComponent {
   totalPendingAmount: any;
   amountError: string = '';
   showFillAmountPopup: boolean = false;
+  isApprovedForView: boolean = true;
 
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;

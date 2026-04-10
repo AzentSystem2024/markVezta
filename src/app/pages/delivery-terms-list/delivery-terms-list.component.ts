@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import {
   DxDataGridComponent,
@@ -27,9 +27,16 @@ export class DeliveryTermsListComponent {
   showFilterRow = true;
   showHeaderFilter = true;
   isAddDeliveryTermsPopupOpened = false;
+  isFilterRowVisible: boolean = false;
+   readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
   ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Delivery_terms-list');
@@ -37,6 +44,54 @@ export class DeliveryTermsListComponent {
   addDeliveryTerms() {
     this.isAddDeliveryTermsPopupOpened = true;
   }
+
+     searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+   //=================================refresh=============================
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+   refreshGrid() {
+    this.showDeliveryTerms();
+  }
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.addDeliveryTerms());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+
+  toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
 
   showDeliveryTerms() {
     this.dataservice.getDeliveryTermsData().subscribe((response) => {
@@ -50,6 +105,7 @@ export class DeliveryTermsListComponent {
       .postDeliveryTermsData(CODE, DESCRIPTION)
       .subscribe((response) => {
         if (response) {
+          this.isAddDeliveryTermsPopupOpened = false;
           this.showDeliveryTerms();
         }
       });

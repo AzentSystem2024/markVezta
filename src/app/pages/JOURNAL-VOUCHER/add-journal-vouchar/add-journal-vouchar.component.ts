@@ -224,7 +224,7 @@ export class AddJournalVoucharComponent {
 
   getDepartments() {
     const payload = {
-      NAME: 'DEPARTMENTS',
+      NAME: 'DEPT',
       COMPANY_ID: this.selectedCompany,
     };
     this.dataService.getDropdownData(payload).subscribe((res) => {

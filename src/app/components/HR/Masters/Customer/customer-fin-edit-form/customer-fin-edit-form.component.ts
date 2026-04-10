@@ -95,10 +95,10 @@ export class CustomerFinEditFormComponent {
     CUST_VAT_RULE_ID: '',
     VAT_REGNO: '',
     CUST_TYPE: 0,
-    DELIVERY_ADDRESS: [],
+    DELIVERY_ADDRESS: [] as any,
     DEALER_TYPE: 0,
-    DEALER_ID: 0,
-    DeliveryAddresses: [],
+    DEALER_ID: null,
+    DeliveryAddresses: [] as any[],
     IS_COMPANY_BRANCH_VALUE: 0,
   };
 
@@ -116,11 +116,11 @@ export class CustomerFinEditFormComponent {
     { text: 'CompanyBranch', value: 3 },
   ];
 
-  isDealerVisible: boolean;
+  isDealerVisible: boolean = false;
   deliveryAddress1: any;
   deliveryAddress2: any;
   deliveryAddress3: any;
-  isSubDealerPopupVisible: boolean;
+  isSubDealerPopupVisible: boolean = false;
   dealerList: any;
   PhonenumberCode: any;
   mobileNumber: any;
@@ -128,7 +128,7 @@ export class CustomerFinEditFormComponent {
   mobile_limit: any;
   MobilecountryCode: any;
   countryCodeDeliveryaddress: any;
-  Phone_limit: number;
+  Phone_limit: number | undefined;
   mobile_limit_Delivery_Address: number = 0;
   savedAddresses: any[] = [];
 
@@ -170,8 +170,8 @@ export class CustomerFinEditFormComponent {
 
       // Handle DeliveryAddresses (array of detailed addresses)
       if (this.formCustomerData.DeliveryAddresses?.length > 0) {
-        const firstAddress = this.formCustomerData.DeliveryAddresses[0];
-        const deliveyMobile = firstAddress.MOBILE;
+        const firstAddress: any = this.formCustomerData.DeliveryAddresses[0];
+        const deliveyMobile = firstAddress?.MOBILE;
         const [countryCode, number] = deliveyMobile.split('-');
 
         // Fill form input values
@@ -277,12 +277,16 @@ export class CustomerFinEditFormComponent {
 
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
@@ -350,7 +354,6 @@ export class CustomerFinEditFormComponent {
   }
 
   getStateDropDown() {
-    const id = this.selecte_countyId;
     const payload = {
       NAME: 'STATE_NAME',
       COUNTRY_ID: this.selecte_countyId,
@@ -365,24 +368,56 @@ export class CustomerFinEditFormComponent {
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
+
+    // Step 1: Get selected country (from dropdown API)
     const selectedCountry = this.CountryDropdownData.find(
-      (country: any) => country.ID === this.selecte_countyId,
+      (c: any) => c.ID === this.selecte_countyId,
     );
 
-    // If found, set code & name
-    if (selectedCountry) {
-      // this.countryCode = selectedCountry.CODE; // e.g., '+971'
-      this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
+    if (!selectedCountry) {
+      this.countryCode = '';
+      return;
+    }
+
+    const selectedName = selectedCountry.DESCRIPTION?.toLowerCase().trim();
+
+    // Step 2: Match with countryCodes using "contains"
+    const matchedCountry = this.countryCodes.find((c: any) =>
+      c.COUNTRY_NAME?.toLowerCase().includes(selectedName),
+    );
+
+    if (matchedCountry) {
+      this.countryCode = matchedCountry.CODE;
+      this.PhonenumberCode = matchedCountry.CODE;
+      this.DEFAULT_COUNTRY_CODE = matchedCountry.CODE;
     } else {
-      // Fallback if no country found
-      // this.countryCode = '';
+      this.countryCode = '';
       this.DEFAULT_COUNTRY_CODE = '';
-      console.warn(
-        '⚠️ No matching country found for ID:',
-        this.selecte_countyId,
-      );
+      console.warn('⚠️ No matching country code found for:', selectedName);
     }
   }
+
+  // onCountrySelectionChanged(event: any) {
+  //   this.selecte_countyId = event.value;
+  //   this.getStateDropDown();
+  //   const selectedCountry = this.CountryDropdownData.find(
+  //     (country: any) => country.ID === this.selecte_countyId,
+  //   );
+
+  //   // If found, set code & name
+  //   if (selectedCountry) {
+  //     // this.countryCode = selectedCountry.CODE; // e.g., '+971'
+  //     this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
+  //   } else {
+  //     // Fallback if no country found
+  //     // this.countryCode = '';
+  //     this.DEFAULT_COUNTRY_CODE = '';
+  //     console.warn(
+  //       '⚠️ No matching country found for ID:',
+  //       this.selecte_countyId,
+  //     );
+  //   }
+  // }
 
   ngOnInit(): void {
     this.getPaymentTerms();
@@ -498,13 +533,10 @@ export class CustomerFinEditFormComponent {
     // ✅ Remember which card is being edited
     this.editingIndex = i;
   }
-  onDropdownClosed() {}
-  onDropdownOpened() {}
-  updateMobileNumber() {}
 
   countryDisplay(item: any) {
     if (!item) return '';
-    return `${item.CODE}${item.COUNTRY_NAME}`;
+    return `${item.CODE}`;
   }
 
   onCountrycodeChangeDeliveryAddressmobile(e: any) {

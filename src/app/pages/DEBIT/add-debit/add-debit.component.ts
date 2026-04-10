@@ -574,53 +574,80 @@ export class AddDebitComponent {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();
 
-          const grid = this.itemsGridRef?.instance;
-          const visibleRows = grid.getVisibleRows();
-
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
-          );
-
           if (!enterPressedOnce) {
             enterPressedOnce = true;
-
             setTimeout(() => {
-              event.component?.open?.(); // open dropdown
+              if (event.component?.open) {
+                event.component.open(); // open dropdown
+              }
             }, 50);
           } else {
             enterPressedOnce = false;
-
             setTimeout(() => {
-              grid.editCell(rowIndex, 'particulars'); // ✅ correct index
+              this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
             }, 50);
           }
+        }
+      };
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        const selectedLedger = this.ledgerList.find(
+          (item: any) => item.HEAD_CODE === args.value,
+        );
+
+        e.setValue(args.value);
+
+        if (selectedLedger) {
+          //Set ledger name
+          e.component.cellValue(
+            rowIndex,
+            'ledgerName',
+            selectedLedger.HEAD_NAME,
+          );
+
+          //Set HSN from SELECTED INVOICE (NOT SESSION)
+          if (this.selectedInvoiceHSN) {
+            e.component.cellValue(
+              rowIndex,
+              'HSN_CODE',
+              this.selectedInvoiceHSN,
+            );
+          }
+
+          // GST is already applied globally via applyInvoiceGSTToRows()
+          //  DO NOT SET GST HERE
+
+          // Move to next field
+          setTimeout(() => {
+            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+          }, 50);
         }
       };
     }
 
     // ➤ ledgerName: move to particulars on Enter
     if (e.dataField === 'ledgerName') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          event.event.preventDefault();
-          // setTimeout(() => {
-          //   this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-          // }, 50);
-        }
-      };
-
       e.editorOptions.onValueChanged = (args: any) => {
+        const grid = this.itemsGridRef?.instance;
+        const visibleRows = grid.getVisibleRows();
+
+        const rowIndex = visibleRows.findIndex((r) => r?.data === e.row?.data);
+
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_NAME === args.value,
         );
+
         e.setValue(args.value);
+
         if (selectedLedger) {
-          e.component.cellValue(
-            rowIndex,
-            'ledgerCode',
-            selectedLedger.HEAD_CODE,
-          );
+          // ✅ Set ledgerCode
+          grid.cellValue(rowIndex, 'ledgerCode', selectedLedger.HEAD_CODE);
         }
+
+        // 🔥 MOVE TO PARTICULARS (THIS IS THE KEY)
+        setTimeout(() => {
+          grid.editCell(rowIndex, 'particulars');
+        }, 50);
       };
     }
 
@@ -637,6 +664,18 @@ export class AddDebitComponent {
       };
     }
     if (e.dataField === 'Amount') {
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = e.component;
+          const rowIndex = e.row.rowIndex;
+          // Move focus to the "ledgerCode" column in the same row
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
+          });
+        }
+      };
+    }
+    if (e.dataField === 'GST_PERC') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           const grid = this.itemsGridRef?.instance;
@@ -709,22 +748,6 @@ export class AddDebitComponent {
         e.row.data.SGST = 0;
       };
     }
-    // if (e.dataField === 'GST_PERC') {
-    //   const originalOnValueChanged = e.editorOptions.onValueChanged;
-
-    //   e.editorOptions.onValueChanged = (args: any) => {
-    //     // keep existing behavior
-    //     if (originalOnValueChanged) {
-    //       originalOnValueChanged(args);
-    //     }
-
-    //     e.setValue(args.value);
-
-    //     // CLEAR CGST & SGST WHEN IGST IS ENTERED
-    //     e.row.data.CGST = 0;
-    //     e.row.data.SGST = 0;
-    //   };
-    // }
 
     if (e.dataField === 'CGST' || e.dataField === 'SGST') {
       const originalOnValueChanged = e.editorOptions.onValueChanged;
@@ -1075,7 +1098,7 @@ export class AddDebitComponent {
       TRANS_TYPE: 36,
       COMPANY_ID: 0,
       STORE_ID: 0,
-      DOC_NO: null,
+      DOC_NO: this.getDocNo(),
       TRANS_DATE: new Date(),
       TRANS_STATUS: 1,
       SUPP_ID: '',

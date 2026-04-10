@@ -367,9 +367,13 @@ import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order
 import { PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 import { ProfitAndLossBranchModule } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 import { StoresListModule } from './pages/MASTER/stores-list/stores-list.component';
+import { SupplierFinListComponent, SupplierFinListModule} from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
+import { SupplierFinFormComponent, SupplierFinFormModule } from './components/HR/Masters/Supplier/supplier-fin-form/supplier-fin-form.component';
+import { SupplierFinEditComponent, SupplierFinEditModule } from './components/HR/Masters/Supplier/supplier-fin-edit/supplier-fin-edit.component';
+import { PayrollViewReportComponent, PayrollViewReportModule } from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -736,6 +740,10 @@ import { StoresListModule } from './pages/MASTER/stores-list/stores-list.compone
     PrepaymentPostingReportModule,
     SalaryWPSModule,
     ProfitAndLossBranchModule,
+    SupplierFinListModule,
+    SupplierFinFormModule,
+    SupplierFinEditModule,
+    PayrollViewReportModule,
   ],
 
   providers: [

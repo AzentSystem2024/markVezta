@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -30,6 +31,7 @@ import {
   DxTabPanelModule,
   DxTabsModule,
   DxNumberBoxModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -51,6 +53,8 @@ import { DataService } from 'src/app/services';
 export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
   @Output() saveSuccess = new EventEmitter<void>();
   @Input() invoiceFormData: any;
+  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent|undefined;
+
   invoiceHeader: any = {
     id:0,
     invoiceNo: '',
@@ -71,6 +75,7 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
   items: any;
   department: any;
   isApproved: boolean = false;
+  allSubDepartments: any[] = [];
 
   invoiceDetails: any[] = [];
 
@@ -88,6 +93,8 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
   transactionTypes = ['Cash', 'Credit'];
   subDeptMap: any = {};
   branch:any;
+  userID:any;
+  finID:any;
 
   isReadOnly: boolean = false;
 
@@ -98,8 +105,10 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    // this.userID = menuResponse.USER_ID;
-    // this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
+    console.log(menuResponse,"menuResponse");
+
+    this.userID = menuResponse.USER_ID;
+    this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     
     this.getCustomerDropdown();
@@ -120,7 +129,7 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
 
     const data = this.invoiceFormData;
 
-    // 🔥 HEADER
+    //  HEADER
     this.invoiceHeader = {
       id : data.ID,
       invoiceNo: data.INVOICE_NO,
@@ -139,7 +148,7 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
 
     this.isApproved = data.IS_APPROVED;
 
-    // 🔥 DETAILS
+    //  DETAILS
     this.invoiceDetails = (data.DETAILS || []).map((d: any) => ({
       itemCode: d.ITEM_ID,
       itemDescription: d.ITEM_DESCRIPTION,
@@ -153,12 +162,66 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
       patientShare: d.PATIENT_SHARE,
       vatCode: d.VAT_CODE,
       vatPercent: d.VAT_PERC,
+      vatID: d.VAT_CLASS_ID,
       vatAmount: d.VAT_AMOUNT,
       netAmount: d.NET_AMOUNT
     }));
 
-    // 🔥🔥 ADD THIS PART HERE (VERY IMPORTANT)
-    this.subDeptMap = {}; // reset
+
+    setTimeout(() => {
+
+      if (this.isReadOnly) return;
+
+      if (!this.invoiceDetails) {
+        this.invoiceDetails = [];
+      }
+
+      const hasEmptyRow = this.invoiceDetails.some(r =>
+        !r.itemCode &&
+        (!r.quantity || r.quantity === 0) &&
+        (!r.grossAmount || r.grossAmount === 0)
+      );
+
+      let addedNewRow = false;
+
+      //  Add only if no empty row exists
+      if (!hasEmptyRow) {
+        this.invoiceDetails.push({
+          itemCode: null,
+          itemDescription: '',
+          clinician: '',
+          orderingClinician: '',
+          department: null,
+          subDepartment: null,
+          quantity: 0,
+          duration: 0,
+          grossAmount: 0,
+          patientShare: 0,
+          vatCode: null,
+          vatPercent: 0,
+          vatID: null,
+          vatAmount: 0,
+          netAmount: 0
+        });
+
+        addedNewRow = true;
+      }
+
+      //  Focus itemCode of last row
+      setTimeout(() => {
+        const grid = this.itemsGridRef?.instance;
+
+        if (grid) {
+          const lastIndex = this.invoiceDetails.length - 1;
+
+          grid.editCell(lastIndex, 'itemCode');
+        }
+      }, 100);
+
+    }, 0);
+
+    this.subDeptMap = {};
+    this.allSubDepartments = []; // 🔥 ADD THIS
 
     this.invoiceDetails.forEach((row, index) => {
 
@@ -167,6 +230,14 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
         this.getSubDepartment(row.department, (data) => {
 
           this.subDeptMap[index] = data;
+
+          // 🔥 ADD THIS (same as onEditorPreparing)
+          this.allSubDepartments = [
+            ...this.allSubDepartments,
+            ...data.filter(d =>
+              !this.allSubDepartments.some(x => x.ID === d.ID)
+            )
+          ];
 
         });
 
@@ -268,6 +339,32 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
   }
 }
 
+//   updateCalculation(e: any) {
+
+//   const row = e.data;
+
+//   const quantity = Number(row.quantity) || 0;
+//   const duration = Number(row.duration) || 0;
+//   const vatPercent = Number(row.vatPercent) || 0;
+//   const patientShare = Number(row.patientShare) || 0;
+
+//   let gross = Number(row.grossAmount) || 0;
+
+//   // 🔥 If quantity/duration present → calculate gross
+//   // if (quantity && duration) {
+//   //   // gross = quantity * duration;
+//   //   row.grossAmount = gross;
+//   // }
+
+//   // 🔥 VAT
+//   const vatAmount = (gross * vatPercent) / 100;
+//   row.vatAmount = vatAmount;
+
+//   // 🔥 NET
+//   row.netAmount = gross + vatAmount - patientShare;
+// }
+
+
   updateCalculation(e: any) {
 
   const row = e.data;
@@ -276,21 +373,79 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
   const duration = Number(row.duration) || 0;
   const vatPercent = Number(row.vatPercent) || 0;
   const patientShare = Number(row.patientShare) || 0;
+  const gross = Number(row.grossAmount) || 0;
 
-  let gross = Number(row.grossAmount) || 0;
-
-  // 🔥 If quantity/duration present → calculate gross
-  // if (quantity && duration) {
-  //   // gross = quantity * duration;
-  //   row.grossAmount = gross;
-  // }
-
-  // 🔥 VAT
+  //  VAT
   const vatAmount = (gross * vatPercent) / 100;
   row.vatAmount = vatAmount;
 
-  // 🔥 NET
+  //  NET
   row.netAmount = gross + vatAmount - patientShare;
+
+  // ============================
+  //  ADD THIS BLOCK (ROW ADD)
+  // ============================
+
+  const rowIndex = e.component.getRowIndexByKey(e.key);
+
+  const isValid =
+    row.itemCode &&
+    quantity > 0 &&
+    gross > 0;
+
+  if (!isValid) return;
+
+  const isLastRow = rowIndex === this.invoiceDetails.length - 1;
+
+  if (!isLastRow) return;
+
+  //  check next row
+  const nextRow = this.invoiceDetails[rowIndex + 1];
+
+  const hasNextEmptyRow =
+    nextRow &&
+    !nextRow.itemCode &&
+    (!nextRow.quantity || nextRow.quantity === 0) &&
+    (!nextRow.grossAmount || nextRow.grossAmount === 0);
+
+  if (hasNextEmptyRow) return;
+
+  //  ADD ROW
+  this.invoiceDetails = [
+    ...this.invoiceDetails,
+    {
+      itemCode: null,
+      itemDescription: '',
+      clinician: '',
+      orderingClinician: '',
+      department: null,
+      subDepartment: null,
+      quantity: 0,
+      duration: 0,
+      grossAmount: 0,
+      patientShare: 0,
+      vatCode: null,
+      vatPercent: 0,
+      vatID: null,
+      vatAmount: 0,
+      netAmount: 0
+    }
+  ];
+
+  //  REFRESH + FOCUS
+  setTimeout(() => {
+    const grid = this.itemsGridRef?.instance;
+
+    if (grid) {
+      grid.refresh();
+
+      setTimeout(() => {
+        const newIndex = this.invoiceDetails.length - 1;
+        grid.editCell(newIndex, 'itemCode');
+      }, 100);
+    }
+
+  }, 0);
 }
 
   calculateRowWithGrid(e: any) {
@@ -347,13 +502,20 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
       if (res?.data?.length) {
 
         const item = res.data[0];
+        console.log('VAT_CLASS_ID:', item.VAT_CLASS_ID); // 🔥 your value
 
         const rowIndex = e.row.rowIndex;
+
+        const rowData = this.invoiceDetails[rowIndex];
+
+        rowData.vatID = item.VAT_CLASS_ID; 
 
         // FIX HERE
         e.component.cellValue(rowIndex, 'itemDescription', item.ITEM_DESCRIPTION);
         e.component.cellValue(rowIndex, 'vatCode', item.VAT_CODE);
         e.component.cellValue(rowIndex, 'vatPercent', item.VAT_PERC);
+        e.component.cellValue(rowIndex, 'vatID', item.VAT_CLASS_ID);
+        
 
         //  recalc
         this.calculateRowWithGrid(e);
@@ -381,20 +543,27 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
         this.getSubDepartment(deptId, (data) => {
           console.log(data, 'API RESULT');
 
-          // 🔥 store separately (NOT inside row)
+          //  store separately (NOT inside row)
           this.subDeptMap[rowIndex] = data;
 
-          // 🔥 reopen editor
-          setTimeout(() => {
-            e.component.editCell(rowIndex, 'subDepartment');
-          });
+          this.allSubDepartments = [
+            ...this.allSubDepartments,
+            ...data.filter(d => 
+              !this.allSubDepartments.some(x => x.ID === d.ID)
+            )
+          ];
+
+          // reopen editor
+          // setTimeout(() => {
+          //   e.component.editCell(rowIndex, 'subDepartment');
+          // });
         });
 
         if (original) original(args);
       };
     }
 
-    // 🔥 SubDepartment editor
+    //SubDepartment editor
     if (e.dataField === 'subDepartment' && e.parentType === 'dataRow') {
       const rowIndex = e.row.rowIndex;
 
@@ -422,6 +591,7 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
         },
       };
     }
+
   }
 
   getAllSubDepartments() {
@@ -439,6 +609,8 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
 
   const payload = {
     ID: this.invoiceHeader.id || 0, 
+    USER_ID : this.userID,
+    FIN_ID : this.finID,
     INVOICE_NO: this.invoiceHeader.invoiceNo,
     INVOICE_DATE: this.invoiceHeader.date,
     REF_NO: this.invoiceHeader.referenceNo,
@@ -452,7 +624,13 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
     STORE_ID : this.invoiceHeader.storeId,
     IS_APPROVED : this.isApproved,
 
-    DETAILS: this.invoiceDetails.map((row: any) => ({
+    DETAILS: this.invoiceDetails
+    .filter((row: any) =>
+      row.itemCode &&
+      Number(row.quantity) > 0 &&
+      Number(row.grossAmount) > 0
+    )
+    .map((row: any) => ({
       ITEM_ID: row.itemCode,
       CLINICIAN: row.clinician,
       ORDERING_CLINICIAN: row.orderingClinician,
@@ -464,6 +642,7 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
       PATIENT_SHARE: row.patientShare,
       VAT_CODE: row.vatCode,
       VAT_PERC: row.vatPercent,
+      VAT_CLASS_ID: row.vatID,
       VAT_AMOUNT: row.vatAmount,
       NET_AMOUNT: row.netAmount
     }))
@@ -550,27 +729,124 @@ validateForm(): boolean {
 
   for (let i = 0; i < this.invoiceDetails.length; i++) {
 
-    const row = this.invoiceDetails[i];
+  const row = this.invoiceDetails[i];
 
-    if (!row.itemCode) {
-      notify(`Row ${i + 1}: Item is required`, 'warning', 2000);
-      return false;
-    }
+  const isEmptyRow =
+    !row.itemCode &&
+    (!row.quantity || row.quantity === 0) &&
+    (!row.grossAmount || row.grossAmount === 0);
 
-    if (!row.quantity || row.quantity <= 0) {
-      notify(`Row ${i + 1}: Quantity must be > 0`, 'warning', 2000);
-      return false;
-    }
-
-    if (!row.grossAmount || row.grossAmount <= 0) {
-      notify(`Row ${i + 1}: Gross Amount must be > 0`, 'warning', 2000);
-      return false;
-    }
-
+  // skip completely empty row
+  if (isEmptyRow) {
+    continue;
   }
+
+  // validate only filled rows
+  if (!row.itemCode) {
+    notify(`Row ${i + 1}: Item is required`, 'warning', 2000);
+    return false;
+  }
+
+  if (!row.quantity || row.quantity <= 0) {
+    notify(`Row ${i + 1}: Quantity must be > 0`, 'warning', 2000);
+    return false;
+  }
+
+  if (!row.grossAmount || row.grossAmount <= 0) {
+    notify(`Row ${i + 1}: Gross Amount must be > 0`, 'warning', 2000);
+    return false;
+  }
+}
 
   return true;
 }
+
+
+addNewManualRow() {
+
+  if (!this.invoiceDetails) {
+    this.invoiceDetails = [];
+  }
+
+  // ✅ prevent empty row
+  if (this.hasEmptyRow()) {
+    notify(
+      'Please fill the existing empty row before adding a new one.',
+      'warning',
+      2000
+    );
+    return;
+  }
+
+  // ✅ optional SL_NO (if needed)
+  const nextSlNo =
+    this.invoiceDetails.length > 0
+      ? Math.max(...this.invoiceDetails.map((r: any, i: number) => i + 1))
+      : 1;
+
+  const newRow = {
+    itemCode: null,
+    itemDescription: '',
+    clinician: '',
+    orderingClinician: '',
+    department: null,
+    subDepartment: null,
+    quantity: 0,
+    duration: 0,
+    grossAmount: 0,
+    patientShare: 0,
+    vatCode: null,
+    vatPercent: 0,
+    vatID: null,
+    vatAmount: 0,
+    netAmount: 0
+  };
+
+  // 🔥 IMPORTANT CHANGE → add at TOP
+  this.invoiceDetails = [
+  ...this.invoiceDetails,
+  newRow
+];
+
+  // 🔥 focus FIRST ROW (index 0)
+  setTimeout(() => {
+    const grid = this.itemsGridRef?.instance;
+    const lastIndex = this.invoiceDetails.length - 1;
+    grid?.editCell(lastIndex, 'itemCode');
+  }, 100);
+}
+
+private hasEmptyRow(): boolean {
+  return (this.invoiceDetails || []).some((r: any) => {
+
+    const hasItem = !!r.itemCode;
+
+    const hasQuantity = Number(r.quantity) > 0;
+    const hasGross = Number(r.grossAmount) > 0;
+    const hasNet = Number(r.netAmount) > 0;
+
+    // ✅ block if item selected but values not filled
+    return hasItem && (!hasQuantity || !hasGross || !hasNet);
+  });
+}
+
+
+calculateVatAmount = (row: any) => {
+  const gross = Number(row.grossAmount) || 0;
+  const vatPercent = Number(row.vatPercent) || 0;
+
+  return (gross * vatPercent) / 100;
+};
+
+calculateNetAmount = (row: any) => {
+  const gross = Number(row.grossAmount) || 0;
+  const vatPercent = Number(row.vatPercent) || 0;
+  const patientShare = Number(row.patientShare) || 0;
+
+  const vat = (gross * vatPercent) / 100;
+
+  return gross + vat - patientShare;
+};
 
 }
 

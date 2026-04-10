@@ -10,13 +10,27 @@
       [allowColumnReordering]="true"
       [allowColumnResizing]="true"
       (onExporting)="onExporting($event)"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      [height]="'82vh'"
     >
-    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
-    <dxo-filter-row
-    [visible]="showFilterRow"
-  ></dxo-filter-row>
+   <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
 
-  <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
 
 <dxo-export
       [enabled]="true"
@@ -24,54 +38,75 @@
     >
     </dxo-export>
     
-    <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
-        <dxo-popup title="Edit Payment Terms" [showTitle]="true" [width]="450" [height]="300">
-        
-        </dxo-popup>
-        <dxo-form [colCount]="1">
-
-        </dxo-form>
-      </dxo-editing>
-    <dxo-search-panel
+     <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
       [visible]="true"
-      placeholder="Data Search"
-    ></dxo-search-panel>
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+  
+    <dxo-editing
+  mode="popup"
+  [allowUpdating]="true"
+  [allowDeleting]="true"
+  [allowAdding]="true"
+>
+  <dxo-popup
+    title="Edit Payment Terms"
+    [showTitle]="true"
+    [width]="500"
+    [height]="300"
+  ></dxo-popup>
+
+  <dxo-form [colCount]="1">
+    <dxi-item dataField="CODE"></dxi-item>
+    <dxi-item dataField="DESCRIPTION"></dxi-item>
+  </dxo-form>
+</dxo-editing>
+   
     <dxo-toolbar>
-        <dxi-item location="before">
-          <div class="grid-header">Payment Terms</div>
-        </dxi-item>
-    
-    <dxi-item location="after" locateInMenu="auto">
-        <dx-button
-          text="Add"
-          icon="plus"
-          type="default"
-          stylingMode="contained"
-          (onClick)="addPaymentTerms()"
-          
-        ></dx-button>
+       <dxi-item location="before" locateInMenu="never">
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Payment Terms
+        </div>
       </dxi-item>
-      <dxi-item
-            location="after"
-            locateInMenu="auto"
-            showText="inMenu"
-            widget="dxButton"
-            [options]="{
-              text: 'Refresh',
-              icon: 'refresh',
-              stylingMode: 'text'
-            }"
-          ></dxi-item>
-          <dxi-item location="after" locateInMenu="auto">
-            <div class="separator"></div>
-          </dxi-item>
-          <dxi-item name="exportButton"></dxi-item>
-          <dxi-item location="after" locateInMenu="auto">
-            <div class="separator"></div>
-          </dxi-item>
-          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
     
+    <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
+      
+       <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+          <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
+
     </dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code">
       <dxi-validation-rule type="required" message="Code is required">
@@ -99,7 +134,26 @@
         [(visible)]="isAddPaymentTermsPopupOpened"
         (save)="onClickSavePaymentTerms()"
         titleText="New Payment Terms"
+        [showApprove]="false"
+        (onHiding)="handleClose()"
       >
-    <app-payment-terms-form></app-payment-terms-form>
-      </form-popup>
+    <app-payment-terms-form
+    
+    ></app-payment-terms-form>
+      </form-popup> 
+
+      <!-- <form-popup
+        [(visible)]="isEditPaymentTermsPopupOpened"
+        (save)="onClickSavePaymentTerms()"
+        titleText="Edit Payment Terms"
+        [showApprove]="false"
+        (onHiding)="handleClose()"
+      >
+    <app-payment-terms-form
+    *ngIf="isEditPaymentTermsPopupOpened  && selectedPaymentTerms"
+      [EditingResponseData]="selectedPaymentTerms"
+    (popupClosed)="handleClose()"
+    ></app-payment-terms-form>
+      </form-popup>  -->
     </div>
+   
