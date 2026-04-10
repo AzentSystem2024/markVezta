@@ -162,6 +162,10 @@ import { PaymentTermsListComponent } from './pages/payment-terms-list/payment-te
 import { DeliveryTermsListComponent } from './pages/delivery-terms-list/delivery-terms-list.component';
 import { SupplierFinListComponent } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
 import { ImportItemsTemplateComponent } from './pages/MASTER/import-items-template/import-items-template.component';
+import { CurrencyListComponent } from './pages/currency-list/currency-list.component';
+import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
+import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
+import { PromotionComponent } from './pages/promotion/promotion.component';
 
 const routes: Routes = [
   {
@@ -179,8 +183,6 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
-  
-   
 
   {
     path: 'auth',
@@ -273,7 +275,7 @@ const routes: Routes = [
         component: CustomerListComponent,
         canActivate: [AuthGuardService],
       },
-       {
+      {
         path: 'customer--fin-list',
         component: CustomerFinListComponent,
         canActivate: [AuthGuardService],
@@ -1001,7 +1003,7 @@ const routes: Routes = [
         path: 'profit-loss-branch',
         component: ProfitAndLossBranchComponent,
         canActivate: [AuthGuardService],
-      },  
+      },
 
       {
         path: 'misc-sales-invoice',
@@ -1010,20 +1012,45 @@ const routes: Routes = [
       },
       {
         path: 'payment-terms',
-        component:PaymentTermsListComponent,
+        component: PaymentTermsListComponent,
         canActivate: [AuthGuardService],
       },
       {
         path: 'delivery-terms',
-        component:DeliveryTermsListComponent,
+        component: DeliveryTermsListComponent,
         canActivate: [AuthGuardService],
       },
       {
         path: 'supplier-me',
-        component:SupplierFinListComponent,
+        component: SupplierFinListComponent,
         canActivate: [AuthGuardService],
       },
-      
+      {
+        path: 'supplier-me',
+        component: SupplierFinListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'currency',
+        component: CurrencyListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'landed-costing',
+        component: LandedCostListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'tenders',
+        component: TendersListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotions',
+        component: PromotionComponent,
+        canActivate: [AuthGuardService],
+      },
+
       {
         path: '**',
         redirectTo: 'login',

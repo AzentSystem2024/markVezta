@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild, NgZone } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import {
   DxDataGridComponent,
@@ -23,9 +23,9 @@ import { ExportService } from 'src/app/services/export.service';
 })
 export class LandedCostListComponent implements OnInit {
   @ViewChild(LandedCostFormComponent)
-  landedcostComponent: LandedCostFormComponent;
+  landedcostComponent!: LandedCostFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   currencyOptions = [
     { text: 'Local', value: true },
     { text: 'Supplier', value: false },
@@ -41,11 +41,36 @@ export class LandedCostListComponent implements OnInit {
   showFilterRow = true;
   showHeaderFilter = true;
   IS_INACTIVE: boolean = false;
-  
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private ngZone: NgZone,
   ) {}
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+
+    onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.addLandedcost());
+    },
+
+    elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Landed_cost-list');
   }
@@ -66,7 +91,7 @@ export class LandedCostListComponent implements OnInit {
 
   showLandedcost() {
     this.dataservice.getLandedcostData().subscribe((response) => {
-      // this.landedcost = response;
+      this.landedcost = response;
       // console.log(response,"LANDEDCOST");
     });
   }
@@ -103,7 +128,7 @@ export class LandedCostListComponent implements OnInit {
         }
       });
   }
-  onRowUpdating(event) {
+  onRowUpdating(event: any) {
     const updatedData = { ...event.oldData, ...event.newData };
 
     const {
@@ -140,7 +165,7 @@ export class LandedCostListComponent implements OnInit {
         }
       });
   }
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
     const {
       ID,
@@ -193,13 +218,13 @@ export class LandedCostListComponent implements OnInit {
     this.loadDropdownData();
     this.showLandedcost();
   }
-  calculateStatus(rowData) {
+  calculateStatus(rowData: any) {
     return rowData.IS_INACTIVE ? 'Inactive' : 'Active';
   }
-  calculateCurrency(rowData) {
+  calculateCurrency(rowData: any) {
     return rowData.IS_LOCAL_CURRENCY ? 'Local' : 'Supplier';
   }
-  calculateAmount(rowData) {
+  calculateAmount(rowData: any) {
     return rowData.IS_FIXED_AMOUNT ? 'Fixed Amount' : 'Percentage';
   }
 }

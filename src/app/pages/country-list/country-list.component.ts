@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild, NgZone } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
@@ -22,9 +22,9 @@ import { ExportService } from 'src/app/services/export.service';
   styleUrls: ['./country-list.component.scss'],
 })
 export class CountryListComponent implements OnInit {
-  @ViewChild(CountryFormComponent) countryComponent: CountryFormComponent;
+  @ViewChild(CountryFormComponent) countryComponent!: CountryFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -36,7 +36,31 @@ export class CountryListComponent implements OnInit {
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private ngZone: NgZone,
   ) {}
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+
+    onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.addCountry());
+    },
+
+    elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Country-list');
   }
@@ -86,7 +110,7 @@ export class CountryListComponent implements OnInit {
       }
     });
   }
-  onRowUpdating(event) {
+  onRowUpdating(event: any) {
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };

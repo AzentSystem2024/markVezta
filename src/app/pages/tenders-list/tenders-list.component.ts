@@ -20,9 +20,9 @@ import { DxCheckBoxModule } from 'devextreme-angular';
   styleUrls: ['./tenders-list.component.scss'],
 })
 export class TendersListComponent implements OnInit {
-  @ViewChild(TendersFormComponent) tendersComponent: TendersFormComponent;
+  @ViewChild(TendersFormComponent) tendersComponent!: TendersFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   supplier: any;
   tenders: any;
   currencyList: any;

@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild, NgZone } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
@@ -17,9 +17,9 @@ import { ExportService } from 'src/app/services/export.service';
   styleUrls: ['./currency-list.component.scss'],
 })
 export class CurrencyListComponent implements OnInit {
-  @ViewChild(CurrencyFormComponent) currencyComponent: CurrencyFormComponent;
+  @ViewChild(CurrencyFormComponent) currencyComponent!: CurrencyFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   showFilterRow = true;
   currency: any;
   showHeaderFilter = true;
@@ -28,7 +28,32 @@ export class CurrencyListComponent implements OnInit {
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private ngZone: NgZone,
   ) {}
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+
+    onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.addCurrency());
+    },
+
+    elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
 
   addCurrency() {
     this.isAddCurrencyPopupOpened = true;
@@ -80,7 +105,7 @@ export class CurrencyListComponent implements OnInit {
     }
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
     const {
       ID,
@@ -125,7 +150,7 @@ export class CurrencyListComponent implements OnInit {
       });
   }
 
-  onRowUpdating(event) {
+  onRowUpdating(event: any) {
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };
@@ -172,7 +197,7 @@ export class CurrencyListComponent implements OnInit {
     event.cancel = true; // Prevent the default update operation
   }
 
-  validateFractionUnit(params): boolean {
+  validateFractionUnit(params: any): boolean {
     const value = params.value;
 
     // Regular expression to check if value consists only of digits

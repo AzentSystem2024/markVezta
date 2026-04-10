@@ -47,7 +47,7 @@
             [editorOptions]="{
               items: currencyOptions,
               value: isLocalCurrency,
-              layout: 'horizontal'
+              layout: 'horizontal',
             }"
           >
             <dxo-label [visible]="false"></dxo-label>
@@ -61,7 +61,7 @@
             [editorOptions]="{
               items: amountOptions,
               value: isFixedAmount,
-              layout: 'horizontal'
+              layout: 'horizontal',
             }"
           ></dxi-item>
           <dxi-item dataField="VALUE" [colSpan]="1"></dxi-item>
@@ -77,15 +77,8 @@
         <div class="grid-header">Landed Cost</div>
       </dxi-item>
 
-      <dxi-item location="after" locateInMenu="auto">
-        <dx-button
-          text="Add"
-          icon="plus"
-          type="default"
-          stylingMode="contained"
-          (onClick)="addLandedcost()"
-        ></dx-button>
-      </dxi-item>
+      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+
       <dxi-item
         location="after"
         locateInMenu="auto"
@@ -94,7 +87,7 @@
         [options]="{
           text: 'Refresh',
           icon: 'refresh',
-          stylingMode: 'text'
+          stylingMode: 'text',
         }"
       ></dxi-item>
       <dxi-item location="after" locateInMenu="auto">
@@ -104,7 +97,11 @@
       <dxi-item location="after" locateInMenu="auto">
         <div class="separator"></div>
       </dxi-item>
-      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
     </dxo-toolbar>
 
     <dxi-column dataField="CODE" caption="Code" [visible]="false"> </dxi-column>
