@@ -165,6 +165,13 @@ import { ImportItemsTemplateComponent } from './pages/MASTER/import-items-templa
 import { PromotionLogComponent } from './pages/promotion-log/promotion-log.component';
 import { PromotionComponent } from './pages/promotion/promotion.component';
 import { PromotionSchemaLogComponent } from './pages/promotion-schema-log/promotion-schema-log.component';
+// import { CurrencyListComponent } from './pages/currency-list/currency-list.component';
+import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
+import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
+import { CurrencyListComponent } from './pages/currency-list/currency-list.component';
+// import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
+// import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
+// import { PromotionComponent } from './pages/promotion/promotion.component';
 
 const routes: Routes = [
   {
@@ -1039,6 +1046,34 @@ const routes: Routes = [
         component: PromotionSchemaLogComponent,
         canActivate: [AuthGuardService],
       },
+      //   canActivate: [AuthGuardService],
+      // },
+      {
+        path: 'supplier-me',
+        component: SupplierFinListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'currency',
+        component: CurrencyListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'landed-costing',
+        component: LandedCostListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'tenders',
+        component: TendersListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotions',
+        component: PromotionComponent,
+        canActivate: [AuthGuardService],
+      },
+
       {
         path: '**',
         redirectTo: 'login',

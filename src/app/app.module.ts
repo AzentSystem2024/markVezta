@@ -379,6 +379,10 @@ import {
   SupplierFinEditComponent,
   SupplierFinEditModule,
 } from './components/HR/Masters/Supplier/supplier-fin-edit/supplier-fin-edit.component';
+import {
+  PayrollViewReportComponent,
+  PayrollViewReportModule,
+} from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -751,7 +755,7 @@ import {
     SupplierFinListModule,
     SupplierFinFormModule,
     SupplierFinEditModule,
-    
+    PayrollViewReportModule,
   ],
 
   providers: [

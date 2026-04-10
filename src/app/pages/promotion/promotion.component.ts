@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -47,7 +48,7 @@ import { DataService } from 'src/app/services';
 })
 export class PromotionComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   itemsList: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -99,10 +100,10 @@ export class PromotionComponent {
     { value: 2, text: 'Price Level 2' },
     { value: 3, text: 'Price Level 3' },
   ];
-  selectedPriceLevel: string;
+  selectedPriceLevel: any;
   operationValue: string = '+';
   selectedSchema: any;
-  roundingValue: string;
+  roundingValue: any;
   // onSaleStatus: boolean = false;
   onSaleStatus: boolean | null = null;
   schemaLevelPromotion: boolean | null = null;
@@ -115,7 +116,7 @@ export class PromotionComponent {
     { label: 'Set Promotion Price To', value: 'defaultPrice' },
   ];
   promotionSchema: any;
-  tagTemplate = (data) => {
+  tagTemplate = (data: any) => {
     return `
       <div style="margin-right: 2px; display: inline-block; white-space: nowrap;">
         ${data.text}
@@ -178,7 +179,31 @@ export class PromotionComponent {
   constructor(
     private dataservice: DataService,
     private router: Router,
+    private ngZone: NgZone,
   ) {}
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+
+    onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.onAddClick());
+    },
+
+    elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
 
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');

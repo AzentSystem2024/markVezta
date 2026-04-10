@@ -132,6 +132,25 @@
           </dxi-item>
         </div>
 
+         <dxi-item>
+      <dx-tag-box
+  label="Store"
+  labelMode="floating"
+  displayExpr="DESCRIPTION"
+  valueExpr="ID"
+  [items]="Store"
+  [searchEnabled]="true"
+  [(value)]="selectedStoreid"
+  [showSelectionControls]="true"
+  [maxDisplayedTags]="100"
+  [showMultiTagOnly]="true"
+  [multiline]="false"
+  [hint]="storeHint"
+  [width]="200"
+  (onValueChanged)="updateStoreHint()"
+></dx-tag-box>
+    </dxi-item>
+
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -203,6 +222,8 @@
       <dxi-column dataField="VoucherNo" caption="Voucher No"></dxi-column>
       <dxi-column dataField="Particulars" caption="Particulars"></dxi-column>
       <dxi-column dataField="Remarks" caption="Remarks"></dxi-column>
+      <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column
         dataField="DebitAmount"
         caption="Debit Amount"
@@ -583,4 +604,35 @@
       (popupClosed)="handleClose()"
     ></app-sale-return-form>
   </ng-container>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isMiscViewInvoice"
+  [(visible)]="isMiscViewInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="View Misc Sales Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isMiscViewInvoice">
+    <app-misc-sales-invoice-form
+      [invoiceFormData]="selectedInvoice"
+      (popupClosed)="handleClose()"
+    ></app-misc-sales-invoice-form>
+  </ng-container>
+</dx-popup>
+
+
+<dx-popup
+  [(visible)]="viewPayrollPopupOpened"
+  [width]="'75vw'"
+  [height]="'90vh'"
+  title="Payroll"
+  (onHiding)="handleClose()"
+>
+  <app-payroll-view-report
+    *ngIf="viewPayrollPopupOpened"
+    [payroll]="selectedPayroll"
+    (popupClosed)="handleClose()"
+  ></app-payroll-view-report>
 </dx-popup>
