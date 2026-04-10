@@ -302,15 +302,17 @@ export class PromotionComponent {
   }
 
   schemaOptions() {
-    this.dataservice.getDropdownData('PROMOTIONSCHEMA').subscribe((data) => {
-      this.promotionSchema = data;
-      // console.log(data, 'schemadropdown');
-    });
+    this.dataservice
+      .getDropdownData('PROMOTIONSCHEMA_TYPE')
+      .subscribe((data) => {
+        this.promotionSchema = data;
+        // console.log(data, 'schemadropdown');
+      });
   }
 
   onSchemaChanged(event: any) {
     const selectedSchema = this.promotionSchema.find(
-      (schema) => schema.ID == event.value, // Use event.value to get the selected ID
+      (schema: any) => schema.ID == event.value, // Use event.value to get the selected ID
     );
     // console.log(selectedSchema.REMARKS,"SELECTEDSCHEMA")
     if (selectedSchema) {

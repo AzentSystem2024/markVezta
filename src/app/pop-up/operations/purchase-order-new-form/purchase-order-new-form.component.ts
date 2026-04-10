@@ -1340,6 +1340,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       case '+86': // China
         requiredLength = 11;
         break;
+      case '+965': // Kuwait
+        requiredLength = 8;
+        break;
 
       default:
         requiredLength = 10;

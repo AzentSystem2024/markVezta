@@ -88,7 +88,7 @@ export class PromotionSchemaLogComponent {
   tableData$: Observable<any[]>;
   selectedSchemaCondition: string = 'multiple';
   currentSchemaValue: string;
-  // selectedValueInEdit: string = 'regular'; 
+  // selectedValueInEdit: string = 'regular';
   isSchemaOnQuantityMultiple: boolean;
   // selectedRadioValue: any = 'multiple';
   schemaCondition: string;
@@ -99,15 +99,16 @@ export class PromotionSchemaLogComponent {
 
   constructor(
     private dataservice: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
-    this.dataservice.getDropdownData('PROMOTIONSCHEMA_TYPE').subscribe((data) => {
+    const payload = {
+      name: 'PROMOTIONSCHEMA_TYPE',
+    };
+    this.dataservice.getDropdownData(payload).subscribe((data) => {
       this.promotionSchema = data;
       console.log(this.promotionSchema, 'dropdown');
     });
   }
-
-
 
   ngOnInit() {
     this.getLogList();
@@ -115,9 +116,10 @@ export class PromotionSchemaLogComponent {
   }
 
   setSchemaType() {
-    this.selectedSchemaType = this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE ? 'multiple' : 'regular';
+    this.selectedSchemaType = this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE
+      ? 'multiple'
+      : 'regular';
   }
-
 
   adjustPopupSize() {
     if (this.selectedPromotionSchema === 3) {
@@ -139,7 +141,7 @@ export class PromotionSchemaLogComponent {
     this.buyAndGetDisabled =
       this.selectedPromotionSchema === this.promotionSchema[2]?.ID;
     const selectedSchema = this.promotionSchema.find(
-      (schema) => schema.ID === this.selectedPromotionSchema
+      (schema) => schema.ID === this.selectedPromotionSchema,
     );
     if (this.selectedPromotionSchema === 3) {
       this.tableData = [];
@@ -160,7 +162,6 @@ export class PromotionSchemaLogComponent {
       console.log(this.logList, 'Sorted LOGLIST');
     });
   }
-  
 
   openEditingStart(event: any) {
     const id = event.data.ID;
@@ -169,10 +170,9 @@ export class PromotionSchemaLogComponent {
       this.dataservice.selectPromotionSchema(id).subscribe(
         (response: any) => {
           if (response) {
-
             this.promotionData = response; // Store the fetched data
             this.tableData = response.promotionschema_entry;
-            console.log(this.promotionData,"PROMOTION")
+            console.log(this.promotionData, 'PROMOTION');
             this.setSchemaType();
             setTimeout(() => {
               this.cdr.detectChanges();
@@ -186,13 +186,13 @@ export class PromotionSchemaLogComponent {
         },
         (error) => {
           console.error('API Error:', error);
-        }
+        },
       );
     }
   }
 
   onSchemaTypeChange(event: any) {
-    console.log(event.value, "inevent");
+    console.log(event.value, 'inevent');
     if (event.value === 'multiple') {
       this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = true;
       this.promotionData.SCHEMA_ON_REGULAR_PRICE = false;
@@ -201,8 +201,6 @@ export class PromotionSchemaLogComponent {
       this.promotionData.SCHEMA_ON_REGULAR_PRICE = true;
     }
   }
-
-  
 
   handleSchemaConditionChange(event: any) {
     const selectedValue = event.value.value; // Get the selected value
@@ -217,7 +215,7 @@ export class PromotionSchemaLogComponent {
       this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = true;
       console.log(
         this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE,
-        'PROMOTIONDATA'
+        'PROMOTIONDATA',
       );
       this.promotionData.SCHEMA_ON_REGULAR_PRICE = false; // Ensure the other is set to false
     } else if (selectedValue === 'more') {
@@ -226,8 +224,6 @@ export class PromotionSchemaLogComponent {
     }
     console.log('Schema condition changed:', this.promotionData);
   }
-
-
 
   onAddClick() {
     this.id = null;
@@ -243,24 +239,29 @@ export class PromotionSchemaLogComponent {
     this.tableData = [...this.tableData];
     this.dataGrid.instance.refresh(); // Refresh the grid to reflect changes
   }
-  
 
   savePromotionShema() {
-    console.log(this.promotionData,"PROMOTIONDATA")
-    console.log(this.DISC_PERCENT,"DISCOUNTTTT")
-    const isDuplicate = this.logList.some((row) => row.DESCRIPTION === this.promotionData.DESCRIPTION);
-  
+    console.log(this.promotionData, 'PROMOTIONDATA');
+    console.log(this.DISC_PERCENT, 'DISCOUNTTTT');
+    const isDuplicate = this.logList.some(
+      (row) => row.DESCRIPTION === this.promotionData.DESCRIPTION,
+    );
+
     if (isDuplicate) {
-      notify({
-        message: "This promotion name already exists. Please use a different name.",
-        position: { at: 'top right', my: 'top right' },
-      }, 'error');
+      notify(
+        {
+          message:
+            'This promotion name already exists. Please use a different name.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+      );
       return; // Exit the function if there's a duplicate
     }
     const payload = {
       DESCRIPTION: this.promotionData.DESCRIPTION, // Use promotionData
       QTY_BUY: this.promotionData.QTY_BUY ?? 1.0,
-      QTY_GET: this.promotionData.QTY_GET ,
+      QTY_GET: this.promotionData.QTY_GET,
       DISC_PERCENT: this.DISC_PERCENT,
       IS_INACTIVE: this.promotionData.IS_INACTIVE || false,
       SCHEMA_TYPE_ID: this.promotionData.SCHEMA_TYPE_ID || 1, // Use promotionData
@@ -278,35 +279,35 @@ export class PromotionSchemaLogComponent {
     };
     this.dataservice.savePromotionSchema(payload).subscribe((response: any) => {
       if (response) {
-        try{
-          notify({
-            message:"Promtion Schema added successfully",
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success'
-        )
-        this.dataGrid.instance.refresh();
-        this.isPopupVisible = false;
-        this.getLogList();
-        }
-        catch(error){
-          notify({
-            message : "Add operation failed",
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error'
-        )
+        try {
+          notify(
+            {
+              message: 'Promtion Schema added successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+          this.dataGrid.instance.refresh();
+          this.isPopupVisible = false;
+          this.getLogList();
+        } catch (error) {
+          notify(
+            {
+              message: 'Add operation failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
         }
       }
     });
   }
 
-handleSchemaConditionChangeinEdit(event: any) {
-  this.schemaCondition = event.value;
-  // Map back to boolean
-  this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = event.value === 'multiple';
-}
-
+  handleSchemaConditionChangeinEdit(event: any) {
+    this.schemaCondition = event.value;
+    // Map back to boolean
+    this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = event.value === 'multiple';
+  }
 
   openDetailsPopup() {
     this.detailsPopup = true;
@@ -314,16 +315,23 @@ handleSchemaConditionChangeinEdit(event: any) {
   }
 
   updatePromotionSchema() {
-    const isDuplicate = this.logList.some((row) => row.DESCRIPTION === this.promotionData.DESCRIPTION &&
-    row.ID !== this.promotionData.ID); // Exclude the current promotion being edited
+    const isDuplicate = this.logList.some(
+      (row: any) =>
+        row.DESCRIPTION === this.promotionData.DESCRIPTION &&
+        row.ID !== this.promotionData.ID,
+    ); // Exclude the current promotion being edited
 
-  if (isDuplicate) {
-    notify({
-      message: "This promotion name already exists. Please use a different name.",
-      position: { at: 'top right', my: 'top right' },
-    }, 'error');
-    return; // Exit the function if there's a duplicate
-  }
+    if (isDuplicate) {
+      notify(
+        {
+          message:
+            'This promotion name already exists. Please use a different name.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+      );
+      return; // Exit the function if there's a duplicate
+    }
     const payload = {
       ID: this.promotionData.ID,
       DESCRIPTION: this.promotionData.DESCRIPTION,
@@ -341,24 +349,25 @@ handleSchemaConditionChangeinEdit(event: any) {
     this.dataservice.updatePromotionSchema(payload).subscribe(
       (response: any) => {
         if (response) {
-          try{
-            notify({
-              message:"Promtion Schema updated successfully",
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success'
-          )
-          this.dataGrid.instance.refresh();
-          this.isEditPopupVisible = false;
-          this.getLogList();
-          }
-          catch(error){
-            notify({
-              message : "Edit operation failed",
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error'
-          )
+          try {
+            notify(
+              {
+                message: 'Promtion Schema updated successfully',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+            );
+            this.dataGrid.instance.refresh();
+            this.isEditPopupVisible = false;
+            this.getLogList();
+          } catch (error) {
+            notify(
+              {
+                message: 'Edit operation failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
           }
         } else {
           console.error('Update Failed:', response.message);
@@ -366,27 +375,28 @@ handleSchemaConditionChangeinEdit(event: any) {
       },
       (error) => {
         console.error('API Error:', error);
-      }
+      },
     );
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data; // Get the data of the selected row
     const id = selectedRow.ID;
-  
+
     // Cancel the row removal until the delete operation is confirmed
     event.cancel = true;
-  
+
     this.dataservice.deletePromotion(id).subscribe(
       (response: any) => {
-        if (response.flag === "0") {
+        if (response.flag === '0') {
           // Promotion is in use, show a notification and prevent deletion
           notify(
             {
-              message: response.message || 'Cannot delete.. Promotion is in use..',
+              message:
+                response.message || 'Cannot delete.. Promotion is in use..',
               position: { at: 'top center', my: 'top center' },
             },
-            'error'
+            'error',
           );
         } else {
           // Successful deletion
@@ -395,9 +405,9 @@ handleSchemaConditionChangeinEdit(event: any) {
               message: 'Promotion Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
-  
+
           // If the deletion is successful, refresh the data grid
           this.dataGrid.instance.refresh();
         }
@@ -410,17 +420,15 @@ handleSchemaConditionChangeinEdit(event: any) {
             message: 'Delete Operation Failed',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
-      }
+      },
     );
   }
-  
-  
 
   onSaved(event: any) {
     // Loop through the changes to find added rows
-    event.changes.forEach((change) => {
+    event.changes.forEach((change: any) => {
       if (change.type === 'insert') {
         // Append each new row to the end of `tableData`
         this.tableData = [...this.tableData, change.data];
@@ -446,7 +454,7 @@ handleSchemaConditionChangeinEdit(event: any) {
       event.preventDefault();
     }
   }
-  
+
   onPercentageChange(event: any) {
     let value = event.value;
 
@@ -468,7 +476,6 @@ handleSchemaConditionChangeinEdit(event: any) {
   getFormattedPercentage(): string {
     return `${this.promotionData.DISC_PERCENT}%`;
   }
-  
 
   onSelectionChanged(event) {}
   onCellPrepared(event) {}
@@ -502,7 +509,7 @@ handleSchemaConditionChangeinEdit(event: any) {
     DxTagBoxModule,
     DxNumberBoxModule,
     DxValidationGroupModule,
-    DxValidatorModule
+    DxValidatorModule,
   ],
   providers: [],
   exports: [PromotionSchemaLogComponent],

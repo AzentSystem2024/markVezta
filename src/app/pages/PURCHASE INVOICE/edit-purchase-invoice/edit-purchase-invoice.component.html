@@ -25,11 +25,21 @@
         style="
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
+          align-items: center;
           gap: 10px;
         "
       >
+        <!-- Left side -->
         <div style="display: flex; gap: 4px">
+          <dx-text-box
+            label="Reference No."
+            labelMode="floating"
+            [(value)]="purchaseInvoiceFormData.DOC_NO"
+            [width]="200"
+            [readOnly]="readOnly"
+          >
+          </dx-text-box>
+
           <dx-date-box
             label="Date"
             type="date"
@@ -40,27 +50,34 @@
             [displayFormat]="'dd-MM-yyyy'"
           >
           </dx-date-box>
-
-          <dx-text-box
-            label="Reference No."
-            labelMode="floating"
-            [(value)]="purchaseInvoiceFormData.DOC_NO"
-            [width]="200"
-            [readOnly]="readOnly"
-          >
-          </dx-text-box>
         </div>
 
-        <dx-date-box
-          label="Transaction Date"
-          type="date"
-          [(value)]="purchaseInvoiceFormData.PURCH_DATE"
-          labelMode="floating"
-          [width]="200"
-          [displayFormat]="'dd-MM-yyyy'"
-          [readOnly]="true"
-        >
-        </dx-date-box>
+        <!-- Right side (Supplier + Button) -->
+        <div style="display: flex; gap: 8px; align-items: center">
+          <dx-select-box
+            [dataSource]="distributorList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="purchaseInvoiceFormData.SUPP_ID"
+            [width]="300"
+            label="Supplier"
+            labelMode="floating"
+            (onValueChanged)="onSupplierChanged($event)"
+            [readOnly]="readOnly"
+          >
+          </dx-select-box>
+
+          <dx-button
+            text="Fill Pending GRN"
+            icon="event"
+            [width]="200"
+            stylingMode="outlined"
+            class="blue-outline-btn"
+            (onClick)="openPendingGrnPopup()"
+            [disabled]="readOnly || !purchaseInvoiceFormData.SUPP_ID"
+          >
+          </dx-button>
+        </div>
       </div>
 
       <!-- Row 2: Supplier + Narration on left, Fill Pending GRN button on right -->
@@ -71,50 +88,7 @@
           align-items: flex-start;
           gap: 10px;
         "
-      >
-        <div style="display: flex; gap: 4px">
-          <dx-select-box
-            [dataSource]="distributorList"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="purchaseInvoiceFormData.SUPP_ID"
-            [width]="405"
-            label="Supplier"
-            labelMode="floating"
-            (onValueChanged)="onSupplierChanged($event)"
-            [readOnly]="readOnly"
-          >
-          </dx-select-box>
-
-          <dx-text-box
-            label="Narration"
-            labelMode="floating"
-            [(value)]="purchaseInvoiceFormData.NARRATION"
-            [width]="400"
-            [readOnly]="readOnly"
-          >
-          </dx-text-box>
-        </div>
-
-        <div
-          style="
-            display: flex;
-            gap: 2px;
-            justify-content: flex-end;
-            margin-top: 8px;
-          "
-        >
-          <dx-button
-            text="Fill Pending GRN"
-            icon="event"
-            [width]="200"
-            stylingMode="outlined"
-            class="blue-outline-btn"
-            (onClick)="openPendingGrnPopup()"
-            [disabled]="readOnly"
-          ></dx-button>
-        </div>
-      </div>
+      ></div>
     </div>
 
     <div class="salary-grid-wrapper" style="padding: 0 20px">
@@ -133,7 +107,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'50vh'"
+          [height]="'55vh'"
           [width]="'auto'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
@@ -318,6 +292,14 @@
               [readOnly]="readOnly"
               [width]="200"
             ></dx-text-box>
+            <dx-text-box
+              label="Narration"
+              labelMode="floating"
+              [(value)]="purchaseInvoiceFormData.NARRATION"
+              [width]="400"
+              [readOnly]="readOnly"
+            >
+            </dx-text-box>
           </div>
 
           <div

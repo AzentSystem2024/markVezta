@@ -428,7 +428,7 @@ export class SupplierListComponent implements OnInit {
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
       .find((menu: any) => menu.Path === '/supplier');
-
+    console.log(packingRights, 'SUPPLIERPACKINGRIGHTSSSSSSSSSSSSSSSSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;

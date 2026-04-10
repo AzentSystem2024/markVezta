@@ -3529,49 +3529,49 @@ The result can be exported to HTML or Markdown.`;
 
   PromotionLogList(): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/worksheetitemproperty/Promotionlist`,
+      `${this.apiUrl}worksheetitemproperty/Promotionlist`,
       {},
     );
   }
 
   savePromotion(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/worksheetitemproperty/insertpromotion`,
+      `${this.apiUrl}worksheetitemproperty/insertpromotion`,
       payload,
     );
   }
 
   selectPromotionWorksheet(id: number): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/worksheetitemproperty/selectpromotion/${id}`,
+      `${this.apiUrl}worksheetitemproperty/selectpromotion/${id}`,
       {},
     );
   }
 
   updatePromotion(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/worksheetitemproperty/updatepromotion`,
+      `${this.apiUrl}worksheetitemproperty/updatepromotion`,
       payload,
     );
   }
 
   verifyPromotion(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/worksheetitemproperty/Verifypromotion`,
+      `${this.apiUrl}worksheetitemproperty/Verifypromotion`,
       payload,
     );
   }
 
   approvePromotion(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/worksheetitemproperty/approvepromotion`,
+      `${this.apiUrl}worksheetitemproperty/approvepromotion`,
       payload,
     );
   }
 
   delete(id: number): Observable<any> {
     return this.http.post(
-      `${this.apiUrl}/worksheetitemproperty/deletepromotion/${id}`,
+      `${this.apiUrl}worksheetitemproperty/deletepromotion/${id}`,
       {},
     );
   }

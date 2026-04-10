@@ -519,6 +519,7 @@ export class QuotationFormComponent {
   }
 
   getSalesmanDropdown() {
+    console.log('salesmannnnnnnnnnnnnnnnnnnnnnnnnnnnnn');
     const payload = {
       COMPANY_ID: this.companyID,
       NAME: 'SALESMAN',
@@ -851,15 +852,15 @@ export class QuotationFormComponent {
   saveQuotation() {
     // 1. Validation
     if (!this.quotationFormData.CUST_ID) {
-      notify('Please select a customer.', 'error', 3000);
+      notify('Please select a customer.', 'warning', 3000);
       return;
     }
     if (!this.quotationFormData.REF_NO) {
-      notify('Please enter reference no.', 'error', 3000);
+      notify('Please enter reference no.', 'warning', 3000);
       return;
     }
     if (!this.quotationFormData.STORE_ID) {
-      notify('Please select a store', 'error', 3000);
+      notify('Please select a store', 'warning', 3000);
       return;
     }
 
@@ -867,7 +868,7 @@ export class QuotationFormComponent {
       !this.quotationFormData.Details ||
       this.quotationFormData.Details.length === 0
     ) {
-      notify('Please add at least one item to the quotation.', 'error', 3000);
+      notify('Please add at least one item to the quotation.', 'warning', 3000);
       return;
     }
 
@@ -879,7 +880,7 @@ export class QuotationFormComponent {
     if (validDetails.length === 0) {
       notify(
         'Please add at least one valid item to the quotation.',
-        'error',
+        'warning',
         3000,
       );
       return;

@@ -443,7 +443,8 @@
         icon="plus"
         hint="Add item"
         type="default"
-        stylingMode="contained"
+        stylingMode="outlined"
+        [elementAttr]="{ class: 'small-btn' }"
         (onClick)="onAddItemClick()"
       ></dx-button>
     </div>
@@ -473,6 +474,7 @@
       mode="cell"
       [allowUpdating]="true"
       [allowDeleting]="true"
+      [allowAdding]="false"
     ></dxo-editing>
     <dxi-column
       caption="Item Id"
@@ -533,7 +535,7 @@
     <dxi-column
       caption="Qty"
       dataField="qtyOrdered"
-      alignment="center"
+      alignment="right"
       width="76"
       [allowEditing]="true"
       [editorOptions]="{
@@ -555,7 +557,7 @@
     <dxi-column
       caption="Disc%"
       dataField="discountPercentage"
-      alignment="center"
+      alignment="right"
       width="auto"
       [allowEditing]="true"
       [editorOptions]="{ format: '#0', mode: 'number' }"
@@ -582,7 +584,7 @@
     <dxi-column
       [caption]="vatTitle + ' (%)'"
       dataField="VAT_PERC"
-      alignment="center"
+      alignment="right"
       width="90"
       [allowEditing]="false"
     ></dxi-column>
@@ -714,7 +716,7 @@
             caption="Price"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
-          <dxi-column dataField="CURRENCY_NAME" caption="Currency"></dxi-column>
+          <!-- <dxi-column dataField="CURRENCY_NAME" caption="Currency"></dxi-column> -->
         </dx-data-grid>
       </div>
     </div>
