@@ -1361,19 +1361,31 @@ export class DataService {
 
   //-------------------------------------------------------------------------------------------------------------//
   getStoreItemPropertyList(): Observable<any> {
-    return this.http.post(this.apiUrlList, {});
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/itempropertylist`,
+      {},
+    );
   }
   verifyItemStoreProperties(payload: any): Observable<any> {
-    return this.http.post(this.apiUrlForVerify, payload);
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/Verify`,
+      payload,
+    );
   }
 
   approveworksheetItemProperty(payload: any): Observable<any> {
-    return this.http.post(this.apiUrlForApproval, payload);
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/Approval`,
+      payload,
+    );
   }
 
   //change item store properties
   saveWorksheetItemPropertyData(payload: any): Observable<any> {
-    return this.http.post(this.apiUrlForStoreProperties, payload);
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/insert`,
+      payload,
+    );
   }
 
   updateworksheetItemProperty(payload: any): Observable<any> {
@@ -1381,12 +1393,15 @@ export class DataService {
   }
 
   selectWorksheet(id: number): Observable<any> {
-    return this.http.post(`${this.apiUrlForSelectWorksheet}/${id}`, {});
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/select/${id}`,
+      {},
+    );
   }
 
   //store item property log
   public getWorksheetItemPropertyLog(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/worksheetitemproperty/list`, {});
+    return this.http.post(`${this.apiUrl}worksheetitemproperty/list`, {});
   }
 
   deleteWorksheet(id: number): Observable<any> {
@@ -3495,7 +3510,7 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
-  //Promotion Schema
+  //  ion Schema
   getPromotionSchemaLog(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}promotionschema/list`, {});
   }

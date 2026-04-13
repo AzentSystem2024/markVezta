@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -46,7 +47,7 @@ import { WorksheetService } from 'src/app/services/worksheet.service';
 })
 export class ItemStorePropertiesLogComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   showHeaderFilter = true;
   logList: any;
   userId: any;
@@ -58,21 +59,49 @@ export class ItemStorePropertiesLogComponent implements OnInit {
       hint: 'Verify',
       icon: 'check',
       text: 'Verify',
-      onClick: (e) => this.onVerifyClick(e),
+      onClick: (e: any) => this.onVerifyClick(e),
     },
     {
       hint: 'Approve',
       icon: 'taskcomplete',
       text: 'Approve',
-      onClick: (e) => this.onApproveClick(e),
+      onClick: (e: any) => this.onApproveClick(e),
     },
   ];
   allButtons = ['edit', 'delete', ...this.customButtons];
   totalRecords: any;
 
+  addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
+    // icon: 'add',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    // onClick: () => this.addCreditNote(),
+    onClick: () => {
+      this.zone.run(() => {
+        this.onAddClick();
+      });
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
   constructor(
     private dataservice: DataService,
     private router: Router,
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
@@ -158,7 +187,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     const selectedId = event.data.ID; // Get the selected row ID
     if (selectedId) {
       this.selectWorksheetById(selectedId);
-      // this.router.navigate(['/item-store-properties']);
+      this.router.navigate(['/item-change-property-Edit']);
     } else {
       console.warn('No valid row ID selected');
     }
@@ -333,7 +362,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     if (id) {
       this.dataservice.deleteWorksheet(id).subscribe(
         (response) => {
-          const index = this.logList.findIndex((item) => item.ID === id);
+          const index = this.logList.findIndex((item: any) => item.ID === id);
           if (index !== -1) {
             this.logList.splice(index, 1); // Remove item from the array
             event.component.refresh(); // Refresh the DataGrid
@@ -357,7 +386,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   }
 
   onAddClick() {
-    this.router.navigate(['/change-item-property']);
+    this.router.navigate(['/item-change-property-add']);
   }
 }
 @NgModule({
