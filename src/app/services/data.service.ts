@@ -1010,8 +1010,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Salary/View`, payload);
   }
 
-   viewSelectedPayrollForReport(id: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}Salary/select/`+ id , {});
+  viewSelectedPayrollForReport(id: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Salary/select/` + id, {});
   }
 
   updatePayroll(items: any) {
@@ -1574,7 +1574,7 @@ export class DataService {
 
   //brand
   public getBrandData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/itembrand/list`, {});
+    return this.http.post(`${this.apiUrl}itembrand/list`, {});
   }
 
   public postBrandData(
@@ -1584,7 +1584,7 @@ export class DataService {
   ): Observable<any> {
     const data = { CODE, BRAND_NAME, COMPANY_ID };
 
-    return this.http.post(`${this.apiUrl}/itembrand/save`, data);
+    return this.http.post(`${this.apiUrl}itembrand/save`, data);
   }
   removeBrand(id: any, code: string, brandName: string, companyId: string) {
     const requestBody = {
@@ -1593,7 +1593,7 @@ export class DataService {
       COMPANY_ID: companyId,
     };
     return this.http.post<any>(
-      `${this.apiUrl}/itembrand/delete/` + id,
+      `${this.apiUrl}itembrand/delete/` + id,
       requestBody,
     );
   }
@@ -1605,7 +1605,7 @@ export class DataService {
   ): Observable<any> {
     const data = { ID, CODE, BRAND_NAME, COMPANY_ID };
 
-    return this.http.post(`${this.apiUrl}/itembrand/save`, data);
+    return this.http.post(`${this.apiUrl}itembrand/save`, data);
   }
 
   //currency
@@ -2832,7 +2832,7 @@ export class DataService {
 
   //tenders
   public getTendersData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/tender/list`, {});
+    return this.http.post(`${this.apiUrl}tender/list`, {});
   }
   public postTendersData(
     CODE: any,
@@ -2859,7 +2859,7 @@ export class DataService {
       ADDITIONAL_INFO_REQUIRED,
     };
 
-    return this.http.post(`${this.apiUrl}/tender/save`, data);
+    return this.http.post(`${this.apiUrl}tender/save`, data);
   }
 
   removeTenders(
@@ -2888,12 +2888,12 @@ export class DataService {
       ADDITIONAL_INFO_REQUIRED: additional_info,
     };
     return this.http.post<any>(
-      `${this.apiUrl}/tender/delete/` + id,
+      `${this.apiUrl}tender/delete/` + id,
       requestBody,
     );
   }
   updateTenders(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/tender/save`, data);
+    return this.http.post<any>(`${this.apiUrl}tender/save`, data);
   }
 
   //reasons
@@ -3435,18 +3435,18 @@ The result can be exported to HTML or Markdown.`;
       STORE_ID: storeId,
     };
 
-    return this.http.post<any>(`${this.apiUrl}/itemvizard/list`, payload);
+    return this.http.post<any>(`${this.apiUrl}itemvizard/list`, payload);
   }
 
   getItemsList(params: {
     MASTER_TYPE: string;
     MASTER_VALUE: string;
   }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/items/list`, params);
+    return this.http.post(`${this.apiUrl}items/list`, params);
   }
 
   pushItemToStore(payloads: ItemStorePayload): Observable<any> {
-    return this.http.post(`${this.apiUrl}/itemvizard/insert`, payloads);
+    return this.http.post(`${this.apiUrl}itemvizard/insert`, payloads);
   }
 
   //import
@@ -3497,7 +3497,7 @@ The result can be exported to HTML or Markdown.`;
 
   //Promotion Schema
   getPromotionSchemaLog(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/promotionschema/list`, {});
+    return this.http.post<any>(`${this.apiUrl}promotionschema/list`, {});
   }
 
   savePromotionSchema(payload: any): Observable<any> {
@@ -3526,7 +3526,7 @@ The result can be exported to HTML or Markdown.`;
   // }
 
   deletePromotion(id: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/promotionschema/delete/${id}`, {});
+    return this.http.post(`${this.apiUrl}promotionschema/delete/${id}`, {});
   }
 
   //promotion log
