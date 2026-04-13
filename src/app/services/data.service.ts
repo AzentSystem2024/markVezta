@@ -3711,7 +3711,9 @@ The result can be exported to HTML or Markdown.`;
     };
     return this.http.post(`${this.apiUrl}grn/pendingpo`, reqBodyData);
   }
-
+public getPendingPoItems(payload:any): Observable<any> {
+    return this.http.post(`${this.apiUrl}grn/pendingpolist`, payload);
+  }
   saveGrnData(items: Object): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}grn/insert`, data);
