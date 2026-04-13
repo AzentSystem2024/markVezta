@@ -472,7 +472,8 @@ export class AddPurchaseInvoiceComponent {
 
     selectedRows.forEach((row) => {
       const exists = this.mainGridData.some(
-        (item) => item.GRN_DET_ID === row.GRN_DET_ID,
+        (item) =>
+          item.GRN_DET_ID === row.GRN_DET_ID && item.ITEM_ID === row.ITEM_ID,
       );
       if (exists) return;
 

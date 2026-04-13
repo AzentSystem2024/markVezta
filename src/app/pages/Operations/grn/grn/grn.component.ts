@@ -360,7 +360,7 @@ export class GrnComponent implements OnInit {
             if (approveRes.Message === 'Success') {
               notify(
                 {
-                  message: 'Data Verified & Approved Successfully',
+                  message: 'Data Updated & Approved Successfully',
                   position: { at: 'top center', my: 'top center' },
                 },
                 'success',
@@ -384,7 +384,7 @@ export class GrnComponent implements OnInit {
         else {
           notify(
             {
-              message: 'Data Verified Successfully',
+              message: 'Data Updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
             'success',

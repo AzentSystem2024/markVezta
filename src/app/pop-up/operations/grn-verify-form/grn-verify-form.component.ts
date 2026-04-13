@@ -162,6 +162,17 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
   // getNewGrnData = () => ({ ...this.newGrnData });
 
+  pendingGrnItems: any[] = [];
+  isPendingPopupVisible: boolean = false;
+  showPendingButton: boolean = false;
+  selectedPendingItems: any[] = [];
+
+  readonly allowedPageSizes: any = [10, 50, 100];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showInfo = true;
+  showNavButtons = true;
+
   constructor(
     private service: DataService,
     private ref: ChangeDetectorRef,
@@ -338,7 +349,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         );
 
         // Optionally reset the QUANTITY field or prevent further processing
-        updatedRow.QUANTITY = ''; // Reset to QTY_TO_RECEIVE value
+        updatedData.QUANTITY = 0; // Reset to QTY_TO_RECEIVE value
 
         return; // Exit the function to prevent further processing
       }
@@ -864,6 +875,40 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
   // Expose this method to verify component
   getNewGrnData = () => {
+    // Check if there are items
+    if (!this.poDetails || this.poDetails.length === 0) {
+      notify(
+        {
+          message: 'No items available to save.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'warning',
+        2000,
+      );
+      return null;
+    }
+
+    // Validate RECEIVED_QTY
+    const invalidRow = this.poDetails.find(
+      (item: any) =>
+        item.QUANTITY === null ||
+        item.QUANTITY === undefined ||
+        item.QUANTITY === '' ||
+        Number(item.QUANTITY) <= 0,
+    );
+
+    if (invalidRow) {
+      notify(
+        {
+          message: 'Please enter Received Qty for all items before saving.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+        2000,
+      );
+      return null;
+    }
+
     const prepared = this.preparePayload(); // all rows from poDetails
 
     // Merge edits from demoArray into prepared.GRNDetails
@@ -986,6 +1031,10 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.formdata && changes.formdata.currentValue) {
       console.log(this.formdata, 'formdata');
+
+      if (this.formdata.ID) {
+        this.loadPendingGrn();
+      }
 
       this.currencySymbol = this.formdata.CURRENCY_SYMBOL;
 
@@ -1329,6 +1378,99 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     this.poDetails = [...this.poDetails];
 
     console.log('After delete → poDetails:', this.poDetails);
+  }
+
+  loadPendingGrn() {
+    if (!this.formdata.ID) return;
+
+    const payload = {
+      GRN_ID: this.formdata.ID,
+    };
+
+    this.service.getPendingPoItems(payload).subscribe((res: any) => {
+      const items = res?.Podetails || [];
+
+      this.pendingGrnItems = items;
+
+      //  Show button only if items exist
+      this.showPendingButton = items.length > 0;
+    });
+  }
+
+  openPendingPopup() {
+    this.isPendingPopupVisible = true;
+  }
+
+  onSavePendingItems() {
+    if (!this.selectedPendingItems || this.selectedPendingItems.length === 0) {
+      notify(
+        {
+          message: 'Please select at least one item',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        2000,
+      );
+      return;
+    }
+
+    // Get full row data from selected keys
+    const selectedRows = this.pendingGrnItems.filter((item) =>
+      this.selectedPendingItems.includes(item.PO_DETAIL_ID),
+    );
+
+    // Map to your grid structure
+    const newItems = selectedRows.map((item, index) => ({
+      ...item,
+      SL_NO: this.poDetails.length + index + 1,
+      QUANTITY: 0,
+      QTY_TO_RECEIVE: item.PENDING_QTY,
+      RATE: Number(item.PRICE).toFixed(2),
+    }));
+
+    // Avoid duplicates
+    const filteredItems = newItems.filter(
+      (newItem) =>
+        !this.poDetails.some(
+          (existing: any) =>
+            existing.ITEM_ID === newItem.ITEM_ID &&
+            existing.PO_DETAIL_ID === newItem.PO_DETAIL_ID,
+        ),
+    );
+
+    // Merge into grid
+    this.poDetails = [...this.poDetails, ...filteredItems];
+
+    // Close popup
+    this.isPendingPopupVisible = false;
+
+    // Clear selection
+    this.selectedPendingItems = [];
+  }
+
+  isItemAlreadyAdded(item: any): boolean {
+    return this.poDetails.some(
+      (x: any) => x.PO_DETAIL_ID === item.PO_DETAIL_ID,
+    );
+  }
+
+  onPendingSelectionChanged(e: any) {
+    e.selectedRowKeys = e.selectedRowKeys.filter((key: any) => {
+      const item = this.pendingGrnItems.find((x) => x.PO_DETAIL_ID === key);
+      return !this.isItemAlreadyAdded(item);
+    });
+  }
+
+  onPendingRowPrepared(e: any) {
+    console.log(e, 'onrowprepared');
+    if (e.rowType === 'data') {
+      const isSelected = this.isItemAlreadyAdded(e.data);
+
+      if (isSelected) {
+        e.rowElement.style.pointerEvents = 'none';
+        e.rowElement.style.opacity = '0.5';
+      }
+    }
   }
 }
 @NgModule({

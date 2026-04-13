@@ -169,6 +169,7 @@ import { PromotionSchemaLogComponent } from './pages/promotion-schema-log/promot
 import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 import { CurrencyListComponent } from './pages/currency-list/currency-list.component';
+import { ItemBrandListComponent } from './pages/item-brand-list/item-brand-list.component';
 import { PromotionEditComponent } from './pages/promotion-edit/promotion-edit.component';
 import { ItemStorePropertiesComponent } from './pages/item-store-properties/item-store-properties.component';
 import { PromotionViewComponent } from './pages/promotion-view/promotion-view.component';
@@ -598,6 +599,11 @@ const routes: Routes = [
       {
         path: 'item-category',
         component: ItemCategoryListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'item-brand',
+        component: ItemBrandListComponent,
         canActivate: [AuthGuardService],
       },
       {
