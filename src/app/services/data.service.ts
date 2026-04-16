@@ -2850,7 +2850,7 @@ export class DataService {
 
   //tenders
   public getTendersData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}tender/list`, {});
+    return this.http.post(`${this.apiUrl}tenders/list`, {});
   }
   public postTendersData(
     CODE: any,
@@ -2877,7 +2877,7 @@ export class DataService {
       ADDITIONAL_INFO_REQUIRED,
     };
 
-    return this.http.post(`${this.apiUrl}tender/save`, data);
+    return this.http.post(`${this.apiUrl}tenders/save`, data);
   }
 
   removeTenders(
@@ -2906,12 +2906,16 @@ export class DataService {
       ADDITIONAL_INFO_REQUIRED: additional_info,
     };
     return this.http.post<any>(
-      `${this.apiUrl}tender/delete/` + id,
+      `${this.apiUrl}tenders/delete/` + id,
       requestBody,
     );
   }
   updateTenders(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}tender/save`, data);
+    return this.http.post<any>(`${this.apiUrl}tenders/save`, data);
+  }
+
+  public selectTenders(id: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}tenders/select/${id}`, {});
   }
 
   //reasons
@@ -3520,21 +3524,21 @@ The result can be exported to HTML or Markdown.`;
 
   savePromotionSchema(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/promotionschema/insert`,
+      `${this.apiUrl}promotionschema/insert`,
       payload,
     );
   }
 
   selectPromotionSchema(id: number): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/promotionschema/select/${id}`,
+      `${this.apiUrl}promotionschema/select/${id}`,
       {},
     );
   }
 
   updatePromotionSchema(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/promotionschema/update`,
+      `${this.apiUrl}promotionschema/update`,
       payload,
     );
   }

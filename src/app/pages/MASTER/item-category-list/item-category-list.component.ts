@@ -209,12 +209,12 @@ export class ItemCategoryListComponent implements OnInit {
         COMPANY_ID,
       )
       .subscribe((response) => {
-        if (response) {
+        if (response.flag == '1') {
           this.showCategory();
           this.isAddCategoryPopupOpened = false;
           notify(
             {
-              message: 'This Item Category inserted successfully',
+              message: 'Item Category saved successfully',
               position: { at: 'top right', my: 'top right' },
               displayTime: 1000,
             },

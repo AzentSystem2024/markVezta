@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild, NgZone } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DataService } from 'src/app/services';
@@ -10,6 +10,7 @@ import {
 import notify from 'devextreme/ui/notify';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import { ExportService } from 'src/app/services/export.service';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-item-brand-list',
@@ -21,14 +22,59 @@ export class ItemBrandListComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent | undefined;
 
+  addButtonOptions = {
+  type: 'default',
+  stylingMode: 'contained',
+  hint: 'Add new Brand',
+  onClick: () => this.addBrand(),
+  elementAttr: { class: 'add-button' },
+
+  template: () => {
+    return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+  },
+};
+
+searchButtonOptions = {
+  icon: 'search',
+  hint: 'Show / Hide Filters',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => this.toggleFilters(),
+};
+
+refreshButtonOptions = {
+  icon: 'refresh',
+  hint: 'Refresh',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+      this.zone.run(() => this.refresh());
+    },
+  
+};
+
   brand: any;
   isAddBrandPopupOpened = false;
   showFilterRow = true;
   showHeaderFilter = true;
+  isFilterOpened = false;
+
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+
+  brandDataSource: any;
 
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private zone: NgZone,
   ) {}
 
   onExporting(event: any) {
@@ -40,10 +86,20 @@ export class ItemBrandListComponent implements OnInit {
   }
 
   showBrand() {
-    this.dataservice.getBrandData().subscribe((response) => {
-      this.brand = response;
-    });
-  }
+  this.brandDataSource = new DataSource({
+    load: () => {
+      return new Promise((resolve) => {
+        this.dataservice.getBrandData().subscribe((response: any) => {
+          const data = response?.data || [];
+          resolve({
+            data: data,
+            totalCount: data.length
+          });
+        });
+      });
+    }
+  });
+}
   onRowRemoving(event:any) {
     const selectedRow = event.data;
     const { ID, CODE, BRAND_NAME, COMPANY_ID } = selectedRow;
@@ -126,9 +182,23 @@ export class ItemBrandListComponent implements OnInit {
   ngOnInit(): void {
     this.showBrand();
   }
-  refresh = () => {
-    this.dataGrid?.instance.refresh();
-  };
+  
+  refresh() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.showBrand();
+  }
+  toggleFilters() {
+  this.isFilterOpened = !this.isFilterOpened;
+
+  const grid = this.dataGrid?.instance;
+
+  if (grid) {
+    grid.option('filterRow.visible', this.isFilterOpened);
+    grid.option('headerFilter.visible', this.isFilterOpened);
+  }
+}
 }
 @NgModule({
   imports: [

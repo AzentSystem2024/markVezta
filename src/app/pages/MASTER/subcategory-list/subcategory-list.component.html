@@ -8,6 +8,7 @@
       rowAlternationInterval="2"
       (onRowRemoving)="onRowRemoving($event)"
       (onRowUpdating)="onRowUpdating($event)"
+      (onExporting)="onExporting($event)"
       [showBorders]="true"
       [width]="'100%'"
       [height]="'82vh'"
@@ -24,6 +25,7 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+        
         <dxo-popup
           title="Edit Category"
           [showTitle]="true"
@@ -32,6 +34,8 @@
         >
         </dxo-popup>
       </dxo-editing>
+
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
       <dxo-toolbar>
         <dxi-item location="before">
@@ -140,7 +144,7 @@
   [(visible)]="editSubcategory"
   [width]="'30vw'"
   [height]="'40vh'"
-  title="Update Subcategory"
+  title="Edit SubCategory"
   (onHiding)="handleClose()"
 >
   <app-subcategory-edit

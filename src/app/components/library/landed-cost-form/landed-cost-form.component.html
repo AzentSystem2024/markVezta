@@ -1,25 +1,39 @@
 <dx-form class="plain-styled-form" [colCount]="1">
     
     <dxi-item itemType="group" [colCount]="2">
-      <dxi-item>
-        <div *dxTemplate>
+      <!-- <dxi-item> -->
+        <!-- <div *dxTemplate> -->
           <!-- <dx-text-box
             label="Code"
            
             width="100"
             stylingMode="filled"
           ></dx-text-box> -->
-          <dx-text-box
+          <!-- <dx-text-box
           label="Code"
           [(value)]="newLandedCost.CODE"
-          width="100"
-          stylingMode="filled"
+          width="150"
+          labelMode="floating"
         >
 
-    
-      </dx-text-box>
+        <dx-validator>
+      <dxi-validation-rule
+        type="required"
+        message="Code is required"
+      ></dxi-validation-rule>
+
+      <dxi-validation-rule
+        type="pattern"
+        [pattern]="'^[a-zA-Z0-9]+$'"
+        message="Code should be alphanumeric only"
+      ></dxi-validation-rule>
+    </dx-validator> -->
+
+      <!-- </dx-text-box>
         </div>
-        </dxi-item>
+        </dxi-item> -->
+
+        <dxi-item></dxi-item>
         <dxi-item Align="Right">
           <dx-check-box 
                   [(value)]="newLandedCost.IS_INACTIVE"
@@ -36,8 +50,15 @@
               <dx-text-box
                 label="Description"
                 [(value)]="newLandedCost.DESCRIPTION"
-                stylingMode="filled"
-              ></dx-text-box>
+                labelMode="floating"
+              >
+              <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Description is required"
+            ></dxi-validation-rule>
+            </dx-validator>
+            </dx-text-box>
             </div>
             </dxi-item>
           </dxi-item>
@@ -48,8 +69,10 @@
                
                 <dx-radio-group
                     [items]="currencyOptions"
-                    [(value)]="newLandedCost.isLocalCurency"
-                    (onValueChanged)="onValueChangedCurrency($event.value)"
+                    displayExpr="text"
+                    valueExpr="value"
+                    [(value)]="newLandedCost.IS_LOCAL_CURRENCY"
+                    
                     layout="horizontal"
                    
                   ></dx-radio-group>
@@ -63,20 +86,31 @@
                   <label>Amount</label>
                   <dx-radio-group
                     [items]="amountOptions"
-                    [(value)]="newLandedCost.isFixedAmount"
-                    (onValueChanged)="onValueChangedAmount($event)"
+                    displayExpr="text"
+                    valueExpr="value"
+                   [(value)]="newLandedCost.IS_FIXED_AMOUNT"
+                    
                     layout="horizontal"
                   ></dx-radio-group>
                 </div>
               </dxi-item>
 
-              <dxi-item>
+              <dxi-item [colSpan]="1">
                 <div *dxTemplate>
-                  <dx-text-box
-                    label="Value"
-                    [(value)]="newLandedCost.VALUE"
-                    stylingMode="filled"
-                  ></dx-text-box>
+                  <dx-number-box
+                  label="Value"
+                  [(value)]="newLandedCost.VALUE"
+                  [min]="0"
+                  [showSpinButtons]="true"
+                  labelMode="floating"
+                >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="Value is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-number-box>
                 </div>
                 </dxi-item>
               </dxi-item>
