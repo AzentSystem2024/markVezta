@@ -165,7 +165,7 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
       } else if (isDescriptionDuplicate) {
         notify(
           {
-            message: 'This Category already exists',
+            message: 'This Item Category already exists',
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
@@ -176,16 +176,28 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
 
       this.service.updateCategory(payload).subscribe((res: any) => {
         console.log(res);
-        this.popupClosed.emit();
-        notify(
-          {
-            message: 'This Item Category Updated successfully',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 1000,
-          },
-          'success',
-        );
-        return;
+
+        if (res?.flag === '1') {
+          this.popupClosed.emit();
+
+          notify(
+            {
+              message: 'Item Category Updated successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 1000,
+            },
+            'success'
+          );
+        } else {
+          notify(
+            {
+              message: res?.message || 'Update failed',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 2000,
+            },
+            'error'
+          );
+        }
       });
     });
   }

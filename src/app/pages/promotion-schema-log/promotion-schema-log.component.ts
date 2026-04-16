@@ -4,6 +4,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -41,6 +42,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
 import { DxNumberBoxTypes } from 'devextreme-angular/ui/number-box';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-promotion-schema-log',
@@ -49,7 +51,10 @@ import { DxNumberBoxTypes } from 'devextreme-angular/ui/number-box';
 })
 export class PromotionSchemaLogComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
+  @ViewChild(DxValidationGroupComponent) validationGroup: DxValidationGroupComponent;
+  @ViewChild('editValidationGroup') editValidationGroup: DxValidationGroupComponent;
+
   showHeaderFilter = true;
   logList: any;
   isPopupVisible: boolean = false;
@@ -96,10 +101,62 @@ export class PromotionSchemaLogComponent {
   SCHEMA_ON_REGULAR_PRICE: any;
   selectedSchemaType: string = '';
   DISC_PERCENT: any;
+  isFilterOpened = false;
+  isFilterRowVisible: boolean = false;
+
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+
+  logDataSource: any;
+
+  isSaving: boolean = false;
+  isUpdating: boolean = false;
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.zone.run(() => this.onAddClick());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
 
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
+    private zone: NgZone
   ) {
     const payload = {
       name: 'PROMOTIONSCHEMA_TYPE',
@@ -134,6 +191,13 @@ export class PromotionSchemaLogComponent {
   onPromotionSchemaChange(event: any) {
     this.selectedPromotionSchema = event.value;
     this.areRadioButtonsDisabled = this.selectedPromotionSchema !== 1;
+    // ✅ set value ONLY when enabled
+    if (!this.areRadioButtonsDisabled) {
+      this.selectedSchemaCondition = 'multiple';
+    } else {
+      this.selectedSchemaCondition = '';
+    }
+
     const selectedID = event.value;
     this.selectedPromotionSchema !== this.promotionSchema[0]?.DESCRIPTION;
     this.isQtyGetDisabled =
@@ -152,16 +216,32 @@ export class PromotionSchemaLogComponent {
   }
 
   getLogList() {
-    this.dataservice.getPromotionSchemaLog().subscribe((response: any) => {
-      this.logList = response.promotion_data || [];
-      this.logList.sort((a: any, b: any) => {
-        const idA = a.ID || 0;
-        const idB = b.ID || 0;
-        return idB - idA; // Descending order by ID
+  this.logDataSource = new DataSource({
+    load: () => {
+      return new Promise((resolve) => {
+        this.dataservice.getPromotionSchemaLog().subscribe((response: any) => {
+          
+          let data = response.promotion_data || [];
+
+          // Sort descending by ID
+          data = data.sort((a: any, b: any) => {
+            return (b.ID || 0) - (a.ID || 0);
+          });
+
+          //  Store in logList ALSO
+          this.logList = data;
+
+          console.log(this.logList, 'Sorted LOGLIST');
+
+          resolve({
+            data: data,
+            totalCount: data.length
+          });
+        });
       });
-      console.log(this.logList, 'Sorted LOGLIST');
-    });
-  }
+    }
+  });
+}
 
   openEditingStart(event: any) {
     const id = event.data.ID;
@@ -203,7 +283,7 @@ export class PromotionSchemaLogComponent {
   }
 
   handleSchemaConditionChange(event: any) {
-    const selectedValue = event.value.value; // Get the selected value
+    const selectedValue = event.value; // Get the selected value
     console.log(event.value, 'SCHEMA');
     if (!this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE) {
       this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = false; // Default to false
@@ -241,6 +321,15 @@ export class PromotionSchemaLogComponent {
   }
 
   savePromotionShema() {
+
+    const result = this.validationGroup.instance.validate();
+
+    if (!result.isValid) {
+      return;
+    }
+
+    this.isSaving = true;
+
     console.log(this.promotionData, 'PROMOTIONDATA');
     console.log(this.DISC_PERCENT, 'DISCOUNTTTT');
     const isDuplicate = this.logList.some(
@@ -248,6 +337,7 @@ export class PromotionSchemaLogComponent {
     );
 
     if (isDuplicate) {
+      this.isSaving = false;
       notify(
         {
           message:
@@ -258,6 +348,43 @@ export class PromotionSchemaLogComponent {
       );
       return; // Exit the function if there's a duplicate
     }
+
+    // if (this.selectedSchemaType == 'multiple' || this.selectedSchemaType == 'regular' && this.selectedPromotionSchema==1) {
+    //   console.log(this.selectedSchemaType, this.selectedPromotionSchema )
+    //   notify({
+    //     message: 'Please select schema condition',
+    //     position: { at: 'top right', my: 'top right' }
+    //   }, 'error');
+    //   return;
+    // }
+
+    //  MIX & MATCH VALIDATION
+    if (this.selectedPromotionSchema === 3) {
+
+      if (!this.tableData || this.tableData.length === 0) {
+        this.isSaving = false;
+        notify({
+          message: 'Please add at least one row for Mix & Match schema',
+          position: { at: 'top right', my: 'top right' }
+        }, 'error');
+        return;
+      }
+
+      const invalidRow = this.tableData.find(row =>
+        !row.qtyToBuy || row.qtyToBuy <= 0 ||
+        row.discount === null || row.discount === undefined || isNaN(row.discount)
+      );
+
+      if (invalidRow) {
+        this.isSaving = false;
+        notify({
+          message: 'Qty must be > 0 and Discount must be a valid number',
+          position: { at: 'top right', my: 'top right' }
+        }, 'error');
+        return;
+      }
+    }
+
     const payload = {
       DESCRIPTION: this.promotionData.DESCRIPTION, // Use promotionData
       QTY_BUY: this.promotionData.QTY_BUY ?? 1.0,
@@ -278,6 +405,7 @@ export class PromotionSchemaLogComponent {
           : [{ QTY_BUY: 0, DISC_PERCENT: 0, DESCRIPTION: '' }],
     };
     this.dataservice.savePromotionSchema(payload).subscribe((response: any) => {
+      this.isSaving = false;
       if (response) {
         try {
           notify(
@@ -291,6 +419,7 @@ export class PromotionSchemaLogComponent {
           this.isPopupVisible = false;
           this.getLogList();
         } catch (error) {
+          this.isSaving = false;
           notify(
             {
               message: 'Add operation failed',
@@ -315,6 +444,15 @@ export class PromotionSchemaLogComponent {
   }
 
   updatePromotionSchema() {
+
+    const result = this.editValidationGroup.instance.validate();
+
+    if (!result.isValid) {
+      return;
+    }
+
+    this.isUpdating = true;
+ 
     const isDuplicate = this.logList.some(
       (row: any) =>
         row.DESCRIPTION === this.promotionData.DESCRIPTION &&
@@ -322,6 +460,8 @@ export class PromotionSchemaLogComponent {
     ); // Exclude the current promotion being edited
 
     if (isDuplicate) {
+      this.isUpdating = false;
+ 
       notify(
         {
           message:
@@ -332,6 +472,34 @@ export class PromotionSchemaLogComponent {
       );
       return; // Exit the function if there's a duplicate
     }
+
+    if (this.selectedPromotionSchema === 3) {
+
+      if (!this.tableData || this.tableData.length === 0) {
+        this.isUpdating = false;
+        notify({
+          message: 'Please add at least one row for Mix & Match schema',
+          position: { at: 'top right', my: 'top right' }
+        }, 'error');
+        return;
+      }
+
+      const invalidRow = this.tableData.find(row =>
+        !row.qtyToBuy || row.qtyToBuy <= 0 ||
+        row.discount === null || row.discount === undefined || isNaN(row.discount)
+      );
+
+      if (invalidRow) {
+        this.isUpdating = false;
+        notify({
+          message: 'Qty must be > 0 and Discount must be a valid number',
+          position: { at: 'top right', my: 'top right' }
+        }, 'error');
+        return;
+      }
+    }
+
+
     const payload = {
       ID: this.promotionData.ID,
       DESCRIPTION: this.promotionData.DESCRIPTION,
@@ -348,6 +516,7 @@ export class PromotionSchemaLogComponent {
 
     this.dataservice.updatePromotionSchema(payload).subscribe(
       (response: any) => {
+        this.isUpdating = false;
         if (response) {
           try {
             notify(
@@ -361,6 +530,8 @@ export class PromotionSchemaLogComponent {
             this.isEditPopupVisible = false;
             this.getLogList();
           } catch (error) {
+            this.isUpdating = false;
+
             notify(
               {
                 message: 'Edit operation failed',
@@ -370,10 +541,12 @@ export class PromotionSchemaLogComponent {
             );
           }
         } else {
+          this.isUpdating = false;
           console.error('Update Failed:', response.message);
         }
       },
       (error) => {
+        this.isUpdating = false;
         console.error('API Error:', error);
       },
     );
@@ -477,9 +650,42 @@ export class PromotionSchemaLogComponent {
     return `${this.promotionData.DISC_PERCENT}%`;
   }
 
-  onSelectionChanged(event) {}
-  onCellPrepared(event) {}
-  SavePromotion() {}
+  // onSelectionChanged(event) {}
+  // onCellPrepared(event) {}
+  // SavePromotion() {}
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.getLogList();
+  }
+
+  onExporting(event: any) {
+    const fileName = 'promotion-schema-list';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
+
+  onEditCancel() {
+  this.isEditPopupVisible = false;
+  this.resetPopup(); // optional but recommended
+}
+  onNewCancel() {
+  this.isPopupVisible = false;
+  this.resetPopup(); // optional but recommended
+}
+
 }
 @NgModule({
   imports: [

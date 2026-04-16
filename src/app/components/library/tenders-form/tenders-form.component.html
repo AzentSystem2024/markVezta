@@ -7,7 +7,7 @@
               label="Code"
               [(value)]="newTender.CODE"
               width="100"
-              stylingMode="filled"
+              labelMode="floating"
             >
             <dx-validator>
               <dxi-validation-rule
@@ -33,7 +33,7 @@
                 <dx-text-box
                   label="Description"
                   [(value)]="newTender.DESCRIPTION"
-                  stylingMode="filled"
+                  labelMode="floating"
                 >
                 <dx-validator>
                   <dxi-validation-rule
@@ -48,16 +48,16 @@
             <dxi-item itemType="group" [colCount]="1">
                 <dxi-item>
                   <div *dxTemplate>
-                    <label>Arabic Name</label>
                     <dx-text-box
                       [(value)]="newTender.ARABIC_DESCRIPTION"
-                      stylingMode="filled"
                       [rtlEnabled]="true"
+                      labelMode="floating"
+                      label="Arabic Description"
                     >
                     <dx-validator>
                       <dxi-validation-rule
                           type="required"
-                          message="Arabic name is required">
+                          message="Arabic Description is required">
                       </dxi-validation-rule>
                   </dx-validator>
                   </dx-text-box>
@@ -75,7 +75,7 @@
                   valueExpr="ID"
                   [(value)]="newTender.TENDER_TYPE"
                   placeholder="Select Tender type"
-                  stylingMode="filled"
+                  labelMode="floating"
                 >
                 <dx-validator>
                   <dxi-validation-rule
@@ -88,20 +88,22 @@
             </dxi-item>
             <dxi-item>
                   <div *dxTemplate  Align="Right">
-                    <dx-text-box
-                      label="Display Order"
-                      [(value)]="newTender.DISPLAY_ORDER"
-                      width="95"
-                      stylingMode="filled"
-                     
-                    >
+                    <dx-number-box
+                    label="Display Order"
+                    [(value)]="newTender.DISPLAY_ORDER"
+                    width="140"
+                    labelMode="floating"
+                    [min]="0"
+                    [showSpinButtons]="true"
+                  >
                     <dx-validator>
                       <dxi-validation-rule
-                          type="required"
-                          message="Display order is required">
+                        type="required"
+                        message="Display order is required">
                       </dxi-validation-rule>
-                  </dx-validator>
-                  </dx-text-box>
+
+                    </dx-validator>
+                  </dx-number-box>
                   </div>
                   </dxi-item>
           </dxi-item>
@@ -115,7 +117,7 @@
                   valueExpr="ID"
                   [(value)]="newTender.CURRENCY_ID"
                   placeholder="Select Currency"
-                  stylingMode="filled"
+                  labelMode="floating"
                 >
                 <dx-validator>
                   <dxi-validation-rule

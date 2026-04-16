@@ -333,6 +333,11 @@ export class SubcategoryListComponent {
       console.log(response, 'categories!!!!!!!!!!!!!!!!!!!!!!!!!!!!??????');
     });
   }
+
+  onExporting(event: any) {
+    const fileName = 'item-sub-category-list';
+    this.dataService.exportDataGrid(event, fileName);
+  }
 }
 
 @NgModule({

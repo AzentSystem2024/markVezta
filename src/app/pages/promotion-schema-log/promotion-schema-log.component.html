@@ -1,49 +1,95 @@
 <div class="view-wrapper list-page">
   <div>
     <dx-data-grid
+      #dataGrid
       [width]="'100%'"
-      [height]="'530px'"
+      [height]="'82vh'"
       class="grid theme-dependent"
-      [dataSource]="logList"
+      [dataSource]="logDataSource"
       [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
-      (onSelectionChanged)="onSelectionChanged($event)"
       (onEditingStart)="openEditingStart($event)"
       (onRowRemoving)="onRowRemoving($event)"
-      (onCellPrepared)="onCellPrepared($event)"
-      [selection]="{ mode: 'single' }"
+      (onExporting)="onExporting($event)"
     >
-      <dxo-scrolling
-        mode="standard"
-        columnRenderingMode="virtual"
-      ></dxo-scrolling>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
+
       <dxo-editing
         mode="popup"
         [allowUpdating]="true"
         [allowDeleting]="true"
       ></dxo-editing>
-      <dxo-search-panel
-        [visible]="true"
-        [highlightCaseSensitive]="false"
-      ></dxo-search-panel>
-      <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="'auto'"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-toolbar>
+        <!-- Title -->
         <dxi-item location="before">
-          <div class="grid-header">Promotion Schema</div>
+          <div
+            class="grid-header"
+            style="font-weight: 600; font-size: 20px; margin-left: 12px"
+          >
+            Promotion Schema
+          </div>
         </dxi-item>
+
+        <!-- Search Panel -->
+        <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+
+        <!-- Custom Search Button -->
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <!-- Refresh Button -->
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <!-- Divider -->
         <dxi-item location="after">
-          <dx-button
-            text="Add"
-            icon="plus"
-            type="default"
-            stylingMode="contained"
-            (click)="onAddClick()"
-          ></dx-button>
+          <div class="toolbar-divider"></div>
         </dxi-item>
+
+        <!-- Export -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <!-- Add Button -->
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
       <dxi-column
         dataField="DESCRIPTION"
@@ -71,6 +117,7 @@
   [closeOnOutsideClick]="true"
 >
   <div class="popup-content">
+    <dx-validation-group #validationGroup>
     <div class="form-row">
       <div class="input-container">
         <div class="spacing" style="display: flex; align-items: center">
@@ -80,10 +127,13 @@
             placeholder="Promotion Name"
             style="width: 480px"
           >
-        </dx-text-box>
+          <dx-validator>
+            <dxi-validation-rule type="required" message="Promotion name is required"></dxi-validation-rule>
+          </dx-validator>   
+          </dx-text-box>
         </div>
 
-        <div class="spacing" style="display: flex; align-items: center;">
+        <div class="spacing" style="display: flex; align-items: center">
           <label style="width: 120px; margin-right: 8px">Type</label>
           <div style="display: flex; align-items: center; width: 480px">
             <dx-select-box
@@ -94,7 +144,11 @@
               placeholder="Choose Type"
               style="flex: 1"
               (onValueChanged)="onPromotionSchemaChange($event)"
-            ></dx-select-box>
+            >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Type is required"></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
             <div
               style="margin-left: 8px; cursor: pointer"
               (click)="openDetailsPopup()"
@@ -119,19 +173,25 @@
               margin-left: 80px;
             "
           >
-            <label style="width: 70px; text-align: right; margin-left: 14px;">Buy</label>
+            <label style="width: 70px; text-align: right; margin-left: 14px"
+              >Buy</label
+            >
             <dx-number-box
               #numberBox
               [min]="0"
               [showSpinButtons]="true"
               [inputAttr]="{ 'aria-label': 'Sales' }"
-
               [(value)]="promotionData.QTY_BUY"
               [disabled]="buyAndGetDisabled"
-              style="width: 150px;"
+              style="width: 150px"
               placeholder="Buy"
-          ></dx-number-box>
-            
+            >
+             <dx-validator>
+              <dxi-validation-rule type="required" message="Buy quantity required"></dxi-validation-rule>
+              <dxi-validation-rule type="range" [min]="1" message="Must be greater than 0"></dxi-validation-rule>
+            </dx-validator>
+          </dx-number-box>
+
             <!-- Get Field -->
             <label
               [style.width]="'50px'"
@@ -142,51 +202,64 @@
             >
               Get
             </label>
-                <dx-number-box
-                #numberBox
-                [min]="0"
-                [showSpinButtons]="true"
-                [inputAttr]="{ 'aria-label': 'Sales' }"
-                (onKeyDown)="keyDown($event)"
-                [(value)]="promotionData.QTY_GET"
-                [disabled]="isQtyGetDisabled || buyAndGetDisabled"
-                style="width: 150px;"
-                placeholder="Get"
-              ></dx-number-box>
+            <dx-number-box
+              #numberBox
+              [min]="0"
+              [showSpinButtons]="true"
+              [inputAttr]="{ 'aria-label': 'Sales' }"
+              (onKeyDown)="keyDown($event)"
+              [(value)]="promotionData.QTY_GET"
+              [disabled]="isQtyGetDisabled || buyAndGetDisabled"
+              style="width: 150px"
+              placeholder="Get"
+            >
+            <dx-validator *ngIf="!isQtyGetDisabled">
+              <dxi-validation-rule type="required" message="Get quantity required"></dxi-validation-rule>
+              <dxi-validation-rule type="range" [min]="1" message="Must be greater than 0"></dxi-validation-rule>
+            </dx-validator>
+          </dx-number-box>
 
             <label style="width: 70px; text-align: right">Discount%</label>
-        
 
             <dx-number-box
               #numberBox
               [min]="0"
               [max]="100"
               [showSpinButtons]="true"
-              [inputAttr]="{ 'aria-label': 'Sales', 'placeholder': 'Discount'}"
+              [inputAttr]="{ 'aria-label': 'Sales', placeholder: 'Discount' }"
               [(value)]="DISC_PERCENT"
               (valueChange)="onPercentageChange($event)"
               [disabled]="buyAndGetDisabled"
-              style="width: 150px;"
-          ></dx-number-box> 
+              style="width: 150px"
+            >
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Disc % is required"></dxi-validation-rule>
+              <dxi-validation-rule type="range" [min]="0" [max]="100" message="0–100 only"></dxi-validation-rule>
+            </dx-validator>
+          </dx-number-box>
           </div>
 
           <div style="margin-top: 10px">
             <label>
               <dx-radio-group
                 [(value)]="selectedSchemaCondition"
+                displayExpr="text"
+                valueExpr="value"
                 (onValueChanged)="handleSchemaConditionChange($event)"
                 [items]="[
                   {
                     text: 'Schema is applicable on the multiple of promotion quantity',
-                    value: 'multiple'
+                    value: 'multiple',
                   },
                   {
                     text: 'Schema is applicable when the quantity is more than promotion quantity',
-                    value: 'more'
-                  }
+                    value: 'more',
+                  },
                 ]"
                 [disabled]="areRadioButtonsDisabled"
-              ></dx-radio-group>
+              >
+
+            </dx-radio-group>
             </label>
           </div>
         </div>
@@ -199,7 +272,7 @@
             [showBorders]="true"
             [editing]="{
               mode: 'batch',
-              allowAdding: true
+              allowAdding: true,
             }"
             noDataText=" "
             (onRowInserted)="onRowInserted($event)"
@@ -210,14 +283,28 @@
               caption="Qty to Buy"
               width="130"
               [allowEditing]="true"
-            >
+              dataType="number"
+              [editorOptions]="{
+                min: 1,
+                showSpinButtons: true,
+                format: '#0'
+              }"
+            >   
             </dxi-column>
             <dxi-column
               dataField="discount"
               caption="Discount %"
               width="130"
               [allowEditing]="true"
+              dataType="number"
+              [editorOptions]="{
+                min: 0,
+                max: 100,
+                showSpinButtons: true,
+                format: '#0.##'
+              }"
             >
+
             </dxi-column>
             <dxi-column
               dataField="description"
@@ -238,19 +325,30 @@
         </div>
 
         <!-- <div style="display: flex; justify-content: flex-end; padding: 20px"> -->
-        <div style="padding: 20px; text-align: right">
-          <div style="margin-right: auto">
-            <dx-button
-              text="Save"
-              stylingMode="contained"
-              type="default"
-              (onClick)="savePromotionShema()"
-              style="width: 150px"
-            ></dx-button>
-          </div>
+        <div class="footer-actions" style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px;">
+
+          <!-- Cancel -->
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="onNewCancel()"
+            [disabled]="isSaving || isUpdating"
+            type="normal"
+          ></dx-button>
+
+          <!-- Save -->
+          <dx-button
+           [text]="isSaving ? 'Saving...' : 'Save'"
+            stylingMode="contained"
+            type="default"
+            [disabled]="isSaving"
+            (onClick)="savePromotionShema()"
+          ></dx-button>
+
         </div>
       </div>
     </div>
+    </dx-validation-group>
   </div>
   <div></div>
 </dx-popup>
@@ -306,6 +404,7 @@
   (onHiding)="resetPopup()"
 >
   <div class="popup-content">
+    <dx-validation-group #editValidationGroup>
     <div class="form-row">
       <div class="input-container">
         <div class="spacing" style="display: flex; align-items: center">
@@ -314,7 +413,11 @@
             [(value)]="promotionData.DESCRIPTION"
             placeholder="Description"
             style="width: 480px"
-          ></dx-text-box>
+          >
+          <dx-validator>
+            <dxi-validation-rule type="required" message="Promotion name is required"></dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
         </div>
 
         <div class="spacing" style="display: flex; align-items: center">
@@ -328,7 +431,11 @@
               placeholder="Choose Type"
               style="flex: 1"
               (onValueChanged)="onPromotionSchemaChange($event)"
-            ></dx-select-box>
+            >
+             <dx-validator>
+              <dxi-validation-rule type="required" message="Type is required"></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
             <div
               style="margin-left: 8px; cursor: pointer"
               (click)="openDetailsPopup()"
@@ -353,17 +460,25 @@
             "
           >
             <!-- Buy Field -->
-            <label style="width: 70px; text-align: right; margin-left: 5px;">Buy</label>
+            <label style="width: 70px; text-align: right; margin-left: 5px"
+              >Buy</label
+            >
             <dx-number-box
               #numberBox
               [min]="0"
               [showSpinButtons]="true"
               [inputAttr]="{ 'aria-label': 'Sales' }"
-
               [(value)]="promotionData.QTY_BUY"
               [disabled]="buyAndGetDisabled"
-              style="width: 150px;"
-          ></dx-number-box>
+              style="width: 150px"
+            >
+
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Buy quantity required"></dxi-validation-rule>
+              <dxi-validation-rule type="range" [min]="1" message="Must be greater than 0"></dxi-validation-rule>
+            </dx-validator>
+
+          </dx-number-box>
 
             <!-- Get Field -->
             <label
@@ -375,16 +490,23 @@
             >
               Get
             </label>
-                <dx-number-box
-                #numberBox
-                [min]="0"
-                [showSpinButtons]="true"
-                [inputAttr]="{ 'aria-label': 'Sales' }"
-                (onKeyDown)="keyDown($event)"
-                [(value)]="promotionData.QTY_GET"
-                [disabled]="isQtyGetDisabled || buyAndGetDisabled"
-                style="width: 150px;"
-              ></dx-number-box>
+            <dx-number-box
+              #numberBox
+              [min]="0"
+              [showSpinButtons]="true"
+              [inputAttr]="{ 'aria-label': 'Sales' }"
+              (onKeyDown)="keyDown($event)"
+              [(value)]="promotionData.QTY_GET"
+              [disabled]="isQtyGetDisabled || buyAndGetDisabled"
+              style="width: 150px"
+            >
+
+            <dx-validator *ngIf="!isQtyGetDisabled">
+              <dxi-validation-rule type="required" message="Get quantity required"></dxi-validation-rule>
+              <dxi-validation-rule type="range" [min]="1" message="Must be greater than 0"></dxi-validation-rule>
+            </dx-validator>
+
+          </dx-number-box>
 
             <!-- Discount Field -->
             <label style="width: 70px; text-align: right">Discount</label>
@@ -396,25 +518,33 @@
               [inputAttr]="{ 'aria-label': 'Sales' }"
               [(value)]="DISC_PERCENT"
               [disabled]="buyAndGetDisabled"
-              style="width: 150px;"
-          ></dx-number-box>
+              style="width: 150px"
+            >
+
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Disc % is required"></dxi-validation-rule>
+              <dxi-validation-rule type="range" [min]="0" [max]="100" message="0–100 only"></dxi-validation-rule>
+            </dx-validator>
+          </dx-number-box>
           </div>
 
           <div style="margin-top: 10px">
             <label style="width: 100px; margin-right: 8px"></label>
             <dx-radio-group
               [(value)]="selectedSchemaType"
+              displayExpr="label"
+              valueExpr="value"
               [items]="[
                 {
                   value: 'multiple',
                   label:
-                    'Schema is applicable on the multiple of promotion quantity'
+                    'Schema is applicable on the multiple of promotion quantity',
                 },
                 {
                   value: 'regular',
                   label:
-                    'Schema is applicable when the quantity is more than promotion quantity'
-                }
+                    'Schema is applicable when the quantity is more than promotion quantity',
+                },
               ]"
               displayExpr="label"
               valueExpr="value"
@@ -439,18 +569,32 @@
               [allowDeleting]="true"
             ></dxo-editing>
             <dxi-column
-              dataField="QTY_BUY"
+              dataField="qtyToBuy"
               caption="Qty to Buy"
               width="130"
               [allowEditing]="true"
-            >
+              dataType="number"
+              [editorOptions]="{
+                min: 1,
+                showSpinButtons: true,
+                format: '#0'
+              }"
+            >   
             </dxi-column>
             <dxi-column
-              dataField="DISC_PERCENT"
+              dataField="discount"
               caption="Discount %"
               width="130"
               [allowEditing]="true"
+              dataType="number"
+              [editorOptions]="{
+                min: 0,
+                max: 100,
+                showSpinButtons: true,
+                format: '#0.##'
+              }"
             >
+
             </dxi-column>
             <dxi-column
               dataField="DESCRIPTION"
@@ -470,19 +614,31 @@
           </div>
         </div>
 
-        <div style="padding: 20px; text-align: right">
-          <div style="margin-right: auto">
-            <dx-button
-              text="Save"
-              stylingMode="contained"
-              type="default"
-              (onClick)="updatePromotionSchema()"
-              style="width: 150px"
-            ></dx-button>
-          </div>
+        <div class="footer-actions"
+     style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px; padding: 15px 20px;">
+
+      <!-- Cancel -->
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        (onClick)="onEditCancel()"
+        [disabled]="isSaving || isUpdating"
+      ></dx-button>
+
+      <!-- Update -->
+      <dx-button
+        [text]="isUpdating ? 'Updating...' : 'Update'"
+        stylingMode="contained"
+        type="default"
+        [disabled]="isUpdating"
+        (onClick)="updatePromotionSchema()"
+      ></dx-button>
+
         </div>
       </div>
     </div>
+    </dx-validation-group>
   </div>
   <div></div>
 </dx-popup>

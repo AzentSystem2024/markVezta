@@ -104,7 +104,8 @@
 </div>
 
 <form-popup
-  height="300px"
+  [width]="500"
+  height="'auto'"
   [(visible)]="isAddCategoryPopupOpened"
   (save)="onClickSaveCategory()"
   titleText="New Category"
@@ -115,9 +116,9 @@
 
 <dx-popup
   [(visible)]="editItemCategory"
-  [width]="'35vw'"
-  [height]="'40vh'"
-  title="Update Category"
+  [height]="'auto'"
+  [width]="'500px'"
+  title="Edit Category"
   (onHiding)="handleClose()"
 >
   <app-itemcategory-edit

@@ -1,19 +1,35 @@
 <div class="view-wrapper list-page">
   <dx-data-grid
     class="grid theme-dependent"
+    [height]="'82vh'"
     [dataSource]="tenders"
     (onRowRemoving)="onRowRemoving($event)"
     [showBorders]="true"
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
+    (onEditingStart)="onEditingRow($event)"
     (onExporting)="onExporting($event)"
     (onRowUpdating)="onRowUpdating($event)"
   >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+
     <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
 
-    <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+    <dxo-header-filter [visible]="showHeaderFilter">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
 
-    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
@@ -82,55 +98,62 @@
       placeholder="Data Search"
     ></dxo-search-panel>
     <dxo-toolbar>
+      <!-- Title -->
       <dxi-item location="before">
         <div class="grid-header">Tenders</div>
       </dxi-item>
 
-      <dxi-item location="after" locateInMenu="auto">
-        <!-- <dx-button
-        text="Add"
-        icon="plus"
-        type="default"
-        stylingMode="contained"
-        (onClick)="addTenders()"
-        
-      ></dx-button> -->
-      </dxi-item>
+      <!-- Search toggle button -->
       <dxi-item
         location="after"
         locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          text: 'Refresh',
-          icon: 'refresh',
-          stylingMode: 'text',
-        }"
+        [options]="searchButtonOptions"
       ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
+
+      <!-- Refresh button -->
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
       </dxi-item>
-      <dxi-item name="exportButton"></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
-      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+
+      <!-- Export -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
+
+      <!-- Add Button -->
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
     </dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code"></dxi-column>
     <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
     <dxi-column dataField="TENDERTYPE_DESCRIPTION" caption="Tender Type">
-      <dxo-lookup
+      <!-- <dxo-lookup
         [dataSource]="TenderTypeDropdownData"
         displayExpr="DESCRIPTION"
         valueExpr="ID"
-      ></dxo-lookup>
-    </dxi-column>
+      ></dxo-lookup> -->
+    </dxi-column> 
     <dxi-column dataField="CURRENCY_DESCRIPTION" caption="Currency">
-      <dxo-lookup
+      <!-- <dxo-lookup
         [dataSource]="currencyList"
         displayExpr="DESCRIPTION"
         valueExpr="ID"
-      ></dxo-lookup>
+      ></dxo-lookup> -->
     </dxi-column>
     <dxi-column
       dataField="ARABIC_DESCRIPTION"
@@ -166,12 +189,26 @@
       dataType="boolean"
       [visible]="false"
     ></dxi-column>
+    <dxi-column dataField="STATUS" caption="Status"></dxi-column>
   </dx-data-grid>
   <form-popup
     [(visible)]="isAddTendersPopupOpened"
     (save)="onClickSaveTenders()"
     titleText="New Tenders"
+    [showApprove]="false"
   >
-    <app-tenders-form></app-tenders-form>
+    <app-tenders-form #addForm></app-tenders-form>
+  </form-popup>
+
+  <form-popup
+    [(visible)]="isEditTendersPopupOpened"
+    (save)="onClickSaveTenders()"
+    titleText="Edit Tenders"
+    [showApprove]="false"
+  >
+    <app-tenders-form
+    #editForm
+    [formData]="editingRowData"
+    ></app-tenders-form>
   </form-popup>
 </div>

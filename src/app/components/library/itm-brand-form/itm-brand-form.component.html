@@ -8,26 +8,43 @@
       ></dxo-col-count-by-screen>
       <dxi-item>
         <div *dxTemplate>
-          <form-textbox
+          <dx-text-box
             label="Code"
             [(value)]="newBrand.CODE"
-            [isEditing]="true"
-            validationRules="required"
+            labelMode="floating"
           >
+
+          <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="Code is required"
+          ></dxi-validation-rule>
+
+          <dxi-validation-rule
+            type="pattern"
+            [pattern]="'^[a-zA-Z0-9]+$'"
+            message="Code should be alphanumeric only"
+          ></dxi-validation-rule>
+        </dx-validator>
      
-          </form-textbox>
+          </dx-text-box>
         </div>
       </dxi-item>
   
       <dxi-item>
         <div *dxTemplate>
-          <form-textbox
+          <dx-text-box
             label="Brand Name"
             [(value)]="newBrand.BRAND_NAME"
-            [isEditing]="true"
-            validationRules="required"
+            labelMode="floating"
           >
-          </form-textbox>
+          <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="Brand Name is required"
+          ></dxi-validation-rule>
+          </dx-validator>
+          </dx-text-box>
         </div>
       </dxi-item>
 
