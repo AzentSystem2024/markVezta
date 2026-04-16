@@ -90,3 +90,15 @@
     Total records: {{ totalRecords }}
   </div> -->
 </div>
+
+<dx-popup
+  [(visible)]="editPackPopupOpened"
+  [width]="'80vw'"
+  [height]="'90vh'"
+  title="Update Packing"
+  (onHiding)="handleClose()"
+>
+  <div *dxTemplate="let data of 'content'">
+    <app-edit-item-store-property  [selectedData]="selectedData"></app-edit-item-store-property>
+  </div>
+</dx-popup>

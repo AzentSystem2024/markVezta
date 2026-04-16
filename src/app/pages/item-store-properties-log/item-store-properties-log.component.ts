@@ -39,6 +39,8 @@ import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
 import { WorksheetService } from 'src/app/services/worksheet.service';
+import { ItemStorePropertiesEditModule } from '../item-store-properties-edit/item-store-properties-edit.component';
+import { EditItemStorePropertyModule } from 'src/app/pop-up/operations/edit-item-store-property/edit-item-store-property.component';
 
 @Component({
   selector: 'app-item-store-properties-log',
@@ -54,6 +56,9 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   selectedWorksheetData: any;
   isPopupVisible: boolean = false;
   selectedRowData: any;
+  isEditPopupOpened: boolean = false;
+  editPackPopupOpened: boolean = false;
+  selectedData:any
   customButtons = [
     {
       hint: 'Verify',
@@ -109,6 +114,16 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     this.userId = sessionStorage.getItem('UserId');
   }
 
+  openEditingStart(event: any) {
+    event.cancel = true; // Prevent the default editing action
+    const selectedId = event.data.ID; // Get the selected row ID
+    this.dataservice.selectWorksheet(selectedId).subscribe((res: any) => {
+      console.log(res, '============selected data for edit===========');
+      this.selectedData=res
+
+      this.editPackPopupOpened = true;
+    });
+  }
   listWorkisheetItemProperty() {
     this.dataservice
       .getWorksheetItemPropertyLog()
@@ -154,26 +169,6 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     );
   }
 
-  selectWorksheetById(worksheetId: number) {
-    if (!worksheetId) {
-      console.warn('Invalid worksheet ID');
-      return;
-    }
-    this.dataservice.selectWorksheet(worksheetId).subscribe(
-      (response) => {
-        this.selectedWorksheetData = response;
-        this.dataservice.setWorksheetData(this.selectedWorksheetData);
-        this.router.navigate(['/item-store-properties-edit'], {
-          state: { worksheetData: this.selectedWorksheetData },
-        });
-        this.isPopupVisible = true;
-      },
-      (error) => {
-        console.error('Error selecting worksheet:', error);
-      },
-    );
-  }
-
   onRowSelected(event: any) {
     if (event.selectedRowsData.length > 0) {
       this.selectedWorksheetData = event.selectedRowsData[0];
@@ -182,16 +177,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     }
   }
 
-  openEditingStart(event: any) {
-    event.cancel = true; // Prevent the default editing action
-    const selectedId = event.data.ID; // Get the selected row ID
-    if (selectedId) {
-      this.selectWorksheetById(selectedId);
-      this.router.navigate(['/item-change-property-Edit']);
-    } else {
-      console.warn('No valid row ID selected');
-    }
-  }
+  handleClose() {}
 
   onSelectionChanged(event: any) {
     if (event.selectedRowsData.length > 0) {
@@ -415,6 +401,8 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     DxRadioGroupModule,
     DxPopupModule,
     DxTagBoxModule,
+    ItemStorePropertiesEditModule,
+    EditItemStorePropertyModule,
   ],
   providers: [],
   exports: [ItemStorePropertiesLogComponent],
