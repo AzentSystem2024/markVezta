@@ -111,6 +111,7 @@ export class AddInvoiceRetailComponent {
   itemsDescriptionList: any;
   isSaving: boolean = false;
   storeID: any;
+  invalidQtyRowIndex: number | null = null;
   constructor(private dataService: DataService) {}
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
@@ -305,7 +306,6 @@ export class AddInvoiceRetailComponent {
   };
 
   getCustomerOrUnitLst() {
-    console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
     };
@@ -324,10 +324,10 @@ export class AddInvoiceRetailComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
 
-    const data = this.EditingResponseData; // ✅ full object
+    const data = this.EditingResponseData; //  full object
     const Details = data.Details || [];
 
-    // ✅ PATCH HEADER
+    //  PATCH HEADER
     this.invoiceFormData = {
       ...this.invoiceFormData,
       ...data,
@@ -352,7 +352,7 @@ export class AddInvoiceRetailComponent {
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
     }));
 
-    // 🔥 refresh grid
+    // refresh grid
     setTimeout(() => {
       this.itemsGridRef?.instance?.option(
         'dataSource',
@@ -650,6 +650,35 @@ export class AddInvoiceRetailComponent {
 
     if (grid) {
       grid.saveEditData();
+    }
+
+    // 🔥 VALIDATION
+    const invalidIndex = (this.invoiceFormData.Details || []).findIndex(
+      (item: any) => item.ITEM_CODE && (!item.QUANTITY || item.QUANTITY <= 0),
+    );
+
+    if (invalidIndex !== -1) {
+      notify({
+        message: 'Quantity must be greater than 0',
+        type: 'warning',
+        displayTime: 3000,
+        position: { my: 'center top', at: 'center top', of: window },
+      });
+
+      if (grid) {
+        setTimeout(() => {
+          grid.editCell(invalidIndex, 'QUANTITY');
+
+          setTimeout(() => {
+            const cell = grid.getCellElement(invalidIndex, 'QUANTITY');
+            const input = cell?.querySelector('input');
+            input?.focus();
+            input?.select();
+          }, 50);
+        }, 50);
+      }
+
+      return; // STOP SAVE
     }
 
     this.isSaving = true;
