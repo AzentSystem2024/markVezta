@@ -383,6 +383,14 @@ import {
   PayrollViewReportComponent,
   PayrollViewReportModule,
 } from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
+import {
+  InvoiceRetailComponent,
+  InvoiceRetailModule,
+} from './pages/Operations/invoice-retail/invoice-retail.component';
+import {
+  AddInvoiceRetailComponent,
+  AddInvoiceRetailModule,
+} from './pages/INVOICE/add-invoice-retail/add-invoice-retail.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -756,6 +764,8 @@ import {
     SupplierFinFormModule,
     SupplierFinEditModule,
     PayrollViewReportModule,
+    InvoiceRetailModule,
+    AddInvoiceRetailModule,
   ],
 
   providers: [

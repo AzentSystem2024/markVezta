@@ -173,6 +173,7 @@ import { ItemBrandListComponent } from './pages/item-brand-list/item-brand-list.
 import { PromotionEditComponent } from './pages/promotion-edit/promotion-edit.component';
 import { ItemStorePropertiesComponent } from './pages/item-store-properties/item-store-properties.component';
 import { PromotionViewComponent } from './pages/promotion-view/promotion-view.component';
+import { InvoiceRetailComponent } from './pages/Operations/invoice-retail/invoice-retail.component';
 // import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 // import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 // import { PromotionComponent } from './pages/promotion/promotion.component';
@@ -1100,6 +1101,11 @@ const routes: Routes = [
       {
         path: 'item-change-property',
         component: ItemStorePropertiesComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'invoice-retail',
+        component: InvoiceRetailComponent,
         canActivate: [AuthGuardService],
       },
       {

@@ -38,34 +38,22 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../../DEBIT/add-debit/add-debit.component';
-import { DebitComponent } from '../../ACCOUNTS/debit/debit.component';
-import { EditDebitModule } from '../../DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
-import { DataService } from 'src/app/services';
-import {
-  AddInvoiceComponent,
-  AddInvoiceModule,
-} from '../../INVOICE/add-invoice/add-invoice.component';
-import { EditInvoiceModule } from '../../INVOICE/edit-invoice/edit-invoice.component';
-import notify from 'devextreme/ui/notify';
-import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
-import { Router } from '@angular/router';
-import DataSource from 'devextreme/data/data_source';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { InvoiceListComponent } from '../invoice-list/invoice-list.component';
+import { Router } from '@angular/router';
+import { DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
+import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 
 @Component({
-  selector: 'app-invoice-list',
-  templateUrl: './invoice-list.component.html',
-  styleUrls: ['./invoice-list.component.scss'],
+  selector: 'app-invoice-retail',
+  templateUrl: './invoice-retail.component.html',
+  styleUrls: ['./invoice-retail.component.scss'],
 })
-export class InvoiceListComponent {
-  @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
+export class InvoiceRetailComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: any = DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -75,12 +63,48 @@ export class InvoiceListComponent {
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
+  isAddInvoice: boolean = false;
+  dateRanges = [
+    { label: 'Today', value: 'today' },
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
+  ];
+  selectedDateRange: string = 'today';
+  customStartDate: any = null;
+  customEndDate: any = null;
+  showCustomDatePopup = false;
+  filteredInvoiceList: any;
+  InvoiceDataSource: any;
+  invoiceArray: any[] = [];
+  invoiceCount = 0;
+  isEditInvoice: boolean = false;
+  selectedInvoice: any;
+  isViewInvoice: boolean = false;
+
+  sessionData: any;
+  selected_Company_id: any;
+  selected_fin_id: any;
+  financialYeaDate: any;
+  formatted_from_date: any;
+  selected_vat_id: any;
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  companyID: any;
+  vatTitle: any;
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -112,51 +136,24 @@ export class InvoiceListComponent {
     },
     text: '',
   };
-  isAddInvoice: boolean = false;
-  dateRanges = [
-    { label: 'Today', value: 'today' },
-    { label: 'All', value: 'all' },
-    { label: 'Last 7 Days', value: 'last7' },
-    { label: 'Last 15 Days', value: 'last15' },
-    { label: 'Last 30 Days', value: 'last30' },
-    { label: 'Custom', value: 'custom' },
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
   ];
-  selectedDateRange: string = 'today';
-  customStartDate: any = null;
-  customEndDate: any = null;
-  showCustomDatePopup = false;
-  filteredInvoiceList: any;
-  InvoiceDataSource: DataSource;
-  invoiceArray: any[] = [];
-  invoiceCount = 0;
-  isEditInvoice: boolean = false;
-  selectedInvoice: any;
-  isViewInvoice: boolean;
-
-  sessionData: any;
-  selected_Company_id: any;
-  selected_fin_id: any;
-  financialYeaDate: any;
-  formatted_from_date: any;
-  selected_vat_id: any;
-
-  canAdd = false;
-  canEdit = false;
-  canView = false;
-  canDelete = false;
-  canApprove = false;
-  canPrint = false;
-  companyID: any;
-  vatTitle: any;
+  isReadOnlyInvoice: boolean;
 
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {
-    this.sesstion_Details();
-  }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -169,11 +166,11 @@ export class InvoiceListComponent {
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
-    //
+    console.log(menuGroups, 'MENUGROUPSSSSSSSSSSS');
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/invoice');
-
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/invoice');
+    console.log(packingRights, 'PACKINGRIGHTSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -183,9 +180,24 @@ export class InvoiceListComponent {
       this.canApprove = packingRights.canApprove;
     }
 
-    //
-    //
     this.getInvoiceList();
+  }
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.getInvoiceList();
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
 
   getInvoiceList(dateRange: string = this.selectedDateRange) {
@@ -307,44 +319,6 @@ export class InvoiceListComponent {
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-    this.getInvoiceList();
-  }
-
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
-  }
-  onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton',
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'search',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
-  }
-
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
 
@@ -378,6 +352,7 @@ export class InvoiceListComponent {
 
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
+
   applyDateFilter() {
     if (!this.selectedDateRange || !this.invoiceArray) {
       this.filteredInvoiceList = this.invoiceArray;
@@ -446,7 +421,12 @@ export class InvoiceListComponent {
 
     this.getInvoiceList('custom');
   }
-
+  private formatAsDDMMYYYY(d: Date): string {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
   private parseDateString(dateStr: string): Date {
     const [day, month, year] = dateStr
       .split('-')
@@ -470,13 +450,6 @@ export class InvoiceListComponent {
     this.customStartDate = null;
     this.customEndDate = null;
     this.showCustomDatePopup = true;
-  }
-
-  private formatAsDDMMYYYY(d: Date): string {
-    const day = d.getDate().toString().padStart(2, '0');
-    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
   }
 
   get customStartDateFormatted(): string {
@@ -509,7 +482,6 @@ export class InvoiceListComponent {
     }, 0);
   }
 
-  //status flag color
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
@@ -526,17 +498,6 @@ export class InvoiceListComponent {
     cellElement.appendChild(icon);
   }
 
-  getStatusFilterData = [
-    {
-      text: 'Approved',
-      value: 'Approved',
-    },
-    {
-      text: 'Open',
-      value: 'Open',
-    },
-  ];
-
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
       if (e.data.TRANS_STATUS === 5) {
@@ -549,20 +510,25 @@ export class InvoiceListComponent {
   }
 
   onEditInvoice(event: any) {
-    event.cancel = true; // Prevent default popup editing
+    event.cancel = true;
+
     const invoiceId = event.data.TRANS_ID;
     const transStatus = event.data.TRANS_STATUS;
 
-    this.dataService.selectInvoice(invoiceId).subscribe((response: any) => {
-      this.selectedInvoice = response.Data;
-      if (transStatus === 5) {
-        // Open view popup
-        this.isViewInvoice = true;
-      } else {
-        // Open edit popup
-        this.isEditInvoice = true;
-      }
-    });
+    //  SET FLAG HERE
+    this.isReadOnlyInvoice = transStatus === 5;
+
+    this.dataService
+      .selectInvoiceRetail(invoiceId)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+
+        if (transStatus === 5) {
+          this.isViewInvoice = true;
+        } else {
+          this.isEditInvoice = true;
+        }
+      });
   }
 
   onDeleteInvoice(event: any) {
@@ -574,7 +540,7 @@ export class InvoiceListComponent {
     const invoiceId = event.data.TRANS_ID;
     event.cancel = true;
     // Call your delete API
-    this.dataService.deleteInvoice(invoiceId).subscribe(
+    this.dataService.deleteInvoiceRetail(invoiceId).subscribe(
       (response: any) => {
         if (response) {
           notify(
@@ -609,22 +575,21 @@ export class InvoiceListComponent {
 
     this.applyCustomDateFilter(); // your existing function
   }
+
   addInvoice() {
     this.isAddInvoice = true;
     this.cdr.detectChanges();
   }
-
   handleClose() {
-    this.isAddInvoice = false;
-    this.isEditInvoice = false;
-    this.isViewInvoice = false;
-    this.getInvoiceList();
-    if (this.addInvoiceComp) {
-      this.addInvoiceComp.resetInvoiceForm();
-    }
+    this.ngZone.run(() => {
+      this.isAddInvoice = false;
+      this.isEditInvoice = false;
+      this.isViewInvoice = false;
+
+      this.getInvoiceList();
+    });
   }
 }
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -656,20 +621,12 @@ export class InvoiceListComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
-    AddCreditNoteModule,
-    EditCreditNoteModule,
-    ViewCreditNoteModule,
-    AddDebitModule,
-    EditDebitModule,
-    ViewDebitModule,
-    AddInvoiceModule,
-    EditInvoiceModule,
-    ViewInvoiceModule,
     CustomDatePopupModule,
+    AddInvoiceRetailModule,
   ],
   providers: [],
-  declarations: [InvoiceListComponent],
-  exports: [InvoiceListComponent],
+  declarations: [InvoiceRetailComponent],
+  exports: [InvoiceRetailComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceListModule {}
+export class InvoiceRetailModule {}
