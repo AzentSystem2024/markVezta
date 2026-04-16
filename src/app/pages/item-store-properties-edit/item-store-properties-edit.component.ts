@@ -48,7 +48,7 @@ import { WorksheetService } from 'src/app/services/worksheet.service';
 export class ItemStorePropertiesEditComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   // @Input() selectedWorksheetData: any;
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   @Input() selectedWorksheetData: any;
   items: any;
   itemsList: any;
@@ -78,7 +78,7 @@ export class ItemStorePropertiesEditComponent {
   }> = [];
   editedItems: any[] = [];
   userId: any;
-  selectedRowId: number | null = null; // Store the selected row ID
+  selectedRowId: any; // Store the selected row ID
   selectedItemId: number | null = null;
   storeId: any;
   selectedRowIds: number[] = [];
@@ -102,7 +102,7 @@ export class ItemStorePropertiesEditComponent {
   selectedItems: any;
   isSaved: boolean = false;
   AllowCommitWithSave: any;
-  isVerified: boolean;
+  isVerified: boolean = false;
   selected_Company_id: any;
 
   constructor(
@@ -145,9 +145,9 @@ export class ItemStorePropertiesEditComponent {
           this.worksheetData.worksheet_item_store?.[0]?.STORE_ID;
 
         this.selectedItems = this.worksheetData.worksheet_item_property.filter(
-          (item) => item.Selected === true,
+          (item: any) => item.Selected === true,
         );
-        this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
+        this.selectedRowKeys = this.selectedItems.map((item: any) => item.ID);
         this.cdr.detectChanges();
       } else {
         // this.listStoreItemProperty();
@@ -156,7 +156,9 @@ export class ItemStorePropertiesEditComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -194,7 +196,7 @@ export class ItemStorePropertiesEditComponent {
         });
         this.dataGrid.instance.refresh();
       },
-      (error) => {
+      (error: any) => {
         console.error('Error fetching items:', error);
       },
     );
@@ -202,13 +204,13 @@ export class ItemStorePropertiesEditComponent {
 
   onSelectionChanged(event: any) {
     this.selectedRowCount = event.selectedRowKeys.length;
-    this.selectedRowIds = event.selectedRowKeys;
+    // this.selectedRowIds = event.selectedRowKeys;
     this.selectedRowKeys = this.selectedRowIds;
-    const selectedItems = event.selectedRowsData;
-    if (selectedItems.length > 0) {
-      const selectedRow = selectedItems[0]; // Get the first selected row
-      this.selectedRowId = selectedRow.ID; // Capture the row ID
-      this.selectedItemId = selectedRow.ID;
+    const currentSelectedRowKeys = event.currentSelectedRowKeys;
+    if (currentSelectedRowKeys.length > 0) {
+      const selectedRow = currentSelectedRowKeys; // Get the first selected row
+      this.selectedRowId = selectedRow.ITEM_ID; // Capture the row ID
+      this.selectedItemId = selectedRow.ITEM_ID;
       this.inactiveoldValue =
         this.oldValues[this.selectedRowId]?.['IS_INACTIVE_NEW'];
       this.NotDiscounteoldValue =
@@ -229,7 +231,7 @@ export class ItemStorePropertiesEditComponent {
   fetchSelectedItem(id: number): void {
     this.dataservice.selectItems(id).subscribe(
       (response: any) => {
-        const item = this.itemStoresList.find((i) => i.ID === id);
+        const item = this.itemStoresList.find((i: any) => i.ID === id);
         if (item) {
           item.item_stores = response.item_stores || [];
           if (item.item_stores.length > 0) {
@@ -298,7 +300,7 @@ export class ItemStorePropertiesEditComponent {
   }
 
   extractChangedProperties() {
-    this.worksheetData.worksheet_item_property.forEach((item) => {
+    this.worksheetData.worksheet_item_property.forEach((item: any) => {
       if (item.Selected) {
         if (item.IS_INACTIVE !== item.IS_INACTIVE_NEW) {
           this.addProperty('Inactive', item.IS_INACTIVE_NEW);
@@ -407,7 +409,7 @@ export class ItemStorePropertiesEditComponent {
 
     this.selectedRowKeys.forEach((selectedId: number) => {
       let worksheetItem = editedItem.worksheet_item_property.find(
-        (prop) => prop.ITEM_ID === selectedId,
+        (prop: any) => prop.ITEM_ID === selectedId,
       );
 
       if (!worksheetItem) {

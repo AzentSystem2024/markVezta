@@ -36,14 +36,19 @@
         <dxi-item location="before">
           <div class="grid-header">Store Properties Log</div>
         </dxi-item>
-        <dxi-item location="after">
-          <dx-button
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        >
+          <!-- <dx-button
             text="Add"
             icon="plus"
             type="default"
             stylingMode="contained"
             (click)="onAddClick()"
-          ></dx-button>
+          ></dx-button> -->
         </dxi-item>
       </dxo-toolbar>
 

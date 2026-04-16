@@ -77,7 +77,7 @@ export class ItemStorePropertiesComponent {
   editedItems: any[] = [];
   userId: any;
   AllowCommitWithSave: any;
-  selectedRowId: number | null = null; // Store the selected row ID
+  selectedRowId: any; // Store the selected row ID
   selectedItemId: number | null = null;
   storeId: any;
   selectedRowIds: number[] = [];
@@ -134,11 +134,15 @@ export class ItemStorePropertiesComponent {
   listStoreItemProperty() {
     this.dataservice.getStoreItemPropertyList().subscribe((response) => {
       this.itemStoresList = response.data;
+      console.log(
+        this.itemStoresList,
+        '================item store list===================',
+      );
 
       // Find items with matching ITEM_IDs from selectedItems
-      const matchingItems = this.itemStoresList.filter((itemStore) => {
+      const matchingItems = this.itemStoresList.filter((itemStore: any) => {
         return this.selectedItems.some(
-          (selectedItem) => selectedItem.ITEM_ID === itemStore.ITEM_ID,
+          (selectedItem: any) => selectedItem.ITEM_ID === itemStore.ITEM_ID,
         );
       });
 
@@ -147,7 +151,9 @@ export class ItemStorePropertiesComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -160,6 +166,10 @@ export class ItemStorePropertiesComponent {
     });
   }
   onEditorPreparing = (e: any) => {
+    console.log(
+      e,
+      '=================editor preparing event===================',
+    );
     if (
       e.parentType === 'dataRow' &&
       e.dataField &&
@@ -174,41 +184,46 @@ export class ItemStorePropertiesComponent {
     }
   };
 
-  listItems() {
-    const payload = {};
-    this.dataservice.getItemsData().subscribe(
-      (items: any) => {
-        this.items = items;
-        this.itemStoresList = items.data;
-        this.itemStoresList.forEach((item: any) => {
-          this.fetchSelectedItem(item.ID);
-        });
-        this.dataGrid.instance.refresh();
-      },
-      (error) => {
-        console.error('Error fetching items:', error);
-      },
-    );
-  }
+  // listItems() {
+  //   const payload = {};
+  //   this.dataservice.getItemsData().subscribe(
+  //     (items: any) => {
+  //       this.items = items;
+  //       this.itemStoresList = items.data;
+  //       this.itemStoresList.forEach((item: any) => {
+  //         this.fetchSelectedItem(item.ID);
+  //       });
+  //       this.dataGrid.instance.refresh();
+  //     },
+  //     (error: any) => {
+  //       console.error('Error fetching items:', error);
+  //     },
+  //   );
+  // }
 
   onSelectionChanged(event: any) {
     this.selectedRowCount = event.selectedRowKeys.length;
     this.selectedRowKeys = event.selectedRowKeys;
-    const selectedItems = event.selectedRowsData;
+    console.log(event, '=============event====================');
+    const selectedItems = event.currentSelectedRowKeys;
     if (selectedItems.length > 0) {
       const selectedRow = selectedItems[0];
-      this.selectedRowId = selectedRow.ID;
-      this.selectedItemId = selectedRow.ITEM_ID;
-      this.inactiveoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_INACTIVE_NEW'];
-      this.NotDiscounteoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_NOT_DISCOUNTABLE_NEW'];
-      this.NotSaleoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_ITEM_NEW'];
-      this.NotSaleReturnoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_RETURN_NEW'];
-      this.NotPriceoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_PRICE_REQUIRED_NEW'];
+      this.selectedRowId = selectedRow.ITEM_ID;
+      console.log(
+        this.selectedRowId,
+        '=============selected row id=====================',
+      );
+      // this.selectedItemId = selectedRow.ITEM_ID;
+      // this.inactiveoldValue =
+      //   this.oldValues[this.selectedRowId]?.['IS_INACTIVE_NEW'];
+      // this.NotDiscounteoldValue =
+      //   this.oldValues[this.selectedRowId]?.['IS_NOT_DISCOUNTABLE_NEW'];
+      // this.NotSaleoldValue =
+      //   this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_ITEM_NEW'];
+      // this.NotSaleReturnoldValue =
+      //   this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_RETURN_NEW'];
+      // this.NotPriceoldValue =
+      //   this.oldValues[this.selectedRowId]?.['IS_PRICE_REQUIRED_NEW'];
       this.fetchSelectedItem(this.selectedRowId);
     } else {
       this.selectedRowId = null;
@@ -219,33 +234,33 @@ export class ItemStorePropertiesComponent {
   fetchSelectedItem(id: number): void {
     this.dataservice.selectItems(id).subscribe(
       (response: any) => {
-        const item = this.itemStoresList.find((i) => i.ID === id);
+        const item = this.itemStoresList.find((i: any) => i.ID === id);
         if (item) {
           item.item_stores = response.item_stores || [];
-          if (item.item_stores.length > 0) {
-            item.IS_NOT_SALE_ITEM = this.aggregateProperty(
-              item.item_stores,
-              'IS_NOT_SALE_ITEM',
-            );
-            item.IS_NOT_SALE_RETURN = this.aggregateProperty(
-              item.item_stores,
-              'IS_NOT_SALE_RETURN',
-            );
-            item.IS_PRICE_REQUIRED = this.aggregateProperty(
-              item.item_stores,
-              'IS_PRICE_REQUIRED',
-            );
-            item.IS_NOT_DISCOUNTABLE = this.aggregateProperty(
-              item.item_stores,
-              'IS_NOT_DISCOUNTABLE',
-            );
-            item.IS_INACTIVE = this.aggregateProperty(
-              item.item_stores,
-              'IS_INACTIVE',
-            );
-          } else {
-            item.STORE_NAME = 'No Store';
-          }
+          // if (item.item_stores.length > 0) {
+          //   item.IS_NOT_SALE_ITEM = this.aggregateProperty(
+          //     item.item_stores,
+          //     'IS_NOT_SALE_ITEM',
+          //   );
+          //   item.IS_NOT_SALE_RETURN = this.aggregateProperty(
+          //     item.item_stores,
+          //     'IS_NOT_SALE_RETURN',
+          //   );
+          //   item.IS_PRICE_REQUIRED = this.aggregateProperty(
+          //     item.item_stores,
+          //     'IS_PRICE_REQUIRED',
+          //   );
+          //   item.IS_NOT_DISCOUNTABLE = this.aggregateProperty(
+          //     item.item_stores,
+          //     'IS_NOT_DISCOUNTABLE',
+          //   );
+          //   item.IS_INACTIVE = this.aggregateProperty(
+          //     item.item_stores,
+          //     'IS_INACTIVE',
+          //   );
+          // } else {
+          //   item.STORE_NAME = 'No Store';
+          // }
           this.filteredRowCount = this.itemStoresList.length;
           // Check if worksheetData exists and match the item ID
           //
@@ -297,8 +312,9 @@ export class ItemStorePropertiesComponent {
       editedItem = {
         COMPANY_ID: 1,
         USER_ID: 1,
-        STORE_ID: this.selectedStoreId,
+        STORE_ID: this.selectedStoreId.toString(),
         NARRATION: '',
+        WS_DATE: new Date(),
         worksheet_item_property: [], // Initialize as an empty array
       };
       this.editedItems.push(editedItem);
@@ -308,19 +324,27 @@ export class ItemStorePropertiesComponent {
     this.selectedRowKeys.forEach((selectedItem: any) => {
       const selectedId = selectedItem.ID;
       let worksheetItem = editedItem.worksheet_item_property.find(
-        (prop) => prop.ID === selectedId,
+        (prop: any) => prop.ID === selectedId,
       );
 
       if (!worksheetItem) {
         // If no worksheetItem exists, initialize it with the current values (old values)
         worksheetItem = {
-          ITEM_ID: selectedId,
+          ID: 0,
+          ITEM_ID: rowData.ITEM_ID, // Use the ITEM_ID from rowData
           IS_PRICE_REQUIRED: rowData.IS_PRICE_REQUIRED ?? false, // Old value
           IS_NOT_DISCOUNTABLE: rowData.IS_NOT_DISCOUNTABLE ?? false, // Old value
           IS_NOT_SALE_ITEM: rowData.IS_NOT_SALE_ITEM ?? false, // Old value
           IS_NOT_SALE_RETURN: rowData.IS_NOT_SALE_RETURN ?? false, // Old value
           IS_INACTIVE: rowData.IS_INACTIVE ?? false, // Old value
-
+          BARCODE: rowData.BARCODE, // Include other necessary fields from rowData
+          DESCRIPTION: rowData.DESCRIPTION,
+          DEPT_NAME: rowData.DEPT_NAME,
+          CAT_NAME: rowData.CAT_NAME,
+          BRAND_NAME: rowData.BRAND_NAME,
+          Selected: true,
+          STORE_ID: rowData.STORE_ID,
+          STORE_NAME: rowData.STORE_NAME,
           // Initialize new values as null, to be set when the checkbox changes
           IS_PRICE_REQUIRED_NEW: null,
           IS_NOT_DISCOUNTABLE_NEW: null,
@@ -366,8 +390,10 @@ export class ItemStorePropertiesComponent {
   }
 
   saveChanges() {
+    console.log(this.dataGrid);
     if (this.editedItems.length > 0) {
       const payload = this.editedItems;
+      console.log(payload);
       this.dataservice.saveWorksheetItemPropertyData(payload[0]).subscribe(
         (response: any) => {
           this.savedWorksheet = response;
@@ -382,6 +408,7 @@ export class ItemStorePropertiesComponent {
               'success',
             );
             // this.dataGrid.instance.refresh();
+            this.router.navigate(['/item-store-properties-log']);
           } else {
             notify(
               {
@@ -416,6 +443,7 @@ export class ItemStorePropertiesComponent {
       USER_ID: this.savedWorksheet.USER_ID,
       STORE_ID: this.savedWorksheet.STORE_ID,
       worksheet_item_property: this.editedItems.map((item) => ({
+        ID: 0,
         ITEM_ID: item.ITEM_ID, // Ensure to use the right fields
         IS_PRICE_REQUIRED: item.IS_PRICE_REQUIRED,
         IS_PRICE_REQUIRED_NEW: item.IS_PRICE_REQUIRED_NEW,
@@ -470,6 +498,7 @@ export class ItemStorePropertiesComponent {
       USER_ID: this.savedWorksheet.USER_ID,
       STORE_ID: this.savedWorksheet.STORE_ID,
       worksheet_item_property: this.editedItems.map((item) => ({
+        ID: 0,
         ITEM_ID: item.ITEM_ID, // Ensure to use the right fields
         IS_PRICE_REQUIRED: item.IS_PRICE_REQUIRED,
         IS_PRICE_REQUIRED_NEW: item.IS_PRICE_REQUIRED_NEW,
@@ -537,33 +566,34 @@ export class ItemStorePropertiesComponent {
         (store: any) => store.ID === storeId,
       );
       if (this.filteredStores.length > 0) {
-        this.listItemsByStoreId(storeId);
+        // this.listItemsByStoreId(storeId);
       }
     });
   }
 
-  listItemsByStoreId(storeId: number) {
-    if (storeId == 1) {
-      const payload = {};
-      this.dataservice.getItemsData().subscribe((response: any) => {
-        this.items = response;
-        this.itemStoresList = response.data;
-        this.dataGrid.instance.refresh();
-        this.itemStoresList.forEach((item: any) => {
-          this.fetchSelectedItem(item.ID);
-        });
-      });
-    } else {
-      this.dataservice.getItemsByStoreId(storeId).subscribe((response: any) => {
-        this.items = response;
-        this.itemStoresList = response.data;
-        this.dataGrid.instance.refresh();
-        this.itemStoresList.forEach((item: any) => {
-          this.fetchSelectedItem(item.ID);
-        });
-      });
-    }
-  }
+  // listItemsByStoreId(storeId: number) {
+  //   if (storeId == 1) {
+  //     const payload = {};
+  //     this.dataservice.getItemsData().subscribe((response: any) => {
+  //       this.items = response;
+  //       this.itemStoresList = response.data;
+  //       this.dataGrid.instance.refresh();
+  //       this.itemStoresList.forEach((item: any) => {
+  //         this.fetchSelectedItem(item.ID);
+  //       });
+  //     });
+  //   } else {
+  //     this.dataservice.getItemsByStoreId(storeId).subscribe((response: any) => {
+  //       this.items = response;
+  //       this.itemStoresList = response.data;
+  //       console.log(this.itemStoresList);
+  //       this.dataGrid.instance.refresh();
+  //       this.itemStoresList.forEach((item: any) => {
+  //         this.fetchSelectedItem(item.ID);
+  //       });
+  //     });
+  //   }
+  // }
 
   onCancel() {
     this.router.navigate(['/item-store-properties-log']);
